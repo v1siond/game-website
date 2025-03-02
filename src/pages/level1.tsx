@@ -10,8 +10,17 @@ const Level1 = ({}: LevelProps) => {
 
   const ref = useRef<HTMLCanvasElement>(null)
 
-  const loadLevel1 = useCallback(() => {
+  const loadLevel1 = useCallback(async () => {
     if (ref?.current) loadCanvasLevel(ref.current)
+    const playAudio = () => {
+      let audio = new Audio('/music/level1.mp3');
+      audio.onended = () => {
+        audio.play();
+      };
+      audio.play();
+    };
+
+    document.addEventListener('click', playAudio, { once: true });
   }, [ref?.current])
 
   useEffect(() => {
