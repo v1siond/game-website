@@ -20,8 +20,8 @@ const Level1 = ({}: LevelProps) => {
 
 
   return (
-    <main className="grid grid-rows-1 grid-cols-1 h-full w-full">
-      <canvas className="w-full h-full min-h-full min-w-full" id="level1" ref={ref}></canvas>
+    <main className="grid grid-rows-1 grid-cols-1">
+      <canvas className="w-max h-max min-h-full min-w-full" id="level1" ref={ref}></canvas>
     </main>
   )
 }

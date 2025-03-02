@@ -5,11 +5,52 @@ const canvasObject: CanvasObject = {
   canvasElement: undefined
 }
 
+const spriteStop = `
+ @
+/|\\
+/ \\
+`;
+
+
+const spriteWalkingRight = `
+ @
+ |\\
+/ >
+`;
+
+const spriteWalkingRight2 = `
+ @
+/|
+> \\
+`;
+
+
+const spriteWalkingLeft = `
+ @
+/|
+< \\
+`;
+
+const spriteWalkingLeft2 = `
+ @
+ |\\
+/ <
+`;
+
+
+const spriteWalJump = `
+\\ @ /
+  |
+ < >
+`;
+
+let currentSprite = spriteStop
+
 const properties = {
-  height: 100,
-  width: 100,
-  movementSpeed: 12,
-  jumpHeight: 18,
+  height: 50,
+  width: 50,
+  movementSpeed: 10,
+  jumpHeight: 15,
   canJump: true,
   gravity: {
     coeficient: 1,
@@ -17,8 +58,8 @@ const properties = {
     y: 0
   },
   position: {
-    x: 100,
-    y: 100
+    x: 50,
+    y: 50
   }
 }
 
@@ -35,7 +76,7 @@ export const updatePlayerPosition = () => {
                               0 :
                               properties.gravity.x
   properties.position.y += properties.gravity.y
-  playerPosition.bottom = properties.position.y + properties.height
+  playerPosition.bottom = properties.position.y + (properties.height * 1.5)
   properties.gravity.y = height >= (playerPosition.bottom + properties.gravity.y) ? properties.gravity.y + properties.gravity.coeficient : 0
   properties.canJump = height <= (playerPosition.bottom + properties.gravity.y)
   return properties.position.y
@@ -44,9 +85,26 @@ export const updatePlayerPosition = () => {
 export const animatePlayer = () => {
   if (!canvasObject.canvas || !canvasObject.canvasElement) return;
   canvasObject.canvas.fillStyle = 'blue'
-  canvasObject.canvas.fillRect(properties.position.x, properties.position.y, properties.width, properties.height)
+  drawPlayer(currentSprite || spriteStop, 1)
 }
 
+const drawPlayer = (sprite: string, scale: number) => {
+  if (!canvasObject?.canvas || !canvasObject.canvasElement) return;
+  let lines = sprite.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    for (let j = 0; j < line.length; j++) {
+      let char = line[j];
+      canvasObject.canvas.fillStyle = 'white';
+      canvasObject.canvas.font = `${20 * scale}px monospace`;
+      canvasObject.canvas.fillText(
+        char,
+        properties.position.x + j * 10 * scale,
+        properties.position.y + (i * 5) * 5 * scale
+      );
+    }
+  }
+}
 
 export const draw = (canvasObj: any) => {
   if (!canvasObj) return;
@@ -58,16 +116,21 @@ export const draw = (canvasObj: any) => {
 export const handleMovement = (config: any) => {
   properties.gravity.x = 0
   if (config.keys.ArrowRight.pressed) {
+    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingRight ? spriteWalkingRight2 : spriteWalkingRight) : spriteWalJump
     return properties.gravity.x = properties.movementSpeed
-  } else if (config.keys.ArrowLeft.pressed) {
+  }
+  if (config.keys.ArrowLeft.pressed) {
+    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingLeft ? spriteWalkingLeft2 : spriteWalkingLeft) : spriteWalJump
     return properties.gravity.x = -properties.movementSpeed
   }
+  currentSprite = spriteStop
 }
 
-export const jump = (off = false) => {
+export const jump = () => {
   const height = (canvasObject.canvasElement?.height || 0)
   if (!properties.canJump) return;
   if (properties.gravity.y == 0 && height <= playerPosition.bottom) {
+    currentSprite = spriteWalJump
     properties.canJump = false
     return properties.gravity.y = -properties.jumpHeight
   }

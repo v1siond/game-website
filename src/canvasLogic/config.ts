@@ -1,6 +1,6 @@
 const config = {
-  width: 21, // 1344
-  height: 10, // 640
+  width: 30, // 1920px
+  height: 15.585, // 997.44px
   cellSize: 64,
   keys: {
     ArrowRight: {
