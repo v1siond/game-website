@@ -5,8 +5,8 @@ import { setupEventListeners } from './eventListeners'
 
 
 const player = Player
-const heightCoeficient = 18
-const widthCoeficient = 8
+const heightCoeficient = 25
+const widthCoeficient = 15
 
 const canvasObject: CanvasObject = {
   canvas: undefined,
@@ -43,41 +43,50 @@ const drawTemple = (scale: number) => {
     `                                           |`,
     `                                           :`,
     `                                        ._/_\\_.`,
-    `                                         |   |   `,
+    `                                         |___|   `,
     `                                         | n |`,
-    `                                         |   |`,
+    `                                         |___|`,
     `                                       ._/_,_\\_.`,
     `                                       -.|   |.- `,
     `                                         |.n.|`,
-    `                                         |   |`,
+    `                                         |___|`,
     `                                      ._/_,_,_\\_.`,
     `                                      ,-|     |-,`,
     `                                        |..n..|`,
-    `                                        |     |`,
+    `                                        |_____|`,
     `                                     ._/_,_,_,_\\_.`,
     `                                     ,-|       |-,`,
     `                                       |...n...|`,
-    `                                       |       |`,
+    `                                       |_______|`,
     `                                    ._/_,_,_,_,_\\_.`,
     `                                      |         | `,
     `                                      |....n....|`,
-    `                                      |         |`,
+    `                                      |_________|`,
     `                                   ._/_,_,_,_,_,_\\_.`,
     `                                     |           |`,
     `                                     |.....n.....|`,
-    `                                     |           |  `,
+    `                                     |___________|  `,
     `                                  ._/_,_,_,_,_,_,_\\_. `,
     `          \`,  '.  \`.  ".  \`,  '.  |       ---       |  ",  \`.  \`,  \`.  \`,  ',`,
     `                                  |    n   _   n    |`,
     `                            ^     |      | . |      |     ^`,
     `     :,.:;..;;..;;.,:;,.:,o_^_____|______|_._|______|_____^_o;,.:;.,;;,,:;,.:;,;;:`,
-    `     ..o..o..o..o..o..o.o..o...   //_______________\\\\  ..o..o..o..o..o..o.o..o...`,
-    `                                 //=================\\\\\\`,
-    `     ][  ][  ][  ][  |_|______  ///__________________\\\\\\  _______|_|  ][  ][  ][  ][`,
-    `    /                |         ///====================\\\\\\\\         |                \\`,
-    `   /                 |        ///______________________\\\\\\\\        |                 \\`,
-    `  /__________________|___    ////=======================\\\\\\\\\\   ___|__________________\\`,
-    `                           /////_________________________\\\\\\\\\\\\`
+    `     ..o..o..o..o..o..o.o..o...   //===============\\\\  ..o..o..o..o..o..o.o..o...`,
+    `                                 ||_________________||`,
+    `                                //___________________\\\\`,
+    `                               ||_____________________||`,
+    `    ][  ][  ][  ][  |__|____  //_______________________\\\\\\  ______|__|  ][  ][  ][  ][`,
+    `                    |        |||_________________________|||         |`,
+    `   /                |       ///___________________________\\\\\\\        |                \\`,
+    `                    |      |||_____________________________|||       |`,
+    `  /                 |     ///_______________________________\\\\\\      |                 \\`,
+    `                    |   ||||_________________________________||||    |`,
+    ` /__________________|__////___________________________________\\\\\\\\\\__|__________________\\`,
+    `                     ||||_______________________________________|||||`,
+    `                   /////=========================================\\\\\\\\\\\\`,
+    ``,
+    ``,
+    `_____________________________________________________________________________________________`
   ]
 
 
@@ -99,7 +108,7 @@ export const animateLevel = () => {
   // Setup background
   canvasObject.canvas.fillStyle = 'black'
   canvasObject.canvas.fillRect(0, 0, canvasObject.canvasElement.width, canvasObject.canvasElement.height)
-  drawTemple(4)
+  drawTemple(2)
   // Load Player
   player.handleMovement(config)
   player.draw(canvasObject)
@@ -122,20 +131,19 @@ export const loadCanvasLevel = (canvasElement: HTMLCanvasElement) => {
 }
 
 const fillCanvas = (lines: string[], scale: number) => {
-  const repeat = Math.round(scale / 2)
   if (!canvasObject?.canvas || !canvasObject.canvasElement) return
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
     let scaledLine = '';
     for (let j = 0; j < line.length; j++) {
-        scaledLine += line[j].repeat(2);
+      scaledLine += line[j].repeat(scale);
     }
     for (let k = 0; k < scaledLine.length; k++) {
-      for (let j = 0; j < scale; j++) {
-      let char = scaledLine[k];
+      for (let j = 0; j < 4; j++) {
+        let char = scaledLine[k];
         canvasObject.canvas.fillStyle = colorMap[char] || 'blue';
         canvasObject.canvas.font = `${widthCoeficient * scale}px monospace`;
-        canvasObject.canvas.fillText(char, k * (widthCoeficient + scale), heightCoeficient * i * scale + 10 * j);
+        canvasObject.canvas.fillText(char, k * (widthCoeficient + scale), heightCoeficient * i * scale + 10 * (j * 0.25));
       }
     }
   }

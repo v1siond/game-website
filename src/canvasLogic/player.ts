@@ -76,7 +76,7 @@ export const updatePlayerPosition = () => {
                               0 :
                               properties.gravity.x
   properties.position.y += properties.gravity.y
-  playerPosition.bottom = properties.position.y + (properties.height * 1.5)
+  playerPosition.bottom = properties.position.y + (properties.height * 2.5)
   properties.gravity.y = height >= (playerPosition.bottom + properties.gravity.y) ? properties.gravity.y + properties.gravity.coeficient : 0
   properties.canJump = height <= (playerPosition.bottom + properties.gravity.y)
   return properties.position.y
@@ -96,7 +96,7 @@ const drawPlayer = (sprite: string, scale: number) => {
     for (let j = 0; j < line.length; j++) {
       let char = line[j];
       canvasObject.canvas.fillStyle = 'white';
-      canvasObject.canvas.font = `${20 * scale}px monospace`;
+      canvasObject.canvas.font = `${25 * scale}px monospace`;
       canvasObject.canvas.fillText(
         char,
         properties.position.x + j * 10 * scale,
