@@ -7,40 +7,40 @@ const canvasObject: CanvasObject = {
 
 const spriteStop = `
  @
-/|\\
+/#\\
 / \\
 `;
 
 
 const spriteWalkingRight = `
  @
- |\\
+/#-
 / >
 `;
 
 const spriteWalkingRight2 = `
  @
-/|
+-#\\
 > \\
 `;
 
 
 const spriteWalkingLeft = `
  @
-/|
+/#-
 < \\
 `;
 
 const spriteWalkingLeft2 = `
  @
- |\\
+-#\\
 / <
 `;
 
 
-const spriteWalJump = `
+const spriteJump = `
 \\ @ /
-  |
+  #
  < >
 `;
 
@@ -116,21 +116,21 @@ export const draw = (canvasObj: any) => {
 export const handleMovement = (config: any) => {
   properties.gravity.x = 0
   if (config.keys.ArrowRight.pressed) {
-    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingRight ? spriteWalkingRight2 : spriteWalkingRight) : spriteWalJump
+    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingRight ? spriteWalkingRight2 : spriteWalkingRight) : spriteJump
     return properties.gravity.x = properties.movementSpeed
   }
   if (config.keys.ArrowLeft.pressed) {
-    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingLeft ? spriteWalkingLeft2 : spriteWalkingLeft) : spriteWalJump
+    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingLeft ? spriteWalkingLeft2 : spriteWalkingLeft) : spriteJump
     return properties.gravity.x = -properties.movementSpeed
   }
-  currentSprite = spriteStop
+  currentSprite = properties.gravity.y == 0 ? spriteStop : spriteJump
 }
 
 export const jump = () => {
   const height = (canvasObject.canvasElement?.height || 0)
   if (!properties.canJump) return;
   if (properties.gravity.y == 0 && height <= playerPosition.bottom) {
-    currentSprite = spriteWalJump
+    currentSprite = spriteJump
     properties.canJump = false
     return properties.gravity.y = -properties.jumpHeight
   }
