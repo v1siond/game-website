@@ -5,6 +5,16 @@ const canvasObject: CanvasObject = {
   canvasElement: undefined
 }
 
+const colorMap: any = {
+  '@': 'rgba(243, 191, 54, 1)',
+  '#': 'rgb(134, 91, 61)',
+  '/': 'rgba(255, 0, 0, 1)',
+  '\\': 'rgba(255, 0, 0, .75)',
+  '>': 'rgba(255, 255, 255, .75)',
+  '<': 'rgba(255, 255, 255, .75)',
+  '-': 'rgba(255, 255, 255, .75)'
+}
+
 const spriteStop = `
  @
 /#\\
@@ -47,19 +57,19 @@ const spriteJump = `
 let currentSprite = spriteStop
 
 const properties = {
-  height: 50,
-  width: 50,
-  movementSpeed: 10,
-  jumpHeight: 15,
+  height: 30,
+  width: 30,
+  movementSpeed: 15,
+  jumpHeight: 18,
   canJump: true,
   gravity: {
-    coeficient: 1,
+    coeficient: 2,
     x: 0,
     y: 0
   },
   position: {
-    x: 50,
-    y: 50
+    x: 30,
+    y: 30
   }
 }
 
@@ -76,7 +86,7 @@ export const updatePlayerPosition = () => {
                               0 :
                               properties.gravity.x
   properties.position.y += properties.gravity.y
-  playerPosition.bottom = properties.position.y + (properties.height * 2.5)
+  playerPosition.bottom = properties.position.y + (properties.height * 7.5)
   properties.gravity.y = height >= (playerPosition.bottom + properties.gravity.y) ? properties.gravity.y + properties.gravity.coeficient : 0
   properties.canJump = height <= (playerPosition.bottom + properties.gravity.y)
   return properties.position.y
@@ -95,12 +105,12 @@ const drawPlayer = (sprite: string, scale: number) => {
     let line = lines[i];
     for (let j = 0; j < line.length; j++) {
       let char = line[j];
-      canvasObject.canvas.fillStyle = 'white';
-      canvasObject.canvas.font = `${25 * scale}px monospace`;
+      canvasObject.canvas.fillStyle = colorMap[char] || 'white';
+      canvasObject.canvas.font = `bold ${20 * scale}px Silkscreen`;
       canvasObject.canvas.fillText(
         char,
-        properties.position.x + j * 10 * scale,
-        properties.position.y + (i * 5) * 5 * scale
+        properties.position.x + j * 15 * scale,
+        properties.position.y + (i * 4) * 5 * scale
       );
     }
   }
