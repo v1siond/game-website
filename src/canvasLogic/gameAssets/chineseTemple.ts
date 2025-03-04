@@ -37,16 +37,19 @@ import GameAsset from "@/interfaces/GameAsset"
 const fillColorMap: any = {
   '\\': 'rgba(255, 99, 71, .25)', // lightgray
   '/': 'rgba(255, 99, 71, .25', // lightgray
-  '|': 'rgba(255, 0, 0, .2)',
-  '=': 'gray',
+  '|': 'rgba(243, 191, 54, .75)', // tomato
+  '=': 'rgba(67, 50, 24, 0.85)',
   '0': 'rgba(243, 191, 54, .3)',
-  'W': 'rgba(219, 136, 54, .3)',
+  'W': 'rgba(110, 71, 32, 0.81)',
   'Y': 'rgba(219, 136, 54, .6)',
   'y': 'rgba(219, 136, 54, .3)',
   'x': 'rgba(255, 0, 0, .4)',
   'X': 'rgba(255, 0, 0, .4)',
   ';': 'rgba(0, 158, 0, .25)', // green
   ',': 'rgba(0, 100, 0, .25)', // darkgreen
+  'n': 'gray',
+  '-': 'lightgray',
+  '_': 'black'
 }
 
 const colorMap: any = {
@@ -54,7 +57,7 @@ const colorMap: any = {
   '.': 'rgba(144, 300, 180, .6)', // lightgreen
   '~': 'rgba(211, 211, 211, 1)', // lightgray
   '\\': 'rgba(255, 99, 71, .7)', // lightgray
-  '/': 'rgba(255, 99, 71, 1)', // lightgray
+  '/': 'rgba(255, 0, 0, 1)', // lightgray
   'n': 'rgba(255, 0, 0, 1)', // red
   '_': 'rgba(128, 128, 128, 1)', // gray
   '-': 'rgba(255, 255, 255, 1)', // white
@@ -63,7 +66,7 @@ const colorMap: any = {
   ',': 'rgba(0, 100, 0, 1)', // darkgreen
   '`': 'rgba(255, 255, 255, 1)', // white
   ']': 'rgba(0, 128, 0, 1)', // green
-  '|': 'rgba(243, 191, 54, .3)', // tomato
+  '|': 'rgb(30, 27, 20)', // tomato
   '0': 'rgba(219, 136, 54, .6)',
   'W': 'rgba(243, 191, 54, 1)',
   'w': 'rgba(243, 191, 54, 1)',
@@ -92,7 +95,7 @@ const colorByTile = (rowIndex: number, columnIndex: number) => {
   const difference = rowIndex >= minRow && rowIndex <= maxRow ? maxRow - rowIndex : -1
 
   if ((rowIndex >= minRow && rowIndex <= 65) && (columnIndex >= (minColumn + difference) && columnIndex <= (maxColumn - difference)))
-    return 'rgba(67, 50, 24, 0.85)'
+    return 'rgba(73, 48, 13, 0.85)'
   return 'rgb(34, 31, 67)'
 }
 
@@ -108,7 +111,7 @@ const getTemplateMap = () => {
         columnNumber: columnIndex,
         animation: shouldAnimate(char) ? {
           name: "move",
-          interval: 1500,
+          interval: 15,
           value: char,
           color: colorMap[char] || colorByTile(rowIndex, columnIndex)
         } : null
@@ -124,7 +127,7 @@ const shouldBlock = (char: string) => {
 }
 
 const shouldAnimate = (char: string) => {
-  return ['(', ')', '&', '@'].includes(char)
+  return ['(', ')', '&', '@', '/', '\\'].includes(char)
 }
 
 const template = [
@@ -180,20 +183,25 @@ const template = [
   `                 |                               ||  n   |   |  n   ||                                               |                           `,
   `                |                          ^     ||      | * |      ||    ^                                           |                          `,
   `               |  o;::,:,.:;:,..;.,:;,.,,o_^_____||______|___|______||____^_o;.:;.,;;,;;:,.:;,|,:;,.:;,:;,.:;,;;:,.:   |                         `,
-  `              | /\\                      /\\       || //   .....  \\\\  ||      /\\                      /\\                  |                  `,
-  `             | //\\\\  .o.o..o...        //\\\\  ....//_________________\\\\.... //\\\\   ...o..o..o..     //\\\\  ...o..o..o..    |             `,
-  `            | ///\\\\\\                  ///\\\\\\     ||=================||    ///\\\\\\                  ///\\\\\\                  |          `,
-  `           |    W0   ..o..o..o..o..o.   w0....  //                  \\\\ .o.o W0   o..o..o.o..o..     w0                 "   |                   `,
-  `          |     0W                      0W      ||===================||     0W                      0W                      |                    `,
-  `         |  [   0W [[]][]][]][]][][][]  w0____ //                    \\\\ ____0W ][]][]][]][]][]][]   w0 ][][]                 |                 `,
-  `        |       W0            ,         0W    |||=====================|||   W0         ,            0W               .        |                  `,
-  `       |  []    W0  .                   w0   ///                      \\\\\\\   W0                      w0                         |             `,
-  `      |         0W       .              0W   |||=======================|||  0W   .            .     0W       ,              ^   |                `,
-  `     |  ;  ;    0W ;               ,    w0  ///                        \\\\\\\  0W        ;             w0                  ;        |           `,
-  `     YyYyYyYyYyYW0YyYyYyYyYyYyYyYyYyYyYy0W  |||=========================||| W0YyYyYyYyYyYyYyYyYyYyYy0WYyYyYyYyYyYyYyYyYyYyYyYyYyY|               `,
-  `     YyYyYyYyYyY0WYyYyYyYyYyYyYyYyYyYyYyw0 ////                         \\\\\\\ W0YyYyYyYyYyYyYyYyYyYyYyw0YyYyYyYyYyYyYyYyYyYyYyYyYyY|           `,
-  `     YyYyYyYyYyYW0YyYyYyYyYyYyYyYyYyYyYy0W||||===========================|||0WYyYyYyYyYyYyYyYyYyYyYy0WYyYyYyYyYyYyYyYyYyYyYyYyYyY|               `,
-  `     YyYyYyYyYyY0WYyYyYyYyYyYyYyYyYyYyYyW0////                           \\\\\\0WYyYyYyYyYyYyYyYyYyYyYyW0YyYyYyYyYyYyYyYyYyYyYyYyYyY|            `,
+  `              | /\\                      /\\           ||   ..... ||          /\\                      /\\                  |                  `,
+  `             | //\\\\  .o.o..o...        //\\\\ ....  __________________  .... //\\\\   ...o..o..o..     //\\\\  ...o..o..o..    |             `,
+  `            | ///\\\\\\                  ///\\\\\\      __________________      ///\\\\\\                  ///\\\\\\                  |          `,
+  `           |    W0   ..o..o..o..o..o.   w0....                        .o.o  W0   o..o..o.o..o..     w0                 "   |                   `,
+  `          |     0W                      0W       //==== ===== =====\\\\       0W                      0W                      |                    `,
+  `         |  [   0W [[]][]][]][]][][][]  w0____  //                  \\\\ ____ 0W ][]][]][]][]][]][]   w0 ][][]                 |                 `,
+  `        |       W0            ,         0W     //==== == ====== ==== \\\\     W0         ,            0W               .        |                  `,
+  `       |  []    W0  .                   w0    //                      \\\\\    W0                      w0                         |             `,
+  `      |         0W       .              0W   //==== ==== ==== === ==== \\\\   0W   .            .     0W       ,              ^   |                `,
+  `     |  ;  ;    0W ;               ,    w0  //                          \\\\\  0W        ;             w0                  ;        |           `,
+  `     YyYyYyYyYyYW0YyYyYyYyYyYyYyYyYyYyYy0W ///= = = === === === == ==== \\\\\\ W0YyYyYyYyYyYyYyYyYyYyYy0WYyYyYyYyYyYyYyYyYyYyYyYyYyY|               `,
+  `     YyYyYyYyYyY0WYyYyYyYyYyYyYyYyYyYyYyw0////                          \\\\\\\\\ W0YyYyYyYyYyYyYyYyYyYyYyw0YyYyYyYyYyYyYyYyYyYyYyYyYyY|           `,
+  `     YyYyYyYyYyYW0YyYyYyYyYyYyYyYyYyYyYy0W////==== == === == === == ==  \\\\\\\\0WYyYyYyYyYyYyYyYyYyYyYy0WYyYyYyYyYyYyYyYyYyYyYyYyYyY|               `,
+  `     YyYyYyYyYyY0WYyYyYyYyYyYyYyYyYyYyYyW0////                          \\\\\\\\0WYyYyYyYyYyYyYyYyYyYyYyW0YyYyYyYyYyYyYyYyYyYyYyYyYyY|            `,
+  ``,
+  ``,
+  ``,
+  `          .         .         .         .          .          .          .          .          .           .         .           .        .       `,
+  ``,
   ``,
   `     -        -        -        -        -        -        -        -        -        -        -        -        -        -        -       -      `,
   `                                                                                                                                                  `,

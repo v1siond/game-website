@@ -59,8 +59,8 @@ let currentSprite = spriteStop
 const properties = {
   height: 32,
   width: 32,
-  movementSpeed: 15,
-  jumpHeight: 18,
+  movementSpeed: 20,
+  jumpHeight: 24,
   canJump: true,
   gravity: {
     coeficient: 2,
