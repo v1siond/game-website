@@ -1,6 +1,7 @@
 interface GameAsset {
   template: string[],
-  colorMap: any;
+  colorMap?: any;
+  templateMap: any;
 }
 
 export default GameAsset;

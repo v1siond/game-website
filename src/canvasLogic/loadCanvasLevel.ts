@@ -6,19 +6,23 @@ import templeData from './gameAssets/chineseTemple'
 
 
 const player = Player
-const heightCoeficient = 10
-const widthCoeficient = 8
+const heightCoeficient = 32
+const widthCoeficient = 32
+var fps, fpsInterval: number, startTime, now, then: number, elapsed;
 
 const canvasObject: CanvasObject = {
   canvas: undefined,
   canvasElement: undefined
 }
 
+
+let charAnimated: any = {}
+
 const drawTemple = (scale: number) => {
   if (!canvasObject?.canvas || !canvasObject.canvasElement) return
 
-  fillCanvas(templeData.template, scale)
-  const templeWidth = widthCoeficient * scale * ((templeData.template[templeData.template.length - 1].length || 0) * 0.75);
+  fillCanvas(scale)
+  const templeWidth = widthCoeficient * scale * templeData.template[templeData.template.length - 1].length;
   const templeHeight = heightCoeficient * scale * templeData.template.length;
 
   if (canvasObject.canvasElement.width < templeWidth) {
@@ -29,13 +33,36 @@ const drawTemple = (scale: number) => {
   }
 }
 
+const fillCanvas = (scale: number) => {
+  if (!canvasObject?.canvas || !canvasObject.canvasElement) return
+  Object.values(templeData.templateMap).forEach((lines: any) => {
+    lines.forEach((line: any) => {
+      if (!canvasObject.canvas) return
+      const animate = charAnimated[`${line.rowNumber}${line.columnNumber}`]
+      canvasObject.canvas.strokeStyle = 'white';
+      canvasObject.canvas.lineWidth = .1;
+      canvasObject.canvas.strokeRect(line.columnNumber * (widthCoeficient + scale), heightCoeficient * line.rowNumber * scale, widthCoeficient, heightCoeficient);
+      canvasObject.canvas.fillStyle = line.fillColor || 'black';
+      canvasObject.canvas.font = animate && line.animation ? `italic bold ${widthCoeficient * scale}px Silkscreen` : `bold ${widthCoeficient * scale}px Silkscreen`;
+      canvasObject.canvas.fillRect(line.columnNumber * (widthCoeficient + scale), heightCoeficient * line.rowNumber * scale, widthCoeficient, heightCoeficient)
+      canvasObject.canvas.fillStyle = line.animation && animate ? line.animation.color : line.color || 'black';
+      canvasObject.canvas.fillText(line.value, line.columnNumber * (widthCoeficient + scale), heightCoeficient * line.rowNumber * scale);
+      if (line.animation)
+        setTimeout(() => {
+          charAnimated[`${line.rowNumber}${line.columnNumber}`] = !charAnimated[`${line.rowNumber}${line.columnNumber}`]
+        }, line.animation.interval)
+    })
+  })
+}
+
 export const animateLevel = () => {
   if (!canvasObject.canvas || !canvasObject.canvasElement) return;
-  if (typeof window !== undefined) window.requestAnimationFrame(animateLevel)
+  if (typeof window !== undefined) window.requestAnimationFrame(animateLevel);
   // Setup background
   canvasObject.canvas.fillStyle = 'black'
   canvasObject.canvas.fillRect(0, 0, canvasObject.canvasElement.width, canvasObject.canvasElement.height)
-  drawTemple(4)
+
+  drawTemple(1)
   // Load Player
   player.handleMovement(config)
   player.draw(canvasObject)
@@ -53,25 +80,8 @@ export const loadCanvasLevel = (canvasElement: HTMLCanvasElement) => {
   canvasObject.canvasElement.width = config.cellSize * config.width
   canvasObject.canvasElement.height = config.cellSize * config.height
 
-  animateLevel()
-  setupEventListeners(player, config)
-}
+  animateLevel();
 
-const fillCanvas = (lines: string[], scale: number) => {
-  if (!canvasObject?.canvas || !canvasObject.canvasElement) return
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-    let scaledLine = '';
-    for (let j = 0; j < line.length; j++) {
-      scaledLine += line[j].repeat(Math.round(scale / 2));
-    }
-    for (let k = 0; k < scaledLine.length; k++) {
-      for (let j = 0; j < 4; j++) {
-        let char = scaledLine[k];
-        canvasObject.canvas.fillStyle = templeData.colorMap[char] || 'blue';
-        canvasObject.canvas.font = `${widthCoeficient * scale}px Silkscreen`;
-        canvasObject.canvas.fillText(char, k * (widthCoeficient + scale), heightCoeficient * i * scale + 10 * (j * 0.25));
-      }
-    }
-  }
+
+  setupEventListeners(player, config)
 }
