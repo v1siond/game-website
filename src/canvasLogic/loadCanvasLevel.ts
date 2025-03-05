@@ -37,9 +37,9 @@ const fillCanvas = (scale: number) => {
   Object.values(templeData.templateMap).forEach((lines: any) => {
     lines.forEach((line: any) => {
       if (!canvasObject.canvas) return
-      const animate = line.animation && oldTime % line.animation.interval === 0
-      const x = animate && line.animation?.name?.includes('move') ? (line.columnNumber * (widthCoeficient + scale)) - 2 : (line.columnNumber * (widthCoeficient + scale))
-      const y = animate && line.animation?.name?.includes('move') ? (heightCoeficient * line.rowNumber * scale) - 2 : (heightCoeficient * line.rowNumber * scale)
+      const animate = (line.animation && oldTime % line.animation?.interval === 0)
+      const x = (line.columnNumber * (widthCoeficient + scale))
+      const y = (heightCoeficient * line.rowNumber * scale)
 
       // Apply brightness adjustment to a specific section of the canvas
       const randomBrightness = Math.random() * 5 + 0.5; // Random value between 0.5 and 2
@@ -48,37 +48,25 @@ const fillCanvas = (scale: number) => {
       const brightenedColor = `rgba(${Math.min(255, r * randomBrightness)}, ${Math.min(255, g * randomBrightness)}, ${Math.min(255, b * randomBrightness)}, ${a})`;
       const brightenedCFillolor = `rgba(${Math.min(255, r2 * randomBrightness)}, ${Math.min(255, g2 * randomBrightness)}, ${Math.min(255, b2 * randomBrightness)}, ${a2})`;
 
-      canvasObject.canvas.font =  `bold ${widthCoeficient * scale}px ${defaultFont}`;
+      canvasObject.canvas.font = animate && line.animation?.name?.includes('move') ? `italic ${widthCoeficient * scale}px ${defaultFont}` : `bold ${widthCoeficient * scale}px ${defaultFont}`;
       canvasObject.canvas.fillStyle = animate && line.animation?.name?.includes('brightup') ? brightenedColor : line.color || 'black';
+      canvasObject.canvas.strokeStyle =  animate && line.animation?.name?.includes('brightup') ? brightenedCFillolor : line.fillColor || 'white'
+      canvasObject.canvas.lineWidth = 3;
       canvasObject.canvas.fillText(line.value, x, y);
-      canvasObject.canvas.strokeStyle =  animate && line.animation?.name?.includes('brightup') ? brightenedCFillolor : line.color || 'black'
-      canvasObject.canvas.lineWidth = 1;
       canvasObject.canvas.strokeText(line.value, x, y);
-      if (line.animation) {
-        oldTime = (oldTime || 0) + 1
-        canvasObject.canvas.strokeRect(x, y, widthCoeficient, heightCoeficient);
-      }
-      if (animate && line.animation?.name?.includes('brightup') || line.value === ' ') {
-        canvasObject.canvas.fillStyle = animate && line.animation?.name?.includes('brightup') ? brightenedColor : line.color || 'black';
-        canvasObject.canvas.lineWidth = 1;
+      if (line.animation?.name?.includes('block') || line.value === ' ') {
+        canvasObject.canvas.fillStyle = animate ? brightenedCFillolor : line.fillColor || 'rgba(255,255,255,.2)';
         canvasObject.canvas.fillRect(x, y, widthCoeficient, heightCoeficient)
       }
+      if (animate && line.animation?.name?.includes('brightup') || line.value === ' ') {
+        canvasObject.canvas.fillStyle = animate && line.animation?.name?.includes('brightup') ? brightenedColor : line.fillColor || 'black';
+        canvasObject.canvas.lineWidth = 1;
+        canvasObject.canvas.strokeRect(x, y, widthCoeficient, heightCoeficient)
+      }
+      oldTime = (oldTime || 0) + 1
     })
   })
 }
-
-/*
-
-
-      const x = line.columnNumber * (widthCoeficient + scale)
-      const y = heightCoeficient * line.rowNumber * scale
-
-      if (line.animation && animate) {
-        setTimeout(() => {
-          charAnimated[`${line.rowNumber}${line.columnNumber}`] = !charAnimated[`${line.rowNumber}${line.columnNumber}`]
-        }, line.animation.interval)
-      }
-*/
 
 export const animateLevel = () => {
   if (!canvasObject.canvas || !canvasObject.canvasElement) return;
