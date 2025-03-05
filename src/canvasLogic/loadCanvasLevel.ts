@@ -54,8 +54,8 @@ const fillCanvas = (scale: number) => {
       canvasObject.canvas.lineWidth = 3;
       canvasObject.canvas.fillText(line.value, x, y);
       canvasObject.canvas.strokeText(line.value, x, y);
-      if (line.animation?.name?.includes('block') || line.value === ' ') {
-        canvasObject.canvas.fillStyle = animate ? brightenedCFillolor : line.fillColor || 'rgba(255,255,255,.2)';
+      if (line.value === ' ') {
+        canvasObject.canvas.fillStyle = line.fillColor || 'rgba(255,255,255,.2)';
         canvasObject.canvas.fillRect(x, y, widthCoeficient, heightCoeficient)
       }
       if (animate && line.animation?.name?.includes('brightup') || line.value === ' ') {
