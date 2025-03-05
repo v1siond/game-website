@@ -59,7 +59,7 @@ let currentSprite = spriteStop
 const properties = {
   height: 32,
   width: 32,
-  movementSpeed: 20,
+  movementSpeed: 15,
   jumpHeight: 24,
   canJump: true,
   gravity: {
@@ -94,7 +94,6 @@ export const updatePlayerPosition = () => {
 
 export const animatePlayer = () => {
   if (!canvasObject.canvas || !canvasObject.canvasElement) return;
-  canvasObject.canvas.fillStyle = 'blue'
   drawPlayer(currentSprite || spriteStop, 1)
 }
 
