@@ -86,7 +86,7 @@ export const updatePlayerPosition = () => {
                               0 :
                               properties.gravity.x
   properties.position.y += properties.gravity.y
-  playerPosition.bottom = properties.position.y + (properties.height * 6.5)
+  playerPosition.bottom = properties.position.y + (properties.height * 13)
   properties.gravity.y = height >= (playerPosition.bottom + properties.gravity.y) ? properties.gravity.y + properties.gravity.coeficient : 0
   properties.canJump = height <= (playerPosition.bottom + properties.gravity.y)
   return properties.position.y
@@ -104,14 +104,18 @@ const drawPlayer = (sprite: string, scale: number) => {
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i];
     for (let j = 0; j < line.length; j++) {
+      const x = properties.position.x + j * 15 * scale
+      const y = properties.position.y + (i * 4) * 5 * scale
       let char = line[j];
       canvasObject.canvas.fillStyle = colorMap[char] || 'white';
       canvasObject.canvas.font = `bold ${20 * scale}px Silkscreen`;
       canvasObject.canvas.fillText(
         char,
-        properties.position.x + j * 15 * scale,
-        properties.position.y + (i * 4) * 5 * scale
+        x,
+        y
       );
+      canvasObject.canvas.strokeStyle =  colorMap[char] || 'white'
+      canvasObject.canvas.strokeText(char, x, y);
     }
   }
 }

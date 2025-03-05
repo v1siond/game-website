@@ -4,6 +4,7 @@ import config from './config'
 import { setupEventListeners } from './eventListeners'
 import templeData from './gameAssets/chineseTemple'
 
+const defaultFont = 'Silkscreen'
 
 const player = Player
 const heightCoeficient = 32
@@ -16,10 +17,10 @@ const canvasObject: CanvasObject = {
 }
 
 
-const drawTemple = (scale: number, time?: number) => {
+const drawTemple = (scale: number) => {
   if (!canvasObject?.canvas || !canvasObject.canvasElement) return
 
-  fillCanvas(scale, time)
+  fillCanvas(scale)
   const templeWidth = widthCoeficient * scale * templeData.template[templeData.template.length - 1].length;
   const templeHeight = heightCoeficient * scale * templeData.template.length;
 
@@ -31,30 +32,37 @@ const drawTemple = (scale: number, time?: number) => {
   }
 }
 
-const fillCanvas = (scale: number, time?: number) => {
+const fillCanvas = (scale: number) => {
   if (!canvasObject?.canvas || !canvasObject.canvasElement) return
   Object.values(templeData.templateMap).forEach((lines: any) => {
     lines.forEach((line: any) => {
       if (!canvasObject.canvas) return
-      const x = line.columnNumber * (widthCoeficient + scale)
-      const y = heightCoeficient * line.rowNumber * scale
       const animate = line.animation && oldTime % line.animation.interval === 0
-      console.log(animate, oldTime)
-      canvasObject.canvas.strokeStyle = 'white';
-      canvasObject.canvas.lineWidth = .1;
-      canvasObject.canvas.strokeRect(x, y, widthCoeficient, heightCoeficient);
+      const x = animate && line.animation?.name?.includes('move') ? (line.columnNumber * (widthCoeficient + scale)) - 2 : (line.columnNumber * (widthCoeficient + scale))
+      const y = animate && line.animation?.name?.includes('move') ? (heightCoeficient * line.rowNumber * scale) - 2 : (heightCoeficient * line.rowNumber * scale)
 
       // Apply brightness adjustment to a specific section of the canvas
-      const randomBrightness = Math.random() * 3 + 0.5; // Random value between 0.5 and 2
+      const randomBrightness = Math.random() * 5 + 0.5; // Random value between 0.5 and 2
       const [r, g, b, a] = line.color.match(/[\d.]+/g).map(Number);
+      const [r2, g2, b2, a2] = line.color.match(/[\d.]+/g).map(Number);
       const brightenedColor = `rgba(${Math.min(255, r * randomBrightness)}, ${Math.min(255, g * randomBrightness)}, ${Math.min(255, b * randomBrightness)}, ${a})`;
-      canvasObject.canvas.fillStyle = line.fillColor || 'black';
-      canvasObject.canvas.fillRect(x, y, widthCoeficient, heightCoeficient)
+      const brightenedCFillolor = `rgba(${Math.min(255, r2 * randomBrightness)}, ${Math.min(255, g2 * randomBrightness)}, ${Math.min(255, b2 * randomBrightness)}, ${a2})`;
 
-      canvasObject.canvas.font = animate ? `italic bold ${widthCoeficient * scale}px PermanentMarker` : `bold ${widthCoeficient * scale}px PermanentMarker`;
-      canvasObject.canvas.fillStyle = animate ? brightenedColor : line.color || 'black';
+      canvasObject.canvas.font =  `bold ${widthCoeficient * scale}px ${defaultFont}`;
+      canvasObject.canvas.fillStyle = animate && line.animation?.name?.includes('brightup') ? brightenedColor : line.color || 'black';
       canvasObject.canvas.fillText(line.value, x, y);
-      if (line.animation) oldTime = (oldTime || 0) + 1
+      canvasObject.canvas.strokeStyle =  animate && line.animation?.name?.includes('brightup') ? brightenedCFillolor : line.color || 'black'
+      canvasObject.canvas.lineWidth = 1;
+      canvasObject.canvas.strokeText(line.value, x, y);
+      if (line.animation) {
+        oldTime = (oldTime || 0) + 1
+        canvasObject.canvas.strokeRect(x, y, widthCoeficient, heightCoeficient);
+      }
+      if (animate && line.animation?.name?.includes('brightup') || line.value === ' ') {
+        canvasObject.canvas.fillStyle = animate && line.animation?.name?.includes('brightup') ? brightenedColor : line.color || 'black';
+        canvasObject.canvas.lineWidth = 1;
+        canvasObject.canvas.fillRect(x, y, widthCoeficient, heightCoeficient)
+      }
     })
   })
 }
@@ -72,20 +80,18 @@ const fillCanvas = (scale: number, time?: number) => {
       }
 */
 
-export const animateLevel = (time?: number) => {
+export const animateLevel = () => {
   if (!canvasObject.canvas || !canvasObject.canvasElement) return;
 
-  const fps60 = 1000 / 60;
+
 
   if (typeof window !== undefined)
-    window.requestAnimationFrame((time) => {
-      setTimeout(() => animateLevel(time), fps60);
-    });
+    window.requestAnimationFrame(() => setTimeout(() => animateLevel(), 1000 / 60));
   // Setup background
   canvasObject.canvas.fillStyle = 'black'
   canvasObject.canvas.fillRect(0, 0, canvasObject.canvasElement.width, canvasObject.canvasElement.height)
 
-  drawTemple(1, time)
+  drawTemple(1)
   // Load Player
   player.handleMovement(config)
   player.draw(canvasObject)
@@ -103,7 +109,7 @@ export const loadCanvasLevel = (canvasElement: HTMLCanvasElement) => {
   canvasObject.canvasElement.width = config.cellSize * config.width
   canvasObject.canvasElement.height = config.cellSize * config.height
 
-  animateLevel(0);
+  animateLevel();
 
 
   setupEventListeners(player, config)
