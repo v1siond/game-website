@@ -37,10 +37,10 @@ import GameAsset from "@/interfaces/GameAsset"
 const fillColorMap: any = {
   '\\': 'rgba(255, 99, 71, 1)', // lightgray
   '/': 'rgba(255, 99, 71, 1', // lightgray
-  '|': 'rgb(246, 180, 14)', // tomato
+  '|': 'rgba(234, 197, 112, 0.96)', // tomato
   '=': 'rgba(252, 247, 241, 0.85)',
   '0': 'rgba(243, 191, 54, 1)',
-  'W': 'rgba(243, 191, 54, 1)',
+  'W': 'rgb(173, 134, 33)',
   'w': 'rgba(243, 191, 54, 1)',
   'Y': 'rgb(228, 24, 24)',
   'y': 'rgba(219, 136, 54, 1)',
@@ -52,7 +52,7 @@ const fillColorMap: any = {
   '-': 'rgba(60, 48, 33, 0.76)',
   '_': 'rgba(194, 165, 92, 1)', // gray
   '*': 'rgba(255, 255, 255, 1)', // white
-  '.': 'rgba(144, 300, 180, 1)', // lightgreen
+  '8': 'rgba(243, 191, 54, 1)',
   '~': 'rgba(211, 211, 211, 1)', // lightgray
   '`': 'rgba(255, 255, 255, 1)', // white
   ']': 'rgba(0, 128, 0, 1)', // green
@@ -66,11 +66,12 @@ const fillColorMap: any = {
   '@': 'rgba(0, 130, 0, 1)',
   '(': 'rgba(0, 130, 0, 1)',
   ')': 'rgba(0, 130, 0, 1)',
+  '.': 'rgba(243, 191, 54, .5)'
 }
 
 const colorMap: any = {
   '*': 'rgba(255, 255, 255, .5)', // white
-  '.': 'rgba(144, 300, 180, .6)', // lightgreen
+  '.': 'rgba(243, 191, 54, .5)',
   '~': 'rgba(211, 211, 211, 1)', // lightgray
   '\\': 'rgba(255, 99, 71, .5)', // lightgray
   '/': 'rgba(255, 0, 0, .6)', // lightgray
@@ -82,15 +83,15 @@ const colorMap: any = {
   ',': 'rgba(26, 182, 26, 0.5)', // darkgreen
   '`': 'rgba(255, 255, 255, 1)', // white
   ']': 'rgba(0, 128, 0, .35)', // green
-  '|': 'rgba(110, 88, 31, 0.35)', // tomato
-  '0': 'rgba(219, 136, 54, .6)',
-  'W': 'rgba(243, 191, 54, .5)',
+  '|': 'rgba(53, 40, 11, 0.72)', // tomato
+  '0': 'rgba(174, 102, 30, 0.6)',
+  'W': 'rgba(68, 54, 20, 0.63)',
   'w': 'rgba(243, 191, 54, .5)',
   '[': 'rgba(0, 128, 0, .35)', // green
   'g': 'rgba(255, 255, 0, .25)',
   ':': 'rgba(26, 182, 26, 0.5)', // red
   '^': 'rgba(238, 130, 238, 1)', // violet
-  'o': 'rgba(255, 255, 0, .25)', // yellow
+  'o': 'rgba(255, 255, 0, .5)', // yellow
   'x': 'rgba(255, 0, 0, .6)',
   'X': 'rgba(255, 0, 0, .5)',
   '+': 'rgba(255, 0, 0, .2)',
@@ -100,74 +101,91 @@ const colorMap: any = {
   '@': 'rgba(0, 130, 0, .5)',
   '(': 'rgba(0, 130, 0, .5)',
   ')': 'rgba(0, 130, 0, .5)',
+  '8': 'rgba(243, 191, 54, .5)'
 }
 
 
 const colorByTile = (rowIndex: number, columnIndex: number) => {
+  const isMountain = getMountain(rowIndex, columnIndex)
+  const isMountainBase = getMountainBases(rowIndex, columnIndex)
   const isTempleArea = getTempleArea(rowIndex, columnIndex)
   const isTemple = getTemple(rowIndex, columnIndex)
-  const isMountain = getMountain(rowIndex, columnIndex)
-  if (isTempleArea) return 'rgba(108, 85, 53, 0.85)'
+  const isTempleDoor = getTempleDoor(rowIndex, columnIndex)
   if (isMountain) return 'rgba(108, 85, 53, 0.85)'
-  if(rowIndex < 10) return 'rgba(56, 57, 128, 0.35)'
-  if(rowIndex >=  66) return 'rgba(21, 22, 72, 0.07)'
-  if(rowIndex >=  10) return 'rgba(106, 233, 100, 0.51)'
+  if (isMountainBase) return 'rgba(87, 62, 26, 0.85)'
+  if (isTempleDoor) return 'rgba(85, 59, 23, 0.85)'
+  if (isTemple) return 'rgba(180, 132, 65, 0.85)'
+  if (isTempleArea) return 'rgba(160, 128, 80, 0.93)'
+  if(rowIndex < 10) return 'rgba(102, 165, 196, 0.79)'
+  if(rowIndex >=  68) return 'rgba(21, 22, 72, 0.07)'
+  if (rowIndex >= 10) {
+    const gradientFactor = (rowIndex - 10) / (68 - 10);
+    const darkerBrown = { r: 160, g: 128, b: 80, a: 0.93 };
+    const brown = { r: 242, g: 163, b: 60, a: 0.69 };
+
+    const r = Math.round(darkerBrown.r + gradientFactor * (brown.r - darkerBrown.r));
+    const g = Math.round(darkerBrown.g + gradientFactor * (brown.g - darkerBrown.g));
+    const b = Math.round(darkerBrown.b + gradientFactor * (brown.b - darkerBrown.b));
+    const a = darkerBrown.a + gradientFactor * (brown.a - darkerBrown.a);
+
+    return `rgba(${r}, ${g}, ${b}, ${a})`;
+  }
   return 'rgb(0, 0, 0)'
 }
 
 const getMountain = (rowIndex: number, columnIndex: number) => {
   const mountainsCoordinates = [
     {
-      minRow: 19,
-      maxRow: 26,
+      minRow: 20,
+      maxRow: 27,
       minColumn: 2,
       maxColumn: 19
     },
     {
-      minRow: 32,
-      maxRow: 39,
+      minRow: 33,
+      maxRow: 40,
       minColumn: 7,
       maxColumn: 24
     },
     {
-      minRow: 7,
-      maxRow: 17,
+      minRow: 8,
+      maxRow: 18,
       minColumn: 23,
       maxColumn: 40
     },
     {
-      minRow: 2,
-      maxRow: 9,
+      minRow: 3,
+      maxRow: 10,
       minColumn: 49,
       maxColumn: 64
     },
     {
-      minRow: 1,
-      maxRow: 8,
+      minRow: 2,
+      maxRow: 9,
       minColumn: 80,
       maxColumn: 97
     },
     {
-      minRow: 8,
-      maxRow: 17,
+      minRow: 9,
+      maxRow: 18,
       minColumn: 94,
       maxColumn: 110
     },
     {
-      minRow: 1,
-      maxRow: 9,
+      minRow: 2,
+      maxRow: 10,
       minColumn: 110,
       maxColumn: 126
     },
     {
-      minRow: 16,
-      maxRow: 29,
+      minRow: 17,
+      maxRow: 30,
       minColumn: 114,
       maxColumn: 130
     },
     {
-      minRow: 9,
-      maxRow: 17,
+      minRow: 10,
+      maxRow: 18,
       minColumn: 130,
       maxColumn: 146
     }
@@ -180,22 +198,143 @@ const getMountain = (rowIndex: number, columnIndex: number) => {
 }
 
 
+const getMountainBases = (rowIndex: number, columnIndex: number) => {
+  const mountainsCoordinates = [
+    {
+      minRow: 27,
+      maxRow: 28,
+      minColumn: 1,
+      maxColumn: 20
+    },
+    {
+      minRow: 40,
+      maxRow: 41,
+      minColumn: 6,
+      maxColumn: 24
+    },
+    {
+      minRow: 18,
+      maxRow: 19,
+      minColumn: 22,
+      maxColumn: 41
+    },
+    {
+      minRow: 10,
+      maxRow: 11,
+      minColumn: 47,
+      maxColumn: 66
+    },
+    {
+      minRow: 9,
+      maxRow: 10,
+      minColumn: 79,
+      maxColumn: 98
+    },
+    {
+      minRow: 18,
+      maxRow: 19,
+      minColumn: 93,
+      maxColumn: 112
+    },
+    {
+      minRow: 10,
+      maxRow: 11,
+      minColumn: 109,
+      maxColumn: 128
+    },
+    {
+      minRow: 30,
+      maxRow: 31,
+      minColumn: 113,
+      maxColumn: 132
+    },
+    {
+      minRow: 19,
+      maxRow: 19,
+      minColumn: 128,
+      maxColumn: 146
+    }
+  ]
+
+  return mountainsCoordinates.find((mountain) => {
+    const difference = rowIndex >= mountain.minRow && rowIndex <= mountain.maxRow ? mountain.maxRow - rowIndex : -1
+    return (rowIndex >= mountain.minRow && rowIndex <= mountain.maxRow + 1) && (columnIndex >= (mountain.minColumn + difference) && columnIndex <= (mountain.maxColumn - difference))
+  })
+}
+
+
 const getTemple = (rowIndex: number, columnIndex: number) => {
-  const maxRow = 61;
-  const minRow = 23;
-  const minColumn = 6;
-  const maxColumn = 128
-  const difference = rowIndex >= minRow && rowIndex <= maxRow ? maxRow - rowIndex : -1
-  return (rowIndex >= minRow && rowIndex <= 65) && (columnIndex >= (minColumn + difference) && columnIndex <= (maxColumn - difference))
+  const templeCoordinates = [
+    {
+      minRow: 21,
+      maxRow: 31,
+      minColumn: 56,
+      maxColumn: 62
+    },
+    {
+      minRow: 31,
+      maxRow: 40,
+      minColumn: 53,
+      maxColumn: 63
+    },
+    {
+      minRow: 34,
+      maxRow: 40,
+      minColumn: 54,
+      maxColumn: 64
+    },
+    {
+      minRow: 39,
+      maxRow: 43,
+      minColumn: 53,
+      maxColumn: 65
+    },
+    {
+      minRow: 43,
+      maxRow: 48,
+      minColumn: 52,
+      maxColumn: 66
+    },
+    {
+      minRow: 49,
+      maxRow: 52,
+      minColumn: 49,
+      maxColumn: 69
+    },
+  ]
+
+  return templeCoordinates.find((temple) => {
+    return (rowIndex >= temple.minRow && rowIndex <= temple.maxRow) && (columnIndex >= temple.minColumn && columnIndex <= temple.maxColumn)
+  })
+}
+
+const getTempleDoor = (rowIndex: number, columnIndex: number) => {
+  const templeDoorCoordinates =  [
+    {
+      minRow: 53,
+      maxRow: 54,
+      minColumn: 44,
+      maxColumn: 74
+    },
+    {
+      minRow: 49,
+      maxRow: 53,
+      minColumn: 57,
+      maxColumn: 60
+    }]
+
+ return  templeDoorCoordinates.find((temple) => {
+    return (rowIndex >= temple.minRow && rowIndex <= temple.maxRow) && (columnIndex >= temple.minColumn && columnIndex <= temple.maxColumn)
+  })
 }
 
 const getTempleArea = (rowIndex: number, columnIndex: number) => {
-  const maxRow = 61;
-  const minRow = 23;
-  const minColumn = 6;
-  const maxColumn = 128
-  const difference = rowIndex >= minRow && rowIndex <= maxRow ? maxRow - rowIndex : -1
-  return (rowIndex >= minRow && rowIndex <= 65) && (columnIndex >= (minColumn + difference) && columnIndex <= (maxColumn - difference))
+  const maxRow = 67;
+  const minRow = 26;
+  const minColumn = 5;
+  const maxColumn = 129
+  const difference = rowIndex >= minRow && rowIndex <= maxRow ? ((maxRow - 4) - rowIndex) : 0
+  return (rowIndex >= minRow && rowIndex <= maxRow) && (columnIndex >= (minColumn + difference) && columnIndex <= (maxColumn - difference))
 }
 
 const getTemplateMap = () => {
@@ -242,10 +381,10 @@ const intervalByChar = (char: string) => {
 }
 const animationByChar = (char: string) => {
   if (!shouldAnimate) return;
-  if (['g', ':', ',', ';', '[', ']'].includes(char)) return "move"
-  if (['@', '(', ')', '︵', '&'].includes(char)) return "move_brightup"
-  if (['o', '-'].includes(char)) return "brightup"
-  return "move"
+  if (['g', ':', ',', ';'].includes(char)) return "move"
+  if (['@', '(', ')', '&'].includes(char)) return "move_brightup"
+  if (['o', '-', '8'].includes(char)) return "brightup"
+  return null
 }
 
 const shouldBlock = (char: string) => {
@@ -253,77 +392,78 @@ const shouldBlock = (char: string) => {
 }
 
 const shouldAnimate = (char: string) => {
-  return ['(', ')', '&', '@', ';', ',', 'o', 'g'].includes(char)
+  return ['(', ')', '&', '@', ';', ',', 'o', 'g', '8'].includes(char)
 }
 
 const template = [
+  `                                                                                                                                                  `,
   `                                                                                        /\\                                                       `,
-  `                                                        /\\                             /  \\                           /\\                       `,
-  `                                                       /  \\                           /    \\                         /  \\                      `,
-  `                                                      /    \\                         /      \\                       /    \\                     `,
-  `                                                     /      \\                       /     *  \\                     /      \\                    `,
+  `    8888                                                /\\                             /  \\                           /\\                       `,
+  `   888888                                              /  \\                           /    \\                         /  \\                      `,
+  `   888888                                             /    \\                         /      \\                       /    \\                     `,
+  `    8888                                             /      \\                       /     *  \\                     /      \\                    `,
   `                                                    /     *  \\                     /          \\                   /     *  \\                   `,
   `                                                   /          \\                   /            \\                 /          \\                  `,
   `                                                  /            \\                 /   *          \\               /            \\                 `,
   `                                                 /   *          \\               /                \\             /   *          \\                `,
-  `                               /\\               /                \\             /                  \\   /\\      /                \\         /\\ `,
-  `                              /  \\             /                  \\                                  /  \\    /                  \\       /  \\ `,
-  `                             /    \\                                                                 /    \\                             /    \\  `,
+  `                               /\\               /                \\             /                  \\   /\\      /                \\         /\\   `,
+  `                              /  \\             /                  \\                                  /  \\    /                  \\       /  \\  `,
+  `                             /    \\                                                                 /    \\                             /    \\   `,
   `         ,,,,,,,            /      \\                                                               /      \\                           /      \\ `,
-  `        ,,,,,,,,,          /     *  \\           ,:W;,;W;,.:;,          (&)                        /     *  \\                         /     *  \ `,
+  `        ,,,,,,,,,          /     *  \\           ,:g;,;g;,,:;,          (&)                        /     *  \\                         /     *  \ `,
   `       ,,,,,,,,,,,        /          \\                                (@&@)                      /          \\                       /           `,
   `        ,,,,,,,,,        /            \\                              (@&@&@)                    /            \\                     /            `,
   `                        /   *          \\                            (@&@&@&@)                  /   *          \\                   /   *         `,
   `                       /                \\                          (&@&@&@&@&)                /                \\                 /              `,
-  `          /\\          /                  \\                 ^      (@@&@&@@@&@@)              /                  \\               /              `,
-  `         /  \\                                              |           W0W                                         ,:;;,;W;,W:;,                `,
-  `        /    \\                           _________________|||__________0W0____________________                                                   `,
-  `       /      \\                          |YyYyYyYyYyYyYyYy:::yYyYyYyYyYW0WyYyYYyYyYYyYyyYyYyY|                            /\\                   `,
-  `      /     *  \\                         |YyYyYyYyYyYy._//_|_\\\\_.YyYYyY0W0YYyYyYyyYyYyYyYyYyy|    ,:W;,;,W;,.:;,         /  \\                 `,
-  `     /          \\                        |YyYyYyYyYyYyoy||___||yoyYyYyYW0WyYyYYyYyYYyYyYyYyYy|                          /    \\                 `,
-  `    /            \\    ,:;;,;W;,W:;,      |YyYyYyYyYyYyYy|| n ||yYyYyYyY0W0yYyYYyYyYYyYyYyYyYy|                         /      \\                `,
-  `   /   *          \\                      |              ||___||    ;,;,W0W.:;,    (&@)       |                        /     *  \\              `,
-  `  /                \\                    |            ._//_,_,_\\\\_. ,;,;,:;,.:;  (&@&@&)       |                      /          \\             `,
-  ` /                  \\                  | ,:;.,;WWW;, o ||     || o             (@&@&@&@&)      |                    /            \\             `,
+  `          /\\          /                  \\                /|\\     (@@&@&@@@&@@)              /                  \\               /              `,
+  `         /  \\                                            //|\\\\         W0W                                         ,:;;,;g;,g:;                 `,
+  `        /    \\                           _______________///|\\\\\\________W00____________________                                                   `,
+  `       /      \\                          ||||||||||||||////|\\\\\\\\|||||||W0W||||||||||||||||||||                            /\\                   `,
+  `      /     *  \\                         |||||||||||||/////|\\\\\\\\\\||||||0W0||||||||||||||||||||    ,:g;,;,g;,,:;,         /  \\                 `,
+  `     /          \\                        |||||||||||||o|||   |||o||||||W0W||||||||||||||||||||                          /    \\                 `,
+  `    /            \\    ,:;;,;g;,g:;,      ||||||||||||||/|| n ||\\|||||||0W0||||||||||||||||||||                         /      \\                `,
+  `   /   *          \\                      |            //||   ||\\\\  g,;,W0W,:g,    (&@)       |                        /     *  \\              `,
+  `  /                \\                    |            //////|\\\\\\\\\\\\ ,;,g,:;,,:;  (@&@&@&)      |                      /          \\             `,
+  ` /                  \\                  | ,:;,,;ggg;, o ||     || o             (@&@&@&@&)      |                    /            \\             `,
   `                                      |                ||  n  ||              (@@&@&@@@&@)      |    ,:W;,;W,;,    /   *          \\              `,
-  `   ,:;;,;W;W,.:;,                    | (@)             ||_____||                   W0            |                /                \\          `,
-  `                                    | (@&@)        ._///_,_,_,_\\\\\\_.               0W             |              /                  \\         `,
+  `   ,:;;,;g;g,,:;,                    | (@)             ||     ||                   0W            |                /                \\          `,
+  `                                    | (@&@)        ////////|\\\\\\\\\\\\\\\\               W0             |              /                  \\         `,
   `               /\\                  | (@&@&@)       o ||         || o               0W              |                                             `,
-  `              /  \\                | (@&@&@&@)        || .  n  . ||   ,:;.,;0W0;,., W0   :;,.:;,;;:, |                                            `,
-  `             /    \\              | (&@&@&@&@&)       ||_________||                 W0                |                                           `,
-  `            /      \\            |      0W0        ._//__,_,_,_,__\\\\_.              0W                 |                          ,;0W;,        `,
-  `   ,;0W;,  /     *  \\          |       W0W        o ||           || o              0W                  |                                         `,
-  `          /          \\        |        0W0          ||  .  n  .  ||            ;,;,w0,.:;               |                                        `,
-  `         /            \\      |     ;,;,W0W,.:,      ||           ||            :;;,0W:;,.:;,             |      ,:W;,;W;,.:;,                   `,
-  `        /   *          \\    |     ,;;,;0W0;,.,,  ._///_,_,_,_,_,_\\\\\\_.        ,;,;,:;,.:;,                |                                   `,
-  `       /                \\  |     ,;,;,:;,.:;,;.  o ||             || o                                     |                                     `,
-  `      /                  \\|                        ||.   . n .   .||                                        |                                    `,
-  `                         |                         ||             ||                      ;,;,;:;,.:,        |                      ,;0W;,        `,
-  `                        |                       ._////_,_,_,_,_,_\\\\\\\\_.                  ,:;.,;g,g;,.,        |                               `,
-  `                       |       ,:;,.:;,;;       o  ||             ||  o                 ,;,;,g;g.g;,;..        |                                  `,
-  `       ,:;;,;0W;,.:;, |   .,;;,,:;,.:;,;;:,;       ||             ||                                            |     ,;0W;,                      `,
-  `                     |                             || . .  n  . . ||                                             |                                `,
-  `                    |                              ||             ||                                  :;,.:;,;;:, |                               `,
-  `                   |    ..g..g..g..                ||_____________||                                               |                              `,
-  `                  |                            ._////_,_,_,_,_,_,_\\\\\\\\\_.               ;,;,:;,.:;,                  |                         `,
-  `       ,;0W;,    |                      ,:;,.: o ||      | - |      || o ;:.:;.   .:;,;;:,.:;,:;,.:;,:;,.:;          |                            `,
-  `                |                                ||  n   |   |   n  ||                                                |               ,;0W;,      `,
-  `               |    g::,:,.:;:,..;.,:;.g         ||      | * |      ||                                                 |                          `,
-  `              |                             _____||______|___|______||____           ...g..g..g..                       |                         `,
-  ` ,;0W;,      | /\\                       /\\               .....               /\\                      /\\                  |                    `,
-  `            | //\\\\   ..g..g..g..g..g.  //\\\\ ....  ______       ______  .... //\\\\                    //\\\\  ...g..g..g..    |                   `,
-  `           | ///\\\\\\                   ///\\\\\\      ______       ______      ///\\\\\\                  ///\\\\\\                  |                   `,
-  `          |    W0                       w0                                   W0   g..g..g..g..g..    w0                 "   |                     `,
-  `         |     0W                       0W       //=====       =====\\\\       0W                      0W                      |                  `,
-  `        |  ;   0W       ,,,,,,,         w0____  //                   \\\\ ____ 0W    ,,,,,,,,,         w0                       |                 `,
-  `       |       W0      ,,,,,,,,,        0W     //====   ,,,,,,,   ====\\\\     W0   ,,,,,,,,,,,        0W               .        |                `,
-  `      |  ,;    W0  .  ,,,,,,,,,,,       w0    //       ,,,,,,,,,       \\\\\    W0                      w0                         |              `,
-  `     |         0W      ,,,,,,,,,        0W   //====   ,,,,,,,,,,,   ====\\\\   0W   .            .     0W       ,              ^   |              `,
-  `    |  ;  ;    0W ;               ,     w0  //         ,,,,,,,,,         \\\\\  0W        ;             w0                  ;        |            `,
-  `    YyYyYyYyYyYW0YyYyYyYyYyYyYyYyYyYyYyY0W ///====                   ====\\\\\\ W0YyYyYyYyYyYyYyYyYyYyYy0WYyYyYyYyYyYyYyYyYyYyYyYyYyY|            `,
-  `    YyYyYyYyYyY0WYyYyYyYyYyYyYyYyYyYyYyYw0//////////               \\\\\\\\\\\\\\\\\\\\\W0YyYyYyYyYyYyYyYyYyYyYyw0YyYyYyYyYyYyYyYyYyYyYyYyYyY|           `,
-  `    YyYyYyYyYyYW0YyYyYyYyYyYyYyYyYyYyYyY0W//////////               \\\\\\\\\\\\\\\\\\\\0WYyYyYyYyYyYyYyYyYyYyYy0WYyYyYyYyYyYyYyYyYyYyYyYyYyY|           `,
-  `    YyYyYyYyYyY0WYyYyYyYyYyYyYyYyYyYyYyYW0//////////               \\\\\\\\\\\\\\\\\\\\0WYyYyYyYyYyYyYyYyYyYyYyW0YyYyYyYyYyYyYyYyYyYyYyYyYyY|     `,
+  `              /  \\                | (@&@&@&@)        || .  n  . ||   ,:;,,;ggg;,., W0   :;,,:;,;;:, |                                            `,
+  `             /    \\              | (&@&@&@&@&)       ||         ||                 0W                |                                           `,
+  `            /      \\            |      0W0        /////////|\\\\\\\\\\\\\\\\\\\\             W0                 |                          ,;gg;,        `,
+  `   ,;gg;,  /     *  \\          |       W0W        o ||           || o              0W                  |                                         `,
+  `          /          \\        |        0W0          ||  .  n  .  ||\            ;,;,w0,,:;               |                                        `,
+  `         /            \\      |     ;,;,W0W,,g,      ||           ||           :;;,,0W:;,,:;,             |      ,:W;,;W;,.:;,                   `,
+  `        /   *          \\    |     ,;g,;0W0;,,,,  //////////|\\\\\\\\\\\\\\\\\\\\         ,;,;,:;,,:;,               |                                   `,
+  `       /                \\  |     ,;,;,g;,,g;,;;  o ||             || o                                     |                                     `,
+  `      /                  \\|                        || . .  n  . . ||                                        |                                    `,
+  `                         |                         ||             ||                      ;,;,;:;,g:,        |                      ,;gg;,        `,
+  `                        |                        //////////|\\\\\\\\\\\\\\\\\\\\                   ,:;,,;g,g;,g,        |                               `,
+  `                       |       ,,;g,,;,g;        o ||             || o                  ,;,;,g;g,g;,;,;        |                                  `,
+  `       ,:;;,;gg;,,:;, |   ,,g;,,g;,.g;,;;g,;      /||             ||\\                                           |     ,;gg;,                      `,
+  `                     |                           //|| . .  n  . . ||\\\\                                           |                                `,
+  `                    |                           ///||             ||\\\\\\                               :;,g:;,;;:, |                               `,
+  `                   |    ..g..g..g..            ////||             ||\\\\\\\\                                           |                              `,
+  `                  |                           /////////////o\\\\\\\\\\\\\\\\\\\\\\\\\\\               ;,;,:;,g:;,                 |                         `,
+  `       ,;gg;,    |                      ,:;,.: o ||      |   |      || o ;:.:;.   ,:;,;;:,g:;,:;,g:;,:;,g:;          |                            `,
+  `                |                                ||  n   |  _|   n  ||                                                |               ,;gg;,      `,
+  `               |    g::,g,,g;g,,g;,,g;,g         ||      |   |      ||                                                 |                          `,
+  `              |                             _______________________________          ...g..g..g..                       |                         `,
+  ` ,;gg;,      | /\\                       /\\  |            _____            |  /\\                      /\\                  |                    `,
+  `            | //\\\\   ..g..g..g..g..g.  //\\\\ |      |||||_______|||||      | //\\\\                    //\\\\  ...g..g..g..    |                   `,
+  `           | ///\\\\\\                   ///\\\\\\      |                 |      ///\\\\\\                  ///\\\\\\                  |                   `,
+  `          |    ||                       ||       |                   |       ||   g..g..g..g..g..    ||                 "   |                     `,
+  `         |     ||                       ||      |                     |      ||                      ||                      |                  `,
+  `        |  ;   ||       ,,,,,,,         ||     |                       |     ||    ,,,,,,,,,         ||                       |                 `,
+  `       |       ||      ,,,,,,,,,        ||    | ====    ,,,,,,,   ====  |    ||   ,,,,,,,,,,,        ||               .        |                `,
+  `      |  ,;    ||  .  ,,,,,,,,,,,       ||   |         ,,,,,,,,,         |   ||                      ||                         |              `,
+  `     |         ||      ,,,,,,,,,        ||  | ====    ,,,,,,,,,,,   ====  |  ||   .            .     ||       ,              ^   |              `,
+  `    |  ;  ;    || ;               ,     || |           ,,,,,,,,,           | ||        ;             ||                  ;        |            `,
+  ` @@ ||||||||||||||||||||||||||||||||||||||||||||||||               |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| (@)   (@)  (@)    `,
+  `(&&)||||||||||||||||||||||||||||||||||||||||||||||||               ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||(&&&) (&&&) (&&&)     `,
+  `(@@)||||||||||||||||||||||||||||||||||||||||||||||||               ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||(@&@)(@&@)(@&@)           `,
+  `(@@)||||||||||||||||||||||||||||||||||||||||||||||||               ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||(@&@)(@&@)(@&@)`,
   `                                                                                                                                                  `,
   `                                                                                                                                                  `,
   `                                                                                                                                                  `,
@@ -331,12 +471,6 @@ const template = [
   `                                                                                                                                                  `,
   `                                                                                                                                                  `,
   `                                                                                                                                                  `,
-  `XxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXx`,
-  `XxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXx`,
-  `XxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXx`,
-  `XxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXx`,
-  `XxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXx`,
-  `XxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXxYyXyYxYxXyXx`,
 ]
 
 

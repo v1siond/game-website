@@ -57,13 +57,13 @@ const spriteJump = `
 let currentSprite = spriteStop
 
 const properties = {
-  height: 32,
-  width: 32,
-  movementSpeed: 15,
+  height: 16,
+  width: 16,
+  movementSpeed: 30,
   jumpHeight: 24,
   canJump: true,
   gravity: {
-    coeficient: 2,
+    coeficient: 1,
     x: 0,
     y: 0
   },
@@ -86,7 +86,7 @@ export const updatePlayerPosition = () => {
                               0 :
                               properties.gravity.x
   properties.position.y += properties.gravity.y
-  playerPosition.bottom = properties.position.y + (properties.height * 13)
+  playerPosition.bottom = properties.position.y + (properties.height * 6)
   properties.gravity.y = height >= (playerPosition.bottom + properties.gravity.y) ? properties.gravity.y + properties.gravity.coeficient : 0
   properties.canJump = height <= (playerPosition.bottom + properties.gravity.y)
   return properties.position.y
@@ -150,11 +150,24 @@ export const jump = () => {
   properties.gravity.y = 0
 }
 
-export default {
-  draw,
-  jump,
-  properties,
-  animatePlayer,
-  handleMovement,
-  updatePlayerPosition
+const buildPlayer = ({
+  width,
+  height
+}: any) => {
+  properties.width = width
+  properties.height = height
+  properties.position.x = width
+  properties.position.y = height
+  properties.jumpHeight = height * 0.66
+  properties.movementSpeed = width * 0.5
+  return {
+    draw,
+    jump,
+    properties,
+    animatePlayer,
+    handleMovement,
+    updatePlayerPosition
+  }
 }
+
+export default buildPlayer
