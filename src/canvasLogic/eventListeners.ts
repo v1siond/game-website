@@ -4,7 +4,7 @@ export const setupEventListeners = (player: any, config: any) => {
       event.preventDefault();
       config.keys[event.key].pressed = true
     }
-    if (event.key === 'ArrowUp') {
+    if (event.key === ' ') {
       event.preventDefault();
       return player.jump();
     }

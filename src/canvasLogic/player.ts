@@ -5,56 +5,99 @@ const canvasObject: CanvasObject = {
   canvasElement: undefined
 }
 
+const fillColorMap: any = {
+  '0': 'rgb(255, 0, 0)',
+  '#': 'rgb(223, 162, 6)',
+  '/': 'rgb(255, 0, 0)',
+  '\\': 'rgb(255, 0, 0)',
+  '|': 'rgb(255, 0, 0)',
+  '>': 'rgb(255, 0, 0)',
+  '.': 'rgb(255, 0, 0)',
+  '}': 'rgb(255, 0, 0)',
+  '{': 'rgb(255, 0, 0)',
+  '<': 'rgb(255, 0, 0)',
+  '-': 'rgb(255, 0, 0)',
+  '!': 'rgb(255, 0, 0)',
+  "'": 'rgb(255, 0, 0)',
+}
+
 const colorMap: any = {
-  '@': 'rgba(243, 191, 54, 1)',
-  '#': 'rgb(134, 91, 61)',
-  '/': 'rgba(255, 0, 0, 1)',
-  '\\': 'rgba(255, 0, 0, .75)',
-  '>': 'rgba(255, 255, 255, .75)',
-  '<': 'rgba(255, 255, 255, .75)',
-  '-': 'rgba(255, 255, 255, .75)'
+  '0': 'rgba(255, 255, 255, 1)',
+  '#': 'rgba(255, 255, 255, 1)',
+  '/': 'rgba(255, 255, 255, 1)',
+  '\\': 'rgba(255, 255, 255, 1)',
+  '>': 'rgba(255, 255, 255, 1)',
+  '<': 'rgba(255, 255, 255, 1)',
+  '-': 'rgba(255, 255, 255, 1)',
+  '!': 'rgba(255, 255, 255, 1)',
+  "'": 'rgba(255, 255, 255, 1)',
+  '}': 'rgba(255, 255, 255, 1)',
+  '{':  'rgba(255, 255, 255, 1)',
+  '.': 'rgba(255, 255, 255, 1)',
 }
 
 const spriteStop = `
- @
-/#\\
+ 0
+{|\\
 / \\
 `;
 
 
 const spriteWalkingRight = `
- @
-/#-
-/ >
+ 0
+{|-
+- \\
 `;
 
 const spriteWalkingRight2 = `
- @
--#\\
-> \\
+ 0
+-|\\
+ >
 `;
 
 
 const spriteWalkingLeft = `
- @
-/#-
-< \\
+ 0
+/|}
+ <
 `;
 
 const spriteWalkingLeft2 = `
- @
--#\\
-/ <
+ 0
+-|\\
+/ -
 `;
 
 
 const spriteJump = `
-\\ @ /
-  #
- < >
+\\ 0 /
+  |
+ { }
 `;
 
+const spriteWalkingUp = `
+  0/
+ !|
+ | '
+`
+const spriteWalkingUp2 = `
+ \\0
+  |!
+ ' |
+`
+const spriteWalkingDown = `
+ . |
+  |
+ /0!
+`
+const spriteWalkingDown2 = `
+ | .
+  |
+ '0\\
+`
+
 let currentSprite = spriteStop
+let oldTime: number = 0
 
 const properties = {
   height: 16,
@@ -63,13 +106,14 @@ const properties = {
   jumpHeight: 24,
   canJump: true,
   gravity: {
-    coeficient: 1,
+    coeficient: 2,
     x: 0,
     y: 0
   },
   position: {
     x: 30,
-    y: 30
+    y: 30,
+    bottom: 6 * 16
   }
 }
 
@@ -86,7 +130,7 @@ export const updatePlayerPosition = () => {
                               0 :
                               properties.gravity.x
   properties.position.y += properties.gravity.y
-  playerPosition.bottom = properties.position.y + (properties.height * 6)
+  playerPosition.bottom = properties.position.y + (properties.height + properties.position.bottom)
   properties.gravity.y = height >= (playerPosition.bottom + properties.gravity.y) ? properties.gravity.y + properties.gravity.coeficient : 0
   properties.canJump = height <= (playerPosition.bottom + properties.gravity.y)
   return properties.position.y
@@ -113,7 +157,9 @@ const drawPlayer = (sprite: string, scale: number) => {
         x,
         y
       );
-      canvasObject.canvas.strokeStyle =  colorMap[char] || 'white'
+      canvasObject.canvas.fillStyle = fillColorMap[char] || 'white';
+      canvasObject.canvas.strokeStyle =  fillColorMap[char] || 'white'
+      canvasObject.canvas.lineWidth = 2;
       canvasObject.canvas.strokeText(char, x, y);
     }
   }
@@ -126,17 +172,33 @@ export const draw = (canvasObj: any) => {
   animatePlayer()
 }
 
-export const handleMovement = (config: any) => {
+export const handleMovement = (config: any, time: number) => {
+  const height = (canvasObject.canvasElement?.height || 0)
+  const animate = (time - oldTime) >= config.interval
   properties.gravity.x = 0
+  const keyPressed = Object.values(config.keys).find((key: any) => key.pressed)
   if (config.keys.ArrowRight.pressed) {
-    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingRight ? spriteWalkingRight2 : spriteWalkingRight) : spriteJump
-    return properties.gravity.x = properties.movementSpeed
+    currentSprite = animate ? (properties.gravity.y == 0 ? (currentSprite === spriteWalkingRight ? spriteWalkingRight2 : spriteWalkingRight) : spriteJump) : currentSprite
+    properties.gravity.x = properties.movementSpeed
   }
   if (config.keys.ArrowLeft.pressed) {
-    currentSprite = properties.gravity.y == 0 ? (currentSprite === spriteWalkingLeft ? spriteWalkingLeft2 : spriteWalkingLeft) : spriteJump
-    return properties.gravity.x = -properties.movementSpeed
+    currentSprite = animate ? (properties.gravity.y == 0 ? (currentSprite === spriteWalkingLeft ? spriteWalkingLeft2 : spriteWalkingLeft) : spriteJump) : currentSprite
+    properties.gravity.x = -properties.movementSpeed
   }
-  currentSprite = properties.gravity.y == 0 ? spriteStop : spriteJump
+  if (config.keys.ArrowUp.pressed) {
+    currentSprite = animate ? (properties.gravity.y == 0 ? (currentSprite === spriteWalkingUp ? spriteWalkingUp2 : spriteWalkingUp) : spriteJump) : currentSprite
+    properties.position.bottom += properties.movementSpeed
+    properties.position.y -= properties.movementSpeed
+  }
+  if (config.keys.ArrowDown.pressed) {
+    currentSprite = animate ? (properties.gravity.y == 0 ? (currentSprite === spriteWalkingDown2 ? spriteWalkingDown : spriteWalkingDown2) : spriteJump) : currentSprite
+    properties.position.bottom = properties.position.bottom > (properties.height * 2) ? properties.position.bottom - properties.movementSpeed : properties.height
+    properties.position.y = properties.position.bottom > (properties.height * 2) ? properties.position.y + properties.movementSpeed : height - (properties.height * 2)
+  }
+  if (keyPressed && animate) {
+    oldTime = animate ? time + config.interval : oldTime;
+  }
+  if (!keyPressed && animate) currentSprite = properties.gravity.y == 0 ? spriteStop : spriteJump
 }
 
 export const jump = () => {
@@ -160,6 +222,7 @@ const buildPlayer = ({
   properties.position.y = height
   properties.jumpHeight = height * 0.66
   properties.movementSpeed = width * 0.5
+  properties.position.bottom = height * 6
   return {
     draw,
     jump,

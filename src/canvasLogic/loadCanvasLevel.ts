@@ -121,7 +121,7 @@ export const animateLevel = (time: number) => {
 
   drawTemple(1, time)
   // Load Player
-  player.handleMovement(config)
+  player.handleMovement(config, time)
   player.draw(canvasObject)
   player.updatePlayerPosition()
 }
