@@ -7,7 +7,9 @@ const canvasObject: CanvasObject = {
 
 const fillColorMap: any = {
   '0': 'rgb(255, 0, 0)',
-  '#': 'rgb(223, 162, 6)',
+  '@': 'rgb(255, 0, 0)',
+  '#': 'rgb(255, 0, 0)',
+  '%': 'rgb(255, 0, 0)',
   '/': 'rgb(255, 0, 0)',
   '\\': 'rgb(255, 0, 0)',
   '|': 'rgb(255, 0, 0)',
@@ -22,77 +24,80 @@ const fillColorMap: any = {
 }
 
 const colorMap: any = {
-  '0': 'rgba(255, 255, 255, 1)',
-  '#': 'rgba(255, 255, 255, 1)',
-  '/': 'rgba(255, 255, 255, 1)',
-  '\\': 'rgba(255, 255, 255, 1)',
-  '>': 'rgba(255, 255, 255, 1)',
-  '<': 'rgba(255, 255, 255, 1)',
-  '-': 'rgba(255, 255, 255, 1)',
-  '!': 'rgba(255, 255, 255, 1)',
-  "'": 'rgba(255, 255, 255, 1)',
-  '}': 'rgba(255, 255, 255, 1)',
-  '{':  'rgba(255, 255, 255, 1)',
-  '.': 'rgba(255, 255, 255, 1)',
+  '0': 'rgba(255, 255, 255, .75)',
+  '@': 'rgba(255, 255, 255, .75)',
+  '#': 'rgba(255, 255, 255, .75)',
+  '%': 'rgba(255, 255, 255, .75)',
+  '/': 'rgba(255, 255, 255, .75)',
+  '\\': 'rgba(255, 255, 255, .75)',
+  '>': 'rgba(255, 255, 255, .75)',
+  '<': 'rgba(255, 255, 255, .75)',
+  '-': 'rgba(255, 255, 255, .75)',
+  '|': 'rgba(255, 255, 255, .75)',
+  '!': 'rgba(255, 255, 255, .75)',
+  "'": 'rgba(255, 255, 255, .75)',
+  '}': 'rgba(255, 255, 255, .75)',
+  '{':  'rgba(255, 255, 255, .75)',
+  '.': 'rgba(255, 255, 255, .75)',
 }
 
 const spriteStop = `
- 0
-{|\\
+ @
+{%\\
 / \\
 `;
 
 
 const spriteWalkingRight = `
- 0
-{|-
+ @
+{%-
 - \\
 `;
 
 const spriteWalkingRight2 = `
- 0
--|\\
+ @
+-%\\
  >
 `;
 
 
 const spriteWalkingLeft = `
- 0
-/|}
+ @
+/%}
  <
 `;
 
 const spriteWalkingLeft2 = `
- 0
--|\\
+ @
+-%\\
 / -
 `;
 
 
 const spriteJump = `
-\\ 0 /
-  |
+\\ @ /
+  %
  { }
 `;
 
 const spriteWalkingUp = `
   0/
- !|
+ !%
  | '
 `
 const spriteWalkingUp2 = `
  \\0
-  |!
+  %!
  ' |
 `
 const spriteWalkingDown = `
  . |
-  |
+  %
  /0!
 `
 const spriteWalkingDown2 = `
  | .
-  |
+  %
  '0\\
 `
 
@@ -151,7 +156,7 @@ const drawPlayer = (sprite: string, scale: number) => {
       const y = properties.position.y + (i * 4) * 5 * scale
       let char = line[j];
       canvasObject.canvas.fillStyle = colorMap[char] || 'white';
-      canvasObject.canvas.font = `bold ${20 * scale}px Silkscreen`;
+      canvasObject.canvas.font = `bold ${25 * scale}px Silkscreen`;
       canvasObject.canvas.fillText(
         char,
         x,
