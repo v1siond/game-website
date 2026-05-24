@@ -1,0 +1,103 @@
+// Prisma Schema for Game Website
+// Run: npx prisma migrate dev --name init
+// Run: npx prisma generate
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// LEVEL TEMPLATES
+// ═══════════════════════════════════════════════════════════════════
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String   @default("custom")  // village, forest, castle, custom, etc.
+
+  // Grid configuration
+  cols        Int      @default(50)
+  rows        Int      @default(50)
+  cellSize    Int      @default(16)
+  isoScale    Float    @default(2.5)
+
+  // Spawn point
+  spawnCol    Int      @default(25)
+  spawnRow    Int      @default(25)
+
+  // Serialized grid data (JSON)
+  groundData  Json     // 2D array of ground types
+  heightData  Json     // 2D array of heights
+  assetsData  Json     // Array of placed assets
+
+  // Connectors - cells that link to other templates
+  // Format: [{ col, row, targetTemplateId, interaction, spawnCol, spawnRow }]
+  connectors  Json     @default("[]")
+
+  // Metadata
+  thumbnail   String?  // Base64 or URL to preview image
+  isPublic    Boolean  @default(false)
+  tags        String[] @default([])
+
+  // Ownership
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([authorId])
+  @@index([isPublic])
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// USERS (optional, for future auth)
+// ═══════════════════════════════════════════════════════════════════
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatar    String?
+
+  templates Template[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// ASSET LIBRARY (custom user-created composite assets)
+// ═══════════════════════════════════════════════════════════════════
+
+model CustomAsset {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  category    String   @default("custom")  // nature, building, decoration
+
+  // Dimensions
+  width       Int      @default(1)
+  depth       Int      @default(1)
+
+  // Tile placements (JSON array of TilePlacement)
+  tilesData   Json
+
+  // Ownership
+  authorId    String?
+  isPublic    Boolean  @default(false)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([category])
+  @@index([authorId])
+}
