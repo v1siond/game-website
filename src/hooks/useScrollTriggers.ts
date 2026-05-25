@@ -132,7 +132,7 @@ export function useScrollTriggers(config: ScrollTriggerConfig): ScrollTriggerRet
         progress = 1 - (distanceToTrigger / fadeDistance)
       }
 
-      // Check if triggered
+      // Check if triggered - fires when scroll position passes trigger point
       const triggered = progress >= 1 || (persistTriggered && triggeredOnce.current.has(trigger.id))
 
       if (triggered && persistTriggered) {
@@ -277,14 +277,14 @@ export function getDefaultTriggerStyles(state: TriggerState | undefined): React.
   if (!state) {
     return {
       opacity: 0,
-      transform: 'translateY(30px)',
-      transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
+      transform: 'translateY(20px)',
+      transition: 'opacity 0.4s ease-out, transform 0.4s ease-out',
     }
   }
 
   return {
     opacity: state.progress,
-    transform: `translateY(${30 * (1 - state.progress)}px)`,
-    transition: state.triggered ? 'opacity 0.6s ease-out, transform 0.6s ease-out' : 'none',
+    transform: `translateY(${20 * (1 - state.progress)}px)`,
+    transition: state.triggered ? 'opacity 0.4s ease-out, transform 0.4s ease-out' : 'none',
   }
 }

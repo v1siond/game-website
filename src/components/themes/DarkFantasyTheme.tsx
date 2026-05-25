@@ -8,13 +8,16 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
 import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 import { useScrollTriggers, TriggerState, getDefaultTriggerStyles } from '@/hooks/useScrollTriggers'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
+import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
+import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
+import { BugPullReveal } from './DarkFantasy/BugCreature'
+import { BattleReveal } from './DarkFantasy/BattleReveal'
 
 // Blended Dark Fantasy Metroidvania palette
 // Hollow Knight ethereal blues + Iconoclast brass/copper + Ori spirit gold + Salt & Sanctuary stone
@@ -53,29 +56,28 @@ const DF = {
 /**
  * TRIGGER CONFIGURATION
  * ====================
- * Each trigger defines when a section becomes visible.
+ * Each trigger defines when content ANIMATIONS start.
  * Position is a percentage of total page height (0-100).
  *
- * Triggers are calculated based on:
- * - viewportTriggerOffset (70% of viewport by default)
- * - fadeDistance (200px by default)
+ * Content starts HIDDEN in animation components - triggers control
+ * when content animates INTO view.
  *
- * When scroll position + (viewport * 0.7) reaches trigger position,
- * the content starts fading in over fadeDistance pixels.
+ * viewportTriggerOffset 0.35 means triggers fire when:
+ *   scrollY + (viewport * 0.35) >= triggerY
+ * This ensures animations play when section is ~35% up from bottom.
  */
 const TRIGGER_CONFIG = [
-  { id: 'roles', position: 5 },
-  { id: 'profession-selector', position: 10 },
-  { id: 'about', position: 18 },
+  { id: 'profession-selector', position: 8 },
+  { id: 'about', position: 15 },
   { id: 'art-spirits', position: 25 },
-  { id: 'experience', position: 32 },
-  { id: 'art-lanterns', position: 42 },
-  { id: 'tech-stack', position: 50 },
-  { id: 'projects', position: 58 },
-  { id: 'art-crystals', position: 68 },
-  { id: 'ventures', position: 75 },
-  { id: 'posts', position: 82 },
-  { id: 'contact', position: 90 },
+  { id: 'experience', position: 38 },       // KnightSlashReveal: knight slashes, content RIGHT→LEFT
+  { id: 'art-lanterns', position: 48 },
+  { id: 'tech-stack', position: 55 },       // Simple fade (TriggerSection)
+  { id: 'projects', position: 65 },         // BugPullReveal: bug pulls content LEFT→RIGHT
+  { id: 'art-crystals', position: 75 },
+  { id: 'ventures', position: 82 },
+  { id: 'posts', position: 88 },
+  { id: 'contact', position: 94 },          // BattleReveal: knight kills bug, content drops TOP→DOWN
 ]
 
 /**
@@ -300,89 +302,46 @@ const SpiritParticles = memo(function SpiritParticles() {
   )
 })
 
-// Gothic chandelier with mechanical elements (blend of Art Nouveau + Iconoclast)
+// Gothic chandelier with mechanical elements - compact version that doesn't overlap content
 const GothicChandelier = memo(function GothicChandelier() {
   return (
     <svg
-      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[600px] h-48 opacity-70"
-      viewBox="0 0 500 160"
+      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[500px] h-16 opacity-50"
+      viewBox="0 0 500 60"
       aria-hidden="true"
       role="presentation"
     >
       {/* Central chain with gear link */}
-      <path d="M250,0 L250,18" stroke={DF.brass} strokeWidth="2" />
-      <circle cx="250" cy="24" r="6" fill="none" stroke={DF.copper} strokeWidth="1.5" />
-      {/* Small gear decoration */}
-      <circle cx="250" cy="24" r="3" fill={DF.brass} />
-      <path d="M250,30 L250,40" stroke={DF.brass} strokeWidth="2" />
+      <path d="M250,0 L250,10" stroke={DF.brass} strokeWidth="2" />
+      <circle cx="250" cy="14" r="4" fill="none" stroke={DF.copper} strokeWidth="1" />
+      <circle cx="250" cy="14" r="2" fill={DF.brass} />
 
-      {/* Ornate arms with mechanical joints */}
+      {/* Simple ornate arms */}
       <path
-        d="M250,40 Q230,48 215,45 Q195,52 175,48 Q160,55 140,52"
+        d="M250,18 Q200,22 150,20 Q100,24 50,22"
         fill="none"
         stroke={DF.brass}
-        strokeWidth="1.5"
+        strokeWidth="1"
+        opacity="0.6"
       />
       <path
-        d="M250,40 Q270,48 285,45 Q305,52 325,48 Q340,55 360,52"
+        d="M250,18 Q300,22 350,20 Q400,24 450,22"
         fill="none"
         stroke={DF.brass}
-        strokeWidth="1.5"
+        strokeWidth="1"
+        opacity="0.6"
       />
 
-      {/* Gear joints at intervals */}
-      {[175, 250, 325].map((x, i) => (
+      {/* Subtle glow points along the arms */}
+      {[100, 175, 250, 325, 400].map((x, i) => (
         <g key={i}>
-          <circle cx={x} cy={48} r="4" fill={DF.copper} opacity="0.6" />
-          <circle cx={x} cy={48} r="2" fill={DF.voidDeep} />
+          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="3" fill={DF.spiritGold} opacity="0.3" />
+          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="6" fill={DF.spiritGold} opacity="0.1" />
         </g>
       ))}
 
-      {/* Hanging lanterns with ethereal glow */}
-      {[80, 140, 200, 250, 300, 360, 420].map((x, i) => {
-        const yOffset = Math.abs(x - 250) * 0.12
-        const chainLen = 35 + Math.abs(x - 250) * 0.08
-        const isCenter = x === 250
-        return (
-          <g key={i}>
-            <path
-              d={`M${x},${52 + yOffset} L${x},${52 + yOffset + chainLen}`}
-              stroke={DF.copper}
-              strokeWidth="1"
-              strokeDasharray="3 2"
-              opacity="0.5"
-            />
-            {/* Lantern body */}
-            <rect
-              x={x - (isCenter ? 6 : 4)}
-              y={55 + yOffset + chainLen}
-              width={isCenter ? 12 : 8}
-              height={isCenter ? 18 : 14}
-              fill={DF.voidPurple}
-              stroke={DF.brass}
-              strokeWidth="1"
-            />
-            {/* Inner glow */}
-            <rect
-              x={x - (isCenter ? 4 : 2)}
-              y={58 + yOffset + chainLen}
-              width={isCenter ? 8 : 4}
-              height={isCenter ? 12 : 8}
-              fill={DF.spiritGold}
-              opacity="0.6"
-            />
-            {/* Outer glow halo */}
-            <ellipse
-              cx={x}
-              cy={65 + yOffset + chainLen}
-              rx={isCenter ? 15 : 10}
-              ry={isCenter ? 12 : 8}
-              fill={DF.spiritGold}
-              opacity="0.15"
-            />
-          </g>
-        )
-      })}
+      {/* Central larger glow */}
+      <ellipse cx="250" cy="30" rx="20" ry="12" fill={DF.spiritGold} opacity="0.15" />
     </svg>
   )
 })
@@ -1278,9 +1237,9 @@ export default function DarkFantasyTheme() {
     getProgress,
   } = useScrollTriggers({
     triggers: TRIGGER_CONFIG,
-    defaultFadeDistance: 250,
-    viewportTriggerOffset: 0.65,
-    persistTriggered: true,
+    defaultFadeDistance: 150,
+    viewportTriggerOffset: 0.35,   // Trigger when section is 35% up from bottom of viewport
+    persistTriggered: false,       // Allow animations to replay on re-scroll
   })
 
   // Memoize expensive data operations
@@ -1370,6 +1329,10 @@ export default function DarkFantasyTheme() {
       <DarkFantasyAtmosphere />
       <SpiritParticles />
 
+      {/* Interactive Elements - desktop only */}
+      <ParallaxLayers />
+      <CursorTrail />
+
       {/* Vignette overlay - optimized: no box-shadow */}
       <div
         className="fixed inset-0 pointer-events-none z-[8]"
@@ -1445,49 +1408,23 @@ export default function DarkFantasyTheme() {
         </div>
       </nav>
 
-      {/* Hero Section - below fixed nav */}
+      {/* Hero Section - below fixed nav, changes with profession */}
       <header className="relative z-20 pt-20 md:pt-24 pb-6 px-4 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm md:text-base tracking-wider mb-2" style={{ color: DF.silver }}>
-            {PROFESSIONAL_SUMMARY.headline}
+            {PROFESSIONAL_SUMMARY[active].headline}
           </p>
           <p
             className="text-xs md:text-sm tracking-wider italic"
             style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
           >
-            {PROFESSIONAL_SUMMARY.tagline}
+            {PROFESSIONAL_SUMMARY[active].tagline}
           </p>
         </div>
       </header>
 
       {/* Main content */}
       <main id="main-content" tabIndex={-1} className="outline-none">
-
-      {/* Current Roles */}
-      <TriggerSection id="roles" states={triggerStates}>
-        <section className="relative z-20 py-6 px-6" aria-labelledby="current-roles-heading">
-          <h2 id="current-roles-heading" className="sr-only">Current Roles</h2>
-          <div className="max-w-6xl mx-auto">
-            <div className="flex flex-wrap justify-center gap-8" role="list">
-              {CURRENT_ROLES.map((role) => (
-                <div
-                  key={role.id}
-                  className="text-center px-4 py-2"
-                  style={{
-                    background: `${DF.void}80`,
-                    border: `1px solid ${DF.stoneDark}`,
-                    borderRadius: '4px',
-                  }}
-                  role="listitem"
-                >
-                  <p className="text-sm tracking-[0.15em] uppercase" style={{ color: DF.ethereal }}>{role.title}</p>
-                  <p className="text-base" style={{ color: DF.bone }}>{role.company}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </TriggerSection>
 
       {/* Profession Selector - Waystation style */}
       <TriggerSection id="profession-selector" states={triggerStates}>
@@ -1564,9 +1501,9 @@ export default function DarkFantasyTheme() {
         <ArtSectionSpirits />
       </TriggerSection>
 
-      {/* Work Experience */}
+      {/* Work Experience - Knight Slash Reveal (content slides from right) */}
       {experience.length > 0 && (
-        <TriggerSection id="experience" states={triggerStates}>
+        <KnightSlashReveal triggered={isTriggered('experience')}>
           <section className="relative z-20 py-8 px-6">
             <div className="max-w-4xl mx-auto">
               <VoidFrame title="Work Experience">
@@ -1578,7 +1515,7 @@ export default function DarkFantasyTheme() {
               </VoidFrame>
             </div>
           </section>
-        </TriggerSection>
+        </KnightSlashReveal>
       )}
 
       {/* Art Section 2 - Lanterns */}
@@ -1586,7 +1523,7 @@ export default function DarkFantasyTheme() {
         <ArtSectionLanterns />
       </TriggerSection>
 
-      {/* Tech Stack / Skills */}
+      {/* Tech Stack / Skills - Simple fade trigger (no complex animation) */}
       <TriggerSection id="tech-stack" states={triggerStates}>
         <section className="relative z-20 py-8 px-6">
           <div className="max-w-4xl mx-auto">
@@ -1601,8 +1538,8 @@ export default function DarkFantasyTheme() {
         </section>
       </TriggerSection>
 
-      {/* Projects */}
-      <TriggerSection id="projects" states={triggerStates}>
+      {/* Projects - Bug Pull Reveal (bug runs erratically, pulls content from left) */}
+      <BugPullReveal triggered={isTriggered('projects')}>
         <section className="relative z-20 py-8 px-6">
           <div className="max-w-4xl mx-auto">
             <VoidFrame title="Featured Work">
@@ -1614,7 +1551,7 @@ export default function DarkFantasyTheme() {
             </VoidFrame>
           </div>
         </section>
-      </TriggerSection>
+      </BugPullReveal>
 
       {/* Art Section 3 - Crystals */}
       <TriggerSection id="art-crystals" states={triggerStates} preRender={false}>
@@ -1672,46 +1609,48 @@ export default function DarkFantasyTheme() {
 
       </main>
 
-      {/* Contact CTA */}
-      <TriggerSection id="contact" states={triggerStates}>
+      {/* Contact CTA - Battle Reveal (knight kills bug, content drops from top) */}
+      <BattleReveal triggered={isTriggered('contact')}>
         <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: '"Cinzel", serif' }}>
-              Ready to Work Together?
-            </h2>
-            <p className="text-sm" style={{ color: DF.silver }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="mb-8">
+              <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: '"Cinzel", serif' }}>
+                Ready to Work Together?
+              </h2>
+              <p className="text-sm" style={{ color: DF.silver }}>
+                10+ years delivering production systems. Let&apos;s build something.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="mailto:alexanderpulido81@gmail.com"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={{
+                  background: DF.brass,
+                  color: DF.void,
+                  fontFamily: '"Cinzel", serif',
+                  borderRadius: '4px',
+                }}
+              >
+                Get In Touch
+              </a>
+              <Link
+                href="/cv"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={{
+                  background: 'transparent',
+                  border: `2px solid ${DF.brass}`,
+                  color: DF.brass,
+                  fontFamily: '"Cinzel", serif',
+                  borderRadius: '4px',
+                }}
+              >
+                Download CV
+              </Link>
+            </div>
           </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              style={{
-                background: DF.brass,
-                color: DF.void,
-                fontFamily: '"Cinzel", serif',
-              }}
-            >
-              Get In Touch
-            </a>
-            <Link
-              href="/cv"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              style={{
-                background: 'transparent',
-                border: `2px solid ${DF.brass}`,
-                color: DF.brass,
-                fontFamily: '"Cinzel", serif',
-              }}
-            >
-              Download CV
-            </Link>
-          </div>
-        </div>
         </section>
-      </TriggerSection>
+      </BattleReveal>
 
       {/* Bottom obscure overlay - content fades into darkness */}
       <div
@@ -1772,6 +1711,12 @@ export default function DarkFantasyTheme() {
         @keyframes lanternFloat {
           0%, 100% { transform: translateY(0) translateZ(0); }
           50% { transform: translateY(-8px) translateZ(0); }
+        }
+
+        /* Spirit companion wisp trail */
+        @keyframes wispTrail {
+          0%, 100% { transform: translateX(0); }
+          50% { transform: translateX(3px); }
         }
 
         /* Accessibility: Reduce motion */
