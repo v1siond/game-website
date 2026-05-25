@@ -394,6 +394,8 @@ export const BugPullReveal = memo(function BugPullReveal({
   const showBug = phase !== 'idle' && phase !== 'alex-enters'
   const showAlex = phase !== 'idle'
 
+  const isFloating = phase === 'attack-stance' || phase === 'complete'
+
   return (
     <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '280px' }}>
       {/* Alex on LEFT, facing RIGHT to defend */}
@@ -406,14 +408,38 @@ export const BugPullReveal = memo(function BugPullReveal({
         </div>
       )}
 
-      {/* Bug attacking from RIGHT */}
+      {/* Bug attacking from RIGHT with shadow */}
       {showBug && (
-        <div
-          className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
-          style={{ ...getBugStyle(), position: 'absolute' }}
-        >
-          <BattleBug size={120} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
-        </div>
+        <>
+          {/* Bug shadow - offset below when floating */}
+          <div
+            className="absolute top-1/2 z-5 pointer-events-none"
+            style={{
+              ...getBugStyle(),
+              position: 'absolute',
+              transform: isFloating ? 'translateY(60px)' : 'translateY(40px)',
+              transition: 'all 400ms ease-out',
+            }}
+          >
+            <div
+              className="rounded-full"
+              style={{
+                width: isFloating ? 80 : 60,
+                height: isFloating ? 16 : 12,
+                background: 'radial-gradient(ellipse, rgba(15,10,26,0.6) 0%, transparent 70%)',
+                transform: 'translateX(20px)',
+                transition: 'all 400ms ease-out',
+              }}
+            />
+          </div>
+          {/* Bug */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
+            style={{ ...getBugStyle(), position: 'absolute' }}
+          >
+            <BattleBug size={120} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
+          </div>
+        </>
       )}
 
       {/* Content being pushed by bug, stopped by Alex */}
@@ -429,6 +455,10 @@ export const BugPullReveal = memo(function BugPullReveal({
         @keyframes knightBreathing {
           0%, 100% { transform: translateY(0) scale(1); }
           50% { transform: translateY(-3px) scale(1.02); }
+        }
+        @keyframes shadowPulse {
+          0%, 100% { transform: translateY(60px) scale(1); opacity: 0.5; }
+          50% { transform: translateY(70px) scale(1.1); opacity: 0.3; }
         }
       `}</style>
     </div>

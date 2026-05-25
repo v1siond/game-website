@@ -71,8 +71,8 @@ export const KnightCharacter = memo(function KnightCharacter({
   return (
     <svg
       width={50 * effectiveScale}
-      height={70 * effectiveScale}
-      viewBox="0 0 50 70"
+      height={85 * effectiveScale}
+      viewBox="0 0 50 85"
       className={className}
       style={{
         overflow: 'visible',
@@ -222,6 +222,44 @@ export const KnightCharacter = memo(function KnightCharacter({
           />
         )}
       </g>
+
+      {/* LEGS - visible below cloak */}
+      <g>
+        {/* Left leg */}
+        <path
+          d="M18,66 L16,75 L14,75 L14,78 L20,78 L20,75 L18,75 L20,66"
+          fill={DF.cloakDark}
+          stroke={DF.void}
+          strokeWidth="0.5"
+        />
+        {/* Right leg */}
+        <path
+          d="M30,66 L28,75 L26,75 L26,78 L32,78 L32,75 L30,75 L32,66"
+          fill={DF.cloakDark}
+          stroke={DF.void}
+          strokeWidth="0.5"
+        />
+        {/* Boot details */}
+        <ellipse cx="17" cy="77" rx="4" ry="1.5" fill={DF.void} />
+        <ellipse cx="29" cy="77" rx="4" ry="1.5" fill={DF.void} />
+      </g>
+
+      {/* GROUND SHADOW - follows character */}
+      <ellipse
+        cx="25"
+        cy="82"
+        rx="12"
+        ry="3"
+        fill={DF.void}
+        opacity="0.5"
+      >
+        <animate
+          attributeName="opacity"
+          values="0.4;0.6;0.4"
+          dur="2s"
+          repeatCount="indefinite"
+        />
+      </ellipse>
     </svg>
   )
 })

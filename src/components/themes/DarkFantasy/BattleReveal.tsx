@@ -398,6 +398,26 @@ export const BattleReveal = memo(function BattleReveal({
 
         {/* Impact and Blood Splatter are now inside bug container below */}
 
+        {/* Bug shadow - stays on ground */}
+        {showBug && !isBugDead && (
+          <div
+            className="absolute right-[18%] bottom-[10%] z-5 pointer-events-none"
+            style={{
+              transition: 'all 300ms ease-out',
+            }}
+          >
+            <div
+              className="rounded-full"
+              style={{
+                width: 80,
+                height: 16,
+                background: 'radial-gradient(ellipse, rgba(15,10,26,0.5) 0%, transparent 70%)',
+                animation: 'shadowBreathing 2s ease-in-out infinite',
+              }}
+            />
+          </div>
+        )}
+
         {/* Bug container - all bug-related effects are children so they follow the bug */}
         {showBug && (
           <div
@@ -1239,6 +1259,17 @@ const battleRevealKeyframes = `
     100% {
       opacity: 0;
       transform: translateY(25px) scale(0.3);
+    }
+  }
+
+  @keyframes shadowBreathing {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.5;
+    }
+    50% {
+      transform: scale(1.15);
+      opacity: 0.35;
     }
   }
 
