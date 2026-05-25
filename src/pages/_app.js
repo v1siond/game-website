@@ -1,5 +1,6 @@
-import '../styles/globals.css' // Assuming your Tailwind CSS is in a file named globals.css
-
+import Head from 'next/head'
+import '../styles/globals.css'
+import { ToastProvider } from '../components/Toast'
 import localFont from "next/font/local";
 
 const silkScreen = localFont({
@@ -28,7 +29,18 @@ const permanentMarker = localFont({
 });
 
 function GameWebsite({ Component, pageProps }) {
-  return <Component className={`${silkScreen.className} ${permanentMarker.className}`} {...pageProps} />
+  return (
+    <>
+      <Head>
+        <title>Alexander Pulido - System Engineer, Musician, Martial Artist</title>
+        <meta name="description" content="Portfolio of Alexander Pulido - Senior Full-Stack Developer specializing in Elixir, Phoenix, Vue.js, and Kubernetes. Also a drummer and martial artist." />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+      </Head>
+      <ToastProvider>
+        <Component className={`${silkScreen.className} ${permanentMarker.className}`} {...pageProps} />
+      </ToastProvider>
+    </>
+  )
 }
 
 export default GameWebsite

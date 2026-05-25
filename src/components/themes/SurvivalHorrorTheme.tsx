@@ -160,22 +160,24 @@ function ZombieChaseSection({
         >
           {/* Survivor running */}
           <div
-            className={`absolute top-1/2 -translate-y-1/2`}
+            className="absolute top-1/2 left-0"
             style={{
               animation: direction === 'left'
                 ? 'survivor-run-left 1.2s ease-out forwards'
                 : 'survivor-run-right 1.2s ease-out forwards',
+              willChange: 'transform',
             }}
           >
             <SurvivorSprite direction={direction === 'left' ? 'right' : 'left'} size={50} />
           </div>
           {/* Zombie chasing */}
           <div
-            className={`absolute top-1/2 -translate-y-1/2`}
+            className="absolute top-1/2 left-0"
             style={{
               animation: direction === 'left'
                 ? 'zombie-chase-left 1.2s ease-out forwards'
                 : 'zombie-chase-right 1.2s ease-out forwards',
+              willChange: 'transform',
             }}
           >
             <ZombieChaser direction={direction === 'left' ? 'right' : 'left'} size={55} />
@@ -1719,22 +1721,22 @@ export default function SurvivalHorrorTheme() {
           animation: shadow-creep-right 15s ease-in-out infinite;
           animation-delay: -7s;
         }
-        /* Zombie chase animations */
+        /* Zombie chase animations - using transform for GPU compositing */
         @keyframes survivor-run-left {
-          0% { left: -80px; }
-          100% { left: calc(100% + 80px); }
+          0% { transform: translateX(-80px) translateY(-50%); }
+          100% { transform: translateX(calc(100vw + 80px)) translateY(-50%); }
         }
         @keyframes survivor-run-right {
-          0% { right: -80px; }
-          100% { right: calc(100% + 80px); }
+          0% { transform: translateX(calc(100vw + 80px)) translateY(-50%); }
+          100% { transform: translateX(-80px) translateY(-50%); }
         }
         @keyframes zombie-chase-left {
-          0% { left: -150px; }
-          100% { left: calc(100% + 30px); }
+          0% { transform: translateX(-150px) translateY(-50%); }
+          100% { transform: translateX(calc(100vw + 30px)) translateY(-50%); }
         }
         @keyframes zombie-chase-right {
-          0% { right: -150px; }
-          100% { right: calc(100% + 30px); }
+          0% { transform: translateX(calc(100vw + 30px)) translateY(-50%); }
+          100% { transform: translateX(-150px) translateY(-50%); }
         }
         @keyframes zombie-reach {
           0%, 100% { transform: rotate(0deg); }
