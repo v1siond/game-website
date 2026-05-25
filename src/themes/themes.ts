@@ -332,11 +332,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 11. Pac-Man - Classic arcade
+  // 11. Retro Atomic - Fallout
   {
     id: 'retro-atomic',
-    name: 'Pac-Man',
-    description: 'Pac-Man - classic arcade, ghosts, maze',
+    name: 'Retro Atomic',
+    description: 'Fallout - Vault-Tec, Pip-Boy, wasteland',
     colors: {
       background: '#000000',
       backgroundGradient: 'linear-gradient(to bottom, #000000, #000000)',
