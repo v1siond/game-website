@@ -1,20 +1,18 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
+import { getSkillsByProfession } from '@/data/skills'
 import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { TECH_STACK } from '@/data/techStack'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // =============================================================================
 // ACCESSIBILITY HELPERS
@@ -35,437 +33,369 @@ function usePrefersReducedMotion(): boolean {
 }
 
 // =============================================================================
-// GREEK KEY / MEANDER PATTERN
+// HADES COLOR PALETTE
+// True to the game: deep crimsons, Styx emerald-greens, golden filigree,
+// purple underworld glow, warm ember oranges
 // =============================================================================
-function GreekKeyBorder({
-  className = '',
-  animated = true,
-  reducedMotion = false
-}: {
-  className?: string
-  animated?: boolean
-  reducedMotion?: boolean
-}) {
-  const shouldAnimate = animated && !reducedMotion
-  return (
-    <div
-      className={`relative overflow-hidden ${className}`}
-      role="presentation"
-      aria-hidden="true"
-    >
-      <svg
-        viewBox="0 0 200 20"
-        className="w-full h-5"
-        preserveAspectRatio="none"
-        style={{ filter: 'drop-shadow(0 0 3px #d4af37)' }}
-      >
-        <defs>
-          <pattern id="greekKey" patternUnits="userSpaceOnUse" width="40" height="20">
-            <path
-              d="M0 10 L10 10 L10 0 L30 0 L30 10 L20 10 L20 20 L40 20"
-              fill="none"
-              stroke="#d4af37"
-              strokeWidth="2"
-            />
-          </pattern>
-          {shouldAnimate && (
-            <linearGradient id="keyGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#d4af37" stopOpacity="0.3">
-                <animate attributeName="offset" values="-1;1" dur="3s" repeatCount="indefinite" />
-              </stop>
-              <stop offset="50%" stopColor="#fff" stopOpacity="0.8">
-                <animate attributeName="offset" values="-0.5;1.5" dur="3s" repeatCount="indefinite" />
-              </stop>
-              <stop offset="100%" stopColor="#d4af37" stopOpacity="0.3">
-                <animate attributeName="offset" values="0;2" dur="3s" repeatCount="indefinite" />
-              </stop>
-            </linearGradient>
-          )}
-        </defs>
-        <rect x="0" y="0" width="100%" height="100%" fill="url(#greekKey)" />
-        {shouldAnimate && <rect x="0" y="0" width="100%" height="100%" fill="url(#keyGlow)" opacity="0.5" />}
-      </svg>
-    </div>
-  )
+const HADES_COLORS = {
+  // Core background - the House of Hades stone
+  stoneDeep: '#0d0608',
+  stoneMid: '#1a0d10',
+  stoneLight: '#2a1518',
+
+  // Blood/Zagreus reds
+  bloodDeep: '#6b0f1a',
+  bloodMid: '#9b1b2d',
+  bloodBright: '#dc2f44',
+  bloodGlow: '#ff4060',
+
+  // Styx river greens (the actual in-game color!)
+  styxDeep: '#0a2a20',
+  styxMid: '#0f4a38',
+  styxBright: '#1a8060',
+  styxGlow: '#20b080',
+
+  // Golden filigree (boon frames, currency)
+  goldDeep: '#8b6914',
+  goldMid: '#d4af37',
+  goldBright: '#f0d060',
+  goldGlow: '#ffe888',
+
+  // God colors (authentic to game)
+  athenaGreen: '#3dd68c',
+  apolloOrange: '#ff9500',
+  aresRed: '#ff3344',
+  zeusBlue: '#4488ff',
+  poseidonCyan: '#00c8ff',
+  dionysusViolet: '#bb44ff',
+  demeterIce: '#88ddff',
+  artemisGreen: '#44ff88',
+  aphroditePink: '#ff66aa',
+  hermesOrange: '#ffaa00',
+  chaosVoid: '#8844cc',
+  hadesGold: '#d4af37',
+
+  // UI elements
+  textPrimary: '#f0e0d8',
+  textSecondary: '#a08880',
+  textMuted: '#705850',
+
+  // Ember/fire
+  emberOrange: '#ff6633',
+  emberYellow: '#ffaa44',
+  ashGray: '#3a2a25',
 }
 
 // =============================================================================
-// LAUREL WREATH
+// SVG PATTERNS - Stone textures, Greek patterns
 // =============================================================================
-function LaurelWreath({ size = 'large' }: { size?: 'large' | 'small' }) {
-  const scale = size === 'large' ? 1 : 0.5
+function HadesPatternDefs() {
   return (
-    <svg
-      viewBox="0 0 200 60"
-      className="absolute"
-      style={{
-        width: `${200 * scale}px`,
-        height: `${60 * scale}px`,
-        filter: 'drop-shadow(0 0 8px #d4af3780)',
-      }}
-    >
+    <svg className="absolute w-0 h-0" aria-hidden="true">
       <defs>
-        <linearGradient id="laurelGold" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#f0d060" />
-          <stop offset="50%" stopColor="#d4af37" />
-          <stop offset="100%" stopColor="#a08020" />
+        {/* Greek meander/key pattern */}
+        <pattern id="greekMeander" patternUnits="userSpaceOnUse" width="32" height="16">
+          <path
+            d="M0 8 L8 8 L8 0 L24 0 L24 8 L16 8 L16 16 L32 16 M0 16 L0 8"
+            fill="none"
+            stroke={HADES_COLORS.goldMid}
+            strokeWidth="1.5"
+            opacity="0.6"
+          />
+        </pattern>
+
+        {/* Stone crack texture */}
+        <pattern id="stoneCracks" patternUnits="userSpaceOnUse" width="100" height="100">
+          <path
+            d="M10 5 Q20 15 15 30 M50 0 L55 25 Q60 40 50 50 M80 10 Q75 30 85 45 M30 60 L40 75 Q35 90 45 100 M70 55 Q80 70 75 85"
+            fill="none"
+            stroke={HADES_COLORS.bloodDeep}
+            strokeWidth="0.5"
+            opacity="0.3"
+          />
+        </pattern>
+
+        {/* Gold filigree scrollwork */}
+        <pattern id="goldFiligree" patternUnits="userSpaceOnUse" width="60" height="30">
+          <path
+            d="M0 15 Q15 5 30 15 Q45 25 60 15"
+            fill="none"
+            stroke={HADES_COLORS.goldDeep}
+            strokeWidth="1"
+            opacity="0.4"
+          />
+          <circle cx="30" cy="15" r="3" fill={HADES_COLORS.goldMid} opacity="0.5" />
+        </pattern>
+
+        {/* Radial gold gradient for boons */}
+        <radialGradient id="boonGlow" cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stopColor={HADES_COLORS.goldGlow} stopOpacity="0.4" />
+          <stop offset="50%" stopColor={HADES_COLORS.goldMid} stopOpacity="0.2" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+
+        {/* Blood pool gradient */}
+        <radialGradient id="bloodPool" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor={HADES_COLORS.bloodBright} stopOpacity="0.6" />
+          <stop offset="70%" stopColor={HADES_COLORS.bloodDeep} stopOpacity="0.3" />
+          <stop offset="100%" stopColor="transparent" />
+        </radialGradient>
+
+        {/* Styx water gradient */}
+        <linearGradient id="styxGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="transparent" />
+          <stop offset="30%" stopColor={HADES_COLORS.styxDeep} />
+          <stop offset="70%" stopColor={HADES_COLORS.styxMid} />
+          <stop offset="100%" stopColor={HADES_COLORS.styxBright} />
+        </linearGradient>
+
+        {/* Column gold gradient */}
+        <linearGradient id="columnGold" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={HADES_COLORS.goldBright} />
+          <stop offset="50%" stopColor={HADES_COLORS.goldMid} />
+          <stop offset="100%" stopColor={HADES_COLORS.goldDeep} />
         </linearGradient>
       </defs>
-      {/* Left branch */}
-      <g transform="translate(10, 30)">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <ellipse
-            key={`left-${i}`}
-            cx={15 + i * 12}
-            cy={-5 + Math.sin(i * 0.5) * 8}
-            rx="8"
-            ry="4"
-            fill="url(#laurelGold)"
-            transform={`rotate(${-30 + i * 5}, ${15 + i * 12}, ${-5 + Math.sin(i * 0.5) * 8})`}
-            style={{ animation: `laurelSway ${2 + i * 0.2}s ease-in-out infinite alternate` }}
-          />
-        ))}
-        <path d="M10 0 Q50 -10 90 5" fill="none" stroke="#8b7020" strokeWidth="2" />
-      </g>
-      {/* Right branch */}
-      <g transform="translate(190, 30) scale(-1, 1)">
-        {[0, 1, 2, 3, 4, 5].map((i) => (
-          <ellipse
-            key={`right-${i}`}
-            cx={15 + i * 12}
-            cy={-5 + Math.sin(i * 0.5) * 8}
-            rx="8"
-            ry="4"
-            fill="url(#laurelGold)"
-            transform={`rotate(${-30 + i * 5}, ${15 + i * 12}, ${-5 + Math.sin(i * 0.5) * 8})`}
-            style={{ animation: `laurelSway ${2 + i * 0.2}s ease-in-out infinite alternate` }}
-          />
-        ))}
-        <path d="M10 0 Q50 -10 90 5" fill="none" stroke="#8b7020" strokeWidth="2" />
-      </g>
     </svg>
   )
 }
 
 // =============================================================================
-// ANIMATED FLAMES
+// GREEK MEANDER BORDER
 // =============================================================================
-function AnimatedFlames({
-  side,
-  reducedMotion = false
-}: {
-  side: 'left' | 'right'
-  reducedMotion?: boolean
-}) {
+function MeanderBorder({ className = '' }: { className?: string }) {
   return (
     <div
-      className={`fixed top-0 bottom-0 w-20 pointer-events-none z-[4] ${
-        side === 'left' ? 'left-0' : 'right-0'
-      }`}
+      className={`h-4 w-full ${className}`}
+      style={{
+        background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='16'%3E%3Cpath d='M0 8 L8 8 L8 0 L24 0 L24 8 L16 8 L16 16 L32 16' fill='none' stroke='%23d4af37' stroke-width='1.5' opacity='0.7'/%3E%3C/svg%3E")`,
+        filter: `drop-shadow(0 0 4px ${HADES_COLORS.goldMid}40)`,
+      }}
       role="presentation"
       aria-hidden="true"
+    />
+  )
+}
+
+// =============================================================================
+// ORNATE FRAME - Hades boon card style
+// =============================================================================
+function OrnateFrame({
+  children,
+  color = HADES_COLORS.goldMid,
+  className = '',
+  glowColor,
+}: {
+  children: React.ReactNode
+  color?: string
+  className?: string
+  glowColor?: string
+}) {
+  const glow = glowColor || color
+  return (
+    <div
+      className={`relative ${className}`}
+      style={{
+        background: `linear-gradient(135deg, ${HADES_COLORS.stoneLight}, ${HADES_COLORS.stoneMid})`,
+        border: `2px solid ${color}`,
+        boxShadow: `
+          inset 0 0 30px ${HADES_COLORS.stoneDeep},
+          0 0 15px ${glow}30,
+          0 0 30px ${glow}15
+        `,
+      }}
     >
-      {/* Multiple flame layers */}
-      {[0, 1, 2, 3, 4].map((i) => (
-        <div
-          key={i}
-          className="absolute bottom-0"
-          style={{
-            left: side === 'left' ? `${10 + i * 15}px` : 'auto',
-            right: side === 'right' ? `${10 + i * 15}px` : 'auto',
-            width: '30px',
-            height: '150px',
-            background: `linear-gradient(to top,
-              #ff3344 0%,
-              #ff6633 30%,
-              #ffaa33 60%,
-              #ffdd66 80%,
-              transparent 100%)`,
-            borderRadius: '50% 50% 20% 20%',
-            filter: 'blur(3px)',
-            animation: reducedMotion ? 'none' : `flameFlicker ${0.5 + i * 0.1}s ease-in-out infinite alternate`,
-            animationDelay: reducedMotion ? '0s' : `${i * 0.15}s`,
-            opacity: 0.7,
-          }}
-        />
-      ))}
-      {/* Core bright flame */}
-      <div
-        className="absolute bottom-0"
-        style={{
-          left: side === 'left' ? '25px' : 'auto',
-          right: side === 'right' ? '25px' : 'auto',
-          width: '20px',
-          height: '100px',
-          background: 'linear-gradient(to top, #fff 0%, #ffee88 50%, transparent 100%)',
-          borderRadius: '50% 50% 20% 20%',
-          filter: 'blur(2px)',
-          animation: reducedMotion ? 'none' : 'flameCoreFlicker 0.3s ease-in-out infinite alternate',
-        }}
-      />
+      {/* Corner ornaments */}
+      <svg className="absolute -top-1 -left-1 w-6 h-6" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M0 24 L0 8 Q0 0 8 0 L24 0" fill="none" stroke={color} strokeWidth="2" />
+        <circle cx="4" cy="4" r="2" fill={color} />
+      </svg>
+      <svg className="absolute -top-1 -right-1 w-6 h-6" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M24 24 L24 8 Q24 0 16 0 L0 0" fill="none" stroke={color} strokeWidth="2" />
+        <circle cx="20" cy="4" r="2" fill={color} />
+      </svg>
+      <svg className="absolute -bottom-1 -left-1 w-6 h-6" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M0 0 L0 16 Q0 24 8 24 L24 24" fill="none" stroke={color} strokeWidth="2" />
+        <circle cx="4" cy="20" r="2" fill={color} />
+      </svg>
+      <svg className="absolute -bottom-1 -right-1 w-6 h-6" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M24 0 L24 16 Q24 24 16 24 L0 24" fill="none" stroke={color} strokeWidth="2" />
+        <circle cx="20" cy="20" r="2" fill={color} />
+      </svg>
+      {children}
     </div>
   )
 }
 
 // =============================================================================
-// GOD SILHOUETTES
+// LAUREL WREATH - Purely SVG
 // =============================================================================
-function GodSilhouette({ god, position }: { god: 'zeus' | 'athena' | 'ares' | 'hades'; position: string }) {
-  const paths = {
-    zeus: 'M50 10 L55 25 L70 30 L55 35 L60 50 L50 40 L40 50 L45 35 L30 30 L45 25 Z M50 50 L45 80 L40 100 L50 90 L60 100 L55 80 Z', // Lightning bolt figure
-    athena: 'M50 5 L50 15 L40 15 L35 25 L40 25 L35 30 L45 30 L45 50 L40 50 L40 100 L60 100 L60 50 L55 50 L55 30 L65 30 L60 25 L65 25 L60 15 L50 15 M45 55 L45 70 L55 70 L55 55 Z', // Helmeted figure with shield
-    ares: 'M50 5 L45 20 L30 25 L45 30 L40 40 L50 35 L60 40 L55 30 L70 25 L55 20 Z M45 45 L35 100 M55 45 L65 100 M50 45 L50 80 M30 60 L70 60', // Warrior with spear
-    hades: 'M50 5 L35 25 L40 25 L35 40 L45 35 L40 50 L50 45 L60 50 L55 35 L65 40 L60 25 L65 25 L50 5 M40 55 L35 100 L50 85 L65 100 L60 55 Z', // Dark crowned figure
-  }
-
-  const colors = {
-    zeus: '#5588ff',
-    athena: '#44dd88',
-    ares: '#ff3344',
-    hades: '#8844ff',
-  }
-
+function LaurelWreath({ width = 180 }: { width?: number }) {
   return (
-    <div className={`fixed ${position} pointer-events-none z-[3] opacity-20 hover:opacity-40 transition-opacity`}>
-      <svg viewBox="0 0 100 100" className="w-24 h-24">
+    <svg
+      viewBox="0 0 180 50"
+      className="mx-auto"
+      style={{
+        width,
+        filter: `drop-shadow(0 0 8px ${HADES_COLORS.goldMid}60)`
+      }}
+      aria-hidden="true"
+    >
+      {/* Left branch */}
+      <g fill={HADES_COLORS.goldMid}>
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <ellipse
+            key={`l-${i}`}
+            cx={20 + i * 12}
+            cy={25 + Math.sin(i * 0.8) * 8}
+            rx="10"
+            ry="5"
+            transform={`rotate(${-45 + i * 8}, ${20 + i * 12}, ${25 + Math.sin(i * 0.8) * 8})`}
+          />
+        ))}
         <path
-          d={paths[god]}
-          fill={colors[god]}
-          stroke={colors[god]}
-          strokeWidth="1"
-          style={{ filter: `drop-shadow(0 0 10px ${colors[god]})` }}
+          d="M15 30 Q50 15 90 25"
+          fill="none"
+          stroke={HADES_COLORS.goldDeep}
+          strokeWidth="2"
         />
-      </svg>
-    </div>
-  )
-}
-
-// =============================================================================
-// SKULLS AND BONES
-// =============================================================================
-function SkullDecoration({ position, size = 40 }: { position: string; size?: number }) {
-  return (
-    <div className={`absolute ${position} pointer-events-none`}>
-      <svg viewBox="0 0 50 60" width={size} height={size * 1.2} style={{ filter: 'drop-shadow(0 0 5px #ff334480)' }}>
-        {/* Skull */}
-        <ellipse cx="25" cy="20" rx="18" ry="16" fill="#e8ddd0" />
-        <ellipse cx="25" cy="25" rx="14" ry="10" fill="#d4c8b8" />
-        {/* Eye sockets */}
-        <ellipse cx="18" cy="18" rx="5" ry="6" fill="#1a0a10" />
-        <ellipse cx="32" cy="18" rx="5" ry="6" fill="#1a0a10" />
-        {/* Eye glow */}
-        <ellipse cx="18" cy="18" rx="2" ry="3" fill="#ff3344" opacity="0.8">
-          <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="32" cy="18" rx="2" ry="3" fill="#ff3344" opacity="0.8">
-          <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />
-        </ellipse>
-        {/* Nose */}
-        <path d="M25 22 L23 28 L27 28 Z" fill="#1a0a10" />
-        {/* Teeth */}
-        <rect x="17" y="32" width="16" height="6" fill="#e8ddd0" rx="1" />
-        <line x1="20" y1="32" x2="20" y2="38" stroke="#1a0a10" strokeWidth="1" />
-        <line x1="23" y1="32" x2="23" y2="38" stroke="#1a0a10" strokeWidth="1" />
-        <line x1="27" y1="32" x2="27" y2="38" stroke="#1a0a10" strokeWidth="1" />
-        <line x1="30" y1="32" x2="30" y2="38" stroke="#1a0a10" strokeWidth="1" />
-        {/* Jaw */}
-        <path d="M12 30 Q25 45 38 30" fill="none" stroke="#d4c8b8" strokeWidth="3" />
-      </svg>
-    </div>
-  )
-}
-
-function BoneDecoration({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 80 20" className={`h-4 ${className}`} style={{ filter: 'drop-shadow(0 0 3px #a0908080)' }}>
-      <ellipse cx="8" cy="5" rx="6" ry="4" fill="#e8ddd0" />
-      <ellipse cx="8" cy="15" rx="6" ry="4" fill="#e8ddd0" />
-      <rect x="6" y="5" width="68" height="10" fill="#d4c8b8" rx="3" />
-      <ellipse cx="72" cy="5" rx="6" ry="4" fill="#e8ddd0" />
-      <ellipse cx="72" cy="15" rx="6" ry="4" fill="#e8ddd0" />
+      </g>
+      {/* Right branch */}
+      <g fill={HADES_COLORS.goldMid}>
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <ellipse
+            key={`r-${i}`}
+            cx={160 - i * 12}
+            cy={25 + Math.sin(i * 0.8) * 8}
+            rx="10"
+            ry="5"
+            transform={`rotate(${45 - i * 8}, ${160 - i * 12}, ${25 + Math.sin(i * 0.8) * 8})`}
+          />
+        ))}
+        <path
+          d="M165 30 Q130 15 90 25"
+          fill="none"
+          stroke={HADES_COLORS.goldDeep}
+          strokeWidth="2"
+        />
+      </g>
     </svg>
   )
 }
 
 // =============================================================================
-// BLOOD / ICHOR DRIPS
+// SKULL DECORATION - Underworld style
 // =============================================================================
-function IchorDrips() {
-  const [drips, setDrips] = useState<Array<{ id: number; x: number; delay: number; duration: number; isIchor: boolean }>>([])
-
-  useEffect(() => {
-    setDrips(
-      Array.from({ length: 15 }, (_, i) => ({
-        id: i,
-        x: 5 + Math.random() * 90,
-        delay: Math.random() * 8,
-        duration: 4 + Math.random() * 4,
-        isIchor: Math.random() > 0.7, // 30% golden ichor, 70% blood
-      }))
-    )
-  }, [])
-
+function SkullIcon({ size = 24, className = '' }: { size?: number; className?: string }) {
   return (
-    <div className="fixed top-0 left-0 right-0 h-full pointer-events-none z-[6] overflow-hidden">
-      {drips.map((drip) => (
-        <div
-          key={drip.id}
-          className="absolute top-0 animate-drip"
-          style={{
-            left: `${drip.x}%`,
-            width: '4px',
-            height: '30px',
-            background: drip.isIchor
-              ? 'linear-gradient(180deg, #d4af37, #ffdd88)'
-              : 'linear-gradient(180deg, #ff3344, #880022)',
-            borderRadius: '0 0 50% 50%',
-            boxShadow: drip.isIchor
-              ? '0 0 10px #d4af37, 0 5px 15px #d4af3780'
-              : '0 0 10px #ff3344, 0 5px 15px #ff334480',
-            animationDelay: `${drip.delay}s`,
-            animationDuration: `${drip.duration}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
-// =============================================================================
-// SHIELD AND SPEAR
-// =============================================================================
-function ShieldOrnament({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 60 70" className={`w-12 h-14 ${className}`}>
-      <defs>
-        <radialGradient id="shieldGrad" cx="30%" cy="30%" r="70%">
-          <stop offset="0%" stopColor="#c4a030" />
-          <stop offset="50%" stopColor="#8b6914" />
-          <stop offset="100%" stopColor="#5a4510" />
-        </radialGradient>
-      </defs>
-      {/* Shield body */}
-      <path
-        d="M30 5 L55 15 L55 40 Q55 60 30 68 Q5 60 5 40 L5 15 Z"
-        fill="url(#shieldGrad)"
-        stroke="#d4af37"
-        strokeWidth="2"
-      />
-      {/* Shield pattern - Greek lambda */}
-      <path d="M30 20 L22 50 M30 20 L38 50 M24 40 L36 40" stroke="#1a0a10" strokeWidth="3" fill="none" />
-      {/* Shield boss */}
-      <circle cx="30" cy="35" r="8" fill="#d4af37" stroke="#8b6914" strokeWidth="2" />
+    <svg
+      viewBox="0 0 30 36"
+      width={size}
+      height={size * 1.2}
+      className={className}
+      style={{ filter: `drop-shadow(0 0 4px ${HADES_COLORS.bloodGlow}40)` }}
+      aria-hidden="true"
+    >
+      {/* Skull shape */}
+      <ellipse cx="15" cy="13" rx="12" ry="10" fill={HADES_COLORS.textPrimary} />
+      <ellipse cx="15" cy="16" rx="9" ry="6" fill="#c8b8a8" />
+      {/* Eye sockets */}
+      <ellipse cx="10" cy="12" rx="3.5" ry="4" fill={HADES_COLORS.stoneDeep} />
+      <ellipse cx="20" cy="12" rx="3.5" ry="4" fill={HADES_COLORS.stoneDeep} />
+      {/* Glowing eyes */}
+      <ellipse cx="10" cy="12" rx="1.5" ry="2" fill={HADES_COLORS.bloodBright} opacity="0.9" />
+      <ellipse cx="20" cy="12" rx="1.5" ry="2" fill={HADES_COLORS.bloodBright} opacity="0.9" />
+      {/* Nose */}
+      <path d="M15 15 L13.5 19 L16.5 19 Z" fill={HADES_COLORS.stoneDeep} />
+      {/* Teeth */}
+      <rect x="10" y="22" width="10" height="4" fill={HADES_COLORS.textPrimary} rx="1" />
+      <line x1="12" y1="22" x2="12" y2="26" stroke={HADES_COLORS.stoneDeep} strokeWidth="0.5" />
+      <line x1="14" y1="22" x2="14" y2="26" stroke={HADES_COLORS.stoneDeep} strokeWidth="0.5" />
+      <line x1="16" y1="22" x2="16" y2="26" stroke={HADES_COLORS.stoneDeep} strokeWidth="0.5" />
+      <line x1="18" y1="22" x2="18" y2="26" stroke={HADES_COLORS.stoneDeep} strokeWidth="0.5" />
+      {/* Jaw */}
+      <path d="M8 20 Q15 30 22 20" fill="none" stroke="#c8b8a8" strokeWidth="2" />
     </svg>
   )
 }
 
+// =============================================================================
+// BONE DIVIDER
+// =============================================================================
+function BoneDivider({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 120 16"
+      className={`h-4 ${className}`}
+      style={{ filter: `drop-shadow(0 0 2px ${HADES_COLORS.textMuted}40)` }}
+      aria-hidden="true"
+    >
+      <ellipse cx="8" cy="4" rx="5" ry="3" fill="#d8ccc0" />
+      <ellipse cx="8" cy="12" rx="5" ry="3" fill="#d8ccc0" />
+      <rect x="6" y="4" width="108" height="8" fill="#c8b8a8" rx="3" />
+      <ellipse cx="112" cy="4" rx="5" ry="3" fill="#d8ccc0" />
+      <ellipse cx="112" cy="12" rx="5" ry="3" fill="#d8ccc0" />
+    </svg>
+  )
+}
+
+// =============================================================================
+// SPEAR DIVIDER
+// =============================================================================
 function SpearDivider() {
   return (
-    <div className="flex items-center justify-center my-4">
-      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#d4af37] to-transparent" />
-      <svg viewBox="0 0 100 20" className="w-20 h-5 mx-2">
-        {/* Spear tip */}
-        <polygon points="0,10 15,5 15,15" fill="#d4af37" />
-        {/* Shaft */}
-        <rect x="15" y="8" width="70" height="4" fill="#8b6914" />
-        {/* End decoration */}
-        <polygon points="85,10 100,5 100,15" fill="#d4af37" />
+    <div className="flex items-center justify-center my-6" aria-hidden="true">
+      <div
+        className="flex-1 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${HADES_COLORS.goldMid}, transparent)` }}
+      />
+      <svg viewBox="0 0 80 16" className="w-16 h-4 mx-3">
+        <polygon points="0,8 12,4 12,12" fill={HADES_COLORS.goldMid} />
+        <rect x="12" y="6" width="56" height="4" fill={HADES_COLORS.goldDeep} />
+        <polygon points="68,8 80,4 80,12" fill={HADES_COLORS.goldMid} />
       </svg>
-      <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#d4af37] to-transparent" />
+      <div
+        className="flex-1 h-px"
+        style={{ background: `linear-gradient(90deg, transparent, ${HADES_COLORS.goldMid}, transparent)` }}
+      />
     </div>
   )
 }
 
 // =============================================================================
-// CERBERUS
+// FLOATING EMBERS - CSS only, no state
 // =============================================================================
-function CerberusSilhouette() {
-  return (
-    <div className="relative w-full flex justify-center">
-      <svg viewBox="0 0 200 80" className="w-48 h-20" style={{ filter: 'drop-shadow(0 0 15px #ff334480)' }}>
-        <defs>
-          <linearGradient id="cerberusGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#4a2020" />
-            <stop offset="100%" stopColor="#1a0a10" />
-          </linearGradient>
-        </defs>
-        {/* Body */}
-        <ellipse cx="100" cy="60" rx="50" ry="20" fill="url(#cerberusGrad)" />
-        {/* Left head */}
-        <g transform="translate(50, 30)">
-          <ellipse cx="0" cy="0" rx="15" ry="12" fill="url(#cerberusGrad)" />
-          <ellipse cx="-5" cy="-3" rx="2" ry="2" fill="#ff3344">
-            <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" />
-          </ellipse>
-          <path d="M-10 5 Q0 15 10 5" fill="none" stroke="#ff3344" strokeWidth="1" /> {/* Snarl */}
-          <polygon points="-8,-10 -5,-15 -2,-10" fill="url(#cerberusGrad)" /> {/* Ear */}
-        </g>
-        {/* Center head (larger) */}
-        <g transform="translate(100, 20)">
-          <ellipse cx="0" cy="0" rx="18" ry="15" fill="url(#cerberusGrad)" />
-          <ellipse cx="-6" cy="-4" rx="3" ry="3" fill="#ff3344">
-            <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
-          </ellipse>
-          <ellipse cx="6" cy="-4" rx="3" ry="3" fill="#ff3344">
-            <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" />
-          </ellipse>
-          <path d="M-12 8 Q0 20 12 8" fill="none" stroke="#ff3344" strokeWidth="2" />
-          <polygon points="-12,-12 -8,-20 -4,-12" fill="url(#cerberusGrad)" />
-          <polygon points="4,-12 8,-20 12,-12" fill="url(#cerberusGrad)" />
-        </g>
-        {/* Right head */}
-        <g transform="translate(150, 30)">
-          <ellipse cx="0" cy="0" rx="15" ry="12" fill="url(#cerberusGrad)" />
-          <ellipse cx="5" cy="-3" rx="2" ry="2" fill="#ff3344">
-            <animate attributeName="opacity" values="0.5;1;0.5" dur="1.8s" repeatCount="indefinite" />
-          </ellipse>
-          <path d="M-10 5 Q0 15 10 5" fill="none" stroke="#ff3344" strokeWidth="1" />
-          <polygon points="2,-10 5,-15 8,-10" fill="url(#cerberusGrad)" />
-        </g>
-        {/* Legs */}
-        <rect x="60" y="55" width="8" height="20" fill="url(#cerberusGrad)" rx="3" />
-        <rect x="80" y="55" width="8" height="22" fill="url(#cerberusGrad)" rx="3" />
-        <rect x="112" y="55" width="8" height="22" fill="url(#cerberusGrad)" rx="3" />
-        <rect x="132" y="55" width="8" height="20" fill="url(#cerberusGrad)" rx="3" />
-      </svg>
-    </div>
-  )
-}
+function FloatingEmbers({ reducedMotion }: { reducedMotion: boolean }) {
+  if (reducedMotion) return null
 
-// =============================================================================
-// POMEGRANATE SEEDS
-// =============================================================================
-function PomegranateSeeds() {
-  const [seeds, setSeeds] = useState<Array<{ id: number; x: number; y: number; size: number; delay: number }>>([])
-
-  useEffect(() => {
-    setSeeds(
-      Array.from({ length: 20 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size: 6 + Math.random() * 8,
-        delay: Math.random() * 3,
-      }))
-    )
-  }, [])
+  // Pre-calculated ember positions for performance
+  const embers = [
+    { left: '5%', delay: '0s', duration: '6s', size: 3 },
+    { left: '15%', delay: '1s', duration: '7s', size: 4 },
+    { left: '25%', delay: '2s', duration: '5s', size: 2 },
+    { left: '35%', delay: '0.5s', duration: '8s', size: 5 },
+    { left: '45%', delay: '1.5s', duration: '6s', size: 3 },
+    { left: '55%', delay: '2.5s', duration: '7s', size: 4 },
+    { left: '65%', delay: '0.8s', duration: '5s', size: 2 },
+    { left: '75%', delay: '1.8s', duration: '8s', size: 5 },
+    { left: '85%', delay: '2.2s', duration: '6s', size: 3 },
+    { left: '95%', delay: '0.3s', duration: '7s', size: 4 },
+  ]
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-      {seeds.map((seed) => (
+    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
+      {embers.map((ember, i) => (
         <div
-          key={seed.id}
-          className="absolute animate-seed-glow"
+          key={i}
+          className="absolute bottom-0 rounded-full animate-ember-float"
           style={{
-            left: `${seed.x}%`,
-            top: `${seed.y}%`,
-            width: `${seed.size}px`,
-            height: `${seed.size * 1.3}px`,
-            background: 'radial-gradient(ellipse at 30% 30%, #ff6688, #cc2244, #880022)',
-            borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-            boxShadow: '0 0 10px #ff334480, inset 0 -2px 4px #440011',
-            animationDelay: `${seed.delay}s`,
-            opacity: 0.6,
+            left: ember.left,
+            width: ember.size,
+            height: ember.size,
+            background: i % 2 === 0 ? HADES_COLORS.emberOrange : HADES_COLORS.emberYellow,
+            boxShadow: `0 0 ${ember.size * 2}px ${i % 2 === 0 ? HADES_COLORS.emberOrange : HADES_COLORS.emberYellow}`,
+            animationDelay: ember.delay,
+            animationDuration: ember.duration,
           }}
         />
       ))}
@@ -474,59 +404,34 @@ function PomegranateSeeds() {
 }
 
 // =============================================================================
-// STYX RIVER
+// STYX RIVER - Bottom decoration with authentic green glow
 // =============================================================================
 function StyxRiver() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-32 pointer-events-none z-[7] overflow-hidden">
-      {/* River base */}
+    <div
+      className="fixed bottom-0 left-0 right-0 h-24 pointer-events-none z-[2]"
+      aria-hidden="true"
+    >
+      {/* Base river color */}
       <div
         className="absolute inset-0"
         style={{
-          background: 'linear-gradient(180deg, transparent 0%, #0a151a 30%, #051015 100%)',
+          background: `linear-gradient(180deg, transparent 0%, ${HADES_COLORS.styxDeep} 40%, ${HADES_COLORS.styxMid} 100%)`,
         }}
       />
-      {/* Flowing water effect */}
-      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="styxWater" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#0a2030">
-              <animate attributeName="stop-color" values="#0a2030;#102840;#0a2030" dur="4s" repeatCount="indefinite" />
-            </stop>
-            <stop offset="50%" stopColor="#153050">
-              <animate attributeName="stop-color" values="#153050;#204060;#153050" dur="4s" repeatCount="indefinite" />
-            </stop>
-            <stop offset="100%" stopColor="#0a2030">
-              <animate attributeName="stop-color" values="#0a2030;#102840;#0a2030" dur="4s" repeatCount="indefinite" />
-            </stop>
-          </linearGradient>
-        </defs>
-        <rect x="0" y="40" width="100%" height="100" fill="url(#styxWater)" opacity="0.8" />
-      </svg>
-      {/* Floating souls */}
-      {[...Array(8)].map((_, i) => (
-        <div
-          key={i}
-          className="absolute animate-soul-drift"
-          style={{
-            bottom: `${20 + Math.random() * 30}px`,
-            left: `${-10 + i * 15}%`,
-            width: '20px',
-            height: '30px',
-            background: 'radial-gradient(ellipse at 50% 30%, #88aacc40, #44668820, transparent)',
-            borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-            filter: 'blur(2px)',
-            animationDelay: `${i * 1.5}s`,
-            animationDuration: `${15 + Math.random() * 10}s`,
-          }}
-        />
-      ))}
-      {/* Green glow from depths */}
+      {/* Emerald glow from depths */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-8"
+        className="absolute bottom-0 left-0 right-0 h-12"
         style={{
-          background: 'linear-gradient(180deg, transparent, #22886620)',
-          filter: 'blur(4px)',
+          background: `linear-gradient(180deg, transparent, ${HADES_COLORS.styxBright}30)`,
+          filter: 'blur(8px)',
+        }}
+      />
+      {/* Ripple effect */}
+      <div
+        className="absolute bottom-4 left-0 right-0 h-px animate-styx-ripple"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${HADES_COLORS.styxGlow}60, transparent)`,
         }}
       />
     </div>
@@ -534,115 +439,89 @@ function StyxRiver() {
 }
 
 // =============================================================================
-// FLOATING EMBERS (enhanced)
+// BLOOD VIGNETTE - Edges of the screen
 // =============================================================================
-function EmberParticles() {
-  const [particles, setParticles] = useState<Array<{ id: number; x: number; delay: number; duration: number; size: number }>>([])
-
-  useEffect(() => {
-    setParticles(
-      Array.from({ length: 40 }, (_, i) => ({
-        id: i,
-        x: Math.random() * 100,
-        delay: Math.random() * 5,
-        duration: 3 + Math.random() * 4,
-        size: 2 + Math.random() * 4,
-      }))
-    )
-  }, [])
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden">
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute bottom-0 animate-ember-rise"
-          style={{
-            left: `${p.x}%`,
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            background: p.size > 4 ? '#ffaa33' : '#ff6655',
-            borderRadius: '50%',
-            boxShadow: `0 0 ${p.size * 2}px ${p.size > 4 ? '#ffaa33' : '#ff6655'}, 0 0 ${p.size * 4}px ${p.size > 4 ? '#ff8800' : '#ff3344'}`,
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
-// =============================================================================
-// GREEK COLUMN (enhanced with flames)
-// =============================================================================
-function GreekColumn({ side }: { side: 'left' | 'right' }) {
+function BloodVignette() {
   return (
     <div
-      className={`fixed top-0 bottom-0 w-20 pointer-events-none z-[3] ${
+      className="fixed inset-0 pointer-events-none z-[3]"
+      style={{
+        background: `
+          radial-gradient(ellipse at 50% 0%, ${HADES_COLORS.bloodDeep}30 0%, transparent 50%),
+          radial-gradient(ellipse at 0% 50%, ${HADES_COLORS.bloodDeep}20 0%, transparent 40%),
+          radial-gradient(ellipse at 100% 50%, ${HADES_COLORS.bloodDeep}20 0%, transparent 40%),
+          radial-gradient(ellipse at 50% 100%, ${HADES_COLORS.styxDeep}40 0%, transparent 50%)
+        `,
+      }}
+      aria-hidden="true"
+    />
+  )
+}
+
+// =============================================================================
+// SIDE FLAMES - Greek brazier style
+// =============================================================================
+function SideFlames({ side, reducedMotion }: { side: 'left' | 'right'; reducedMotion: boolean }) {
+  return (
+    <div
+      className={`fixed top-0 bottom-0 w-16 pointer-events-none z-[4] ${
         side === 'left' ? 'left-0' : 'right-0'
       }`}
-      style={{
-        background: 'linear-gradient(180deg, #4a2020, #251518, #1a0a10)',
-        borderRight: side === 'left' ? '3px solid #d4af37' : 'none',
-        borderLeft: side === 'right' ? '3px solid #d4af37' : 'none',
-      }}
+      aria-hidden="true"
     >
-      {/* Column top - Ionic capital */}
-      <div className="absolute top-0 w-full h-32">
-        <svg viewBox="0 0 80 120" className="w-full h-full">
-          <defs>
-            <linearGradient id="columnGold" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#f0d060" />
-              <stop offset="50%" stopColor="#d4af37" />
-              <stop offset="100%" stopColor="#8b6914" />
-            </linearGradient>
-          </defs>
-          {/* Volutes (scrolls) */}
-          <circle cx="15" cy="30" r="12" fill="none" stroke="url(#columnGold)" strokeWidth="3" />
-          <circle cx="65" cy="30" r="12" fill="none" stroke="url(#columnGold)" strokeWidth="3" />
-          <circle cx="15" cy="30" r="6" fill="url(#columnGold)" />
-          <circle cx="65" cy="30" r="6" fill="url(#columnGold)" />
-          {/* Connecting band */}
-          <rect x="15" y="24" width="50" height="12" fill="url(#columnGold)" />
-          {/* Echinus */}
-          <ellipse cx="40" cy="50" rx="35" ry="8" fill="url(#columnGold)" />
-          {/* Abacus */}
-          <rect x="5" y="55" width="70" height="10" fill="url(#columnGold)" />
-        </svg>
-      </div>
-
-      {/* Column fluting pattern */}
+      {/* Column base */}
       <div
-        className="absolute top-32 bottom-32 w-full"
+        className="absolute inset-0"
         style={{
-          background: `repeating-linear-gradient(90deg,
-            #3a1818 0px,
-            #4a2020 5px,
-            #3a1818 10px)`,
+          background: `linear-gradient(180deg, ${HADES_COLORS.stoneLight}, ${HADES_COLORS.stoneMid}, ${HADES_COLORS.stoneDeep})`,
+          borderRight: side === 'left' ? `2px solid ${HADES_COLORS.goldDeep}` : 'none',
+          borderLeft: side === 'right' ? `2px solid ${HADES_COLORS.goldDeep}` : 'none',
         }}
       />
 
-      {/* Column base */}
-      <div className="absolute bottom-0 w-full h-32">
-        <svg viewBox="0 0 80 120" className="w-full h-full">
-          <rect x="5" y="0" width="70" height="10" fill="url(#columnGold)" />
-          <ellipse cx="40" cy="20" rx="35" ry="8" fill="url(#columnGold)" />
-          <rect x="10" y="25" width="60" height="40" fill="#4a2020" />
-          <ellipse cx="40" cy="70" rx="38" ry="10" fill="url(#columnGold)" />
-          <rect x="2" y="75" width="76" height="45" fill="#3a1818" />
+      {/* Flame brazier */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2">
+        {/* Brazier bowl */}
+        <svg viewBox="0 0 40 30" className="w-10 h-8">
+          <path
+            d="M5 0 L35 0 L30 25 Q20 30 10 25 Z"
+            fill={HADES_COLORS.goldDeep}
+            stroke={HADES_COLORS.goldMid}
+            strokeWidth="1"
+          />
         </svg>
+
+        {/* Flames */}
+        {!reducedMotion && (
+          <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-8 flex justify-center gap-0.5">
+            {[0, 1, 2].map((i) => (
+              <div
+                key={i}
+                className="animate-flame-flicker"
+                style={{
+                  width: 6 + i * 2,
+                  height: 30 - i * 5,
+                  background: `linear-gradient(to top, ${HADES_COLORS.bloodBright}, ${HADES_COLORS.emberOrange}, ${HADES_COLORS.emberYellow})`,
+                  borderRadius: '50% 50% 30% 30%',
+                  filter: 'blur(1px)',
+                  animationDelay: `${i * 0.1}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Skull on column */}
-      {side === 'left' && <SkullDecoration position="top-40 left-2" size={35} />}
-      {side === 'right' && <SkullDecoration position="top-40 right-2" size={35} />}
+      {/* Top decoration */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2">
+        <SkullIcon size={20} />
+      </div>
     </div>
   )
 }
 
 // =============================================================================
-// BOON CARD (profession selector)
+// PROFESSION BOON CARD - Hexagonal Olympian style
 // =============================================================================
 function BoonCard({
   profession,
@@ -654,102 +533,103 @@ function BoonCard({
   onClick: () => void
 }) {
   const gods = {
-    engineer: { name: 'ATHENA', color: '#44dd88', title: 'Goddess of Wisdom' },
-    drummer: { name: 'APOLLO', color: '#ffaa33', title: 'God of Music' },
-    fighter: { name: 'ARES', color: '#ff3344', title: 'God of War' },
+    engineer: {
+      name: 'ATHENA',
+      color: HADES_COLORS.athenaGreen,
+      title: 'Goddess of Wisdom',
+      icon: 'M20 8 L20 4 L16 4 L14 8 L16 12 L14 16 L18 16 L18 28 L22 28 L22 16 L26 16 L24 12 L26 8 L22 4 L20 4' // Helmet/owl
+    },
+    drummer: {
+      name: 'APOLLO',
+      color: HADES_COLORS.apolloOrange,
+      title: 'God of Music',
+      icon: 'M20 6 L14 14 Q12 20 20 26 Q28 20 26 14 Z M18 14 L18 22 M20 14 L20 24 M22 14 L22 22' // Lyre
+    },
+    fighter: {
+      name: 'ARES',
+      color: HADES_COLORS.aresRed,
+      title: 'God of War',
+      icon: 'M20 4 L12 12 L12 20 L20 16 L28 20 L28 12 Z M20 18 L20 32 M14 24 L26 24' // Helmet with spear
+    },
   }
   const god = gods[profession]
 
   return (
     <button
       onClick={onClick}
-      className={`relative p-6 transition-all duration-300 group ${
+      className={`relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
         isActive ? 'scale-110 z-10' : 'opacity-70 hover:opacity-100 hover:scale-105'
       }`}
       style={{
-        background: isActive
-          ? `linear-gradient(180deg, ${god.color}40, #1a0a10)`
-          : 'linear-gradient(180deg, #301a20, #1a0a10)',
-        border: `3px solid ${isActive ? god.color : '#4a2020'}`,
-        clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-        minWidth: '140px',
+        focusVisibleRingColor: god.color,
       }}
+      aria-pressed={isActive}
+      aria-label={`Select ${god.name} - ${god.title}`}
     >
-      {/* Animated glow */}
-      {isActive && (
-        <div
-          className="absolute inset-0 animate-pulse"
+      <svg viewBox="0 0 100 120" className="w-28 h-36">
+        {/* Hexagon background */}
+        <path
+          d="M50 5 L90 25 L90 85 L50 115 L10 85 L10 25 Z"
+          fill={isActive ? `${god.color}20` : HADES_COLORS.stoneMid}
+          stroke={isActive ? god.color : HADES_COLORS.goldDeep}
+          strokeWidth="3"
           style={{
-            background: `radial-gradient(circle at 50% 50%, ${god.color}40, transparent 70%)`,
-            clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+            filter: isActive ? `drop-shadow(0 0 15px ${god.color}60)` : 'none',
           }}
         />
-      )}
 
-      <div className="relative z-10 text-center">
-        {/* God silhouette icon */}
-        <div
-          className="w-16 h-16 mx-auto mb-2 rounded-full flex items-center justify-center"
-          style={{
-            background: `radial-gradient(circle, ${god.color}30, transparent)`,
-            border: `2px solid ${god.color}60`,
-          }}
-        >
-          <svg viewBox="0 0 40 40" className="w-10 h-10">
-            {profession === 'engineer' && (
-              // Athena - owl/helmet
-              <g fill={god.color}>
-                <circle cx="20" cy="15" r="8" />
-                <path d="M12 13 L8 8 L12 10 M28 13 L32 8 L28 10" />
-                <rect x="15" y="22" width="10" height="15" rx="2" />
-                <path d="M10 25 L15 22 L15 37 L10 35 Z" />
-                <path d="M30 25 L25 22 L25 37 L30 35 Z" />
-              </g>
-            )}
-            {profession === 'drummer' && (
-              // Apollo - lyre/sun
-              <g fill={god.color}>
-                <circle cx="20" cy="12" r="8" />
-                <path d="M12 12 L5 5 M28 12 L35 5 M20 4 L20 -2 M14 6 L10 0 M26 6 L30 0" stroke={god.color} strokeWidth="2" />
-                <path d="M12 20 Q12 35 20 38 Q28 35 28 20 Z" />
-                <line x1="14" y1="22" x2="14" y2="34" stroke="#1a0a10" strokeWidth="1" />
-                <line x1="17" y1="22" x2="17" y2="36" stroke="#1a0a10" strokeWidth="1" />
-                <line x1="20" y1="22" x2="20" y2="37" stroke="#1a0a10" strokeWidth="1" />
-                <line x1="23" y1="22" x2="23" y2="36" stroke="#1a0a10" strokeWidth="1" />
-                <line x1="26" y1="22" x2="26" y2="34" stroke="#1a0a10" strokeWidth="1" />
-              </g>
-            )}
-            {profession === 'fighter' && (
-              // Ares - helmet/spear
-              <g fill={god.color}>
-                <path d="M20 5 L10 15 L10 25 L20 20 L30 25 L30 15 Z" />
-                <rect x="18" y="3" width="4" height="8" />
-                <circle cx="20" cy="28" r="6" />
-                <rect x="18" y="32" width="4" height="8" />
-                <line x1="32" y1="5" x2="32" y2="40" stroke={god.color} strokeWidth="2" />
-                <polygon points="32,2 28,8 36,8" />
-              </g>
-            )}
-          </svg>
-        </div>
-        <span
-          className="text-lg font-bold tracking-wider block"
-          style={{ color: god.color, textShadow: `0 0 10px ${god.color}60` }}
+        {/* Inner hexagon */}
+        <path
+          d="M50 15 L82 32 L82 78 L50 105 L18 78 L18 32 Z"
+          fill="none"
+          stroke={isActive ? god.color : HADES_COLORS.goldDeep}
+          strokeWidth="1"
+          opacity="0.5"
+        />
+
+        {/* God icon */}
+        <g transform="translate(30, 25)">
+          <path
+            d={god.icon}
+            fill={isActive ? god.color : HADES_COLORS.textSecondary}
+            style={{
+              filter: isActive ? `drop-shadow(0 0 8px ${god.color})` : 'none',
+            }}
+          />
+        </g>
+
+        {/* God name */}
+        <text
+          x="50"
+          y="90"
+          textAnchor="middle"
+          fill={isActive ? god.color : HADES_COLORS.textSecondary}
+          fontSize="10"
+          fontWeight="bold"
+          style={{ fontFamily: 'serif' }}
         >
           {god.name}
-        </span>
-        <span className="text-[10px] block mt-1" style={{ color: '#a08888' }}>
-          {god.title}
-        </span>
-      </div>
+        </text>
 
-      {/* Laurel selection indicator */}
+        {/* Title */}
+        <text
+          x="50"
+          y="102"
+          textAnchor="middle"
+          fill={HADES_COLORS.textMuted}
+          fontSize="6"
+        >
+          {god.title}
+        </text>
+      </svg>
+
+      {/* Active indicator laurel */}
       {isActive && (
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2">
-          <svg viewBox="0 0 60 20" className="w-12 h-4">
-            <path d="M5 15 Q15 5 30 10 Q45 5 55 15" fill="none" stroke="#d4af37" strokeWidth="2" />
+        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
+          <svg viewBox="0 0 40 12" className="w-8 h-3">
+            <path d="M0 10 Q10 2 20 6 Q30 2 40 10" fill="none" stroke={HADES_COLORS.goldMid} strokeWidth="1.5" />
             {[0, 1, 2, 3, 4].map(i => (
-              <ellipse key={i} cx={10 + i * 10} cy={12 - Math.abs(2 - i) * 2} rx="4" ry="2" fill="#d4af37" transform={`rotate(${-20 + i * 10}, ${10 + i * 10}, ${12 - Math.abs(2 - i) * 2})`} />
+              <ellipse key={i} cx={4 + i * 8} cy={8 - Math.abs(2 - i) * 1.5} rx="3" ry="1.5" fill={HADES_COLORS.goldMid} />
             ))}
           </svg>
         </div>
@@ -759,87 +639,125 @@ function BoonCard({
 }
 
 // =============================================================================
-// BOON SKILL (NO 1-5 BARS - shows actual achievements/impact)
+// SECTION CARD - Stone tablet with blood pool edges
 // =============================================================================
-function BoonSkill({
-  name,
-  description,
-  color,
-  icon
+function SectionCard({
+  children,
+  color = HADES_COLORS.goldMid,
+  className = '',
+  ariaLabel,
 }: {
-  name: string
-  description?: string
-  color: string
-  icon?: string
+  children: React.ReactNode
+  color?: string
+  className?: string
+  ariaLabel?: string
 }) {
   return (
-    <div
-      className="flex items-start gap-3 py-2 group cursor-pointer hover:bg-[#ffffff08] px-2 rounded transition-colors"
-      role="listitem"
-      aria-label={`${name}${description ? `: ${description}` : ''}`}
+    <section
+      className={`relative p-6 ${className}`}
+      style={{
+        background: `
+          linear-gradient(135deg, ${HADES_COLORS.stoneLight} 0%, ${HADES_COLORS.stoneMid} 50%, ${HADES_COLORS.stoneDeep} 100%)
+        `,
+        border: `2px solid ${color}60`,
+        boxShadow: `
+          inset 0 0 40px ${HADES_COLORS.stoneDeep},
+          0 0 20px ${color}20
+        `,
+      }}
+      role="region"
+      aria-label={ariaLabel}
     >
-      {/* Hexagonal boon icon */}
-      <div className="w-7 h-8 relative flex-shrink-0 mt-0.5">
-        <svg viewBox="0 0 28 32" className="w-full h-full">
-          <path
-            d="M14 1 L26 8 L26 24 L14 31 L2 24 L2 8 Z"
-            fill={`${color}25`}
-            stroke={color}
-            strokeWidth="1.5"
-          />
-          <text x="14" y="18" textAnchor="middle" fill={color} fontSize="10">
-            {icon || '◆'}
-          </text>
-        </svg>
-      </div>
-      <div className="flex-1 min-w-0">
-        <span className="text-xs font-medium block" style={{ color: '#f0e8e0' }}>
-          {name}
-        </span>
-        {description && (
-          <span className="text-[10px] block mt-0.5" style={{ color: '#a08888' }}>
-            {description}
-          </span>
-        )}
-      </div>
-      {/* Radiant glow indicator */}
+      {/* Stone texture overlay */}
       <div
-        className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5"
+        className="absolute inset-0 pointer-events-none opacity-30"
         style={{
-          background: color,
-          boxShadow: `0 0 6px ${color}80`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M10 5 Q20 15 15 30 M50 0 L55 25 Q60 40 50 50 M80 10 Q75 30 85 45' fill='none' stroke='%236b0f1a' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E")`,
         }}
+        aria-hidden="true"
       />
-    </div>
+
+      {/* Blood drip accents at top */}
+      <div className="absolute top-0 left-8 w-1 h-4 rounded-b-full" style={{ background: `linear-gradient(180deg, ${HADES_COLORS.bloodBright}, transparent)` }} aria-hidden="true" />
+      <div className="absolute top-0 left-16 w-0.5 h-3 rounded-b-full" style={{ background: `linear-gradient(180deg, ${HADES_COLORS.bloodMid}, transparent)` }} aria-hidden="true" />
+      <div className="absolute top-0 right-12 w-1 h-5 rounded-b-full" style={{ background: `linear-gradient(180deg, ${HADES_COLORS.bloodBright}, transparent)` }} aria-hidden="true" />
+
+      {/* Corner ornaments */}
+      <div className="absolute top-1 left-1 w-4 h-4 border-t-2 border-l-2" style={{ borderColor: color }} aria-hidden="true" />
+      <div className="absolute top-1 right-1 w-4 h-4 border-t-2 border-r-2" style={{ borderColor: color }} aria-hidden="true" />
+      <div className="absolute bottom-1 left-1 w-4 h-4 border-b-2 border-l-2" style={{ borderColor: color }} aria-hidden="true" />
+      <div className="absolute bottom-1 right-1 w-4 h-4 border-b-2 border-r-2" style={{ borderColor: color }} aria-hidden="true" />
+
+      <div className="relative z-10">
+        {children}
+      </div>
+    </section>
   )
 }
 
 // =============================================================================
-// TECH STACK DISPLAY (Engineer - boon style, no percentages)
+// SECTION TITLE - With decorative elements
 // =============================================================================
-function TechStackBoons({ color }: { color: string }) {
+function SectionTitle({
+  children,
+  color = HADES_COLORS.goldMid,
+  icon,
+}: {
+  children: React.ReactNode
+  color?: string
+  icon?: React.ReactNode
+}) {
+  return (
+    <h2
+      className="text-lg mb-4 flex items-center gap-3"
+      style={{
+        color,
+        textShadow: `0 0 10px ${color}40`,
+      }}
+    >
+      {icon || (
+        <svg viewBox="0 0 20 24" className="w-5 h-6" aria-hidden="true">
+          <polygon points="10,0 20,6 20,18 10,24 0,18 0,6" fill={color} opacity="0.8" />
+          <polygon points="10,4 16,8 16,16 10,20 4,16 4,8" fill={HADES_COLORS.stoneDeep} />
+        </svg>
+      )}
+      <span className="tracking-wider">{children}</span>
+      <div
+        className="flex-1 h-px ml-3"
+        style={{ background: `linear-gradient(90deg, ${color}60, transparent)` }}
+        aria-hidden="true"
+      />
+    </h2>
+  )
+}
+
+// =============================================================================
+// TECH STACK DISPLAY - Boon-style tags, NO proficiency bars
+// =============================================================================
+function TechStackDisplay({ color }: { color: string }) {
   return (
     <div className="space-y-4" role="list" aria-label="Technology expertise">
       {TECH_STACK.map((category) => (
         <div key={category.name} className="mb-4 last:mb-0">
           <h3
             className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2"
-            style={{ color: '#d4af37', borderColor: '#d4af3740' }}
+            style={{ color: HADES_COLORS.goldMid, borderColor: `${HADES_COLORS.goldMid}30` }}
           >
-            <span className="text-[10px]">{category.icon}</span>
+            <span className="text-sm">{category.icon}</span>
             {category.name.toUpperCase()}
           </h3>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5" role="list">
             {category.items.map((tech) => (
               <span
                 key={tech}
-                className="text-[10px] px-2 py-1 transition-all hover:scale-105"
+                className="text-[10px] px-2.5 py-1 transition-all hover:scale-105"
                 style={{
                   background: `${color}15`,
                   border: `1px solid ${color}40`,
-                  color: '#f0e8e0',
-                  clipPath: 'polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%)',
+                  color: HADES_COLORS.textPrimary,
+                  clipPath: 'polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%)',
                 }}
+                role="listitem"
               >
                 {tech}
               </span>
@@ -852,49 +770,71 @@ function TechStackBoons({ color }: { color: string }) {
 }
 
 // =============================================================================
-// CURRENT ROLES DISPLAY
+// SKILL DISPLAY - For drummer/fighter, NO 1-5 bars, show expertise
+// =============================================================================
+function SkillDisplay({
+  skills,
+  color
+}: {
+  skills: ReturnType<typeof getSkillsByProfession>
+  color: string
+}) {
+  return (
+    <div className="space-y-4" role="list" aria-label="Skills and expertise">
+      {skills.map((category) => (
+        <div key={category.name} className="mb-4 last:mb-0">
+          <h3
+            className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2"
+            style={{ color: HADES_COLORS.goldMid, borderColor: `${HADES_COLORS.goldMid}30` }}
+          >
+            <span className="text-sm">{category.icon}</span>
+            {category.name.toUpperCase()}
+          </h3>
+          <div className="space-y-1" role="list">
+            {category.skills.map((skill) => (
+              <div
+                key={skill.name}
+                className="flex items-center gap-2 py-1.5 px-2 hover:bg-white/5 transition-colors rounded"
+                role="listitem"
+              >
+                {/* Boon-style hexagon indicator */}
+                <svg viewBox="0 0 16 18" className="w-3 h-3.5 flex-shrink-0" aria-hidden="true">
+                  <polygon
+                    points="8,1 15,5 15,13 8,17 1,13 1,5"
+                    fill={color}
+                    opacity="0.8"
+                  />
+                </svg>
+                <span className="text-xs" style={{ color: HADES_COLORS.textPrimary }}>
+                  {skill.name}
+                </span>
+                {/* Active glow dot */}
+                <div
+                  className="w-1.5 h-1.5 rounded-full ml-auto flex-shrink-0"
+                  style={{
+                    background: color,
+                    boxShadow: `0 0 6px ${color}`,
+                  }}
+                  aria-hidden="true"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// =============================================================================
+// CURRENT ROLES - Leadership positions display
 // =============================================================================
 function CurrentRolesSection({ color }: { color: string }) {
   return (
-    <section
-      className="relative p-6 mb-8"
-      style={{
-        background: 'linear-gradient(135deg, #2a1a28, #1a0a15)',
-        border: `2px solid ${color}50`,
-        borderRadius: '4px',
-      }}
-      role="region"
-      aria-label="Current professional roles"
-    >
-      {/* Magenta corner flames */}
-      <div
-        className="absolute -top-1 -left-1 w-8 h-8"
-        style={{
-          background: `radial-gradient(circle at 0% 0%, ${color}60 0%, transparent 70%)`,
-        }}
-      />
-      <div
-        className="absolute -top-1 -right-1 w-8 h-8"
-        style={{
-          background: `radial-gradient(circle at 100% 0%, ${color}60 0%, transparent 70%)`,
-        }}
-      />
-
-      <h2
-        className="text-lg mb-4 flex items-center gap-3"
-        style={{ color: '#d4af37' }}
-      >
-        <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
-          <path
-            d="M12 2L2 7v10l10 5 10-5V7L12 2z"
-            fill="none"
-            stroke="#d4af37"
-            strokeWidth="2"
-          />
-          <circle cx="12" cy="12" r="3" fill="#d4af37" />
-        </svg>
+    <SectionCard color={color} ariaLabel="Current professional roles" className="mb-8">
+      <SectionTitle color={HADES_COLORS.goldMid}>
         Current Positions
-      </h2>
+      </SectionTitle>
 
       <div className="grid gap-3">
         {CURRENT_ROLES.map((role) => (
@@ -902,18 +842,18 @@ function CurrentRolesSection({ color }: { color: string }) {
             key={role.id}
             className="p-3 transition-all hover:translate-x-1"
             style={{
-              background: 'linear-gradient(90deg, #301a2580, transparent)',
-              borderLeft: `3px solid ${role.type === 'leadership' ? '#d4af37' : color}`,
+              background: `linear-gradient(90deg, ${HADES_COLORS.stoneLight}80, transparent)`,
+              borderLeft: `3px solid ${role.type === 'leadership' ? HADES_COLORS.goldMid : color}`,
             }}
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-sm font-bold" style={{ color: '#f0e8e0' }}>
+                <h3 className="text-sm font-bold" style={{ color: HADES_COLORS.textPrimary }}>
                   {role.title}
                 </h3>
                 <p
                   className="text-xs"
-                  style={{ color: role.type === 'leadership' ? '#d4af37' : color }}
+                  style={{ color: role.type === 'leadership' ? HADES_COLORS.goldMid : color }}
                 >
                   {role.company}
                 </p>
@@ -922,70 +862,46 @@ function CurrentRolesSection({ color }: { color: string }) {
                 <span
                   className="text-[8px] px-2 py-0.5 tracking-wider"
                   style={{
-                    background: '#d4af3720',
-                    border: '1px solid #d4af3750',
-                    color: '#d4af37',
+                    background: `${HADES_COLORS.goldMid}20`,
+                    border: `1px solid ${HADES_COLORS.goldMid}50`,
+                    color: HADES_COLORS.goldMid,
                   }}
                 >
                   LEADERSHIP
                 </span>
               )}
             </div>
-            <p className="text-[10px] mt-1" style={{ color: '#a08888' }}>
+            <p className="text-[10px] mt-1" style={{ color: HADES_COLORS.textSecondary }}>
               {role.description}
             </p>
           </div>
         ))}
       </div>
-    </section>
+    </SectionCard>
   )
 }
 
 // =============================================================================
-// COMPANIES SECTION (Engineer mode - like Olympian blessings)
+// COMPANIES SECTION - Underworld ventures
 // =============================================================================
-function CompaniesSection({ reducedMotion }: { reducedMotion: boolean }) {
+function CompaniesSection() {
   return (
-    <section
-      className="relative p-6 mb-8"
-      style={{
-        background: 'linear-gradient(180deg, #251520, #1a0a10)',
-        border: '1px solid #8844ff40',
-      }}
-      role="region"
-      aria-label="Companies and ventures"
-    >
-      {/* Purple underworld glow */}
-      <div
-        className="absolute inset-0 opacity-30"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 0%, #8844ff20, transparent 60%)',
-        }}
-      />
-
-      <h2
-        className="text-lg mb-4 flex items-center gap-3 relative z-10"
-        style={{ color: '#8844ff' }}
-      >
-        <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
-          <rect x="3" y="8" width="18" height="12" rx="2" fill="none" stroke="#8844ff" strokeWidth="2" />
-          <path d="M7 8V6a5 5 0 0 1 10 0v2" fill="none" stroke="#8844ff" strokeWidth="2" />
-        </svg>
+    <SectionCard color={HADES_COLORS.chaosVoid} ariaLabel="Companies and ventures" className="mb-8">
+      <SectionTitle color={HADES_COLORS.chaosVoid}>
         Ventures & Companies
-      </h2>
+      </SectionTitle>
 
-      <div className="grid gap-4 relative z-10">
-        {COMPANIES.map((company, i) => (
+      <div className="grid gap-4">
+        {COMPANIES.map((company) => (
           <a
             key={company.id}
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="block p-4 transition-all group"
+            className="block p-4 transition-all group hover:translate-x-1"
             style={{
-              background: 'linear-gradient(135deg, #2a1a28, #1a0a15)',
-              border: '1px solid #8844ff30',
-              animation: reducedMotion ? 'none' : `fadeSlideIn 0.4s ease-out ${i * 0.1}s both`,
+              background: `linear-gradient(135deg, ${HADES_COLORS.stoneLight}, ${HADES_COLORS.stoneMid})`,
+              border: `1px solid ${HADES_COLORS.chaosVoid}40`,
             }}
             aria-label={`${company.name} - ${company.tagline}`}
           >
@@ -993,10 +909,10 @@ function CompaniesSection({ reducedMotion }: { reducedMotion: boolean }) {
               <div className="flex items-center gap-2">
                 <span className="text-lg">{company.icon}</span>
                 <div>
-                  <h3 className="text-sm font-bold" style={{ color: '#f0e8e0' }}>
+                  <h3 className="text-sm font-bold" style={{ color: HADES_COLORS.textPrimary }}>
                     {company.name}
                   </h3>
-                  <p className="text-[10px]" style={{ color: '#8844ff' }}>
+                  <p className="text-[10px]" style={{ color: HADES_COLORS.chaosVoid }}>
                     {company.tagline}
                   </p>
                 </div>
@@ -1009,12 +925,12 @@ function CompaniesSection({ reducedMotion }: { reducedMotion: boolean }) {
                 <path
                   d="M4 12L12 4M12 4H6M12 4v6"
                   fill="none"
-                  stroke="#8844ff"
+                  stroke={HADES_COLORS.chaosVoid}
                   strokeWidth="2"
                 />
               </svg>
             </div>
-            <p className="text-xs mb-3" style={{ color: '#a08888' }}>
+            <p className="text-xs mb-3" style={{ color: HADES_COLORS.textSecondary }}>
               {company.description}
             </p>
             <div className="flex flex-wrap gap-1">
@@ -1023,93 +939,60 @@ function CompaniesSection({ reducedMotion }: { reducedMotion: boolean }) {
                   key={service}
                   className="text-[8px] px-2 py-0.5"
                   style={{
-                    background: '#8844ff15',
-                    border: '1px solid #8844ff30',
-                    color: '#a088bb',
+                    background: `${HADES_COLORS.chaosVoid}15`,
+                    border: `1px solid ${HADES_COLORS.chaosVoid}30`,
+                    color: HADES_COLORS.textSecondary,
                   }}
                 >
                   {service}
                 </span>
               ))}
             </div>
-
-            {/* Hover glow */}
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-              style={{
-                boxShadow: 'inset 0 0 20px #8844ff20',
-              }}
-            />
           </a>
         ))}
       </div>
-    </section>
+    </SectionCard>
   )
 }
 
 // =============================================================================
-// BANDS SECTION (Drummer mode - Apollo's blessing style)
+// BANDS SECTION - Apollo's musical projects
 // =============================================================================
-function BandsSection({ reducedMotion }: { reducedMotion: boolean }) {
+function BandsSection() {
   return (
-    <section
-      className="relative p-6 mb-8"
-      style={{
-        background: 'linear-gradient(180deg, #2a2015, #1a0a10)',
-        border: '1px solid #ffaa3340',
-      }}
-      role="region"
-      aria-label="Musical projects and bands"
-    >
-      {/* Golden sun glow (Apollo) */}
-      <div
-        className="absolute inset-0 opacity-20"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 0%, #ffaa3340, transparent 60%)',
-        }}
-      />
-
-      <h2
-        className="text-lg mb-4 flex items-center gap-3 relative z-10"
-        style={{ color: '#ffaa33' }}
-      >
-        <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
-          <circle cx="12" cy="12" r="8" fill="none" stroke="#ffaa33" strokeWidth="2" />
-          <circle cx="12" cy="12" r="3" fill="#ffaa33" />
-          <path d="M12 2v2M12 20v2M2 12h2M20 12h2" stroke="#ffaa33" strokeWidth="2" />
-        </svg>
+    <SectionCard color={HADES_COLORS.apolloOrange} ariaLabel="Musical projects and bands" className="mb-8">
+      <SectionTitle color={HADES_COLORS.apolloOrange}>
         Musical Projects
-      </h2>
+      </SectionTitle>
 
-      <div className="grid gap-4 relative z-10">
-        {BANDS.map((band, i) => (
+      <div className="grid gap-4">
+        {BANDS.map((band) => (
           <div
             key={band.id}
-            className="p-4 transition-all group"
+            className="p-4 transition-all hover:translate-x-1"
             style={{
-              background: 'linear-gradient(135deg, #2a2015, #1a0a10)',
-              border: '1px solid #ffaa3330',
-              animation: reducedMotion ? 'none' : `fadeSlideIn 0.4s ease-out ${i * 0.1}s both`,
+              background: `linear-gradient(135deg, ${HADES_COLORS.stoneLight}, ${HADES_COLORS.stoneMid})`,
+              border: `1px solid ${HADES_COLORS.apolloOrange}40`,
             }}
           >
             <div className="flex justify-between items-start mb-2">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold" style={{ color: '#f0e8e0' }}>
+                  <h3 className="text-sm font-bold" style={{ color: HADES_COLORS.textPrimary }}>
                     {band.name}
                   </h3>
                   {band.active && (
                     <span
                       className="w-2 h-2 rounded-full"
                       style={{
-                        background: '#44dd88',
-                        boxShadow: '0 0 6px #44dd88',
+                        background: HADES_COLORS.athenaGreen,
+                        boxShadow: `0 0 6px ${HADES_COLORS.athenaGreen}`,
                       }}
                       aria-label="Currently active"
                     />
                   )}
                 </div>
-                <p className="text-xs" style={{ color: '#ffaa33' }}>
+                <p className="text-xs" style={{ color: HADES_COLORS.apolloOrange }}>
                   {band.genre} - {band.role}
                 </p>
               </div>
@@ -1125,174 +1008,69 @@ function BandsSection({ reducedMotion }: { reducedMotion: boolean }) {
                     <path
                       d="M4 12L12 4M12 4H6M12 4v6"
                       fill="none"
-                      stroke="#ffaa33"
+                      stroke={HADES_COLORS.apolloOrange}
                       strokeWidth="2"
                     />
                   </svg>
                 </a>
               )}
             </div>
-            <p className="text-xs" style={{ color: '#a08888' }}>
+            <p className="text-xs" style={{ color: HADES_COLORS.textSecondary }}>
               {band.description}
             </p>
-
-            {/* Sound wave decoration */}
-            <div className="flex items-end gap-0.5 mt-3 h-3" aria-hidden="true">
-              {[3, 5, 4, 6, 3, 5, 4, 6, 3, 5].map((h, j) => (
-                <div
-                  key={j}
-                  className="w-1 rounded-sm"
-                  style={{
-                    height: `${h * 2}px`,
-                    background: `linear-gradient(180deg, #ffaa33, #ffaa3360)`,
-                    opacity: 0.4,
-                    animation: reducedMotion ? 'none' : `soundWave 0.8s ease-in-out ${j * 0.05}s infinite alternate`,
-                  }}
-                />
-              ))}
-            </div>
           </div>
         ))}
       </div>
-    </section>
+    </SectionCard>
   )
 }
 
 // =============================================================================
-// KEEPSAKE PROJECT CARD
+// EXPERIENCE CARD - Timeline entry
 // =============================================================================
-function KeepsakeCard({ project, index }: { project: typeof PROJECTS_DATA[0]; index: number }) {
-  const [revealed, setRevealed] = useState(false)
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setRevealed(true), 300 + index * 150)
-    return () => clearTimeout(timeout)
-  }, [index])
-
-  return (
-    <div
-      className={`relative p-4 transition-all duration-500 group cursor-pointer ${
-        revealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-      }`}
-      style={{
-        background: 'linear-gradient(135deg, #301a20, #1a0a10)',
-        border: '2px solid #ff334480',
-        borderRadius: '8px',
-      }}
-    >
-      {/* Blood drip accent */}
-      <div
-        className="absolute top-0 left-4 w-1 h-6"
-        style={{
-          background: 'linear-gradient(180deg, #ff3344, transparent)',
-          borderRadius: '0 0 50% 50%',
-        }}
-      />
-      <div
-        className="absolute top-0 right-8 w-1 h-4"
-        style={{
-          background: 'linear-gradient(180deg, #ff3344, transparent)',
-          borderRadius: '0 0 50% 50%',
-        }}
-      />
-
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="text-sm font-bold" style={{ color: '#ff3344' }}>
-          {project.name}
-        </h3>
-        {project.featured && (
-          <ShieldOrnament className="w-6 h-7 -mt-1" />
-        )}
-      </div>
-      <p className="text-[10px] mb-3" style={{ color: '#a08888' }}>
-        {project.tagline}
-      </p>
-      <div className="flex gap-1 flex-wrap">
-        {project.techStack.slice(0, 3).map((tech) => (
-          <span
-            key={tech}
-            className="text-[8px] px-2 py-0.5"
-            style={{
-              background: '#ff334420',
-              color: '#ff6655',
-              border: '1px solid #ff334440',
-            }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-
-      {/* Bone decoration */}
-      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 opacity-30">
-        <BoneDecoration className="w-16" />
-      </div>
-
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-        style={{
-          boxShadow: 'inset 0 0 30px #ff334430, 0 0 20px #ff334420',
-        }}
-      />
-    </div>
-  )
-}
-
-// =============================================================================
-// EXPERIENCE CARD (Work Experience)
-// =============================================================================
-function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; index: number }) {
-  const [revealed, setRevealed] = useState(false)
+function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
   const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
   const startDisplay = new Date(entry.startDate).getFullYear()
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setRevealed(true), 200 + index * 100)
-    return () => clearTimeout(timeout)
-  }, [index])
-
   return (
     <div
-      className={`relative p-4 transition-all duration-500 ${
-        revealed ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
-      }`}
+      className="relative p-4"
       style={{
-        background: 'linear-gradient(135deg, #251518, #1a0a10)',
-        border: '1px solid #d4af3760',
-        borderLeft: '3px solid #d4af37',
+        background: `linear-gradient(135deg, ${HADES_COLORS.stoneLight}80, ${HADES_COLORS.stoneMid})`,
+        borderLeft: `3px solid ${HADES_COLORS.goldMid}`,
       }}
     >
       {/* Golden accent line */}
       <div
         className="absolute top-0 left-0 right-0 h-px"
         style={{
-          background: 'linear-gradient(90deg, #d4af37, transparent)',
+          background: `linear-gradient(90deg, ${HADES_COLORS.goldMid}, transparent)`,
         }}
+        aria-hidden="true"
       />
 
       <div className="flex justify-between items-start mb-2">
         <div>
-          <h4 className="text-sm font-bold" style={{ color: '#f0e8e0' }}>
+          <h4 className="text-sm font-bold" style={{ color: HADES_COLORS.textPrimary }}>
             {entry.title}
           </h4>
-          <p className="text-xs" style={{ color: '#d4af37' }}>
+          <p className="text-xs" style={{ color: HADES_COLORS.goldMid }}>
             {entry.organization}
           </p>
         </div>
         <span
           className="text-[10px] px-2 py-0.5"
           style={{
-            background: '#ff334420',
-            border: '1px solid #ff334440',
-            color: '#ff6655',
+            background: `${HADES_COLORS.bloodMid}30`,
+            border: `1px solid ${HADES_COLORS.bloodMid}50`,
+            color: HADES_COLORS.bloodBright,
           }}
         >
           {startDisplay} - {endDisplay}
         </span>
       </div>
 
-      <p className="text-xs mb-2" style={{ color: '#a08888' }}>
+      <p className="text-xs mb-2" style={{ color: HADES_COLORS.textSecondary }}>
         {entry.description}
       </p>
 
@@ -1302,200 +1080,134 @@ function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; in
             <li
               key={i}
               className="text-xs flex items-start gap-2"
-              style={{ color: '#f0e8e0' }}
+              style={{ color: HADES_COLORS.textPrimary }}
             >
-              <span style={{ color: '#d4af37' }}>&#9670;</span>
+              <span style={{ color: HADES_COLORS.goldMid }} aria-hidden="true">&#9670;</span>
               {highlight}
             </li>
           ))}
         </ul>
       )}
-
-      {/* Subtle skull decoration for larger entries */}
-      {entry.highlights && entry.highlights.length > 0 && (
-        <div className="absolute -right-2 -bottom-2 opacity-10">
-          <SkullDecoration position="" size={20} />
-        </div>
-      )}
     </div>
   )
 }
 
 // =============================================================================
-// ZAGREUS-STYLE ALEXANDER CHARACTER
+// PROJECT CARD - Keepsake style
 // =============================================================================
-function ZagGreusCharacter({
-  size = 60,
-  direction = 'right',
-  className = ''
-}: {
-  size?: number
-  direction?: 'left' | 'right'
-  className?: string
-}) {
-  const [frame, setFrame] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => setFrame(f => (f + 1) % 2), 140)
-    return () => clearInterval(interval)
-  }, [])
-
-  const sprite = direction === 'right'
-    ? (frame === 0 ? '/assets/sprites/run_right.png' : '/assets/sprites/run_right_1.png')
-    : (frame === 0 ? '/assets/sprites/run_left.png' : '/assets/sprites/run_left_1.png')
-
+function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
   return (
-    <div className={`relative ${className}`} style={{ width: size, height: size * 1.2 }}>
-      <Image
-        src={sprite}
-        alt="Prince of the Underworld"
-        fill
-        className="object-contain"
-        style={{ filter: 'brightness(1.1) contrast(1.3) hue-rotate(-10deg) saturate(1.2)' }}
-      />
-      {/* Laurel crown glow */}
+    <div
+      className="relative p-4 transition-all hover:translate-y-[-2px] group"
+      style={{
+        background: `linear-gradient(135deg, ${HADES_COLORS.stoneLight}, ${HADES_COLORS.stoneMid})`,
+        border: `2px solid ${HADES_COLORS.bloodMid}60`,
+        borderRadius: '4px',
+      }}
+    >
+      {/* Blood drip accents */}
       <div
-        className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-4"
-        style={{
-          background: 'radial-gradient(ellipse, #d4af3780 0%, transparent 70%)',
-          filter: 'blur(3px)',
-        }}
+        className="absolute top-0 left-4 w-1 h-5 rounded-b-full"
+        style={{ background: `linear-gradient(180deg, ${HADES_COLORS.bloodBright}, transparent)` }}
+        aria-hidden="true"
       />
-      {/* Blood foot effect */}
       <div
-        className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-3"
-        style={{
-          background: 'radial-gradient(ellipse, #ff334450 0%, transparent 70%)',
-          animation: 'bloodPulse 1.5s ease-in-out infinite',
-        }}
+        className="absolute top-0 right-8 w-0.5 h-3 rounded-b-full"
+        style={{ background: `linear-gradient(180deg, ${HADES_COLORS.bloodMid}, transparent)` }}
+        aria-hidden="true"
       />
-    </div>
-  )
-}
 
-// =============================================================================
-// OLYMPIAN PROFESSION ORNAMENTS
-// =============================================================================
-function OlympianOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
-  const ornamentsByProfession = {
-    engineer: [
-      { icon: '🦉', x: 5, y: 25, size: 32, god: 'athena' },
-      { icon: '⚡', x: 90, y: 30, size: 28, god: 'zeus' },
-      { icon: '🔱', x: 7, y: 70, size: 26, god: 'poseidon' },
-      { icon: '🌿', x: 88, y: 75, size: 28, god: 'demeter' },
-    ],
-    drummer: [
-      { icon: '🎸', x: 4, y: 22, size: 30, god: 'apollo' },
-      { icon: '☀️', x: 92, y: 28, size: 32, god: 'apollo' },
-      { icon: '🍇', x: 5, y: 68, size: 26, god: 'dionysus' },
-      { icon: '🌙', x: 90, y: 72, size: 28, god: 'artemis' },
-    ],
-    fighter: [
-      { icon: '⚔️', x: 5, y: 24, size: 30, god: 'ares' },
-      { icon: '🛡️', x: 91, y: 26, size: 28, god: 'athena' },
-      { icon: '💀', x: 6, y: 70, size: 26, god: 'hades' },
-      { icon: '🔥', x: 89, y: 74, size: 30, god: 'ares' },
-    ],
-  }
-
-  const godColors: Record<string, string> = {
-    athena: '#44dd88',
-    zeus: '#5588ff',
-    poseidon: '#44aaff',
-    demeter: '#88cc44',
-    apollo: '#ffaa33',
-    dionysus: '#aa44ff',
-    artemis: '#88ff88',
-    ares: '#ff3344',
-    hades: '#8844ff',
-  }
-
-  const items = ornamentsByProfession[profession]
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden">
-      {items.map((item, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{
-            left: `${item.x}%`,
-            top: `${item.y}%`,
-            fontSize: item.size,
-            opacity: 0.35,
-            filter: `drop-shadow(0 0 12px ${godColors[item.god]})`,
-            animation: `olympianFloat ${14 + i * 4}s ease-in-out infinite`,
-            animationDelay: `${-i * 3}s`,
-          }}
-        >
-          {item.icon}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// =============================================================================
-// DASH REVEAL SECTION (Zagreus dash animation)
-// =============================================================================
-function DashRevealSection({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [phase, setPhase] = useState<'hidden' | 'dashing' | 'revealed'>('hidden')
-
-  useEffect(() => {
-    if (hasEntered && phase === 'hidden') {
-      setPhase('dashing')
-      setTimeout(() => setPhase('revealed'), 600)
-    }
-  }, [hasEntered, phase])
-
-  return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      {/* Dash animation */}
-      {phase === 'dashing' && (
-        <div className="absolute inset-0 z-50 pointer-events-none">
-          <div
-            className="absolute top-1/2 -translate-y-1/2"
-            style={{ animation: 'zagDash 0.6s ease-out forwards' }}
-          >
-            <ZagGreusCharacter size={45} direction="right" />
-          </div>
-          {/* Dash trail */}
-          <div
-            className="absolute top-1/2 -translate-y-1/2 left-0 h-8"
-            style={{
-              width: '100%',
-              background: 'linear-gradient(90deg, transparent 0%, #ff334460 50%, transparent 100%)',
-              animation: 'dashTrail 0.4s ease-out forwards',
-            }}
-          />
-          {/* Blood splatter */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(circle at 50% 50%, #ff334420 0%, transparent 40%)',
-              animation: 'bloodFlash 0.3s ease-out',
-            }}
-          />
-        </div>
-      )}
-
-      <div
-        style={{
-          opacity: phase === 'revealed' ? 1 : 0,
-          transform: phase === 'revealed' ? 'translateX(0)' : 'translateX(-15px)',
-          transition: 'all 0.5s ease-out',
-        }}
-      >
-        {children}
+      <div className="flex justify-between items-start mb-2">
+        <h3 className="text-sm font-bold" style={{ color: HADES_COLORS.bloodBright }}>
+          {project.name}
+        </h3>
+        {project.featured && (
+          <svg viewBox="0 0 20 24" className="w-4 h-5" aria-label="Featured project">
+            <polygon points="10,0 20,6 20,18 10,24 0,18 0,6" fill={HADES_COLORS.goldMid} />
+          </svg>
+        )}
       </div>
+
+      <p className="text-[10px] mb-2" style={{ color: HADES_COLORS.textSecondary }}>
+        {project.tagline}
+      </p>
+
+      {project.impact && (
+        <p className="text-[9px] mb-2 italic" style={{ color: HADES_COLORS.athenaGreen }}>
+          {project.impact}
+        </p>
+      )}
+
+      <div className="flex gap-1 flex-wrap">
+        {project.techStack.slice(0, 4).map((tech) => (
+          <span
+            key={tech}
+            className="text-[8px] px-2 py-0.5"
+            style={{
+              background: `${HADES_COLORS.bloodMid}20`,
+              border: `1px solid ${HADES_COLORS.bloodMid}40`,
+              color: HADES_COLORS.bloodBright,
+            }}
+          >
+            {tech}
+          </span>
+        ))}
+      </div>
+
+      {/* Hover glow */}
+      <div
+        className="absolute inset-0 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+        style={{
+          boxShadow: `inset 0 0 20px ${HADES_COLORS.bloodMid}30, 0 0 15px ${HADES_COLORS.bloodMid}20`,
+        }}
+        aria-hidden="true"
+      />
+    </div>
+  )
+}
+
+// =============================================================================
+// CERBERUS SILHOUETTE
+// =============================================================================
+function Cerberus() {
+  return (
+    <div className="flex justify-center py-4" aria-hidden="true">
+      <svg
+        viewBox="0 0 180 70"
+        className="w-40 h-16"
+        style={{ filter: `drop-shadow(0 0 10px ${HADES_COLORS.bloodMid}60)` }}
+      >
+        {/* Body */}
+        <ellipse cx="90" cy="55" rx="45" ry="15" fill={HADES_COLORS.stoneDeep} />
+
+        {/* Left head */}
+        <g transform="translate(45, 25)">
+          <ellipse cx="0" cy="0" rx="12" ry="10" fill={HADES_COLORS.stoneDeep} />
+          <ellipse cx="-4" cy="-2" rx="2" ry="2" fill={HADES_COLORS.bloodBright} />
+          <path d="M-8 4 Q0 12 8 4" fill="none" stroke={HADES_COLORS.bloodMid} strokeWidth="1" />
+        </g>
+
+        {/* Center head (larger) */}
+        <g transform="translate(90, 18)">
+          <ellipse cx="0" cy="0" rx="15" ry="12" fill={HADES_COLORS.stoneDeep} />
+          <ellipse cx="-5" cy="-3" rx="2.5" ry="2.5" fill={HADES_COLORS.bloodBright} />
+          <ellipse cx="5" cy="-3" rx="2.5" ry="2.5" fill={HADES_COLORS.bloodBright} />
+          <path d="M-10 6 Q0 16 10 6" fill="none" stroke={HADES_COLORS.bloodMid} strokeWidth="1.5" />
+        </g>
+
+        {/* Right head */}
+        <g transform="translate(135, 25)">
+          <ellipse cx="0" cy="0" rx="12" ry="10" fill={HADES_COLORS.stoneDeep} />
+          <ellipse cx="4" cy="-2" rx="2" ry="2" fill={HADES_COLORS.bloodBright} />
+          <path d="M-8 4 Q0 12 8 4" fill="none" stroke={HADES_COLORS.bloodMid} strokeWidth="1" />
+        </g>
+
+        {/* Legs */}
+        <rect x="55" y="50" width="6" height="15" fill={HADES_COLORS.stoneDeep} rx="2" />
+        <rect x="75" y="50" width="6" height="17" fill={HADES_COLORS.stoneDeep} rx="2" />
+        <rect x="100" y="50" width="6" height="17" fill={HADES_COLORS.stoneDeep} rx="2" />
+        <rect x="120" y="50" width="6" height="15" fill={HADES_COLORS.stoneDeep} rx="2" />
+      </svg>
     </div>
   )
 }
@@ -1510,8 +1222,7 @@ export default function MythicTheme() {
   const reducedMotion = usePrefersReducedMotion()
 
   const aboutData = ABOUT_DATA[active]
-  const otherSkills = getSkillsByProfession(active)
-  const engineerSkills = getEngineerSkills()
+  const skills = getSkillsByProfession(active)
   const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
   const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
@@ -1522,144 +1233,131 @@ export default function MythicTheme() {
   if (!mounted) return null
 
   const godColors = {
-    engineer: '#44dd88',
-    drummer: '#ffaa33',
-    fighter: '#ff3344',
+    engineer: HADES_COLORS.athenaGreen,
+    drummer: HADES_COLORS.apolloOrange,
+    fighter: HADES_COLORS.aresRed,
   }
 
   return (
     <div
       className="min-h-screen relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #2a1520, #1a0a10, #0a0508)',
+        background: `linear-gradient(180deg, ${HADES_COLORS.stoneLight}, ${HADES_COLORS.stoneMid}, ${HADES_COLORS.stoneDeep})`,
         fontFamily: '"Cinzel", "Georgia", serif',
       }}
       role="main"
       aria-label="Alexander Pulido - Portfolio"
     >
-      {/* Background layers - decorative, hidden from screen readers */}
-      {!reducedMotion && <PomegranateSeeds />}
-      {!reducedMotion && <EmberParticles />}
-      {!reducedMotion && <IchorDrips />}
+      <HadesPatternDefs />
 
-      {/* Profession ornaments */}
-      <OlympianOrnaments profession={active} />
-
-      {/* Side decorations */}
-      <GreekColumn side="left" />
-      <GreekColumn side="right" />
-      <AnimatedFlames side="left" reducedMotion={reducedMotion} />
-      <AnimatedFlames side="right" reducedMotion={reducedMotion} />
-
-      {/* God silhouettes in corners */}
-      <GodSilhouette god="zeus" position="top-40 left-24" />
-      <GodSilhouette god="athena" position="top-40 right-24" />
-      <GodSilhouette god="ares" position="bottom-40 left-24" />
-      <GodSilhouette god="hades" position="bottom-40 right-24" />
-
-      {/* Blood vignette */}
-      <div
-        className="fixed inset-0 pointer-events-none z-[5]"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 0%, #ff334415, transparent 50%), radial-gradient(ellipse at 50% 100%, #ff334420, transparent 50%)',
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Styx river at bottom */}
+      {/* Background effects */}
+      <FloatingEmbers reducedMotion={reducedMotion} />
+      <BloodVignette />
       <StyxRiver />
 
-      {/* Header */}
-      <header className="relative z-30 pt-8 pb-4 text-center" role="banner">
-        <div className="max-w-4xl mx-auto px-24">
-          {/* Greek key top border */}
-          <GreekKeyBorder className="mb-4" reducedMotion={reducedMotion} />
+      {/* Side decorations */}
+      <SideFlames side="left" reducedMotion={reducedMotion} />
+      <SideFlames side="right" reducedMotion={reducedMotion} />
 
-          {/* Laurel wreath with title */}
-          <div className="relative flex justify-center items-center mb-2">
-            <div className="absolute left-1/2 -translate-x-1/2 -top-2" aria-hidden="true">
-              <LaurelWreath size="large" />
-            </div>
-            <h1
-              className="text-4xl tracking-[0.2em] relative z-10 px-8"
-              style={{
-                color: '#d4af37',
-                textShadow: '0 0 30px #d4af3760, 0 2px 4px #000',
-              }}
-            >
-              ALEXANDER PULIDO
-            </h1>
-          </div>
+      {/* ========== HEADER ========== */}
+      <header className="relative z-30 pt-8 pb-4 text-center px-20" role="banner">
+        <MeanderBorder className="max-w-2xl mx-auto mb-6" />
 
-          {/* Professional headline from PROFESSIONAL_SUMMARY */}
-          <p
-            className="text-sm tracking-widest mb-1"
-            style={{ color: '#f0e8e0' }}
-            aria-label="Professional title"
+        {/* Laurel wreath with name */}
+        <div className="relative mb-2">
+          <LaurelWreath width={200} />
+          <h1
+            className="text-3xl md:text-4xl tracking-[0.15em] relative z-10 mt-2"
+            style={{
+              color: HADES_COLORS.goldMid,
+              textShadow: `0 0 30px ${HADES_COLORS.goldMid}50, 0 2px 4px ${HADES_COLORS.stoneDeep}`,
+            }}
           >
-            {active === 'engineer' ? PROFESSIONAL_SUMMARY.headline.toUpperCase() : config.title.toUpperCase()}
-          </p>
-          <p
-            className="text-xs tracking-wider mb-2 italic"
-            style={{ color: godColors[active] }}
-          >
-            {active === 'engineer' ? PROFESSIONAL_SUMMARY.tagline : aboutData.headline}
-          </p>
-          <p className="text-[10px] tracking-[0.3em]" style={{ color: '#a08888' }}>
-            ESCAPE FROM THE UNDERWORLD
-          </p>
-
-          <SpearDivider />
-
-          <div className="flex justify-center gap-4 mt-4">
-            <Link
-              href="/cv"
-              className="px-6 py-2 text-sm tracking-wider transition-all hover:scale-105 relative group"
-              style={{
-                background: 'transparent',
-                border: '2px solid #d4af37',
-                color: '#d4af37',
-              }}
-            >
-              <span className="relative z-10">CODEX</span>
-              <div className="absolute inset-0 bg-[#d4af3720] opacity-0 group-hover:opacity-100 transition-opacity" />
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="px-6 py-2 text-sm tracking-wider transition-all hover:scale-105 relative overflow-hidden group"
-              style={{
-                background: 'linear-gradient(180deg, #ff3344, #aa1122)',
-                color: '#fff',
-                boxShadow: '0 0 20px #ff334480, inset 0 1px 0 #ff6655',
-              }}
-            >
-              <span className="relative z-10">ENTER TARTARUS</span>
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{
-                  background: 'linear-gradient(180deg, #ff4455, #cc2233)',
-                }}
-              />
-            </Link>
-            <ThemeSwitcher />
-          </div>
-
-          <GreekKeyBorder className="mt-4" />
+            ALEXANDER PULIDO
+          </h1>
         </div>
+
+        {/* Professional headline */}
+        <p
+          className="text-sm tracking-widest mb-1"
+          style={{ color: HADES_COLORS.textPrimary }}
+        >
+          {active === 'engineer' ? PROFESSIONAL_SUMMARY.headline.toUpperCase() : config.title.toUpperCase()}
+        </p>
+        <p
+          className="text-xs tracking-wider italic mb-2"
+          style={{ color: godColors[active] }}
+        >
+          {active === 'engineer' ? PROFESSIONAL_SUMMARY.tagline : aboutData.headline}
+        </p>
+        <p
+          className="text-[10px] tracking-[0.3em]"
+          style={{ color: HADES_COLORS.textMuted }}
+        >
+          ESCAPE FROM THE UNDERWORLD
+        </p>
+
+        <SpearDivider />
+
+        {/* Navigation buttons */}
+        <div className="flex justify-center gap-4 mt-4 flex-wrap">
+          <Link
+            href="/cv"
+            className="px-6 py-2 text-sm tracking-wider transition-all hover:scale-105 relative group"
+            style={{
+              background: 'transparent',
+              border: `2px solid ${HADES_COLORS.goldMid}`,
+              color: HADES_COLORS.goldMid,
+            }}
+          >
+            <span className="relative z-10">CODEX</span>
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ background: `${HADES_COLORS.goldMid}20` }}
+            />
+          </Link>
+          <Link
+            href="/personal-projects/game-engine"
+            className="px-6 py-2 text-sm tracking-wider transition-all hover:scale-105 relative overflow-hidden group"
+            style={{
+              background: `linear-gradient(180deg, ${HADES_COLORS.bloodBright}, ${HADES_COLORS.bloodDeep})`,
+              color: HADES_COLORS.textPrimary,
+              boxShadow: `0 0 15px ${HADES_COLORS.bloodMid}60`,
+            }}
+          >
+            <span className="relative z-10">ENTER TARTARUS</span>
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{
+                background: `linear-gradient(180deg, ${HADES_COLORS.bloodGlow}, ${HADES_COLORS.bloodBright})`,
+              }}
+            />
+          </Link>
+          <ThemeSwitcher />
+        </div>
+
+        <MeanderBorder className="max-w-2xl mx-auto mt-6" />
       </header>
 
-      {/* Boon selection */}
+      {/* ========== BOON SELECTION ========== */}
       <section
-        className="relative z-20 py-8"
+        className="relative z-20 py-6"
         role="region"
         aria-label="Select profession"
       >
         <div className="text-center mb-4">
-          <span className="text-xs tracking-[0.3em]" style={{ color: '#d4af37' }}>
+          <span
+            className="text-xs tracking-[0.3em]"
+            style={{ color: HADES_COLORS.goldMid }}
+          >
             CHOOSE YOUR PATRON
           </span>
         </div>
-        <div className="flex justify-center gap-8" role="radiogroup" aria-label="Profession selection">
+        <div
+          className="flex justify-center gap-6 md:gap-8"
+          role="radiogroup"
+          aria-label="Profession selection"
+        >
           {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
             <BoonCard
               key={prof}
@@ -1671,45 +1369,38 @@ export default function MythicTheme() {
         </div>
       </section>
 
-      {/* Main content */}
-      <main className="relative z-20 px-24 py-8">
+      {/* ========== MAIN CONTENT ========== */}
+      <main className="relative z-20 px-20 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Bio as prophecy */}
-          <DashRevealSection>
-          <section
-            className="relative p-8 mb-8 text-center"
-            style={{
-              background: 'linear-gradient(180deg, #301a2080, #1a0a1080)',
-              border: '1px solid #d4af3740',
-            }}
-            role="region"
-            aria-label="About section"
+
+          {/* ===== ABOUT SECTION ===== */}
+          <SectionCard
+            color={godColors[active]}
+            ariaLabel="About section"
+            className="mb-8"
           >
-            {/* Corner skulls */}
-            <SkullDecoration position="top-2 left-2" size={30} />
-            <SkullDecoration position="top-2 right-2" size={30} />
-
-            {/* Greek key borders */}
-            <div className="absolute top-0 left-8 right-8">
-              <GreekKeyBorder animated={false} reducedMotion={reducedMotion} />
+            {/* Header decorations */}
+            <div className="absolute top-2 left-2">
+              <SkullIcon size={24} />
             </div>
-            <div className="absolute bottom-0 left-8 right-8 rotate-180">
-              <GreekKeyBorder animated={false} reducedMotion={reducedMotion} />
+            <div className="absolute top-2 right-2">
+              <SkullIcon size={24} />
             </div>
 
-            <h2 className="text-lg mb-4 flex items-center justify-center gap-3" style={{ color: '#d4af37' }}>
-              <ShieldOrnament className="w-8 h-10" />
-              About
-              <ShieldOrnament className="w-8 h-10 scale-x-[-1]" />
-            </h2>
-            {/* Use PROFESSIONAL_SUMMARY.bio for engineer, otherwise aboutData.bio */}
+            <MeanderBorder className="mb-4 max-w-md mx-auto" />
+
+            <SectionTitle color={HADES_COLORS.goldMid}>
+              The Prince Speaks
+            </SectionTitle>
+
             <p
-              className="text-sm leading-relaxed italic max-w-2xl mx-auto"
-              style={{ color: '#f0e8e0' }}
+              className="text-sm leading-relaxed italic max-w-2xl mx-auto text-center mb-4"
+              style={{ color: HADES_COLORS.textPrimary }}
             >
               &ldquo;{active === 'engineer' ? PROFESSIONAL_SUMMARY.bio : aboutData.bio}&rdquo;
             </p>
-            {/* Show highlights for engineer */}
+
+            {/* Highlights for engineer */}
             {active === 'engineer' && PROFESSIONAL_SUMMARY.highlights && (
               <div className="flex justify-center gap-2 mt-4 flex-wrap">
                 {PROFESSIONAL_SUMMARY.highlights.map((highlight, i) => (
@@ -1717,9 +1408,9 @@ export default function MythicTheme() {
                     key={i}
                     className="text-[9px] px-3 py-1"
                     style={{
-                      background: '#44dd8815',
-                      border: '1px solid #44dd8840',
-                      color: '#44dd88',
+                      background: `${HADES_COLORS.athenaGreen}15`,
+                      border: `1px solid ${HADES_COLORS.athenaGreen}40`,
+                      color: HADES_COLORS.athenaGreen,
                     }}
                   >
                     {highlight}
@@ -1727,333 +1418,173 @@ export default function MythicTheme() {
                 ))}
               </div>
             )}
+
+            {/* Quick facts */}
             <div className="flex justify-center gap-3 mt-4 flex-wrap">
               {aboutData.quickFacts.map((fact, i) => (
                 <span
                   key={i}
-                  className="text-[10px] px-4 py-1 relative"
+                  className="text-[10px] px-4 py-1"
                   style={{
-                    background: '#ff334420',
-                    border: '1px solid #ff334480',
-                    color: '#ff6655',
+                    background: `${HADES_COLORS.bloodMid}20`,
+                    border: `1px solid ${HADES_COLORS.bloodMid}60`,
+                    color: HADES_COLORS.bloodBright,
                   }}
                 >
                   {fact}
                 </span>
               ))}
             </div>
-          </section>
-          </DashRevealSection>
+
+            <MeanderBorder className="mt-4 max-w-md mx-auto" />
+          </SectionCard>
 
           <SpearDivider />
 
-          {/* Current Roles Section - for engineer only */}
+          {/* ===== CURRENT ROLES (Engineer only) ===== */}
           {active === 'engineer' && (
-            <DashRevealSection>
-              <CurrentRolesSection color={godColors[active]} />
-            </DashRevealSection>
+            <CurrentRolesSection color={godColors[active]} />
           )}
 
-          {/* Companies Section - for engineer only */}
-          {active === 'engineer' && (
-            <DashRevealSection>
-              <CompaniesSection reducedMotion={reducedMotion} />
-            </DashRevealSection>
-          )}
+          {/* ===== COMPANIES (Engineer only) ===== */}
+          {active === 'engineer' && <CompaniesSection />}
 
-          {/* Bands Section - for drummer only */}
-          {active === 'drummer' && (
-            <DashRevealSection>
-              <BandsSection reducedMotion={reducedMotion} />
-            </DashRevealSection>
-          )}
+          {/* ===== BANDS (Drummer only) ===== */}
+          {active === 'drummer' && <BandsSection />}
 
-          {/* Work Experience */}
+          {/* ===== WORK EXPERIENCE ===== */}
           {experience.length > 0 && (
-            <DashRevealSection>
-              <section
-                className="relative p-6 mb-8"
-                style={{
-                  background: 'linear-gradient(180deg, #251518, #1a0a10)',
-                  border: '1px solid #d4af3740',
-                }}
-                role="region"
-                aria-label="Work experience"
-              >
-                {/* Greek key borders */}
-                <div className="absolute top-0 left-4 right-4">
-                  <GreekKeyBorder animated={false} reducedMotion={reducedMotion} />
-                </div>
-
-                <h2 className="text-lg mb-6 mt-4 flex items-center gap-3" style={{ color: '#d4af37' }}>
-                  <svg viewBox="0 0 20 20" className="w-5 h-5" aria-hidden="true">
-                    <polygon points="10,0 20,7 17,20 3,20 0,7" fill="#d4af37" />
-                  </svg>
-                  Work Experience
-                  <div className="flex-1 h-px ml-3" style={{ background: 'linear-gradient(90deg, #d4af3760, transparent)' }} aria-hidden="true" />
-                </h2>
-
-                <div className="space-y-4">
-                  {experience.map((entry, i) => (
-                    <ExperienceCard key={entry.id} entry={entry} index={i} />
-                  ))}
-                </div>
-
-                {/* Bottom decoration */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2" aria-hidden="true">
-                  <BoneDecoration className="w-20 opacity-40" />
-                </div>
-              </section>
-            </DashRevealSection>
-          )}
-
-          <SpearDivider />
-
-          {/* Grid */}
-          <div className="grid md:grid-cols-2 gap-8 mt-8">
-            {/* Tech Stack / Skills - NO 1-5 BARS */}
-            <section
-              className="relative p-6"
-              style={{
-                background: 'linear-gradient(180deg, #251518, #1a0a10)',
-                border: '1px solid #4a2020',
-              }}
-              role="region"
-              aria-label={active === 'engineer' ? 'Technology stack' : 'Skills and expertise'}
+            <SectionCard
+              color={HADES_COLORS.goldMid}
+              ariaLabel="Work experience"
+              className="mb-8"
             >
-              <BoneDecoration className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 opacity-50" />
+              <MeanderBorder className="mb-4" />
 
-              <h2 className="text-lg mb-4 flex items-center gap-2" style={{ color: godColors[active] }}>
-                <svg viewBox="0 0 20 20" className="w-5 h-5" aria-hidden="true">
-                  <polygon points="10,0 20,7 17,20 3,20 0,7" fill={godColors[active]} />
-                </svg>
-                {active === 'engineer' ? 'Tech Stack' : 'Skills & Expertise'}
-              </h2>
+              <SectionTitle color={HADES_COLORS.goldMid}>
+                Trials Completed
+              </SectionTitle>
 
-              {/* Engineer: use TechStackBoons (no proficiency bars) */}
-              {active === 'engineer' ? (
-                <TechStackBoons color={godColors[active]} />
-              ) : (
-                /* Drummer/Fighter: use BoonSkill display (no 1-5 bars, show descriptions) */
-                otherSkills.map((category) => (
-                  <div key={category.name} className="mb-4 last:mb-0">
-                    <h3
-                      className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2"
-                      style={{ color: '#d4af37', borderColor: '#d4af3740' }}
-                    >
-                      <span className="text-[10px]">{category.icon}</span>
-                      {category.name.toUpperCase()}
-                    </h3>
-                    <div role="list">
-                      {category.skills.map((skill) => (
-                        <BoonSkill
-                          key={skill.name}
-                          name={skill.name}
-                          color={godColors[active]}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))
-              )}
-            </section>
-
-            {/* Projects */}
-            <section role="region" aria-label="Featured projects">
-              <h2 className="text-lg mb-4 flex items-center gap-2" style={{ color: '#ff3344' }}>
-                <svg viewBox="0 0 20 20" className="w-5 h-5" aria-hidden="true">
-                  <polygon points="10,0 20,7 17,20 3,20 0,7" fill="#ff3344" />
-                </svg>
-                Featured Work
-              </h2>
               <div className="space-y-4">
-                {projects.slice(0, 4).map((project, i) => (
-                  <KeepsakeCard key={project.id} project={project} index={i} />
+                {experience.map((entry) => (
+                  <ExperienceCard key={entry.id} entry={entry} />
                 ))}
               </div>
-            </section>
+
+              <div className="flex justify-center mt-4">
+                <BoneDivider className="w-32" />
+              </div>
+            </SectionCard>
+          )}
+
+          <SpearDivider />
+
+          {/* ===== GRID: SKILLS + PROJECTS ===== */}
+          <div className="grid md:grid-cols-2 gap-8 mt-8">
+            {/* Tech Stack / Skills */}
+            <SectionCard
+              color={godColors[active]}
+              ariaLabel={active === 'engineer' ? 'Technology stack' : 'Skills and expertise'}
+            >
+              <BoneDivider className="absolute -top-2 left-1/2 -translate-x-1/2 w-24 opacity-50" />
+
+              <SectionTitle color={godColors[active]}>
+                {active === 'engineer' ? 'Arsenal' : 'Mastery'}
+              </SectionTitle>
+
+              {active === 'engineer' ? (
+                <TechStackDisplay color={godColors[active]} />
+              ) : (
+                <SkillDisplay skills={skills} color={godColors[active]} />
+              )}
+            </SectionCard>
+
+            {/* Projects */}
+            <div>
+              <SectionTitle color={HADES_COLORS.bloodBright}>
+                Legendary Deeds
+              </SectionTitle>
+
+              <div className="space-y-4">
+                {projects.slice(0, 4).map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Cerberus guardian */}
-      <div className="relative z-20 py-8">
-        <CerberusSilhouette />
+      {/* ========== CERBERUS GUARDIAN ========== */}
+      <div className="relative z-20 py-4">
+        <Cerberus />
       </div>
 
-      {/* Footer */}
-      <footer className="relative z-20 py-8 text-center pb-36" role="contentinfo">
-        <GreekKeyBorder className="max-w-md mx-auto mb-4" reducedMotion={reducedMotion} />
-        <p className="text-xs tracking-widest flex items-center justify-center gap-4" style={{ color: '#a08888' }}>
-          <span className="text-[#d4af37]" aria-hidden="true">&#9670;</span>
+      {/* ========== FOOTER ========== */}
+      <footer className="relative z-20 py-8 text-center pb-32" role="contentinfo">
+        <MeanderBorder className="max-w-sm mx-auto mb-4" />
+
+        <p
+          className="text-xs tracking-widest flex items-center justify-center gap-4"
+          style={{ color: HADES_COLORS.textSecondary }}
+        >
+          <span style={{ color: HADES_COLORS.goldMid }} aria-hidden="true">&#9670;</span>
           DEATH IS NOT THE END
-          <span className="text-[#d4af37]" aria-hidden="true">&#9670;</span>
+          <span style={{ color: HADES_COLORS.goldMid }} aria-hidden="true">&#9670;</span>
           <span aria-label="Year 2026">MMXXVI</span>
-          <span className="text-[#d4af37]" aria-hidden="true">&#9670;</span>
+          <span style={{ color: HADES_COLORS.goldMid }} aria-hidden="true">&#9670;</span>
         </p>
-        <GreekKeyBorder className="max-w-md mx-auto mt-4" reducedMotion={reducedMotion} />
+
+        <MeanderBorder className="max-w-sm mx-auto mt-4" />
       </footer>
 
-      {/* Animations */}
+      {/* ========== CSS ANIMATIONS ========== */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 
-        @keyframes ember-rise {
+        @keyframes ember-float {
           0% {
             opacity: 1;
             transform: translateY(0) scale(1);
-          }
-          50% {
-            opacity: 0.8;
           }
           100% {
             opacity: 0;
             transform: translateY(-100vh) scale(0.3);
           }
         }
-        .animate-ember-rise {
-          animation: ember-rise linear infinite;
+        .animate-ember-float {
+          animation: ember-float linear infinite;
         }
 
-        @keyframes flameFlicker {
-          0% {
-            transform: scaleY(1) scaleX(1) translateY(0);
-            opacity: 0.6;
-          }
-          50% {
-            transform: scaleY(1.1) scaleX(0.95) translateY(-5px);
+        @keyframes flame-flicker {
+          0%, 100% {
+            transform: scaleY(1) scaleX(1);
             opacity: 0.8;
           }
-          100% {
-            transform: scaleY(0.9) scaleX(1.05) translateY(2px);
-            opacity: 0.7;
-          }
-        }
-
-        @keyframes flameCoreFlicker {
-          0% {
-            transform: scaleY(1) translateY(0);
-            opacity: 0.9;
-          }
-          100% {
-            transform: scaleY(1.15) translateY(-3px);
+          50% {
+            transform: scaleY(1.1) scaleX(0.9);
             opacity: 1;
           }
         }
-
-        @keyframes drip {
-          0% {
-            transform: translateY(-100%);
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateY(100vh);
-            opacity: 0;
-          }
-        }
-        .animate-drip {
-          animation: drip ease-in infinite;
+        .animate-flame-flicker {
+          animation: flame-flicker 0.4s ease-in-out infinite;
         }
 
-        @keyframes laurelSway {
-          0% {
-            transform: rotate(-2deg);
-          }
-          100% {
-            transform: rotate(2deg);
-          }
-        }
-
-        @keyframes seed-glow {
+        @keyframes styx-ripple {
           0%, 100% {
-            opacity: 0.4;
-            filter: brightness(0.8);
+            opacity: 0.3;
+            transform: scaleX(0.8);
           }
           50% {
-            opacity: 0.7;
-            filter: brightness(1.2);
+            opacity: 0.6;
+            transform: scaleX(1.2);
           }
         }
-        .animate-seed-glow {
-          animation: seed-glow 3s ease-in-out infinite;
+        .animate-styx-ripple {
+          animation: styx-ripple 3s ease-in-out infinite;
         }
 
-        @keyframes soul-drift {
-          0% {
-            transform: translateX(0) translateY(0);
-            opacity: 0;
-          }
-          10% {
-            opacity: 0.4;
-          }
-          90% {
-            opacity: 0.4;
-          }
-          100% {
-            transform: translateX(120vw) translateY(-10px);
-            opacity: 0;
-          }
-        }
-        .animate-soul-drift {
-          animation: soul-drift linear infinite;
-        }
-
-        @keyframes olympianFloat {
-          0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.35; }
-          25% { transform: translateY(-12px) rotate(5deg); opacity: 0.45; }
-          50% { transform: translateY(-5px) rotate(-3deg); opacity: 0.3; }
-          75% { transform: translateY(-15px) rotate(3deg); opacity: 0.4; }
-        }
-
-        @keyframes zagDash {
-          0% { left: -60px; opacity: 1; }
-          70% { opacity: 1; }
-          100% { left: 110%; opacity: 0; }
-        }
-
-        @keyframes dashTrail {
-          0% { opacity: 0; transform: scaleX(0); }
-          50% { opacity: 0.6; transform: scaleX(1); }
-          100% { opacity: 0; transform: scaleX(1.2); }
-        }
-
-        @keyframes bloodFlash {
-          0%, 100% { opacity: 0; }
-          30% { opacity: 0.4; }
-        }
-
-        @keyframes bloodPulse {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.2); }
-        }
-
-        @keyframes fadeSlideIn {
-          0% {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes soundWave {
-          0% {
-            transform: scaleY(0.6);
-          }
-          100% {
-            transform: scaleY(1);
-          }
-        }
-
-        /* Reduced motion: disable all animations */
+        /* Reduced motion */
         @media (prefers-reduced-motion: reduce) {
           *,
           *::before,
