@@ -172,15 +172,15 @@ export const BattleReveal = memo(function BattleReveal({
       setShowBloodSplatter(false)
       setBugTremble(false)
       setShowDeathParticles(true)
-      setShowBloodPool(true)
       setScreenShake(true)
       setPhase('bug-death')
       setAttackPhase(0)
     }, PHASE_TIMING['bug-death']))
 
-    // Bug fall - particles continue, shake stops
+    // Bug fall - blood pool appears when bug hits ground
     timers.push(setTimeout(() => {
       setScreenShake(false)
+      setShowBloodPool(true)
       setPhase('bug-fall')
     }, PHASE_TIMING['bug-fall']))
 
