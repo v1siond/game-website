@@ -1365,9 +1365,9 @@ function ZoneNode({
   connections: Array<{ direction: 'up' | 'down' | 'left' | 'right' }>
 }) {
   const zones = {
-    engineer: { name: 'FIRELINK CORE', icon: null, color: COLORS.bonfire, description: 'Senior Staff Engineer • CTO' },
-    drummer: { name: 'DEPTHS OF RHYTHM', icon: null, color: '#9966ff', description: 'Professional Drummer' },
-    fighter: { name: 'ARENA OF DUELS', icon: null, color: '#ff4444', description: 'BJJ Instructor' },
+    engineer: { name: 'SYSTEM ENGINEER', icon: null, color: COLORS.bonfire, description: 'Senior Staff • CTO' },
+    drummer: { name: 'MUSICIAN', icon: null, color: '#9966ff', description: 'Professional Drummer' },
+    fighter: { name: 'MARTIAL ARTIST', icon: null, color: '#ff4444', description: 'BJJ Instructor' },
   }
   const zone = zones[profession]
 

@@ -706,21 +706,21 @@ function RealmSelector({
 }) {
   const realms = {
     engineer: {
-      name: 'MIDGARD',
+      name: 'SYSTEM ENGINEER',
       color: GOW.frostBright,
-      title: 'Builder of Worlds',
+      title: 'Senior Staff • CTO',
       icon: 'ᛗ', // Mannaz rune
     },
     drummer: {
-      name: 'MUSPELHEIM',
+      name: 'MUSICIAN',
       color: GOW.fireOrange,
-      title: 'Fire & Rhythm',
+      title: 'Professional Drummer',
       icon: 'ᛉ', // Algiz rune
     },
     fighter: {
-      name: 'ALFHEIM',
+      name: 'MARTIAL ARTIST',
       color: GOW.bloodBright,
-      title: 'Warrior Spirit',
+      title: 'BJJ Instructor',
       icon: 'ᛏ', // Tiwaz rune
     },
   }

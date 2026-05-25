@@ -1022,8 +1022,8 @@ function PlasmidButton({
 }) {
   const plasmids = {
     engineer: {
-      name: 'ELECTRO BOLT',
-      desc: 'Senior Staff Engineer • CTO',
+      name: 'SYSTEM ENGINEER',
+      desc: 'Senior Staff • CTO',
       icon: (
         <svg viewBox="0 0 40 40" className="w-12 h-12">
           <path d="M20 5 L25 18 L32 18 L18 35 L22 22 L15 22 Z" fill={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="1" />
@@ -1031,7 +1031,7 @@ function PlasmidButton({
       ),
     },
     drummer: {
-      name: 'SONIC BOOM',
+      name: 'MUSICIAN',
       desc: 'Professional Drummer',
       icon: (
         <svg viewBox="0 0 40 40" className="w-12 h-12">
@@ -1042,7 +1042,7 @@ function PlasmidButton({
       ),
     },
     fighter: {
-      name: 'SPORTBOOST',
+      name: 'MARTIAL ARTIST',
       desc: 'BJJ Instructor',
       icon: (
         <svg viewBox="0 0 40 40" className="w-12 h-12">
