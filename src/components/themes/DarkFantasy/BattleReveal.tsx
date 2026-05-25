@@ -305,12 +305,11 @@ export const BattleReveal = memo(function BattleReveal({
           opacity: 0.55,
         }
       case 'complete':
-        // Dead on the ground with occasional twitch
+        // Dead on the ground - no twitch, just static (blood drips handled in DeadBugCreature SVG)
         return {
           ...baseStyle,
           transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
-          opacity: 0.55,
-          animation: 'deadBugTwitch 4s ease-in-out infinite',
+          opacity: 0.6,
         }
       default:
         return baseStyle
@@ -505,11 +504,18 @@ export const BattleReveal = memo(function BattleReveal({
   )
 })
 
-// Battle Bug - SIMPLE Hollow Knight style
-// Based on actual HK infected enemies: round body, orange blobs, simple legs
-// EXPORTED for reuse in BugDiscoverReveal
+/**
+ * BATTLE BUG - HK BOSS STYLE
+ * ==========================
+ * Based on actual HK boss designs (chunky, armored, threatening):
+ * - Segmented armored body
+ * - Void-black eyes with orange infection glow
+ * - Curved mandibles
+ * - Thick segmented legs
+ * - Orange infection growths
+ */
 export const BattleBug = memo(function BattleBug({
-  size = 100,
+  size = 120,
   legPhase = 0,
   antennaPhase = 0,
   isHit = false,
@@ -519,16 +525,18 @@ export const BattleBug = memo(function BattleBug({
   antennaPhase?: number
   isHit?: boolean
 }) {
-  // SATURATED colors for visibility
-  const shell = '#4a3870'
-  const shellDark = '#2a1840'
-  const infected = '#ff6600'
-  const infectedBright = '#ffcc55'
+  const shell = '#3a3055'
+  const shellMid = '#2a2040'
+  const shellDark = '#1a1525'
+  const mask = '#4a4565'
+  const maskLight = '#5a5575'
+  const infected = '#ff6b35'
+  const infectedBright = '#ff9955'
   const infectedGlow = '#ff8833'
 
   const getLegY = (index: number) => {
     const offset = index % 2 === 0 ? 0 : 0.5
-    return Math.sin((legPhase + offset) * Math.PI * 2) * 3
+    return Math.sin((legPhase + offset) * Math.PI * 2) * 4
   }
 
   const antennaWiggle = Math.sin(antennaPhase * Math.PI * 2) * 6
@@ -536,18 +544,18 @@ export const BattleBug = memo(function BattleBug({
   return (
     <svg
       width={size}
-      height={size * 0.7}
-      viewBox="0 0 80 56"
+      height={size * 0.85}
+      viewBox="0 0 100 85"
       style={{
         filter: isHit
           ? 'brightness(2) saturate(0)'
-          : `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 4px ${infected}80)`,
+          : `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 6px ${infected}80)`,
         transition: 'filter 100ms'
       }}
     >
       <defs>
         <filter id="battleGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -555,117 +563,200 @@ export const BattleBug = memo(function BattleBug({
         </filter>
         <radialGradient id="battleShellGrad" cx="50%" cy="30%" r="70%">
           <stop offset="0%" stopColor={shell} />
+          <stop offset="70%" stopColor={shellMid} />
           <stop offset="100%" stopColor={shellDark} />
+        </radialGradient>
+        <radialGradient id="battleMaskGrad" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stopColor={maskLight} />
+          <stop offset="100%" stopColor={mask} />
         </radialGradient>
       </defs>
 
-      {/* SIMPLE THIN LEGS - 3 per side */}
-      <g stroke={shellDark} strokeWidth="2.5" strokeLinecap="round" fill="none">
-        <path d={`M24,30 Q14,${34 + getLegY(0)} 6,${42 + getLegY(0)}`} />
-        <path d={`M22,36 Q12,${40 + getLegY(1)} 4,${48 + getLegY(1)}`} />
-        <path d={`M26,40 Q18,${44 + getLegY(2)} 10,${52 + getLegY(2)}`} />
-        <path d={`M56,30 Q66,${34 + getLegY(3)} 74,${42 + getLegY(3)}`} />
-        <path d={`M58,36 Q68,${40 + getLegY(4)} 76,${48 + getLegY(4)}`} />
-        <path d={`M54,40 Q62,${44 + getLegY(5)} 70,${52 + getLegY(5)}`} />
+      {/* LEGS - thick, segmented, 4 per side */}
+      <g stroke={shellDark} strokeWidth="4" strokeLinecap="round" fill="none">
+        <path d={`M28,45 Q18,${50 + getLegY(0)} 10,${58 + getLegY(0)} Q6,${62 + getLegY(0)} 4,${68 + getLegY(0)}`} />
+        <path d={`M25,52 Q15,${56 + getLegY(1)} 8,${64 + getLegY(1)} Q4,${68 + getLegY(1)} 2,${74 + getLegY(1)}`} />
+        <path d={`M26,58 Q18,${62 + getLegY(2)} 12,${70 + getLegY(2)} Q8,${74 + getLegY(2)} 6,${80 + getLegY(2)}`} />
+        <path d={`M30,62 Q24,${66 + getLegY(3)} 18,${74 + getLegY(3)}`} />
+        <path d={`M72,45 Q82,${50 + getLegY(4)} 90,${58 + getLegY(4)} Q94,${62 + getLegY(4)} 96,${68 + getLegY(4)}`} />
+        <path d={`M75,52 Q85,${56 + getLegY(5)} 92,${64 + getLegY(5)} Q96,${68 + getLegY(5)} 98,${74 + getLegY(5)}`} />
+        <path d={`M74,58 Q82,${62 + getLegY(6)} 88,${70 + getLegY(6)} Q92,${74 + getLegY(6)} 94,${80 + getLegY(6)}`} />
+        <path d={`M70,62 Q76,${66 + getLegY(7)} 82,${74 + getLegY(7)}`} />
+      </g>
+      {/* Leg joints */}
+      <g fill={shellMid}>
+        <circle cx="18" cy={50 + getLegY(0)} r="3" />
+        <circle cx="15" cy={56 + getLegY(1)} r="3" />
+        <circle cx="82" cy={50 + getLegY(4)} r="3" />
+        <circle cx="85" cy={56 + getLegY(5)} r="3" />
       </g>
 
-      {/* SIMPLE BODY - round oval */}
-      <ellipse cx="40" cy="32" rx="22" ry="16" fill="url(#battleShellGrad)" stroke={DF.void} strokeWidth="1" />
+      {/* BODY - chunky segmented shell */}
+      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#battleShellGrad)" stroke={DF.void} strokeWidth="1.5" />
+      <path d="M30,50 Q50,45 70,50" fill="none" stroke={shellDark} strokeWidth="2" opacity="0.6" />
+      <path d="M32,58 Q50,54 68,58" fill="none" stroke={shellDark} strokeWidth="1.5" opacity="0.4" />
 
-      {/* HEAD - smaller oval */}
-      <ellipse cx="40" cy="18" rx="14" ry="10" fill={shell} stroke={DF.void} strokeWidth="0.5" />
+      {/* Middle segment */}
+      <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DF.void} strokeWidth="1" />
 
-      {/* ANTENNAE - simple curved */}
-      <path d={`M30,12 Q${24 + antennaWiggle},4 ${20 + antennaWiggle},0`} fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" />
-      <path d={`M50,12 Q${56 - antennaWiggle},4 ${60 - antennaWiggle},0`} fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" />
+      {/* HEAD/MASK */}
+      <ellipse cx="50" cy="26" rx="18" ry="15" fill="url(#battleMaskGrad)" stroke={DF.void} strokeWidth="1" />
+      <path d="M35,22 Q50,16 65,22" fill="none" stroke={maskLight} strokeWidth="2" opacity="0.5" />
 
-      {/* EYES - orange glowing */}
+      {/* MANDIBLES */}
+      <path d={`M36,32 Q${28 + antennaWiggle * 0.3},38 ${24 + antennaWiggle * 0.5},45`} fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" />
+      <path d={`M64,32 Q${72 - antennaWiggle * 0.3},38 ${76 - antennaWiggle * 0.5},45`} fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" />
+      <circle cx={24 + antennaWiggle * 0.5} cy="45" r="3" fill={shellDark} />
+      <circle cx={76 - antennaWiggle * 0.5} cy="45" r="3" fill={shellDark} />
+
+      {/* HORNS */}
+      <path d={`M38,14 Q${30 + antennaWiggle},6 ${26 + antennaWiggle},0`} fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" />
+      <path d={`M62,14 Q${70 - antennaWiggle},6 ${74 - antennaWiggle},0`} fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" />
+
+      {/* EYES - void black with orange glow */}
       <g filter="url(#battleGlow)">
-        <ellipse cx="32" cy="18" rx="5" ry="6" fill={infected} />
-        <ellipse cx="48" cy="18" rx="5" ry="6" fill={infected} />
-        <ellipse cx="30" cy="16" rx="2" ry="3" fill={infectedBright} opacity="0.7" />
-        <ellipse cx="46" cy="16" rx="2" ry="3" fill={infectedBright} opacity="0.7" />
+        <ellipse cx="40" cy="24" rx="6" ry="8" fill={DF.void} />
+        <ellipse cx="60" cy="24" rx="6" ry="8" fill={DF.void} />
+        <ellipse cx="40" cy="24" rx="4" ry="5" fill={infected} opacity="0.7" />
+        <ellipse cx="60" cy="24" rx="4" ry="5" fill={infected} opacity="0.7" />
+        <ellipse cx="38" cy="22" rx="2" ry="2.5" fill={infectedBright} opacity="0.8" />
+        <ellipse cx="58" cy="22" rx="2" ry="2.5" fill={infectedBright} opacity="0.8" />
       </g>
 
-      {/* INFECTION BLOBS - bulbous orange growths */}
+      {/* INFECTION GROWTHS */}
       <g filter="url(#battleGlow)">
-        <ellipse cx="40" cy="26" rx="8" ry="7" fill={infected} opacity="0.9">
-          <animate attributeName="rx" values="8;9;8" dur="2s" repeatCount="indefinite" />
+        <ellipse cx="50" cy="50" rx="10" ry="8" fill={infected} opacity="0.85">
+          <animate attributeName="rx" values="10;11;10" dur="2s" repeatCount="indefinite" />
         </ellipse>
-        <ellipse cx="28" cy="36" rx="6" ry="5" fill={infected} opacity="0.8">
+        <ellipse cx="35" cy="56" rx="7" ry="5" fill={infected} opacity="0.75">
           <animate attributeName="ry" values="5;6;5" dur="1.8s" repeatCount="indefinite" />
         </ellipse>
-        <ellipse cx="52" cy="36" rx="6" ry="5" fill={infected} opacity="0.8">
+        <ellipse cx="65" cy="56" rx="7" ry="5" fill={infected} opacity="0.75">
           <animate attributeName="ry" values="5;6;5" dur="2.2s" repeatCount="indefinite" />
         </ellipse>
-        <circle cx="36" cy="42" r="4" fill={infected} opacity="0.6" />
-        <circle cx="46" cy="40" r="3" fill={infected} opacity="0.5" />
+        <circle cx="42" cy="60" r="4" fill={infected} opacity="0.5" />
+        <circle cx="58" cy="62" r="3" fill={infected} opacity="0.45" />
+        <circle cx="50" cy="38" r="5" fill={infected} opacity="0.6" />
       </g>
 
-      {/* Blob highlights */}
-      <ellipse cx="38" cy="24" rx="3" ry="2" fill={infectedBright} opacity="0.4" />
+      <ellipse cx="48" cy="47" rx="3" ry="2" fill={infectedBright} opacity="0.35" />
     </svg>
   )
 })
 
-// Dead Bug - SIMPLE Hollow Knight style, flipped, SATURATED colors
-const DeadBugCreature = memo(function DeadBugCreature({ size = 100 }: { size?: number }) {
-  // SATURATED colors
-  const shell = '#4a3870'
-  const shellDark = '#2a1840'
-  const infected = '#ff6600'
-  const infectedGlow = '#ff8833'
+/**
+ * DEAD BUG - HK Boss style corpse
+ * ================================
+ * Matches the BattleBug design but:
+ * - Flipped/rotated
+ * - Curled legs
+ * - Dimmed colors
+ * - Dripping blood animation
+ * - Exhaling smoke
+ */
+const DeadBugCreature = memo(function DeadBugCreature({ size = 120 }: { size?: number }) {
+  const shell = '#3a3055'
+  const shellMid = '#2a2040'
+  const shellDark = '#1a1525'
+  const mask = '#4a4565'
+  const infected = '#ff6b35'
+  const infectedDim = '#cc4420'
 
   return (
     <svg
       width={size}
-      height={size * 0.7}
-      viewBox="0 0 80 56"
+      height={size * 0.85}
+      viewBox="0 0 100 85"
       style={{
-        opacity: 0.9,
+        opacity: 0.85,
         transform: 'rotate(180deg)',
-        filter: `drop-shadow(0 0 12px ${infectedGlow}70) drop-shadow(0 0 6px ${infected}80)`
+        filter: `drop-shadow(0 0 8px ${infected}40)`
       }}
     >
       <defs>
         <radialGradient id="deadShellGrad" cx="50%" cy="30%" r="70%">
           <stop offset="0%" stopColor={shell} />
+          <stop offset="70%" stopColor={shellMid} />
           <stop offset="100%" stopColor={shellDark} />
         </radialGradient>
       </defs>
 
-      {/* CURLED LEGS - pointing inward */}
-      <g stroke={shellDark} strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.7">
-        <path d="M24,30 Q18,24 20,18" />
-        <path d="M22,36 Q16,30 18,24" />
-        <path d="M26,40 Q22,34 24,28" />
-        <path d="M56,30 Q62,24 60,18" />
-        <path d="M58,36 Q64,30 62,24" />
-        <path d="M54,40 Q58,34 56,28" />
+      {/* CURLED LEGS - dead, pointing inward */}
+      <g stroke={shellDark} strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6">
+        <path d="M28,45 Q22,38 26,30" />
+        <path d="M25,52 Q18,44 22,36" />
+        <path d="M26,58 Q20,50 24,42" />
+        <path d="M30,62 Q26,56 28,50" />
+        <path d="M72,45 Q78,38 74,30" />
+        <path d="M75,52 Q82,44 78,36" />
+        <path d="M74,58 Q80,50 76,42" />
+        <path d="M70,62 Q74,56 72,50" />
       </g>
 
-      {/* BODY */}
-      <ellipse cx="40" cy="32" rx="22" ry="16" fill="url(#deadShellGrad)" stroke={DF.void} strokeWidth="1" opacity="0.85" />
+      {/* BODY - dimmed */}
+      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#deadShellGrad)" stroke={DF.void} strokeWidth="1.5" opacity="0.8" />
+      <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DF.void} strokeWidth="1" opacity="0.8" />
 
-      {/* HEAD */}
-      <ellipse cx="40" cy="18" rx="14" ry="10" fill={shell} stroke={DF.void} strokeWidth="0.5" opacity="0.85" />
+      {/* HEAD/MASK */}
+      <ellipse cx="50" cy="26" rx="18" ry="15" fill={mask} stroke={DF.void} strokeWidth="1" opacity="0.8" />
 
-      {/* ANTENNAE - drooped */}
-      <path d="M30,12 Q22,18 16,22" fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
-      <path d="M50,12 Q58,18 64,22" fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+      {/* MANDIBLES - drooped */}
+      <path d="M36,32 Q30,42 28,52" fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" opacity="0.6" />
+      <path d="M64,32 Q70,42 72,52" fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" opacity="0.6" />
 
-      {/* CLOSED EYES - still glowing but dimmed */}
-      <ellipse cx="32" cy="18" rx="5" ry="3" fill={infected} opacity="0.6" />
-      <ellipse cx="48" cy="18" rx="5" ry="3" fill={infected} opacity="0.6" />
+      {/* HORNS - drooped */}
+      <path d="M38,14 Q30,20 24,28" fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" opacity="0.5" />
+      <path d="M62,14 Q70,20 76,28" fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" opacity="0.5" />
+
+      {/* CLOSED EYES - dimmed */}
+      <ellipse cx="40" cy="24" rx="5" ry="4" fill={DF.void} opacity="0.8" />
+      <ellipse cx="60" cy="24" rx="5" ry="4" fill={DF.void} opacity="0.8" />
+      <ellipse cx="40" cy="24" rx="3" ry="2" fill={infectedDim} opacity="0.4" />
+      <ellipse cx="60" cy="24" rx="3" ry="2" fill={infectedDim} opacity="0.4" />
 
       {/* Dimmed infection - leaking */}
-      <ellipse cx="40" cy="26" rx="6" ry="5" fill={infected} opacity="0.35" />
-      <ellipse cx="30" cy="36" rx="4" ry="3" fill={infected} opacity="0.25" />
-      <ellipse cx="50" cy="36" rx="4" ry="3" fill={infected} opacity="0.25" />
+      <ellipse cx="50" cy="50" rx="8" ry="6" fill={infectedDim} opacity="0.35" />
+      <ellipse cx="38" cy="56" rx="5" ry="4" fill={infectedDim} opacity="0.25" />
+      <ellipse cx="62" cy="56" rx="5" ry="4" fill={infectedDim} opacity="0.25" />
 
-      {/* Blood pool below */}
-      <ellipse cx="40" cy="50" rx="15" ry="4" fill={infected} opacity="0.4" />
-      <path d="M36,42 Q38,46 40,50" fill="none" stroke={infected} strokeWidth="3" opacity="0.4" />
+      {/* DRIPPING BLOOD - animated */}
+      <g>
+        <ellipse cx="50" cy="72" rx="12" ry="4" fill={infected} opacity="0.5" />
+        {/* Drip 1 */}
+        <ellipse cx="46" cy="65" rx="2" ry="3" fill={infected} opacity="0.6">
+          <animate attributeName="cy" values="60;68;60" dur="2s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.6;0.3;0.6" dur="2s" repeatCount="indefinite" />
+        </ellipse>
+        {/* Drip 2 */}
+        <ellipse cx="54" cy="62" rx="1.5" ry="2.5" fill={infected} opacity="0.5">
+          <animate attributeName="cy" values="58;66;58" dur="2.5s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite" />
+        </ellipse>
+        {/* Drip 3 */}
+        <ellipse cx="50" cy="64" rx="2.5" ry="4" fill={infected} opacity="0.55">
+          <animate attributeName="cy" values="62;70;62" dur="1.8s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.55;0.25;0.55" dur="1.8s" repeatCount="indefinite" />
+        </ellipse>
+      </g>
+
+      {/* SMOKE/STEAM - rising from body */}
+      <g opacity="0.4">
+        <ellipse cx="45" cy="35" rx="3" ry="2" fill="#aaa">
+          <animate attributeName="cy" values="40;25;40" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="rx" values="3;6;3" dur="3s" repeatCount="indefinite" />
+        </ellipse>
+        <ellipse cx="55" cy="38" rx="2.5" ry="1.5" fill="#999">
+          <animate attributeName="cy" values="42;28;42" dur="3.5s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.35;0;0.35" dur="3.5s" repeatCount="indefinite" />
+          <animate attributeName="rx" values="2.5;5;2.5" dur="3.5s" repeatCount="indefinite" />
+        </ellipse>
+        <ellipse cx="50" cy="32" rx="2" ry="1.5" fill="#bbb">
+          <animate attributeName="cy" values="36;22;36" dur="4s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" />
+          <animate attributeName="rx" values="2;4;2" dur="4s" repeatCount="indefinite" />
+        </ellipse>
+      </g>
     </svg>
   )
 })

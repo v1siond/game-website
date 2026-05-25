@@ -454,6 +454,591 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
 })
 
 /**
+ * PROFESSION-SPECIFIC BACKGROUND ORNAMENTS
+ * =========================================
+ * HK-style parallax depth layers with silhouette ornaments.
+ *
+ * Pattern: CSS transform-based parallax (GPU-accelerated)
+ * Why chosen: Parallax creates depth without expensive blur filters.
+ * Each layer moves at different speeds on scroll for depth illusion.
+ *
+ * Layers (HK-style):
+ * - Far background (slowest, smallest, most faded) - 0.2x scroll speed
+ * - Mid background (medium) - 0.5x scroll speed
+ * - Near background (fastest, larger, less faded) - 0.8x scroll speed
+ *
+ * Replication steps for other themes:
+ * 1. Create 3-5 parallax layers with decreasing opacity for depth
+ * 2. Use transform: translateY with scroll-based multipliers
+ * 3. Match ornament shapes to the profession/game aesthetic
+ * 4. Far = small + faded, Near = larger + slightly more visible
+ */
+
+// Engineering ornaments - City of Tears style (geometric, architectural)
+const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY }: { scrollY: number }) {
+  return (
+    <>
+      {/* FAR LAYER - tiny gears, distant structures */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.15}px) translateZ(0)`,
+          opacity: 0.12,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Distant gear silhouettes */}
+        {[
+          { x: 150, y: 200, r: 30 },
+          { x: 1750, y: 300, r: 25 },
+          { x: 200, y: 600, r: 35 },
+          { x: 1680, y: 700, r: 28 },
+          { x: 100, y: 900, r: 32 },
+          { x: 1800, y: 850, r: 22 },
+        ].map((g, i) => (
+          <g key={i} transform={`translate(${g.x}, ${g.y})`}>
+            <circle r={g.r} fill="none" stroke={DF.brass} strokeWidth="2" opacity="0.6" />
+            <circle r={g.r * 0.4} fill={DF.brass} opacity="0.3" />
+            {/* Gear teeth suggestion */}
+            {Array.from({ length: 8 }, (_, j) => {
+              const angle = (j * 360) / 8
+              const rad = (angle * Math.PI) / 180
+              return (
+                <line
+                  key={j}
+                  x1={Math.cos(rad) * g.r * 0.85}
+                  y1={Math.sin(rad) * g.r * 0.85}
+                  x2={Math.cos(rad) * g.r * 1.15}
+                  y2={Math.sin(rad) * g.r * 1.15}
+                  stroke={DF.brass}
+                  strokeWidth="2"
+                />
+              )
+            })}
+          </g>
+        ))}
+        {/* Distant vertical pipes */}
+        <line x1="80" y1="0" x2="80" y2="1080" stroke={DF.copper} strokeWidth="3" opacity="0.4" />
+        <line x1="1840" y1="0" x2="1840" y2="1080" stroke={DF.copper} strokeWidth="3" opacity="0.4" />
+      </svg>
+
+      {/* MID LAYER - medium gears, cable connections */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.35}px) translateZ(0)`,
+          opacity: 0.18,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Medium gears with more detail */}
+        {[
+          { x: 50, y: 400, r: 55 },
+          { x: 1870, y: 500, r: 50 },
+          { x: 120, y: 800, r: 45 },
+          { x: 1800, y: 200, r: 48 },
+        ].map((g, i) => (
+          <g key={i} transform={`translate(${g.x}, ${g.y})`}>
+            <circle r={g.r} fill="none" stroke={DF.brass} strokeWidth="3" />
+            <circle r={g.r * 0.6} fill="none" stroke={DF.copper} strokeWidth="2" />
+            <circle r={g.r * 0.25} fill={DF.brass} opacity="0.5" />
+            {/* Spokes */}
+            {Array.from({ length: 4 }, (_, j) => {
+              const angle = j * 90
+              const rad = (angle * Math.PI) / 180
+              return (
+                <line
+                  key={j}
+                  x1={0}
+                  y1={0}
+                  x2={Math.cos(rad) * g.r * 0.9}
+                  y2={Math.sin(rad) * g.r * 0.9}
+                  stroke={DF.copper}
+                  strokeWidth="2"
+                  opacity="0.7"
+                />
+              )
+            })}
+          </g>
+        ))}
+        {/* Connecting cables */}
+        <path
+          d="M50,400 Q200,350 120,800"
+          fill="none"
+          stroke={DF.copper}
+          strokeWidth="2"
+          strokeDasharray="8 4"
+          opacity="0.5"
+        />
+        <path
+          d="M1870,500 Q1700,400 1800,200"
+          fill="none"
+          stroke={DF.copper}
+          strokeWidth="2"
+          strokeDasharray="8 4"
+          opacity="0.5"
+        />
+        {/* Horizontal structural beams */}
+        <rect x="0" y="150" width="250" height="4" fill={DF.stoneGrey} opacity="0.4" />
+        <rect x="1670" y="180" width="250" height="4" fill={DF.stoneGrey} opacity="0.4" />
+        <rect x="0" y="650" width="180" height="4" fill={DF.stoneGrey} opacity="0.4" />
+        <rect x="1740" y="620" width="180" height="4" fill={DF.stoneGrey} opacity="0.4" />
+      </svg>
+
+      {/* NEAR LAYER - large gears, terminal glows */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.6}px) translateZ(0)`,
+          opacity: 0.22,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Large foreground gears - partially visible at edges */}
+        <g transform="translate(-60, 550)">
+          <circle r="120" fill="none" stroke={DF.brass} strokeWidth="5" />
+          <circle r="80" fill="none" stroke={DF.copper} strokeWidth="3" />
+          <circle r="30" fill={DF.brass} opacity="0.4" />
+          {Array.from({ length: 12 }, (_, j) => {
+            const angle = (j * 360) / 12
+            const rad = (angle * Math.PI) / 180
+            return (
+              <line
+                key={j}
+                x1={Math.cos(rad) * 100}
+                y1={Math.sin(rad) * 100}
+                x2={Math.cos(rad) * 135}
+                y2={Math.sin(rad) * 135}
+                stroke={DF.brass}
+                strokeWidth="4"
+              />
+            )
+          })}
+        </g>
+        <g transform="translate(1980, 650)">
+          <circle r="100" fill="none" stroke={DF.brass} strokeWidth="5" />
+          <circle r="65" fill="none" stroke={DF.copper} strokeWidth="3" />
+          <circle r="25" fill={DF.brass} opacity="0.4" />
+        </g>
+        {/* Terminal glow points */}
+        <circle cx="30" cy="300" r="8" fill={DF.ethereal} opacity="0.6" />
+        <circle cx="30" cy="300" r="20" fill={DF.ethereal} opacity="0.2" />
+        <circle cx="1890" cy="400" r="8" fill={DF.ethereal} opacity="0.6" />
+        <circle cx="1890" cy="400" r="20" fill={DF.ethereal} opacity="0.2" />
+        {/* Circuit path suggestions */}
+        <path
+          d="M0,300 L30,300 L30,350 L80,350"
+          fill="none"
+          stroke={DF.ethereal}
+          strokeWidth="2"
+          opacity="0.4"
+        />
+        <path
+          d="M1920,400 L1890,400 L1890,450 L1840,450"
+          fill="none"
+          stroke={DF.ethereal}
+          strokeWidth="2"
+          opacity="0.4"
+        />
+      </svg>
+    </>
+  )
+})
+
+// Musician ornaments - organic flowing shapes (acoustic curves, cymbals as stalactites)
+const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY: number }) {
+  return (
+    <>
+      {/* FAR LAYER - tiny wave patterns, distant circles */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.15}px) translateZ(0)`,
+          opacity: 0.1,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Distant sound wave lines */}
+        <path
+          d="M0,200 Q100,180 200,200 Q300,220 400,200"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="2"
+          opacity="0.6"
+        />
+        <path
+          d="M1520,250 Q1620,230 1720,250 Q1820,270 1920,250"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="2"
+          opacity="0.6"
+        />
+        {/* Distant circular elements (cymbal suggestions) */}
+        {[
+          { x: 100, y: 350, r: 20 },
+          { x: 1820, y: 400, r: 18 },
+          { x: 150, y: 700, r: 22 },
+          { x: 1770, y: 750, r: 20 },
+        ].map((c, i) => (
+          <g key={i}>
+            <circle cx={c.x} cy={c.y} r={c.r} fill="none" stroke={DF.lavender} strokeWidth="1.5" opacity="0.5" />
+            <circle cx={c.x} cy={c.y} r={c.r * 0.4} fill={DF.lavender} opacity="0.3" />
+          </g>
+        ))}
+      </svg>
+
+      {/* MID LAYER - wave curves, hanging cymbal shapes */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.35}px) translateZ(0)`,
+          opacity: 0.15,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Acoustic curve shapes */}
+        <path
+          d="M-50,300 Q50,250 100,350 Q150,450 100,500 Q50,550 -50,500"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="3"
+          opacity="0.5"
+        />
+        <path
+          d="M1970,400 Q1870,350 1820,450 Q1770,550 1820,600 Q1870,650 1970,600"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="3"
+          opacity="0.5"
+        />
+        {/* Hanging cymbal/gong shapes */}
+        {[
+          { x: 80, y: 150, r: 35 },
+          { x: 1840, y: 200, r: 40 },
+          { x: 120, y: 550, r: 30 },
+          { x: 1800, y: 600, r: 35 },
+        ].map((c, i) => (
+          <g key={i}>
+            {/* Hanging chain */}
+            <line x1={c.x} y1={0} x2={c.x} y2={c.y - c.r} stroke={DF.brass} strokeWidth="2" opacity="0.4" />
+            {/* Cymbal shape - ellipse from side view */}
+            <ellipse cx={c.x} cy={c.y} rx={c.r} ry={c.r * 0.25} fill="none" stroke={DF.spiritGold} strokeWidth="2" opacity="0.6" />
+            <ellipse cx={c.x} cy={c.y - 3} rx={c.r * 0.8} ry={c.r * 0.15} fill={DF.spiritGold} opacity="0.2" />
+            {/* Center bell */}
+            <circle cx={c.x} cy={c.y} r={c.r * 0.2} fill={DF.spiritGold} opacity="0.4" />
+          </g>
+        ))}
+        {/* Flowing wave lines */}
+        <path
+          d="M0,450 Q80,420 160,450 Q240,480 320,450 Q400,420 480,450"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="2"
+          opacity="0.4"
+        />
+        <path
+          d="M1440,500 Q1520,470 1600,500 Q1680,530 1760,500 Q1840,470 1920,500"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="2"
+          opacity="0.4"
+        />
+      </svg>
+
+      {/* NEAR LAYER - large acoustic shapes, resonant glows */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.6}px) translateZ(0)`,
+          opacity: 0.2,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Large acoustic curve - like f-hole */}
+        <path
+          d="M-80,350 Q20,280 60,400 Q100,520 60,600 Q20,680 -80,620"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="4"
+          opacity="0.6"
+        />
+        <path
+          d="M2000,450 Q1900,380 1860,500 Q1820,620 1860,700 Q1900,780 2000,720"
+          fill="none"
+          stroke={DF.lavender}
+          strokeWidth="4"
+          opacity="0.6"
+        />
+        {/* Large cymbal at edge */}
+        <g transform="translate(-30, 180)">
+          <ellipse rx="80" ry="20" fill="none" stroke={DF.spiritGold} strokeWidth="3" />
+          <ellipse rx="60" ry="12" fill={DF.spiritGold} opacity="0.15" />
+          <circle r="15" fill={DF.spiritGold} opacity="0.3" />
+        </g>
+        <g transform="translate(1950, 250)">
+          <ellipse rx="70" ry="18" fill="none" stroke={DF.spiritGold} strokeWidth="3" />
+          <ellipse rx="50" ry="10" fill={DF.spiritGold} opacity="0.15" />
+          <circle r="12" fill={DF.spiritGold} opacity="0.3" />
+        </g>
+        {/* Resonant glow points */}
+        <circle cx="40" cy="450" r="10" fill={DF.lavender} opacity="0.5" />
+        <circle cx="40" cy="450" r="25" fill={DF.lavender} opacity="0.15" />
+        <circle cx="1880" cy="550" r="10" fill={DF.lavender} opacity="0.5" />
+        <circle cx="1880" cy="550" r="25" fill={DF.lavender} opacity="0.15" />
+      </svg>
+    </>
+  )
+})
+
+// Martial Artist ornaments - sharp angles, temple architecture, bamboo
+const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: number }) {
+  return (
+    <>
+      {/* FAR LAYER - distant temple roofs, bamboo silhouettes */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.15}px) translateZ(0)`,
+          opacity: 0.1,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Distant temple roof silhouettes */}
+        <path
+          d="M-50,250 L100,180 L250,250"
+          fill="none"
+          stroke={DF.spiritGold}
+          strokeWidth="2"
+          opacity="0.5"
+        />
+        <path
+          d="M1670,280 L1820,210 L1970,280"
+          fill="none"
+          stroke={DF.spiritGold}
+          strokeWidth="2"
+          opacity="0.5"
+        />
+        {/* Distant bamboo verticals */}
+        {[60, 90, 130, 1790, 1830, 1860].map((x, i) => (
+          <line
+            key={i}
+            x1={x}
+            y1={350}
+            x2={x}
+            y2={900}
+            stroke={DF.forestGreen}
+            strokeWidth="2"
+            opacity="0.4"
+          />
+        ))}
+        {/* Small pose silhouettes in distance */}
+        <path
+          d="M150,700 L155,680 L165,690 L170,675 L160,685 L155,680"
+          fill={DF.spiritGold}
+          opacity="0.3"
+        />
+        <path
+          d="M1770,720 L1775,700 L1785,710 L1790,695 L1780,705 L1775,700"
+          fill={DF.spiritGold}
+          opacity="0.3"
+        />
+      </svg>
+
+      {/* MID LAYER - temple curves, flowing ribbons, bamboo */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.35}px) translateZ(0)`,
+          opacity: 0.15,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Temple roof curves - more detailed */}
+        <path
+          d="M-100,200 Q50,120 200,200 L180,210 Q50,140 -80,210 Z"
+          fill={DF.spiritGold}
+          opacity="0.3"
+        />
+        <path
+          d="M1720,230 Q1870,150 2020,230 L2000,240 Q1870,170 1740,240 Z"
+          fill={DF.spiritGold}
+          opacity="0.3"
+        />
+        {/* Bamboo stalks with segments */}
+        {[
+          { x: 40, segments: 6 },
+          { x: 80, segments: 5 },
+          { x: 140, segments: 7 },
+          { x: 1780, segments: 5 },
+          { x: 1840, segments: 6 },
+          { x: 1880, segments: 7 },
+        ].map((b, i) => (
+          <g key={i}>
+            <line x1={b.x} y1={250} x2={b.x} y2={950} stroke={DF.forestGreen} strokeWidth="4" opacity="0.5" />
+            {Array.from({ length: b.segments }, (_, j) => (
+              <line
+                key={j}
+                x1={b.x - 6}
+                y1={300 + j * 100}
+                x2={b.x + 6}
+                y2={300 + j * 100}
+                stroke={DF.mossGreen}
+                strokeWidth="2"
+                opacity="0.6"
+              />
+            ))}
+          </g>
+        ))}
+        {/* Flowing ribbons */}
+        <path
+          d="M0,400 Q60,380 100,420 Q140,460 180,430 Q220,400 260,440"
+          fill="none"
+          stroke={DF.spiritGold}
+          strokeWidth="3"
+          opacity="0.4"
+          strokeLinecap="round"
+        />
+        <path
+          d="M1660,450 Q1720,420 1760,470 Q1800,520 1840,480 Q1880,440 1920,490"
+          fill="none"
+          stroke={DF.spiritGold}
+          strokeWidth="3"
+          opacity="0.4"
+          strokeLinecap="round"
+        />
+      </svg>
+
+      {/* NEAR LAYER - large temple elements, martial poses, bamboo foreground */}
+      <svg
+        className="fixed inset-0 w-full h-full pointer-events-none"
+        style={{
+          transform: `translateY(${scrollY * 0.6}px) translateZ(0)`,
+          opacity: 0.2,
+        }}
+        viewBox="0 0 1920 1080"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        {/* Large temple roof edge */}
+        <path
+          d="M-150,150 Q100,50 350,150 L320,170 Q100,80 -120,170 Z"
+          fill={DF.spiritGold}
+          opacity="0.35"
+        />
+        <path
+          d="M1570,180 Q1820,80 2070,180 L2040,200 Q1820,110 1600,200 Z"
+          fill={DF.spiritGold}
+          opacity="0.35"
+        />
+        {/* Bamboo with leaves */}
+        {[
+          { x: 20, leavesY: 350 },
+          { x: 60, leavesY: 280 },
+          { x: 1860, leavesY: 320 },
+          { x: 1900, leavesY: 380 },
+        ].map((b, i) => (
+          <g key={i}>
+            <line x1={b.x} y1={200} x2={b.x} y2={1000} stroke={DF.forestGreen} strokeWidth="6" opacity="0.6" />
+            {/* Leaves */}
+            <path
+              d={`M${b.x},${b.leavesY} Q${b.x + 30},${b.leavesY - 20} ${b.x + 50},${b.leavesY - 10}`}
+              fill="none"
+              stroke={DF.mossGreen}
+              strokeWidth="3"
+              opacity="0.5"
+            />
+            <path
+              d={`M${b.x},${b.leavesY + 40} Q${b.x - 25},${b.leavesY + 25} ${b.x - 45},${b.leavesY + 35}`}
+              fill="none"
+              stroke={DF.mossGreen}
+              strokeWidth="3"
+              opacity="0.5"
+            />
+          </g>
+        ))}
+        {/* Martial pose silhouette - stylized, angular */}
+        <g transform="translate(100, 600)" opacity="0.25">
+          {/* Fighting stance */}
+          <path
+            d="M0,0 L10,-40 L5,-45 L15,-50 L10,-40 L20,-30 L25,-15 L15,-10 L10,0 L20,30 L15,50 L5,30 L0,50 L-5,30 L-15,50 L-10,30 L0,0"
+            fill={DF.spiritGold}
+          />
+        </g>
+        <g transform="translate(1820, 650) scale(-1,1)" opacity="0.25">
+          {/* Mirror pose */}
+          <path
+            d="M0,0 L10,-40 L5,-45 L15,-50 L10,-40 L20,-30 L25,-15 L15,-10 L10,0 L20,30 L15,50 L5,30 L0,50 L-5,30 L-15,50 L-10,30 L0,0"
+            fill={DF.spiritGold}
+          />
+        </g>
+        {/* Flowing ribbon accent */}
+        <path
+          d="M-20,500 Q80,460 140,520 Q200,580 260,530"
+          fill="none"
+          stroke={DF.spiritGold}
+          strokeWidth="4"
+          opacity="0.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M1660,550 Q1740,500 1800,570 Q1860,640 1940,580"
+          fill="none"
+          stroke={DF.spiritGold}
+          strokeWidth="4"
+          opacity="0.5"
+          strokeLinecap="round"
+        />
+      </svg>
+    </>
+  )
+})
+
+// Container component that selects ornaments based on profession
+const ProfessionOrnaments = memo(function ProfessionOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    let ticking = false
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrollY(window.scrollY)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden" aria-hidden="true">
+      {profession === 'engineer' && <EngineerOrnaments scrollY={scrollY} />}
+      {profession === 'drummer' && <MusicianOrnaments scrollY={scrollY} />}
+      {profession === 'fighter' && <FighterOrnaments scrollY={scrollY} />}
+    </div>
+  )
+})
+
+/**
  * ENERGY FLOW ANIMATION
  * =====================
  * Pattern: setTimeout-phase with CSS transforms
@@ -1684,6 +2269,7 @@ export default function DarkFantasyTheme() {
       <EtherealRain />
       <DarkFantasyAtmosphere />
       <SpiritParticles />
+      <ProfessionOrnaments profession={active} />
 
       {/* Interactive Elements - desktop only */}
       <ParallaxLayers />

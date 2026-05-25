@@ -63,6 +63,16 @@ export const KnightCharacter = memo(function KnightCharacter({
   const nailRotation = getNailRotation()
 
   return (
+    <>
+    {/* Breathing keyframe - always included when breathing prop is true */}
+    {breathing && (
+      <style>{`
+        @keyframes knightCloakBreathing {
+          0%, 100% { transform: scaleY(1) scaleX(1); }
+          50% { transform: scaleY(1.06) scaleX(1.03); }
+        }
+      `}</style>
+    )}
     <svg
       width={60 * effectiveScale}
       height={80 * effectiveScale}
@@ -81,7 +91,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       <g
         style={{
           transformOrigin: '30px 60px',
-          animation: breathing ? 'cloakBreathing 3s ease-in-out infinite' : undefined,
+          animation: breathing ? 'knightCloakBreathing 3s ease-in-out infinite' : undefined,
         }}
       >
         <path
@@ -240,6 +250,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       {/* Ground shadow */}
       <ellipse cx="30" cy="76" rx="14" ry="2" fill={DF.void} opacity="0.3" />
     </svg>
+    </>
   )
 })
 
@@ -397,10 +408,6 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           0% { opacity: 0; transform: translateX(-100%); }
           50% { opacity: 1; }
           100% { opacity: 0; transform: translateX(100%); }
-        }
-        @keyframes cloakBreathing {
-          0%, 100% { transform: scaleY(1) scaleX(1); }
-          50% { transform: scaleY(1.04) scaleX(1.02); }
         }
       `}</style>
     </div>
