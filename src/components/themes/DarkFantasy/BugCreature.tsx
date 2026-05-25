@@ -180,20 +180,20 @@ interface BugPullRevealProps {
 
 type AnimationPhase =
   | 'idle'
-  | 'alex-enters'      // Alex walks in from left
-  | 'bug-appears'      // Bug emerges from right with content
-  | 'bug-throws'       // Bug throws content AT Alex
-  | 'content-lands'    // Content lands near Alex
-  | 'attack-stance'    // Bug floats into attack position, Alex reacts
+  | 'alex-enters'      // Alex enters at CENTER
+  | 'bug-appears'      // Bug appears at RIGHT EDGE with content
+  | 'bug-hits'         // Bug HITS content (bug stays, content flies)
+  | 'alex-blocks'      // Alex blocks content, pushed LEFT
+  | 'attack-stance'    // Bug floats, Alex ready on left
   | 'complete'
 
 const ATTACK_TIMING = {
   'alex-enters': 0,
-  'bug-appears': 300,
-  'bug-throws': 600,
-  'content-lands': 900,
-  'attack-stance': 1200,
-  'complete': 1700,
+  'bug-appears': 400,
+  'bug-hits': 700,
+  'alex-blocks': 1000,
+  'attack-stance': 1400,
+  'complete': 1900,
 }
 
 export const BugPullReveal = memo(function BugPullReveal({
@@ -215,8 +215,8 @@ export const BugPullReveal = memo(function BugPullReveal({
       if (!lastTime) lastTime = time
       const delta = time - lastTime
       lastTime = time
-      // Faster when throwing, slower when floating
-      const speed = phase === 'bug-throws' ? 0.015 : phase === 'attack-stance' ? 0.003 : 0.006
+      // Faster when hitting, slower when floating
+      const speed = phase === 'bug-hits' ? 0.015 : phase === 'attack-stance' ? 0.003 : 0.006
       setLegPhase(prev => (prev + delta * speed) % 1)
       rafId = requestAnimationFrame(animate)
     }
@@ -238,57 +238,72 @@ export const BugPullReveal = memo(function BugPullReveal({
     const timers: NodeJS.Timeout[] = []
 
     timers.push(setTimeout(() => setPhase('bug-appears'), ATTACK_TIMING['bug-appears']))
-    timers.push(setTimeout(() => setPhase('bug-throws'), ATTACK_TIMING['bug-throws']))
-    timers.push(setTimeout(() => setPhase('content-lands'), ATTACK_TIMING['content-lands']))
+    timers.push(setTimeout(() => setPhase('bug-hits'), ATTACK_TIMING['bug-hits']))
+    timers.push(setTimeout(() => setPhase('alex-blocks'), ATTACK_TIMING['alex-blocks']))
     timers.push(setTimeout(() => setPhase('attack-stance'), ATTACK_TIMING['attack-stance']))
     timers.push(setTimeout(() => setPhase('complete'), ATTACK_TIMING['complete']))
 
     return () => timers.forEach(t => clearTimeout(t))
   }, [triggered])
 
-  // Alex on LEFT, faces RIGHT to defend against incoming attack
+  // Alex starts CENTER, gets pushed LEFT when blocking content
   const getAlexStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
-        return { left: '-100px', opacity: 0 }
+        return { left: '45%', transform: 'translateX(-50%)', opacity: 0 }
       case 'alex-enters':
+        // Alex enters at CENTER
         return {
-          left: '8%',
+          left: '45%',
+          transform: 'translateX(-50%)',
           opacity: 1,
-          transition: 'all 300ms ease-out'
+          transition: 'all 400ms ease-out'
         }
       case 'bug-appears':
-      case 'bug-throws':
+        // Alex waiting at center
         return {
-          left: '8%',
+          left: '45%',
+          transform: 'translateX(-50%)',
           opacity: 1
         }
-      case 'content-lands':
-        // Alex braces to stop content
+      case 'bug-hits':
+        // Alex braces for impact
         return {
-          left: '6%',
+          left: '40%',
+          transform: 'translateX(-50%)',
           opacity: 1,
           transition: 'all 150ms ease-out'
         }
-      case 'attack-stance':
-        // Alex ready for battle
+      case 'alex-blocks':
+        // Alex blocks and gets pushed LEFT
         return {
-          left: '6%',
-          opacity: 1
+          left: '8%',
+          transform: 'translateX(0)',
+          opacity: 1,
+          transition: 'all 250ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+        }
+      case 'attack-stance':
+        // Alex ready on left
+        return {
+          left: '5%',
+          transform: 'translateX(0)',
+          opacity: 1,
+          transition: 'all 200ms ease-out'
         }
       case 'complete':
-        // Alex stays in ready stance with breathing animation
+        // Alex breathing animation on left
         return {
-          left: '6%',
+          left: '5%',
+          transform: 'translateX(0)',
           opacity: 1,
           animation: 'knightBreathing 2s ease-in-out infinite'
         }
       default:
-        return { left: '-100px', opacity: 0 }
+        return { left: '45%', transform: 'translateX(-50%)', opacity: 0 }
     }
   }
 
-  // Bug attacks from RIGHT, retreats to attack stance on RIGHT
+  // Bug at RIGHT EDGE, HITS content but STAYS in place, then floats
   const getBugStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
@@ -296,33 +311,33 @@ export const BugPullReveal = memo(function BugPullReveal({
         // Bug hidden off-screen RIGHT
         return { right: '-150px', opacity: 0, transform: 'translateY(0)' }
       case 'bug-appears':
-        // Bug enters from RIGHT pushing content toward center
+        // Bug appears at RIGHT EDGE
+        return {
+          right: '2%',
+          opacity: 1,
+          transform: 'translateY(0)',
+          transition: 'all 350ms ease-out'
+        }
+      case 'bug-hits':
+        // Bug HITS content (lunges slightly left then snaps back)
         return {
           right: '5%',
           opacity: 1,
-          transform: 'translateY(0)',
-          transition: 'all 400ms ease-out'
+          transform: 'translateX(-20px) translateY(-8px) rotate(-8deg)',
+          transition: 'all 150ms ease-out'
         }
-      case 'bug-throws':
-        // Bug lunges LEFT pushing content toward Alex
+      case 'alex-blocks':
+        // Bug snaps back to position after hit
         return {
-          right: '25%',
+          right: '3%',
           opacity: 1,
-          transform: 'translateY(-5px) rotate(-5deg)',
-          transition: 'all 250ms ease-out'
-        }
-      case 'content-lands':
-        // Bug recoils as Alex stops the content
-        return {
-          right: '15%',
-          opacity: 1,
-          transform: 'translateY(5px) rotate(3deg)',
+          transform: 'translateY(0) rotate(0deg)',
           transition: 'all 200ms ease-out'
         }
       case 'attack-stance':
-        // Bug floats UP into attack position on RIGHT
+        // Bug floats UP into attack position
         return {
-          right: '8%',
+          right: '5%',
           opacity: 1,
           transform: 'translateY(-40px)',
           transition: 'all 400ms ease-out',
@@ -331,7 +346,7 @@ export const BugPullReveal = memo(function BugPullReveal({
       case 'complete':
         // Bug continues floating menacingly
         return {
-          right: '8%',
+          right: '5%',
           opacity: 1,
           transform: 'translateY(-40px)',
           animation: 'bugFloat 1.5s ease-in-out infinite'
@@ -341,35 +356,35 @@ export const BugPullReveal = memo(function BugPullReveal({
     }
   }
 
-  // Content pushed by bug from RIGHT, stopped by Alex in CENTER
+  // Content starts near bug (RIGHT), gets HIT toward CENTER
   const getContentStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
       case 'alex-enters':
-        // Content starts off-screen RIGHT (with bug)
+        // Content hidden off-screen RIGHT
         return { transform: 'translateX(100%)', opacity: 0 }
       case 'bug-appears':
-        // Content enters with bug
+        // Content appears next to bug (left of bug)
         return {
-          transform: 'translateX(60%)',
-          opacity: 0.6,
-          transition: 'all 400ms ease-out'
+          transform: 'translateX(55%)',
+          opacity: 0.7,
+          transition: 'all 350ms ease-out'
         }
-      case 'bug-throws':
-        // Content pushed toward Alex
+      case 'bug-hits':
+        // Content gets HIT and flies toward Alex
         return {
-          transform: 'translateX(10%)',
-          opacity: 0.9,
-          transition: 'all 250ms ease-out'
+          transform: 'translateX(15%)',
+          opacity: 0.95,
+          transition: 'all 300ms ease-out'
         }
-      case 'content-lands':
+      case 'alex-blocks':
       case 'attack-stance':
       case 'complete':
-        // Alex stops content in center
+        // Content stopped at CENTER by Alex
         return {
           transform: 'translateX(0)',
           opacity: 1,
-          transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+          transition: 'all 250ms cubic-bezier(0.34, 1.56, 0.64, 1)'
         }
       default:
         return { transform: 'translateX(0)', opacity: 1 }
