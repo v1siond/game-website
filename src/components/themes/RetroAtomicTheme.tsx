@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
@@ -12,30 +12,32 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // ============================================================================
-// FALLOUT COLOR PALETTE
+// FALLOUT COLOR PALETTE - Deep research into Fallout aesthetics
 // ============================================================================
 
-// Pip-Boy / Terminal Green
+// Pip-Boy / Terminal Green (iconic Fallout 3/4/NV green)
 const PIPBOY_GREEN = '#14ff00'
 const PIPBOY_GREEN_DIM = '#0a8800'
 const PIPBOY_GREEN_GLOW = '#14ff0040'
+const PIPBOY_DARK = '#001a00'
 
-// Vault-Tec Colors
+// Vault-Tec Corporate Colors (blue/yellow from Vault Boy, marketing materials)
 const VAULT_BLUE = '#1a3c6e'
+const VAULT_BLUE_LIGHT = '#2e5c9e'
 const VAULT_YELLOW = '#ffd700'
 const VAULT_YELLOW_DIM = '#b8960a'
 
-// Nuka-Cola
+// Nuka-Cola (the iconic wasteland soda)
 const NUKA_RED = '#c41e3a'
 const NUKA_GLOW = '#ff4d6a'
 
-// Wasteland Tones
+// Wasteland Tones (post-apocalyptic earth, rust, decay)
 const WASTELAND_BROWN = '#3d2914'
-const WASTELAND_ORANGE = '#8b4513'
+const WASTELAND_TAN = '#8b7355'
 const RUST_ORANGE = '#b7410e'
+const RUST_DARK = '#5c2006'
 const IRRADIATED_AMBER = '#ffbf00'
 
 // Backgrounds
@@ -45,11 +47,87 @@ const PANEL_BG = '#141410'
 
 // Text
 const TERMINAL_TEXT = '#14ff00'
-const AMBER_TEXT = '#ffbf00'
 const FADED_TEXT = '#666655'
 
 // ============================================================================
-// RADIATION / NUCLEAR ICONS (SVG)
+// CSS TEXTURE GENERATORS (Pure CSS, no images)
+// ============================================================================
+
+// Rusted metal texture - weathered wasteland panels
+const rustedMetalTexture = `
+  linear-gradient(135deg, ${RUST_DARK}40 0%, transparent 50%),
+  linear-gradient(225deg, ${WASTELAND_BROWN}30 0%, transparent 50%),
+  repeating-linear-gradient(
+    90deg,
+    ${RUST_ORANGE}08 0px,
+    ${RUST_ORANGE}08 2px,
+    transparent 2px,
+    transparent 4px
+  ),
+  repeating-linear-gradient(
+    0deg,
+    ${RUST_DARK}10 0px,
+    ${RUST_DARK}10 1px,
+    transparent 1px,
+    transparent 3px
+  ),
+  radial-gradient(ellipse at 20% 30%, ${RUST_ORANGE}15 0%, transparent 50%),
+  radial-gradient(ellipse at 80% 70%, ${WASTELAND_BROWN}20 0%, transparent 40%)
+`
+
+// Pip-Boy terminal screen effect - CRT phosphor glow
+const pipBoyScreenTexture = `
+  repeating-linear-gradient(
+    0deg,
+    ${PIPBOY_GREEN}03 0px,
+    ${PIPBOY_GREEN}03 1px,
+    transparent 1px,
+    transparent 2px
+  ),
+  repeating-linear-gradient(
+    90deg,
+    ${PIPBOY_GREEN}02 0px,
+    ${PIPBOY_GREEN}02 1px,
+    transparent 1px,
+    transparent 3px
+  ),
+  radial-gradient(ellipse at 50% 0%, ${PIPBOY_GREEN}15 0%, transparent 50%),
+  radial-gradient(ellipse at 50% 100%, ${PIPBOY_DARK} 0%, transparent 30%),
+  linear-gradient(180deg, ${PIPBOY_DARK}80 0%, ${TERMINAL_BG} 10%, ${TERMINAL_BG} 90%, ${PIPBOY_DARK}80 100%)
+`
+
+// Worn paper/document texture - wasteland files and records
+const wornPaperTexture = `
+  repeating-linear-gradient(
+    45deg,
+    ${WASTELAND_TAN}05 0px,
+    ${WASTELAND_TAN}05 1px,
+    transparent 1px,
+    transparent 6px
+  ),
+  repeating-linear-gradient(
+    -45deg,
+    ${WASTELAND_BROWN}08 0px,
+    ${WASTELAND_BROWN}08 1px,
+    transparent 1px,
+    transparent 8px
+  ),
+  linear-gradient(180deg, ${WASTELAND_TAN}15 0%, ${WASTELAND_BROWN}10 100%)
+`
+
+// Radiation warning pattern - hazard stripes
+const radiationWarningPattern = `
+  repeating-linear-gradient(
+    45deg,
+    ${VAULT_YELLOW}20 0px,
+    ${VAULT_YELLOW}20 10px,
+    ${TERMINAL_BG} 10px,
+    ${TERMINAL_BG} 20px
+  )
+`
+
+// ============================================================================
+// RADIATION / NUCLEAR ICONS (SVG - no image imports)
 // ============================================================================
 
 function RadiationSymbol({
@@ -148,19 +226,52 @@ function BottleCapIcon({
   )
 }
 
+// Vault Boy silhouette (iconic thumbs-up pose)
+function VaultBoyIcon({
+  size = 24,
+  color = VAULT_YELLOW,
+  ariaLabel = 'Vault Boy'
+}: {
+  size?: number
+  color?: string
+  ariaLabel?: string
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 100 100"
+      aria-label={ariaLabel}
+      role="img"
+    >
+      {/* Head */}
+      <circle cx="50" cy="25" r="18" fill={color} />
+      {/* Body */}
+      <ellipse cx="50" cy="55" rx="15" ry="20" fill={color} />
+      {/* Thumbs up arm */}
+      <path d="M65 50 Q80 40 75 25 Q72 20 68 22 Q70 30 60 45" fill={color} />
+      {/* Other arm */}
+      <path d="M35 50 Q25 55 20 65" stroke={color} strokeWidth="6" fill="none" strokeLinecap="round" />
+      {/* Legs */}
+      <path d="M42 72 L38 95" stroke={color} strokeWidth="8" strokeLinecap="round" />
+      <path d="M58 72 L62 95" stroke={color} strokeWidth="8" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 // ============================================================================
-// TERMINAL SCANLINE EFFECT
+// TERMINAL SCANLINE EFFECT (CRT authenticity)
 // ============================================================================
 
 function TerminalScanlines({ reducedMotion }: { reducedMotion: boolean }) {
-  if (reducedMotion) return null
-
   return (
     <div
       className="fixed inset-0 pointer-events-none z-[100]"
       style={{
-        background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px)',
-        opacity: 0.4,
+        background: reducedMotion
+          ? 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px)'
+          : 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.15) 2px, rgba(0,0,0,0.15) 4px)',
+        opacity: reducedMotion ? 0.2 : 0.4,
       }}
       aria-hidden="true"
     />
@@ -168,91 +279,135 @@ function TerminalScanlines({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 // ============================================================================
-// PIP-BOY STYLE STAT DISPLAY (S.P.E.C.I.A.L. inspired)
+// VAULT-TEC PANEL FRAMES (Different texture variants)
 // ============================================================================
 
-function StatBar({
-  label,
-  value,
-  maxValue = 10,
-  color = PIPBOY_GREEN
-}: {
-  label: string
-  value: number
-  maxValue?: number
-  color?: string
-}) {
-  const filledBars = Math.min(value, maxValue)
-
-  return (
-    <div className="flex items-center gap-3" role="meter" aria-label={`${label}: ${value} out of ${maxValue}`}>
-      <span
-        className="text-xs font-bold w-24 tracking-wider uppercase"
-        style={{ color }}
-      >
-        {label}
-      </span>
-      <div className="flex gap-1">
-        {[...Array(maxValue)].map((_, i) => (
-          <div
-            key={i}
-            className="w-4 h-3"
-            style={{
-              background: i < filledBars ? color : `${color}30`,
-              boxShadow: i < filledBars ? `0 0 4px ${color}` : 'none',
-            }}
-          />
-        ))}
-      </div>
-      <span className="text-xs font-mono" style={{ color }}>{value}</span>
-    </div>
-  )
-}
-
-// ============================================================================
-// VAULT-TEC PANEL FRAME
-// ============================================================================
-
-function VaultPanel({
+function RustedMetalPanel({
   children,
   title,
-  variant = 'terminal',
   ariaLabel,
 }: {
   children: React.ReactNode
   title: string
-  variant?: 'terminal' | 'vault' | 'warning'
   ariaLabel?: string
 }) {
-  const colors = {
-    terminal: { border: PIPBOY_GREEN, title: PIPBOY_GREEN, bg: TERMINAL_BG },
-    vault: { border: VAULT_BLUE, title: VAULT_YELLOW, bg: VAULT_BG },
-    warning: { border: RUST_ORANGE, title: NUKA_RED, bg: PANEL_BG },
-  }
-  const c = colors[variant]
-
   return (
     <section
       className="relative"
       aria-label={ariaLabel || title}
     >
-      {/* Main border */}
+      {/* Rusted metal background */}
       <div
         className="absolute inset-0"
         style={{
-          border: `2px solid ${c.border}`,
-          boxShadow: `0 0 10px ${c.border}30, inset 0 0 20px ${c.border}10`,
+          background: rustedMetalTexture,
+          backgroundColor: PANEL_BG,
         }}
+        aria-hidden="true"
       />
 
-      {/* Corner bolts/rivets */}
-      {['-top-1 -left-1', '-top-1 -right-1', '-bottom-1 -left-1', '-bottom-1 -right-1'].map((pos, i) => (
+      {/* Border with rust effect */}
+      <div
+        className="absolute inset-0"
+        style={{
+          border: `3px solid ${RUST_ORANGE}`,
+          boxShadow: `
+            inset 0 0 20px ${RUST_DARK}50,
+            0 0 10px ${RUST_ORANGE}20
+          `,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Corner rivets/bolts */}
+      {['-top-1.5 -left-1.5', '-top-1.5 -right-1.5', '-bottom-1.5 -left-1.5', '-bottom-1.5 -right-1.5'].map((pos, i) => (
         <div
           key={i}
-          className={`absolute w-3 h-3 rounded-full ${pos}`}
+          className={`absolute w-4 h-4 rounded-full ${pos}`}
           style={{
-            background: `radial-gradient(circle at 30% 30%, ${VAULT_YELLOW}, ${WASTELAND_BROWN})`,
-            border: `1px solid ${WASTELAND_BROWN}`,
+            background: `radial-gradient(circle at 30% 30%, ${VAULT_YELLOW_DIM}, ${RUST_DARK})`,
+            border: `2px solid ${RUST_DARK}`,
+            boxShadow: `inset 0 0 2px ${VAULT_YELLOW}40`,
+          }}
+          aria-hidden="true"
+        />
+      ))}
+
+      {/* Title bar with hazard stripe */}
+      <div
+        className="absolute -top-4 left-6 px-4 py-1 flex items-center gap-2"
+        style={{
+          background: radiationWarningPattern,
+          backgroundColor: TERMINAL_BG,
+          border: `2px solid ${RUST_ORANGE}`,
+        }}
+      >
+        <RadiationSymbol size={14} color={VAULT_YELLOW} ariaLabel="" />
+        <h2
+          className="text-xs tracking-[0.25em] uppercase font-bold"
+          style={{
+            color: VAULT_YELLOW,
+            textShadow: `0 0 8px ${VAULT_YELLOW}80`,
+            fontFamily: 'monospace',
+          }}
+        >
+          {title}
+        </h2>
+      </div>
+
+      <div className="relative pt-8 pb-6 px-6">
+        {children}
+      </div>
+    </section>
+  )
+}
+
+function PipBoyTerminalPanel({
+  children,
+  title,
+  ariaLabel,
+}: {
+  children: React.ReactNode
+  title: string
+  ariaLabel?: string
+}) {
+  return (
+    <section
+      className="relative"
+      aria-label={ariaLabel || title}
+    >
+      {/* Pip-Boy screen effect background */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: pipBoyScreenTexture,
+          backgroundColor: TERMINAL_BG,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Terminal border with glow */}
+      <div
+        className="absolute inset-0"
+        style={{
+          border: `2px solid ${PIPBOY_GREEN}`,
+          boxShadow: `
+            inset 0 0 30px ${PIPBOY_GREEN}15,
+            0 0 15px ${PIPBOY_GREEN}30,
+            inset 0 0 60px ${PIPBOY_DARK}
+          `,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Corner indicators (like Pip-Boy UI elements) */}
+      {['top-1 left-1', 'top-1 right-1', 'bottom-1 left-1', 'bottom-1 right-1'].map((pos, i) => (
+        <div
+          key={i}
+          className={`absolute w-2 h-2 ${pos}`}
+          style={{
+            background: PIPBOY_GREEN,
+            boxShadow: `0 0 6px ${PIPBOY_GREEN}`,
           }}
           aria-hidden="true"
         />
@@ -261,68 +416,92 @@ function VaultPanel({
       {/* Title bar */}
       <div
         className="absolute -top-3 left-6 px-4 py-0.5 flex items-center gap-2"
-        style={{ background: c.bg }}
+        style={{ background: TERMINAL_BG }}
       >
-        <RadiationSymbol size={14} color={c.title} ariaLabel="" />
+        <span style={{ color: PIPBOY_GREEN_DIM }}>&gt;&gt;</span>
         <h2
           className="text-xs tracking-[0.25em] uppercase font-bold"
           style={{
-            color: c.title,
-            textShadow: `0 0 8px ${c.title}80`,
+            color: PIPBOY_GREEN,
+            textShadow: `0 0 10px ${PIPBOY_GREEN}80`,
             fontFamily: 'monospace',
           }}
         >
           {title}
         </h2>
+        <span style={{ color: PIPBOY_GREEN_DIM }}>&lt;&lt;</span>
       </div>
 
-      <div className="pt-6 pb-4 px-4" style={{ background: c.bg }}>
+      <div className="relative pt-6 pb-4 px-4">
         {children}
       </div>
     </section>
   )
 }
 
-// ============================================================================
-// TERMINAL REVEAL ANIMATION
-// ============================================================================
-
-function TerminalReveal({
+function WornDocumentPanel({
   children,
-  delay = 0,
-  reducedMotion,
+  title,
+  ariaLabel,
 }: {
   children: React.ReactNode
-  delay?: number
-  reducedMotion: boolean
+  title: string
+  ariaLabel?: string
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasTriggered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [revealed, setRevealed] = useState(false)
-
-  useEffect(() => {
-    if (hasTriggered && !revealed) {
-      if (reducedMotion) {
-        setRevealed(true)
-      } else {
-        const timer = setTimeout(() => setRevealed(true), delay)
-        return () => clearTimeout(timer)
-      }
-    }
-  }, [hasTriggered, revealed, delay, reducedMotion])
-
   return (
-    <div ref={ref} className="relative overflow-hidden">
+    <section
+      className="relative"
+      aria-label={ariaLabel || title}
+    >
+      {/* Worn paper texture */}
       <div
+        className="absolute inset-0"
         style={{
-          opacity: revealed ? 1 : 0,
-          transform: revealed || reducedMotion ? 'translateY(0)' : 'translateY(10px)',
-          transition: reducedMotion ? 'none' : 'all 0.5s ease-out',
+          background: wornPaperTexture,
+          backgroundColor: VAULT_BG,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Border like aged document */}
+      <div
+        className="absolute inset-0"
+        style={{
+          border: `2px solid ${VAULT_BLUE}`,
+          boxShadow: `
+            inset 0 0 20px ${WASTELAND_BROWN}30,
+            0 0 8px ${VAULT_BLUE}20
+          `,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Vault-Tec style header stripe */}
+      <div
+        className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center gap-3"
+        style={{
+          background: `linear-gradient(90deg, ${VAULT_BLUE}, ${VAULT_BLUE_LIGHT}, ${VAULT_BLUE})`,
+          borderBottom: `2px solid ${VAULT_YELLOW}`,
         }}
       >
+        <VaultBoyIcon size={18} color={VAULT_YELLOW} ariaLabel="" />
+        <h2
+          className="text-xs tracking-[0.3em] uppercase font-bold"
+          style={{
+            color: VAULT_YELLOW,
+            textShadow: `0 0 6px ${VAULT_YELLOW}60`,
+            fontFamily: 'monospace',
+          }}
+        >
+          {title}
+        </h2>
+        <VaultBoyIcon size={18} color={VAULT_YELLOW} ariaLabel="" />
+      </div>
+
+      <div className="relative pt-12 pb-6 px-6">
         {children}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -339,60 +518,56 @@ function WastelandBackground({ reducedMotion }: { reducedMotion: boolean }) {
         style={{
           background: `linear-gradient(180deg,
             ${TERMINAL_BG} 0%,
-            ${WASTELAND_BROWN}20 50%,
-            ${RUST_ORANGE}15 100%)`,
+            ${WASTELAND_BROWN}15 40%,
+            ${RUST_ORANGE}10 70%,
+            ${TERMINAL_BG} 100%)`,
         }}
       />
 
-      {/* Floating radiation symbols */}
-      {!reducedMotion && [...Array(5)].map((_, i) => (
+      {/* Static radiation symbols (no animation if reduced motion) */}
+      {[...Array(5)].map((_, i) => (
         <div
           key={i}
           className="absolute"
           style={{
-            left: `${15 + i * 20}%`,
+            left: `${15 + i * 18}%`,
             top: `${20 + (i % 3) * 25}%`,
-            opacity: 0.08,
-            animation: `floatSlow ${15 + i * 3}s ease-in-out infinite`,
-            animationDelay: `${-i * 2}s`,
+            opacity: 0.06,
+            transform: reducedMotion ? 'none' : undefined,
           }}
         >
-          <RadiationSymbol size={60 + i * 10} color={PIPBOY_GREEN} />
+          <RadiationSymbol size={50 + i * 8} color={PIPBOY_GREEN} ariaLabel="" />
         </div>
       ))}
 
       {/* Atom decorations */}
-      {!reducedMotion && [...Array(3)].map((_, i) => (
+      {[...Array(3)].map((_, i) => (
         <div
           key={`atom-${i}`}
           className="absolute"
           style={{
             right: `${10 + i * 15}%`,
-            bottom: `${15 + i * 20}%`,
-            opacity: 0.06,
-            animation: `atomSpin ${20 + i * 5}s linear infinite`,
+            bottom: `${15 + i * 18}%`,
+            opacity: 0.05,
           }}
         >
-          <AtomSymbol size={80} color={IRRADIATED_AMBER} />
+          <AtomSymbol size={70} color={IRRADIATED_AMBER} ariaLabel="" />
         </div>
       ))}
 
-      <style jsx>{`
-        @keyframes floatSlow {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          50% { transform: translateY(-20px) rotate(5deg); }
-        }
-        @keyframes atomSpin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
+      {/* Subtle vignette */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at 50% 50%, transparent 40%, ${TERMINAL_BG}80 100%)`,
+        }}
+      />
     </div>
   )
 }
 
 // ============================================================================
-// PROFESSION SELECTOR (Vault-Tec style)
+// PROFESSION SELECTOR (Vault-Tec S.P.E.C.I.A.L. style)
 // ============================================================================
 
 function ProfessionSelector({
@@ -403,16 +578,16 @@ function ProfessionSelector({
   onSelect: (p: 'engineer' | 'drummer' | 'fighter') => void
 }) {
   const professions = [
-    { id: 'engineer', label: 'ENGINEER', stat: 'INT', icon: '>' },
-    { id: 'drummer', label: 'MUSICIAN', stat: 'AGL', icon: '>' },
-    { id: 'fighter', label: 'FIGHTER', stat: 'STR', icon: '>' },
+    { id: 'engineer', label: 'ENGINEER', stat: 'INT', desc: 'Technical Specialist' },
+    { id: 'drummer', label: 'MUSICIAN', stat: 'AGL', desc: 'Rhythm Division' },
+    { id: 'fighter', label: 'FIGHTER', stat: 'STR', desc: 'Combat Training' },
   ] as const
 
   return (
     <div
       className="flex justify-center gap-4 py-6"
       role="tablist"
-      aria-label="Select profession"
+      aria-label="Select profession to view"
     >
       {professions.map((prof) => {
         const isActive = active === prof.id
@@ -423,30 +598,92 @@ function ProfessionSelector({
             role="tab"
             aria-selected={isActive}
             aria-controls={`${prof.id}-content`}
-            className="relative px-6 py-3 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2"
+            className="relative px-6 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             style={{
               background: isActive ? PIPBOY_GREEN : 'transparent',
               border: `2px solid ${isActive ? PIPBOY_GREEN : PIPBOY_GREEN_DIM}`,
               color: isActive ? TERMINAL_BG : PIPBOY_GREEN,
-              boxShadow: isActive ? `0 0 20px ${PIPBOY_GREEN_GLOW}` : 'none',
+              boxShadow: isActive ? `0 0 20px ${PIPBOY_GREEN_GLOW}, inset 0 0 10px ${PIPBOY_DARK}` : 'none',
               fontFamily: 'monospace',
             }}
           >
-            <span className="text-xs tracking-wider font-bold">
-              {isActive && `${prof.icon} `}{prof.label}
+            <span className="text-xs tracking-wider font-bold block">
+              {isActive && '> '}{prof.label}
             </span>
             <span
               className="block text-[10px] mt-1"
               style={{
                 color: isActive ? TERMINAL_BG : PIPBOY_GREEN_DIM,
-                opacity: 0.8,
+                opacity: 0.9,
               }}
             >
-              [{prof.stat}]
+              [{prof.stat}] {prof.desc}
             </span>
           </button>
         )
       })}
+    </div>
+  )
+}
+
+// ============================================================================
+// ACHIEVEMENTS DISPLAY (Replaces 1-10 stat bars)
+// ============================================================================
+
+function AchievementsDisplay({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
+  const achievements = {
+    engineer: [
+      { icon: '>', label: '10+ Years Full-Stack Development', category: 'EXPERIENCE' },
+      { icon: '>', label: 'Elixir/Phoenix, Vue/Quasar Expert', category: 'TECH' },
+      { icon: '>', label: 'Kubernetes Infrastructure Lead', category: 'DEVOPS' },
+      { icon: '>', label: 'Multiple Production Systems Architected', category: 'IMPACT' },
+      { icon: '>', label: 'Team Lead & Technical Mentor', category: 'LEADERSHIP' },
+      { icon: '>', label: 'Real-time WebSocket Systems', category: 'SPECIALTY' },
+    ],
+    drummer: [
+      { icon: '>', label: 'Professional Metal Drummer', category: 'ROLE' },
+      { icon: '>', label: 'Multiple Band Projects', category: 'EXPERIENCE' },
+      { icon: '>', label: 'Studio Recording Sessions', category: 'ACHIEVEMENT' },
+      { icon: '>', label: 'Live Performance Expert', category: 'SKILL' },
+      { icon: '>', label: 'Technical Death Metal Specialist', category: 'GENRE' },
+      { icon: '>', label: 'Blast Beats & Complex Patterns', category: 'TECHNIQUE' },
+    ],
+    fighter: [
+      { icon: '>', label: 'Martial Arts Training', category: 'DISCIPLINE' },
+      { icon: '>', label: 'Competition Experience', category: 'ACHIEVEMENT' },
+      { icon: '>', label: 'Physical Conditioning Focus', category: 'TRAINING' },
+      { icon: '>', label: 'Mental Discipline & Focus', category: 'MINDSET' },
+      { icon: '>', label: 'Strategic Combat Thinking', category: 'SKILL' },
+      { icon: '>', label: 'Continuous Improvement', category: 'PHILOSOPHY' },
+    ],
+  }
+
+  return (
+    <div className="grid md:grid-cols-2 gap-3 font-mono">
+      {achievements[profession].map((achievement, i) => (
+        <div
+          key={i}
+          className="flex items-center gap-3 p-2"
+          style={{
+            background: `${PIPBOY_GREEN}08`,
+            border: `1px solid ${PIPBOY_GREEN}30`,
+          }}
+        >
+          <span
+            className="text-xs px-2 py-0.5"
+            style={{
+              background: TERMINAL_BG,
+              border: `1px solid ${VAULT_YELLOW}50`,
+              color: VAULT_YELLOW,
+            }}
+          >
+            {achievement.category}
+          </span>
+          <span className="text-sm" style={{ color: PIPBOY_GREEN }}>
+            {achievement.icon} {achievement.label}
+          </span>
+        </div>
+      ))}
     </div>
   )
 }
@@ -476,7 +713,7 @@ function BottleCapCounter({ count, label }: { count: number; label: string }) {
 }
 
 // ============================================================================
-// TECH STACK / SKILLS DISPLAY (Terminal style, no proficiency bars)
+// TECH STACK / SKILLS DISPLAY (Terminal style, achievements not bars)
 // ============================================================================
 
 function TechTerminal({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
@@ -493,10 +730,10 @@ function TechTerminal({ categories }: { categories: ReturnType<typeof getEnginee
             {category.name.toUpperCase()}
           </h3>
           <div className="flex flex-wrap gap-2">
-            {category.items.map((tech, i) => (
+            {category.items.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1 text-xs font-bold transition-all hover:scale-105 cursor-default"
+                className="px-3 py-1 text-xs font-bold cursor-default"
                 style={{
                   background: TERMINAL_BG,
                   border: `1px solid ${PIPBOY_GREEN}`,
@@ -514,7 +751,7 @@ function TechTerminal({ categories }: { categories: ReturnType<typeof getEnginee
   )
 }
 
-// Skills for drummer/fighter - with achievements instead of bars
+// Skills for drummer/fighter - list format, no proficiency bars
 function SkillsTerminal({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
   return (
     <div className="grid md:grid-cols-3 gap-6 font-mono">
@@ -547,7 +784,7 @@ function SkillsTerminal({ categories }: { categories: ReturnType<typeof getSkill
 }
 
 // ============================================================================
-// EXPERIENCE CARD (Terminal log style)
+// EXPERIENCE CARD (Terminal log style with worn paper texture)
 // ============================================================================
 
 function ExperienceTerminal({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
@@ -556,14 +793,26 @@ function ExperienceTerminal({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 
   return (
     <article
-      className="p-4 font-mono"
+      className="relative p-4 font-mono"
       style={{
-        background: TERMINAL_BG,
+        background: wornPaperTexture,
+        backgroundColor: TERMINAL_BG,
         border: `1px solid ${PIPBOY_GREEN}40`,
-        boxShadow: `inset 0 0 20px ${PIPBOY_GREEN}10`,
+        boxShadow: `inset 0 0 20px ${PIPBOY_GREEN}08`,
       }}
     >
-      <div className="flex justify-between items-start mb-2">
+      {/* Classification stamp effect */}
+      <div
+        className="absolute top-2 right-2 text-[8px] px-2 py-0.5 rotate-[-5deg]"
+        style={{
+          border: `1px solid ${entry.endDate ? FADED_TEXT : PIPBOY_GREEN}`,
+          color: entry.endDate ? FADED_TEXT : PIPBOY_GREEN,
+        }}
+      >
+        {entry.endDate ? 'ARCHIVED' : 'ACTIVE DUTY'}
+      </div>
+
+      <div className="flex justify-between items-start mb-2 pr-20">
         <div>
           <h4
             className="text-sm font-bold uppercase tracking-wide"
@@ -576,9 +825,9 @@ function ExperienceTerminal({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
         <span
           className="text-[10px] px-2 py-1"
           style={{
-            background: entry.endDate ? PANEL_BG : `${PIPBOY_GREEN}20`,
-            border: `1px solid ${entry.endDate ? FADED_TEXT : PIPBOY_GREEN}`,
-            color: entry.endDate ? FADED_TEXT : PIPBOY_GREEN,
+            background: `${VAULT_BLUE}30`,
+            border: `1px solid ${VAULT_BLUE}`,
+            color: VAULT_YELLOW,
           }}
         >
           {startDisplay} - {endDisplay}
@@ -612,27 +861,35 @@ function ExperienceTerminal({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 function ProjectDossier({ project }: { project: typeof PROJECTS_DATA[0] }) {
   return (
     <article
-      className="p-4 transition-all hover:scale-[1.01] cursor-pointer group font-mono"
+      className="relative p-4 cursor-pointer group font-mono"
       style={{
-        background: project.featured ? `${VAULT_BLUE}20` : TERMINAL_BG,
+        background: project.featured ? rustedMetalTexture : pipBoyScreenTexture,
+        backgroundColor: project.featured ? `${VAULT_BLUE}15` : TERMINAL_BG,
         border: `2px solid ${project.featured ? VAULT_YELLOW : PIPBOY_GREEN}50`,
-        boxShadow: project.featured ? `0 0 15px ${VAULT_YELLOW}20` : 'none',
+        boxShadow: project.featured ? `0 0 15px ${VAULT_YELLOW}15` : 'none',
       }}
     >
       {project.featured && (
         <div
-          className="flex items-center gap-2 mb-2"
-          style={{ color: VAULT_YELLOW }}
+          className="absolute -top-2 -right-2 flex items-center gap-1 px-2 py-0.5"
+          style={{
+            background: radiationWarningPattern,
+            backgroundColor: TERMINAL_BG,
+            border: `1px solid ${VAULT_YELLOW}`,
+          }}
         >
-          <BottleCapIcon size={14} />
-          <span className="text-[10px] tracking-wider font-bold">
-            PRIORITY PROJECT
+          <BottleCapIcon size={12} />
+          <span
+            className="text-[9px] tracking-wider font-bold"
+            style={{ color: VAULT_YELLOW }}
+          >
+            PRIORITY
           </span>
         </div>
       )}
 
       <h4
-        className="text-sm font-bold uppercase tracking-wide group-hover:text-[#1aff1a] transition-colors"
+        className="text-sm font-bold uppercase tracking-wide"
         style={{ color: PIPBOY_GREEN }}
       >
         {project.name}
@@ -683,19 +940,20 @@ function CompanyTerminal({ company }: { company: typeof COMPANIES[0] }) {
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-all hover:scale-[1.02] group font-mono focus:outline-none focus:ring-2"
+      className="block p-4 group font-mono focus:outline-none focus-visible:ring-2"
       style={{
-        background: TERMINAL_BG,
+        background: pipBoyScreenTexture,
+        backgroundColor: TERMINAL_BG,
         border: `1px solid ${VAULT_BLUE}`,
         boxShadow: `inset 0 0 15px ${VAULT_BLUE}10`,
       }}
-      aria-label={`${company.name}: ${company.tagline}`}
+      aria-label={`${company.name}: ${company.tagline}. Opens in new tab.`}
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl">{company.icon}</span>
         <div>
           <h4
-            className="text-sm font-bold uppercase tracking-wide group-hover:text-[#1aff1a] transition-colors"
+            className="text-sm font-bold uppercase tracking-wide"
             style={{ color: PIPBOY_GREEN }}
           >
             {company.name}
@@ -718,15 +976,16 @@ function CompanyTerminal({ company }: { company: typeof COMPANIES[0] }) {
 function BandTerminal({ band }: { band: typeof BANDS[0] }) {
   const content = (
     <article
-      className="p-4 transition-all hover:scale-[1.02] group font-mono"
+      className="p-4 group font-mono"
       style={{
-        background: TERMINAL_BG,
+        background: rustedMetalTexture,
+        backgroundColor: TERMINAL_BG,
         border: `1px solid ${NUKA_RED}50`,
-        boxShadow: `inset 0 0 15px ${NUKA_RED}10`,
+        boxShadow: `inset 0 0 15px ${NUKA_RED}08`,
       }}
     >
       <h4
-        className="text-sm font-bold uppercase tracking-wide group-hover:text-[#ff6a8a] transition-colors"
+        className="text-sm font-bold uppercase tracking-wide"
         style={{ color: NUKA_GLOW }}
       >
         {band.name}
@@ -740,8 +999,11 @@ function BandTerminal({ band }: { band: typeof BANDS[0] }) {
           className="mt-2 text-[10px] flex items-center gap-1"
           style={{ color: PIPBOY_GREEN }}
         >
-          <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: PIPBOY_GREEN }} />
-          ACTIVE
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{ background: PIPBOY_GREEN, boxShadow: `0 0 4px ${PIPBOY_GREEN}` }}
+          />
+          ACTIVE BROADCAST
         </div>
       )}
     </article>
@@ -753,8 +1015,8 @@ function BandTerminal({ band }: { band: typeof BANDS[0] }) {
         href={band.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block focus:outline-none focus:ring-2"
-        aria-label={`${band.name}: ${band.genre}`}
+        className="block focus:outline-none focus-visible:ring-2"
+        aria-label={`${band.name}: ${band.genre}. Opens in new tab.`}
       >
         {content}
       </a>
@@ -776,7 +1038,9 @@ function RolesDisplay() {
           className="text-center px-4 py-2"
           style={{
             border: `1px solid ${role.type === 'leadership' ? VAULT_YELLOW : PIPBOY_GREEN}40`,
-            background: `${role.type === 'leadership' ? VAULT_YELLOW : PIPBOY_GREEN}08`,
+            background: role.type === 'leadership'
+              ? `linear-gradient(180deg, ${VAULT_YELLOW}10 0%, transparent 100%)`
+              : `${PIPBOY_GREEN}08`,
           }}
         >
           <p
@@ -807,7 +1071,7 @@ export default function RetroAtomicTheme() {
   useTheme()
   const { active, setActive } = useProfession()
   const [mounted, setMounted] = useState(false)
-  const [capsCollected, setCapsCollected] = useState(0)
+  const [capsCollected, setCapsCollected] = useState(2077) // Fallout reference year
   const [reducedMotion, setReducedMotion] = useState(false)
 
   const aboutData = ABOUT_DATA[active]
@@ -828,28 +1092,9 @@ export default function RetroAtomicTheme() {
 
   useEffect(() => {
     setMounted(true)
-    // Simulate collecting bottle caps
-    if (!reducedMotion) {
-      const interval = setInterval(() => setCapsCollected(c => c + 1), 2000)
-      return () => clearInterval(interval)
-    }
-  }, [reducedMotion])
-
-  // Calculate "S.P.E.C.I.A.L." stats based on profession
-  const getStats = useCallback(() => {
-    const base = { STR: 5, PER: 6, END: 5, CHA: 7, INT: 8, AGL: 6, LCK: 5 }
-    if (active === 'engineer') {
-      return { ...base, INT: 10, PER: 8, END: 7 }
-    } else if (active === 'drummer') {
-      return { ...base, AGL: 10, CHA: 8, PER: 7 }
-    } else {
-      return { ...base, STR: 10, END: 9, AGL: 8 }
-    }
-  }, [active])
+  }, [])
 
   if (!mounted) return null
-
-  const stats = getStats()
 
   return (
     <div
@@ -874,7 +1119,7 @@ export default function RetroAtomicTheme() {
       >
         <div className="max-w-6xl mx-auto">
           {/* Top bar */}
-          <div className="flex justify-between items-start mb-4">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
             <div>
               {/* Vault-Tec style header */}
               <div
@@ -896,7 +1141,7 @@ export default function RetroAtomicTheme() {
                     className="text-xs tracking-widest"
                     style={{ color: VAULT_YELLOW }}
                   >
-                    VAULT-TEC PERSONNEL FILE
+                    VAULT-TEC PERSONNEL FILE // CLEARANCE: ALPHA
                   </p>
                 </div>
               </div>
@@ -919,10 +1164,10 @@ export default function RetroAtomicTheme() {
             <div className="flex flex-col items-end gap-3">
               <BottleCapCounter count={capsCollected} label="CAPS" />
 
-              <div className="flex gap-3 items-center">
+              <div className="flex gap-3 items-center flex-wrap justify-end">
                 <Link
                   href="/cv"
-                  className="px-4 py-2 text-xs font-bold tracking-wider transition-all hover:scale-105 focus:outline-none focus:ring-2"
+                  className="px-4 py-2 text-xs font-bold tracking-wider focus:outline-none focus-visible:ring-2"
                   style={{
                     background: TERMINAL_BG,
                     border: `2px solid ${VAULT_BLUE}`,
@@ -934,7 +1179,7 @@ export default function RetroAtomicTheme() {
                 </Link>
                 <Link
                   href="/personal-projects/game-engine"
-                  className="px-4 py-2 text-xs font-bold tracking-wider transition-all hover:scale-105 focus:outline-none focus:ring-2"
+                  className="px-4 py-2 text-xs font-bold tracking-wider focus:outline-none focus-visible:ring-2"
                   style={{
                     background: TERMINAL_BG,
                     border: `2px solid ${PIPBOY_GREEN}`,
@@ -971,26 +1216,16 @@ export default function RetroAtomicTheme() {
       </section>
 
       {/* ============================================================ */}
-      {/* S.P.E.C.I.A.L. STATS */}
+      {/* ACHIEVEMENTS (Replaces S.P.E.C.I.A.L. stat bars) */}
       {/* ============================================================ */}
       <section
         className="relative z-20 py-6 px-6"
-        aria-label="S.P.E.C.I.A.L. character statistics"
+        aria-label="Professional achievements"
       >
         <div className="max-w-4xl mx-auto">
-          <TerminalReveal reducedMotion={reducedMotion}>
-            <VaultPanel title="S.P.E.C.I.A.L." variant="terminal">
-              <div className="grid md:grid-cols-2 gap-3">
-                <StatBar label="STRENGTH" value={stats.STR} />
-                <StatBar label="PERCEPTION" value={stats.PER} />
-                <StatBar label="ENDURANCE" value={stats.END} />
-                <StatBar label="CHARISMA" value={stats.CHA} />
-                <StatBar label="INTELLIGENCE" value={stats.INT} />
-                <StatBar label="AGILITY" value={stats.AGL} />
-                <StatBar label="LUCK" value={stats.LCK} />
-              </div>
-            </VaultPanel>
-          </TerminalReveal>
+          <PipBoyTerminalPanel title="Achievements Unlocked" ariaLabel="Key achievements and credentials">
+            <AchievementsDisplay profession={active} />
+          </PipBoyTerminalPanel>
         </div>
       </section>
 
@@ -1002,31 +1237,29 @@ export default function RetroAtomicTheme() {
         aria-label="About section"
       >
         <div className="max-w-4xl mx-auto">
-          <TerminalReveal reducedMotion={reducedMotion}>
-            <VaultPanel title="Personnel Dossier" variant="vault">
-              <p
-                className="text-sm leading-relaxed mb-4"
-                style={{ color: TERMINAL_TEXT }}
-              >
-                {aboutData.bio}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span
-                    key={i}
-                    className="px-3 py-1 text-xs font-bold"
-                    style={{
-                      background: `${VAULT_YELLOW}15`,
-                      border: `1px solid ${VAULT_YELLOW}50`,
-                      color: VAULT_YELLOW,
-                    }}
-                  >
-                    {fact}
-                  </span>
-                ))}
-              </div>
-            </VaultPanel>
-          </TerminalReveal>
+          <WornDocumentPanel title="Personnel Dossier" ariaLabel="Personal background and information">
+            <p
+              className="text-sm leading-relaxed mb-4"
+              style={{ color: TERMINAL_TEXT }}
+            >
+              {aboutData.bio}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {aboutData.quickFacts.map((fact, i) => (
+                <span
+                  key={i}
+                  className="px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: `${VAULT_YELLOW}15`,
+                    border: `1px solid ${VAULT_YELLOW}50`,
+                    color: VAULT_YELLOW,
+                  }}
+                >
+                  {fact}
+                </span>
+              ))}
+            </div>
+          </WornDocumentPanel>
         </div>
       </section>
 
@@ -1039,15 +1272,13 @@ export default function RetroAtomicTheme() {
           aria-label="Work experience"
         >
           <div className="max-w-4xl mx-auto">
-            <TerminalReveal delay={100} reducedMotion={reducedMotion}>
-              <VaultPanel title="Mission Log" variant="terminal">
-                <div className="space-y-4">
-                  {experience.map((entry) => (
-                    <ExperienceTerminal key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </VaultPanel>
-            </TerminalReveal>
+            <RustedMetalPanel title="Mission Log" ariaLabel="Professional work history">
+              <div className="space-y-4">
+                {experience.map((entry) => (
+                  <ExperienceTerminal key={entry.id} entry={entry} />
+                ))}
+              </div>
+            </RustedMetalPanel>
           </div>
         </section>
       )}
@@ -1060,18 +1291,16 @@ export default function RetroAtomicTheme() {
         aria-label={active === 'engineer' ? 'Technical skills' : 'Skills and abilities'}
       >
         <div className="max-w-4xl mx-auto">
-          <TerminalReveal delay={100} reducedMotion={reducedMotion}>
-            <VaultPanel
-              title={active === 'engineer' ? 'Tech Arsenal' : 'Skill Perks'}
-              variant="terminal"
-            >
-              {active === 'engineer' ? (
-                <TechTerminal categories={engineerTech} />
-              ) : (
-                <SkillsTerminal categories={otherSkills} />
-              )}
-            </VaultPanel>
-          </TerminalReveal>
+          <PipBoyTerminalPanel
+            title={active === 'engineer' ? 'Tech Arsenal' : 'Skill Perks'}
+            ariaLabel={active === 'engineer' ? 'Technical skills and technologies' : 'Professional skills'}
+          >
+            {active === 'engineer' ? (
+              <TechTerminal categories={engineerTech} />
+            ) : (
+              <SkillsTerminal categories={otherSkills} />
+            )}
+          </PipBoyTerminalPanel>
         </div>
       </section>
 
@@ -1083,15 +1312,13 @@ export default function RetroAtomicTheme() {
         aria-label="Featured projects"
       >
         <div className="max-w-4xl mx-auto">
-          <TerminalReveal delay={100} reducedMotion={reducedMotion}>
-            <VaultPanel title="Quest Log" variant="warning">
-              <div className="grid md:grid-cols-2 gap-4">
-                {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                  <ProjectDossier key={project.id} project={project} />
-                ))}
-              </div>
-            </VaultPanel>
-          </TerminalReveal>
+          <RustedMetalPanel title="Quest Log" ariaLabel="Portfolio of projects">
+            <div className="grid md:grid-cols-2 gap-4">
+              {projects.filter(p => p.featured).slice(0, 6).map((project) => (
+                <ProjectDossier key={project.id} project={project} />
+              ))}
+            </div>
+          </RustedMetalPanel>
         </div>
       </section>
 
@@ -1104,15 +1331,13 @@ export default function RetroAtomicTheme() {
           aria-label="Companies and ventures"
         >
           <div className="max-w-4xl mx-auto">
-            <TerminalReveal delay={100} reducedMotion={reducedMotion}>
-              <VaultPanel title="Affiliated Factions" variant="vault">
-                <div className="grid md:grid-cols-3 gap-4">
-                  {COMPANIES.map((company) => (
-                    <CompanyTerminal key={company.id} company={company} />
-                  ))}
-                </div>
-              </VaultPanel>
-            </TerminalReveal>
+            <WornDocumentPanel title="Affiliated Factions" ariaLabel="Companies and organizations">
+              <div className="grid md:grid-cols-3 gap-4">
+                {COMPANIES.map((company) => (
+                  <CompanyTerminal key={company.id} company={company} />
+                ))}
+              </div>
+            </WornDocumentPanel>
           </div>
         </section>
       )}
@@ -1123,15 +1348,13 @@ export default function RetroAtomicTheme() {
           aria-label="Musical projects and bands"
         >
           <div className="max-w-4xl mx-auto">
-            <TerminalReveal delay={100} reducedMotion={reducedMotion}>
-              <VaultPanel title="Radio Stations" variant="warning">
-                <div className="grid md:grid-cols-3 gap-4">
-                  {BANDS.map((band) => (
-                    <BandTerminal key={band.id} band={band} />
-                  ))}
-                </div>
-              </VaultPanel>
-            </TerminalReveal>
+            <RustedMetalPanel title="Radio Stations" ariaLabel="Musical bands and projects">
+              <div className="grid md:grid-cols-3 gap-4">
+                {BANDS.map((band) => (
+                  <BandTerminal key={band.id} band={band} />
+                ))}
+              </div>
+            </RustedMetalPanel>
           </div>
         </section>
       )}
@@ -1160,14 +1383,14 @@ export default function RetroAtomicTheme() {
         </p>
         <div className="flex justify-center gap-2 mt-4">
           {[...Array(7)].map((_, i) => (
-            <RadiationSymbol key={i} size={12} color={PIPBOY_GREEN_DIM} />
+            <RadiationSymbol key={i} size={12} color={PIPBOY_GREEN_DIM} ariaLabel="" />
           ))}
         </div>
         <p
           className="text-[10px] mt-4"
           style={{ color: `${FADED_TEXT}80` }}
         >
-          [TERMINAL v2.0.77 // ALL SYSTEMS NOMINAL]
+          [TERMINAL v2.0.77 // ALL SYSTEMS NOMINAL // {new Date().getFullYear()}]
         </p>
       </footer>
     </div>
