@@ -18,6 +18,8 @@ import { useSmoothScroll, useScrollZones, useInViewTrigger } from '@/hooks/useSc
 // ZELDA BREATH OF THE WILD / TEARS OF THE KINGDOM THEMED DECORATIVE ELEMENTS
 // Featuring: Sheikah slate aesthetics, Triforce symbols, cel-shaded painterly style,
 // Korok decorations, shrine glow effects, and Hylian-inspired patterns
+//
+// ALL CONTENT IMMEDIATELY VISIBLE - NO HIDING ANIMATIONS
 // =============================================================================
 
 // --- COLOR PALETTE ---
@@ -357,12 +359,8 @@ function ShrineTower({ size = 60, active = false }: { size?: number; active?: bo
       {/* Top beacon */}
       {active && (
         <>
-          <circle cx="18" cy="5" r="4" fill="#ff8844" filter="url(#shrineGlow)">
-            <animate attributeName="r" values="3;5;3" dur="2s" repeatCount="indefinite" />
-          </circle>
-          <path d="M18,0 L18,-15" stroke="#ff8844" strokeWidth="2" opacity="0.6" filter="url(#shrineGlow)">
-            <animate attributeName="opacity" values="0.3;0.8;0.3" dur="1.5s" repeatCount="indefinite" />
-          </path>
+          <circle cx="18" cy="5" r="4" fill="#ff8844" filter="url(#shrineGlow)" />
+          <path d="M18,0 L18,-15" stroke="#ff8844" strokeWidth="2" opacity="0.6" filter="url(#shrineGlow)" />
         </>
       )}
       {/* Sheikah patterns on tower */}
@@ -409,23 +407,139 @@ function Rupee({ color = 'green', size = 20 }: { color?: 'green' | 'blue' | 'red
   )
 }
 
-// Ancient Sheikah Slate pattern (decorative border)
-function SheikahPattern({ width = 200, height = 10 }: { width?: number; height?: number }) {
+// === SECTION CARD TEXTURE PATTERNS (Hyrule-themed) ===
+
+// Sheikah Slate Tech Pattern - circuit-like patterns with cyan glow
+function SheikahSlateTexture() {
   return (
-    <svg
-      width={width}
-      height={height}
-      viewBox="0 0 200 10"
-      aria-hidden="true"
-    >
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
       <defs>
-        <pattern id="sheikahLine" x="0" y="0" width="40" height="10" patternUnits="userSpaceOnUse">
-          <rect width="40" height="10" fill="transparent" />
-          <path d="M0,5 L5,0 L15,5 L5,10 Z M20,5 L25,2 L35,5 L25,8 Z" fill="#00d4ff" opacity="0.5" />
-          <circle cx="10" cy="5" r="2" fill="#00d4ff" opacity="0.7" />
+        <pattern id="sheikahCircuits" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+          <rect width="60" height="60" fill="transparent" />
+          {/* Circuit lines */}
+          <path d="M0,30 L15,30 L20,25 L30,25" stroke="#00d4ff" strokeWidth="0.5" fill="none" opacity="0.15" />
+          <path d="M30,25 L30,10 L40,10" stroke="#00d4ff" strokeWidth="0.5" fill="none" opacity="0.15" />
+          <path d="M45,30 L60,30" stroke="#00d4ff" strokeWidth="0.5" fill="none" opacity="0.15" />
+          <path d="M30,35 L30,50 L20,50" stroke="#00d4ff" strokeWidth="0.5" fill="none" opacity="0.15" />
+          {/* Sheikah eye mini */}
+          <circle cx="30" cy="30" r="4" fill="none" stroke="#00d4ff" strokeWidth="0.5" opacity="0.2" />
+          <circle cx="30" cy="30" r="1.5" fill="#00d4ff" opacity="0.15" />
+          {/* Connection nodes */}
+          <circle cx="15" cy="30" r="1" fill="#00d4ff" opacity="0.2" />
+          <circle cx="45" cy="30" r="1" fill="#00d4ff" opacity="0.2" />
+          <circle cx="30" cy="10" r="1" fill="#00d4ff" opacity="0.2" />
+          <circle cx="30" cy="50" r="1" fill="#00d4ff" opacity="0.2" />
         </pattern>
+        <linearGradient id="sheikahFade" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.03" />
+          <stop offset="50%" stopColor="#00d4ff" stopOpacity="0.08" />
+          <stop offset="100%" stopColor="#00d4ff" stopOpacity="0.03" />
+        </linearGradient>
       </defs>
-      <rect width="100%" height="100%" fill="url(#sheikahLine)" />
+      <rect width="100%" height="100%" fill="url(#sheikahFade)" />
+      <rect width="100%" height="100%" fill="url(#sheikahCircuits)" />
+    </svg>
+  )
+}
+
+// Ancient Stone Shrine Texture - weathered stone with cracks
+function ShrineStoneTexture() {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
+      <defs>
+        <pattern id="stoneTexture" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+          <rect width="80" height="80" fill="transparent" />
+          {/* Stone block outlines */}
+          <rect x="2" y="2" width="36" height="24" fill="none" stroke="#5a4a3a" strokeWidth="0.5" opacity="0.15" rx="1" />
+          <rect x="42" y="2" width="36" height="24" fill="none" stroke="#5a4a3a" strokeWidth="0.5" opacity="0.15" rx="1" />
+          <rect x="2" y="30" width="28" height="22" fill="none" stroke="#5a4a3a" strokeWidth="0.5" opacity="0.15" rx="1" />
+          <rect x="34" y="30" width="44" height="22" fill="none" stroke="#5a4a3a" strokeWidth="0.5" opacity="0.15" rx="1" />
+          <rect x="2" y="56" width="46" height="22" fill="none" stroke="#5a4a3a" strokeWidth="0.5" opacity="0.15" rx="1" />
+          <rect x="52" y="56" width="26" height="22" fill="none" stroke="#5a4a3a" strokeWidth="0.5" opacity="0.15" rx="1" />
+          {/* Cracks */}
+          <path d="M25,8 L28,15 L24,20" stroke="#3a2a1a" strokeWidth="0.3" fill="none" opacity="0.2" />
+          <path d="M60,35 L58,42 L62,48" stroke="#3a2a1a" strokeWidth="0.3" fill="none" opacity="0.2" />
+          {/* Ancient rune marks */}
+          <path d="M15,40 L15,48 L12,45" stroke="#ff8844" strokeWidth="0.5" fill="none" opacity="0.1" />
+          <circle cx="70" cy="14" r="3" fill="none" stroke="#ff8844" strokeWidth="0.5" opacity="0.1" />
+        </pattern>
+        <linearGradient id="stoneFade" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#8b7355" stopOpacity="0.05" />
+          <stop offset="50%" stopColor="#6a5a4a" stopOpacity="0.08" />
+          <stop offset="100%" stopColor="#5a4a3a" stopOpacity="0.05" />
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#stoneFade)" />
+      <rect width="100%" height="100%" fill="url(#stoneTexture)" />
+    </svg>
+  )
+}
+
+// Grass/Nature Watercolor Wash - soft green gradients with organic shapes
+function GrassWatercolorTexture() {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
+      <defs>
+        <pattern id="grassTexture" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+          <rect width="100" height="100" fill="transparent" />
+          {/* Grass blades */}
+          <path d="M10,100 Q12,85 8,70" stroke="#60b830" strokeWidth="1" fill="none" opacity="0.08" />
+          <path d="M15,100 Q18,80 14,65" stroke="#40a060" strokeWidth="1" fill="none" opacity="0.08" />
+          <path d="M45,100 Q48,82 43,68" stroke="#60b830" strokeWidth="1" fill="none" opacity="0.08" />
+          <path d="M50,100 Q53,78 48,62" stroke="#78c850" strokeWidth="1" fill="none" opacity="0.08" />
+          <path d="M80,100 Q83,85 78,72" stroke="#40a060" strokeWidth="1" fill="none" opacity="0.08" />
+          <path d="M85,100 Q88,80 82,65" stroke="#60b830" strokeWidth="1" fill="none" opacity="0.08" />
+          {/* Flower dots */}
+          <circle cx="25" cy="88" r="2" fill="#ffaa55" opacity="0.1" />
+          <circle cx="68" cy="92" r="1.5" fill="#ff8888" opacity="0.1" />
+          {/* Leaf shapes */}
+          <ellipse cx="35" cy="75" rx="4" ry="8" fill="#60b830" opacity="0.05" transform="rotate(-15 35 75)" />
+          <ellipse cx="90" cy="80" rx="3" ry="6" fill="#78c850" opacity="0.05" transform="rotate(10 90 80)" />
+        </pattern>
+        <linearGradient id="grassFade" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stopColor="#60b830" stopOpacity="0.08" />
+          <stop offset="50%" stopColor="#40a060" stopOpacity="0.04" />
+          <stop offset="100%" stopColor="#78c850" stopOpacity="0.02" />
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grassFade)" />
+      <rect width="100%" height="100%" fill="url(#grassTexture)" />
+    </svg>
+  )
+}
+
+// Korok Leaf Paper Texture - natural paper with leaf veins
+function KorokPaperTexture() {
+  return (
+    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
+      <defs>
+        <pattern id="korokPaper" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
+          <rect width="120" height="120" fill="transparent" />
+          {/* Large leaf veins */}
+          <path d="M0,60 Q30,50 60,60 Q90,70 120,60" stroke="#90d860" strokeWidth="0.8" fill="none" opacity="0.06" />
+          <path d="M60,0 Q50,30 60,60 Q70,90 60,120" stroke="#60b830" strokeWidth="0.8" fill="none" opacity="0.06" />
+          {/* Secondary veins */}
+          <path d="M30,30 Q45,40 60,30" stroke="#90d860" strokeWidth="0.4" fill="none" opacity="0.05" />
+          <path d="M60,90 Q75,80 90,90" stroke="#60b830" strokeWidth="0.4" fill="none" opacity="0.05" />
+          <path d="M90,30 Q80,45 90,60" stroke="#78c850" strokeWidth="0.4" fill="none" opacity="0.05" />
+          <path d="M30,60 Q40,75 30,90" stroke="#408820" strokeWidth="0.4" fill="none" opacity="0.05" />
+          {/* Korok mask hints */}
+          <ellipse cx="60" cy="60" rx="8" ry="10" fill="none" stroke="#408820" strokeWidth="0.3" opacity="0.04" />
+          <circle cx="57" cy="57" r="1.5" fill="#408820" opacity="0.04" />
+          <circle cx="63" cy="57" r="1.5" fill="#408820" opacity="0.04" />
+          {/* Paper fibers */}
+          <path d="M20,15 L25,18" stroke="#c8daa8" strokeWidth="0.3" opacity="0.1" />
+          <path d="M85,95 L92,98" stroke="#c8daa8" strokeWidth="0.3" opacity="0.1" />
+          <path d="M15,80 L20,82" stroke="#c8daa8" strokeWidth="0.3" opacity="0.1" />
+        </pattern>
+        <linearGradient id="korokFade" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#d8f0b0" stopOpacity="0.04" />
+          <stop offset="50%" stopColor="#c8e0a0" stopOpacity="0.06" />
+          <stop offset="100%" stopColor="#b8d890" stopOpacity="0.04" />
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#korokFade)" />
+      <rect width="100%" height="100%" fill="url(#korokPaper)" />
     </svg>
   )
 }
@@ -816,14 +930,8 @@ function Bokoblin({ isDead = false, size = 44 }: { isDead?: boolean; size?: numb
       {isDead ? (
         <>
           {/* Death poof - purple smoke */}
-          <circle cx="22" cy="26" r="4" fill="#8844aa" opacity="0.8">
-            <animate attributeName="r" values="4;22;28" dur="0.4s" fill="freeze" />
-            <animate attributeName="opacity" values="0.8;0.4;0" dur="0.4s" fill="freeze" />
-          </circle>
-          <circle cx="22" cy="26" r="2" fill="#aa66cc">
-            <animate attributeName="r" values="2;18;24" dur="0.4s" fill="freeze" />
-            <animate attributeName="opacity" values="1;0.5;0" dur="0.4s" fill="freeze" />
-          </circle>
+          <circle cx="22" cy="26" r="4" fill="#8844aa" opacity="0.8" />
+          <circle cx="22" cy="26" r="2" fill="#aa66cc" />
         </>
       ) : (
         <>
@@ -1074,12 +1182,6 @@ function ShrineMarker({ active = false }: { active?: boolean }) {
         filter={active ? 'url(#markerGlow)' : undefined}
       />
       <circle cx="14" cy="14" r="5" fill={active ? '#ffe888' : '#3a5a7a'} />
-      {active && (
-        <circle cx="14" cy="14" r="7" fill="none" stroke="#ffaa66" strokeWidth="1" opacity="0.6">
-          <animate attributeName="r" values="5;9;5" dur="1.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.8;0.2;0.8" dur="1.5s" repeatCount="indefinite" />
-        </circle>
-      )}
     </svg>
   )
 }
@@ -1160,8 +1262,20 @@ function MapNode({
   )
 }
 
-// Sheikah Frame - ancient tech border
-function SheikahFrame({ children, title, icon }: { children: React.ReactNode; title: string; icon?: React.ReactNode }) {
+// Sheikah Frame - ancient tech border with texture
+function SheikahFrame({ children, title, icon, textureType = 'sheikah' }: {
+  children: React.ReactNode
+  title: string
+  icon?: React.ReactNode
+  textureType?: 'sheikah' | 'stone' | 'grass' | 'korok'
+}) {
+  const TextureComponent = {
+    sheikah: SheikahSlateTexture,
+    stone: ShrineStoneTexture,
+    grass: GrassWatercolorTexture,
+    korok: KorokPaperTexture,
+  }[textureType]
+
   return (
     <div className="relative" role="region" aria-label={title}>
       {/* Corner decorations - Sheikah patterns */}
@@ -1196,9 +1310,9 @@ function SheikahFrame({ children, title, icon }: { children: React.ReactNode; ti
         <div className="flex-1 h-1" style={{ background: 'linear-gradient(90deg, #00d4ff, #00d4ff80, transparent)' }} aria-hidden="true" />
       </div>
 
-      {/* Content area */}
+      {/* Content area with texture */}
       <div
-        className="p-6 relative"
+        className="p-6 relative overflow-hidden"
         style={{
           background: 'linear-gradient(180deg, rgba(26,42,58,0.98), rgba(18,30,42,0.98))',
           border: '2px solid #00d4ff40',
@@ -1206,6 +1320,9 @@ function SheikahFrame({ children, title, icon }: { children: React.ReactNode; ti
           boxShadow: 'inset 0 2px 15px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.3), 0 0 40px #00d4ff10',
         }}
       >
+        {/* Texture layer */}
+        <TextureComponent />
+
         <div
           className="absolute inset-3 pointer-events-none rounded-lg"
           style={{
@@ -1213,71 +1330,10 @@ function SheikahFrame({ children, title, icon }: { children: React.ReactNode; ti
           }}
           aria-hidden="true"
         />
-        {children}
-      </div>
-    </div>
-  )
-}
-
-// Spirit Orb chest that opens on scroll
-function SpiritOrbChest({ item }: { item: React.ReactNode }) {
-  const chestRef = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(chestRef, { threshold: 0.7 })
-  const [showItem, setShowItem] = useState(false)
-
-  useEffect(() => {
-    if (hasEntered) {
-      setTimeout(() => setShowItem(true), 300)
-    }
-  }, [hasEntered])
-
-  return (
-    <div ref={chestRef} className="relative inline-block">
-      <div className={hasEntered ? 'chest-bounce' : ''}>
-        <svg width="52" height="46" viewBox="0 0 52 46" aria-label="Treasure chest">
-          <defs>
-            <linearGradient id="chestWood" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#6a5040" />
-              <stop offset="50%" stopColor="#5a4030" />
-              <stop offset="100%" stopColor="#4a3020" />
-            </linearGradient>
-            <filter id="chestGlow">
-              <feGaussianBlur stdDeviation="3" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
-          </defs>
-          {/* Base */}
-          <rect x="4" y="24" width="44" height="20" rx="3" fill="url(#chestWood)" stroke="#3a2010" strokeWidth="2" />
-          {/* Metal bands */}
-          <rect x="4" y="30" width="44" height="4" fill="#8a7a6a" opacity="0.6" />
-          <rect x="4" y="38" width="44" height="3" fill="#8a7a6a" opacity="0.4" />
-          {/* Lid */}
-          <path
-            d={hasEntered ? "M4,24 Q4,8 26,4 Q48,8 48,24 L48,18 Q48,2 26,-2 Q4,2 4,18 Z" : "M4,24 Q4,8 26,4 Q48,8 48,24 Z"}
-            fill="url(#chestWood)"
-            stroke="#3a2010"
-            strokeWidth="2"
-            className={hasEntered ? 'lid-open' : ''}
-          />
-          {/* Lock */}
-          <circle cx="26" cy="32" r="5" fill="#f8d030" stroke="#e8b020" strokeWidth="1.5" />
-          <rect x="24" y="32" width="4" height="7" fill="#f8d030" />
-          {/* Glow when open */}
-          {hasEntered && (
-            <ellipse cx="26" cy="16" rx="14" ry="8" fill="#00d4ff" opacity="0.7" filter="url(#chestGlow)">
-              <animate attributeName="opacity" values="0.5;0.9;0.5" dur="0.8s" repeatCount="indefinite" />
-            </ellipse>
-          )}
-        </svg>
-      </div>
-      {showItem && (
-        <div className="absolute -top-20 left-1/2 -translate-x-1/2 treasure-item">
-          {item}
+        <div className="relative z-10">
+          {children}
         </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -1317,81 +1373,59 @@ function TechCompendium({ categories }: { categories: ReturnType<typeof getEngin
 
 // Shrine Quest card
 function ShrineQuestCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
-  const [revealed, setRevealed] = useState(false)
-
   return (
     <div
-      className={`relative p-4 cursor-pointer transition-all group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 ${revealed ? 'chest-open' : ''}`}
+      className="relative p-4 cursor-pointer transition-all group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 hover:scale-[1.02]"
       style={{
         background: 'linear-gradient(180deg, rgba(42,58,74,0.98), rgba(26,42,58,0.98))',
         border: '2px solid #00d4ff50',
         borderRadius: '10px',
         boxShadow: '0 4px 0 #1a2a3a, 0 6px 16px rgba(0,0,0,0.4), inset 0 1px 3px rgba(255,255,255,0.05)',
       }}
-      onClick={() => {
-        setRevealed(true)
-        setTimeout(() => setRevealed(false), 500)
-      }}
       tabIndex={0}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setRevealed(true); setTimeout(() => setRevealed(false), 500); } }}
-      role="button"
-      aria-label={`View project: ${project.name}`}
+      role="article"
+      aria-label={`Project: ${project.name}`}
     >
-      <div className="absolute -top-3 -right-3" aria-hidden="true">
-        <ShrineTower size={35} active={revealed} />
-      </div>
-      {project.featured && (
-        <div className="flex items-center gap-1 mb-2">
-          <Triforce size={14} />
-          <span className="text-[8px] tracking-wider" style={{ color: '#f8d030', textShadow: '0 0 8px #f8d03080' }}>LEGENDARY SHRINE</span>
+      {/* Stone texture overlay */}
+      <ShrineStoneTexture />
+
+      <div className="relative z-10">
+        <div className="absolute -top-3 -right-3" aria-hidden="true">
+          <ShrineTower size={35} active />
         </div>
-      )}
-      <h3 className="text-sm font-bold mb-1" style={{ color: '#e0f0ff' }}>
-        {project.name}
-      </h3>
-      <p className="text-[10px] mb-2" style={{ color: '#8ac0e0' }}>
-        {project.tagline}
-      </p>
-      {project.impact && (
-        <p className="text-[10px] mb-2 italic flex items-center gap-1" style={{ color: '#ff8844' }}>
-          <Rupee color="gold" size={12} /> {project.impact}
-        </p>
-      )}
-      <div className="flex gap-1 flex-wrap">
-        {project.techStack.slice(0, 4).map((tech) => (
-          <span
-            key={tech}
-            className="text-[8px] px-2 py-0.5 rounded"
-            style={{
-              background: 'rgba(0,212,255,0.15)',
-              color: '#60c8e8',
-              border: '1px solid #00d4ff30',
-            }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-      {revealed && (
-        <div className="absolute inset-0 flex items-center justify-center rounded-lg" style={{ background: 'rgba(0,0,0,0.6)' }} aria-hidden="true">
-          <div className="text-3xl item-get">
-            <svg width="50" height="50" viewBox="0 0 50 50">
-              <defs>
-                <filter id="orbGlow">
-                  <feGaussianBlur stdDeviation="4" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-              <circle cx="25" cy="25" r="20" fill="#00d4ff" filter="url(#orbGlow)" />
-              <circle cx="25" cy="25" r="15" fill="#40e8ff" />
-              <circle cx="20" cy="20" r="5" fill="#ffffff" opacity="0.6" />
-            </svg>
+        {project.featured && (
+          <div className="flex items-center gap-1 mb-2">
+            <Triforce size={14} />
+            <span className="text-[8px] tracking-wider" style={{ color: '#f8d030', textShadow: '0 0 8px #f8d03080' }}>LEGENDARY SHRINE</span>
           </div>
+        )}
+        <h3 className="text-sm font-bold mb-1" style={{ color: '#e0f0ff' }}>
+          {project.name}
+        </h3>
+        <p className="text-[10px] mb-2" style={{ color: '#8ac0e0' }}>
+          {project.tagline}
+        </p>
+        {project.impact && (
+          <p className="text-[10px] mb-2 italic flex items-center gap-1" style={{ color: '#ff8844' }}>
+            <Rupee color="gold" size={12} /> {project.impact}
+          </p>
+        )}
+        <div className="flex gap-1 flex-wrap">
+          {project.techStack.slice(0, 4).map((tech) => (
+            <span
+              key={tech}
+              className="text-[8px] px-2 py-0.5 rounded"
+              style={{
+                background: 'rgba(0,212,255,0.15)',
+                color: '#60c8e8',
+                border: '1px solid #00d4ff30',
+              }}
+            >
+              {tech}
+            </span>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   )
 }
@@ -1403,23 +1437,26 @@ function TechLabCard({ company }: { company: typeof COMPANIES[0] }) {
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-all hover:scale-[1.02] group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400"
+      className="block p-4 transition-all hover:scale-[1.02] group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-cyan-400 relative overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, rgba(42,58,74,0.98), rgba(26,42,58,0.98))',
         border: '2px solid #00d4ff40',
         borderRadius: '10px',
       }}
     >
-      <div className="flex items-center gap-3 mb-2">
-        <ShrineMarker active />
-        <div>
-          <h4 className="text-sm group-hover:text-cyan-300 transition-colors" style={{ color: '#e0f0ff' }}>
-            {company.name}
-          </h4>
-          <p className="text-[10px]" style={{ color: '#ff8844' }}>{company.tagline}</p>
+      <SheikahSlateTexture />
+      <div className="relative z-10">
+        <div className="flex items-center gap-3 mb-2">
+          <ShrineMarker active />
+          <div>
+            <h4 className="text-sm group-hover:text-cyan-300 transition-colors" style={{ color: '#e0f0ff' }}>
+              {company.name}
+            </h4>
+            <p className="text-[10px]" style={{ color: '#ff8844' }}>{company.tagline}</p>
+          </div>
         </div>
+        <p className="text-xs" style={{ color: '#8ac0e0' }}>{company.description}</p>
       </div>
-      <p className="text-xs" style={{ color: '#8ac0e0' }}>{company.description}</p>
     </a>
   )
 }
@@ -1428,22 +1465,25 @@ function TechLabCard({ company }: { company: typeof COMPANIES[0] }) {
 function RitoVillageCard({ band }: { band: typeof BANDS[0] }) {
   const content = (
     <div
-      className="p-4 transition-all hover:scale-[1.02] group"
+      className="p-4 transition-all hover:scale-[1.02] group relative overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, rgba(58,74,58,0.98), rgba(42,58,42,0.98))',
         border: '2px solid #40e8a060',
         borderRadius: '10px',
       }}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <KorokLeaf size={20} />
-        <h4 className="text-sm group-hover:text-green-300 transition-colors" style={{ color: '#c0ffc0' }}>
-          {band.name}
-        </h4>
+      <KorokPaperTexture />
+      <div className="relative z-10">
+        <div className="flex items-center gap-2 mb-2">
+          <KorokLeaf size={20} />
+          <h4 className="text-sm group-hover:text-green-300 transition-colors" style={{ color: '#c0ffc0' }}>
+            {band.name}
+          </h4>
+        </div>
+        <p className="text-[10px] mt-1" style={{ color: '#80e080' }}>{band.genre} | {band.role}</p>
+        <p className="text-xs mt-2" style={{ color: '#a0d8a0' }}>{band.description}</p>
+        {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: '#60a060' }}>Quest not yet discovered...</p>}
       </div>
-      <p className="text-[10px] mt-1" style={{ color: '#80e080' }}>{band.genre} | {band.role}</p>
-      <p className="text-xs mt-2" style={{ color: '#a0d8a0' }}>{band.description}</p>
-      {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: '#60a060' }}>Quest not yet discovered...</p>}
     </div>
   )
 
@@ -1460,7 +1500,7 @@ function QuestLogEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 
   return (
     <div
-      className="p-4 transition-all hover:scale-[1.01]"
+      className="p-4 transition-all hover:scale-[1.01] relative overflow-hidden"
       style={{
         background: 'linear-gradient(180deg, rgba(42,58,74,0.98), rgba(26,42,58,0.98))',
         border: '2px solid #00d4ff30',
@@ -1468,36 +1508,39 @@ function QuestLogEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
         boxShadow: '0 2px 0 #1a2a3a, 0 4px 12px rgba(0,0,0,0.3)',
       }}
     >
-      <div className="flex justify-between items-start mb-2">
-        <div className="flex items-start gap-2">
-          <Rupee color="gold" size={18} />
-          <div>
-            <h4 className="text-sm font-bold" style={{ color: '#e0f0ff' }}>{entry.title}</h4>
-            <p className="text-xs" style={{ color: '#ff8844' }}>{entry.organization}</p>
+      <ShrineStoneTexture />
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-2">
+          <div className="flex items-start gap-2">
+            <Rupee color="gold" size={18} />
+            <div>
+              <h4 className="text-sm font-bold" style={{ color: '#e0f0ff' }}>{entry.title}</h4>
+              <p className="text-xs" style={{ color: '#ff8844' }}>{entry.organization}</p>
+            </div>
           </div>
+          <span
+            className="text-[10px] px-2 py-1 rounded"
+            style={{
+              background: 'rgba(0,212,255,0.15)',
+              color: '#60c8e8',
+              border: '1px solid #00d4ff30',
+            }}
+          >
+            {startDisplay} - {endDisplay}
+          </span>
         </div>
-        <span
-          className="text-[10px] px-2 py-1 rounded"
-          style={{
-            background: 'rgba(0,212,255,0.15)',
-            color: '#60c8e8',
-            border: '1px solid #00d4ff30',
-          }}
-        >
-          {startDisplay} - {endDisplay}
-        </span>
+        <p className="text-xs mb-2" style={{ color: '#8ac0e0' }}>{entry.description}</p>
+        {entry.highlights && entry.highlights.length > 0 && (
+          <ul className="space-y-1 mt-2">
+            {entry.highlights.map((highlight, i) => (
+              <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#c0e8ff' }}>
+                <span style={{ color: '#00d4ff' }}>&#9830;</span>
+                {highlight}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-      <p className="text-xs mb-2" style={{ color: '#8ac0e0' }}>{entry.description}</p>
-      {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-1 mt-2">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#c0e8ff' }}>
-              <span style={{ color: '#00d4ff' }}>&#9830;</span>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   )
 }
@@ -1636,10 +1679,10 @@ export default function AdventurePathsTheme() {
         </svg>
       </div>
 
-      {/* Header (z-[30] - above overlay) */}
+      {/* Header (z-[30] - above overlay) - ALL CONTENT IMMEDIATELY VISIBLE */}
       <header className="relative z-30 p-6">
         <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div className="fade-in-down">
+          <div>
             <div className="flex items-center gap-4 mb-3">
               <Triforce size={36} />
               <h1
@@ -1793,24 +1836,12 @@ export default function AdventurePathsTheme() {
         </div>
       </section>
 
-      {/* Main content (z-[20]) */}
+      {/* Main content (z-[20]) - ALL CONTENT IMMEDIATELY VISIBLE */}
       <main className="relative z-20 px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* About treasure chest */}
-          <div className="flex justify-center mb-4">
-            <SpiritOrbChest
-              item={
-                <div className="flex flex-col items-center gap-1">
-                  <SheikahEye size={36} glowing />
-                  <span className="text-[10px] font-bold whitespace-nowrap" style={{ color: '#00d4ff', textShadow: '0 0 10px #00d4ff80' }}>ABOUT</span>
-                </div>
-              }
-            />
-          </div>
-
-          {/* About panel */}
+          {/* About panel - with grass texture */}
           <section className="mb-8">
-            <SheikahFrame title="About" icon={<SheikahEye size={20} glowing />}>
+            <SheikahFrame title="About" icon={<SheikahEye size={20} glowing />} textureType="grass">
               <p className="text-sm leading-relaxed mb-4" style={{ color: '#c0e8ff' }}>
                 {aboutData.bio}
               </p>
@@ -1838,25 +1869,13 @@ export default function AdventurePathsTheme() {
             </SheikahFrame>
           </section>
 
-          {/* Work Experience */}
+          {/* Work Experience - with stone texture */}
           {experience.length > 0 && (
             <>
               <MasterSwordDivider />
 
-              {/* Work Experience treasure chest */}
-              <div className="flex justify-center mb-4">
-                <SpiritOrbChest
-                  item={
-                    <div className="flex flex-col items-center gap-1">
-                      <Triforce size={32} />
-                      <span className="text-[10px] font-bold whitespace-nowrap" style={{ color: '#f8d030', textShadow: '0 0 10px #f8d03080' }}>QUEST LOG</span>
-                    </div>
-                  }
-                />
-              </div>
-
               <section className="mb-8">
-                <SheikahFrame title="Quest Log" icon={<Triforce size={18} />}>
+                <SheikahFrame title="Quest Log" icon={<Triforce size={18} />} textureType="stone">
                   <div className="space-y-4">
                     {experience.map((entry) => (
                       <QuestLogEntry key={entry.id} entry={entry} />
@@ -1869,25 +1888,12 @@ export default function AdventurePathsTheme() {
 
           <MasterSwordDivider />
 
-          {/* Skills treasure chest */}
-          <div className="flex justify-center mb-4">
-            <SpiritOrbChest
-              item={
-                <div className="flex flex-col items-center gap-1">
-                  {active === 'engineer' ? <SheikahEye size={32} glowing /> : <StaminaWheel segments={4} maxSegments={5} size={36} />}
-                  <span className="text-[10px] font-bold whitespace-nowrap" style={{ color: '#00d4ff', textShadow: '0 0 10px #00d4ff80' }}>
-                    {active === 'engineer' ? 'COMPENDIUM' : 'ABILITIES'}
-                  </span>
-                </div>
-              }
-            />
-          </div>
-
-          {/* Tech Stack / Skills */}
+          {/* Tech Stack / Skills - with sheikah texture */}
           <section className="mb-8">
             <SheikahFrame
               title={active === 'engineer' ? 'Sheikah Compendium' : 'Champion Abilities'}
               icon={active === 'engineer' ? <SheikahEye size={20} glowing /> : <StaminaWheel segments={3} maxSegments={4} size={24} />}
+              textureType="sheikah"
             >
               {active === 'engineer' ? (
                 <TechCompendium categories={engineerTech} />
@@ -1903,21 +1909,9 @@ export default function AdventurePathsTheme() {
 
           <MasterSwordDivider />
 
-          {/* Projects treasure chest */}
-          <div className="flex justify-center mb-4">
-            <SpiritOrbChest
-              item={
-                <div className="flex flex-col items-center gap-1">
-                  <ShrineTower size={40} active />
-                  <span className="text-[10px] font-bold whitespace-nowrap" style={{ color: '#ff8844', textShadow: '0 0 10px #ff884480' }}>SHRINES</span>
-                </div>
-              }
-            />
-          </div>
-
-          {/* Projects */}
+          {/* Projects - with stone texture */}
           <section className="mb-8">
-            <SheikahFrame title="Ancient Shrines" icon={<ShrineTower size={24} active />}>
+            <SheikahFrame title="Ancient Shrines" icon={<ShrineTower size={24} active />} textureType="stone">
               <div className="grid md:grid-cols-2 gap-4">
                 {projects.filter(p => p.featured).slice(0, 6).map((project) => (
                   <ShrineQuestCard key={project.id} project={project} />
@@ -1931,7 +1925,7 @@ export default function AdventurePathsTheme() {
             <>
               <MasterSwordDivider />
               <section className="mb-8">
-                <SheikahFrame title="Tech Labs" icon={<ShrineMarker active />}>
+                <SheikahFrame title="Tech Labs" icon={<ShrineMarker active />} textureType="sheikah">
                   <div className="grid md:grid-cols-3 gap-4">
                     {COMPANIES.map((company) => (
                       <TechLabCard key={company.id} company={company} />
@@ -1946,7 +1940,7 @@ export default function AdventurePathsTheme() {
             <>
               <MasterSwordDivider />
               <section className="mb-8">
-                <SheikahFrame title="Rito Village" icon={<KorokLeaf size={24} />}>
+                <SheikahFrame title="Rito Village" icon={<KorokLeaf size={24} />} textureType="korok">
                   <div className="grid md:grid-cols-3 gap-4">
                     {BANDS.map((band) => (
                       <RitoVillageCard key={band.id} band={band} />
@@ -1989,9 +1983,9 @@ export default function AdventurePathsTheme() {
         </p>
       </footer>
 
-      {/* CSS Animations */}
+      {/* CSS Animations - ALL NON-HIDING, DECORATIVE ONLY */}
       <style jsx global>{`
-        /* === CONTINUOUS PARTICLE ANIMATIONS === */
+        /* === CONTINUOUS PARTICLE ANIMATIONS (decorative, never hides content) === */
 
         @keyframes sparkle-loop {
           0%, 100% { opacity: 0; transform: scale(0.5) translateY(0); }
@@ -2056,7 +2050,7 @@ export default function AdventurePathsTheme() {
           animation: hero-legs-run 0.3s ease-in-out infinite;
         }
 
-        /* === CUCCO CHASE (one-time trigger) === */
+        /* === CUCCO CHASE (one-time trigger, decorative) === */
 
         @keyframes cucco-chase-run {
           0% { transform: translateX(100%); }
@@ -2076,7 +2070,7 @@ export default function AdventurePathsTheme() {
           animation: cucco-bob-walk 0.25s ease-in-out infinite;
         }
 
-        /* === ENEMY DEATH === */
+        /* === ENEMY DEATH (decorative feedback) === */
 
         @keyframes enemy-death-poof {
           0% { opacity: 1; transform: scale(1); }
@@ -2088,47 +2082,7 @@ export default function AdventurePathsTheme() {
           animation: enemy-death-poof 0.5s ease-out forwards;
         }
 
-        /* === TREASURE CHEST === */
-
-        @keyframes chest-bounce-open {
-          0%, 100% { transform: translateY(0); }
-          20% { transform: translateY(-18px); }
-          40% { transform: translateY(0); }
-          60% { transform: translateY(-10px); }
-          80% { transform: translateY(0); }
-        }
-
-        @keyframes treasure-item-float {
-          0% { opacity: 0; transform: translateY(40px) scale(0) rotate(-30deg); }
-          30% { opacity: 1; transform: translateY(0) scale(1.4) rotate(0deg); }
-          50% { transform: translateY(-15px) scale(1.15) rotate(8deg); }
-          70% { transform: translateY(-8px) scale(1.05) rotate(-5deg); }
-          100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
-        }
-
-        @keyframes item-get-float {
-          0% { transform: scale(0) rotate(-60deg); opacity: 0; }
-          50% { transform: scale(1.6) rotate(0deg); opacity: 1; }
-          100% { transform: scale(1.2) rotate(0deg) translateY(-25px); opacity: 0; }
-        }
-
-        .chest-bounce {
-          animation: chest-bounce-open 0.7s ease-out;
-        }
-
-        .treasure-item {
-          animation: treasure-item-float 0.9s ease-out forwards;
-        }
-
-        .item-get {
-          animation: item-get-float 0.7s ease-out forwards;
-        }
-
-        .chest-open {
-          animation: chest-bounce-open 0.35s ease-out;
-        }
-
-        /* === UI ANIMATIONS === */
+        /* === UI ANIMATIONS (decorative accents, no content hiding) === */
 
         @keyframes ping-slow-anim {
           0% { transform: scale(1); opacity: 0.5; }
@@ -2138,11 +2092,6 @@ export default function AdventurePathsTheme() {
         @keyframes pulse-glow-anim {
           0%, 100% { opacity: 0.3; }
           50% { opacity: 0.7; }
-        }
-
-        @keyframes fade-in-down-anim {
-          from { opacity: 0; transform: translateY(-25px); }
-          to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes bounce-anim {
@@ -2156,10 +2105,6 @@ export default function AdventurePathsTheme() {
 
         .pulse-glow {
           animation: pulse-glow-anim 2.5s ease-in-out infinite;
-        }
-
-        .fade-in-down {
-          animation: fade-in-down-anim 0.7s ease-out;
         }
 
         .bounce-arrow {
@@ -2231,13 +2176,8 @@ export default function AdventurePathsTheme() {
           .cucco-chase,
           .cucco-bob,
           .enemy-death,
-          .chest-bounce,
-          .treasure-item,
-          .item-get,
-          .chest-open,
           .ping-slow,
           .pulse-glow,
-          .fade-in-down,
           .bounce-arrow,
           .bounce-warning,
           .hero-smooth,
@@ -2251,6 +2191,13 @@ export default function AdventurePathsTheme() {
           .hero-smooth,
           .enemy-appear {
             opacity: 1;
+          }
+          /* Hide decorative particles entirely for reduced motion */
+          .sparkle-particle,
+          .leaf-particle,
+          .cloud-float,
+          .guardian-particle {
+            display: none;
           }
         }
       `}</style>
