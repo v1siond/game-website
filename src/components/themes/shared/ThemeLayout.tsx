@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -9,6 +9,7 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { SkipLink } from './AccessibilityStyles'
 
 // =============================================================================
 // SHARED THEME LAYOUT
@@ -103,6 +104,25 @@ export interface ThemeLayoutProps {
   globalStyles?: string
 }
 
+// Hook to detect reduced motion preference
+export function useReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches)
+    }
+
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
+  return prefersReducedMotion
+}
+
 // Layout wrapper - themes use this to maintain consistent z-indexing and structure
 export function ThemeLayoutWrapper({
   children,
@@ -110,11 +130,15 @@ export function ThemeLayoutWrapper({
   backgroundStyle,
   globalStyles,
 }: ThemeLayoutProps) {
+  const prefersReducedMotion = useReducedMotion()
+
   return (
     <div
       className={`min-h-screen relative overflow-hidden ${className}`}
       style={backgroundStyle}
+      data-reduced-motion={prefersReducedMotion ? 'true' : 'false'}
     >
+      <SkipLink href="#main-content" />
       {globalStyles && (
         <style jsx global>{globalStyles}</style>
       )}

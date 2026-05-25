@@ -1,5 +1,7 @@
 'use client'
 
+import { ReactNode } from 'react'
+
 /**
  * WCAG AA Accessibility Styles for Game Website Themes
  *
@@ -13,9 +15,12 @@
  * - Small text: 14px minimum (0.875rem) - never below
  * - Labels/captions: 14px minimum
  *
+ * TOUCH TARGET REQUIREMENTS:
+ * - Minimum 44x44px touch targets
+ *
  * FOCUS INDICATORS:
- * - 2px outline minimum
- * - 2px offset for visibility
+ * - 3px outline minimum for visibility
+ * - 2px offset for separation from element
  * - High contrast color against background
  */
 
@@ -172,12 +177,85 @@ export const THEME_FOCUS_COLORS: Record<string, string> = {
   tropicalPlatformer: '#00ccff',
 }
 
-// Skip link component
+// Skip link component - ensures keyboard users can bypass navigation
 export function SkipLink({ href = '#main-content' }: { href?: string }) {
   return (
-    <a href={href} className="skip-link">
+    <a
+      href={href}
+      className="skip-link"
+      style={{
+        position: 'absolute',
+        left: '-9999px',
+        top: 'auto',
+        width: '1px',
+        height: '1px',
+        overflow: 'hidden',
+        zIndex: 9999,
+      }}
+      onFocus={(e) => {
+        const el = e.currentTarget
+        el.style.position = 'fixed'
+        el.style.top = '1rem'
+        el.style.left = '1rem'
+        el.style.width = 'auto'
+        el.style.height = 'auto'
+        el.style.padding = '1rem 1.5rem'
+        el.style.background = '#000'
+        el.style.color = '#fff'
+        el.style.fontSize = '1rem'
+        el.style.fontWeight = 'bold'
+        el.style.outline = '3px solid #fff'
+        el.style.outlineOffset = '2px'
+        el.style.borderRadius = '4px'
+        el.style.textDecoration = 'none'
+      }}
+      onBlur={(e) => {
+        const el = e.currentTarget
+        el.style.position = 'absolute'
+        el.style.left = '-9999px'
+        el.style.top = 'auto'
+        el.style.width = '1px'
+        el.style.height = '1px'
+        el.style.overflow = 'hidden'
+      }}
+    >
       Skip to main content
     </a>
+  )
+}
+
+// Skip links container for multiple targets
+export function SkipLinks({ links }: { links: Array<{ href: string; label: string }> }) {
+  return (
+    <nav aria-label="Skip links" className="sr-only focus-within:not-sr-only">
+      <ul className="flex gap-2 p-2 fixed top-0 left-0 z-[9999] bg-black">
+        {links.map((link) => (
+          <li key={link.href}>
+            <a
+              href={link.href}
+              className="text-white px-4 py-2 bg-gray-800 rounded focus:outline-2 focus:outline-white focus:outline-offset-2"
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+// Accessible main content wrapper with proper landmark
+export function MainContent({
+  children,
+  className = '',
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <main id="main-content" tabIndex={-1} className={`outline-none ${className}`}>
+      {children}
+    </main>
   )
 }
 
