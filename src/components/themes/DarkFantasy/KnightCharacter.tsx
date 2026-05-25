@@ -318,8 +318,15 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       case 'slash':
         return { transform: 'translateX(-25px)', opacity: 1, transition: 'all 100ms ease-out' }
       case 'content-reveal':
+        return { transform: 'translateX(-40px)', opacity: 0.7, transition: 'all 250ms ease-out' }
       case 'complete':
-        return { transform: 'translateX(60px)', opacity: 0.3, transition: 'all 250ms ease-out' }
+        // Knight rests more to the left, breathing animation
+        return {
+          transform: 'translateX(-50px)',
+          opacity: 0.6,
+          transition: 'all 300ms ease-out',
+          animation: 'knightBreathing 3s ease-in-out infinite',
+        }
       default:
         return { transform: 'translateX(120px)', opacity: 0 }
     }
@@ -380,6 +387,10 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           0% { opacity: 0; transform: translateX(-100%); }
           50% { opacity: 1; }
           100% { opacity: 0; transform: translateX(100%); }
+        }
+        @keyframes knightBreathing {
+          0%, 100% { transform: translateX(-50px) translateY(0) scale(1); }
+          50% { transform: translateX(-50px) translateY(-3px) scale(1.02); }
         }
       `}</style>
     </div>

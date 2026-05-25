@@ -299,12 +299,19 @@ export const BattleReveal = memo(function BattleReveal({
           transition: 'transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }
       case 'content-drop':
-      case 'complete':
         // Dead on the ground - rolled/tumbled to the right
         return {
           ...baseStyle,
           transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
           opacity: 0.55,
+        }
+      case 'complete':
+        // Dead on the ground with occasional twitch
+        return {
+          ...baseStyle,
+          transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
+          opacity: 0.55,
+          animation: 'deadBugTwitch 4s ease-in-out infinite',
         }
       default:
         return baseStyle
@@ -469,6 +476,7 @@ export const BattleReveal = memo(function BattleReveal({
               right: '18%',
               bottom: '15%',
               transform: 'translateX(-120px) translateY(55px)',
+              animation: phase === 'complete' ? 'bloodPoolPulse 3s ease-in-out infinite' : undefined,
             }}
           >
             <BloodPool />
@@ -1227,6 +1235,32 @@ const battleRevealKeyframes = `
     }
     50% {
       transform: translateX(80px) translateY(-4px) scale(1.02);
+    }
+  }
+
+  @keyframes deadBugTwitch {
+    0%, 85%, 100% {
+      transform: translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75);
+    }
+    87% {
+      transform: translateX(-118px) translateY(48px) rotateZ(538deg) scale(0.76);
+    }
+    89% {
+      transform: translateX(-121px) translateY(51px) rotateZ(541deg) scale(0.74);
+    }
+    91% {
+      transform: translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75);
+    }
+  }
+
+  @keyframes bloodPoolPulse {
+    0%, 100% {
+      transform: translateX(-120px) translateY(55px) scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: translateX(-120px) translateY(55px) scale(1.03);
+      opacity: 0.85;
     }
   }
 
