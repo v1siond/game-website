@@ -34,262 +34,405 @@ function usePrefersReducedMotion(): boolean {
 }
 
 // =============================================================================
-// AUTHENTIC HADES COLOR PALETTE
-// Based on actual gameplay: River Styx GREEN, stone grey floors, orange fire
+// GOD OF WAR COLOR PALETTE
+// Authentic Norse style: frost blues, fire oranges, gold, stone grey
 // =============================================================================
-const HADES = {
-  // STYX GREEN - THE DOMINANT COLOR (glowing river pools)
-  styxBright: '#00ff66',
-  styxMid: '#33cc66',
-  styxDark: '#006633',
-  styxDeep: '#003319',
-  styxGlow: '#00ff6680',
+const GOW = {
+  // FROST BLUE - Leviathan Axe (primary accent)
+  frostBright: '#00CCFF',
+  frostMid: '#66DDFF',
+  frostDark: '#003366',
+  frostDeep: '#001A33',
+  frostGlow: '#00CCFF80',
 
-  // STONE GREY - Floor tiles, walls
-  stoneDark: '#1a1a1e',
-  stoneMid: '#2a2a30',
-  stoneLight: '#3d3d45',
-  stoneFloor: '#252528',
-  groutLine: '#1a1a1c',
+  // FIRE ORANGE/RED - Blades of Chaos
+  fireOrange: '#FF6600',
+  fireBright: '#FF4400',
+  fireYellow: '#FFAA00',
+  fireDark: '#CC3300',
+  fireGlow: '#FF440080',
 
-  // FIRE/EMBER - Orange and yellow
-  fireOrange: '#ff6600',
-  fireYellow: '#ffaa00',
-  fireRed: '#ff3300',
-  emberGlow: '#ff660080',
+  // GOLD - Divine elements, Norse ornaments
+  goldBright: '#FFD700',
+  goldMid: '#D4AF37',
+  goldDark: '#8B6914',
+  goldGlow: '#FFD70060',
 
-  // BLOOD - Dark, not bright
-  bloodDark: '#330000',
-  bloodMid: '#660000',
-  bloodBright: '#990000',
-  bloodSplatter: '#440000',
+  // STONE GREY - Nordic carved stone
+  stoneDark: '#1A1A1A',
+  stoneMid: '#333333',
+  stoneLight: '#4A4A4A',
+  stoneAccent: '#666666',
 
-  // GOLD TRIM - Greek patterns, ornaments
-  goldBright: '#d4af37',
-  goldMid: '#b8860b',
-  goldDark: '#8b6914',
+  // BLOOD RED - Kratos's tattoo, rage
+  bloodDark: '#660000',
+  bloodMid: '#8B0000',
+  bloodBright: '#AA0000',
+  kratosTattoo: '#CC2222',
 
-  // PURPLE/MAGENTA - Magic effects
-  magicPurple: '#9933ff',
-  magicMagenta: '#cc66ff',
-  chaosPurple: '#6622aa',
+  // SNOW WHITE - Fimbulwinter
+  snowWhite: '#F0F8FF',
+  snowMid: '#E8E8E8',
+  snowDark: '#C8C8C8',
 
-  // ZAGREUS RED - Accent, cape color
-  zagRed: '#cc2244',
-  zagRedBright: '#ff3355',
+  // BIFROST - Realm travel rainbow
+  bifrostPurple: '#9933FF',
+  bifrostGreen: '#33FF99',
+  bifrostYellow: '#FFFF33',
+  bifrostOrange: '#FF9933',
 
-  // TEXT
-  textPrimary: '#e8e0d8',
-  textSecondary: '#a0988a',
-  textMuted: '#605850',
+  // BACKGROUNDS
+  bgDarkest: '#0D0D0D',
+  bgDark: '#1A1A1A',
+
+  // TEXT - WCAG AA compliant on dark backgrounds
+  textPrimary: '#F0F8FF',    // Snow white - 15.5:1 on #1A1A1A
+  textSecondary: '#B8C4CE',  // Muted blue-grey - 8.7:1 on #1A1A1A
+  textMuted: '#8899AA',      // Dimmed - 5.2:1 on #1A1A1A
 }
 
 // =============================================================================
-// SVG PATTERNS - Stone texture, Greek meander, cracks
+// SVG PATTERNS - Norse runes, knot patterns, frost/fire
 // =============================================================================
-function HadesPatterns() {
+function NorsePatterns() {
   return (
     <svg className="absolute w-0 h-0" aria-hidden="true">
       <defs>
-        {/* Stone floor tile pattern */}
-        <pattern id="stoneFloor" patternUnits="userSpaceOnUse" width="80" height="80">
-          <rect width="80" height="80" fill={HADES.stoneMid} />
-          <rect x="0" y="0" width="38" height="38" fill={HADES.stoneFloor} />
-          <rect x="42" y="0" width="38" height="38" fill={HADES.stoneLight} />
-          <rect x="0" y="42" width="38" height="38" fill={HADES.stoneLight} />
-          <rect x="42" y="42" width="38" height="38" fill={HADES.stoneFloor} />
-          {/* Grout lines */}
-          <line x1="0" y1="40" x2="80" y2="40" stroke={HADES.groutLine} strokeWidth="4" />
-          <line x1="40" y1="0" x2="40" y2="80" stroke={HADES.groutLine} strokeWidth="4" />
-          {/* Cracks */}
+        {/* Norse knot pattern */}
+        <pattern id="norseKnot" patternUnits="userSpaceOnUse" width="60" height="60">
+          <rect width="60" height="60" fill="transparent" />
           <path
-            d="M10 5 Q15 15 12 25 M55 60 L58 70 Q60 75 55 80"
+            d="M10 10 Q30 0 50 10 Q60 30 50 50 Q30 60 10 50 Q0 30 10 10"
             fill="none"
-            stroke={HADES.stoneDark}
-            strokeWidth="0.5"
-            opacity="0.6"
+            stroke={GOW.goldDark}
+            strokeWidth="1"
+            opacity="0.15"
           />
+          <circle cx="30" cy="30" r="8" fill="none" stroke={GOW.goldDark} strokeWidth="0.5" opacity="0.1" />
         </pattern>
 
-        {/* Greek meander/key pattern - horizontal */}
-        <pattern id="meanderH" patternUnits="userSpaceOnUse" width="40" height="20">
-          <path
-            d="M0 10 L10 10 L10 0 L30 0 L30 10 L20 10 L20 20 L40 20"
-            fill="none"
-            stroke={HADES.goldBright}
-            strokeWidth="2"
-          />
-        </pattern>
-
-        {/* Styx water gradient */}
-        <radialGradient id="styxPool" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={HADES.styxBright} stopOpacity="0.8" />
-          <stop offset="40%" stopColor={HADES.styxMid} stopOpacity="0.5" />
-          <stop offset="70%" stopColor={HADES.styxDark} stopOpacity="0.3" />
-          <stop offset="100%" stopColor="transparent" />
-        </radialGradient>
+        {/* Frost gradient */}
+        <linearGradient id="frostGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={GOW.frostBright} stopOpacity="0.8" />
+          <stop offset="50%" stopColor={GOW.frostMid} stopOpacity="0.5" />
+          <stop offset="100%" stopColor={GOW.frostDark} stopOpacity="0.3" />
+        </linearGradient>
 
         {/* Fire gradient */}
         <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor={HADES.fireRed} />
-          <stop offset="40%" stopColor={HADES.fireOrange} />
-          <stop offset="100%" stopColor={HADES.fireYellow} />
+          <stop offset="0%" stopColor={GOW.fireDark} />
+          <stop offset="40%" stopColor={GOW.fireOrange} />
+          <stop offset="100%" stopColor={GOW.fireYellow} />
         </linearGradient>
 
-        {/* Blood splatter gradient */}
-        <radialGradient id="bloodSplat" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={HADES.bloodMid} stopOpacity="0.6" />
-          <stop offset="100%" stopColor={HADES.bloodDark} stopOpacity="0" />
-        </radialGradient>
+        {/* Bifrost gradient */}
+        <linearGradient id="bifrostGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={GOW.frostBright} />
+          <stop offset="25%" stopColor={GOW.bifrostGreen} />
+          <stop offset="50%" stopColor={GOW.bifrostYellow} />
+          <stop offset="75%" stopColor={GOW.bifrostOrange} />
+          <stop offset="100%" stopColor={GOW.bifrostPurple} />
+        </linearGradient>
+
+        {/* Stone texture */}
+        <filter id="stoneTexture">
+          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+          <feDiffuseLighting in="noise" lightingColor={GOW.stoneLight} surfaceScale="1.5">
+            <feDistantLight azimuth="45" elevation="60" />
+          </feDiffuseLighting>
+        </filter>
+
+        {/* Glow filter */}
+        <filter id="frostGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        <filter id="fireGlowFilter" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
       </defs>
     </svg>
   )
 }
 
 // =============================================================================
-// GREEK MEANDER BORDER - Authentic pattern
+// NORSE RUNE BORDER - Elder Futhark inspired
 // =============================================================================
-function GreekMeander({ className = '' }: { className?: string }) {
+function RuneBorder({ className = '', color = GOW.goldMid }: { className?: string; color?: string }) {
+  // Simplified Elder Futhark-inspired rune shapes
+  const runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛈ', 'ᛇ', 'ᛉ', 'ᛋ']
+
   return (
     <div
-      className={`w-full h-5 ${className}`}
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='20'%3E%3Cpath d='M0 10 L10 10 L10 0 L30 0 L30 10 L20 10 L20 20 L40 20' fill='none' stroke='%23d4af37' stroke-width='2'/%3E%3C/svg%3E")`,
-        filter: `drop-shadow(0 0 4px ${HADES.goldBright}60)`,
-      }}
+      className={`w-full h-6 flex items-center justify-center gap-3 overflow-hidden ${className}`}
+      style={{ filter: `drop-shadow(0 0 4px ${color}40)` }}
       role="presentation"
       aria-hidden="true"
-    />
+    >
+      <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, transparent, ${color})` }} />
+      {runes.slice(0, 8).map((rune, i) => (
+        <span
+          key={i}
+          className="text-xs opacity-60"
+          style={{ color, fontFamily: 'serif' }}
+        >
+          {rune}
+        </span>
+      ))}
+      <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, ${color}, transparent)` }} />
+    </div>
   )
 }
 
 // =============================================================================
-// SKULL DECORATION - Underworld style
+// LEVIATHAN AXE - Frost decoration
 // =============================================================================
-function Skull({ size = 20, className = '' }: { size?: number; className?: string }) {
+function LeviathanAxe({ size = 40, className = '' }: { size?: number; className?: string }) {
   return (
     <svg
-      viewBox="0 0 24 28"
-      width={size}
-      height={size * 1.17}
+      viewBox="0 0 24 48"
+      width={size * 0.5}
+      height={size}
       className={className}
-      style={{ filter: `drop-shadow(0 0 3px ${HADES.styxGlow})` }}
+      style={{ filter: `drop-shadow(0 0 8px ${GOW.frostGlow})` }}
       aria-hidden="true"
     >
-      {/* Skull outline */}
-      <ellipse cx="12" cy="10" rx="10" ry="9" fill={HADES.stoneLight} stroke={HADES.goldDark} strokeWidth="0.5" />
-      {/* Eye sockets */}
-      <ellipse cx="8" cy="9" rx="3" ry="3.5" fill={HADES.stoneDark} />
-      <ellipse cx="16" cy="9" rx="3" ry="3.5" fill={HADES.stoneDark} />
-      {/* Glowing eyes */}
-      <ellipse cx="8" cy="9" rx="1.2" ry="1.5" fill={HADES.styxBright} opacity="0.9" />
-      <ellipse cx="16" cy="9" rx="1.2" ry="1.5" fill={HADES.styxBright} opacity="0.9" />
-      {/* Nose */}
-      <path d="M12 12 L10.5 15 L13.5 15 Z" fill={HADES.stoneDark} />
-      {/* Teeth */}
-      <rect x="8" y="17" width="8" height="3" fill={HADES.stoneLight} rx="0.5" />
-      <line x1="9.5" y1="17" x2="9.5" y2="20" stroke={HADES.stoneDark} strokeWidth="0.4" />
-      <line x1="11" y1="17" x2="11" y2="20" stroke={HADES.stoneDark} strokeWidth="0.4" />
-      <line x1="12.5" y1="17" x2="12.5" y2="20" stroke={HADES.stoneDark} strokeWidth="0.4" />
-      <line x1="14" y1="17" x2="14" y2="20" stroke={HADES.stoneDark} strokeWidth="0.4" />
-      {/* Jaw */}
-      <path d="M6 17 Q12 24 18 17" fill="none" stroke={HADES.stoneLight} strokeWidth="1.5" />
+      {/* Axe head */}
+      <path
+        d="M4 8 L12 4 L20 8 L20 16 L16 20 L12 18 L8 20 L4 16 Z"
+        fill={GOW.stoneLight}
+        stroke={GOW.frostBright}
+        strokeWidth="1"
+      />
+      {/* Frost glow on blade */}
+      <path
+        d="M6 10 L12 6 L18 10 L18 14 L14 17 L12 16 L10 17 L6 14 Z"
+        fill={GOW.frostBright}
+        opacity="0.4"
+      />
+      {/* Handle */}
+      <rect x="10" y="18" width="4" height="26" fill={GOW.goldDark} />
+      <rect x="11" y="20" width="2" height="22" fill={GOW.goldMid} />
+      {/* Rune inscriptions on blade */}
+      <text x="12" y="12" textAnchor="middle" fill={GOW.frostBright} fontSize="4" fontFamily="serif">ᚠ</text>
+      {/* Pommel */}
+      <ellipse cx="12" cy="45" rx="3" ry="2" fill={GOW.goldMid} />
     </svg>
   )
 }
 
 // =============================================================================
-// GREEK URN - Decorative element
+// BLADES OF CHAOS - Fire decoration
 // =============================================================================
-function GreekUrn({ size = 30 }: { size?: number }) {
+function BladesOfChaos({ size = 32, className = '' }: { size?: number; className?: string }) {
   return (
     <svg
-      viewBox="0 0 24 36"
-      width={size * 0.67}
+      viewBox="0 0 48 24"
+      width={size * 1.5}
+      height={size * 0.75}
+      className={className}
+      style={{ filter: `drop-shadow(0 0 6px ${GOW.fireGlow})` }}
+      aria-hidden="true"
+    >
+      {/* Left blade */}
+      <path
+        d="M4 12 L16 6 L20 12 L16 18 Z"
+        fill={GOW.stoneLight}
+        stroke={GOW.fireOrange}
+        strokeWidth="0.5"
+      />
+      <path d="M6 12 L14 8 L17 12 L14 16 Z" fill={GOW.fireOrange} opacity="0.5" />
+
+      {/* Right blade */}
+      <path
+        d="M44 12 L32 6 L28 12 L32 18 Z"
+        fill={GOW.stoneLight}
+        stroke={GOW.fireOrange}
+        strokeWidth="0.5"
+      />
+      <path d="M42 12 L34 8 L31 12 L34 16 Z" fill={GOW.fireOrange} opacity="0.5" />
+
+      {/* Chains */}
+      <path
+        d="M20 12 Q24 10 28 12"
+        fill="none"
+        stroke={GOW.goldDark}
+        strokeWidth="1.5"
+        strokeDasharray="2 1"
+      />
+      <path
+        d="M20 12 Q24 14 28 12"
+        fill="none"
+        stroke={GOW.goldDark}
+        strokeWidth="1.5"
+        strokeDasharray="2 1"
+      />
+    </svg>
+  )
+}
+
+// =============================================================================
+// WORLD SERPENT - Jormungandr motif
+// =============================================================================
+function WorldSerpent({ size = 60, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 100 40"
+      width={size * 2.5}
+      height={size}
+      className={className}
+      aria-hidden="true"
+    >
+      {/* Serpent body - coiled */}
+      <path
+        d="M10 20 Q20 5 35 15 Q50 25 65 15 Q80 5 90 20"
+        fill="none"
+        stroke={GOW.frostMid}
+        strokeWidth="4"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+      {/* Scales pattern */}
+      <path
+        d="M15 18 Q25 8 35 15 M40 18 Q50 28 60 18 M70 15 Q80 8 88 18"
+        fill="none"
+        stroke={GOW.frostBright}
+        strokeWidth="1"
+        opacity="0.4"
+      />
+      {/* Head */}
+      <circle cx="10" cy="20" r="5" fill={GOW.frostMid} />
+      <circle cx="8" cy="18" r="1.5" fill={GOW.frostBright} />
+      {/* Tail */}
+      <path d="M90 20 L98 18 L98 22 Z" fill={GOW.frostMid} />
+    </svg>
+  )
+}
+
+// =============================================================================
+// KRATOS SILHOUETTE - Header decoration
+// =============================================================================
+function KratosSilhouette({ size = 48 }: { size?: number }) {
+  return (
+    <svg
+      viewBox="0 0 32 40"
+      width={size * 0.8}
       height={size}
       aria-hidden="true"
     >
-      {/* Urn body */}
-      <ellipse cx="12" cy="26" rx="8" ry="4" fill={HADES.goldDark} />
+      {/* Bald head */}
+      <ellipse cx="16" cy="10" rx="8" ry="9" fill={GOW.stoneLight} />
+      {/* Red tattoo stripe */}
       <path
-        d="M4 26 Q4 14 8 10 L8 8 Q4 8 4 6 L4 4 L20 4 L20 6 Q20 8 16 8 L16 10 Q20 14 20 26 Z"
-        fill={HADES.goldMid}
-        stroke={HADES.goldBright}
-        strokeWidth="0.5"
+        d="M8 6 Q10 10 8 16"
+        fill="none"
+        stroke={GOW.kratosTattoo}
+        strokeWidth="2"
+        strokeLinecap="round"
       />
-      {/* Handles */}
-      <path d="M4 18 Q0 18 0 14 Q0 10 4 10" fill="none" stroke={HADES.goldMid} strokeWidth="1.5" />
-      <path d="M20 18 Q24 18 24 14 Q24 10 20 10" fill="none" stroke={HADES.goldMid} strokeWidth="1.5" />
-      {/* Greek pattern on urn */}
-      <rect x="6" y="16" width="12" height="4" fill="none" stroke={HADES.goldBright} strokeWidth="0.5" />
-      <path d="M7 18 L9 18 L9 17 L11 17 L11 18 L13 18 L13 19 L11 19 L11 20 L9 20 L9 19 L7 19 Z" fill={HADES.goldBright} opacity="0.6" />
+      {/* Beard */}
+      <path
+        d="M10 14 Q16 22 22 14"
+        fill={GOW.stoneMid}
+      />
+      {/* Eyes (fierce) */}
+      <ellipse cx="12" cy="9" rx="1.5" ry="1" fill={GOW.snowWhite} />
+      <ellipse cx="20" cy="9" rx="1.5" ry="1" fill={GOW.snowWhite} />
+      {/* Shoulders */}
+      <path
+        d="M8 18 L4 28 L16 26 L28 28 L24 18"
+        fill={GOW.stoneLight}
+      />
+      {/* Red war paint on shoulder */}
+      <path
+        d="M6 20 L8 28"
+        fill="none"
+        stroke={GOW.kratosTattoo}
+        strokeWidth="1.5"
+      />
     </svg>
   )
 }
 
 // =============================================================================
-// GREEK COLUMN - Side decoration
+// NORDIC PILLAR - Side decorations
 // =============================================================================
-function GreekColumn({ side }: { side: 'left' | 'right' }) {
+function NordicPillar({ side }: { side: 'left' | 'right' }) {
   return (
     <div
-      className={`fixed top-0 bottom-0 w-12 md:w-16 pointer-events-none z-10 hidden lg:block ${
+      className={`fixed top-0 bottom-0 w-10 md:w-14 pointer-events-none z-10 hidden lg:block ${
         side === 'left' ? 'left-0' : 'right-0'
       }`}
       aria-hidden="true"
     >
-      {/* Column shaft */}
+      {/* Stone pillar */}
       <div
         className="absolute inset-0"
         style={{
           background: `linear-gradient(90deg,
-            ${side === 'left' ? HADES.stoneLight : HADES.stoneMid},
-            ${HADES.stoneMid},
-            ${side === 'left' ? HADES.stoneMid : HADES.stoneLight}
+            ${side === 'left' ? GOW.stoneMid : GOW.stoneDark},
+            ${GOW.stoneDark},
+            ${side === 'left' ? GOW.stoneDark : GOW.stoneMid}
           )`,
         }}
       >
-        {/* Flutes (vertical grooves) */}
-        {[0, 1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="absolute top-24 bottom-32 w-1"
-            style={{
-              left: `${20 + i * 20}%`,
-              background: `linear-gradient(90deg, ${HADES.stoneDark}40, transparent, ${HADES.stoneDark}40)`,
-            }}
-          />
-        ))}
+        {/* Carved runes running down */}
+        <div className="absolute top-20 bottom-32 left-1/2 -translate-x-1/2 w-px flex flex-col items-center gap-8">
+          {['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ'].map((rune, i) => (
+            <span
+              key={i}
+              className="text-sm opacity-30"
+              style={{ color: GOW.goldMid, textShadow: `0 0 4px ${GOW.goldGlow}` }}
+            >
+              {rune}
+            </span>
+          ))}
+        </div>
+      </div>
 
-        {/* Cracks */}
-        <svg className="absolute inset-0 w-full h-full opacity-30">
+      {/* Top ornament - knot pattern */}
+      <div
+        className="absolute top-0 left-0 right-0 h-16"
+        style={{
+          background: `linear-gradient(180deg, ${GOW.goldDark}, ${GOW.stoneDark})`,
+        }}
+      >
+        <svg className="w-full h-full" viewBox="0 0 20 30" preserveAspectRatio="none">
           <path
-            d="M8 100 Q12 150 6 200 M10 400 L14 450 Q10 480 15 520"
+            d="M0 0 L10 8 L20 0 L20 20 Q10 30 0 20 Z"
+            fill={GOW.goldDark}
+            opacity="0.8"
+          />
+          <path
+            d="M5 5 L10 10 L15 5"
             fill="none"
-            stroke={HADES.stoneDark}
+            stroke={GOW.goldBright}
             strokeWidth="0.5"
           />
         </svg>
       </div>
 
-      {/* Capital (top) */}
+      {/* Frost glow effect */}
       <div
-        className="absolute top-0 left-0 right-0 h-20"
+        className="absolute top-1/4 left-0 right-0 h-32 animate-pillar-frost"
         style={{
-          background: `linear-gradient(180deg, ${HADES.goldMid}, ${HADES.goldDark}, ${HADES.stoneLight})`,
+          background: `radial-gradient(ellipse at center, ${GOW.frostBright}15, transparent)`,
         }}
-      >
-        <GreekMeander className="absolute top-2 left-0 right-0" />
-        <div className="absolute top-8 left-1/2 -translate-x-1/2">
-          <Skull size={16} />
-        </div>
-      </div>
+      />
 
-      {/* Base */}
+      {/* Fire glow effect */}
       <div
-        className="absolute bottom-24 left-0 right-0 h-8"
+        className="absolute top-2/3 left-0 right-0 h-32 animate-pillar-fire"
         style={{
-          background: `linear-gradient(180deg, ${HADES.stoneLight}, ${HADES.goldDark}, ${HADES.goldMid})`,
+          background: `radial-gradient(ellipse at center, ${GOW.fireOrange}15, transparent)`,
         }}
       />
     </div>
@@ -297,21 +440,61 @@ function GreekColumn({ side }: { side: 'left' | 'right' }) {
 }
 
 // =============================================================================
-// FLOATING EMBERS - Orange/yellow fire particles
+// FROST PARTICLES - Leviathan Axe effect
 // =============================================================================
-function FloatingEmbers({ reducedMotion }: { reducedMotion: boolean }) {
+function FrostParticles({ reducedMotion }: { reducedMotion: boolean }) {
+  if (reducedMotion) return null
+
+  const particles = [
+    { left: '5%', delay: '0s', duration: '8s', size: 3 },
+    { left: '15%', delay: '1s', duration: '7s', size: 4 },
+    { left: '25%', delay: '2s', duration: '9s', size: 3 },
+    { left: '35%', delay: '0.5s', duration: '8s', size: 5 },
+    { left: '45%', delay: '1.5s', duration: '7s', size: 3 },
+    { left: '55%', delay: '2.5s', duration: '9s', size: 4 },
+    { left: '65%', delay: '0.8s', duration: '8s', size: 3 },
+    { left: '75%', delay: '1.8s', duration: '7s', size: 5 },
+    { left: '85%', delay: '0.3s', duration: '9s', size: 4 },
+    { left: '95%', delay: '2.2s', duration: '8s', size: 3 },
+  ]
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[5] overflow-hidden" aria-hidden="true">
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="absolute top-0 rounded-full animate-frost-fall"
+          style={{
+            left: p.left,
+            width: p.size,
+            height: p.size,
+            background: GOW.frostBright,
+            boxShadow: `0 0 ${p.size * 2}px ${GOW.frostBright}`,
+            animationDelay: p.delay,
+            animationDuration: p.duration,
+            opacity: 0.6,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// =============================================================================
+// FIRE EMBERS - Blades of Chaos effect (bottom)
+// =============================================================================
+function FireEmbers({ reducedMotion }: { reducedMotion: boolean }) {
   if (reducedMotion) return null
 
   const embers = [
-    { left: '8%', delay: '0s', duration: '7s', size: 4 },
-    { left: '18%', delay: '1.2s', duration: '6s', size: 3 },
-    { left: '28%', delay: '0.5s', duration: '8s', size: 5 },
-    { left: '42%', delay: '2s', duration: '6.5s', size: 3 },
-    { left: '55%', delay: '0.8s', duration: '7.5s', size: 4 },
-    { left: '68%', delay: '1.5s', duration: '6s', size: 3 },
-    { left: '78%', delay: '2.5s', duration: '8s', size: 5 },
-    { left: '88%', delay: '0.3s', duration: '7s', size: 4 },
-    { left: '95%', delay: '1.8s', duration: '6.5s', size: 3 },
+    { left: '10%', delay: '0s', duration: '6s', size: 4 },
+    { left: '20%', delay: '1.2s', duration: '5s', size: 3 },
+    { left: '30%', delay: '0.5s', duration: '7s', size: 5 },
+    { left: '50%', delay: '2s', duration: '5.5s', size: 3 },
+    { left: '60%', delay: '0.8s', duration: '6.5s', size: 4 },
+    { left: '70%', delay: '1.5s', duration: '5s', size: 3 },
+    { left: '80%', delay: '2.5s', duration: '7s', size: 5 },
+    { left: '90%', delay: '0.3s', duration: '6s', size: 4 },
   ]
 
   return (
@@ -324,8 +507,8 @@ function FloatingEmbers({ reducedMotion }: { reducedMotion: boolean }) {
             left: ember.left,
             width: ember.size,
             height: ember.size,
-            background: i % 2 === 0 ? HADES.fireOrange : HADES.fireYellow,
-            boxShadow: `0 0 ${ember.size * 3}px ${i % 2 === 0 ? HADES.fireOrange : HADES.fireYellow}`,
+            background: i % 2 === 0 ? GOW.fireOrange : GOW.fireYellow,
+            boxShadow: `0 0 ${ember.size * 3}px ${i % 2 === 0 ? GOW.fireOrange : GOW.fireYellow}`,
             animationDelay: ember.delay,
             animationDuration: ember.duration,
           }}
@@ -336,69 +519,40 @@ function FloatingEmbers({ reducedMotion }: { reducedMotion: boolean }) {
 }
 
 // =============================================================================
-// STYX RIVER POOLS - Green glowing edges
+// BIFROST EDGE - Rainbow realm travel effect
 // =============================================================================
-function StyxPools() {
+function BifrostEdge() {
   return (
     <>
-      {/* Bottom Styx river */}
+      {/* Bottom bifrost glow */}
       <div
-        className="fixed bottom-0 left-0 right-0 h-24 pointer-events-none z-[4]"
+        className="fixed bottom-0 left-0 right-0 h-20 pointer-events-none z-[4]"
         aria-hidden="true"
       >
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 animate-bifrost-pulse"
           style={{
             background: `linear-gradient(180deg,
               transparent 0%,
-              ${HADES.styxDeep}40 30%,
-              ${HADES.styxDark}80 60%,
-              ${HADES.styxMid} 100%
+              ${GOW.bgDark}80 40%,
+              ${GOW.frostDark}60 70%,
+              ${GOW.frostMid}40 100%
             )`,
           }}
         />
         <div
-          className="absolute bottom-0 left-0 right-0 h-8 animate-styx-glow"
+          className="absolute bottom-0 left-0 right-0 h-2"
           style={{
-            background: HADES.styxBright,
-            filter: 'blur(12px)',
+            background: `linear-gradient(90deg,
+              ${GOW.frostBright},
+              ${GOW.bifrostGreen},
+              ${GOW.bifrostYellow},
+              ${GOW.bifrostOrange},
+              ${GOW.bifrostPurple},
+              ${GOW.frostBright}
+            )`,
+            filter: 'blur(4px)',
             opacity: 0.6,
-          }}
-        />
-        {/* Ripples */}
-        <div
-          className="absolute bottom-6 left-0 right-0 h-px animate-styx-ripple"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${HADES.styxBright}, transparent)`,
-          }}
-        />
-      </div>
-
-      {/* Side pools - left */}
-      <div
-        className="fixed left-12 md:left-16 top-1/3 w-16 h-32 pointer-events-none z-[3] hidden lg:block"
-        aria-hidden="true"
-      >
-        <div
-          className="absolute inset-0 rounded-full animate-pool-pulse"
-          style={{
-            background: `radial-gradient(ellipse at center, ${HADES.styxBright}40, ${HADES.styxDark}20, transparent)`,
-            filter: 'blur(8px)',
-          }}
-        />
-      </div>
-
-      {/* Side pools - right */}
-      <div
-        className="fixed right-12 md:right-16 top-2/3 w-16 h-32 pointer-events-none z-[3] hidden lg:block"
-        aria-hidden="true"
-      >
-        <div
-          className="absolute inset-0 rounded-full animate-pool-pulse"
-          style={{
-            background: `radial-gradient(ellipse at center, ${HADES.styxBright}40, ${HADES.styxDark}20, transparent)`,
-            filter: 'blur(8px)',
-            animationDelay: '1.5s',
           }}
         />
       </div>
@@ -407,38 +561,7 @@ function StyxPools() {
 }
 
 // =============================================================================
-// BLOOD SPLATTERS - Dark, decorative
-// =============================================================================
-function BloodSplatters() {
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[2]" aria-hidden="true">
-      {/* Top left splatter */}
-      <svg className="absolute top-20 left-20 w-32 h-32 opacity-40">
-        <ellipse cx="40" cy="60" rx="35" ry="20" fill={HADES.bloodDark} />
-        <circle cx="20" cy="40" r="12" fill={HADES.bloodMid} />
-        <circle cx="70" cy="50" r="8" fill={HADES.bloodSplatter} />
-        <path d="M40 80 L35 100 M50 75 L55 95 M30 70 L20 85" fill="none" stroke={HADES.bloodDark} strokeWidth="2" />
-      </svg>
-
-      {/* Top right splatter */}
-      <svg className="absolute top-40 right-32 w-24 h-24 opacity-30">
-        <circle cx="50" cy="40" r="20" fill={HADES.bloodDark} />
-        <circle cx="35" cy="55" r="10" fill={HADES.bloodMid} />
-        <path d="M50 60 L45 80 M60 55 L70 75" fill="none" stroke={HADES.bloodDark} strokeWidth="2" />
-      </svg>
-
-      {/* Bottom splatter */}
-      <svg className="absolute bottom-32 left-1/3 w-40 h-20 opacity-35 hidden md:block">
-        <ellipse cx="80" cy="10" rx="70" ry="8" fill={HADES.bloodDark} />
-        <circle cx="30" cy="15" r="6" fill={HADES.bloodMid} />
-        <circle cx="120" cy="12" r="5" fill={HADES.bloodSplatter} />
-      </svg>
-    </div>
-  )
-}
-
-// =============================================================================
-// VIGNETTE - Dark edges
+// VIGNETTE - Dark edges with frost/fire hints
 // =============================================================================
 function Vignette() {
   return (
@@ -446,9 +569,9 @@ function Vignette() {
       className="fixed inset-0 pointer-events-none z-[6]"
       style={{
         background: `
-          radial-gradient(ellipse at 50% 50%, transparent 40%, ${HADES.stoneDark}90 100%),
-          radial-gradient(ellipse at 50% 0%, ${HADES.bloodDark}30 0%, transparent 50%),
-          radial-gradient(ellipse at 50% 100%, ${HADES.styxDeep}50 0%, transparent 40%)
+          radial-gradient(ellipse at 50% 50%, transparent 40%, ${GOW.bgDarkest}95 100%),
+          radial-gradient(ellipse at 0% 50%, ${GOW.frostDark}20 0%, transparent 30%),
+          radial-gradient(ellipse at 100% 50%, ${GOW.fireDark}20 0%, transparent 30%)
         `,
       }}
       aria-hidden="true"
@@ -457,95 +580,67 @@ function Vignette() {
 }
 
 // =============================================================================
-// SECTION CARD - Stone tablet with Greek meander border, Styx glow
+// STONE TABLET - Section card with Norse styling
 // =============================================================================
 function StoneTablet({
   children,
-  accentColor = HADES.goldBright,
+  accentColor = GOW.goldMid,
+  variant = 'default',
   className = '',
   ariaLabel,
 }: {
   children: React.ReactNode
   accentColor?: string
+  variant?: 'default' | 'frost' | 'fire'
   className?: string
   ariaLabel?: string
 }) {
+  const borderColor = variant === 'frost' ? GOW.frostBright : variant === 'fire' ? GOW.fireOrange : GOW.goldMid
+  const glowColor = variant === 'frost' ? GOW.frostGlow : variant === 'fire' ? GOW.fireGlow : GOW.goldGlow
+
   return (
     <section
       className={`relative p-6 ${className}`}
       style={{
-        background: `
-          linear-gradient(135deg, ${HADES.stoneLight} 0%, ${HADES.stoneMid} 50%, ${HADES.stoneFloor} 100%)
-        `,
+        background: `linear-gradient(135deg, ${GOW.stoneMid} 0%, ${GOW.stoneDark} 50%, ${GOW.bgDark} 100%)`,
         boxShadow: `
-          inset 0 2px 0 ${HADES.stoneLight},
-          inset 0 -2px 0 ${HADES.stoneDark},
-          0 0 30px ${HADES.styxDark}60,
-          0 8px 20px ${HADES.stoneDark}80
+          inset 0 1px 0 ${GOW.stoneLight}40,
+          inset 0 -1px 0 ${GOW.bgDarkest},
+          0 0 30px ${glowColor},
+          0 8px 20px ${GOW.bgDarkest}80
         `,
+        border: `2px solid ${borderColor}30`,
       }}
       role="region"
       aria-label={ariaLabel}
     >
-      {/* Greek meander border - all sides */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          border: `3px solid ${HADES.goldMid}`,
-          boxShadow: `inset 0 0 0 6px ${HADES.stoneMid}, inset 0 0 0 8px ${HADES.goldDark}40`,
-        }}
-      >
-        {/* Top meander */}
+      {/* Corner ornaments - Nordic knot */}
+      {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
         <div
-          className="absolute -top-px left-4 right-4 h-3"
+          key={i}
+          className={`absolute ${pos} w-6 h-6`}
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Cpath d='M0 6 L6 6 L6 0 L18 0 L18 6 L12 6 L12 12 L24 12' fill='none' stroke='%23d4af37' stroke-width='1.5'/%3E%3C/svg%3E")`,
+            borderTop: pos.includes('top') ? `2px solid ${borderColor}` : 'none',
+            borderBottom: pos.includes('bottom') ? `2px solid ${borderColor}` : 'none',
+            borderLeft: pos.includes('left') ? `2px solid ${borderColor}` : 'none',
+            borderRight: pos.includes('right') ? `2px solid ${borderColor}` : 'none',
           }}
         />
-        {/* Bottom meander */}
-        <div
-          className="absolute -bottom-px left-4 right-4 h-3"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='12'%3E%3Cpath d='M0 6 L6 6 L6 0 L18 0 L18 6 L12 6 L12 12 L24 12' fill='none' stroke='%23d4af37' stroke-width='1.5'/%3E%3C/svg%3E")`,
-            transform: 'rotate(180deg)',
-          }}
-        />
-      </div>
+      ))}
 
-      {/* Corner skull ornaments */}
-      <div className="absolute -top-1 -left-1">
-        <Skull size={18} />
-      </div>
-      <div className="absolute -top-1 -right-1">
-        <Skull size={18} />
-      </div>
-      <div className="absolute -bottom-1 -left-1">
-        <Skull size={18} />
-      </div>
-      <div className="absolute -bottom-1 -right-1">
-        <Skull size={18} />
-      </div>
+      {/* Rune inscriptions at top */}
+      <RuneBorder color={borderColor} className="absolute -top-3 left-8 right-8" />
 
-      {/* Styx glow underneath */}
+      {/* Subtle glow underneath */}
       <div
-        className="absolute -bottom-2 left-8 right-8 h-2 rounded-full"
+        className="absolute -bottom-1 left-12 right-12 h-1 rounded-full"
         style={{
-          background: HADES.styxMid,
+          background: borderColor,
           filter: 'blur(6px)',
-          opacity: 0.5,
+          opacity: 0.4,
         }}
         aria-hidden="true"
       />
-
-      {/* Stone texture cracks */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20" aria-hidden="true">
-        <path
-          d="M20 10 Q30 30 25 50 M80 5 L85 35 Q82 50 90 70 M150 20 Q145 45 155 65"
-          fill="none"
-          stroke={HADES.stoneDark}
-          strokeWidth="0.5"
-        />
-      </svg>
 
       <div className="relative z-10">{children}</div>
     </section>
@@ -553,14 +648,16 @@ function StoneTablet({
 }
 
 // =============================================================================
-// SECTION TITLE - Gold with hexagon icon
+// SECTION TITLE - Gold with axe/blade icon
 // =============================================================================
 function SectionTitle({
   children,
-  color = HADES.goldBright,
+  color = GOW.goldBright,
+  icon = 'axe',
 }: {
   children: React.ReactNode
   color?: string
+  icon?: 'axe' | 'blade' | 'rune'
 }) {
   return (
     <h2
@@ -571,10 +668,20 @@ function SectionTitle({
         fontFamily: '"Cinzel", Georgia, serif',
       }}
     >
-      <svg viewBox="0 0 20 24" className="w-4 h-5" aria-hidden="true">
-        <polygon points="10,0 20,6 20,18 10,24 0,18 0,6" fill={color} opacity="0.9" />
-        <polygon points="10,4 16,8 16,16 10,20 4,16 4,8" fill={HADES.stoneDark} />
-      </svg>
+      {icon === 'axe' && (
+        <svg viewBox="0 0 16 20" className="w-4 h-5" aria-hidden="true">
+          <path d="M4 4 L8 2 L12 4 L12 8 L10 10 L8 9 L6 10 L4 8 Z" fill={GOW.frostBright} />
+          <rect x="7" y="9" width="2" height="10" fill={GOW.goldDark} />
+        </svg>
+      )}
+      {icon === 'blade' && (
+        <svg viewBox="0 0 20 16" className="w-5 h-4" aria-hidden="true">
+          <path d="M2 8 L10 4 L18 8 L10 12 Z" fill={GOW.fireOrange} />
+        </svg>
+      )}
+      {icon === 'rune' && (
+        <span className="text-base" style={{ color, fontFamily: 'serif' }}>ᚱ</span>
+      )}
       <span className="tracking-widest uppercase text-sm">{children}</span>
       <div
         className="flex-1 h-px ml-2"
@@ -586,9 +693,9 @@ function SectionTitle({
 }
 
 // =============================================================================
-// BOON SELECTOR - Hexagonal god selection cards
+// REALM SELECTOR - Profession selection (Bifrost style)
 // =============================================================================
-function BoonSelector({
+function RealmSelector({
   profession,
   isActive,
   onClick,
@@ -597,91 +704,86 @@ function BoonSelector({
   isActive: boolean
   onClick: () => void
 }) {
-  const gods = {
+  const realms = {
     engineer: {
-      name: 'ATHENA',
-      color: HADES.styxBright,
-      title: 'Wisdom & Strategy',
-      iconPath: 'M10 4 L10 2 L8 2 L7 4 L8 7 L7 10 L9 10 L9 16 L11 16 L11 10 L13 10 L12 7 L13 4 L12 2 L10 2',
+      name: 'MIDGARD',
+      color: GOW.frostBright,
+      title: 'Builder of Worlds',
+      icon: 'ᛗ', // Mannaz rune
     },
     drummer: {
-      name: 'APOLLO',
-      color: HADES.fireOrange,
-      title: 'Music & Light',
-      iconPath: 'M10 3 L6 8 Q5 12 10 16 Q15 12 14 8 Z M8 9 L8 14 M10 9 L10 15 M12 9 L12 14',
+      name: 'MUSPELHEIM',
+      color: GOW.fireOrange,
+      title: 'Fire & Rhythm',
+      icon: 'ᛉ', // Algiz rune
     },
     fighter: {
-      name: 'ARES',
-      color: HADES.zagRedBright,
-      title: 'War & Valor',
-      iconPath: 'M10 2 L5 7 L5 12 L10 10 L15 12 L15 7 Z M10 11 L10 18 M7 14 L13 14',
+      name: 'ALFHEIM',
+      color: GOW.bloodBright,
+      title: 'Warrior Spirit',
+      icon: 'ᛏ', // Tiwaz rune
     },
   }
-  const god = gods[profession]
+  const realm = realms[profession]
 
   return (
     <button
       onClick={onClick}
-      className={`relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+      className={`relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
         isActive ? 'scale-110 z-10' : 'opacity-60 hover:opacity-90 hover:scale-105'
       }`}
-      style={{ '--ring-color': god.color } as React.CSSProperties}
+      style={{ '--ring-color': realm.color } as React.CSSProperties}
       aria-pressed={isActive}
-      aria-label={`Select ${god.name} - ${god.title}`}
+      aria-label={`Select ${realm.name} - ${realm.title}`}
     >
-      <svg viewBox="0 0 80 100" className="w-20 h-24 md:w-24 md:h-28">
-        {/* Hexagon background */}
-        <path
-          d="M40 5 L75 22 L75 68 L40 95 L5 68 L5 22 Z"
-          fill={isActive ? `${god.color}25` : HADES.stoneMid}
-          stroke={isActive ? god.color : HADES.goldDark}
-          strokeWidth={isActive ? 3 : 2}
+      <div
+        className="relative w-20 h-24 md:w-24 md:h-28 flex flex-col items-center justify-center"
+        style={{
+          background: isActive
+            ? `linear-gradient(180deg, ${realm.color}20, ${GOW.bgDark})`
+            : `linear-gradient(180deg, ${GOW.stoneMid}, ${GOW.stoneDark})`,
+          border: `2px solid ${isActive ? realm.color : GOW.stoneLight}`,
+          boxShadow: isActive ? `0 0 20px ${realm.color}60, inset 0 0 20px ${realm.color}20` : 'none',
+          clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+        }}
+      >
+        {/* Rune icon */}
+        <span
+          className="text-2xl md:text-3xl mb-1"
           style={{
-            filter: isActive ? `drop-shadow(0 0 15px ${god.color}80)` : 'none',
+            color: isActive ? realm.color : GOW.textSecondary,
+            textShadow: isActive ? `0 0 10px ${realm.color}` : 'none',
+            fontFamily: 'serif',
           }}
-        />
-
-        {/* Inner hexagon */}
-        <path
-          d="M40 12 L68 26 L68 64 L40 88 L12 64 L12 26 Z"
-          fill="none"
-          stroke={isActive ? god.color : HADES.goldDark}
-          strokeWidth="1"
-          opacity="0.4"
-        />
-
-        {/* God icon */}
-        <g transform="translate(30, 20)">
-          <path d={god.iconPath} fill={isActive ? god.color : HADES.textSecondary} />
-        </g>
-
-        {/* God name */}
-        <text
-          x="40"
-          y="72"
-          textAnchor="middle"
-          fill={isActive ? god.color : HADES.textSecondary}
-          fontSize="8"
-          fontWeight="bold"
-          style={{ fontFamily: '"Cinzel", serif' }}
         >
-          {god.name}
-        </text>
+          {realm.icon}
+        </span>
+
+        {/* Realm name */}
+        <span
+          className="text-xs font-bold tracking-wider"
+          style={{ color: isActive ? realm.color : GOW.textSecondary }}
+        >
+          {realm.name}
+        </span>
 
         {/* Title */}
-        <text x="40" y="82" textAnchor="middle" fill={HADES.textMuted} fontSize="5">
-          {god.title}
-        </text>
-      </svg>
+        <span
+          className="text-xs opacity-70 mt-0.5"
+          style={{ color: GOW.textMuted, fontSize: '0.6rem' }}
+        >
+          {realm.title}
+        </span>
+      </div>
 
       {/* Active glow ring */}
       {isActive && (
         <div
-          className="absolute inset-0 rounded-full animate-boon-pulse pointer-events-none"
+          className="absolute inset-0 animate-realm-pulse pointer-events-none"
           style={{
-            border: `2px solid ${god.color}`,
-            filter: `blur(2px)`,
-            opacity: 0.5,
+            clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+            border: `2px solid ${realm.color}`,
+            filter: 'blur(2px)',
           }}
         />
       )}
@@ -690,7 +792,7 @@ function BoonSelector({
 }
 
 // =============================================================================
-// TECH STACK DISPLAY - Boon style tags, NO skill bars
+// TECH STACK DISPLAY - Rune-tagged skills
 // =============================================================================
 function TechStackDisplay({ color }: { color: string }) {
   return (
@@ -700,8 +802,8 @@ function TechStackDisplay({ color }: { color: string }) {
           <h3
             className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2 uppercase"
             style={{
-              color: HADES.goldBright,
-              borderColor: `${HADES.goldBright}30`,
+              color: GOW.goldBright,
+              borderColor: `${GOW.goldBright}30`,
               fontFamily: '"Cinzel", serif',
             }}
           >
@@ -714,10 +816,9 @@ function TechStackDisplay({ color }: { color: string }) {
                 key={tech}
                 className="text-xs px-2 py-1 transition-all hover:scale-105"
                 style={{
-                  background: `${color}15`,
-                  border: `1px solid ${color}40`,
-                  color: HADES.textPrimary,
-                  clipPath: 'polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%)',
+                  background: `${color}12`,
+                  border: `1px solid ${color}35`,
+                  color: GOW.textPrimary,
                 }}
                 role="listitem"
               >
@@ -732,7 +833,7 @@ function TechStackDisplay({ color }: { color: string }) {
 }
 
 // =============================================================================
-// ACHIEVEMENT DISPLAY - For drummer/fighter, shows REAL achievements
+// ACHIEVEMENT DISPLAY - For drummer/fighter
 // =============================================================================
 function AchievementDisplay({
   profession,
@@ -750,8 +851,8 @@ function AchievementDisplay({
           <h3
             className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2 uppercase"
             style={{
-              color: HADES.goldBright,
-              borderColor: `${HADES.goldBright}30`,
+              color: GOW.goldBright,
+              borderColor: `${GOW.goldBright}30`,
               fontFamily: '"Cinzel", serif',
             }}
           >
@@ -765,12 +866,10 @@ function AchievementDisplay({
                 className="flex items-start gap-2 py-1 px-2 hover:bg-white/5 transition-colors rounded"
                 role="listitem"
               >
-                <svg viewBox="0 0 12 14" className="w-2.5 h-3 flex-shrink-0 mt-0.5" aria-hidden="true">
-                  <polygon points="6,0 12,4 12,10 6,14 0,10 0,4" fill={color} />
-                </svg>
+                <span className="text-sm mt-0.5" style={{ color }} aria-hidden="true">ᚱ</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-xs font-medium" style={{ color: HADES.textPrimary }}>
+                    <span className="text-xs font-medium" style={{ color: GOW.textPrimary }}>
                       {achievement.title}
                     </span>
                     {achievement.metric && (
@@ -780,7 +879,7 @@ function AchievementDisplay({
                     )}
                   </div>
                   {achievement.description && (
-                    <p className="text-xs mt-0.5" style={{ color: HADES.textSecondary }}>
+                    <p className="text-xs mt-0.5" style={{ color: GOW.textSecondary }}>
                       {achievement.description}
                     </p>
                   )}
@@ -799,8 +898,8 @@ function AchievementDisplay({
 // =============================================================================
 function CurrentRolesSection({ color }: { color: string }) {
   return (
-    <StoneTablet accentColor={color} ariaLabel="Current professional roles" className="mb-6">
-      <SectionTitle>Current Positions</SectionTitle>
+    <StoneTablet accentColor={color} variant="frost" ariaLabel="Current professional roles" className="mb-6">
+      <SectionTitle icon="axe">Current Positions</SectionTitle>
 
       <div className="grid gap-3">
         {CURRENT_ROLES.map((role) => (
@@ -808,18 +907,18 @@ function CurrentRolesSection({ color }: { color: string }) {
             key={role.id}
             className="p-3 transition-all hover:translate-x-1"
             style={{
-              background: `linear-gradient(90deg, ${HADES.stoneLight}60, transparent)`,
-              borderLeft: `3px solid ${role.type === 'leadership' ? HADES.goldBright : color}`,
+              background: `linear-gradient(90deg, ${GOW.stoneMid}60, transparent)`,
+              borderLeft: `3px solid ${role.type === 'leadership' ? GOW.goldBright : color}`,
             }}
           >
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-sm font-bold" style={{ color: HADES.textPrimary }}>
+                <h3 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
                   {role.title}
                 </h3>
                 <p
                   className="text-xs"
-                  style={{ color: role.type === 'leadership' ? HADES.goldBright : color }}
+                  style={{ color: role.type === 'leadership' ? GOW.goldBright : color }}
                 >
                   {role.company}
                 </p>
@@ -828,16 +927,16 @@ function CurrentRolesSection({ color }: { color: string }) {
                 <span
                   className="text-xs px-2 py-0.5 tracking-wider uppercase"
                   style={{
-                    background: `${HADES.goldBright}15`,
-                    border: `1px solid ${HADES.goldBright}40`,
-                    color: HADES.goldBright,
+                    background: `${GOW.goldBright}15`,
+                    border: `1px solid ${GOW.goldBright}40`,
+                    color: GOW.goldBright,
                   }}
                 >
                   Leadership
                 </span>
               )}
             </div>
-            <p className="text-xs mt-1" style={{ color: HADES.textSecondary }}>
+            <p className="text-xs mt-1" style={{ color: GOW.textSecondary }}>
               {role.description}
             </p>
           </div>
@@ -852,8 +951,8 @@ function CurrentRolesSection({ color }: { color: string }) {
 // =============================================================================
 function CompaniesSection() {
   return (
-    <StoneTablet accentColor={HADES.magicPurple} ariaLabel="Companies and ventures" className="mb-6">
-      <SectionTitle color={HADES.magicPurple}>Ventures & Companies</SectionTitle>
+    <StoneTablet accentColor={GOW.bifrostPurple} ariaLabel="Companies and ventures" className="mb-6">
+      <SectionTitle color={GOW.bifrostPurple} icon="rune">Ventures & Companies</SectionTitle>
 
       <div className="grid gap-3">
         {COMPANIES.map((company) => (
@@ -864,8 +963,8 @@ function CompaniesSection() {
             rel="noopener noreferrer"
             className="block p-3 transition-all group hover:translate-x-1"
             style={{
-              background: `linear-gradient(135deg, ${HADES.stoneLight}60, transparent)`,
-              border: `1px solid ${HADES.magicPurple}30`,
+              background: `linear-gradient(135deg, ${GOW.stoneMid}60, transparent)`,
+              border: `1px solid ${GOW.bifrostPurple}30`,
             }}
             aria-label={`${company.name} - ${company.tagline}`}
           >
@@ -873,10 +972,10 @@ function CompaniesSection() {
               <div className="flex items-center gap-2">
                 <span className="text-base">{company.icon}</span>
                 <div>
-                  <h3 className="text-sm font-bold" style={{ color: HADES.textPrimary }}>
+                  <h3 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
                     {company.name}
                   </h3>
-                  <p className="text-xs" style={{ color: HADES.magicPurple }}>
+                  <p className="text-xs" style={{ color: GOW.bifrostPurple }}>
                     {company.tagline}
                   </p>
                 </div>
@@ -886,10 +985,10 @@ function CompaniesSection() {
                 className="w-3 h-3 opacity-40 group-hover:opacity-100 transition-opacity"
                 aria-hidden="true"
               >
-                <path d="M4 12L12 4M12 4H6M12 4v6" fill="none" stroke={HADES.magicPurple} strokeWidth="2" />
+                <path d="M4 12L12 4M12 4H6M12 4v6" fill="none" stroke={GOW.bifrostPurple} strokeWidth="2" />
               </svg>
             </div>
-            <p className="text-xs mb-2" style={{ color: HADES.textSecondary }}>
+            <p className="text-xs mb-2" style={{ color: GOW.textSecondary }}>
               {company.description}
             </p>
             <div className="flex flex-wrap gap-1">
@@ -898,9 +997,9 @@ function CompaniesSection() {
                   key={service}
                   className="text-xs px-1.5 py-0.5"
                   style={{
-                    background: `${HADES.magicPurple}10`,
-                    border: `1px solid ${HADES.magicPurple}25`,
-                    color: HADES.textSecondary,
+                    background: `${GOW.bifrostPurple}10`,
+                    border: `1px solid ${GOW.bifrostPurple}25`,
+                    color: GOW.textSecondary,
                   }}
                 >
                   {service}
@@ -915,12 +1014,12 @@ function CompaniesSection() {
 }
 
 // =============================================================================
-// BANDS SECTION - Musical projects
+// BANDS SECTION - Musical projects (Fire themed)
 // =============================================================================
 function BandsSection() {
   return (
-    <StoneTablet accentColor={HADES.fireOrange} ariaLabel="Musical projects and bands" className="mb-6">
-      <SectionTitle color={HADES.fireOrange}>Musical Projects</SectionTitle>
+    <StoneTablet accentColor={GOW.fireOrange} variant="fire" ariaLabel="Musical projects and bands" className="mb-6">
+      <SectionTitle color={GOW.fireOrange} icon="blade">Musical Projects</SectionTitle>
 
       <div className="grid gap-3">
         {BANDS.map((band) => (
@@ -928,28 +1027,28 @@ function BandsSection() {
             key={band.id}
             className="p-3 transition-all hover:translate-x-1"
             style={{
-              background: `linear-gradient(135deg, ${HADES.stoneLight}60, transparent)`,
-              border: `1px solid ${HADES.fireOrange}30`,
+              background: `linear-gradient(135deg, ${GOW.stoneMid}60, transparent)`,
+              border: `1px solid ${GOW.fireOrange}30`,
             }}
           >
             <div className="flex justify-between items-start mb-1">
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold" style={{ color: HADES.textPrimary }}>
+                  <h3 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
                     {band.name}
                   </h3>
                   {band.active && (
                     <span
                       className="w-2 h-2 rounded-full"
                       style={{
-                        background: HADES.styxBright,
-                        boxShadow: `0 0 6px ${HADES.styxBright}`,
+                        background: GOW.fireYellow,
+                        boxShadow: `0 0 6px ${GOW.fireYellow}`,
                       }}
                       aria-label="Currently active"
                     />
                   )}
                 </div>
-                <p className="text-xs" style={{ color: HADES.fireOrange }}>
+                <p className="text-xs" style={{ color: GOW.fireOrange }}>
                   {band.genre} - {band.role}
                 </p>
               </div>
@@ -962,12 +1061,12 @@ function BandsSection() {
                   aria-label={`Visit ${band.name} website`}
                 >
                   <svg viewBox="0 0 16 16" className="w-3 h-3">
-                    <path d="M4 12L12 4M12 4H6M12 4v6" fill="none" stroke={HADES.fireOrange} strokeWidth="2" />
+                    <path d="M4 12L12 4M12 4H6M12 4v6" fill="none" stroke={GOW.fireOrange} strokeWidth="2" />
                   </svg>
                 </a>
               )}
             </div>
-            <p className="text-xs" style={{ color: HADES.textSecondary }}>
+            <p className="text-xs" style={{ color: GOW.textSecondary }}>
               {band.description}
             </p>
           </div>
@@ -980,7 +1079,7 @@ function BandsSection() {
 // =============================================================================
 // EXPERIENCE CARD
 // =============================================================================
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
+function ExperienceCard({ entry, color }: { entry: typeof EXPERIENCE_DATA[0]; color: string }) {
   const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
   const startDisplay = new Date(entry.startDate).getFullYear()
 
@@ -988,42 +1087,40 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
     <div
       className="relative p-3"
       style={{
-        background: `linear-gradient(135deg, ${HADES.stoneLight}50, transparent)`,
-        borderLeft: `3px solid ${HADES.goldBright}`,
+        background: `linear-gradient(135deg, ${GOW.stoneMid}50, transparent)`,
+        borderLeft: `3px solid ${color}`,
       }}
     >
       <div className="flex justify-between items-start mb-1">
         <div>
-          <h4 className="text-sm font-bold" style={{ color: HADES.textPrimary }}>
+          <h4 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
             {entry.title}
           </h4>
-          <p className="text-xs" style={{ color: HADES.goldBright }}>
+          <p className="text-xs" style={{ color }}>
             {entry.organization}
           </p>
         </div>
         <span
           className="text-xs px-2 py-0.5"
           style={{
-            background: `${HADES.zagRed}20`,
-            border: `1px solid ${HADES.zagRed}40`,
-            color: HADES.zagRedBright,
+            background: `${color}20`,
+            border: `1px solid ${color}40`,
+            color,
           }}
         >
           {startDisplay} - {endDisplay}
         </span>
       </div>
 
-      <p className="text-xs mb-1" style={{ color: HADES.textSecondary }}>
+      <p className="text-xs mb-1" style={{ color: GOW.textSecondary }}>
         {entry.description}
       </p>
 
       {entry.highlights && entry.highlights.length > 0 && (
         <ul className="space-y-0.5 mt-2">
           {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-xs flex items-start gap-1.5" style={{ color: HADES.textPrimary }}>
-              <span style={{ color: HADES.goldBright }} aria-hidden="true">
-                &#9670;
-              </span>
+            <li key={i} className="text-xs flex items-start gap-1.5" style={{ color: GOW.textPrimary }}>
+              <span style={{ color }} aria-hidden="true">ᚱ</span>
               {highlight}
             </li>
           ))}
@@ -1036,32 +1133,33 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 // =============================================================================
 // PROJECT CARD
 // =============================================================================
-function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+function ProjectCard({ project, color }: { project: typeof PROJECTS_DATA[0]; color: string }) {
   return (
     <div
       className="relative p-3 transition-all hover:translate-y-[-2px] group"
       style={{
-        background: `linear-gradient(135deg, ${HADES.stoneLight}, ${HADES.stoneMid})`,
-        border: `2px solid ${HADES.zagRed}50`,
+        background: `linear-gradient(135deg, ${GOW.stoneMid}, ${GOW.stoneDark})`,
+        border: `2px solid ${color}40`,
       }}
     >
       <div className="flex justify-between items-start mb-1">
-        <h3 className="text-sm font-bold" style={{ color: HADES.zagRedBright }}>
+        <h3 className="text-sm font-bold" style={{ color }}>
           {project.name}
         </h3>
         {project.featured && (
           <svg viewBox="0 0 16 20" className="w-3 h-4" aria-label="Featured project">
-            <polygon points="8,0 16,5 16,15 8,20 0,15 0,5" fill={HADES.goldBright} />
+            <path d="M8 2 L14 6 L14 14 L8 18 L2 14 L2 6 Z" fill={GOW.goldBright} />
+            <text x="8" y="12" textAnchor="middle" fill={GOW.bgDark} fontSize="6" fontFamily="serif">ᚠ</text>
           </svg>
         )}
       </div>
 
-      <p className="text-xs mb-1" style={{ color: HADES.textSecondary }}>
+      <p className="text-xs mb-1" style={{ color: GOW.textSecondary }}>
         {project.tagline}
       </p>
 
       {project.impact && (
-        <p className="text-xs mb-2 italic" style={{ color: HADES.styxMid }}>
+        <p className="text-xs mb-2 italic" style={{ color: GOW.frostMid }}>
           {project.impact}
         </p>
       )}
@@ -1072,9 +1170,9 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
             key={tech}
             className="text-xs px-1.5 py-0.5"
             style={{
-              background: `${HADES.zagRed}15`,
-              border: `1px solid ${HADES.zagRed}30`,
-              color: HADES.zagRedBright,
+              background: `${color}15`,
+              border: `1px solid ${color}30`,
+              color,
             }}
           >
             {tech}
@@ -1086,7 +1184,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
         style={{
-          boxShadow: `inset 0 0 15px ${HADES.zagRed}20, 0 0 10px ${HADES.zagRed}15`,
+          boxShadow: `inset 0 0 15px ${color}20, 0 0 10px ${color}15`,
         }}
         aria-hidden="true"
       />
@@ -1095,19 +1193,96 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
 }
 
 // =============================================================================
-// ART BREAK - Decorative divider with urns
+// ART BREAK - Decorative divider with World Serpent
 // =============================================================================
-function ArtBreak() {
+function ArtBreak({ variant = 'serpent' }: { variant?: 'serpent' | 'weapons' | 'bifrost' }) {
   return (
-    <div className="flex items-center justify-center gap-4 my-6" aria-hidden="true">
-      <GreekUrn size={28} />
-      <div className="flex items-center gap-2">
-        <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HADES.goldBright})` }} />
-        <Skull size={16} />
-        <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, ${HADES.goldBright}, transparent)` }} />
-      </div>
-      <GreekUrn size={28} />
+    <div className="flex items-center justify-center gap-4 my-8 py-4" aria-hidden="true">
+      {variant === 'serpent' && (
+        <>
+          <LeviathanAxe size={32} />
+          <WorldSerpent size={40} />
+          <BladesOfChaos size={28} />
+        </>
+      )}
+      {variant === 'weapons' && (
+        <>
+          <LeviathanAxe size={36} />
+          <div className="flex items-center gap-2">
+            <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, transparent, ${GOW.goldBright})` }} />
+            <span className="text-lg" style={{ color: GOW.goldBright, fontFamily: 'serif' }}>ᚠ</span>
+            <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, ${GOW.goldBright}, transparent)` }} />
+          </div>
+          <BladesOfChaos size={36} />
+        </>
+      )}
+      {variant === 'bifrost' && (
+        <div
+          className="w-full max-w-md h-1 rounded-full"
+          style={{
+            background: `linear-gradient(90deg,
+              transparent,
+              ${GOW.frostBright},
+              ${GOW.bifrostGreen},
+              ${GOW.bifrostYellow},
+              ${GOW.bifrostOrange},
+              ${GOW.bifrostPurple},
+              transparent
+            )`,
+            filter: 'blur(1px)',
+          }}
+        />
+      )}
     </div>
+  )
+}
+
+// =============================================================================
+// POSTS SECTION - Blog/content placeholder
+// =============================================================================
+function PostsSection() {
+  const posts = [
+    {
+      id: 'building-with-elixir',
+      title: 'Building Enterprise Systems with Elixir',
+      excerpt: 'Lessons learned from scaling Phoenix applications to handle millions of transactions.',
+      date: '2026-04',
+    },
+    {
+      id: 'kubernetes-patterns',
+      title: 'Kubernetes Patterns for Production',
+      excerpt: 'Real-world deployment strategies and GitOps workflows.',
+      date: '2026-03',
+    },
+  ]
+
+  return (
+    <StoneTablet accentColor={GOW.frostMid} variant="frost" ariaLabel="Recent posts" className="mb-6">
+      <SectionTitle color={GOW.frostMid} icon="rune">Wisdom Shared</SectionTitle>
+
+      <div className="grid gap-3">
+        {posts.map((post) => (
+          <div
+            key={post.id}
+            className="p-3 transition-all hover:translate-x-1"
+            style={{
+              background: `linear-gradient(90deg, ${GOW.stoneMid}40, transparent)`,
+              borderLeft: `2px solid ${GOW.frostMid}`,
+            }}
+          >
+            <h4 className="text-sm font-medium mb-1" style={{ color: GOW.textPrimary }}>
+              {post.title}
+            </h4>
+            <p className="text-xs mb-1" style={{ color: GOW.textSecondary }}>
+              {post.excerpt}
+            </p>
+            <span className="text-xs" style={{ color: GOW.textMuted }}>
+              {post.date}
+            </span>
+          </div>
+        ))}
+      </div>
+    </StoneTablet>
   )
 }
 
@@ -1131,55 +1306,60 @@ export default function MythicTheme() {
 
   if (!mounted) return null
 
-  const godColors = {
-    engineer: HADES.styxBright,
-    drummer: HADES.fireOrange,
-    fighter: HADES.zagRedBright,
+  const realmColors = {
+    engineer: GOW.frostBright,
+    drummer: GOW.fireOrange,
+    fighter: GOW.bloodBright,
   }
+
+  const currentColor = realmColors[active]
 
   return (
     <div
       className="min-h-screen relative overflow-hidden"
       style={{
-        background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='%232a2a30'/%3E%3Crect x='0' y='0' width='38' height='38' fill='%23252528'/%3E%3Crect x='42' y='0' width='38' height='38' fill='%233d3d45'/%3E%3Crect x='0' y='42' width='38' height='38' fill='%233d3d45'/%3E%3Crect x='42' y='42' width='38' height='38' fill='%23252528'/%3E%3Cline x1='0' y1='40' x2='80' y2='40' stroke='%231a1a1c' stroke-width='4'/%3E%3Cline x1='40' y1='0' x2='40' y2='80' stroke='%231a1a1c' stroke-width='4'/%3E%3C/svg%3E")`,
+        background: `
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%231A1A1A'/%3E%3Cpath d='M10 10 Q30 0 50 10 Q60 30 50 50 Q30 60 10 50 Q0 30 10 10' fill='none' stroke='%23333' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E"),
+          linear-gradient(180deg, ${GOW.bgDarkest} 0%, ${GOW.bgDark} 50%, ${GOW.stoneDark} 100%)
+        `,
         fontFamily: '"Cinzel", Georgia, serif',
       }}
       role="main"
       aria-label="Alexander Pulido - Portfolio"
     >
-      <HadesPatterns />
+      <NorsePatterns />
 
       {/* Background effects */}
-      <BloodSplatters />
-      <StyxPools />
-      <FloatingEmbers reducedMotion={reducedMotion} />
+      <FrostParticles reducedMotion={reducedMotion} />
+      <FireEmbers reducedMotion={reducedMotion} />
+      <BifrostEdge />
       <Vignette />
 
-      {/* Greek columns */}
-      <GreekColumn side="left" />
-      <GreekColumn side="right" />
+      {/* Nordic pillars */}
+      <NordicPillar side="left" />
+      <NordicPillar side="right" />
 
       {/* ========== HEADER ========== */}
       <header className="relative z-30 p-4 md:p-6 lg:px-20" role="banner">
         <div className="max-w-4xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex items-center gap-3">
-              {/* Skull logo */}
-              <Skull size={36} />
+            <div className="flex items-center gap-4">
+              {/* Kratos silhouette */}
+              <KratosSilhouette size={48} />
               <div>
                 <h1
-                  className="text-xl md:text-2xl tracking-[0.15em] uppercase"
+                  className="text-xl md:text-2xl tracking-[0.12em] uppercase"
                   style={{
-                    color: HADES.goldBright,
-                    textShadow: `0 0 20px ${HADES.goldBright}40, 0 2px 4px ${HADES.stoneDark}`,
+                    color: GOW.goldBright,
+                    textShadow: `0 0 20px ${GOW.goldGlow}, 0 2px 4px ${GOW.bgDarkest}`,
                   }}
                 >
                   Alexander Pulido
                 </h1>
-                <p className="text-xs tracking-widest uppercase" style={{ color: HADES.textPrimary }}>
+                <p className="text-xs tracking-widest uppercase" style={{ color: GOW.textPrimary }}>
                   {active === 'engineer' ? PROFESSIONAL_SUMMARY.headline : config.title}
                 </p>
-                <p className="text-xs tracking-wider italic mt-0.5" style={{ color: godColors[active] }}>
+                <p className="text-xs tracking-wider italic mt-0.5" style={{ color: currentColor }}>
                   {active === 'engineer' ? PROFESSIONAL_SUMMARY.tagline : aboutData.headline}
                 </p>
               </div>
@@ -1191,29 +1371,29 @@ export default function MythicTheme() {
                 className="px-3 py-1.5 text-xs tracking-wider uppercase transition-all hover:scale-105 relative group"
                 style={{
                   background: 'transparent',
-                  border: `2px solid ${HADES.goldBright}`,
-                  color: HADES.goldBright,
+                  border: `2px solid ${GOW.goldBright}`,
+                  color: GOW.goldBright,
                 }}
               >
                 <span className="relative z-10">Codex</span>
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: `${HADES.goldBright}15` }}
+                  style={{ background: `${GOW.goldBright}15` }}
                 />
               </Link>
               <Link
                 href="/personal-projects/game-engine"
                 className="px-3 py-1.5 text-xs tracking-wider uppercase transition-all hover:scale-105 relative overflow-hidden group"
                 style={{
-                  background: `linear-gradient(180deg, ${HADES.zagRedBright}, ${HADES.zagRed})`,
-                  color: HADES.textPrimary,
-                  boxShadow: `0 0 10px ${HADES.zagRed}60`,
+                  background: `linear-gradient(180deg, ${GOW.frostBright}, ${GOW.frostDark})`,
+                  color: GOW.bgDark,
+                  boxShadow: `0 0 10px ${GOW.frostGlow}`,
                 }}
               >
-                <span className="relative z-10">Enter Tartarus</span>
+                <span className="relative z-10 font-bold">Enter Midgard</span>
                 <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: `linear-gradient(180deg, ${HADES.fireOrange}, ${HADES.zagRedBright})` }}
+                  style={{ background: `linear-gradient(180deg, ${GOW.frostMid}, ${GOW.frostBright})` }}
                 />
               </Link>
               <ThemeSwitcher />
@@ -1222,16 +1402,16 @@ export default function MythicTheme() {
         </div>
       </header>
 
-      {/* ========== BOON SELECTION ========== */}
+      {/* ========== REALM SELECTION ========== */}
       <section className="relative z-20 py-4" role="region" aria-label="Select profession">
         <div className="text-center mb-3">
-          <span className="text-xs tracking-[0.25em] uppercase" style={{ color: HADES.goldBright }}>
-            Choose Your Patron
+          <span className="text-xs tracking-[0.25em] uppercase" style={{ color: GOW.goldBright }}>
+            Choose Your Realm
           </span>
         </div>
         <div className="flex justify-center gap-4 md:gap-6" role="radiogroup" aria-label="Profession selection">
           {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-            <BoonSelector key={prof} profession={prof} isActive={active === prof} onClick={() => setActive(prof)} />
+            <RealmSelector key={prof} profession={prof} isActive={active === prof} onClick={() => setActive(prof)} />
           ))}
         </div>
       </section>
@@ -1240,14 +1420,14 @@ export default function MythicTheme() {
       <main className="relative z-20 px-4 md:px-6 lg:px-20 py-6 pb-32">
         <div className="max-w-4xl mx-auto">
           {/* ===== ABOUT SECTION ===== */}
-          <StoneTablet accentColor={godColors[active]} ariaLabel="About section" className="mb-6">
-            <GreekMeander className="mb-4 max-w-xs mx-auto" />
+          <StoneTablet accentColor={currentColor} ariaLabel="About section" className="mb-6">
+            <RuneBorder color={currentColor} className="mb-4 max-w-xs mx-auto" />
 
-            <SectionTitle>The Prince Speaks</SectionTitle>
+            <SectionTitle color={currentColor}>The Warrior Speaks</SectionTitle>
 
             <p
               className="text-sm leading-relaxed italic max-w-2xl mx-auto text-center mb-4"
-              style={{ color: HADES.textPrimary }}
+              style={{ color: GOW.textPrimary }}
             >
               &ldquo;{active === 'engineer' ? PROFESSIONAL_SUMMARY.bio : aboutData.bio}&rdquo;
             </p>
@@ -1259,9 +1439,9 @@ export default function MythicTheme() {
                     key={i}
                     className="text-xs px-2 py-0.5"
                     style={{
-                      background: `${HADES.styxBright}12`,
-                      border: `1px solid ${HADES.styxBright}35`,
-                      color: HADES.styxBright,
+                      background: `${GOW.frostBright}12`,
+                      border: `1px solid ${GOW.frostBright}35`,
+                      color: GOW.frostBright,
                     }}
                   >
                     {highlight}
@@ -1276,9 +1456,9 @@ export default function MythicTheme() {
                   key={i}
                   className="text-xs px-3 py-0.5"
                   style={{
-                    background: `${HADES.zagRed}15`,
-                    border: `1px solid ${HADES.zagRed}50`,
-                    color: HADES.zagRedBright,
+                    background: `${currentColor}15`,
+                    border: `1px solid ${currentColor}40`,
+                    color: currentColor,
                   }}
                 >
                   {fact}
@@ -1286,98 +1466,118 @@ export default function MythicTheme() {
               ))}
             </div>
 
-            <GreekMeander className="mt-4 max-w-xs mx-auto" />
+            <RuneBorder color={currentColor} className="mt-4 max-w-xs mx-auto" />
           </StoneTablet>
 
-          <ArtBreak />
-
-          {/* ===== CURRENT ROLES (Engineer) ===== */}
-          {active === 'engineer' && <CurrentRolesSection color={godColors[active]} />}
-
-          {/* ===== COMPANIES (Engineer) ===== */}
-          {active === 'engineer' && <CompaniesSection />}
-
-          {/* ===== BANDS (Drummer) ===== */}
-          {active === 'drummer' && <BandsSection />}
-
-          <ArtBreak />
+          {/* ===== ART BREAK 1 ===== */}
+          <ArtBreak variant="serpent" />
 
           {/* ===== EXPERIENCE ===== */}
           {experience.length > 0 && (
-            <StoneTablet accentColor={HADES.goldBright} ariaLabel="Work experience" className="mb-6">
-              <GreekMeander className="mb-4" />
-
+            <StoneTablet accentColor={GOW.goldBright} ariaLabel="Work experience" className="mb-6">
               <SectionTitle>Trials Completed</SectionTitle>
 
               <div className="space-y-3">
                 {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
+                  <ExperienceCard key={entry.id} entry={entry} color={currentColor} />
                 ))}
               </div>
             </StoneTablet>
           )}
 
-          <ArtBreak />
+          {/* ===== ART BREAK 2 ===== */}
+          <ArtBreak variant="weapons" />
 
           {/* ===== GRID: SKILLS + PROJECTS ===== */}
           <div className="grid md:grid-cols-2 gap-6 mt-6">
             {/* Tech Stack / Skills */}
             <StoneTablet
-              accentColor={godColors[active]}
+              accentColor={currentColor}
+              variant={active === 'engineer' ? 'frost' : active === 'drummer' ? 'fire' : 'default'}
               ariaLabel={active === 'engineer' ? 'Technology stack' : 'Skills and expertise'}
             >
-              <SectionTitle color={godColors[active]}>
+              <SectionTitle color={currentColor} icon={active === 'engineer' ? 'axe' : 'blade'}>
                 {active === 'engineer' ? 'Arsenal' : 'Mastery'}
               </SectionTitle>
 
               {active === 'engineer' ? (
-                <TechStackDisplay color={godColors[active]} />
+                <TechStackDisplay color={currentColor} />
               ) : (
-                <AchievementDisplay profession={active} color={godColors[active]} />
+                <AchievementDisplay profession={active} color={currentColor} />
               )}
             </StoneTablet>
 
             {/* Projects */}
             <div>
-              <SectionTitle color={HADES.zagRedBright}>Legendary Deeds</SectionTitle>
+              <SectionTitle color={GOW.goldBright}>Legendary Deeds</SectionTitle>
 
               <div className="space-y-3">
                 {projects.slice(0, 4).map((project) => (
-                  <ProjectCard key={project.id} project={project} />
+                  <ProjectCard key={project.id} project={project} color={currentColor} />
                 ))}
               </div>
             </div>
           </div>
+
+          {/* ===== ART BREAK 3 ===== */}
+          <ArtBreak variant="bifrost" />
+
+          {/* ===== VENTURES / BANDS (profession-specific) ===== */}
+          {active === 'engineer' && (
+            <>
+              <CurrentRolesSection color={currentColor} />
+              <CompaniesSection />
+            </>
+          )}
+
+          {active === 'drummer' && <BandsSection />}
+
+          {/* ===== POSTS SECTION ===== */}
+          <PostsSection />
         </div>
       </main>
 
       {/* ========== FOOTER ========== */}
       <footer className="relative z-20 py-6 text-center pb-28" role="contentinfo">
-        <GreekMeander className="max-w-xs mx-auto mb-3" />
+        <RuneBorder color={GOW.goldMid} className="max-w-xs mx-auto mb-3" />
 
         <p
           className="text-xs tracking-widest flex items-center justify-center gap-3"
-          style={{ color: HADES.textSecondary }}
+          style={{ color: GOW.textSecondary }}
         >
-          <span style={{ color: HADES.goldBright }} aria-hidden="true">
-            &#9670;
-          </span>
-          Death Is Not The End
-          <span style={{ color: HADES.goldBright }} aria-hidden="true">
-            &#9670;
-          </span>
+          <span style={{ color: GOW.frostBright }} aria-hidden="true">ᚠ</span>
+          The Journey Continues
+          <span style={{ color: GOW.fireOrange }} aria-hidden="true">ᚱ</span>
           <span aria-label="Year 2026">MMXXVI</span>
-          <span style={{ color: HADES.goldBright }} aria-hidden="true">
-            &#9670;
-          </span>
+          <span style={{ color: GOW.goldBright }} aria-hidden="true">ᚦ</span>
         </p>
 
-        <GreekMeander className="max-w-xs mx-auto mt-3" />
+        <RuneBorder color={GOW.goldMid} className="max-w-xs mx-auto mt-3" />
       </footer>
 
       {/* ========== CSS ANIMATIONS ========== */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
+
+        @keyframes frost-fall {
+          0% {
+            opacity: 0;
+            transform: translateY(-10px) scale(0.5);
+          }
+          10% {
+            opacity: 0.8;
+          }
+          90% {
+            opacity: 0.6;
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(100vh) scale(0.2);
+          }
+        }
+        .animate-frost-fall {
+          animation: frost-fall linear infinite;
+        }
 
         @keyframes ember-rise {
           0% {
@@ -1393,65 +1593,61 @@ export default function MythicTheme() {
           animation: ember-rise linear infinite;
         }
 
-        @keyframes styx-glow {
-          0%,
-          100% {
-            opacity: 0.5;
-          }
-          50% {
+        @keyframes bifrost-pulse {
+          0%, 100% {
             opacity: 0.8;
           }
+          50% {
+            opacity: 1;
+          }
         }
-        .animate-styx-glow {
-          animation: styx-glow 3s ease-in-out infinite;
+        .animate-bifrost-pulse {
+          animation: bifrost-pulse 4s ease-in-out infinite;
         }
 
-        @keyframes styx-ripple {
-          0%,
-          100% {
+        @keyframes pillar-frost {
+          0%, 100% {
             opacity: 0.3;
-            transform: scaleX(0.8);
+            transform: translateY(0);
           }
           50% {
-            opacity: 0.7;
-            transform: scaleX(1.2);
+            opacity: 0.6;
+            transform: translateY(-10px);
           }
         }
-        .animate-styx-ripple {
-          animation: styx-ripple 4s ease-in-out infinite;
+        .animate-pillar-frost {
+          animation: pillar-frost 6s ease-in-out infinite;
         }
 
-        @keyframes pool-pulse {
-          0%,
-          100% {
-            opacity: 0.4;
-            transform: scale(1);
+        @keyframes pillar-fire {
+          0%, 100% {
+            opacity: 0.3;
+            transform: translateY(0);
           }
           50% {
-            opacity: 0.7;
-            transform: scale(1.1);
+            opacity: 0.5;
+            transform: translateY(10px);
           }
         }
-        .animate-pool-pulse {
-          animation: pool-pulse 5s ease-in-out infinite;
+        .animate-pillar-fire {
+          animation: pillar-fire 5s ease-in-out infinite;
         }
 
-        @keyframes boon-pulse {
-          0%,
-          100% {
+        @keyframes realm-pulse {
+          0%, 100% {
             opacity: 0.3;
             transform: scale(1);
           }
           50% {
             opacity: 0.6;
-            transform: scale(1.05);
+            transform: scale(1.02);
           }
         }
-        .animate-boon-pulse {
-          animation: boon-pulse 2s ease-in-out infinite;
+        .animate-realm-pulse {
+          animation: realm-pulse 2s ease-in-out infinite;
         }
 
-        /* Reduced motion */
+        /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
           *,
           *::before,
@@ -1460,6 +1656,18 @@ export default function MythicTheme() {
             animation-iteration-count: 1 !important;
             transition-duration: 0.01ms !important;
           }
+        }
+
+        /* Focus styles for accessibility */
+        *:focus-visible {
+          outline: 2px solid ${GOW.frostBright};
+          outline-offset: 2px;
+        }
+
+        button:focus-visible,
+        a:focus-visible {
+          outline: 2px solid ${GOW.goldBright};
+          outline-offset: 2px;
         }
       `}</style>
     </div>
