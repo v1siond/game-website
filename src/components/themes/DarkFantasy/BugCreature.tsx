@@ -246,127 +246,131 @@ export const BugPullReveal = memo(function BugPullReveal({
     return () => timers.forEach(t => clearTimeout(t))
   }, [triggered])
 
-  // Alex enters from RIGHT, faces LEFT to stop incoming attack
+  // Alex on LEFT, faces RIGHT to defend against incoming attack
   const getAlexStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
-        return { right: '-100px', opacity: 0 }
+        return { left: '-100px', opacity: 0 }
       case 'alex-enters':
         return {
-          right: '8%',
+          left: '8%',
           opacity: 1,
           transition: 'all 300ms ease-out'
         }
       case 'bug-appears':
       case 'bug-throws':
         return {
-          right: '8%',
+          left: '8%',
           opacity: 1
         }
       case 'content-lands':
         // Alex braces to stop content
         return {
-          right: '10%',
+          left: '6%',
           opacity: 1,
           transition: 'all 150ms ease-out'
         }
       case 'attack-stance':
-      case 'complete':
-        // Alex stands guard
+        // Alex ready for battle
         return {
-          right: '10%',
-          opacity: phase === 'complete' ? 0.5 : 1,
-          transition: 'opacity 300ms'
+          left: '6%',
+          opacity: 1
+        }
+      case 'complete':
+        // Alex stays in ready stance with breathing animation
+        return {
+          left: '6%',
+          opacity: 1,
+          animation: 'knightBreathing 2s ease-in-out infinite'
         }
       default:
-        return { right: '-100px', opacity: 0 }
+        return { left: '-100px', opacity: 0 }
     }
   }
 
-  // Bug comes from LEFT pushing content, then retreats to attack stance
+  // Bug attacks from RIGHT, retreats to attack stance on RIGHT
   const getBugStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
       case 'alex-enters':
-        // Bug hidden off-screen LEFT
-        return { left: '-150px', opacity: 0, transform: 'translateY(0)' }
+        // Bug hidden off-screen RIGHT
+        return { right: '-150px', opacity: 0, transform: 'translateY(0)' }
       case 'bug-appears':
-        // Bug enters from LEFT pushing content toward center
+        // Bug enters from RIGHT pushing content toward center
         return {
-          left: '5%',
+          right: '5%',
           opacity: 1,
           transform: 'translateY(0)',
           transition: 'all 400ms ease-out'
         }
       case 'bug-throws':
-        // Bug lunges RIGHT pushing content toward Alex
+        // Bug lunges LEFT pushing content toward Alex
         return {
-          left: '25%',
+          right: '25%',
           opacity: 1,
-          transform: 'translateY(-5px) rotate(5deg)',
+          transform: 'translateY(-5px) rotate(-5deg)',
           transition: 'all 250ms ease-out'
         }
       case 'content-lands':
         // Bug recoils as Alex stops the content
         return {
-          left: '15%',
+          right: '15%',
           opacity: 1,
-          transform: 'translateY(5px) rotate(-3deg)',
+          transform: 'translateY(5px) rotate(3deg)',
           transition: 'all 200ms ease-out'
         }
       case 'attack-stance':
-        // Bug floats UP into attack position on LEFT
+        // Bug floats UP into attack position on RIGHT
         return {
-          left: '8%',
+          right: '8%',
           opacity: 1,
           transform: 'translateY(-40px)',
           transition: 'all 400ms ease-out',
-          animation: 'bugFloat 1000ms ease-in-out infinite'
+          animation: 'bugFloat 1.5s ease-in-out infinite'
         }
       case 'complete':
+        // Bug continues floating menacingly
         return {
-          left: '8%',
-          opacity: 0.5,
+          right: '8%',
+          opacity: 1,
           transform: 'translateY(-40px)',
-          animation: 'bugFloat 1000ms ease-in-out infinite',
-          transition: 'opacity 300ms'
+          animation: 'bugFloat 1.5s ease-in-out infinite'
         }
       default:
-        return { left: '-150px', opacity: 0 }
+        return { right: '-150px', opacity: 0 }
     }
   }
 
-  // Content pushed by bug from LEFT, stopped by Alex in CENTER
+  // Content pushed by bug from RIGHT, stopped by Alex in CENTER
   const getContentStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
       case 'alex-enters':
-        // Content starts off-screen LEFT (with bug)
-        return { transform: 'translateX(-100%)', opacity: 0 }
+        // Content starts off-screen RIGHT (with bug)
+        return { transform: 'translateX(100%)', opacity: 0 }
       case 'bug-appears':
         // Content enters with bug
         return {
-          transform: 'translateX(-60%)',
+          transform: 'translateX(60%)',
           opacity: 0.6,
           transition: 'all 400ms ease-out'
         }
       case 'bug-throws':
         // Content pushed toward Alex
         return {
-          transform: 'translateX(-10%)',
+          transform: 'translateX(10%)',
           opacity: 0.9,
           transition: 'all 250ms ease-out'
         }
       case 'content-lands':
       case 'attack-stance':
+      case 'complete':
         // Alex stops content in center
         return {
           transform: 'translateX(0)',
           opacity: 1,
           transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)'
         }
-      case 'complete':
-        return { transform: 'translateX(0)', opacity: 1 }
       default:
         return { transform: 'translateX(0)', opacity: 1 }
     }
@@ -377,23 +381,23 @@ export const BugPullReveal = memo(function BugPullReveal({
 
   return (
     <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '280px' }}>
-      {/* Alex on the RIGHT, facing LEFT to stop attack */}
+      {/* Alex on LEFT, facing RIGHT to defend */}
       {showAlex && (
         <div
           className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
           style={{ ...getAlexStyle(), position: 'absolute' }}
         >
-          <KnightCharacter scale={1.4} facingDirection="left" />
+          <KnightCharacter scale={1.5} facingDirection="right" />
         </div>
       )}
 
-      {/* Bug pushing content from LEFT */}
+      {/* Bug attacking from RIGHT */}
       {showBug && (
         <div
           className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
           style={{ ...getBugStyle(), position: 'absolute' }}
         >
-          <BattleBug size={110} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
+          <BattleBug size={120} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
         </div>
       )}
 
@@ -406,6 +410,10 @@ export const BugPullReveal = memo(function BugPullReveal({
         @keyframes bugFloat {
           0%, 100% { transform: translateY(-40px); }
           50% { transform: translateY(-55px); }
+        }
+        @keyframes knightBreathing {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-3px) scale(1.02); }
         }
       `}</style>
     </div>

@@ -218,6 +218,13 @@ export const BattleReveal = memo(function BattleReveal({
           opacity: 1,
           transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)'
         }
+      case 'complete':
+        // Knight stays in victory stance with breathing animation
+        return {
+          transform: 'translateX(80px)',
+          opacity: 1,
+          animation: 'knightVictoryBreathing 2.5s ease-in-out infinite'
+        }
       default:
         return {
           transform: 'translateX(80px)',
@@ -429,7 +436,28 @@ export const BattleReveal = memo(function BattleReveal({
             )}
 
             {isBugDead ? (
-              <DeadBugCreature size={120} />
+              <>
+                <DeadBugCreature size={120} />
+                {/* Continuous drip effect when complete */}
+                {phase === 'complete' && (
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 pointer-events-none">
+                    {[0, 1, 2].map((i) => (
+                      <div
+                        key={i}
+                        className="absolute rounded-full"
+                        style={{
+                          width: 4,
+                          height: 6,
+                          backgroundColor: '#ff6b35',
+                          left: `${-10 + i * 10}px`,
+                          animation: `continuousDrip 1.5s ease-in ${i * 0.5}s infinite`,
+                          boxShadow: '0 0 4px #ff6b35',
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </>
             ) : (
               <BattleBug
                 size={120}
@@ -477,10 +505,12 @@ export const BattleBug = memo(function BattleBug({
   antennaPhase?: number
   isHit?: boolean
 }) {
-  const shell = '#2a2040'
-  const shellDark = '#1a1525'
-  const infected = '#ff6b35'
-  const infectedBright = '#ff9955'
+  // More saturated colors
+  const shell = '#352850'
+  const shellDark = '#201530'
+  const infected = '#ff5500'
+  const infectedBright = '#ffaa44'
+  const infectedGlow = '#ff7722'
 
   const getLegY = (index: number) => {
     const offset = index % 2 === 0 ? 0 : 0.5
@@ -495,13 +525,15 @@ export const BattleBug = memo(function BattleBug({
       height={size * 0.7}
       viewBox="0 0 80 56"
       style={{
-        filter: isHit ? 'brightness(2) saturate(0)' : `drop-shadow(0 0 10px ${infected}50)`,
+        filter: isHit
+          ? 'brightness(2) saturate(0)'
+          : `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 4px ${infected}80)`,
         transition: 'filter 100ms'
       }}
     >
       <defs>
         <filter id="battleGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feGaussianBlur stdDeviation="3" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
@@ -1183,6 +1215,30 @@ const battleRevealKeyframes = `
     100% {
       transform: scale(1);
       opacity: 0.6;
+    }
+  }
+
+  @keyframes knightVictoryBreathing {
+    0%, 100% {
+      transform: translateX(80px) translateY(0) scale(1);
+    }
+    50% {
+      transform: translateX(80px) translateY(-4px) scale(1.02);
+    }
+  }
+
+  @keyframes continuousDrip {
+    0% {
+      opacity: 0;
+      transform: translateY(0) scale(0.5);
+    }
+    20% {
+      opacity: 0.7;
+      transform: translateY(5px) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(25px) scale(0.3);
     }
   }
 

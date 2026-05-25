@@ -21,20 +21,21 @@ import { memo, useEffect, useState, ReactNode } from 'react'
 const DF = {
   void: '#0f0a1a',
   voidDeep: '#0a0610',
-  // Alexander's skin tones (from sprite, darkened for HK style)
-  skin: '#8b6b4a',
-  skinShade: '#6b5040',
-  skinHighlight: '#a07b5a',
-  // Beard/hair (dark, nearly void)
-  beard: '#2a2030',
-  beardDark: '#1a1520',
-  hair: '#2a2030',
-  // Cloak
-  cloak: '#2a2535',
-  cloakDark: '#1a1520',
-  // Accents
-  ethereal: '#41c8e8',
-  bone: '#e8e4dc',
+  // Alexander's skin tones - MORE SATURATED
+  skin: '#a5784d',
+  skinShade: '#7a5a3a',
+  skinHighlight: '#c49060',
+  // Beard/hair - richer dark brown
+  beard: '#352838',
+  beardDark: '#221822',
+  hair: '#352838',
+  // Cloak - deeper purple tones
+  cloak: '#3a3050',
+  cloakDark: '#221830',
+  // Accents - brighter ethereal
+  ethereal: '#50e0ff',
+  etherealGlow: '#80ffff',
+  bone: '#f0ece5',
   spiritGlow: '#ffffff',
 }
 
@@ -76,6 +77,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       style={{
         overflow: 'visible',
         transform: isLeft ? 'scaleX(-1)' : 'none',
+        filter: `drop-shadow(0 0 8px ${DF.ethereal}40) drop-shadow(0 0 3px ${DF.void})`,
       }}
     >
       <defs>
@@ -88,7 +90,14 @@ export const KnightCharacter = memo(function KnightCharacter({
           <stop offset="100%" stopColor={DF.cloakDark} />
         </linearGradient>
         <filter id="attackGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id="characterGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
