@@ -14,48 +14,75 @@ import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
-// Hollow Knight color palette
+// Hollow Knight color palette - based on City of Tears zone
 const HK = {
-  void: '#0D0D0D',
-  deepPurple: '#330055',
-  soul: '#6DCCF4',
-  soulDark: '#4E9FD1',
-  bone: '#F5F5F5',
-  mist: '#B0BEC5',
-  thorn: '#6A2C70',
-  infection: '#FF8C00',
+  // Core colors
+  void: '#000000',
+  deepBlue: '#1d2e65',       // City of Tears primary
+  midBlue: '#4d6f94',        // City of Tears secondary
+  paleBlue: '#abc2c5',       // City of Tears highlights
+  darkPurple: '#362e42',     // City of Tears shadows
+  purple: '#330055',         // Main HK purple
+
+  // Character colors
+  bone: '#F7F7F7',           // Knight mask white
+  silver: '#C0C0C0',         // UI elements
+  lavender: '#B7A9D9',       // Soft accents
+
+  // Accent colors
+  soul: '#6DCCF4',           // Soul cyan glow
+  soulDark: '#4E9FD1',       // Darker soul
+  infection: '#FF8C00',      // Orange infection
+
+  // Greenpath accents (for variety)
+  leafGreen: '#4E7E3B',
+  mossGreen: '#2F5D34',
 }
 
-// SVG Hollow Knight Mask - the iconic two-horned face
-function HollowKnightMask({ size = 80, glowing = false }: { size?: number; glowing?: boolean }) {
+// SVG Hollow Knight - simple oval face with curved horns (accurate to game)
+function TheKnight({ size = 60 }: { size?: number }) {
   return (
-    <svg width={size} height={size * 1.2} viewBox="0 0 80 96" className="transition-all duration-300">
-      <defs>
-        <filter id="soulGlow">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      {/* Horns */}
-      <path d="M20,48 Q15,30 8,8 Q12,12 20,20 Q18,35 20,48" fill={HK.bone} />
-      <path d="M60,48 Q65,30 72,8 Q68,12 60,20 Q62,35 60,48" fill={HK.bone} />
-      {/* Face */}
-      <ellipse cx="40" cy="60" rx="25" ry="30" fill={HK.bone} />
-      {/* Eyes - void black with soul glow when active */}
-      <ellipse
-        cx="30" cy="55" rx="6" ry="8"
-        fill={glowing ? HK.soul : HK.void}
-        filter={glowing ? "url(#soulGlow)" : undefined}
+    <svg width={size} height={size * 1.4} viewBox="0 0 40 56" className="transition-all duration-300">
+      {/* Cloak/body - dark grey */}
+      <ellipse cx="20" cy="48" rx="12" ry="10" fill="#2a2a2a" />
+      <rect x="12" y="38" width="16" height="12" fill="#2a2a2a" />
+
+      {/* Left horn - curved upward */}
+      <path
+        d="M12,22 Q8,14 6,4 Q10,8 14,16 Q12,20 12,22"
+        fill={HK.bone}
+        stroke={HK.bone}
+        strokeWidth="0.5"
       />
-      <ellipse
-        cx="50" cy="55" rx="6" ry="8"
-        fill={glowing ? HK.soul : HK.void}
-        filter={glowing ? "url(#soulGlow)" : undefined}
+      {/* Right horn - curved upward */}
+      <path
+        d="M28,22 Q32,14 34,4 Q30,8 26,16 Q28,20 28,22"
+        fill={HK.bone}
+        stroke={HK.bone}
+        strokeWidth="0.5"
       />
+
+      {/* Face - simple oval */}
+      <ellipse cx="20" cy="28" rx="12" ry="14" fill={HK.bone} />
+
+      {/* Eyes - void black ovals, angled slightly */}
+      <ellipse cx="15" cy="26" rx="3" ry="5" fill={HK.void} />
+      <ellipse cx="25" cy="26" rx="3" ry="5" fill={HK.void} />
     </svg>
+  )
+}
+
+// Soul orb UI element (top-left in game)
+function SoulOrb({ filled = 100 }: { filled?: number }) {
+  return (
+    <div
+      className="relative w-8 h-8 rounded-full"
+      style={{
+        background: `conic-gradient(${HK.bone} ${filled}%, ${HK.void} ${filled}%)`,
+        border: `2px solid ${HK.bone}`,
+        boxShadow: filled > 50 ? `0 0 10px ${HK.soul}` : 'none',
+      }}
+    />
   )
 }
 
@@ -96,23 +123,42 @@ function SoulParticles() {
   )
 }
 
-// Void tendrils - subtle dark wisps at edges
-function VoidTendrils() {
+// City of Tears architectural elements - pillars and ironwork at edges
+function CityArchitecture() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[3]">
-      {/* Left tendril */}
-      <svg className="absolute left-0 top-0 h-full w-32 opacity-40" viewBox="0 0 100 800" preserveAspectRatio="none">
-        <path
-          d="M0,0 Q30,100 10,200 Q40,300 5,400 Q35,500 15,600 Q45,700 0,800 L0,0 Z"
-          fill={HK.deepPurple}
-        />
+      {/* Left pillar */}
+      <svg className="absolute left-0 top-0 h-full w-20 opacity-30" viewBox="0 0 60 800" preserveAspectRatio="none">
+        {/* Gothic pillar shape */}
+        <rect x="5" y="0" width="20" height="800" fill={HK.darkPurple} />
+        <rect x="0" y="0" width="30" height="40" fill={HK.darkPurple} />
+        {/* Ornate curves */}
+        <path d="M25,40 Q40,60 25,100 Q45,140 25,180" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
+        <path d="M25,200 Q40,240 25,280 Q45,320 25,360" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
       </svg>
-      {/* Right tendril */}
-      <svg className="absolute right-0 top-0 h-full w-32 opacity-40" viewBox="0 0 100 800" preserveAspectRatio="none">
-        <path
-          d="M100,0 Q70,100 90,200 Q60,300 95,400 Q65,500 85,600 Q55,700 100,800 L100,0 Z"
-          fill={HK.deepPurple}
-        />
+      {/* Right pillar */}
+      <svg className="absolute right-0 top-0 h-full w-20 opacity-30" viewBox="0 0 60 800" preserveAspectRatio="none">
+        <rect x="35" y="0" width="20" height="800" fill={HK.darkPurple} />
+        <rect x="30" y="0" width="30" height="40" fill={HK.darkPurple} />
+        <path d="M35,40 Q20,60 35,100 Q15,140 35,180" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
+        <path d="M35,200 Q20,240 35,280 Q15,320 35,360" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
+      </svg>
+      {/* Top chandelier hint */}
+      <svg className="absolute top-0 left-1/2 transform -translate-x-1/2 w-64 h-32 opacity-20" viewBox="0 0 200 80">
+        {/* Chandelier chain */}
+        <line x1="100" y1="0" x2="100" y2="20" stroke={HK.silver} strokeWidth="2" />
+        {/* Chandelier body */}
+        <ellipse cx="100" cy="30" rx="40" ry="10" fill="none" stroke={HK.silver} strokeWidth="1" />
+        {/* Hanging ornaments */}
+        <circle cx="70" cy="45" r="4" fill={HK.paleBlue} opacity="0.6" />
+        <circle cx="100" cy="50" r="5" fill={HK.paleBlue} opacity="0.8" />
+        <circle cx="130" cy="45" r="4" fill={HK.paleBlue} opacity="0.6" />
+        {/* Glowing orbs */}
+        <circle cx="60" cy="55" r="3" fill={HK.bone} />
+        <circle cx="80" cy="60" r="3" fill={HK.bone} />
+        <circle cx="100" cy="65" r="4" fill={HK.bone} />
+        <circle cx="120" cy="60" r="3" fill={HK.bone} />
+        <circle cx="140" cy="55" r="3" fill={HK.bone} />
       </svg>
     </div>
   )
@@ -153,7 +199,7 @@ function NailSlashReveal({
           />
           {/* Small mask icon during slash */}
           <div style={{ animation: 'knightDash 0.4s ease-out forwards' }}>
-            <HollowKnightMask size={30} glowing />
+            <TheKnight size={30} />
           </div>
         </div>
       )}
@@ -207,18 +253,18 @@ function BenchWaypoint({
         }`}
         style={{
           background: `radial-gradient(circle at 30% 30%, ${color}30, ${HK.void})`,
-          border: `2px solid ${isActive ? color : HK.deepPurple}`,
+          border: `2px solid ${isActive ? color : HK.darkPurple}`,
           borderRadius: '60% 40% 55% 45% / 45% 55% 40% 60%',
           boxShadow: isActive
             ? `0 0 30px ${color}50, inset 0 0 20px ${color}20`
             : `inset 0 0 15px rgba(0,0,0,0.5)`,
         }}
       >
-        <span className="text-xl mb-1" style={{ color: isActive ? color : HK.mist }}>{icon}</span>
+        <span className="text-xl mb-1" style={{ color: isActive ? color : HK.silver }}>{icon}</span>
         <span
           className="text-[8px] tracking-[0.2em] uppercase"
           style={{
-            color: isActive ? color : HK.mist,
+            color: isActive ? color : HK.silver,
             fontFamily: '"Cinzel", "Garamond", serif',
           }}
         >
@@ -258,7 +304,7 @@ function VoidFrame({ children, title }: { children: React.ReactNode; title: stri
 
       {/* Title with soul dividers */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HK.deepPurple})` }} />
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HK.darkPurple})` }} />
         <h2
           className="text-sm tracking-[0.25em] uppercase"
           style={{
@@ -269,14 +315,14 @@ function VoidFrame({ children, title }: { children: React.ReactNode; title: stri
         >
           {title}
         </h2>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${HK.deepPurple}, transparent)` }} />
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${HK.darkPurple}, transparent)` }} />
       </div>
 
       <div
         className="p-6 relative"
         style={{
-          background: `linear-gradient(180deg, ${HK.void}ee, ${HK.deepPurple}40)`,
-          border: `1px solid ${HK.deepPurple}`,
+          background: `linear-gradient(180deg, ${HK.void}ee, ${HK.darkPurple}40)`,
+          border: `1px solid ${HK.darkPurple}`,
           borderRadius: '4px 8px 4px 8px',
           boxShadow: `inset 0 0 30px rgba(0,0,0,0.4)`,
         }}
@@ -295,7 +341,7 @@ function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSk
         <div key={category.name}>
           <h3
             className="text-xs tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: HK.mist, fontFamily: '"Cinzel", serif' }}
+            style={{ color: HK.silver, fontFamily: '"Cinzel", serif' }}
           >
             <span>{category.icon}</span>
             {category.name}
@@ -330,7 +376,7 @@ function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByP
         <div key={category.name}>
           <h3
             className="text-xs tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: HK.mist, fontFamily: '"Cinzel", serif' }}
+            style={{ color: HK.silver, fontFamily: '"Cinzel", serif' }}
           >
             <span>{category.icon}</span>
             {category.name}
@@ -355,8 +401,8 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
     <div
       className="p-4 transition-all hover:scale-[1.02] cursor-pointer group"
       style={{
-        background: `linear-gradient(135deg, ${HK.void}, ${HK.deepPurple}40)`,
-        border: `1px solid ${project.featured ? HK.soul : HK.deepPurple}`,
+        background: `linear-gradient(135deg, ${HK.void}, ${HK.darkPurple}40)`,
+        border: `1px solid ${project.featured ? HK.soul : HK.darkPurple}`,
         borderRadius: '2px 6px 2px 6px',
         boxShadow: project.featured ? `0 0 20px ${HK.soul}30` : 'none',
       }}
@@ -367,13 +413,13 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
       <h4 className="text-sm mt-1 transition-colors" style={{ color: HK.bone }}>
         {project.name}
       </h4>
-      <p className="text-xs mt-2" style={{ color: HK.mist }}>{project.tagline}</p>
+      <p className="text-xs mt-2" style={{ color: HK.silver }}>{project.tagline}</p>
       {project.impact && (
         <p className="text-xs mt-2 italic" style={{ color: HK.soul }}>→ {project.impact}</p>
       )}
       <div className="flex flex-wrap gap-1 mt-3">
         {project.techStack.slice(0, 4).map((tech) => (
-          <span key={tech} className="text-[8px] px-1 py-0.5" style={{ background: `${HK.soul}15`, color: HK.mist }}>
+          <span key={tech} className="text-[8px] px-1 py-0.5" style={{ background: `${HK.soul}15`, color: HK.silver }}>
             {tech}
           </span>
         ))}
@@ -391,8 +437,8 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
       rel="noopener noreferrer"
       className="block p-4 transition-all hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${HK.void}, ${HK.deepPurple}40)`,
-        border: `1px solid ${HK.deepPurple}`,
+        background: `linear-gradient(135deg, ${HK.void}, ${HK.darkPurple}40)`,
+        border: `1px solid ${HK.darkPurple}`,
         borderRadius: '2px 6px 2px 6px',
       }}
     >
@@ -405,7 +451,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
           <p className="text-[10px]" style={{ color: HK.soul }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-xs" style={{ color: HK.mist }}>{company.description}</p>
+      <p className="text-xs" style={{ color: HK.silver }}>{company.description}</p>
     </a>
   )
 }
@@ -416,8 +462,8 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
     <div
       className="p-4 transition-all hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${HK.void}, ${HK.thorn}30)`,
-        border: `1px solid ${HK.thorn}`,
+        background: `linear-gradient(135deg, ${HK.void}, ${HK.lavender}30)`,
+        border: `1px solid ${HK.lavender}`,
         borderRadius: '2px 6px 2px 6px',
       }}
     >
@@ -425,8 +471,8 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
         {band.name}
       </h4>
       <p className="text-[10px] mt-1" style={{ color: HK.soul }}>{band.genre} • {band.role}</p>
-      <p className="text-xs mt-2" style={{ color: HK.mist }}>{band.description}</p>
-      {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: HK.mist }}>Website coming soon</p>}
+      <p className="text-xs mt-2" style={{ color: HK.silver }}>{band.description}</p>
+      {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: HK.silver }}>Website coming soon</p>}
     </div>
   )
 
@@ -445,8 +491,8 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
     <div
       className="p-4"
       style={{
-        background: `linear-gradient(135deg, ${HK.void}, ${HK.deepPurple}30)`,
-        border: `1px solid ${HK.deepPurple}`,
+        background: `linear-gradient(135deg, ${HK.void}, ${HK.darkPurple}30)`,
+        border: `1px solid ${HK.darkPurple}`,
         borderRadius: '2px 6px 2px 6px',
       }}
     >
@@ -467,7 +513,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-xs mb-2" style={{ color: HK.mist }}>{entry.description}</p>
+      <p className="text-xs mb-2" style={{ color: HK.silver }}>{entry.description}</p>
       {entry.highlights && entry.highlights.length > 0 && (
         <ul className="space-y-1">
           {entry.highlights.map((highlight, i) => (
@@ -501,7 +547,7 @@ export default function DarkFantasyTheme() {
 
   const professionNodes = [
     { id: 'engineer', icon: '⚙', label: 'Engineer', color: HK.soul, position: { x: 25, y: 50 } },
-    { id: 'drummer', icon: '♪', label: 'Musician', color: HK.thorn, position: { x: 50, y: 30 } },
+    { id: 'drummer', icon: '♪', label: 'Musician', color: HK.lavender, position: { x: 50, y: 30 } },
     { id: 'fighter', icon: '⚔', label: 'Fighter', color: HK.infection, position: { x: 75, y: 50 } },
   ]
 
@@ -509,29 +555,30 @@ export default function DarkFantasyTheme() {
     <div
       className="min-h-screen relative overflow-hidden"
       style={{
-        background: `linear-gradient(180deg, ${HK.void}, ${HK.deepPurple}30, ${HK.void})`,
+        background: `linear-gradient(180deg, ${HK.void}, ${HK.deepBlue}, ${HK.darkPurple})`,
         fontFamily: '"Cinzel", "Garamond", serif',
       }}
     >
-      {/* Hollow Knight atmosphere layers */}
+      {/* City of Tears atmosphere - deep blue with rain-like particles */}
       <div
         className="fixed inset-0 z-0"
         style={{
           background: `
-            radial-gradient(ellipse at 20% 80%, ${HK.deepPurple}60 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 20%, ${HK.thorn}30 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 50%, ${HK.deepPurple}20 0%, ${HK.void} 100%)
+            radial-gradient(ellipse at 30% 20%, ${HK.midBlue}40 0%, transparent 40%),
+            radial-gradient(ellipse at 70% 70%, ${HK.deepBlue}60 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 100%, ${HK.paleBlue}20 0%, transparent 40%),
+            linear-gradient(180deg, ${HK.void} 0%, ${HK.deepBlue} 50%, ${HK.darkPurple} 100%)
           `,
         }}
       />
-      <VoidTendrils />
+      <CityArchitecture />
       <SoulParticles />
-      {/* Heavy vignette for that Hollow Knight depth */}
+      {/* Heavy vignette - City of Tears has strong depth */}
       <div
         className="fixed inset-0 pointer-events-none z-[8]"
         style={{
-          boxShadow: `inset 0 0 150px 50px rgba(0,0,0,0.7)`,
-          background: 'radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.5) 100%)',
+          boxShadow: `inset 0 0 200px 80px ${HK.void}`,
+          background: 'radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(0,0,0,0.6) 100%)',
         }}
       />
 
@@ -539,7 +586,7 @@ export default function DarkFantasyTheme() {
       <header className="relative z-30 p-6">
         <div className="max-w-6xl mx-auto flex justify-between items-start">
           <div className="flex items-center gap-6 animate-fade-in-down">
-            <HollowKnightMask size={60} glowing />
+            <TheKnight size={60} />
             <div>
               <h1
                 className="text-3xl tracking-[0.3em] font-normal uppercase"
@@ -550,7 +597,7 @@ export default function DarkFantasyTheme() {
               >
                 Alexander Pulido
               </h1>
-              <p className="text-sm tracking-wider mt-2" style={{ color: HK.mist }}>
+              <p className="text-sm tracking-wider mt-2" style={{ color: HK.silver }}>
                 {PROFESSIONAL_SUMMARY.headline}
               </p>
               <p
@@ -567,8 +614,8 @@ export default function DarkFantasyTheme() {
               href="/cv"
               className="px-4 py-2 text-xs tracking-[0.15em] uppercase transition-all hover:scale-105"
               style={{
-                border: `1px solid ${HK.deepPurple}`,
-                color: HK.mist,
+                border: `1px solid ${HK.darkPurple}`,
+                color: HK.silver,
                 background: `${HK.void}cc`,
                 borderRadius: '2px 4px 2px 4px',
               }}
@@ -603,7 +650,7 @@ export default function DarkFantasyTheme() {
                 className="text-center px-4 py-2"
                 style={{
                   background: `${HK.void}80`,
-                  border: `1px solid ${HK.deepPurple}`,
+                  border: `1px solid ${HK.darkPurple}`,
                   borderRadius: '4px 8px 4px 8px',
                 }}
               >
@@ -621,8 +668,8 @@ export default function DarkFantasyTheme() {
           <div
             className="relative h-48 overflow-hidden"
             style={{
-              background: `linear-gradient(180deg, transparent, ${HK.deepPurple}30)`,
-              border: `1px solid ${HK.deepPurple}40`,
+              background: `linear-gradient(180deg, transparent, ${HK.darkPurple}30)`,
+              border: `1px solid ${HK.darkPurple}40`,
               borderRadius: '4px',
             }}
           >
@@ -747,10 +794,10 @@ export default function DarkFantasyTheme() {
 
       {/* Footer */}
       <footer className="relative z-20 py-12 px-6 text-center">
-        <div className="inline-flex items-center gap-4" style={{ color: HK.mist }}>
-          <div className="w-12 h-px" style={{ background: HK.deepPurple }} />
+        <div className="inline-flex items-center gap-4" style={{ color: HK.silver }}>
+          <div className="w-12 h-px" style={{ background: HK.darkPurple }} />
           <span className="text-xs tracking-[0.2em]" style={{ fontFamily: '"Cinzel", serif' }}>MMXXVI</span>
-          <div className="w-12 h-px" style={{ background: HK.deepPurple }} />
+          <div className="w-12 h-px" style={{ background: HK.darkPurple }} />
         </div>
       </footer>
 
