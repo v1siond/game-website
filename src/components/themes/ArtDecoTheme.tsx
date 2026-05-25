@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -13,7 +12,6 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // Hook for respecting reduced motion preferences
 function useReducedMotion(): boolean {
@@ -65,30 +63,14 @@ const SKILL_ACHIEVEMENTS: Record<string, Record<string, string[]>> = {
   },
 }
 
-// Deep sea diver Alexander - Bioshock style
-function DiverCharacter({
+// Deep sea diver - pure SVG Bioshock diving suit style (no image imports)
+function DiverSilhouette({
   size = 60,
-  direction = 'right',
   className = '',
-  reducedMotion = false,
 }: {
   size?: number
-  direction?: 'left' | 'right'
   className?: string
-  reducedMotion?: boolean
 }) {
-  const [frame, setFrame] = useState(0)
-
-  useEffect(() => {
-    if (reducedMotion) return
-    const interval = setInterval(() => setFrame(f => (f + 1) % 2), 200)
-    return () => clearInterval(interval)
-  }, [reducedMotion])
-
-  const sprite = direction === 'right'
-    ? (frame === 0 ? '/assets/sprites/run_right.png' : '/assets/sprites/run_right_1.png')
-    : (frame === 0 ? '/assets/sprites/run_left.png' : '/assets/sprites/run_left_1.png')
-
   return (
     <div
       className={`relative ${className}`}
@@ -96,32 +78,41 @@ function DiverCharacter({
       role="img"
       aria-label="Rapture citizen in diving suit"
     >
-      <Image
-        src={sprite}
-        alt="Rapture Citizen"
-        fill
-        className="object-contain"
-        style={{ filter: 'brightness(0.85) contrast(1.2) sepia(0.3) hue-rotate(-20deg)' }}
-      />
-      {/* Diving suit helmet glow */}
-      <div
-        className="absolute -top-1 left-1/2 -translate-x-1/2 w-6 h-6 rounded-full"
-        style={{
-          background: 'radial-gradient(circle, rgba(212,175,55,0.4) 0%, transparent 70%)',
-          filter: 'blur(3px)',
-        }}
+      <svg
+        viewBox="0 0 40 60"
+        className="w-full h-full"
         aria-hidden="true"
-      />
-      {/* Underwater bubbles from suit */}
-      {!reducedMotion && (
-        <div
-          className="absolute -top-4 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full animate-bubble-small"
-          style={{
-            background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.6), rgba(200,220,240,0.2))',
-          }}
-          aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="diver-helmet-glow" cx="50%" cy="40%" r="50%">
+            <stop offset="0%" stopColor="#f0c850" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#d4af37" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="diver-body-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#d4af37" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#8b7320" stopOpacity="0.3" />
+          </linearGradient>
+        </defs>
+        {/* Diving helmet */}
+        <ellipse cx="20" cy="14" rx="10" ry="12" fill="url(#diver-body-gradient)" />
+        {/* Helmet porthole */}
+        <circle cx="20" cy="12" r="5" fill="url(#diver-helmet-glow)" />
+        <circle cx="20" cy="12" r="4" fill="#0a1520" opacity="0.5" />
+        <circle cx="20" cy="12" r="5" fill="none" stroke="#d4af37" strokeWidth="0.8" opacity="0.8" />
+        {/* Helmet rivets */}
+        <circle cx="12" cy="14" r="1" fill="#d4af37" opacity="0.6" />
+        <circle cx="28" cy="14" r="1" fill="#d4af37" opacity="0.6" />
+        {/* Body/suit */}
+        <path
+          d="M12 24 Q8 35 10 50 L14 58 L26 58 L30 50 Q32 35 28 24 Q24 22 20 22 Q16 22 12 24"
+          fill="url(#diver-body-gradient)"
         />
-      )}
+        {/* Arms */}
+        <path d="M12 28 L6 38 L8 40 L14 32" fill="#d4af37" opacity="0.3" />
+        <path d="M28 28 L34 38 L32 40 L26 32" fill="#d4af37" opacity="0.3" />
+        {/* Tank */}
+        <ellipse cx="20" cy="35" rx="3" ry="8" fill="#d4af37" opacity="0.2" />
+      </svg>
     </div>
   )
 }
@@ -184,80 +175,17 @@ function RaptureOrnaments({
   )
 }
 
-// Bathysphere reveal section
-function BathysphereRevealSection({
+// Section wrapper - content immediately visible, no hiding animations
+function RaptureSection({
   children,
   className = '',
-  reducedMotion = false,
 }: {
   children: React.ReactNode
   className?: string
-  reducedMotion?: boolean
 }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [phase, setPhase] = useState<'hidden' | 'descending' | 'revealed'>('hidden')
-
-  useEffect(() => {
-    if (hasEntered && phase === 'hidden') {
-      if (reducedMotion) {
-        // Skip animation for reduced motion
-        setPhase('revealed')
-      } else {
-        setPhase('descending')
-        setTimeout(() => setPhase('revealed'), 800)
-      }
-    }
-  }, [hasEntered, phase, reducedMotion])
-
   return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      {/* Bathysphere descent animation */}
-      {phase === 'descending' && !reducedMotion && (
-        <div className="absolute inset-0 z-50 pointer-events-none" aria-hidden="true">
-          {/* Diver swimming across */}
-          <div
-            className="absolute top-1/2 -translate-y-1/2"
-            style={{ animation: 'bathyDescent 0.8s ease-out forwards' }}
-          >
-            <DiverCharacter size={40} direction="right" reducedMotion={reducedMotion} />
-          </div>
-          {/* Bubble trail */}
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full"
-              style={{
-                left: `${10 + i * 8}%`,
-                top: `${45 + (i % 3) * 5}%`,
-                width: 4 + Math.random() * 4,
-                height: 4 + Math.random() * 4,
-                background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(200,220,240,0.2))',
-                animation: `bubbleTrail 0.6s ease-out forwards`,
-                animationDelay: `${i * 0.08}s`,
-              }}
-            />
-          ))}
-          {/* Gold flash */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'radial-gradient(circle at 50% 50%, rgba(212,175,55,0.15) 0%, transparent 50%)',
-              animation: 'goldFlash 0.4s ease-out',
-            }}
-          />
-        </div>
-      )}
-
-      <div
-        style={{
-          opacity: phase === 'revealed' ? 1 : 0,
-          transform: phase === 'revealed' ? 'translateY(0)' : 'translateY(20px)',
-          transition: reducedMotion ? 'none' : 'all 0.6s ease-out',
-        }}
-      >
-        {children}
-      </div>
+    <div className={`relative ${className}`}>
+      {children}
     </div>
   )
 }
@@ -643,7 +571,80 @@ function NeonSign({
   )
 }
 
-// Decorative gold frame - Art deco Rapture style
+// Art Deco corner filigree SVG pattern
+function DecoCornerFiligree({ position }: { position: 'tl' | 'tr' | 'bl' | 'br' }) {
+  const transforms = {
+    tl: '',
+    tr: 'scale(-1, 1)',
+    bl: 'scale(1, -1)',
+    br: 'scale(-1, -1)',
+  }
+  const positions = {
+    tl: '-top-2 -left-2',
+    tr: '-top-2 -right-2',
+    bl: '-bottom-2 -left-2',
+    br: '-bottom-2 -right-2',
+  }
+
+  return (
+    <svg
+      className={`absolute ${positions[position]} w-16 h-16`}
+      viewBox="0 0 64 64"
+      aria-hidden="true"
+      style={{ transform: transforms[position] }}
+    >
+      <defs>
+        <linearGradient id={`corner-gradient-${position}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#f0c850" />
+          <stop offset="50%" stopColor="#d4af37" />
+          <stop offset="100%" stopColor="#8b7320" />
+        </linearGradient>
+      </defs>
+      {/* Main corner bracket */}
+      <path
+        d="M4,60 L4,4 L60,4"
+        fill="none"
+        stroke={`url(#corner-gradient-${position})`}
+        strokeWidth="2.5"
+      />
+      {/* Inner decorative lines */}
+      <path
+        d="M10,52 L10,10 L52,10"
+        fill="none"
+        stroke="#d4af37"
+        strokeWidth="1"
+        opacity="0.6"
+      />
+      {/* Art deco fan motif */}
+      <path
+        d="M4,4 L18,18 M4,4 L20,12 M4,4 L12,20"
+        stroke="#d4af37"
+        strokeWidth="0.8"
+        opacity="0.5"
+        fill="none"
+      />
+      {/* Diamond accent */}
+      <path
+        d="M4,4 L8,0 L12,4 L8,8 Z"
+        fill="#d4af37"
+        opacity="0.8"
+      />
+      {/* Sunburst rays from corner */}
+      <path
+        d="M4,4 L24,4 M4,4 L4,24 M4,4 L20,20"
+        stroke="#d4af37"
+        strokeWidth="0.5"
+        opacity="0.3"
+      />
+      {/* Small circles - rivet aesthetic */}
+      <circle cx="16" cy="4" r="2" fill="#d4af37" opacity="0.6" />
+      <circle cx="4" cy="16" r="2" fill="#d4af37" opacity="0.6" />
+      <circle cx="12" cy="12" r="1.5" fill="#f0c850" opacity="0.5" />
+    </svg>
+  )
+}
+
+// Decorative gold frame - Deep Rapture underwater style with textures
 function GoldFrame({
   children,
   title,
@@ -657,50 +658,149 @@ function GoldFrame({
 }) {
   return (
     <section className="relative" aria-label={ariaLabel || title}>
-      {/* Corner ornaments */}
-      <svg className="absolute -top-4 -left-4 w-12 h-12" viewBox="0 0 48 48" aria-hidden="true">
-        <path d="M4,44 L4,4 L44,4" fill="none" stroke="#d4af37" strokeWidth="2" />
-        <path d="M8,36 L8,8 L36,8" fill="none" stroke="#d4af37" strokeWidth="1" />
-        <circle cx="4" cy="4" r="3" fill="#d4af37" />
-        <path d="M12,4 L4,12" stroke="#d4af37" strokeWidth="1" />
-      </svg>
-      <svg className="absolute -top-4 -right-4 w-12 h-12 scale-x-[-1]" viewBox="0 0 48 48" aria-hidden="true">
-        <path d="M4,44 L4,4 L44,4" fill="none" stroke="#d4af37" strokeWidth="2" />
-        <path d="M8,36 L8,8 L36,8" fill="none" stroke="#d4af37" strokeWidth="1" />
-        <circle cx="4" cy="4" r="3" fill="#d4af37" />
-        <path d="M12,4 L4,12" stroke="#d4af37" strokeWidth="1" />
-      </svg>
-      <svg className="absolute -bottom-4 -left-4 w-12 h-12 scale-y-[-1]" viewBox="0 0 48 48" aria-hidden="true">
-        <path d="M4,44 L4,4 L44,4" fill="none" stroke="#d4af37" strokeWidth="2" />
-        <path d="M8,36 L8,8 L36,8" fill="none" stroke="#d4af37" strokeWidth="1" />
-        <circle cx="4" cy="4" r="3" fill="#d4af37" />
-        <path d="M12,4 L4,12" stroke="#d4af37" strokeWidth="1" />
-      </svg>
-      <svg className="absolute -bottom-4 -right-4 w-12 h-12 scale-[-1]" viewBox="0 0 48 48" aria-hidden="true">
-        <path d="M4,44 L4,4 L44,4" fill="none" stroke="#d4af37" strokeWidth="2" />
-        <path d="M8,36 L8,8 L36,8" fill="none" stroke="#d4af37" strokeWidth="1" />
-        <circle cx="4" cy="4" r="3" fill="#d4af37" />
-        <path d="M12,4 L4,12" stroke="#d4af37" strokeWidth="1" />
-      </svg>
+      {/* Brass filigree corners */}
+      <DecoCornerFiligree position="tl" />
+      <DecoCornerFiligree position="tr" />
+      <DecoCornerFiligree position="bl" />
+      <DecoCornerFiligree position="br" />
 
-      {/* Main frame */}
+      {/* Main frame with deep underwater textures */}
       <div
-        className="p-6"
+        className="relative p-6 overflow-hidden"
         style={{
-          background: 'linear-gradient(180deg, rgba(21, 32, 48, 0.95), rgba(10, 21, 32, 0.98))',
+          background: `
+            linear-gradient(180deg, rgba(21, 32, 48, 0.97), rgba(10, 21, 32, 0.99)),
+            repeating-linear-gradient(
+              45deg,
+              transparent,
+              transparent 10px,
+              rgba(212, 175, 55, 0.02) 10px,
+              rgba(212, 175, 55, 0.02) 20px
+            )
+          `,
           border: '2px solid #d4af37',
+          boxShadow: `
+            inset 0 0 60px rgba(10, 21, 32, 0.8),
+            inset 0 0 20px rgba(65, 200, 232, 0.05),
+            0 0 20px rgba(212, 175, 55, 0.15)
+          `,
         }}
       >
-        {title && (
-          <div className="text-center mb-4 pb-3 border-b" style={{ borderColor: '#d4af3740' }}>
-            <NeonSign
-              text={title}
-              className="text-sm tracking-[0.3em]"
-              reducedMotion={reducedMotion}
+        {/* Water caustic overlay - subtle light refraction effect */}
+        <div
+          className={`absolute inset-0 pointer-events-none ${reducedMotion ? '' : 'animate-card-caustics'}`}
+          aria-hidden="true"
+          style={{
+            background: `
+              radial-gradient(ellipse 80% 60% at 20% 30%, rgba(65, 200, 232, 0.06) 0%, transparent 50%),
+              radial-gradient(ellipse 60% 80% at 80% 70%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+              radial-gradient(ellipse 100% 50% at 50% 100%, rgba(65, 200, 232, 0.04) 0%, transparent 40%)
+            `,
+            mixBlendMode: 'screen',
+          }}
+        />
+
+        {/* Art deco geometric pattern overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.04]"
+          aria-hidden="true"
+        >
+          <svg className="w-full h-full" preserveAspectRatio="none">
+            <defs>
+              <pattern id="card-deco-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+                {/* Diamond grid */}
+                <path d="M30 0 L60 30 L30 60 L0 30 Z" fill="none" stroke="#d4af37" strokeWidth="0.5" />
+                {/* Center circle */}
+                <circle cx="30" cy="30" r="8" fill="none" stroke="#d4af37" strokeWidth="0.3" />
+                {/* Cross accent */}
+                <path d="M30 15 L30 22 M30 38 L30 45 M15 30 L22 30 M38 30 L45 30" stroke="#d4af37" strokeWidth="0.3" />
+                {/* Corner fans */}
+                <path d="M0 0 L10 5 M0 0 L5 10" stroke="#d4af37" strokeWidth="0.3" />
+                <path d="M60 0 L50 5 M60 0 L55 10" stroke="#d4af37" strokeWidth="0.3" />
+                <path d="M0 60 L10 55 M0 60 L5 50" stroke="#d4af37" strokeWidth="0.3" />
+                <path d="M60 60 L50 55 M60 60 L55 50" stroke="#d4af37" strokeWidth="0.3" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#card-deco-pattern)" />
+          </svg>
+        </div>
+
+        {/* Bubble particles scattered in card */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {[
+            { x: 8, y: 15, size: 3 },
+            { x: 92, y: 25, size: 2 },
+            { x: 5, y: 75, size: 4 },
+            { x: 88, y: 85, size: 2.5 },
+            { x: 15, y: 45, size: 2 },
+            { x: 95, y: 55, size: 3 },
+          ].map((bubble, i) => (
+            <div
+              key={i}
+              className={`absolute rounded-full ${reducedMotion ? '' : 'animate-bubble-gentle'}`}
+              style={{
+                left: `${bubble.x}%`,
+                top: `${bubble.y}%`,
+                width: bubble.size,
+                height: bubble.size,
+                background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), rgba(65,200,232,0.15))',
+                border: '0.5px solid rgba(255,255,255,0.2)',
+                animationDelay: `${i * 0.8}s`,
+              }}
             />
+          ))}
+        </div>
+
+        {/* Pressure crack effects - subtle stress lines */}
+        <svg
+          className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.06]"
+          aria-hidden="true"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M0,20 Q10,22 20,18 T40,25"
+            fill="none"
+            stroke="#65c8e8"
+            strokeWidth="0.5"
+          />
+          <path
+            d="M80%,90% Q85%,85% 95%,88%"
+            fill="none"
+            stroke="#65c8e8"
+            strokeWidth="0.5"
+          />
+        </svg>
+
+        {/* Inner gold border glow */}
+        <div
+          className="absolute inset-[2px] pointer-events-none"
+          style={{
+            border: '1px solid rgba(212, 175, 55, 0.2)',
+            boxShadow: 'inset 0 0 15px rgba(212, 175, 55, 0.08)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Title with enhanced neon styling */}
+        {title && (
+          <div className="relative z-10 text-center mb-4 pb-3" style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.3)' }}>
+            <div className="relative inline-block">
+              {/* Art deco line accents */}
+              <span className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 w-8 h-px mr-3" style={{ background: 'linear-gradient(90deg, transparent, #d4af37)' }} aria-hidden="true" />
+              <NeonSign
+                text={title}
+                className="text-sm tracking-[0.3em]"
+                reducedMotion={reducedMotion}
+              />
+              <span className="absolute right-0 top-1/2 translate-x-full -translate-y-1/2 w-8 h-px ml-3" style={{ background: 'linear-gradient(90deg, #d4af37, transparent)' }} aria-hidden="true" />
+            </div>
           </div>
         )}
-        {children}
+
+        {/* Content */}
+        <div className="relative z-10">
+          {children}
+        </div>
       </div>
     </section>
   )
@@ -790,47 +890,80 @@ function PlasmidButton({
   )
 }
 
-// Skill display with achievements (no proficiency bars)
+// Skill display with achievements (no proficiency bars) - Rapture texture
 function SkillAchievementCard({
   skillName,
   profession,
+  reducedMotion = false,
 }: {
   skillName: string
   profession: 'drummer' | 'fighter'
+  reducedMotion?: boolean
 }) {
   const achievements = SKILL_ACHIEVEMENTS[profession]?.[skillName] || []
 
   return (
     <div
-      className="p-3 mb-2 transition-all hover:scale-[1.01]"
+      className="relative p-3 mb-2 overflow-hidden group"
       style={{
-        background: 'linear-gradient(180deg, rgba(21, 32, 48, 0.8), rgba(10, 21, 32, 0.9))',
-        border: '1px solid #d4af3740',
+        background: `
+          linear-gradient(180deg, rgba(21, 32, 48, 0.9), rgba(10, 21, 32, 0.95)),
+          repeating-linear-gradient(
+            30deg,
+            transparent,
+            transparent 6px,
+            rgba(212, 175, 55, 0.01) 6px,
+            rgba(212, 175, 55, 0.01) 12px
+          )
+        `,
+        border: '1px solid rgba(212, 175, 55, 0.3)',
+        boxShadow: 'inset 0 0 20px rgba(10, 21, 32, 0.4)',
       }}
     >
-      <h4
-        className="text-xs font-bold mb-2"
-        style={{ color: '#d4af37', fontFamily: '"Playfair Display", serif' }}
-      >
-        {'>>'} {skillName}
-      </h4>
-      {achievements.length > 0 ? (
-        <ul className="space-y-1">
-          {achievements.map((achievement, i) => (
-            <li
-              key={i}
-              className="text-[10px] flex items-start gap-2"
-              style={{ color: '#e8e0d0' }}
-            >
-              <span style={{ color: '#d4af3780' }}>-</span>
-              {achievement}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-[10px]" style={{ color: '#a09080' }}>
-          Demonstrated proficiency
-        </p>
+      {/* Subtle caustic shimmer */}
+      <div
+        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.03]' : 'animate-card-caustics opacity-[0.06]'}`}
+        style={{
+          background: 'radial-gradient(ellipse 60% 40% at 20% 30%, rgba(65, 200, 232, 0.15) 0%, transparent 50%)',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Content */}
+      <div className="relative z-10">
+        <h4
+          className="text-xs font-bold mb-2"
+          style={{ color: '#d4af37', fontFamily: '"Playfair Display", serif' }}
+        >
+          {'>>'} {skillName}
+        </h4>
+        {achievements.length > 0 ? (
+          <ul className="space-y-1">
+            {achievements.map((achievement, i) => (
+              <li
+                key={i}
+                className="text-[10px] flex items-start gap-2"
+                style={{ color: '#e8e0d0' }}
+              >
+                <span style={{ color: '#d4af3780' }}>-</span>
+                {achievement}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-[10px]" style={{ color: '#a09080' }}>
+            Demonstrated proficiency
+          </p>
+        )}
+      </div>
+
+      {/* Hover brass gleam */}
+      {!reducedMotion && (
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+          style={{ boxShadow: 'inset 0 0 25px rgba(212, 175, 55, 0.12)' }}
+          aria-hidden="true"
+        />
       )}
     </div>
   )
@@ -868,7 +1001,7 @@ function DecoGauge({ name, value, max = 5 }: { name: string; value: number; max?
   )
 }
 
-// Experience card with art deco styling - Rapture employment records
+// Experience card with deep Rapture underwater textures
 function ExperienceCard({
   entry,
   reducedMotion = false,
@@ -881,75 +1014,112 @@ function ExperienceCard({
 
   return (
     <article
-      className={`relative p-4 group ${reducedMotion ? '' : 'transition-all'}`}
+      className="relative p-4 group overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, rgba(21, 32, 48, 0.9), rgba(10, 21, 32, 0.95))',
+        background: `
+          linear-gradient(180deg, rgba(21, 32, 48, 0.95), rgba(10, 21, 32, 0.98)),
+          repeating-linear-gradient(
+            60deg,
+            transparent,
+            transparent 12px,
+            rgba(212, 175, 55, 0.012) 12px,
+            rgba(212, 175, 55, 0.012) 24px
+          )
+        `,
         border: '1px solid #d4af3760',
+        boxShadow: 'inset 0 0 40px rgba(10, 21, 32, 0.6)',
       }}
       aria-label={`${entry.title} at ${entry.organization}`}
     >
-      {/* Top decorative line */}
+      {/* Water caustic effect */}
       <div
-        className="absolute top-0 left-4 right-4 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, #d4af37, transparent)' }}
+        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-5' : 'animate-card-caustics opacity-8'}`}
+        style={{
+          background: `
+            radial-gradient(ellipse 60% 40% at 10% 20%, rgba(65, 200, 232, 0.12) 0%, transparent 50%),
+            radial-gradient(ellipse 50% 60% at 90% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 50%)
+          `,
+        }}
         aria-hidden="true"
       />
 
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h4 className="text-sm" style={{ color: '#d4af37', fontFamily: '"Playfair Display", serif' }}>
-            {entry.title}
-          </h4>
-          <p className="text-xs mt-1" style={{ color: '#e8e0d0' }}>{entry.organization}</p>
-        </div>
-        <time
-          className="text-[10px] px-2 py-0.5"
-          style={{
-            background: '#d4af3720',
-            border: '1px solid #d4af3740',
-            color: '#d4af37',
-          }}
-          dateTime={`${entry.startDate}/${entry.endDate || ''}`}
-        >
-          {startDisplay} - {endDisplay}
-        </time>
+      {/* Art deco header line with diamond accents */}
+      <div className="absolute top-0 left-0 right-0 flex items-center" aria-hidden="true">
+        <svg className="w-4 h-4" viewBox="0 0 16 16">
+          <path d="M0,8 L8,0 L8,8 L0,8" fill="#d4af37" opacity="0.3" />
+        </svg>
+        <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #d4af37, rgba(212, 175, 55, 0.2), #d4af37)' }} />
+        <svg className="w-4 h-4" viewBox="0 0 16 16">
+          <path d="M16,8 L8,0 L8,8 L16,8" fill="#d4af37" opacity="0.3" />
+        </svg>
       </div>
 
-      <p className="text-xs mb-3" style={{ color: '#a09080' }}>{entry.description}</p>
+      {/* Bubble particle */}
+      <div
+        className={`absolute top-3 right-4 w-2 h-2 rounded-full ${reducedMotion ? '' : 'animate-bubble-gentle'}`}
+        style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), rgba(65,200,232,0.12))' }}
+        aria-hidden="true"
+      />
 
-      {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-1 mb-3" aria-label="Key achievements">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#e8e0d0' }}>
-              <span style={{ color: '#d4af37' }} aria-hidden="true">{'>>'}</span>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="flex gap-2 flex-wrap" aria-label="Skills used">
-        {entry.skills.slice(0, 4).map((skill) => (
-          <span
-            key={skill}
-            className="text-[8px] px-2 py-0.5"
+      <div className="relative z-10 pt-2">
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <h4 className="text-sm" style={{ color: '#d4af37', fontFamily: '"Playfair Display", serif' }}>
+              {entry.title}
+            </h4>
+            <p className="text-xs mt-1" style={{ color: '#e8e0d0' }}>{entry.organization}</p>
+          </div>
+          <time
+            className="text-[10px] px-2 py-0.5"
             style={{
-              background: '#d4af3715',
-              border: '1px solid #d4af3730',
-              color: '#a09080',
+              background: 'rgba(212, 175, 55, 0.15)',
+              border: '1px solid rgba(212, 175, 55, 0.4)',
+              color: '#d4af37',
+              boxShadow: '0 0 8px rgba(212, 175, 55, 0.1)',
             }}
+            dateTime={`${entry.startDate}/${entry.endDate || ''}`}
           >
-            {skill}
-          </span>
-        ))}
+            {startDisplay} - {endDisplay}
+          </time>
+        </div>
+
+        <p className="text-xs mb-3" style={{ color: '#a09080' }}>{entry.description}</p>
+
+        {entry.highlights && entry.highlights.length > 0 && (
+          <ul className="space-y-1 mb-3" aria-label="Key achievements">
+            {entry.highlights.map((highlight, i) => (
+              <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#e8e0d0' }}>
+                <span style={{ color: '#d4af37' }} aria-hidden="true">{'>>'}</span>
+                {highlight}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="flex gap-2 flex-wrap" aria-label="Skills used">
+          {entry.skills.slice(0, 4).map((skill) => (
+            <span
+              key={skill}
+              className="text-[8px] px-2 py-0.5"
+              style={{
+                background: 'rgba(212, 175, 55, 0.1)',
+                border: '1px solid rgba(212, 175, 55, 0.25)',
+                color: '#a09080',
+              }}
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
       </div>
 
-      {/* Hover glow */}
+      {/* Hover glow - underwater brass gleam */}
       {!reducedMotion && (
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
           style={{
-            boxShadow: 'inset 0 0 30px rgba(212, 175, 55, 0.1)',
+            boxShadow: 'inset 0 0 50px rgba(212, 175, 55, 0.15)',
+            background: 'linear-gradient(180deg, rgba(65, 200, 232, 0.03) 0%, transparent 30%, rgba(212, 175, 55, 0.05) 100%)',
           }}
           aria-hidden="true"
         />
@@ -1003,9 +1173,11 @@ function TechCloud({
 function SkillsWithAchievements({
   categories,
   profession,
+  reducedMotion = false,
 }: {
   categories: ReturnType<typeof getSkillsByProfession>
   profession: 'drummer' | 'fighter'
+  reducedMotion?: boolean
 }) {
   return (
     <div className="space-y-4" role="list" aria-label="Skills with achievements">
@@ -1024,6 +1196,7 @@ function SkillsWithAchievements({
                 key={skill.name}
                 skillName={skill.name}
                 profession={profession}
+                reducedMotion={reducedMotion}
               />
             ))}
           </div>
@@ -1033,86 +1206,98 @@ function SkillsWithAchievements({
   )
 }
 
-// Project display as vintage Rapture poster
+// Project display as vintage Rapture poster - immediately visible, no hiding
 function VaultPoster({
   project,
-  index,
   reducedMotion = false,
 }: {
   project: typeof PROJECTS_DATA[0]
-  index: number
   reducedMotion?: boolean
 }) {
-  const [visible, setVisible] = useState(reducedMotion)
-
-  useEffect(() => {
-    if (reducedMotion) {
-      setVisible(true)
-      return
-    }
-    const timeout = setTimeout(() => setVisible(true), 200 + index * 100)
-    return () => clearTimeout(timeout)
-  }, [index, reducedMotion])
-
   return (
     <article
-      className={`relative p-4 group cursor-pointer ${
-        reducedMotion
-          ? ''
-          : `transition-all duration-500 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`
-      }`}
+      className="relative p-4 group cursor-pointer overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, rgba(21, 32, 48, 0.9), rgba(10, 21, 32, 0.95))',
+        background: `
+          linear-gradient(180deg, rgba(21, 32, 48, 0.95), rgba(10, 21, 32, 0.98)),
+          repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 8px,
+            rgba(212, 175, 55, 0.015) 8px,
+            rgba(212, 175, 55, 0.015) 16px
+          )
+        `,
         border: '1px solid #d4af3760',
+        boxShadow: 'inset 0 0 30px rgba(10, 21, 32, 0.5)',
       }}
       aria-label={`Project: ${project.name}`}
     >
-      {/* Top decorative line */}
+      {/* Water caustic shimmer */}
       <div
-        className="absolute top-0 left-4 right-4 h-px"
-        style={{ background: 'linear-gradient(90deg, transparent, #d4af37, transparent)' }}
+        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-5' : 'animate-card-caustics opacity-10'}`}
+        style={{
+          background: `
+            radial-gradient(ellipse 50% 40% at 30% 20%, rgba(65, 200, 232, 0.2) 0%, transparent 50%),
+            radial-gradient(ellipse 40% 50% at 70% 80%, rgba(212, 175, 55, 0.15) 0%, transparent 50%)
+          `,
+        }}
         aria-hidden="true"
       />
 
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="text-sm" style={{ color: '#d4af37', fontFamily: '"Playfair Display", serif' }}>
-          {project.name}
-        </h3>
-        {project.featured && (
-          <span
-            className="text-[8px] px-2 py-0.5"
-            style={{ background: '#d4af37', color: '#0a1520' }}
-            aria-label="Featured project"
-          >
-            * FEATURED
-          </span>
-        )}
-      </div>
-      <p className="text-[10px] mb-3" style={{ color: '#a09080' }}>
-        {project.tagline}
-      </p>
-      <div className="flex gap-2 flex-wrap" aria-label="Technologies used">
-        {project.techStack.slice(0, 3).map((tech) => (
-          <span
-            key={tech}
-            className="text-[8px] px-2 py-0.5"
-            style={{
-              background: '#d4af3720',
-              border: '1px solid #d4af3740',
-              color: '#d4af37',
-            }}
-          >
-            {tech}
-          </span>
-        ))}
+      {/* Top decorative line with art deco ends */}
+      <div className="absolute top-0 left-0 right-0 flex items-center" aria-hidden="true">
+        <div className="w-3 h-3 border-l border-t" style={{ borderColor: '#d4af37' }} />
+        <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #d4af37, rgba(212, 175, 55, 0.3), #d4af37)' }} />
+        <div className="w-3 h-3 border-r border-t" style={{ borderColor: '#d4af37' }} />
       </div>
 
-      {/* Hover glow */}
+      {/* Small bubble accents */}
+      <div className="absolute top-2 right-3 w-1.5 h-1.5 rounded-full" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), rgba(65,200,232,0.1))' }} aria-hidden="true" />
+      <div className="absolute bottom-4 left-2 w-2 h-2 rounded-full" style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), rgba(65,200,232,0.08))' }} aria-hidden="true" />
+
+      <div className="relative z-10">
+        <div className="flex justify-between items-start mb-2 pt-2">
+          <h3 className="text-sm" style={{ color: '#d4af37', fontFamily: '"Playfair Display", serif' }}>
+            {project.name}
+          </h3>
+          {project.featured && (
+            <span
+              className="text-[8px] px-2 py-0.5"
+              style={{ background: '#d4af37', color: '#0a1520' }}
+              aria-label="Featured project"
+            >
+              * FEATURED
+            </span>
+          )}
+        </div>
+        <p className="text-[10px] mb-3" style={{ color: '#a09080' }}>
+          {project.tagline}
+        </p>
+        <div className="flex gap-2 flex-wrap" aria-label="Technologies used">
+          {project.techStack.slice(0, 3).map((tech) => (
+            <span
+              key={tech}
+              className="text-[8px] px-2 py-0.5"
+              style={{
+                background: '#d4af3720',
+                border: '1px solid #d4af3740',
+                color: '#d4af37',
+              }}
+            >
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Hover glow - brass gleam */}
       {!reducedMotion && (
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
           style={{
-            boxShadow: 'inset 0 0 30px rgba(212, 175, 55, 0.2)',
+            boxShadow: 'inset 0 0 40px rgba(212, 175, 55, 0.25)',
+            background: 'linear-gradient(180deg, rgba(212, 175, 55, 0.05) 0%, transparent 50%)',
           }}
           aria-hidden="true"
         />
@@ -1121,7 +1306,7 @@ function VaultPoster({
   )
 }
 
-// Company card with art deco styling - Rapture's finest enterprises
+// Company card with deep Rapture underwater texture
 function CompanyCard({
   company,
   reducedMotion = false,
@@ -1134,31 +1319,74 @@ function CompanyCard({
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`block p-4 group ${reducedMotion ? '' : 'transition-all hover:scale-[1.02]'}`}
+      className="relative block p-4 group overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, rgba(21, 32, 48, 0.9), rgba(10, 21, 32, 0.95))',
-        border: '1px solid #d4af3760',
+        background: `
+          linear-gradient(180deg, rgba(21, 32, 48, 0.95), rgba(10, 21, 32, 0.98)),
+          repeating-linear-gradient(
+            -30deg,
+            transparent,
+            transparent 8px,
+            rgba(212, 175, 55, 0.012) 8px,
+            rgba(212, 175, 55, 0.012) 16px
+          )
+        `,
+        border: '1px solid rgba(212, 175, 55, 0.4)',
+        boxShadow: 'inset 0 0 25px rgba(10, 21, 32, 0.5)',
       }}
       aria-label={`${company.name}: ${company.tagline}`}
     >
-      <div className="flex items-center gap-3 mb-2">
-        <span className="text-2xl" aria-hidden="true">{company.icon}</span>
-        <div>
-          <h4
-            className={`text-sm ${reducedMotion ? '' : 'group-hover:text-amber-300 transition-colors'}`}
-            style={{ color: '#d4af37' }}
-          >
-            {company.name}
-          </h4>
-          <p className="text-[10px]" style={{ color: '#a09080' }}>{company.tagline}</p>
+      {/* Water caustic shimmer */}
+      <div
+        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.04]' : 'animate-card-caustics opacity-[0.08]'}`}
+        style={{
+          background: `
+            radial-gradient(ellipse 50% 40% at 80% 20%, rgba(65, 200, 232, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse 40% 50% at 20% 80%, rgba(212, 175, 55, 0.1) 0%, transparent 50%)
+          `,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Bubble accent */}
+      <div
+        className={`absolute top-2 right-2 w-1.5 h-1.5 rounded-full ${reducedMotion ? '' : 'animate-bubble-gentle'}`}
+        style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), rgba(65,200,232,0.1))' }}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10">
+        <div className="flex items-center gap-3 mb-2">
+          <span className="text-2xl" aria-hidden="true">{company.icon}</span>
+          <div>
+            <h4
+              className={`text-sm ${reducedMotion ? '' : 'group-hover:text-amber-300 transition-colors'}`}
+              style={{ color: '#d4af37' }}
+            >
+              {company.name}
+            </h4>
+            <p className="text-[10px]" style={{ color: '#a09080' }}>{company.tagline}</p>
+          </div>
         </div>
+        <p className="text-xs" style={{ color: '#e8e0d0' }}>{company.description}</p>
       </div>
-      <p className="text-xs" style={{ color: '#e8e0d0' }}>{company.description}</p>
+
+      {/* Hover brass gleam */}
+      {!reducedMotion && (
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+          style={{
+            boxShadow: 'inset 0 0 35px rgba(212, 175, 55, 0.2)',
+            background: 'linear-gradient(180deg, rgba(212, 175, 55, 0.04) 0%, transparent 40%)',
+          }}
+          aria-hidden="true"
+        />
+      )}
     </a>
   )
 }
 
-// Band card with art deco styling - Rapture's jazz clubs
+// Band card with deep Rapture underwater texture - jazz clubs aesthetic
 function BandCard({
   band,
   reducedMotion = false,
@@ -1168,21 +1396,64 @@ function BandCard({
 }) {
   const content = (
     <div
-      className={`p-4 group ${reducedMotion ? '' : 'transition-all hover:scale-[1.02]'}`}
+      className="relative p-4 group overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, rgba(21, 32, 48, 0.9), rgba(10, 21, 32, 0.95))',
-        border: '1px solid #d4af3760',
+        background: `
+          linear-gradient(180deg, rgba(21, 32, 48, 0.95), rgba(10, 21, 32, 0.98)),
+          repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 8px,
+            rgba(212, 175, 55, 0.012) 8px,
+            rgba(212, 175, 55, 0.012) 16px
+          )
+        `,
+        border: '1px solid rgba(212, 175, 55, 0.4)',
+        boxShadow: 'inset 0 0 25px rgba(10, 21, 32, 0.5)',
       }}
     >
-      <h4
-        className={`text-sm ${reducedMotion ? '' : 'group-hover:text-amber-300 transition-colors'}`}
-        style={{ color: '#d4af37' }}
-      >
-        {band.name}
-      </h4>
-      <p className="text-[10px] mt-1" style={{ color: '#a09080' }}>{band.genre} - {band.role}</p>
-      <p className="text-xs mt-2" style={{ color: '#e8e0d0' }}>{band.description}</p>
-      {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: '#a09080' }}>Website coming soon</p>}
+      {/* Water caustic shimmer */}
+      <div
+        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.04]' : 'animate-card-caustics opacity-[0.08]'}`}
+        style={{
+          background: `
+            radial-gradient(ellipse 50% 40% at 70% 30%, rgba(65, 200, 232, 0.15) 0%, transparent 50%),
+            radial-gradient(ellipse 40% 50% at 30% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%)
+          `,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Bubble accent */}
+      <div
+        className={`absolute top-3 right-3 w-2 h-2 rounded-full ${reducedMotion ? '' : 'animate-bubble-gentle'}`}
+        style={{ background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.3), rgba(65,200,232,0.1))' }}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10">
+        <h4
+          className={`text-sm ${reducedMotion ? '' : 'group-hover:text-amber-300 transition-colors'}`}
+          style={{ color: '#d4af37' }}
+        >
+          {band.name}
+        </h4>
+        <p className="text-[10px] mt-1" style={{ color: '#a09080' }}>{band.genre} - {band.role}</p>
+        <p className="text-xs mt-2" style={{ color: '#e8e0d0' }}>{band.description}</p>
+        {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: '#a09080' }}>Website coming soon</p>}
+      </div>
+
+      {/* Hover brass gleam */}
+      {!reducedMotion && (
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+          style={{
+            boxShadow: 'inset 0 0 35px rgba(212, 175, 55, 0.2)',
+            background: 'linear-gradient(180deg, rgba(212, 175, 55, 0.04) 0%, transparent 40%)',
+          }}
+          aria-hidden="true"
+        />
+      )}
     </div>
   )
 
@@ -1353,8 +1624,8 @@ export default function ArtDecoTheme() {
       {/* Main content */}
       <main className="relative z-20 px-8 py-8">
         <div className="max-w-5xl mx-auto">
-          {/* Bio */}
-          <BathysphereRevealSection reducedMotion={reducedMotion}>
+          {/* Bio - immediately visible */}
+          <RaptureSection>
             <GoldFrame title="ABOUT" reducedMotion={reducedMotion} ariaLabel="About me">
               <p className="text-sm leading-relaxed text-center" style={{ color: '#e8e0d0' }}>
                 {aboutData.bio}
@@ -1376,11 +1647,11 @@ export default function ArtDecoTheme() {
                 ))}
               </div>
             </GoldFrame>
-          </BathysphereRevealSection>
+          </RaptureSection>
 
-          {/* Work Experience */}
+          {/* Work Experience - immediately visible */}
           {experience.length > 0 && (
-            <BathysphereRevealSection reducedMotion={reducedMotion} className="mt-12">
+            <RaptureSection className="mt-12">
               <GoldFrame title="WORK EXPERIENCE" reducedMotion={reducedMotion} ariaLabel="Work experience">
                 <div className="space-y-4">
                   {experience.map((entry) => (
@@ -1388,7 +1659,7 @@ export default function ArtDecoTheme() {
                   ))}
                 </div>
               </GoldFrame>
-            </BathysphereRevealSection>
+            </RaptureSection>
           )}
 
           {/* Grid layout */}
@@ -1405,6 +1676,7 @@ export default function ArtDecoTheme() {
                 <SkillsWithAchievements
                   categories={otherSkills}
                   profession={active as 'drummer' | 'fighter'}
+                  reducedMotion={reducedMotion}
                 />
               )}
             </GoldFrame>
@@ -1424,11 +1696,10 @@ export default function ArtDecoTheme() {
                 />
               </div>
               <div className="space-y-3" role="list" aria-label="Featured projects">
-                {projects.slice(0, 4).map((project, i) => (
+                {projects.slice(0, 4).map((project) => (
                   <VaultPoster
                     key={project.id}
                     project={project}
-                    index={i}
                     reducedMotion={reducedMotion}
                   />
                 ))}
@@ -1589,29 +1860,54 @@ export default function ArtDecoTheme() {
           75% { transform: translateY(-12px) rotate(2deg); opacity: 0.3; }
         }
 
-        @keyframes bathyDescent {
-          0% { left: -50px; transform: translateY(-10px); opacity: 0; }
-          20% { opacity: 1; }
-          80% { opacity: 1; }
-          100% { left: 110%; transform: translateY(10px); opacity: 0; }
-        }
-
-        @keyframes bubbleTrail {
-          0% { transform: translateY(0) scale(1); opacity: 0.6; }
-          100% { transform: translateY(-30px) scale(0.3); opacity: 0; }
-        }
-
-        @keyframes goldFlash {
-          0%, 100% { opacity: 0; }
-          30% { opacity: 0.3; }
-        }
-
         @keyframes bubble-small {
           0%, 100% { transform: translateY(0) scale(1); opacity: 0.5; }
           50% { transform: translateY(-8px) scale(0.8); opacity: 0.3; }
         }
         .animate-bubble-small {
           animation: bubble-small 1.5s ease-in-out infinite;
+        }
+
+        /* Card caustic light effect - subtle water refraction inside cards */
+        @keyframes card-caustics {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+            opacity: 0.08;
+          }
+          25% {
+            transform: translate(2%, -1%) scale(1.02);
+            opacity: 0.12;
+          }
+          50% {
+            transform: translate(-1%, 2%) scale(0.98);
+            opacity: 0.06;
+          }
+          75% {
+            transform: translate(1%, 1%) scale(1.01);
+            opacity: 0.1;
+          }
+        }
+        .animate-card-caustics {
+          animation: card-caustics 12s ease-in-out infinite;
+        }
+
+        /* Gentle bubble float for card bubble particles */
+        @keyframes bubble-gentle {
+          0%, 100% {
+            transform: translateY(0) translateX(0);
+            opacity: 0.4;
+          }
+          33% {
+            transform: translateY(-3px) translateX(1px);
+            opacity: 0.5;
+          }
+          66% {
+            transform: translateY(-1px) translateX(-1px);
+            opacity: 0.35;
+          }
+        }
+        .animate-bubble-gentle {
+          animation: bubble-gentle 6s ease-in-out infinite;
         }
 
         /* Screen reader only class */
