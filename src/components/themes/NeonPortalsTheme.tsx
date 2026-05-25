@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -13,20 +12,40 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { useSmoothScroll, useInViewTrigger } from '@/hooks/useScrollAnimation'
+import { useSmoothScroll } from '@/hooks/useScrollAnimation'
 
 // Portal game colors - authentic Aperture Science palette
-const PORTAL_ORANGE = '#ff6f00'
-const PORTAL_BLUE = '#00a2ff'
+const PORTAL_ORANGE = '#FF6B00'
+const PORTAL_BLUE = '#00A0FF'
 const APERTURE_WHITE = '#f5f5f5'
 const APERTURE_GREY = '#d4d4d4'
 const PANEL_DARK = '#1a1a1e'
-const CHAMBER_BG = '#e8e8e8'
 const WARNING_YELLOW = '#ffc107'
 const CAUTION_BLACK = '#1a1a1a'
 
 // ============================================================================
-// APERTURE SCIENCE VISUAL COMPONENTS
+// CUSTOM HOOKS
+// ============================================================================
+
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches)
+    }
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
+  return prefersReducedMotion
+}
+
+// ============================================================================
+// APERTURE SCIENCE VISUAL COMPONENTS - CSS/SVG ONLY
 // ============================================================================
 
 // Aperture Science logo - authentic iris design
@@ -67,7 +86,7 @@ function ApertureLogoSVG({
   )
 }
 
-// Companion Cube decorative element
+// Companion Cube decorative element - pure SVG
 function CompanionCube({
   size = 40,
   glowing = false,
@@ -205,7 +224,29 @@ function WarningSign({
   )
 }
 
-// Test chamber panel grid background - clean white panels
+// "The cake is a lie" graffiti SVG
+function CakeIsALieGraffiti({ className = '' }: { className?: string }) {
+  return (
+    <div
+      className={`graffiti-text ${className}`}
+      role="img"
+      aria-label="The cake is a lie - graffiti"
+      style={{
+        fontFamily: 'monospace',
+        fontSize: '10px',
+        color: '#8b4513',
+        textShadow: '1px 1px 0 #5a2d0a',
+        letterSpacing: '-0.5px',
+        transform: 'rotate(-2deg)',
+        opacity: 0.6,
+      }}
+    >
+      the cake is a lie
+    </div>
+  )
+}
+
+// Test chamber panel grid background - clean white panels with scuffs
 function TestChamberPanels() {
   return (
     <div
@@ -213,106 +254,76 @@ function TestChamberPanels() {
       role="presentation"
       aria-hidden="true"
     >
-      {/* Base gradient */}
+      {/* Base gradient - cold chamber feel */}
       <div
         className="absolute inset-0"
         style={{
           background: `linear-gradient(180deg, ${PANEL_DARK} 0%, #0d0d12 50%, ${PANEL_DARK} 100%)`,
         }}
       />
-      {/* Panel grid overlay */}
+
+      {/* Main panel grid - white aperture panels */}
       <div
-        className="absolute inset-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `
-            linear-gradient(${APERTURE_WHITE} 1px, transparent 1px),
-            linear-gradient(90deg, ${APERTURE_WHITE} 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px',
-        }}
-      />
-      {/* Panel seams */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
+        className="absolute inset-0 opacity-[0.04]"
         style={{
           backgroundImage: `
             linear-gradient(${APERTURE_WHITE} 2px, transparent 2px),
             linear-gradient(90deg, ${APERTURE_WHITE} 2px, transparent 2px)
           `,
+          backgroundSize: '80px 80px',
+        }}
+      />
+
+      {/* Panel seams - larger grid */}
+      <div
+        className="absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage: `
+            linear-gradient(${APERTURE_WHITE} 3px, transparent 3px),
+            linear-gradient(90deg, ${APERTURE_WHITE} 3px, transparent 3px)
+          `,
           backgroundSize: '240px 240px',
         }}
       />
-    </div>
-  )
-}
 
-// Alexander as test subject - actual sprite with Aperture styling
-function TestSubjectAlexander({
-  size = 50,
-  facing = 'right',
-}: {
-  size?: number
-  facing?: 'left' | 'right'
-}) {
-  const [frame, setFrame] = useState(0)
-  const prefersReducedMotion = usePrefersReducedMotion()
-
-  useEffect(() => {
-    if (prefersReducedMotion) return
-    const interval = setInterval(() => setFrame(f => (f + 1) % 2), 150)
-    return () => clearInterval(interval)
-  }, [prefersReducedMotion])
-
-  const sprite = facing === 'right'
-    ? (frame === 0 ? '/assets/sprites/run_right.png' : '/assets/sprites/run_right_1.png')
-    : (frame === 0 ? '/assets/sprites/run_left.png' : '/assets/sprites/run_left_1.png')
-
-  return (
-    <div
-      className="relative"
-      style={{ width: size, height: size * 1.2 }}
-      role="img"
-      aria-label="Test Subject navigating chamber"
-    >
-      <Image
-        src={sprite}
-        alt="Test Subject"
-        fill
-        className="object-contain"
-        style={{
-          filter: 'brightness(1.1) contrast(1.2) drop-shadow(0 0 8px rgba(0,162,255,0.5))',
-        }}
-      />
-      {/* Long fall boots glow effect */}
+      {/* Scuff marks / dirty panel overlay */}
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2"
+        className="absolute inset-0 opacity-[0.02]"
         style={{
-          width: '20px',
-          height: '4px',
-          background: `radial-gradient(ellipse, ${PORTAL_BLUE} 0%, transparent 70%)`,
-          filter: 'blur(2px)',
+          backgroundImage: `
+            radial-gradient(circle at 20% 30%, rgba(139, 69, 19, 0.3) 0%, transparent 15%),
+            radial-gradient(circle at 70% 60%, rgba(100, 100, 100, 0.2) 0%, transparent 20%),
+            radial-gradient(circle at 40% 80%, rgba(139, 69, 19, 0.25) 0%, transparent 10%),
+            radial-gradient(circle at 85% 15%, rgba(80, 80, 80, 0.3) 0%, transparent 12%)
+          `,
+        }}
+      />
+
+      {/* Orange portal ambient glow - left side */}
+      <div
+        className="absolute"
+        style={{
+          left: 0,
+          top: '30%',
+          width: '200px',
+          height: '40%',
+          background: `radial-gradient(ellipse at left, ${PORTAL_ORANGE}15 0%, transparent 70%)`,
+        }}
+      />
+
+      {/* Blue portal ambient glow - right side */}
+      <div
+        className="absolute"
+        style={{
+          right: 0,
+          top: '30%',
+          width: '200px',
+          height: '40%',
+          background: `radial-gradient(ellipse at right, ${PORTAL_BLUE}15 0%, transparent 70%)`,
         }}
       />
     </div>
   )
-}
-
-// Custom hook for reduced motion preference
-function usePrefersReducedMotion() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-
-    const handler = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches)
-    }
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return prefersReducedMotion
 }
 
 // Portal SVG with authentic oval shape and glow
@@ -404,7 +415,7 @@ function PortalSVG({
   )
 }
 
-// Ambient particles - portal energy wisps
+// Ambient particles - portal energy wisps (non-blocking, decorative only)
 function AmbientParticles() {
   const [particles, setParticles] = useState<Array<{
     id: number
@@ -422,7 +433,7 @@ function AmbientParticles() {
       return
     }
     setParticles(
-      Array.from({ length: 30 }, (_, i) => ({
+      Array.from({ length: 20 }, (_, i) => ({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
@@ -457,14 +468,8 @@ function AmbientParticles() {
   )
 }
 
-// Scroll portal scene - test subject moves between portals
-function ScrollPortalScene() {
-  const { scrollProgress } = useSmoothScroll(0.12)
-  const prefersReducedMotion = usePrefersReducedMotion()
-
-  // Test subject position: moves from left to right as you scroll
-  const subjectX = prefersReducedMotion ? 50 : 10 + scrollProgress * 80
-
+// Static portal scene - decorative portals on sides (NO scroll-tracking test subject)
+function PortalDecoration() {
   return (
     <div
       className="fixed inset-0 pointer-events-none z-10 overflow-hidden"
@@ -475,116 +480,50 @@ function ScrollPortalScene() {
       <div
         className="absolute"
         style={{
-          left: '6%',
+          left: '3%',
           top: '45%',
           transform: 'translateY(-50%)',
         }}
       >
-        <PortalSVG color="orange" size={130} />
+        <PortalSVG color="orange" size={100} />
       </div>
 
       {/* Blue portal - RIGHT side */}
       <div
         className="absolute"
         style={{
-          right: '6%',
+          right: '3%',
           top: '45%',
           transform: 'translateY(-50%)',
         }}
       >
-        <PortalSVG color="blue" size={130} />
-      </div>
-
-      {/* Test subject - smooth CSS transition for movement */}
-      <div
-        className={`absolute ${prefersReducedMotion ? '' : 'transition-all duration-300 ease-out'}`}
-        style={{
-          left: `${subjectX}%`,
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}
-      >
-        <TestSubjectAlexander size={50} facing="right" />
+        <PortalSVG color="blue" size={100} />
       </div>
 
       {/* Companion cubes as decoration */}
-      <div className="absolute bottom-20 left-[15%] opacity-30">
+      <div className="absolute bottom-20 left-[15%] opacity-20">
         <CompanionCube size={30} />
       </div>
-      <div className="absolute bottom-32 right-[20%] opacity-20">
+      <div className="absolute bottom-32 right-[20%] opacity-15">
         <CompanionCube size={25} />
       </div>
-    </div>
-  )
-}
 
-// PortalReveal - content emerges from portal on scroll
-function PortalReveal({
-  children,
-  portalSide = 'left',
-  delay = 0,
-  initialVisible = false
-}: {
-  children: React.ReactNode
-  portalSide?: 'left' | 'right'
-  delay?: number
-  initialVisible?: boolean
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasTriggered = useInViewTrigger(ref, { threshold: 0.1, rootMargin: '-50px' })
-  const [isVisible, setIsVisible] = useState(initialVisible)
-  const prefersReducedMotion = usePrefersReducedMotion()
-
-  useEffect(() => {
-    if (prefersReducedMotion) {
-      setIsVisible(true)
-      return
-    }
-    if (hasTriggered || initialVisible) {
-      const timer = setTimeout(() => setIsVisible(true), delay)
-      return () => clearTimeout(timer)
-    }
-  }, [hasTriggered, delay, initialVisible, prefersReducedMotion])
-
-  const portalColor = portalSide === 'left' ? 'orange' : 'blue'
-
-  return (
-    <div ref={ref} className="relative">
-      {/* Mini portal indicator */}
-      {!prefersReducedMotion && (
-        <div
-          className={`absolute top-1/2 -translate-y-1/2 transition-all duration-500 ${
-            isVisible ? 'opacity-0 scale-50' : 'opacity-50 scale-100'
-          }`}
-          style={{
-            [portalSide]: '-70px',
-          }}
-          aria-hidden="true"
-        >
-          <PortalSVG color={portalColor} size={50} />
-        </div>
-      )}
-
-      {/* Content */}
-      <div
-        className={`${prefersReducedMotion ? '' : 'transition-all duration-700 ease-out'} ${
-          isVisible
-            ? 'opacity-100 translate-x-0'
-            : `opacity-0 ${portalSide === 'left' ? '-translate-x-16' : 'translate-x-16'}`
-        }`}
-      >
-        {children}
+      {/* Graffiti decorations */}
+      <div className="absolute bottom-40 left-[8%]">
+        <CakeIsALieGraffiti />
+      </div>
+      <div className="absolute top-[60%] right-[12%]">
+        <CakeIsALieGraffiti className="rotate-3" />
       </div>
     </div>
   )
 }
 
-// Robot sentry turrets that track scroll
+// Robot sentry turrets - decorative
 function RobotSentry({ side }: { side: 'left' | 'right' }) {
   const { scrollProgress } = useSmoothScroll(0.1)
   const prefersReducedMotion = usePrefersReducedMotion()
 
-  // Rotation based on scroll
   const rotation = prefersReducedMotion ? 0 : scrollProgress * 60 - 30
   const active = scrollProgress > 0.1 && scrollProgress < 0.9
 
@@ -604,13 +543,13 @@ function RobotSentry({ side }: { side: 'left' | 'right' }) {
           transform: `rotate(${rotation * 0.3}deg)`,
         }}
       >
-        <TurretSilhouette size={90} active={active} side={side} />
+        <TurretSilhouette size={80} active={active} side={side} />
       </div>
-      {/* "Are you still there?" indicator */}
       {active && (
         <div
           className="absolute -top-6 left-1/2 -translate-x-1/2 text-[8px] whitespace-nowrap glados-text"
           style={{ color: '#ff3333' }}
+          aria-hidden="true"
         >
           TARGET ACQUIRED
         </div>
@@ -620,43 +559,74 @@ function RobotSentry({ side }: { side: 'left' | 'right' }) {
 }
 
 // ============================================================================
-// CV CONTENT COMPONENTS - PORTAL STYLED
+// CV CONTENT COMPONENTS - PORTAL STYLED TEST CHAMBER CARDS
 // ============================================================================
 
-// Aperture Science styled frame for sections
-function ApertureFrame({
+// Aperture Science test chamber card - clean white panels with portal glow edges
+function TestChamberSection({
   children,
   title,
   icon,
   warning,
+  variant = 'clean',
+  glowColor = 'blue',
 }: {
   children: React.ReactNode
   title: string
   icon?: React.ReactNode
   warning?: string
+  variant?: 'clean' | 'scuffed' | 'overgrown'
+  glowColor?: 'blue' | 'orange' | 'both'
 }) {
+  const glowStyle = {
+    blue: `0 0 30px ${PORTAL_BLUE}20, inset 0 0 60px ${PORTAL_BLUE}05`,
+    orange: `0 0 30px ${PORTAL_ORANGE}20, inset 0 0 60px ${PORTAL_ORANGE}05`,
+    both: `0 0 20px ${PORTAL_BLUE}15, 0 0 20px ${PORTAL_ORANGE}15, inset 0 0 40px ${PORTAL_BLUE}03, inset 0 0 40px ${PORTAL_ORANGE}03`,
+  }
+
+  const borderColor = glowColor === 'orange' ? PORTAL_ORANGE : glowColor === 'both' ? PORTAL_BLUE : PORTAL_BLUE
+
   return (
     <section
-      className="relative"
+      className="relative chamber-section"
       aria-labelledby={`section-${title.toLowerCase().replace(/\s+/g, '-')}`}
     >
-      {/* Corner brackets - test chamber style */}
-      {[
-        'top-0 left-0 border-t-2 border-l-2',
-        'top-0 right-0 border-t-2 border-r-2',
-        'bottom-0 left-0 border-b-2 border-l-2',
-        'bottom-0 right-0 border-b-2 border-r-2'
-      ].map((pos, i) => (
-        <div
-          key={i}
-          className={`absolute w-5 h-5 ${pos}`}
-          style={{ borderColor: i < 2 ? PORTAL_ORANGE : PORTAL_BLUE }}
-          aria-hidden="true"
-        />
-      ))}
+      {/* Caution stripe borders - top and bottom */}
+      <div
+        className="absolute top-0 left-0 right-0 h-1"
+        style={{
+          background: `repeating-linear-gradient(90deg, ${WARNING_YELLOW}, ${WARNING_YELLOW} 8px, ${CAUTION_BLACK} 8px, ${CAUTION_BLACK} 16px)`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-0 left-0 right-0 h-1"
+        style={{
+          background: `repeating-linear-gradient(90deg, ${CAUTION_BLACK}, ${CAUTION_BLACK} 8px, ${WARNING_YELLOW} 8px, ${WARNING_YELLOW} 16px)`,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Portal glow edges - left (orange) and right (blue) */}
+      <div
+        className="absolute top-0 bottom-0 left-0 w-1"
+        style={{
+          background: `linear-gradient(180deg, ${PORTAL_ORANGE}60, ${PORTAL_ORANGE}30, ${PORTAL_ORANGE}60)`,
+          boxShadow: `0 0 15px ${PORTAL_ORANGE}40`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute top-0 bottom-0 right-0 w-1"
+        style={{
+          background: `linear-gradient(180deg, ${PORTAL_BLUE}60, ${PORTAL_BLUE}30, ${PORTAL_BLUE}60)`,
+          boxShadow: `0 0 15px ${PORTAL_BLUE}40`,
+        }}
+        aria-hidden="true"
+      />
 
       {/* Section header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-6 pt-4 px-6">
         <div
           className="flex-1 h-px"
           style={{ background: `linear-gradient(90deg, transparent, ${PORTAL_ORANGE}50)` }}
@@ -681,20 +651,53 @@ function ApertureFrame({
 
       {/* Optional warning */}
       {warning && (
-        <div className="mb-4 flex justify-center">
+        <div className="mb-4 flex justify-center px-6">
           <WarningSign text="NOTICE" subtext={warning} />
         </div>
       )}
 
-      {/* Content panel */}
+      {/* Content panel - white panel grid texture */}
       <div
         className="p-6 relative"
         style={{
-          background: `linear-gradient(180deg, ${PANEL_DARK}f5, #0c0c10f5)`,
-          border: `1px solid ${PORTAL_BLUE}25`,
-          boxShadow: `inset 0 1px 0 ${APERTURE_WHITE}05`,
+          background: `
+            linear-gradient(180deg, ${PANEL_DARK}f8, #0c0c10f8),
+            repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px),
+            repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.02) 39px, rgba(255,255,255,0.02) 40px)
+          `,
+          boxShadow: glowStyle[glowColor],
         }}
       >
+        {/* Scuff overlay for 'scuffed' variant */}
+        {variant === 'scuffed' && (
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.03]"
+            style={{
+              backgroundImage: `
+                radial-gradient(circle at 15% 20%, rgba(139, 69, 19, 0.5) 0%, transparent 10%),
+                radial-gradient(circle at 80% 70%, rgba(100, 100, 100, 0.4) 0%, transparent 15%),
+                radial-gradient(circle at 50% 90%, rgba(139, 69, 19, 0.3) 0%, transparent 8%)
+              `,
+            }}
+            aria-hidden="true"
+          />
+        )}
+
+        {/* Overgrown overlay for 'overgrown' variant */}
+        {variant === 'overgrown' && (
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.04]"
+            style={{
+              backgroundImage: `
+                radial-gradient(circle at 10% 80%, rgba(34, 139, 34, 0.4) 0%, transparent 20%),
+                radial-gradient(circle at 90% 20%, rgba(34, 139, 34, 0.3) 0%, transparent 15%),
+                radial-gradient(circle at 30% 50%, rgba(107, 142, 35, 0.2) 0%, transparent 10%)
+              `,
+            }}
+            aria-hidden="true"
+          />
+        )}
+
         {children}
       </div>
     </section>
@@ -726,7 +729,7 @@ function GladosText({
   )
 }
 
-// Portal Ring - profession selection
+// Portal Ring - profession selection (VISIBLE IMMEDIATELY)
 function PortalRing({
   profession,
   isActive,
@@ -752,7 +755,7 @@ function PortalRing({
   return (
     <button
       onClick={onClick}
-      className={`absolute ${prefersReducedMotion ? '' : 'transition-all duration-500'} ${
+      className={`absolute ${prefersReducedMotion ? '' : 'transition-all duration-300'} ${
         isActive ? 'scale-110 z-20' : 'scale-100 hover:scale-105'
       }`}
       style={{
@@ -867,7 +870,7 @@ function TechTerminal({ categories }: { categories: ReturnType<typeof getEnginee
             {category.items.map((tech, i) => (
               <span
                 key={tech}
-                className="px-3 py-1.5 text-xs transition-all hover:scale-105 cursor-default chamber-panel"
+                className="px-3 py-1.5 text-xs transition-all hover:scale-105 cursor-default"
                 style={{
                   background: `${i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE}12`,
                   border: `1px solid ${i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE}35`,
@@ -923,7 +926,7 @@ function SkillsPanel({ categories }: { categories: ReturnType<typeof getSkillsBy
   )
 }
 
-// Project card - test chamber style
+// Project card - test chamber style with portal glow
 function TestChamberCard({ project, index }: { project: typeof PROJECTS_DATA[0]; index: number }) {
   const [hovered, setHovered] = useState(false)
   const isOrange = index % 2 === 0
@@ -931,9 +934,13 @@ function TestChamberCard({ project, index }: { project: typeof PROJECTS_DATA[0];
 
   return (
     <article
-      className="relative p-5 cursor-pointer transition-all duration-300 group chamber-panel"
+      className="relative p-5 cursor-pointer transition-all duration-300 group"
       style={{
-        background: `linear-gradient(180deg, ${PANEL_DARK}, #0a0a0e)`,
+        background: `
+          linear-gradient(180deg, ${PANEL_DARK}, #0a0a0e),
+          repeating-linear-gradient(0deg, transparent, transparent 19px, rgba(255,255,255,0.015) 19px, rgba(255,255,255,0.015) 20px),
+          repeating-linear-gradient(90deg, transparent, transparent 19px, rgba(255,255,255,0.015) 19px, rgba(255,255,255,0.015) 20px)
+        `,
         border: `2px solid ${hovered ? color : '#2a2a30'}`,
         boxShadow: hovered ? `0 0 40px ${color}30, inset 0 0 40px ${color}08` : 'none',
       }}
@@ -941,6 +948,22 @@ function TestChamberCard({ project, index }: { project: typeof PROJECTS_DATA[0];
       onMouseLeave={() => setHovered(false)}
       aria-labelledby={`project-${project.id}`}
     >
+      {/* Portal glow edge on hover */}
+      {hovered && (
+        <>
+          <div
+            className="absolute top-0 bottom-0 left-0 w-0.5"
+            style={{ background: PORTAL_ORANGE, boxShadow: `0 0 10px ${PORTAL_ORANGE}` }}
+            aria-hidden="true"
+          />
+          <div
+            className="absolute top-0 bottom-0 right-0 w-0.5"
+            style={{ background: PORTAL_BLUE, boxShadow: `0 0 10px ${PORTAL_BLUE}` }}
+            aria-hidden="true"
+          />
+        </>
+      )}
+
       {/* Chamber number badge */}
       <div
         className="absolute -top-3 -right-3 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold"
@@ -1013,7 +1036,7 @@ function VentureCard({ company }: { company: typeof COMPANIES[0] }) {
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-5 transition-all hover:scale-[1.02] group chamber-panel"
+      className="block p-5 transition-all hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(180deg, ${PANEL_DARK}, #0a0a0e)`,
         border: `1px solid ${PORTAL_BLUE}30`,
@@ -1048,7 +1071,7 @@ function VentureCard({ company }: { company: typeof COMPANIES[0] }) {
   )
 }
 
-// Experience card
+// Experience card - FULLY VISIBLE
 function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; index: number }) {
   const isOrange = index % 2 === 0
   const color = isOrange ? PORTAL_ORANGE : PORTAL_BLUE
@@ -1057,7 +1080,7 @@ function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; in
 
   return (
     <article
-      className="p-5 chamber-panel"
+      className="p-5"
       style={{
         background: `linear-gradient(180deg, ${PANEL_DARK}, #0a0a0e)`,
         border: `1px solid ${color}25`,
@@ -1115,11 +1138,11 @@ function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; in
   )
 }
 
-// Band card
+// Band card - FULLY VISIBLE
 function MusicChamberCard({ band }: { band: typeof BANDS[0] }) {
   const content = (
     <article
-      className="p-5 transition-all hover:scale-[1.02] group chamber-panel"
+      className="p-5 transition-all hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(180deg, ${PANEL_DARK}, #0a0a0e)`,
         border: `1px solid ${PORTAL_ORANGE}30`,
@@ -1162,7 +1185,7 @@ function MusicChamberCard({ band }: { band: typeof BANDS[0] }) {
 }
 
 // ============================================================================
-// MAIN THEME COMPONENT
+// MAIN THEME COMPONENT - ALL CONTENT IMMEDIATELY VISIBLE
 // ============================================================================
 
 export default function NeonPortalsTheme() {
@@ -1209,18 +1232,18 @@ export default function NeonPortalsTheme() {
       <TestChamberPanels />
       <AmbientParticles />
 
-      {/* Scroll scene with portals and test subject */}
-      <ScrollPortalScene />
+      {/* Static portal decoration */}
+      <PortalDecoration />
 
       {/* Robot sentries */}
       <RobotSentry side="left" />
       <RobotSentry side="right" />
 
-      {/* Header */}
+      {/* Header - IMMEDIATELY VISIBLE */}
       <header className="relative z-30 p-6" role="banner">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-4">
           <div className="flex items-center gap-6">
-            <ApertureLogoSVG size={55} color={APERTURE_WHITE} className="spin-very-slow" />
+            <ApertureLogoSVG size={55} color={APERTURE_WHITE} className={prefersReducedMotion ? '' : 'spin-very-slow'} />
             <div>
               <h1
                 className="text-2xl md:text-3xl tracking-wide font-light glados-text"
@@ -1243,7 +1266,7 @@ export default function NeonPortalsTheme() {
           <nav className="flex gap-3 items-center" aria-label="Main navigation">
             <Link
               href="/cv"
-              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 chamber-panel"
+              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105"
               style={{
                 background: `${PORTAL_BLUE}15`,
                 border: `2px solid ${PORTAL_BLUE}`,
@@ -1271,7 +1294,7 @@ export default function NeonPortalsTheme() {
         </div>
       </header>
 
-      {/* Current Roles */}
+      {/* Current Roles - IMMEDIATELY VISIBLE */}
       <section className="relative z-20 py-4 px-6" aria-label="Current roles">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
@@ -1296,7 +1319,7 @@ export default function NeonPortalsTheme() {
         </div>
       </section>
 
-      {/* Portal selection area */}
+      {/* Portal selection area - IMMEDIATELY VISIBLE */}
       <section
         className="relative z-20 h-[340px]"
         aria-label="Select profession"
@@ -1324,97 +1347,90 @@ export default function NeonPortalsTheme() {
         </div>
       </section>
 
-      {/* Main content */}
+      {/* Main content - ALL IMMEDIATELY VISIBLE */}
       <main id="main-content" className="relative z-20 px-6 py-8">
         <div className="max-w-5xl mx-auto space-y-10">
-          {/* About */}
-          <PortalReveal portalSide="left" delay={0} initialVisible={true}>
-            <ApertureFrame title="Test Subject Profile" warning="CLEARANCE LEVEL: AUTHORIZED">
-              <p className="text-sm leading-relaxed mb-5 glados-text" style={{ color: APERTURE_WHITE }}>
-                {aboutData.bio}
-              </p>
-              <div className="flex flex-wrap gap-2" role="list" aria-label="Quick facts">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span
-                    key={i}
-                    className="text-xs px-3 py-1.5 chamber-panel"
-                    style={{
-                      background: `${i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE}12`,
-                      border: `1px solid ${i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE}`,
-                      color: i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE,
-                    }}
-                    role="listitem"
-                  >
-                    {fact}
-                  </span>
-                ))}
-              </div>
-            </ApertureFrame>
-          </PortalReveal>
+          {/* About - VISIBLE */}
+          <TestChamberSection title="Test Subject Profile" warning="CLEARANCE LEVEL: AUTHORIZED" variant="clean" glowColor="both">
+            <p className="text-sm leading-relaxed mb-5 glados-text" style={{ color: APERTURE_WHITE }}>
+              {aboutData.bio}
+            </p>
+            <div className="flex flex-wrap gap-2" role="list" aria-label="Quick facts">
+              {aboutData.quickFacts.map((fact, i) => (
+                <span
+                  key={i}
+                  className="text-xs px-3 py-1.5"
+                  style={{
+                    background: `${i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE}12`,
+                    border: `1px solid ${i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE}`,
+                    color: i % 2 === 0 ? PORTAL_BLUE : PORTAL_ORANGE,
+                  }}
+                  role="listitem"
+                >
+                  {fact}
+                </span>
+              ))}
+            </div>
+          </TestChamberSection>
 
-          {/* Work Experience */}
+          {/* Work Experience - VISIBLE */}
           {experience.length > 0 && (
-            <PortalReveal portalSide="right" delay={100}>
-              <ApertureFrame title="Testing History">
-                <div className="space-y-4">
-                  {experience.map((entry, i) => (
-                    <ExperienceCard key={entry.id} entry={entry} index={i} />
-                  ))}
-                </div>
-              </ApertureFrame>
-            </PortalReveal>
-          )}
-
-          {/* Tech Stack / Skills */}
-          <PortalReveal portalSide="left" delay={100}>
-            <ApertureFrame title={active === 'engineer' ? 'Equipment Specifications' : 'Subject Capabilities'}>
-              {active === 'engineer' ? (
-                <TechTerminal categories={engineerTech} />
-              ) : (
-                <SkillsPanel categories={otherSkills} />
-              )}
-            </ApertureFrame>
-          </PortalReveal>
-
-          {/* Projects */}
-          <PortalReveal portalSide="right" delay={100}>
-            <ApertureFrame title="Test Chambers" warning="RESULTS VERIFIED">
-              <div className="grid md:grid-cols-2 gap-5">
-                {projects.filter(p => p.featured).slice(0, 6).map((project, i) => (
-                  <TestChamberCard key={project.id} project={project} index={i} />
+            <TestChamberSection title="Testing History" variant="scuffed" glowColor="orange">
+              <div className="space-y-4">
+                {experience.map((entry, i) => (
+                  <ExperienceCard key={entry.id} entry={entry} index={i} />
                 ))}
               </div>
-            </ApertureFrame>
-          </PortalReveal>
-
-          {/* Companies (Engineer) / Bands (Drummer) */}
-          {active === 'engineer' && (
-            <PortalReveal portalSide="left" delay={100}>
-              <ApertureFrame title="Enrichment Ventures">
-                <div className="grid md:grid-cols-3 gap-5">
-                  {COMPANIES.map((company) => (
-                    <VentureCard key={company.id} company={company} />
-                  ))}
-                </div>
-              </ApertureFrame>
-            </PortalReveal>
+            </TestChamberSection>
           )}
 
+          {/* Tech Stack / Skills - VISIBLE */}
+          <TestChamberSection
+            title={active === 'engineer' ? 'Equipment Specifications' : 'Subject Capabilities'}
+            variant="clean"
+            glowColor="blue"
+          >
+            {active === 'engineer' ? (
+              <TechTerminal categories={engineerTech} />
+            ) : (
+              <SkillsPanel categories={otherSkills} />
+            )}
+          </TestChamberSection>
+
+          {/* Projects - VISIBLE */}
+          <TestChamberSection title="Test Chambers" warning="RESULTS VERIFIED" variant="scuffed" glowColor="both">
+            <div className="grid md:grid-cols-2 gap-5">
+              {projects.filter(p => p.featured).slice(0, 6).map((project, i) => (
+                <TestChamberCard key={project.id} project={project} index={i} />
+              ))}
+            </div>
+          </TestChamberSection>
+
+          {/* Companies (Engineer) - VISIBLE */}
+          {active === 'engineer' && (
+            <TestChamberSection title="Enrichment Ventures" variant="overgrown" glowColor="blue">
+              <div className="grid md:grid-cols-3 gap-5">
+                {COMPANIES.map((company) => (
+                  <VentureCard key={company.id} company={company} />
+                ))}
+              </div>
+            </TestChamberSection>
+          )}
+
+          {/* Bands (Drummer) - VISIBLE */}
           {active === 'drummer' && (
-            <PortalReveal portalSide="left" delay={100}>
-              <ApertureFrame title="Audio Test Subjects">
-                <div className="grid md:grid-cols-3 gap-5">
-                  {BANDS.map((band) => (
-                    <MusicChamberCard key={band.id} band={band} />
-                  ))}
-                </div>
-              </ApertureFrame>
-            </PortalReveal>
+            <TestChamberSection title="Audio Test Subjects" variant="overgrown" glowColor="orange">
+              <div className="grid md:grid-cols-3 gap-5">
+                {BANDS.map((band) => (
+                  <MusicChamberCard key={band.id} band={band} />
+                ))}
+              </div>
+            </TestChamberSection>
           )}
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer - VISIBLE */}
       <footer className="relative z-20 py-10 text-center" role="contentinfo">
         <div className="flex items-center justify-center gap-5">
           <ApertureLogoSVG size={28} color="#444" />
@@ -1449,12 +1465,9 @@ export default function NeonPortalsTheme() {
           letter-spacing: 0.02em;
         }
 
-        /* Chamber panel hover effect */
-        .chamber-panel {
-          transition: all 0.3s ease;
-        }
-        .chamber-panel:hover {
-          transform: translateY(-2px);
+        /* Chamber section styling */
+        .chamber-section {
+          position: relative;
         }
 
         /* Portal glow animations */
