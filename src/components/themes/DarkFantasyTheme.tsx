@@ -830,6 +830,323 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
   )
 }
 
+// Art Section 1 - The Knight silhouette with infection tendrils
+function ArtSectionKnight() {
+  return (
+    <div className="relative z-20 py-16 px-6 overflow-hidden">
+      <div className="max-w-6xl mx-auto relative h-48 flex items-center justify-center">
+        {/* Infection tendrils spreading from center */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 200" preserveAspectRatio="xMidYMid meet">
+          {/* Left infection tendril */}
+          <path
+            d="M400,100 Q350,90 280,85 Q200,80 120,95 Q80,100 40,90"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="2"
+            opacity="0.3"
+            className="animate-pulse"
+          />
+          <path
+            d="M400,100 Q340,110 260,105 Q180,100 100,115"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="1.5"
+            opacity="0.2"
+          />
+          {/* Right infection tendril */}
+          <path
+            d="M400,100 Q450,90 520,85 Q600,80 680,95 Q720,100 760,90"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="2"
+            opacity="0.3"
+            className="animate-pulse"
+          />
+          <path
+            d="M400,100 Q460,110 540,105 Q620,100 700,115"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="1.5"
+            opacity="0.2"
+          />
+          {/* Infection orbs along tendrils */}
+          {[120, 220, 320, 480, 580, 680].map((x, i) => (
+            <circle
+              key={i}
+              cx={x}
+              cy={90 + Math.sin(i * 1.5) * 15}
+              r={3 + Math.random() * 2}
+              fill={HK.infection}
+              opacity={0.2 + Math.random() * 0.2}
+            />
+          ))}
+        </svg>
+
+        {/* Centered Knight silhouette */}
+        <div className="relative z-10">
+          <TheKnight size={80} />
+          {/* Soul glow behind knight */}
+          <div
+            className="absolute inset-0 -z-10"
+            style={{
+              background: `radial-gradient(circle, ${HK.soul}30 0%, transparent 70%)`,
+              filter: 'blur(20px)',
+              transform: 'scale(2)',
+            }}
+          />
+        </div>
+
+        {/* Decorative soul wisps */}
+        <div
+          className="absolute left-1/4 top-1/2 w-3 h-3 rounded-full"
+          style={{
+            background: HK.soul,
+            boxShadow: `0 0 15px ${HK.soul}`,
+            opacity: 0.5,
+            animation: 'soulFloat 8s ease-in-out infinite',
+          }}
+        />
+        <div
+          className="absolute right-1/4 top-1/3 w-2 h-2 rounded-full"
+          style={{
+            background: HK.soul,
+            boxShadow: `0 0 10px ${HK.soul}`,
+            opacity: 0.4,
+            animation: 'soulFloat 10s ease-in-out infinite 2s',
+          }}
+        />
+      </div>
+
+      {/* Horizontal divider lines */}
+      <div className="max-w-2xl mx-auto flex items-center gap-4 mt-4">
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HK.darkPurple}, transparent)` }} />
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <path d="M10,2 L18,10 L10,18 L2,10 Z" fill="none" stroke={HK.soul} strokeWidth="1" opacity="0.5" />
+        </svg>
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HK.darkPurple}, transparent)` }} />
+      </div>
+    </div>
+  )
+}
+
+// Art Section 2 - Soul vessels and particles
+function ArtSectionSoul() {
+  const [vessels] = useState(() =>
+    Array.from({ length: 5 }, (_, i) => ({
+      id: i,
+      x: 15 + i * 18,
+      fill: 30 + Math.random() * 70,
+      delay: i * 0.5,
+    }))
+  )
+
+  return (
+    <div className="relative z-20 py-16 px-6 overflow-hidden">
+      <div className="max-w-4xl mx-auto relative h-32 flex items-center justify-center">
+        {/* Soul vessels in a row */}
+        <div className="flex items-end justify-center gap-8">
+          {vessels.map((v) => (
+            <div
+              key={v.id}
+              className="transform hover:scale-110 transition-transform duration-300"
+              style={{
+                animation: `vesselPulse 3s ease-in-out infinite`,
+                animationDelay: `${v.delay}s`,
+              }}
+            >
+              <SoulVessel filled={v.fill} />
+            </div>
+          ))}
+        </div>
+
+        {/* Floating soul particles */}
+        {Array.from({ length: 8 }, (_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              left: `${10 + i * 12}%`,
+              top: `${20 + Math.sin(i * 2) * 30}%`,
+              width: 4 + Math.random() * 3,
+              height: 4 + Math.random() * 3,
+              background: HK.soul,
+              boxShadow: `0 0 ${10 + Math.random() * 10}px ${HK.soul}`,
+              opacity: 0.3 + Math.random() * 0.3,
+              animation: `soulFloat ${15 + Math.random() * 10}s ease-in-out infinite`,
+              animationDelay: `${-Math.random() * 10}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Decorative curved lines */}
+      <svg className="w-full h-8 mt-4" viewBox="0 0 800 30" preserveAspectRatio="none">
+        <path
+          d="M0,15 Q200,5 400,15 Q600,25 800,15"
+          fill="none"
+          stroke={HK.soul}
+          strokeWidth="1"
+          opacity="0.2"
+        />
+        <path
+          d="M0,15 Q200,25 400,15 Q600,5 800,15"
+          fill="none"
+          stroke={HK.darkPurple}
+          strokeWidth="1"
+          opacity="0.4"
+        />
+      </svg>
+    </div>
+  )
+}
+
+// Art Section 3 - Infection spreading pattern
+function ArtSectionInfection() {
+  return (
+    <div className="relative z-20 py-16 px-6 overflow-hidden">
+      <div className="max-w-6xl mx-auto relative h-40">
+        <svg className="w-full h-full" viewBox="0 0 1000 160" preserveAspectRatio="xMidYMid meet">
+          {/* Central infection mass */}
+          <ellipse
+            cx="500"
+            cy="80"
+            rx="30"
+            ry="25"
+            fill={HK.infection}
+            opacity="0.3"
+          />
+          <ellipse
+            cx="500"
+            cy="80"
+            rx="20"
+            ry="15"
+            fill={HK.infection}
+            opacity="0.5"
+          />
+          <ellipse
+            cx="500"
+            cy="80"
+            rx="8"
+            ry="6"
+            fill={HK.infection}
+            opacity="0.8"
+          />
+
+          {/* Spreading veins - left */}
+          <path
+            d="M470,80 Q400,60 320,70 Q240,80 160,60 Q100,45 40,55"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="3"
+            opacity="0.25"
+            strokeLinecap="round"
+          />
+          <path
+            d="M470,80 Q420,100 350,95 Q280,90 200,110 Q140,125 60,115"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="2"
+            opacity="0.2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M470,85 Q430,70 380,75 Q320,80 260,65"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="1.5"
+            opacity="0.15"
+            strokeLinecap="round"
+          />
+
+          {/* Spreading veins - right */}
+          <path
+            d="M530,80 Q600,60 680,70 Q760,80 840,60 Q900,45 960,55"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="3"
+            opacity="0.25"
+            strokeLinecap="round"
+          />
+          <path
+            d="M530,80 Q580,100 650,95 Q720,90 800,110 Q860,125 940,115"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="2"
+            opacity="0.2"
+            strokeLinecap="round"
+          />
+          <path
+            d="M530,85 Q570,70 620,75 Q680,80 740,65"
+            fill="none"
+            stroke={HK.infection}
+            strokeWidth="1.5"
+            opacity="0.15"
+            strokeLinecap="round"
+          />
+
+          {/* Infection bubbles/cysts */}
+          {[
+            { x: 380, y: 75 }, { x: 280, y: 90 }, { x: 180, y: 65 }, { x: 100, y: 85 },
+            { x: 620, y: 75 }, { x: 720, y: 90 }, { x: 820, y: 65 }, { x: 900, y: 85 },
+          ].map((pos, i) => (
+            <g key={i}>
+              <circle
+                cx={pos.x}
+                cy={pos.y}
+                r={4 + Math.random() * 3}
+                fill={HK.infection}
+                opacity={0.2 + Math.random() * 0.15}
+              />
+              <circle
+                cx={pos.x}
+                cy={pos.y}
+                r={2}
+                fill={HK.infection}
+                opacity={0.4}
+              />
+            </g>
+          ))}
+
+          {/* Decorative void eyes in infection */}
+          <g opacity="0.4">
+            <ellipse cx="500" cy="80" rx="5" ry="8" fill={HK.void} />
+            {/* Eye shine */}
+            <circle cx="502" cy="77" r="1.5" fill={HK.infection} opacity="0.8" />
+          </g>
+        </svg>
+
+        {/* Glow effect behind infection */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32"
+          style={{
+            background: `radial-gradient(ellipse, ${HK.infection}20 0%, transparent 70%)`,
+            filter: 'blur(30px)',
+          }}
+        />
+      </div>
+
+      {/* Bottom divider */}
+      <div className="max-w-3xl mx-auto flex items-center gap-6 mt-4">
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HK.infection}40, transparent)` }} />
+        <div className="flex gap-2">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-2 h-2 rounded-full"
+              style={{
+                background: HK.infection,
+                opacity: 0.3 + i * 0.2,
+                boxShadow: `0 0 8px ${HK.infection}`,
+              }}
+            />
+          ))}
+        </div>
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HK.infection}40, transparent)` }} />
+      </div>
+    </div>
+  )
+}
+
 export default function DarkFantasyTheme() {
   const { theme } = useTheme()
   const { active, setActive, config } = useProfession()
@@ -1028,6 +1345,9 @@ export default function DarkFantasyTheme() {
         </div>
       </section>
 
+      {/* Art Section 1 - Knight silhouette with infection */}
+      <ArtSectionKnight />
+
       {/* Work Experience */}
       {experience.length > 0 && (
         <section className="relative z-20 py-8 px-6">
@@ -1042,6 +1362,9 @@ export default function DarkFantasyTheme() {
           </div>
         </section>
       )}
+
+      {/* Art Section 2 - Soul vessels */}
+      <ArtSectionSoul />
 
       {/* Tech Stack / Skills */}
       <section className="relative z-20 py-8 px-6">
@@ -1069,7 +1392,10 @@ export default function DarkFantasyTheme() {
         </div>
       </section>
 
-      {/* Companies (Engineer) / Bands (Drummer) */}
+      {/* Art Section 3 - Infection pattern */}
+      <ArtSectionInfection />
+
+      {/* Companies (Engineer) / Bands (Drummer) - Ventures */}
       {active === 'engineer' && (
         <section className="relative z-20 py-8 px-6">
           <div className="max-w-4xl mx-auto">
@@ -1097,6 +1423,22 @@ export default function DarkFantasyTheme() {
           </div>
         </section>
       )}
+
+      {/* Posts Section */}
+      <section className="relative z-20 py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <VoidFrame title="Posts">
+            <div className="text-center py-8">
+              <p className="text-sm" style={{ color: HK.silver }}>
+                Writings and thoughts coming soon...
+              </p>
+              <p className="text-xs mt-2 italic" style={{ color: HK.soul }}>
+                ◇ Check back for updates on development, music, and martial arts
+              </p>
+            </div>
+          </VoidFrame>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="relative z-20 py-12 px-6 text-center">
@@ -1136,6 +1478,10 @@ export default function DarkFantasyTheme() {
           20% { opacity: 1; }
           80% { opacity: 1; }
           100% { transform: translateX(calc(100vw + 100px)); opacity: 0; }
+        }
+        @keyframes vesselPulse {
+          0%, 100% { transform: scale(1); filter: brightness(1); }
+          50% { transform: scale(1.05); filter: brightness(1.1); }
         }
       `}</style>
     </div>
