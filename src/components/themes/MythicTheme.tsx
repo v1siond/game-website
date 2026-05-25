@@ -1260,83 +1260,74 @@ export default function MythicTheme() {
       <SideFlames side="right" reducedMotion={reducedMotion} />
 
       {/* ========== HEADER ========== */}
-      <header className="relative z-30 pt-8 pb-4 text-center px-20" role="banner">
-        <MeanderBorder className="max-w-2xl mx-auto mb-6" />
+      <header className="relative z-30 p-6" role="banner">
+        <div className="max-w-6xl mx-auto flex justify-between items-start">
+          <div className="flex items-center gap-4">
+            {/* Laurel wreath icon */}
+            <div className="relative flex-shrink-0">
+              <LaurelWreath width={60} />
+            </div>
+            <div>
+              <h1
+                className="text-2xl md:text-3xl tracking-[0.15em]"
+                style={{
+                  color: HADES_COLORS.goldMid,
+                  textShadow: `0 0 30px ${HADES_COLORS.goldMid}50, 0 2px 4px ${HADES_COLORS.stoneDeep}`,
+                }}
+              >
+                ALEXANDER PULIDO
+              </h1>
+              <p
+                className="text-sm tracking-widest mt-1"
+                style={{ color: HADES_COLORS.textPrimary }}
+              >
+                {active === 'engineer' ? PROFESSIONAL_SUMMARY.headline.toUpperCase() : config.title.toUpperCase()}
+              </p>
+              <p
+                className="text-xs tracking-wider italic mt-1"
+                style={{ color: godColors[active] }}
+              >
+                {active === 'engineer' ? PROFESSIONAL_SUMMARY.tagline : aboutData.headline}
+              </p>
+            </div>
+          </div>
 
-        {/* Laurel wreath with name */}
-        <div className="relative mb-2">
-          <LaurelWreath width={200} />
-          <h1
-            className="text-3xl md:text-4xl tracking-[0.15em] relative z-10 mt-2"
-            style={{
-              color: HADES_COLORS.goldMid,
-              textShadow: `0 0 30px ${HADES_COLORS.goldMid}50, 0 2px 4px ${HADES_COLORS.stoneDeep}`,
-            }}
-          >
-            ALEXANDER PULIDO
-          </h1>
-        </div>
-
-        {/* Professional headline */}
-        <p
-          className="text-sm tracking-widest mb-1"
-          style={{ color: HADES_COLORS.textPrimary }}
-        >
-          {active === 'engineer' ? PROFESSIONAL_SUMMARY.headline.toUpperCase() : config.title.toUpperCase()}
-        </p>
-        <p
-          className="text-xs tracking-wider italic mb-2"
-          style={{ color: godColors[active] }}
-        >
-          {active === 'engineer' ? PROFESSIONAL_SUMMARY.tagline : aboutData.headline}
-        </p>
-        <p
-          className="text-[10px] tracking-[0.3em]"
-          style={{ color: HADES_COLORS.textMuted }}
-        >
-          ESCAPE FROM THE UNDERWORLD
-        </p>
-
-        <SpearDivider />
-
-        {/* Navigation buttons */}
-        <div className="flex justify-center gap-4 mt-4 flex-wrap">
-          <Link
-            href="/cv"
-            className="px-6 py-2 text-sm tracking-wider transition-all hover:scale-105 relative group"
-            style={{
-              background: 'transparent',
-              border: `2px solid ${HADES_COLORS.goldMid}`,
-              color: HADES_COLORS.goldMid,
-            }}
-          >
-            <span className="relative z-10">CODEX</span>
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ background: `${HADES_COLORS.goldMid}20` }}
-            />
-          </Link>
-          <Link
-            href="/personal-projects/game-engine"
-            className="px-6 py-2 text-sm tracking-wider transition-all hover:scale-105 relative overflow-hidden group"
-            style={{
-              background: `linear-gradient(180deg, ${HADES_COLORS.bloodBright}, ${HADES_COLORS.bloodDeep})`,
-              color: HADES_COLORS.textPrimary,
-              boxShadow: `0 0 15px ${HADES_COLORS.bloodMid}60`,
-            }}
-          >
-            <span className="relative z-10">ENTER TARTARUS</span>
-            <div
-              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          <nav className="flex gap-3 items-center" aria-label="Main navigation">
+            <Link
+              href="/cv"
+              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 relative group"
               style={{
-                background: `linear-gradient(180deg, ${HADES_COLORS.bloodGlow}, ${HADES_COLORS.bloodBright})`,
+                background: 'transparent',
+                border: `2px solid ${HADES_COLORS.goldMid}`,
+                color: HADES_COLORS.goldMid,
               }}
-            />
-          </Link>
-          <ThemeSwitcher />
+            >
+              <span className="relative z-10">CODEX</span>
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: `${HADES_COLORS.goldMid}20` }}
+              />
+            </Link>
+            <Link
+              href="/personal-projects/game-engine"
+              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 relative overflow-hidden group"
+              style={{
+                background: `linear-gradient(180deg, ${HADES_COLORS.bloodBright}, ${HADES_COLORS.bloodDeep})`,
+                color: HADES_COLORS.textPrimary,
+                boxShadow: `0 0 15px ${HADES_COLORS.bloodMid}60`,
+              }}
+            >
+              <span className="relative z-10">ENTER TARTARUS</span>
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{
+                  background: `linear-gradient(180deg, ${HADES_COLORS.bloodGlow}, ${HADES_COLORS.bloodBright})`,
+                }}
+              />
+            </Link>
+            <ThemeSwitcher />
+          </nav>
         </div>
-
-        <MeanderBorder className="max-w-2xl mx-auto mt-6" />
       </header>
 
       {/* ========== BOON SELECTION ========== */}

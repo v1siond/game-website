@@ -1522,65 +1522,71 @@ export default function ArtDecoTheme() {
       />
 
       {/* Header */}
-      <header className="relative z-30 p-8 text-center" role="banner">
-        {/* Art deco sunburst - lighthouse motif */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-48 pointer-events-none" aria-hidden="true">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div
-              key={i}
-              className="absolute bottom-0 left-1/2 w-0.5 h-32"
+      <header className="relative z-30 p-6" role="banner">
+        <div className="max-w-6xl mx-auto flex justify-between items-start">
+          <div className="flex items-center gap-4">
+            {/* Art deco sunburst - lighthouse motif */}
+            <div className="relative w-16 h-16 pointer-events-none flex-shrink-0" aria-hidden="true">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="absolute top-1/2 left-1/2 w-0.5 h-8"
+                  style={{
+                    background: 'linear-gradient(to top, #d4af37, transparent)',
+                    transform: `translate(-50%, -100%) rotate(${i * 45}deg)`,
+                    transformOrigin: 'bottom center',
+                    opacity: 0.4,
+                  }}
+                />
+              ))}
+              <DiverSilhouette size={40} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+            </div>
+            <div>
+              <h1
+                className="text-3xl tracking-[0.15em]"
+                style={{
+                  color: '#d4af37',
+                  textShadow: '0 0 40px rgba(212, 175, 55, 0.5)',
+                }}
+              >
+                <NeonSign text="ALEXANDER PULIDO" reducedMotion={reducedMotion} />
+              </h1>
+              <p className="text-sm tracking-wider mt-1" style={{ color: '#e8e0d0' }}>
+                {PROFESSIONAL_SUMMARY.headline}
+              </p>
+              <p className="text-xs tracking-wider mt-1 italic" style={{ color: '#d4af37' }}>
+                {PROFESSIONAL_SUMMARY.tagline}
+              </p>
+            </div>
+          </div>
+
+          <nav className="flex gap-3 items-center" aria-label="Main navigation">
+            <Link
+              href="/cv"
+              className={`px-4 py-2 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
               style={{
-                background: 'linear-gradient(to top, #d4af37, transparent)',
-                transform: `translateX(-50%) rotate(${-55 + i * 10}deg)`,
-                transformOrigin: 'bottom center',
-                opacity: 0.3,
+                background: 'transparent',
+                border: '2px solid #d4af37',
+                color: '#d4af37',
               }}
-            />
-          ))}
+              aria-label="View my dossier (CV)"
+            >
+              DOSSIER
+            </Link>
+            <Link
+              href="/personal-projects/game-engine"
+              className={`px-4 py-2 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+              style={{
+                background: '#d4af37',
+                color: '#0a1520',
+              }}
+              aria-label="Enter Rapture - explore personal projects"
+            >
+              ENTER RAPTURE
+            </Link>
+            <ThemeSwitcher />
+          </nav>
         </div>
-
-        <h1
-          className="text-4xl tracking-[0.2em] relative z-10"
-          style={{
-            color: '#d4af37',
-            textShadow: '0 0 40px rgba(212, 175, 55, 0.5)',
-          }}
-        >
-          <NeonSign text="ALEXANDER PULIDO" reducedMotion={reducedMotion} />
-        </h1>
-        <p className="text-sm tracking-wider mt-2" style={{ color: '#e8e0d0' }}>
-          {PROFESSIONAL_SUMMARY.headline}
-        </p>
-        <p className="text-xs tracking-wider mt-1 italic" style={{ color: '#d4af37' }}>
-          {PROFESSIONAL_SUMMARY.tagline}
-        </p>
-
-        <nav className="flex justify-center gap-4 mt-6" aria-label="Main navigation">
-          <Link
-            href="/cv"
-            className={`px-6 py-2 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-            style={{
-              background: 'transparent',
-              border: '2px solid #d4af37',
-              color: '#d4af37',
-            }}
-            aria-label="View my dossier (CV)"
-          >
-            DOSSIER
-          </Link>
-          <Link
-            href="/personal-projects/game-engine"
-            className={`px-6 py-2 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-            style={{
-              background: '#d4af37',
-              color: '#0a1520',
-            }}
-            aria-label="Enter Rapture - explore personal projects"
-          >
-            ENTER RAPTURE
-          </Link>
-          <ThemeSwitcher />
-        </nav>
       </header>
 
       {/* Current Roles */}

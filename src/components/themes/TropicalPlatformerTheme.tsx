@@ -571,6 +571,225 @@ function JungleFloaters({ profession, reducedMotion = false }: { profession: 'en
   )
 }
 
+// =============================================================================
+// ART SECTION COMPONENTS - Decorative themed breaks between content sections
+// These create visual rhythm and reinforce the Crash Bandicoot jungle theme
+// =============================================================================
+
+// Art Section: Jungle Trail with collectibles - appears after About
+function JungleTrailArt({ reducedMotion = false }: { reducedMotion?: boolean }) {
+  return (
+    <div
+      className="relative z-10 py-8 overflow-hidden"
+      aria-hidden="true"
+    >
+      <div className="max-w-4xl mx-auto">
+        {/* Jungle path with collectibles */}
+        <svg viewBox="0 0 800 80" className="w-full h-20" preserveAspectRatio="xMidYMid meet">
+          {/* Ground/path */}
+          <rect x="0" y="60" width="800" height="20" fill={COLORS.sandDark} />
+          <rect x="0" y="55" width="800" height="8" fill={COLORS.sandLight} />
+
+          {/* Grass tufts */}
+          {[50, 150, 280, 420, 550, 680, 750].map((x, i) => (
+            <g key={i}>
+              <path
+                d={`M${x} 55 Q${x - 5} 45 ${x - 3} 35 M${x} 55 Q${x + 2} 42 ${x + 5} 30 M${x} 55 Q${x + 8} 48 ${x + 10} 38`}
+                stroke={COLORS.palmGreen}
+                strokeWidth="2"
+                fill="none"
+              />
+            </g>
+          ))}
+
+          {/* Wumpa fruits floating */}
+          <g className={reducedMotion ? '' : 'animate-wumpa-bob'} style={{ transformOrigin: '120px 30px' }}>
+            <ellipse cx="120" cy="30" rx="12" ry="10" fill={COLORS.wumpaOrange} />
+            <ellipse cx="117" cy="26" rx="4" ry="3" fill={COLORS.wumpaBright} opacity="0.6" />
+            <path d="M120 20 Q124 16 128 18 Q124 14 120 16 Z" fill={COLORS.palmGreen} />
+          </g>
+
+          <g className={reducedMotion ? '' : 'animate-wumpa-bob-delayed'} style={{ transformOrigin: '400px 25px' }}>
+            <ellipse cx="400" cy="25" rx="12" ry="10" fill={COLORS.wumpaOrange} />
+            <ellipse cx="397" cy="21" rx="4" ry="3" fill={COLORS.wumpaBright} opacity="0.6" />
+            <path d="M400 15 Q404 11 408 13 Q404 9 400 11 Z" fill={COLORS.palmGreen} />
+          </g>
+
+          <g className={reducedMotion ? '' : 'animate-wumpa-bob'} style={{ transformOrigin: '680px 28px' }}>
+            <ellipse cx="680" cy="28" rx="12" ry="10" fill={COLORS.wumpaOrange} />
+            <ellipse cx="677" cy="24" rx="4" ry="3" fill={COLORS.wumpaBright} opacity="0.6" />
+            <path d="M680 18 Q684 14 688 16 Q684 12 680 14 Z" fill={COLORS.palmGreen} />
+          </g>
+
+          {/* Crystals */}
+          <g className={reducedMotion ? '' : 'animate-crystal-pulse'}>
+            <path d="M260 20 L272 35 L260 55 L248 35 Z" fill={COLORS.crystalBlue} opacity="0.9" />
+            <path d="M260 20 L272 35 L260 40 Z" fill={`${COLORS.crystalBlue}cc`} />
+            <path d="M256 28 L258 26 L258 32 Z" fill="rgba(255,255,255,0.6)" />
+          </g>
+
+          <g className={reducedMotion ? '' : 'animate-crystal-pulse-delayed'}>
+            <path d="M540 22 L550 35 L540 52 L530 35 Z" fill={COLORS.crystalPurple} opacity="0.9" />
+            <path d="M540 22 L550 35 L540 38 Z" fill={`${COLORS.crystalPurple}cc`} />
+            <path d="M537 29 L539 27 L539 33 Z" fill="rgba(255,255,255,0.6)" />
+          </g>
+
+          {/* Wooden crate */}
+          <g>
+            <rect x="330" y="35" width="25" height="25" fill={COLORS.crateWood} stroke={COLORS.crateHighlight} strokeWidth="2" rx="2" />
+            <line x1="330" y1="45" x2="355" y2="45" stroke={COLORS.crateDark} strokeWidth="1" />
+            <rect x="332" y="37" width="4" height="4" fill={COLORS.cortexMetal} />
+            <rect x="349" y="37" width="4" height="4" fill={COLORS.cortexMetal} />
+          </g>
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+// Art Section: Temple Ruins border - appears after Experience
+function TempleRuinsArt({ reducedMotion = false }: { reducedMotion?: boolean }) {
+  return (
+    <div
+      className="relative z-10 py-6 overflow-hidden"
+      aria-hidden="true"
+    >
+      <div className="max-w-4xl mx-auto">
+        <svg viewBox="0 0 800 100" className="w-full h-24" preserveAspectRatio="xMidYMid meet">
+          {/* Temple stone base */}
+          <rect x="100" y="70" width="600" height="30" fill={COLORS.templeStone} />
+          <rect x="100" y="65" width="600" height="8" fill={COLORS.templeDark} />
+
+          {/* Stone block pattern */}
+          {[120, 220, 320, 420, 520, 620].map((x, i) => (
+            <g key={i}>
+              <rect x={x} y="70" width="80" height="28" fill="none" stroke={COLORS.templeDark} strokeWidth="1" />
+              <rect x={x + 40} y="70" width="40" height="28" fill="none" stroke={COLORS.templeDark} strokeWidth="0.5" opacity="0.5" />
+            </g>
+          ))}
+
+          {/* Moss patches */}
+          {[150, 350, 550].map((x, i) => (
+            <ellipse key={i} cx={x} cy="68" rx="20" ry="5" fill={COLORS.mossGreen} opacity="0.6" />
+          ))}
+
+          {/* Temple pillars */}
+          <g>
+            <rect x="80" y="20" width="30" height="50" fill={COLORS.templeStone} />
+            <rect x="80" y="15" width="30" height="8" fill={COLORS.templeDark} />
+            <rect x="75" y="10" width="40" height="8" fill={COLORS.templeStone} />
+            {/* Pillar details */}
+            <line x1="88" y1="20" x2="88" y2="70" stroke={COLORS.templeDark} strokeWidth="1" opacity="0.3" />
+            <line x1="102" y1="20" x2="102" y2="70" stroke={COLORS.templeDark} strokeWidth="1" opacity="0.3" />
+          </g>
+
+          <g>
+            <rect x="690" y="20" width="30" height="50" fill={COLORS.templeStone} />
+            <rect x="690" y="15" width="30" height="8" fill={COLORS.templeDark} />
+            <rect x="685" y="10" width="40" height="8" fill={COLORS.templeStone} />
+            <line x1="698" y1="20" x2="698" y2="70" stroke={COLORS.templeDark} strokeWidth="1" opacity="0.3" />
+            <line x1="712" y1="20" x2="712" y2="70" stroke={COLORS.templeDark} strokeWidth="1" opacity="0.3" />
+          </g>
+
+          {/* Torch flames */}
+          <g className={reducedMotion ? '' : 'animate-torch-flicker'}>
+            <ellipse cx="95" cy="8" rx="8" ry="12" fill={COLORS.torchFire} />
+            <ellipse cx="95" cy="5" rx="5" ry="8" fill={COLORS.wumpaOrange} />
+            <ellipse cx="95" cy="3" rx="3" ry="5" fill={COLORS.checkpointYellow} />
+          </g>
+
+          <g className={reducedMotion ? '' : 'animate-torch-flicker-delayed'}>
+            <ellipse cx="705" cy="8" rx="8" ry="12" fill={COLORS.torchFire} />
+            <ellipse cx="705" cy="5" rx="5" ry="8" fill={COLORS.wumpaOrange} />
+            <ellipse cx="705" cy="3" rx="3" ry="5" fill={COLORS.checkpointYellow} />
+          </g>
+
+          {/* Central Aku Aku face carving */}
+          <g opacity="0.7">
+            <ellipse cx="400" cy="45" rx="25" ry="30" fill={COLORS.akuWood} />
+            {/* Eyes */}
+            <ellipse cx="392" cy="38" rx="5" ry="6" fill={COLORS.akuGold} />
+            <ellipse cx="408" cy="38" rx="5" ry="6" fill={COLORS.akuGold} />
+            <circle cx="392" cy="38" r="2" fill="#000" />
+            <circle cx="408" cy="38" r="2" fill="#000" />
+            {/* Mouth */}
+            <path d="M388 52 Q395 50 400 52 Q405 50 412 52 Q408 58 400 60 Q392 58 388 52 Z" fill={COLORS.tntRed} />
+          </g>
+
+          {/* Decorative tribal pattern */}
+          <path
+            d="M200 65 L210 55 L220 65 M280 65 L290 55 L300 65 M500 65 L510 55 L520 65 M580 65 L590 55 L600 65"
+            stroke={COLORS.akuGold}
+            strokeWidth="2"
+            fill="none"
+            opacity="0.6"
+          />
+        </svg>
+      </div>
+    </div>
+  )
+}
+
+// Art Section: Crate Stack with TNT - appears after Skills before Featured Work
+function CrateStackArt({ reducedMotion = false }: { reducedMotion?: boolean }) {
+  return (
+    <div
+      className="relative z-10 py-6 overflow-hidden"
+      aria-hidden="true"
+    >
+      <div className="max-w-4xl mx-auto">
+        <div className="flex justify-center items-end gap-4">
+          {/* Left crate stack */}
+          <div className="flex flex-col items-center gap-1">
+            <WoodenCrate size={35} />
+            <WoodenCrate size={35} variant="bounce" />
+          </div>
+
+          {/* Wumpa fruits */}
+          <div className="flex gap-2 mb-4">
+            <WumpaFruit size={28} />
+            <WumpaFruit size={28} />
+          </div>
+
+          {/* Center TNT (danger!) */}
+          <div className="relative">
+            <TNTCrate size={45} countdown={!reducedMotion} />
+            {!reducedMotion && (
+              <div
+                className="absolute -top-6 left-1/2 -translate-x-1/2 text-xs font-bold animate-pulse"
+                style={{ color: COLORS.tntBright, textShadow: '0 0 10px #ff0000' }}
+              >
+                !
+              </div>
+            )}
+          </div>
+
+          {/* Crystals */}
+          <div className="flex gap-3 mb-2">
+            <Crystal size={30} color={COLORS.crystalBlue} />
+            <Crystal size={26} color={COLORS.crystalPurple} />
+          </div>
+
+          {/* Right crate stack */}
+          <div className="flex flex-col items-center gap-1">
+            <NitroCrate size={35} />
+            <WoodenCrate size={35} variant="checkpoint" />
+          </div>
+        </div>
+
+        {/* Decorative line */}
+        <div className="mt-4 flex justify-center items-center gap-4">
+          <div className="h-0.5 w-20" style={{ background: `linear-gradient(90deg, transparent, ${COLORS.akuGold}, transparent)` }} />
+          <WumpaFruit size={20} />
+          <div className="h-0.5 w-32" style={{ background: COLORS.akuGold }} />
+          <WumpaFruit size={20} />
+          <div className="h-0.5 w-20" style={{ background: `linear-gradient(90deg, transparent, ${COLORS.akuGold}, transparent)` }} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Section wrapper with wooden crate styling
 function CrateSection({
   children,
@@ -1072,6 +1291,52 @@ export default function TropicalPlatformerTheme() {
           100% { transform: translateX(-300px); }
         }
 
+        @keyframes wumpa-bob {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+
+        @keyframes crystal-pulse {
+          0%, 100% { opacity: 0.9; filter: brightness(1); }
+          50% { opacity: 1; filter: brightness(1.3); }
+        }
+
+        @keyframes torch-flicker {
+          0%, 100% { transform: scaleY(1) scaleX(1); opacity: 1; }
+          25% { transform: scaleY(1.1) scaleX(0.95); opacity: 0.9; }
+          50% { transform: scaleY(0.95) scaleX(1.05); opacity: 1; }
+          75% { transform: scaleY(1.05) scaleX(0.98); opacity: 0.95; }
+        }
+
+        .animate-wumpa-bob {
+          animation: wumpa-bob 2s ease-in-out infinite;
+        }
+
+        .animate-wumpa-bob-delayed {
+          animation: wumpa-bob 2s ease-in-out infinite;
+          animation-delay: 0.5s;
+        }
+
+        .animate-crystal-pulse {
+          animation: crystal-pulse 3s ease-in-out infinite;
+        }
+
+        .animate-crystal-pulse-delayed {
+          animation: crystal-pulse 3s ease-in-out infinite;
+          animation-delay: 1s;
+        }
+
+        .animate-torch-flicker {
+          animation: torch-flicker 0.5s ease-in-out infinite;
+          transform-origin: center bottom;
+        }
+
+        .animate-torch-flicker-delayed {
+          animation: torch-flicker 0.5s ease-in-out infinite;
+          animation-delay: 0.2s;
+          transform-origin: center bottom;
+        }
+
         .animate-aku-glow {
           animation: aku-glow 2s ease-in-out infinite;
         }
@@ -1102,7 +1367,13 @@ export default function TropicalPlatformerTheme() {
           .animate-tnt-pulse,
           .animate-nitro-glow,
           .animate-wave-back,
-          .animate-wave-front {
+          .animate-wave-front,
+          .animate-wumpa-bob,
+          .animate-wumpa-bob-delayed,
+          .animate-crystal-pulse,
+          .animate-crystal-pulse-delayed,
+          .animate-torch-flicker,
+          .animate-torch-flicker-delayed {
             animation: none;
           }
         }
@@ -1262,6 +1533,9 @@ export default function TropicalPlatformerTheme() {
         </div>
       </section>
 
+      {/* === ART SECTION 1: After About === */}
+      <JungleTrailArt reducedMotion={reducedMotion} />
+
       {/* Work Experience */}
       {experience.length > 0 && (
         <section className="relative z-20 py-8 px-6">
@@ -1281,6 +1555,9 @@ export default function TropicalPlatformerTheme() {
         </section>
       )}
 
+      {/* === ART SECTION 2: After Experience === */}
+      <TempleRuinsArt reducedMotion={reducedMotion} />
+
       {/* Tech Stack / Skills */}
       <section className="relative z-20 py-8 px-6">
         <div className="max-w-4xl mx-auto">
@@ -1297,6 +1574,9 @@ export default function TropicalPlatformerTheme() {
           </CrateSection>
         </div>
       </section>
+
+      {/* === ART SECTION 3: After Skills === */}
+      <CrateStackArt reducedMotion={reducedMotion} />
 
       {/* Featured Projects */}
       <section className="relative z-20 py-8 px-6">

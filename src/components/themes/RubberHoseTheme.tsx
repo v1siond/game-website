@@ -1250,47 +1250,51 @@ export default function RubberHoseTheme() {
       {/* Main content area with padding for film strips */}
       <div className="ml-14 mr-14">
         {/* Header */}
-        <header className="relative z-30 p-8 text-center">
-          <CartoonTitle
-            text="ALEXANDER PULIDO"
-            subtitle={PROFESSIONAL_SUMMARY.headline}
-          />
-          <p
-            className="text-xs tracking-widest mt-2 italic"
-            style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}
-          >
-            &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
-          </p>
+        <header className="relative z-30 p-6">
+          <div className="max-w-6xl mx-auto flex justify-between items-start">
+            <div>
+              <CartoonTitle
+                text="ALEXANDER PULIDO"
+                subtitle={PROFESSIONAL_SUMMARY.headline}
+              />
+              <p
+                className="text-xs tracking-widest mt-2 italic"
+                style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}
+              >
+                &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
+              </p>
+            </div>
 
-          <nav className="flex justify-center gap-4 mt-6 flex-wrap" aria-label="Main navigation">
-            <Link
-              href="/cv"
-              className="px-5 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:rotate-1"
-              style={{
-                background: CUPHEAD_COLORS.inkBlack,
-                color: CUPHEAD_COLORS.paperCream,
-                border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
-                fontFamily: 'serif',
-                boxShadow: '3px 3px 0 #1a1510',
-              }}
-            >
-              ☆ RESUME ☆
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="px-5 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:-rotate-1"
-              style={{
-                background: CUPHEAD_COLORS.accentRedDark,
-                color: CUPHEAD_COLORS.paperCream,
-                border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
-                fontFamily: 'serif',
-                boxShadow: '3px 3px 0 #5a0000',
-              }}
-            >
-              ☆ PLAY GAME ☆
-            </Link>
-            <ThemeSwitcher />
-          </nav>
+            <nav className="flex gap-3 items-center flex-wrap" aria-label="Main navigation">
+              <Link
+                href="/cv"
+                className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:rotate-1"
+                style={{
+                  background: CUPHEAD_COLORS.inkBlack,
+                  color: CUPHEAD_COLORS.paperCream,
+                  border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
+                  fontFamily: 'serif',
+                  boxShadow: '3px 3px 0 #1a1510',
+                }}
+              >
+                RESUME
+              </Link>
+              <Link
+                href="/personal-projects/game-engine"
+                className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:-rotate-1"
+                style={{
+                  background: CUPHEAD_COLORS.accentRedDark,
+                  color: CUPHEAD_COLORS.paperCream,
+                  border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
+                  fontFamily: 'serif',
+                  boxShadow: '3px 3px 0 #5a0000',
+                }}
+              >
+                PLAY GAME
+              </Link>
+              <ThemeSwitcher />
+            </nav>
+          </div>
         </header>
 
         {/* Current Roles */}

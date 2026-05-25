@@ -718,7 +718,7 @@ function SkillCutIn({
           {name}
         </span>
         {achievement && (
-          <span className="text-xs block mt-0.5" style={{ color: '#999' }}>
+          <span className="text-sm block mt-0.5" style={{ color: '#ccc' }}>
             {achievement}
           </span>
         )}
@@ -795,18 +795,18 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
               <h4 className="text-sm font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
                 {company.name}
               </h4>
-              <p className="text-[10px]" style={{ color: '#ff0033' }}>{company.tagline}</p>
+              <p className="text-sm" style={{ color: '#ff6666' }}>{company.tagline}</p>
             </div>
           </div>
-          <p className="text-xs" style={{ color: '#666' }}>{company.description}</p>
+          <p className="text-sm" style={{ color: '#b8b8b8' }}>{company.description}</p>
 
           {/* Services tags */}
           <div className="flex flex-wrap gap-1 mt-3">
             {company.services.slice(0, 3).map((service) => (
               <span
                 key={service}
-                className="text-[8px] px-2 py-0.5"
-                style={{ background: '#ff003310', color: '#ff0033' }}
+                className="text-sm px-2 py-0.5"
+                style={{ background: '#ff003320', color: '#ff6666' }}
               >
                 {service}
               </span>
@@ -838,15 +838,15 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
       </div>
 
       <div style={{ transform: 'skewX(2deg)' }}>
-        <h4 className="text-sm font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
+        <h4 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
           {band.name}
         </h4>
-        <p className="text-[10px] mt-1" style={{ color: '#ff0033' }}>
+        <p className="text-sm mt-1" style={{ color: '#ff6666' }}>
           {band.genre} | {band.role}
         </p>
-        <p className="text-xs mt-2" style={{ color: '#666' }}>{band.description}</p>
+        <p className="text-sm mt-2" style={{ color: '#b8b8b8' }}>{band.description}</p>
         {!band.url && (
-          <p className="text-[8px] mt-2 italic" style={{ color: '#444' }}>
+          <p className="text-sm mt-2 italic" style={{ color: '#999' }}>
             Website coming soon
           </p>
         )}
@@ -890,23 +890,23 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
             <h4 className="text-sm font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
               {entry.title}
             </h4>
-            <p className="text-[10px] mt-0.5" style={{ color: '#ff0033' }}>
+            <p className="text-sm mt-0.5" style={{ color: '#ff6666' }}>
               {entry.organization}
             </p>
           </div>
           <span
-            className="text-[10px] px-2 py-1"
+            className="text-sm px-2 py-1"
             style={{
-              background: '#ff003315',
+              background: '#ff003320',
               border: '1px solid #ff003340',
-              color: '#ff0033',
+              color: '#ff6666',
             }}
           >
             {startDisplay} - {endDisplay}
           </span>
         </div>
 
-        <p className="text-xs mb-3" style={{ color: '#666' }}>
+        <p className="text-sm mb-3" style={{ color: '#b8b8b8' }}>
           {entry.description}
         </p>
 
@@ -915,10 +915,10 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
             {entry.highlights.map((highlight, i) => (
               <li
                 key={i}
-                className="text-xs flex items-start gap-2"
-                style={{ color: '#ccc' }}
+                className="text-sm flex items-start gap-2"
+                style={{ color: '#e0e0e0' }}
               >
-                <span style={{ color: '#ff0033' }}>▸</span>
+                <span style={{ color: '#ff6666' }}>▸</span>
                 {highlight}
               </li>
             ))}
@@ -930,8 +930,8 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           {entry.skills.slice(0, 4).map((skill) => (
             <span
               key={skill}
-              className="text-[8px] px-2 py-0.5"
-              style={{ background: '#ff003320', color: '#ff0033' }}
+              className="text-sm px-2 py-0.5"
+              style={{ background: '#ff003320', color: '#ff6666' }}
             >
               {skill}
             </span>

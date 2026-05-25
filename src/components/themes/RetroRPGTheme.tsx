@@ -693,24 +693,25 @@ export default function RetroRPGTheme() {
 
       {/* Header */}
       <header className="relative z-30 p-4 border-b-4 border-white" role="banner">
-        <div className="max-w-5xl mx-auto">
-          {/* Professional headline */}
-          <div className="text-center mb-4">
-            <h1 className="text-xl tracking-wider mb-2 flex items-center justify-center gap-3">
-              <PixelHeartSoul size={20} color="#ff0000" />
-              ALEXANDER PULIDO
-              <PixelHeartSoul size={20} color="#ff0000" />
-            </h1>
-            <p className="text-yellow-400 text-[10px] tracking-wide">
-              {PROFESSIONAL_SUMMARY.headline}
-            </p>
-            <p className="text-cyan-400 text-[8px] mt-1 italic">
-              * {PROFESSIONAL_SUMMARY.tagline}
-            </p>
+        <div className="max-w-5xl mx-auto flex justify-between items-start">
+          {/* Left: Name and info */}
+          <div className="flex items-center gap-3">
+            <PixelHeartSoul size={24} color="#ff0000" />
+            <div>
+              <h1 className="text-lg tracking-wider">
+                ALEXANDER PULIDO
+              </h1>
+              <p className="text-yellow-400 text-[10px] tracking-wide">
+                {PROFESSIONAL_SUMMARY.headline}
+              </p>
+              <p className="text-cyan-400 text-[8px] mt-1 italic">
+                * {PROFESSIONAL_SUMMARY.tagline}
+              </p>
+            </div>
           </div>
 
-          {/* Nav */}
-          <nav className="flex flex-wrap justify-center gap-2 items-center" aria-label="Main navigation">
+          {/* Right: Nav */}
+          <nav className="flex gap-2 items-center" aria-label="Main navigation">
             <Link
               href="/cv"
               className="px-3 py-2 text-[9px] border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black transition-colors flex items-center gap-2"
