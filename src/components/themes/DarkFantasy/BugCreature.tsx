@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, memo, ReactNode } from 'react'
+import { useState, useEffect, memo, ReactNode, useRef } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { BattleBug } from './BattleReveal'
 
@@ -203,6 +203,7 @@ export const BugPullReveal = memo(function BugPullReveal({
 }: BugPullRevealProps) {
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [legPhase, setLegPhase] = useState(0)
+  const hasAnimated = useRef(false)
 
   // Bug leg/antenna animation
   useEffect(() => {
@@ -226,13 +227,14 @@ export const BugPullReveal = memo(function BugPullReveal({
   }, [phase])
 
   useEffect(() => {
-    if (!triggered) {
-      setPhase('idle')
+    if (!triggered || hasAnimated.current) {
+      if (!triggered && !hasAnimated.current) {
+        setPhase('idle')
+      }
       return
     }
 
-    if (phase !== 'idle') return
-
+    hasAnimated.current = true
     setPhase('alex-enters')
 
     const timers: NodeJS.Timeout[] = []

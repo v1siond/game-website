@@ -82,6 +82,7 @@ export const BattleReveal = memo(function BattleReveal({
 
   const rafRef = useRef<number | null>(null)
   const lastTimeRef = useRef(0)
+  const hasAnimated = useRef(false)
 
   // Continuous animation loop for leg/antenna movement
   useEffect(() => {
@@ -110,23 +111,16 @@ export const BattleReveal = memo(function BattleReveal({
 
   // Trigger animation sequence
   useEffect(() => {
-    if (!triggered) {
-      // Reset all state when scrolling back up
-      setPhase('idle')
-      setAttackPhase(0)
-      setShowSlash(false)
-      setShowImpact(false)
-      setShowDeathParticles(false)
-      setShowBloodSplatter(false)
-      setShowBloodPool(false)
-      setScreenShake(false)
-      setBugHit(false)
-      setBugTremble(false)
+    if (!triggered || hasAnimated.current) {
+      // Only reset if we haven't animated yet
+      if (!triggered && !hasAnimated.current) {
+        setPhase('idle')
+      }
       return
     }
 
-    // Only start if coming from idle (prevents re-triggering mid-animation)
-    if (phase !== 'idle') return
+    // Mark as animated so we don't replay
+    hasAnimated.current = true
 
     // Start the sequence
     setPhase('bug-wander')
@@ -177,12 +171,16 @@ export const BattleReveal = memo(function BattleReveal({
       setAttackPhase(0)
     }, PHASE_TIMING['bug-death']))
 
-    // Bug fall - blood pool appears when bug hits ground
+    // Bug fall - start the tumble
     timers.push(setTimeout(() => {
       setScreenShake(false)
-      setShowBloodPool(true)
       setPhase('bug-fall')
     }, PHASE_TIMING['bug-fall']))
+
+    // Blood pool appears AFTER tumble animation completes (500ms after bug-fall starts)
+    timers.push(setTimeout(() => {
+      setShowBloodPool(true)
+    }, PHASE_TIMING['bug-fall'] + 500))
 
     // Death particles fade (longer - 500ms after fall)
     timers.push(setTimeout(() => {
@@ -449,41 +447,7 @@ export const BattleReveal = memo(function BattleReveal({
             )}
 
             {isBugDead ? (
-              <>
-                <DeadBugCreature size={120} />
-                {/* Blood Pool - dead center of bug container */}
-                {showBloodPool && (
-                  <div
-                    className="absolute z-5 pointer-events-none"
-                    style={{
-                      left: '50%',
-                      top: '50%',
-                      transform: 'translate(-50%, -50%) rotate(180deg)',
-                    }}
-                  >
-                    <BloodPool />
-                  </div>
-                )}
-                {/* Continuous drip effect when complete */}
-                {phase === 'complete' && (
-                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 pointer-events-none">
-                    {[0, 1, 2].map((i) => (
-                      <div
-                        key={i}
-                        className="absolute rounded-full"
-                        style={{
-                          width: 4,
-                          height: 6,
-                          backgroundColor: '#ff6b35',
-                          left: `${-10 + i * 10}px`,
-                          animation: `continuousDrip 1.5s ease-in ${i * 0.5}s infinite`,
-                          boxShadow: '0 0 4px #ff6b35',
-                        }}
-                      />
-                    ))}
-                  </div>
-                )}
-              </>
+              <DeadBugCreature size={120} />
             ) : (
               <BattleBug
                 size={120}
@@ -492,6 +456,22 @@ export const BattleReveal = memo(function BattleReveal({
                 isHit={bugHit}
               />
             )}
+          </div>
+        )}
+
+        {/* Blood Pool - RIGHT EDGE at dead bug CENTER */}
+        {/* Bug final pos: right:18%, translateX(-120px), translateY(50px) */}
+        {/* Blood pool right edge should touch bug center */}
+        {showBloodPool && isBugDead && (
+          <div
+            className="absolute z-4 pointer-events-none"
+            style={{
+              right: '18%',
+              bottom: '15%',
+              transform: 'translateX(-120px) translateY(55px)',
+            }}
+          >
+            <BloodPool />
           </div>
         )}
 
@@ -531,12 +511,12 @@ export const BattleBug = memo(function BattleBug({
   antennaPhase?: number
   isHit?: boolean
 }) {
-  // More saturated colors
-  const shell = '#352850'
-  const shellDark = '#201530'
-  const infected = '#ff5500'
-  const infectedBright = '#ffaa44'
-  const infectedGlow = '#ff7722'
+  // SATURATED colors for visibility
+  const shell = '#4a3870'
+  const shellDark = '#2a1840'
+  const infected = '#ff6600'
+  const infectedBright = '#ffcc55'
+  const infectedGlow = '#ff8833'
 
   const getLegY = (index: number) => {
     const offset = index % 2 === 0 ? 0 : 0.5
@@ -622,11 +602,11 @@ export const BattleBug = memo(function BattleBug({
 
 // Dead Bug - SIMPLE Hollow Knight style, flipped, SATURATED colors
 const DeadBugCreature = memo(function DeadBugCreature({ size = 100 }: { size?: number }) {
-  // More saturated colors to match live bug
-  const shell = '#352850'
-  const shellDark = '#201530'
-  const infected = '#ff5500'
-  const infectedGlow = '#ff7722'
+  // SATURATED colors
+  const shell = '#4a3870'
+  const shellDark = '#2a1840'
+  const infected = '#ff6600'
+  const infectedGlow = '#ff8833'
 
   return (
     <svg
@@ -634,9 +614,9 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 100 }: { size?: n
       height={size * 0.7}
       viewBox="0 0 80 56"
       style={{
-        opacity: 0.8,
+        opacity: 0.9,
         transform: 'rotate(180deg)',
-        filter: `drop-shadow(0 0 10px ${infectedGlow}50) drop-shadow(0 0 4px ${infected}60)`
+        filter: `drop-shadow(0 0 12px ${infectedGlow}70) drop-shadow(0 0 6px ${infected}80)`
       }}
     >
       <defs>
@@ -666,9 +646,9 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 100 }: { size?: n
       <path d="M30,12 Q22,18 16,22" fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
       <path d="M50,12 Q58,18 64,22" fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
 
-      {/* CLOSED EYES - dimmed, no X */}
-      <ellipse cx="32" cy="18" rx="5" ry="3" fill={infected} opacity="0.4" />
-      <ellipse cx="48" cy="18" rx="5" ry="3" fill={infected} opacity="0.4" />
+      {/* CLOSED EYES - still glowing but dimmed */}
+      <ellipse cx="32" cy="18" rx="5" ry="3" fill={infected} opacity="0.6" />
+      <ellipse cx="48" cy="18" rx="5" ry="3" fill={infected} opacity="0.6" />
 
       {/* Dimmed infection - leaking */}
       <ellipse cx="40" cy="26" rx="6" ry="5" fill={infected} opacity="0.35" />
@@ -973,12 +953,12 @@ const BloodSplatter = memo(function BloodSplatter() {
 
 // Blood Pool - orange/green infection blood that stays on the "floor"
 const BloodPool = memo(function BloodPool() {
-  // Mix of orange and green for infected blood
-  const poolColors = ['#ff6b35', '#44aa44', '#ff7b00', '#55bb55', '#cc5500', '#338833']
+  // SATURATED infected blood - bright greens and oranges
+  const poolColors = ['#ff5500', '#00ff44', '#ff7700', '#33ff66', '#ee4400', '#22ee55']
 
-  // Main pool blobs
+  // Main pool blobs - spread LEFT from right edge
   const pools = Array.from({ length: 8 }, (_, i) => ({
-    x: (Math.random() - 0.5) * 80,
+    x: -10 - Math.random() * 70,  // All negative = extends LEFT from right edge
     y: Math.random() * 20,
     width: 20 + Math.random() * 40,
     height: 8 + Math.random() * 12,
@@ -986,9 +966,9 @@ const BloodPool = memo(function BloodPool() {
     color: poolColors[i % poolColors.length],
   }))
 
-  // Small drips/splats
+  // Small drips/splats - also extend left
   const drips = Array.from({ length: 12 }, (_, i) => ({
-    x: (Math.random() - 0.5) * 100,
+    x: -5 - Math.random() * 90,
     y: Math.random() * 15 - 5,
     size: 4 + Math.random() * 8,
     delay: 100 + i * 30,
@@ -996,22 +976,21 @@ const BloodPool = memo(function BloodPool() {
   }))
 
   return (
-    <div className="relative w-40 h-12" style={{ transform: 'translateX(-50%)' }}>
-      {/* Main pool blobs */}
+    <div className="relative w-40 h-12">
+      {/* Main pool blobs - positioned from RIGHT edge */}
       {pools.map((p, i) => (
         <div
           key={`pool-${i}`}
           className="absolute rounded-full"
           style={{
-            left: `calc(50% + ${p.x}px)`,
+            right: -p.x,  // Convert to right positioning
             bottom: p.y,
             width: p.width,
             height: p.height,
             backgroundColor: p.color,
-            boxShadow: `0 0 ${p.height}px ${p.color}80, inset 0 -2px 4px rgba(0,0,0,0.3)`,
+            boxShadow: `0 0 ${p.height + 4}px ${p.color}, inset 0 -2px 4px rgba(0,0,0,0.3)`,
             opacity: 0,
             animation: `bloodPoolSpread 400ms ease-out ${p.delay}ms forwards`,
-            transform: 'translateX(-50%)',
           }}
         />
       ))}
@@ -1022,12 +1001,12 @@ const BloodPool = memo(function BloodPool() {
           key={`drip-${i}`}
           className="absolute rounded-full"
           style={{
-            left: `calc(50% + ${d.x}px)`,
+            right: -d.x,
             bottom: d.y,
             width: d.size,
             height: d.size,
             backgroundColor: d.color,
-            boxShadow: `0 0 ${d.size / 2}px ${d.color}`,
+            boxShadow: `0 0 ${d.size}px ${d.color}`,
             opacity: 0,
             animation: `bloodDripAppear 300ms ease-out ${d.delay}ms forwards`,
           }}
@@ -1214,16 +1193,16 @@ const battleRevealKeyframes = `
 
   @keyframes bloodPoolSpread {
     0% {
-      transform: translateX(-50%) scaleX(0.2) scaleY(0.5);
+      transform: scaleX(0.2) scaleY(0.5);
       opacity: 0;
     }
     50% {
-      transform: translateX(-50%) scaleX(1.1) scaleY(1);
-      opacity: 0.8;
+      transform: scaleX(1.1) scaleY(1);
+      opacity: 0.9;
     }
     100% {
-      transform: translateX(-50%) scaleX(1) scaleY(1);
-      opacity: 0.7;
+      transform: scaleX(1) scaleY(1);
+      opacity: 0.85;
     }
   }
 

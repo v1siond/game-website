@@ -11,8 +11,7 @@ import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
-import { useScrollTriggers, TriggerState, getDefaultTriggerStyles } from '@/hooks/useScrollTriggers'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
@@ -54,69 +53,39 @@ const DF = {
 }
 
 /**
- * TRIGGER CONFIGURATION
- * ====================
- * Each trigger defines when content ANIMATIONS start.
- * Position is a percentage of total page height (0-100).
+ * SECTION TRIGGER WRAPPER
+ * =======================
+ * Uses IntersectionObserver to detect when sections enter viewport.
+ * NO hardcoded percentages - triggers based on ACTUAL element position.
  *
- * Content starts HIDDEN in animation components - triggers control
- * when content animates INTO view.
- *
- * viewportTriggerOffset 0.35 means triggers fire when:
- *   scrollY + (viewport * 0.35) >= triggerY
- * This ensures animations play when section is ~35% up from bottom.
+ * Pattern: IntersectionObserver (browser-native, performant)
+ * Why chosen: Automatically handles content size changes, responsive,
+ * works correctly regardless of font size or content length.
  */
-const TRIGGER_CONFIG = [
-  { id: 'profession-selector', position: 5 },
-  { id: 'about', position: 10 },
-  { id: 'art-spirits', position: 18 },
-  { id: 'experience', position: 25 },       // KnightSlashReveal: Alex enters, slashes content into view
-  { id: 'art-lanterns', position: 30 },
-  { id: 'tech-stack', position: 35 },       // Simple fade (TriggerSection)
-  { id: 'projects', position: 70 },         // BugAttackReveal: 30% from bottom
-  { id: 'art-crystals', position: 68 },
-  { id: 'ventures', position: 75 },
-  { id: 'posts', position: 85 },
-  { id: 'contact', position: 98 },          // BattleReveal: at footer
-]
-
-/**
- * TRIGGER SECTION WRAPPER
- * ======================
- * Wraps content and controls visibility based on scroll triggers.
- * Uses GPU-accelerated properties only (transform, opacity).
- *
- * Props:
- * - id: Must match a trigger ID from TRIGGER_CONFIG
- * - states: Trigger states map from useScrollTriggers
- * - children: Content to show/hide
- * - preRender: If false, content is not in DOM until triggered
- */
-const TriggerSection = memo(function TriggerSection({
-  id,
-  states,
+const FadeInSection = memo(function FadeInSection({
   children,
-  preRender = true,
   className = '',
+  delay = 0,
 }: {
-  id: string
-  states: Map<string, TriggerState>
   children: React.ReactNode
-  preRender?: boolean
   className?: string
+  delay?: number
 }) {
-  const state = states.get(id)
-  const triggered = state?.triggered ?? false
-
-  // Don't render if not pre-rendering and not triggered
-  if (!preRender && !triggered) {
-    return null
-  }
-
-  const styles = getDefaultTriggerStyles(state)
+  const { ref, triggered } = useSectionTrigger({
+    threshold: 0.1,
+    rootMargin: '0px 0px -5% 0px',
+  })
 
   return (
-    <div className={className} style={styles}>
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: triggered ? 1 : 0,
+        transform: triggered ? 'translateY(0)' : 'translateY(20px)',
+        transition: `opacity 0.5s ease-out ${delay}ms, transform 0.5s ease-out ${delay}ms`,
+      }}
+    >
       {children}
     </div>
   )
@@ -484,54 +453,210 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
   )
 })
 
-// Section reveal animation - ethereal fade instead of specific character
-function EtherealReveal({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [phase, setPhase] = useState<'hidden' | 'reveal' | 'visible'>('hidden')
+/**
+ * ENERGY FLOW ANIMATION
+ * =====================
+ * Pattern: setTimeout-phase with CSS transforms
+ * Why chosen: User interaction (click) triggers a short animation sequence.
+ *             JS coordinates timing, CSS handles GPU-accelerated visuals.
+ *
+ * Phases: idle -> flowing -> arrived -> idle
+ * Timing: { flowing: 0ms (start), arrived: 350ms, idle: 500ms }
+ *
+ * How it works:
+ * - Tracks previous profession via useRef
+ * - On profession change, calculates path from old to new node
+ * - Spawns energy particles that travel along the connection path
+ * - Uses CSS keyframes with transform/opacity (GPU-accelerated)
+ * - Particles fade out as destination node "lights up"
+ *
+ * Replication steps for other themes:
+ * 1. Create component that tracks previous selection with useRef
+ * 2. Define node positions and path connections
+ * 3. Calculate animation direction based on from/to indices
+ * 4. Use CSS @keyframes with transform: translate3d for movement
+ * 5. Sync destination glow with particle arrival time
+ */
 
-  useEffect(() => {
-    if (hasEntered && phase === 'hidden') {
-      setPhase('reveal')
-      setTimeout(() => setPhase('visible'), 500)
-    }
-  }, [hasEntered, phase])
+/**
+ * ELECTRICITY THROUGH WIRE ANIMATION
+ * ===================================
+ * Energy flows along the actual wire paths between profession nodes.
+ * The path goes: Engineer (25%,50%) ↔ Drummer (50%,30%) ↔ Fighter (75%,50%)
+ *
+ * When switching between non-adjacent nodes (Engineer↔Fighter),
+ * energy travels THROUGH the middle node (Drummer).
+ */
+
+// Calculate the wire path segments between two professions
+function getWirePath(from: string, to: string): Array<{ x: number; y: number }> {
+  const positions: Record<string, { x: number; y: number }> = {
+    engineer: { x: 25, y: 50 },
+    drummer: { x: 50, y: 30 },
+    fighter: { x: 75, y: 50 },
+  }
+
+  // Direct adjacent paths
+  if ((from === 'engineer' && to === 'drummer') || (from === 'drummer' && to === 'engineer')) {
+    return [positions[from], positions[to]]
+  }
+  if ((from === 'drummer' && to === 'fighter') || (from === 'fighter' && to === 'drummer')) {
+    return [positions[from], positions[to]]
+  }
+  // Non-adjacent: go through drummer
+  if (from === 'engineer' && to === 'fighter') {
+    return [positions.engineer, positions.drummer, positions.fighter]
+  }
+  if (from === 'fighter' && to === 'engineer') {
+    return [positions.fighter, positions.drummer, positions.engineer]
+  }
+  return [positions[from], positions[to]]
+}
+
+// Single energy particle that travels along a path
+const WireEnergyParticle = memo(function WireEnergyParticle({
+  pathPoints,
+  delay,
+  duration,
+  color,
+  size,
+}: {
+  pathPoints: Array<{ x: number; y: number }>
+  delay: number
+  duration: number
+  color: string
+  size: number
+}) {
+  // Generate CSS animation that follows the path waypoints
+  const keyframeId = `wirePath-${delay}-${Date.now()}`
+  const keyframes = pathPoints.map((point, i) => {
+    const progress = (i / (pathPoints.length - 1)) * 100
+    return `${progress}% { left: ${point.x}%; top: ${point.y}%; }`
+  }).join('\n')
 
   return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      {/* Ethereal light sweep */}
-      {phase === 'reveal' && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div
-            className="absolute h-px"
-            style={{
-              width: '100%',
-              background: `linear-gradient(90deg, transparent, ${DF.spiritGold}, ${DF.ethereal}, transparent)`,
-              boxShadow: `0 0 20px ${DF.spiritGold}, 0 0 40px ${DF.ethereal}`,
-              animation: 'lightSweep 0.4s ease-out forwards',
-            }}
-          />
-        </div>
-      )}
-
+    <>
+      <style>{`
+        @keyframes ${keyframeId} {
+          ${keyframes}
+        }
+      `}</style>
       <div
+        className="absolute rounded-full pointer-events-none"
         style={{
-          opacity: phase === 'visible' ? 1 : 0,
-          transform: phase === 'visible' ? 'translateY(0)' : 'translateY(15px)',
-          transition: 'all 0.4s ease-out',
+          left: `${pathPoints[0].x}%`,
+          top: `${pathPoints[0].y}%`,
+          width: 8 * size,
+          height: 8 * size,
+          background: `radial-gradient(circle, ${color} 30%, ${color}80 60%, transparent 100%)`,
+          boxShadow: `0 0 12px ${color}, 0 0 24px ${color}60`,
+          transform: 'translate(-50%, -50%)',
+          animation: `${keyframeId} ${duration}ms ease-in-out ${delay}ms forwards`,
+          opacity: 0,
+          animationFillMode: 'forwards',
         }}
-      >
-        {children}
-      </div>
+        aria-hidden="true"
+      />
+    </>
+  )
+})
+
+// Wire glow effect that shows the path lighting up
+const WireGlow = memo(function WireGlow({
+  pathPoints,
+  duration,
+  color,
+}: {
+  pathPoints: Array<{ x: number; y: number }>
+  duration: number
+  color: string
+}) {
+  // Create SVG path for the glow effect
+  const pathD = pathPoints.map((p, i) =>
+    `${i === 0 ? 'M' : 'L'}${p.x} ${p.y}`
+  ).join(' ')
+
+  return (
+    <svg
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <filter id="wireGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="1" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <path
+        d={pathD}
+        fill="none"
+        stroke={color}
+        strokeWidth="0.8"
+        filter="url(#wireGlow)"
+        style={{
+          strokeDasharray: '100',
+          strokeDashoffset: '100',
+          animation: `wireStroke ${duration}ms ease-out forwards`,
+        }}
+      />
+    </svg>
+  )
+})
+
+// Energy flow container that manages the animation state
+const EnergyFlowAnimation = memo(function EnergyFlowAnimation({
+  fromProfession,
+  toProfession,
+  isAnimating,
+  nodes,
+}: {
+  fromProfession: string | null
+  toProfession: string
+  isAnimating: boolean
+  nodes: Array<{ id: string; position: { x: number; y: number }; color: string }>
+}) {
+  if (!isAnimating || !fromProfession || fromProfession === toProfession) {
+    return null
+  }
+
+  const pathPoints = getWirePath(fromProfession, toProfession)
+  const totalDuration = pathPoints.length > 2 ? 450 : 300
+
+  // Create multiple particles with staggered timing for a "stream" effect
+  const particles = [
+    { delay: 0, size: 1 },
+    { delay: 30, size: 0.85 },
+    { delay: 60, size: 0.7 },
+    { delay: 90, size: 0.9 },
+    { delay: 120, size: 0.75 },
+  ]
+
+  const energyColor = '#50e0ff' // Ethereal HK blue
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {/* Wire glow effect */}
+      <WireGlow pathPoints={pathPoints} duration={totalDuration} color={energyColor} />
+
+      {/* Energy particles following the wire */}
+      {particles.map((p, i) => (
+        <WireEnergyParticle
+          key={i}
+          pathPoints={pathPoints}
+          delay={p.delay}
+          duration={totalDuration}
+          color={energyColor}
+          size={p.size}
+        />
+      ))}
     </div>
   )
-}
+})
 
 // Waystation node for profession selection (generic rest point, not HK bench)
 const WaystationNode = memo(function WaystationNode({
@@ -540,6 +665,7 @@ const WaystationNode = memo(function WaystationNode({
   sublabel,
   color,
   isActive,
+  isReceivingEnergy,
   onClick,
   position,
 }: {
@@ -548,6 +674,7 @@ const WaystationNode = memo(function WaystationNode({
   sublabel: string
   color: string
   isActive: boolean
+  isReceivingEnergy?: boolean
   onClick: () => void
   position: { x: number; y: number }
 }) {
@@ -566,50 +693,127 @@ const WaystationNode = memo(function WaystationNode({
       role="tab"
       tabIndex={isActive ? 0 : -1}
     >
-      {/* Active glow - optimized: reduced blur */}
+      {/* Energy arrival burst - shows when this node receives energy */}
+      {isReceivingEnergy && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse, #50e0ff60 0%, #50e0ff30 40%, transparent 70%)`,
+            animation: 'energyArrival 400ms ease-out forwards',
+          }}
+          aria-hidden="true"
+        />
+      )}
+      {/* Active glow - rectangular to match VoidFrame */}
       <div
-        className={`absolute inset-0 rounded-full transition-all duration-500 ${
-          isActive ? 'opacity-50 scale-150' : 'opacity-0 scale-100 group-hover:opacity-30 group-hover:scale-125'
+        className={`absolute inset-0 transition-all duration-500 ${
+          isActive ? 'opacity-50 scale-110' : 'opacity-0 scale-100 group-hover:opacity-30 group-hover:scale-105'
         }`}
         style={{
-          background: `radial-gradient(circle, ${color}60 0%, ${color}30 40%, transparent 70%)`,
+          background: `radial-gradient(ellipse, ${color}60 0%, ${color}30 40%, transparent 70%)`,
         }}
         aria-hidden="true"
       />
-      {/* Main container - hexagonal/crystalline shape */}
+      {/* Main container - VoidFrame style with decorative elements */}
       <div
-        className={`relative w-16 h-16 md:w-24 md:h-24 flex flex-col items-center justify-center transition-all duration-300 ${
+        className={`relative w-20 h-20 md:w-28 md:h-28 flex flex-col items-center justify-center transition-all duration-300 ${
           isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
         style={{
-          background: `linear-gradient(135deg, ${DF.voidDeep}, ${color}15)`,
-          border: `2px solid ${isActive ? color : DF.stoneDark}`,
-          borderRadius: '8px',
-          clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+          background: `linear-gradient(180deg,
+            rgba(15, 10, 30, 0.92) 0%,
+            rgba(20, 15, 35, 0.88) 50%,
+            rgba(15, 10, 30, 0.92) 100%
+          )`,
+          border: `1px solid ${isActive ? color : 'rgba(232, 228, 220, 0.15)'}`,
+          borderRadius: '2px',
+          backdropFilter: 'blur(4px)',
+          boxShadow: isActive
+            ? `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 0 15px ${color}40`
+            : `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.3)`,
+          animation: isReceivingEnergy ? 'nodeArrival 400ms ease-out' : undefined,
         }}
       >
+        {/* Top flourish - mini version */}
+        <svg
+          className="absolute -top-2 left-1/2 -translate-x-1/2"
+          width="50"
+          height="8"
+          viewBox="0 0 50 8"
+          aria-hidden="true"
+        >
+          <path
+            d="M25,4 L27,2 L25,0 L23,2 Z"
+            fill={isActive ? color : DF.bone}
+            opacity={isActive ? 0.8 : 0.4}
+          />
+          <path
+            d="M23,4 Q15,3 5,5"
+            fill="none"
+            stroke={isActive ? color : DF.bone}
+            strokeWidth="0.5"
+            opacity={isActive ? 0.6 : 0.3}
+          />
+          <path
+            d="M27,4 Q35,3 45,5"
+            fill="none"
+            stroke={isActive ? color : DF.bone}
+            strokeWidth="0.5"
+            opacity={isActive ? 0.6 : 0.3}
+          />
+        </svg>
+
         {/* Abstract icon */}
         <div className="mb-0.5 md:mb-1 scale-75 md:scale-100" style={{ color: isActive ? color : DF.silver }}>
           {icon}
         </div>
         <span
-          className="text-[10px] md:text-xs tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
+          className="text-sm tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
           style={{
             color: isActive ? color : DF.silver,
-            fontFamily: '"Cinzel", "Garamond", serif',
+            fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
           {label}
         </span>
         <span
-          className="text-[8px] md:text-[10px] tracking-wider opacity-70 text-center leading-tight hidden md:block"
+          className="text-sm tracking-wider opacity-70 text-center leading-tight hidden md:block"
           style={{
             color: isActive ? color : DF.silver,
-            fontFamily: '"Cinzel", serif',
+            fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
           {sublabel}
         </span>
+
+        {/* Bottom flourish - mini version */}
+        <svg
+          className="absolute -bottom-2 left-1/2 -translate-x-1/2"
+          width="40"
+          height="6"
+          viewBox="0 0 40 6"
+          aria-hidden="true"
+        >
+          <path
+            d="M20,2 L22,4 L20,6 L18,4 Z"
+            fill={isActive ? color : DF.bone}
+            opacity={isActive ? 0.6 : 0.3}
+          />
+          <path
+            d="M18,4 Q10,4 2,3"
+            fill="none"
+            stroke={isActive ? color : DF.bone}
+            strokeWidth="0.5"
+            opacity={isActive ? 0.4 : 0.2}
+          />
+          <path
+            d="M22,4 Q30,4 38,3"
+            fill="none"
+            stroke={isActive ? color : DF.bone}
+            strokeWidth="0.5"
+            opacity={isActive ? 0.4 : 0.2}
+          />
+        </svg>
       </div>
     </button>
   )
@@ -639,7 +843,139 @@ const DiamondIcon = () => (
   </svg>
 )
 
-// Panel frame with gothic/mechanical blend
+/**
+ * Hollow Knight-style Decorative Flourish
+ * =======================================
+ * Elegant curved vine-like pattern used at top/bottom of dialogue boxes.
+ * Inspired by Hollow Knight's UI - organic, gothic curves with small embellishments.
+ *
+ * Pattern: CSS-only (SVG paths)
+ * Why chosen: Static decorative element, no animation needed. SVG paths give us
+ * precise control over the organic curved shapes that define HK's aesthetic.
+ */
+const DialogueFlourish = memo(function DialogueFlourish({
+  position,
+  width = 200
+}: {
+  position: 'top' | 'bottom'
+  width?: number
+}) {
+  const isTop = position === 'top'
+  // Flip the SVG for bottom position
+  const transform = isTop ? '' : 'scale(1, -1)'
+
+  return (
+    <svg
+      className="absolute left-1/2 -translate-x-1/2"
+      style={{
+        [isTop ? 'top' : 'bottom']: '-12px',
+        width: width,
+        height: 24,
+      }}
+      viewBox="0 0 200 24"
+      aria-hidden="true"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <g transform={transform} style={{ transformOrigin: 'center' }}>
+        {/* Central diamond ornament */}
+        <path
+          d="M100,4 L104,10 L100,16 L96,10 Z"
+          fill={DF.bone}
+          opacity="0.7"
+        />
+        <path
+          d="M100,6 L102,10 L100,14 L98,10 Z"
+          fill={DF.ethereal}
+          opacity="0.4"
+        />
+
+        {/* Left curved vine */}
+        <path
+          d="M96,10 Q80,8 65,12 Q50,16 35,10 Q25,6 15,10"
+          fill="none"
+          stroke={DF.bone}
+          strokeWidth="1.2"
+          opacity="0.5"
+          strokeLinecap="round"
+        />
+        {/* Left inner curve */}
+        <path
+          d="M90,10 Q75,6 60,10 Q48,14 38,8"
+          fill="none"
+          stroke={DF.bone}
+          strokeWidth="0.8"
+          opacity="0.3"
+          strokeLinecap="round"
+        />
+        {/* Left small curl accent */}
+        <path
+          d="M35,10 Q32,6 28,8 Q26,10 28,12"
+          fill="none"
+          stroke={DF.bone}
+          strokeWidth="0.8"
+          opacity="0.4"
+          strokeLinecap="round"
+        />
+
+        {/* Right curved vine (mirrored) */}
+        <path
+          d="M104,10 Q120,8 135,12 Q150,16 165,10 Q175,6 185,10"
+          fill="none"
+          stroke={DF.bone}
+          strokeWidth="1.2"
+          opacity="0.5"
+          strokeLinecap="round"
+        />
+        {/* Right inner curve */}
+        <path
+          d="M110,10 Q125,6 140,10 Q152,14 162,8"
+          fill="none"
+          stroke={DF.bone}
+          strokeWidth="0.8"
+          opacity="0.3"
+          strokeLinecap="round"
+        />
+        {/* Right small curl accent */}
+        <path
+          d="M165,10 Q168,6 172,8 Q174,10 172,12"
+          fill="none"
+          stroke={DF.bone}
+          strokeWidth="0.8"
+          opacity="0.4"
+          strokeLinecap="round"
+        />
+
+        {/* Small dot accents along the vines */}
+        <circle cx="50" cy="14" r="1.5" fill={DF.bone} opacity="0.3" />
+        <circle cx="70" cy="10" r="1" fill={DF.bone} opacity="0.4" />
+        <circle cx="150" cy="14" r="1.5" fill={DF.bone} opacity="0.3" />
+        <circle cx="130" cy="10" r="1" fill={DF.bone} opacity="0.4" />
+      </g>
+    </svg>
+  )
+})
+
+/**
+ * Hollow Knight-style Dialogue Box Frame (VoidFrame)
+ * ==================================================
+ * Visual styling matching HK's in-game dialogue boxes:
+ * - Dark semi-transparent background (deep blue/purple tones)
+ * - Decorative flourishes at top and bottom borders
+ * - Clean white text on dark background
+ * - Slight backdrop blur for depth
+ * - Gothic, elegant feel with organic curved borders
+ *
+ * Pattern: CSS-only styling (no JS animation for the frame itself)
+ * Why chosen: Static visual element, CSS is more performant than JS.
+ * The flourishes use SVG paths for precise organic curves.
+ *
+ * Replication steps for other themes:
+ * 1. Create a DialogueFlourish component with theme-appropriate SVG patterns
+ * 2. Use semi-transparent background matching theme's void/dark colors
+ * 3. Add backdrop-filter blur for depth
+ * 4. Position flourishes at top (-12px) and bottom (-12px)
+ * 5. Use centered title with subtle underline accent
+ */
 const VoidFrame = memo(function VoidFrame({
   children,
   title,
@@ -653,66 +989,69 @@ const VoidFrame = memo(function VoidFrame({
   const headingId = `section-${title.toLowerCase().replace(/\s+/g, '-')}`
 
   return (
-    <div className="relative" role="region" aria-labelledby={headingId}>
-      {/* Corner ornaments - gear/crystal hybrid */}
-      <svg className="absolute -top-3 -left-3 w-10 h-10" viewBox="0 0 40 40" aria-hidden="true">
-        <path d="M5,35 Q5,5 35,5" fill="none" stroke={DF.brass} strokeWidth="1.5" opacity="0.6" />
-        <circle cx="8" cy="8" r="4" fill={DF.copper} opacity="0.4" />
-        <circle cx="8" cy="8" r="2" fill={DF.spiritGold} opacity="0.6" />
-      </svg>
-      <svg className="absolute -top-3 -right-3 w-10 h-10" viewBox="0 0 40 40" aria-hidden="true">
-        <path d="M35,35 Q35,5 5,5" fill="none" stroke={DF.brass} strokeWidth="1.5" opacity="0.6" />
-        <circle cx="32" cy="8" r="4" fill={DF.copper} opacity="0.4" />
-        <circle cx="32" cy="8" r="2" fill={DF.spiritGold} opacity="0.6" />
-      </svg>
-      <svg className="absolute -bottom-3 -left-3 w-10 h-10" viewBox="0 0 40 40" aria-hidden="true">
-        <path d="M5,5 Q5,35 35,35" fill="none" stroke={DF.brass} strokeWidth="1.5" opacity="0.6" />
-        <circle cx="8" cy="32" r="4" fill={DF.copper} opacity="0.4" />
-      </svg>
-      <svg className="absolute -bottom-3 -right-3 w-10 h-10" viewBox="0 0 40 40" aria-hidden="true">
-        <path d="M35,5 Q35,35 5,35" fill="none" stroke={DF.brass} strokeWidth="1.5" opacity="0.6" />
-        <circle cx="32" cy="32" r="4" fill={DF.copper} opacity="0.4" />
-      </svg>
-
-      {/* Title with mechanical dividers */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 flex items-center">
-          <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, transparent, ${DF.brass})` }} />
-          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="mx-1">
-            <circle cx="6" cy="6" r="4" fill="none" stroke={DF.copper} strokeWidth="1" />
-            <circle cx="6" cy="6" r="1.5" fill={DF.spiritGold} />
-          </svg>
-        </div>
-        <HeadingTag
-          id={headingId}
-          className="text-base tracking-[0.25em] uppercase px-2"
-          style={{
-            color: DF.bone,
-            fontFamily: '"Cinzel", "Garamond", serif',
-            textShadow: `0 0 15px ${DF.ethereal}40`,
-          }}
-        >
-          {title}
-        </HeadingTag>
-        <div className="flex-1 flex items-center">
-          <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" className="mx-1">
-            <circle cx="6" cy="6" r="4" fill="none" stroke={DF.copper} strokeWidth="1" />
-            <circle cx="6" cy="6" r="1.5" fill={DF.spiritGold} />
-          </svg>
-          <div className="h-px flex-1" style={{ background: `linear-gradient(90deg, ${DF.brass}, transparent)` }} />
-        </div>
-      </div>
-
+    <div className="relative pt-4 pb-4" role="region" aria-labelledby={headingId}>
+      {/* Main dialogue box container */}
       <div
-        className="p-6 relative"
+        className="relative"
         style={{
-          background: `linear-gradient(180deg, ${DF.void}f0, ${DF.voidPurple}40)`,
-          border: `1px solid ${DF.stoneDark}80`,
-          borderRadius: '4px',
-          boxShadow: `inset 0 0 40px rgba(0,0,0,0.5)`,
+          // Semi-transparent dark background matching HK's dialogue boxes
+          // Deep blue-purple tones for that void/underground feel
+          background: `linear-gradient(180deg,
+            rgba(15, 10, 30, 0.92) 0%,
+            rgba(20, 15, 35, 0.88) 50%,
+            rgba(15, 10, 30, 0.92) 100%
+          )`,
+          // Subtle border with slight glow - bone color at low opacity
+          border: `1px solid rgba(232, 228, 220, 0.15)`,
+          borderRadius: '2px',
+          // Backdrop blur for depth (subtle, not overwhelming)
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)',
+          // Inner shadow for depth, outer shadow for lift
+          boxShadow: `
+            inset 0 0 60px rgba(0, 0, 0, 0.4),
+            inset 0 1px 0 rgba(232, 228, 220, 0.05),
+            0 4px 20px rgba(0, 0, 0, 0.3)
+          `,
         }}
       >
-        {children}
+        {/* Top decorative flourish - elegant vine-like pattern */}
+        <DialogueFlourish position="top" width={220} />
+
+        {/* Title header - elegant centered text like HK dialogue speaker name */}
+        <div className="pt-6 pb-4 px-6 text-center">
+          <HeadingTag
+            id={headingId}
+            className="text-sm tracking-[0.3em] uppercase inline-block"
+            style={{
+              color: DF.bone,
+              fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
+              fontWeight: 400,
+              letterSpacing: '0.25em',
+              // Subtle text shadow for readability on dark background
+              textShadow: `0 2px 8px rgba(0, 0, 0, 0.5)`,
+            }}
+          >
+            {title}
+          </HeadingTag>
+          {/* Subtle underline accent below title */}
+          <div
+            className="mt-2 mx-auto"
+            style={{
+              width: '40px',
+              height: '1px',
+              background: `linear-gradient(90deg, transparent, ${DF.bone}40, transparent)`,
+            }}
+          />
+        </div>
+
+        {/* Content area - clean white text */}
+        <div className="px-6 pb-6">
+          {children}
+        </div>
+
+        {/* Bottom decorative flourish - slightly smaller than top */}
+        <DialogueFlourish position="bottom" width={180} />
       </div>
     </div>
   )
@@ -726,7 +1065,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnTy
         <div key={category.name}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DF.silver, fontFamily: '"Cinzel", serif' }}
+            style={{ color: DF.silver, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
           >
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -761,7 +1100,7 @@ const SkillsList = memo(function SkillsList({ categories }: { categories: Return
         <div key={category.name}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DF.silver, fontFamily: '"Cinzel", serif' }}
+            style={{ color: DF.silver, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
           >
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -1229,18 +1568,34 @@ export default function DarkFantasyTheme() {
   const { active, setActive, config } = useProfession()
   const [mounted, setMounted] = useState(false)
 
-  // Scroll trigger system - calculates trigger states based on scroll position
-  const {
-    states: triggerStates,
-    scrollProgress,
-    isTriggered,
-    getProgress,
-  } = useScrollTriggers({
-    triggers: TRIGGER_CONFIG,
-    defaultFadeDistance: 150,
-    viewportTriggerOffset: 0.35,   // Trigger when section is 35% up from bottom of viewport
-    persistTriggered: false,       // Allow animations to replay on re-scroll
-  })
+  // Track previous profession for energy flow animation
+  const previousProfession = useRef<string | null>(null)
+  const [isEnergyFlowing, setIsEnergyFlowing] = useState(false)
+  const [animatingFrom, setAnimatingFrom] = useState<string | null>(null)
+
+  // Handle profession change with energy flow animation
+  const handleProfessionChange = (newProfession: 'engineer' | 'drummer' | 'fighter') => {
+    if (newProfession === active) return
+
+    // Trigger energy flow animation
+    setAnimatingFrom(active)
+    setIsEnergyFlowing(true)
+
+    // Update the profession
+    setActive(newProfession)
+
+    // Clear animation state after animation completes
+    setTimeout(() => {
+      setIsEnergyFlowing(false)
+      setAnimatingFrom(null)
+    }, 500)
+  }
+
+  // Section triggers using IntersectionObserver
+  // Each animated section gets its own trigger based on ACTUAL element position
+  const experienceTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
+  const projectsTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
+  const contactTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
 
   // Memoize expensive data operations
   const aboutData = useMemo(() => ABOUT_DATA[active], [active])
@@ -1307,7 +1662,8 @@ export default function DarkFantasyTheme() {
       className="min-h-screen relative overflow-hidden"
       style={{
         background: `linear-gradient(180deg, ${DF.void}, ${DF.voidDeep}, ${DF.voidPurple})`,
-        fontFamily: '"Cinzel", "Garamond", serif',
+        fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
+        fontSize: '14px',
       }}
     >
       {/* Skip Link for accessibility */}
@@ -1380,7 +1736,7 @@ export default function DarkFantasyTheme() {
           <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
+              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
               style={{
                 border: `1px solid ${DF.stoneDark}`,
                 color: DF.silver,
@@ -1392,7 +1748,7 @@ export default function DarkFantasyTheme() {
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
+              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
               style={{
                 border: `1px solid ${DF.ethereal}`,
                 color: DF.ethereal,
@@ -1415,7 +1771,7 @@ export default function DarkFantasyTheme() {
             {PROFESSIONAL_SUMMARY[active].headline}
           </p>
           <p
-            className="text-xs md:text-sm tracking-wider italic"
+            className="text-sm tracking-wider italic"
             style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
           >
             {PROFESSIONAL_SUMMARY[active].tagline}
@@ -1427,8 +1783,8 @@ export default function DarkFantasyTheme() {
       <main id="main-content" tabIndex={-1} className="outline-none">
 
       {/* Profession Selector - Waystation style */}
-      <TriggerSection id="profession-selector" states={triggerStates}>
-        <section className="relative z-20 py-8" aria-labelledby="profession-heading">
+      <FadeInSection>
+        <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
           <h2 id="profession-heading" className="sr-only">Select Your Profession</h2>
           <div className="max-w-6xl mx-auto px-4 md:px-6">
             <div
@@ -1456,30 +1812,40 @@ export default function DarkFantasyTheme() {
                 <circle cx="37.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
                 <circle cx="62.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
               </svg>
+
+              {/* Energy flow animation between nodes */}
+              <EnergyFlowAnimation
+                fromProfession={animatingFrom}
+                toProfession={active}
+                isAnimating={isEnergyFlowing}
+                nodes={professionNodes}
+              />
+
               {professionNodes.map((node) => (
                 <WaystationNode
                   key={node.id}
                   {...node}
                   isActive={active === node.id}
-                  onClick={() => setActive(node.id as 'engineer' | 'drummer' | 'fighter')}
+                  isReceivingEnergy={isEnergyFlowing && active === node.id}
+                  onClick={() => handleProfessionChange(node.id as 'engineer' | 'drummer' | 'fighter')}
                 />
               ))}
             </div>
           </div>
         </section>
-      </TriggerSection>
+      </FadeInSection>
 
       {/* About */}
-      <TriggerSection id="about" states={triggerStates}>
-        <section className="relative z-20 py-8 px-6">
+      <FadeInSection delay={100}>
+        <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <VoidFrame title="About">
-              <p className="text-sm leading-relaxed mb-4" style={{ color: DF.bone }}>{aboutData.bio}</p>
-              <div className="flex flex-wrap gap-3">
+              <p className="leading-relaxed mb-4" style={{ color: DF.bone }}>{aboutData.bio}</p>
+              <div className="flex flex-wrap gap-2 md:gap-3">
                 {aboutData.quickFacts.map((fact, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1 text-xs"
+                    className="px-2 md:px-3 py-1"
                     style={{
                       background: `${DF.ethereal}12`,
                       border: `1px solid ${DF.ethereal}30`,
@@ -1494,16 +1860,17 @@ export default function DarkFantasyTheme() {
             </VoidFrame>
           </div>
         </section>
-      </TriggerSection>
+      </FadeInSection>
 
       {/* Art Section 1 - Spirits and Gears */}
-      <TriggerSection id="art-spirits" states={triggerStates} preRender={false}>
+      <FadeInSection delay={150}>
         <ArtSectionSpirits />
-      </TriggerSection>
+      </FadeInSection>
 
       {/* Work Experience - Knight Slash Reveal (content slides from right) */}
       {experience.length > 0 && (
-        <KnightSlashReveal triggered={isTriggered('experience')}>
+        <div ref={experienceTrigger.ref}>
+          <KnightSlashReveal triggered={experienceTrigger.triggered}>
           <section className="relative z-20 py-8 px-6">
             <div className="max-w-4xl mx-auto">
               <VoidFrame title="Work Experience">
@@ -1515,17 +1882,18 @@ export default function DarkFantasyTheme() {
               </VoidFrame>
             </div>
           </section>
-        </KnightSlashReveal>
+          </KnightSlashReveal>
+        </div>
       )}
 
       {/* Art Section 2 - Lanterns */}
-      <TriggerSection id="art-lanterns" states={triggerStates} preRender={false}>
+      <FadeInSection>
         <ArtSectionLanterns />
-      </TriggerSection>
+      </FadeInSection>
 
-      {/* Tech Stack / Skills - Simple fade trigger (no complex animation) */}
-      <TriggerSection id="tech-stack" states={triggerStates}>
-        <section className="relative z-20 py-8 px-6">
+      {/* Tech Stack / Skills */}
+      <FadeInSection>
+        <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <VoidFrame title={active === 'engineer' ? 'Tech Stack' : 'Skills'}>
               {active === 'engineer' ? (
@@ -1536,35 +1904,37 @@ export default function DarkFantasyTheme() {
             </VoidFrame>
           </div>
         </section>
-      </TriggerSection>
+      </FadeInSection>
 
-      {/* Projects - Bug Pull Reveal (bug runs erratically, pulls content from left) */}
-      <BugPullReveal triggered={isTriggered('projects')}>
-        <section className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <VoidFrame title="Featured Work">
-              <div className="grid md:grid-cols-2 gap-4">
-                {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
-              </div>
-            </VoidFrame>
-          </div>
-        </section>
-      </BugPullReveal>
+      {/* Projects - Bug Pull Reveal */}
+      <div ref={projectsTrigger.ref}>
+        <BugPullReveal triggered={projectsTrigger.triggered}>
+          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <VoidFrame title="Featured Work">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+                  {projects.filter(p => p.featured).slice(0, 6).map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
+              </VoidFrame>
+            </div>
+          </section>
+        </BugPullReveal>
+      </div>
 
       {/* Art Section 3 - Crystals */}
-      <TriggerSection id="art-crystals" states={triggerStates} preRender={false}>
+      <FadeInSection>
         <ArtSectionCrystals />
-      </TriggerSection>
+      </FadeInSection>
 
       {/* Ventures (Companies/Bands) */}
-      <TriggerSection id="ventures" states={triggerStates}>
+      <FadeInSection>
         {active === 'engineer' && (
-          <section className="relative z-20 py-8 px-6">
+          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
             <div className="max-w-4xl mx-auto">
               <VoidFrame title="Ventures">
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-3 gap-3 md:gap-4">
                   {COMPANIES.map((company) => (
                     <CompanyCard key={company.id} company={company} />
                   ))}
@@ -1575,10 +1945,10 @@ export default function DarkFantasyTheme() {
         )}
 
         {active === 'drummer' && (
-          <section className="relative z-20 py-8 px-6">
+          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
             <div className="max-w-4xl mx-auto">
               <VoidFrame title="Bands">
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid md:grid-cols-3 gap-3 md:gap-4">
                   {BANDS.map((band) => (
                     <BandCard key={band.id} band={band} />
                   ))}
@@ -1587,34 +1957,35 @@ export default function DarkFantasyTheme() {
             </div>
           </section>
         )}
-      </TriggerSection>
+      </FadeInSection>
 
       {/* Posts */}
-      <TriggerSection id="posts" states={triggerStates}>
-        <section className="relative z-20 py-8 px-6">
+      <FadeInSection>
+        <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             <VoidFrame title="Posts">
-              <div className="text-center py-8">
-                <p className="text-sm" style={{ color: DF.silver }}>
+              <div className="text-center py-6 md:py-8">
+                <p style={{ color: DF.silver }}>
                   Writings and thoughts coming soon...
                 </p>
-                <p className="text-xs mt-2 italic" style={{ color: DF.ethereal }}>
+                <p className="mt-2 italic" style={{ color: DF.ethereal }}>
                   * Check back for updates on development, music, and martial arts
                 </p>
               </div>
             </VoidFrame>
           </div>
         </section>
-      </TriggerSection>
+      </FadeInSection>
 
       </main>
 
       {/* Contact CTA - Battle Reveal (knight kills bug, content drops from top) */}
-      <BattleReveal triggered={isTriggered('contact')}>
+      <div ref={contactTrigger.ref}>
+        <BattleReveal triggered={contactTrigger.triggered}>
         <section className="relative z-20 py-16 px-6" aria-label="Contact">
           <div className="max-w-2xl mx-auto text-center">
             <div className="mb-8">
-              <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: '"Cinzel", serif' }}>
+              <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
                 Ready to Work Together?
               </h2>
               <p className="text-sm" style={{ color: DF.silver }}>
@@ -1628,7 +1999,7 @@ export default function DarkFantasyTheme() {
                 style={{
                   background: DF.brass,
                   color: DF.void,
-                  fontFamily: '"Cinzel", serif',
+                  fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
                   borderRadius: '4px',
                 }}
               >
@@ -1641,7 +2012,7 @@ export default function DarkFantasyTheme() {
                   background: 'transparent',
                   border: `2px solid ${DF.brass}`,
                   color: DF.brass,
-                  fontFamily: '"Cinzel", serif',
+                  fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
                   borderRadius: '4px',
                 }}
               >
@@ -1650,7 +2021,8 @@ export default function DarkFantasyTheme() {
             </div>
           </div>
         </section>
-      </BattleReveal>
+        </BattleReveal>
+      </div>
 
       {/* Bottom obscure overlay - content fades into darkness */}
       <div
@@ -1665,7 +2037,7 @@ export default function DarkFantasyTheme() {
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
         <div className="inline-flex items-center gap-4" style={{ color: DF.silver }}>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
-          <span className="text-sm tracking-[0.2em]" style={{ fontFamily: '"Cinzel", serif' }}>
+          <span className="text-sm tracking-[0.2em]" style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
             <span className="sr-only">Copyright </span>© {new Date().getFullYear()} Alexander Pulido
           </span>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
@@ -1719,12 +2091,60 @@ export default function DarkFantasyTheme() {
           50% { transform: translateX(3px); }
         }
 
+        /* Wire stroke animation - electricity through wire */
+        @keyframes wireStroke {
+          0% {
+            stroke-dashoffset: 100;
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            stroke-dashoffset: 0;
+            opacity: 0;
+          }
+        }
+
+        /* Destination node pulse when energy arrives */
+        @keyframes nodeArrival {
+          0% { transform: scale(1); }
+          50% { transform: scale(1.15); }
+          100% { transform: scale(1.1); }
+        }
+
+        /* Energy arrival burst effect */
+        @keyframes energyArrival {
+          0% {
+            opacity: 0;
+            transform: scale(0.5);
+          }
+          30% {
+            opacity: 1;
+            transform: scale(1.2);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(2);
+          }
+        }
+
         /* Accessibility: Reduce motion */
         @media (prefers-reduced-motion: reduce) {
           .animate-fade-in-down,
           .will-animate {
             animation: none !important;
             transition: none !important;
+          }
+          /* Disable energy flow animations for reduced motion */
+          [style*="energyFlow"],
+          [style*="energyArrival"],
+          [style*="nodeArrival"] {
+            animation: none !important;
+            opacity: 0 !important;
           }
         }
       `}</style>

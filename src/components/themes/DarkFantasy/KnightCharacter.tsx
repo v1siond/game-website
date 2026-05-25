@@ -1,42 +1,34 @@
 'use client'
 
-import { memo, useEffect, useState, ReactNode } from 'react'
+import { memo, ReactNode, useState, useEffect, useRef } from 'react'
 
 /**
- * ALEXANDER CHARACTER - HOLLOW KNIGHT STYLE
- * =========================================
+ * ALEXANDER AS HOLLOW KNIGHT CHARACTER
+ * =====================================
+ * Based on reference image - 3/4 view facing RIGHT
  *
- * Alexander's features styled in HK's dark aesthetic:
- * - Brown/tan skin (from sprite)
- * - Dark prominent BEARD (key identifier)
- * - Dark short hair
- * - Simple oval eyes with void-like quality
- * - Visible ears
- * - Dark flowing CLOAK (HK style)
- * - Thin nail weapon (HK style)
+ * KEY DESIGN ELEMENTS (from reference):
+ * - HORNS curve UPWARD like crescents (not outward like devil horns)
+ * - Large rounded head/mask (egg-shaped, top-heavy)
+ * - TWO void black eyes (large ovals)
+ * - Small cloak/body below head
+ * - Default orientation faces RIGHT (mirror for left)
  *
- * Style: Simple shapes, limited dark palette, readable silhouette
+ * ALEXANDER ADAPTATION:
+ * - Beard extends from bottom of mask
  */
 
 const DF = {
-  void: '#0f0a1a',
-  voidDeep: '#0a0610',
-  // Alexander's skin tones - MORE SATURATED
-  skin: '#a5784d',
-  skinShade: '#7a5a3a',
-  skinHighlight: '#c49060',
-  // Beard/hair - richer dark brown
-  beard: '#352838',
-  beardDark: '#221822',
-  hair: '#352838',
-  // Cloak - deeper purple tones
-  cloak: '#3a3050',
-  cloakDark: '#221830',
-  // Accents - brighter ethereal
+  void: '#000000',
+  mask: '#ffffff',
+  maskShade: '#e8e8e8',
+  cloak: '#3d4a5c',
+  cloakDark: '#2a3545',
   ethereal: '#50e0ff',
-  etherealGlow: '#80ffff',
-  bone: '#f0ece5',
-  spiritGlow: '#ffffff',
+  nail: '#c8c8c8',
+  nailShade: '#a0a0a0',
+  beard: '#4a3c2e',
+  beardDark: '#3a2c1e',
 }
 
 interface KnightCharacterProps {
@@ -56,208 +48,188 @@ export const KnightCharacter = memo(function KnightCharacter({
   facingDirection = 'right',
   className = '',
 }: KnightCharacterProps) {
-  const effectiveScale = size ? size / 50 : scale
+  const effectiveScale = size ? size / 60 : scale
   const isLeft = facingDirection === 'left'
 
   const getNailRotation = () => {
-    if (!attacking) return -20
-    if (attackPhase < 0.3) return -20 - (attackPhase / 0.3) * 60
-    if (attackPhase < 0.5) return -80
-    return -80 + ((attackPhase - 0.5) / 0.5) * 160
+    if (!attacking) return 25
+    if (attackPhase < 0.3) return 25 - (attackPhase / 0.3) * 85
+    if (attackPhase < 0.5) return -60
+    return -60 + ((attackPhase - 0.5) / 0.5) * 85
   }
 
   const nailRotation = getNailRotation()
 
   return (
     <svg
-      width={50 * effectiveScale}
-      height={85 * effectiveScale}
-      viewBox="0 0 50 85"
+      width={60 * effectiveScale}
+      height={80 * effectiveScale}
+      viewBox="0 0 60 80"
       className={className}
       style={{
         overflow: 'visible',
         transform: isLeft ? 'scaleX(-1)' : 'none',
-        filter: `drop-shadow(0 0 8px ${DF.ethereal}40) drop-shadow(0 0 3px ${DF.void})`,
+        filter: `drop-shadow(0 0 4px ${DF.ethereal}30)`,
       }}
     >
-      <defs>
-        <radialGradient id="skinGrad" cx="50%" cy="30%" r="70%">
-          <stop offset="0%" stopColor={DF.skinHighlight} />
-          <stop offset="100%" stopColor={DF.skin} />
-        </radialGradient>
-        <linearGradient id="cloakGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={DF.cloak} />
-          <stop offset="100%" stopColor={DF.cloakDark} />
-        </linearGradient>
-        <filter id="attackGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <filter id="characterGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="1" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
+      {/* === KNIGHT - 3/4 VIEW FACING RIGHT === */}
+      {/* Based on reference image proportions */}
 
-      {/* CLOAK / BODY - dark flowing shape (HK style) */}
+      {/* CLOAK/BODY - small, below head */}
       <path
-        d="M18,30
-           C12,34 8,45 10,58
-           Q12,65 18,68
-           L32,68
-           Q38,65 40,58
-           C42,45 38,34 32,30
+        d="M18,48
+           C14,52 12,60 14,70
+           L18,74
+           L42,74
+           L46,70
+           C48,60 46,52 42,48
            Z"
-        fill="url(#cloakGrad)"
-        stroke={DF.voidDeep}
-        strokeWidth="0.5"
+        fill={DF.cloak}
+        stroke={DF.void}
+        strokeWidth="1.5"
       />
-      {/* Cloak folds */}
+      {/* Cloak detail - center fold */}
       <path
-        d="M20,36 Q19,48 20,60 M30,36 Q31,48 30,60"
-        fill="none"
-        stroke={DF.voidDeep}
+        d="M30,50 L30,72"
+        stroke={DF.cloakDark}
+        strokeWidth="2"
+        opacity="0.5"
+      />
+      {/* Cloak side folds */}
+      <path
+        d="M22,52 C20,58 20,66 22,72"
+        stroke={DF.cloakDark}
         strokeWidth="1"
-        opacity="0.4"
+        fill="none"
+        opacity="0.3"
+      />
+      <path
+        d="M38,52 C40,58 40,66 38,72"
+        stroke={DF.cloakDark}
+        strokeWidth="1"
+        fill="none"
+        opacity="0.3"
       />
 
-      {/* EAR - one visible (3/4 side view) */}
-      <ellipse cx="8" cy="16" rx="3" ry="4" fill={DF.skin} stroke={DF.skinShade} strokeWidth="0.5" />
-      <ellipse cx="8" cy="16" rx="1.5" ry="2.5" fill={DF.skinShade} opacity="0.5" />
+      {/* MASK/HEAD - large rounded egg shape */}
+      <ellipse
+        cx="30"
+        cy="28"
+        rx="20"
+        ry="22"
+        fill={DF.mask}
+        stroke={DF.void}
+        strokeWidth="1.5"
+      />
 
-      {/* HEAD - 3/4 side view profile */}
+      {/* LEFT HORN - curves UPWARD (crescent pointing up-left) */}
       <path
-        d="M12,4
-           Q28,2 35,10
-           Q38,16 36,24
-           Q34,28 28,30
-           L18,30
-           Q12,28 10,22
-           Q8,14 12,4
+        d="M14,14
+           C10,8 8,2 10,-6
+           C14,-4 16,2 18,10
+           C16,12 14,14 14,14
            Z"
-        fill="url(#skinGrad)"
-        stroke={DF.skinShade}
-        strokeWidth="0.5"
+        fill={DF.mask}
+        stroke={DF.void}
+        strokeWidth="1"
       />
 
-      {/* HAIR - side view */}
+      {/* RIGHT HORN - curves UPWARD (crescent pointing up-right) */}
       <path
-        d="M12,4
-           Q14,0 26,0
-           Q36,2 35,10
-           Q32,6 24,5
-           Q16,4 12,8
+        d="M46,14
+           C50,8 52,2 50,-6
+           C46,-4 44,2 42,10
+           C44,12 46,14 46,14
            Z"
-        fill={DF.hair}
-        stroke={DF.beardDark}
-        strokeWidth="0.3"
+        fill={DF.mask}
+        stroke={DF.void}
+        strokeWidth="1"
       />
-      {/* Hair back */}
-      <path d="M10,8 Q8,12 10,18" fill="none" stroke={DF.hair} strokeWidth="4" strokeLinecap="round" />
 
-      {/* BEARD - side profile */}
+      {/* LEFT EYE - large void oval */}
+      <ellipse
+        cx="22"
+        cy="28"
+        rx="6"
+        ry="9"
+        fill={DF.void}
+      />
+
+      {/* RIGHT EYE - large void oval */}
+      <ellipse
+        cx="38"
+        cy="28"
+        rx="6"
+        ry="9"
+        fill={DF.void}
+      />
+
+      {/* BEARD - Alexander's signature */}
       <path
-        d="M18,22
-           Q14,24 14,28
-           Q16,34 24,36
-           Q30,34 32,28
-           Q32,24 28,22
-           Q24,23 18,22
+        d="M20,42
+           C18,44 16,48 18,54
+           C20,58 26,62 30,62
+           C34,62 40,58 42,54
+           C44,48 42,44 40,42
+           C36,44 34,46 30,46
+           C26,46 24,44 20,42
            Z"
         fill={DF.beard}
         stroke={DF.beardDark}
-        strokeWidth="0.3"
+        strokeWidth="0.5"
       />
-      {/* Beard texture */}
+      {/* Beard texture lines */}
       <path
-        d="M18,26 Q20,30 22,34
-           M26,24 L26,32"
-        fill="none"
+        d="M24,48 C24,52 26,56 28,58"
         stroke={DF.beardDark}
         strokeWidth="0.5"
-        opacity="0.6"
+        fill="none"
+        opacity="0.5"
+      />
+      <path
+        d="M36,48 C36,52 34,56 32,58"
+        stroke={DF.beardDark}
+        strokeWidth="0.5"
+        fill="none"
+        opacity="0.5"
+      />
+      <path
+        d="M30,46 L30,60"
+        stroke={DF.beardDark}
+        strokeWidth="0.5"
+        opacity="0.4"
       />
 
-      {/* EYE - single visible eye (side view) with ethereal glow */}
-      <ellipse cx="28" cy="14" rx="4" ry="5" fill={DF.voidDeep} />
-      {/* Ethereal eye glow */}
-      <ellipse cx="28" cy="14" rx="2.5" ry="3" fill={DF.ethereal} opacity="0.2" />
-      {/* Bright core */}
-      <ellipse cx="29" cy="13" rx="1.2" ry="1.5" fill={DF.ethereal} opacity="0.5" />
-
-      {/* Nose hint */}
-      <path d="M34,16 Q36,18 34,20" fill="none" stroke={DF.skinShade} strokeWidth="0.8" opacity="0.4" />
-
-      {/* NAIL (SWORD) - HK style weapon */}
+      {/* NAIL - held to the side */}
       <g
         style={{
-          transformOrigin: '8px 40px',
+          transformOrigin: '52px 55px',
           transform: `rotate(${nailRotation}deg)`,
-          transition: attacking ? 'transform 0.08s ease-out' : 'transform 0.2s ease-out',
+          transition: attacking ? 'transform 0.06s ease-out' : 'transform 0.15s ease-out',
         }}
       >
-        <rect x="5" y="38" width="6" height="10" rx="1" fill={DF.cloak} stroke={DF.bone} strokeWidth="0.5" />
-        <ellipse cx="8" cy="38" rx="5" ry="2" fill={DF.bone} />
+        {/* Handle */}
+        <rect x="49" y="53" width="6" height="10" rx="1" fill={DF.cloakDark} stroke={DF.void} strokeWidth="0.5" />
+        {/* Blade */}
         <path
-          d="M8,38 L5,18 L8,4 L11,18 L8,38"
-          fill={DF.bone}
-          stroke={DF.skinShade}
-          strokeWidth="0.3"
+          d="M52,53 L48,35 L52,15 L56,35 L52,53"
+          fill={DF.nail}
+          stroke={DF.nailShade}
+          strokeWidth="0.5"
         />
-        <line x1="8" y1="36" x2="8" y2="6" stroke={DF.spiritGlow} strokeWidth="0.8" opacity="0.5" />
-        {attacking && attackPhase > 0.4 && (
+        {/* Highlight */}
+        <line x1="52" y1="50" x2="52" y2="18" stroke="#ffffff" strokeWidth="0.5" opacity="0.5" />
+        {attacking && attackPhase > 0.2 && attackPhase < 0.6 && (
           <path
-            d="M8,38 L5,18 L8,4 L11,18 L8,38"
+            d="M52,53 L48,35 L52,15 L56,35 L52,53"
             fill={DF.ethereal}
-            opacity={0.5 * Math.min(1, (attackPhase - 0.4) * 3)}
-            filter="url(#attackGlow)"
+            opacity="0.5"
           />
         )}
       </g>
 
-      {/* LEGS - visible below cloak */}
-      <g>
-        {/* Left leg */}
-        <path
-          d="M18,66 L16,75 L14,75 L14,78 L20,78 L20,75 L18,75 L20,66"
-          fill={DF.cloakDark}
-          stroke={DF.void}
-          strokeWidth="0.5"
-        />
-        {/* Right leg */}
-        <path
-          d="M30,66 L28,75 L26,75 L26,78 L32,78 L32,75 L30,75 L32,66"
-          fill={DF.cloakDark}
-          stroke={DF.void}
-          strokeWidth="0.5"
-        />
-        {/* Boot details */}
-        <ellipse cx="17" cy="77" rx="4" ry="1.5" fill={DF.void} />
-        <ellipse cx="29" cy="77" rx="4" ry="1.5" fill={DF.void} />
-      </g>
-
-      {/* GROUND SHADOW - follows character */}
-      <ellipse
-        cx="25"
-        cy="82"
-        rx="12"
-        ry="3"
-        fill={DF.void}
-        opacity="0.5"
-      >
-        <animate
-          attributeName="opacity"
-          values="0.4;0.6;0.4"
-          dur="2s"
-          repeatCount="indefinite"
-        />
-      </ellipse>
+      {/* Ground shadow */}
+      <ellipse cx="30" cy="76" rx="14" ry="2" fill={DF.void} opacity="0.3" />
     </svg>
   )
 })
@@ -265,6 +237,7 @@ export const KnightCharacter = memo(function KnightCharacter({
 // ============================================
 // KNIGHT SLASH REVEAL ANIMATION
 // ============================================
+// Uses IntersectionObserver for reliable triggering
 
 interface KnightSlashRevealProps {
   children: ReactNode
@@ -290,17 +263,21 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [attackPhase, setAttackPhase] = useState(0)
   const [showSlash, setShowSlash] = useState(false)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
-    if (!triggered) {
-      setPhase('idle')
-      setAttackPhase(0)
-      setShowSlash(false)
+    if (!triggered || hasAnimated.current) {
+      if (!triggered) {
+        // Only reset if we haven't animated yet
+        if (!hasAnimated.current) {
+          setPhase('idle')
+        }
+      }
       return
     }
 
-    if (phase !== 'idle') return
-
+    // Mark as animated so we don't replay
+    hasAnimated.current = true
     setPhase('knight-enter')
 
     const timers: NodeJS.Timeout[] = []
@@ -351,6 +328,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const getContentStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
+        return { transform: 'translateX(100%)', opacity: 0 }
       case 'knight-enter':
       case 'knight-raise':
       case 'slash':
