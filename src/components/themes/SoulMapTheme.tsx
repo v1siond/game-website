@@ -14,6 +14,20 @@ import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
+// Color palette - Dark Souls authentic
+const COLORS = {
+  bonfire: '#ff6a00',
+  ember: '#ff8c42',
+  ash: '#3a3633',
+  stone: '#252321',
+  fog: '#8a9ba8',
+  soul: '#00ccff',
+  blood: '#8b0000',
+  darksign: '#ff4400',
+  gold: '#c9a227',
+  humanity: '#1a1a1a',
+}
+
 // Undead Warrior Alexander - Dark Souls style
 function UndeadWarrior({
   size = 60,
@@ -25,38 +39,151 @@ function UndeadWarrior({
   className?: string
 }) {
   const [frame, setFrame] = useState(0)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
+    if (prefersReducedMotion) return
     const interval = setInterval(() => setFrame(f => (f + 1) % 2), 160)
     return () => clearInterval(interval)
-  }, [])
+  }, [prefersReducedMotion])
 
   const sprite = direction === 'right'
     ? (frame === 0 ? '/assets/sprites/run_right.png' : '/assets/sprites/run_right_1.png')
     : (frame === 0 ? '/assets/sprites/run_left.png' : '/assets/sprites/run_left_1.png')
 
   return (
-    <div className={`relative ${className}`} style={{ width: size, height: size * 1.2 }}>
+    <div
+      className={`relative ${className}`}
+      style={{ width: size, height: size * 1.2 }}
+      role="img"
+      aria-label="Undead Warrior character"
+    >
       <Image
         src={sprite}
-        alt="Undead Warrior"
+        alt=""
         fill
         className="object-contain"
         style={{ filter: 'brightness(0.7) contrast(1.4) sepia(0.2)' }}
       />
-      {/* Ember glow effect */}
+      {!prefersReducedMotion && (
+        <div
+          className="absolute inset-0 animate-pulse"
+          style={{
+            background: `radial-gradient(circle, ${COLORS.bonfire}4d 0%, transparent 60%)`,
+          }}
+          aria-hidden="true"
+        />
+      )}
+    </div>
+  )
+}
+
+// Praise the Sun gesture silhouette
+function PraiseTheSun({ size = 80, className = '' }: { size?: number; className?: string }) {
+  return (
+    <div
+      className={`relative ${className}`}
+      style={{ width: size, height: size }}
+      role="img"
+      aria-label="Praise the Sun gesture - iconic Dark Souls pose"
+    >
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        {/* Sun rays */}
+        <g className="animate-sun-pulse" style={{ transformOrigin: '50px 25px' }}>
+          {[...Array(8)].map((_, i) => (
+            <line
+              key={i}
+              x1="50"
+              y1="25"
+              x2={50 + Math.cos((i * Math.PI) / 4) * 18}
+              y2={25 + Math.sin((i * Math.PI) / 4) * 18}
+              stroke={COLORS.gold}
+              strokeWidth="2"
+              opacity="0.6"
+            />
+          ))}
+          <circle cx="50" cy="25" r="10" fill={COLORS.gold} opacity="0.8" />
+        </g>
+        {/* Knight silhouette - arms raised */}
+        <g fill={COLORS.ash}>
+          {/* Head */}
+          <ellipse cx="50" cy="45" rx="6" ry="7" />
+          {/* Body */}
+          <path d="M42 52 L50 75 L58 52 Z" />
+          {/* Left arm raised */}
+          <path d="M43 55 L28 35 L32 33 L45 50 Z" />
+          {/* Right arm raised */}
+          <path d="M57 55 L72 35 L68 33 L55 50 Z" />
+          {/* Legs */}
+          <path d="M46 72 L44 95 L48 95 L50 78 L52 95 L56 95 L54 72 Z" />
+        </g>
+      </svg>
+      {/* Glow effect */}
       <div
-        className="absolute inset-0 animate-pulse"
+        className="absolute inset-0 rounded-full"
         style={{
-          background: 'radial-gradient(circle, rgba(255,100,0,0.3) 0%, transparent 60%)',
+          background: `radial-gradient(circle at 50% 25%, ${COLORS.gold}40 0%, transparent 50%)`,
         }}
+        aria-hidden="true"
       />
     </div>
   )
 }
 
+// Knight silhouette - hollowed form
+function HollowKnight({ variant = 'standing', className = '' }: { variant?: 'standing' | 'kneeling' | 'combat'; className?: string }) {
+  const paths = {
+    standing: 'M50 15 L47 20 L53 20 Z M45 22 L50 45 L55 22 Z M43 25 L35 35 L37 36 L44 28 Z M57 25 L65 35 L63 36 L56 28 Z M46 42 L44 70 L48 70 L50 50 L52 70 L56 70 L54 42 Z',
+    kneeling: 'M50 25 L47 30 L53 30 Z M45 32 L50 50 L55 32 Z M43 35 L30 40 L32 42 L44 38 Z M50 48 L45 65 L50 60 L55 65 L50 48 Z M42 60 L38 70 L50 70 L45 60 Z M58 60 L62 70 L50 70 L55 60 Z',
+    combat: 'M50 15 L47 20 L53 20 Z M45 22 L50 40 L55 22 Z M43 25 L25 20 L26 23 L42 28 Z M57 25 L75 35 L73 38 L56 30 Z M46 38 L44 65 L48 65 L50 45 L52 65 L56 65 L54 38 Z',
+  }
+
+  return (
+    <div
+      className={`opacity-20 ${className}`}
+      role="img"
+      aria-label={`Hollow knight silhouette in ${variant} pose`}
+    >
+      <svg viewBox="0 0 100 80" fill={COLORS.ash} width="60" height="48">
+        <path d={paths[variant]} />
+      </svg>
+    </div>
+  )
+}
+
+// Gothic stone texture overlay
+function StoneTexture() {
+  return (
+    <div
+      className="fixed inset-0 pointer-events-none z-[1] opacity-[0.03]"
+      aria-hidden="true"
+      style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
+      }}
+    />
+  )
+}
+
 // Profession-specific ember ornaments
 function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
   const ornamentsByProfession = {
     engineer: [
       { icon: '⚙️', x: 5, y: 20, size: 28 },
@@ -80,8 +207,30 @@ function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | '
 
   const items = ornamentsByProfession[profession]
 
+  if (prefersReducedMotion) {
+    return (
+      <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden" aria-hidden="true">
+        {items.map((item, i) => (
+          <div
+            key={i}
+            className="absolute"
+            style={{
+              left: `${item.x}%`,
+              top: `${item.y}%`,
+              fontSize: item.size,
+              opacity: 0.3,
+              filter: `drop-shadow(0 0 8px ${COLORS.bonfire}99)`,
+            }}
+          >
+            {item.icon}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   return (
-    <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden">
+    <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden" aria-hidden="true">
       {items.map((item, i) => (
         <div
           key={i}
@@ -91,7 +240,7 @@ function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | '
             top: `${item.y}%`,
             fontSize: item.size,
             opacity: 0.4,
-            filter: 'drop-shadow(0 0 8px rgba(255,100,0,0.6))',
+            filter: `drop-shadow(0 0 8px ${COLORS.bonfire}99)`,
             animation: `emberFloat ${12 + i * 3}s ease-in-out infinite`,
             animationDelay: `${-i * 2}s`,
           }}
@@ -107,37 +256,54 @@ function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | '
 function DodgeRollSection({
   children,
   className = '',
+  ariaLabel,
 }: {
   children: React.ReactNode
   className?: string
+  ariaLabel?: string
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
   const [phase, setPhase] = useState<'hidden' | 'rolling' | 'revealed'>('hidden')
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => {
     if (hasEntered && phase === 'hidden') {
-      setPhase('rolling')
-      setTimeout(() => setPhase('revealed'), 700)
+      if (prefersReducedMotion) {
+        setPhase('revealed')
+      } else {
+        setPhase('rolling')
+        setTimeout(() => setPhase('revealed'), 700)
+      }
     }
-  }, [hasEntered, phase])
+  }, [hasEntered, phase, prefersReducedMotion])
 
   return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      {/* Dodge roll animation */}
-      {phase === 'rolling' && (
-        <div className="absolute inset-0 z-50 pointer-events-none">
+    <div
+      ref={ref}
+      className={`relative overflow-hidden ${className}`}
+      aria-label={ariaLabel}
+    >
+      {phase === 'rolling' && !prefersReducedMotion && (
+        <div className="absolute inset-0 z-50 pointer-events-none" aria-hidden="true">
           <div
             className="absolute top-1/2 -translate-y-1/2"
             style={{ animation: 'dodgeRoll 0.7s ease-out forwards' }}
           >
             <UndeadWarrior size={50} direction="right" />
           </div>
-          {/* I-frame flash */}
           <div
             className="absolute inset-0"
             style={{
-              background: 'radial-gradient(circle, rgba(255,200,100,0.2) 0%, transparent 50%)',
+              background: `radial-gradient(circle, ${COLORS.ember}33 0%, transparent 50%)`,
               animation: 'iframeFlash 0.3s ease-out 2',
             }}
           />
@@ -148,7 +314,7 @@ function DodgeRollSection({
         style={{
           opacity: phase === 'revealed' ? 1 : 0,
           transform: phase === 'revealed' ? 'translateX(0)' : 'translateX(-20px)',
-          transition: 'all 0.4s ease-out',
+          transition: prefersReducedMotion ? 'none' : 'all 0.4s ease-out',
         }}
       >
         {children}
@@ -159,19 +325,32 @@ function DodgeRollSection({
 
 // Souls counter - floating soul particles
 function SoulsCounter({ count }: { count: number }) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
   return (
-    <div className="fixed top-6 right-24 z-40 flex items-center gap-2">
-      {/* Soul orb */}
+    <div
+      className="fixed top-6 right-24 z-40 flex items-center gap-2"
+      role="status"
+      aria-label={`Souls: ${count.toLocaleString()}`}
+    >
       <div className="relative">
         <div
-          className="w-6 h-6 rounded-full animate-pulse"
+          className={`w-6 h-6 rounded-full ${!prefersReducedMotion ? 'animate-pulse' : ''}`}
           style={{
-            background: 'radial-gradient(circle at 30% 30%, #88ffff, #00aacc 50%, #006688)',
-            boxShadow: '0 0 15px #00ccff, 0 0 30px #00aacc40',
+            background: `radial-gradient(circle at 30% 30%, ${COLORS.soul}, #00aacc 50%, #006688)`,
+            boxShadow: `0 0 15px ${COLORS.soul}, 0 0 30px #00aacc40`,
           }}
+          aria-hidden="true"
         />
-        {/* Soul particles */}
-        {[...Array(4)].map((_, i) => (
+        {!prefersReducedMotion && [...Array(4)].map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 rounded-full bg-cyan-400 animate-soul-float"
@@ -180,93 +359,140 @@ function SoulsCounter({ count }: { count: number }) {
               top: '50%',
               animationDelay: `${i * 0.3}s`,
             }}
+            aria-hidden="true"
           />
         ))}
       </div>
-      <span className="text-sm font-bold tracking-wider" style={{ color: '#88ffff', textShadow: '0 0 10px #00ccff' }}>
+      <span
+        className="text-sm font-bold tracking-wider"
+        style={{ color: COLORS.soul, textShadow: `0 0 10px ${COLORS.soul}` }}
+      >
         {count.toLocaleString()}
       </span>
     </div>
   )
 }
 
-// Animated Bonfire component
-function Bonfire({ size = 'normal' }: { size?: 'small' | 'normal' | 'large' }) {
+// Animated Bonfire component - enhanced with more realistic flames
+function Bonfire({ size = 'normal', label }: { size?: 'small' | 'normal' | 'large'; label?: string }) {
   const scales = { small: 0.5, normal: 1, large: 1.5 }
   const scale = scales[size]
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
 
   return (
-    <div className="relative" style={{ transform: `scale(${scale})` }}>
-      {/* Sword in ground */}
+    <div
+      className="relative"
+      style={{ transform: `scale(${scale})` }}
+      role="img"
+      aria-label={label || 'Bonfire checkpoint'}
+    >
+      {/* Coiled sword in ground */}
       <div
-        className="absolute -top-12 left-1/2 -translate-x-1/2 w-1.5 h-14"
+        className="absolute -top-14 left-1/2 -translate-x-1/2 w-2 h-16"
         style={{
-          background: 'linear-gradient(to bottom, #888, #333)',
+          background: `linear-gradient(to bottom, #aaa, #666 30%, #444)`,
           boxShadow: '0 0 5px rgba(0,0,0,0.8)',
+          clipPath: 'polygon(30% 0, 70% 0, 60% 100%, 40% 100%)',
         }}
+        aria-hidden="true"
       >
-        {/* Sword crossguard */}
+        {/* Sword crossguard - curved like coiled sword */}
         <div
-          className="absolute -top-1 left-1/2 -translate-x-1/2 w-8 h-2"
-          style={{ background: 'linear-gradient(to bottom, #666, #444)' }}
+          className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-3"
+          style={{
+            background: `linear-gradient(to bottom, #777, #555)`,
+            borderRadius: '0 0 50% 50%',
+          }}
         />
-        {/* Sword handle */}
+        {/* Sword handle wrap */}
         <div
-          className="absolute -top-5 left-1/2 -translate-x-1/2 w-2 h-4"
-          style={{ background: '#553311' }}
+          className="absolute -top-4 left-1/2 -translate-x-1/2 w-2 h-5"
+          style={{ background: '#442211' }}
         />
       </div>
 
-      {/* Fire base */}
-      <div className="relative w-16 h-12">
-        {/* Main flames */}
-        {[...Array(5)].map((_, i) => (
+      {/* Fire base container */}
+      <div className="relative w-20 h-16">
+        {/* Main flames - more organic shapes */}
+        {[...Array(7)].map((_, i) => (
           <div
             key={i}
-            className="absolute bottom-0 animate-flame"
+            className={prefersReducedMotion ? '' : 'animate-flame'}
             style={{
-              left: `${10 + i * 15}%`,
-              width: `${12 + Math.random() * 8}px`,
-              height: `${20 + Math.random() * 20}px`,
-              background: `linear-gradient(to top, #ff4400, #ff8800 40%, #ffcc00 70%, transparent)`,
+              position: 'absolute',
+              bottom: '8px',
+              left: `${5 + i * 12}%`,
+              width: `${14 + Math.sin(i) * 6}px`,
+              height: `${24 + Math.cos(i * 2) * 16}px`,
+              background: `linear-gradient(to top,
+                ${COLORS.darksign} 0%,
+                ${COLORS.bonfire} 30%,
+                ${COLORS.ember} 60%,
+                ${COLORS.gold} 85%,
+                transparent 100%
+              )`,
               borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-              animationDelay: `${i * 0.15}s`,
-              filter: 'blur(1px)',
+              animationDelay: `${i * 0.12}s`,
+              filter: 'blur(0.5px)',
+              opacity: 0.95,
             }}
+            aria-hidden="true"
           />
         ))}
 
-        {/* Embers */}
-        {[...Array(8)].map((_, i) => (
+        {/* Inner bright core */}
+        <div
+          className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-6"
+          style={{
+            background: `radial-gradient(ellipse at 50% 80%, ${COLORS.gold}, ${COLORS.ember} 50%, transparent 80%)`,
+            filter: 'blur(2px)',
+          }}
+          aria-hidden="true"
+        />
+
+        {/* Rising embers */}
+        {!prefersReducedMotion && [...Array(12)].map((_, i) => (
           <div
             key={i}
             className="absolute w-1 h-1 rounded-full animate-ember"
             style={{
-              left: `${20 + Math.random() * 60}%`,
-              bottom: '30%',
-              background: i % 2 === 0 ? '#ff6600' : '#ffaa00',
-              animationDelay: `${i * 0.4}s`,
-              boxShadow: '0 0 3px #ff6600',
+              left: `${25 + Math.random() * 50}%`,
+              bottom: '40%',
+              background: i % 3 === 0 ? COLORS.gold : i % 2 === 0 ? COLORS.bonfire : COLORS.ember,
+              animationDelay: `${i * 0.25}s`,
+              boxShadow: `0 0 4px ${COLORS.bonfire}`,
             }}
+            aria-hidden="true"
           />
         ))}
 
-        {/* Glow */}
+        {/* Ambient glow */}
         <div
-          className="absolute inset-0 -bottom-4"
+          className="absolute -inset-8"
           style={{
-            background: 'radial-gradient(ellipse at 50% 100%, #ff660040, transparent 70%)',
+            background: `radial-gradient(ellipse at 50% 80%, ${COLORS.bonfire}60, ${COLORS.darksign}30 40%, transparent 70%)`,
+            filter: 'blur(8px)',
           }}
+          aria-hidden="true"
         />
       </div>
 
-      {/* Coal base */}
+      {/* Coal/ash base */}
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-20 h-4 rounded-full"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-5 rounded-full"
         style={{
-          background: 'radial-gradient(ellipse, #442200, #221100)',
-          boxShadow: 'inset 0 -2px 4px #ff330020',
+          background: `radial-gradient(ellipse, #331100, #1a0800 60%, #0a0400)`,
+          boxShadow: `inset 0 2px 8px ${COLORS.darksign}40`,
         }}
+        aria-hidden="true"
       />
     </div>
   )
@@ -274,52 +500,70 @@ function Bonfire({ size = 'normal' }: { size?: 'small' | 'normal' | 'large' }) {
 
 // Fog Gate - misty barrier as section divider
 function FogGate() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
   return (
-    <div className="relative h-16 w-full overflow-hidden my-8">
+    <div
+      className="relative h-20 w-full overflow-hidden my-8"
+      role="separator"
+      aria-label="Section divider - fog wall"
+    >
       <div className="absolute inset-0 flex items-center justify-center">
         {/* Main fog layers */}
-        {[...Array(3)].map((_, i) => (
+        {[...Array(4)].map((_, i) => (
           <div
             key={i}
-            className="absolute inset-0 animate-fog-drift"
+            className={prefersReducedMotion ? '' : 'animate-fog-drift'}
             style={{
+              position: 'absolute',
+              inset: 0,
               background: `linear-gradient(90deg,
                 transparent 0%,
-                rgba(150, 180, 200, ${0.1 - i * 0.02}) 20%,
-                rgba(200, 220, 240, ${0.15 - i * 0.03}) 50%,
-                rgba(150, 180, 200, ${0.1 - i * 0.02}) 80%,
+                rgba(138, 155, 168, ${0.08 - i * 0.015}) 15%,
+                rgba(180, 195, 210, ${0.12 - i * 0.02}) 50%,
+                rgba(138, 155, 168, ${0.08 - i * 0.015}) 85%,
                 transparent 100%
               )`,
-              animationDelay: `${i * 2}s`,
-              animationDuration: `${8 + i * 2}s`,
+              animationDelay: `${i * 2.5}s`,
+              animationDuration: `${10 + i * 2}s`,
             }}
+            aria-hidden="true"
           />
         ))}
 
         {/* Fog particles */}
-        {[...Array(20)].map((_, i) => (
+        {!prefersReducedMotion && [...Array(25)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full animate-fog-particle"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              width: `${20 + Math.random() * 40}px`,
-              height: `${10 + Math.random() * 20}px`,
-              background: `radial-gradient(ellipse, rgba(200, 220, 240, ${0.1 + Math.random() * 0.1}), transparent)`,
-              animationDelay: `${Math.random() * 5}s`,
-              filter: 'blur(4px)',
+              width: `${25 + Math.random() * 50}px`,
+              height: `${12 + Math.random() * 25}px`,
+              background: `radial-gradient(ellipse, rgba(180, 195, 210, ${0.08 + Math.random() * 0.08}), transparent)`,
+              animationDelay: `${Math.random() * 6}s`,
+              filter: 'blur(6px)',
             }}
+            aria-hidden="true"
           />
         ))}
 
         {/* Interaction prompt */}
         <div className="relative z-10 text-center">
           <span
-            className="text-xs tracking-widest animate-pulse"
-            style={{ color: '#aabbcc80', textShadow: '0 0 10px #aabbcc40' }}
+            className={`text-xs tracking-[0.3em] ${!prefersReducedMotion ? 'animate-pulse' : ''}`}
+            style={{ color: `${COLORS.fog}80`, textShadow: `0 0 15px ${COLORS.fog}40` }}
           >
-            TRAVERSE THE FOG
+            TRAVERSE THE WHITE LIGHT
           </span>
         </div>
       </div>
@@ -330,96 +574,152 @@ function FogGate() {
 // Bloodstain decoration
 function Bloodstain({ className = '' }: { className?: string }) {
   return (
-    <div className={`relative ${className}`}>
-      <svg width="30" height="30" viewBox="0 0 30 30" className="opacity-30">
-        <ellipse cx="15" cy="18" rx="12" ry="8" fill="#660000" />
-        <ellipse cx="15" cy="16" rx="8" ry="5" fill="#880000" />
-        <circle cx="10" cy="10" r="3" fill="#770000" />
-        <circle cx="20" cy="8" r="2" fill="#660000" />
+    <div className={`relative ${className}`} aria-hidden="true">
+      <svg width="35" height="35" viewBox="0 0 35 35" className="opacity-25">
+        <ellipse cx="17" cy="22" rx="14" ry="9" fill="#550000" />
+        <ellipse cx="17" cy="19" rx="9" ry="6" fill={COLORS.blood} />
+        <circle cx="11" cy="11" r="4" fill="#660000" />
+        <circle cx="23" cy="9" r="2.5" fill="#550000" />
+        <ellipse cx="8" cy="18" rx="2" ry="3" fill="#440000" />
       </svg>
     </div>
   )
 }
 
-// Estus Flask
+// Estus Flask - enhanced
 function EstusFlask({ charges = 5, maxCharges = 5 }: { charges?: number; maxCharges?: number }) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
   return (
-    <div className="flex items-center gap-2">
-      {/* Flask */}
-      <div className="relative w-8 h-12">
-        {/* Flask body */}
+    <div
+      className="flex items-center gap-2"
+      role="status"
+      aria-label={`Estus Flask: ${charges} of ${maxCharges} charges`}
+    >
+      <div className="relative w-8 h-14">
+        {/* Flask body - more rounded like actual Estus */}
         <div
-          className="absolute bottom-0 w-full h-10 rounded-b-lg"
+          className="absolute bottom-0 w-full h-11 rounded-b-xl rounded-t-lg"
           style={{
-            background: 'linear-gradient(to right, #553300, #774411, #553300)',
-            border: '2px solid #442200',
+            background: `linear-gradient(to right, #4a3520, #6b4c30, #4a3520)`,
+            border: '2px solid #3a2810',
+            boxShadow: 'inset 0 0 8px rgba(0,0,0,0.5)',
           }}
+          aria-hidden="true"
         />
         {/* Flask neck */}
         <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-4 rounded-t"
+          className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-5 rounded-t-lg"
           style={{
-            background: 'linear-gradient(to right, #442200, #553300, #442200)',
+            background: `linear-gradient(to right, #3a2810, #4a3520, #3a2810)`,
           }}
+          aria-hidden="true"
+        />
+        {/* Cork */}
+        <div
+          className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-2 rounded-t"
+          style={{ background: '#2a1808' }}
+          aria-hidden="true"
         />
         {/* Liquid */}
         <div
-          className="absolute bottom-1 left-1 right-1 rounded-b-md animate-liquid-glow"
+          className={`absolute bottom-1 left-1 right-1 rounded-b-lg ${!prefersReducedMotion ? 'animate-liquid-glow' : ''}`}
           style={{
-            height: `${(charges / maxCharges) * 70}%`,
-            background: 'linear-gradient(to top, #ff6600, #ff8800, #ffaa00)',
-            boxShadow: '0 0 10px #ff6600, inset 0 0 10px #ffcc0060',
+            height: `${(charges / maxCharges) * 75}%`,
+            background: `linear-gradient(to top, ${COLORS.darksign}, ${COLORS.bonfire}, ${COLORS.ember})`,
+            boxShadow: `0 0 12px ${COLORS.bonfire}, inset 0 0 12px ${COLORS.gold}80`,
           }}
+          aria-hidden="true"
         />
       </div>
-      {/* Charge count */}
-      <span className="text-sm font-bold" style={{ color: '#ff8800' }}>
+      <span className="text-sm font-bold" style={{ color: COLORS.bonfire }}>
         {charges}/{maxCharges}
       </span>
     </div>
   )
 }
 
-// Darksign - Sun eclipse symbol
+// Darksign - Sun eclipse symbol - enhanced
 function Darksign({ size = 40 }: { size?: number }) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
   return (
-    <div className="relative" style={{ width: size, height: size }}>
-      {/* Outer ring - dark flame */}
+    <div
+      className="relative"
+      style={{ width: size, height: size }}
+      role="img"
+      aria-label="Darksign - mark of the undead"
+    >
+      {/* Outer ring - dark flame corona */}
       <div
-        className="absolute inset-0 rounded-full animate-darksign-pulse"
+        className={prefersReducedMotion ? '' : 'animate-darksign-pulse'}
         style={{
-          background: 'radial-gradient(circle, transparent 40%, #ff4400 50%, #cc2200 60%, #660000 70%, transparent 75%)',
-          boxShadow: '0 0 20px #ff440040, inset 0 0 15px #ff440020',
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '50%',
+          background: `radial-gradient(circle,
+            transparent 35%,
+            ${COLORS.darksign} 45%,
+            ${COLORS.bonfire} 50%,
+            ${COLORS.blood} 60%,
+            #330000 70%,
+            transparent 78%
+          )`,
+          boxShadow: `0 0 25px ${COLORS.darksign}50, inset 0 0 20px ${COLORS.darksign}30`,
         }}
+        aria-hidden="true"
       />
-      {/* Inner dark circle */}
+      {/* Inner dark circle - the hollow sun */}
       <div
-        className="absolute rounded-full"
         style={{
-          top: '15%',
-          left: '15%',
-          right: '15%',
-          bottom: '15%',
-          background: 'radial-gradient(circle at 30% 30%, #1a1a1a, #000)',
-          boxShadow: 'inset 0 0 10px rgba(0,0,0,0.8)',
+          position: 'absolute',
+          top: '20%',
+          left: '20%',
+          right: '20%',
+          bottom: '20%',
+          borderRadius: '50%',
+          background: `radial-gradient(circle at 35% 35%, #1a1a1a, ${COLORS.humanity})`,
+          boxShadow: 'inset 0 0 12px rgba(0,0,0,0.9)',
         }}
+        aria-hidden="true"
       />
     </div>
   )
 }
 
-// YOU DIED text effect
+// YOU DIED text effect - enhanced with authentic styling
 function YouDied({ show }: { show: boolean }) {
   if (!show) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none animate-you-died">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none animate-you-died"
+      role="alert"
+      aria-live="assertive"
+    >
       <div
-        className="text-6xl md:text-8xl font-serif tracking-[0.5em] uppercase"
+        className="text-6xl md:text-8xl font-serif tracking-[0.6em] uppercase"
         style={{
-          color: '#8b0000',
-          textShadow: '0 0 50px #ff0000, 0 0 100px #660000',
-          filter: 'blur(0.5px)',
+          color: COLORS.blood,
+          textShadow: `0 0 60px #ff0000, 0 0 120px ${COLORS.blood}`,
+          fontFamily: '"Cinzel", "Trajan Pro", serif',
+          filter: 'blur(0.3px)',
         }}
       >
         YOU DIED
@@ -431,29 +731,34 @@ function YouDied({ show }: { show: boolean }) {
 // Sword stuck in ground - rest point marker
 function SwordMarker() {
   return (
-    <div className="relative w-6 h-16">
+    <div className="relative w-6 h-16" role="img" aria-label="Bonfire sword marker">
       {/* Blade */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-10"
         style={{
-          background: 'linear-gradient(to bottom, #ccc, #888 30%, #666)',
+          background: `linear-gradient(to bottom, #ddd, #999 20%, #777)`,
           boxShadow: '0 0 5px rgba(0,0,0,0.5)',
+          clipPath: 'polygon(30% 0, 70% 0, 55% 100%, 45% 100%)',
         }}
+        aria-hidden="true"
       />
       {/* Crossguard */}
       <div
         className="absolute top-8 left-1/2 -translate-x-1/2 w-6 h-1.5 rounded"
-        style={{ background: 'linear-gradient(to bottom, #555, #333)' }}
+        style={{ background: `linear-gradient(to bottom, #666, ${COLORS.ash})` }}
+        aria-hidden="true"
       />
       {/* Handle */}
       <div
         className="absolute top-9 left-1/2 -translate-x-1/2 w-1.5 h-4"
-        style={{ background: '#442211' }}
+        style={{ background: '#3a2211' }}
+        aria-hidden="true"
       />
       {/* Pommel */}
       <div
-        className="absolute top-12 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full"
-        style={{ background: '#333' }}
+        className="absolute top-12 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
+        style={{ background: `linear-gradient(135deg, #444, #222)` }}
+        aria-hidden="true"
       />
     </div>
   )
@@ -461,32 +766,44 @@ function SwordMarker() {
 
 // Map fog/unexplored area effect - Dark Souls style
 function MapFog() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
   return (
-    <div className="fixed inset-0 pointer-events-none z-[2]">
-      {/* Dark vignette */}
+    <div className="fixed inset-0 pointer-events-none z-[2]" aria-hidden="true">
+      {/* Dark vignette - heavier for Dark Souls feel */}
       <div
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(circle at 50% 50%, transparent 30%, rgba(5, 5, 8, 0.9) 100%)
+            radial-gradient(circle at 50% 50%, transparent 20%, rgba(5, 5, 8, 0.85) 100%)
           `,
         }}
       />
       {/* Ash particles */}
-      <div className="absolute inset-0 opacity-20">
-        {[...Array(30)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-gray-400 animate-ash-fall"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${10 + Math.random() * 10}s`,
-            }}
-          />
-        ))}
-      </div>
+      {!prefersReducedMotion && (
+        <div className="absolute inset-0 opacity-15">
+          {[...Array(40)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 rounded-full bg-gray-500 animate-ash-fall"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 12}s`,
+                animationDuration: `${12 + Math.random() * 12}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -506,7 +823,7 @@ function ZoneNode({
   connections: Array<{ direction: 'up' | 'down' | 'left' | 'right' }>
 }) {
   const zones = {
-    engineer: { name: 'FIRELINK CORE', icon: null, color: '#ff8800', description: 'System Architecture' },
+    engineer: { name: 'FIRELINK CORE', icon: null, color: COLORS.bonfire, description: 'System Architecture' },
     drummer: { name: 'DEPTHS OF RHYTHM', icon: null, color: '#9966ff', description: 'Musical Prowess' },
     fighter: { name: 'ARENA OF DUELS', icon: null, color: '#ff4444', description: 'Combat Mastery' },
   }
@@ -518,6 +835,8 @@ function ZoneNode({
       className={`relative transition-all duration-500 ${
         isActive ? 'scale-110 z-20' : 'hover:scale-105 opacity-70 hover:opacity-100'
       }`}
+      aria-label={`${zone.name} - ${zone.description}. ${isActive ? 'Currently active.' : ''} ${isExplored ? 'Explored.' : 'Unexplored.'}`}
+      aria-pressed={isActive}
     >
       {/* Connection lines - ancient stone paths */}
       {connections.map((conn, i) => (
@@ -529,19 +848,20 @@ function ZoneNode({
             ...(conn.direction === 'down' && { bottom: '-30px', left: '50%', width: '3px', height: '30px', transform: 'translateX(-50%)' }),
             ...(conn.direction === 'left' && { left: '-30px', top: '50%', width: '30px', height: '3px', transform: 'translateY(-50%)' }),
             ...(conn.direction === 'right' && { right: '-30px', top: '50%', width: '30px', height: '3px', transform: 'translateY(-50%)' }),
-            background: `linear-gradient(${conn.direction === 'left' || conn.direction === 'right' ? '90deg' : '180deg'}, transparent, #33221180, transparent)`,
+            background: `linear-gradient(${conn.direction === 'left' || conn.direction === 'right' ? '90deg' : '180deg'}, transparent, ${COLORS.ash}80, transparent)`,
           }}
+          aria-hidden="true"
         />
       ))}
 
-      {/* Zone container */}
+      {/* Zone container - gothic stone frame */}
       <div
         className="w-32 h-24 flex flex-col items-center justify-center relative"
         style={{
           background: isActive
-            ? `radial-gradient(ellipse at 50% 80%, ${zone.color}30, #0d0a0f 70%)`
+            ? `radial-gradient(ellipse at 50% 80%, ${zone.color}30, ${COLORS.stone} 70%)`
             : isExplored
-            ? 'linear-gradient(180deg, #0d0a0f, #151015)'
+            ? `linear-gradient(180deg, ${COLORS.stone}, #151015)`
             : '#0a0808',
           border: `2px solid ${isActive ? zone.color : isExplored ? '#2a2025' : '#151015'}`,
           boxShadow: isActive
@@ -551,14 +871,14 @@ function ZoneNode({
       >
         {/* Mini bonfire when active */}
         {isActive && (
-          <div className="absolute -top-8">
+          <div className="absolute -top-8" aria-hidden="true">
             <Bonfire size="small" />
           </div>
         )}
 
         {/* Zone icon - sword marker when not active */}
         {!isActive && isExplored && (
-          <div className="absolute -top-10 scale-50">
+          <div className="absolute -top-10 scale-50" aria-hidden="true">
             <SwordMarker />
           </div>
         )}
@@ -579,8 +899,8 @@ function ZoneNode({
 
       {/* Rest at bonfire prompt */}
       {isActive && (
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap">
-          <span className="text-[8px] tracking-widest animate-pulse" style={{ color: '#ff880080' }}>
+        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap" aria-hidden="true">
+          <span className="text-[8px] tracking-widest animate-pulse" style={{ color: `${COLORS.bonfire}80` }}>
             BONFIRE LIT
           </span>
         </div>
@@ -589,66 +909,56 @@ function ZoneNode({
   )
 }
 
-// Ability unlock display - Dark Souls stat style
-function AbilityUnlock({ name, level, unlocked }: { name: string; level: number; unlocked: boolean }) {
+// Impact statement for skills - NO 1-5 bars, shows achievements
+function SkillImpact({ name, impact, icon }: { name: string; impact: string; icon?: string }) {
   return (
     <div
-      className={`flex items-center gap-3 py-2 transition-all border-b ${
-        unlocked ? '' : 'opacity-30'
-      }`}
+      className="flex items-start gap-3 py-3 border-b"
       style={{ borderColor: '#1a1518' }}
     >
       <div
-        className="w-8 h-8 flex items-center justify-center"
+        className="w-8 h-8 flex items-center justify-center flex-shrink-0 mt-0.5"
         style={{
-          background: unlocked ? '#ff660015' : '#0a0808',
-          border: `1px solid ${unlocked ? '#ff660040' : '#1a1518'}`,
+          background: `${COLORS.bonfire}15`,
+          border: `1px solid ${COLORS.bonfire}40`,
         }}
       >
-        {unlocked ? (
-          <Darksign size={16} />
+        {icon ? (
+          <span className="text-sm">{icon}</span>
         ) : (
-          <span className="text-sm" style={{ color: '#333' }}>?</span>
+          <Darksign size={14} />
         )}
       </div>
-      <span className="text-xs flex-1 tracking-wide" style={{ color: unlocked ? '#c0b0a0' : '#444' }}>
-        {unlocked ? name : '???'}
-      </span>
-      {/* Level bar - souls style */}
-      <div className="flex gap-0.5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="w-2 h-4"
-            style={{
-              background: i < level
-                ? 'linear-gradient(to top, #ff6600, #ff8800)'
-                : '#151015',
-              boxShadow: i < level ? '0 0 5px #ff660040' : 'none',
-            }}
-          />
-        ))}
+      <div className="flex-1">
+        <span className="text-xs font-bold tracking-wide block" style={{ color: COLORS.ember }}>
+          {name}
+        </span>
+        <span className="text-[11px] leading-relaxed block mt-1" style={{ color: '#a09080' }}>
+          {impact}
+        </span>
       </div>
     </div>
   )
 }
 
-// Save room style project card - Bonfire checkpoint
+// Save room style project card - Bonfire checkpoint with impact
 function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
   return (
-    <div
+    <article
       className="p-4 group cursor-pointer transition-all relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #12100f, #0a0908)',
-        border: '1px solid #2a2520',
+        background: `linear-gradient(180deg, #12100f, #0a0908)`,
+        border: `1px solid ${COLORS.ash}`,
       }}
+      aria-labelledby={`project-${project.id}`}
     >
       {/* Ember glow on hover */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
         style={{
-          background: 'radial-gradient(ellipse at 50% 100%, #ff660010, transparent 70%)',
+          background: `radial-gradient(ellipse at 50% 100%, ${COLORS.bonfire}10, transparent 70%)`,
         }}
+        aria-hidden="true"
       />
 
       {/* Save point indicator - small ember */}
@@ -657,18 +967,29 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
           className="w-3 h-3 rounded-full"
           style={{
             background: project.featured
-              ? 'radial-gradient(circle, #ffaa00, #ff6600)'
-              : 'radial-gradient(circle, #666, #333)',
-            boxShadow: project.featured ? '0 0 10px #ff660060' : 'none',
+              ? `radial-gradient(circle, ${COLORS.gold}, ${COLORS.bonfire})`
+              : `radial-gradient(circle, #666, ${COLORS.ash})`,
+            boxShadow: project.featured ? `0 0 10px ${COLORS.bonfire}60` : 'none',
           }}
+          aria-hidden="true"
         />
-        <h3 className="text-sm tracking-wide" style={{ color: project.featured ? '#ffaa66' : '#8a8070' }}>
+        <h3
+          id={`project-${project.id}`}
+          className="text-sm tracking-wide"
+          style={{ color: project.featured ? '#ffaa66' : '#8a8070' }}
+        >
           {project.name}
         </h3>
       </div>
-      <p className="text-[10px] mb-3 leading-relaxed" style={{ color: '#666050' }}>
+      <p className="text-[10px] mb-2 leading-relaxed" style={{ color: '#666050' }}>
         {project.tagline}
       </p>
+      {/* Impact statement instead of just description */}
+      {project.metrics && project.metrics.length > 0 && (
+        <p className="text-[11px] mb-3 leading-relaxed" style={{ color: '#a09080' }}>
+          {project.metrics[0]}
+        </p>
+      )}
       <div className="flex gap-1 flex-wrap">
         {project.techStack.slice(0, 3).map((tech) => (
           <span
@@ -677,14 +998,14 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
             style={{
               background: '#1a1815',
               color: '#887860',
-              border: '1px solid #2a2520',
+              border: `1px solid ${COLORS.ash}`,
             }}
           >
             {tech}
           </span>
         ))}
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -697,32 +1018,34 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
       rel="noopener noreferrer"
       className="block p-4 group transition-all relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #12100f, #0a0908)',
-        border: '1px solid #2a2520',
+        background: `linear-gradient(180deg, #12100f, #0a0908)`,
+        border: `1px solid ${COLORS.ash}`,
       }}
+      aria-label={`${company.name} - ${company.tagline}. ${company.description}`}
     >
       {/* Hover glow */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
         style={{
-          background: 'radial-gradient(ellipse at 50% 0%, #ff880010, transparent 70%)',
+          background: `radial-gradient(ellipse at 50% 0%, ${COLORS.bonfire}10, transparent 70%)`,
         }}
+        aria-hidden="true"
       />
 
       <div className="flex items-center gap-3 mb-2 relative">
-        <span className="text-2xl">{company.icon}</span>
+        <span className="text-2xl" aria-hidden="true">{company.icon}</span>
         <div>
           <h4 className="text-sm tracking-wide group-hover:text-orange-300 transition-colors" style={{ color: '#c0a080' }}>
             {company.name}
           </h4>
-          <p className="text-[10px]" style={{ color: '#ff8800' }}>{company.tagline}</p>
+          <p className="text-[10px]" style={{ color: COLORS.bonfire }}>{company.tagline}</p>
         </div>
       </div>
       <p className="text-xs leading-relaxed" style={{ color: '#666050' }}>{company.description}</p>
 
       {/* External link indicator */}
-      <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-        <span className="text-[8px]" style={{ color: '#ff880060' }}>TRAVEL</span>
+      <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
+        <span className="text-[8px]" style={{ color: `${COLORS.bonfire}60` }}>TRAVEL</span>
       </div>
     </a>
   )
@@ -731,19 +1054,21 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
 // Band card - Dark Souls covenant style
 function BandCard({ band }: { band: typeof BANDS[0] }) {
   const content = (
-    <div
+    <article
       className="p-4 group transition-all relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #12100f, #0a0908)',
-        border: '1px solid #2a2520',
+        background: `linear-gradient(180deg, #12100f, #0a0908)`,
+        border: `1px solid ${COLORS.ash}`,
       }}
+      aria-label={`${band.name} - ${band.genre}, ${band.role}. ${band.description}`}
     >
       {/* Hover glow - purple for music */}
       <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
         style={{
-          background: 'radial-gradient(ellipse at 50% 0%, #9966ff10, transparent 70%)',
+          background: `radial-gradient(ellipse at 50% 0%, #9966ff10, transparent 70%)`,
         }}
+        aria-hidden="true"
       />
 
       <h4 className="text-sm tracking-wide group-hover:text-purple-300 transition-colors" style={{ color: '#b090d0' }}>
@@ -754,7 +1079,7 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
       {!band.url && (
         <p className="text-[10px] mt-2 italic" style={{ color: '#444' }}>Covenant forming...</p>
       )}
-    </div>
+    </article>
   )
 
   if (band.url) {
@@ -769,26 +1094,28 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
   const startDisplay = new Date(entry.startDate).getFullYear()
 
   return (
-    <div
+    <article
       className="p-4 relative"
       style={{
-        background: 'linear-gradient(180deg, #12100f, #0a0908)',
-        border: '1px solid #2a2520',
+        background: `linear-gradient(180deg, #12100f, #0a0908)`,
+        border: `1px solid ${COLORS.ash}`,
       }}
+      aria-label={`${entry.title} at ${entry.organization}, ${startDisplay} to ${endDisplay}`}
     >
       {/* Ember accent on left */}
       <div
         className="absolute left-0 top-4 bottom-4 w-1"
         style={{
-          background: 'linear-gradient(to bottom, #ff660000, #ff6600, #ff660000)',
-          boxShadow: '0 0 8px #ff660040',
+          background: `linear-gradient(to bottom, ${COLORS.bonfire}00, ${COLORS.bonfire}, ${COLORS.bonfire}00)`,
+          boxShadow: `0 0 8px ${COLORS.bonfire}40`,
         }}
+        aria-hidden="true"
       />
 
       <div className="flex justify-between items-start mb-2 pl-3">
         <div>
           <h4 className="text-sm tracking-wide" style={{ color: '#c0a080' }}>{entry.title}</h4>
-          <p className="text-xs" style={{ color: '#ff8800' }}>{entry.organization}</p>
+          <p className="text-xs" style={{ color: COLORS.bonfire }}>{entry.organization}</p>
         </div>
         <span className="text-[10px] tracking-wide" style={{ color: '#666050' }}>
           {startDisplay} - {endDisplay}
@@ -796,42 +1123,122 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
       </div>
       <p className="text-xs mb-2 pl-3 leading-relaxed" style={{ color: '#807060' }}>{entry.description}</p>
       {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="pl-3 space-y-1">
+        <ul className="pl-3 space-y-1" aria-label="Achievements">
           {entry.highlights.map((highlight, i) => (
             <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#a09080' }}>
-              <span style={{ color: '#ff660080' }}>◆</span>
+              <span style={{ color: `${COLORS.bonfire}80` }} aria-hidden="true">◆</span>
               {highlight}
             </li>
           ))}
         </ul>
       )}
-    </div>
+    </article>
   )
 }
 
-// Tech stack for engineer - Dark Souls attribute style
+// Tech stack for engineer - Dark Souls attribute style with impacts
 function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+  // Impact statements for tech categories
+  const categoryImpacts: Record<string, string> = {
+    'Languages': 'Primary: Elixir & TypeScript. Built enterprise systems processing millions of transactions.',
+    'Backend Frameworks': 'Phoenix/Ash specialist. Architected multi-tenant SaaS platforms from scratch.',
+    'Frontend Frameworks': 'Full-stack delivery from React SPAs to LiveView real-time dashboards.',
+    'Databases': 'PostgreSQL performance tuning, complex migrations, data modeling at scale.',
+    'Cloud & DevOps': 'Kubernetes clusters, GitOps pipelines, infrastructure as code.',
+    'Integrations & APIs': 'Shopify, Stripe, Google Workspace - built production integrations used by thousands.',
+    'AI & Automation': 'Claude/GPT integrations, prompt engineering for production AI features.',
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="list" aria-label="Technology categories">
       {categories.map((category) => (
-        <div key={category.name}>
-          <h3 className="text-xs tracking-[0.2em] mb-3 flex items-center gap-2" style={{ color: '#886640' }}>
+        <div key={category.name} role="listitem">
+          <div className="flex items-center gap-2 mb-2">
             <Darksign size={12} />
-            {category.name.toUpperCase()}
-          </h3>
-          <div className="flex flex-wrap gap-2">
+            <h3 className="text-xs tracking-[0.2em]" style={{ color: '#886640' }}>
+              {category.name.toUpperCase()}
+            </h3>
+          </div>
+          {/* Impact statement */}
+          {categoryImpacts[category.name] && (
+            <p className="text-[11px] mb-3 leading-relaxed" style={{ color: '#a09080' }}>
+              {categoryImpacts[category.name]}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2" role="list" aria-label={`${category.name} technologies`}>
             {category.items.map((tech) => (
               <span
                 key={tech}
+                role="listitem"
                 className="px-3 py-1 text-xs transition-all hover:scale-105 cursor-default"
                 style={{
                   background: '#12100f',
-                  border: '1px solid #2a2520',
+                  border: `1px solid ${COLORS.ash}`,
                   color: '#a09080',
                 }}
               >
                 {tech}
               </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Skills display for drummer/fighter - with achievements, NO bars
+function SkillsDisplay({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
+  // Impact statements for skills
+  const skillImpacts: Record<string, string> = {
+    // Drummer
+    'Rock/Metal': 'Active in 3 metal/rock bands, studio recording experience',
+    'Progressive': 'Complex time signatures, dynamic arrangements with Eon',
+    'Latin/Salsa': 'Trained in authentic Latin rhythms and clave patterns',
+    'Jazz Fusion': 'Polyrhythmic independence, improvisational chops',
+    'Funk/Soul': 'Retrogroove founding member, deep pocket grooves',
+    'Double Bass': 'Clean, controlled double bass at 180+ BPM',
+    'Polyrhythms': '4 over 3, 5 over 4, layered independence',
+    'Odd Time Signatures': '7/8, 11/8, metric modulation proficiency',
+    'Ghost Notes': 'Dynamic control and subtle ghost note phrasing',
+    'Linear Drumming': 'No simultaneous hits, flowing single-surface patterns',
+    'Studio Recording': '15+ years, multiple album recordings',
+    'Live Touring': '7 years professional live performance',
+    'Session Work': 'Hired for studio sessions across genres',
+    'Music Production': 'Logic Pro, home studio setup',
+    // Fighter
+    'Muay Thai (3 years)': 'Clinch work, elbow/knee techniques, fight cardio',
+    'Brazilian Jiu-Jitsu (2 years)': 'Guard game, submissions, positional control',
+    'MMA (1 year)': 'Integrating striking with grappling transitions',
+    'Wrestling': 'Takedown defense, scrambles',
+    'Striking': 'Boxing fundamentals, Thai kicks, combinations',
+    'Clinch Work': 'Thai clinch control, dirty boxing',
+    'Ground Game': 'Top pressure, guard passing',
+    'Submissions': 'Triangle, armbar, RNC, guillotine',
+    'Fundamentals Instruction': 'Teaching beginners proper technique',
+    'Competition Prep': 'Preparing fighters for amateur bouts',
+    'Self Defense': 'Practical self-defense applications',
+    'Private Coaching': 'One-on-one skill development',
+  }
+
+  return (
+    <div className="space-y-6" role="list" aria-label="Skill categories">
+      {categories.map((category) => (
+        <div key={category.name} role="listitem">
+          <div className="flex items-center gap-2 mb-3">
+            {category.icon && <span className="text-lg" aria-hidden="true">{category.icon}</span>}
+            <h3 className="text-[10px] tracking-[0.2em]" style={{ color: '#886640' }}>
+              {category.name.toUpperCase()}
+            </h3>
+          </div>
+          <div className="space-y-0" role="list" aria-label={`${category.name} skills`}>
+            {category.skills.map((skill) => (
+              <SkillImpact
+                key={skill.name}
+                name={skill.name}
+                impact={skillImpacts[skill.name] || 'Developed through years of dedicated practice'}
+                icon={category.icon}
+              />
             ))}
           </div>
         </div>
@@ -850,36 +1257,41 @@ function MiniMap({ active }: { active: string }) {
   const pos = positions[active as keyof typeof positions]
 
   return (
-    <div
+    <nav
       className="fixed bottom-6 right-6 p-3 z-30"
       style={{
-        background: 'linear-gradient(180deg, #0d0a0fee, #05050899)',
-        border: '2px solid #2a2520',
+        background: `linear-gradient(180deg, ${COLORS.stone}ee, #05050899)`,
+        border: `2px solid ${COLORS.ash}`,
         boxShadow: '0 0 20px rgba(0,0,0,0.8)',
       }}
+      aria-label="Navigation map"
     >
       <div className="text-[8px] tracking-widest mb-2 text-center" style={{ color: '#666050' }}>
         LORDRAN
       </div>
-      <div className="grid grid-cols-3 gap-1">
+      <div className="grid grid-cols-3 gap-1" role="grid" aria-label="Area grid">
         {Array.from({ length: 9 }).map((_, i) => {
           const x = i % 3
           const y = Math.floor(i / 3)
           const isCurrent = pos.x === x && pos.y === y
+          const areaNames = ['', 'Drums', '', 'Fighter', 'Hub', 'Engineer', '', '', '']
           return (
             <div
               key={i}
+              role="gridcell"
+              aria-label={areaNames[i] || 'Empty area'}
+              aria-current={isCurrent ? 'location' : undefined}
               className="w-4 h-4 relative"
               style={{
                 background: isCurrent
-                  ? 'radial-gradient(circle, #ff8800, #ff440080)'
+                  ? `radial-gradient(circle, ${COLORS.bonfire}, ${COLORS.darksign}80)`
                   : '#1a1815',
-                boxShadow: isCurrent ? '0 0 10px #ff880060' : 'none',
-                border: '1px solid #2a2520',
+                boxShadow: isCurrent ? `0 0 10px ${COLORS.bonfire}60` : 'none',
+                border: `1px solid ${COLORS.ash}`,
               }}
             >
               {isCurrent && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
                   <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
                 </div>
               )}
@@ -887,24 +1299,25 @@ function MiniMap({ active }: { active: string }) {
           )
         })}
       </div>
-    </div>
+    </nav>
   )
 }
 
 // Current roles - Dark Souls covenant ranks
 function RolesDisplay() {
   return (
-    <div className="flex flex-wrap justify-center gap-6">
+    <div className="flex flex-wrap justify-center gap-6" role="list" aria-label="Current positions">
       {CURRENT_ROLES.map((role) => (
         <div
           key={role.id}
+          role="listitem"
           className="text-center px-4 py-2 relative"
           style={{
-            background: 'linear-gradient(180deg, transparent, #ff880008)',
-            borderBottom: '1px solid #ff880040',
+            background: `linear-gradient(180deg, transparent, ${COLORS.bonfire}08)`,
+            borderBottom: `1px solid ${COLORS.bonfire}40`,
           }}
         >
-          <p className="text-xs tracking-[0.2em]" style={{ color: '#ff8800' }}>{role.title}</p>
+          <p className="text-xs tracking-[0.2em]" style={{ color: COLORS.bonfire }}>{role.title}</p>
           <p className="text-sm mt-1" style={{ color: '#c0b0a0' }}>{role.company}</p>
         </div>
       ))}
@@ -913,27 +1326,36 @@ function RolesDisplay() {
 }
 
 export default function SoulMapTheme() {
-  const { active, setActive, config } = useProfession()
+  const { active, setActive } = useProfession()
   const [mounted, setMounted] = useState(false)
   const [explored, setExplored] = useState<Set<string>>(new Set(['engineer']))
   const [souls, setSouls] = useState(125890)
   const [showDeath, setShowDeath] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   const aboutData = ABOUT_DATA[active]
   const skills = getSkillsByProfession(active)
-  const otherSkills = getSkillsByProfession(active)
   const engineerTech = getEngineerSkills()
   const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
   const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
+  useEffect(() => {
+    if (prefersReducedMotion) return
     // Increment souls slowly for effect
     const interval = setInterval(() => {
       setSouls(s => s + Math.floor(Math.random() * 10))
     }, 3000)
     return () => clearInterval(interval)
-  }, [])
+  }, [prefersReducedMotion])
 
   const handleZoneClick = (prof: 'engineer' | 'drummer' | 'fighter') => {
     setActive(prof)
@@ -946,10 +1368,22 @@ export default function SoulMapTheme() {
     <div
       className="min-h-screen relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, #0a0808, #050505)',
+        background: `linear-gradient(180deg, #0a0808, #050505)`,
         fontFamily: '"Cinzel", "Times New Roman", serif',
       }}
     >
+      {/* Skip to content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2"
+        style={{ background: COLORS.bonfire, color: '#000' }}
+      >
+        Skip to main content
+      </a>
+
+      {/* Stone texture overlay */}
+      <StoneTexture />
+
       {/* Map effects */}
       <MapFog />
 
@@ -967,8 +1401,13 @@ export default function SoulMapTheme() {
       <Bloodstain className="fixed top-[60%] right-[15%] z-[1] rotate-45" />
       <Bloodstain className="fixed bottom-40 left-[30%] z-[1] -rotate-12" />
 
+      {/* Hollow knight silhouettes */}
+      <HollowKnight variant="standing" className="fixed top-[20%] left-[5%] z-[1]" />
+      <HollowKnight variant="kneeling" className="fixed bottom-[30%] right-[8%] z-[1]" />
+      <HollowKnight variant="combat" className="fixed top-[45%] right-[3%] z-[1]" />
+
       {/* Header with Darksign */}
-      <header className="relative z-30 p-6">
+      <header className="relative z-30 p-6" role="banner">
         <div className="max-w-6xl mx-auto flex justify-between items-start">
           <div className="flex items-center gap-4">
             <Darksign size={50} />
@@ -977,7 +1416,7 @@ export default function SoulMapTheme() {
                 className="text-3xl tracking-[0.4em]"
                 style={{
                   color: '#c0a060',
-                  textShadow: '0 0 30px #ff880030',
+                  textShadow: `0 0 30px ${COLORS.bonfire}30`,
                 }}
               >
                 ALEXANDER PULIDO
@@ -985,7 +1424,7 @@ export default function SoulMapTheme() {
               <p className="text-sm mt-1 tracking-wider" style={{ color: '#888060' }}>
                 {PROFESSIONAL_SUMMARY.headline}
               </p>
-              <p className="text-xs mt-1 italic tracking-wide" style={{ color: '#ff8800' }}>
+              <p className="text-xs mt-1 italic tracking-wide" style={{ color: COLORS.bonfire }}>
                 {PROFESSIONAL_SUMMARY.tagline}
               </p>
             </div>
@@ -997,10 +1436,11 @@ export default function SoulMapTheme() {
               href="/cv"
               className="px-4 py-2 text-xs tracking-[0.2em] transition-all hover:bg-[#1a1815]"
               style={{
-                background: '#0d0a0f',
-                border: '1px solid #ff880040',
-                color: '#ff8800',
+                background: COLORS.stone,
+                border: `1px solid ${COLORS.bonfire}40`,
+                color: COLORS.bonfire,
               }}
+              aria-label="View CV - Rest at bonfire"
             >
               REST
             </Link>
@@ -1008,9 +1448,10 @@ export default function SoulMapTheme() {
               href="/personal-projects/game-engine"
               className="px-4 py-2 text-xs tracking-[0.2em] transition-all"
               style={{
-                background: 'linear-gradient(180deg, #ff8800, #cc6600)',
+                background: `linear-gradient(180deg, ${COLORS.bonfire}, #cc6600)`,
                 color: '#0a0808',
               }}
+              aria-label="Explore game engine project"
             >
               EXPLORE
             </Link>
@@ -1020,7 +1461,7 @@ export default function SoulMapTheme() {
       </header>
 
       {/* Current Roles / Covenants */}
-      <section className="relative z-20 py-6 px-6">
+      <section className="relative z-20 py-6 px-6" aria-label="Current positions">
         <div className="max-w-6xl mx-auto">
           <RolesDisplay />
         </div>
@@ -1030,7 +1471,7 @@ export default function SoulMapTheme() {
       <FogGate />
 
       {/* Map navigation with bonfire */}
-      <section className="relative z-20 py-8">
+      <section className="relative z-20 py-8" aria-label="Profession selection">
         <div className="flex justify-center items-center gap-8">
           <ZoneNode
             profession="drummer"
@@ -1049,7 +1490,7 @@ export default function SoulMapTheme() {
             connections={[{ direction: 'right' }]}
           />
           <div className="w-24 flex justify-center">
-            <Bonfire size="normal" />
+            <Bonfire size="normal" label="Central bonfire - hub area" />
           </div>
           <ZoneNode
             profession="engineer"
@@ -1059,51 +1500,58 @@ export default function SoulMapTheme() {
             connections={[{ direction: 'left' }, { direction: 'up' }]}
           />
         </div>
+
+        {/* Praise the Sun decoration */}
+        <div className="flex justify-center mt-8">
+          <PraiseTheSun size={60} />
+        </div>
       </section>
 
       {/* Fog Gate divider */}
       <FogGate />
 
       {/* Zone info */}
-      <main className="relative z-20 px-6 py-8">
+      <main id="main-content" className="relative z-20 px-6 py-8" role="main">
         <div className="max-w-4xl mx-auto">
           {/* Bio panel - item description style */}
-          <DodgeRollSection>
+          <DodgeRollSection ariaLabel="About section">
           <section
             className="p-6 mb-8 relative"
             style={{
-              background: 'linear-gradient(180deg, #12100fee, #0a0908ee)',
-              border: '1px solid #2a2520',
+              background: `linear-gradient(180deg, #12100fee, #0a0908ee)`,
+              border: `1px solid ${COLORS.ash}`,
               boxShadow: 'inset 0 0 30px rgba(0,0,0,0.5)',
             }}
+            aria-labelledby="about-heading"
           >
             {/* Corner ornaments */}
             {['top-0 left-0', 'top-0 right-0 scale-x-[-1]', 'bottom-0 left-0 scale-y-[-1]', 'bottom-0 right-0 scale-[-1]'].map((pos, i) => (
-              <div key={i} className={`absolute ${pos} w-6 h-6`}>
+              <div key={i} className={`absolute ${pos} w-6 h-6`} aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M0 0 L24 0 L24 4 L4 4 L4 24 L0 24 Z" fill="#2a2520" />
+                  <path d="M0 0 L24 0 L24 4 L4 4 L4 24 L0 24 Z" fill={COLORS.ash} />
                 </svg>
               </div>
             ))}
 
             <div className="flex items-center gap-2 mb-4">
               <SwordMarker />
-              <h2 className="text-sm tracking-[0.3em]" style={{ color: '#ff8800' }}>
+              <h2 id="about-heading" className="text-sm tracking-[0.3em]" style={{ color: COLORS.bonfire }}>
                 ABOUT
               </h2>
             </div>
             <p className="text-sm leading-relaxed" style={{ color: '#a09080' }}>
               {aboutData.bio}
             </p>
-            <div className="flex gap-2 mt-4 flex-wrap">
+            <div className="flex gap-2 mt-4 flex-wrap" role="list" aria-label="Quick facts">
               {aboutData.quickFacts.map((fact, i) => (
                 <span
                   key={i}
+                  role="listitem"
                   className="text-[10px] px-3 py-1 tracking-wide"
                   style={{
                     background: '#1a1815',
                     color: '#887860',
-                    border: '1px solid #2a2520',
+                    border: `1px solid ${COLORS.ash}`,
                   }}
                 >
                   {fact}
@@ -1115,31 +1563,32 @@ export default function SoulMapTheme() {
 
           {/* Work Experience Section */}
           {experience.length > 0 && (
-            <DodgeRollSection>
+            <DodgeRollSection ariaLabel="Work experience section">
               <section
                 className="p-6 mb-8 relative"
                 style={{
-                  background: 'linear-gradient(180deg, #12100fee, #0a0908ee)',
-                  border: '1px solid #2a2520',
+                  background: `linear-gradient(180deg, #12100fee, #0a0908ee)`,
+                  border: `1px solid ${COLORS.ash}`,
                   boxShadow: 'inset 0 0 30px rgba(0,0,0,0.5)',
                 }}
+                aria-labelledby="experience-heading"
               >
                 {/* Corner ornaments */}
                 {['top-0 left-0', 'top-0 right-0 scale-x-[-1]', 'bottom-0 left-0 scale-y-[-1]', 'bottom-0 right-0 scale-[-1]'].map((pos, i) => (
-                  <div key={i} className={`absolute ${pos} w-6 h-6`}>
+                  <div key={i} className={`absolute ${pos} w-6 h-6`} aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none">
-                      <path d="M0 0 L24 0 L24 4 L4 4 L4 24 L0 24 Z" fill="#2a2520" />
+                      <path d="M0 0 L24 0 L24 4 L4 4 L4 24 L0 24 Z" fill={COLORS.ash} />
                     </svg>
                   </div>
                 ))}
 
                 <div className="flex items-center gap-2 mb-4">
                   <SwordMarker />
-                  <h2 className="text-sm tracking-[0.3em]" style={{ color: '#ff8800' }}>
+                  <h2 id="experience-heading" className="text-sm tracking-[0.3em]" style={{ color: COLORS.bonfire }}>
                     WORK EXPERIENCE
                   </h2>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-3" role="list">
                   {experience.map((entry) => (
                     <ExperienceCard key={entry.id} entry={entry} />
                   ))}
@@ -1153,11 +1602,12 @@ export default function SoulMapTheme() {
             <section
               className="p-6 relative"
               style={{
-                background: 'linear-gradient(180deg, #12100fee, #0a0908ee)',
-                border: '1px solid #2a2520',
+                background: `linear-gradient(180deg, #12100fee, #0a0908ee)`,
+                border: `1px solid ${COLORS.ash}`,
               }}
+              aria-labelledby="skills-heading"
             >
-              <h2 className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: '#ff8800' }}>
+              <h2 id="skills-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: COLORS.bonfire }}>
                 <Darksign size={16} />
                 {active === 'engineer' ? 'TECH STACK' : 'SKILLS'}
               </h2>
@@ -1165,33 +1615,17 @@ export default function SoulMapTheme() {
               {active === 'engineer' ? (
                 <TechCloud categories={engineerTech} />
               ) : (
-                <div>
-                  {skills.map((category) => (
-                    <div key={category.name} className="mb-4 last:mb-0">
-                      <h3 className="text-[10px] tracking-[0.2em] mb-2" style={{ color: '#886640' }}>
-                        {category.name.toUpperCase()}
-                      </h3>
-                      {category.skills.map((skill, i) => (
-                        <AbilityUnlock
-                          key={skill.name}
-                          name={skill.name}
-                          level={skill.proficiency}
-                          unlocked={i < 4 || explored.size > 1}
-                        />
-                      ))}
-                    </div>
-                  ))}
-                </div>
+                <SkillsDisplay categories={skills} />
               )}
             </section>
 
             {/* Save rooms / Projects */}
-            <section>
-              <h2 className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: '#88cc55' }}>
-                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: '0 0 10px #88cc55' }} />
+            <section aria-labelledby="projects-heading">
+              <h2 id="projects-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: '#88cc55' }}>
+                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: '0 0 10px #88cc55' }} aria-hidden="true" />
                 PROJECTS
               </h2>
-              <div className="space-y-2">
+              <div className="space-y-2" role="list">
                 {projects.slice(0, 4).map((project) => (
                   <SaveRoomCard key={project.id} project={project} />
                 ))}
@@ -1201,12 +1635,12 @@ export default function SoulMapTheme() {
 
           {/* Companies (Engineer) */}
           {active === 'engineer' && (
-            <section className="mt-8">
+            <section className="mt-8" aria-labelledby="companies-heading">
               <FogGate />
-              <h2 className="text-sm tracking-[0.3em] mb-4 text-center" style={{ color: '#ff8800' }}>
+              <h2 id="companies-heading" className="text-sm tracking-[0.3em] mb-4 text-center" style={{ color: COLORS.bonfire }}>
                 COMPANIES
               </h2>
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-3 gap-4" role="list">
                 {COMPANIES.map((company) => (
                   <CompanyCard key={company.id} company={company} />
                 ))}
@@ -1216,12 +1650,12 @@ export default function SoulMapTheme() {
 
           {/* Bands (Drummer) */}
           {active === 'drummer' && (
-            <section className="mt-8">
+            <section className="mt-8" aria-labelledby="bands-heading">
               <FogGate />
-              <h2 className="text-sm tracking-[0.3em] mb-4 text-center" style={{ color: '#9966ff' }}>
+              <h2 id="bands-heading" className="text-sm tracking-[0.3em] mb-4 text-center" style={{ color: '#9966ff' }}>
                 BANDS
               </h2>
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-3 gap-4" role="list">
                 {BANDS.map((band) => (
                   <BandCard key={band.id} band={band} />
                 ))}
@@ -1235,85 +1669,108 @@ export default function SoulMapTheme() {
       <MiniMap active={active} />
 
       {/* Footer */}
-      <footer className="relative z-20 py-12 text-center">
+      <footer className="relative z-20 py-12 text-center" role="contentinfo">
         <div className="flex items-center justify-center gap-4">
-          <div className="w-12 h-px" style={{ background: 'linear-gradient(90deg, transparent, #2a2520)' }} />
-          <Bonfire size="small" />
-          <div className="w-12 h-px" style={{ background: 'linear-gradient(90deg, #2a2520, transparent)' }} />
+          <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, transparent, ${COLORS.ash})` }} aria-hidden="true" />
+          <Bonfire size="small" label="Footer bonfire" />
+          <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, ${COLORS.ash}, transparent)` }} aria-hidden="true" />
         </div>
         <p className="text-[10px] tracking-[0.4em] mt-4" style={{ color: '#444030' }}>
           EXPLORATION: {Math.round((explored.size / 3) * 100)}% • MMXXVI
         </p>
       </footer>
 
-      {/* Dark Souls animations */}
+      {/* Dark Souls animations - with prefers-reduced-motion support */}
       <style jsx global>{`
-        @keyframes flame {
-          0%, 100% { transform: scaleY(1) scaleX(1); opacity: 1; }
-          50% { transform: scaleY(1.2) scaleX(0.9); opacity: 0.8; }
+        @media (prefers-reduced-motion: no-preference) {
+          @keyframes flame {
+            0%, 100% { transform: scaleY(1) scaleX(1); opacity: 1; }
+            50% { transform: scaleY(1.3) scaleX(0.85); opacity: 0.85; }
+          }
+          @keyframes ember {
+            0% { transform: translateY(0) translateX(0); opacity: 1; }
+            100% { transform: translateY(-50px) translateX(15px); opacity: 0; }
+          }
+          @keyframes soul-float {
+            0% { transform: translate(-50%, -50%) translateY(0); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) translateY(-35px) rotate(360deg); opacity: 0; }
+          }
+          @keyframes fog-drift {
+            0%, 100% { transform: translateX(-15%); opacity: 0.4; }
+            50% { transform: translateX(15%); opacity: 0.7; }
+          }
+          @keyframes fog-particle {
+            0%, 100% { transform: translateX(0) scale(1); opacity: 0.25; }
+            50% { transform: translateX(25px) scale(1.3); opacity: 0.45; }
+          }
+          @keyframes ash-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+          }
+          @keyframes darksign-pulse {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.08); filter: brightness(1.25); }
+          }
+          @keyframes liquid-glow {
+            0%, 100% { box-shadow: 0 0 12px ${COLORS.bonfire}, inset 0 0 12px ${COLORS.gold}80; }
+            50% { box-shadow: 0 0 25px ${COLORS.ember}, inset 0 0 18px ${COLORS.gold}; }
+          }
+          @keyframes you-died {
+            0% { opacity: 0; transform: scale(1.6); }
+            20% { opacity: 1; transform: scale(1); }
+            80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.85); }
+          }
+          @keyframes emberFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
+            25% { transform: translateY(-10px) rotate(6deg); opacity: 0.5; }
+            50% { transform: translateY(-4px) rotate(-4deg); opacity: 0.35; }
+            75% { transform: translateY(-12px) rotate(4deg); opacity: 0.45; }
+          }
+          @keyframes dodgeRoll {
+            0% { left: -60px; transform: rotate(0deg); }
+            50% { transform: rotate(360deg); }
+            100% { left: 110%; transform: rotate(720deg); }
+          }
+          @keyframes iframeFlash {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.5; }
+          }
+          @keyframes sun-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+          }
+          .animate-flame { animation: flame 0.25s ease-in-out infinite; }
+          .animate-ember-float { animation: emberFloat 12s ease-in-out infinite; }
+          .animate-ember { animation: ember 2.5s ease-out infinite; }
+          .animate-soul-float { animation: soul-float 2.5s ease-out infinite; }
+          .animate-fog-drift { animation: fog-drift 12s ease-in-out infinite; }
+          .animate-fog-particle { animation: fog-particle 10s ease-in-out infinite; }
+          .animate-ash-fall { animation: ash-fall 18s linear infinite; }
+          .animate-darksign-pulse { animation: darksign-pulse 3.5s ease-in-out infinite; }
+          .animate-liquid-glow { animation: liquid-glow 2.5s ease-in-out infinite; }
+          .animate-you-died { animation: you-died 4.5s ease-in-out forwards; }
+          .animate-sun-pulse { animation: sun-pulse 4s ease-in-out infinite; }
         }
-        @keyframes ember {
-          0% { transform: translateY(0) translateX(0); opacity: 1; }
-          100% { transform: translateY(-40px) translateX(10px); opacity: 0; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .animate-flame,
+          .animate-ember-float,
+          .animate-ember,
+          .animate-soul-float,
+          .animate-fog-drift,
+          .animate-fog-particle,
+          .animate-ash-fall,
+          .animate-darksign-pulse,
+          .animate-liquid-glow,
+          .animate-you-died,
+          .animate-sun-pulse {
+            animation: none !important;
+          }
         }
-        @keyframes soul-float {
-          0% { transform: translate(-50%, -50%) translateY(0); opacity: 0; }
-          20% { opacity: 1; }
-          100% { transform: translate(-50%, -50%) translateY(-30px) rotate(360deg); opacity: 0; }
-        }
-        @keyframes fog-drift {
-          0%, 100% { transform: translateX(-10%); opacity: 0.5; }
-          50% { transform: translateX(10%); opacity: 0.8; }
-        }
-        @keyframes fog-particle {
-          0%, 100% { transform: translateX(0) scale(1); opacity: 0.3; }
-          50% { transform: translateX(20px) scale(1.2); opacity: 0.5; }
-        }
-        @keyframes ash-fall {
-          0% { transform: translateY(-100vh) rotate(0deg); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-        @keyframes darksign-pulse {
-          0%, 100% { transform: scale(1); filter: brightness(1); }
-          50% { transform: scale(1.05); filter: brightness(1.2); }
-        }
-        @keyframes liquid-glow {
-          0%, 100% { box-shadow: 0 0 10px #ff6600, inset 0 0 10px #ffcc0060; }
-          50% { box-shadow: 0 0 20px #ff8800, inset 0 0 15px #ffcc0080; }
-        }
-        @keyframes you-died {
-          0% { opacity: 0; transform: scale(1.5); }
-          20% { opacity: 1; transform: scale(1); }
-          80% { opacity: 1; transform: scale(1); }
-          100% { opacity: 0; transform: scale(0.9); }
-        }
-        @keyframes emberFloat {
-          0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.4; }
-          25% { transform: translateY(-8px) rotate(5deg); opacity: 0.5; }
-          50% { transform: translateY(-3px) rotate(-3deg); opacity: 0.35; }
-          75% { transform: translateY(-10px) rotate(3deg); opacity: 0.45; }
-        }
-        @keyframes dodgeRoll {
-          0% { left: -60px; transform: rotate(0deg); }
-          50% { transform: rotate(360deg); }
-          100% { left: 110%; transform: rotate(720deg); }
-        }
-        @keyframes iframeFlash {
-          0%, 100% { opacity: 0; }
-          50% { opacity: 0.6; }
-        }
-        .animate-flame { animation: flame 0.3s ease-in-out infinite; }
-        .animate-ember-float { animation: emberFloat 12s ease-in-out infinite; }
-        .animate-ember { animation: ember 2s ease-out infinite; }
-        .animate-soul-float { animation: soul-float 2s ease-out infinite; }
-        .animate-fog-drift { animation: fog-drift 10s ease-in-out infinite; }
-        .animate-fog-particle { animation: fog-particle 8s ease-in-out infinite; }
-        .animate-ash-fall { animation: ash-fall 15s linear infinite; }
-        .animate-darksign-pulse { animation: darksign-pulse 3s ease-in-out infinite; }
-        .animate-liquid-glow { animation: liquid-glow 2s ease-in-out infinite; }
-        .animate-you-died { animation: you-died 4s ease-in-out forwards; }
       `}</style>
     </div>
   )
