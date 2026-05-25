@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
@@ -14,433 +14,694 @@ import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 
 // ============================================================================
-// WORLD OF WARCRAFT COLOR PALETTE
-// Based on WoW's painted/stylized 3D aesthetic
+// WARCRAFT RTS COLOR PALETTE (Warcraft 1, 2, 3 - NOT World of Warcraft!)
+// Based on classic RTS UI: gold borders, stone panels, beveled edges
 // ============================================================================
 
-const WOW = {
-  // Alliance colors
-  allianceGold: '#c9a227',
-  allianceBlue: '#1a3a6e',
-  allianceLightBlue: '#4488cc',
-  stormwindStone: '#3d3d4a',
+const WC3 = {
+  // Human Alliance (WC2/WC3)
+  humanBlue: '#0042FF',
+  humanGold: '#FFD700',
+  humanSilver: '#C0C0C0',
+  humanBrown: '#5C4033',
 
-  // Horde colors (for accents)
-  hordeRed: '#8c1616',
-  hordeBlack: '#1a1010',
-  orgrimmarBrown: '#5a3d2a',
+  // Orc Horde (WC2/WC3)
+  orcRed: '#FF0000',
+  orcBrown: '#8B4513',
+  orcBlack: '#1A0A0A',
+  orcOrange: '#FF6600',
 
-  // Item rarity colors (iconic!)
-  poorGray: '#9d9d9d',
-  commonWhite: '#ffffff',
-  uncommonGreen: '#1eff00',
-  rareBlue: '#0070dd',
-  epicPurple: '#a335ee',
-  legendaryOrange: '#ff8000',
-  artifactGold: '#e6cc80',
+  // Night Elf (WC3)
+  elfPurple: '#800080',
+  elfSilver: '#C0C0C0',
+  elfMoonlight: '#B8A9D4',
+  elfGreen: '#00FF7F',
 
-  // UI colors
-  questYellow: '#ffff00',
-  manaBlue: '#4169e1',
-  healthGreen: '#00ff00',
-  rageRed: '#ff0000',
-  energyYellow: '#ffff00',
-  runicBlue: '#00d1ff',
+  // Undead (WC3)
+  undeadGreen: '#00FF00',
+  undeadBlack: '#0A0A0A',
+  undeadPurple: '#4B0082',
+  undeadBone: '#D4C4A8',
 
-  // Character class colors
-  warrior: '#c79c6e',
-  paladin: '#f58cba',
-  hunter: '#abd473',
-  rogue: '#fff569',
-  priest: '#ffffff',
-  shaman: '#0070de',
-  mage: '#69ccf0',
-  warlock: '#9482c9',
-  druid: '#ff7d0a',
-  deathKnight: '#c41f3b',
+  // RTS UI Colors
+  panelGold: '#C9A227',
+  panelBronze: '#CD7F32',
+  panelDark: '#1A1612',
+  panelStone: '#3D3428',
+  panelBorder: '#6B5A3C',
 
-  // Texture colors
-  parchment: '#d4c4a8',
-  parchmentDark: '#a89878',
-  leather: '#6b4423',
-  leatherLight: '#8b5a2b',
-  metal: '#8b8b8b',
-  goldTrim: '#ffd700',
-  bronzeTrim: '#cd7f32',
+  // Resource colors
+  goldYellow: '#FFD700',
+  lumberGreen: '#228B22',
+  foodOrange: '#FF8C00',
+  supplyBlue: '#4169E1',
 
-  // Backgrounds
-  darkBg: '#0a0808',
-  panelBg: '#1a1612',
-  panelBorder: '#3d3428',
+  // Health/Mana bars (classic RTS style)
+  healthGreen: '#00FF00',
+  healthYellow: '#FFFF00',
+  healthRed: '#FF0000',
+  manaBlue: '#0000FF',
+
+  // Text colors
+  textGold: '#FFD700',
+  textWhite: '#FFFFFF',
+  textGray: '#AAAAAA',
+  textGreen: '#00FF00',
+  textRed: '#FF0000',
+
+  // Terrain textures
+  grassGreen: '#2D5016',
+  dirtBrown: '#4A3728',
+  stoneGray: '#4A4A4A',
+  waterBlue: '#1E3A5F',
+
+  // Fog of war
+  fogBlack: '#000000',
+  fogGray: '#1A1A1A',
 }
 
 // ============================================================================
-// ALLIANCE LION CREST SVG
+// WC3 STYLE GOLD RESOURCE ICON (inline SVG)
 // ============================================================================
 
-function AllianceCrest({ size = 80 }: { size?: number }) {
+function GoldIcon({ size = 16 }: { size?: number }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 100 100"
-      aria-label="Alliance Crest"
+      viewBox="0 0 16 16"
+      aria-label="Gold"
+      role="img"
+    >
+      {/* Gold coin stack */}
+      <ellipse cx="8" cy="12" rx="6" ry="2" fill={WC3.panelBronze} />
+      <ellipse cx="8" cy="11" rx="6" ry="2" fill={WC3.goldYellow} />
+      <ellipse cx="8" cy="9" rx="5" ry="1.5" fill={WC3.panelBronze} />
+      <ellipse cx="8" cy="8" rx="5" ry="1.5" fill={WC3.goldYellow} />
+      <ellipse cx="8" cy="6" rx="4" ry="1" fill={WC3.panelBronze} />
+      <ellipse cx="8" cy="5" rx="4" ry="1" fill={WC3.goldYellow} />
+    </svg>
+  )
+}
+
+// ============================================================================
+// WC3 STYLE LUMBER RESOURCE ICON
+// ============================================================================
+
+function LumberIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      aria-label="Lumber"
+      role="img"
+    >
+      {/* Log stack */}
+      <rect x="2" y="10" width="12" height="4" rx="2" fill="#5C4033" />
+      <rect x="3" y="10" width="10" height="1" fill="#8B6914" />
+      <rect x="3" y="6" width="10" height="4" rx="2" fill="#6B4423" />
+      <rect x="4" y="6" width="8" height="1" fill="#A0724A" />
+      <rect x="5" y="3" width="6" height="3" rx="1.5" fill="#7B5433" />
+      <rect x="6" y="3" width="4" height="1" fill="#B08050" />
+    </svg>
+  )
+}
+
+// ============================================================================
+// WC3 STYLE FOOD/SUPPLY ICON
+// ============================================================================
+
+function FoodIcon({ size = 16 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      aria-label="Food Supply"
+      role="img"
+    >
+      {/* Wheat/grain bundle */}
+      <ellipse cx="8" cy="13" rx="5" ry="2" fill={WC3.dirtBrown} />
+      <path d="M8,2 L8,13" stroke="#D4A017" strokeWidth="1" />
+      <path d="M5,3 L5,12" stroke="#D4A017" strokeWidth="1" />
+      <path d="M11,3 L11,12" stroke="#D4A017" strokeWidth="1" />
+      <ellipse cx="8" cy="2" rx="1.5" ry="2" fill={WC3.goldYellow} />
+      <ellipse cx="5" cy="3" rx="1" ry="1.5" fill={WC3.goldYellow} />
+      <ellipse cx="11" cy="3" rx="1" ry="1.5" fill={WC3.goldYellow} />
+    </svg>
+  )
+}
+
+// ============================================================================
+// WARCRAFT 3 FACTION ICON (Human Lion / Orc Crest / Night Elf / Undead)
+// ============================================================================
+
+function HumanCrest({ size = 48 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      aria-label="Human Alliance Crest"
       role="img"
     >
       {/* Shield background */}
       <path
-        d="M50,5 L90,25 L90,60 Q90,85 50,95 Q10,85 10,60 L10,25 Z"
-        fill={WOW.allianceBlue}
-        stroke={WOW.allianceGold}
-        strokeWidth="3"
+        d="M24,2 L44,12 L44,28 Q44,42 24,46 Q4,42 4,28 L4,12 Z"
+        fill={WC3.humanBlue}
+        stroke={WC3.humanGold}
+        strokeWidth="2"
       />
-      {/* Inner shield */}
+      {/* Inner shield detail */}
       <path
-        d="M50,12 L82,28 L82,58 Q82,78 50,88 Q18,78 18,58 L18,28 Z"
-        fill={`${WOW.allianceLightBlue}40`}
-        stroke={WOW.allianceGold}
+        d="M24,6 L40,14 L40,27 Q40,38 24,42 Q8,38 8,27 L8,14 Z"
+        fill="none"
+        stroke={WC3.humanGold}
         strokeWidth="1"
+        opacity="0.5"
       />
-      {/* Lion silhouette - simplified heraldic style */}
-      <g fill={WOW.allianceGold}>
-        {/* Lion body */}
-        <ellipse cx="50" cy="55" rx="18" ry="15" />
-        {/* Lion head */}
-        <circle cx="50" cy="38" r="12" />
-        {/* Mane */}
-        <path d="M38,30 Q32,35 35,45 Q38,42 40,40" />
-        <path d="M62,30 Q68,35 65,45 Q62,42 60,40" />
-        <path d="M42,28 Q38,25 40,35 Q43,33 44,32" />
-        <path d="M58,28 Q62,25 60,35 Q57,33 56,32" />
+      {/* Simplified lion silhouette */}
+      <g fill={WC3.humanGold}>
+        {/* Body */}
+        <ellipse cx="24" cy="28" rx="10" ry="8" />
+        {/* Head */}
+        <circle cx="24" cy="18" r="6" />
+        {/* Mane spikes */}
+        <path d="M18,14 L16,10 L20,13 Z" />
+        <path d="M30,14 L32,10 L28,13 Z" />
+        <path d="M24,12 L24,8 L26,11 Z" />
+        <path d="M24,12 L24,8 L22,11 Z" />
         {/* Crown */}
-        <path d="M40,25 L42,20 L46,24 L50,18 L54,24 L58,20 L60,25 L50,28 Z" />
-        {/* Eyes - void */}
-        <circle cx="45" cy="36" r="2" fill={WOW.allianceBlue} />
-        <circle cx="55" cy="36" r="2" fill={WOW.allianceBlue} />
-        {/* Front legs */}
-        <rect x="38" y="62" width="6" height="14" rx="2" />
-        <rect x="56" y="62" width="6" height="14" rx="2" />
-        {/* Tail */}
-        <path d="M68,52 Q78,48 75,58 Q72,55 70,54" />
+        <path d="M20,12 L21,8 L24,10 L27,8 L28,12 Z" />
+      </g>
+    </svg>
+  )
+}
+
+function OrcCrest({ size = 48 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      aria-label="Orc Horde Crest"
+      role="img"
+    >
+      {/* Angular horde shield */}
+      <path
+        d="M24,2 L42,14 L42,32 L24,46 L6,32 L6,14 Z"
+        fill={WC3.orcBlack}
+        stroke={WC3.orcRed}
+        strokeWidth="2"
+      />
+      {/* Inner detail */}
+      <path
+        d="M24,8 L36,16 L36,30 L24,40 L12,30 L12,16 Z"
+        fill="none"
+        stroke={WC3.orcRed}
+        strokeWidth="1"
+        opacity="0.5"
+      />
+      {/* Stylized orc skull/emblem */}
+      <g fill={WC3.orcRed}>
+        {/* Central diamond */}
+        <path d="M24,14 L32,24 L24,34 L16,24 Z" />
+        {/* Tusks */}
+        <path d="M18,20 L14,26 L18,24 Z" />
+        <path d="M30,20 L34,26 L30,24 Z" />
+        {/* Eye holes */}
+        <circle cx="20" cy="22" r="2" fill={WC3.orcBlack} />
+        <circle cx="28" cy="22" r="2" fill={WC3.orcBlack} />
+      </g>
+    </svg>
+  )
+}
+
+function NightElfCrest({ size = 48 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      aria-label="Night Elf Crest"
+      role="img"
+    >
+      {/* Curved elven shield */}
+      <path
+        d="M24,2 Q44,10 44,26 Q44,42 24,46 Q4,42 4,26 Q4,10 24,2 Z"
+        fill={WC3.elfPurple}
+        stroke={WC3.elfSilver}
+        strokeWidth="2"
+      />
+      {/* Moon crescent */}
+      <g fill={WC3.elfSilver}>
+        <circle cx="24" cy="20" r="10" />
+        <circle cx="28" cy="18" r="8" fill={WC3.elfPurple} />
+      </g>
+      {/* Owl eyes below moon */}
+      <g fill={WC3.elfGreen}>
+        <ellipse cx="18" cy="34" rx="3" ry="4" />
+        <ellipse cx="30" cy="34" rx="3" ry="4" />
+        <circle cx="18" cy="34" r="1" fill={WC3.elfPurple} />
+        <circle cx="30" cy="34" r="1" fill={WC3.elfPurple} />
+      </g>
+    </svg>
+  )
+}
+
+function UndeadCrest({ size = 48 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      aria-label="Undead Scourge Crest"
+      role="img"
+    >
+      {/* Jagged undead shield */}
+      <path
+        d="M24,2 L38,8 L44,24 L38,40 L24,46 L10,40 L4,24 L10,8 Z"
+        fill={WC3.undeadBlack}
+        stroke={WC3.undeadGreen}
+        strokeWidth="2"
+      />
+      {/* Skull */}
+      <g fill={WC3.undeadBone}>
+        <ellipse cx="24" cy="22" rx="10" ry="12" />
+        {/* Eye sockets */}
+        <ellipse cx="20" cy="20" rx="3" ry="4" fill={WC3.undeadGreen} />
+        <ellipse cx="28" cy="20" rx="3" ry="4" fill={WC3.undeadGreen} />
+        {/* Nose */}
+        <path d="M24,24 L22,28 L26,28 Z" fill={WC3.undeadBlack} />
+        {/* Teeth */}
+        <rect x="18" y="30" width="12" height="4" fill={WC3.undeadBone} />
+        <line x1="20" y1="30" x2="20" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
+        <line x1="22" y1="30" x2="22" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
+        <line x1="24" y1="30" x2="24" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
+        <line x1="26" y1="30" x2="26" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
+        <line x1="28" y1="30" x2="28" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
       </g>
     </svg>
   )
 }
 
 // ============================================================================
-// HORDE SYMBOL SVG
+// WC3 STYLE RESOURCE COUNTER (Gold: 1500 | Lumber: 800 | Food: 45/100)
 // ============================================================================
 
-function HordeSymbol({ size = 40 }: { size?: number }) {
+function ResourceCounter({
+  icon,
+  value,
+  label,
+  maxValue,
+}: {
+  icon: React.ReactNode
+  value: number
+  label: string
+  maxValue?: number
+}) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 100 100"
-      aria-label="Horde Symbol"
-      role="img"
+    <div
+      className="flex items-center gap-1 px-2 py-1"
+      style={{
+        background: 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)',
+        border: `1px solid ${WC3.panelBorder}`,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.3)',
+      }}
+      role="status"
+      aria-label={`${label}: ${value}${maxValue ? ` of ${maxValue}` : ''}`}
     >
-      {/* Horde emblem - angular, brutal */}
-      <path
-        d="M50,5 L65,25 L85,30 L75,50 L85,70 L65,75 L50,95 L35,75 L15,70 L25,50 L15,30 L35,25 Z"
-        fill={WOW.hordeRed}
-        stroke={WOW.hordeBlack}
-        strokeWidth="3"
-      />
-      {/* Inner detail */}
-      <path
-        d="M50,20 L60,35 L75,38 L68,50 L75,62 L60,65 L50,80 L40,65 L25,62 L32,50 L25,38 L40,35 Z"
-        fill={`${WOW.hordeRed}80`}
-        stroke={WOW.allianceGold}
-        strokeWidth="1"
-      />
-      {/* Central eye/skull motif */}
-      <circle cx="50" cy="50" r="10" fill={WOW.hordeBlack} stroke={WOW.allianceGold} strokeWidth="1" />
-      <circle cx="46" cy="48" r="2" fill={WOW.hordeRed} />
-      <circle cx="54" cy="48" r="2" fill={WOW.hordeRed} />
-      <path d="M45,54 Q50,58 55,54" stroke={WOW.hordeRed} strokeWidth="2" fill="none" />
-    </svg>
+      {icon}
+      <span
+        className="text-xs font-bold tabular-nums"
+        style={{ color: WC3.textGold, textShadow: '0 1px 0 #000' }}
+      >
+        {maxValue ? `${value}/${maxValue}` : value}
+      </span>
+    </div>
   )
 }
 
 // ============================================================================
-// QUEST MARKER SVG
+// WC3 STYLE HEALTH/MANA BAR (thick, segmented, classic RTS look)
 // ============================================================================
 
-function QuestMarker({
-  type = 'available',
-  size = 24
+function UnitBar({
+  label,
+  current,
+  max,
+  type = 'health',
 }: {
-  type?: 'available' | 'progress' | 'complete'
+  label: string
+  current: number
+  max: number
+  type?: 'health' | 'mana' | 'experience'
+}) {
+  const percent = Math.min(100, (current / max) * 100)
+  const segments = 10
+
+  const colors = {
+    health: percent > 50 ? WC3.healthGreen : percent > 25 ? WC3.healthYellow : WC3.healthRed,
+    mana: WC3.manaBlue,
+    experience: WC3.elfPurple,
+  }
+
+  return (
+    <div
+      className="flex items-center gap-2"
+      role="progressbar"
+      aria-valuenow={current}
+      aria-valuemin={0}
+      aria-valuemax={max}
+      aria-label={label}
+    >
+      <span
+        className="text-[10px] uppercase tracking-wider font-bold w-8 text-right"
+        style={{ color: WC3.textGray }}
+      >
+        {label}
+      </span>
+      <div
+        className="flex-1 h-4 relative flex gap-px overflow-hidden"
+        style={{
+          background: '#0A0A0A',
+          border: `2px solid ${WC3.panelBorder}`,
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.8)',
+        }}
+      >
+        {/* Segmented bar fill */}
+        {[...Array(segments)].map((_, i) => {
+          const segmentPercent = ((i + 1) / segments) * 100
+          const isFilled = percent >= segmentPercent - (100 / segments / 2)
+          return (
+            <div
+              key={i}
+              className="flex-1"
+              style={{
+                background: isFilled ? colors[type] : 'transparent',
+                boxShadow: isFilled ? `inset 0 1px 0 rgba(255,255,255,0.3)` : 'none',
+              }}
+            />
+          )
+        })}
+        {/* Text overlay */}
+        <span
+          className="absolute inset-0 flex items-center justify-center text-[10px] font-bold"
+          style={{ color: WC3.textWhite, textShadow: '0 1px 2px #000, 0 0 4px #000' }}
+        >
+          {current} / {max}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// WC3 STYLE UNIT PORTRAIT FRAME (square, beveled gold border)
+// ============================================================================
+
+function UnitPortrait({
+  children,
+  selected = false,
+  size = 64,
+}: {
+  children: React.ReactNode
+  selected?: boolean
   size?: number
 }) {
-  const colors = {
-    available: WOW.questYellow, // Yellow ! for available
-    progress: WOW.commonWhite, // White ? for in progress
-    complete: WOW.questYellow, // Yellow ? for complete
-  }
-  const symbol = type === 'available' ? '!' : '?'
-
   return (
-    <svg
-      width={size}
-      height={size * 1.5}
-      viewBox="0 0 24 36"
-      aria-label={`Quest ${type}`}
-      role="img"
+    <div
+      className="relative"
+      style={{
+        width: size,
+        height: size,
+      }}
     >
-      {/* Glowing background */}
-      <defs>
-        <filter id={`questGlow-${type}`}>
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      <ellipse
-        cx="12"
-        cy="32"
-        rx="8"
-        ry="3"
-        fill={`${colors[type]}40`}
-        filter={`url(#questGlow-${type})`}
-      />
-      <text
-        x="12"
-        y="24"
-        textAnchor="middle"
-        fontSize="28"
-        fontWeight="bold"
-        fill={colors[type]}
-        stroke={WOW.hordeBlack}
-        strokeWidth="1"
-        filter={`url(#questGlow-${type})`}
-        style={{ fontFamily: 'serif' }}
+      {/* Outer beveled frame */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.panelBronze} 50%, ${WC3.humanGold} 100%)`,
+          padding: 3,
+        }}
       >
-        {symbol}
-      </text>
-    </svg>
+        {/* Inner dark frame */}
+        <div
+          className="w-full h-full"
+          style={{
+            background: '#0A0A0A',
+            border: selected ? `2px solid ${WC3.healthGreen}` : '2px solid #1A1A1A',
+            boxShadow: selected ? `0 0 8px ${WC3.healthGreen}` : 'inset 0 2px 4px rgba(0,0,0,0.8)',
+          }}
+        >
+          {/* Content */}
+          <div className="w-full h-full flex items-center justify-center">
+            {children}
+          </div>
+        </div>
+      </div>
+      {/* Corner bevels (classic WC3 look) */}
+      <div
+        className="absolute top-0 left-0 w-2 h-2"
+        style={{
+          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, transparent 100%)`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute top-0 right-0 w-2 h-2"
+        style={{
+          background: `linear-gradient(-135deg, ${WC3.humanGold} 0%, transparent 100%)`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-0 left-0 w-2 h-2"
+        style={{
+          background: `linear-gradient(45deg, ${WC3.humanGold} 0%, transparent 100%)`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute bottom-0 right-0 w-2 h-2"
+        style={{
+          background: `linear-gradient(-45deg, ${WC3.humanGold} 0%, transparent 100%)`,
+        }}
+        aria-hidden="true"
+      />
+    </div>
   )
 }
 
 // ============================================================================
-// ABILITY ICON FRAME (like talent/spell icons)
+// WC3 STYLE ABILITY ICON (square, beveled, with cooldown overlay option)
 // ============================================================================
 
 function AbilityIcon({
   children,
-  rarity = 'common',
-  active = false,
-  size = 48
+  hotkey,
+  learned = true,
+  size = 40,
 }: {
   children: React.ReactNode
-  rarity?: 'poor' | 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
-  active?: boolean
+  hotkey?: string
+  learned?: boolean
   size?: number
 }) {
-  const borderColors = {
-    poor: WOW.poorGray,
-    common: WOW.commonWhite,
-    uncommon: WOW.uncommonGreen,
-    rare: WOW.rareBlue,
-    epic: WOW.epicPurple,
-    legendary: WOW.legendaryOrange,
-  }
-
   return (
     <div
-      className="relative flex items-center justify-center transition-transform hover:scale-110"
-      style={{
-        width: size,
-        height: size,
-        background: `linear-gradient(135deg, ${WOW.panelBg}, ${WOW.darkBg})`,
-        border: `2px solid ${borderColors[rarity]}`,
-        boxShadow: active
-          ? `0 0 10px ${borderColors[rarity]}, inset 0 0 8px ${borderColors[rarity]}40`
-          : `inset 0 2px 4px rgba(0,0,0,0.5)`,
-      }}
-      role="img"
+      className="relative group"
+      style={{ width: size, height: size }}
     >
-      {/* Corner accents */}
+      {/* Beveled border */}
       <div
-        className="absolute top-0 left-0 w-2 h-2"
-        style={{ borderTop: `2px solid ${WOW.allianceGold}`, borderLeft: `2px solid ${WOW.allianceGold}` }}
-      />
-      <div
-        className="absolute top-0 right-0 w-2 h-2"
-        style={{ borderTop: `2px solid ${WOW.allianceGold}`, borderRight: `2px solid ${WOW.allianceGold}` }}
-      />
-      <div
-        className="absolute bottom-0 left-0 w-2 h-2"
-        style={{ borderBottom: `2px solid ${WOW.allianceGold}`, borderLeft: `2px solid ${WOW.allianceGold}` }}
-      />
-      <div
-        className="absolute bottom-0 right-0 w-2 h-2"
-        style={{ borderBottom: `2px solid ${WOW.allianceGold}`, borderRight: `2px solid ${WOW.allianceGold}` }}
-      />
-      {children}
-    </div>
-  )
-}
-
-// ============================================================================
-// GOLD COIN SVG
-// ============================================================================
-
-function GoldCoin({ size = 20 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 20 20"
-      aria-label="Gold coin"
-      role="img"
-    >
-      <defs>
-        <linearGradient id="coinGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={WOW.goldTrim} />
-          <stop offset="50%" stopColor={WOW.allianceGold} />
-          <stop offset="100%" stopColor={WOW.bronzeTrim} />
-        </linearGradient>
-      </defs>
-      <circle cx="10" cy="10" r="9" fill="url(#coinGradient)" stroke={WOW.bronzeTrim} strokeWidth="1" />
-      <circle cx="10" cy="10" r="6" fill="none" stroke={WOW.bronzeTrim} strokeWidth="0.5" />
-      <text x="10" y="14" textAnchor="middle" fontSize="10" fill={WOW.bronzeTrim} fontWeight="bold">G</text>
-    </svg>
-  )
-}
-
-// ============================================================================
-// DUNGEON PORTAL EFFECT
-// ============================================================================
-
-function PortalEffect() {
-  return (
-    <div
-      className="absolute inset-0 pointer-events-none overflow-hidden opacity-30"
-      aria-hidden="true"
-    >
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] rounded-full"
+        className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse, ${WOW.manaBlue}20 0%, transparent 40%)`,
-          animation: 'portalPulse 4s ease-in-out infinite',
+          background: learned
+            ? `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`
+            : `linear-gradient(135deg, #4A4A4A 0%, #2A2A2A 100%)`,
+          padding: 2,
         }}
-      />
-      <style jsx>{`
-        @keyframes portalPulse {
-          0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
-          50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.5; }
-        }
-      `}</style>
+      >
+        {/* Inner content */}
+        <div
+          className={`w-full h-full flex items-center justify-center transition-all ${
+            learned ? 'group-hover:brightness-125' : ''
+          }`}
+          style={{
+            background: learned
+              ? 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)'
+              : '#1A1A1A',
+            opacity: learned ? 1 : 0.5,
+          }}
+        >
+          {children}
+        </div>
+      </div>
+      {/* Hotkey indicator */}
+      {hotkey && (
+        <div
+          className="absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-[8px] font-bold"
+          style={{
+            background: WC3.panelDark,
+            border: `1px solid ${WC3.panelBorder}`,
+            color: WC3.textGold,
+          }}
+          aria-label={`Hotkey: ${hotkey}`}
+        >
+          {hotkey}
+        </div>
+      )}
     </div>
   )
 }
 
 // ============================================================================
-// PARCHMENT CARD (Quest Log style)
+// WC3 STYLE COMMAND PANEL (like the bottom-right ability grid)
 // ============================================================================
 
-function ParchmentCard({
-  children,
+function CommandPanel({
   title,
-  questType = 'normal',
-  className = ''
+  children,
+  className = '',
 }: {
-  children: React.ReactNode
   title: string
-  questType?: 'normal' | 'elite' | 'legendary'
+  children: React.ReactNode
   className?: string
 }) {
-  const borderColor = {
-    normal: WOW.panelBorder,
-    elite: WOW.epicPurple,
-    legendary: WOW.legendaryOrange,
+  return (
+    <section
+      className={`relative ${className}`}
+      style={{
+        background: 'linear-gradient(180deg, #1A1612 0%, #0F0C0A 100%)',
+        border: `3px solid ${WC3.panelBorder}`,
+        boxShadow: `
+          inset 0 1px 0 rgba(255,215,0,0.2),
+          inset 0 -1px 0 rgba(0,0,0,0.5),
+          0 4px 12px rgba(0,0,0,0.5)
+        `,
+      }}
+      aria-labelledby={`panel-${title.toLowerCase().replace(/\s/g, '-')}`}
+    >
+      {/* Gold corner accents */}
+      {[
+        'top-0 left-0 border-t-2 border-l-2',
+        'top-0 right-0 border-t-2 border-r-2',
+        'bottom-0 left-0 border-b-2 border-l-2',
+        'bottom-0 right-0 border-b-2 border-r-2',
+      ].map((pos, i) => (
+        <div
+          key={i}
+          className={`absolute w-4 h-4 ${pos}`}
+          style={{ borderColor: WC3.humanGold }}
+          aria-hidden="true"
+        />
+      ))}
+
+      {/* Title bar */}
+      <div
+        className="px-4 py-2"
+        style={{
+          background: 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)',
+          borderBottom: `2px solid ${WC3.panelBorder}`,
+        }}
+      >
+        <h2
+          id={`panel-${title.toLowerCase().replace(/\s/g, '-')}`}
+          className="text-sm tracking-wider uppercase font-bold text-center"
+          style={{
+            color: WC3.textGold,
+            textShadow: '0 1px 2px #000',
+            fontFamily: 'Georgia, "Times New Roman", serif',
+          }}
+        >
+          {title}
+        </h2>
+      </div>
+
+      {/* Content */}
+      <div className="p-4">
+        {children}
+      </div>
+    </section>
+  )
+}
+
+// ============================================================================
+// WC3 STYLE INFO PANEL (like unit/building info display)
+// ============================================================================
+
+function InfoPanel({
+  title,
+  children,
+  faction = 'human',
+  className = '',
+}: {
+  title: string
+  children: React.ReactNode
+  faction?: 'human' | 'orc' | 'nightelf' | 'undead'
+  className?: string
+}) {
+  const factionColors = {
+    human: { primary: WC3.humanBlue, accent: WC3.humanGold },
+    orc: { primary: WC3.orcRed, accent: WC3.orcOrange },
+    nightelf: { primary: WC3.elfPurple, accent: WC3.elfSilver },
+    undead: { primary: WC3.undeadPurple, accent: WC3.undeadGreen },
   }
+
+  const colors = factionColors[faction]
 
   return (
     <section
       className={`relative ${className}`}
       style={{
-        background: `linear-gradient(180deg, ${WOW.panelBg} 0%, #0f0c0a 100%)`,
-        border: `3px solid ${borderColor[questType]}`,
+        background: `linear-gradient(180deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
+        border: `3px solid ${colors.accent}`,
         boxShadow: `
-          inset 0 0 60px rgba(0,0,0,0.6),
-          0 8px 32px rgba(0,0,0,0.5)
+          inset 0 0 30px ${colors.primary}20,
+          0 4px 16px rgba(0,0,0,0.6)
         `,
       }}
-      aria-labelledby={`section-${title.toLowerCase().replace(/\s/g, '-')}`}
+      aria-labelledby={`info-${title.toLowerCase().replace(/\s/g, '-')}`}
     >
-      {/* Metal rivets in corners */}
-      {['top-2 left-2', 'top-2 right-2', 'bottom-2 left-2', 'bottom-2 right-2'].map((pos, i) => (
+      {/* Decorative rivets */}
+      {['top-1 left-1', 'top-1 right-1', 'bottom-1 left-1', 'bottom-1 right-1'].map((pos, i) => (
         <div
           key={i}
-          className={`absolute w-4 h-4 rounded-full ${pos}`}
+          className={`absolute w-3 h-3 rounded-full ${pos}`}
           style={{
-            background: `radial-gradient(circle at 30% 30%, ${WOW.goldTrim}, ${WOW.bronzeTrim})`,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.4)',
+            background: `radial-gradient(circle at 30% 30%, ${colors.accent}, ${WC3.panelBronze})`,
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
           }}
           aria-hidden="true"
         />
       ))}
 
-      {/* Leather hinge on left */}
-      <div
-        className="absolute left-0 top-1/4 w-3 h-20"
-        style={{
-          background: `linear-gradient(90deg, ${WOW.leather}, ${WOW.leatherLight})`,
-          borderRadius: '0 4px 4px 0',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute left-0 top-2/3 w-3 h-20"
-        style={{
-          background: `linear-gradient(90deg, ${WOW.leather}, ${WOW.leatherLight})`,
-          borderRadius: '0 4px 4px 0',
-        }}
-        aria-hidden="true"
-      />
-
       {/* Title banner */}
       <div
-        className="absolute -top-4 left-1/2 -translate-x-1/2 px-8 py-2"
+        className="relative px-4 py-2 mx-4 -mt-3"
         style={{
-          background: `linear-gradient(180deg, #2a2015 0%, #1a1510 100%)`,
-          border: `2px solid ${WOW.allianceGold}`,
-          boxShadow: `0 0 15px ${WOW.allianceGold}30`,
+          background: `linear-gradient(180deg, #2A2318 0%, ${WC3.panelDark} 100%)`,
+          border: `2px solid ${colors.accent}`,
+          boxShadow: `0 0 10px ${colors.primary}40`,
         }}
       >
         <h2
-          id={`section-${title.toLowerCase().replace(/\s/g, '-')}`}
-          className="text-sm tracking-[0.2em] uppercase font-bold whitespace-nowrap"
+          id={`info-${title.toLowerCase().replace(/\s/g, '-')}`}
+          className="text-sm tracking-[0.15em] uppercase font-bold text-center"
           style={{
-            color: WOW.allianceGold,
-            textShadow: `0 0 10px ${WOW.allianceGold}60`,
-            fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
+            color: colors.accent,
+            textShadow: `0 0 8px ${colors.primary}60`,
+            fontFamily: 'Georgia, "Times New Roman", serif',
           }}
         >
-          {questType === 'elite' && <span className="mr-2" aria-label="Elite">[+]</span>}
-          {questType === 'legendary' && <span className="mr-2" aria-label="Legendary">[!!!]</span>}
           {title}
         </h2>
       </div>
 
-      {/* Parchment texture overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-5"
-        style={{
-          backgroundImage: `
-            radial-gradient(ellipse at 20% 30%, ${WOW.parchment} 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 70%, ${WOW.parchment} 0%, transparent 50%)
-          `,
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 pt-8 pb-6 px-8">
+      {/* Content */}
+      <div className="pt-4 pb-4 px-6">
         {children}
       </div>
     </section>
@@ -448,271 +709,185 @@ function ParchmentCard({
 }
 
 // ============================================================================
-// STONE TABLET CARD
+// WC3 STYLE MINIMAP FRAME
 // ============================================================================
 
-function StoneTablet({
+function MinimapFrame({
   children,
   title,
-  className = ''
 }: {
   children: React.ReactNode
   title: string
-  className?: string
 }) {
   return (
-    <section
-      className={`relative ${className}`}
-      style={{
-        background: `linear-gradient(180deg, ${WOW.stormwindStone} 0%, #2a2a35 100%)`,
-        border: `4px solid ${WOW.metal}`,
-        borderRadius: '4px',
-        boxShadow: `
-          inset 0 2px 0 rgba(255,255,255,0.1),
-          inset 0 -4px 8px rgba(0,0,0,0.4),
-          0 8px 24px rgba(0,0,0,0.5)
-        `,
-      }}
-      aria-labelledby={`tablet-${title.toLowerCase().replace(/\s/g, '-')}`}
-    >
-      {/* Carved title */}
+    <div className="relative" aria-label={title}>
+      {/* Gold frame */}
       <div
-        className="absolute -top-3 left-1/2 -translate-x-1/2"
+        className="p-1"
         style={{
-          background: WOW.stormwindStone,
-          padding: '4px 24px',
-          border: `2px solid ${WOW.metal}`,
+          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.panelBronze} 50%, ${WC3.humanGold} 100%)`,
         }}
       >
-        <h3
-          id={`tablet-${title.toLowerCase().replace(/\s/g, '-')}`}
-          className="text-xs tracking-wider uppercase font-bold"
+        {/* Dark inner */}
+        <div
+          className="p-1"
           style={{
-            color: WOW.parchment,
-            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
+            background: WC3.panelDark,
+            border: `1px solid ${WC3.panelBorder}`,
           }}
         >
-          {title}
-        </h3>
-      </div>
-
-      {/* Stone crack details */}
-      <svg
-        className="absolute inset-0 w-full h-full opacity-10 pointer-events-none"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-      >
-        <path d="M10,0 L15,30 L5,60" stroke={WOW.darkBg} strokeWidth="1" fill="none" />
-        <path d="M90%,100% L85%,70% L95%,40%" stroke={WOW.darkBg} strokeWidth="1" fill="none" />
-      </svg>
-
-      <div className="relative z-10 pt-6 pb-4 px-6">
-        {children}
-      </div>
-    </section>
-  )
-}
-
-// ============================================================================
-// WOW-STYLE RESOURCE BAR (Health/Mana/Experience)
-// ============================================================================
-
-function ResourceBar({
-  label,
-  current,
-  max,
-  type = 'health',
-  showText = true
-}: {
-  label: string
-  current: number
-  max: number
-  type?: 'health' | 'mana' | 'experience' | 'rage' | 'energy'
-  showText?: boolean
-}) {
-  const percent = Math.min(100, (current / max) * 100)
-
-  const colors = {
-    health: { bar: WOW.healthGreen, glow: WOW.healthGreen },
-    mana: { bar: WOW.manaBlue, glow: WOW.manaBlue },
-    experience: { bar: WOW.epicPurple, glow: WOW.epicPurple },
-    rage: { bar: WOW.rageRed, glow: WOW.rageRed },
-    energy: { bar: WOW.energyYellow, glow: WOW.energyYellow },
-  }
-
-  return (
-    <div className="flex items-center gap-3" role="progressbar" aria-valuenow={current} aria-valuemin={0} aria-valuemax={max} aria-label={label}>
-      <span
-        className="text-[10px] uppercase tracking-wider w-12 text-right font-bold"
-        style={{ color: WOW.parchmentDark }}
-      >
-        {label}
-      </span>
-      <div
-        className="flex-1 h-5 relative overflow-hidden"
-        style={{
-          background: `linear-gradient(180deg, #0a0a0a 0%, #1a1a1a 100%)`,
-          border: `2px solid ${WOW.panelBorder}`,
-          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)',
-        }}
-      >
-        {/* Bar fill */}
-        <div
-          className="absolute inset-0 transition-all duration-500"
-          style={{
-            width: `${percent}%`,
-            background: `linear-gradient(180deg, ${colors[type].bar}cc 0%, ${colors[type].bar}99 50%, ${colors[type].bar}cc 100%)`,
-            boxShadow: `0 0 8px ${colors[type].glow}60`,
-          }}
-        />
-        {/* Tick marks */}
-        <div className="absolute inset-0 flex justify-between px-px opacity-30">
-          {[...Array(10)].map((_, i) => (
-            <div key={i} className="w-px h-full bg-black" />
-          ))}
+          {children}
         </div>
-        {/* Text overlay */}
-        {showText && (
-          <span
-            className="absolute inset-0 flex items-center justify-center text-[10px] font-bold"
-            style={{
-              color: WOW.commonWhite,
-              textShadow: '0 1px 2px rgba(0,0,0,0.8), 0 0 4px rgba(0,0,0,0.5)'
-            }}
-          >
-            {current} / {max}
-          </span>
-        )}
       </div>
+      {/* Corner decorations */}
+      <div
+        className="absolute -top-1 -left-1 w-3 h-3"
+        style={{
+          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
+          borderRadius: '1px',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -top-1 -right-1 w-3 h-3"
+        style={{
+          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
+          borderRadius: '1px',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -bottom-1 -left-1 w-3 h-3"
+        style={{
+          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
+          borderRadius: '1px',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -bottom-1 -right-1 w-3 h-3"
+        style={{
+          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
+          borderRadius: '1px',
+        }}
+        aria-hidden="true"
+      />
     </div>
   )
 }
 
 // ============================================================================
-// CLASS/PROFESSION SELECTOR (like character creation)
+// FACTION SELECTOR (like race selection in WC3)
 // ============================================================================
 
-function ClassSelector({
+function FactionSelector({
   active,
   onSelect,
 }: {
   active: 'engineer' | 'drummer' | 'fighter'
   onSelect: (p: 'engineer' | 'drummer' | 'fighter') => void
 }) {
-  const classes = [
+  const factions = [
     {
       id: 'engineer',
-      name: 'Archmage',
-      desc: 'Master of Systems',
-      classColor: WOW.mage,
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-          <circle cx="16" cy="16" r="12" fill={WOW.mage} opacity="0.3" />
-          <path d="M16,4 L18,14 L28,16 L18,18 L16,28 L14,18 L4,16 L14,14 Z" fill={WOW.mage} />
-          <circle cx="16" cy="16" r="4" fill={WOW.commonWhite} />
-        </svg>
-      )
+      name: 'Human Alliance',
+      desc: 'Arcane Architect',
+      icon: <HumanCrest size={40} />,
+      color: WC3.humanBlue,
+      accent: WC3.humanGold,
     },
     {
       id: 'drummer',
-      name: 'Bard',
+      name: 'Night Elf Sentinels',
       desc: 'Keeper of Rhythm',
-      classColor: WOW.shaman,
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-          <ellipse cx="16" cy="20" rx="10" ry="8" fill={WOW.shaman} opacity="0.3" />
-          <ellipse cx="16" cy="18" rx="8" ry="6" fill={WOW.leather} stroke={WOW.shaman} strokeWidth="2" />
-          <line x1="16" y1="4" x2="16" y2="12" stroke={WOW.shaman} strokeWidth="2" />
-          <circle cx="16" cy="4" r="2" fill={WOW.shaman} />
-        </svg>
-      )
+      icon: <NightElfCrest size={40} />,
+      color: WC3.elfPurple,
+      accent: WC3.elfSilver,
     },
     {
       id: 'fighter',
-      name: 'Warrior',
-      desc: 'Battle-Forged',
-      classColor: WOW.warrior,
-      icon: (
-        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true">
-          <path d="M16,2 L20,12 L16,10 L12,12 Z" fill={WOW.warrior} />
-          <path d="M8,14 L16,30 L24,14 L16,18 Z" fill={WOW.warrior} opacity="0.8" />
-          <rect x="14" y="8" width="4" height="16" fill={WOW.metal} />
-          <rect x="10" y="12" width="12" height="3" fill={WOW.warrior} />
-        </svg>
-      )
+      name: 'Orc Horde',
+      desc: 'Battle-Hardened',
+      icon: <OrcCrest size={40} />,
+      color: WC3.orcRed,
+      accent: WC3.orcOrange,
     },
   ] as const
 
   return (
     <nav
-      className="flex justify-center gap-4 md:gap-8 py-6"
+      className="flex justify-center gap-4 md:gap-6 py-6"
       role="tablist"
       aria-label="Profession selection"
     >
-      {classes.map((cls) => (
+      {factions.map((faction) => (
         <button
-          key={cls.id}
-          onClick={() => onSelect(cls.id)}
+          key={faction.id}
+          onClick={() => onSelect(faction.id)}
           role="tab"
-          aria-selected={active === cls.id}
-          aria-controls={`panel-${cls.id}`}
-          className="relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+          aria-selected={active === faction.id}
+          aria-controls={`panel-${faction.id}`}
+          className="relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-transform hover:scale-105"
           style={{
-            ['--ring-color' as string]: cls.classColor,
+            ['--ring-color' as string]: faction.accent,
           }}
         >
           <div
-            className={`w-24 md:w-32 h-32 md:h-40 flex flex-col items-center justify-center gap-2 transition-all duration-300 ${
-              active === cls.id ? 'scale-105' : 'hover:scale-102 opacity-70 hover:opacity-100'
-            }`}
+            className="w-28 md:w-36 h-32 md:h-40 flex flex-col items-center justify-center gap-2 p-3 transition-all"
             style={{
-              background: active === cls.id
-                ? `linear-gradient(180deg, ${cls.classColor}30 0%, ${WOW.darkBg} 100%)`
-                : `linear-gradient(180deg, ${WOW.panelBg} 0%, ${WOW.darkBg} 100%)`,
-              border: `3px solid ${active === cls.id ? cls.classColor : WOW.panelBorder}`,
-              boxShadow: active === cls.id
-                ? `0 0 30px ${cls.classColor}40, inset 0 0 20px ${cls.classColor}20`
-                : '0 4px 12px rgba(0,0,0,0.4)',
+              background: active === faction.id
+                ? `linear-gradient(180deg, ${faction.color}40 0%, ${WC3.panelDark} 100%)`
+                : `linear-gradient(180deg, #1A1612 0%, #0A0808 100%)`,
+              border: `3px solid ${active === faction.id ? faction.accent : WC3.panelBorder}`,
+              boxShadow: active === faction.id
+                ? `0 0 20px ${faction.color}50, inset 0 0 15px ${faction.color}30`
+                : 'inset 0 2px 4px rgba(0,0,0,0.5)',
             }}
           >
-            {/* Class icon */}
+            {/* Faction icon */}
             <div className="relative">
-              {cls.icon}
-              {active === cls.id && (
+              {faction.icon}
+              {active === faction.id && (
                 <div
                   className="absolute inset-0 animate-pulse"
-                  style={{ filter: `drop-shadow(0 0 8px ${cls.classColor})` }}
+                  style={{ filter: `drop-shadow(0 0 6px ${faction.accent})` }}
+                  aria-hidden="true"
                 >
-                  {cls.icon}
+                  {faction.icon}
                 </div>
               )}
             </div>
 
-            {/* Class name */}
+            {/* Faction name */}
             <span
-              className="text-sm font-bold tracking-wider"
+              className="text-xs md:text-sm font-bold tracking-wider text-center leading-tight"
               style={{
-                color: active === cls.id ? cls.classColor : WOW.parchmentDark,
-                textShadow: active === cls.id ? `0 0 10px ${cls.classColor}80` : 'none',
+                color: active === faction.id ? faction.accent : WC3.textGray,
+                textShadow: active === faction.id ? `0 0 8px ${faction.color}` : 'none',
+                fontFamily: 'Georgia, "Times New Roman", serif',
               }}
             >
-              {cls.name}
+              {faction.name}
             </span>
 
             {/* Description */}
             <span
-              className="text-[10px] opacity-70"
-              style={{ color: WOW.parchment }}
+              className="text-[10px]"
+              style={{ color: WC3.textGray }}
             >
-              {cls.desc}
+              {faction.desc}
             </span>
           </div>
 
-          {/* Selection indicator */}
-          {active === cls.id && (
+          {/* Selection arrow */}
+          {active === faction.id && (
             <div
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45"
-              style={{ background: cls.classColor }}
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0"
+              style={{
+                borderLeft: '8px solid transparent',
+                borderRight: '8px solid transparent',
+                borderTop: `8px solid ${faction.accent}`,
+              }}
               aria-hidden="true"
             />
           )}
@@ -723,72 +898,61 @@ function ClassSelector({
 }
 
 // ============================================================================
-// TECH STACK AS TALENT TREE
+// TECH STACK AS BUILD QUEUE (like building units in WC3)
 // ============================================================================
 
-function TalentTree({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
-  const rarityByIndex = ['legendary', 'epic', 'rare', 'uncommon', 'common'] as const
-
+function BuildQueue({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
   return (
-    <div className="space-y-8">
-      {categories.slice(0, 6).map((category, catIndex) => (
+    <div className="space-y-6">
+      {categories.slice(0, 6).map((category) => (
         <div key={category.name}>
-          {/* Category header like talent tree tier */}
-          <div className="flex items-center gap-3 mb-4">
-            <span className="text-xl">{category.icon}</span>
+          {/* Category header */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">{category.icon}</span>
             <h3
               className="text-sm tracking-wider uppercase font-bold"
               style={{
-                color: WOW.allianceGold,
-                textShadow: `0 0 8px ${WOW.allianceGold}40`,
+                color: WC3.textGold,
+                textShadow: '0 1px 2px #000',
+                fontFamily: 'Georgia, "Times New Roman", serif',
               }}
             >
               {category.name}
             </h3>
             <div
               className="flex-1 h-px"
-              style={{ background: `linear-gradient(90deg, ${WOW.allianceGold}60, transparent)` }}
+              style={{
+                background: `linear-gradient(90deg, ${WC3.panelBorder}, transparent)`,
+              }}
               aria-hidden="true"
             />
           </div>
 
-          {/* Skills as ability icons */}
-          <div className="flex flex-wrap gap-3">
-            {category.items.map((tech, techIndex) => {
-              const rarity = rarityByIndex[Math.min(catIndex, rarityByIndex.length - 1)]
-              return (
-                <div
-                  key={tech}
-                  className="group relative"
+          {/* Tech items as ability icons */}
+          <div className="flex flex-wrap gap-2">
+            {category.items.map((tech) => (
+              <AbilityIcon key={tech} learned={true} size={32}>
+                <span
+                  className="text-[10px] font-bold text-center leading-tight px-1"
+                  style={{ color: WC3.textWhite }}
                 >
-                  <div
-                    className="px-3 py-2 text-xs font-bold transition-all cursor-default hover:scale-105"
-                    style={{
-                      background: `linear-gradient(180deg, ${WOW.panelBg} 0%, ${WOW.darkBg} 100%)`,
-                      border: `2px solid ${WOW[`${rarity}${rarity === 'common' ? 'White' : rarity === 'uncommon' ? 'Green' : rarity === 'rare' ? 'Blue' : rarity === 'epic' ? 'Purple' : 'Orange'}`] || WOW.panelBorder}`,
-                      color: WOW.parchment,
-                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
-                    }}
-                  >
-                    {tech}
-                  </div>
-                  {/* Tooltip on hover */}
-                  <div
-                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap"
-                    style={{
-                      background: WOW.darkBg,
-                      border: `1px solid ${WOW.allianceGold}`,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.8)',
-                    }}
-                    role="tooltip"
-                  >
-                    <span className="text-[10px]" style={{ color: WOW.parchment }}>
-                      Proficiency: <span style={{ color: WOW.uncommonGreen }}>Mastered</span>
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
+                  {tech.substring(0, 3).toUpperCase()}
+                </span>
+              </AbilityIcon>
+            ))}
+          </div>
+
+          {/* Full names list */}
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+            {category.items.map((tech) => (
+              <span
+                key={tech}
+                className="text-xs"
+                style={{ color: WC3.textGray }}
+              >
+                {tech}
+              </span>
+            ))}
           </div>
         </div>
       ))}
@@ -802,14 +966,17 @@ function TalentTree({ categories }: { categories: ReturnType<typeof getEngineerS
 
 function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
   return (
-    <div className="grid md:grid-cols-3 gap-8">
+    <div className="grid md:grid-cols-3 gap-6">
       {categories.map((category) => (
         <div key={category.name}>
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-3">
             <span className="text-lg">{category.icon}</span>
             <h3
               className="text-sm tracking-wider uppercase font-bold"
-              style={{ color: WOW.allianceGold }}
+              style={{
+                color: WC3.textGold,
+                fontFamily: 'Georgia, "Times New Roman", serif',
+              }}
             >
               {category.name}
             </h3>
@@ -819,9 +986,13 @@ function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByP
               <li
                 key={skill.name}
                 className="flex items-center gap-2 text-sm"
-                style={{ color: WOW.parchment }}
+                style={{ color: WC3.textWhite }}
               >
-                <QuestMarker type="complete" size={12} />
+                <div
+                  className="w-2 h-2 rotate-45"
+                  style={{ background: WC3.healthGreen }}
+                  aria-hidden="true"
+                />
                 <span>{skill.name}</span>
               </li>
             ))}
@@ -833,7 +1004,7 @@ function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByP
 }
 
 // ============================================================================
-// EXPERIENCE CARD (Quest completed style)
+// EXPERIENCE CARD (Campaign mission style)
 // ============================================================================
 
 function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
@@ -843,46 +1014,50 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 
   return (
     <article
-      className="p-4 transition-all hover:scale-[1.01]"
+      className="p-4 transition-all hover:brightness-110"
       style={{
-        background: `linear-gradient(135deg, ${WOW.panelBg} 0%, ${WOW.darkBg} 100%)`,
-        border: `2px solid ${isCurrentRole ? WOW.epicPurple : WOW.panelBorder}`,
-        boxShadow: isCurrentRole ? `0 0 15px ${WOW.epicPurple}30` : 'none',
+        background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
+        border: `2px solid ${isCurrentRole ? WC3.healthGreen : WC3.panelBorder}`,
+        boxShadow: isCurrentRole ? `0 0 12px ${WC3.healthGreen}30` : 'none',
       }}
     >
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-2 gap-2">
         <div className="flex items-start gap-2">
-          <QuestMarker type={isCurrentRole ? 'progress' : 'complete'} size={16} />
+          <UnitPortrait size={32} selected={isCurrentRole}>
+            <span className="text-xs" style={{ color: WC3.textGold }}>
+              {entry.title.charAt(0)}
+            </span>
+          </UnitPortrait>
           <div>
-            <h4 className="text-sm font-bold" style={{ color: WOW.parchment }}>
+            <h4 className="text-sm font-bold" style={{ color: WC3.textWhite }}>
               {entry.title}
             </h4>
-            <p className="text-xs" style={{ color: WOW.allianceGold }}>
+            <p className="text-xs" style={{ color: WC3.textGold }}>
               {entry.organization}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <GoldCoin size={14} />
-          <span className="text-[10px]" style={{ color: WOW.parchmentDark }}>
+        <div className="flex items-center gap-2 shrink-0">
+          <GoldIcon size={12} />
+          <span className="text-[10px]" style={{ color: WC3.textGray }}>
             {startDisplay} - {endDisplay}
           </span>
         </div>
       </div>
 
-      <p className="text-xs mb-3 pl-6" style={{ color: WOW.parchmentDark }}>
+      <p className="text-xs mb-3 ml-10" style={{ color: WC3.textGray }}>
         {entry.description}
       </p>
 
       {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-1 pl-6" role="list">
+        <ul className="space-y-1 ml-10" role="list">
           {entry.highlights.map((highlight, i) => (
             <li
               key={i}
               className="text-xs flex items-start gap-2"
-              style={{ color: WOW.parchment }}
+              style={{ color: WC3.textWhite }}
             >
-              <span style={{ color: WOW.uncommonGreen }} aria-hidden="true">+</span>
+              <span style={{ color: WC3.healthGreen }} aria-hidden="true">+</span>
               <span>{highlight}</span>
             </li>
           ))}
@@ -893,58 +1068,61 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 }
 
 // ============================================================================
-// PROJECT CARD (Raid/Dungeon style)
+// PROJECT CARD (Quest/Mission style)
 // ============================================================================
 
 function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
-  const difficulty = project.featured ? 'legendary' : 'rare'
-
   return (
     <article
-      className="p-4 transition-all hover:scale-[1.02] cursor-pointer group"
+      className="p-4 transition-all hover:brightness-110 cursor-pointer group"
       style={{
-        background: `linear-gradient(135deg, ${WOW.panelBg} 0%, ${WOW.darkBg} 100%)`,
-        border: `2px solid ${project.featured ? WOW.legendaryOrange : WOW.rareBlue}`,
-        boxShadow: project.featured ? `0 0 20px ${WOW.legendaryOrange}30` : '0 4px 12px rgba(0,0,0,0.4)',
+        background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
+        border: `2px solid ${project.featured ? WC3.goldYellow : WC3.panelBorder}`,
+        boxShadow: project.featured ? `0 0 15px ${WC3.goldYellow}30` : 'none',
       }}
     >
       {project.featured && (
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-[10px] tracking-wider font-bold" style={{ color: WOW.legendaryOrange }}>
-            LEGENDARY
+          <div
+            className="w-2 h-2 rounded-full"
+            style={{ background: WC3.goldYellow }}
+            aria-hidden="true"
+          />
+          <span
+            className="text-[10px] tracking-wider font-bold"
+            style={{ color: WC3.goldYellow }}
+          >
+            LEGENDARY QUEST
           </span>
-          <div className="flex gap-1" aria-hidden="true">
-            {[...Array(3)].map((_, i) => <GoldCoin key={i} size={10} />)}
-          </div>
         </div>
       )}
 
       <h4
-        className="text-sm font-bold mb-1 group-hover:text-yellow-300 transition-colors"
-        style={{ color: project.featured ? WOW.legendaryOrange : WOW.rareBlue }}
+        className="text-sm font-bold mb-1 group-hover:brightness-125 transition-all"
+        style={{ color: project.featured ? WC3.goldYellow : WC3.humanBlue }}
       >
         {project.name}
       </h4>
 
-      <p className="text-xs mb-3" style={{ color: WOW.parchmentDark }}>
+      <p className="text-xs mb-3" style={{ color: WC3.textGray }}>
         {project.tagline}
       </p>
 
       {project.impact && (
-        <p className="text-xs mb-3 italic" style={{ color: WOW.uncommonGreen }}>
+        <p className="text-xs mb-3" style={{ color: WC3.healthGreen }}>
           <span aria-hidden="true">+</span> {project.impact}
         </p>
       )}
 
       <div className="flex flex-wrap gap-1">
-        {project.techStack.slice(0, 4).map((tech, i) => (
+        {project.techStack.slice(0, 4).map((tech) => (
           <span
             key={tech}
             className="text-[9px] px-2 py-0.5 font-bold"
             style={{
-              background: `${WOW.manaBlue}30`,
-              border: `1px solid ${WOW.manaBlue}60`,
-              color: WOW.runicBlue,
+              background: `${WC3.humanBlue}30`,
+              border: `1px solid ${WC3.humanBlue}60`,
+              color: WC3.textWhite,
             }}
           >
             {tech}
@@ -956,7 +1134,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
 }
 
 // ============================================================================
-// COMPANY CARD (Faction Outpost style)
+// COMPANY CARD (Allied outpost style)
 // ============================================================================
 
 function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
@@ -965,36 +1143,30 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-all hover:scale-[1.02] group"
+      className="block p-4 transition-all hover:brightness-110 group"
       style={{
-        background: `linear-gradient(135deg, ${WOW.panelBg} 0%, ${WOW.darkBg} 100%)`,
-        border: `2px solid ${WOW.panelBorder}`,
+        background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
+        border: `2px solid ${WC3.panelBorder}`,
       }}
       aria-label={`${company.name} - ${company.tagline}`}
     >
       <div className="flex items-center gap-3 mb-3">
-        <div
-          className="w-10 h-10 flex items-center justify-center text-xl"
-          style={{
-            background: `linear-gradient(135deg, ${WOW.allianceBlue}60, ${WOW.darkBg})`,
-            border: `2px solid ${WOW.allianceGold}`,
-          }}
-        >
-          {company.icon}
-        </div>
+        <UnitPortrait size={40}>
+          <span className="text-lg">{company.icon}</span>
+        </UnitPortrait>
         <div>
           <h4
-            className="text-sm font-bold group-hover:text-yellow-300 transition-colors"
-            style={{ color: WOW.parchment }}
+            className="text-sm font-bold group-hover:brightness-125 transition-colors"
+            style={{ color: WC3.textWhite }}
           >
             {company.name}
           </h4>
-          <p className="text-[10px]" style={{ color: WOW.allianceGold }}>
+          <p className="text-[10px]" style={{ color: WC3.textGold }}>
             {company.tagline}
           </p>
         </div>
       </div>
-      <p className="text-xs" style={{ color: WOW.parchmentDark }}>
+      <p className="text-xs" style={{ color: WC3.textGray }}>
         {company.description}
       </p>
     </a>
@@ -1002,43 +1174,44 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
 }
 
 // ============================================================================
-// BAND CARD (Guild style)
+// BAND CARD (Warband style)
 // ============================================================================
 
 function BandCard({ band }: { band: typeof BANDS[0] }) {
   const content = (
     <article
-      className="p-4 transition-all hover:scale-[1.02] group"
+      className="p-4 transition-all hover:brightness-110 group"
       style={{
-        background: `linear-gradient(135deg, ${WOW.panelBg} 0%, ${WOW.darkBg} 100%)`,
-        border: `2px solid ${WOW.panelBorder}`,
+        background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
+        border: `2px solid ${band.active ? WC3.orcRed : WC3.panelBorder}`,
+        boxShadow: band.active ? `0 0 10px ${WC3.orcRed}30` : 'none',
       }}
     >
       <div className="flex items-center gap-2 mb-2">
-        <HordeSymbol size={24} />
+        <OrcCrest size={24} />
         <div>
           <h4
-            className="text-sm font-bold group-hover:text-yellow-300 transition-colors"
-            style={{ color: WOW.parchment }}
+            className="text-sm font-bold group-hover:brightness-125 transition-colors"
+            style={{ color: WC3.textWhite }}
           >
             {band.name}
           </h4>
-          <p className="text-[10px]" style={{ color: WOW.allianceGold }}>
+          <p className="text-[10px]" style={{ color: WC3.textGold }}>
             {band.genre} | {band.role}
           </p>
         </div>
       </div>
-      <p className="text-xs" style={{ color: WOW.parchmentDark }}>
+      <p className="text-xs" style={{ color: WC3.textGray }}>
         {band.description}
       </p>
       {band.active && (
         <div className="mt-2 flex items-center gap-1">
           <div
             className="w-2 h-2 rounded-full animate-pulse"
-            style={{ background: WOW.healthGreen, boxShadow: `0 0 6px ${WOW.healthGreen}` }}
+            style={{ background: WC3.healthGreen, boxShadow: `0 0 6px ${WC3.healthGreen}` }}
             aria-hidden="true"
           />
-          <span className="text-[10px]" style={{ color: WOW.healthGreen }}>Active</span>
+          <span className="text-[10px]" style={{ color: WC3.healthGreen }}>Active</span>
         </div>
       )}
     </article>
@@ -1055,53 +1228,54 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
 }
 
 // ============================================================================
-// FLOATING PARTICLES (Arcane magic style)
+// FOG OF WAR EFFECT (ambient background)
 // ============================================================================
 
-function ArcaneParticles() {
-  const particles = useMemo(() =>
-    Array.from({ length: 25 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: Math.random() * 4 + 2,
-      opacity: Math.random() * 0.4 + 0.1,
-      duration: Math.random() * 20 + 15,
-      delay: Math.random() * -20,
-    })),
-  [])
-
+function FogOfWar() {
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-[2] overflow-hidden"
+      className="fixed inset-0 pointer-events-none z-[1] overflow-hidden"
       aria-hidden="true"
     >
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute rounded-full"
-          style={{
-            left: `${p.x}%`,
-            top: `${p.y}%`,
-            width: p.size,
-            height: p.size,
-            background: WOW.manaBlue,
-            opacity: p.opacity,
-            boxShadow: `0 0 ${p.size * 2}px ${WOW.manaBlue}`,
-            animation: `arcaneFloat ${p.duration}s ease-in-out infinite`,
-            animationDelay: `${p.delay}s`,
-          }}
-        />
-      ))}
+      {/* Gradient fog */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at 20% 20%, transparent 0%, ${WC3.fogBlack}80 70%),
+            radial-gradient(ellipse at 80% 80%, transparent 0%, ${WC3.fogBlack}80 70%),
+            radial-gradient(ellipse at 50% 50%, transparent 0%, ${WC3.fogBlack}40 100%)
+          `,
+        }}
+      />
+      {/* Subtle animated particles */}
       <style jsx>{`
-        @keyframes arcaneFloat {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          25% { transform: translateY(-30px) translateX(10px); }
-          50% { transform: translateY(-10px) translateX(-10px); }
-          75% { transform: translateY(-40px) translateX(5px); }
+        @keyframes fogDrift {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(20px) translateY(-10px); }
         }
       `}</style>
     </div>
+  )
+}
+
+// ============================================================================
+// TERRAIN GRID (subtle isometric grid like WC3 terrain)
+// ============================================================================
+
+function TerrainGrid() {
+  return (
+    <div
+      className="fixed inset-0 pointer-events-none z-[0] opacity-[0.03]"
+      aria-hidden="true"
+      style={{
+        backgroundImage: `
+          linear-gradient(${WC3.grassGreen} 1px, transparent 1px),
+          linear-gradient(90deg, ${WC3.grassGreen} 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
+      }}
+    />
   )
 }
 
@@ -1121,6 +1295,14 @@ export default function MedievalFantasyTheme() {
   const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
   const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
+  // Map profession to faction for styling
+  const factionMap = {
+    engineer: 'human' as const,
+    drummer: 'nightelf' as const,
+    fighter: 'orc' as const,
+  }
+  const currentFaction = factionMap[active]
+
   useEffect(() => {
     setMounted(true)
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -1136,78 +1318,105 @@ export default function MedievalFantasyTheme() {
     <div
       className="min-h-screen relative overflow-x-hidden"
       style={{
-        background: `linear-gradient(180deg, ${WOW.darkBg} 0%, #0d0a08 50%, ${WOW.darkBg} 100%)`,
-        fontFamily: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
+        background: `linear-gradient(180deg, #0A0808 0%, #0F0C0A 50%, #0A0808 100%)`,
+        fontFamily: 'Georgia, "Times New Roman", serif',
       }}
     >
-      {/* Arcane floating particles */}
-      {!prefersReducedMotion && <ArcaneParticles />}
+      {/* Terrain grid background */}
+      <TerrainGrid />
 
-      {/* Portal effect background */}
-      {!prefersReducedMotion && <PortalEffect />}
+      {/* Fog of war effect */}
+      {!prefersReducedMotion && <FogOfWar />}
 
-      {/* Top Alliance banner */}
+      {/* Top resource bar (like WC3 top UI) */}
       <div
-        className="fixed top-0 left-0 right-0 h-1 z-50"
+        className="fixed top-0 left-0 right-0 z-50 flex justify-center gap-4 py-2 px-4"
         style={{
-          background: `linear-gradient(90deg, transparent, ${WOW.allianceGold}, transparent)`,
+          background: `linear-gradient(180deg, #1A1612 0%, #0F0C0A 100%)`,
+          borderBottom: `2px solid ${WC3.panelBorder}`,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
         }}
-        aria-hidden="true"
-      />
+        role="status"
+        aria-label="Character resources"
+      >
+        <ResourceCounter
+          icon={<GoldIcon size={16} />}
+          value={15000}
+          label="Experience Points"
+        />
+        <ResourceCounter
+          icon={<LumberIcon size={16} />}
+          value={85}
+          maxValue={100}
+          label="Skill Level"
+        />
+        <ResourceCounter
+          icon={<FoodIcon size={16} />}
+          value={100}
+          maxValue={100}
+          label="Energy"
+        />
+      </div>
 
       {/* Header */}
-      <header className="relative z-40 p-4 md:p-6">
+      <header className="relative z-40 pt-16 p-4 md:p-6 md:pt-16">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-4">
-          {/* Left: Name and info */}
+          {/* Left: Portrait and Name */}
           <div className="flex items-start gap-4">
-            <AllianceCrest size={60} />
+            {/* Unit portrait frame */}
+            <UnitPortrait size={80} selected={true}>
+              {active === 'engineer' && <HumanCrest size={60} />}
+              {active === 'drummer' && <NightElfCrest size={60} />}
+              {active === 'fighter' && <OrcCrest size={60} />}
+            </UnitPortrait>
+
             <div>
               <h1
-                className="text-2xl md:text-4xl font-bold tracking-wide"
+                className="text-2xl md:text-3xl font-bold tracking-wide"
                 style={{
-                  color: WOW.allianceGold,
-                  textShadow: `2px 2px 0 ${WOW.darkBg}, 0 0 20px ${WOW.allianceGold}50`,
+                  color: WC3.textGold,
+                  textShadow: '2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.3)',
                 }}
               >
                 ALEXANDER PULIDO
               </h1>
-              <p className="text-sm md:text-lg mt-1" style={{ color: WOW.parchment }}>
+              <p className="text-sm md:text-base mt-1" style={{ color: WC3.textWhite }}>
                 {PROFESSIONAL_SUMMARY.headline}
               </p>
-              <p className="text-xs md:text-sm mt-1 italic" style={{ color: WOW.allianceGold }}>
+              <p className="text-xs md:text-sm mt-1 italic" style={{ color: WC3.textGold }}>
                 {PROFESSIONAL_SUMMARY.tagline}
               </p>
 
-              {/* Resource bars */}
-              <div className="mt-4 space-y-1 w-48 md:w-64">
-                <ResourceBar label="EXP" current={85} max={100} type="experience" />
-                <ResourceBar label="MANA" current={100} max={100} type="mana" />
+              {/* Unit bars */}
+              <div className="mt-4 space-y-1 w-56 md:w-72">
+                <UnitBar label="EXP" current={85} max={100} type="experience" />
+                <UnitBar label="MANA" current={100} max={100} type="mana" />
               </div>
             </div>
           </div>
 
-          {/* Right: Navigation */}
-          <div className="flex flex-wrap gap-2 md:gap-4 items-center">
+          {/* Right: Navigation buttons */}
+          <div className="flex flex-wrap gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-3 md:px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:scale-105 focus:outline-none focus-visible:ring-2"
+              className="px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2"
               style={{
-                background: `linear-gradient(180deg, ${WOW.panelBg} 0%, ${WOW.darkBg} 100%)`,
-                border: `2px solid ${WOW.allianceGold}`,
-                color: WOW.allianceGold,
-                boxShadow: `0 4px 0 ${WOW.darkBg}`,
+                background: 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)',
+                border: `2px solid ${WC3.humanGold}`,
+                color: WC3.textGold,
+                boxShadow: `inset 0 1px 0 rgba(255,215,0,0.3), 0 2px 0 ${WC3.panelDark}`,
               }}
             >
               SCROLL
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-3 md:px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:scale-105 focus:outline-none focus-visible:ring-2"
+              className="px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2"
               style={{
-                background: `linear-gradient(180deg, ${WOW.allianceBlue}60 0%, ${WOW.darkBg} 100%)`,
-                border: `2px solid ${WOW.manaBlue}`,
-                color: WOW.runicBlue,
-                boxShadow: `0 4px 0 ${WOW.darkBg}`,
+                background: 'linear-gradient(180deg, #1A2535 0%, #0A1520 100%)',
+                border: `2px solid ${WC3.humanBlue}`,
+                color: WC3.humanBlue,
+                boxShadow: `inset 0 1px 0 rgba(0,66,255,0.3), 0 2px 0 ${WC3.panelDark}`,
               }}
             >
               NEBULITH
@@ -1221,15 +1430,19 @@ export default function MedievalFantasyTheme() {
       <section className="relative z-30 py-4 px-4 md:px-6" aria-labelledby="current-roles-heading">
         <h2 id="current-roles-heading" className="sr-only">Current Roles</h2>
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             {CURRENT_ROLES.map((role) => (
               <div key={role.id} className="text-center flex items-center gap-2">
-                <QuestMarker type="progress" size={16} />
+                <div
+                  className="w-2 h-2 rounded-full animate-pulse"
+                  style={{ background: WC3.healthGreen }}
+                  aria-hidden="true"
+                />
                 <div>
-                  <p className="text-xs md:text-sm font-bold" style={{ color: WOW.allianceGold }}>
+                  <p className="text-xs md:text-sm font-bold" style={{ color: WC3.textGold }}>
                     {role.title}
                   </p>
-                  <p className="text-sm md:text-lg" style={{ color: WOW.parchment }}>
+                  <p className="text-sm md:text-base" style={{ color: WC3.textWhite }}>
                     {role.company}
                   </p>
                 </div>
@@ -1239,18 +1452,18 @@ export default function MedievalFantasyTheme() {
         </div>
       </section>
 
-      {/* Class/Profession Selection */}
+      {/* Faction/Profession Selection */}
       <section className="relative z-30 py-4" aria-label="Select profession">
-        <ClassSelector active={active} onSelect={setActive} />
+        <FactionSelector active={active} onSelect={setActive} />
       </section>
 
       {/* Main Content */}
-      <main className="relative z-20 py-8 px-4 md:px-6 space-y-12">
-        <div className="max-w-4xl mx-auto space-y-12">
+      <main className="relative z-20 py-8 px-4 md:px-6 space-y-10">
+        <div className="max-w-4xl mx-auto space-y-10">
 
           {/* About Section */}
-          <ParchmentCard title="About" questType="normal">
-            <p className="text-sm leading-relaxed mb-4" style={{ color: WOW.parchment }}>
+          <InfoPanel title="Unit Information" faction={currentFaction}>
+            <p className="text-sm leading-relaxed mb-4" style={{ color: WC3.textWhite }}>
               {aboutData.bio}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -1259,88 +1472,101 @@ export default function MedievalFantasyTheme() {
                   key={i}
                   className="px-3 py-1 text-xs font-bold"
                   style={{
-                    background: `${WOW.allianceGold}15`,
-                    border: `1px solid ${WOW.allianceGold}60`,
-                    color: WOW.allianceGold,
+                    background: `${WC3.humanGold}15`,
+                    border: `1px solid ${WC3.humanGold}60`,
+                    color: WC3.textGold,
                   }}
                 >
                   {fact}
                 </span>
               ))}
             </div>
-          </ParchmentCard>
+          </InfoPanel>
 
           {/* Work Experience */}
           {experience.length > 0 && (
-            <ParchmentCard title="Campaigns" questType="elite">
+            <InfoPanel title="Campaign History" faction={currentFaction}>
               <div className="space-y-4">
                 {experience.map((entry) => (
                   <ExperienceCard key={entry.id} entry={entry} />
                 ))}
               </div>
-            </ParchmentCard>
+            </InfoPanel>
           )}
 
           {/* Tech Stack / Skills */}
-          <ParchmentCard
-            title={active === 'engineer' ? 'Spellbook' : 'Abilities'}
-            questType={active === 'engineer' ? 'legendary' : 'normal'}
+          <CommandPanel
+            title={active === 'engineer' ? 'Spell Book' : 'Abilities'}
           >
             {active === 'engineer' ? (
-              <TalentTree categories={engineerTech} />
+              <BuildQueue categories={engineerTech} />
             ) : (
               <SkillsList categories={otherSkills} />
             )}
-          </ParchmentCard>
+          </CommandPanel>
 
           {/* Projects */}
-          <ParchmentCard title="Dungeons Conquered" questType="elite">
+          <InfoPanel title="Completed Quests" faction={currentFaction}>
             <div className="grid md:grid-cols-2 gap-4">
               {projects.filter(p => p.featured).slice(0, 6).map((project) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>
-          </ParchmentCard>
+          </InfoPanel>
 
           {/* Companies (Engineer) / Bands (Drummer) */}
           {active === 'engineer' && (
-            <ParchmentCard title="Allied Outposts">
+            <InfoPanel title="Allied Outposts" faction="human">
               <div className="grid md:grid-cols-3 gap-4">
                 {COMPANIES.map((company) => (
                   <CompanyCard key={company.id} company={company} />
                 ))}
               </div>
-            </ParchmentCard>
+            </InfoPanel>
           )}
 
           {active === 'drummer' && (
-            <ParchmentCard title="Guilds">
+            <InfoPanel title="Warbands" faction="nightelf">
               <div className="grid md:grid-cols-3 gap-4">
                 {BANDS.map((band) => (
                   <BandCard key={band.id} band={band} />
                 ))}
               </div>
-            </ParchmentCard>
+            </InfoPanel>
           )}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-20 py-12 text-center">
-        <div className="flex justify-center mb-4">
-          <AllianceCrest size={50} />
+      {/* Footer styled as minimap area */}
+      <footer className="relative z-20 py-12 px-4">
+        <div className="max-w-md mx-auto">
+          <MinimapFrame title="Location">
+            <div
+              className="w-full h-32 flex flex-col items-center justify-center gap-2"
+              style={{
+                background: `linear-gradient(135deg, ${WC3.grassGreen}40 0%, ${WC3.dirtBrown}40 50%, ${WC3.waterBlue}40 100%)`,
+              }}
+            >
+              {/* Mini faction icons */}
+              <div className="flex justify-center gap-4">
+                <HumanCrest size={24} />
+                <NightElfCrest size={24} />
+                <OrcCrest size={24} />
+                <UndeadCrest size={24} />
+              </div>
+              <p className="text-sm font-bold" style={{ color: WC3.textGold }}>
+                AZEROTH
+              </p>
+              <p className="text-xs" style={{ color: WC3.textGray }}>
+                Warcraft III: The Frozen Throne
+              </p>
+            </div>
+          </MinimapFrame>
         </div>
-        <p className="text-sm font-bold" style={{ color: WOW.allianceGold }}>
-          FOR THE ALLIANCE
+
+        <p className="text-center text-xs mt-4" style={{ color: WC3.textGray }}>
+          Built with the spirit of classic RTS games (1994-2003)
         </p>
-        <p className="text-xs mt-2" style={{ color: WOW.parchmentDark }}>
-          Stormwind, Azeroth
-        </p>
-        <div className="flex justify-center gap-6 mt-6">
-          <AllianceCrest size={24} />
-          <HordeSymbol size={24} />
-          <AllianceCrest size={24} />
-        </div>
       </footer>
 
       {/* Reduced motion styles */}
