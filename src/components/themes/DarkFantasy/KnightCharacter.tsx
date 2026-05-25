@@ -127,74 +127,72 @@ export const KnightCharacter = memo(function KnightCharacter({
         opacity="0.4"
       />
 
-      {/* EARS - visible like in sprite */}
-      <ellipse cx="10" cy="18" rx="3" ry="4" fill={DF.skin} stroke={DF.skinShade} strokeWidth="0.5" />
-      <ellipse cx="40" cy="18" rx="3" ry="4" fill={DF.skin} stroke={DF.skinShade} strokeWidth="0.5" />
-      {/* Inner ear detail */}
-      <ellipse cx="10" cy="18" rx="1.5" ry="2.5" fill={DF.skinShade} opacity="0.5" />
-      <ellipse cx="40" cy="18" rx="1.5" ry="2.5" fill={DF.skinShade} opacity="0.5" />
+      {/* EAR - one visible (3/4 side view) */}
+      <ellipse cx="8" cy="16" rx="3" ry="4" fill={DF.skin} stroke={DF.skinShade} strokeWidth="0.5" />
+      <ellipse cx="8" cy="16" rx="1.5" ry="2.5" fill={DF.skinShade} opacity="0.5" />
 
-      {/* HEAD - Alexander's face shape */}
-      <ellipse
-        cx="25"
-        cy="16"
-        rx="12"
-        ry="14"
+      {/* HEAD - 3/4 side view profile */}
+      <path
+        d="M12,4
+           Q28,2 35,10
+           Q38,16 36,24
+           Q34,28 28,30
+           L18,30
+           Q12,28 10,22
+           Q8,14 12,4
+           Z"
         fill="url(#skinGrad)"
         stroke={DF.skinShade}
         strokeWidth="0.5"
       />
 
-      {/* HAIR - dark, short, close-cropped like sprite */}
+      {/* HAIR - side view */}
       <path
-        d="M13,12
-           Q13,4 25,4
-           Q37,4 37,12
-           Q37,8 25,6
-           Q13,8 13,12
+        d="M12,4
+           Q14,0 26,0
+           Q36,2 35,10
+           Q32,6 24,5
+           Q16,4 12,8
            Z"
         fill={DF.hair}
         stroke={DF.beardDark}
         strokeWidth="0.3"
       />
-      {/* Hair sides */}
-      <path d="M13,12 Q12,14 13,18" fill="none" stroke={DF.hair} strokeWidth="3" strokeLinecap="round" />
-      <path d="M37,12 Q38,14 37,18" fill="none" stroke={DF.hair} strokeWidth="3" strokeLinecap="round" />
+      {/* Hair back */}
+      <path d="M10,8 Q8,12 10,18" fill="none" stroke={DF.hair} strokeWidth="4" strokeLinecap="round" />
 
-      {/* BEARD - prominent, key Alexander identifier */}
+      {/* BEARD - side profile */}
       <path
-        d="M16,22
-           Q14,26 16,30
-           Q20,34 25,35
-           Q30,34 34,30
-           Q36,26 34,22
-           Q30,24 25,24
-           Q20,24 16,22
+        d="M18,22
+           Q14,24 14,28
+           Q16,34 24,36
+           Q30,34 32,28
+           Q32,24 28,22
+           Q24,23 18,22
            Z"
         fill={DF.beard}
         stroke={DF.beardDark}
         strokeWidth="0.3"
       />
-      {/* Beard texture lines */}
+      {/* Beard texture */}
       <path
-        d="M18,26 Q20,30 22,32
-           M25,25 L25,33
-           M32,26 Q30,30 28,32"
+        d="M18,26 Q20,30 22,34
+           M26,24 L26,32"
         fill="none"
         stroke={DF.beardDark}
         strokeWidth="0.5"
         opacity="0.6"
       />
 
-      {/* EYES - void-like with subtle ethereal glow (HK style: one glowing accent) */}
-      <ellipse cx="20" cy="16" rx="3" ry="4" fill={DF.voidDeep} />
-      <ellipse cx="30" cy="16" rx="3" ry="4" fill={DF.voidDeep} />
-      {/* Ethereal eye glow - the "one glowing accent" HK OCs need */}
-      <ellipse cx="20" cy="16" rx="2" ry="2.5" fill={DF.ethereal} opacity="0.15" />
-      <ellipse cx="30" cy="16" rx="2" ry="2.5" fill={DF.ethereal} opacity="0.15" />
-      {/* Tiny bright core */}
-      <ellipse cx="20" cy="15" rx="0.8" ry="1" fill={DF.ethereal} opacity="0.4" />
-      <ellipse cx="30" cy="15" rx="0.8" ry="1" fill={DF.ethereal} opacity="0.4" />
+      {/* EYE - single visible eye (side view) with ethereal glow */}
+      <ellipse cx="28" cy="14" rx="4" ry="5" fill={DF.voidDeep} />
+      {/* Ethereal eye glow */}
+      <ellipse cx="28" cy="14" rx="2.5" ry="3" fill={DF.ethereal} opacity="0.2" />
+      {/* Bright core */}
+      <ellipse cx="29" cy="13" rx="1.2" ry="1.5" fill={DF.ethereal} opacity="0.5" />
+
+      {/* Nose hint */}
+      <path d="M34,16 Q36,18 34,20" fill="none" stroke={DF.skinShade} strokeWidth="0.8" opacity="0.4" />
 
       {/* NAIL (SWORD) - HK style weapon */}
       <g

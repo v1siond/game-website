@@ -441,9 +441,9 @@ export const BattleReveal = memo(function BattleReveal({
               </div>
             )}
 
-            {/* Death Particles - centered on bug */}
+            {/* Death Particles - dead center on bug */}
             {showDeathParticles && (
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none">
+              <div className="absolute left-1/2 top-1/2 z-30 pointer-events-none">
                 <DeathParticles />
               </div>
             )}
@@ -451,14 +451,14 @@ export const BattleReveal = memo(function BattleReveal({
             {isBugDead ? (
               <>
                 <DeadBugCreature size={120} />
-                {/* Blood Pool - inside dead bug, counter-rotated, offset left */}
+                {/* Blood Pool - aligned horizontally with bug, offset left */}
                 {showBloodPool && (
                   <div
                     className="absolute z-5 pointer-events-none"
                     style={{
                       left: '50%',
-                      top: '100%',
-                      transform: 'rotate(180deg) translateX(40px) translateY(-20px)',
+                      top: '50%',
+                      transform: 'rotate(180deg) translateX(-80px) translateY(0)',
                     }}
                   >
                     <BloodPool />
@@ -620,11 +620,13 @@ export const BattleBug = memo(function BattleBug({
   )
 })
 
-// Dead Bug - SIMPLE Hollow Knight style, flipped
+// Dead Bug - SIMPLE Hollow Knight style, flipped, SATURATED colors
 const DeadBugCreature = memo(function DeadBugCreature({ size = 100 }: { size?: number }) {
-  const shell = '#2a2040'
-  const shellDark = '#1a1525'
-  const infected = '#ff6b35'
+  // More saturated colors to match live bug
+  const shell = '#352850'
+  const shellDark = '#201530'
+  const infected = '#ff5500'
+  const infectedGlow = '#ff7722'
 
   return (
     <svg
@@ -632,9 +634,9 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 100 }: { size?: n
       height={size * 0.7}
       viewBox="0 0 80 56"
       style={{
-        opacity: 0.7,
+        opacity: 0.8,
         transform: 'rotate(180deg)',
-        filter: `drop-shadow(0 0 6px ${infected}30)`
+        filter: `drop-shadow(0 0 10px ${infectedGlow}50) drop-shadow(0 0 4px ${infected}60)`
       }}
     >
       <defs>
