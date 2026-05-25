@@ -38,6 +38,7 @@ interface KnightCharacterProps {
   attackPhase?: number
   facingDirection?: 'left' | 'right'
   className?: string
+  breathing?: boolean
 }
 
 export const KnightCharacter = memo(function KnightCharacter({
@@ -47,6 +48,7 @@ export const KnightCharacter = memo(function KnightCharacter({
   attackPhase = 0,
   facingDirection = 'right',
   className = '',
+  breathing = false,
 }: KnightCharacterProps) {
   const effectiveScale = size ? size / 60 : scale
   const isLeft = facingDirection === 'left'
@@ -75,41 +77,48 @@ export const KnightCharacter = memo(function KnightCharacter({
       {/* === KNIGHT - 3/4 VIEW FACING RIGHT === */}
       {/* Based on reference image proportions */}
 
-      {/* CLOAK/BODY - small, below head */}
-      <path
-        d="M18,48
-           C14,52 12,60 14,70
-           L18,74
-           L42,74
-           L46,70
-           C48,60 46,52 42,48
-           Z"
-        fill={DF.cloak}
-        stroke={DF.void}
-        strokeWidth="1.5"
-      />
-      {/* Cloak detail - center fold */}
-      <path
-        d="M30,50 L30,72"
-        stroke={DF.cloakDark}
-        strokeWidth="2"
-        opacity="0.5"
-      />
-      {/* Cloak side folds */}
-      <path
-        d="M22,52 C20,58 20,66 22,72"
-        stroke={DF.cloakDark}
-        strokeWidth="1"
-        fill="none"
-        opacity="0.3"
-      />
-      <path
-        d="M38,52 C40,58 40,66 38,72"
-        stroke={DF.cloakDark}
-        strokeWidth="1"
-        fill="none"
-        opacity="0.3"
-      />
+      {/* CLOAK/BODY - small, below head - breathing animation applied here only */}
+      <g
+        style={{
+          transformOrigin: '30px 60px',
+          animation: breathing ? 'cloakBreathing 3s ease-in-out infinite' : undefined,
+        }}
+      >
+        <path
+          d="M18,48
+             C14,52 12,60 14,70
+             L18,74
+             L42,74
+             L46,70
+             C48,60 46,52 42,48
+             Z"
+          fill={DF.cloak}
+          stroke={DF.void}
+          strokeWidth="1.5"
+        />
+        {/* Cloak detail - center fold */}
+        <path
+          d="M30,50 L30,72"
+          stroke={DF.cloakDark}
+          strokeWidth="2"
+          opacity="0.5"
+        />
+        {/* Cloak side folds */}
+        <path
+          d="M22,52 C20,58 20,66 22,72"
+          stroke={DF.cloakDark}
+          strokeWidth="1"
+          fill="none"
+          opacity="0.3"
+        />
+        <path
+          d="M38,52 C40,58 40,66 38,72"
+          stroke={DF.cloakDark}
+          strokeWidth="1"
+          fill="none"
+          opacity="0.3"
+        />
+      </g>
 
       {/* MASK/HEAD - large rounded egg shape */}
       <ellipse
@@ -248,11 +257,11 @@ interface KnightSlashRevealProps {
 type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'content-reveal' | 'complete'
 
 const PHASE_TIMING = {
-  'knight-enter': 0,
-  'knight-raise': 200,
-  'slash': 350,
-  'content-reveal': 450,
-  'complete': 800,
+  'knight-enter': 500,      // 0.5s delay before animation starts
+  'knight-raise': 700,
+  'slash': 850,
+  'content-reveal': 950,
+  'complete': 1300,
 }
 
 export const KnightSlashReveal = memo(function KnightSlashReveal({
@@ -278,10 +287,11 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
 
     // Mark as animated so we don't replay
     hasAnimated.current = true
-    setPhase('knight-enter')
 
     const timers: NodeJS.Timeout[] = []
 
+    // 0.5s delay before animation starts
+    timers.push(setTimeout(() => setPhase('knight-enter'), PHASE_TIMING['knight-enter']))
     timers.push(setTimeout(() => setPhase('knight-raise'), PHASE_TIMING['knight-raise']))
 
     timers.push(setTimeout(() => {
@@ -318,14 +328,13 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       case 'slash':
         return { transform: 'translateX(-25px)', opacity: 1, transition: 'all 100ms ease-out' }
       case 'content-reveal':
-        return { transform: 'translateX(-40px)', opacity: 0.7, transition: 'all 250ms ease-out' }
+        return { transform: 'translateX(-70px)', opacity: 0.75, transition: 'all 250ms ease-out' }
       case 'complete':
-        // Knight rests more to the left, breathing animation
+        // Knight rests closer to content (more to the left)
         return {
-          transform: 'translateX(-50px)',
-          opacity: 0.6,
+          transform: 'translateX(-90px)',
+          opacity: 0.7,
           transition: 'all 300ms ease-out',
-          animation: 'knightBreathing 3s ease-in-out infinite',
         }
       default:
         return { transform: 'translateX(120px)', opacity: 0 }
@@ -378,6 +387,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
             attacking={isAttacking}
             attackPhase={attackPhase}
             facingDirection="left"
+            breathing={phase === 'complete'}
           />
         </div>
       )}
@@ -388,9 +398,9 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           50% { opacity: 1; }
           100% { opacity: 0; transform: translateX(100%); }
         }
-        @keyframes knightBreathing {
-          0%, 100% { transform: translateX(-50px) translateY(0) scale(1); }
-          50% { transform: translateX(-50px) translateY(-3px) scale(1.02); }
+        @keyframes cloakBreathing {
+          0%, 100% { transform: scaleY(1) scaleX(1); }
+          50% { transform: scaleY(1.04) scaleX(1.02); }
         }
       `}</style>
     </div>

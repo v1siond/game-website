@@ -285,20 +285,19 @@ export const BugPullReveal = memo(function BugPullReveal({
           transition: 'all 250ms cubic-bezier(0.34, 1.56, 0.64, 1)'
         }
       case 'attack-stance':
-        // Alex ready on left
+        // Alex ready on left, closer to content
         return {
-          left: '5%',
+          left: '10%',
           transform: 'translateX(0)',
           opacity: 1,
           transition: 'all 200ms ease-out'
         }
       case 'complete':
-        // Alex breathing animation on left
+        // Alex on left, closer to content
         return {
-          left: '5%',
+          left: '10%',
           transform: 'translateX(0)',
           opacity: 1,
-          animation: 'knightBreathing 2s ease-in-out infinite'
         }
       default:
         return { left: '45%', transform: 'translateX(-50%)', opacity: 0 }
@@ -337,20 +336,20 @@ export const BugPullReveal = memo(function BugPullReveal({
           transition: 'all 200ms ease-out'
         }
       case 'attack-stance':
-        // Bug floats UP into attack position
+        // Bug floats UP HIGH into attack position, closer to content
         return {
-          right: '5%',
+          right: '8%',
           opacity: 1,
-          transform: 'translateY(-40px)',
+          transform: 'translateY(-70px)',
           transition: 'all 400ms ease-out',
           animation: 'bugFloat 1.5s ease-in-out infinite'
         }
       case 'complete':
-        // Bug continues floating menacingly
+        // Bug continues floating HIGH and menacingly
         return {
-          right: '5%',
+          right: '8%',
           opacity: 1,
-          transform: 'translateY(-40px)',
+          transform: 'translateY(-70px)',
           animation: 'bugFloat 1.5s ease-in-out infinite'
         }
       default:
@@ -406,7 +405,7 @@ export const BugPullReveal = memo(function BugPullReveal({
           className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
           style={{ ...getAlexStyle(), position: 'absolute' }}
         >
-          <KnightCharacter scale={1.5} facingDirection="right" />
+          <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
         </div>
       )}
 
@@ -451,16 +450,16 @@ export const BugPullReveal = memo(function BugPullReveal({
 
       <style>{`
         @keyframes bugFloat {
-          0%, 100% { transform: translateY(-40px); }
-          50% { transform: translateY(-55px); }
+          0%, 100% { transform: translateY(-70px); }
+          50% { transform: translateY(-85px); }
         }
         @keyframes knightBreathing {
           0%, 100% { transform: translateY(0) scale(1); }
           50% { transform: translateY(-3px) scale(1.02); }
         }
         @keyframes shadowPulse {
-          0%, 100% { transform: translateY(60px) scale(1); opacity: 0.5; }
-          50% { transform: translateY(70px) scale(1.1); opacity: 0.3; }
+          0%, 100% { transform: translateY(90px) scale(1); opacity: 0.5; }
+          50% { transform: translateY(100px) scale(1.1); opacity: 0.3; }
         }
       `}</style>
     </div>

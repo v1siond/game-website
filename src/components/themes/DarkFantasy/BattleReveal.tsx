@@ -217,15 +217,14 @@ export const BattleReveal = memo(function BattleReveal({
           transition: 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1)'
         }
       case 'complete':
-        // Knight stays in victory stance with breathing animation
+        // Knight stays closer to content, breathing handled by cloak
         return {
-          transform: 'translateX(80px)',
+          transform: 'translateX(140px)',
           opacity: 1,
-          animation: 'knightVictoryBreathing 2.5s ease-in-out infinite'
         }
       default:
         return {
-          transform: 'translateX(80px)',
+          transform: 'translateX(140px)',
           opacity: 1,
           transition: 'transform 200ms ease-out'
         }
@@ -386,6 +385,7 @@ export const BattleReveal = memo(function BattleReveal({
                 attacking={isAttacking}
                 attackPhase={attackPhase}
                 facingDirection="right"
+                breathing={phase === 'complete'}
               />
             </div>
           </div>
