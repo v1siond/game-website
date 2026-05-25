@@ -15,6 +15,25 @@ import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
+// Check for reduced motion preference
+function usePrefersReducedMotion() {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches)
+    }
+
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
+  return prefersReducedMotion
+}
+
 // Phantom Thief Alexander - stylish masked figure
 function PhantomThiefCharacter({
   size = 60,
@@ -471,15 +490,17 @@ function AllOutAttackSplash({ children, featured = false }: { children: React.Re
   )
 }
 
-// Persona-style character portrait
+// Persona-style character portrait with Tarot card motif
 function CharacterCard({
   profession,
   isActive,
   onClick,
+  prefersReducedMotion = false,
 }: {
   profession: 'engineer' | 'drummer' | 'fighter'
   isActive: boolean
   onClick: () => void
+  prefersReducedMotion?: boolean
 }) {
   const icons = { engineer: '💻', drummer: '🥁', fighter: '🥋' }
   const titles = { engineer: 'THE ENGINEER', drummer: 'THE MUSICIAN', fighter: 'THE FIGHTER' }
@@ -488,14 +509,18 @@ function CharacterCard({
   return (
     <button
       onClick={onClick}
-      className={`relative group transition-all duration-300 ${
+      className={`relative group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black ${
         isActive ? 'scale-105 z-10' : 'opacity-60 hover:opacity-100'
       }`}
       style={{
-        transform: `skewX(-5deg) ${isActive ? 'scale(1.05)' : ''}`,
+        transform: prefersReducedMotion
+          ? isActive ? 'scale(1.05)' : 'none'
+          : `skewX(-5deg) ${isActive ? 'scale(1.05)' : ''}`,
       }}
+      aria-pressed={isActive}
+      aria-label={`Select ${titles[profession]} persona - ${arcanas[profession]}`}
     >
-      {/* Card background */}
+      {/* Card background with Tarot styling */}
       <div
         className="p-6 relative overflow-hidden"
         style={{
@@ -505,17 +530,37 @@ function CharacterCard({
           border: `3px solid ${isActive ? '#ff0033' : '#333'}`,
         }}
       >
-        {/* Diagonal stripes */}
+        {/* Diagonal stripes - Persona 5 pattern */}
         <div
           className="absolute inset-0 opacity-20"
           style={{
             background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #000 10px, #000 20px)',
           }}
+          aria-hidden="true"
         />
 
+        {/* Corner Tarot decorations */}
+        <div
+          className="absolute top-1 left-1 text-[8px] font-bold"
+          style={{ color: isActive ? '#000' : '#ff003380' }}
+          aria-hidden="true"
+        >
+          {arcanas[profession].split(' - ')[0]}
+        </div>
+        <div
+          className="absolute bottom-1 right-1 text-[8px] font-bold rotate-180"
+          style={{ color: isActive ? '#000' : '#ff003380' }}
+          aria-hidden="true"
+        >
+          {arcanas[profession].split(' - ')[0]}
+        </div>
+
         {/* Content - counter-skew */}
-        <div className="relative z-10" style={{ transform: 'skewX(5deg)' }}>
-          <span className="text-5xl block mb-3">{icons[profession]}</span>
+        <div
+          className="relative z-10"
+          style={{ transform: prefersReducedMotion ? 'none' : 'skewX(5deg)' }}
+        >
+          <span className="text-5xl block mb-3" aria-hidden="true">{icons[profession]}</span>
           <span
             className="text-lg font-black tracking-wider block"
             style={{ color: isActive ? '#000' : '#fff' }}
@@ -531,8 +576,8 @@ function CharacterCard({
         </div>
 
         {/* Selection indicator */}
-        {isActive && (
-          <div className="absolute -right-2 top-1/2 -translate-y-1/2">
+        {isActive && !prefersReducedMotion && (
+          <div className="absolute -right-2 top-1/2 -translate-y-1/2" aria-hidden="true">
             <span className="text-2xl animate-pulse">◀</span>
           </div>
         )}
@@ -541,26 +586,41 @@ function CharacterCard({
   )
 }
 
-// Role card with stylish display
-function RoleCard({ role }: { role: typeof CURRENT_ROLES[0] }) {
+// Role card with stylish display - Persona 5 menu item style
+function RoleCard({
+  role,
+  prefersReducedMotion = false,
+}: {
+  role: typeof CURRENT_ROLES[0]
+  prefersReducedMotion?: boolean
+}) {
   return (
-    <div
+    <article
       className="px-4 py-2 relative overflow-hidden group"
       style={{
         background: 'linear-gradient(90deg, rgba(255,0,51,0.1), transparent)',
         borderLeft: '3px solid #ff0033',
-        transform: 'skewX(-3deg)',
+        transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
       }}
+      aria-label={`${role.title} at ${role.company}`}
     >
-      <div style={{ transform: 'skewX(3deg)' }}>
-        <span className="text-xs tracking-wider" style={{ color: '#ff0033' }}>
+      {/* Hover slash effect */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+        style={{
+          background: 'linear-gradient(90deg, transparent, rgba(255,0,51,0.05), transparent)',
+        }}
+        aria-hidden="true"
+      />
+      <div style={{ transform: prefersReducedMotion ? 'none' : 'skewX(3deg)' }}>
+        <span className="text-xs tracking-wider font-medium" style={{ color: '#ff0033' }}>
           {role.title}
         </span>
         <span className="text-sm font-bold block" style={{ color: '#fff' }}>
           {role.company}
         </span>
       </div>
-    </div>
+    </article>
   )
 }
 
@@ -611,34 +671,100 @@ function TechStackDisplay({ categories }: { categories: ReturnType<typeof getEng
   )
 }
 
-// Skill burst effect (for drummer/fighter)
-function SkillBurst({ name, level }: { name: string; level: number }) {
+// Skill display with achievement/impact statements instead of bars
+// Persona 5 cut-in style skill card
+function SkillCutIn({
+  name,
+  achievement,
+  index = 0,
+}: {
+  name: string
+  achievement?: string
+  index?: number
+}) {
+  const [revealed, setRevealed] = useState(false)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setRevealed(true), 100 + index * 80)
+    return () => clearTimeout(timeout)
+  }, [index])
+
   return (
     <div
-      className="relative px-4 py-2 group cursor-pointer"
+      className={`relative overflow-hidden group transition-all duration-300 ${
+        revealed ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
+      }`}
       style={{
-        background: 'linear-gradient(90deg, #ff003330, transparent)',
-        clipPath: 'polygon(0 0, 100% 0, 95% 100%, 5% 100%)',
+        background: 'linear-gradient(90deg, #ff003320, transparent 80%)',
+        borderLeft: '3px solid #ff0033',
+        transform: 'skewX(-3deg)',
       }}
+      role="listitem"
+      aria-label={`${name}${achievement ? `: ${achievement}` : ''}`}
     >
-      <div className="flex items-center gap-3">
-        <span className="text-xs" style={{ color: '#ff0033' }}>
+      {/* Slash accent on hover */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+        style={{
+          background: 'linear-gradient(135deg, transparent 40%, rgba(255,0,51,0.1) 50%, transparent 60%)',
+        }}
+      />
+
+      <div className="px-4 py-2" style={{ transform: 'skewX(3deg)' }}>
+        <span
+          className="text-sm font-bold tracking-wider block"
+          style={{ color: '#ff0033' }}
+        >
           {name}
         </span>
-        <div className="flex gap-1">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <div
-              key={i}
-              className="w-3 h-3 rotate-45"
-              style={{
-                background: i < level ? '#ff0033' : '#330011',
-              }}
-            />
-          ))}
-        </div>
+        {achievement && (
+          <span className="text-xs block mt-0.5" style={{ color: '#999' }}>
+            {achievement}
+          </span>
+        )}
       </div>
+
+      {/* Red accent slash */}
+      <div
+        className="absolute top-0 right-0 w-8 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+        style={{
+          background: 'linear-gradient(135deg, transparent 50%, #ff003340 50%)',
+        }}
+      />
     </div>
   )
+}
+
+// Drummer/Fighter skills with impact statements
+const SKILL_ACHIEVEMENTS: Record<string, string> = {
+  // Drummer
+  'Rock/Metal': 'National tours, 30+ cities',
+  'Progressive': 'Complex time signatures mastery',
+  'Latin/Salsa': 'Authentic clave patterns',
+  'Jazz Fusion': 'Improvisational freedom',
+  'Funk/Soul': 'Deep pocket grooves',
+  'Double Bass': 'Clean 200+ BPM patterns',
+  'Polyrhythms': '5 over 4, 7 over 4 fluency',
+  'Odd Time Signatures': '7/8, 11/8, mixed meters',
+  'Ghost Notes': 'Subtle dynamics control',
+  'Linear Drumming': 'Single-surface flow',
+  'Studio Recording': 'Multiple album credits',
+  'Live Touring': '100+ shows performed',
+  'Session Work': 'Multiple genre adaptability',
+  'Music Production': 'Drum programming, mixing',
+  // Fighter
+  'Muay Thai (3 years)': 'Traditional clinch & elbow work',
+  'Brazilian Jiu-Jitsu (2 years)': 'Guard specialist',
+  'MMA (1 year)': 'Striking-to-grappling transitions',
+  'Wrestling': 'Takedown defense focus',
+  'Striking': 'Boxing, kicks, knees, elbows',
+  'Clinch Work': 'Thai plum, dirty boxing',
+  'Ground Game': 'Sweeps and positional control',
+  'Submissions': 'Chokes and joint locks',
+  'Fundamentals Instruction': 'Teaching 3 classes/week',
+  'Competition Prep': '20+ students to competition',
+  'Self Defense': 'Real-world scenario focus',
+  'Private Coaching': 'Personalized training plans',
 }
 
 // Company card with Persona flair
@@ -892,53 +1018,67 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
   )
 }
 
-// Dramatic TAKE YOUR TIME
-function TakeYourTime() {
-  const [phase, setPhase] = useState(0)
+// Dramatic TAKE YOUR TIME - iconic Persona 5 loading screen text
+function TakeYourTime({ prefersReducedMotion = false }: { prefersReducedMotion?: boolean }) {
+  const [phase, setPhase] = useState(prefersReducedMotion ? 3 : 0)
 
   useEffect(() => {
+    if (prefersReducedMotion) return
+
     const timers = [
       setTimeout(() => setPhase(1), 500),
       setTimeout(() => setPhase(2), 1000),
       setTimeout(() => setPhase(3), 1500),
     ]
     return () => timers.forEach(clearTimeout)
-  }, [])
+  }, [prefersReducedMotion])
 
   return (
-    <div className="relative h-32 flex items-center justify-center overflow-hidden">
-      {/* Background splash */}
+    <div
+      className="relative h-32 flex items-center justify-center overflow-hidden"
+      role="banner"
+      aria-label="Take Your Time - Persona 5 style welcome message"
+    >
+      {/* Background splash with paint splatter effect */}
       <div
         className={`absolute inset-0 transition-all duration-500 ${phase >= 1 ? 'opacity-100' : 'opacity-0'}`}
         style={{
-          background: 'radial-gradient(ellipse at center, rgba(255,0,51,0.2) 0%, transparent 70%)',
+          background: `radial-gradient(ellipse at center, rgba(255,0,51,0.2) 0%, transparent 70%),
+                       radial-gradient(circle at 20% 60%, rgba(255,0,51,0.15) 0%, transparent 30%),
+                       radial-gradient(circle at 80% 40%, rgba(255,0,51,0.1) 0%, transparent 25%)`,
         }}
+        aria-hidden="true"
       />
 
-      {/* Speed lines */}
-      <div className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${phase >= 2 ? 'opacity-30' : 'opacity-0'}`}>
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute h-0.5 animate-speed-line"
-            style={{
-              top: `${5 + i * 8}%`,
-              left: '-100%',
-              right: '-100%',
-              background: 'linear-gradient(90deg, transparent, #ff0033, transparent)',
-              animationDelay: `${i * 0.1}s`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Speed lines - manga action effect */}
+      {!prefersReducedMotion && (
+        <div
+          className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${phase >= 2 ? 'opacity-30' : 'opacity-0'}`}
+          aria-hidden="true"
+        >
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute h-0.5 animate-speed-line"
+              style={{
+                top: `${5 + i * 8}%`,
+                left: '-100%',
+                right: '-100%',
+                background: 'linear-gradient(90deg, transparent, #ff0033, transparent)',
+                animationDelay: `${i * 0.1}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
-      {/* Main text */}
+      {/* Main text - ALL CAPS bold Persona style */}
       <div
         className={`relative transition-all duration-700 ${phase >= 3 ? 'opacity-100 scale-100' : 'opacity-0 scale-150'}`}
-        style={{ transform: 'skewX(-5deg)' }}
+        style={{ transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)' }}
       >
         <span
-          className="text-6xl md:text-7xl font-black tracking-widest animate-pulse"
+          className={`text-5xl sm:text-6xl md:text-7xl font-black tracking-widest ${prefersReducedMotion ? '' : 'animate-pulse'}`}
           style={{
             color: '#ff0033',
             textShadow: '4px 4px 0 #000, 8px 8px 0 #330011, -2px -2px 0 #ff003380',
@@ -948,25 +1088,40 @@ function TakeYourTime() {
           TAKE YOUR TIME
         </span>
 
-        {/* Underline accent */}
+        {/* Brush stroke underline */}
         <div
           className="absolute -bottom-2 left-1/4 right-1/4 h-1"
           style={{
             background: 'linear-gradient(90deg, transparent, #ff0033, transparent)',
           }}
+          aria-hidden="true"
+        />
+
+        {/* Ink splatter accents */}
+        <div
+          className="absolute -top-4 -left-8 w-6 h-6 rounded-full opacity-40"
+          style={{ background: '#ff0033', filter: 'blur(3px)' }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute -bottom-4 -right-6 w-4 h-4 rounded-full opacity-30"
+          style={{ background: '#ff0033', filter: 'blur(2px)' }}
+          aria-hidden="true"
         />
       </div>
 
-      {/* Card suits decoration */}
+      {/* Card suits decoration - Persona 5 motif */}
       <span
         className={`absolute left-4 top-1/2 -translate-y-1/2 text-4xl transition-all duration-500 ${phase >= 2 ? 'opacity-30' : 'opacity-0'}`}
         style={{ color: '#ff0033' }}
+        aria-hidden="true"
       >
         ♠
       </span>
       <span
         className={`absolute right-4 top-1/2 -translate-y-1/2 text-4xl transition-all duration-500 ${phase >= 2 ? 'opacity-30' : 'opacity-0'}`}
         style={{ color: '#ff0033' }}
+        aria-hidden="true"
       >
         ♥
       </span>
@@ -978,6 +1133,7 @@ export default function BoldNoirTheme() {
   const { theme } = useTheme()
   const { active, setActive, config } = useProfession()
   const [mounted, setMounted] = useState(false)
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   const aboutData = ABOUT_DATA[active]
   const engineerTech = getEngineerSkills()
@@ -998,16 +1154,22 @@ export default function BoldNoirTheme() {
         background: '#0a0a0a',
         fontFamily: '"Bebas Neue", "Impact", sans-serif',
       }}
+      role="main"
+      aria-label="Alexander Pulido Portfolio - Persona 5 Theme"
     >
-      {/* Background layers */}
-      <DiagonalLines />
-      <FloatingMasks />
+      {/* Background layers - disabled when user prefers reduced motion */}
+      {!prefersReducedMotion && (
+        <>
+          <DiagonalLines />
+          <FloatingMasks />
+          <StylishOrnaments profession={active} />
+        </>
+      )}
       <CardSuits />
-      <StylishOrnaments profession={active} />
       <HalftoneOverlay />
       <PaintStroke position="top" />
       <PaintStroke position="right" />
-      <BreakingChains />
+      {!prefersReducedMotion && <BreakingChains />}
 
       {/* Red corner accent */}
       <div
@@ -1018,59 +1180,91 @@ export default function BoldNoirTheme() {
       />
 
       {/* Header */}
-      <header className="relative z-30 p-6">
+      <header className="relative z-30 p-6" role="banner">
         <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div style={{ transform: 'skewX(-3deg)' }}>
-            <h1
-              className="text-4xl font-black tracking-wider"
-              style={{
-                color: '#ff0033',
-                textShadow: '3px 3px 0 #000, 6px 6px 0 #330011',
-              }}
+          <div style={{ transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)' }}>
+            {/* Persona 5 style name with paint splatter accent */}
+            <div className="relative inline-block">
+              <h1
+                className="text-4xl md:text-5xl font-black tracking-wider relative z-10"
+                style={{
+                  color: '#ff0033',
+                  textShadow: '3px 3px 0 #000, 6px 6px 0 #330011',
+                }}
+              >
+                ALEXANDER PULIDO
+              </h1>
+              {/* Paint splatter decoration behind name */}
+              <div
+                className="absolute -inset-4 -z-10 opacity-20"
+                style={{
+                  background: `radial-gradient(ellipse at 20% 50%, #ff0033 0%, transparent 50%),
+                               radial-gradient(ellipse at 80% 30%, #ff0033 0%, transparent 40%)`,
+                }}
+                aria-hidden="true"
+              />
+            </div>
+            <p
+              className="text-sm md:text-base tracking-wider mt-2 font-medium"
+              style={{ color: '#ccc' }}
             >
-              ALEXANDER PULIDO
-            </h1>
-            <p className="text-sm tracking-wider mt-2" style={{ color: '#ccc' }}>
               {PROFESSIONAL_SUMMARY.headline}
             </p>
-            <p className="text-xs tracking-wider mt-1 italic" style={{ color: '#ff0033' }}>
+            <p
+              className="text-xs md:text-sm tracking-wider mt-1 italic"
+              style={{ color: '#ff0033' }}
+            >
               {PROFESSIONAL_SUMMARY.tagline}
             </p>
           </div>
 
-          <div className="flex gap-3 items-center" style={{ transform: 'skewX(-3deg)' }}>
+          <nav
+            className="flex gap-3 items-center"
+            style={{ transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)' }}
+            aria-label="Main navigation"
+          >
             <Link
               href="/cv"
-              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:bg-red-900/20"
+              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black"
               style={{
                 background: 'transparent',
                 border: '3px solid #ff0033',
                 color: '#ff0033',
               }}
+              aria-label="View full profile and CV"
             >
               PROFILE
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105"
+              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black"
               style={{
                 background: '#ff0033',
                 color: '#000',
               }}
+              aria-label="Play the game engine demo"
             >
               PLAY
             </Link>
             <ThemeSwitcher />
-          </div>
+          </nav>
         </div>
       </header>
 
-      {/* Current Roles */}
-      <section className="relative z-20 py-4 px-6">
+      {/* Current Roles - Persona 5 status display */}
+      <section
+        className="relative z-20 py-4 px-6"
+        aria-label="Current professional roles"
+      >
         <div className="max-w-6xl mx-auto">
+          <h2 className="sr-only">Current Roles</h2>
           <div className="flex flex-wrap justify-center gap-6">
             {CURRENT_ROLES.map((role) => (
-              <RoleCard key={role.id} role={role} />
+              <RoleCard
+                key={role.id}
+                role={role}
+                prefersReducedMotion={prefersReducedMotion}
+              />
             ))}
           </div>
         </div>
@@ -1079,171 +1273,239 @@ export default function BoldNoirTheme() {
       {/* Main content */}
       <main className="relative z-20 px-6 py-8">
         <div className="max-w-6xl mx-auto">
-          {/* Take Your Time message */}
-          <TakeYourTime />
+          {/* Take Your Time message - iconic Persona 5 loading screen */}
+          <TakeYourTime prefersReducedMotion={prefersReducedMotion} />
 
-          {/* Character selection */}
-          <section className="mb-12 mt-8">
-            <div className="flex justify-center gap-6">
+          {/* Character selection - Persona 5 party member selection */}
+          <section
+            className="mb-12 mt-8"
+            aria-label="Select profession persona"
+            role="group"
+          >
+            <h2 className="sr-only">Choose Your Persona</h2>
+            <div className="flex justify-center gap-6 flex-wrap">
               {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
                 <CharacterCard
                   key={prof}
                   profession={prof}
                   isActive={active === prof}
                   onClick={() => setActive(prof)}
+                  prefersReducedMotion={prefersReducedMotion}
                 />
               ))}
             </div>
           </section>
 
           {/* About section */}
-          <SkewedPanel color="#ff0033" direction="right" delay={200}>
-            <h2 className="text-xl font-black mb-3" style={{ color: '#ff0033' }}>
-              ABOUT
-            </h2>
-            <p className="text-sm leading-relaxed" style={{ color: '#ccc' }}>
-              {aboutData.bio}
-            </p>
-            <div className="flex flex-wrap gap-2 mt-4">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="text-[10px] px-3 py-1 font-bold"
-                  style={{
-                    background: '#ff003320',
-                    border: '1px solid #ff0033',
-                    color: '#ff0033',
-                    transform: 'skewX(-5deg)',
-                  }}
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </SkewedPanel>
+          <section aria-labelledby="about-heading">
+            <SkewedPanel color="#ff0033" direction="right" delay={200}>
+              <h2
+                id="about-heading"
+                className="text-xl font-black mb-3"
+                style={{ color: '#ff0033' }}
+              >
+                ABOUT
+              </h2>
+              <p className="text-sm leading-relaxed" style={{ color: '#ccc' }}>
+                {aboutData.bio}
+              </p>
+              <ul
+                className="flex flex-wrap gap-2 mt-4"
+                aria-label="Quick facts"
+              >
+                {aboutData.quickFacts.map((fact, i) => (
+                  <li
+                    key={i}
+                    className="text-[10px] px-3 py-1 font-bold"
+                    style={{
+                      background: '#ff003320',
+                      border: '1px solid #ff0033',
+                      color: '#ff0033',
+                      transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)',
+                    }}
+                  >
+                    {fact}
+                  </li>
+                ))}
+              </ul>
+            </SkewedPanel>
+          </section>
 
           {/* Work Experience section */}
           {experience.length > 0 && (
-            <div className="mt-8">
+            <section className="mt-8" aria-labelledby="experience-heading">
               <SkewedPanel color="#ff0033" direction="left" delay={300}>
-                <h2 className="text-xl font-black mb-4" style={{ color: '#ff0033' }}>
+                <h2
+                  id="experience-heading"
+                  className="text-xl font-black mb-4"
+                  style={{ color: '#ff0033' }}
+                >
                   WORK EXPERIENCE
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-4" role="list">
                   {experience.map((entry) => (
                     <ExperienceCard key={entry.id} entry={entry} />
                   ))}
                 </div>
               </SkewedPanel>
-            </div>
+            </section>
           )}
 
           {/* Skills / Tech Stack section */}
           <div className="mt-8">
             {active === 'engineer' ? (
               <SkewedPanel color="#ff0033" direction="left" delay={400}>
-                <h2 className="text-xl font-black mb-4" style={{ color: '#ff0033' }}>
+                <h2
+                  id="tech-stack-heading"
+                  className="text-xl font-black mb-4"
+                  style={{ color: '#ff0033' }}
+                >
                   TECH STACK
                 </h2>
-                <TechStackDisplay categories={engineerTech} />
+                <div aria-labelledby="tech-stack-heading">
+                  <TechStackDisplay categories={engineerTech} />
+                </div>
               </SkewedPanel>
             ) : (
               <SkewedPanel color="#ff0033" direction="left" delay={400}>
-                <h2 className="text-xl font-black mb-4" style={{ color: '#ff0033' }}>
-                  SKILLS
+                <h2
+                  id="skills-heading"
+                  className="text-xl font-black mb-4"
+                  style={{ color: '#ff0033' }}
+                >
+                  {active === 'drummer' ? 'MUSICAL SKILLS' : 'COMBAT SKILLS'}
                 </h2>
-                {otherSkills.map((category) => (
-                  <div key={category.name} className="mb-4 last:mb-0">
-                    <h3 className="text-xs tracking-widest mb-2 flex items-center gap-2" style={{ color: '#666' }}>
-                      <span>{category.icon}</span>
-                      {category.name}
-                    </h3>
-                    <div className="space-y-1">
-                      {category.skills.map((skill) => (
-                        <SkillBurst key={skill.name} name={skill.name} level={skill.proficiency} />
-                      ))}
+                <div aria-labelledby="skills-heading">
+                  {otherSkills.map((category) => (
+                    <div key={category.name} className="mb-5 last:mb-0">
+                      <h3
+                        className="text-xs tracking-widest mb-3 flex items-center gap-2"
+                        style={{ color: '#ff0033' }}
+                      >
+                        <span aria-hidden="true">{category.icon}</span>
+                        <span className="font-bold">{category.name.toUpperCase()}</span>
+                        <div
+                          className="flex-1 h-px"
+                          style={{ background: 'linear-gradient(90deg, #ff003350, transparent)' }}
+                          aria-hidden="true"
+                        />
+                      </h3>
+                      <div className="space-y-2" role="list">
+                        {category.skills.map((skill, idx) => (
+                          <SkillCutIn
+                            key={skill.name}
+                            name={skill.name}
+                            achievement={SKILL_ACHIEVEMENTS[skill.name]}
+                            index={idx}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </SkewedPanel>
             )}
           </div>
 
           {/* Companies (Engineer) / Bands (Drummer) */}
           {active === 'engineer' && (
-            <section className="mt-8">
-              <div
+            <section className="mt-8" aria-labelledby="companies-heading">
+              <h2
+                id="companies-heading"
                 className="mb-4 text-xl font-black"
                 style={{
                   color: '#ff0033',
-                  transform: 'skewX(-3deg)',
+                  transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
                 }}
               >
                 COMPANIES
-              </div>
-              <div className="grid md:grid-cols-3 gap-4">
+              </h2>
+              <div className="grid md:grid-cols-3 gap-4" role="list">
                 {COMPANIES.map((company) => (
-                  <CompanyCard key={company.id} company={company} />
+                  <div key={company.id} role="listitem">
+                    <CompanyCard company={company} />
+                  </div>
                 ))}
               </div>
             </section>
           )}
 
           {active === 'drummer' && (
-            <section className="mt-8">
-              <div
+            <section className="mt-8" aria-labelledby="bands-heading">
+              <h2
+                id="bands-heading"
                 className="mb-4 text-xl font-black"
                 style={{
                   color: '#ff0033',
-                  transform: 'skewX(-3deg)',
+                  transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
                 }}
               >
                 BANDS
-              </div>
-              <div className="grid md:grid-cols-3 gap-4">
+              </h2>
+              <div className="grid md:grid-cols-3 gap-4" role="list">
                 {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
+                  <div key={band.id} role="listitem">
+                    <BandCard band={band} />
+                  </div>
                 ))}
               </div>
             </section>
           )}
 
           {/* Projects section */}
-          <section className="mt-8">
-            <div
+          <section className="mt-8" aria-labelledby="projects-heading">
+            <h2
+              id="projects-heading"
               className="mb-4 text-xl font-black"
               style={{
                 color: '#ff0033',
-                transform: 'skewX(-3deg)',
+                transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
               }}
             >
               PROJECTS
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
+            </h2>
+            <div className="grid md:grid-cols-2 gap-4" role="list">
               {projects.slice(0, 6).map((project, i) => (
-                <ProjectCard key={project.id} project={project} index={i} />
+                <div key={project.id} role="listitem">
+                  <ProjectCard project={project} index={i} />
+                </div>
               ))}
             </div>
           </section>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-20 py-8 text-center">
+      {/* Footer - Persona 5 style */}
+      <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <div className="flex items-center justify-center gap-4">
-          <span style={{ color: '#ff0033' }}>♠</span>
+          <span style={{ color: '#ff0033' }} aria-hidden="true">♠</span>
           <p
             className="text-xs tracking-widest"
-            style={{ color: '#333', transform: 'skewX(-3deg)' }}
+            style={{
+              color: '#666',
+              transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
+            }}
           >
-            THE PHANTOM THIEVES OF CODE • 2026
+            THE PHANTOM THIEVES OF CODE
+            <span aria-hidden="true"> • </span>
+            <time dateTime="2026">2026</time>
           </p>
-          <span style={{ color: '#ff0033' }}>♥</span>
+          <span style={{ color: '#ff0033' }} aria-hidden="true">♥</span>
         </div>
+
+        {/* Phantom mask silhouette accent */}
+        <div
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-48 h-12 opacity-5 pointer-events-none"
+          style={{
+            background: `radial-gradient(ellipse at center, #ff0033 0%, transparent 70%)`,
+          }}
+          aria-hidden="true"
+        />
       </footer>
 
-      {/* Animations */}
+      {/* Animations - Persona 5 gameplay style effects */}
       <style jsx global>{`
+        /* Diagonal sliding lines for background */
         @keyframes slide-diagonal {
           0% { transform: rotate(45deg) translateY(-100%); }
           100% { transform: rotate(45deg) translateY(100%); }
@@ -1251,10 +1513,14 @@ export default function BoldNoirTheme() {
         .animate-slide-diagonal {
           animation: slide-diagonal 3s linear infinite;
         }
+
+        /* Floating mask animation */
         @keyframes float-mask {
           0%, 100% { transform: rotate(var(--rotation, 0deg)) scale(var(--scale, 1)) translateY(0); }
           50% { transform: rotate(var(--rotation, 0deg)) scale(var(--scale, 1)) translateY(-10px); }
         }
+
+        /* Speed lines - manga action effect */
         @keyframes speed-line {
           0% { transform: translateX(-100%); opacity: 0; }
           50% { opacity: 1; }
@@ -1263,11 +1529,15 @@ export default function BoldNoirTheme() {
         .animate-speed-line {
           animation: speed-line 2s ease-in-out infinite;
         }
+
+        /* Floating text/ornament animation */
         @keyframes stylishFloat {
           0%, 100% { transform: rotate(var(--rotation, 0deg)) translateY(0) translateX(0); }
           25% { transform: rotate(var(--rotation, 0deg)) translateY(-12px) translateX(8px); }
           75% { transform: rotate(var(--rotation, 0deg)) translateY(-6px) translateX(-6px); }
         }
+
+        /* ALL OUT ATTACK flash effect */
         @keyframes attack-flash {
           0% { opacity: 0; transform: scale(0.5) skewX(-30deg); }
           30% { opacity: 1; transform: scale(1.1) skewX(-5deg); }
@@ -1275,6 +1545,54 @@ export default function BoldNoirTheme() {
           100% { opacity: 0; transform: scale(1.2) skewX(10deg); }
         }
         .animate-attack-flash { animation: attack-flash 0.8s ease-out forwards; }
+
+        /* Paint splatter pulse */
+        @keyframes splatter-pulse {
+          0%, 100% { opacity: 0.2; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.05); }
+        }
+
+        /* Cut-in slide animation */
+        @keyframes cut-in-slide {
+          0% { transform: translateX(-100%) skewX(-15deg); opacity: 0; }
+          50% { transform: translateX(5%) skewX(-5deg); opacity: 1; }
+          100% { transform: translateX(0) skewX(0deg); opacity: 1; }
+        }
+
+        /* Screen reader only class */
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border: 0;
+        }
+
+        /* Respect user's reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+          .animate-slide-diagonal,
+          .animate-speed-line,
+          .animate-attack-flash,
+          .animate-pulse {
+            animation: none !important;
+          }
+
+          * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
+
+        /* Focus styles for accessibility */
+        *:focus-visible {
+          outline: 2px solid #ff0033;
+          outline-offset: 2px;
+        }
       `}</style>
     </div>
   )

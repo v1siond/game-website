@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTheme } from '@/themes/ThemeContext'
@@ -13,14 +13,46 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { TECH_STACK } from '@/data/techStack'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
+
+// =============================================================================
+// ACCESSIBILITY HELPERS
+// =============================================================================
+function usePrefersReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
+  return prefersReducedMotion
+}
 
 // =============================================================================
 // GREEK KEY / MEANDER PATTERN
 // =============================================================================
-function GreekKeyBorder({ className = '', animated = true }: { className?: string; animated?: boolean }) {
+function GreekKeyBorder({
+  className = '',
+  animated = true,
+  reducedMotion = false
+}: {
+  className?: string
+  animated?: boolean
+  reducedMotion?: boolean
+}) {
+  const shouldAnimate = animated && !reducedMotion
   return (
-    <div className={`relative overflow-hidden ${className}`}>
+    <div
+      className={`relative overflow-hidden ${className}`}
+      role="presentation"
+      aria-hidden="true"
+    >
       <svg
         viewBox="0 0 200 20"
         className="w-full h-5"
@@ -36,7 +68,7 @@ function GreekKeyBorder({ className = '', animated = true }: { className?: strin
               strokeWidth="2"
             />
           </pattern>
-          {animated && (
+          {shouldAnimate && (
             <linearGradient id="keyGlow" x1="0%" y1="0%" x2="100%" y2="0%">
               <stop offset="0%" stopColor="#d4af37" stopOpacity="0.3">
                 <animate attributeName="offset" values="-1;1" dur="3s" repeatCount="indefinite" />
@@ -51,7 +83,7 @@ function GreekKeyBorder({ className = '', animated = true }: { className?: strin
           )}
         </defs>
         <rect x="0" y="0" width="100%" height="100%" fill="url(#greekKey)" />
-        {animated && <rect x="0" y="0" width="100%" height="100%" fill="url(#keyGlow)" opacity="0.5" />}
+        {shouldAnimate && <rect x="0" y="0" width="100%" height="100%" fill="url(#keyGlow)" opacity="0.5" />}
       </svg>
     </div>
   )
@@ -118,12 +150,20 @@ function LaurelWreath({ size = 'large' }: { size?: 'large' | 'small' }) {
 // =============================================================================
 // ANIMATED FLAMES
 // =============================================================================
-function AnimatedFlames({ side }: { side: 'left' | 'right' }) {
+function AnimatedFlames({
+  side,
+  reducedMotion = false
+}: {
+  side: 'left' | 'right'
+  reducedMotion?: boolean
+}) {
   return (
     <div
       className={`fixed top-0 bottom-0 w-20 pointer-events-none z-[4] ${
         side === 'left' ? 'left-0' : 'right-0'
       }`}
+      role="presentation"
+      aria-hidden="true"
     >
       {/* Multiple flame layers */}
       {[0, 1, 2, 3, 4].map((i) => (
@@ -143,8 +183,8 @@ function AnimatedFlames({ side }: { side: 'left' | 'right' }) {
               transparent 100%)`,
             borderRadius: '50% 50% 20% 20%',
             filter: 'blur(3px)',
-            animation: `flameFlicker ${0.5 + i * 0.1}s ease-in-out infinite alternate`,
-            animationDelay: `${i * 0.15}s`,
+            animation: reducedMotion ? 'none' : `flameFlicker ${0.5 + i * 0.1}s ease-in-out infinite alternate`,
+            animationDelay: reducedMotion ? '0s' : `${i * 0.15}s`,
             opacity: 0.7,
           }}
         />
@@ -160,7 +200,7 @@ function AnimatedFlames({ side }: { side: 'left' | 'right' }) {
           background: 'linear-gradient(to top, #fff 0%, #ffee88 50%, transparent 100%)',
           borderRadius: '50% 50% 20% 20%',
           filter: 'blur(2px)',
-          animation: 'flameCoreFlicker 0.3s ease-in-out infinite alternate',
+          animation: reducedMotion ? 'none' : 'flameCoreFlicker 0.3s ease-in-out infinite alternate',
         }}
       />
     </div>
@@ -719,45 +759,402 @@ function BoonCard({
 }
 
 // =============================================================================
-// BLESSING SKILL
+// BOON SKILL (NO 1-5 BARS - shows actual achievements/impact)
 // =============================================================================
-function BlessingSkill({ name, level, color }: { name: string; level: number; color: string }) {
+function BoonSkill({
+  name,
+  description,
+  color,
+  icon
+}: {
+  name: string
+  description?: string
+  color: string
+  icon?: string
+}) {
   return (
-    <div className="flex items-center gap-3 py-2 group cursor-pointer hover:bg-[#ffffff08] px-2 rounded transition-colors">
-      {/* Shield icon */}
-      <div className="w-8 h-9 relative">
-        <svg viewBox="0 0 30 36" className="w-full h-full">
+    <div
+      className="flex items-start gap-3 py-2 group cursor-pointer hover:bg-[#ffffff08] px-2 rounded transition-colors"
+      role="listitem"
+      aria-label={`${name}${description ? `: ${description}` : ''}`}
+    >
+      {/* Hexagonal boon icon */}
+      <div className="w-7 h-8 relative flex-shrink-0 mt-0.5">
+        <svg viewBox="0 0 28 32" className="w-full h-full">
           <path
-            d="M15 2 L28 8 L28 20 Q28 32 15 35 Q2 32 2 20 L2 8 Z"
-            fill={`${color}30`}
+            d="M14 1 L26 8 L26 24 L14 31 L2 24 L2 8 Z"
+            fill={`${color}25`}
             stroke={color}
-            strokeWidth="2"
+            strokeWidth="1.5"
           />
-          <text x="15" y="22" textAnchor="middle" fill={color} fontSize="12" fontWeight="bold">
-            {level}
+          <text x="14" y="18" textAnchor="middle" fill={color} fontSize="10">
+            {icon || '◆'}
           </text>
         </svg>
       </div>
-      <span className="text-xs flex-1" style={{ color: '#f0e8e0' }}>
-        {name}
-      </span>
-      {/* Gem indicators */}
-      <div className="flex gap-1">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className="w-3 h-4"
-            style={{
-              background: i < level
-                ? `linear-gradient(180deg, ${color}, ${color}80)`
-                : '#2a1518',
-              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-              boxShadow: i < level ? `0 0 5px ${color}60` : 'none',
-            }}
+      <div className="flex-1 min-w-0">
+        <span className="text-xs font-medium block" style={{ color: '#f0e8e0' }}>
+          {name}
+        </span>
+        {description && (
+          <span className="text-[10px] block mt-0.5" style={{ color: '#a08888' }}>
+            {description}
+          </span>
+        )}
+      </div>
+      {/* Radiant glow indicator */}
+      <div
+        className="w-2 h-2 rounded-full flex-shrink-0 mt-1.5"
+        style={{
+          background: color,
+          boxShadow: `0 0 6px ${color}80`,
+        }}
+      />
+    </div>
+  )
+}
+
+// =============================================================================
+// TECH STACK DISPLAY (Engineer - boon style, no percentages)
+// =============================================================================
+function TechStackBoons({ color }: { color: string }) {
+  return (
+    <div className="space-y-4" role="list" aria-label="Technology expertise">
+      {TECH_STACK.map((category) => (
+        <div key={category.name} className="mb-4 last:mb-0">
+          <h3
+            className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2"
+            style={{ color: '#d4af37', borderColor: '#d4af3740' }}
+          >
+            <span className="text-[10px]">{category.icon}</span>
+            {category.name.toUpperCase()}
+          </h3>
+          <div className="flex flex-wrap gap-1.5">
+            {category.items.map((tech) => (
+              <span
+                key={tech}
+                className="text-[10px] px-2 py-1 transition-all hover:scale-105"
+                style={{
+                  background: `${color}15`,
+                  border: `1px solid ${color}40`,
+                  color: '#f0e8e0',
+                  clipPath: 'polygon(8% 0%, 100% 0%, 92% 100%, 0% 100%)',
+                }}
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// =============================================================================
+// CURRENT ROLES DISPLAY
+// =============================================================================
+function CurrentRolesSection({ color }: { color: string }) {
+  return (
+    <section
+      className="relative p-6 mb-8"
+      style={{
+        background: 'linear-gradient(135deg, #2a1a28, #1a0a15)',
+        border: `2px solid ${color}50`,
+        borderRadius: '4px',
+      }}
+      role="region"
+      aria-label="Current professional roles"
+    >
+      {/* Magenta corner flames */}
+      <div
+        className="absolute -top-1 -left-1 w-8 h-8"
+        style={{
+          background: `radial-gradient(circle at 0% 0%, ${color}60 0%, transparent 70%)`,
+        }}
+      />
+      <div
+        className="absolute -top-1 -right-1 w-8 h-8"
+        style={{
+          background: `radial-gradient(circle at 100% 0%, ${color}60 0%, transparent 70%)`,
+        }}
+      />
+
+      <h2
+        className="text-lg mb-4 flex items-center gap-3"
+        style={{ color: '#d4af37' }}
+      >
+        <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+          <path
+            d="M12 2L2 7v10l10 5 10-5V7L12 2z"
+            fill="none"
+            stroke="#d4af37"
+            strokeWidth="2"
           />
+          <circle cx="12" cy="12" r="3" fill="#d4af37" />
+        </svg>
+        Current Positions
+      </h2>
+
+      <div className="grid gap-3">
+        {CURRENT_ROLES.map((role) => (
+          <div
+            key={role.id}
+            className="p-3 transition-all hover:translate-x-1"
+            style={{
+              background: 'linear-gradient(90deg, #301a2580, transparent)',
+              borderLeft: `3px solid ${role.type === 'leadership' ? '#d4af37' : color}`,
+            }}
+          >
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-sm font-bold" style={{ color: '#f0e8e0' }}>
+                  {role.title}
+                </h3>
+                <p
+                  className="text-xs"
+                  style={{ color: role.type === 'leadership' ? '#d4af37' : color }}
+                >
+                  {role.company}
+                </p>
+              </div>
+              {role.type === 'leadership' && (
+                <span
+                  className="text-[8px] px-2 py-0.5 tracking-wider"
+                  style={{
+                    background: '#d4af3720',
+                    border: '1px solid #d4af3750',
+                    color: '#d4af37',
+                  }}
+                >
+                  LEADERSHIP
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] mt-1" style={{ color: '#a08888' }}>
+              {role.description}
+            </p>
+          </div>
         ))}
       </div>
-    </div>
+    </section>
+  )
+}
+
+// =============================================================================
+// COMPANIES SECTION (Engineer mode - like Olympian blessings)
+// =============================================================================
+function CompaniesSection({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <section
+      className="relative p-6 mb-8"
+      style={{
+        background: 'linear-gradient(180deg, #251520, #1a0a10)',
+        border: '1px solid #8844ff40',
+      }}
+      role="region"
+      aria-label="Companies and ventures"
+    >
+      {/* Purple underworld glow */}
+      <div
+        className="absolute inset-0 opacity-30"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 0%, #8844ff20, transparent 60%)',
+        }}
+      />
+
+      <h2
+        className="text-lg mb-4 flex items-center gap-3 relative z-10"
+        style={{ color: '#8844ff' }}
+      >
+        <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+          <rect x="3" y="8" width="18" height="12" rx="2" fill="none" stroke="#8844ff" strokeWidth="2" />
+          <path d="M7 8V6a5 5 0 0 1 10 0v2" fill="none" stroke="#8844ff" strokeWidth="2" />
+        </svg>
+        Ventures & Companies
+      </h2>
+
+      <div className="grid gap-4 relative z-10">
+        {COMPANIES.map((company, i) => (
+          <a
+            key={company.id}
+            href={company.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block p-4 transition-all group"
+            style={{
+              background: 'linear-gradient(135deg, #2a1a28, #1a0a15)',
+              border: '1px solid #8844ff30',
+              animation: reducedMotion ? 'none' : `fadeSlideIn 0.4s ease-out ${i * 0.1}s both`,
+            }}
+            aria-label={`${company.name} - ${company.tagline}`}
+          >
+            <div className="flex justify-between items-start mb-2">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">{company.icon}</span>
+                <div>
+                  <h3 className="text-sm font-bold" style={{ color: '#f0e8e0' }}>
+                    {company.name}
+                  </h3>
+                  <p className="text-[10px]" style={{ color: '#8844ff' }}>
+                    {company.tagline}
+                  </p>
+                </div>
+              </div>
+              <svg
+                viewBox="0 0 16 16"
+                className="w-4 h-4 opacity-50 group-hover:opacity-100 transition-opacity"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 12L12 4M12 4H6M12 4v6"
+                  fill="none"
+                  stroke="#8844ff"
+                  strokeWidth="2"
+                />
+              </svg>
+            </div>
+            <p className="text-xs mb-3" style={{ color: '#a08888' }}>
+              {company.description}
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {company.services.map((service) => (
+                <span
+                  key={service}
+                  className="text-[8px] px-2 py-0.5"
+                  style={{
+                    background: '#8844ff15',
+                    border: '1px solid #8844ff30',
+                    color: '#a088bb',
+                  }}
+                >
+                  {service}
+                </span>
+              ))}
+            </div>
+
+            {/* Hover glow */}
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+              style={{
+                boxShadow: 'inset 0 0 20px #8844ff20',
+              }}
+            />
+          </a>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+// =============================================================================
+// BANDS SECTION (Drummer mode - Apollo's blessing style)
+// =============================================================================
+function BandsSection({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <section
+      className="relative p-6 mb-8"
+      style={{
+        background: 'linear-gradient(180deg, #2a2015, #1a0a10)',
+        border: '1px solid #ffaa3340',
+      }}
+      role="region"
+      aria-label="Musical projects and bands"
+    >
+      {/* Golden sun glow (Apollo) */}
+      <div
+        className="absolute inset-0 opacity-20"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 0%, #ffaa3340, transparent 60%)',
+        }}
+      />
+
+      <h2
+        className="text-lg mb-4 flex items-center gap-3 relative z-10"
+        style={{ color: '#ffaa33' }}
+      >
+        <svg viewBox="0 0 24 24" className="w-5 h-5" aria-hidden="true">
+          <circle cx="12" cy="12" r="8" fill="none" stroke="#ffaa33" strokeWidth="2" />
+          <circle cx="12" cy="12" r="3" fill="#ffaa33" />
+          <path d="M12 2v2M12 20v2M2 12h2M20 12h2" stroke="#ffaa33" strokeWidth="2" />
+        </svg>
+        Musical Projects
+      </h2>
+
+      <div className="grid gap-4 relative z-10">
+        {BANDS.map((band, i) => (
+          <div
+            key={band.id}
+            className="p-4 transition-all group"
+            style={{
+              background: 'linear-gradient(135deg, #2a2015, #1a0a10)',
+              border: '1px solid #ffaa3330',
+              animation: reducedMotion ? 'none' : `fadeSlideIn 0.4s ease-out ${i * 0.1}s both`,
+            }}
+          >
+            <div className="flex justify-between items-start mb-2">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-bold" style={{ color: '#f0e8e0' }}>
+                    {band.name}
+                  </h3>
+                  {band.active && (
+                    <span
+                      className="w-2 h-2 rounded-full"
+                      style={{
+                        background: '#44dd88',
+                        boxShadow: '0 0 6px #44dd88',
+                      }}
+                      aria-label="Currently active"
+                    />
+                  )}
+                </div>
+                <p className="text-xs" style={{ color: '#ffaa33' }}>
+                  {band.genre} - {band.role}
+                </p>
+              </div>
+              {band.url && (
+                <a
+                  href={band.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="opacity-50 hover:opacity-100 transition-opacity"
+                  aria-label={`Visit ${band.name} website`}
+                >
+                  <svg viewBox="0 0 16 16" className="w-4 h-4">
+                    <path
+                      d="M4 12L12 4M12 4H6M12 4v6"
+                      fill="none"
+                      stroke="#ffaa33"
+                      strokeWidth="2"
+                    />
+                  </svg>
+                </a>
+              )}
+            </div>
+            <p className="text-xs" style={{ color: '#a08888' }}>
+              {band.description}
+            </p>
+
+            {/* Sound wave decoration */}
+            <div className="flex items-end gap-0.5 mt-3 h-3" aria-hidden="true">
+              {[3, 5, 4, 6, 3, 5, 4, 6, 3, 5].map((h, j) => (
+                <div
+                  key={j}
+                  className="w-1 rounded-sm"
+                  style={{
+                    height: `${h * 2}px`,
+                    background: `linear-gradient(180deg, #ffaa33, #ffaa3360)`,
+                    opacity: 0.4,
+                    animation: reducedMotion ? 'none' : `soundWave 0.8s ease-in-out ${j * 0.05}s infinite alternate`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -1110,9 +1507,11 @@ export default function MythicTheme() {
   const { theme } = useTheme()
   const { active, setActive, config } = useProfession()
   const [mounted, setMounted] = useState(false)
+  const reducedMotion = usePrefersReducedMotion()
 
   const aboutData = ABOUT_DATA[active]
   const otherSkills = getSkillsByProfession(active)
+  const engineerSkills = getEngineerSkills()
   const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
   const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
@@ -1135,11 +1534,13 @@ export default function MythicTheme() {
         background: 'linear-gradient(180deg, #2a1520, #1a0a10, #0a0508)',
         fontFamily: '"Cinzel", "Georgia", serif',
       }}
+      role="main"
+      aria-label="Alexander Pulido - Portfolio"
     >
-      {/* Background layers */}
-      <PomegranateSeeds />
-      <EmberParticles />
-      <IchorDrips />
+      {/* Background layers - decorative, hidden from screen readers */}
+      {!reducedMotion && <PomegranateSeeds />}
+      {!reducedMotion && <EmberParticles />}
+      {!reducedMotion && <IchorDrips />}
 
       {/* Profession ornaments */}
       <OlympianOrnaments profession={active} />
@@ -1147,8 +1548,8 @@ export default function MythicTheme() {
       {/* Side decorations */}
       <GreekColumn side="left" />
       <GreekColumn side="right" />
-      <AnimatedFlames side="left" />
-      <AnimatedFlames side="right" />
+      <AnimatedFlames side="left" reducedMotion={reducedMotion} />
+      <AnimatedFlames side="right" reducedMotion={reducedMotion} />
 
       {/* God silhouettes in corners */}
       <GodSilhouette god="zeus" position="top-40 left-24" />
@@ -1162,20 +1563,21 @@ export default function MythicTheme() {
         style={{
           background: 'radial-gradient(ellipse at 50% 0%, #ff334415, transparent 50%), radial-gradient(ellipse at 50% 100%, #ff334420, transparent 50%)',
         }}
+        aria-hidden="true"
       />
 
       {/* Styx river at bottom */}
       <StyxRiver />
 
       {/* Header */}
-      <header className="relative z-30 pt-8 pb-4 text-center">
+      <header className="relative z-30 pt-8 pb-4 text-center" role="banner">
         <div className="max-w-4xl mx-auto px-24">
           {/* Greek key top border */}
-          <GreekKeyBorder className="mb-4" />
+          <GreekKeyBorder className="mb-4" reducedMotion={reducedMotion} />
 
           {/* Laurel wreath with title */}
           <div className="relative flex justify-center items-center mb-2">
-            <div className="absolute left-1/2 -translate-x-1/2 -top-2">
+            <div className="absolute left-1/2 -translate-x-1/2 -top-2" aria-hidden="true">
               <LaurelWreath size="large" />
             </div>
             <h1
@@ -1189,10 +1591,21 @@ export default function MythicTheme() {
             </h1>
           </div>
 
-          <p className="text-sm tracking-widest mb-2" style={{ color: '#a08888' }}>
-            {config.title.toUpperCase()}
+          {/* Professional headline from PROFESSIONAL_SUMMARY */}
+          <p
+            className="text-sm tracking-widest mb-1"
+            style={{ color: '#f0e8e0' }}
+            aria-label="Professional title"
+          >
+            {active === 'engineer' ? PROFESSIONAL_SUMMARY.headline.toUpperCase() : config.title.toUpperCase()}
           </p>
-          <p className="text-xs tracking-[0.3em]" style={{ color: '#ff6655' }}>
+          <p
+            className="text-xs tracking-wider mb-2 italic"
+            style={{ color: godColors[active] }}
+          >
+            {active === 'engineer' ? PROFESSIONAL_SUMMARY.tagline : aboutData.headline}
+          </p>
+          <p className="text-[10px] tracking-[0.3em]" style={{ color: '#a08888' }}>
             ESCAPE FROM THE UNDERWORLD
           </p>
 
@@ -1236,13 +1649,17 @@ export default function MythicTheme() {
       </header>
 
       {/* Boon selection */}
-      <section className="relative z-20 py-8">
+      <section
+        className="relative z-20 py-8"
+        role="region"
+        aria-label="Select profession"
+      >
         <div className="text-center mb-4">
           <span className="text-xs tracking-[0.3em]" style={{ color: '#d4af37' }}>
             CHOOSE YOUR PATRON
           </span>
         </div>
-        <div className="flex justify-center gap-8">
+        <div className="flex justify-center gap-8" role="radiogroup" aria-label="Profession selection">
           {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
             <BoonCard
               key={prof}
@@ -1265,6 +1682,8 @@ export default function MythicTheme() {
               background: 'linear-gradient(180deg, #301a2080, #1a0a1080)',
               border: '1px solid #d4af3740',
             }}
+            role="region"
+            aria-label="About section"
           >
             {/* Corner skulls */}
             <SkullDecoration position="top-2 left-2" size={30} />
@@ -1272,10 +1691,10 @@ export default function MythicTheme() {
 
             {/* Greek key borders */}
             <div className="absolute top-0 left-8 right-8">
-              <GreekKeyBorder animated={false} />
+              <GreekKeyBorder animated={false} reducedMotion={reducedMotion} />
             </div>
             <div className="absolute bottom-0 left-8 right-8 rotate-180">
-              <GreekKeyBorder animated={false} />
+              <GreekKeyBorder animated={false} reducedMotion={reducedMotion} />
             </div>
 
             <h2 className="text-lg mb-4 flex items-center justify-center gap-3" style={{ color: '#d4af37' }}>
@@ -1283,13 +1702,32 @@ export default function MythicTheme() {
               About
               <ShieldOrnament className="w-8 h-10 scale-x-[-1]" />
             </h2>
+            {/* Use PROFESSIONAL_SUMMARY.bio for engineer, otherwise aboutData.bio */}
             <p
               className="text-sm leading-relaxed italic max-w-2xl mx-auto"
               style={{ color: '#f0e8e0' }}
             >
-              &ldquo;{aboutData.bio}&rdquo;
+              &ldquo;{active === 'engineer' ? PROFESSIONAL_SUMMARY.bio : aboutData.bio}&rdquo;
             </p>
-            <div className="flex justify-center gap-3 mt-6 flex-wrap">
+            {/* Show highlights for engineer */}
+            {active === 'engineer' && PROFESSIONAL_SUMMARY.highlights && (
+              <div className="flex justify-center gap-2 mt-4 flex-wrap">
+                {PROFESSIONAL_SUMMARY.highlights.map((highlight, i) => (
+                  <span
+                    key={i}
+                    className="text-[9px] px-3 py-1"
+                    style={{
+                      background: '#44dd8815',
+                      border: '1px solid #44dd8840',
+                      color: '#44dd88',
+                    }}
+                  >
+                    {highlight}
+                  </span>
+                ))}
+              </div>
+            )}
+            <div className="flex justify-center gap-3 mt-4 flex-wrap">
               {aboutData.quickFacts.map((fact, i) => (
                 <span
                   key={i}
@@ -1309,6 +1747,27 @@ export default function MythicTheme() {
 
           <SpearDivider />
 
+          {/* Current Roles Section - for engineer only */}
+          {active === 'engineer' && (
+            <DashRevealSection>
+              <CurrentRolesSection color={godColors[active]} />
+            </DashRevealSection>
+          )}
+
+          {/* Companies Section - for engineer only */}
+          {active === 'engineer' && (
+            <DashRevealSection>
+              <CompaniesSection reducedMotion={reducedMotion} />
+            </DashRevealSection>
+          )}
+
+          {/* Bands Section - for drummer only */}
+          {active === 'drummer' && (
+            <DashRevealSection>
+              <BandsSection reducedMotion={reducedMotion} />
+            </DashRevealSection>
+          )}
+
           {/* Work Experience */}
           {experience.length > 0 && (
             <DashRevealSection>
@@ -1318,18 +1777,20 @@ export default function MythicTheme() {
                   background: 'linear-gradient(180deg, #251518, #1a0a10)',
                   border: '1px solid #d4af3740',
                 }}
+                role="region"
+                aria-label="Work experience"
               >
                 {/* Greek key borders */}
                 <div className="absolute top-0 left-4 right-4">
-                  <GreekKeyBorder animated={false} />
+                  <GreekKeyBorder animated={false} reducedMotion={reducedMotion} />
                 </div>
 
                 <h2 className="text-lg mb-6 mt-4 flex items-center gap-3" style={{ color: '#d4af37' }}>
-                  <svg viewBox="0 0 20 20" className="w-5 h-5">
+                  <svg viewBox="0 0 20 20" className="w-5 h-5" aria-hidden="true">
                     <polygon points="10,0 20,7 17,20 3,20 0,7" fill="#d4af37" />
                   </svg>
                   Work Experience
-                  <div className="flex-1 h-px ml-3" style={{ background: 'linear-gradient(90deg, #d4af3760, transparent)' }} />
+                  <div className="flex-1 h-px ml-3" style={{ background: 'linear-gradient(90deg, #d4af3760, transparent)' }} aria-hidden="true" />
                 </h2>
 
                 <div className="space-y-4">
@@ -1339,7 +1800,7 @@ export default function MythicTheme() {
                 </div>
 
                 {/* Bottom decoration */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2" aria-hidden="true">
                   <BoneDecoration className="w-20 opacity-40" />
                 </div>
               </section>
@@ -1350,48 +1811,57 @@ export default function MythicTheme() {
 
           {/* Grid */}
           <div className="grid md:grid-cols-2 gap-8 mt-8">
-            {/* Tech Stack / Skills */}
+            {/* Tech Stack / Skills - NO 1-5 BARS */}
             <section
               className="relative p-6"
               style={{
                 background: 'linear-gradient(180deg, #251518, #1a0a10)',
                 border: '1px solid #4a2020',
               }}
+              role="region"
+              aria-label={active === 'engineer' ? 'Technology stack' : 'Skills and expertise'}
             >
               <BoneDecoration className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 opacity-50" />
 
               <h2 className="text-lg mb-4 flex items-center gap-2" style={{ color: godColors[active] }}>
-                <svg viewBox="0 0 20 20" className="w-5 h-5">
+                <svg viewBox="0 0 20 20" className="w-5 h-5" aria-hidden="true">
                   <polygon points="10,0 20,7 17,20 3,20 0,7" fill={godColors[active]} />
                 </svg>
-                {active === 'engineer' ? 'Tech Stack' : 'Skills'}
+                {active === 'engineer' ? 'Tech Stack' : 'Skills & Expertise'}
               </h2>
-              {otherSkills.map((category) => (
-                <div key={category.name} className="mb-4 last:mb-0">
-                  <h3
-                    className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2"
-                    style={{ color: '#d4af37', borderColor: '#d4af3740' }}
-                  >
-                    <span className="text-[8px]">&#9670;</span>
-                    {category.name.toUpperCase()}
-                    <span className="text-[8px]">&#9670;</span>
-                  </h3>
-                  {category.skills.map((skill) => (
-                    <BlessingSkill
-                      key={skill.name}
-                      name={skill.name}
-                      level={skill.proficiency}
-                      color={godColors[active]}
-                    />
-                  ))}
-                </div>
-              ))}
+
+              {/* Engineer: use TechStackBoons (no proficiency bars) */}
+              {active === 'engineer' ? (
+                <TechStackBoons color={godColors[active]} />
+              ) : (
+                /* Drummer/Fighter: use BoonSkill display (no 1-5 bars, show descriptions) */
+                otherSkills.map((category) => (
+                  <div key={category.name} className="mb-4 last:mb-0">
+                    <h3
+                      className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2"
+                      style={{ color: '#d4af37', borderColor: '#d4af3740' }}
+                    >
+                      <span className="text-[10px]">{category.icon}</span>
+                      {category.name.toUpperCase()}
+                    </h3>
+                    <div role="list">
+                      {category.skills.map((skill) => (
+                        <BoonSkill
+                          key={skill.name}
+                          name={skill.name}
+                          color={godColors[active]}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))
+              )}
             </section>
 
             {/* Projects */}
-            <section>
+            <section role="region" aria-label="Featured projects">
               <h2 className="text-lg mb-4 flex items-center gap-2" style={{ color: '#ff3344' }}>
-                <svg viewBox="0 0 20 20" className="w-5 h-5">
+                <svg viewBox="0 0 20 20" className="w-5 h-5" aria-hidden="true">
                   <polygon points="10,0 20,7 17,20 3,20 0,7" fill="#ff3344" />
                 </svg>
                 Featured Work
@@ -1412,16 +1882,16 @@ export default function MythicTheme() {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-20 py-8 text-center pb-36">
-        <GreekKeyBorder className="max-w-md mx-auto mb-4" />
+      <footer className="relative z-20 py-8 text-center pb-36" role="contentinfo">
+        <GreekKeyBorder className="max-w-md mx-auto mb-4" reducedMotion={reducedMotion} />
         <p className="text-xs tracking-widest flex items-center justify-center gap-4" style={{ color: '#a08888' }}>
-          <span className="text-[#d4af37]">&#9670;</span>
+          <span className="text-[#d4af37]" aria-hidden="true">&#9670;</span>
           DEATH IS NOT THE END
-          <span className="text-[#d4af37]">&#9670;</span>
-          MMXXVI
-          <span className="text-[#d4af37]">&#9670;</span>
+          <span className="text-[#d4af37]" aria-hidden="true">&#9670;</span>
+          <span aria-label="Year 2026">MMXXVI</span>
+          <span className="text-[#d4af37]" aria-hidden="true">&#9670;</span>
         </p>
-        <GreekKeyBorder className="max-w-md mx-auto mt-4" />
+        <GreekKeyBorder className="max-w-md mx-auto mt-4" reducedMotion={reducedMotion} />
       </footer>
 
       {/* Animations */}
@@ -1561,6 +2031,37 @@ export default function MythicTheme() {
         @keyframes bloodPulse {
           0%, 100% { opacity: 0.3; transform: scale(1); }
           50% { opacity: 0.6; transform: scale(1.2); }
+        }
+
+        @keyframes fadeSlideIn {
+          0% {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          100% {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes soundWave {
+          0% {
+            transform: scaleY(0.6);
+          }
+          100% {
+            transform: scaleY(1);
+          }
+        }
+
+        /* Reduced motion: disable all animations */
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
         }
       `}</style>
     </div>
