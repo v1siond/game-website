@@ -14,82 +14,68 @@ import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 
 // =============================================================================
-// LIMBO - EXACT VISUAL RECREATION
-// Pure greyscale: #000000, #1A1A1A, #2A2A2A, #4A4A4A, #5A5A5A, #8A8A8A, #9A9A9A, #CCCCCC, #DDDDDD, #EEEEEE
-// NO other colors. Heavy film grain. Stark silhouettes. Fog layers.
+// LIMBO - DARKER, PERFORMANCE-OPTIMIZED
+// True Limbo aesthetic: almost pure black with grey fog
+// Background: very dark grey/black (#0A0A0A to #1A1A1A)
+// Text: light grey (#CCCCCC to #FFFFFF), Silhouettes: pure black
+// Fog effects: the only lighter elements
 // =============================================================================
 
-// LIMBO COLOR PALETTE - EXACT
+// LIMBO COLOR PALETTE - DARKER
 const LIMBO = {
   black: '#000000',
-  darkGrey1: '#1A1A1A',
-  darkGrey2: '#2A2A2A',
-  midGrey1: '#4A4A4A',
-  midGrey2: '#5A5A5A',
-  lightGrey1: '#8A8A8A',
-  lightGrey2: '#9A9A9A',
-  fogWhite1: '#CCCCCC',
-  fogWhite2: '#DDDDDD',
-  fogWhite3: '#EEEEEE',
+  voidBlack: '#050505',     // Deepest background
+  darkGrey1: '#0A0A0A',     // Primary background
+  darkGrey2: '#121212',     // Secondary background
+  darkGrey3: '#1A1A1A',     // Card backgrounds
+  midGrey1: '#2A2A2A',      // Borders, muted elements
+  midGrey2: '#3A3A3A',      // Decorative elements
+  lightGrey1: '#888888',    // Secondary text
+  lightGrey2: '#AAAAAA',    // Body text (WCAG AA on dark)
+  fogWhite1: '#CCCCCC',     // Primary text
+  fogWhite2: '#DDDDDD',     // Headings
+  fogWhite3: '#EEEEEE',     // Glowing elements, emphasis
 }
 
 // =============================================================================
-// ATMOSPHERIC EFFECTS - Film grain, vignette, fog, scratches
+// ATMOSPHERIC EFFECTS - Simplified for performance
+// Only essential: single grain layer, single fog layer, vignette
+// Uses CSS transforms only (GPU-accelerated), will-change where needed
 // =============================================================================
 
 function LimboAtmosphere() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden" aria-hidden="true">
-      {/* HEAVY film grain - essential Limbo texture */}
+      {/* Single film grain layer - reduced opacity for performance */}
       <div
-        className="absolute inset-0 opacity-30 grain mix-blend-multiply"
+        className="absolute inset-0 opacity-15 grain will-change-transform"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='6' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
-      {/* Secondary grain layer - finer texture */}
-      <div
-        className="absolute inset-0 opacity-20 grain-secondary mix-blend-overlay"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise2'%3E%3CfeTurbulence type='turbulence' baseFrequency='1.4' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise2)'/%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Film scratches - vertical lines */}
-      <div className="absolute inset-0 film-scratches opacity-10" />
-
-      {/* Fog layer 1 - slow drift left to right */}
+      {/* Single fog layer - simplified animation */}
       <div
-        className="absolute inset-0 fog-drift-1"
+        className="absolute inset-0 fog-drift will-change-transform"
         style={{
-          background: `linear-gradient(90deg, transparent 0%, ${LIMBO.fogWhite1}15 20%, ${LIMBO.fogWhite2}20 40%, ${LIMBO.fogWhite1}15 60%, transparent 80%)`,
-        }}
-      />
-      {/* Fog layer 2 - opposite direction, slower */}
-      <div
-        className="absolute inset-0 fog-drift-2"
-        style={{
-          background: `linear-gradient(90deg, transparent 10%, ${LIMBO.fogWhite1}10 30%, ${LIMBO.fogWhite2}12 50%, ${LIMBO.fogWhite1}10 70%, transparent 90%)`,
+          background: `linear-gradient(90deg, transparent 0%, ${LIMBO.midGrey1}15 30%, ${LIMBO.midGrey2}10 50%, ${LIMBO.midGrey1}15 70%, transparent 100%)`,
         }}
       />
 
-      {/* HEAVY vignette - Limbo's dark edges */}
+      {/* HEAVY vignette - static, no animation needed */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse at 50% 50%, transparent 20%, ${LIMBO.black}40 55%, ${LIMBO.black}75 100%)`,
+          background: `radial-gradient(ellipse at 50% 50%, transparent 15%, ${LIMBO.black}50 50%, ${LIMBO.black}95 100%)`,
         }}
       />
-      {/* Top/bottom noir gradient */}
+      {/* Top/bottom noir gradient - stronger for darker feel */}
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(180deg, ${LIMBO.black}50 0%, transparent 15%, transparent 85%, ${LIMBO.black}60 100%)`,
+          background: `linear-gradient(180deg, ${LIMBO.black}70 0%, transparent 20%, transparent 80%, ${LIMBO.black}80 100%)`,
         }}
       />
-
-      {/* Rain/mist - subtle vertical lines */}
-      <div className="absolute inset-0 rain-mist opacity-5" />
     </div>
   )
 }
@@ -102,23 +88,23 @@ function LimboAtmosphere() {
 function GiantSpiderArt() {
   return (
     <div className="relative w-full h-64 overflow-hidden" aria-hidden="true">
-      {/* Fog background */}
+      {/* Fog background - darker */}
       <div className="absolute inset-0" style={{
-        background: `linear-gradient(180deg, ${LIMBO.midGrey1} 0%, ${LIMBO.darkGrey2} 50%, ${LIMBO.darkGrey1} 100%)`
+        background: `linear-gradient(180deg, ${LIMBO.midGrey1} 0%, ${LIMBO.darkGrey3} 50%, ${LIMBO.darkGrey1} 100%)`
       }} />
 
       {/* Distant trees in fog */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 256" preserveAspectRatio="xMidYMid slice">
         {/* Background fog trees */}
-        <g fill={LIMBO.darkGrey2} opacity="0.3">
+        <g fill={LIMBO.darkGrey3} opacity="0.3">
           <path d="M50,256 L50,180 Q30,170 25,150 Q45,160 50,140 Q35,130 30,110 Q50,120 50,100 L50,80 L55,80 L55,256 Z" />
           <path d="M150,256 L150,160 Q130,150 125,130 Q145,140 150,120 Q135,110 130,90 Q150,100 150,80 L150,60 L155,60 L155,256 Z" />
           <path d="M700,256 L700,170 Q720,160 725,140 Q705,150 700,130 Q715,120 720,100 Q700,110 700,90 L700,70 L705,70 L705,256 Z" />
           <path d="M600,256 L600,190 Q580,180 575,160 Q595,170 600,150 Q585,140 580,120 Q600,130 600,110 L600,90 L605,90 L605,256 Z" />
         </g>
 
-        {/* GIANT SPIDER */}
-        <g className="spider-breathe" style={{ transformOrigin: '400px 180px' }}>
+        {/* GIANT SPIDER - simplified animation */}
+        <g className="spider-breathe will-change-transform" style={{ transformOrigin: '400px 180px' }}>
           {/* Spider body - large abdomen */}
           <ellipse cx="400" cy="180" rx="60" ry="40" fill={LIMBO.black} />
           {/* Spider cephalothorax */}
@@ -156,9 +142,9 @@ function GiantSpiderArt() {
         <path d="M450,0 Q440,80 430,120" stroke={LIMBO.lightGrey1} strokeWidth="1" fill="none" opacity="0.2" />
       </svg>
 
-      {/* Film grain overlay on art */}
-      <div className="absolute inset-0 opacity-25" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+      {/* Film grain overlay on art - reduced */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
       }} />
     </div>
   )
@@ -168,19 +154,19 @@ function GiantSpiderArt() {
 function IndustrialGearsArt() {
   return (
     <div className="relative w-full h-56 overflow-hidden" aria-hidden="true">
-      {/* Industrial background */}
+      {/* Industrial background - darker */}
       <div className="absolute inset-0" style={{
-        background: `linear-gradient(180deg, ${LIMBO.darkGrey1} 0%, ${LIMBO.darkGrey2} 40%, ${LIMBO.midGrey1} 100%)`
+        background: `linear-gradient(180deg, ${LIMBO.darkGrey1} 0%, ${LIMBO.darkGrey2} 40%, ${LIMBO.darkGrey3} 100%)`
       }} />
 
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 224" preserveAspectRatio="xMidYMid slice">
         {/* Factory smokestacks in background */}
-        <rect x="50" y="120" width="30" height="104" fill={LIMBO.darkGrey2} />
-        <rect x="720" y="100" width="40" height="124" fill={LIMBO.darkGrey2} />
-        <rect x="680" y="140" width="25" height="84" fill={LIMBO.darkGrey2} />
+        <rect x="50" y="120" width="30" height="104" fill={LIMBO.darkGrey3} />
+        <rect x="720" y="100" width="40" height="124" fill={LIMBO.darkGrey3} />
+        <rect x="680" y="140" width="25" height="84" fill={LIMBO.darkGrey3} />
 
-        {/* Smoke from stacks */}
-        <g className="smoke-rise" opacity="0.15">
+        {/* Smoke from stacks - static, no animation for perf */}
+        <g opacity="0.1">
           <ellipse cx="65" cy="100" rx="20" ry="15" fill={LIMBO.lightGrey2} />
           <ellipse cx="740" cy="80" rx="25" ry="18" fill={LIMBO.lightGrey2} />
         </g>
@@ -191,8 +177,8 @@ function IndustrialGearsArt() {
         <rect x="200" y="150" width="8" height="74" fill={LIMBO.black} />
         <rect x="600" y="155" width="8" height="69" fill={LIMBO.black} />
 
-        {/* LARGE GEAR - main, slow rotation */}
-        <g className="gear-rotate-slow" style={{ transformOrigin: '300px 120px' }}>
+        {/* LARGE GEAR - main, slow rotation - GPU accelerated */}
+        <g className="gear-rotate-slow will-change-transform" style={{ transformOrigin: '300px 120px' }}>
           <circle cx="300" cy="120" r="70" fill="none" stroke={LIMBO.black} strokeWidth="12" />
           <circle cx="300" cy="120" r="20" fill={LIMBO.black} />
           {[...Array(16)].map((_, i) => {
@@ -211,8 +197,8 @@ function IndustrialGearsArt() {
           })}
         </g>
 
-        {/* MEDIUM GEAR - interlocking, opposite rotation */}
-        <g className="gear-rotate-medium" style={{ transformOrigin: '480px 110px' }}>
+        {/* MEDIUM GEAR - interlocking, opposite rotation - GPU accelerated */}
+        <g className="gear-rotate-medium will-change-transform" style={{ transformOrigin: '480px 110px' }}>
           <circle cx="480" cy="110" r="50" fill="none" stroke={LIMBO.black} strokeWidth="10" />
           <circle cx="480" cy="110" r="14" fill={LIMBO.black} />
           {[...Array(12)].map((_, i) => {
@@ -231,8 +217,8 @@ function IndustrialGearsArt() {
           })}
         </g>
 
-        {/* SMALL GEAR - fast rotation */}
-        <g className="gear-rotate-fast" style={{ transformOrigin: '160px 140px' }}>
+        {/* SMALL GEAR - removed for performance (keep only 2 gears) */}
+        <g style={{ transformOrigin: '160px 140px' }}>
           <circle cx="160" cy="140" r="30" fill="none" stroke={LIMBO.black} strokeWidth="6" />
           <circle cx="160" cy="140" r="8" fill={LIMBO.black} />
           {[...Array(10)].map((_, i) => {
@@ -251,8 +237,8 @@ function IndustrialGearsArt() {
           })}
         </g>
 
-        {/* SAW BLADE - spinning danger */}
-        <g className="saw-spin" style={{ transformOrigin: '620px 170px' }}>
+        {/* SAW BLADE - static for performance */}
+        <g style={{ transformOrigin: '620px 170px' }}>
           <circle cx="620" cy="170" r="35" fill="none" stroke={LIMBO.black} strokeWidth="4" />
           <circle cx="620" cy="170" r="6" fill={LIMBO.black} />
           {[...Array(24)].map((_, i) => {
@@ -279,17 +265,17 @@ function IndustrialGearsArt() {
                 stroke={LIMBO.black} strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
         </g>
 
-        {/* Chains hanging */}
-        <g className="chain-swing" style={{ transformOrigin: '400px 0' }}>
+        {/* Chains hanging - static for performance */}
+        <g style={{ transformOrigin: '400px 0' }}>
           {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <ellipse key={i} cx="400" cy={i * 18 + 10} rx="6" ry="8" fill="none" stroke={LIMBO.black} strokeWidth="3" />
           ))}
         </g>
       </svg>
 
-      {/* Film grain */}
-      <div className="absolute inset-0 opacity-25" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+      {/* Film grain - reduced */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
       }} />
     </div>
   )
@@ -299,9 +285,9 @@ function IndustrialGearsArt() {
 function ForestArt() {
   return (
     <div className="relative w-full h-64 overflow-hidden" aria-hidden="true">
-      {/* Foggy forest background */}
+      {/* Foggy forest background - darker base */}
       <div className="absolute inset-0" style={{
-        background: `linear-gradient(180deg, ${LIMBO.lightGrey1} 0%, ${LIMBO.midGrey2} 30%, ${LIMBO.darkGrey2} 70%, ${LIMBO.darkGrey1} 100%)`
+        background: `linear-gradient(180deg, ${LIMBO.midGrey2} 0%, ${LIMBO.darkGrey3} 30%, ${LIMBO.darkGrey2} 70%, ${LIMBO.darkGrey1} 100%)`
       }} />
 
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 256" preserveAspectRatio="xMidYMid slice">
@@ -334,16 +320,16 @@ function ForestArt() {
           <path d="M675,70 Q640,40 620,20" stroke={LIMBO.black} strokeWidth="5" fill="none" />
         </g>
 
-        {/* Rope/hanging element - subtle */}
-        <g className="rope-swing" style={{ transformOrigin: '400px 0' }}>
+        {/* Rope/hanging element - static for performance */}
+        <g style={{ transformOrigin: '400px 0' }}>
           <path d="M400,0 Q398,60 400,100 Q402,140 398,180" stroke={LIMBO.darkGrey1} strokeWidth="2" fill="none" />
           {/* Subtle hanging figure silhouette - abstract */}
           <ellipse cx="400" cy="200" rx="8" ry="10" fill={LIMBO.darkGrey1} opacity="0.4" />
           <line x1="400" y1="210" x2="400" y2="240" stroke={LIMBO.darkGrey1} strokeWidth="2" opacity="0.4" />
         </g>
 
-        {/* BOY SILHOUETTE - small figure with GLOWING WHITE EYES */}
-        <g className="boy-walk">
+        {/* BOY SILHOUETTE - small figure with GLOWING WHITE EYES - static */}
+        <g>
           {/* Head */}
           <ellipse cx="400" cy="230" rx="6" ry="7" fill={LIMBO.black} />
           {/* GLOWING WHITE EYES */}
@@ -363,14 +349,14 @@ function ForestArt() {
         <line x1="0" y1="256" x2="800" y2="256" stroke={LIMBO.black} strokeWidth="4" />
       </svg>
 
-      {/* Fog overlay */}
-      <div className="absolute inset-0 fog-layer opacity-20" style={{
-        background: `linear-gradient(180deg, ${LIMBO.fogWhite2}30 0%, transparent 50%, ${LIMBO.fogWhite1}20 100%)`
+      {/* Fog overlay - simplified */}
+      <div className="absolute inset-0 opacity-15" style={{
+        background: `linear-gradient(180deg, ${LIMBO.midGrey2}20 0%, transparent 50%, ${LIMBO.midGrey1}15 100%)`
       }} />
 
-      {/* Film grain */}
-      <div className="absolute inset-0 opacity-25" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+      {/* Film grain - reduced */}
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
       }} />
     </div>
   )
@@ -391,15 +377,18 @@ function LimboCard({ children, className = '', ariaLabel }: {
       role={ariaLabel ? 'region' : undefined}
       aria-label={ariaLabel}
       style={{
-        background: `linear-gradient(135deg, ${LIMBO.darkGrey1} 0%, ${LIMBO.darkGrey2} 50%, ${LIMBO.darkGrey1} 100%)`,
+        background: `linear-gradient(135deg, ${LIMBO.darkGrey2} 0%, ${LIMBO.darkGrey3} 50%, ${LIMBO.darkGrey2} 100%)`,
         borderLeft: `4px solid ${LIMBO.black}`,
-        boxShadow: `6px 6px 0 ${LIMBO.black}80, inset 0 0 30px ${LIMBO.black}40`,
+        boxShadow: `6px 6px 0 ${LIMBO.black}, inset 0 0 30px ${LIMBO.black}60`,
       }}
     >
-      {/* Film grain overlay */}
+      {/* Film grain overlay - static for performance */}
       <div
-        className="absolute inset-0 pointer-events-none opacity-15 mix-blend-overlay grain-card"
+        className="absolute inset-0 pointer-events-none opacity-8"
         aria-hidden="true"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
       />
       {/* Torn edge effect - top */}
       <div
@@ -426,17 +415,13 @@ function LimboItemCard({ children, href, className = '' }: {
   className?: string
 }) {
   const cardStyle = {
-    background: `linear-gradient(145deg, ${LIMBO.darkGrey1} 0%, ${LIMBO.darkGrey2} 100%)`,
+    background: `linear-gradient(145deg, ${LIMBO.darkGrey2} 0%, ${LIMBO.darkGrey3} 100%)`,
     border: `2px solid ${LIMBO.black}`,
-    boxShadow: `4px 4px 0 ${LIMBO.black}, inset 0 0 20px ${LIMBO.black}50`,
+    boxShadow: `4px 4px 0 ${LIMBO.black}, inset 0 0 20px ${LIMBO.black}70`,
   }
 
   const content = (
     <div className="relative" style={cardStyle}>
-      <div
-        className="absolute inset-0 pointer-events-none opacity-12 mix-blend-overlay grain-card"
-        aria-hidden="true"
-      />
       <div className={`relative z-10 p-4 ${className}`}>
         {children}
       </div>
@@ -633,9 +618,9 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 
   return (
     <article className="p-4" style={{
-      background: `${LIMBO.darkGrey1}E6`,
+      background: `${LIMBO.darkGrey2}`,
       borderLeft: `3px solid ${LIMBO.black}`,
-      boxShadow: `4px 4px 0 ${LIMBO.black}80`,
+      boxShadow: `4px 4px 0 ${LIMBO.black}`,
     }}>
       <div className="flex justify-between items-start mb-1">
         <div>
@@ -712,9 +697,9 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
 function WorkCard({ work }: { work: typeof WORK_EXPERIENCE[0] }) {
   return (
     <article className="p-4" style={{
-      background: `${LIMBO.darkGrey1}E6`,
+      background: `${LIMBO.darkGrey2}`,
       borderLeft: `3px solid ${LIMBO.black}`,
-      boxShadow: `4px 4px 0 ${LIMBO.black}80`,
+      boxShadow: `4px 4px 0 ${LIMBO.black}`,
     }}>
       <div className="flex justify-between items-start mb-1">
         <div>
@@ -762,7 +747,8 @@ export default function SilhouetteTheme() {
     <div
       className="min-h-screen relative"
       style={{
-        background: `linear-gradient(180deg, ${LIMBO.lightGrey2} 0%, ${LIMBO.lightGrey1} 15%, ${LIMBO.midGrey2} 40%, ${LIMBO.midGrey1} 70%, ${LIMBO.darkGrey2} 100%)`,
+        // DARK like actual Limbo - almost pure black with slight gradient
+        background: `linear-gradient(180deg, ${LIMBO.darkGrey1} 0%, ${LIMBO.voidBlack} 30%, ${LIMBO.voidBlack} 70%, ${LIMBO.darkGrey1} 100%)`,
         fontFamily: '"Courier New", Consolas, monospace',
         overflowX: 'hidden',
       }}
@@ -774,13 +760,13 @@ export default function SilhouetteTheme() {
       <header className="relative z-30 p-6" role="banner">
         <div className="max-w-3xl mx-auto flex justify-between items-start">
           <div>
-            <h1 className="text-2xl tracking-[0.5em] font-normal" style={{ color: LIMBO.darkGrey1 }}>
+            <h1 className="text-2xl tracking-[0.5em] font-normal" style={{ color: LIMBO.fogWhite2 }}>
               ALEXANDER PULIDO
             </h1>
-            <p className="text-xs tracking-[0.2em] mt-2" style={{ color: LIMBO.darkGrey2 }}>
+            <p className="text-xs tracking-[0.2em] mt-2" style={{ color: LIMBO.fogWhite1 }}>
               {PROFESSIONAL_SUMMARY.headline}
             </p>
-            <p className="text-xs tracking-wider mt-1 italic" style={{ color: LIMBO.midGrey1 }}>
+            <p className="text-xs tracking-wider mt-1 italic" style={{ color: LIMBO.lightGrey1 }}>
               {PROFESSIONAL_SUMMARY.tagline}
             </p>
           </div>
@@ -788,15 +774,15 @@ export default function SilhouetteTheme() {
           <nav className="flex gap-3 items-center" aria-label="Main navigation">
             <Link
               href="/cv"
-              className="limbo-btn px-3 py-1.5 text-xs tracking-[0.2em] uppercase transition-colors hover:bg-black hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-              style={{ background: 'transparent', border: `2px solid ${LIMBO.black}`, color: LIMBO.darkGrey1 }}
+              className="limbo-btn px-3 py-1.5 text-xs tracking-[0.2em] uppercase transition-colors hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              style={{ background: 'transparent', border: `2px solid ${LIMBO.fogWhite1}`, color: LIMBO.fogWhite1 }}
             >
               resume
             </Link>
             <Link
               href="/personal-projects/game-engine"
               className="limbo-btn px-3 py-1.5 text-xs tracking-[0.2em] uppercase transition-colors hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ background: LIMBO.black, color: LIMBO.fogWhite1 }}
+              style={{ background: LIMBO.fogWhite1, color: LIMBO.black }}
             >
               enter
             </Link>
@@ -811,8 +797,8 @@ export default function SilhouetteTheme() {
           <div className="flex flex-wrap justify-center gap-6">
             {CURRENT_ROLES.map((role) => (
               <div key={role.id} className="text-center">
-                <p className="text-xs tracking-[0.3em] uppercase" style={{ color: LIMBO.darkGrey1 }}>{role.title}</p>
-                <p className="text-xs mt-0.5" style={{ color: LIMBO.midGrey1 }}>{role.company}</p>
+                <p className="text-xs tracking-[0.3em] uppercase" style={{ color: LIMBO.fogWhite1 }}>{role.title}</p>
+                <p className="text-xs mt-0.5" style={{ color: LIMBO.lightGrey1 }}>{role.company}</p>
               </div>
             ))}
           </div>
@@ -826,7 +812,7 @@ export default function SilhouetteTheme() {
             <SilhouetteFigure key={prof} profession={prof} isActive={active === prof} onClick={() => setActive(prof)} />
           ))}
         </div>
-        <p className="text-center mt-3 text-xs tracking-[0.3em] uppercase" style={{ color: LIMBO.midGrey1 }}>
+        <p className="text-center mt-3 text-xs tracking-[0.3em] uppercase" style={{ color: LIMBO.lightGrey1 }}>
           {config.title.toLowerCase()}
         </p>
       </section>
@@ -937,138 +923,69 @@ export default function SilhouetteTheme() {
           </div>
         </section>
 
+        {/* ========== POSTS ========== */}
+        <section className="px-6 py-8" aria-label="Posts">
+          <div className="max-w-2xl mx-auto">
+            <SectionHeader title="posts" />
+            <LimboCard>
+              <div className="text-center py-6">
+                <p className="text-sm" style={{ color: LIMBO.lightGrey2 }}>
+                  Writings and thoughts coming soon...
+                </p>
+                <p className="text-xs mt-2 italic" style={{ color: LIMBO.lightGrey1 }}>
+                  [ emerging from the void ]
+                </p>
+              </div>
+            </LimboCard>
+          </div>
+        </section>
+
       </main>
 
       {/* ========== FOOTER ========== */}
       <footer className="relative z-20 py-10 text-center" role="contentinfo">
         <div className="flex items-center justify-center gap-3" aria-hidden="true">
-          <div className="w-6 h-px" style={{ background: `${LIMBO.black}40` }} />
-          <p className="text-xs tracking-[0.5em]" style={{ color: LIMBO.midGrey2 }}>. . .</p>
-          <div className="w-6 h-px" style={{ background: `${LIMBO.black}40` }} />
+          <div className="w-6 h-px" style={{ background: `${LIMBO.midGrey1}` }} />
+          <p className="text-xs tracking-[0.5em]" style={{ color: LIMBO.lightGrey1 }}>. . .</p>
+          <div className="w-6 h-px" style={{ background: `${LIMBO.midGrey1}` }} />
         </div>
       </footer>
 
       {/* =================================================================
-          LIMBO CSS - PURE GREYSCALE, HEAVY FILM GRAIN, FOG, MACHINERY
+          LIMBO CSS - OPTIMIZED FOR PERFORMANCE
+          Only essential animations, using CSS transforms only (GPU accelerated)
           ================================================================= */}
       <style jsx global>{`
-        /* ============ FOG DRIFT ============ */
-        @keyframes fog-drift-1 {
-          0% { transform: translateX(-30%); }
-          100% { transform: translateX(30%); }
+        /* ============ FOG DRIFT - Single layer, slow ============ */
+        @keyframes fog-drift {
+          0% { transform: translateX(-20%); }
+          100% { transform: translateX(20%); }
         }
-        @keyframes fog-drift-2 {
-          0% { transform: translateX(20%); }
-          100% { transform: translateX(-20%); }
-        }
-        .fog-drift-1 {
-          animation: fog-drift-1 60s ease-in-out infinite alternate;
-        }
-        .fog-drift-2 {
-          animation: fog-drift-2 80s ease-in-out infinite alternate;
-        }
-        .fog-layer {
-          animation: fog-drift-1 40s ease-in-out infinite alternate;
+        .fog-drift {
+          animation: fog-drift 80s ease-in-out infinite alternate;
         }
 
-        /* ============ HEAVY FILM GRAIN ============ */
+        /* ============ FILM GRAIN - Simplified ============ */
         @keyframes grain {
           0%, 100% { transform: translate(0, 0); }
-          10% { transform: translate(-1%, -1%); }
-          20% { transform: translate(0.5%, 1%); }
-          30% { transform: translate(-0.5%, -0.5%); }
-          40% { transform: translate(1%, -1%); }
-          50% { transform: translate(-1%, 0.5%); }
-          60% { transform: translate(0.5%, -0.5%); }
-          70% { transform: translate(-0.5%, 1%); }
-          80% { transform: translate(1%, 0.5%); }
-          90% { transform: translate(-1%, -0.5%); }
-        }
-        @keyframes grain-secondary {
-          0%, 100% { transform: translate(0, 0) scale(1.05); }
-          50% { transform: translate(-0.5%, 0.5%) scale(1.05); }
+          25% { transform: translate(-0.5%, 0.5%); }
+          50% { transform: translate(0.5%, -0.5%); }
+          75% { transform: translate(-0.5%, -0.5%); }
         }
         .grain {
-          animation: grain 0.3s steps(10) infinite;
-        }
-        .grain-secondary {
-          animation: grain-secondary 0.5s steps(6) infinite;
-        }
-        .grain-card {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 64 64' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-          animation: grain 0.4s steps(8) infinite;
+          animation: grain 0.5s steps(4) infinite;
         }
 
-        /* ============ FILM SCRATCHES ============ */
-        @keyframes film-scratch {
-          0% { opacity: 0.05; }
-          10% { opacity: 0.12; }
-          20% { opacity: 0.05; }
-          100% { opacity: 0.05; }
-        }
-        .film-scratches {
-          background: repeating-linear-gradient(
-            90deg,
-            transparent 0px,
-            transparent 100px,
-            ${LIMBO.fogWhite3}10 100px,
-            ${LIMBO.fogWhite3}10 101px,
-            transparent 101px,
-            transparent 300px,
-            ${LIMBO.fogWhite2}08 300px,
-            ${LIMBO.fogWhite2}08 301px
-          );
-          animation: film-scratch 3s linear infinite;
-        }
-
-        /* ============ RAIN / MIST ============ */
-        @keyframes rain-fall {
-          0% { transform: translateY(-100%); }
-          100% { transform: translateY(100%); }
-        }
-        .rain-mist {
-          background: repeating-linear-gradient(
-            180deg,
-            transparent 0px,
-            transparent 10px,
-            ${LIMBO.fogWhite2}05 10px,
-            ${LIMBO.fogWhite2}05 11px,
-            transparent 11px,
-            transparent 25px,
-            ${LIMBO.fogWhite1}03 25px,
-            ${LIMBO.fogWhite1}03 26px
-          );
-          animation: rain-fall 15s linear infinite;
-        }
-
-        /* ============ SPIDER ANIMATIONS ============ */
+        /* ============ SPIDER BREATHING - Subtle ============ */
         @keyframes spider-breathe {
-          0%, 100% { transform: scale(1) translateY(0); }
-          50% { transform: scale(1.02) translateY(-2px); }
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.015); }
         }
         .spider-breathe {
-          animation: spider-breathe 4s ease-in-out infinite;
+          animation: spider-breathe 5s ease-in-out infinite;
         }
-        @keyframes spider-eye-glow {
-          0%, 100% { filter: drop-shadow(0 0 4px ${LIMBO.fogWhite3}) drop-shadow(0 0 8px ${LIMBO.fogWhite2}); }
-          50% { filter: drop-shadow(0 0 6px ${LIMBO.fogWhite3}) drop-shadow(0 0 12px ${LIMBO.fogWhite2}); }
-        }
-        .spider-eye {
-          animation: spider-eye-glow 2s ease-in-out infinite;
-        }
-        @keyframes leg-twitch {
-          0%, 95%, 100% { transform: rotate(0deg); }
-          97% { transform: rotate(1deg); }
-        }
-        .spider-leg-1, .spider-leg-2, .spider-leg-3, .spider-leg-4 {
-          transform-origin: center;
-          animation: leg-twitch 8s ease-in-out infinite;
-        }
-        .spider-leg-2 { animation-delay: 0.5s; }
-        .spider-leg-3 { animation-delay: 1s; }
-        .spider-leg-4 { animation-delay: 1.5s; }
 
-        /* ============ GEAR ROTATIONS ============ */
+        /* ============ GEAR ROTATIONS - Only 2 gears ============ */
         @keyframes gear-rotate {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
@@ -1078,69 +995,16 @@ export default function SilhouetteTheme() {
           to { transform: rotate(0deg); }
         }
         .gear-rotate-slow {
-          animation: gear-rotate 50s linear infinite;
+          animation: gear-rotate 60s linear infinite;
         }
         .gear-rotate-medium {
-          animation: gear-rotate-reverse 35s linear infinite;
-        }
-        .gear-rotate-fast {
-          animation: gear-rotate 20s linear infinite;
-        }
-        .saw-spin {
-          animation: gear-rotate 8s linear infinite;
+          animation: gear-rotate-reverse 40s linear infinite;
         }
 
-        /* ============ SMOKE RISE ============ */
-        @keyframes smoke-rise {
-          0%, 100% { transform: translateY(0) scale(1); opacity: 0.15; }
-          50% { transform: translateY(-10px) scale(1.2); opacity: 0.1; }
-        }
-        .smoke-rise {
-          animation: smoke-rise 6s ease-in-out infinite;
-        }
-
-        /* ============ CHAIN SWING ============ */
-        @keyframes chain-swing {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(2deg); }
-          75% { transform: rotate(-2deg); }
-        }
-        .chain-swing {
-          animation: chain-swing 5s ease-in-out infinite;
-        }
-
-        /* ============ BOY WALK ============ */
-        @keyframes boy-walk {
-          0%, 100% { transform: translateX(0) scaleX(1); }
-          49% { transform: translateX(25px) scaleX(1); }
-          50% { transform: translateX(25px) scaleX(-1); }
-          99% { transform: translateX(0) scaleX(-1); }
-        }
-        .boy-walk {
-          animation: boy-walk 20s ease-in-out infinite;
-        }
-        @keyframes boy-eye-glow {
-          0%, 100% { filter: drop-shadow(0 0 2px ${LIMBO.fogWhite3}) drop-shadow(0 0 4px ${LIMBO.fogWhite2}); }
-          50% { filter: drop-shadow(0 0 3px ${LIMBO.fogWhite3}) drop-shadow(0 0 6px ${LIMBO.fogWhite2}); }
-        }
-        .boy-eye {
-          animation: boy-eye-glow 2s ease-in-out infinite;
-        }
-
-        /* ============ ROPE SWING ============ */
-        @keyframes rope-swing {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(1deg); }
-          75% { transform: rotate(-1deg); }
-        }
-        .rope-swing {
-          animation: rope-swing 4s ease-in-out infinite;
-        }
-
-        /* ============ FIGURE EYE GLOW ============ */
+        /* ============ FIGURE EYE GLOW - For profession selector ============ */
         @keyframes figure-eye-glow {
-          0%, 100% { filter: drop-shadow(0 0 3px ${LIMBO.fogWhite3}); }
-          50% { filter: drop-shadow(0 0 6px ${LIMBO.fogWhite3}); }
+          0%, 100% { opacity: 0.9; }
+          50% { opacity: 1; }
         }
         .figure-eye {
           animation: figure-eye-glow 2s ease-in-out infinite;
@@ -1158,20 +1022,19 @@ export default function SilhouetteTheme() {
           left: 3px;
           width: 100%;
           height: 100%;
-          background: ${LIMBO.black};
+          background: ${LIMBO.midGrey1};
           z-index: -1;
-          transition: top 0.15s ease, left 0.15s ease;
+          transition: transform 0.15s ease;
+          transform: translate(0, 0);
         }
         .limbo-btn:hover::after {
-          top: 5px;
-          left: 5px;
+          transform: translate(2px, 2px);
         }
         .limbo-btn:hover {
           transform: translate(-1px, -1px);
         }
         .limbo-btn:active::after {
-          top: 1px;
-          left: 1px;
+          transform: translate(-2px, -2px);
         }
         .limbo-btn:active {
           transform: translate(1px, 1px);
@@ -1179,40 +1042,24 @@ export default function SilhouetteTheme() {
 
         /* ============ ACCESSIBILITY - REDUCED MOTION ============ */
         @media (prefers-reduced-motion: reduce) {
-          .fog-drift-1,
-          .fog-drift-2,
-          .fog-layer,
+          .fog-drift,
           .grain,
-          .grain-secondary,
-          .grain-card,
-          .film-scratches,
-          .rain-mist,
           .spider-breathe,
-          .spider-eye,
-          .spider-leg-1,
-          .spider-leg-2,
-          .spider-leg-3,
-          .spider-leg-4,
           .gear-rotate-slow,
           .gear-rotate-medium,
-          .gear-rotate-fast,
-          .saw-spin,
-          .smoke-rise,
-          .chain-swing,
-          .boy-walk,
-          .boy-eye,
-          .rope-swing,
-          .figure-eye,
-          .limbo-btn {
+          .figure-eye {
             animation: none !important;
           }
           .limbo-btn::after {
-            transition: none;
+            transition: none !important;
           }
-          .spider-eye,
-          .boy-eye,
-          .figure-eye {
-            filter: drop-shadow(0 0 4px ${LIMBO.fogWhite3});
+          .limbo-btn:hover,
+          .limbo-btn:active {
+            transform: none !important;
+          }
+          .limbo-btn:hover::after,
+          .limbo-btn:active::after {
+            transform: none !important;
           }
         }
       `}</style>
