@@ -771,14 +771,14 @@ function CharacterCard({
         {/* Corner Tarot decorations */}
         <div
           className="absolute top-1 left-1 text-[8px] font-bold"
-          style={{ color: isActive ? '#000' : '#ff003380' }}
+          style={{ color: isActive ? '#000' : '#ff6666' }}
           aria-hidden="true"
         >
           {arcanas[profession].split(' - ')[0]}
         </div>
         <div
           className="absolute bottom-1 right-1 text-[8px] font-bold rotate-180"
-          style={{ color: isActive ? '#000' : '#ff003380' }}
+          style={{ color: isActive ? '#000' : '#ff6666' }}
           aria-hidden="true"
         >
           {arcanas[profession].split(' - ')[0]}
@@ -798,7 +798,7 @@ function CharacterCard({
           </span>
           <span
             className="text-[10px] tracking-widest block mt-1"
-            style={{ color: isActive ? '#330011' : '#ff0033' }}
+            style={{ color: isActive ? '#1a0000' : '#ff6666' }}
           >
             {arcanas[profession]}
           </span>
@@ -842,7 +842,7 @@ function RoleCard({
         aria-hidden="true"
       />
       <div style={{ transform: prefersReducedMotion ? 'none' : 'skewX(3deg)' }}>
-        <span className="text-xs tracking-wider font-medium" style={{ color: '#ff0033' }}>
+        <span className="text-xs tracking-wider font-medium" style={{ color: '#ff6666' }}>
           {role.title}
         </span>
         <span className="text-sm font-bold block" style={{ color: '#fff' }}>
@@ -942,12 +942,12 @@ function SkillCutIn({
       <div className="px-4 py-2" style={{ transform: 'skewX(3deg)' }}>
         <span
           className="text-sm font-bold tracking-wider block"
-          style={{ color: '#ff0033' }}
+          style={{ color: '#fff' }}
         >
           {name}
         </span>
         {achievement && (
-          <span className="text-sm block mt-0.5" style={{ color: '#ccc' }}>
+          <span className="text-sm block mt-0.5" style={{ color: '#e0e0e0' }}>
             {achievement}
           </span>
         )}
@@ -1035,7 +1035,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
               <span
                 key={service}
                 className="text-sm px-2 py-0.5"
-                style={{ background: '#ff003320', color: '#ff6666' }}
+                style={{ background: '#ff003330', color: '#fff' }}
               >
                 {service}
               </span>
@@ -1126,9 +1126,9 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           <span
             className="text-sm px-2 py-1"
             style={{
-              background: '#ff003320',
-              border: '1px solid #ff003340',
-              color: '#ff6666',
+              background: '#ff003330',
+              border: '1px solid #ff003350',
+              color: '#fff',
             }}
           >
             {startDisplay} - {endDisplay}
@@ -1160,7 +1160,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
             <span
               key={skill}
               className="text-sm px-2 py-0.5"
-              style={{ background: '#ff003320', color: '#ff6666' }}
+              style={{ background: '#ff003330', color: '#fff' }}
             >
               {skill}
             </span>
@@ -1234,7 +1234,7 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
                 <span
                   key={tech}
                   className="text-sm px-2 py-0.5"
-                  style={{ background: '#ff003320', color: '#ff6666' }}
+                  style={{ background: '#ff003330', color: '#fff' }}
                 >
                   {tech}
                 </span>
@@ -1547,9 +1547,9 @@ export default function BoldNoirTheme() {
                     key={i}
                     className="text-[10px] px-3 py-1 font-bold"
                     style={{
-                      background: '#ff003320',
+                      background: '#ff003330',
                       border: '1px solid #ff0033',
-                      color: '#ff0033',
+                      color: '#fff',
                       transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)',
                     }}
                   >
