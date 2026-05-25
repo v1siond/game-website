@@ -39,64 +39,136 @@ const HK = {
   mossGreen: '#2F5D34',
 }
 
-// SVG Hollow Knight - simple oval face with curved horns (accurate to game)
+// SVG Hollow Knight - accurate to game: egg-shaped face, curved horns, triangular void eyes
 function TheKnight({ size = 60 }: { size?: number }) {
   return (
-    <svg width={size} height={size * 1.4} viewBox="0 0 40 56" className="transition-all duration-300">
-      {/* Cloak/body - dark grey */}
-      <ellipse cx="20" cy="48" rx="12" ry="10" fill="#2a2a2a" />
-      <rect x="12" y="38" width="16" height="12" fill="#2a2a2a" />
-
-      {/* Left horn - curved upward */}
+    <svg width={size} height={size * 1.5} viewBox="0 0 60 90" className="transition-all duration-300">
+      {/* Cloak/body - dark flowing shape */}
       <path
-        d="M12,22 Q8,14 6,4 Q10,8 14,16 Q12,20 12,22"
-        fill={HK.bone}
-        stroke={HK.bone}
-        strokeWidth="0.5"
+        d="M30,55 Q15,58 12,75 Q15,85 30,88 Q45,85 48,75 Q45,58 30,55"
+        fill="#1a1a1a"
       />
-      {/* Right horn - curved upward */}
+      {/* Cloak inner fold */}
       <path
-        d="M28,22 Q32,14 34,4 Q30,8 26,16 Q28,20 28,22"
-        fill={HK.bone}
-        stroke={HK.bone}
-        strokeWidth="0.5"
+        d="M30,60 Q22,65 20,78 Q25,82 30,82 Q35,82 40,78 Q38,65 30,60"
+        fill="#0a0a0a"
       />
 
-      {/* Face - simple oval */}
-      <ellipse cx="20" cy="28" rx="12" ry="14" fill={HK.bone} />
+      {/* Left horn - smooth outward curve then sharp point */}
+      <path
+        d="M20,35 Q12,28 8,12 Q14,18 18,30 Q19,34 20,35"
+        fill={HK.bone}
+        stroke={HK.bone}
+        strokeWidth="1"
+        strokeLinejoin="round"
+      />
+      {/* Right horn - mirror */}
+      <path
+        d="M40,35 Q48,28 52,12 Q46,18 42,30 Q41,34 40,35"
+        fill={HK.bone}
+        stroke={HK.bone}
+        strokeWidth="1"
+        strokeLinejoin="round"
+      />
 
-      {/* Eyes - void black ovals, angled slightly */}
-      <ellipse cx="15" cy="26" rx="3" ry="5" fill={HK.void} />
-      <ellipse cx="25" cy="26" rx="3" ry="5" fill={HK.void} />
+      {/* Face - egg shape, wider at top */}
+      <ellipse cx="30" cy="42" rx="14" ry="17" fill={HK.bone} />
+
+      {/* Eyes - void black, elongated triangular, angled inward */}
+      <path d="M22,38 Q20,42 22,48 Q24,48 26,44 Q25,40 22,38" fill={HK.void} />
+      <path d="M38,38 Q40,42 38,48 Q36,48 34,44 Q35,40 38,38" fill={HK.void} />
     </svg>
   )
 }
 
-// Soul orb UI element (top-left in game)
-function SoulOrb({ filled = 100 }: { filled?: number }) {
+// Soul vessel UI - mask-like with eye holes (accurate to in-game UI)
+function SoulVessel({ filled = 100 }: { filled?: number }) {
   return (
-    <div
-      className="relative w-8 h-8 rounded-full"
-      style={{
-        background: `conic-gradient(${HK.bone} ${filled}%, ${HK.void} ${filled}%)`,
-        border: `2px solid ${HK.bone}`,
-        boxShadow: filled > 50 ? `0 0 10px ${HK.soul}` : 'none',
-      }}
-    />
+    <svg width="36" height="44" viewBox="0 0 36 44" className="drop-shadow-lg">
+      {/* Vessel outline - mask shape */}
+      <path
+        d="M18,2 Q4,8 4,22 Q4,38 18,42 Q32,38 32,22 Q32,8 18,2"
+        fill={HK.void}
+        stroke={HK.bone}
+        strokeWidth="2"
+      />
+      {/* Soul fill - rises from bottom */}
+      <defs>
+        <clipPath id="vesselClip">
+          <path d="M18,4 Q6,9 6,22 Q6,36 18,40 Q30,36 30,22 Q30,9 18,4" />
+        </clipPath>
+      </defs>
+      <rect
+        x="6"
+        y={40 - (filled * 0.36)}
+        width="24"
+        height={filled * 0.36}
+        fill={HK.soul}
+        clipPath="url(#vesselClip)"
+        opacity="0.9"
+      />
+      {/* Eye holes - void black */}
+      <ellipse cx="12" cy="18" rx="3" ry="5" fill={HK.void} />
+      <ellipse cx="24" cy="18" rx="3" ry="5" fill={HK.void} />
+      {/* Soul glow when full */}
+      {filled > 80 && (
+        <path
+          d="M18,4 Q6,9 6,22 Q6,36 18,40 Q30,36 30,22 Q30,9 18,4"
+          fill="none"
+          stroke={HK.soul}
+          strokeWidth="1"
+          opacity="0.6"
+          style={{ filter: `drop-shadow(0 0 6px ${HK.soul})` }}
+        />
+      )}
+    </svg>
   )
 }
 
-// Soul particles - floating cyan orbs with glow
+// Rain effect - City of Tears' most iconic visual element
+function CityRain() {
+  const [drops] = useState(() =>
+    Array.from({ length: 80 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      height: Math.random() * 20 + 10,
+      opacity: Math.random() * 0.3 + 0.1,
+      speed: Math.random() * 1.5 + 0.8,
+      delay: Math.random() * -3,
+    }))
+  )
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden">
+      {drops.map((d) => (
+        <div
+          key={d.id}
+          className="absolute w-px"
+          style={{
+            left: `${d.x}%`,
+            top: '-30px',
+            height: d.height,
+            background: `linear-gradient(180deg, transparent, ${HK.paleBlue}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
+            animation: `rain ${d.speed}s linear infinite`,
+            animationDelay: `${d.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// Soul particles - sparse floating cyan orbs
 function SoulParticles() {
   const [particles] = useState(() =>
-    Array.from({ length: 25 }, (_, i) => ({
+    Array.from({ length: 12 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
-      size: Math.random() * 6 + 3,
-      opacity: Math.random() * 0.4 + 0.2,
-      speed: Math.random() * 25 + 15,
-      delay: Math.random() * -20,
+      size: Math.random() * 4 + 2,
+      opacity: Math.random() * 0.3 + 0.1,
+      speed: Math.random() * 30 + 20,
+      delay: Math.random() * -25,
     }))
   )
 
@@ -111,10 +183,10 @@ function SoulParticles() {
             top: `${p.y}%`,
             width: p.size,
             height: p.size,
-            background: `radial-gradient(circle, ${HK.soul}, ${HK.soulDark})`,
+            background: HK.soul,
             opacity: p.opacity,
-            boxShadow: `0 0 ${p.size * 2}px ${HK.soul}, 0 0 ${p.size * 4}px ${HK.soulDark}`,
-            animation: `float ${p.speed}s ease-in-out infinite`,
+            boxShadow: `0 0 ${p.size * 3}px ${HK.soul}`,
+            animation: `soulFloat ${p.speed}s ease-in-out infinite`,
             animationDelay: `${p.delay}s`,
           }}
         />
@@ -123,43 +195,238 @@ function SoulParticles() {
   )
 }
 
-// City of Tears architectural elements - pillars and ironwork at edges
+// City of Tears chandelier - Art Nouveau styled with organic curves
+function CityOfTearsChandelier() {
+  return (
+    <svg
+      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[600px] h-48 opacity-70"
+      viewBox="0 0 500 160"
+    >
+      {/* Central chain with decorative links */}
+      <path d="M250,0 L250,20" stroke={HK.silver} strokeWidth="2" />
+      <circle cx="250" cy="25" r="5" fill="none" stroke={HK.silver} strokeWidth="1.5" />
+      <path d="M250,30 L250,40" stroke={HK.silver} strokeWidth="2" />
+
+      {/* Central ornate piece - Art Nouveau style */}
+      <path
+        d="M250,40 Q230,50 220,45 Q200,55 190,50 Q180,60 160,55
+           M250,40 Q270,50 280,45 Q300,55 310,50 Q320,60 340,55"
+        fill="none"
+        stroke={HK.silver}
+        strokeWidth="1.5"
+      />
+
+      {/* Swooping arms with organic curves */}
+      <path
+        d="M160,55 Q140,70 120,65 Q100,80 80,75"
+        fill="none"
+        stroke={HK.silver}
+        strokeWidth="1"
+        opacity="0.8"
+      />
+      <path
+        d="M340,55 Q360,70 380,65 Q400,80 420,75"
+        fill="none"
+        stroke={HK.silver}
+        strokeWidth="1"
+        opacity="0.8"
+      />
+
+      {/* Hanging chains with tear drops */}
+      {[80, 120, 160, 200, 250, 300, 340, 380, 420].map((x, i) => {
+        const yOffset = Math.abs(x - 250) * 0.15
+        const chainLen = 40 + Math.abs(x - 250) * 0.1
+        return (
+          <g key={i}>
+            {/* Chain */}
+            <path
+              d={`M${x},${55 + yOffset} L${x},${55 + yOffset + chainLen}`}
+              stroke={HK.silver}
+              strokeWidth="1"
+              strokeDasharray="3 2"
+              opacity="0.6"
+            />
+            {/* Glowing orb */}
+            <circle
+              cx={x}
+              cy={60 + yOffset + chainLen}
+              r={x === 250 ? 10 : 7}
+              fill={HK.bone}
+              opacity="0.95"
+            />
+            {/* Orb glow */}
+            <circle
+              cx={x}
+              cy={60 + yOffset + chainLen}
+              r={x === 250 ? 18 : 12}
+              fill={HK.bone}
+              opacity="0.15"
+            />
+          </g>
+        )
+      })}
+
+      {/* Decorative curls between arms */}
+      <path
+        d="M180,60 Q175,75 185,80 Q175,85 180,95"
+        fill="none"
+        stroke={HK.silver}
+        strokeWidth="1"
+        opacity="0.5"
+      />
+      <path
+        d="M320,60 Q325,75 315,80 Q325,85 320,95"
+        fill="none"
+        stroke={HK.silver}
+        strokeWidth="1"
+        opacity="0.5"
+      />
+    </svg>
+  )
+}
+
+// Ornate ironwork railing - Art Nouveau silhouette style
+function SpikyRailing() {
+  return (
+    <svg
+      className="fixed bottom-0 left-0 w-full h-32 opacity-50 pointer-events-none z-[6]"
+      viewBox="0 0 1000 100"
+      preserveAspectRatio="none"
+    >
+      {/* Base bar with slight curve */}
+      <path
+        d="M0,85 Q250,80 500,85 Q750,90 1000,85 L1000,100 L0,100 Z"
+        fill={HK.void}
+      />
+
+      {/* Repeating ornate finials - alternating heights */}
+      {Array.from({ length: 25 }, (_, i) => {
+        const x = i * 40 + 20
+        const isMain = i % 2 === 0
+        const height = isMain ? 55 : 35
+        return (
+          <g key={i}>
+            {/* Main spike with curved sides */}
+            <path
+              d={`M${x},85
+                 Q${x - 4},${85 - height * 0.3} ${x - 2},${85 - height * 0.6}
+                 Q${x},${85 - height} ${x},${85 - height}
+                 Q${x},${85 - height} ${x + 2},${85 - height * 0.6}
+                 Q${x + 4},${85 - height * 0.3} ${x},85`}
+              fill={HK.void}
+            />
+            {/* Decorative curls on main spikes */}
+            {isMain && (
+              <>
+                <path
+                  d={`M${x - 3},${85 - height * 0.4} Q${x - 12},${85 - height * 0.5} ${x - 8},${85 - height * 0.2}`}
+                  fill="none"
+                  stroke={HK.void}
+                  strokeWidth="3"
+                />
+                <path
+                  d={`M${x + 3},${85 - height * 0.4} Q${x + 12},${85 - height * 0.5} ${x + 8},${85 - height * 0.2}`}
+                  fill="none"
+                  stroke={HK.void}
+                  strokeWidth="3"
+                />
+              </>
+            )}
+          </g>
+        )
+      })}
+
+      {/* Connecting curves between spikes */}
+      {Array.from({ length: 24 }, (_, i) => {
+        const x1 = i * 40 + 20
+        const x2 = (i + 1) * 40 + 20
+        return (
+          <path
+            key={`curve-${i}`}
+            d={`M${x1},70 Q${(x1 + x2) / 2},78 ${x2},70`}
+            fill="none"
+            stroke={HK.void}
+            strokeWidth="2"
+          />
+        )
+      })}
+    </svg>
+  )
+}
+
+// Tall ornate window - Art Nouveau arch with soft light
+function OrnateWindow({ side }: { side: 'left' | 'right' }) {
+  const xPos = side === 'left' ? '5%' : '95%'
+  const transform = side === 'left' ? 'translateX(0)' : 'translateX(-100%)'
+
+  return (
+    <div
+      className="absolute top-[10%] h-[60%] w-24 opacity-40"
+      style={{ left: xPos, transform }}
+    >
+      <svg viewBox="0 0 80 200" className="w-full h-full" preserveAspectRatio="none">
+        {/* Window frame - Art Nouveau arch */}
+        <path
+          d="M10,200 L10,60 Q10,10 40,10 Q70,10 70,60 L70,200"
+          fill="none"
+          stroke={HK.silver}
+          strokeWidth="3"
+        />
+        {/* Inner arch */}
+        <path
+          d="M15,195 L15,62 Q15,18 40,18 Q65,18 65,62 L65,195"
+          fill={HK.paleBlue}
+          opacity="0.1"
+        />
+        {/* Decorative mullions */}
+        <line x1="40" y1="18" x2="40" y2="195" stroke={HK.silver} strokeWidth="1" opacity="0.5" />
+        <path d="M15,100 Q40,90 65,100" fill="none" stroke={HK.silver} strokeWidth="1" opacity="0.4" />
+        <path d="M15,140 Q40,130 65,140" fill="none" stroke={HK.silver} strokeWidth="1" opacity="0.4" />
+        {/* Art nouveau ornament at top */}
+        <path
+          d="M30,30 Q35,25 40,30 Q45,25 50,30"
+          fill="none"
+          stroke={HK.silver}
+          strokeWidth="1"
+          opacity="0.6"
+        />
+      </svg>
+      {/* Light glow from window */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(ellipse at ${side === 'left' ? '80%' : '20%'} 30%, ${HK.paleBlue}30, transparent 70%)`,
+          filter: 'blur(20px)',
+        }}
+      />
+    </div>
+  )
+}
+
+// City of Tears architecture - combined elements
 function CityArchitecture() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[3]">
-      {/* Left pillar */}
-      <svg className="absolute left-0 top-0 h-full w-20 opacity-30" viewBox="0 0 60 800" preserveAspectRatio="none">
-        {/* Gothic pillar shape */}
-        <rect x="5" y="0" width="20" height="800" fill={HK.darkPurple} />
-        <rect x="0" y="0" width="30" height="40" fill={HK.darkPurple} />
-        {/* Ornate curves */}
-        <path d="M25,40 Q40,60 25,100 Q45,140 25,180" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
-        <path d="M25,200 Q40,240 25,280 Q45,320 25,360" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
-      </svg>
-      {/* Right pillar */}
-      <svg className="absolute right-0 top-0 h-full w-20 opacity-30" viewBox="0 0 60 800" preserveAspectRatio="none">
-        <rect x="35" y="0" width="20" height="800" fill={HK.darkPurple} />
-        <rect x="30" y="0" width="30" height="40" fill={HK.darkPurple} />
-        <path d="M35,40 Q20,60 35,100 Q15,140 35,180" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
-        <path d="M35,200 Q20,240 35,280 Q15,320 35,360" stroke={HK.midBlue} strokeWidth="2" fill="none" opacity="0.5" />
-      </svg>
-      {/* Top chandelier hint */}
-      <svg className="absolute top-0 left-1/2 transform -translate-x-1/2 w-64 h-32 opacity-20" viewBox="0 0 200 80">
-        {/* Chandelier chain */}
-        <line x1="100" y1="0" x2="100" y2="20" stroke={HK.silver} strokeWidth="2" />
-        {/* Chandelier body */}
-        <ellipse cx="100" cy="30" rx="40" ry="10" fill="none" stroke={HK.silver} strokeWidth="1" />
-        {/* Hanging ornaments */}
-        <circle cx="70" cy="45" r="4" fill={HK.paleBlue} opacity="0.6" />
-        <circle cx="100" cy="50" r="5" fill={HK.paleBlue} opacity="0.8" />
-        <circle cx="130" cy="45" r="4" fill={HK.paleBlue} opacity="0.6" />
-        {/* Glowing orbs */}
-        <circle cx="60" cy="55" r="3" fill={HK.bone} />
-        <circle cx="80" cy="60" r="3" fill={HK.bone} />
-        <circle cx="100" cy="65" r="4" fill={HK.bone} />
-        <circle cx="120" cy="60" r="3" fill={HK.bone} />
-        <circle cx="140" cy="55" r="3" fill={HK.bone} />
-      </svg>
+      <CityOfTearsChandelier />
+      <OrnateWindow side="left" />
+      <OrnateWindow side="right" />
+      <SpikyRailing />
+
+      {/* Central atmospheric glow - soft and diffused */}
+      <div
+        className="absolute top-[15%] left-1/2 transform -translate-x-1/2 w-[800px] h-[500px]"
+        style={{
+          background: `radial-gradient(ellipse at center top, ${HK.paleBlue}25 0%, ${HK.midBlue}10 40%, transparent 70%)`,
+          filter: 'blur(60px)',
+        }}
+      />
+      {/* Bottom fog */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-48"
+        style={{
+          background: `linear-gradient(180deg, transparent, ${HK.deepBlue}40, ${HK.darkPurple}60)`,
+        }}
+      />
     </div>
   )
 }
@@ -275,56 +542,91 @@ function BenchWaypoint({
   )
 }
 
-// Hollow Knight panel frame - organic hand-drawn feel
+// Hollow Knight panel frame - Art Nouveau organic curves
 function VoidFrame({ children, title }: { children: React.ReactNode; title: string }) {
   return (
     <div className="relative">
-      {/* Corner thorns/shell ornaments */}
-      {[
-        { pos: '-top-2 -left-2', rot: '0' },
-        { pos: '-top-2 -right-2', rot: '90' },
-        { pos: '-bottom-2 -left-2', rot: '-90' },
-        { pos: '-bottom-2 -right-2', rot: '180' },
-      ].map((corner, i) => (
-        <div
-          key={i}
-          className={`absolute w-6 h-6 ${corner.pos}`}
-          style={{ transform: `rotate(${corner.rot}deg)` }}
-        >
-          <svg viewBox="0 0 24 24" className="w-full h-full">
-            <path
-              d="M2,12 Q2,2 12,2 L10,6 Q6,6 6,12 Z"
-              fill={HK.soul}
-              opacity="0.5"
-            />
-            <circle cx="4" cy="4" r="2" fill={HK.soul} opacity="0.7" />
-          </svg>
-        </div>
-      ))}
+      {/* Art Nouveau corner ornaments - flowing organic shapes */}
+      <svg className="absolute -top-3 -left-3 w-10 h-10" viewBox="0 0 40 40">
+        <path
+          d="M5,35 Q5,5 35,5"
+          fill="none"
+          stroke={HK.silver}
+          strokeWidth="1.5"
+          opacity="0.6"
+        />
+        <circle cx="8" cy="8" r="3" fill={HK.soul} opacity="0.4" />
+        <path d="M12,20 Q8,15 15,12" fill="none" stroke={HK.silver} strokeWidth="1" opacity="0.4" />
+      </svg>
+      <svg className="absolute -top-3 -right-3 w-10 h-10" viewBox="0 0 40 40">
+        <path
+          d="M35,35 Q35,5 5,5"
+          fill="none"
+          stroke={HK.silver}
+          strokeWidth="1.5"
+          opacity="0.6"
+        />
+        <circle cx="32" cy="8" r="3" fill={HK.soul} opacity="0.4" />
+        <path d="M28,20 Q32,15 25,12" fill="none" stroke={HK.silver} strokeWidth="1" opacity="0.4" />
+      </svg>
+      <svg className="absolute -bottom-3 -left-3 w-10 h-10" viewBox="0 0 40 40">
+        <path
+          d="M5,5 Q5,35 35,35"
+          fill="none"
+          stroke={HK.silver}
+          strokeWidth="1.5"
+          opacity="0.6"
+        />
+        <circle cx="8" cy="32" r="3" fill={HK.soul} opacity="0.4" />
+      </svg>
+      <svg className="absolute -bottom-3 -right-3 w-10 h-10" viewBox="0 0 40 40">
+        <path
+          d="M35,5 Q35,35 5,35"
+          fill="none"
+          stroke={HK.silver}
+          strokeWidth="1.5"
+          opacity="0.6"
+        />
+        <circle cx="32" cy="32" r="3" fill={HK.soul} opacity="0.4" />
+      </svg>
 
-      {/* Title with soul dividers */}
+      {/* Title with organic dividers */}
       <div className="flex items-center gap-4 mb-6">
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${HK.darkPurple})` }} />
+        <svg className="flex-1 h-3" viewBox="0 0 200 12" preserveAspectRatio="none">
+          <path
+            d="M0,6 Q50,2 100,6 Q150,10 200,6"
+            fill="none"
+            stroke={HK.darkPurple}
+            strokeWidth="1"
+          />
+        </svg>
         <h2
-          className="text-sm tracking-[0.25em] uppercase"
+          className="text-sm tracking-[0.25em] uppercase px-2"
           style={{
-            color: HK.soul,
+            color: HK.bone,
             fontFamily: '"Cinzel", "Garamond", serif',
-            textShadow: `0 0 20px ${HK.soulDark}`,
+            textShadow: `0 0 15px ${HK.soulDark}`,
           }}
         >
           {title}
         </h2>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${HK.darkPurple}, transparent)` }} />
+        <svg className="flex-1 h-3" viewBox="0 0 200 12" preserveAspectRatio="none">
+          <path
+            d="M0,6 Q50,10 100,6 Q150,2 200,6"
+            fill="none"
+            stroke={HK.darkPurple}
+            strokeWidth="1"
+          />
+        </svg>
       </div>
 
       <div
         className="p-6 relative"
         style={{
-          background: `linear-gradient(180deg, ${HK.void}ee, ${HK.darkPurple}40)`,
-          border: `1px solid ${HK.darkPurple}`,
-          borderRadius: '4px 8px 4px 8px',
-          boxShadow: `inset 0 0 30px rgba(0,0,0,0.4)`,
+          background: `linear-gradient(180deg, ${HK.void}f0, ${HK.darkPurple}30)`,
+          border: `1px solid ${HK.darkPurple}60`,
+          borderRadius: '2px',
+          boxShadow: `inset 0 0 40px rgba(0,0,0,0.5)`,
         }}
       >
         {children}
@@ -559,26 +861,30 @@ export default function DarkFantasyTheme() {
         fontFamily: '"Cinzel", "Garamond", serif',
       }}
     >
-      {/* City of Tears atmosphere - deep blue with rain-like particles */}
+      {/* City of Tears atmosphere - muted blue-grey with depth */}
       <div
         className="fixed inset-0 z-0"
         style={{
           background: `
-            radial-gradient(ellipse at 30% 20%, ${HK.midBlue}40 0%, transparent 40%),
-            radial-gradient(ellipse at 70% 70%, ${HK.deepBlue}60 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 100%, ${HK.paleBlue}20 0%, transparent 40%),
-            linear-gradient(180deg, ${HK.void} 0%, ${HK.deepBlue} 50%, ${HK.darkPurple} 100%)
+            radial-gradient(ellipse at 50% 10%, ${HK.midBlue}30 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 60%, ${HK.deepBlue}40 0%, transparent 40%),
+            radial-gradient(ellipse at 80% 40%, ${HK.deepBlue}30 0%, transparent 35%),
+            linear-gradient(180deg, ${HK.void} 0%, ${HK.deepBlue}90 40%, ${HK.darkPurple}80 100%)
           `,
         }}
       />
+      <CityRain />
       <CityArchitecture />
       <SoulParticles />
-      {/* Heavy vignette - City of Tears has strong depth */}
+      {/* Heavy vignette - City of Tears has strong depth, darker edges */}
       <div
         className="fixed inset-0 pointer-events-none z-[8]"
         style={{
-          boxShadow: `inset 0 0 200px 80px ${HK.void}`,
-          background: 'radial-gradient(ellipse at 50% 30%, transparent 20%, rgba(0,0,0,0.6) 100%)',
+          boxShadow: `inset 0 0 250px 100px ${HK.void}`,
+          background: `
+            radial-gradient(ellipse at 50% 25%, transparent 15%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%),
+            linear-gradient(180deg, transparent 60%, ${HK.void}90 100%)
+          `,
         }}
       />
 
@@ -803,36 +1109,34 @@ export default function DarkFantasyTheme() {
 
       {/* Animations */}
       <style jsx global>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0) translateX(0); }
-          25% { transform: translateY(-20px) translateX(5px); }
-          50% { transform: translateY(-10px) translateX(-5px); }
-          75% { transform: translateY(-30px) translateX(3px); }
+        @keyframes rain {
+          0% { transform: translateY(-30px); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(100vh); opacity: 0; }
+        }
+        @keyframes soulFloat {
+          0%, 100% { transform: translateY(0) translateX(0); opacity: 0.2; }
+          25% { transform: translateY(-30px) translateX(10px); opacity: 0.4; }
+          50% { transform: translateY(-15px) translateX(-8px); opacity: 0.3; }
+          75% { transform: translateY(-40px) translateX(5px); opacity: 0.35; }
         }
         @keyframes fade-in-down {
           from { opacity: 0; transform: translateY(-20px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .animate-float { animation: float 20s ease-in-out infinite; }
         .animate-fade-in-down { animation: fade-in-down 0.8s ease-out; }
-        @keyframes ornamentFloat {
-          0%, 100% { transform: translateY(0) translateX(0) rotate(0deg); }
-          25% { transform: translateY(-15px) translateX(8px) rotate(5deg); }
-          50% { transform: translateY(-8px) translateX(-5px) rotate(-3deg); }
-          75% { transform: translateY(-20px) translateX(3px) rotate(3deg); }
-        }
         @keyframes slashReveal {
           0% { transform: scaleX(0); opacity: 0; }
           50% { transform: scaleX(1); opacity: 1; }
           100% { transform: scaleX(0); opacity: 0; }
         }
-        @keyframes knight-dash {
+        @keyframes knightDash {
           0% { transform: translateX(-100px); opacity: 0; }
           20% { opacity: 1; }
           80% { opacity: 1; }
           100% { transform: translateX(calc(100vw + 100px)); opacity: 0; }
         }
-        .animate-knight-dash { animation: knight-dash 0.6s ease-out forwards; }
       `}</style>
     </div>
   )
