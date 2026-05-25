@@ -448,19 +448,22 @@ export const BattleReveal = memo(function BattleReveal({
               </div>
             )}
 
-            {/* Blood Pool - offset LEFT to where battle happened (bug moves right) */}
-            {showBloodPool && (
-              <div
-                className="absolute top-full mt-4 z-5 pointer-events-none"
-                style={{ left: '50%', transform: 'translateX(calc(-50% + 80px))' }}
-              >
-                <BloodPool />
-              </div>
-            )}
-
             {isBugDead ? (
               <>
                 <DeadBugCreature size={120} />
+                {/* Blood Pool - inside dead bug, counter-rotated, offset left */}
+                {showBloodPool && (
+                  <div
+                    className="absolute z-5 pointer-events-none"
+                    style={{
+                      left: '50%',
+                      top: '100%',
+                      transform: 'rotate(180deg) translateX(40px) translateY(-20px)',
+                    }}
+                  >
+                    <BloodPool />
+                  </div>
+                )}
                 {/* Continuous drip effect when complete */}
                 {phase === 'complete' && (
                   <div className="absolute left-1/2 top-1/2 -translate-x-1/2 pointer-events-none">
