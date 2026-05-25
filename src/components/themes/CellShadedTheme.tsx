@@ -515,7 +515,7 @@ function VaultHunterCard({
           {hunter.name}
         </span>
         <span
-          className="text-[10px] block mt-1 font-bold relative z-10"
+          className="text-sm block mt-1 font-bold relative z-10"
           style={{
             color: isActive ? BORDERLANDS_COLORS.clapTrapYellow : hunter.color,
             fontStyle: 'italic',
@@ -533,7 +533,7 @@ function VaultHunterCard({
           }}
         >
           <span
-            className="text-[8px] font-black tracking-widest"
+            className="text-sm font-black tracking-widest"
             style={{ color: isActive ? BORDERLANDS_COLORS.clapTrapYellow : hunter.color }}
           >
             {hunter.actionSkill}
@@ -541,7 +541,7 @@ function VaultHunterCard({
         </div>
 
         <span
-          className="text-[8px] block mt-2 font-black tracking-widest relative z-10"
+          className="text-sm block mt-2 font-black tracking-widest relative z-10"
           style={{ color: isActive ? BORDERLANDS_COLORS.paper : '#555' }}
         >
           {hunter.level}
@@ -607,7 +607,7 @@ function TechStackCloud({ categories, reducedMotion = false }: { categories: Ret
             <span className="text-lg" aria-hidden="true">{category.icon}</span>
             {category.name.toUpperCase()}
             <span
-              className="text-[8px] px-2 py-0.5 font-black"
+              className="text-sm px-2 py-0.5 font-black"
               style={{
                 background: BORDERLANDS_COLORS.ink,
                 color: colors[catIndex % colors.length],
@@ -708,7 +708,7 @@ function SkillAchievement({
             >
               {/* Rarity badge */}
               <span
-                className="absolute -top-2 right-2 text-[7px] px-2 py-0.5 font-black tracking-wider"
+                className="absolute -top-2 right-2 text-sm px-2 py-0.5 font-black tracking-wider"
                 style={{
                   background: rarity.color,
                   color: BORDERLANDS_COLORS.ink,
@@ -728,7 +728,7 @@ function SkillAchievement({
                     {skill.name.toUpperCase()}
                   </span>
                   <span
-                    className="text-[10px] block mt-1 italic"
+                    className="text-sm block mt-1 italic"
                     style={{ color: rarity.color }}
                   >
                     {getAchievementText(skill.name, skill.proficiency)}
@@ -783,7 +783,7 @@ function ExperienceCard({ entry, index, reducedMotion = false }: { entry: typeof
 
       {/* Mission type indicator */}
       <div
-        className="absolute top-2 right-2 text-[8px] font-black tracking-widest"
+        className="absolute top-2 right-2 text-sm font-black tracking-widest"
         aria-hidden="true"
         style={{ color: color }}
       >
@@ -812,7 +812,7 @@ function ExperienceCard({ entry, index, reducedMotion = false }: { entry: typeof
           {entry.highlights.map((highlight, i) => (
             <li
               key={i}
-              className="text-[11px] flex items-start gap-2"
+              className="text-sm flex items-start gap-2"
               style={{ color: BORDERLANDS_COLORS.ink, fontFamily: 'Arial, sans-serif' }}
             >
               <span
@@ -869,7 +869,7 @@ function LootCard({ project, rarity, reducedMotion = false }: { project: typeof 
 
       {/* Rarity banner */}
       <div
-        className="absolute -top-3 left-4 px-3 py-0.5 text-[10px] font-black tracking-wider"
+        className="absolute -top-3 left-4 px-3 py-0.5 text-sm font-black tracking-wider"
         style={{
           background: `linear-gradient(180deg, ${config.color} 0%, ${config.color}cc 100%)`,
           color: '#fff',
@@ -884,7 +884,7 @@ function LootCard({ project, rarity, reducedMotion = false }: { project: typeof 
 
       {/* Weapon stats panel */}
       <div className="absolute top-1 right-2 text-right" aria-hidden="true">
-        <div className="flex flex-col gap-0.5 text-[7px] font-bold">
+        <div className="flex flex-col gap-0.5 text-sm font-bold">
           <span style={{ color: '#666' }}>DMG <span style={{ color: config.color }}>{dmg}</span></span>
           <span style={{ color: '#666' }}>ACC <span style={{ color: config.color }}>{accuracy}%</span></span>
           <span style={{ color: '#666' }}>RoF <span style={{ color: config.color }}>{fireRate}</span></span>
@@ -894,14 +894,14 @@ function LootCard({ project, rarity, reducedMotion = false }: { project: typeof 
       <h3 className="text-sm font-black mt-4 mb-1 pr-14 relative z-10" style={{ color: BORDERLANDS_COLORS.ink }}>
         {project.name}
       </h3>
-      <p className="text-[10px] mb-2 relative z-10" style={{ color: '#555', fontFamily: 'Arial, sans-serif' }}>
+      <p className="text-sm mb-2 relative z-10" style={{ color: '#555', fontFamily: 'Arial, sans-serif' }}>
         {project.tagline}
       </p>
 
       {/* Impact statement - the key achievement */}
       {project.impact && (
         <p
-          className="text-[10px] mb-2 font-bold relative z-10 px-2 py-1"
+          className="text-sm mb-2 font-bold relative z-10 px-2 py-1"
           style={{
             color: config.color,
             background: `${BORDERLANDS_COLORS.ink}`,
@@ -917,7 +917,7 @@ function LootCard({ project, rarity, reducedMotion = false }: { project: typeof 
         {project.techStack.slice(0, 4).map((tech, i) => (
           <span
             key={tech}
-            className="text-[8px] px-2 py-0.5 font-bold"
+            className="text-sm px-2 py-0.5 font-bold"
             style={{
               background: i === 0 ? config.color : BORDERLANDS_COLORS.ink,
               color: i === 0 ? BORDERLANDS_COLORS.ink : BORDERLANDS_COLORS.paper,
@@ -976,7 +976,7 @@ function CompanyCard({ company, reducedMotion = false }: { company: typeof COMPA
           boxShadow: `2px 2px 0 ${BORDERLANDS_COLORS.ink}`,
         }}
       >
-        <span className="text-[10px] font-black tracking-wider" style={{ color: BORDERLANDS_COLORS.ink }}>
+        <span className="text-sm font-black tracking-wider" style={{ color: BORDERLANDS_COLORS.ink }}>
           VENDOR
         </span>
       </div>
@@ -996,7 +996,7 @@ function CompanyCard({ company, reducedMotion = false }: { company: typeof COMPA
           <p className="text-[9px] font-bold" style={{ color: BORDERLANDS_COLORS.legendary }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-[10px] relative z-10" style={{ color: '#555', fontFamily: 'Arial, sans-serif' }}>{company.description}</p>
+      <p className="text-sm relative z-10" style={{ color: '#555', fontFamily: 'Arial, sans-serif' }}>{company.description}</p>
 
       {/* Services as weapon bonuses */}
       <div className="mt-3 space-y-1 relative z-10">
@@ -1037,18 +1037,18 @@ function BandCard({ band, reducedMotion = false }: { band: typeof BANDS[0]; redu
           aria-hidden="true"
           style={{ background: BORDERLANDS_COLORS.uncommon, boxShadow: `0 0 10px ${BORDERLANDS_COLORS.uncommon}` }}
         />
-        <span className="text-[8px] tracking-widest font-bold" style={{ color: BORDERLANDS_COLORS.eridium }}>ECHO RECORDING</span>
+        <span className="text-sm tracking-widest font-bold" style={{ color: BORDERLANDS_COLORS.eridium }}>ECHO RECORDING</span>
       </div>
 
       <h4 className={`text-sm font-black ${reducedMotion ? '' : 'group-hover:text-[#ff6600] transition-colors'}`} style={{ color: BORDERLANDS_COLORS.paper }}>
         {band.name}
       </h4>
-      <p className="text-[10px] mt-1 font-bold" style={{ color: BORDERLANDS_COLORS.eridium }}>
+      <p className="text-sm mt-1 font-bold" style={{ color: BORDERLANDS_COLORS.eridium }}>
         {band.genre} | {band.role}
       </p>
-      <p className="text-[10px] mt-2" style={{ color: '#aaa', fontFamily: 'Arial, sans-serif' }}>{band.description}</p>
+      <p className="text-sm mt-2" style={{ color: '#aaa', fontFamily: 'Arial, sans-serif' }}>{band.description}</p>
       {!band.url && (
-        <p className="text-[8px] mt-2 italic" style={{ color: '#666' }}>
+        <p className="text-sm mt-2 italic" style={{ color: '#666' }}>
           [SIGNAL INCOMING...]
         </p>
       )}
@@ -1109,7 +1109,7 @@ function RoleBadge({ role }: { role: typeof CURRENT_ROLES[0] }) {
 
       {/* Skill point indicator */}
       <div
-        className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center text-[8px] font-black"
+        className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center text-sm font-black"
         aria-hidden="true"
         style={{
           background: roleColor,
@@ -1124,7 +1124,7 @@ function RoleBadge({ role }: { role: typeof CURRENT_ROLES[0] }) {
         {role.title}
       </p>
       <p className="text-sm font-black relative z-10" style={{ color: BORDERLANDS_COLORS.ink }}>{role.company}</p>
-      <p className="text-[8px] mt-1 relative z-10" style={{ color: '#555', fontFamily: 'Arial, sans-serif' }}>{role.description}</p>
+      <p className="text-sm mt-1 relative z-10" style={{ color: '#555', fontFamily: 'Arial, sans-serif' }}>{role.description}</p>
     </div>
   )
 }

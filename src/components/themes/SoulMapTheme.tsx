@@ -961,7 +961,7 @@ function ZoneNode({
           {zone.name}
         </span>
         <span
-          className="text-[8px] tracking-wider mt-1"
+          className="text-sm tracking-wider mt-1"
           style={{ color: isActive ? '#aaa' : '#444' }}
         >
           {zone.description}
@@ -971,7 +971,7 @@ function ZoneNode({
       {/* Rest at bonfire prompt */}
       {isActive && (
         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap" aria-hidden="true">
-          <span className="text-[8px] tracking-widest animate-pulse" style={{ color: `${COLORS.bonfire}80` }}>
+          <span className="text-sm tracking-widest animate-pulse" style={{ color: `${COLORS.bonfire}80` }}>
             BONFIRE LIT
           </span>
         </div>
@@ -1052,7 +1052,7 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
           {project.name}
         </h3>
       </div>
-      <p className="text-[10px] mb-2 leading-relaxed" style={{ color: '#666050' }}>
+      <p className="text-sm mb-2 leading-relaxed" style={{ color: '#666050' }}>
         {project.tagline}
       </p>
       {/* Impact statement instead of just description */}
@@ -1065,7 +1065,7 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
         {project.techStack.slice(0, 3).map((tech) => (
           <span
             key={tech}
-            className="text-[8px] px-2 py-0.5 tracking-wide"
+            className="text-sm px-2 py-0.5 tracking-wide"
             style={{
               background: '#1a1815',
               color: '#887860',
@@ -1109,14 +1109,14 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
           <h4 className="text-sm tracking-wide group-hover:text-orange-300 transition-colors" style={{ color: '#c0a080' }}>
             {company.name}
           </h4>
-          <p className="text-[10px]" style={{ color: COLORS.bonfire }}>{company.tagline}</p>
+          <p className="text-sm" style={{ color: COLORS.bonfire }}>{company.tagline}</p>
         </div>
       </div>
       <p className="text-xs leading-relaxed" style={{ color: '#666050' }}>{company.description}</p>
 
       {/* External link indicator */}
       <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
-        <span className="text-[8px]" style={{ color: `${COLORS.bonfire}60` }}>TRAVEL</span>
+        <span className="text-sm" style={{ color: `${COLORS.bonfire}60` }}>TRAVEL</span>
       </div>
     </a>
   )
@@ -1145,10 +1145,10 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
       <h4 className="text-sm tracking-wide group-hover:text-purple-300 transition-colors" style={{ color: '#b090d0' }}>
         {band.name}
       </h4>
-      <p className="text-[10px] mt-1" style={{ color: '#9966ff' }}>{band.genre} - {band.role}</p>
+      <p className="text-sm mt-1" style={{ color: '#9966ff' }}>{band.genre} - {band.role}</p>
       <p className="text-xs mt-2 leading-relaxed" style={{ color: '#666050' }}>{band.description}</p>
       {!band.url && (
-        <p className="text-[10px] mt-2 italic" style={{ color: '#444' }}>Covenant forming...</p>
+        <p className="text-sm mt-2 italic" style={{ color: '#444' }}>Covenant forming...</p>
       )}
     </article>
   )
@@ -1188,7 +1188,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           <h4 className="text-sm tracking-wide" style={{ color: '#c0a080' }}>{entry.title}</h4>
           <p className="text-xs" style={{ color: COLORS.bonfire }}>{entry.organization}</p>
         </div>
-        <span className="text-[10px] tracking-wide" style={{ color: '#666050' }}>
+        <span className="text-sm tracking-wide" style={{ color: '#666050' }}>
           {startDisplay} - {endDisplay}
         </span>
       </div>
@@ -1298,7 +1298,7 @@ function SkillsDisplay({ categories }: { categories: ReturnType<typeof getSkills
         <div key={category.name} role="listitem">
           <div className="flex items-center gap-2 mb-3">
             {category.icon && <span className="text-lg" aria-hidden="true">{category.icon}</span>}
-            <h3 className="text-[10px] tracking-[0.2em]" style={{ color: '#886640' }}>
+            <h3 className="text-sm tracking-[0.2em]" style={{ color: '#886640' }}>
               {category.name.toUpperCase()}
             </h3>
           </div>
@@ -1337,7 +1337,7 @@ function MiniMap({ active }: { active: string }) {
       }}
       aria-label="Navigation map"
     >
-      <div className="text-[8px] tracking-widest mb-2 text-center" style={{ color: '#666050' }}>
+      <div className="text-sm tracking-widest mb-2 text-center" style={{ color: '#666050' }}>
         LORDRAN
       </div>
       <div className="grid grid-cols-3 gap-1" role="grid" aria-label="Area grid">
@@ -1600,7 +1600,7 @@ export default function SoulMapTheme() {
                 <span
                   key={i}
                   role="listitem"
-                  className="text-[10px] px-3 py-1 tracking-wide"
+                  className="text-sm px-3 py-1 tracking-wide"
                   style={{
                     background: '#1a1815',
                     color: '#887860',
@@ -1704,7 +1704,7 @@ export default function SoulMapTheme() {
           <Bonfire size="small" label="Footer bonfire" />
           <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, ${COLORS.ash}, transparent)` }} aria-hidden="true" />
         </div>
-        <p className="text-[10px] tracking-[0.4em] mt-4" style={{ color: '#444030' }}>
+        <p className="text-sm tracking-[0.4em] mt-4" style={{ color: '#444030' }}>
           EXPLORATION: {Math.round((explored.size / 3) * 100)}% • MMXXVI
         </p>
       </footer>

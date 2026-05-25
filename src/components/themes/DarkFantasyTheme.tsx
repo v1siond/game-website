@@ -529,7 +529,7 @@ function BenchWaypoint({
       >
         <span className="text-xl mb-1" style={{ color: isActive ? color : HK.silver }}>{icon}</span>
         <span
-          className="text-[8px] tracking-[0.2em] uppercase"
+          className="text-sm tracking-[0.2em] uppercase"
           style={{
             color: isActive ? color : HK.silver,
             fontFamily: '"Cinzel", "Garamond", serif',
@@ -710,7 +710,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
       }}
     >
       {project.featured && (
-        <span className="text-[8px] tracking-[0.15em] uppercase" style={{ color: HK.soul }}>◇ Featured</span>
+        <span className="text-sm tracking-[0.15em] uppercase" style={{ color: HK.soul }}>◇ Featured</span>
       )}
       <h4 className="text-sm mt-1 transition-colors" style={{ color: HK.bone }}>
         {project.name}
@@ -721,7 +721,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
       )}
       <div className="flex flex-wrap gap-1 mt-3">
         {project.techStack.slice(0, 4).map((tech) => (
-          <span key={tech} className="text-[8px] px-1 py-0.5" style={{ background: `${HK.soul}15`, color: HK.silver }}>
+          <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${HK.soul}15`, color: HK.silver }}>
             {tech}
           </span>
         ))}
@@ -750,7 +750,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
           <h4 className="text-sm transition-colors" style={{ color: HK.bone }}>
             {company.name}
           </h4>
-          <p className="text-[10px]" style={{ color: HK.soul }}>{company.tagline}</p>
+          <p className="text-sm" style={{ color: HK.soul }}>{company.tagline}</p>
         </div>
       </div>
       <p className="text-xs" style={{ color: HK.silver }}>{company.description}</p>
@@ -772,9 +772,9 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
       <h4 className="text-sm transition-colors" style={{ color: HK.bone }}>
         {band.name}
       </h4>
-      <p className="text-[10px] mt-1" style={{ color: HK.soul }}>{band.genre} • {band.role}</p>
+      <p className="text-sm mt-1" style={{ color: HK.soul }}>{band.genre} • {band.role}</p>
       <p className="text-xs mt-2" style={{ color: HK.silver }}>{band.description}</p>
-      {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: HK.silver }}>Website coming soon</p>}
+      {!band.url && <p className="text-sm mt-2 italic" style={{ color: HK.silver }}>Website coming soon</p>}
     </div>
   )
 
@@ -804,7 +804,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           <p className="text-xs" style={{ color: HK.soul }}>{entry.organization}</p>
         </div>
         <span
-          className="text-[10px] px-2 py-0.5"
+          className="text-sm px-2 py-0.5"
           style={{
             color: HK.soul,
             background: `${HK.soul}15`,

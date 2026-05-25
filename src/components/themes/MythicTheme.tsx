@@ -750,7 +750,7 @@ function TechStackDisplay({ color }: { color: string }) {
             {category.items.map((tech) => (
               <span
                 key={tech}
-                className="text-[10px] px-2.5 py-1 transition-all hover:scale-105"
+                className="text-sm px-2.5 py-1 transition-all hover:scale-105"
                 style={{
                   background: `${color}15`,
                   border: `1px solid ${color}40`,
@@ -860,7 +860,7 @@ function CurrentRolesSection({ color }: { color: string }) {
               </div>
               {role.type === 'leadership' && (
                 <span
-                  className="text-[8px] px-2 py-0.5 tracking-wider"
+                  className="text-sm px-2 py-0.5 tracking-wider"
                   style={{
                     background: `${HADES_COLORS.goldMid}20`,
                     border: `1px solid ${HADES_COLORS.goldMid}50`,
@@ -871,7 +871,7 @@ function CurrentRolesSection({ color }: { color: string }) {
                 </span>
               )}
             </div>
-            <p className="text-[10px] mt-1" style={{ color: HADES_COLORS.textSecondary }}>
+            <p className="text-sm mt-1" style={{ color: HADES_COLORS.textSecondary }}>
               {role.description}
             </p>
           </div>
@@ -912,7 +912,7 @@ function CompaniesSection() {
                   <h3 className="text-sm font-bold" style={{ color: HADES_COLORS.textPrimary }}>
                     {company.name}
                   </h3>
-                  <p className="text-[10px]" style={{ color: HADES_COLORS.chaosVoid }}>
+                  <p className="text-sm" style={{ color: HADES_COLORS.chaosVoid }}>
                     {company.tagline}
                   </p>
                 </div>
@@ -937,7 +937,7 @@ function CompaniesSection() {
               {company.services.map((service) => (
                 <span
                   key={service}
-                  className="text-[8px] px-2 py-0.5"
+                  className="text-sm px-2 py-0.5"
                   style={{
                     background: `${HADES_COLORS.chaosVoid}15`,
                     border: `1px solid ${HADES_COLORS.chaosVoid}30`,
@@ -1059,7 +1059,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           </p>
         </div>
         <span
-          className="text-[10px] px-2 py-0.5"
+          className="text-sm px-2 py-0.5"
           style={{
             background: `${HADES_COLORS.bloodMid}30`,
             border: `1px solid ${HADES_COLORS.bloodMid}50`,
@@ -1128,7 +1128,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
         )}
       </div>
 
-      <p className="text-[10px] mb-2" style={{ color: HADES_COLORS.textSecondary }}>
+      <p className="text-sm mb-2" style={{ color: HADES_COLORS.textSecondary }}>
         {project.tagline}
       </p>
 
@@ -1142,7 +1142,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
         {project.techStack.slice(0, 4).map((tech) => (
           <span
             key={tech}
-            className="text-[8px] px-2 py-0.5"
+            className="text-sm px-2 py-0.5"
             style={{
               background: `${HADES_COLORS.bloodMid}20`,
               border: `1px solid ${HADES_COLORS.bloodMid}40`,
@@ -1415,7 +1415,7 @@ export default function MythicTheme() {
               {aboutData.quickFacts.map((fact, i) => (
                 <span
                   key={i}
-                  className="text-[10px] px-4 py-1"
+                  className="text-sm px-4 py-1"
                   style={{
                     background: `${HADES_COLORS.bloodMid}20`,
                     border: `1px solid ${HADES_COLORS.bloodMid}60`,

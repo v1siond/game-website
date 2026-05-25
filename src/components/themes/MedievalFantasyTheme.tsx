@@ -377,7 +377,7 @@ function UnitBar({
       aria-label={label}
     >
       <span
-        className="text-[10px] uppercase tracking-wider font-bold w-8 text-right"
+        className="text-sm uppercase tracking-wider font-bold w-8 text-right"
         style={{ color: WC3.textGray }}
       >
         {label}
@@ -407,7 +407,7 @@ function UnitBar({
         })}
         {/* Text overlay */}
         <span
-          className="absolute inset-0 flex items-center justify-center text-[10px] font-bold"
+          className="absolute inset-0 flex items-center justify-center text-sm font-bold"
           style={{ color: WC3.textWhite, textShadow: '0 1px 2px #000, 0 0 4px #000' }}
         >
           {current} / {max}
@@ -542,7 +542,7 @@ function AbilityIcon({
       {/* Hotkey indicator */}
       {hotkey && (
         <div
-          className="absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-[8px] font-bold"
+          className="absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-sm font-bold"
           style={{
             background: WC3.panelDark,
             border: `1px solid ${WC3.panelBorder}`,
@@ -872,7 +872,7 @@ function FactionSelector({
 
             {/* Description */}
             <span
-              className="text-[10px]"
+              className="text-sm"
               style={{ color: WC3.textGray }}
             >
               {faction.desc}
@@ -933,7 +933,7 @@ function BuildQueue({ categories }: { categories: ReturnType<typeof getEngineerS
             {category.items.map((tech) => (
               <AbilityIcon key={tech} learned={true} size={32}>
                 <span
-                  className="text-[10px] font-bold text-center leading-tight px-1"
+                  className="text-sm font-bold text-center leading-tight px-1"
                   style={{ color: WC3.textWhite }}
                 >
                   {tech.substring(0, 3).toUpperCase()}
@@ -1039,7 +1039,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <GoldIcon size={12} />
-          <span className="text-[10px]" style={{ color: WC3.textGray }}>
+          <span className="text-sm" style={{ color: WC3.textGray }}>
             {startDisplay} - {endDisplay}
           </span>
         </div>
@@ -1089,7 +1089,7 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
             aria-hidden="true"
           />
           <span
-            className="text-[10px] tracking-wider font-bold"
+            className="text-sm tracking-wider font-bold"
             style={{ color: WC3.goldYellow }}
           >
             LEGENDARY QUEST
@@ -1161,7 +1161,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
           >
             {company.name}
           </h4>
-          <p className="text-[10px]" style={{ color: WC3.textGold }}>
+          <p className="text-sm" style={{ color: WC3.textGold }}>
             {company.tagline}
           </p>
         </div>
@@ -1196,7 +1196,7 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
           >
             {band.name}
           </h4>
-          <p className="text-[10px]" style={{ color: WC3.textGold }}>
+          <p className="text-sm" style={{ color: WC3.textGold }}>
             {band.genre} | {band.role}
           </p>
         </div>
@@ -1211,7 +1211,7 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
             style={{ background: WC3.healthGreen, boxShadow: `0 0 6px ${WC3.healthGreen}` }}
             aria-hidden="true"
           />
-          <span className="text-[10px]" style={{ color: WC3.healthGreen }}>Active</span>
+          <span className="text-sm" style={{ color: WC3.healthGreen }}>Active</span>
         </div>
       )}
     </article>

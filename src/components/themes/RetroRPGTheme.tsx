@@ -332,7 +332,7 @@ function DeterminationText({
 function DeterminationMoment({ text }: { text: string }) {
   return (
     <div className="text-center py-4" role="img" aria-label="Determination moment">
-      <p className="text-white/60 text-[10px] mb-2">* {text}</p>
+      <p className="text-white/60 text-sm mb-2">* {text}</p>
       <p className="text-xs">
         <DeterminationText>But it refused.</DeterminationText>
       </p>
@@ -407,7 +407,7 @@ function CompanyCard({ company }: { company: (typeof COMPANIES)[0] }) {
           <h4 className="text-xs font-bold text-white group-hover:text-black">
             {company.name}
           </h4>
-          <p className="text-[8px] text-yellow-400 group-hover:text-yellow-600">
+          <p className="text-sm text-yellow-400 group-hover:text-yellow-600">
             {company.tagline}
           </p>
         </div>
@@ -445,11 +445,11 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
             <PixelHeartSoul size={10} color="#ff0000" animate={false} ariaLabel="" />
             {entry.title}
           </h4>
-          <p className="text-[10px] text-yellow-400">
+          <p className="text-sm text-yellow-400">
             @ {entry.organization}
           </p>
         </div>
-        <span className="text-[8px] text-white/60 tabular-nums">
+        <span className="text-sm text-white/60 tabular-nums">
           {startDisplay} - {endDisplay}
         </span>
       </div>
@@ -482,14 +482,14 @@ function BandCard({ band }: { band: (typeof BANDS)[0] }) {
         <PixelHeartSoul size={10} color="#9900ff" animate={false} ariaLabel="" />
         {band.name} appears!
       </h4>
-      <p className="text-[8px] text-purple-400 mt-1">
+      <p className="text-sm text-purple-400 mt-1">
         {band.genre} | {band.role}
       </p>
       <p className="text-[9px] text-white/80 mt-2">
         {band.description}
       </p>
       {!band.url && (
-        <p className="text-[8px] text-yellow-400 mt-2 italic">
+        <p className="text-sm text-yellow-400 mt-2 italic">
           * Website coming soon...
         </p>
       )}
@@ -523,12 +523,12 @@ function ProjectCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
         </span>
         {project.featured && <SavePointStar size="sm" />}
       </div>
-      <p className="text-[8px] text-white/60 group-hover:text-white/80 mb-2">
+      <p className="text-sm text-white/60 group-hover:text-white/80 mb-2">
         {project.tagline}
       </p>
       {/* Impact statement */}
       {project.impact && (
-        <p className="text-[8px] text-cyan-400 group-hover:text-cyan-200 flex items-start gap-1 mb-2">
+        <p className="text-sm text-cyan-400 group-hover:text-cyan-200 flex items-start gap-1 mb-2">
           <span className="text-yellow-400">*</span>
           {project.impact}
         </p>
@@ -701,10 +701,10 @@ export default function RetroRPGTheme() {
               <h1 className="text-lg tracking-wider">
                 ALEXANDER PULIDO
               </h1>
-              <p className="text-yellow-400 text-[10px] tracking-wide">
+              <p className="text-yellow-400 text-sm tracking-wide">
                 {PROFESSIONAL_SUMMARY.headline}
               </p>
-              <p className="text-cyan-400 text-[8px] mt-1 italic">
+              <p className="text-cyan-400 text-sm mt-1 italic">
                 * {PROFESSIONAL_SUMMARY.tagline}
               </p>
             </div>
@@ -766,7 +766,7 @@ export default function RetroRPGTheme() {
           {/* About Section */}
           <BattleBox title="ABOUT" color="#9900ff" ariaLabel="About Alexander">
             <div className="mb-4 p-3 border-2 border-white/30">
-              <p className="text-[10px] text-white leading-relaxed">
+              <p className="text-sm text-white leading-relaxed">
                 {aboutData.bio}
               </p>
             </div>
@@ -862,12 +862,12 @@ export default function RetroRPGTheme() {
 
       {/* Footer */}
       <footer className="relative z-20 py-8 px-4 border-t-4 border-white text-center" role="contentinfo">
-        <p className="text-[8px] tracking-widest text-white/80">
+        <p className="text-sm tracking-widest text-white/80">
           * The power of <DeterminationText>determination</DeterminationText> shines within you.
         </p>
         <div className="flex items-center justify-center gap-2 mt-3">
           <PixelHeartSoul size={16} color="#ff0000" />
-          <span className="text-yellow-400 text-[10px]">SAVE PROGRESS</span>
+          <span className="text-yellow-400 text-sm">SAVE PROGRESS</span>
           <PixelHeartSoul size={16} color="#ff0000" />
         </div>
       </footer>

@@ -985,18 +985,18 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
               </span>
               {project.featured && (
                 <span
-                  className="text-[8px] px-2 py-1 font-bold animate-pulse"
+                  className="text-sm px-2 py-1 font-bold animate-pulse"
                   style={{ background: '#ff0033', color: '#000' }}
                 >
                   ALL OUT
                 </span>
               )}
             </div>
-            <p className="text-[10px]" style={{ color: '#666' }}>
+            <p className="text-sm" style={{ color: '#b8b8b8' }}>
               {project.tagline}
             </p>
             {project.impact && (
-              <p className="text-[10px] mt-2 italic" style={{ color: '#ff0033' }}>
+              <p className="text-sm mt-2 italic" style={{ color: '#ff6666' }}>
                 → {project.impact}
               </p>
             )}
@@ -1004,8 +1004,8 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
               {project.techStack.slice(0, 4).map((tech) => (
                 <span
                   key={tech}
-                  className="text-[8px] px-2 py-0.5"
-                  style={{ background: '#ff003320', color: '#ff0033' }}
+                  className="text-sm px-2 py-0.5"
+                  style={{ background: '#ff003320', color: '#ff6666' }}
                 >
                   {tech}
                 </span>

@@ -215,7 +215,7 @@ function WarningSign({
           {text}
         </span>
         {subtext && (
-          <span className="bg-black px-2 py-0.5 text-white text-[10px]">
+          <span className="bg-black px-2 py-0.5 text-white text-sm">
             {subtext}
           </span>
         )}
@@ -547,7 +547,7 @@ function RobotSentry({ side }: { side: 'left' | 'right' }) {
       </div>
       {active && (
         <div
-          className="absolute -top-6 left-1/2 -translate-x-1/2 text-[8px] whitespace-nowrap glados-text"
+          className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm whitespace-nowrap glados-text"
           style={{ color: '#ff3333' }}
           aria-hidden="true"
         >
@@ -1101,7 +1101,7 @@ function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; in
           </p>
         </div>
         <span
-          className="text-[10px] tracking-wider px-2 py-1"
+          className="text-sm tracking-wider px-2 py-1"
           style={{
             background: `${color}15`,
             color,
@@ -1161,7 +1161,7 @@ function MusicChamberCard({ band }: { band: typeof BANDS[0] }) {
       </p>
       <p className="text-xs mt-2" style={{ color: '#888' }}>{band.description}</p>
       {!band.url && (
-        <p className="text-[10px] mt-2 italic" style={{ color: '#666' }}>
+        <p className="text-sm mt-2 italic" style={{ color: '#666' }}>
           [AUDIO LOGS PENDING]
         </p>
       )}
@@ -1438,7 +1438,7 @@ export default function NeonPortalsTheme() {
             <p className="text-xs tracking-[0.3em]" style={{ color: '#444' }}>
               APERTURE SCIENCE ENRICHMENT CENTER
             </p>
-            <p className="text-[10px] tracking-wider mt-1" style={{ color: '#333' }}>
+            <p className="text-sm tracking-wider mt-1" style={{ color: '#333' }}>
               "WE DO WHAT WE MUST BECAUSE WE CAN"
             </p>
           </div>

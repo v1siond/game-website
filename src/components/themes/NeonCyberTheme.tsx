@@ -399,7 +399,7 @@ function CyberPanel({
           </div>
           <h2
             id={`panel-${title.toLowerCase().replace(/\s+/g, '-')}`}
-            className="text-[10px] tracking-[0.3em] uppercase"
+            className="text-sm tracking-[0.3em] uppercase"
             style={{ color: accentColor }}
           >
             {'//'} {title}
@@ -549,7 +549,7 @@ function SkillChip({
 
   return (
     <div
-      className="px-3 py-2 text-[10px] relative overflow-hidden group cursor-default transition-all hover:scale-105"
+      className="px-3 py-2 text-sm relative overflow-hidden group cursor-default transition-all hover:scale-105"
       style={{
         background: `${color}15`,
         border: `1px solid ${color}60`,
@@ -573,7 +573,7 @@ function SkillChip({
       <div className="relative z-10">
         <span className="font-mono font-bold">{name}</span>
         {achievement && (
-          <span className="block text-[8px] text-white/60 mt-0.5 italic">{achievement}</span>
+          <span className="block text-sm text-white/60 mt-0.5 italic">{achievement}</span>
         )}
       </div>
     </div>
@@ -604,7 +604,7 @@ function RoleBadge({
       }}
       aria-label={`${type === 'leadership' ? 'Leadership' : 'Employment'}: ${title} at ${company}`}
     >
-      <div className="text-[10px] tracking-wider" style={{ color: color }}>
+      <div className="text-sm tracking-wider" style={{ color: color }}>
         {type === 'leadership' ? '// LEADERSHIP' : '// EMPLOYMENT'}
       </div>
       <div className="text-sm font-bold text-white">{title}</div>
@@ -648,7 +648,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
             <h3 className="text-sm font-bold text-white group-hover:text-cyan-400 transition-colors">
               {company.name}
             </h3>
-            <p className="text-[10px] text-pink-500">{company.tagline}</p>
+            <p className="text-sm text-pink-500">{company.tagline}</p>
           </div>
         </div>
         <p className="text-xs text-white/70 mb-3">{company.description}</p>
@@ -656,7 +656,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
           {company.services.slice(0, 3).map((service) => (
             <span
               key={service}
-              className="text-[8px] px-2 py-0.5 bg-cyan-400/10 border border-cyan-400/30 text-cyan-400"
+              className="text-sm px-2 py-0.5 bg-cyan-400/10 border border-cyan-400/30 text-cyan-400"
             >
               {service}
             </span>
@@ -665,7 +665,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
 
         {/* External link indicator */}
         <div
-          className="absolute top-2 right-6 text-[10px] text-cyan-400/50 group-hover:text-cyan-400 transition-colors"
+          className="absolute top-2 right-6 text-sm text-cyan-400/50 group-hover:text-cyan-400 transition-colors"
           aria-hidden="true"
         >
           [LINK]
@@ -692,14 +692,14 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
       <h3 className="text-sm font-bold text-white group-hover:text-pink-400 transition-colors">
         {band.name}
       </h3>
-      <p className="text-[10px] mt-1" style={{ color: '#9966cc' }}>
+      <p className="text-sm mt-1" style={{ color: '#9966cc' }}>
         {band.genre} | {band.role}
       </p>
       <p className="text-xs text-white/70 mt-2">{band.description}</p>
       {band.url ? (
-        <div className="text-[10px] text-cyan-400/70 mt-2">[STREAM_LINK]</div>
+        <div className="text-sm text-cyan-400/70 mt-2">[STREAM_LINK]</div>
       ) : (
-        <div className="text-[10px] text-white/30 mt-2 italic">[LINK_PENDING]</div>
+        <div className="text-sm text-white/30 mt-2 italic">[LINK_PENDING]</div>
       )}
     </article>
   )
@@ -740,9 +740,9 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           <h3 className="text-sm text-cyan-400 group-hover:text-pink-400 transition-colors font-mono">
             {entry.title}
           </h3>
-          <div className="text-[10px] text-pink-500 mt-0.5">{entry.organization}</div>
+          <div className="text-sm text-pink-500 mt-0.5">{entry.organization}</div>
         </div>
-        <span className="text-[10px] text-white/50 font-mono px-2 py-0.5 bg-white/5 border border-white/10">
+        <span className="text-sm text-white/50 font-mono px-2 py-0.5 bg-white/5 border border-white/10">
           {startDisplay} - {endDisplay}
         </span>
       </header>
@@ -754,7 +754,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
       {entry.highlights && entry.highlights.length > 0 && (
         <ul className="space-y-1 mb-2" aria-label="Key achievements">
           {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-[10px] text-cyan-400 flex items-start gap-2 font-mono">
+            <li key={i} className="text-sm text-cyan-400 flex items-start gap-2 font-mono">
               <span className="text-pink-500" aria-hidden="true">&gt;</span>
               {highlight}
             </li>
@@ -767,7 +767,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
         {entry.skills.slice(0, 5).map((skill) => (
           <span
             key={skill}
-            className="text-[8px] px-2 py-0.5 bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 font-mono"
+            className="text-sm px-2 py-0.5 bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 font-mono"
             role="listitem"
           >
             {skill}
@@ -796,7 +796,7 @@ function TechCategory({ category }: { category: ReturnType<typeof getEngineerSki
         {category.items.map((tech, i) => (
           <span
             key={tech}
-            className="px-2 py-1 text-[10px] font-mono transition-all hover:scale-105 cursor-default"
+            className="px-2 py-1 text-sm font-mono transition-all hover:scale-105 cursor-default"
             style={{
               background: `${['#ff00ff', '#00ffff', '#ffff00', '#00ff66', '#ff6600'][i % 5]}15`,
               border: `1px solid ${['#ff00ff', '#00ffff', '#ffff00', '#00ff66', '#ff6600'][i % 5]}40`,
@@ -977,7 +977,7 @@ export default function NeonCyberTheme() {
 
       {/* Top HUD elements - Kiroshi optics overlay style */}
       <div
-        className="fixed top-4 left-4 z-40 text-[8px] text-cyan-400/50 font-mono space-y-1"
+        className="fixed top-4 left-4 z-40 text-sm text-cyan-400/50 font-mono space-y-1"
         role="presentation"
         aria-hidden="true"
       >
@@ -987,7 +987,7 @@ export default function NeonCyberTheme() {
         <div className="mt-2 text-pink-500/50">THREAT_LVL: MINIMAL</div>
       </div>
       <div
-        className="fixed top-4 right-20 z-40 text-[8px] text-pink-500/50 font-mono text-right space-y-1"
+        className="fixed top-4 right-20 z-40 text-sm text-pink-500/50 font-mono text-right space-y-1"
         role="presentation"
         aria-hidden="true"
       >
@@ -1055,7 +1055,7 @@ export default function NeonCyberTheme() {
       <section className="relative z-20 py-6 px-6" aria-labelledby="roles-heading">
         <div className="max-w-6xl mx-auto">
           <h2 id="roles-heading" className="text-center mb-4">
-            <span className="text-[10px] tracking-[0.3em] text-cyan-400/70 font-mono">
+            <span className="text-sm tracking-[0.3em] text-cyan-400/70 font-mono">
               {'//'} ACTIVE_CONTRACTS
             </span>
           </h2>
@@ -1147,11 +1147,11 @@ export default function NeonCyberTheme() {
                       {prof.toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-[10px] text-white/50 block font-mono">
+                  <span className="text-sm text-white/50 block font-mono">
                     {prof === 'engineer' ? 'EXP: 10+ YEARS' : prof === 'drummer' ? 'EXP: 15 YEARS' : 'EXP: 6 YEARS'}
                   </span>
                   {active === prof && (
-                    <span className="text-[8px] text-green-400 block mt-1 font-mono">[ACTIVE]</span>
+                    <span className="text-sm text-green-400 block mt-1 font-mono">[ACTIVE]</span>
                   )}
                 </div>
               </button>
@@ -1204,20 +1204,20 @@ export default function NeonCyberTheme() {
                         {project.name}
                       </h3>
                       {project.featured && (
-                        <span className="text-[8px] px-2 py-0.5 bg-yellow-400 text-black font-bold">
+                        <span className="text-sm px-2 py-0.5 bg-yellow-400 text-black font-bold">
                           PREEM
                         </span>
                       )}
                     </header>
-                    <p className="text-[10px] text-white/50 mt-1">{project.tagline}</p>
+                    <p className="text-sm text-white/50 mt-1">{project.tagline}</p>
                     {project.impact && (
-                      <p className="text-[10px] text-pink-500 mt-1 italic">&gt; {project.impact}</p>
+                      <p className="text-sm text-pink-500 mt-1 italic">&gt; {project.impact}</p>
                     )}
                     <div className="flex gap-2 mt-2 flex-wrap" role="list" aria-label="Technologies used">
                       {project.techStack.slice(0, 4).map((tech) => (
                         <span
                           key={tech}
-                          className="text-[8px] px-1 py-0.5 bg-white/5 text-cyan-400 font-mono"
+                          className="text-sm px-1 py-0.5 bg-white/5 text-cyan-400 font-mono"
                           role="listitem"
                         >
                           {tech}
@@ -1238,7 +1238,7 @@ export default function NeonCyberTheme() {
                 {aboutData.quickFacts.map((fact, i) => (
                   <span
                     key={i}
-                    className="text-[10px] px-2 py-1 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-mono"
+                    className="text-sm px-2 py-1 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-mono"
                     role="listitem"
                   >
                     [{fact}]
@@ -1296,10 +1296,10 @@ export default function NeonCyberTheme() {
           <span className="text-xs text-cyan-400/50 tracking-[0.3em] font-mono">NIGHT_CITY // 2077</span>
           <div className="w-16 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" aria-hidden="true" />
         </div>
-        <p className="text-[10px] text-white/30 tracking-widest font-mono">
+        <p className="text-sm text-white/30 tracking-widest font-mono">
           [ SYS.ONLINE ] // [ NET.STABLE ] // [ ICE.BYPASSED ] // [ CHROME.PREEM ]
         </p>
-        <p className="text-[8px] text-white/20 mt-2 font-mono">
+        <p className="text-sm text-white/20 mt-2 font-mono">
           // Wake the f*** up, samurai. We have a city to burn.
         </p>
       </footer>

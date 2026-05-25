@@ -866,8 +866,8 @@ function PlasmidButton({
 
         {/* Description */}
         <div
-          className="text-[10px] mt-1"
-          style={{ color: isActive ? '#0a1520' : '#a09080' }}
+          className="text-sm mt-1"
+          style={{ color: isActive ? '#0a1520' : '#c0b0a0' }}
         >
           {descs[profession]}
         </div>
@@ -932,7 +932,7 @@ function SkillAchievementCard({
       {/* Content */}
       <div className="relative z-10">
         <h4
-          className="text-xs font-bold mb-2"
+          className="text-base font-bold mb-2"
           style={{ color: '#d4af37', fontFamily: '"Playfair Display", serif' }}
         >
           {'>>'} {skillName}
@@ -942,16 +942,16 @@ function SkillAchievementCard({
             {achievements.map((achievement, i) => (
               <li
                 key={i}
-                className="text-[10px] flex items-start gap-2"
+                className="text-sm flex items-start gap-2"
                 style={{ color: '#e8e0d0' }}
               >
-                <span style={{ color: '#d4af3780' }}>-</span>
+                <span style={{ color: '#d4af37' }}>-</span>
                 {achievement}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="text-[10px]" style={{ color: '#a09080' }}>
+          <p className="text-sm" style={{ color: '#c0b0a0' }}>
             Demonstrated proficiency
           </p>
         )}
@@ -1070,7 +1070,7 @@ function ExperienceCard({
             <p className="text-xs mt-1" style={{ color: '#e8e0d0' }}>{entry.organization}</p>
           </div>
           <time
-            className="text-[10px] px-2 py-0.5"
+            className="text-sm px-2 py-0.5"
             style={{
               background: 'rgba(212, 175, 55, 0.15)',
               border: '1px solid rgba(212, 175, 55, 0.4)',
@@ -1083,12 +1083,12 @@ function ExperienceCard({
           </time>
         </div>
 
-        <p className="text-xs mb-3" style={{ color: '#a09080' }}>{entry.description}</p>
+        <p className="text-sm mb-3" style={{ color: '#c0b0a0' }}>{entry.description}</p>
 
         {entry.highlights && entry.highlights.length > 0 && (
           <ul className="space-y-1 mb-3" aria-label="Key achievements">
             {entry.highlights.map((highlight, i) => (
-              <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#e8e0d0' }}>
+              <li key={i} className="text-sm flex items-start gap-2" style={{ color: '#e8e0d0' }}>
                 <span style={{ color: '#d4af37' }} aria-hidden="true">{'>>'}</span>
                 {highlight}
               </li>
@@ -1100,11 +1100,11 @@ function ExperienceCard({
           {entry.skills.slice(0, 4).map((skill) => (
             <span
               key={skill}
-              className="text-[8px] px-2 py-0.5"
+              className="text-sm px-2 py-0.5"
               style={{
                 background: 'rgba(212, 175, 55, 0.1)',
                 border: '1px solid rgba(212, 175, 55, 0.25)',
-                color: '#a09080',
+                color: '#d4af37',
               }}
             >
               {skill}
@@ -1141,7 +1141,7 @@ function TechCloud({
       {categories.map((category) => (
         <div key={category.name} role="listitem">
           <h3
-            className="text-xs tracking-widest mb-2 flex items-center gap-2"
+            className="text-base tracking-widest mb-2 flex items-center gap-2"
             style={{ color: '#d4af37' }}
           >
             <span aria-hidden="true">{category.icon}</span>
@@ -1152,7 +1152,7 @@ function TechCloud({
               <span
                 key={tech}
                 role="listitem"
-                className={`text-[10px] px-2 py-1 ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+                className={`text-sm px-2 py-1 ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
                 style={{
                   background: '#d4af3715',
                   border: '1px solid #d4af3740',
@@ -1263,7 +1263,7 @@ function VaultPoster({
           </h3>
           {project.featured && (
             <span
-              className="text-[8px] px-2 py-0.5"
+              className="text-sm px-2 py-0.5"
               style={{ background: '#d4af37', color: '#0a1520' }}
               aria-label="Featured project"
             >
@@ -1271,14 +1271,14 @@ function VaultPoster({
             </span>
           )}
         </div>
-        <p className="text-[10px] mb-3" style={{ color: '#a09080' }}>
+        <p className="text-sm mb-3" style={{ color: '#c0b0a0' }}>
           {project.tagline}
         </p>
         <div className="flex gap-2 flex-wrap" aria-label="Technologies used">
           {project.techStack.slice(0, 3).map((tech) => (
             <span
               key={tech}
-              className="text-[8px] px-2 py-0.5"
+              className="text-sm px-2 py-0.5"
               style={{
                 background: '#d4af3720',
                 border: '1px solid #d4af3740',
@@ -1365,10 +1365,10 @@ function CompanyCard({
             >
               {company.name}
             </h4>
-            <p className="text-[10px]" style={{ color: '#a09080' }}>{company.tagline}</p>
+            <p className="text-sm" style={{ color: '#c0b0a0' }}>{company.tagline}</p>
           </div>
         </div>
-        <p className="text-xs" style={{ color: '#e8e0d0' }}>{company.description}</p>
+        <p className="text-sm" style={{ color: '#e8e0d0' }}>{company.description}</p>
       </div>
 
       {/* Hover brass gleam */}
@@ -1438,9 +1438,9 @@ function BandCard({
         >
           {band.name}
         </h4>
-        <p className="text-[10px] mt-1" style={{ color: '#a09080' }}>{band.genre} - {band.role}</p>
-        <p className="text-xs mt-2" style={{ color: '#e8e0d0' }}>{band.description}</p>
-        {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: '#a09080' }}>Website coming soon</p>}
+        <p className="text-sm mt-1" style={{ color: '#c0b0a0' }}>{band.genre} - {band.role}</p>
+        <p className="text-sm mt-2" style={{ color: '#e8e0d0' }}>{band.description}</p>
+        {!band.url && <p className="text-sm mt-2 italic" style={{ color: '#c0b0a0' }}>Website coming soon</p>}
       </div>
 
       {/* Hover brass gleam */}
@@ -1641,7 +1641,7 @@ export default function ArtDecoTheme() {
                   <span
                     key={i}
                     role="listitem"
-                    className="text-[10px] px-3 py-1"
+                    className="text-sm px-3 py-1"
                     style={{
                       background: '#d4af3710',
                       border: '1px solid #d4af3740',

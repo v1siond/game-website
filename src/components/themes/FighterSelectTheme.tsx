@@ -403,10 +403,10 @@ function ComboCounter({ hits, label }: { hits: number; label: string }) {
         {hits}
       </span>
       <div className="flex flex-col">
-        <span className="text-[8px] tracking-widest" style={{ color: theme.colors.accent }}>
+        <span className="text-sm tracking-widest" style={{ color: theme.colors.accent }}>
           {label.toUpperCase()}
         </span>
-        <span className="text-[10px] font-bold" style={{ color: '#ff6600' }}>
+        <span className="text-sm font-bold" style={{ color: '#ff6600' }}>
           COMBO!
         </span>
       </div>
@@ -438,7 +438,7 @@ function SpecialMoveInput({ name, input }: { name: string; input: string }) {
     return notation.split('').map((char, i) => (
       <span
         key={i}
-        className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold"
+        className="inline-flex items-center justify-center w-5 h-5 text-sm font-bold"
         style={{
           background: `radial-gradient(circle at 40% 35%, ${theme.colors.surface}, #1a1a2a)`,
           border: '2px solid #3a3a4a',
@@ -624,7 +624,7 @@ function CharacterPortrait({
         }}
       >
         <div className="text-sm font-bold tracking-widest">{name}</div>
-        <div className="text-[10px] opacity-80">{subtitle}</div>
+        <div className="text-sm opacity-80">{subtitle}</div>
       </div>
 
       {/* Win/Loss record */}
@@ -656,7 +656,7 @@ function CharacterPortrait({
         {achievements.slice(0, 3).map((achievement, i) => (
           <div
             key={i}
-            className="text-[9px] px-2 py-1 text-left"
+            className="text-sm px-2 py-1 text-left"
             style={{
               background: `${theme.colors.accent}15`,
               borderLeft: `2px solid ${theme.colors.accent}`,
@@ -722,7 +722,7 @@ function RoleRank({ role }: { role: (typeof CURRENT_ROLES)[0] }) {
         </div>
       )}
       <div
-        className="text-[10px] tracking-[0.2em]"
+        className="text-sm tracking-[0.2em]"
         style={{ color: isLeadership ? '#ffd700' : theme.colors.accent }}
       >
         {role.title.toUpperCase()}
@@ -775,19 +775,19 @@ function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
             >
               {company.name}
             </h4>
-            <p className="text-[10px] tracking-wider" style={{ color: theme.colors.accent }}>
+            <p className="text-sm tracking-wider" style={{ color: theme.colors.accent }}>
               {company.tagline}
             </p>
           </div>
         </div>
-        <p className="text-[10px] mt-3 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
+        <p className="text-sm mt-3 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
           {company.description}
         </p>
         <div className="flex flex-wrap gap-1 mt-3 relative">
           {company.services.slice(0, 3).map((service) => (
             <span
               key={service}
-              className="text-[8px] px-2 py-0.5"
+              className="text-sm px-2 py-0.5"
               style={{
                 background: `${theme.colors.accent}20`,
                 border: `1px solid ${theme.colors.accent}40`,
@@ -835,21 +835,21 @@ function BandCard({ band }: { band: (typeof BANDS)[0] }) {
         </h4>
         {band.active && (
           <span
-            className="text-[8px] px-2 py-0.5 font-bold"
+            className="text-sm px-2 py-0.5 font-bold"
             style={{ background: '#4ade80', color: '#000', boxShadow: '0 0 10px #4ade80' }}
           >
             ACTIVE
           </span>
         )}
       </div>
-      <p className="text-[10px] mt-1 relative" style={{ color: bandColor }}>
+      <p className="text-sm mt-1 relative" style={{ color: bandColor }}>
         {band.genre} // {band.role}
       </p>
-      <p className="text-[10px] mt-2 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
+      <p className="text-sm mt-2 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
         {band.description}
       </p>
       {!band.url && (
-        <p className="text-[8px] mt-2 italic relative" style={{ color: theme.colors.textMuted }}>
+        <p className="text-sm mt-2 italic relative" style={{ color: theme.colors.textMuted }}>
           Website coming soon...
         </p>
       )}
@@ -907,12 +907,12 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
             <h4 className="text-sm font-bold" style={{ color: theme.colors.text }}>
               {entry.title}
             </h4>
-            <p className="text-[10px] tracking-wider" style={{ color: theme.colors.accent }}>
+            <p className="text-sm tracking-wider" style={{ color: theme.colors.accent }}>
               {entry.organization}
             </p>
           </div>
           <span
-            className="text-[10px] px-3 py-1 font-bold tracking-wider"
+            className="text-sm px-3 py-1 font-bold tracking-wider"
             style={{
               background: isActive ? 'linear-gradient(90deg, #4ade80, #22c55e)' : theme.colors.border,
               color: isActive ? '#000' : theme.colors.text,
@@ -924,7 +924,7 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
         </div>
 
         {/* Description */}
-        <p className="text-[10px] mb-3 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
+        <p className="text-sm mb-3 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
           {entry.description}
         </p>
 
@@ -934,7 +934,7 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
             {entry.highlights.map((highlight, i) => (
               <li
                 key={i}
-                className="text-[10px] flex items-start gap-2"
+                className="text-sm flex items-start gap-2"
                 style={{ color: theme.colors.text }}
               >
                 <ArcadeText text="KO" type="ko" size="sm" />
@@ -949,7 +949,7 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
           {entry.skills.slice(0, 5).map((skill) => (
             <span
               key={skill}
-              className="text-[8px] px-2 py-0.5"
+              className="text-sm px-2 py-0.5"
               style={{
                 background: `${theme.colors.accent}20`,
                 border: `1px solid ${theme.colors.accent}30`,
@@ -1014,7 +1014,7 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
           </h4>
           {project.featured && (
             <span
-              className="text-[8px] px-2 py-1 font-bold tracking-widest"
+              className="text-sm px-2 py-1 font-bold tracking-widest"
               style={{
                 background: 'linear-gradient(90deg, #ffd700, #ffaa00)',
                 color: '#000',
@@ -1027,14 +1027,14 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
         </div>
 
         {/* Tagline */}
-        <p className="text-[10px] mb-2 relative" style={{ color: theme.colors.textMuted }}>
+        <p className="text-sm mb-2 relative" style={{ color: theme.colors.textMuted }}>
           {project.tagline}
         </p>
 
         {/* Impact statement */}
         {project.impact && (
           <div
-            className="text-[10px] py-2 px-3 mb-3 relative"
+            className="text-sm py-2 px-3 mb-3 relative"
             style={{
               background: `linear-gradient(90deg, ${theme.colors.accent}20, transparent)`,
               borderLeft: `3px solid ${theme.colors.accent}`,
@@ -1050,7 +1050,7 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
           {project.techStack.slice(0, 5).map((tech) => (
             <span
               key={tech}
-              className="text-[8px] px-2 py-0.5"
+              className="text-sm px-2 py-0.5"
               style={{
                 background: `${theme.colors.accent}15`,
                 border: `1px solid ${theme.colors.accent}30`,
@@ -1070,7 +1070,7 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
                 href={project.links.site}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[9px] px-3 py-1 font-bold focus:outline-none focus-visible:ring-2"
+                className="text-sm px-3 py-1 font-bold focus:outline-none focus-visible:ring-2"
                 style={{
                   background: theme.colors.accent,
                   color: '#000',
@@ -1084,7 +1084,7 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
             {project.links.demo && (
               <Link
                 href={project.links.demo}
-                className="text-[9px] px-3 py-1 font-bold focus:outline-none focus-visible:ring-2"
+                className="text-sm px-3 py-1 font-bold focus:outline-none focus-visible:ring-2"
                 style={{
                   background: '#4ade80',
                   color: '#000',
@@ -1135,7 +1135,7 @@ function SkillSection({
         {category.skills.map((skill) => (
           <div
             key={skill.name}
-            className="px-2 py-1 text-[10px]"
+            className="px-2 py-1 text-sm"
             style={{
               background: `${theme.colors.accent}10`,
               borderLeft: `2px solid ${theme.colors.accent}`,
@@ -1556,7 +1556,7 @@ export default function FighterSelectTheme() {
               boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.8)',
             }}
           />
-          <span className="text-[10px] tracking-widest" style={{ color: theme.colors.textMuted }}>
+          <span className="text-sm tracking-widest" style={{ color: theme.colors.textMuted }}>
             INSERT COIN
           </span>
           <span

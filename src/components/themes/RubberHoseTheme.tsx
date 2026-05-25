@@ -968,7 +968,7 @@ function CompanyPoster({ company }: { company: typeof COMPANIES[0] }) {
             >
               {company.name}
             </h4>
-            <p className="text-[10px]" style={{ color: CUPHEAD_COLORS.accentRedDark }}>{company.tagline}</p>
+            <p className="text-sm" style={{ color: CUPHEAD_COLORS.accentRedDark }}>{company.tagline}</p>
           </div>
         </div>
         <p className="text-xs" style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}>{company.description}</p>
@@ -1017,10 +1017,10 @@ function BandRecord({ band }: { band: typeof BANDS[0] }) {
       >
         ♫ {band.name}
       </h4>
-      <p className="text-[10px] mt-1" style={{ color: CUPHEAD_COLORS.accentRedDark }}>{band.genre} • {band.role}</p>
+      <p className="text-sm mt-1" style={{ color: CUPHEAD_COLORS.accentRedDark }}>{band.genre} • {band.role}</p>
       <p className="text-xs mt-2" style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}>{band.description}</p>
       {!band.url && (
-        <p className="text-[10px] mt-2 italic" style={{ color: CUPHEAD_COLORS.shadowDark }}>~ Website coming soon ~</p>
+        <p className="text-sm mt-2 italic" style={{ color: CUPHEAD_COLORS.shadowDark }}>~ Website coming soon ~</p>
       )}
     </article>
   )
@@ -1078,7 +1078,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           </p>
         </div>
         <span
-          className="text-[10px] px-2 py-1"
+          className="text-sm px-2 py-1"
           style={{
             background: CUPHEAD_COLORS.inkBlack,
             color: CUPHEAD_COLORS.paperCream,
@@ -1133,7 +1133,7 @@ function VintagePoster({ project }: { project: typeof PROJECTS_DATA[0] }) {
 
       {project.featured && (
         <span
-          className="text-[8px] tracking-wider"
+          className="text-sm tracking-wider"
           style={{ color: CUPHEAD_COLORS.accentGold }}
         >
           ★ FEATURED ★
@@ -1142,12 +1142,12 @@ function VintagePoster({ project }: { project: typeof PROJECTS_DATA[0] }) {
       <h3 className="text-sm font-bold mt-1" style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}>
         {project.name.toUpperCase()}
       </h3>
-      <p className="text-[10px] mb-2" style={{ color: CUPHEAD_COLORS.shadowDark }}>
+      <p className="text-sm mb-2" style={{ color: CUPHEAD_COLORS.shadowDark }}>
         {project.tagline}
       </p>
       {project.impact && (
         <p
-          className="text-[10px] mb-2 italic px-2 py-1 rounded"
+          className="text-sm mb-2 italic px-2 py-1 rounded"
           style={{
             color: CUPHEAD_COLORS.inkBlack,
             background: `${CUPHEAD_COLORS.accentGold}30`,
@@ -1161,7 +1161,7 @@ function VintagePoster({ project }: { project: typeof PROJECTS_DATA[0] }) {
         {project.techStack.slice(0, 4).map((tech) => (
           <span
             key={tech}
-            className="text-[8px] px-2 py-0.5 rounded-full"
+            className="text-sm px-2 py-0.5 rounded-full"
             style={{
               background: CUPHEAD_COLORS.inkBlack,
               color: CUPHEAD_COLORS.paperCream,

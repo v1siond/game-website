@@ -794,10 +794,10 @@ function InventorySlot({
       {/* Content */}
       <div className="absolute inset-2 flex flex-col items-center justify-center">
         <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">{icon}</span>
-        <span className="text-[10px] tracking-wider text-center uppercase" style={{ color: RE.cream }}>
+        <span className="text-sm tracking-wider text-center uppercase" style={{ color: RE.cream }}>
           {label}
         </span>
-        <span className="text-[8px] mt-1" style={{ color: RE.warmGlow }}>
+        <span className="text-sm mt-1" style={{ color: RE.warmGlow }}>
           {sublabel}
         </span>
       </div>
@@ -863,7 +863,7 @@ function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSk
             {category.items.map((tech) => (
               <span
                 key={tech}
-                className="px-2 py-1 text-[10px] tracking-wider transition-all hover:scale-105 cursor-default"
+                className="px-2 py-1 text-sm tracking-wider transition-all hover:scale-105 cursor-default"
                 style={{ background: `${RE.midBrown}50`, border: `1px solid ${RE.midBrown}`, color: RE.cream }}
               >
                 {tech}
@@ -903,7 +903,7 @@ function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByP
                     }}
                   />
                 </div>
-                <span className="text-[10px] w-8" style={{ color: RE.candlelight }}>
+                <span className="text-sm w-8" style={{ color: RE.candlelight }}>
                   {skill.proficiency}/5
                 </span>
               </div>
@@ -931,7 +931,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
           <h4 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
             {company.name}
           </h4>
-          <p className="text-[10px]" style={{ color: RE.warmGlow }}>{company.tagline}</p>
+          <p className="text-sm" style={{ color: RE.warmGlow }}>{company.tagline}</p>
         </div>
       </div>
       <p className="text-xs" style={{ color: RE.fog }}>{company.description}</p>
@@ -949,9 +949,9 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
       <h4 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
         {band.name}
       </h4>
-      <p className="text-[10px] mt-1" style={{ color: RE.warmGlow }}>{band.genre} | {band.role}</p>
+      <p className="text-sm mt-1" style={{ color: RE.warmGlow }}>{band.genre} | {band.role}</p>
       <p className="text-xs mt-2" style={{ color: RE.fog }}>{band.description}</p>
-      {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: RE.mistDark }}>-- COMING SOON --</p>}
+      {!band.url && <p className="text-sm mt-2 italic" style={{ color: RE.mistDark }}>-- COMING SOON --</p>}
     </div>
   )
 
@@ -977,7 +977,7 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           <p className="text-xs" style={{ color: RE.warmGlow }}>{entry.organization}</p>
         </div>
         <span
-          className="text-[10px] px-2 py-1"
+          className="text-sm px-2 py-1"
           style={{ color: RE.candlelight, background: `${RE.rust}30`, border: `1px solid ${RE.rust}50` }}
         >
           {startDisplay} - {endDisplay}
@@ -1174,7 +1174,7 @@ export default function SurvivalHorrorTheme() {
       <section className="relative z-20 py-4 px-6" aria-labelledby="current-status-heading">
         <div className="max-w-6xl mx-auto">
           <div className="p-4" style={{ background: `${RE.darkSepia}cc`, border: `1px solid ${RE.midBrown}` }}>
-            <h2 id="current-status-heading" className="text-[10px] tracking-[0.3em] mb-3 uppercase" style={{ color: RE.warmGlow }}>
+            <h2 id="current-status-heading" className="text-sm tracking-[0.3em] mb-3 uppercase" style={{ color: RE.warmGlow }}>
               Current Status
             </h2>
             <div className="flex flex-wrap justify-center gap-6">
@@ -1260,7 +1260,7 @@ export default function SurvivalHorrorTheme() {
               {aboutData.quickFacts.map((fact, i) => (
                 <span
                   key={i}
-                  className="text-[10px] px-2 py-1"
+                  className="text-sm px-2 py-1"
                   style={{ background: RE.darkSepia, border: `1px solid ${RE.midBrown}`, color: RE.fog }}
                 >
                   ▸ {fact}
@@ -1281,7 +1281,7 @@ export default function SurvivalHorrorTheme() {
             >
               {/* Folder tab */}
               <div
-                className="absolute -top-2 left-6 px-4 py-1 text-[8px] tracking-wider uppercase"
+                className="absolute -top-2 left-6 px-4 py-1 text-sm tracking-wider uppercase"
                 style={{ background: RE.midBrown, color: RE.cream, borderRadius: '4px 4px 0 0' }}
               >
                 Personnel File
@@ -1313,7 +1313,7 @@ export default function SurvivalHorrorTheme() {
             />
             <h2 className="text-xs tracking-[0.3em] mb-4 flex items-center gap-2 uppercase" style={{ color: RE.warmGlow }}>
               {active === 'engineer' ? 'Tech Stack' : 'Skills'}
-              <span className="text-[8px]" style={{ color: RE.candlelight }}>
+              <span className="text-sm" style={{ color: RE.candlelight }}>
                 {active === 'engineer' ? `[${engineerTech.flatMap(c => c.items).length} ITEMS]` : ''}
               </span>
             </h2>
@@ -1366,7 +1366,7 @@ export default function SurvivalHorrorTheme() {
             >
               {/* Stamp mark */}
               <div
-                className="absolute top-3 right-3 text-[8px] px-2 py-1 rotate-[-8deg] opacity-60"
+                className="absolute top-3 right-3 text-sm px-2 py-1 rotate-[-8deg] opacity-60"
                 style={{ border: `2px solid ${RE.rust}`, color: RE.rust }}
               >
                 APPROVED
@@ -1418,7 +1418,7 @@ export default function SurvivalHorrorTheme() {
           <TypewriterSavePoint />
           <div className="flex items-center gap-4">
             <InkRibbon />
-            <p className="text-[10px] tracking-widest uppercase" style={{ color: RE.warmGlow }}>
+            <p className="text-sm tracking-widest uppercase" style={{ color: RE.warmGlow }}>
               Typewriter Save Point | 2026 | Spencer Mansion Archives
             </p>
             <InkRibbon />

@@ -1248,7 +1248,7 @@ function MapNode({
         )}
       </div>
       <div
-        className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-lg text-[10px] font-bold tracking-wider"
+        className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-lg text-sm font-bold tracking-wider"
         style={{
           background: isActive ? 'linear-gradient(180deg, #2a3a4a, #1a2a3a)' : 'rgba(26,42,58,0.95)',
           color: isActive ? colors[profession] : '#8a9aaa',
@@ -1396,17 +1396,17 @@ function ShrineQuestCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
         {project.featured && (
           <div className="flex items-center gap-1 mb-2">
             <Triforce size={14} />
-            <span className="text-[8px] tracking-wider" style={{ color: '#f8d030', textShadow: '0 0 8px #f8d03080' }}>LEGENDARY SHRINE</span>
+            <span className="text-sm tracking-wider" style={{ color: '#f8d030', textShadow: '0 0 8px #f8d03080' }}>LEGENDARY SHRINE</span>
           </div>
         )}
         <h3 className="text-sm font-bold mb-1" style={{ color: '#e0f0ff' }}>
           {project.name}
         </h3>
-        <p className="text-[10px] mb-2" style={{ color: '#8ac0e0' }}>
+        <p className="text-sm mb-2" style={{ color: '#8ac0e0' }}>
           {project.tagline}
         </p>
         {project.impact && (
-          <p className="text-[10px] mb-2 italic flex items-center gap-1" style={{ color: '#ff8844' }}>
+          <p className="text-sm mb-2 italic flex items-center gap-1" style={{ color: '#ff8844' }}>
             <Rupee color="gold" size={12} /> {project.impact}
           </p>
         )}
@@ -1414,7 +1414,7 @@ function ShrineQuestCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
           {project.techStack.slice(0, 4).map((tech) => (
             <span
               key={tech}
-              className="text-[8px] px-2 py-0.5 rounded"
+              className="text-sm px-2 py-0.5 rounded"
               style={{
                 background: 'rgba(0,212,255,0.15)',
                 color: '#60c8e8',
@@ -1452,7 +1452,7 @@ function TechLabCard({ company }: { company: typeof COMPANIES[0] }) {
             <h4 className="text-sm group-hover:text-cyan-300 transition-colors" style={{ color: '#e0f0ff' }}>
               {company.name}
             </h4>
-            <p className="text-[10px]" style={{ color: '#ff8844' }}>{company.tagline}</p>
+            <p className="text-sm" style={{ color: '#ff8844' }}>{company.tagline}</p>
           </div>
         </div>
         <p className="text-xs" style={{ color: '#8ac0e0' }}>{company.description}</p>
@@ -1480,9 +1480,9 @@ function RitoVillageCard({ band }: { band: typeof BANDS[0] }) {
             {band.name}
           </h4>
         </div>
-        <p className="text-[10px] mt-1" style={{ color: '#80e080' }}>{band.genre} | {band.role}</p>
+        <p className="text-sm mt-1" style={{ color: '#80e080' }}>{band.genre} | {band.role}</p>
         <p className="text-xs mt-2" style={{ color: '#a0d8a0' }}>{band.description}</p>
-        {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: '#60a060' }}>Quest not yet discovered...</p>}
+        {!band.url && <p className="text-sm mt-2 italic" style={{ color: '#60a060' }}>Quest not yet discovered...</p>}
       </div>
     </div>
   )
@@ -1519,7 +1519,7 @@ function QuestLogEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
             </div>
           </div>
           <span
-            className="text-[10px] px-2 py-1 rounded"
+            className="text-sm px-2 py-1 rounded"
             style={{
               background: 'rgba(0,212,255,0.15)',
               color: '#60c8e8',

@@ -611,7 +611,7 @@ function ProfessionSelector({
               {isActive && '> '}{prof.label}
             </span>
             <span
-              className="block text-[10px] mt-1"
+              className="block text-sm mt-1"
               style={{
                 color: isActive ? TERMINAL_BG : PIPBOY_GREEN_DIM,
                 opacity: 0.9,
@@ -705,7 +705,7 @@ function BottleCapCounter({ count, label }: { count: number; label: string }) {
       >
         {count.toLocaleString()}
       </span>
-      <span className="text-[10px] uppercase" style={{ color: FADED_TEXT }}>
+      <span className="text-sm uppercase" style={{ color: FADED_TEXT }}>
         {label}
       </span>
     </div>
@@ -803,7 +803,7 @@ function ExperienceTerminal({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
     >
       {/* Classification stamp effect */}
       <div
-        className="absolute top-2 right-2 text-[8px] px-2 py-0.5 rotate-[-5deg]"
+        className="absolute top-2 right-2 text-sm px-2 py-0.5 rotate-[-5deg]"
         style={{
           border: `1px solid ${entry.endDate ? FADED_TEXT : PIPBOY_GREEN}`,
           color: entry.endDate ? FADED_TEXT : PIPBOY_GREEN,
@@ -823,7 +823,7 @@ function ExperienceTerminal({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           <p className="text-xs mt-1" style={{ color: VAULT_YELLOW }}>{entry.organization}</p>
         </div>
         <span
-          className="text-[10px] px-2 py-1"
+          className="text-sm px-2 py-1"
           style={{
             background: `${VAULT_BLUE}30`,
             border: `1px solid ${VAULT_BLUE}`,
@@ -958,11 +958,11 @@ function CompanyTerminal({ company }: { company: typeof COMPANIES[0] }) {
           >
             {company.name}
           </h4>
-          <p className="text-[10px]" style={{ color: VAULT_YELLOW }}>{company.tagline}</p>
+          <p className="text-sm" style={{ color: VAULT_YELLOW }}>{company.tagline}</p>
         </div>
       </div>
       <p className="text-xs" style={{ color: FADED_TEXT }}>{company.description}</p>
-      <div className="mt-2 text-[10px]" style={{ color: PIPBOY_GREEN_DIM }}>
+      <div className="mt-2 text-sm" style={{ color: PIPBOY_GREEN_DIM }}>
         [ACCESS TERMINAL &gt;]
       </div>
     </a>
@@ -990,13 +990,13 @@ function BandTerminal({ band }: { band: typeof BANDS[0] }) {
       >
         {band.name}
       </h4>
-      <p className="text-[10px] mt-1" style={{ color: VAULT_YELLOW }}>
+      <p className="text-sm mt-1" style={{ color: VAULT_YELLOW }}>
         {band.genre} // {band.role}
       </p>
       <p className="text-xs mt-2" style={{ color: FADED_TEXT }}>{band.description}</p>
       {band.active && (
         <div
-          className="mt-2 text-[10px] flex items-center gap-1"
+          className="mt-2 text-sm flex items-center gap-1"
           style={{ color: PIPBOY_GREEN }}
         >
           <span
@@ -1387,7 +1387,7 @@ export default function RetroAtomicTheme() {
           ))}
         </div>
         <p
-          className="text-[10px] mt-4"
+          className="text-sm mt-4"
           style={{ color: `${FADED_TEXT}80` }}
         >
           [TERMINAL v2.0.77 // ALL SYSTEMS NOMINAL // {new Date().getFullYear()}]
