@@ -1611,24 +1611,24 @@ export default function FighterSelectTheme() {
     {
       id: 'engineer',
       icon: '💻',
-      name: 'THE ENGINEER',
-      subtitle: 'Code Warrior',
+      name: 'SYSTEM ENGINEER',
+      subtitle: 'Senior Staff • CTO',
       achievements: ['10+ years experience', 'CTO x 2', 'Enterprise scale', '50k+ users migrated'],
       winRecord: { wins: 999, losses: 0 },
     },
     {
       id: 'drummer',
       icon: '🥁',
-      name: 'THE MUSICIAN',
-      subtitle: 'Rhythm Master',
+      name: 'MUSICIAN',
+      subtitle: 'Professional Drummer',
       achievements: ['15 years playing', '7 years professional', '3 active bands', '30+ city tour'],
       winRecord: { wins: 15, losses: 0 },
     },
     {
       id: 'fighter',
       icon: '🥋',
-      name: 'THE FIGHTER',
-      subtitle: 'Combat Expert',
+      name: 'MARTIAL ARTIST',
+      subtitle: 'BJJ Instructor',
       achievements: ['6 years training', 'BJJ Instructor', '20+ students', '3 disciplines'],
       winRecord: { wins: 6, losses: 0 },
     },
@@ -1754,7 +1754,7 @@ export default function FighterSelectTheme() {
 
         <main className="max-w-6xl mx-auto px-6">
           {/* ================================================================= */}
-          {/* ABOUT SECTION */}
+          {/* ABOUT SECTION (with Character Select integrated) */}
           {/* ================================================================= */}
           <ArcadeSectionCard
             color={COLORS.specialBlue}
@@ -1762,47 +1762,16 @@ export default function FighterSelectTheme() {
             titleIcon="►"
             id="about-heading"
           >
-            <p
-              className="text-base leading-relaxed mb-6"
-              style={{ color: COLORS.chrome, fontFamily: 'system-ui, sans-serif' }}
-            >
-              {aboutData.bio}
-            </p>
-            <div className="flex flex-wrap gap-3" role="list" aria-label="Quick facts">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="px-5 py-2 text-sm font-black tracking-wider uppercase"
-                  style={{
-                    background: `linear-gradient(90deg, ${COLORS.specialBlue}, ${COLORS.specialBlueDark})`,
-                    color: '#000',
-                    clipPath: 'polygon(8% 0, 100% 0, 92% 100%, 0 100%)',
-                    boxShadow: `0 0 12px ${COLORS.specialBlue}60`,
-                  }}
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </ArcadeSectionCard>
-
-          {/* ART: VS Badge separator */}
-          <ArtSeparator type="versus" />
-
-          {/* ================================================================= */}
-          {/* CHARACTER SELECT */}
-          {/* ================================================================= */}
-          <section className="py-4" aria-label="Character selection">
             {/* Current roles - championship belts */}
-            <div className="flex flex-wrap justify-center gap-4 mb-10" role="list">
+            <div className="flex flex-wrap justify-center gap-4 mb-8" role="list" aria-label="Current roles">
               {CURRENT_ROLES.map((role) => (
                 <RoleRank key={role.id} role={role} />
               ))}
             </div>
 
-            {/* Character portraits */}
+            {/* Character portraits - profession switching */}
             <div
-              className="flex items-center justify-center gap-4 lg:gap-8 mb-10 flex-wrap"
+              className="flex items-center justify-center gap-4 lg:gap-8 mb-8 flex-wrap"
               role="group"
               aria-label="Select a character"
             >
@@ -1849,7 +1818,38 @@ export default function FighterSelectTheme() {
 
             {/* Ready banner */}
             <FightBanner text={`${config.title.toUpperCase()} - READY!`} ready />
-          </section>
+
+            {/* Bio and quick facts */}
+            <div className="mt-8 pt-8" style={{ borderTop: `2px solid ${COLORS.specialBlue}40` }}>
+              <p
+                className="text-base leading-relaxed mb-6"
+                style={{ color: COLORS.chrome, fontFamily: 'system-ui, sans-serif' }}
+              >
+                {aboutData.bio}
+              </p>
+              <div className="flex flex-wrap gap-3" role="list" aria-label="Quick facts">
+                {aboutData.quickFacts.map((fact, i) => (
+                  <span
+                    key={i}
+                    className="px-5 py-2 text-sm font-black tracking-wider uppercase"
+                    style={{
+                      background: `linear-gradient(90deg, ${COLORS.specialBlue}, ${COLORS.specialBlueDark})`,
+                      color: '#000',
+                      clipPath: 'polygon(8% 0, 100% 0, 92% 100%, 0 100%)',
+                      boxShadow: `0 0 12px ${COLORS.specialBlue}60`,
+                    }}
+                  >
+                    {fact}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </ArcadeSectionCard>
+
+          {/* ================================================================= */}
+          {/* ART SECTION 1: VS Badge separator (after About) */}
+          {/* ================================================================= */}
+          <ArtSeparator type="versus" />
 
           {/* ================================================================= */}
           {/* EXPERIENCE / FIGHT RECORD */}

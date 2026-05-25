@@ -50,11 +50,11 @@ const RAPTURE_COLORS = {
   blood: '#8B0000',
   adamRed: '#ff6b6b',
 
-  // Cream/Ivory (Art Deco accents)
+  // Cream/Ivory (Art Deco accents) - WCAG AA compliant on deep sea backgrounds
   ivory: '#FFFFF0',
   cream: '#FAF0E6',
-  parchment: '#e8e0d0',
-  warmWhite: '#c0b0a0',
+  parchment: '#e8e0d0',    // contrast ~16:1 on deepSea - passes AA
+  warmWhite: '#d0c8b8',    // improved from #c0b0a0 for better contrast (~12:1)
 }
 
 // ============================================================================
@@ -1023,7 +1023,7 @@ function PlasmidButton({
   const plasmids = {
     engineer: {
       name: 'ELECTRO BOLT',
-      desc: 'System Engineering',
+      desc: 'Senior Staff Engineer • CTO',
       icon: (
         <svg viewBox="0 0 40 40" className="w-12 h-12">
           <path d="M20 5 L25 18 L32 18 L18 35 L22 22 L15 22 Z" fill={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="1" />
@@ -1032,7 +1032,7 @@ function PlasmidButton({
     },
     drummer: {
       name: 'SONIC BOOM',
-      desc: 'Musical Mastery',
+      desc: 'Professional Drummer',
       icon: (
         <svg viewBox="0 0 40 40" className="w-12 h-12">
           <circle cx="20" cy="20" r="10" fill="none" stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="2" />
@@ -1043,7 +1043,7 @@ function PlasmidButton({
     },
     fighter: {
       name: 'SPORTBOOST',
-      desc: 'Combat Arts',
+      desc: 'BJJ Instructor',
       icon: (
         <svg viewBox="0 0 40 40" className="w-12 h-12">
           <path d="M10 30 L20 10 L30 30" fill="none" stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="2.5" strokeLinecap="round" />
@@ -1510,9 +1510,19 @@ function ProjectCard({
             </span>
           )}
         </div>
-        <p className="text-sm mb-4" style={{ color: RAPTURE_COLORS.warmWhite }}>
+        <p className="text-sm mb-3" style={{ color: RAPTURE_COLORS.warmWhite }}>
           {project.tagline}
         </p>
+        {/* Impact statement - quantified achievement */}
+        {project.impact && (
+          <p
+            className="text-sm mb-3 flex items-start gap-2"
+            style={{ color: RAPTURE_COLORS.parchment }}
+          >
+            <span style={{ color: RAPTURE_COLORS.goldBright }} aria-hidden="true">{'>'}</span>
+            <span className="italic">{project.impact}</span>
+          </p>
+        )}
         <div className="flex gap-2 flex-wrap">
           {project.techStack.slice(0, 4).map((tech) => (
             <span
@@ -1769,89 +1779,85 @@ export default function ArtDecoTheme() {
       {/* ================================================================== */}
       {/* HEADER */}
       {/* ================================================================== */}
-      <header className="relative z-30 p-6 pt-20">
-        <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div className="flex items-center gap-5">
-            {/* Art Deco Sunburst Logo */}
-            <div className="relative w-20 h-20 pointer-events-none flex-shrink-0" aria-hidden="true">
-              {/* Sunburst rays */}
-              {Array.from({ length: 12 }).map((_, i) => (
+      <header className="relative z-30 p-6 pt-20 pb-10">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-start mb-8">
+            <div className="flex items-center gap-5">
+              {/* Art Deco Sunburst Logo */}
+              <div className="relative w-20 h-20 pointer-events-none flex-shrink-0" aria-hidden="true">
+                {/* Sunburst rays */}
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute top-1/2 left-1/2 w-0.5"
+                    style={{
+                      height: '45px',
+                      background: `linear-gradient(to top, ${RAPTURE_COLORS.gold}, transparent)`,
+                      transform: `translate(-50%, -100%) rotate(${i * 30}deg)`,
+                      transformOrigin: 'bottom center',
+                      opacity: i % 2 === 0 ? 0.5 : 0.3,
+                    }}
+                  />
+                ))}
+                {/* Center circle */}
                 <div
-                  key={i}
-                  className="absolute top-1/2 left-1/2 w-0.5"
+                  className="absolute top-1/2 left-1/2 w-10 h-10 rounded-full -translate-x-1/2 -translate-y-1/2"
                   style={{
-                    height: '45px',
-                    background: `linear-gradient(to top, ${RAPTURE_COLORS.gold}, transparent)`,
-                    transform: `translate(-50%, -100%) rotate(${i * 30}deg)`,
-                    transformOrigin: 'bottom center',
-                    opacity: i % 2 === 0 ? 0.5 : 0.3,
+                    background: `radial-gradient(circle, ${RAPTURE_COLORS.goldBright}60, ${RAPTURE_COLORS.gold}30)`,
+                    border: `2px solid ${RAPTURE_COLORS.gold}`,
                   }}
                 />
-              ))}
-              {/* Center circle */}
-              <div
-                className="absolute top-1/2 left-1/2 w-10 h-10 rounded-full -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  background: `radial-gradient(circle, ${RAPTURE_COLORS.goldBright}60, ${RAPTURE_COLORS.gold}30)`,
-                  border: `2px solid ${RAPTURE_COLORS.gold}`,
-                }}
-              />
+              </div>
+              <div>
+                <h1
+                  className="text-4xl tracking-[0.2em]"
+                  style={{
+                    textShadow: `0 0 50px ${RAPTURE_COLORS.gold}70`,
+                  }}
+                >
+                  <NeonSign text="ALEXANDER PULIDO" reducedMotion={reducedMotion} />
+                </h1>
+                <p className="text-base tracking-wider mt-2" style={{ color: RAPTURE_COLORS.parchment }}>
+                  {PROFESSIONAL_SUMMARY.headline}
+                </p>
+                <p className="text-sm tracking-wider mt-1 italic" style={{ color: RAPTURE_COLORS.gold }}>
+                  {PROFESSIONAL_SUMMARY.tagline}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1
-                className="text-4xl tracking-[0.2em]"
+
+            <nav className="flex gap-4 items-center">
+              <Link
+                href="/cv"
+                className={`px-5 py-2.5 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
                 style={{
-                  textShadow: `0 0 50px ${RAPTURE_COLORS.gold}70`,
+                  background: 'transparent',
+                  border: `2px solid ${RAPTURE_COLORS.gold}`,
+                  color: RAPTURE_COLORS.gold,
                 }}
               >
-                <NeonSign text="ALEXANDER PULIDO" reducedMotion={reducedMotion} />
-              </h1>
-              <p className="text-base tracking-wider mt-2" style={{ color: RAPTURE_COLORS.parchment }}>
-                {PROFESSIONAL_SUMMARY.headline}
-              </p>
-              <p className="text-sm tracking-wider mt-1 italic" style={{ color: RAPTURE_COLORS.gold }}>
-                {PROFESSIONAL_SUMMARY.tagline}
-              </p>
-            </div>
+                DOSSIER
+              </Link>
+              <Link
+                href="/personal-projects/game-engine"
+                className={`px-5 py-2.5 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+                style={{
+                  background: RAPTURE_COLORS.gold,
+                  color: RAPTURE_COLORS.deepSea,
+                }}
+              >
+                ENTER RAPTURE
+              </Link>
+              <ThemeSwitcher />
+            </nav>
           </div>
 
-          <nav className="flex gap-4 items-center">
-            <Link
-              href="/cv"
-              className={`px-5 py-2.5 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-              style={{
-                background: 'transparent',
-                border: `2px solid ${RAPTURE_COLORS.gold}`,
-                color: RAPTURE_COLORS.gold,
-              }}
-            >
-              DOSSIER
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className={`px-5 py-2.5 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-              style={{
-                background: RAPTURE_COLORS.gold,
-                color: RAPTURE_COLORS.deepSea,
-              }}
-            >
-              ENTER RAPTURE
-            </Link>
-            <ThemeSwitcher />
-          </nav>
-        </div>
-      </header>
-
-      {/* ================================================================== */}
-      {/* CURRENT ROLES */}
-      {/* ================================================================== */}
-      <section className="relative z-20 py-6 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-8">
+          {/* Current Roles - integrated into header */}
+          <div className="flex flex-wrap justify-center gap-6">
             {CURRENT_ROLES.map((role) => (
               <article
                 key={role.id}
-                className="text-center px-8 py-4"
+                className="text-center px-6 py-3"
                 style={{
                   background: `${RAPTURE_COLORS.deepSeaMid}90`,
                   border: `1px solid ${RAPTURE_COLORS.gold}50`,
@@ -1863,12 +1869,12 @@ export default function ArtDecoTheme() {
             ))}
           </div>
         </div>
-      </section>
+      </header>
 
       {/* ================================================================== */}
       {/* PLASMID SELECTION - Profession Switcher */}
       {/* ================================================================== */}
-      <section className="relative z-20 py-10">
+      <section className="relative z-20 py-8">
         <div className="flex justify-center gap-8">
           {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
             <PlasmidButton
