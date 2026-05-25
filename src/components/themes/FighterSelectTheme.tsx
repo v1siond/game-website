@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useRef } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
@@ -13,207 +13,231 @@ import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 
-// Neon electric border with animated glow
-function NeonFrame({
+// =============================================================================
+// CSS-ONLY SVG PATTERNS & TEXTURES
+// =============================================================================
+
+// Metallic arcade cabinet texture - brushed metal with rivets
+const metallicTexture = `
+  linear-gradient(135deg, #2a2a3a 0%, #1a1a2a 25%, #3a3a4a 50%, #1a1a2a 75%, #2a2a3a 100%),
+  repeating-linear-gradient(90deg, transparent 0px, transparent 4px, rgba(255,255,255,0.02) 4px, rgba(255,255,255,0.02) 5px),
+  repeating-linear-gradient(0deg, transparent 0px, transparent 4px, rgba(0,0,0,0.1) 4px, rgba(0,0,0,0.1) 5px)
+`
+
+// CRT scanline overlay
+const crtScanlines = `
+  repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.2) 4px),
+  repeating-linear-gradient(90deg, rgba(255,0,0,0.02) 0px, rgba(255,0,0,0.02) 1px, transparent 1px, transparent 3px)
+`
+
+// Screen vignette
+const screenVignette = `radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(0,0,0,0.5) 100%)`
+
+// Screen glow (subtle RGB shift at edges)
+const screenGlow = `
+  radial-gradient(ellipse at 20% 30%, rgba(255,0,100,0.05) 0%, transparent 40%),
+  radial-gradient(ellipse at 80% 70%, rgba(0,100,255,0.05) 0%, transparent 40%)
+`
+
+// =============================================================================
+// SECTION CARD - ARCADE CABINET PANEL STYLE
+// =============================================================================
+function ArcadeSectionCard({
   children,
   color = '#00ffff',
-  className = '',
+  title,
+  titleIcon,
+  id,
 }: {
   children: React.ReactNode
   color?: string
-  className?: string
+  title?: string
+  titleIcon?: string
+  id?: string
 }) {
   const { theme } = useTheme()
-  const [glowIntensity, setGlowIntensity] = useState(1)
-
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) return
-
-    const interval = setInterval(() => {
-      setGlowIntensity(0.7 + Math.random() * 0.6)
-    }, 100)
-    return () => clearInterval(interval)
-  }, [])
 
   return (
-    <div
-      className={`relative ${className}`}
+    <section
+      aria-labelledby={id}
+      className="relative mb-8"
       style={{
+        // Base metallic cabinet texture
+        background: metallicTexture,
+        // Neon glow border
         border: `3px solid ${color}`,
         boxShadow: `
-          0 0 ${5 * glowIntensity}px ${color},
-          0 0 ${10 * glowIntensity}px ${color},
-          0 0 ${20 * glowIntensity}px ${color}40,
-          inset 0 0 ${15 * glowIntensity}px ${color}20
+          0 0 8px ${color},
+          0 0 16px ${color}40,
+          inset 0 0 30px rgba(0,0,0,0.6),
+          inset 2px 2px 0 rgba(255,255,255,0.05),
+          inset -2px -2px 0 rgba(0,0,0,0.3)
         `,
-        background: `linear-gradient(135deg, ${theme.colors.background}, #0a0a1a)`,
       }}
     >
-      {/* Corner accents */}
-      {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
+      {/* CRT scanline overlay on section */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
+        style={{ background: crtScanlines, opacity: 0.3 }}
+      />
+
+      {/* Corner bolts/rivets */}
+      {[
+        { pos: 'top-2 left-2' },
+        { pos: 'top-2 right-2' },
+        { pos: 'bottom-2 left-2' },
+        { pos: 'bottom-2 right-2' },
+      ].map((corner, i) => (
         <div
           key={i}
-          className={`absolute w-4 h-4 ${pos}`}
+          className={`absolute w-4 h-4 z-10 ${corner.pos}`}
+          aria-hidden="true"
           style={{
-            borderTop: i < 2 ? `2px solid ${color}` : 'none',
-            borderBottom: i >= 2 ? `2px solid ${color}` : 'none',
-            borderLeft: i % 2 === 0 ? `2px solid ${color}` : 'none',
-            borderRight: i % 2 === 1 ? `2px solid ${color}` : 'none',
-            boxShadow: `0 0 8px ${color}`,
+            background: `radial-gradient(circle at 30% 30%, #7a7a8a, #4a4a5a, #2a2a3a)`,
+            border: '1px solid #1a1a2a',
+            borderRadius: '50%',
+            boxShadow: `
+              inset 0 1px 2px rgba(255,255,255,0.4),
+              inset 0 -1px 2px rgba(0,0,0,0.6),
+              0 1px 3px rgba(0,0,0,0.4)
+            `,
           }}
-        />
-      ))}
-      {children}
-    </div>
-  )
-}
-
-// Arcade cabinet frame with bolts and CRT styling
-function ArcadeFrame({ children }: { children: React.ReactNode }) {
-  const { theme } = useTheme()
-
-  return (
-    <div className="relative" role="region" aria-label="Arcade cabinet frame">
-      {/* Outer frame */}
-      <div
-        className="absolute inset-0 -m-3"
-        style={{
-          border: `6px solid ${theme.colors.border}`,
-          background: `linear-gradient(135deg, #1a1a2e, #0f0f1a, #1a1a2e)`,
-          boxShadow: `
-            inset 0 0 30px rgba(0,0,0,0.8),
-            0 0 20px rgba(0,0,0,0.5),
-            inset 2px 2px 0 rgba(255,255,255,0.05)
-          `,
-        }}
-      />
-      {/* Corner bolts with metallic effect */}
-      {['-top-2 -left-2', '-top-2 -right-2', '-bottom-2 -left-2', '-bottom-2 -right-2'].map(
-        (pos, i) => (
+        >
+          {/* Phillips head screw pattern */}
           <div
-            key={i}
-            className={`absolute w-6 h-6 z-10 ${pos}`}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{
+              width: '8px',
+              height: '1px',
+              background: '#1a1a1a',
+            }}
+          />
+          <div
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            style={{
+              width: '1px',
+              height: '8px',
+              background: '#1a1a1a',
+            }}
+          />
+        </div>
+      ))}
+
+      {/* Title bar with arcade button styling */}
+      {title && (
+        <div
+          id={id}
+          className="relative px-6 py-3 flex items-center gap-3"
+          style={{
+            background: `linear-gradient(180deg, ${color}30, ${color}10, transparent)`,
+            borderBottom: `2px solid ${color}60`,
+          }}
+        >
+          {/* Arcade button decoration */}
+          <div
+            className="w-8 h-8 flex items-center justify-center shrink-0"
             aria-hidden="true"
             style={{
-              background: `radial-gradient(circle at 30% 30%, #6a6a7a, #3a3a4a, #2a2a3a)`,
-              border: `2px solid ${theme.colors.border}`,
+              background: `radial-gradient(circle at 40% 35%, ${color}, ${color}80, ${color}50)`,
+              border: `3px solid #1a1a2a`,
               borderRadius: '50%',
               boxShadow: `
-                inset 0 1px 3px rgba(255,255,255,0.3),
-                inset 0 -2px 4px rgba(0,0,0,0.5),
-                0 2px 4px rgba(0,0,0,0.3)
+                inset 0 2px 4px rgba(255,255,255,0.4),
+                inset 0 -2px 4px rgba(0,0,0,0.4),
+                0 0 10px ${color}60,
+                0 3px 6px rgba(0,0,0,0.4)
               `,
             }}
           >
-            {/* Bolt slot */}
-            <div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-0.5"
-              style={{ background: '#1a1a1a' }}
-            />
+            <span className="text-sm" style={{ filter: `drop-shadow(0 0 4px ${color})` }}>
+              {titleIcon}
+            </span>
           </div>
-        )
+          <h2
+            className="text-xl tracking-[0.15em] font-bold"
+            style={{
+              color,
+              textShadow: `0 0 10px ${color}, 0 0 20px ${color}60, 2px 2px 0 #000`,
+            }}
+          >
+            {title}
+          </h2>
+        </div>
       )}
-      <div className="relative z-5">{children}</div>
-    </div>
+
+      <div className="relative p-6">{children}</div>
+    </section>
   )
 }
 
-// VS badge with dramatic flames and lightning
+// =============================================================================
+// VS BADGE - DRAMATIC LIGHTNING WITH CSS SVG
+// =============================================================================
 function VSBadge({ large = false }: { large?: boolean }) {
-  const [flash, setFlash] = useState(false)
-  const [flames, setFlames] = useState<Array<{ id: number; x: number; delay: number }>>([])
-  const [lightning, setLightning] = useState(false)
-  const prefersReducedMotion = useRef(false)
-
-  useEffect(() => {
-    prefersReducedMotion.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion.current) return
-
-    // Flash effect
-    const flashInterval = setInterval(() => {
-      setFlash(true)
-      setTimeout(() => setFlash(false), 100)
-    }, 2000)
-
-    // Lightning effect
-    const lightningInterval = setInterval(() => {
-      setLightning(true)
-      setTimeout(() => setLightning(false), 150)
-    }, 3000)
-
-    // Generate flame particles
-    setFlames(
-      Array.from({ length: 12 }, (_, i) => ({
-        id: i,
-        x: (i - 6) * 8,
-        delay: i * 0.08,
-      }))
-    )
-
-    return () => {
-      clearInterval(flashInterval)
-      clearInterval(lightningInterval)
-    }
-  }, [])
+  const prefersReducedMotion = useRef(
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
 
   return (
-    <div className="relative" role="img" aria-label="VS versus badge">
-      {/* Lightning bolts */}
-      {lightning && !prefersReducedMotion.current && (
-        <>
-          <div
-            className="absolute -left-8 top-1/2 -translate-y-1/2 text-3xl"
-            style={{ color: '#ffff00', textShadow: '0 0 20px #ffff00' }}
-          >
-            ⚡
-          </div>
-          <div
-            className="absolute -right-8 top-1/2 -translate-y-1/2 text-3xl"
-            style={{ color: '#ffff00', textShadow: '0 0 20px #ffff00' }}
-          >
-            ⚡
-          </div>
-        </>
-      )}
-
-      {/* Flame particles */}
-      {flames.map((flame) => (
-        <div
-          key={flame.id}
-          className="absolute animate-flame"
-          aria-hidden="true"
-          style={{
-            left: `calc(50% + ${flame.x}px)`,
-            bottom: '-10px',
-            width: '8px',
-            height: '24px',
-            background: `linear-gradient(to top, #ff2200, #ff6600, #ffaa00, transparent)`,
-            borderRadius: '50%',
-            animationDelay: `${flame.delay}s`,
-            filter: 'blur(2px)',
-          }}
+    <div
+      className="relative flex items-center justify-center"
+      role="img"
+      aria-label="VS versus badge"
+      style={{ width: large ? '120px' : '80px', height: large ? '100px' : '70px' }}
+    >
+      {/* Lightning bolts - CSS triangles forming zigzag */}
+      <svg
+        className="absolute inset-0"
+        viewBox="0 0 80 70"
+        aria-hidden="true"
+        style={{
+          filter: 'drop-shadow(0 0 8px #ffff00) drop-shadow(0 0 16px #ff6600)',
+        }}
+      >
+        {/* Left lightning */}
+        <path
+          d="M15 10 L25 25 L18 25 L28 45 L20 45 L35 65 L25 40 L32 40 L22 22 L28 22 L15 10"
+          fill="#ffff00"
+          opacity="0.9"
         />
-      ))}
+        {/* Right lightning */}
+        <path
+          d="M65 10 L55 25 L62 25 L52 45 L60 45 L45 65 L55 40 L48 40 L58 22 L52 22 L65 10"
+          fill="#ffff00"
+          opacity="0.9"
+        />
+      </svg>
+
+      {/* Flame base - CSS gradient circles */}
+      <div
+        className="absolute bottom-0 left-1/2 -translate-x-1/2"
+        aria-hidden="true"
+        style={{
+          width: large ? '100px' : '70px',
+          height: large ? '30px' : '20px',
+          background: `
+            radial-gradient(ellipse at 50% 100%, #ff2200 0%, #ff6600 40%, #ffaa00 70%, transparent 100%)
+          `,
+          filter: 'blur(3px)',
+        }}
+      />
 
       {/* VS Text */}
       <div
-        className={`relative transition-all duration-100 ${flash ? 'scale-125' : 'scale-100'}`}
+        className={`relative z-10 ${!prefersReducedMotion.current ? 'animate-vs-pulse' : ''}`}
         style={{
-          fontSize: large ? '5rem' : '3rem',
+          fontSize: large ? '3rem' : '2rem',
           fontWeight: 'bold',
           color: '#ffd700',
           textShadow: `
             0 0 10px #ffd700,
             0 0 20px #ff6600,
-            0 0 40px #ff4400,
-            0 0 60px #ff2200,
+            0 0 30px #ff4400,
             3px 3px 0 #000,
-            -3px -3px 0 #000,
-            3px -3px 0 #000,
-            -3px 3px 0 #000
+            -1px -1px 0 #000
           `,
-          WebkitTextStroke: '2px #000',
+          WebkitTextStroke: '1px #000',
           letterSpacing: '0.1em',
         }}
       >
@@ -223,69 +247,61 @@ function VSBadge({ large = false }: { large?: boolean }) {
   )
 }
 
-// FIGHT! banner with dramatic animation
-function FightBanner({ text = 'FIGHT!' }: { text?: string }) {
-  const [visible, setVisible] = useState(false)
-  const [scale, setScale] = useState(0)
+// =============================================================================
+// FIGHT/KO/PERFECT TEXT STYLING
+// =============================================================================
+function ArcadeText({
+  text,
+  type = 'fight',
+  size = 'md',
+}: {
+  text: string
+  type?: 'fight' | 'ko' | 'perfect' | 'ready' | 'round'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
+}) {
+  const colorMap = {
+    fight: { primary: '#ff0000', secondary: '#ff6600', tertiary: '#ffaa00' },
+    ko: { primary: '#ffd700', secondary: '#ff6600', tertiary: '#ff2200' },
+    perfect: { primary: '#00ffff', secondary: '#00aaff', tertiary: '#0066ff' },
+    ready: { primary: '#4ade80', secondary: '#22c55e', tertiary: '#16a34a' },
+    round: { primary: '#ffffff', secondary: '#cccccc', tertiary: '#999999' },
+  }
 
-  useEffect(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const sizeMap = {
+    sm: '1rem',
+    md: '2rem',
+    lg: '3rem',
+    xl: '5rem',
+  }
 
-    const showTimer = setTimeout(() => {
-      setVisible(true)
-      if (!prefersReducedMotion) {
-        // Dramatic entrance
-        let currentScale = 3
-        const scaleInterval = setInterval(() => {
-          currentScale -= 0.1
-          if (currentScale <= 1) {
-            setScale(1)
-            clearInterval(scaleInterval)
-          } else {
-            setScale(currentScale)
-          }
-        }, 20)
-      } else {
-        setScale(1)
-      }
-    }, 300)
-
-    return () => clearTimeout(showTimer)
-  }, [])
-
-  if (!visible) return null
+  const colors = colorMap[type]
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center pointer-events-none z-50"
-      role="status"
-      aria-live="polite"
+    <span
+      className="font-bold tracking-[0.2em]"
+      style={{
+        fontSize: sizeMap[size],
+        color: colors.primary,
+        textShadow: `
+          0 0 10px ${colors.primary},
+          0 0 20px ${colors.secondary},
+          0 0 30px ${colors.tertiary}40,
+          2px 2px 0 #000,
+          -1px -1px 0 #000,
+          1px -1px 0 #000,
+          -1px 1px 0 #000
+        `,
+        WebkitTextStroke: size === 'xl' ? '2px #000' : '1px #000',
+      }}
     >
-      <div
-        className="transition-transform duration-100"
-        style={{
-          transform: `scale(${scale})`,
-          fontSize: '8rem',
-          fontWeight: 'bold',
-          color: '#ff0000',
-          textShadow: `
-            0 0 20px #ff0000,
-            0 0 40px #ff6600,
-            0 0 60px #ffaa00,
-            4px 4px 0 #000,
-            -4px -4px 0 #000
-          `,
-          WebkitTextStroke: '3px #000',
-          letterSpacing: '0.2em',
-        }}
-      >
-        {text}
-      </div>
-    </div>
+      {text}
+    </span>
   )
 }
 
-// Health bar style indicator with animated fill
+// =============================================================================
+// HEALTH BAR - IMMEDIATELY VISIBLE
+// =============================================================================
 function HealthBar({
   label,
   value,
@@ -313,56 +329,149 @@ function HealthBar({
     >
       <span
         id={id}
-        className="text-xs font-bold tracking-wider w-20 uppercase"
-        style={{ color, textAlign: reverse ? 'right' : 'left' }}
+        className="text-xs font-bold tracking-wider w-24 uppercase"
+        style={{ color, textAlign: reverse ? 'right' : 'left', textShadow: `0 0 5px ${color}60` }}
       >
         {label}
       </span>
       <div
-        className="flex-1 h-5 relative"
+        className="flex-1 h-6 relative"
         style={{
           background: 'linear-gradient(180deg, #0a0a1a, #1a1a2e, #0a0a1a)',
-          border: `2px solid ${color}40`,
-          boxShadow: `inset 0 2px 6px rgba(0,0,0,0.7), 0 0 5px ${color}30`,
+          border: `2px solid ${color}60`,
+          boxShadow: `inset 0 2px 8px rgba(0,0,0,0.8), 0 0 5px ${color}30`,
         }}
       >
-        {/* Animated fill */}
+        {/* Fill - IMMEDIATE, no animation */}
         <div
-          className="absolute top-0 bottom-0 transition-all duration-700 ease-out"
+          className="absolute top-0 bottom-0"
           style={{
             left: reverse ? 'auto' : 0,
             right: reverse ? 0 : 'auto',
             width: `${percentage}%`,
             background: `linear-gradient(180deg, ${color}, ${color}cc, ${color}88)`,
-            boxShadow: `0 0 15px ${color}80, inset 0 1px 0 rgba(255,255,255,0.3)`,
+            boxShadow: `0 0 15px ${color}80, inset 0 1px 0 rgba(255,255,255,0.4)`,
           }}
         />
-        {/* Segment lines */}
+        {/* Segment dividers */}
         {Array.from({ length: 10 }).map((_, i) => (
           <div
             key={i}
             className="absolute top-0 bottom-0 w-px"
             aria-hidden="true"
-            style={{
-              left: `${(i + 1) * 10}%`,
-              background: 'rgba(0,0,0,0.4)',
-            }}
+            style={{ left: `${(i + 1) * 10}%`, background: 'rgba(0,0,0,0.5)' }}
           />
         ))}
-        {/* Shine effect */}
+        {/* Top shine */}
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-x-0 top-0 h-1/3 opacity-30"
           aria-hidden="true"
-          style={{
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.3), transparent 50%)',
-          }}
+          style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.4), transparent)' }}
         />
+      </div>
+      <span className="text-xs font-bold w-12 tabular-nums" style={{ color }}>
+        {value}%
+      </span>
+    </div>
+  )
+}
+
+// =============================================================================
+// COMBO COUNTER DISPLAY
+// =============================================================================
+function ComboCounter({ hits, label }: { hits: number; label: string }) {
+  const { theme } = useTheme()
+
+  return (
+    <div
+      className="inline-flex items-center gap-2 px-3 py-1"
+      role="status"
+      aria-label={`${hits} ${label}`}
+      style={{
+        background: 'linear-gradient(180deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6))',
+        border: `2px solid ${theme.colors.accent}`,
+        boxShadow: `0 0 10px ${theme.colors.accent}40`,
+      }}
+    >
+      <span
+        className="text-2xl font-bold tabular-nums"
+        style={{
+          color: '#ffd700',
+          textShadow: '0 0 10px #ffd700, 0 0 20px #ff6600',
+        }}
+      >
+        {hits}
+      </span>
+      <div className="flex flex-col">
+        <span className="text-[8px] tracking-widest" style={{ color: theme.colors.accent }}>
+          {label.toUpperCase()}
+        </span>
+        <span className="text-[10px] font-bold" style={{ color: '#ff6600' }}>
+          COMBO!
+        </span>
       </div>
     </div>
   )
 }
 
-// Round indicators (like Street Fighter round wins)
+// =============================================================================
+// SPECIAL MOVE INPUT DISPLAY
+// =============================================================================
+function SpecialMoveInput({ name, input }: { name: string; input: string }) {
+  const { theme } = useTheme()
+
+  // Parse input notation like "↓→P" into visual buttons
+  const renderInput = (notation: string) => {
+    const symbols: Record<string, string> = {
+      '↓': '▼',
+      '↑': '▲',
+      '←': '◄',
+      '→': '►',
+      P: 'P',
+      K: 'K',
+      LP: 'LP',
+      HP: 'HP',
+      LK: 'LK',
+      HK: 'HK',
+    }
+
+    return notation.split('').map((char, i) => (
+      <span
+        key={i}
+        className="inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold"
+        style={{
+          background: `radial-gradient(circle at 40% 35%, ${theme.colors.surface}, #1a1a2a)`,
+          border: '2px solid #3a3a4a',
+          borderRadius: '4px',
+          boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.4)',
+          color: theme.colors.text,
+        }}
+      >
+        {symbols[char] || char}
+      </span>
+    ))
+  }
+
+  return (
+    <div
+      className="flex items-center justify-between px-3 py-2 group cursor-default"
+      style={{
+        background: `linear-gradient(90deg, ${theme.colors.surface}90, ${theme.colors.surface}40)`,
+        borderLeft: `3px solid ${theme.colors.accent}`,
+        borderBottom: `1px solid ${theme.colors.border}40`,
+      }}
+    >
+      <span className="text-xs font-medium" style={{ color: theme.colors.text }}>
+        {name}
+      </span>
+      <div className="flex gap-0.5">{renderInput(input)}</div>
+    </div>
+  )
+}
+
+// =============================================================================
+// ROUND INDICATORS
+// =============================================================================
 function RoundIndicators({
   wins,
   maxWins = 2,
@@ -381,12 +490,12 @@ function RoundIndicators({
       {Array.from({ length: maxWins }).map((_, i) => (
         <div
           key={i}
-          className="w-4 h-4 rounded-full transition-all duration-300"
+          className="w-4 h-4 rounded-full"
           aria-hidden="true"
           style={{
-            background: i < wins ? '#ffd700' : '#333',
-            boxShadow: i < wins ? '0 0 10px #ffd700, 0 0 20px #ff6600' : 'none',
-            border: '2px solid #555',
+            background: i < wins ? 'radial-gradient(circle at 40% 35%, #ffd700, #cc9900)' : '#2a2a3a',
+            boxShadow: i < wins ? '0 0 10px #ffd700, 0 0 20px #ff660060' : 'inset 0 2px 4px rgba(0,0,0,0.4)',
+            border: '2px solid #3a3a4a',
           }}
         />
       ))}
@@ -394,7 +503,31 @@ function RoundIndicators({
   )
 }
 
-// Character portrait with VS screen style - enhanced with more arcade aesthetics
+// =============================================================================
+// PLAYER INDICATOR (P1/P2)
+// =============================================================================
+function PlayerIndicator({ player, side }: { player: 1 | 2; side: 'left' | 'right' }) {
+  const color = player === 1 ? '#00aaff' : '#ff4444'
+
+  return (
+    <div
+      className={`absolute -top-8 ${side === 'left' ? 'left-2' : 'right-2'} px-3 py-1`}
+      aria-label={`Player ${player}`}
+      style={{
+        background: `linear-gradient(180deg, ${color}, ${color}cc)`,
+        border: '2px solid #000',
+        boxShadow: `0 0 10px ${color}60`,
+        clipPath: 'polygon(10% 0, 90% 0, 100% 100%, 0 100%)',
+      }}
+    >
+      <span className="text-xs font-bold tracking-widest text-black">P{player}</span>
+    </div>
+  )
+}
+
+// =============================================================================
+// CHARACTER PORTRAIT WITH NEON FRAME
+// =============================================================================
 function CharacterPortrait({
   icon,
   name,
@@ -404,6 +537,7 @@ function CharacterPortrait({
   isSelected,
   onClick,
   side,
+  playerNum,
 }: {
   icon: string
   name: string
@@ -413,24 +547,22 @@ function CharacterPortrait({
   isSelected: boolean
   onClick: () => void
   side: 'left' | 'right'
+  playerNum: 1 | 2
 }) {
   const { theme } = useTheme()
-  const [hover, setHover] = useState(false)
 
   return (
     <button
       onClick={onClick}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
       aria-pressed={isSelected}
-      aria-label={`Select ${name} - ${subtitle}`}
-      className={`relative p-5 transition-all duration-300 focus:outline-none focus-visible:ring-4 ${
+      aria-label={`Select ${name} - ${subtitle}. ${achievements.join('. ')}. Win record: ${winRecord.wins} wins, ${winRecord.losses} losses.`}
+      className={`relative p-5 focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 ${
         isSelected ? 'scale-105 z-10' : 'opacity-70 hover:opacity-100'
       }`}
       style={{
         background: isSelected
           ? `linear-gradient(${side === 'left' ? '135deg' : '-135deg'}, ${theme.colors.accent}50, #0a0a2040)`
-          : `linear-gradient(180deg, ${theme.colors.surface}, #0a0a1a)`,
+          : metallicTexture,
         border: `4px solid ${isSelected ? theme.colors.accent : theme.colors.border}`,
         clipPath:
           side === 'left'
@@ -438,20 +570,26 @@ function CharacterPortrait({
             : 'polygon(8% 0, 100% 0, 100% 100%, 0 100%)',
         boxShadow: isSelected
           ? `
-            0 0 30px ${theme.colors.accent}60,
-            0 0 60px ${theme.colors.accent}30,
+            0 0 30px ${theme.colors.accent}80,
+            0 0 60px ${theme.colors.accent}40,
             inset 0 0 20px ${theme.colors.accent}20
           `
-          : hover
-          ? `0 0 15px ${theme.colors.accent}40`
-          : 'none',
+          : `
+            inset 0 2px 4px rgba(255,255,255,0.1),
+            inset 0 -2px 4px rgba(0,0,0,0.4),
+            0 4px 8px rgba(0,0,0,0.3)
+          `,
         minWidth: '180px',
+        transition: 'transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease',
       }}
     >
-      {/* Electric border effect when selected */}
+      {/* Player indicator */}
+      {isSelected && <PlayerIndicator player={playerNum} side={side} />}
+
+      {/* Neon border glow when selected */}
       {isSelected && (
         <div
-          className="absolute inset-0 animate-pulse pointer-events-none"
+          className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
           style={{
             border: `2px solid ${theme.colors.accent}`,
@@ -459,22 +597,22 @@ function CharacterPortrait({
               side === 'left'
                 ? 'polygon(0 0, 100% 0, 92% 100%, 0 100%)'
                 : 'polygon(8% 0, 100% 0, 100% 100%, 0 100%)',
+            boxShadow: `inset 0 0 15px ${theme.colors.accent}60`,
           }}
         />
       )}
 
       {/* Character icon with glow */}
       <div
-        className="text-7xl mb-4 transition-transform duration-200"
+        className="text-7xl mb-4"
         style={{
           filter: isSelected ? `drop-shadow(0 0 20px ${theme.colors.accent})` : 'none',
-          transform: hover ? 'scale(1.1)' : 'scale(1)',
         }}
       >
         {icon}
       </div>
 
-      {/* Name plate - arcade style */}
+      {/* Name plate - hexagonal arcade style */}
       <div
         className="py-2 -mx-5 px-5"
         style={{
@@ -489,7 +627,7 @@ function CharacterPortrait({
         <div className="text-[10px] opacity-80">{subtitle}</div>
       </div>
 
-      {/* Win/Loss record - KO style */}
+      {/* Win/Loss record */}
       <div
         className="mt-3 py-2 text-center"
         style={{
@@ -502,8 +640,8 @@ function CharacterPortrait({
         >
           W:{winRecord.wins}
         </span>
-        <span className="text-xs mx-3" style={{ color: '#ffd700 ' }}>
-          KO
+        <span className="text-xs mx-3" style={{ color: '#ffd700' }}>
+          <ArcadeText text="KO" type="ko" size="sm" />
         </span>
         <span
           className="text-xs font-bold tracking-wider"
@@ -513,7 +651,7 @@ function CharacterPortrait({
         </span>
       </div>
 
-      {/* Achievements - NO BARS, show actual impact */}
+      {/* Achievements - impact statements */}
       <div className="mt-4 space-y-1">
         {achievements.slice(0, 3).map((achievement, i) => (
           <div
@@ -530,10 +668,10 @@ function CharacterPortrait({
         ))}
       </div>
 
-      {/* Selection indicator - arrow */}
+      {/* Selection arrow */}
       {isSelected && (
         <div
-          className="absolute -top-3 left-1/2 -translate-x-1/2 text-3xl animate-bounce"
+          className="absolute -top-3 left-1/2 -translate-x-1/2 text-2xl"
           aria-hidden="true"
           style={{
             color: theme.colors.accent,
@@ -552,25 +690,28 @@ function CharacterPortrait({
   )
 }
 
-// Role/Rank display with championship belt style
+// =============================================================================
+// ROLE RANK DISPLAY
+// =============================================================================
 function RoleRank({ role }: { role: (typeof CURRENT_ROLES)[0] }) {
   const { theme } = useTheme()
   const isLeadership = role.type === 'leadership'
 
   return (
     <div
-      className="relative px-5 py-3 text-center transition-all duration-200 hover:scale-105"
+      className="relative px-5 py-3 text-center"
       role="listitem"
       style={{
         background: isLeadership
           ? `linear-gradient(180deg, #ffd70040, #ffd70010, transparent)`
-          : `linear-gradient(180deg, ${theme.colors.surface}, transparent)`,
+          : metallicTexture,
         border: `3px solid ${isLeadership ? '#ffd700' : theme.colors.border}`,
         clipPath: 'polygon(15% 0, 85% 0, 100% 50%, 85% 100%, 15% 100%, 0 50%)',
-        boxShadow: isLeadership ? '0 0 20px #ffd70040' : 'none',
+        boxShadow: isLeadership
+          ? '0 0 20px #ffd70040, inset 0 0 15px #ffd70020'
+          : 'inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.3)',
       }}
     >
-      {/* Championship star */}
       {isLeadership && (
         <div
           className="absolute -top-2 left-1/2 -translate-x-1/2 text-lg"
@@ -596,44 +737,9 @@ function RoleRank({ role }: { role: (typeof CURRENT_ROLES)[0] }) {
   )
 }
 
-// Special move / tech skill with combo notation
-function SpecialMove({ name, category }: { name: string; category: string }) {
-  const { theme } = useTheme()
-  const [isHovered, setIsHovered] = useState(false)
-
-  return (
-    <div
-      className="relative px-2 py-1.5 cursor-default transition-all duration-200"
-      style={{
-        background: isHovered
-          ? `linear-gradient(90deg, ${theme.colors.accent}40, ${theme.colors.accent}10)`
-          : `${theme.colors.surface}90`,
-        border: `1px solid ${isHovered ? theme.colors.accent : theme.colors.border}50`,
-        transform: isHovered ? 'translateX(4px) scale(1.02)' : 'none',
-        boxShadow: isHovered ? `0 0 10px ${theme.colors.accent}30` : 'none',
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <span
-        className="text-xs font-medium"
-        style={{ color: isHovered ? theme.colors.accent : theme.colors.text }}
-      >
-        {name}
-      </span>
-      {isHovered && (
-        <span
-          className="absolute right-1 text-[8px] tracking-wider animate-pulse"
-          style={{ color: theme.colors.accent }}
-        >
-          ↓→P
-        </span>
-      )}
-    </div>
-  )
-}
-
-// Team affiliate card with arcade insert style
+// =============================================================================
+// TEAM CARD (COMPANIES)
+// =============================================================================
 function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
   const { theme } = useTheme()
 
@@ -643,17 +749,29 @@ function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`Visit ${company.name} - ${company.tagline}`}
-      className="block transition-all duration-200 hover:scale-[1.03] group focus:outline-none focus-visible:ring-4"
+      className="block focus:outline-none focus-visible:ring-4"
+      style={{
+        background: metallicTexture,
+        border: `2px solid ${theme.colors.accent}`,
+        boxShadow: `0 0 10px ${theme.colors.accent}30, inset 0 0 20px rgba(0,0,0,0.4)`,
+      }}
     >
-      <NeonFrame color={theme.colors.accent} className="p-4">
-        <div className="flex items-center gap-3">
+      <div className="p-4 relative">
+        {/* CRT scanlines */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-20"
+          aria-hidden="true"
+          style={{ background: crtScanlines }}
+        />
+
+        <div className="flex items-center gap-3 relative">
           <span className="text-3xl" aria-hidden="true">
             {company.icon}
           </span>
           <div>
             <h4
-              className="text-sm font-bold tracking-wide group-hover:text-cyan-300 transition-colors"
-              style={{ color: theme.colors.text }}
+              className="text-sm font-bold tracking-wide"
+              style={{ color: theme.colors.text, textShadow: `0 0 10px ${theme.colors.accent}40` }}
             >
               {company.name}
             </h4>
@@ -662,11 +780,10 @@ function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
             </p>
           </div>
         </div>
-        <p className="text-[10px] mt-3 leading-relaxed" style={{ color: theme.colors.textMuted }}>
+        <p className="text-[10px] mt-3 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
           {company.description}
         </p>
-        {/* Services as combo moves */}
-        <div className="flex flex-wrap gap-1 mt-3">
+        <div className="flex flex-wrap gap-1 mt-3 relative">
           {company.services.slice(0, 3).map((service) => (
             <span
               key={service}
@@ -681,45 +798,62 @@ function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
             </span>
           ))}
         </div>
-      </NeonFrame>
+      </div>
     </a>
   )
 }
 
-// Band card for drummer mode - stage/venue style
+// =============================================================================
+// BAND CARD
+// =============================================================================
 function BandCard({ band }: { band: (typeof BANDS)[0] }) {
   const { theme } = useTheme()
+  const bandColor = '#9966cc'
 
   const content = (
-    <NeonFrame color="#9966cc" className="p-4 transition-all duration-200 hover:scale-[1.03]">
-      <div className="flex justify-between items-start">
+    <div
+      className="p-4 relative"
+      style={{
+        background: metallicTexture,
+        border: `2px solid ${bandColor}`,
+        boxShadow: `0 0 10px ${bandColor}30, inset 0 0 20px rgba(0,0,0,0.4)`,
+      }}
+    >
+      {/* CRT scanlines */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-20"
+        aria-hidden="true"
+        style={{ background: crtScanlines }}
+      />
+
+      <div className="flex justify-between items-start relative">
         <h4
           className="text-sm font-bold tracking-wide"
-          style={{ color: theme.colors.text, textShadow: '0 0 5px #9966cc50' }}
+          style={{ color: theme.colors.text, textShadow: `0 0 10px ${bandColor}40` }}
         >
           {band.name}
         </h4>
         {band.active && (
           <span
-            className="text-[8px] px-2 py-0.5 font-bold animate-pulse"
+            className="text-[8px] px-2 py-0.5 font-bold"
             style={{ background: '#4ade80', color: '#000', boxShadow: '0 0 10px #4ade80' }}
           >
             ACTIVE
           </span>
         )}
       </div>
-      <p className="text-[10px] mt-1" style={{ color: '#9966cc' }}>
+      <p className="text-[10px] mt-1 relative" style={{ color: bandColor }}>
         {band.genre} // {band.role}
       </p>
-      <p className="text-[10px] mt-2 leading-relaxed" style={{ color: theme.colors.textMuted }}>
+      <p className="text-[10px] mt-2 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
         {band.description}
       </p>
       {!band.url && (
-        <p className="text-[8px] mt-2 italic" style={{ color: theme.colors.textMuted }}>
+        <p className="text-[8px] mt-2 italic relative" style={{ color: theme.colors.textMuted }}>
           Website coming soon...
         </p>
       )}
-    </NeonFrame>
+    </div>
   )
 
   if (band.url) {
@@ -738,7 +872,9 @@ function BandCard({ band }: { band: (typeof BANDS)[0] }) {
   return <div role="article">{content}</div>
 }
 
-// Work experience card with fight record style
+// =============================================================================
+// EXPERIENCE CARD
+// =============================================================================
 function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
   const { theme } = useTheme()
   const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
@@ -747,17 +883,26 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
 
   return (
     <article
-      className="relative group transition-all duration-200 hover:scale-[1.02]"
+      className="relative"
       style={{
-        background: `linear-gradient(135deg, ${theme.colors.surface}, #0a0a1a)`,
+        background: metallicTexture,
         border: `3px solid ${isActive ? theme.colors.accent : theme.colors.border}`,
         clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)',
-        boxShadow: isActive ? `0 0 20px ${theme.colors.accent}30` : 'none',
+        boxShadow: isActive
+          ? `0 0 20px ${theme.colors.accent}40, inset 0 0 20px rgba(0,0,0,0.4)`
+          : 'inset 0 0 20px rgba(0,0,0,0.4)',
       }}
     >
-      <div className="p-4">
+      <div className="p-4 relative">
+        {/* CRT scanlines */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-20"
+          aria-hidden="true"
+          style={{ background: crtScanlines }}
+        />
+
         {/* Header */}
-        <div className="flex justify-between items-start mb-3">
+        <div className="flex justify-between items-start mb-3 relative">
           <div>
             <h4 className="text-sm font-bold" style={{ color: theme.colors.text }}>
               {entry.title}
@@ -769,9 +914,7 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
           <span
             className="text-[10px] px-3 py-1 font-bold tracking-wider"
             style={{
-              background: isActive
-                ? `linear-gradient(90deg, #4ade80, #22c55e)`
-                : theme.colors.border,
+              background: isActive ? 'linear-gradient(90deg, #4ade80, #22c55e)' : theme.colors.border,
               color: isActive ? '#000' : theme.colors.text,
               boxShadow: isActive ? '0 0 10px #4ade8060' : 'none',
             }}
@@ -781,28 +924,28 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
         </div>
 
         {/* Description */}
-        <p className="text-[10px] mb-3 leading-relaxed" style={{ color: theme.colors.textMuted }}>
+        <p className="text-[10px] mb-3 leading-relaxed relative" style={{ color: theme.colors.textMuted }}>
           {entry.description}
         </p>
 
-        {/* Highlights as KO achievements */}
+        {/* Highlights */}
         {entry.highlights && entry.highlights.length > 0 && (
-          <ul className="space-y-1 mb-3" role="list">
+          <ul className="space-y-1 mb-3 relative" role="list">
             {entry.highlights.map((highlight, i) => (
               <li
                 key={i}
                 className="text-[10px] flex items-start gap-2"
                 style={{ color: theme.colors.text }}
               >
-                <span style={{ color: '#ffd700' }}>KO</span>
-                {highlight}
+                <ArcadeText text="KO" type="ko" size="sm" />
+                <span>{highlight}</span>
               </li>
             ))}
           </ul>
         )}
 
-        {/* Skills as special moves */}
-        <div className="flex flex-wrap gap-1">
+        {/* Skills */}
+        <div className="flex flex-wrap gap-1 relative">
           {entry.skills.slice(0, 5).map((skill) => (
             <span
               key={skill}
@@ -824,44 +967,42 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
         className="absolute bottom-0 right-0 w-5 h-5"
         aria-hidden="true"
         style={{
-          background: isActive
-            ? `linear-gradient(135deg, ${theme.colors.accent}, #ffd700)`
-            : theme.colors.accent,
+          background: isActive ? `linear-gradient(135deg, ${theme.colors.accent}, #ffd700)` : theme.colors.accent,
           clipPath: 'polygon(100% 0, 100% 100%, 0 100%)',
-        }}
-      />
-
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${theme.colors.accent}15, transparent)`,
         }}
       />
     </article>
   )
 }
 
-// Fight card / project card with championship style
+// =============================================================================
+// PROJECT CARD (FIGHT CARD)
+// =============================================================================
 function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
   const { theme } = useTheme()
 
   return (
     <article
-      className="relative group cursor-pointer transition-all duration-200 hover:scale-[1.02]"
+      className="relative"
       style={{
-        background: `linear-gradient(135deg, ${theme.colors.surface}, #0a0a1a)`,
+        background: metallicTexture,
         border: `3px solid ${project.featured ? '#ffd700' : theme.colors.border}`,
         clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%)',
         boxShadow: project.featured
-          ? '0 0 25px rgba(255, 215, 0, 0.3), inset 0 0 15px rgba(255, 215, 0, 0.1)'
-          : 'none',
+          ? '0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 20px rgba(255, 215, 0, 0.1)'
+          : 'inset 0 0 20px rgba(0,0,0,0.4)',
       }}
     >
-      <div className="p-4">
-        {/* Header with championship badge */}
-        <div className="flex justify-between items-start mb-3">
+      <div className="p-4 relative">
+        {/* CRT scanlines */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-20"
+          aria-hidden="true"
+          style={{ background: crtScanlines }}
+        />
+
+        {/* Header */}
+        <div className="flex justify-between items-start mb-3 relative">
           <h4
             className="text-sm font-bold tracking-wide"
             style={{
@@ -880,32 +1021,32 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
                 boxShadow: '0 0 15px #ffd70060',
               }}
             >
-              CHAMPION
+              <ArcadeText text="CHAMPION" type="ko" size="sm" />
             </span>
           )}
         </div>
 
         {/* Tagline */}
-        <p className="text-[10px] mb-2" style={{ color: theme.colors.textMuted }}>
+        <p className="text-[10px] mb-2 relative" style={{ color: theme.colors.textMuted }}>
           {project.tagline}
         </p>
 
-        {/* Impact statement - the KO */}
+        {/* Impact statement */}
         {project.impact && (
           <div
-            className="text-[10px] py-2 px-3 mb-3"
+            className="text-[10px] py-2 px-3 mb-3 relative"
             style={{
               background: `linear-gradient(90deg, ${theme.colors.accent}20, transparent)`,
               borderLeft: `3px solid ${theme.colors.accent}`,
               color: theme.colors.accent,
             }}
           >
-            KO: {project.impact}
+            <ArcadeText text="KO:" type="ko" size="sm" /> {project.impact}
           </div>
         )}
 
-        {/* Tech stack as combo inputs */}
-        <div className="flex flex-wrap gap-1">
+        {/* Tech stack */}
+        <div className="flex flex-wrap gap-1 relative">
           {project.techStack.slice(0, 5).map((tech) => (
             <span
               key={tech}
@@ -923,17 +1064,17 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
 
         {/* Links */}
         {project.links && (
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-2 mt-3 relative">
             {project.links.site && (
               <a
                 href={project.links.site}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[9px] px-2 py-1 hover:scale-105 transition-transform"
+                className="text-[9px] px-3 py-1 font-bold focus:outline-none focus-visible:ring-2"
                 style={{
                   background: theme.colors.accent,
                   color: '#000',
-                  fontWeight: 'bold',
+                  boxShadow: `0 0 10px ${theme.colors.accent}60`,
                 }}
                 aria-label={`Visit ${project.name} website`}
               >
@@ -943,11 +1084,11 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
             {project.links.demo && (
               <Link
                 href={project.links.demo}
-                className="text-[9px] px-2 py-1 hover:scale-105 transition-transform"
+                className="text-[9px] px-3 py-1 font-bold focus:outline-none focus-visible:ring-2"
                 style={{
                   background: '#4ade80',
                   color: '#000',
-                  fontWeight: 'bold',
+                  boxShadow: '0 0 10px #4ade8060',
                 }}
                 aria-label={`Play ${project.name} demo`}
               >
@@ -967,21 +1108,14 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
           clipPath: 'polygon(100% 0, 100% 100%, 0 100%)',
         }}
       />
-
-      {/* Hover glow effect */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-        aria-hidden="true"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${project.featured ? '#ffd700' : theme.colors.accent}20, transparent)`,
-        }}
-      />
     </article>
   )
 }
 
-// Skills section for drummer/fighter - NO BARS, show achievements
-function SkillAchievements({
+// =============================================================================
+// SKILL SECTION (NO BARS - ACHIEVEMENTS ONLY)
+// =============================================================================
+function SkillSection({
   category,
 }: {
   category: { name: string; icon?: string; skills: { name: string; proficiency: number }[] }
@@ -992,7 +1126,7 @@ function SkillAchievements({
     <div className="space-y-2">
       <h4
         className="text-xs font-bold tracking-wider flex items-center gap-2"
-        style={{ color: theme.colors.text }}
+        style={{ color: theme.colors.text, textShadow: `0 0 5px ${theme.colors.accent}40` }}
       >
         <span aria-hidden="true">{category.icon}</span>
         {category.name.toUpperCase()}
@@ -1016,37 +1150,18 @@ function SkillAchievements({
   )
 }
 
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
 export default function FighterSelectTheme() {
   const { theme } = useTheme()
   const { active, setActive, config } = useProfession()
-  const [mounted, setMounted] = useState(false)
-  const [showReady, setShowReady] = useState(false)
-  const [showFight, setShowFight] = useState(false)
 
   const aboutData = ABOUT_DATA[active]
   const engineerTech = getEngineerSkills()
   const otherSkills = getSkillsByProfession(active)
   const projects = PROJECTS_DATA.filter((p) => p.professions.includes(active) || p.featured)
   const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
-
-  useEffect(() => {
-    setMounted(true)
-    const readyTimeout = setTimeout(() => setShowReady(true), 500)
-    const fightTimeout = setTimeout(() => setShowFight(true), 1000)
-    return () => {
-      clearTimeout(readyTimeout)
-      clearTimeout(fightTimeout)
-    }
-  }, [])
-
-  // Reset fight animation on character change
-  useEffect(() => {
-    setShowFight(false)
-    const timeout = setTimeout(() => setShowFight(true), 300)
-    return () => clearTimeout(timeout)
-  }, [active])
-
-  if (!mounted) return null
 
   const characters = [
     {
@@ -1075,6 +1190,14 @@ export default function FighterSelectTheme() {
     },
   ]
 
+  // Common move inputs for engineer
+  const specialMoves = [
+    { name: 'Deploy to Production', input: '↓→P' },
+    { name: 'Debug Master', input: '←↓→K' },
+    { name: 'Code Review', input: '↓↓P' },
+    { name: 'Ship Feature', input: '→→P' },
+  ]
+
   return (
     <div
       className="min-h-screen relative overflow-hidden"
@@ -1083,115 +1206,84 @@ export default function FighterSelectTheme() {
         fontFamily: '"Impact", "Arial Black", sans-serif',
       }}
     >
-      {/* Fight banner */}
-      {showFight && <FightBanner text={config.title.toUpperCase()} />}
-
-      {/* Dramatic gradient background */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        aria-hidden="true"
-        style={{
-          background: `
-            radial-gradient(circle at 20% 30%, ${theme.colors.accent}15 0%, transparent 40%),
-            radial-gradient(circle at 80% 70%, #9966cc15 0%, transparent 40%),
-            radial-gradient(circle at 50% 50%, #ffd70008 0%, transparent 60%)
-          `,
-        }}
-      />
-
-      {/* Animated background stripes */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute h-1 animate-stripe"
-            style={{
-              top: `${i * 8 + 4}%`,
-              left: '-100%',
-              right: '-100%',
-              background: `linear-gradient(90deg, transparent, ${theme.colors.accent}30, transparent)`,
-              animationDelay: `${i * 0.15}s`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Screen glow effects */}
+      <div className="fixed inset-0 pointer-events-none z-0" aria-hidden="true" style={{ background: screenGlow }} />
 
       {/* CRT Scanlines overlay */}
       <div
         className="fixed inset-0 pointer-events-none z-[100]"
         aria-hidden="true"
-        style={{
-          background: `
-            repeating-linear-gradient(
-              0deg,
-              transparent,
-              transparent 2px,
-              rgba(0,0,0,0.15) 2px,
-              rgba(0,0,0,0.15) 4px
-            )
-          `,
-          opacity: 0.5,
-        }}
+        style={{ background: crtScanlines, opacity: 0.4 }}
       />
 
-      {/* Screen vignette effect */}
+      {/* Screen vignette */}
       <div
         className="fixed inset-0 pointer-events-none z-[99]"
         aria-hidden="true"
-        style={{
-          background: `radial-gradient(ellipse at center, transparent 0%, transparent 60%, rgba(0,0,0,0.4) 100%)`,
-        }}
+        style={{ background: screenVignette }}
       />
 
-      {/* Header with arcade frame */}
+      {/* =================================================================== */}
+      {/* HEADER */}
+      {/* =================================================================== */}
       <header className="relative z-30 p-6">
         <div className="max-w-6xl mx-auto">
-          <ArcadeFrame>
-            <div className="flex justify-between items-start p-5">
+          <ArcadeSectionCard color={theme.colors.accent}>
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4">
               <div>
+                {/* Title with dramatic styling */}
                 <h1
-                  className="text-4xl tracking-widest"
+                  className="text-3xl md:text-4xl tracking-widest"
                   style={{
                     color: theme.colors.accent,
                     textShadow: `
                       0 0 10px ${theme.colors.accent},
+                      0 0 20px ${theme.colors.accent}60,
                       3px 3px 0 ${theme.colors.background},
-                      6px 6px 0 #000
+                      5px 5px 0 #000
                     `,
                   }}
                 >
                   SELECT YOUR FIGHTER
                 </h1>
+
+                {/* Professional summary */}
                 <p
-                  className="text-base mt-3 tracking-wide"
+                  className="text-sm md:text-base mt-3 tracking-wide"
                   style={{ color: theme.colors.text, fontFamily: 'sans-serif' }}
                 >
                   {PROFESSIONAL_SUMMARY.headline}
                 </p>
                 <p
-                  className="text-sm mt-1 italic tracking-wider"
+                  className="text-xs md:text-sm mt-1 italic tracking-wider"
                   style={{ color: theme.colors.accent }}
                 >
                   &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
                 </p>
+
+                {/* Combo counter showing years of experience */}
+                <div className="mt-4">
+                  <ComboCounter hits={10} label="Years Experience" />
+                </div>
               </div>
 
-              <nav className="flex gap-3 items-center" aria-label="Main navigation">
+              <nav className="flex gap-3 items-center shrink-0" aria-label="Main navigation">
                 <Link
                   href="/cv"
-                  className="px-5 py-2 text-sm tracking-widest transition-all hover:scale-105 focus:outline-none focus-visible:ring-4"
+                  className="px-5 py-2 text-sm tracking-widest focus:outline-none focus-visible:ring-4"
                   style={{
-                    background: `linear-gradient(180deg, ${theme.colors.surface}, #0a0a1a)`,
+                    background: metallicTexture,
                     border: `3px solid ${theme.colors.border}`,
                     color: theme.colors.text,
                     clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0 100%)',
+                    boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.3)',
                   }}
                 >
                   CV
                 </Link>
                 <Link
                   href="/personal-projects/game-engine"
-                  className="px-5 py-2 text-sm tracking-widest transition-all hover:scale-105 focus:outline-none focus-visible:ring-4"
+                  className="px-5 py-2 text-sm tracking-widest focus:outline-none focus-visible:ring-4"
                   style={{
                     background: `linear-gradient(90deg, ${theme.colors.accent}, #ffd700)`,
                     color: '#000',
@@ -1204,11 +1296,13 @@ export default function FighterSelectTheme() {
                 <ThemeSwitcher />
               </nav>
             </div>
-          </ArcadeFrame>
+          </ArcadeSectionCard>
         </div>
       </header>
 
-      {/* Current Roles - Championship Ranks */}
+      {/* =================================================================== */}
+      {/* CURRENT ROLES */}
+      {/* =================================================================== */}
       <section className="relative z-20 py-4 px-6" aria-label="Current professional roles">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-wrap justify-center gap-4" role="list">
@@ -1219,12 +1313,14 @@ export default function FighterSelectTheme() {
         </div>
       </section>
 
-      {/* Character select area */}
+      {/* =================================================================== */}
+      {/* CHARACTER SELECT */}
+      {/* =================================================================== */}
       <section className="relative z-20 py-8 px-6" aria-label="Character selection">
         <div className="max-w-6xl mx-auto">
-          {/* VS Screen layout */}
+          {/* VS Screen layout - ALL VISIBLE IMMEDIATELY */}
           <div
-            className="flex items-center justify-center gap-6 mb-8 flex-wrap"
+            className="flex items-center justify-center gap-4 md:gap-6 mb-8 flex-wrap"
             role="group"
             aria-label="Select a character"
           >
@@ -1239,9 +1335,10 @@ export default function FighterSelectTheme() {
                   isSelected={active === char.id}
                   onClick={() => setActive(char.id as 'engineer' | 'drummer' | 'fighter')}
                   side={index === 0 ? 'left' : index === 2 ? 'right' : 'left'}
+                  playerNum={index === 0 ? 1 : 2}
                 />
                 {index < characters.length - 1 && (
-                  <div className="mx-4 hidden md:block">
+                  <div className="mx-2 md:mx-4 hidden md:block">
                     <VSBadge />
                   </div>
                 )}
@@ -1249,7 +1346,7 @@ export default function FighterSelectTheme() {
             ))}
           </div>
 
-          {/* Health bars */}
+          {/* Health bars - IMMEDIATELY VISIBLE */}
           <div className="max-w-3xl mx-auto mb-8 space-y-3">
             <HealthBar
               label="Experience"
@@ -1268,40 +1365,27 @@ export default function FighterSelectTheme() {
             />
           </div>
 
-          {/* Ready banner */}
-          {showReady && (
-            <div
-              className="text-center py-5 mb-8"
-              role="status"
-              aria-live="polite"
-              style={{
-                background: `linear-gradient(90deg, transparent, ${theme.colors.accent}50, transparent)`,
-              }}
-            >
-              <span
-                className="text-5xl font-bold tracking-[0.3em] animate-pulse"
-                style={{
-                  color: theme.colors.accent,
-                  textShadow: `
-                    0 0 20px ${theme.colors.accent},
-                    0 0 40px ${theme.colors.accent},
-                    0 0 60px ${theme.colors.accent}50
-                  `,
-                }}
-              >
-                {config.title.toUpperCase()} - READY!
-              </span>
-            </div>
-          )}
+          {/* Ready banner - IMMEDIATELY VISIBLE */}
+          <div
+            className="text-center py-5 mb-8"
+            role="status"
+            aria-live="polite"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${theme.colors.accent}50, transparent)`,
+            }}
+          >
+            <ArcadeText text={`${config.title.toUpperCase()} - READY!`} type="ready" size="lg" />
+          </div>
 
-          {/* Bio panel */}
-          <NeonFrame color={theme.colors.accent} className="p-6 mb-8">
-            <h2
-              className="text-2xl mb-4 flex items-center gap-3 tracking-wider"
-              style={{ color: theme.colors.accent }}
-            >
-              <span aria-hidden="true">►</span> FIGHTER PROFILE
-            </h2>
+          {/* =================================================================== */}
+          {/* FIGHTER PROFILE */}
+          {/* =================================================================== */}
+          <ArcadeSectionCard
+            color={theme.colors.accent}
+            title="FIGHTER PROFILE"
+            titleIcon="►"
+            id="profile-heading"
+          >
             <p
               className="text-sm leading-relaxed mb-4"
               style={{ color: theme.colors.text, fontFamily: 'sans-serif' }}
@@ -1324,139 +1408,125 @@ export default function FighterSelectTheme() {
                 </span>
               ))}
             </div>
-          </NeonFrame>
+          </ArcadeSectionCard>
 
-          {/* Work Experience section */}
+          {/* =================================================================== */}
+          {/* FIGHT RECORD (EXPERIENCE) */}
+          {/* =================================================================== */}
           {experience.length > 0 && (
-            <section className="mb-8" aria-labelledby="experience-heading">
-              <NeonFrame color={theme.colors.accent} className="p-6">
-                <h2
-                  id="experience-heading"
-                  className="text-2xl mb-6 flex items-center gap-3 tracking-wider"
-                  style={{ color: theme.colors.accent }}
-                >
-                  <span aria-hidden="true">►►</span> FIGHT RECORD
-                </h2>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {experience.map((entry) => (
-                    <ExperienceCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </NeonFrame>
-            </section>
-          )}
-
-          {/* Skills/Tech section */}
-          <section className="mb-8" aria-labelledby="skills-heading">
-            <NeonFrame
-              color={active === 'engineer' ? '#00ffff' : active === 'drummer' ? '#9966cc' : '#ff6600'}
-              className="p-6"
+            <ArcadeSectionCard
+              color={theme.colors.accent}
+              title="FIGHT RECORD"
+              titleIcon="►►"
+              id="experience-heading"
             >
-              <h2
-                id="skills-heading"
-                className="text-2xl mb-6 flex items-center gap-3 tracking-wider"
-                style={{ color: theme.colors.accent }}
-              >
-                <span aria-hidden="true">►►►</span> {active === 'engineer' ? 'SPECIAL MOVES' : 'COMBAT SKILLS'}
-              </h2>
-
-              {active === 'engineer' ? (
-                // Engineer: Show all technologies as "special moves" with combo notation
-                <div className="space-y-6">
-                  {engineerTech.slice(0, 6).map((category) => (
-                    <div key={category.name}>
-                      <h3
-                        className="text-sm mb-3 flex items-center gap-2 tracking-wider"
-                        style={{ color: theme.colors.text }}
-                      >
-                        <span aria-hidden="true">{category.icon}</span>
-                        {category.name.toUpperCase()}
-                      </h3>
-                      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1">
-                        {category.items.map((tech) => (
-                          <SpecialMove key={tech} name={tech} category={category.name} />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                // Drummer/Fighter: Show skills as achievements - NO BARS
-                <div className="grid md:grid-cols-3 gap-6">
-                  {otherSkills.map((category) => (
-                    <SkillAchievements key={category.name} category={category} />
-                  ))}
-                </div>
-              )}
-            </NeonFrame>
-          </section>
-
-          {/* Companies (Engineer) */}
-          {active === 'engineer' && (
-            <section className="mb-8" aria-labelledby="ventures-heading">
-              <NeonFrame color="#00ffff" className="p-6">
-                <h2
-                  id="ventures-heading"
-                  className="text-2xl mb-6 flex items-center gap-3 tracking-wider"
-                  style={{ color: theme.colors.accent }}
-                >
-                  <span aria-hidden="true">►►►►</span> TEAM AFFILIATIONS
-                </h2>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {COMPANIES.map((company) => (
-                    <TeamCard key={company.id} company={company} />
-                  ))}
-                </div>
-              </NeonFrame>
-            </section>
-          )}
-
-          {/* Bands (Drummer) */}
-          {active === 'drummer' && (
-            <section className="mb-8" aria-labelledby="bands-heading">
-              <NeonFrame color="#9966cc" className="p-6">
-                <h2
-                  id="bands-heading"
-                  className="text-2xl mb-6 flex items-center gap-3 tracking-wider"
-                  style={{ color: '#9966cc' }}
-                >
-                  <span aria-hidden="true">♪♪♪</span> STAGE CREWS
-                </h2>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {BANDS.map((band) => (
-                    <BandCard key={band.id} band={band} />
-                  ))}
-                </div>
-              </NeonFrame>
-            </section>
-          )}
-
-          {/* Projects / Featured Work */}
-          <section aria-labelledby="projects-heading">
-            <NeonFrame color="#ffd700" className="p-6">
-              <h2
-                id="projects-heading"
-                className="text-2xl mb-6 flex items-center gap-3 tracking-wider"
-                style={{ color: '#ffd700', textShadow: '0 0 10px #ffd700' }}
-              >
-                <span aria-hidden="true">★</span> CHAMPIONSHIP VICTORIES
-              </h2>
               <div className="grid md:grid-cols-2 gap-4">
-                {projects.slice(0, 6).map((project) => (
-                  <FightCard key={project.id} project={project} />
+                {experience.map((entry) => (
+                  <ExperienceCard key={entry.id} entry={entry} />
                 ))}
               </div>
-            </NeonFrame>
-          </section>
+            </ArcadeSectionCard>
+          )}
+
+          {/* =================================================================== */}
+          {/* SKILLS / SPECIAL MOVES */}
+          {/* =================================================================== */}
+          <ArcadeSectionCard
+            color={active === 'engineer' ? '#00ffff' : active === 'drummer' ? '#9966cc' : '#ff6600'}
+            title={active === 'engineer' ? 'SPECIAL MOVES' : 'COMBAT SKILLS'}
+            titleIcon="►►►"
+            id="skills-heading"
+          >
+            {active === 'engineer' ? (
+              <div className="space-y-6">
+                {/* Special move inputs */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+                  {specialMoves.map((move) => (
+                    <SpecialMoveInput key={move.name} name={move.name} input={move.input} />
+                  ))}
+                </div>
+
+                {/* Tech categories */}
+                {engineerTech.slice(0, 6).map((category) => (
+                  <div key={category.name}>
+                    <h3
+                      className="text-sm mb-3 flex items-center gap-2 tracking-wider"
+                      style={{ color: theme.colors.text, textShadow: `0 0 5px ${theme.colors.accent}40` }}
+                    >
+                      <span aria-hidden="true">{category.icon}</span>
+                      {category.name.toUpperCase()}
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-1">
+                      {category.items.map((tech) => (
+                        <div
+                          key={tech}
+                          className="px-2 py-1.5 text-xs"
+                          style={{
+                            background: `${theme.colors.surface}90`,
+                            border: `1px solid ${theme.colors.border}50`,
+                            color: theme.colors.text,
+                          }}
+                        >
+                          {tech}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-3 gap-6">
+                {otherSkills.map((category) => (
+                  <SkillSection key={category.name} category={category} />
+                ))}
+              </div>
+            )}
+          </ArcadeSectionCard>
+
+          {/* =================================================================== */}
+          {/* TEAM AFFILIATIONS (COMPANIES) */}
+          {/* =================================================================== */}
+          {active === 'engineer' && (
+            <ArcadeSectionCard color="#00ffff" title="TEAM AFFILIATIONS" titleIcon="►►►►" id="ventures-heading">
+              <div className="grid md:grid-cols-3 gap-4">
+                {COMPANIES.map((company) => (
+                  <TeamCard key={company.id} company={company} />
+                ))}
+              </div>
+            </ArcadeSectionCard>
+          )}
+
+          {/* =================================================================== */}
+          {/* STAGE CREWS (BANDS) */}
+          {/* =================================================================== */}
+          {active === 'drummer' && (
+            <ArcadeSectionCard color="#9966cc" title="STAGE CREWS" titleIcon="♪♪♪" id="bands-heading">
+              <div className="grid md:grid-cols-3 gap-4">
+                {BANDS.map((band) => (
+                  <BandCard key={band.id} band={band} />
+                ))}
+              </div>
+            </ArcadeSectionCard>
+          )}
+
+          {/* =================================================================== */}
+          {/* CHAMPIONSHIP VICTORIES (PROJECTS) */}
+          {/* =================================================================== */}
+          <ArcadeSectionCard color="#ffd700" title="CHAMPIONSHIP VICTORIES" titleIcon="★" id="projects-heading">
+            <div className="grid md:grid-cols-2 gap-4">
+              {projects.slice(0, 6).map((project) => (
+                <FightCard key={project.id} project={project} />
+              ))}
+            </div>
+          </ArcadeSectionCard>
         </div>
       </section>
 
-      {/* Footer - Arcade cabinet insert coin */}
+      {/* =================================================================== */}
+      {/* FOOTER */}
+      {/* =================================================================== */}
       <footer className="relative z-20 py-10 text-center">
-        <p
-          className="text-sm tracking-[0.3em] animate-pulse"
-          style={{ color: theme.colors.textMuted }}
-        >
+        <p className="text-sm tracking-[0.3em]" style={{ color: theme.colors.textMuted }}>
           ▸ PRESS START TO CONTINUE ◂
         </p>
         <p
@@ -1465,20 +1535,32 @@ export default function FighterSelectTheme() {
         >
           MMXXVI ALEXANDER PULIDO
         </p>
+
+        {/* Insert coin slot - worn arcade button style */}
         <div
-          className="mt-5 inline-flex items-center gap-3 px-6 py-2"
+          className="mt-5 inline-flex items-center gap-3 px-6 py-3"
+          aria-hidden="true"
           style={{
-            background: 'linear-gradient(180deg, rgba(0,0,0,0.7), rgba(0,0,0,0.5))',
-            border: `2px solid ${theme.colors.border}`,
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.5)',
+            background: metallicTexture,
+            border: `3px solid ${theme.colors.border}`,
+            boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.6), 0 4px 8px rgba(0,0,0,0.3)',
           }}
         >
+          {/* Worn coin slot */}
+          <div
+            className="w-12 h-2"
+            style={{
+              background: 'linear-gradient(180deg, #1a1a1a, #0a0a0a)',
+              border: '1px solid #3a3a3a',
+              borderRadius: '2px',
+              boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.8)',
+            }}
+          />
           <span className="text-[10px] tracking-widest" style={{ color: theme.colors.textMuted }}>
             INSERT COIN
           </span>
           <span
-            className="animate-blink text-xl"
-            aria-hidden="true"
+            className="text-xl animate-blink"
             style={{ color: '#ffd700', textShadow: '0 0 10px #ffd700' }}
           >
             ●
@@ -1486,36 +1568,26 @@ export default function FighterSelectTheme() {
         </div>
       </footer>
 
-      {/* Animations - with prefers-reduced-motion support */}
+      {/* =================================================================== */}
+      {/* ANIMATIONS - WITH REDUCED MOTION SUPPORT */}
+      {/* =================================================================== */}
       <style jsx global>{`
         @media (prefers-reduced-motion: reduce) {
-          .animate-stripe,
-          .animate-flame,
-          .animate-blink,
-          .animate-bounce,
-          .animate-pulse {
+          .animate-vs-pulse,
+          .animate-blink {
             animation: none !important;
           }
         }
 
-        @keyframes stripe {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
-        }
-
-        @keyframes flame {
+        @keyframes vs-pulse {
           0%,
           100% {
-            transform: translateY(0) scaleY(1);
-            opacity: 0.7;
+            transform: scale(1);
+            filter: brightness(1);
           }
           50% {
-            transform: translateY(-15px) scaleY(1.3);
-            opacity: 1;
+            transform: scale(1.05);
+            filter: brightness(1.2);
           }
         }
 
@@ -1525,16 +1597,12 @@ export default function FighterSelectTheme() {
             opacity: 1;
           }
           50% {
-            opacity: 0;
+            opacity: 0.3;
           }
         }
 
-        .animate-stripe {
-          animation: stripe 4s linear infinite;
-        }
-
-        .animate-flame {
-          animation: flame 0.6s ease-in-out infinite;
+        .animate-vs-pulse {
+          animation: vs-pulse 2s ease-in-out infinite;
         }
 
         .animate-blink {
