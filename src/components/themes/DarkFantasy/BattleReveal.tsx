@@ -293,10 +293,10 @@ export const BattleReveal = memo(function BattleReveal({
           transition: 'transform 300ms cubic-bezier(0.68, -0.55, 0.27, 1.55)'
         }
       case 'bug-fall':
-        // Bug falls to ground on RIGHT side (negative X = move right)
+        // Bug falls to ground on RIGHT side (more negative X = more right)
         return {
           ...baseStyle,
-          transform: 'translateX(-30px) translateY(40px) rotateZ(180deg) scale(0.75)',
+          transform: 'translateX(-50px) translateY(40px) rotateZ(180deg) scale(0.75)',
           opacity: 0.7,
           transition: 'transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }
@@ -305,7 +305,7 @@ export const BattleReveal = memo(function BattleReveal({
         // Dead on the ground - stays on RIGHT
         return {
           ...baseStyle,
-          transform: 'translateX(-30px) translateY(40px) rotateZ(180deg) scale(0.75)',
+          transform: 'translateX(-50px) translateY(40px) rotateZ(180deg) scale(0.75)',
           opacity: 0.55,
         }
       default:
@@ -451,14 +451,14 @@ export const BattleReveal = memo(function BattleReveal({
             {isBugDead ? (
               <>
                 <DeadBugCreature size={120} />
-                {/* Blood Pool - aligned horizontally with bug, offset left */}
+                {/* Blood Pool - at bug center */}
                 {showBloodPool && (
                   <div
                     className="absolute z-5 pointer-events-none"
                     style={{
                       left: '50%',
                       top: '50%',
-                      transform: 'rotate(180deg) translateX(-80px) translateY(0)',
+                      transform: 'rotate(180deg) translateX(0) translateY(0)',
                     }}
                   >
                     <BloodPool />
@@ -666,13 +666,9 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 100 }: { size?: n
       <path d="M30,12 Q22,18 16,22" fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
       <path d="M50,12 Q58,18 64,22" fill="none" stroke={shellDark} strokeWidth="2" strokeLinecap="round" opacity="0.6" />
 
-      {/* X EYES - dead */}
-      <g stroke={infected} strokeWidth="2.5" strokeLinecap="round" opacity="0.7">
-        <line x1="26" y1="12" x2="38" y2="24" />
-        <line x1="38" y1="12" x2="26" y2="24" />
-        <line x1="42" y1="12" x2="54" y2="24" />
-        <line x1="54" y1="12" x2="42" y2="24" />
-      </g>
+      {/* CLOSED EYES - dimmed, no X */}
+      <ellipse cx="32" cy="18" rx="5" ry="3" fill={infected} opacity="0.4" />
+      <ellipse cx="48" cy="18" rx="5" ry="3" fill={infected} opacity="0.4" />
 
       {/* Dimmed infection - leaking */}
       <ellipse cx="40" cy="26" rx="6" ry="5" fill={infected} opacity="0.35" />
