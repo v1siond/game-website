@@ -71,13 +71,13 @@ const TRIGGER_CONFIG = [
   { id: 'about', position: 10 },
   { id: 'art-spirits', position: 18 },
   { id: 'experience', position: 25 },       // KnightSlashReveal: Alex enters, slashes content into view
-  { id: 'art-lanterns', position: 35 },
-  { id: 'tech-stack', position: 42 },       // Simple fade (TriggerSection)
-  { id: 'projects', position: 50 },         // BugDiscoverReveal: Alex spots the bug lurking
-  { id: 'art-crystals', position: 60 },
-  { id: 'ventures', position: 68 },
-  { id: 'posts', position: 76 },
-  { id: 'contact', position: 82 },          // BattleReveal: Alex defeats the bug, content drops
+  { id: 'art-lanterns', position: 30 },
+  { id: 'tech-stack', position: 35 },       // Simple fade (TriggerSection)
+  { id: 'projects', position: 23 },         // BugAttackReveal: Bug throws content at Alex (15% earlier)
+  { id: 'art-crystals', position: 55 },
+  { id: 'ventures', position: 65 },
+  { id: 'posts', position: 75 },
+  { id: 'contact', position: 95 },          // BattleReveal: near bottom of page
 ]
 
 /**

@@ -167,10 +167,10 @@ export const BugCreature = memo(function BugCreature({
 })
 
 // ============================================
-// BUG DISCOVER REVEAL ANIMATION
+// BUG ATTACK REVEAL ANIMATION
 // ============================================
-// Narrative: Alex is exploring, discovers the bug lurking
-// Sets up the battle that happens at Contact section
+// Narrative: Bug throws content AT Alex as an attack, starting the battle
+// Alex is on left, bug throws content at him, then enters attack stance
 
 interface BugPullRevealProps {
   children: ReactNode
@@ -180,18 +180,20 @@ interface BugPullRevealProps {
 
 type AnimationPhase =
   | 'idle'
-  | 'bug-lurking'      // Bug visible in shadows on right
   | 'alex-enters'      // Alex walks in from left
-  | 'alex-spots'       // Alex notices the bug - both freeze
-  | 'tension'          // Tense standoff - content appears
+  | 'bug-appears'      // Bug emerges from right with content
+  | 'bug-throws'       // Bug throws content AT Alex
+  | 'content-lands'    // Content lands near Alex
+  | 'attack-stance'    // Bug floats into attack position, Alex reacts
   | 'complete'
 
-const DISCOVER_TIMING = {
-  'bug-lurking': 0,
-  'alex-enters': 200,
-  'alex-spots': 600,
-  'tension': 900,
-  'complete': 1400,
+const ATTACK_TIMING = {
+  'alex-enters': 0,
+  'bug-appears': 300,
+  'bug-throws': 600,
+  'content-lands': 900,
+  'attack-stance': 1200,
+  'complete': 1700,
 }
 
 export const BugPullReveal = memo(function BugPullReveal({
@@ -213,8 +215,8 @@ export const BugPullReveal = memo(function BugPullReveal({
       if (!lastTime) lastTime = time
       const delta = time - lastTime
       lastTime = time
-      // Slow down when spotted (tension)
-      const speed = phase === 'alex-spots' || phase === 'tension' ? 0.002 : 0.006
+      // Faster when throwing, slower when floating
+      const speed = phase === 'bug-throws' ? 0.015 : phase === 'attack-stance' ? 0.003 : 0.006
       setLegPhase(prev => (prev + delta * speed) % 1)
       rafId = requestAnimationFrame(animate)
     }
@@ -231,76 +233,49 @@ export const BugPullReveal = memo(function BugPullReveal({
 
     if (phase !== 'idle') return
 
-    setPhase('bug-lurking')
+    setPhase('alex-enters')
 
     const timers: NodeJS.Timeout[] = []
 
-    timers.push(setTimeout(() => setPhase('alex-enters'), DISCOVER_TIMING['alex-enters']))
-    timers.push(setTimeout(() => setPhase('alex-spots'), DISCOVER_TIMING['alex-spots']))
-    timers.push(setTimeout(() => setPhase('tension'), DISCOVER_TIMING['tension']))
-    timers.push(setTimeout(() => setPhase('complete'), DISCOVER_TIMING['complete']))
+    timers.push(setTimeout(() => setPhase('bug-appears'), ATTACK_TIMING['bug-appears']))
+    timers.push(setTimeout(() => setPhase('bug-throws'), ATTACK_TIMING['bug-throws']))
+    timers.push(setTimeout(() => setPhase('content-lands'), ATTACK_TIMING['content-lands']))
+    timers.push(setTimeout(() => setPhase('attack-stance'), ATTACK_TIMING['attack-stance']))
+    timers.push(setTimeout(() => setPhase('complete'), ATTACK_TIMING['complete']))
 
     return () => timers.forEach(t => clearTimeout(t))
   }, [triggered])
 
-  // Bug emerges from shadows on right
-  const getBugStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        return { right: '-80px', opacity: 0 }
-      case 'bug-lurking':
-        return {
-          right: '10%',
-          opacity: 0.6,
-          transition: 'all 300ms ease-out',
-          filter: 'brightness(0.6)'
-        }
-      case 'alex-enters':
-        return {
-          right: '10%',
-          opacity: 0.7,
-          transition: 'all 200ms',
-          filter: 'brightness(0.7)'
-        }
-      case 'alex-spots':
-      case 'tension':
-        return {
-          right: '8%',
-          opacity: 1,
-          transition: 'all 200ms ease-out',
-          filter: 'brightness(1)',
-          animation: 'bugThreat 200ms ease-in-out infinite'
-        }
-      case 'complete':
-        return { right: '8%', opacity: 0.4, transition: 'opacity 300ms' }
-      default:
-        return { right: '-80px', opacity: 0 }
-    }
-  }
-
-  // Alex enters from left, exploring
+  // Alex enters from left, reacts to attack
   const getAlexStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
-      case 'bug-lurking':
         return { left: '-100px', opacity: 0 }
       case 'alex-enters':
         return {
-          left: '15%',
+          left: '8%',
           opacity: 1,
-          transition: 'all 400ms ease-out'
+          transition: 'all 300ms ease-out'
         }
-      case 'alex-spots':
+      case 'bug-appears':
+      case 'bug-throws':
         return {
-          left: '18%',
+          left: '8%',
+          opacity: 1
+        }
+      case 'content-lands':
+        // Alex steps back slightly, surprised
+        return {
+          left: '5%',
           opacity: 1,
           transition: 'all 150ms ease-out'
         }
-      case 'tension':
+      case 'attack-stance':
       case 'complete':
+        // Alex ready for battle
         return {
-          left: '18%',
-          opacity: phase === 'complete' ? 0.4 : 1,
+          left: '5%',
+          opacity: phase === 'complete' ? 0.5 : 1,
           transition: 'opacity 300ms'
         }
       default:
@@ -308,61 +283,126 @@ export const BugPullReveal = memo(function BugPullReveal({
     }
   }
 
-  // Content appears during tension
-  const getContentStyle = (): React.CSSProperties => {
+  // Bug comes from LEFT, throws content, then floats UP into attack stance
+  const getBugStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
-      case 'bug-lurking':
       case 'alex-enters':
-      case 'alex-spots':
-        return { transform: 'scale(0.9)', opacity: 0 }
-      case 'tension':
+        // Bug starts off-screen LEFT
+        return { left: '-120px', opacity: 0, transform: 'translateY(0)' }
+      case 'bug-appears':
+        // Bug enters from LEFT to center-right area
         return {
-          transform: 'scale(1)',
+          left: '60%',
           opacity: 1,
-          transition: 'all 400ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+          transform: 'translateY(0)',
+          transition: 'all 400ms ease-out'
+        }
+      case 'bug-throws':
+        // Bug lunges LEFT while throwing content at Alex
+        return {
+          left: '45%',
+          opacity: 1,
+          transform: 'translateY(-10px) rotate(-5deg)',
+          transition: 'all 250ms ease-out'
+        }
+      case 'content-lands':
+        // Bug retreats back to right
+        return {
+          left: '70%',
+          opacity: 1,
+          transform: 'translateY(0)',
+          transition: 'all 300ms ease-out'
+        }
+      case 'attack-stance':
+        // Bug floats UP into attack position
+        return {
+          left: '75%',
+          opacity: 1,
+          transform: 'translateY(-40px)',
+          transition: 'all 400ms ease-out',
+          animation: 'bugFloat 1000ms ease-in-out infinite'
         }
       case 'complete':
-        return { transform: 'scale(1)', opacity: 1 }
+        return {
+          left: '75%',
+          opacity: 0.5,
+          transform: 'translateY(-40px)',
+          animation: 'bugFloat 1000ms ease-in-out infinite',
+          transition: 'opacity 300ms'
+        }
       default:
-        return { transform: 'scale(1)', opacity: 1 }
+        return { right: '-120px', opacity: 0 }
     }
   }
 
-  const showCharacters = phase !== 'idle'
-  const showBug = phase !== 'idle'
+  // Content gets thrown from bug towards Alex
+  const getContentStyle = (): React.CSSProperties => {
+    switch (phase) {
+      case 'idle':
+      case 'alex-enters':
+        return { transform: 'translateX(120%)', opacity: 0 }
+      case 'bug-appears':
+        return {
+          transform: 'translateX(80%)',
+          opacity: 0.5,
+          transition: 'all 300ms ease-out'
+        }
+      case 'bug-throws':
+        // Content flies towards Alex (left side)
+        return {
+          transform: 'translateX(10%)',
+          opacity: 0.9,
+          transition: 'all 300ms ease-out'
+        }
+      case 'content-lands':
+      case 'attack-stance':
+        return {
+          transform: 'translateX(0)',
+          opacity: 1,
+          transition: 'all 200ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+        }
+      case 'complete':
+        return { transform: 'translateX(0)', opacity: 1 }
+      default:
+        return { transform: 'translateX(0)', opacity: 1 }
+    }
+  }
+
+  const showBug = phase !== 'idle' && phase !== 'alex-enters'
+  const showAlex = phase !== 'idle'
 
   return (
     <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '280px' }}>
-      {/* Bug lurking on right - same bug from BattleReveal */}
-      {showBug && (
-        <div
-          className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
-          style={{ ...getBugStyle(), position: 'absolute' }}
-        >
-          <BattleBug size={100} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
-        </div>
-      )}
-
-      {/* Alex entering from left */}
-      {showCharacters && (
+      {/* Alex on the left */}
+      {showAlex && (
         <div
           className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
           style={{ ...getAlexStyle(), position: 'absolute' }}
         >
-          <KnightCharacter scale={1.5} facingDirection="right" />
+          <KnightCharacter scale={1.4} facingDirection="right" />
         </div>
       )}
 
-      {/* Content in center */}
-      <div className="relative z-20 flex justify-center" style={getContentStyle()}>
+      {/* Bug throwing content then floating in attack stance */}
+      {showBug && (
+        <div
+          className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
+          style={{ ...getBugStyle(), position: 'absolute' }}
+        >
+          <BattleBug size={110} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
+        </div>
+      )}
+
+      {/* Content being thrown at Alex */}
+      <div className="relative z-20" style={getContentStyle()}>
         {children}
       </div>
 
       <style>{`
-        @keyframes bugThreat {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-3px) scale(1.02); }
+        @keyframes bugFloat {
+          0%, 100% { transform: translateY(-40px); }
+          50% { transform: translateY(-55px); }
         }
       `}</style>
     </div>

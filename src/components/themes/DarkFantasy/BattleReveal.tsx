@@ -232,18 +232,26 @@ export const BattleReveal = memo(function BattleReveal({
       transition: 'transform 200ms ease-out, opacity 200ms ease-out',
     }
 
+    // Bug base: right-[18%] bottom-[15%] (BOTTOM RIGHT - where bug ends up dead)
+    // Explosion: left-[12%] top-[15%] (TOP LEFT - where bug starts and explodes)
+    // Bug starts at TOP LEFT, flies to BOTTOM RIGHT for battle, then explodes back at TOP LEFT
+
     switch (phase) {
       case 'idle':
+        // Start at EXPLOSION position (TOP LEFT)
+        // Large negative X and Y to move from bottom-right base to top-left
         return {
           ...baseStyle,
-          transform: 'translateX(0) translateY(0) rotateZ(0deg)',
+          transform: 'translateX(-280px) translateY(-180px) rotateZ(0deg)',
           opacity: 0
         }
       case 'bug-wander':
+        // Bug flies from TOP LEFT down to BOTTOM RIGHT battle position
         return {
           ...baseStyle,
           transform: 'translateX(0) translateY(0) rotateZ(0deg)',
           opacity: 1,
+          transition: 'all 600ms ease-out',
           animation: 'bugWander 600ms ease-in-out infinite'
         }
       case 'knight-dash':
@@ -254,6 +262,7 @@ export const BattleReveal = memo(function BattleReveal({
         }
       case 'slash':
       case 'bug-hit':
+        // Recoil from hit at battle position
         return {
           ...baseStyle,
           transform: 'translateX(30px) translateY(-15px) rotateZ(-15deg) scale(0.95)',
@@ -261,6 +270,7 @@ export const BattleReveal = memo(function BattleReveal({
           transition: 'transform 100ms ease-out'
         }
       case 'bug-tremble':
+        // Tremble before explosion at battle position
         return {
           ...baseStyle,
           transform: 'translateX(30px) translateY(-10px) rotateZ(-10deg) scale(0.95)',
@@ -269,24 +279,27 @@ export const BattleReveal = memo(function BattleReveal({
           transition: 'none'
         }
       case 'bug-death':
+        // Bug flies back to TOP LEFT explosion position, flips and explodes
         return {
           ...baseStyle,
-          transform: 'translateX(40px) translateY(-40px) rotateZ(180deg) scale(0.85)',
+          transform: 'translateX(-280px) translateY(-180px) rotateZ(180deg) scale(0.85)',
           opacity: 0.9,
           transition: 'transform 400ms cubic-bezier(0.68, -0.55, 0.27, 1.55)'
         }
       case 'bug-fall':
+        // Bug falls from TOP LEFT explosion to ground (still on left side)
         return {
           ...baseStyle,
-          transform: 'translateX(30px) translateY(50px) rotateZ(180deg) scale(0.75)',
+          transform: 'translateX(-200px) translateY(50px) rotateZ(180deg) scale(0.75)',
           opacity: 0.7,
           transition: 'transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }
       case 'content-drop':
       case 'complete':
+        // Dead on the ground (left side, below explosion)
         return {
           ...baseStyle,
-          transform: 'translateX(30px) translateY(50px) rotateZ(180deg) scale(0.75)',
+          transform: 'translateX(-200px) translateY(50px) rotateZ(180deg) scale(0.75)',
           opacity: 0.55,
         }
       default:
@@ -306,9 +319,10 @@ export const BattleReveal = memo(function BattleReveal({
       case 'knight-dash':
       case 'slash':
       case 'bug-hit':
+      case 'bug-tremble':
       case 'bug-death':
       case 'bug-fall':
-        // Content hidden during battle, drops after
+        // Content hidden during entire battle, drops only after bug dies
         return {
           transform: 'translateY(-100vh)',
           opacity: 0
@@ -395,19 +409,19 @@ export const BattleReveal = memo(function BattleReveal({
           </div>
         )}
 
-        {/* Blood Pool - stays on the floor after explosion */}
+        {/* Blood Pool - stays on the floor after explosion (LEFT side where bug falls) */}
         {showBloodPool && (
           <div
-            className="absolute right-[20%] bottom-[8%] z-5 pointer-events-none"
+            className="absolute left-[15%] bottom-[8%] z-5 pointer-events-none"
           >
             <BloodPool />
           </div>
         )}
 
-        {/* Death Particles - EXPLOSIVE */}
+        {/* Death Particles - EXPLOSIVE - TOP LEFT of container */}
         {showDeathParticles && (
           <div
-            className="absolute right-[20%] bottom-[30%] z-30 pointer-events-none"
+            className="absolute left-[12%] top-[15%] z-30 pointer-events-none"
           >
             <DeathParticles />
           </div>
@@ -1135,16 +1149,16 @@ const battleRevealKeyframes = `
   }
 
   @keyframes bugTremble {
-    0%, 100% { transform: translateX(30px) translateY(-10px) rotate(-10deg); }
-    10% { transform: translateX(28px) translateY(-12px) rotate(-12deg); }
-    20% { transform: translateX(32px) translateY(-8px) rotate(-8deg); }
-    30% { transform: translateX(27px) translateY(-11px) rotate(-13deg); }
-    40% { transform: translateX(33px) translateY(-9px) rotate(-7deg); }
-    50% { transform: translateX(29px) translateY(-13px) rotate(-11deg); }
-    60% { transform: translateX(31px) translateY(-7px) rotate(-9deg); }
-    70% { transform: translateX(28px) translateY(-12px) rotate(-14deg); }
-    80% { transform: translateX(32px) translateY(-8px) rotate(-6deg); }
-    90% { transform: translateX(30px) translateY(-11px) rotate(-12deg); }
+    0%, 100% { transform: translateX(30px) translateY(-10px) rotate(-10deg) scale(0.95); }
+    10% { transform: translateX(26px) translateY(-14px) rotate(-14deg) scale(0.94); }
+    20% { transform: translateX(34px) translateY(-6px) rotate(-6deg) scale(0.96); }
+    30% { transform: translateX(25px) translateY(-13px) rotate(-15deg) scale(0.94); }
+    40% { transform: translateX(35px) translateY(-7px) rotate(-5deg) scale(0.96); }
+    50% { transform: translateX(27px) translateY(-15px) rotate(-13deg) scale(0.94); }
+    60% { transform: translateX(33px) translateY(-5px) rotate(-7deg) scale(0.96); }
+    70% { transform: translateX(26px) translateY(-14px) rotate(-16deg) scale(0.93); }
+    80% { transform: translateX(34px) translateY(-6px) rotate(-4deg) scale(0.96); }
+    90% { transform: translateX(28px) translateY(-12px) rotate(-12deg) scale(0.95); }
   }
 
   @keyframes bloodPoolSpread {
