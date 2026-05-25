@@ -288,24 +288,24 @@ export const BattleReveal = memo(function BattleReveal({
         // Bug pops up and flips (explosion particles appear here)
         return {
           ...baseStyle,
-          transform: 'translateX(0) translateY(-40px) rotateZ(180deg) scale(0.9)',
+          transform: 'translateX(-20px) translateY(-40px) rotateZ(180deg) scale(0.9)',
           opacity: 0.9,
           transition: 'transform 300ms cubic-bezier(0.68, -0.55, 0.27, 1.55)'
         }
       case 'bug-fall':
-        // Bug falls to ground (blood pool appears below)
+        // Bug falls to ground on RIGHT side (negative X = move right)
         return {
           ...baseStyle,
-          transform: 'translateX(10px) translateY(40px) rotateZ(180deg) scale(0.75)',
+          transform: 'translateX(-30px) translateY(40px) rotateZ(180deg) scale(0.75)',
           opacity: 0.7,
           transition: 'transform 350ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }
       case 'content-drop':
       case 'complete':
-        // Dead on the ground
+        // Dead on the ground - stays on RIGHT
         return {
           ...baseStyle,
-          transform: 'translateX(10px) translateY(40px) rotateZ(180deg) scale(0.75)',
+          transform: 'translateX(-30px) translateY(40px) rotateZ(180deg) scale(0.75)',
           opacity: 0.55,
         }
       default:
@@ -448,9 +448,12 @@ export const BattleReveal = memo(function BattleReveal({
               </div>
             )}
 
-            {/* Blood Pool - below bug */}
+            {/* Blood Pool - offset LEFT to where battle happened (bug moves right) */}
             {showBloodPool && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-4 z-5 pointer-events-none">
+              <div
+                className="absolute top-full mt-4 z-5 pointer-events-none"
+                style={{ left: '50%', transform: 'translateX(calc(-50% + 80px))' }}
+              >
                 <BloodPool />
               </div>
             )}
