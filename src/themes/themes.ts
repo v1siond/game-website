@@ -543,7 +543,7 @@ export const themes: Theme[] = [
   },
 ]
 
-export const DEFAULT_THEME_ID = 'dark-fantasy'
+export const DEFAULT_THEME_ID = 'neon-cyber'
 
 export function getThemeById(id: string): Theme {
   return themes.find(t => t.id === id) || themes[0]

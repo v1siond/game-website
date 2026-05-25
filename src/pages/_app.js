@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import '../styles/globals.css'
 import { ToastProvider } from '../components/Toast'
+import FPSTracker from '../components/FPSTracker'
 import localFont from "next/font/local";
 
 const silkScreen = localFont({
@@ -37,6 +38,7 @@ function GameWebsite({ Component, pageProps }) {
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
       </Head>
       <ToastProvider>
+        <FPSTracker position="top-right" showGraph={true} defaultVisible={false} />
         <Component className={`${silkScreen.className} ${permanentMarker.className}`} {...pageProps} />
       </ToastProvider>
     </>

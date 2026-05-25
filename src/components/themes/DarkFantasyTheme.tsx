@@ -13,6 +13,7 @@ import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
+import { useScrollTriggers, TriggerState, getDefaultTriggerStyles } from '@/hooks/useScrollTriggers'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 
 // Blended Dark Fantasy Metroidvania palette
@@ -49,23 +50,92 @@ const DF = {
   lavender: '#b7a9d9',
 }
 
-// Abstract spirit wisp - ethereal floating light (not character-shaped)
-const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DF.ethereal }: { size?: number; color?: string }) {
+/**
+ * TRIGGER CONFIGURATION
+ * ====================
+ * Each trigger defines when a section becomes visible.
+ * Position is a percentage of total page height (0-100).
+ *
+ * Triggers are calculated based on:
+ * - viewportTriggerOffset (70% of viewport by default)
+ * - fadeDistance (200px by default)
+ *
+ * When scroll position + (viewport * 0.7) reaches trigger position,
+ * the content starts fading in over fadeDistance pixels.
+ */
+const TRIGGER_CONFIG = [
+  { id: 'roles', position: 5 },
+  { id: 'profession-selector', position: 10 },
+  { id: 'about', position: 18 },
+  { id: 'art-spirits', position: 25 },
+  { id: 'experience', position: 32 },
+  { id: 'art-lanterns', position: 42 },
+  { id: 'tech-stack', position: 50 },
+  { id: 'projects', position: 58 },
+  { id: 'art-crystals', position: 68 },
+  { id: 'ventures', position: 75 },
+  { id: 'posts', position: 82 },
+  { id: 'contact', position: 90 },
+]
+
+/**
+ * TRIGGER SECTION WRAPPER
+ * ======================
+ * Wraps content and controls visibility based on scroll triggers.
+ * Uses GPU-accelerated properties only (transform, opacity).
+ *
+ * Props:
+ * - id: Must match a trigger ID from TRIGGER_CONFIG
+ * - states: Trigger states map from useScrollTriggers
+ * - children: Content to show/hide
+ * - preRender: If false, content is not in DOM until triggered
+ */
+const TriggerSection = memo(function TriggerSection({
+  id,
+  states,
+  children,
+  preRender = true,
+  className = '',
+}: {
+  id: string
+  states: Map<string, TriggerState>
+  children: React.ReactNode
+  preRender?: boolean
+  className?: string
+}) {
+  const state = states.get(id)
+  const triggered = state?.triggered ?? false
+
+  // Don't render if not pre-rendering and not triggered
+  if (!preRender && !triggered) {
+    return null
+  }
+
+  const styles = getDefaultTriggerStyles(state)
+
   return (
-    <svg width={size} height={size} viewBox="0 0 40 40" className="transition-all duration-300" aria-hidden="true" role="presentation">
-      {/* Central glow core */}
+    <div className={className} style={styles}>
+      {children}
+    </div>
+  )
+})
+
+// Abstract spirit wisp - optimized: no SVG filter
+const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DF.ethereal }: { size?: number; color?: string }) {
+  const gradId = `wispGlow-${color?.replace('#', '')}`
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true" role="presentation">
       <defs>
-        <radialGradient id="wispGlow" cx="50%" cy="50%" r="50%">
+        <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor={color} stopOpacity="0.9" />
-          <stop offset="40%" stopColor={color} stopOpacity="0.5" />
+          <stop offset="30%" stopColor={color} stopOpacity="0.6" />
+          <stop offset="60%" stopColor={color} stopOpacity="0.3" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </radialGradient>
-        <filter id="wispBlur" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
-        </filter>
       </defs>
-      {/* Outer ethereal haze */}
-      <circle cx="20" cy="20" r="18" fill="url(#wispGlow)" filter="url(#wispBlur)" />
+      {/* Outer ethereal haze - multiple circles instead of filter */}
+      <circle cx="20" cy="20" r="18" fill={`url(#${gradId})`} />
+      <circle cx="20" cy="20" r="12" fill={color} opacity="0.15" />
       {/* Inner core */}
       <ellipse cx="20" cy="20" rx="6" ry="8" fill={color} opacity="0.8" />
       {/* Trailing wisps */}
@@ -149,10 +219,10 @@ const FloatingLantern = memo(function FloatingLantern({ size = 30 }: { size?: nu
   )
 })
 
-// Ethereal rain effect (City of Tears inspired but generic)
+// Ethereal rain effect - optimized with fewer elements
 const EtherealRain = memo(function EtherealRain() {
   const drops = useMemo(() =>
-    Array.from({ length: 40 }, (_, i) => ({
+    Array.from({ length: 20 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       height: Math.random() * 20 + 10,
@@ -165,14 +235,15 @@ const EtherealRain = memo(function EtherealRain() {
 
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-[4] overflow-hidden contain-strict"
+      className="fixed inset-0 pointer-events-none z-[4] overflow-hidden"
+      style={{ contain: 'strict' }}
       aria-hidden="true"
       role="presentation"
     >
       {drops.map((d) => (
         <div
           key={d.id}
-          className="absolute w-px will-animate"
+          className="absolute w-px"
           style={{
             left: `${d.x}%`,
             top: '-30px',
@@ -180,7 +251,6 @@ const EtherealRain = memo(function EtherealRain() {
             background: `linear-gradient(180deg, transparent, ${DF.ethereal}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
             animation: `etherealRain ${d.speed}s linear infinite`,
             animationDelay: `${d.delay}s`,
-            willChange: 'transform',
           }}
         />
       ))}
@@ -188,10 +258,10 @@ const EtherealRain = memo(function EtherealRain() {
   )
 })
 
-// Spirit particles - mix of Ori wisps and generic floating lights
+// Spirit particles - optimized: no box-shadow, fewer elements
 const SpiritParticles = memo(function SpiritParticles() {
   const particles = useMemo(() =>
-    Array.from({ length: 10 }, (_, i) => ({
+    Array.from({ length: 6 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -206,25 +276,23 @@ const SpiritParticles = memo(function SpiritParticles() {
 
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-[5] overflow-hidden contain-strict"
+      className="fixed inset-0 pointer-events-none z-[5] overflow-hidden"
+      style={{ contain: 'strict' }}
       aria-hidden="true"
       role="presentation"
     >
       {particles.map((p) => (
         <div
           key={p.id}
-          className="absolute rounded-full will-animate"
+          className="absolute rounded-full"
           style={{
             left: `${p.x}%`,
             top: `${p.y}%`,
-            width: p.size,
-            height: p.size,
-            background: p.color,
-            opacity: p.opacity,
-            boxShadow: `0 0 ${p.size * 3}px ${p.color}`,
+            width: p.size * 2.5,
+            height: p.size * 2.5,
+            background: `radial-gradient(circle, ${p.color} 20%, ${p.color}40 50%, transparent 70%)`,
             animation: `spiritFloat ${p.speed}s ease-in-out infinite`,
             animationDelay: `${p.delay}s`,
-            willChange: 'transform, opacity',
           }}
         />
       ))}
@@ -419,33 +487,30 @@ const GothicWindow = memo(function GothicWindow({ side }: { side: 'left' | 'righ
         <circle cx="30" cy="55" r="3" fill={DF.spiritGold} opacity="0.4" />
         <circle cx="50" cy="55" r="3" fill={DF.spiritGold} opacity="0.4" />
       </svg>
-      {/* Light rays emanating */}
+      {/* Light rays emanating - no blur filter for performance */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse at ${side === 'left' ? '80%' : '20%'} 30%, ${DF.spiritGold}20, transparent 70%)`,
-          filter: 'blur(25px)',
+          background: `radial-gradient(ellipse at ${side === 'left' ? '80%' : '20%'} 30%, ${DF.spiritGold}15, ${DF.spiritGold}08 40%, transparent 70%)`,
         }}
       />
     </div>
   )
 })
 
-// Combined atmosphere layer
+// Combined atmosphere layer - NO chandelier here (it's in header now)
 const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[3] contain-strict" aria-hidden="true" role="presentation">
-      <GothicChandelier />
       <GothicWindow side="left" />
       <GothicWindow side="right" />
       <StoneFormations />
 
-      {/* Central ethereal glow - Ori inspired */}
+      {/* Central ethereal glow - no blur filter for performance */}
       <div
         className="absolute top-[15%] left-1/2 w-[800px] h-[500px]"
         style={{
-          background: `radial-gradient(ellipse at center top, ${DF.spiritGold}15 0%, ${DF.ethereal}08 40%, transparent 70%)`,
-          filter: 'blur(60px)',
+          background: `radial-gradient(ellipse at center top, ${DF.spiritGold}10 0%, ${DF.spiritGold}05 20%, ${DF.ethereal}04 50%, transparent 80%)`,
           transform: 'translateX(-50%) translateZ(0)',
         }}
       />
@@ -530,7 +595,7 @@ const WaystationNode = memo(function WaystationNode({
   return (
     <button
       onClick={onClick}
-      className="absolute transform -translate-x-1/2 -translate-y-1/2 group min-w-[100px] min-h-[100px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      className="absolute transform -translate-x-1/2 -translate-y-1/2 group min-w-[70px] md:min-w-[100px] min-h-[70px] md:min-h-[100px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
@@ -542,21 +607,19 @@ const WaystationNode = memo(function WaystationNode({
       role="tab"
       tabIndex={isActive ? 0 : -1}
     >
-      {/* Active glow */}
+      {/* Active glow - optimized: reduced blur */}
       <div
         className={`absolute inset-0 rounded-full transition-all duration-500 ${
           isActive ? 'opacity-50 scale-150' : 'opacity-0 scale-100 group-hover:opacity-30 group-hover:scale-125'
         }`}
         style={{
-          backgroundColor: color,
-          filter: 'blur(20px)',
-          willChange: 'transform, opacity',
+          background: `radial-gradient(circle, ${color}60 0%, ${color}30 40%, transparent 70%)`,
         }}
         aria-hidden="true"
       />
       {/* Main container - hexagonal/crystalline shape */}
       <div
-        className={`relative w-24 h-24 flex flex-col items-center justify-center transition-all duration-300 ${
+        className={`relative w-16 h-16 md:w-24 md:h-24 flex flex-col items-center justify-center transition-all duration-300 ${
           isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
         style={{
@@ -564,18 +627,14 @@ const WaystationNode = memo(function WaystationNode({
           border: `2px solid ${isActive ? color : DF.stoneDark}`,
           borderRadius: '8px',
           clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-          boxShadow: isActive
-            ? `0 0 30px ${color}40, inset 0 0 20px ${color}15`
-            : `inset 0 0 15px rgba(0,0,0,0.5)`,
-          willChange: 'transform',
         }}
       >
         {/* Abstract icon */}
-        <div className="mb-1" style={{ color: isActive ? color : DF.silver }}>
+        <div className="mb-0.5 md:mb-1 scale-75 md:scale-100" style={{ color: isActive ? color : DF.silver }}>
           {icon}
         </div>
         <span
-          className="text-xs tracking-[0.15em] uppercase font-medium"
+          className="text-[10px] md:text-xs tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
           style={{
             color: isActive ? color : DF.silver,
             fontFamily: '"Cinzel", "Garamond", serif',
@@ -584,7 +643,7 @@ const WaystationNode = memo(function WaystationNode({
           {label}
         </span>
         <span
-          className="text-[10px] tracking-wider opacity-70 text-center leading-tight"
+          className="text-[8px] md:text-[10px] tracking-wider opacity-70 text-center leading-tight hidden md:block"
           style={{
             color: isActive ? color : DF.silver,
             fontFamily: '"Cinzel", serif',
@@ -723,7 +782,6 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnTy
                   border: `1px solid ${DF.ethereal}30`,
                   color: DF.bone,
                   borderRadius: '3px',
-                  willChange: 'transform',
                 }}
               >
                 {tech}
@@ -772,8 +830,6 @@ const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PRO
         background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple}50)`,
         border: `1px solid ${project.featured ? DF.spiritGold : DF.stoneDark}`,
         borderRadius: '4px',
-        boxShadow: project.featured ? `0 0 20px ${DF.spiritGold}20` : 'none',
-        willChange: 'transform',
       }}
       tabIndex={0}
       role="button"
@@ -817,7 +873,6 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COM
         background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple}40)`,
         border: `1px solid ${DF.stoneDark}`,
         borderRadius: '4px',
-        willChange: 'transform',
         ['--tw-ring-color' as string]: DF.spiritGold,
         ['--tw-ring-offset-color' as string]: DF.void,
       }}
@@ -847,7 +902,6 @@ const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
         background: `linear-gradient(135deg, ${DF.void}, ${DF.lavender}20)`,
         border: `1px solid ${DF.lavender}60`,
         borderRadius: '4px',
-        willChange: 'transform',
       }}
     >
       <h3 className="text-base transition-colors" style={{ color: DF.bone }}>
@@ -999,7 +1053,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
           </div>
         </div>
 
-        {/* Floating particles */}
+        {/* Floating particles - no box-shadow */}
         {[
           { x: '20%', y: '30%', color: DF.spiritGold },
           { x: '80%', y: '40%', color: DF.ethereal },
@@ -1008,13 +1062,11 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
         ].map((p, i) => (
           <div
             key={i}
-            className="absolute w-2 h-2 rounded-full"
+            className="absolute w-4 h-4 rounded-full"
             style={{
               left: p.x,
               top: p.y,
-              background: p.color,
-              boxShadow: `0 0 12px ${p.color}`,
-              opacity: 0.5,
+              background: `radial-gradient(circle, ${p.color} 20%, ${p.color}50 50%, transparent 70%)`,
               animation: `spiritFloat ${8 + i * 2}s ease-in-out infinite`,
               animationDelay: `${i * -2}s`,
             }}
@@ -1181,12 +1233,11 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
           ))}
         </svg>
 
-        {/* Glow behind crystals */}
+        {/* Glow behind crystals - no blur filter */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-32"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-40"
           style={{
-            background: `radial-gradient(ellipse, ${DF.ethereal}20 0%, ${DF.spiritGold}10 50%, transparent 70%)`,
-            filter: 'blur(30px)',
+            background: `radial-gradient(ellipse, ${DF.ethereal}15 0%, ${DF.ethereal}08 30%, ${DF.spiritGold}05 60%, transparent 80%)`,
           }}
         />
       </div>
@@ -1218,6 +1269,19 @@ export default function DarkFantasyTheme() {
   const { theme } = useTheme()
   const { active, setActive, config } = useProfession()
   const [mounted, setMounted] = useState(false)
+
+  // Scroll trigger system - calculates trigger states based on scroll position
+  const {
+    states: triggerStates,
+    scrollProgress,
+    isTriggered,
+    getProgress,
+  } = useScrollTriggers({
+    triggers: TRIGGER_CONFIG,
+    defaultFadeDistance: 250,
+    viewportTriggerOffset: 0.65,
+    persistTriggered: true,
+  })
 
   // Memoize expensive data operations
   const aboutData = useMemo(() => ABOUT_DATA[active], [active])
@@ -1306,79 +1370,93 @@ export default function DarkFantasyTheme() {
       <DarkFantasyAtmosphere />
       <SpiritParticles />
 
-      {/* Vignette overlay */}
+      {/* Vignette overlay - optimized: no box-shadow */}
       <div
         className="fixed inset-0 pointer-events-none z-[8]"
         style={{
-          boxShadow: `inset 0 0 250px 100px ${DF.void}`,
           background: `
-            radial-gradient(ellipse at 50% 25%, transparent 15%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0.7) 100%),
+            radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 30%, rgba(15,10,26,0.4) 60%, rgba(15,10,26,0.8) 100%),
             linear-gradient(180deg, transparent 60%, ${DF.void}90 100%)
           `,
         }}
       />
 
-      {/* Header */}
-      <header className="relative z-30 p-6" role="banner">
-        <div className="max-w-6xl mx-auto flex justify-between items-start flex-wrap gap-4">
-          <div className="flex items-center gap-6 animate-fade-in-down">
-            <div aria-hidden="true">
-              <SpiritWisp size={50} color={DF.spiritGold} />
-            </div>
-            <div>
-              <h1
-                className="text-3xl tracking-[0.3em] font-normal uppercase"
-                style={{
-                  color: DF.bone,
-                  textShadow: `0 0 30px ${DF.ethereal}40`,
-                }}
-              >
-                Alexander Pulido
-              </h1>
-              <p className="text-base tracking-wider mt-2" style={{ color: DF.silver }}>
-                {PROFESSIONAL_SUMMARY.headline}
-              </p>
-              <p
-                className="text-sm tracking-wider mt-1 italic"
-                style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
-              >
-                {PROFESSIONAL_SUMMARY.tagline}
-              </p>
-            </div>
-          </div>
+      {/* Chandelier - absolute at top, doesn't scroll */}
+      <div className="absolute top-0 left-0 right-0 z-[2] pointer-events-none" aria-hidden="true">
+        <GothicChandelier />
+      </div>
 
-          <nav className="flex gap-3 items-center flex-wrap" aria-label="Primary navigation">
+      {/* Fixed Navigation Bar */}
+      <nav
+        className="fixed top-0 left-0 right-0 z-[50] px-4 py-3 md:px-6 md:py-4"
+        style={{
+          background: `linear-gradient(180deg, ${DF.void}f5 0%, ${DF.void}e0 70%, transparent 100%)`,
+          backdropFilter: 'blur(8px)',
+        }}
+        role="banner"
+        aria-label="Primary navigation"
+      >
+        <div className="max-w-6xl mx-auto flex justify-between items-center gap-2 md:gap-4">
+          {/* Name - compact on mobile */}
+          <Link href="/" className="flex items-center gap-2 md:gap-3 group">
+            <div aria-hidden="true" className="hidden sm:block">
+              <SpiritWisp size={32} color={DF.spiritGold} />
+            </div>
+            <h1
+              className="text-sm md:text-lg tracking-[0.15em] md:tracking-[0.2em] font-normal uppercase whitespace-nowrap"
+              style={{
+                color: DF.bone,
+                textShadow: `0 0 20px ${DF.ethereal}30`,
+              }}
+            >
+              Alexander Pulido
+            </h1>
+          </Link>
+
+          {/* Nav Links */}
+          <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-4 py-2 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
               style={{
                 border: `1px solid ${DF.stoneDark}`,
                 color: DF.silver,
                 background: `${DF.void}cc`,
                 borderRadius: '4px',
-                ['--tw-ring-color' as string]: DF.spiritGold,
-                ['--tw-ring-offset-color' as string]: DF.void,
               }}
             >
-              <span aria-hidden="true">* </span>CV
+              CV
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-4 py-2 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              className="px-2 md:px-3 py-1.5 md:py-2 text-xs md:text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
               style={{
                 border: `1px solid ${DF.ethereal}`,
                 color: DF.ethereal,
                 background: `${DF.ethereal}15`,
                 borderRadius: '4px',
-                boxShadow: `0 0 15px ${DF.ethereal}20`,
-                ['--tw-ring-color' as string]: DF.ethereal,
-                ['--tw-ring-offset-color' as string]: DF.void,
               }}
             >
-              <span aria-hidden="true">* </span>Nebulith
+              <span className="hidden sm:inline">Nebulith</span>
+              <span className="sm:hidden">Game</span>
             </Link>
             <ThemeSwitcher />
-          </nav>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section - below fixed nav */}
+      <header className="relative z-20 pt-20 md:pt-24 pb-6 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-sm md:text-base tracking-wider mb-2" style={{ color: DF.silver }}>
+            {PROFESSIONAL_SUMMARY.headline}
+          </p>
+          <p
+            className="text-xs md:text-sm tracking-wider italic"
+            style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
+          >
+            {PROFESSIONAL_SUMMARY.tagline}
+          </p>
         </div>
       </header>
 
@@ -1386,198 +1464,270 @@ export default function DarkFantasyTheme() {
       <main id="main-content" tabIndex={-1} className="outline-none">
 
       {/* Current Roles */}
-      <section className="relative z-20 py-6 px-6" aria-labelledby="current-roles-heading">
-        <h2 id="current-roles-heading" className="sr-only">Current Roles</h2>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-8" role="list">
-            {CURRENT_ROLES.map((role) => (
-              <div
-                key={role.id}
-                className="text-center px-4 py-2"
-                style={{
-                  background: `${DF.void}80`,
-                  border: `1px solid ${DF.stoneDark}`,
-                  borderRadius: '4px',
-                }}
-                role="listitem"
-              >
-                <p className="text-sm tracking-[0.15em] uppercase" style={{ color: DF.ethereal }}>{role.title}</p>
-                <p className="text-base" style={{ color: DF.bone }}>{role.company}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Profession Selector - Waystation style */}
-      <section className="relative z-20 py-8" aria-labelledby="profession-heading">
-        <h2 id="profession-heading" className="sr-only">Select Your Profession</h2>
-        <div className="max-w-6xl mx-auto px-6">
-          <div
-            className="relative h-56 overflow-hidden"
-            style={{
-              background: `linear-gradient(180deg, transparent, ${DF.voidPurple}30)`,
-              border: `1px solid ${DF.stoneDark}60`,
-              borderRadius: '4px',
-            }}
-            role="tablist"
-            aria-label="Profession selector"
-          >
-            {/* Connection paths */}
-            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor={DF.brass} stopOpacity="0" />
-                  <stop offset="50%" stopColor={DF.brass} stopOpacity="0.4" />
-                  <stop offset="100%" stopColor={DF.brass} stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              <line x1="25%" y1="50%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-              <line x1="50%" y1="30%" x2="75%" y2="50%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-              {/* Gear decorations at intersections */}
-              <circle cx="37.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
-              <circle cx="62.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
-            </svg>
-            {professionNodes.map((node) => (
-              <WaystationNode
-                key={node.id}
-                {...node}
-                isActive={active === node.id}
-                onClick={() => setActive(node.id as 'engineer' | 'drummer' | 'fighter')}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About */}
-      <section className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <VoidFrame title="About">
-            <p className="text-sm leading-relaxed mb-4" style={{ color: DF.bone }}>{aboutData.bio}</p>
-            <div className="flex flex-wrap gap-3">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 text-xs"
+      <TriggerSection id="roles" states={triggerStates}>
+        <section className="relative z-20 py-6 px-6" aria-labelledby="current-roles-heading">
+          <h2 id="current-roles-heading" className="sr-only">Current Roles</h2>
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-wrap justify-center gap-8" role="list">
+              {CURRENT_ROLES.map((role) => (
+                <div
+                  key={role.id}
+                  className="text-center px-4 py-2"
                   style={{
-                    background: `${DF.ethereal}12`,
-                    border: `1px solid ${DF.ethereal}30`,
-                    color: DF.ethereal,
-                    borderRadius: '3px',
+                    background: `${DF.void}80`,
+                    border: `1px solid ${DF.stoneDark}`,
+                    borderRadius: '4px',
                   }}
+                  role="listitem"
                 >
-                  * {fact}
-                </span>
+                  <p className="text-sm tracking-[0.15em] uppercase" style={{ color: DF.ethereal }}>{role.title}</p>
+                  <p className="text-base" style={{ color: DF.bone }}>{role.company}</p>
+                </div>
               ))}
             </div>
-          </VoidFrame>
-        </div>
-      </section>
+          </div>
+        </section>
+      </TriggerSection>
+
+      {/* Profession Selector - Waystation style */}
+      <TriggerSection id="profession-selector" states={triggerStates}>
+        <section className="relative z-20 py-8" aria-labelledby="profession-heading">
+          <h2 id="profession-heading" className="sr-only">Select Your Profession</h2>
+          <div className="max-w-6xl mx-auto px-4 md:px-6">
+            <div
+              className="relative h-40 md:h-56 overflow-hidden"
+              style={{
+                background: `linear-gradient(180deg, transparent, ${DF.voidPurple}30)`,
+                border: `1px solid ${DF.stoneDark}60`,
+                borderRadius: '4px',
+              }}
+              role="tablist"
+              aria-label="Profession selector"
+            >
+              {/* Connection paths */}
+              <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor={DF.brass} stopOpacity="0" />
+                    <stop offset="50%" stopColor={DF.brass} stopOpacity="0.4" />
+                    <stop offset="100%" stopColor={DF.brass} stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <line x1="25%" y1="50%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                <line x1="50%" y1="30%" x2="75%" y2="50%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                {/* Gear decorations at intersections */}
+                <circle cx="37.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
+                <circle cx="62.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
+              </svg>
+              {professionNodes.map((node) => (
+                <WaystationNode
+                  key={node.id}
+                  {...node}
+                  isActive={active === node.id}
+                  onClick={() => setActive(node.id as 'engineer' | 'drummer' | 'fighter')}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      </TriggerSection>
+
+      {/* About */}
+      <TriggerSection id="about" states={triggerStates}>
+        <section className="relative z-20 py-8 px-6">
+          <div className="max-w-4xl mx-auto">
+            <VoidFrame title="About">
+              <p className="text-sm leading-relaxed mb-4" style={{ color: DF.bone }}>{aboutData.bio}</p>
+              <div className="flex flex-wrap gap-3">
+                {aboutData.quickFacts.map((fact, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 text-xs"
+                    style={{
+                      background: `${DF.ethereal}12`,
+                      border: `1px solid ${DF.ethereal}30`,
+                      color: DF.ethereal,
+                      borderRadius: '3px',
+                    }}
+                  >
+                    * {fact}
+                  </span>
+                ))}
+              </div>
+            </VoidFrame>
+          </div>
+        </section>
+      </TriggerSection>
 
       {/* Art Section 1 - Spirits and Gears */}
-      <ArtSectionSpirits />
+      <TriggerSection id="art-spirits" states={triggerStates} preRender={false}>
+        <ArtSectionSpirits />
+      </TriggerSection>
 
       {/* Work Experience */}
       {experience.length > 0 && (
-        <section className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <VoidFrame title="Work Experience">
-              <div className="space-y-4">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </VoidFrame>
-          </div>
-        </section>
+        <TriggerSection id="experience" states={triggerStates}>
+          <section className="relative z-20 py-8 px-6">
+            <div className="max-w-4xl mx-auto">
+              <VoidFrame title="Work Experience">
+                <div className="space-y-4">
+                  {experience.map((entry) => (
+                    <ExperienceCard key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              </VoidFrame>
+            </div>
+          </section>
+        </TriggerSection>
       )}
 
       {/* Art Section 2 - Lanterns */}
-      <ArtSectionLanterns />
+      <TriggerSection id="art-lanterns" states={triggerStates} preRender={false}>
+        <ArtSectionLanterns />
+      </TriggerSection>
 
       {/* Tech Stack / Skills */}
-      <section className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <VoidFrame title={active === 'engineer' ? 'Tech Stack' : 'Skills'}>
-            {active === 'engineer' ? (
-              <TechCloud categories={engineerTech} />
-            ) : (
-              <SkillsList categories={otherSkills} />
-            )}
-          </VoidFrame>
-        </div>
-      </section>
+      <TriggerSection id="tech-stack" states={triggerStates}>
+        <section className="relative z-20 py-8 px-6">
+          <div className="max-w-4xl mx-auto">
+            <VoidFrame title={active === 'engineer' ? 'Tech Stack' : 'Skills'}>
+              {active === 'engineer' ? (
+                <TechCloud categories={engineerTech} />
+              ) : (
+                <SkillsList categories={otherSkills} />
+              )}
+            </VoidFrame>
+          </div>
+        </section>
+      </TriggerSection>
 
       {/* Projects */}
-      <section className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <VoidFrame title="Featured Work">
-            <div className="grid md:grid-cols-2 gap-4">
-              {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
-          </VoidFrame>
-        </div>
-      </section>
+      <TriggerSection id="projects" states={triggerStates}>
+        <section className="relative z-20 py-8 px-6">
+          <div className="max-w-4xl mx-auto">
+            <VoidFrame title="Featured Work">
+              <div className="grid md:grid-cols-2 gap-4">
+                {projects.filter(p => p.featured).slice(0, 6).map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            </VoidFrame>
+          </div>
+        </section>
+      </TriggerSection>
 
       {/* Art Section 3 - Crystals */}
-      <ArtSectionCrystals />
+      <TriggerSection id="art-crystals" states={triggerStates} preRender={false}>
+        <ArtSectionCrystals />
+      </TriggerSection>
 
       {/* Ventures (Companies/Bands) */}
-      {active === 'engineer' && (
-        <section className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <VoidFrame title="Ventures">
-              <div className="grid md:grid-cols-3 gap-4">
-                {COMPANIES.map((company) => (
-                  <CompanyCard key={company.id} company={company} />
-                ))}
-              </div>
-            </VoidFrame>
-          </div>
-        </section>
-      )}
+      <TriggerSection id="ventures" states={triggerStates}>
+        {active === 'engineer' && (
+          <section className="relative z-20 py-8 px-6">
+            <div className="max-w-4xl mx-auto">
+              <VoidFrame title="Ventures">
+                <div className="grid md:grid-cols-3 gap-4">
+                  {COMPANIES.map((company) => (
+                    <CompanyCard key={company.id} company={company} />
+                  ))}
+                </div>
+              </VoidFrame>
+            </div>
+          </section>
+        )}
 
-      {active === 'drummer' && (
-        <section className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <VoidFrame title="Bands">
-              <div className="grid md:grid-cols-3 gap-4">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </VoidFrame>
-          </div>
-        </section>
-      )}
+        {active === 'drummer' && (
+          <section className="relative z-20 py-8 px-6">
+            <div className="max-w-4xl mx-auto">
+              <VoidFrame title="Bands">
+                <div className="grid md:grid-cols-3 gap-4">
+                  {BANDS.map((band) => (
+                    <BandCard key={band.id} band={band} />
+                  ))}
+                </div>
+              </VoidFrame>
+            </div>
+          </section>
+        )}
+      </TriggerSection>
 
       {/* Posts */}
-      <section className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <VoidFrame title="Posts">
-            <div className="text-center py-8">
-              <p className="text-sm" style={{ color: DF.silver }}>
-                Writings and thoughts coming soon...
-              </p>
-              <p className="text-xs mt-2 italic" style={{ color: DF.ethereal }}>
-                * Check back for updates on development, music, and martial arts
-              </p>
-            </div>
-          </VoidFrame>
-        </div>
-      </section>
+      <TriggerSection id="posts" states={triggerStates}>
+        <section className="relative z-20 py-8 px-6">
+          <div className="max-w-4xl mx-auto">
+            <VoidFrame title="Posts">
+              <div className="text-center py-8">
+                <p className="text-sm" style={{ color: DF.silver }}>
+                  Writings and thoughts coming soon...
+                </p>
+                <p className="text-xs mt-2 italic" style={{ color: DF.ethereal }}>
+                  * Check back for updates on development, music, and martial arts
+                </p>
+              </div>
+            </VoidFrame>
+          </div>
+        </section>
+      </TriggerSection>
 
       </main>
+
+      {/* Contact CTA */}
+      <TriggerSection id="contact" states={triggerStates}>
+        <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: '"Cinzel", serif' }}>
+              Ready to Work Together?
+            </h2>
+            <p className="text-sm" style={{ color: DF.silver }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              style={{
+                background: DF.brass,
+                color: DF.void,
+                fontFamily: '"Cinzel", serif',
+              }}
+            >
+              Get In Touch
+            </a>
+            <Link
+              href="/cv"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              style={{
+                background: 'transparent',
+                border: `2px solid ${DF.brass}`,
+                color: DF.brass,
+                fontFamily: '"Cinzel", serif',
+              }}
+            >
+              Download CV
+            </Link>
+          </div>
+        </div>
+        </section>
+      </TriggerSection>
+
+      {/* Bottom obscure overlay - content fades into darkness */}
+      <div
+        className="fixed bottom-0 left-0 right-0 h-48 pointer-events-none z-[7]"
+        style={{
+          background: `linear-gradient(180deg, transparent 0%, ${DF.void}40 30%, ${DF.void}90 70%, ${DF.void} 100%)`,
+        }}
+        aria-hidden="true"
+      />
 
       {/* Footer */}
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
         <div className="inline-flex items-center gap-4" style={{ color: DF.silver }}>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]" style={{ fontFamily: '"Cinzel", serif' }}>
-            <span className="sr-only">Copyright </span>MMXXVI
+            <span className="sr-only">Copyright </span>© {new Date().getFullYear()} Alexander Pulido
           </span>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
         </div>

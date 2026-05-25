@@ -27,9 +27,15 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setThemeById = (id: string) => {
+    // Preserve scroll position when changing themes
+    const scrollY = window.scrollY
     const newTheme = getThemeById(id)
     setTheme(newTheme)
     localStorage.setItem(STORAGE_KEY, id)
+    // Restore scroll position after React re-renders
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollY)
+    })
   }
 
   // Prevent hydration mismatch by rendering default until mounted
