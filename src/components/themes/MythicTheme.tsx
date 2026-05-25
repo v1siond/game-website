@@ -625,7 +625,7 @@ function BoonSelector({
       className={`relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
         isActive ? 'scale-110 z-10' : 'opacity-60 hover:opacity-90 hover:scale-105'
       }`}
-      style={{ focusVisibleRingColor: god.color }}
+      style={{ '--ring-color': god.color } as React.CSSProperties}
       aria-pressed={isActive}
       aria-label={`Select ${god.name} - ${god.title}`}
     >

@@ -1056,9 +1056,9 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
         {project.tagline}
       </p>
       {/* Impact statement instead of just description */}
-      {project.metrics && project.metrics.length > 0 && (
+      {project.impact && (
         <p className="text-[11px] mb-3 leading-relaxed" style={{ color: '#a09080' }}>
-          {project.metrics[0]}
+          {project.impact}
         </p>
       )}
       <div className="flex gap-1 flex-wrap">

@@ -262,13 +262,13 @@ function VaultDoor({ size = 100 }: { size?: number }) {
       {/* Door */}
       <circle cx="50" cy="50" r="42" fill={VAULT_BLUE_DARK} />
       {/* Inner details */}
-      <circle cx="50" cy="50" r="35" fill="none" stroke={VAULT_YELLOW}40 strokeWidth="2" />
-      <circle cx="50" cy="50" r="25" fill="none" stroke={VAULT_YELLOW}30 strokeWidth="1" />
+      <circle cx="50" cy="50" r="35" fill="none" stroke={`${VAULT_YELLOW}40`} strokeWidth="2" />
+      <circle cx="50" cy="50" r="25" fill="none" stroke={`${VAULT_YELLOW}30`} strokeWidth="1" />
       {/* Vault number */}
       <text x="50" y="45" textAnchor="middle" fill={VAULT_YELLOW} fontSize="20" fontWeight="bold" fontFamily="monospace">
         101
       </text>
-      <text x="50" y="62" textAnchor="middle" fill={VAULT_YELLOW}80 fontSize="8" fontFamily="monospace">
+      <text x="50" y="62" textAnchor="middle" fill={`${VAULT_YELLOW}80`} fontSize="8" fontFamily="monospace">
         VAULT-TEC
       </text>
       {/* Handle */}
