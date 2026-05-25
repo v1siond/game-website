@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
@@ -12,7 +11,6 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // Color palette - Dark Souls authentic
 const COLORS = {
@@ -28,7 +26,7 @@ const COLORS = {
   humanity: '#1a1a1a',
 }
 
-// Undead Warrior Alexander - Dark Souls style
+// Undead Warrior Alexander - Pure CSS/SVG Dark Souls style
 function UndeadWarrior({
   size = 60,
   direction = 'right',
@@ -38,7 +36,6 @@ function UndeadWarrior({
   direction?: 'left' | 'right'
   className?: string
 }) {
-  const [frame, setFrame] = useState(0)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
@@ -49,35 +46,57 @@ function UndeadWarrior({
     return () => mediaQuery.removeEventListener('change', handler)
   }, [])
 
-  useEffect(() => {
-    if (prefersReducedMotion) return
-    const interval = setInterval(() => setFrame(f => (f + 1) % 2), 160)
-    return () => clearInterval(interval)
-  }, [prefersReducedMotion])
-
-  const sprite = direction === 'right'
-    ? (frame === 0 ? '/assets/sprites/run_right.png' : '/assets/sprites/run_right_1.png')
-    : (frame === 0 ? '/assets/sprites/run_left.png' : '/assets/sprites/run_left_1.png')
+  const flipStyle = direction === 'left' ? { transform: 'scaleX(-1)' } : {}
 
   return (
     <div
       className={`relative ${className}`}
-      style={{ width: size, height: size * 1.2 }}
+      style={{ width: size, height: size * 1.2, ...flipStyle }}
       role="img"
       aria-label="Undead Warrior character"
     >
-      <Image
-        src={sprite}
-        alt=""
-        fill
-        className="object-contain"
-        style={{ filter: 'brightness(0.7) contrast(1.4) sepia(0.2)' }}
-      />
+      <svg viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg" width={size} height={size * 1.2}>
+        {/* Helmet */}
+        <ellipse cx="20" cy="8" rx="6" ry="7" fill="#3a3633"/>
+        <path d="M14 5 L20 2 L26 5 L26 10 L14 10 Z" fill="#4a4643"/>
+        <rect x="17" y="9" width="6" height="2" fill="#1a1a1a" rx="1"/>
+        {/* Visor slit */}
+        <rect x="16" y="6" width="8" height="1" fill="#0a0a0a"/>
+        {/* Body armor */}
+        <path d="M14 14 L26 14 L28 32 L12 32 Z" fill="#2a2623"/>
+        <path d="M16 16 L24 16 L25 28 L15 28 Z" fill="#3a3633"/>
+        {/* Chainmail texture */}
+        <line x1="16" y1="18" x2="24" y2="18" stroke="#4a4643" strokeWidth="0.5"/>
+        <line x1="16" y1="21" x2="24" y2="21" stroke="#4a4643" strokeWidth="0.5"/>
+        <line x1="16" y1="24" x2="24" y2="24" stroke="#4a4643" strokeWidth="0.5"/>
+        {/* Sword on back */}
+        <rect x="10" y="10" width="2" height="24" fill="#666" transform="rotate(-15 10 10)"/>
+        <rect x="8" y="10" width="6" height="2" fill="#555" transform="rotate(-15 10 10)"/>
+        {/* Arms */}
+        <path d="M12 16 L6 24 L8 26 L14 18 Z" fill="#2a2623"/>
+        <path d="M28 16 L34 24 L32 26 L26 18 Z" fill="#2a2623"/>
+        {/* Shield arm */}
+        <ellipse cx="6" cy="25" rx="4" ry="5" fill="#3a3633" stroke="#4a4643" strokeWidth="1"/>
+        {/* Legs */}
+        <path d="M14 30 L12 46 L16 46 L18 34 Z" fill="#2a2623"/>
+        <path d="M26 30 L28 46 L24 46 L22 34 Z" fill="#2a2623"/>
+        {/* Boots */}
+        <ellipse cx="14" cy="46" rx="3" ry="2" fill="#1a1a1a"/>
+        <ellipse cx="26" cy="46" rx="3" ry="2" fill="#1a1a1a"/>
+        {/* Ember glow */}
+        <circle cx="20" cy="24" r="8" fill={`url(#emberGlow-${direction})`} opacity="0.3"/>
+        <defs>
+          <radialGradient id={`emberGlow-${direction}`}>
+            <stop offset="0%" stopColor={COLORS.bonfire}/>
+            <stop offset="100%" stopColor="transparent"/>
+          </radialGradient>
+        </defs>
+      </svg>
       {!prefersReducedMotion && (
         <div
-          className="absolute inset-0 animate-pulse"
+          className="absolute inset-0"
           style={{
-            background: `radial-gradient(circle, ${COLORS.bonfire}4d 0%, transparent 60%)`,
+            background: `radial-gradient(circle, ${COLORS.bonfire}20 0%, transparent 60%)`,
           }}
           aria-hidden="true"
         />
@@ -172,6 +191,129 @@ function StoneTexture() {
   )
 }
 
+// Stone Section Card - ancient castle/bonfire aesthetic with textures
+function StoneSectionCard({
+  children,
+  className = '',
+  glowColor = COLORS.bonfire,
+  ariaLabelledby,
+}: {
+  children: React.ReactNode
+  className?: string
+  glowColor?: string
+  ariaLabelledby?: string
+}) {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
+
+  return (
+    <section
+      className={`relative overflow-hidden ${className}`}
+      style={{
+        background: `
+          linear-gradient(180deg, #15120fee 0%, #0c0a08ee 100%)
+        `,
+        border: `1px solid ${COLORS.ash}`,
+        boxShadow: `
+          inset 0 0 40px rgba(0,0,0,0.6),
+          inset 0 1px 0 rgba(60,55,50,0.3),
+          0 4px 20px rgba(0,0,0,0.4)
+        `,
+      }}
+      aria-labelledby={ariaLabelledby}
+    >
+      {/* Stone/brick texture overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.08]"
+        aria-hidden="true"
+        style={{
+          backgroundImage: `
+            linear-gradient(90deg, transparent 0%, transparent 48%, rgba(40,35,30,0.5) 50%, transparent 52%, transparent 100%),
+            linear-gradient(0deg, transparent 0%, transparent 48%, rgba(40,35,30,0.3) 50%, transparent 52%, transparent 100%)
+          `,
+          backgroundSize: '60px 40px',
+        }}
+      />
+
+      {/* Cracked stone SVG pattern */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-[0.04]"
+        aria-hidden="true"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0 L25 30 L15 50 L30 100' stroke='%23555' stroke-width='0.5' fill='none'/%3E%3Cpath d='M60 0 L55 40 L70 70 L50 100' stroke='%23444' stroke-width='0.5' fill='none'/%3E%3Cpath d='M0 30 L40 35 L100 25' stroke='%23555' stroke-width='0.5' fill='none'/%3E%3Cpath d='M0 70 L30 75 L60 65 L100 80' stroke='%23444' stroke-width='0.5' fill='none'/%3E%3C/svg%3E")`,
+          backgroundSize: '200px 200px',
+        }}
+      />
+
+      {/* Bonfire warm glow on edges */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          boxShadow: `
+            inset 0 -2px 30px ${glowColor}15,
+            inset -2px 0 20px ${glowColor}08,
+            inset 2px 0 20px ${glowColor}08
+          `,
+        }}
+      />
+
+      {/* Ember/ash particle overlay */}
+      {!prefersReducedMotion && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-0.5 h-0.5 rounded-full animate-section-ember"
+              style={{
+                left: `${15 + Math.random() * 70}%`,
+                bottom: '10%',
+                background: i % 2 === 0 ? COLORS.ember : COLORS.gold,
+                animationDelay: `${i * 0.8}s`,
+                opacity: 0.6,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Fog gate transparency at top */}
+      <div
+        className="absolute top-0 left-0 right-0 h-8 pointer-events-none"
+        aria-hidden="true"
+        style={{
+          background: `linear-gradient(to bottom, ${COLORS.fog}08, transparent)`,
+        }}
+      />
+
+      {/* Gothic corner ornaments - cathedral style */}
+      {['top-0 left-0', 'top-0 right-0 scale-x-[-1]', 'bottom-0 left-0 scale-y-[-1]', 'bottom-0 right-0 scale-[-1]'].map((pos, i) => (
+        <div key={i} className={`absolute ${pos} w-8 h-8 pointer-events-none`} aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            {/* Gothic arch corner */}
+            <path d="M0 0 L32 0 L32 4 L4 4 L4 32 L0 32 Z" fill={COLORS.ash} opacity="0.6"/>
+            <path d="M0 0 L16 0 L16 2 L2 2 L2 16 L0 16 Z" fill={glowColor} opacity="0.2"/>
+            {/* Decorative flourish */}
+            <circle cx="8" cy="8" r="2" fill={COLORS.ash} opacity="0.4"/>
+          </svg>
+        </div>
+      ))}
+
+      {/* Content */}
+      <div className="relative z-10 p-6">
+        {children}
+      </div>
+    </section>
+  )
+}
+
 // Profession-specific ember ornaments
 function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
@@ -248,77 +390,6 @@ function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | '
           {item.icon}
         </div>
       ))}
-    </div>
-  )
-}
-
-// Dodge roll reveal section
-function DodgeRollSection({
-  children,
-  className = '',
-  ariaLabel,
-}: {
-  children: React.ReactNode
-  className?: string
-  ariaLabel?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [phase, setPhase] = useState<'hidden' | 'rolling' | 'revealed'>('hidden')
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  useEffect(() => {
-    if (hasEntered && phase === 'hidden') {
-      if (prefersReducedMotion) {
-        setPhase('revealed')
-      } else {
-        setPhase('rolling')
-        setTimeout(() => setPhase('revealed'), 700)
-      }
-    }
-  }, [hasEntered, phase, prefersReducedMotion])
-
-  return (
-    <div
-      ref={ref}
-      className={`relative overflow-hidden ${className}`}
-      aria-label={ariaLabel}
-    >
-      {phase === 'rolling' && !prefersReducedMotion && (
-        <div className="absolute inset-0 z-50 pointer-events-none" aria-hidden="true">
-          <div
-            className="absolute top-1/2 -translate-y-1/2"
-            style={{ animation: 'dodgeRoll 0.7s ease-out forwards' }}
-          >
-            <UndeadWarrior size={50} direction="right" />
-          </div>
-          <div
-            className="absolute inset-0"
-            style={{
-              background: `radial-gradient(circle, ${COLORS.ember}33 0%, transparent 50%)`,
-              animation: 'iframeFlash 0.3s ease-out 2',
-            }}
-          />
-        </div>
-      )}
-
-      <div
-        style={{
-          opacity: phase === 'revealed' ? 1 : 0,
-          transform: phase === 'revealed' ? 'translateX(0)' : 'translateX(-20px)',
-          transition: prefersReducedMotion ? 'none' : 'all 0.4s ease-out',
-        }}
-      >
-        {children}
-      </div>
     </div>
   )
 }
@@ -1514,25 +1585,7 @@ export default function SoulMapTheme() {
       <main id="main-content" className="relative z-20 px-6 py-8" role="main">
         <div className="max-w-4xl mx-auto">
           {/* Bio panel - item description style */}
-          <DodgeRollSection ariaLabel="About section">
-          <section
-            className="p-6 mb-8 relative"
-            style={{
-              background: `linear-gradient(180deg, #12100fee, #0a0908ee)`,
-              border: `1px solid ${COLORS.ash}`,
-              boxShadow: 'inset 0 0 30px rgba(0,0,0,0.5)',
-            }}
-            aria-labelledby="about-heading"
-          >
-            {/* Corner ornaments */}
-            {['top-0 left-0', 'top-0 right-0 scale-x-[-1]', 'bottom-0 left-0 scale-y-[-1]', 'bottom-0 right-0 scale-[-1]'].map((pos, i) => (
-              <div key={i} className={`absolute ${pos} w-6 h-6`} aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M0 0 L24 0 L24 4 L4 4 L4 24 L0 24 Z" fill={COLORS.ash} />
-                </svg>
-              </div>
-            ))}
-
+          <StoneSectionCard className="mb-8" ariaLabelledby="about-heading">
             <div className="flex items-center gap-2 mb-4">
               <SwordMarker />
               <h2 id="about-heading" className="text-sm tracking-[0.3em]" style={{ color: COLORS.bonfire }}>
@@ -1558,54 +1611,30 @@ export default function SoulMapTheme() {
                 </span>
               ))}
             </div>
-          </section>
-          </DodgeRollSection>
+          </StoneSectionCard>
 
           {/* Work Experience Section */}
           {experience.length > 0 && (
-            <DodgeRollSection ariaLabel="Work experience section">
-              <section
-                className="p-6 mb-8 relative"
-                style={{
-                  background: `linear-gradient(180deg, #12100fee, #0a0908ee)`,
-                  border: `1px solid ${COLORS.ash}`,
-                  boxShadow: 'inset 0 0 30px rgba(0,0,0,0.5)',
-                }}
-                aria-labelledby="experience-heading"
-              >
-                {/* Corner ornaments */}
-                {['top-0 left-0', 'top-0 right-0 scale-x-[-1]', 'bottom-0 left-0 scale-y-[-1]', 'bottom-0 right-0 scale-[-1]'].map((pos, i) => (
-                  <div key={i} className={`absolute ${pos} w-6 h-6`} aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none">
-                      <path d="M0 0 L24 0 L24 4 L4 4 L4 24 L0 24 Z" fill={COLORS.ash} />
-                    </svg>
-                  </div>
+            <StoneSectionCard className="mb-8" ariaLabelledby="experience-heading">
+              <div className="flex items-center gap-2 mb-4">
+                <SwordMarker />
+                <h2 id="experience-heading" className="text-sm tracking-[0.3em]" style={{ color: COLORS.bonfire }}>
+                  WORK EXPERIENCE
+                </h2>
+              </div>
+              <div className="space-y-3" role="list">
+                {experience.map((entry) => (
+                  <ExperienceCard key={entry.id} entry={entry} />
                 ))}
-
-                <div className="flex items-center gap-2 mb-4">
-                  <SwordMarker />
-                  <h2 id="experience-heading" className="text-sm tracking-[0.3em]" style={{ color: COLORS.bonfire }}>
-                    WORK EXPERIENCE
-                  </h2>
-                </div>
-                <div className="space-y-3" role="list">
-                  {experience.map((entry) => (
-                    <ExperienceCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </section>
-            </DodgeRollSection>
+              </div>
+            </StoneSectionCard>
           )}
 
           <div className="grid md:grid-cols-2 gap-6">
             {/* Abilities / Tech Stack */}
-            <section
-              className="p-6 relative"
-              style={{
-                background: `linear-gradient(180deg, #12100fee, #0a0908ee)`,
-                border: `1px solid ${COLORS.ash}`,
-              }}
-              aria-labelledby="skills-heading"
+            <StoneSectionCard
+              ariaLabelledby="skills-heading"
+              glowColor={active === 'drummer' ? '#9966ff' : active === 'fighter' ? '#ff4444' : COLORS.bonfire}
             >
               <h2 id="skills-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: COLORS.bonfire }}>
                 <Darksign size={16} />
@@ -1617,7 +1646,7 @@ export default function SoulMapTheme() {
               ) : (
                 <SkillsDisplay categories={skills} />
               )}
-            </section>
+            </StoneSectionCard>
 
             {/* Save rooms / Projects */}
             <section aria-labelledby="projects-heading">
@@ -1730,18 +1759,14 @@ export default function SoulMapTheme() {
             50% { transform: translateY(-4px) rotate(-4deg); opacity: 0.35; }
             75% { transform: translateY(-12px) rotate(4deg); opacity: 0.45; }
           }
-          @keyframes dodgeRoll {
-            0% { left: -60px; transform: rotate(0deg); }
-            50% { transform: rotate(360deg); }
-            100% { left: 110%; transform: rotate(720deg); }
-          }
-          @keyframes iframeFlash {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 0.5; }
-          }
           @keyframes sun-pulse {
             0%, 100% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.1); opacity: 1; }
+          }
+          @keyframes section-ember {
+            0% { transform: translateY(0) translateX(0); opacity: 0.6; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-60px) translateX(10px); opacity: 0; }
           }
           .animate-flame { animation: flame 0.25s ease-in-out infinite; }
           .animate-ember-float { animation: emberFloat 12s ease-in-out infinite; }
@@ -1754,6 +1779,7 @@ export default function SoulMapTheme() {
           .animate-liquid-glow { animation: liquid-glow 2.5s ease-in-out infinite; }
           .animate-you-died { animation: you-died 4.5s ease-in-out forwards; }
           .animate-sun-pulse { animation: sun-pulse 4s ease-in-out infinite; }
+          .animate-section-ember { animation: section-ember 3s ease-out infinite; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -1767,7 +1793,8 @@ export default function SoulMapTheme() {
           .animate-darksign-pulse,
           .animate-liquid-glow,
           .animate-you-died,
-          .animate-sun-pulse {
+          .animate-sun-pulse,
+          .animate-section-ember {
             animation: none !important;
           }
         }
