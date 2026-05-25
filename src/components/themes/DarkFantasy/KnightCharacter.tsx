@@ -3,27 +3,38 @@
 import { memo, useEffect, useState, ReactNode } from 'react'
 
 /**
- * KNIGHT CHARACTER - HOLLOW KNIGHT STYLE
- * ======================================
+ * ALEXANDER CHARACTER - HOLLOW KNIGHT STYLE
+ * =========================================
  *
- * Based on actual Hollow Knight art style:
- * - White/bone MASK with 2 void eye holes (no face!)
- * - Simple curved horns pointing UP
- * - Dark flowing CLOAK as the entire body
- * - Thin nail weapon
+ * Alexander's features styled in HK's dark aesthetic:
+ * - Brown/tan skin (from sprite)
+ * - Dark prominent BEARD (key identifier)
+ * - Dark short hair
+ * - Simple oval eyes with void-like quality
+ * - Visible ears
+ * - Dark flowing CLOAK (HK style)
+ * - Thin nail weapon (HK style)
  *
- * Alexander is represented by the MASK SHAPE - the bottom edge
- * has a subtle beard-like curve, but it's still a mask, not a face.
+ * Style: Simple shapes, limited dark palette, readable silhouette
  */
 
 const DF = {
   void: '#0f0a1a',
   voidDeep: '#0a0610',
-  bone: '#e8e4dc',
-  boneShade: '#c8c4bc',
+  // Alexander's skin tones (from sprite, darkened for HK style)
+  skin: '#8b6b4a',
+  skinShade: '#6b5040',
+  skinHighlight: '#a07b5a',
+  // Beard/hair (dark, nearly void)
+  beard: '#2a2030',
+  beardDark: '#1a1520',
+  hair: '#2a2030',
+  // Cloak
   cloak: '#2a2535',
   cloakDark: '#1a1520',
+  // Accents
   ethereal: '#41c8e8',
+  bone: '#e8e4dc',
   spiritGlow: '#ffffff',
 }
 
@@ -47,7 +58,6 @@ export const KnightCharacter = memo(function KnightCharacter({
   const effectiveScale = size ? size / 50 : scale
   const isLeft = facingDirection === 'left'
 
-  // Nail rotation during attack
   const getNailRotation = () => {
     if (!attacking) return -20
     if (attackPhase < 0.3) return -20 - (attackPhase / 0.3) * 60
@@ -69,19 +79,14 @@ export const KnightCharacter = memo(function KnightCharacter({
       }}
     >
       <defs>
-        {/* Mask gradient - white with slight shading */}
-        <radialGradient id="maskGrad" cx="50%" cy="30%" r="70%">
-          <stop offset="0%" stopColor={DF.bone} />
-          <stop offset="100%" stopColor={DF.boneShade} />
+        <radialGradient id="skinGrad" cx="50%" cy="30%" r="70%">
+          <stop offset="0%" stopColor={DF.skinHighlight} />
+          <stop offset="100%" stopColor={DF.skin} />
         </radialGradient>
-
-        {/* Cloak gradient */}
         <linearGradient id="cloakGrad" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stopColor={DF.cloak} />
           <stop offset="100%" stopColor={DF.cloakDark} />
         </linearGradient>
-
-        {/* Glow for attack */}
         <filter id="attackGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2" result="blur" />
           <feMerge>
@@ -91,78 +96,98 @@ export const KnightCharacter = memo(function KnightCharacter({
         </filter>
       </defs>
 
-      {/* CLOAK / BODY - simple flowing shape */}
+      {/* CLOAK / BODY - dark flowing shape (HK style) */}
       <path
-        d="M18,32
-           C12,36 8,45 10,58
+        d="M18,30
+           C12,34 8,45 10,58
            Q12,65 18,68
            L32,68
            Q38,65 40,58
-           C42,45 38,36 32,32
-           L25,30
+           C42,45 38,34 32,30
            Z"
         fill="url(#cloakGrad)"
         stroke={DF.voidDeep}
         strokeWidth="0.5"
       />
-
-      {/* Cloak inner folds */}
+      {/* Cloak folds */}
       <path
-        d="M20,38 Q19,50 20,62
-           M30,38 Q31,50 30,62"
+        d="M20,36 Q19,48 20,60 M30,36 Q31,48 30,60"
         fill="none"
         stroke={DF.voidDeep}
         strokeWidth="1"
         opacity="0.4"
       />
 
-      {/* MASK - the iconic Hollow Knight style */}
-      {/* Main mask shape - with subtle beard-like bottom (Alexander hint) */}
+      {/* EARS - visible like in sprite */}
+      <ellipse cx="10" cy="18" rx="3" ry="4" fill={DF.skin} stroke={DF.skinShade} strokeWidth="0.5" />
+      <ellipse cx="40" cy="18" rx="3" ry="4" fill={DF.skin} stroke={DF.skinShade} strokeWidth="0.5" />
+      {/* Inner ear detail */}
+      <ellipse cx="10" cy="18" rx="1.5" ry="2.5" fill={DF.skinShade} opacity="0.5" />
+      <ellipse cx="40" cy="18" rx="1.5" ry="2.5" fill={DF.skinShade} opacity="0.5" />
+
+      {/* HEAD - Alexander's face shape */}
+      <ellipse
+        cx="25"
+        cy="16"
+        rx="12"
+        ry="14"
+        fill="url(#skinGrad)"
+        stroke={DF.skinShade}
+        strokeWidth="0.5"
+      />
+
+      {/* HAIR - dark, short, close-cropped like sprite */}
       <path
-        d="M25,4
-           C14,4 10,12 10,20
-           C10,26 12,30 16,32
-           Q20,35 25,36
-           Q30,35 34,32
-           C38,30 40,26 40,20
-           C40,12 36,4 25,4
+        d="M13,12
+           Q13,4 25,4
+           Q37,4 37,12
+           Q37,8 25,6
+           Q13,8 13,12
            Z"
-        fill="url(#maskGrad)"
-        stroke={DF.boneShade}
-        strokeWidth="0.5"
+        fill={DF.hair}
+        stroke={DF.beardDark}
+        strokeWidth="0.3"
       />
+      {/* Hair sides */}
+      <path d="M13,12 Q12,14 13,18" fill="none" stroke={DF.hair} strokeWidth="3" strokeLinecap="round" />
+      <path d="M37,12 Q38,14 37,18" fill="none" stroke={DF.hair} strokeWidth="3" strokeLinecap="round" />
 
-      {/* HORNS - simple curved, pointing up */}
+      {/* BEARD - prominent, key Alexander identifier */}
       <path
-        d="M14,14
-           C10,10 8,4 12,0
-           C14,3 15,8 15,14"
-        fill={DF.bone}
-        stroke={DF.boneShade}
-        strokeWidth="0.5"
+        d="M16,22
+           Q14,26 16,30
+           Q20,34 25,35
+           Q30,34 34,30
+           Q36,26 34,22
+           Q30,24 25,24
+           Q20,24 16,22
+           Z"
+        fill={DF.beard}
+        stroke={DF.beardDark}
+        strokeWidth="0.3"
       />
+      {/* Beard texture lines */}
       <path
-        d="M36,14
-           C40,10 42,4 38,0
-           C36,3 35,8 35,14"
-        fill={DF.bone}
-        stroke={DF.boneShade}
+        d="M18,26 Q20,30 22,32
+           M25,25 L25,33
+           M32,26 Q30,30 28,32"
+        fill="none"
+        stroke={DF.beardDark}
         strokeWidth="0.5"
+        opacity="0.6"
       />
 
-      {/* Horn highlights */}
-      <path d="M13,12 C11,8 10,4 12,1" fill="none" stroke={DF.spiritGlow} strokeWidth="0.8" opacity="0.4" />
-      <path d="M37,12 C39,8 40,4 38,1" fill="none" stroke={DF.spiritGlow} strokeWidth="0.8" opacity="0.4" />
+      {/* EYES - void-like with subtle ethereal glow (HK style: one glowing accent) */}
+      <ellipse cx="20" cy="16" rx="3" ry="4" fill={DF.voidDeep} />
+      <ellipse cx="30" cy="16" rx="3" ry="4" fill={DF.voidDeep} />
+      {/* Ethereal eye glow - the "one glowing accent" HK OCs need */}
+      <ellipse cx="20" cy="16" rx="2" ry="2.5" fill={DF.ethereal} opacity="0.15" />
+      <ellipse cx="30" cy="16" rx="2" ry="2.5" fill={DF.ethereal} opacity="0.15" />
+      {/* Tiny bright core */}
+      <ellipse cx="20" cy="15" rx="0.8" ry="1" fill={DF.ethereal} opacity="0.4" />
+      <ellipse cx="30" cy="15" rx="0.8" ry="1" fill={DF.ethereal} opacity="0.4" />
 
-      {/* EYES - pure void, no pupils, just black holes */}
-      <ellipse cx="19" cy="18" rx="4" ry="5" fill={DF.voidDeep} />
-      <ellipse cx="31" cy="18" rx="4" ry="5" fill={DF.voidDeep} />
-
-      {/* Subtle eye depth */}
-      <ellipse cx="19" cy="18" rx="3" ry="4" fill={DF.void} />
-      <ellipse cx="31" cy="18" rx="3" ry="4" fill={DF.void} />
-
-      {/* NAIL (SWORD) - thin and elegant */}
+      {/* NAIL (SWORD) - HK style weapon */}
       <g
         style={{
           transformOrigin: '8px 40px',
@@ -170,24 +195,15 @@ export const KnightCharacter = memo(function KnightCharacter({
           transition: attacking ? 'transform 0.08s ease-out' : 'transform 0.2s ease-out',
         }}
       >
-        {/* Handle */}
         <rect x="5" y="38" width="6" height="10" rx="1" fill={DF.cloak} stroke={DF.bone} strokeWidth="0.5" />
-
-        {/* Guard */}
         <ellipse cx="8" cy="38" rx="5" ry="2" fill={DF.bone} />
-
-        {/* Blade - thin and pointed */}
         <path
           d="M8,38 L5,18 L8,4 L11,18 L8,38"
           fill={DF.bone}
-          stroke={DF.boneShade}
+          stroke={DF.skinShade}
           strokeWidth="0.3"
         />
-
-        {/* Blade center line */}
         <line x1="8" y1="36" x2="8" y2="6" stroke={DF.spiritGlow} strokeWidth="0.8" opacity="0.5" />
-
-        {/* Attack glow */}
         {attacking && attackPhase > 0.4 && (
           <path
             d="M8,38 L5,18 L8,4 L11,18 L8,38"

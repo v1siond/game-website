@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, memo, ReactNode } from 'react'
+import { KnightCharacter } from './KnightCharacter'
+import { BattleBug } from './BattleReveal'
 
 /**
  * BUG CREATURE - HOLLOW KNIGHT INFECTED STYLE
@@ -165,8 +167,10 @@ export const BugCreature = memo(function BugCreature({
 })
 
 // ============================================
-// BUG PULL REVEAL ANIMATION
+// BUG DISCOVER REVEAL ANIMATION
 // ============================================
+// Narrative: Alex is exploring, discovers the bug lurking
+// Sets up the battle that happens at Contact section
 
 interface BugPullRevealProps {
   children: ReactNode
@@ -174,13 +178,20 @@ interface BugPullRevealProps {
   className?: string
 }
 
-type AnimationPhase = 'idle' | 'bug-enter' | 'bug-center' | 'bug-exit' | 'complete'
+type AnimationPhase =
+  | 'idle'
+  | 'bug-lurking'      // Bug visible in shadows on right
+  | 'alex-enters'      // Alex walks in from left
+  | 'alex-spots'       // Alex notices the bug - both freeze
+  | 'tension'          // Tense standoff - content appears
+  | 'complete'
 
-const BUG_TIMING = {
-  'bug-enter': 0,
-  'bug-center': 400,
-  'bug-exit': 800,
-  'complete': 1200,
+const DISCOVER_TIMING = {
+  'bug-lurking': 0,
+  'alex-enters': 200,
+  'alex-spots': 600,
+  'tension': 900,
+  'complete': 1400,
 }
 
 export const BugPullReveal = memo(function BugPullReveal({
@@ -191,7 +202,7 @@ export const BugPullReveal = memo(function BugPullReveal({
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [legPhase, setLegPhase] = useState(0)
 
-  // Leg animation
+  // Bug leg/antenna animation
   useEffect(() => {
     if (phase === 'idle' || phase === 'complete') return
 
@@ -202,7 +213,9 @@ export const BugPullReveal = memo(function BugPullReveal({
       if (!lastTime) lastTime = time
       const delta = time - lastTime
       lastTime = time
-      setLegPhase(prev => (prev + delta * 0.008) % 1)
+      // Slow down when spotted (tension)
+      const speed = phase === 'alex-spots' || phase === 'tension' ? 0.002 : 0.006
+      setLegPhase(prev => (prev + delta * speed) % 1)
       rafId = requestAnimationFrame(animate)
     }
 
@@ -218,74 +231,138 @@ export const BugPullReveal = memo(function BugPullReveal({
 
     if (phase !== 'idle') return
 
-    setPhase('bug-enter')
+    setPhase('bug-lurking')
 
     const timers: NodeJS.Timeout[] = []
 
-    timers.push(setTimeout(() => setPhase('bug-center'), BUG_TIMING['bug-center']))
-    timers.push(setTimeout(() => setPhase('bug-exit'), BUG_TIMING['bug-exit']))
-    timers.push(setTimeout(() => setPhase('complete'), BUG_TIMING['complete']))
+    timers.push(setTimeout(() => setPhase('alex-enters'), DISCOVER_TIMING['alex-enters']))
+    timers.push(setTimeout(() => setPhase('alex-spots'), DISCOVER_TIMING['alex-spots']))
+    timers.push(setTimeout(() => setPhase('tension'), DISCOVER_TIMING['tension']))
+    timers.push(setTimeout(() => setPhase('complete'), DISCOVER_TIMING['complete']))
 
     return () => timers.forEach(t => clearTimeout(t))
   }, [triggered])
 
+  // Bug emerges from shadows on right
   const getBugStyle = (): React.CSSProperties => {
-    const baseWobble = { animation: 'bugRun 100ms ease-in-out infinite' }
-
     switch (phase) {
       case 'idle':
-        return { left: '-100px', opacity: 0 }
-      case 'bug-enter':
-        return { left: '-100px', opacity: 1, transition: 'left 400ms ease-out, opacity 200ms', ...baseWobble }
-      case 'bug-center':
-        return { left: 'calc(50% - 40px)', opacity: 1, transition: 'left 400ms ease-in-out', ...baseWobble }
-      case 'bug-exit':
-        return { left: 'calc(100% + 100px)', opacity: 0, transition: 'left 400ms ease-in, opacity 300ms ease-in 100ms', ...baseWobble }
+        return { right: '-80px', opacity: 0 }
+      case 'bug-lurking':
+        return {
+          right: '10%',
+          opacity: 0.6,
+          transition: 'all 300ms ease-out',
+          filter: 'brightness(0.6)'
+        }
+      case 'alex-enters':
+        return {
+          right: '10%',
+          opacity: 0.7,
+          transition: 'all 200ms',
+          filter: 'brightness(0.7)'
+        }
+      case 'alex-spots':
+      case 'tension':
+        return {
+          right: '8%',
+          opacity: 1,
+          transition: 'all 200ms ease-out',
+          filter: 'brightness(1)',
+          animation: 'bugThreat 200ms ease-in-out infinite'
+        }
       case 'complete':
-        return { left: 'calc(100% + 100px)', opacity: 0 }
+        return { right: '8%', opacity: 0.4, transition: 'opacity 300ms' }
+      default:
+        return { right: '-80px', opacity: 0 }
+    }
+  }
+
+  // Alex enters from left, exploring
+  const getAlexStyle = (): React.CSSProperties => {
+    switch (phase) {
+      case 'idle':
+      case 'bug-lurking':
+        return { left: '-100px', opacity: 0 }
+      case 'alex-enters':
+        return {
+          left: '15%',
+          opacity: 1,
+          transition: 'all 400ms ease-out'
+        }
+      case 'alex-spots':
+        return {
+          left: '18%',
+          opacity: 1,
+          transition: 'all 150ms ease-out'
+        }
+      case 'tension':
+      case 'complete':
+        return {
+          left: '18%',
+          opacity: phase === 'complete' ? 0.4 : 1,
+          transition: 'opacity 300ms'
+        }
       default:
         return { left: '-100px', opacity: 0 }
     }
   }
 
+  // Content appears during tension
   const getContentStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
-        return { transform: 'translateX(-100%) translateY(20px)', opacity: 0 }
-      case 'bug-enter':
-        return { transform: 'translateX(-60%) translateY(10px)', opacity: 0.5, transition: 'all 400ms ease-out' }
-      case 'bug-center':
-        return { transform: 'translateX(0) translateY(0)', opacity: 1, transition: 'all 400ms cubic-bezier(0.34, 1.56, 0.64, 1)' }
-      case 'bug-exit':
+      case 'bug-lurking':
+      case 'alex-enters':
+      case 'alex-spots':
+        return { transform: 'scale(0.9)', opacity: 0 }
+      case 'tension':
+        return {
+          transform: 'scale(1)',
+          opacity: 1,
+          transition: 'all 400ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+        }
       case 'complete':
-        return { transform: 'translateX(0) translateY(0)', opacity: 1 }
+        return { transform: 'scale(1)', opacity: 1 }
       default:
-        return { transform: 'translateX(0)', opacity: 1 }
+        return { transform: 'scale(1)', opacity: 1 }
     }
   }
 
-  const showBug = phase !== 'idle' && phase !== 'complete'
+  const showCharacters = phase !== 'idle'
+  const showBug = phase !== 'idle'
 
   return (
-    <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '250px' }}>
+    <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '280px' }}>
+      {/* Bug lurking on right - same bug from BattleReveal */}
       {showBug && (
         <div
-          className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
+          className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
           style={{ ...getBugStyle(), position: 'absolute' }}
         >
-          <BugCreature size={80} legPhase={legPhase} antennaPhase={legPhase * 1.5} />
+          <BattleBug size={100} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
         </div>
       )}
 
-      <div className="relative z-20" style={getContentStyle()}>
+      {/* Alex entering from left */}
+      {showCharacters && (
+        <div
+          className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
+          style={{ ...getAlexStyle(), position: 'absolute' }}
+        >
+          <KnightCharacter scale={1.5} facingDirection="right" />
+        </div>
+      )}
+
+      {/* Content in center */}
+      <div className="relative z-20 flex justify-center" style={getContentStyle()}>
         {children}
       </div>
 
       <style>{`
-        @keyframes bugRun {
-          0%, 100% { transform: translateY(0) rotate(0deg); }
-          25% { transform: translateY(-3px) rotate(-2deg); }
-          75% { transform: translateY(3px) rotate(2deg); }
+        @keyframes bugThreat {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-3px) scale(1.02); }
         }
       `}</style>
     </div>

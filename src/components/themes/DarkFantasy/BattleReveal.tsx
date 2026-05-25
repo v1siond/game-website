@@ -456,7 +456,8 @@ export const BattleReveal = memo(function BattleReveal({
 
 // Battle Bug - SIMPLE Hollow Knight style
 // Based on actual HK infected enemies: round body, orange blobs, simple legs
-const BattleBug = memo(function BattleBug({
+// EXPORTED for reuse in BugDiscoverReveal
+export const BattleBug = memo(function BattleBug({
   size = 100,
   legPhase = 0,
   antennaPhase = 0,
