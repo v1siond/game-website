@@ -451,14 +451,14 @@ export const BattleReveal = memo(function BattleReveal({
             {isBugDead ? (
               <>
                 <DeadBugCreature size={120} />
-                {/* Blood Pool - at bug center */}
+                {/* Blood Pool - dead center of bug container */}
                 {showBloodPool && (
                   <div
                     className="absolute z-5 pointer-events-none"
                     style={{
                       left: '50%',
                       top: '50%',
-                      transform: 'rotate(180deg) translateX(0) translateY(0)',
+                      transform: 'translate(-50%, -50%) rotate(180deg)',
                     }}
                   >
                     <BloodPool />
