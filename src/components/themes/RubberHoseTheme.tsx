@@ -1110,6 +1110,220 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 }
 
 // ============================================================================
+// COMPONENT: Art Section - Cuphead themed decorative break
+// ============================================================================
+function ArtSection({ variant = 'filmReel' }: { variant?: 'filmReel' | 'musicNotes' | 'bouncingBalls' }) {
+  const reducedMotion = usePrefersReducedMotion()
+
+  if (variant === 'filmReel') {
+    // Film reel with sprocket holes and vintage film elements
+    return (
+      <div className="relative py-12 my-8 overflow-hidden" aria-hidden="true">
+        {/* Top film strip */}
+        <div
+          className="absolute top-0 left-0 right-0 h-8 flex items-center justify-center"
+          style={{ background: '#1a1510' }}
+        >
+          <div className={`flex gap-4 ${reducedMotion ? '' : 'cuphead-sprocket-scroll-horizontal'}`}>
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-4 h-4 rounded-sm flex-shrink-0"
+                style={{ background: CUPHEAD_COLORS.paperCream, border: `1px solid ${CUPHEAD_COLORS.inkBlack}` }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Center content - vintage film countdown style */}
+        <div className="flex justify-center items-center gap-8 py-4">
+          <div className="w-16 h-px" style={{ background: CUPHEAD_COLORS.inkBlack }} />
+          <div
+            className={`w-20 h-20 rounded-full flex items-center justify-center relative ${reducedMotion ? '' : 'cuphead-bob'}`}
+            style={{
+              border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
+              background: CUPHEAD_COLORS.paperDark,
+            }}
+          >
+            {/* Pie-cut eye design inside circle */}
+            <div className="flex gap-2">
+              <div className="w-4 h-5 rounded-full relative" style={{ background: CUPHEAD_COLORS.inkBlack }}>
+                <div className="absolute top-0 left-0 w-2 h-3" style={{ background: CUPHEAD_COLORS.paperDark }} />
+              </div>
+              <div className="w-4 h-5 rounded-full relative" style={{ background: CUPHEAD_COLORS.inkBlack }}>
+                <div className="absolute top-0 left-0 w-2 h-3" style={{ background: CUPHEAD_COLORS.paperDark }} />
+              </div>
+            </div>
+            {/* Countdown lines */}
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
+              <div
+                key={angle}
+                className="absolute w-1 h-3"
+                style={{
+                  background: CUPHEAD_COLORS.accentRedDark,
+                  transform: `rotate(${angle}deg) translateY(-32px)`,
+                }}
+              />
+            ))}
+          </div>
+          <div className="w-16 h-px" style={{ background: CUPHEAD_COLORS.inkBlack }} />
+        </div>
+
+        {/* Bottom film strip */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-8 flex items-center justify-center"
+          style={{ background: '#1a1510' }}
+        >
+          <div className={`flex gap-4 ${reducedMotion ? '' : 'cuphead-sprocket-scroll-horizontal-reverse'}`}>
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div
+                key={i}
+                className="w-4 h-4 rounded-sm flex-shrink-0"
+                style={{ background: CUPHEAD_COLORS.paperCream, border: `1px solid ${CUPHEAD_COLORS.inkBlack}` }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Film strip perforations on sides */}
+        <div className="absolute left-4 top-8 bottom-8 w-2 flex flex-col justify-around">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="w-2 h-2 rounded-full" style={{ background: CUPHEAD_COLORS.inkBlack, opacity: 0.3 }} />
+          ))}
+        </div>
+        <div className="absolute right-4 top-8 bottom-8 w-2 flex flex-col justify-around">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="w-2 h-2 rounded-full" style={{ background: CUPHEAD_COLORS.inkBlack, opacity: 0.3 }} />
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (variant === 'musicNotes') {
+    // Jazz-age music notes dancing across the screen
+    const notes = ['\u{266A}', '\u{266B}', '\u{266C}', '\u{2669}', '\u{266D}', '\u{266F}']
+    return (
+      <div className="relative py-10 my-8 overflow-hidden" aria-hidden="true">
+        {/* Decorative line with curls */}
+        <svg className="absolute top-1/2 left-0 right-0 h-8 -translate-y-1/2" viewBox="0 0 800 40" preserveAspectRatio="none">
+          <path
+            d="M0,20 Q100,0 200,20 T400,20 T600,20 T800,20"
+            fill="none"
+            stroke={CUPHEAD_COLORS.inkBlack}
+            strokeWidth="3"
+            opacity="0.4"
+          />
+        </svg>
+
+        {/* Dancing music notes */}
+        <div className="flex justify-around items-center px-8">
+          {notes.map((note, i) => (
+            <span
+              key={i}
+              className={`text-3xl ${reducedMotion ? '' : 'cuphead-bounce-letter'}`}
+              style={{
+                animationDelay: reducedMotion ? '0s' : `${i * 0.1}s`,
+                color: CUPHEAD_COLORS.inkBlack,
+                opacity: 0.6,
+                textShadow: `2px 2px 0 ${CUPHEAD_COLORS.shadowBrown}`,
+              }}
+            >
+              {note}
+            </span>
+          ))}
+        </div>
+
+        {/* Bouncing balls underneath notes */}
+        <div className="flex justify-around mt-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className={`w-4 h-4 rounded-full ${reducedMotion ? '' : 'cuphead-bounce-squash'}`}
+              style={{
+                animationDelay: reducedMotion ? '0s' : `${i * 0.2}s`,
+                background: `radial-gradient(circle at 30% 30%, ${CUPHEAD_COLORS.inkSoft}, ${CUPHEAD_COLORS.inkBlack})`,
+                boxShadow: '1px 1px 0 #1a1510',
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Stars decorating the sides */}
+        <span className="absolute left-8 top-1/2 -translate-y-1/2 text-xl" style={{ color: CUPHEAD_COLORS.accentGold }}>
+          ✦
+        </span>
+        <span className="absolute right-8 top-1/2 -translate-y-1/2 text-xl" style={{ color: CUPHEAD_COLORS.accentGold }}>
+          ✦
+        </span>
+      </div>
+    )
+  }
+
+  if (variant === 'bouncingBalls') {
+    // Classic cartoon bouncing balls with pie-eyes
+    return (
+      <div className="relative py-10 my-8 overflow-hidden" aria-hidden="true">
+        {/* Horizontal dashed line */}
+        <div
+          className="absolute top-1/2 left-8 right-8 h-1 -translate-y-1/2"
+          style={{ borderTop: `3px dashed ${CUPHEAD_COLORS.inkBlack}`, opacity: 0.3 }}
+        />
+
+        {/* Pie-eye characters bouncing */}
+        <div className="flex justify-around items-end h-24">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div
+              key={i}
+              className={`relative ${reducedMotion ? '' : 'cuphead-bounce-squash'}`}
+              style={{ animationDelay: reducedMotion ? '0s' : `${i * 0.3}s` }}
+            >
+              {/* Ball body */}
+              <div
+                className="w-10 h-10 rounded-full relative"
+                style={{
+                  background: `radial-gradient(circle at 30% 30%, ${CUPHEAD_COLORS.paperCream}, ${CUPHEAD_COLORS.paperDark})`,
+                  border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
+                  boxShadow: '2px 2px 0 #1a1510',
+                }}
+              >
+                {/* Pie-cut eyes */}
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 flex gap-1">
+                  <div className="w-2 h-3 rounded-full relative" style={{ background: CUPHEAD_COLORS.inkBlack }}>
+                    <div className="absolute top-0 left-0 w-1 h-1.5" style={{ background: CUPHEAD_COLORS.paperCream }} />
+                  </div>
+                  <div className="w-2 h-3 rounded-full relative" style={{ background: CUPHEAD_COLORS.inkBlack }}>
+                    <div className="absolute top-0 left-0 w-1 h-1.5" style={{ background: CUPHEAD_COLORS.paperCream }} />
+                  </div>
+                </div>
+                {/* Smile */}
+                <div
+                  className="absolute bottom-1.5 left-1/2 -translate-x-1/2 w-4 h-2 rounded-b-full"
+                  style={{ borderBottom: `2px solid ${CUPHEAD_COLORS.inkBlack}` }}
+                />
+              </div>
+              {/* Shadow underneath */}
+              <div
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-2 rounded-full"
+                style={{ background: CUPHEAD_COLORS.inkBlack, opacity: 0.2 }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Vintage corner decorations */}
+        <div className="absolute top-2 left-4 text-lg" style={{ color: CUPHEAD_COLORS.accentRedDark }}>❧</div>
+        <div className="absolute top-2 right-4 text-lg" style={{ color: CUPHEAD_COLORS.accentRedDark, transform: 'scaleX(-1)' }}>❧</div>
+        <div className="absolute bottom-2 left-4 text-lg" style={{ color: CUPHEAD_COLORS.accentRedDark, transform: 'scaleY(-1)' }}>❧</div>
+        <div className="absolute bottom-2 right-4 text-lg" style={{ color: CUPHEAD_COLORS.accentRedDark, transform: 'scale(-1)' }}>❧</div>
+      </div>
+    )
+  }
+
+  return null
+}
+
+// ============================================================================
 // COMPONENT: Project Poster (vintage movie/show poster style)
 // ============================================================================
 function VintagePoster({ project }: { project: typeof PROJECTS_DATA[0] }) {
@@ -1331,8 +1545,8 @@ export default function RubberHoseTheme() {
         {/* Main content */}
         <main id="main-content" className="relative z-20 px-4 md:px-8 py-8">
           <div className="max-w-4xl mx-auto">
-            {/* About section */}
-            <section className="text-center mb-12" aria-labelledby="about-heading">
+            {/* 1. ABOUT SECTION */}
+            <section className="text-center mb-8" aria-labelledby="about-heading">
               <DecorativeBanner>
                 <span id="about-heading" className="text-lg tracking-wider">ABOUT</span>
               </DecorativeBanner>
@@ -1345,7 +1559,7 @@ export default function RubberHoseTheme() {
             </section>
 
             {/* Quick facts as film reel frames */}
-            <section className="mb-12" aria-labelledby="facts-heading">
+            <section className="mb-8" aria-labelledby="facts-heading">
               <h2 id="facts-heading" className="sr-only">Quick Facts</h2>
               <div className="flex justify-center gap-3 flex-wrap" role="list">
                 {aboutData.quickFacts.map((fact, i) => (
@@ -1369,9 +1583,12 @@ export default function RubberHoseTheme() {
               </div>
             </section>
 
-            {/* Work Experience */}
+            {/* ========== ART SECTION 1: Film Reel Break ========== */}
+            <ArtSection variant="filmReel" />
+
+            {/* 2. WORK EXPERIENCE */}
             {experience.length > 0 && (
-              <section className="mb-12" aria-labelledby="experience-heading">
+              <section className="mb-8" aria-labelledby="experience-heading">
                 <div className="text-center mb-6">
                   <DecorativeBanner>
                     <span id="experience-heading" className="text-lg tracking-wider">WORK EXPERIENCE</span>
@@ -1385,8 +1602,11 @@ export default function RubberHoseTheme() {
               </section>
             )}
 
-            {/* Tech Stack / Skills section - NO PROFICIENCY BARS */}
-            <section className="mb-12" aria-labelledby="skills-heading">
+            {/* ========== ART SECTION 2: Music Notes Break ========== */}
+            <ArtSection variant="musicNotes" />
+
+            {/* 3. TECH STACK / SKILLS */}
+            <section className="mb-8" aria-labelledby="skills-heading">
               <div className="text-center mb-6">
                 <DecorativeBanner>
                   <span id="skills-heading" className="text-lg tracking-wider">
@@ -1410,11 +1630,11 @@ export default function RubberHoseTheme() {
               </div>
             </section>
 
-            {/* Projects with impact statements */}
-            <section className="mb-12" aria-labelledby="projects-heading">
+            {/* 4. FEATURED WORK / PROJECTS */}
+            <section className="mb-8" aria-labelledby="projects-heading">
               <div className="text-center mb-6">
                 <DecorativeBanner>
-                  <span id="projects-heading" className="text-lg tracking-wider">PROJECTS</span>
+                  <span id="projects-heading" className="text-lg tracking-wider">FEATURED WORK</span>
                 </DecorativeBanner>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
@@ -1424,12 +1644,15 @@ export default function RubberHoseTheme() {
               </div>
             </section>
 
-            {/* Companies (Engineer mode) */}
+            {/* ========== ART SECTION 3: Bouncing Balls Break ========== */}
+            <ArtSection variant="bouncingBalls" />
+
+            {/* 5. VENTURES (Companies/Bands) */}
             {active === 'engineer' && (
-              <section className="mb-12" aria-labelledby="companies-heading">
+              <section className="mb-8" aria-labelledby="companies-heading">
                 <div className="text-center mb-6">
                   <DecorativeBanner>
-                    <span id="companies-heading" className="text-lg tracking-wider">COMPANIES</span>
+                    <span id="companies-heading" className="text-lg tracking-wider">VENTURES</span>
                   </DecorativeBanner>
                 </div>
                 <div className="grid md:grid-cols-3 gap-4">
@@ -1440,12 +1663,11 @@ export default function RubberHoseTheme() {
               </section>
             )}
 
-            {/* Bands (Drummer mode) */}
             {active === 'drummer' && (
-              <section className="mb-12" aria-labelledby="bands-heading">
+              <section className="mb-8" aria-labelledby="bands-heading">
                 <div className="text-center mb-6">
                   <DecorativeBanner>
-                    <span id="bands-heading" className="text-lg tracking-wider">BANDS</span>
+                    <span id="bands-heading" className="text-lg tracking-wider">VENTURES</span>
                   </DecorativeBanner>
                 </div>
                 <div className="grid md:grid-cols-3 gap-4">
@@ -1455,6 +1677,9 @@ export default function RubberHoseTheme() {
                 </div>
               </section>
             )}
+
+            {/* 6. POSTS placeholder - can be expanded later */}
+            {/* Posts section would go here when content is available */}
           </div>
         </main>
 
@@ -1503,7 +1728,7 @@ export default function RubberHoseTheme() {
           52% { opacity: 0; }
         }
 
-        /* Sprocket hole scrolling */
+        /* Sprocket hole scrolling - vertical */
         @keyframes cuphead-sprocket {
           0% { transform: translateY(0); }
           100% { transform: translateY(-256px); }
@@ -1512,6 +1737,17 @@ export default function RubberHoseTheme() {
         @keyframes cuphead-sprocket-reverse {
           0% { transform: translateY(-256px); }
           100% { transform: translateY(0); }
+        }
+
+        /* Sprocket hole scrolling - horizontal for art sections */
+        @keyframes cuphead-sprocket-horizontal {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-160px); }
+        }
+
+        @keyframes cuphead-sprocket-horizontal-reverse {
+          0% { transform: translateX(-160px); }
+          100% { transform: translateX(0); }
         }
 
         /* Floating up animation for music notes */
@@ -1603,6 +1839,14 @@ export default function RubberHoseTheme() {
           animation: cuphead-sprocket-reverse 4s linear infinite;
         }
 
+        .cuphead-sprocket-scroll-horizontal {
+          animation: cuphead-sprocket-horizontal 3s linear infinite;
+        }
+
+        .cuphead-sprocket-scroll-horizontal-reverse {
+          animation: cuphead-sprocket-horizontal-reverse 3s linear infinite;
+        }
+
         .cuphead-float-up {
           animation: cuphead-float 15s linear infinite;
         }
@@ -1655,6 +1899,8 @@ export default function RubberHoseTheme() {
           .cuphead-flicker,
           .cuphead-sprocket-scroll,
           .cuphead-sprocket-scroll-reverse,
+          .cuphead-sprocket-scroll-horizontal,
+          .cuphead-sprocket-scroll-horizontal-reverse,
           .cuphead-float-up,
           .cuphead-bob,
           .cuphead-bounce-squash,
