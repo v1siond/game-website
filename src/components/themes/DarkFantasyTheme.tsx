@@ -73,7 +73,7 @@ const TRIGGER_CONFIG = [
   { id: 'experience', position: 25 },       // KnightSlashReveal: Alex enters, slashes content into view
   { id: 'art-lanterns', position: 30 },
   { id: 'tech-stack', position: 35 },       // Simple fade (TriggerSection)
-  { id: 'projects', position: 23 },         // BugAttackReveal: Bug throws content at Alex (15% earlier)
+  { id: 'projects', position: 38 },         // BugAttackReveal: Bug pushes content, Alex stops it
   { id: 'art-crystals', position: 55 },
   { id: 'ventures', position: 65 },
   { id: 'posts', position: 75 },

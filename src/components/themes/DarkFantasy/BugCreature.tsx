@@ -246,78 +246,78 @@ export const BugPullReveal = memo(function BugPullReveal({
     return () => timers.forEach(t => clearTimeout(t))
   }, [triggered])
 
-  // Alex enters from left, reacts to attack
+  // Alex enters from RIGHT, faces LEFT to stop incoming attack
   const getAlexStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
-        return { left: '-100px', opacity: 0 }
+        return { right: '-100px', opacity: 0 }
       case 'alex-enters':
         return {
-          left: '8%',
+          right: '8%',
           opacity: 1,
           transition: 'all 300ms ease-out'
         }
       case 'bug-appears':
       case 'bug-throws':
         return {
-          left: '8%',
+          right: '8%',
           opacity: 1
         }
       case 'content-lands':
-        // Alex steps back slightly, surprised
+        // Alex braces to stop content
         return {
-          left: '5%',
+          right: '10%',
           opacity: 1,
           transition: 'all 150ms ease-out'
         }
       case 'attack-stance':
       case 'complete':
-        // Alex ready for battle
+        // Alex stands guard
         return {
-          left: '5%',
+          right: '10%',
           opacity: phase === 'complete' ? 0.5 : 1,
           transition: 'opacity 300ms'
         }
       default:
-        return { left: '-100px', opacity: 0 }
+        return { right: '-100px', opacity: 0 }
     }
   }
 
-  // Bug comes from LEFT, throws content, then floats UP into attack stance
+  // Bug comes from LEFT pushing content, then retreats to attack stance
   const getBugStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
       case 'alex-enters':
-        // Bug starts off-screen LEFT
-        return { left: '-120px', opacity: 0, transform: 'translateY(0)' }
+        // Bug hidden off-screen LEFT
+        return { left: '-150px', opacity: 0, transform: 'translateY(0)' }
       case 'bug-appears':
-        // Bug enters from LEFT to center-right area
+        // Bug enters from LEFT pushing content toward center
         return {
-          left: '60%',
+          left: '5%',
           opacity: 1,
           transform: 'translateY(0)',
           transition: 'all 400ms ease-out'
         }
       case 'bug-throws':
-        // Bug lunges LEFT while throwing content at Alex
+        // Bug lunges RIGHT pushing content toward Alex
         return {
-          left: '45%',
+          left: '25%',
           opacity: 1,
-          transform: 'translateY(-10px) rotate(-5deg)',
+          transform: 'translateY(-5px) rotate(5deg)',
           transition: 'all 250ms ease-out'
         }
       case 'content-lands':
-        // Bug retreats back to right
+        // Bug recoils as Alex stops the content
         return {
-          left: '70%',
+          left: '15%',
           opacity: 1,
-          transform: 'translateY(0)',
-          transition: 'all 300ms ease-out'
+          transform: 'translateY(5px) rotate(-3deg)',
+          transition: 'all 200ms ease-out'
         }
       case 'attack-stance':
-        // Bug floats UP into attack position
+        // Bug floats UP into attack position on LEFT
         return {
-          left: '75%',
+          left: '8%',
           opacity: 1,
           transform: 'translateY(-40px)',
           transition: 'all 400ms ease-out',
@@ -325,38 +325,41 @@ export const BugPullReveal = memo(function BugPullReveal({
         }
       case 'complete':
         return {
-          left: '75%',
+          left: '8%',
           opacity: 0.5,
           transform: 'translateY(-40px)',
           animation: 'bugFloat 1000ms ease-in-out infinite',
           transition: 'opacity 300ms'
         }
       default:
-        return { right: '-120px', opacity: 0 }
+        return { left: '-150px', opacity: 0 }
     }
   }
 
-  // Content gets thrown from bug towards Alex
+  // Content pushed by bug from LEFT, stopped by Alex in CENTER
   const getContentStyle = (): React.CSSProperties => {
     switch (phase) {
       case 'idle':
       case 'alex-enters':
-        return { transform: 'translateX(120%)', opacity: 0 }
+        // Content starts off-screen LEFT (with bug)
+        return { transform: 'translateX(-100%)', opacity: 0 }
       case 'bug-appears':
+        // Content enters with bug
         return {
-          transform: 'translateX(80%)',
-          opacity: 0.5,
-          transition: 'all 300ms ease-out'
+          transform: 'translateX(-60%)',
+          opacity: 0.6,
+          transition: 'all 400ms ease-out'
         }
       case 'bug-throws':
-        // Content flies towards Alex (left side)
+        // Content pushed toward Alex
         return {
-          transform: 'translateX(10%)',
+          transform: 'translateX(-10%)',
           opacity: 0.9,
-          transition: 'all 300ms ease-out'
+          transition: 'all 250ms ease-out'
         }
       case 'content-lands':
       case 'attack-stance':
+        // Alex stops content in center
         return {
           transform: 'translateX(0)',
           opacity: 1,
@@ -374,17 +377,17 @@ export const BugPullReveal = memo(function BugPullReveal({
 
   return (
     <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '280px' }}>
-      {/* Alex on the left */}
+      {/* Alex on the RIGHT, facing LEFT to stop attack */}
       {showAlex && (
         <div
           className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
           style={{ ...getAlexStyle(), position: 'absolute' }}
         >
-          <KnightCharacter scale={1.4} facingDirection="right" />
+          <KnightCharacter scale={1.4} facingDirection="left" />
         </div>
       )}
 
-      {/* Bug throwing content then floating in attack stance */}
+      {/* Bug pushing content from LEFT */}
       {showBug && (
         <div
           className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
@@ -394,7 +397,7 @@ export const BugPullReveal = memo(function BugPullReveal({
         </div>
       )}
 
-      {/* Content being thrown at Alex */}
+      {/* Content being pushed by bug, stopped by Alex */}
       <div className="relative z-20" style={getContentStyle()}>
         {children}
       </div>
