@@ -734,26 +734,26 @@ function VaultHunterCard({
 }) {
   const hunters = {
     engineer: {
-      name: 'TECH WIZARD',
+      name: 'SYSTEM ENGINEER',
       icon: '💻',
       color: BORDERLANDS_COLORS.rare,
-      tagline: 'SYSTEMS ONLINE',
+      tagline: 'SENIOR STAFF • CTO',
       level: 'LVL 50',
       actionSkill: 'DEPLOY INFRASTRUCTURE',
     },
     drummer: {
-      name: 'BEAT MASTER',
+      name: 'MUSICIAN',
       icon: '🥁',
       color: BORDERLANDS_COLORS.legendary,
-      tagline: 'DROP THE BEAT',
+      tagline: 'PROFESSIONAL DRUMMER',
       level: 'LVL 45',
       actionSkill: 'RHYTHMIC ASSAULT',
     },
     fighter: {
-      name: 'BRAWLER',
+      name: 'MARTIAL ARTIST',
       icon: '🥋',
       color: BORDERLANDS_COLORS.psychoRed,
-      tagline: 'FISTS OF FURY',
+      tagline: 'BJJ INSTRUCTOR',
       level: 'LVL 40',
       actionSkill: 'MELEE OVERRIDE',
     },
