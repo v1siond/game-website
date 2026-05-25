@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
@@ -15,109 +15,78 @@ import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience
 
 // ============================================================================
 // WARCRAFT RTS COLOR PALETTE (Warcraft 1, 2, 3 - NOT World of Warcraft!)
-// Based on classic RTS UI: gold borders, stone panels, beveled edges
 // ============================================================================
 
 const WC3 = {
-  // Human Alliance (WC2/WC3)
+  // Human Alliance
   humanBlue: '#0042FF',
   humanGold: '#FFD700',
+  humanGoldDark: '#DAA520',
   humanSilver: '#C0C0C0',
-  humanBrown: '#5C4033',
 
-  // Orc Horde (WC2/WC3)
+  // Orc Horde
   orcRed: '#FF0000',
+  orcRedDark: '#CC0000',
   orcBrown: '#8B4513',
-  orcBlack: '#1A0A0A',
-  orcOrange: '#FF6600',
+  orcBrownDark: '#654321',
 
-  // Night Elf (WC3)
+  // Night Elf
   elfPurple: '#800080',
+  elfPurpleLight: '#9932CC',
   elfSilver: '#C0C0C0',
-  elfMoonlight: '#B8A9D4',
-  elfGreen: '#00FF7F',
+  elfSilverDark: '#A8A8A8',
 
-  // Undead (WC3)
+  // Undead Scourge
   undeadGreen: '#00FF00',
-  undeadBlack: '#0A0A0A',
-  undeadPurple: '#4B0082',
-  undeadBone: '#D4C4A8',
+  undeadGreenDark: '#00CC00',
+  undeadBone: '#D2B48C',
+  undeadBoneDark: '#C4A76C',
 
-  // RTS UI Colors
-  panelGold: '#C9A227',
-  panelBronze: '#CD7F32',
+  // UI Gold (WC3 interface)
+  uiGold: '#FFD700',
+  uiGoldDark: '#B8860B',
+  lumber: '#8B4513',
+  stone: '#696969',
+  stoneDark: '#808080',
+
+  // Panel colors
   panelDark: '#1A1612',
-  panelStone: '#3D3428',
+  panelMid: '#2A2318',
   panelBorder: '#6B5A3C',
+  panelGold: '#C9A227',
 
-  // Resource colors
-  goldYellow: '#FFD700',
-  lumberGreen: '#228B22',
-  foodOrange: '#FF8C00',
-  supplyBlue: '#4169E1',
-
-  // Health/Mana bars (classic RTS style)
+  // Health/Mana (classic segmented bars)
   healthGreen: '#00FF00',
   healthYellow: '#FFFF00',
   healthRed: '#FF0000',
   manaBlue: '#0000FF',
 
-  // Text colors
+  // Text
   textGold: '#FFD700',
   textWhite: '#FFFFFF',
   textGray: '#AAAAAA',
-  textGreen: '#00FF00',
-  textRed: '#FF0000',
-
-  // Terrain textures
-  grassGreen: '#2D5016',
-  dirtBrown: '#4A3728',
-  stoneGray: '#4A4A4A',
-  waterBlue: '#1E3A5F',
-
-  // Fog of war
-  fogBlack: '#000000',
-  fogGray: '#1A1A1A',
 }
 
 // ============================================================================
-// WC3 STYLE GOLD RESOURCE ICON (inline SVG)
+// RESOURCE ICONS (Gold, Lumber, Food - WC3 Top Bar Style)
 // ============================================================================
 
 function GoldIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 16 16"
-      aria-label="Gold"
-      role="img"
-    >
-      {/* Gold coin stack */}
-      <ellipse cx="8" cy="12" rx="6" ry="2" fill={WC3.panelBronze} />
-      <ellipse cx="8" cy="11" rx="6" ry="2" fill={WC3.goldYellow} />
-      <ellipse cx="8" cy="9" rx="5" ry="1.5" fill={WC3.panelBronze} />
-      <ellipse cx="8" cy="8" rx="5" ry="1.5" fill={WC3.goldYellow} />
-      <ellipse cx="8" cy="6" rx="4" ry="1" fill={WC3.panelBronze} />
-      <ellipse cx="8" cy="5" rx="4" ry="1" fill={WC3.goldYellow} />
+    <svg width={size} height={size} viewBox="0 0 16 16" aria-label="Gold">
+      <ellipse cx="8" cy="12" rx="6" ry="2" fill={WC3.uiGoldDark} />
+      <ellipse cx="8" cy="11" rx="6" ry="2" fill={WC3.uiGold} />
+      <ellipse cx="8" cy="9" rx="5" ry="1.5" fill={WC3.uiGoldDark} />
+      <ellipse cx="8" cy="8" rx="5" ry="1.5" fill={WC3.uiGold} />
+      <ellipse cx="8" cy="6" rx="4" ry="1" fill={WC3.uiGoldDark} />
+      <ellipse cx="8" cy="5" rx="4" ry="1" fill={WC3.uiGold} />
     </svg>
   )
 }
 
-// ============================================================================
-// WC3 STYLE LUMBER RESOURCE ICON
-// ============================================================================
-
 function LumberIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 16 16"
-      aria-label="Lumber"
-      role="img"
-    >
-      {/* Log stack */}
+    <svg width={size} height={size} viewBox="0 0 16 16" aria-label="Lumber">
       <rect x="2" y="10" width="12" height="4" rx="2" fill="#5C4033" />
       <rect x="3" y="10" width="10" height="1" fill="#8B6914" />
       <rect x="3" y="6" width="10" height="4" rx="2" fill="#6B4423" />
@@ -128,208 +97,336 @@ function LumberIcon({ size = 16 }: { size?: number }) {
   )
 }
 
-// ============================================================================
-// WC3 STYLE FOOD/SUPPLY ICON
-// ============================================================================
-
 function FoodIcon({ size = 16 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 16 16"
-      aria-label="Food Supply"
-      role="img"
-    >
-      {/* Wheat/grain bundle */}
-      <ellipse cx="8" cy="13" rx="5" ry="2" fill={WC3.dirtBrown} />
+    <svg width={size} height={size} viewBox="0 0 16 16" aria-label="Food">
+      <ellipse cx="8" cy="13" rx="5" ry="2" fill="#4A3728" />
       <path d="M8,2 L8,13" stroke="#D4A017" strokeWidth="1" />
       <path d="M5,3 L5,12" stroke="#D4A017" strokeWidth="1" />
       <path d="M11,3 L11,12" stroke="#D4A017" strokeWidth="1" />
-      <ellipse cx="8" cy="2" rx="1.5" ry="2" fill={WC3.goldYellow} />
-      <ellipse cx="5" cy="3" rx="1" ry="1.5" fill={WC3.goldYellow} />
-      <ellipse cx="11" cy="3" rx="1" ry="1.5" fill={WC3.goldYellow} />
+      <ellipse cx="8" cy="2" rx="1.5" ry="2" fill={WC3.uiGold} />
+      <ellipse cx="5" cy="3" rx="1" ry="1.5" fill={WC3.uiGold} />
+      <ellipse cx="11" cy="3" rx="1" ry="1.5" fill={WC3.uiGold} />
     </svg>
   )
 }
 
 // ============================================================================
-// WARCRAFT 3 FACTION ICON (Human Lion / Orc Crest / Night Elf / Undead)
+// FACTION CRESTS (Human Lion, Orc Wolf/Skull, Night Elf Owl/Moon, Undead Skull)
 // ============================================================================
 
-function HumanCrest({ size = 48 }: { size?: number }) {
+function HumanCrest({ size = 64 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      aria-label="Human Alliance Crest"
-      role="img"
-    >
-      {/* Shield background */}
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-label="Human Alliance">
+      {/* Shield */}
       <path
-        d="M24,2 L44,12 L44,28 Q44,42 24,46 Q4,42 4,28 L4,12 Z"
+        d="M32,4 L58,16 L58,38 Q58,54 32,60 Q6,54 6,38 L6,16 Z"
         fill={WC3.humanBlue}
         stroke={WC3.humanGold}
-        strokeWidth="2"
+        strokeWidth="3"
       />
-      {/* Inner shield detail */}
+      {/* Inner border */}
       <path
-        d="M24,6 L40,14 L40,27 Q40,38 24,42 Q8,38 8,27 L8,14 Z"
+        d="M32,10 L52,20 L52,36 Q52,48 32,54 Q12,48 12,36 L12,20 Z"
         fill="none"
-        stroke={WC3.humanGold}
+        stroke={WC3.humanGoldDark}
         strokeWidth="1"
-        opacity="0.5"
+        opacity="0.6"
       />
-      {/* Simplified lion silhouette */}
+      {/* Stylized Lion Head */}
       <g fill={WC3.humanGold}>
-        {/* Body */}
-        <ellipse cx="24" cy="28" rx="10" ry="8" />
-        {/* Head */}
-        <circle cx="24" cy="18" r="6" />
-        {/* Mane spikes */}
-        <path d="M18,14 L16,10 L20,13 Z" />
-        <path d="M30,14 L32,10 L28,13 Z" />
-        <path d="M24,12 L24,8 L26,11 Z" />
-        <path d="M24,12 L24,8 L22,11 Z" />
+        {/* Mane */}
+        <path d="M32,16 L26,12 L24,18 L20,14 L22,22 L18,20 L22,26 L16,26 L22,30 Z" />
+        <path d="M32,16 L38,12 L40,18 L44,14 L42,22 L46,20 L42,26 L48,26 L42,30 Z" />
+        {/* Face */}
+        <ellipse cx="32" cy="30" rx="10" ry="12" />
+        {/* Eyes */}
+        <circle cx="28" cy="28" r="2" fill={WC3.humanBlue} />
+        <circle cx="36" cy="28" r="2" fill={WC3.humanBlue} />
+        {/* Nose */}
+        <ellipse cx="32" cy="34" rx="3" ry="2" fill={WC3.humanGoldDark} />
         {/* Crown */}
-        <path d="M20,12 L21,8 L24,10 L27,8 L28,12 Z" />
+        <path d="M24,14 L26,8 L29,12 L32,6 L35,12 L38,8 L40,14 Z" />
       </g>
     </svg>
   )
 }
 
-function OrcCrest({ size = 48 }: { size?: number }) {
+function OrcCrest({ size = 64 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      aria-label="Orc Horde Crest"
-      role="img"
-    >
-      {/* Angular horde shield */}
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-label="Orc Horde">
+      {/* Angular Horde Shield */}
       <path
-        d="M24,2 L42,14 L42,32 L24,46 L6,32 L6,14 Z"
-        fill={WC3.orcBlack}
+        d="M32,4 L56,18 L56,42 L32,60 L8,42 L8,18 Z"
+        fill="#0A0505"
         stroke={WC3.orcRed}
-        strokeWidth="2"
+        strokeWidth="3"
       />
-      {/* Inner detail */}
+      {/* Inner angular border */}
       <path
-        d="M24,8 L36,16 L36,30 L24,40 L12,30 L12,16 Z"
+        d="M32,12 L48,22 L48,38 L32,52 L16,38 L16,22 Z"
         fill="none"
-        stroke={WC3.orcRed}
+        stroke={WC3.orcRedDark}
         strokeWidth="1"
-        opacity="0.5"
+        opacity="0.6"
       />
-      {/* Stylized orc skull/emblem */}
+      {/* Stylized Orc Skull/Wolf */}
       <g fill={WC3.orcRed}>
-        {/* Central diamond */}
-        <path d="M24,14 L32,24 L24,34 L16,24 Z" />
+        {/* Central emblem - war banner style */}
+        <path d="M32,18 L42,32 L32,46 L22,32 Z" />
         {/* Tusks */}
-        <path d="M18,20 L14,26 L18,24 Z" />
-        <path d="M30,20 L34,26 L30,24 Z" />
-        {/* Eye holes */}
-        <circle cx="20" cy="22" r="2" fill={WC3.orcBlack} />
-        <circle cx="28" cy="22" r="2" fill={WC3.orcBlack} />
+        <path d="M22,26 L16,34 L22,32 Z" />
+        <path d="M42,26 L48,34 L42,32 Z" />
+        {/* Eye sockets */}
+        <circle cx="27" cy="28" r="3" fill="#0A0505" />
+        <circle cx="37" cy="28" r="3" fill="#0A0505" />
+        {/* Inner eye glow */}
+        <circle cx="27" cy="28" r="1.5" fill={WC3.orcRedDark} />
+        <circle cx="37" cy="28" r="1.5" fill={WC3.orcRedDark} />
+        {/* Teeth */}
+        <rect x="28" y="38" width="8" height="4" fill={WC3.orcRed} />
+        <line x1="30" y1="38" x2="30" y2="42" stroke="#0A0505" strokeWidth="1" />
+        <line x1="32" y1="38" x2="32" y2="42" stroke="#0A0505" strokeWidth="1" />
+        <line x1="34" y1="38" x2="34" y2="42" stroke="#0A0505" strokeWidth="1" />
       </g>
     </svg>
   )
 }
 
-function NightElfCrest({ size = 48 }: { size?: number }) {
+function NightElfCrest({ size = 64 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      aria-label="Night Elf Crest"
-      role="img"
-    >
-      {/* Curved elven shield */}
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-label="Night Elf Sentinels">
+      {/* Curved Elven Shield */}
       <path
-        d="M24,2 Q44,10 44,26 Q44,42 24,46 Q4,42 4,26 Q4,10 24,2 Z"
+        d="M32,4 Q58,14 58,34 Q58,54 32,60 Q6,54 6,34 Q6,14 32,4 Z"
         fill={WC3.elfPurple}
         stroke={WC3.elfSilver}
-        strokeWidth="2"
+        strokeWidth="3"
       />
-      {/* Moon crescent */}
+      {/* Moon Crescent */}
       <g fill={WC3.elfSilver}>
-        <circle cx="24" cy="20" r="10" />
-        <circle cx="28" cy="18" r="8" fill={WC3.elfPurple} />
+        <circle cx="32" cy="24" r="12" />
+        <circle cx="38" cy="22" r="10" fill={WC3.elfPurple} />
       </g>
-      {/* Owl eyes below moon */}
-      <g fill={WC3.elfGreen}>
-        <ellipse cx="18" cy="34" rx="3" ry="4" />
-        <ellipse cx="30" cy="34" rx="3" ry="4" />
-        <circle cx="18" cy="34" r="1" fill={WC3.elfPurple} />
-        <circle cx="30" cy="34" r="1" fill={WC3.elfPurple} />
+      {/* Owl Eyes */}
+      <g>
+        <ellipse cx="24" cy="44" rx="5" ry="6" fill={WC3.elfSilver} />
+        <ellipse cx="40" cy="44" rx="5" ry="6" fill={WC3.elfSilver} />
+        <ellipse cx="24" cy="44" rx="3" ry="4" fill="#00FF7F" />
+        <ellipse cx="40" cy="44" rx="3" ry="4" fill="#00FF7F" />
+        <circle cx="24" cy="44" r="1.5" fill={WC3.elfPurple} />
+        <circle cx="40" cy="44" r="1.5" fill={WC3.elfPurple} />
       </g>
+      {/* Beak */}
+      <path d="M32,48 L30,52 L32,54 L34,52 Z" fill={WC3.elfSilverDark} />
     </svg>
   )
 }
 
-function UndeadCrest({ size = 48 }: { size?: number }) {
+function UndeadCrest({ size = 64 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      aria-label="Undead Scourge Crest"
-      role="img"
-    >
-      {/* Jagged undead shield */}
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-label="Undead Scourge">
+      {/* Jagged Shield */}
       <path
-        d="M24,2 L38,8 L44,24 L38,40 L24,46 L10,40 L4,24 L10,8 Z"
-        fill={WC3.undeadBlack}
+        d="M32,4 L50,10 L58,28 L52,46 L32,60 L12,46 L6,28 L14,10 Z"
+        fill="#0A0A0A"
         stroke={WC3.undeadGreen}
-        strokeWidth="2"
+        strokeWidth="3"
       />
       {/* Skull */}
       <g fill={WC3.undeadBone}>
-        <ellipse cx="24" cy="22" rx="10" ry="12" />
+        <ellipse cx="32" cy="28" rx="14" ry="16" />
         {/* Eye sockets */}
-        <ellipse cx="20" cy="20" rx="3" ry="4" fill={WC3.undeadGreen} />
-        <ellipse cx="28" cy="20" rx="3" ry="4" fill={WC3.undeadGreen} />
-        {/* Nose */}
-        <path d="M24,24 L22,28 L26,28 Z" fill={WC3.undeadBlack} />
-        {/* Teeth */}
-        <rect x="18" y="30" width="12" height="4" fill={WC3.undeadBone} />
-        <line x1="20" y1="30" x2="20" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
-        <line x1="22" y1="30" x2="22" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
-        <line x1="24" y1="30" x2="24" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
-        <line x1="26" y1="30" x2="26" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
-        <line x1="28" y1="30" x2="28" y2="34" stroke={WC3.undeadBlack} strokeWidth="1" />
+        <ellipse cx="26" cy="26" rx="4" ry="5" fill={WC3.undeadGreen} />
+        <ellipse cx="38" cy="26" rx="4" ry="5" fill={WC3.undeadGreen} />
+        {/* Nose hole */}
+        <path d="M32,32 L30,38 L34,38 Z" fill="#0A0A0A" />
+        {/* Jaw/Teeth */}
+        <rect x="22" y="40" width="20" height="6" rx="1" />
+        <line x1="25" y1="40" x2="25" y2="46" stroke="#0A0A0A" strokeWidth="1" />
+        <line x1="28" y1="40" x2="28" y2="46" stroke="#0A0A0A" strokeWidth="1" />
+        <line x1="31" y1="40" x2="31" y2="46" stroke="#0A0A0A" strokeWidth="1" />
+        <line x1="34" y1="40" x2="34" y2="46" stroke="#0A0A0A" strokeWidth="1" />
+        <line x1="37" y1="40" x2="37" y2="46" stroke="#0A0A0A" strokeWidth="1" />
+        <line x1="40" y1="40" x2="40" y2="46" stroke="#0A0A0A" strokeWidth="1" />
       </g>
     </svg>
   )
 }
 
 // ============================================================================
-// WC3 STYLE RESOURCE COUNTER (Gold: 1500 | Lumber: 800 | Food: 45/100)
+// WC3 UNIT SILHOUETTES (Peasant, Peon, Wisp, Acolyte)
 // ============================================================================
 
-function ResourceCounter({
+function PeasantUnit({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-label="Peasant">
+      {/* Body */}
+      <ellipse cx="16" cy="22" rx="6" ry="8" fill={WC3.humanBlue} />
+      {/* Head */}
+      <circle cx="16" cy="10" r="5" fill="#FFDAB9" />
+      {/* Hat */}
+      <path d="M11,8 L16,3 L21,8 Z" fill={WC3.humanGold} />
+      {/* Pick/tool */}
+      <path d="M22,14 L28,8" stroke="#8B4513" strokeWidth="2" />
+      <path d="M26,6 L28,8 L30,6" stroke="#808080" strokeWidth="2" fill="none" />
+    </svg>
+  )
+}
+
+function PeonUnit({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-label="Peon">
+      {/* Hunched body */}
+      <ellipse cx="16" cy="24" rx="7" ry="6" fill={WC3.orcBrown} />
+      {/* Head */}
+      <circle cx="16" cy="12" r="6" fill="#4A7023" />
+      {/* Tusks */}
+      <path d="M12,14 L10,18" stroke="#FFFFF0" strokeWidth="2" />
+      <path d="M20,14 L22,18" stroke="#FFFFF0" strokeWidth="2" />
+      {/* Eyes */}
+      <circle cx="14" cy="11" r="1" fill={WC3.orcRed} />
+      <circle cx="18" cy="11" r="1" fill={WC3.orcRed} />
+    </svg>
+  )
+}
+
+function WispUnit({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-label="Wisp">
+      {/* Glowing core */}
+      <circle cx="16" cy="16" r="8" fill={WC3.elfSilver} opacity="0.3" />
+      <circle cx="16" cy="16" r="5" fill={WC3.elfSilver} opacity="0.6" />
+      <circle cx="16" cy="16" r="3" fill="#FFFFFF" />
+      {/* Trailing wisps */}
+      <path d="M16,24 Q12,28 10,30" stroke={WC3.elfSilver} strokeWidth="2" fill="none" opacity="0.5" />
+      <path d="M16,24 Q20,28 22,30" stroke={WC3.elfSilver} strokeWidth="2" fill="none" opacity="0.5" />
+      <path d="M16,24 L16,30" stroke={WC3.elfSilver} strokeWidth="2" opacity="0.5" />
+    </svg>
+  )
+}
+
+function AcolyteUnit({ size = 32 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-label="Acolyte">
+      {/* Robed body */}
+      <path d="M10,28 L16,14 L22,28 Z" fill="#1A0A2E" />
+      {/* Hood */}
+      <path d="M12,14 Q16,8 20,14 Q16,18 12,14 Z" fill="#1A0A2E" />
+      {/* Glowing eyes */}
+      <circle cx="14" cy="12" r="1" fill={WC3.undeadGreen} />
+      <circle cx="18" cy="12" r="1" fill={WC3.undeadGreen} />
+      {/* Staff */}
+      <line x1="24" y1="6" x2="24" y2="28" stroke="#4A3728" strokeWidth="2" />
+      <circle cx="24" cy="6" r="3" fill={WC3.undeadGreen} opacity="0.8" />
+    </svg>
+  )
+}
+
+// ============================================================================
+// WC3 BUILDING SILHOUETTES (Town Hall, Barracks, Tower styles)
+// ============================================================================
+
+function HumanBarracks({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-label="Barracks">
+      {/* Main building */}
+      <rect x="8" y="20" width="32" height="24" fill={WC3.stone} stroke={WC3.humanGold} strokeWidth="2" />
+      {/* Roof */}
+      <path d="M4,20 L24,4 L44,20 Z" fill={WC3.humanBlue} stroke={WC3.humanGold} strokeWidth="2" />
+      {/* Door */}
+      <rect x="18" y="30" width="12" height="14" fill="#2A1810" />
+      <path d="M18,30 L24,24 L30,30 Z" fill="#2A1810" />
+      {/* Windows */}
+      <rect x="10" y="26" width="6" height="6" fill={WC3.humanBlue} stroke={WC3.humanGold} strokeWidth="1" />
+      <rect x="32" y="26" width="6" height="6" fill={WC3.humanBlue} stroke={WC3.humanGold} strokeWidth="1" />
+      {/* Banner */}
+      <rect x="22" y="6" width="4" height="10" fill={WC3.humanBlue} />
+    </svg>
+  )
+}
+
+function OrcBurrow({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-label="Burrow">
+      {/* Spiked hut */}
+      <ellipse cx="24" cy="36" rx="18" ry="10" fill={WC3.orcBrown} />
+      <path d="M8,30 Q24,4 40,30" fill={WC3.orcBrownDark} stroke={WC3.orcRed} strokeWidth="2" />
+      {/* Spikes */}
+      <path d="M12,26 L10,16" stroke="#FFFFF0" strokeWidth="3" />
+      <path d="M24,12 L24,2" stroke="#FFFFF0" strokeWidth="3" />
+      <path d="M36,26 L38,16" stroke="#FFFFF0" strokeWidth="3" />
+      {/* Entrance */}
+      <ellipse cx="24" cy="36" rx="6" ry="5" fill="#0A0505" />
+      {/* Skull decoration */}
+      <circle cx="24" cy="30" r="3" fill={WC3.undeadBone} />
+      <circle cx="23" cy="29" r="1" fill="#0A0505" />
+      <circle cx="25" cy="29" r="1" fill="#0A0505" />
+    </svg>
+  )
+}
+
+function ElfAncient({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-label="Ancient">
+      {/* Tree trunk */}
+      <path d="M20,44 Q18,30 16,20 Q24,16 32,20 Q30,30 28,44 Z" fill={WC3.orcBrown} />
+      {/* Foliage */}
+      <ellipse cx="24" cy="16" rx="16" ry="12" fill={WC3.elfPurple} opacity="0.8" />
+      <ellipse cx="20" cy="12" rx="10" ry="8" fill={WC3.elfPurpleLight} opacity="0.6" />
+      <ellipse cx="28" cy="14" rx="10" ry="8" fill={WC3.elfPurpleLight} opacity="0.6" />
+      {/* Face in tree */}
+      <ellipse cx="22" cy="28" rx="2" ry="3" fill={WC3.elfSilver} />
+      <ellipse cx="26" cy="28" rx="2" ry="3" fill={WC3.elfSilver} />
+      <circle cx="22" cy="28" r="1" fill={WC3.elfPurple} />
+      <circle cx="26" cy="28" r="1" fill={WC3.elfPurple} />
+      {/* Moonwell glow */}
+      <circle cx="24" cy="42" r="6" fill={WC3.elfSilver} opacity="0.3" />
+    </svg>
+  )
+}
+
+function UndeadZiggurat({ size = 48 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" aria-label="Ziggurat">
+      {/* Stepped pyramid */}
+      <rect x="6" y="36" width="36" height="8" fill="#2A2A2A" stroke={WC3.undeadGreen} strokeWidth="1" />
+      <rect x="10" y="28" width="28" height="8" fill="#1A1A1A" stroke={WC3.undeadGreen} strokeWidth="1" />
+      <rect x="14" y="20" width="20" height="8" fill="#0A0A0A" stroke={WC3.undeadGreen} strokeWidth="1" />
+      <rect x="18" y="12" width="12" height="8" fill="#050505" stroke={WC3.undeadGreen} strokeWidth="1" />
+      {/* Glowing orb */}
+      <circle cx="24" cy="8" r="4" fill={WC3.undeadGreen} />
+      <circle cx="24" cy="8" r="2" fill="#FFFFFF" opacity="0.5" />
+      {/* Bone decorations */}
+      <line x1="8" y1="40" x2="8" y2="36" stroke={WC3.undeadBone} strokeWidth="2" />
+      <line x1="40" y1="40" x2="40" y2="36" stroke={WC3.undeadBone} strokeWidth="2" />
+    </svg>
+  )
+}
+
+// ============================================================================
+// WC3 UI COMPONENTS
+// ============================================================================
+
+function ResourceBar({
   icon,
   value,
-  label,
   maxValue,
+  label,
 }: {
   icon: React.ReactNode
   value: number
-  label: string
   maxValue?: number
+  label: string
 }) {
   return (
     <div
-      className="flex items-center gap-1 px-2 py-1"
+      className="flex items-center gap-1 px-3 py-1"
       style={{
         background: 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)',
         border: `1px solid ${WC3.panelBorder}`,
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.3)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)',
       }}
-      role="status"
       aria-label={`${label}: ${value}${maxValue ? ` of ${maxValue}` : ''}`}
     >
       {icon}
@@ -343,84 +440,6 @@ function ResourceCounter({
   )
 }
 
-// ============================================================================
-// WC3 STYLE HEALTH/MANA BAR (thick, segmented, classic RTS look)
-// ============================================================================
-
-function UnitBar({
-  label,
-  current,
-  max,
-  type = 'health',
-}: {
-  label: string
-  current: number
-  max: number
-  type?: 'health' | 'mana' | 'experience'
-}) {
-  const percent = Math.min(100, (current / max) * 100)
-  const segments = 10
-
-  const colors = {
-    health: percent > 50 ? WC3.healthGreen : percent > 25 ? WC3.healthYellow : WC3.healthRed,
-    mana: WC3.manaBlue,
-    experience: WC3.elfPurple,
-  }
-
-  return (
-    <div
-      className="flex items-center gap-2"
-      role="progressbar"
-      aria-valuenow={current}
-      aria-valuemin={0}
-      aria-valuemax={max}
-      aria-label={label}
-    >
-      <span
-        className="text-sm uppercase tracking-wider font-bold w-8 text-right"
-        style={{ color: WC3.textGray }}
-      >
-        {label}
-      </span>
-      <div
-        className="flex-1 h-4 relative flex gap-px overflow-hidden"
-        style={{
-          background: '#0A0A0A',
-          border: `2px solid ${WC3.panelBorder}`,
-          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.8)',
-        }}
-      >
-        {/* Segmented bar fill */}
-        {[...Array(segments)].map((_, i) => {
-          const segmentPercent = ((i + 1) / segments) * 100
-          const isFilled = percent >= segmentPercent - (100 / segments / 2)
-          return (
-            <div
-              key={i}
-              className="flex-1"
-              style={{
-                background: isFilled ? colors[type] : 'transparent',
-                boxShadow: isFilled ? `inset 0 1px 0 rgba(255,255,255,0.3)` : 'none',
-              }}
-            />
-          )
-        })}
-        {/* Text overlay */}
-        <span
-          className="absolute inset-0 flex items-center justify-center text-sm font-bold"
-          style={{ color: WC3.textWhite, textShadow: '0 1px 2px #000, 0 0 4px #000' }}
-        >
-          {current} / {max}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// WC3 STYLE UNIT PORTRAIT FRAME (square, beveled gold border)
-// ============================================================================
-
 function UnitPortrait({
   children,
   selected = false,
@@ -431,72 +450,160 @@ function UnitPortrait({
   size?: number
 }) {
   return (
-    <div
-      className="relative"
-      style={{
-        width: size,
-        height: size,
-      }}
-    >
-      {/* Outer beveled frame */}
+    <div className="relative" style={{ width: size, height: size }}>
+      {/* Gold beveled frame */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 p-[3px]"
         style={{
-          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.panelBronze} 50%, ${WC3.humanGold} 100%)`,
-          padding: 3,
+          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.uiGoldDark} 50%, ${WC3.humanGold} 100%)`,
         }}
       >
-        {/* Inner dark frame */}
         <div
-          className="w-full h-full"
+          className="w-full h-full flex items-center justify-center"
           style={{
             background: '#0A0A0A',
             border: selected ? `2px solid ${WC3.healthGreen}` : '2px solid #1A1A1A',
             boxShadow: selected ? `0 0 8px ${WC3.healthGreen}` : 'inset 0 2px 4px rgba(0,0,0,0.8)',
           }}
         >
-          {/* Content */}
-          <div className="w-full h-full flex items-center justify-center">
-            {children}
-          </div>
+          {children}
         </div>
       </div>
-      {/* Corner bevels (classic WC3 look) */}
-      <div
-        className="absolute top-0 left-0 w-2 h-2"
-        style={{
-          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, transparent 100%)`,
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-0 right-0 w-2 h-2"
-        style={{
-          background: `linear-gradient(-135deg, ${WC3.humanGold} 0%, transparent 100%)`,
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-0 left-0 w-2 h-2"
-        style={{
-          background: `linear-gradient(45deg, ${WC3.humanGold} 0%, transparent 100%)`,
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-0 right-0 w-2 h-2"
-        style={{
-          background: `linear-gradient(-45deg, ${WC3.humanGold} 0%, transparent 100%)`,
-        }}
-        aria-hidden="true"
-      />
+      {/* Corner bevels */}
+      {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
+        <div
+          key={i}
+          className={`absolute w-2 h-2 ${pos}`}
+          style={{
+            background: `radial-gradient(circle at ${i % 2 === 0 ? '70%' : '30%'} ${i < 2 ? '70%' : '30%'}, ${WC3.humanGold}, transparent)`,
+          }}
+        />
+      ))}
     </div>
   )
 }
 
-// ============================================================================
-// WC3 STYLE ABILITY ICON (square, beveled, with cooldown overlay option)
-// ============================================================================
+function HealthManaBar({
+  label,
+  current,
+  max,
+  type,
+}: {
+  label: string
+  current: number
+  max: number
+  type: 'health' | 'mana' | 'exp'
+}) {
+  const percent = Math.min(100, (current / max) * 100)
+  const segments = 10
+
+  const colors = {
+    health: percent > 50 ? WC3.healthGreen : percent > 25 ? WC3.healthYellow : WC3.healthRed,
+    mana: WC3.manaBlue,
+    exp: WC3.elfPurple,
+  }
+
+  return (
+    <div className="flex items-center gap-2" aria-label={`${label}: ${current}/${max}`}>
+      <span className="text-xs font-bold w-8 text-right" style={{ color: WC3.textGray }}>
+        {label}
+      </span>
+      <div
+        className="flex-1 h-3 flex gap-px overflow-hidden relative"
+        style={{
+          background: '#0A0A0A',
+          border: `2px solid ${WC3.panelBorder}`,
+        }}
+      >
+        {[...Array(segments)].map((_, i) => {
+          const segmentPercent = ((i + 1) / segments) * 100
+          const isFilled = percent >= segmentPercent - (100 / segments / 2)
+          return (
+            <div
+              key={i}
+              className="flex-1"
+              style={{
+                background: isFilled ? colors[type] : 'transparent',
+                boxShadow: isFilled ? 'inset 0 1px 0 rgba(255,255,255,0.3)' : 'none',
+              }}
+            />
+          )
+        })}
+        <span
+          className="absolute inset-0 flex items-center justify-center text-[10px] font-bold"
+          style={{ color: WC3.textWhite, textShadow: '0 1px 2px #000' }}
+        >
+          {current}/{max}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function WC3Panel({
+  title,
+  children,
+  faction = 'human',
+  className = '',
+}: {
+  title: string
+  children: React.ReactNode
+  faction?: 'human' | 'orc' | 'nightelf' | 'undead'
+  className?: string
+}) {
+  const factionColors = {
+    human: { primary: WC3.humanBlue, accent: WC3.humanGold },
+    orc: { primary: WC3.orcRed, accent: WC3.orcRedDark },
+    nightelf: { primary: WC3.elfPurple, accent: WC3.elfSilver },
+    undead: { primary: WC3.undeadGreen, accent: WC3.undeadBone },
+  }
+  const colors = factionColors[faction]
+
+  return (
+    <section
+      className={`relative ${className}`}
+      style={{
+        background: `linear-gradient(180deg, ${WC3.panelMid} 0%, ${WC3.panelDark} 100%)`,
+        border: `3px solid ${colors.accent}`,
+        boxShadow: `inset 0 0 30px ${colors.primary}15, 0 4px 16px rgba(0,0,0,0.6)`,
+      }}
+    >
+      {/* Corner rivets */}
+      {['top-1 left-1', 'top-1 right-1', 'bottom-1 left-1', 'bottom-1 right-1'].map((pos, i) => (
+        <div
+          key={i}
+          className={`absolute w-3 h-3 rounded-full ${pos}`}
+          style={{
+            background: `radial-gradient(circle at 30% 30%, ${colors.accent}, ${WC3.panelBorder})`,
+          }}
+        />
+      ))}
+
+      {/* Title banner */}
+      <div
+        className="relative px-6 py-2 mx-4 -mt-3"
+        style={{
+          background: `linear-gradient(180deg, ${WC3.panelMid} 0%, ${WC3.panelDark} 100%)`,
+          border: `2px solid ${colors.accent}`,
+          boxShadow: `0 0 10px ${colors.primary}30`,
+        }}
+      >
+        <h2
+          className="text-sm tracking-[0.2em] uppercase font-bold text-center"
+          style={{
+            color: colors.accent,
+            textShadow: `0 0 8px ${colors.primary}50`,
+            fontFamily: 'Georgia, serif',
+          }}
+        >
+          {title}
+        </h2>
+      </div>
+
+      <div className="pt-4 pb-6 px-6">{children}</div>
+    </section>
+  )
+}
 
 function AbilityIcon({
   children,
@@ -510,45 +617,33 @@ function AbilityIcon({
   size?: number
 }) {
   return (
-    <div
-      className="relative group"
-      style={{ width: size, height: size }}
-    >
-      {/* Beveled border */}
+    <div className="relative group" style={{ width: size, height: size }}>
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 p-[2px]"
         style={{
           background: learned
-            ? `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`
-            : `linear-gradient(135deg, #4A4A4A 0%, #2A2A2A 100%)`,
-          padding: 2,
+            ? `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.uiGoldDark} 100%)`
+            : 'linear-gradient(135deg, #4A4A4A 0%, #2A2A2A 100%)',
         }}
       >
-        {/* Inner content */}
         <div
-          className={`w-full h-full flex items-center justify-center transition-all ${
-            learned ? 'group-hover:brightness-125' : ''
-          }`}
+          className={`w-full h-full flex items-center justify-center transition-all ${learned ? 'group-hover:brightness-125' : ''}`}
           style={{
-            background: learned
-              ? 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)'
-              : '#1A1A1A',
+            background: learned ? 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)' : '#1A1A1A',
             opacity: learned ? 1 : 0.5,
           }}
         >
           {children}
         </div>
       </div>
-      {/* Hotkey indicator */}
       {hotkey && (
         <div
-          className="absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-sm font-bold"
+          className="absolute -bottom-1 -right-1 w-4 h-4 flex items-center justify-center text-[10px] font-bold"
           style={{
             background: WC3.panelDark,
             border: `1px solid ${WC3.panelBorder}`,
             color: WC3.textGold,
           }}
-          aria-label={`Hotkey: ${hotkey}`}
         >
           {hotkey}
         </div>
@@ -558,453 +653,105 @@ function AbilityIcon({
 }
 
 // ============================================================================
-// WC3 STYLE COMMAND PANEL (like the bottom-right ability grid)
+// FACTION ART DISPLAY COMPONENTS
 // ============================================================================
 
-function CommandPanel({
-  title,
-  children,
-  className = '',
-}: {
-  title: string
-  children: React.ReactNode
-  className?: string
-}) {
+function FactionCrestsArt() {
   return (
-    <section
-      className={`relative ${className}`}
+    <div
+      className="py-8 flex justify-center items-center gap-8 md:gap-16"
       style={{
-        background: 'linear-gradient(180deg, #1A1612 0%, #0F0C0A 100%)',
-        border: `3px solid ${WC3.panelBorder}`,
-        boxShadow: `
-          inset 0 1px 0 rgba(255,215,0,0.2),
-          inset 0 -1px 0 rgba(0,0,0,0.5),
-          0 4px 12px rgba(0,0,0,0.5)
-        `,
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.panelDark}80 20%, ${WC3.panelDark}80 80%, transparent 100%)`,
+        borderTop: `1px solid ${WC3.panelBorder}`,
+        borderBottom: `1px solid ${WC3.panelBorder}`,
       }}
-      aria-labelledby={`panel-${title.toLowerCase().replace(/\s/g, '-')}`}
     >
-      {/* Gold corner accents */}
-      {[
-        'top-0 left-0 border-t-2 border-l-2',
-        'top-0 right-0 border-t-2 border-r-2',
-        'bottom-0 left-0 border-b-2 border-l-2',
-        'bottom-0 right-0 border-b-2 border-r-2',
-      ].map((pos, i) => (
-        <div
-          key={i}
-          className={`absolute w-4 h-4 ${pos}`}
-          style={{ borderColor: WC3.humanGold }}
-          aria-hidden="true"
-        />
-      ))}
-
-      {/* Title bar */}
-      <div
-        className="px-4 py-2"
-        style={{
-          background: 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)',
-          borderBottom: `2px solid ${WC3.panelBorder}`,
-        }}
-      >
-        <h2
-          id={`panel-${title.toLowerCase().replace(/\s/g, '-')}`}
-          className="text-sm tracking-wider uppercase font-bold text-center"
-          style={{
-            color: WC3.textGold,
-            textShadow: '0 1px 2px #000',
-            fontFamily: 'Georgia, "Times New Roman", serif',
-          }}
-        >
-          {title}
-        </h2>
+      <div className="text-center">
+        <HumanCrest size={80} />
+        <p className="mt-2 text-xs uppercase tracking-wider" style={{ color: WC3.humanGold }}>Alliance</p>
       </div>
-
-      {/* Content */}
-      <div className="p-4">
-        {children}
+      <div className="text-center">
+        <OrcCrest size={80} />
+        <p className="mt-2 text-xs uppercase tracking-wider" style={{ color: WC3.orcRed }}>Horde</p>
       </div>
-    </section>
+      <div className="text-center">
+        <NightElfCrest size={80} />
+        <p className="mt-2 text-xs uppercase tracking-wider" style={{ color: WC3.elfSilver }}>Sentinels</p>
+      </div>
+      <div className="text-center">
+        <UndeadCrest size={80} />
+        <p className="mt-2 text-xs uppercase tracking-wider" style={{ color: WC3.undeadGreen }}>Scourge</p>
+      </div>
+    </div>
   )
 }
 
-// ============================================================================
-// WC3 STYLE INFO PANEL (like unit/building info display)
-// ============================================================================
-
-function InfoPanel({
-  title,
-  children,
-  faction = 'human',
-  className = '',
-}: {
-  title: string
-  children: React.ReactNode
-  faction?: 'human' | 'orc' | 'nightelf' | 'undead'
-  className?: string
-}) {
-  const factionColors = {
-    human: { primary: WC3.humanBlue, accent: WC3.humanGold },
-    orc: { primary: WC3.orcRed, accent: WC3.orcOrange },
-    nightelf: { primary: WC3.elfPurple, accent: WC3.elfSilver },
-    undead: { primary: WC3.undeadPurple, accent: WC3.undeadGreen },
-  }
-
-  const colors = factionColors[faction]
-
+function UnitsArt() {
   return (
-    <section
-      className={`relative ${className}`}
+    <div
+      className="py-8 flex justify-center items-end gap-6 md:gap-12"
       style={{
-        background: `linear-gradient(180deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
-        border: `3px solid ${colors.accent}`,
-        boxShadow: `
-          inset 0 0 30px ${colors.primary}20,
-          0 4px 16px rgba(0,0,0,0.6)
-        `,
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.panelDark}60 30%, ${WC3.panelDark}60 70%, transparent 100%)`,
+        borderTop: `1px solid ${WC3.panelBorder}`,
+        borderBottom: `1px solid ${WC3.panelBorder}`,
       }}
-      aria-labelledby={`info-${title.toLowerCase().replace(/\s/g, '-')}`}
     >
-      {/* Decorative rivets */}
-      {['top-1 left-1', 'top-1 right-1', 'bottom-1 left-1', 'bottom-1 right-1'].map((pos, i) => (
-        <div
-          key={i}
-          className={`absolute w-3 h-3 rounded-full ${pos}`}
-          style={{
-            background: `radial-gradient(circle at 30% 30%, ${colors.accent}, ${WC3.panelBronze})`,
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3)',
-          }}
-          aria-hidden="true"
-        />
-      ))}
-
-      {/* Title banner */}
-      <div
-        className="relative px-4 py-2 mx-4 -mt-3"
-        style={{
-          background: `linear-gradient(180deg, #2A2318 0%, ${WC3.panelDark} 100%)`,
-          border: `2px solid ${colors.accent}`,
-          boxShadow: `0 0 10px ${colors.primary}40`,
-        }}
-      >
-        <h2
-          id={`info-${title.toLowerCase().replace(/\s/g, '-')}`}
-          className="text-sm tracking-[0.15em] uppercase font-bold text-center"
-          style={{
-            color: colors.accent,
-            textShadow: `0 0 8px ${colors.primary}60`,
-            fontFamily: 'Georgia, "Times New Roman", serif',
-          }}
-        >
-          {title}
-        </h2>
+      <div className="text-center">
+        <PeasantUnit size={48} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.humanGold }}>Peasant</p>
+        <p className="text-[8px]" style={{ color: WC3.textGray }}>Worker</p>
       </div>
-
-      {/* Content */}
-      <div className="pt-4 pb-4 px-6">
-        {children}
+      <div className="text-center">
+        <PeonUnit size={48} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.orcRed }}>Peon</p>
+        <p className="text-[8px]" style={{ color: WC3.textGray }}>Worker</p>
       </div>
-    </section>
-  )
-}
-
-// ============================================================================
-// WC3 STYLE MINIMAP FRAME
-// ============================================================================
-
-function MinimapFrame({
-  children,
-  title,
-}: {
-  children: React.ReactNode
-  title: string
-}) {
-  return (
-    <div className="relative" aria-label={title}>
-      {/* Gold frame */}
-      <div
-        className="p-1"
-        style={{
-          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.panelBronze} 50%, ${WC3.humanGold} 100%)`,
-        }}
-      >
-        {/* Dark inner */}
-        <div
-          className="p-1"
-          style={{
-            background: WC3.panelDark,
-            border: `1px solid ${WC3.panelBorder}`,
-          }}
-        >
-          {children}
-        </div>
+      <div className="text-center">
+        <WispUnit size={48} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.elfSilver }}>Wisp</p>
+        <p className="text-[8px]" style={{ color: WC3.textGray }}>Worker</p>
       </div>
-      {/* Corner decorations */}
-      <div
-        className="absolute -top-1 -left-1 w-3 h-3"
-        style={{
-          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
-          borderRadius: '1px',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute -top-1 -right-1 w-3 h-3"
-        style={{
-          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
-          borderRadius: '1px',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute -bottom-1 -left-1 w-3 h-3"
-        style={{
-          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
-          borderRadius: '1px',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute -bottom-1 -right-1 w-3 h-3"
-        style={{
-          background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.panelBronze} 100%)`,
-          borderRadius: '1px',
-        }}
-        aria-hidden="true"
-      />
+      <div className="text-center">
+        <AcolyteUnit size={48} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.undeadGreen }}>Acolyte</p>
+        <p className="text-[8px]" style={{ color: WC3.textGray }}>Worker</p>
+      </div>
     </div>
   )
 }
 
-// ============================================================================
-// FACTION SELECTOR (like race selection in WC3)
-// ============================================================================
-
-function FactionSelector({
-  active,
-  onSelect,
-}: {
-  active: 'engineer' | 'drummer' | 'fighter'
-  onSelect: (p: 'engineer' | 'drummer' | 'fighter') => void
-}) {
-  const factions = [
-    {
-      id: 'engineer',
-      name: 'Human Alliance',
-      desc: 'Arcane Architect',
-      icon: <HumanCrest size={40} />,
-      color: WC3.humanBlue,
-      accent: WC3.humanGold,
-    },
-    {
-      id: 'drummer',
-      name: 'Night Elf Sentinels',
-      desc: 'Keeper of Rhythm',
-      icon: <NightElfCrest size={40} />,
-      color: WC3.elfPurple,
-      accent: WC3.elfSilver,
-    },
-    {
-      id: 'fighter',
-      name: 'Orc Horde',
-      desc: 'Battle-Hardened',
-      icon: <OrcCrest size={40} />,
-      color: WC3.orcRed,
-      accent: WC3.orcOrange,
-    },
-  ] as const
-
+function BuildingsArt() {
   return (
-    <nav
-      className="flex justify-center gap-4 md:gap-6 py-6"
-      role="tablist"
-      aria-label="Profession selection"
+    <div
+      className="py-8 flex justify-center items-end gap-4 md:gap-10"
+      style={{
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.panelDark}70 25%, ${WC3.panelDark}70 75%, transparent 100%)`,
+        borderTop: `1px solid ${WC3.panelBorder}`,
+        borderBottom: `1px solid ${WC3.panelBorder}`,
+      }}
     >
-      {factions.map((faction) => (
-        <button
-          key={faction.id}
-          onClick={() => onSelect(faction.id)}
-          role="tab"
-          aria-selected={active === faction.id}
-          aria-controls={`panel-${faction.id}`}
-          className="relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 transition-transform hover:scale-105"
-          style={{
-            ['--ring-color' as string]: faction.accent,
-          }}
-        >
-          <div
-            className="w-28 md:w-36 h-32 md:h-40 flex flex-col items-center justify-center gap-2 p-3 transition-all"
-            style={{
-              background: active === faction.id
-                ? `linear-gradient(180deg, ${faction.color}40 0%, ${WC3.panelDark} 100%)`
-                : `linear-gradient(180deg, #1A1612 0%, #0A0808 100%)`,
-              border: `3px solid ${active === faction.id ? faction.accent : WC3.panelBorder}`,
-              boxShadow: active === faction.id
-                ? `0 0 20px ${faction.color}50, inset 0 0 15px ${faction.color}30`
-                : 'inset 0 2px 4px rgba(0,0,0,0.5)',
-            }}
-          >
-            {/* Faction icon */}
-            <div className="relative">
-              {faction.icon}
-              {active === faction.id && (
-                <div
-                  className="absolute inset-0 animate-pulse"
-                  style={{ filter: `drop-shadow(0 0 6px ${faction.accent})` }}
-                  aria-hidden="true"
-                >
-                  {faction.icon}
-                </div>
-              )}
-            </div>
-
-            {/* Faction name */}
-            <span
-              className="text-xs md:text-sm font-bold tracking-wider text-center leading-tight"
-              style={{
-                color: active === faction.id ? faction.accent : WC3.textGray,
-                textShadow: active === faction.id ? `0 0 8px ${faction.color}` : 'none',
-                fontFamily: 'Georgia, "Times New Roman", serif',
-              }}
-            >
-              {faction.name}
-            </span>
-
-            {/* Description */}
-            <span
-              className="text-sm"
-              style={{ color: WC3.textGray }}
-            >
-              {faction.desc}
-            </span>
-          </div>
-
-          {/* Selection arrow */}
-          {active === faction.id && (
-            <div
-              className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0"
-              style={{
-                borderLeft: '8px solid transparent',
-                borderRight: '8px solid transparent',
-                borderTop: `8px solid ${faction.accent}`,
-              }}
-              aria-hidden="true"
-            />
-          )}
-        </button>
-      ))}
-    </nav>
-  )
-}
-
-// ============================================================================
-// TECH STACK AS BUILD QUEUE (like building units in WC3)
-// ============================================================================
-
-function BuildQueue({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
-  return (
-    <div className="space-y-6">
-      {categories.slice(0, 6).map((category) => (
-        <div key={category.name}>
-          {/* Category header */}
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">{category.icon}</span>
-            <h3
-              className="text-sm tracking-wider uppercase font-bold"
-              style={{
-                color: WC3.textGold,
-                textShadow: '0 1px 2px #000',
-                fontFamily: 'Georgia, "Times New Roman", serif',
-              }}
-            >
-              {category.name}
-            </h3>
-            <div
-              className="flex-1 h-px"
-              style={{
-                background: `linear-gradient(90deg, ${WC3.panelBorder}, transparent)`,
-              }}
-              aria-hidden="true"
-            />
-          </div>
-
-          {/* Tech items as ability icons */}
-          <div className="flex flex-wrap gap-2">
-            {category.items.map((tech) => (
-              <AbilityIcon key={tech} learned={true} size={32}>
-                <span
-                  className="text-sm font-bold text-center leading-tight px-1"
-                  style={{ color: WC3.textWhite }}
-                >
-                  {tech.substring(0, 3).toUpperCase()}
-                </span>
-              </AbilityIcon>
-            ))}
-          </div>
-
-          {/* Full names list */}
-          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-            {category.items.map((tech) => (
-              <span
-                key={tech}
-                className="text-xs"
-                style={{ color: WC3.textGray }}
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
+      <div className="text-center">
+        <HumanBarracks size={64} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.humanGold }}>Barracks</p>
+      </div>
+      <div className="text-center">
+        <OrcBurrow size={64} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.orcRed }}>Burrow</p>
+      </div>
+      <div className="text-center">
+        <ElfAncient size={64} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.elfSilver }}>Ancient</p>
+      </div>
+      <div className="text-center">
+        <UndeadZiggurat size={64} />
+        <p className="mt-1 text-[10px] uppercase tracking-wider" style={{ color: WC3.undeadGreen }}>Ziggurat</p>
+      </div>
     </div>
   )
 }
 
 // ============================================================================
-// SKILLS LIST (for drummer/fighter)
-// ============================================================================
-
-function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
-  return (
-    <div className="grid md:grid-cols-3 gap-6">
-      {categories.map((category) => (
-        <div key={category.name}>
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-lg">{category.icon}</span>
-            <h3
-              className="text-sm tracking-wider uppercase font-bold"
-              style={{
-                color: WC3.textGold,
-                fontFamily: 'Georgia, "Times New Roman", serif',
-              }}
-            >
-              {category.name}
-            </h3>
-          </div>
-          <ul className="space-y-2" role="list">
-            {category.skills.map((skill) => (
-              <li
-                key={skill.name}
-                className="flex items-center gap-2 text-sm"
-                style={{ color: WC3.textWhite }}
-              >
-                <div
-                  className="w-2 h-2 rotate-45"
-                  style={{ background: WC3.healthGreen }}
-                  aria-hidden="true"
-                />
-                <span>{skill.name}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ============================================================================
-// EXPERIENCE CARD (Campaign mission style)
+// CONTENT CARDS
 // ============================================================================
 
 function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
@@ -1018,47 +765,33 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
       style={{
         background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
         border: `2px solid ${isCurrentRole ? WC3.healthGreen : WC3.panelBorder}`,
-        boxShadow: isCurrentRole ? `0 0 12px ${WC3.healthGreen}30` : 'none',
+        boxShadow: isCurrentRole ? `0 0 12px ${WC3.healthGreen}25` : 'none',
       }}
     >
       <div className="flex justify-between items-start mb-2 gap-2">
-        <div className="flex items-start gap-2">
-          <UnitPortrait size={32} selected={isCurrentRole}>
-            <span className="text-xs" style={{ color: WC3.textGold }}>
+        <div className="flex items-start gap-3">
+          <UnitPortrait size={36} selected={isCurrentRole}>
+            <span className="text-sm font-bold" style={{ color: WC3.textGold }}>
               {entry.title.charAt(0)}
             </span>
           </UnitPortrait>
           <div>
-            <h4 className="text-sm font-bold" style={{ color: WC3.textWhite }}>
-              {entry.title}
-            </h4>
-            <p className="text-xs" style={{ color: WC3.textGold }}>
-              {entry.organization}
-            </p>
+            <h4 className="text-sm font-bold" style={{ color: WC3.textWhite }}>{entry.title}</h4>
+            <p className="text-xs" style={{ color: WC3.textGold }}>{entry.organization}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <GoldIcon size={12} />
-          <span className="text-sm" style={{ color: WC3.textGray }}>
-            {startDisplay} - {endDisplay}
-          </span>
+          <span className="text-xs" style={{ color: WC3.textGray }}>{startDisplay} - {endDisplay}</span>
         </div>
       </div>
-
-      <p className="text-xs mb-3 ml-10" style={{ color: WC3.textGray }}>
-        {entry.description}
-      </p>
-
+      <p className="text-xs mb-2 ml-12" style={{ color: WC3.textGray }}>{entry.description}</p>
       {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-1 ml-10" role="list">
-          {entry.highlights.map((highlight, i) => (
-            <li
-              key={i}
-              className="text-xs flex items-start gap-2"
-              style={{ color: WC3.textWhite }}
-            >
-              <span style={{ color: WC3.healthGreen }} aria-hidden="true">+</span>
-              <span>{highlight}</span>
+        <ul className="space-y-1 ml-12">
+          {entry.highlights.map((h, i) => (
+            <li key={i} className="text-xs flex items-start gap-2" style={{ color: WC3.textWhite }}>
+              <span style={{ color: WC3.healthGreen }}>+</span>
+              <span>{h}</span>
             </li>
           ))}
         </ul>
@@ -1067,61 +800,42 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
   )
 }
 
-// ============================================================================
-// PROJECT CARD (Quest/Mission style)
-// ============================================================================
-
 function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
   return (
     <article
-      className="p-4 transition-all hover:brightness-110 cursor-pointer group"
+      className="p-4 transition-all hover:brightness-110"
       style={{
         background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
-        border: `2px solid ${project.featured ? WC3.goldYellow : WC3.panelBorder}`,
-        boxShadow: project.featured ? `0 0 15px ${WC3.goldYellow}30` : 'none',
+        border: `2px solid ${project.featured ? WC3.uiGold : WC3.panelBorder}`,
+        boxShadow: project.featured ? `0 0 15px ${WC3.uiGold}20` : 'none',
       }}
     >
       {project.featured && (
         <div className="flex items-center gap-2 mb-2">
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ background: WC3.goldYellow }}
-            aria-hidden="true"
-          />
-          <span
-            className="text-sm tracking-wider font-bold"
-            style={{ color: WC3.goldYellow }}
-          >
-            LEGENDARY QUEST
-          </span>
+          <div className="w-2 h-2 rounded-full" style={{ background: WC3.uiGold }} />
+          <span className="text-xs tracking-wider font-bold" style={{ color: WC3.uiGold }}>LEGENDARY</span>
         </div>
       )}
-
       <h4
-        className="text-sm font-bold mb-1 group-hover:brightness-125 transition-all"
-        style={{ color: project.featured ? WC3.goldYellow : WC3.humanBlue }}
+        className="text-sm font-bold mb-1"
+        style={{ color: project.featured ? WC3.uiGold : WC3.humanBlue }}
       >
         {project.name}
       </h4>
-
-      <p className="text-xs mb-3" style={{ color: WC3.textGray }}>
-        {project.tagline}
-      </p>
-
+      <p className="text-xs mb-2" style={{ color: WC3.textGray }}>{project.tagline}</p>
       {project.impact && (
-        <p className="text-xs mb-3" style={{ color: WC3.healthGreen }}>
-          <span aria-hidden="true">+</span> {project.impact}
+        <p className="text-xs mb-2" style={{ color: WC3.healthGreen }}>
+          <span>+</span> {project.impact}
         </p>
       )}
-
       <div className="flex flex-wrap gap-1">
         {project.techStack.slice(0, 4).map((tech) => (
           <span
             key={tech}
             className="text-[9px] px-2 py-0.5 font-bold"
             style={{
-              background: `${WC3.humanBlue}30`,
-              border: `1px solid ${WC3.humanBlue}60`,
+              background: `${WC3.humanBlue}25`,
+              border: `1px solid ${WC3.humanBlue}50`,
               color: WC3.textWhite,
             }}
           >
@@ -1133,85 +847,57 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
   )
 }
 
-// ============================================================================
-// COMPANY CARD (Allied outpost style)
-// ============================================================================
-
 function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-all hover:brightness-110 group"
+      className="block p-4 transition-all hover:brightness-110"
       style={{
         background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
         border: `2px solid ${WC3.panelBorder}`,
       }}
-      aria-label={`${company.name} - ${company.tagline}`}
     >
-      <div className="flex items-center gap-3 mb-3">
-        <UnitPortrait size={40}>
+      <div className="flex items-center gap-3 mb-2">
+        <UnitPortrait size={36}>
           <span className="text-lg">{company.icon}</span>
         </UnitPortrait>
         <div>
-          <h4
-            className="text-sm font-bold group-hover:brightness-125 transition-colors"
-            style={{ color: WC3.textWhite }}
-          >
-            {company.name}
-          </h4>
-          <p className="text-sm" style={{ color: WC3.textGold }}>
-            {company.tagline}
-          </p>
+          <h4 className="text-sm font-bold" style={{ color: WC3.textWhite }}>{company.name}</h4>
+          <p className="text-xs" style={{ color: WC3.textGold }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-xs" style={{ color: WC3.textGray }}>
-        {company.description}
-      </p>
+      <p className="text-xs" style={{ color: WC3.textGray }}>{company.description}</p>
     </a>
   )
 }
 
-// ============================================================================
-// BAND CARD (Warband style)
-// ============================================================================
-
 function BandCard({ band }: { band: typeof BANDS[0] }) {
   const content = (
     <article
-      className="p-4 transition-all hover:brightness-110 group"
+      className="p-4 transition-all hover:brightness-110"
       style={{
         background: `linear-gradient(135deg, ${WC3.panelDark} 0%, #0A0808 100%)`,
-        border: `2px solid ${band.active ? WC3.orcRed : WC3.panelBorder}`,
-        boxShadow: band.active ? `0 0 10px ${WC3.orcRed}30` : 'none',
+        border: `2px solid ${band.active ? WC3.elfPurple : WC3.panelBorder}`,
+        boxShadow: band.active ? `0 0 10px ${WC3.elfPurple}25` : 'none',
       }}
     >
       <div className="flex items-center gap-2 mb-2">
-        <OrcCrest size={24} />
+        <NightElfCrest size={24} />
         <div>
-          <h4
-            className="text-sm font-bold group-hover:brightness-125 transition-colors"
-            style={{ color: WC3.textWhite }}
-          >
-            {band.name}
-          </h4>
-          <p className="text-sm" style={{ color: WC3.textGold }}>
-            {band.genre} | {band.role}
-          </p>
+          <h4 className="text-sm font-bold" style={{ color: WC3.textWhite }}>{band.name}</h4>
+          <p className="text-xs" style={{ color: WC3.textGold }}>{band.genre} | {band.role}</p>
         </div>
       </div>
-      <p className="text-xs" style={{ color: WC3.textGray }}>
-        {band.description}
-      </p>
+      <p className="text-xs" style={{ color: WC3.textGray }}>{band.description}</p>
       {band.active && (
         <div className="mt-2 flex items-center gap-1">
           <div
             className="w-2 h-2 rounded-full animate-pulse"
-            style={{ background: WC3.healthGreen, boxShadow: `0 0 6px ${WC3.healthGreen}` }}
-            aria-hidden="true"
+            style={{ background: WC3.healthGreen }}
           />
-          <span className="text-sm" style={{ color: WC3.healthGreen }}>Active</span>
+          <span className="text-xs" style={{ color: WC3.healthGreen }}>Active</span>
         </div>
       )}
     </article>
@@ -1219,7 +905,7 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
 
   if (band.url) {
     return (
-      <a href={band.url} target="_blank" rel="noopener noreferrer" className="block" aria-label={`${band.name} - ${band.genre}`}>
+      <a href={band.url} target="_blank" rel="noopener noreferrer" className="block">
         {content}
       </a>
     )
@@ -1228,50 +914,177 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
 }
 
 // ============================================================================
-// FOG OF WAR EFFECT (ambient background)
+// TECH STACK BUILD QUEUE
 // ============================================================================
 
-function FogOfWar() {
+function TechBuildQueue({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
   return (
-    <div
-      className="fixed inset-0 pointer-events-none z-[1] overflow-hidden"
-      aria-hidden="true"
-    >
-      {/* Gradient fog */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(ellipse at 20% 20%, transparent 0%, ${WC3.fogBlack}80 70%),
-            radial-gradient(ellipse at 80% 80%, transparent 0%, ${WC3.fogBlack}80 70%),
-            radial-gradient(ellipse at 50% 50%, transparent 0%, ${WC3.fogBlack}40 100%)
-          `,
-        }}
-      />
-      {/* Subtle animated particles */}
-      <style jsx>{`
-        @keyframes fogDrift {
-          0%, 100% { transform: translateX(0) translateY(0); }
-          50% { transform: translateX(20px) translateY(-10px); }
-        }
-      `}</style>
+    <div className="space-y-6">
+      {categories.slice(0, 7).map((category) => (
+        <div key={category.name}>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">{category.icon}</span>
+            <h3
+              className="text-xs tracking-wider uppercase font-bold"
+              style={{ color: WC3.textGold, fontFamily: 'Georgia, serif' }}
+            >
+              {category.name}
+            </h3>
+            <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${WC3.panelBorder}, transparent)` }} />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {category.items.map((tech) => (
+              <AbilityIcon key={tech} learned={true} size={36}>
+                <span className="text-[10px] font-bold text-center leading-tight px-0.5" style={{ color: WC3.textWhite }}>
+                  {tech.substring(0, 4).toUpperCase()}
+                </span>
+              </AbilityIcon>
+            ))}
+          </div>
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+            {category.items.map((tech) => (
+              <span key={tech} className="text-[10px]" style={{ color: WC3.textGray }}>{tech}</span>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function OtherSkillsList({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
+  return (
+    <div className="grid md:grid-cols-3 gap-6">
+      {categories.map((category) => (
+        <div key={category.name}>
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-lg">{category.icon}</span>
+            <h3 className="text-xs tracking-wider uppercase font-bold" style={{ color: WC3.textGold }}>
+              {category.name}
+            </h3>
+          </div>
+          <ul className="space-y-2">
+            {category.skills.map((skill) => (
+              <li key={skill.name} className="flex items-center gap-2 text-xs" style={{ color: WC3.textWhite }}>
+                <div className="w-2 h-2 rotate-45" style={{ background: WC3.healthGreen }} />
+                <span>{skill.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
     </div>
   )
 }
 
 // ============================================================================
-// TERRAIN GRID (subtle isometric grid like WC3 terrain)
+// FACTION SELECTOR (Race Selection Screen Style)
+// ============================================================================
+
+function FactionSelector({
+  active,
+  onSelect,
+}: {
+  active: 'engineer' | 'drummer' | 'fighter'
+  onSelect: (p: 'engineer' | 'drummer' | 'fighter') => void
+}) {
+  const factions = [
+    {
+      id: 'engineer' as const,
+      name: 'Human Alliance',
+      desc: 'Arcane Architect',
+      icon: <HumanCrest size={48} />,
+      color: WC3.humanBlue,
+      accent: WC3.humanGold,
+    },
+    {
+      id: 'drummer' as const,
+      name: 'Night Elf Sentinels',
+      desc: 'Keeper of Rhythm',
+      icon: <NightElfCrest size={48} />,
+      color: WC3.elfPurple,
+      accent: WC3.elfSilver,
+    },
+    {
+      id: 'fighter' as const,
+      name: 'Orc Horde',
+      desc: 'Battle-Hardened',
+      icon: <OrcCrest size={48} />,
+      color: WC3.orcRed,
+      accent: WC3.orcRed,
+    },
+  ]
+
+  return (
+    <nav className="flex justify-center gap-4 md:gap-6 py-6" role="tablist" aria-label="Profession selection">
+      {factions.map((faction) => (
+        <button
+          key={faction.id}
+          onClick={() => onSelect(faction.id)}
+          role="tab"
+          aria-selected={active === faction.id}
+          className="relative group focus:outline-none focus-visible:ring-2 transition-transform hover:scale-105"
+        >
+          <div
+            className="w-28 md:w-36 h-36 md:h-44 flex flex-col items-center justify-center gap-2 p-3 transition-all"
+            style={{
+              background: active === faction.id
+                ? `linear-gradient(180deg, ${faction.color}35 0%, ${WC3.panelDark} 100%)`
+                : `linear-gradient(180deg, #1A1612 0%, #0A0808 100%)`,
+              border: `3px solid ${active === faction.id ? faction.accent : WC3.panelBorder}`,
+              boxShadow: active === faction.id
+                ? `0 0 20px ${faction.color}40, inset 0 0 15px ${faction.color}20`
+                : 'inset 0 2px 4px rgba(0,0,0,0.5)',
+            }}
+          >
+            <div className="relative">
+              {faction.icon}
+              {active === faction.id && (
+                <div className="absolute inset-0 animate-pulse" style={{ filter: `drop-shadow(0 0 6px ${faction.accent})` }}>
+                  {faction.icon}
+                </div>
+              )}
+            </div>
+            <span
+              className="text-[10px] md:text-xs font-bold tracking-wider text-center leading-tight"
+              style={{
+                color: active === faction.id ? faction.accent : WC3.textGray,
+                textShadow: active === faction.id ? `0 0 8px ${faction.color}` : 'none',
+                fontFamily: 'Georgia, serif',
+              }}
+            >
+              {faction.name}
+            </span>
+            <span className="text-[10px]" style={{ color: WC3.textGray }}>{faction.desc}</span>
+          </div>
+          {active === faction.id && (
+            <div
+              className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0"
+              style={{
+                borderLeft: '8px solid transparent',
+                borderRight: '8px solid transparent',
+                borderTop: `8px solid ${faction.accent}`,
+              }}
+            />
+          )}
+        </button>
+      ))}
+    </nav>
+  )
+}
+
+// ============================================================================
+// TERRAIN GRID BACKGROUND
 // ============================================================================
 
 function TerrainGrid() {
   return (
     <div
-      className="fixed inset-0 pointer-events-none z-[0] opacity-[0.03]"
-      aria-hidden="true"
+      className="fixed inset-0 pointer-events-none z-0 opacity-[0.03]"
       style={{
         backgroundImage: `
-          linear-gradient(${WC3.grassGreen} 1px, transparent 1px),
-          linear-gradient(90deg, ${WC3.grassGreen} 1px, transparent 1px)
+          linear-gradient(#2D5016 1px, transparent 1px),
+          linear-gradient(90deg, #2D5016 1px, transparent 1px)
         `,
         backgroundSize: '40px 40px',
       }}
@@ -1280,14 +1093,45 @@ function TerrainGrid() {
 }
 
 // ============================================================================
-// MAIN THEME COMPONENT
+// MINIMAP FRAME (Footer)
+// ============================================================================
+
+function MinimapFrame({ children, title }: { children: React.ReactNode; title: string }) {
+  return (
+    <div className="relative" aria-label={title}>
+      <div
+        className="p-1"
+        style={{
+          background: `linear-gradient(135deg, ${WC3.humanGold} 0%, ${WC3.uiGoldDark} 50%, ${WC3.humanGold} 100%)`,
+        }}
+      >
+        <div className="p-1" style={{ background: WC3.panelDark, border: `1px solid ${WC3.panelBorder}` }}>
+          {children}
+        </div>
+      </div>
+      {/* Corner gems */}
+      {['-top-1 -left-1', '-top-1 -right-1', '-bottom-1 -left-1', '-bottom-1 -right-1'].map((pos, i) => (
+        <div
+          key={i}
+          className={`absolute w-3 h-3 ${pos}`}
+          style={{
+            background: `radial-gradient(circle, ${WC3.humanGold} 0%, ${WC3.uiGoldDark} 100%)`,
+            borderRadius: '1px',
+          }}
+        />
+      ))}
+    </div>
+  )
+}
+
+// ============================================================================
+// MAIN COMPONENT
 // ============================================================================
 
 export default function MedievalFantasyTheme() {
   useTheme()
   const { active, setActive } = useProfession()
   const [mounted, setMounted] = useState(false)
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   const aboutData = ABOUT_DATA[active]
   const engineerTech = getEngineerSkills()
@@ -1295,7 +1139,6 @@ export default function MedievalFantasyTheme() {
   const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
   const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
-  // Map profession to faction for styling
   const factionMap = {
     engineer: 'human' as const,
     drummer: 'nightelf' as const,
@@ -1305,11 +1148,6 @@ export default function MedievalFantasyTheme() {
 
   useEffect(() => {
     setMounted(true)
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
   }, [])
 
   if (!mounted) return null
@@ -1322,61 +1160,36 @@ export default function MedievalFantasyTheme() {
         fontFamily: 'Georgia, "Times New Roman", serif',
       }}
     >
-      {/* Terrain grid background */}
       <TerrainGrid />
 
-      {/* Fog of war effect */}
-      {!prefersReducedMotion && <FogOfWar />}
-
-      {/* Top resource bar (like WC3 top UI) */}
+      {/* ====== TOP RESOURCE BAR (WC3 Style) ====== */}
       <div
         className="fixed top-0 left-0 right-0 z-50 flex justify-center gap-4 py-2 px-4"
         style={{
-          background: `linear-gradient(180deg, #1A1612 0%, #0F0C0A 100%)`,
+          background: 'linear-gradient(180deg, #1A1612 0%, #0F0C0A 100%)',
           borderBottom: `2px solid ${WC3.panelBorder}`,
           boxShadow: '0 2px 8px rgba(0,0,0,0.5)',
         }}
-        role="status"
-        aria-label="Character resources"
       >
-        <ResourceCounter
-          icon={<GoldIcon size={16} />}
-          value={15000}
-          label="Experience Points"
-        />
-        <ResourceCounter
-          icon={<LumberIcon size={16} />}
-          value={85}
-          maxValue={100}
-          label="Skill Level"
-        />
-        <ResourceCounter
-          icon={<FoodIcon size={16} />}
-          value={100}
-          maxValue={100}
-          label="Energy"
-        />
+        <ResourceBar icon={<GoldIcon size={16} />} value={15000} label="Experience" />
+        <ResourceBar icon={<LumberIcon size={16} />} value={85} maxValue={100} label="Skill Level" />
+        <ResourceBar icon={<FoodIcon size={16} />} value={100} maxValue={100} label="Energy" />
       </div>
 
-      {/* Header */}
+      {/* ====== HEADER ====== */}
       <header className="relative z-40 pt-16 p-4 md:p-6 md:pt-16">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-4">
-          {/* Left: Portrait and Name */}
+          {/* Portrait + Name */}
           <div className="flex items-start gap-4">
-            {/* Unit portrait frame */}
             <UnitPortrait size={80} selected={true}>
               {active === 'engineer' && <HumanCrest size={60} />}
               {active === 'drummer' && <NightElfCrest size={60} />}
               {active === 'fighter' && <OrcCrest size={60} />}
             </UnitPortrait>
-
             <div>
               <h1
                 className="text-2xl md:text-3xl font-bold tracking-wide"
-                style={{
-                  color: WC3.textGold,
-                  textShadow: '2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.3)',
-                }}
+                style={{ color: WC3.textGold, textShadow: '2px 2px 0 #000, 0 0 10px rgba(255,215,0,0.3)' }}
               >
                 ALEXANDER PULIDO
               </h1>
@@ -1386,20 +1199,18 @@ export default function MedievalFantasyTheme() {
               <p className="text-xs md:text-sm mt-1 italic" style={{ color: WC3.textGold }}>
                 {PROFESSIONAL_SUMMARY.tagline}
               </p>
-
-              {/* Unit bars */}
               <div className="mt-4 space-y-1 w-56 md:w-72">
-                <UnitBar label="EXP" current={85} max={100} type="experience" />
-                <UnitBar label="MANA" current={100} max={100} type="mana" />
+                <HealthManaBar label="EXP" current={85} max={100} type="exp" />
+                <HealthManaBar label="MANA" current={100} max={100} type="mana" />
               </div>
             </div>
           </div>
 
-          {/* Right: Navigation buttons */}
+          {/* Nav buttons */}
           <div className="flex flex-wrap gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2"
+              className="px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:brightness-125"
               style={{
                 background: 'linear-gradient(180deg, #2A2318 0%, #1A1612 100%)',
                 border: `2px solid ${WC3.humanGold}`,
@@ -1411,7 +1222,7 @@ export default function MedievalFantasyTheme() {
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2"
+              className="px-4 py-2 text-xs md:text-sm font-bold tracking-wider transition-all hover:brightness-125"
               style={{
                 background: 'linear-gradient(180deg, #1A2535 0%, #0A1520 100%)',
                 border: `2px solid ${WC3.humanBlue}`,
@@ -1426,25 +1237,16 @@ export default function MedievalFantasyTheme() {
         </div>
       </header>
 
-      {/* Current Roles */}
-      <section className="relative z-30 py-4 px-4 md:px-6" aria-labelledby="current-roles-heading">
-        <h2 id="current-roles-heading" className="sr-only">Current Roles</h2>
+      {/* ====== CURRENT ROLES ====== */}
+      <section className="relative z-30 py-4 px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             {CURRENT_ROLES.map((role) => (
               <div key={role.id} className="text-center flex items-center gap-2">
-                <div
-                  className="w-2 h-2 rounded-full animate-pulse"
-                  style={{ background: WC3.healthGreen }}
-                  aria-hidden="true"
-                />
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: WC3.healthGreen }} />
                 <div>
-                  <p className="text-xs md:text-sm font-bold" style={{ color: WC3.textGold }}>
-                    {role.title}
-                  </p>
-                  <p className="text-sm md:text-base" style={{ color: WC3.textWhite }}>
-                    {role.company}
-                  </p>
+                  <p className="text-xs md:text-sm font-bold" style={{ color: WC3.textGold }}>{role.title}</p>
+                  <p className="text-sm md:text-base" style={{ color: WC3.textWhite }}>{role.company}</p>
                 </div>
               </div>
             ))}
@@ -1452,118 +1254,154 @@ export default function MedievalFantasyTheme() {
         </div>
       </section>
 
-      {/* Faction/Profession Selection */}
-      <section className="relative z-30 py-4" aria-label="Select profession">
+      {/* ====== FACTION SELECTOR ====== */}
+      <section className="relative z-30 py-4">
         <FactionSelector active={active} onSelect={setActive} />
       </section>
 
-      {/* Main Content */}
-      <main className="relative z-20 py-8 px-4 md:px-6 space-y-10">
-        <div className="max-w-4xl mx-auto space-y-10">
+      {/* ====== MAIN CONTENT ====== */}
+      <main className="relative z-20 space-y-0">
 
-          {/* About Section */}
-          <InfoPanel title="Unit Information" faction={currentFaction}>
-            <p className="text-sm leading-relaxed mb-4" style={{ color: WC3.textWhite }}>
-              {aboutData.bio}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="px-3 py-1 text-xs font-bold"
-                  style={{
-                    background: `${WC3.humanGold}15`,
-                    border: `1px solid ${WC3.humanGold}60`,
-                    color: WC3.textGold,
-                  }}
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </InfoPanel>
-
-          {/* Work Experience */}
-          {experience.length > 0 && (
-            <InfoPanel title="Campaign History" faction={currentFaction}>
-              <div className="space-y-4">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
+        {/* ABOUT */}
+        <div className="py-8 px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <WC3Panel title="Unit Information" faction={currentFaction}>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: WC3.textWhite }}>
+                {aboutData.bio}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {aboutData.quickFacts.map((fact, i) => (
+                  <span
+                    key={i}
+                    className="px-3 py-1 text-xs font-bold"
+                    style={{
+                      background: `${WC3.humanGold}12`,
+                      border: `1px solid ${WC3.humanGold}50`,
+                      color: WC3.textGold,
+                    }}
+                  >
+                    {fact}
+                  </span>
                 ))}
               </div>
-            </InfoPanel>
-          )}
-
-          {/* Tech Stack / Skills */}
-          <CommandPanel
-            title={active === 'engineer' ? 'Spell Book' : 'Abilities'}
-          >
-            {active === 'engineer' ? (
-              <BuildQueue categories={engineerTech} />
-            ) : (
-              <SkillsList categories={otherSkills} />
-            )}
-          </CommandPanel>
-
-          {/* Projects */}
-          <InfoPanel title="Completed Quests" faction={currentFaction}>
-            <div className="grid md:grid-cols-2 gap-4">
-              {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
-          </InfoPanel>
-
-          {/* Companies (Engineer) / Bands (Drummer) */}
-          {active === 'engineer' && (
-            <InfoPanel title="Allied Outposts" faction="human">
-              <div className="grid md:grid-cols-3 gap-4">
-                {COMPANIES.map((company) => (
-                  <CompanyCard key={company.id} company={company} />
-                ))}
-              </div>
-            </InfoPanel>
-          )}
-
-          {active === 'drummer' && (
-            <InfoPanel title="Warbands" faction="nightelf">
-              <div className="grid md:grid-cols-3 gap-4">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </InfoPanel>
-          )}
+            </WC3Panel>
+          </div>
         </div>
+
+        {/* ART: FACTION CRESTS */}
+        <FactionCrestsArt />
+
+        {/* EXPERIENCE */}
+        {experience.length > 0 && (
+          <div className="py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <WC3Panel title="Campaign History" faction={currentFaction}>
+                <div className="space-y-4">
+                  {experience.map((entry) => (
+                    <ExperienceCard key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              </WC3Panel>
+            </div>
+          </div>
+        )}
+
+        {/* ART: UNITS */}
+        <UnitsArt />
+
+        {/* SKILLS */}
+        <div className="py-8 px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <WC3Panel title={active === 'engineer' ? 'Spell Book' : 'Abilities'} faction={currentFaction}>
+              {active === 'engineer' ? (
+                <TechBuildQueue categories={engineerTech} />
+              ) : (
+                <OtherSkillsList categories={otherSkills} />
+              )}
+            </WC3Panel>
+          </div>
+        </div>
+
+        {/* PROJECTS */}
+        <div className="py-8 px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <WC3Panel title="Completed Quests" faction={currentFaction}>
+              <div className="grid md:grid-cols-2 gap-4">
+                {projects.filter(p => p.featured).slice(0, 6).map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            </WC3Panel>
+          </div>
+        </div>
+
+        {/* ART: BUILDINGS */}
+        <BuildingsArt />
+
+        {/* VENTURES (Companies for Engineer, Bands for Drummer) */}
+        {active === 'engineer' && (
+          <div className="py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <WC3Panel title="Allied Outposts" faction="human">
+                <div className="grid md:grid-cols-3 gap-4">
+                  {COMPANIES.map((company) => (
+                    <CompanyCard key={company.id} company={company} />
+                  ))}
+                </div>
+              </WC3Panel>
+            </div>
+          </div>
+        )}
+
+        {active === 'drummer' && (
+          <div className="py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <WC3Panel title="Warbands" faction="nightelf">
+                <div className="grid md:grid-cols-3 gap-4">
+                  {BANDS.map((band) => (
+                    <BandCard key={band.id} band={band} />
+                  ))}
+                </div>
+              </WC3Panel>
+            </div>
+          </div>
+        )}
+
+        {/* POSTS PLACEHOLDER */}
+        <div className="py-8 px-4 md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <WC3Panel title="War Chronicles" faction={currentFaction}>
+              <div className="text-center py-8" style={{ color: WC3.textGray }}>
+                <p className="text-sm italic">Chronicles coming soon...</p>
+                <p className="text-xs mt-2">Battle reports and strategic insights</p>
+              </div>
+            </WC3Panel>
+          </div>
+        </div>
+
       </main>
 
-      {/* Footer styled as minimap area */}
+      {/* ====== FOOTER MINIMAP ====== */}
       <footer className="relative z-20 py-12 px-4">
         <div className="max-w-md mx-auto">
           <MinimapFrame title="Location">
             <div
               className="w-full h-32 flex flex-col items-center justify-center gap-2"
               style={{
-                background: `linear-gradient(135deg, ${WC3.grassGreen}40 0%, ${WC3.dirtBrown}40 50%, ${WC3.waterBlue}40 100%)`,
+                background: `linear-gradient(135deg, #2D501635 0%, #4A372835 50%, #1E3A5F35 100%)`,
               }}
             >
-              {/* Mini faction icons */}
               <div className="flex justify-center gap-4">
                 <HumanCrest size={24} />
                 <NightElfCrest size={24} />
                 <OrcCrest size={24} />
                 <UndeadCrest size={24} />
               </div>
-              <p className="text-sm font-bold" style={{ color: WC3.textGold }}>
-                AZEROTH
-              </p>
-              <p className="text-xs" style={{ color: WC3.textGray }}>
-                Warcraft III: The Frozen Throne
-              </p>
+              <p className="text-sm font-bold" style={{ color: WC3.textGold }}>AZEROTH</p>
+              <p className="text-xs" style={{ color: WC3.textGray }}>Warcraft III: Reign of Chaos</p>
             </div>
           </MinimapFrame>
         </div>
-
         <p className="text-center text-xs mt-4" style={{ color: WC3.textGray }}>
           Built with the spirit of classic RTS games (1994-2003)
         </p>
