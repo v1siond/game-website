@@ -1869,7 +1869,9 @@ export default function FighterSelectTheme() {
             </ArcadeSectionCard>
           )}
 
-          {/* ART: Lightning separator */}
+          {/* ================================================================= */}
+          {/* ART SECTION 2: Lightning separator (after Experience) */}
+          {/* ================================================================= */}
           <ArtSeparator type="lightning" />
 
           {/* ================================================================= */}
@@ -1948,7 +1950,9 @@ export default function FighterSelectTheme() {
             </div>
           </ArcadeSectionCard>
 
-          {/* ART: Flames separator */}
+          {/* ================================================================= */}
+          {/* ART SECTION 3: Flames separator (after Projects) */}
+          {/* ================================================================= */}
           <ArtSeparator type="flames" />
 
           {/* ================================================================= */}
