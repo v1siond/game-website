@@ -14,28 +14,49 @@ import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 
 // =============================================================================
-// UNDERTALE EXACT COLOR PALETTE
+// CHRONO TRIGGER EXACT COLOR PALETTE
 // =============================================================================
-const UNDERTALE_COLORS = {
-  // Core
-  void: '#000000',
+const CT_COLORS = {
+  // Time Portal Colors
+  portalBlue: '#3366FF',
+  portalBlueBright: '#6699FF',
+  portalPurple: '#9933CC',
+  portalMagenta: '#CC66FF',
+
+  // Era Colors
+  medievalGreen: '#339933',
+  medievalGreenLight: '#66CC66',
+  futureChrome: '#99CCCC',
+  futureChromeLight: '#CCFFFF',
+  prehistoricOrange: '#FF6633',
+  prehistoricOrangeLight: '#FF9966',
+
+  // Dark Blue Backgrounds
+  voidDark: '#000033',
+  voidMid: '#000066',
+  voidLight: '#000099',
+
+  // UI Colors
   white: '#FFFFFF',
+  gold: '#FFD700',
+  silver: '#C0C0C0',
+  red: '#FF3333',
+  lavosRed: '#CC0033',
+  lavosPurple: '#660066',
 
-  // Soul Traits
-  determination: '#FF0000',
-  determinationDark: '#CC0000',
-  patience: '#00FFFF',
-  bravery: '#FFA500',
-  integrity: '#0000FF',
-  perseverance: '#FF00FF',
-  kindness: '#00FF00',
-  justice: '#FFFF00',
+  // ATB Gauge Colors
+  atbGreen: '#00FF66',
+  atbYellow: '#FFFF00',
+  atbOrange: '#FF9900',
 
-  // Characters
-  sansBlueEye: '#00FFFF',
-  sansBlueGlow: '#0066FF',
-  floweyYellow: '#FFFF00',
-  papyrusOrange: '#FF6600',
+  // Character Colors
+  cronoOrange: '#FF6600',
+  marleBlue: '#66CCFF',
+  frogGreen: '#33CC33',
+  lucca: '#9966CC',
+  robo: '#CCCC99',
+  ayla: '#FFCC66',
+  magus: '#6633CC',
 }
 
 // =============================================================================
@@ -60,354 +81,431 @@ function usePrefersReducedMotion(): boolean {
 }
 
 // =============================================================================
-// PIXEL ART SVG COMPONENTS
+// PIXEL ART SVG COMPONENTS - CHRONO TRIGGER STYLE
 // =============================================================================
 
-// 8x8 Pixel Heart Soul (Undertale signature)
-function PixelHeart({
-  size = 16,
-  color = UNDERTALE_COLORS.determination,
+// Time Portal Swirl Effect
+function TimePortal({
+  size = 120,
   animate = true,
   className = '',
 }: {
   size?: number
-  color?: string
   animate?: boolean
   className?: string
 }) {
   const reducedMotion = usePrefersReducedMotion()
   const shouldAnimate = animate && !reducedMotion
 
-  // 8x8 pixel heart - exact Undertale proportions
-  const pixels = [
-    '  ##  ##  ',
-    ' ######## ',
-    '##########',
-    '##########',
-    '##########',
-    ' ######## ',
-    '  ######  ',
-    '   ####   ',
-    '    ##    ',
-  ]
-
   return (
-    <span
-      className={`inline-block ${className}`}
-      style={{ imageRendering: 'pixelated' as const }}
+    <div
+      className={`relative ${className}`}
+      style={{ width: size, height: size }}
       role="img"
-      aria-label="Soul heart"
+      aria-label="Time portal"
     >
       <svg
         width={size}
         height={size}
-        viewBox="0 0 10 9"
+        viewBox="0 0 120 120"
+        className={shouldAnimate ? 'animate-portal-spin' : ''}
         style={{ imageRendering: 'pixelated' as const }}
-        className={shouldAnimate ? 'animate-soul-beat' : ''}
       >
-        {pixels.map((row, y) =>
-          row.split('').map((char, x) =>
-            char === '#' ? (
-              <rect key={`${x}-${y}`} x={x} y={y} width={1} height={1} fill={color} />
-            ) : null
-          )
-        )}
+        {/* Outer ring */}
+        <circle cx="60" cy="60" r="55" fill="none" stroke={CT_COLORS.portalPurple} strokeWidth="4" opacity="0.8" />
+        <circle cx="60" cy="60" r="50" fill="none" stroke={CT_COLORS.portalBlue} strokeWidth="3" opacity="0.9" />
+
+        {/* Swirling energy rings */}
+        <ellipse cx="60" cy="60" rx="40" ry="20" fill="none" stroke={CT_COLORS.portalBlueBright} strokeWidth="2"
+          className={shouldAnimate ? 'animate-portal-ring-1' : ''} opacity="0.7" />
+        <ellipse cx="60" cy="60" rx="30" ry="35" fill="none" stroke={CT_COLORS.portalMagenta} strokeWidth="2"
+          className={shouldAnimate ? 'animate-portal-ring-2' : ''} opacity="0.6" />
+        <ellipse cx="60" cy="60" rx="25" ry="15" fill="none" stroke={CT_COLORS.futureChromeLight} strokeWidth="2"
+          className={shouldAnimate ? 'animate-portal-ring-3' : ''} opacity="0.5" />
+
+        {/* Center glow */}
+        <circle cx="60" cy="60" r="15" fill={CT_COLORS.portalBlue} opacity="0.4" />
+        <circle cx="60" cy="60" r="8" fill={CT_COLORS.white} opacity="0.8" />
+
+        {/* Sparkle particles */}
+        <circle cx="30" cy="40" r="2" fill={CT_COLORS.white} className={shouldAnimate ? 'animate-sparkle-1' : ''} />
+        <circle cx="90" cy="50" r="2" fill={CT_COLORS.white} className={shouldAnimate ? 'animate-sparkle-2' : ''} />
+        <circle cx="50" cy="90" r="2" fill={CT_COLORS.white} className={shouldAnimate ? 'animate-sparkle-3' : ''} />
+        <circle cx="75" cy="25" r="1.5" fill={CT_COLORS.portalMagenta} className={shouldAnimate ? 'animate-sparkle-4' : ''} />
       </svg>
-    </span>
+    </div>
   )
 }
 
-// 4-pointed Save Star
-function SaveStar({
-  size = 16,
-  animate = true,
-}: {
-  size?: number
-  animate?: boolean
-}) {
+// Crono Silhouette (spiky hair protagonist)
+function CronoPixelArt({ size = 64 }: { size?: number }) {
+  return (
+    <div
+      style={{ imageRendering: 'pixelated' as const }}
+      role="img"
+      aria-label="Crono character silhouette"
+    >
+      <svg width={size} height={size * 1.5} viewBox="0 0 32 48">
+        {/* Spiky hair */}
+        <rect x="8" y="0" width="4" height="6" fill={CT_COLORS.cronoOrange} />
+        <rect x="12" y="2" width="3" height="8" fill={CT_COLORS.cronoOrange} />
+        <rect x="15" y="0" width="4" height="7" fill={CT_COLORS.cronoOrange} />
+        <rect x="19" y="3" width="3" height="6" fill={CT_COLORS.cronoOrange} />
+        <rect x="22" y="5" width="3" height="4" fill={CT_COLORS.cronoOrange} />
+        {/* Head */}
+        <rect x="10" y="8" width="14" height="10" fill={CT_COLORS.cronoOrange} />
+        {/* Eyes */}
+        <rect x="12" y="12" width="3" height="2" fill={CT_COLORS.voidDark} />
+        <rect x="18" y="12" width="3" height="2" fill={CT_COLORS.voidDark} />
+        {/* Headband */}
+        <rect x="9" y="10" width="16" height="2" fill={CT_COLORS.white} />
+        {/* Body / Tunic */}
+        <rect x="10" y="18" width="14" height="14" fill={CT_COLORS.white} />
+        {/* Belt */}
+        <rect x="10" y="28" width="14" height="2" fill={CT_COLORS.gold} />
+        {/* Pants */}
+        <rect x="10" y="30" width="6" height="10" fill={CT_COLORS.portalBlue} />
+        <rect x="18" y="30" width="6" height="10" fill={CT_COLORS.portalBlue} />
+        {/* Boots */}
+        <rect x="9" y="40" width="7" height="6" fill={CT_COLORS.prehistoricOrange} />
+        <rect x="17" y="40" width="7" height="6" fill={CT_COLORS.prehistoricOrange} />
+        {/* Katana */}
+        <rect x="24" y="16" width="2" height="20" fill={CT_COLORS.silver} />
+        <rect x="24" y="14" width="2" height="3" fill={CT_COLORS.gold} />
+      </svg>
+    </div>
+  )
+}
+
+// Marle Silhouette (princess with ponytail)
+function MarlePixelArt({ size = 64 }: { size?: number }) {
+  return (
+    <div
+      style={{ imageRendering: 'pixelated' as const }}
+      role="img"
+      aria-label="Marle character silhouette"
+    >
+      <svg width={size} height={size * 1.5} viewBox="0 0 32 48">
+        {/* Ponytail */}
+        <rect x="20" y="4" width="6" height="16" fill={CT_COLORS.gold} />
+        <rect x="24" y="8" width="4" height="10" fill={CT_COLORS.gold} />
+        {/* Hair front */}
+        <rect x="10" y="2" width="12" height="10" fill={CT_COLORS.gold} />
+        <rect x="8" y="6" width="4" height="6" fill={CT_COLORS.gold} />
+        {/* Head */}
+        <rect x="10" y="8" width="12" height="10" fill="#FFDDCC" />
+        {/* Eyes */}
+        <rect x="12" y="12" width="2" height="2" fill={CT_COLORS.marleBlue} />
+        <rect x="18" y="12" width="2" height="2" fill={CT_COLORS.marleBlue} />
+        {/* Dress top */}
+        <rect x="8" y="18" width="16" height="8" fill={CT_COLORS.white} />
+        {/* Dress bottom */}
+        <rect x="6" y="26" width="20" height="14" fill={CT_COLORS.white} />
+        {/* Blue trim */}
+        <rect x="6" y="38" width="20" height="2" fill={CT_COLORS.marleBlue} />
+        {/* Pendant */}
+        <rect x="14" y="20" width="4" height="4" fill={CT_COLORS.marleBlue} />
+        {/* Boots */}
+        <rect x="10" y="40" width="5" height="6" fill={CT_COLORS.marleBlue} />
+        <rect x="17" y="40" width="5" height="6" fill={CT_COLORS.marleBlue} />
+      </svg>
+    </div>
+  )
+}
+
+// Frog Silhouette (Glenn the knight)
+function FrogPixelArt({ size = 64 }: { size?: number }) {
+  return (
+    <div
+      style={{ imageRendering: 'pixelated' as const }}
+      role="img"
+      aria-label="Frog character silhouette"
+    >
+      <svg width={size} height={size * 1.4} viewBox="0 0 32 44">
+        {/* Head (rounded frog shape) */}
+        <rect x="6" y="0" width="20" height="14" fill={CT_COLORS.frogGreen} />
+        <rect x="4" y="4" width="4" height="8" fill={CT_COLORS.frogGreen} />
+        <rect x="24" y="4" width="4" height="8" fill={CT_COLORS.frogGreen} />
+        {/* Eyes (bulging) */}
+        <rect x="8" y="4" width="5" height="5" fill={CT_COLORS.gold} />
+        <rect x="19" y="4" width="5" height="5" fill={CT_COLORS.gold} />
+        <rect x="10" y="6" width="2" height="2" fill={CT_COLORS.voidDark} />
+        <rect x="21" y="6" width="2" height="2" fill={CT_COLORS.voidDark} />
+        {/* Cape */}
+        <rect x="2" y="14" width="4" height="20" fill={CT_COLORS.medievalGreen} />
+        <rect x="26" y="14" width="4" height="20" fill={CT_COLORS.medievalGreen} />
+        {/* Armor body */}
+        <rect x="6" y="14" width="20" height="16" fill={CT_COLORS.silver} />
+        {/* Gold trim on armor */}
+        <rect x="12" y="16" width="8" height="2" fill={CT_COLORS.gold} />
+        <rect x="14" y="18" width="4" height="8" fill={CT_COLORS.gold} />
+        {/* Legs */}
+        <rect x="8" y="30" width="7" height="10" fill={CT_COLORS.medievalGreen} />
+        <rect x="17" y="30" width="7" height="10" fill={CT_COLORS.medievalGreen} />
+        {/* Masamune sword */}
+        <rect x="0" y="10" width="2" height="24" fill={CT_COLORS.silver} />
+        <rect x="0" y="8" width="2" height="3" fill={CT_COLORS.gold} />
+        <rect x="0" y="6" width="2" height="2" fill={CT_COLORS.portalPurple} />
+      </svg>
+    </div>
+  )
+}
+
+// Epoch Time Machine
+function EpochPixelArt({ size = 100 }: { size?: number }) {
+  const reducedMotion = usePrefersReducedMotion()
+
+  return (
+    <div
+      style={{ imageRendering: 'pixelated' as const }}
+      role="img"
+      aria-label="Epoch time machine"
+    >
+      <svg width={size} height={size * 0.5} viewBox="0 0 100 50">
+        {/* Main body */}
+        <ellipse cx="50" cy="30" rx="45" ry="15" fill={CT_COLORS.futureChrome} />
+        <ellipse cx="50" cy="28" rx="40" ry="12" fill={CT_COLORS.futureChromeLight} />
+        {/* Cockpit dome */}
+        <ellipse cx="50" cy="22" rx="20" ry="15" fill={CT_COLORS.portalBlue} opacity="0.5" />
+        <ellipse cx="50" cy="20" rx="15" ry="10" fill={CT_COLORS.portalBlueBright} opacity="0.4" />
+        {/* Wings */}
+        <polygon points="5,35 25,25 25,35" fill={CT_COLORS.silver} />
+        <polygon points="95,35 75,25 75,35" fill={CT_COLORS.silver} />
+        {/* Engine glow */}
+        <ellipse cx="15" cy="35" rx="8" ry="4" fill={CT_COLORS.portalMagenta}
+          className={!reducedMotion ? 'animate-engine-pulse' : ''} opacity="0.7" />
+        <ellipse cx="85" cy="35" rx="8" ry="4" fill={CT_COLORS.portalMagenta}
+          className={!reducedMotion ? 'animate-engine-pulse' : ''} opacity="0.7" />
+        {/* Lights */}
+        <rect x="30" y="32" width="3" height="3" fill={CT_COLORS.atbGreen} />
+        <rect x="67" y="32" width="3" height="3" fill={CT_COLORS.atbGreen} />
+      </svg>
+    </div>
+  )
+}
+
+// Lavos (Final Boss Motif) - For dramatic elements
+function LavosEye({ size = 80, animate = true }: { size?: number; animate?: boolean }) {
   const reducedMotion = usePrefersReducedMotion()
   const shouldAnimate = animate && !reducedMotion
 
   return (
-    <span
-      className={`inline-block ${shouldAnimate ? 'animate-save-sparkle' : ''}`}
+    <div
       style={{ imageRendering: 'pixelated' as const }}
       role="img"
-      aria-label="Save point"
+      aria-label="Lavos eye decoration"
     >
-      <svg width={size} height={size} viewBox="0 0 8 8">
-        {/* Center cross */}
-        <rect x="3" y="0" width="2" height="8" fill={UNDERTALE_COLORS.justice} />
-        <rect x="0" y="3" width="8" height="2" fill={UNDERTALE_COLORS.justice} />
-        {/* Corner sparkles */}
-        <rect x="2" y="2" width="1" height="1" fill={UNDERTALE_COLORS.bravery} />
-        <rect x="5" y="2" width="1" height="1" fill={UNDERTALE_COLORS.bravery} />
-        <rect x="2" y="5" width="1" height="1" fill={UNDERTALE_COLORS.bravery} />
-        <rect x="5" y="5" width="1" height="1" fill={UNDERTALE_COLORS.bravery} />
+      <svg width={size} height={size} viewBox="0 0 80 80">
+        {/* Outer shell spikes */}
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((angle, i) => {
+          const radian = (angle * Math.PI) / 180
+          const x1 = 40 + Math.cos(radian) * 30
+          const y1 = 40 + Math.sin(radian) * 30
+          const x2 = 40 + Math.cos(radian) * 38
+          const y2 = 40 + Math.sin(radian) * 38
+          return (
+            <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+              stroke={CT_COLORS.lavosPurple} strokeWidth="3" opacity="0.8" />
+          )
+        })}
+        {/* Core eye */}
+        <circle cx="40" cy="40" r="25" fill={CT_COLORS.lavosPurple} />
+        <circle cx="40" cy="40" r="20" fill={CT_COLORS.lavosRed} />
+        <circle cx="40" cy="40" r="12" fill={CT_COLORS.voidDark} />
+        <circle cx="40" cy="40" r="6" fill={CT_COLORS.lavosRed}
+          className={shouldAnimate ? 'animate-lavos-pulse' : ''} />
+        {/* Inner glow */}
+        <circle cx="36" cy="36" r="3" fill={CT_COLORS.white} opacity="0.5" />
       </svg>
+    </div>
+  )
+}
+
+// Era Indicator Badge
+function EraBadge({
+  era,
+  year
+}: {
+  era: 'prehistoric' | 'medieval' | 'present' | 'future' | 'end-of-time'
+  year?: string
+}) {
+  const eraConfig = {
+    prehistoric: { bg: CT_COLORS.prehistoricOrange, text: '65,000,000 BC' },
+    medieval: { bg: CT_COLORS.medievalGreen, text: '600 AD' },
+    present: { bg: CT_COLORS.portalBlue, text: '1000 AD' },
+    future: { bg: CT_COLORS.futureChrome, text: '2300 AD' },
+    'end-of-time': { bg: CT_COLORS.portalPurple, text: 'End of Time' },
+  }
+
+  const config = eraConfig[era]
+
+  return (
+    <span
+      className="inline-flex items-center gap-2 px-3 py-1 text-[10px] tracking-widest"
+      style={{
+        background: config.bg,
+        color: era === 'future' ? CT_COLORS.voidDark : CT_COLORS.white,
+        border: `2px solid ${CT_COLORS.white}`,
+      }}
+      role="img"
+      aria-label={`Era: ${year || config.text}`}
+    >
+      <span style={{ fontSize: '8px' }}>◈</span>
+      {year || config.text}
     </span>
   )
 }
 
-// Pixel Bone Attack
-function PixelBone({
-  height = 48,
-  className = '',
+// ATB Gauge (Active Time Battle)
+function ATBGauge({
+  value = 100,
+  label,
+  showLabel = true,
 }: {
-  height?: number
-  className?: string
+  value?: number
+  label?: string
+  showLabel?: boolean
 }) {
-  const boneWidth = Math.max(8, height / 6)
-  const knobSize = boneWidth * 1.5
+  const getColor = () => {
+    if (value >= 80) return CT_COLORS.atbGreen
+    if (value >= 50) return CT_COLORS.atbYellow
+    return CT_COLORS.atbOrange
+  }
 
   return (
-    <div
-      className={`flex flex-col items-center ${className}`}
-      style={{ imageRendering: 'pixelated' as const }}
-      role="img"
-      aria-label="Bone decoration"
-    >
-      <svg width={knobSize * 2} height={height} viewBox={`0 0 ${knobSize * 2} ${height}`}>
-        {/* Top knobs */}
-        <rect x={knobSize / 2 - 2} y={0} width={4} height={4} fill={UNDERTALE_COLORS.white} />
-        <rect x={knobSize + knobSize / 2 - 2} y={0} width={4} height={4} fill={UNDERTALE_COLORS.white} />
-        <rect x={knobSize / 2} y={4} width={knobSize} height={4} fill={UNDERTALE_COLORS.white} />
-        {/* Shaft */}
-        <rect x={knobSize - 2} y={8} width={4} height={height - 16} fill={UNDERTALE_COLORS.white} />
-        {/* Bottom knobs */}
-        <rect x={knobSize / 2} y={height - 8} width={knobSize} height={4} fill={UNDERTALE_COLORS.white} />
-        <rect x={knobSize / 2 - 2} y={height - 4} width={4} height={4} fill={UNDERTALE_COLORS.white} />
-        <rect x={knobSize + knobSize / 2 - 2} y={height - 4} width={4} height={4} fill={UNDERTALE_COLORS.white} />
-      </svg>
-    </div>
-  )
-}
-
-// Flowey Pixel Art
-function FloweyPixelArt({
-  size = 64,
-  expression = 'neutral',
-}: {
-  size?: number
-  expression?: 'neutral' | 'evil' | 'friendly'
-}) {
-  return (
-    <div
-      style={{ imageRendering: 'pixelated' as const }}
-      role="img"
-      aria-label="Flowey the flower"
-    >
-      <svg width={size} height={size * 1.2} viewBox="0 0 32 40">
-        {/* Stem */}
-        <rect x="14" y="20" width="4" height="18" fill="#00AA00" />
-        <rect x="10" y="28" width="4" height="4" fill="#00AA00" />
-        <rect x="18" y="32" width="4" height="4" fill="#00AA00" />
-        {/* Petals */}
-        <rect x="6" y="4" width="6" height="6" fill={UNDERTALE_COLORS.floweyYellow} />
-        <rect x="20" y="4" width="6" height="6" fill={UNDERTALE_COLORS.floweyYellow} />
-        <rect x="2" y="10" width="6" height="6" fill={UNDERTALE_COLORS.floweyYellow} />
-        <rect x="24" y="10" width="6" height="6" fill={UNDERTALE_COLORS.floweyYellow} />
-        <rect x="6" y="16" width="6" height="6" fill={UNDERTALE_COLORS.floweyYellow} />
-        <rect x="20" y="16" width="6" height="6" fill={UNDERTALE_COLORS.floweyYellow} />
-        {/* Face center */}
-        <rect x="10" y="8" width="12" height="14" fill={UNDERTALE_COLORS.floweyYellow} />
-        {/* Eyes */}
-        {expression === 'evil' ? (
-          <>
-            <rect x="12" y="10" width="2" height="4" fill={UNDERTALE_COLORS.void} />
-            <rect x="18" y="10" width="2" height="4" fill={UNDERTALE_COLORS.void} />
-            <rect x="11" y="11" width="1" height="2" fill={UNDERTALE_COLORS.determination} />
-            <rect x="20" y="11" width="1" height="2" fill={UNDERTALE_COLORS.determination} />
-          </>
-        ) : (
-          <>
-            <rect x="12" y="11" width="2" height="2" fill={UNDERTALE_COLORS.void} />
-            <rect x="18" y="11" width="2" height="2" fill={UNDERTALE_COLORS.void} />
-          </>
-        )}
-        {/* Mouth */}
-        {expression === 'evil' ? (
-          <>
-            <rect x="13" y="16" width="6" height="2" fill={UNDERTALE_COLORS.void} />
-            <rect x="12" y="15" width="2" height="1" fill={UNDERTALE_COLORS.void} />
-            <rect x="18" y="15" width="2" height="1" fill={UNDERTALE_COLORS.void} />
-          </>
-        ) : (
-          <>
-            <rect x="14" y="16" width="1" height="2" fill={UNDERTALE_COLORS.void} />
-            <rect x="17" y="16" width="1" height="2" fill={UNDERTALE_COLORS.void} />
-            <rect x="15" y="17" width="2" height="1" fill={UNDERTALE_COLORS.void} />
-          </>
-        )}
-      </svg>
-    </div>
-  )
-}
-
-// Sans Pixel Silhouette
-function SansPixelArt({ size = 48 }: { size?: number }) {
-  const reducedMotion = usePrefersReducedMotion()
-
-  return (
-    <div
-      style={{ imageRendering: 'pixelated' as const }}
-      role="img"
-      aria-label="Sans"
-    >
-      <svg width={size} height={size * 1.5} viewBox="0 0 24 36">
-        {/* Skull */}
-        <rect x="4" y="0" width="16" height="14" fill={UNDERTALE_COLORS.white} />
-        {/* Eye sockets */}
-        <rect x="6" y="4" width="4" height="4" fill={UNDERTALE_COLORS.void} />
-        <rect x="14" y="4" width="4" height="4" fill={UNDERTALE_COLORS.void} />
-        {/* Left eye glow */}
-        <rect
-          x="7"
-          y="5"
-          width="2"
-          height="2"
-          fill={UNDERTALE_COLORS.sansBlueEye}
-          className={!reducedMotion ? 'animate-sans-eye' : ''}
+    <div className="flex items-center gap-2">
+      {showLabel && label && (
+        <span className="text-[9px] text-white/80 w-16 truncate">{label}</span>
+      )}
+      <div
+        className="flex-1 h-3 relative overflow-hidden"
+        style={{
+          background: CT_COLORS.voidDark,
+          border: `1px solid ${CT_COLORS.silver}`,
+        }}
+        role="progressbar"
+        aria-valuenow={value}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={label || 'ATB gauge'}
+      >
+        <div
+          className="h-full transition-all duration-300"
+          style={{
+            width: `${value}%`,
+            background: `linear-gradient(90deg, ${getColor()}, ${getColor()}88)`,
+            boxShadow: `0 0 8px ${getColor()}`,
+          }}
         />
-        {/* Nose */}
-        <rect x="10" y="8" width="4" height="2" fill={UNDERTALE_COLORS.void} />
-        {/* Grin */}
-        <rect x="6" y="10" width="12" height="3" fill={UNDERTALE_COLORS.void} />
-        <rect x="7" y="10" width="2" height="2" fill={UNDERTALE_COLORS.white} />
-        <rect x="11" y="10" width="2" height="2" fill={UNDERTALE_COLORS.white} />
-        <rect x="15" y="10" width="2" height="2" fill={UNDERTALE_COLORS.white} />
-        {/* Hoodie */}
-        <rect x="2" y="14" width="20" height="18" fill="#3355FF" />
-        {/* Hood shadow */}
-        <rect x="4" y="14" width="16" height="2" fill="#2244CC" />
-        {/* Zipper */}
-        <rect x="10" y="18" width="4" height="12" fill={UNDERTALE_COLORS.white} />
-        {/* Hands in pockets */}
-        <rect x="4" y="26" width="4" height="4" fill={UNDERTALE_COLORS.white} />
-        <rect x="16" y="26" width="4" height="4" fill={UNDERTALE_COLORS.white} />
-      </svg>
-    </div>
-  )
-}
-
-// Papyrus Pixel Silhouette
-function PapyrusPixelArt({ size = 48 }: { size?: number }) {
-  return (
-    <div
-      style={{ imageRendering: 'pixelated' as const }}
-      role="img"
-      aria-label="Papyrus"
-    >
-      <svg width={size} height={size * 1.8} viewBox="0 0 24 44">
-        {/* Skull (taller) */}
-        <rect x="6" y="0" width="12" height="12" fill={UNDERTALE_COLORS.white} />
-        {/* Eye sockets (tall) */}
-        <rect x="7" y="2" width="3" height="4" fill={UNDERTALE_COLORS.void} />
-        <rect x="14" y="2" width="3" height="4" fill={UNDERTALE_COLORS.void} />
-        {/* Orange glow in eye */}
-        <rect x="14" y="3" width="2" height="2" fill={UNDERTALE_COLORS.papyrusOrange} />
-        {/* Nose */}
-        <rect x="10" y="6" width="4" height="2" fill={UNDERTALE_COLORS.void} />
-        {/* Mouth */}
-        <rect x="8" y="8" width="8" height="3" fill={UNDERTALE_COLORS.void} />
-        {/* Battle body */}
-        <rect x="4" y="12" width="16" height="20" fill={UNDERTALE_COLORS.white} />
-        {/* Orange chest details */}
-        <rect x="8" y="16" width="8" height="2" fill={UNDERTALE_COLORS.papyrusOrange} />
-        <rect x="8" y="20" width="8" height="2" fill={UNDERTALE_COLORS.papyrusOrange} />
-        {/* Red scarf */}
-        <rect x="0" y="12" width="4" height="16" fill={UNDERTALE_COLORS.determination} />
-        <rect x="20" y="12" width="4" height="10" fill={UNDERTALE_COLORS.determination} />
-        {/* Boots */}
-        <rect x="6" y="32" width="4" height="12" fill={UNDERTALE_COLORS.papyrusOrange} />
-        <rect x="14" y="32" width="4" height="12" fill={UNDERTALE_COLORS.papyrusOrange} />
-      </svg>
-    </div>
-  )
-}
-
-// Soul Collection Display
-function SoulCollection() {
-  const souls = [
-    { color: UNDERTALE_COLORS.patience, trait: 'Patience', delay: '0s' },
-    { color: UNDERTALE_COLORS.bravery, trait: 'Bravery', delay: '0.2s' },
-    { color: UNDERTALE_COLORS.integrity, trait: 'Integrity', delay: '0.4s' },
-    { color: UNDERTALE_COLORS.perseverance, trait: 'Perseverance', delay: '0.6s' },
-    { color: UNDERTALE_COLORS.kindness, trait: 'Kindness', delay: '0.8s' },
-    { color: UNDERTALE_COLORS.justice, trait: 'Justice', delay: '1s' },
-  ]
-
-  return (
-    <div className="py-8 border-t-4 border-b-4 border-white/20 my-8">
-      <p className="text-center text-xs text-white/60 mb-6 tracking-widest">
-        * The human SOULS...
-      </p>
-      <div className="flex justify-center items-center gap-6 flex-wrap">
-        {souls.map((soul) => (
-          <div key={soul.trait} className="text-center">
-            <PixelHeart size={32} color={soul.color} />
-            <p
-              className="text-[8px] mt-2 tracking-wider"
-              style={{ color: soul.color }}
-            >
-              {soul.trait.toUpperCase()}
-            </p>
-          </div>
-        ))}
-      </div>
-      <div className="text-center mt-6">
-        <PixelHeart size={40} color={UNDERTALE_COLORS.determination} />
-        <p className="text-xs mt-2 text-red-500 tracking-widest animate-determination-glow">
-          DETERMINATION
-        </p>
+        {/* Pixel grid overlay */}
+        <div
+          className="absolute inset-0 opacity-30"
+          style={{
+            background: 'repeating-linear-gradient(90deg, transparent 0px, transparent 3px, rgba(0,0,0,0.3) 3px, rgba(0,0,0,0.3) 4px)',
+          }}
+          aria-hidden="true"
+        />
       </div>
     </div>
   )
 }
 
-// Bone Attack Pattern Decoration
-function BoneAttackSection() {
-  return (
-    <div className="py-6 border-t-2 border-b-2 border-white/10 my-6 overflow-hidden">
-      <div className="flex justify-center items-end gap-3 opacity-30">
-        <PixelBone height={24} />
-        <PixelBone height={40} />
-        <PixelBone height={56} />
-        <PixelBone height={72} />
-        <PixelBone height={56} />
-        <PixelBone height={40} />
-        <PixelBone height={24} />
-      </div>
-      <p className="text-center text-[8px] text-white/40 mt-4 tracking-widest">
-        * Papyrus is preparing a bone attack...
-      </p>
-    </div>
-  )
-}
+// =============================================================================
+// ART SECTIONS - CHRONO TRIGGER THEMED
+// =============================================================================
 
-// Character Gallery Section
-function CharacterGallery() {
+// Character Party Display
+function CharacterParty() {
   return (
-    <div className="py-8 border-t-4 border-b-4 border-white/20 my-8">
-      <p className="text-center text-xs text-white/60 mb-8 tracking-widest">
-        * You encountered some familiar faces...
+    <div className="py-10 border-t-4 border-b-4 my-8" style={{ borderColor: CT_COLORS.portalBlue + '40' }}>
+      <p className="text-center text-xs mb-8 tracking-widest" style={{ color: CT_COLORS.portalMagenta }}>
+        ◈ The party gathers through time... ◈
       </p>
       <div className="flex justify-center items-end gap-12 flex-wrap">
         <div className="text-center">
-          <FloweyPixelArt size={48} expression="neutral" />
-          <p className="text-[8px] mt-3 text-yellow-400 tracking-wider">FLOWEY</p>
-          <p className="text-[6px] text-white/40 mt-1">In this world...</p>
+          <CronoPixelArt size={48} />
+          <p className="text-[10px] mt-3 tracking-wider" style={{ color: CT_COLORS.cronoOrange }}>CRONO</p>
+          <p className="text-[8px] mt-1" style={{ color: CT_COLORS.silver }}>Leader</p>
         </div>
         <div className="text-center">
-          <SansPixelArt size={40} />
-          <p className="text-[8px] mt-3 text-cyan-400 tracking-wider">SANS</p>
-          <p className="text-[6px] text-white/40 mt-1">*wink*</p>
+          <MarlePixelArt size={48} />
+          <p className="text-[10px] mt-3 tracking-wider" style={{ color: CT_COLORS.marleBlue }}>MARLE</p>
+          <p className="text-[8px] mt-1" style={{ color: CT_COLORS.silver }}>Princess</p>
         </div>
         <div className="text-center">
-          <PapyrusPixelArt size={40} />
-          <p className="text-[8px] mt-3 text-orange-400 tracking-wider">PAPYRUS</p>
-          <p className="text-[6px] text-white/40 mt-1">NYEH HEH HEH!</p>
+          <FrogPixelArt size={48} />
+          <p className="text-[10px] mt-3 tracking-wider" style={{ color: CT_COLORS.frogGreen }}>FROG</p>
+          <p className="text-[8px] mt-1" style={{ color: CT_COLORS.silver }}>Knight</p>
         </div>
+      </div>
+      <div className="flex justify-center mt-8">
+        <EpochPixelArt size={120} />
+      </div>
+      <p className="text-center text-[9px] mt-4 tracking-wider" style={{ color: CT_COLORS.futureChrome }}>
+        EPOCH - Wings of Time
+      </p>
+    </div>
+  )
+}
+
+// Time Portal Gateway Section
+function TimePortalGateway() {
+  return (
+    <div className="py-12 border-t-4 border-b-4 my-8 relative overflow-hidden"
+      style={{ borderColor: CT_COLORS.portalPurple + '40' }}>
+      {/* Background time distortion */}
+      <div className="absolute inset-0 opacity-10"
+        style={{
+          background: `radial-gradient(ellipse at center, ${CT_COLORS.portalBlue} 0%, transparent 70%)`,
+        }}
+        aria-hidden="true"
+      />
+
+      <p className="text-center text-xs mb-8 tracking-widest relative z-10" style={{ color: CT_COLORS.portalBlueBright }}>
+        ◈ A Gate to another era opens... ◈
+      </p>
+
+      <div className="flex justify-center items-center gap-8 flex-wrap relative z-10">
+        <TimePortal size={100} />
+        <div className="text-center max-w-xs">
+          <p className="text-sm mb-4" style={{ color: CT_COLORS.white }}>
+            The flow of time is not constant...
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            <EraBadge era="prehistoric" />
+            <EraBadge era="medieval" />
+            <EraBadge era="present" />
+            <EraBadge era="future" />
+          </div>
+        </div>
+        <TimePortal size={100} />
+      </div>
+    </div>
+  )
+}
+
+// Lavos Dramatic Section
+function LavosDramaticSection() {
+  return (
+    <div className="py-10 border-t-4 border-b-4 my-8 relative"
+      style={{
+        borderColor: CT_COLORS.lavosRed + '60',
+        background: `linear-gradient(180deg, ${CT_COLORS.voidDark} 0%, ${CT_COLORS.lavosPurple}20 50%, ${CT_COLORS.voidDark} 100%)`,
+      }}>
+      <p className="text-center text-xs mb-6 tracking-widest" style={{ color: CT_COLORS.lavosRed }}>
+        ◈ The Day of Lavos approaches... ◈
+      </p>
+      <div className="flex justify-center items-center gap-8">
+        <LavosEye size={60} />
+        <div className="text-center">
+          <p className="text-sm tracking-widest animate-lavos-text" style={{ color: CT_COLORS.red }}>
+            1999 AD
+          </p>
+          <p className="text-[10px] mt-2" style={{ color: CT_COLORS.silver }}>
+            &ldquo;But...the future refused to change.&rdquo;
+          </p>
+        </div>
+        <LavosEye size={60} />
       </div>
     </div>
   )
@@ -417,103 +515,68 @@ function CharacterGallery() {
 // UI COMPONENTS
 // =============================================================================
 
-// Battle Box Frame (Undertale signature UI)
-function BattleBox({
+// Battle Menu Frame (CT signature UI)
+function BattleFrame({
   children,
   title,
-  borderColor = UNDERTALE_COLORS.white,
-  accentColor = UNDERTALE_COLORS.determination,
+  era = 'present',
 }: {
   children: React.ReactNode
   title?: string
-  borderColor?: string
-  accentColor?: string
+  era?: 'prehistoric' | 'medieval' | 'present' | 'future' | 'end-of-time'
 }) {
+  const eraColors = {
+    prehistoric: CT_COLORS.prehistoricOrange,
+    medieval: CT_COLORS.medievalGreen,
+    present: CT_COLORS.portalBlue,
+    future: CT_COLORS.futureChrome,
+    'end-of-time': CT_COLORS.portalPurple,
+  }
+
+  const accentColor = eraColors[era]
+
   return (
     <section
       className="relative mb-8"
       style={{
-        border: `4px solid ${borderColor}`,
-        background: UNDERTALE_COLORS.void,
+        border: `3px solid ${CT_COLORS.white}`,
+        background: `linear-gradient(180deg, ${CT_COLORS.voidDark} 0%, ${CT_COLORS.voidMid} 100%)`,
+        boxShadow: `0 0 20px ${accentColor}40, inset 0 0 40px ${CT_COLORS.voidDark}`,
         imageRendering: 'pixelated' as const,
       }}
       role="region"
       aria-label={title || 'Content section'}
     >
-      {/* Red corner accents (determination) */}
-      <div
-        className="absolute top-0 left-0 w-3 h-3"
-        style={{ background: accentColor }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-0 right-0 w-3 h-3"
-        style={{ background: accentColor }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-0 left-0 w-3 h-3"
-        style={{ background: accentColor }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute bottom-0 right-0 w-3 h-3"
-        style={{ background: accentColor }}
-        aria-hidden="true"
-      />
+      {/* Corner accents */}
+      <div className="absolute top-0 left-0 w-4 h-4" style={{ background: accentColor }} aria-hidden="true" />
+      <div className="absolute top-0 right-0 w-4 h-4" style={{ background: accentColor }} aria-hidden="true" />
+      <div className="absolute bottom-0 left-0 w-4 h-4" style={{ background: accentColor }} aria-hidden="true" />
+      <div className="absolute bottom-0 right-0 w-4 h-4" style={{ background: accentColor }} aria-hidden="true" />
+
+      {/* Side bars */}
+      <div className="absolute top-4 bottom-4 left-0 w-1" style={{ background: accentColor + '60' }} aria-hidden="true" />
+      <div className="absolute top-4 bottom-4 right-0 w-1" style={{ background: accentColor + '60' }} aria-hidden="true" />
 
       {title && (
         <div
-          className="px-4 py-3 border-b-4 flex items-center gap-3"
-          style={{ borderColor }}
+          className="px-5 py-3 border-b-2 flex items-center gap-3"
+          style={{ borderColor: CT_COLORS.white + '40' }}
         >
-          <PixelHeart size={12} color={accentColor} animate={false} />
-          <h2 className="text-xs tracking-widest" style={{ color: borderColor }}>
+          <span style={{ color: accentColor }}>◈</span>
+          <h2 className="text-xs tracking-[0.2em]" style={{ color: CT_COLORS.white }}>
             {title}
           </h2>
+          <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${accentColor}60, transparent)` }} />
         </div>
       )}
 
-      <div className="p-4">{children}</div>
+      <div className="p-5">{children}</div>
     </section>
   )
 }
 
-// Determination Text (red glow)
-function DeterminationText({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <span
-      className={`text-red-500 ${className}`}
-      style={{
-        textShadow: `0 0 8px ${UNDERTALE_COLORS.determination}, 0 0 16px ${UNDERTALE_COLORS.determinationDark}`,
-      }}
-    >
-      {children}
-    </span>
-  )
-}
-
-// "But it refused" Moment
-function DeterminationMoment({ text }: { text: string }) {
-  return (
-    <div className="text-center py-6" role="img" aria-label="Determination moment">
-      <p className="text-white/60 text-xs mb-3">* {text}</p>
-      <p className="text-sm tracking-widest">
-        <DeterminationText>But it refused.</DeterminationText>
-      </p>
-      <PixelHeart size={32} color={UNDERTALE_COLORS.determination} className="mx-auto mt-4" />
-    </div>
-  )
-}
-
-// Battle Menu Button (FIGHT/ACT/ITEM/MERCY style)
-function BattleMenuButton({
+// Menu Command Button (FIGHT/TECH/ITEM style)
+function MenuCommandButton({
   label,
   isSelected,
   onClick,
@@ -527,18 +590,20 @@ function BattleMenuButton({
   return (
     <button
       onClick={onClick}
-      className="relative px-6 py-3 text-xs tracking-widest font-bold transition-all flex items-center gap-2"
+      className="relative px-6 py-3 text-xs tracking-[0.15em] font-bold transition-all flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2"
       style={{
-        background: isSelected ? color : UNDERTALE_COLORS.void,
-        border: `4px solid ${color}`,
-        color: isSelected ? UNDERTALE_COLORS.void : color,
-        boxShadow: isSelected ? `0 0 20px ${color}80` : 'none',
+        background: isSelected
+          ? `linear-gradient(180deg, ${color} 0%, ${color}AA 100%)`
+          : CT_COLORS.voidDark,
+        border: `3px solid ${color}`,
+        color: isSelected ? CT_COLORS.voidDark : color,
+        boxShadow: isSelected ? `0 0 20px ${color}80, inset 0 0 10px ${CT_COLORS.white}40` : 'none',
         imageRendering: 'pixelated' as const,
       }}
       aria-pressed={isSelected}
     >
       {isSelected && (
-        <PixelHeart size={12} color={UNDERTALE_COLORS.determination} animate={false} />
+        <span style={{ fontSize: '8px' }}>▶</span>
       )}
       {label}
     </button>
@@ -553,16 +618,25 @@ function BattleMenuButton({
 function RoleCard({ role }: { role: (typeof CURRENT_ROLES)[0] }) {
   return (
     <div
-      className="flex items-start gap-3 p-4 border-2 border-yellow-400/50 hover:border-yellow-400 hover:bg-yellow-400/5 transition-all"
+      className="flex items-start gap-3 p-4 transition-all hover:bg-white/5"
+      style={{
+        border: `2px solid ${CT_COLORS.gold}50`,
+        background: `linear-gradient(90deg, ${CT_COLORS.voidDark} 0%, transparent 100%)`,
+      }}
       role="listitem"
     >
-      <PixelHeart size={14} color={UNDERTALE_COLORS.determination} animate={false} />
-      <div>
-        <p className="text-white text-xs tracking-wide">
-          {role.title} @ <span className="text-cyan-400">{role.company}</span>
+      <span style={{ color: CT_COLORS.gold, fontSize: '10px' }}>◈</span>
+      <div className="flex-1">
+        <p className="text-xs tracking-wide" style={{ color: CT_COLORS.white }}>
+          {role.title} @ <span style={{ color: CT_COLORS.marleBlue }}>{role.company}</span>
         </p>
-        <p className="text-[9px] text-white/60 mt-1 leading-relaxed">{role.description}</p>
+        <p className="text-[10px] mt-2 leading-relaxed" style={{ color: CT_COLORS.silver }}>
+          {role.description}
+        </p>
       </div>
+      {role.type === 'leadership' && (
+        <EraBadge era="future" year="CTO" />
+      )}
     </div>
   )
 }
@@ -574,31 +648,60 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
 
   return (
     <article
-      className="p-4 border-2 border-white/30 hover:border-orange-400 hover:bg-orange-400/5 transition-all"
+      className="p-4 transition-all hover:bg-white/5"
+      style={{
+        border: `2px solid ${CT_COLORS.portalBlue}40`,
+        background: `linear-gradient(180deg, ${CT_COLORS.voidMid}40 0%, ${CT_COLORS.voidDark} 100%)`,
+      }}
       aria-label={`${entry.title} at ${entry.organization}`}
     >
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start mb-3">
         <div>
-          <h4 className="text-xs tracking-wide text-white flex items-center gap-2">
-            <PixelHeart size={10} color={UNDERTALE_COLORS.bravery} animate={false} />
+          <h4 className="text-xs tracking-wide flex items-center gap-2" style={{ color: CT_COLORS.white }}>
+            <span style={{ color: CT_COLORS.medievalGreen }}>▸</span>
             {entry.title}
           </h4>
-          <p className="text-sm text-yellow-400 mt-1">@ {entry.organization}</p>
+          <p className="text-sm mt-1" style={{ color: CT_COLORS.gold }}>
+            @ {entry.organization}
+          </p>
         </div>
-        <span className="text-sm text-white/50 tabular-nums tracking-wider">
+        <span className="text-[10px] tabular-nums tracking-wider px-2 py-1"
+          style={{
+            color: CT_COLORS.futureChrome,
+            background: CT_COLORS.voidDark,
+            border: `1px solid ${CT_COLORS.futureChrome}40`,
+          }}>
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-[9px] text-white/70 mb-3 leading-relaxed">{entry.description}</p>
+      <p className="text-[10px] mb-3 leading-relaxed" style={{ color: CT_COLORS.silver }}>
+        {entry.description}
+      </p>
       {entry.highlights && entry.highlights.length > 0 && (
         <ul className="space-y-2" aria-label="Key achievements">
           {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-[9px] text-cyan-400 flex items-start gap-2">
-              <SaveStar size={10} animate={false} />
+            <li key={i} className="text-[10px] flex items-start gap-2" style={{ color: CT_COLORS.atbGreen }}>
+              <span style={{ color: CT_COLORS.portalMagenta }}>◇</span>
               <span>{highlight}</span>
             </li>
           ))}
         </ul>
+      )}
+      {entry.skills && entry.skills.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-3">
+          {entry.skills.slice(0, 5).map((skill) => (
+            <span
+              key={skill}
+              className="text-[8px] px-2 py-1"
+              style={{
+                color: CT_COLORS.portalBlueBright,
+                border: `1px solid ${CT_COLORS.portalBlue}40`,
+              }}
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
       )}
     </article>
   )
@@ -611,20 +714,31 @@ function ProjectCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
 
   const content = (
     <article
-      className="p-4 border-2 border-white hover:bg-red-600 hover:border-red-500 transition-all group"
+      className="p-4 transition-all group"
+      style={{
+        border: `2px solid ${CT_COLORS.white}`,
+        background: CT_COLORS.voidDark,
+      }}
       aria-label={`${project.name}: ${project.tagline}`}
     >
       <div className="flex justify-between items-start mb-2">
-        <span className="text-xs text-white flex items-center gap-2 tracking-wide group-hover:text-white">
-          <PixelHeart size={10} color={UNDERTALE_COLORS.determination} animate={false} />
+        <span className="text-xs flex items-center gap-2 tracking-wide group-hover:text-white"
+          style={{ color: CT_COLORS.white }}>
+          <span style={{ color: CT_COLORS.cronoOrange }}>◈</span>
           {project.name}
         </span>
-        {project.featured && <SaveStar size={14} />}
+        {project.featured && (
+          <span className="text-[8px] px-2 py-1" style={{ background: CT_COLORS.gold, color: CT_COLORS.voidDark }}>
+            FEATURED
+          </span>
+        )}
       </div>
-      <p className="text-sm text-white/60 group-hover:text-white/80 mb-2">{project.tagline}</p>
+      <p className="text-[11px] mb-2" style={{ color: CT_COLORS.silver }}>
+        {project.tagline}
+      </p>
       {project.impact && (
-        <p className="text-sm text-cyan-400 group-hover:text-cyan-200 flex items-start gap-2 mb-3">
-          <span className="text-yellow-400">*</span>
+        <p className="text-[10px] flex items-start gap-2 mb-3" style={{ color: CT_COLORS.atbGreen }}>
+          <span style={{ color: CT_COLORS.gold }}>★</span>
           {project.impact}
         </p>
       )}
@@ -632,7 +746,11 @@ function ProjectCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
         {project.techStack.slice(0, 4).map((tech) => (
           <span
             key={tech}
-            className="text-[7px] px-2 py-1 border border-white/30 text-white/60 group-hover:border-white/50 group-hover:text-white/80"
+            className="text-[8px] px-2 py-1"
+            style={{
+              border: `1px solid ${CT_COLORS.portalBlue}60`,
+              color: CT_COLORS.portalBlueBright,
+            }}
           >
             {tech}
           </span>
@@ -641,15 +759,18 @@ function ProjectCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
     </article>
   )
 
+  const linkClass = "block hover:scale-[1.02] transition-transform focus:outline-none focus:ring-2 focus:ring-offset-2"
+
   if (isExternal) {
     return (
-      <a href={linkHref} target="_blank" rel="noopener noreferrer" className="block">
+      <a href={linkHref} target="_blank" rel="noopener noreferrer" className={linkClass}
+        style={{ '--tw-ring-color': CT_COLORS.portalBlue } as React.CSSProperties}>
         {content}
       </a>
     )
   }
   return (
-    <Link href={linkHref} className="block">
+    <Link href={linkHref} className={linkClass}>
       {content}
     </Link>
   )
@@ -662,28 +783,37 @@ function CompanyCard({ company }: { company: (typeof COMPANIES)[0] }) {
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 border-2 border-cyan-400 hover:bg-cyan-400 hover:text-black transition-all group"
+      className="block p-4 transition-all group hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2"
+      style={{
+        border: `2px solid ${CT_COLORS.futureChrome}`,
+        background: `linear-gradient(180deg, ${CT_COLORS.voidMid} 0%, ${CT_COLORS.voidDark} 100%)`,
+        '--tw-ring-color': CT_COLORS.futureChrome,
+      } as React.CSSProperties}
       aria-label={`${company.name}: ${company.tagline}`}
     >
       <div className="flex items-start gap-3 mb-2">
         <span className="text-xl" aria-hidden="true">{company.icon}</span>
         <div>
-          <h4 className="text-xs tracking-wide text-white group-hover:text-black">
+          <h4 className="text-xs tracking-wide" style={{ color: CT_COLORS.white }}>
             {company.name}
           </h4>
-          <p className="text-sm text-yellow-400 group-hover:text-yellow-600 mt-1">
+          <p className="text-[11px] mt-1" style={{ color: CT_COLORS.gold }}>
             {company.tagline}
           </p>
         </div>
       </div>
-      <p className="text-[9px] text-white/70 group-hover:text-black/70 mb-3">
-        * {company.description}
+      <p className="text-[10px] mb-3" style={{ color: CT_COLORS.silver }}>
+        ◇ {company.description}
       </p>
       <div className="flex flex-wrap gap-1">
         {company.services.slice(0, 2).map((service) => (
           <span
             key={service}
-            className="text-[7px] px-2 py-1 border border-cyan-400/50 text-cyan-400 group-hover:border-black/50 group-hover:text-black"
+            className="text-[8px] px-2 py-1"
+            style={{
+              border: `1px solid ${CT_COLORS.futureChrome}50`,
+              color: CT_COLORS.futureChrome,
+            }}
           >
             {service}
           </span>
@@ -697,26 +827,36 @@ function CompanyCard({ company }: { company: (typeof COMPANIES)[0] }) {
 function BandCard({ band }: { band: (typeof BANDS)[0] }) {
   const content = (
     <article
-      className="p-4 border-2 border-purple-500 hover:bg-purple-500/20 transition-all"
+      className="p-4 transition-all"
+      style={{
+        border: `2px solid ${CT_COLORS.portalPurple}`,
+        background: `linear-gradient(180deg, ${CT_COLORS.lavosPurple}20 0%, ${CT_COLORS.voidDark} 100%)`,
+      }}
       aria-label={`${band.name}: ${band.genre}`}
     >
-      <h4 className="text-xs tracking-wide text-white flex items-center gap-2">
-        <PixelHeart size={10} color={UNDERTALE_COLORS.perseverance} animate={false} />
-        {band.name} appears!
+      <h4 className="text-xs tracking-wide flex items-center gap-2" style={{ color: CT_COLORS.white }}>
+        <span style={{ color: CT_COLORS.portalMagenta }}>♫</span>
+        {band.name}
       </h4>
-      <p className="text-sm text-purple-400 mt-2">
+      <p className="text-[11px] mt-2" style={{ color: CT_COLORS.portalMagenta }}>
         {band.genre} | {band.role}
       </p>
-      <p className="text-[9px] text-white/70 mt-2">{band.description}</p>
+      <p className="text-[10px] mt-2" style={{ color: CT_COLORS.silver }}>
+        {band.description}
+      </p>
       {!band.url && (
-        <p className="text-sm text-yellow-400 mt-3 italic">* Website coming soon...</p>
+        <p className="text-[10px] mt-3 italic" style={{ color: CT_COLORS.gold }}>
+          ◇ Website coming soon...
+        </p>
       )}
     </article>
   )
 
   if (band.url) {
     return (
-      <a href={band.url} target="_blank" rel="noopener noreferrer" className="block">
+      <a href={band.url} target="_blank" rel="noopener noreferrer"
+        className="block hover:scale-[1.02] transition-transform focus:outline-none focus:ring-2"
+        style={{ '--tw-ring-color': CT_COLORS.portalPurple } as React.CSSProperties}>
         {content}
       </a>
     )
@@ -730,7 +870,7 @@ function TechInventory({ categories }: { categories: ReturnType<typeof getEngine
     <div className="space-y-6" role="list" aria-label="Tech stack">
       {categories.map((category) => (
         <div key={category.name} role="listitem">
-          <p className="text-cyan-400 text-xs mb-3 flex items-center gap-2 tracking-widest">
+          <p className="text-xs mb-3 flex items-center gap-2 tracking-widest" style={{ color: CT_COLORS.futureChrome }}>
             <span>{category.icon}</span>
             {category.name.toUpperCase()}
           </p>
@@ -738,9 +878,13 @@ function TechInventory({ categories }: { categories: ReturnType<typeof getEngine
             {category.items.map((tech) => (
               <span
                 key={tech}
-                className="text-[9px] px-3 py-2 border border-white/40 text-white hover:bg-white hover:text-black transition-all cursor-default flex items-center gap-2"
+                className="text-[10px] px-3 py-2 flex items-center gap-2 transition-colors hover:bg-white/10"
+                style={{
+                  border: `1px solid ${CT_COLORS.portalBlue}60`,
+                  color: CT_COLORS.white,
+                }}
               >
-                <PixelHeart size={6} color={UNDERTALE_COLORS.determination} animate={false} />
+                <span style={{ color: CT_COLORS.atbGreen, fontSize: '6px' }}>●</span>
                 {tech}
               </span>
             ))}
@@ -757,7 +901,7 @@ function SkillsDisplay({ categories }: { categories: ReturnType<typeof getSkills
     <div className="grid md:grid-cols-3 gap-6" role="list" aria-label="Skills">
       {categories.map((category) => (
         <div key={category.name} role="listitem">
-          <p className="text-cyan-400 text-xs mb-3 flex items-center gap-2 tracking-widest">
+          <p className="text-xs mb-3 flex items-center gap-2 tracking-widest" style={{ color: CT_COLORS.medievalGreen }}>
             <span>{category.icon}</span>
             {category.name.toUpperCase()}
           </p>
@@ -765,9 +909,10 @@ function SkillsDisplay({ categories }: { categories: ReturnType<typeof getSkills
             {category.skills.map((skill) => (
               <li
                 key={skill.name}
-                className="text-[9px] text-white flex items-center gap-2"
+                className="text-[10px] flex items-center gap-2"
+                style={{ color: CT_COLORS.white }}
               >
-                <PixelHeart size={6} color={UNDERTALE_COLORS.determination} animate={false} />
+                <span style={{ color: CT_COLORS.portalMagenta, fontSize: '6px' }}>◆</span>
                 {skill.name}
               </li>
             ))}
@@ -806,16 +951,16 @@ export default function RetroRPGTheme() {
   if (!mounted) return null
 
   const professionOptions = [
-    { id: 'engineer' as const, label: 'ENGINEER', color: UNDERTALE_COLORS.patience },
-    { id: 'drummer' as const, label: 'MUSICIAN', color: UNDERTALE_COLORS.perseverance },
-    { id: 'fighter' as const, label: 'FIGHTER', color: UNDERTALE_COLORS.bravery },
+    { id: 'engineer' as const, label: 'ENGINEER', color: CT_COLORS.portalBlue },
+    { id: 'drummer' as const, label: 'MUSICIAN', color: CT_COLORS.portalPurple },
+    { id: 'fighter' as const, label: 'FIGHTER', color: CT_COLORS.prehistoricOrange },
   ]
 
   return (
     <div
       className="min-h-screen relative text-white"
       style={{
-        background: UNDERTALE_COLORS.void,
+        background: `linear-gradient(180deg, ${CT_COLORS.voidDark} 0%, ${CT_COLORS.voidMid} 50%, ${CT_COLORS.voidDark} 100%)`,
         fontFamily: '"Press Start 2P", "Courier New", monospace',
         imageRendering: 'pixelated' as const,
       }}
@@ -823,56 +968,52 @@ export default function RetroRPGTheme() {
       {/* Skip to main content */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-yellow-400 focus:text-black focus:px-4 focus:py-2"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2"
+        style={{ background: CT_COLORS.gold, color: CT_COLORS.voidDark }}
       >
         Skip to main content
       </a>
 
       {/* CRT Scanlines */}
       <div
-        className="fixed inset-0 pointer-events-none z-10 opacity-[0.08]"
+        className="fixed inset-0 pointer-events-none z-10 opacity-[0.05]"
         style={{
           background:
-            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.8) 2px, rgba(0,0,0,0.8) 4px)',
+            'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.5) 2px, rgba(0,0,0,0.5) 4px)',
         }}
         aria-hidden="true"
       />
 
-      {/* Decorative Characters (fixed position) */}
-      <div className="fixed top-24 left-4 opacity-15 hidden xl:block" aria-hidden="true">
-        <SansPixelArt size={32} />
+      {/* Ambient Time Portal Effects */}
+      <div className="fixed top-20 left-8 opacity-10 hidden xl:block" aria-hidden="true">
+        <TimePortal size={80} animate={!reducedMotion} />
       </div>
-      <div className="fixed top-24 right-4 opacity-15 hidden xl:block" aria-hidden="true">
-        <PapyrusPixelArt size={32} />
-      </div>
-      <div className="fixed bottom-24 left-8 opacity-10 hidden xl:block" aria-hidden="true">
-        <FloweyPixelArt size={40} expression="neutral" />
+      <div className="fixed bottom-20 right-8 opacity-10 hidden xl:block" aria-hidden="true">
+        <TimePortal size={80} animate={!reducedMotion} />
       </div>
 
-      {/* Bone decorations at edges */}
-      <div className="fixed bottom-0 left-1/4 hidden lg:flex gap-4 opacity-15" aria-hidden="true">
-        <PixelBone height={32} />
-        <PixelBone height={48} />
-        <PixelBone height={24} />
+      {/* Character silhouettes at edges */}
+      <div className="fixed top-32 right-4 opacity-15 hidden xl:block" aria-hidden="true">
+        <CronoPixelArt size={32} />
       </div>
-      <div className="fixed bottom-0 right-1/4 hidden lg:flex gap-4 opacity-15" aria-hidden="true">
-        <PixelBone height={40} />
-        <PixelBone height={28} />
-        <PixelBone height={44} />
+      <div className="fixed bottom-32 left-4 opacity-15 hidden xl:block" aria-hidden="true">
+        <FrogPixelArt size={32} />
       </div>
 
       {/* ========== HEADER ========== */}
-      <header className="relative z-30 p-6 border-b-4 border-white" role="banner">
+      <header className="relative z-30 p-6 border-b-4" style={{ borderColor: CT_COLORS.white }} role="banner">
         <div className="max-w-5xl mx-auto flex justify-between items-start flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <PixelHeart size={32} color={UNDERTALE_COLORS.determination} />
+            <TimePortal size={48} animate={!reducedMotion} />
             <div>
-              <h1 className="text-lg tracking-widest">ALEXANDER PULIDO</h1>
-              <p className="text-yellow-400 text-sm tracking-wide mt-1">
+              <h1 className="text-lg tracking-[0.2em]" style={{ color: CT_COLORS.white }}>
+                ALEXANDER PULIDO
+              </h1>
+              <p className="text-[11px] tracking-wide mt-1" style={{ color: CT_COLORS.gold }}>
                 {PROFESSIONAL_SUMMARY.headline}
               </p>
-              <p className="text-cyan-400 text-xs mt-2 italic">
-                * {PROFESSIONAL_SUMMARY.tagline}
+              <p className="text-[10px] mt-2 italic" style={{ color: CT_COLORS.portalBlueBright }}>
+                ◇ {PROFESSIONAL_SUMMARY.tagline}
               </p>
             </div>
           </div>
@@ -880,15 +1021,25 @@ export default function RetroRPGTheme() {
           <nav className="flex gap-3 items-center flex-wrap" aria-label="Main navigation">
             <Link
               href="/cv"
-              className="px-4 py-2 text-[9px] border-4 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black transition-all flex items-center gap-2 tracking-widest"
+              className="px-4 py-2 text-[10px] tracking-widest flex items-center gap-2 transition-all hover:scale-105 focus:outline-none focus:ring-2"
+              style={{
+                border: `3px solid ${CT_COLORS.gold}`,
+                color: CT_COLORS.gold,
+                background: CT_COLORS.voidDark,
+              }}
               aria-label="View CV - Save point"
             >
-              <SaveStar size={12} />
+              <span>◈</span>
               SAVE
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-4 py-2 text-[9px] border-4 border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all tracking-widest"
+              className="px-4 py-2 text-[10px] tracking-widest transition-all hover:scale-105 focus:outline-none focus:ring-2"
+              style={{
+                border: `3px solid ${CT_COLORS.portalBlue}`,
+                color: CT_COLORS.portalBlue,
+                background: CT_COLORS.voidDark,
+              }}
               aria-label="Play game engine demo"
             >
               GAME
@@ -898,11 +1049,11 @@ export default function RetroRPGTheme() {
         </div>
       </header>
 
-      {/* Profession Selector (ACT Menu) */}
-      <div className="relative z-20 px-6 py-6 border-b-2 border-white/20">
+      {/* Profession Selector (Party Menu) */}
+      <div className="relative z-20 px-6 py-6 border-b-2" style={{ borderColor: CT_COLORS.white + '30' }}>
         <div className="max-w-5xl mx-auto">
-          <p className="text-yellow-400 text-xs mb-4 text-center tracking-widest">
-            * Choose your path
+          <p className="text-xs mb-4 text-center tracking-widest" style={{ color: CT_COLORS.gold }}>
+            ◈ Select your path through time ◈
           </p>
           <div
             className="flex flex-wrap justify-center gap-4"
@@ -910,7 +1061,7 @@ export default function RetroRPGTheme() {
             aria-label="Profession selection"
           >
             {professionOptions.map((opt) => (
-              <BattleMenuButton
+              <MenuCommandButton
                 key={opt.id}
                 label={opt.label}
                 isSelected={active === opt.id}
@@ -927,13 +1078,12 @@ export default function RetroRPGTheme() {
         <div className="max-w-5xl mx-auto">
 
           {/* ABOUT Section */}
-          <BattleBox
-            title="ABOUT"
-            borderColor={UNDERTALE_COLORS.perseverance}
-            accentColor={UNDERTALE_COLORS.determination}
-          >
-            <div className="mb-4 p-4 border-2 border-white/20">
-              <p className="text-sm text-white leading-relaxed tracking-wide">
+          <BattleFrame title="ABOUT" era="present">
+            <div className="mb-4 p-4" style={{
+              border: `2px solid ${CT_COLORS.portalBlue}30`,
+              background: `linear-gradient(90deg, ${CT_COLORS.voidDark} 0%, transparent 100%)`,
+            }}>
+              <p className="text-[11px] leading-relaxed tracking-wide" style={{ color: CT_COLORS.white }}>
                 {aboutData.bio}
               </p>
             </div>
@@ -941,56 +1091,48 @@ export default function RetroRPGTheme() {
               {aboutData.quickFacts.map((fact, i) => (
                 <span
                   key={i}
-                  className="text-[9px] px-3 py-2 border border-purple-500/50 text-purple-400 flex items-center gap-2"
+                  className="text-[10px] px-3 py-2 flex items-center gap-2"
+                  style={{
+                    border: `1px solid ${CT_COLORS.portalPurple}50`,
+                    color: CT_COLORS.portalMagenta,
+                  }}
                   role="listitem"
                 >
-                  <PixelHeart size={6} color={UNDERTALE_COLORS.perseverance} animate={false} />
+                  <span style={{ color: CT_COLORS.gold, fontSize: '6px' }}>◆</span>
                   {fact}
                 </span>
               ))}
             </div>
-          </BattleBox>
+          </BattleFrame>
 
-          {/* ART Section: Soul Collection */}
-          <SoulCollection />
+          {/* ART SECTION 1: Character Party */}
+          <CharacterParty />
 
           {/* EXPERIENCE Section */}
           {experience.length > 0 && (
-            <BattleBox
-              title="EXPERIENCE"
-              borderColor={UNDERTALE_COLORS.bravery}
-              accentColor={UNDERTALE_COLORS.determination}
-            >
+            <BattleFrame title="EXPERIENCE" era="medieval">
               <div className="space-y-4">
                 {experience.map((entry) => (
                   <ExperienceCard key={entry.id} entry={entry} />
                 ))}
               </div>
-            </BattleBox>
+            </BattleFrame>
           )}
 
-          {/* ART Section: Bone Attack */}
-          <BoneAttackSection />
+          {/* ART SECTION 2: Time Portal Gateway */}
+          <TimePortalGateway />
 
           {/* SKILLS Section */}
-          <BattleBox
-            title={active === 'engineer' ? 'TECH STACK' : 'ABILITIES'}
-            borderColor={UNDERTALE_COLORS.kindness}
-            accentColor={UNDERTALE_COLORS.determination}
-          >
+          <BattleFrame title={active === 'engineer' ? 'TECH STACK' : 'ABILITIES'} era="future">
             {active === 'engineer' ? (
               <TechInventory categories={engineerTech} />
             ) : (
               <SkillsDisplay categories={otherSkills} />
             )}
-          </BattleBox>
+          </BattleFrame>
 
           {/* PROJECTS Section */}
-          <BattleBox
-            title="PROJECTS"
-            borderColor={UNDERTALE_COLORS.determination}
-            accentColor={UNDERTALE_COLORS.determination}
-          >
+          <BattleFrame title="PROJECTS" era="present">
             <div className="grid md:grid-cols-2 gap-4">
               {projects.filter((p) => p.featured).map((project) => (
                 <ProjectCard key={project.id} project={project} />
@@ -998,8 +1140,11 @@ export default function RetroRPGTheme() {
             </div>
             {projects.filter((p) => !p.featured).length > 0 && (
               <details className="mt-6">
-                <summary className="text-[9px] text-yellow-400 cursor-pointer hover:text-yellow-300 tracking-widest">
-                  * View more projects...
+                <summary
+                  className="text-[10px] cursor-pointer tracking-widest transition-colors hover:opacity-80 focus:outline-none focus:ring-2"
+                  style={{ color: CT_COLORS.gold }}
+                >
+                  ◇ View more projects...
                 </summary>
                 <div className="grid md:grid-cols-2 gap-4 mt-4">
                   {projects.filter((p) => !p.featured).map((project) => (
@@ -1008,111 +1153,174 @@ export default function RetroRPGTheme() {
                 </div>
               </details>
             )}
-          </BattleBox>
+          </BattleFrame>
 
-          {/* ART Section: Characters */}
-          <CharacterGallery />
+          {/* ART SECTION 3: Lavos Dramatic */}
+          <LavosDramaticSection />
 
           {/* VENTURES Section (engineer only) */}
           {active === 'engineer' && (
-            <BattleBox
-              title="VENTURES"
-              borderColor={UNDERTALE_COLORS.patience}
-              accentColor={UNDERTALE_COLORS.determination}
-            >
+            <BattleFrame title="VENTURES" era="future">
               <div className="grid md:grid-cols-3 gap-4">
                 {COMPANIES.map((company) => (
                   <CompanyCard key={company.id} company={company} />
                 ))}
               </div>
-            </BattleBox>
+            </BattleFrame>
           )}
 
           {/* BANDS Section (drummer only) */}
           {active === 'drummer' && (
-            <BattleBox
-              title="BANDS"
-              borderColor={UNDERTALE_COLORS.perseverance}
-              accentColor={UNDERTALE_COLORS.determination}
-            >
+            <BattleFrame title="BANDS" era="medieval">
               <div className="grid md:grid-cols-3 gap-4">
                 {BANDS.map((band) => (
                   <BandCard key={band.id} band={band} />
                 ))}
               </div>
-            </BattleBox>
+            </BattleFrame>
           )}
 
+          {/* POSTS Section */}
+          <BattleFrame title="POSTS" era="end-of-time">
+            <div className="text-center py-8">
+              <p className="text-[11px]" style={{ color: CT_COLORS.silver }}>
+                Writings and thoughts coming soon...
+              </p>
+              <p className="text-[10px] mt-3 italic" style={{ color: CT_COLORS.portalMagenta }}>
+                ◇ Check back for updates on development, music, and martial arts
+              </p>
+              <div className="flex justify-center mt-6 gap-4">
+                <EraBadge era="present" year="TECH" />
+                <EraBadge era="medieval" year="MUSIC" />
+                <EraBadge era="prehistoric" year="FIGHTING" />
+              </div>
+            </div>
+          </BattleFrame>
+
           {/* CURRENT ROLES Section */}
-          <BattleBox
-            title="EQUIPPED ROLES"
-            borderColor={UNDERTALE_COLORS.justice}
-            accentColor={UNDERTALE_COLORS.determination}
-          >
+          <BattleFrame title="EQUIPPED ROLES" era="present">
             <div className="space-y-3" role="list">
               {CURRENT_ROLES.map((role) => (
                 <RoleCard key={role.id} role={role} />
               ))}
             </div>
-          </BattleBox>
-
-          {/* Determination Moment */}
-          <div className="border-4 border-red-500 bg-black p-6">
-            <DeterminationMoment text="Despite everything, the deadlines kept coming..." />
-          </div>
+          </BattleFrame>
 
         </div>
       </main>
 
       {/* ========== FOOTER ========== */}
-      <footer className="relative z-20 py-10 px-6 border-t-4 border-white text-center" role="contentinfo">
-        <p className="text-xs tracking-widest text-white/80">
-          * The power of <DeterminationText>determination</DeterminationText> shines within you.
-        </p>
-        <div className="flex items-center justify-center gap-4 mt-4">
-          <PixelHeart size={20} color={UNDERTALE_COLORS.determination} />
-          <span className="text-yellow-400 text-xs tracking-widest">SAVE PROGRESS</span>
-          <PixelHeart size={20} color={UNDERTALE_COLORS.determination} />
+      <footer className="relative z-20 py-12 px-6 border-t-4 text-center" style={{ borderColor: CT_COLORS.white }} role="contentinfo">
+        <div className="flex items-center justify-center gap-4 mb-4">
+          <TimePortal size={32} animate={!reducedMotion} />
+          <span className="text-xs tracking-[0.2em]" style={{ color: CT_COLORS.gold }}>
+            SAVE YOUR PROGRESS
+          </span>
+          <TimePortal size={32} animate={!reducedMotion} />
         </div>
+        <p className="text-[10px] tracking-widest" style={{ color: CT_COLORS.silver }}>
+          ◈ The future is not yet written... ◈
+        </p>
+        <p className="text-[9px] mt-4" style={{ color: CT_COLORS.portalPurple }}>
+          &ldquo;But...the future refused to change.&rdquo;
+        </p>
       </footer>
 
       {/* ========== CSS ANIMATIONS ========== */}
       <style jsx global>{`
-        @keyframes soul-beat {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.15); }
+        /* Portal spin animation */
+        @keyframes portal-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
         }
-        @keyframes save-sparkle {
-          0%, 100% { opacity: 1; transform: scale(1) rotate(0deg); }
-          25% { opacity: 0.8; transform: scale(1.1) rotate(5deg); }
-          50% { opacity: 0.6; transform: scale(1.2) rotate(0deg); }
-          75% { opacity: 0.8; transform: scale(1.1) rotate(-5deg); }
+
+        /* Portal ring animations */
+        @keyframes portal-ring-1 {
+          0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.7; }
+          50% { transform: rotate(180deg) scale(1.1); opacity: 0.5; }
         }
-        @keyframes sans-eye {
-          0%, 90%, 100% { opacity: 1; }
-          92%, 98% { opacity: 0.3; }
+        @keyframes portal-ring-2 {
+          0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.6; }
+          50% { transform: rotate(-180deg) scale(0.9); opacity: 0.4; }
         }
-        @keyframes determination-glow {
+        @keyframes portal-ring-3 {
+          0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.5; }
+          50% { transform: rotate(90deg) scale(1.2); opacity: 0.3; }
+        }
+
+        /* Sparkle animations */
+        @keyframes sparkle-1 {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.3; transform: scale(0.5); }
+        }
+        @keyframes sparkle-2 {
+          0%, 100% { opacity: 0.3; transform: scale(0.5); }
+          50% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes sparkle-3 {
+          0%, 100% { opacity: 0.8; transform: scale(0.8); }
+          50% { opacity: 0.2; transform: scale(0.4); }
+        }
+        @keyframes sparkle-4 {
+          0%, 100% { opacity: 0.5; transform: scale(0.7); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Engine pulse */
+        @keyframes engine-pulse {
+          0%, 100% { opacity: 0.7; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* Lavos pulse */
+        @keyframes lavos-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(0.8); }
+        }
+
+        /* Lavos text glow */
+        @keyframes lavos-text {
           0%, 100% {
-            text-shadow: 0 0 8px ${UNDERTALE_COLORS.determination}, 0 0 16px ${UNDERTALE_COLORS.determinationDark};
+            text-shadow: 0 0 8px ${CT_COLORS.lavosRed}, 0 0 16px ${CT_COLORS.lavosPurple};
           }
           50% {
-            text-shadow: 0 0 16px ${UNDERTALE_COLORS.determination}, 0 0 32px ${UNDERTALE_COLORS.determinationDark}, 0 0 48px ${UNDERTALE_COLORS.determination};
+            text-shadow: 0 0 16px ${CT_COLORS.lavosRed}, 0 0 32px ${CT_COLORS.lavosPurple}, 0 0 48px ${CT_COLORS.red};
           }
         }
 
-        .animate-soul-beat { animation: soul-beat 1.5s ease-in-out infinite; }
-        .animate-save-sparkle { animation: save-sparkle 3s ease-in-out infinite; }
-        .animate-sans-eye { animation: sans-eye 4s ease-in-out infinite; }
-        .animate-determination-glow { animation: determination-glow 2s ease-in-out infinite; }
+        .animate-portal-spin { animation: portal-spin 20s linear infinite; }
+        .animate-portal-ring-1 { animation: portal-ring-1 4s ease-in-out infinite; }
+        .animate-portal-ring-2 { animation: portal-ring-2 5s ease-in-out infinite; }
+        .animate-portal-ring-3 { animation: portal-ring-3 3s ease-in-out infinite; }
+        .animate-sparkle-1 { animation: sparkle-1 2s ease-in-out infinite; }
+        .animate-sparkle-2 { animation: sparkle-2 2.5s ease-in-out infinite; }
+        .animate-sparkle-3 { animation: sparkle-3 1.8s ease-in-out infinite; }
+        .animate-sparkle-4 { animation: sparkle-4 2.2s ease-in-out infinite; }
+        .animate-engine-pulse { animation: engine-pulse 1.5s ease-in-out infinite; }
+        .animate-lavos-pulse { animation: lavos-pulse 2s ease-in-out infinite; }
+        .animate-lavos-text { animation: lavos-text 3s ease-in-out infinite; }
 
+        /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
-          .animate-soul-beat,
-          .animate-save-sparkle,
-          .animate-sans-eye,
-          .animate-determination-glow {
+          .animate-portal-spin,
+          .animate-portal-ring-1,
+          .animate-portal-ring-2,
+          .animate-portal-ring-3,
+          .animate-sparkle-1,
+          .animate-sparkle-2,
+          .animate-sparkle-3,
+          .animate-sparkle-4,
+          .animate-engine-pulse,
+          .animate-lavos-pulse,
+          .animate-lavos-text {
             animation: none !important;
           }
+        }
+
+        /* Focus visible styles for accessibility */
+        :focus-visible {
+          outline: 2px solid ${CT_COLORS.gold};
+          outline-offset: 2px;
         }
       `}</style>
     </div>
