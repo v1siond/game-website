@@ -12,711 +12,861 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { useSmoothScroll, useScrollZones, useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // =============================================================================
-// MARIO 64 / GALAXY / SUNSHINE / PAPER MARIO THEMED DECORATIVE ELEMENTS
-// Featuring: Power Stars, Coins, Question Blocks, Pipes, Mushrooms, Star Bits,
-// Launch Stars, cosmic backgrounds, paper-style outlines
+// SUPER MARIO BROS (NES) THEMED CV
+// Classic 2D platformer aesthetic with authentic color palette
+//
+// COLOR PALETTE:
+// Sky Blue: #5C94FC, #92CCFF
+// Ground Brown: #D87B17, #8B4513, #5C3317
+// Brick Red: #AD6B2F, #7B3B0A
+// Pipe Green: #5C9E31, #3E6B1F, #1E4B0F
+// Question Block Yellow: #FFD700, #F5A623, #E5941B
+// Mario Red: #E52521, #C41E3A
+// Luigi Green: #43B047
+// Coin Gold: #FFD700, #FFC107
+// Cloud White: #FFFFFF, #E8E8E8
+// Bush Green: #228B22, #32CD32
+// Flag Pole Grey: #808080, #A0A0A0
 //
 // ALL CONTENT IMMEDIATELY VISIBLE - NO HIDING ANIMATIONS
 // =============================================================================
 
-// --- COLOR PALETTE (Mario Universe) ---
-// Primary: Mario Red (#e52521), Blue (#049cd8), Yellow (#fbd000), Green (#43b047)
-// Galaxy: Deep purple (#2d0060), Cosmic blue (#0a0a30), Star yellow (#fff200)
-// Sunshine: Tropical aqua (#00c8ff), Sand (#f5e6c8), Shine gold (#ffd700)
-// Paper Mario: White outlines, flat colors, slight shadows
+// === MARIO COLORS ===
+const MARIO_COLORS = {
+  skyBlue: '#5C94FC',
+  skyLight: '#92CCFF',
+  groundBrown: '#D87B17',
+  groundDark: '#8B4513',
+  groundDarkest: '#5C3317',
+  brickRed: '#AD6B2F',
+  brickDark: '#7B3B0A',
+  pipeGreen: '#5C9E31',
+  pipeMid: '#3E6B1F',
+  pipeDark: '#1E4B0F',
+  questionYellow: '#FFD700',
+  questionOrange: '#F5A623',
+  questionDark: '#E5941B',
+  marioRed: '#E52521',
+  marioDarkRed: '#C41E3A',
+  luigiGreen: '#43B047',
+  coinGold: '#FFD700',
+  coinOrange: '#FFC107',
+  cloudWhite: '#FFFFFF',
+  cloudGrey: '#E8E8E8',
+  bushGreen: '#228B22',
+  bushLight: '#32CD32',
+  flagGrey: '#808080',
+  flagLight: '#A0A0A0',
+  undergroundBlue: '#000080',
+  undergroundBlack: '#0A0A20',
+  castleGrey: '#707070',
+  castleDark: '#404040',
+}
 
-// Power Star - iconic Mario collectible
-function PowerStar({ size = 40, isShineSprite = false, spinning = false }: { size?: number; isShineSprite?: boolean; spinning?: boolean }) {
-  const color = isShineSprite ? '#ffd700' : '#fff200'
-  const highlightColor = isShineSprite ? '#fff8b0' : '#ffffa0'
-  const shadowColor = isShineSprite ? '#cc9900' : '#cccc00'
-
+// === QUESTION BLOCK - Iconic "?" Block with bounce animation ===
+function QuestionBlock({ size = 48, hit = false }: { size?: number; hit?: boolean }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 100 100"
-      aria-label={isShineSprite ? "Shine Sprite" : "Power Star"}
+      viewBox="0 0 48 48"
+      aria-label={hit ? "Empty Block" : "Question Block"}
       role="img"
-      className={spinning ? 'star-spin' : ''}
+      className={hit ? '' : 'question-bounce'}
     >
       <defs>
-        <filter id={`starGlow${isShineSprite ? 'Shine' : ''}`} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <linearGradient id={`starGrad${isShineSprite ? 'Shine' : ''}`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={highlightColor} />
-          <stop offset="50%" stopColor={color} />
-          <stop offset="100%" stopColor={shadowColor} />
+        <linearGradient id="questionGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={MARIO_COLORS.questionYellow} />
+          <stop offset="50%" stopColor={MARIO_COLORS.questionOrange} />
+          <stop offset="100%" stopColor={MARIO_COLORS.questionDark} />
         </linearGradient>
       </defs>
-      {/* Five-pointed star shape */}
-      <polygon
-        points="50,5 61,40 97,40 68,62 79,97 50,75 21,97 32,62 3,40 39,40"
-        fill={`url(#starGrad${isShineSprite ? 'Shine' : ''})`}
-        stroke={isShineSprite ? '#e6c200' : '#dddd00'}
-        strokeWidth="2"
-        filter={`url(#starGlow${isShineSprite ? 'Shine' : ''})`}
-      />
-      {/* Eyes */}
-      <ellipse cx="40" cy="45" rx="6" ry="8" fill="#111" />
-      <ellipse cx="60" cy="45" rx="6" ry="8" fill="#111" />
-      {/* Eye highlights */}
-      <circle cx="38" cy="43" r="2" fill="#fff" />
-      <circle cx="58" cy="43" r="2" fill="#fff" />
-      {/* Happy smile */}
-      <path d="M40,58 Q50,68 60,58" fill="none" stroke="#111" strokeWidth="3" strokeLinecap="round" />
-      {/* Sparkle accents */}
-      {isShineSprite && (
+      {/* Block body */}
+      <rect x="2" y="2" width="44" height="44" rx="2" fill={hit ? MARIO_COLORS.brickDark : 'url(#questionGrad)'} stroke={hit ? MARIO_COLORS.groundDarkest : MARIO_COLORS.groundBrown} strokeWidth="3" />
+      {/* 3D edge - top/left highlight */}
+      <path d="M4,4 L44,4 L44,6 L6,6 L6,44 L4,44 Z" fill={hit ? MARIO_COLORS.brickRed : '#FFEC80'} opacity="0.6" />
+      {/* 3D edge - bottom/right shadow */}
+      <path d="M44,6 L44,44 L42,44 L42,6 Z" fill="#000" opacity="0.3" />
+      <path d="M6,44 L44,44 L44,42 L6,42 Z" fill="#000" opacity="0.3" />
+      {/* Corner rivets */}
+      <circle cx="10" cy="10" r="3" fill={hit ? MARIO_COLORS.groundDarkest : MARIO_COLORS.groundBrown} />
+      <circle cx="38" cy="10" r="3" fill={hit ? MARIO_COLORS.groundDarkest : MARIO_COLORS.groundBrown} />
+      <circle cx="10" cy="38" r="3" fill={hit ? MARIO_COLORS.groundDarkest : MARIO_COLORS.groundBrown} />
+      <circle cx="38" cy="38" r="3" fill={hit ? MARIO_COLORS.groundDarkest : MARIO_COLORS.groundBrown} />
+      {/* Question mark or empty */}
+      {!hit ? (
         <>
-          <circle cx="30" cy="25" r="3" fill="#fff" opacity="0.8" />
-          <circle cx="75" cy="30" r="2" fill="#fff" opacity="0.8" />
-          <circle cx="85" cy="55" r="2" fill="#fff" opacity="0.8" />
+          <text x="24" y="32" textAnchor="middle" fontSize="22" fontWeight="bold" fill={MARIO_COLORS.groundBrown} fontFamily="Arial Black, sans-serif">?</text>
+          <text x="24" y="31" textAnchor="middle" fontSize="22" fontWeight="bold" fill="#FFF" fontFamily="Arial Black, sans-serif">?</text>
         </>
+      ) : (
+        <rect x="18" y="20" width="12" height="8" fill={MARIO_COLORS.groundDarkest} opacity="0.5" />
       )}
     </svg>
   )
 }
 
-// Coin - Mario currency with spinning animation
-function Coin({ size = 24, isRedCoin = false, isBlueCoin = false }: { size?: number; isRedCoin?: boolean; isBlueCoin?: boolean }) {
-  const color = isBlueCoin ? '#049cd8' : isRedCoin ? '#e52521' : '#fbd000'
-  const highlight = isBlueCoin ? '#60c0ff' : isRedCoin ? '#ff6060' : '#ffea60'
-  const shadow = isBlueCoin ? '#0266a0' : isRedCoin ? '#aa1a1a' : '#c8a000'
+// === BRICK BLOCK - Breakable brick pattern ===
+function BrickBlock({ size = 48 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 48 48"
+      aria-label="Brick Block"
+      role="img"
+    >
+      <rect width="48" height="48" fill={MARIO_COLORS.brickRed} />
+      {/* Brick pattern - mortar lines */}
+      <rect x="0" y="0" width="22" height="14" fill={MARIO_COLORS.brickRed} stroke={MARIO_COLORS.brickDark} strokeWidth="2" />
+      <rect x="24" y="0" width="24" height="14" fill={MARIO_COLORS.brickRed} stroke={MARIO_COLORS.brickDark} strokeWidth="2" />
+      <rect x="0" y="16" width="48" height="14" fill={MARIO_COLORS.brickRed} stroke={MARIO_COLORS.brickDark} strokeWidth="2" />
+      <rect x="0" y="32" width="22" height="16" fill={MARIO_COLORS.brickRed} stroke={MARIO_COLORS.brickDark} strokeWidth="2" />
+      <rect x="24" y="32" width="24" height="16" fill={MARIO_COLORS.brickRed} stroke={MARIO_COLORS.brickDark} strokeWidth="2" />
+      {/* Highlight on bricks */}
+      <rect x="2" y="2" width="18" height="3" fill="#D08040" opacity="0.5" />
+      <rect x="26" y="2" width="20" height="3" fill="#D08040" opacity="0.5" />
+      <rect x="2" y="18" width="44" height="3" fill="#D08040" opacity="0.5" />
+      <rect x="2" y="34" width="18" height="3" fill="#D08040" opacity="0.5" />
+      <rect x="26" y="34" width="20" height="3" fill="#D08040" opacity="0.5" />
+    </svg>
+  )
+}
 
+// === GREEN PIPE - Classic warp pipe with rim ===
+function GreenPipe({ height = 80, width = 64 }: { height?: number; width?: number }) {
+  return (
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 64 ${height}`}
+      aria-label="Warp Pipe"
+      role="img"
+    >
+      <defs>
+        <linearGradient id="pipeBodyGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={MARIO_COLORS.pipeDark} />
+          <stop offset="20%" stopColor={MARIO_COLORS.pipeMid} />
+          <stop offset="50%" stopColor={MARIO_COLORS.pipeGreen} />
+          <stop offset="80%" stopColor={MARIO_COLORS.pipeMid} />
+          <stop offset="100%" stopColor={MARIO_COLORS.pipeDark} />
+        </linearGradient>
+        <linearGradient id="pipeLipGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={MARIO_COLORS.pipeDark} />
+          <stop offset="15%" stopColor={MARIO_COLORS.pipeGreen} />
+          <stop offset="50%" stopColor="#7BC847" />
+          <stop offset="85%" stopColor={MARIO_COLORS.pipeGreen} />
+          <stop offset="100%" stopColor={MARIO_COLORS.pipeDark} />
+        </linearGradient>
+      </defs>
+      {/* Pipe body */}
+      <rect x="8" y="20" width="48" height={height - 20} fill="url(#pipeBodyGrad)" />
+      {/* Pipe rim/lip */}
+      <rect x="0" y="0" width="64" height="24" rx="2" fill="url(#pipeLipGrad)" />
+      {/* Rim top highlight */}
+      <rect x="4" y="2" width="56" height="4" rx="1" fill="#8FD860" opacity="0.6" />
+      {/* Inner darkness */}
+      <ellipse cx="32" cy="10" rx="20" ry="6" fill={MARIO_COLORS.pipeDark} />
+      {/* Body vertical lines */}
+      <line x1="20" y1="24" x2="20" y2={height} stroke={MARIO_COLORS.pipeDark} strokeWidth="1" opacity="0.3" />
+      <line x1="44" y1="24" x2="44" y2={height} stroke={MARIO_COLORS.pipeDark} strokeWidth="1" opacity="0.3" />
+    </svg>
+  )
+}
+
+// === SPINNING COIN - Golden coin with spin animation ===
+function Coin({ size = 24 }: { size?: number }) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      aria-label={isBlueCoin ? "Blue Coin" : isRedCoin ? "Red Coin" : "Gold Coin"}
+      aria-label="Gold Coin"
       role="img"
+      className="coin-spin"
     >
       <defs>
-        <linearGradient id={`coinGrad${isBlueCoin ? 'Blue' : isRedCoin ? 'Red' : ''}`} x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={highlight} />
-          <stop offset="50%" stopColor={color} />
-          <stop offset="100%" stopColor={shadow} />
+        <linearGradient id="coinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#FFEC80" />
+          <stop offset="30%" stopColor={MARIO_COLORS.coinGold} />
+          <stop offset="70%" stopColor={MARIO_COLORS.coinOrange} />
+          <stop offset="100%" stopColor="#CC9900" />
         </linearGradient>
       </defs>
-      <circle cx="12" cy="12" r="10" fill={`url(#coinGrad${isBlueCoin ? 'Blue' : isRedCoin ? 'Red' : ''})`} stroke={shadow} strokeWidth="1.5" />
-      {/* Star emblem in center */}
-      <polygon
-        points="12,5 13.5,9.5 18,9.5 14.5,12.5 16,17 12,14 8,17 9.5,12.5 6,9.5 10.5,9.5"
-        fill={shadow}
-        opacity="0.4"
-      />
-      {/* Shine effect */}
-      <ellipse cx="9" cy="8" rx="2" ry="3" fill="#fff" opacity="0.6" transform="rotate(-25 9 8)" />
+      <ellipse cx="12" cy="12" rx="10" ry="10" fill="url(#coinGrad)" stroke="#CC9900" strokeWidth="1.5" />
+      {/* Inner circle */}
+      <ellipse cx="12" cy="12" rx="7" ry="7" fill="none" stroke="#CC9900" strokeWidth="1" opacity="0.5" />
+      {/* Shine */}
+      <ellipse cx="8" cy="8" rx="3" ry="4" fill="#FFF" opacity="0.5" transform="rotate(-30 8 8)" />
     </svg>
   )
 }
 
-// Question Block - iconic Mario item box
-function QuestionBlock({ size = 50, isHit = false }: { size?: number; isHit?: boolean }) {
-  const baseColor = isHit ? '#8b4513' : '#fbd000'
-  const darkColor = isHit ? '#5a2d0a' : '#c8a000'
-
+// === MARIO SILHOUETTE - Iconic cap and mustache ===
+function MarioSilhouette({ size = 60, color = MARIO_COLORS.marioRed }: { size?: number; color?: string }) {
   return (
     <svg
       width={size}
       height={size}
-      viewBox="0 0 50 50"
-      aria-label={isHit ? "Empty Block" : "Question Block"}
+      viewBox="0 0 60 60"
+      aria-label="Mario"
       role="img"
     >
-      <defs>
-        <linearGradient id={`blockGrad${isHit ? 'Hit' : ''}`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={baseColor} />
-          <stop offset="100%" stopColor={darkColor} />
-        </linearGradient>
-      </defs>
-      {/* Block base with 3D effect */}
-      <rect x="2" y="2" width="46" height="46" rx="4" fill={`url(#blockGrad${isHit ? 'Hit' : ''})`} stroke={darkColor} strokeWidth="2" />
-      {/* Top highlight */}
-      <rect x="4" y="4" width="42" height="3" rx="1" fill="#fff" opacity="0.4" />
-      {/* Side shadow */}
-      <rect x="4" y="40" width="42" height="6" rx="1" fill="#000" opacity="0.2" />
-      {/* Corner rivets */}
-      <circle cx="8" cy="8" r="2" fill={darkColor} />
-      <circle cx="42" cy="8" r="2" fill={darkColor} />
-      <circle cx="8" cy="42" r="2" fill={darkColor} />
-      <circle cx="42" cy="42" r="2" fill={darkColor} />
-      {/* Question mark or empty */}
-      {!isHit ? (
-        <text x="25" y="34" textAnchor="middle" fontSize="24" fontWeight="bold" fill="#fff" stroke={darkColor} strokeWidth="1">?</text>
-      ) : (
-        <rect x="18" y="22" width="14" height="6" rx="1" fill={darkColor} opacity="0.5" />
-      )}
-    </svg>
-  )
-}
-
-// Green Pipe - classic Mario warp pipe
-function GreenPipe({ size = 60, direction = 'up' }: { size?: number; direction?: 'up' | 'down' | 'left' | 'right' }) {
-  const rotation = { up: 0, down: 180, left: -90, right: 90 }[direction]
-
-  return (
-    <svg
-      width={size * 0.8}
-      height={size}
-      viewBox="0 0 48 60"
-      style={{ transform: `rotate(${rotation}deg)` }}
-      aria-label="Warp Pipe"
-      role="img"
-    >
-      <defs>
-        <linearGradient id="pipeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#1a5c1a" />
-          <stop offset="30%" stopColor="#43b047" />
-          <stop offset="70%" stopColor="#43b047" />
-          <stop offset="100%" stopColor="#1a5c1a" />
-        </linearGradient>
-        <linearGradient id="pipeLip" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#0d3d0d" />
-          <stop offset="30%" stopColor="#2a802a" />
-          <stop offset="70%" stopColor="#2a802a" />
-          <stop offset="100%" stopColor="#0d3d0d" />
-        </linearGradient>
-      </defs>
-      {/* Pipe body */}
-      <rect x="6" y="15" width="36" height="45" fill="url(#pipeGrad)" />
-      {/* Pipe lip */}
-      <rect x="0" y="0" width="48" height="18" rx="3" fill="url(#pipeLip)" />
-      {/* Lip highlight */}
-      <rect x="4" y="2" width="40" height="4" rx="2" fill="#5ac05a" opacity="0.6" />
-      {/* Inner dark */}
-      <ellipse cx="24" cy="9" rx="16" ry="6" fill="#0a2a0a" />
-    </svg>
-  )
-}
-
-// Mushroom - 1UP or Super Mushroom
-function Mushroom({ size = 36, is1UP = false }: { size?: number; is1UP?: boolean }) {
-  const capColor = is1UP ? '#43b047' : '#e52521'
-  const spotColor = '#fff'
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 36 36"
-      aria-label={is1UP ? "1-UP Mushroom" : "Super Mushroom"}
-      role="img"
-    >
-      <defs>
-        <linearGradient id={`mushroomCap${is1UP ? '1up' : ''}`} x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={capColor} />
-          <stop offset="100%" stopColor={is1UP ? '#2a802a' : '#aa1a1a'} />
-        </linearGradient>
-      </defs>
       {/* Cap */}
-      <ellipse cx="18" cy="14" rx="16" ry="12" fill={`url(#mushroomCap${is1UP ? '1up' : ''})`} stroke={is1UP ? '#1a5c1a' : '#8b1111'} strokeWidth="1" />
-      {/* Spots */}
-      <ellipse cx="10" cy="10" rx="5" ry="4" fill={spotColor} />
-      <ellipse cx="26" cy="12" rx="4" ry="3" fill={spotColor} />
-      <ellipse cx="18" cy="8" rx="3" ry="2" fill={spotColor} />
-      {/* Stem */}
-      <path d="M10,14 Q10,28 12,32 L24,32 Q26,28 26,14" fill="#f5e6c8" stroke="#d4c4a8" strokeWidth="1" />
-      {/* Face */}
-      <ellipse cx="14" cy="24" rx="2" ry="3" fill="#111" />
-      <ellipse cx="22" cy="24" rx="2" ry="3" fill="#111" />
-      <circle cx="13" cy="23" r="0.8" fill="#fff" />
-      <circle cx="21" cy="23" r="0.8" fill="#fff" />
-    </svg>
-  )
-}
-
-// Fire Flower
-function FireFlower({ size = 36 }: { size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 36 36"
-      aria-label="Fire Flower"
-      role="img"
-    >
-      {/* Stem */}
-      <rect x="16" y="20" width="4" height="14" fill="#43b047" />
-      {/* Leaves */}
-      <ellipse cx="12" cy="28" rx="5" ry="3" fill="#43b047" transform="rotate(-20 12 28)" />
-      <ellipse cx="24" cy="28" rx="5" ry="3" fill="#43b047" transform="rotate(20 24 28)" />
-      {/* Flower petals */}
-      <circle cx="18" cy="8" r="5" fill="#ff6600" stroke="#cc4400" strokeWidth="1" />
-      <circle cx="10" cy="12" r="5" fill="#ff6600" stroke="#cc4400" strokeWidth="1" />
-      <circle cx="26" cy="12" r="5" fill="#ff6600" stroke="#cc4400" strokeWidth="1" />
-      <circle cx="12" cy="18" r="5" fill="#ff6600" stroke="#cc4400" strokeWidth="1" />
-      <circle cx="24" cy="18" r="5" fill="#ff6600" stroke="#cc4400" strokeWidth="1" />
-      {/* Center */}
-      <circle cx="18" cy="13" r="5" fill="#fff" stroke="#ddd" strokeWidth="1" />
+      <ellipse cx="30" cy="18" rx="22" ry="12" fill={color} />
+      <rect x="8" y="14" width="44" height="8" fill={color} />
+      {/* Cap bill */}
+      <ellipse cx="42" cy="22" rx="12" ry="4" fill={color} />
+      {/* Face circle */}
+      <circle cx="30" cy="35" r="16" fill="#FFD8B0" />
+      {/* Mustache */}
+      <path d="M18,38 Q22,42 30,40 Q38,42 42,38 Q40,46 30,44 Q20,46 18,38" fill="#3D2314" />
+      {/* Nose */}
+      <ellipse cx="30" cy="36" rx="6" ry="5" fill="#FFD8B0" stroke="#E8C090" strokeWidth="1" />
       {/* Eyes */}
-      <ellipse cx="16" cy="12" rx="1.5" ry="2" fill="#111" />
-      <ellipse cx="20" cy="12" rx="1.5" ry="2" fill="#111" />
+      <ellipse cx="24" cy="32" rx="3" ry="4" fill="#000" />
+      <ellipse cx="36" cy="32" rx="3" ry="4" fill="#000" />
+      <circle cx="23" cy="31" r="1" fill="#FFF" />
+      <circle cx="35" cy="31" r="1" fill="#FFF" />
+      {/* Cap "M" emblem */}
+      <circle cx="30" cy="12" r="6" fill="#FFF" />
+      <text x="30" y="16" textAnchor="middle" fontSize="10" fontWeight="bold" fill={color} fontFamily="Arial Black">M</text>
     </svg>
   )
 }
 
-// Star Bit - Galaxy collectible
-function StarBit({ size = 16, color = 'yellow' }: { size?: number; color?: 'yellow' | 'red' | 'blue' | 'green' | 'purple' }) {
-  const colors = {
-    yellow: { fill: '#fff200', glow: '#ffff80' },
-    red: { fill: '#e52521', glow: '#ff8080' },
-    blue: { fill: '#049cd8', glow: '#80d0ff' },
-    green: { fill: '#43b047', glow: '#80ff80' },
-    purple: { fill: '#9b59b6', glow: '#d080ff' },
-  }
-  const c = colors[color]
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 16 16"
-      aria-label={`${color} Star Bit`}
-      role="img"
-    >
-      <defs>
-        <filter id={`starBitGlow${color}`} x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="1.5" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-      {/* Crystal shape */}
-      <polygon
-        points="8,1 10,6 15,8 10,10 8,15 6,10 1,8 6,6"
-        fill={c.fill}
-        stroke={c.glow}
-        strokeWidth="0.5"
-        filter={`url(#starBitGlow${color})`}
-      />
-      {/* Inner shine */}
-      <polygon
-        points="8,4 9,7 12,8 9,9 8,12 7,9 4,8 7,7"
-        fill="#fff"
-        opacity="0.6"
-      />
-    </svg>
-  )
-}
-
-// Launch Star - Galaxy warp star
-function LaunchStar({ size = 50, active = false }: { size?: number; active?: boolean }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 50 50"
-      aria-label="Launch Star"
-      role="img"
-      className={active ? 'launch-star-pulse' : ''}
-    >
-      <defs>
-        <filter id="launchGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <linearGradient id="launchGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#ffcc00" />
-          <stop offset="50%" stopColor="#ff8800" />
-          <stop offset="100%" stopColor="#ff4400" />
-        </linearGradient>
-      </defs>
-      {/* Outer ring */}
-      <circle cx="25" cy="25" r="22" fill="none" stroke="url(#launchGrad)" strokeWidth="3" filter="url(#launchGlow)" />
-      {/* Inner star */}
-      <polygon
-        points="25,8 28,18 38,18 30,24 33,34 25,28 17,34 20,24 12,18 22,18"
-        fill="url(#launchGrad)"
-        stroke="#ffaa00"
-        strokeWidth="1"
-        filter="url(#launchGlow)"
-      />
-      {/* Center sparkle */}
-      {active && (
-        <circle cx="25" cy="25" r="4" fill="#fff" opacity="0.9" />
-      )}
-    </svg>
-  )
-}
-
-// Luma - Galaxy star creature
-function Luma({ size = 40, color = 'yellow' }: { size?: number; color?: 'yellow' | 'blue' | 'pink' | 'green' }) {
-  const colors = {
-    yellow: { body: '#fff200', dark: '#cccc00' },
-    blue: { body: '#049cd8', dark: '#0266a0' },
-    pink: { body: '#ff69b4', dark: '#cc5090' },
-    green: { body: '#43b047', dark: '#2a802a' },
-  }
-  const c = colors[color]
+// === SUPER MUSHROOM - Red cap with white dots ===
+function SuperMushroom({ size = 40, is1UP = false }: { size?: number; is1UP?: boolean }) {
+  const capColor = is1UP ? MARIO_COLORS.luigiGreen : MARIO_COLORS.marioRed
+  const capDark = is1UP ? MARIO_COLORS.pipeMid : MARIO_COLORS.marioDarkRed
 
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 40 40"
-      aria-label={`${color} Luma`}
+      aria-label={is1UP ? "1-UP Mushroom" : "Super Mushroom"}
+      role="img"
+    >
+      {/* Cap */}
+      <ellipse cx="20" cy="14" rx="18" ry="12" fill={capColor} stroke={capDark} strokeWidth="2" />
+      {/* White spots */}
+      <ellipse cx="10" cy="10" rx="5" ry="4" fill="#FFF" />
+      <ellipse cx="28" cy="12" rx="4" ry="3" fill="#FFF" />
+      <ellipse cx="20" cy="6" rx="3" ry="2" fill="#FFF" />
+      {/* Stem */}
+      <path d="M10,16 Q8,28 12,36 L28,36 Q32,28 30,16" fill="#F5E6C8" stroke="#D4C4A8" strokeWidth="1" />
+      {/* Face */}
+      <ellipse cx="15" cy="26" rx="2.5" ry="3.5" fill="#000" />
+      <ellipse cx="25" cy="26" rx="2.5" ry="3.5" fill="#000" />
+      <circle cx="14" cy="25" r="1" fill="#FFF" />
+      <circle cx="24" cy="25" r="1" fill="#FFF" />
+    </svg>
+  )
+}
+
+// === FIRE FLOWER - White and red flower ===
+function FireFlower({ size = 40 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 40 40"
+      aria-label="Fire Flower"
+      role="img"
+    >
+      {/* Stem */}
+      <rect x="18" y="22" width="4" height="16" fill={MARIO_COLORS.pipeGreen} />
+      {/* Leaves */}
+      <ellipse cx="12" cy="32" rx="6" ry="3" fill={MARIO_COLORS.pipeGreen} transform="rotate(-20 12 32)" />
+      <ellipse cx="28" cy="32" rx="6" ry="3" fill={MARIO_COLORS.pipeGreen} transform="rotate(20 28 32)" />
+      {/* Petals - orange/red */}
+      <circle cx="20" cy="8" r="6" fill={MARIO_COLORS.questionOrange} stroke={MARIO_COLORS.marioRed} strokeWidth="1" />
+      <circle cx="10" cy="14" r="6" fill={MARIO_COLORS.questionOrange} stroke={MARIO_COLORS.marioRed} strokeWidth="1" />
+      <circle cx="30" cy="14" r="6" fill={MARIO_COLORS.questionOrange} stroke={MARIO_COLORS.marioRed} strokeWidth="1" />
+      <circle cx="12" cy="22" r="5" fill={MARIO_COLORS.questionOrange} stroke={MARIO_COLORS.marioRed} strokeWidth="1" />
+      <circle cx="28" cy="22" r="5" fill={MARIO_COLORS.questionOrange} stroke={MARIO_COLORS.marioRed} strokeWidth="1" />
+      {/* Center - white face */}
+      <circle cx="20" cy="15" r="6" fill="#FFF" stroke="#DDD" strokeWidth="1" />
+      <ellipse cx="18" cy="14" rx="1.5" ry="2" fill="#000" />
+      <ellipse cx="22" cy="14" rx="1.5" ry="2" fill="#000" />
+    </svg>
+  )
+}
+
+// === STARMAN - Five-pointed star with eyes ===
+function Starman({ size = 44 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 44 44"
+      aria-label="Starman"
+      role="img"
+      className="starman-flash"
+    >
+      <defs>
+        <linearGradient id="starmanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#FFFF80" />
+          <stop offset="50%" stopColor={MARIO_COLORS.coinGold} />
+          <stop offset="100%" stopColor="#CC9900" />
+        </linearGradient>
+      </defs>
+      {/* Five-pointed star */}
+      <polygon
+        points="22,2 27,16 42,16 30,26 35,40 22,32 9,40 14,26 2,16 17,16"
+        fill="url(#starmanGrad)"
+        stroke="#CC9900"
+        strokeWidth="2"
+      />
+      {/* Eyes */}
+      <ellipse cx="17" cy="20" rx="3" ry="4" fill="#000" />
+      <ellipse cx="27" cy="20" rx="3" ry="4" fill="#000" />
+      <circle cx="16" cy="19" r="1" fill="#FFF" />
+      <circle cx="26" cy="19" r="1" fill="#FFF" />
+      {/* Smile */}
+      <path d="M17,26 Q22,30 27,26" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// === FLAG POLE with Flag ===
+function FlagPole({ height = 160 }: { height?: number }) {
+  return (
+    <svg
+      width={40}
+      height={height}
+      viewBox={`0 0 40 ${height}`}
+      aria-label="Goal Flag Pole"
+      role="img"
+    >
+      {/* Pole */}
+      <rect x="18" y="0" width="4" height={height} fill={MARIO_COLORS.flagGrey} />
+      <rect x="19" y="0" width="1" height={height} fill={MARIO_COLORS.flagLight} />
+      {/* Top ball */}
+      <circle cx="20" cy="6" r="6" fill={MARIO_COLORS.coinGold} stroke="#CC9900" strokeWidth="1" />
+      {/* Flag */}
+      <polygon
+        points={`22,10 40,18 40,34 22,26`}
+        fill={MARIO_COLORS.pipeGreen}
+        stroke={MARIO_COLORS.pipeDark}
+        strokeWidth="1"
+      />
+      {/* Base */}
+      <rect x="10" y={height - 16} width="20" height="16" fill={MARIO_COLORS.groundBrown} stroke={MARIO_COLORS.groundDark} strokeWidth="2" />
+    </svg>
+  )
+}
+
+// === CLOUD (same shape as bush, different colors) ===
+function MarioCloud({ width = 120 }: { width?: number }) {
+  return (
+    <svg
+      width={width}
+      height={width * 0.5}
+      viewBox="0 0 120 60"
+      aria-label="Cloud"
+      role="img"
+      className="cloud-float"
+    >
+      <defs>
+        <linearGradient id="cloudGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={MARIO_COLORS.cloudWhite} />
+          <stop offset="100%" stopColor={MARIO_COLORS.cloudGrey} />
+        </linearGradient>
+      </defs>
+      {/* Triple-bump shape */}
+      <ellipse cx="60" cy="40" rx="55" ry="18" fill="url(#cloudGrad)" />
+      <ellipse cx="35" cy="30" rx="30" ry="22" fill="url(#cloudGrad)" />
+      <ellipse cx="85" cy="30" rx="30" ry="22" fill="url(#cloudGrad)" />
+      <ellipse cx="60" cy="22" rx="25" ry="18" fill={MARIO_COLORS.cloudWhite} />
+      {/* Eyes and smile (clouds have faces in Mario!) */}
+      <ellipse cx="45" cy="32" rx="4" ry="5" fill="#000" />
+      <ellipse cx="75" cy="32" rx="4" ry="5" fill="#000" />
+      <circle cx="43" cy="30" r="1.5" fill="#FFF" />
+      <circle cx="73" cy="30" r="1.5" fill="#FFF" />
+      <path d="M50,42 Q60,48 70,42" fill="none" stroke="#AAA" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+// === BUSH (same shape as cloud, green colors) ===
+function MarioBush({ width = 100 }: { width?: number }) {
+  return (
+    <svg
+      width={width}
+      height={width * 0.5}
+      viewBox="0 0 100 50"
+      aria-label="Bush"
       role="img"
     >
       <defs>
-        <filter id={`lumaGlow${color}`} x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        <radialGradient id={`lumaBody${color}`} cx="40%" cy="30%" r="60%">
-          <stop offset="0%" stopColor="#fff" />
-          <stop offset="30%" stopColor={c.body} />
-          <stop offset="100%" stopColor={c.dark} />
-        </radialGradient>
-      </defs>
-      {/* Star-shaped body */}
-      <polygon
-        points="20,2 24,14 36,14 26,22 30,34 20,26 10,34 14,22 4,14 16,14"
-        fill={`url(#lumaBody${color})`}
-        stroke={c.dark}
-        strokeWidth="1"
-        filter={`url(#lumaGlow${color})`}
-      />
-      {/* Eyes */}
-      <ellipse cx="16" cy="18" rx="3" ry="4" fill="#111" />
-      <ellipse cx="24" cy="18" rx="3" ry="4" fill="#111" />
-      {/* Eye highlights */}
-      <circle cx="15" cy="17" r="1" fill="#fff" />
-      <circle cx="23" cy="17" r="1" fill="#fff" />
-    </svg>
-  )
-}
-
-// === SECTION CARD TEXTURE PATTERNS (Mario-themed) ===
-
-// Brick Block Pattern - classic Mario texture
-function BrickBlockTexture() {
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
-      <defs>
-        <pattern id="brickPattern" x="0" y="0" width="60" height="30" patternUnits="userSpaceOnUse">
-          <rect width="60" height="30" fill="transparent" />
-          {/* Brick rows */}
-          <rect x="1" y="1" width="28" height="13" rx="1" fill="#c25c00" opacity="0.08" stroke="#8b4000" strokeWidth="0.5" />
-          <rect x="31" y="1" width="28" height="13" rx="1" fill="#c25c00" opacity="0.08" stroke="#8b4000" strokeWidth="0.5" />
-          <rect x="-14" y="16" width="28" height="13" rx="1" fill="#c25c00" opacity="0.08" stroke="#8b4000" strokeWidth="0.5" />
-          <rect x="16" y="16" width="28" height="13" rx="1" fill="#c25c00" opacity="0.08" stroke="#8b4000" strokeWidth="0.5" />
-          <rect x="46" y="16" width="28" height="13" rx="1" fill="#c25c00" opacity="0.08" stroke="#8b4000" strokeWidth="0.5" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#brickPattern)" />
-    </svg>
-  )
-}
-
-// Galaxy Cosmic Background - deep space with stars
-function GalaxyTexture() {
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
-      <defs>
-        <pattern id="galaxyStars" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
-          <rect width="100" height="100" fill="transparent" />
-          {/* Distant stars */}
-          <circle cx="10" cy="20" r="0.8" fill="#fff" opacity="0.3" />
-          <circle cx="45" cy="15" r="0.6" fill="#fff" opacity="0.25" />
-          <circle cx="80" cy="35" r="0.7" fill="#fff" opacity="0.35" />
-          <circle cx="25" cy="60" r="0.5" fill="#fff" opacity="0.2" />
-          <circle cx="70" cy="75" r="0.9" fill="#fff" opacity="0.3" />
-          <circle cx="55" cy="90" r="0.6" fill="#fff" opacity="0.25" />
-          <circle cx="90" cy="55" r="0.7" fill="#fff" opacity="0.3" />
-          <circle cx="15" cy="85" r="0.5" fill="#fff" opacity="0.2" />
-          {/* Colored stars */}
-          <circle cx="35" cy="40" r="1" fill="#ff69b4" opacity="0.15" />
-          <circle cx="65" cy="60" r="1" fill="#049cd8" opacity="0.15" />
-        </pattern>
-        <radialGradient id="galaxyFade" cx="50%" cy="50%" r="70%">
-          <stop offset="0%" stopColor="#1a0040" stopOpacity="0.05" />
-          <stop offset="100%" stopColor="#0a0020" stopOpacity="0.12" />
-        </radialGradient>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#galaxyFade)" />
-      <rect width="100%" height="100%" fill="url(#galaxyStars)" />
-    </svg>
-  )
-}
-
-// Sunshine Tropical Pattern - Isle Delfino style
-function SunshineTexture() {
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
-      <defs>
-        <pattern id="sunshineWaves" x="0" y="0" width="80" height="40" patternUnits="userSpaceOnUse">
-          <rect width="80" height="40" fill="transparent" />
-          {/* Wave curves */}
-          <path d="M0,20 Q20,10 40,20 Q60,30 80,20" fill="none" stroke="#00c8ff" strokeWidth="1" opacity="0.08" />
-          <path d="M0,35 Q20,25 40,35 Q60,45 80,35" fill="none" stroke="#00a8e0" strokeWidth="1" opacity="0.06" />
-          {/* Sand dots */}
-          <circle cx="15" cy="38" r="1" fill="#f5e6c8" opacity="0.1" />
-          <circle cx="55" cy="36" r="1.5" fill="#f5e6c8" opacity="0.08" />
-        </pattern>
-        <linearGradient id="sunshineFade" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#00c8ff" stopOpacity="0.03" />
-          <stop offset="50%" stopColor="#87ceeb" stopOpacity="0.05" />
-          <stop offset="100%" stopColor="#f5e6c8" stopOpacity="0.04" />
+        <linearGradient id="bushGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={MARIO_COLORS.bushLight} />
+          <stop offset="100%" stopColor={MARIO_COLORS.bushGreen} />
         </linearGradient>
       </defs>
-      <rect width="100%" height="100%" fill="url(#sunshineFade)" />
-      <rect width="100%" height="100%" fill="url(#sunshineWaves)" />
+      {/* Triple-bump shape */}
+      <ellipse cx="50" cy="38" rx="48" ry="12" fill="url(#bushGrad)" />
+      <ellipse cx="28" cy="28" rx="26" ry="20" fill="url(#bushGrad)" />
+      <ellipse cx="72" cy="28" rx="26" ry="20" fill="url(#bushGrad)" />
+      <ellipse cx="50" cy="20" rx="22" ry="16" fill={MARIO_COLORS.bushLight} />
     </svg>
   )
 }
 
-// Paper Mario Style - white outlines, flat colors
-function PaperMarioTexture() {
+// === GROUND/FLOOR PATTERN ===
+function GroundPattern() {
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true" preserveAspectRatio="none">
+    <svg className="w-full h-20" viewBox="0 0 800 80" preserveAspectRatio="none" aria-hidden="true">
       <defs>
-        <pattern id="paperFolds" x="0" y="0" width="120" height="120" patternUnits="userSpaceOnUse">
-          <rect width="120" height="120" fill="transparent" />
-          {/* Paper fold lines */}
-          <path d="M0,60 L120,60" stroke="#fff" strokeWidth="0.5" opacity="0.05" />
-          <path d="M60,0 L60,120" stroke="#fff" strokeWidth="0.5" opacity="0.05" />
-          {/* Corner fold */}
-          <path d="M100,0 L120,20" stroke="#fff" strokeWidth="0.3" opacity="0.08" />
-          <path d="M0,100 L20,120" stroke="#fff" strokeWidth="0.3" opacity="0.08" />
-          {/* Subtle crease shadows */}
-          <path d="M30,30 Q60,35 90,30" stroke="#000" strokeWidth="0.3" opacity="0.03" fill="none" />
-          <path d="M30,90 Q60,85 90,90" stroke="#000" strokeWidth="0.3" opacity="0.03" fill="none" />
+        <pattern id="groundBricks" x="0" y="0" width="32" height="16" patternUnits="userSpaceOnUse">
+          <rect width="32" height="16" fill={MARIO_COLORS.groundBrown} />
+          <rect x="0" y="0" width="15" height="7" fill={MARIO_COLORS.groundBrown} stroke={MARIO_COLORS.groundDark} strokeWidth="1" />
+          <rect x="16" y="0" width="16" height="7" fill={MARIO_COLORS.groundBrown} stroke={MARIO_COLORS.groundDark} strokeWidth="1" />
+          <rect x="8" y="8" width="16" height="8" fill={MARIO_COLORS.groundBrown} stroke={MARIO_COLORS.groundDark} strokeWidth="1" />
+          <rect x="0" y="8" width="8" height="8" fill={MARIO_COLORS.groundBrown} stroke={MARIO_COLORS.groundDark} strokeWidth="1" />
+          <rect x="24" y="8" width="8" height="8" fill={MARIO_COLORS.groundBrown} stroke={MARIO_COLORS.groundDark} strokeWidth="1" />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill="url(#paperFolds)" />
+      {/* Top grass strip */}
+      <rect x="0" y="0" width="800" height="8" fill={MARIO_COLORS.pipeGreen} />
+      {/* Ground bricks */}
+      <rect x="0" y="8" width="800" height="72" fill="url(#groundBricks)" />
     </svg>
   )
 }
 
-// === CONTINUOUS CSS-ANIMATED PARTICLES ===
+// =============================================================================
+// DECORATIVE ART SECTIONS
+// =============================================================================
 
-// Coin particles - floating golden coins
-function CoinParticles() {
-  const [coins, setCoins] = useState<Array<{
-    id: number
-    x: number
-    y: number
-    delay: number
-    duration: number
-    size: number
-  }>>([])
-
-  useEffect(() => {
-    const newCoins = Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      delay: Math.random() * 8,
-      duration: 3 + Math.random() * 3,
-      size: 16 + Math.random() * 10,
-    }))
-    setCoins(newCoins)
-  }, [])
-
+// === ART SECTION 1: Mushroom Kingdom Scene (after About) ===
+function MushroomKingdomScene() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[3] overflow-hidden" aria-hidden="true">
-      {coins.map((c) => (
-        <div
-          key={c.id}
-          className="absolute coin-float"
-          style={{
-            left: `${c.x}%`,
-            top: `${c.y}%`,
-            animationDelay: `${c.delay}s`,
-            animationDuration: `${c.duration}s`,
-          }}
-        >
-          <Coin size={c.size} />
+    <div className="relative w-full py-12 overflow-hidden" style={{ background: MARIO_COLORS.skyBlue }}>
+      {/* Sky gradient */}
+      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${MARIO_COLORS.skyLight} 0%, ${MARIO_COLORS.skyBlue} 100%)` }} />
+
+      {/* Clouds */}
+      <div className="absolute top-4 left-[5%]"><MarioCloud width={100} /></div>
+      <div className="absolute top-8 left-[40%]"><MarioCloud width={140} /></div>
+      <div className="absolute top-2 right-[10%]"><MarioCloud width={90} /></div>
+
+      {/* Hills in background */}
+      <svg className="absolute bottom-20 left-0 w-full" height="60" viewBox="0 0 800 60" preserveAspectRatio="none" aria-hidden="true">
+        <ellipse cx="150" cy="60" rx="120" ry="50" fill={MARIO_COLORS.bushGreen} />
+        <ellipse cx="500" cy="60" rx="180" ry="60" fill={MARIO_COLORS.bushGreen} />
+        <ellipse cx="720" cy="60" rx="100" ry="40" fill={MARIO_COLORS.bushGreen} />
+      </svg>
+
+      {/* Scene elements */}
+      <div className="relative z-10 max-w-4xl mx-auto flex items-end justify-between px-4" style={{ height: '200px' }}>
+        {/* Left: Question blocks and coins */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex gap-1">
+            <Coin size={20} />
+            <Coin size={20} />
+            <Coin size={20} />
+          </div>
+          <div className="flex gap-1">
+            <QuestionBlock size={40} />
+            <BrickBlock size={40} />
+            <QuestionBlock size={40} />
+          </div>
         </div>
-      ))}
-    </div>
-  )
-}
 
-// Star Bit particles - Galaxy style colorful bits
-function StarBitParticles() {
-  const [bits, setBits] = useState<Array<{
-    id: number
-    x: number
-    y: number
-    color: 'yellow' | 'red' | 'blue' | 'green' | 'purple'
-    delay: number
-    duration: number
-  }>>([])
-
-  useEffect(() => {
-    const colors: Array<'yellow' | 'red' | 'blue' | 'green' | 'purple'> = ['yellow', 'red', 'blue', 'green', 'purple']
-    const newBits = Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      delay: Math.random() * 6,
-      duration: 2 + Math.random() * 2,
-    }))
-    setBits(newBits)
-  }, [])
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden" aria-hidden="true">
-      {bits.map((b) => (
-        <div
-          key={b.id}
-          className="absolute starbit-twinkle"
-          style={{
-            left: `${b.x}%`,
-            top: `${b.y}%`,
-            animationDelay: `${b.delay}s`,
-            animationDuration: `${b.duration}s`,
-          }}
-        >
-          <StarBit size={14} color={b.color} />
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// Floating clouds - Mario sky style
-function MarioClouds() {
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <div
-          key={i}
-          className="absolute cloud-drift"
-          style={{
-            top: `${8 + i * 12}%`,
-            left: '-200px',
-            animationDelay: `${i * 6}s`,
-            animationDuration: `${35 + i * 10}s`,
-          }}
-        >
-          <svg width="180" height="80" viewBox="0 0 180 80" opacity="0.9">
-            <defs>
-              <linearGradient id={`cloudGrad${i}`} x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="100%" stopColor="#e8f0ff" />
-              </linearGradient>
-            </defs>
-            {/* Fluffy Mario-style cloud */}
-            <ellipse cx="90" cy="55" rx="80" ry="25" fill={`url(#cloudGrad${i})`} />
-            <ellipse cx="55" cy="45" rx="45" ry="30" fill={`url(#cloudGrad${i})`} />
-            <ellipse cx="125" cy="45" rx="50" ry="28" fill={`url(#cloudGrad${i})`} />
-            <ellipse cx="85" cy="35" rx="40" ry="25" fill="#fff" />
-            <ellipse cx="65" cy="30" rx="30" ry="20" fill="#fff" />
-            <ellipse cx="110" cy="32" rx="35" ry="22" fill="#fff" />
+        {/* Center: Pipe with Piranha Plant silhouette */}
+        <div className="flex flex-col items-center">
+          {/* Piranha plant peeking */}
+          <svg width="40" height="30" viewBox="0 0 40 30" aria-hidden="true">
+            <ellipse cx="20" cy="25" rx="18" ry="12" fill={MARIO_COLORS.marioRed} />
+            <ellipse cx="20" cy="15" rx="14" ry="10" fill={MARIO_COLORS.marioRed} />
+            {/* White dots */}
+            <circle cx="10" cy="20" r="4" fill="#FFF" />
+            <circle cx="30" cy="20" r="4" fill="#FFF" />
+            <circle cx="20" cy="12" r="3" fill="#FFF" />
+            {/* Stem hint */}
+            <rect x="16" y="26" width="8" height="4" fill={MARIO_COLORS.pipeGreen} />
           </svg>
+          <GreenPipe height={100} width={64} />
         </div>
-      ))}
+
+        {/* Right: Starman and mushroom */}
+        <div className="flex items-end gap-4">
+          <Starman size={40} />
+          <SuperMushroom size={36} />
+          <SuperMushroom size={36} is1UP />
+          <FireFlower size={36} />
+        </div>
+      </div>
+
+      {/* Bushes */}
+      <div className="absolute bottom-20 left-[8%]"><MarioBush width={80} /></div>
+      <div className="absolute bottom-20 right-[15%]"><MarioBush width={100} /></div>
+
+      {/* Ground */}
+      <div className="absolute bottom-0 left-0 right-0">
+        <GroundPattern />
+      </div>
     </div>
   )
 }
 
-// Rainbow ring particles - Galaxy style
-function RainbowRings() {
-  const [rings, setRings] = useState<Array<{
-    id: number
-    x: number
-    y: number
-    delay: number
-    size: number
-  }>>([])
-
-  useEffect(() => {
-    const newRings = Array.from({ length: 5 }, (_, i) => ({
-      id: i,
-      x: 15 + i * 18,
-      y: 75 + Math.random() * 15,
-      delay: Math.random() * 4,
-      size: 30 + Math.random() * 20,
-    }))
-    setRings(newRings)
-  }, [])
-
+// === ART SECTION 2: Underground Level (after Experience) ===
+function UndergroundScene() {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden" aria-hidden="true">
-      {rings.map((r) => (
+    <div className="relative w-full py-12 overflow-hidden" style={{ background: MARIO_COLORS.undergroundBlack }}>
+      {/* Dark underground gradient */}
+      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${MARIO_COLORS.undergroundBlack} 0%, ${MARIO_COLORS.undergroundBlue} 50%, ${MARIO_COLORS.undergroundBlack} 100%)` }} />
+
+      {/* Brick ceiling */}
+      <svg className="absolute top-0 left-0 w-full" height="48" viewBox="0 0 800 48" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <pattern id="ceilingBricks" x="0" y="0" width="48" height="24" patternUnits="userSpaceOnUse">
+            <rect width="48" height="24" fill={MARIO_COLORS.undergroundBlue} />
+            <rect x="0" y="0" width="22" height="10" fill="#2A2A6A" stroke="#1A1A4A" strokeWidth="1" />
+            <rect x="24" y="0" width="24" height="10" fill="#2A2A6A" stroke="#1A1A4A" strokeWidth="1" />
+            <rect x="12" y="12" width="24" height="12" fill="#2A2A6A" stroke="#1A1A4A" strokeWidth="1" />
+            <rect x="0" y="12" width="12" height="12" fill="#2A2A6A" stroke="#1A1A4A" strokeWidth="1" />
+            <rect x="36" y="12" width="12" height="12" fill="#2A2A6A" stroke="#1A1A4A" strokeWidth="1" />
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="800" height="48" fill="url(#ceilingBricks)" />
+      </svg>
+
+      {/* Scene elements */}
+      <div className="relative z-10 max-w-4xl mx-auto flex items-end justify-between px-4" style={{ height: '180px' }}>
+        {/* Left: Pipes */}
+        <div className="flex items-end gap-8">
+          <GreenPipe height={120} width={56} />
+          <GreenPipe height={80} width={56} />
+        </div>
+
+        {/* Center: Block formation with coins */}
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex gap-2">
+            <Coin size={18} />
+            <Coin size={18} />
+            <Coin size={18} />
+            <Coin size={18} />
+            <Coin size={18} />
+          </div>
+          <div className="flex">
+            <BrickBlock size={36} />
+            <QuestionBlock size={36} />
+            <BrickBlock size={36} />
+            <BrickBlock size={36} />
+            <QuestionBlock size={36} />
+            <BrickBlock size={36} />
+          </div>
+        </div>
+
+        {/* Right: Pipe with piranha silhouette */}
+        <div className="flex items-end gap-4">
+          <div className="relative">
+            {/* Piranha shadow */}
+            <svg className="absolute -top-8 left-1/2 -translate-x-1/2" width="50" height="40" viewBox="0 0 50 40" opacity="0.8" aria-hidden="true">
+              <path d="M10,40 L10,30 Q25,20 40,30 L40,40 Z" fill={MARIO_COLORS.pipeGreen} />
+              <ellipse cx="25" cy="15" rx="20" ry="15" fill={MARIO_COLORS.marioRed} />
+              <circle cx="15" cy="12" r="4" fill="#FFF" />
+              <circle cx="35" cy="12" r="4" fill="#FFF" />
+            </svg>
+            <GreenPipe height={100} width={64} />
+          </div>
+        </div>
+      </div>
+
+      {/* Underground floor */}
+      <svg className="absolute bottom-0 left-0 w-full" height="32" viewBox="0 0 800 32" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <pattern id="undergroundFloor" x="0" y="0" width="32" height="16" patternUnits="userSpaceOnUse">
+            <rect width="32" height="16" fill="#2A2A6A" />
+            <rect x="0" y="0" width="15" height="7" stroke="#1A1A4A" strokeWidth="1" fill="none" />
+            <rect x="16" y="0" width="16" height="7" stroke="#1A1A4A" strokeWidth="1" fill="none" />
+            <rect x="8" y="8" width="16" height="8" stroke="#1A1A4A" strokeWidth="1" fill="none" />
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="800" height="32" fill="url(#undergroundFloor)" />
+      </svg>
+    </div>
+  )
+}
+
+// === ART SECTION 3: Castle/Flag Pole Victory Scene (after Projects) ===
+function CastleVictoryScene() {
+  return (
+    <div className="relative w-full py-12 overflow-hidden" style={{ background: MARIO_COLORS.skyBlue }}>
+      {/* Sky */}
+      <div className="absolute inset-0" style={{ background: `linear-gradient(180deg, ${MARIO_COLORS.skyLight} 0%, ${MARIO_COLORS.skyBlue} 60%, #FFB347 100%)` }} />
+
+      {/* Clouds */}
+      <div className="absolute top-6 left-[20%]"><MarioCloud width={80} /></div>
+      <div className="absolute top-4 right-[25%]"><MarioCloud width={100} /></div>
+
+      {/* Castle */}
+      <svg className="absolute bottom-20 right-[15%]" width="200" height="160" viewBox="0 0 200 160" aria-label="Castle" role="img">
+        <defs>
+          <pattern id="castleBricks" x="0" y="0" width="20" height="10" patternUnits="userSpaceOnUse">
+            <rect width="20" height="10" fill={MARIO_COLORS.castleGrey} />
+            <rect x="0" y="0" width="9" height="4" stroke={MARIO_COLORS.castleDark} strokeWidth="0.5" fill="none" />
+            <rect x="10" y="0" width="10" height="4" stroke={MARIO_COLORS.castleDark} strokeWidth="0.5" fill="none" />
+            <rect x="5" y="5" width="10" height="5" stroke={MARIO_COLORS.castleDark} strokeWidth="0.5" fill="none" />
+          </pattern>
+        </defs>
+        {/* Main castle body */}
+        <rect x="20" y="60" width="160" height="100" fill="url(#castleBricks)" />
+        {/* Towers */}
+        <rect x="10" y="40" width="30" height="120" fill="url(#castleBricks)" />
+        <rect x="160" y="40" width="30" height="120" fill="url(#castleBricks)" />
+        {/* Tower tops (crenellations) */}
+        <rect x="10" y="30" width="10" height="15" fill="url(#castleBricks)" />
+        <rect x="30" y="30" width="10" height="15" fill="url(#castleBricks)" />
+        <rect x="160" y="30" width="10" height="15" fill="url(#castleBricks)" />
+        <rect x="180" y="30" width="10" height="15" fill="url(#castleBricks)" />
+        {/* Center tower */}
+        <rect x="70" y="20" width="60" height="80" fill="url(#castleBricks)" />
+        <rect x="70" y="8" width="20" height="18" fill="url(#castleBricks)" />
+        <rect x="110" y="8" width="20" height="18" fill="url(#castleBricks)" />
+        {/* Door */}
+        <rect x="80" y="100" width="40" height="60" fill="#1A1A1A" rx="20" />
+        {/* Windows */}
+        <rect x="85" y="50" width="12" height="16" fill="#1A1A1A" />
+        <rect x="103" y="50" width="12" height="16" fill="#1A1A1A" />
+        {/* Flag on castle */}
+        <line x1="100" y1="8" x2="100" y2="-15" stroke={MARIO_COLORS.flagGrey} strokeWidth="2" />
+        <polygon points="100,-15 120,-10 100,0" fill={MARIO_COLORS.marioRed} />
+      </svg>
+
+      {/* Flag pole */}
+      <div className="absolute bottom-20 left-[20%]">
+        <FlagPole height={140} />
+      </div>
+
+      {/* Victory coins and stars */}
+      <div className="absolute bottom-32 left-[35%] flex gap-4 items-center">
+        <Coin size={28} />
+        <Starman size={48} />
+        <Coin size={28} />
+      </div>
+
+      {/* Mario reaching flag */}
+      <div className="absolute bottom-24 left-[18%]">
+        <MarioSilhouette size={50} />
+      </div>
+
+      {/* Bushes */}
+      <div className="absolute bottom-20 left-[5%]"><MarioBush width={70} /></div>
+      <div className="absolute bottom-20 left-[45%]"><MarioBush width={90} /></div>
+
+      {/* Ground */}
+      <div className="absolute bottom-0 left-0 right-0">
+        <GroundPattern />
+      </div>
+    </div>
+  )
+}
+
+// =============================================================================
+// SECTION CARD STYLES
+// =============================================================================
+
+// Question Block Panel Style
+function QuestionBlockPanel({ children, title, icon }: {
+  children: React.ReactNode
+  title: string
+  icon?: React.ReactNode
+}) {
+  return (
+    <div className="relative" role="region" aria-label={title}>
+      {/* Corner question blocks */}
+      <div className="absolute -top-4 -left-4 z-10" aria-hidden="true"><QuestionBlock size={32} /></div>
+      <div className="absolute -top-4 -right-4 z-10" aria-hidden="true"><QuestionBlock size={32} /></div>
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 h-1" style={{ background: `linear-gradient(90deg, transparent, ${MARIO_COLORS.questionYellow}80, ${MARIO_COLORS.questionYellow})` }} aria-hidden="true" />
         <div
-          key={r.id}
-          className="absolute rainbow-pulse"
+          className="flex items-center gap-2 px-5 py-2"
           style={{
-            left: `${r.x}%`,
-            bottom: '10%',
-            animationDelay: `${r.delay}s`,
+            background: `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`,
+            border: `3px solid ${MARIO_COLORS.questionYellow}`,
+            borderRadius: '4px',
+            boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
           }}
         >
-          <svg width={r.size} height={r.size * 0.6} viewBox="0 0 50 30">
-            <defs>
-              <linearGradient id={`rainbow${r.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#e52521" />
-                <stop offset="20%" stopColor="#ff8800" />
-                <stop offset="40%" stopColor="#fbd000" />
-                <stop offset="60%" stopColor="#43b047" />
-                <stop offset="80%" stopColor="#049cd8" />
-                <stop offset="100%" stopColor="#9b59b6" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M5,28 Q25,0 45,28"
-              fill="none"
-              stroke={`url(#rainbow${r.id})`}
-              strokeWidth="4"
-              strokeLinecap="round"
-              opacity="0.4"
-            />
-          </svg>
+          {icon}
+          <h2 className="text-sm tracking-[0.15em] uppercase font-bold text-white" style={{ textShadow: '2px 2px 0 #000', fontFamily: '"Press Start 2P", monospace, sans-serif' }}>{title}</h2>
         </div>
-      ))}
+        <div className="flex-1 h-1" style={{ background: `linear-gradient(90deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionYellow}80, transparent)` }} aria-hidden="true" />
+      </div>
+
+      {/* Content with brick texture */}
+      <div
+        className="p-6 relative overflow-hidden"
+        style={{
+          background: `linear-gradient(180deg, #FFF9E6 0%, #FFF3CC 100%)`,
+          border: `4px solid ${MARIO_COLORS.groundBrown}`,
+          borderRadius: '4px',
+          boxShadow: `inset 0 2px 0 #FFECB3, 0 4px 0 ${MARIO_COLORS.groundDarkest}`,
+        }}
+      >
+        {/* Subtle brick texture overlay */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-5" aria-hidden="true">
+          <defs>
+            <pattern id="subtleBrick" x="0" y="0" width="60" height="30" patternUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="28" height="13" stroke={MARIO_COLORS.brickDark} strokeWidth="0.5" fill="none" />
+              <rect x="30" y="0" width="30" height="13" stroke={MARIO_COLORS.brickDark} strokeWidth="0.5" fill="none" />
+              <rect x="15" y="15" width="30" height="15" stroke={MARIO_COLORS.brickDark} strokeWidth="0.5" fill="none" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#subtleBrick)" />
+        </svg>
+        <div className="relative z-10">
+          {children}
+        </div>
+      </div>
     </div>
   )
 }
 
-// === UI COMPONENTS ===
+// Underground/Castle variant panel
+function UndergroundPanel({ children, title, icon }: {
+  children: React.ReactNode
+  title: string
+  icon?: React.ReactNode
+}) {
+  return (
+    <div className="relative" role="region" aria-label={title}>
+      {/* Corner coins */}
+      <div className="absolute -top-3 -left-3 z-10" aria-hidden="true"><Coin size={24} /></div>
+      <div className="absolute -top-3 -right-3 z-10" aria-hidden="true"><Coin size={24} /></div>
 
-// Profession selector node - styled as Power Star / Shine Sprite / Launch Star
-function ProfessionNode({
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 h-1" style={{ background: `linear-gradient(90deg, transparent, ${MARIO_COLORS.coinGold}60, ${MARIO_COLORS.coinGold})` }} aria-hidden="true" />
+        <div
+          className="flex items-center gap-2 px-5 py-2"
+          style={{
+            background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
+            border: `3px solid ${MARIO_COLORS.coinGold}`,
+            borderRadius: '4px',
+            boxShadow: `0 4px 0 ${MARIO_COLORS.pipeDark}`,
+          }}
+        >
+          {icon}
+          <h2 className="text-sm tracking-[0.15em] uppercase font-bold text-white" style={{ textShadow: '2px 2px 0 #000', fontFamily: '"Press Start 2P", monospace, sans-serif' }}>{title}</h2>
+        </div>
+        <div className="flex-1 h-1" style={{ background: `linear-gradient(90deg, ${MARIO_COLORS.coinGold}, ${MARIO_COLORS.coinGold}60, transparent)` }} aria-hidden="true" />
+      </div>
+
+      {/* Dark content area */}
+      <div
+        className="p-6 relative overflow-hidden"
+        style={{
+          background: `linear-gradient(180deg, ${MARIO_COLORS.undergroundBlue} 0%, ${MARIO_COLORS.undergroundBlack} 100%)`,
+          border: `4px solid #3A3A8A`,
+          borderRadius: '4px',
+          boxShadow: `inset 0 2px 0 #4A4A9A, 0 4px 0 #0A0A20`,
+        }}
+      >
+        <div className="relative z-10">
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Castle variant panel
+function CastlePanel({ children, title, icon }: {
+  children: React.ReactNode
+  title: string
+  icon?: React.ReactNode
+}) {
+  return (
+    <div className="relative" role="region" aria-label={title}>
+      {/* Corner stars */}
+      <div className="absolute -top-4 -left-4 z-10" aria-hidden="true"><Starman size={32} /></div>
+      <div className="absolute -top-4 -right-4 z-10" aria-hidden="true"><Starman size={32} /></div>
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 h-1" style={{ background: `linear-gradient(90deg, transparent, ${MARIO_COLORS.flagLight}80, ${MARIO_COLORS.flagLight})` }} aria-hidden="true" />
+        <div
+          className="flex items-center gap-2 px-5 py-2"
+          style={{
+            background: `linear-gradient(180deg, ${MARIO_COLORS.castleGrey}, ${MARIO_COLORS.castleDark})`,
+            border: `3px solid ${MARIO_COLORS.flagLight}`,
+            borderRadius: '4px',
+            boxShadow: `0 4px 0 #2A2A2A`,
+          }}
+        >
+          {icon}
+          <h2 className="text-sm tracking-[0.15em] uppercase font-bold text-white" style={{ textShadow: '2px 2px 0 #000', fontFamily: '"Press Start 2P", monospace, sans-serif' }}>{title}</h2>
+        </div>
+        <div className="flex-1 h-1" style={{ background: `linear-gradient(90deg, ${MARIO_COLORS.flagLight}, ${MARIO_COLORS.flagLight}80, transparent)` }} aria-hidden="true" />
+      </div>
+
+      {/* Stone content area */}
+      <div
+        className="p-6 relative overflow-hidden"
+        style={{
+          background: `linear-gradient(180deg, ${MARIO_COLORS.castleGrey} 0%, ${MARIO_COLORS.castleDark} 100%)`,
+          border: `4px solid #5A5A5A`,
+          borderRadius: '4px',
+          boxShadow: `inset 0 2px 0 #8A8A8A, 0 4px 0 #2A2A2A`,
+        }}
+      >
+        {/* Castle brick texture */}
+        <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10" aria-hidden="true">
+          <defs>
+            <pattern id="castleBrickBg" x="0" y="0" width="40" height="20" patternUnits="userSpaceOnUse">
+              <rect x="0" y="0" width="18" height="9" stroke="#3A3A3A" strokeWidth="0.5" fill="none" />
+              <rect x="20" y="0" width="20" height="9" stroke="#3A3A3A" strokeWidth="0.5" fill="none" />
+              <rect x="10" y="10" width="20" height="10" stroke="#3A3A3A" strokeWidth="0.5" fill="none" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#castleBrickBg)" />
+        </svg>
+        <div className="relative z-10">
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// =============================================================================
+// UI COMPONENTS
+// =============================================================================
+
+// Profession Selector - styled as Power-Ups
+function ProfessionPowerUp({
   profession,
   isActive,
   onClick,
-  position,
 }: {
   profession: 'engineer' | 'drummer' | 'fighter'
   isActive: boolean
   onClick: () => void
-  position: { x: number; y: number }
 }) {
   const icons = {
-    engineer: <PowerStar size={50} isShineSprite={isActive} spinning={isActive} />,
-    drummer: <Luma size={50} color={isActive ? 'pink' : 'yellow'} />,
-    fighter: <LaunchStar size={50} active={isActive} />,
+    engineer: <FireFlower size={50} />,
+    drummer: <Starman size={50} />,
+    fighter: <SuperMushroom size={50} />,
   }
   const labels = {
-    engineer: 'TECH GALAXY',
-    drummer: 'RHYTHM COMET',
-    fighter: 'POWER PLANET'
+    engineer: 'TECH WORLD',
+    drummer: 'MUSIC WORLD',
+    fighter: 'POWER WORLD'
   }
   const colors = {
-    engineer: '#ffd700',
-    drummer: '#ff69b4',
-    fighter: '#ff6600'
+    engineer: MARIO_COLORS.questionOrange,
+    drummer: MARIO_COLORS.coinGold,
+    fighter: MARIO_COLORS.marioRed,
   }
 
   return (
@@ -727,52 +877,46 @@ function ProfessionNode({
         e.stopPropagation()
         onClick()
       }}
-      className={`absolute transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-400 cursor-pointer ${
-        isActive ? 'scale-125 z-30' : 'hover:scale-110 z-20'
+      className={`relative flex flex-col items-center transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-400 cursor-pointer ${
+        isActive ? 'scale-110' : 'hover:scale-105 opacity-80 hover:opacity-100'
       }`}
-      style={{
-        left: position.x,
-        top: position.y,
-        transform: `translate(-50%, -50%) ${isActive ? 'scale(1.25)' : ''}`,
-      }}
-      aria-label={`Select ${labels[profession]} profession ${isActive ? '(currently selected)' : ''}`}
+      aria-label={`Select ${labels[profession]} ${isActive ? '(currently selected)' : ''}`}
       aria-pressed={isActive}
     >
-      {isActive && (
-        <div
-          className="absolute inset-0 rounded-full blur-xl pulse-glow"
-          style={{
-            background: colors[profession],
-            opacity: 0.5,
-            transform: 'scale(2.5)',
-          }}
-          aria-hidden="true"
-        />
-      )}
+      {/* Power-up block */}
       <div
-        className="relative w-20 h-20 rounded-full flex items-center justify-center"
+        className="w-20 h-20 flex items-center justify-center relative"
         style={{
           background: isActive
-            ? `radial-gradient(circle, ${colors[profession]}60, #1a0040)`
-            : 'radial-gradient(circle, #2a0060, #0a0020)',
-          border: `3px solid ${isActive ? colors[profession] : '#4a2080'}`,
+            ? `linear-gradient(180deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionDark})`
+            : `linear-gradient(180deg, ${MARIO_COLORS.brickRed}, ${MARIO_COLORS.brickDark})`,
+          border: `4px solid ${isActive ? MARIO_COLORS.groundBrown : MARIO_COLORS.groundDarkest}`,
+          borderRadius: '4px',
           boxShadow: isActive
-            ? `0 0 30px ${colors[profession]}, 0 0 60px ${colors[profession]}60, inset 0 0 20px rgba(255,255,255,0.2)`
-            : '0 4px 15px rgba(0,0,0,0.5), inset 0 2px 8px rgba(255,255,255,0.1)',
+            ? `0 4px 0 ${MARIO_COLORS.groundDarkest}, 0 0 20px ${colors[profession]}60`
+            : `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
         }}
       >
         {icons[profession]}
         {isActive && (
-          <div className="absolute inset-0 rounded-full border-2 border-white opacity-30 ping-slow" aria-hidden="true" />
+          <div className="absolute -top-2 -right-2" aria-hidden="true">
+            <Coin size={20} />
+          </div>
         )}
       </div>
+
+      {/* Label */}
       <div
-        className="absolute -bottom-10 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-lg text-[10px] font-bold tracking-wider"
+        className="mt-3 px-3 py-1 text-[10px] font-bold tracking-wider whitespace-nowrap"
         style={{
-          background: isActive ? 'linear-gradient(180deg, #2a0060, #1a0040)' : 'rgba(26,0,64,0.95)',
-          color: isActive ? colors[profession] : '#a080c0',
-          border: `2px solid ${isActive ? colors[profession] : '#4a2080'}`,
-          boxShadow: isActive ? `0 0 15px ${colors[profession]}60` : '0 2px 8px rgba(0,0,0,0.4)',
+          background: isActive
+            ? `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`
+            : `linear-gradient(180deg, ${MARIO_COLORS.castleGrey}, ${MARIO_COLORS.castleDark})`,
+          color: '#FFF',
+          border: `2px solid ${isActive ? MARIO_COLORS.questionYellow : MARIO_COLORS.flagGrey}`,
+          borderRadius: '2px',
+          textShadow: '1px 1px 0 #000',
+          fontFamily: '"Press Start 2P", monospace, sans-serif',
         }}
       >
         {labels[profession]}
@@ -781,99 +925,28 @@ function ProfessionNode({
   )
 }
 
-// Mario Frame - styled card container with Paper Mario aesthetic
-function MarioFrame({ children, title, icon, textureType = 'brick' }: {
-  children: React.ReactNode
-  title: string
-  icon?: React.ReactNode
-  textureType?: 'brick' | 'galaxy' | 'sunshine' | 'paper'
-}) {
-  const TextureComponent = {
-    brick: BrickBlockTexture,
-    galaxy: GalaxyTexture,
-    sunshine: SunshineTexture,
-    paper: PaperMarioTexture,
-  }[textureType]
-
-  return (
-    <div className="relative" role="region" aria-label={title}>
-      {/* Corner decorations - Question Blocks */}
-      <div className="absolute -top-3 -left-3" aria-hidden="true">
-        <QuestionBlock size={28} />
-      </div>
-      <div className="absolute -top-3 -right-3" aria-hidden="true">
-        <QuestionBlock size={28} />
-      </div>
-      <div className="absolute -bottom-3 -left-3" aria-hidden="true">
-        <PowerStar size={25} />
-      </div>
-      <div className="absolute -bottom-3 -right-3" aria-hidden="true">
-        <PowerStar size={25} />
-      </div>
-
-      {/* Header bar */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 h-1" style={{ background: 'linear-gradient(90deg, transparent, #fbd00080, #fbd000)' }} aria-hidden="true" />
-        <div
-          className="flex items-center gap-2 px-5 py-2"
-          style={{
-            background: 'linear-gradient(180deg, #e52521, #aa1a1a)',
-            border: '3px solid #fbd000',
-            borderRadius: '8px',
-            boxShadow: '0 4px 0 #8b1111, 0 6px 15px rgba(0,0,0,0.4)',
-          }}
-        >
-          {icon}
-          <h2 className="text-sm tracking-[0.15em] uppercase font-bold text-white" style={{ textShadow: '2px 2px 0 #000' }}>{title}</h2>
-        </div>
-        <div className="flex-1 h-1" style={{ background: 'linear-gradient(90deg, #fbd000, #fbd00080, transparent)' }} aria-hidden="true" />
-      </div>
-
-      {/* Content area with texture */}
-      <div
-        className="p-6 relative overflow-hidden"
-        style={{
-          background: 'linear-gradient(180deg, rgba(26,0,64,0.95), rgba(10,0,30,0.98))',
-          border: '3px solid #4a2080',
-          borderRadius: '12px',
-          boxShadow: 'inset 0 2px 15px rgba(0,0,0,0.5), 0 6px 20px rgba(0,0,0,0.4), 0 0 40px #4a208020',
-        }}
-      >
-        <TextureComponent />
-        <div
-          className="absolute inset-3 pointer-events-none rounded-lg"
-          style={{ border: '1px solid #6a4090' }}
-          aria-hidden="true"
-        />
-        <div className="relative z-10">
-          {children}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Tech Stack display - Mario inventory style
+// Tech inventory - Question block style
 function TechInventory({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {categories.slice(0, 7).map((category, catIdx) => (
         <div key={category.name}>
-          <h3 className="text-xs tracking-wider mb-3 flex items-center gap-2 text-yellow-300">
-            <Coin size={18} isRedCoin={catIdx % 3 === 0} isBlueCoin={catIdx % 3 === 1} />
-            <span style={{ textShadow: '0 0 8px #fbd00060' }}>{category.name.toUpperCase()}</span>
+          <h3 className="text-xs tracking-wider mb-2 flex items-center gap-2" style={{ color: MARIO_COLORS.groundBrown }}>
+            <Coin size={16} />
+            <span style={{ fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '10px' }}>{category.name.toUpperCase()}</span>
           </h3>
           <div className="flex flex-wrap gap-2">
             {category.items.map((tech) => (
               <span
                 key={tech}
-                className="px-3 py-1.5 text-xs transition-all hover:scale-105 cursor-default"
+                className="px-3 py-1.5 text-xs transition-transform hover:scale-105 cursor-default"
                 style={{
-                  background: 'linear-gradient(180deg, rgba(74,32,128,0.9), rgba(42,0,96,0.9))',
-                  border: '2px solid #6a4090',
-                  color: '#e0c0ff',
-                  borderRadius: '6px',
-                  boxShadow: '0 2px 0 #2a0060, 0 3px 6px rgba(0,0,0,0.3)',
+                  background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
+                  border: `2px solid ${MARIO_COLORS.pipeMid}`,
+                  color: '#FFF',
+                  borderRadius: '2px',
+                  boxShadow: `0 2px 0 ${MARIO_COLORS.pipeDark}`,
+                  textShadow: '1px 1px 0 #000',
                 }}
               >
                 {tech}
@@ -886,42 +959,44 @@ function TechInventory({ categories }: { categories: ReturnType<typeof getEngine
   )
 }
 
-// Project card - Star Quest style
-function StarQuestCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+// Project card - Star style
+function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
   return (
     <div
-      className="relative p-4 cursor-pointer transition-all group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400 hover:scale-[1.02]"
+      className="relative p-4 transition-transform hover:scale-[1.02] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
       style={{
-        background: 'linear-gradient(180deg, rgba(74,32,128,0.95), rgba(42,0,96,0.98))',
-        border: '3px solid #6a4090',
-        borderRadius: '10px',
-        boxShadow: '0 4px 0 #2a0060, 0 6px 16px rgba(0,0,0,0.4)',
+        background: `linear-gradient(180deg, #FFF9E6, #FFF3CC)`,
+        border: `3px solid ${MARIO_COLORS.groundBrown}`,
+        borderRadius: '4px',
+        boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
       }}
       tabIndex={0}
       role="article"
       aria-label={`Project: ${project.name}`}
     >
-      <GalaxyTexture />
+      {/* Featured star */}
+      {project.featured && (
+        <div className="absolute -top-3 -right-3" aria-hidden="true">
+          <Starman size={28} />
+        </div>
+      )}
 
       <div className="relative z-10">
-        <div className="absolute -top-3 -right-3" aria-hidden="true">
-          <PowerStar size={30} isShineSprite={project.featured} />
-        </div>
         {project.featured && (
           <div className="flex items-center gap-1 mb-2">
-            <StarBit size={12} color="yellow" />
-            <span className="text-[8px] tracking-wider text-yellow-300" style={{ textShadow: '0 0 8px #fbd00080' }}>GRAND STAR PROJECT</span>
+            <Coin size={12} />
+            <span className="text-[8px] tracking-wider" style={{ color: MARIO_COLORS.questionDark, fontFamily: '"Press Start 2P", monospace' }}>STARRED</span>
           </div>
         )}
-        <h3 className="text-sm font-bold mb-1 text-white">
+        <h3 className="text-sm font-bold mb-1" style={{ color: MARIO_COLORS.groundDarkest }}>
           {project.name}
         </h3>
-        <p className="text-[10px] mb-2 text-purple-200">
+        <p className="text-[10px] mb-2" style={{ color: MARIO_COLORS.groundDark }}>
           {project.tagline}
         </p>
         {project.impact && (
-          <p className="text-[10px] mb-2 italic flex items-center gap-1 text-yellow-300">
-            <Coin size={12} /> {project.impact}
+          <p className="text-[10px] mb-2 italic flex items-center gap-1" style={{ color: MARIO_COLORS.pipeGreen }}>
+            <Coin size={10} /> {project.impact}
           </p>
         )}
         <div className="flex gap-1 flex-wrap">
@@ -930,9 +1005,9 @@ function StarQuestCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
               key={tech}
               className="text-[8px] px-2 py-0.5 rounded"
               style={{
-                background: 'rgba(106,64,144,0.6)',
-                color: '#c0a0e0',
-                border: '1px solid #8a60b0',
+                background: MARIO_COLORS.skyBlue,
+                color: '#FFF',
+                border: `1px solid ${MARIO_COLORS.skyLight}`,
               }}
             >
               {tech}
@@ -944,111 +1019,112 @@ function StarQuestCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
   )
 }
 
-// Company card - Warp Pipe destination style
-function WarpPipeCard({ company }: { company: typeof COMPANIES[0] }) {
+// Company card - Pipe style
+function PipeCard({ company }: { company: typeof COMPANIES[0] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-all hover:scale-[1.02] group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-400 relative overflow-hidden"
+      className="block p-4 transition-transform hover:scale-[1.02] group focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-400 relative overflow-hidden"
       style={{
-        background: 'linear-gradient(180deg, rgba(26,92,26,0.95), rgba(13,61,13,0.98))',
-        border: '3px solid #43b047',
-        borderRadius: '10px',
+        background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
+        border: `3px solid ${MARIO_COLORS.pipeMid}`,
+        borderRadius: '4px',
+        boxShadow: `0 3px 0 ${MARIO_COLORS.pipeDark}`,
       }}
     >
-      <SunshineTexture />
       <div className="relative z-10">
         <div className="flex items-center gap-3 mb-2">
-          <GreenPipe size={35} />
+          <GreenPipe height={40} width={32} />
           <div>
-            <h4 className="text-sm group-hover:text-green-300 transition-colors text-white">
+            <h4 className="text-sm text-white group-hover:text-yellow-200 transition-colors">
               {company.name}
             </h4>
-            <p className="text-[10px] text-yellow-300">{company.tagline}</p>
+            <p className="text-[10px]" style={{ color: MARIO_COLORS.coinGold }}>{company.tagline}</p>
           </div>
         </div>
-        <p className="text-xs text-green-200">{company.description}</p>
+        <p className="text-xs" style={{ color: '#C8E8C8' }}>{company.description}</p>
       </div>
     </a>
   )
 }
 
-// Band card - Music Note style
-function MusicWorldCard({ band }: { band: typeof BANDS[0] }) {
+// Band card - Music note style
+function MusicCard({ band }: { band: typeof BANDS[0] }) {
   const content = (
     <div
-      className="p-4 transition-all hover:scale-[1.02] group relative overflow-hidden"
+      className="p-4 transition-transform hover:scale-[1.02] group relative"
       style={{
-        background: 'linear-gradient(180deg, rgba(155,89,182,0.95), rgba(100,50,130,0.98))',
-        border: '3px solid #d080ff',
-        borderRadius: '10px',
+        background: `linear-gradient(180deg, ${MARIO_COLORS.coinGold}, ${MARIO_COLORS.questionDark})`,
+        border: `3px solid ${MARIO_COLORS.groundBrown}`,
+        borderRadius: '4px',
+        boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
       }}
     >
-      <PaperMarioTexture />
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-2">
-          <Luma size={24} color="pink" />
-          <h4 className="text-sm group-hover:text-pink-200 transition-colors text-white">
+          <Starman size={24} />
+          <h4 className="text-sm font-bold text-white group-hover:text-yellow-100 transition-colors">
             {band.name}
           </h4>
         </div>
-        <p className="text-[10px] mt-1 text-purple-200">{band.genre} | {band.role}</p>
-        <p className="text-xs mt-2 text-pink-100">{band.description}</p>
-        {!band.url && <p className="text-[10px] mt-2 italic text-purple-300">World not yet unlocked...</p>}
+        <p className="text-[10px] mt-1" style={{ color: MARIO_COLORS.groundDarkest }}>{band.genre} | {band.role}</p>
+        <p className="text-xs mt-2 text-white">{band.description}</p>
+        {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: MARIO_COLORS.groundDark }}>World locked...</p>}
       </div>
     </div>
   )
 
   if (band.url) {
-    return <a href={band.url} target="_blank" rel="noopener noreferrer" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-400">{content}</a>
+    return <a href={band.url} target="_blank" rel="noopener noreferrer" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400">{content}</a>
   }
   return content
 }
 
-// Experience entry - Power Star Quest Log
-function QuestLogEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
+// Experience entry - Quest log style
+function QuestEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
+  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'NOW'
   const startDisplay = new Date(entry.startDate).getFullYear()
 
   return (
     <div
-      className="p-4 transition-all hover:scale-[1.01] relative overflow-hidden"
+      className="p-4 transition-transform hover:scale-[1.01] relative"
       style={{
-        background: 'linear-gradient(180deg, rgba(74,32,128,0.95), rgba(42,0,96,0.98))',
-        border: '3px solid #6a4090',
-        borderRadius: '10px',
-        boxShadow: '0 3px 0 #2a0060, 0 5px 12px rgba(0,0,0,0.3)',
+        background: `linear-gradient(180deg, #3A3A8A, ${MARIO_COLORS.undergroundBlack})`,
+        border: `3px solid #5A5A9A`,
+        borderRadius: '4px',
+        boxShadow: `0 3px 0 #1A1A4A`,
       }}
     >
-      <GalaxyTexture />
       <div className="relative z-10">
         <div className="flex justify-between items-start mb-2">
           <div className="flex items-start gap-2">
-            <PowerStar size={22} />
+            <Coin size={18} />
             <div>
               <h4 className="text-sm font-bold text-white">{entry.title}</h4>
-              <p className="text-xs text-yellow-300">{entry.organization}</p>
+              <p className="text-xs" style={{ color: MARIO_COLORS.coinGold }}>{entry.organization}</p>
             </div>
           </div>
           <span
-            className="text-[10px] px-2 py-1 rounded"
+            className="text-[9px] px-2 py-1"
             style={{
-              background: 'rgba(106,64,144,0.8)',
-              color: '#e0c0ff',
-              border: '1px solid #8a60b0',
+              background: MARIO_COLORS.pipeGreen,
+              color: '#FFF',
+              border: `1px solid ${MARIO_COLORS.pipeMid}`,
+              borderRadius: '2px',
+              fontFamily: '"Press Start 2P", monospace',
             }}
           >
-            {startDisplay} - {endDisplay}
+            {startDisplay}-{endDisplay}
           </span>
         </div>
-        <p className="text-xs mb-2 text-purple-200">{entry.description}</p>
+        <p className="text-xs mb-2" style={{ color: '#B8B8D8' }}>{entry.description}</p>
         {entry.highlights && entry.highlights.length > 0 && (
           <ul className="space-y-1 mt-2">
             {entry.highlights.map((highlight, i) => (
-              <li key={i} className="text-xs flex items-start gap-2 text-purple-100">
-                <StarBit size={10} color={(['yellow', 'red', 'blue', 'green', 'purple'] as const)[i % 5]} />
+              <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#D8D8F8' }}>
+                <span style={{ color: MARIO_COLORS.coinGold }}>*</span>
                 {highlight}
               </li>
             ))}
@@ -1059,25 +1135,25 @@ function QuestLogEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
   )
 }
 
-// Skill display - Power-Up style
-function SkillDisplay({ category }: { category: ReturnType<typeof getSkillsByProfession>[0] }) {
+// Skill display
+function SkillBadges({ category }: { category: ReturnType<typeof getSkillsByProfession>[0] }) {
   return (
     <div className="mb-4">
-      <h3 className="text-xs tracking-wider mb-3 flex items-center gap-2 text-yellow-300">
+      <h3 className="text-xs tracking-wider mb-2 flex items-center gap-2" style={{ color: MARIO_COLORS.castleGrey }}>
         <span>{category.icon}</span>
-        <span style={{ textShadow: '0 0 8px #fbd00060' }}>{category.name.toUpperCase()}</span>
+        <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}>{category.name.toUpperCase()}</span>
       </h3>
       <div className="flex flex-wrap gap-2">
         {category.skills.map((skill) => (
           <span
             key={skill.name}
-            className="px-3 py-1.5 text-xs transition-all hover:scale-105 cursor-default"
+            className="px-3 py-1.5 text-xs transition-transform hover:scale-105 cursor-default"
             style={{
-              background: 'linear-gradient(180deg, rgba(74,32,128,0.9), rgba(42,0,96,0.9))',
-              border: '2px solid #6a4090',
-              color: '#e0c0ff',
-              borderRadius: '6px',
-              boxShadow: '0 2px 0 #2a0060',
+              background: `linear-gradient(180deg, ${MARIO_COLORS.coinGold}, ${MARIO_COLORS.questionDark})`,
+              border: `2px solid ${MARIO_COLORS.groundBrown}`,
+              color: MARIO_COLORS.groundDarkest,
+              borderRadius: '2px',
+              boxShadow: `0 2px 0 ${MARIO_COLORS.groundDarkest}`,
             }}
           >
             {skill.name}
@@ -1088,43 +1164,25 @@ function SkillDisplay({ category }: { category: ReturnType<typeof getSkillsByPro
   )
 }
 
-// Content overlay
-function CosmicOverlay() {
-  return (
-    <div
-      className="fixed inset-0 pointer-events-none z-[8]"
-      style={{
-        background: 'radial-gradient(ellipse at center, transparent 0%, rgba(10,0,30,0.15) 70%, rgba(10,0,30,0.25) 100%)',
-      }}
-      aria-hidden="true"
-    />
-  )
-}
-
-// Divider - Mario style
+// Divider with Mario elements
 function MarioDivider() {
   return (
-    <div className="flex justify-center items-center py-8 gap-4" aria-hidden="true">
-      <Coin size={24} />
-      <QuestionBlock size={35} />
-      <div className="flex gap-1">
-        <StarBit size={16} color="yellow" />
-        <StarBit size={16} color="red" />
-        <StarBit size={16} color="blue" />
-      </div>
-      <PowerStar size={40} />
-      <div className="flex gap-1">
-        <StarBit size={16} color="green" />
-        <StarBit size={16} color="purple" />
-        <StarBit size={16} color="yellow" />
-      </div>
-      <QuestionBlock size={35} />
-      <Coin size={24} />
+    <div className="flex justify-center items-center py-6 gap-3" aria-hidden="true">
+      <Coin size={20} />
+      <BrickBlock size={32} />
+      <QuestionBlock size={36} />
+      <Coin size={20} />
+      <Coin size={20} />
+      <QuestionBlock size={36} />
+      <BrickBlock size={32} />
+      <Coin size={20} />
     </div>
   )
 }
 
-// === MAIN COMPONENT ===
+// =============================================================================
+// MAIN COMPONENT
+// =============================================================================
 
 export default function AdventurePathsTheme() {
   const { theme } = useTheme()
@@ -1137,13 +1195,6 @@ export default function AdventurePathsTheme() {
   const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
   const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
-  // Position nodes with enough spacing for clickability
-  const nodePositions = {
-    engineer: { x: 120, y: 100 },
-    drummer: { x: 350, y: 80 },
-    fighter: { x: 580, y: 100 },
-  }
-
   useEffect(() => {
     setMounted(true)
   }, [])
@@ -1152,131 +1203,115 @@ export default function AdventurePathsTheme() {
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
+      className="min-h-screen relative overflow-x-hidden"
       style={{
-        // Mario Galaxy cosmic background
-        background: 'linear-gradient(180deg, #0a0030 0%, #1a0050 20%, #2d0060 40%, #1a0050 60%, #0a0030 80%, #050020 100%)',
-        fontFamily: '"Nunito", "Quicksand", "Segoe UI", sans-serif',
+        background: `linear-gradient(180deg, ${MARIO_COLORS.skyLight} 0%, ${MARIO_COLORS.skyBlue} 100%)`,
+        fontFamily: '"Nunito", "Segoe UI", sans-serif',
       }}
     >
-      {/* Background layers - continuous CSS animations */}
-      <MarioClouds />
-      <RainbowRings />
-      <CoinParticles />
-      <StarBitParticles />
-
-      {/* Cosmic content overlay */}
-      <CosmicOverlay />
-
-      {/* Galaxy star field background (z-[0]) */}
-      <div className="fixed inset-0 pointer-events-none z-[0]" aria-hidden="true">
-        <svg width="100%" height="100%" preserveAspectRatio="none">
-          <defs>
-            <radialGradient id="galaxyCore" cx="50%" cy="30%" r="50%">
-              <stop offset="0%" stopColor="#4a2080" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="transparent" />
-            </radialGradient>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#galaxyCore)" />
-          {/* Distant stars */}
-          {Array.from({ length: 100 }).map((_, i) => (
-            <circle
-              key={i}
-              cx={`${Math.random() * 100}%`}
-              cy={`${Math.random() * 100}%`}
-              r={Math.random() * 1.5 + 0.3}
-              fill="#fff"
-              opacity={Math.random() * 0.5 + 0.2}
-            />
-          ))}
-        </svg>
+      {/* Floating clouds background */}
+      <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
+        <div className="absolute top-[5%] left-[10%] cloud-float-1"><MarioCloud width={120} /></div>
+        <div className="absolute top-[15%] right-[15%] cloud-float-2"><MarioCloud width={100} /></div>
+        <div className="absolute top-[8%] left-[50%] cloud-float-3"><MarioCloud width={80} /></div>
+        <div className="absolute top-[20%] left-[30%] cloud-float-2"><MarioCloud width={90} /></div>
+        <div className="absolute top-[12%] right-[40%] cloud-float-1"><MarioCloud width={110} /></div>
       </div>
 
-      {/* Header - ALL CONTENT IMMEDIATELY VISIBLE */}
+      {/* Header */}
       <header className="relative z-30 p-6">
         <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div>
-            <div className="flex items-center gap-4 mb-3">
-              <PowerStar size={45} isShineSprite />
+          <div className="flex items-start gap-4">
+            <MarioSilhouette size={70} />
+            <div>
               <h1
-                className="text-3xl tracking-wider font-bold text-white"
+                className="text-2xl tracking-wider font-bold"
                 style={{
-                  textShadow: '3px 3px 0 #e52521, 6px 6px 0 #000, 0 0 30px #ffd70080'
+                  color: '#FFF',
+                  textShadow: `3px 3px 0 ${MARIO_COLORS.marioRed}, 6px 6px 0 #000`,
+                  fontFamily: '"Press Start 2P", "Arial Black", sans-serif',
                 }}
               >
                 ALEXANDER PULIDO
               </h1>
+              <p
+                className="text-xs tracking-wide mt-2"
+                style={{
+                  color: MARIO_COLORS.groundDarkest,
+                  textShadow: '1px 1px 0 #FFF',
+                }}
+              >
+                {PROFESSIONAL_SUMMARY.headline}
+              </p>
+              <p className="text-[10px] tracking-wide mt-1 italic" style={{ color: MARIO_COLORS.groundDark }}>
+                {PROFESSIONAL_SUMMARY.tagline}
+              </p>
             </div>
-            <p
-              className="text-sm tracking-wide font-medium text-yellow-200"
-              style={{ textShadow: '0 0 15px rgba(251,208,0,0.6)' }}
-            >
-              {PROFESSIONAL_SUMMARY.headline}
-            </p>
-            <p
-              className="text-xs tracking-wide mt-1 italic text-purple-200"
-              style={{ textShadow: '0 0 10px rgba(155,89,182,0.5)' }}
-            >
-              {PROFESSIONAL_SUMMARY.tagline}
-            </p>
           </div>
 
           <div className="flex flex-col items-end gap-3">
-            <div className="flex items-center gap-5">
-              {/* Coin counter */}
+            {/* Coin/Star counters */}
+            <div className="flex items-center gap-4">
               <div
-                className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                className="flex items-center gap-2 px-3 py-1.5"
                 style={{
-                  background: 'linear-gradient(180deg, #2a0060, #1a0040)',
-                  border: '3px solid #6a4090',
-                  boxShadow: '0 3px 0 #0a0020, 0 0 15px #4a208040'
+                  background: `linear-gradient(180deg, #2A2A2A, #1A1A1A)`,
+                  border: `2px solid ${MARIO_COLORS.coinGold}`,
+                  borderRadius: '4px',
                 }}
               >
-                <Coin size={22} />
-                <span className="text-sm font-bold text-yellow-300" style={{ textShadow: '0 0 8px #fbd00060' }}>99,999</span>
+                <Coin size={20} />
+                <span className="text-sm font-bold" style={{ color: '#FFF', fontFamily: '"Press Start 2P", monospace' }}>x99</span>
               </div>
-              {/* Star counter */}
               <div
-                className="flex items-center gap-2 px-4 py-2 rounded-lg"
+                className="flex items-center gap-2 px-3 py-1.5"
                 style={{
-                  background: 'linear-gradient(180deg, #2a0060, #1a0040)',
-                  border: '3px solid #6a4090',
-                  boxShadow: '0 3px 0 #0a0020, 0 0 15px #4a208040'
+                  background: `linear-gradient(180deg, #2A2A2A, #1A1A1A)`,
+                  border: `2px solid ${MARIO_COLORS.coinGold}`,
+                  borderRadius: '4px',
                 }}
               >
-                <PowerStar size={22} />
-                <span className="text-sm font-bold text-yellow-300" style={{ textShadow: '0 0 8px #fbd00060' }}>120</span>
+                <Starman size={20} />
+                <span className="text-sm font-bold" style={{ color: '#FFF', fontFamily: '"Press Start 2P", monospace' }}>x7</span>
               </div>
             </div>
+
+            {/* Action buttons */}
             <div className="flex gap-3 items-center">
               <Link
                 href="/cv"
-                className="mario-button px-5 py-2.5 text-xs tracking-wider transition-all hover:scale-105 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400"
+                className="mario-button px-4 py-2 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
                 style={{
-                  background: 'linear-gradient(180deg, #049cd8, #0266a0)',
-                  border: '3px solid #60c0ff',
-                  color: '#fff',
-                  boxShadow: '0 4px 0 #024080',
+                  background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
+                  border: `3px solid ${MARIO_COLORS.pipeMid}`,
+                  color: '#FFF',
+                  borderRadius: '4px',
+                  boxShadow: `0 4px 0 ${MARIO_COLORS.pipeDark}`,
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '10px',
                 }}
               >
                 <span className="flex items-center gap-2">
-                  <QuestionBlock size={18} />
-                  INVENTORY
+                  <QuestionBlock size={16} hit />
+                  RESUME
                 </span>
               </Link>
               <Link
                 href="/personal-projects/game-engine"
-                className="mario-button px-5 py-2.5 text-xs tracking-wider transition-all hover:scale-105 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400"
+                className="mario-button px-4 py-2 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
                 style={{
-                  background: 'linear-gradient(180deg, #fbd000, #c8a000)',
-                  border: '3px solid #ffe860',
-                  color: '#3a2a00',
-                  boxShadow: '0 4px 0 #8b6914',
+                  background: `linear-gradient(180deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionDark})`,
+                  border: `3px solid ${MARIO_COLORS.groundBrown}`,
+                  color: MARIO_COLORS.groundDarkest,
+                  borderRadius: '4px',
+                  boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '10px',
                 }}
               >
                 <span className="flex items-center gap-2">
-                  <PowerStar size={18} />
-                  ADVENTURE
+                  <Starman size={16} />
+                  PLAY
                 </span>
               </Link>
               <ThemeSwitcher />
@@ -1285,24 +1320,25 @@ export default function AdventurePathsTheme() {
         </div>
       </header>
 
-      {/* Current Roles - Power-Up style */}
+      {/* Current Roles */}
       <section className="relative z-20 py-4 px-6" aria-label="Current Roles">
         <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-6">
+          <div className="flex flex-wrap justify-center gap-4">
             {CURRENT_ROLES.map((role, idx) => (
               <div
                 key={role.id}
-                className="flex items-center gap-3 px-5 py-2.5 rounded-lg"
+                className="flex items-center gap-3 px-4 py-2"
                 style={{
-                  background: 'linear-gradient(180deg, rgba(42,0,96,0.95), rgba(26,0,64,0.95))',
-                  border: '3px solid #6a4090',
-                  boxShadow: '0 3px 0 #2a0060, 0 0 20px #4a208030',
+                  background: `linear-gradient(180deg, #FFF9E6, #FFF3CC)`,
+                  border: `3px solid ${MARIO_COLORS.groundBrown}`,
+                  borderRadius: '4px',
+                  boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
                 }}
               >
-                {idx === 0 ? <Mushroom size={28} /> : <Mushroom size={28} is1UP />}
+                {idx === 0 ? <SuperMushroom size={28} /> : <SuperMushroom size={28} is1UP />}
                 <div>
-                  <p className="text-xs tracking-wider text-yellow-300" style={{ textShadow: '0 0 8px #fbd00060' }}>{role.title}</p>
-                  <p className="text-sm font-medium text-white">{role.company}</p>
+                  <p className="text-[10px] tracking-wider" style={{ color: MARIO_COLORS.groundDark, fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}>{role.title}</p>
+                  <p className="text-sm font-medium" style={{ color: MARIO_COLORS.groundDarkest }}>{role.company}</p>
                 </div>
               </div>
             ))}
@@ -1310,326 +1346,283 @@ export default function AdventurePathsTheme() {
         </div>
       </section>
 
-      {/* World Map - Galaxy Observatory style profession selector */}
-      <section className="relative z-20 h-[280px]" aria-label="Profession Selection">
-        <div className="relative max-w-3xl mx-auto h-full">
-          {/* Galaxy orbital paths */}
-          <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 1 }} aria-hidden="true">
-            <defs>
-              <linearGradient id="orbitGlow" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#ff69b4" stopOpacity="0.6" />
-                <stop offset="50%" stopColor="#ffd700" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#ff6600" stopOpacity="0.6" />
-              </linearGradient>
-              <filter id="orbitBlur">
-                <feGaussianBlur stdDeviation="2" />
-              </filter>
-            </defs>
-            {/* Curved orbital paths */}
-            <path
-              d="M 120 100 Q 235 50 350 80"
-              fill="none"
-              stroke="url(#orbitGlow)"
-              strokeWidth="4"
-              strokeDasharray="12 8"
-              strokeLinecap="round"
-              filter="url(#orbitBlur)"
-            />
-            <path
-              d="M 350 80 Q 465 110 580 100"
-              fill="none"
-              stroke="url(#orbitGlow)"
-              strokeWidth="4"
-              strokeDasharray="12 8"
-              strokeLinecap="round"
-              filter="url(#orbitBlur)"
-            />
-          </svg>
-
-          {/* Profession nodes - ensure they're above orbital paths */}
+      {/* Profession Selector - Power-up blocks */}
+      <section className="relative z-20 py-8" aria-label="Profession Selection">
+        <div className="max-w-3xl mx-auto flex justify-center gap-12">
           {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-            <ProfessionNode
+            <ProfessionPowerUp
               key={prof}
               profession={prof}
               isActive={active === prof}
               onClick={() => setActive(prof)}
-              position={nodePositions[prof]}
             />
           ))}
         </div>
       </section>
 
-      {/* Main content - ALL CONTENT IMMEDIATELY VISIBLE */}
+      {/* Main content - NEW LAYOUT ORDER */}
       <main className="relative z-20 px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* About panel */}
+
+          {/* === ABOUT === */}
           <section className="mb-8">
-            <MarioFrame title="About" icon={<Luma size={24} color="yellow" />} textureType="galaxy">
-              <p className="text-sm leading-relaxed mb-4 text-purple-100">
+            <QuestionBlockPanel title="About" icon={<MarioSilhouette size={24} />}>
+              <p className="text-sm leading-relaxed mb-4" style={{ color: MARIO_COLORS.groundDarkest }}>
                 {aboutData.bio}
               </p>
               <div className="flex flex-wrap gap-2">
                 {aboutData.quickFacts.map((fact, i) => (
                   <span
                     key={i}
-                    className="text-xs px-4 py-1.5 rounded-lg flex items-center gap-2"
+                    className="text-xs px-3 py-1.5 flex items-center gap-2"
                     style={{
                       background: [
-                        'rgba(229,37,33,0.2)',
-                        'rgba(4,156,216,0.2)',
-                        'rgba(67,176,71,0.2)',
-                        'rgba(251,208,0,0.2)'
+                        `${MARIO_COLORS.marioRed}20`,
+                        `${MARIO_COLORS.pipeGreen}20`,
+                        `${MARIO_COLORS.skyBlue}20`,
+                        `${MARIO_COLORS.coinGold}20`
                       ][i % 4],
-                      border: `2px solid ${['#e52521', '#049cd8', '#43b047', '#fbd000'][i % 4]}50`,
-                      color: '#e0c0ff',
+                      border: `2px solid ${[
+                        MARIO_COLORS.marioRed,
+                        MARIO_COLORS.pipeGreen,
+                        MARIO_COLORS.skyBlue,
+                        MARIO_COLORS.coinGold
+                      ][i % 4]}50`,
+                      borderRadius: '2px',
+                      color: MARIO_COLORS.groundDarkest,
                     }}
                   >
-                    <StarBit size={12} color={(['red', 'blue', 'green', 'yellow'] as const)[i % 4]} />
+                    <Coin size={12} />
                     {fact}
                   </span>
                 ))}
               </div>
-            </MarioFrame>
+            </QuestionBlockPanel>
           </section>
 
-          {/* Work Experience */}
-          {experience.length > 0 && (
-            <>
-              <MarioDivider />
+          {/* === ART SECTION 1: Mushroom Kingdom (after About) === */}
+        </div>
+      </main>
 
-              <section className="mb-8">
-                <MarioFrame title="Star Log" icon={<PowerStar size={24} />} textureType="galaxy">
-                  <div className="space-y-4">
-                    {experience.map((entry) => (
-                      <QuestLogEntry key={entry.id} entry={entry} />
-                    ))}
-                  </div>
-                </MarioFrame>
-              </section>
-            </>
+      <MushroomKingdomScene />
+
+      <main className="relative z-20 px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+
+          {/* === EXPERIENCE === */}
+          {experience.length > 0 && (
+            <section className="mb-8">
+              <UndergroundPanel title="Experience" icon={<Coin size={24} />}>
+                <div className="space-y-4">
+                  {experience.map((entry) => (
+                    <QuestEntry key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              </UndergroundPanel>
+            </section>
           )}
 
-          <MarioDivider />
+          {/* === ART SECTION 2: Underground (after Experience) === */}
+        </div>
+      </main>
 
-          {/* Tech Stack / Skills */}
+      <UndergroundScene />
+
+      <main className="relative z-20 px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+
+          {/* === SKILLS === */}
           <section className="mb-8">
-            <MarioFrame
-              title={active === 'engineer' ? 'Power-Up Inventory' : 'Special Abilities'}
-              icon={active === 'engineer' ? <FireFlower size={28} /> : <Mushroom size={28} />}
-              textureType="paper"
+            <QuestionBlockPanel
+              title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
+              icon={active === 'engineer' ? <FireFlower size={28} /> : <SuperMushroom size={28} />}
             >
               {active === 'engineer' ? (
                 <TechInventory categories={engineerTech} />
               ) : (
                 <div className="space-y-4">
                   {otherSkills.map((category) => (
-                    <SkillDisplay key={category.name} category={category} />
+                    <SkillBadges key={category.name} category={category} />
                   ))}
                 </div>
               )}
-            </MarioFrame>
+            </QuestionBlockPanel>
           </section>
 
           <MarioDivider />
 
-          {/* Projects */}
+          {/* === PROJECTS === */}
           <section className="mb-8">
-            <MarioFrame title="Grand Star Quests" icon={<PowerStar size={28} isShineSprite />} textureType="galaxy">
+            <CastlePanel title="Projects" icon={<Starman size={28} />}>
               <div className="grid md:grid-cols-2 gap-4">
                 {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                  <StarQuestCard key={project.id} project={project} />
+                  <ProjectCard key={project.id} project={project} />
                 ))}
               </div>
-            </MarioFrame>
+            </CastlePanel>
           </section>
 
-          {/* Companies (Engineer) / Bands (Drummer) */}
-          {active === 'engineer' && (
-            <>
-              <MarioDivider />
-              <section className="mb-8">
-                <MarioFrame title="Warp Zones" icon={<GreenPipe size={30} />} textureType="sunshine">
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {COMPANIES.map((company) => (
-                      <WarpPipeCard key={company.id} company={company} />
-                    ))}
-                  </div>
-                </MarioFrame>
-              </section>
-            </>
-          )}
-
-          {active === 'drummer' && (
-            <>
-              <MarioDivider />
-              <section className="mb-8">
-                <MarioFrame title="Music Worlds" icon={<Luma size={28} color="pink" />} textureType="paper">
-                  <div className="grid md:grid-cols-3 gap-4">
-                    {BANDS.map((band) => (
-                      <MusicWorldCard key={band.id} band={band} />
-                    ))}
-                  </div>
-                </MarioFrame>
-              </section>
-            </>
-          )}
+          {/* === ART SECTION 3: Castle Victory (after Projects) === */}
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="relative z-20 py-10 text-center">
-        <div
-          className="inline-flex items-center justify-center gap-6 px-8 py-4 rounded-xl"
-          style={{
-            background: 'linear-gradient(180deg, rgba(42,0,96,0.95), rgba(26,0,64,0.95))',
-            border: '3px solid #6a4090',
-            boxShadow: '0 4px 0 #2a0060, 0 0 30px #4a208030'
-          }}
-        >
-          <GreenPipe size={40} />
-          <div className="flex items-center gap-3 text-purple-200">
-            <PowerStar size={28} />
-            <span className="text-sm tracking-[0.25em] font-medium">GALAXY EXPLORER SINCE 2014</span>
-            <PowerStar size={28} />
-          </div>
-          <GreenPipe size={40} />
+      <CastleVictoryScene />
+
+      <main className="relative z-20 px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+
+          {/* === VENTURES (Companies for Engineer / Bands for Drummer) === */}
+          {active === 'engineer' && (
+            <section className="mb-8">
+              <QuestionBlockPanel title="Ventures" icon={<GreenPipe height={28} width={24} />}>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {COMPANIES.map((company) => (
+                    <PipeCard key={company.id} company={company} />
+                  ))}
+                </div>
+              </QuestionBlockPanel>
+            </section>
+          )}
+
+          {active === 'drummer' && (
+            <section className="mb-8">
+              <QuestionBlockPanel title="Bands" icon={<Starman size={28} />}>
+                <div className="grid md:grid-cols-3 gap-4">
+                  {BANDS.map((band) => (
+                    <MusicCard key={band.id} band={band} />
+                  ))}
+                </div>
+              </QuestionBlockPanel>
+            </section>
+          )}
+
+          {/* === POSTS (placeholder) === */}
+          <section className="mb-8">
+            <UndergroundPanel title="Posts" icon={<QuestionBlock size={24} />}>
+              <div className="text-center py-8">
+                <QuestionBlock size={60} hit />
+                <p className="mt-4 text-sm" style={{ color: '#8888AA' }}>Coming soon... check back for blog posts!</p>
+              </div>
+            </UndergroundPanel>
+          </section>
         </div>
-        <p
-          className="text-xs mt-3 px-4 py-2 rounded-lg inline-block"
-          style={{
-            color: '#a080c0',
-            background: 'rgba(26,0,64,0.9)',
-            border: '2px solid #4a2080'
-          }}
-        >
-          SAVE FILE 01 | STARS: 120/120 | SHINE SPRITES: 120/120
-        </p>
+      </main>
+
+      {/* Footer with ground */}
+      <footer className="relative z-20">
+        <div className="text-center py-8">
+          <div
+            className="inline-flex items-center justify-center gap-4 px-6 py-3"
+            style={{
+              background: `linear-gradient(180deg, #2A2A2A, #1A1A1A)`,
+              border: `3px solid ${MARIO_COLORS.coinGold}`,
+              borderRadius: '4px',
+              boxShadow: `0 4px 0 #0A0A0A`,
+            }}
+          >
+            <GreenPipe height={40} width={32} />
+            <div className="flex items-center gap-2">
+              <Starman size={24} />
+              <span className="text-[10px] tracking-wider text-white" style={{ fontFamily: '"Press Start 2P", monospace' }}>PLAYER SINCE 2014</span>
+              <Starman size={24} />
+            </div>
+            <GreenPipe height={40} width={32} />
+          </div>
+          <p
+            className="text-[8px] mt-3 px-3 py-1 inline-block"
+            style={{
+              color: MARIO_COLORS.castleGrey,
+              background: '#1A1A1A',
+              border: `1px solid ${MARIO_COLORS.castleDark}`,
+              borderRadius: '2px',
+              fontFamily: '"Press Start 2P", monospace',
+            }}
+          >
+            WORLD 1-1 CLEAR * COINS: 99 * LIVES: 99
+          </p>
+        </div>
+        <GroundPattern />
       </footer>
 
-      {/* CSS Animations - ALL NON-HIDING, DECORATIVE ONLY */}
+      {/* CSS Animations */}
       <style jsx global>{`
-        /* === CONTINUOUS PARTICLE ANIMATIONS === */
-
-        @keyframes coin-float-anim {
-          0%, 100% { opacity: 0.6; transform: translateY(0) rotateY(0deg); }
-          25% { opacity: 0.9; transform: translateY(-15px) rotateY(90deg); }
-          50% { opacity: 0.7; transform: translateY(-8px) rotateY(180deg); }
-          75% { opacity: 0.9; transform: translateY(-20px) rotateY(270deg); }
+        /* === COIN SPIN === */
+        @keyframes coinSpinAnim {
+          0%, 100% { transform: scaleX(1); }
+          50% { transform: scaleX(0.2); }
+        }
+        .coin-spin {
+          animation: coinSpinAnim 0.8s ease-in-out infinite;
         }
 
-        @keyframes starbit-twinkle-anim {
-          0%, 100% { opacity: 0.4; transform: scale(0.8) rotate(0deg); }
-          50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+        /* === QUESTION BLOCK BOUNCE === */
+        @keyframes questionBounceAnim {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        .question-bounce {
+          animation: questionBounceAnim 2s ease-in-out infinite;
         }
 
-        @keyframes cloud-drift-anim {
-          from { transform: translateX(-200px); }
-          to { transform: translateX(calc(100vw + 200px)); }
+        /* === STARMAN FLASH === */
+        @keyframes starmanFlashAnim {
+          0%, 100% { filter: brightness(1) hue-rotate(0deg); }
+          25% { filter: brightness(1.3) hue-rotate(60deg); }
+          50% { filter: brightness(1.1) hue-rotate(120deg); }
+          75% { filter: brightness(1.3) hue-rotate(180deg); }
+        }
+        .starman-flash {
+          animation: starmanFlashAnim 0.5s linear infinite;
         }
 
-        @keyframes rainbow-pulse-anim {
-          0%, 100% { opacity: 0.3; transform: scale(0.9); }
-          50% { opacity: 0.6; transform: scale(1.1); }
+        /* === CLOUD FLOAT === */
+        @keyframes cloudFloatAnim {
+          0%, 100% { transform: translateX(0) translateY(0); }
+          50% { transform: translateX(20px) translateY(-5px); }
+        }
+        .cloud-float {
+          animation: cloudFloatAnim 8s ease-in-out infinite;
+        }
+        .cloud-float-1 {
+          animation: cloudFloatAnim 12s ease-in-out infinite;
+        }
+        .cloud-float-2 {
+          animation: cloudFloatAnim 10s ease-in-out infinite;
+          animation-delay: -3s;
+        }
+        .cloud-float-3 {
+          animation: cloudFloatAnim 14s ease-in-out infinite;
+          animation-delay: -6s;
         }
 
-        .coin-float {
-          animation: coin-float-anim ease-in-out infinite;
-        }
-
-        .starbit-twinkle {
-          animation: starbit-twinkle-anim ease-in-out infinite;
-        }
-
-        .cloud-drift {
-          animation: cloud-drift-anim linear infinite;
-        }
-
-        .rainbow-pulse {
-          animation: rainbow-pulse-anim ease-in-out infinite 3s;
-        }
-
-        /* === UI ANIMATIONS === */
-
-        @keyframes star-spin-anim {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes launch-star-pulse-anim {
-          0%, 100% { transform: scale(1); filter: brightness(1); }
-          50% { transform: scale(1.1); filter: brightness(1.3); }
-        }
-
-        @keyframes ping-slow-anim {
-          0% { transform: scale(1); opacity: 0.5; }
-          100% { transform: scale(1.6); opacity: 0; }
-        }
-
-        @keyframes pulse-glow-anim {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.8; }
-        }
-
-        .star-spin {
-          animation: star-spin-anim 4s linear infinite;
-        }
-
-        .launch-star-pulse {
-          animation: launch-star-pulse-anim 1.5s ease-in-out infinite;
-        }
-
-        .ping-slow {
-          animation: ping-slow-anim 2s ease-out infinite;
-        }
-
-        .pulse-glow {
-          animation: pulse-glow-anim 2.5s ease-in-out infinite;
-        }
-
-        /* ========================================
-           MARIO BUTTON - Power-Up Press Effect
-           ======================================== */
+        /* === MARIO BUTTON === */
         .mario-button {
           position: relative;
           overflow: hidden;
           transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
         .mario-button:active {
-          transform: translateY(4px) scale(0.98);
+          transform: translateY(4px) scale(0.98) !important;
           box-shadow: none !important;
         }
-        .mario-button::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(
-            180deg,
-            rgba(255, 255, 255, 0.3) 0%,
-            transparent 50%,
-            rgba(0, 0, 0, 0.1) 100%
-          );
-          pointer-events: none;
-        }
 
-        /* ===== REDUCED MOTION SUPPORT ===== */
+        /* === REDUCED MOTION SUPPORT === */
         @media (prefers-reduced-motion: reduce) {
-          .coin-float,
-          .starbit-twinkle,
-          .cloud-drift,
-          .rainbow-pulse,
-          .star-spin,
-          .launch-star-pulse,
-          .ping-slow,
-          .pulse-glow,
+          .coin-spin,
+          .question-bounce,
+          .starman-flash,
+          .cloud-float,
+          .cloud-float-1,
+          .cloud-float-2,
+          .cloud-float-3,
           .mario-button {
             animation: none !important;
             transition: none !important;
           }
-          .coin-float,
-          .starbit-twinkle {
-            display: none;
-          }
         }
+
+        /* === GOOGLE FONT FALLBACK === */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
       `}</style>
     </div>
   )
