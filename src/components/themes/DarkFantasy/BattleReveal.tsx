@@ -293,19 +293,19 @@ export const BattleReveal = memo(function BattleReveal({
           transition: 'transform 300ms cubic-bezier(0.68, -0.55, 0.27, 1.55)'
         }
       case 'bug-fall':
-        // Bug falls and wheels/rolls to the RIGHT after explosion
+        // Bug tumbles/rolls to the RIGHT like a boulder after explosion
         return {
           ...baseStyle,
-          transform: 'translateX(-80px) translateY(45px) rotateZ(240deg) scale(0.75)',
+          transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
           opacity: 0.7,
-          transition: 'transform 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          transition: 'transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }
       case 'content-drop':
       case 'complete':
-        // Dead on the ground - rolled to the right
+        // Dead on the ground - rolled/tumbled to the right
         return {
           ...baseStyle,
-          transform: 'translateX(-80px) translateY(45px) rotateZ(240deg) scale(0.75)',
+          transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
           opacity: 0.55,
         }
       default:
