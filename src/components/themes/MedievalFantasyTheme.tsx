@@ -312,24 +312,22 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     phase: 'falling' | 'explosion' | 'rising' | 'idle'
   }>>([])
 
-  // Track infernal count outside of state for spawn decisions
-  const infernalCountRef = useRef(0)
+  // Track infernal counts per side (max 2 left, 1 right)
+  const leftCountRef = useRef(0)
+  const rightCountRef = useRef(0)
 
   useEffect(() => {
     let infernalId = 0
     let isActive = true
     const timeouts: NodeJS.Timeout[] = []
 
-    const spawnInfernal = (newId: number) => {
-      const side: 'left' | 'right' = Math.random() > 0.5 ? 'left' : 'right'
-      // Left side: 5-18%, Right side: 82-95% - beside the content card
-      const startX = side === 'left' ? (5 + Math.random() * 13) : (82 + Math.random() * 13)
-      // Diagonal drift toward center
-      const drift = side === 'left' ? (5 + Math.random() * 8) : -(5 + Math.random() * 8)
-      const landX = startX + drift
+    const spawnInfernal = (newId: number, side: 'left' | 'right') => {
+      // Landing position - this is the single reference point for ALL phases
+      // Left side: 8-18%, Right side: 82-92%
+      const landX = side === 'left' ? (8 + Math.random() * 10) : (82 + Math.random() * 10)
 
-      // Phase 1: Falling (4s slow diagonal descent)
-      setInfernals(prev => [...prev, { id: newId, x: startX, landX, side, phase: 'falling' }])
+      // Phase 1: Falling - starts at landX, animates from top to bottom
+      setInfernals(prev => [...prev, { id: newId, x: landX, landX, side, phase: 'falling' }])
 
       // Phase 2: Explosion (after 4s fall)
       timeouts.push(setTimeout(() => {
@@ -358,8 +356,22 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
     const triggerLightningStorm = () => {
       if (!isActive) return
-      // Max 4 infernals on screen
-      if (infernalCountRef.current >= 4) return
+
+      // Determine which side to spawn (max 2 left, 1 right)
+      const canSpawnLeft = leftCountRef.current < 2
+      const canSpawnRight = rightCountRef.current < 1
+
+      if (!canSpawnLeft && !canSpawnRight) return
+
+      // Choose side based on availability
+      let side: 'left' | 'right'
+      if (canSpawnLeft && canSpawnRight) {
+        side = Math.random() > 0.6 ? 'left' : 'right' // Slight bias to left since it has more slots
+      } else if (canSpawnLeft) {
+        side = 'left'
+      } else {
+        side = 'right'
+      }
 
       // Lightning in the sky area
       const lightX = 20 + Math.random() * 60
@@ -377,15 +389,20 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       // Spawn infernal after lightning
       timeouts.push(setTimeout(() => {
         if (!isActive) return
-        if (infernalCountRef.current >= 4) return
-        infernalCountRef.current++
-        spawnInfernal(infernalId++)
+        // Double-check availability
+        if (side === 'left' && leftCountRef.current >= 2) return
+        if (side === 'right' && rightCountRef.current >= 1) return
+
+        if (side === 'left') leftCountRef.current++
+        else rightCountRef.current++
+
+        spawnInfernal(infernalId++, side)
       }, 200))
     }
 
     const scheduleNext = () => {
       if (!isActive) return
-      const delay = 8000 + Math.random() * 10000 // 8-18s between infernals
+      const delay = 6000 + Math.random() * 8000 // 6-14s between infernals
       timeouts.push(setTimeout(() => {
         triggerLightningStorm()
         scheduleNext()
@@ -711,16 +728,17 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         </svg>
       )}
 
-      {/* === WC3 INFERNAL - Slow diagonal fall → Explosion → Creature rises === */}
+      {/* === WC3 INFERNAL - All phases centered on same landX point === */}
       {infernals.map((inf) => (
         <div key={inf.id}>
-          {/* PHASE 1: FALLING ASTEROID - Slow diagonal descent */}
+          {/* PHASE 1: FALLING ASTEROID - Falls to the landing point */}
           {inf.phase === 'falling' && (
             <div
               style={{
                 position: 'absolute',
-                left: `${inf.x}%`,
-                top: '-8%',
+                left: `${inf.landX}%`,
+                bottom: '10vh',
+                transform: 'translateX(-50%)',
                 animation: `infernalFall${inf.side === 'left' ? 'Right' : 'Left'} 4s ease-in forwards`,
               }}
             >
@@ -1077,33 +1095,33 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       }} />
 
       <style>{`
-        /* Infernal falling from LEFT side - drifts RIGHT toward content */
+        /* Infernal falling from LEFT side - starts above, drifts right as it falls */
         @keyframes infernalFallRight {
           0% {
-            transform: translate(0, 0) scale(0.4);
+            transform: translateX(-50%) translate(-8vw, -90vh) scale(0.4);
             opacity: 0;
           }
           5% {
             opacity: 1;
-            transform: translate(1vw, 5vh) scale(0.5);
+            transform: translateX(-50%) translate(-7vw, -85vh) scale(0.5);
           }
           100% {
-            transform: translate(10vw, 82vh) scale(1);
+            transform: translateX(-50%) translate(0, 0) scale(1);
             opacity: 1;
           }
         }
-        /* Infernal falling from RIGHT side - drifts LEFT toward content */
+        /* Infernal falling from RIGHT side - starts above, drifts left as it falls */
         @keyframes infernalFallLeft {
           0% {
-            transform: translate(0, 0) scale(0.4);
+            transform: translateX(-50%) translate(8vw, -90vh) scale(0.4);
             opacity: 0;
           }
           5% {
             opacity: 1;
-            transform: translate(-1vw, 5vh) scale(0.5);
+            transform: translateX(-50%) translate(7vw, -85vh) scale(0.5);
           }
           100% {
-            transform: translate(-10vw, 82vh) scale(1);
+            transform: translateX(-50%) translate(0, 0) scale(1);
             opacity: 1;
           }
         }
