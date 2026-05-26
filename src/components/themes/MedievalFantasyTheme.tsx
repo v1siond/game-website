@@ -137,7 +137,7 @@ function WC3Frame({ children, title, zone = 'roc' }: { children: React.ReactNode
           <div style={{ background: WC3.metalDark, padding: '2px' }}>
             <div style={{
               background: `radial-gradient(ellipse at 50% 0%, ${WC3.bgDeep} 0%, ${WC3.bgVoid} 100%)`,
-              padding: '1.25rem',
+              padding: '1.5rem 1.75rem',
               boxShadow: `inset 0 2px 12px rgba(0,0,0,0.8)`,
             }}>
               {title && (
@@ -2893,60 +2893,145 @@ const RoCArtDivider = memo(function RoCArtDivider({ variant = 'weapons', scale =
   return (
     <div style={{
       position: 'relative',
-      height: `${60 * scale}px`,
-      margin: `${1 * scale}rem 0`,
+      height: `${140 * scale}px`,
+      margin: `${2 * scale}rem 0`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      transform: `scale(${scale})`,
-      transformOrigin: 'center center',
-      opacity: 0.6,
+      overflow: 'hidden',
     }}>
-      {/* Subtle green glow behind */}
+      {/* Background gradient fade - blends with battlefield */}
       <div style={{
         position: 'absolute',
-        width: '180px',
-        height: '40px',
-        background: `radial-gradient(ellipse, ${WC3.roc.felDark}20 0%, transparent 70%)`,
-        filter: 'blur(20px)',
+        inset: 0,
+        background: `linear-gradient(180deg,
+          transparent 0%,
+          ${WC3.roc.felDark}08 20%,
+          ${WC3.roc.felDark}12 50%,
+          ${WC3.roc.felDark}08 80%,
+          transparent 100%
+        )`,
         pointerEvents: 'none',
       }} />
 
-      {/* Horizontal line - very subtle, grassy green */}
+      {/* Fel energy glow behind center */}
+      <div style={{
+        position: 'absolute',
+        width: '300px',
+        height: '80px',
+        background: `radial-gradient(ellipse, ${WC3.roc.felDark}25 0%, transparent 70%)`,
+        filter: 'blur(25px)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Horizontal decorative lines */}
+      <div style={{
+        position: 'absolute',
+        left: '5%',
+        right: '5%',
+        height: '2px',
+        background: `linear-gradient(90deg,
+          transparent 0%,
+          ${WC3.metalDark}50 15%,
+          ${WC3.roc.felDark}60 30%,
+          ${WC3.roc.felMid}80 50%,
+          ${WC3.roc.felDark}60 70%,
+          ${WC3.metalDark}50 85%,
+          transparent 100%
+        )`,
+        boxShadow: `0 0 8px ${WC3.roc.felGlow}`,
+      }} />
+
+      {/* Second line above - creates depth */}
       <div style={{
         position: 'absolute',
         left: '15%',
         right: '15%',
+        top: '35%',
         height: '1px',
-        background: `linear-gradient(90deg, transparent 0%, #2a3a25 20%, ${WC3.roc.felDark}50 50%, #2a3a25 80%, transparent 100%)`,
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.metalMid}30 30%, ${WC3.metalMid}40 50%, ${WC3.metalMid}30 70%, transparent 100%)`,
       }} />
 
-      {/* Grass tuft decorations on left - very subtle */}
-      <svg width="30" height="20" viewBox="0 0 30 20" style={{ position: 'absolute', left: '12%', top: '50%', transform: 'translateY(-50%)', opacity: 0.35 }}>
-        <line x1="5" y1="20" x2="6" y2="8" stroke="#3a4a30" strokeWidth="1" />
-        <line x1="12" y1="20" x2="13" y2="5" stroke="#4a5a38" strokeWidth="1" />
-        <line x1="19" y1="20" x2="18" y2="7" stroke="#3a4a30" strokeWidth="1" />
-        <line x1="25" y1="20" x2="26" y2="10" stroke="#4a5a38" strokeWidth="1" />
+      {/* Third line below */}
+      <div style={{
+        position: 'absolute',
+        left: '15%',
+        right: '15%',
+        bottom: '35%',
+        height: '1px',
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.metalMid}30 30%, ${WC3.metalMid}40 50%, ${WC3.metalMid}30 70%, transparent 100%)`,
+      }} />
+
+      {/* Center ornament */}
+      <svg width="180" height="100" viewBox="0 0 180 100" style={{ position: 'relative', zIndex: 2 }}>
+        {variant === 'weapons' && (
+          <>
+            {/* Crossed swords */}
+            <g transform="translate(90,50)">
+              {/* Left sword */}
+              <g transform="rotate(-30)">
+                <rect x="-4" y="-35" width="8" height="50" fill={WC3.metalMid} />
+                <rect x="-2" y="-35" width="4" height="50" fill={WC3.metalLight} opacity="0.6" />
+                <rect x="-12" y="12" width="24" height="6" fill={WC3.metalDark} rx="1" />
+                <circle cx="0" cy="-38" r="5" fill={WC3.roc.felDark} />
+                <circle cx="0" cy="-38" r="3" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 3px ${WC3.roc.felGlow})` }} />
+              </g>
+              {/* Right sword */}
+              <g transform="rotate(30)">
+                <rect x="-4" y="-35" width="8" height="50" fill={WC3.metalMid} />
+                <rect x="-2" y="-35" width="4" height="50" fill={WC3.metalLight} opacity="0.6" />
+                <rect x="-12" y="12" width="24" height="6" fill={WC3.metalDark} rx="1" />
+                <circle cx="0" cy="-38" r="5" fill={WC3.roc.felDark} />
+                <circle cx="0" cy="-38" r="3" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 3px ${WC3.roc.felGlow})` }} />
+              </g>
+              {/* Center shield */}
+              <circle cx="0" cy="0" r="18" fill={WC3.metalDark} stroke={WC3.metalMid} strokeWidth="2" />
+              <circle cx="0" cy="0" r="12" fill="none" stroke={WC3.roc.felDark} strokeWidth="1.5" opacity="0.6" />
+              <circle cx="0" cy="0" r="5" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 6px ${WC3.roc.felGlow})` }} />
+            </g>
+          </>
+        )}
+        {variant === 'banner' && (
+          <g transform="translate(90,50)">
+            {/* War banner pole */}
+            <rect x="-3" y="-40" width="6" height="80" fill={WC3.metalMid} />
+            <circle cx="0" cy="-42" r="6" fill={WC3.roc.felDark} />
+            <circle cx="0" cy="-42" r="4" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 4px ${WC3.roc.felGlow})` }} />
+            {/* Banner fabric */}
+            <path d="M5,-35 Q35,-30 30,-10 Q25,10 35,25 L5,20 Z" fill={WC3.hordeRed} opacity="0.8" />
+            <path d="M5,-35 Q35,-30 30,-10" stroke={WC3.bloodRed} strokeWidth="2" fill="none" opacity="0.5" />
+          </g>
+        )}
+        {variant === 'rune' && (
+          <g transform="translate(90,50)">
+            {/* Fel rune circle */}
+            <circle cx="0" cy="0" r="30" fill="none" stroke={WC3.roc.felDark} strokeWidth="2" opacity="0.5" />
+            <circle cx="0" cy="0" r="20" fill="none" stroke={WC3.roc.felMid} strokeWidth="1.5" opacity="0.4" />
+            {/* Rune symbols */}
+            <path d="M0,-25 L8,-8 L0,5 L-8,-8 Z" fill={WC3.roc.felMid} opacity="0.6" />
+            <circle cx="0" cy="0" r="8" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 8px ${WC3.roc.felGlow})` }} />
+          </g>
+        )}
       </svg>
 
-      {/* Grass tuft decorations on right */}
-      <svg width="30" height="20" viewBox="0 0 30 20" style={{ position: 'absolute', right: '12%', top: '50%', transform: 'translateY(-50%) scaleX(-1)', opacity: 0.35 }}>
-        <line x1="5" y1="20" x2="6" y2="8" stroke="#3a4a30" strokeWidth="1" />
-        <line x1="12" y1="20" x2="13" y2="5" stroke="#4a5a38" strokeWidth="1" />
-        <line x1="19" y1="20" x2="18" y2="7" stroke="#3a4a30" strokeWidth="1" />
-        <line x1="25" y1="20" x2="26" y2="10" stroke="#4a5a38" strokeWidth="1" />
-      </svg>
-
-      {/* Center element - minimal fel rune, not weapons */}
-      <svg width="60" height="40" viewBox="0 0 60 40" style={{ position: 'relative', zIndex: 2, opacity: 0.7 }}>
-        {/* Simple fel glow dot */}
-        <ellipse cx="30" cy="20" rx="15" ry="12" fill={WC3.roc.felDark} opacity="0.15" />
-        <circle cx="30" cy="20" r="6" fill={WC3.roc.felDark} opacity="0.3" />
-        <circle cx="30" cy="20" r="3" fill={WC3.roc.felMid} opacity="0.4" />
-        {/* Subtle side lines */}
-        <line x1="5" y1="20" x2="18" y2="20" stroke={WC3.roc.felDark} strokeWidth="1" opacity="0.4" />
-        <line x1="42" y1="20" x2="55" y2="20" stroke={WC3.roc.felDark} strokeWidth="1" opacity="0.4" />
-      </svg>
+      {/* Side decorative elements - floating embers */}
+      {[...Array(6)].map((_, i) => (
+        <div
+          key={`ember-${i}`}
+          style={{
+            position: 'absolute',
+            left: `${10 + (i % 3) * 30 + (i > 2 ? 5 : 0)}%`,
+            top: `${20 + (i % 2) * 40}%`,
+            width: '4px',
+            height: '4px',
+            borderRadius: '50%',
+            background: WC3.roc.felMid,
+            boxShadow: `0 0 8px ${WC3.roc.felGlow}`,
+            opacity: 0.4 + (i % 3) * 0.15,
+            animation: `felPulse ${2 + i * 0.3}s ease-in-out infinite`,
+          }}
+        />
+      ))}
     </div>
   )
 })
@@ -2955,38 +3040,90 @@ const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', scale = 
   return (
     <div style={{
       position: 'relative',
-      height: `${80 * scale}px`,
-      margin: `${1.5 * scale}rem 0`,
+      height: `${140 * scale}px`,
+      margin: `${2 * scale}rem 0`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      transform: `scale(${scale})`,
-      transformOrigin: 'center center',
+      overflow: 'hidden',
     }}>
-      {/* Horizontal line base - icy */}
+      {/* Background gradient fade - blends with frozen landscape */}
       <div style={{
         position: 'absolute',
-        left: '10%',
-        right: '10%',
-        height: '2px',
-        background: `linear-gradient(90deg, transparent 0%, ${WC3.ft.iceDark}60 20%, ${WC3.ft.iceMid}80 50%, ${WC3.ft.iceDark}60 80%, transparent 100%)`,
+        inset: 0,
+        background: `linear-gradient(180deg,
+          transparent 0%,
+          ${WC3.ft.iceDark}08 20%,
+          ${WC3.ft.iceGlow}12 50%,
+          ${WC3.ft.iceDark}08 80%,
+          transparent 100%
+        )`,
+        pointerEvents: 'none',
       }} />
 
-      {/* Center art piece */}
-      <svg width="140" height="70" viewBox="0 0 140 70" style={{ position: 'relative', zIndex: 2 }}>
+      {/* Ice glow behind center */}
+      <div style={{
+        position: 'absolute',
+        width: '300px',
+        height: '80px',
+        background: `radial-gradient(ellipse, ${WC3.ft.iceGlow}30 0%, transparent 70%)`,
+        filter: 'blur(25px)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Horizontal decorative lines - icy */}
+      <div style={{
+        position: 'absolute',
+        left: '5%',
+        right: '5%',
+        height: '2px',
+        background: `linear-gradient(90deg,
+          transparent 0%,
+          ${WC3.ft.iceDark}50 15%,
+          ${WC3.ft.iceMid}80 50%,
+          ${WC3.ft.iceDark}50 85%,
+          transparent 100%
+        )`,
+        boxShadow: `0 0 10px ${WC3.ft.iceGlow}`,
+      }} />
+
+      {/* Frost lines above and below */}
+      <div style={{
+        position: 'absolute',
+        left: '15%',
+        right: '15%',
+        top: '35%',
+        height: '1px',
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.ft.iceDark}40 30%, ${WC3.ft.iceDark}50 50%, ${WC3.ft.iceDark}40 70%, transparent 100%)`,
+      }} />
+      <div style={{
+        position: 'absolute',
+        left: '15%',
+        right: '15%',
+        bottom: '35%',
+        height: '1px',
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.ft.iceDark}40 30%, ${WC3.ft.iceDark}50 50%, ${WC3.ft.iceDark}40 70%, transparent 100%)`,
+      }} />
+
+      {/* Center art piece - larger */}
+      <svg width="200" height="110" viewBox="0 0 200 110" style={{ position: 'relative', zIndex: 2 }}>
         {variant === 'crystals' && (
           <>
-            {/* Ice crystal cluster */}
-            <g transform="translate(70,35)">
+            {/* Ice crystal cluster - more elaborate */}
+            <g transform="translate(100,55)">
               {/* Center large crystal */}
-              <polygon points="0,-30 6,-10 4,15 -4,15 -6,-10" fill={WC3.ft.iceMid} opacity="0.8" />
-              <polygon points="0,-28 4,-12 3,10" fill={WC3.ft.iceBright} opacity="0.4" />
+              <polygon points="0,-45 10,-15 7,25 -7,25 -10,-15" fill={WC3.ft.iceMid} opacity="0.9" />
+              <polygon points="0,-42 6,-18 5,20" fill={WC3.ft.iceBright} opacity="0.5" />
               {/* Left crystals */}
-              <polygon points="-15,-20 -10,-8 -12,15 -18,15 -20,-8" fill={WC3.ft.iceDark} opacity="0.7" transform="rotate(-15)" />
-              <polygon points="-25,-12 -22,-2 -24,12 -28,12 -28,-2" fill={WC3.ft.iceMid} opacity="0.5" transform="rotate(-25)" />
+              <polygon points="-20,-32 -12,-12 -15,22 -25,22 -28,-12" fill={WC3.ft.iceDark} opacity="0.8" transform="rotate(-18)" />
+              <polygon points="-35,-22 -30,-5 -33,18 -40,18 -42,-5" fill={WC3.ft.iceMid} opacity="0.6" transform="rotate(-30)" />
+              <polygon points="-48,-12 -45,0 -47,12 -52,12 -52,0" fill={WC3.ft.iceDark} opacity="0.4" transform="rotate(-40)" />
               {/* Right crystals */}
-              <polygon points="15,-20 20,-8 18,15 12,15 10,-8" fill={WC3.ft.iceDark} opacity="0.7" transform="rotate(15)" />
-              <polygon points="25,-12 28,-2 26,12 22,12 22,-2" fill={WC3.ft.iceMid} opacity="0.5" transform="rotate(25)" />
+              <polygon points="20,-32 28,-12 25,22 15,22 12,-12" fill={WC3.ft.iceDark} opacity="0.8" transform="rotate(18)" />
+              <polygon points="35,-22 40,-5 37,18 30,18 28,-5" fill={WC3.ft.iceMid} opacity="0.6" transform="rotate(30)" />
+              <polygon points="48,-12 52,0 50,12 45,12 45,0" fill={WC3.ft.iceDark} opacity="0.4" transform="rotate(40)" />
+              {/* Inner glow */}
+              <ellipse cx="0" cy="0" rx="12" ry="20" fill={WC3.ft.iceBright} opacity="0.15" style={{ filter: `blur(4px)` }} />
             </g>
           </>
         )}
@@ -3033,6 +3170,26 @@ const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', scale = 
         filter: 'blur(15px)',
         pointerEvents: 'none',
       }} />
+
+      {/* Floating ice particles */}
+      {[...Array(8)].map((_, i) => (
+        <div
+          key={`ice-${i}`}
+          style={{
+            position: 'absolute',
+            left: `${8 + (i % 4) * 22 + (i > 3 ? 3 : 0)}%`,
+            top: `${15 + (i % 2) * 50}%`,
+            width: i % 2 === 0 ? '3px' : '5px',
+            height: i % 2 === 0 ? '3px' : '5px',
+            background: WC3.ft.iceBright,
+            boxShadow: `0 0 6px ${WC3.ft.iceGlow}`,
+            opacity: 0.3 + (i % 4) * 0.1,
+            borderRadius: '1px',
+            transform: `rotate(${i * 15}deg)`,
+            animation: `felPulse ${2.5 + i * 0.2}s ease-in-out infinite`,
+          }}
+        />
+      ))}
     </div>
   )
 })
@@ -3165,30 +3322,206 @@ export default function MedievalFantasyTheme() {
         </FadeInSection>
         </div>
 
-        {/* Profession Selector */}
+        {/* Profession Selector - WC3 Style Command Card */}
         <FadeInSection delay={100}>
-          <nav style={{ marginBottom: sectionSpacing, display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <WC3Button onClick={() => setActive('engineer')} active={active === 'engineer'} zone="roc">Engineer</WC3Button>
-            <WC3Button onClick={() => setActive('drummer')} active={active === 'drummer'} zone="roc">Musician</WC3Button>
-            <WC3Button onClick={() => setActive('fighter')} active={active === 'fighter'} zone="roc">Muay Thai</WC3Button>
+          <nav style={{
+            marginBottom: sectionSpacing,
+            position: 'relative',
+            height: isLargeScreen ? '12rem' : '9rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            {/* Background glow */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: `radial-gradient(ellipse 80% 100% at 50% 100%, ${WC3.roc.felDark}15 0%, transparent 70%)`,
+              pointerEvents: 'none',
+            }} />
+
+            {/* Connecting paths SVG */}
+            <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }} preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="felPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={WC3.roc.felDark} stopOpacity="0.3" />
+                  <stop offset="50%" stopColor={WC3.roc.felMid} stopOpacity="0.5" />
+                  <stop offset="100%" stopColor={WC3.roc.felDark} stopOpacity="0.3" />
+                </linearGradient>
+              </defs>
+              {/* Left to center path */}
+              <path
+                d={isLargeScreen ? "M 20% 70% Q 35% 40%, 50% 50%" : "M 15% 75% Q 32% 45%, 50% 55%"}
+                stroke="url(#felPathGradient)"
+                strokeWidth="2"
+                fill="none"
+                strokeDasharray={active === 'engineer' ? "none" : "4 4"}
+                style={{
+                  filter: active === 'engineer' ? `drop-shadow(0 0 4px ${WC3.roc.felMid})` : 'none',
+                  transition: 'all 0.3s ease'
+                }}
+              />
+              {/* Center to right path */}
+              <path
+                d={isLargeScreen ? "M 50% 50% Q 65% 40%, 80% 70%" : "M 50% 55% Q 68% 45%, 85% 75%"}
+                stroke="url(#felPathGradient)"
+                strokeWidth="2"
+                fill="none"
+                strokeDasharray={active === 'fighter' ? "none" : "4 4"}
+                style={{
+                  filter: active === 'fighter' ? `drop-shadow(0 0 4px ${WC3.roc.felMid})` : 'none',
+                  transition: 'all 0.3s ease'
+                }}
+              />
+            </svg>
+
+            {/* Profession nodes */}
+            <div style={{
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              width: '100%',
+              maxWidth: isLargeScreen ? '700px' : '500px',
+              padding: '0 1rem',
+            }}>
+              {/* Engineer Node - Left */}
+              <button
+                onClick={() => setActive('engineer')}
+                style={{
+                  width: isLargeScreen ? '6rem' : '4.5rem',
+                  height: isLargeScreen ? '6rem' : '4.5rem',
+                  background: active === 'engineer'
+                    ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
+                    : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
+                  border: `3px solid ${active === 'engineer' ? WC3.roc.felMid : WC3.metalMid}`,
+                  boxShadow: active === 'engineer'
+                    ? `0 0 20px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
+                    : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.25rem',
+                  transition: 'all 0.3s ease',
+                  position: 'relative',
+                  alignSelf: 'flex-end',
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke={active === 'engineer' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span style={{
+                  color: active === 'engineer' ? WC3.roc.felBright : WC3.textMid,
+                  fontSize: isLargeScreen ? '0.7rem' : '0.6rem',
+                  fontFamily: '"Cinzel", serif',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                }}>System</span>
+              </button>
+
+              {/* Musician Node - Center (elevated) */}
+              <button
+                onClick={() => setActive('drummer')}
+                style={{
+                  width: isLargeScreen ? '7rem' : '5rem',
+                  height: isLargeScreen ? '7rem' : '5rem',
+                  background: active === 'drummer'
+                    ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
+                    : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
+                  border: `3px solid ${active === 'drummer' ? WC3.roc.felMid : WC3.metalMid}`,
+                  boxShadow: active === 'drummer'
+                    ? `0 0 25px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
+                    : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.25rem',
+                  transition: 'all 0.3s ease',
+                  alignSelf: 'flex-start',
+                  marginTop: isLargeScreen ? '0.5rem' : '0.25rem',
+                }}
+              >
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke={active === 'drummer' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2"/>
+                  <circle cx="12" cy="12" r="3" fill={active === 'drummer' ? WC3.roc.felBright : WC3.textMid}/>
+                  <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke={active === 'drummer' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2"/>
+                </svg>
+                <span style={{
+                  color: active === 'drummer' ? WC3.roc.felBright : WC3.textMid,
+                  fontSize: isLargeScreen ? '0.7rem' : '0.6rem',
+                  fontFamily: '"Cinzel", serif',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                }}>Drummer</span>
+              </button>
+
+              {/* Fighter Node - Right */}
+              <button
+                onClick={() => setActive('fighter')}
+                style={{
+                  width: isLargeScreen ? '6rem' : '4.5rem',
+                  height: isLargeScreen ? '6rem' : '4.5rem',
+                  background: active === 'fighter'
+                    ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
+                    : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
+                  border: `3px solid ${active === 'fighter' ? WC3.roc.felMid : WC3.metalMid}`,
+                  boxShadow: active === 'fighter'
+                    ? `0 0 20px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
+                    : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.25rem',
+                  transition: 'all 0.3s ease',
+                  alignSelf: 'flex-end',
+                }}
+              >
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 4l7.07 17.57 2.51-7.39 7.39-2.51L4 4z" stroke={active === 'fighter' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <span style={{
+                  color: active === 'fighter' ? WC3.roc.felBright : WC3.textMid,
+                  fontSize: isLargeScreen ? '0.7rem' : '0.6rem',
+                  fontFamily: '"Cinzel", serif',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                }}>Muay Thai</span>
+              </button>
+            </div>
           </nav>
         </FadeInSection>
 
-        {/* About */}
+        {/* About - More breathing room */}
         <FadeInSection>
-          <section style={{ marginBottom: sectionSpacing }}>
+          <section style={{ marginBottom: sectionSpacing, marginTop: '1rem' }}>
             <WC3Frame title="About" zone="roc">
-              <p style={{ color: WC3.textBright, lineHeight: 1.7, marginBottom: '0.75rem', fontSize: '0.875rem' }}>{aboutData.bio}</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
+              <p style={{
+                color: WC3.textBright,
+                lineHeight: 1.8,
+                marginBottom: '1.25rem',
+                fontSize: isLargeScreen ? '0.95rem' : '0.875rem',
+                padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
+              }}>{aboutData.bio}</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: isLargeScreen ? '0.625rem' : '0.5rem' }}>
                 {aboutData.quickFacts.map((fact, i) => (
                   <span key={i} style={{
-                    background: WC3.metalDark,
+                    background: `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
                     border: `1px solid ${WC3.metalMid}`,
                     color: WC3.textMid,
-                    fontSize: '0.625rem',
-                    padding: '0.25rem 0.5rem',
+                    fontSize: isLargeScreen ? '0.75rem' : '0.675rem',
+                    padding: isLargeScreen ? '0.5rem 0.875rem' : '0.375rem 0.625rem',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.05em'
+                    letterSpacing: '0.05em',
+                    boxShadow: `inset 0 1px 2px rgba(0,0,0,0.3)`,
                   }}>
                     {fact}
                   </span>
