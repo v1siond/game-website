@@ -1141,9 +1141,9 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             {/* Pole top spike */}
             <polygon points="6,-30 -4,5 16,5" fill="#5a4a35" />
             <polygon points="6,-25 0,3 12,3" fill="#6a5a45" />
-            {/* Banner fabric with wave columns - skull integrated INTO each column */}
+            {/* Banner fabric with wave columns - Horde skull centered and sliced across columns */}
             <g transform="translate(12, 15)" className="banner-fabric">
-              {/* Define clipping regions for skull parts */}
+              {/* Define clipping regions for skull parts - skull centered at x=44 */}
               <defs>
                 <clipPath id="bannerCol1"><rect x="0" y="0" width="18" height="150" /></clipPath>
                 <clipPath id="bannerCol2"><rect x="18" y="0" width="18" height="150" /></clipPath>
@@ -1152,31 +1152,54 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 <clipPath id="bannerCol5"><rect x="72" y="0" width="18" height="150" /></clipPath>
               </defs>
 
-              {/* Column 1 with skull slice */}
-              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0s' }}>
-                <rect x="0" y="0" width="18" height="150" fill="#aa2525" />
-                <g clipPath="url(#bannerCol1)"><g transform="translate(44, 75)">{/* Skull left edge - partial tusk */}<path d="M-10,-6 Q-16,5 -12,14" stroke="#ccbb99" strokeWidth="2" fill="none" opacity="0.7" /></g></g>
-              </g>
-              {/* Column 2 with skull slice */}
-              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.12s' }}>
-                <rect x="18" y="2" width="18" height="148" fill="#992222" />
-                <g clipPath="url(#bannerCol2)"><g transform="translate(44, 75)">{/* Skull left part */}<ellipse cx="0" cy="-12" rx="16" ry="12" fill="#441212" opacity="0.8" /><ellipse cx="-6" cy="-12" rx="3.5" ry="2.5" fill="#220606" /><path d="M-10,-6 Q-16,5 -12,14" stroke="#ccbb99" strokeWidth="2" fill="none" /></g></g>
-              </g>
-              {/* Column 3 with skull slice - CENTER */}
-              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.24s' }}>
-                <rect x="36" y="4" width="18" height="146" fill="#882020" />
-                <g clipPath="url(#bannerCol3)"><g transform="translate(44, 75)">{/* Skull center */}<ellipse cx="0" cy="-12" rx="16" ry="12" fill="#441212" opacity="0.8" /><ellipse cx="0" cy="-10" rx="10" ry="7" fill="#551515" opacity="0.6" /><rect x="-7" y="-3" width="14" height="7" fill="#441212" opacity="0.8" /><line x1="-5" y1="-3" x2="-5" y2="4" stroke="#220606" strokeWidth="2" /><line x1="0" y1="-3" x2="0" y2="4" stroke="#220606" strokeWidth="2" /><line x1="5" y1="-3" x2="5" y2="4" stroke="#220606" strokeWidth="2" /></g></g>
-              </g>
-              {/* Column 4 with skull slice */}
-              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.36s' }}>
-                <rect x="54" y="6" width="18" height="144" fill="#771818" />
-                <g clipPath="url(#bannerCol4)"><g transform="translate(44, 75)">{/* Skull right part */}<ellipse cx="0" cy="-12" rx="16" ry="12" fill="#441212" opacity="0.8" /><ellipse cx="6" cy="-12" rx="3.5" ry="2.5" fill="#220606" /><path d="M10,-6 Q16,5 12,14" stroke="#ccbb99" strokeWidth="2" fill="none" /></g></g>
-              </g>
-              {/* Column 5 (edge) with skull slice */}
-              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.48s' }}>
-                <rect x="72" y="8" width="15" height="142" fill="#661515" />
-                <g clipPath="url(#bannerCol5)"><g transform="translate(44, 75)">{/* Skull right edge - partial tusk */}<path d="M10,-6 Q16,5 12,14" stroke="#ccbb99" strokeWidth="2" fill="none" opacity="0.7" /></g></g>
-              </g>
+              {/* Horde skull definition - complete skull to be clipped by each column */}
+              {/* Skull is centered at x=44, y=70 relative to banner-fabric */}
+              {[
+                { id: 1, x: 0, w: 18, delay: '0s', fill: '#aa2525', yOff: 0 },
+                { id: 2, x: 18, w: 18, delay: '0.12s', fill: '#992222', yOff: 2 },
+                { id: 3, x: 36, w: 18, delay: '0.24s', fill: '#882020', yOff: 4 },
+                { id: 4, x: 54, w: 18, delay: '0.36s', fill: '#771818', yOff: 6 },
+                { id: 5, x: 72, w: 15, delay: '0.48s', fill: '#661515', yOff: 8 },
+              ].map((col) => (
+                <g key={col.id} style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: col.delay }}>
+                  {/* Fabric column */}
+                  <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
+                  {/* Skull slice - clipped to this column */}
+                  <g clipPath={`url(#bannerCol${col.id})`}>
+                    <g transform="translate(44, 70)">
+                      {/* Skull outline - dark embossed look */}
+                      <ellipse cx="0" cy="0" rx="22" ry="18" fill="#1a0808" />
+                      {/* Skull main shape */}
+                      <ellipse cx="0" cy="-2" rx="20" ry="16" fill="#2a1010" />
+                      {/* Skull highlight */}
+                      <ellipse cx="0" cy="-4" rx="16" ry="12" fill="#3a1515" />
+                      {/* Left eye socket - dark void */}
+                      <ellipse cx="-7" cy="-4" rx="5" ry="4" fill="#0a0404" />
+                      {/* Left eye glow */}
+                      <ellipse cx="-7" cy="-4" rx="2.5" ry="2" fill="#441111" />
+                      {/* Right eye socket - dark void */}
+                      <ellipse cx="7" cy="-4" rx="5" ry="4" fill="#0a0404" />
+                      {/* Right eye glow */}
+                      <ellipse cx="7" cy="-4" rx="2.5" ry="2" fill="#441111" />
+                      {/* Nose cavity */}
+                      <path d="M0,2 L-3,8 L0,6 L3,8 Z" fill="#0a0404" />
+                      {/* Jaw/teeth area */}
+                      <rect x="-12" y="8" width="24" height="8" fill="#2a1010" rx="2" />
+                      {/* Teeth */}
+                      <g fill="#1a0808">
+                        <rect x="-10" y="9" width="3" height="6" />
+                        <rect x="-5" y="9" width="3" height="6" />
+                        <rect x="0" y="9" width="3" height="6" />
+                        <rect x="5" y="9" width="3" height="6" />
+                      </g>
+                      {/* Left tusk */}
+                      <path d="M-14,4 Q-20,12 -16,22" stroke="#ccbb88" strokeWidth="3" fill="none" strokeLinecap="round" />
+                      {/* Right tusk */}
+                      <path d="M14,4 Q20,12 16,22" stroke="#ccbb88" strokeWidth="3" fill="none" strokeLinecap="round" />
+                    </g>
+                  </g>
+                </g>
+              ))}
               {/* Banner edge fraying */}
               <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill="#661515" style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
             </g>
