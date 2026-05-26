@@ -2236,7 +2236,7 @@ export default function DarkFantasyTheme() {
       id: 'fighter',
       icon: <DiamondIcon />,
       label: 'Martial',
-      sublabel: 'BJJ Instructor',
+      sublabel: 'Muay Thai',
       color: DF.spiritGold,
       position: { x: 75, y: 50 }
     },
