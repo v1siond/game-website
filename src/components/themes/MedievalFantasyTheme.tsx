@@ -308,11 +308,12 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     id: number
     x: number
     landX: number
+    landY: string // '30vh' for left, '10vh' for right
     side: 'left' | 'right'
     phase: 'falling' | 'explosion' | 'rising' | 'idle'
   }>>([])
 
-  // Track infernal counts per side (max 2 left, 1 right)
+  // Track infernal counts per side (max 1 left, 1 right = 2 total)
   const leftCountRef = useRef(0)
   const rightCountRef = useRef(0)
 
@@ -325,9 +326,11 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       // Landing position - this is the single reference point for ALL phases
       // Left side: 8-18%, Right side: 82-92%
       const landX = side === 'left' ? (8 + Math.random() * 10) : (82 + Math.random() * 10)
+      // Different landing heights: left at 30vh, right at 10vh from bottom
+      const landY = side === 'left' ? '30vh' : '10vh'
 
       // Phase 1: Falling - starts at landX, animates from top to bottom
-      setInfernals(prev => [...prev, { id: newId, x: landX, landX, side, phase: 'falling' }])
+      setInfernals(prev => [...prev, { id: newId, x: landX, landX, landY, side, phase: 'falling' }])
 
       // Phase 2: Explosion (after 4s fall)
       timeouts.push(setTimeout(() => {
@@ -357,8 +360,8 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     const triggerLightningStorm = () => {
       if (!isActive) return
 
-      // Determine which side to spawn (max 2 left, 1 right)
-      const canSpawnLeft = leftCountRef.current < 2
+      // Determine which side to spawn (max 1 left, 1 right = 2 total)
+      const canSpawnLeft = leftCountRef.current < 1
       const canSpawnRight = rightCountRef.current < 1
 
       if (!canSpawnLeft && !canSpawnRight) return
@@ -737,7 +740,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               style={{
                 position: 'absolute',
                 left: `${inf.landX}%`,
-                bottom: '10vh',
+                bottom: inf.landY,
                 transform: 'translateX(-50%)',
                 animation: `infernalFall${inf.side === 'left' ? 'Right' : 'Left'} 4s ease-in forwards`,
               }}
@@ -818,7 +821,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               style={{
                 position: 'absolute',
                 left: `${inf.landX}%`,
-                bottom: '10vh',
+                bottom: inf.landY,
                 transform: 'translateX(-50%)',
               }}
             >
@@ -868,7 +871,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               style={{
                 position: 'absolute',
                 left: `${inf.landX}%`,
-                bottom: '10vh',
+                bottom: inf.landY,
                 transform: 'translateX(-50%)',
                 animation: 'infernalRise 1s ease-out forwards',
               }}
@@ -973,14 +976,14 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 {/* Mouth fire */}
                 <path d="M37,20 L40,23 L43,20" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" />
               </svg>
-              {/* Ground scorch */}
+              {/* Shadow - 15px below feet */}
               <div style={{
                 position: 'absolute',
-                left: '-40px',
-                bottom: '-15px',
-                width: '130px',
-                height: '30px',
-                background: `radial-gradient(ellipse, ${WC3.roc.felDark}80 0%, ${WC3.roc.felDark}40 50%, transparent 80%)`,
+                left: '-35px',
+                bottom: '-25px',
+                width: '110px',
+                height: '20px',
+                background: 'radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 80%)',
                 borderRadius: '50%',
               }} />
             </div>
@@ -992,7 +995,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               style={{
                 position: 'absolute',
                 left: `${inf.landX}%`,
-                bottom: '10vh',
+                bottom: inf.landY,
                 transform: 'translateX(-50%)',
               }}
             >
@@ -1077,14 +1080,14 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 <ellipse cx="45" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowI${inf.id})`} />
                 <path d="M37,20 L40,23 L43,20" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" />
               </svg>
-              {/* Ground scorch */}
+              {/* Shadow - 15px below feet */}
               <div style={{
                 position: 'absolute',
-                left: '-40px',
-                bottom: '-15px',
-                width: '130px',
-                height: '30px',
-                background: `radial-gradient(ellipse, ${WC3.roc.felDark}80 0%, ${WC3.roc.felDark}40 50%, transparent 80%)`,
+                left: '-35px',
+                bottom: '-25px',
+                width: '110px',
+                height: '20px',
+                background: 'radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 80%)',
                 borderRadius: '50%',
               }} />
             </div>
