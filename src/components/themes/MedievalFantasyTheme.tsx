@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useEffect, useState, useMemo, useCallback } from 'react'
+import { memo, useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
@@ -312,13 +312,54 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     phase: 'falling' | 'explosion' | 'rising' | 'idle'
   }>>([])
 
+  // Track infernal count outside of state for spawn decisions
+  const infernalCountRef = useRef(0)
+
   useEffect(() => {
     let infernalId = 0
     let isActive = true
     const timeouts: NodeJS.Timeout[] = []
 
+    const spawnInfernal = (newId: number) => {
+      const side: 'left' | 'right' = Math.random() > 0.5 ? 'left' : 'right'
+      // Left side: 5-18%, Right side: 82-95% - beside the content card
+      const startX = side === 'left' ? (5 + Math.random() * 13) : (82 + Math.random() * 13)
+      // Diagonal drift toward center
+      const drift = side === 'left' ? (5 + Math.random() * 8) : -(5 + Math.random() * 8)
+      const landX = startX + drift
+
+      // Phase 1: Falling (4s slow diagonal descent)
+      setInfernals(prev => [...prev, { id: newId, x: startX, landX, side, phase: 'falling' }])
+
+      // Phase 2: Explosion (after 4s fall)
+      timeouts.push(setTimeout(() => {
+        if (!isActive) return
+        setInfernals(prev => prev.map(inf =>
+          inf.id === newId ? { ...inf, phase: 'explosion' } : inf
+        ))
+      }, 4000))
+
+      // Phase 3: Rising (after 0.6s explosion)
+      timeouts.push(setTimeout(() => {
+        if (!isActive) return
+        setInfernals(prev => prev.map(inf =>
+          inf.id === newId ? { ...inf, phase: 'rising' } : inf
+        ))
+      }, 4600))
+
+      // Phase 4: Idle (after 1s rising) - stays permanently
+      timeouts.push(setTimeout(() => {
+        if (!isActive) return
+        setInfernals(prev => prev.map(inf =>
+          inf.id === newId ? { ...inf, phase: 'idle' } : inf
+        ))
+      }, 5600))
+    }
+
     const triggerLightningStorm = () => {
       if (!isActive) return
+      // Max 4 infernals on screen
+      if (infernalCountRef.current >= 4) return
 
       // Lightning in the sky area
       const lightX = 20 + Math.random() * 60
@@ -333,55 +374,18 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         setCloudGlow(0)
       }, 400))
 
-      // Spawn infernal on LEFT or RIGHT side of content (not middle)
+      // Spawn infernal after lightning
       timeouts.push(setTimeout(() => {
         if (!isActive) return
-        const newId = infernalId++
-        const side: 'left' | 'right' = Math.random() > 0.5 ? 'left' : 'right'
-        // Left side: 5-18%, Right side: 82-95% - beside the content card
-        const startX = side === 'left' ? (5 + Math.random() * 13) : (82 + Math.random() * 13)
-        // Diagonal drift toward center
-        const drift = side === 'left' ? (5 + Math.random() * 8) : -(5 + Math.random() * 8)
-        const landX = startX + drift
-
-        // Phase 1: Falling (4s slow diagonal descent)
-        setInfernals(prev => [...prev, { id: newId, x: startX, landX, side, phase: 'falling' }])
-
-        // Phase 2: Explosion (after 4s fall)
-        timeouts.push(setTimeout(() => {
-          if (!isActive) return
-          setInfernals(prev => prev.map(inf =>
-            inf.id === newId ? { ...inf, phase: 'explosion' } : inf
-          ))
-        }, 4000))
-
-        // Phase 3: Rising (after 0.6s explosion)
-        timeouts.push(setTimeout(() => {
-          if (!isActive) return
-          setInfernals(prev => prev.map(inf =>
-            inf.id === newId ? { ...inf, phase: 'rising' } : inf
-          ))
-        }, 4600))
-
-        // Phase 4: Idle (after 1s rising)
-        timeouts.push(setTimeout(() => {
-          if (!isActive) return
-          setInfernals(prev => prev.map(inf =>
-            inf.id === newId ? { ...inf, phase: 'idle' } : inf
-          ))
-        }, 5600))
-
-        // Remove after 12s total
-        timeouts.push(setTimeout(() => {
-          if (!isActive) return
-          setInfernals(prev => prev.filter(inf => inf.id !== newId))
-        }, 12000))
+        if (infernalCountRef.current >= 4) return
+        infernalCountRef.current++
+        spawnInfernal(infernalId++)
       }, 200))
     }
 
     const scheduleNext = () => {
       if (!isActive) return
-      const delay = 6000 + Math.random() * 8000 // 6-14s between infernals
+      const delay = 8000 + Math.random() * 10000 // 8-18s between infernals
       timeouts.push(setTimeout(() => {
         triggerLightningStorm()
         scheduleNext()
