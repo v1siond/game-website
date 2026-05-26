@@ -241,6 +241,368 @@ function InnerCard({ children, highlight, zone = 'roc' }: { children: React.Reac
 }
 
 // =============================================================================
+// INFERNAL GOLEM SVG - WC3-style rock golem with fel fire joints
+// =============================================================================
+
+interface InfernalGolemProps {
+  id: string
+  isIdle?: boolean
+  scale?: number
+}
+
+function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps) {
+  const suffix = isIdle ? 'Idle' : ''
+  const rockId = `rock${suffix}${id}`
+  const felFireId = `felFire${suffix}${id}`
+  const glowId = `glow${suffix}${id}`
+  const rockCrackId = `rockCrack${suffix}${id}`
+  const fireFilterId = `fireFilter${suffix}${id}`
+
+  // feTurbulence-based fire using displacement mapping (leimapapa technique)
+  const FelFlame = ({ cx, cy, size = 1, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
+    const w = size * 16
+    const h = size * 22
+    const filterId = `${fireFilterId}_${cx}_${cy}`
+    const gradId = `fireGrad_${suffix}${id}_${cx}_${cy}`
+
+    return (
+      <g transform={`translate(${cx - w/2}, ${cy - h})`}>
+        <defs>
+          <radialGradient id={gradId} cx="50%" cy="90%" r="60%" fx="50%" fy="85%">
+            <stop offset="0%" stopColor="#ffffcc" stopOpacity="0.9" />
+            <stop offset="25%" stopColor={WC3.roc.felBright} stopOpacity="0.85" />
+            <stop offset="50%" stopColor={WC3.roc.felMid} stopOpacity="0.8" />
+            <stop offset="75%" stopColor={WC3.roc.felDark} stopOpacity="0.6" />
+            <stop offset="100%" stopColor={WC3.roc.felDark} stopOpacity="0" />
+          </radialGradient>
+          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.03 0.06" numOctaves="3" seed={delay} result="noise">
+              {isIdle && <animate attributeName="baseFrequency" values="0.03 0.06;0.04 0.08;0.03 0.06" dur={`${2 + delay * 0.3}s`} repeatCount="indefinite" />}
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale={size * 8} xChannelSelector="R" yChannelSelector="G" />
+            <feGaussianBlur stdDeviation="1" />
+          </filter>
+        </defs>
+        <ellipse cx={w/2} cy={h * 0.7} rx={w * 0.4} ry={h * 0.55} fill={`url(#${gradId})`} filter={`url(#${filterId})`} />
+      </g>
+    )
+  }
+
+  // Smaller flame for joints - same technique, smaller scale
+  const SmallFlame = ({ cx, cy, size = 0.6, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
+    const w = size * 12
+    const h = size * 16
+    const filterId = `${fireFilterId}S_${cx}_${cy}`
+    const gradId = `fireGradS_${suffix}${id}_${cx}_${cy}`
+
+    return (
+      <g transform={`translate(${cx - w/2}, ${cy - h})`}>
+        <defs>
+          <radialGradient id={gradId} cx="50%" cy="85%" r="55%" fx="50%" fy="80%">
+            <stop offset="0%" stopColor="#ffffaa" stopOpacity="0.85" />
+            <stop offset="30%" stopColor={WC3.roc.felBright} stopOpacity="0.8" />
+            <stop offset="60%" stopColor={WC3.roc.felMid} stopOpacity="0.7" />
+            <stop offset="100%" stopColor={WC3.roc.felDark} stopOpacity="0" />
+          </radialGradient>
+          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.04 0.08" numOctaves="2" seed={delay * 3} result="noise">
+              {isIdle && <animate attributeName="baseFrequency" values="0.04 0.08;0.05 0.1;0.04 0.08" dur={`${1.5 + delay * 0.2}s`} repeatCount="indefinite" />}
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale={size * 6} xChannelSelector="R" yChannelSelector="G" />
+            <feGaussianBlur stdDeviation="0.8" />
+          </filter>
+        </defs>
+        <ellipse cx={w/2} cy={h * 0.65} rx={w * 0.4} ry={h * 0.5} fill={`url(#${gradId})`} filter={`url(#${filterId})`} />
+      </g>
+    )
+  }
+
+  const breathStyle: React.CSSProperties = isIdle
+    ? { animation: 'infernalBreath 3s ease-in-out infinite', transformOrigin: 'center bottom' }
+    : {}
+
+  return (
+    <svg
+      width={160 * scale}
+      height={200 * scale}
+      viewBox="0 0 160 200"
+      style={{ overflow: 'visible', ...breathStyle }}
+    >
+      <defs>
+        {/* Rock gradient - dark grey with texture */}
+        <linearGradient id={rockId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#4a4845" />
+          <stop offset="30%" stopColor="#3a3835" />
+          <stop offset="60%" stopColor="#2a2825" />
+          <stop offset="100%" stopColor="#1a1815" />
+        </linearGradient>
+
+        {/* Fel fire gradient */}
+        <linearGradient id={felFireId} x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stopColor={WC3.roc.felDark} />
+          <stop offset="30%" stopColor={WC3.roc.felMid} />
+          <stop offset="60%" stopColor={WC3.roc.felBright} />
+          <stop offset="100%" stopColor="#ffff88" />
+        </linearGradient>
+
+        {/* Rock crack glow */}
+        <linearGradient id={rockCrackId} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={WC3.roc.felDark} />
+          <stop offset="50%" stopColor={WC3.roc.felMid} />
+          <stop offset="100%" stopColor={WC3.roc.felDark} />
+        </linearGradient>
+
+        {/* Glow filter */}
+        <filter id={glowId}>
+          <feGaussianBlur stdDeviation="4" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+        {/* Inner glow for rock cracks */}
+        <filter id={`${glowId}Inner`}>
+          <feGaussianBlur stdDeviation="2" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* ============ LEFT LEG (back layer) ============ */}
+      {/* Thigh */}
+      <polygon
+        points="50,120 42,140 52,145 58,125"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Knee fire - layered flame */}
+      <SmallFlame cx={48} cy={147} size={0.7} delay={1} />
+      {/* Calf */}
+      <polygon
+        points="44,152 36,178 48,182 54,158"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Foot claws */}
+      <polygon points="36,178 26,192 36,188" fill={WC3.roc.felBright} />
+      <polygon points="40,180 34,196 44,190" fill={WC3.roc.felBright} />
+      <polygon points="46,182 44,198 52,192" fill={WC3.roc.felMid} />
+
+      {/* ============ RIGHT LEG (back layer) ============ */}
+      {/* Thigh */}
+      <polygon
+        points="110,120 102,125 108,145 118,140"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Knee fire - layered flame */}
+      <SmallFlame cx={112} cy={147} size={0.7} delay={2} />
+      {/* Calf */}
+      <polygon
+        points="106,152 106,158 112,182 124,178"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Foot claws */}
+      <polygon points="124,178 134,192 124,188" fill={WC3.roc.felBright} />
+      <polygon points="120,180 126,196 116,190" fill={WC3.roc.felBright} />
+      <polygon points="114,182 116,198 108,192" fill={WC3.roc.felMid} />
+
+      {/* ============ HIP FIRE (connecting legs to torso) ============ */}
+      <FelFlame cx={55} cy={115} size={0.9} delay={3} />
+      <FelFlame cx={105} cy={115} size={0.9} delay={4} />
+
+      {/* ============ TORSO ============ */}
+      {/* Main torso rock plates */}
+      <polygon
+        points="45,60 38,90 50,115 80,122 110,115 122,90 115,60 95,50 65,50"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="2"
+      />
+      {/* Green crack lines on torso */}
+      <path d="M65,55 L60,75 L70,95 L80,115" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+      <path d="M95,55 L100,75 L90,95 L80,115" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+      <path d="M55,70 L80,80 L105,70" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+      {/* Core fire visible through center - layered */}
+      <FelFlame cx={80} cy={85} size={1.2} delay={0} />
+
+      {/* ============ MASSIVE LEFT SHOULDER (iconic WC3 feature) ============ */}
+      {/* Shoulder fire base - layered flame */}
+      <FelFlame cx={35} cy={55} size={1} delay={5} />
+      {/* Hexagonal boulder shoulder */}
+      <polygon
+        points="5,35 0,55 10,75 35,80 55,65 50,40 30,25 10,30"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="2"
+      />
+      {/* Shoulder cracks */}
+      <path d="M15,40 L25,55 L20,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+      <path d="M40,35 L35,55 L45,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+      {/* Shoulder flame on top - layered */}
+      <FelFlame cx={25} cy={25} size={1.3} delay={6} />
+
+      {/* ============ MASSIVE RIGHT SHOULDER ============ */}
+      {/* Shoulder fire base - layered flame */}
+      <FelFlame cx={125} cy={55} size={1} delay={7} />
+      {/* Hexagonal boulder shoulder */}
+      <polygon
+        points="155,35 160,55 150,75 125,80 105,65 110,40 130,25 150,30"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="2"
+      />
+      {/* Shoulder cracks */}
+      <path d="M145,40 L135,55 L140,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+      <path d="M120,35 L125,55 L115,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+      {/* Shoulder flame on top - layered */}
+      <FelFlame cx={135} cy={25} size={1.3} delay={8} />
+
+      {/* ============ LEFT ARM ============ */}
+      {/* Upper arm */}
+      <polygon
+        points="20,78 12,95 22,105 32,90"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Elbow fire - layered */}
+      <SmallFlame cx={18} cy={108} size={0.7} delay={9} />
+      {/* Forearm */}
+      <polygon
+        points="14,112 6,135 18,142 26,120"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Forearm cracks */}
+      <path d="M18,115 L12,130" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+      {/* Hand claws */}
+      <polygon points="6,135 -4,155 8,148" fill={WC3.roc.felBright} />
+      <polygon points="10,138 4,162 16,152" fill={WC3.roc.felBright} />
+      <polygon points="16,140 14,165 24,155" fill={WC3.roc.felBright} />
+      <polygon points="20,142 22,160 28,150" fill={WC3.roc.felMid} />
+
+      {/* ============ RIGHT ARM ============ */}
+      {/* Upper arm */}
+      <polygon
+        points="140,78 148,90 138,105 128,95"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Elbow fire - layered */}
+      <SmallFlame cx={142} cy={108} size={0.7} delay={10} />
+      {/* Forearm */}
+      <polygon
+        points="134,112 134,120 142,142 154,135"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1.5"
+      />
+      {/* Forearm cracks */}
+      <path d="M142,115 L148,130" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+      {/* Hand claws */}
+      <polygon points="154,135 164,155 152,148" fill={WC3.roc.felBright} />
+      <polygon points="150,138 156,162 144,152" fill={WC3.roc.felBright} />
+      <polygon points="144,140 146,165 136,155" fill={WC3.roc.felBright} />
+      <polygon points="140,142 138,160 132,150" fill={WC3.roc.felMid} />
+
+      {/* ============ NECK FIRE ============ */}
+      <FelFlame cx={80} cy={48} size={1.1} delay={11} />
+
+      {/* ============ HEAD (Menacing Skull) ============ */}
+      {/* Skull base shape */}
+      <polygon
+        points="58,48 52,35 55,18 65,8 80,5 95,8 105,18 108,35 102,48 92,50 68,50"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="2"
+      />
+      {/* Forehead plate */}
+      <polygon
+        points="60,20 65,10 80,7 95,10 100,20 95,22 65,22"
+        fill="#2a2825"
+        stroke="#1a1815"
+        strokeWidth="1"
+      />
+      {/* Heavy brow ridge - creates menacing shadow */}
+      <polygon
+        points="55,28 62,22 80,20 98,22 105,28 100,32 60,32"
+        fill="#1a1815"
+        stroke="#0a0a08"
+        strokeWidth="1"
+      />
+
+      {/* LEFT EYE SOCKET - Dark hole with fire from within */}
+      {/* Socket (dark recess) */}
+      <polygon
+        points="62,32 68,28 76,32 76,40 68,43 62,38"
+        fill="#0a0808"
+        stroke="#1a1815"
+        strokeWidth="1"
+      />
+      {/* Fire glow from deep inside */}
+      <ellipse cx="69" cy="36" rx="4" ry="3" fill={WC3.roc.felDark} opacity="0.8" />
+      <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={WC3.roc.felMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
+      <ellipse cx="69" cy="34" rx="1.5" ry="1" fill={WC3.roc.felBright} opacity="0.7" filter={`url(#${glowId})`} />
+
+      {/* RIGHT EYE SOCKET - Dark hole with fire from within */}
+      <polygon
+        points="84,32 92,28 98,32 98,38 92,43 84,40"
+        fill="#0a0808"
+        stroke="#1a1815"
+        strokeWidth="1"
+      />
+      <ellipse cx="91" cy="36" rx="4" ry="3" fill={WC3.roc.felDark} opacity="0.8" />
+      <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={WC3.roc.felMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
+      <ellipse cx="91" cy="34" rx="1.5" ry="1" fill={WC3.roc.felBright} opacity="0.7" filter={`url(#${glowId})`} />
+
+      {/* NASAL CAVITY - Dark triangular hole */}
+      <polygon
+        points="76,38 80,34 84,38 80,46"
+        fill="#0a0808"
+        stroke="#1a1815"
+        strokeWidth="1"
+      />
+      {/* Glow from within nasal cavity */}
+      <ellipse cx="80" cy="40" rx="2" ry="3" fill={WC3.roc.felDark} opacity="0.6" />
+
+      {/* JAW/TEETH AREA */}
+      {/* Lower jaw structure */}
+      <polygon
+        points="65,46 70,42 80,41 90,42 95,46 92,52 68,52"
+        fill={`url(#${rockId})`}
+        stroke="#1a1815"
+        strokeWidth="1"
+      />
+      {/* Teeth - dark gaps between rock teeth */}
+      <line x1="72" y1="46" x2="72" y2="50" stroke="#0a0808" strokeWidth="2" />
+      <line x1="77" y1="45" x2="77" y2="50" stroke="#0a0808" strokeWidth="2" />
+      <line x1="83" y1="45" x2="83" y2="50" stroke="#0a0808" strokeWidth="2" />
+      <line x1="88" y1="46" x2="88" y2="50" stroke="#0a0808" strokeWidth="2" />
+      {/* Glow between teeth */}
+      <ellipse cx="80" cy="48" rx="8" ry="2" fill={WC3.roc.felDark} opacity="0.4" filter={`url(#${glowId}Inner)`} />
+
+      {/* Cheekbone cracks */}
+      <path d="M58,35 L65,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+      <path d="M102,35 L95,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+
+      {/* ============ HEAD FLAME (top) - Layered flame tongues ============ */}
+      <FelFlame cx={80} cy={5} size={1.5} delay={12} />
+    </svg>
+  )
+}
+
+// =============================================================================
 // DUAL ZONE ATMOSPHERE - RoC transitions to FT based on scroll
 // =============================================================================
 
@@ -296,7 +658,7 @@ const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
 })
 
 // =============================================================================
-// REIGN OF CHAOS ATMOSPHERE - Storm with perspective depth
+// REIGN OF CHAOS ATMOSPHERE - Dark apocalyptic sky with infernals raining down
 // =============================================================================
 
 const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
@@ -306,9 +668,9 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
   // Infernal phases: falling meteor → explosion → creature rises → idle
   const [infernals, setInfernals] = useState<Array<{
     id: number
-    x: number
-    landX: number
-    landY: string // '30vh' for left, '10vh' for right
+    x: string
+    landX: string
+    landY: string
     side: 'left' | 'right'
     phase: 'falling' | 'explosion' | 'rising' | 'idle'
   }>>([])
@@ -323,16 +685,13 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     const timeouts: NodeJS.Timeout[] = []
 
     const spawnInfernal = (newId: number, side: 'left' | 'right') => {
-      // Landing position - this is the single reference point for ALL phases
-      // Left side: 8-18%, Right side: 82-92%
-      const landX = side === 'left' ? (8 + Math.random() * 10) : (82 + Math.random() * 10)
-      // Different landing heights: left at 30vh, right at 10vh from bottom
-      const landY = side === 'left' ? '30vh' : '10vh'
+      // Land positions - golems in background, higher up on screen
+      // Left: 8vw from left, 32vh from top | Right: 12vw from right, 28vh from top
+      const landX = side === 'left' ? '8vw' : 'calc(100vw - 12vw)'
+      const landY = side === 'left' ? '32vh' : '28vh'
 
-      // Phase 1: Falling - starts at landX, animates from top to bottom
       setInfernals(prev => [...prev, { id: newId, x: landX, landX, landY, side, phase: 'falling' }])
 
-      // Phase 2: Explosion (after 4s fall)
       timeouts.push(setTimeout(() => {
         if (!isActive) return
         setInfernals(prev => prev.map(inf =>
@@ -340,7 +699,6 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         ))
       }, 4000))
 
-      // Phase 3: Rising (after 0.6s explosion)
       timeouts.push(setTimeout(() => {
         if (!isActive) return
         setInfernals(prev => prev.map(inf =>
@@ -348,7 +706,6 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         ))
       }, 4600))
 
-      // Phase 4: Idle (after 1s rising) - stays permanently
       timeouts.push(setTimeout(() => {
         if (!isActive) return
         setInfernals(prev => prev.map(inf =>
@@ -360,23 +717,20 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     const triggerLightningStorm = () => {
       if (!isActive) return
 
-      // Determine which side to spawn (max 1 left, 1 right = 2 total)
       const canSpawnLeft = leftCountRef.current < 1
       const canSpawnRight = rightCountRef.current < 1
 
       if (!canSpawnLeft && !canSpawnRight) return
 
-      // Choose side based on availability
       let side: 'left' | 'right'
       if (canSpawnLeft && canSpawnRight) {
-        side = Math.random() > 0.6 ? 'left' : 'right' // Slight bias to left since it has more slots
+        side = Math.random() > 0.6 ? 'left' : 'right'
       } else if (canSpawnLeft) {
         side = 'left'
       } else {
         side = 'right'
       }
 
-      // Lightning in the sky area
       const lightX = 20 + Math.random() * 60
       setLightningX(lightX)
       setLightningActive(true)
@@ -389,10 +743,8 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         setCloudGlow(0)
       }, 400))
 
-      // Spawn infernal after lightning
       timeouts.push(setTimeout(() => {
         if (!isActive) return
-        // Double-check availability
         if (side === 'left' && leftCountRef.current >= 2) return
         if (side === 'right' && rightCountRef.current >= 1) return
 
@@ -405,14 +757,13 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
     const scheduleNext = () => {
       if (!isActive) return
-      const delay = 6000 + Math.random() * 8000 // 6-14s between infernals
+      const delay = 6000 + Math.random() * 8000
       timeouts.push(setTimeout(() => {
         triggerLightningStorm()
         scheduleNext()
       }, delay))
     }
 
-    // Start first infernal quickly
     timeouts.push(setTimeout(triggerLightningStorm, 1500))
     scheduleNext()
 
@@ -422,238 +773,464 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     }
   }, [])
 
-  // Heavy storm rain - 3 layers for depth
-  const rainDrops = useMemo(() => ({
-    // Back layer - faint, slow
-    back: Array.from({ length: 40 }, (_, i) => ({
+  // Rain drops falling - stormy battlefield, diagonal to right
+  const raindrops = useMemo(() =>
+    Array.from({ length: 120 }, (_, i) => ({
       id: i,
-      x: Math.random() * 130 - 15,
-      delay: Math.random() * -4,
-      duration: 1.0 + Math.random() * 0.3,
-      length: 15 + Math.random() * 10,
-      opacity: 0.2 + Math.random() * 0.1,
-    })),
-    // Mid layer - medium
-    mid: Array.from({ length: 60 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 125 - 12,
-      delay: Math.random() * -3,
-      duration: 0.7 + Math.random() * 0.25,
-      length: 25 + Math.random() * 15,
-      opacity: 0.35 + Math.random() * 0.15,
-    })),
-    // Front layer - bright, fast
-    front: Array.from({ length: 35 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 120 - 10,
+      x: Math.random() * 120 - 20,  // Start off-screen left
       delay: Math.random() * -2,
-      duration: 0.5 + Math.random() * 0.2,
-      length: 35 + Math.random() * 20,
-      opacity: 0.5 + Math.random() * 0.2,
+      duration: 0.6 + Math.random() * 0.3,
+      length: 20 + Math.random() * 25,
     })),
-  }), [])
+    []
+  )
 
   return (
     <>
-      {/* Sky gradient with depth */}
+      {/* GREEN-tinted stormy sky - matching WC3 RoC menu aesthetic */}
       <div style={{
         position: 'absolute',
         inset: 0,
         background: `linear-gradient(180deg,
-          #020302 0%,
-          #040604 10%,
-          #0a120a 25%,
-          #0d180d 45%,
-          #0a140a 65%,
-          #060a06 85%,
-          #030403 100%)`
+          #0a1a15 0%,
+          #0d2018 10%,
+          #0f2a1c 20%,
+          #123520 35%,
+          #154025 50%,
+          #123018 65%,
+          #0d2515 80%,
+          #081a10 90%,
+          #050f08 100%)`
       }} />
 
-      {/* === BATTLEFIELD BACKGROUND - Animated Painting === */}
-      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '75%' }} viewBox="0 0 1000 750" preserveAspectRatio="xMidYMax slice">
+      {/* === WC3 ROC MENU BACKGROUND - Grassy battlefield with war debris === */}
+      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
         <defs>
-          {/* Gradients for depth */}
-          <linearGradient id="battlefieldFade" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0a150a" stopOpacity="0" />
-            <stop offset="30%" stopColor="#0a150a" stopOpacity="0.15" />
-            <stop offset="100%" stopColor="#060806" stopOpacity="0.6" />
+          {/* Grass ground gradient */}
+          <linearGradient id="grassGround" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1a3520" />
+            <stop offset="50%" stopColor="#152a18" />
+            <stop offset="100%" stopColor="#0d1a0f" />
           </linearGradient>
-          <linearGradient id="horizonGlow" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={WC3.roc.felMid} stopOpacity="0.15" />
-            <stop offset="50%" stopColor={WC3.roc.fireMid} stopOpacity="0.08" />
-            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+          {/* Water/puddle gradient */}
+          <linearGradient id="waterPuddle" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1a3040" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#0d1820" stopOpacity="0.8" />
           </linearGradient>
-          <filter id="distantBlur" x="-20%" y="-20%" width="140%" height="140%">
+          {/* Banner red */}
+          <linearGradient id="bannerRed" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#aa2020" />
+            <stop offset="50%" stopColor="#881515" />
+            <stop offset="100%" stopColor="#661010" />
+          </linearGradient>
+          {/* Shield orange */}
+          <linearGradient id="shieldOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#cc8844" />
+            <stop offset="50%" stopColor="#aa6633" />
+            <stop offset="100%" stopColor="#885522" />
+          </linearGradient>
+          {/* Metal */}
+          <linearGradient id="metalGray" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#6a6a65" />
+            <stop offset="50%" stopColor="#4a4a45" />
+            <stop offset="100%" stopColor="#3a3a35" />
+          </linearGradient>
+          {/* Wood pole */}
+          <linearGradient id="woodBrown" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#4a3520" />
+            <stop offset="50%" stopColor="#3a2815" />
+            <stop offset="100%" stopColor="#2a1a0a" />
+          </linearGradient>
+          <filter id="rocDistantBlur" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
           </filter>
-          <filter id="midBlur" x="-10%" y="-10%" width="120%" height="120%">
+          <filter id="rocMidBlur" x="-10%" y="-10%" width="120%" height="120%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
           </filter>
+          <filter id="felGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" />
+          </filter>
+          {/* Ground fade - green tint to blend with sky */}
+          <linearGradient id="rocGroundFade" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0a1a15" stopOpacity="0.8" />
+            <stop offset="40%" stopColor="#0d2018" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="transparent" stopOpacity="0" />
+          </linearGradient>
         </defs>
 
-        {/* Horizon glow - distant fires */}
-        <rect x="0" y="0" width="1000" height="200" fill="url(#horizonGlow)" />
+        {/* === DARK STORM CLOUDS at top === */}
+        <g opacity="0.8">
+          <ellipse cx="200" cy="80" rx="300" ry="120" fill="#0a1810" />
+          <ellipse cx="500" cy="60" rx="350" ry="100" fill="#081510" />
+          <ellipse cx="800" cy="90" rx="280" ry="110" fill="#0a1810" />
+          <ellipse cx="350" cy="150" rx="200" ry="80" fill="#0d1a12" />
+          <ellipse cx="700" cy="140" rx="220" ry="85" fill="#0d1a12" />
+        </g>
 
-        {/* FAR LAYER - Distant citadels and towers (silhouettes) */}
-        <g filter="url(#distantBlur)" opacity="0.25">
+        {/* === FAR LAYER - Ruined stone structures silhouettes === */}
+        <g filter="url(#rocDistantBlur)" opacity="0.5">
           {/* Ruined tower left */}
-          <polygon points="80,180 95,80 105,85 115,60 125,90 140,180" fill="#0a120a" />
-          <rect x="90" y="100" width="30" height="6" fill={WC3.roc.fireMid} opacity="0.4" />
-
-          {/* Burning fortress center-left */}
-          <polygon points="250,180 260,100 280,110 295,50 310,105 330,120 340,180" fill="#0d150d" />
-          <polygon points="290,55 295,50 300,55 300,70 290,70" fill={WC3.roc.fireBright} opacity="0.5" />
-
-          {/* Massive ruined gate center */}
-          <polygon points="450,180 460,90 480,100 500,40 520,100 540,90 550,180" fill="#0a130a" />
-          <polygon points="470,180 480,130 495,135 500,110 505,135 520,130 530,180" fill="#060906" />
-          <rect x="490" y="60" width="20" height="40" fill={WC3.roc.fireMid} opacity="0.3" />
-
-          {/* Watchtower right */}
-          <polygon points="720,180 730,100 745,70 760,100 770,180" fill="#0d150d" />
-
-          {/* Ruined wall far right */}
-          <polygon points="850,180 860,140 880,150 900,120 920,145 940,130 960,180" fill="#0a120a" />
+          <g transform="translate(80, 200)">
+            <polygon points="0,200 30,80 60,120 90,40 120,100 150,200" fill="#1a2518" />
+            <rect x="55" y="60" width="30" height="50" fill="#152015" />
+          </g>
+          {/* Ruined wall center */}
+          <polygon points="350,350 400,250 450,280 500,200 550,260 600,230 650,350" fill="#182318" />
+          {/* Ruined fortress right */}
+          <g transform="translate(750, 220)">
+            <polygon points="0,180 40,70 80,110 120,30 160,90 200,180" fill="#1a2518" />
+            <polygon points="100,50 120,30 140,45" fill="#253020" opacity="0.5" />
+          </g>
         </g>
 
-        {/* MID LAYER - Battlefield debris, siege weapons */}
-        <g filter="url(#midBlur)" opacity="0.35">
-          {/* Broken siege tower left */}
-          <polygon points="60,350 80,200 120,210 140,350" fill="#1a2518" />
-          <polygon points="70,280 85,230 115,235 130,280" fill="#0d150d" />
-          <line x1="90" y1="220" x2="70" y2="300" stroke="#2a3525" strokeWidth="3" />
-
-          {/* Fallen catapult */}
-          <g transform="translate(200, 300) rotate(-15)">
-            <rect x="0" y="0" width="80" height="15" fill="#2a2015" />
-            <polygon points="60,-30 70,0 80,-30 85,0 90,-25" fill="#3a3020" />
-            <circle cx="10" cy="20" r="12" fill="#1a1510" stroke="#2a2520" strokeWidth="2" />
-            <circle cx="70" cy="20" r="12" fill="#1a1510" stroke="#2a2520" strokeWidth="2" />
-          </g>
-
-          {/* War banners - tattered */}
-          <g transform="translate(380, 280)">
-            <line x1="0" y1="0" x2="0" y2="80" stroke="#3a2a1a" strokeWidth="4" />
-            <path d="M2,10 Q30,20 25,45 Q20,60 35,75 L5,70 Q10,55 5,40 Z" fill={WC3.bloodRed} opacity="0.6" />
-          </g>
-
-          {/* Broken ballista */}
-          <g transform="translate(550, 320)">
-            <rect x="0" y="0" width="60" height="10" fill="#2a2015" transform="rotate(-8)" />
-            <line x1="30" y1="-5" x2="70" y2="-40" stroke="#3a3025" strokeWidth="4" />
-            <line x1="30" y1="-5" x2="-10" y2="-30" stroke="#3a3025" strokeWidth="3" />
-          </g>
-
-          {/* Ruined wall segment */}
-          <polygon points="700,350 710,280 730,290 750,260 770,285 790,270 820,350" fill="#1a2518" />
-          <polygon points="740,280 750,260 760,275" fill={WC3.roc.felDark} opacity="0.3" />
+        {/* === DISTANT HILLS - Grassy depth perception === */}
+        <g filter="url(#rocDistantBlur)" opacity="0.4">
+          {/* Far hill left */}
+          <ellipse cx="150" cy="450" rx="250" ry="80" fill="#1a2a1a" />
+          {/* Far hill center */}
+          <ellipse cx="500" cy="420" rx="350" ry="100" fill="#182818" />
+          {/* Far hill right */}
+          <ellipse cx="850" cy="460" rx="280" ry="90" fill="#1a2a1a" />
         </g>
 
-        {/* NEAR LAYER - Foreground debris, bodies, weapons */}
+        {/* === MID HILLS - More defined grassy rolling hills === */}
+        <g filter="url(#rocMidBlur)" opacity="0.5">
+          {/* Mid hill left */}
+          <ellipse cx="100" cy="550" rx="200" ry="60" fill="#223820" />
+          <ellipse cx="100" cy="560" rx="180" ry="50" fill="#1a3018" />
+          {/* Mid hill center-left */}
+          <ellipse cx="350" cy="520" rx="220" ry="70" fill="#203520" />
+          {/* Mid hill center-right */}
+          <ellipse cx="650" cy="540" rx="200" ry="65" fill="#223820" />
+          {/* Mid hill right */}
+          <ellipse cx="900" cy="560" rx="180" ry="55" fill="#203520" />
+        </g>
+
+        {/* === GRASS TEXTURE ACROSS ENTIRE BACKGROUND === */}
+
+        {/* VERY DISTANT GRASS (y=320-400) - tiny, sparse, faded */}
+        <g opacity="0.2" filter="url(#rocDistantBlur)">
+          {Array.from({ length: 60 }, (_, i) => 15 + i * 17).map((x, i) => (
+            <g key={`vdg${i}`}>
+              <line x1={x} y1={350 + (i % 7) * 8} x2={x + 0.5} y2={346 + (i % 7) * 8} stroke="#2a3a25" strokeWidth="0.8" />
+              <line x1={x + 5} y1={355 + (i % 5) * 6} x2={x + 5.5} y2={351 + (i % 5) * 6} stroke="#253520" strokeWidth="0.8" />
+            </g>
+          ))}
+        </g>
+
+        {/* FAR GRASS (y=400-500) - small, sparse */}
+        <g opacity="0.25">
+          {Array.from({ length: 70 }, (_, i) => 10 + i * 15).map((x, i) => (
+            <g key={`fg${i}`}>
+              <line x1={x} y1={440 + (i % 6) * 10} x2={x + 0.8} y2={435 + (i % 6) * 10 - (i % 3)} stroke="#2a3a28" strokeWidth="0.8" />
+              <line x1={x + 4} y1={445 + (i % 5) * 8} x2={x + 4.5} y2={440 + (i % 5) * 8 - (i % 4)} stroke="#354530" strokeWidth="0.8" />
+              <line x1={x + 8} y1={442 + (i % 7) * 9} x2={x + 8.5} y2={438 + (i % 7) * 9} stroke="#2a3a28" strokeWidth="0.7" />
+            </g>
+          ))}
+        </g>
+
+        {/* MID-FAR GRASS (y=500-580) - growing larger */}
+        <g opacity="0.35">
+          {Array.from({ length: 80 }, (_, i) => 5 + i * 13).map((x, i) => (
+            <g key={`mfg${i}`}>
+              <line x1={x} y1={530 + (i % 5) * 10} x2={x + 1} y2={523 + (i % 5) * 10 - (i % 3) * 2} stroke="#3a4a30" strokeWidth="1" />
+              <line x1={x + 5} y1={535 + (i % 6) * 8} x2={x + 5.5} y2={528 + (i % 6) * 8 - (i % 4)} stroke="#4a5a38" strokeWidth="1" />
+              <line x1={x + 9} y1={532 + (i % 4) * 12} x2={x + 9.5} y2={526 + (i % 4) * 12 - (i % 3)} stroke="#3a4a30" strokeWidth="0.9" />
+            </g>
+          ))}
+        </g>
+
+        {/* MID GRASS (y=580-660) - medium density */}
         <g opacity="0.45">
-          {/* Fallen soldier silhouettes - left */}
-          <ellipse cx="50" cy="550" rx="40" ry="12" fill="#0d150d" />
-          <polygon points="30,540 45,520 60,530 70,545 50,555 25,550" fill="#1a2218" />
-          <line x1="70" y1="540" x2="95" y2="510" stroke="#3a3a35" strokeWidth="2" />
+          {Array.from({ length: 85 }, (_, i) => 3 + i * 12).map((x, i) => (
+            <g key={`mg${i}`}>
+              <line x1={x} y1={610 + (i % 5) * 10} x2={x + 1} y2={600 + (i % 5) * 10 - (i % 4) * 2} stroke="#3a4a30" strokeWidth="1.1" />
+              <line x1={x + 4} y1={615 + (i % 6) * 8} x2={x + 4.8} y2={606 + (i % 6) * 8 - (i % 3) * 2} stroke="#4a5a38" strokeWidth="1.1" />
+              <line x1={x + 8} y1={612 + (i % 4) * 12} x2={x + 8.5} y2={604 + (i % 4) * 12 - (i % 5)} stroke="#455535" strokeWidth="1" />
+            </g>
+          ))}
+        </g>
 
-          {/* Broken sword and shield */}
-          <g transform="translate(150, 520)">
-            <polygon points="0,0 5,-40 10,-38 12,0 8,5 4,5" fill="#4a4a45" />
-            <ellipse cx="30" cy="15" rx="20" ry="25" fill="#3a2a1a" transform="rotate(-20)" />
-            <ellipse cx="30" cy="15" rx="12" ry="15" fill="#2a1a10" transform="rotate(-20)" />
+        {/* NEAR-MID GRASS (y=660-720) - denser */}
+        <g opacity="0.55">
+          {Array.from({ length: 90 }, (_, i) => i * 11).map((x, i) => (
+            <g key={`nmg${i}`}>
+              <line x1={x} y1={690 + (i % 4) * 8} x2={x + 1.2} y2={679 + (i % 4) * 8 - (i % 3) * 2} stroke="#4a5a38" strokeWidth="1.2" />
+              <line x1={x + 4} y1={695 + (i % 5) * 6} x2={x + 5} y2={685 + (i % 5) * 6 - (i % 4) * 2} stroke="#556640" strokeWidth="1.2" />
+              <line x1={x + 8} y1={692 + (i % 3) * 10} x2={x + 8.8} y2={682 + (i % 3) * 10 - (i % 5)} stroke="#4a5a38" strokeWidth="1.1" />
+            </g>
+          ))}
+        </g>
+
+        {/* === MID LAYER - Stone pillars, broken walls === */}
+        <g filter="url(#rocMidBlur)" opacity="0.6">
+          {/* Stone pillar left */}
+          <g transform="translate(120, 320)">
+            <rect x="0" y="0" width="40" height="180" fill="#2a3528" />
+            <rect x="5" y="0" width="30" height="180" fill="#354530" />
+            <polygon points="0,0 20,-30 40,0" fill="#2a3528" />
+          </g>
+          {/* Broken wall segment center-left */}
+          <polygon points="280,500 320,380 360,420 400,350 440,400 480,500" fill="#253020" />
+          {/* Stone pillar center-right */}
+          <g transform="translate(650, 350)">
+            <rect x="0" y="0" width="35" height="150" fill="#2a3528" />
+            <polygon points="0,0 17,-25 35,0" fill="#2a3528" />
+          </g>
+          {/* Broken arch right */}
+          <g transform="translate(800, 380)">
+            <polygon points="0,120 20,40 50,60 80,20 110,50 140,120" fill="#253020" />
+          </g>
+        </g>
+
+        {/* === NEAR HILLS - Foreground grassy terrain === */}
+        <g opacity="0.6">
+          {/* Near hill left */}
+          <ellipse cx="50" cy="680" rx="180" ry="60" fill="#253518" />
+          {/* Near hill center */}
+          <ellipse cx="500" cy="650" rx="400" ry="80" fill="#203015" />
+          {/* Near hill right */}
+          <ellipse cx="950" cy="680" rx="170" ry="55" fill="#253518" />
+        </g>
+
+        {/* === GRASS GROUND - Dense grass across full battlefield === */}
+        <g>
+          {/* Base ground plane - extends full width */}
+          <ellipse cx="500" cy="780" rx="650" ry="120" fill="#1a2a18" />
+          <ellipse cx="500" cy="800" rx="600" ry="90" fill="#152215" />
+          <ellipse cx="500" cy="815" rx="580" ry="70" fill="#0d1a0f" />
+
+          {/* === DENSE GRASS COVERAGE - Full battlefield width === */}
+          {/* Far back grass - tiny, sparse (y=745-755) */}
+          {Array.from({ length: 50 }, (_, i) => 10 + i * 20).map((x, i) => (
+            <g key={`gb${i}`}>
+              <line x1={x} y1="750" x2={x + 1} y2={743 - (i % 3)} stroke="#3a4a30" strokeWidth="1"
+                style={i % 7 === 0 ? { transformOrigin: `${x}px 750px`, animation: `grassBlade ${2.5 + (i % 3) * 0.3}s ease-in-out infinite`, animationDelay: `${(i % 8) * 0.35}s` } : undefined} />
+              <line x1={x + 6} y1="750" x2={x + 5} y2={742 - (i % 4)} stroke="#445535" strokeWidth="1"
+                style={i % 8 === 0 ? { transformOrigin: `${x + 6}px 750px`, animation: `grassBlade ${2.8 + (i % 4) * 0.2}s ease-in-out infinite`, animationDelay: `${(i % 6) * 0.4}s` } : undefined} />
+            </g>
+          ))}
+
+          {/* Mid-back grass (y=765-775) */}
+          {Array.from({ length: 55 }, (_, i) => 5 + i * 18).map((x, i) => (
+            <g key={`gmb${i}`}>
+              <line x1={x} y1="770" x2={x + 1} y2={760 - (i % 3)} stroke="#4a5a38" strokeWidth="1.2"
+                style={i % 5 === 0 ? { transformOrigin: `${x}px 770px`, animation: `grassBlade ${2.3 + (i % 4) * 0.3}s ease-in-out infinite`, animationDelay: `${(i % 7) * 0.3}s` } : undefined} />
+              <line x1={x + 5} y1="770" x2={x + 4} y2={759 - (i % 4)} stroke="#506040" strokeWidth="1.2" />
+              <line x1={x + 10} y1="770" x2={x + 11} y2={761 - (i % 3)} stroke="#4a5a38" strokeWidth="1" />
+            </g>
+          ))}
+
+          {/* Mid grass - more dense (y=780-795) */}
+          {Array.from({ length: 60 }, (_, i) => 3 + i * 17).map((x, i) => (
+            <g key={`gm${i}`}>
+              <line x1={x} y1="790" x2={x + 1} y2={778 - (i % 4)} stroke="#4a5a38" strokeWidth="1.5"
+                style={i % 4 === 0 ? { transformOrigin: `${x}px 790px`, animation: `grassBlade ${2.2 + (i % 5) * 0.25}s ease-in-out infinite`, animationDelay: `${(i % 6) * 0.28}s` } : undefined} />
+              <line x1={x + 5} y1="790" x2={x + 4} y2={777 - (i % 3)} stroke="#556640" strokeWidth="1.5"
+                style={i % 5 === 0 ? { transformOrigin: `${x + 5}px 790px`, animation: `grassBlade ${2.5 + (i % 4) * 0.2}s ease-in-out infinite`, animationDelay: `${(i % 5) * 0.35}s` } : undefined} />
+              <line x1={x + 10} y1="790" x2={x + 11} y2={779 - (i % 4)} stroke="#4a5a38" strokeWidth="1.2" />
+            </g>
+          ))}
+
+          {/* Front grass - taller, brighter (y=805-820) */}
+          {Array.from({ length: 65 }, (_, i) => i * 16).map((x, i) => (
+            <g key={`gf${i}`}>
+              <line x1={x} y1="810" x2={x + 1} y2={795 - (i % 4)} stroke="#5a6a45" strokeWidth="1.8"
+                style={i % 3 === 0 ? { transformOrigin: `${x}px 810px`, animation: `grassBlade ${2.1 + (i % 6) * 0.2}s ease-in-out infinite`, animationDelay: `${(i % 8) * 0.22}s` } : undefined} />
+              <line x1={x + 6} y1="810" x2={x + 5} y2={794 - (i % 3) * 2} stroke="#6a7a50" strokeWidth="1.8"
+                style={i % 4 === 0 ? { transformOrigin: `${x + 6}px 810px`, animation: `grassBlade ${2.4 + (i % 5) * 0.18}s ease-in-out infinite`, animationDelay: `${(i % 7) * 0.3}s` } : undefined} />
+              <line x1={x + 11} y1="810" x2={x + 12} y2={796 - (i % 4)} stroke="#5a6a45" strokeWidth="1.3" />
+            </g>
+          ))}
+
+          {/* Foreground grass - tallest, brightest (y=825-845) */}
+          {Array.from({ length: 70 }, (_, i) => i * 15).map((x, i) => (
+            <g key={`gff${i}`}>
+              <line x1={x} y1="830" x2={x + 1} y2={812 - (i % 5)} stroke="#6a7a50" strokeWidth="2"
+                style={i % 3 === 0 ? { transformOrigin: `${x}px 830px`, animation: `grassBlade ${2 + (i % 7) * 0.18}s ease-in-out infinite`, animationDelay: `${(i % 9) * 0.18}s` } : undefined} />
+              <line x1={x + 6} y1="830" x2={x + 5} y2={811 - (i % 4) * 2} stroke="#7a8a58" strokeWidth="2"
+                style={i % 4 === 0 ? { transformOrigin: `${x + 6}px 830px`, animation: `grassBlade ${2.2 + (i % 6) * 0.15}s ease-in-out infinite`, animationDelay: `${(i % 8) * 0.25}s` } : undefined} />
+              <line x1={x + 11} y1="830" x2={x + 12} y2={813 - (i % 5)} stroke="#6a7a50" strokeWidth="1.6" />
+              <line x1={x + 15} y1="830" x2={x + 14} y2={814 - (i % 4)} stroke="#7a8a58" strokeWidth="1.3" />
+            </g>
+          ))}
+        </g>
+
+        {/* === WAR DEBRIS - Colorful, visible like WC3 reference === */}
+        <g>
+          {/* === WEAPONS LYING FLAT ON GROUND (back layer) === */}
+          {/* Broken sword lying flat - far left */}
+          <g transform="translate(80, 760) rotate(85)">
+            <polygon points="-3,-45 3,-45 4,-5 -4,-5" fill="url(#metalGray)" />
+            <rect x="-7" y="-5" width="14" height="5" fill="#4a3a25" />
+          </g>
+          {/* Dagger lying flat - center */}
+          <g transform="translate(480, 780) rotate(-70)">
+            <polygon points="-2,-30 2,-30 3,-5 -3,-5" fill="#5a5a55" />
+            <rect x="-4" y="-5" width="8" height="4" fill="#3a2a1a" />
+          </g>
+          {/* Mace lying flat - right side */}
+          <g transform="translate(720, 770) rotate(75)">
+            <rect x="-3" y="-60" width="6" height="60" fill="url(#woodBrown)" />
+            <ellipse cx="0" cy="-65" rx="12" ry="10" fill="url(#metalGray)" />
+            <ellipse cx="0" cy="-65" rx="8" ry="7" fill="#4a4a45" />
           </g>
 
-          {/* Bodies mid */}
-          <ellipse cx="320" cy="600" rx="35" ry="10" fill="#0d150d" />
-          <ellipse cx="450" cy="580" rx="30" ry="8" fill="#0d150d" />
-
-          {/* Embedded weapons */}
-          <line x1="400" y1="620" x2="420" y2="560" stroke="#4a4a45" strokeWidth="3" />
-          <polygon points="418,565 420,555 425,560 422,570" fill="#5a5a55" />
-
-          {/* War banner fallen */}
-          <g transform="translate(550, 580)">
-            <line x1="0" y1="0" x2="60" y2="-15" stroke="#3a2a1a" strokeWidth="5" />
-            <path d="M60,-15 Q90,-5 85,20 Q80,35 100,45 L65,40 Q70,30 65,15 Z" fill={WC3.hordeRed} opacity="0.5" />
+          {/* === ORANGE SHIELD - Lying on ground (center-right) === */}
+          <g transform="translate(620, 720)">
+            <ellipse cx="0" cy="0" rx="70" ry="28" fill="url(#shieldOrange)" />
+            <ellipse cx="0" cy="0" rx="60" ry="23" fill="#bb7744" />
+            <ellipse cx="0" cy="0" rx="20" ry="9" fill="#aa6633" />
+            <ellipse cx="-4" cy="-2" rx="12" ry="5" fill="#cc9955" opacity="0.6" />
+            <ellipse cx="0" cy="0" rx="68" ry="27" fill="none" stroke="#664422" strokeWidth="3" />
           </g>
 
-          {/* More fallen warriors - right */}
-          <ellipse cx="700" cy="620" rx="45" ry="12" fill="#0d150d" />
-          <polygon points="680,610 695,590 720,600 740,615 710,625 675,620" fill="#1a2218" />
+          {/* === FALLEN WARRIOR SILHOUETTES === */}
+          <ellipse cx="280" cy="755" rx="45" ry="15" fill="#1a2515" opacity="0.6" />
+          <ellipse cx="550" cy="740" rx="40" ry="14" fill="#1a2515" opacity="0.5" />
 
-          {/* Spear cluster */}
-          <line x1="800" y1="650" x2="820" y2="550" stroke="#3a3a35" strokeWidth="2" />
-          <line x1="815" y1="655" x2="840" y2="560" stroke="#3a3a35" strokeWidth="2" />
-          <line x1="830" y1="660" x2="845" y2="580" stroke="#3a3a35" strokeWidth="2" />
+          {/* === WATER PUDDLE - Reflective blue === */}
+          <g transform="translate(850, 790)">
+            <ellipse cx="0" cy="0" rx="90" ry="35" fill="url(#waterPuddle)" />
+            <ellipse cx="-8" cy="-4" rx="70" ry="25" fill="#1a3545" opacity="0.5" />
+            <ellipse cx="-25" cy="-8" rx="20" ry="6" fill="#2a4555" opacity="0.4" />
+          </g>
 
-          {/* Skull */}
-          <circle cx="900" cy="630" r="12" fill="#8a8a80" opacity="0.3" />
-          <ellipse cx="895" cy="628" rx="3" ry="4" fill="#1a1a18" />
-          <ellipse cx="905" cy="628" rx="3" ry="4" fill="#1a1a18" />
+          {/* === ROCKS AND DEBRIS (scattered) === */}
+          <polygon points="180,785 195,760 215,780" fill="#3a4530" opacity="0.7" />
+          <polygon points="380,775 398,745 418,770 408,785" fill="#354028" opacity="0.6" />
+          <polygon points="580,790 595,770 612,788" fill="#3a4530" opacity="0.5" />
+          <polygon points="760,785 775,765 792,782" fill="#354028" opacity="0.6" />
+
+          {/* === WEAPONS STUCK IN GROUND (mid layer) === */}
+          {/* Axe anchored - left */}
+          <g transform="translate(320, 695) rotate(-18)">
+            <rect x="-4" y="-90" width="8" height="90" fill="url(#woodBrown)" />
+            <path d="M-4,-90 Q-32,-77 -28,-58 L4,-68 Z" fill="url(#metalGray)" />
+            <path d="M-4,-88 Q-28,-77 -24,-60 L2,-69 Z" fill="#5a5a55" />
+          </g>
+          {/* Sword anchored - center-left */}
+          <g transform="translate(440, 730) rotate(15)">
+            <rect x="-3" y="-85" width="6" height="85" fill="url(#metalGray)" />
+            <rect x="-9" y="-5" width="18" height="7" fill="#4a3a25" />
+            <rect x="-2" y="0" width="4" height="12" fill="#3a2a1a" />
+            <polygon points="0,-95 -5,-83 5,-83" fill="#6a6a65" />
+          </g>
+          {/* Spear anchored - right */}
+          <g transform="translate(780, 705) rotate(-12)">
+            <rect x="-3" y="-120" width="6" height="120" fill="url(#woodBrown)" />
+            <polygon points="0,-135 -7,-118 7,-118" fill="url(#metalGray)" />
+          </g>
+          {/* Halberd anchored - far right */}
+          <g transform="translate(920, 700) rotate(8)">
+            <rect x="-3" y="-130" width="6" height="130" fill="url(#woodBrown)" />
+            <polygon points="0,-145 -10,-125 10,-125" fill="url(#metalGray)" />
+            <path d="M-10,-125 Q-15,-135 -5,-145" fill="url(#metalGray)" />
+          </g>
+          {/* Broken spear - left side */}
+          <g transform="translate(130, 740) rotate(35)">
+            <rect x="-2" y="-70" width="5" height="70" fill="url(#woodBrown)" />
+          </g>
+
+          {/* === HORDE WAR BANNER - On TOP of weapons with wind animation === */}
+          <g transform="translate(200, 520) rotate(-10)" className="war-banner">
+            {/* Banner pole */}
+            <rect x="0" y="0" width="12" height="230" fill="#3a2815" />
+            <rect x="2" y="0" width="8" height="230" fill="#4a3520" />
+            <rect x="4" y="5" width="4" height="220" fill="#5a4530" opacity="0.5" />
+            {/* Pole top spike */}
+            <polygon points="6,-30 -4,5 16,5" fill="#5a4a35" />
+            <polygon points="6,-25 0,3 12,3" fill="#6a5a45" />
+            {/* Banner fabric with wave columns - skull integrated INTO each column */}
+            <g transform="translate(12, 15)" className="banner-fabric">
+              {/* Define clipping regions for skull parts */}
+              <defs>
+                <clipPath id="bannerCol1"><rect x="0" y="0" width="18" height="150" /></clipPath>
+                <clipPath id="bannerCol2"><rect x="18" y="0" width="18" height="150" /></clipPath>
+                <clipPath id="bannerCol3"><rect x="36" y="0" width="18" height="150" /></clipPath>
+                <clipPath id="bannerCol4"><rect x="54" y="0" width="18" height="150" /></clipPath>
+                <clipPath id="bannerCol5"><rect x="72" y="0" width="18" height="150" /></clipPath>
+              </defs>
+
+              {/* Column 1 with skull slice */}
+              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0s' }}>
+                <rect x="0" y="0" width="18" height="150" fill="#aa2525" />
+                <g clipPath="url(#bannerCol1)"><g transform="translate(44, 75)">{/* Skull left edge - partial tusk */}<path d="M-10,-6 Q-16,5 -12,14" stroke="#ccbb99" strokeWidth="2" fill="none" opacity="0.7" /></g></g>
+              </g>
+              {/* Column 2 with skull slice */}
+              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.12s' }}>
+                <rect x="18" y="2" width="18" height="148" fill="#992222" />
+                <g clipPath="url(#bannerCol2)"><g transform="translate(44, 75)">{/* Skull left part */}<ellipse cx="0" cy="-12" rx="16" ry="12" fill="#441212" opacity="0.8" /><ellipse cx="-6" cy="-12" rx="3.5" ry="2.5" fill="#220606" /><path d="M-10,-6 Q-16,5 -12,14" stroke="#ccbb99" strokeWidth="2" fill="none" /></g></g>
+              </g>
+              {/* Column 3 with skull slice - CENTER */}
+              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.24s' }}>
+                <rect x="36" y="4" width="18" height="146" fill="#882020" />
+                <g clipPath="url(#bannerCol3)"><g transform="translate(44, 75)">{/* Skull center */}<ellipse cx="0" cy="-12" rx="16" ry="12" fill="#441212" opacity="0.8" /><ellipse cx="0" cy="-10" rx="10" ry="7" fill="#551515" opacity="0.6" /><rect x="-7" y="-3" width="14" height="7" fill="#441212" opacity="0.8" /><line x1="-5" y1="-3" x2="-5" y2="4" stroke="#220606" strokeWidth="2" /><line x1="0" y1="-3" x2="0" y2="4" stroke="#220606" strokeWidth="2" /><line x1="5" y1="-3" x2="5" y2="4" stroke="#220606" strokeWidth="2" /></g></g>
+              </g>
+              {/* Column 4 with skull slice */}
+              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.36s' }}>
+                <rect x="54" y="6" width="18" height="144" fill="#771818" />
+                <g clipPath="url(#bannerCol4)"><g transform="translate(44, 75)">{/* Skull right part */}<ellipse cx="0" cy="-12" rx="16" ry="12" fill="#441212" opacity="0.8" /><ellipse cx="6" cy="-12" rx="3.5" ry="2.5" fill="#220606" /><path d="M10,-6 Q16,5 12,14" stroke="#ccbb99" strokeWidth="2" fill="none" /></g></g>
+              </g>
+              {/* Column 5 (edge) with skull slice */}
+              <g style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.48s' }}>
+                <rect x="72" y="8" width="15" height="142" fill="#661515" />
+                <g clipPath="url(#bannerCol5)"><g transform="translate(44, 75)">{/* Skull right edge - partial tusk */}<path d="M10,-6 Q16,5 12,14" stroke="#ccbb99" strokeWidth="2" fill="none" opacity="0.7" /></g></g>
+              </g>
+              {/* Banner edge fraying */}
+              <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill="#661515" style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
+            </g>
+            {/* Pole shadow */}
+            <ellipse cx="6" cy="235" rx="15" ry="5" fill="#0a0a08" opacity="0.4" />
+          </g>
         </g>
 
         {/* Ground plane fade */}
-        <rect x="0" y="100" width="1000" height="650" fill="url(#battlefieldFade)" />
+        <rect x="0" y="200" width="1000" height="650" fill="url(#rocGroundFade)" />
 
-        {/* Perspective lines (subtle) */}
-        <g opacity="0.08">
-          {[-50, -30, -15, 0, 15, 30, 50].map((offset, i) => (
-            <line key={i} x1={500 + offset * 3} y1="100" x2={offset < 0 ? -300 : offset > 0 ? 1300 : 500} y2="750" stroke="#1a2a1a" strokeWidth="1" />
+        {/* === PERSPECTIVE LINES - subtle depth like FT === */}
+        <g opacity="0.04">
+          {[-60, -35, -15, 0, 15, 35, 60].map((offset, i) => (
+            <line key={i} x1={500 + offset * 2} y1="180" x2={offset < 0 ? -400 : offset > 0 ? 1400 : 500} y2="850" stroke="#201820" strokeWidth="1" />
           ))}
         </g>
       </svg>
 
-      {/* === VIGNETTE LIGHTING - Dark edges, lit center === */}
+      {/* === STORMY ATMOSPHERE GLOW - green-tinted like WC3 === */}
+      <div style={{
+        position: 'absolute',
+        top: '5%',
+        left: '5%',
+        width: '50%',
+        height: '35%',
+        background: 'radial-gradient(ellipse at 30% 40%, #1a3a2512 0%, #0d251806 40%, transparent 70%)',
+        filter: 'blur(50px)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '8%',
+        right: '5%',
+        width: '45%',
+        height: '30%',
+        background: 'radial-gradient(ellipse at 60% 50%, #2a4a3010 0%, #1a3a2506 50%, transparent 80%)',
+        filter: 'blur(55px)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* Vignette - dark green edges, focused center */}
       <div style={{
         position: 'absolute',
         inset: 0,
         background: `
-          radial-gradient(ellipse 70% 60% at 50% 45%, transparent 0%, transparent 40%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.6) 100%),
-          radial-gradient(ellipse 80% 50% at 50% 50%, ${WC3.roc.felDark}15 0%, transparent 50%)
+          radial-gradient(ellipse 70% 60% at 50% 40%, transparent 0%, transparent 35%, rgba(5,15,8,0.4) 70%, rgba(0,8,4,0.7) 100%),
+          radial-gradient(ellipse 60% 40% at 50% 30%, #0d251810 0%, transparent 50%)
         `,
         pointerEvents: 'none',
       }} />
 
-      {/* Corner darkening */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '30%',
-        height: '40%',
-        background: `radial-gradient(ellipse at 0% 0%, rgba(0,0,0,0.5) 0%, transparent 70%)`,
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        right: 0,
-        width: '30%',
-        height: '40%',
-        background: `radial-gradient(ellipse at 100% 0%, rgba(0,0,0,0.5) 0%, transparent 70%)`,
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '35%',
-        height: '35%',
-        background: `radial-gradient(ellipse at 0% 100%, rgba(0,0,0,0.6) 0%, transparent 70%)`,
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        width: '35%',
-        height: '35%',
-        background: `radial-gradient(ellipse at 100% 100%, rgba(0,0,0,0.6) 0%, transparent 70%)`,
-        pointerEvents: 'none',
-      }} />
-
-      {/* Volumetric cloud layers */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '50%' }} viewBox="0 0 1000 500" preserveAspectRatio="none">
+      {/* Volumetric storm clouds - green-tinted */}
+      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '45%' }} viewBox="0 0 1000 450" preserveAspectRatio="none">
         <defs>
           <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="15" />
@@ -662,18 +1239,18 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
           </filter>
           <radialGradient id="cloudCore" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="#1a2818" />
-            <stop offset="60%" stopColor="#0f1a0d" />
-            <stop offset="100%" stopColor="#080c08" />
+            <stop offset="0%" stopColor="#1a2518" />
+            <stop offset="60%" stopColor="#0d1a0f" />
+            <stop offset="100%" stopColor="#05100a" />
           </radialGradient>
         </defs>
-        {/* Far background clouds - massive, blurred */}
+        {/* Far clouds - massive storm wall */}
         <g filter="url(#cloudBlur)" opacity="0.6">
-          <ellipse cx="150" cy="100" rx="300" ry="120" fill="#0a120a" />
-          <ellipse cx="500" cy="80" rx="400" ry="150" fill="#0d150d" />
-          <ellipse cx="850" cy="110" rx="320" ry="130" fill="#0a120a" />
+          <ellipse cx="150" cy="100" rx="300" ry="120" fill="#0a1510" />
+          <ellipse cx="500" cy="80" rx="400" ry="150" fill="#0d1a12" />
+          <ellipse cx="850" cy="110" rx="320" ry="130" fill="#0a1510" />
         </g>
-        {/* Mid clouds - storm mass */}
+        {/* Mid clouds - storm core */}
         <g filter="url(#cloudBlurLight)" opacity="0.8">
           <ellipse cx="200" cy="180" rx="250" ry="90" fill="url(#cloudCore)" />
           <ellipse cx="480" cy="150" rx="320" ry="110" fill="url(#cloudCore)" />
@@ -686,26 +1263,26 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           <ellipse cx="600" cy="270" rx="200" ry="55" fill="#0d180d" />
           <ellipse cx="880" cy="260" rx="160" ry="50" fill="#0a150a" />
         </g>
-        {/* Wispy cloud tendrils */}
+        {/* Wispy tendrils */}
         <g opacity="0.25">
-          <path d="M0,320 Q150,300 300,330 Q450,310 500,340" stroke="#1a2518" strokeWidth="20" fill="none" />
-          <path d="M500,310 Q650,330 800,300 Q900,320 1000,310" stroke="#1a2518" strokeWidth="15" fill="none" />
+          <path d="M0,320 Q150,300 300,330 Q450,310 500,340" stroke="#1a2515" strokeWidth="20" fill="none" />
+          <path d="M500,310 Q650,330 800,300 Q900,320 1000,310" stroke="#1a2515" strokeWidth="15" fill="none" />
         </g>
       </svg>
 
-      {/* Cloud glow when lightning strikes */}
+      {/* Cloud glow when lightning strikes - white/pale blue */}
       <div style={{
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
         height: '50%',
-        background: `radial-gradient(ellipse at ${lightningX}% 35%, ${WC3.roc.felBright}${Math.floor(cloudGlow * 50).toString(16).padStart(2, '0')} 0%, ${WC3.roc.felMid}${Math.floor(cloudGlow * 25).toString(16).padStart(2, '0')} 25%, transparent 60%)`,
+        background: `radial-gradient(ellipse at ${lightningX}% 35%, #ddffff${Math.floor(cloudGlow * 50).toString(16).padStart(2, '0')} 0%, #aaddee${Math.floor(cloudGlow * 25).toString(16).padStart(2, '0')} 25%, transparent 60%)`,
         transition: 'background 0.15s ease',
         pointerEvents: 'none',
       }} />
 
-      {/* Lightning bolt */}
+      {/* Lightning bolt - natural storm lightning */}
       {lightningActive && (
         <svg
           style={{
@@ -715,34 +1292,36 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             width: '8%',
             height: '45%',
             opacity: 0.85,
-            filter: `drop-shadow(0 0 15px ${WC3.roc.felBright}) drop-shadow(0 0 30px ${WC3.roc.felMid})`,
+            filter: 'drop-shadow(0 0 15px #ccffff) drop-shadow(0 0 30px #88ccdd)',
           }}
           viewBox="0 0 80 450"
         >
           <path
             d="M40 0 L35 70 L55 80 L30 160 L48 170 L22 270 L42 280 L15 380 L50 290 L32 280 L58 180 L40 170 L65 90 L45 80 Z"
-            fill={WC3.roc.felBright}
+            fill="#ddffff"
           />
           <path
             d="M40 5 L37 65 L52 75 L32 150 L47 160 L26 250 L44 260 L22 360 L48 275 L34 268 L56 172 L42 165 L62 88 L46 82 Z"
-            fill="#aaffaa"
+            fill="#ffffff"
             opacity="0.7"
           />
         </svg>
       )}
 
-      {/* === WC3 INFERNAL - All phases centered on same landX point === */}
+      {/* === WC3 INFERNAL - Fixed positioned relative to viewport === */}
       {infernals.map((inf) => (
         <div key={inf.id}>
           {/* PHASE 1: FALLING ASTEROID - Falls to the landing point */}
           {inf.phase === 'falling' && (
             <div
               style={{
-                position: 'absolute',
-                left: `${inf.landX}%`,
-                bottom: inf.landY,
+                position: 'fixed',
+                left: inf.landX,
+                top: inf.landY,
                 transform: 'translateX(-50%)',
                 animation: `infernalFall${inf.side === 'left' ? 'Right' : 'Left'} 4s ease-in forwards`,
+                zIndex: 5,
+                pointerEvents: 'none',
               }}
             >
               {/* Outer glow - large atmospheric */}
@@ -819,10 +1398,12 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           {inf.phase === 'explosion' && (
             <div
               style={{
-                position: 'absolute',
-                left: `${inf.landX}%`,
-                bottom: inf.landY,
+                position: 'fixed',
+                left: inf.landX,
+                top: inf.landY,
                 transform: 'translateX(-50%)',
+                zIndex: 5,
+                pointerEvents: 'none',
               }}
             >
               {/* Main explosion flash */}
@@ -869,292 +1450,103 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           {inf.phase === 'rising' && (
             <div
               style={{
-                position: 'absolute',
-                left: `${inf.landX}%`,
-                bottom: inf.landY,
-                transform: 'translateX(-50%)',
+                position: 'fixed',
+                left: inf.landX,
+                top: inf.landY,
+                transform: 'translateX(-40%)',
                 animation: 'infernalRise 1s ease-out forwards',
+                zIndex: 5,
+                pointerEvents: 'none',
               }}
             >
-              {/* WC3 Infernal - DISTINCT rock segments linked by fel fire */}
-              <svg width="80" height="100" viewBox="0 0 80 100" style={{ overflow: 'visible' }}>
-                <defs>
-                  <linearGradient id={`rock${inf.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#4a4a45" />
-                    <stop offset="50%" stopColor="#2a2a28" />
-                    <stop offset="100%" stopColor="#1a1a18" />
-                  </linearGradient>
-                  <linearGradient id={`felFire${inf.id}`} x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor={WC3.roc.felDark} />
-                    <stop offset="40%" stopColor={WC3.roc.felMid} />
-                    <stop offset="70%" stopColor={WC3.roc.felBright} />
-                    <stop offset="100%" stopColor="#ffff66" />
-                  </linearGradient>
-                  <filter id={`glow${inf.id}`}>
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                  </filter>
-                </defs>
-
-                {/* Overall fel aura */}
-                <ellipse cx="40" cy="55" rx="45" ry="55" fill={WC3.roc.felBright} opacity="0.12" filter={`url(#glow${inf.id})`} />
-
-                {/* === LEFT LEG - Two rock segments linked by fire === */}
-                {/* Upper leg rock */}
-                <polygon points="26,62 22,72 28,75 32,65" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* FIRE LINK between leg segments */}
-                <ellipse cx="25" cy="76" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-                {/* Lower leg rock */}
-                <polygon points="22,78 16,95 24,98 28,82" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* Foot claws */}
-                <polygon points="16,95 10,100 16,98" fill={WC3.roc.felBright} />
-                <polygon points="20,97 18,103 24,100" fill={WC3.roc.felBright} />
-
-                {/* === RIGHT LEG - Two rock segments linked by fire === */}
-                {/* Upper leg rock */}
-                <polygon points="54,62 48,65 52,75 58,72" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* FIRE LINK between leg segments */}
-                <ellipse cx="55" cy="76" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-                {/* Lower leg rock */}
-                <polygon points="52,78 56,82 64,98 58,95" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* Foot claws */}
-                <polygon points="64,95 70,100 64,98" fill={WC3.roc.felBright} />
-                <polygon points="60,97 62,103 56,100" fill={WC3.roc.felBright} />
-
-                {/* === FIRE LINKING LEGS TO TORSO === */}
-                <ellipse cx="30" cy="58" rx="6" ry="5" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-                <ellipse cx="50" cy="58" rx="6" ry="5" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-
-                {/* === TORSO - Large central rock with fire core === */}
-                <polygon points="24,35 20,55 40,62 60,55 56,35 48,28 32,28" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* Central fire core visible through cracks */}
-                <ellipse cx="40" cy="45" rx="10" ry="8" fill={`url(#felFire${inf.id})`} opacity="0.8" filter={`url(#glow${inf.id})`} />
-                <path d="M32,42 L40,52 L48,42" stroke={WC3.roc.felBright} strokeWidth="2" fill="none" />
-
-                {/* === LEFT ARM - Two rock segments linked by fire === */}
-                {/* Shoulder rock */}
-                <polygon points="22,35 14,42 18,48 26,42" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* FIRE LINK at elbow */}
-                <ellipse cx="12" cy="50" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-                {/* Forearm rock */}
-                <polygon points="10,52 4,62 10,65 16,56" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* Claws */}
-                <polygon points="4,62 -2,68 4,66" fill={WC3.roc.felBright} />
-                <polygon points="6,64 2,72 8,68" fill={WC3.roc.felBright} />
-                <polygon points="10,65 8,74 14,68" fill={WC3.roc.felBright} />
-
-                {/* === RIGHT ARM - Two rock segments linked by fire === */}
-                {/* Shoulder rock */}
-                <polygon points="58,35 54,42 62,48 66,42" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* FIRE LINK at elbow */}
-                <ellipse cx="68" cy="50" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-                {/* Forearm rock */}
-                <polygon points="64,52 70,56 76,65 70,62" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* Claws */}
-                <polygon points="76,62 82,68 76,66" fill={WC3.roc.felBright} />
-                <polygon points="74,64 78,72 72,68" fill={WC3.roc.felBright} />
-                <polygon points="70,65 72,74 66,68" fill={WC3.roc.felBright} />
-
-                {/* === FIRE LINKING ARMS TO TORSO === */}
-                <ellipse cx="22" cy="36" rx="5" ry="6" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-                <ellipse cx="58" cy="36" rx="5" ry="6" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-
-                {/* === SHOULDER FLAMES rising up === */}
-                <ellipse cx="18" cy="30" rx="7" ry="12" fill={`url(#felFire${inf.id})`} opacity="0.9" filter={`url(#glow${inf.id})`} />
-                <ellipse cx="62" cy="30" rx="7" ry="12" fill={`url(#felFire${inf.id})`} opacity="0.9" filter={`url(#glow${inf.id})`} />
-
-                {/* === FIRE LINKING HEAD TO TORSO === */}
-                <ellipse cx="40" cy="28" rx="8" ry="5" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
-
-                {/* === HEAD - Angular rock skull === */}
-                <polygon points="32,26 28,16 32,8 40,5 48,8 52,16 48,26" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                {/* Glowing eyes */}
-                <polygon points="33,15 37,18 35,14 33,11" fill={WC3.roc.felBright} />
-                <polygon points="47,15 43,18 45,14 47,11" fill={WC3.roc.felBright} />
-                <ellipse cx="35" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glow${inf.id})`} />
-                <ellipse cx="45" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glow${inf.id})`} />
-                {/* Mouth fire */}
-                <path d="M37,20 L40,23 L43,20" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" />
-              </svg>
-              {/* Shadow - 15px below feet */}
+              {/* Shadow FIRST - golem renders on top of shadow */}
               <div style={{
                 position: 'absolute',
-                left: '-35px',
-                bottom: '-25px',
-                width: '110px',
-                height: '20px',
-                background: 'radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 80%)',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                bottom: '-10px',
+                width: '200px',
+                height: '40px',
+                background: `radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.35) 45%, ${WC3.roc.felDark}15 75%, transparent 100%)`,
                 borderRadius: '50%',
               }} />
+              <InfernalGolemSVG id={inf.id} isIdle={false} scale={1} />
             </div>
           )}
 
-          {/* PHASE 4: IDLE - Infernal with animated fire links */}
+          {/* PHASE 4: IDLE - Same infernal design as rising, with subtle idle animations */}
           {inf.phase === 'idle' && (
             <div
               style={{
-                position: 'absolute',
-                left: `${inf.landX}%`,
-                bottom: inf.landY,
-                transform: 'translateX(-50%)',
+                position: 'fixed',
+                left: inf.landX,
+                top: inf.landY,
+                transform: 'translateX(-40%)',
+                zIndex: 5,
+                pointerEvents: 'none',
               }}
             >
-              {/* WC3 Infernal - Rock segments linked by animated fire */}
-              <svg width="80" height="100" viewBox="0 0 80 100" style={{ overflow: 'visible', animation: 'infernalBreath 2s ease-in-out infinite' }}>
-                <defs>
-                  <linearGradient id={`rockI${inf.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#4a4a45" />
-                    <stop offset="50%" stopColor="#2a2a28" />
-                    <stop offset="100%" stopColor="#1a1a18" />
-                  </linearGradient>
-                  <linearGradient id={`felFireI${inf.id}`} x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor={WC3.roc.felDark} />
-                    <stop offset="40%" stopColor={WC3.roc.felMid} />
-                    <stop offset="70%" stopColor={WC3.roc.felBright} />
-                    <stop offset="100%" stopColor="#ffff66" />
-                  </linearGradient>
-                  <filter id={`glowI${inf.id}`}>
-                    <feGaussianBlur stdDeviation="3" result="blur" />
-                    <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-                  </filter>
-                </defs>
-
-                {/* Overall fel aura - pulsing */}
-                <ellipse cx="40" cy="55" rx="45" ry="55" fill={WC3.roc.felBright} opacity="0.15" filter={`url(#glowI${inf.id})`} style={{ animation: 'felPulse 1.5s ease-in-out infinite' }} />
-
-                {/* === LEFT LEG === */}
-                <polygon points="26,62 22,72 28,75 32,65" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <ellipse cx="25" cy="76" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.3s ease-in-out infinite alternate' }} />
-                <polygon points="22,78 16,95 24,98 28,82" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <polygon points="16,95 10,100 16,98" fill={WC3.roc.felBright} />
-                <polygon points="20,97 18,103 24,100" fill={WC3.roc.felBright} />
-
-                {/* === RIGHT LEG === */}
-                <polygon points="54,62 48,65 52,75 58,72" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <ellipse cx="55" cy="76" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.35s ease-in-out infinite alternate' }} />
-                <polygon points="52,78 56,82 64,98 58,95" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <polygon points="64,95 70,100 64,98" fill={WC3.roc.felBright} />
-                <polygon points="60,97 62,103 56,100" fill={WC3.roc.felBright} />
-
-                {/* === HIP FIRE LINKS === */}
-                <ellipse cx="30" cy="58" rx="6" ry="5" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.25s ease-in-out infinite alternate' }} />
-                <ellipse cx="50" cy="58" rx="6" ry="5" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.28s ease-in-out infinite alternate' }} />
-
-                {/* === TORSO === */}
-                <polygon points="24,35 20,55 40,62 60,55 56,35 48,28 32,28" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <ellipse cx="40" cy="45" rx="10" ry="8" fill={`url(#felFireI${inf.id})`} opacity="0.8" filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.2s ease-in-out infinite alternate' }} />
-                <path d="M32,42 L40,52 L48,42" stroke={WC3.roc.felBright} strokeWidth="2" fill="none" />
-
-                {/* === LEFT ARM === */}
-                <polygon points="22,35 14,42 18,48 26,42" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <ellipse cx="12" cy="50" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.32s ease-in-out infinite alternate' }} />
-                <polygon points="10,52 4,62 10,65 16,56" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <polygon points="4,62 -2,68 4,66" fill={WC3.roc.felBright} />
-                <polygon points="6,64 2,72 8,68" fill={WC3.roc.felBright} />
-                <polygon points="10,65 8,74 14,68" fill={WC3.roc.felBright} />
-
-                {/* === RIGHT ARM === */}
-                <polygon points="58,35 54,42 62,48 66,42" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <ellipse cx="68" cy="50" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.29s ease-in-out infinite alternate' }} />
-                <polygon points="64,52 70,56 76,65 70,62" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <polygon points="76,62 82,68 76,66" fill={WC3.roc.felBright} />
-                <polygon points="74,64 78,72 72,68" fill={WC3.roc.felBright} />
-                <polygon points="70,65 72,74 66,68" fill={WC3.roc.felBright} />
-
-                {/* === SHOULDER FIRE LINKS === */}
-                <ellipse cx="22" cy="36" rx="5" ry="6" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.22s ease-in-out infinite alternate' }} />
-                <ellipse cx="58" cy="36" rx="5" ry="6" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.24s ease-in-out infinite alternate' }} />
-
-                {/* === SHOULDER FLAMES === */}
-                <ellipse cx="18" cy="30" rx="7" ry="12" fill={`url(#felFireI${inf.id})`} opacity="0.9" filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.18s ease-in-out infinite alternate' }} />
-                <ellipse cx="62" cy="30" rx="7" ry="12" fill={`url(#felFireI${inf.id})`} opacity="0.9" filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.2s ease-in-out infinite alternate' }} />
-
-                {/* === NECK FIRE LINK === */}
-                <ellipse cx="40" cy="28" rx="8" ry="5" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.26s ease-in-out infinite alternate' }} />
-
-                {/* === HEAD === */}
-                <polygon points="32,26 28,16 32,8 40,5 48,8 52,16 48,26" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
-                <polygon points="33,15 37,18 35,14 33,11" fill={WC3.roc.felBright} style={{ animation: 'eyeGlow 2s ease-in-out infinite' }} />
-                <polygon points="47,15 43,18 45,14 47,11" fill={WC3.roc.felBright} style={{ animation: 'eyeGlow 2s ease-in-out infinite' }} />
-                <ellipse cx="35" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowI${inf.id})`} />
-                <ellipse cx="45" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowI${inf.id})`} />
-                <path d="M37,20 L40,23 L43,20" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" />
-              </svg>
-              {/* Shadow - 15px below feet */}
+              {/* Shadow FIRST - golem renders on top of shadow */}
               <div style={{
                 position: 'absolute',
-                left: '-35px',
-                bottom: '-25px',
-                width: '110px',
-                height: '20px',
-                background: 'radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 50%, transparent 80%)',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                bottom: '-10px',
+                width: '200px',
+                height: '40px',
+                background: `radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.35) 45%, ${WC3.roc.felDark}15 75%, transparent 100%)`,
                 borderRadius: '50%',
               }} />
+              <InfernalGolemSVG id={inf.id} isIdle={true} scale={1} />
             </div>
           )}
         </div>
       ))}
 
-      {/* === HEAVY STORM RAIN - 3 depth layers === */}
-      {/* Back layer - distant, faint */}
-      {rainDrops.back.map((drop) => (
+      {/* === RAIN - Falling diagonally to the right === */}
+      {raindrops.map((drop) => (
         <div
-          key={`rain-b-${drop.id}`}
+          key={`rain-${drop.id}`}
           style={{
             position: 'absolute',
             left: `${drop.x}%`,
             top: '-5%',
-            width: '1px',
-            height: drop.length,
-            background: `linear-gradient(180deg, transparent 0%, rgba(80,100,80,${drop.opacity}) 50%, rgba(80,100,80,${drop.opacity * 0.3}) 100%)`,
-            animation: `rainStorm ${drop.duration}s linear infinite`,
+            width: '2px',
+            height: `${drop.length}px`,
+            background: 'linear-gradient(180deg, transparent 0%, #9ab0b8aa 20%, #c0d5ddcc 50%, #9ab0b8aa 80%, transparent 100%)',
+            transform: 'rotate(-20deg)',
+            animation: `rainFallDiagonal ${drop.duration}s linear infinite`,
             animationDelay: `${drop.delay}s`,
-          }}
-        />
-      ))}
-      {/* Mid layer - medium prominence */}
-      {rainDrops.mid.map((drop) => (
-        <div
-          key={`rain-m-${drop.id}`}
-          style={{
-            position: 'absolute',
-            left: `${drop.x}%`,
-            top: '-5%',
-            width: '1px',
-            height: drop.length,
-            background: `linear-gradient(180deg, transparent 0%, rgba(100,120,100,${drop.opacity}) 40%, rgba(100,120,100,${drop.opacity * 0.4}) 100%)`,
-            animation: `rainStorm ${drop.duration}s linear infinite`,
-            animationDelay: `${drop.delay}s`,
-          }}
-        />
-      ))}
-      {/* Front layer - bright, prominent */}
-      {rainDrops.front.map((drop) => (
-        <div
-          key={`rain-f-${drop.id}`}
-          style={{
-            position: 'absolute',
-            left: `${drop.x}%`,
-            top: '-5%',
-            width: '1.5px',
-            height: drop.length,
-            background: `linear-gradient(180deg, transparent 0%, rgba(140,160,140,${drop.opacity}) 30%, rgba(120,140,120,${drop.opacity * 0.5}) 100%)`,
-            animation: `rainStorm ${drop.duration}s linear infinite`,
-            animationDelay: `${drop.delay}s`,
-            filter: 'blur(0.3px)',
+            opacity: 0,
           }}
         />
       ))}
 
-      {/* Ground mist */}
+      {/* === FOREGROUND GRASS TUFTS === */}
+      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '80px', pointerEvents: 'none' }} viewBox="0 0 1000 80" preserveAspectRatio="none">
+        {/* Grass silhouettes */}
+        <g opacity="0.85">
+          {[30, 120, 250, 400, 550, 700, 850, 950].map((x, i) => (
+            <g key={`fg-${i}`} transform={`translate(${x}, 75)`}>
+              <path d={`M0,0 Q${-2},${-20} ${1},${-35 - i % 8}`} stroke="#3a4530" strokeWidth="2" fill="none" />
+              <path d={`M5,0 Q${7},${-25} ${4},${-40 - i % 6}`} stroke="#4a5538" strokeWidth="2" fill="none" />
+              <path d={`M10,0 Q${8},${-15} ${12},${-28 - i % 5}`} stroke="#3a4530" strokeWidth="1.5" fill="none" />
+            </g>
+          ))}
+        </g>
+        {/* Ground bar - dark grass */}
+        <rect x="0" y="65" width="1000" height="15" fill="#0d1a0f" opacity="0.95" />
+      </svg>
+
+      {/* Ground mist atmosphere */}
       <div style={{
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        height: '25%',
-        background: `linear-gradient(0deg, #0a0f0a50 0%, #0a0f0a20 50%, transparent 100%)`,
-        filter: 'blur(10px)',
+        height: '20%',
+        background: 'linear-gradient(0deg, #0d1a0f40 0%, #0a150a25 50%, transparent 100%)',
+        filter: 'blur(15px)',
       }} />
 
       <style>{`
@@ -1248,28 +1640,94 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             opacity: 0;
           }
         }
-        /* Infernal creature rising from impact */
+        /* Infernal creature rising from impact - must preserve translateX(-50%) */
         @keyframes infernalRise {
           0% {
-            transform: translateY(30px) scale(0.5);
+            transform: translateX(-40%) translateY(30px) scale(0.5);
             opacity: 0;
           }
           40% {
-            transform: translateY(10px) scale(0.9);
+            transform: translateX(-40%) translateY(10px) scale(0.9);
             opacity: 0.7;
           }
           100% {
-            transform: translateY(0) scale(1);
+            transform: translateX(-40%) translateY(0) scale(1);
             opacity: 1;
           }
         }
-        /* Idle breathing animation */
+        /* Idle breathing animation - SVG only, no translateX (that's on container) */
         @keyframes infernalBreath {
           0%, 100% {
             transform: scaleY(1) translateY(0);
           }
           50% {
-            transform: scaleY(1.03) translateY(-2px);
+            transform: scaleY(1.02) translateY(-1px);
+          }
+        }
+        /* Head looks around - left, center, right, center */
+        @keyframes headLook {
+          0%, 15%, 85%, 100% {
+            transform: rotate(0deg);
+          }
+          25%, 35% {
+            transform: rotate(-8deg);
+          }
+          55%, 65% {
+            transform: rotate(8deg);
+          }
+        }
+        /* Left arm sway */
+        @keyframes leftArmSway {
+          0%, 100% {
+            transform: rotate(0deg);
+          }
+          30% {
+            transform: rotate(-5deg);
+          }
+          70% {
+            transform: rotate(3deg);
+          }
+        }
+        /* Right arm sway - opposite phase */
+        @keyframes rightArmSway {
+          0%, 100% {
+            transform: rotate(0deg);
+          }
+          30% {
+            transform: rotate(5deg);
+          }
+          70% {
+            transform: rotate(-3deg);
+          }
+        }
+        /* Left leg weight shift */
+        @keyframes leftLegShift {
+          0%, 100% {
+            transform: rotate(0deg) translateX(0);
+          }
+          50% {
+            transform: rotate(-2deg) translateX(-1px);
+          }
+        }
+        /* Right leg weight shift - opposite phase */
+        @keyframes rightLegShift {
+          0%, 100% {
+            transform: rotate(0deg) translateX(0);
+          }
+          50% {
+            transform: rotate(2deg) translateX(1px);
+          }
+        }
+        /* Torso subtle sway */
+        @keyframes torsoSway {
+          0%, 100% {
+            transform: rotate(0deg);
+          }
+          25% {
+            transform: rotate(-1deg);
+          }
+          75% {
+            transform: rotate(1deg);
           }
         }
         /* Body glow pulse */
@@ -1283,15 +1741,88 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             transform: scale(1.08);
           }
         }
-        /* Joint flame flicker */
-        @keyframes flameFlicker {
-          0% {
-            opacity: 0.6;
-            transform: scale(1);
+        /* Layered flame animations - outer layer (slowest, largest movement) */
+        @keyframes flameOuter {
+          0%, 100% {
+            transform: scaleY(1) scaleX(1) translateX(0);
+            opacity: 0.8;
           }
-          100% {
+          25% {
+            transform: scaleY(1.15) scaleX(0.9) translateX(-1px);
+            opacity: 0.7;
+          }
+          50% {
+            transform: scaleY(1.05) scaleX(1.05) translateX(1px);
+            opacity: 0.85;
+          }
+          75% {
+            transform: scaleY(1.12) scaleX(0.95) translateX(-0.5px);
+            opacity: 0.75;
+          }
+        }
+        /* Middle flame layer */
+        @keyframes flameMid {
+          0%, 100% {
+            transform: scaleY(1) scaleX(1) translateX(0);
             opacity: 0.9;
-            transform: scale(1.1);
+          }
+          20% {
+            transform: scaleY(1.12) scaleX(0.92) translateX(0.5px);
+            opacity: 0.85;
+          }
+          45% {
+            transform: scaleY(1.08) scaleX(1.03) translateX(-0.8px);
+            opacity: 0.95;
+          }
+          70% {
+            transform: scaleY(1.18) scaleX(0.88) translateX(0.3px);
+            opacity: 0.88;
+          }
+        }
+        /* Inner flame layer (faster, more erratic) */
+        @keyframes flameInner {
+          0%, 100% {
+            transform: scaleY(1) scaleX(1) translateX(0);
+            opacity: 0.85;
+          }
+          15% {
+            transform: scaleY(1.2) scaleX(0.85) translateX(-0.5px);
+            opacity: 0.9;
+          }
+          35% {
+            transform: scaleY(1.05) scaleX(1.08) translateX(0.8px);
+            opacity: 0.8;
+          }
+          55% {
+            transform: scaleY(1.25) scaleX(0.82) translateX(-0.3px);
+            opacity: 0.92;
+          }
+          80% {
+            transform: scaleY(1.1) scaleX(0.95) translateX(0.4px);
+            opacity: 0.85;
+          }
+        }
+        /* Core flame (hottest, fastest flicker) */
+        @keyframes flameCore {
+          0%, 100% {
+            transform: scaleY(1) scaleX(1);
+            opacity: 0.7;
+          }
+          20% {
+            transform: scaleY(1.3) scaleX(0.8);
+            opacity: 0.8;
+          }
+          40% {
+            transform: scaleY(0.9) scaleX(1.1);
+            opacity: 0.65;
+          }
+          60% {
+            transform: scaleY(1.25) scaleX(0.85);
+            opacity: 0.75;
+          }
+          80% {
+            transform: scaleY(1.05) scaleX(0.95);
+            opacity: 0.7;
           }
         }
         /* Eye glow intensity variation */
@@ -1309,10 +1840,37 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             filter: brightness(0.8);
           }
         }
-        /* Rain storm */
-        @keyframes rainStorm {
-          0% { transform: translate(0, 0) rotate(-12deg); opacity: 0.5; }
-          100% { transform: translate(18vw, 120vh) rotate(-12deg); opacity: 0; }
+        /* Rain falling diagonally to the right (\ shape) */
+        @keyframes rainFallDiagonal {
+          0% {
+            transform: rotate(-20deg) translateY(0);
+            opacity: 0;
+          }
+          5% {
+            opacity: 0.7;
+          }
+          95% {
+            opacity: 0.7;
+          }
+          100% {
+            transform: rotate(-20deg) translateY(115vh);
+            opacity: 0;
+          }
+        }
+        /* Grass blade wind - rotates from bottom anchor point */
+        @keyframes grassBlade {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(4deg); }
+          75% { transform: rotate(-3deg); }
+        }
+        /* Banner wave - staggered columns create ripple effect */
+        @keyframes bannerWave {
+          0% {
+            transform: translateY(0) skewX(0deg);
+          }
+          100% {
+            transform: translateY(-6px) skewX(3deg);
+          }
         }
       `}</style>
     </>
@@ -1888,95 +2446,60 @@ const RoCArtDivider = memo(function RoCArtDivider({ variant = 'weapons', scale =
   return (
     <div style={{
       position: 'relative',
-      height: `${80 * scale}px`,
-      margin: `${1.5 * scale}rem 0`,
+      height: `${60 * scale}px`,
+      margin: `${1 * scale}rem 0`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       transform: `scale(${scale})`,
       transformOrigin: 'center center',
+      opacity: 0.6,
     }}>
-      {/* Horizontal line base */}
+      {/* Subtle green glow behind */}
       <div style={{
         position: 'absolute',
-        left: '10%',
-        right: '10%',
-        height: '2px',
-        background: `linear-gradient(90deg, transparent 0%, ${WC3.metalDark} 20%, ${WC3.metalMid} 50%, ${WC3.metalDark} 80%, transparent 100%)`,
-      }} />
-
-      {/* Center art piece */}
-      <svg width="120" height="70" viewBox="0 0 120 70" style={{ position: 'relative', zIndex: 2 }}>
-        {variant === 'weapons' && (
-          <>
-            {/* Crossed broken swords */}
-            <g transform="translate(60,35)">
-              {/* Left sword */}
-              <g transform="rotate(-30)">
-                <path d="M-5,-30 L0,-28 L3,0 L-3,0 Z" fill={WC3.metalLight} />
-                <path d="M-2,-25 L0,-24 L1,-5" fill="none" stroke={WC3.metalHighlight} strokeWidth="1" opacity="0.6" />
-                <rect x="-5" y="0" width="10" height="4" fill={WC3.goldDark} />
-                <rect x="-2" y="4" width="4" height="8" fill="#3a2a1a" />
-              </g>
-              {/* Right sword */}
-              <g transform="rotate(30)">
-                <path d="M-5,-30 L0,-28 L3,0 L-3,0 Z" fill={WC3.metalLight} />
-                <path d="M-2,-25 L0,-24 L1,-5" fill="none" stroke={WC3.metalHighlight} strokeWidth="1" opacity="0.6" />
-                <rect x="-5" y="0" width="10" height="4" fill={WC3.goldDark} />
-                <rect x="-2" y="4" width="4" height="8" fill="#3a2a1a" />
-              </g>
-              {/* Shield in center */}
-              <ellipse cx="0" cy="5" rx="12" ry="14" fill="#4a3525" stroke={WC3.metalMid} strokeWidth="2" />
-              <ellipse cx="0" cy="5" rx="6" ry="8" fill="none" stroke={WC3.goldDark} strokeWidth="1" opacity="0.6" />
-              <circle cx="0" cy="5" r="3" fill={WC3.roc.felDark} opacity="0.8" />
-            </g>
-          </>
-        )}
-        {variant === 'banner' && (
-          <>
-            {/* War banner */}
-            <g transform="translate(60,10)">
-              {/* Pole */}
-              <rect x="-2" y="0" width="4" height="55" fill="#3a2a1a" />
-              <circle cx="0" cy="2" r="4" fill={WC3.goldDark} />
-              {/* Banner fabric */}
-              <path d="M2,8 Q30,18 25,35 Q22,48 35,55 L4,50 Q8,40 5,28 Z" fill={WC3.bloodRed} opacity="0.9" />
-              <path d="M-2,8 Q-28,20 -24,38 Q-20,50 -32,55 L-4,50 Q-6,42 -4,30 Z" fill={WC3.hordeRed} opacity="0.85" />
-              {/* Emblem hint */}
-              <circle cx="15" cy="30" r="8" fill={WC3.goldDark} opacity="0.5" />
-            </g>
-          </>
-        )}
-        {variant === 'rune' && (
-          <>
-            {/* Demonic rune circle */}
-            <g transform="translate(60,35)">
-              <circle cx="0" cy="0" r="28" fill="none" stroke={WC3.roc.felDark} strokeWidth="2" opacity="0.6" />
-              <circle cx="0" cy="0" r="22" fill="none" stroke={WC3.roc.felMid} strokeWidth="1" opacity="0.5" />
-              {/* Rune spokes */}
-              {[0, 72, 144, 216, 288].map((angle, i) => (
-                <line key={i} x1={Math.cos(angle * Math.PI / 180) * 10} y1={Math.sin(angle * Math.PI / 180) * 10} x2={Math.cos(angle * Math.PI / 180) * 26} y2={Math.sin(angle * Math.PI / 180) * 26} stroke={WC3.roc.felMid} strokeWidth="2" opacity="0.7" />
-              ))}
-              {/* Inner glow */}
-              <circle cx="0" cy="0" r="8" fill={WC3.roc.felDark} opacity="0.4" />
-              <circle cx="0" cy="0" r="4" fill={WC3.roc.felBright} opacity="0.3" />
-            </g>
-          </>
-        )}
-        {/* Side decorations */}
-        <circle cx="15" cy="35" r="3" fill={WC3.metalMid} />
-        <circle cx="105" cy="35" r="3" fill={WC3.metalMid} />
-      </svg>
-
-      {/* Subtle glow */}
-      <div style={{
-        position: 'absolute',
-        inset: '20%',
-        background: `radial-gradient(ellipse at center, ${WC3.roc.felGlow} 0%, transparent 70%)`,
-        opacity: 0.3,
-        filter: 'blur(15px)',
+        width: '180px',
+        height: '40px',
+        background: `radial-gradient(ellipse, ${WC3.roc.felDark}20 0%, transparent 70%)`,
+        filter: 'blur(20px)',
         pointerEvents: 'none',
       }} />
+
+      {/* Horizontal line - very subtle, grassy green */}
+      <div style={{
+        position: 'absolute',
+        left: '15%',
+        right: '15%',
+        height: '1px',
+        background: `linear-gradient(90deg, transparent 0%, #2a3a25 20%, ${WC3.roc.felDark}50 50%, #2a3a25 80%, transparent 100%)`,
+      }} />
+
+      {/* Grass tuft decorations on left - very subtle */}
+      <svg width="30" height="20" viewBox="0 0 30 20" style={{ position: 'absolute', left: '12%', top: '50%', transform: 'translateY(-50%)', opacity: 0.35 }}>
+        <line x1="5" y1="20" x2="6" y2="8" stroke="#3a4a30" strokeWidth="1" />
+        <line x1="12" y1="20" x2="13" y2="5" stroke="#4a5a38" strokeWidth="1" />
+        <line x1="19" y1="20" x2="18" y2="7" stroke="#3a4a30" strokeWidth="1" />
+        <line x1="25" y1="20" x2="26" y2="10" stroke="#4a5a38" strokeWidth="1" />
+      </svg>
+
+      {/* Grass tuft decorations on right */}
+      <svg width="30" height="20" viewBox="0 0 30 20" style={{ position: 'absolute', right: '12%', top: '50%', transform: 'translateY(-50%) scaleX(-1)', opacity: 0.35 }}>
+        <line x1="5" y1="20" x2="6" y2="8" stroke="#3a4a30" strokeWidth="1" />
+        <line x1="12" y1="20" x2="13" y2="5" stroke="#4a5a38" strokeWidth="1" />
+        <line x1="19" y1="20" x2="18" y2="7" stroke="#3a4a30" strokeWidth="1" />
+        <line x1="25" y1="20" x2="26" y2="10" stroke="#4a5a38" strokeWidth="1" />
+      </svg>
+
+      {/* Center element - minimal fel rune, not weapons */}
+      <svg width="60" height="40" viewBox="0 0 60 40" style={{ position: 'relative', zIndex: 2, opacity: 0.7 }}>
+        {/* Simple fel glow dot */}
+        <ellipse cx="30" cy="20" rx="15" ry="12" fill={WC3.roc.felDark} opacity="0.15" />
+        <circle cx="30" cy="20" r="6" fill={WC3.roc.felDark} opacity="0.3" />
+        <circle cx="30" cy="20" r="3" fill={WC3.roc.felMid} opacity="0.4" />
+        {/* Subtle side lines */}
+        <line x1="5" y1="20" x2="18" y2="20" stroke={WC3.roc.felDark} strokeWidth="1" opacity="0.4" />
+        <line x1="42" y1="20" x2="55" y2="20" stroke={WC3.roc.felDark} strokeWidth="1" opacity="0.4" />
+      </svg>
     </div>
   )
 })
@@ -2126,11 +2649,14 @@ export default function MedievalFantasyTheme() {
     }
   }, [])
 
-  // Calculate available space and whether to show extra content
+  // Calculate available space - EXACT match to Dark Fantasy spacing
+  // Dark Fantasy uses: py-6 md:py-8 (1.5rem/2rem padding) for sections, py-16 (4rem) for art dividers
+  // Section gap in DF = bottom padding + top padding of next = 3rem (small) / 4rem (md+)
+  // Art divider total padding = 8rem (4rem top + 4rem bottom), but we use margin so just 4rem each side
   const isLargeScreen = viewportHeight >= 800
-  const isExtraLargeScreen = viewportHeight >= 1000
-  const sectionSpacing = isExtraLargeScreen ? '3rem' : isLargeScreen ? '2.5rem' : '2rem'
-  const artDividerScale = isExtraLargeScreen ? 1.2 : isLargeScreen ? 1 : 0.85
+  const sectionSpacing = isLargeScreen ? '4rem' : '3rem'  // gap between content sections
+  const artDividerMargin = isLargeScreen ? '4rem' : '3rem'  // margin around art dividers
+  const artDividerScale = isLargeScreen ? 1.3 : 1.1
 
   if (!mounted) {
     return (
@@ -2144,11 +2670,13 @@ export default function MedievalFantasyTheme() {
     <div style={{ minHeight: '100vh', background: WC3.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: WC3.textBright }}>
       <DualZoneAtmosphere />
 
+      {/* ============ MAIN CONTENT - Starts at top like Dark Fantasy ============ */}
       <div style={{ position: 'relative', zIndex: 2, padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
 
         {/* ============ REIGN OF CHAOS ZONE ============ */}
 
-        {/* Header */}
+        {/* Header - wrapped in high z-index container for ThemeSwitcher dropdown */}
+        <div style={{ position: 'relative', zIndex: 100 }}>
         <FadeInSection>
           <header style={{ marginBottom: sectionSpacing }}>
             <WC3Frame zone="roc">
@@ -2168,7 +2696,7 @@ export default function MedievalFantasyTheme() {
                   <p style={{ color: WC3.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{PROFESSIONAL_SUMMARY.headline}</p>
                   <p style={{ color: WC3.textMid, fontSize: '0.75rem', fontStyle: 'italic' }}>{PROFESSIONAL_SUMMARY.tagline}</p>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                   <WC3Button href="/cv" zone="roc">Scroll</WC3Button>
                   <WC3Button href="/personal-projects/game-engine" zone="roc">Nebulith</WC3Button>
                   <ThemeSwitcher />
@@ -2188,10 +2716,11 @@ export default function MedievalFantasyTheme() {
             </WC3Frame>
           </header>
         </FadeInSection>
+        </div>
 
         {/* Profession Selector */}
         <FadeInSection delay={100}>
-          <nav style={{ marginBottom: '2rem', display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+          <nav style={{ marginBottom: sectionSpacing, display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
             <WC3Button onClick={() => setActive('engineer')} active={active === 'engineer'} zone="roc">Engineer</WC3Button>
             <WC3Button onClick={() => setActive('drummer')} active={active === 'drummer'} zone="roc">Musician</WC3Button>
             <WC3Button onClick={() => setActive('fighter')} active={active === 'fighter'} zone="roc">Muay Thai</WC3Button>
@@ -2200,7 +2729,7 @@ export default function MedievalFantasyTheme() {
 
         {/* About */}
         <FadeInSection>
-          <section style={{ marginBottom: '2rem' }}>
+          <section style={{ marginBottom: sectionSpacing }}>
             <WC3Frame title="About" zone="roc">
               <p style={{ color: WC3.textBright, lineHeight: 1.7, marginBottom: '0.75rem', fontSize: '0.875rem' }}>{aboutData.bio}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
@@ -2224,16 +2753,18 @@ export default function MedievalFantasyTheme() {
 
         {/* === RoC Art Divider: Crossed Weapons === */}
         <FadeInSection>
-          <RoCArtDivider variant="weapons" scale={artDividerScale} />
+          <div style={{ margin: `${artDividerMargin} 0` }}>
+            <RoCArtDivider variant="weapons" scale={artDividerScale} />
+          </div>
         </FadeInSection>
 
-        {/* Work Experience - with RoC ornaments */}
+        {/* Work Experience - subtle, faded like fog of war */}
         <FadeInSection>
           <SectionWithOrnament
             leftOrnament={<RoCOrnament side="left" type="flag" />}
             rightOrnament={<RoCOrnament side="right" type="weapons" />}
           >
-            <section style={{ marginBottom: '2rem' }}>
+            <section style={{ marginBottom: sectionSpacing, opacity: 0.7, filter: 'brightness(0.85)' }}>
               <WC3Frame title="Work Experience" zone="roc">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {active === 'engineer' ? workExperience.map((job) => (
@@ -2283,7 +2814,9 @@ export default function MedievalFantasyTheme() {
 
         {/* === RoC Art Divider: War Banner === */}
         <FadeInSection>
-          <RoCArtDivider variant="banner" scale={artDividerScale} />
+          <div style={{ margin: `${artDividerMargin} 0` }}>
+            <RoCArtDivider variant="banner" scale={artDividerScale} />
+          </div>
         </FadeInSection>
 
         {/* Skills - with shield ornament */}
@@ -2291,7 +2824,7 @@ export default function MedievalFantasyTheme() {
           <SectionWithOrnament
             rightOrnament={<RoCOrnament side="right" type="shield" />}
           >
-            <section style={{ marginBottom: '2rem' }}>
+            <section style={{ marginBottom: sectionSpacing }}>
               <WC3Frame title={active === 'engineer' ? 'Tech Stack' : 'Skills'} zone="roc">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                   {active === 'engineer' ? engineerTech.map((category) => (
@@ -2327,7 +2860,9 @@ export default function MedievalFantasyTheme() {
 
         {/* === Transition Art Divider: Ice Crystals === */}
         <FadeInSection>
-          <FTArtDivider variant="crystals" scale={artDividerScale} />
+          <div style={{ margin: `${artDividerMargin} 0` }}>
+            <FTArtDivider variant="crystals" scale={artDividerScale} />
+          </div>
         </FadeInSection>
 
         {/* Projects - FT zone begins */}
@@ -2336,7 +2871,7 @@ export default function MedievalFantasyTheme() {
             leftOrnament={<FTOrnament side="left" type="shard" />}
             rightOrnament={<FTOrnament side="right" type="rune" />}
           >
-            <section style={{ marginBottom: '2rem' }}>
+            <section style={{ marginBottom: sectionSpacing }}>
               <WC3Frame title="Projects" zone="ft">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
                   {(active === 'engineer' ? getFeaturedProjects(projects) : projects).slice(0, 6).map((project) => (
@@ -2354,7 +2889,9 @@ export default function MedievalFantasyTheme() {
 
         {/* === FT Art Divider: Frost Rune === */}
         <FadeInSection>
-          <FTArtDivider variant="rune" scale={artDividerScale} />
+          <div style={{ margin: `${artDividerMargin} 0` }}>
+            <FTArtDivider variant="rune" scale={artDividerScale} />
+          </div>
         </FadeInSection>
 
         {/* Companies / Bands */}
@@ -2363,7 +2900,7 @@ export default function MedievalFantasyTheme() {
             leftOrnament={<FTOrnament side="left" type="frost" />}
           >
             {active === 'engineer' && (
-              <section style={{ marginBottom: '2rem' }}>
+              <section style={{ marginBottom: sectionSpacing }}>
                 <WC3Frame title="Companies" zone="ft">
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                     {COMPANIES.map((company) => (
@@ -2379,7 +2916,7 @@ export default function MedievalFantasyTheme() {
               </section>
             )}
             {active === 'drummer' && (
-              <section style={{ marginBottom: '2rem' }}>
+              <section style={{ marginBottom: sectionSpacing }}>
                 <WC3Frame title="Bands" zone="ft">
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                     {BANDS.map((band) => (
@@ -2398,7 +2935,9 @@ export default function MedievalFantasyTheme() {
 
         {/* === FT Art Divider: Ice Throne === */}
         <FadeInSection>
-          <FTArtDivider variant="throne" scale={artDividerScale} />
+          <div style={{ margin: `${artDividerMargin} 0` }}>
+            <FTArtDivider variant="throne" scale={artDividerScale} />
+          </div>
         </FadeInSection>
 
         {/* Contact */}
@@ -2406,7 +2945,7 @@ export default function MedievalFantasyTheme() {
           <SectionWithOrnament
             rightOrnament={<FTOrnament side="right" type="shard" />}
           >
-            <section style={{ marginBottom: '2rem' }}>
+            <section style={{ marginBottom: sectionSpacing }}>
               <WC3Frame title="Contact" zone="ft">
                 <p style={{ color: WC3.textMid, marginBottom: '0.75rem', fontSize: '0.8125rem' }}>
                   10+ years delivering production systems. Let&apos;s build something.

@@ -1758,7 +1758,7 @@ export default function FighterSelectTheme() {
           {/* ================================================================= */}
           <ArcadeSectionCard
             color={COLORS.specialBlue}
-            title="FIGHTER PROFILE"
+            title="About"
             titleIcon="►"
             id="about-heading"
           >
@@ -1857,7 +1857,7 @@ export default function FighterSelectTheme() {
           {experience.length > 0 && (
             <ArcadeSectionCard
               color={COLORS.p1Blue}
-              title="FIGHT RECORD"
+              title="Work Experience"
               titleIcon="▶▶"
               id="experience-heading"
             >
@@ -1879,7 +1879,7 @@ export default function FighterSelectTheme() {
           {/* ================================================================= */}
           <ArcadeSectionCard
             color={active === 'engineer' ? COLORS.specialBlue : active === 'drummer' ? COLORS.neonPink : COLORS.orange}
-            title={active === 'engineer' ? 'SPECIAL MOVES' : 'COMBAT SKILLS'}
+            title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
             titleIcon="▶▶▶"
             id="skills-heading"
           >
@@ -1939,7 +1939,7 @@ export default function FighterSelectTheme() {
           {/* ================================================================= */}
           <ArcadeSectionCard
             color={COLORS.gold}
-            title="CHAMPIONSHIP VICTORIES"
+            title="Projects"
             titleIcon="★"
             id="projects-heading"
           >
@@ -1961,7 +1961,7 @@ export default function FighterSelectTheme() {
           {active === 'engineer' && (
             <ArcadeSectionCard
               color={COLORS.specialBlue}
-              title="TEAM AFFILIATIONS"
+              title="Companies"
               titleIcon="▶▶▶▶"
               id="ventures-heading"
             >
@@ -1979,7 +1979,7 @@ export default function FighterSelectTheme() {
           {active === 'drummer' && (
             <ArcadeSectionCard
               color={COLORS.neonPink}
-              title="STAGE CREWS"
+              title="Bands"
               titleIcon="♪♪♪"
               id="bands-heading"
             >
@@ -1991,6 +1991,57 @@ export default function FighterSelectTheme() {
             </ArcadeSectionCard>
           )}
         </main>
+
+        {/* ================================================================= */}
+        {/* CONTACT CTA */}
+        {/* ================================================================= */}
+        <section className="relative z-20 py-12 px-6" aria-label="Contact">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="mb-6">
+              <h2
+                className="text-xl tracking-[0.3em] uppercase mb-2"
+                style={{
+                  fontFamily: '"Impact", "Arial Black", sans-serif',
+                  color: COLORS.gold,
+                  textShadow: `0 0 20px ${COLORS.gold}40`,
+                }}
+              >
+                CHALLENGER APPROACHING?
+              </h2>
+              <p className="text-sm" style={{ color: COLORS.chromeLight }}>
+                10+ years delivering production systems. Let&apos;s build something.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="mailto:alexanderpulido81@gmail.com"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.2em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
+                style={{
+                  fontFamily: '"Impact", "Arial Black", sans-serif',
+                  background: `linear-gradient(180deg, ${COLORS.gold}, ${COLORS.goldDark})`,
+                  color: COLORS.arcadeBlack,
+                  border: `2px solid ${COLORS.gold}`,
+                  boxShadow: `0 0 15px ${COLORS.gold}40`,
+                }}
+              >
+                GET IN TOUCH
+              </a>
+              <Link
+                href="/cv"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.2em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
+                style={{
+                  fontFamily: '"Impact", "Arial Black", sans-serif',
+                  background: 'transparent',
+                  border: `2px solid ${COLORS.specialBlue}`,
+                  color: COLORS.specialBlue,
+                  boxShadow: `0 0 10px ${COLORS.specialBlue}30`,
+                }}
+              >
+                DOWNLOAD CV
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* ================================================================= */}
         {/* FOOTER */}

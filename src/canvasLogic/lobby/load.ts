@@ -1,19 +1,26 @@
-import CanvasObject from '../interfaces/CanvasObject'
-import Player from './player'
-import config from './config'
-import { setupEventListeners } from './eventListeners'
-import templeData from './gameAssets/chineseTemple'
+import CanvasObject from '../../interfaces/CanvasObject'
+import Player from '../player'
+import config from '../config'
+import { setupEventListeners } from '../eventListeners'
+import templeData from '../gameAssets/lobby'
+import { CellData } from '../../interfaces/GameAsset'
+
+interface CellAnimationState {
+  font?: { current: string };
+  color?: { current: string; currentFill: string; currentInverted: string };
+}
 
 const defaultFont = 'Silkscreen'
 
 const cellHeight = 32
 const cellWidth = 32
+const defaultAnimationInterval = 250
 const player = Player({
   height: cellHeight,
   width: cellWidth
 })
-let oldTime: number = 0
-let cellAnimated: any = {}
+const oldTime: Record<string, number> = {}
+const cellAnimated: Record<string, CellAnimationState> = {}
 
 const canvasObject: CanvasObject = {
   canvas: undefined,
@@ -21,7 +28,7 @@ const canvasObject: CanvasObject = {
 }
 
 
-const drawTemple = (scale: number, time: number) => {
+const drawLobby = (scale: number, time: number) => {
   if (!canvasObject?.canvas || !canvasObject.canvasElement) return
 
   fillCanvas(scale, time)
@@ -36,6 +43,7 @@ const drawTemple = (scale: number, time: number) => {
   }
 }
 
+
 const fillCanvas = (scale: number, time: number) => {
   if (!canvasObject?.canvas || !canvasObject.canvasElement) return;
 
@@ -45,17 +53,25 @@ const fillCanvas = (scale: number, time: number) => {
   const fontStatic = `bold ${scaleCellWidth}px ${defaultFont}`;
   const fontDynamic = `italic bold ${scaleCellWidth}px ${defaultFont}`;
 
-  Object.entries(templateMap).forEach(([rowIndex, lines]: [string, any]) => {
-    lines.forEach((line: any, columnIndex: number) => {
-      const animate = line.animation && (time - oldTime) >= line.animation.interval;
+  Object.entries(templateMap).forEach(([rowIndex, lines]: [string, CellData[]]) => {
+    lines.forEach((line: CellData, columnIndex: number) => {
+
+      // Animation booleans, verify cell is animated and interval has ppssed
+      const currentOldTime = line.animation ? oldTime[`${rowIndex}${columnIndex}`] || (time + (line.animation.interval || defaultAnimationInterval)) : 0
+      const currentCell = cellAnimated[`${rowIndex}${columnIndex}`] || {};
+
+      const animate = line.animation && (time - currentOldTime) >= line.animation.interval;
       const moveAnimation = line.animation?.name?.includes('move');
       const lightenAnimation = line.animation?.name?.includes('brightup');
 
+      // Brightness randomizer, to create lighten effects
       const randomBrightness = Math.random() * 5 + 0.5;
-      const [r, g, b, a] = line.color.match(/[\d.]+/g).map(Number);
-      const brightenedColor = `rgba(${Math.min(255, r * randomBrightness)}, ${Math.min(255, g * randomBrightness)}, ${Math.min(255, b * randomBrightness)}, ${a})`;
-      const brightenedFillColor = `rgba(${Math.min(255, r * randomBrightness)}, ${Math.min(255, g * randomBrightness)}, ${Math.min(255, b * randomBrightness)}, ${a})`;
+      const colorMatch = line.color.match(/[\d.]+/g);
+      const [r, g, b, a] = colorMatch ? colorMatch.map(Number) : [255, 255, 255, 1];
+      const brightenedColor = `rgba(${Math.min(255, r * randomBrightness)}, ${Math.min(255, g * randomBrightness)}, ${Math.min(255, b * randomBrightness)}, ${a < .75 ? .75 : a})`;
+      const brightenedFillColor = `rgba(${Math.min(255, r * randomBrightness)}, ${Math.min(255, g * randomBrightness)}, ${Math.min(255, b * randomBrightness)}, ${a < .75 ? .75 : a})`;
 
+      // variable values to use in animations/default states
       const animations = {
         font: {
           static: fontStatic,
@@ -69,7 +85,13 @@ const fillCanvas = (scale: number, time: number) => {
         },
       };
 
-      const currentCell = cellAnimated[`${rowIndex}${columnIndex}`] || {};
+      /*
+          Handle animations
+
+          The logic validates the duration of animation intervals. If the cell is animated and the interval has passed, the value changes.
+
+          the new value depends on the previous value, it goes back and forth from default state to "animated" stated, creating the illusion of animation
+      */
       const newCell = {
         font: {
           current: animate && moveAnimation
@@ -89,6 +111,7 @@ const fillCanvas = (scale: number, time: number) => {
         },
       };
 
+      // Center content, measure text width, center on cell based of that. Then center based of height
       const textWidth = canvas.measureText(line.value).width;
       const x = line.columnNumber * (cellWidth + scale);
       const y = cellHeight * line.rowNumber * scale;
@@ -98,35 +121,46 @@ const fillCanvas = (scale: number, time: number) => {
 
       canvas.font = newCell.font.current;
       canvas.strokeStyle = lightenAnimation ? newCell.color.currentFill : animations.color.staticFill;
-      canvas.lineWidth = 3;
-      canvas.fillText(line.value, centeredX, centeredY);
+      canvas.lineWidth = 1;
+
+      canvas.strokeStyle = lightenAnimation ? newCell.color.currentFill : animations.color.staticFill;
+      canvas.lineWidth = 1;
+
+      // Draw text border
       canvas.strokeText(line.value, centeredX, centeredY);
-      canvas.fillStyle = line.value === ' ' ? animations.color.staticFill : animations.color.static;
+
+      canvas.fillStyle = animations.color.staticFill;
+
+      // Draw cell
       canvas.fillRect(x, y, cellWidth + 1, cellHeight + 1);
 
+      canvas.fillStyle = line.value === ' ' ? animations.color.staticFill : animations.color.static;
+      // Draw text
+      canvas.fillText(line.value, centeredX, centeredY);
+
       cellAnimated[`${rowIndex}${columnIndex}`] = newCell;
+      oldTime[`${rowIndex}${columnIndex}`] = animate ? time + (line.animation?.interval || defaultAnimationInterval) : currentOldTime;
     });
   });
-  oldTime = time > oldTime ? time + 500 : oldTime;
 }
 
-export const animateLevel = (time: number) => {
+export const animateLobby = (time: number) => {
   if (!canvasObject.canvas || !canvasObject.canvasElement) return;
 
   if (typeof window !== undefined)
-    window.requestAnimationFrame((time) => setTimeout(() => animateLevel(time), 1000 / 60));
+    window.requestAnimationFrame((time) => setTimeout(() => animateLobby(time), 1000 / 60));
   // Setup background
   canvasObject.canvas.fillStyle = 'black'
   canvasObject.canvas.fillRect(0, 0, canvasObject.canvasElement.width, canvasObject.canvasElement.height)
 
-  drawTemple(1, time)
+  drawLobby(1, time)
   // Load Player
   player.handleMovement(config, time)
   player.draw(canvasObject)
   player.updatePlayerPosition()
 }
 
-export const loadCanvasLevel = (canvasElement: HTMLCanvasElement) => {
+export const load = (canvasElement: HTMLCanvasElement) => {
   const canvas = canvasElement.getContext('2d') as CanvasRenderingContext2D | null
 
   if (!canvas) return;
@@ -137,7 +171,7 @@ export const loadCanvasLevel = (canvasElement: HTMLCanvasElement) => {
   canvasObject.canvasElement.width = config.cellSize * config.width
   canvasObject.canvasElement.height = config.cellSize * config.height
 
-  animateLevel(0);
+  animateLobby(0);
 
 
   setupEventListeners(player, config)

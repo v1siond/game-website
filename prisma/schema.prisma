@@ -101,3 +101,218 @@ model CustomAsset {
   @@index([category])
   @@index([authorId])
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// CV / PORTFOLIO TABLES
+// ═══════════════════════════════════════════════════════════════════
+
+// Professional summary and about sections
+model ProfessionalSummary {
+  id         String   @id @default(cuid())
+  headline   String
+  tagline    String
+  bio        String   @db.Text
+  highlights Json     // Array of highlight strings
+
+  // i18n fields
+  headline_es   String?
+  headline_it   String?
+  tagline_es    String?
+  tagline_it    String?
+  bio_es        String?  @db.Text
+  bio_it        String?  @db.Text
+  highlights_es Json?    // Translated highlights
+  highlights_it Json?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// About me per profession
+model AboutMe {
+  id           String   @id @default(cuid())
+  professionId String   // 'engineer', 'drummer', 'fighter'
+  headline     String
+  bio          String   @db.Text
+  quickFacts   Json     // Array of quick fact strings
+
+  // i18n fields
+  headline_es   String?
+  headline_it   String?
+  bio_es        String?  @db.Text
+  bio_it        String?  @db.Text
+  quickFacts_es Json?
+  quickFacts_it Json?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([professionId])
+}
+
+// Work experience entries
+model WorkExperience {
+  id          String    @id @default(cuid())
+  title       String
+  company     String
+  description String    @db.Text
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  highlights  Json?     // Array of achievement strings
+  skills      String[]  // Related skills/technologies
+  order       Int       @default(0)
+
+  // i18n fields
+  title_es       String?
+  title_it       String?
+  description_es String?  @db.Text
+  description_it String?  @db.Text
+  highlights_es  Json?
+  highlights_it  Json?
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([order])
+}
+
+// Projects
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  tagline     String
+  description String   @db.Text
+  impact      String?  // Quantified achievement
+  techStack   Json     // Array of technology strings
+  status      String   @default("active")  // active, completed, archived
+  featured    Boolean  @default(false)
+  professions String[] // Array: engineer, drummer, fighter
+  tags        String[] // work, personal, open-source
+  links       Json?    // { demo?, github?, site? }
+  order       Int      @default(0)
+
+  // i18n fields
+  name_es        String?
+  name_it        String?
+  tagline_es     String?
+  tagline_it     String?
+  description_es String?  @db.Text
+  description_it String?  @db.Text
+  impact_es      String?
+  impact_it      String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([featured])
+  @@index([status])
+  @@index([order])
+}
+
+// Tech stack categories
+model TechCategory {
+  id           String       @id @default(cuid())
+  name         String       @unique
+  icon         String
+  order        Int          @default(0)
+  technologies Technology[]
+
+  // i18n fields
+  name_es String?
+  name_it String?
+
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@index([order])
+}
+
+// Individual technologies
+model Technology {
+  id         String       @id @default(cuid())
+  name       String
+  categoryId String
+  category   TechCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  order      Int          @default(0)
+
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  @@index([categoryId])
+  @@index([order])
+}
+
+// Companies to promote
+model Company {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  tagline     String
+  description String   @db.Text
+  url         String
+  services    Json     // Array of service strings
+  icon        String
+  order       Int      @default(0)
+
+  // i18n fields
+  tagline_es     String?
+  tagline_it     String?
+  description_es String?  @db.Text
+  description_it String?  @db.Text
+  services_es    Json?
+  services_it    Json?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([order])
+}
+
+// Musical bands
+model Band {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  genre       String
+  role        String
+  description String   @db.Text
+  url         String?
+  active      Boolean  @default(true)
+  order       Int      @default(0)
+
+  // i18n fields
+  description_es String?  @db.Text
+  description_it String?  @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([active])
+  @@index([order])
+}
+
+// Current professional roles
+model Role {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  company     String
+  type        String   // 'employment' | 'leadership'
+  current     Boolean  @default(true)
+  description String   @db.Text
+  order       Int      @default(0)
+
+  // i18n fields
+  title_es       String?
+  title_it       String?
+  description_es String?  @db.Text
+  description_it String?  @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([current])
+  @@index([order])
+}

@@ -1683,6 +1683,58 @@ export default function RubberHoseTheme() {
           </div>
         </main>
 
+        {/* Contact CTA */}
+        <section className="relative z-20 py-12" aria-label="Contact">
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="mb-8">
+              <h2
+                className="text-xl tracking-[0.15em] mb-3"
+                style={{
+                  color: CUPHEAD_COLORS.inkBlack,
+                  fontFamily: '"Abril Fatface", serif',
+                  textShadow: `2px 2px 0 ${CUPHEAD_COLORS.shadowBrown}`,
+                }}
+              >
+                Ready to Work Together?
+              </h2>
+              <p
+                className="text-sm"
+                style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}
+              >
+                10+ years delivering production systems. Let&apos;s build something.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="mailto:alexanderpulido81@gmail.com"
+                className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 hover:rotate-1"
+                style={{
+                  background: CUPHEAD_COLORS.accentRedDark,
+                  color: CUPHEAD_COLORS.paperCream,
+                  border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
+                  fontFamily: '"Abril Fatface", serif',
+                  boxShadow: '4px 4px 0 #5a0000',
+                }}
+              >
+                ★ Get In Touch ★
+              </a>
+              <Link
+                href="/cv"
+                className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 hover:-rotate-1"
+                style={{
+                  background: CUPHEAD_COLORS.paperDark,
+                  color: CUPHEAD_COLORS.inkBlack,
+                  border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
+                  fontFamily: '"Abril Fatface", serif',
+                  boxShadow: `4px 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
+                }}
+              >
+                Download CV
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Footer */}
         <footer className="relative z-20 py-8 text-center">
           <div className="flex items-center justify-center gap-4">

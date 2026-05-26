@@ -1713,6 +1713,57 @@ export default function BoldNoirTheme() {
         </div>
       </main>
 
+      {/* Contact CTA - Persona 5 style */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <SkewedPanel color="#ff0033" direction="right" delay={0}>
+            <div className="py-4">
+              <h2
+                className="text-xl font-black mb-3"
+                style={{
+                  color: '#ff0033',
+                  transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
+                }}
+              >
+                READY TO WORK TOGETHER?
+              </h2>
+              <p className="text-sm mb-6" style={{ color: '#ccc' }}>
+                10+ years delivering production systems. Let&apos;s build something.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="mailto:alexanderpulido81@gmail.com"
+                  className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 font-bold"
+                  style={{
+                    background: '#ff0033',
+                    color: '#000',
+                    transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)',
+                  }}
+                >
+                  <span style={{ display: 'inline-block', transform: prefersReducedMotion ? 'none' : 'skewX(5deg)' }}>
+                    GET IN TOUCH
+                  </span>
+                </a>
+                <Link
+                  href="/cv"
+                  className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 hover:bg-red-900/20 font-bold"
+                  style={{
+                    background: 'transparent',
+                    border: '3px solid #ff0033',
+                    color: '#ff0033',
+                    transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)',
+                  }}
+                >
+                  <span style={{ display: 'inline-block', transform: prefersReducedMotion ? 'none' : 'skewX(5deg)' }}>
+                    VIEW CV
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </SkewedPanel>
+        </div>
+      </section>
+
       {/* Footer - Persona 5 style */}
       <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <div className="flex items-center justify-center gap-4">

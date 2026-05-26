@@ -1,0 +1,29 @@
+{
+  "cv": {
+    "pageTitle": "CV - Alexander Pulido",
+    "downloadPdf": "Descargar PDF",
+    "professionalSummary": "Resumen Profesional",
+    "coreCompetencies": "Competencias Principales",
+    "currentPositions": "Posiciones Actuales",
+    "keyProjects": "Proyectos Clave y Logros",
+    "technicalSkills": "Habilidades Tecnicas",
+    "professionalExperience": "Experiencia Profesional",
+    "education": "Educacion y Aprendizaje Continuo",
+    "educationText": "Ingeniero autodidacta con mas de 10 anos de experiencia practica construyendo sistemas de produccion. Aprendiz continuo a traves de trabajo en proyectos, documentacion tecnica y manteniendose actualizado con los desarrollos de la industria.",
+    "present": "Presente",
+    "impact": "Impacto",
+    "tech": "Tecnologias"
+  },
+  "common": {
+    "email": "Correo",
+    "website": "Sitio Web",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "switchLanguage": "Cambiar idioma"
+  },
+  "languages": {
+    "en": "Ingles",
+    "es": "Espanol",
+    "it": "Italiano"
+  }
+}

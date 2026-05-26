@@ -2177,6 +2177,46 @@ export default function SoulMapTheme() {
       {/* Mini-map */}
       <MiniMap active={active} />
 
+      {/* Contact CTA */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h2 className="text-sm tracking-[0.4em] mb-3" style={{ color: COLORS.bonfire }}>
+              READY TO WORK TOGETHER?
+            </h2>
+            <p className="text-xs tracking-wide" style={{ color: '#a09080' }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="px-6 py-3 text-xs tracking-[0.2em] flex items-center justify-center gap-2 transition-all hover:scale-105"
+              style={{
+                background: `linear-gradient(180deg, ${COLORS.bonfire}, #cc6600)`,
+                color: '#0a0808',
+                border: `2px solid ${COLORS.ember}`,
+                boxShadow: `0 0 20px ${COLORS.bonfire}40`,
+              }}
+            >
+              <Darksign size={14} />
+              GET IN TOUCH
+            </a>
+            <Link
+              href="/cv"
+              className="px-6 py-3 text-xs tracking-[0.2em] flex items-center justify-center gap-2 transition-all hover:bg-[#1a1815]"
+              style={{
+                background: COLORS.stone,
+                border: `1px solid ${COLORS.bonfire}40`,
+                color: COLORS.bonfire,
+              }}
+            >
+              DOWNLOAD CV
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="relative z-20 py-12 text-center" role="contentinfo">
         <div className="flex items-center justify-center gap-4">

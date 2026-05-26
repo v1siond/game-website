@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { GameEngine, convertLegacyAsset } from '@/engine'
 import chineseTemple from '@/canvasLogic/gameAssets/chineseTemple'
 
@@ -170,9 +171,9 @@ const EngineTest = () => {
     <main className="fixed inset-0 overflow-hidden bg-black">
       {/* Navigation */}
       <nav className="fixed top-4 left-4 z-10 bg-black/90 p-3 text-white font-mono text-sm rounded flex gap-2">
-        <a href="/village-test" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Village</a>
-        <a href="/engine-test" className="px-3 py-1 bg-yellow-600 rounded hover:bg-yellow-500">Engine</a>
-        <a href="/" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Home</a>
+        <Link href="/village-test" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Village</Link>
+        <Link href="/engine-test" className="px-3 py-1 bg-yellow-600 rounded hover:bg-yellow-500">Engine</Link>
+        <Link href="/" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Home</Link>
       </nav>
 
       <div className="fixed top-4 right-4 z-10 bg-gray-900/90 p-4 rounded text-white font-mono text-sm">

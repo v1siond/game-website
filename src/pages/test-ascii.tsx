@@ -7,12 +7,18 @@ import { loadCanvasLevel } from '../canvasLogic/testLevel/loadCanvasLevel'
 const Level1 = () => {
 
   const ref = useRef<HTMLCanvasElement>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
-    if (ref?.current) loadCanvasLevel(ref.current)
+    let cleanupLevel: (() => void) | undefined
+
+    if (ref?.current) {
+      cleanupLevel = loadCanvasLevel(ref.current)
+    }
 
     const playAudio = () => {
       const audio = new Audio('/music/level1.mp3');
+      audioRef.current = audio
       audio.onended = () => {
         audio.play();
       };
@@ -22,6 +28,14 @@ const Level1 = () => {
     document.addEventListener('click', playAudio, { once: true });
 
     return () => {
+      // Clean up canvas level (animation loop + event listeners)
+      if (cleanupLevel) cleanupLevel()
+      // Stop and clean up audio
+      if (audioRef.current) {
+        audioRef.current.pause()
+        audioRef.current.src = ''
+        audioRef.current = null
+      }
       document.removeEventListener('click', playAudio);
     };
   }, [])

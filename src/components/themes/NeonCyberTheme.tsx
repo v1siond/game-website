@@ -1339,7 +1339,7 @@ export default function NeonCyberTheme() {
                 <span className="ml-4 text-xs text-white/50 font-mono">v-term@night-city:~</span>
               </div>
               <TerminalLine prefix="$ " text="cat /netrunner/alex/profile.db" delay={0} />
-              <TerminalLine prefix="> " text={PROFESSIONAL_SUMMARY.bio.slice(0, 120) + '...'} delay={800} />
+              <TerminalLine prefix="> " text={PROFESSIONAL_SUMMARY[active].tagline} delay={800} />
               <TerminalLine prefix="$ " text={`set PROFESSION=${active.toUpperCase()}`} delay={2500} />
             </div>
           </HolographicShimmer>
@@ -1552,18 +1552,52 @@ export default function NeonCyberTheme() {
         </div>
       </main>
 
+      {/* Contact CTA */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h2 className="text-xl tracking-wider mb-3 font-mono" style={{ color: '#00ffff' }}>
+              READY_TO_JACK_IN?
+            </h2>
+            <p className="text-sm font-mono" style={{ color: '#ff00ff' }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-wider uppercase transition-all hover:scale-105 min-h-[44px] font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              style={{
+                background: 'linear-gradient(90deg, #00ffff, #ff00ff)',
+                color: '#0a0a0a',
+              }}
+            >
+              ESTABLISH_LINK
+            </a>
+            <Link
+              href="/cv"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-wider uppercase transition-all hover:scale-105 min-h-[44px] font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              style={{
+                background: 'transparent',
+                border: '2px solid #00ffff',
+                color: '#00ffff',
+              }}
+            >
+              DOWNLOAD_CV.exe
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer - System status */}
-      <footer className="relative z-20 py-8 text-center">
+      <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <div className="flex items-center justify-center gap-4 mb-4">
           <div className="w-16 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent" aria-hidden="true" />
-          <span className="text-xs text-cyan-400/50 tracking-[0.3em] font-mono">NIGHT_CITY // 2077</span>
+          <span className="text-xs text-cyan-400/50 tracking-[0.3em] font-mono">NIGHT_CITY // {new Date().getFullYear()}</span>
           <div className="w-16 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" aria-hidden="true" />
         </div>
         <p className="text-sm text-white/30 tracking-widest font-mono">
-          [ SYS.ONLINE ] // [ NET.STABLE ] // [ ICE.BYPASSED ] // [ CHROME.PREEM ]
-        </p>
-        <p className="text-sm text-white/20 mt-2 font-mono">
-          // Wake the f*** up, samurai. We have a city to burn.
+          © {new Date().getFullYear()} Alexander Pulido
         </p>
       </footer>
 

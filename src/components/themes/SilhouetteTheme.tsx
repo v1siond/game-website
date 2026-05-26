@@ -38,42 +38,79 @@ const LIMBO = {
 }
 
 // =============================================================================
-// ATMOSPHERIC EFFECTS - Simplified for performance
-// Only essential: single grain layer, single fog layer, vignette
+// ATMOSPHERIC EFFECTS - Enhanced for impact
+// Multiple fog layers, floating particles, strong vignette
 // Uses CSS transforms only (GPU-accelerated), will-change where needed
 // =============================================================================
 
 function LimboAtmosphere() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden" aria-hidden="true">
-      {/* Single film grain layer - reduced opacity for performance */}
+      {/* Film grain layer - enhanced opacity */}
       <div
-        className="absolute inset-0 opacity-15 grain will-change-transform"
+        className="absolute inset-0 opacity-20 grain will-change-transform"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
         }}
       />
 
-      {/* Single fog layer - simplified animation */}
+      {/* Fog layer 1 - slow drift */}
       <div
-        className="absolute inset-0 fog-drift will-change-transform"
+        className="absolute inset-0 fog-drift-slow will-change-transform"
         style={{
-          background: `linear-gradient(90deg, transparent 0%, ${LIMBO.midGrey1}15 30%, ${LIMBO.midGrey2}10 50%, ${LIMBO.midGrey1}15 70%, transparent 100%)`,
+          background: `linear-gradient(90deg, transparent 0%, ${LIMBO.midGrey1}20 25%, ${LIMBO.midGrey2}15 50%, ${LIMBO.midGrey1}20 75%, transparent 100%)`,
         }}
       />
 
-      {/* HEAVY vignette - static, no animation needed */}
+      {/* Fog layer 2 - faster counter-drift for depth */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 fog-drift-fast will-change-transform"
         style={{
-          background: `radial-gradient(ellipse at 50% 50%, transparent 15%, ${LIMBO.black}50 50%, ${LIMBO.black}95 100%)`,
+          background: `linear-gradient(90deg, transparent 10%, ${LIMBO.darkGrey3}12 35%, transparent 50%, ${LIMBO.darkGrey3}12 65%, transparent 90%)`,
         }}
       />
-      {/* Top/bottom noir gradient - stronger for darker feel */}
+
+      {/* Fog layer 3 - vertical creep from bottom */}
+      <div
+        className="absolute inset-0 fog-rise will-change-transform"
+        style={{
+          background: `linear-gradient(0deg, ${LIMBO.midGrey1}25 0%, ${LIMBO.midGrey2}10 30%, transparent 60%)`,
+        }}
+      />
+
+      {/* Floating dust particles */}
+      <div className="absolute inset-0">
+        <div className="particle particle-1" style={{ left: '10%', top: '20%' }} />
+        <div className="particle particle-2" style={{ left: '25%', top: '60%' }} />
+        <div className="particle particle-3" style={{ left: '45%', top: '35%' }} />
+        <div className="particle particle-4" style={{ left: '65%', top: '70%' }} />
+        <div className="particle particle-5" style={{ left: '80%', top: '25%' }} />
+        <div className="particle particle-6" style={{ left: '15%', top: '80%' }} />
+        <div className="particle particle-7" style={{ left: '55%', top: '15%' }} />
+        <div className="particle particle-8" style={{ left: '90%', top: '55%' }} />
+      </div>
+
+      {/* HEAVY vignette - stronger for cinematic feel */}
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(180deg, ${LIMBO.black}70 0%, transparent 20%, transparent 80%, ${LIMBO.black}80 100%)`,
+          background: `radial-gradient(ellipse at 50% 50%, transparent 10%, ${LIMBO.black}40 40%, ${LIMBO.black}85 70%, ${LIMBO.black} 100%)`,
+        }}
+      />
+
+      {/* Top/bottom noir gradient - cinematic letterbox effect */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(180deg, ${LIMBO.black}85 0%, ${LIMBO.black}40 8%, transparent 18%, transparent 82%, ${LIMBO.black}40 92%, ${LIMBO.black}90 100%)`,
+        }}
+      />
+
+      {/* Side vignettes for depth */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(90deg, ${LIMBO.black}60 0%, transparent 15%, transparent 85%, ${LIMBO.black}60 100%)`,
         }}
       />
     </div>
@@ -87,10 +124,14 @@ function LimboAtmosphere() {
 // GIANT SPIDER - Massive 8-legged silhouette (iconic Limbo boss)
 function GiantSpiderArt() {
   return (
-    <div className="relative w-full h-64 overflow-hidden" aria-hidden="true">
-      {/* Fog background - darker */}
+    <div className="relative w-full h-80 md:h-96 overflow-hidden" aria-hidden="true">
+      {/* Gradient transition from content above */}
       <div className="absolute inset-0" style={{
-        background: `linear-gradient(180deg, ${LIMBO.midGrey1} 0%, ${LIMBO.darkGrey3} 50%, ${LIMBO.darkGrey1} 100%)`
+        background: `linear-gradient(180deg, ${LIMBO.voidBlack} 0%, ${LIMBO.darkGrey2} 15%, ${LIMBO.midGrey1}30 40%, ${LIMBO.darkGrey2} 70%, ${LIMBO.voidBlack} 100%)`
+      }} />
+      {/* Fog overlay for depth */}
+      <div className="absolute inset-0 fog-drift-slow opacity-40" style={{
+        background: `linear-gradient(90deg, transparent 0%, ${LIMBO.midGrey1}40 30%, ${LIMBO.midGrey2}30 50%, ${LIMBO.midGrey1}40 70%, transparent 100%)`
       }} />
 
       {/* Distant trees in fog */}
@@ -153,10 +194,14 @@ function GiantSpiderArt() {
 // INDUSTRIAL GEARS - Interlocking, rotating machinery
 function IndustrialGearsArt() {
   return (
-    <div className="relative w-full h-56 overflow-hidden" aria-hidden="true">
-      {/* Industrial background - darker */}
+    <div className="relative w-full h-72 md:h-80 overflow-hidden" aria-hidden="true">
+      {/* Gradient transition from content */}
       <div className="absolute inset-0" style={{
-        background: `linear-gradient(180deg, ${LIMBO.darkGrey1} 0%, ${LIMBO.darkGrey2} 40%, ${LIMBO.darkGrey3} 100%)`
+        background: `linear-gradient(180deg, ${LIMBO.voidBlack} 0%, ${LIMBO.darkGrey2} 20%, ${LIMBO.darkGrey3}40 50%, ${LIMBO.darkGrey2} 80%, ${LIMBO.voidBlack} 100%)`
+      }} />
+      {/* Fog layer for atmosphere */}
+      <div className="absolute inset-0 opacity-30" style={{
+        background: `linear-gradient(90deg, transparent 0%, ${LIMBO.midGrey1}30 40%, ${LIMBO.midGrey2}20 60%, transparent 100%)`
       }} />
 
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 224" preserveAspectRatio="xMidYMid slice">
@@ -284,10 +329,14 @@ function IndustrialGearsArt() {
 // FOREST - Bare, twisted branches, fog, hanging silhouettes
 function ForestArt() {
   return (
-    <div className="relative w-full h-64 overflow-hidden" aria-hidden="true">
-      {/* Foggy forest background - darker base */}
+    <div className="relative w-full h-80 md:h-96 overflow-hidden" aria-hidden="true">
+      {/* Gradient transition from content */}
       <div className="absolute inset-0" style={{
-        background: `linear-gradient(180deg, ${LIMBO.midGrey2} 0%, ${LIMBO.darkGrey3} 30%, ${LIMBO.darkGrey2} 70%, ${LIMBO.darkGrey1} 100%)`
+        background: `linear-gradient(180deg, ${LIMBO.voidBlack} 0%, ${LIMBO.darkGrey2} 10%, ${LIMBO.midGrey2}30 35%, ${LIMBO.darkGrey3} 60%, ${LIMBO.darkGrey2} 85%, ${LIMBO.voidBlack} 100%)`
+      }} />
+      {/* Rising fog from bottom */}
+      <div className="absolute inset-0 fog-rise opacity-40" style={{
+        background: `linear-gradient(0deg, ${LIMBO.midGrey1}40 0%, ${LIMBO.midGrey2}20 25%, transparent 50%)`
       }} />
 
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 800 256" preserveAspectRatio="xMidYMid slice">
@@ -942,13 +991,46 @@ export default function SilhouetteTheme() {
 
       </main>
 
+      {/* ========== CONTACT CTA ========== */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h2 className="text-xl tracking-[0.3em] font-normal mb-3" style={{ color: LIMBO.fogWhite2 }}>
+              READY TO WORK TOGETHER?
+            </h2>
+            <p className="text-sm" style={{ color: LIMBO.lightGrey2 }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="limbo-btn px-6 py-3 text-sm tracking-[0.2em] uppercase transition-colors hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              style={{ background: LIMBO.fogWhite1, color: LIMBO.black }}
+            >
+              Get In Touch
+            </a>
+            <Link
+              href="/cv"
+              className="limbo-btn px-6 py-3 text-sm tracking-[0.2em] uppercase transition-colors hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              style={{ background: 'transparent', border: `2px solid ${LIMBO.fogWhite1}`, color: LIMBO.fogWhite1 }}
+            >
+              Download CV
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ========== FOOTER ========== */}
       <footer className="relative z-20 py-10 text-center" role="contentinfo">
-        <div className="flex items-center justify-center gap-3" aria-hidden="true">
+        <div className="flex items-center justify-center gap-3 mb-4" aria-hidden="true">
           <div className="w-6 h-px" style={{ background: `${LIMBO.midGrey1}` }} />
           <p className="text-xs tracking-[0.5em]" style={{ color: LIMBO.lightGrey1 }}>. . .</p>
           <div className="w-6 h-px" style={{ background: `${LIMBO.midGrey1}` }} />
         </div>
+        <p className="text-xs" style={{ color: LIMBO.midGrey2 }}>
+          © {new Date().getFullYear()} Alexander Pulido
+        </p>
       </footer>
 
       {/* =================================================================
@@ -956,16 +1038,57 @@ export default function SilhouetteTheme() {
           Only essential animations, using CSS transforms only (GPU accelerated)
           ================================================================= */}
       <style jsx global>{`
-        /* ============ FOG DRIFT - Single layer, slow ============ */
-        @keyframes fog-drift {
-          0% { transform: translateX(-20%); }
-          100% { transform: translateX(20%); }
+        /* ============ FOG DRIFT - Multiple layers ============ */
+        @keyframes fog-drift-slow {
+          0% { transform: translateX(-15%); }
+          100% { transform: translateX(15%); }
         }
-        .fog-drift {
-          animation: fog-drift 80s ease-in-out infinite alternate;
+        .fog-drift-slow {
+          animation: fog-drift-slow 90s ease-in-out infinite alternate;
         }
 
-        /* ============ FILM GRAIN - Simplified ============ */
+        @keyframes fog-drift-fast {
+          0% { transform: translateX(10%); }
+          100% { transform: translateX(-10%); }
+        }
+        .fog-drift-fast {
+          animation: fog-drift-fast 60s ease-in-out infinite alternate;
+        }
+
+        @keyframes fog-rise {
+          0% { transform: translateY(5%); opacity: 0.25; }
+          50% { transform: translateY(-3%); opacity: 0.4; }
+          100% { transform: translateY(5%); opacity: 0.25; }
+        }
+        .fog-rise {
+          animation: fog-rise 40s ease-in-out infinite;
+        }
+
+        /* ============ FLOATING PARTICLES ============ */
+        .particle {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: ${LIMBO.lightGrey1};
+          border-radius: 50%;
+          opacity: 0;
+        }
+        @keyframes particle-float {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          10% { opacity: 0.4; }
+          90% { opacity: 0.4; }
+          100% { transform: translateY(-100vh) translateX(20px); opacity: 0; }
+        }
+        .particle-1 { animation: particle-float 25s linear infinite; animation-delay: 0s; }
+        .particle-2 { animation: particle-float 30s linear infinite; animation-delay: 4s; }
+        .particle-3 { animation: particle-float 28s linear infinite; animation-delay: 8s; }
+        .particle-4 { animation: particle-float 32s linear infinite; animation-delay: 12s; }
+        .particle-5 { animation: particle-float 26s linear infinite; animation-delay: 2s; }
+        .particle-6 { animation: particle-float 35s linear infinite; animation-delay: 6s; }
+        .particle-7 { animation: particle-float 22s linear infinite; animation-delay: 10s; }
+        .particle-8 { animation: particle-float 29s linear infinite; animation-delay: 14s; }
+
+        /* ============ FILM GRAIN ============ */
         @keyframes grain {
           0%, 100% { transform: translate(0, 0); }
           25% { transform: translate(-0.5%, 0.5%); }
@@ -973,19 +1096,19 @@ export default function SilhouetteTheme() {
           75% { transform: translate(-0.5%, -0.5%); }
         }
         .grain {
-          animation: grain 0.5s steps(4) infinite;
+          animation: grain 0.4s steps(4) infinite;
         }
 
         /* ============ SPIDER BREATHING - Subtle ============ */
         @keyframes spider-breathe {
           0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.015); }
+          50% { transform: scale(1.02); }
         }
         .spider-breathe {
-          animation: spider-breathe 5s ease-in-out infinite;
+          animation: spider-breathe 4s ease-in-out infinite;
         }
 
-        /* ============ GEAR ROTATIONS - Only 2 gears ============ */
+        /* ============ GEAR ROTATIONS ============ */
         @keyframes gear-rotate {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
@@ -1042,12 +1165,17 @@ export default function SilhouetteTheme() {
 
         /* ============ ACCESSIBILITY - REDUCED MOTION ============ */
         @media (prefers-reduced-motion: reduce) {
-          .fog-drift,
+          .fog-drift-slow,
+          .fog-drift-fast,
+          .fog-rise,
           .grain,
           .spider-breathe,
           .gear-rotate-slow,
           .gear-rotate-medium,
-          .figure-eye {
+          .figure-eye,
+          .particle,
+          .particle-1, .particle-2, .particle-3, .particle-4,
+          .particle-5, .particle-6, .particle-7, .particle-8 {
             animation: none !important;
           }
           .limbo-btn::after {

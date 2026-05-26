@@ -7,10 +7,24 @@ export interface AboutMe {
   quickFacts: string[]
 }
 
-// Professional summary focused on selling services
-export const PROFESSIONAL_SUMMARY = {
-  headline: 'Senior Staff Engineer • CTO • Full-Stack Architect',
-  tagline: 'If you need to build it, I can deliver it.',
+// Professional summaries per profession - impactful headlines and taglines
+export const PROFESSIONAL_SUMMARY: Record<Profession, { headline: string; tagline: string }> = {
+  engineer: {
+    headline: 'Senior Staff Engineer • CTO • Full-Stack Architect',
+    tagline: 'If you need to build it, I can deliver it.',
+  },
+  drummer: {
+    headline: 'Professional Drummer • 15 Years • Any Genre',
+    tagline: 'From brutal death metal to smooth salsa — I lock in the pocket.',
+  },
+  fighter: {
+    headline: 'Martial Artist • BJJ Instructor • 6 Years Training',
+    tagline: 'Muay Thai. MMA. Jiu-Jitsu. The mat teaches what words cannot.',
+  },
+}
+
+// Extended bio for engineer (used in some themes)
+export const ENGINEER_EXTENDED_BIO = {
   bio: `10+ years architecting and delivering production systems across the full stack. From migrating multi-million transaction apps to building complete SaaS platforms from scratch. I've helped build Truth Social in its early stages, created enterprise insurance platforms processing thousands of policies daily, and shipped a Google Marketplace-approved audit system. Currently Senior Staff Engineer at DBA and CTO of two startups. I specialize in turning complex requirements into working software.`,
   highlights: [
     'Enterprise Elixir/Phoenix systems at scale',

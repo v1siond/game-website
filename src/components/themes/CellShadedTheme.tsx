@@ -1079,7 +1079,7 @@ function ExperienceCard({ entry, index, reducedMotion = false }: { entry: typeof
         aria-hidden="true"
         style={{ color: color }}
       >
-        MISSION LOG
+        EXPERIENCE
       </div>
 
       <h3
@@ -1583,7 +1583,7 @@ export default function CellShadedTheme() {
                 boxShadow: `4px 4px 0 ${BORDERLANDS_COLORS.ink}`,
               }}
             >
-              STATS
+              Resume
             </Link>
             <Link
               href="/personal-projects/game-engine"
@@ -1679,7 +1679,7 @@ export default function CellShadedTheme() {
           {/* 2. Work Experience */}
           {experience.length > 0 && (
             <section className="mb-8">
-              <ComicPanel rotation={0.5} accentColor={BORDERLANDS_COLORS.legendary} title="MISSION LOG" ariaLabel="Work Experience">
+              <ComicPanel rotation={0.5} accentColor={BORDERLANDS_COLORS.legendary} title="Work Experience" ariaLabel="Work Experience">
                 <div className="mt-4">
                   {experience.map((entry, i) => (
                     <ExperienceCard key={entry.id} entry={entry} index={i} reducedMotion={reducedMotion} />
@@ -1695,13 +1695,13 @@ export default function CellShadedTheme() {
           {/* 3. Tech Stack (Engineer) or Skills with achievements (NO BARS) */}
           <section className="mb-8">
             {active === 'engineer' ? (
-              <ComicPanel rotation={-0.5} accentColor={BORDERLANDS_COLORS.rare} title="WEAPON LOADOUT" ariaLabel="Technical Skills">
+              <ComicPanel rotation={-0.5} accentColor={BORDERLANDS_COLORS.rare} title="Tech Stack" ariaLabel="Technical Skills">
                 <div className="mt-4">
                   <TechStackCloud categories={engineerTech} reducedMotion={reducedMotion} />
                 </div>
               </ComicPanel>
             ) : (
-              <ComicPanel rotation={-1} accentColor={active === 'drummer' ? BORDERLANDS_COLORS.eridium : BORDERLANDS_COLORS.psychoRed} title="SKILL TREE" ariaLabel={`${active === 'drummer' ? 'Drummer' : 'Fighter'} Skills`}>
+              <ComicPanel rotation={-1} accentColor={active === 'drummer' ? BORDERLANDS_COLORS.eridium : BORDERLANDS_COLORS.psychoRed} title="Skills" ariaLabel={`${active === 'drummer' ? 'Drummer' : 'Fighter'} Skills`}>
                 <div className="mt-4">
                   {skills.map((category, catIndex) => (
                     <SkillAchievement
@@ -1732,7 +1732,7 @@ export default function CellShadedTheme() {
                   textShadow: `2px 2px 0 ${BORDERLANDS_COLORS.legendary}`,
                 }}
               >
-                LOOT DROPS
+                Projects
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -1798,6 +1798,55 @@ export default function CellShadedTheme() {
           )}
         </div>
       </main>
+
+      {/* Contact CTA */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <ComicPanel rotation={0} accentColor={BORDERLANDS_COLORS.legendary} title="GET IN TOUCH" ariaLabel="Contact section">
+            <div className="py-4 mt-4">
+              <h2
+                className="text-xl font-black mb-3"
+                style={{
+                  color: BORDERLANDS_COLORS.ink,
+                  textShadow: `2px 2px 0 ${BORDERLANDS_COLORS.legendary}`,
+                }}
+              >
+                READY TO TEAM UP?
+              </h2>
+              <p className="text-sm mb-6" style={{ color: BORDERLANDS_COLORS.ink, fontFamily: 'Arial, sans-serif' }}>
+                10+ years delivering production systems. Let&apos;s build something.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="mailto:alexanderpulido81@gmail.com"
+                  className={`px-6 py-3 text-sm tracking-wider font-black ${reducedMotion ? '' : 'transition-all hover:scale-105 hover:rotate-2'}`}
+                  style={{
+                    background: `linear-gradient(135deg, ${BORDERLANDS_COLORS.legendary} 0%, ${BORDERLANDS_COLORS.dustyOrange} 100%)`,
+                    border: `5px solid ${BORDERLANDS_COLORS.ink}`,
+                    color: '#fff',
+                    boxShadow: `4px 4px 0 ${BORDERLANDS_COLORS.ink}`,
+                    textShadow: `2px 2px 0 ${BORDERLANDS_COLORS.ink}`,
+                  }}
+                >
+                  GET IN TOUCH
+                </a>
+                <Link
+                  href="/cv"
+                  className={`px-6 py-3 text-sm tracking-wider font-black ${reducedMotion ? '' : 'transition-all hover:scale-105 hover:-rotate-2'}`}
+                  style={{
+                    background: '#fff',
+                    border: `5px solid ${BORDERLANDS_COLORS.ink}`,
+                    color: BORDERLANDS_COLORS.ink,
+                    boxShadow: `4px 4px 0 ${BORDERLANDS_COLORS.ink}`,
+                  }}
+                >
+                  VIEW CV
+                </Link>
+              </div>
+            </div>
+          </ComicPanel>
+        </div>
+      </section>
 
       {/* Footer */}
       <footer className="relative z-20 py-8 text-center" role="contentinfo">

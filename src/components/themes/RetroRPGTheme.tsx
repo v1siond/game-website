@@ -1123,7 +1123,7 @@ export default function RetroRPGTheme() {
           <TimePortalGateway />
 
           {/* SKILLS Section */}
-          <BattleFrame title={active === 'engineer' ? 'TECH STACK' : 'ABILITIES'} era="future">
+          <BattleFrame title={active === 'engineer' ? 'TECH STACK' : 'SKILLS'} era="future">
             {active === 'engineer' ? (
               <TechInventory categories={engineerTech} />
             ) : (
@@ -1208,6 +1208,47 @@ export default function RetroRPGTheme() {
 
         </div>
       </main>
+
+      {/* ========== CONTACT CTA ========== */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h2 className="text-xl tracking-[0.2em] mb-3" style={{ color: CT_COLORS.gold }}>
+              READY TO WORK TOGETHER?
+            </h2>
+            <p className="text-[11px] tracking-wide" style={{ color: CT_COLORS.silver }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="px-6 py-3 text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all hover:scale-105 focus:outline-none focus:ring-2"
+              style={{
+                background: `linear-gradient(180deg, ${CT_COLORS.portalBlue}, ${CT_COLORS.portalPurple})`,
+                border: `3px solid ${CT_COLORS.white}`,
+                color: CT_COLORS.white,
+                boxShadow: `0 0 20px ${CT_COLORS.portalBlue}60`,
+              }}
+            >
+              <span>◈</span>
+              GET IN TOUCH
+            </a>
+            <Link
+              href="/cv"
+              className="px-6 py-3 text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all hover:scale-105 focus:outline-none focus:ring-2"
+              style={{
+                border: `3px solid ${CT_COLORS.gold}`,
+                color: CT_COLORS.gold,
+                background: CT_COLORS.voidDark,
+              }}
+            >
+              <span>◈</span>
+              DOWNLOAD CV
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* ========== FOOTER ========== */}
       <footer className="relative z-20 py-12 px-6 border-t-4 text-center" style={{ borderColor: CT_COLORS.white }} role="contentinfo">

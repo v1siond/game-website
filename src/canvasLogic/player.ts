@@ -1,104 +1,105 @@
 import CanvasObject from "@/interfaces/CanvasObject"
 
+interface KeyState {
+  pressed: boolean;
+}
+
+interface GameConfig {
+  interval: number;
+  keys: {
+    ArrowRight: KeyState;
+    ArrowLeft: KeyState;
+    ArrowUp: KeyState;
+    ArrowDown: KeyState;
+    [key: string]: KeyState;
+  };
+}
+
+interface PlayerDimensions {
+  width: number;
+  height: number;
+}
+
 const canvasObject: CanvasObject = {
   canvas: undefined,
   canvasElement: undefined
 }
 
-const fillColorMap: any = {
-  '0': 'rgb(255, 0, 0)',
-  '@': 'rgb(255, 0, 0)',
-  '#': 'rgb(255, 0, 0)',
-  '%': 'rgb(255, 0, 0)',
-  '/': 'rgb(255, 0, 0)',
-  '\\': 'rgb(255, 0, 0)',
-  '|': 'rgb(255, 0, 0)',
-  '>': 'rgb(255, 0, 0)',
-  '.': 'rgb(255, 0, 0)',
-  '}': 'rgb(255, 0, 0)',
-  '{': 'rgb(255, 0, 0)',
-  '<': 'rgb(255, 0, 0)',
-  '-': 'rgb(255, 0, 0)',
-  '!': 'rgb(255, 0, 0)',
-  "'": 'rgb(255, 0, 0)',
-}
-
-const colorMap: any = {
-  '0': 'rgba(255, 255, 255, .75)',
-  '@': 'rgba(255, 255, 255, .75)',
-  '#': 'rgba(255, 255, 255, .75)',
-  '%': 'rgba(255, 255, 255, .75)',
-  '/': 'rgba(255, 255, 255, .75)',
-  '\\': 'rgba(255, 255, 255, .75)',
-  '>': 'rgba(255, 255, 255, .75)',
-  '<': 'rgba(255, 255, 255, .75)',
-  '-': 'rgba(255, 255, 255, .75)',
-  '|': 'rgba(255, 255, 255, .75)',
-  '!': 'rgba(255, 255, 255, .75)',
-  "'": 'rgba(255, 255, 255, .75)',
-  '}': 'rgba(255, 255, 255, .75)',
-  '{':  'rgba(255, 255, 255, .75)',
-  '.': 'rgba(255, 255, 255, .75)',
+const colorMap: Record<string, string> = {
+  '0': 'rgba(255, 128, 0, 0.85)',
+  'O': 'rgba(255, 128, 0, 0.85)',
+  '#': 'rgba(255, 0, 0, .85)',
+  '/': 'rgba(255, 255, 0, .85)',
+  '\\': 'rgba(255, 255, 0, .85)',
+  '>': 'rgba(255, 255, 0, .85)',
+  '<': 'rgba(255, 255, 0, .85)',
+  '-': 'rgba(255, 255, 0, .85)',
+  '|': 'rgba(255, 255, 0, .85)',
+  '!':  'rgba(255, 255, 0, .85)',
+  "'": 'rgba(255, 255, 0, .85)',
+  '}': 'rgba(255, 255, 0, .85)',
+  '{':  'rgba(255, 255, 0, .85)',
+  '.': 'rgba(255, 255, 0, .85)',
 }
 
 const spriteStop = `
- @
-{%\\
+ 0
+<#\\
 / \\
 `;
 
 
 const spriteWalkingRight = `
- @
-{%-
+ 0
+/#>
 - \\
 `;
 
 const spriteWalkingRight2 = `
- @
--%\\
+ 0
+<#\\
  >
 `;
 
 
 const spriteWalkingLeft = `
- @
-/%}
- <
+ 0
+<#\\
+/ -
 `;
 
 const spriteWalkingLeft2 = `
- @
--%\\
-/ -
+ 0
+/#>
+ <
 `;
 
 
 const spriteJump = `
-\\ @ /
-  %
- { }
+\\0/
+ #
+! !
 `;
 
 const spriteWalkingUp = `
-  0/
- !%
- | '
+ O
+<#'
+' !
 `
 const spriteWalkingUp2 = `
- \\0
-  %!
- ' |
+ O
+'#>
+! '
 `
 const spriteWalkingDown = `
- . |
-  %
- /0!
+ O
+'#>
+! '
 `
 const spriteWalkingDown2 = `
- | .
-  %
- '0\\
+ O
+<#'
+' !
 `
 
 let currentSprite = spriteStop
@@ -107,18 +108,18 @@ let oldTime: number = 0
 const properties = {
   height: 16,
   width: 16,
-  movementSpeed: 30,
-  jumpHeight: 24,
+  movementSpeed: 40,
+  jumpHeight: 22,
   canJump: true,
   gravity: {
-    coeficient: 2,
+    coeficient: 3,
     x: 0,
     y: 0
   },
   position: {
-    x: 30,
-    y: 30,
-    bottom: 6 * 16
+    x: 32,
+    y: 32,
+    bottom: 0
   }
 }
 
@@ -148,40 +149,54 @@ export const animatePlayer = () => {
 
 const drawPlayer = (sprite: string, scale: number) => {
   if (!canvasObject?.canvas || !canvasObject.canvasElement) return;
-  let lines = sprite.split('\n');
+  const lines = sprite.split('\n');
   for (let i = 0; i < lines.length; i++) {
-    let line = lines[i];
-    for (let j = 0; j < line.length; j++) {
-      const x = properties.position.x + j * 15 * scale
-      const y = properties.position.y + (i * 4) * 5 * scale
-      let char = line[j];
-      canvasObject.canvas.fillStyle = colorMap[char] || 'white';
-      canvasObject.canvas.font = `bold ${25 * scale}px Silkscreen`;
+    const line = lines[i];
+    const length = line.length
+    for (let j = 0; j < length; j++) {
+      const x = properties.position.x + (j > (length * 0.6) ? j : j * 0.8) * ((properties.width * 0.65) * scale)
+      const y = properties.position.y + i * ((properties.height * 0.75) * scale)
+      const char = line[j];
+      const randomBrightness = Math.random() * 5 + 0.5;
+      const colorMatch = (colorMap[char] || 'rgba(255, 255, 255, 1)').match(/[\d.]+/g);
+      const [r, g, b, a] = colorMatch ? colorMatch.map(Number) : [255, 255, 255, 1];
+      const brightenedColor = `rgba(${Math.min(255, r * randomBrightness)}, ${Math.min(255, g * randomBrightness)}, ${Math.min(255, b * randomBrightness)}, ${a})`;
+      canvasObject.canvas.fillStyle = brightenedColor;
+      canvasObject.canvas.font = `bold ${properties.height * scale}px Silkscreen`;
       canvasObject.canvas.fillText(
         char,
         x,
         y
       );
-      canvasObject.canvas.fillStyle = fillColorMap[char] || 'white';
-      canvasObject.canvas.strokeStyle =  fillColorMap[char] || 'white'
-      canvasObject.canvas.lineWidth = 2;
+      canvasObject.canvas.strokeStyle =  'black'
+      canvasObject.canvas.lineWidth = 1;
       canvasObject.canvas.strokeText(char, x, y);
+      canvasObject.canvas.strokeStyle =  brightenedColor
+      canvasObject.canvas.lineWidth = 1;
+      canvasObject.canvas.strokeText(char, x + 1, y + 1);
+      canvasObject.canvas.fillStyle = char == '0' || char === 'O' ? colorMap[char] : brightenedColor;
+      canvasObject.canvas.font = `bold ${properties.height * scale}px Silkscreen`;
+      canvasObject.canvas.fillText(
+        char,
+        x,
+        y
+      );
     }
   }
 }
 
-export const draw = (canvasObj: any) => {
+export const draw = (canvasObj: CanvasObject) => {
   if (!canvasObj) return;
   canvasObject.canvas = canvasObj.canvas
   canvasObject.canvasElement = canvasObj.canvasElement
   animatePlayer()
 }
 
-export const handleMovement = (config: any, time: number) => {
+export const handleMovement = (config: GameConfig, time: number) => {
   const height = (canvasObject.canvasElement?.height || 0)
   const animate = (time - oldTime) >= config.interval
   properties.gravity.x = 0
-  const keyPressed = Object.values(config.keys).find((key: any) => key.pressed)
+  const keyPressed = Object.values(config.keys).find((key: KeyState) => key.pressed)
   if (config.keys.ArrowRight.pressed) {
     currentSprite = animate ? (properties.gravity.y == 0 ? (currentSprite === spriteWalkingRight ? spriteWalkingRight2 : spriteWalkingRight) : spriteJump) : currentSprite
     properties.gravity.x = properties.movementSpeed
@@ -198,7 +213,7 @@ export const handleMovement = (config: any, time: number) => {
   if (config.keys.ArrowDown.pressed) {
     currentSprite = animate ? (properties.gravity.y == 0 ? (currentSprite === spriteWalkingDown2 ? spriteWalkingDown : spriteWalkingDown2) : spriteJump) : currentSprite
     properties.position.bottom = properties.position.bottom > (properties.height * 2) ? properties.position.bottom - properties.movementSpeed : properties.height
-    properties.position.y = properties.position.bottom > (properties.height * 2) ? properties.position.y + properties.movementSpeed : height - (properties.height * 2)
+    properties.position.y = properties.position.bottom > (properties.height * 2) ? properties.position.y + properties.movementSpeed : height - (properties.height)
   }
   if (keyPressed && animate) {
     oldTime = animate ? time + config.interval : oldTime;
@@ -220,14 +235,14 @@ export const jump = () => {
 const buildPlayer = ({
   width,
   height
-}: any) => {
+}: PlayerDimensions) => {
   properties.width = width
   properties.height = height
   properties.position.x = width
   properties.position.y = height
   properties.jumpHeight = height * 0.66
   properties.movementSpeed = width * 0.5
-  properties.position.bottom = height * 6
+  properties.position.bottom = height * 2
   return {
     draw,
     jump,

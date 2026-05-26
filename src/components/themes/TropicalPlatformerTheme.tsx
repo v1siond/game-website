@@ -2170,6 +2170,59 @@ export default function TropicalPlatformerTheme() {
       )}
 
       {/* ================================================================ */}
+      {/* CONTACT CTA */}
+      {/* ================================================================ */}
+      <section className="relative z-20 py-12 px-6" aria-label="Contact">
+        <div className="max-w-4xl mx-auto">
+          <CratePanel
+            title="Ready to Work Together?"
+            titleIcon={<WumpaFruit size={28} />}
+            variant="checkpoint"
+          >
+            <div className="text-center">
+              <p className="text-lg mb-6" style={{ color: '#fff' }}>
+                10+ years delivering production systems. Let&apos;s build something.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="mailto:alexanderpulido81@gmail.com"
+                  className="px-6 py-3 font-black tracking-widest transition-all hover:scale-105 flex items-center justify-center gap-2"
+                  style={{
+                    background: `linear-gradient(180deg, ${COLORS.crashOrange}, ${COLORS.crashOrangeDark})`,
+                    border: `4px solid ${COLORS.maskYellow}`,
+                    color: '#fff',
+                    boxShadow: '0 5px 0 #994400, inset 0 2px 0 rgba(255,255,255,0.2)',
+                    textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
+                    fontFamily: 'Impact, sans-serif',
+                    borderRadius: '6px',
+                  }}
+                >
+                  <GemIcon size={20} color="yellow" />
+                  GET IN TOUCH
+                </a>
+                <Link
+                  href="/cv"
+                  className="px-6 py-3 font-black tracking-widest transition-all hover:scale-105 flex items-center justify-center gap-2"
+                  style={{
+                    background: `linear-gradient(180deg, ${COLORS.crateWood}, ${COLORS.beachBrown})`,
+                    border: `4px solid ${COLORS.cratePeru}`,
+                    color: '#fff',
+                    boxShadow: '0 5px 0 #3a2010, inset 0 2px 0 rgba(255,255,255,0.2)',
+                    textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
+                    fontFamily: 'Impact, sans-serif',
+                    borderRadius: '6px',
+                  }}
+                >
+                  <WoodenCrate size={20} />
+                  DOWNLOAD CV
+                </Link>
+              </div>
+            </div>
+          </CratePanel>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
       {/* FOOTER */}
       {/* ================================================================ */}
       <footer className="relative z-20 py-20 text-center">

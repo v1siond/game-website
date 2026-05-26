@@ -1537,6 +1537,63 @@ export default function MythicTheme() {
         </div>
       </main>
 
+      {/* ========== CONTACT CTA ========== */}
+      <section className="relative z-20 py-16 px-4 md:px-6 lg:px-20" aria-label="Contact">
+        <div className="max-w-2xl mx-auto">
+          <StoneTablet accentColor={GOW.goldBright} ariaLabel="Contact section">
+            <div className="text-center py-4">
+              <RuneBorder color={GOW.goldBright} className="mb-4 max-w-xs mx-auto" />
+              <h2
+                className="text-lg tracking-[0.15em] mb-3 uppercase"
+                style={{
+                  color: GOW.goldBright,
+                  textShadow: `0 0 12px ${GOW.goldGlow}`,
+                  fontFamily: '"Cinzel", Georgia, serif',
+                }}
+              >
+                Ready to Work Together?
+              </h2>
+              <p className="text-sm mb-6" style={{ color: GOW.textSecondary }}>
+                10+ years delivering production systems. Let&apos;s build something.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="mailto:alexanderpulido81@gmail.com"
+                  className="px-6 py-3 text-xs tracking-wider uppercase transition-all hover:scale-105 relative overflow-hidden group"
+                  style={{
+                    background: `linear-gradient(180deg, ${GOW.frostBright}, ${GOW.frostDark})`,
+                    color: GOW.bgDark,
+                    boxShadow: `0 0 10px ${GOW.frostGlow}`,
+                  }}
+                >
+                  <span className="relative z-10 font-bold">Get In Touch</span>
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: `linear-gradient(180deg, ${GOW.frostMid}, ${GOW.frostBright})` }}
+                  />
+                </a>
+                <Link
+                  href="/cv"
+                  className="px-6 py-3 text-xs tracking-wider uppercase transition-all hover:scale-105 relative group"
+                  style={{
+                    background: 'transparent',
+                    border: `2px solid ${GOW.goldBright}`,
+                    color: GOW.goldBright,
+                  }}
+                >
+                  <span className="relative z-10">View Codex</span>
+                  <div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ background: `${GOW.goldBright}15` }}
+                  />
+                </Link>
+              </div>
+              <RuneBorder color={GOW.goldBright} className="mt-6 max-w-xs mx-auto" />
+            </div>
+          </StoneTablet>
+        </div>
+      </section>
+
       {/* ========== FOOTER ========== */}
       <footer className="relative z-20 py-6 text-center pb-28" role="contentinfo">
         <RuneBorder color={GOW.goldMid} className="max-w-xs mx-auto mb-3" />

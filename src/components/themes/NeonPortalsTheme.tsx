@@ -1475,7 +1475,7 @@ export default function NeonPortalsTheme() {
 
           {/* 1. ABOUT */}
           <TestChamberSection
-            title="Test Subject Profile"
+            title="About"
             notice="CLEARANCE LEVEL: AUTHORIZED"
             id="about"
           >
@@ -1505,7 +1505,7 @@ export default function NeonPortalsTheme() {
 
           {/* 3. EXPERIENCE */}
           {experience.length > 0 && (
-            <TestChamberSection title="Testing History" id="experience">
+            <TestChamberSection title="Work Experience" id="experience">
               <div className="space-y-3">
                 {experience.map((entry, i) => (
                   <ExperienceCard key={entry.id} entry={entry} index={i} />
@@ -1519,7 +1519,7 @@ export default function NeonPortalsTheme() {
 
           {/* 5. SKILLS */}
           <TestChamberSection
-            title={active === 'engineer' ? 'Equipment Specifications' : 'Subject Capabilities'}
+            title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
             id="skills"
           >
             {active === 'engineer' ? (
@@ -1530,7 +1530,7 @@ export default function NeonPortalsTheme() {
           </TestChamberSection>
 
           {/* 6. PROJECTS */}
-          <TestChamberSection title="Test Chambers" notice="RESULTS VERIFIED" id="projects">
+          <TestChamberSection title="Projects" notice="RESULTS VERIFIED" id="projects">
             <div className="grid md:grid-cols-2 gap-4">
               {projects.filter(p => p.featured).slice(0, 6).map((project, i) => (
                 <ProjectCard key={project.id} project={project} index={i} />
@@ -1543,7 +1543,7 @@ export default function NeonPortalsTheme() {
 
           {/* 8. VENTURES (Engineer) */}
           {active === 'engineer' && (
-            <TestChamberSection title="Enrichment Ventures" id="ventures">
+            <TestChamberSection title="Ventures" id="ventures">
               <div className="grid md:grid-cols-3 gap-4">
                 {COMPANIES.map((company) => (
                   <VentureCard key={company.id} company={company} />
@@ -1554,7 +1554,7 @@ export default function NeonPortalsTheme() {
 
           {/* 9. BANDS (Drummer) */}
           {active === 'drummer' && (
-            <TestChamberSection title="Audio Test Subjects" id="bands">
+            <TestChamberSection title="Bands" id="bands">
               <div className="grid md:grid-cols-3 gap-4">
                 {BANDS.map((band) => (
                   <BandCard key={band.id} band={band} />
@@ -1570,6 +1570,45 @@ export default function NeonPortalsTheme() {
       </main>
 
       {/* ================================================================== */}
+      {/* CONTACT CTA */}
+      {/* ================================================================== */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h2 className="text-lg tracking-[0.2em] mb-3" style={{ color: PORTAL.METAL_LIGHT }}>
+              READY FOR TESTING?
+            </h2>
+            <p className="text-sm" style={{ color: PORTAL.METAL_MID }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
+              style={{
+                background: PORTAL.ORANGE,
+                color: PORTAL.PANEL_BG,
+              }}
+            >
+              Initiate Contact
+            </a>
+            <Link
+              href="/cv"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
+              style={{
+                background: 'transparent',
+                border: `2px solid ${PORTAL.BLUE}`,
+                color: PORTAL.BLUE,
+              }}
+            >
+              Download CV
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
       {/* FOOTER */}
       {/* ================================================================== */}
       <footer className="relative z-20 py-8 text-center mt-6" role="contentinfo">
@@ -1581,19 +1620,10 @@ export default function NeonPortalsTheme() {
               className="text-[9px] tracking-[0.25em]"
               style={{ color: PORTAL.METAL_MID }}
             >
-              APERTURE SCIENCE ENRICHMENT CENTER
-            </p>
-            <p
-              className="text-xs tracking-wider mt-0.5 italic"
-              style={{ color: PORTAL.METAL_DARK }}
-            >
-              "We do what we must because we can"
+              © {new Date().getFullYear()} Alexander Pulido
             </p>
           </div>
         </div>
-        <p className="text-[8px] mt-3" style={{ color: PORTAL.METAL_DARK }}>
-          TEST CHAMBER MMXXVI | ALL RIGHTS RESERVED
-        </p>
       </footer>
 
       {/* ================================================================== */}

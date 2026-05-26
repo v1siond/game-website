@@ -1,19 +1,18 @@
 import {
   useRef,
-  useEffect,
-  useCallback
+  useEffect
 } from 'react'
-import LevelProps from '../interfaces/LevelProps'
-import { loadCanvasLevel } from '../canvasLogic/loadCanvasLevel'
+import { load } from '../../canvasLogic/lobby/load'
 
-const Level1 = ({}: LevelProps) => {
+const Lobby = () => {
 
   const ref = useRef<HTMLCanvasElement>(null)
 
-  const loadLevel1 = useCallback(async () => {
-    if (ref?.current) loadCanvasLevel(ref.current)
+  useEffect(() => {
+    if (ref?.current) load(ref.current)
+
     const playAudio = () => {
-      let audio = new Audio('/music/level1.mp3');
+      const audio = new Audio('/music/level1.mp3');
       audio.onended = () => {
         audio.play();
       };
@@ -21,10 +20,10 @@ const Level1 = ({}: LevelProps) => {
     };
 
     document.addEventListener('click', playAudio, { once: true });
-  }, [ref?.current])
 
-  useEffect(() => {
-    loadLevel1()
+    return () => {
+      document.removeEventListener('click', playAudio);
+    };
   }, [])
 
 
@@ -35,4 +34,4 @@ const Level1 = ({}: LevelProps) => {
   )
 }
 
-export default Level1;
+export default Lobby;

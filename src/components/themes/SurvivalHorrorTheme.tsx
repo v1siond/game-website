@@ -1648,6 +1648,44 @@ export default function SurvivalHorrorTheme() {
         </div>
       </main>
 
+      {/* Contact CTA */}
+      <section className="relative z-20 py-12 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <h2 className="text-sm tracking-[0.3em] mb-3 uppercase" style={{ color: RE.warmGlow }}>
+              Ready to Work Together?
+            </h2>
+            <p className="text-xs" style={{ color: RE.fog }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="px-6 py-3 text-sm tracking-wider transition-all hover:brightness-125"
+              style={{
+                background: `${RE.rust}80`,
+                border: `2px solid ${RE.warmGlow}`,
+                color: RE.cream,
+              }}
+            >
+              [CONTACT] Get In Touch
+            </a>
+            <Link
+              href="/cv"
+              className="px-6 py-3 text-sm tracking-wider transition-all hover:brightness-125"
+              style={{
+                background: RE.darkSepia,
+                border: `2px solid ${RE.midBrown}`,
+                color: RE.cream,
+              }}
+            >
+              [FILE] Download CV
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer - save room style */}
       <footer className="relative z-20 py-12 text-center">
         <div className="flex flex-col items-center gap-4">

@@ -1,0 +1,29 @@
+{
+  "cv": {
+    "pageTitle": "CV - Alexander Pulido",
+    "downloadPdf": "Download PDF",
+    "professionalSummary": "Professional Summary",
+    "coreCompetencies": "Core Competencies",
+    "currentPositions": "Current Positions",
+    "keyProjects": "Key Projects & Achievements",
+    "technicalSkills": "Technical Skills",
+    "professionalExperience": "Professional Experience",
+    "education": "Education & Continuous Learning",
+    "educationText": "Self-taught engineer with 10+ years of practical experience building production systems. Continuous learner through hands-on project work, technical documentation, and staying current with industry developments.",
+    "present": "Present",
+    "impact": "Impact",
+    "tech": "Tech"
+  },
+  "common": {
+    "email": "Email",
+    "website": "Website",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "switchLanguage": "Switch language"
+  },
+  "languages": {
+    "en": "English",
+    "es": "Spanish",
+    "it": "Italian"
+  }
+}

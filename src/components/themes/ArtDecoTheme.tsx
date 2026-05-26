@@ -1836,7 +1836,7 @@ export default function ArtDecoTheme() {
                   color: RAPTURE_COLORS.gold,
                 }}
               >
-                DOSSIER
+                CV
               </Link>
               <Link
                 href="/personal-projects/game-engine"
@@ -1846,7 +1846,7 @@ export default function ArtDecoTheme() {
                   color: RAPTURE_COLORS.deepSea,
                 }}
               >
-                ENTER RAPTURE
+                PORTFOLIO
               </Link>
               <ThemeSwitcher />
             </nav>
@@ -2012,7 +2012,7 @@ export default function ArtDecoTheme() {
           {/* POSTS SECTION - Placeholder */}
           {/* ============================================================ */}
           <div className="pt-8">
-            <GoldFrame title="DISPATCHES FROM RAPTURE" reducedMotion={reducedMotion}>
+            <GoldFrame title="POSTS" reducedMotion={reducedMotion}>
               <div className="text-center py-8">
                 <p className="text-base italic" style={{ color: RAPTURE_COLORS.warmWhite }}>
                   Coming soon... transmissions from the deep.
@@ -2022,6 +2022,51 @@ export default function ArtDecoTheme() {
           </div>
         </div>
       </main>
+
+      {/* ================================================================== */}
+      {/* CONTACT CTA */}
+      {/* ================================================================== */}
+      <section className="relative z-20 py-16 px-8" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <GoldFrame reducedMotion={reducedMotion}>
+            <div className="mb-6">
+              <NeonSign
+                text="READY TO WORK TOGETHER?"
+                className="text-lg tracking-[0.25em]"
+                reducedMotion={reducedMotion}
+              />
+            </div>
+            <p className="text-sm mb-8" style={{ color: RAPTURE_COLORS.parchment }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="mailto:alexanderpulido81@gmail.com"
+                className={`px-6 py-3 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+                style={{
+                  background: RAPTURE_COLORS.gold,
+                  color: RAPTURE_COLORS.deepSea,
+                  border: `2px solid ${RAPTURE_COLORS.goldBright}`,
+                  boxShadow: `0 0 20px ${RAPTURE_COLORS.gold}40`,
+                }}
+              >
+                GET IN TOUCH
+              </a>
+              <Link
+                href="/cv"
+                className={`px-6 py-3 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+                style={{
+                  background: 'transparent',
+                  border: `2px solid ${RAPTURE_COLORS.gold}`,
+                  color: RAPTURE_COLORS.gold,
+                }}
+              >
+                VIEW CV
+              </Link>
+            </div>
+          </GoldFrame>
+        </div>
+      </section>
 
       {/* ================================================================== */}
       {/* FOOTER */}

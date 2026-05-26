@@ -1,4 +1,4 @@
-import GameAsset from "@/interfaces/GameAsset"
+import GameAsset, { CellData } from "@/interfaces/GameAsset"
 
 // cuadro de 48x48
 // cada cuuadro contiene 4 caracteres
@@ -34,7 +34,7 @@ import GameAsset from "@/interfaces/GameAsset"
 
 */
 
-const fillColorMap: any = {
+const fillColorMap: Record<string, string> = {
   '\\': 'rgba(255, 99, 71, 1)', // lightgray
   '/': 'rgba(255, 99, 71, 1', // lightgray
   '|': 'rgba(234, 197, 112, 0.96)', // tomato
@@ -52,7 +52,6 @@ const fillColorMap: any = {
   '-': 'rgba(60, 48, 33, 0.76)',
   '_': 'rgba(194, 165, 92, 1)', // gray
   '*': 'rgba(255, 255, 255, 1)', // white
-  '8': 'rgba(243, 191, 54, 1)',
   '~': 'rgba(211, 211, 211, 1)', // lightgray
   '`': 'rgba(255, 255, 255, 1)', // white
   ']': 'rgba(0, 128, 0, 1)', // green
@@ -66,10 +65,11 @@ const fillColorMap: any = {
   '@': 'rgba(0, 130, 0, 1)',
   '(': 'rgba(0, 130, 0, 1)',
   ')': 'rgba(0, 130, 0, 1)',
-  '.': 'rgba(243, 191, 54, .5)'
+  '.': 'rgba(243, 191, 54, .5)',
+  '8': 'rgb(231, 231, 231)'
 }
 
-const colorMap: any = {
+const colorMap: Record<string, string> = {
   '*': 'rgba(255, 255, 255, .5)', // white
   '.': 'rgba(243, 191, 54, .5)',
   '~': 'rgba(211, 211, 211, 1)', // lightgray
@@ -101,22 +101,20 @@ const colorMap: any = {
   '@': 'rgba(0, 130, 0, .5)',
   '(': 'rgba(0, 130, 0, .5)',
   ')': 'rgba(0, 130, 0, .5)',
-  '8': 'rgba(243, 191, 54, .5)'
+  '8': 'rgba(172, 172, 168, 0.6)'
 }
 
 
 const colorByTile = (rowIndex: number, columnIndex: number) => {
   const isMountain = getMountain(rowIndex, columnIndex)
-  const isMountainBase = getMountainBases(rowIndex, columnIndex)
   const isTempleArea = getTempleArea(rowIndex, columnIndex)
   const isTemple = getTemple(rowIndex, columnIndex)
   const isTempleDoor = getTempleDoor(rowIndex, columnIndex)
-  if (isMountain) return 'rgba(108, 85, 53, 0.85)'
-  if (isMountainBase) return 'rgba(87, 62, 26, 0.85)'
+  if (isMountain) return 'rgba(255, 212, 58, 0.9)'
   if (isTempleDoor) return 'rgba(85, 59, 23, 0.85)'
   if (isTemple) return 'rgba(180, 132, 65, 0.85)'
   if (isTempleArea) return 'rgba(160, 128, 80, 0.93)'
-  if(rowIndex < 10) return 'rgba(102, 165, 196, 0.79)'
+  if(rowIndex < 10) return 'rgba(13, 63, 88, 0.79)'
   if(rowIndex >=  68) return 'rgba(21, 22, 72, 0.07)'
   if (rowIndex >= 10) {
     const gradientFactor = (rowIndex - 10) / (68 - 10);
@@ -197,72 +195,6 @@ const getMountain = (rowIndex: number, columnIndex: number) => {
   })
 }
 
-
-const getMountainBases = (rowIndex: number, columnIndex: number) => {
-  const mountainsCoordinates = [
-    {
-      minRow: 27,
-      maxRow: 28,
-      minColumn: 1,
-      maxColumn: 20
-    },
-    {
-      minRow: 40,
-      maxRow: 41,
-      minColumn: 6,
-      maxColumn: 24
-    },
-    {
-      minRow: 18,
-      maxRow: 19,
-      minColumn: 22,
-      maxColumn: 41
-    },
-    {
-      minRow: 10,
-      maxRow: 11,
-      minColumn: 47,
-      maxColumn: 66
-    },
-    {
-      minRow: 9,
-      maxRow: 10,
-      minColumn: 79,
-      maxColumn: 98
-    },
-    {
-      minRow: 18,
-      maxRow: 19,
-      minColumn: 93,
-      maxColumn: 112
-    },
-    {
-      minRow: 10,
-      maxRow: 11,
-      minColumn: 109,
-      maxColumn: 128
-    },
-    {
-      minRow: 30,
-      maxRow: 31,
-      minColumn: 113,
-      maxColumn: 132
-    },
-    {
-      minRow: 19,
-      maxRow: 19,
-      minColumn: 128,
-      maxColumn: 146
-    }
-  ]
-
-  return mountainsCoordinates.find((mountain) => {
-    const difference = rowIndex >= mountain.minRow && rowIndex <= mountain.maxRow ? mountain.maxRow - rowIndex : -1
-    return (rowIndex >= mountain.minRow && rowIndex <= mountain.maxRow + 1) && (columnIndex >= (mountain.minColumn + difference) && columnIndex <= (mountain.maxColumn - difference))
-  })
-}
-
-
 const getTemple = (rowIndex: number, columnIndex: number) => {
   const templeCoordinates = [
     {
@@ -337,9 +269,9 @@ const getTempleArea = (rowIndex: number, columnIndex: number) => {
   return (rowIndex >= minRow && rowIndex <= maxRow) && (columnIndex >= (minColumn + difference) && columnIndex <= (maxColumn - difference))
 }
 
-const getTemplateMap = () => {
-  return template.reduce((acc: any, line: any, rowIndex: number) => {
-    const lines = line.split('').map((char: string, columnIndex: number) => {
+const getTemplateMap = (): Record<number, CellData[]> => {
+  return template.reduce<Record<number, CellData[]>>((acc, line, rowIndex) => {
+    const lines: CellData[] = line.split('').map((char, columnIndex) => {
       return {
         value: char,
         color: colorMap[char] || colorByTile(rowIndex, columnIndex),
@@ -375,12 +307,13 @@ const intervalByChar = (char: string) => {
       return randomBase * 5
     case '@':
       return randomBase * 7
+    case '8':
+      return  35
     default:
       return randomBase * 10
   }
 }
-const animationByChar = (char: string) => {
-  if (!shouldAnimate) return;
+const animationByChar = (char: string): string | null => {
   if (['g', ':', ',', ';'].includes(char)) return "move"
   if (['@', '(', ')', '&'].includes(char)) return "move_brightup"
   if (['o', '-', '8'].includes(char)) return "brightup"
@@ -431,7 +364,7 @@ const template = [
   `               /\\                  | (@&@&@)       o ||         || o               0W              |                                             `,
   `              /  \\                | (@&@&@&@)        || .  n  . ||   ,:;,,;ggg;,., W0   :;,,:;,;;:, |                                            `,
   `             /    \\              | (&@&@&@&@&)       ||         ||                 0W                |                                           `,
-  `            /      \\            |      0W0        /////////|\\\\\\\\\\\\\\\\\\\\             W0                 |                          ,;gg;,        `,
+  `            /      \\            |      0W0        /////////|\\\\\\\\\\\\\\\\\\              W0                 |                          ,;gg;,        `,
   `   ,;gg;,  /     *  \\          |       W0W        o ||           || o              0W                  |                                         `,
   `          /          \\        |        0W0          ||  .  n  .  ||\            ;,;,w0,,:;               |                                        `,
   `         /            \\      |     ;,;,W0W,,g,      ||           ||           :;;,,0W:;,,:;,             |      ,:W;,;W;,.:;,                   `,

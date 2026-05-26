@@ -14,6 +14,7 @@
  */
 import { useRef, useEffect, useState, useCallback } from 'react'
 import Head from 'next/head'
+import Link from 'next/link'
 import { TileGrid, TILE_DEFS } from '@/engine/TileGrid'
 import { createVillageGrid, VILLAGE_GRID_CONFIG } from '@/levels/village-grid'
 
@@ -304,10 +305,10 @@ export default function TopView() {
 
         {/* Navigation */}
         <nav className="fixed top-4 left-4 bg-black/90 p-3 text-white font-mono text-sm rounded flex gap-2">
-          <a href="/top-view" className="px-3 py-1 bg-blue-600 rounded hover:bg-blue-500">Top View</a>
-          <a href="/village-test" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Isometric</a>
-          <a href="/engine-test" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Engine</a>
-          <a href="/" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Home</a>
+          <Link href="/top-view" className="px-3 py-1 bg-blue-600 rounded hover:bg-blue-500">Top View</Link>
+          <Link href="/village-test" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Isometric</Link>
+          <Link href="/engine-test" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Engine</Link>
+          <Link href="/" className="px-3 py-1 bg-gray-700 rounded hover:bg-gray-600">Home</Link>
         </nav>
 
         {/* Tile Palette */}

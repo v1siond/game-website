@@ -1508,6 +1508,69 @@ export default function AdventurePathsTheme() {
         </div>
       </main>
 
+      {/* Contact CTA */}
+      <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-8">
+            <div className="flex justify-center gap-2 mb-4">
+              <Coin size={20} />
+              <QuestionBlock size={32} />
+              <Coin size={20} />
+            </div>
+            <h2
+              className="text-lg tracking-[0.15em] mb-3"
+              style={{
+                color: MARIO_COLORS.marioRed,
+                textShadow: `2px 2px 0 ${MARIO_COLORS.groundDarkest}`,
+                fontFamily: '"Press Start 2P", monospace, sans-serif',
+              }}
+            >
+              READY TO TEAM UP?
+            </h2>
+            <p
+              className="text-sm"
+              style={{ color: MARIO_COLORS.groundDarkest }}
+            >
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="mario-button px-6 py-3 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400 inline-flex items-center justify-center gap-2"
+              style={{
+                background: `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`,
+                border: `3px solid ${MARIO_COLORS.groundBrown}`,
+                color: '#FFF',
+                borderRadius: '4px',
+                boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: '10px',
+              }}
+            >
+              <Starman size={16} />
+              GET IN TOUCH
+            </a>
+            <Link
+              href="/cv"
+              className="mario-button px-6 py-3 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400 inline-flex items-center justify-center gap-2"
+              style={{
+                background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
+                border: `3px solid ${MARIO_COLORS.pipeMid}`,
+                color: '#FFF',
+                borderRadius: '4px',
+                boxShadow: `0 4px 0 ${MARIO_COLORS.pipeDark}`,
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: '10px',
+              }}
+            >
+              <QuestionBlock size={16} hit />
+              VIEW CV
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Footer with ground */}
       <footer className="relative z-20">
         <div className="text-center py-8">

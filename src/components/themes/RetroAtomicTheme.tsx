@@ -1300,7 +1300,7 @@ export default function RetroAtomicTheme() {
       {/* ================================================================ */}
       <section className="relative z-20 py-6 px-4 md:px-6" aria-label="About">
         <div className="max-w-4xl mx-auto">
-          <WornDocumentPanel title="Personnel Dossier">
+          <WornDocumentPanel title="About">
             <p className="text-sm leading-relaxed mb-4 font-mono" style={{ color: TERMINAL_TEXT }}>
               {aboutData.bio}
             </p>
@@ -1334,7 +1334,7 @@ export default function RetroAtomicTheme() {
       {experience.length > 0 && (
         <section className="relative z-20 py-6 px-4 md:px-6" aria-label="Experience">
           <div className="max-w-4xl mx-auto">
-            <RustedPanel title="Mission Log">
+            <RustedPanel title="Work Experience">
               <div className="space-y-4">
                 {experience.map((entry) => (
                   <ExperienceCard key={entry.id} entry={entry} />
@@ -1355,7 +1355,7 @@ export default function RetroAtomicTheme() {
       {/* ================================================================ */}
       <section className="relative z-20 py-6 px-4 md:px-6" aria-label="Skills">
         <div className="max-w-4xl mx-auto">
-          <PipBoyFrame title={active === 'engineer' ? 'Tech Arsenal' : 'Skill Perks'}>
+          <PipBoyFrame title={active === 'engineer' ? 'Tech Stack' : 'Skills'}>
             {active === 'engineer' ? (
               <TechStackTerminal categories={engineerTech} />
             ) : (
@@ -1370,7 +1370,7 @@ export default function RetroAtomicTheme() {
       {/* ================================================================ */}
       <section className="relative z-20 py-6 px-4 md:px-6" aria-label="Projects">
         <div className="max-w-4xl mx-auto">
-          <RustedPanel title="Quest Log">
+          <RustedPanel title="Projects">
             <div className="grid md:grid-cols-2 gap-4">
               {projects.filter(p => p.featured).slice(0, 6).map((project) => (
                 <ProjectCard key={project.id} project={project} />
@@ -1391,7 +1391,7 @@ export default function RetroAtomicTheme() {
       {active === 'engineer' && (
         <section className="relative z-20 py-6 px-4 md:px-6" aria-label="Ventures">
           <div className="max-w-4xl mx-auto">
-            <VaultTecPanel title="Affiliated Factions">
+            <VaultTecPanel title="Ventures">
               <div className="grid md:grid-cols-3 gap-4">
                 {COMPANIES.map((company) => (
                   <CompanyCard key={company.id} company={company} />
@@ -1408,7 +1408,7 @@ export default function RetroAtomicTheme() {
       {active === 'drummer' && (
         <section className="relative z-20 py-6 px-4 md:px-6" aria-label="Bands">
           <div className="max-w-4xl mx-auto">
-            <RustedPanel title="Radio Stations">
+            <RustedPanel title="Bands">
               <div className="grid md:grid-cols-3 gap-4">
                 {BANDS.map((band) => (
                   <BandCard key={band.id} band={band} />
@@ -1424,9 +1424,52 @@ export default function RetroAtomicTheme() {
       {/* ================================================================ */}
       <section className="relative z-20 py-6 px-4 md:px-6" aria-label="Achievements">
         <div className="max-w-4xl mx-auto">
-          <PipBoyFrame title="Achievements Unlocked">
+          <PipBoyFrame title="Achievements">
             <AchievementsTerminal profession={active} />
           </PipBoyFrame>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* CONTACT CTA */}
+      {/* ================================================================ */}
+      <section className="relative z-20 py-12 px-4 md:px-6" aria-label="Contact">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="mb-6">
+            <h2
+              className="text-lg font-bold tracking-widest uppercase font-mono mb-2"
+              style={{ color: VAULT_YELLOW }}
+            >
+              [ INITIATE CONTACT PROTOCOL ]
+            </h2>
+            <p className="text-sm font-mono" style={{ color: TERMINAL_TEXT }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="mailto:alexanderpulido81@gmail.com"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-widest uppercase font-mono transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
+              style={{
+                background: PIPBOY_GREEN,
+                color: '#0a0a08',
+                boxShadow: `0 0 15px ${PIPBOY_GREEN}40`,
+              }}
+            >
+              SEND TRANSMISSION
+            </a>
+            <Link
+              href="/cv"
+              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-widest uppercase font-mono transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
+              style={{
+                background: 'transparent',
+                border: `2px solid ${VAULT_YELLOW}`,
+                color: VAULT_YELLOW,
+              }}
+            >
+              DOWNLOAD DOSSIER
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -1435,27 +1478,10 @@ export default function RetroAtomicTheme() {
       {/* ================================================================ */}
       <footer className="relative z-20 py-12 text-center" role="contentinfo">
         <div className="flex justify-center gap-4 mb-4">
-          <AtomSymbol size={50} color={PIPBOY_GREEN} />
+          <AtomSymbol size={40} color={PIPBOY_GREEN_DIM} />
         </div>
-        <p
-          className="text-sm font-bold tracking-widest uppercase font-mono"
-          style={{ color: VAULT_YELLOW }}
-        >
-          VAULT-TEC INDUSTRIES
-        </p>
-        <p className="text-xs mt-2 font-mono" style={{ color: FADED_TEXT }}>
-          &quot;Prepare for the Future&quot;
-        </p>
-        <div className="flex justify-center gap-2 mt-4">
-          {[...Array(7)].map((_, i) => (
-            <RadiationSymbol key={i} size={14} color={PIPBOY_GREEN_DIM} />
-          ))}
-        </div>
-        <p
-          className="text-xs mt-4 font-mono"
-          style={{ color: `${FADED_TEXT}80` }}
-        >
-          [TERMINAL v3.0.77 // ALL SYSTEMS NOMINAL // {new Date().getFullYear()}]
+        <p className="text-xs font-mono" style={{ color: FADED_TEXT }}>
+          © {new Date().getFullYear()} Alexander Pulido
         </p>
       </footer>
     </div>

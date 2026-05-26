@@ -37,6 +37,7 @@ export default function ThemeSwitcher() {
   const { theme, setThemeById, allThemes } = useTheme()
   const [isOpen, setIsOpen] = useState(false)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 60, right: 16 })
   const dropdownRef = useRef<HTMLDivElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const selectedRef = useRef<HTMLButtonElement>(null)
@@ -145,6 +146,13 @@ export default function ThemeSwitcher() {
   }, [isOpen, theme.id])
 
   const handleToggle = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      setDropdownPosition({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      })
+    }
     setIsOpen(!isOpen)
     if (!isOpen) {
       const selectedIndex = flatThemeList.findIndex(t => t.id === theme.id)
@@ -212,8 +220,11 @@ export default function ThemeSwitcher() {
           role="listbox"
           aria-label="Available themes"
           aria-activedescendant={focusedIndex >= 0 && flatThemeList[focusedIndex] ? `theme-${flatThemeList[focusedIndex].id}` : undefined}
-          className="absolute right-0 mt-2 w-80 max-h-[70vh] overflow-y-auto z-[100]"
+          className="fixed w-80 max-h-[70vh] overflow-y-auto"
           style={{
+            top: dropdownPosition.top,
+            right: dropdownPosition.right,
+            zIndex: 99999,
             backgroundColor: theme.colors.surface,
             border: `2px solid ${theme.colors.border}`,
             boxShadow: `0 8px 32px rgba(0, 0, 0, 0.7)`,
