@@ -380,7 +380,7 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
         strokeWidth="1.5"
       />
       {/* Knee fire - layered flame */}
-      <SmallFlame cx={48} cy={147} size={0.7} delay={1} />
+      <SmallFlame cx={48} cy={147} size={1.05} delay={1} />
       {/* Calf */}
       <polygon
         points="44,152 36,178 48,182 54,158"
@@ -402,7 +402,7 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
         strokeWidth="1.5"
       />
       {/* Knee fire - layered flame */}
-      <SmallFlame cx={112} cy={147} size={0.7} delay={2} />
+      <SmallFlame cx={112} cy={147} size={1.05} delay={2} />
       {/* Calf */}
       <polygon
         points="106,152 106,158 112,182 124,178"
@@ -416,8 +416,8 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <polygon points="114,182 116,198 108,192" fill={WC3.roc.felMid} />
 
       {/* ============ HIP FIRE (connecting legs to torso) ============ */}
-      <FelFlame cx={55} cy={115} size={0.9} delay={3} />
-      <FelFlame cx={105} cy={115} size={0.9} delay={4} />
+      <FelFlame cx={55} cy={115} size={1.35} delay={3} />
+      <FelFlame cx={105} cy={115} size={1.35} delay={4} />
 
       {/* ============ TORSO ============ */}
       {/* Main torso rock plates */}
@@ -432,11 +432,11 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <path d="M95,55 L100,75 L90,95 L80,115" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       <path d="M55,70 L80,80 L105,70" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       {/* Core fire visible through center - layered */}
-      <FelFlame cx={80} cy={85} size={1.2} delay={0} />
+      <FelFlame cx={80} cy={85} size={1.8} delay={0} />
 
       {/* ============ MASSIVE LEFT SHOULDER (iconic WC3 feature) ============ */}
       {/* Shoulder fire base - layered flame */}
-      <FelFlame cx={35} cy={55} size={1} delay={5} />
+      <FelFlame cx={35} cy={55} size={1.5} delay={5} />
       {/* Hexagonal boulder shoulder */}
       <polygon
         points="5,35 0,55 10,75 35,80 55,65 50,40 30,25 10,30"
@@ -448,11 +448,11 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <path d="M15,40 L25,55 L20,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       <path d="M40,35 L35,55 L45,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       {/* Shoulder flame on top - layered */}
-      <FelFlame cx={25} cy={25} size={1.3} delay={6} />
+      <FelFlame cx={25} cy={25} size={1.95} delay={6} />
 
       {/* ============ MASSIVE RIGHT SHOULDER ============ */}
       {/* Shoulder fire base - layered flame */}
-      <FelFlame cx={125} cy={55} size={1} delay={7} />
+      <FelFlame cx={125} cy={55} size={1.5} delay={7} />
       {/* Hexagonal boulder shoulder */}
       <polygon
         points="155,35 160,55 150,75 125,80 105,65 110,40 130,25 150,30"
@@ -464,7 +464,7 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <path d="M145,40 L135,55 L140,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       <path d="M120,35 L125,55 L115,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       {/* Shoulder flame on top - layered */}
-      <FelFlame cx={135} cy={25} size={1.3} delay={8} />
+      <FelFlame cx={135} cy={25} size={1.95} delay={8} />
 
       {/* ============ LEFT ARM ============ */}
       {/* Upper arm */}
@@ -475,7 +475,7 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
         strokeWidth="1.5"
       />
       {/* Elbow fire - layered */}
-      <SmallFlame cx={18} cy={108} size={0.7} delay={9} />
+      <SmallFlame cx={18} cy={108} size={1.05} delay={9} />
       {/* Forearm */}
       <polygon
         points="14,112 6,135 18,142 26,120"
@@ -500,7 +500,7 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
         strokeWidth="1.5"
       />
       {/* Elbow fire - layered */}
-      <SmallFlame cx={142} cy={108} size={0.7} delay={10} />
+      <SmallFlame cx={142} cy={108} size={1.05} delay={10} />
       {/* Forearm */}
       <polygon
         points="134,112 134,120 142,142 154,135"
@@ -517,7 +517,7 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <polygon points="140,142 138,160 132,150" fill={WC3.roc.felMid} />
 
       {/* ============ NECK FIRE ============ */}
-      <FelFlame cx={80} cy={48} size={1.1} delay={11} />
+      <FelFlame cx={80} cy={48} size={1.65} delay={11} />
 
       {/* ============ HEAD (Menacing Skull) ============ */}
       {/* Skull base shape */}
@@ -597,7 +597,7 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <path d="M102,35 L95,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
 
       {/* ============ HEAD FLAME (top) - Layered flame tongues ============ */}
-      <FelFlame cx={80} cy={5} size={1.5} delay={12} />
+      <FelFlame cx={80} cy={5} size={2.25} delay={12} />
     </svg>
   )
 }
@@ -1056,24 +1056,123 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           ))}
         </g>
 
-        {/* === WAR DEBRIS - Colorful, visible like WC3 reference === */}
+        {/* === WAR DEBRIS - Aftermath of a battlefield === */}
         <g>
-          {/* === WEAPONS LYING FLAT ON GROUND (back layer) === */}
+          {/* ======================================================= */}
+          {/* === BACKGROUND DEBRIS (y=350-500) - Distant, faded === */}
+          {/* ======================================================= */}
+          <g opacity="0.25" filter="url(#rocDistantBlur)">
+            {/* Distant broken spear - far left background */}
+            <g transform="translate(50, 420) rotate(65)">
+              <rect x="-2" y="-50" width="4" height="50" fill="#3a2a18" />
+            </g>
+            {/* Distant fallen shield - left background */}
+            <g transform="translate(150, 380)">
+              <ellipse cx="0" cy="0" rx="25" ry="10" fill="#5a4530" />
+              <ellipse cx="0" cy="0" rx="20" ry="8" fill="#4a3a28" />
+            </g>
+            {/* Distant axe - center-left background */}
+            <g transform="translate(350, 400) rotate(-25)">
+              <rect x="-2" y="-40" width="4" height="40" fill="#3a2815" />
+              <path d="M-2,-40 Q-18,-35 -15,-22 L2,-28 Z" fill="#4a4a42" />
+            </g>
+            {/* Distant sword stuck in ground - right background */}
+            <g transform="translate(700, 390) rotate(10)">
+              <rect x="-2" y="-55" width="4" height="55" fill="#4a4a45" />
+              <rect x="-5" y="-5" width="10" height="4" fill="#3a2a1a" />
+            </g>
+            {/* Distant banner pole (no fabric) - far right */}
+            <g transform="translate(900, 410) rotate(-8)">
+              <rect x="-2" y="-70" width="4" height="70" fill="#3a2815" />
+            </g>
+            {/* Distant orc drum - center background */}
+            <g transform="translate(500, 430)">
+              <ellipse cx="0" cy="0" rx="22" ry="12" fill="#4a3520" />
+              <ellipse cx="0" cy="-3" rx="18" ry="9" fill="#5a4530" />
+              <ellipse cx="0" cy="-5" rx="14" ry="7" fill="#3a2515" />
+            </g>
+          </g>
+
+          {/* ======================================================= */}
+          {/* === MIDGROUND DEBRIS (y=500-680) - Medium distance === */}
+          {/* ======================================================= */}
+          <g opacity="0.4">
+            {/* Mid orc war drum - left side */}
+            <g transform="translate(100, 620)">
+              <ellipse cx="0" cy="0" rx="35" ry="18" fill="#5a4025" />
+              <ellipse cx="0" cy="-5" rx="30" ry="15" fill="#6a5035" />
+              <ellipse cx="0" cy="-8" rx="25" ry="12" fill="#4a3020" />
+              <line x1="-20" y1="-8" x2="-25" y2="-25" stroke="#3a2815" strokeWidth="4" />
+              <ellipse cx="-28" cy="-28" rx="8" ry="8" fill="#5a4a35" />
+            </g>
+            {/* Mid fallen banner - center-left */}
+            <g transform="translate(280, 580) rotate(75)">
+              <rect x="-3" y="-80" width="6" height="80" fill="#3a2815" />
+              <polygon points="3,-80 50,-70 45,-40 3,-50" fill="#662020" opacity="0.7" />
+            </g>
+            {/* Mid shield with spears - center */}
+            <g transform="translate(450, 600)">
+              <g transform="rotate(-30)">
+                <rect x="-2" y="-65" width="4" height="65" fill="#3a2815" />
+                <polygon points="0,-75 -5,-60 5,-60" fill="#4a4a42" />
+              </g>
+              <ellipse cx="15" cy="5" rx="30" ry="15" fill="#5a4530" />
+              <ellipse cx="15" cy="5" rx="25" ry="12" fill="#4a3a28" />
+              <ellipse cx="15" cy="5" rx="10" ry="5" fill="#664422" />
+            </g>
+            {/* Mid broken axe - right side */}
+            <g transform="translate(750, 610) rotate(20)">
+              <rect x="-3" y="-55" width="6" height="55" fill="#4a3520" />
+              <path d="M-3,-55 Q-25,-45 -20,-30 L3,-38 Z" fill="#5a5a52" />
+            </g>
+            {/* Mid armor piece - far right */}
+            <g transform="translate(880, 590)">
+              <ellipse cx="0" cy="0" rx="20" ry="25" fill="#4a4a45" />
+              <ellipse cx="0" cy="-5" rx="15" ry="18" fill="#3a3a38" />
+              <path d="M-12,10 L-18,30 M12,10 L18,30" stroke="#4a4a45" strokeWidth="4" />
+            </g>
+            {/* Mid sword lying flat - left */}
+            <g transform="translate(180, 660) rotate(80)">
+              <polygon points="-2,-50 2,-50 3,-5 -3,-5" fill="#5a5a55" />
+              <rect x="-5" y="-5" width="10" height="4" fill="#4a3a25" />
+            </g>
+            {/* Mid spear - far left */}
+            <g transform="translate(40, 600) rotate(-15)">
+              <rect x="-2" y="-90" width="4" height="90" fill="#4a3520" />
+              <polygon points="0,-100 -6,-85 6,-85" fill="#5a5a52" />
+            </g>
+          </g>
+
+          {/* ======================================================= */}
+          {/* === FOREGROUND DEBRIS (y=700-800) - Close, detailed === */}
+          {/* ======================================================= */}
           {/* Broken sword lying flat - far left */}
           <g transform="translate(80, 760) rotate(85)">
             <polygon points="-3,-45 3,-45 4,-5 -4,-5" fill="url(#metalGray)" />
             <rect x="-7" y="-5" width="14" height="5" fill="#4a3a25" />
           </g>
-          {/* Dagger lying flat - center */}
-          <g transform="translate(480, 780) rotate(-70)">
+          {/* Dagger lying flat - center-left */}
+          <g transform="translate(350, 780) rotate(-70)">
             <polygon points="-2,-30 2,-30 3,-5 -3,-5" fill="#5a5a55" />
             <rect x="-4" y="-5" width="8" height="4" fill="#3a2a1a" />
+          </g>
+          {/* War horn - center */}
+          <g transform="translate(480, 770) rotate(25)">
+            <path d="M0,0 Q15,-8 35,-5 Q40,-2 38,5 Q35,8 15,12 Q5,10 0,0" fill="#6a5535" />
+            <ellipse cx="2" cy="3" rx="5" ry="6" fill="#4a3525" />
           </g>
           {/* Mace lying flat - right side */}
           <g transform="translate(720, 770) rotate(75)">
             <rect x="-3" y="-60" width="6" height="60" fill="url(#woodBrown)" />
             <ellipse cx="0" cy="-65" rx="12" ry="10" fill="url(#metalGray)" />
             <ellipse cx="0" cy="-65" rx="8" ry="7" fill="#4a4a45" />
+          </g>
+          {/* Helmet - far right foreground */}
+          <g transform="translate(880, 765)">
+            <ellipse cx="0" cy="0" rx="22" ry="15" fill="#4a4a45" />
+            <ellipse cx="0" cy="-5" rx="18" ry="10" fill="#5a5a55" />
+            <path d="M-15,-8 Q0,-20 15,-8" fill="#4a4a45" stroke="#3a3a38" strokeWidth="2" />
+            <rect x="-3" y="-18" width="6" height="8" fill="#5a5a55" />
           </g>
 
           {/* === ORANGE SHIELD - Lying on ground (center-right) === */}
@@ -1102,34 +1201,38 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           <polygon points="580,790 595,770 612,788" fill="#3a4530" opacity="0.5" />
           <polygon points="760,785 775,765 792,782" fill="#354028" opacity="0.6" />
 
-          {/* === WEAPONS STUCK IN GROUND (mid layer) === */}
-          {/* Axe anchored - left */}
-          <g transform="translate(320, 695) rotate(-18)">
-            <rect x="-4" y="-90" width="8" height="90" fill="url(#woodBrown)" />
-            <path d="M-4,-90 Q-32,-77 -28,-58 L4,-68 Z" fill="url(#metalGray)" />
-            <path d="M-4,-88 Q-28,-77 -24,-60 L2,-69 Z" fill="#5a5a55" />
+          {/* === WEAPONS STUCK IN GROUND (anchored at ground level y~770-800) === */}
+          {/* Axe anchored in ground - left side */}
+          <g transform="translate(300, 780) rotate(-12)">
+            <rect x="-4" y="-75" width="8" height="75" fill="url(#woodBrown)" />
+            <path d="M-4,-75 Q-28,-65 -24,-48 L4,-56 Z" fill="url(#metalGray)" />
+            <path d="M-4,-73 Q-24,-65 -20,-50 L2,-57 Z" fill="#5a5a55" />
           </g>
-          {/* Sword anchored - center-left */}
-          <g transform="translate(440, 730) rotate(15)">
-            <rect x="-3" y="-85" width="6" height="85" fill="url(#metalGray)" />
-            <rect x="-9" y="-5" width="18" height="7" fill="#4a3a25" />
-            <rect x="-2" y="0" width="4" height="12" fill="#3a2a1a" />
-            <polygon points="0,-95 -5,-83 5,-83" fill="#6a6a65" />
+          {/* Broken sword stuck at angle - center (moved to side of shield area) */}
+          <g transform="translate(530, 785) rotate(-70)">
+            <rect x="-3" y="-65" width="6" height="65" fill="url(#metalGray)" />
+            <rect x="-8" y="-5" width="16" height="6" fill="#4a3a25" />
+            <polygon points="0,-72 -4,-62 4,-62" fill="#6a6a65" />
           </g>
-          {/* Spear anchored - right */}
-          <g transform="translate(780, 705) rotate(-12)">
-            <rect x="-3" y="-120" width="6" height="120" fill="url(#woodBrown)" />
-            <polygon points="0,-135 -7,-118 7,-118" fill="url(#metalGray)" />
+          {/* Spear anchored - right of shield */}
+          <g transform="translate(720, 775) rotate(-8)">
+            <rect x="-3" y="-100" width="6" height="100" fill="url(#woodBrown)" />
+            <polygon points="0,-112 -6,-95 6,-95" fill="url(#metalGray)" />
           </g>
-          {/* Halberd anchored - far right */}
-          <g transform="translate(920, 700) rotate(8)">
-            <rect x="-3" y="-130" width="6" height="130" fill="url(#woodBrown)" />
-            <polygon points="0,-145 -10,-125 10,-125" fill="url(#metalGray)" />
-            <path d="M-10,-125 Q-15,-135 -5,-145" fill="url(#metalGray)" />
+          {/* Halberd anchored - far right near edge */}
+          <g transform="translate(950, 770) rotate(5)">
+            <rect x="-3" y="-110" width="6" height="110" fill="url(#woodBrown)" />
+            <polygon points="0,-125 -8,-105 8,-105" fill="url(#metalGray)" />
+            <path d="M-8,-105 Q-12,-115 -4,-125" fill="url(#metalGray)" />
           </g>
-          {/* Broken spear - left side */}
-          <g transform="translate(130, 740) rotate(35)">
-            <rect x="-2" y="-70" width="5" height="70" fill="url(#woodBrown)" />
+          {/* Broken spear lying at angle - left side */}
+          <g transform="translate(120, 775) rotate(55)">
+            <rect x="-2" y="-60" width="5" height="60" fill="url(#woodBrown)" />
+          </g>
+          {/* Second axe - far left */}
+          <g transform="translate(50, 785) rotate(15)">
+            <rect x="-3" y="-55" width="6" height="55" fill="url(#woodBrown)" />
+            <path d="M3,-55 Q22,-48 18,-35 L-3,-42 Z" fill="url(#metalGray)" />
           </g>
 
           {/* === HORDE WAR BANNER - On TOP of weapons with wind animation === */}
