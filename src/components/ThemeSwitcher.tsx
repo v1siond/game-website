@@ -176,7 +176,7 @@ export default function ThemeSwitcher() {
   }
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-[9999]" ref={dropdownRef}>
       <button
         ref={buttonRef}
         onClick={handleToggle}
