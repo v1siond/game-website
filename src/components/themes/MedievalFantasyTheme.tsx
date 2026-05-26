@@ -372,76 +372,80 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
         </filter>
       </defs>
 
-      {/* ============ LEFT LEG (back layer) ============ */}
-      {/* Thigh */}
-      <polygon
-        points="50,120 42,140 52,145 58,125"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="1.5"
-      />
-      {/* Knee fire - layered flame */}
-      <SmallFlame cx={48} cy={147} size={1.05} delay={1} />
-      {/* Calf - MASSIVE boulder like shoulder */}
-      <polygon
-        points="30,148 26,162 32,178 50,185 58,172 55,155 45,148"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="2"
-      />
-      {/* Calf cracks */}
-      <path d="M38,155 L42,168 L38,178" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-      {/* Foot claws */}
-      <polygon points="32,178 22,195 34,190" fill={WC3.roc.felBright} />
-      <polygon points="40,182 36,200 48,194" fill={WC3.roc.felBright} />
-      <polygon points="50,185 50,202 58,196" fill={WC3.roc.felMid} />
+      {/* ============ LEFT LEG (back layer) - with idle shift ============ */}
+      <g style={isIdle ? { animation: 'leftLegShift 5s ease-in-out infinite', transformOrigin: '50px 120px' } : {}}>
+        {/* Thigh */}
+        <polygon
+          points="50,120 42,140 52,145 58,125"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="1.5"
+        />
+        {/* Knee fire - layered flame */}
+        <SmallFlame cx={48} cy={147} size={1.6} delay={1} />
+        {/* Calf - MASSIVE boulder like shoulder */}
+        <polygon
+          points="30,148 26,162 32,178 50,185 58,172 55,155 45,148"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="2"
+        />
+        {/* Calf cracks */}
+        <path d="M38,155 L42,168 L38,178" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        {/* Foot claws - 2 large claws */}
+        <polygon points="32,178 18,200 38,192" fill={WC3.roc.felBright} />
+        <polygon points="48,182 48,205 60,195" fill={WC3.roc.felBright} />
+      </g>
 
-      {/* ============ RIGHT LEG (back layer) ============ */}
-      {/* Thigh */}
-      <polygon
-        points="110,120 102,125 108,145 118,140"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="1.5"
-      />
-      {/* Knee fire - layered flame */}
-      <SmallFlame cx={112} cy={147} size={1.05} delay={2} />
-      {/* Calf - MASSIVE boulder like shoulder */}
-      <polygon
-        points="102,148 105,155 102,172 110,185 128,178 134,162 130,148 115,148"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="2"
-      />
-      {/* Calf cracks */}
-      <path d="M122,155 L118,168 L122,178" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-      {/* Foot claws */}
-      <polygon points="128,178 138,195 126,190" fill={WC3.roc.felBright} />
-      <polygon points="120,182 124,200 112,194" fill={WC3.roc.felBright} />
-      <polygon points="110,185 110,202 102,196" fill={WC3.roc.felMid} />
+      {/* ============ RIGHT LEG (back layer) - with idle shift ============ */}
+      <g style={isIdle ? { animation: 'rightLegShift 5s ease-in-out infinite', transformOrigin: '110px 120px' } : {}}>
+        {/* Thigh */}
+        <polygon
+          points="110,120 102,125 108,145 118,140"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="1.5"
+        />
+        {/* Knee fire - layered flame */}
+        <SmallFlame cx={112} cy={147} size={1.6} delay={2} />
+        {/* Calf - MASSIVE boulder like shoulder */}
+        <polygon
+          points="102,148 105,155 102,172 110,185 128,178 134,162 130,148 115,148"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="2"
+        />
+        {/* Calf cracks */}
+        <path d="M122,155 L118,168 L122,178" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        {/* Foot claws - 2 large claws */}
+        <polygon points="128,178 142,200 122,192" fill={WC3.roc.felBright} />
+        <polygon points="112,182 112,205 100,195" fill={WC3.roc.felBright} />
+      </g>
 
       {/* ============ HIP FIRE (connecting legs to torso) ============ */}
-      <FelFlame cx={55} cy={115} size={1.35} delay={3} />
-      <FelFlame cx={105} cy={115} size={1.35} delay={4} />
+      <FelFlame cx={55} cy={115} size={2.7} delay={3} />
+      <FelFlame cx={105} cy={115} size={2.7} delay={4} />
 
-      {/* ============ TORSO ============ */}
-      {/* Main torso rock plates */}
-      <polygon
-        points="45,60 38,90 50,115 80,122 110,115 122,90 115,60 95,50 65,50"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="2"
-      />
-      {/* Green crack lines on torso */}
-      <path d="M65,55 L60,75 L70,95 L80,115" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
-      <path d="M95,55 L100,75 L90,95 L80,115" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
-      <path d="M55,70 L80,80 L105,70" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
-      {/* Core fire visible through center - layered */}
-      <FelFlame cx={80} cy={85} size={1.8} delay={0} />
+      {/* ============ TORSO - with idle sway ============ */}
+      <g style={isIdle ? { animation: 'torsoSway 7s ease-in-out infinite', transformOrigin: '80px 115px' } : {}}>
+        {/* Main torso rock plates */}
+        <polygon
+          points="45,60 38,90 50,115 80,122 110,115 122,90 115,60 95,50 65,50"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="2"
+        />
+        {/* Green crack lines on torso */}
+        <path d="M65,55 L60,75 L70,95 L80,115" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+        <path d="M95,55 L100,75 L90,95 L80,115" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+        <path d="M55,70 L80,80 L105,70" stroke={`url(#${rockCrackId})`} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
+        {/* Core fire visible through center - layered */}
+        <FelFlame cx={80} cy={85} size={2.6} delay={0} />
+      </g>
 
       {/* ============ MASSIVE LEFT SHOULDER (iconic WC3 feature) ============ */}
       {/* Shoulder fire base - layered flame */}
-      <FelFlame cx={35} cy={55} size={1.5} delay={5} />
+      <FelFlame cx={35} cy={55} size={2.2} delay={5} />
       {/* Hexagonal boulder shoulder */}
       <polygon
         points="5,35 0,55 10,75 35,80 55,65 50,40 30,25 10,30"
@@ -453,11 +457,11 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <path d="M15,40 L25,55 L20,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       <path d="M40,35 L35,55 L45,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       {/* Shoulder flame on top - layered */}
-      <FelFlame cx={25} cy={25} size={1.95} delay={6} />
+      <FelFlame cx={25} cy={25} size={2.8} delay={6} />
 
       {/* ============ MASSIVE RIGHT SHOULDER ============ */}
       {/* Shoulder fire base - layered flame */}
-      <FelFlame cx={125} cy={55} size={1.5} delay={7} />
+      <FelFlame cx={125} cy={55} size={2.2} delay={7} />
       {/* Hexagonal boulder shoulder */}
       <polygon
         points="155,35 160,55 150,75 125,80 105,65 110,40 130,25 150,30"
@@ -469,142 +473,144 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       <path d="M145,40 L135,55 L140,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       <path d="M120,35 L125,55 L115,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       {/* Shoulder flame on top - layered */}
-      <FelFlame cx={135} cy={25} size={1.95} delay={8} />
+      <FelFlame cx={135} cy={25} size={2.8} delay={8} />
 
-      {/* ============ LEFT ARM ============ */}
-      {/* Upper arm */}
-      <polygon
-        points="20,78 12,95 22,105 32,90"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="1.5"
-      />
-      {/* Elbow fire - layered */}
-      <SmallFlame cx={18} cy={108} size={1.05} delay={9} />
-      {/* Forearm - MASSIVE boulder like shoulder */}
-      <polygon
-        points="0,108 -5,125 2,145 22,150 32,138 30,118 18,108"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="2"
-      />
-      {/* Forearm cracks */}
-      <path d="M8,115 L12,130 L8,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-      <path d="M22,115 L18,130 L24,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-      {/* Hand claws */}
-      <polygon points="2,145 -10,168 6,158" fill={WC3.roc.felBright} />
-      <polygon points="10,148 6,172 18,162" fill={WC3.roc.felBright} />
-      <polygon points="18,150 18,175 28,165" fill={WC3.roc.felBright} />
-      <polygon points="24,148 28,168 34,158" fill={WC3.roc.felMid} />
+      {/* ============ LEFT ARM - with idle sway ============ */}
+      <g style={isIdle ? { animation: 'leftArmSway 6s ease-in-out infinite', transformOrigin: '25px 78px' } : {}}>
+        {/* Upper arm */}
+        <polygon
+          points="20,78 12,95 22,105 32,90"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="1.5"
+        />
+        {/* Elbow fire - layered */}
+        <SmallFlame cx={18} cy={108} size={1.6} delay={9} />
+        {/* Forearm - MASSIVE boulder like shoulder */}
+        <polygon
+          points="0,108 -5,125 2,145 22,150 32,138 30,118 18,108"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="2"
+        />
+        {/* Forearm cracks */}
+        <path d="M8,115 L12,130 L8,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        <path d="M22,115 L18,130 L24,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        {/* Hand claws - 2 large claws */}
+        <polygon points="4,145 -14,175 12,162" fill={WC3.roc.felBright} />
+        <polygon points="20,148 18,180 32,165" fill={WC3.roc.felBright} />
+      </g>
 
-      {/* ============ RIGHT ARM ============ */}
-      {/* Upper arm */}
-      <polygon
-        points="140,78 148,90 138,105 128,95"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="1.5"
-      />
-      {/* Elbow fire - layered */}
-      <SmallFlame cx={142} cy={108} size={1.05} delay={10} />
-      {/* Forearm - MASSIVE boulder like shoulder */}
-      <polygon
-        points="128,108 130,118 128,138 138,150 158,145 165,125 160,108 142,108"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="2"
-      />
-      {/* Forearm cracks */}
-      <path d="M152,115 L148,130 L152,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-      <path d="M138,115 L142,130 L136,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-      {/* Hand claws */}
-      <polygon points="158,145 170,168 154,158" fill={WC3.roc.felBright} />
-      <polygon points="150,148 154,172 142,162" fill={WC3.roc.felBright} />
-      <polygon points="142,150 142,175 132,165" fill={WC3.roc.felBright} />
-      <polygon points="136,148 132,168 126,158" fill={WC3.roc.felMid} />
+      {/* ============ RIGHT ARM - with idle sway ============ */}
+      <g style={isIdle ? { animation: 'rightArmSway 6s ease-in-out infinite', transformOrigin: '135px 78px' } : {}}>
+        {/* Upper arm */}
+        <polygon
+          points="140,78 148,90 138,105 128,95"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="1.5"
+        />
+        {/* Elbow fire - layered */}
+        <SmallFlame cx={142} cy={108} size={1.6} delay={10} />
+        {/* Forearm - MASSIVE boulder like shoulder */}
+        <polygon
+          points="128,108 130,118 128,138 138,150 158,145 165,125 160,108 142,108"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="2"
+        />
+        {/* Forearm cracks */}
+        <path d="M152,115 L148,130 L152,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        <path d="M138,115 L142,130 L136,142" stroke={WC3.roc.felMid} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        {/* Hand claws - 2 large claws */}
+        <polygon points="156,145 174,175 148,162" fill={WC3.roc.felBright} />
+        <polygon points="140,148 142,180 128,165" fill={WC3.roc.felBright} />
+      </g>
 
       {/* ============ NECK FIRE ============ */}
-      <FelFlame cx={80} cy={48} size={1.65} delay={11} />
+      <FelFlame cx={80} cy={48} size={2.4} delay={11} />
 
-      {/* ============ HEAD (Menacing Skull) ============ */}
-      {/* Skull base shape */}
-      <polygon
-        points="58,48 52,35 55,18 65,8 80,5 95,8 105,18 108,35 102,48 92,50 68,50"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="2"
-      />
-      {/* Forehead plate */}
-      <polygon
-        points="60,20 65,10 80,7 95,10 100,20 95,22 65,22"
-        fill="#2a2825"
-        stroke="#1a1815"
-        strokeWidth="1"
-      />
-      {/* Heavy brow ridge - creates menacing shadow */}
-      <polygon
-        points="55,28 62,22 80,20 98,22 105,28 100,32 60,32"
-        fill="#1a1815"
-        stroke="#0a0a08"
-        strokeWidth="1"
-      />
+      {/* ============ HEAD (Menacing Skull) - with idle look animation ============ */}
+      <g style={isIdle ? { animation: 'headLook 8s ease-in-out infinite', transformOrigin: '80px 50px' } : {}}>
+        {/* Skull base shape */}
+        <polygon
+          points="58,48 52,35 55,18 65,8 80,5 95,8 105,18 108,35 102,48 92,50 68,50"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="2"
+        />
+        {/* Forehead plate */}
+        <polygon
+          points="60,20 65,10 80,7 95,10 100,20 95,22 65,22"
+          fill="#2a2825"
+          stroke="#1a1815"
+          strokeWidth="1"
+        />
+        {/* Heavy brow ridge - creates menacing shadow */}
+        <polygon
+          points="55,28 62,22 80,20 98,22 105,28 100,32 60,32"
+          fill="#1a1815"
+          stroke="#0a0a08"
+          strokeWidth="1"
+        />
 
-      {/* LEFT EYE SOCKET - Dark hole with fire from within */}
-      {/* Socket (dark recess) */}
-      <polygon
-        points="62,32 68,28 76,32 76,40 68,43 62,38"
-        fill="#0a0808"
-        stroke="#1a1815"
-        strokeWidth="1"
-      />
-      {/* Fire glow from deep inside */}
-      <ellipse cx="69" cy="36" rx="4" ry="3" fill={WC3.roc.felDark} opacity="0.8" />
-      <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={WC3.roc.felMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
-      <ellipse cx="69" cy="34" rx="1.5" ry="1" fill={WC3.roc.felBright} opacity="0.7" filter={`url(#${glowId})`} />
+        {/* LEFT EYE SOCKET - Dark hole with fire from within */}
+        {/* Socket (dark recess) */}
+        <polygon
+          points="62,32 68,28 76,32 76,40 68,43 62,38"
+          fill="#0a0808"
+          stroke="#1a1815"
+          strokeWidth="1"
+        />
+        {/* Fire glow from deep inside */}
+        <ellipse cx="69" cy="36" rx="4" ry="3" fill={WC3.roc.felDark} opacity="0.8" />
+        <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={WC3.roc.felMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
+        <ellipse cx="69" cy="34" rx="1.5" ry="1" fill={WC3.roc.felBright} opacity="0.7" filter={`url(#${glowId})`} />
 
-      {/* RIGHT EYE SOCKET - Dark hole with fire from within */}
-      <polygon
-        points="84,32 92,28 98,32 98,38 92,43 84,40"
-        fill="#0a0808"
-        stroke="#1a1815"
-        strokeWidth="1"
-      />
-      <ellipse cx="91" cy="36" rx="4" ry="3" fill={WC3.roc.felDark} opacity="0.8" />
-      <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={WC3.roc.felMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
-      <ellipse cx="91" cy="34" rx="1.5" ry="1" fill={WC3.roc.felBright} opacity="0.7" filter={`url(#${glowId})`} />
+        {/* RIGHT EYE SOCKET - Dark hole with fire from within */}
+        <polygon
+          points="84,32 92,28 98,32 98,38 92,43 84,40"
+          fill="#0a0808"
+          stroke="#1a1815"
+          strokeWidth="1"
+        />
+        <ellipse cx="91" cy="36" rx="4" ry="3" fill={WC3.roc.felDark} opacity="0.8" />
+        <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={WC3.roc.felMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
+        <ellipse cx="91" cy="34" rx="1.5" ry="1" fill={WC3.roc.felBright} opacity="0.7" filter={`url(#${glowId})`} />
 
-      {/* NASAL CAVITY - Dark triangular hole */}
-      <polygon
-        points="76,38 80,34 84,38 80,46"
-        fill="#0a0808"
-        stroke="#1a1815"
-        strokeWidth="1"
-      />
-      {/* Glow from within nasal cavity */}
-      <ellipse cx="80" cy="40" rx="2" ry="3" fill={WC3.roc.felDark} opacity="0.6" />
+        {/* NASAL CAVITY - Dark triangular hole */}
+        <polygon
+          points="76,38 80,34 84,38 80,46"
+          fill="#0a0808"
+          stroke="#1a1815"
+          strokeWidth="1"
+        />
+        {/* Glow from within nasal cavity */}
+        <ellipse cx="80" cy="40" rx="2" ry="3" fill={WC3.roc.felDark} opacity="0.6" />
 
-      {/* JAW/TEETH AREA */}
-      {/* Lower jaw structure */}
-      <polygon
-        points="65,46 70,42 80,41 90,42 95,46 92,52 68,52"
-        fill={`url(#${rockId})`}
-        stroke="#1a1815"
-        strokeWidth="1"
-      />
-      {/* Teeth - dark gaps between rock teeth */}
-      <line x1="72" y1="46" x2="72" y2="50" stroke="#0a0808" strokeWidth="2" />
-      <line x1="77" y1="45" x2="77" y2="50" stroke="#0a0808" strokeWidth="2" />
-      <line x1="83" y1="45" x2="83" y2="50" stroke="#0a0808" strokeWidth="2" />
-      <line x1="88" y1="46" x2="88" y2="50" stroke="#0a0808" strokeWidth="2" />
-      {/* Glow between teeth */}
-      <ellipse cx="80" cy="48" rx="8" ry="2" fill={WC3.roc.felDark} opacity="0.4" filter={`url(#${glowId}Inner)`} />
+        {/* JAW/TEETH AREA */}
+        {/* Lower jaw structure */}
+        <polygon
+          points="65,46 70,42 80,41 90,42 95,46 92,52 68,52"
+          fill={`url(#${rockId})`}
+          stroke="#1a1815"
+          strokeWidth="1"
+        />
+        {/* Teeth - dark gaps between rock teeth */}
+        <line x1="72" y1="46" x2="72" y2="50" stroke="#0a0808" strokeWidth="2" />
+        <line x1="77" y1="45" x2="77" y2="50" stroke="#0a0808" strokeWidth="2" />
+        <line x1="83" y1="45" x2="83" y2="50" stroke="#0a0808" strokeWidth="2" />
+        <line x1="88" y1="46" x2="88" y2="50" stroke="#0a0808" strokeWidth="2" />
+        {/* Glow between teeth */}
+        <ellipse cx="80" cy="48" rx="8" ry="2" fill={WC3.roc.felDark} opacity="0.4" filter={`url(#${glowId}Inner)`} />
 
-      {/* Cheekbone cracks */}
-      <path d="M58,35 L65,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-      <path d="M102,35 L95,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        {/* Cheekbone cracks */}
+        <path d="M58,35 L65,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
+        <path d="M102,35 L95,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
 
-      {/* ============ HEAD FLAME (top) - Layered flame tongues ============ */}
-      <FelFlame cx={80} cy={5} size={2.25} delay={12} />
+        {/* ============ HEAD FLAME (top) - Layered flame tongues ============ */}
+        <FelFlame cx={80} cy={5} size={3.2} delay={12} />
+      </g>
     </svg>
   )
 }
@@ -1815,10 +1821,12 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                     <ellipse cx="-2" cy="2" rx="2" ry="3" fill="#0a0404" />
                     <ellipse cx="2" cy="2" rx="2" ry="3" fill="#0a0404" />
                     <path d="M-16,6 L-14,14 L-8,16 L0,14 L8,16 L14,14 L16,6" fill="#2a1010" />
-                    <path d="M-12,12 Q-14,4 -10,-2" stroke="#4a3828" strokeWidth="3.5" fill="none" strokeLinecap="round" />
-                    <path d="M12,12 Q14,4 10,-2" stroke="#4a3828" strokeWidth="3.5" fill="none" strokeLinecap="round" />
-                    <path d="M-11,10 Q-13,5 -10,0" stroke="#5a4838" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                    <path d="M11,10 Q13,5 10,0" stroke="#5a4838" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+                    {/* Orc tusks - horizontal from jaw corners, pointing outward */}
+                    <path d="M-14,10 L-22,6 L-24,10" fill="#4a3828" stroke="#3a2818" strokeWidth="1" />
+                    <path d="M14,10 L22,6 L24,10" fill="#4a3828" stroke="#3a2818" strokeWidth="1" />
+                    {/* Tusk highlights */}
+                    <path d="M-15,9 L-20,7" stroke="#5a4838" strokeWidth="1" fill="none" />
+                    <path d="M15,9 L20,7" stroke="#5a4838" strokeWidth="1" fill="none" />
                   </g>
                 </g>
               </g>
@@ -1828,6 +1836,26 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
           {/* Pole shadow */}
           <ellipse cx="12" cy="285" rx="15" ry="5" fill="#0a0a08" opacity="0.4" />
+
+          {/* Animated flag shadow on ground - sways with banner */}
+          <g transform="translate(45, 280)">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <ellipse
+                key={`flagShadow${i}`}
+                cx={i * 15}
+                cy={i * 2}
+                rx={18 - i * 2}
+                ry={6 - i * 0.5}
+                fill="#0a0a08"
+                opacity={0.25 - i * 0.04}
+                style={{
+                  animation: 'bannerWave 1.4s ease-in-out infinite alternate',
+                  animationDelay: `${i * 0.12}s`,
+                  transformOrigin: `${i * 15}px ${i * 2}px`,
+                }}
+              />
+            ))}
+          </g>
         </svg>
       </div>
 
@@ -2077,40 +2105,46 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             transform: scaleY(1.02) translateY(-1px);
           }
         }
-        /* Head looks around - left, center, right, center */
+        /* Head looks around - left, center, right, center (more dramatic) */
         @keyframes headLook {
-          0%, 15%, 85%, 100% {
+          0%, 20%, 80%, 100% {
             transform: rotate(0deg);
           }
-          25%, 35% {
-            transform: rotate(-8deg);
+          30%, 40% {
+            transform: rotate(-12deg);
           }
-          55%, 65% {
-            transform: rotate(8deg);
+          55%, 70% {
+            transform: rotate(12deg);
           }
         }
-        /* Left arm sway */
+        /* Left arm sway - muscle flex effect */
         @keyframes leftArmSway {
           0%, 100% {
-            transform: rotate(0deg);
+            transform: rotate(0deg) scaleX(1);
           }
-          30% {
-            transform: rotate(-5deg);
+          25% {
+            transform: rotate(-8deg) scaleX(1.05);
           }
-          70% {
-            transform: rotate(3deg);
+          50% {
+            transform: rotate(-3deg) scaleX(1);
+          }
+          75% {
+            transform: rotate(5deg) scaleX(0.98);
           }
         }
-        /* Right arm sway - opposite phase */
+        /* Right arm sway - opposite phase muscle flex */
         @keyframes rightArmSway {
           0%, 100% {
-            transform: rotate(0deg);
+            transform: rotate(0deg) scaleX(1);
           }
-          30% {
-            transform: rotate(5deg);
+          25% {
+            transform: rotate(8deg) scaleX(1.05);
           }
-          70% {
-            transform: rotate(-3deg);
+          50% {
+            transform: rotate(3deg) scaleX(1);
+          }
+          75% {
+            transform: rotate(-5deg) scaleX(0.98);
           }
         }
         /* Left leg weight shift */
