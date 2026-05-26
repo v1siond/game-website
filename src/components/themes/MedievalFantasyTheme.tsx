@@ -784,28 +784,28 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 <circle cx="12" cy="12" r="3" fill={WC3.roc.fireCore} opacity="0.7" />
                 <circle cx="18" cy="16" r="2" fill={WC3.roc.fireBright} opacity="0.5" />
               </svg>
-              {/* Fire trail - diagonal */}
+              {/* Fire trail - direction based on fall side */}
               <div style={{
                 position: 'absolute',
                 top: '-100px',
-                left: '25px',
+                left: inf.side === 'left' ? '25px' : '-15px',
                 width: '20px',
                 height: '120px',
-                background: `linear-gradient(160deg, transparent 0%, ${WC3.roc.felDark}30 15%, ${WC3.roc.felMid}60 40%, ${WC3.roc.felBright}80 70%, ${WC3.roc.fireCore} 100%)`,
+                background: `linear-gradient(${inf.side === 'left' ? '160deg' : '200deg'}, transparent 0%, ${WC3.roc.felDark}30 15%, ${WC3.roc.felMid}60 40%, ${WC3.roc.felBright}80 70%, ${WC3.roc.fireCore} 100%)`,
                 filter: 'blur(5px)',
-                transform: 'rotate(-20deg)',
+                transform: `rotate(${inf.side === 'left' ? '-20deg' : '20deg'})`,
                 transformOrigin: 'bottom center',
               }} />
               {/* Secondary trail wisps */}
               <div style={{
                 position: 'absolute',
                 top: '-70px',
-                left: '35px',
+                left: inf.side === 'left' ? '35px' : '-25px',
                 width: '10px',
                 height: '80px',
-                background: `linear-gradient(155deg, transparent 0%, ${WC3.roc.felMid}40 50%, ${WC3.roc.felBright}70 100%)`,
+                background: `linear-gradient(${inf.side === 'left' ? '155deg' : '205deg'}, transparent 0%, ${WC3.roc.felMid}40 50%, ${WC3.roc.felBright}70 100%)`,
                 filter: 'blur(4px)',
-                transform: 'rotate(-25deg)',
+                transform: `rotate(${inf.side === 'left' ? '-25deg' : '25deg'})`,
                 transformOrigin: 'bottom center',
                 opacity: 0.6,
               }} />
@@ -873,75 +873,112 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 animation: 'infernalRise 1s ease-out forwards',
               }}
             >
-              {/* WC3 Infernal - Segmented rock golem with fel glow */}
-              <svg width="70" height="90" viewBox="0 0 70 90" style={{ overflow: 'visible' }}>
+              {/* WC3 Infernal - DISTINCT rock segments linked by fel fire */}
+              <svg width="80" height="100" viewBox="0 0 80 100" style={{ overflow: 'visible' }}>
                 <defs>
                   <linearGradient id={`rock${inf.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3a3a38" />
-                    <stop offset="40%" stopColor="#2a2a28" />
+                    <stop offset="0%" stopColor="#4a4a45" />
+                    <stop offset="50%" stopColor="#2a2a28" />
                     <stop offset="100%" stopColor="#1a1a18" />
                   </linearGradient>
-                  <linearGradient id={`felGrad${inf.id}`} x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor={WC3.roc.felMid} />
-                    <stop offset="50%" stopColor={WC3.roc.felBright} />
+                  <linearGradient id={`felFire${inf.id}`} x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stopColor={WC3.roc.felDark} />
+                    <stop offset="40%" stopColor={WC3.roc.felMid} />
+                    <stop offset="70%" stopColor={WC3.roc.felBright} />
                     <stop offset="100%" stopColor="#ffff66" />
                   </linearGradient>
                   <filter id={`glow${inf.id}`}>
-                    <feGaussianBlur stdDeviation="2" result="blur" />
+                    <feGaussianBlur stdDeviation="3" result="blur" />
                     <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                   </filter>
                 </defs>
+
                 {/* Overall fel aura */}
-                <ellipse cx="35" cy="50" rx="40" ry="50" fill={WC3.roc.felBright} opacity="0.15" filter={`url(#glow${inf.id})`} />
-                {/* LEFT LEG - segmented */}
-                <polygon points="22,58 18,72 14,90 22,88 26,72 28,58" fill={`url(#rock${inf.id})`} />
-                <polygon points="14,90 8,92 12,88 18,85" fill={WC3.roc.felBright} opacity="0.8" /> {/* foot claw */}
-                <line x1="20" y1="65" x2="26" y2="65" stroke={WC3.roc.felMid} strokeWidth="2" opacity="0.7" />
-                {/* RIGHT LEG - segmented */}
-                <polygon points="48,58 52,72 56,90 48,88 44,72 42,58" fill={`url(#rock${inf.id})`} />
-                <polygon points="56,90 62,92 58,88 52,85" fill={WC3.roc.felBright} opacity="0.8" /> {/* foot claw */}
-                <line x1="44" y1="65" x2="50" y2="65" stroke={WC3.roc.felMid} strokeWidth="2" opacity="0.7" />
-                {/* TORSO - segmented plates */}
-                <polygon points="20,35 18,58 35,62 52,58 50,35 42,28 28,28" fill={`url(#rock${inf.id})`} />
-                {/* Chest fel glow cracks */}
-                <path d="M28,40 L35,50 L42,40" stroke={WC3.roc.felBright} strokeWidth="3" fill="none" opacity="0.8" />
-                <path d="M25,48 L35,55 L45,48" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" opacity="0.6" />
-                <ellipse cx="35" cy="45" rx="8" ry="6" fill={WC3.roc.felBright} opacity="0.5" filter={`url(#glow${inf.id})`} />
-                {/* LEFT ARM */}
-                <polygon points="18,35 8,42 2,55 6,58 14,48 20,42" fill={`url(#rock${inf.id})`} />
-                {/* Left claws */}
-                <polygon points="2,55 -2,60 2,58 6,55" fill={WC3.roc.felBright} />
-                <polygon points="4,57 0,64 5,61 8,57" fill={WC3.roc.felBright} />
-                <polygon points="6,58 4,66 8,62 10,58" fill={WC3.roc.felBright} />
-                {/* RIGHT ARM */}
-                <polygon points="52,35 62,42 68,55 64,58 56,48 50,42" fill={`url(#rock${inf.id})`} />
-                {/* Right claws */}
-                <polygon points="68,55 72,60 68,58 64,55" fill={WC3.roc.felBright} />
-                <polygon points="66,57 70,64 65,61 62,57" fill={WC3.roc.felBright} />
-                <polygon points="64,58 66,66 62,62 60,58" fill={WC3.roc.felBright} />
-                {/* SHOULDER FLAMES - left */}
-                <ellipse cx="12" cy="32" rx="8" ry="12" fill={`url(#felGrad${inf.id})`} opacity="0.9" filter={`url(#glow${inf.id})`} />
-                <ellipse cx="10" cy="28" rx="5" ry="8" fill="#ffff66" opacity="0.6" />
-                {/* SHOULDER FLAMES - right */}
-                <ellipse cx="58" cy="32" rx="8" ry="12" fill={`url(#felGrad${inf.id})`} opacity="0.9" filter={`url(#glow${inf.id})`} />
-                <ellipse cx="60" cy="28" rx="5" ry="8" fill="#ffff66" opacity="0.6" />
-                {/* HEAD - angular skull */}
-                <polygon points="28,28 25,18 28,8 35,5 42,8 45,18 42,28" fill={`url(#rock${inf.id})`} />
-                {/* V-shaped glowing eyes */}
-                <polygon points="28,16 32,20 30,16 28,12" fill={WC3.roc.felBright} />
-                <polygon points="42,16 38,20 40,16 42,12" fill={WC3.roc.felBright} />
-                {/* Eye glow */}
-                <ellipse cx="30" cy="16" rx="4" ry="3" fill={WC3.roc.felBright} opacity="0.5" filter={`url(#glow${inf.id})`} />
-                <ellipse cx="40" cy="16" rx="4" ry="3" fill={WC3.roc.felBright} opacity="0.5" filter={`url(#glow${inf.id})`} />
-                {/* Mouth glow */}
-                <path d="M32,22 L35,24 L38,22" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" opacity="0.6" />
+                <ellipse cx="40" cy="55" rx="45" ry="55" fill={WC3.roc.felBright} opacity="0.12" filter={`url(#glow${inf.id})`} />
+
+                {/* === LEFT LEG - Two rock segments linked by fire === */}
+                {/* Upper leg rock */}
+                <polygon points="26,62 22,72 28,75 32,65" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* FIRE LINK between leg segments */}
+                <ellipse cx="25" cy="76" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+                {/* Lower leg rock */}
+                <polygon points="22,78 16,95 24,98 28,82" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* Foot claws */}
+                <polygon points="16,95 10,100 16,98" fill={WC3.roc.felBright} />
+                <polygon points="20,97 18,103 24,100" fill={WC3.roc.felBright} />
+
+                {/* === RIGHT LEG - Two rock segments linked by fire === */}
+                {/* Upper leg rock */}
+                <polygon points="54,62 48,65 52,75 58,72" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* FIRE LINK between leg segments */}
+                <ellipse cx="55" cy="76" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+                {/* Lower leg rock */}
+                <polygon points="52,78 56,82 64,98 58,95" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* Foot claws */}
+                <polygon points="64,95 70,100 64,98" fill={WC3.roc.felBright} />
+                <polygon points="60,97 62,103 56,100" fill={WC3.roc.felBright} />
+
+                {/* === FIRE LINKING LEGS TO TORSO === */}
+                <ellipse cx="30" cy="58" rx="6" ry="5" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+                <ellipse cx="50" cy="58" rx="6" ry="5" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+
+                {/* === TORSO - Large central rock with fire core === */}
+                <polygon points="24,35 20,55 40,62 60,55 56,35 48,28 32,28" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* Central fire core visible through cracks */}
+                <ellipse cx="40" cy="45" rx="10" ry="8" fill={`url(#felFire${inf.id})`} opacity="0.8" filter={`url(#glow${inf.id})`} />
+                <path d="M32,42 L40,52 L48,42" stroke={WC3.roc.felBright} strokeWidth="2" fill="none" />
+
+                {/* === LEFT ARM - Two rock segments linked by fire === */}
+                {/* Shoulder rock */}
+                <polygon points="22,35 14,42 18,48 26,42" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* FIRE LINK at elbow */}
+                <ellipse cx="12" cy="50" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+                {/* Forearm rock */}
+                <polygon points="10,52 4,62 10,65 16,56" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* Claws */}
+                <polygon points="4,62 -2,68 4,66" fill={WC3.roc.felBright} />
+                <polygon points="6,64 2,72 8,68" fill={WC3.roc.felBright} />
+                <polygon points="10,65 8,74 14,68" fill={WC3.roc.felBright} />
+
+                {/* === RIGHT ARM - Two rock segments linked by fire === */}
+                {/* Shoulder rock */}
+                <polygon points="58,35 54,42 62,48 66,42" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* FIRE LINK at elbow */}
+                <ellipse cx="68" cy="50" rx="5" ry="4" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+                {/* Forearm rock */}
+                <polygon points="64,52 70,56 76,65 70,62" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* Claws */}
+                <polygon points="76,62 82,68 76,66" fill={WC3.roc.felBright} />
+                <polygon points="74,64 78,72 72,68" fill={WC3.roc.felBright} />
+                <polygon points="70,65 72,74 66,68" fill={WC3.roc.felBright} />
+
+                {/* === FIRE LINKING ARMS TO TORSO === */}
+                <ellipse cx="22" cy="36" rx="5" ry="6" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+                <ellipse cx="58" cy="36" rx="5" ry="6" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+
+                {/* === SHOULDER FLAMES rising up === */}
+                <ellipse cx="18" cy="30" rx="7" ry="12" fill={`url(#felFire${inf.id})`} opacity="0.9" filter={`url(#glow${inf.id})`} />
+                <ellipse cx="62" cy="30" rx="7" ry="12" fill={`url(#felFire${inf.id})`} opacity="0.9" filter={`url(#glow${inf.id})`} />
+
+                {/* === FIRE LINKING HEAD TO TORSO === */}
+                <ellipse cx="40" cy="28" rx="8" ry="5" fill={`url(#felFire${inf.id})`} filter={`url(#glow${inf.id})`} />
+
+                {/* === HEAD - Angular rock skull === */}
+                <polygon points="32,26 28,16 32,8 40,5 48,8 52,16 48,26" fill={`url(#rock${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                {/* Glowing eyes */}
+                <polygon points="33,15 37,18 35,14 33,11" fill={WC3.roc.felBright} />
+                <polygon points="47,15 43,18 45,14 47,11" fill={WC3.roc.felBright} />
+                <ellipse cx="35" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glow${inf.id})`} />
+                <ellipse cx="45" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glow${inf.id})`} />
+                {/* Mouth fire */}
+                <path d="M37,20 L40,23 L43,20" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" />
               </svg>
               {/* Ground scorch */}
               <div style={{
                 position: 'absolute',
-                left: '-35px',
+                left: '-40px',
                 bottom: '-15px',
-                width: '120px',
+                width: '130px',
                 height: '30px',
                 background: `radial-gradient(ellipse, ${WC3.roc.felDark}80 0%, ${WC3.roc.felDark}40 50%, transparent 80%)`,
                 borderRadius: '50%',
@@ -949,7 +986,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             </div>
           )}
 
-          {/* PHASE 4: IDLE - Infernal stands with breathing animation */}
+          {/* PHASE 4: IDLE - Infernal with animated fire links */}
           {inf.phase === 'idle' && (
             <div
               style={{
@@ -959,70 +996,93 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 transform: 'translateX(-50%)',
               }}
             >
-              {/* WC3 Infernal with idle animations */}
-              <svg width="70" height="90" viewBox="0 0 70 90" style={{ overflow: 'visible', animation: 'infernalBreath 2s ease-in-out infinite' }}>
+              {/* WC3 Infernal - Rock segments linked by animated fire */}
+              <svg width="80" height="100" viewBox="0 0 80 100" style={{ overflow: 'visible', animation: 'infernalBreath 2s ease-in-out infinite' }}>
                 <defs>
-                  <linearGradient id={`rockIdle${inf.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#3a3a38" />
-                    <stop offset="40%" stopColor="#2a2a28" />
+                  <linearGradient id={`rockI${inf.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#4a4a45" />
+                    <stop offset="50%" stopColor="#2a2a28" />
                     <stop offset="100%" stopColor="#1a1a18" />
                   </linearGradient>
-                  <linearGradient id={`felGradIdle${inf.id}`} x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor={WC3.roc.felMid} />
-                    <stop offset="50%" stopColor={WC3.roc.felBright} />
+                  <linearGradient id={`felFireI${inf.id}`} x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stopColor={WC3.roc.felDark} />
+                    <stop offset="40%" stopColor={WC3.roc.felMid} />
+                    <stop offset="70%" stopColor={WC3.roc.felBright} />
                     <stop offset="100%" stopColor="#ffff66" />
                   </linearGradient>
-                  <filter id={`glowIdle${inf.id}`}>
-                    <feGaussianBlur stdDeviation="2" result="blur" />
+                  <filter id={`glowI${inf.id}`}>
+                    <feGaussianBlur stdDeviation="3" result="blur" />
                     <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
                   </filter>
                 </defs>
+
                 {/* Overall fel aura - pulsing */}
-                <ellipse cx="35" cy="50" rx="40" ry="50" fill={WC3.roc.felBright} opacity="0.2" filter={`url(#glowIdle${inf.id})`} style={{ animation: 'felPulse 1.5s ease-in-out infinite' }} />
-                {/* LEFT LEG */}
-                <polygon points="22,58 18,72 14,90 22,88 26,72 28,58" fill={`url(#rockIdle${inf.id})`} />
-                <polygon points="14,90 8,92 12,88 18,85" fill={WC3.roc.felBright} opacity="0.8" />
-                <line x1="20" y1="65" x2="26" y2="65" stroke={WC3.roc.felMid} strokeWidth="2" opacity="0.7" style={{ animation: 'flameFlicker 0.4s ease-in-out infinite alternate' }} />
-                {/* RIGHT LEG */}
-                <polygon points="48,58 52,72 56,90 48,88 44,72 42,58" fill={`url(#rockIdle${inf.id})`} />
-                <polygon points="56,90 62,92 58,88 52,85" fill={WC3.roc.felBright} opacity="0.8" />
-                <line x1="44" y1="65" x2="50" y2="65" stroke={WC3.roc.felMid} strokeWidth="2" opacity="0.7" style={{ animation: 'flameFlicker 0.35s ease-in-out infinite alternate' }} />
-                {/* TORSO */}
-                <polygon points="20,35 18,58 35,62 52,58 50,35 42,28 28,28" fill={`url(#rockIdle${inf.id})`} />
-                {/* Chest fel glow - flickering */}
-                <path d="M28,40 L35,50 L42,40" stroke={WC3.roc.felBright} strokeWidth="3" fill="none" opacity="0.8" style={{ animation: 'flameFlicker 0.3s ease-in-out infinite alternate' }} />
-                <path d="M25,48 L35,55 L45,48" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" opacity="0.6" />
-                <ellipse cx="35" cy="45" rx="8" ry="6" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowIdle${inf.id})`} style={{ animation: 'flameFlicker 0.25s ease-in-out infinite alternate' }} />
-                {/* LEFT ARM */}
-                <polygon points="18,35 8,42 2,55 6,58 14,48 20,42" fill={`url(#rockIdle${inf.id})`} />
-                <polygon points="2,55 -2,60 2,58 6,55" fill={WC3.roc.felBright} />
-                <polygon points="4,57 0,64 5,61 8,57" fill={WC3.roc.felBright} />
-                <polygon points="6,58 4,66 8,62 10,58" fill={WC3.roc.felBright} />
-                {/* RIGHT ARM */}
-                <polygon points="52,35 62,42 68,55 64,58 56,48 50,42" fill={`url(#rockIdle${inf.id})`} />
-                <polygon points="68,55 72,60 68,58 64,55" fill={WC3.roc.felBright} />
-                <polygon points="66,57 70,64 65,61 62,57" fill={WC3.roc.felBright} />
-                <polygon points="64,58 66,66 62,62 60,58" fill={WC3.roc.felBright} />
-                {/* SHOULDER FLAMES - animated */}
-                <ellipse cx="12" cy="32" rx="8" ry="12" fill={`url(#felGradIdle${inf.id})`} opacity="0.9" filter={`url(#glowIdle${inf.id})`} style={{ animation: 'flameFlicker 0.2s ease-in-out infinite alternate' }} />
-                <ellipse cx="10" cy="28" rx="5" ry="8" fill="#ffff66" opacity="0.7" style={{ animation: 'flameFlicker 0.15s ease-in-out infinite alternate' }} />
-                <ellipse cx="58" cy="32" rx="8" ry="12" fill={`url(#felGradIdle${inf.id})`} opacity="0.9" filter={`url(#glowIdle${inf.id})`} style={{ animation: 'flameFlicker 0.22s ease-in-out infinite alternate' }} />
-                <ellipse cx="60" cy="28" rx="5" ry="8" fill="#ffff66" opacity="0.7" style={{ animation: 'flameFlicker 0.18s ease-in-out infinite alternate' }} />
-                {/* HEAD */}
-                <polygon points="28,28 25,18 28,8 35,5 42,8 45,18 42,28" fill={`url(#rockIdle${inf.id})`} />
-                {/* Eyes - glowing */}
-                <polygon points="28,16 32,20 30,16 28,12" fill={WC3.roc.felBright} style={{ animation: 'eyeGlow 2s ease-in-out infinite' }} />
-                <polygon points="42,16 38,20 40,16 42,12" fill={WC3.roc.felBright} style={{ animation: 'eyeGlow 2s ease-in-out infinite' }} />
-                <ellipse cx="30" cy="16" rx="4" ry="3" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowIdle${inf.id})`} />
-                <ellipse cx="40" cy="16" rx="4" ry="3" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowIdle${inf.id})`} />
-                <path d="M32,22 L35,24 L38,22" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" opacity="0.6" />
+                <ellipse cx="40" cy="55" rx="45" ry="55" fill={WC3.roc.felBright} opacity="0.15" filter={`url(#glowI${inf.id})`} style={{ animation: 'felPulse 1.5s ease-in-out infinite' }} />
+
+                {/* === LEFT LEG === */}
+                <polygon points="26,62 22,72 28,75 32,65" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <ellipse cx="25" cy="76" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.3s ease-in-out infinite alternate' }} />
+                <polygon points="22,78 16,95 24,98 28,82" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <polygon points="16,95 10,100 16,98" fill={WC3.roc.felBright} />
+                <polygon points="20,97 18,103 24,100" fill={WC3.roc.felBright} />
+
+                {/* === RIGHT LEG === */}
+                <polygon points="54,62 48,65 52,75 58,72" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <ellipse cx="55" cy="76" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.35s ease-in-out infinite alternate' }} />
+                <polygon points="52,78 56,82 64,98 58,95" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <polygon points="64,95 70,100 64,98" fill={WC3.roc.felBright} />
+                <polygon points="60,97 62,103 56,100" fill={WC3.roc.felBright} />
+
+                {/* === HIP FIRE LINKS === */}
+                <ellipse cx="30" cy="58" rx="6" ry="5" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.25s ease-in-out infinite alternate' }} />
+                <ellipse cx="50" cy="58" rx="6" ry="5" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.28s ease-in-out infinite alternate' }} />
+
+                {/* === TORSO === */}
+                <polygon points="24,35 20,55 40,62 60,55 56,35 48,28 32,28" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <ellipse cx="40" cy="45" rx="10" ry="8" fill={`url(#felFireI${inf.id})`} opacity="0.8" filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.2s ease-in-out infinite alternate' }} />
+                <path d="M32,42 L40,52 L48,42" stroke={WC3.roc.felBright} strokeWidth="2" fill="none" />
+
+                {/* === LEFT ARM === */}
+                <polygon points="22,35 14,42 18,48 26,42" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <ellipse cx="12" cy="50" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.32s ease-in-out infinite alternate' }} />
+                <polygon points="10,52 4,62 10,65 16,56" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <polygon points="4,62 -2,68 4,66" fill={WC3.roc.felBright} />
+                <polygon points="6,64 2,72 8,68" fill={WC3.roc.felBright} />
+                <polygon points="10,65 8,74 14,68" fill={WC3.roc.felBright} />
+
+                {/* === RIGHT ARM === */}
+                <polygon points="58,35 54,42 62,48 66,42" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <ellipse cx="68" cy="50" rx="5" ry="4" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.29s ease-in-out infinite alternate' }} />
+                <polygon points="64,52 70,56 76,65 70,62" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <polygon points="76,62 82,68 76,66" fill={WC3.roc.felBright} />
+                <polygon points="74,64 78,72 72,68" fill={WC3.roc.felBright} />
+                <polygon points="70,65 72,74 66,68" fill={WC3.roc.felBright} />
+
+                {/* === SHOULDER FIRE LINKS === */}
+                <ellipse cx="22" cy="36" rx="5" ry="6" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.22s ease-in-out infinite alternate' }} />
+                <ellipse cx="58" cy="36" rx="5" ry="6" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.24s ease-in-out infinite alternate' }} />
+
+                {/* === SHOULDER FLAMES === */}
+                <ellipse cx="18" cy="30" rx="7" ry="12" fill={`url(#felFireI${inf.id})`} opacity="0.9" filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.18s ease-in-out infinite alternate' }} />
+                <ellipse cx="62" cy="30" rx="7" ry="12" fill={`url(#felFireI${inf.id})`} opacity="0.9" filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.2s ease-in-out infinite alternate' }} />
+
+                {/* === NECK FIRE LINK === */}
+                <ellipse cx="40" cy="28" rx="8" ry="5" fill={`url(#felFireI${inf.id})`} filter={`url(#glowI${inf.id})`} style={{ animation: 'flameFlicker 0.26s ease-in-out infinite alternate' }} />
+
+                {/* === HEAD === */}
+                <polygon points="32,26 28,16 32,8 40,5 48,8 52,16 48,26" fill={`url(#rockI${inf.id})`} stroke="#1a1a18" strokeWidth="1" />
+                <polygon points="33,15 37,18 35,14 33,11" fill={WC3.roc.felBright} style={{ animation: 'eyeGlow 2s ease-in-out infinite' }} />
+                <polygon points="47,15 43,18 45,14 47,11" fill={WC3.roc.felBright} style={{ animation: 'eyeGlow 2s ease-in-out infinite' }} />
+                <ellipse cx="35" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowI${inf.id})`} />
+                <ellipse cx="45" cy="14" rx="3" ry="2" fill={WC3.roc.felBright} opacity="0.6" filter={`url(#glowI${inf.id})`} />
+                <path d="M37,20 L40,23 L43,20" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" />
               </svg>
               {/* Ground scorch */}
               <div style={{
                 position: 'absolute',
-                left: '-35px',
+                left: '-40px',
                 bottom: '-15px',
-                width: '120px',
+                width: '130px',
                 height: '30px',
                 background: `radial-gradient(ellipse, ${WC3.roc.felDark}80 0%, ${WC3.roc.felDark}40 50%, transparent 80%)`,
                 borderRadius: '50%',
