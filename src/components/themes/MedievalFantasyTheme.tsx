@@ -307,74 +307,95 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
   const [infernals, setInfernals] = useState<Array<{
     id: number
     x: number
-    landX: number // where it lands (diagonal drift)
+    landX: number
+    side: 'left' | 'right'
     phase: 'falling' | 'explosion' | 'rising' | 'idle'
   }>>([])
 
   useEffect(() => {
     let infernalId = 0
+    let isActive = true
+    const timeouts: NodeJS.Timeout[] = []
 
     const triggerLightningStorm = () => {
-      const x = 15 + Math.random() * 70
-      setLightningX(x)
+      if (!isActive) return
+
+      // Lightning in the sky area
+      const lightX = 20 + Math.random() * 60
+      setLightningX(lightX)
       setLightningActive(true)
       setCloudGlow(1)
 
-      setTimeout(() => setCloudGlow(0.6), 100)
-      setTimeout(() => setCloudGlow(0.25), 200)
-      setTimeout(() => {
+      timeouts.push(setTimeout(() => setCloudGlow(0.6), 100))
+      timeouts.push(setTimeout(() => setCloudGlow(0.25), 200))
+      timeouts.push(setTimeout(() => {
         setLightningActive(false)
         setCloudGlow(0)
-      }, 400)
+      }, 400))
 
-      // Spawn infernal after lightning
-      setTimeout(() => {
+      // Spawn infernal on LEFT or RIGHT side of content (not middle)
+      timeouts.push(setTimeout(() => {
+        if (!isActive) return
         const newId = infernalId++
-        const startX = x + (Math.random() - 0.5) * 15
-        const landX = startX + (Math.random() > 0.5 ? 1 : -1) * (8 + Math.random() * 7) // Diagonal drift
+        const side: 'left' | 'right' = Math.random() > 0.5 ? 'left' : 'right'
+        // Left side: 5-18%, Right side: 82-95% - beside the content card
+        const startX = side === 'left' ? (5 + Math.random() * 13) : (82 + Math.random() * 13)
+        // Diagonal drift toward center
+        const drift = side === 'left' ? (5 + Math.random() * 8) : -(5 + Math.random() * 8)
+        const landX = startX + drift
 
         // Phase 1: Falling (4s slow diagonal descent)
-        setInfernals(prev => [...prev, { id: newId, x: startX, landX, phase: 'falling' }])
+        setInfernals(prev => [...prev, { id: newId, x: startX, landX, side, phase: 'falling' }])
 
         // Phase 2: Explosion (after 4s fall)
-        setTimeout(() => {
+        timeouts.push(setTimeout(() => {
+          if (!isActive) return
           setInfernals(prev => prev.map(inf =>
             inf.id === newId ? { ...inf, phase: 'explosion' } : inf
           ))
-        }, 4000)
+        }, 4000))
 
         // Phase 3: Rising (after 0.6s explosion)
-        setTimeout(() => {
+        timeouts.push(setTimeout(() => {
+          if (!isActive) return
           setInfernals(prev => prev.map(inf =>
             inf.id === newId ? { ...inf, phase: 'rising' } : inf
           ))
-        }, 4600)
+        }, 4600))
 
         // Phase 4: Idle (after 1s rising)
-        setTimeout(() => {
+        timeouts.push(setTimeout(() => {
+          if (!isActive) return
           setInfernals(prev => prev.map(inf =>
             inf.id === newId ? { ...inf, phase: 'idle' } : inf
           ))
-        }, 5600)
+        }, 5600))
 
-        // Remove after 12s total (stays on screen ~7s after landing)
-        setTimeout(() => {
+        // Remove after 12s total
+        timeouts.push(setTimeout(() => {
+          if (!isActive) return
           setInfernals(prev => prev.filter(inf => inf.id !== newId))
-        }, 12000)
-      }, 200)
+        }, 12000))
+      }, 200))
     }
 
     const scheduleNext = () => {
-      const delay = 10000 + Math.random() * 15000 // 10-25s between (less frequent)
-      return setTimeout(() => {
+      if (!isActive) return
+      const delay = 6000 + Math.random() * 8000 // 6-14s between infernals
+      timeouts.push(setTimeout(() => {
         triggerLightningStorm()
         scheduleNext()
-      }, delay)
+      }, delay))
     }
 
-    setTimeout(triggerLightningStorm, 3000)
-    const timeout = scheduleNext()
-    return () => clearTimeout(timeout)
+    // Start first infernal quickly
+    timeouts.push(setTimeout(triggerLightningStorm, 1500))
+    scheduleNext()
+
+    return () => {
+      isActive = false
+      timeouts.forEach(t => clearTimeout(t))
+    }
   }, [])
 
   // Heavy storm rain - 3 layers for depth
@@ -696,7 +717,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 position: 'absolute',
                 left: `${inf.x}%`,
                 top: '-8%',
-                animation: 'infernalDiagonalFall 4s ease-in forwards',
+                animation: `infernalFall${inf.side === 'left' ? 'Right' : 'Left'} 4s ease-in forwards`,
               }}
             >
               {/* Outer glow - large atmospheric */}
@@ -999,8 +1020,8 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       }} />
 
       <style>{`
-        /* Infernal diagonal fall - 4s slow descent to middle of screen */
-        @keyframes infernalDiagonalFall {
+        /* Infernal falling from LEFT side - drifts RIGHT toward content */
+        @keyframes infernalFallRight {
           0% {
             transform: translate(0, 0) scale(0.5);
             opacity: 0;
@@ -1010,7 +1031,22 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             transform: translate(1vw, 3vh) scale(0.6);
           }
           100% {
-            transform: translate(15vw, 58vh) scale(1);
+            transform: translate(8vw, 55vh) scale(1);
+            opacity: 1;
+          }
+        }
+        /* Infernal falling from RIGHT side - drifts LEFT toward content */
+        @keyframes infernalFallLeft {
+          0% {
+            transform: translate(0, 0) scale(0.5);
+            opacity: 0;
+          }
+          5% {
+            opacity: 1;
+            transform: translate(-1vw, 3vh) scale(0.6);
+          }
+          100% {
+            transform: translate(-8vw, 55vh) scale(1);
             opacity: 1;
           }
         }
@@ -1237,42 +1273,53 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
           </filter>
         </defs>
 
-        {/* === THE FROZEN THRONE - Prominent in far background === */}
-        {/* Massive throne glow - icy power emanating */}
-        <ellipse cx="500" cy="80" rx="200" ry="120" fill="url(#throneGlow)" filter="url(#iceGlow)" opacity="0.6" />
-        <ellipse cx="500" cy="60" rx="100" ry="60" fill={WC3.ft.iceBright} filter="url(#iceGlow)" opacity="0.15" />
+        {/* === THE FROZEN THRONE - HIGHLY VISIBLE in center background === */}
+        {/* Massive throne glow - icy power emanating from the throne */}
+        <ellipse cx="500" cy="150" rx="280" ry="180" fill={WC3.ft.iceMid} filter="url(#iceGlow)" opacity="0.25" />
+        <ellipse cx="500" cy="120" rx="180" ry="100" fill={WC3.ft.iceBright} filter="url(#iceGlow)" opacity="0.2" />
+        <ellipse cx="500" cy="100" rx="80" ry="50" fill={WC3.ft.iceBright} filter="url(#iceGlow)" opacity="0.35" />
 
-        {/* The Frozen Throne structure - MORE VISIBLE */}
-        <g transform="translate(500, 50)" filter="url(#ftDistantBlur)" opacity="0.55">
-          {/* Throne base - massive ice platform */}
-          <polygon points="-160,280 -140,200 -100,220 -60,150 -30,170 0,100 30,170 60,150 100,220 140,200 160,280" fill="#0c1e38" />
+        {/* The Frozen Throne structure - NO BLUR, higher opacity */}
+        <g transform="translate(500, 80)" opacity="0.75">
+          {/* Throne base - massive ice platform with ice-blue tint */}
+          <polygon points="-200,320 -170,220 -130,250 -80,160 -40,190 0,100 40,190 80,160 130,250 170,220 200,320" fill="#1a3050" />
+          <polygon points="-180,300 -150,240 -100,260 -50,200 50,200 100,260 150,240 180,300" fill="#152840" />
           {/* Ice steps cascading down */}
-          <polygon points="-180,280 -160,250 -120,260 -80,230 80,230 120,260 160,250 180,280" fill="#081828" />
-          <polygon points="-140,260 -100,240 -60,250 60,250 100,240 140,260" fill="#0a1a30" opacity="0.7" />
+          <polygon points="-220,320 -200,280 -160,295 -100,260 100,260 160,295 200,280 220,320" fill="#102538" />
+          <polygon points="-160,300 -120,275 -70,290 70,290 120,275 160,300" fill="#0d2030" opacity="0.8" />
 
-          {/* Central throne spire - Lich King's seat */}
-          <polygon points="-40,150 -25,80 -15,100 0,20 15,100 25,80 40,150" fill="#102545" />
-          <polygon points="-25,120 -15,60 0,30 15,60 25,120" fill={WC3.ft.iceDark} opacity="0.6" />
-          {/* Inner glow of throne */}
-          <polygon points="-15,100 0,40 15,100" fill={WC3.ft.iceMid} opacity="0.4" />
+          {/* Central throne spire - Lich King's seat - PROMINENT */}
+          <polygon points="-50,180 -35,100 -20,130 0,30 20,130 35,100 50,180" fill="#1e3855" />
+          <polygon points="-35,150 -20,80 0,40 20,80 35,150" fill={WC3.ft.iceDark} opacity="0.8" />
+          {/* Inner ice glow of throne */}
+          <polygon points="-20,130 0,50 20,130" fill={WC3.ft.iceMid} opacity="0.6" />
+          <polygon points="-12,110 0,60 12,110" fill={WC3.ft.iceBright} opacity="0.4" />
 
-          {/* Ice crown at apex - glowing */}
-          <polygon points="-10,50 0,10 10,50" fill={WC3.ft.iceMid} opacity="0.6" />
-          <polygon points="-6,40 0,15 6,40" fill={WC3.ft.iceBright} opacity="0.5" />
-          {/* Crown glow */}
-          <ellipse cx="0" cy="20" rx="20" ry="15" fill={WC3.ft.iceBright} opacity="0.3" filter="url(#iceGlow)" />
+          {/* Ice crown at apex - GLOWING BRIGHTLY */}
+          <polygon points="-15,70 0,20 15,70" fill={WC3.ft.iceMid} opacity="0.8" />
+          <polygon points="-10,60 0,25 10,60" fill={WC3.ft.iceBright} opacity="0.7" />
+          <polygon points="-6,50 0,30 6,50" fill="#ffffff" opacity="0.5" />
+          {/* Crown power glow */}
+          <ellipse cx="0" cy="35" rx="30" ry="25" fill={WC3.ft.iceBright} opacity="0.5" filter="url(#iceGlow)" />
+          <ellipse cx="0" cy="30" rx="15" ry="12" fill="#ffffff" opacity="0.3" filter="url(#iceGlow)" />
 
-          {/* Flanking spires - left */}
-          <polygon points="-100,200 -90,120 -80,140 -70,80 -60,130 -50,200" fill="#0d1a35" />
-          <polygon points="-75,100 -70,80 -65,95" fill={WC3.ft.iceMid} opacity="0.3" />
+          {/* Flanking spires - left - taller */}
+          <polygon points="-120,240 -105,140 -95,170 -80,90 -70,150 -55,240" fill="#1a3048" />
+          <polygon points="-95,120 -80,90 -70,115" fill={WC3.ft.iceMid} opacity="0.5" />
+          <polygon points="-150,280 -140,200 -130,280" fill="#152840" />
 
-          {/* Flanking spires - right */}
-          <polygon points="50,200 60,130 70,80 80,140 90,120 100,200" fill="#0d1a35" />
-          <polygon points="65,95 70,80 75,100" fill={WC3.ft.iceMid} opacity="0.3" />
+          {/* Flanking spires - right - taller */}
+          <polygon points="55,240 70,150 80,90 95,170 105,140 120,240" fill="#1a3048" />
+          <polygon points="70,115 80,90 95,120" fill={WC3.ft.iceMid} opacity="0.5" />
+          <polygon points="130,280 140,200 150,280" fill="#152840" />
 
           {/* Outer tower spires */}
-          <polygon points="-130,240 -120,160 -110,240" fill="#0a1530" />
-          <polygon points="110,240 120,160 130,240" fill="#0a1530" />
+          <polygon points="-170,300 -155,190 -140,300" fill="#12253a" />
+          <polygon points="140,300 155,190 170,300" fill="#12253a" />
+
+          {/* Ice detail highlights */}
+          <line x1="-30" y1="160" x2="0" y2="60" stroke={WC3.ft.iceBright} strokeWidth="1" opacity="0.3" />
+          <line x1="30" y1="160" x2="0" y2="60" stroke={WC3.ft.iceBright} strokeWidth="1" opacity="0.3" />
         </g>
 
         {/* === FAR LAYER - Distant mountain ranges === */}
