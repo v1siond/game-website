@@ -82,14 +82,15 @@ const FadeInSection = memo(function FadeInSection({
   children: React.ReactNode
   delay?: number
 }) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px -5% 0px' })
+  // Trigger when 20% of element is visible, with -20% margin so it triggers when well into viewport
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.2, rootMargin: '0px 0px -20% 0px' })
   return (
     <div
       ref={ref}
       style={{
         opacity: triggered ? 1 : 0,
-        transform: triggered ? 'translateY(0)' : 'translateY(20px)',
-        transition: `opacity 0.6s ease-out ${delay}ms, transform 0.6s ease-out ${delay}ms`
+        transform: triggered ? 'translateY(0)' : 'translateY(30px)',
+        transition: `opacity 0.7s ease-out ${delay}ms, transform 0.7s ease-out ${delay}ms`
       }}
     >
       {children}
@@ -1056,126 +1057,9 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           ))}
         </g>
 
-        {/* === WAR DEBRIS - Aftermath of a battlefield === */}
+        {/* === WAR DEBRIS - Ground level only, matching terrain === */}
         <g>
-          {/* ======================================================= */}
-          {/* === BACKGROUND DEBRIS (y=350-500) - Distant, faded === */}
-          {/* ======================================================= */}
-          <g opacity="0.25" filter="url(#rocDistantBlur)">
-            {/* Distant broken spear - far left background */}
-            <g transform="translate(50, 420) rotate(65)">
-              <rect x="-2" y="-50" width="4" height="50" fill="#3a2a18" />
-            </g>
-            {/* Distant fallen shield - left background */}
-            <g transform="translate(150, 380)">
-              <ellipse cx="0" cy="0" rx="25" ry="10" fill="#5a4530" />
-              <ellipse cx="0" cy="0" rx="20" ry="8" fill="#4a3a28" />
-            </g>
-            {/* Distant axe - center-left background */}
-            <g transform="translate(350, 400) rotate(-25)">
-              <rect x="-2" y="-40" width="4" height="40" fill="#3a2815" />
-              <path d="M-2,-40 Q-18,-35 -15,-22 L2,-28 Z" fill="#4a4a42" />
-            </g>
-            {/* Distant sword stuck in ground - right background */}
-            <g transform="translate(700, 390) rotate(10)">
-              <rect x="-2" y="-55" width="4" height="55" fill="#4a4a45" />
-              <rect x="-5" y="-5" width="10" height="4" fill="#3a2a1a" />
-            </g>
-            {/* Distant banner pole (no fabric) - far right */}
-            <g transform="translate(900, 410) rotate(-8)">
-              <rect x="-2" y="-70" width="4" height="70" fill="#3a2815" />
-            </g>
-            {/* Distant orc drum - center background */}
-            <g transform="translate(500, 430)">
-              <ellipse cx="0" cy="0" rx="22" ry="12" fill="#4a3520" />
-              <ellipse cx="0" cy="-3" rx="18" ry="9" fill="#5a4530" />
-              <ellipse cx="0" cy="-5" rx="14" ry="7" fill="#3a2515" />
-            </g>
-          </g>
-
-          {/* ======================================================= */}
-          {/* === MIDGROUND DEBRIS (y=500-680) - Medium distance === */}
-          {/* ======================================================= */}
-          <g opacity="0.4">
-            {/* Mid orc war drum - left side */}
-            <g transform="translate(100, 620)">
-              <ellipse cx="0" cy="0" rx="35" ry="18" fill="#5a4025" />
-              <ellipse cx="0" cy="-5" rx="30" ry="15" fill="#6a5035" />
-              <ellipse cx="0" cy="-8" rx="25" ry="12" fill="#4a3020" />
-              <line x1="-20" y1="-8" x2="-25" y2="-25" stroke="#3a2815" strokeWidth="4" />
-              <ellipse cx="-28" cy="-28" rx="8" ry="8" fill="#5a4a35" />
-            </g>
-            {/* Mid fallen banner - center-left */}
-            <g transform="translate(280, 580) rotate(75)">
-              <rect x="-3" y="-80" width="6" height="80" fill="#3a2815" />
-              <polygon points="3,-80 50,-70 45,-40 3,-50" fill="#662020" opacity="0.7" />
-            </g>
-            {/* Mid shield with spears - center */}
-            <g transform="translate(450, 600)">
-              <g transform="rotate(-30)">
-                <rect x="-2" y="-65" width="4" height="65" fill="#3a2815" />
-                <polygon points="0,-75 -5,-60 5,-60" fill="#4a4a42" />
-              </g>
-              <ellipse cx="15" cy="5" rx="30" ry="15" fill="#5a4530" />
-              <ellipse cx="15" cy="5" rx="25" ry="12" fill="#4a3a28" />
-              <ellipse cx="15" cy="5" rx="10" ry="5" fill="#664422" />
-            </g>
-            {/* Mid broken axe - right side */}
-            <g transform="translate(750, 610) rotate(20)">
-              <rect x="-3" y="-55" width="6" height="55" fill="#4a3520" />
-              <path d="M-3,-55 Q-25,-45 -20,-30 L3,-38 Z" fill="#5a5a52" />
-            </g>
-            {/* Mid armor piece - far right */}
-            <g transform="translate(880, 590)">
-              <ellipse cx="0" cy="0" rx="20" ry="25" fill="#4a4a45" />
-              <ellipse cx="0" cy="-5" rx="15" ry="18" fill="#3a3a38" />
-              <path d="M-12,10 L-18,30 M12,10 L18,30" stroke="#4a4a45" strokeWidth="4" />
-            </g>
-            {/* Mid sword lying flat - left */}
-            <g transform="translate(180, 660) rotate(80)">
-              <polygon points="-2,-50 2,-50 3,-5 -3,-5" fill="#5a5a55" />
-              <rect x="-5" y="-5" width="10" height="4" fill="#4a3a25" />
-            </g>
-            {/* Mid spear - far left */}
-            <g transform="translate(40, 600) rotate(-15)">
-              <rect x="-2" y="-90" width="4" height="90" fill="#4a3520" />
-              <polygon points="0,-100 -6,-85 6,-85" fill="#5a5a52" />
-            </g>
-          </g>
-
-          {/* ======================================================= */}
-          {/* === FOREGROUND DEBRIS (y=700-800) - Close, detailed === */}
-          {/* ======================================================= */}
-          {/* Broken sword lying flat - far left */}
-          <g transform="translate(80, 760) rotate(85)">
-            <polygon points="-3,-45 3,-45 4,-5 -4,-5" fill="url(#metalGray)" />
-            <rect x="-7" y="-5" width="14" height="5" fill="#4a3a25" />
-          </g>
-          {/* Dagger lying flat - center-left */}
-          <g transform="translate(350, 780) rotate(-70)">
-            <polygon points="-2,-30 2,-30 3,-5 -3,-5" fill="#5a5a55" />
-            <rect x="-4" y="-5" width="8" height="4" fill="#3a2a1a" />
-          </g>
-          {/* War horn - center */}
-          <g transform="translate(480, 770) rotate(25)">
-            <path d="M0,0 Q15,-8 35,-5 Q40,-2 38,5 Q35,8 15,12 Q5,10 0,0" fill="#6a5535" />
-            <ellipse cx="2" cy="3" rx="5" ry="6" fill="#4a3525" />
-          </g>
-          {/* Mace lying flat - right side */}
-          <g transform="translate(720, 770) rotate(75)">
-            <rect x="-3" y="-60" width="6" height="60" fill="url(#woodBrown)" />
-            <ellipse cx="0" cy="-65" rx="12" ry="10" fill="url(#metalGray)" />
-            <ellipse cx="0" cy="-65" rx="8" ry="7" fill="#4a4a45" />
-          </g>
-          {/* Helmet - far right foreground */}
-          <g transform="translate(880, 765)">
-            <ellipse cx="0" cy="0" rx="22" ry="15" fill="#4a4a45" />
-            <ellipse cx="0" cy="-5" rx="18" ry="10" fill="#5a5a55" />
-            <path d="M-15,-8 Q0,-20 15,-8" fill="#4a4a45" stroke="#3a3a38" strokeWidth="2" />
-            <rect x="-3" y="-18" width="6" height="8" fill="#5a5a55" />
-          </g>
-
-          {/* === ORANGE SHIELD - Lying on ground (center-right) === */}
+          {/* === ORANGE SHIELD - Lying flat on ground (center-right) === */}
           <g transform="translate(620, 720)">
             <ellipse cx="0" cy="0" rx="70" ry="28" fill="url(#shieldOrange)" />
             <ellipse cx="0" cy="0" rx="60" ry="23" fill="#bb7744" />
@@ -1195,47 +1079,12 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             <ellipse cx="-25" cy="-8" rx="20" ry="6" fill="#2a4555" opacity="0.4" />
           </g>
 
-          {/* === ROCKS AND DEBRIS (scattered) === */}
-          <polygon points="180,785 195,760 215,780" fill="#3a4530" opacity="0.7" />
-          <polygon points="380,775 398,745 418,770 408,785" fill="#354028" opacity="0.6" />
-          <polygon points="580,790 595,770 612,788" fill="#3a4530" opacity="0.5" />
-          <polygon points="760,785 775,765 792,782" fill="#354028" opacity="0.6" />
+          {/* === ROCKS - Low to ground, natural === */}
+          <polygon points="180,795 195,780 215,792" fill="#3a4530" opacity="0.5" />
+          <polygon points="380,798 398,785 418,795" fill="#354028" opacity="0.4" />
+          <polygon points="760,796 775,783 792,794" fill="#354028" opacity="0.4" />
 
-          {/* === WEAPONS STUCK IN GROUND (anchored at ground level y~770-800) === */}
-          {/* Axe anchored in ground - left side */}
-          <g transform="translate(300, 780) rotate(-12)">
-            <rect x="-4" y="-75" width="8" height="75" fill="url(#woodBrown)" />
-            <path d="M-4,-75 Q-28,-65 -24,-48 L4,-56 Z" fill="url(#metalGray)" />
-            <path d="M-4,-73 Q-24,-65 -20,-50 L2,-57 Z" fill="#5a5a55" />
-          </g>
-          {/* Broken sword stuck at angle - center (moved to side of shield area) */}
-          <g transform="translate(530, 785) rotate(-70)">
-            <rect x="-3" y="-65" width="6" height="65" fill="url(#metalGray)" />
-            <rect x="-8" y="-5" width="16" height="6" fill="#4a3a25" />
-            <polygon points="0,-72 -4,-62 4,-62" fill="#6a6a65" />
-          </g>
-          {/* Spear anchored - right of shield */}
-          <g transform="translate(720, 775) rotate(-8)">
-            <rect x="-3" y="-100" width="6" height="100" fill="url(#woodBrown)" />
-            <polygon points="0,-112 -6,-95 6,-95" fill="url(#metalGray)" />
-          </g>
-          {/* Halberd anchored - far right near edge */}
-          <g transform="translate(950, 770) rotate(5)">
-            <rect x="-3" y="-110" width="6" height="110" fill="url(#woodBrown)" />
-            <polygon points="0,-125 -8,-105 8,-105" fill="url(#metalGray)" />
-            <path d="M-8,-105 Q-12,-115 -4,-125" fill="url(#metalGray)" />
-          </g>
-          {/* Broken spear lying at angle - left side */}
-          <g transform="translate(120, 775) rotate(55)">
-            <rect x="-2" y="-60" width="5" height="60" fill="url(#woodBrown)" />
-          </g>
-          {/* Second axe - far left */}
-          <g transform="translate(50, 785) rotate(15)">
-            <rect x="-3" y="-55" width="6" height="55" fill="url(#woodBrown)" />
-            <path d="M3,-55 Q22,-48 18,-35 L-3,-42 Z" fill="url(#metalGray)" />
-          </g>
-
-          {/* === HORDE WAR BANNER - On TOP of weapons with wind animation === */}
+          {/* === HORDE WAR BANNER - Main decorative element === */}
           <g transform="translate(200, 520) rotate(-10)" className="war-banner">
             {/* Banner pole */}
             <rect x="0" y="0" width="12" height="230" fill="#3a2815" />
@@ -1520,7 +1369,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             </div>
           )}
 
-          {/* PHASE 2: EXPLOSION - Fel green explosion */}
+          {/* PHASE 2: EXPLOSION - Dramatic fel green explosion with shockwave */}
           {inf.phase === 'explosion' && (
             <div
               style={{
@@ -1532,43 +1381,74 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 pointerEvents: 'none',
               }}
             >
-              {/* Main explosion flash */}
+              {/* Shockwave ring expanding outward */}
               <div style={{
                 position: 'absolute',
-                left: '-80px',
-                bottom: '-40px',
-                width: '160px',
-                height: '100px',
-                background: `radial-gradient(ellipse at 50% 80%, ${WC3.roc.fireCore} 0%, ${WC3.roc.felBright}90 20%, ${WC3.roc.felMid}60 45%, ${WC3.roc.felDark}30 70%, transparent 100%)`,
-                animation: 'explosionFlash 0.6s ease-out forwards',
+                left: '-120px',
+                bottom: '-20px',
+                width: '240px',
+                height: '60px',
+                border: `3px solid ${WC3.roc.felBright}`,
+                borderRadius: '50%',
+                animation: 'shockwaveExpand 0.5s ease-out forwards',
+                opacity: 0.8,
               }} />
-              {/* Debris particles */}
-              {[0, 1, 2, 3, 4].map((i) => (
+              {/* Main explosion flash - larger and brighter */}
+              <div style={{
+                position: 'absolute',
+                left: '-100px',
+                bottom: '-50px',
+                width: '200px',
+                height: '130px',
+                background: `radial-gradient(ellipse at 50% 75%, ${WC3.roc.fireCore} 0%, ${WC3.roc.felBright} 15%, ${WC3.roc.felMid}90 35%, ${WC3.roc.felDark}50 60%, transparent 100%)`,
+                animation: 'explosionFlash 0.7s ease-out forwards',
+              }} />
+              {/* Secondary flash layer */}
+              <div style={{
+                position: 'absolute',
+                left: '-60px',
+                bottom: '-30px',
+                width: '120px',
+                height: '80px',
+                background: `radial-gradient(ellipse at 50% 80%, ${WC3.roc.fireCore} 0%, ${WC3.roc.fireBright}80 30%, transparent 70%)`,
+                animation: 'explosionFlash 0.5s ease-out forwards',
+                animationDelay: '0.1s',
+              }} />
+              {/* Debris particles - more of them, varied sizes */}
+              {[...Array(12)].map((_, i) => (
                 <div
                   key={i}
                   style={{
                     position: 'absolute',
-                    left: `${-20 + i * 10}px`,
-                    bottom: '0px',
-                    width: '8px',
-                    height: '8px',
+                    left: `${-30 + (i % 6) * 12}px`,
+                    bottom: `${5 + (i % 3) * 5}px`,
+                    width: `${6 + (i % 4) * 2}px`,
+                    height: `${6 + (i % 4) * 2}px`,
                     borderRadius: '30%',
-                    background: i % 2 === 0 ? WC3.roc.felBright : WC3.roc.fireBright,
-                    animation: `debrisFly${i % 3} 0.5s ease-out forwards`,
-                    opacity: 0.8,
+                    background: i % 3 === 0 ? WC3.roc.fireCore : i % 3 === 1 ? WC3.roc.felBright : '#3a3530',
+                    animation: `debrisFly${i % 3} ${0.4 + (i % 4) * 0.1}s ease-out forwards`,
+                    animationDelay: `${i * 0.02}s`,
+                    opacity: 0.9,
                   }}
                 />
               ))}
-              {/* Ground scorch mark */}
-              <div style={{
-                position: 'absolute',
-                left: '-50px',
-                bottom: '-10px',
-                width: '100px',
-                height: '25px',
-                background: `radial-gradient(ellipse, ${WC3.roc.felDark} 0%, ${WC3.roc.felDark}60 40%, transparent 80%)`,
-                borderRadius: '50%',
-              }} />
+              {/* Smoke wisps rising */}
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={`smoke${i}`}
+                  style={{
+                    position: 'absolute',
+                    left: `${-20 + i * 20}px`,
+                    bottom: '10px',
+                    width: '30px',
+                    height: '60px',
+                    background: `linear-gradient(to top, ${WC3.roc.felDark}60 0%, ${WC3.roc.felDark}20 50%, transparent 100%)`,
+                    filter: 'blur(8px)',
+                    animation: `smokeRise 1s ease-out forwards`,
+                    animationDelay: `${i * 0.15}s`,
+                  }}
+                />
+              ))}
             </div>
           )}
 
@@ -1600,7 +1480,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             </div>
           )}
 
-          {/* PHASE 4: IDLE - Same infernal design as rising, with subtle idle animations */}
+          {/* PHASE 4: IDLE - Infernal with crater beneath */}
           {inf.phase === 'idle' && (
             <div
               style={{
@@ -1612,15 +1492,48 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 pointerEvents: 'none',
               }}
             >
-              {/* Shadow FIRST - golem renders on top of shadow */}
+              {/* === CRATER - Permanent destruction from impact === */}
+              <svg
+                width="220"
+                height="60"
+                viewBox="0 0 220 60"
+                style={{
+                  position: 'absolute',
+                  left: '-30px',
+                  bottom: '-25px',
+                  zIndex: -1,
+                }}
+              >
+                {/* Crater hole - dark center */}
+                <ellipse cx="110" cy="35" rx="85" ry="22" fill="#0a0806" />
+                <ellipse cx="110" cy="33" rx="70" ry="18" fill="#151210" />
+                {/* Crater rim - raised earth with cracks */}
+                <ellipse cx="110" cy="35" rx="95" ry="28" fill="none" stroke="#2a2520" strokeWidth="4" />
+                <ellipse cx="110" cy="35" rx="100" ry="30" fill="none" stroke="#1a1815" strokeWidth="2" />
+                {/* Radiating cracks */}
+                <path d="M25,32 L55,34" stroke="#1a1512" strokeWidth="2" />
+                <path d="M15,40 L45,38" stroke="#151210" strokeWidth="1.5" />
+                <path d="M195,30 L165,33" stroke="#1a1512" strokeWidth="2" />
+                <path d="M205,38 L175,37" stroke="#151210" strokeWidth="1.5" />
+                <path d="M90,8 L95,22" stroke="#1a1512" strokeWidth="2" />
+                <path d="M130,10 L125,23" stroke="#151210" strokeWidth="1.5" />
+                {/* Scorched earth texture */}
+                <ellipse cx="80" cy="35" rx="12" ry="5" fill="#1a1512" opacity="0.6" />
+                <ellipse cx="140" cy="36" rx="15" ry="6" fill="#151210" opacity="0.5" />
+                <ellipse cx="110" cy="38" rx="8" ry="3" fill="#0a0806" opacity="0.7" />
+                {/* Fel glow from within */}
+                <ellipse cx="110" cy="38" rx="40" ry="12" fill={WC3.roc.felDark} opacity="0.2" />
+                <ellipse cx="110" cy="40" rx="20" ry="6" fill={WC3.roc.felMid} opacity="0.15" />
+              </svg>
+              {/* Shadow on top of crater */}
               <div style={{
                 position: 'absolute',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                bottom: '-10px',
-                width: '200px',
-                height: '40px',
-                background: `radial-gradient(ellipse, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.35) 45%, ${WC3.roc.felDark}15 75%, transparent 100%)`,
+                bottom: '-8px',
+                width: '180px',
+                height: '35px',
+                background: `radial-gradient(ellipse, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.4) 40%, ${WC3.roc.felDark}18 70%, transparent 100%)`,
                 borderRadius: '50%',
               }} />
               <InfernalGolemSVG id={inf.id} isIdle={true} scale={1} />
@@ -1676,30 +1589,50 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       }} />
 
       <style>{`
-        /* Infernal falling from LEFT side - starts above, drifts right as it falls */
+        /* Infernal falling from LEFT side - starts tiny and far, grows as it approaches */
         @keyframes infernalFallRight {
           0% {
-            transform: translateX(-50%) translate(-8vw, -90vh) scale(0.4);
+            transform: translateX(-50%) translate(-12vw, -95vh) scale(0.1);
             opacity: 0;
           }
-          5% {
-            opacity: 1;
-            transform: translateX(-50%) translate(-7vw, -85vh) scale(0.5);
+          8% {
+            opacity: 0.6;
+            transform: translateX(-50%) translate(-10vw, -85vh) scale(0.2);
+          }
+          30% {
+            opacity: 0.9;
+            transform: translateX(-50%) translate(-6vw, -55vh) scale(0.4);
+          }
+          60% {
+            transform: translateX(-50%) translate(-3vw, -25vh) scale(0.65);
+          }
+          85% {
+            transform: translateX(-50%) translate(-1vw, -8vh) scale(0.85);
           }
           100% {
             transform: translateX(-50%) translate(0, 0) scale(1);
             opacity: 1;
           }
         }
-        /* Infernal falling from RIGHT side - starts above, drifts left as it falls */
+        /* Infernal falling from RIGHT side - starts tiny and far, grows as it approaches */
         @keyframes infernalFallLeft {
           0% {
-            transform: translateX(-50%) translate(8vw, -90vh) scale(0.4);
+            transform: translateX(-50%) translate(12vw, -95vh) scale(0.1);
             opacity: 0;
           }
-          5% {
-            opacity: 1;
-            transform: translateX(-50%) translate(7vw, -85vh) scale(0.5);
+          8% {
+            opacity: 0.6;
+            transform: translateX(-50%) translate(10vw, -85vh) scale(0.2);
+          }
+          30% {
+            opacity: 0.9;
+            transform: translateX(-50%) translate(6vw, -55vh) scale(0.4);
+          }
+          60% {
+            transform: translateX(-50%) translate(3vw, -25vh) scale(0.65);
+          }
+          85% {
+            transform: translateX(-50%) translate(1vw, -8vh) scale(0.85);
           }
           100% {
             transform: translateX(-50%) translate(0, 0) scale(1);
@@ -1720,19 +1653,46 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         /* Explosion flash on impact */
         @keyframes explosionFlash {
           0% {
-            transform: scale(0.3);
+            transform: scale(0.2);
+            opacity: 1;
+            filter: brightness(2.5);
+          }
+          20% {
+            transform: scale(1.3);
             opacity: 1;
             filter: brightness(2);
           }
-          30% {
-            transform: scale(1.2);
-            opacity: 0.9;
-            filter: brightness(1.5);
+          50% {
+            transform: scale(1.6);
+            opacity: 0.7;
+            filter: brightness(1.3);
           }
           100% {
-            transform: scale(1.8);
+            transform: scale(2);
             opacity: 0;
-            filter: brightness(0.5);
+            filter: brightness(0.3);
+          }
+        }
+        /* Shockwave ring expanding */
+        @keyframes shockwaveExpand {
+          0% {
+            transform: scale(0.3);
+            opacity: 1;
+          }
+          100% {
+            transform: scale(2.5);
+            opacity: 0;
+          }
+        }
+        /* Smoke rising from impact */
+        @keyframes smokeRise {
+          0% {
+            transform: translateY(0) scale(1);
+            opacity: 0.6;
+          }
+          100% {
+            transform: translateY(-80px) scale(1.5);
+            opacity: 0;
           }
         }
         /* Debris particles flying outward */
