@@ -775,7 +775,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               style={{
                 position: 'absolute',
                 left: `${inf.landX}%`,
-                bottom: '12%',
+                top: '50%',
                 transform: 'translateX(-50%)',
               }}
             >
@@ -825,7 +825,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               style={{
                 position: 'absolute',
                 left: `${inf.landX}%`,
-                bottom: '12%',
+                top: '50%',
                 transform: 'translateX(-50%)',
                 animation: 'infernalRise 1s ease-out forwards',
               }}
@@ -878,7 +878,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               style={{
                 position: 'absolute',
                 left: `${inf.landX}%`,
-                bottom: '12%',
+                top: '50%',
                 transform: 'translateX(-50%)',
               }}
             >
@@ -999,18 +999,18 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       }} />
 
       <style>{`
-        /* Infernal diagonal fall - 4s slow descent across screen */
+        /* Infernal diagonal fall - 4s slow descent to middle of screen */
         @keyframes infernalDiagonalFall {
           0% {
-            transform: translate(0, 0) scale(0.7);
+            transform: translate(0, 0) scale(0.5);
             opacity: 0;
           }
           5% {
             opacity: 1;
-            transform: translate(2vw, 5vh) scale(0.8);
+            transform: translate(1vw, 3vh) scale(0.6);
           }
           100% {
-            transform: translate(25vw, 100vh) scale(1);
+            transform: translate(15vw, 58vh) scale(1);
             opacity: 1;
           }
         }
@@ -1237,35 +1237,53 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
           </filter>
         </defs>
 
-        {/* Throne glow - distant power */}
-        <ellipse cx="500" cy="120" rx="150" ry="80" fill="url(#throneGlow)" filter="url(#iceGlow)" />
+        {/* === THE FROZEN THRONE - Prominent in far background === */}
+        {/* Massive throne glow - icy power emanating */}
+        <ellipse cx="500" cy="80" rx="200" ry="120" fill="url(#throneGlow)" filter="url(#iceGlow)" opacity="0.6" />
+        <ellipse cx="500" cy="60" rx="100" ry="60" fill={WC3.ft.iceBright} filter="url(#iceGlow)" opacity="0.15" />
 
-        {/* === FAR LAYER - The Frozen Throne itself + distant peaks === */}
-        <g filter="url(#ftDistantBlur)" opacity="0.3">
-          {/* The Frozen Throne - central, far back */}
-          <g transform="translate(500, 100)">
-            {/* Throne base structure */}
-            <polygon points="-80,150 -60,80 -40,90 -20,40 0,0 20,40 40,90 60,80 80,150" fill="#0a1828" />
-            {/* Ice steps leading up */}
-            <polygon points="-100,150 -80,120 -60,130 -40,110 40,110 60,130 80,120 100,150" fill="#081520" />
-            {/* Central spire - Lich King's seat */}
-            <polygon points="-15,60 0,-30 15,60" fill="#102540" />
-            <polygon points="-10,50 0,-20 10,50" fill={WC3.ft.iceDark} opacity="0.5" />
-            {/* Ice crown glow */}
-            <polygon points="-8,20 0,-25 8,20" fill={WC3.ft.iceMid} opacity="0.4" />
-            <ellipse cx="0" cy="-10" rx="12" ry="8" fill={WC3.ft.iceBright} opacity="0.15" filter="url(#iceGlow)" />
-            {/* Side spires */}
-            <polygon points="-50,100 -45,50 -40,100" fill="#0d1a30" />
-            <polygon points="40,100 45,50 50,100" fill="#0d1a30" />
-          </g>
+        {/* The Frozen Throne structure - MORE VISIBLE */}
+        <g transform="translate(500, 50)" filter="url(#ftDistantBlur)" opacity="0.55">
+          {/* Throne base - massive ice platform */}
+          <polygon points="-160,280 -140,200 -100,220 -60,150 -30,170 0,100 30,170 60,150 100,220 140,200 160,280" fill="#0c1e38" />
+          {/* Ice steps cascading down */}
+          <polygon points="-180,280 -160,250 -120,260 -80,230 80,230 120,260 160,250 180,280" fill="#081828" />
+          <polygon points="-140,260 -100,240 -60,250 60,250 100,240 140,260" fill="#0a1a30" opacity="0.7" />
 
+          {/* Central throne spire - Lich King's seat */}
+          <polygon points="-40,150 -25,80 -15,100 0,20 15,100 25,80 40,150" fill="#102545" />
+          <polygon points="-25,120 -15,60 0,30 15,60 25,120" fill={WC3.ft.iceDark} opacity="0.6" />
+          {/* Inner glow of throne */}
+          <polygon points="-15,100 0,40 15,100" fill={WC3.ft.iceMid} opacity="0.4" />
+
+          {/* Ice crown at apex - glowing */}
+          <polygon points="-10,50 0,10 10,50" fill={WC3.ft.iceMid} opacity="0.6" />
+          <polygon points="-6,40 0,15 6,40" fill={WC3.ft.iceBright} opacity="0.5" />
+          {/* Crown glow */}
+          <ellipse cx="0" cy="20" rx="20" ry="15" fill={WC3.ft.iceBright} opacity="0.3" filter="url(#iceGlow)" />
+
+          {/* Flanking spires - left */}
+          <polygon points="-100,200 -90,120 -80,140 -70,80 -60,130 -50,200" fill="#0d1a35" />
+          <polygon points="-75,100 -70,80 -65,95" fill={WC3.ft.iceMid} opacity="0.3" />
+
+          {/* Flanking spires - right */}
+          <polygon points="50,200 60,130 70,80 80,140 90,120 100,200" fill="#0d1a35" />
+          <polygon points="65,95 70,80 75,100" fill={WC3.ft.iceMid} opacity="0.3" />
+
+          {/* Outer tower spires */}
+          <polygon points="-130,240 -120,160 -110,240" fill="#0a1530" />
+          <polygon points="110,240 120,160 130,240" fill="#0a1530" />
+        </g>
+
+        {/* === FAR LAYER - Distant mountain ranges === */}
+        <g filter="url(#ftDistantBlur)" opacity="0.35">
           {/* Distant mountain range - far left */}
-          <polygon points="0,200 30,100 60,130 100,60 140,110 180,80 220,140 260,200" fill="#061525" />
-          <polygon points="80,80 100,60 120,75" fill={WC3.ft.iceDark} opacity="0.3" />
+          <polygon points="0,220 30,120 60,150 100,80 140,130 180,100 220,160 260,220" fill="#061525" />
+          <polygon points="80,100 100,80 120,95" fill={WC3.ft.iceDark} opacity="0.4" />
 
           {/* Distant peaks - far right */}
-          <polygon points="740,200 780,90 820,120 860,50 900,100 940,70 980,130 1000,200" fill="#061525" />
-          <polygon points="840,70 860,50 880,65" fill={WC3.ft.iceDark} opacity="0.3" />
+          <polygon points="740,220 780,110 820,140 860,70 900,120 940,90 980,150 1000,220" fill="#061525" />
+          <polygon points="840,90 860,70 880,85" fill={WC3.ft.iceDark} opacity="0.4" />
         </g>
 
         {/* === MID LAYER - Ice citadels, frozen structures === */}
