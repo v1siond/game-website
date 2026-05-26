@@ -1138,7 +1138,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         /* Rain storm */
         @keyframes rainStorm {
           0% { transform: translate(0, 0) rotate(-12deg); opacity: 0.5; }
-          100% { transform: translate(-18vw, 120vh) rotate(-12deg); opacity: 0; }
+          100% { transform: translate(18vw, 120vh) rotate(-12deg); opacity: 0; }
         }
       `}</style>
     </>
