@@ -2889,149 +2889,152 @@ const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left' | 'ri
 // ART SECTION DIVIDERS - Decorative breaks between content
 // =============================================================================
 
-const RoCArtDivider = memo(function RoCArtDivider({ variant = 'weapons', scale = 1 }: { variant?: 'weapons' | 'banner' | 'rune'; scale?: number }) {
+const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', scale = 1 }: { variant?: 'horde' | 'alliance' | 'weapons'; scale?: number }) {
   return (
     <div style={{
       position: 'relative',
-      height: `${140 * scale}px`,
+      height: `${120 * scale}px`,
       margin: `${2 * scale}rem 0`,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      overflow: 'hidden',
     }}>
-      {/* Background gradient fade - blends with battlefield */}
+      {/* Subtle glow behind center - no solid background */}
       <div style={{
         position: 'absolute',
-        inset: 0,
-        background: `linear-gradient(180deg,
-          transparent 0%,
-          ${WC3.roc.felDark}08 20%,
-          ${WC3.roc.felDark}12 50%,
-          ${WC3.roc.felDark}08 80%,
-          transparent 100%
-        )`,
+        width: '200px',
+        height: '60px',
+        background: `radial-gradient(ellipse, ${WC3.roc.felDark}20 0%, transparent 70%)`,
+        filter: 'blur(20px)',
         pointerEvents: 'none',
       }} />
 
-      {/* Fel energy glow behind center */}
+      {/* Single horizontal line - subtle metal */}
       <div style={{
         position: 'absolute',
-        width: '300px',
-        height: '80px',
-        background: `radial-gradient(ellipse, ${WC3.roc.felDark}25 0%, transparent 70%)`,
-        filter: 'blur(25px)',
-        pointerEvents: 'none',
-      }} />
-
-      {/* Horizontal decorative lines */}
-      <div style={{
-        position: 'absolute',
-        left: '5%',
-        right: '5%',
-        height: '2px',
+        left: '10%',
+        right: '10%',
+        height: '1px',
         background: `linear-gradient(90deg,
           transparent 0%,
-          ${WC3.metalDark}50 15%,
-          ${WC3.roc.felDark}60 30%,
-          ${WC3.roc.felMid}80 50%,
-          ${WC3.roc.felDark}60 70%,
-          ${WC3.metalDark}50 85%,
+          ${WC3.metalDark}40 20%,
+          ${WC3.metalMid}60 50%,
+          ${WC3.metalDark}40 80%,
           transparent 100%
         )`,
-        boxShadow: `0 0 8px ${WC3.roc.felGlow}`,
       }} />
 
-      {/* Second line above - creates depth */}
-      <div style={{
-        position: 'absolute',
-        left: '15%',
-        right: '15%',
-        top: '35%',
-        height: '1px',
-        background: `linear-gradient(90deg, transparent 0%, ${WC3.metalMid}30 30%, ${WC3.metalMid}40 50%, ${WC3.metalMid}30 70%, transparent 100%)`,
-      }} />
-
-      {/* Third line below */}
-      <div style={{
-        position: 'absolute',
-        left: '15%',
-        right: '15%',
-        bottom: '35%',
-        height: '1px',
-        background: `linear-gradient(90deg, transparent 0%, ${WC3.metalMid}30 30%, ${WC3.metalMid}40 50%, ${WC3.metalMid}30 70%, transparent 100%)`,
-      }} />
-
-      {/* Center ornament */}
-      <svg width="180" height="100" viewBox="0 0 180 100" style={{ position: 'relative', zIndex: 2 }}>
-        {variant === 'weapons' && (
-          <>
-            {/* Crossed swords */}
-            <g transform="translate(90,50)">
-              {/* Left sword */}
-              <g transform="rotate(-30)">
-                <rect x="-4" y="-35" width="8" height="50" fill={WC3.metalMid} />
-                <rect x="-2" y="-35" width="4" height="50" fill={WC3.metalLight} opacity="0.6" />
-                <rect x="-12" y="12" width="24" height="6" fill={WC3.metalDark} rx="1" />
-                <circle cx="0" cy="-38" r="5" fill={WC3.roc.felDark} />
-                <circle cx="0" cy="-38" r="3" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 3px ${WC3.roc.felGlow})` }} />
-              </g>
-              {/* Right sword */}
-              <g transform="rotate(30)">
-                <rect x="-4" y="-35" width="8" height="50" fill={WC3.metalMid} />
-                <rect x="-2" y="-35" width="4" height="50" fill={WC3.metalLight} opacity="0.6" />
-                <rect x="-12" y="12" width="24" height="6" fill={WC3.metalDark} rx="1" />
-                <circle cx="0" cy="-38" r="5" fill={WC3.roc.felDark} />
-                <circle cx="0" cy="-38" r="3" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 3px ${WC3.roc.felGlow})` }} />
-              </g>
-              {/* Center shield */}
-              <circle cx="0" cy="0" r="18" fill={WC3.metalDark} stroke={WC3.metalMid} strokeWidth="2" />
-              <circle cx="0" cy="0" r="12" fill="none" stroke={WC3.roc.felDark} strokeWidth="1.5" opacity="0.6" />
-              <circle cx="0" cy="0" r="5" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 6px ${WC3.roc.felGlow})` }} />
+      {/* Center shield ornament */}
+      <svg width="140" height="100" viewBox="0 0 140 100" style={{ position: 'relative', zIndex: 2 }}>
+        {variant === 'horde' && (
+          <g transform="translate(70,50)">
+            {/* Horde shield shape - pointed bottom */}
+            <path
+              d="M0,-38 L32,-28 L35,5 L20,32 L0,42 L-20,32 L-35,5 L-32,-28 Z"
+              fill={WC3.hordeRed}
+              stroke={WC3.metalDark}
+              strokeWidth="3"
+            />
+            {/* Shield rim highlight */}
+            <path
+              d="M0,-35 L28,-26 L30,3 L18,27 L0,36"
+              fill="none"
+              stroke={WC3.bloodRed}
+              strokeWidth="1.5"
+              opacity="0.5"
+            />
+            {/* Orc skull emblem */}
+            <g transform="translate(0,-2)">
+              {/* Skull base */}
+              <ellipse cx="0" cy="0" rx="16" ry="14" fill="#3a3028" />
+              {/* Jaw */}
+              <path d="M-12,8 Q-8,18 0,20 Q8,18 12,8" fill="#2a2018" />
+              {/* Eye sockets */}
+              <ellipse cx="-6" cy="-2" rx="5" ry="4" fill="#1a1008" />
+              <ellipse cx="6" cy="-2" rx="5" ry="4" fill="#1a1008" />
+              {/* Nose hole */}
+              <ellipse cx="0" cy="6" rx="3" ry="4" fill="#1a1008" />
+              {/* Tusks - horizontal orc style */}
+              <path d="M-12,8 L-22,5 L-20,10 Z" fill="#4a3828" stroke="#3a2818" strokeWidth="1" />
+              <path d="M12,8 L22,5 L20,10 Z" fill="#4a3828" stroke="#3a2818" strokeWidth="1" />
+              {/* Brow ridge */}
+              <path d="M-14,-6 Q0,-12 14,-6" fill="none" stroke="#2a2018" strokeWidth="2" />
             </g>
-          </>
-        )}
-        {variant === 'banner' && (
-          <g transform="translate(90,50)">
-            {/* War banner pole */}
-            <rect x="-3" y="-40" width="6" height="80" fill={WC3.metalMid} />
-            <circle cx="0" cy="-42" r="6" fill={WC3.roc.felDark} />
-            <circle cx="0" cy="-42" r="4" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 4px ${WC3.roc.felGlow})` }} />
-            {/* Banner fabric */}
-            <path d="M5,-35 Q35,-30 30,-10 Q25,10 35,25 L5,20 Z" fill={WC3.hordeRed} opacity="0.8" />
-            <path d="M5,-35 Q35,-30 30,-10" stroke={WC3.bloodRed} strokeWidth="2" fill="none" opacity="0.5" />
+            {/* Corner spikes */}
+            <polygon points="-32,-28 -40,-25 -35,-18" fill={WC3.metalDark} />
+            <polygon points="32,-28 40,-25 35,-18" fill={WC3.metalDark} />
           </g>
         )}
-        {variant === 'rune' && (
-          <g transform="translate(90,50)">
-            {/* Fel rune circle */}
-            <circle cx="0" cy="0" r="30" fill="none" stroke={WC3.roc.felDark} strokeWidth="2" opacity="0.5" />
-            <circle cx="0" cy="0" r="20" fill="none" stroke={WC3.roc.felMid} strokeWidth="1.5" opacity="0.4" />
-            {/* Rune symbols */}
-            <path d="M0,-25 L8,-8 L0,5 L-8,-8 Z" fill={WC3.roc.felMid} opacity="0.6" />
-            <circle cx="0" cy="0" r="8" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 8px ${WC3.roc.felGlow})` }} />
+        {variant === 'alliance' && (
+          <g transform="translate(70,50)">
+            {/* Alliance shield shape - rounded bottom */}
+            <path
+              d="M0,-38 L30,-30 L35,-5 L30,20 L0,38 L-30,20 L-35,-5 L-30,-30 Z"
+              fill={WC3.allianceBlue}
+              stroke={WC3.goldDark}
+              strokeWidth="3"
+            />
+            {/* Gold trim */}
+            <path
+              d="M0,-32 L24,-25 L28,-5 L24,16 L0,30"
+              fill="none"
+              stroke={WC3.goldMid}
+              strokeWidth="1.5"
+              opacity="0.6"
+            />
+            {/* Lion head silhouette */}
+            <g transform="translate(0,0)">
+              {/* Mane */}
+              <circle cx="0" cy="-5" r="18" fill={WC3.goldDark} opacity="0.8" />
+              {/* Face */}
+              <ellipse cx="0" cy="-2" rx="12" ry="10" fill={WC3.goldMid} />
+              {/* Eyes */}
+              <ellipse cx="-4" cy="-5" rx="2" ry="1.5" fill="#1a2a4a" />
+              <ellipse cx="4" cy="-5" rx="2" ry="1.5" fill="#1a2a4a" />
+              {/* Nose */}
+              <ellipse cx="0" cy="0" rx="3" ry="2" fill={WC3.goldDark} />
+              {/* Mouth */}
+              <path d="M-5,4 Q0,8 5,4" fill="none" stroke={WC3.goldDark} strokeWidth="1.5" />
+            </g>
+          </g>
+        )}
+        {variant === 'weapons' && (
+          <g transform="translate(70,50)">
+            {/* Crossed axes - more orc-like */}
+            <g transform="rotate(-35)">
+              <rect x="-3" y="-35" width="6" height="55" fill={WC3.metalMid} rx="2" />
+              {/* Axe head */}
+              <path d="M-3,-30 Q-18,-25 -20,-15 Q-15,-5 -3,-8 Z" fill={WC3.metalLight} stroke={WC3.metalDark} strokeWidth="1" />
+            </g>
+            <g transform="rotate(35)">
+              <rect x="-3" y="-35" width="6" height="55" fill={WC3.metalMid} rx="2" />
+              {/* Axe head */}
+              <path d="M3,-30 Q18,-25 20,-15 Q15,-5 3,-8 Z" fill={WC3.metalLight} stroke={WC3.metalDark} strokeWidth="1" />
+            </g>
+            {/* Center boss */}
+            <circle cx="0" cy="0" r="10" fill={WC3.metalDark} stroke={WC3.metalMid} strokeWidth="2" />
+            <circle cx="0" cy="0" r="5" fill={WC3.roc.felMid} style={{ filter: `drop-shadow(0 0 4px ${WC3.roc.felGlow})` }} />
           </g>
         )}
       </svg>
 
-      {/* Side decorative elements - floating embers */}
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={`ember-${i}`}
-          style={{
-            position: 'absolute',
-            left: `${10 + (i % 3) * 30 + (i > 2 ? 5 : 0)}%`,
-            top: `${20 + (i % 2) * 40}%`,
-            width: '4px',
-            height: '4px',
-            borderRadius: '50%',
-            background: WC3.roc.felMid,
-            boxShadow: `0 0 8px ${WC3.roc.felGlow}`,
-            opacity: 0.4 + (i % 3) * 0.15,
-            animation: `felPulse ${2 + i * 0.3}s ease-in-out infinite`,
-          }}
-        />
-      ))}
+      {/* Side accent lines */}
+      <div style={{
+        position: 'absolute',
+        left: '5%',
+        width: '15%',
+        height: '1px',
+        top: '50%',
+        background: `linear-gradient(90deg, transparent 0%, ${WC3.metalDark}50 100%)`,
+      }} />
+      <div style={{
+        position: 'absolute',
+        right: '5%',
+        width: '15%',
+        height: '1px',
+        top: '50%',
+        background: `linear-gradient(270deg, transparent 0%, ${WC3.metalDark}50 100%)`,
+      }} />
     </div>
   )
 })
@@ -3534,7 +3537,7 @@ export default function MedievalFantasyTheme() {
         {/* === RoC Art Divider: Crossed Weapons === */}
         <FadeInSection>
           <div style={{ margin: `${artDividerMargin} 0` }}>
-            <RoCArtDivider variant="weapons" scale={artDividerScale} />
+            <RoCArtDivider variant="horde" scale={artDividerScale} />
           </div>
         </FadeInSection>
 
@@ -3595,7 +3598,7 @@ export default function MedievalFantasyTheme() {
         {/* === RoC Art Divider: War Banner === */}
         <FadeInSection>
           <div style={{ margin: `${artDividerMargin} 0` }}>
-            <RoCArtDivider variant="banner" scale={artDividerScale} />
+            <RoCArtDivider variant="weapons" scale={artDividerScale} />
           </div>
         </FadeInSection>
 
