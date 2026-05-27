@@ -25,10 +25,10 @@ const WC3 = {
     skyTop: '#050805',
     skyMid: '#081008',
     skyBot: '#0c150c',
-    felBright: '#66ff66',
-    felMid: '#33cc33',
-    felDark: '#1a8a1a',
-    felGlow: '#44ff4480',
+    felBright: '#4a9a4a',
+    felMid: '#2a7a2a',
+    felDark: '#1a5a1a',
+    felGlow: '#3a8a3a80',
     fireBright: '#ffaa44',
     fireMid: '#dd6622',
     fireCore: '#ffff88',
@@ -1348,7 +1348,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 </g>
               ))}
               {/* Banner edge fraying */}
-              <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill="#661515" style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
+              <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill="#2a0a0a" style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
             </g>
             {/* Pole shadow */}
             <ellipse cx="6" cy="235" rx="15" ry="5" fill="#0a0a08" opacity="0.4" />
@@ -1846,11 +1846,11 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             </defs>
 
             {[
-              { id: 1, x: 0, w: 18, delay: '0s', fill: '#aa2525', yOff: 0 },
-              { id: 2, x: 18, w: 18, delay: '0.12s', fill: '#992222', yOff: 2 },
-              { id: 3, x: 36, w: 18, delay: '0.24s', fill: '#882020', yOff: 4 },
-              { id: 4, x: 54, w: 18, delay: '0.36s', fill: '#771818', yOff: 6 },
-              { id: 5, x: 72, w: 15, delay: '0.48s', fill: '#661515', yOff: 8 },
+              { id: 1, x: 0, w: 18, delay: '0s', fill: '#6a2020', yOff: 0 },
+              { id: 2, x: 18, w: 18, delay: '0.12s', fill: '#5a1a1a', yOff: 2 },
+              { id: 3, x: 36, w: 18, delay: '0.24s', fill: '#4a1515', yOff: 4 },
+              { id: 4, x: 54, w: 18, delay: '0.36s', fill: '#3a1010', yOff: 6 },
+              { id: 5, x: 72, w: 15, delay: '0.48s', fill: '#2a0a0a', yOff: 8 },
             ].map((col) => (
               <g key={col.id} style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: col.delay }}>
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
@@ -1876,7 +1876,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 </g>
               </g>
             ))}
-            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill="#661515" style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
+            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill="#2a0a0a" style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: '0.55s' }} />
           </g>
 
           {/* Pole shadow */}
