@@ -694,13 +694,25 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     active: boolean
   } | null>(null)
 
-  // Single idle golem on right side
-  const [rightGolemReady, setRightGolemReady] = useState(false)
+  // Right-side golem spawn sequence: meteor → explosion → assembly → final
+  const [golemPhase, setGolemPhase] = useState<'waiting' | 'meteor' | 'explosion' | 'assembling' | 'final'>('waiting')
 
   useEffect(() => {
-    // Show right golem after a delay
-    const timer = setTimeout(() => setRightGolemReady(true), 3000)
-    return () => clearTimeout(timer)
+    const timeouts: NodeJS.Timeout[] = []
+
+    // Phase 1: Meteor falls (starts after 2s, lasts 1.5s)
+    timeouts.push(setTimeout(() => setGolemPhase('meteor'), 2000))
+
+    // Phase 2: Explosion on impact (after meteor lands)
+    timeouts.push(setTimeout(() => setGolemPhase('explosion'), 3500))
+
+    // Phase 3: Rocks start assembling (after explosion)
+    timeouts.push(setTimeout(() => setGolemPhase('assembling'), 4200))
+
+    // Phase 4: Final detailed golem (after assembly completes ~2s)
+    timeouts.push(setTimeout(() => setGolemPhase('final'), 6500))
+
+    return () => timeouts.forEach(t => clearTimeout(t))
   }, [])
 
   // Occasional meteor spawn (every 8-15 seconds)
@@ -1428,7 +1440,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         pointerEvents: 'none',
       }} />
 
-      {/* Volumetric storm clouds - DENSE, top 18% only */}
+      {/* Volumetric storm clouds - DARK GREENISH, top 18% only */}
       <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '18%' }} viewBox="0 0 1000 180" preserveAspectRatio="none">
         <defs>
           <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
@@ -1438,37 +1450,37 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
           </filter>
           <radialGradient id="cloudCore" cx="50%" cy="40%" r="60%">
-            <stop offset="0%" stopColor="#1a2518" />
-            <stop offset="60%" stopColor="#0d1a0f" />
-            <stop offset="100%" stopColor="#05100a" />
+            <stop offset="0%" stopColor="#253525" />
+            <stop offset="60%" stopColor="#182818" />
+            <stop offset="100%" stopColor="#0c1a0c" />
           </radialGradient>
         </defs>
-        {/* Dense cloud bank - concentrated at top */}
-        <g filter="url(#cloudBlur)" opacity="0.85">
-          <ellipse cx="100" cy="40" rx="200" ry="60" fill="#030603" />
-          <ellipse cx="350" cy="30" rx="250" ry="55" fill="#020502" />
-          <ellipse cx="600" cy="35" rx="280" ry="65" fill="#030603" />
-          <ellipse cx="850" cy="40" rx="220" ry="55" fill="#020502" />
+        {/* Dense cloud bank - DARK GREENISH tones */}
+        <g filter="url(#cloudBlur)" opacity="0.9">
+          <ellipse cx="100" cy="40" rx="200" ry="60" fill="#152515" />
+          <ellipse cx="350" cy="30" rx="250" ry="55" fill="#122012" />
+          <ellipse cx="600" cy="35" rx="280" ry="65" fill="#152515" />
+          <ellipse cx="850" cy="40" rx="220" ry="55" fill="#122012" />
         </g>
-        {/* Secondary layer */}
+        {/* Secondary layer - slightly brighter green */}
         <g filter="url(#cloudBlurLight)" opacity="0.9">
           <ellipse cx="200" cy="70" rx="180" ry="45" fill="url(#cloudCore)" />
           <ellipse cx="450" cy="65" rx="200" ry="50" fill="url(#cloudCore)" />
           <ellipse cx="700" cy="72" rx="190" ry="48" fill="url(#cloudCore)" />
           <ellipse cx="950" cy="68" rx="170" ry="45" fill="url(#cloudCore)" />
         </g>
-        {/* Bottom edge - wispy */}
-        <g opacity="0.6">
-          <ellipse cx="150" cy="110" rx="120" ry="35" fill="#060b06" />
-          <ellipse cx="400" cy="105" rx="140" ry="38" fill="#050a05" />
-          <ellipse cx="650" cy="115" rx="130" ry="35" fill="#060b06" />
-          <ellipse cx="900" cy="108" rx="120" ry="32" fill="#050a05" />
+        {/* Bottom edge - wispy greenish */}
+        <g opacity="0.7">
+          <ellipse cx="150" cy="110" rx="120" ry="35" fill="#1a2a1a" />
+          <ellipse cx="400" cy="105" rx="140" ry="38" fill="#152515" />
+          <ellipse cx="650" cy="115" rx="130" ry="35" fill="#1a2a1a" />
+          <ellipse cx="900" cy="108" rx="120" ry="32" fill="#152515" />
         </g>
         {/* Wisps trailing down */}
-        <g opacity="0.35">
-          <ellipse cx="250" cy="145" rx="80" ry="25" fill="#081008" />
-          <ellipse cx="550" cy="140" rx="100" ry="28" fill="#071007" />
-          <ellipse cx="800" cy="150" rx="90" ry="25" fill="#081008" />
+        <g opacity="0.5">
+          <ellipse cx="250" cy="145" rx="80" ry="25" fill="#1f2f1f" />
+          <ellipse cx="550" cy="140" rx="100" ry="28" fill="#1a2a1a" />
+          <ellipse cx="800" cy="150" rx="90" ry="25" fill="#1f2f1f" />
         </g>
       </svg>
 
@@ -1481,7 +1493,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         height: '20%',
         pointerEvents: 'none',
       }}>
-        {/* Base green storm glow - always visible, subtle */}
+        {/* Base green storm glow - always visible, gives clouds greenish tint */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -1489,9 +1501,9 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           right: 0,
           height: '100%',
           background: `
-            radial-gradient(ellipse at 20% 30%, ${WC3.roc.felMid}18 0%, transparent 50%),
-            radial-gradient(ellipse at 50% 25%, ${WC3.roc.felBright}10 0%, transparent 45%),
-            radial-gradient(ellipse at 80% 35%, ${WC3.roc.felMid}15 0%, transparent 55%)
+            radial-gradient(ellipse at 20% 30%, ${WC3.roc.felMid}40 0%, ${WC3.roc.felDark}20 40%, transparent 70%),
+            radial-gradient(ellipse at 50% 25%, ${WC3.roc.felBright}30 0%, ${WC3.roc.felMid}18 35%, transparent 65%),
+            radial-gradient(ellipse at 80% 35%, ${WC3.roc.felMid}35 0%, ${WC3.roc.felDark}18 40%, transparent 70%)
           `,
         }} />
 
@@ -1652,8 +1664,8 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         </div>
       )}
 
-      {/* === SINGLE RIGHT-SIDE INFERNAL GOLEM - With rock assembly animation === */}
-      {rightGolemReady && (
+      {/* === SINGLE RIGHT-SIDE INFERNAL GOLEM - Full spawn sequence === */}
+      {golemPhase !== 'waiting' && (
         <div
           style={{
             position: 'fixed',
@@ -1665,116 +1677,168 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             pointerEvents: 'none',
           }}
         >
-          {/* Crater at feet - appears immediately */}
-          <svg
-            width="160"
-            height="40"
-            viewBox="0 0 160 40"
-            style={{
-              position: 'absolute',
-              left: '0px',
-              top: '200px',
-              transform: 'translateY(-50%)',
-              zIndex: -1,
-              animation: 'crackGrow 1s ease-out forwards',
-            }}
-          >
-            <ellipse cx="80" cy="20" rx="75" ry="18" fill="#080604" />
-            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out forwards' }} />
-            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out 0.1s forwards' }} />
-            <ellipse cx="80" cy="20" rx="12" ry="6" fill={WC3.roc.felDark} opacity="0.4" />
-          </svg>
+          {/* PHASE 1: METEOR FALLING */}
+          {golemPhase === 'meteor' && (
+            <div
+              style={{
+                position: 'absolute',
+                left: '80px',
+                top: '-150px',
+                transform: 'translateX(-50%)',
+                animation: 'golemMeteorFall 1.5s ease-in forwards',
+              }}
+            >
+              {/* Meteor core */}
+              <div style={{
+                width: '35px',
+                height: '35px',
+                borderRadius: '50%',
+                background: `radial-gradient(circle at 30% 30%, ${WC3.roc.fireBright} 0%, ${WC3.roc.fireMid} 40%, ${WC3.roc.felMid} 70%, #1a1510 100%)`,
+                boxShadow: `0 0 30px ${WC3.roc.felBright}, 0 0 60px ${WC3.roc.fireMid}`,
+              }} />
+              {/* Meteor trail */}
+              <div style={{
+                position: 'absolute',
+                top: '-80px',
+                left: '50%',
+                width: '12px',
+                height: '100px',
+                background: `linear-gradient(180deg, transparent 0%, ${WC3.roc.felDark}30 20%, ${WC3.roc.felMid}60 50%, ${WC3.roc.felBright}90 80%, ${WC3.roc.fireCore} 100%)`,
+                filter: 'blur(4px)',
+                transform: 'translateX(-50%)',
+              }} />
+            </div>
+          )}
 
-          {/* Emergence glow during assembly */}
-          <div style={{
-            position: 'absolute',
-            left: '80px',
-            top: '200px',
-            transform: 'translateX(-50%) translateY(-50%)',
-            width: '150px',
-            height: '200px',
-            background: `radial-gradient(ellipse at 50% 90%, ${WC3.roc.felBright}60 0%, ${WC3.roc.felMid}30 30%, transparent 70%)`,
-            animation: 'emergeGlow 2.5s ease-out forwards',
-            pointerEvents: 'none',
-          }} />
+          {/* PHASE 2: EXPLOSION */}
+          {(golemPhase === 'explosion' || golemPhase === 'assembling' || golemPhase === 'final') && (
+            <>
+              {/* Explosion flash - only during explosion phase */}
+              {golemPhase === 'explosion' && (
+                <div style={{
+                  position: 'absolute',
+                  left: '80px',
+                  top: '200px',
+                  transform: 'translate(-50%, -50%)',
+                  width: '250px',
+                  height: '250px',
+                  background: `radial-gradient(circle, ${WC3.roc.felBright}90 0%, ${WC3.roc.felMid}60 30%, ${WC3.roc.felDark}30 60%, transparent 80%)`,
+                  animation: 'explosionFlash 0.6s ease-out forwards',
+                }} />
+              )}
 
-          {/* Shadow */}
-          <div style={{
-            position: 'absolute',
-            left: '80px',
-            transform: 'translateX(-50%) translateY(-50%)',
-            top: '200px',
-            width: '120px',
-            height: '25px',
-            background: `radial-gradient(ellipse, ${WC3.roc.felDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
-            borderRadius: '50%',
-          }} />
+              {/* Crater - appears after explosion */}
+              <svg
+                width="160"
+                height="40"
+                viewBox="0 0 160 40"
+                style={{
+                  position: 'absolute',
+                  left: '0px',
+                  top: '200px',
+                  transform: 'translateY(-50%)',
+                  zIndex: -1,
+                }}
+              >
+                <ellipse cx="80" cy="20" rx="75" ry="18" fill="#080604" />
+                <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out forwards' }} />
+                <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out 0.1s forwards' }} />
+                <ellipse cx="80" cy="20" rx="12" ry="6" fill={WC3.roc.felDark} opacity="0.4" />
+              </svg>
 
-          {/* === ROCK ASSEMBLY - Simplified rocks flying into position === */}
-          <svg
-            width="160"
-            height="200"
-            viewBox="0 0 160 200"
-            style={{ position: 'absolute', left: '-10px', top: '0px', overflow: 'visible' }}
-          >
-            {/* HEAD rock - flies from left */}
-            <g style={{ animation: 'assembleHead 1.8s ease-out forwards' }}>
-              <ellipse cx="80" cy="25" rx="22" ry="18" fill="#3a3835" />
-              <ellipse cx="80" cy="24" rx="18" ry="14" fill="#4a4845" />
-              {/* Eyes glow */}
-              <ellipse cx="70" cy="24" rx="4" ry="3" fill={WC3.roc.felMid} style={{ animation: 'rockGlowPulse 1.8s ease-out forwards' }} />
-              <ellipse cx="90" cy="24" rx="4" ry="3" fill={WC3.roc.felMid} style={{ animation: 'rockGlowPulse 1.8s ease-out forwards' }} />
-            </g>
+              {/* Shadow */}
+              <div style={{
+                position: 'absolute',
+                left: '80px',
+                transform: 'translateX(-50%) translateY(-50%)',
+                top: '200px',
+                width: '120px',
+                height: '25px',
+                background: `radial-gradient(ellipse, ${WC3.roc.felDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
+                borderRadius: '50%',
+              }} />
+            </>
+          )}
 
-            {/* LEFT SHOULDER rock */}
-            <g style={{ animation: 'assembleLeftShoulder 1.5s ease-out 0.2s forwards', opacity: 0 }}>
-              <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill="#3a3835" />
-              <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill="#4a4845" />
-            </g>
+          {/* PHASE 3: ROCK ASSEMBLY - only visible during assembling phase */}
+          {(golemPhase === 'assembling' || golemPhase === 'explosion') && (
+            <>
+              {/* Emergence glow */}
+              <div style={{
+                position: 'absolute',
+                left: '80px',
+                top: '200px',
+                transform: 'translateX(-50%) translateY(-50%)',
+                width: '150px',
+                height: '200px',
+                background: `radial-gradient(ellipse at 50% 90%, ${WC3.roc.felBright}60 0%, ${WC3.roc.felMid}30 30%, transparent 70%)`,
+                animation: 'emergeGlow 2.5s ease-out forwards',
+                pointerEvents: 'none',
+              }} />
 
-            {/* RIGHT SHOULDER rock */}
-            <g style={{ animation: 'assembleRightShoulder 1.6s ease-out 0.15s forwards', opacity: 0 }}>
-              <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill="#3a3835" />
-              <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill="#4a4845" />
-            </g>
+              {/* Assembling rocks */}
+              <svg
+                width="160"
+                height="200"
+                viewBox="0 0 160 200"
+                style={{
+                  position: 'absolute',
+                  left: '-10px',
+                  top: '0px',
+                  overflow: 'visible',
+                  opacity: golemPhase === 'assembling' ? 1 : 0,
+                  transition: 'opacity 0.3s ease',
+                }}
+              >
+                {/* HEAD rock */}
+                <g style={{ animation: 'assembleHead 1.8s ease-out forwards' }}>
+                  <ellipse cx="80" cy="25" rx="22" ry="18" fill="#3a3835" />
+                  <ellipse cx="80" cy="24" rx="18" ry="14" fill="#4a4845" />
+                  <ellipse cx="70" cy="24" rx="4" ry="3" fill={WC3.roc.felMid} />
+                  <ellipse cx="90" cy="24" rx="4" ry="3" fill={WC3.roc.felMid} />
+                </g>
+                {/* LEFT SHOULDER */}
+                <g style={{ animation: 'assembleLeftShoulder 1.5s ease-out 0.2s forwards', opacity: 0 }}>
+                  <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill="#3a3835" />
+                  <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill="#4a4845" />
+                </g>
+                {/* RIGHT SHOULDER */}
+                <g style={{ animation: 'assembleRightShoulder 1.6s ease-out 0.15s forwards', opacity: 0 }}>
+                  <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill="#3a3835" />
+                  <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill="#4a4845" />
+                </g>
+                {/* TORSO */}
+                <g style={{ animation: 'assembleTorso 1.4s ease-out 0.3s forwards', opacity: 0 }}>
+                  <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill="#2a2825" />
+                  <polygon points="60,58 58,88 62,110 98,110 102,88 100,58" fill="#3a3835" />
+                  <path d="M80,65 L75,85 L82,105" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" />
+                </g>
+                {/* LEFT ARM */}
+                <g style={{ animation: 'assembleLeftArm 1.7s ease-out 0.4s forwards', opacity: 0 }}>
+                  <polygon points="15,72 8,100 18,115 30,108 28,78" fill="#3a3835" />
+                </g>
+                {/* RIGHT ARM */}
+                <g style={{ animation: 'assembleRightArm 1.65s ease-out 0.35s forwards', opacity: 0 }}>
+                  <polygon points="145,72 152,100 142,115 130,108 132,78" fill="#3a3835" />
+                </g>
+                {/* LEFT LEG */}
+                <g style={{ animation: 'assembleLeftLeg 1.3s ease-out 0.5s forwards', opacity: 0 }}>
+                  <polygon points="50,120 42,160 55,185 68,175 62,125" fill="#3a3835" />
+                </g>
+                {/* RIGHT LEG */}
+                <g style={{ animation: 'assembleRightLeg 1.35s ease-out 0.45s forwards', opacity: 0 }}>
+                  <polygon points="110,120 118,160 105,185 92,175 98,125" fill="#3a3835" />
+                </g>
+              </svg>
+            </>
+          )}
 
-            {/* TORSO rock - rises from crater center */}
-            <g style={{ animation: 'assembleTorso 1.4s ease-out 0.3s forwards', opacity: 0 }}>
-              <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill="#2a2825" />
-              <polygon points="60,58 58,88 62,110 98,110 102,88 100,58" fill="#3a3835" />
-              {/* Chest crack glow */}
-              <path d="M80,65 L75,85 L82,105" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" style={{ animation: 'rockGlowPulse 1.4s ease-out 0.3s forwards' }} />
-            </g>
-
-            {/* LEFT ARM rock */}
-            <g style={{ animation: 'assembleLeftArm 1.7s ease-out 0.4s forwards', opacity: 0 }}>
-              <polygon points="15,72 8,100 18,115 30,108 28,78" fill="#3a3835" />
-              <polygon points="18,75 12,98 20,110 26,104 25,80" fill="#4a4845" />
-            </g>
-
-            {/* RIGHT ARM rock */}
-            <g style={{ animation: 'assembleRightArm 1.65s ease-out 0.35s forwards', opacity: 0 }}>
-              <polygon points="145,72 152,100 142,115 130,108 132,78" fill="#3a3835" />
-              <polygon points="142,75 148,98 140,110 134,104 135,80" fill="#4a4845" />
-            </g>
-
-            {/* LEFT LEG rock */}
-            <g style={{ animation: 'assembleLeftLeg 1.3s ease-out 0.5s forwards', opacity: 0 }}>
-              <polygon points="50,120 42,160 55,185 68,175 62,125" fill="#3a3835" />
-              <polygon points="52,125 46,155 56,178 62,170 58,128" fill="#4a4845" />
-            </g>
-
-            {/* RIGHT LEG rock */}
-            <g style={{ animation: 'assembleRightLeg 1.35s ease-out 0.45s forwards', opacity: 0 }}>
-              <polygon points="110,120 118,160 105,185 92,175 98,125" fill="#3a3835" />
-              <polygon points="108,125 114,155 104,178 98,170 102,128" fill="#4a4845" />
-            </g>
-          </svg>
-
-          {/* === DETAILED GOLEM - Fades in after assembly completes === */}
-          <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: 'golemFadeIn 1.5s ease-out 2s forwards', opacity: 0 }}>
-            <InfernalGolemSVG id={999} isIdle={true} />
-          </div>
+          {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
+          {golemPhase === 'final' && (
+            <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: 'golemFadeIn 1s ease-out forwards' }}>
+              <InfernalGolemSVG id={999} isIdle={true} />
+            </div>
+          )}
         </div>
       )}
 
@@ -2307,6 +2371,35 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         @keyframes golemFadeIn {
           0% { opacity: 0; filter: brightness(1.3); }
           100% { opacity: 1; filter: brightness(1); }
+        }
+        /* Meteor falls from sky for golem spawn */
+        @keyframes golemMeteorFall {
+          0% {
+            transform: translateX(-50%) translateY(0);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(-50%) translateY(350px);
+            opacity: 1;
+          }
+        }
+        /* Explosion flash on meteor impact */
+        @keyframes explosionFlash {
+          0% {
+            transform: translate(-50%, -50%) scale(0.3);
+            opacity: 1;
+          }
+          30% {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 0.9;
+          }
+          100% {
+            transform: translate(-50%, -50%) scale(1.5);
+            opacity: 0;
+          }
         }
         /* Crater crack grows from center outward */
         @keyframes crackGrow {
