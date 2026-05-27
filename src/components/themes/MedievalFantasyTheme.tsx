@@ -3547,58 +3547,52 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
 
         {/* === ALEXANDER'S HEAD === */}
         {/* Face - skin tone base */}
-        <ellipse cx="100" cy="42" rx="22" ry="22" fill="url(#undeadSkin)" />
+        <ellipse cx="100" cy="40" rx="20" ry="20" fill="url(#undeadSkin)" />
 
         {/* HAIR on top */}
-        <path d="M78,30 Q78,14 100,10 Q122,14 122,30 Q110,22 100,22 Q90,22 78,30 Z" fill="#0a0808" />
-        <path d="M82,24 Q100,16 118,24" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.4" />
-        <path d="M85,20 Q100,14 115,20" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
+        <path d="M80,28 Q80,14 100,10 Q120,14 120,28 Q110,20 100,20 Q90,20 80,28 Z" fill="#0a0808" />
+        <path d="M84,22 Q100,14 116,22" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.4" />
 
-        {/* FULL BEARD - one organic shape covering lower face */}
-        {/* Sideburns flow into cheeks into jaw into chin */}
+        {/* FULL BEARD - covers from cheeks down */}
         <path
-          d="M76,35
-             Q74,50 76,60
-             Q78,75 82,85
-             Q90,100 100,105
-             Q110,100 118,85
-             Q122,75 124,60
-             Q126,50 124,35
-             Q120,42 115,48
-             Q108,54 100,56
-             Q92,54 85,48
-             Q80,42 76,35 Z"
+          d="M78,45
+             Q76,55 78,70
+             Q82,90 100,100
+             Q118,90 122,70
+             Q124,55 122,45
+             Q115,50 100,52
+             Q85,50 78,45 Z"
           fill="#0a0808"
         />
 
-        {/* Mouth opening in beard */}
-        <ellipse cx="100" cy="68" rx="10" ry="5" fill="url(#undeadSkin)" />
-        <path d="M94,68 Q100,66 106,68" stroke="#4a3020" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        {/* Mustache - directly under nose */}
+        <path d="M86,52 Q93,55 100,54 Q107,55 114,52 Q108,58 100,58 Q92,58 86,52 Z" fill="#0a0808" />
 
-        {/* Mustache above mouth opening */}
-        <path d="M85,58 Q92,62 100,60 Q108,62 115,58 Q110,64 100,65 Q90,64 85,58 Z" fill="#0a0808" />
+        {/* Mouth opening */}
+        <ellipse cx="100" cy="62" rx="8" ry="4" fill="url(#undeadSkin)" />
+        <path d="M95,62 Q100,60 105,62" stroke="#4a3020" strokeWidth="1.5" strokeLinecap="round" fill="none" />
 
-        {/* Beard texture lines */}
-        <path d="M82,65 Q88,82 95,98" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
-        <path d="M100,70 Q100,88 100,102" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
-        <path d="M118,65 Q112,82 105,98" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
+        {/* Beard texture */}
+        <path d="M85,65 Q92,82 98,95" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
+        <path d="M100,66 L100,96" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
+        <path d="M115,65 Q108,82 102,95" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
 
         {/* EYES */}
-        <ellipse cx="90" cy="38" rx="4" ry="3" fill="#1a1210" />
-        <ellipse cx="110" cy="38" rx="4" ry="3" fill="#1a1210" />
-        <ellipse cx="90" cy="38" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+        <ellipse cx="92" cy="36" rx="4" ry="3" fill="#1a1210" />
+        <ellipse cx="108" cy="36" rx="4" ry="3" fill="#1a1210" />
+        <ellipse cx="92" cy="36" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
           <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
         </ellipse>
-        <ellipse cx="110" cy="38" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+        <ellipse cx="108" cy="36" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
           <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
         </ellipse>
 
         {/* Eyebrows */}
-        <path d="M84,34 Q90,32 94,34" stroke="#0a0808" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-        <path d="M106,34 Q110,32 116,34" stroke="#0a0808" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        <path d="M86,32 Q92,30 96,32" stroke="#0a0808" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        <path d="M104,32 Q108,30 114,32" stroke="#0a0808" strokeWidth="2.5" strokeLinecap="round" fill="none" />
 
         {/* NOSE */}
-        <path d="M100,42 L97,50 L103,50 Z" fill="#5a4a3a" />
+        <path d="M100,40 L97,48 L103,48 Z" fill="#5a4a3a" />
 
         {/* Frost breath */}
         <ellipse cx="110" cy="72" rx="12" ry="6" fill={WC3.ft.frostWhite} opacity="0.15" filter="url(#frostGlow)">
