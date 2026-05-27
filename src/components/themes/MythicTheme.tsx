@@ -509,15 +509,77 @@ const FloatingAsh = memo(function FloatingAsh() {
 // Phases: idle → eruption → flowing → complete
 // =============================================================================
 const Volcano = memo(function Volcano() {
+  const [phase, setPhase] = useState<'idle' | 'trembling' | 'eruption' | 'flowing' | 'complete'>('idle')
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setPhase('trembling'), 1500),  // Start trembling after 1.5s
+      setTimeout(() => setPhase('eruption'), 2500),   // Explosion at 2.5s
+      setTimeout(() => setPhase('flowing'), 3000),    // Lava starts flowing at 3s
+      setTimeout(() => setPhase('complete'), 7000),   // Animation complete at 7s
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [])
+
+  const lavaPathLength = 400
+
   return (
     <div
       className="fixed bottom-0 left-0 pointer-events-none z-[1]"
       style={{
         width: 'clamp(300px, 40vw, 500px)',
         height: 'clamp(350px, 50vh, 550px)',
+        animation: phase === 'trembling'
+          ? 'volcanoTremble 0.08s ease-in-out infinite'
+          : phase === 'eruption'
+            ? 'volcanoErupt 0.05s ease-in-out infinite'
+            : 'none',
       }}
       aria-hidden="true"
     >
+      <style>{`
+        @keyframes volcanoTremble {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(-2px, 1px); }
+          75% { transform: translate(2px, -1px); }
+        }
+        @keyframes volcanoErupt {
+          0%, 100% { transform: translate(0, 0); }
+          25% { transform: translate(-2px, 1px); }
+          50% { transform: translate(2px, 0); }
+          75% { transform: translate(-1px, -1px); }
+        }
+        @keyframes lavaRock1 {
+          0% { transform: translate(0, 0); opacity: 1; }
+          40% { transform: translate(-30px, -90px); opacity: 1; }
+          100% { transform: translate(-50px, 40px); opacity: 0; }
+        }
+        @keyframes lavaRock2 {
+          0% { transform: translate(0, 0); opacity: 1; }
+          45% { transform: translate(10px, -110px); opacity: 1; }
+          100% { transform: translate(15px, 30px); opacity: 0; }
+        }
+        @keyframes lavaRock3 {
+          0% { transform: translate(0, 0); opacity: 1; }
+          40% { transform: translate(35px, -80px); opacity: 1; }
+          100% { transform: translate(55px, 50px); opacity: 0; }
+        }
+        @keyframes lavaRock4 {
+          0% { transform: translate(0, 0); opacity: 1; }
+          50% { transform: translate(-15px, -120px); opacity: 1; }
+          100% { transform: translate(-25px, 20px); opacity: 0; }
+        }
+        @keyframes lavaRock5 {
+          0% { transform: translate(0, 0); opacity: 1; }
+          45% { transform: translate(25px, -100px); opacity: 1; }
+          100% { transform: translate(40px, 35px); opacity: 0; }
+        }
+        @keyframes eruptionBurst {
+          0% { transform: scaleY(0.3); opacity: 0.9; }
+          30% { transform: scaleY(1); opacity: 1; }
+          100% { transform: scaleY(0.5); opacity: 0; }
+        }
+      `}</style>
       <svg
         className="w-full h-full"
         viewBox="0 0 400 500"
@@ -525,26 +587,26 @@ const Volcano = memo(function Volcano() {
         style={{ overflow: 'visible' }}
       >
         <defs>
-          {/* Turbulence filter for organic lava movement */}
+          {/* Turbulence filter for organic lava movement - SLOW for viscous lava */}
           <filter id="lavaTurbulence" x="-20%" y="-20%" width="140%" height="140%">
             <feTurbulence
               type="turbulence"
-              baseFrequency="0.015 0.04"
-              numOctaves="3"
+              baseFrequency="0.012 0.03"
+              numOctaves="2"
               seed="5"
               result="turbulence"
             >
               <animate
                 attributeName="seed"
-                values="5;15;5"
-                dur="8s"
+                values="5;12;5"
+                dur="18s"
                 repeatCount="indefinite"
               />
             </feTurbulence>
             <feDisplacementMap
               in="SourceGraphic"
               in2="turbulence"
-              scale="12"
+              scale="10"
               xChannelSelector="R"
               yChannelSelector="G"
             />
@@ -602,18 +664,30 @@ const Volcano = memo(function Volcano() {
           fill="url(#volcanoFade)"
         />
 
-        {/* Lava flows - anchored below crater (y=150), behind crater */}
-        <g filter="url(#lavaTurbulence)" opacity="0.85">
-          {/* Center flow - from crater center (200,160) */}
+        {/* Lava flows - hidden until flowing phase, then grow top to bottom */}
+        <g
+          filter="url(#lavaTurbulence)"
+          style={{
+            opacity: phase === 'flowing' || phase === 'complete' ? 0.85 : 0,
+            transition: 'opacity 0.5s ease-out',
+          }}
+        >
+          {/* Center flow */}
           <path
             d="M200,160 Q205,240 200,340 Q195,440 200,520"
             fill="none"
             stroke="url(#lavaCore)"
             strokeWidth="20"
             strokeLinecap="round"
+            pathLength={lavaPathLength}
+            style={{
+              strokeDasharray: lavaPathLength,
+              strokeDashoffset: (phase === 'flowing' || phase === 'complete') ? 0 : lavaPathLength,
+              transition: 'stroke-dashoffset 4s ease-out',
+            }}
           />
 
-          {/* Left flow - from crater center-left (160,150) */}
+          {/* Left flow */}
           <path
             d="M160,150 Q130,250 100,370 Q80,460 60,520"
             fill="none"
@@ -621,9 +695,15 @@ const Volcano = memo(function Volcano() {
             strokeWidth="16"
             strokeLinecap="round"
             opacity="0.8"
+            pathLength={lavaPathLength}
+            style={{
+              strokeDasharray: lavaPathLength,
+              strokeDashoffset: (phase === 'flowing' || phase === 'complete') ? 0 : lavaPathLength,
+              transition: 'stroke-dashoffset 4s ease-out 0.3s',
+            }}
           />
 
-          {/* Right flow - from crater center-right (235,150) */}
+          {/* Right flow */}
           <path
             d="M235,150 Q275,270 305,410 Q325,480 345,520"
             fill="none"
@@ -631,10 +711,59 @@ const Volcano = memo(function Volcano() {
             strokeWidth="14"
             strokeLinecap="round"
             opacity="0.7"
+            pathLength={lavaPathLength}
+            style={{
+              strokeDasharray: lavaPathLength,
+              strokeDashoffset: (phase === 'flowing' || phase === 'complete') ? 0 : lavaPathLength,
+              transition: 'stroke-dashoffset 4s ease-out 0.5s',
+            }}
           />
         </g>
 
-        {/* Crater glow - renders on top of lava */}
+        {/* Eruption effects */}
+        <g>
+          {/* Vertical burst of light from crater */}
+          <ellipse
+            cx="200"
+            cy="100"
+            rx="25"
+            ry="50"
+            fill={GOW.fireBright}
+            style={{
+              mixBlendMode: 'screen',
+              transformOrigin: '200px 140px',
+              opacity: phase === 'eruption' ? 1 : 0,
+              animation: phase === 'eruption' ? 'eruptionBurst 0.5s ease-out forwards' : 'none',
+            }}
+          />
+
+          {/* Bright flash at crater */}
+          <ellipse
+            cx="200"
+            cy="130"
+            rx="45"
+            ry="25"
+            fill={GOW.fireBright}
+            style={{
+              mixBlendMode: 'screen',
+              opacity: phase === 'eruption' ? 0.9 : phase === 'flowing' ? 0.15 : 0,
+              transition: 'opacity 0.3s ease-out',
+            }}
+          />
+
+          {/* Lava rocks - shoot up then fall with gravity */}
+          {phase === 'eruption' && (
+            <>
+              <circle cx="195" cy="130" r="6" fill="#ff6600" style={{ animation: 'lavaRock1 0.8s ease-out forwards' }} />
+              <circle cx="200" cy="130" r="8" fill="#ff8800" style={{ animation: 'lavaRock2 0.9s ease-out forwards' }} />
+              <circle cx="205" cy="130" r="5" fill="#ff5500" style={{ animation: 'lavaRock3 0.75s ease-out forwards' }} />
+              <circle cx="192" cy="130" r="4" fill="#ffaa00" style={{ animation: 'lavaRock4 0.95s ease-out forwards' }} />
+              <circle cx="208" cy="130" r="5" fill="#ff7700" style={{ animation: 'lavaRock5 0.85s ease-out forwards' }} />
+            </>
+          )}
+        </g>
+
+        {/* Crater glow - renders on top of lava, pulses bigger during eruption */}
         <ellipse
           cx="200"
           cy="140"
@@ -642,6 +771,11 @@ const Volcano = memo(function Volcano() {
           ry="14"
           fill="url(#craterGlow)"
           filter="url(#lavaGlow2)"
+          style={{
+            transform: phase === 'eruption' ? 'scale(1.5)' : 'scale(1)',
+            transformOrigin: '200px 140px',
+            transition: 'transform 0.3s ease-out',
+          }}
         >
           <animate attributeName="opacity" values="0.7;0.95;0.7" dur="2s" repeatCount="indefinite" />
         </ellipse>
