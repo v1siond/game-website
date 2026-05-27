@@ -3545,54 +3545,63 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         <ellipse cx="100" cy="68" rx="18" ry="7" fill="#1a2535" />
         <ellipse cx="100" cy="68" rx="18" ry="7" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
 
-        {/* === ALEXANDER'S HEAD === */}
-        {/* Face - skin tone base */}
-        <ellipse cx="100" cy="40" rx="20" ry="20" fill="url(#undeadSkin)" />
+        {/* === ALEXANDER'S HEAD - Based on UXWing beard-man-face reference === */}
+        {/* Face skin base - oval head shape */}
+        <ellipse cx="100" cy="45" rx="24" ry="28" fill="url(#undeadSkin)" />
 
-        {/* HAIR on top */}
-        <path d="M80,28 Q80,14 100,10 Q120,14 120,28 Q110,20 100,20 Q90,20 80,28 Z" fill="#0a0808" />
-        <path d="M84,22 Q100,14 116,22" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.4" />
-
-        {/* FULL BEARD - covers from cheeks down */}
+        {/* HAIR - on top of head */}
         <path
-          d="M78,45
-             Q76,55 78,70
-             Q82,90 100,100
-             Q118,90 122,70
-             Q124,55 122,45
-             Q115,50 100,52
-             Q85,50 78,45 Z"
+          d="M76,32 Q76,12 100,8 Q124,12 124,32
+             Q115,20 100,18 Q85,20 76,32 Z"
           fill="#0a0808"
         />
 
-        {/* Mustache - directly under nose */}
-        <path d="M86,52 Q93,55 100,54 Q107,55 114,52 Q108,58 100,58 Q92,58 86,52 Z" fill="#0a0808" />
+        {/* BEARD - full coverage from cheekbones down, with face opening */}
+        {/* Outer beard shape */}
+        <path
+          d="M76,42
+             C74,55 74,70 80,85
+             Q90,105 100,108
+             Q110,105 120,85
+             C126,70 126,55 124,42
+             Q118,48 112,50
+             L108,52 Q100,54 92,52 L88,50
+             Q82,48 76,42 Z"
+          fill="#0a0808"
+        />
 
-        {/* Mouth opening */}
-        <ellipse cx="100" cy="62" rx="8" ry="4" fill="url(#undeadSkin)" />
-        <path d="M95,62 Q100,60 105,62" stroke="#4a3020" strokeWidth="1.5" strokeLinecap="round" fill="none" />
-
-        {/* Beard texture */}
-        <path d="M85,65 Q92,82 98,95" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
-        <path d="M100,66 L100,96" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
-        <path d="M115,65 Q108,82 102,95" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.3" />
+        {/* EYEBROWS - thick, dark */}
+        <path d="M84,34 Q90,31 96,34" stroke="#0a0808" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path d="M104,34 Q110,31 116,34" stroke="#0a0808" strokeWidth="3" strokeLinecap="round" fill="none" />
 
         {/* EYES */}
-        <ellipse cx="92" cy="36" rx="4" ry="3" fill="#1a1210" />
-        <ellipse cx="108" cy="36" rx="4" ry="3" fill="#1a1210" />
-        <ellipse cx="92" cy="36" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+        <ellipse cx="90" cy="40" rx="5" ry="4" fill="#1a1210" />
+        <ellipse cx="110" cy="40" rx="5" ry="4" fill="#1a1210" />
+        <ellipse cx="90" cy="40" rx="6" ry="5" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
           <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
         </ellipse>
-        <ellipse cx="108" cy="36" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+        <ellipse cx="110" cy="40" rx="6" ry="5" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
           <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
         </ellipse>
-
-        {/* Eyebrows */}
-        <path d="M86,32 Q92,30 96,32" stroke="#0a0808" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-        <path d="M104,32 Q108,30 114,32" stroke="#0a0808" strokeWidth="2.5" strokeLinecap="round" fill="none" />
 
         {/* NOSE */}
-        <path d="M100,40 L97,48 L103,48 Z" fill="#5a4a3a" />
+        <path d="M100,46 L96,56 L104,56 Z" fill="#5a4a3a" />
+
+        {/* MUSTACHE - handlebar style */}
+        <path
+          d="M86,60 Q90,58 100,59 Q110,58 114,60
+             Q112,64 108,65 Q100,66 92,65 Q88,64 86,60 Z"
+          fill="#0a0808"
+        />
+
+        {/* MOUTH - small opening in beard */}
+        <ellipse cx="100" cy="70" rx="6" ry="3" fill="url(#undeadSkin)" />
+        <path d="M96,70 Q100,68 104,70" stroke="#4a3020" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+
+        {/* Beard texture lines */}
+        <path d="M84,72 Q90,88 98,102" stroke="#1a1818" strokeWidth="1.5" fill="none" opacity="0.25" />
+        <path d="M100,74 L100,104" stroke="#1a1818" strokeWidth="1.5" fill="none" opacity="0.25" />
+        <path d="M116,72 Q110,88 102,102" stroke="#1a1818" strokeWidth="1.5" fill="none" opacity="0.25" />
 
         {/* Frost breath */}
         <ellipse cx="110" cy="72" rx="12" ry="6" fill={WC3.ft.frostWhite} opacity="0.15" filter="url(#frostGlow)">
