@@ -109,27 +109,27 @@ export const KratosCharacter = memo(function KratosCharacter({
         }}>
 
           {/* === LEFT LEG (back leg when running) === */}
-          {/* Sprite-style: curved thigh tapering to knee, calf bulge, thin ankle */}
+          {/* Curves bulge RIGHT in SVG → appear LEFT on screen after flip */}
           <g style={{
             transformOrigin: '25px 55px',
             animation: running ? 'kratosLeftLeg 0.3s ease-in-out infinite' : undefined,
           }}>
-            {/* Thigh - curved muscular shape */}
+            {/* Thigh */}
             <path
-              d="M22,55 Q18,58 19,64 Q20,68 23,68 L27,68 Q30,68 30,64 Q31,58 28,55 Z"
+              d="M22,55 L20,62 Q20,68 22,68 L26,68 Q28,68 28,62 L26,55 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Calf - tapered with muscle bulge */}
+            {/* Calf - bulge on RIGHT side in SVG */}
             <path
-              d="M20,68 Q17,72 18,76 Q19,82 21,83 L24,83 Q26,82 26,76 Q27,72 25,68 Z"
+              d="M21,68 L20,75 Q20,80 22,82 L25,82 Q28,80 27,75 L26,68 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Foot/sandal */}
-            <ellipse cx="22" cy="85" rx="5" ry="2.5" fill={KRATOS.beard} />
+            {/* Foot */}
+            <ellipse cx="23" cy="84" rx="5" ry="2.5" fill={KRATOS.beard} />
           </g>
 
           {/* === RIGHT LEG (front leg when running) === */}
@@ -137,22 +137,22 @@ export const KratosCharacter = memo(function KratosCharacter({
             transformOrigin: '35px 55px',
             animation: running ? 'kratosRightLeg 0.3s ease-in-out infinite' : undefined,
           }}>
-            {/* Thigh - curved muscular shape */}
+            {/* Thigh */}
             <path
-              d="M32,55 Q28,58 29,64 Q30,68 33,68 L37,68 Q40,68 40,64 Q41,58 38,55 Z"
+              d="M32,55 L30,62 Q30,68 32,68 L36,68 Q38,68 38,62 L36,55 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Calf - tapered with muscle bulge */}
+            {/* Calf - bulge on RIGHT side in SVG */}
             <path
-              d="M30,68 Q27,72 28,76 Q29,82 31,83 L34,83 Q36,82 36,76 Q37,72 35,68 Z"
+              d="M31,68 L30,75 Q30,80 32,82 L35,82 Q38,80 37,75 L36,68 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Foot/sandal */}
-            <ellipse cx="32" cy="85" rx="5" ry="2.5" fill={KRATOS.beard} />
+            {/* Foot */}
+            <ellipse cx="33" cy="84" rx="5" ry="2.5" fill={KRATOS.beard} />
           </g>
 
           {/* === BATTLE SKIRT === */}
@@ -193,9 +193,9 @@ export const KratosCharacter = memo(function KratosCharacter({
           <path d="M26,38 L34,38" stroke={KRATOS.skinShadow} strokeWidth="0.6" opacity="0.3" />
           <path d="M26,42 L34,42" stroke={KRATOS.skinShadow} strokeWidth="0.6" opacity="0.3" />
 
-          {/* RED TATTOO - Kratos's left side (SVG right, appears on viewer's right after flip) */}
+          {/* RED TATTOO - body (SVG left → screen right after flip) */}
           <path
-            d="M38,26 C40,32 41,40 40,48"
+            d="M22,26 C20,32 19,40 20,48"
             stroke={KRATOS.tattoo}
             strokeWidth="2.5"
             fill="none"
@@ -263,9 +263,9 @@ export const KratosCharacter = memo(function KratosCharacter({
             strokeWidth="0.5"
           />
 
-          {/* RED TATTOO - on head/face (SVG right side, appears on viewer's right after flip) */}
+          {/* RED TATTOO - head (SVG left x=21 → screen right after flip, next to right eye at x=25) */}
           <path
-            d="M39,4 C41,10 41,18 39,26"
+            d="M21,3 C19,8 19,16 21,24"
             stroke={KRATOS.tattoo}
             strokeWidth="3"
             fill="none"
