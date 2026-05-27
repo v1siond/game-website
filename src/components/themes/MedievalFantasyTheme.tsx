@@ -3375,12 +3375,6 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
             <stop offset="50%" stopColor="#b8923e" />
             <stop offset="100%" stopColor="#8a6d2f" />
           </linearGradient>
-          <linearGradient id="hairGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#1a1515" />
-            <stop offset="40%" stopColor="#4a4545" />
-            <stop offset="70%" stopColor="#8a8585" />
-            <stop offset="100%" stopColor="#d0d0d5" />
-          </linearGradient>
           <linearGradient id="undeadSkin" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#6a5a4a" />
             <stop offset="100%" stopColor="#5a4a3a" />
@@ -3555,35 +3549,7 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         <ellipse cx="100" cy="58" rx="10" ry="6" fill="url(#undeadSkin)" />
         <ellipse cx="100" cy="40" rx="20" ry="24" fill="url(#undeadSkin)" />
 
-        {/* LONG FLOWING HAIR - Arthas style, white/silver flowing down */}
-        {/* Hair mass at top of head */}
-        <path d="M80,38 Q75,18 88,10 Q100,5 112,10 Q125,18 120,38 L116,32 Q108,24 100,24 Q92,24 84,32 Z" fill="#1a1515" />
-
-        {/* Left side hair - flows DOWN naturally alongside face/armor */}
-        <g opacity="0.95">
-          {/* Back layer - darkest */}
-          <path d="M82,35 Q78,50 75,80 Q72,120 70,160 Q68,190 65,220" stroke="#2a2525" strokeWidth="8" strokeLinecap="round" fill="none" />
-          <path d="M84,38 Q80,55 77,90 Q74,130 72,170 Q70,200 68,230" stroke="#4a4545" strokeWidth="6" strokeLinecap="round" fill="none" />
-          {/* Mid layer */}
-          <path d="M85,40 Q82,60 80,100 Q78,140 76,180 Q74,210 72,240" stroke="#7a7575" strokeWidth="5" strokeLinecap="round" fill="none" />
-          {/* Front layer - lightest (white tips) */}
-          <path d="M86,42 Q84,65 82,105 Q80,145 78,185 Q76,215 75,245" stroke="#a8a8a8" strokeWidth="4" strokeLinecap="round" fill="none" />
-          <path d="M87,45 Q85,70 84,110 Q82,150 80,190 Q78,220 78,250" stroke="#c8c8c8" strokeWidth="3" strokeLinecap="round" fill="none" />
-        </g>
-
-        {/* Right side hair - flows DOWN naturally alongside face/armor */}
-        <g opacity="0.95">
-          {/* Back layer - darkest */}
-          <path d="M118,35 Q122,50 125,80 Q128,120 130,160 Q132,190 135,220" stroke="#2a2525" strokeWidth="8" strokeLinecap="round" fill="none" />
-          <path d="M116,38 Q120,55 123,90 Q126,130 128,170 Q130,200 132,230" stroke="#4a4545" strokeWidth="6" strokeLinecap="round" fill="none" />
-          {/* Mid layer */}
-          <path d="M115,40 Q118,60 120,100 Q122,140 124,180 Q126,210 128,240" stroke="#7a7575" strokeWidth="5" strokeLinecap="round" fill="none" />
-          {/* Front layer - lightest (white tips) */}
-          <path d="M114,42 Q116,65 118,105 Q120,145 122,185 Q124,215 125,245" stroke="#a8a8a8" strokeWidth="4" strokeLinecap="round" fill="none" />
-          <path d="M113,45 Q115,70 116,110 Q118,150 120,190 Q122,220 122,250" stroke="#c8c8c8" strokeWidth="3" strokeLinecap="round" fill="none" />
-        </g>
-
-        {/* Ears - small, covered by hair */}
+        {/* Ears */}
         <ellipse cx="80" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
         <ellipse cx="120" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
 
