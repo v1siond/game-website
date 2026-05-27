@@ -10,10 +10,12 @@ import { memo, useState, useEffect, useRef } from 'react'
  */
 
 const K = {
-  skin: '#d4c8b8',
-  skinShadow: '#a89880',
+  // Latino skin tone
+  skin: '#c4956a',
+  skinShadow: '#9a7050',
   tattoo: '#8b1a1a',
-  beard: '#2a1a0a',
+  beard: '#1a1208',
+  hair: '#1a1208',
   skirt: '#8b1a1a',
   skirtDark: '#5a0a0a',
   belt: '#5a4a2a',
@@ -94,6 +96,8 @@ const KratosRunFrame1 = memo(function KratosRunFrame1() {
       {/* Head - SIDE PROFILE for running */}
       <g transform="translate(0, -2)">
         <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        {/* Hair on top */}
+        <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
         {/* Tattoo on visible side */}
         <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
         {/* Single eye visible (side view) */}
@@ -174,6 +178,8 @@ const KratosRunFrame2 = memo(function KratosRunFrame2() {
       {/* Head - SIDE PROFILE for running */}
       <g>
         <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        {/* Hair on top */}
+        <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
         <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
         <circle cx="30.5" cy="12" r="1" fill={K.eye} />
@@ -249,6 +255,8 @@ const KratosRunFrame3 = memo(function KratosRunFrame3() {
       {/* Head - SIDE PROFILE for running */}
       <g transform="translate(0, -2)">
         <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        {/* Hair on top */}
+        <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
         <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
         <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
         <circle cx="30.5" cy="12" r="1" fill={K.eye} />
@@ -313,6 +321,8 @@ const KratosIdle = memo(function KratosIdle() {
 
       {/* Head - front facing for idle (looks good) */}
       <ellipse cx="35" cy="14" rx="8" ry="9" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      {/* Hair on top */}
+      <path d="M27,10 Q29,3 35,2 Q41,3 43,10 Q41,6 35,5 Q29,6 27,10 Z" fill={K.hair} />
       <path d="M32,6 Q30,10 31,14 Q31,18 32,22" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <ellipse cx="32" cy="12" rx="2" ry="1.5" fill="white" />
       <ellipse cx="38" cy="12" rx="2" ry="1.5" fill="white" />
