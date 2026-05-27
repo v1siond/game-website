@@ -33,6 +33,30 @@ const K = {
 }
 
 // ============================================================================
+// SHARED: Running head facing RIGHT (for moving left after flip)
+// ============================================================================
+const RunningHeadRight = memo(function RunningHeadRight() {
+  return (
+    <g transform="translate(0, -2)">
+      <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      {/* Hair on top */}
+      <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
+      {/* Tattoo on left side (visible when facing right) */}
+      <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      {/* Single eye visible - facing RIGHT */}
+      <ellipse cx="39" cy="12" rx="2" ry="1.5" fill="white" />
+      <circle cx="39.5" cy="12" r="1" fill={K.eye} />
+      {/* Eyebrow */}
+      <path d="M37,9 L42,10" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
+      {/* Beard profile - facing right */}
+      <path d="M38,17 Q40,20 38,23 Q35,21 35,17 Z" fill={K.beard} />
+      {/* Nose hint - facing right */}
+      <path d="M41,13 L42,15" stroke={K.skinShadow} strokeWidth="0.5" />
+    </g>
+  )
+})
+
+// ============================================================================
 // FRAME 1: Contact Right - right leg forward, left blade forward
 // ============================================================================
 const KratosRunFrame1 = memo(function KratosRunFrame1() {
@@ -57,16 +81,16 @@ const KratosRunFrame1 = memo(function KratosRunFrame1() {
         <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
       </g>
 
-      {/* Back leg - extended back - thinner, longer */}
+      {/* Back leg - extended back - thinner */}
       <g>
-        <path d="M37,46 Q42,50 48,58 Q52,66 50,72 L46,72 Q46,66 42,58 Q38,52 36,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="48" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M37,46 Q41,50 46,58 Q49,66 47,72 L44,72 Q44,66 41,58 Q38,52 36,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="45.5" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Front leg - extended forward - thinner, longer */}
+      {/* Front leg - extended forward - thinner */}
       <g>
-        <path d="M33,46 Q28,50 22,58 Q18,66 20,72 L24,72 Q24,66 28,58 Q32,52 34,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="22" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M33,46 Q29,50 24,58 Q21,66 23,72 L26,72 Q26,66 29,58 Q32,52 34,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="24.5" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
       {/* Skirt */}
@@ -93,23 +117,8 @@ const KratosRunFrame1 = memo(function KratosRunFrame1() {
         <path d="M19,42 L8,52 Q3,56 6,58 L17,47 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
       </g>
 
-      {/* Head - SIDE PROFILE for running */}
-      <g transform="translate(0, -2)">
-        <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        {/* Hair on top */}
-        <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
-        {/* Tattoo on visible side */}
-        <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        {/* Single eye visible (side view) */}
-        <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
-        <circle cx="30.5" cy="12" r="1" fill={K.eye} />
-        {/* Eyebrow */}
-        <path d="M28,9 L33,10" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        {/* Beard profile */}
-        <path d="M32,17 Q30,20 32,23 Q35,21 35,17 Z" fill={K.beard} />
-        {/* Nose hint */}
-        <path d="M29,13 L28,15" stroke={K.skinShadow} strokeWidth="0.5" />
-      </g>
+      {/* Head - facing RIGHT */}
+      <RunningHeadRight />
     </g>
   )
 })
@@ -175,18 +184,8 @@ const KratosRunFrame2 = memo(function KratosRunFrame2() {
         <path d="M48,42 L56,56 Q59,60 56,62 L46,48 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
       </g>
 
-      {/* Head - SIDE PROFILE for running */}
-      <g>
-        <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        {/* Hair on top */}
-        <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
-        <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
-        <circle cx="30.5" cy="12" r="1" fill={K.eye} />
-        <path d="M28,9 L33,10" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M32,17 Q30,20 32,23 Q35,21 35,17 Z" fill={K.beard} />
-        <path d="M29,13 L28,15" stroke={K.skinShadow} strokeWidth="0.5" />
-      </g>
+      {/* Head - facing RIGHT */}
+      <RunningHeadRight />
     </g>
   )
 })
@@ -252,18 +251,8 @@ const KratosRunFrame3 = memo(function KratosRunFrame3() {
         <path d="M51,42 L62,52 Q67,56 64,58 L53,47 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
       </g>
 
-      {/* Head - SIDE PROFILE for running */}
-      <g transform="translate(0, -2)">
-        <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        {/* Hair on top */}
-        <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
-        <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
-        <circle cx="30.5" cy="12" r="1" fill={K.eye} />
-        <path d="M28,9 L33,10" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M32,17 Q30,20 32,23 Q35,21 35,17 Z" fill={K.beard} />
-        <path d="M29,13 L28,15" stroke={K.skinShadow} strokeWidth="0.5" />
-      </g>
+      {/* Head - facing RIGHT */}
+      <RunningHeadRight />
     </g>
   )
 })
