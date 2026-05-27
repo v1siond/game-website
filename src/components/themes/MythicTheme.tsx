@@ -13,6 +13,7 @@ import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
+import { KratosChainPullReveal } from './Mythic/KratosSprite'
 
 // =============================================================================
 // GOD OF WAR 3 COLOR PALETTE
@@ -269,6 +270,99 @@ const FadeInSection = memo(function FadeInSection({
         transform: triggered ? 'translateY(0)' : 'translateY(30px)',
         transition: `opacity 0.6s ease-out ${delay}ms, transform 0.6s ease-out ${delay}ms`,
         willChange: 'opacity, transform',
+      }}
+    >
+      {children}
+    </div>
+  )
+})
+
+// =============================================================================
+// CHAIN PULL SECTION - Kratos pulls content with Blades of Chaos
+// Uses requestAnimationFrame for smooth animation from top-left corner
+// Pattern: triggered prop passed from parent's useSectionTrigger (like DarkFantasy)
+// =============================================================================
+const easeOutBack = (t: number): number => {
+  const c1 = 1.70158
+  const c3 = c1 + 1
+  return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2)
+}
+
+const easeOutCubic = (t: number): number => 1 - Math.pow(1 - t, 3)
+
+const ChainPullSection = memo(function ChainPullSection({
+  children,
+  triggered,
+  className = '',
+  delay = 300,
+  duration = 1400,
+  startX = -500,
+  startY = -250,
+  startRotation = -15,
+}: {
+  children: React.ReactNode
+  triggered: boolean
+  className?: string
+  delay?: number
+  duration?: number
+  startX?: number
+  startY?: number
+  startRotation?: number
+}) {
+  const [animation, setAnimation] = useState({
+    x: startX,
+    y: startY,
+    opacity: 0,
+    rotation: startRotation,
+  })
+  const hasAnimated = useRef(false)
+  const startTime = useRef<number | null>(null)
+  const rafRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (!triggered || hasAnimated.current) return
+
+    hasAnimated.current = true
+
+    const delayTimeout = setTimeout(() => {
+      startTime.current = null
+
+      const animate = (timestamp: number) => {
+        if (startTime.current === null) startTime.current = timestamp
+
+        const elapsed = timestamp - startTime.current
+        const progress = Math.min(elapsed / duration, 1)
+        const positionProgress = easeOutBack(progress)
+        const opacityProgress = easeOutCubic(progress)
+
+        setAnimation({
+          x: startX * (1 - positionProgress),
+          y: startY * (1 - positionProgress),
+          opacity: opacityProgress,
+          rotation: startRotation * (1 - positionProgress),
+        })
+
+        if (progress < 1) {
+          rafRef.current = requestAnimationFrame(animate)
+        }
+      }
+
+      rafRef.current = requestAnimationFrame(animate)
+    }, delay)
+
+    return () => {
+      clearTimeout(delayTimeout)
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    }
+  }, [triggered, delay, duration, startX, startY, startRotation])
+
+  return (
+    <div
+      className={className}
+      style={{
+        opacity: animation.opacity,
+        transform: `translate(${animation.x}px, ${animation.y}px) rotate(${animation.rotation}deg)`,
+        willChange: 'transform, opacity',
       }}
     >
       {children}
@@ -1579,9 +1673,9 @@ export default function MythicTheme() {
   const { active, setActive, config } = useProfession()
   const [mounted, setMounted] = useState(false)
 
-  const experienceTrigger = useSectionTrigger({ threshold: 0.05, rootMargin: '100px 0px 0px 0px' })
-  const projectsTrigger = useSectionTrigger({ threshold: 0.05, rootMargin: '100px 0px 0px 0px' })
-  const contactTrigger = useSectionTrigger({ threshold: 0.05, rootMargin: '100px 0px 0px 0px' })
+  const experienceTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
+  const projectsTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
+  const contactTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
 
   const aboutData = useMemo(() => ABOUT_DATA[active], [active])
   const engineerTech = useMemo(() => getEngineerSkills(), [])
@@ -1852,28 +1946,25 @@ export default function MythicTheme() {
           <ArtSectionWeapons />
         </FadeInSection>
 
-        {/* Work Experience */}
+        {/* Work Experience - Kratos runs in, then pulls content with Blades of Chaos */}
         {experience.length > 0 && (
           <section
             ref={experienceTrigger.ref}
-            className="relative z-20 py-8 px-6"
-            style={{
-              opacity: experienceTrigger.triggered ? 1 : 0,
-              transform: experienceTrigger.triggered ? 'translateY(0)' : 'translateY(30px)',
-              transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
-              willChange: 'opacity, transform',
-            }}
+            className="relative z-20 py-8 px-6 overflow-visible"
           >
-              <div className="max-w-4xl mx-auto">
-                <SpartanFrame title="Work Experience">
-                  <div>
-                    {experience.map((entry, index) => (
-                      <ExperienceCard key={entry.id} entry={entry} isLast={index === experience.length - 1} />
-                    ))}
-                  </div>
-                </SpartanFrame>
-              </div>
-            </section>
+            <KratosChainPullReveal
+              triggered={experienceTrigger.triggered}
+              className="max-w-4xl mx-auto"
+            >
+              <SpartanFrame title="Work Experience">
+                <div>
+                  {experience.map((entry, index) => (
+                    <ExperienceCard key={entry.id} entry={entry} isLast={index === experience.length - 1} />
+                  ))}
+                </div>
+              </SpartanFrame>
+            </KratosChainPullReveal>
+          </section>
         )}
 
         {/* Art Section 2 - Greek Pillars */}
