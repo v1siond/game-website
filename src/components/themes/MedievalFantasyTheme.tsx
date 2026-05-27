@@ -1855,99 +1855,108 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           <path d="M-2,279 Q-4,269 0,265" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
           <path d="M24,281 Q28,271 25,267" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
 
-          {/* Banner pole - War totem style with horns */}
-          {/* Main pole - rough hewn wood */}
-          <rect x="4" y="50" width="16" height="235" fill="#2a1a10" />
-          <rect x="6" y="50" width="12" height="235" fill="#3a2815" />
-          <rect x="8" y="55" width="8" height="225" fill="#4a3520" />
-          <rect x="10" y="60" width="4" height="215" fill="#5a4530" opacity="0.4" />
-          {/* Wood grain texture lines */}
-          <line x1="7" y1="70" x2="7" y2="270" stroke="#2a1a10" strokeWidth="1" opacity="0.5" />
-          <line x1="17" y1="65" x2="17" y2="275" stroke="#2a1a10" strokeWidth="1" opacity="0.4" />
+          {/* Banner pole - Dark war totem with blood stains */}
+          {/* Main pole - charred dark wood */}
+          <rect x="4" y="50" width="16" height="235" fill="#0f0a08" />
+          <rect x="6" y="50" width="12" height="235" fill="#1a1210" />
+          <rect x="8" y="55" width="8" height="225" fill="#251a15" />
+          <rect x="10" y="60" width="4" height="215" fill="#2a1f18" opacity="0.5" />
+          {/* Wood grain texture - dark */}
+          <line x1="7" y1="70" x2="7" y2="270" stroke="#0a0806" strokeWidth="1" opacity="0.6" />
+          <line x1="17" y1="65" x2="17" y2="275" stroke="#0a0806" strokeWidth="1" opacity="0.5" />
 
-          {/* Leather wrappings on pole */}
-          <rect x="3" y="110" width="18" height="8" fill="#3a2818" rx="1" />
-          <rect x="4" y="112" width="16" height="4" fill="#4a3828" />
-          <rect x="3" y="180" width="18" height="8" fill="#3a2818" rx="1" />
-          <rect x="4" y="182" width="16" height="4" fill="#4a3828" />
-          <rect x="3" y="240" width="18" height="8" fill="#3a2818" rx="1" />
-          <rect x="4" y="242" width="16" height="4" fill="#4a3828" />
+          {/* Blood stains dripping down pole */}
+          <path d="M8,80 Q6,95 8,110 Q10,125 7,140" stroke="#3a1515" strokeWidth="3" fill="none" opacity="0.7" />
+          <path d="M14,130 Q16,150 13,170 Q15,190 12,210" stroke="#2a1010" strokeWidth="4" fill="none" opacity="0.6" />
+          <path d="M10,200 Q8,220 11,240 Q9,260 10,275" stroke="#3a1515" strokeWidth="2" fill="none" opacity="0.5" />
+          {/* Blood splatter spots */}
+          <ellipse cx="6" cy="90" rx="3" ry="2" fill="#3a1010" opacity="0.6" />
+          <ellipse cx="16" cy="155" rx="4" ry="2" fill="#2a0a0a" opacity="0.5" />
+          <ellipse cx="8" cy="220" rx="3" ry="3" fill="#3a1515" opacity="0.4" />
+
+          {/* Leather wrappings - darker, worn */}
+          <rect x="3" y="110" width="18" height="8" fill="#1a1210" rx="1" />
+          <rect x="4" y="112" width="16" height="4" fill="#251a15" />
+          <rect x="3" y="180" width="18" height="8" fill="#1a1210" rx="1" />
+          <rect x="4" y="182" width="16" height="4" fill="#251a15" />
+          <rect x="3" y="240" width="18" height="8" fill="#1a1210" rx="1" />
+          <rect x="4" y="242" width="16" height="4" fill="#251a15" />
 
           {/* Top section - skull mount */}
-          <polygon points="12,20 0,50 24,50" fill="#3a2815" />
-          <polygon points="12,25 4,48 20,48" fill="#4a3520" />
+          <polygon points="12,20 0,50 24,50" fill="#1a1210" />
+          <polygon points="12,25 4,48 20,48" fill="#251a15" />
 
-          {/* Small skull at top */}
+          {/* Small skull at top - weathered bone */}
           <g transform="translate(12, 38)">
-            <ellipse cx="0" cy="0" rx="8" ry="6" fill="#4a4038" />
-            <ellipse cx="0" cy="-1" rx="6" ry="4" fill="#5a5048" />
-            <ellipse cx="-3" cy="-1" rx="2" ry="1.5" fill="#1a1510" />
-            <ellipse cx="3" cy="-1" rx="2" ry="1.5" fill="#1a1510" />
-            <ellipse cx="0" cy="2" rx="1" ry="1.5" fill="#1a1510" />
+            <ellipse cx="0" cy="0" rx="8" ry="6" fill="#3a3530" />
+            <ellipse cx="0" cy="-1" rx="6" ry="4" fill="#4a4540" />
+            <ellipse cx="-3" cy="-1" rx="2" ry="1.5" fill="#0a0808" />
+            <ellipse cx="3" cy="-1" rx="2" ry="1.5" fill="#0a0808" />
+            <ellipse cx="0" cy="2" rx="1" ry="1.5" fill="#0a0808" />
+            {/* Blood on skull */}
+            <path d="M-5,3 Q-3,5 -1,4" stroke="#3a1515" strokeWidth="1.5" fill="none" opacity="0.6" />
           </g>
 
-          {/* Top spike */}
-          <polygon points="12,8 8,22 16,22" fill="#5a5a55" />
-          <polygon points="12,10 10,20 14,20" fill="#7a7a75" opacity="0.6" />
+          {/* Top spike - dark iron */}
+          <polygon points="12,8 8,22 16,22" fill="#3a3a38" />
+          <polygon points="12,10 10,20 14,20" fill="#4a4a48" opacity="0.5" />
 
-          {/* WAR HORNS - mounted on pole sides */}
-          {/* Left horn - curves outward */}
+          {/* WAR HORNS - darker, battle-worn */}
+          {/* Left horn */}
           <g transform="translate(-2, 52)">
             <path
               d="M12,0 Q-5,5 -15,25 Q-20,40 -18,50"
               fill="none"
-              stroke="#5a5048"
+              stroke="#3a3530"
               strokeWidth="8"
               strokeLinecap="round"
             />
             <path
               d="M12,0 Q-5,5 -15,25 Q-20,40 -18,50"
               fill="none"
-              stroke="#6a6058"
+              stroke="#4a4540"
               strokeWidth="5"
               strokeLinecap="round"
             />
             <path
               d="M10,2 Q-3,7 -12,25"
               fill="none"
-              stroke="#7a7068"
+              stroke="#5a5550"
               strokeWidth="2"
-              opacity="0.5"
+              opacity="0.4"
             />
-            {/* Horn tip */}
-            <circle cx="-18" cy="50" r="3" fill="#4a4038" />
+            <circle cx="-18" cy="50" r="3" fill="#2a2520" />
           </g>
 
-          {/* Right horn - curves outward */}
+          {/* Right horn */}
           <g transform="translate(14, 52)">
             <path
               d="M0,0 Q17,5 27,25 Q32,40 30,50"
               fill="none"
-              stroke="#5a5048"
+              stroke="#3a3530"
               strokeWidth="8"
               strokeLinecap="round"
             />
             <path
               d="M0,0 Q17,5 27,25 Q32,40 30,50"
               fill="none"
-              stroke="#6a6058"
+              stroke="#4a4540"
               strokeWidth="5"
               strokeLinecap="round"
             />
             <path
               d="M2,2 Q15,7 24,25"
               fill="none"
-              stroke="#7a7068"
+              stroke="#5a5550"
               strokeWidth="2"
-              opacity="0.5"
+              opacity="0.4"
             />
-            {/* Horn tip */}
-            <circle cx="30" cy="50" r="3" fill="#4a4038" />
+            <circle cx="30" cy="50" r="3" fill="#2a2520" />
           </g>
 
-          {/* Metal rings holding horns */}
-          <ellipse cx="12" cy="55" rx="12" ry="4" fill="none" stroke="#4a4a45" strokeWidth="2" />
-          <ellipse cx="12" cy="55" rx="10" ry="3" fill="none" stroke="#5a5a55" strokeWidth="1" />
+          {/* Metal rings - rusted iron */}
+          <ellipse cx="12" cy="55" rx="12" ry="4" fill="none" stroke="#3a3530" strokeWidth="2" />
+          <ellipse cx="12" cy="55" rx="10" ry="3" fill="none" stroke="#4a4540" strokeWidth="1" />
 
           {/* Banner fabric - simplified but visible */}
           <g transform="translate(18, 55)">
