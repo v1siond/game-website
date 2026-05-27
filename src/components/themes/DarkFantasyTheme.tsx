@@ -1374,7 +1374,7 @@ const WaystationNode = memo(function WaystationNode({
           {icon}
         </div>
         <span
-          className="text-content-sm tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
+          className="text-sm tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
           style={{
             color: isActive ? color : DF.silver,
             fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
@@ -1383,7 +1383,7 @@ const WaystationNode = memo(function WaystationNode({
           {label}
         </span>
         <span
-          className="text-content-sm tracking-wider opacity-70 text-center leading-tight hidden md:block"
+          className="text-sm tracking-wider opacity-70 text-center leading-tight hidden md:block"
           style={{
             color: isActive ? color : DF.silver,
             fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
@@ -1628,7 +1628,7 @@ const VoidFrame = memo(function VoidFrame({
         <div className="pt-6 pb-4 px-6 text-center">
           <HeadingTag
             id={headingId}
-            className="text-content-sm tracking-[0.3em] uppercase inline-block"
+            className="text-sm tracking-[0.3em] uppercase inline-block"
             style={{
               color: DF.bone,
               fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
@@ -1670,7 +1670,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnTy
       {categories.slice(0, 5).map((category) => (
         <div key={category.name}>
           <h3
-            className="text-content-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
+            className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
             style={{ color: DF.silver, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
           >
             <span aria-hidden="true">{category.icon}</span>
@@ -1705,7 +1705,7 @@ const SkillsList = memo(function SkillsList({ categories }: { categories: Return
       {categories.map((category) => (
         <div key={category.name}>
           <h3
-            className="text-content-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
+            className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
             style={{ color: DF.silver, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
           >
             <span aria-hidden="true">{category.icon}</span>
@@ -1713,7 +1713,7 @@ const SkillsList = memo(function SkillsList({ categories }: { categories: Return
           </h3>
           <ul className="space-y-2" aria-label={`${category.name} skills`}>
             {category.skills.map((skill) => (
-              <li key={skill.name} className="text-content-sm flex items-center gap-2" style={{ color: DF.bone }}>
+              <li key={skill.name} className="text-sm flex items-center gap-2" style={{ color: DF.bone }}>
                 <span style={{ color: DF.spiritGold }} aria-hidden="true">*</span>
                 {skill.name}
               </li>
@@ -1740,23 +1740,23 @@ const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PRO
       aria-label={`View ${project.name} project details`}
     >
       {project.featured && (
-        <span className="text-content-sm tracking-[0.15em] uppercase" style={{ color: DF.spiritGold }}>
+        <span className="text-sm tracking-[0.15em] uppercase" style={{ color: DF.spiritGold }}>
           <span aria-hidden="true">* </span>Featured
         </span>
       )}
-      <h3 className="text-content mt-1 transition-colors" style={{ color: DF.bone }}>
+      <h3 className="text-lg mt-1 transition-colors" style={{ color: DF.bone }}>
         {project.name}
       </h3>
-      <p className="text-content-sm mt-2" style={{ color: DF.silver }}>{project.tagline}</p>
+      <p className="text-sm mt-2" style={{ color: DF.silver }}>{project.tagline}</p>
       {project.impact && (
-        <p className="text-content-sm mt-2 italic" style={{ color: DF.ethereal }}>
+        <p className="text-sm mt-2 italic" style={{ color: DF.ethereal }}>
           <span aria-hidden="true">- </span>
           <span className="sr-only">Impact: </span>{project.impact}
         </p>
       )}
       <div className="flex flex-wrap gap-1 mt-3" aria-label="Technologies used">
         {project.techStack.slice(0, 4).map((tech) => (
-          <span key={tech} className="text-content-sm px-1 py-0.5" style={{ background: `${DF.ethereal}12`, color: DF.silver }}>
+          <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${DF.ethereal}12`, color: DF.silver }}>
             {tech}
           </span>
         ))}
@@ -1785,14 +1785,14 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COM
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl" aria-hidden="true">{company.icon}</span>
         <div>
-          <h3 className="text-content transition-colors" style={{ color: DF.bone }}>
+          <h3 className="text-lg transition-colors" style={{ color: DF.bone }}>
             {company.name}
             <span className="sr-only"> (opens in new tab)</span>
           </h3>
-          <p className="text-content-sm" style={{ color: DF.spiritGold }}>{company.tagline}</p>
+          <p className="text-sm" style={{ color: DF.spiritGold }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-content-sm" style={{ color: DF.silver }}>{company.description}</p>
+      <p className="text-sm" style={{ color: DF.silver }}>{company.description}</p>
     </a>
   )
 })
@@ -1808,15 +1808,15 @@ const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
         borderRadius: '4px',
       }}
     >
-      <h3 className="text-content transition-colors" style={{ color: DF.bone }}>
+      <h3 className="text-lg transition-colors" style={{ color: DF.bone }}>
         {band.name}
         {band.url && <span className="sr-only"> (opens in new tab)</span>}
       </h3>
-      <p className="text-content-sm mt-1" style={{ color: DF.lavender }}>
+      <p className="text-sm mt-1" style={{ color: DF.lavender }}>
         {band.genre} <span aria-hidden="true">|</span> {band.role}
       </p>
-      <p className="text-content-sm mt-2" style={{ color: DF.silver }}>{band.description}</p>
-      {!band.url && <p className="text-content-sm mt-2 italic" style={{ color: DF.silver }}>Website coming soon</p>}
+      <p className="text-sm mt-2" style={{ color: DF.silver }}>{band.description}</p>
+      {!band.url && <p className="text-sm mt-2 italic" style={{ color: DF.silver }}>Website coming soon</p>}
     </article>
   )
 
@@ -1856,11 +1856,11 @@ const ExperienceCard = memo(function ExperienceCard({ entry }: { entry: typeof E
     >
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
-          <h3 className="text-content font-medium" style={{ color: DF.bone }}>{entry.title}</h3>
-          <p className="text-content-sm" style={{ color: DF.ethereal }}>{entry.organization}</p>
+          <h3 className="text-lg font-medium" style={{ color: DF.bone }}>{entry.title}</h3>
+          <p className="text-sm" style={{ color: DF.ethereal }}>{entry.organization}</p>
         </div>
         <span
-          className="text-content-sm px-2 py-0.5"
+          className="text-sm px-2 py-0.5"
           style={{
             color: DF.spiritGold,
             background: `${DF.spiritGold}12`,
@@ -1871,11 +1871,11 @@ const ExperienceCard = memo(function ExperienceCard({ entry }: { entry: typeof E
           <time>{startDisplay}</time> - <time>{endDisplay}</time>
         </span>
       </div>
-      <p className="text-content-sm mb-2" style={{ color: DF.silver }}>{entry.description}</p>
+      <p className="text-sm mb-2" style={{ color: DF.silver }}>{entry.description}</p>
       {entry.highlights && entry.highlights.length > 0 && (
         <ul className="space-y-1" aria-label="Key achievements">
           {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-content-sm flex items-start gap-2" style={{ color: DF.bone }}>
+            <li key={i} className="text-sm flex items-start gap-2" style={{ color: DF.bone }}>
               <span style={{ color: DF.spiritGold }} aria-hidden="true">*</span>
               {highlight}
             </li>
@@ -2269,7 +2269,6 @@ export default function DarkFantasyTheme() {
       style={{
         background: `linear-gradient(180deg, ${DF.void}, ${DF.voidDeep}, ${DF.voidPurple})`,
         fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
-        fontSize: '14px',
       }}
     >
       {/* Skip Link for accessibility */}
@@ -2329,7 +2328,7 @@ export default function DarkFantasyTheme() {
               <SpiritWisp size={32} color={DF.spiritGold} />
             </div>
             <h1
-              className="text-content-sm md:text-content-lg tracking-[0.15em] md:tracking-[0.2em] font-normal uppercase whitespace-nowrap"
+              className="text-sm md:text-lg tracking-[0.15em] md:tracking-[0.2em] font-normal uppercase whitespace-nowrap"
               style={{
                 color: DF.bone,
                 textShadow: `0 0 20px ${DF.ethereal}30`,
@@ -2374,11 +2373,11 @@ export default function DarkFantasyTheme() {
       {/* Hero Section - below fixed nav, changes with profession */}
       <header className="relative z-20 pt-20 md:pt-24 pb-6 px-4 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-content-sm md:text-content tracking-wider mb-2" style={{ color: DF.silver }}>
+          <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DF.silver }}>
             {PROFESSIONAL_SUMMARY[active].headline}
           </p>
           <p
-            className="text-content-sm tracking-wider italic"
+            className="text-sm tracking-wider italic"
             style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
           >
             {PROFESSIONAL_SUMMARY[active].tagline}
@@ -2595,7 +2594,7 @@ export default function DarkFantasyTheme() {
               <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
                 Ready to Work Together?
               </h2>
-              <p className="text-content-sm" style={{ color: DF.silver }}>
+              <p className="text-sm" style={{ color: DF.silver }}>
                 10+ years delivering production systems. Let&apos;s build something.
               </p>
             </div>
@@ -2644,7 +2643,7 @@ export default function DarkFantasyTheme() {
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
         <div className="inline-flex items-center gap-4" style={{ color: DF.silver }}>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
-          <span className="text-content-sm tracking-[0.2em]" style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
+          <span className="text-sm tracking-[0.2em]" style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
             <span className="sr-only">Copyright </span>© {new Date().getFullYear()} Alexander Pulido
           </span>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
