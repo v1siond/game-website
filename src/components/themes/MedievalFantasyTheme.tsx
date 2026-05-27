@@ -3566,11 +3566,37 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         {/* NOSE */}
         <path d="M100,45 L95,55 L105,55 Z" fill="#5a4a3a" />
 
-        {/* MOUTH - stern frown */}
-        <path d="M92,60 Q100,58 108,60" stroke="#3a2a1a" strokeWidth="2" strokeLinecap="round" fill="none" />
+        {/* Full Beard - thick sides, rounded bottom */}
+        {/* Main beard mass */}
+        <path
+          d="M80,50
+             Q75,55 74,65
+             Q73,80 76,95
+             Q80,110 100,115
+             Q120,110 124,95
+             Q127,80 126,65
+             Q125,55 120,50
+             L118,52 Q115,58 110,60 L108,58
+             Q100,62 92,58 L90,60 Q85,58 82,52 Z"
+          fill="#0a0808"
+        />
+        {/* Beard texture - lighter strands */}
+        <path d="M82,65 Q84,80 86,95" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
+        <path d="M90,62 Q92,85 95,105" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
+        <path d="M100,64 Q100,90 100,110" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
+        <path d="M110,62 Q108,85 105,105" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
+        <path d="M118,65 Q116,80 114,95" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
 
-        {/* Beard - BLACK */}
-        <path d="M84,58 Q78,70 84,82 Q92,92 100,94 Q108,92 116,82 Q122,70 116,58 Q108,68 100,70 Q92,68 84,58" fill="#0a0808" />
+        {/* Mustache - thick, covers upper lip */}
+        <path
+          d="M88,56 Q94,60 100,58 Q106,60 112,56 Q108,64 100,65 Q92,64 88,56"
+          fill="#0a0808"
+        />
+        <path d="M88,58 Q94,62 100,60" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.4" />
+        <path d="M100,60 Q106,62 112,58" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.4" />
+
+        {/* Mouth visible under mustache */}
+        <path d="M95,66 Q100,65 105,66" stroke="#3a2a1a" strokeWidth="1.5" strokeLinecap="round" fill="none" />
 
         {/* EYES - dark ovals with ice glow */}
         <ellipse cx="90" cy="42" rx="4.5" ry="3.5" fill="#1a1210" />
