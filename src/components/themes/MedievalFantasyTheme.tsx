@@ -1677,35 +1677,37 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             pointerEvents: 'none',
           }}
         >
-          {/* PHASE 1: METEOR FALLING */}
+          {/* PHASE 1: METEOR FALLING - diagonal, starts small and grows */}
           {golemPhase === 'meteor' && (
             <div
               style={{
                 position: 'absolute',
-                left: '80px',
-                top: '-150px',
-                transform: 'translateX(-50%)',
+                left: '-50px',
+                top: '-200px',
                 animation: 'golemMeteorFall 1.5s ease-in forwards',
               }}
             >
-              {/* Meteor core */}
+              {/* Meteor core - scales up during animation */}
               <div style={{
-                width: '35px',
-                height: '35px',
+                width: '10px',
+                height: '10px',
                 borderRadius: '50%',
-                background: `radial-gradient(circle at 30% 30%, ${WC3.roc.fireBright} 0%, ${WC3.roc.fireMid} 40%, ${WC3.roc.felMid} 70%, #1a1510 100%)`,
-                boxShadow: `0 0 30px ${WC3.roc.felBright}, 0 0 60px ${WC3.roc.fireMid}`,
+                background: `radial-gradient(circle at 30% 30%, ${WC3.roc.fireCore} 0%, ${WC3.roc.fireBright} 30%, ${WC3.roc.fireMid} 60%, ${WC3.roc.felMid} 85%, #1a1510 100%)`,
+                boxShadow: `0 0 15px ${WC3.roc.felBright}, 0 0 30px ${WC3.roc.fireMid}`,
+                animation: 'meteorGrow 1.5s ease-in forwards',
               }} />
-              {/* Meteor trail */}
+              {/* Meteor trail - diagonal, grows with meteor */}
               <div style={{
                 position: 'absolute',
-                top: '-80px',
+                top: '-40px',
                 left: '50%',
-                width: '12px',
-                height: '100px',
-                background: `linear-gradient(180deg, transparent 0%, ${WC3.roc.felDark}30 20%, ${WC3.roc.felMid}60 50%, ${WC3.roc.felBright}90 80%, ${WC3.roc.fireCore} 100%)`,
-                filter: 'blur(4px)',
-                transform: 'translateX(-50%)',
+                width: '4px',
+                height: '50px',
+                background: `linear-gradient(180deg, transparent 0%, ${WC3.roc.felDark}40 30%, ${WC3.roc.felMid}70 60%, ${WC3.roc.felBright}95 85%, ${WC3.roc.fireCore} 100%)`,
+                filter: 'blur(3px)',
+                transform: 'translateX(-50%) rotate(-25deg)',
+                transformOrigin: 'bottom center',
+                animation: 'meteorTrailGrow 1.5s ease-in forwards',
               }} />
             </div>
           )}
@@ -2372,18 +2374,54 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           0% { opacity: 0; filter: brightness(1.3); }
           100% { opacity: 1; filter: brightness(1); }
         }
-        /* Meteor falls from sky for golem spawn */
+        /* Meteor falls diagonally from sky for golem spawn */
         @keyframes golemMeteorFall {
           0% {
-            transform: translateX(-50%) translateY(0);
+            transform: translate(0, 0);
             opacity: 0;
           }
-          10% {
+          8% {
             opacity: 1;
           }
           100% {
-            transform: translateX(-50%) translateY(350px);
+            transform: translate(130px, 400px);
             opacity: 1;
+          }
+        }
+        /* Meteor grows as it approaches (perspective effect) */
+        @keyframes meteorGrow {
+          0% {
+            width: 8px;
+            height: 8px;
+            box-shadow: 0 0 8px ${WC3.roc.felBright}, 0 0 15px ${WC3.roc.fireMid};
+          }
+          50% {
+            width: 20px;
+            height: 20px;
+            box-shadow: 0 0 20px ${WC3.roc.felBright}, 0 0 40px ${WC3.roc.fireMid};
+          }
+          100% {
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 0 35px ${WC3.roc.felBright}, 0 0 70px ${WC3.roc.fireMid};
+          }
+        }
+        /* Trail grows with meteor */
+        @keyframes meteorTrailGrow {
+          0% {
+            width: 3px;
+            height: 30px;
+            filter: blur(2px);
+          }
+          50% {
+            width: 8px;
+            height: 70px;
+            filter: blur(3px);
+          }
+          100% {
+            width: 14px;
+            height: 120px;
+            filter: blur(5px);
           }
         }
         /* Explosion flash on meteor impact */
