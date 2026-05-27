@@ -3,36 +3,31 @@
 import { memo, useState, useEffect, useRef } from 'react'
 
 /**
- * KRATOS SVG CHARACTER - Redesigned with proper sprite proportions
- * ================================================================
- * Based on research from:
- * - SLYNYRD Pixelblog human anatomy (6-head model)
- * - AnimeOutline muscular male tutorial
- * - 2D Will Never Die sprite guides
- * - God of War: Betrayal sprite references
+ * KRATOS SVG CHARACTER - Based on God of War: Betrayal sprite sheet
+ * =================================================================
+ * Reference: spritedatabase.net/file/7048
  *
- * Proportions (6-head model, 90px total height):
- * - Head: 15px tall, 12px wide
- * - Shoulders: ~36px wide (3x head width for muscular look)
- * - Neck: ~8px wide (2/3 head width)
- * - Torso: V-shape, wide chest tapering to waist
- * - Arms: Thick upper arm (~8px), taper to wrist (~4px)
- * - Legs: Thigh thick (~10px), calf bulge, ankle thin (~4px)
- *
- * Tattoo: Kratos's LEFT side (SVG left x~20 → screen right after scaleX flip)
+ * Key features from reference:
+ * - Dynamic running/attack pose (body leaning forward)
+ * - Blades of Chaos - curved blades on chains
+ * - Arms extended in attack position
+ * - Compact proportions (~5 heads tall)
+ * - Red loincloth/skirt flowing with movement
  */
 
 const KRATOS = {
-  skin: '#d4c8b8',        // Ash-white skin (lighter)
-  skinLight: '#e8ddd0',   // Highlights
-  skinShadow: '#a89880',  // Skin shadow
-  tattoo: '#8b1a1a',      // Red tattoo
-  beard: '#2a1a0a',       // Dark beard
-  skirt: '#8b1a1a',       // Red battle skirt
-  skirtDark: '#5a0a0a',   // Skirt shadow
-  belt: '#5a4a2a',        // Leather belt
-  gold: '#c9a227',        // Gold accents
-  eye: '#1a0a00',         // Dark eye
+  skin: '#d4c8b8',
+  skinShadow: '#a89880',
+  tattoo: '#8b1a1a',
+  beard: '#2a1a0a',
+  skirt: '#8b1a1a',
+  skirtDark: '#5a0a0a',
+  belt: '#5a4a2a',
+  gold: '#c9a227',
+  blade: '#d4a030',
+  bladeDark: '#8a6a10',
+  chain: '#7a7a7a',
+  eye: '#1a0a00',
 }
 
 interface KratosCharacterProps {
@@ -55,31 +50,35 @@ export const KratosCharacter = memo(function KratosCharacter({
       {running && (
         <style>{`
           @keyframes kratosBodyBob {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-2px) rotate(-5deg); }
           }
-          @keyframes kratosLeftLeg {
-            0%, 100% { transform: rotate(-20deg); }
-            50% { transform: rotate(20deg); }
+          @keyframes kratosBackLeg {
+            0%, 100% { transform: rotate(-35deg); }
+            50% { transform: rotate(15deg); }
           }
-          @keyframes kratosRightLeg {
-            0%, 100% { transform: rotate(20deg); }
+          @keyframes kratosFrontLeg {
+            0%, 100% { transform: rotate(35deg); }
+            50% { transform: rotate(-15deg); }
+          }
+          @keyframes kratosBackArm {
+            0%, 100% { transform: rotate(40deg); }
             50% { transform: rotate(-20deg); }
           }
-          @keyframes kratosLeftArm {
-            0%, 100% { transform: rotate(25deg); }
-            50% { transform: rotate(-25deg); }
+          @keyframes kratosFrontArm {
+            0%, 100% { transform: rotate(-50deg); }
+            50% { transform: rotate(10deg); }
           }
-          @keyframes kratosRightArm {
-            0%, 100% { transform: rotate(-25deg); }
-            50% { transform: rotate(25deg); }
+          @keyframes bladeSwing {
+            0%, 100% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
           }
         `}</style>
       )}
       <svg
-        width={60 * scale}
+        width={80 * scale}
         height={90 * scale}
-        viewBox="0 0 60 90"
+        viewBox="0 0 80 90"
         className={className}
         style={{
           overflow: 'visible',
@@ -94,199 +93,222 @@ export const KratosCharacter = memo(function KratosCharacter({
             <stop offset="100%" stopColor="#5a4a10" stopOpacity="0" />
           </radialGradient>
         </defs>
-        <ellipse cx="30" cy="87" rx="20" ry="5" fill="url(#kratosShadowGradient)" />
+        <ellipse cx="40" cy="87" rx="18" ry="4" fill="url(#kratosShadowGradient)" />
 
-        {/* Body group with bob animation */}
+        {/* Main body group - tilted forward for running pose */}
         <g style={{
-          animation: running ? 'kratosBodyBob 0.3s ease-in-out infinite' : undefined,
+          transformOrigin: '40px 50px',
+          animation: running ? 'kratosBodyBob 0.25s ease-in-out infinite' : undefined,
+          transform: running ? undefined : 'rotate(-5deg)',
         }}>
 
-          {/* === LEGS === */}
-          {/* Left leg (back when running) */}
+          {/* === BACK BLADE OF CHAOS (behind body) === */}
           <g style={{
-            transformOrigin: '24px 52px',
-            animation: running ? 'kratosLeftLeg 0.3s ease-in-out infinite' : undefined,
+            transformOrigin: '55px 35px',
+            animation: running ? 'bladeSwing 0.25s ease-in-out infinite' : undefined,
           }}>
-            {/* Thigh - muscular curve */}
+            {/* Chain */}
             <path
-              d="M21,52 Q18,56 19,62 Q20,66 23,66 L27,66 Q29,66 29,62 Q30,56 27,52 Z"
-              fill={KRATOS.skin}
-              stroke={KRATOS.skinShadow}
+              d="M52,38 Q60,32 70,28 Q78,25 85,20"
+              stroke={KRATOS.chain}
+              strokeWidth="1.5"
+              fill="none"
+              strokeDasharray="2,1"
+            />
+            {/* Blade - curved like in sprite */}
+            <path
+              d="M82,22 Q88,18 92,12 Q94,8 90,6 Q86,8 84,14 Q80,20 82,22 Z"
+              fill={KRATOS.blade}
+              stroke={KRATOS.bladeDark}
               strokeWidth="0.5"
             />
-            {/* Calf - proper muscle bulge on back */}
-            <path
-              d="M20,66 Q17,70 18,76 Q19,82 22,83 L26,83 Q28,82 28,76 Q29,70 26,66 Z"
-              fill={KRATOS.skin}
-              stroke={KRATOS.skinShadow}
-              strokeWidth="0.5"
-            />
-            {/* Foot */}
-            <ellipse cx="24" cy="85" rx="5" ry="2" fill={KRATOS.beard} />
           </g>
 
-          {/* Right leg (front when running) */}
+          {/* === BACK LEG === */}
           <g style={{
-            transformOrigin: '36px 52px',
-            animation: running ? 'kratosRightLeg 0.3s ease-in-out infinite' : undefined,
+            transformOrigin: '35px 52px',
+            animation: running ? 'kratosBackLeg 0.25s ease-in-out infinite' : undefined,
           }}>
-            {/* Thigh */}
             <path
-              d="M33,52 Q30,56 31,62 Q32,66 35,66 L39,66 Q41,66 41,62 Q42,56 39,52 Z"
+              d="M32,52 Q29,58 30,65 Q31,70 34,70 L38,70 Q40,70 40,65 Q41,58 38,52 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Calf */}
             <path
-              d="M32,66 Q29,70 30,76 Q31,82 34,83 L38,83 Q40,82 40,76 Q41,70 38,66 Z"
+              d="M31,70 Q28,76 29,82 L33,84 L37,84 L38,82 Q39,76 36,70 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Foot */}
-            <ellipse cx="36" cy="85" rx="5" ry="2" fill={KRATOS.beard} />
+            <ellipse cx="33" cy="85" rx="4" ry="2" fill={KRATOS.beard} />
           </g>
 
-          {/* === BATTLE SKIRT === */}
+          {/* === FRONT LEG === */}
+          <g style={{
+            transformOrigin: '45px 52px',
+            animation: running ? 'kratosFrontLeg 0.25s ease-in-out infinite' : undefined,
+          }}>
+            <path
+              d="M42,52 Q39,58 40,65 Q41,70 44,70 L48,70 Q50,70 50,65 Q51,58 48,52 Z"
+              fill={KRATOS.skin}
+              stroke={KRATOS.skinShadow}
+              strokeWidth="0.5"
+            />
+            <path
+              d="M41,70 Q38,76 39,82 L43,84 L47,84 L48,82 Q49,76 46,70 Z"
+              fill={KRATOS.skin}
+              stroke={KRATOS.skinShadow}
+              strokeWidth="0.5"
+            />
+            <ellipse cx="44" cy="85" rx="4" ry="2" fill={KRATOS.beard} />
+          </g>
+
+          {/* === BATTLE SKIRT - flowing back === */}
           <path
-            d="M19,48 L16,58 L21,59 L25,56 L30,59 L35,56 L39,59 L44,58 L41,48 Z"
+            d="M30,48 L26,60 L31,62 L36,58 L40,62 L44,58 L49,62 L54,60 L50,48 Z"
             fill={KRATOS.skirt}
             stroke={KRATOS.skirtDark}
             strokeWidth="0.5"
           />
-          {/* Skirt folds/shadows */}
-          <path d="M25,50 L24,56" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
-          <path d="M30,50 L30,57" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
-          <path d="M35,50 L36,56" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
+          <path d="M36,50 L34,58" stroke={KRATOS.skirtDark} strokeWidth="0.6" opacity="0.5" />
+          <path d="M44,50 L46,58" stroke={KRATOS.skirtDark} strokeWidth="0.6" opacity="0.5" />
 
-          {/* === TORSO - narrower, more proportional === */}
+          {/* === TORSO - leaning forward === */}
           <path
-            d="M18,26
-               Q15,30 17,40 L19,48 L41,48 L43,40
-               Q45,30 42,26
-               L38,24 L30,23 L22,24 Z"
+            d="M28,28
+               Q24,32 26,42 L29,48 L51,48 L54,42
+               Q56,32 52,28
+               L46,26 L40,25 L34,26 Z"
             fill={KRATOS.skin}
             stroke={KRATOS.skinShadow}
             strokeWidth="0.5"
           />
 
-          {/* Chest muscles (pectorals) */}
+          {/* Chest definition */}
           <path
-            d="M20,28 Q24,31 27,30 Q30,29 33,30 Q36,31 40,28"
+            d="M30,30 Q34,33 37,31 Q40,30 43,31 Q46,33 50,30"
             stroke={KRATOS.skinShadow}
-            strokeWidth="0.8"
+            strokeWidth="0.7"
             fill="none"
             opacity="0.4"
           />
-          {/* Center chest line */}
-          <path d="M30,30 L30,46" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.3" />
-          {/* Abs */}
-          <path d="M26,36 L34,36" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
-          <path d="M25,40 L35,40" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
-          <path d="M25,44 L35,44" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
+          <path d="M40,32 L40,46" stroke={KRATOS.skinShadow} strokeWidth="0.4" opacity="0.3" />
+          <path d="M35,37 L45,37" stroke={KRATOS.skinShadow} strokeWidth="0.4" opacity="0.2" />
+          <path d="M34,41 L46,41" stroke={KRATOS.skinShadow} strokeWidth="0.4" opacity="0.2" />
 
-          {/* RED TATTOO on body - aligned with head tattoo */}
+          {/* RED TATTOO on body */}
           <path
-            d="M23,26 Q21,34 21,42 Q21,46 22,48"
+            d="M33,28 Q31,36 31,44 Q31,47 32,48"
+            stroke={KRATOS.tattoo}
+            strokeWidth="2"
+            fill="none"
+            strokeLinecap="round"
+          />
+
+          {/* Belt */}
+          <rect x="28" y="46" width="24" height="3" rx="1" fill={KRATOS.belt} />
+          <circle cx="40" cy="47.5" r="1.5" fill={KRATOS.gold} />
+
+          {/* === BACK ARM (raised back with blade) === */}
+          <g style={{
+            transformOrigin: '52px 28px',
+            animation: running ? 'kratosBackArm 0.25s ease-in-out infinite' : undefined,
+          }}>
+            <ellipse cx="53" cy="28" rx="3" ry="2.5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            <path
+              d="M51,29 Q48,33 49,38 L53,38 Q55,33 53,29 Z"
+              fill={KRATOS.skin}
+              stroke={KRATOS.skinShadow}
+              strokeWidth="0.5"
+            />
+            <path
+              d="M49,38 Q47,42 48,47 L52,47 Q53,42 51,38 Z"
+              fill={KRATOS.skin}
+              stroke={KRATOS.skinShadow}
+              strokeWidth="0.5"
+            />
+            <ellipse cx="50" cy="49" rx="2.5" ry="2" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+          </g>
+
+          {/* === FRONT ARM (extended forward with blade) === */}
+          <g style={{
+            transformOrigin: '28px 28px',
+            animation: running ? 'kratosFrontArm 0.25s ease-in-out infinite' : undefined,
+          }}>
+            <ellipse cx="27" cy="28" rx="3" ry="2.5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            <path
+              d="M25,29 Q22,33 23,38 L27,38 Q29,33 27,29 Z"
+              fill={KRATOS.skin}
+              stroke={KRATOS.skinShadow}
+              strokeWidth="0.5"
+            />
+            <path
+              d="M22,38 Q19,42 20,47 L24,47 Q26,42 24,38 Z"
+              fill={KRATOS.skin}
+              stroke={KRATOS.skinShadow}
+              strokeWidth="0.5"
+            />
+            <ellipse cx="22" cy="49" rx="2.5" ry="2" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+          </g>
+
+          {/* === FRONT BLADE OF CHAOS === */}
+          <g style={{
+            transformOrigin: '22px 49px',
+            animation: running ? 'bladeSwing 0.25s ease-in-out infinite reverse' : undefined,
+          }}>
+            {/* Chain */}
+            <path
+              d="M22,49 Q14,45 6,48 Q-2,52 -10,55"
+              stroke={KRATOS.chain}
+              strokeWidth="1.5"
+              fill="none"
+              strokeDasharray="2,1"
+            />
+            {/* Blade */}
+            <path
+              d="M-8,54 Q-14,52 -20,56 Q-24,60 -20,62 Q-16,60 -12,56 Q-6,52 -8,54 Z"
+              fill={KRATOS.blade}
+              stroke={KRATOS.bladeDark}
+              strokeWidth="0.5"
+            />
+          </g>
+
+          {/* === HEAD === */}
+          <rect x="36" y="22" width="8" height="5" rx="2" fill={KRATOS.skin} />
+          <ellipse cx="40" cy="14" rx="10" ry="11" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+
+          {/* RED TATTOO on head */}
+          <path
+            d="M32,4 Q30,8 31,14 Q31,20 32,24"
             stroke={KRATOS.tattoo}
             strokeWidth="2.5"
             fill="none"
             strokeLinecap="round"
           />
 
-          {/* Belt */}
-          <rect x="18" y="46" width="24" height="3" rx="1" fill={KRATOS.belt} />
-          <circle cx="30" cy="47.5" r="2" fill={KRATOS.gold} />
+          {/* Eyes - fierce stare */}
+          <ellipse cx="35" cy="12" rx="2.5" ry="1.8" fill="white" />
+          <ellipse cx="45" cy="12" rx="2.5" ry="1.8" fill="white" />
+          <circle cx="36" cy="12" r="1.2" fill={KRATOS.eye} />
+          <circle cx="46" cy="12" r="1.2" fill={KRATOS.eye} />
 
-          {/* === LEFT ARM === */}
-          <g style={{
-            transformOrigin: '16px 26px',
-            animation: running ? 'kratosLeftArm 0.3s ease-in-out infinite' : undefined,
-          }}>
-            {/* Shoulder/Deltoid */}
-            <ellipse cx="15" cy="27" rx="4" ry="3" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
-            {/* Upper arm */}
-            <path
-              d="M12,28 Q9,32 10,38 Q11,42 13,42 L17,42 Q19,42 19,38 Q20,32 17,28 Z"
-              fill={KRATOS.skin}
-              stroke={KRATOS.skinShadow}
-              strokeWidth="0.5"
-            />
-            {/* Forearm */}
-            <path
-              d="M11,42 Q9,46 9,52 Q9,54 11,54 L15,54 Q17,54 17,52 Q17,46 15,42 Z"
-              fill={KRATOS.skin}
-              stroke={KRATOS.skinShadow}
-              strokeWidth="0.5"
-            />
-            {/* Fist */}
-            <ellipse cx="13" cy="56" rx="3" ry="2.5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
-          </g>
-
-          {/* === RIGHT ARM === */}
-          <g style={{
-            transformOrigin: '44px 26px',
-            animation: running ? 'kratosRightArm 0.3s ease-in-out infinite' : undefined,
-          }}>
-            {/* Shoulder/Deltoid */}
-            <ellipse cx="45" cy="27" rx="4" ry="3" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
-            {/* Upper arm */}
-            <path
-              d="M43,28 Q40,32 41,38 Q42,42 43,42 L47,42 Q49,42 49,38 Q50,32 47,28 Z"
-              fill={KRATOS.skin}
-              stroke={KRATOS.skinShadow}
-              strokeWidth="0.5"
-            />
-            {/* Forearm */}
-            <path
-              d="M43,42 Q41,46 41,52 Q41,54 43,54 L47,54 Q49,54 49,52 Q49,46 47,42 Z"
-              fill={KRATOS.skin}
-              stroke={KRATOS.skinShadow}
-              strokeWidth="0.5"
-            />
-            {/* Fist */}
-            <ellipse cx="45" cy="56" rx="3" ry="2.5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
-          </g>
-
-          {/* === HEAD === */}
-          {/* Neck - thick like a muscular warrior */}
-          <rect x="26" y="20" width="8" height="6" rx="2" fill={KRATOS.skin} />
-
-          {/* Head shape - slightly wider at jaw */}
-          <ellipse cx="30" cy="12" rx="11" ry="12" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
-
-          {/* RED TATTOO on head - next to LEFT eye in SVG (x~23), appears next to RIGHT eye on screen after flip */}
-          <path
-            d="M23,1 Q21,6 22,12 Q22,18 23,22"
-            stroke={KRATOS.tattoo}
-            strokeWidth="3"
-            fill="none"
-            strokeLinecap="round"
-          />
-
-          {/* Eyes - intense stare */}
-          <ellipse cx="24" cy="11" rx="3" ry="2" fill="white" />
-          <ellipse cx="36" cy="11" rx="3" ry="2" fill="white" />
-          <circle cx="24" cy="11" r="1.5" fill={KRATOS.eye} />
-          <circle cx="36" cy="11" r="1.5" fill={KRATOS.eye} />
-
-          {/* Angry eyebrows - angled down toward center */}
-          <path d="M20,7 L27,9" stroke={KRATOS.beard} strokeWidth="2" strokeLinecap="round" />
-          <path d="M40,7 L33,9" stroke={KRATOS.beard} strokeWidth="2" strokeLinecap="round" />
+          {/* Angry eyebrows */}
+          <path d="M32,8 L37,10" stroke={KRATOS.beard} strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M48,8 L43,10" stroke={KRATOS.beard} strokeWidth="1.8" strokeLinecap="round" />
 
           {/* Nose */}
-          <path d="M30,12 L28,16 L32,16 Z" fill={KRATOS.skinShadow} opacity="0.4" />
+          <path d="M40,13 L38,17 L42,17 Z" fill={KRATOS.skinShadow} opacity="0.4" />
 
-          {/* Beard/goatee - classic Kratos look */}
+          {/* Beard */}
           <path
-            d="M24,17 Q24,22 27,24 Q30,26 33,24 Q36,22 36,17
-               L34,17 Q34,20 32,22 Q30,23 28,22 Q26,20 26,17 Z"
+            d="M35,18 Q35,22 38,24 Q40,25 42,24 Q45,22 45,18
+               L43,18 Q43,21 41,22 Q40,22.5 39,22 Q37,21 37,18 Z"
             fill={KRATOS.beard}
           />
 
-          {/* Mouth - grimace */}
-          <path d="M27,18 L33,18" stroke="#1a0a00" strokeWidth="0.8" />
+          {/* Mouth - battle cry */}
+          <path d="M37,19 Q40,21 43,19" stroke="#1a0a00" strokeWidth="0.8" fill="none" />
 
         </g>
       </svg>
@@ -322,11 +344,10 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
 
     setPhase('kratos-run')
 
-    // Kratos runs from off-screen right to position
     const startTime = performance.now()
     const runDuration = 1000
-    const startX = -600  // Far off-screen right
-    const endX = -180    // Final position between content and screen edge
+    const startX = -600
+    const endX = -180
 
     const animateRun = (now: number) => {
       const elapsed = now - startTime
@@ -356,7 +377,6 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
 
   return (
     <div className={`relative ${className}`}>
-      {/* Kratos */}
       <div
         className="absolute z-30 pointer-events-none"
         style={{
@@ -374,7 +394,6 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
         />
       </div>
 
-      {/* Content */}
       <div
         style={{
           opacity: isContentVisible ? 1 : 0,
