@@ -3549,6 +3549,16 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         <ellipse cx="100" cy="58" rx="10" ry="6" fill="url(#undeadSkin)" />
         <ellipse cx="100" cy="40" rx="20" ry="24" fill="url(#undeadSkin)" />
 
+        {/* Short dark hair - cropped style */}
+        <path
+          d="M80,35 Q80,18 100,16 Q120,18 120,35 L118,30 Q110,22 100,22 Q90,22 82,30 Z"
+          fill="#1a1515"
+        />
+        {/* Hair texture lines */}
+        <path d="M85,28 Q90,24 95,26" stroke="#2a2525" strokeWidth="1" fill="none" opacity="0.6" />
+        <path d="M105,26 Q110,24 115,28" stroke="#2a2525" strokeWidth="1" fill="none" opacity="0.6" />
+        <path d="M92,22 Q100,19 108,22" stroke="#2a2525" strokeWidth="1" fill="none" opacity="0.5" />
+
         {/* Ears */}
         <ellipse cx="80" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
         <ellipse cx="120" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
