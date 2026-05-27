@@ -3425,21 +3425,37 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         <ellipse cx="100" cy="58" rx="10" ry="6" fill="url(#undeadSkin)" />
         <ellipse cx="100" cy="40" rx="20" ry="24" fill="url(#undeadSkin)" />
 
-        {/* LONG Hair - BLACK roots to GRAY to WHITE tips */}
+        {/* LONG FLOWING HAIR - Arthas style, white/silver flowing down */}
+        {/* Hair mass at top of head */}
         <path d="M80,38 Q75,18 88,10 Q100,5 112,10 Q125,18 120,38 L116,32 Q108,24 100,24 Q92,24 84,32 Z" fill="#1a1515" />
-        {/* Long flowing hair strands - gradient from dark to light */}
-        <path d="M78,36 Q70,55 65,85 Q62,105 60,120" stroke="#1a1515" strokeWidth="5" strokeLinecap="round" fill="none" />
-        <path d="M82,38 Q75,60 72,90 Q70,115 68,135" stroke="#3a3535" strokeWidth="4" strokeLinecap="round" fill="none" />
-        <path d="M78,42 Q72,65 70,95 Q68,120 65,145" stroke="#5a5555" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-        <path d="M76,45 Q70,70 68,100 Q66,130 62,155" stroke="#8a8585" strokeWidth="3" strokeLinecap="round" fill="none" />
-        <path d="M122,36 Q130,55 135,85 Q138,105 140,120" stroke="#1a1515" strokeWidth="5" strokeLinecap="round" fill="none" />
-        <path d="M118,38 Q125,60 128,90 Q130,115 132,135" stroke="#3a3535" strokeWidth="4" strokeLinecap="round" fill="none" />
-        <path d="M122,42 Q128,65 130,95 Q132,120 135,145" stroke="#5a5555" strokeWidth="3.5" strokeLinecap="round" fill="none" />
-        <path d="M124,45 Q130,70 132,100 Q134,130 138,155" stroke="#c0c0c5" strokeWidth="3" strokeLinecap="round" fill="none" />
 
-        {/* Ears - darker undead skin */}
-        <ellipse cx="78" cy="42" rx="5" ry="7" fill="url(#undeadSkin)" />
-        <ellipse cx="122" cy="42" rx="5" ry="7" fill="url(#undeadSkin)" />
+        {/* Left side hair - flows DOWN naturally alongside face/armor */}
+        <g opacity="0.95">
+          {/* Back layer - darkest */}
+          <path d="M82,35 Q78,50 75,80 Q72,120 70,160 Q68,190 65,220" stroke="#2a2525" strokeWidth="8" strokeLinecap="round" fill="none" />
+          <path d="M84,38 Q80,55 77,90 Q74,130 72,170 Q70,200 68,230" stroke="#4a4545" strokeWidth="6" strokeLinecap="round" fill="none" />
+          {/* Mid layer */}
+          <path d="M85,40 Q82,60 80,100 Q78,140 76,180 Q74,210 72,240" stroke="#7a7575" strokeWidth="5" strokeLinecap="round" fill="none" />
+          {/* Front layer - lightest (white tips) */}
+          <path d="M86,42 Q84,65 82,105 Q80,145 78,185 Q76,215 75,245" stroke="#a8a8a8" strokeWidth="4" strokeLinecap="round" fill="none" />
+          <path d="M87,45 Q85,70 84,110 Q82,150 80,190 Q78,220 78,250" stroke="#c8c8c8" strokeWidth="3" strokeLinecap="round" fill="none" />
+        </g>
+
+        {/* Right side hair - flows DOWN naturally alongside face/armor */}
+        <g opacity="0.95">
+          {/* Back layer - darkest */}
+          <path d="M118,35 Q122,50 125,80 Q128,120 130,160 Q132,190 135,220" stroke="#2a2525" strokeWidth="8" strokeLinecap="round" fill="none" />
+          <path d="M116,38 Q120,55 123,90 Q126,130 128,170 Q130,200 132,230" stroke="#4a4545" strokeWidth="6" strokeLinecap="round" fill="none" />
+          {/* Mid layer */}
+          <path d="M115,40 Q118,60 120,100 Q122,140 124,180 Q126,210 128,240" stroke="#7a7575" strokeWidth="5" strokeLinecap="round" fill="none" />
+          {/* Front layer - lightest (white tips) */}
+          <path d="M114,42 Q116,65 118,105 Q120,145 122,185 Q124,215 125,245" stroke="#a8a8a8" strokeWidth="4" strokeLinecap="round" fill="none" />
+          <path d="M113,45 Q115,70 116,110 Q118,150 120,190 Q122,220 122,250" stroke="#c8c8c8" strokeWidth="3" strokeLinecap="round" fill="none" />
+        </g>
+
+        {/* Ears - small, covered by hair */}
+        <ellipse cx="80" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
+        <ellipse cx="120" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
 
         {/* NOSE */}
         <path d="M100,45 L95,55 L105,55 Z" fill="#5a4a3a" />
@@ -4334,7 +4350,7 @@ export default function MedievalFantasyTheme() {
                   <p style={{ color: WC3.textMid, fontSize: '0.875rem', fontStyle: 'italic' }}>{PROFESSIONAL_SUMMARY.tagline}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <WC3Button href="/cv" zone="roc">Scroll</WC3Button>
+                  <WC3Button href="/cv" zone="roc">CV</WC3Button>
                   <WC3Button href="/personal-projects/game-engine" zone="roc">Nebulith</WC3Button>
                   <ThemeSwitcher />
                 </div>
@@ -4685,7 +4701,7 @@ export default function MedievalFantasyTheme() {
             rightOrnament={<FTOrnament side="right" type="rune" />}
           >
             <section style={{ marginBottom: sectionSpacing }}>
-              <WC3Frame title="Projects" zone="ft">
+              <WC3Frame title="Featured Work" zone="ft">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
                   {(active === 'engineer' ? getFeaturedProjects(projects) : projects).slice(0, 6).map((project) => (
                     <InnerCard key={project.id} zone="ft">
@@ -4714,7 +4730,7 @@ export default function MedievalFantasyTheme() {
           >
             {active === 'engineer' && (
               <section style={{ marginBottom: sectionSpacing }}>
-                <WC3Frame title="Companies" zone="ft">
+                <WC3Frame title="Ventures" zone="ft">
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                     {COMPANIES.map((company) => (
                       <InnerCard key={company.id} zone="ft">
