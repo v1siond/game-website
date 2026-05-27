@@ -367,7 +367,7 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
         <KratosCharacter
           scale={2}
           running={isKratosRunning}
-          facingDirection="left"
+          facingDirection="right"
         />
       </div>
 
