@@ -797,11 +797,11 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     }
   }, [])
 
-  // Rain drops falling - stormy battlefield, diagonal to right
+  // Rain drops falling - stormy battlefield, diagonal to right (optimized: 50 drops)
   const raindrops = useMemo(() =>
-    Array.from({ length: 120 }, (_, i) => ({
+    Array.from({ length: 50 }, (_, i) => ({
       id: i,
-      x: Math.random() * 120 - 20,  // Start off-screen left
+      x: Math.random() * 120 - 20,
       delay: Math.random() * -2,
       duration: 0.6 + Math.random() * 0.3,
       length: 20 + Math.random() * 25,
@@ -930,41 +930,38 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           <ellipse cx="500" cy="500" rx="600" ry="200" fill="#182518" />
         </g>
 
-        {/* === GRASS TEXTURE - Dense distribution across entire ground === */}
-        {/* Expanded grass layer covering y=350 to y=840 with perspective scaling */}
+        {/* === GRASS TEXTURE - Optimized: 200 blades, only 15 animated === */}
         <g>
-          {Array.from({ length: 600 }, (_, i) => {
-            // Distribute across full width and height - 15 rows of 40
-            const row = Math.floor(i / 40)
-            const col = i % 40
+          {Array.from({ length: 200 }, (_, i) => {
+            // Distribute across width and height - 10 rows of 20
+            const row = Math.floor(i / 20)
+            const col = i % 20
 
-            // X position with randomization for natural look
-            const x = 5 + col * 25 + ((i * 17) % 12) - 6
+            // X position with pseudo-random offset
+            const x = 10 + col * 50 + ((i * 17) % 25) - 12
 
-            // Y position - spans from 350 to 840 (higher up for more coverage)
-            const baseY = 360 + row * 32 + ((i * 23) % 18)
+            // Y position - spans from 400 to 840
+            const baseY = 400 + row * 44 + ((i * 23) % 20)
 
-            // Perspective: blades get taller and thicker toward bottom
-            const perspectiveFactor = Math.max(0, (baseY - 350) / 490)  // 0 at top, 1 at bottom
-            const height = 6 + perspectiveFactor * 20 + ((i * 7) % 7)
-            const strokeW = 0.6 + perspectiveFactor * 1.6
-            const opacity = 0.2 + perspectiveFactor * 0.6
+            // Perspective: blades get taller toward bottom
+            const perspectiveFactor = Math.max(0, (baseY - 400) / 440)
+            const height = 8 + perspectiveFactor * 18 + ((i * 7) % 6)
+            const strokeW = 0.8 + perspectiveFactor * 1.4
+            const opacity = 0.25 + perspectiveFactor * 0.55
 
-            // Curve direction varies more
-            const curve = ((i % 13) - 6) * (1.2 + perspectiveFactor * 2.5)
+            // Curve direction
+            const curve = ((i % 11) - 5) * (1.5 + perspectiveFactor * 2)
 
-            // Color gets brighter toward foreground
-            const colors = perspectiveFactor < 0.25
-              ? ['#252f22', '#283225']
-              : perspectiveFactor < 0.5
-                ? ['#2a3828', '#2d3a2a']
-                : perspectiveFactor < 0.75
-                  ? ['#354530', '#3a4a38']
-                  : ['#455540', '#4a5a45']
+            // Color by depth
+            const colors = perspectiveFactor < 0.4
+              ? ['#283225', '#2a3828']
+              : perspectiveFactor < 0.7
+                ? ['#354530', '#3a4a38']
+                : ['#455540', '#4a5a45']
             const color = colors[i % 2]
 
-            // More blades animate toward the front
-            const animated = i % 6 === 0 && perspectiveFactor > 0.35
+            // Only animate 15 blades in foreground (performance optimization)
+            const animated = i % 14 === 0 && perspectiveFactor > 0.6
 
             return (
               <path
@@ -977,8 +974,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 opacity={opacity}
                 style={animated ? {
                   transformOrigin: `${x}px ${baseY}px`,
-                  animation: `grassBlade ${2 + (i % 5) * 0.3}s ease-in-out infinite`,
-                  animationDelay: `${(i % 12) * 0.15}s`
+                  animation: `grassBlade ${2.5 + (i % 3) * 0.4}s ease-in-out infinite`,
                 } : undefined}
               />
             )
@@ -1033,59 +1029,136 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
         {/* === WAR DEBRIS - Weapons and items scattered on battlefield === */}
         <g>
-          {/* === MID-GROUND DEBRIS (y=450-650) - Scattered across the green floor area === */}
+          {/* === TOP-GROUND DEBRIS (y=380-450) - Distant battlefield debris === */}
 
-          {/* Broken sword - mid left */}
+          {/* Distant fallen banner - top left */}
+          <g transform="translate(80, 400) rotate(12)">
+            <rect x="0" y="-1" width="35" height="2" fill="#3a2a18" opacity="0.35" />
+            <polygon points="35,-8 50,-5 48,5 35,8" fill="#552222" opacity="0.3" />
+          </g>
+
+          {/* Distant broken cart wheel - top center-left */}
+          <g transform="translate(250, 420)">
+            <ellipse cx="0" cy="0" rx="18" ry="7" fill="#3a3028" opacity="0.35" />
+            <ellipse cx="0" cy="0" rx="14" ry="5" fill="none" stroke="#2a2018" strokeWidth="2" opacity="0.3" />
+            <line x1="-12" y1="0" x2="12" y2="0" stroke="#2a2018" strokeWidth="1.5" opacity="0.25" />
+            <line x1="0" y1="-5" x2="0" y2="5" stroke="#2a2018" strokeWidth="1.5" opacity="0.25" />
+          </g>
+
+          {/* Distant pile of bodies (shadow) - top center */}
+          <ellipse cx="450" cy="390" rx="50" ry="15" fill="#151812" opacity="0.25" />
+          <ellipse cx="470" cy="385" rx="30" ry="10" fill="#1a1a15" opacity="0.2" />
+
+          {/* Distant catapult wreckage - top right */}
+          <g transform="translate(700, 410) rotate(-8)">
+            <rect x="0" y="0" width="40" height="4" fill="#3a2a18" opacity="0.3" />
+            <rect x="35" y="-12" width="4" height="16" fill="#3a2a18" opacity="0.25" />
+            <polygon points="8,-3 15,-8 22,-3" fill="#2a2018" opacity="0.25" />
+          </g>
+
+          {/* Distant rocks/boulders - top scattered */}
+          <polygon points="150,430 168,418 185,428" fill="#252220" opacity="0.3" />
+          <polygon points="550,400 570,388 590,398" fill="#202018" opacity="0.25" />
+          <polygon points="850,420 870,408 888,418" fill="#252220" opacity="0.3" />
+
+          {/* Distant arrows in ground - top */}
+          <g transform="translate(320, 395) rotate(-75)">
+            <rect x="0" y="0" width="18" height="1.5" fill="#3a2a18" opacity="0.3" />
+            <polygon points="18,-2 23,0 18,2" fill="#4a4a45" opacity="0.25" />
+          </g>
+          <g transform="translate(620, 405) rotate(-82)">
+            <rect x="0" y="0" width="15" height="1.5" fill="#3a2a18" opacity="0.25" />
+            <polygon points="15,-2 20,0 15,2" fill="#4a4a45" opacity="0.2" />
+          </g>
+
+          {/* === MID-GROUND DEBRIS (y=450-650) - More detailed === */}
+
+          {/* Broken sword with blood stain - mid left */}
           <g transform="translate(180, 520) rotate(-15)">
-            <rect x="-2" y="-35" width="3" height="30" fill="#4a4a45" opacity="0.7" />
-            <polygon points="-2,-35 0,-42 2,-35" fill="#5a5a55" opacity="0.7" />
-            <rect x="-5" y="-6" width="10" height="4" fill="#3a3a35" opacity="0.7" />
+            <ellipse cx="5" cy="5" rx="12" ry="6" fill="#2a1515" opacity="0.4" />
+            <rect x="-2" y="-35" width="4" height="32" fill="#5a5a55" opacity="0.75" />
+            <rect x="-1" y="-33" width="2" height="28" fill="#7a7a75" opacity="0.5" />
+            <polygon points="-3,-35 0,-44 3,-35" fill="#6a6a65" opacity="0.75" />
+            <rect x="-6" y="-5" width="12" height="5" fill="#4a4a45" opacity="0.75" />
+            <rect x="-3" y="0" width="6" height="8" fill="#3a2815" opacity="0.7" />
           </g>
 
-          {/* Shield lying flat - mid center-left */}
+          {/* Detailed shield lying flat - mid center-left */}
           <g transform="translate(320, 560)">
-            <ellipse cx="0" cy="0" rx="35" ry="14" fill="#3a3535" opacity="0.6" />
-            <ellipse cx="0" cy="0" rx="28" ry="11" fill="#4a4540" opacity="0.6" />
-            <ellipse cx="0" cy="0" rx="10" ry="4" fill="#2a2520" opacity="0.6" />
+            <ellipse cx="2" cy="3" rx="38" ry="16" fill="#1a1815" opacity="0.35" />
+            <ellipse cx="0" cy="0" rx="38" ry="15" fill="#4a4540" opacity="0.65" />
+            <ellipse cx="0" cy="0" rx="30" ry="12" fill="#5a5550" opacity="0.6" />
+            <ellipse cx="0" cy="0" rx="12" ry="5" fill="#3a3530" opacity="0.6" />
+            <path d="M-25,-8 L22,10" stroke="#2a2520" strokeWidth="3" opacity="0.5" />
+            <ellipse cx="0" cy="0" rx="36" ry="14" fill="none" stroke="#3a3530" strokeWidth="2" opacity="0.5" />
           </g>
 
-          {/* Broken spear shaft - mid center */}
+          {/* Broken spear with detailed shaft - mid center */}
           <g transform="translate(480, 510) rotate(25)">
-            <rect x="0" y="-2" width="50" height="3" fill="#3a2a18" opacity="0.6" />
+            <ellipse cx="25" cy="4" rx="28" ry="5" fill="#1a1815" opacity="0.25" />
+            <rect x="0" y="-2" width="55" height="4" fill="#4a3a28" opacity="0.65" />
+            <rect x="2" y="-1" width="50" height="2" fill="#5a4a38" opacity="0.5" />
+            <polygon points="55,-4 65,0 55,4" fill="#5a5a55" opacity="0.6" />
           </g>
 
-          {/* Small axe - mid right */}
+          {/* War hammer - mid center-right */}
+          <g transform="translate(600, 530) rotate(-20)">
+            <ellipse cx="15" cy="5" rx="20" ry="5" fill="#1a1815" opacity="0.25" />
+            <rect x="0" y="-2" width="35" height="4" fill="#4a3a28" opacity="0.6" />
+            <rect x="30" y="-10" width="12" height="20" fill="#5a5a55" opacity="0.6" />
+            <rect x="31" y="-8" width="10" height="16" fill="#6a6a65" opacity="0.4" />
+          </g>
+
+          {/* Detailed axe - mid right */}
           <g transform="translate(680, 540) rotate(-35)">
-            <rect x="0" y="-2" width="20" height="3" fill="#3a2a18" opacity="0.6" />
-            <path d="M19,-6 Q25,-3 24,0 Q25,3 19,6 L19,-6" fill="#4a4a45" opacity="0.6" />
+            <ellipse cx="12" cy="5" rx="15" ry="4" fill="#1a1815" opacity="0.25" />
+            <rect x="0" y="-2" width="24" height="4" fill="#4a3a28" opacity="0.65" />
+            <rect x="1" y="-1" width="22" height="2" fill="#5a4a38" opacity="0.4" />
+            <path d="M22,-8 Q32,-4 30,0 Q32,4 22,8 L22,-8" fill="#5a5a55" opacity="0.65" />
+            <path d="M23,-6 Q29,-3 28,0 Q29,3 23,6" fill="#7a7a75" opacity="0.4" />
           </g>
 
-          {/* Helmet - mid far right */}
+          {/* Detailed helmet with dent - mid far right */}
           <g transform="translate(820, 580)">
-            <ellipse cx="0" cy="0" rx="15" ry="7" fill="#4a4a45" opacity="0.5" />
-            <ellipse cx="0" cy="-2" rx="12" ry="5" fill="#5a5a55" opacity="0.5" />
+            <ellipse cx="0" cy="4" rx="18" ry="6" fill="#1a1815" opacity="0.3" />
+            <ellipse cx="0" cy="0" rx="18" ry="8" fill="#5a5a55" opacity="0.55" />
+            <ellipse cx="0" cy="-3" rx="14" ry="6" fill="#6a6a65" opacity="0.5" />
+            <ellipse cx="5" cy="-1" rx="5" ry="3" fill="#4a4a45" opacity="0.4" />
+            <path d="M-8,-6 Q-5,-10 2,-8" stroke="#3a3a35" strokeWidth="1.5" fill="none" opacity="0.4" />
           </g>
 
-          {/* Rocks - mid ground scattered */}
-          <polygon points="250,500 265,488 280,498" fill="#252220" opacity="0.5" />
-          <polygon points="420,550 438,538 455,548" fill="#202018" opacity="0.4" />
-          <polygon points="580,490 595,480 610,492" fill="#252220" opacity="0.4" />
-          <polygon points="750, 520 762,510 775,518" fill="#202018" opacity="0.5" />
+          {/* More rocks - mid ground scattered */}
+          <polygon points="250,500 268,486 288,498" fill="#2a2520" opacity="0.5" />
+          <polygon points="252,502 266,495 275,503" fill="#353028" opacity="0.35" />
+          <polygon points="420,550 440,536 460,548" fill="#252220" opacity="0.45" />
+          <polygon points="580,490 598,478 618,490" fill="#2a2520" opacity="0.45" />
+          <polygon points="750,520 765,508 782,518" fill="#252220" opacity="0.5" />
+          <polygon points="900,540 918,528 935,538" fill="#202018" opacity="0.4" />
 
-          {/* Fallen warrior shadows - mid ground */}
-          <ellipse cx="380" cy="540" rx="35" ry="12" fill="#151812" opacity="0.35" />
-          <ellipse cx="620" cy="505" rx="30" ry="10" fill="#151812" opacity="0.3" />
+          {/* Fallen warrior shadows with armor glint - mid ground */}
+          <ellipse cx="380" cy="540" rx="40" ry="14" fill="#151812" opacity="0.4" />
+          <ellipse cx="385" cy="538" rx="8" ry="3" fill="#3a3a35" opacity="0.2" />
+          <ellipse cx="620" cy="505" rx="35" ry="12" fill="#151812" opacity="0.35" />
+          <ellipse cx="615" cy="503" rx="6" ry="2" fill="#4a4a45" opacity="0.15" />
 
-          {/* Arrow stuck in ground - mid */}
+          {/* Multiple arrows stuck in ground - mid */}
           <g transform="translate(550, 530) rotate(-80)">
-            <rect x="0" y="-1" width="25" height="2" fill="#3a2a18" opacity="0.6" />
-            <polygon points="25,-3 32,0 25,3" fill="#4a4a45" opacity="0.6" />
+            <rect x="0" y="-1" width="28" height="2" fill="#4a3a28" opacity="0.65" />
+            <polygon points="28,-3 36,0 28,3" fill="#5a5a55" opacity="0.6" />
+            <polygon points="0,-2 -4,0 0,2" fill="#3a3028" opacity="0.5" />
+          </g>
+          <g transform="translate(530, 545) rotate(-72)">
+            <rect x="0" y="-1" width="22" height="1.5" fill="#3a2a18" opacity="0.55" />
+            <polygon points="22,-2 28,0 22,2" fill="#4a4a45" opacity="0.5" />
           </g>
 
-          {/* Small broken shield - mid left */}
+          {/* Broken shield with emblem - mid left */}
           <g transform="translate(140, 570)">
-            <ellipse cx="0" cy="0" rx="22" ry="9" fill="#3a2a20" opacity="0.5" />
-            <path d="M-15,-6 L18,8" stroke="#252018" strokeWidth="2" opacity="0.4" />
+            <ellipse cx="2" cy="3" rx="26" ry="11" fill="#1a1815" opacity="0.3" />
+            <ellipse cx="0" cy="0" rx="26" ry="10" fill="#4a3a30" opacity="0.55" />
+            <ellipse cx="0" cy="0" rx="20" ry="8" fill="#5a4a40" opacity="0.5" />
+            <circle cx="0" cy="0" r="6" fill="#3a2a20" opacity="0.5" />
+            <path d="M-18,-5 L20,7" stroke="#2a2018" strokeWidth="3" opacity="0.45" />
           </g>
 
           {/* === FOREGROUND DEBRIS (y=700-800) - Original positions === */}
@@ -1782,13 +1855,99 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           <path d="M-2,279 Q-4,269 0,265" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
           <path d="M24,281 Q28,271 25,267" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
 
-          {/* Banner pole */}
-          <rect x="6" y="40" width="12" height="245" fill="#3a2815" />
-          <rect x="8" y="40" width="8" height="245" fill="#4a3520" />
-          <rect x="10" y="45" width="4" height="235" fill="#5a4530" opacity="0.5" />
-          {/* Pole top spike */}
-          <polygon points="12,15 2,45 22,45" fill="#5a4a35" />
-          <polygon points="12,20 6,43 18,43" fill="#6a5a45" />
+          {/* Banner pole - War totem style with horns */}
+          {/* Main pole - rough hewn wood */}
+          <rect x="4" y="50" width="16" height="235" fill="#2a1a10" />
+          <rect x="6" y="50" width="12" height="235" fill="#3a2815" />
+          <rect x="8" y="55" width="8" height="225" fill="#4a3520" />
+          <rect x="10" y="60" width="4" height="215" fill="#5a4530" opacity="0.4" />
+          {/* Wood grain texture lines */}
+          <line x1="7" y1="70" x2="7" y2="270" stroke="#2a1a10" strokeWidth="1" opacity="0.5" />
+          <line x1="17" y1="65" x2="17" y2="275" stroke="#2a1a10" strokeWidth="1" opacity="0.4" />
+
+          {/* Leather wrappings on pole */}
+          <rect x="3" y="110" width="18" height="8" fill="#3a2818" rx="1" />
+          <rect x="4" y="112" width="16" height="4" fill="#4a3828" />
+          <rect x="3" y="180" width="18" height="8" fill="#3a2818" rx="1" />
+          <rect x="4" y="182" width="16" height="4" fill="#4a3828" />
+          <rect x="3" y="240" width="18" height="8" fill="#3a2818" rx="1" />
+          <rect x="4" y="242" width="16" height="4" fill="#4a3828" />
+
+          {/* Top section - skull mount */}
+          <polygon points="12,20 0,50 24,50" fill="#3a2815" />
+          <polygon points="12,25 4,48 20,48" fill="#4a3520" />
+
+          {/* Small skull at top */}
+          <g transform="translate(12, 38)">
+            <ellipse cx="0" cy="0" rx="8" ry="6" fill="#4a4038" />
+            <ellipse cx="0" cy="-1" rx="6" ry="4" fill="#5a5048" />
+            <ellipse cx="-3" cy="-1" rx="2" ry="1.5" fill="#1a1510" />
+            <ellipse cx="3" cy="-1" rx="2" ry="1.5" fill="#1a1510" />
+            <ellipse cx="0" cy="2" rx="1" ry="1.5" fill="#1a1510" />
+          </g>
+
+          {/* Top spike */}
+          <polygon points="12,8 8,22 16,22" fill="#5a5a55" />
+          <polygon points="12,10 10,20 14,20" fill="#7a7a75" opacity="0.6" />
+
+          {/* WAR HORNS - mounted on pole sides */}
+          {/* Left horn - curves outward */}
+          <g transform="translate(-2, 52)">
+            <path
+              d="M12,0 Q-5,5 -15,25 Q-20,40 -18,50"
+              fill="none"
+              stroke="#5a5048"
+              strokeWidth="8"
+              strokeLinecap="round"
+            />
+            <path
+              d="M12,0 Q-5,5 -15,25 Q-20,40 -18,50"
+              fill="none"
+              stroke="#6a6058"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M10,2 Q-3,7 -12,25"
+              fill="none"
+              stroke="#7a7068"
+              strokeWidth="2"
+              opacity="0.5"
+            />
+            {/* Horn tip */}
+            <circle cx="-18" cy="50" r="3" fill="#4a4038" />
+          </g>
+
+          {/* Right horn - curves outward */}
+          <g transform="translate(14, 52)">
+            <path
+              d="M0,0 Q17,5 27,25 Q32,40 30,50"
+              fill="none"
+              stroke="#5a5048"
+              strokeWidth="8"
+              strokeLinecap="round"
+            />
+            <path
+              d="M0,0 Q17,5 27,25 Q32,40 30,50"
+              fill="none"
+              stroke="#6a6058"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M2,2 Q15,7 24,25"
+              fill="none"
+              stroke="#7a7068"
+              strokeWidth="2"
+              opacity="0.5"
+            />
+            {/* Horn tip */}
+            <circle cx="30" cy="50" r="3" fill="#4a4038" />
+          </g>
+
+          {/* Metal rings holding horns */}
+          <ellipse cx="12" cy="55" rx="12" ry="4" fill="none" stroke="#4a4a45" strokeWidth="2" />
+          <ellipse cx="12" cy="55" rx="10" ry="3" fill="none" stroke="#5a5a55" strokeWidth="1" />
 
           {/* Banner fabric - simplified but visible */}
           <g transform="translate(18, 55)">
