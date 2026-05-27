@@ -1,1290 +1,1267 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
+import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { TECH_STACK } from '@/data/techStack'
-import { getAchievementsByProfession } from '@/data/achievements'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 
 // =============================================================================
-// ACCESSIBILITY - Reduced Motion Detection
-// =============================================================================
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return prefersReducedMotion
-}
-
-// =============================================================================
-// GOD OF WAR COLOR PALETTE
-// Authentic Norse style: frost blues, fire oranges, gold, stone grey
+// GOD OF WAR 3 COLOR PALETTE
+// Extracted from actual GOW3 menu: pure blacks, crimson blood, bronze gold
 // =============================================================================
 const GOW = {
-  // FROST BLUE - Leviathan Axe (primary accent)
-  frostBright: '#00CCFF',
-  frostMid: '#66DDFF',
-  frostDark: '#003366',
-  frostDeep: '#001A33',
-  frostGlow: '#00CCFF80',
+  // Backgrounds - pure black, no purple tint (unlike Dark Fantasy)
+  void: '#000000',
+  voidDeep: '#0a0808',
+  voidWarm: '#0f0c0a',        // Slight warm brown undertone
 
-  // FIRE ORANGE/RED - Blades of Chaos
-  fireOrange: '#FF6600',
-  fireBright: '#FF4400',
-  fireYellow: '#FFAA00',
-  fireDark: '#CC3300',
-  fireGlow: '#FF440080',
+  // Blood - deep crimson/maroon, not bright red
+  blood: '#6b1010',            // Main blood color
+  bloodBright: '#8b1a1a',      // Highlights
+  bloodDark: '#3d0808',        // Shadows
+  bloodGlow: '#a02020',        // For glow effects
 
-  // GOLD - Divine elements, Norse ornaments
-  goldBright: '#FFD700',
-  goldMid: '#D4AF37',
-  goldDark: '#8B6914',
-  goldGlow: '#FFD70060',
+  // Gold - warm bronze/copper, metallic feel
+  gold: '#c9a227',             // Primary gold (from GOW logo)
+  goldBright: '#e8c040',       // Highlights
+  goldDark: '#8a6c14',         // Shadows
+  bronze: '#a67c30',           // More coppery variant
 
-  // STONE GREY - Nordic carved stone
-  stoneDark: '#1A1A1A',
-  stoneMid: '#333333',
-  stoneLight: '#4A4A4A',
-  stoneAccent: '#666666',
+  // Ash grey - Kratos's skin, stone, mountains
+  ash: '#5a5856',
+  ashLight: '#7a7876',
+  ashDark: '#3a3836',
+  ashWarm: '#4a4644',          // Warm grey
 
-  // BLOOD RED - Kratos's tattoo, rage
-  bloodDark: '#660000',
-  bloodMid: '#8B0000',
-  bloodBright: '#AA0000',
-  kratosTattoo: '#CC2222',
+  // Storm - brown/grey clouds, warm tones
+  stormBrown: '#2a2420',       // Dark storm clouds
+  stormGrey: '#3a3430',        // Mid clouds
+  stormLight: '#4a4440',       // Lighter clouds
 
-  // SNOW WHITE - Fimbulwinter
-  snowWhite: '#F0F8FF',
-  snowMid: '#E8E8E8',
-  snowDark: '#C8C8C8',
+  // Lightning - pale yellow/white, not blue
+  lightning: '#ffffd0',
+  lightningCore: '#ffffff',
 
-  // BIFROST - Realm travel rainbow
-  bifrostPurple: '#9933FF',
-  bifrostGreen: '#33FF99',
-  bifrostYellow: '#FFFF33',
-  bifrostOrange: '#FF9933',
+  // Fire/Chaos - orange flames from Blades
+  fire: '#e05000',
+  fireBright: '#ff7020',
+  fireGlow: '#ff9040',
 
-  // BACKGROUNDS
-  bgDarkest: '#0D0D0D',
-  bgDark: '#1A1A1A',
-
-  // TEXT - WCAG AA compliant on dark backgrounds
-  textPrimary: '#F0F8FF',    // Snow white - 15.5:1 on #1A1A1A
-  textSecondary: '#B8C4CE',  // Muted blue-grey - 8.7:1 on #1A1A1A
-  textMuted: '#8899AA',      // Dimmed - 5.2:1 on #1A1A1A
+  // UI text
+  bone: '#e8e0d0',             // Warm cream, not pure white
+  boneLight: '#f5efe5',
+  silver: '#908880',           // Warm grey
 }
 
 // =============================================================================
-// SVG PATTERNS - Norse runes, knot patterns, frost/fire
+// PARALLAX LAYERS - Profession-specific background ornaments
+// 3 layers: Far (0.15x), Mid (0.35x), Near (0.6x) scroll speed
 // =============================================================================
-function NorsePatterns() {
+const ParallaxLayers = memo(function ParallaxLayers({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    let ticking = false
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrollY(window.scrollY)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  // Profession-specific ornament sets
+  const ornaments = {
+    engineer: {
+      far: [
+        { x: 5, y: 20, element: <GearSVG size={40} />, },
+        { x: 92, y: 35, element: <GearSVG size={35} />, },
+        { x: 8, y: 60, element: <CircuitSVG size={50} />, },
+        { x: 88, y: 75, element: <GearSVG size={45} />, },
+      ],
+      mid: [
+        { x: 3, y: 40, element: <GearSVG size={55} />, },
+        { x: 95, y: 55, element: <CircuitSVG size={60} />, },
+        { x: 6, y: 85, element: <GearSVG size={50} />, },
+      ],
+      near: [
+        { x: 2, y: 30, element: <GearSVG size={70} />, },
+        { x: 96, y: 65, element: <CircuitSVG size={80} />, },
+      ],
+    },
+    drummer: {
+      far: [
+        { x: 5, y: 25, element: <DrumSVG size={40} />, },
+        { x: 90, y: 40, element: <WaveSVG size={50} />, },
+        { x: 8, y: 65, element: <DrumSVG size={35} />, },
+        { x: 88, y: 80, element: <WaveSVG size={45} />, },
+      ],
+      mid: [
+        { x: 4, y: 45, element: <WaveSVG size={60} />, },
+        { x: 94, y: 60, element: <DrumSVG size={55} />, },
+        { x: 6, y: 90, element: <WaveSVG size={50} />, },
+      ],
+      near: [
+        { x: 2, y: 35, element: <DrumSVG size={75} />, },
+        { x: 95, y: 70, element: <WaveSVG size={80} />, },
+      ],
+    },
+    fighter: {
+      far: [
+        { x: 6, y: 20, element: <SwordSVG size={45} />, },
+        { x: 91, y: 35, element: <ShieldSVG size={40} />, },
+        { x: 7, y: 60, element: <SwordSVG size={35} />, },
+        { x: 89, y: 80, element: <ShieldSVG size={50} />, },
+      ],
+      mid: [
+        { x: 4, y: 40, element: <ShieldSVG size={55} />, },
+        { x: 94, y: 55, element: <SwordSVG size={60} />, },
+        { x: 5, y: 85, element: <ShieldSVG size={50} />, },
+      ],
+      near: [
+        { x: 2, y: 30, element: <SwordSVG size={70} />, },
+        { x: 96, y: 65, element: <ShieldSVG size={80} />, },
+      ],
+    },
+  }
+
+  const layers = ornaments[profession]
+
   return (
-    <svg className="absolute w-0 h-0" aria-hidden="true">
-      <defs>
-        {/* Norse knot pattern */}
-        <pattern id="norseKnot" patternUnits="userSpaceOnUse" width="60" height="60">
-          <rect width="60" height="60" fill="transparent" />
-          <path
-            d="M10 10 Q30 0 50 10 Q60 30 50 50 Q30 60 10 50 Q0 30 10 10"
-            fill="none"
-            stroke={GOW.goldDark}
-            strokeWidth="1"
-            opacity="0.15"
-          />
-          <circle cx="30" cy="30" r="8" fill="none" stroke={GOW.goldDark} strokeWidth="0.5" opacity="0.1" />
-        </pattern>
-
-        {/* Frost gradient */}
-        <linearGradient id="frostGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={GOW.frostBright} stopOpacity="0.8" />
-          <stop offset="50%" stopColor={GOW.frostMid} stopOpacity="0.5" />
-          <stop offset="100%" stopColor={GOW.frostDark} stopOpacity="0.3" />
-        </linearGradient>
-
-        {/* Fire gradient */}
-        <linearGradient id="fireGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stopColor={GOW.fireDark} />
-          <stop offset="40%" stopColor={GOW.fireOrange} />
-          <stop offset="100%" stopColor={GOW.fireYellow} />
-        </linearGradient>
-
-        {/* Bifrost gradient */}
-        <linearGradient id="bifrostGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor={GOW.frostBright} />
-          <stop offset="25%" stopColor={GOW.bifrostGreen} />
-          <stop offset="50%" stopColor={GOW.bifrostYellow} />
-          <stop offset="75%" stopColor={GOW.bifrostOrange} />
-          <stop offset="100%" stopColor={GOW.bifrostPurple} />
-        </linearGradient>
-
-        {/* Stone texture */}
-        <filter id="stoneTexture">
-          <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
-          <feDiffuseLighting in="noise" lightingColor={GOW.stoneLight} surfaceScale="1.5">
-            <feDistantLight azimuth="45" elevation="60" />
-          </feDiffuseLighting>
-        </filter>
-
-        {/* Glow filter */}
-        <filter id="frostGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-
-        <filter id="fireGlowFilter" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-    </svg>
-  )
-}
-
-// =============================================================================
-// NORSE RUNE BORDER - Elder Futhark inspired
-// =============================================================================
-function RuneBorder({ className = '', color = GOW.goldMid }: { className?: string; color?: string }) {
-  // Simplified Elder Futhark-inspired rune shapes
-  const runes = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛈ', 'ᛇ', 'ᛉ', 'ᛋ']
-
-  return (
-    <div
-      className={`w-full h-6 flex items-center justify-center gap-3 overflow-hidden ${className}`}
-      style={{ filter: `drop-shadow(0 0 4px ${color}40)` }}
-      role="presentation"
-      aria-hidden="true"
-    >
-      <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, transparent, ${color})` }} />
-      {runes.slice(0, 8).map((rune, i) => (
-        <span
-          key={i}
-          className="text-xs opacity-60"
-          style={{ color, fontFamily: 'serif' }}
+    <div className="fixed inset-0 pointer-events-none z-[3] overflow-hidden" aria-hidden="true">
+      {/* Far layer - 0.15x speed */}
+      {layers.far.map((item, i) => (
+        <div
+          key={`far-${i}`}
+          className="absolute"
+          style={{
+            left: `${item.x}%`,
+            top: `${item.y}%`,
+            transform: `translateY(${scrollY * 0.15}px)`,
+            opacity: 0.35,
+          }}
         >
-          {rune}
-        </span>
+          {item.element}
+        </div>
       ))}
-      <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, ${color}, transparent)` }} />
+
+      {/* Mid layer - 0.35x speed */}
+      {layers.mid.map((item, i) => (
+        <div
+          key={`mid-${i}`}
+          className="absolute"
+          style={{
+            left: `${item.x}%`,
+            top: `${item.y}%`,
+            transform: `translateY(${scrollY * 0.35}px)`,
+            opacity: 0.45,
+          }}
+        >
+          {item.element}
+        </div>
+      ))}
+
+      {/* Near layer - 0.6x speed, most visible */}
+      {layers.near.map((item, i) => (
+        <div
+          key={`near-${i}`}
+          className="absolute"
+          style={{
+            left: `${item.x}%`,
+            top: `${item.y}%`,
+            transform: `translateY(${scrollY * 0.6}px)`,
+            opacity: 0.55,
+          }}
+        >
+          {item.element}
+        </div>
+      ))}
     </div>
   )
-}
+})
+
+// Ornament SVGs for parallax layers
+const GearSVG = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill={GOW.gold} opacity="0.6">
+    <path d="M20,8 L22,4 L18,4 Z M20,32 L22,36 L18,36 Z M8,20 L4,22 L4,18 Z M32,20 L36,22 L36,18 Z" />
+    <circle cx="20" cy="20" r="8" fill="none" stroke={GOW.gold} strokeWidth="2" />
+    <circle cx="20" cy="20" r="4" fill={GOW.gold} />
+  </svg>
+)
+
+const CircuitSVG = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 50 50" fill="none" stroke={GOW.gold} strokeWidth="1.5" opacity="0.5">
+    <path d="M10,25 L20,25 L25,15 L30,35 L35,25 L45,25" />
+    <circle cx="10" cy="25" r="3" fill={GOW.gold} />
+    <circle cx="45" cy="25" r="3" fill={GOW.gold} />
+  </svg>
+)
+
+const DrumSVG = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 40 40" fill={GOW.fire} opacity="0.6">
+    <ellipse cx="20" cy="30" rx="15" ry="6" fill="none" stroke={GOW.fire} strokeWidth="2" />
+    <path d="M5,15 L5,30 M35,15 L35,30" stroke={GOW.fire} strokeWidth="2" />
+    <ellipse cx="20" cy="15" rx="15" ry="6" fill={GOW.fire} opacity="0.3" />
+    <line x1="10" y1="8" x2="20" y2="15" stroke={GOW.fireGlow} strokeWidth="2" />
+    <line x1="30" y1="8" x2="20" y2="15" stroke={GOW.fireGlow} strokeWidth="2" />
+  </svg>
+)
+
+const WaveSVG = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 50 30" fill="none" stroke={GOW.fire} strokeWidth="2" opacity="0.5">
+    <path d="M5,15 Q12,5 20,15 Q28,25 35,15 Q42,5 50,15" />
+    <path d="M5,20 Q12,10 20,20 Q28,30 35,20 Q42,10 50,20" opacity="0.5" />
+  </svg>
+)
+
+const SwordSVG = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 20 50" fill={GOW.blood} opacity="0.6">
+    <path d="M10,0 L12,35 L10,38 L8,35 Z" fill={GOW.ashLight} />
+    <rect x="6" y="35" width="8" height="4" fill={GOW.gold} />
+    <rect x="8" y="39" width="4" height="8" fill={GOW.goldDark} />
+  </svg>
+)
+
+const ShieldSVG = ({ size }: { size: number }) => (
+  <svg width={size} height={size} viewBox="0 0 40 50" fill={GOW.blood} opacity="0.5">
+    <path d="M20,5 L35,12 L35,30 L20,45 L5,30 L5,12 Z" fill={GOW.ashDark} stroke={GOW.gold} strokeWidth="2" />
+    <path d="M20,12 L28,16 L28,28 L20,38 L12,28 L12,16 Z" fill={GOW.blood} opacity="0.5" />
+  </svg>
+)
 
 // =============================================================================
-// LEVIATHAN AXE - Frost decoration
+// FADE IN SECTION (IntersectionObserver based)
 // =============================================================================
-function LeviathanAxe({ size = 40, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 48"
-      width={size * 0.5}
-      height={size}
-      className={className}
-      style={{ filter: `drop-shadow(0 0 8px ${GOW.frostGlow})` }}
-      aria-hidden="true"
-    >
-      {/* Axe head */}
-      <path
-        d="M4 8 L12 4 L20 8 L20 16 L16 20 L12 18 L8 20 L4 16 Z"
-        fill={GOW.stoneLight}
-        stroke={GOW.frostBright}
-        strokeWidth="1"
-      />
-      {/* Frost glow on blade */}
-      <path
-        d="M6 10 L12 6 L18 10 L18 14 L14 17 L12 16 L10 17 L6 14 Z"
-        fill={GOW.frostBright}
-        opacity="0.4"
-      />
-      {/* Handle */}
-      <rect x="10" y="18" width="4" height="26" fill={GOW.goldDark} />
-      <rect x="11" y="20" width="2" height="22" fill={GOW.goldMid} />
-      {/* Rune inscriptions on blade */}
-      <text x="12" y="12" textAnchor="middle" fill={GOW.frostBright} fontSize="4" fontFamily="serif">ᚠ</text>
-      {/* Pommel */}
-      <ellipse cx="12" cy="45" rx="3" ry="2" fill={GOW.goldMid} />
-    </svg>
-  )
-}
+const FadeInSection = memo(function FadeInSection({
+  children,
+  className = '',
+  delay = 0,
+}: {
+  children: React.ReactNode
+  className?: string
+  delay?: number
+}) {
+  const { ref, triggered } = useSectionTrigger({
+    threshold: 0.05,
+    rootMargin: '100px 0px 0px 0px',
+  })
 
-// =============================================================================
-// BLADES OF CHAOS - Fire decoration
-// =============================================================================
-function BladesOfChaos({ size = 32, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 48 24"
-      width={size * 1.5}
-      height={size * 0.75}
-      className={className}
-      style={{ filter: `drop-shadow(0 0 6px ${GOW.fireGlow})` }}
-      aria-hidden="true"
-    >
-      {/* Left blade */}
-      <path
-        d="M4 12 L16 6 L20 12 L16 18 Z"
-        fill={GOW.stoneLight}
-        stroke={GOW.fireOrange}
-        strokeWidth="0.5"
-      />
-      <path d="M6 12 L14 8 L17 12 L14 16 Z" fill={GOW.fireOrange} opacity="0.5" />
-
-      {/* Right blade */}
-      <path
-        d="M44 12 L32 6 L28 12 L32 18 Z"
-        fill={GOW.stoneLight}
-        stroke={GOW.fireOrange}
-        strokeWidth="0.5"
-      />
-      <path d="M42 12 L34 8 L31 12 L34 16 Z" fill={GOW.fireOrange} opacity="0.5" />
-
-      {/* Chains */}
-      <path
-        d="M20 12 Q24 10 28 12"
-        fill="none"
-        stroke={GOW.goldDark}
-        strokeWidth="1.5"
-        strokeDasharray="2 1"
-      />
-      <path
-        d="M20 12 Q24 14 28 12"
-        fill="none"
-        stroke={GOW.goldDark}
-        strokeWidth="1.5"
-        strokeDasharray="2 1"
-      />
-    </svg>
-  )
-}
-
-// =============================================================================
-// WORLD SERPENT - Jormungandr motif
-// =============================================================================
-function WorldSerpent({ size = 60, className = '' }: { size?: number; className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 100 40"
-      width={size * 2.5}
-      height={size}
-      className={className}
-      aria-hidden="true"
-    >
-      {/* Serpent body - coiled */}
-      <path
-        d="M10 20 Q20 5 35 15 Q50 25 65 15 Q80 5 90 20"
-        fill="none"
-        stroke={GOW.frostMid}
-        strokeWidth="4"
-        strokeLinecap="round"
-        opacity="0.6"
-      />
-      {/* Scales pattern */}
-      <path
-        d="M15 18 Q25 8 35 15 M40 18 Q50 28 60 18 M70 15 Q80 8 88 18"
-        fill="none"
-        stroke={GOW.frostBright}
-        strokeWidth="1"
-        opacity="0.4"
-      />
-      {/* Head */}
-      <circle cx="10" cy="20" r="5" fill={GOW.frostMid} />
-      <circle cx="8" cy="18" r="1.5" fill={GOW.frostBright} />
-      {/* Tail */}
-      <path d="M90 20 L98 18 L98 22 Z" fill={GOW.frostMid} />
-    </svg>
-  )
-}
-
-// =============================================================================
-// KRATOS SILHOUETTE - Header decoration
-// =============================================================================
-function KratosSilhouette({ size = 48 }: { size?: number }) {
-  return (
-    <svg
-      viewBox="0 0 32 40"
-      width={size * 0.8}
-      height={size}
-      aria-hidden="true"
-    >
-      {/* Bald head */}
-      <ellipse cx="16" cy="10" rx="8" ry="9" fill={GOW.stoneLight} />
-      {/* Red tattoo stripe */}
-      <path
-        d="M8 6 Q10 10 8 16"
-        fill="none"
-        stroke={GOW.kratosTattoo}
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      {/* Beard */}
-      <path
-        d="M10 14 Q16 22 22 14"
-        fill={GOW.stoneMid}
-      />
-      {/* Eyes (fierce) */}
-      <ellipse cx="12" cy="9" rx="1.5" ry="1" fill={GOW.snowWhite} />
-      <ellipse cx="20" cy="9" rx="1.5" ry="1" fill={GOW.snowWhite} />
-      {/* Shoulders */}
-      <path
-        d="M8 18 L4 28 L16 26 L28 28 L24 18"
-        fill={GOW.stoneLight}
-      />
-      {/* Red war paint on shoulder */}
-      <path
-        d="M6 20 L8 28"
-        fill="none"
-        stroke={GOW.kratosTattoo}
-        strokeWidth="1.5"
-      />
-    </svg>
-  )
-}
-
-// =============================================================================
-// NORDIC PILLAR - Side decorations
-// =============================================================================
-function NordicPillar({ side }: { side: 'left' | 'right' }) {
   return (
     <div
-      className={`fixed top-0 bottom-0 w-10 md:w-14 pointer-events-none z-10 hidden lg:block ${
-        side === 'left' ? 'left-0' : 'right-0'
-      }`}
-      aria-hidden="true"
+      ref={ref}
+      className={className}
+      style={{
+        opacity: triggered ? 1 : 0,
+        transform: triggered ? 'translateY(0)' : 'translateY(30px)',
+        transition: `opacity 0.6s ease-out ${delay}ms, transform 0.6s ease-out ${delay}ms`,
+        willChange: 'opacity, transform',
+      }}
     >
-      {/* Stone pillar */}
+      {children}
+    </div>
+  )
+})
+
+// =============================================================================
+// GOW3 BLOOD BANNER - The iconic dripping blood frame from GOW3 menu
+// =============================================================================
+const BloodBanner = memo(function BloodBanner() {
+  return (
+    <div className="fixed top-0 left-0 right-0 h-24 z-[45] pointer-events-none" aria-hidden="true">
+      <svg className="w-full h-full" viewBox="0 0 1920 100" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="bloodBannerGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={GOW.bloodBright} stopOpacity="0.9" />
+            <stop offset="40%" stopColor={GOW.blood} stopOpacity="0.8" />
+            <stop offset="100%" stopColor={GOW.bloodDark} stopOpacity="0.3" />
+          </linearGradient>
+          <filter id="bloodDrip">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise" />
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="5" />
+          </filter>
+        </defs>
+        {/* Main blood splash shape - jagged, dripping */}
+        <path
+          d="M0,0 L0,35
+             Q50,40 80,55 Q100,70 120,45 Q150,60 180,50
+             Q220,75 260,40 Q300,55 340,35 Q380,60 420,45
+             Q480,70 540,35 Q600,50 660,40 Q720,65 780,35
+             Q840,55 900,45 Q960,70 1020,40 Q1080,55 1140,35
+             Q1200,60 1260,45 Q1320,70 1380,40 Q1440,55 1500,35
+             Q1560,65 1620,45 Q1680,60 1740,40 Q1800,55 1860,50
+             Q1890,65 1920,40 L1920,0 Z"
+          fill="url(#bloodBannerGrad)"
+        />
+        {/* Blood drips */}
+        {[120, 340, 560, 780, 1000, 1220, 1440, 1660, 1800].map((x, i) => (
+          <path
+            key={i}
+            d={`M${x},${45 + (i % 3) * 10} Q${x - 3},${60 + (i % 4) * 15} ${x},${75 + (i % 3) * 20} Q${x + 3},${60 + (i % 4) * 15} ${x},${45 + (i % 3) * 10}`}
+            fill={GOW.blood}
+            opacity={0.6 + (i % 3) * 0.1}
+          />
+        ))}
+      </svg>
+    </div>
+  )
+})
+
+// =============================================================================
+// STORMY CLOUDS WITH LIGHTNING - Parallax background
+// =============================================================================
+const StormyClouds = memo(function StormyClouds() {
+  const [lightning, setLightning] = useState(false)
+  const [lightningPos, setLightningPos] = useState({ x: 50, y: 30 })
+
+  useEffect(() => {
+    const flashLightning = () => {
+      setLightningPos({ x: 20 + Math.random() * 60, y: 10 + Math.random() * 30 })
+      setLightning(true)
+      setTimeout(() => setLightning(false), 150)
+      setTimeout(() => {
+        setLightning(true)
+        setTimeout(() => setLightning(false), 100)
+      }, 200)
+    }
+
+    const interval = setInterval(flashLightning, 4000 + Math.random() * 3000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden" aria-hidden="true">
+      {/* Cloud layers */}
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(90deg,
-            ${side === 'left' ? GOW.stoneMid : GOW.stoneDark},
-            ${GOW.stoneDark},
-            ${side === 'left' ? GOW.stoneDark : GOW.stoneMid}
+          background: `
+            radial-gradient(ellipse 80% 50% at 20% 20%, ${GOW.stormGrey}40 0%, transparent 50%),
+            radial-gradient(ellipse 100% 60% at 70% 15%, ${GOW.stormBrown}50 0%, transparent 60%),
+            radial-gradient(ellipse 60% 40% at 50% 30%, ${GOW.stormGrey}30 0%, transparent 50%),
+            radial-gradient(ellipse 90% 50% at 85% 25%, ${GOW.stormBrown}40 0%, transparent 55%)
+          `,
+        }}
+      />
+
+      {/* Lightning flash */}
+      {lightning && (
+        <>
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `radial-gradient(ellipse at ${lightningPos.x}% ${lightningPos.y}%, ${GOW.lightning}30 0%, transparent 40%)`,
+            }}
+          />
+          <svg
+            className="absolute w-32 h-64"
+            style={{ left: `${lightningPos.x}%`, top: `${lightningPos.y - 5}%` }}
+            viewBox="0 0 100 200"
+          >
+            <path
+              d="M50,0 L45,50 L60,45 L40,120 L55,115 L30,200"
+              fill="none"
+              stroke={GOW.lightning}
+              strokeWidth="3"
+              opacity="0.8"
+            />
+            <path
+              d="M50,0 L45,50 L60,45 L40,120 L55,115 L30,200"
+              fill="none"
+              stroke="white"
+              strokeWidth="1"
+              opacity="0.9"
+            />
+          </svg>
+        </>
+      )}
+
+      {/* Distant mountains silhouette */}
+      <svg
+        className="absolute bottom-0 left-0 right-0 h-48 opacity-30"
+        viewBox="0 0 1920 200"
+        preserveAspectRatio="none"
+      >
+        <path
+          d="M0,200 L0,150 L200,80 L400,120 L600,60 L800,100 L1000,40 L1200,90 L1400,50 L1600,110 L1800,70 L1920,130 L1920,200 Z"
+          fill={GOW.ashDark}
+        />
+      </svg>
+    </div>
+  )
+})
+
+// =============================================================================
+// GREEK MEANDER PATTERN - Classic Greek key border
+// =============================================================================
+const GreekMeander = memo(function GreekMeander({ color = GOW.gold, opacity = 0.3 }: { color?: string; opacity?: number }) {
+  return (
+    <svg className="w-full h-4" viewBox="0 0 400 16" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <pattern id="meander" patternUnits="userSpaceOnUse" width="32" height="16">
+          <path
+            d="M0,8 L4,8 L4,4 L8,4 L8,12 L12,12 L12,0 L16,0 L16,16 L20,16 L20,4 L24,4 L24,12 L28,12 L28,8 L32,8"
+            fill="none"
+            stroke={color}
+            strokeWidth="1.5"
+            opacity={opacity}
+          />
+        </pattern>
+      </defs>
+      <rect width="400" height="16" fill="url(#meander)" />
+    </svg>
+  )
+})
+
+
+// =============================================================================
+// BLOOD SPLASH DECORATION (smaller accents)
+// =============================================================================
+const BloodSplash = memo(function BloodSplash({ side }: { side: 'left' | 'right' }) {
+  return (
+    <svg
+      className={`absolute top-24 ${side === 'left' ? 'left-0' : 'right-0'} w-32 h-24 opacity-30`}
+      viewBox="0 0 200 120"
+      aria-hidden="true"
+      style={{ transform: side === 'right' ? 'scaleX(-1)' : undefined }}
+    >
+      <defs>
+        <linearGradient id={`bloodGrad-${side}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={GOW.bloodBright} stopOpacity="0.8" />
+          <stop offset="50%" stopColor={GOW.blood} stopOpacity="0.6" />
+          <stop offset="100%" stopColor={GOW.bloodDark} stopOpacity="0.3" />
+        </linearGradient>
+      </defs>
+      {/* Dripping blood effect */}
+      <path
+        d="M0,0 L80,0 Q90,20 70,40 Q60,60 75,80 L60,120 Q40,100 50,70 Q55,40 30,30 L0,40 Z"
+        fill={`url(#bloodGrad-${side})`}
+      />
+      <path
+        d="M40,0 L60,0 Q50,30 55,50 L45,80 Q35,60 40,40 Q45,20 40,0 Z"
+        fill={GOW.blood}
+        opacity="0.5"
+      />
+    </svg>
+  )
+})
+
+// =============================================================================
+// STORM RAIN EFFECT
+// =============================================================================
+const StormRain = memo(function StormRain() {
+  const drops = useMemo(() =>
+    Array.from({ length: 25 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      height: Math.random() * 30 + 15,
+      opacity: Math.random() * 0.2 + 0.1,
+      speed: Math.random() * 0.8 + 0.5,
+      delay: Math.random() * -2,
+    })),
+    []
+  )
+
+  return (
+    <div
+      className="fixed inset-0 pointer-events-none z-[4] overflow-hidden"
+      style={{ contain: 'strict' }}
+      aria-hidden="true"
+    >
+      {drops.map((d) => (
+        <div
+          key={d.id}
+          className="absolute w-px"
+          style={{
+            left: `${d.x}%`,
+            top: '-40px',
+            height: d.height,
+            background: `linear-gradient(180deg, transparent, ${GOW.ashLight}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
+            animation: `stormRain ${d.speed}s linear infinite`,
+            animationDelay: `${d.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+})
+
+// =============================================================================
+// EMBER PARTICLES (from Blades of Chaos)
+// =============================================================================
+const EmberParticles = memo(function EmberParticles() {
+  const embers = useMemo(() =>
+    Array.from({ length: 8 }, (_, i) => ({
+      id: i,
+      x: Math.random() * 100,
+      y: 80 + Math.random() * 20,
+      size: Math.random() * 4 + 2,
+      speed: Math.random() * 15 + 10,
+      delay: Math.random() * -10,
+      color: i % 2 === 0 ? GOW.fire : GOW.fireBright,
+    })),
+    []
+  )
+
+  return (
+    <div
+      className="fixed inset-0 pointer-events-none z-[5] overflow-hidden"
+      style={{ contain: 'strict' }}
+      aria-hidden="true"
+    >
+      {embers.map((e) => (
+        <div
+          key={e.id}
+          className="absolute rounded-full"
+          style={{
+            left: `${e.x}%`,
+            bottom: `${100 - e.y}%`,
+            width: e.size,
+            height: e.size,
+            background: `radial-gradient(circle, ${e.color} 30%, ${e.color}60 60%, transparent 80%)`,
+            animation: `emberRise ${e.speed}s ease-out infinite`,
+            animationDelay: `${e.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+})
+
+// =============================================================================
+// GOW3 SPARTAN FRAME FLOURISH - More aggressive Greek styling
+// =============================================================================
+const SpartanFlourish = memo(function SpartanFlourish({
+  position,
+  width = 200,
+}: {
+  position: 'top' | 'bottom'
+  width?: number
+}) {
+  const isTop = position === 'top'
+  const transform = isTop ? '' : 'scale(1, -1)'
+
+  return (
+    <svg
+      className="absolute left-1/2 -translate-x-1/2"
+      style={{
+        [isTop ? 'top' : 'bottom']: '-14px',
+        width: width,
+        height: 28,
+      }}
+      viewBox="0 0 200 28"
+      aria-hidden="true"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <g transform={transform} style={{ transformOrigin: 'center' }}>
+        {/* Central Omega symbol (Kratos's mark) */}
+        <path
+          d="M100,4 C92,4 86,10 86,18 L90,18 C90,12 94,8 100,8 C106,8 110,12 110,18 L114,18 C114,10 108,4 100,4"
+          fill={GOW.gold}
+          opacity="0.8"
+        />
+        {/* Blood drip from omega */}
+        <path
+          d="M100,18 Q99,22 100,26 Q101,22 100,18"
+          fill={GOW.blood}
+          opacity="0.6"
+        />
+
+        {/* Left spear/blade shapes */}
+        <path
+          d="M82,14 L70,10 L68,14 L70,18 L82,14"
+          fill={GOW.gold}
+          opacity="0.5"
+        />
+        <path
+          d="M65,14 L40,8 L38,14 L40,20 L65,14"
+          fill={GOW.gold}
+          opacity="0.4"
+        />
+        <line x1="38" y1="14" x2="10" y2="14" stroke={GOW.gold} strokeWidth="1" opacity="0.3" />
+
+        {/* Right spear/blade shapes (mirrored) */}
+        <path
+          d="M118,14 L130,10 L132,14 L130,18 L118,14"
+          fill={GOW.gold}
+          opacity="0.5"
+        />
+        <path
+          d="M135,14 L160,8 L162,14 L160,20 L135,14"
+          fill={GOW.gold}
+          opacity="0.4"
+        />
+        <line x1="162" y1="14" x2="190" y2="14" stroke={GOW.gold} strokeWidth="1" opacity="0.3" />
+
+        {/* Blood accents */}
+        <circle cx="55" cy="14" r="2" fill={GOW.blood} opacity="0.5" />
+        <circle cx="145" cy="14" r="2" fill={GOW.blood} opacity="0.5" />
+      </g>
+    </svg>
+  )
+})
+
+// =============================================================================
+// SPARTAN FRAME - GOW3 styled content frame
+// =============================================================================
+const SpartanFrame = memo(function SpartanFrame({
+  children,
+  title,
+  headingLevel = 'h2',
+}: {
+  children: React.ReactNode
+  title: string
+  headingLevel?: 'h2' | 'h3'
+}) {
+  const HeadingTag = headingLevel
+  const headingId = `section-${title.toLowerCase().replace(/\s+/g, '-')}`
+
+  return (
+    <div className="relative pt-4 pb-4" role="region" aria-labelledby={headingId}>
+      {/* Greek meander border top */}
+      <GreekMeander color={GOW.gold} opacity={0.2} />
+
+      <div
+        className="relative"
+        style={{
+          background: `linear-gradient(180deg,
+            rgba(10, 10, 12, 0.96) 0%,
+            rgba(15, 12, 18, 0.92) 50%,
+            rgba(10, 10, 12, 0.96) 100%
           )`,
+          borderLeft: `2px solid ${GOW.bloodDark}50`,
+          borderRight: `2px solid ${GOW.bloodDark}50`,
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          boxShadow: `
+            inset 0 0 80px rgba(0, 0, 0, 0.6),
+            inset 0 1px 0 ${GOW.gold}08,
+            0 8px 32px rgba(0, 0, 0, 0.5)
+          `,
         }}
       >
-        {/* Carved runes running down */}
-        <div className="absolute top-20 bottom-32 left-1/2 -translate-x-1/2 w-px flex flex-col items-center gap-8">
-          {['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ'].map((rune, i) => (
-            <span
-              key={i}
-              className="text-sm opacity-30"
-              style={{ color: GOW.goldMid, textShadow: `0 0 4px ${GOW.goldGlow}` }}
-            >
-              {rune}
-            </span>
-          ))}
+        <div className="pt-6 pb-4 px-6 text-center">
+          <HeadingTag
+            id={headingId}
+            className="text-sm tracking-[0.35em] uppercase inline-block"
+            style={{
+              color: GOW.goldBright,
+              fontWeight: 600,
+              letterSpacing: '0.3em',
+              textShadow: `0 0 30px ${GOW.gold}50, 0 0 60px ${GOW.gold}20, 0 2px 4px rgba(0, 0, 0, 0.8)`,
+            }}
+          >
+            {title}
+          </HeadingTag>
+          {/* Blood line under title */}
+          <div
+            className="mt-3 mx-auto"
+            style={{
+              width: '60px',
+              height: '2px',
+              background: `linear-gradient(90deg, transparent, ${GOW.blood}, transparent)`,
+              boxShadow: `0 0 10px ${GOW.blood}60`,
+            }}
+          />
+        </div>
+
+        <div className="px-6 pb-6">
+          {children}
         </div>
       </div>
 
-      {/* Top ornament - knot pattern */}
-      <div
-        className="absolute top-0 left-0 right-0 h-16"
-        style={{
-          background: `linear-gradient(180deg, ${GOW.goldDark}, ${GOW.stoneDark})`,
-        }}
-      >
-        <svg className="w-full h-full" viewBox="0 0 20 30" preserveAspectRatio="none">
-          <path
-            d="M0 0 L10 8 L20 0 L20 20 Q10 30 0 20 Z"
-            fill={GOW.goldDark}
-            opacity="0.8"
-          />
-          <path
-            d="M5 5 L10 10 L15 5"
-            fill="none"
-            stroke={GOW.goldBright}
-            strokeWidth="0.5"
-          />
-        </svg>
-      </div>
-
-      {/* Frost glow effect */}
-      <div
-        className="absolute top-1/4 left-0 right-0 h-32 animate-pillar-frost"
-        style={{
-          background: `radial-gradient(ellipse at center, ${GOW.frostBright}15, transparent)`,
-        }}
-      />
-
-      {/* Fire glow effect */}
-      <div
-        className="absolute top-2/3 left-0 right-0 h-32 animate-pillar-fire"
-        style={{
-          background: `radial-gradient(ellipse at center, ${GOW.fireOrange}15, transparent)`,
-        }}
-      />
+      {/* Greek meander border bottom */}
+      <GreekMeander color={GOW.gold} opacity={0.2} />
     </div>
   )
-}
+})
 
 // =============================================================================
-// FROST PARTICLES - Leviathan Axe effect
+// PROFESSION ICONS
 // =============================================================================
-function FrostParticles({ reducedMotion }: { reducedMotion: boolean }) {
-  if (reducedMotion) return null
+const GearIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12,8 L14,4 L10,4 Z M12,16 L14,20 L10,20 Z M8,12 L4,14 L4,10 Z M16,12 L20,14 L20,10 Z" />
+    <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5" />
+  </svg>
+)
 
-  const particles = [
-    { left: '5%', delay: '0s', duration: '8s', size: 3 },
-    { left: '15%', delay: '1s', duration: '7s', size: 4 },
-    { left: '25%', delay: '2s', duration: '9s', size: 3 },
-    { left: '35%', delay: '0.5s', duration: '8s', size: 5 },
-    { left: '45%', delay: '1.5s', duration: '7s', size: 3 },
-    { left: '55%', delay: '2.5s', duration: '9s', size: 4 },
-    { left: '65%', delay: '0.8s', duration: '8s', size: 3 },
-    { left: '75%', delay: '1.8s', duration: '7s', size: 5 },
-    { left: '85%', delay: '0.3s', duration: '9s', size: 4 },
-    { left: '95%', delay: '2.2s', duration: '8s', size: 3 },
-  ]
+const WaveIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <path d="M4,12 Q7,8 10,12 Q13,16 16,12 Q19,8 22,12" strokeLinecap="round" />
+    <path d="M4,16 Q7,12 10,16 Q13,20 16,16 Q19,12 22,16" strokeLinecap="round" opacity="0.5" />
+  </svg>
+)
 
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[5] overflow-hidden" aria-hidden="true">
-      {particles.map((p, i) => (
-        <div
-          key={i}
-          className="absolute top-0 rounded-full animate-frost-fall"
-          style={{
-            left: p.left,
-            width: p.size,
-            height: p.size,
-            background: GOW.frostBright,
-            boxShadow: `0 0 ${p.size * 2}px ${GOW.frostBright}`,
-            animationDelay: p.delay,
-            animationDuration: p.duration,
-            opacity: 0.6,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
+const DiamondIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M12,2 L22,12 L12,22 L2,12 Z" fill="none" stroke="currentColor" strokeWidth="2" />
+    <path d="M12,6 L18,12 L12,18 L6,12 Z" opacity="0.3" />
+    <circle cx="12" cy="12" r="2" />
+  </svg>
+)
 
 // =============================================================================
-// FIRE EMBERS - Blades of Chaos effect (bottom)
+// WAYSTATION NODE (Profession selector)
 // =============================================================================
-function FireEmbers({ reducedMotion }: { reducedMotion: boolean }) {
-  if (reducedMotion) return null
-
-  const embers = [
-    { left: '10%', delay: '0s', duration: '6s', size: 4 },
-    { left: '20%', delay: '1.2s', duration: '5s', size: 3 },
-    { left: '30%', delay: '0.5s', duration: '7s', size: 5 },
-    { left: '50%', delay: '2s', duration: '5.5s', size: 3 },
-    { left: '60%', delay: '0.8s', duration: '6.5s', size: 4 },
-    { left: '70%', delay: '1.5s', duration: '5s', size: 3 },
-    { left: '80%', delay: '2.5s', duration: '7s', size: 5 },
-    { left: '90%', delay: '0.3s', duration: '6s', size: 4 },
-  ]
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[5] overflow-hidden" aria-hidden="true">
-      {embers.map((ember, i) => (
-        <div
-          key={i}
-          className="absolute bottom-24 rounded-full animate-ember-rise"
-          style={{
-            left: ember.left,
-            width: ember.size,
-            height: ember.size,
-            background: i % 2 === 0 ? GOW.fireOrange : GOW.fireYellow,
-            boxShadow: `0 0 ${ember.size * 3}px ${i % 2 === 0 ? GOW.fireOrange : GOW.fireYellow}`,
-            animationDelay: ember.delay,
-            animationDuration: ember.duration,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
-// =============================================================================
-// BIFROST EDGE - Rainbow realm travel effect
-// =============================================================================
-function BifrostEdge() {
-  return (
-    <>
-      {/* Bottom bifrost glow */}
-      <div
-        className="fixed bottom-0 left-0 right-0 h-20 pointer-events-none z-[4]"
-        aria-hidden="true"
-      >
-        <div
-          className="absolute inset-0 animate-bifrost-pulse"
-          style={{
-            background: `linear-gradient(180deg,
-              transparent 0%,
-              ${GOW.bgDark}80 40%,
-              ${GOW.frostDark}60 70%,
-              ${GOW.frostMid}40 100%
-            )`,
-          }}
-        />
-        <div
-          className="absolute bottom-0 left-0 right-0 h-2"
-          style={{
-            background: `linear-gradient(90deg,
-              ${GOW.frostBright},
-              ${GOW.bifrostGreen},
-              ${GOW.bifrostYellow},
-              ${GOW.bifrostOrange},
-              ${GOW.bifrostPurple},
-              ${GOW.frostBright}
-            )`,
-            filter: 'blur(4px)',
-            opacity: 0.6,
-          }}
-        />
-      </div>
-    </>
-  )
-}
-
-// =============================================================================
-// VIGNETTE - Dark edges with frost/fire hints
-// =============================================================================
-function Vignette() {
-  return (
-    <div
-      className="fixed inset-0 pointer-events-none z-[6]"
-      style={{
-        background: `
-          radial-gradient(ellipse at 50% 50%, transparent 40%, ${GOW.bgDarkest}95 100%),
-          radial-gradient(ellipse at 0% 50%, ${GOW.frostDark}20 0%, transparent 30%),
-          radial-gradient(ellipse at 100% 50%, ${GOW.fireDark}20 0%, transparent 30%)
-        `,
-      }}
-      aria-hidden="true"
-    />
-  )
-}
-
-// =============================================================================
-// STONE TABLET - Section card with Norse styling
-// =============================================================================
-function StoneTablet({
-  children,
-  accentColor = GOW.goldMid,
-  variant = 'default',
-  className = '',
-  ariaLabel,
-}: {
-  children: React.ReactNode
-  accentColor?: string
-  variant?: 'default' | 'frost' | 'fire'
-  className?: string
-  ariaLabel?: string
-}) {
-  const borderColor = variant === 'frost' ? GOW.frostBright : variant === 'fire' ? GOW.fireOrange : GOW.goldMid
-  const glowColor = variant === 'frost' ? GOW.frostGlow : variant === 'fire' ? GOW.fireGlow : GOW.goldGlow
-
-  return (
-    <section
-      className={`relative p-6 ${className}`}
-      style={{
-        background: `linear-gradient(135deg, ${GOW.stoneMid} 0%, ${GOW.stoneDark} 50%, ${GOW.bgDark} 100%)`,
-        boxShadow: `
-          inset 0 1px 0 ${GOW.stoneLight}40,
-          inset 0 -1px 0 ${GOW.bgDarkest},
-          0 0 30px ${glowColor},
-          0 8px 20px ${GOW.bgDarkest}80
-        `,
-        border: `2px solid ${borderColor}30`,
-      }}
-      role="region"
-      aria-label={ariaLabel}
-    >
-      {/* Corner ornaments - Nordic knot */}
-      {['top-0 left-0', 'top-0 right-0', 'bottom-0 left-0', 'bottom-0 right-0'].map((pos, i) => (
-        <div
-          key={i}
-          className={`absolute ${pos} w-6 h-6`}
-          style={{
-            borderTop: pos.includes('top') ? `2px solid ${borderColor}` : 'none',
-            borderBottom: pos.includes('bottom') ? `2px solid ${borderColor}` : 'none',
-            borderLeft: pos.includes('left') ? `2px solid ${borderColor}` : 'none',
-            borderRight: pos.includes('right') ? `2px solid ${borderColor}` : 'none',
-          }}
-        />
-      ))}
-
-      {/* Rune inscriptions at top */}
-      <RuneBorder color={borderColor} className="absolute -top-3 left-8 right-8" />
-
-      {/* Subtle glow underneath */}
-      <div
-        className="absolute -bottom-1 left-12 right-12 h-1 rounded-full"
-        style={{
-          background: borderColor,
-          filter: 'blur(6px)',
-          opacity: 0.4,
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10">{children}</div>
-    </section>
-  )
-}
-
-// =============================================================================
-// SECTION TITLE - Gold with axe/blade icon
-// =============================================================================
-function SectionTitle({
-  children,
-  color = GOW.goldBright,
-  icon = 'axe',
-}: {
-  children: React.ReactNode
-  color?: string
-  icon?: 'axe' | 'blade' | 'rune'
-}) {
-  return (
-    <h2
-      className="text-lg mb-4 flex items-center gap-3"
-      style={{
-        color,
-        textShadow: `0 0 12px ${color}50`,
-        fontFamily: '"Cinzel", Georgia, serif',
-      }}
-    >
-      {icon === 'axe' && (
-        <svg viewBox="0 0 16 20" className="w-4 h-5" aria-hidden="true">
-          <path d="M4 4 L8 2 L12 4 L12 8 L10 10 L8 9 L6 10 L4 8 Z" fill={GOW.frostBright} />
-          <rect x="7" y="9" width="2" height="10" fill={GOW.goldDark} />
-        </svg>
-      )}
-      {icon === 'blade' && (
-        <svg viewBox="0 0 20 16" className="w-5 h-4" aria-hidden="true">
-          <path d="M2 8 L10 4 L18 8 L10 12 Z" fill={GOW.fireOrange} />
-        </svg>
-      )}
-      {icon === 'rune' && (
-        <span className="text-base" style={{ color, fontFamily: 'serif' }}>ᚱ</span>
-      )}
-      <span className="tracking-widest uppercase text-sm">{children}</span>
-      <div
-        className="flex-1 h-px ml-2"
-        style={{ background: `linear-gradient(90deg, ${color}80, transparent)` }}
-        aria-hidden="true"
-      />
-    </h2>
-  )
-}
-
-// =============================================================================
-// REALM SELECTOR - Profession selection (Bifrost style)
-// =============================================================================
-function RealmSelector({
-  profession,
+const WaystationNode = memo(function WaystationNode({
+  icon,
+  label,
+  sublabel,
+  color,
   isActive,
   onClick,
+  position,
 }: {
-  profession: 'engineer' | 'drummer' | 'fighter'
+  icon: React.ReactNode
+  label: string
+  sublabel: string
+  color: string
   isActive: boolean
   onClick: () => void
+  position: { x: number; y: number }
 }) {
-  const realms = {
-    engineer: {
-      name: 'SYSTEM ENGINEER',
-      color: GOW.frostBright,
-      title: 'Senior Staff • CTO',
-      icon: 'ᛗ', // Mannaz rune
-    },
-    drummer: {
-      name: 'MUSICIAN',
-      color: GOW.fireOrange,
-      title: 'Professional Drummer',
-      icon: 'ᛉ', // Algiz rune
-    },
-    fighter: {
-      name: 'MARTIAL ARTIST',
-      color: GOW.bloodBright,
-      title: 'BJJ Instructor',
-      icon: 'ᛏ', // Tiwaz rune
-    },
-  }
-  const realm = realms[profession]
-
   return (
     <button
       onClick={onClick}
-      className={`relative transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-black ${
-        isActive ? 'scale-110 z-10' : 'opacity-60 hover:opacity-90 hover:scale-105'
-      }`}
-      style={{ '--ring-color': realm.color } as React.CSSProperties}
+      className="absolute transform -translate-x-1/2 -translate-y-1/2 group min-w-[70px] md:min-w-[100px] min-h-[70px] md:min-h-[100px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      style={{
+        left: `${position.x}%`,
+        top: `${position.y}%`,
+        ['--tw-ring-color' as string]: color,
+        ['--tw-ring-offset-color' as string]: GOW.void,
+      }}
       aria-pressed={isActive}
-      aria-label={`Select ${realm.name} - ${realm.title}`}
+      aria-label={`Select ${label} - ${sublabel} profession${isActive ? ' (currently selected)' : ''}`}
+      role="tab"
+      tabIndex={isActive ? 0 : -1}
     >
       <div
-        className="relative w-20 h-24 md:w-24 md:h-28 flex flex-col items-center justify-center"
+        className={`absolute inset-0 transition-all duration-500 ${
+          isActive ? 'opacity-50 scale-110' : 'opacity-0 scale-100 group-hover:opacity-30 group-hover:scale-105'
+        }`}
         style={{
-          background: isActive
-            ? `linear-gradient(180deg, ${realm.color}20, ${GOW.bgDark})`
-            : `linear-gradient(180deg, ${GOW.stoneMid}, ${GOW.stoneDark})`,
-          border: `2px solid ${isActive ? realm.color : GOW.stoneLight}`,
-          boxShadow: isActive ? `0 0 20px ${realm.color}60, inset 0 0 20px ${realm.color}20` : 'none',
-          clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+          background: `radial-gradient(ellipse, ${color}60 0%, ${color}30 40%, transparent 70%)`,
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className={`relative w-20 h-20 md:w-28 md:h-28 flex flex-col items-center justify-center transition-all duration-300 ${
+          isActive ? 'scale-110' : 'group-hover:scale-105'
+        }`}
+        style={{
+          background: `linear-gradient(180deg,
+            rgba(10, 10, 12, 0.92) 0%,
+            rgba(15, 13, 20, 0.88) 50%,
+            rgba(10, 10, 12, 0.92) 100%
+          )`,
+          border: `1px solid ${isActive ? color : GOW.gold}30`,
+          borderRadius: '2px',
+          backdropFilter: 'blur(4px)',
+          boxShadow: isActive
+            ? `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 0 15px ${color}40`
+            : `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.3)`,
         }}
       >
-        {/* Rune icon */}
+        <div className="mb-0.5 md:mb-1 scale-75 md:scale-100" style={{ color: isActive ? color : GOW.silver }}>
+          {icon}
+        </div>
         <span
-          className="text-2xl md:text-3xl mb-1"
-          style={{
-            color: isActive ? realm.color : GOW.textSecondary,
-            textShadow: isActive ? `0 0 10px ${realm.color}` : 'none',
-            fontFamily: 'serif',
-          }}
+          className="text-sm tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
+          style={{ color: isActive ? color : GOW.silver }}
         >
-          {realm.icon}
+          {label}
         </span>
-
-        {/* Realm name */}
         <span
-          className="text-xs font-bold tracking-wider"
-          style={{ color: isActive ? realm.color : GOW.textSecondary }}
+          className="text-sm tracking-wider opacity-70 text-center leading-tight hidden md:block"
+          style={{ color: isActive ? color : GOW.silver }}
         >
-          {realm.name}
-        </span>
-
-        {/* Title */}
-        <span
-          className="text-xs opacity-70 mt-0.5"
-          style={{ color: GOW.textMuted, fontSize: '0.6rem' }}
-        >
-          {realm.title}
+          {sublabel}
         </span>
       </div>
-
-      {/* Active glow ring */}
-      {isActive && (
-        <div
-          className="absolute inset-0 animate-realm-pulse pointer-events-none"
-          style={{
-            clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-            border: `2px solid ${realm.color}`,
-            filter: 'blur(2px)',
-          }}
-        />
-      )}
     </button>
   )
-}
+})
 
 // =============================================================================
-// TECH STACK DISPLAY - Rune-tagged skills
+// TECH CLOUD (Engineer skills)
 // =============================================================================
-function TechStackDisplay({ color }: { color: string }) {
+const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
   return (
-    <div className="space-y-4" role="list" aria-label="Technology expertise">
-      {TECH_STACK.map((category) => (
+    <div className="space-y-6">
+      {categories.slice(0, 5).map((category) => (
         <div key={category.name}>
           <h3
-            className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2 uppercase"
-            style={{
-              color: GOW.goldBright,
-              borderColor: `${GOW.goldBright}30`,
-              fontFamily: '"Cinzel", serif',
-            }}
+            className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
+            style={{ color: GOW.silver }}
           >
-            <span>{category.icon}</span>
+            <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
-          <div className="flex flex-wrap gap-1.5" role="list">
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
             {category.items.map((tech) => (
-              <span
+              <li
                 key={tech}
-                className="text-xs px-2 py-1 transition-all hover:scale-105"
+                className="px-3 py-1 text-sm transition-transform hover:scale-105 cursor-default"
                 style={{
-                  background: `${color}12`,
-                  border: `1px solid ${color}35`,
-                  color: GOW.textPrimary,
+                  background: `${GOW.gold}12`,
+                  border: `1px solid ${GOW.gold}30`,
+                  color: GOW.bone,
+                  borderRadius: '3px',
                 }}
-                role="listitem"
               >
                 {tech}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       ))}
     </div>
   )
-}
+})
 
 // =============================================================================
-// ACHIEVEMENT DISPLAY - For drummer/fighter
+// SKILLS LIST (Drummer/Fighter)
 // =============================================================================
-function AchievementDisplay({
-  profession,
-  color,
-}: {
-  profession: 'drummer' | 'fighter'
-  color: string
-}) {
-  const achievements = getAchievementsByProfession(profession)
-
+const SkillsList = memo(function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
   return (
-    <div className="space-y-4" role="list" aria-label="Achievements and expertise">
-      {achievements.map((category) => (
+    <div className="grid md:grid-cols-3 gap-6">
+      {categories.map((category) => (
         <div key={category.name}>
           <h3
-            className="text-xs tracking-widest mb-2 pb-1 border-b flex items-center gap-2 uppercase"
-            style={{
-              color: GOW.goldBright,
-              borderColor: `${GOW.goldBright}30`,
-              fontFamily: '"Cinzel", serif',
-            }}
+            className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
+            style={{ color: GOW.silver }}
           >
-            <span>{category.icon}</span>
+            <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
-          <div className="space-y-1.5" role="list">
-            {category.achievements.map((achievement, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-2 py-1 px-2 hover:bg-white/5 transition-colors rounded"
-                role="listitem"
-              >
-                <span className="text-sm mt-0.5" style={{ color }} aria-hidden="true">ᚱ</span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xs font-medium" style={{ color: GOW.textPrimary }}>
-                      {achievement.title}
-                    </span>
-                    {achievement.metric && (
-                      <span className="text-xs" style={{ color }}>
-                        {achievement.metric}
-                      </span>
-                    )}
-                  </div>
-                  {achievement.description && (
-                    <p className="text-xs mt-0.5" style={{ color: GOW.textSecondary }}>
-                      {achievement.description}
-                    </p>
-                  )}
-                </div>
-              </div>
+          <ul className="space-y-2" aria-label={`${category.name} skills`}>
+            {category.skills.map((skill) => (
+              <li key={skill.name} className="text-sm flex items-center gap-2" style={{ color: GOW.bone }}>
+                <span style={{ color: GOW.blood }} aria-hidden="true">◆</span>
+                {skill.name}
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       ))}
     </div>
   )
-}
+})
 
 // =============================================================================
-// CURRENT ROLES SECTION
+// PROJECT CARD
 // =============================================================================
-function CurrentRolesSection({ color }: { color: string }) {
+const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
   return (
-    <StoneTablet accentColor={color} variant="frost" ariaLabel="Current professional roles" className="mb-6">
-      <SectionTitle icon="axe">Current Positions</SectionTitle>
-
-      <div className="grid gap-3">
-        {CURRENT_ROLES.map((role) => (
-          <div
-            key={role.id}
-            className="p-3 transition-all hover:translate-x-1"
-            style={{
-              background: `linear-gradient(90deg, ${GOW.stoneMid}60, transparent)`,
-              borderLeft: `3px solid ${role.type === 'leadership' ? GOW.goldBright : color}`,
-            }}
-          >
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
-                  {role.title}
-                </h3>
-                <p
-                  className="text-xs"
-                  style={{ color: role.type === 'leadership' ? GOW.goldBright : color }}
-                >
-                  {role.company}
-                </p>
-              </div>
-              {role.type === 'leadership' && (
-                <span
-                  className="text-xs px-2 py-0.5 tracking-wider uppercase"
-                  style={{
-                    background: `${GOW.goldBright}15`,
-                    border: `1px solid ${GOW.goldBright}40`,
-                    color: GOW.goldBright,
-                  }}
-                >
-                  Leadership
-                </span>
-              )}
-            </div>
-            <p className="text-xs mt-1" style={{ color: GOW.textSecondary }}>
-              {role.description}
-            </p>
-          </div>
+    <article
+      className="p-4 transition-transform hover:scale-[1.02] cursor-pointer group"
+      style={{
+        background: `linear-gradient(135deg, ${GOW.void}, ${GOW.voidWarm}50)`,
+        border: `1px solid ${GOW.stormBrown}`,
+        borderRadius: '4px',
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`View ${project.name} project details`}
+    >
+      <h3 className="text-lg transition-colors" style={{ color: GOW.bone }}>
+        {project.name}
+      </h3>
+      <p className="text-sm mt-2" style={{ color: GOW.silver }}>{project.tagline}</p>
+      {project.impact && (
+        <p className="text-sm mt-2 italic" style={{ color: GOW.gold }}>
+          <span aria-hidden="true">— </span>
+          <span className="sr-only">Impact: </span>{project.impact}
+        </p>
+      )}
+      <div className="flex flex-wrap gap-1 mt-3" aria-label="Technologies used">
+        {project.techStack.slice(0, 4).map((tech) => (
+          <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${GOW.gold}12`, color: GOW.silver }}>
+            {tech}
+          </span>
         ))}
       </div>
-    </StoneTablet>
+    </article>
   )
-}
+})
 
 // =============================================================================
-// COMPANIES SECTION
+// COMPANY CARD
 // =============================================================================
-function CompaniesSection() {
+const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
   return (
-    <StoneTablet accentColor={GOW.bifrostPurple} ariaLabel="Companies and ventures" className="mb-6">
-      <SectionTitle color={GOW.bifrostPurple} icon="rune">Ventures & Companies</SectionTitle>
-
-      <div className="grid gap-3">
-        {COMPANIES.map((company) => (
-          <a
-            key={company.id}
-            href={company.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block p-3 transition-all group hover:translate-x-1"
-            style={{
-              background: `linear-gradient(135deg, ${GOW.stoneMid}60, transparent)`,
-              border: `1px solid ${GOW.bifrostPurple}30`,
-            }}
-            aria-label={`${company.name} - ${company.tagline}`}
-          >
-            <div className="flex justify-between items-start mb-1">
-              <div className="flex items-center gap-2">
-                <span className="text-base">{company.icon}</span>
-                <div>
-                  <h3 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
-                    {company.name}
-                  </h3>
-                  <p className="text-xs" style={{ color: GOW.bifrostPurple }}>
-                    {company.tagline}
-                  </p>
-                </div>
-              </div>
-              <svg
-                viewBox="0 0 16 16"
-                className="w-3 h-3 opacity-40 group-hover:opacity-100 transition-opacity"
-                aria-hidden="true"
-              >
-                <path d="M4 12L12 4M12 4H6M12 4v6" fill="none" stroke={GOW.bifrostPurple} strokeWidth="2" />
-              </svg>
-            </div>
-            <p className="text-xs mb-2" style={{ color: GOW.textSecondary }}>
-              {company.description}
-            </p>
-            <div className="flex flex-wrap gap-1">
-              {company.services.map((service) => (
-                <span
-                  key={service}
-                  className="text-xs px-1.5 py-0.5"
-                  style={{
-                    background: `${GOW.bifrostPurple}10`,
-                    border: `1px solid ${GOW.bifrostPurple}25`,
-                    color: GOW.textSecondary,
-                  }}
-                >
-                  {service}
-                </span>
-              ))}
-            </div>
-          </a>
-        ))}
+    <a
+      href={company.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      style={{
+        background: `linear-gradient(135deg, ${GOW.void}, ${GOW.voidWarm}40)`,
+        border: `1px solid ${GOW.stormBrown}`,
+        borderRadius: '4px',
+        ['--tw-ring-color' as string]: GOW.gold,
+        ['--tw-ring-offset-color' as string]: GOW.void,
+      }}
+      aria-label={`${company.name} - ${company.tagline}. Opens in new tab.`}
+    >
+      <div className="flex items-center gap-3 mb-2">
+        <span className="text-2xl" aria-hidden="true">{company.icon}</span>
+        <div>
+          <h3 className="text-lg transition-colors" style={{ color: GOW.bone }}>
+            {company.name}
+            <span className="sr-only"> (opens in new tab)</span>
+          </h3>
+          <p className="text-sm" style={{ color: GOW.gold }}>{company.tagline}</p>
+        </div>
       </div>
-    </StoneTablet>
+      <p className="text-sm" style={{ color: GOW.silver }}>{company.description}</p>
+    </a>
   )
-}
+})
 
 // =============================================================================
-// BANDS SECTION - Musical projects (Fire themed)
+// BAND CARD
 // =============================================================================
-function BandsSection() {
-  return (
-    <StoneTablet accentColor={GOW.fireOrange} variant="fire" ariaLabel="Musical projects and bands" className="mb-6">
-      <SectionTitle color={GOW.fireOrange} icon="blade">Musical Projects</SectionTitle>
-
-      <div className="grid gap-3">
-        {BANDS.map((band) => (
-          <div
-            key={band.id}
-            className="p-3 transition-all hover:translate-x-1"
-            style={{
-              background: `linear-gradient(135deg, ${GOW.stoneMid}60, transparent)`,
-              border: `1px solid ${GOW.fireOrange}30`,
-            }}
-          >
-            <div className="flex justify-between items-start mb-1">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
-                    {band.name}
-                  </h3>
-                  {band.active && (
-                    <span
-                      className="w-2 h-2 rounded-full"
-                      style={{
-                        background: GOW.fireYellow,
-                        boxShadow: `0 0 6px ${GOW.fireYellow}`,
-                      }}
-                      aria-label="Currently active"
-                    />
-                  )}
-                </div>
-                <p className="text-xs" style={{ color: GOW.fireOrange }}>
-                  {band.genre} - {band.role}
-                </p>
-              </div>
-              {band.url && (
-                <a
-                  href={band.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="opacity-40 hover:opacity-100 transition-opacity"
-                  aria-label={`Visit ${band.name} website`}
-                >
-                  <svg viewBox="0 0 16 16" className="w-3 h-3">
-                    <path d="M4 12L12 4M12 4H6M12 4v6" fill="none" stroke={GOW.fireOrange} strokeWidth="2" />
-                  </svg>
-                </a>
-              )}
-            </div>
-            <p className="text-xs" style={{ color: GOW.textSecondary }}>
-              {band.description}
-            </p>
-          </div>
-        ))}
-      </div>
-    </StoneTablet>
+const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
+  const content = (
+    <article
+      className="p-4 transition-transform hover:scale-[1.02] group"
+      style={{
+        background: `linear-gradient(135deg, ${GOW.void}, ${GOW.fire}15)`,
+        border: `1px solid ${GOW.fire}40`,
+        borderRadius: '4px',
+      }}
+    >
+      <h3 className="text-lg transition-colors" style={{ color: GOW.bone }}>
+        {band.name}
+        {band.url && <span className="sr-only"> (opens in new tab)</span>}
+      </h3>
+      <p className="text-sm mt-1" style={{ color: GOW.fire }}>
+        {band.genre} <span aria-hidden="true">|</span> {band.role}
+      </p>
+      <p className="text-sm mt-2" style={{ color: GOW.silver }}>{band.description}</p>
+      {!band.url && <p className="text-sm mt-2 italic" style={{ color: GOW.silver }}>Website coming soon</p>}
+    </article>
   )
-}
+
+  if (band.url) {
+    return (
+      <a
+        href={band.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+        style={{
+          ['--tw-ring-color' as string]: GOW.fire,
+          ['--tw-ring-offset-color' as string]: GOW.void,
+        }}
+        aria-label={`${band.name} - ${band.genre}. Opens in new tab.`}
+      >
+        {content}
+      </a>
+    )
+  }
+  return content
+})
 
 // =============================================================================
 // EXPERIENCE CARD
 // =============================================================================
-function ExperienceCard({ entry, color }: { entry: typeof EXPERIENCE_DATA[0]; color: string }) {
+const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: typeof EXPERIENCE_DATA[0]; isLast?: boolean }) {
   const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
   const startDisplay = new Date(entry.startDate).getFullYear()
 
   return (
-    <div
-      className="relative p-3"
-      style={{
-        background: `linear-gradient(135deg, ${GOW.stoneMid}50, transparent)`,
-        borderLeft: `3px solid ${color}`,
-      }}
-    >
-      <div className="flex justify-between items-start mb-1">
+    <article className="py-4">
+      <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
-          <h4 className="text-sm font-bold" style={{ color: GOW.textPrimary }}>
-            {entry.title}
-          </h4>
-          <p className="text-xs" style={{ color }}>
-            {entry.organization}
-          </p>
+          <h3 className="text-lg font-medium" style={{ color: GOW.bone }}>{entry.title}</h3>
+          <p className="text-sm" style={{ color: GOW.gold }}>{entry.organization}</p>
         </div>
-        <span
-          className="text-xs px-2 py-0.5"
-          style={{
-            background: `${color}20`,
-            border: `1px solid ${color}40`,
-            color,
-          }}
-        >
-          {startDisplay} - {endDisplay}
+        <span className="text-sm" style={{ color: GOW.gold }}>
+          <time>{startDisplay}</time> - <time>{endDisplay}</time>
         </span>
       </div>
-
-      <p className="text-xs mb-1" style={{ color: GOW.textSecondary }}>
-        {entry.description}
-      </p>
-
+      <p className="text-sm mb-2" style={{ color: GOW.silver }}>{entry.description}</p>
       {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-0.5 mt-2">
+        <ul className="space-y-1" aria-label="Key achievements">
           {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-xs flex items-start gap-1.5" style={{ color: GOW.textPrimary }}>
-              <span style={{ color }} aria-hidden="true">ᚱ</span>
+            <li key={i} className="text-sm flex items-start gap-2" style={{ color: GOW.bone }}>
+              <span style={{ color: GOW.blood }} aria-hidden="true">◆</span>
               {highlight}
             </li>
           ))}
         </ul>
       )}
-    </div>
-  )
-}
-
-// =============================================================================
-// PROJECT CARD
-// =============================================================================
-function ProjectCard({ project, color }: { project: typeof PROJECTS_DATA[0]; color: string }) {
-  return (
-    <div
-      className="relative p-3 transition-all hover:translate-y-[-2px] group"
-      style={{
-        background: `linear-gradient(135deg, ${GOW.stoneMid}, ${GOW.stoneDark})`,
-        border: `2px solid ${color}40`,
-      }}
-    >
-      <div className="flex justify-between items-start mb-1">
-        <h3 className="text-sm font-bold" style={{ color }}>
-          {project.name}
-        </h3>
-        {project.featured && (
-          <svg viewBox="0 0 16 20" className="w-3 h-4" aria-label="Featured project">
-            <path d="M8 2 L14 6 L14 14 L8 18 L2 14 L2 6 Z" fill={GOW.goldBright} />
-            <text x="8" y="12" textAnchor="middle" fill={GOW.bgDark} fontSize="6" fontFamily="serif">ᚠ</text>
-          </svg>
-        )}
-      </div>
-
-      <p className="text-xs mb-1" style={{ color: GOW.textSecondary }}>
-        {project.tagline}
-      </p>
-
-      {project.impact && (
-        <p className="text-xs mb-2 italic" style={{ color: GOW.frostMid }}>
-          {project.impact}
-        </p>
-      )}
-
-      <div className="flex gap-1 flex-wrap">
-        {project.techStack.slice(0, 4).map((tech) => (
-          <span
-            key={tech}
-            className="text-xs px-1.5 py-0.5"
-            style={{
-              background: `${color}15`,
-              border: `1px solid ${color}30`,
-              color,
-            }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-        style={{
-          boxShadow: `inset 0 0 15px ${color}20, 0 0 10px ${color}15`,
-        }}
-        aria-hidden="true"
-      />
-    </div>
-  )
-}
-
-// =============================================================================
-// ART BREAK - Decorative divider with World Serpent
-// =============================================================================
-function ArtBreak({ variant = 'serpent' }: { variant?: 'serpent' | 'weapons' | 'bifrost' }) {
-  return (
-    <div className="flex items-center justify-center gap-4 my-8 py-4" aria-hidden="true">
-      {variant === 'serpent' && (
-        <>
-          <LeviathanAxe size={32} />
-          <WorldSerpent size={40} />
-          <BladesOfChaos size={28} />
-        </>
-      )}
-      {variant === 'weapons' && (
-        <>
-          <LeviathanAxe size={36} />
-          <div className="flex items-center gap-2">
-            <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, transparent, ${GOW.goldBright})` }} />
-            <span className="text-lg" style={{ color: GOW.goldBright, fontFamily: 'serif' }}>ᚠ</span>
-            <div className="w-16 h-px" style={{ background: `linear-gradient(90deg, ${GOW.goldBright}, transparent)` }} />
-          </div>
-          <BladesOfChaos size={36} />
-        </>
-      )}
-      {variant === 'bifrost' && (
+      {!isLast && (
         <div
-          className="w-full max-w-md h-1 rounded-full"
-          style={{
-            background: `linear-gradient(90deg,
-              transparent,
-              ${GOW.frostBright},
-              ${GOW.bifrostGreen},
-              ${GOW.bifrostYellow},
-              ${GOW.bifrostOrange},
-              ${GOW.bifrostPurple},
-              transparent
-            )`,
-            filter: 'blur(1px)',
-          }}
+          className="mt-4"
+          style={{ borderBottom: `1px solid ${GOW.stormBrown}40` }}
         />
       )}
+    </article>
+  )
+})
+
+// =============================================================================
+// ART SECTION 1 - Blades of Chaos with Chains
+// =============================================================================
+const ArtSectionWeapons = memo(function ArtSectionWeapons() {
+  return (
+    <div className="relative z-20 py-12 px-6 overflow-hidden" aria-hidden="true" role="presentation">
+      <div className="max-w-6xl mx-auto relative h-40 flex items-center justify-center">
+        <svg className="w-full h-full" viewBox="0 0 800 140" preserveAspectRatio="xMidYMid meet">
+          {/* Left chain */}
+          <g opacity="0.6">
+            {Array.from({ length: 8 }, (_, i) => (
+              <ellipse
+                key={`left-chain-${i}`}
+                cx={80 + i * 25}
+                cy={70 + Math.sin(i * 0.8) * 8}
+                rx="8"
+                ry="12"
+                fill="none"
+                stroke={GOW.goldDark}
+                strokeWidth="3"
+                transform={`rotate(${i * 15}, ${80 + i * 25}, ${70 + Math.sin(i * 0.8) * 8})`}
+              />
+            ))}
+          </g>
+
+          {/* Left Blade */}
+          <g transform="translate(320, 70)">
+            <path d="M-60,-8 L0,-20 L10,0 L0,20 L-60,8 Z" fill={GOW.ashLight} />
+            <path d="M-55,-5 L-5,-15 L5,0 L-5,15 L-55,5 Z" fill={GOW.fire} opacity="0.5" />
+            <path d="M-50,0 L-10,0" stroke={GOW.fireBright} strokeWidth="2" opacity="0.8" />
+            {/* Blood drip */}
+            <path d="M5,0 Q8,10 5,20 Q2,10 5,0" fill={GOW.blood} opacity="0.6" />
+          </g>
+
+          {/* Central Omega */}
+          <g transform="translate(400, 70)">
+            <path
+              d="M0,-30 C-20,-30 -35,-10 -35,15 L-25,15 C-25,-5 -15,-20 0,-20 C15,-20 25,-5 25,15 L35,15 C35,-10 20,-30 0,-30"
+              fill={GOW.gold}
+              opacity="0.8"
+            />
+            <path d="M0,15 Q-2,25 0,35 Q2,25 0,15" fill={GOW.blood} opacity="0.7" />
+          </g>
+
+          {/* Right Blade */}
+          <g transform="translate(480, 70)">
+            <path d="M60,-8 L0,-20 L-10,0 L0,20 L60,8 Z" fill={GOW.ashLight} />
+            <path d="M55,-5 L5,-15 L-5,0 L5,15 L55,5 Z" fill={GOW.fire} opacity="0.5" />
+            <path d="M50,0 L10,0" stroke={GOW.fireBright} strokeWidth="2" opacity="0.8" />
+            {/* Blood drip */}
+            <path d="M-5,0 Q-8,10 -5,20 Q-2,10 -5,0" fill={GOW.blood} opacity="0.6" />
+          </g>
+
+          {/* Right chain */}
+          <g opacity="0.6">
+            {Array.from({ length: 8 }, (_, i) => (
+              <ellipse
+                key={`right-chain-${i}`}
+                cx={720 - i * 25}
+                cy={70 + Math.sin(i * 0.8) * 8}
+                rx="8"
+                ry="12"
+                fill="none"
+                stroke={GOW.goldDark}
+                strokeWidth="3"
+                transform={`rotate(${-i * 15}, ${720 - i * 25}, ${70 + Math.sin(i * 0.8) * 8})`}
+              />
+            ))}
+          </g>
+        </svg>
+      </div>
+
+      {/* Greek meander divider */}
+      <div className="max-w-md mx-auto">
+        <GreekMeander color={GOW.blood} opacity={0.4} />
+      </div>
     </div>
   )
-}
+})
 
 // =============================================================================
-// POSTS SECTION - Blog/content placeholder
+// ART SECTION 2 - Greek Pillars with Blood
 // =============================================================================
-function PostsSection() {
-  const posts = [
-    {
-      id: 'building-with-elixir',
-      title: 'Building Enterprise Systems with Elixir',
-      excerpt: 'Lessons learned from scaling Phoenix applications to handle millions of transactions.',
-      date: '2026-04',
-    },
-    {
-      id: 'kubernetes-patterns',
-      title: 'Kubernetes Patterns for Production',
-      excerpt: 'Real-world deployment strategies and GitOps workflows.',
-      date: '2026-03',
-    },
-  ]
-
+const ArtSectionPillars = memo(function ArtSectionPillars() {
   return (
-    <StoneTablet accentColor={GOW.frostMid} variant="frost" ariaLabel="Recent posts" className="mb-6">
-      <SectionTitle color={GOW.frostMid} icon="rune">Wisdom Shared</SectionTitle>
+    <div className="relative z-20 py-12 px-6 overflow-hidden" aria-hidden="true" role="presentation">
+      <div className="max-w-5xl mx-auto relative h-32 flex items-center justify-center">
+        <svg className="w-full h-full" viewBox="0 0 700 120" preserveAspectRatio="xMidYMid meet">
+          {/* Left pillar */}
+          <g transform="translate(100, 10)">
+            {/* Capital */}
+            <rect x="-25" y="0" width="50" height="8" fill={GOW.ashLight} />
+            <rect x="-20" y="8" width="40" height="4" fill={GOW.ash} />
+            {/* Shaft with flutes */}
+            <rect x="-15" y="12" width="30" height="85" fill={GOW.ash} />
+            {[0, 1, 2, 3, 4].map((i) => (
+              <rect key={i} x={-12 + i * 6} y="15" width="2" height="80" fill={GOW.ashDark} opacity="0.4" />
+            ))}
+            {/* Base */}
+            <rect x="-20" y="97" width="40" height="6" fill={GOW.ashLight} />
+            {/* Blood drip */}
+            <path d="M5,0 Q3,25 8,50 Q4,70 6,95" fill="none" stroke={GOW.blood} strokeWidth="3" opacity="0.5" />
+          </g>
 
-      <div className="grid gap-3">
-        {posts.map((post) => (
-          <div
-            key={post.id}
-            className="p-3 transition-all hover:translate-x-1"
-            style={{
-              background: `linear-gradient(90deg, ${GOW.stoneMid}40, transparent)`,
-              borderLeft: `2px solid ${GOW.frostMid}`,
-            }}
-          >
-            <h4 className="text-sm font-medium mb-1" style={{ color: GOW.textPrimary }}>
-              {post.title}
-            </h4>
-            <p className="text-xs mb-1" style={{ color: GOW.textSecondary }}>
-              {post.excerpt}
-            </p>
-            <span className="text-xs" style={{ color: GOW.textMuted }}>
-              {post.date}
-            </span>
-          </div>
-        ))}
+          {/* Center - Spartan helmet silhouette */}
+          <g transform="translate(350, 60)">
+            <path
+              d="M0,-45 C-30,-45 -45,-25 -45,5 L-45,35 L-35,40 L-35,15 C-35,-15 -20,-35 0,-35 C20,-35 35,-15 35,15 L35,40 L45,35 L45,5 C45,-25 30,-45 0,-45"
+              fill={GOW.gold}
+              opacity="0.7"
+            />
+            {/* Crest */}
+            <path
+              d="M0,-45 Q-5,-55 0,-60 Q5,-55 0,-45"
+              fill={GOW.blood}
+              opacity="0.8"
+            />
+            {/* Eye slit */}
+            <rect x="-30" y="0" width="60" height="6" fill={GOW.voidDeep} opacity="0.8" />
+          </g>
+
+          {/* Right pillar */}
+          <g transform="translate(600, 10)">
+            {/* Capital */}
+            <rect x="-25" y="0" width="50" height="8" fill={GOW.ashLight} />
+            <rect x="-20" y="8" width="40" height="4" fill={GOW.ash} />
+            {/* Shaft with flutes */}
+            <rect x="-15" y="12" width="30" height="85" fill={GOW.ash} />
+            {[0, 1, 2, 3, 4].map((i) => (
+              <rect key={i} x={-12 + i * 6} y="15" width="2" height="80" fill={GOW.ashDark} opacity="0.4" />
+            ))}
+            {/* Base */}
+            <rect x="-20" y="97" width="40" height="6" fill={GOW.ashLight} />
+            {/* Blood drip */}
+            <path d="M-5,0 Q-3,30 -8,60 Q-4,80 -6,95" fill="none" stroke={GOW.blood} strokeWidth="3" opacity="0.5" />
+          </g>
+
+          {/* Connecting laurel wreath hints */}
+          <path d="M145,50 Q200,30 280,50" fill="none" stroke={GOW.gold} strokeWidth="1" opacity="0.3" />
+          <path d="M420,50 Q500,30 555,50" fill="none" stroke={GOW.gold} strokeWidth="1" opacity="0.3" />
+        </svg>
       </div>
-    </StoneTablet>
+
+      {/* Divider */}
+      <div className="max-w-xs mx-auto flex items-center gap-3 mt-4">
+        <div className="flex-1 h-px" style={{ background: GOW.gold, opacity: 0.3 }} />
+        <svg width="20" height="20" viewBox="0 0 20 20">
+          <path d="M10,2 L18,10 L10,18 L2,10 Z" fill={GOW.blood} opacity="0.5" />
+        </svg>
+        <div className="flex-1 h-px" style={{ background: GOW.gold, opacity: 0.3 }} />
+      </div>
+    </div>
   )
-}
+})
+
+// =============================================================================
+// ART SECTION 3 - Mount Olympus / Tartarus
+// =============================================================================
+const ArtSectionOlympus = memo(function ArtSectionOlympus() {
+  return (
+    <div className="relative z-20 py-12 px-6 overflow-hidden" aria-hidden="true" role="presentation">
+      <div className="max-w-6xl mx-auto relative h-36">
+        <svg className="w-full h-full" viewBox="0 0 1000 140" preserveAspectRatio="xMidYMid meet">
+          {/* Tartarus flames at bottom */}
+          {Array.from({ length: 15 }, (_, i) => (
+            <path
+              key={`flame-${i}`}
+              d={`M${50 + i * 65},140 Q${45 + i * 65},${120 - (i % 3) * 10} ${55 + i * 65},${100 - (i % 4) * 8} Q${50 + i * 65},${115 - (i % 3) * 5} ${50 + i * 65},140`}
+              fill={i % 2 === 0 ? GOW.fire : GOW.fireBright}
+              opacity={0.3 + (i % 3) * 0.1}
+            />
+          ))}
+
+          {/* Mount Olympus silhouette */}
+          <path
+            d="M300,140 L350,90 L400,100 L450,50 L500,30 L550,50 L600,100 L650,90 L700,140"
+            fill={GOW.ashDark}
+            opacity="0.7"
+          />
+
+          {/* Temple at peak */}
+          <g transform="translate(500, 30)">
+            {/* Roof */}
+            <path d="M-30,0 L0,-20 L30,0 Z" fill={GOW.gold} opacity="0.6" />
+            {/* Columns */}
+            <rect x="-25" y="0" width="4" height="25" fill={GOW.ashLight} opacity="0.5" />
+            <rect x="-10" y="0" width="4" height="25" fill={GOW.ashLight} opacity="0.5" />
+            <rect x="6" y="0" width="4" height="25" fill={GOW.ashLight} opacity="0.5" />
+            <rect x="21" y="0" width="4" height="25" fill={GOW.ashLight} opacity="0.5" />
+            {/* Divine glow */}
+            <ellipse cx="0" cy="10" rx="40" ry="30" fill={GOW.gold} opacity="0.15" />
+          </g>
+
+          {/* Blood rivers */}
+          <path
+            d="M100,140 Q200,120 300,130 Q400,110 500,125"
+            fill="none"
+            stroke={GOW.blood}
+            strokeWidth="3"
+            opacity="0.3"
+          />
+          <path
+            d="M500,125 Q600,115 700,130 Q800,120 900,140"
+            fill="none"
+            stroke={GOW.blood}
+            strokeWidth="3"
+            opacity="0.3"
+          />
+
+          {/* Chains hanging from sky */}
+          {[150, 400, 600, 850].map((x, i) => (
+            <g key={`chain-${i}`} opacity="0.4">
+              {Array.from({ length: 4 }, (_, j) => (
+                <ellipse
+                  key={j}
+                  cx={x}
+                  cy={j * 15}
+                  rx="4"
+                  ry="8"
+                  fill="none"
+                  stroke={GOW.goldDark}
+                  strokeWidth="2"
+                />
+              ))}
+            </g>
+          ))}
+        </svg>
+
+        {/* Fire glow at bottom */}
+        <div
+          className="absolute left-0 right-0 bottom-0 h-16"
+          style={{
+            background: `linear-gradient(180deg, transparent, ${GOW.fire}15)`,
+          }}
+        />
+      </div>
+
+      {/* Greek meander divider */}
+      <div className="max-w-sm mx-auto mt-4">
+        <GreekMeander color={GOW.gold} opacity={0.25} />
+      </div>
+    </div>
+  )
+})
 
 // =============================================================================
 // MAIN COMPONENT
@@ -1293,438 +1270,525 @@ export default function MythicTheme() {
   const { theme } = useTheme()
   const { active, setActive, config } = useProfession()
   const [mounted, setMounted] = useState(false)
-  const reducedMotion = usePrefersReducedMotion()
 
-  const aboutData = ABOUT_DATA[active]
-  const skills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter((p) => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
+  const experienceTrigger = useSectionTrigger({ threshold: 0.05, rootMargin: '100px 0px 0px 0px' })
+  const projectsTrigger = useSectionTrigger({ threshold: 0.05, rootMargin: '100px 0px 0px 0px' })
+  const contactTrigger = useSectionTrigger({ threshold: 0.05, rootMargin: '100px 0px 0px 0px' })
+
+  const aboutData = useMemo(() => ABOUT_DATA[active], [active])
+  const engineerTech = useMemo(() => getEngineerSkills(), [])
+  const otherSkills = useMemo(() => getSkillsByProfession(active), [active])
+  const projects = useMemo(
+    () => PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured),
+    [active]
+  )
+  const experience = useMemo(
+    () => filterExperienceByProfession(EXPERIENCE_DATA, active),
+    [active]
+  )
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
-  if (!mounted) return null
-
-  const realmColors = {
-    engineer: GOW.frostBright,
-    drummer: GOW.fireOrange,
-    fighter: GOW.bloodBright,
+  if (!mounted) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ background: GOW.void }}
+        role="status"
+        aria-label="Loading theme"
+      >
+        <div className="animate-pulse text-center" style={{ color: GOW.bone }}>
+          Loading...
+        </div>
+      </div>
+    )
   }
 
-  const currentColor = realmColors[active]
+  const professionNodes = [
+    {
+      id: 'engineer',
+      icon: <GearIcon />,
+      label: 'System',
+      sublabel: 'Engineer / CTO',
+      color: GOW.gold,
+      position: { x: 25, y: 50 },
+    },
+    {
+      id: 'drummer',
+      icon: <WaveIcon />,
+      label: 'Musician',
+      sublabel: 'Pro Drummer',
+      color: GOW.fire,
+      position: { x: 50, y: 30 },
+    },
+    {
+      id: 'fighter',
+      icon: <DiamondIcon />,
+      label: 'Martial',
+      sublabel: 'Muay Thai',
+      color: GOW.bloodBright,
+      position: { x: 75, y: 50 },
+    },
+  ]
 
   return (
     <div
       className="min-h-screen relative overflow-hidden"
       style={{
-        background: `
-          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Crect width='60' height='60' fill='%231A1A1A'/%3E%3Cpath d='M10 10 Q30 0 50 10 Q60 30 50 50 Q30 60 10 50 Q0 30 10 10' fill='none' stroke='%23333' stroke-width='0.5' opacity='0.3'/%3E%3C/svg%3E"),
-          linear-gradient(180deg, ${GOW.bgDarkest} 0%, ${GOW.bgDark} 50%, ${GOW.stoneDark} 100%)
-        `,
-        fontFamily: '"Cinzel", Georgia, serif',
+        background: `linear-gradient(180deg, ${GOW.void}, ${GOW.voidDeep}, ${GOW.voidWarm})`,
       }}
-      role="main"
-      aria-label="Alexander Pulido - Portfolio"
     >
-      <NorsePatterns />
+      <SkipLink href="#main-content" />
 
-      {/* Background effects */}
-      <FrostParticles reducedMotion={reducedMotion} />
-      <FireEmbers reducedMotion={reducedMotion} />
-      <BifrostEdge />
-      <Vignette />
+      {/* GOW3 Stormy clouds with lightning */}
+      <StormyClouds />
 
-      {/* Nordic pillars */}
-      <NordicPillar side="left" />
-      <NordicPillar side="right" />
+      {/* Atmospheric background */}
+      <div
+        className="fixed inset-0 z-0"
+        style={{
+          background: `
+            radial-gradient(ellipse at 50% 0%, ${GOW.stormGrey}25 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 70%, ${GOW.bloodDark}20 0%, transparent 40%),
+            radial-gradient(ellipse at 80% 30%, ${GOW.fire}10 0%, transparent 35%),
+            linear-gradient(180deg, ${GOW.void} 0%, ${GOW.voidDeep} 40%, ${GOW.voidWarm} 100%)
+          `,
+        }}
+      />
+      <StormRain />
+      <EmberParticles />
 
-      {/* ========== HEADER ========== */}
-      <header className="relative z-30 p-4 md:p-6 lg:px-20" role="banner">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div className="flex items-center gap-4">
-              {/* Kratos silhouette */}
-              <KratosSilhouette size={48} />
-              <div>
-                <h1
-                  className="text-xl md:text-2xl tracking-[0.12em] uppercase"
-                  style={{
-                    color: GOW.goldBright,
-                    textShadow: `0 0 20px ${GOW.goldGlow}, 0 2px 4px ${GOW.bgDarkest}`,
-                  }}
-                >
-                  Alexander Pulido
-                </h1>
-                <p className="text-xs tracking-widest uppercase" style={{ color: GOW.textPrimary }}>
-                  {active === 'engineer' ? PROFESSIONAL_SUMMARY.headline : config.title}
-                </p>
-                <p className="text-xs tracking-wider italic mt-0.5" style={{ color: currentColor }}>
-                  {active === 'engineer' ? PROFESSIONAL_SUMMARY.tagline : aboutData.headline}
-                </p>
-              </div>
-            </div>
+      {/* GOW3 Blood banner at top */}
+      <BloodBanner />
 
-            <nav className="flex gap-2 items-center flex-wrap" aria-label="Main navigation">
-              <Link
-                href="/cv"
-                className="px-3 py-1.5 text-xs tracking-wider uppercase transition-all hover:scale-105 relative group"
-                style={{
-                  background: 'transparent',
-                  border: `2px solid ${GOW.goldBright}`,
-                  color: GOW.goldBright,
-                }}
-              >
-                <span className="relative z-10">Codex</span>
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: `${GOW.goldBright}15` }}
-                />
-              </Link>
-              <Link
-                href="/personal-projects/game-engine"
-                className="px-3 py-1.5 text-xs tracking-wider uppercase transition-all hover:scale-105 relative overflow-hidden group"
-                style={{
-                  background: `linear-gradient(180deg, ${GOW.frostBright}, ${GOW.frostDark})`,
-                  color: GOW.bgDark,
-                  boxShadow: `0 0 10px ${GOW.frostGlow}`,
-                }}
-              >
-                <span className="relative z-10 font-bold">Enter Midgard</span>
-                <div
-                  className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ background: `linear-gradient(180deg, ${GOW.frostMid}, ${GOW.frostBright})` }}
-                />
-              </Link>
-              <ThemeSwitcher />
-            </nav>
+      {/* Smaller blood splash accents */}
+      <BloodSplash side="left" />
+      <BloodSplash side="right" />
+
+      {/* Parallax background ornaments per profession */}
+      <ParallaxLayers profession={active} />
+
+      {/* Vignette */}
+      <div
+        className="fixed inset-0 pointer-events-none z-[8]"
+        style={{
+          background: `
+            radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 30%, rgba(10,10,12,0.5) 60%, rgba(10,10,12,0.9) 100%),
+            linear-gradient(180deg, transparent 60%, ${GOW.void}90 100%)
+          `,
+        }}
+      />
+
+      {/* Fixed Navigation Bar - Below blood banner */}
+      <nav
+        className="fixed top-16 md:top-14 left-0 right-0 z-[46] px-4 py-2 md:px-6 md:py-3"
+        style={{
+          background: `linear-gradient(180deg, ${GOW.void}f0 0%, ${GOW.void}cc 100%)`,
+          backdropFilter: 'blur(8px)',
+          borderBottom: `1px solid ${GOW.gold}15`,
+        }}
+        role="banner"
+        aria-label="Primary navigation"
+      >
+        <div className="max-w-6xl mx-auto flex justify-between items-center gap-2 md:gap-4">
+          <Link href="/" className="flex items-center gap-2 md:gap-3 group">
+            {/* Small Omega symbol */}
+            <svg className="w-5 h-5 md:w-6 md:h-6 hidden sm:block" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12,4 C8,4 5,8 5,14 L8,14 C8,10 9.5,7 12,7 C14.5,7 16,10 16,14 L19,14 C19,8 16,4 12,4"
+                fill={GOW.gold}
+                opacity="0.8"
+              />
+            </svg>
+            <h1
+              className="text-sm md:text-lg tracking-[0.2em] md:tracking-[0.25em] font-semibold uppercase whitespace-nowrap"
+              style={{
+                color: GOW.goldBright,
+                textShadow: `0 0 30px ${GOW.gold}40, 0 2px 4px rgba(0,0,0,0.5)`,
+              }}
+            >
+              Alexander Pulido
+            </h1>
+          </Link>
+
+          <div className="flex gap-2 md:gap-3 items-center">
+            <Link
+              href="/cv"
+              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
+              style={{
+                border: `1px solid ${GOW.gold}40`,
+                color: GOW.gold,
+                background: `${GOW.void}ee`,
+              }}
+            >
+              CV
+            </Link>
+            <Link
+              href="/personal-projects/game-engine"
+              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
+              style={{
+                border: `1px solid ${GOW.blood}`,
+                color: GOW.bone,
+                background: `linear-gradient(180deg, ${GOW.blood}cc, ${GOW.bloodDark})`,
+                boxShadow: `0 0 15px ${GOW.blood}40`,
+              }}
+            >
+              <span className="hidden sm:inline">Nebulith</span>
+              <span className="sm:hidden">Game</span>
+            </Link>
+            <ThemeSwitcher />
           </div>
+        </div>
+      </nav>
+
+      {/* Hero Section - Below nav and blood banner */}
+      <header className="relative z-20 pt-32 md:pt-36 pb-6 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p
+            className="text-base md:text-xl tracking-wider mb-2 font-medium"
+            style={{
+              color: GOW.bone,
+              textShadow: `0 2px 4px rgba(0,0,0,0.8)`,
+            }}
+          >
+            {PROFESSIONAL_SUMMARY[active].headline}
+          </p>
+          <p
+            className="text-sm md:text-base tracking-wider italic"
+            style={{
+              color: GOW.goldBright,
+              textShadow: `0 0 20px ${GOW.gold}50, 0 2px 4px rgba(0,0,0,0.6)`,
+            }}
+          >
+            {PROFESSIONAL_SUMMARY[active].tagline}
+          </p>
         </div>
       </header>
 
-      {/* ========== REALM SELECTION ========== */}
-      <section className="relative z-20 py-4" role="region" aria-label="Select profession">
-        <div className="text-center mb-3">
-          <span className="text-xs tracking-[0.25em] uppercase" style={{ color: GOW.goldBright }}>
-            Choose Your Realm
-          </span>
-        </div>
-        <div className="flex justify-center gap-4 md:gap-6" role="radiogroup" aria-label="Profession selection">
-          {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-            <RealmSelector key={prof} profession={prof} isActive={active === prof} onClick={() => setActive(prof)} />
-          ))}
-        </div>
-      </section>
+      {/* Main content */}
+      <main id="main-content" tabIndex={-1} className="outline-none">
 
-      {/* ========== MAIN CONTENT ========== */}
-      <main className="relative z-20 px-4 md:px-6 lg:px-20 py-6 pb-32">
-        <div className="max-w-4xl mx-auto">
-          {/* ===== ABOUT SECTION ===== */}
-          <StoneTablet accentColor={currentColor} ariaLabel="About section" className="mb-6">
-            <RuneBorder color={currentColor} className="mb-4 max-w-xs mx-auto" />
+        {/* Profession Selector */}
+        <FadeInSection>
+          <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
+            <h2 id="profession-heading" className="sr-only">Select Your Profession</h2>
+            <div className="max-w-6xl mx-auto px-4 md:px-6">
+              <div
+                className="relative h-40 md:h-56 overflow-hidden"
+                style={{
+                  background: `linear-gradient(180deg, transparent, ${GOW.voidWarm}30)`,
+                  border: `1px solid ${GOW.gold}20`,
+                  borderRadius: '4px',
+                }}
+                role="tablist"
+                aria-label="Profession selector"
+              >
+                <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+                  <defs>
+                    <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor={GOW.gold} stopOpacity="0" />
+                      <stop offset="50%" stopColor={GOW.gold} stopOpacity="0.4" />
+                      <stop offset="100%" stopColor={GOW.gold} stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <line x1="25%" y1="50%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                  <line x1="50%" y1="30%" x2="75%" y2="50%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                </svg>
 
-            <SectionTitle color={currentColor}>The Warrior Speaks</SectionTitle>
-
-            <p
-              className="text-sm leading-relaxed italic max-w-2xl mx-auto text-center mb-4"
-              style={{ color: GOW.textPrimary }}
-            >
-              &ldquo;{active === 'engineer' ? PROFESSIONAL_SUMMARY.bio : aboutData.bio}&rdquo;
-            </p>
-
-            {active === 'engineer' && PROFESSIONAL_SUMMARY.highlights && (
-              <div className="flex justify-center gap-2 mt-3 flex-wrap">
-                {PROFESSIONAL_SUMMARY.highlights.map((highlight, i) => (
-                  <span
-                    key={i}
-                    className="text-xs px-2 py-0.5"
-                    style={{
-                      background: `${GOW.frostBright}12`,
-                      border: `1px solid ${GOW.frostBright}35`,
-                      color: GOW.frostBright,
-                    }}
-                  >
-                    {highlight}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            <div className="flex justify-center gap-2 mt-3 flex-wrap">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="text-xs px-3 py-0.5"
-                  style={{
-                    background: `${currentColor}15`,
-                    border: `1px solid ${currentColor}40`,
-                    color: currentColor,
-                  }}
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-
-            <RuneBorder color={currentColor} className="mt-4 max-w-xs mx-auto" />
-          </StoneTablet>
-
-          {/* ===== ART BREAK 1 ===== */}
-          <ArtBreak variant="serpent" />
-
-          {/* ===== EXPERIENCE ===== */}
-          {experience.length > 0 && (
-            <StoneTablet accentColor={GOW.goldBright} ariaLabel="Work experience" className="mb-6">
-              <SectionTitle>Trials Completed</SectionTitle>
-
-              <div className="space-y-3">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} color={currentColor} />
-                ))}
-              </div>
-            </StoneTablet>
-          )}
-
-          {/* ===== ART BREAK 2 ===== */}
-          <ArtBreak variant="weapons" />
-
-          {/* ===== GRID: SKILLS + PROJECTS ===== */}
-          <div className="grid md:grid-cols-2 gap-6 mt-6">
-            {/* Tech Stack / Skills */}
-            <StoneTablet
-              accentColor={currentColor}
-              variant={active === 'engineer' ? 'frost' : active === 'drummer' ? 'fire' : 'default'}
-              ariaLabel={active === 'engineer' ? 'Technology stack' : 'Skills and expertise'}
-            >
-              <SectionTitle color={currentColor} icon={active === 'engineer' ? 'axe' : 'blade'}>
-                {active === 'engineer' ? 'Arsenal' : 'Mastery'}
-              </SectionTitle>
-
-              {active === 'engineer' ? (
-                <TechStackDisplay color={currentColor} />
-              ) : (
-                <AchievementDisplay profession={active} color={currentColor} />
-              )}
-            </StoneTablet>
-
-            {/* Projects */}
-            <div>
-              <SectionTitle color={GOW.goldBright}>Legendary Deeds</SectionTitle>
-
-              <div className="space-y-3">
-                {projects.slice(0, 4).map((project) => (
-                  <ProjectCard key={project.id} project={project} color={currentColor} />
+                {professionNodes.map((node) => (
+                  <WaystationNode
+                    key={node.id}
+                    {...node}
+                    isActive={active === node.id}
+                    onClick={() => setActive(node.id as 'engineer' | 'drummer' | 'fighter')}
+                  />
                 ))}
               </div>
             </div>
-          </div>
+          </section>
+        </FadeInSection>
 
-          {/* ===== ART BREAK 3 ===== */}
-          <ArtBreak variant="bifrost" />
+        {/* About */}
+        <FadeInSection delay={100}>
+          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <SpartanFrame title="About">
+                <p className="leading-relaxed mb-4" style={{ color: GOW.bone }}>{aboutData.bio}</p>
+                <div className="flex flex-wrap gap-2 md:gap-3">
+                  {aboutData.quickFacts.map((fact, i) => (
+                    <span
+                      key={i}
+                      className="px-2 md:px-3 py-1"
+                      style={{
+                        background: `${GOW.gold}12`,
+                        border: `1px solid ${GOW.gold}30`,
+                        color: GOW.gold,
+                        borderRadius: '3px',
+                      }}
+                    >
+                      ◆ {fact}
+                    </span>
+                  ))}
+                </div>
+              </SpartanFrame>
+            </div>
+          </section>
+        </FadeInSection>
 
-          {/* ===== VENTURES / BANDS (profession-specific) ===== */}
+        {/* Art Section 1 - Weapons */}
+        <FadeInSection delay={150}>
+          <ArtSectionWeapons />
+        </FadeInSection>
+
+        {/* Work Experience */}
+        {experience.length > 0 && (
+          <section
+            ref={experienceTrigger.ref}
+            className="relative z-20 py-8 px-6"
+            style={{
+              opacity: experienceTrigger.triggered ? 1 : 0,
+              transform: experienceTrigger.triggered ? 'translateY(0)' : 'translateY(30px)',
+              transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
+              willChange: 'opacity, transform',
+            }}
+          >
+              <div className="max-w-4xl mx-auto">
+                <SpartanFrame title="Work Experience">
+                  <div>
+                    {experience.map((entry, index) => (
+                      <ExperienceCard key={entry.id} entry={entry} isLast={index === experience.length - 1} />
+                    ))}
+                  </div>
+                </SpartanFrame>
+              </div>
+            </section>
+        )}
+
+        {/* Art Section 2 - Greek Pillars */}
+        <FadeInSection>
+          <ArtSectionPillars />
+        </FadeInSection>
+
+        {/* Tech Stack / Skills */}
+        <FadeInSection>
+          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <SpartanFrame title={active === 'engineer' ? 'Tech Stack' : 'Skills'}>
+                {active === 'engineer' ? (
+                  <TechCloud categories={engineerTech} />
+                ) : (
+                  <SkillsList categories={otherSkills} />
+                )}
+              </SpartanFrame>
+            </div>
+          </section>
+        </FadeInSection>
+
+        {/* Projects - Featured Work */}
+        <section
+          ref={projectsTrigger.ref}
+          className="relative z-20 py-6 md:py-8 px-4 md:px-6"
+          style={{
+            opacity: projectsTrigger.triggered ? 1 : 0,
+            transform: projectsTrigger.triggered ? 'translateY(0)' : 'translateY(30px)',
+            transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
+            willChange: 'opacity, transform',
+          }}
+        >
+            <div className="max-w-4xl mx-auto">
+              <SpartanFrame title="Featured Work">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+                  {projects.filter(p => p.featured).slice(0, 6).map((project) => (
+                    <ProjectCard key={project.id} project={project} />
+                  ))}
+                </div>
+              </SpartanFrame>
+            </div>
+          </section>
+
+        {/* Art Section 3 - Mount Olympus */}
+        <FadeInSection>
+          <ArtSectionOlympus />
+        </FadeInSection>
+
+        {/* Ventures (Companies/Bands) */}
+        <FadeInSection>
           {active === 'engineer' && (
-            <>
-              <CurrentRolesSection color={currentColor} />
-              <CompaniesSection />
-            </>
+            <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+              <div className="max-w-4xl mx-auto">
+                <SpartanFrame title="Ventures">
+                  <div className="grid md:grid-cols-3 gap-3 md:gap-4">
+                    {COMPANIES.map((company) => (
+                      <CompanyCard key={company.id} company={company} />
+                    ))}
+                  </div>
+                </SpartanFrame>
+              </div>
+            </section>
           )}
 
-          {active === 'drummer' && <BandsSection />}
+          {active === 'drummer' && (
+            <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+              <div className="max-w-4xl mx-auto">
+                <SpartanFrame title="Bands">
+                  <div className="grid md:grid-cols-3 gap-3 md:gap-4">
+                    {BANDS.map((band) => (
+                      <BandCard key={band.id} band={band} />
+                    ))}
+                  </div>
+                </SpartanFrame>
+              </div>
+            </section>
+          )}
+        </FadeInSection>
 
-          {/* ===== POSTS SECTION ===== */}
-          <PostsSection />
-        </div>
+        {/* Posts */}
+        <FadeInSection>
+          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <SpartanFrame title="Posts">
+                <div className="text-center py-6 md:py-8">
+                  <p style={{ color: GOW.silver }}>
+                    Writings and thoughts coming soon...
+                  </p>
+                  <p className="mt-2 italic" style={{ color: GOW.gold }}>
+                    ◆ Check back for updates on development, music, and martial arts
+                  </p>
+                </div>
+              </SpartanFrame>
+            </div>
+          </section>
+        </FadeInSection>
+
       </main>
 
-      {/* ========== CONTACT CTA ========== */}
-      <section className="relative z-20 py-16 px-4 md:px-6 lg:px-20" aria-label="Contact">
-        <div className="max-w-2xl mx-auto">
-          <StoneTablet accentColor={GOW.goldBright} ariaLabel="Contact section">
-            <div className="text-center py-4">
-              <RuneBorder color={GOW.goldBright} className="mb-4 max-w-xs mx-auto" />
-              <h2
-                className="text-lg tracking-[0.15em] mb-3 uppercase"
-                style={{
-                  color: GOW.goldBright,
-                  textShadow: `0 0 12px ${GOW.goldGlow}`,
-                  fontFamily: '"Cinzel", Georgia, serif',
-                }}
-              >
+      {/* Contact CTA */}
+      <section
+        ref={contactTrigger.ref}
+        className="relative z-20 py-16 px-6"
+        aria-label="Contact"
+        style={{
+          opacity: contactTrigger.triggered ? 1 : 0,
+          transform: contactTrigger.triggered ? 'translateY(0)' : 'translateY(30px)',
+          transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
+          willChange: 'opacity, transform',
+        }}
+      >
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="mb-8">
+              <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: GOW.gold }}>
                 Ready to Work Together?
               </h2>
-              <p className="text-sm mb-6" style={{ color: GOW.textSecondary }}>
+              <p className="text-sm" style={{ color: GOW.silver }}>
                 10+ years delivering production systems. Let&apos;s build something.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="mailto:alexanderpulido81@gmail.com"
-                  className="px-6 py-3 text-xs tracking-wider uppercase transition-all hover:scale-105 relative overflow-hidden group"
-                  style={{
-                    background: `linear-gradient(180deg, ${GOW.frostBright}, ${GOW.frostDark})`,
-                    color: GOW.bgDark,
-                    boxShadow: `0 0 10px ${GOW.frostGlow}`,
-                  }}
-                >
-                  <span className="relative z-10 font-bold">Get In Touch</span>
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: `linear-gradient(180deg, ${GOW.frostMid}, ${GOW.frostBright})` }}
-                  />
-                </a>
-                <Link
-                  href="/cv"
-                  className="px-6 py-3 text-xs tracking-wider uppercase transition-all hover:scale-105 relative group"
-                  style={{
-                    background: 'transparent',
-                    border: `2px solid ${GOW.goldBright}`,
-                    color: GOW.goldBright,
-                  }}
-                >
-                  <span className="relative z-10">View Codex</span>
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                    style={{ background: `${GOW.goldBright}15` }}
-                  />
-                </Link>
-              </div>
-              <RuneBorder color={GOW.goldBright} className="mt-6 max-w-xs mx-auto" />
             </div>
-          </StoneTablet>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="mailto:alexanderpulido81@gmail.com"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={{
+                  background: GOW.gold,
+                  color: GOW.void,
+                  borderRadius: '4px',
+                }}
+              >
+                Get In Touch
+              </a>
+              <Link
+                href="/cv"
+                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={{
+                  background: 'transparent',
+                  border: `2px solid ${GOW.gold}`,
+                  color: GOW.gold,
+                  borderRadius: '4px',
+                }}
+              >
+                Download CV
+              </Link>
+            </div>
+          </div>
+        </section>
+
+      {/* Bottom obscure overlay */}
+      <div
+        className="fixed bottom-0 left-0 right-0 h-48 pointer-events-none z-[7]"
+        style={{
+          background: `linear-gradient(180deg, transparent 0%, ${GOW.void}40 30%, ${GOW.void}90 70%, ${GOW.void} 100%)`,
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Footer */}
+      <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
+        <div className="inline-flex items-center gap-4" style={{ color: GOW.silver }}>
+          <div className="w-12 h-px" style={{ background: GOW.gold }} aria-hidden="true" />
+          <span className="text-sm tracking-[0.2em]">
+            <span className="sr-only">Copyright </span>© {new Date().getFullYear()} Alexander Pulido
+          </span>
+          <div className="w-12 h-px" style={{ background: GOW.gold }} aria-hidden="true" />
         </div>
-      </section>
-
-      {/* ========== FOOTER ========== */}
-      <footer className="relative z-20 py-6 text-center pb-28" role="contentinfo">
-        <RuneBorder color={GOW.goldMid} className="max-w-xs mx-auto mb-3" />
-
-        <p
-          className="text-xs tracking-widest flex items-center justify-center gap-3"
-          style={{ color: GOW.textSecondary }}
-        >
-          <span style={{ color: GOW.frostBright }} aria-hidden="true">ᚠ</span>
-          The Journey Continues
-          <span style={{ color: GOW.fireOrange }} aria-hidden="true">ᚱ</span>
-          <span aria-label="Year 2026">MMXXVI</span>
-          <span style={{ color: GOW.goldBright }} aria-hidden="true">ᚦ</span>
-        </p>
-
-        <RuneBorder color={GOW.goldMid} className="max-w-xs mx-auto mt-3" />
       </footer>
 
-      {/* ========== CSS ANIMATIONS ========== */}
+      {/* Animations */}
       <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap');
-
-        @keyframes frost-fall {
-          0% {
-            opacity: 0;
-            transform: translateY(-10px) scale(0.5);
-          }
-          10% {
-            opacity: 0.8;
-          }
-          90% {
-            opacity: 0.6;
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(100vh) scale(0.2);
-          }
-        }
-        .animate-frost-fall {
-          animation: frost-fall linear infinite;
+        @keyframes stormRain {
+          0% { transform: translateY(-40px) translateZ(0); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(100vh) translateZ(0); opacity: 0; }
         }
 
-        @keyframes ember-rise {
-          0% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-100vh) scale(0.2);
-          }
-        }
-        .animate-ember-rise {
-          animation: ember-rise linear infinite;
+        @keyframes emberRise {
+          0% { transform: translateY(0) translateZ(0); opacity: 0.8; }
+          100% { transform: translateY(-100vh) translateX(20px) translateZ(0); opacity: 0; }
         }
 
-        @keyframes bifrost-pulse {
-          0%, 100% {
-            opacity: 0.8;
-          }
-          50% {
-            opacity: 1;
-          }
-        }
-        .animate-bifrost-pulse {
-          animation: bifrost-pulse 4s ease-in-out infinite;
+        @keyframes bloodDrip {
+          0%, 100% { transform: scaleY(1); }
+          50% { transform: scaleY(1.1); }
         }
 
-        @keyframes pillar-frost {
-          0%, 100% {
-            opacity: 0.3;
-            transform: translateY(0);
-          }
-          50% {
-            opacity: 0.6;
-            transform: translateY(-10px);
-          }
-        }
-        .animate-pillar-frost {
-          animation: pillar-frost 6s ease-in-out infinite;
+        @keyframes chainSwing {
+          0%, 100% { transform: rotate(-2deg); }
+          50% { transform: rotate(2deg); }
         }
 
-        @keyframes pillar-fire {
-          0%, 100% {
-            opacity: 0.3;
-            transform: translateY(0);
-          }
-          50% {
-            opacity: 0.5;
-            transform: translateY(10px);
-          }
-        }
-        .animate-pillar-fire {
-          animation: pillar-fire 5s ease-in-out infinite;
+        @keyframes fireFlicker {
+          0%, 100% { opacity: 0.3; transform: scaleY(1); }
+          25% { opacity: 0.5; transform: scaleY(1.1); }
+          50% { opacity: 0.4; transform: scaleY(0.95); }
+          75% { opacity: 0.6; transform: scaleY(1.05); }
         }
 
-        @keyframes realm-pulse {
-          0%, 100% {
-            opacity: 0.3;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 0.6;
-            transform: scale(1.02);
-          }
-        }
-        .animate-realm-pulse {
-          animation: realm-pulse 2s ease-in-out infinite;
+        @keyframes omegaPulse {
+          0%, 100% { filter: drop-shadow(0 0 5px ${GOW.gold}40); }
+          50% { filter: drop-shadow(0 0 15px ${GOW.gold}80); }
         }
 
-        /* Reduced motion support */
+        /* Scrollbar styling for GOW theme */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+          background: ${GOW.voidDeep};
+        }
+        ::-webkit-scrollbar-thumb {
+          background: ${GOW.bloodDark};
+          border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: ${GOW.blood};
+        }
+
         @media (prefers-reduced-motion: reduce) {
-          *,
-          *::before,
-          *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
+          * {
+            animation: none !important;
+            transition: none !important;
           }
-        }
-
-        /* Focus styles for accessibility */
-        *:focus-visible {
-          outline: 2px solid ${GOW.frostBright};
-          outline-offset: 2px;
-        }
-
-        button:focus-visible,
-        a:focus-visible {
-          outline: 2px solid ${GOW.goldBright};
-          outline-offset: 2px;
         }
       `}</style>
     </div>
