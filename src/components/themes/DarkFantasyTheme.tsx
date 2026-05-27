@@ -1841,32 +1841,20 @@ const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
 })
 
 // Work experience card
-const ExperienceCard = memo(function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
+const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: typeof EXPERIENCE_DATA[0]; isLast?: boolean }) {
   const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
   const startDisplay = new Date(entry.startDate).getFullYear()
 
   return (
-    <article
-      className="p-4"
-      style={{
-        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple}30)`,
-        border: `1px solid ${DF.stoneDark}`,
-        borderRadius: '4px',
-      }}
-    >
+    <article className="py-4">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
           <h3 className="text-lg font-medium" style={{ color: DF.bone }}>{entry.title}</h3>
           <p className="text-sm" style={{ color: DF.ethereal }}>{entry.organization}</p>
         </div>
         <span
-          className="text-sm px-2 py-0.5"
-          style={{
-            color: DF.spiritGold,
-            background: `${DF.spiritGold}12`,
-            border: `1px solid ${DF.spiritGold}25`,
-            borderRadius: '3px',
-          }}
+          className="text-sm"
+          style={{ color: DF.spiritGold }}
         >
           <time>{startDisplay}</time> - <time>{endDisplay}</time>
         </span>
@@ -1881,6 +1869,14 @@ const ExperienceCard = memo(function ExperienceCard({ entry }: { entry: typeof E
             </li>
           ))}
         </ul>
+      )}
+      {!isLast && (
+        <div
+          className="mt-4"
+          style={{
+            borderBottom: `1px solid ${DF.stoneDark}40`,
+          }}
+        />
       )}
     </article>
   )
@@ -2480,9 +2476,9 @@ export default function DarkFantasyTheme() {
           <section className="relative z-20 py-8 px-6">
             <div className="max-w-4xl mx-auto">
               <VoidFrame title="Work Experience">
-                <div className="space-y-4">
-                  {experience.map((entry) => (
-                    <ExperienceCard key={entry.id} entry={entry} />
+                <div>
+                  {experience.map((entry, index) => (
+                    <ExperienceCard key={entry.id} entry={entry} isLast={index === experience.length - 1} />
                   ))}
                 </div>
               </VoidFrame>
