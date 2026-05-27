@@ -195,7 +195,7 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* RED TATTOO - body (SVG left → screen right after flip) */}
           <path
-            d="M22,26 C20,32 19,40 20,48"
+            d="M19,26 C17,32 16,40 17,48"
             stroke={KRATOS.tattoo}
             strokeWidth="2.5"
             fill="none"
@@ -265,7 +265,7 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* RED TATTOO - head (SVG left x=21 → screen right after flip, next to right eye at x=25) */}
           <path
-            d="M21,3 C19,8 19,16 21,24"
+            d="M18,3 C16,8 16,16 18,24"
             stroke={KRATOS.tattoo}
             strokeWidth="3"
             fill="none"
@@ -336,8 +336,8 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
     // Animate Kratos running from right to center
     const startTime = performance.now()
     const runDuration = 1000
-    const startX = -200
-    const endX = 20
+    const startX = -400
+    const endX = -350
 
     const animateRun = (now: number) => {
       const elapsed = now - startTime
