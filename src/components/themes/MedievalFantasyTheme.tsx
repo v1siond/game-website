@@ -25,10 +25,11 @@ const WC3 = {
     skyTop: '#050805',
     skyMid: '#081008',
     skyBot: '#0c150c',
-    felBright: '#4a9a4a',
-    felMid: '#2a7a2a',
-    felDark: '#1a5a1a',
-    felGlow: '#3a8a3a80',
+    // Olive-green fel tones - muddy, worn, rain-soaked battlefield
+    felBright: '#5a6a3a',
+    felMid: '#3a4a28',
+    felDark: '#2a3518',
+    felGlow: '#4a5a3080',
     fireBright: '#ffaa44',
     fireMid: '#dd6622',
     fireCore: '#ffff88',
@@ -675,6 +676,16 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
   const [cloudGlow, setCloudGlow] = useState(0)
   const [ambientFlash, setAmbientFlash] = useState(false)
   const [ambientFlashX, setAmbientFlashX] = useState(30)
+  // Cloud zones for realistic sequential flashing (left, center-left, center, center-right, right)
+  const cloudZones = useMemo(() => [
+    { x: 12, y: 25, spread: 15 },   // left
+    { x: 30, y: 35, spread: 18 },   // center-left
+    { x: 50, y: 28, spread: 20 },   // center
+    { x: 70, y: 32, spread: 18 },   // center-right
+    { x: 88, y: 30, spread: 15 },   // right
+  ], [])
+  const [activeZone, setActiveZone] = useState(0)
+  const lastZoneRef = useRef(-1)
   // Occasional falling meteor (every 8-15 seconds, like old golem spawn cadence)
   const [fallingMeteor, setFallingMeteor] = useState<{
     id: number
@@ -733,7 +744,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     }
   }, [])
 
-  // Ambient thunder flashes - more frequent, just cloud illumination (no infernals)
+  // Ambient thunder flashes - realistic sequential cloud zone flashing
   useEffect(() => {
     let isActive = true
     const timeouts: NodeJS.Timeout[] = []
@@ -741,19 +752,37 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     const triggerAmbientFlash = () => {
       if (!isActive) return
 
-      // Random position in clouds
-      const flashX = 15 + Math.random() * 70
+      // Pick a cloud zone different from the last one
+      let newZone = Math.floor(Math.random() * cloudZones.length)
+      while (newZone === lastZoneRef.current && cloudZones.length > 1) {
+        newZone = Math.floor(Math.random() * cloudZones.length)
+      }
+      lastZoneRef.current = newZone
+
+      const zone = cloudZones[newZone]
+      // Add slight variation within the zone
+      const flashX = zone.x + (Math.random() - 0.5) * zone.spread * 0.5
       setAmbientFlashX(flashX)
+      setActiveZone(newZone)
       setAmbientFlash(true)
 
       // Quick double-flash effect (realistic lightning flicker)
       timeouts.push(setTimeout(() => setAmbientFlash(false), 80))
       timeouts.push(setTimeout(() => setAmbientFlash(true), 120))
       timeouts.push(setTimeout(() => setAmbientFlash(false), 200))
-      // Sometimes triple flash
-      if (Math.random() > 0.5) {
-        timeouts.push(setTimeout(() => setAmbientFlash(true), 280))
-        timeouts.push(setTimeout(() => setAmbientFlash(false), 350))
+
+      // Sometimes chain to adjacent zone (30% chance)
+      if (Math.random() > 0.7) {
+        const adjacentZone = newZone + (Math.random() > 0.5 ? 1 : -1)
+        if (adjacentZone >= 0 && adjacentZone < cloudZones.length) {
+          const adjZone = cloudZones[adjacentZone]
+          timeouts.push(setTimeout(() => {
+            setAmbientFlashX(adjZone.x + (Math.random() - 0.5) * 8)
+            setActiveZone(adjacentZone)
+            setAmbientFlash(true)
+          }, 300))
+          timeouts.push(setTimeout(() => setAmbientFlash(false), 400))
+        }
       }
     }
 
@@ -774,7 +803,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       isActive = false
       timeouts.forEach(t => clearTimeout(t))
     }
-  }, [])
+  }, [cloudZones])
 
   // Rain drops - longer animation cycles = fewer repaints = better performance
   const raindrops = useMemo(() =>
@@ -1272,13 +1301,13 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
           {/* === HORDE WAR BANNER - Hidden here, rendered as fixed element above infernals === */}
           <g transform="translate(200, 520) rotate(-10)" className="war-banner" opacity="0">
-            {/* Dirt mound at pole base - matches terrain ground */}
-            <ellipse cx="6" cy="235" rx="25" ry="10" fill="#1a2518" />
-            <ellipse cx="6" cy="233" rx="20" ry="8" fill="#253020" />
-            <ellipse cx="6" cy="231" rx="12" ry="5" fill="#2a2518" />
+            {/* Dirt mound at pole base - dark brownish like visible flagpole */}
+            <ellipse cx="6" cy="235" rx="25" ry="10" fill="#0c0f0a" />
+            <ellipse cx="6" cy="233" rx="20" ry="8" fill="#12150f" />
+            <ellipse cx="6" cy="231" rx="12" ry="5" fill="#181a14" />
             {/* Small dirt clumps around base */}
-            <ellipse cx="-12" cy="238" rx="8" ry="4" fill="#1a2518" opacity="0.7" />
-            <ellipse cx="22" cy="240" rx="10" ry="5" fill="#253020" opacity="0.6" />
+            <ellipse cx="-12" cy="238" rx="8" ry="4" fill="#0c0f0a" opacity="0.7" />
+            <ellipse cx="22" cy="240" rx="10" ry="5" fill="#12150f" opacity="0.6" />
             {/* Grass tufts growing from dirt - olive-green */}
             <path d="M-8,232 Q-10,222 -6,218" stroke="#5a5a30" strokeWidth="1.5" fill="none" strokeLinecap="round" />
             <path d="M18,234 Q22,224 19,220" stroke="#6a6535" strokeWidth="1.5" fill="none" strokeLinecap="round" />
@@ -1483,22 +1512,24 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           }} />
         )}
 
-        {/* === AMBIENT THUNDER FLASH - Frequent cloud flickers === */}
-        {ambientFlash && (
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '100%',
-            background: `
-              radial-gradient(ellipse at ${ambientFlashX}% 30%, ${WC3.roc.felBright}80 0%, ${WC3.roc.felBright}45 20%, ${WC3.roc.felMid}25 40%, transparent 65%),
-              radial-gradient(ellipse at ${ambientFlashX + 20}% 45%, ${WC3.roc.felMid}50 0%, transparent 45%),
-              radial-gradient(ellipse at ${ambientFlashX - 10}% 25%, ${WC3.roc.felBright}35 0%, transparent 35%)
-            `,
-            transition: 'opacity 0.05s ease-out',
-          }} />
-        )}
+        {/* === AMBIENT THUNDER FLASH - Localized to specific cloud zones === */}
+        {ambientFlash && (() => {
+          const zone = cloudZones[activeZone] || { x: 50, y: 30, spread: 18 }
+          return (
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              height: '100%',
+              background: `
+                radial-gradient(ellipse at ${ambientFlashX}% ${zone.y}%, ${WC3.roc.felBright}80 0%, ${WC3.roc.felBright}45 15%, ${WC3.roc.felMid}25 30%, transparent ${zone.spread + 45}%),
+                radial-gradient(ellipse at ${ambientFlashX + 8}% ${zone.y + 12}%, ${WC3.roc.felMid}40 0%, transparent 25%)
+              `,
+              transition: 'opacity 0.05s ease-out',
+            }} />
+          )
+        })()}
 
         {/* Pulsing storm glow - subtle ambient with cloudGlow intensity */}
         <div style={{
@@ -1719,13 +1750,13 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         }}
       >
         <svg width="120" height="300" viewBox="0 0 120 300" style={{ overflow: 'visible' }}>
-          {/* Dirt mound at pole base - matches battlefield ground colors exactly */}
-          <ellipse cx="12" cy="282" rx="28" ry="12" fill="#1a2518" />
-          <ellipse cx="12" cy="280" rx="22" ry="9" fill="#253020" />
-          <ellipse cx="12" cy="278" rx="14" ry="6" fill="#2a2518" />
+          {/* Dirt mound at pole base - dark brownish, matches shadowed terrain */}
+          <ellipse cx="12" cy="282" rx="28" ry="12" fill="#0c0f0a" />
+          <ellipse cx="12" cy="280" rx="22" ry="9" fill="#12150f" />
+          <ellipse cx="12" cy="278" rx="14" ry="6" fill="#181a14" />
           {/* Small dirt clumps */}
-          <ellipse cx="-8" cy="286" rx="10" ry="5" fill="#1a2518" opacity="0.8" />
-          <ellipse cx="30" cy="288" rx="12" ry="6" fill="#253020" opacity="0.7" />
+          <ellipse cx="-8" cy="286" rx="10" ry="5" fill="#0c0f0a" opacity="0.8" />
+          <ellipse cx="30" cy="288" rx="12" ry="6" fill="#12150f" opacity="0.7" />
           {/* Grass tufts around base - olive-green like terrain grass */}
           <path d="M-5,278 Q-8,268 -3,262" stroke="#5a5a30" strokeWidth="1.5" fill="none" strokeLinecap="round" />
           <path d="M28,280 Q32,270 29,264" stroke="#6a6535" strokeWidth="1.5" fill="none" strokeLinecap="round" />
@@ -1845,12 +1876,13 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               <clipPath id="flagBannerCol5"><rect x="72" y="0" width="15" height="150" /></clipPath>
             </defs>
 
+            {/* Worn, rain-soaked bloody banner - brownish red tones */}
             {[
-              { id: 1, x: 0, w: 18, delay: '0s', fill: '#6a2020', yOff: 0 },
-              { id: 2, x: 18, w: 18, delay: '0.12s', fill: '#5a1a1a', yOff: 2 },
-              { id: 3, x: 36, w: 18, delay: '0.24s', fill: '#4a1515', yOff: 4 },
-              { id: 4, x: 54, w: 18, delay: '0.36s', fill: '#3a1010', yOff: 6 },
-              { id: 5, x: 72, w: 15, delay: '0.48s', fill: '#2a0a0a', yOff: 8 },
+              { id: 1, x: 0, w: 18, delay: '0s', fill: '#4a2018', yOff: 0 },
+              { id: 2, x: 18, w: 18, delay: '0.12s', fill: '#3a1812', yOff: 2 },
+              { id: 3, x: 36, w: 18, delay: '0.24s', fill: '#2a1210', yOff: 4 },
+              { id: 4, x: 54, w: 18, delay: '0.36s', fill: '#1f0c0a', yOff: 6 },
+              { id: 5, x: 72, w: 15, delay: '0.48s', fill: '#150808', yOff: 8 },
             ].map((col) => (
               <g key={col.id} style={{ animation: 'bannerWave 1.4s ease-in-out infinite alternate', animationDelay: col.delay }}>
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
