@@ -1652,7 +1652,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         </div>
       )}
 
-      {/* === SINGLE RIGHT-SIDE INFERNAL GOLEM === */}
+      {/* === SINGLE RIGHT-SIDE INFERNAL GOLEM - With rock assembly animation === */}
       {rightGolemReady && (
         <div
           style={{
@@ -1663,10 +1663,9 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             transformOrigin: 'center top',
             zIndex: 5,
             pointerEvents: 'none',
-            animation: 'golemFadeIn 1.5s ease-out forwards',
           }}
         >
-          {/* Crater at feet */}
+          {/* Crater at feet - appears immediately */}
           <svg
             width="160"
             height="40"
@@ -1677,13 +1676,27 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
               top: '200px',
               transform: 'translateY(-50%)',
               zIndex: -1,
+              animation: 'crackGrow 1s ease-out forwards',
             }}
           >
             <ellipse cx="80" cy="20" rx="75" ry="18" fill="#080604" />
-            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out forwards' }} />
+            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: 'crackGrow 0.8s ease-out 0.1s forwards' }} />
             <ellipse cx="80" cy="20" rx="12" ry="6" fill={WC3.roc.felDark} opacity="0.4" />
           </svg>
+
+          {/* Emergence glow during assembly */}
+          <div style={{
+            position: 'absolute',
+            left: '80px',
+            top: '200px',
+            transform: 'translateX(-50%) translateY(-50%)',
+            width: '150px',
+            height: '200px',
+            background: `radial-gradient(ellipse at 50% 90%, ${WC3.roc.felBright}60 0%, ${WC3.roc.felMid}30 30%, transparent 70%)`,
+            animation: 'emergeGlow 2.5s ease-out forwards',
+            pointerEvents: 'none',
+          }} />
 
           {/* Shadow */}
           <div style={{
@@ -1697,7 +1710,69 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             borderRadius: '50%',
           }} />
 
-          <div style={{ position: 'absolute', left: '-10px', top: '0px' }}>
+          {/* === ROCK ASSEMBLY - Simplified rocks flying into position === */}
+          <svg
+            width="160"
+            height="200"
+            viewBox="0 0 160 200"
+            style={{ position: 'absolute', left: '-10px', top: '0px', overflow: 'visible' }}
+          >
+            {/* HEAD rock - flies from left */}
+            <g style={{ animation: 'assembleHead 1.8s ease-out forwards' }}>
+              <ellipse cx="80" cy="25" rx="22" ry="18" fill="#3a3835" />
+              <ellipse cx="80" cy="24" rx="18" ry="14" fill="#4a4845" />
+              {/* Eyes glow */}
+              <ellipse cx="70" cy="24" rx="4" ry="3" fill={WC3.roc.felMid} style={{ animation: 'rockGlowPulse 1.8s ease-out forwards' }} />
+              <ellipse cx="90" cy="24" rx="4" ry="3" fill={WC3.roc.felMid} style={{ animation: 'rockGlowPulse 1.8s ease-out forwards' }} />
+            </g>
+
+            {/* LEFT SHOULDER rock */}
+            <g style={{ animation: 'assembleLeftShoulder 1.5s ease-out 0.2s forwards', opacity: 0 }}>
+              <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill="#3a3835" />
+              <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill="#4a4845" />
+            </g>
+
+            {/* RIGHT SHOULDER rock */}
+            <g style={{ animation: 'assembleRightShoulder 1.6s ease-out 0.15s forwards', opacity: 0 }}>
+              <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill="#3a3835" />
+              <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill="#4a4845" />
+            </g>
+
+            {/* TORSO rock - rises from crater center */}
+            <g style={{ animation: 'assembleTorso 1.4s ease-out 0.3s forwards', opacity: 0 }}>
+              <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill="#2a2825" />
+              <polygon points="60,58 58,88 62,110 98,110 102,88 100,58" fill="#3a3835" />
+              {/* Chest crack glow */}
+              <path d="M80,65 L75,85 L82,105" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" style={{ animation: 'rockGlowPulse 1.4s ease-out 0.3s forwards' }} />
+            </g>
+
+            {/* LEFT ARM rock */}
+            <g style={{ animation: 'assembleLeftArm 1.7s ease-out 0.4s forwards', opacity: 0 }}>
+              <polygon points="15,72 8,100 18,115 30,108 28,78" fill="#3a3835" />
+              <polygon points="18,75 12,98 20,110 26,104 25,80" fill="#4a4845" />
+            </g>
+
+            {/* RIGHT ARM rock */}
+            <g style={{ animation: 'assembleRightArm 1.65s ease-out 0.35s forwards', opacity: 0 }}>
+              <polygon points="145,72 152,100 142,115 130,108 132,78" fill="#3a3835" />
+              <polygon points="142,75 148,98 140,110 134,104 135,80" fill="#4a4845" />
+            </g>
+
+            {/* LEFT LEG rock */}
+            <g style={{ animation: 'assembleLeftLeg 1.3s ease-out 0.5s forwards', opacity: 0 }}>
+              <polygon points="50,120 42,160 55,185 68,175 62,125" fill="#3a3835" />
+              <polygon points="52,125 46,155 56,178 62,170 58,128" fill="#4a4845" />
+            </g>
+
+            {/* RIGHT LEG rock */}
+            <g style={{ animation: 'assembleRightLeg 1.35s ease-out 0.45s forwards', opacity: 0 }}>
+              <polygon points="110,120 118,160 105,185 92,175 98,125" fill="#3a3835" />
+              <polygon points="108,125 114,155 104,178 98,170 102,128" fill="#4a4845" />
+            </g>
+          </svg>
+
+          {/* === DETAILED GOLEM - Fades in after assembly completes === */}
+          <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: 'golemFadeIn 1.5s ease-out 2s forwards', opacity: 0 }}>
             <InfernalGolemSVG id={999} isIdle={true} />
           </div>
         </div>
@@ -2221,6 +2296,12 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           0% { opacity: 0.8; transform: translateY(80px); }
           50% { opacity: 0.6; transform: translateY(30px); }
           100% { opacity: 0; transform: translateY(-20px); }
+        }
+        /* Rock parts glow during assembly */
+        @keyframes rockGlowPulse {
+          0% { opacity: 0.2; filter: brightness(2); }
+          50% { opacity: 0.8; filter: brightness(1.5); }
+          100% { opacity: 1; filter: brightness(1); }
         }
         /* Detailed golem fades in on top of assembled rocks */
         @keyframes golemFadeIn {
