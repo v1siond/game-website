@@ -1739,7 +1739,7 @@ export default function MythicTheme() {
     <div
       className="min-h-screen relative overflow-hidden"
       style={{
-        background: `linear-gradient(180deg, ${GOW.void}, ${GOW.voidDeep}, ${GOW.voidWarm})`,
+        background: `linear-gradient(180deg, ${GOW.void} 0%, ${GOW.voidDeep} 20%, ${GOW.ash}40 60%, ${GOW.ashLight}50 100%)`,
       }}
     >
       <SkipLink href="#main-content" />
@@ -1756,7 +1756,7 @@ export default function MythicTheme() {
             radial-gradient(ellipse at 5% 85%, ${GOW.fire}30 0%, ${GOW.fire}15 25%, transparent 50%),
             radial-gradient(ellipse at 20% 70%, ${GOW.bloodDark}20 0%, transparent 40%),
             radial-gradient(ellipse at 80% 30%, ${GOW.fire}10 0%, transparent 35%),
-            linear-gradient(180deg, ${GOW.void} 0%, ${GOW.voidDeep} 40%, ${GOW.voidWarm} 100%)
+            linear-gradient(180deg, ${GOW.void} 0%, ${GOW.voidDeep} 25%, ${GOW.ash}30 70%, ${GOW.ashLight}40 100%)
           `,
         }}
       />
