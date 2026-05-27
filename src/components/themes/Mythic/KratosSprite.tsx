@@ -177,7 +177,7 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* RED TATTOO - left side of body */}
           <path
-            d="M24,26 C22,30 21,38 22,46"
+            d="M18,26 C16,30 15,38 16,46"
             stroke={KRATOS.tattoo}
             strokeWidth="2.5"
             fill="none"
@@ -247,7 +247,7 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* RED TATTOO - on head/face */}
           <path
-            d="M22,8 C20,12 20,18 22,24"
+            d="M16,8 C14,12 14,18 16,24"
             stroke={KRATOS.tattoo}
             strokeWidth="3"
             fill="none"
