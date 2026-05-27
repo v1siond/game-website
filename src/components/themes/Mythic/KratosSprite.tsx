@@ -86,6 +86,23 @@ export const KratosCharacter = memo(function KratosCharacter({
           transform: isLeft ? 'scaleX(-1)' : 'none',
         }}
       >
+        {/* Ground shadow - yellowish to contrast dark background */}
+        <ellipse
+          cx="30"
+          cy="88"
+          rx="25"
+          ry="6"
+          fill="url(#kratosShadowGradient)"
+          opacity="0.7"
+        />
+        <defs>
+          <radialGradient id="kratosShadowGradient" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#c9a227" stopOpacity="0.6" />
+            <stop offset="70%" stopColor="#8b7319" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#5a4a10" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
         {/* Body group with bob animation */}
         <g style={{
           animation: running ? 'kratosBodyBob 0.3s ease-in-out infinite' : undefined,
