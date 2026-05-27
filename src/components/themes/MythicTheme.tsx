@@ -510,17 +510,17 @@ const FloatingAsh = memo(function FloatingAsh() {
 const Volcano = memo(function Volcano() {
   return (
     <div
-      className="fixed top-0 left-0 pointer-events-none z-[1]"
+      className="fixed bottom-0 left-0 pointer-events-none z-[1]"
       style={{
-        width: 'clamp(280px, 35vw, 450px)',
-        height: 'clamp(400px, 55vh, 700px)',
+        width: 'clamp(300px, 40vw, 500px)',
+        height: 'clamp(350px, 50vh, 550px)',
       }}
       aria-hidden="true"
     >
       <svg
         className="w-full h-full"
-        viewBox="0 0 400 600"
-        preserveAspectRatio="xMinYMin slice"
+        viewBox="0 0 400 500"
+        preserveAspectRatio="xMinYMax slice"
         style={{ overflow: 'visible' }}
       >
         <defs>
@@ -597,39 +597,39 @@ const Volcano = memo(function Volcano() {
           </linearGradient>
 
           <mask id="volcanoMask">
-            <rect x="0" y="0" width="400" height="600" fill="url(#edgeFade)" />
+            <rect x="0" y="0" width="400" height="500" fill="url(#edgeFade)" />
           </mask>
         </defs>
 
         {/* Ambient glow behind volcano */}
         <ellipse
-          cx="180"
-          cy="200"
-          rx="180"
-          ry="250"
+          cx="200"
+          cy="250"
+          rx="200"
+          ry="280"
           fill={GOW.fire}
-          opacity="0.08"
+          opacity="0.06"
           style={{ mixBlendMode: 'screen' }}
         />
 
         {/* Volcano silhouette - jagged mountain shape */}
         <path
-          d="M-80,600
-             L40,380 L60,400 L90,320 L110,340
-             L140,220 L155,240 L175,180 L195,200 L210,160
-             L225,190 L245,170 L265,230
-             L290,280 L310,260 L340,340 L360,320 L400,450
-             L420,600 Z"
+          d="M-80,500
+             L30,320 L50,340 L80,280 L100,300
+             L130,180 L150,200 L180,120 L200,100
+             L220,120 L250,180 L270,160 L300,240
+             L330,300 L350,280 L400,400
+             L420,500 Z"
           fill="url(#volcanoFade)"
           mask="url(#volcanoMask)"
         />
 
-        {/* Crater glow */}
+        {/* Crater glow - centered on peak at x=200 */}
         <ellipse
-          cx="210"
-          cy="165"
-          rx="45"
-          ry="20"
+          cx="200"
+          cy="105"
+          rx="40"
+          ry="18"
           fill="url(#craterGlow)"
           filter="url(#lavaGlow2)"
         >
@@ -640,80 +640,46 @@ const Volcano = memo(function Volcano() {
         <g filter="url(#lavaTurbulence)" opacity="0.85">
           {/* Main center flow */}
           <path
-            d="M195,180 Q200,250 195,350 Q190,450 200,550 Q205,580 200,620"
+            d="M200,115 Q205,200 200,300 Q195,400 200,520"
             fill="none"
             stroke="url(#lavaCore)"
-            strokeWidth="18"
+            strokeWidth="20"
             strokeLinecap="round"
           />
 
           {/* Left flow */}
           <path
-            d="M175,190 Q150,280 130,380 Q115,480 100,600"
+            d="M185,130 Q150,220 120,340 Q100,430 80,520"
             fill="none"
             stroke="url(#lavaCore)"
-            strokeWidth="14"
+            strokeWidth="16"
             strokeLinecap="round"
             opacity="0.8"
           />
 
           {/* Right flow */}
           <path
-            d="M225,185 Q260,300 280,420 Q295,520 310,620"
+            d="M215,130 Q260,250 290,380 Q310,450 330,520"
             fill="none"
             stroke="url(#lavaCore)"
-            strokeWidth="12"
+            strokeWidth="14"
             strokeLinecap="round"
             opacity="0.7"
           />
         </g>
 
-        {/* Thin bright lava streams (no filter, sharper) */}
-        <g opacity="0.6">
-          <path
-            d="M185,200 Q170,300 155,420 Q145,500 130,580"
-            fill="none"
-            stroke={GOW.fireBright}
-            strokeWidth="4"
-            strokeLinecap="round"
-          >
-            <animate attributeName="stroke-width" values="3;5;3" dur="3s" repeatCount="indefinite" />
-          </path>
-          <path
-            d="M215,195 Q235,320 250,460 Q260,530 270,600"
-            fill="none"
-            stroke={GOW.fireBright}
-            strokeWidth="3"
-            strokeLinecap="round"
-          >
-            <animate attributeName="stroke-width" values="2;4;2" dur="4s" repeatCount="indefinite" />
-          </path>
-        </g>
-
-        {/* Smoke wisps rising */}
-        <g opacity="0.25" style={{ mixBlendMode: 'screen' }}>
-          <ellipse cx="190" cy="120" rx="35" ry="25" fill={GOW.stormGrey}>
-            <animate attributeName="cy" values="120;80;120" dur="6s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.3;0.15;0.3" dur="6s" repeatCount="indefinite" />
-          </ellipse>
-          <ellipse cx="230" cy="100" rx="45" ry="30" fill={GOW.ashDark}>
-            <animate attributeName="cy" values="100;50;100" dur="8s" repeatCount="indefinite" />
-            <animate attributeName="rx" values="45;60;45" dur="8s" repeatCount="indefinite" />
-          </ellipse>
-        </g>
-
-        {/* Bottom fade overlay - blends into page background */}
+        {/* Top fade overlay - blends into page background */}
         <rect
           x="0"
-          y="450"
+          y="0"
           width="400"
-          height="150"
-          fill="url(#bottomFade)"
+          height="120"
+          fill="url(#topFade)"
         />
         <defs>
-          <linearGradient id="bottomFade" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={GOW.void} stopOpacity="0" />
-            <stop offset="100%" stopColor={GOW.void} stopOpacity="1" />
+          <linearGradient id="topFade" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={GOW.void} stopOpacity="1" />
+            <stop offset="100%" stopColor={GOW.void} stopOpacity="0" />
           </linearGradient>
         </defs>
       </svg>
