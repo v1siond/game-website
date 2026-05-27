@@ -78,9 +78,9 @@ const WC3 = {
   allianceBlue: '#1e3a5f',
   elfPurple: '#4a2a6a',
 
-  textBright: '#e8dcc8',
-  textMid: '#a08868',
-  textDim: '#685840',
+  textBright: '#e8dcc8',  // ~14:1 contrast on dark bg ✓
+  textMid: '#b09878',     // bumped from #a08868 for ~7:1 contrast ✓
+  textDim: '#8a7860',     // bumped from #685840 for ~4.5:1 contrast ✓ WCAG AA
 }
 
 // =============================================================================
@@ -818,8 +818,9 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
   }, [cloudZones])
 
   // Rain drops - longer animation cycles = fewer repaints = better performance
+  // Reduced particle counts for performance
   const raindrops = useMemo(() =>
-    Array.from({ length: 25 }, (_, i) => ({
+    Array.from({ length: 12 }, (_, i) => ({
       id: i,
       x: Math.random() * 130 - 15,
       delay: Math.random() * -4,
@@ -829,11 +830,11 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     []
   )
 
-  // Wind streaks for stormy rain effect (like Frozen Throne snow has)
+  // Wind streaks - reduced for performance
   const rainWindStreaks = useMemo(() =>
-    Array.from({ length: 12 }, (_, i) => ({
+    Array.from({ length: 5 }, (_, i) => ({
       id: i,
-      y: 10 + Math.random() * 70,
+      y: 15 + i * 16,
       delay: Math.random() * -6,
       duration: 2 + Math.random() * 1.5,
       length: 100 + Math.random() * 150,
@@ -982,14 +983,14 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
         {/* === OLIVE-GREEN GRASS - WC3 Style, clustered naturally === */}
         <g>
-          {Array.from({ length: 250 }, (_, i) => {
-            // Create natural clusters - grass grows in clumps
-            const clusterIndex = Math.floor(i / 5) // 50 clusters of 5 blades
+          {Array.from({ length: 80 }, (_, i) => {
+            // Create natural clusters - grass grows in clumps (reduced for perf)
+            const clusterIndex = Math.floor(i / 5) // 16 clusters of 5 blades
             const bladeInCluster = i % 5
 
             // Base cluster positions spread across foreground
-            const clusterX = 30 + (clusterIndex % 25) * 38 + ((clusterIndex * 17) % 30)
-            const clusterY = 620 + Math.floor(clusterIndex / 25) * 45 + ((clusterIndex * 13) % 35)
+            const clusterX = 30 + (clusterIndex % 8) * 115 + ((clusterIndex * 17) % 40)
+            const clusterY = 640 + Math.floor(clusterIndex / 8) * 50 + ((clusterIndex * 13) % 30)
 
             // Individual blade offset from cluster center
             const x = clusterX + (bladeInCluster - 2) * 4 + ((i * 7) % 5)
@@ -2698,26 +2699,26 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 // =============================================================================
 
 const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
-  // Dense snow layers
+  // Snow layers - reduced counts for performance
   const snowLayers = useMemo(() => ({
-    // Far layer - small, slow, many
-    far: Array.from({ length: 60 }, (_, i) => ({
+    // Far layer - small, slow
+    far: Array.from({ length: 20 }, (_, i) => ({
       id: i,
       x: Math.random() * 120 - 10,
       delay: Math.random() * -15,
       duration: 10 + Math.random() * 8,
       size: 1 + Math.random() * 2,
     })),
-    // Mid layer - medium size and speed
-    mid: Array.from({ length: 40 }, (_, i) => ({
+    // Mid layer - medium size
+    mid: Array.from({ length: 15 }, (_, i) => ({
       id: i,
       x: Math.random() * 120 - 10,
       delay: Math.random() * -10,
       duration: 6 + Math.random() * 4,
       size: 2 + Math.random() * 3,
     })),
-    // Near layer - large, fast, few
-    near: Array.from({ length: 20 }, (_, i) => ({
+    // Near layer - large, fast
+    near: Array.from({ length: 8 }, (_, i) => ({
       id: i,
       x: Math.random() * 120 - 10,
       delay: Math.random() * -5,
@@ -2726,11 +2727,11 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
     })),
   }), [])
 
-  // Wind/frost streaks
+  // Wind/frost streaks - reduced for performance
   const windStreaks = useMemo(() =>
-    Array.from({ length: 25 }, (_, i) => ({
+    Array.from({ length: 8 }, (_, i) => ({
       id: i,
-      y: Math.random() * 100,
+      y: i * 12.5,
       delay: Math.random() * -8,
       duration: 1.5 + Math.random() * 1,
       length: 80 + Math.random() * 120,
@@ -4326,7 +4327,7 @@ export default function MedievalFantasyTheme() {
                     <div style={{ width: '6px', height: '6px', background: WC3.roc.felMid, boxShadow: `0 0 6px ${WC3.roc.felMid}` }} />
                     <div>
                       <p style={{ color: WC3.roc.felBright, fontSize: '0.75rem', fontWeight: 600 }}>{role.title}</p>
-                      <p style={{ color: WC3.textDim, fontSize: '0.625rem' }}>{role.company}</p>
+                      <p style={{ color: WC3.textDim, fontSize: '0.75rem' }}>{role.company}</p>
                     </div>
                   </div>
                 ))}
@@ -4428,7 +4429,7 @@ export default function MedievalFantasyTheme() {
                 </svg>
                 <span style={{
                   color: active === 'engineer' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '0.7rem' : '0.6rem',
+                  fontSize: isLargeScreen ? '0.8125rem' : '0.75rem',
                   fontFamily: '"Cinzel", serif',
                   fontWeight: 700,
                   textTransform: 'uppercase',
@@ -4467,7 +4468,7 @@ export default function MedievalFantasyTheme() {
                 </svg>
                 <span style={{
                   color: active === 'drummer' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '0.7rem' : '0.6rem',
+                  fontSize: isLargeScreen ? '0.8125rem' : '0.75rem',
                   fontFamily: '"Cinzel", serif',
                   fontWeight: 700,
                   textTransform: 'uppercase',
@@ -4503,7 +4504,7 @@ export default function MedievalFantasyTheme() {
                 </svg>
                 <span style={{
                   color: active === 'fighter' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '0.7rem' : '0.6rem',
+                  fontSize: isLargeScreen ? '0.8125rem' : '0.75rem',
                   fontFamily: '"Cinzel", serif',
                   fontWeight: 700,
                   textTransform: 'uppercase',
@@ -4531,7 +4532,7 @@ export default function MedievalFantasyTheme() {
                     background: `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
                     border: `1px solid ${WC3.metalMid}`,
                     color: WC3.textMid,
-                    fontSize: isLargeScreen ? '0.75rem' : '0.675rem',
+                    fontSize: isLargeScreen ? '0.875rem' : '0.8125rem',
                     padding: isLargeScreen ? '0.5rem 0.875rem' : '0.375rem 0.625rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
@@ -4568,7 +4569,7 @@ export default function MedievalFantasyTheme() {
                           <h3 style={{ color: WC3.textBright, fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.125rem' }}>{job.title}</h3>
                           <p style={{ color: WC3.goldMid, fontSize: '0.75rem' }}>{job.company}</p>
                         </div>
-                        <span style={{ color: WC3.textDim, fontSize: '0.625rem' }}>{job.period}</span>
+                        <span style={{ color: WC3.textDim, fontSize: '0.75rem' }}>{job.period}</span>
                       </div>
                       <ul style={{ listStyle: 'none', padding: 0, margin: '0.375rem 0 0 0' }}>
                         {job.highlights.slice(0, 2).map((h, i) => (
@@ -4583,7 +4584,7 @@ export default function MedievalFantasyTheme() {
                             <span key={tech} style={{
                               background: WC3.roc.felDark + '40',
                               color: WC3.roc.felBright,
-                              fontSize: '0.5rem',
+                              fontSize: '0.75rem',
                               padding: '0.125rem 0.25rem',
                               textTransform: 'uppercase'
                             }}>
@@ -4623,23 +4624,23 @@ export default function MedievalFantasyTheme() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                   {active === 'engineer' ? engineerTech.map((category) => (
                     <div key={category.name}>
-                      <h3 style={{ color: WC3.goldMid, fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
+                      <h3 style={{ color: WC3.goldMid, fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
                         {category.name}
                       </h3>
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                         {category.items.slice(0, 5).map((tech) => (
-                          <li key={tech} style={{ color: WC3.textMid, fontSize: '0.6875rem', marginBottom: '0.125rem' }}>{tech}</li>
+                          <li key={tech} style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{tech}</li>
                         ))}
                       </ul>
                     </div>
                   )) : otherSkills.map((category) => (
                     <div key={category.name}>
-                      <h3 style={{ color: WC3.goldMid, fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
+                      <h3 style={{ color: WC3.goldMid, fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
                         {category.name}
                       </h3>
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                         {category.skills.slice(0, 5).map((skill) => (
-                          <li key={skill.name} style={{ color: WC3.textMid, fontSize: '0.6875rem', marginBottom: '0.125rem' }}>{skill.name}</li>
+                          <li key={skill.name} style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{skill.name}</li>
                         ))}
                       </ul>
                     </div>
@@ -4671,8 +4672,8 @@ export default function MedievalFantasyTheme() {
                   {(active === 'engineer' ? getFeaturedProjects(projects) : projects).slice(0, 6).map((project) => (
                     <InnerCard key={project.id} zone="ft">
                       <h3 style={{ color: WC3.textBright, fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>{project.title}</h3>
-                      <p style={{ color: WC3.textMid, fontSize: '0.6875rem', marginBottom: '0.25rem' }}>{project.description}</p>
-                      {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '0.6875rem', fontWeight: 500 }}>{project.impact}</p>}
+                      <p style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>{project.description}</p>
+                      {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '0.8125rem', fontWeight: 500 }}>{project.impact}</p>}
                     </InnerCard>
                   ))}
                 </div>
@@ -4700,9 +4701,9 @@ export default function MedievalFantasyTheme() {
                     {COMPANIES.map((company) => (
                       <InnerCard key={company.id} zone="ft">
                         <h3 style={{ color: WC3.textBright, fontSize: '0.8125rem', fontWeight: 600 }}>{company.name}</h3>
-                        <p style={{ color: WC3.goldMid, fontSize: '0.6875rem', marginBottom: '0.125rem' }}>{company.role}</p>
-                        <p style={{ color: WC3.textMid, fontSize: '0.6875rem', marginBottom: '0.25rem' }}>{company.description}</p>
-                        {company.url && <a href={company.url} target="_blank" rel="noopener noreferrer" style={{ color: WC3.ft.iceMid, fontSize: '0.625rem', textDecoration: 'none' }}>{company.url}</a>}
+                        <p style={{ color: WC3.goldMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{company.role}</p>
+                        <p style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>{company.description}</p>
+                        {company.url && <a href={company.url} target="_blank" rel="noopener noreferrer" style={{ color: WC3.ft.iceMid, fontSize: '0.75rem', textDecoration: 'none' }}>{company.url}</a>}
                       </InnerCard>
                     ))}
                   </div>
@@ -4716,8 +4717,8 @@ export default function MedievalFantasyTheme() {
                     {BANDS.map((band) => (
                       <InnerCard key={band.id} zone="ft">
                         <h3 style={{ color: WC3.textBright, fontSize: '0.8125rem', fontWeight: 600 }}>{band.name}</h3>
-                        <p style={{ color: WC3.goldMid, fontSize: '0.6875rem', marginBottom: '0.125rem' }}>{band.role}</p>
-                        <p style={{ color: WC3.textMid, fontSize: '0.6875rem' }}>{band.description}</p>
+                        <p style={{ color: WC3.goldMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{band.role}</p>
+                        <p style={{ color: WC3.textMid, fontSize: '0.8125rem' }}>{band.description}</p>
                       </InnerCard>
                     ))}
                   </div>
@@ -4775,7 +4776,7 @@ export default function MedievalFantasyTheme() {
 
         {/* Footer */}
         <footer style={{ textAlign: 'center', paddingTop: '0.75rem' }}>
-          <p style={{ color: WC3.textDim, fontSize: '0.625rem', letterSpacing: '0.1em' }}>
+          <p style={{ color: WC3.textDim, fontSize: '0.75rem', letterSpacing: '0.1em' }}>
             © {new Date().getFullYear()} ALEXANDER PULIDO
           </p>
         </footer>
