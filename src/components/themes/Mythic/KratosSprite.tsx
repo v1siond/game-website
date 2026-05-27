@@ -150,22 +150,22 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* === BATTLE SKIRT === */}
           <path
-            d="M17,48 L14,58 L19,60 L24,56 L30,60 L36,56 L41,60 L46,58 L43,48 Z"
+            d="M19,48 L16,58 L21,59 L25,56 L30,59 L35,56 L39,59 L44,58 L41,48 Z"
             fill={KRATOS.skirt}
             stroke={KRATOS.skirtDark}
             strokeWidth="0.5"
           />
           {/* Skirt folds/shadows */}
-          <path d="M24,50 L23,56" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
-          <path d="M30,50 L30,58" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
-          <path d="M36,50 L37,56" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
+          <path d="M25,50 L24,56" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
+          <path d="M30,50 L30,57" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
+          <path d="M35,50 L36,56" stroke={KRATOS.skirtDark} strokeWidth="0.8" opacity="0.5" />
 
-          {/* === TORSO - V-shape muscular === */}
+          {/* === TORSO - narrower, more proportional === */}
           <path
-            d="M14,26
-               Q10,30 12,40 L16,48 L44,48 L48,40
-               Q50,30 46,26
-               L40,24 L30,22 L20,24 Z"
+            d="M18,26
+               Q15,30 17,40 L19,48 L41,48 L43,40
+               Q45,30 42,26
+               L38,24 L30,23 L22,24 Z"
             fill={KRATOS.skin}
             stroke={KRATOS.skinShadow}
             strokeWidth="0.5"
@@ -173,18 +173,18 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* Chest muscles (pectorals) */}
           <path
-            d="M18,28 Q22,32 26,30 Q28,29 30,30 Q32,29 34,30 Q38,32 42,28"
+            d="M20,28 Q24,31 27,30 Q30,29 33,30 Q36,31 40,28"
             stroke={KRATOS.skinShadow}
-            strokeWidth="1"
+            strokeWidth="0.8"
             fill="none"
             opacity="0.4"
           />
           {/* Center chest line */}
           <path d="M30,30 L30,46" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.3" />
-          {/* Abs - 6 pack definition */}
-          <path d="M25,36 L35,36" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
-          <path d="M24,40 L36,40" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
-          <path d="M24,44 L36,44" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
+          {/* Abs */}
+          <path d="M26,36 L34,36" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
+          <path d="M25,40 L35,40" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
+          <path d="M25,44 L35,44" stroke={KRATOS.skinShadow} strokeWidth="0.5" opacity="0.25" />
 
           {/* RED TATTOO on body - aligned with head tattoo */}
           <path
@@ -196,57 +196,57 @@ export const KratosCharacter = memo(function KratosCharacter({
           />
 
           {/* Belt */}
-          <rect x="15" y="46" width="30" height="3" rx="1" fill={KRATOS.belt} />
+          <rect x="18" y="46" width="24" height="3" rx="1" fill={KRATOS.belt} />
           <circle cx="30" cy="47.5" r="2" fill={KRATOS.gold} />
 
           {/* === LEFT ARM === */}
           <g style={{
-            transformOrigin: '14px 26px',
+            transformOrigin: '16px 26px',
             animation: running ? 'kratosLeftArm 0.3s ease-in-out infinite' : undefined,
           }}>
             {/* Shoulder/Deltoid */}
-            <ellipse cx="12" cy="27" rx="5" ry="4" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
-            {/* Upper arm - thick bicep */}
+            <ellipse cx="15" cy="27" rx="4" ry="3" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            {/* Upper arm */}
             <path
-              d="M8,28 Q4,32 5,40 Q6,44 10,44 L14,44 Q17,44 17,40 Q18,32 14,28 Z"
+              d="M12,28 Q9,32 10,38 Q11,42 13,42 L17,42 Q19,42 19,38 Q20,32 17,28 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Forearm - tapers */}
+            {/* Forearm */}
             <path
-              d="M7,44 Q4,48 4,54 Q4,56 7,56 L11,56 Q14,56 14,54 Q14,48 11,44 Z"
+              d="M11,42 Q9,46 9,52 Q9,54 11,54 L15,54 Q17,54 17,52 Q17,46 15,42 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
             {/* Fist */}
-            <ellipse cx="9" cy="58" rx="4" ry="3" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            <ellipse cx="13" cy="56" rx="3" ry="2.5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
           </g>
 
           {/* === RIGHT ARM === */}
           <g style={{
-            transformOrigin: '46px 26px',
+            transformOrigin: '44px 26px',
             animation: running ? 'kratosRightArm 0.3s ease-in-out infinite' : undefined,
           }}>
             {/* Shoulder/Deltoid */}
-            <ellipse cx="48" cy="27" rx="5" ry="4" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
-            {/* Upper arm - thick bicep */}
+            <ellipse cx="45" cy="27" rx="4" ry="3" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            {/* Upper arm */}
             <path
-              d="M46,28 Q42,32 43,40 Q44,44 46,44 L50,44 Q53,44 53,40 Q54,32 50,28 Z"
+              d="M43,28 Q40,32 41,38 Q42,42 43,42 L47,42 Q49,42 49,38 Q50,32 47,28 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Forearm - tapers */}
+            {/* Forearm */}
             <path
-              d="M46,44 Q43,48 43,54 Q43,56 46,56 L50,56 Q53,56 53,54 Q53,48 50,44 Z"
+              d="M43,42 Q41,46 41,52 Q41,54 43,54 L47,54 Q49,54 49,52 Q49,46 47,42 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
             {/* Fist */}
-            <ellipse cx="48" cy="58" rx="4" ry="3" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            <ellipse cx="45" cy="56" rx="3" ry="2.5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
           </g>
 
           {/* === HEAD === */}
