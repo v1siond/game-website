@@ -504,6 +504,156 @@ const FloatingAsh = memo(function FloatingAsh() {
 })
 
 // =============================================================================
+// VOLCANO WITH LAVA - Top left corner, Tartarus feel
+// =============================================================================
+const Volcano = memo(function Volcano() {
+  return (
+    <div
+      className="fixed top-0 left-0 pointer-events-none z-[2] w-[400px] h-[500px] md:w-[500px] md:h-[600px]"
+      aria-hidden="true"
+    >
+      <svg className="w-full h-full" viewBox="0 0 500 600" preserveAspectRatio="xMinYMin slice">
+        <defs>
+          {/* Lava gradient */}
+          <linearGradient id="lavaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={GOW.fireBright} />
+            <stop offset="30%" stopColor={GOW.fire} />
+            <stop offset="70%" stopColor="#cc3300" />
+            <stop offset="100%" stopColor={GOW.bloodDark} />
+          </linearGradient>
+          {/* Volcano rock gradient */}
+          <linearGradient id="volcanoRock" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={GOW.ashDark} />
+            <stop offset="50%" stopColor="#1a1512" />
+            <stop offset="100%" stopColor={GOW.voidDeep} />
+          </linearGradient>
+          {/* Glow filter */}
+          <filter id="lavaGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="8" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Volcano mountain silhouette */}
+        <path
+          d="M-50,600 L80,250 L120,180 L150,200 L180,160 L220,200 L250,180 L280,250 L400,600 Z"
+          fill="url(#volcanoRock)"
+          opacity="0.9"
+        />
+
+        {/* Crater glow */}
+        <ellipse
+          cx="180"
+          cy="175"
+          rx="60"
+          ry="25"
+          fill={GOW.fire}
+          opacity="0.6"
+          filter="url(#lavaGlow)"
+        >
+          <animate attributeName="opacity" values="0.4;0.7;0.4" dur="2s" repeatCount="indefinite" />
+        </ellipse>
+
+        {/* Lava eruption from crater */}
+        <path
+          d="M150,180 Q165,120 180,80 Q195,120 210,180"
+          fill="url(#lavaGrad)"
+          opacity="0.8"
+        >
+          <animate attributeName="d"
+            values="M150,180 Q165,120 180,80 Q195,120 210,180;
+                    M155,180 Q170,100 180,60 Q190,100 205,180;
+                    M150,180 Q165,120 180,80 Q195,120 210,180"
+            dur="3s" repeatCount="indefinite" />
+        </path>
+
+        {/* Main lava flow - left side */}
+        <path
+          d="M130,220 Q100,300 80,400 Q70,480 90,600"
+          fill="none"
+          stroke="url(#lavaGrad)"
+          strokeWidth="25"
+          strokeLinecap="round"
+          opacity="0.7"
+        >
+          <animate attributeName="stroke-width" values="20;28;20" dur="4s" repeatCount="indefinite" />
+        </path>
+
+        {/* Lava flow - center */}
+        <path
+          d="M180,200 Q200,320 190,450 Q185,520 200,600"
+          fill="none"
+          stroke="url(#lavaGrad)"
+          strokeWidth="30"
+          strokeLinecap="round"
+          opacity="0.8"
+        >
+          <animate attributeName="stroke-width" values="25;35;25" dur="3.5s" repeatCount="indefinite" />
+        </path>
+
+        {/* Lava flow - right side */}
+        <path
+          d="M230,220 Q280,350 300,500 Q310,550 320,600"
+          fill="none"
+          stroke="url(#lavaGrad)"
+          strokeWidth="20"
+          strokeLinecap="round"
+          opacity="0.6"
+        >
+          <animate attributeName="stroke-width" values="15;22;15" dur="5s" repeatCount="indefinite" />
+        </path>
+
+        {/* Small lava streams */}
+        <path
+          d="M160,250 Q140,350 120,500"
+          fill="none"
+          stroke={GOW.fire}
+          strokeWidth="8"
+          strokeLinecap="round"
+          opacity="0.5"
+        />
+        <path
+          d="M200,240 Q240,400 260,550"
+          fill="none"
+          stroke={GOW.fire}
+          strokeWidth="6"
+          strokeLinecap="round"
+          opacity="0.4"
+        />
+
+        {/* Smoke/ash cloud at top */}
+        <g opacity="0.4">
+          <ellipse cx="140" cy="100" rx="50" ry="40" fill={GOW.stormGrey}>
+            <animate attributeName="cy" values="100;90;100" dur="4s" repeatCount="indefinite" />
+            <animate attributeName="rx" values="50;60;50" dur="4s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="200" cy="70" rx="60" ry="45" fill={GOW.stormBrown}>
+            <animate attributeName="cy" values="70;55;70" dur="5s" repeatCount="indefinite" />
+            <animate attributeName="rx" values="60;75;60" dur="5s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="170" cy="50" rx="40" ry="30" fill={GOW.ashDark}>
+            <animate attributeName="cy" values="50;35;50" dur="6s" repeatCount="indefinite" />
+          </ellipse>
+        </g>
+
+        {/* Hot glow at base of volcano */}
+        <ellipse
+          cx="180"
+          cy="600"
+          rx="200"
+          ry="80"
+          fill={GOW.fire}
+          opacity="0.15"
+        />
+      </svg>
+    </div>
+  )
+})
+
+// =============================================================================
 // DIVINE LIGHT RAYS - Olympus god rays from above
 // =============================================================================
 const DivineLightRays = memo(function DivineLightRays() {
@@ -1386,13 +1536,13 @@ export default function MythicTheme() {
       />
       <FloatingAsh />
       <DivineLightRays />
+      <Volcano />
       <EmberParticles />
 
       {/* GOW3 Blood banner at top */}
       <BloodBanner />
 
-      {/* Smaller blood splash accents */}
-      <BloodSplash side="left" />
+      {/* Blood splash accent on right (volcano on left) */}
       <BloodSplash side="right" />
 
       {/* Parallax background ornaments per profession */}
