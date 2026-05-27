@@ -504,8 +504,9 @@ const FloatingAsh = memo(function FloatingAsh() {
 })
 
 // =============================================================================
-// VOLCANO WITH LAVA - Top left corner, blends into background
-// Uses feTurbulence for organic lava flow, gradient masks for blending
+// VOLCANO WITH LAVA - Bottom left corner, phased animation
+// Pattern 2: Multi-Phase Reveal Sequences (from animation-patterns memory)
+// Phases: idle → eruption → flowing → complete
 // =============================================================================
 const Volcano = memo(function Volcano() {
   return (
@@ -564,12 +565,11 @@ const Volcano = memo(function Volcano() {
             </feMerge>
           </filter>
 
-          {/* Volcano silhouette gradient - fades into void */}
-          <linearGradient id="volcanoFade" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={GOW.voidDeep} stopOpacity="0.95" />
-            <stop offset="40%" stopColor="#0d0a08" stopOpacity="0.9" />
-            <stop offset="70%" stopColor={GOW.voidDeep} stopOpacity="0.6" />
-            <stop offset="100%" stopColor={GOW.void} stopOpacity="0" />
+          {/* Volcano silhouette gradient - visible against lit background */}
+          <linearGradient id="volcanoFade" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stopColor="#1a1512" stopOpacity="1" />
+            <stop offset="50%" stopColor="#0f0c0a" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="#0a0806" stopOpacity="0.9" />
           </linearGradient>
 
           {/* Lava gradient - bright core to dark edges */}
@@ -588,68 +588,34 @@ const Volcano = memo(function Volcano() {
             <stop offset="60%" stopColor={GOW.fire} stopOpacity="0.3" />
             <stop offset="100%" stopColor={GOW.fire} stopOpacity="0" />
           </radialGradient>
-
-          {/* Mask to fade volcano edges */}
-          <linearGradient id="edgeFade" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="white" stopOpacity="0" />
-            <stop offset="30%" stopColor="white" stopOpacity="1" />
-            <stop offset="100%" stopColor="white" stopOpacity="0" />
-          </linearGradient>
-
-          <mask id="volcanoMask">
-            <rect x="0" y="0" width="400" height="500" fill="url(#edgeFade)" />
-          </mask>
         </defs>
 
-        {/* Ambient glow behind volcano */}
-        <ellipse
-          cx="200"
-          cy="250"
-          rx="200"
-          ry="280"
-          fill={GOW.fire}
-          opacity="0.06"
-          style={{ mixBlendMode: 'screen' }}
-        />
-
-        {/* Volcano silhouette - jagged mountain shape */}
+        {/* Volcano silhouette - flat caldera from ea9c5fc */}
         <path
           d="M-80,500
              L30,320 L50,340 L80,280 L100,300
-             L130,180 L150,200 L180,120 L200,100
-             L220,120 L250,180 L270,160 L300,240
-             L330,300 L350,280 L400,400
+             L130,200 L150,180
+             L160,140 L240,140
+             L250,180 L270,200
+             L300,300 L320,280 L400,450
              L420,500 Z"
           fill="url(#volcanoFade)"
-          mask="url(#volcanoMask)"
         />
 
-        {/* Crater glow - centered on peak at x=200 */}
-        <ellipse
-          cx="200"
-          cy="105"
-          rx="40"
-          ry="18"
-          fill="url(#craterGlow)"
-          filter="url(#lavaGlow2)"
-        >
-          <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
-        </ellipse>
-
-        {/* Lava flows with turbulence filter */}
+        {/* Lava flows - anchored below crater (y=150), behind crater */}
         <g filter="url(#lavaTurbulence)" opacity="0.85">
-          {/* Main center flow */}
+          {/* Center flow - from crater center (200,160) */}
           <path
-            d="M200,115 Q205,200 200,300 Q195,400 200,520"
+            d="M200,160 Q205,240 200,340 Q195,440 200,520"
             fill="none"
             stroke="url(#lavaCore)"
             strokeWidth="20"
             strokeLinecap="round"
           />
 
-          {/* Left flow */}
+          {/* Left flow - from crater center-left (160,150) */}
           <path
-            d="M185,130 Q150,220 120,340 Q100,430 80,520"
+            d="M160,150 Q130,250 100,370 Q80,460 60,520"
             fill="none"
             stroke="url(#lavaCore)"
             strokeWidth="16"
@@ -657,9 +623,9 @@ const Volcano = memo(function Volcano() {
             opacity="0.8"
           />
 
-          {/* Right flow */}
+          {/* Right flow - from crater center-right (235,150) */}
           <path
-            d="M215,130 Q260,250 290,380 Q310,450 330,520"
+            d="M235,150 Q275,270 305,410 Q325,480 345,520"
             fill="none"
             stroke="url(#lavaCore)"
             strokeWidth="14"
@@ -668,20 +634,17 @@ const Volcano = memo(function Volcano() {
           />
         </g>
 
-        {/* Top fade overlay - blends into page background */}
-        <rect
-          x="0"
-          y="0"
-          width="400"
-          height="120"
-          fill="url(#topFade)"
-        />
-        <defs>
-          <linearGradient id="topFade" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={GOW.void} stopOpacity="1" />
-            <stop offset="100%" stopColor={GOW.void} stopOpacity="0" />
-          </linearGradient>
-        </defs>
+        {/* Crater glow - renders on top of lava */}
+        <ellipse
+          cx="200"
+          cy="140"
+          rx="38"
+          ry="14"
+          fill="url(#craterGlow)"
+          filter="url(#lavaGlow2)"
+        >
+          <animate attributeName="opacity" values="0.7;0.95;0.7" dur="2s" repeatCount="indefinite" />
+        </ellipse>
       </svg>
     </div>
   )
@@ -1556,12 +1519,13 @@ export default function MythicTheme() {
       {/* GOW3 Stormy clouds with lightning */}
       <StormyClouds />
 
-      {/* Atmospheric background */}
+      {/* Atmospheric background - with warm glow on left for volcano */}
       <div
         className="fixed inset-0 z-0"
         style={{
           background: `
             radial-gradient(ellipse at 50% 0%, ${GOW.stormGrey}25 0%, transparent 50%),
+            radial-gradient(ellipse at 5% 85%, ${GOW.fire}30 0%, ${GOW.fire}15 25%, transparent 50%),
             radial-gradient(ellipse at 20% 70%, ${GOW.bloodDark}20 0%, transparent 40%),
             radial-gradient(ellipse at 80% 30%, ${GOW.fire}10 0%, transparent 35%),
             linear-gradient(180deg, ${GOW.void} 0%, ${GOW.voidDeep} 40%, ${GOW.voidWarm} 100%)
