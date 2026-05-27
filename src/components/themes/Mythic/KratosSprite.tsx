@@ -33,7 +33,8 @@ const K = {
 }
 
 // ============================================================================
-// SHARED: Running head facing RIGHT (for moving left after flip)
+// SHARED: Running head facing RIGHT in SVG (shows LEFT on screen after flip)
+// All features on the RIGHT side of the face
 // ============================================================================
 const RunningHeadRight = memo(function RunningHeadRight() {
   return (
@@ -41,8 +42,8 @@ const RunningHeadRight = memo(function RunningHeadRight() {
       <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
       {/* Hair on top */}
       <path d="M28,10 Q30,4 35,3 Q40,4 42,10 Q40,7 35,6 Q30,7 28,10 Z" fill={K.hair} />
-      {/* Tattoo on left side (visible when facing right) */}
-      <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+      {/* Tattoo on RIGHT side (same side as eye) */}
+      <path d="M40,6 Q42,10 41,14 Q41,18 40,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
       {/* Single eye visible - facing RIGHT */}
       <ellipse cx="39" cy="12" rx="2" ry="1.5" fill="white" />
       <circle cx="39.5" cy="12" r="1" fill={K.eye} />
@@ -57,16 +58,17 @@ const RunningHeadRight = memo(function RunningHeadRight() {
 })
 
 // ============================================================================
-// FRAME 1: Contact Right - right leg forward, left blade forward
+// FRAME 1: Right leg forward, left leg back = _/\ shape
+// Blue blade forward (right side in SVG), Red blade back
 // ============================================================================
 const KratosRunFrame1 = memo(function KratosRunFrame1() {
   return (
     <g>
       {/* Chains from back to blades */}
-      <path d="M35,42 Q40,44 50,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
-      <path d="M35,42 Q30,44 20,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q45,44 55,38" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q25,48 15,52" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
 
-      {/* Torso - smaller, leaning forward */}
+      {/* Torso - leaning forward */}
       <g transform="rotate(-10, 35, 38)">
         <path
           d="M29,26 Q26,29 27,36 L30,42 L40,42 L43,36 Q44,29 41,26 L38,24 L35,23 L32,24 Z"
@@ -81,16 +83,16 @@ const KratosRunFrame1 = memo(function KratosRunFrame1() {
         <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
       </g>
 
-      {/* Back leg - extended back - thinner */}
+      {/* LEFT leg - extended BACK (angled \) */}
       <g>
-        <path d="M37,46 Q41,50 46,58 Q49,66 47,72 L44,72 Q44,66 41,58 Q38,52 36,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="45.5" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M32,46 Q26,52 20,60 Q16,68 18,72 L22,72 Q22,66 26,58 Q30,50 33,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="20" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Front leg - extended forward - thinner */}
+      {/* RIGHT leg - extended FORWARD (angled /) */}
       <g>
-        <path d="M33,46 Q29,50 24,58 Q21,66 23,72 L26,72 Q26,66 29,58 Q32,52 34,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="24.5" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M38,46 Q44,52 50,60 Q54,68 52,72 L48,72 Q48,66 44,58 Q40,50 37,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="50" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
       {/* Skirt */}
@@ -101,20 +103,20 @@ const KratosRunFrame1 = memo(function KratosRunFrame1() {
         strokeWidth="0.5"
       />
 
-      {/* Back arm + BLUE blade - more muscular */}
-      <g>
-        <ellipse cx="42" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M43,28 Q48,34 51,40 L47,42 Q45,36 42,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="49" cy="42" rx="3" ry="2.5" fill={K.skin} />
-        <path d="M51,42 L62,52 Q67,56 64,58 L53,47 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
-      </g>
-
-      {/* Front arm + RED blade - more muscular */}
+      {/* Back arm + RED blade (left side, swinging back) */}
       <g>
         <ellipse cx="28" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M27,28 Q22,34 19,40 L23,42 Q25,36 28,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="21" cy="42" rx="3" ry="2.5" fill={K.skin} />
-        <path d="M19,42 L8,52 Q3,56 6,58 L17,47 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
+        <path d="M26,28 Q20,36 16,46 L20,48 Q23,38 27,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="18" cy="48" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M16,50 L6,62 Q2,66 5,68 L16,55 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
+      </g>
+
+      {/* Front arm + BLUE blade (right side, swinging forward) */}
+      <g>
+        <ellipse cx="42" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M44,28 Q50,32 54,36 L51,40 Q48,34 43,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="52" cy="38" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M54,36 L66,28 Q71,24 68,22 L56,32 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
       </g>
 
       {/* Head - facing RIGHT */}
@@ -124,16 +126,16 @@ const KratosRunFrame1 = memo(function KratosRunFrame1() {
 })
 
 // ============================================================================
-// FRAME 2: Mid-Stride - legs together, blades at sides
+// FRAME 2: Mid-stride - legs passing through center, arms at sides
 // ============================================================================
 const KratosRunFrame2 = memo(function KratosRunFrame2() {
   return (
     <g>
       {/* Chains from back to blades */}
-      <path d="M35,42 Q42,46 46,42" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
-      <path d="M35,42 Q28,46 24,42" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q42,48 48,52" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q28,48 22,52" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
 
-      {/* Torso - smaller, slight lean */}
+      {/* Torso - slight lean */}
       <g transform="rotate(-5, 35, 38)">
         <path
           d="M29,26 Q26,29 27,36 L30,42 L40,42 L43,36 Q44,29 41,26 L38,24 L35,23 L32,24 Z"
@@ -148,16 +150,16 @@ const KratosRunFrame2 = memo(function KratosRunFrame2() {
         <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
       </g>
 
-      {/* Left leg - passing through - thinner, longer */}
+      {/* Left leg - passing through (slightly back) */}
       <g>
-        <path d="M31,46 Q27,52 26,60 Q26,68 28,72 L32,72 Q32,68 32,60 Q33,52 33,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="30" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M32,46 Q30,52 28,60 Q27,68 29,72 L33,72 Q33,68 33,60 Q34,52 34,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="31" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Right leg - passing through - thinner, longer */}
+      {/* Right leg - passing through (slightly forward) */}
       <g>
-        <path d="M37,46 Q41,52 42,60 Q42,68 40,72 L36,72 Q36,68 36,60 Q35,52 35,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="38" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M38,46 Q40,52 42,60 Q43,68 41,72 L37,72 Q37,68 37,60 Q36,52 36,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="39" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
       {/* Skirt */}
@@ -168,20 +170,20 @@ const KratosRunFrame2 = memo(function KratosRunFrame2() {
         strokeWidth="0.5"
       />
 
-      {/* Left arm + RED blade - more muscular */}
+      {/* Left arm + RED blade (at side, going down) */}
       <g>
         <ellipse cx="28" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M26,28 Q24,34 22,40 L26,42 Q27,36 28,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="24" cy="42" rx="3" ry="2.5" fill={K.skin} />
-        <path d="M22,42 L14,56 Q11,60 14,62 L24,48 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
+        <path d="M26,28 Q24,36 22,44 L26,46 Q27,38 28,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="24" cy="46" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M22,48 L14,62 Q11,66 14,68 L24,54 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
       </g>
 
-      {/* Right arm + BLUE blade - more muscular */}
+      {/* Right arm + BLUE blade (at side, going down) */}
       <g>
         <ellipse cx="42" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M44,28 Q46,34 48,40 L44,42 Q43,36 42,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="46" cy="42" rx="3" ry="2.5" fill={K.skin} />
-        <path d="M48,42 L56,56 Q59,60 56,62 L46,48 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
+        <path d="M44,28 Q46,36 48,44 L44,46 Q43,38 42,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="46" cy="46" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M48,48 L56,62 Q59,66 56,68 L46,54 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
       </g>
 
       {/* Head - facing RIGHT */}
@@ -191,16 +193,17 @@ const KratosRunFrame2 = memo(function KratosRunFrame2() {
 })
 
 // ============================================================================
-// FRAME 3: Contact Left - left leg forward, right blade forward
+// FRAME 3: Left leg forward, right leg back = mirrored _/\ shape
+// Red blade forward (left side in SVG), Blue blade back
 // ============================================================================
 const KratosRunFrame3 = memo(function KratosRunFrame3() {
   return (
     <g>
       {/* Chains from back to blades */}
-      <path d="M35,42 Q30,44 20,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
-      <path d="M35,42 Q40,44 50,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q25,44 15,38" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q45,48 55,52" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
 
-      {/* Torso - smaller, leaning forward */}
+      {/* Torso - leaning forward */}
       <g transform="rotate(-10, 35, 38)">
         <path
           d="M29,26 Q26,29 27,36 L30,42 L40,42 L43,36 Q44,29 41,26 L38,24 L35,23 L32,24 Z"
@@ -215,16 +218,16 @@ const KratosRunFrame3 = memo(function KratosRunFrame3() {
         <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
       </g>
 
-      {/* Back leg - extended back - thinner, longer */}
+      {/* RIGHT leg - extended BACK (angled \) */}
       <g>
-        <path d="M33,46 Q28,50 22,58 Q18,66 20,72 L24,72 Q24,66 28,58 Q32,52 34,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="22" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M38,46 Q44,52 50,60 Q54,68 52,72 L48,72 Q48,66 44,58 Q40,50 37,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="50" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Front leg - extended forward - thinner, longer */}
+      {/* LEFT leg - extended FORWARD (angled /) */}
       <g>
-        <path d="M37,46 Q42,50 48,58 Q52,66 50,72 L46,72 Q46,66 42,58 Q38,52 36,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="48" cy="73" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M32,46 Q26,52 20,60 Q16,68 18,72 L22,72 Q22,66 26,58 Q30,50 33,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="20" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
       {/* Skirt */}
@@ -235,20 +238,20 @@ const KratosRunFrame3 = memo(function KratosRunFrame3() {
         strokeWidth="0.5"
       />
 
-      {/* Back arm + RED blade - more muscular */}
-      <g>
-        <ellipse cx="28" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M27,28 Q22,34 19,40 L23,42 Q25,36 28,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="21" cy="42" rx="3" ry="2.5" fill={K.skin} />
-        <path d="M19,42 L8,52 Q3,56 6,58 L17,47 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
-      </g>
-
-      {/* Front arm + BLUE blade - more muscular */}
+      {/* Back arm + BLUE blade (right side, swinging back) */}
       <g>
         <ellipse cx="42" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M43,28 Q48,34 51,40 L47,42 Q45,36 42,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="49" cy="42" rx="3" ry="2.5" fill={K.skin} />
-        <path d="M51,42 L62,52 Q67,56 64,58 L53,47 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
+        <path d="M44,28 Q50,36 54,46 L50,48 Q47,38 43,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="52" cy="48" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M54,50 L64,62 Q68,66 65,68 L54,55 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
+      </g>
+
+      {/* Front arm + RED blade (left side, swinging forward) */}
+      <g>
+        <ellipse cx="28" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M26,28 Q20,32 16,36 L19,40 Q22,34 27,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="18" cy="38" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M16,36 L4,28 Q-1,24 2,22 L14,32 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
       </g>
 
       {/* Head - facing RIGHT */}
