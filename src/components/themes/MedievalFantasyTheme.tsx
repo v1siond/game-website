@@ -1272,17 +1272,17 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
           {/* === HORDE WAR BANNER - Hidden here, rendered as fixed element above infernals === */}
           <g transform="translate(200, 520) rotate(-10)" className="war-banner" opacity="0">
-            {/* Dirt mound at pole base */}
-            <ellipse cx="6" cy="235" rx="25" ry="10" fill="#3d3020" />
-            <ellipse cx="6" cy="233" rx="20" ry="8" fill="#4a3a28" />
-            <ellipse cx="6" cy="231" rx="12" ry="5" fill="#554535" />
+            {/* Dirt mound at pole base - matches terrain ground */}
+            <ellipse cx="6" cy="235" rx="25" ry="10" fill="#1a2518" />
+            <ellipse cx="6" cy="233" rx="20" ry="8" fill="#253020" />
+            <ellipse cx="6" cy="231" rx="12" ry="5" fill="#2a2518" />
             {/* Small dirt clumps around base */}
-            <ellipse cx="-12" cy="238" rx="8" ry="4" fill="#3d3020" opacity="0.7" />
-            <ellipse cx="22" cy="240" rx="10" ry="5" fill="#3d3020" opacity="0.6" />
-            {/* Grass tufts growing from dirt */}
-            <path d="M-8,232 Q-10,222 -6,218" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-            <path d="M18,234 Q22,224 19,220" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-            <path d="M-15,236 Q-18,228 -14,225" stroke="#455540" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+            <ellipse cx="-12" cy="238" rx="8" ry="4" fill="#1a2518" opacity="0.7" />
+            <ellipse cx="22" cy="240" rx="10" ry="5" fill="#253020" opacity="0.6" />
+            {/* Grass tufts growing from dirt - olive-green */}
+            <path d="M-8,232 Q-10,222 -6,218" stroke="#5a5a30" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+            <path d="M18,234 Q22,224 19,220" stroke="#6a6535" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+            <path d="M-15,236 Q-18,228 -14,225" stroke="#4a4a28" strokeWidth="1.2" fill="none" strokeLinecap="round" />
 
             {/* Banner pole */}
             <rect x="0" y="0" width="12" height="230" fill="#3a2815" />
@@ -1719,18 +1719,18 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         }}
       >
         <svg width="120" height="300" viewBox="0 0 120 300" style={{ overflow: 'visible' }}>
-          {/* Dirt mound at pole base - matches battlefield green-brown */}
+          {/* Dirt mound at pole base - matches battlefield ground colors exactly */}
           <ellipse cx="12" cy="282" rx="28" ry="12" fill="#1a2518" />
           <ellipse cx="12" cy="280" rx="22" ry="9" fill="#253020" />
-          <ellipse cx="12" cy="278" rx="14" ry="6" fill="#2a3525" />
+          <ellipse cx="12" cy="278" rx="14" ry="6" fill="#2a2518" />
           {/* Small dirt clumps */}
           <ellipse cx="-8" cy="286" rx="10" ry="5" fill="#1a2518" opacity="0.8" />
-          <ellipse cx="30" cy="288" rx="12" ry="6" fill="#1a2518" opacity="0.7" />
-          {/* Grass tufts around base */}
-          <path d="M-5,278 Q-8,268 -3,262" stroke="#354530" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-          <path d="M28,280 Q32,270 29,264" stroke="#3a4a38" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-          <path d="M-12,282 Q-15,274 -10,270" stroke="#2a3828" strokeWidth="1" fill="none" strokeLinecap="round" />
-          <path d="M35,284 Q38,276 35,272" stroke="#2a3828" strokeWidth="1" fill="none" strokeLinecap="round" />
+          <ellipse cx="30" cy="288" rx="12" ry="6" fill="#253020" opacity="0.7" />
+          {/* Grass tufts around base - olive-green like terrain grass */}
+          <path d="M-5,278 Q-8,268 -3,262" stroke="#5a5a30" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <path d="M28,280 Q32,270 29,264" stroke="#6a6535" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <path d="M-12,282 Q-15,274 -10,270" stroke="#4a4a28" strokeWidth="1" fill="none" strokeLinecap="round" />
+          <path d="M35,284 Q38,276 35,272" stroke="#5a5a30" strokeWidth="1" fill="none" strokeLinecap="round" />
 
           {/* Banner pole - Dark war totem with blood stains */}
           {/* Main pole - charred dark wood */}
@@ -2428,11 +2428,12 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           0% { transform: translate(0, 0) rotate(-25deg); opacity: 0.6; }
           100% { transform: translate(25vw, 115vh) rotate(-25deg); opacity: 0; }
         }
-        /* Grass blade wind - rotates from bottom anchor point */
+        /* Grass blade wind - ondulating wave to the right, anchored at base */
         @keyframes grassBlade {
           0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(4deg); }
-          75% { transform: rotate(-3deg); }
+          25% { transform: rotate(6deg); }
+          50% { transform: rotate(12deg); }
+          75% { transform: rotate(6deg); }
         }
         /* Banner wave - staggered columns create ripple effect */
         @keyframes bannerWave {
