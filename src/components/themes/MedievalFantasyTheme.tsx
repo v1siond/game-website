@@ -3564,39 +3564,34 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         <ellipse cx="120" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
 
         {/* NOSE */}
-        <path d="M100,45 L95,55 L105,55 Z" fill="#5a4a3a" />
+        <path d="M100,45 L96,54 L104,54 Z" fill="#5a4a3a" />
 
-        {/* Full Beard - thick sides, rounded bottom */}
-        {/* Main beard mass */}
+        {/* MUSTACHE - below nose, above mouth */}
         <path
-          d="M80,50
-             Q75,55 74,65
-             Q73,80 76,95
-             Q80,110 100,115
-             Q120,110 124,95
-             Q127,80 126,65
-             Q125,55 120,50
-             L118,52 Q115,58 110,60 L108,58
-             Q100,62 92,58 L90,60 Q85,58 82,52 Z"
+          d="M88,56 Q94,58 100,57 Q106,58 112,56 L110,60 Q100,62 90,60 Z"
           fill="#0a0808"
         />
-        {/* Beard texture - lighter strands */}
-        <path d="M82,65 Q84,80 86,95" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
-        <path d="M90,62 Q92,85 95,105" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
-        <path d="M100,64 Q100,90 100,110" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
-        <path d="M110,62 Q108,85 105,105" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
-        <path d="M118,65 Q116,80 114,95" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.5" />
 
-        {/* Mustache - thick, covers upper lip */}
+        {/* MOUTH - visible below mustache */}
+        <path d="M94,64 Q100,62 106,64" stroke="#4a3020" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+        {/* BEARD - starts below mouth at chin, goes down */}
         <path
-          d="M88,56 Q94,60 100,58 Q106,60 112,56 Q108,64 100,65 Q92,64 88,56"
+          d="M82,68
+             Q78,72 76,82
+             Q74,95 80,108
+             Q90,120 100,122
+             Q110,120 120,108
+             Q126,95 124,82
+             Q122,72 118,68
+             Q110,72 100,72
+             Q90,72 82,68 Z"
           fill="#0a0808"
         />
-        <path d="M88,58 Q94,62 100,60" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.4" />
-        <path d="M100,60 Q106,62 112,58" stroke="#1a1818" strokeWidth="1" fill="none" opacity="0.4" />
-
-        {/* Mouth visible under mustache */}
-        <path d="M95,66 Q100,65 105,66" stroke="#3a2a1a" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        {/* Beard texture */}
+        <path d="M86,75 Q88,90 92,108" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.4" />
+        <path d="M100,74 Q100,95 100,115" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.4" />
+        <path d="M114,75 Q112,90 108,108" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.4" />
 
         {/* EYES - dark ovals with ice glow */}
         <ellipse cx="90" cy="42" rx="4.5" ry="3.5" fill="#1a1210" />
