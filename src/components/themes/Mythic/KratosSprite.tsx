@@ -336,8 +336,8 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
     // Animate Kratos running from right to center
     const startTime = performance.now()
     const runDuration = 1000
-    const startX = -400
-    const endX = -350
+    const startX = -600
+    const endX = -180
 
     const animateRun = (now: number) => {
       const elapsed = now - startTime
