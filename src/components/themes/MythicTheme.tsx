@@ -460,17 +460,18 @@ const BloodSplash = memo(function BloodSplash({ side }: { side: 'left' | 'right'
 })
 
 // =============================================================================
-// STORM RAIN EFFECT
+// FLOATING ASH PARTICLES - GOW3 volcanic atmosphere (replaces rain)
 // =============================================================================
-const StormRain = memo(function StormRain() {
-  const drops = useMemo(() =>
-    Array.from({ length: 25 }, (_, i) => ({
+const FloatingAsh = memo(function FloatingAsh() {
+  const particles = useMemo(() =>
+    Array.from({ length: 30 }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
-      height: Math.random() * 30 + 15,
-      opacity: Math.random() * 0.2 + 0.1,
-      speed: Math.random() * 0.8 + 0.5,
-      delay: Math.random() * -2,
+      size: Math.random() * 3 + 1,
+      opacity: Math.random() * 0.4 + 0.1,
+      speed: Math.random() * 20 + 15,
+      delay: Math.random() * -15,
+      drift: (Math.random() - 0.5) * 40,
     })),
     []
   )
@@ -481,20 +482,46 @@ const StormRain = memo(function StormRain() {
       style={{ contain: 'strict' }}
       aria-hidden="true"
     >
-      {drops.map((d) => (
+      {particles.map((p) => (
         <div
-          key={d.id}
-          className="absolute w-px"
+          key={p.id}
+          className="absolute rounded-full"
           style={{
-            left: `${d.x}%`,
-            top: '-40px',
-            height: d.height,
-            background: `linear-gradient(180deg, transparent, ${GOW.ashLight}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
-            animation: `stormRain ${d.speed}s linear infinite`,
-            animationDelay: `${d.delay}s`,
+            left: `${p.x}%`,
+            bottom: '-10px',
+            width: p.size,
+            height: p.size,
+            background: GOW.ashLight,
+            opacity: p.opacity,
+            animation: `ashFloat ${p.speed}s ease-out infinite`,
+            animationDelay: `${p.delay}s`,
+            ['--drift' as string]: `${p.drift}px`,
           }}
         />
       ))}
+    </div>
+  )
+})
+
+// =============================================================================
+// DIVINE LIGHT RAYS - Olympus god rays from above
+// =============================================================================
+const DivineLightRays = memo(function DivineLightRays() {
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden" aria-hidden="true">
+      <svg className="w-full h-full opacity-20" viewBox="0 0 1920 1080" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="divineRay" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%" stopColor={GOW.goldBright} stopOpacity="0.4" />
+            <stop offset="30%" stopColor={GOW.gold} stopOpacity="0.2" />
+            <stop offset="100%" stopColor={GOW.gold} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {/* Angled light rays from top */}
+        <polygon points="400,0 500,0 700,1080 550,1080" fill="url(#divineRay)" opacity="0.3" />
+        <polygon points="900,0 980,0 1100,1080 980,1080" fill="url(#divineRay)" opacity="0.4" />
+        <polygon points="1400,0 1520,0 1350,1080 1200,1080" fill="url(#divineRay)" opacity="0.3" />
+      </svg>
     </div>
   )
 })
@@ -1357,7 +1384,8 @@ export default function MythicTheme() {
           `,
         }}
       />
-      <StormRain />
+      <FloatingAsh />
+      <DivineLightRays />
       <EmberParticles />
 
       {/* GOW3 Blood banner at top */}
@@ -1735,11 +1763,17 @@ export default function MythicTheme() {
 
       {/* Animations */}
       <style jsx global>{`
-        @keyframes stormRain {
-          0% { transform: translateY(-40px) translateZ(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(100vh) translateZ(0); opacity: 0; }
+        @keyframes ashFloat {
+          0% {
+            transform: translateY(0) translateX(0) translateZ(0);
+            opacity: 0;
+          }
+          10% { opacity: var(--ash-opacity, 0.3); }
+          90% { opacity: var(--ash-opacity, 0.3); }
+          100% {
+            transform: translateY(-100vh) translateX(var(--drift, 0px)) translateZ(0);
+            opacity: 0;
+          }
         }
 
         @keyframes emberRise {
