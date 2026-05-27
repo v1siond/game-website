@@ -37,6 +37,9 @@ type PixelColor = keyof typeof C
 // Pixel grid type - 2D array of color keys
 type PixelGrid = (PixelColor | null)[][]
 
+// Shorthand for null/transparent
+const _ = null
+
 // ============================================================================
 // KRATOS FRAMES - Each frame is a 32x48 pixel grid
 // ============================================================================
@@ -98,9 +101,6 @@ const KRATOS_IDLE_1: PixelGrid = [
   [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
   [_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_],
 ]
-
-// Helper to create shifted/modified frames
-const _ = null
 
 // RUN FRAME 1 - Left leg forward
 const KRATOS_RUN_1: PixelGrid = [
