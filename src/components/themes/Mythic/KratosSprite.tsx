@@ -113,22 +113,22 @@ export const KratosCharacter = memo(function KratosCharacter({
             transformOrigin: '25px 55px',
             animation: running ? 'kratosLeftLeg 0.3s ease-in-out infinite' : undefined,
           }}>
-            {/* Thigh */}
+            {/* Thigh - muscular */}
             <path
-              d="M22,55 L20,68 L26,68 L28,55 Z"
+              d="M20,55 L17,68 L27,68 L30,55 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Lower leg */}
+            {/* Lower leg - muscular */}
             <path
-              d="M20,68 L18,82 L24,82 L26,68 Z"
+              d="M18,68 L15,82 L26,82 L28,68 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
             {/* Foot */}
-            <ellipse cx="21" cy="84" rx="5" ry="3" fill={KRATOS.beard} />
+            <ellipse cx="20" cy="84" rx="6" ry="3" fill={KRATOS.beard} />
           </g>
 
           {/* === RIGHT LEG (front leg when running) === */}
@@ -136,22 +136,22 @@ export const KratosCharacter = memo(function KratosCharacter({
             transformOrigin: '35px 55px',
             animation: running ? 'kratosRightLeg 0.3s ease-in-out infinite' : undefined,
           }}>
-            {/* Thigh */}
+            {/* Thigh - muscular */}
             <path
-              d="M32,55 L30,68 L36,68 L38,55 Z"
+              d="M30,55 L27,68 L39,68 L42,55 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Lower leg */}
+            {/* Lower leg - muscular */}
             <path
-              d="M30,68 L28,82 L34,82 L36,68 Z"
+              d="M28,68 L25,82 L37,82 L39,68 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
             {/* Foot */}
-            <ellipse cx="31" cy="84" rx="5" ry="3" fill={KRATOS.beard} />
+            <ellipse cx="31" cy="84" rx="6" ry="3" fill={KRATOS.beard} />
           </g>
 
           {/* === BATTLE SKIRT === */}
@@ -194,7 +194,7 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* RED TATTOO - left side of body */}
           <path
-            d="M26,26 C24,30 23,38 24,46"
+            d="M22,26 C20,32 19,40 20,48"
             stroke={KRATOS.tattoo}
             strokeWidth="2.5"
             fill="none"
@@ -210,22 +210,22 @@ export const KratosCharacter = memo(function KratosCharacter({
             transformOrigin: '18px 28px',
             animation: running ? 'kratosLeftArm 0.3s ease-in-out infinite' : undefined,
           }}>
-            {/* Upper arm */}
+            {/* Upper arm - muscular */}
             <path
-              d="M14,28 C10,30 8,35 10,42 L16,42 C18,36 18,32 16,28 Z"
+              d="M14,28 C8,30 5,36 8,44 L18,44 C20,36 20,32 16,28 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Forearm */}
+            {/* Forearm - muscular */}
             <path
-              d="M10,42 L6,52 L12,54 L16,42 Z"
+              d="M8,44 L3,54 L14,56 L18,44 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
             {/* Fist */}
-            <circle cx="9" cy="54" r="4" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            <circle cx="8" cy="56" r="5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
           </g>
 
           {/* === RIGHT ARM === */}
@@ -233,22 +233,22 @@ export const KratosCharacter = memo(function KratosCharacter({
             transformOrigin: '42px 28px',
             animation: running ? 'kratosRightArm 0.3s ease-in-out infinite' : undefined,
           }}>
-            {/* Upper arm */}
+            {/* Upper arm - muscular */}
             <path
-              d="M46,28 C50,30 52,35 50,42 L44,42 C42,36 42,32 44,28 Z"
+              d="M44,28 C52,30 55,36 52,44 L42,44 C40,36 40,32 44,28 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
-            {/* Forearm */}
+            {/* Forearm - muscular */}
             <path
-              d="M50,42 L54,52 L48,54 L44,42 Z"
+              d="M52,44 L57,54 L46,56 L42,44 Z"
               fill={KRATOS.skin}
               stroke={KRATOS.skinShadow}
               strokeWidth="0.5"
             />
             {/* Fist */}
-            <circle cx="51" cy="54" r="4" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
+            <circle cx="52" cy="56" r="5" fill={KRATOS.skin} stroke={KRATOS.skinShadow} strokeWidth="0.5" />
           </g>
 
           {/* === HEAD === */}
@@ -264,7 +264,7 @@ export const KratosCharacter = memo(function KratosCharacter({
 
           {/* RED TATTOO - on head/face */}
           <path
-            d="M24,8 C22,12 22,18 24,24"
+            d="M21,4 C19,10 19,18 21,26"
             stroke={KRATOS.tattoo}
             strokeWidth="3"
             fill="none"
@@ -335,8 +335,8 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
     // Animate Kratos running from right to center
     const startTime = performance.now()
     const runDuration = 1000
-    const startX = 200
-    const endX = -30
+    const startX = -150
+    const endX = -60
 
     const animateRun = (now: number) => {
       const elapsed = now - startTime
@@ -384,7 +384,7 @@ export const KratosChainPullReveal = memo(function KratosChainPullReveal({
         <KratosCharacter
           scale={2}
           running={isKratosRunning}
-          facingDirection="right"
+          facingDirection="left"
         />
       </div>
 
