@@ -504,150 +504,218 @@ const FloatingAsh = memo(function FloatingAsh() {
 })
 
 // =============================================================================
-// VOLCANO WITH LAVA - Top left corner, Tartarus feel
+// VOLCANO WITH LAVA - Top left corner, blends into background
+// Uses feTurbulence for organic lava flow, gradient masks for blending
 // =============================================================================
 const Volcano = memo(function Volcano() {
   return (
     <div
-      className="fixed top-0 left-0 pointer-events-none z-[2] w-[400px] h-[500px] md:w-[500px] md:h-[600px]"
+      className="fixed top-0 left-0 pointer-events-none z-[1]"
+      style={{
+        width: 'clamp(280px, 35vw, 450px)',
+        height: 'clamp(400px, 55vh, 700px)',
+      }}
       aria-hidden="true"
     >
-      <svg className="w-full h-full" viewBox="0 0 500 600" preserveAspectRatio="xMinYMin slice">
+      <svg
+        className="w-full h-full"
+        viewBox="0 0 400 600"
+        preserveAspectRatio="xMinYMin slice"
+        style={{ overflow: 'visible' }}
+      >
         <defs>
-          {/* Lava gradient */}
-          <linearGradient id="lavaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={GOW.fireBright} />
-            <stop offset="30%" stopColor={GOW.fire} />
-            <stop offset="70%" stopColor="#cc3300" />
-            <stop offset="100%" stopColor={GOW.bloodDark} />
-          </linearGradient>
-          {/* Volcano rock gradient */}
-          <linearGradient id="volcanoRock" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor={GOW.ashDark} />
-            <stop offset="50%" stopColor="#1a1512" />
-            <stop offset="100%" stopColor={GOW.voidDeep} />
-          </linearGradient>
-          {/* Glow filter */}
-          <filter id="lavaGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="8" result="blur" />
+          {/* Turbulence filter for organic lava movement */}
+          <filter id="lavaTurbulence" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence
+              type="turbulence"
+              baseFrequency="0.015 0.04"
+              numOctaves="3"
+              seed="5"
+              result="turbulence"
+            >
+              <animate
+                attributeName="seed"
+                values="5;15;5"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            </feTurbulence>
+            <feDisplacementMap
+              in="SourceGraphic"
+              in2="turbulence"
+              scale="12"
+              xChannelSelector="R"
+              yChannelSelector="G"
+            />
+          </filter>
+
+          {/* Glow filter for lava */}
+          <filter id="lavaGlow2" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+            <feColorMatrix
+              in="blur"
+              type="matrix"
+              values="1.5 0 0 0 0  0 0.5 0 0 0  0 0 0.2 0 0  0 0 0 1 0"
+              result="coloredBlur"
+            />
             <feMerge>
-              <feMergeNode in="blur" />
+              <feMergeNode in="coloredBlur" />
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+
+          {/* Volcano silhouette gradient - fades into void */}
+          <linearGradient id="volcanoFade" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor={GOW.voidDeep} stopOpacity="0.95" />
+            <stop offset="40%" stopColor="#0d0a08" stopOpacity="0.9" />
+            <stop offset="70%" stopColor={GOW.voidDeep} stopOpacity="0.6" />
+            <stop offset="100%" stopColor={GOW.void} stopOpacity="0" />
+          </linearGradient>
+
+          {/* Lava gradient - bright core to dark edges */}
+          <linearGradient id="lavaCore" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ffcc00" stopOpacity="1" />
+            <stop offset="20%" stopColor={GOW.fireBright} stopOpacity="0.95" />
+            <stop offset="50%" stopColor={GOW.fire} stopOpacity="0.85" />
+            <stop offset="80%" stopColor="#aa2200" stopOpacity="0.7" />
+            <stop offset="100%" stopColor={GOW.bloodDark} stopOpacity="0.5" />
+          </linearGradient>
+
+          {/* Radial glow for crater */}
+          <radialGradient id="craterGlow" cx="50%" cy="50%" r="60%">
+            <stop offset="0%" stopColor="#ffdd44" stopOpacity="0.9" />
+            <stop offset="30%" stopColor={GOW.fireBright} stopOpacity="0.6" />
+            <stop offset="60%" stopColor={GOW.fire} stopOpacity="0.3" />
+            <stop offset="100%" stopColor={GOW.fire} stopOpacity="0" />
+          </radialGradient>
+
+          {/* Mask to fade volcano edges */}
+          <linearGradient id="edgeFade" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="white" stopOpacity="0" />
+            <stop offset="30%" stopColor="white" stopOpacity="1" />
+            <stop offset="100%" stopColor="white" stopOpacity="0" />
+          </linearGradient>
+
+          <mask id="volcanoMask">
+            <rect x="0" y="0" width="400" height="600" fill="url(#edgeFade)" />
+          </mask>
         </defs>
 
-        {/* Volcano mountain silhouette */}
+        {/* Ambient glow behind volcano */}
+        <ellipse
+          cx="180"
+          cy="200"
+          rx="180"
+          ry="250"
+          fill={GOW.fire}
+          opacity="0.08"
+          style={{ mixBlendMode: 'screen' }}
+        />
+
+        {/* Volcano silhouette - jagged mountain shape */}
         <path
-          d="M-50,600 L80,250 L120,180 L150,200 L180,160 L220,200 L250,180 L280,250 L400,600 Z"
-          fill="url(#volcanoRock)"
-          opacity="0.9"
+          d="M-80,600
+             L40,380 L60,400 L90,320 L110,340
+             L140,220 L155,240 L175,180 L195,200 L210,160
+             L225,190 L245,170 L265,230
+             L290,280 L310,260 L340,340 L360,320 L400,450
+             L420,600 Z"
+          fill="url(#volcanoFade)"
+          mask="url(#volcanoMask)"
         />
 
         {/* Crater glow */}
         <ellipse
-          cx="180"
-          cy="175"
-          rx="60"
-          ry="25"
-          fill={GOW.fire}
-          opacity="0.6"
-          filter="url(#lavaGlow)"
+          cx="210"
+          cy="165"
+          rx="45"
+          ry="20"
+          fill="url(#craterGlow)"
+          filter="url(#lavaGlow2)"
         >
-          <animate attributeName="opacity" values="0.4;0.7;0.4" dur="2s" repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.7;1;0.7" dur="2.5s" repeatCount="indefinite" />
         </ellipse>
 
-        {/* Lava eruption from crater */}
-        <path
-          d="M150,180 Q165,120 180,80 Q195,120 210,180"
-          fill="url(#lavaGrad)"
-          opacity="0.8"
-        >
-          <animate attributeName="d"
-            values="M150,180 Q165,120 180,80 Q195,120 210,180;
-                    M155,180 Q170,100 180,60 Q190,100 205,180;
-                    M150,180 Q165,120 180,80 Q195,120 210,180"
-            dur="3s" repeatCount="indefinite" />
-        </path>
+        {/* Lava flows with turbulence filter */}
+        <g filter="url(#lavaTurbulence)" opacity="0.85">
+          {/* Main center flow */}
+          <path
+            d="M195,180 Q200,250 195,350 Q190,450 200,550 Q205,580 200,620"
+            fill="none"
+            stroke="url(#lavaCore)"
+            strokeWidth="18"
+            strokeLinecap="round"
+          />
 
-        {/* Main lava flow - left side */}
-        <path
-          d="M130,220 Q100,300 80,400 Q70,480 90,600"
-          fill="none"
-          stroke="url(#lavaGrad)"
-          strokeWidth="25"
-          strokeLinecap="round"
-          opacity="0.7"
-        >
-          <animate attributeName="stroke-width" values="20;28;20" dur="4s" repeatCount="indefinite" />
-        </path>
+          {/* Left flow */}
+          <path
+            d="M175,190 Q150,280 130,380 Q115,480 100,600"
+            fill="none"
+            stroke="url(#lavaCore)"
+            strokeWidth="14"
+            strokeLinecap="round"
+            opacity="0.8"
+          />
 
-        {/* Lava flow - center */}
-        <path
-          d="M180,200 Q200,320 190,450 Q185,520 200,600"
-          fill="none"
-          stroke="url(#lavaGrad)"
-          strokeWidth="30"
-          strokeLinecap="round"
-          opacity="0.8"
-        >
-          <animate attributeName="stroke-width" values="25;35;25" dur="3.5s" repeatCount="indefinite" />
-        </path>
+          {/* Right flow */}
+          <path
+            d="M225,185 Q260,300 280,420 Q295,520 310,620"
+            fill="none"
+            stroke="url(#lavaCore)"
+            strokeWidth="12"
+            strokeLinecap="round"
+            opacity="0.7"
+          />
+        </g>
 
-        {/* Lava flow - right side */}
-        <path
-          d="M230,220 Q280,350 300,500 Q310,550 320,600"
-          fill="none"
-          stroke="url(#lavaGrad)"
-          strokeWidth="20"
-          strokeLinecap="round"
-          opacity="0.6"
-        >
-          <animate attributeName="stroke-width" values="15;22;15" dur="5s" repeatCount="indefinite" />
-        </path>
+        {/* Thin bright lava streams (no filter, sharper) */}
+        <g opacity="0.6">
+          <path
+            d="M185,200 Q170,300 155,420 Q145,500 130,580"
+            fill="none"
+            stroke={GOW.fireBright}
+            strokeWidth="4"
+            strokeLinecap="round"
+          >
+            <animate attributeName="stroke-width" values="3;5;3" dur="3s" repeatCount="indefinite" />
+          </path>
+          <path
+            d="M215,195 Q235,320 250,460 Q260,530 270,600"
+            fill="none"
+            stroke={GOW.fireBright}
+            strokeWidth="3"
+            strokeLinecap="round"
+          >
+            <animate attributeName="stroke-width" values="2;4;2" dur="4s" repeatCount="indefinite" />
+          </path>
+        </g>
 
-        {/* Small lava streams */}
-        <path
-          d="M160,250 Q140,350 120,500"
-          fill="none"
-          stroke={GOW.fire}
-          strokeWidth="8"
-          strokeLinecap="round"
-          opacity="0.5"
-        />
-        <path
-          d="M200,240 Q240,400 260,550"
-          fill="none"
-          stroke={GOW.fire}
-          strokeWidth="6"
-          strokeLinecap="round"
-          opacity="0.4"
-        />
-
-        {/* Smoke/ash cloud at top */}
-        <g opacity="0.4">
-          <ellipse cx="140" cy="100" rx="50" ry="40" fill={GOW.stormGrey}>
-            <animate attributeName="cy" values="100;90;100" dur="4s" repeatCount="indefinite" />
-            <animate attributeName="rx" values="50;60;50" dur="4s" repeatCount="indefinite" />
+        {/* Smoke wisps rising */}
+        <g opacity="0.25" style={{ mixBlendMode: 'screen' }}>
+          <ellipse cx="190" cy="120" rx="35" ry="25" fill={GOW.stormGrey}>
+            <animate attributeName="cy" values="120;80;120" dur="6s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.3;0.15;0.3" dur="6s" repeatCount="indefinite" />
           </ellipse>
-          <ellipse cx="200" cy="70" rx="60" ry="45" fill={GOW.stormBrown}>
-            <animate attributeName="cy" values="70;55;70" dur="5s" repeatCount="indefinite" />
-            <animate attributeName="rx" values="60;75;60" dur="5s" repeatCount="indefinite" />
-          </ellipse>
-          <ellipse cx="170" cy="50" rx="40" ry="30" fill={GOW.ashDark}>
-            <animate attributeName="cy" values="50;35;50" dur="6s" repeatCount="indefinite" />
+          <ellipse cx="230" cy="100" rx="45" ry="30" fill={GOW.ashDark}>
+            <animate attributeName="cy" values="100;50;100" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="rx" values="45;60;45" dur="8s" repeatCount="indefinite" />
           </ellipse>
         </g>
 
-        {/* Hot glow at base of volcano */}
-        <ellipse
-          cx="180"
-          cy="600"
-          rx="200"
-          ry="80"
-          fill={GOW.fire}
-          opacity="0.15"
+        {/* Bottom fade overlay - blends into page background */}
+        <rect
+          x="0"
+          y="450"
+          width="400"
+          height="150"
+          fill="url(#bottomFade)"
         />
+        <defs>
+          <linearGradient id="bottomFade" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor={GOW.void} stopOpacity="0" />
+            <stop offset="100%" stopColor={GOW.void} stopOpacity="1" />
+          </linearGradient>
+        </defs>
       </svg>
     </div>
   )
