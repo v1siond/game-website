@@ -259,61 +259,52 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
   const rockCrackId = `rockCrack${suffix}${id}`
   const fireFilterId = `fireFilter${suffix}${id}`
 
-  // feTurbulence-based fire using displacement mapping (leimapapa technique)
+  // Simplified flame using CSS animations (much faster than feTurbulence)
   const FelFlame = ({ cx, cy, size = 1, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
-    const w = size * 16
-    const h = size * 22
-    const filterId = `${fireFilterId}_${cx}_${cy}`
-    const gradId = `fireGrad_${suffix}${id}_${cx}_${cy}`
-
+    const w = size * 14
+    const h = size * 20
     return (
       <g transform={`translate(${cx - w/2}, ${cy - h})`}>
-        <defs>
-          <radialGradient id={gradId} cx="50%" cy="90%" r="60%" fx="50%" fy="85%">
-            <stop offset="0%" stopColor="#ffffcc" stopOpacity="0.9" />
-            <stop offset="25%" stopColor={WC3.roc.felBright} stopOpacity="0.85" />
-            <stop offset="50%" stopColor={WC3.roc.felMid} stopOpacity="0.8" />
-            <stop offset="75%" stopColor={WC3.roc.felDark} stopOpacity="0.6" />
-            <stop offset="100%" stopColor={WC3.roc.felDark} stopOpacity="0" />
-          </radialGradient>
-          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.03 0.06" numOctaves="3" seed={delay} result="noise">
-              {isIdle && <animate attributeName="baseFrequency" values="0.03 0.06;0.04 0.08;0.03 0.06" dur={`${2 + delay * 0.3}s`} repeatCount="indefinite" />}
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale={size * 8} xChannelSelector="R" yChannelSelector="G" />
-            <feGaussianBlur stdDeviation="1" />
-          </filter>
-        </defs>
-        <ellipse cx={w/2} cy={h * 0.7} rx={w * 0.4} ry={h * 0.55} fill={`url(#${gradId})`} filter={`url(#${filterId})`} />
+        {/* Outer glow */}
+        <ellipse
+          cx={w/2} cy={h * 0.6} rx={w * 0.5} ry={h * 0.5}
+          fill={WC3.roc.felDark} opacity="0.4"
+          style={isIdle ? { animation: `flameOuter ${1.8 + delay * 0.1}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` } : undefined}
+        />
+        {/* Middle flame */}
+        <ellipse
+          cx={w/2} cy={h * 0.55} rx={w * 0.35} ry={h * 0.4}
+          fill={WC3.roc.felMid} opacity="0.7"
+          style={isIdle ? { animation: `flameMid ${1.5 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` } : undefined}
+        />
+        {/* Inner bright core */}
+        <ellipse
+          cx={w/2} cy={h * 0.5} rx={w * 0.2} ry={h * 0.3}
+          fill={WC3.roc.felBright} opacity="0.85"
+          style={isIdle ? { animation: `flameInner ${1.2 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.5}px` } : undefined}
+        />
       </g>
     )
   }
 
-  // Smaller flame for joints - same technique, smaller scale
+  // Smaller flame for joints - CSS animation based (performance optimized)
   const SmallFlame = ({ cx, cy, size = 0.6, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
-    const w = size * 12
-    const h = size * 16
-    const filterId = `${fireFilterId}S_${cx}_${cy}`
-    const gradId = `fireGradS_${suffix}${id}_${cx}_${cy}`
-
+    const w = size * 10
+    const h = size * 14
     return (
       <g transform={`translate(${cx - w/2}, ${cy - h})`}>
-        <defs>
-          <radialGradient id={gradId} cx="50%" cy="85%" r="55%" fx="50%" fy="80%">
-            <stop offset="0%" stopColor="#ffffaa" stopOpacity="0.85" />
-            <stop offset="30%" stopColor={WC3.roc.felBright} stopOpacity="0.8" />
-            <stop offset="60%" stopColor={WC3.roc.felMid} stopOpacity="0.7" />
-            <stop offset="100%" stopColor={WC3.roc.felDark} stopOpacity="0" />
-          </radialGradient>
-          <filter id={filterId} x="-50%" y="-50%" width="200%" height="200%">
-            <feTurbulence type="fractalNoise" baseFrequency="0.04 0.08" numOctaves="2" seed={delay * 3} result="noise">
-              {isIdle && <animate attributeName="baseFrequency" values="0.04 0.08;0.05 0.1;0.04 0.08" dur={`${1.5 + delay * 0.2}s`} repeatCount="indefinite" />}
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" in2="noise" scale={size * 6} xChannelSelector="R" yChannelSelector="G" />
-            <feGaussianBlur stdDeviation="0.8" />
-          </filter>
-        </defs>
-        <ellipse cx={w/2} cy={h * 0.65} rx={w * 0.4} ry={h * 0.5} fill={`url(#${gradId})`} filter={`url(#${filterId})`} />
+        {/* Outer glow */}
+        <ellipse
+          cx={w/2} cy={h * 0.6} rx={w * 0.45} ry={h * 0.45}
+          fill={WC3.roc.felDark} opacity="0.35"
+          style={isIdle ? { animation: `flameOuter ${1.6 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` } : undefined}
+        />
+        {/* Inner core */}
+        <ellipse
+          cx={w/2} cy={h * 0.55} rx={w * 0.25} ry={h * 0.35}
+          fill={WC3.roc.felMid} opacity="0.75"
+          style={isIdle ? { animation: `flameInner ${1.3 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` } : undefined}
+        />
       </g>
     )
   }
@@ -797,9 +788,9 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     }
   }, [])
 
-  // Rain drops falling - stormy battlefield, diagonal to right (optimized: 50 drops)
+  // Rain drops falling - stormy battlefield (optimized: 30 drops)
   const raindrops = useMemo(() =>
-    Array.from({ length: 50 }, (_, i) => ({
+    Array.from({ length: 30 }, (_, i) => ({
       id: i,
       x: Math.random() * 120 - 20,
       delay: Math.random() * -2,
@@ -811,20 +802,20 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
   return (
     <>
-      {/* GREEN-tinted stormy sky - matching WC3 RoC menu aesthetic */}
+      {/* GREEN-BROWN tinted stormy sky - matching WC3 RoC aesthetic */}
       <div style={{
         position: 'absolute',
         inset: 0,
         background: `linear-gradient(180deg,
-          #0a1a15 0%,
-          #0d2018 10%,
-          #0f2a1c 20%,
-          #123520 35%,
-          #154025 50%,
-          #123018 65%,
-          #0d2515 80%,
-          #081a10 90%,
-          #050f08 100%)`
+          #0a1812 0%,
+          #0d1f15 10%,
+          #102518 20%,
+          #152d1c 35%,
+          #1a3520 50%,
+          #182a1a 65%,
+          #152518 80%,
+          #101a12 90%,
+          #080f0a 100%)`
       }} />
 
       {/* === WC3 ROC MENU BACKGROUND - Grassy battlefield with war debris === */}
@@ -1004,25 +995,51 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
         {/* === GROUND PLANE - Single unified surface === */}
         <g>
-          {/* Main ground - gradient from mid to foreground */}
+          {/* Main ground - gradient with more brown */}
           <defs>
             <linearGradient id="groundGradient" x1="0%" y1="0%" x2="0%" y2="100%">
               <stop offset="0%" stopColor="#1a2518" />
-              <stop offset="40%" stopColor="#182015" />
-              <stop offset="100%" stopColor="#0d150f" />
+              <stop offset="40%" stopColor="#1a1f15" />
+              <stop offset="100%" stopColor="#12150f" />
+            </linearGradient>
+            {/* Dirt road gradient */}
+            <linearGradient id="dirtRoad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#2a2218" />
+              <stop offset="50%" stopColor="#252015" />
+              <stop offset="100%" stopColor="#1a1810" />
             </linearGradient>
           </defs>
           <ellipse cx="500" cy="750" rx="700" ry="200" fill="url(#groundGradient)" />
 
-          {/* Dirt and sand patches scattered across ground */}
-          <ellipse cx="120" cy="720" rx="50" ry="20" fill="url(#dirtPatch)" />
-          <ellipse cx="320" cy="740" rx="60" ry="25" fill="url(#sandPatch)" />
-          <ellipse cx="580" cy="710" rx="45" ry="18" fill="url(#dirtPatch)" />
-          <ellipse cx="750" cy="745" rx="55" ry="22" fill="url(#deadGrass)" />
-          <ellipse cx="900" cy="725" rx="50" ry="20" fill="url(#dirtPatch)" />
-          <ellipse cx="450" cy="760" rx="70" ry="28" fill="url(#sandPatch)" />
-          <ellipse cx="200" cy="770" rx="60" ry="22" fill="url(#deadGrass)" />
-          <ellipse cx="680" cy="780" rx="65" ry="25" fill="url(#dirtPatch)" />
+          {/* Dirt road/path running across mid-ground */}
+          <path
+            d="M-50,680 Q200,660 400,670 Q600,680 800,665 Q950,655 1050,670"
+            fill="none"
+            stroke="url(#dirtRoad)"
+            strokeWidth="45"
+            opacity="0.5"
+          />
+          <path
+            d="M-50,680 Q200,660 400,670 Q600,680 800,665 Q950,655 1050,670"
+            fill="none"
+            stroke="#2a2015"
+            strokeWidth="30"
+            opacity="0.3"
+          />
+
+          {/* Dirt and sand patches - more brown tones */}
+          <ellipse cx="120" cy="720" rx="55" ry="22" fill="#251a12" opacity="0.5" />
+          <ellipse cx="320" cy="740" rx="65" ry="28" fill="#2a2015" opacity="0.45" />
+          <ellipse cx="580" cy="710" rx="50" ry="20" fill="#252018" opacity="0.5" />
+          <ellipse cx="750" cy="745" rx="60" ry="25" fill="#1a1a12" opacity="0.4" />
+          <ellipse cx="900" cy="725" rx="55" ry="22" fill="#251a12" opacity="0.5" />
+          <ellipse cx="450" cy="760" rx="75" ry="30" fill="#2a2218" opacity="0.45" />
+          <ellipse cx="200" cy="770" rx="65" ry="25" fill="#1f1a10" opacity="0.4" />
+          <ellipse cx="680" cy="780" rx="70" ry="28" fill="#252015" opacity="0.45" />
+
+          {/* Rocky outcrops at edges */}
+          <polygon points="50,800 75,760 95,770 115,755 140,800" fill="#252220" opacity="0.5" />
+          <polygon points="880,795 905,755 925,765 945,750 970,795" fill="#252220" opacity="0.45" />
 
           {/* Grass is handled by the unified grass layer above */}
         </g>
@@ -1844,16 +1861,18 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         }}
       >
         <svg width="120" height="300" viewBox="0 0 120 300" style={{ overflow: 'visible' }}>
-          {/* Dirt mound at pole base */}
-          <ellipse cx="12" cy="282" rx="25" ry="10" fill="#3d3020" />
-          <ellipse cx="12" cy="280" rx="20" ry="8" fill="#4a3a28" />
-          <ellipse cx="12" cy="278" rx="12" ry="5" fill="#554535" />
+          {/* Dirt mound at pole base - matches battlefield green-brown */}
+          <ellipse cx="12" cy="282" rx="28" ry="12" fill="#1a2518" />
+          <ellipse cx="12" cy="280" rx="22" ry="9" fill="#253020" />
+          <ellipse cx="12" cy="278" rx="14" ry="6" fill="#2a3525" />
           {/* Small dirt clumps */}
-          <ellipse cx="-6" cy="285" rx="8" ry="4" fill="#3d3020" opacity="0.7" />
-          <ellipse cx="28" cy="287" rx="10" ry="5" fill="#3d3020" opacity="0.6" />
-          {/* Grass tufts */}
-          <path d="M-2,279 Q-4,269 0,265" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-          <path d="M24,281 Q28,271 25,267" stroke="#4a5a40" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <ellipse cx="-8" cy="286" rx="10" ry="5" fill="#1a2518" opacity="0.8" />
+          <ellipse cx="30" cy="288" rx="12" ry="6" fill="#1a2518" opacity="0.7" />
+          {/* Grass tufts around base */}
+          <path d="M-5,278 Q-8,268 -3,262" stroke="#354530" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <path d="M28,280 Q32,270 29,264" stroke="#3a4a38" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+          <path d="M-12,282 Q-15,274 -10,270" stroke="#2a3828" strokeWidth="1" fill="none" strokeLinecap="round" />
+          <path d="M35,284 Q38,276 35,272" stroke="#2a3828" strokeWidth="1" fill="none" strokeLinecap="round" />
 
           {/* Banner pole - Dark war totem with blood stains */}
           {/* Main pole - charred dark wood */}
@@ -3766,7 +3785,7 @@ export default function MedievalFantasyTheme() {
         {/* === RoC Art Divider: War Banner === */}
         <FadeInSection>
           <div style={{ margin: `${artDividerMargin} 0` }}>
-            <RoCArtDivider variant="weapons" scale={artDividerScale} />
+            <RoCArtDivider variant="alliance" scale={artDividerScale} />
           </div>
         </FadeInSection>
 
@@ -3882,6 +3901,22 @@ export default function MedievalFantasyTheme() {
               </section>
             )}
           </SectionWithOrnament>
+        </FadeInSection>
+
+        {/* Posts */}
+        <FadeInSection>
+          <section style={{ marginBottom: sectionSpacing }}>
+            <WC3Frame title="Posts" zone="ft">
+              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+                <p style={{ color: WC3.textMid, marginBottom: '0.5rem' }}>
+                  Writings and thoughts coming soon...
+                </p>
+                <p style={{ color: WC3.ft.iceMid, fontSize: '0.75rem', fontStyle: 'italic' }}>
+                  * Check back for updates on development, music, and martial arts
+                </p>
+              </div>
+            </WC3Frame>
+          </section>
         </FadeInSection>
 
         {/* === FT Art Divider: Ice Throne === */}
