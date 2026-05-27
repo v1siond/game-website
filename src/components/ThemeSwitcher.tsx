@@ -220,10 +220,11 @@ export default function ThemeSwitcher() {
           role="listbox"
           aria-label="Available themes"
           aria-activedescendant={focusedIndex >= 0 && flatThemeList[focusedIndex] ? `theme-${flatThemeList[focusedIndex].id}` : undefined}
-          className="fixed w-80 max-h-[70vh] overflow-y-auto"
+          className="absolute w-80 max-h-[70vh] overflow-y-auto"
           style={{
-            top: dropdownPosition.top,
-            right: dropdownPosition.right,
+            top: '100%',
+            right: 0,
+            marginTop: '8px',
             zIndex: 99999,
             backgroundColor: theme.colors.surface,
             border: `2px solid ${theme.colors.border}`,
