@@ -3545,67 +3545,65 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         <ellipse cx="100" cy="68" rx="18" ry="7" fill="#1a2535" />
         <ellipse cx="100" cy="68" rx="18" ry="7" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
 
-        {/* === ALEXANDER'S HEAD - DARKER UNDEAD SKIN === */}
-        <ellipse cx="100" cy="58" rx="10" ry="6" fill="url(#undeadSkin)" />
-        <ellipse cx="100" cy="40" rx="20" ry="24" fill="url(#undeadSkin)" />
+        {/* === ALEXANDER'S HEAD === */}
+        {/* Face base - skin tone */}
+        <ellipse cx="100" cy="48" rx="22" ry="26" fill="url(#undeadSkin)" />
 
-        {/* Short dark hair - cropped style */}
+        {/* HAIR + SIDEBURNS + BEARD - One connected piece framing the face */}
+        {/* This wraps around: top hair → sideburns → jaw beard */}
         <path
-          d="M80,35 Q80,18 100,16 Q120,18 120,35 L118,30 Q110,22 100,22 Q90,22 82,30 Z"
-          fill="#1a1515"
+          d="M78,20
+             Q75,12 85,8 Q100,4 115,8 Q125,12 122,20
+             L124,25 Q128,35 128,50
+             L128,55 Q128,70 124,85
+             Q120,100 100,110
+             Q80,100 76,85
+             Q72,70 72,55
+             L72,50 Q72,35 76,25 Z"
+          fill="#0a0808"
         />
-        {/* Hair texture lines */}
-        <path d="M85,28 Q90,24 95,26" stroke="#2a2525" strokeWidth="1" fill="none" opacity="0.6" />
-        <path d="M105,26 Q110,24 115,28" stroke="#2a2525" strokeWidth="1" fill="none" opacity="0.6" />
-        <path d="M92,22 Q100,19 108,22" stroke="#2a2525" strokeWidth="1" fill="none" opacity="0.5" />
+        {/* Face cutout - reveals skin underneath */}
+        <ellipse cx="100" cy="46" rx="18" ry="20" fill="url(#undeadSkin)" />
 
-        {/* Ears */}
-        <ellipse cx="80" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
-        <ellipse cx="120" cy="44" rx="4" ry="5" fill="url(#undeadSkin)" />
+        {/* Hair texture on top */}
+        <path d="M82,18 Q90,12 100,10 Q110,12 118,18" stroke="#1a1515" strokeWidth="2" fill="none" opacity="0.5" />
+        <path d="M85,14 Q95,10 105,10 Q115,14 118,16" stroke="#2a2222" strokeWidth="1" fill="none" opacity="0.4" />
+
+        {/* Sideburn texture */}
+        <path d="M76,40 L76,60" stroke="#1a1515" strokeWidth="1" fill="none" opacity="0.3" />
+        <path d="M124,40 L124,60" stroke="#1a1515" strokeWidth="1" fill="none" opacity="0.3" />
+
+        {/* Beard texture at bottom */}
+        <path d="M85,90 Q92,100 100,105" stroke="#1a1515" strokeWidth="2" fill="none" opacity="0.3" />
+        <path d="M115,90 Q108,100 100,105" stroke="#1a1515" strokeWidth="2" fill="none" opacity="0.3" />
+        <path d="M100,85 L100,105" stroke="#1a1515" strokeWidth="2" fill="none" opacity="0.3" />
+
+        {/* EYES */}
+        <ellipse cx="92" cy="42" rx="4" ry="3" fill="#1a1210" />
+        <ellipse cx="108" cy="42" rx="4" ry="3" fill="#1a1210" />
+        <ellipse cx="92" cy="42" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+          <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
+        </ellipse>
+        <ellipse cx="108" cy="42" rx="5" ry="4" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+          <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
+        </ellipse>
+
+        {/* Eyebrows */}
+        <path d="M86,38 Q92,36 96,38" stroke="#1a1515" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M104,38 Q108,36 114,38" stroke="#1a1515" strokeWidth="2" strokeLinecap="round" fill="none" />
 
         {/* NOSE */}
-        <path d="M100,45 L96,54 L104,54 Z" fill="#5a4a3a" />
+        <path d="M100,46 L97,54 L103,54 Z" fill="#5a4a3a" />
 
-        {/* MUSTACHE - below nose, above mouth */}
+        {/* MUSTACHE - connects to sideburns/beard on sides */}
         <path
-          d="M88,56 Q94,58 100,57 Q106,58 112,56 L110,60 Q100,62 90,60 Z"
+          d="M82,58 Q86,56 92,57 Q100,58 108,57 Q114,56 118,58
+             L116,62 Q108,64 100,63 Q92,64 84,62 Z"
           fill="#0a0808"
         />
 
-        {/* MOUTH - visible below mustache */}
-        <path d="M94,64 Q100,62 106,64" stroke="#4a3020" strokeWidth="2" strokeLinecap="round" fill="none" />
-
-        {/* BEARD - starts below mouth at chin, goes down */}
-        <path
-          d="M82,68
-             Q78,72 76,82
-             Q74,95 80,108
-             Q90,120 100,122
-             Q110,120 120,108
-             Q126,95 124,82
-             Q122,72 118,68
-             Q110,72 100,72
-             Q90,72 82,68 Z"
-          fill="#0a0808"
-        />
-        {/* Beard texture */}
-        <path d="M86,75 Q88,90 92,108" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.4" />
-        <path d="M100,74 Q100,95 100,115" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.4" />
-        <path d="M114,75 Q112,90 108,108" stroke="#1a1818" strokeWidth="2" fill="none" opacity="0.4" />
-
-        {/* EYES - dark ovals with ice glow */}
-        <ellipse cx="90" cy="42" rx="4.5" ry="3.5" fill="#1a1210" />
-        <ellipse cx="110" cy="42" rx="4.5" ry="3.5" fill="#1a1210" />
-        <ellipse cx="90" cy="42" rx="6.5" ry="5" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
-          <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="110" cy="42" rx="6.5" ry="5" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
-          <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
-        </ellipse>
-
-        {/* Angry eyebrows - dark */}
-        <path d="M82,35 L92,40" stroke="#1a1515" strokeWidth="3" strokeLinecap="round" />
-        <path d="M108,40 L118,35" stroke="#1a1515" strokeWidth="3" strokeLinecap="round" />
+        {/* MOUTH - visible gap between mustache and chin beard */}
+        <path d="M95,66 Q100,65 105,66" stroke="#4a3020" strokeWidth="1.5" strokeLinecap="round" fill="none" />
 
         {/* Frost breath */}
         <ellipse cx="110" cy="72" rx="12" ry="6" fill={WC3.ft.frostWhite} opacity="0.15" filter="url(#frostGlow)">
