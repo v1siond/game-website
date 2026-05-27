@@ -447,8 +447,6 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       {/* Shoulder cracks */}
       <path d="M15,40 L25,55 L20,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       <path d="M40,35 L35,55 L45,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
-      {/* Shoulder flame on top - layered */}
-      <FelFlame cx={25} cy={25} size={2.8} delay={6} />
 
       {/* ============ MASSIVE RIGHT SHOULDER ============ */}
       {/* Shoulder fire base - layered flame */}
@@ -463,8 +461,6 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
       {/* Shoulder cracks */}
       <path d="M145,40 L135,55 L140,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
       <path d="M120,35 L125,55 L115,70" stroke={WC3.roc.felMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
-      {/* Shoulder flame on top - layered */}
-      <FelFlame cx={135} cy={25} size={2.8} delay={8} />
 
       {/* ============ LEFT ARM - with idle sway ============ */}
       <g style={isIdle ? { animation: 'leftArmSway 6s ease-in-out infinite', transformOrigin: '25px 78px' } : {}}>
@@ -598,9 +594,6 @@ function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps)
         {/* Cheekbone cracks */}
         <path d="M58,35 L65,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
         <path d="M102,35 L95,40" stroke={WC3.roc.felDark} strokeWidth="1.5" fill="none" filter={`url(#${glowId}Inner)`} />
-
-        {/* ============ HEAD FLAME (top) - Layered flame tongues ============ */}
-        <FelFlame cx={80} cy={5} size={3.2} delay={12} />
       </g>
     </svg>
   )
@@ -2226,26 +2219,52 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             opacity: 1;
           }
         }
-        /* Infernal EMERGES from crater - grows upward from feet */
+        /* Infernal EMERGES from crater - assembles in chunks like WC3 */
         @keyframes infernalEmerge {
           0% {
-            transform: scaleY(0) scaleX(0.3);
+            transform: scaleY(0) scaleX(0.2);
             opacity: 0;
+            filter: brightness(2.5);
+          }
+          8% {
+            transform: scaleY(0.15) scaleX(0.4);
+            opacity: 0.4;
             filter: brightness(2);
           }
-          20% {
-            transform: scaleY(0.3) scaleX(0.6);
+          15% {
+            transform: scaleY(0.15) scaleX(0.4);
             opacity: 0.5;
             filter: brightness(1.8);
           }
-          50% {
-            transform: scaleY(0.7) scaleX(0.9);
-            opacity: 0.8;
-            filter: brightness(1.4);
+          25% {
+            transform: scaleY(0.35) scaleX(0.6);
+            opacity: 0.6;
+            filter: brightness(1.6);
           }
-          80% {
-            transform: scaleY(0.95) scaleX(1);
+          35% {
+            transform: scaleY(0.35) scaleX(0.6);
+            opacity: 0.7;
+            filter: brightness(1.5);
+          }
+          50% {
+            transform: scaleY(0.6) scaleX(0.8);
+            opacity: 0.8;
+            filter: brightness(1.3);
+          }
+          60% {
+            transform: scaleY(0.6) scaleX(0.8);
+            opacity: 0.85;
+            filter: brightness(1.2);
+          }
+          75% {
+            transform: scaleY(0.85) scaleX(0.95);
+            opacity: 0.9;
             filter: brightness(1.1);
+          }
+          85% {
+            transform: scaleY(0.85) scaleX(0.95);
+            opacity: 0.95;
+            filter: brightness(1.05);
           }
           100% {
             transform: scaleY(1) scaleX(1);
