@@ -22,9 +22,9 @@ import { WORK_EXPERIENCE } from '@/data/achievements'
 const WC3 = {
   // === REIGN OF CHAOS (demonic, war, plague) ===
   roc: {
-    skyTop: '#0a1208',
-    skyMid: '#0f1a10',
-    skyBot: '#152518',
+    skyTop: '#050805',
+    skyMid: '#081008',
+    skyBot: '#0c150c',
     felBright: '#66ff66',
     felMid: '#33cc33',
     felDark: '#1a8a1a',
@@ -32,6 +32,17 @@ const WC3 = {
     fireBright: '#ffaa44',
     fireMid: '#dd6622',
     fireCore: '#ffff88',
+    // Terrain - WC3 RoC style: olive-green grass, earthy ground
+    grassOlive: '#5a5a30',       // olive-green grass (main)
+    grassYellow: '#6a6535',      // yellowish green
+    grassDark: '#4a4a28',        // darker grass shadow
+    grassLight: '#7a7040',       // lighter grass highlights
+    groundGreen: '#1a2518',      // greenish ground (from flagpole)
+    groundMid: '#253020',        // mid-tone ground
+    groundDark: '#2a2518',       // darker areas
+    waterDark: '#1a2a30',        // puddle water
+    rockDistant: '#4a4a48',      // distant gray cliffs
+    rockSilhouette: '#2a2a28',   // very distant rock shapes
   },
 
   // === FROZEN THRONE (ice, frost, Northrend) ===
@@ -662,117 +673,58 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
   const [lightningActive, setLightningActive] = useState(false)
   const [lightningX, setLightningX] = useState(50)
   const [cloudGlow, setCloudGlow] = useState(0)
-  // Infernal phases: falling meteor → explosion → crater appears → creature rises → idle
-  const [infernals, setInfernals] = useState<Array<{
+  const [ambientFlash, setAmbientFlash] = useState(false)
+  const [ambientFlashX, setAmbientFlashX] = useState(30)
+  // Occasional falling meteor (every 8-15 seconds, like old golem spawn cadence)
+  const [fallingMeteor, setFallingMeteor] = useState<{
     id: number
-    x: string
-    landX: string
-    landY: string
-    side: 'left' | 'right'
-    scale: number
-    phase: 'falling' | 'explosion' | 'crater' | 'rising' | 'idle'
-  }>>([])
+    startX: number
+    direction: 'left' | 'right'
+    active: boolean
+  } | null>(null)
 
-  // Track infernal counts per side (max 1 left, 1 right = 2 total)
-  const leftCountRef = useRef(0)
-  const rightCountRef = useRef(0)
+  // Single idle golem on right side
+  const [rightGolemReady, setRightGolemReady] = useState(false)
 
   useEffect(() => {
-    let infernalId = 0
+    // Show right golem after a delay
+    const timer = setTimeout(() => setRightGolemReady(true), 3000)
+    return () => clearTimeout(timer)
+  }, [])
+
+  // Occasional meteor spawn (every 8-15 seconds)
+  useEffect(() => {
+    let meteorId = 0
     let isActive = true
     const timeouts: NodeJS.Timeout[] = []
 
-    const spawnInfernal = (newId: number, side: 'left' | 'right') => {
-      // Land positions with perspective:
-      // Left: foreground (larger, lower) - 20vw from left, 33vh from top, scale 1
-      // Right: background (smaller, higher) - 18vw from right, 24vh from top, scale 0.7
-      const landX = side === 'left' ? '20vw' : 'calc(100vw - 18vw)'
-      const landY = side === 'left' ? '33vh' : '24vh'
-      const scale = side === 'left' ? 1 : 0.7
-
-      setInfernals(prev => [...prev, { id: newId, x: landX, landX, landY, side, scale, phase: 'falling' }])
-
-      // Phase timeline: falling(0-4s) → explosion(4-4.6s) → crater(4.6-5s) → rising(5-6s) → idle
-      timeouts.push(setTimeout(() => {
-        if (!isActive) return
-        setInfernals(prev => prev.map(inf =>
-          inf.id === newId ? { ...inf, phase: 'explosion' } : inf
-        ))
-      }, 4000))
-
-      timeouts.push(setTimeout(() => {
-        if (!isActive) return
-        setInfernals(prev => prev.map(inf =>
-          inf.id === newId ? { ...inf, phase: 'crater' } : inf
-        ))
-      }, 4600))
-
-      timeouts.push(setTimeout(() => {
-        if (!isActive) return
-        setInfernals(prev => prev.map(inf =>
-          inf.id === newId ? { ...inf, phase: 'rising' } : inf
-        ))
-      }, 5000))
-
-      timeouts.push(setTimeout(() => {
-        if (!isActive) return
-        setInfernals(prev => prev.map(inf =>
-          inf.id === newId ? { ...inf, phase: 'idle' } : inf
-        ))
-      }, 6000))
-    }
-
-    const triggerLightningStorm = () => {
+    const spawnMeteor = () => {
       if (!isActive) return
+      const id = meteorId++
+      const startX = 15 + Math.random() * 70
+      const direction = Math.random() > 0.5 ? 'left' : 'right'
 
-      const canSpawnLeft = leftCountRef.current < 1
-      const canSpawnRight = rightCountRef.current < 1
+      setFallingMeteor({ id, startX, direction: direction as 'left' | 'right', active: true })
 
-      if (!canSpawnLeft && !canSpawnRight) return
-
-      let side: 'left' | 'right'
-      if (canSpawnLeft && canSpawnRight) {
-        side = Math.random() > 0.6 ? 'left' : 'right'
-      } else if (canSpawnLeft) {
-        side = 'left'
-      } else {
-        side = 'right'
-      }
-
-      const lightX = 20 + Math.random() * 60
-      setLightningX(lightX)
-      setLightningActive(true)
-      setCloudGlow(1)
-
-      timeouts.push(setTimeout(() => setCloudGlow(0.6), 100))
-      timeouts.push(setTimeout(() => setCloudGlow(0.25), 200))
-      timeouts.push(setTimeout(() => {
-        setLightningActive(false)
-        setCloudGlow(0)
-      }, 400))
-
+      // Clear meteor after animation (4s)
       timeouts.push(setTimeout(() => {
         if (!isActive) return
-        if (side === 'left' && leftCountRef.current >= 2) return
-        if (side === 'right' && rightCountRef.current >= 1) return
-
-        if (side === 'left') leftCountRef.current++
-        else rightCountRef.current++
-
-        spawnInfernal(infernalId++, side)
-      }, 200))
+        setFallingMeteor(null)
+      }, 4000))
     }
 
     const scheduleNext = () => {
       if (!isActive) return
-      const delay = 6000 + Math.random() * 8000
+      // Every 8-15 seconds (like old golem cadence)
+      const delay = 8000 + Math.random() * 7000
       timeouts.push(setTimeout(() => {
-        triggerLightningStorm()
+        spawnMeteor()
         scheduleNext()
       }, delay))
     }
 
-    timeouts.push(setTimeout(triggerLightningStorm, 1500))
+    // First meteor after 2 seconds
+    timeouts.push(setTimeout(spawnMeteor, 2000))
     scheduleNext()
 
     return () => {
@@ -781,14 +733,70 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     }
   }, [])
 
-  // Rain drops falling - stormy battlefield (optimized: 30 drops)
+  // Ambient thunder flashes - more frequent, just cloud illumination (no infernals)
+  useEffect(() => {
+    let isActive = true
+    const timeouts: NodeJS.Timeout[] = []
+
+    const triggerAmbientFlash = () => {
+      if (!isActive) return
+
+      // Random position in clouds
+      const flashX = 15 + Math.random() * 70
+      setAmbientFlashX(flashX)
+      setAmbientFlash(true)
+
+      // Quick double-flash effect (realistic lightning flicker)
+      timeouts.push(setTimeout(() => setAmbientFlash(false), 80))
+      timeouts.push(setTimeout(() => setAmbientFlash(true), 120))
+      timeouts.push(setTimeout(() => setAmbientFlash(false), 200))
+      // Sometimes triple flash
+      if (Math.random() > 0.5) {
+        timeouts.push(setTimeout(() => setAmbientFlash(true), 280))
+        timeouts.push(setTimeout(() => setAmbientFlash(false), 350))
+      }
+    }
+
+    const scheduleAmbientFlash = () => {
+      if (!isActive) return
+      // Flash every 2-5 seconds for frequent storm effect
+      const delay = 2000 + Math.random() * 3000
+      timeouts.push(setTimeout(() => {
+        triggerAmbientFlash()
+        scheduleAmbientFlash()
+      }, delay))
+    }
+
+    // Start after a short delay
+    timeouts.push(setTimeout(scheduleAmbientFlash, 800))
+
+    return () => {
+      isActive = false
+      timeouts.forEach(t => clearTimeout(t))
+    }
+  }, [])
+
+  // Rain drops - longer animation cycles = fewer repaints = better performance
   const raindrops = useMemo(() =>
-    Array.from({ length: 30 }, (_, i) => ({
+    Array.from({ length: 25 }, (_, i) => ({
       id: i,
-      x: Math.random() * 120 - 20,
-      delay: Math.random() * -2,
-      duration: 0.6 + Math.random() * 0.3,
-      length: 20 + Math.random() * 25,
+      x: Math.random() * 130 - 15,
+      delay: Math.random() * -4,
+      duration: 2.5 + Math.random() * 1.5, // 2.5-4s (was 0.6-0.9s) - much fewer repaints
+      length: 25 + Math.random() * 30,
+    })),
+    []
+  )
+
+  // Wind streaks for stormy rain effect (like Frozen Throne snow has)
+  const rainWindStreaks = useMemo(() =>
+    Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      y: 10 + Math.random() * 70,
+      delay: Math.random() * -6,
+      duration: 2 + Math.random() * 1.5,
+      length: 100 + Math.random() * 150,
+      thickness: 1 + Math.random() * 0.5,
     })),
     []
   )
@@ -884,73 +892,105 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           </linearGradient>
         </defs>
 
-        {/* === DARK STORM CLOUDS at top === */}
-        <g opacity="0.8">
-          <ellipse cx="200" cy="80" rx="300" ry="120" fill="#0a1810" />
-          <ellipse cx="500" cy="60" rx="350" ry="100" fill="#081510" />
-          <ellipse cx="800" cy="90" rx="280" ry="110" fill="#0a1810" />
-          <ellipse cx="350" cy="150" rx="200" ry="80" fill="#0d1a12" />
-          <ellipse cx="700" cy="140" rx="220" ry="85" fill="#0d1a12" />
+        {/* === DENSE STORM CLOUDS - Top 15-20% only === */}
+        <g opacity="0.95">
+          {/* Dense cloud bank - concentrated at very top */}
+          <ellipse cx="150" cy="20" rx="250" ry="50" fill="#030603" />
+          <ellipse cx="400" cy="15" rx="300" ry="45" fill="#020502" />
+          <ellipse cx="700" cy="25" rx="280" ry="55" fill="#030603" />
+          <ellipse cx="950" cy="18" rx="220" ry="48" fill="#020502" />
+          {/* Second layer - slightly lower */}
+          <ellipse cx="80" cy="55" rx="180" ry="40" fill="#040804" />
+          <ellipse cx="300" cy="48" rx="200" ry="42" fill="#050a05" />
+          <ellipse cx="550" cy="52" rx="220" ry="45" fill="#040804" />
+          <ellipse cx="800" cy="50" rx="190" ry="40" fill="#050a05" />
+          {/* Bottom edge - wispy, max ~120px from top (12% of 1000) */}
+          <ellipse cx="200" cy="85" rx="140" ry="30" fill="#060b06" opacity="0.7" />
+          <ellipse cx="500" cy="80" rx="180" ry="35" fill="#050a05" opacity="0.6" />
+          <ellipse cx="750" cy="90" rx="150" ry="28" fill="#060b06" opacity="0.5" />
         </g>
 
-        {/* === FAR LAYER - Ruined stone structures silhouettes === */}
-        <g filter="url(#rocDistantBlur)" opacity="0.5">
-          {/* Ruined tower left */}
-          <g transform="translate(80, 200)">
-            <polygon points="0,200 30,80 60,120 90,40 120,100 150,200" fill="#1a2518" />
-            <rect x="55" y="60" width="30" height="50" fill="#152015" />
-          </g>
-          {/* Ruined wall center */}
-          <polygon points="350,350 400,250 450,280 500,200 550,260 600,230 650,350" fill="#182318" />
-          {/* Ruined fortress right */}
-          <g transform="translate(750, 220)">
-            <polygon points="0,180 40,70 80,110 120,30 160,90 200,180" fill="#1a2518" />
-            <polygon points="100,50 120,30 140,45" fill="#253020" opacity="0.5" />
-          </g>
+        {/* === DISTANT ROCKY CLIFF SILHOUETTE - Gray, far background === */}
+        <g filter="url(#rocDistantBlur)" opacity="0.7">
+          {/* Main cliff shape - like WC3 reference */}
+          <path d="M550,180 L600,120 L650,140 L720,80 L780,110 L850,90 L920,130 L1000,100 L1000,350 L550,350 Z" fill={WC3.roc.rockSilhouette} />
+          <path d="M600,150 L640,130 L680,145 L720,100 L750,120" stroke={WC3.roc.rockDistant} strokeWidth="3" fill="none" opacity="0.4" />
         </g>
 
-        {/* === DISTANT TERRAIN - Single unified ground layer === */}
-        <g filter="url(#rocDistantBlur)" opacity="0.35">
-          <ellipse cx="500" cy="500" rx="600" ry="200" fill="#182518" />
-        </g>
+        {/* === ATMOSPHERIC FOG LAYER - Creates depth === */}
+        <rect x="0" y="150" width="1000" height="200" fill="url(#rocGroundFade)" opacity="0.5" />
 
-        {/* === GRASS TEXTURE - Optimized: 200 blades, only 15 animated === */}
+        {/* === GREENISH EARTHY GROUND - Like flagpole dirt === */}
         <g>
-          {Array.from({ length: 200 }, (_, i) => {
-            // Distribute across width and height - 10 rows of 20
-            const row = Math.floor(i / 20)
-            const col = i % 20
+          {/* Main ground plane - greenish earth tones */}
+          <ellipse cx="500" cy="650" rx="700" ry="280" fill={WC3.roc.groundDark} />
+          <ellipse cx="500" cy="700" rx="650" ry="250" fill={WC3.roc.groundGreen} opacity="0.9" />
+          <ellipse cx="500" cy="720" rx="600" ry="220" fill={WC3.roc.groundMid} opacity="0.7" />
+          {/* Ground variation patches */}
+          <ellipse cx="200" cy="550" rx="120" ry="50" fill={WC3.roc.groundDark} opacity="0.6" />
+          <ellipse cx="600" cy="520" rx="150" ry="60" fill={WC3.roc.groundGreen} opacity="0.5" />
+          <ellipse cx="850" cy="580" rx="100" ry="45" fill={WC3.roc.groundMid} opacity="0.5" />
+        </g>
 
-            // X position with pseudo-random offset
-            const x = 10 + col * 50 + ((i * 17) % 25) - 12
+        {/* === WATER PUDDLES - Reflective dark areas === */}
+        <g>
+          <ellipse cx="150" cy="720" rx="100" ry="40" fill={WC3.roc.waterDark} opacity="0.7" />
+          <ellipse cx="155" cy="715" rx="70" ry="25" fill="#253540" opacity="0.5" />
+          <ellipse cx="400" cy="680" rx="80" ry="35" fill={WC3.roc.waterDark} opacity="0.6" />
+        </g>
 
-            // Y position - spans from 400 to 840
-            const baseY = 400 + row * 44 + ((i * 23) % 20)
+        {/* === OLIVE-GREEN GRASS - WC3 Style, clustered naturally === */}
+        <g>
+          {Array.from({ length: 250 }, (_, i) => {
+            // Create natural clusters - grass grows in clumps
+            const clusterIndex = Math.floor(i / 5) // 50 clusters of 5 blades
+            const bladeInCluster = i % 5
 
-            // Perspective: blades get taller toward bottom
-            const perspectiveFactor = Math.max(0, (baseY - 400) / 440)
-            const height = 8 + perspectiveFactor * 18 + ((i * 7) % 6)
-            const strokeW = 0.8 + perspectiveFactor * 1.4
-            const opacity = 0.25 + perspectiveFactor * 0.55
+            // Base cluster positions spread across foreground
+            const clusterX = 30 + (clusterIndex % 25) * 38 + ((clusterIndex * 17) % 30)
+            const clusterY = 620 + Math.floor(clusterIndex / 25) * 45 + ((clusterIndex * 13) % 35)
 
-            // Curve direction
-            const curve = ((i % 11) - 5) * (1.5 + perspectiveFactor * 2)
+            // Individual blade offset from cluster center
+            const x = clusterX + (bladeInCluster - 2) * 4 + ((i * 7) % 5)
+            const baseY = clusterY + ((bladeInCluster * 3) % 8)
 
-            // Color by depth
-            const colors = perspectiveFactor < 0.4
-              ? ['#283225', '#2a3828']
-              : perspectiveFactor < 0.7
-                ? ['#354530', '#3a4a38']
-                : ['#455540', '#4a5a45']
-            const color = colors[i % 2]
+            // Perspective factor for size
+            const perspectiveFactor = Math.max(0, (baseY - 600) / 250)
 
-            // Only animate 15 blades in foreground (performance optimization)
-            const animated = i % 14 === 0 && perspectiveFactor > 0.6
+            // Taller grass in foreground, varied heights within cluster
+            const baseHeight = 30 + perspectiveFactor * 50
+            const heightVariation = ((bladeInCluster * 7 + i * 3) % 20) - 10
+            const height = baseHeight + heightVariation
+
+            // Stroke width - thinner far, thicker near
+            const strokeW = 1.0 + perspectiveFactor * 1.5 + ((bladeInCluster % 2) * 0.3)
+
+            // Opacity - fainter far, stronger near
+            const opacity = 0.45 + perspectiveFactor * 0.45
+
+            // Natural curve - all blades in cluster curve similarly (wind)
+            const windDirection = ((clusterIndex % 3) - 1) * 0.6
+            const baseCurve = windDirection * (5 + perspectiveFactor * 8)
+            const bladeCurve = baseCurve + ((bladeInCluster - 2) * 2)
+
+            // OLIVE-GREEN grass colors (like WC3 reference)
+            const colors = [
+              WC3.roc.grassOlive,    // #5a5a30 - main olive
+              WC3.roc.grassYellow,   // #6a6535 - yellowish
+              WC3.roc.grassDark,     // #4a4a28 - darker
+              WC3.roc.grassLight,    // #7a7040 - highlights
+              '#555530',             // mid olive
+              '#656535',             // yellow-olive
+            ]
+            const color = colors[(i + bladeInCluster) % 6]
+
+            // Animate some foreground blades
+            const animated = bladeInCluster === 2 && perspectiveFactor > 0.6 && clusterIndex % 4 === 0
 
             return (
               <path
                 key={`grass${i}`}
-                d={`M${x},${baseY} Q${x + curve},${baseY - height * 0.5} ${x + curve * 0.4},${baseY - height}`}
+                d={`M${x},${baseY} Q${x + bladeCurve * 0.7},${baseY - height * 0.55} ${x + bladeCurve},${baseY - height}`}
                 stroke={color}
                 strokeWidth={strokeW}
                 fill="none"
@@ -958,83 +998,58 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 opacity={opacity}
                 style={animated ? {
                   transformOrigin: `${x}px ${baseY}px`,
-                  animation: `grassBlade ${2.5 + (i % 3) * 0.4}s ease-in-out infinite`,
+                  animation: `grassBlade ${2.0 + (clusterIndex % 3) * 0.4}s ease-in-out infinite`,
                 } : undefined}
               />
             )
           })}
         </g>
 
-        {/* === MID LAYER - Stone pillars, broken walls === */}
-        <g filter="url(#rocMidBlur)" opacity="0.6">
-          {/* Stone pillar left */}
-          <g transform="translate(120, 320)">
-            <rect x="0" y="0" width="40" height="180" fill="#2a3528" />
-            <rect x="5" y="0" width="30" height="180" fill="#354530" />
-            <polygon points="0,0 20,-30 40,0" fill="#2a3528" />
+        {/* === CATTAILS/REEDS near water (like WC3) === */}
+        <g>
+          {[90, 120, 155, 190, 370, 400, 440].map((x, i) => (
+            <g key={`reed${i}`}>
+              {/* Stem */}
+              <path
+                d={`M${x},${740 - i * 6} Q${x + 1},${700 - i * 6} ${x + 2},${660 - i * 8}`}
+                stroke="#3a3520"
+                strokeWidth="2.5"
+                fill="none"
+              />
+              {/* Brown bulrush head */}
+              <ellipse cx={x + 2} cy={652 - i * 10} rx="4" ry="12" fill="#2a1a10" />
+              <ellipse cx={x + 2} cy={650 - i * 10} rx="3" ry="10" fill="#3a2a18" />
+            </g>
+          ))}
+        </g>
+
+        {/* === MID-GROUND ELEMENTS === */}
+        <g filter="url(#rocMidBlur)" opacity="0.7">
+          {/* Broken wooden structure left (like WC3 banner frame) */}
+          <g transform="translate(280, 380)">
+            <rect x="0" y="0" width="8" height="120" fill="#3a2815" transform="rotate(-8)" />
+            <rect x="60" y="-20" width="6" height="100" fill="#2a1a0a" transform="rotate(12)" />
+            <rect x="-10" y="40" width="80" height="6" fill="#3a2815" transform="rotate(-5)" />
           </g>
-          {/* Broken wall segment center-left */}
-          <polygon points="280,500 320,380 360,420 400,350 440,400 480,500" fill="#253020" />
-          {/* Stone pillar center-right */}
-          <g transform="translate(650, 350)">
-            <rect x="0" y="0" width="35" height="150" fill="#2a3528" />
-            <polygon points="0,0 17,-25 35,0" fill="#2a3528" />
-          </g>
-          {/* Broken arch right */}
-          <g transform="translate(800, 380)">
-            <polygon points="0,120 20,40 50,60 80,20 110,50 140,120" fill="#253020" />
+          {/* Distant sword in ground */}
+          <g transform="translate(520, 420)">
+            <rect x="0" y="0" width="4" height="50" fill="#5a5a55" transform="rotate(-10)" />
+            <rect x="-8" y="45" width="20" height="4" fill="#4a4a45" />
           </g>
         </g>
 
-        {/* === GROUND PLANE - Single unified surface === */}
-        <g>
-          {/* Main ground - gradient with more brown */}
-          <defs>
-            <linearGradient id="groundGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#1a2518" />
-              <stop offset="40%" stopColor="#1a1f15" />
-              <stop offset="100%" stopColor="#12150f" />
-            </linearGradient>
-            {/* Dirt road gradient */}
-            <linearGradient id="dirtRoad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#2a2218" />
-              <stop offset="50%" stopColor="#252015" />
-              <stop offset="100%" stopColor="#1a1810" />
-            </linearGradient>
-          </defs>
-          <ellipse cx="500" cy="750" rx="700" ry="200" fill="url(#groundGradient)" />
+        {/* === FOREGROUND ROCKS - Small, warmer brown === */}
+        <g opacity="0.8">
+          <polygon points="50,780 70,755 95,770 110,780" fill="#4a4035" />
+          <polygon points="900,770 920,745 945,760 960,775" fill="#4a4035" />
+          <polygon points="300,800 325,775 350,785" fill="#3a3025" opacity="0.7" />
+        </g>
 
-          {/* Dirt road/path running across mid-ground */}
-          <path
-            d="M-50,680 Q200,660 400,670 Q600,680 800,665 Q950,655 1050,670"
-            fill="none"
-            stroke="url(#dirtRoad)"
-            strokeWidth="45"
-            opacity="0.5"
-          />
-          <path
-            d="M-50,680 Q200,660 400,670 Q600,680 800,665 Q950,655 1050,670"
-            fill="none"
-            stroke="#2a2015"
-            strokeWidth="30"
-            opacity="0.3"
-          />
-
-          {/* Dirt and sand patches - more brown tones */}
-          <ellipse cx="120" cy="720" rx="55" ry="22" fill="#251a12" opacity="0.5" />
-          <ellipse cx="320" cy="740" rx="65" ry="28" fill="#2a2015" opacity="0.45" />
-          <ellipse cx="580" cy="710" rx="50" ry="20" fill="#252018" opacity="0.5" />
-          <ellipse cx="750" cy="745" rx="60" ry="25" fill="#1a1a12" opacity="0.4" />
-          <ellipse cx="900" cy="725" rx="55" ry="22" fill="#251a12" opacity="0.5" />
-          <ellipse cx="450" cy="760" rx="75" ry="30" fill="#2a2218" opacity="0.45" />
-          <ellipse cx="200" cy="770" rx="65" ry="25" fill="#1f1a10" opacity="0.4" />
-          <ellipse cx="680" cy="780" rx="70" ry="28" fill="#252015" opacity="0.45" />
-
-          {/* Rocky outcrops at edges */}
-          <polygon points="50,800 75,760 95,770 115,755 140,800" fill="#252220" opacity="0.5" />
-          <polygon points="880,795 905,755 925,765 945,750 970,795" fill="#252220" opacity="0.45" />
-
-          {/* Grass is handled by the unified grass layer above */}
+        {/* === MID LAYER - Remaining stone pillar === */}
+        <g filter="url(#rocMidBlur)" opacity="0.5">
+          <g transform="translate(650, 380)">
+            <rect x="0" y="0" width="30" height="100" fill={WC3.roc.rockDistant} />
+          </g>
         </g>
 
         {/* === WAR DEBRIS - Weapons and items scattered on battlefield === */}
@@ -1384,14 +1399,14 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
         pointerEvents: 'none',
       }} />
 
-      {/* Volumetric storm clouds - green-tinted */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '45%' }} viewBox="0 0 1000 450" preserveAspectRatio="none">
+      {/* Volumetric storm clouds - DENSE, top 18% only */}
+      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '18%' }} viewBox="0 0 1000 180" preserveAspectRatio="none">
         <defs>
           <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="15" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" />
           </filter>
           <filter id="cloudBlurLight" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="8" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="5" />
           </filter>
           <radialGradient id="cloudCore" cx="50%" cy="40%" r="60%">
             <stop offset="0%" stopColor="#1a2518" />
@@ -1399,430 +1414,282 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             <stop offset="100%" stopColor="#05100a" />
           </radialGradient>
         </defs>
-        {/* Far clouds - massive storm wall */}
-        <g filter="url(#cloudBlur)" opacity="0.6">
-          <ellipse cx="150" cy="100" rx="300" ry="120" fill="#0a1510" />
-          <ellipse cx="500" cy="80" rx="400" ry="150" fill="#0d1a12" />
-          <ellipse cx="850" cy="110" rx="320" ry="130" fill="#0a1510" />
+        {/* Dense cloud bank - concentrated at top */}
+        <g filter="url(#cloudBlur)" opacity="0.85">
+          <ellipse cx="100" cy="40" rx="200" ry="60" fill="#030603" />
+          <ellipse cx="350" cy="30" rx="250" ry="55" fill="#020502" />
+          <ellipse cx="600" cy="35" rx="280" ry="65" fill="#030603" />
+          <ellipse cx="850" cy="40" rx="220" ry="55" fill="#020502" />
         </g>
-        {/* Mid clouds - storm core */}
-        <g filter="url(#cloudBlurLight)" opacity="0.8">
-          <ellipse cx="200" cy="180" rx="250" ry="90" fill="url(#cloudCore)" />
-          <ellipse cx="480" cy="150" rx="320" ry="110" fill="url(#cloudCore)" />
-          <ellipse cx="780" cy="190" rx="280" ry="95" fill="url(#cloudCore)" />
+        {/* Secondary layer */}
+        <g filter="url(#cloudBlurLight)" opacity="0.9">
+          <ellipse cx="200" cy="70" rx="180" ry="45" fill="url(#cloudCore)" />
+          <ellipse cx="450" cy="65" rx="200" ry="50" fill="url(#cloudCore)" />
+          <ellipse cx="700" cy="72" rx="190" ry="48" fill="url(#cloudCore)" />
+          <ellipse cx="950" cy="68" rx="170" ry="45" fill="url(#cloudCore)" />
         </g>
-        {/* Front detail clouds */}
-        <g opacity="0.5">
-          <ellipse cx="100" cy="280" rx="150" ry="50" fill="#0d180d" />
-          <ellipse cx="350" cy="250" rx="180" ry="60" fill="#0a150a" />
-          <ellipse cx="600" cy="270" rx="200" ry="55" fill="#0d180d" />
-          <ellipse cx="880" cy="260" rx="160" ry="50" fill="#0a150a" />
+        {/* Bottom edge - wispy */}
+        <g opacity="0.6">
+          <ellipse cx="150" cy="110" rx="120" ry="35" fill="#060b06" />
+          <ellipse cx="400" cy="105" rx="140" ry="38" fill="#050a05" />
+          <ellipse cx="650" cy="115" rx="130" ry="35" fill="#060b06" />
+          <ellipse cx="900" cy="108" rx="120" ry="32" fill="#050a05" />
         </g>
-        {/* Wispy tendrils */}
-        <g opacity="0.25">
-          <path d="M0,320 Q150,300 300,330 Q450,310 500,340" stroke="#1a2515" strokeWidth="20" fill="none" />
-          <path d="M500,310 Q650,330 800,300 Q900,320 1000,310" stroke="#1a2515" strokeWidth="15" fill="none" />
+        {/* Wisps trailing down */}
+        <g opacity="0.35">
+          <ellipse cx="250" cy="145" rx="80" ry="25" fill="#081008" />
+          <ellipse cx="550" cy="140" rx="100" ry="28" fill="#071007" />
+          <ellipse cx="800" cy="150" rx="90" ry="25" fill="#081008" />
         </g>
       </svg>
 
-      {/* Cloud glow when lightning strikes - white/pale blue */}
+      {/* Stormy cloud glow - FEL GREEN atmospheric lighting */}
       <div style={{
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
-        height: '50%',
-        background: `radial-gradient(ellipse at ${lightningX}% 35%, #ddffff${Math.floor(cloudGlow * 50).toString(16).padStart(2, '0')} 0%, #aaddee${Math.floor(cloudGlow * 25).toString(16).padStart(2, '0')} 25%, transparent 60%)`,
-        transition: 'background 0.15s ease',
+        height: '20%',
         pointerEvents: 'none',
-      }} />
+      }}>
+        {/* Base green storm glow - always visible, subtle */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '100%',
+          background: `
+            radial-gradient(ellipse at 20% 30%, ${WC3.roc.felMid}18 0%, transparent 50%),
+            radial-gradient(ellipse at 50% 25%, ${WC3.roc.felBright}10 0%, transparent 45%),
+            radial-gradient(ellipse at 80% 35%, ${WC3.roc.felMid}15 0%, transparent 55%)
+          `,
+        }} />
 
-      {/* Lightning bolt - natural storm lightning */}
-      {lightningActive && (
-        <svg
+        {/* === THUNDER FLASH - Dramatic cloud illumination (infernal spawn) === */}
+        {lightningActive && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '100%',
+            background: `
+              radial-gradient(ellipse at ${lightningX}% 25%, ${WC3.roc.felBright}95 0%, ${WC3.roc.felBright}60 15%, ${WC3.roc.felMid}35 35%, transparent 60%),
+              radial-gradient(ellipse at ${lightningX + 10}% 40%, ${WC3.roc.felBright}70 0%, ${WC3.roc.felMid}40 25%, transparent 50%),
+              radial-gradient(ellipse at ${lightningX - 15}% 35%, ${WC3.roc.felMid}55 0%, transparent 40%)
+            `,
+            animation: 'thunderFlash 0.15s ease-out',
+          }} />
+        )}
+
+        {/* === AMBIENT THUNDER FLASH - Frequent cloud flickers === */}
+        {ambientFlash && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '100%',
+            background: `
+              radial-gradient(ellipse at ${ambientFlashX}% 30%, ${WC3.roc.felBright}80 0%, ${WC3.roc.felBright}45 20%, ${WC3.roc.felMid}25 40%, transparent 65%),
+              radial-gradient(ellipse at ${ambientFlashX + 20}% 45%, ${WC3.roc.felMid}50 0%, transparent 45%),
+              radial-gradient(ellipse at ${ambientFlashX - 10}% 25%, ${WC3.roc.felBright}35 0%, transparent 35%)
+            `,
+            transition: 'opacity 0.05s ease-out',
+          }} />
+        )}
+
+        {/* Pulsing storm glow - subtle ambient with cloudGlow intensity */}
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '100%',
+          background: `
+            radial-gradient(ellipse at ${lightningX}% 30%, ${WC3.roc.felBright}${Math.floor(cloudGlow * 40).toString(16).padStart(2, '0')} 0%, ${WC3.roc.felMid}${Math.floor(cloudGlow * 22).toString(16).padStart(2, '0')} 30%, transparent 55%),
+            radial-gradient(ellipse at ${100 - lightningX}% 40%, ${WC3.roc.felMid}${Math.floor(cloudGlow * 25).toString(16).padStart(2, '0')} 0%, transparent 40%)
+          `,
+          transition: 'background 0.2s ease',
+        }} />
+
+        {/* Cloud underlighting - ambient glow within clouds */}
+        <div style={{
+          position: 'absolute',
+          top: '15%',
+          left: 0,
+          right: 0,
+          height: '40%',
+          background: `
+            radial-gradient(ellipse at 15% 60%, ${WC3.roc.felBright}15 0%, transparent 35%),
+            radial-gradient(ellipse at 45% 50%, ${WC3.roc.felMid}18 0%, transparent 40%),
+            radial-gradient(ellipse at 75% 55%, ${WC3.roc.felBright}12 0%, transparent 30%),
+            radial-gradient(ellipse at 90% 65%, ${WC3.roc.felMid}15 0%, transparent 35%)
+          `,
+          animation: 'stormPulse 6s ease-in-out infinite',
+        }} />
+
+        {/* Secondary flash echo - follows main flash */}
+        {lightningActive && (
+          <div style={{
+            position: 'absolute',
+            top: '10%',
+            left: 0,
+            right: 0,
+            height: '50%',
+            background: `
+              radial-gradient(ellipse at ${100 - lightningX}% 50%, ${WC3.roc.felBright}40 0%, transparent 45%)
+            `,
+            animation: 'thunderFlash 0.2s ease-out 0.08s',
+            opacity: 0.6,
+          }} />
+        )}
+      </div>
+
+      <style>{`
+        @keyframes stormPulse {
+          0%, 100% { opacity: 0.5; }
+          30% { opacity: 0.8; }
+          60% { opacity: 0.4; }
+          80% { opacity: 0.7; }
+        }
+        @keyframes thunderFlash {
+          0% { opacity: 1; }
+          30% { opacity: 0.9; }
+          60% { opacity: 0.4; }
+          100% { opacity: 0; }
+        }
+      `}</style>
+
+      {/* === OCCASIONAL FALLING METEOR - Every 8-15 seconds === */}
+      {fallingMeteor && fallingMeteor.active && (
+        <div
+          key={`meteor-${fallingMeteor.id}`}
           style={{
             position: 'absolute',
-            top: '8%',
-            left: `${lightningX - 4}%`,
-            width: '8%',
-            height: '45%',
-            opacity: 0.85,
-            filter: 'drop-shadow(0 0 15px #ccffff) drop-shadow(0 0 30px #88ccdd)',
+            left: `${fallingMeteor.startX}%`,
+            top: '-5%',
+            width: '25px',
+            height: '25px',
+            animation: `meteorRain${fallingMeteor.direction === 'left' ? 'Left' : 'Right'} 4s ease-in forwards`,
+            zIndex: 4,
+            pointerEvents: 'none',
           }}
-          viewBox="0 0 80 450"
         >
-          <path
-            d="M40 0 L35 70 L55 80 L30 160 L48 170 L22 270 L42 280 L15 380 L50 290 L32 280 L58 180 L40 170 L65 90 L45 80 Z"
-            fill="#ddffff"
-          />
-          <path
-            d="M40 5 L37 65 L52 75 L32 150 L47 160 L26 250 L44 260 L22 360 L48 275 L34 268 L56 172 L42 165 L62 88 L46 82 Z"
-            fill="#ffffff"
-            opacity="0.7"
-          />
-        </svg>
+          {/* Meteor glow */}
+          <div style={{
+            position: 'absolute',
+            width: '70px',
+            height: '70px',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            borderRadius: '50%',
+            background: `radial-gradient(circle, ${WC3.roc.felBright}60 0%, ${WC3.roc.felMid}35 35%, ${WC3.roc.felDark}20 60%, transparent 80%)`,
+            filter: 'blur(8px)',
+          }} />
+          {/* Meteor body */}
+          <svg width="25" height="25" viewBox="0 0 30 30" style={{ position: 'relative', zIndex: 2 }}>
+            <defs>
+              <radialGradient id={`meteor${fallingMeteor.id}`} cx="30%" cy="30%">
+                <stop offset="0%" stopColor={WC3.roc.fireCore} />
+                <stop offset="35%" stopColor={WC3.roc.fireBright} />
+                <stop offset="70%" stopColor={WC3.roc.felMid} />
+                <stop offset="100%" stopColor="#2a1a0a" />
+              </radialGradient>
+            </defs>
+            <path
+              d="M15,2 L22,6 L26,12 L28,18 L24,24 L18,28 L10,26 L4,22 L2,14 L6,8 L12,4 Z"
+              fill={`url(#meteor${fallingMeteor.id})`}
+            />
+            <path d="M10,8 L15,15 L12,22" stroke={WC3.roc.felBright} strokeWidth="1.5" fill="none" opacity="0.6" />
+            <circle cx="12" cy="12" r="3" fill={WC3.roc.fireCore} opacity="0.7" />
+          </svg>
+          {/* Fire trail */}
+          <div style={{
+            position: 'absolute',
+            top: '-80px',
+            left: '50%',
+            width: '15px',
+            height: '90px',
+            background: `linear-gradient(180deg, transparent 0%, ${WC3.roc.felDark}30 15%, ${WC3.roc.felMid}55 45%, ${WC3.roc.felBright}80 75%, ${WC3.roc.fireCore} 100%)`,
+            filter: 'blur(5px)',
+            transform: `translateX(-50%) rotate(${fallingMeteor.direction === 'left' ? '25deg' : '-25deg'})`,
+            transformOrigin: 'bottom center',
+          }} />
+        </div>
       )}
 
-      {/* === WC3 INFERNAL - Fixed positioned relative to viewport === */}
-      {infernals.map((inf) => (
-        <div key={inf.id}>
-          {/* PHASE 1: FALLING ASTEROID - Falls to the landing point */}
-          {inf.phase === 'falling' && (
-            <div
-              style={{
-                position: 'fixed',
-                left: inf.landX,
-                top: inf.landY,
-                transform: 'translateX(-50%)',
-                animation: `infernalFall${inf.side === 'left' ? 'Right' : 'Left'} 4s ease-in forwards`,
-                zIndex: 5,
-                pointerEvents: 'none',
-              }}
-            >
-              {/* Asteroid container - glow + rock centered together */}
-              <div style={{ position: 'relative', width: '30px', height: '30px' }}>
-                {/* Circular glow - perfectly centered behind asteroid */}
-                <div style={{
-                  position: 'absolute',
-                  width: '80px',
-                  height: '80px',
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  borderRadius: '50%',
-                  background: `radial-gradient(circle, ${WC3.roc.felBright}60 0%, ${WC3.roc.felMid}40 30%, ${WC3.roc.felDark}20 55%, transparent 75%)`,
-                  filter: 'blur(8px)',
-                  animation: 'meteorPulse 0.8s ease-in-out infinite',
-                }} />
-                {/* Asteroid body - rocky irregular shape */}
-                <svg width="30" height="30" viewBox="0 0 30 30" style={{ position: 'relative', zIndex: 2 }}>
-                <defs>
-                  <radialGradient id={`asteroidGrad${inf.id}`} cx="30%" cy="30%">
-                    <stop offset="0%" stopColor={WC3.roc.fireCore} />
-                    <stop offset="30%" stopColor={WC3.roc.fireBright} />
-                    <stop offset="60%" stopColor={WC3.roc.felMid} />
-                    <stop offset="100%" stopColor="#2a1a0a" />
-                  </radialGradient>
-                  <filter id={`asteroidGlow${inf.id}`}>
-                    <feGaussianBlur stdDeviation="2" result="glow" />
-                    <feMerge>
-                      <feMergeNode in="glow" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
-                {/* Rocky irregular shape */}
-                <path
-                  d="M15,2 L22,6 L26,12 L28,18 L24,24 L18,28 L10,26 L4,22 L2,14 L6,8 L12,4 Z"
-                  fill={`url(#asteroidGrad${inf.id})`}
-                  filter={`url(#asteroidGlow${inf.id})`}
-                />
-                {/* Surface cracks glowing */}
-                <path d="M10,8 L15,15 L12,22" stroke={WC3.roc.felBright} strokeWidth="1.5" fill="none" opacity="0.6" />
-                <path d="M20,10 L15,15 L22,20" stroke={WC3.roc.fireBright} strokeWidth="1" fill="none" opacity="0.5" />
-                {/* Hot spots */}
-                <circle cx="12" cy="12" r="3" fill={WC3.roc.fireCore} opacity="0.7" />
-                <circle cx="18" cy="16" r="2" fill={WC3.roc.fireBright} opacity="0.5" />
-              </svg>
-              </div>
-              {/* Fire trail - centered on asteroid, angled based on fall direction */}
-              <div style={{
-                position: 'absolute',
-                top: '-100px',
-                left: '15px',
-                width: '20px',
-                height: '120px',
-                background: `linear-gradient(180deg, transparent 0%, ${WC3.roc.felDark}30 15%, ${WC3.roc.felMid}60 40%, ${WC3.roc.felBright}80 70%, ${WC3.roc.fireCore} 100%)`,
-                filter: 'blur(5px)',
-                transform: `translateX(-50%) rotate(${inf.side === 'left' ? '-20deg' : '20deg'})`,
-                transformOrigin: 'bottom center',
-              }} />
-              {/* Secondary trail wisps - also centered */}
-              <div style={{
-                position: 'absolute',
-                top: '-70px',
-                left: '15px',
-                width: '10px',
-                height: '80px',
-                background: `linear-gradient(180deg, transparent 0%, ${WC3.roc.felMid}40 50%, ${WC3.roc.felBright}70 100%)`,
-                filter: 'blur(4px)',
-                transform: `translateX(-50%) rotate(${inf.side === 'left' ? '-25deg' : '25deg'})`,
-                transformOrigin: 'bottom center',
-                opacity: 0.6,
-              }} />
-            </div>
-          )}
+      {/* === SINGLE RIGHT-SIDE INFERNAL GOLEM === */}
+      {rightGolemReady && (
+        <div
+          style={{
+            position: 'fixed',
+            right: '15%',
+            top: '25vh',
+            transform: 'scale(0.6)',
+            transformOrigin: 'center top',
+            zIndex: 5,
+            pointerEvents: 'none',
+            animation: 'golemFadeIn 1.5s ease-out forwards',
+          }}
+        >
+          {/* Crater at feet */}
+          <svg
+            width="160"
+            height="40"
+            viewBox="0 0 160 40"
+            style={{
+              position: 'absolute',
+              left: '0px',
+              top: '200px',
+              transform: 'translateY(-50%)',
+              zIndex: -1,
+            }}
+          >
+            <ellipse cx="80" cy="20" rx="75" ry="18" fill="#080604" />
+            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+            <ellipse cx="80" cy="20" rx="12" ry="6" fill={WC3.roc.felDark} opacity="0.4" />
+          </svg>
 
-          {/* PHASE 2: EXPLOSION - Dramatic fel green explosion at golem's feet */}
-          {/* All phases use same center point: golem feet at landY + 200px */}
-          {inf.phase === 'explosion' && (
-            <div
-              style={{
-                position: 'fixed',
-                left: inf.landX,
-                top: `calc(${inf.landY} + 200px)`,
-                transform: `translateX(-50%) scale(${inf.scale})`,
-                transformOrigin: 'center center',
-                zIndex: 5,
-                pointerEvents: 'none',
-              }}
-            >
-              {/* Shockwave ring expanding outward - at ground level */}
-              <div style={{
-                position: 'absolute',
-                left: '-120px',
-                top: '-30px',
-                width: '240px',
-                height: '60px',
-                border: `3px solid ${WC3.roc.felBright}`,
-                borderRadius: '50%',
-                animation: 'shockwaveExpand 0.5s ease-out forwards',
-                opacity: 0.8,
-              }} />
-              {/* Main explosion flash - rises from ground */}
-              <div style={{
-                position: 'absolute',
-                left: '-100px',
-                top: '-130px',
-                width: '200px',
-                height: '130px',
-                background: `radial-gradient(ellipse at 50% 75%, ${WC3.roc.fireCore} 0%, ${WC3.roc.felBright} 15%, ${WC3.roc.felMid}90 35%, ${WC3.roc.felDark}50 60%, transparent 100%)`,
-                animation: 'explosionFlash 0.7s ease-out forwards',
-              }} />
-              {/* Secondary flash layer */}
-              <div style={{
-                position: 'absolute',
-                left: '-60px',
-                top: '-80px',
-                width: '120px',
-                height: '80px',
-                background: `radial-gradient(ellipse at 50% 80%, ${WC3.roc.fireCore} 0%, ${WC3.roc.fireBright}80 30%, transparent 70%)`,
-                animation: 'explosionFlash 0.5s ease-out forwards',
-                animationDelay: '0.1s',
-              }} />
-              {/* Debris particles - start at ground level, fly upward */}
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    position: 'absolute',
-                    left: `${-30 + (i % 6) * 12}px`,
-                    top: `${-15 - (i % 3) * 5}px`,
-                    width: `${6 + (i % 4) * 2}px`,
-                    height: `${6 + (i % 4) * 2}px`,
-                    borderRadius: '30%',
-                    background: i % 3 === 0 ? WC3.roc.fireCore : i % 3 === 1 ? WC3.roc.felBright : '#3a3530',
-                    animation: `debrisFly${i % 3} ${0.4 + (i % 4) * 0.1}s ease-out forwards`,
-                    animationDelay: `${i * 0.02}s`,
-                    opacity: 0.9,
-                  }}
-                />
-              ))}
-              {/* Smoke wisps rising from ground */}
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={`smoke${i}`}
-                  style={{
-                    position: 'absolute',
-                    left: `${-20 + i * 20}px`,
-                    top: '-70px',
-                    width: '30px',
-                    height: '60px',
-                    background: `linear-gradient(to top, ${WC3.roc.felDark}60 0%, ${WC3.roc.felDark}20 50%, transparent 100%)`,
-                    filter: 'blur(8px)',
-                    animation: `smokeRise 1s ease-out forwards`,
-                    animationDelay: `${i * 0.15}s`,
-                  }}
-                />
-              ))}
-            </div>
-          )}
+          {/* Shadow */}
+          <div style={{
+            position: 'absolute',
+            left: '80px',
+            transform: 'translateX(-50%) translateY(-50%)',
+            top: '200px',
+            width: '120px',
+            height: '25px',
+            background: `radial-gradient(ellipse, ${WC3.roc.felDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
+            borderRadius: '50%',
+          }} />
 
-          {/* PHASE 2.5: CRATER - Lightning bolt cracks appear and grow from center */}
-          {/* Same center point as explosion: golem feet at landY + 200px */}
-          {inf.phase === 'crater' && (
-            <div
-              style={{
-                position: 'fixed',
-                left: inf.landX,
-                top: `calc(${inf.landY} + 200px)`,
-                transform: `translateX(-50%) scale(${inf.scale})`,
-                transformOrigin: 'center center',
-                zIndex: 5,
-                pointerEvents: 'none',
-              }}
-            >
-              {/* Animated crater with lightning bolt cracks growing from center */}
-              <svg
-                width="160"
-                height="40"
-                viewBox="0 0 160 40"
-                style={{
-                  animation: 'fadeIn 0.2s ease-out forwards',
-                }}
-              >
-                {/* Dark crater base - invisible boundary */}
-                <ellipse cx="80" cy="20" rx="75" ry="18" fill="#080604" />
-                {/* Lightning bolt cracks - grow from center with tremble */}
-                <path d="M80,20 L78,12 L82,10 L77,4 L83,2" stroke="#0a0806" strokeWidth="3" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out forwards, crackTremble 0.15s ease-in-out 0.4s 3' }} />
-                <path d="M80,20 L95,14 L92,10 L108,6 L105,2" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.05s forwards, crackTremble 0.15s ease-in-out 0.45s 3' }} />
-                <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.1s forwards, crackTremble 0.15s ease-in-out 0.5s 3' }} />
-                <path d="M80,20 L95,28 L90,32 L110,36 L105,38" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.15s forwards, crackTremble 0.15s ease-in-out 0.55s 3' }} />
-                <path d="M80,20 L82,28 L78,32 L84,36 L80,38" stroke="#0a0806" strokeWidth="2" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.2s forwards, crackTremble 0.15s ease-in-out 0.6s 3' }} />
-                <path d="M80,20 L65,28 L70,32 L50,36 L55,38" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.25s forwards, crackTremble 0.15s ease-in-out 0.65s 3' }} />
-                <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.3s forwards, crackTremble 0.15s ease-in-out 0.7s 3' }} />
-                <path d="M80,20 L65,14 L68,10 L52,6 L55,2" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.35s forwards, crackTremble 0.15s ease-in-out 0.75s 3' }} />
-                {/* Center glow pulsing */}
-                <ellipse cx="80" cy="20" rx="12" ry="6" fill={WC3.roc.felDark} opacity="0.5" style={{ animation: 'meteorPulse 0.5s ease-in-out infinite' }} />
-              </svg>
-              {/* Lingering smoke */}
-              {[0, 1, 2].map((i) => (
-                <div
-                  key={`smoke${i}`}
-                  style={{
-                    position: 'absolute',
-                    left: `${55 + i * 25}px`,
-                    top: '-30px',
-                    width: '25px',
-                    height: '40px',
-                    background: `linear-gradient(to top, ${WC3.roc.felDark}50 0%, transparent 100%)`,
-                    filter: 'blur(5px)',
-                    animation: `smokeRise 1.2s ease-out forwards`,
-                    animationDelay: `${i * 0.1}s`,
-                  }}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* PHASE 3: RISING - Infernal creature emerges FROM crater (grows upward from feet) */}
-          {inf.phase === 'rising' && (
-            <div
-              style={{
-                position: 'fixed',
-                left: inf.landX,
-                top: inf.landY,
-                transform: `translateX(-50%) scale(${inf.scale})`,
-                transformOrigin: 'center top',
-                zIndex: 5,
-                pointerEvents: 'none',
-              }}
-            >
-              {/* Animated crater - centered at golem feet (y=200) */}
-              <svg
-                width="160"
-                height="40"
-                viewBox="0 0 160 40"
-                style={{
-                  position: 'absolute',
-                  left: '0px',
-                  top: '200px',
-                  transform: 'translateY(-50%)',
-                  zIndex: -1,
-                }}
-              >
-                {/* Dark crater base - invisible boundary circle */}
-                <ellipse cx="80" cy="20" rx="75" ry="18" fill="#080604" />
-                {/* Lightning bolt cracks - grow from center with tremble */}
-                {/* Top crack */}
-                <path d="M80,20 L78,12 L82,10 L77,4 L83,2" className="craterCrack" stroke="#0a0806" strokeWidth="3" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out forwards, crackTremble 0.15s ease-in-out 0.4s 3' }} />
-                {/* Top-right */}
-                <path d="M80,20 L95,14 L92,10 L108,6 L105,2" className="craterCrack" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.05s forwards, crackTremble 0.15s ease-in-out 0.45s 3' }} />
-                {/* Right */}
-                <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" className="craterCrack" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.1s forwards, crackTremble 0.15s ease-in-out 0.5s 3' }} />
-                {/* Bottom-right */}
-                <path d="M80,20 L95,28 L90,32 L110,36 L105,38" className="craterCrack" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.15s forwards, crackTremble 0.15s ease-in-out 0.55s 3' }} />
-                {/* Bottom */}
-                <path d="M80,20 L82,28 L78,32 L84,36 L80,38" className="craterCrack" stroke="#0a0806" strokeWidth="2" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.2s forwards, crackTremble 0.15s ease-in-out 0.6s 3' }} />
-                {/* Bottom-left */}
-                <path d="M80,20 L65,28 L70,32 L50,36 L55,38" className="craterCrack" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.25s forwards, crackTremble 0.15s ease-in-out 0.65s 3' }} />
-                {/* Left */}
-                <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" className="craterCrack" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.3s forwards, crackTremble 0.15s ease-in-out 0.7s 3' }} />
-                {/* Top-left */}
-                <path d="M80,20 L65,14 L68,10 L52,6 L55,2" className="craterCrack" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ animation: 'crackGrow 0.4s ease-out 0.35s forwards, crackTremble 0.15s ease-in-out 0.75s 3' }} />
-                {/* Center glow */}
-                <ellipse cx="80" cy="20" rx="12" ry="6" fill={WC3.roc.felDark} opacity="0.4" />
-              </svg>
-              {/* Shadow with fel glow - at golem feet level (y=200) */}
-              <div style={{
-                position: 'absolute',
-                left: '80px',
-                transform: 'translateX(-50%) translateY(-50%)',
-                top: '200px',
-                width: '120px',
-                height: '25px',
-                background: `radial-gradient(ellipse, ${WC3.roc.felDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
-                borderRadius: '50%',
-              }} />
-              {/* Golem EMERGES from crater - grows upward from feet */}
-              <div style={{
-                animation: 'infernalEmerge 1s ease-out forwards',
-                transformOrigin: 'center bottom',
-              }}>
-                <InfernalGolemSVG id={inf.id} isIdle={false} />
-              </div>
-            </div>
-          )}
-
-          {/* PHASE 4: IDLE - Infernal with cracked ground beneath */}
-          {inf.phase === 'idle' && (
-            <div
-              style={{
-                position: 'fixed',
-                left: inf.landX,
-                top: inf.landY,
-                transform: `translateX(-50%) scale(${inf.scale})`,
-                transformOrigin: 'center top',
-                zIndex: 5,
-                pointerEvents: 'none',
-              }}
-            >
-              {/* Lightning bolt crater - centered at golem feet (y=200) */}
-              <svg
-                width="160"
-                height="40"
-                viewBox="0 0 160 40"
-                style={{
-                  position: 'absolute',
-                  left: '0px',
-                  top: '200px',
-                  transform: 'translateY(-50%)',
-                  zIndex: -1,
-                }}
-              >
-                {/* Dark crater base */}
-                <ellipse cx="80" cy="20" rx="75" ry="18" fill="#080604" />
-                {/* Lightning bolt cracks - static after animation */}
-                <path d="M80,20 L78,12 L82,10 L77,4 L83,2" stroke="#0a0806" strokeWidth="3" fill="none" strokeLinecap="round" />
-                <path d="M80,20 L95,14 L92,10 L108,6 L105,2" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-                <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-                <path d="M80,20 L95,28 L90,32 L110,36 L105,38" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-                <path d="M80,20 L82,28 L78,32 L84,36 L80,38" stroke="#0a0806" strokeWidth="2" fill="none" strokeLinecap="round" />
-                <path d="M80,20 L65,28 L70,32 L50,36 L55,38" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-                <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke="#0a0806" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-                <path d="M80,20 L65,14 L68,10 L52,6 L55,2" stroke="#0c0a08" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-                {/* Center glow */}
-                <ellipse cx="80" cy="20" rx="12" ry="6" fill={WC3.roc.felDark} opacity="0.4" />
-              </svg>
-
-              {/* Shadow with fel glow - at golem feet level (y=200) */}
-              <div style={{
-                position: 'absolute',
-                left: '80px',
-                transform: 'translateX(-50%) translateY(-50%)',
-                top: '200px',
-                width: '120px',
-                height: '25px',
-                background: `radial-gradient(ellipse, ${WC3.roc.felDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
-                borderRadius: '50%',
-              }} />
-              <InfernalGolemSVG id={inf.id} isIdle={true} />
-            </div>
-          )}
+          <div style={{ position: 'absolute', left: '-10px', top: '0px' }}>
+            <InfernalGolemSVG id={999} isIdle={true} />
+          </div>
         </div>
+      )}
+
+      {/* === WIND STREAKS - Horizontal gusts across battlefield === */}
+      {rainWindStreaks.map((streak) => (
+        <div
+          key={`wind-${streak.id}`}
+          style={{
+            position: 'absolute',
+            top: `${streak.y}%`,
+            left: '-15%',
+            width: streak.length,
+            height: streak.thickness,
+            background: `linear-gradient(90deg, transparent 0%, #9ab0b830 30%, #b0c5cc40 50%, #9ab0b830 70%, transparent 100%)`,
+            animation: `rainWindGust ${streak.duration}s linear infinite`,
+            animationDelay: `${streak.delay}s`,
+          }}
+        />
       ))}
 
-      {/* === RAIN - Falling diagonally to the right === */}
+      {/* === RAIN - Falling diagonally with wind === */}
       {raindrops.map((drop) => (
         <div
           key={`rain-${drop.id}`}
@@ -1833,10 +1700,8 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             width: '2px',
             height: `${drop.length}px`,
             background: 'linear-gradient(180deg, transparent 0%, #9ab0b8aa 20%, #c0d5ddcc 50%, #9ab0b8aa 80%, transparent 100%)',
-            transform: 'rotate(-20deg)',
-            animation: `rainFallDiagonal ${drop.duration}s linear infinite`,
+            animation: `rainFallWindy ${drop.duration}s linear infinite`,
             animationDelay: `${drop.delay}s`,
-            opacity: 0,
           }}
         />
       ))}
@@ -2067,54 +1932,38 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
       }} />
 
       <style>{`
-        /* Infernal falling from LEFT side - starts tiny and far, grows as it approaches */
-        @keyframes infernalFallRight {
+        /* Meteor rain - diagonal left (moves down and left) */
+        @keyframes meteorRainLeft {
           0% {
-            transform: translateX(-50%) translate(-12vw, -95vh) scale(0.1);
+            transform: translate(0, 0);
             opacity: 0;
           }
-          8% {
+          10% {
+            opacity: 0.8;
+          }
+          90% {
             opacity: 0.6;
-            transform: translateX(-50%) translate(-10vw, -85vh) scale(0.2);
-          }
-          30% {
-            opacity: 0.9;
-            transform: translateX(-50%) translate(-6vw, -55vh) scale(0.4);
-          }
-          60% {
-            transform: translateX(-50%) translate(-3vw, -25vh) scale(0.65);
-          }
-          85% {
-            transform: translateX(-50%) translate(-1vw, -8vh) scale(0.85);
           }
           100% {
-            transform: translateX(-50%) translate(0, 0) scale(1);
-            opacity: 1;
+            transform: translate(-40vw, 120vh);
+            opacity: 0;
           }
         }
-        /* Infernal falling from RIGHT side - starts tiny and far, grows as it approaches */
-        @keyframes infernalFallLeft {
+        /* Meteor rain - diagonal right (moves down and right) */
+        @keyframes meteorRainRight {
           0% {
-            transform: translateX(-50%) translate(12vw, -95vh) scale(0.1);
+            transform: translate(0, 0);
             opacity: 0;
           }
-          8% {
+          10% {
+            opacity: 0.8;
+          }
+          90% {
             opacity: 0.6;
-            transform: translateX(-50%) translate(10vw, -85vh) scale(0.2);
-          }
-          30% {
-            opacity: 0.9;
-            transform: translateX(-50%) translate(6vw, -55vh) scale(0.4);
-          }
-          60% {
-            transform: translateX(-50%) translate(3vw, -25vh) scale(0.65);
-          }
-          85% {
-            transform: translateX(-50%) translate(1vw, -8vh) scale(0.85);
           }
           100% {
-            transform: translateX(-50%) translate(0, 0) scale(1);
-            opacity: 1;
+            transform: translate(40vw, 120vh);
+            opacity: 0;
           }
         }
         /* Meteor glow pulsing while falling - must include translate to maintain centering */
@@ -2219,58 +2068,132 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             opacity: 1;
           }
         }
-        /* Infernal EMERGES from crater - assembles in chunks like WC3 */
-        @keyframes infernalEmerge {
+        /* === GOLEM ASSEMBLY ANIMATIONS - rocks fly from scattered to final position === */
+        /* HEAD - starts scattered left, flies to top center */
+        @keyframes assembleHead {
           0% {
-            transform: scaleY(0) scaleX(0.2);
-            opacity: 0;
-            filter: brightness(2.5);
-          }
-          8% {
-            transform: scaleY(0.15) scaleX(0.4);
-            opacity: 0.4;
-            filter: brightness(2);
-          }
-          15% {
-            transform: scaleY(0.15) scaleX(0.4);
-            opacity: 0.5;
-            filter: brightness(1.8);
-          }
-          25% {
-            transform: scaleY(0.35) scaleX(0.6);
-            opacity: 0.6;
-            filter: brightness(1.6);
-          }
-          35% {
-            transform: scaleY(0.35) scaleX(0.6);
-            opacity: 0.7;
+            transform: translate(-60px, 150px) rotate(-30deg) scale(0.6);
+            opacity: 0.3;
             filter: brightness(1.5);
           }
-          50% {
-            transform: scaleY(0.6) scaleX(0.8);
-            opacity: 0.8;
+          20% {
+            opacity: 1;
             filter: brightness(1.3);
           }
-          60% {
-            transform: scaleY(0.6) scaleX(0.8);
-            opacity: 0.85;
-            filter: brightness(1.2);
-          }
-          75% {
-            transform: scaleY(0.85) scaleX(0.95);
-            opacity: 0.9;
-            filter: brightness(1.1);
-          }
-          85% {
-            transform: scaleY(0.85) scaleX(0.95);
-            opacity: 0.95;
-            filter: brightness(1.05);
-          }
           100% {
-            transform: scaleY(1) scaleX(1);
+            transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
             filter: brightness(1);
           }
+        }
+        /* LEFT SHOULDER - starts bottom left of crater */
+        @keyframes assembleLeftShoulder {
+          0% {
+            transform: translate(-40px, 130px) rotate(20deg) scale(0.5);
+            opacity: 0;
+            filter: brightness(1.4);
+          }
+          15% { opacity: 1; }
+          100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+          }
+        }
+        /* RIGHT SHOULDER - starts bottom right of crater */
+        @keyframes assembleRightShoulder {
+          0% {
+            transform: translate(40px, 130px) rotate(-25deg) scale(0.5);
+            opacity: 0;
+            filter: brightness(1.4);
+          }
+          15% { opacity: 1; }
+          100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+          }
+        }
+        /* TORSO - starts at crater center, rises up */
+        @keyframes assembleTorso {
+          0% {
+            transform: translate(0, 100px) scale(0.4);
+            opacity: 0;
+            filter: brightness(1.6);
+          }
+          20% { opacity: 1; }
+          100% {
+            transform: translate(0, 0) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+          }
+        }
+        /* LEFT ARM - starts far left */
+        @keyframes assembleLeftArm {
+          0% {
+            transform: translate(-50px, 60px) rotate(45deg) scale(0.4);
+            opacity: 0;
+            filter: brightness(1.3);
+          }
+          20% { opacity: 1; }
+          100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+          }
+        }
+        /* RIGHT ARM - starts far right */
+        @keyframes assembleRightArm {
+          0% {
+            transform: translate(50px, 60px) rotate(-45deg) scale(0.4);
+            opacity: 0;
+            filter: brightness(1.3);
+          }
+          20% { opacity: 1; }
+          100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+          }
+        }
+        /* LEFT LEG - starts left of crater */
+        @keyframes assembleLeftLeg {
+          0% {
+            transform: translate(-30px, 70px) rotate(15deg) scale(0.5);
+            opacity: 0;
+            filter: brightness(1.2);
+          }
+          25% { opacity: 1; }
+          100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+          }
+        }
+        /* RIGHT LEG - starts right of crater */
+        @keyframes assembleRightLeg {
+          0% {
+            transform: translate(30px, 70px) rotate(-15deg) scale(0.5);
+            opacity: 0;
+            filter: brightness(1.2);
+          }
+          25% { opacity: 1; }
+          100% {
+            transform: translate(0, 0) rotate(0deg) scale(1);
+            opacity: 1;
+            filter: brightness(1);
+          }
+        }
+        /* Glow during assembly */
+        @keyframes emergeGlow {
+          0% { opacity: 0.8; transform: translateY(80px); }
+          50% { opacity: 0.6; transform: translateY(30px); }
+          100% { opacity: 0; transform: translateY(-20px); }
+        }
+        /* Detailed golem fades in on top of assembled rocks */
+        @keyframes golemFadeIn {
+          0% { opacity: 0; filter: brightness(1.3); }
+          100% { opacity: 1; filter: brightness(1); }
         }
         /* Crater crack grows from center outward */
         @keyframes crackGrow {
@@ -2493,22 +2416,17 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             filter: brightness(0.8);
           }
         }
-        /* Rain falling diagonally to the right (\ shape) */
-        @keyframes rainFallDiagonal {
-          0% {
-            transform: rotate(-20deg) translateY(0);
-            opacity: 0;
-          }
-          5% {
-            opacity: 0.7;
-          }
-          95% {
-            opacity: 0.7;
-          }
-          100% {
-            transform: rotate(-20deg) translateY(115vh);
-            opacity: 0;
-          }
+        /* Wind gusts blowing across battlefield */
+        @keyframes rainWindGust {
+          0% { transform: translateX(0); opacity: 0; }
+          10% { opacity: 0.5; }
+          85% { opacity: 0.5; }
+          100% { transform: translateX(130vw); opacity: 0; }
+        }
+        /* Rain falling with wind - uses translate only (no rotate) for performance */
+        @keyframes rainFallWindy {
+          0% { transform: translate(0, 0) rotate(-25deg); opacity: 0.6; }
+          100% { transform: translate(25vw, 115vh) rotate(-25deg); opacity: 0; }
         }
         /* Grass blade wind - rotates from bottom anchor point */
         @keyframes grassBlade {
@@ -2877,17 +2795,443 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         filter: 'blur(45px)',
       }} />
 
-      {/* Horizontal wind/frost streaks */}
+      {/* === INVINCIBLE - Standing beside Lich King === */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '1%',
+          bottom: '3%',
+          width: '160px',
+          height: '200px',
+          filter: `drop-shadow(0 0 20px ${WC3.ft.iceMid}50)`,
+        }}
+        viewBox="-40 -20 300 320"
+      >
+        <defs>
+          <linearGradient id="horseBody" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#2a3545" />
+            <stop offset="100%" stopColor="#151d28" />
+          </linearGradient>
+          <filter id="frostGlowHorse">
+            <feGaussianBlur stdDeviation="4" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="smokeBlur">
+            <feGaussianBlur stdDeviation="2" />
+          </filter>
+        </defs>
+
+        {/* Ghostly aura around entire horse */}
+        <ellipse cx="110" cy="180" rx="100" ry="70" fill={WC3.ft.iceMid} opacity="0.08" filter="url(#frostGlowHorse)">
+          <animate attributeName="opacity" values="0.05;0.12;0.05" dur="4s" repeatCount="indefinite" />
+        </ellipse>
+
+        {/* === BACK LEGS with SMOKE === */}
+        <g>
+          <polygon points="145,130 152,165 156,210 160,250 150,252 144,215 140,170 138,135" fill="url(#horseBody)" />
+          <polygon points="160,250 150,252 148,260 158,262" fill="#0d1218" />
+          {/* Blue smoke from back left hoof */}
+          <g filter="url(#smokeBlur)">
+            <ellipse cx="154" cy="255" rx="12" ry="8" fill={WC3.ft.iceMid} opacity="0.25">
+              <animate attributeName="ry" values="8;15;8" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.25;0.1;0.25" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="cy" values="255;245;255" dur="2s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        </g>
+        <g>
+          <polygon points="165,125 175,158 180,200 184,245 174,248 168,205 162,162 158,130" fill="url(#horseBody)" />
+          <polygon points="184,245 174,248 172,256 182,258" fill="#0d1218" />
+          {/* Blue smoke from back right hoof */}
+          <g filter="url(#smokeBlur)">
+            <ellipse cx="178" cy="250" rx="10" ry="7" fill={WC3.ft.iceBright} opacity="0.2">
+              <animate attributeName="ry" values="7;14;7" dur="2.3s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.2;0.08;0.2" dur="2.3s" repeatCount="indefinite" />
+              <animate attributeName="cy" values="250;238;250" dur="2.3s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        </g>
+
+        {/* === FRONT LEGS with SMOKE === */}
+        <g>
+          <polygon points="50,140 44,175 38,215 34,255 44,257 50,220 56,180 58,145" fill="#1a2535" />
+          <polygon points="34,255 44,257 46,265 36,267" fill="#0d1218" />
+          {/* Blue smoke from front left hoof */}
+          <g filter="url(#smokeBlur)">
+            <ellipse cx="40" cy="260" rx="14" ry="9" fill={WC3.ft.iceMid} opacity="0.3">
+              <animate attributeName="ry" values="9;18;9" dur="1.8s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.3;0.1;0.3" dur="1.8s" repeatCount="indefinite" />
+              <animate attributeName="cy" values="260;248;260" dur="1.8s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        </g>
+        <g>
+          <polygon points="70,135 65,170 60,210 55,250 65,252 72,215 78,175 76,140" fill="url(#horseBody)" />
+          <polygon points="55,250 65,252 67,260 57,262" fill="#0d1218" />
+          {/* Blue smoke from front right hoof */}
+          <g filter="url(#smokeBlur)">
+            <ellipse cx="61" cy="255" rx="11" ry="8" fill={WC3.ft.iceBright} opacity="0.22">
+              <animate attributeName="ry" values="8;16;8" dur="2.1s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.22;0.08;0.22" dur="2.1s" repeatCount="indefinite" />
+              <animate attributeName="cy" values="255;242;255" dur="2.1s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+        </g>
+
+        {/* BODY */}
+        <path d="M50,115 Q30,110 35,135 L50,145 L65,120 Q95,95 125,95 Q160,95 180,115 L195,140 Q200,120 188,105 Q170,85 125,80 Q80,85 50,115 Z" fill="url(#horseBody)" />
+        <path d="M50,115 L35,135 L50,145 L70,125 Z" fill="#2a3a4d" />
+        <path d="M180,115 L195,140 L180,145 L165,120 Z" fill="#2a3a4d" />
+        <path d="M65,140 Q120,160 175,140 L175,125 Q120,140 65,125 Z" fill="#151d28" />
+
+        {/* ARMOR PLATE */}
+        <path d="M75,100 Q125,80 175,105 L168,118 Q125,100 82,118 Z" fill="#1a2535" />
+        <path d="M85,108 Q125,95 165,110" stroke={WC3.ft.iceMid} strokeWidth="2" opacity="0.3" fill="none" />
+        <circle cx="125" cy="102" r="5" fill="none" stroke={WC3.ft.iceMid} strokeWidth="1.5" opacity="0.5">
+          <animate attributeName="opacity" values="0.3;0.7;0.3" dur="3s" repeatCount="indefinite" />
+        </circle>
+
+        {/* NECK */}
+        <polygon points="50,115 25,80 10,55 30,45 50,65 65,105" fill="url(#horseBody)" />
+        <polygon points="50,115 25,80 38,88 58,108" fill="#2a3a4d" />
+
+        {/* HEAD - undead horse skull */}
+        <g transform="translate(5, 40)">
+          <polygon points="5,20 -10,5 -25,-15 -30,-40 -22,-50 -5,-45 12,-35 20,-15 25,10" fill="url(#horseBody)" />
+          <polygon points="-10,5 -25,-15 -22,-22 -5,-8 5,5" fill="#2a3a4d" />
+          <polygon points="-5,-45 -22,-50 -28,-42 -12,-30 5,-35" fill="#1a2535" />
+
+          {/* GLOWING EYES - intense blue */}
+          <ellipse cx="0" cy="-22" rx="7" ry="5" fill="#0a0a12" />
+          <ellipse cx="0" cy="-22" rx="5" ry="4" fill={WC3.ft.iceBright} filter="url(#frostGlowHorse)">
+            <animate attributeName="opacity" values="0.7;1;0.7" dur="1.5s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="0" cy="-22" rx="2" ry="1.5" fill="#ffffff" opacity="0.8" />
+
+          {/* BLUE SMOKE from eyes */}
+          <g filter="url(#smokeBlur)">
+            <ellipse cx="8" cy="-28" rx="10" ry="6" fill={WC3.ft.iceMid} opacity="0.35">
+              <animate attributeName="cx" values="8;18;8" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.35;0.1;0.35" dur="2s" repeatCount="indefinite" />
+            </ellipse>
+            <ellipse cx="15" cy="-32" rx="8" ry="5" fill={WC3.ft.iceBright} opacity="0.2">
+              <animate attributeName="cx" values="15;28;15" dur="2.5s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.2;0.05;0.2" dur="2.5s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+
+          {/* BLUE SMOKE from nostrils */}
+          <ellipse cx="-28" cy="-45" rx="3" ry="4" fill="#0a0808" />
+          <g filter="url(#smokeBlur)">
+            <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={WC3.ft.iceMid} opacity="0.3">
+              <animate attributeName="cy" values="-52;-65;-52" dur="3s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.3;0.08;0.3" dur="3s" repeatCount="indefinite" />
+            </ellipse>
+          </g>
+
+          <polygon points="12,-35 18,-55 26,-42 18,-32" fill="url(#horseBody)" />
+          <path d="M-5,-8 L8,-28 M15,-18 L-5,-42" stroke="#1a2535" strokeWidth="3" fill="none" />
+        </g>
+
+        {/* MANE - ghostly ice wisps */}
+        <g style={{ animation: 'capeWave 3s ease-in-out infinite' }}>
+          <path d="M30,45 Q50,15 38,-15 Q65,10 58,45" fill={WC3.ft.iceDark} opacity="0.4" />
+          <path d="M42,55 Q68,15 62,-20" stroke={WC3.ft.iceMid} strokeWidth="3" fill="none" opacity="0.35" />
+          <path d="M52,70 Q78,30 72,0" stroke={WC3.ft.iceBright} strokeWidth="2" fill="none" opacity="0.25" />
+        </g>
+
+        {/* TAIL - ghostly */}
+        <g style={{ animation: 'capeWave 4s ease-in-out infinite reverse' }}>
+          <path d="M200,120 Q225,115 245,135 Q240,160 215,155 Q222,135 200,128" fill={WC3.ft.iceDark} opacity="0.35" />
+          <path d="M205,128 Q230,122 242,145" stroke={WC3.ft.iceMid} strokeWidth="2.5" fill="none" opacity="0.3" />
+        </g>
+
+        {/* Ground frost */}
+        <ellipse cx="110" cy="265" rx="80" ry="12" fill={WC3.ft.iceMid} opacity="0.15" filter="url(#frostGlowHorse)" />
+      </svg>
+
+      {/* === ALEXANDER AS LICH KING - WC3 Style Armor === */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '11%',
+          bottom: '3%',
+          width: '120px',
+          height: '190px',
+          filter: `drop-shadow(0 0 18px ${WC3.ft.iceMid}50)`,
+        }}
+        viewBox="0 0 200 320"
+      >
+        <defs>
+          <linearGradient id="frostmourneGlow" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stopColor={WC3.ft.iceDark} />
+            <stop offset="50%" stopColor={WC3.ft.iceMid} />
+            <stop offset="100%" stopColor={WC3.ft.iceBright} />
+          </linearGradient>
+          <linearGradient id="lichArmor" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2a3545" />
+            <stop offset="50%" stopColor="#1a2535" />
+            <stop offset="100%" stopColor="#0d1520" />
+          </linearGradient>
+          <linearGradient id="goldTrim" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#d4a84b" />
+            <stop offset="50%" stopColor="#b8923e" />
+            <stop offset="100%" stopColor="#8a6d2f" />
+          </linearGradient>
+          <linearGradient id="hairGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#1a1515" />
+            <stop offset="40%" stopColor="#4a4545" />
+            <stop offset="70%" stopColor="#8a8585" />
+            <stop offset="100%" stopColor="#d0d0d5" />
+          </linearGradient>
+          <linearGradient id="undeadSkin" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#6a5a4a" />
+            <stop offset="100%" stopColor="#5a4a3a" />
+          </linearGradient>
+          <filter id="frostGlow">
+            <feGaussianBlur stdDeviation="3" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Cape - dark with fur trim, wave animation */}
+        <g style={{ animation: 'capeWave 3s ease-in-out infinite', transformOrigin: '100px 120px' }}>
+          <path d="M55,95 Q20,150 12,240 L8,310 L192,310 L188,240 Q180,150 145,95" fill="#080c15" opacity="0.9" />
+          <path d="M60,100 Q28,155 22,235 L18,305 L182,305 L178,235 Q172,155 140,100" fill="#0a1018" />
+          {/* Fur trim at shoulders */}
+          <ellipse cx="55" cy="98" rx="12" ry="6" fill="#4a3a2a" />
+          <ellipse cx="145" cy="98" rx="12" ry="6" fill="#4a3a2a" />
+        </g>
+
+        {/* === MASSIVE LEGS - Strong warrior === */}
+        <path d="M60,215 L50,265 L45,305 L75,310 L82,272 L88,220" fill="url(#lichArmor)" />
+        <path d="M112,215 L118,272 L125,310 L155,305 L150,265 L140,220" fill="url(#lichArmor)" />
+        {/* Gold trim on massive legs */}
+        <path d="M50,265 L82,270 M150,265 L118,270" stroke="url(#goldTrim)" strokeWidth="2.5" fill="none" />
+        {/* Skull knee guards - positioned for bigger legs */}
+        <ellipse cx="70" cy="232" rx="14" ry="10" fill="#1a2535" />
+        <circle cx="70" cy="230" r="5" fill="#0d1520" />
+        <circle cx="66" cy="227" r="2" fill={WC3.ft.iceMid} opacity="0.4" />
+        <circle cx="74" cy="227" r="2" fill={WC3.ft.iceMid} opacity="0.4" />
+        <ellipse cx="130" cy="232" rx="14" ry="10" fill="#1a2535" />
+        <circle cx="130" cy="230" r="5" fill="#0d1520" />
+        <circle cx="126" cy="227" r="2" fill={WC3.ft.iceMid} opacity="0.4" />
+        <circle cx="134" cy="227" r="2" fill={WC3.ft.iceMid} opacity="0.4" />
+        {/* Massive boots */}
+        <ellipse cx="60" cy="308" rx="18" ry="7" fill="#0d1218" />
+        <ellipse cx="140" cy="308" rx="18" ry="7" fill="#0d1218" />
+        <path d="M45,305 L75,305 M125,305 L155,305" stroke="url(#goldTrim)" strokeWidth="1.5" fill="none" />
+
+        {/* === TORSO with skull chest plate === */}
+        <g style={{ animation: 'breathe 4s ease-in-out infinite', transformOrigin: '100px 160px' }}>
+          {/* Main chest plate */}
+          <path d="M60,92 L68,75 L100,68 L132,75 L140,92 L145,160 L135,200 L100,210 L65,200 L55,160 Z" fill="url(#lichArmor)" />
+          {/* Gold trim on chest */}
+          <path d="M60,92 L68,75 L100,68 L132,75 L140,92" stroke="url(#goldTrim)" strokeWidth="2.5" fill="none" />
+          <path d="M65,200 L100,210 L135,200" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
+          {/* V-shaped chest detail */}
+          <path d="M75,95 L100,85 L125,95 L125,145 L100,160 L75,145 Z" fill="#151d28" />
+          <path d="M75,95 L100,85 L125,95" stroke="url(#goldTrim)" strokeWidth="1.5" fill="none" />
+          {/* SKULL on chest */}
+          <ellipse cx="100" cy="125" rx="15" ry="12" fill="#2a3545" />
+          <ellipse cx="100" cy="123" rx="12" ry="10" fill="#1a2535" />
+          <ellipse cx="94" cy="120" rx="4" ry="3" fill="#0d1520" />
+          <ellipse cx="106" cy="120" rx="4" ry="3" fill="#0d1520" />
+          <ellipse cx="94" cy="120" rx="2" ry="1.5" fill={WC3.ft.iceMid} opacity="0.5">
+            <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
+          </ellipse>
+          <ellipse cx="106" cy="120" rx="2" ry="1.5" fill={WC3.ft.iceMid} opacity="0.5">
+            <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
+          </ellipse>
+          <path d="M100,126 L97,132 L103,132 Z" fill="#0d1520" />
+          {/* Belt with skull buckle */}
+          <rect x="60" y="175" width="80" height="15" fill="#1a2535" />
+          <path d="M60,175 L140,175 M60,190 L140,190" stroke="url(#goldTrim)" strokeWidth="1.5" fill="none" />
+          <ellipse cx="100" cy="182" rx="10" ry="7" fill="#2a3545" />
+          <circle cx="96" cy="180" rx="2" fill="#0d1520" />
+          <circle cx="104" cy="180" rx="2" fill="#0d1520" />
+        </g>
+
+        {/* === MASSIVE SHOULDER PAULDRONS with spikes === */}
+        {/* Left pauldron */}
+        <g>
+          <ellipse cx="45" cy="88" rx="28" ry="18" fill="url(#lichArmor)" />
+          <ellipse cx="45" cy="88" rx="24" ry="15" fill="#1a2535" />
+          {/* Gold trim */}
+          <ellipse cx="45" cy="88" rx="28" ry="18" fill="none" stroke="url(#goldTrim)" strokeWidth="2" />
+          {/* Spikes */}
+          <polygon points="25,82 15,55 30,78" fill="#2a3545" />
+          <polygon points="35,78 22,48 38,74" fill="#1a2535" />
+          <polygon points="45,75 38,42 50,72" fill="#2a3545" />
+          <polygon points="55,78 58,48 52,74" fill="#1a2535" />
+          {/* Gold tips on spikes */}
+          <circle cx="15" cy="57" r="3" fill="url(#goldTrim)" />
+          <circle cx="22" cy="50" r="2.5" fill="url(#goldTrim)" />
+          <circle cx="38" cy="44" r="3" fill="url(#goldTrim)" />
+          <circle cx="58" cy="50" r="2.5" fill="url(#goldTrim)" />
+          {/* Skull ornament */}
+          <circle cx="45" cy="92" r="6" fill="#0d1520" />
+          <circle cx="42" cy="90" r="1.5" fill={WC3.ft.iceMid} opacity="0.4" />
+          <circle cx="48" cy="90" r="1.5" fill={WC3.ft.iceMid} opacity="0.4" />
+        </g>
+        {/* Right pauldron */}
+        <g>
+          <ellipse cx="155" cy="88" rx="28" ry="18" fill="url(#lichArmor)" />
+          <ellipse cx="155" cy="88" rx="24" ry="15" fill="#1a2535" />
+          <ellipse cx="155" cy="88" rx="28" ry="18" fill="none" stroke="url(#goldTrim)" strokeWidth="2" />
+          <polygon points="145,78 142,48 148,74" fill="#1a2535" />
+          <polygon points="155,75 162,42 150,72" fill="#2a3545" />
+          <polygon points="165,78 178,48 162,74" fill="#1a2535" />
+          <polygon points="175,82 185,55 170,78" fill="#2a3545" />
+          <circle cx="142" cy="50" r="2.5" fill="url(#goldTrim)" />
+          <circle cx="162" cy="44" r="3" fill="url(#goldTrim)" />
+          <circle cx="178" cy="50" r="2.5" fill="url(#goldTrim)" />
+          <circle cx="185" cy="57" r="3" fill="url(#goldTrim)" />
+          <circle cx="155" cy="92" r="6" fill="#0d1520" />
+          <circle cx="152" cy="90" r="1.5" fill={WC3.ft.iceMid} opacity="0.4" />
+          <circle cx="158" cy="90" r="1.5" fill={WC3.ft.iceMid} opacity="0.4" />
+        </g>
+
+        {/* === MASSIVE ARMS - Strong warrior, with gauntlets === */}
+        {/* Left arm - raised, no weapon */}
+        <path d="M32,100 L15,138 L8,180 L32,185 L42,145 L52,105" fill="url(#lichArmor)" />
+        <path d="M15,138 L42,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
+        <polygon points="8,180 0,168 18,175" fill="#1a2535" />
+        <polygon points="15,178 5,165 22,172" fill="#1a2535" />
+
+        {/* Right arm - HOLDING FROSTMOURNE */}
+        <path d="M168,100 L185,138 L192,175 L168,180 L158,142 L148,105" fill="url(#lichArmor)" />
+        <path d="M185,138 L158,143" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
+        {/* Gauntlet holding sword handle */}
+        <ellipse cx="185" cy="178" rx="12" ry="10" fill="url(#lichArmor)" />
+        <ellipse cx="185" cy="178" rx="12" ry="10" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
+
+        {/* === FROSTMOURNE - IN HIS RIGHT HAND === */}
+        <g transform="translate(185, 175) rotate(-5)">
+          {/* Blade glow */}
+          <ellipse cx="0" cy="90" rx="18" ry="95" fill={WC3.ft.iceBright} opacity="0.15" filter="url(#frostGlow)">
+            <animate attributeName="opacity" values="0.1;0.22;0.1" dur="2s" repeatCount="indefinite" />
+          </ellipse>
+
+          {/* Blade pointing down */}
+          <path d="M0,15 L8,25 L11,70 L10,140 L7,190 L0,210 L-7,190 L-10,140 L-11,70 L-8,25 Z" fill="url(#frostmourneGlow)" />
+          <path d="M0,25 L4,35 L4,135 L0,160 L-4,135 L-4,35 Z" fill={WC3.ft.iceBright} opacity="0.5" />
+          {/* Blade serrations */}
+          <path d="M10,60 L16,55 L12,70" fill="url(#frostmourneGlow)" />
+          <path d="M-10,60 L-16,55 L-12,70" fill="url(#frostmourneGlow)" />
+
+          {/* Runes - pulsing */}
+          <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={WC3.ft.iceBright}>
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
+          </path>
+          <path d="M0,95 L4,108 L0,121 L-4,108 Z" fill={WC3.ft.iceBright}>
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite" />
+          </path>
+          <path d="M0,145 L3,156 L0,167 L-3,156 Z" fill={WC3.ft.iceBright}>
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="2.1s" repeatCount="indefinite" />
+          </path>
+
+          {/* Crossguard - skull motif - at hand level */}
+          <path d="M-30,8 L0,15 L30,8 L24,20 L0,25 L-24,20 Z" fill="#1a2535" />
+          <path d="M-30,8 L0,15 L30,8" stroke="url(#goldTrim)" strokeWidth="2" fill="none" />
+          <ellipse cx="0" cy="12" rx="8" ry="6" fill="#0d1520" />
+          <circle cx="-4" cy="10" r="2" fill={WC3.ft.iceMid} opacity="0.6" />
+          <circle cx="4" cy="10" r="2" fill={WC3.ft.iceMid} opacity="0.6" />
+
+          {/* Handle - in gauntlet */}
+          <rect x="-5" y="-8" width="10" height="20" fill="#0a1018" rx="2" />
+          <path d="M-5,-8 L5,-8 M-5,12 L5,12" stroke="url(#goldTrim)" strokeWidth="1" />
+          {/* Pommel */}
+          <circle cx="0" cy="-14" r="7" fill="#1a2535" />
+          <circle cx="0" cy="-14" r="7" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
+          <circle cx="0" cy="-14" r="4" fill="#0d1520" />
+        </g>
+
+        {/* Neck gorget with gold trim */}
+        <ellipse cx="100" cy="68" rx="18" ry="7" fill="#1a2535" />
+        <ellipse cx="100" cy="68" rx="18" ry="7" fill="none" stroke="url(#goldTrim)" strokeWidth="1.5" />
+
+        {/* === ALEXANDER'S HEAD - DARKER UNDEAD SKIN === */}
+        <ellipse cx="100" cy="58" rx="10" ry="6" fill="url(#undeadSkin)" />
+        <ellipse cx="100" cy="40" rx="20" ry="24" fill="url(#undeadSkin)" />
+
+        {/* LONG Hair - BLACK roots to GRAY to WHITE tips */}
+        <path d="M80,38 Q75,18 88,10 Q100,5 112,10 Q125,18 120,38 L116,32 Q108,24 100,24 Q92,24 84,32 Z" fill="#1a1515" />
+        {/* Long flowing hair strands - gradient from dark to light */}
+        <path d="M78,36 Q70,55 65,85 Q62,105 60,120" stroke="#1a1515" strokeWidth="5" strokeLinecap="round" fill="none" />
+        <path d="M82,38 Q75,60 72,90 Q70,115 68,135" stroke="#3a3535" strokeWidth="4" strokeLinecap="round" fill="none" />
+        <path d="M78,42 Q72,65 70,95 Q68,120 65,145" stroke="#5a5555" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+        <path d="M76,45 Q70,70 68,100 Q66,130 62,155" stroke="#8a8585" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path d="M122,36 Q130,55 135,85 Q138,105 140,120" stroke="#1a1515" strokeWidth="5" strokeLinecap="round" fill="none" />
+        <path d="M118,38 Q125,60 128,90 Q130,115 132,135" stroke="#3a3535" strokeWidth="4" strokeLinecap="round" fill="none" />
+        <path d="M122,42 Q128,65 130,95 Q132,120 135,145" stroke="#5a5555" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+        <path d="M124,45 Q130,70 132,100 Q134,130 138,155" stroke="#c0c0c5" strokeWidth="3" strokeLinecap="round" fill="none" />
+
+        {/* Ears - darker undead skin */}
+        <ellipse cx="78" cy="42" rx="5" ry="7" fill="url(#undeadSkin)" />
+        <ellipse cx="122" cy="42" rx="5" ry="7" fill="url(#undeadSkin)" />
+
+        {/* NOSE */}
+        <path d="M100,45 L95,55 L105,55 Z" fill="#5a4a3a" />
+
+        {/* MOUTH - stern frown */}
+        <path d="M92,60 Q100,58 108,60" stroke="#3a2a1a" strokeWidth="2" strokeLinecap="round" fill="none" />
+
+        {/* Beard - BLACK */}
+        <path d="M84,58 Q78,70 84,82 Q92,92 100,94 Q108,92 116,82 Q122,70 116,58 Q108,68 100,70 Q92,68 84,58" fill="#0a0808" />
+
+        {/* EYES - dark ovals with ice glow */}
+        <ellipse cx="90" cy="42" rx="4.5" ry="3.5" fill="#1a1210" />
+        <ellipse cx="110" cy="42" rx="4.5" ry="3.5" fill="#1a1210" />
+        <ellipse cx="90" cy="42" rx="6.5" ry="5" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+          <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
+        </ellipse>
+        <ellipse cx="110" cy="42" rx="6.5" ry="5" fill={WC3.ft.iceBright} opacity="0.2" filter="url(#frostGlow)">
+          <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
+        </ellipse>
+
+        {/* Angry eyebrows - dark */}
+        <path d="M82,35 L92,40" stroke="#1a1515" strokeWidth="3" strokeLinecap="round" />
+        <path d="M108,40 L118,35" stroke="#1a1515" strokeWidth="3" strokeLinecap="round" />
+
+        {/* Frost breath */}
+        <ellipse cx="110" cy="72" rx="12" ry="6" fill={WC3.ft.frostWhite} opacity="0.15" filter="url(#frostGlow)">
+          <animate attributeName="opacity" values="0.1;0.22;0.1" dur="3s" repeatCount="indefinite" />
+          <animate attributeName="rx" values="12;20;12" dur="3s" repeatCount="indefinite" />
+        </ellipse>
+
+        {/* Ground frost */}
+        <ellipse cx="100" cy="315" rx="90" ry="12" fill={WC3.ft.iceMid} opacity="0.1" filter="url(#frostGlow)" />
+      </svg>
+
+      <style>{`
+        @keyframes capeWave {
+          0%, 100% { transform: rotate(0deg); }
+          50% { transform: rotate(1.5deg); }
+        }
+        @keyframes breathe {
+          0%, 100% { transform: scaleY(1); }
+          50% { transform: scaleY(1.02); }
+        }
+      `}</style>
+
+      {/* Horizontal wind/frost streaks - blow RIGHT to LEFT */}
       {windStreaks.map((streak) => (
         <div
           key={streak.id}
           style={{
             position: 'absolute',
             top: `${streak.y}%`,
-            left: '-15%',
+            right: '-15%',
             width: streak.length,
             height: streak.thickness,
-            background: `linear-gradient(90deg, transparent 0%, ${WC3.ft.frostWhite}30 30%, ${WC3.ft.frostWhite}50 50%, ${WC3.ft.frostWhite}30 70%, transparent 100%)`,
+            background: `linear-gradient(270deg, transparent 0%, ${WC3.ft.frostWhite}30 30%, ${WC3.ft.frostWhite}50 50%, ${WC3.ft.frostWhite}30 70%, transparent 100%)`,
             animation: `windStreak ${streak.duration}s linear infinite`,
             animationDelay: `${streak.delay}s`,
             filter: 'blur(1px)',
@@ -2953,6 +3297,222 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         />
       ))}
 
+      {/* === SEMI-BURIED SKELETONS near footer === */}
+      {/* Skeleton 1 - left side, arm reaching up */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '8%',
+          bottom: '2%',
+          width: '60px',
+          height: '80px',
+          opacity: 0.35,
+        }}
+        viewBox="0 0 60 80"
+      >
+        {/* Arm bones reaching up from snow */}
+        <path d="M30,80 L30,50 L25,35 L20,20" stroke="#c8c0b0" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path d="M30,50 L35,35 L40,22" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        {/* Hand bones */}
+        <path d="M20,20 L15,10" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M20,20 L18,8" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M20,20 L22,9" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        {/* Snow covering base */}
+        <ellipse cx="30" cy="78" rx="18" ry="6" fill={WC3.ft.frostWhite} opacity="0.4" />
+      </svg>
+
+      {/* Skeleton 2 - right side, skull half visible */}
+      <svg
+        style={{
+          position: 'absolute',
+          right: '12%',
+          bottom: '3%',
+          width: '50px',
+          height: '45px',
+          opacity: 0.3,
+        }}
+        viewBox="0 0 50 45"
+      >
+        {/* Half-buried skull */}
+        <ellipse cx="25" cy="30" rx="18" ry="15" fill="#d4ccc0" />
+        <ellipse cx="25" cy="28" rx="14" ry="12" fill="#c8c0b0" />
+        {/* Eye socket */}
+        <ellipse cx="18" cy="25" rx="4" ry="5" fill="#1a1a2e" />
+        <ellipse cx="32" cy="25" rx="4" ry="5" fill="#1a1a2e" />
+        {/* Faint ice glow in sockets */}
+        <ellipse cx="18" cy="25" rx="2" ry="2.5" fill={WC3.ft.iceMid} opacity="0.2" />
+        <ellipse cx="32" cy="25" rx="2" ry="2.5" fill={WC3.ft.iceMid} opacity="0.2" />
+        {/* Nose hole */}
+        <path d="M25,28 L23,32 L27,32 Z" fill="#2a2a3e" />
+        {/* Snow covering lower half */}
+        <ellipse cx="25" cy="42" rx="22" ry="8" fill={WC3.ft.frostWhite} opacity="0.5" />
+      </svg>
+
+      {/* Skeleton 3 - center-left, ribcage visible */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '30%',
+          bottom: '1%',
+          width: '70px',
+          height: '50px',
+          opacity: 0.25,
+        }}
+        viewBox="0 0 70 50"
+      >
+        {/* Spine */}
+        <path d="M35,5 L35,45" stroke="#c8c0b0" strokeWidth="4" strokeLinecap="round" fill="none" />
+        {/* Ribs - curved */}
+        <path d="M35,12 Q20,15 15,22" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M35,12 Q50,15 55,22" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M35,20 Q22,23 18,28" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M35,20 Q48,23 52,28" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M35,28 Q25,30 22,34" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <path d="M35,28 Q45,30 48,34" stroke="#c8c0b0" strokeWidth="2" strokeLinecap="round" fill="none" />
+        {/* Snow covering base */}
+        <ellipse cx="35" cy="48" rx="30" ry="8" fill={WC3.ft.frostWhite} opacity="0.45" />
+      </svg>
+
+      {/* Skeleton 4 - far right, another reaching arm */}
+      <svg
+        style={{
+          position: 'absolute',
+          right: '25%',
+          bottom: '2%',
+          width: '45px',
+          height: '60px',
+          opacity: 0.28,
+          transform: 'scaleX(-1)',
+        }}
+        viewBox="0 0 45 60"
+      >
+        {/* Single arm reaching */}
+        <path d="M22,60 L22,40 L18,25 L15,12" stroke="#c8c0b0" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        {/* Fingers */}
+        <path d="M15,12 L12,5" stroke="#c8c0b0" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        <path d="M15,12 L15,4" stroke="#c8c0b0" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        <path d="M15,12 L18,5" stroke="#c8c0b0" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+        {/* Snow base */}
+        <ellipse cx="22" cy="58" rx="14" ry="5" fill={WC3.ft.frostWhite} opacity="0.4" />
+      </svg>
+
+      {/* Skeleton 5 - far background, fallen warrior */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '45%',
+          bottom: '5%',
+          width: '80px',
+          height: '40px',
+          opacity: 0.2,
+        }}
+        viewBox="0 0 80 40"
+      >
+        {/* Fallen skeleton - lying on ground */}
+        <ellipse cx="40" cy="35" rx="35" ry="8" fill={WC3.ft.frostWhite} opacity="0.3" />
+        {/* Skull */}
+        <ellipse cx="15" cy="22" rx="8" ry="7" fill="#c8c0b0" />
+        <ellipse cx="12" cy="20" rx="2" ry="2.5" fill="#1a1a2e" />
+        <ellipse cx="18" cy="20" rx="2" ry="2.5" fill="#1a1a2e" />
+        {/* Ribcage */}
+        <path d="M25,25 L55,28" stroke="#c8c0b0" strokeWidth="3" fill="none" />
+        <path d="M28,22 L35,28" stroke="#c8c0b0" strokeWidth="1.5" fill="none" />
+        <path d="M35,21 L40,28" stroke="#c8c0b0" strokeWidth="1.5" fill="none" />
+        <path d="M42,21 L45,28" stroke="#c8c0b0" strokeWidth="1.5" fill="none" />
+        <path d="M49,22 L50,28" stroke="#c8c0b0" strokeWidth="1.5" fill="none" />
+        {/* Arm bones */}
+        <path d="M58,26 L72,20 L78,15" stroke="#c8c0b0" strokeWidth="2" fill="none" />
+      </svg>
+
+      {/* Skeleton 6 - background, crawling out */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '55%',
+          bottom: '3%',
+          width: '55px',
+          height: '50px',
+          opacity: 0.22,
+        }}
+        viewBox="0 0 55 50"
+      >
+        {/* Skull emerging */}
+        <ellipse cx="28" cy="25" rx="12" ry="10" fill="#d4ccc0" />
+        <ellipse cx="24" cy="22" rx="3" ry="3.5" fill="#1a1a2e" />
+        <ellipse cx="32" cy="22" rx="3" ry="3.5" fill="#1a1a2e" />
+        <path d="M28,26 L26,30 L30,30 Z" fill="#2a2a3e" />
+        {/* Jaw open */}
+        <path d="M20,30 Q28,38 36,30" stroke="#c8c0b0" strokeWidth="2" fill="none" />
+        {/* One arm reaching forward */}
+        <path d="M15,35 L5,25 L2,18" stroke="#c8c0b0" strokeWidth="2.5" fill="none" />
+        <path d="M2,18 L-2,12 M2,18 L0,10 M2,18 L4,11" stroke="#c8c0b0" strokeWidth="1.5" fill="none" />
+        {/* Snow covering lower body */}
+        <ellipse cx="28" cy="45" rx="25" ry="10" fill={WC3.ft.frostWhite} opacity="0.5" />
+      </svg>
+
+      {/* Skeleton 7 - far right background */}
+      <svg
+        style={{
+          position: 'absolute',
+          right: '5%',
+          bottom: '4%',
+          width: '40px',
+          height: '55px',
+          opacity: 0.18,
+        }}
+        viewBox="0 0 40 55"
+      >
+        {/* Upper body emerging */}
+        <path d="M20,55 L20,35" stroke="#c8c0b0" strokeWidth="3" fill="none" />
+        <ellipse cx="20" cy="28" rx="10" ry="8" fill="#c8c0b0" />
+        <ellipse cx="16" cy="26" rx="2.5" ry="3" fill="#1a1a2e" />
+        <ellipse cx="24" cy="26" rx="2.5" ry="3" fill="#1a1a2e" />
+        {/* Arms up */}
+        <path d="M12,38 L5,28 L2,18" stroke="#c8c0b0" strokeWidth="2" fill="none" />
+        <path d="M28,38 L35,28 L38,18" stroke="#c8c0b0" strokeWidth="2" fill="none" />
+        <ellipse cx="20" cy="52" rx="15" ry="6" fill={WC3.ft.frostWhite} opacity="0.4" />
+      </svg>
+
+      {/* Undead ghoul 1 - silhouette in background */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '70%',
+          bottom: '8%',
+          width: '35px',
+          height: '60px',
+          opacity: 0.15,
+        }}
+        viewBox="0 0 35 60"
+      >
+        {/* Hunched ghoul silhouette */}
+        <path d="M18,10 Q25,8 22,18 L20,25 Q25,30 23,40 L20,55 L15,55 L12,40 Q10,30 15,25 L13,18 Q10,8 18,10" fill="#1a2535" />
+        {/* Glowing eyes */}
+        <ellipse cx="14" cy="15" rx="2" ry="1.5" fill={WC3.ft.iceMid} opacity="0.4">
+          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
+        </ellipse>
+        <ellipse cx="20" cy="15" rx="2" ry="1.5" fill={WC3.ft.iceMid} opacity="0.4">
+          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
+        </ellipse>
+      </svg>
+
+      {/* Undead ghoul 2 - far background */}
+      <svg
+        style={{
+          position: 'absolute',
+          left: '38%',
+          bottom: '10%',
+          width: '28px',
+          height: '50px',
+          opacity: 0.12,
+        }}
+        viewBox="0 0 28 50"
+      >
+        <path d="M14,8 Q20,6 18,15 L16,22 Q20,26 18,35 L16,48 L12,48 L10,35 Q8,26 12,22 L10,15 Q8,6 14,8" fill="#1a2535" />
+        <ellipse cx="11" cy="12" rx="1.5" ry="1" fill={WC3.ft.iceMid} opacity="0.35" />
+        <ellipse cx="17" cy="12" rx="1.5" ry="1" fill={WC3.ft.iceMid} opacity="0.35" />
+      </svg>
+
       {/* Ground frost mist */}
       <div style={{
         position: 'absolute',
@@ -2969,7 +3529,7 @@ const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
           0% { transform: translateX(0); opacity: 0; }
           10% { opacity: 0.6; }
           90% { opacity: 0.6; }
-          100% { transform: translateX(130vw); opacity: 0; }
+          100% { transform: translateX(-130vw); opacity: 0; }
         }
         @keyframes blizzardFar {
           0% { transform: translate(0, 0); opacity: 0.4; }
@@ -3945,23 +4505,27 @@ export default function MedievalFantasyTheme() {
           </div>
         </FadeInSection>
 
-        {/* Contact */}
+        {/* Contact - no card, floating text like Dark Fantasy */}
         <FadeInSection>
-          <SectionWithOrnament
-            rightOrnament={<FTOrnament side="right" type="shard" />}
-          >
-            <section style={{ marginBottom: sectionSpacing }}>
-              <WC3Frame title="Contact" zone="ft">
-                <p style={{ color: WC3.textMid, marginBottom: '0.75rem', fontSize: '0.8125rem' }}>
-                  10+ years delivering production systems. Let&apos;s build something.
-                </p>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <WC3Button variant="primary" href="mailto:alexanderpulido81@gmail.com" zone="ft">Send Message</WC3Button>
-                  <WC3Button href="/cv" zone="ft">Download CV</WC3Button>
-                </div>
-              </WC3Frame>
-            </section>
-          </SectionWithOrnament>
+          <section style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
+            <h2 style={{
+              color: WC3.ft.iceBright,
+              fontSize: '1.125rem',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              marginBottom: '0.75rem',
+              textShadow: `0 0 20px ${WC3.ft.iceMid}40`,
+            }}>
+              Ready to Work Together?
+            </h2>
+            <p style={{ color: WC3.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>
+              10+ years delivering production systems. Let&apos;s build something.
+            </p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <WC3Button variant="primary" href="mailto:alexanderpulido81@gmail.com" zone="ft">Send Message</WC3Button>
+              <WC3Button href="/cv" zone="ft">Download CV</WC3Button>
+            </div>
+          </section>
         </FadeInSection>
 
         {/* Footer */}
