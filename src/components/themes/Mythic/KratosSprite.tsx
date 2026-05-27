@@ -37,81 +37,74 @@ const KratosRunFrame1 = memo(function KratosRunFrame1() {
   return (
     <g>
       {/* Chains from back to blades */}
-      <path d="M35,44 Q40,46 50,43" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
-      <path d="M35,44 Q30,46 20,43" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q40,44 50,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q30,44 20,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
 
-      {/* Torso - leaning forward */}
-      <g transform="rotate(-8, 35, 40)">
-        {/* Main torso */}
+      {/* Torso - smaller, leaning forward */}
+      <g transform="rotate(-10, 35, 38)">
         <path
-          d="M28,24 Q24,28 26,38 L29,44 L41,44 L44,38 Q46,28 42,24 L38,22 L35,21 L32,22 Z"
+          d="M29,26 Q26,29 27,36 L30,42 L40,42 L43,36 Q44,29 41,26 L38,24 L35,23 L32,24 Z"
           fill={K.skin}
           stroke={K.skinShadow}
           strokeWidth="0.5"
         />
-        {/* Chest lines */}
-        <path d="M30,28 Q33,30 35,28 Q37,30 40,28" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
-        <path d="M35,30 L35,42" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
-        {/* Tattoo on body - tiny bit more left on screen = +1 to x */}
-        <path d="M33,24 Q31,32 32,42" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
-        {/* Belt */}
-        <rect x="28" y="42" width="14" height="3" rx="1" fill={K.belt} />
-        <circle cx="35" cy="43.5" r="1.5" fill={K.gold} />
+        <path d="M31,29 Q33,31 35,29 Q37,31 39,29" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
+        <path d="M35,30 L35,40" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
+        <path d="M33,26 Q31,32 32,40" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
+        <rect x="29" y="40" width="12" height="3" rx="1" fill={K.belt} />
+        <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
       </g>
 
-      {/* Back leg (left) - extended back - muscular */}
+      {/* Back leg - extended back - thinner, longer */}
       <g>
-        <path d="M36,50 Q40,52 43,56 Q46,60 45,64 L42,66 Q40,62 38,58 Q36,54 34,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="43.5" cy="66" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M37,46 Q42,50 48,58 Q52,66 50,72 L46,72 Q46,66 42,58 Q38,52 36,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="48" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Front leg (right) - extended forward - muscular */}
+      {/* Front leg - extended forward - thinner, longer */}
       <g>
-        <path d="M34,50 Q30,52 27,56 Q24,60 25,64 L28,66 Q30,62 32,58 Q34,54 36,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="26.5" cy="66" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M33,46 Q28,50 22,58 Q18,66 20,72 L24,72 Q24,66 28,58 Q32,52 34,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="22" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Skirt - flowing back - AFTER legs */}
+      {/* Skirt */}
       <path
-        d="M26,45 L22,56 L28,57 L32,54 L35,57 L38,54 L42,57 L48,56 L44,45 Z"
+        d="M27,43 L23,54 L28,55 L32,52 L35,55 L38,52 L42,55 L47,54 L43,43 Z"
         fill={K.skirt}
         stroke={K.skirtDark}
         strokeWidth="0.5"
       />
 
-      {/* Back arm (right) + BLUE blade - bigger */}
+      {/* Back arm + BLUE blade - more muscular */}
       <g>
-        <ellipse cx="42" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M43,27 L50,38 L52,42 L48,42 L44,32 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="50" cy="43" rx="2.5" ry="2" fill={K.skin} />
-        {/* Blue blade with glow - bigger */}
-        <path d="M52,43 L62,52 Q67,56 64,58 L54,48 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
+        <ellipse cx="42" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M43,28 Q48,34 51,40 L47,42 Q45,36 42,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="49" cy="42" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M51,42 L62,52 Q67,56 64,58 L53,47 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
       </g>
 
-      {/* Front arm (left) + RED blade - bigger */}
+      {/* Front arm + RED blade - more muscular */}
       <g>
-        <ellipse cx="28" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M27,27 L20,38 L18,42 L22,42 L26,32 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="20" cy="43" rx="2.5" ry="2" fill={K.skin} />
-        {/* Red blade with glow - bigger */}
-        <path d="M18,43 L8,52 Q3,56 6,58 L16,48 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
+        <ellipse cx="28" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M27,28 Q22,34 19,40 L23,42 Q25,36 28,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="21" cy="42" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M19,42 L8,52 Q3,56 6,58 L17,47 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
       </g>
 
-      {/* Head */}
+      {/* Head - SIDE PROFILE for running */}
       <g transform="translate(0, -2)">
-        <ellipse cx="35" cy="14" rx="8" ry="9" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        {/* Tattoo on head - tiny bit more left = +1 to x */}
-        <path d="M32,6 Q30,10 31,14 Q31,18 32,22" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        {/* Eyes */}
-        <ellipse cx="32" cy="12" rx="2" ry="1.5" fill="white" />
-        <ellipse cx="38" cy="12" rx="2" ry="1.5" fill="white" />
-        <circle cx="32.5" cy="12" r="1" fill={K.eye} />
-        <circle cx="38.5" cy="12" r="1" fill={K.eye} />
-        {/* Eyebrows */}
-        <path d="M29,9 L34,10.5" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M41,9 L36,10.5" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        {/* Beard - solid goatee pointing down */}
-        <path d="M32,17 Q32,22 35,24 Q38,22 38,17 Z" fill={K.beard} />
+        <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        {/* Tattoo on visible side */}
+        <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        {/* Single eye visible (side view) */}
+        <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
+        <circle cx="30.5" cy="12" r="1" fill={K.eye} />
+        {/* Eyebrow */}
+        <path d="M28,9 L33,10" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
+        {/* Beard profile */}
+        <path d="M32,17 Q30,20 32,23 Q35,21 35,17 Z" fill={K.beard} />
+        {/* Nose hint */}
+        <path d="M29,13 L28,15" stroke={K.skinShadow} strokeWidth="0.5" />
       </g>
     </g>
   )
@@ -124,71 +117,69 @@ const KratosRunFrame2 = memo(function KratosRunFrame2() {
   return (
     <g>
       {/* Chains from back to blades */}
-      <path d="M35,44 Q42,48 46,44" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
-      <path d="M35,44 Q28,48 24,44" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q42,46 46,42" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q28,46 24,42" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
 
-      {/* Torso - slight lean */}
-      <g transform="rotate(-5, 35, 40)">
+      {/* Torso - smaller, slight lean */}
+      <g transform="rotate(-5, 35, 38)">
         <path
-          d="M28,24 Q24,28 26,38 L29,44 L41,44 L44,38 Q46,28 42,24 L38,22 L35,21 L32,22 Z"
+          d="M29,26 Q26,29 27,36 L30,42 L40,42 L43,36 Q44,29 41,26 L38,24 L35,23 L32,24 Z"
           fill={K.skin}
           stroke={K.skinShadow}
           strokeWidth="0.5"
         />
-        <path d="M30,28 Q33,30 35,28 Q37,30 40,28" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
-        <path d="M35,30 L35,42" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
-        <path d="M33,24 Q31,32 32,42" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
-        <rect x="28" y="42" width="14" height="3" rx="1" fill={K.belt} />
-        <circle cx="35" cy="43.5" r="1.5" fill={K.gold} />
+        <path d="M31,29 Q33,31 35,29 Q37,31 39,29" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
+        <path d="M35,30 L35,40" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
+        <path d="M33,26 Q31,32 32,40" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
+        <rect x="29" y="40" width="12" height="3" rx="1" fill={K.belt} />
+        <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
       </g>
 
-      {/* Left leg - passing through - muscular */}
+      {/* Left leg - passing through - thinner, longer */}
       <g>
-        <path d="M32,50 Q29,54 30,58 Q30,62 32,66 L35,66 Q35,62 35,58 Q36,54 34,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="33.5" cy="67" rx="3" ry="2" fill={K.beard} />
+        <path d="M31,46 Q27,52 26,60 Q26,68 28,72 L32,72 Q32,68 32,60 Q33,52 33,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="30" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Right leg - passing through - muscular */}
+      {/* Right leg - passing through - thinner, longer */}
       <g>
-        <path d="M36,50 Q39,54 38,58 Q38,62 36,66 L33,66 Q33,62 33,58 Q32,54 34,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="34.5" cy="67" rx="3" ry="2" fill={K.beard} />
+        <path d="M37,46 Q41,52 42,60 Q42,68 40,72 L36,72 Q36,68 36,60 Q35,52 35,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="38" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Skirt - AFTER legs */}
+      {/* Skirt */}
       <path
-        d="M27,45 L24,56 L29,57 L32,55 L35,57 L38,55 L41,57 L46,56 L43,45 Z"
+        d="M28,43 L25,54 L29,55 L32,53 L35,55 L38,53 L41,55 L45,54 L42,43 Z"
         fill={K.skirt}
         stroke={K.skirtDark}
         strokeWidth="0.5"
       />
 
-      {/* Left arm + RED blade - bigger */}
+      {/* Left arm + RED blade - more muscular */}
       <g>
-        <ellipse cx="28" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M26,27 L24,36 L22,42 L26,42 L28,36 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="24" cy="44" rx="2.5" ry="2" fill={K.skin} />
-        <path d="M22,44 L14,56 Q11,60 14,62 L24,50 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
+        <ellipse cx="28" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M26,28 Q24,34 22,40 L26,42 Q27,36 28,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="24" cy="42" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M22,42 L14,56 Q11,60 14,62 L24,48 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
       </g>
 
-      {/* Right arm + BLUE blade - bigger */}
+      {/* Right arm + BLUE blade - more muscular */}
       <g>
-        <ellipse cx="42" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M44,27 L46,36 L48,42 L44,42 L42,36 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="46" cy="44" rx="2.5" ry="2" fill={K.skin} />
-        <path d="M48,44 L56,56 Q59,60 56,62 L46,50 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
+        <ellipse cx="42" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M44,28 Q46,34 48,40 L44,42 Q43,36 42,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="46" cy="42" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M48,42 L56,56 Q59,60 56,62 L46,48 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
       </g>
 
-      {/* Head */}
+      {/* Head - SIDE PROFILE for running */}
       <g>
-        <ellipse cx="35" cy="14" rx="8" ry="9" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M32,6 Q30,10 31,14 Q31,18 32,22" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <ellipse cx="32" cy="12" rx="2" ry="1.5" fill="white" />
-        <ellipse cx="38" cy="12" rx="2" ry="1.5" fill="white" />
-        <circle cx="32.5" cy="12" r="1" fill={K.eye} />
-        <circle cx="38.5" cy="12" r="1" fill={K.eye} />
-        <path d="M29,9 L34,10.5" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M41,9 L36,10.5" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M32,17 Q32,22 35,24 Q38,22 38,17 Z" fill={K.beard} />
+        <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
+        <circle cx="30.5" cy="12" r="1" fill={K.eye} />
+        <path d="M28,9 L33,10" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M32,17 Q30,20 32,23 Q35,21 35,17 Z" fill={K.beard} />
+        <path d="M29,13 L28,15" stroke={K.skinShadow} strokeWidth="0.5" />
       </g>
     </g>
   )
@@ -201,71 +192,69 @@ const KratosRunFrame3 = memo(function KratosRunFrame3() {
   return (
     <g>
       {/* Chains from back to blades */}
-      <path d="M35,44 Q30,46 20,43" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
-      <path d="M35,44 Q40,46 50,43" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q30,44 20,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q40,44 50,41" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
 
-      {/* Torso - leaning forward */}
-      <g transform="rotate(-8, 35, 40)">
+      {/* Torso - smaller, leaning forward */}
+      <g transform="rotate(-10, 35, 38)">
         <path
-          d="M28,24 Q24,28 26,38 L29,44 L41,44 L44,38 Q46,28 42,24 L38,22 L35,21 L32,22 Z"
+          d="M29,26 Q26,29 27,36 L30,42 L40,42 L43,36 Q44,29 41,26 L38,24 L35,23 L32,24 Z"
           fill={K.skin}
           stroke={K.skinShadow}
           strokeWidth="0.5"
         />
-        <path d="M30,28 Q33,30 35,28 Q37,30 40,28" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
-        <path d="M35,30 L35,42" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
-        <path d="M33,24 Q31,32 32,42" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
-        <rect x="28" y="42" width="14" height="3" rx="1" fill={K.belt} />
-        <circle cx="35" cy="43.5" r="1.5" fill={K.gold} />
+        <path d="M31,29 Q33,31 35,29 Q37,31 39,29" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
+        <path d="M35,30 L35,40" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
+        <path d="M33,26 Q31,32 32,40" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
+        <rect x="29" y="40" width="12" height="3" rx="1" fill={K.belt} />
+        <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
       </g>
 
-      {/* Back leg (right) - extended back - muscular */}
+      {/* Back leg - extended back - thinner, longer */}
       <g>
-        <path d="M34,50 Q30,52 27,56 Q24,60 25,64 L28,66 Q30,62 32,58 Q34,54 36,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="26.5" cy="66" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M33,46 Q28,50 22,58 Q18,66 20,72 L24,72 Q24,66 28,58 Q32,52 34,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="22" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Front leg (left) - extended forward - muscular */}
+      {/* Front leg - extended forward - thinner, longer */}
       <g>
-        <path d="M36,50 Q40,52 43,56 Q46,60 45,64 L42,66 Q40,62 38,58 Q36,54 34,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="43.5" cy="66" rx="3.5" ry="2" fill={K.beard} />
+        <path d="M37,46 Q42,50 48,58 Q52,66 50,72 L46,72 Q46,66 42,58 Q38,52 36,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="48" cy="73" rx="3.5" ry="2" fill={K.beard} />
       </g>
 
-      {/* Skirt - flowing back - AFTER legs */}
+      {/* Skirt */}
       <path
-        d="M26,45 L22,56 L28,57 L32,54 L35,57 L38,54 L42,57 L48,56 L44,45 Z"
+        d="M27,43 L23,54 L28,55 L32,52 L35,55 L38,52 L42,55 L47,54 L43,43 Z"
         fill={K.skirt}
         stroke={K.skirtDark}
         strokeWidth="0.5"
       />
 
-      {/* Back arm (left) + RED blade - bigger */}
+      {/* Back arm + RED blade - more muscular */}
       <g>
-        <ellipse cx="28" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M27,27 L20,38 L18,42 L22,42 L26,32 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="20" cy="43" rx="2.5" ry="2" fill={K.skin} />
-        <path d="M18,43 L8,52 Q3,56 6,58 L16,48 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
+        <ellipse cx="28" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M27,28 Q22,34 19,40 L23,42 Q25,36 28,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="21" cy="42" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M19,42 L8,52 Q3,56 6,58 L17,47 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
       </g>
 
-      {/* Front arm (right) + BLUE blade - bigger */}
+      {/* Front arm + BLUE blade - more muscular */}
       <g>
-        <ellipse cx="42" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M43,27 L50,38 L52,42 L48,42 L44,32 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <ellipse cx="50" cy="43" rx="2.5" ry="2" fill={K.skin} />
-        <path d="M52,43 L62,52 Q67,56 64,58 L54,48 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
+        <ellipse cx="42" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M43,28 Q48,34 51,40 L47,42 Q45,36 42,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <ellipse cx="49" cy="42" rx="3" ry="2.5" fill={K.skin} />
+        <path d="M51,42 L62,52 Q67,56 64,58 L53,47 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
       </g>
 
-      {/* Head */}
+      {/* Head - SIDE PROFILE for running */}
       <g transform="translate(0, -2)">
-        <ellipse cx="35" cy="14" rx="8" ry="9" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-        <path d="M32,6 Q30,10 31,14 Q31,18 32,22" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
-        <ellipse cx="32" cy="12" rx="2" ry="1.5" fill="white" />
-        <ellipse cx="38" cy="12" rx="2" ry="1.5" fill="white" />
-        <circle cx="32.5" cy="12" r="1" fill={K.eye} />
-        <circle cx="38.5" cy="12" r="1" fill={K.eye} />
-        <path d="M29,9 L34,10.5" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M41,9 L36,10.5" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M32,17 Q32,22 35,24 Q38,22 38,17 Z" fill={K.beard} />
+        <ellipse cx="35" cy="14" rx="7" ry="8" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+        <path d="M30,6 Q28,10 29,14 Q29,18 30,21" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <ellipse cx="31" cy="12" rx="2" ry="1.5" fill="white" />
+        <circle cx="30.5" cy="12" r="1" fill={K.eye} />
+        <path d="M28,9 L33,10" stroke={K.beard} strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M32,17 Q30,20 32,23 Q35,21 35,17 Z" fill={K.beard} />
+        <path d="M29,13 L28,15" stroke={K.skinShadow} strokeWidth="0.5" />
       </g>
     </g>
   )
@@ -278,51 +267,51 @@ const KratosIdle = memo(function KratosIdle() {
   return (
     <g>
       {/* Chains from back to blades */}
-      <path d="M35,44 Q28,50 22,46" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
-      <path d="M35,44 Q42,50 48,46" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q28,48 22,44" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
+      <path d="M35,42 Q42,48 48,44" stroke={K.chain} strokeWidth="1.5" fill="none" strokeDasharray="2,1" />
 
-      {/* Torso */}
+      {/* Torso - smaller */}
       <path
-        d="M28,24 Q24,28 26,38 L29,44 L41,44 L44,38 Q46,28 42,24 L38,22 L35,21 L32,22 Z"
+        d="M29,26 Q26,29 27,36 L30,42 L40,42 L43,36 Q44,29 41,26 L38,24 L35,23 L32,24 Z"
         fill={K.skin}
         stroke={K.skinShadow}
         strokeWidth="0.5"
       />
-      <path d="M30,28 Q33,30 35,28 Q37,30 40,28" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
-      <path d="M35,30 L35,42" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
-      <path d="M33,24 Q31,32 32,42" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
-      <rect x="28" y="42" width="14" height="3" rx="1" fill={K.belt} />
-      <circle cx="35" cy="43.5" r="1.5" fill={K.gold} />
+      <path d="M31,29 Q33,31 35,29 Q37,31 39,29" stroke={K.skinShadow} strokeWidth="0.5" fill="none" opacity="0.4" />
+      <path d="M35,30 L35,40" stroke={K.skinShadow} strokeWidth="0.4" opacity="0.3" />
+      <path d="M33,26 Q31,32 32,40" stroke={K.tattoo} strokeWidth="2" fill="none" strokeLinecap="round" />
+      <rect x="29" y="40" width="12" height="3" rx="1" fill={K.belt} />
+      <circle cx="35" cy="41.5" r="1.5" fill={K.gold} />
 
-      {/* Left leg - muscular thigh tapering to calf */}
-      <path d="M32,50 Q29,54 29,58 Q29,62 31,66 L34,66 Q35,62 35,58 Q36,54 34,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-      <ellipse cx="32.5" cy="67" rx="3" ry="2" fill={K.beard} />
+      {/* Left leg - thinner, longer */}
+      <path d="M31,46 Q26,52 25,60 Q25,68 27,72 L31,72 Q32,68 32,60 Q33,52 33,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      <ellipse cx="29" cy="73" rx="3.5" ry="2" fill={K.beard} />
 
-      {/* Right leg - muscular thigh tapering to calf */}
-      <path d="M36,50 Q39,54 39,58 Q39,62 37,66 L34,66 Q33,62 33,58 Q32,54 34,50 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-      <ellipse cx="35.5" cy="67" rx="3" ry="2" fill={K.beard} />
+      {/* Right leg - thinner, longer */}
+      <path d="M37,46 Q42,52 43,60 Q43,68 41,72 L37,72 Q36,68 36,60 Q35,52 35,46 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      <ellipse cx="39" cy="73" rx="3.5" ry="2" fill={K.beard} />
 
-      {/* Skirt - AFTER legs */}
+      {/* Skirt */}
       <path
-        d="M28,45 L25,56 L30,57 L33,55 L35,57 L37,55 L40,57 L45,56 L42,45 Z"
+        d="M28,43 L25,54 L30,55 L33,53 L35,55 L37,53 L40,55 L45,54 L42,43 Z"
         fill={K.skirt}
         stroke={K.skirtDark}
         strokeWidth="0.5"
       />
 
-      {/* Left arm + RED blade - bigger */}
-      <ellipse cx="27" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-      <path d="M25,27 L22,36 L20,44 L24,44 L26,36 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-      <ellipse cx="22" cy="46" rx="2.5" ry="2" fill={K.skin} />
-      <path d="M19,46 L12,58 Q9,62 12,64 L22,52 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
+      {/* Left arm + RED blade - more muscular */}
+      <ellipse cx="27" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      <path d="M25,28 Q22,34 20,42 L24,44 Q26,36 27,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      <ellipse cx="22" cy="44" rx="3" ry="2.5" fill={K.skin} />
+      <path d="M19,44 L12,58 Q9,62 12,64 L22,50 Z" fill={K.bladeRed} stroke={K.bladeRedGlow} strokeWidth="1.5" filter="url(#redGlow)" />
 
-      {/* Right arm + BLUE blade - bigger */}
-      <ellipse cx="43" cy="26" rx="3" ry="2.5" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-      <path d="M45,27 L48,36 L50,44 L46,44 L44,36 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
-      <ellipse cx="48" cy="46" rx="2.5" ry="2" fill={K.skin} />
-      <path d="M51,46 L58,58 Q61,62 58,64 L48,52 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
+      {/* Right arm + BLUE blade - more muscular */}
+      <ellipse cx="43" cy="27" rx="3.5" ry="3" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      <path d="M45,28 Q48,34 50,42 L46,44 Q44,36 43,30 Z" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
+      <ellipse cx="48" cy="44" rx="3" ry="2.5" fill={K.skin} />
+      <path d="M51,44 L58,58 Q61,62 58,64 L48,50 Z" fill={K.bladeBlue} stroke={K.bladeBlueGlow} strokeWidth="1.5" filter="url(#blueGlow)" />
 
-      {/* Head */}
+      {/* Head - front facing for idle (looks good) */}
       <ellipse cx="35" cy="14" rx="8" ry="9" fill={K.skin} stroke={K.skinShadow} strokeWidth="0.5" />
       <path d="M32,6 Q30,10 31,14 Q31,18 32,22" stroke={K.tattoo} strokeWidth="2.5" fill="none" strokeLinecap="round" />
       <ellipse cx="32" cy="12" rx="2" ry="1.5" fill="white" />
