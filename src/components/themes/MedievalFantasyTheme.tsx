@@ -165,7 +165,7 @@ function WC3Frame({ children, title, zone = 'roc' }: { children: React.ReactNode
                   <h2 style={{
                     color: WC3.goldBright,
                     fontFamily: '"Cinzel", Georgia, serif',
-                    fontSize: '1rem',
+                    fontSize: '1.125rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.15em',
@@ -219,7 +219,7 @@ function WC3Button({
       : `inset 1px 1px 2px ${WC3.metalLight}, inset -1px -1px 2px ${WC3.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
     color: variant === 'primary' ? WC3.bgVoid : active ? accentBright : WC3.textBright,
     fontFamily: '"Cinzel", Georgia, serif',
-    fontSize: '0.8125rem',
+    fontSize: '1.125rem',
     fontWeight: 600,
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
@@ -696,6 +696,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
 
   // Right-side golem spawn sequence: meteor → explosion → assembly → final
   const [golemPhase, setGolemPhase] = useState<'waiting' | 'meteor' | 'explosion' | 'assembling' | 'final'>('waiting')
+  const [hideAssembly, setHideAssembly] = useState(false)
 
   useEffect(() => {
     const timeouts: NodeJS.Timeout[] = []
@@ -709,8 +710,11 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
     // Phase 3: Rocks start assembling (after explosion)
     timeouts.push(setTimeout(() => setGolemPhase('assembling'), 4200))
 
-    // Phase 4: Final detailed golem (after assembly completes ~2s)
+    // Phase 4: Final detailed golem appears (assembly stays visible)
     timeouts.push(setTimeout(() => setGolemPhase('final'), 6500))
+
+    // Phase 5: Hide assembly after final is fully visible (0.5s overlap)
+    timeouts.push(setTimeout(() => setHideAssembly(true), 7000))
 
     return () => timeouts.forEach(t => clearTimeout(t))
   }, [])
@@ -1763,8 +1767,8 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
             </>
           )}
 
-          {/* PHASE 3: ROCK ASSEMBLY - only visible during assembling phase */}
-          {(golemPhase === 'assembling' || golemPhase === 'explosion') && (
+          {/* PHASE 3: ROCK ASSEMBLY - stays visible until final golem fades in */}
+          {(golemPhase === 'assembling' || golemPhase === 'explosion' || (golemPhase === 'final' && !hideAssembly)) && (
             <>
               {/* Emergence glow */}
               <div style={{
@@ -1789,8 +1793,8 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                   left: '-10px',
                   top: '0px',
                   overflow: 'visible',
-                  opacity: golemPhase === 'assembling' ? 1 : 0,
-                  transition: 'opacity 0.3s ease',
+                  opacity: (golemPhase === 'assembling' || golemPhase === 'final') ? 1 : 0,
+                  transition: 'opacity 0.5s ease',
                 }}
               >
                 {/* HEAD rock */}
@@ -2030,22 +2034,36 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
                 <g clipPath={`url(#flagBannerCol${col.id})`}>
                   <g transform="translate(44, 70)">
-                    <ellipse cx="0" cy="-2" rx="24" ry="16" fill="#1a0808" />
-                    <ellipse cx="0" cy="-4" rx="22" ry="14" fill="#2a1010" />
-                    <path d="M-18,-8 Q-10,-14 0,-12 Q10,-14 18,-8" stroke="#3a1818" strokeWidth="4" fill="none" />
-                    <path d="M-12,-6 L-8,-10 L-2,-8 L-4,-2 L-10,-2 Z" fill="#0a0404" />
-                    <ellipse cx="-7" cy="-5" rx="2" ry="1.5" fill="#2a3320" />
-                    <path d="M12,-6 L8,-10 L2,-8 L4,-2 L10,-2 Z" fill="#0a0404" />
-                    <ellipse cx="7" cy="-5" rx="2" ry="1.5" fill="#2a3320" />
-                    <ellipse cx="-2" cy="2" rx="2" ry="3" fill="#0a0404" />
-                    <ellipse cx="2" cy="2" rx="2" ry="3" fill="#0a0404" />
-                    <path d="M-16,6 L-14,14 L-8,16 L0,14 L8,16 L14,14 L16,6" fill="#2a1010" />
-                    {/* Orc tusks - horizontal from jaw corners, pointing outward */}
-                    <path d="M-14,10 L-22,6 L-24,10" fill="#4a3828" stroke="#3a2818" strokeWidth="1" />
-                    <path d="M14,10 L22,6 L24,10" fill="#4a3828" stroke="#3a2818" strokeWidth="1" />
-                    {/* Tusk highlights */}
-                    <path d="M-15,9 L-20,7" stroke="#5a4838" strokeWidth="1" fill="none" />
-                    <path d="M15,9 L20,7" stroke="#5a4838" strokeWidth="1" fill="none" />
+                    {/* ORC HORNS - curved, coming from skull sides */}
+                    <path d="M-18,-8 Q-28,-15 -32,-28 Q-30,-35 -25,-38" stroke="#a89878" strokeWidth="5" fill="none" strokeLinecap="round" />
+                    <path d="M-18,-8 Q-26,-14 -30,-26 Q-28,-32 -24,-35" stroke="#c8b8a0" strokeWidth="3" fill="none" strokeLinecap="round" />
+                    <path d="M18,-8 Q28,-15 32,-28 Q30,-35 25,-38" stroke="#a89878" strokeWidth="5" fill="none" strokeLinecap="round" />
+                    <path d="M18,-8 Q26,-14 30,-26 Q28,-32 24,-35" stroke="#c8b8a0" strokeWidth="3" fill="none" strokeLinecap="round" />
+                    {/* Skull base - worn bone white with yellow/red tints */}
+                    <ellipse cx="0" cy="-2" rx="24" ry="16" fill="#8a7a68" />
+                    <ellipse cx="0" cy="-4" rx="22" ry="14" fill="#b8a890" />
+                    <ellipse cx="0" cy="-5" rx="19" ry="12" fill="#c8b8a0" />
+                    {/* Brow ridge */}
+                    <path d="M-16,-8 Q-8,-14 0,-12 Q8,-14 16,-8" stroke="#a89878" strokeWidth="4" fill="none" />
+                    {/* Eye sockets - deep and dark */}
+                    <ellipse cx="-8" cy="-4" rx="5" ry="4" fill="#1a0a08" />
+                    <ellipse cx="8" cy="-4" rx="5" ry="4" fill="#1a0a08" />
+                    {/* Fel green eye glow */}
+                    <ellipse cx="-8" cy="-4" rx="2.5" ry="2" fill="#3a4a30" />
+                    <ellipse cx="8" cy="-4" rx="2.5" ry="2" fill="#3a4a30" />
+                    {/* Nose hole */}
+                    <path d="M-2,2 L0,6 L2,2" fill="#2a1a10" />
+                    {/* Jaw - worn bone */}
+                    <path d="M-16,6 L-14,14 L-6,16 L0,14 L6,16 L14,14 L16,6" fill="#a89880" />
+                    <path d="M-14,8 L-12,13 L-4,15 L0,13 L4,15 L12,13 L14,8" fill="#b8a890" />
+                    {/* Blood stains on skull */}
+                    <path d="M-10,-8 Q-12,-2 -8,4" stroke="#6a2a20" strokeWidth="1.5" fill="none" opacity="0.6" />
+                    <path d="M6,0 Q8,5 4,10" stroke="#5a2018" strokeWidth="1" fill="none" opacity="0.5" />
+                    {/* Orc tusks - from jaw, pointing up and out */}
+                    <path d="M-12,12 Q-18,4 -14,-4" stroke="#c8b8a0" strokeWidth="4" fill="none" strokeLinecap="round" />
+                    <path d="M-12,12 Q-16,5 -13,-2" stroke="#d8c8b0" strokeWidth="2" fill="none" strokeLinecap="round" />
+                    <path d="M12,12 Q18,4 14,-4" stroke="#c8b8a0" strokeWidth="4" fill="none" strokeLinecap="round" />
+                    <path d="M12,12 Q16,5 13,-2" stroke="#d8c8b0" strokeWidth="2" fill="none" strokeLinecap="round" />
                   </g>
                 </g>
               </g>
@@ -4313,7 +4331,7 @@ export default function MedievalFantasyTheme() {
                     Alexander Pulido
                   </h1>
                   <p style={{ color: WC3.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{PROFESSIONAL_SUMMARY.headline}</p>
-                  <p style={{ color: WC3.textMid, fontSize: '0.75rem', fontStyle: 'italic' }}>{PROFESSIONAL_SUMMARY.tagline}</p>
+                  <p style={{ color: WC3.textMid, fontSize: '0.875rem', fontStyle: 'italic' }}>{PROFESSIONAL_SUMMARY.tagline}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                   <WC3Button href="/cv" zone="roc">Scroll</WC3Button>
@@ -4326,8 +4344,8 @@ export default function MedievalFantasyTheme() {
                   <div key={role.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <div style={{ width: '6px', height: '6px', background: WC3.roc.felMid, boxShadow: `0 0 6px ${WC3.roc.felMid}` }} />
                     <div>
-                      <p style={{ color: WC3.roc.felBright, fontSize: '0.75rem', fontWeight: 600 }}>{role.title}</p>
-                      <p style={{ color: WC3.textDim, fontSize: '0.75rem' }}>{role.company}</p>
+                      <p style={{ color: WC3.roc.felBright, fontSize: '0.875rem', fontWeight: 600 }}>{role.title}</p>
+                      <p style={{ color: WC3.textDim, fontSize: '0.875rem' }}>{role.company}</p>
                     </div>
                   </div>
                 ))}
@@ -4429,7 +4447,7 @@ export default function MedievalFantasyTheme() {
                 </svg>
                 <span style={{
                   color: active === 'engineer' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '0.8125rem' : '0.75rem',
+                  fontSize: isLargeScreen ? '1rem' : '0.875rem',
                   fontFamily: '"Cinzel", serif',
                   fontWeight: 700,
                   textTransform: 'uppercase',
@@ -4468,7 +4486,7 @@ export default function MedievalFantasyTheme() {
                 </svg>
                 <span style={{
                   color: active === 'drummer' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '0.8125rem' : '0.75rem',
+                  fontSize: isLargeScreen ? '1rem' : '0.875rem',
                   fontFamily: '"Cinzel", serif',
                   fontWeight: 700,
                   textTransform: 'uppercase',
@@ -4504,7 +4522,7 @@ export default function MedievalFantasyTheme() {
                 </svg>
                 <span style={{
                   color: active === 'fighter' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '0.8125rem' : '0.75rem',
+                  fontSize: isLargeScreen ? '1rem' : '0.875rem',
                   fontFamily: '"Cinzel", serif',
                   fontWeight: 700,
                   textTransform: 'uppercase',
@@ -4523,7 +4541,7 @@ export default function MedievalFantasyTheme() {
                 color: WC3.textBright,
                 lineHeight: 1.8,
                 marginBottom: '1.25rem',
-                fontSize: isLargeScreen ? '0.95rem' : '0.875rem',
+                fontSize: isLargeScreen ? '1.125rem' : '1rem',
                 padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
               }}>{aboutData.bio}</p>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: isLargeScreen ? '0.625rem' : '0.5rem' }}>
@@ -4532,7 +4550,7 @@ export default function MedievalFantasyTheme() {
                     background: `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
                     border: `1px solid ${WC3.metalMid}`,
                     color: WC3.textMid,
-                    fontSize: isLargeScreen ? '0.875rem' : '0.8125rem',
+                    fontSize: isLargeScreen ? '1rem' : '0.875rem',
                     padding: isLargeScreen ? '0.5rem 0.875rem' : '0.375rem 0.625rem',
                     textTransform: 'uppercase',
                     letterSpacing: '0.05em',
@@ -4567,13 +4585,13 @@ export default function MedievalFantasyTheme() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.375rem' }}>
                         <div>
                           <h3 style={{ color: WC3.textBright, fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.125rem' }}>{job.title}</h3>
-                          <p style={{ color: WC3.goldMid, fontSize: '0.75rem' }}>{job.company}</p>
+                          <p style={{ color: WC3.goldMid, fontSize: '0.875rem' }}>{job.company}</p>
                         </div>
-                        <span style={{ color: WC3.textDim, fontSize: '0.75rem' }}>{job.period}</span>
+                        <span style={{ color: WC3.textDim, fontSize: '0.875rem' }}>{job.period}</span>
                       </div>
                       <ul style={{ listStyle: 'none', padding: 0, margin: '0.375rem 0 0 0' }}>
                         {job.highlights.slice(0, 2).map((h, i) => (
-                          <li key={i} style={{ color: WC3.textMid, fontSize: '0.75rem', paddingLeft: '0.75rem', position: 'relative', marginBottom: '0.125rem' }}>
+                          <li key={i} style={{ color: WC3.textMid, fontSize: '0.875rem', paddingLeft: '0.75rem', position: 'relative', marginBottom: '0.125rem' }}>
                             <span style={{ position: 'absolute', left: 0, color: WC3.goldDark }}>›</span>{h}
                           </li>
                         ))}
@@ -4584,7 +4602,7 @@ export default function MedievalFantasyTheme() {
                             <span key={tech} style={{
                               background: WC3.roc.felDark + '40',
                               color: WC3.roc.felBright,
-                              fontSize: '0.75rem',
+                              fontSize: '0.875rem',
                               padding: '0.125rem 0.25rem',
                               textTransform: 'uppercase'
                             }}>
@@ -4597,8 +4615,8 @@ export default function MedievalFantasyTheme() {
                   )) : experience.map((entry) => (
                     <InnerCard key={entry.id} zone="roc">
                       <h3 style={{ color: WC3.textBright, fontSize: '0.875rem', fontWeight: 600 }}>{entry.title}</h3>
-                      <p style={{ color: WC3.goldMid, fontSize: '0.75rem', marginBottom: '0.25rem' }}>{entry.organization}</p>
-                      <p style={{ color: WC3.textMid, fontSize: '0.75rem' }}>{entry.description}</p>
+                      <p style={{ color: WC3.goldMid, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{entry.organization}</p>
+                      <p style={{ color: WC3.textMid, fontSize: '0.875rem' }}>{entry.description}</p>
                     </InnerCard>
                   ))}
                 </div>
@@ -4624,23 +4642,23 @@ export default function MedievalFantasyTheme() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                   {active === 'engineer' ? engineerTech.map((category) => (
                     <div key={category.name}>
-                      <h3 style={{ color: WC3.goldMid, fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
+                      <h3 style={{ color: WC3.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
                         {category.name}
                       </h3>
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                         {category.items.slice(0, 5).map((tech) => (
-                          <li key={tech} style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{tech}</li>
+                          <li key={tech} style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{tech}</li>
                         ))}
                       </ul>
                     </div>
                   )) : otherSkills.map((category) => (
                     <div key={category.name}>
-                      <h3 style={{ color: WC3.goldMid, fontSize: '0.8125rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
+                      <h3 style={{ color: WC3.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
                         {category.name}
                       </h3>
                       <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                         {category.skills.slice(0, 5).map((skill) => (
-                          <li key={skill.name} style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{skill.name}</li>
+                          <li key={skill.name} style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{skill.name}</li>
                         ))}
                       </ul>
                     </div>
@@ -4671,9 +4689,9 @@ export default function MedievalFantasyTheme() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
                   {(active === 'engineer' ? getFeaturedProjects(projects) : projects).slice(0, 6).map((project) => (
                     <InnerCard key={project.id} zone="ft">
-                      <h3 style={{ color: WC3.textBright, fontSize: '0.8125rem', fontWeight: 600, marginBottom: '0.25rem' }}>{project.title}</h3>
-                      <p style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>{project.description}</p>
-                      {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '0.8125rem', fontWeight: 500 }}>{project.impact}</p>}
+                      <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.25rem' }}>{project.title}</h3>
+                      <p style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.25rem' }}>{project.description}</p>
+                      {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '1.125rem', fontWeight: 500 }}>{project.impact}</p>}
                     </InnerCard>
                   ))}
                 </div>
@@ -4700,10 +4718,10 @@ export default function MedievalFantasyTheme() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                     {COMPANIES.map((company) => (
                       <InnerCard key={company.id} zone="ft">
-                        <h3 style={{ color: WC3.textBright, fontSize: '0.8125rem', fontWeight: 600 }}>{company.name}</h3>
-                        <p style={{ color: WC3.goldMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{company.role}</p>
-                        <p style={{ color: WC3.textMid, fontSize: '0.8125rem', marginBottom: '0.25rem' }}>{company.description}</p>
-                        {company.url && <a href={company.url} target="_blank" rel="noopener noreferrer" style={{ color: WC3.ft.iceMid, fontSize: '0.75rem', textDecoration: 'none' }}>{company.url}</a>}
+                        <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600 }}>{company.name}</h3>
+                        <p style={{ color: WC3.goldMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{company.role}</p>
+                        <p style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.25rem' }}>{company.description}</p>
+                        {company.url && <a href={company.url} target="_blank" rel="noopener noreferrer" style={{ color: WC3.ft.iceMid, fontSize: '0.875rem', textDecoration: 'none' }}>{company.url}</a>}
                       </InnerCard>
                     ))}
                   </div>
@@ -4716,9 +4734,9 @@ export default function MedievalFantasyTheme() {
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                     {BANDS.map((band) => (
                       <InnerCard key={band.id} zone="ft">
-                        <h3 style={{ color: WC3.textBright, fontSize: '0.8125rem', fontWeight: 600 }}>{band.name}</h3>
-                        <p style={{ color: WC3.goldMid, fontSize: '0.8125rem', marginBottom: '0.125rem' }}>{band.role}</p>
-                        <p style={{ color: WC3.textMid, fontSize: '0.8125rem' }}>{band.description}</p>
+                        <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600 }}>{band.name}</h3>
+                        <p style={{ color: WC3.goldMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{band.role}</p>
+                        <p style={{ color: WC3.textMid, fontSize: '1.125rem' }}>{band.description}</p>
                       </InnerCard>
                     ))}
                   </div>
@@ -4736,7 +4754,7 @@ export default function MedievalFantasyTheme() {
                 <p style={{ color: WC3.textMid, marginBottom: '0.5rem' }}>
                   Writings and thoughts coming soon...
                 </p>
-                <p style={{ color: WC3.ft.iceMid, fontSize: '0.75rem', fontStyle: 'italic' }}>
+                <p style={{ color: WC3.ft.iceMid, fontSize: '0.875rem', fontStyle: 'italic' }}>
                   * Check back for updates on development, music, and martial arts
                 </p>
               </div>
@@ -4776,7 +4794,7 @@ export default function MedievalFantasyTheme() {
 
         {/* Footer */}
         <footer style={{ textAlign: 'center', paddingTop: '0.75rem' }}>
-          <p style={{ color: WC3.textDim, fontSize: '0.75rem', letterSpacing: '0.1em' }}>
+          <p style={{ color: WC3.textDim, fontSize: '0.875rem', letterSpacing: '0.1em' }}>
             © {new Date().getFullYear()} ALEXANDER PULIDO
           </p>
         </footer>
