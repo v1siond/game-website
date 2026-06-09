@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, memo, ReactNode, useRef } from 'react'
+import { useInView, FixedCombatLayer } from './fixedCombat'
 import { KnightCharacter } from './KnightCharacter'
 import { BattleBug } from './BattleReveal'
 
@@ -285,6 +286,8 @@ export const BugPullReveal = memo(function BugPullReveal({
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [legPhase, setLegPhase] = useState(0)
   const hasAnimated = useRef(false)
+  // continuous in-view so the fixed Alex/bug fade out once we scroll past the section
+  const { ref: stageRef, inView } = useInView()
 
   useEffect(() => {
     if (phase === 'idle' || phase === 'complete') return
@@ -361,7 +364,7 @@ export const BugPullReveal = memo(function BugPullReveal({
       case 'attack-stance':
       case 'complete':
         return {
-          left: '10%',
+          left: '15%',
           transform: 'translateX(0)',
           opacity: 1,
           transition: 'all 200ms ease-out'
@@ -400,7 +403,7 @@ export const BugPullReveal = memo(function BugPullReveal({
       case 'attack-stance':
       case 'complete':
         return {
-          right: '8%',
+          right: '16%',
           opacity: 1,
           transform: 'translateY(-70px)',
           transition: 'all 400ms ease-out',
@@ -446,45 +449,50 @@ export const BugPullReveal = memo(function BugPullReveal({
   const isFloating = phase === 'attack-stance' || phase === 'complete'
 
   return (
-    <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '280px' }}>
-      {showAlex && (
-        <div
-          className="absolute top-1/2 -translate-y-1/2 z-10 pointer-events-none"
-          style={{ ...getAlexStyle(), position: 'absolute' }}
-        >
-          <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
-        </div>
-      )}
-
-      {showBug && (
-        <>
-          <div
-            className="absolute top-1/2 z-5 pointer-events-none"
-            style={{
-              ...getBugStyle(),
-              position: 'absolute',
-              transform: isFloating ? 'translateY(60px)' : 'translateY(40px)',
-              transition: 'all 400ms ease-out',
-            }}
-          >
+    <div ref={stageRef} className={`relative w-full ${className}`} style={{ minHeight: '280px' }}>
+      {/* Alex (knight) + bug pinned to the viewport bottom; only the content scrolls */}
+      {(showAlex || showBug) && (
+        <FixedCombatLayer inView={inView}>
+          {showAlex && (
             <div
-              className="rounded-full"
-              style={{
-                width: isFloating ? 100 : 80,
-                height: isFloating ? 20 : 16,
-                background: 'radial-gradient(ellipse, rgba(15,10,26,0.6) 0%, transparent 70%)',
-                transform: 'translateX(20px)',
-                transition: 'all 400ms ease-out',
-              }}
-            />
-          </div>
-          <div
-            className="absolute top-1/2 -translate-y-1/2 z-30 pointer-events-none"
-            style={{ ...getBugStyle(), position: 'absolute' }}
-          >
-            <BattleBug size={140} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
-          </div>
-        </>
+              className="absolute bottom-[15%] z-10 pointer-events-none"
+              style={{ ...getAlexStyle(), position: 'absolute' }}
+            >
+              <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
+            </div>
+          )}
+
+          {showBug && (
+            <>
+              <div
+                className="absolute bottom-[15%] z-5 pointer-events-none"
+                style={{
+                  ...getBugStyle(),
+                  position: 'absolute',
+                  transform: isFloating ? 'translateY(60px)' : 'translateY(40px)',
+                  transition: 'all 400ms ease-out',
+                }}
+              >
+                <div
+                  className="rounded-full"
+                  style={{
+                    width: isFloating ? 100 : 80,
+                    height: isFloating ? 20 : 16,
+                    background: 'radial-gradient(ellipse, rgba(15,10,26,0.6) 0%, transparent 70%)',
+                    transform: 'translateX(20px)',
+                    transition: 'all 400ms ease-out',
+                  }}
+                />
+              </div>
+              <div
+                className="absolute bottom-[15%] -translate-y-1/2 z-30 pointer-events-none"
+                style={{ ...getBugStyle(), position: 'absolute' }}
+              >
+                <BattleBug size={140} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
+              </div>
+            </>
+          )}
+        </FixedCombatLayer>
       )}
 
       <div className="relative z-20" style={getContentStyle()}>

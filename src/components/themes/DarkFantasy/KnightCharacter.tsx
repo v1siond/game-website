@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, ReactNode, useState, useEffect, useRef } from 'react'
+import { useInView, FixedCombatLayer } from './fixedCombat'
 
 /**
  * ALEXANDER AS HOLLOW KNIGHT CHARACTER
@@ -63,13 +64,17 @@ export const KnightCharacter = memo(function KnightCharacter({
   const nailRotation = getNailRotation()
 
   return (
-    <>
-    {/* Breathing keyframe - always included when breathing prop is true */}
+    <span style={{ display: 'inline-block', animation: breathing && !attacking ? 'knightIdleFloat 3.6s ease-in-out infinite' : undefined }}>
+    {/* Idle: gentle float wrapper + cloak breathing (HK-style); disabled while attacking */}
     {breathing && (
       <style>{`
         @keyframes knightCloakBreathing {
           0%, 100% { transform: scaleY(1) scaleX(1); }
           50% { transform: scaleY(1.06) scaleX(1.03); }
+        }
+        @keyframes knightIdleFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
         }
       `}</style>
     )}
@@ -81,9 +86,12 @@ export const KnightCharacter = memo(function KnightCharacter({
       style={{
         overflow: 'visible',
         transform: isLeft ? 'scaleX(-1)' : 'none',
-        filter: `drop-shadow(0 0 4px ${DF.ethereal}30)`,
+        filter: `drop-shadow(0 4px 3px rgba(0,0,0,0.45)) drop-shadow(0 0 5px ${DF.ethereal}22)`,
       }}
     >
+      {/* Ground contact shadow — two soft stacked ellipses (replaces the old glow-only shadow) */}
+      <ellipse cx="30" cy="79" rx="21" ry="4.5" fill={DF.void} opacity="0.22" />
+      <ellipse cx="30" cy="79" rx="14" ry="3" fill={DF.void} opacity="0.4" />
       {/* === KNIGHT - 3/4 VIEW FACING RIGHT === */}
       {/* Based on reference image proportions */}
 
@@ -250,7 +258,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       {/* Ground shadow */}
       <ellipse cx="30" cy="76" rx="14" ry="2" fill={DF.void} opacity="0.3" />
     </svg>
-    </>
+    </span>
   )
 })
 
@@ -284,6 +292,8 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const [attackPhase, setAttackPhase] = useState(0)
   const [showSlash, setShowSlash] = useState(false)
   const hasAnimated = useRef(false)
+  // continuous in-view so the fixed knight fades out once we scroll past the section
+  const { ref: stageRef, inView } = useInView()
 
   useEffect(() => {
     if (!triggered || hasAnimated.current) {
@@ -308,7 +318,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
     timers.push(setTimeout(() => {
       setPhase('slash')
       setShowSlash(true)
-      let start = performance.now()
+      const start = performance.now()
       const animateAttack = (now: number) => {
         const progress = Math.min((now - start) / 100, 1)
         setAttackPhase(progress)
@@ -373,7 +383,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const isAttacking = phase === 'knight-raise' || phase === 'slash'
 
   return (
-    <div className={`relative w-full overflow-hidden ${className}`} style={{ minHeight: '200px' }}>
+    <div ref={stageRef} className={`relative w-full ${className}`} style={{ minHeight: '200px' }}>
       {showSlash && (
         <div
           className="absolute inset-0 z-10 pointer-events-none"
@@ -384,23 +394,28 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
         />
       )}
 
-      <div style={getContentStyle()}>
+      {/* relative z-20: the transform from getContentStyle() makes this a stacking context;
+          without an explicit z-index it sinks below the fixed z-[1..6] background (transparent) */}
+      <div className="relative z-20" style={getContentStyle()}>
         {children}
       </div>
 
+      {/* Knight pinned to the viewport (bottom-right ~15-18%); only the content above scrolls */}
       {showKnight && (
-        <div
-          className="absolute right-8 top-1/2 -translate-y-1/2 z-20 pointer-events-none"
-          style={getKnightStyle()}
-        >
-          <KnightCharacter
-            scale={1.8}
-            attacking={isAttacking}
-            attackPhase={attackPhase}
-            facingDirection="left"
-            breathing={phase === 'complete'}
-          />
-        </div>
+        <FixedCombatLayer inView={inView}>
+          <div
+            className="absolute right-[8%] bottom-[18%] z-20 pointer-events-none"
+            style={getKnightStyle()}
+          >
+            <KnightCharacter
+              scale={1.8}
+              attacking={isAttacking}
+              attackPhase={attackPhase}
+              facingDirection="left"
+              breathing={phase === 'complete'}
+            />
+          </div>
+        </FixedCombatLayer>
       )}
 
       <style>{`

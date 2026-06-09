@@ -57,6 +57,13 @@ export function ProfessionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true)
+    // `?profession=<id>` forces a profession on load (used by the preview screenshot /
+    // ornament audit script). Harmless otherwise.
+    const param = new URLSearchParams(window.location.search).get('profession') as Profession | null
+    if (param && PROFESSION_CONFIGS[param]) {
+      setActiveState(param)
+      return
+    }
     const stored = localStorage.getItem(STORAGE_KEY) as Profession | null
     if (stored && PROFESSION_CONFIGS[stored]) {
       setActiveState(stored)

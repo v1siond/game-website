@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { CURRENT_ROLES } from '@/data/roles'
@@ -12,6 +11,7 @@ import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
 import { PROJECTS_DATA } from '@/data/projects'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // ============================================================================
 // PORTAL COLOR PALETTE - Authentic Game Colors
@@ -1389,7 +1389,6 @@ export default function NeonPortalsTheme() {
             >
               PLAY DEMO
             </Link>
-            <ThemeSwitcher />
           </nav>
         </div>
       </header>
@@ -1605,6 +1604,41 @@ export default function NeonPortalsTheme() {
               Download CV
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* ENTER ANOTHER WORLD */}
+      {/* ================================================================== */}
+      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h2
+              id="worlds-heading"
+              className="text-xl md:text-2xl tracking-[0.2em] uppercase font-light mb-4"
+              style={{
+                color: PORTAL.PANEL_WHITE,
+                textShadow: `0 0 20px ${PORTAL.BLUE}30`,
+              }}
+            >
+              Enter Another World
+            </h2>
+            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
+              <div
+                className="w-12 h-px"
+                style={{ background: `linear-gradient(90deg, transparent, ${PORTAL.ORANGE})` }}
+              />
+              <ApertureLogo size={16} color={PORTAL.BLUE} spinning />
+              <div
+                className="w-12 h-px"
+                style={{ background: `linear-gradient(90deg, ${PORTAL.BLUE}, transparent)` }}
+              />
+            </div>
+            <p className="text-xs tracking-[0.15em] uppercase" style={{ color: PORTAL.PANEL_SCUFFED }}>
+              Warp to another test chamber
+            </p>
+          </div>
+          <WorldsGrid />
         </div>
       </section>
 

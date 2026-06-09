@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 import { useTheme } from '@/themes/ThemeContext'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -1366,7 +1366,6 @@ export default function SurvivalHorrorTheme() {
             >
               [NEBULITH]
             </Link>
-            <ThemeSwitcher />
           </div>
         </div>
       </header>
@@ -1683,6 +1682,24 @@ export default function SurvivalHorrorTheme() {
               [FILE] Download CV
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Enter Another World */}
+      <section className="relative z-20 py-10 md:py-14 px-6" aria-labelledby="worlds-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 id="worlds-heading" className="text-sm tracking-[0.3em] mb-3 uppercase" style={{ color: RE.warmGlow }}>
+              Enter Another World
+            </h2>
+            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
+              <div className="w-10 h-px" style={{ background: `linear-gradient(90deg, transparent, ${RE.midBrown})` }} />
+              <span className="text-sm tracking-widest" style={{ color: RE.candlelight }}>* * *</span>
+              <div className="w-10 h-px" style={{ background: `linear-gradient(90deg, ${RE.midBrown}, transparent)` }} />
+            </div>
+            <p className="text-xs italic" style={{ color: RE.fog }}>Another door waits down the corridor</p>
+          </div>
+          <WorldsGrid />
         </div>
       </section>
 

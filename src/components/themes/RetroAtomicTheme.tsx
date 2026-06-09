@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -12,6 +11,7 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // ============================================================================
 // FALLOUT COLOR PALETTE - Authentic from Fallout 3/4/New Vegas
@@ -1272,7 +1272,6 @@ export default function RetroAtomicTheme() {
                 >
                   [N] NEBULITH
                 </Link>
-                <ThemeSwitcher />
               </div>
             </div>
           </div>
@@ -1470,6 +1469,35 @@ export default function RetroAtomicTheme() {
               DOWNLOAD DOSSIER
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* ENTER ANOTHER WORLD */}
+      {/* ================================================================ */}
+      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h2
+              id="worlds-heading"
+              className="font-mono text-xl md:text-2xl font-bold uppercase tracking-[0.3em] mb-3"
+              style={{
+                color: PIPBOY_GREEN,
+                textShadow: `0 0 20px ${PIPBOY_GREEN_GLOW}, 0 0 40px ${PIPBOY_GREEN}30`,
+              }}
+            >
+              Enter Another World
+            </h2>
+            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
+              <div className="w-10 h-px" style={{ background: VAULT_YELLOW }} />
+              <RadiationSymbol size={16} color={VAULT_YELLOW} />
+              <div className="w-10 h-px" style={{ background: VAULT_YELLOW }} />
+            </div>
+            <p className="font-mono text-xs tracking-widest" style={{ color: VAULT_YELLOW }}>
+              SELECT VAULT // REALITY SHIFT INITIATED
+            </p>
+          </div>
+          <WorldsGrid />
         </div>
       </section>
 

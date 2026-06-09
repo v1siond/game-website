@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -12,6 +11,7 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // =============================================================================
 // SUPER MARIO BROS (NES) THEMED CV
@@ -1314,7 +1314,6 @@ export default function AdventurePathsTheme() {
                   PLAY
                 </span>
               </Link>
-              <ThemeSwitcher />
             </div>
           </div>
         </div>
@@ -1568,6 +1567,39 @@ export default function AdventurePathsTheme() {
               VIEW CV
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Enter Another World */}
+      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="flex justify-center gap-2 mb-4" aria-hidden="true">
+              <Coin size={20} />
+              <QuestionBlock size={32} />
+              <Coin size={20} />
+            </div>
+            <h2
+              id="worlds-heading"
+              className="text-lg md:text-xl tracking-[0.15em] mb-3"
+              style={{
+                color: MARIO_COLORS.marioRed,
+                textShadow: `2px 2px 0 ${MARIO_COLORS.groundDarkest}`,
+                fontFamily: '"Press Start 2P", monospace, sans-serif',
+              }}
+            >
+              Enter Another World
+            </h2>
+            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
+              <div className="w-10 h-1" style={{ background: MARIO_COLORS.questionYellow }} />
+              <Starman size={20} />
+              <div className="w-10 h-1" style={{ background: MARIO_COLORS.questionYellow }} />
+            </div>
+            <p className="text-sm" style={{ color: MARIO_COLORS.groundDarkest }}>
+              Warp to a brand new world!
+            </p>
+          </div>
+          <WorldsGrid />
         </div>
       </section>
 

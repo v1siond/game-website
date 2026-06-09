@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, memo, ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
+import { useInView, FixedCombatLayer } from './fixedCombat'
 
 /**
  * BATTLE REVEAL ANIMATION
@@ -83,6 +84,10 @@ export const BattleReveal = memo(function BattleReveal({
   const rafRef = useRef<number | null>(null)
   const lastTimeRef = useRef(0)
   const hasAnimated = useRef(false)
+  // continuous in-view so the fixed knight/bug fade out once we scroll past the section.
+  // Aggressive top margin (-48%) hides them EARLY as you scroll down toward the worlds
+  // section, so the battle never mixes into it; -12% bottom shows them a touch sooner on entry.
+  const { ref: stageRef, inView } = useInView('-48% 0px -12% 0px')
 
   // Continuous animation loop for leg/antenna movement
   useEffect(() => {
@@ -135,7 +140,7 @@ export const BattleReveal = memo(function BattleReveal({
       setPhase('slash')
       setShowSlash(true)
       // Animate attack phase from 0 to 1 over 200ms
-      let start = performance.now()
+      const start = performance.now()
       const animateAttack = (now: number) => {
         const progress = Math.min((now - start) / 200, 1)
         setAttackPhase(progress)
@@ -368,10 +373,14 @@ export const BattleReveal = memo(function BattleReveal({
       <style>{battleRevealKeyframes}</style>
 
       <div
+        ref={stageRef}
         className={`relative w-full min-h-[300px] flex items-center justify-center ${screenShake ? 'animate-screenShake' : ''}`}
         aria-live="polite"
         aria-label={isAnimating ? "Battle animation in progress" : "Content revealed"}
       >
+        {/* Knight + bug pinned to the viewport corners (left-15% / right-18%, bottom-15-20%);
+            only the content below scrolls past them. Fades out as the section leaves view. */}
+        <FixedCombatLayer inView={inView}>
         {/* Knight - CLOSER to center */}
         {showKnight && (
           <div
@@ -481,6 +490,7 @@ export const BattleReveal = memo(function BattleReveal({
             <BloodPool />
           </div>
         )}
+        </FixedCombatLayer>
 
         {/* Content - center, drops from above */}
         <div

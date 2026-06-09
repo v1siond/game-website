@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -17,6 +16,7 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // Blended Dark Fantasy Metroidvania palette
 // Hollow Knight ethereal blues + Iconoclast brass/copper + Ori spirit gold + Salt & Sanctuary stone
@@ -79,7 +79,11 @@ const FadeInSection = memo(function FadeInSection({
   return (
     <div
       ref={ref}
-      className={className}
+      /* relative z-20: the transform below creates a stacking context, which would
+         otherwise trap the inner section's z-20 as a LOCAL value and let the fixed
+         z-[1..6] background layers (windows/fog) paint over the content. An explicit
+         positive z-index on this wrapper keeps the whole faded block above them. */
+      className={`relative z-20 ${className}`}
       style={{
         opacity: triggered ? 1 : 0,
         transform: triggered ? 'translateY(0)' : 'translateY(20px)',
@@ -426,12 +430,149 @@ const GothicWindow = memo(function GothicWindow({ side }: { side: 'left' | 'righ
   )
 })
 
+// Hollow Knight boss-arena depth — a gothic STAGE: a distant back wall with small,
+// receded lancet windows, a FLOOR in front (cornice + perspective lines + soft stage
+// light) so there's a clear floor/wall read, framed by interior columns and hanging
+// soul-lamps, distant towers beyond, fog and drifting soul motes. Profession floor props
+// layer on top. Static SVG + CSS motes only (no scroll work).
+const HollowDepths = memo(function HollowDepths() {
+  const motes = useMemo(
+    () =>
+      Array.from({ length: 18 }, (_, i) => ({
+        left: (i * 47 + 5) % 100,
+        top: (i * 23 + 7) % 70,
+        size: 2 + (i % 3),
+        dur: 9 + ((i * 5) % 11),
+        delay: i % 7,
+        gold: i % 5 === 0,
+      })),
+    []
+  )
+
+  // small, distant pointed-arch (lancet) window set into the back wall
+  const lancet = (x: number, baseY: number, w: number, h: number, k: string, op: number) => {
+    const hw = w / 2,
+      l = x - hw,
+      r = x + hw,
+      apexY = baseY - h,
+      springY = baseY - h + Math.min(w * 0.8, h * 0.5)
+    const d = `M${l},${baseY} L${l},${springY} Q${l},${apexY} ${x},${apexY} Q${r},${apexY} ${r},${springY} L${r},${baseY} Z`
+    return (
+      <g key={k}>
+        <path d={d} fill={DF.ethereal} opacity={op * 0.45} />
+        <path d={d} fill="none" stroke={DF.stoneGrey} strokeWidth="2.5" opacity={op * 1.8} />
+        <line x1={x} y1={baseY} x2={x} y2={apexY} stroke={DF.stoneGrey} strokeWidth="1.5" opacity={op * 1.4} />
+      </g>
+    )
+  }
+
+  const tower = (x: number, baseY: number, w: number, topY: number, k: string, op: number) => {
+    const hw = w / 2,
+      roofH = w * 1.9
+    return (
+      <g key={k} fill={DF.voidDeep} opacity={op}>
+        <rect x={x - hw} y={topY} width={w} height={baseY - topY} />
+        <polygon points={`${x - hw},${topY} ${x},${topY - roofH} ${x + hw},${topY}`} />
+      </g>
+    )
+  }
+
+  const lamp = (x: number, y: number, k: string) => (
+    <g key={k}>
+      <line x1={x} y1={y - 80} x2={x} y2={y + 70} stroke={DF.stoneGrey} strokeWidth="3" opacity="0.4" />
+      <path d={`M${x - 14},${y} Q${x},${y - 20} ${x + 14},${y} Q${x},${y + 7} ${x - 14},${y} Z`} fill={DF.voidDeep} stroke={DF.stoneGrey} strokeWidth="2" opacity="0.6" />
+      <circle cx={x} cy={y} r="24" fill={DF.ethereal} opacity="0.07" />
+      <circle cx={x} cy={y} r="7" fill={DF.etherealDark} opacity="0.5" />
+    </g>
+  )
+
+  const column = (x: number, k: string) => (
+    <g key={k}>
+      <rect x={x - 52} y={0} width="104" height="1080" fill={DF.void} opacity="0.82" />
+      <rect x={x - 66} y={112} width="132" height="36" rx="6" fill={DF.void} opacity="0.85" />
+      <rect x={x - 66} y={540} width="132" height="26" rx="4" fill={DF.void} opacity="0.85" />
+      {[250, 400].map((y, j) => (
+        <path key={j} d={`M${x - 52},${y} Q${x},${y + 18} ${x + 52},${y}`} fill="none" stroke={DF.stoneDark} strokeWidth="3" opacity="0.8" />
+      ))}
+    </g>
+  )
+
+  const HORIZON = 560
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true" role="presentation">
+      {/* upper nave light, soft floor "stage" light, and a dark vignette */}
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 60% 40% at 50% 22%, ${DF.ethereal}0e, transparent 60%)` }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 55% 32% at 50% 84%, ${DF.ethereal}0c, transparent 62%)` }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, ${DF.void} 100%)` }} />
+
+      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+        {/* distant towers beyond the wall (faint, high) */}
+        {tower(360, 200, 34, -50, 't1', 0.28)}
+        {tower(960, 165, 54, -120, 't2', 0.32)}
+        {tower(1560, 200, 34, -50, 't3', 0.28)}
+
+        {/* BACK WALL */}
+        <rect x="0" y="0" width="1920" height={HORIZON} fill={DF.void} opacity="0.55" />
+        {Array.from({ length: 13 }, (_, i) => (
+          <rect key={`pil${i}`} x={70 + i * 145} y={0} width="14" height={HORIZON} fill={DF.voidDeep} opacity="0.4" />
+        ))}
+        {/* small, distant lancet windows, high on the wall */}
+        {Array.from({ length: 12 }, (_, i) => lancet(150 + i * 145, 430, 96, 250, `w${i}`, 0.1))}
+
+        {/* CORNICE — wall/floor boundary (contrast) */}
+        <rect x="0" y={HORIZON - 5} width="1920" height="9" fill={DF.stoneGrey} opacity="0.2" />
+        <rect x="0" y={HORIZON + 4} width="1920" height="22" fill={DF.void} opacity="0.4" />
+
+                {/* FLOOR — flat 2D side-view plane + foreground balustrade ledge (no perspective) */}
+        <rect x="0" y={HORIZON} width="1920" height={1080 - HORIZON} fill={DF.voidDeep} opacity="0.3" />
+        <rect x="0" y="1004" width="1920" height="14" fill={DF.void} opacity="0.92" />
+        <rect x="0" y="1056" width="1920" height="24" fill={DF.void} opacity="0.96" />
+        {Array.from({ length: 28 }, (_, i) => {
+          const bx = 34 + i * 69
+          return (
+            <g key={`bal${i}`} fill={DF.void} opacity="0.9">
+              <rect x={bx - 7} y="1018" width="14" height="40" rx="3" />
+              <ellipse cx={bx} cy="1018" rx="13" ry="7" />
+              <ellipse cx={bx} cy="1056" rx="13" ry="7" />
+            </g>
+          )
+        })}
+
+        {/* interior side columns */}
+        {column(48, 'cL')}
+        {column(1872, 'cR')}
+
+        {/* hanging soul-lamps along the wall */}
+        {lamp(300, 250, 'l1')}
+        {lamp(620, 210, 'l2')}
+        {lamp(1300, 210, 'l3')}
+        {lamp(1620, 250, 'l4')}
+      </svg>
+
+      {motes.map((m, i) => (
+        <span
+          key={i}
+          className="hk-mote"
+          style={{
+            left: `${m.left}%`,
+            top: `${m.top}%`,
+            width: m.size,
+            height: m.size,
+            background: `radial-gradient(circle, ${m.gold ? DF.spiritGold : DF.etherealDark}, transparent 70%)`,
+            animationDuration: `${m.dur}s`,
+            animationDelay: `${m.delay}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+})
+
 // Combined atmosphere layer - NO chandelier here (it's in header now)
 const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[3] contain-strict" aria-hidden="true" role="presentation">
-      <GothicWindow side="left" />
-      <GothicWindow side="right" />
       <StoneFormations />
 
       {/* Central ethereal glow - no blur filter for performance */}
@@ -672,362 +813,275 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY }: { scrollY
   )
 })
 
-// Musician ornaments - organic flowing shapes (acoustic curves, cymbals as stalactites)
+// Drummer "concert stage" — a Hollow Knight gothic chamber ensemble: drum kit, keyboard,
+// trumpets, guitar, cello + violin, set BACK (smaller, high near the windows) in the side
+// negative spaces so they read as distant stage-dressing and never touch the content.
+// Solid dark shells, tarnished brass, ornate detail, gradient shading. Drummer only.
 const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY: number }) {
+  void scrollY
+  const SHELL = DF.voidDeep
+  const SHELL_D = DF.void
+  const RIM = DF.brass
+  const RIM_H = DF.spiritGold
+  const RIM_S = DF.copper
+  const HW = DF.stoneGrey
+  const GLOW = DF.ethereal
+
+  const drum = (cx: number, cy: number, rx: number, ry: number, k: string, glow = false) => (
+    <g key={k}>
+      <ellipse cx={cx} cy={cy} rx={rx * 1.05} ry={ry * 1.05} fill={SHELL_D} />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#hkHead)" stroke={RIM} strokeWidth="4" />
+      <ellipse cx={cx} cy={cy} rx={rx * 0.92} ry={ry * 0.92} fill="none" stroke={RIM_H} strokeWidth="1.5" opacity="0.4" />
+      {Array.from({ length: 8 }, (_, i) => {
+        const a = (i / 8) * Math.PI * 2 - Math.PI / 2
+        const lx = cx + Math.cos(a) * rx
+        const ly = cy + Math.sin(a) * ry
+        return (
+          <g key={i} transform={`translate(${lx},${ly}) rotate(${(a * 180) / Math.PI + 90})`}>
+            <path d="M0,-8 Q4.5,-2 0,7 Q-4.5,-2 0,-8 Z" fill={RIM} stroke={RIM_S} strokeWidth="0.6" />
+          </g>
+        )
+      })}
+      {glow && (
+        <>
+          <circle cx={cx} cy={cy} r={rx * 0.34} fill={GLOW} opacity="0.14" />
+          <path d={`M${cx},${cy - 30} L${cx - 8},${cy} L${cx},${cy + 30} L${cx + 8},${cy} Z`} fill={RIM_H} opacity="0.4" />
+          <circle cx={cx} cy={cy} r="9" fill={DF.etherealDark} opacity="0.5" />
+        </>
+      )}
+    </g>
+  )
+
+  const cymbal = (x: number, baseY: number, topY: number, rx: number, tilt: number, k: string) => (
+    <g key={k}>
+      <line x1={x} y1={topY} x2={x} y2={baseY} stroke={HW} strokeWidth="4" opacity="0.7" />
+      <line x1={x} y1={baseY} x2={x - 26} y2={baseY + 46} stroke={HW} strokeWidth="3" opacity="0.6" />
+      <line x1={x} y1={baseY} x2={x + 26} y2={baseY + 46} stroke={HW} strokeWidth="3" opacity="0.6" />
+      <g transform={`translate(${x},${topY}) rotate(${tilt})`}>
+        <ellipse rx={rx} ry={rx * 0.15} fill="url(#hkBrass)" stroke={RIM_S} strokeWidth="1.5" />
+        <ellipse rx={rx} ry={rx * 0.15} fill="none" stroke={RIM_H} strokeWidth="1" opacity="0.55" />
+        <ellipse rx={rx * 0.2} ry={rx * 0.05} fill={RIM_S} />
+      </g>
+    </g>
+  )
+
+  const floorTom = (cx: number, topY: number, w: number, h: number, k: string) => (
+    <g key={k}>
+      <line x1={cx - w / 2 + 8} y1={topY + h - 10} x2={cx - w / 2 - 16} y2={topY + h + 70} stroke={HW} strokeWidth="3" opacity="0.6" />
+      <line x1={cx + w / 2 - 8} y1={topY + h - 10} x2={cx + w / 2 + 16} y2={topY + h + 70} stroke={HW} strokeWidth="3" opacity="0.6" />
+      <path d={`M${cx - w / 2},${topY} L${cx - w / 2},${topY + h} Q${cx - w / 2},${topY + h + 14} ${cx},${topY + h + 14} Q${cx + w / 2},${topY + h + 14} ${cx + w / 2},${topY + h} L${cx + w / 2},${topY} Z`} fill="url(#hkShellV)" stroke={SHELL_D} strokeWidth="2" />
+      <ellipse cx={cx} cy={topY} rx={w / 2} ry={w * 0.17} fill="url(#hkHead)" stroke={RIM} strokeWidth="3" />
+      {[0.18, 0.5, 0.82].map((f, i) => (
+        <g key={i}>
+          <path d={`M${cx - w / 2 - 2},${topY + h * f} q-7,5 0,16 q7,-5 0,-16 Z`} fill={RIM} stroke={RIM_S} strokeWidth="0.5" />
+          <path d={`M${cx + w / 2 + 2},${topY + h * f} q7,5 0,16 q-7,-5 0,-16 Z`} fill={RIM} stroke={RIM_S} strokeWidth="0.5" />
+        </g>
+      ))}
+    </g>
+  )
+
+  const keyboard = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      <path d="M-120,0 L-44,-150 M-44,0 L-120,-150" stroke={HW} strokeWidth="11" opacity="0.7" />
+      <path d="M120,0 L44,-150 M44,0 L120,-150" stroke={HW} strokeWidth="11" opacity="0.7" />
+      <rect x="-150" y="-196" width="300" height="56" rx="8" fill="url(#hkShellV)" stroke={RIM} strokeWidth="3" />
+      <rect x="-140" y="-192" width="280" height="9" fill={RIM} opacity="0.7" />
+      {Array.from({ length: 17 }, (_, i) => (
+        <rect key={i} x={-138 + i * 16.2} y="-182" width="13" height="30" fill={DF.bone} opacity="0.45" />
+      ))}
+      {Array.from({ length: 16 }, (_, i) => (i % 7 === 2 || i % 7 === 6 ? null : <rect key={`b${i}`} x={-130 + i * 16.2} y="-182" width="7" height="18" fill={SHELL_D} />))}
+      <rect x="-150" y="-270" width="300" height="74" rx="6" fill="url(#hkShellV)" stroke={RIM} strokeWidth="2" opacity="0.9" />
+      <circle cx="0" cy="-288" r="5" fill={RIM_H} opacity="0.5" />
+    </g>
+  )
+
+  const trumpets = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.92">
+      <line x1="0" y1="0" x2="-26" y2="4" stroke={HW} strokeWidth="4" opacity="0.6" />
+      <line x1="0" y1="0" x2="26" y2="4" stroke={HW} strokeWidth="4" opacity="0.6" />
+      <line x1="0" y1="0" x2="0" y2="-118" stroke={HW} strokeWidth="6" opacity="0.65" />
+      {[{ y: -116, r: -18 }, { y: -150, r: -26 }].map((t, i) => (
+        <g key={i} transform={`translate(0,${t.y}) rotate(${t.r})`}>
+          <rect x="6" y="-6" width="118" height="12" rx="6" fill="url(#hkBrass)" stroke={RIM_S} strokeWidth="1" />
+          <path d="M124,-26 Q160,0 124,26 Q138,0 124,-26 Z" fill="url(#hkBrass)" stroke={RIM_S} strokeWidth="1.5" />
+          <rect x="46" y="-12" width="34" height="20" rx="3" fill={RIM} stroke={RIM_S} strokeWidth="1" />
+          {[52, 62, 72].map((vx) => <line key={vx} x1={vx} y1="-12" x2={vx} y2="-22" stroke={RIM} strokeWidth="3" />)}
+          <circle cx="2" cy="0" r="7" fill={RIM} />
+        </g>
+      ))}
+    </g>
+  )
+
+  // clean electric-guitar silhouette on a stand
+  const guitar = (tx: number, ty: number, s: number, rot: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) rotate(${rot}) scale(${s})`} opacity="0.9">
+      <line x1="-30" y1="6" x2="0" y2="-26" stroke={HW} strokeWidth="6" opacity="0.6" />
+      <line x1="30" y1="6" x2="0" y2="-26" stroke={HW} strokeWidth="6" opacity="0.6" />
+      <path d="M-6,0 C-46,2 -58,-44 -40,-72 C-26,-92 -2,-86 6,-70 C16,-90 44,-86 52,-58 C58,-36 40,-6 6,-6 Z" fill="url(#hkShellV)" stroke={RIM} strokeWidth="3" />
+      <circle cx="6" cy="-48" r="14" fill={SHELL_D} stroke={RIM} strokeWidth="2" />
+      <rect x="-3" y="-300" width="20" height="232" fill="url(#hkShellV)" stroke={RIM} strokeWidth="2" />
+      {Array.from({ length: 6 }, (_, i) => (
+        <line key={i} x1="-3" y1={-110 - i * 30} x2="17" y2={-110 - i * 30} stroke={RIM} strokeWidth="1" opacity="0.4" />
+      ))}
+      <path d="M-3,-300 L17,-300 L22,-346 L-8,-346 Z" fill="url(#hkShellV)" stroke={RIM} strokeWidth="2" />
+      {[-308, -322, -336].map((py) => <circle key={py} cx="-6" cy={py} r="3" fill={RIM} />)}
+    </g>
+  )
+
+  // violin / cello body (figure-8) + fingerboard + scroll; cello stands on an endpin
+  const strings = (tx: number, ty: number, s: number, k: string, pin: boolean) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      {pin && <line x1="0" y1="0" x2="0" y2="26" stroke={HW} strokeWidth="4" opacity="0.6" />}
+      <path d="M0,-8 C-56,-18 -60,-86 -34,-104 C-50,-114 -50,-150 -22,-160 C-40,-176 -36,-210 0,-218 C36,-210 40,-176 22,-160 C50,-150 50,-114 34,-104 C60,-86 56,-18 0,-8 Z" fill="url(#hkShellV)" stroke={RIM} strokeWidth="3" />
+      <path d="M-15,-66 q-7,16 0,34" fill="none" stroke={SHELL_D} strokeWidth="3" />
+      <path d="M15,-66 q7,16 0,34" fill="none" stroke={SHELL_D} strokeWidth="3" />
+      <rect x="-7" y="-94" width="14" height="14" rx="2" fill={RIM} opacity="0.7" />
+      <rect x="-7" y="-218" width="14" height="118" fill={SHELL_D} stroke={RIM} strokeWidth="1.5" />
+      <path d="M-7,-336 q-9,-4 -3,-16 q9,2 10,16 Z" fill="url(#hkShellV)" stroke={RIM} strokeWidth="1.5" />
+      <circle cx="-3" cy="-330" r="8" fill="none" stroke={RIM} strokeWidth="2" />
+    </g>
+  )
+
+  // gothic harp — triangular frame (foot + front pillar + curved neck) with fanned strings
+  const harp = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      <path d="M-8,0 L86,0 L74,20 L4,20 Z" fill="url(#hkShellV)" stroke={RIM} strokeWidth="2.5" />
+      <path d="M58,8 L40,-300 L62,-300 L80,8 Z" fill="url(#hkShellV)" stroke={RIM} strokeWidth="3" />
+      <circle cx="51" cy="-300" r="11" fill={RIM} stroke={RIM_S} strokeWidth="1.5" />
+      <path d="M46,-300 Q-70,-322 -84,-150 Q-90,-40 -6,16" fill="none" stroke="url(#hkBrass)" strokeWidth="12" />
+      <path d="M46,-300 Q-70,-322 -84,-150 Q-90,-40 -6,16" fill="none" stroke={RIM_H} strokeWidth="2" opacity="0.5" />
+      {Array.from({ length: 12 }, (_, i) => {
+        const t = i / 11
+        const topX = 40 + (-78 - 40) * t
+        const topY = -298 + (-120 - -298) * t
+        const botX = 56 + (-2 - 56) * t
+        return <line key={i} x1={topX} y1={topY} x2={botX} y2="14" stroke={RIM_H} strokeWidth="1" opacity="0.3" />
+      })}
+    </g>
+  )
+
+  // tubular bells / chimes — a cathedral-appropriate hanging brass rack
+  const chimes = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      <line x1="-104" y1="14" x2="-104" y2="-300" stroke={HW} strokeWidth="6" opacity="0.6" />
+      <line x1="104" y1="14" x2="104" y2="-300" stroke={HW} strokeWidth="6" opacity="0.6" />
+      <line x1="-120" y1="14" x2="120" y2="14" stroke={HW} strokeWidth="6" opacity="0.6" />
+      <rect x="-112" y="-314" width="224" height="16" rx="7" fill="url(#hkShellV)" stroke={RIM} strokeWidth="2.5" />
+      {Array.from({ length: 7 }, (_, i) => {
+        const x = -84 + i * 28
+        const len = 150 + i * 20
+        return (
+          <g key={i}>
+            <rect x={x - 6} y="-292" width="12" height={len} rx="6" fill="url(#hkBrass)" stroke={RIM_S} strokeWidth="0.8" />
+            <rect x={x - 6} y="-292" width="4" height={len} fill={RIM_H} opacity="0.4" />
+            <ellipse cx={x} cy={-292 + len} rx="6" ry="3" fill={RIM_S} />
+          </g>
+        )
+      })}
+    </g>
+  )
+
+  // idle: a small cluster of drifting music notes rising from an instrument
+  const GLYPHS = ['♪', '♫', '♩', '♬']
+  const noteCluster = (x: number, y: number, seed: number, k: string) => (
+    <g key={k} aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <text
+          key={i}
+          x={x + (i - 1) * 18}
+          y={y}
+          className="hk-note"
+          style={{ animationDelay: `${((seed + i * 1.3) % 3.4).toFixed(2)}s` }}
+          fill={i % 2 === 0 ? GLOW : RIM_H}
+          fontSize="30"
+          opacity="0"
+        >
+          {GLYPHS[(seed + i) % 4]}
+        </text>
+      ))}
+    </g>
+  )
+
+  // idle: drum kit gives a small struck-note burst (no rings — those read as blue circles)
+  const drumFx = (x: number, y: number, k: string) => (
+    <g key={k} aria-hidden="true">
+      <text x={x} y={y - 34} className="hk-thump" style={{ animationDelay: '0.5s' }} fill={RIM_H} fontSize="26" textAnchor="middle" opacity="0">✺</text>
+    </g>
+  )
+
   return (
-    <>
-      {/* FAR LAYER - tiny wave patterns, distant circles */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.15}px) translateZ(0)`,
-          opacity: 0.1,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Distant sound wave lines */}
-        <path
-          d="M0,200 Q100,180 200,200 Q300,220 400,200"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="2"
-          opacity="0.6"
-        />
-        <path
-          d="M1520,250 Q1620,230 1720,250 Q1820,270 1920,250"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="2"
-          opacity="0.6"
-        />
-        {/* Distant circular elements (cymbal suggestions) */}
-        {[
-          { x: 100, y: 350, r: 20 },
-          { x: 1820, y: 400, r: 18 },
-          { x: 150, y: 700, r: 22 },
-          { x: 1770, y: 750, r: 20 },
-        ].map((c, i) => (
-          <g key={i}>
-            <circle cx={c.x} cy={c.y} r={c.r} fill="none" stroke={DF.lavender} strokeWidth="1.5" opacity="0.5" />
-            <circle cx={c.x} cy={c.y} r={c.r * 0.4} fill={DF.lavender} opacity="0.3" />
-          </g>
-        ))}
-      </svg>
+    <svg
+      className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
+      style={{ opacity: 0.82 }}
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMax slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="hkHead" cx="42%" cy="38%" r="70%">
+          <stop offset="0%" stopColor={DF.voidPurple} />
+          <stop offset="70%" stopColor={SHELL} />
+          <stop offset="100%" stopColor={SHELL_D} />
+        </radialGradient>
+        <linearGradient id="hkShellV" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={SHELL_D} />
+          <stop offset="45%" stopColor={DF.voidPurple} />
+          <stop offset="100%" stopColor={SHELL_D} />
+        </linearGradient>
+        <linearGradient id="hkBrass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={RIM_S} />
+          <stop offset="45%" stopColor={RIM_H} />
+          <stop offset="100%" stopColor={RIM_S} />
+        </linearGradient>
+      </defs>
 
-      {/* MID LAYER - wave curves, hanging cymbal shapes */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.35}px) translateZ(0)`,
-          opacity: 0.15,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Acoustic curve shapes */}
-        <path
-          d="M-50,300 Q50,250 100,350 Q150,450 100,500 Q50,550 -50,500"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="3"
-          opacity="0.5"
-        />
-        <path
-          d="M1970,400 Q1870,350 1820,450 Q1770,550 1820,600 Q1870,650 1970,600"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="3"
-          opacity="0.5"
-        />
-        {/* Hanging cymbal/gong shapes */}
-        {[
-          { x: 80, y: 150, r: 35 },
-          { x: 1840, y: 200, r: 40 },
-          { x: 120, y: 550, r: 30 },
-          { x: 1800, y: 600, r: 35 },
-        ].map((c, i) => (
-          <g key={i}>
-            {/* Hanging chain */}
-            <line x1={c.x} y1={0} x2={c.x} y2={c.y - c.r} stroke={DF.brass} strokeWidth="2" opacity="0.4" />
-            {/* Cymbal shape - ellipse from side view */}
-            <ellipse cx={c.x} cy={c.y} rx={c.r} ry={c.r * 0.25} fill="none" stroke={DF.spiritGold} strokeWidth="2" opacity="0.6" />
-            <ellipse cx={c.x} cy={c.y - 3} rx={c.r * 0.8} ry={c.r * 0.15} fill={DF.spiritGold} opacity="0.2" />
-            {/* Center bell */}
-            <circle cx={c.x} cy={c.y} r={c.r * 0.2} fill={DF.spiritGold} opacity="0.4" />
-          </g>
-        ))}
-        {/* Flowing wave lines */}
-        <path
-          d="M0,450 Q80,420 160,450 Q240,480 320,450 Q400,420 480,450"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="2"
-          opacity="0.4"
-        />
-        <path
-          d="M1440,500 Q1520,470 1600,500 Q1680,530 1760,500 Q1840,470 1920,500"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="2"
-          opacity="0.4"
-        />
-      </svg>
+      {/* harp set far BACK and small, floated up near the gothic windows (a distant
+          back-row instrument, like the violin) — sits just above the drum kit */}
+      {harp(1660, 560, 0.38, 'harp')}
 
-      {/* NEAR LAYER - large acoustic shapes, resonant glows */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.6}px) translateZ(0)`,
-          opacity: 0.2,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Large acoustic curve - like f-hole */}
-        <path
-          d="M-80,350 Q20,280 60,400 Q100,520 60,600 Q20,680 -80,620"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="4"
-          opacity="0.6"
-        />
-        <path
-          d="M2000,450 Q1900,380 1860,500 Q1820,620 1860,700 Q1900,780 2000,720"
-          fill="none"
-          stroke={DF.lavender}
-          strokeWidth="4"
-          opacity="0.6"
-        />
-        {/* Large cymbal at edge */}
-        <g transform="translate(-30, 180)">
-          <ellipse rx="80" ry="20" fill="none" stroke={DF.spiritGold} strokeWidth="3" />
-          <ellipse rx="60" ry="12" fill={DF.spiritGold} opacity="0.15" />
-          <circle r="15" fill={DF.spiritGold} opacity="0.3" />
-        </g>
-        <g transform="translate(1950, 250)">
-          <ellipse rx="70" ry="18" fill="none" stroke={DF.spiritGold} strokeWidth="3" />
-          <ellipse rx="50" ry="10" fill={DF.spiritGold} opacity="0.15" />
-          <circle r="12" fill={DF.spiritGold} opacity="0.3" />
-        </g>
-        {/* Resonant glow points */}
-        <circle cx="40" cy="450" r="10" fill={DF.lavender} opacity="0.5" />
-        <circle cx="40" cy="450" r="25" fill={DF.lavender} opacity="0.15" />
-        <circle cx="1880" cy="550" r="10" fill={DF.lavender} opacity="0.5" />
-        <circle cx="1880" cy="550" r="25" fill={DF.lavender} opacity="0.15" />
-      </svg>
-    </>
+      {/* === DRUM KIT — right gutter, set back (small + high) === */}
+      <g transform="translate(1372, 392) scale(0.3)">
+        <circle cx="960" cy="640" r="210" fill={GLOW} opacity="0.05" />
+        {cymbal(675, 1004, 596, 112, -13, 'crash')}
+        {cymbal(1230, 1004, 648, 120, 11, 'ride')}
+        <line x1="545" y1="1004" x2="545" y2="762" stroke={HW} strokeWidth="4" opacity="0.7" />
+        <ellipse cx="545" cy="752" rx="66" ry="11" fill="url(#hkBrass)" stroke={RIM_S} strokeWidth="1.5" />
+        <ellipse cx="545" cy="770" rx="66" ry="11" fill="url(#hkBrass)" stroke={RIM_S} strokeWidth="1.5" />
+        {floorTom(1238, 846, 148, 162, 'ft')}
+        <line x1="960" y1="788" x2="960" y2="688" stroke={HW} strokeWidth="5" opacity="0.6" />
+        <g transform="rotate(-12 882 704)">{drum(882, 704, 86, 70, 'tomL')}</g>
+        <g transform="rotate(12 1042 704)">{drum(1042, 704, 86, 70, 'tomR')}</g>
+        <line x1="742" y1="1004" x2="742" y2="838" stroke={HW} strokeWidth="3" opacity="0.65" />
+        {drum(742, 828, 78, 30, 'snare')}
+        {drum(960, 862, 168, 168, 'bass', true)}
+      </g>
+
+      {/* === stage-LEFT cluster (nudged toward centre): cello, keyboard, guitar === */}
+      {strings(250, 712, 0.54, 'cello', true)}
+      {keyboard(395, 700, 0.42, 'kb')}
+      {guitar(525, 712, 0.34, -9, 'gtr')}
+
+      {/* === stage-RIGHT cluster: trumpets + violin moved to the LEFT of the drum; chimes far right === */}
+      {trumpets(1432, 712, 0.42, 'tp')}
+      {strings(1520, 600, 0.33, 'violin', false)}
+      {chimes(1810, 555, 0.4, 'chimes')}
+
+      {/* === idle: drifting notes from melodic instruments + drum burst === */}
+      {noteCluster(1675, 425, 0, 'n-harp')}
+      {noteCluster(265, 565, 1, 'n-cello')}
+      {noteCluster(410, 560, 2, 'n-kb')}
+      {noteCluster(1450, 615, 3, 'n-tp')}
+      {noteCluster(1530, 505, 4, 'n-vl')}
+      {noteCluster(1820, 425, 5, 'n-chimes')}
+      {drumFx(1655, 565, 'fx-drum')}
+    </svg>
   )
 })
 
-// Martial Artist ornaments - sharp angles, temple architecture, bamboo
+// Muay Thai ornaments - cleared; pending a proper redesign (see project memory)
 const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: number }) {
-  return (
-    <>
-      {/* FAR LAYER - distant temple roofs, bamboo silhouettes */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.15}px) translateZ(0)`,
-          opacity: 0.1,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Distant temple roof silhouettes */}
-        <path
-          d="M-50,250 L100,180 L250,250"
-          fill="none"
-          stroke={DF.spiritGold}
-          strokeWidth="2"
-          opacity="0.5"
-        />
-        <path
-          d="M1670,280 L1820,210 L1970,280"
-          fill="none"
-          stroke={DF.spiritGold}
-          strokeWidth="2"
-          opacity="0.5"
-        />
-        {/* Distant bamboo verticals */}
-        {[60, 90, 130, 1790, 1830, 1860].map((x, i) => (
-          <line
-            key={i}
-            x1={x}
-            y1={350}
-            x2={x}
-            y2={900}
-            stroke={DF.forestGreen}
-            strokeWidth="2"
-            opacity="0.4"
-          />
-        ))}
-        {/* Small pose silhouettes in distance */}
-        <path
-          d="M150,700 L155,680 L165,690 L170,675 L160,685 L155,680"
-          fill={DF.spiritGold}
-          opacity="0.3"
-        />
-        <path
-          d="M1770,720 L1775,700 L1785,710 L1790,695 L1780,705 L1775,700"
-          fill={DF.spiritGold}
-          opacity="0.3"
-        />
-      </svg>
-
-      {/* MID LAYER - temple curves, flowing ribbons, bamboo */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.35}px) translateZ(0)`,
-          opacity: 0.15,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Temple roof curves - more detailed */}
-        <path
-          d="M-100,200 Q50,120 200,200 L180,210 Q50,140 -80,210 Z"
-          fill={DF.spiritGold}
-          opacity="0.3"
-        />
-        <path
-          d="M1720,230 Q1870,150 2020,230 L2000,240 Q1870,170 1740,240 Z"
-          fill={DF.spiritGold}
-          opacity="0.3"
-        />
-        {/* Bamboo stalks with segments */}
-        {[
-          { x: 40, segments: 6 },
-          { x: 80, segments: 5 },
-          { x: 140, segments: 7 },
-          { x: 1780, segments: 5 },
-          { x: 1840, segments: 6 },
-          { x: 1880, segments: 7 },
-        ].map((b, i) => (
-          <g key={i}>
-            <line x1={b.x} y1={250} x2={b.x} y2={950} stroke={DF.forestGreen} strokeWidth="4" opacity="0.5" />
-            {Array.from({ length: b.segments }, (_, j) => (
-              <line
-                key={j}
-                x1={b.x - 6}
-                y1={300 + j * 100}
-                x2={b.x + 6}
-                y2={300 + j * 100}
-                stroke={DF.mossGreen}
-                strokeWidth="2"
-                opacity="0.6"
-              />
-            ))}
-          </g>
-        ))}
-        {/* Flowing ribbons */}
-        <path
-          d="M0,400 Q60,380 100,420 Q140,460 180,430 Q220,400 260,440"
-          fill="none"
-          stroke={DF.spiritGold}
-          strokeWidth="3"
-          opacity="0.4"
-          strokeLinecap="round"
-        />
-        <path
-          d="M1660,450 Q1720,420 1760,470 Q1800,520 1840,480 Q1880,440 1920,490"
-          fill="none"
-          stroke={DF.spiritGold}
-          strokeWidth="3"
-          opacity="0.4"
-          strokeLinecap="round"
-        />
-      </svg>
-
-      {/* NEAR LAYER - large temple elements, martial poses, bamboo foreground */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.6}px) translateZ(0)`,
-          opacity: 0.2,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Large temple roof edge */}
-        <path
-          d="M-150,150 Q100,50 350,150 L320,170 Q100,80 -120,170 Z"
-          fill={DF.spiritGold}
-          opacity="0.35"
-        />
-        <path
-          d="M1570,180 Q1820,80 2070,180 L2040,200 Q1820,110 1600,200 Z"
-          fill={DF.spiritGold}
-          opacity="0.35"
-        />
-        {/* Bamboo with leaves */}
-        {[
-          { x: 20, leavesY: 350 },
-          { x: 60, leavesY: 280 },
-          { x: 1860, leavesY: 320 },
-          { x: 1900, leavesY: 380 },
-        ].map((b, i) => (
-          <g key={i}>
-            <line x1={b.x} y1={200} x2={b.x} y2={1000} stroke={DF.forestGreen} strokeWidth="6" opacity="0.6" />
-            {/* Leaves */}
-            <path
-              d={`M${b.x},${b.leavesY} Q${b.x + 30},${b.leavesY - 20} ${b.x + 50},${b.leavesY - 10}`}
-              fill="none"
-              stroke={DF.mossGreen}
-              strokeWidth="3"
-              opacity="0.5"
-            />
-            <path
-              d={`M${b.x},${b.leavesY + 40} Q${b.x - 25},${b.leavesY + 25} ${b.x - 45},${b.leavesY + 35}`}
-              fill="none"
-              stroke={DF.mossGreen}
-              strokeWidth="3"
-              opacity="0.5"
-            />
-          </g>
-        ))}
-        {/* Martial pose silhouette - stylized, angular */}
-        <g transform="translate(100, 600)" opacity="0.25">
-          {/* Fighting stance */}
-          <path
-            d="M0,0 L10,-40 L5,-45 L15,-50 L10,-40 L20,-30 L25,-15 L15,-10 L10,0 L20,30 L15,50 L5,30 L0,50 L-5,30 L-15,50 L-10,30 L0,0"
-            fill={DF.spiritGold}
-          />
-        </g>
-        <g transform="translate(1820, 650) scale(-1,1)" opacity="0.25">
-          {/* Mirror pose */}
-          <path
-            d="M0,0 L10,-40 L5,-45 L15,-50 L10,-40 L20,-30 L25,-15 L15,-10 L10,0 L20,30 L15,50 L5,30 L0,50 L-5,30 L-15,50 L-10,30 L0,0"
-            fill={DF.spiritGold}
-          />
-        </g>
-        {/* Flowing ribbon accent */}
-        <path
-          d="M-20,500 Q80,460 140,520 Q200,580 260,530"
-          fill="none"
-          stroke={DF.spiritGold}
-          strokeWidth="4"
-          opacity="0.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M1660,550 Q1740,500 1800,570 Q1860,640 1940,580"
-          fill="none"
-          stroke={DF.spiritGold}
-          strokeWidth="4"
-          opacity="0.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    </>
-  )
+  void scrollY
+  return null
 })
 
 // Container component that selects ornaments based on profession
@@ -1051,7 +1105,9 @@ const ProfessionOrnaments = memo(function ProfessionOrnaments({ profession }: { 
   }, [])
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden" aria-hidden="true">
+    <div className="fixed inset-0 pointer-events-none z-[0] overflow-hidden" aria-hidden="true">
+      {/* z-[0]: sits BELOW the z-[1] HollowDepths columns so instruments read as set
+          BEHIND the architecture (was z-[2], which painted them in front of the columns). */}
       {profession === 'engineer' && <EngineerOrnaments scrollY={scrollY} />}
       {profession === 'drummer' && <MusicianOrnaments scrollY={scrollY} />}
       {profession === 'fighter' && <FighterOrnaments scrollY={scrollY} />}
@@ -1322,21 +1378,11 @@ const WaystationNode = memo(function WaystationNode({
       />
       {/* Main container - VoidFrame style with decorative elements */}
       <div
-        className={`relative w-20 h-20 md:w-28 md:h-28 flex flex-col items-center justify-center transition-all duration-300 ${
-          isActive ? 'scale-110' : 'group-hover:scale-105'
+        className={`df-card bg-df-panel relative w-20 h-20 md:w-28 md:h-28 flex flex-col items-center justify-center transition-all duration-300 ${
+          isActive ? 'df-card--active scale-110' : 'group-hover:scale-105'
         }`}
         style={{
-          background: `linear-gradient(180deg,
-            rgba(15, 10, 30, 0.92) 0%,
-            rgba(20, 15, 35, 0.88) 50%,
-            rgba(15, 10, 30, 0.92) 100%
-          )`,
-          border: `1px solid ${isActive ? color : 'rgba(232, 228, 220, 0.15)'}`,
-          borderRadius: '2px',
-          backdropFilter: 'blur(4px)',
-          boxShadow: isActive
-            ? `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 0 15px ${color}40`
-            : `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.3)`,
+          ['--df-accent' as string]: isActive ? color : undefined,
           animation: isReceivingEnergy ? 'nodeArrival 400ms ease-out' : undefined,
         }}
       >
@@ -1597,30 +1643,7 @@ const VoidFrame = memo(function VoidFrame({
   return (
     <div className="relative pt-4 pb-4" role="region" aria-labelledby={headingId}>
       {/* Main dialogue box container */}
-      <div
-        className="relative"
-        style={{
-          // Semi-transparent dark background matching HK's dialogue boxes
-          // Deep blue-purple tones for that void/underground feel
-          background: `linear-gradient(180deg,
-            rgba(15, 10, 30, 0.92) 0%,
-            rgba(20, 15, 35, 0.88) 50%,
-            rgba(15, 10, 30, 0.92) 100%
-          )`,
-          // Subtle border with slight glow - bone color at low opacity
-          border: `1px solid rgba(232, 228, 220, 0.15)`,
-          borderRadius: '2px',
-          // Backdrop blur for depth (subtle, not overwhelming)
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)',
-          // Inner shadow for depth, outer shadow for lift
-          boxShadow: `
-            inset 0 0 60px rgba(0, 0, 0, 0.4),
-            inset 0 1px 0 rgba(232, 228, 220, 0.05),
-            0 4px 20px rgba(0, 0, 0, 0.3)
-          `,
-        }}
-      >
+      <div className="df-panel bg-df-panel relative">
         {/* Top decorative flourish - elegant vine-like pattern */}
         <DialogueFlourish position="top" width={220} />
 
@@ -1731,7 +1754,7 @@ const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PRO
     <article
       className="p-4 transition-transform hover:scale-[1.02] cursor-pointer group"
       style={{
-        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple}50)`,
+        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple})`,
         border: `1px solid ${project.featured ? DF.spiritGold : DF.stoneDark}`,
         borderRadius: '4px',
       }}
@@ -1774,7 +1797,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COM
       rel="noopener noreferrer"
       className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
-        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple}40)`,
+        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple})`,
         border: `1px solid ${DF.stoneDark}`,
         borderRadius: '4px',
         ['--tw-ring-color' as string]: DF.spiritGold,
@@ -1803,7 +1826,7 @@ const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
     <article
       className="p-4 transition-transform hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${DF.void}, ${DF.lavender}20)`,
+        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidDeep})`,
         border: `1px solid ${DF.lavender}60`,
         borderRadius: '4px',
       }}
@@ -2028,19 +2051,6 @@ const ArtSectionLanterns = memo(function ArtSectionLanterns() {
         />
       </div>
 
-      {/* Decorative line */}
-      <svg className="w-full h-6 mt-4" viewBox="0 0 800 24" preserveAspectRatio="none">
-        <path
-          d="M0,12 Q200,6 400,12 Q600,18 800,12"
-          fill="none"
-          stroke={DF.brass}
-          strokeWidth="1"
-          opacity="0.3"
-        />
-        {[200, 400, 600].map((x, i) => (
-          <circle key={i} cx={x} cy={12} r="3" fill={DF.spiritGold} opacity="0.4" />
-        ))}
-      </svg>
     </div>
   )
 })
@@ -2197,7 +2207,9 @@ export default function DarkFantasyTheme() {
   // Each animated section gets its own trigger based on ACTUAL element position
   const experienceTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
   const projectsTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
-  const contactTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
+  // fire the final battle just slightly before it's centered (small positive bottom margin) —
+  // a touch later than the previous +18% which kicked off before you'd even seen the section
+  const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
 
   // Memoize expensive data operations
   const aboutData = useMemo(() => ABOUT_DATA[active], [active])
@@ -2282,6 +2294,7 @@ export default function DarkFantasyTheme() {
           `,
         }}
       />
+      <HollowDepths />
       <EtherealRain />
       <DarkFantasyAtmosphere />
       <SpiritParticles />
@@ -2312,7 +2325,6 @@ export default function DarkFantasyTheme() {
         className="fixed top-0 left-0 right-0 z-[50] px-4 py-3 md:px-6 md:py-4"
         style={{
           background: `linear-gradient(180deg, ${DF.void}f5 0%, ${DF.void}e0 70%, transparent 100%)`,
-          backdropFilter: 'blur(8px)',
         }}
         role="banner"
         aria-label="Primary navigation"
@@ -2361,7 +2373,6 @@ export default function DarkFantasyTheme() {
               <span className="hidden sm:inline">Nebulith</span>
               <span className="sm:hidden">Game</span>
             </Link>
-            <ThemeSwitcher />
           </div>
         </div>
       </nav>
@@ -2624,6 +2635,31 @@ export default function DarkFantasyTheme() {
           </div>
         </section>
         </BattleReveal>
+
+        {/* Enter Another World - portal to the other realms.
+            mt pushes it well below the battle so the fixed knight/bug fully clear first. */}
+        <section className="relative z-20 mt-32 md:mt-52 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-8">
+              <h2
+                id="worlds-heading"
+                className="text-xl md:text-2xl tracking-[0.15em] mb-3"
+                style={{ color: DF.brass, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
+              >
+                Enter Another World
+              </h2>
+              <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
+                <div className="w-10 h-px" style={{ background: DF.brass }} />
+                <span style={{ color: DF.ethereal }}>✦</span>
+                <div className="w-10 h-px" style={{ background: DF.brass }} />
+              </div>
+              <p className="text-sm" style={{ color: DF.silver }}>
+                Step through to a different version of this realm
+              </p>
+            </div>
+            <WorldsGrid />
+          </div>
+        </section>
       </div>
 
       {/* Bottom obscure overlay - content fades into darkness */}

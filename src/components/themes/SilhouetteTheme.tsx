@@ -2,7 +2,6 @@
 
 import React from 'react'
 import Link from 'next/link'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -12,6 +11,7 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // =============================================================================
 // LIMBO - DARKER, PERFORMANCE-OPTIMIZED
@@ -835,7 +835,6 @@ export default function SilhouetteTheme() {
             >
               enter
             </Link>
-            <ThemeSwitcher />
           </nav>
         </div>
       </header>
@@ -1018,6 +1017,26 @@ export default function SilhouetteTheme() {
               Download CV
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* ========== ENTER ANOTHER WORLD ========== */}
+      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 id="worlds-heading" className="text-xl tracking-[0.3em] font-normal uppercase mb-4" style={{ color: LIMBO.fogWhite2 }}>
+              Enter Another World
+            </h2>
+            <div className="flex items-center justify-center gap-3 mb-3" aria-hidden="true">
+              <div className="w-10 h-px" style={{ background: `${LIMBO.midGrey2}` }} />
+              <p className="text-xs tracking-[0.5em]" style={{ color: LIMBO.lightGrey1 }}>. . .</p>
+              <div className="w-10 h-px" style={{ background: `${LIMBO.midGrey2}` }} />
+            </div>
+            <p className="text-xs tracking-[0.2em] uppercase" style={{ color: LIMBO.lightGrey1 }}>
+              Cross into a darker reflection
+            </p>
+          </div>
+          <WorldsGrid />
         </div>
       </section>
 

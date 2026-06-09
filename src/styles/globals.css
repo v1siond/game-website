@@ -1,3 +1,6 @@
+/* Theme component layers (ITCSS) — gothic surfaces, instead of inline styles */
+@import "./themes/dark-fantasy.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -202,3 +205,241 @@ textarea:focus-visible {
     word-wrap: break-word;
   }
 }
+
+/* =================================================================== */
+/* WORLD SELECT (level-select home screen)                              */
+/* =================================================================== */
+
+.ws-root {
+  position: relative;
+  color: #e7e9f3;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(80, 90, 160, 0.18), transparent 60%),
+    linear-gradient(180deg, #0b0c12 0%, #07080d 100%);
+}
+
+/* faint grid texture for the arcade-hub feel */
+.ws-root::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 44px 44px;
+  -webkit-mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+  mask-image: radial-gradient(circle at 50% 30%, #000 0%, transparent 75%);
+}
+
+.ws-title {
+  color: #f3f4fb;
+  text-shadow: 0 0 18px rgba(120, 140, 255, 0.45), 0 2px 0 rgba(0, 0, 0, 0.6);
+}
+.ws-sub { color: #8b93b8; }
+
+.ws-chip {
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+/* cards */
+.wc-card {
+  height: 100%;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  will-change: transform;
+}
+.wc-card:hover,
+.wc-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+}
+
+/* clip + isolate each heavy preview so layout/paint don't leak between cards */
+.wc-frame { contain: layout paint; }
+
+/* freeze CSS animation/transition inside the live preview */
+.wc-freeze,
+.wc-freeze *,
+.wc-freeze *::before,
+.wc-freeze *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+.wc-scrim {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.35) 100%);
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.45);
+  transition: background 0.2s ease;
+}
+.wc-card:hover .wc-scrim {
+  background: linear-gradient(180deg, rgba(120, 140, 255, 0.06) 0%, rgba(0, 0, 0, 0.15) 100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wc-card { transition: none; }
+  .wc-card:hover,
+  .wc-card:focus-visible { transform: none; }
+}
+
+/* =================================================================== */
+/* WORLD TRANSITION PORTAL (4 random variants)                          */
+/* =================================================================== */
+
+.wp-root {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+.wp-root > * {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+
+/* Backdrop fades to the destination world's background, common to all variants */
+.wp-backdrop { background: var(--wp-bg); opacity: 0; }
+.wp-root[data-phase="cover"] .wp-backdrop { animation: wp-fade-in var(--wp-cover) ease forwards; }
+.wp-root[data-phase="reveal"] .wp-backdrop { animation: wp-fade-out var(--wp-reveal) ease forwards; }
+
+/* Effect layers start hidden; each variant lights up the ones it uses */
+.wp-fx, .wp-ring, .wp-grid, .wp-flash { opacity: 0; }
+
+/* The "Entering <world>" label, common to all variants */
+.wp-label { display: flex; align-items: center; justify-content: center; }
+.wp-label-text {
+  color: #fff;
+  font-size: clamp(0.9rem, 3vw, 2rem);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  text-shadow: 0 0 1.4vmax var(--wp-accent), 0 0 0.4vmax #fff;
+  opacity: 0;
+}
+.wp-root[data-phase="cover"] .wp-label-text { animation: wp-label-in var(--wp-cover) ease-out forwards; }
+.wp-root[data-phase="reveal"] .wp-label-text { animation: wp-fade-out var(--wp-reveal) ease forwards; }
+
+@keyframes wp-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes wp-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes wp-label-in { 0% { opacity: 0; transform: scale(0.85); } 55% { opacity: 1; } 100% { opacity: 1; transform: scale(1); } }
+
+/* ---- Variant: VORTEX (iris swirl) ---------------------------------- */
+.wp-root[data-variant="vortex"] .wp-fx,
+.wp-root[data-variant="vortex"] .wp-ring {
+  left: 50%; top: 50%; inset: auto;
+  border-radius: 50%;
+}
+.wp-root[data-variant="vortex"] .wp-fx {
+  width: 230vmax; height: 230vmax; margin: -115vmax 0 0 -115vmax;
+  background: conic-gradient(from 0deg, transparent, var(--wp-accent), transparent 30%, var(--wp-secondary), transparent 55%, var(--wp-accent), transparent 85%, var(--wp-secondary));
+  filter: blur(2px);
+}
+.wp-root[data-variant="vortex"] .wp-ring {
+  width: 44vmax; height: 44vmax; margin: -22vmax 0 0 -22vmax;
+  border: 0.7vmax solid var(--wp-accent);
+  box-shadow: 0 0 7vmax var(--wp-accent), inset 0 0 5vmax var(--wp-secondary);
+}
+.wp-root[data-variant="vortex"][data-phase="cover"] .wp-fx { animation: wp-vortex-in var(--wp-cover) cubic-bezier(0.5,0,0.9,0.5) forwards; }
+.wp-root[data-variant="vortex"][data-phase="reveal"] .wp-fx { animation: wp-vortex-out var(--wp-reveal) cubic-bezier(0.2,0.6,0.4,1) forwards; }
+.wp-root[data-variant="vortex"][data-phase="cover"] .wp-ring { animation: wp-ring-pulse var(--wp-cover) ease-out forwards; }
+@keyframes wp-vortex-in { 0% { transform: scale(0) rotate(0deg); opacity: 0; } 35% { opacity: 1; } 100% { transform: scale(1) rotate(560deg); opacity: 1; } }
+@keyframes wp-vortex-out { 0% { transform: scale(1) rotate(560deg); opacity: 1; } 100% { transform: scale(0) rotate(960deg); opacity: 0; } }
+@keyframes wp-ring-pulse { 0% { transform: scale(0.1); opacity: 0; } 40% { opacity: 1; } 100% { transform: scale(8); opacity: 0; } }
+
+/* ---- Variant: WORMHOLE (tunnel dive) ------------------------------- */
+.wp-root[data-variant="wormhole"] .wp-fx {
+  left: 50%; top: 50%; inset: auto;
+  width: 200vmax; height: 200vmax; margin: -100vmax 0 0 -100vmax;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle at 50% 50%, var(--wp-accent) 0 0.4vmax, transparent 0.4vmax 4.5vmax);
+  mix-blend-mode: screen;
+}
+.wp-root[data-variant="wormhole"] .wp-fx2 {
+  background: repeating-radial-gradient(circle at 50% 50%, var(--wp-secondary) 0 0.3vmax, transparent 0.3vmax 7vmax);
+}
+.wp-root[data-variant="wormhole"][data-phase="cover"] .wp-fx { animation: wp-worm-in var(--wp-cover) ease-in forwards; }
+.wp-root[data-variant="wormhole"][data-phase="cover"] .wp-fx2 { animation: wp-worm-in var(--wp-cover) ease-in forwards; animation-delay: -180ms; }
+.wp-root[data-variant="wormhole"][data-phase="reveal"] .wp-fx,
+.wp-root[data-variant="wormhole"][data-phase="reveal"] .wp-fx2 { animation: wp-fade-out var(--wp-reveal) ease forwards; }
+@keyframes wp-worm-in { 0% { transform: scale(0.15) rotate(0deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: scale(2.4) rotate(60deg); opacity: 1; } }
+
+/* ---- Variant: HYPERSPACE (warp streaks) ---------------------------- */
+.wp-root[data-variant="hyperspace"] .wp-fx {
+  left: 50%; top: 50%; inset: auto;
+  width: 300vmax; height: 300vmax; margin: -150vmax 0 0 -150vmax;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, transparent 0 0.6deg, var(--wp-accent) 0.6deg 1.2deg, transparent 1.2deg 3deg, var(--wp-secondary) 3deg 3.5deg, transparent 3.5deg 5deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 5vmax, #000 16vmax);
+  mask-image: radial-gradient(circle at 50% 50%, transparent 0 5vmax, #000 16vmax);
+}
+.wp-root[data-variant="hyperspace"] .wp-flash {
+  background: radial-gradient(circle at 50% 50%, #fff 0%, transparent 60%);
+}
+.wp-root[data-variant="hyperspace"][data-phase="cover"] .wp-fx { animation: wp-hyper-in var(--wp-cover) cubic-bezier(0.6,0,0.8,0.2) forwards; }
+.wp-root[data-variant="hyperspace"][data-phase="cover"] .wp-flash { animation: wp-flash var(--wp-cover) ease-in forwards; }
+.wp-root[data-variant="hyperspace"][data-phase="reveal"] .wp-fx { animation: wp-fade-out var(--wp-reveal) ease forwards; }
+@keyframes wp-hyper-in { 0% { transform: scale(0.25); opacity: 0; } 25% { opacity: 1; } 100% { transform: scale(1.5); opacity: 1; } }
+@keyframes wp-flash { 0%, 65% { opacity: 0; } 88% { opacity: 0.95; } 100% { opacity: 1; } }
+
+/* ---- Variant: GLITCH (pixel warp) ---------------------------------- */
+.wp-root[data-variant="glitch"] .wp-fx {
+  background:
+    linear-gradient(90deg, var(--wp-accent) 0 12.5%, transparent 12.5% 37.5%, var(--wp-secondary) 37.5% 50%, transparent 50% 75%, var(--wp-accent) 75% 87.5%, transparent 87.5%),
+    linear-gradient(0deg, var(--wp-secondary) 0 12.5%, transparent 12.5% 50%, var(--wp-accent) 50% 62.5%, transparent 62.5%);
+  background-size: 16% 16%;
+  mix-blend-mode: screen;
+}
+.wp-root[data-variant="glitch"] .wp-grid {
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,0.55) 0 2px, transparent 2px 5px);
+}
+.wp-root[data-variant="glitch"][data-phase="cover"] .wp-fx { animation: wp-glitch var(--wp-cover) steps(6, end) forwards; }
+.wp-root[data-variant="glitch"][data-phase="cover"] .wp-grid { animation: wp-fade-in var(--wp-cover) steps(4, end) forwards; }
+.wp-root[data-variant="glitch"][data-phase="reveal"] .wp-fx,
+.wp-root[data-variant="glitch"][data-phase="reveal"] .wp-grid { animation: wp-glitch-out var(--wp-reveal) steps(5, end) forwards; }
+@keyframes wp-glitch {
+  0% { opacity: 0; transform: translate(0, 0); }
+  20% { opacity: 0.6; transform: translate(-2%, 1%); }
+  40% { opacity: 0.85; transform: translate(3%, -2%); }
+  60% { opacity: 0.7; transform: translate(-3%, 2%); }
+  80% { opacity: 1; transform: translate(1%, -1%); }
+  100% { opacity: 1; transform: translate(0, 0); }
+}
+@keyframes wp-glitch-out {
+  0% { opacity: 1; transform: translate(0, 0); }
+  50% { opacity: 0.6; transform: translate(4%, -3%); }
+  100% { opacity: 0; transform: translate(0, 0); }
+}
+
+/* Safety: the provider already skips the portal for reduced motion, but hide it here too. */
+@media (prefers-reduced-motion: reduce) {
+  .wp-root { display: none !important; }
+}
+
+/* Profession background ornaments live in the side gutters. Below ~1024px there are no
+   gutters, so hide them entirely to protect content readability. */
+@media (max-width: 1024px) {
+  .ornament-layer { display: none !important; }
+}
+
+/* Hollow Knight soul motes — soft drifting lumafly-like specks (GPU transform/opacity). */
+.hk-mote {
+  position: absolute;
+  border-radius: 9999px;
+  opacity: 0;
+  animation-name: hk-drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+}
+@keyframes hk-drift {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  15% { opacity: 0.6; }
+  50% { transform: translate3d(8px, -26px, 0); opacity: 0.75; }
+  85% { opacity: 0.5; }
+  100% { transform: translate3d(-6px, -52px, 0); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hk-mote { animation: none; opacity: 0.35; }
+}
+

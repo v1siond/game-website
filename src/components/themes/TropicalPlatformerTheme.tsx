@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -11,6 +10,7 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // ============================================================================
 // CRASH BANDICOOT EXACT COLOR PALETTE
@@ -1986,7 +1986,6 @@ export default function TropicalPlatformerTheme() {
                 NEBULITH
               </Link>
 
-              <ThemeSwitcher />
             </div>
           </div>
         </div>
@@ -2219,6 +2218,40 @@ export default function TropicalPlatformerTheme() {
               </div>
             </div>
           </CratePanel>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* ENTER ANOTHER WORLD */}
+      {/* ================================================================ */}
+      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-8">
+            <h2
+              id="worlds-heading"
+              className="text-2xl md:text-3xl font-black tracking-wider uppercase mb-3"
+              style={{
+                color: COLORS.crashOrange,
+                textShadow: '3px 3px 0 rgba(0,0,0,0.6)',
+                fontFamily: 'Impact, Arial Black, sans-serif',
+                letterSpacing: '0.1em',
+              }}
+            >
+              Enter Another World
+            </h2>
+            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
+              <div className="w-12 h-1 rounded-full" style={{ background: COLORS.jungleLime }} />
+              <WumpaFruit size={22} />
+              <div className="w-12 h-1 rounded-full" style={{ background: COLORS.jungleLime }} />
+            </div>
+            <p
+              className="text-sm font-bold tracking-wide"
+              style={{ color: COLORS.beachSand, fontFamily: 'Impact, sans-serif', textShadow: '1px 1px 0 rgba(0,0,0,0.4)' }}
+            >
+              Warp to a wild new island adventure
+            </p>
+          </div>
+          <WorldsGrid />
         </div>
       </section>
 

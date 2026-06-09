@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { usePreview } from '@/themes/PreviewContext'
 
 /**
  * SECTION TRIGGER HOOK
@@ -43,6 +44,10 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
   const [inView, setInView] = useState(false)
   const elementRef = useRef<HTMLElement | null>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
+
+  // In a World Select preview, sections are clipped/frozen so the observer never
+  // fires — force everything "triggered" so the hero renders instead of staying blank.
+  const isPreview = usePreview()
 
   const setRef = useCallback((element: HTMLElement | null) => {
     // Cleanup previous observer
@@ -91,7 +96,11 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
     }
   }, [])
 
-  return { ref: setRef, triggered, inView }
+  return {
+    ref: setRef,
+    triggered: isPreview || triggered,
+    inView: isPreview || inView,
+  }
 }
 
 /**
@@ -127,6 +136,9 @@ export function useMultiSectionTrigger(options: MultiSectionTriggerOptions): Mul
   const [inViewSections, setInViewSections] = useState<Set<string>>(new Set())
   const elementsRef = useRef<Map<string, HTMLElement>>(new Map())
   const observerRef = useRef<IntersectionObserver | null>(null)
+
+  // See useSectionTrigger: previews are frozen, so report every section as triggered.
+  const isPreview = usePreview()
 
   // Create observer once
   useEffect(() => {
@@ -190,12 +202,12 @@ export function useMultiSectionTrigger(options: MultiSectionTriggerOptions): Mul
   }, [])
 
   const isTriggered = useCallback((id: string) => {
-    return triggeredSections.has(id)
-  }, [triggeredSections])
+    return isPreview || triggeredSections.has(id)
+  }, [isPreview, triggeredSections])
 
   const isInView = useCallback((id: string) => {
-    return inViewSections.has(id)
-  }, [inViewSections])
+    return isPreview || inViewSections.has(id)
+  }, [isPreview, inViewSections])
 
   return {
     registerSection,

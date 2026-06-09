@@ -1,0 +1,83 @@
+/* =========================================================================
+   Dark Fantasy theme — CSS (ITCSS structure)
+
+   Tailwind utilities handle most styling in the components. This file holds
+   the reusable, multi-property gothic SURFACES that don't belong inline:
+     SETTINGS    – palette tokens (mirror tailwind.config `df` colors)
+     COMPONENTS  – Hollow-Knight dialogue panels / selector cards
+   Imported once from globals.css. Never style these surfaces inline.
+   (Plain classes, not @layer — the file is processed as its own module.)
+   ========================================================================= */
+
+/* ---------- SETTINGS: palette tokens ---------- */
+:root {
+  --df-void: #0f0a1a;
+  --df-void-deep: #1a1025;
+  --df-void-purple: #150f25;
+  --df-panel: #15102b; /* opaque dialogue-box surface — NO transparency */
+  --df-ethereal: #41c8e8;
+  --df-spirit-gold: #e8c841;
+  --df-brass: #b08d57;
+  --df-stone: #4a4a4a;
+  --df-stone-dark: #333333;
+  --df-bone: #e8e4dc;
+}
+
+/* ---------- COMPONENTS: gothic surfaces ---------- */
+
+/* Dialogue-box panel (VoidFrame / About / every content section frame).
+   Fully opaque so the busy boss-stage background never bleeds through. */
+.df-panel {
+  background-color: var(--df-panel, #15102b);
+  border: 1px solid rgb(232 228 220 / 0.15);
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 60px rgb(0 0 0 / 0.4),
+    inset 0 1px 0 rgb(232 228 220 / 0.05),
+    0 4px 20px rgb(0 0 0 / 0.3);
+}
+
+/* Waystation profession-selector card. Fully opaque; the active accent
+   colour is passed in via the `--df-accent` custom property (not hardcoded). */
+.df-card {
+  background-color: var(--df-panel, #15102b);
+  border: 1px solid var(--df-accent, rgb(232 228 220 / 0.15));
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 20px rgb(0 0 0 / 0.4),
+    0 2px 10px rgb(0 0 0 / 0.3);
+}
+.df-card--active {
+  box-shadow:
+    inset 0 0 20px rgb(0 0 0 / 0.4),
+    0 0 15px var(--df-accent, transparent);
+}
+
+/* ---------- ANIMATIONS: ambient instrument idle (boss-stage) ----------
+   Melodic instruments breathe out drifting music notes; the drum kit pulses
+   sound rings. GPU-only (transform/opacity), staggered per element via
+   animation-delay. Every element starts at opacity 0 so nothing shows until
+   its cycle begins. `transform-box: fill-box` makes the transform-origin
+   local to each SVG glyph's own box. */
+@keyframes hkNoteFloat {
+  0%   { opacity: 0; transform: translateY(8px) scale(0.7); }
+  18%  { opacity: 0.9; }
+  100% { opacity: 0; transform: translateY(-60px) scale(1.15); }
+}
+@keyframes hkBoomRing {
+  0%   { opacity: 0; transform: scale(0.35); }
+  22%  { opacity: 0.5; }
+  100% { opacity: 0; transform: scale(2.7); }
+}
+@keyframes hkThump {
+  0%   { opacity: 0; transform: translateY(0) scale(0.6); }
+  25%  { opacity: 0.85; }
+  100% { opacity: 0; transform: translateY(-24px) scale(1.2); }
+}
+.hk-note  { animation: hkNoteFloat 3.4s ease-out infinite; transform-box: fill-box; transform-origin: center bottom; }
+.hk-boom  { animation: hkBoomRing 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.hk-thump { animation: hkThump 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hk-note, .hk-boom, .hk-thump { animation: none; opacity: 0; }
+}

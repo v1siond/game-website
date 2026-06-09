@@ -3,7 +3,6 @@
 import { useRef, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
@@ -12,6 +11,7 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // =============================================================================
 // EXACT COLOR PALETTE - STREET FIGHTER / MORTAL KOMBAT / TEKKEN INSPIRED
@@ -1745,7 +1745,6 @@ export default function FighterSelectTheme() {
                   >
                     PLAY
                   </Link>
-                  <ThemeSwitcher />
                 </nav>
               </div>
             </ArcadeSectionCard>
@@ -2040,6 +2039,59 @@ export default function FighterSelectTheme() {
                 DOWNLOAD CV
               </Link>
             </div>
+          </div>
+        </section>
+
+        {/* ================================================================= */}
+        {/* ENTER ANOTHER WORLD */}
+        {/* ================================================================= */}
+        <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-8">
+              <h2
+                id="worlds-heading"
+                className="text-2xl md:text-3xl tracking-[0.15em] uppercase mb-3"
+                style={{
+                  fontFamily: '"Impact", "Arial Black", sans-serif',
+                  color: COLORS.electricYellow,
+                  textShadow: `
+                    0 0 10px ${COLORS.electricYellow},
+                    0 0 20px ${COLORS.gold},
+                    0 0 40px ${COLORS.specialBlue}60,
+                    4px 4px 0 ${COLORS.arcadeBlack},
+                    -2px -2px 0 ${COLORS.arcadeBlack}
+                  `,
+                  WebkitTextStroke: `2px ${COLORS.arcadeBlack}`,
+                }}
+              >
+                Enter Another World
+              </h2>
+              <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
+                <div className="w-10 h-px" style={{ background: COLORS.gold }} />
+                <span
+                  className="font-black tracking-[0.2em]"
+                  style={{
+                    fontFamily: '"Impact", "Arial Black", sans-serif',
+                    color: COLORS.gold,
+                    textShadow: `0 0 12px ${COLORS.gold}, 0 0 20px ${COLORS.specialBlue}60`,
+                  }}
+                >
+                  VS
+                </span>
+                <div className="w-10 h-px" style={{ background: COLORS.gold }} />
+              </div>
+              <p
+                className="text-sm tracking-[0.3em] uppercase"
+                style={{
+                  fontFamily: '"Impact", "Arial Black", sans-serif',
+                  color: COLORS.specialBlue,
+                  textShadow: `0 0 10px ${COLORS.specialBlue}80`,
+                }}
+              >
+                Select your world to continue
+              </p>
+            </div>
+            <WorldsGrid />
           </div>
         </section>
 

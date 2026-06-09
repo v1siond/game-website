@@ -1,0 +1,187 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Component Snapshots DownloadPdfButton matches default state snapshot 1`] = `
+<div>
+  <button
+    class="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
+  >
+    <svg
+      class="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+      />
+    </svg>
+    Download PDF
+  </button>
+</div>
+`;
+
+exports[`Component Snapshots DownloadPdfButton matches different label snapshot 1`] = `
+<div>
+  <button
+    class="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
+  >
+    <svg
+      class="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+      />
+    </svg>
+    Download CV
+  </button>
+</div>
+`;
+
+exports[`Component Snapshots LanguageSwitcher matches default snapshot 1`] = `
+<div>
+  <div
+    class="flex items-center gap-2 print:hidden"
+  >
+    <span
+      class="text-sm text-gray-600"
+    >
+      Language:
+    </span>
+    <select
+      class="text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    >
+      <option
+        value="en"
+      >
+        English
+      </option>
+      <option
+        value="es"
+      >
+        Espanol
+      </option>
+      <option
+        value="it"
+      >
+        Italiano
+      </option>
+    </select>
+  </div>
+</div>
+`;
+
+exports[`Component Snapshots ThemeSwitcher matches closed state snapshot 1`] = `
+<div>
+  <div
+    class="relative z-[9999]"
+  >
+    <button
+      aria-expanded="false"
+      aria-haspopup="listbox"
+      aria-label="Select theme"
+      class="text-sm px-3 py-2 transition-colors cursor-pointer min-h-[44px] flex items-center gap-2"
+      style="border: 1px solid #4020a0; color: rgb(128, 128, 160);"
+    >
+      <span
+        aria-hidden="true"
+        class="w-2 h-2 rounded-full flex-shrink-0"
+        style="background-color: rgb(255, 0, 255);"
+      />
+      <span
+        aria-hidden="true"
+      >
+        THEMES
+      </span>
+      <span
+        class="sr-only"
+      >
+        Current theme: 
+        Neon Cyber
+      </span>
+    </button>
+  </div>
+</div>
+`;
+
+exports[`Profession Data Snapshots profession configs structure matches snapshot 1`] = `
+{
+  "configKeys": [
+    "id",
+    "title",
+    "tagline",
+    "icon",
+    "color",
+    "years",
+  ],
+  "professionIds": [
+    "engineer",
+    "drummer",
+    "fighter",
+  ],
+}
+`;
+
+exports[`Theme Data Snapshots default theme configuration matches snapshot 1`] = `
+{
+  "colorKeys": [
+    "background",
+    "backgroundGradient",
+    "accent",
+    "text",
+    "textMuted",
+    "secondary",
+    "highlight",
+    "border",
+    "borderHover",
+    "surface",
+    "surfaceHover",
+  ],
+  "effectKeys": [
+    "vignette",
+    "grain",
+    "scanlines",
+    "glitch",
+    "flicker",
+    "grainOpacity",
+    "vignetteIntensity",
+  ],
+  "id": "neon-cyber",
+  "name": "Neon Cyber",
+}
+`;
+
+exports[`Theme Data Snapshots theme count matches snapshot 1`] = `
+{
+  "themeIds": [
+    "adventure-paths",
+    "art-deco",
+    "bold-noir",
+    "cell-shaded",
+    "dark-fantasy",
+    "fighter-select",
+    "medieval-fantasy",
+    "mythic",
+    "neon-cyber",
+    "neon-portals",
+    "retro-atomic",
+    "retro-rpg",
+    "rubber-hose",
+    "silhouette",
+    "soul-map",
+    "survival-horror",
+    "tropical-platformer",
+  ],
+  "totalThemes": 17,
+}
+`;
