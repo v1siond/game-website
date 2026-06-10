@@ -12,7 +12,6 @@ import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // ============================================================================
 // CUPHEAD COLOR PALETTE - Authentic 1930s Fleischer/Disney style
@@ -1734,33 +1733,7 @@ export default function RubberHoseTheme() {
           </div>
         </section>
 
-        {/* Enter Another World */}
-        <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h2
-                id="worlds-heading"
-                className="text-xl md:text-2xl tracking-[0.15em] mb-3"
-                style={{
-                  color: CUPHEAD_COLORS.inkBlack,
-                  fontFamily: '"Abril Fatface", serif',
-                  textShadow: `2px 2px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-                }}
-              >
-                Enter Another World
-              </h2>
-              <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-                <div className="w-10 h-px" style={{ background: CUPHEAD_COLORS.inkBlack }} />
-                <span style={{ color: CUPHEAD_COLORS.accentGold }}>✦</span>
-                <div className="w-10 h-px" style={{ background: CUPHEAD_COLORS.inkBlack }} />
-              </div>
-              <p className="text-sm" style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}>
-                Hop on over to another swell picture-show
-              </p>
-            </div>
-            <WorldsGrid />
-          </div>
-        </section>
+        
 
         {/* Footer */}
         <footer className="relative z-20 py-8 text-center">

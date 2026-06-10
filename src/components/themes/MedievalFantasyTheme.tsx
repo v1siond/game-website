@@ -15,7 +15,6 @@ import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
 import { WORK_EXPERIENCE } from '@/data/achievements'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // =============================================================================
 // WARCRAFT 3 DUAL PALETTE - Reign of Chaos + Frozen Throne
@@ -4928,38 +4927,6 @@ export default function MedievalFantasyTheme() {
               <WC3Button variant="primary" href="mailto:alexanderpulido81@gmail.com" zone="ft">Send Message</WC3Button>
               <WC3Button href="/cv" zone="ft">Download CV</WC3Button>
             </div>
-          </section>
-        </FadeInSection>
-
-        {/* Enter Another World */}
-        <FadeInSection>
-          <section style={{ marginBottom: sectionSpacing }} aria-labelledby="worlds-heading">
-            <WC3Frame title="Portals" zone="ft">
-              <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                <h2 id="worlds-heading" style={{
-                  color: WC3.goldBright,
-                  fontFamily: '"Cinzel", Georgia, serif',
-                  fontSize: '1.5rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.15em',
-                  textShadow: `1px 1px 3px ${WC3.bgVoid}`,
-                  margin: 0,
-                }}>
-                  Enter Another World
-                </h2>
-                {/* Gold sigil divider */}
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem', margin: '0.85rem 0 0.75rem' }}>
-                  <div style={{ width: '64px', height: '1px', background: `linear-gradient(90deg, transparent, ${WC3.goldDark})` }} />
-                  <div style={{ width: '8px', height: '8px', transform: 'rotate(45deg)', background: WC3.goldBright, boxShadow: `0 0 8px ${WC3.goldMid}` }} />
-                  <div style={{ width: '64px', height: '1px', background: `linear-gradient(90deg, ${WC3.goldDark}, transparent)` }} />
-                </div>
-                <p style={{ color: WC3.textMid, fontStyle: 'italic', fontSize: '0.875rem', margin: 0 }}>
-                  Step through the portals to distant realms
-                </p>
-              </div>
-              <WorldsGrid />
-            </WC3Frame>
           </section>
         </FadeInSection>
 

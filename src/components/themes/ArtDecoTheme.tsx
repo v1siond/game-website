@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
@@ -2069,33 +2068,7 @@ export default function ArtDecoTheme() {
 
       {/* ================================================================== */}
       {/* ENTER ANOTHER WORLD */}
-      {/* ================================================================== */}
-      <section className="relative z-20 py-10 md:py-14 px-4 md:px-8" aria-labelledby="worlds-heading">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2
-              id="worlds-heading"
-              className="text-xl md:text-2xl tracking-[0.25em] mb-3"
-              style={{
-                color: RAPTURE_COLORS.gold,
-                fontFamily: '"Playfair Display", Georgia, serif',
-                textShadow: `0 0 15px ${RAPTURE_COLORS.gold}40`,
-              }}
-            >
-              Enter Another World
-            </h2>
-            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-              <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, transparent, ${RAPTURE_COLORS.gold})` }} />
-              <span style={{ color: RAPTURE_COLORS.goldBright, transform: 'rotate(45deg)', display: 'inline-block', width: '8px', height: '8px', background: RAPTURE_COLORS.gold }} />
-              <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, ${RAPTURE_COLORS.gold}, transparent)` }} />
-            </div>
-            <p className="text-sm" style={{ color: RAPTURE_COLORS.parchment }}>
-              Descend into another rendering of this salon
-            </p>
-          </div>
-          <WorldsGrid />
-        </div>
-      </section>
+      
 
       {/* ================================================================== */}
       {/* FOOTER */}

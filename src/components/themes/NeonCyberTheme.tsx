@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
@@ -1588,23 +1587,7 @@ export default function NeonCyberTheme() {
         </div>
       </section>
 
-      {/* Enter Another World */}
-      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 id="worlds-heading" className="text-xl md:text-2xl tracking-[0.15em] mb-3 font-mono" style={{ color: '#00ffff', textShadow: '0 0 10px #00ffff, 0 0 20px #00ffff' }}>
-              <GlitchText text="Enter Another World" intensity="high" />
-            </h2>
-            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-              <div className="w-10 h-px" style={{ background: 'linear-gradient(90deg, transparent, #00ffff)' }} />
-              <span className="w-2 h-2 rounded-full" style={{ background: '#ff00ff', boxShadow: '0 0 10px #ff00ff, 0 0 20px #ff00ff' }} />
-              <div className="w-10 h-px" style={{ background: 'linear-gradient(90deg, #ff00ff, transparent)' }} />
-            </div>
-            <p className="text-sm font-mono" style={{ color: '#ff00ff' }}>Jack into a parallel build of this realm</p>
-          </div>
-          <WorldsGrid />
-        </div>
-      </section>
+      
 
       {/* Footer - System status */}
       <footer className="relative z-20 py-8 text-center" role="contentinfo">

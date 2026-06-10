@@ -78,6 +78,32 @@
 .hk-boom  { animation: hkBoomRing 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
 .hk-thump { animation: hkThump 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
 
+/* Muay Thai gym idle — heavy bags / gloves swing gently from their hang point */
+@keyframes hkBagSwing {
+  0%, 100% { transform: rotate(-3.2deg); }
+  50%      { transform: rotate(3.2deg); }
+}
+@keyframes hkGloveSway {
+  0%, 100% { transform: rotate(-5deg); }
+  50%      { transform: rotate(5deg); }
+}
+.hk-swing { animation: hkBagSwing 4.2s ease-in-out infinite; transform-box: fill-box; transform-origin: top center; }
+.hk-sway  { animation: hkGloveSway 3.4s ease-in-out infinite; transform-box: fill-box; transform-origin: top center; }
+
+/* Engineer workstation idle — monitor glow flicker + blinking cursors/LEDs */
+@keyframes hkScreenFlicker {
+  0%, 100% { opacity: 0.10; }
+  45%      { opacity: 0.17; }
+  55%      { opacity: 0.07; }
+}
+@keyframes hkCursorBlink {
+  0%, 49%   { opacity: 0.9; }
+  50%, 100% { opacity: 0; }
+}
+.hk-screen { animation: hkScreenFlicker 3s ease-in-out infinite; }
+.hk-cursor { animation: hkCursorBlink 1.1s steps(1) infinite; }
+
 @media (prefers-reduced-motion: reduce) {
-  .hk-note, .hk-boom, .hk-thump { animation: none; opacity: 0; }
+  .hk-note, .hk-boom, .hk-thump { animation: none; opacity: 0; }  /* appear/disappear FX → hide */
+  .hk-swing, .hk-sway, .hk-screen, .hk-cursor { animation: none; }  /* static gear stays, no motion */
 }

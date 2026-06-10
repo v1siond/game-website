@@ -12,6 +12,10 @@ interface WorldTransitionContextType {
   /** Animate a portal, then load the world, scroll to top, and persist the choice. */
   selectWorld: (id: string) => void
   isTransitioning: boolean
+  /** The "Enter Another World" picker modal (lives outside the page content flow). */
+  isWorldsOpen: boolean
+  openWorlds: () => void
+  closeWorlds: () => void
 }
 
 const WorldTransitionContext = createContext<WorldTransitionContextType | undefined>(undefined)
@@ -30,6 +34,9 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<'idle' | 'cover' | 'reveal'>('idle')
   const [variant, setVariant] = useState<PortalVariant>('vortex')
   const [destId, setDestId] = useState<string | null>(null)
+  const [isWorldsOpen, setIsWorldsOpen] = useState(false)
+  const openWorlds = useCallback(() => setIsWorldsOpen(true), [])
+  const closeWorlds = useCallback(() => setIsWorldsOpen(false), [])
   const timers = useRef<number[]>([])
   // "Shuffle bag": draw all 4 variants once before any repeats, and never repeat
   // back-to-back across bag refills. Keeps successive transitions feeling distinct.
@@ -43,6 +50,7 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
 
   const selectWorld = useCallback(
     (id: string) => {
+      setIsWorldsOpen(false) // picking a world closes the picker modal
       if (id === theme.id) return // already in this world
 
       // Reduced-motion (or non-DOM env): swap instantly, no portal.
@@ -91,7 +99,7 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
   const destTheme = destId ? getThemeById(destId) : theme
 
   return (
-    <WorldTransitionContext.Provider value={{ selectWorld, isTransitioning: phase !== 'idle' }}>
+    <WorldTransitionContext.Provider value={{ selectWorld, isTransitioning: phase !== 'idle', isWorldsOpen, openWorlds, closeWorlds }}>
       {children}
       {phase !== 'idle' && (
         <WorldPortal

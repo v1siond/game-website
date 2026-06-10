@@ -11,7 +11,6 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // =============================================================================
 // CHRONO TRIGGER EXACT COLOR PALETTE
@@ -1249,25 +1248,7 @@ export default function RetroRPGTheme() {
         </div>
       </section>
 
-      {/* ========== ENTER ANOTHER WORLD ========== */}
-      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 id="worlds-heading" className="text-xl md:text-2xl tracking-[0.2em] mb-3" style={{ color: CT_COLORS.gold }}>
-              ENTER ANOTHER WORLD
-            </h2>
-            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-              <div className="w-10 h-px" style={{ background: CT_COLORS.white }} />
-              <span style={{ color: CT_COLORS.portalMagenta }}>◈</span>
-              <div className="w-10 h-px" style={{ background: CT_COLORS.white }} />
-            </div>
-            <p className="text-[11px] tracking-wide" style={{ color: CT_COLORS.silver }}>
-              ◇ Step through. Your save stays here.
-            </p>
-          </div>
-          <WorldsGrid />
-        </div>
-      </section>
+      
 
       {/* ========== FOOTER ========== */}
       <footer className="relative z-20 py-12 px-6 border-t-4 text-center" style={{ borderColor: CT_COLORS.white }} role="contentinfo">

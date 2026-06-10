@@ -10,7 +10,6 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // Color palette - Dark Souls authentic
 const COLORS = {
@@ -2216,27 +2215,7 @@ export default function SoulMapTheme() {
         </div>
       </section>
 
-      {/* Enter Another World */}
-      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 id="worlds-heading" className="text-sm md:text-base tracking-[0.4em] mb-4 flex items-center justify-center gap-3" style={{ color: COLORS.bonfire }}>
-              <SwordMarker />
-              ENTER ANOTHER WORLD
-              <SwordMarker />
-            </h2>
-            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-              <div className="w-10 h-px" style={{ background: COLORS.ash }} />
-              <span style={{ color: COLORS.gold }}>✦</span>
-              <div className="w-10 h-px" style={{ background: COLORS.ash }} />
-            </div>
-            <p className="text-xs tracking-[0.2em]" style={{ color: '#a09080' }}>
-              Traverse the fog to another realm
-            </p>
-          </div>
-          <WorldsGrid />
-        </div>
-      </section>
+      
 
       {/* Footer */}
       <footer className="relative z-20 py-12 text-center" role="contentinfo">

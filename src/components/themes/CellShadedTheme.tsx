@@ -11,7 +11,6 @@ import { CURRENT_ROLES } from '@/data/roles'
 import { COMPANIES } from '@/data/companies'
 import { BANDS } from '@/data/bands'
 import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // Borderlands color palette - desert wasteland + loot rarity
 const BORDERLANDS_COLORS = {
@@ -1847,36 +1846,7 @@ export default function CellShadedTheme() {
         </div>
       </section>
 
-      {/* Enter Another World */}
-      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2
-              id="worlds-heading"
-              className="text-2xl md:text-3xl font-black tracking-[0.1em] mb-3"
-              style={{
-                color: BORDERLANDS_COLORS.legendary,
-                textShadow: `3px 3px 0 ${BORDERLANDS_COLORS.ink}`,
-                WebkitTextStroke: `1px ${BORDERLANDS_COLORS.ink}`,
-                fontFamily: '"Bangers", "Impact", sans-serif',
-              }}
-            >
-              Enter Another World
-            </h2>
-            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-              <div className="w-12 h-1" style={{ background: BORDERLANDS_COLORS.legendary, border: `2px solid ${BORDERLANDS_COLORS.ink}` }} />
-              <svg width="34" height="34" viewBox="0 0 30 30">
-                <polygon points="15,0 18,12 30,12 20,19 24,30 15,23 6,30 10,19 0,12 12,12" fill={BORDERLANDS_COLORS.clapTrapYellow} stroke={BORDERLANDS_COLORS.ink} strokeWidth="2" />
-              </svg>
-              <div className="w-12 h-1" style={{ background: BORDERLANDS_COLORS.legendary, border: `2px solid ${BORDERLANDS_COLORS.ink}` }} />
-            </div>
-            <p className="text-sm font-bold tracking-wider" style={{ color: BORDERLANDS_COLORS.ink }}>
-              Fast-travel to a whole new realm!
-            </p>
-          </div>
-          <WorldsGrid />
-        </div>
-      </section>
+      
 
       {/* Footer */}
       <footer className="relative z-20 py-8 text-center" role="contentinfo">

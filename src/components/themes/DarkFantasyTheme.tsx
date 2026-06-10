@@ -16,7 +16,6 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // Blended Dark Fantasy Metroidvania palette
 // Hollow Knight ethereal blues + Iconoclast brass/copper + Ori spirit gold + Salt & Sanctuary stone
@@ -617,199 +616,184 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
 
 // Engineering ornaments - City of Tears style (geometric, architectural)
 const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY }: { scrollY: number }) {
-  // Pulley rotation: left gears rotate clockwise, right gears counter-clockwise
-  const getRotation = (x: number, speed: number = 0.08) => {
-    const isLeftSide = x < 960
-    return isLeftSide ? scrollY * speed : -scrollY * speed
-  }
+  void scrollY
+  const SHELL = DF.voidDeep
+  const SHELL_D = DF.void
+  const RIM = DF.brass
+  const RIM_H = DF.spiritGold
+  const RIM_S = DF.copper
+  const HW = DF.stoneGrey
+  const GLOW = DF.ethereal
+  void SHELL
+
+  // brass-framed "arcane terminal" monitor — small; glowing code lines + blinking cursor
+  const monitor = (cx: number, cy: number, w: number, h: number, k: string, rot: number) => (
+    <g key={k} transform={`translate(${cx},${cy}) rotate(${rot})`}>
+      <rect x={-6} y={h / 2} width={12} height={18} fill="url(#egBrass)" />
+      <rect x={-18} y={h / 2 + 16} width={36} height={6} rx={2} fill="url(#egBrass)" stroke={RIM_S} strokeWidth="0.8" />
+      <rect x={-w / 2 - 6} y={-h / 2 - 6} width={w + 12} height={h + 12} rx={6} fill="url(#egShell)" stroke={RIM} strokeWidth="2.5" />
+      <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2} fill={SHELL_D} />
+      <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2} fill={GLOW} className="hk-screen" opacity="0.1" />
+      {[0.7, 0.45, 0.8, 0.35, 0.6].map((f, i) => { const cyl = -h / 2 + 9 + (i * (h - 16)) / 5; return <rect key={i} x={-w / 2 + 7} y={cyl} width={(w - 16) * f} height={2.5} rx={1} fill={i % 3 === 0 ? RIM_H : GLOW} opacity="0.55" /> })}
+      <rect x={-w / 2 + 7 + (w - 16) * 0.5} y={-h / 2 + 9 + (4 * (h - 16)) / 5 - 1} width={5} height={4} fill={RIM_H} className="hk-cursor" />
+    </g>
+  )
+
+  const desk = (cx: number, cy: number, w: number, k: string) => (
+    <g key={k}>
+      <rect x={cx - w / 2} y={cy} width={w} height={11} rx={3} fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
+      <rect x={cx - w / 2 + 6} y={cy + 11} width={10} height={42} fill={SHELL_D} />
+      <rect x={cx + w / 2 - 16} y={cy + 11} width={10} height={42} fill={SHELL_D} />
+      <rect x={cx - w / 2} y={cy - 2} width={w} height={2.5} fill={RIM_H} opacity="0.25" />
+    </g>
+  )
+
+  const keyboardDesk = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.9">
+      <rect x={-60} y={-8} width={120} height={20} rx={3} fill="url(#egShell)" stroke={RIM} strokeWidth="1.2" />
+      {Array.from({ length: 4 }, (_, r) => Array.from({ length: 13 }, (_, col) => (
+        <rect key={`${r}-${col}`} x={-54 + col * 8.6} y={-5 + r * 4.4} width={6} height={3} rx={1} fill={SHELL_D} />
+      )))}
+      <ellipse cx={80} cy={3} rx={10} ry={13} fill="url(#egShell)" stroke={RIM} strokeWidth="1.2" />
+    </g>
+  )
+
+  const chair = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.5">
+      <rect x={-30} y={-130} width={60} height={104} rx={18} fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
+      <line x1={0} y1={-26} x2={0} y2={18} stroke={HW} strokeWidth="6" />
+      {[0, 72, 144, 216, 288].map((a, i) => { const r = (a * Math.PI) / 180; return <line key={i} x1={0} y1={18} x2={Math.cos(r) * 38} y2={18 + Math.sin(r) * 12} stroke={HW} strokeWidth="4" /> })}
+    </g>
+  )
+
+  const lamp = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.85">
+      <ellipse cx={0} cy={0} rx={16} ry={5} fill="url(#egBrass)" />
+      <line x1={0} y1={0} x2={-3} y2={-58} stroke={RIM} strokeWidth="3.5" />
+      <line x1={-3} y1={-58} x2={28} y2={-80} stroke={RIM} strokeWidth="3.5" />
+      <path d="M28,-80 q18,3 11,21 l-24,-6 Z" fill="url(#egBrass)" stroke={RIM_S} strokeWidth="1.2" />
+      <circle cx={30} cy={-68} r={6} fill={RIM_H} opacity="0.3" className="hk-screen" />
+    </g>
+  )
+
+  // server / tower with drive bays, vents and blinking status LEDs (left gutter)
+  const tower = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.9">
+      <rect x={-28} y={-150} width={56} height={170} rx={6} fill="url(#egShell)" stroke={RIM} strokeWidth="2.5" />
+      {[-122, -106, -90].map((ly, i) => <rect key={i} x={-20} y={ly} width={40} height={10} rx={2} fill={SHELL_D} stroke={RIM_S} strokeWidth="0.6" />)}
+      {[-62, -46, -30].map((ly, i) => <circle key={i} cx={-12} cy={ly} r={4} fill={i === 0 ? RIM_H : GLOW} className="hk-cursor" style={{ animationDelay: `${i * 0.4}s` }} />)}
+      {Array.from({ length: 5 }, (_, i) => <line key={i} x1={0} y1={-60 + i * 8} x2={20} y2={-60 + i * 8} stroke={SHELL_D} strokeWidth="2" />)}
+    </g>
+  )
+
+  // open laptop with a glowing screen
+  const laptop = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.9">
+      <path d="M-66,0 L66,0 L78,18 L-78,18 Z" fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
+      <g transform="translate(-2,0) skewX(-10)">
+        <rect x={-58} y={-92} width={116} height={92} rx={4} fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
+        <rect x={-50} y={-85} width={100} height={78} rx={2} fill={SHELL_D} />
+        <rect x={-50} y={-85} width={100} height={78} rx={2} fill={GLOW} className="hk-screen" opacity="0.1" />
+        {[0.6, 0.4, 0.75, 0.5].map((f, i) => <rect key={i} x={-44} y={-78 + i * 17} width={88 * f} height={3} rx={1} fill={i % 2 ? RIM_H : GLOW} opacity="0.5" />)}
+      </g>
+    </g>
+  )
+
+  // old CRT terminal (right gutter)
+  const crt = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.9">
+      <rect x={-30} y={0} width={60} height={14} rx={3} fill="url(#egShell)" stroke={RIM} strokeWidth="1.5" />
+      <path d="M-64,-96 Q-70,-100 -64,-104 L64,-104 Q70,-100 64,-96 L60,-4 Q60,2 52,2 L-52,2 Q-60,2 -60,-4 Z" fill="url(#egShell)" stroke={RIM} strokeWidth="2.5" />
+      <rect x={-48} y={-90} width={96} height={78} rx={14} fill={SHELL_D} />
+      <rect x={-48} y={-90} width={96} height={78} rx={14} fill={GLOW} className="hk-screen" opacity="0.12" />
+      {[0.5, 0.7, 0.4].map((f, i) => <rect key={i} x={-40} y={-78 + i * 20} width={80 * f} height={3} rx={1} fill={RIM_H} opacity="0.45" />)}
+    </g>
+  )
+
+  // stack of manuals / books (left gutter)
+  const books = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.85">
+      {[{ w: 96, h: 18, c: RIM_S }, { w: 84, h: 16, c: RIM }, { w: 100, h: 20, c: SHELL }].map((b, i) => {
+        const yy = -i * 18
+        return <g key={i}><rect x={-b.w / 2} y={yy - b.h} width={b.w} height={b.h} rx={2} fill="url(#egShell)" stroke={SHELL_D} strokeWidth="1.5" /><rect x={-b.w / 2 + 3} y={yy - b.h + 3} width={4} height={b.h - 6} fill={b.c} opacity="0.6" /></g>
+      })}
+    </g>
+  )
+
+  // coffee mug + circuit chip accents
+  const mug = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.85">
+      <path d="M-12,-22 L12,-22 L10,2 Q10,6 0,6 Q-10,6 -10,2 Z" fill="url(#egShell)" stroke={RIM} strokeWidth="1.5" />
+      <path d="M12,-18 q12,2 8,12 q-3,5 -9,3" fill="none" stroke={RIM} strokeWidth="2.5" />
+      <ellipse cx={0} cy={-22} rx={12} ry={3} fill={SHELL_D} />
+      <path d="M-4,-30 q2,-5 0,-9 M3,-30 q2,-5 0,-9" fill="none" stroke={GLOW} strokeWidth="1.2" opacity="0.4" />
+    </g>
+  )
+
+  const chip = (cx: number, cy: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.8">
+      <rect x={-26} y={-26} width={52} height={52} rx={3} fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
+      <rect x={-15} y={-15} width={30} height={30} rx={2} fill={SHELL_D} stroke={RIM_S} strokeWidth="1" />
+      <circle cx={0} cy={0} r={5} fill={RIM_H} opacity="0.4" className="hk-screen" />
+      {[-26, 26].map((ex) => [-16, 0, 16].map((ey, j) => <line key={`${ex}-${j}`} x1={ex} y1={ey} x2={ex > 0 ? ex + 8 : ex - 8} y2={ey} stroke={RIM} strokeWidth="2" />))}
+      {[-26, 26].map((ey) => [-16, 0, 16].map((ex, j) => <line key={`v${ey}-${j}`} x1={ex} y1={ey} x2={ex} y2={ey > 0 ? ey + 8 : ey - 8} stroke={RIM} strokeWidth="2" />))}
+    </g>
+  )
+
+  // floating code glyphs rising from the desk (same idea as the music notes)
+  const GLYPHS = ['{ }', '< >', '/>', '( )', ';', '#']
+  const codeCluster = (x: number, y: number, seed: number, k: string) => (
+    <g key={k} aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <text key={i} x={x + (i - 1) * 24} y={y} className="hk-note" style={{ animationDelay: `${((seed + i * 1.3) % 3.4).toFixed(2)}s` }} fill={i % 2 ? GLOW : RIM_H} fontSize="22" opacity="0">{GLYPHS[(seed + i) % 6]}</text>
+      ))}
+    </g>
+  )
 
   return (
-    <>
-      {/* FAR LAYER - tiny gears, distant structures */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.15}px) translateZ(0)`,
-          opacity: 0.12,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Distant gear silhouettes */}
-        {[
-          { x: 150, y: 200, r: 30 },
-          { x: 1750, y: 300, r: 25 },
-          { x: 200, y: 600, r: 35 },
-          { x: 1680, y: 700, r: 28 },
-          { x: 100, y: 900, r: 32 },
-          { x: 1800, y: 850, r: 22 },
-        ].map((g, i) => (
-          <g key={i} transform={`translate(${g.x}, ${g.y}) rotate(${getRotation(g.x, 0.05)})`}>
-            <circle r={g.r} fill="none" stroke={DF.brass} strokeWidth="2" opacity="0.6" />
-            <circle r={g.r * 0.4} fill={DF.brass} opacity="0.3" />
-            {/* Gear teeth suggestion */}
-            {Array.from({ length: 8 }, (_, j) => {
-              const angle = (j * 360) / 8
-              const rad = (angle * Math.PI) / 180
-              return (
-                <line
-                  key={j}
-                  x1={Math.cos(rad) * g.r * 0.85}
-                  y1={Math.sin(rad) * g.r * 0.85}
-                  x2={Math.cos(rad) * g.r * 1.15}
-                  y2={Math.sin(rad) * g.r * 1.15}
-                  stroke={DF.brass}
-                  strokeWidth="2"
-                />
-              )
-            })}
-          </g>
-        ))}
-        {/* Distant vertical pipes */}
-        <line x1="80" y1="0" x2="80" y2="1080" stroke={DF.copper} strokeWidth="3" opacity="0.4" />
-        <line x1="1840" y1="0" x2="1840" y2="1080" stroke={DF.copper} strokeWidth="3" opacity="0.4" />
-      </svg>
+    <svg
+      className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
+      style={{ opacity: 0.82 }}
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMax slice"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id="egShell" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={SHELL_D} />
+          <stop offset="45%" stopColor={DF.voidPurple} />
+          <stop offset="100%" stopColor={SHELL_D} />
+        </linearGradient>
+        <linearGradient id="egBrass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={RIM_S} />
+          <stop offset="45%" stopColor={RIM_H} />
+          <stop offset="100%" stopColor={RIM_S} />
+        </linearGradient>
+      </defs>
 
-      {/* MID LAYER - medium gears, cable connections */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.35}px) translateZ(0)`,
-          opacity: 0.18,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Medium gears with more detail */}
-        {[
-          { x: 50, y: 400, r: 55 },
-          { x: 1870, y: 500, r: 50 },
-          { x: 120, y: 800, r: 45 },
-          { x: 1800, y: 200, r: 48 },
-        ].map((g, i) => (
-          <g key={i} transform={`translate(${g.x}, ${g.y}) rotate(${getRotation(g.x, 0.08)})`}>
-            <circle r={g.r} fill="none" stroke={DF.brass} strokeWidth="3" />
-            <circle r={g.r * 0.6} fill="none" stroke={DF.copper} strokeWidth="2" />
-            <circle r={g.r * 0.25} fill={DF.brass} opacity="0.5" />
-            {/* Spokes */}
-            {Array.from({ length: 4 }, (_, j) => {
-              const angle = j * 90
-              const rad = (angle * Math.PI) / 180
-              return (
-                <line
-                  key={j}
-                  x1={0}
-                  y1={0}
-                  x2={Math.cos(rad) * g.r * 0.9}
-                  y2={Math.sin(rad) * g.r * 0.9}
-                  stroke={DF.copper}
-                  strokeWidth="2"
-                  opacity="0.7"
-                />
-              )
-            })}
-          </g>
-        ))}
-        {/* Connecting cables */}
-        <path
-          d="M50,400 Q200,350 120,800"
-          fill="none"
-          stroke={DF.copper}
-          strokeWidth="2"
-          strokeDasharray="8 4"
-          opacity="0.5"
-        />
-        <path
-          d="M1870,500 Q1700,400 1800,200"
-          fill="none"
-          stroke={DF.copper}
-          strokeWidth="2"
-          strokeDasharray="8 4"
-          opacity="0.5"
-        />
-        {/* Horizontal structural beams */}
-        <rect x="0" y="150" width="250" height="4" fill={DF.stoneGrey} opacity="0.4" />
-        <rect x="1670" y="180" width="250" height="4" fill={DF.stoneGrey} opacity="0.4" />
-        <rect x="0" y="650" width="180" height="4" fill={DF.stoneGrey} opacity="0.4" />
-        <rect x="1740" y="620" width="180" height="4" fill={DF.stoneGrey} opacity="0.4" />
-      </svg>
+      {/* FEATURED — compact dual-monitor desk rig, right of centre (kept smaller than the drum kit) */}
+      {chair(1648, 712, 0.5, 'chair')}
+      {desk(1648, 660, 196, 'desk')}
+      {monitor(1604, 596, 84, 78, 'monL', -6)}
+      {monitor(1692, 592, 88, 82, 'monR', 6)}
+      {keyboardDesk(1645, 652, 0.62, 'kbd')}
+      {lamp(1560, 660, 0.55, 'lamp')}
+      {mug(1726, 648, 0.7, 'mug')}
 
-      {/* NEAR LAYER - large gears, terminal glows */}
-      <svg
-        className="fixed inset-0 w-full h-full pointer-events-none"
-        style={{
-          transform: `translateY(${scrollY * 0.6}px) translateZ(0)`,
-          opacity: 0.22,
-        }}
-        viewBox="0 0 1920 1080"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden="true"
-      >
-        {/* Large foreground gears - partially visible at edges, rotate like pulleys */}
-        <g transform={`translate(-60, 550) rotate(${getRotation(-60, 0.12)})`}>
-          <circle r="120" fill="none" stroke={DF.brass} strokeWidth="5" />
-          <circle r="80" fill="none" stroke={DF.copper} strokeWidth="3" />
-          <circle r="30" fill={DF.brass} opacity="0.4" />
-          {Array.from({ length: 12 }, (_, j) => {
-            const angle = (j * 360) / 12
-            const rad = (angle * Math.PI) / 180
-            return (
-              <line
-                key={j}
-                x1={Math.cos(rad) * 100}
-                y1={Math.sin(rad) * 100}
-                x2={Math.cos(rad) * 135}
-                y2={Math.sin(rad) * 135}
-                stroke={DF.brass}
-                strokeWidth="4"
-              />
-            )
-          })}
-        </g>
-        <g transform={`translate(1980, 650) rotate(${getRotation(1980, 0.12)})`}>
-          <circle r="100" fill="none" stroke={DF.brass} strokeWidth="5" />
-          <circle r="65" fill="none" stroke={DF.copper} strokeWidth="3" />
-          <circle r="25" fill={DF.brass} opacity="0.4" />
-          {Array.from({ length: 10 }, (_, j) => {
-            const angle = (j * 360) / 10
-            const rad = (angle * Math.PI) / 180
-            return (
-              <line
-                key={j}
-                x1={Math.cos(rad) * 80}
-                y1={Math.sin(rad) * 80}
-                x2={Math.cos(rad) * 115}
-                y2={Math.sin(rad) * 115}
-                stroke={DF.brass}
-                strokeWidth="3"
-              />
-            )
-          })}
-        </g>
-        {/* Terminal glow points */}
-        <circle cx="30" cy="300" r="8" fill={DF.ethereal} opacity="0.6" />
-        <circle cx="30" cy="300" r="20" fill={DF.ethereal} opacity="0.2" />
-        <circle cx="1890" cy="400" r="8" fill={DF.ethereal} opacity="0.6" />
-        <circle cx="1890" cy="400" r="20" fill={DF.ethereal} opacity="0.2" />
-        {/* Circuit path suggestions */}
-        <path
-          d="M0,300 L30,300 L30,350 L80,350"
-          fill="none"
-          stroke={DF.ethereal}
-          strokeWidth="2"
-          opacity="0.4"
-        />
-        <path
-          d="M1920,400 L1890,400 L1890,450 L1840,450"
-          fill="none"
-          stroke={DF.ethereal}
-          strokeWidth="2"
-          opacity="0.4"
-        />
-      </svg>
-    </>
+      {/* LEFT gutter — server tower, laptop, books */}
+      {tower(130, 706, 0.55, 'tower')}
+      {laptop(330, 668, 0.5, 'laptop')}
+      {books(470, 700, 0.6, 'books')}
+
+      {/* RIGHT gutter / accents — CRT terminal, circuit chip */}
+      {crt(1850, 660, 0.5, 'crt')}
+      {chip(540, 470, 0.55, 'chip')}
+
+      {/* floating code glyphs */}
+      {codeCluster(1640, 470, 0, 'cc1')}
+      {codeCluster(165, 480, 3, 'cc2')}
+      {codeCluster(1850, 500, 5, 'cc3')}
+    </svg>
   )
 })
 
@@ -1078,10 +1062,258 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY
   )
 })
 
-// Muay Thai ornaments - cleared; pending a proper redesign (see project memory)
+// Muay Thai "gym" boss-stage — gothic-relic gym gear (hanging heavy bags, gloves, ring
+// corner posts + ropes, corner stool) set BACK in the side negative spaces, behind the
+// columns. Same treatment as the music stage: solid dark leather, tarnished brass, idle
+// swing. Fighter only.
 const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: number }) {
   void scrollY
-  return null
+  const SHELL = DF.voidDeep
+  const SHELL_D = DF.void
+  const RIM = DF.brass
+  const RIM_H = DF.spiritGold
+  const RIM_S = DF.copper
+  const HW = DF.stoneGrey
+  const GLOW = DF.ethereal
+
+  // hanging heavy bag — chain + leather cylinder + brass cap/straps; swings on its hang point
+  const heavyBag = (tx: number, ty: number, s: number, k: string, delay: number) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.92">
+      <g className="hk-swing" style={{ animationDelay: `${delay}s` }}>
+        <line x1="0" y1="-360" x2="0" y2="-250" stroke={HW} strokeWidth="5" opacity="0.6" />
+        <path d="M-26,-250 L0,-205 L26,-250" fill="none" stroke={RIM} strokeWidth="4" />
+        <path d="M-40,-205 Q-44,-212 -36,-216 L36,-216 Q44,-212 40,-205 L40,40 Q40,72 0,72 Q-40,72 -40,40 Z" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="2.5" />
+        <ellipse cx="0" cy="-209" rx="40" ry="9" fill="url(#fgBrass)" stroke={RIM_S} strokeWidth="1.5" />
+        {[-150, -78, 4].map((sy, i) => (
+          <rect key={i} x="-42" y={sy} width="84" height="8" fill={RIM} opacity="0.5" />
+        ))}
+        <line x1="0" y1="-205" x2="0" y2="68" stroke={SHELL_D} strokeWidth="1.5" opacity="0.5" />
+        <path d="M-26,-198 Q-34,-80 -26,52" fill="none" stroke={RIM_H} strokeWidth="2.5" opacity="0.18" />
+      </g>
+    </g>
+  )
+
+  // pair of boxing gloves hanging by their laces; sways
+  const gloves = (tx: number, ty: number, s: number, k: string, delay: number) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      <g className="hk-sway" style={{ animationDelay: `${delay}s` }}>
+        <line x1="0" y1="-118" x2="-20" y2="-40" stroke={HW} strokeWidth="3" opacity="0.6" />
+        <line x1="0" y1="-118" x2="20" y2="-40" stroke={HW} strokeWidth="3" opacity="0.6" />
+        <circle cx="0" cy="-120" r="4" fill={RIM} />
+        <g transform="translate(-24,0)">
+          <path d="M-22,-40 Q-32,-44 -30,-18 Q-32,12 -8,18 Q18,20 20,-8 Q26,-16 18,-30 Q12,-46 -22,-40 Z" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
+          <path d="M-14,-16 Q-18,2 -2,8" fill="none" stroke={SHELL_D} strokeWidth="1.5" opacity="0.5" />
+          <rect x="-28" y="-46" width="15" height="9" rx="3" fill={RIM} stroke={RIM_S} strokeWidth="0.8" />
+        </g>
+        <g transform="translate(26,4) scale(-1,1)">
+          <path d="M-22,-40 Q-32,-44 -30,-18 Q-32,12 -8,18 Q18,20 20,-8 Q26,-16 18,-30 Q12,-46 -22,-40 Z" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
+          <rect x="-28" y="-46" width="15" height="9" rx="3" fill={RIM} stroke={RIM_S} strokeWidth="0.8" />
+        </g>
+      </g>
+    </g>
+  )
+
+  // ring corner post + turnbuckle pad + three ropes running inward (mirror with negative s for the other side)
+  const ringPost = (tx: number, ty: number, s: number, ropeDir: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
+      <ellipse cx="0" cy="2" rx="24" ry="6" fill={SHELL_D} opacity="0.6" />
+      <rect x="-10" y="-230" width="20" height="232" fill="url(#fgBrass)" stroke={RIM_S} strokeWidth="1.5" />
+      <rect x="-17" y="-218" width="34" height="66" rx="9" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="2" />
+      <circle cx="0" cy="-185" r="4" fill={RIM_H} opacity="0.4" />
+      {[-198, -150, -102].map((ry, i) => (
+        <line key={i} x1="0" y1={ry} x2={ropeDir * 230} y2={ry + 8} stroke={RIM} strokeWidth="4.5" opacity="0.5" />
+      ))}
+    </g>
+  )
+
+  // worn corner stool with a folded Thai pad leaning on it
+  const stool = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
+      <line x1="-26" y1="0" x2="-20" y2="-64" stroke={HW} strokeWidth="5" opacity="0.7" />
+      <line x1="26" y1="0" x2="20" y2="-64" stroke={HW} strokeWidth="5" opacity="0.7" />
+      <line x1="-20" y1="-30" x2="20" y2="-30" stroke={HW} strokeWidth="3" opacity="0.5" />
+      <rect x="-30" y="-78" width="60" height="16" rx="4" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="2" />
+      {/* leaning Thai pad */}
+      <g transform="translate(34,-2) rotate(16)">
+        <rect x="-9" y="-92" width="22" height="92" rx="7" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
+        <line x1="-9" y1="-46" x2="13" y2="-46" stroke={RIM} strokeWidth="3" opacity="0.5" />
+        <rect x="-7" y="-6" width="18" height="10" rx="2" fill={RIM} opacity="0.7" />
+      </g>
+    </g>
+  )
+
+  // speed bag — teardrop bag under a round wall platform; sways
+  const speedBag = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      <ellipse cx="0" cy="-110" rx="58" ry="14" fill="url(#fgBrass)" stroke={RIM_S} strokeWidth="1.5" />
+      <ellipse cx="0" cy="-110" rx="58" ry="14" fill="none" stroke={RIM_H} strokeWidth="1" opacity="0.4" />
+      <g className="hk-sway" style={{ animationDelay: '0.3s' }}>
+        <line x1="0" y1="-104" x2="0" y2="-78" stroke={HW} strokeWidth="3" opacity="0.6" />
+        <path d="M-20,-78 Q-24,-40 0,-30 Q24,-40 20,-78 Q12,-86 0,-84 Q-12,-86 -20,-78 Z" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
+        <line x1="-14" y1="-70" x2="14" y2="-70" stroke={RIM} strokeWidth="2" opacity="0.5" />
+      </g>
+    </g>
+  )
+
+  // double-end bag — small ball tethered top + bottom
+  const doubleEndBag = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      <line x1="0" y1="-200" x2="0" y2="-70" stroke={HW} strokeWidth="2.5" opacity="0.5" strokeDasharray="6 5" />
+      <line x1="0" y1="-30" x2="0" y2="40" stroke={HW} strokeWidth="2.5" opacity="0.5" strokeDasharray="6 5" />
+      <g className="hk-sway" style={{ animationDelay: '1.1s' }}>
+        <circle cx="0" cy="-50" r="22" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
+        <path d="M-14,-58 Q-18,-44 -6,-36" fill="none" stroke={SHELL_D} strokeWidth="1.5" opacity="0.5" />
+        <rect x="-6" y="-74" width="12" height="6" rx="2" fill={RIM} opacity="0.7" />
+      </g>
+    </g>
+  )
+
+  // coiled jump rope hanging on a peg; sways
+  const jumpRope = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
+      <circle cx="0" cy="-150" r="5" fill={RIM} />
+      <g className="hk-sway" style={{ animationDelay: '0.6s' }}>
+        {[0, 1, 2].map((i) => (
+          <path key={i} d={`M${-14 + i * 4},-148 Q${-46 - i * 8},-70 ${-6 + i * 3},-12 Q${30 + i * 6},-70 ${10 - i * 3},-148`} fill="none" stroke={RIM} strokeWidth="3" opacity="0.5" />
+        ))}
+        <rect x="-26" y="-12" width="12" height="34" rx="5" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="1.5" />
+        <rect x="14" y="-12" width="12" height="34" rx="5" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="1.5" />
+      </g>
+    </g>
+  )
+
+  // corner water bucket
+  const bucket = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
+      <path d="M-30,-46 L30,-46 L24,2 Q24,8 0,8 Q-24,8 -24,2 Z" fill="url(#fgLeather)" stroke={RIM} strokeWidth="2.5" />
+      <ellipse cx="0" cy="-46" rx="30" ry="8" fill={SHELL_D} stroke={RIM} strokeWidth="1.5" />
+      <path d="M-30,-44 Q0,-72 30,-44" fill="none" stroke={RIM} strokeWidth="2.5" />
+      <ellipse cx="0" cy="-46" rx="22" ry="5" fill={GLOW} opacity="0.12" />
+    </g>
+  )
+
+  // mongkol — the sacred Muay Thai headband, hanging from a hook; sways
+  const mongkol = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
+      <circle cx="0" cy="-90" r="4" fill={RIM} />
+      <g className="hk-sway" style={{ animationDelay: '1.6s' }}>
+        <ellipse cx="0" cy="-44" rx="38" ry="46" fill="none" stroke="url(#fgBrass)" strokeWidth="7" />
+        <ellipse cx="0" cy="-44" rx="38" ry="46" fill="none" stroke={RIM_H} strokeWidth="2" opacity="0.4" />
+        <path d="M-10,2 Q0,16 10,2" fill="none" stroke={RIM} strokeWidth="5" />
+        <path d="M-6,12 L-10,40 M6,12 L10,40" stroke={RIM} strokeWidth="4" opacity="0.6" />
+        <circle cx="0" cy="-86" r="7" fill="url(#fgBrass)" stroke={RIM_S} strokeWidth="1" />
+      </g>
+    </g>
+  )
+
+  // Thai kick shield — a big curved pad leaning (a prominent piece)
+  const kickShield = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
+      <rect x="-46" y="-300" width="92" height="300" rx="40" fill="url(#fgLeather)" stroke={RIM} strokeWidth="3" />
+      <rect x="-30" y="-286" width="60" height="272" rx="28" fill="none" stroke={SHELL_D} strokeWidth="2" opacity="0.5" />
+      {[-230, -150, -70].map((sy, i) => <line key={i} x1="-46" y1={sy} x2="46" y2={sy} stroke={RIM} strokeWidth="3" opacity="0.4" />)}
+      <ellipse cx="0" cy="-150" rx="18" ry="58" fill={RIM_H} opacity="0.08" />
+    </g>
+  )
+
+  // focus mitts — a pair of round target pads
+  const focusMitts = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.88">
+      {[-1, 1].map((dir, i) => (
+        <g key={i} transform={`translate(${dir * 40},${i * 8}) rotate(${dir * 14})`}>
+          <circle cx="0" cy="-70" r="42" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2.5" />
+          <circle cx="0" cy="-70" r="22" fill="none" stroke={RIM} strokeWidth="3" opacity="0.5" />
+          <circle cx="0" cy="-70" r="8" fill={RIM_H} opacity="0.4" />
+          <rect x="-12" y="-32" width="24" height="34" rx="8" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="2" />
+        </g>
+      ))}
+    </g>
+  )
+
+  // hand wraps coiled on a peg; sways
+  const handWraps = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
+      <circle cx="0" cy="-120" r="4" fill={RIM} />
+      <g className="hk-sway" style={{ animationDelay: '2s' }}>
+        <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke="url(#fgBrass)" strokeWidth="9" />
+        <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke={RIM_H} strokeWidth="1.5" opacity="0.3" />
+        <path d="M-18,-80 Q-30,-30 -14,10" fill="none" stroke={RIM} strokeWidth="6" opacity="0.6" />
+        <path d="M16,-82 Q28,-34 12,8" fill="none" stroke={RIM} strokeWidth="6" opacity="0.5" />
+      </g>
+    </g>
+  )
+
+  // kettlebell on the floor
+  const kettlebell = (tx: number, ty: number, s: number, k: string) => (
+    <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.88">
+      <ellipse cx="0" cy="2" rx="40" ry="8" fill={SHELL_D} opacity="0.5" />
+      <path d="M-40,-30 Q-40,-70 0,-70 Q40,-70 40,-30 Q40,8 0,8 Q-40,8 -40,-30 Z" fill="url(#fgLeather)" stroke={RIM} strokeWidth="2.5" />
+      <path d="M-22,-60 Q-30,-104 0,-104 Q30,-104 22,-60" fill="none" stroke="url(#fgBrass)" strokeWidth="10" />
+      <ellipse cx="-12" cy="-24" rx="10" ry="16" fill={RIM_H} opacity="0.1" />
+    </g>
+  )
+
+  // idle: a small struck-impact burst near a bag (sparse, like the drum's)
+  const impact = (x: number, y: number) => (
+    <text x={x} y={y} className="hk-thump" style={{ animationDelay: '0.7s' }} fill={RIM_H} fontSize="24" textAnchor="middle" opacity="0" aria-hidden="true">✦</text>
+  )
+
+  return (
+    <svg
+      className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
+      style={{ opacity: 0.95 }}
+      viewBox="0 0 1920 1080"
+      preserveAspectRatio="xMidYMax slice"
+      aria-hidden="true"
+    >
+      <defs>
+        {/* brighter, more saturated leather so the gym gear reads clearly on the dark stage */}
+        <linearGradient id="fgLeather" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor={DF.voidDeep} />
+          <stop offset="45%" stopColor="#3e2a4a" />
+          <stop offset="100%" stopColor={DF.voidDeep} />
+        </linearGradient>
+        <linearGradient id="fgGlove" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#4a2742" />
+          <stop offset="60%" stopColor={SHELL} />
+          <stop offset="100%" stopColor={SHELL_D} />
+        </linearGradient>
+        <linearGradient id="fgBrass" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={RIM_S} />
+          <stop offset="45%" stopColor={RIM_H} />
+          <stop offset="100%" stopColor={RIM_S} />
+        </linearGradient>
+      </defs>
+
+      {/* ring corner posts framing the stage — bigger now, more prominent */}
+      {ringPost(48, 762, 0.58, 1, 'postL')}
+      {ringPost(1872, 762, 0.58, -1, 'postR')}
+
+      {/* PROMINENT centrepieces: big heavy bag centre-right + leaning kick shield + mongkol overhead */}
+      {heavyBag(1664, 534, 0.47, 'bagMain', 0.6)}
+      {kickShield(1500, 700, 0.5, 'shield')}
+      {mongkol(1574, 424, 0.44, 'mongkol')}
+
+      {/* left gutter — heavy bag, double-end bag, gloves, jump rope, hand wraps, kettlebell */}
+      {heavyBag(255, 452, 0.42, 'bagL', 0)}
+      {doubleEndBag(560, 466, 0.5, 'deBag')}
+      {gloves(420, 562, 0.5, 'glovesL', 0.8)}
+      {jumpRope(305, 708, 0.56, 'rope')}
+      {handWraps(118, 556, 0.48, 'wraps')}
+      {kettlebell(640, 714, 0.4, 'kb')}
+
+      {/* right corner — speed bag overhead, focus mitts, stool, bucket */}
+      {speedBag(1796, 456, 0.66, 'speed')}
+      {focusMitts(1720, 716, 0.42, 'mitts')}
+      {stool(1806, 714, 0.4, 'stool')}
+      {bucket(1874, 706, 0.46, 'bucket')}
+
+      {/* faint stage glow + idle impacts near the bags */}
+      <circle cx="1664" cy="470" r="72" fill={GLOW} opacity="0.05" />
+      {impact(255, 540)}
+      {impact(1664, 600)}
+    </svg>
+  )
 })
 
 // Container component that selects ornaments based on profession
@@ -2404,7 +2636,6 @@ export default function DarkFantasyTheme() {
               className="relative h-40 md:h-56 overflow-hidden"
               style={{
                 background: `linear-gradient(180deg, transparent, ${DF.voidPurple}30)`,
-                border: `1px solid ${DF.stoneDark}60`,
                 borderRadius: '4px',
               }}
               role="tablist"
@@ -2636,30 +2867,7 @@ export default function DarkFantasyTheme() {
         </section>
         </BattleReveal>
 
-        {/* Enter Another World - portal to the other realms.
-            mt pushes it well below the battle so the fixed knight/bug fully clear first. */}
-        <section className="relative z-20 mt-32 md:mt-52 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-8">
-              <h2
-                id="worlds-heading"
-                className="text-xl md:text-2xl tracking-[0.15em] mb-3"
-                style={{ color: DF.brass, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
-              >
-                Enter Another World
-              </h2>
-              <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-                <div className="w-10 h-px" style={{ background: DF.brass }} />
-                <span style={{ color: DF.ethereal }}>✦</span>
-                <div className="w-10 h-px" style={{ background: DF.brass }} />
-              </div>
-              <p className="text-sm" style={{ color: DF.silver }}>
-                Step through to a different version of this realm
-              </p>
-            </div>
-            <WorldsGrid />
-          </div>
-        </section>
+        
       </div>
 
       {/* Bottom obscure overlay - content fades into darkness */}

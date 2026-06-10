@@ -13,7 +13,6 @@ import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { KratosChainPullReveal } from './Mythic/KratosSprite'
-import WorldsGrid from '@/components/worlds/WorldsGrid'
 
 // =============================================================================
 // GOD OF WAR 3 COLOR PALETTE
@@ -2113,26 +2112,7 @@ export default function MythicTheme() {
           </div>
         </section>
 
-      {/* Enter Another World */}
-      <section className="relative z-20 py-10 md:py-14 px-4 md:px-6" aria-labelledby="worlds-heading">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 id="worlds-heading" className="text-xl md:text-2xl tracking-[0.15em] mb-3" style={{ color: GOW.gold }}>
-              Enter Another World
-            </h2>
-            <div className="max-w-xs mx-auto mb-3" aria-hidden="true">
-              <GreekMeander color={GOW.gold} opacity={0.4} />
-            </div>
-            <div className="inline-flex items-center gap-3 mb-3" aria-hidden="true">
-              <div className="w-10 h-px" style={{ background: `linear-gradient(90deg, transparent, ${GOW.blood})` }} />
-              <span style={{ color: GOW.gold }}>◆</span>
-              <div className="w-10 h-px" style={{ background: `linear-gradient(90deg, ${GOW.blood}, transparent)` }} />
-            </div>
-            <p className="text-sm" style={{ color: GOW.silver }}>Cross into another realm of the same legend</p>
-          </div>
-          <WorldsGrid />
-        </div>
-      </section>
+      
 
       {/* Bottom obscure overlay */}
       <div
