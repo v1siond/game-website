@@ -949,7 +949,7 @@ export default function SilhouetteTheme() {
           <div className="max-w-2xl mx-auto">
             {active === 'engineer' && (
               <>
-                <SectionHeader title="companies" />
+                <SectionHeader title="ventures" />
                 <div className="grid md:grid-cols-3 gap-3">
                   {COMPANIES.map((company) => (
                     <CompanyCard key={company.id} company={company} />

@@ -1528,7 +1528,7 @@ export default function NeonPortalsTheme() {
           </TestChamberSection>
 
           {/* 6. PROJECTS */}
-          <TestChamberSection title="Projects" notice="RESULTS VERIFIED" id="projects">
+          <TestChamberSection title="Featured Work" notice="RESULTS VERIFIED" id="projects">
             <div className="grid md:grid-cols-2 gap-4">
               {projects.filter(p => p.featured).slice(0, 6).map((project, i) => (
                 <ProjectCard key={project.id} project={project} index={i} />

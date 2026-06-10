@@ -1937,7 +1937,7 @@ export default function FighterSelectTheme() {
           {/* ================================================================= */}
           <ArcadeSectionCard
             color={COLORS.gold}
-            title="Projects"
+            title="Featured Work"
             titleIcon="★"
             id="projects-heading"
           >
@@ -1959,7 +1959,7 @@ export default function FighterSelectTheme() {
           {active === 'engineer' && (
             <ArcadeSectionCard
               color={COLORS.specialBlue}
-              title="Companies"
+              title="Ventures"
               titleIcon="▶▶▶▶"
               id="ventures-heading"
             >

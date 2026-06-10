@@ -1942,7 +1942,7 @@ export default function ArtDecoTheme() {
           {/* SKILLS SECTION */}
           {/* ============================================================ */}
           <GoldFrame
-            title={active === 'engineer' ? 'TECH STACK' : 'SKILLS & ACHIEVEMENTS'}
+            title={active === 'engineer' ? 'TECH STACK' : 'SKILLS'}
             reducedMotion={reducedMotion}
           >
             {active === 'engineer' ? (

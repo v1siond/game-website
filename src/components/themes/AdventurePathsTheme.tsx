@@ -1410,7 +1410,7 @@ export default function AdventurePathsTheme() {
           {/* === EXPERIENCE === */}
           {experience.length > 0 && (
             <section className="mb-8">
-              <UndergroundPanel title="Experience" icon={<Coin size={24} />}>
+              <UndergroundPanel title="Work Experience" icon={<Coin size={24} />}>
                 <div className="space-y-4">
                   {experience.map((entry) => (
                     <QuestEntry key={entry.id} entry={entry} />
@@ -1451,7 +1451,7 @@ export default function AdventurePathsTheme() {
 
           {/* === PROJECTS === */}
           <section className="mb-8">
-            <CastlePanel title="Projects" icon={<Starman size={28} />}>
+            <CastlePanel title="Featured Work" icon={<Starman size={28} />}>
               <div className="grid md:grid-cols-2 gap-4">
                 {projects.filter(p => p.featured).slice(0, 6).map((project) => (
                   <ProjectCard key={project.id} project={project} />

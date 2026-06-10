@@ -1607,7 +1607,7 @@ export default function SurvivalHorrorTheme() {
                 ♪ ♫ ♩
               </div>
               <h2 className="text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: RE.warmGlow }}>
-                Ventures
+                Bands
               </h2>
               <div className="grid md:grid-cols-3 gap-4">
                 {BANDS.map((band) => (

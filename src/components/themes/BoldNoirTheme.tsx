@@ -1606,7 +1606,7 @@ export default function BoldNoirTheme() {
                   className="text-xl font-black mb-4"
                   style={{ color: '#ff0033' }}
                 >
-                  {active === 'drummer' ? 'MUSICAL SKILLS' : 'COMBAT SKILLS'}
+                  SKILLS
                 </h2>
                 <div aria-labelledby="skills-heading">
                   {otherSkills.map((category) => (
@@ -1697,7 +1697,7 @@ export default function BoldNoirTheme() {
                   transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
                 }}
               >
-                VENTURES
+                BANDS
               </h2>
               <div className="grid md:grid-cols-3 gap-4" role="list">
                 {BANDS.map((band) => (

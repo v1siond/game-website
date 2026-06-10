@@ -1368,7 +1368,7 @@ export default function RetroAtomicTheme() {
       {/* ================================================================ */}
       <section className="relative z-20 py-6 px-4 md:px-6" aria-label="Projects">
         <div className="max-w-4xl mx-auto">
-          <RustedPanel title="Projects">
+          <RustedPanel title="Featured Work">
             <div className="grid md:grid-cols-2 gap-4">
               {projects.filter(p => p.featured).slice(0, 6).map((project) => (
                 <ProjectCard key={project.id} project={project} />

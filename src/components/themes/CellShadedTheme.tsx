@@ -1730,7 +1730,7 @@ export default function CellShadedTheme() {
                   textShadow: `2px 2px 0 ${BORDERLANDS_COLORS.legendary}`,
                 }}
               >
-                Projects
+                Featured Work
               </h2>
             </div>
             <div className="grid md:grid-cols-2 gap-6">
@@ -1761,7 +1761,7 @@ export default function CellShadedTheme() {
                     boxShadow: `5px 5px 0 ${BORDERLANDS_COLORS.ink}`,
                   }}
                 >
-                  VENDORS
+                  VENTURES
                 </h2>
               </div>
               <div className="grid md:grid-cols-3 gap-6">
@@ -1784,7 +1784,7 @@ export default function CellShadedTheme() {
                     boxShadow: `5px 5px 0 ${BORDERLANDS_COLORS.ink}`,
                   }}
                 >
-                  ECHO LOGS
+                  BANDS
                 </h2>
               </div>
               <div className="grid md:grid-cols-3 gap-6">

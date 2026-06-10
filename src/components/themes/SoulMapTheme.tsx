@@ -2127,7 +2127,7 @@ export default function SoulMapTheme() {
             <section aria-labelledby="projects-heading">
               <h2 id="projects-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: '#88cc55' }}>
                 <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: '0 0 10px #88cc55' }} aria-hidden="true" />
-                PROJECTS
+                FEATURED WORK
               </h2>
               <div className="space-y-2" role="list">
                 {projects.slice(0, 4).map((project) => (
@@ -2145,7 +2145,7 @@ export default function SoulMapTheme() {
             <section className="mt-8" aria-labelledby="companies-heading">
               <FogGate />
               <h2 id="companies-heading" className="text-sm tracking-[0.3em] mb-4 text-center" style={{ color: COLORS.bonfire }}>
-                COMPANIES
+                VENTURES
               </h2>
               <div className="grid md:grid-cols-3 gap-4" role="list">
                 {COMPANIES.map((company) => (

@@ -7,6 +7,8 @@ import type { World } from '@/themes/worlds'
 
 interface WorldCardProps {
   world: World
+  /** The world currently being viewed — shown highlighted and not clickable. */
+  isCurrent?: boolean
 }
 
 /**
@@ -19,7 +21,7 @@ interface WorldCardProps {
  * live components dragged the page to a crawl. Regenerate the webps after changing a
  * theme's hero.
  */
-export default function WorldCard({ world }: WorldCardProps) {
+export default function WorldCard({ world, isCurrent = false }: WorldCardProps) {
   const { theme: currentTheme } = useTheme() // hosting theme -> card frame chrome
   const { selectWorld } = useWorldTransition()
   const destTheme = getThemeById(world.id) // destination world -> name + accent hint
@@ -27,14 +29,16 @@ export default function WorldCard({ world }: WorldCardProps) {
   return (
     <button
       type="button"
-      onClick={() => selectWorld(world.id)}
-      className="wc-card group relative flex flex-col overflow-hidden rounded-lg text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+      onClick={() => { if (!isCurrent) selectWorld(world.id) }}
+      aria-current={isCurrent ? 'true' : undefined}
+      className={`wc-card group relative flex flex-col overflow-hidden rounded-lg text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${isCurrent ? 'cursor-default' : ''}`}
       style={{
         backgroundColor: currentTheme.colors.surface,
-        border: `2px solid ${currentTheme.colors.border}`,
+        border: `2px solid ${isCurrent ? currentTheme.colors.accent : currentTheme.colors.border}`,
         outlineColor: currentTheme.colors.accent,
+        boxShadow: isCurrent ? `0 0 0 1px ${currentTheme.colors.accent}, 0 0 22px ${currentTheme.colors.accent}55` : undefined,
       }}
-      aria-label={`Enter ${destTheme.name} — ${destTheme.description}`}
+      aria-label={isCurrent ? `${destTheme.name} — current world` : `Enter ${destTheme.name} — ${destTheme.description}`}
     >
       {/* Static hero preview of the destination world (decorative, lazy-loaded) */}
       <div
@@ -83,11 +87,12 @@ export default function WorldCard({ world }: WorldCardProps) {
         <span
           className="shrink-0 rounded px-2 py-1 text-[10px] uppercase tracking-wider"
           style={{
-            color: currentTheme.colors.accent,
-            border: `1px solid ${currentTheme.colors.border}`,
+            color: isCurrent ? currentTheme.colors.background : currentTheme.colors.accent,
+            backgroundColor: isCurrent ? currentTheme.colors.accent : undefined,
+            border: `1px solid ${isCurrent ? currentTheme.colors.accent : currentTheme.colors.border}`,
           }}
         >
-          {world.category}
+          {isCurrent ? '✓ Current' : world.category}
         </span>
       </div>
     </button>

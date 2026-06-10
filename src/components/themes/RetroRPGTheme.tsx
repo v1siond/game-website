@@ -1108,7 +1108,7 @@ export default function RetroRPGTheme() {
 
           {/* EXPERIENCE Section */}
           {experience.length > 0 && (
-            <BattleFrame title="EXPERIENCE" era="medieval">
+            <BattleFrame title="WORK EXPERIENCE" era="medieval">
               <div className="space-y-4">
                 {experience.map((entry) => (
                   <ExperienceCard key={entry.id} entry={entry} />
@@ -1130,7 +1130,7 @@ export default function RetroRPGTheme() {
           </BattleFrame>
 
           {/* PROJECTS Section */}
-          <BattleFrame title="PROJECTS" era="present">
+          <BattleFrame title="FEATURED WORK" era="present">
             <div className="grid md:grid-cols-2 gap-4">
               {projects.filter((p) => p.featured).map((project) => (
                 <ProjectCard key={project.id} project={project} />

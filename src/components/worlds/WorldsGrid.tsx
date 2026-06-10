@@ -54,11 +54,14 @@ export default function WorldsGrid() {
   const { theme } = useTheme()
   const [filter, setFilter] = useState<Filter>('All')
 
-  const others = WORLDS.filter((w) => w.id !== theme.id)
-  const visibleWorlds = filter === 'All' ? others : others.filter((w) => w.category === filter)
+  // Show every world, with the current one first and flagged as selected.
+  const current = WORLDS.find((w) => w.id === theme.id)
+  const rest = WORLDS.filter((w) => w.id !== theme.id)
+  const ordered = current ? [current, ...rest] : rest
+  const visibleWorlds = filter === 'All' ? ordered : ordered.filter((w) => w.category === filter)
   const categoriesWithCounts = WORLD_CATEGORIES.map((cat) => ({
     ...cat,
-    count: others.filter((w) => w.category === cat.name).length,
+    count: ordered.filter((w) => w.category === cat.name).length,
   })).filter((c) => c.count > 0)
 
   return (
@@ -73,7 +76,7 @@ export default function WorldsGrid() {
           onClick={() => setFilter('All')}
           label="All"
           icon="✦"
-          count={others.length}
+          count={ordered.length}
           theme={theme}
         />
         {categoriesWithCounts.map((cat) => (
@@ -91,7 +94,7 @@ export default function WorldsGrid() {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {visibleWorlds.map((world) => (
-          <WorldCard key={world.id} world={world} />
+          <WorldCard key={world.id} world={world} isCurrent={world.id === theme.id} />
         ))}
       </div>
     </div>

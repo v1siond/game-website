@@ -1608,7 +1608,7 @@ export default function RubberHoseTheme() {
               <div className="text-center mb-6">
                 <DecorativeBanner>
                   <span id="skills-heading" className="text-lg tracking-wider">
-                    {active === 'engineer' ? 'TECH STACK' : 'SKILLS & ACHIEVEMENTS'}
+                    {active === 'engineer' ? 'TECH STACK' : 'SKILLS'}
                   </span>
                 </DecorativeBanner>
               </div>
@@ -1665,7 +1665,7 @@ export default function RubberHoseTheme() {
               <section className="mb-8" aria-labelledby="bands-heading">
                 <div className="text-center mb-6">
                   <DecorativeBanner>
-                    <span id="bands-heading" className="text-lg tracking-wider">VENTURES</span>
+                    <span id="bands-heading" className="text-lg tracking-wider">BANDS</span>
                   </DecorativeBanner>
                 </div>
                 <div className="grid md:grid-cols-3 gap-4">

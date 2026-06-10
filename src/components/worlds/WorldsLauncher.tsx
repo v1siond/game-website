@@ -18,7 +18,7 @@ export default function WorldsLauncher() {
     <button
       onClick={openWorlds}
       aria-label="Choose another world"
-      className="fixed bottom-5 left-5 z-[150] inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-sm tracking-wider transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2"
+      className="fixed top-3 right-3 md:top-4 md:right-4 z-[150] inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-sm tracking-wider transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2"
       style={{
         color: c.accent,
         background: `${c.background}e6`,
