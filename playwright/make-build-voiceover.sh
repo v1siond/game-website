@@ -15,6 +15,8 @@ declare -A NARR
 NARR[welcome]="Let's actually build a connected game in Nebulith — several rooms, wired together."
 NARR[forest]="Generate the first room — a spring forest."
 NARR[entities]="Drop in enemies and a quest-giver, then scatter a patrol pack — each with stats and movement."
+NARR[quest]="Select the NPC and author a quest on it — slay three goblins."
+NARR[fight]="Now play it: the same engine fights the enemies for real, with attack animations."
 NARR[temple]="Start a fresh template and generate an autumn temple."
 NARR[connect]="Add a connector and link it back to a room we already saved."
 NARR[cave]="A lava cave — the next room, connected to the last."

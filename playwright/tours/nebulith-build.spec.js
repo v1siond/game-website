@@ -64,12 +64,37 @@ test('nebulith — build a connected multi-room game', async ({ page }) => {
     if (populate) {
       mark('entities')
       await moveClick(page, page.getByRole('button', { name: /Enemy/ }))
-      await clickCell(2, 0)
+      await clickCell(1, 0) // adjacent to the player → we fight this one in play
+      await clickCell(3, 0)
       await clickCell(-2, 1)
       await moveClick(page, page.getByRole('button', { name: /NPC/ }))
-      await clickCell(1, -2)
+      await clickCell(0, -2)
       await moveClick(page, page.getByRole('button', { name: /Scatter entities/ }))
       await see(page)
+
+      // author a KILL quest on the NPC (select it → its quest card appears)
+      mark('quest')
+      await moveClick(page, page.getByRole('button', { name: /NPC/ })) // disarm the NPC tool
+      await clickCell(0, -2) // click the NPC → selects it
+      await page.getByLabel('Quest title').fill('Cull the goblins')
+      await page.getByLabel('Objective kind').selectOption('kill')
+      await page.getByLabel('Objective target').fill('goblin')
+      await page.getByLabel('Objective count').fill('3')
+      await page.getByLabel('Quest-giver NPC').selectOption({ index: 1 })
+      await moveClick(page, page.getByRole('button', { name: 'Link quest to giver' }))
+      await see(page)
+
+      // PLAY it — fight the adjacent enemy with real combat + attack animations
+      mark('fight')
+      await moveClick(page, btn('ISO'))
+      await beat(page)
+      for (let i = 0; i < 5; i++) {
+        await page.keyboard.press('f') // regular attack
+        await pause(page, 300)
+      }
+      await page.keyboard.press('g') // a special attack
+      await see(page)
+      await moveClick(page, btn('Top')) // back to top for placement on the next rooms
     }
 
     if (target) {
