@@ -144,7 +144,7 @@ test('nebulith tutorial — build a connected game', async ({ page }) => {
   // Open Flow and let the graph render BEFORE the mark, so the map line plays over the
   // connected graph (not the lingering boss-save screen).
   await moveClick(page, btn('Flow'))
-  await page.waitForTimeout(1100)
+  await page.waitForTimeout(1900) // Flow graph render + fade settles before the line
   mark('map')
   await holdAct('map')
 
