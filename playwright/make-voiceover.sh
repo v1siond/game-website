@@ -15,12 +15,15 @@ dur(){ ffprobe -v error -show_entries format=duration -of default=nk=1:nw=1 "$1"
 # One line per mark from the spec (SAME names), each written to its beat's length.
 declare -A NARR
 NARR[welcome]="This is Nebulith — an editor that builds whole game levels. Let's make a playable one from scratch."
-NARR[forest]="Pick a zone and a layout, and it generates a navigable forest — varied trees, even charred dead trunks. Don't like it? Re-roll for a new one."
-NARR[temple]="Switch to the lava zone and drop in a temple — a columned hall on a paved approach, themed automatically."
-NARR[cave]="A cave carves itself with cellular automata — one connected, walkable cavern."
-NARR[boss]="And a boss arena: a wide open room with the boss anchored at the far end."
-NARR[play]="Then just play it — the same engine that built the level runs it, so you walk and jump right through."
-NARR[twoD]="Prefer a classic look? Flip to the top-down 2D view — same level, instantly."
+NARR[forest]="Pick a season and a layout, and it generates a navigable forest — spring is airy and bright. Re-roll for a new one."
+NARR[summer]="Switch to summer and the same forest comes back denser and deeper green — every season has its own look."
+NARR[temple]="Autumn paints a temple in golds and ambers — a columned hall, themed automatically."
+NARR[cave]="Drop into a lava zone: a cave carves itself with cellular automata, one connected cavern."
+NARR[boss]="And a boss arena — a wide open room with the boss waiting at the far end."
+NARR[populate]="One click scatters enemies and an NPC into the open space, each with stats and a patrol."
+NARR[inventory]="Press I for the inventory — equip slots, a configurable bag, and special items bound to number keys."
+NARR[play]="Then just play it — walk the hero through and jump across gaps. The engine that built it runs it."
+NARR[twoD]="Prefer top-down? Flip to the 2D view — same level, instantly."
 
 mapfile -t MARKS < <(node -e 'const t=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8"));t.filter(x=>x.name!=="end").sort((a,b)=>a.t-b.t).forEach(x=>console.log(x.name+"\t"+x.t));' "$TIMELINE")
 declare -A WAV_OF DUR_OF

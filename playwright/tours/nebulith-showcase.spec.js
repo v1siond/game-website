@@ -44,27 +44,39 @@ test('nebulith showcase', async ({ page }) => {
   await moveClick(page, btn('ISO'))
   await beat(page)
 
-  // ── forests (generate + randomize) ──
+  // ── spring forest (generate + re-roll) ──
   mark('forest')
-  await generate('verdant', 'forest')
-  await moveClick(page, btn('forest')) // re-roll → a different forest
+  await generate('spring', 'forest')
+  await moveClick(page, btn('forest')) // re-roll → a different layout
   await see(page)
 
-  // ── temple ──
+  // ── summer forest (denser, deeper green — the seasons differ) ──
+  mark('summer')
+  await generate('summer', 'forest')
+
+  // ── autumn temple ──
   mark('temple')
-  await generate('lava', 'temple')
+  await generate('autumn', 'temple')
 
-  // ── cave ──
+  // ── lava cave + boss room ──
   mark('cave')
-  await moveClick(page, btn('cave'))
-  await see(page)
-
-  // ── boss room ──
+  await generate('lava', 'cave')
   mark('boss')
   await moveClick(page, btn('boss stage'))
   await see(page)
 
-  // ── play: walk the character around ──
+  // ── populate: scatter enemies + an NPC into the free space ──
+  mark('populate')
+  await moveClick(page, page.getByRole('button', { name: 'Scatter entities' }))
+  await see(page)
+
+  // ── inventory (I): equip grid + bag + special slots ──
+  mark('inventory')
+  await page.keyboard.press('i')
+  await see(page)
+  await page.keyboard.press('i') // close
+
+  // ── play: walk + jump ──
   mark('play')
   for (const key of ['w', 'w', 'd', 'd', 's', 'a']) {
     await page.keyboard.down(key)
