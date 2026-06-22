@@ -22,6 +22,6 @@ fi
 # Loop the bed, drop it well under the voice, mix; keep length = video.
 ffmpeg -y -i "$VIDEO" -stream_loop -1 -i "$MUSIC" -filter_complex \
   "[1:a]volume=${MUSIC_VOL},aformat=sample_rates=48000:channel_layouts=stereo[m];\
-   [0:a][m]amix=inputs=2:duration=first:dropout_transition=0:normalize=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]" \
+   [0:a][m]amix=inputs=2:duration=first:dropout_transition=0,loudnorm=I=-16:TP=-1.5:LRA=11[a]" \
   -map 0:v -map "[a]" -c:v copy -c:a aac -b:a 192k -shortest -movflags +faststart "$OUT" >/dev/null 2>&1
 echo "music bed → $OUT (vol ${MUSIC_VOL})"
