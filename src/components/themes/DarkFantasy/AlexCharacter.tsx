@@ -278,7 +278,7 @@ export const SlashReveal = memo(function SlashReveal({
     // Slash after entering
     const slashTimer = setTimeout(() => {
       setPhase('slashing')
-      let start = performance.now()
+      const start = performance.now()
       const animateSlash = (now: number) => {
         const progress = Math.min((now - start) / 300, 1)
         setAttackPhase(progress)

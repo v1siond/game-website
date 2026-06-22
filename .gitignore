@@ -39,3 +39,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .superpowers/
+
+# claude context — never in the repo
+.claude/
+
+# demo recordings (large binaries) + playwright artifacts
+recordings/
+test-results/
+playwright-report/
