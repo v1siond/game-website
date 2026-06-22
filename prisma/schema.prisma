@@ -40,6 +40,10 @@ model Template {
   // Format: [{ col, row, targetTemplateId, interaction, spawnCol, spawnRow }]
   connectors  Json     @default("[]")
 
+  // Placed entities (enemies / npcs / player) and authored quests for this room
+  entities    Json     @default("[]")
+  quests      Json     @default("[]")
+
   // Metadata
   thumbnail   String?  // Base64 or URL to preview image
   isPublic    Boolean  @default(false)
