@@ -11,6 +11,10 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    // Bound each action so a missing locator fails fast (with its name) instead of
+    // hanging until the whole test timeout.
+    actionTimeout: 15000,
+    navigationTimeout: 30000,
     // viewport / deviceScaleFactor / recordVideo are set by the showcase fixture.
   },
   projects: [{ name: 'chromium', use: {} }],
