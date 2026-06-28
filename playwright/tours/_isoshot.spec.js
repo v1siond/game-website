@@ -1,11 +1,12 @@
 // Image-analysis harness: generate a settlement, switch to a chosen VIEW, optionally turn on the
 // collision/debug overlay, hide the editor UI, and screenshot the canvas.
 // Run: BASE_URL=http://localhost:3001 SHOT=/abs/path.png VIEW=ISO|2D|Top DEBUG=1 \
-//      ZONE=summer VARIANT=village npx playwright test playwright/tours/_isoshot.spec.js --project=chromium
+//      ZONE=summer VARIANT=town npx playwright test playwright/tours/_isoshot.spec.js --project=chromium
 import { test } from '@playwright/test'
 
 const ZONE = process.env.ZONE || 'summer'
-const VARIANT = process.env.VARIANT || 'village'
+// 'village' was dropped (only town + city remain) — map any stale request to 'town'.
+const VARIANT = (process.env.VARIANT || 'town') === 'village' ? 'town' : process.env.VARIANT || 'town'
 const VIEW = process.env.VIEW || 'ISO' // ISO | 2D | Top
 const DEBUG = process.env.DEBUG === '1'
 const SHOT = process.env.SHOT || '/tmp/isoshot.png'
@@ -25,7 +26,7 @@ test('generate + screenshot a view', async ({ page }) => {
   if (DEBUG) await page.getByRole('button', { name: /Debug overlay/ }).click().catch(() => {})
   await btn(VIEW).click().catch(() => {}) // ISO / 2D / Top
   await page.waitForTimeout(600)
-  await page.getByRole('button', { name: /Preview/ }).click().catch(() => {}) // hide editor panels
+  if (process.env.NOHIDE !== '1') await page.getByRole('button', { name: /Preview/ }).click().catch(() => {}) // hide editor panels
   await page.waitForTimeout(1000)
   await page.locator('canvas').first().screenshot({ path: SHOT })
 })
