@@ -18,6 +18,10 @@ test('generate + screenshot a view', async ({ page }) => {
   await btn(ZONE).click().catch(() => {})
   await btn(VARIANT).click()
   await page.waitForTimeout(1000)
+  if (process.env.SCATTER === '1') {
+    await page.getByRole('button', { name: /Scatter entities/ }).click().catch(() => {})
+    await page.waitForTimeout(500)
+  }
   if (DEBUG) await page.getByRole('button', { name: /Debug overlay/ }).click().catch(() => {})
   await btn(VIEW).click().catch(() => {}) // ISO / 2D / Top
   await page.waitForTimeout(600)
