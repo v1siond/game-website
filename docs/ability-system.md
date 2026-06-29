@@ -113,3 +113,84 @@ bars, drag-to-arrange layout, resize), a full ability-CREATE editor (new defs fr
 rebinding, the seeded-animation library expansion, and the XP/level progress system + requirement
 enforcement. v1 = a real configurable system (registry + assign/remove + display) on a fixed 4-slot
 bar; the bar LAYOUT builder is the next phase.
+
+## Enemy attacks — a CONFIGURABLE pattern (this session)
+
+Enemies used to have a single attack: one `AttackPattern { mode:'melee'|'ranged', cooldownMs }`. They
+now get a **multi-attack pattern** that mirrors the movement system: an **ordered list of attacks** +
+a **traversal mode** (`'sequential'` cycles the list then repeats; `'random'` picks one each swing).
+This is **linked to the attacks system** — an enemy attack IS an attack like the player's.
+
+### Model (`src/game/types.ts`)
+
+```ts
+type AttackMode = 'melee' | 'ranged'              // a single attack's RANGE
+type AttackPatternMode = 'sequential' | 'random'  // traversal — mirrors MovementMode
+
+interface EnemyAttack {           // the enemy-side mirror of a player ability/attack
+  mode: AttackMode                // melee = strike when adjacent; ranged = bolt within reach
+  damage: number                  // extra damage on top of the enemy's strength (the swing's weapon base)
+  cooldownMs: number              // time before the enemy's NEXT attack
+  animation?: AbilityAnimation    // seeded animation → swing/bolt tint
+  reachCells?: number             // ranged reach (chebyshev); melee uses adjacency
+  abilityId?: string              // set when built from a registry ability (provenance + label)
+  name?: string                   // display label
+}
+
+interface AttackPattern {         // mirrors MovementPattern
+  mode: AttackPatternMode
+  attacks: EnemyAttack[]
+}
+```
+
+**Type choice — a lean `EnemyAttack`, not raw `AbilityDef`.** An enemy attack carries `mode`
+(melee/ranged) and `reachCells` as first-class fields the combat tick + editor need directly; a player
+`AbilityDef` expresses range only implicitly (via `animation`) and has no reach, plus id/name/category/
+requirements that are noise for a hand-authored enemy swing. So `EnemyAttack` is a focused record (the
+same way the player path extracts a lean `AbilitySwing { damage, tint }` from an `AbilityDef` rather
+than threading the whole def through the loop). We **still reuse the registry**:
+`enemyAttackFromAbility(ability)` builds an `EnemyAttack` from any `AbilityDef` — reusing its damage,
+cooldown, animation/tint and inferring melee-vs-ranged from the animation — so "add an attack from the
+registry" gives the enemy a real, player-grade attack. *Reuse where it fits; a dedicated type where it
+doesn't.*
+
+### Pure model + selector (`src/game/patterns.ts`, unit-tested)
+
+- `makeEnemyAttack`, `defaultEnemyAttack`, `enemyAttackFromAbility`, `animationRange`, `ENEMY_ATTACK_PRESETS`.
+- Immutable editing: `buildAttackPattern`, `setAttackPatternMode`, `addEnemyAttack`,
+  `removeEnemyAttack`, `updateEnemyAttack` (damage/cooldown clamped).
+- `normalizeAttackPattern(raw)` — accepts the **new** multi-attack shape OR a **legacy** single
+  `{ mode:'melee'|'ranged', cooldownMs }` save (back-compat) OR nothing, and always returns a
+  non-empty pattern. Missing/empty → the engine default (one strength-only melee), so nothing regresses.
+- `nextEnemyAttack(pattern, { fireCount, rng? })` — the selector. Sequential cycles by `fireCount`;
+  random picks via `rng`; empty → the default attack.
+
+### Combat tick (`templates.tsx` → `applyEnemyRetaliation`)
+
+Each living enemy picks its **next** attack via `nextEnemyAttack` (the per-enemy `fireCount` lives in
+`EnemyRuntime.attackFireCount`). If that attack is in range (melee adjacency / ranged reach) and off
+**its** cooldown, it fires: `enemyFist(entity, attack)` rides the attack's `damage` as the swing's
+weapon base through the existing `resolveAttack` (so defense / dodge / block still apply), and the
+animation system plays the attack's `'slash'` (melee) or `'shot'` (ranged) recolored to its tint. So an
+enemy with `[melee, ranged]` visibly alternates a swing and a bolt.
+
+### Authoring (entity editor → Attacks modal, `EntityAttackBody`)
+
+Mirrors the movement editor: a top **Default / Sequential / Random** select, then a list of attack rows
+(melee/ranged + damage + cooldown + tint + remove), with **+ Melee**, **+ Ranged**, and a **+ From
+library…** picker (presets + offensive registry abilities). The pattern rides the entity record, so it
+**saves with the template**.
+
+### Deliberately NOT built yet (documented, later)
+
+- **A full per-attack custom editor** — naming an attack, free-form reach, a richer effect block
+  (debuffs/healing on enemy attacks), per-attack school (magical enemy attacks).
+- **Real travelling enemy projectiles** — enemy ranged currently deals damage on fire + shows a
+  travelling `'shot'` anim; upgrading to the player's deferred-impact `Projectile` (dodge-by-moving)
+  needs the projectile system to treat the player as a target. The `'shot'` anim already flies enemy→
+  player, so it reads as a projectile.
+- **Conditional / trigger logic** — "use the ranged attack when the player is far, melee when adjacent",
+  HP-threshold phase changes, telegraph windows, aggro/leash. The selector is intentionally a pure
+  `(pattern, state) → attack` so a smarter policy can replace `fireCount`/`rng` without touching the tick.
+- **Ranged/melee animation library expansion** — more seeded animations + particles (shared with the
+  player ability work above).
