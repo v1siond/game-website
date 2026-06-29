@@ -64,17 +64,24 @@ Abilities can require a level. A minimal XP/level model powers `requirements.lev
 - This is **documented only** for now — v1 leaves `requirements` on the model but doesn't enforce a
   level (treat unmet `level` as "always allowed" until the progress system lands).
 
-## Authoring (the database / editor — later)
+## Authoring — a configurable SYSTEM, not hardcoded slots
 
-The editor will let an author:
-1. Create an `AbilityDef`: name + description, pick a **category** and a **seeded animation**, set
-   **cooldown**, **requirements**, and **effect** numbers (damage/healing/debuff).
-2. Bind up to 4 to an entity's slots (keys 1–4, rebindable).
+This is the core of it. It is NOT "every entity has 4 fixed abilities." It is a **system**:
 
-The engine stays "not super customizable out of the box": authors choose from the **seeded animation
-library** and tune data — they don't build new animations. Persistence rides the same template/asset
-channel as the rest (see `src/lib/api.ts` + the marker-asset pattern), so an entity's loadout can be
-saved/loaded with the template.
+1. **Ability database (CRUD).** A registry of abilities the author can **add / delete / update**. Each
+   `AbilityDef`: name + description, **category**, a **seeded animation**, **cooldown**,
+   **requirements**, and **effect** numbers (damage / healing / debuff). The engine ships seeded
+   abilities; the author edits + adds more (choosing from the seeded animation library — they don't
+   hand-build animations).
+2. **Assign into slots — per ANY entity.** Abilities are **put into** an entity's action slots and
+   **taken out** again (assign / remove / move). The same system applies to the **player AND enemies**
+   — an enemy's "attack pattern" is just its assigned abilities (see the enemy-attack work). This is
+   **linked to the attacks system**: an ability IS an attack/defense/debuff.
+3. **Action-bar UI builder (à la WoW's Bartender).** The author controls their **action UI**: build
+   bars/slots, place which ability goes where, rearrange. Not a fixed 4-slot bar — a buildable layout.
+
+Persistence rides the same template/asset channel as the rest (see `src/lib/api.ts` + the marker-asset
+pattern), so an entity's ability loadout + the bar layout save/load with the template.
 
 ## Visual hook
 
@@ -83,14 +90,26 @@ melee swing (`drawIsoPlayer`) but **tints the blade red/orange** for the duratio
 in-hand-swing code already takes a glyph + swing progress; the animation id selects a tint + any
 extra particles.
 
-## v1 — built this session (intentionally small)
+## Already built (first slice)
 
-- `src/game/abilities.ts` — the pure model above + a cooldown helper + **one seeded ability**
-  (`FIRE_SLASH`, offensive, `fire-slash` animation) + a default loadout (Fire Slash on slot 1).
-- Basic attack cooldown set to **1.5s** (was looping every 200ms — too fast).
-- Wiring (in the play loop): **key `1` → Fire Slash** when off cooldown → plays the swing with a
-  **red/orange blade**, applies its damage, starts its cooldown.
+- `src/game/abilities.ts` — the pure `AbilityDef` model + cooldown/requirement helpers + seeded
+  `FIRE_SLASH` + a default loadout. The play loop fires the slot's ability by key (key `1` → Fire
+  Slash → red/orange swing, applies damage, cooldown). Basic attack 0.5s.
 
-Deliberately **NOT** built yet (documented above, exported later): the full seeded animation library,
-the abilities-database editor UI, the cooldown HUD for all 4 slots, key rebinding UI, the XP/level
-progress system + requirement enforcement, defensive/debuff/healing example abilities.
+## v1 of the CONFIGURABLE system (this session) — extensible, not hardcoded
+
+1. **Ability registry (the database):** turn `abilities.ts` into a registry of seeded abilities with
+   **variety** — at least one per category (offensive Fire Slash; a defensive guard; a debuff; a
+   ranged shot) — exposed as a list the UI can read. Structure it so add/update is trivial later.
+2. **Editable per-entity loadout:** the player's loadout (slot → abilityId) is **editable** — the
+   inventory's 1–4 Special slots let you **assign** an ability (pick from the registry) and **remove**
+   it. The play loop reads the entity's CURRENT loadout (NOT a hardcoded default). Loadout lives where
+   both the UI + the play loop read it (and saves with the template).
+3. **Display:** the slots + a HUD action bar show the assigned abilities + cooldown sweep; pressing the
+   key fires whatever is assigned.
+
+Deliberately **NOT** built yet (documented, later): the full **Bartender-style bar builder** (multiple
+bars, drag-to-arrange layout, resize), a full ability-CREATE editor (new defs from scratch in-UI), key
+rebinding, the seeded-animation library expansion, and the XP/level progress system + requirement
+enforcement. v1 = a real configurable system (registry + assign/remove + display) on a fixed 4-slot
+bar; the bar LAYOUT builder is the next phase.
