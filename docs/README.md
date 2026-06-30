@@ -51,4 +51,5 @@ Point-in-time analyses (read-only findings + recommendations; nothing auto-appli
 |---|---|
 | [audits/dead-code-and-duplication.md](./audits/dead-code-and-duplication.md) | Dead/unused code (the legacy OO engine + orphan prototype routes, fully-dead engine files, dead exports, `.backup.tsx`) and duplicated logic (player render iso↔2D, the entity/quest/building codec triples, scattered math helpers), each with file:line + safe-vs-risky removal notes. |
 | [audits/folder-structure.md](./audits/folder-structure.md) | Folder/code-placement review: the 12.8k-line `templates.tsx` god file + a staged split plan, pure logic trapped in the page route, the legacy parallel engine, and ranked structural recommendations (effort/risk/payoff). |
+| [audits/engine-extraction-analysis.md](./audits/engine-extraction-analysis.md) | Feasibility/effort/approach for extracting the engine into its own package consumed by game-website: extractable surface + public API, coupling blockers, approach options (recommends a workspace monorepo), and a phased effort estimate. |
 </content>
