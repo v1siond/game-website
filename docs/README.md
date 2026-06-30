@@ -27,6 +27,7 @@ The as-built docs above link to them.
 | [ability-system.md](./ability-system.md) | Data-driven ability system design: seeded animations, the ability database, per-entity loadouts, and the configurable enemy-attack pattern. |
 | [animation-system.md](./animation-system.md) | Frame-based cell-animation authoring design (author defines motion as frames, not opaque presets). |
 | [games-flows.md](./games-flows.md) | "Games" = ordered flows of templates (level 1, 2, 3 …); the model + v1 localStorage persistence (`gamesStore.ts`). |
+| [editor-ui-design.md](./editor-ui-design.md) | The approved editor redesign ("Figma for games"): the 5-minute golden path, the hybrid layout (tool-rail + canvas + morphing Inspector + on-canvas quick-actions), the global art-style/tileset swap, the unified trigger model, and the staged build plan. |
 
 ## Standards
 
