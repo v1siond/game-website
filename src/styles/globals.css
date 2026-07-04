@@ -443,3 +443,9 @@ textarea:focus-visible {
   .hk-mote { animation: none; opacity: 0.35; }
 }
 
+
+/* Flow view is a full-screen level-graph — hide the global FPS overlay while it's up so the
+   perf box doesn't sit on top of the flow. The <body> flag is toggled by the templates editor. */
+body.flow-view-active .fps-tracker {
+  display: none;
+}

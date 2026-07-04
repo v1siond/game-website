@@ -86,7 +86,7 @@ export default function FPSTracker({ position = 'bottom-left', showGraph = true,
   const toggleButton = (
     <button
       onClick={() => setVisible(prev => !prev)}
-      className={`fixed ${positionClasses[position]} z-[99999] font-mono text-xs cursor-pointer`}
+      className={`fps-tracker fixed ${positionClasses[position]} z-[99999] font-mono text-xs cursor-pointer`}
       style={{
         background: visible ? 'rgba(0, 0, 0, 0.9)' : 'rgba(0, 0, 0, 0.7)',
         border: `1px solid ${visible ? '#00ff00' : 'rgba(255, 255, 255, 0.3)'}`,
@@ -107,7 +107,7 @@ export default function FPSTracker({ position = 'bottom-left', showGraph = true,
     <>
       {toggleButton}
       <div
-        className={`fixed z-[99998] font-mono text-xs select-none pointer-events-none`}
+        className={`fps-tracker fixed z-[99998] font-mono text-xs select-none pointer-events-none`}
         style={{
           background: 'rgba(0, 0, 0, 0.9)',
           border: '1px solid rgba(255, 255, 255, 0.2)',
