@@ -450,13 +450,9 @@ body.flow-view-active .fps-tracker {
   display: none;
 }
 
-/* The game-engine page owns all four screen corners (HUD + nav), so pull the global FPS overlay out
-   of the top-RIGHT nav zone (it was overlapping the "More" button). Stack it under the top-left
-   Pos/Grid dev readout instead. !important beats the component's inline + utility positioning for
-   BOTH the toggle button and the expanded panel. */
+/* The game-engine editor owns its OWN FPS readout (#86): a pill in the top nav during edit/show and a
+   floating box in play mode. Hide the GLOBAL _app FPS overlay entirely on this page so there's no
+   duplicate fixed box. */
 body.game-engine-active .fps-tracker {
-  top: 64px !important;
-  left: 12px !important;
-  right: auto !important;
-  bottom: auto !important;
+  display: none !important;
 }
