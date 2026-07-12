@@ -1,11 +1,12 @@
 import type { Locale } from '@/i18n/config'
 import { getStaticCVData } from './cv-data-static'
+import { NEBULITH_API } from './nebulithApi'
 
 // CV/portfolio data now comes from the nebulith ELIXIR backend (GET /api/cv?locale=…)
 // The endpoint does the queries + i18n field selection server-side and returns the SAME shape the page
 // consumes (professionalSummary, currentRoles, companies, featuredProjects, techStack, workExperience).
 // `src/app/cv/page.tsx` already falls back to `getStaticCVData` when this throws / returns empty.
-const NEBULITH_API = 'http://localhost:4001/api'
+// Base URL from the shared, env-configurable NEBULITH_API (see src/lib/nebulithApi.ts).
 
 /** The CV payload shape — reuse the static mirror's type so the page stays fully typed. */
 export type CVData = Awaited<ReturnType<typeof getStaticCVData>>
