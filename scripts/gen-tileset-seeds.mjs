@@ -48,8 +48,19 @@ for (const [slug, t] of Object.entries(catalog.tiles)) {
 for (const [slug, glyph] of Object.entries(entities.tiles)) {
   if (emoji[slug]) continue // a browseable tile already owns this id — keep the canonical (categorised) one
   const img = `${entities.dir}/${slug}.png`
-  emoji[slug] = { char: glyph, ...(hasPng(img) ? { image: img } : {}) } // NO category → resolvable, not browseable
+  // NO category → resolvable, not browseable. `color` is the geometry backing tint (every tile carries one).
+  emoji[slug] = { char: glyph, color: '#d9a066', ...(hasPng(img) ? { image: img } : {}) }
   addedEnt++
+}
+// POSE tiles for the player animation seed (walk/run) — baked (scripts/bake-pose-tiles.mjs), NOT browseable:
+// referenced by tileId from the animation frames (emoji:walk / emoji:run), never shown in the sidebar.
+const POSES = { walk: '🚶', run: '🏃' }
+let addedPose = 0
+for (const [slug, glyph] of Object.entries(POSES)) {
+  if (emoji[slug]) continue
+  const img = `/tiles/emoji/baked/${slug}.png`
+  emoji[slug] = { char: glyph, color: '#d9a066', ...(hasPng(img) ? { image: img } : {}) } // person tone backing tint
+  addedPose++
 }
 
 // ── ASCII seed: per-kind browseable glyphs (category + title) into `tiles`; never clobber the swap-key `label`. ──
