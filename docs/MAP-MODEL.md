@@ -42,6 +42,8 @@ Matching rules: **Width** = 2D = TOP = ISO-front · **Height** = 2D = ISO · **D
 | Tiles — EMOJI tileset | `src/engine/tileset/emojiTileset.ts` (`EMOJI_TILESET`) |
 | Tiles — label → kind (the type→art mapping both tilesets share) | `src/game/artStyle.ts` (`groundKind`, `EMOJI_STYLE`/`ASCII_STYLE`) |
 | Tileset data model + backend load | `src/engine/tileset/{tileset.ts,asciiTileset.ts,tilesetLoader.ts}`, `src/lib/nebulithApi.ts` |
+| Tile Library **sidebar** + per-element override resolution (read the LOADED tileset) | `src/game/artStyle.ts` (`tilesForStyle`, `visualForTileId`), `src/components/game/editorChrome.tsx` (`TileCategoryGrid`) |
+| Tileset **seed pipeline** (one source → DB) | `src/game/data/{tileKinds.json,emojiCatalog.json,entityTiles.json}` → `scripts/gen-tileset-seeds.mjs` → `nebulith/priv/repo/tilesets/*.json` + `src/game/data/tilesetSeed.json` |
 | **TOP** render (projection) | `src/engine/render/birdseye.ts` (`renderTopView`) |
 | **2D** render (front elevation projection) | `src/engine/render/topdown.ts` (`render2D`) |
 | **ISO** render (3D projection) | `src/engine/render/iso.ts` (`render`, `drawIsoAssetAscii`, `drawIsoTileBlock`) |
@@ -53,4 +55,5 @@ Matching rules: **Width** = 2D = TOP = ISO-front · **Height** = 2D = ISO · **D
 - A dimension can **never** differ between views (Width/Height/Depth match per the table above).
 - Everything on the map renders through the **regular tile path** — no per-view special drawer (units/NPCs aside).
 - Tiles come from the **DB tileset** (ascii + emoji), labeled correctly; the front end hardcodes no art.
+- The **Tile Library sidebar** reads the SAME loaded (DB) tileset the map renders from (`tilesForStyle`/`visualForTileId`) — never a parallel hardcoded catalog. A tile is browseable when its DB entry has a `category`. Add/change a tile via the seed pipeline (see canonical §8) + reseed, never in a component.
 - Use the exact terms **cell / block / tile**; never conflate them.
