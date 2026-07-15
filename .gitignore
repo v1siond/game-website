@@ -47,3 +47,4 @@ next-env.d.ts
 recordings/
 test-results/
 playwright-report/
+erl_crash.dump

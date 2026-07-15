@@ -73,6 +73,27 @@ for (const [kind, glyph] of Object.entries(ASCII_GLYPH)) {
   else { ascii.tiles[kind] = { label: kind, glyph, category: cat, title: KIND_LABEL[kind] ?? kind, position: 'single', walkable: true }; addedAscii++ }
 }
 
+// ── COMPOSITION tiles + templates (rich multi-cell ascii art: tree, house, fountain…) — the data-driven
+// replacement for the hardcoded composeBuilding / make* factories. Seeded into the ascii tileset. ──
+const comp = readJson(join(ROOT, 'src', 'game', 'data', 'compositions.json'))
+// A composition is style-agnostic STRUCTURE; each part paints with the ACTIVE style's tile. So every part tile
+// is seeded into BOTH tilesets under the SAME label — ascii renders its glyph, emoji renders its emoji.
+const EMOJI_ROLE_COLOR = { canopy: '#5fae4f', trunk: '#7a5a3a' }
+let addedCompTiles = 0
+for (const [label, t] of Object.entries(comp.tiles)) {
+  ascii.tiles[label] = { label, glyph: t.glyph, colorRole: t.colorRole, position: 'single', walkable: !!t.walkable }
+  if (t.emoji) emoji[label] = { char: t.emoji, color: EMOJI_ROLE_COLOR[t.colorRole] ?? '#cccccc', colorRole: t.colorRole }
+  addedCompTiles++
+}
+ascii.compositions = {}
+for (const [kind, c] of Object.entries(comp.compositions)) {
+  // Propagate each tile's `walkable` onto its composition CELL, so the runtime stamp (stampComposition) reads
+  // collision per cell without re-looking-up the tile: a walkable canopy tile → a walkable cell, a blocking
+  // trunk tile → a blocking cell.
+  const cells = c.cells.map(cell => ({ ...cell, walkable: !!(comp.tiles[cell.label] && comp.tiles[cell.label].walkable) }))
+  ascii.compositions[kind] = { footprint: c.footprint, cells }
+}
+
 writeFileSync(join(NEB, 'emoji.json'), JSON.stringify(emoji, null, 2) + '\n')
 writeFileSync(join(NEB, 'ascii.json'), JSON.stringify(ascii, null, 2) + '\n')
 writeFileSync(join(ROOT, 'src', 'game', 'data', 'tilesetSeed.json'), JSON.stringify({ emoji, ascii }, null, 2) + '\n')
