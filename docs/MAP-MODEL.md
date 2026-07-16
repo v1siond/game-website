@@ -1,59 +1,152 @@
-# Map Model, Views & the Cell/Block/Tile System (engine copy)
+# Nebulith — Map Model, Views & the Cell/Block/Tile System
 
-> **Canonical source of truth:** [`nebulith/docs/MAP-MODEL.md`](../../nebulith/docs/MAP-MODEL.md).
-> This engine-facing copy carries the same model + **where each part lives in this repo's code**.
-> Keep both in sync.
+> **The source of truth for how a Nebulith map is built and viewed.**
+> Read this BEFORE any work that touches maps, tiles, cells/blocks, generators, or the three views.
+> New feature? Check this (+ the feature doc) and make sure the feature matches it.
+> Fixing a bug? Confirm the fix matches this model.
+> Touching tiles or cells/blocks? Understand this first, then update code.
 >
 > Standing workflow for ALL work: **check docs → understand context / high-level → do the work.**
-> New feature → check this + the feature doc, make sure it matches. Fixing a bug → confirm the fix matches.
-> Touching tiles or cells/blocks → understand this first.
+>
+> This is the canonical copy. `game-website/docs/MAP-MODEL.md` mirrors it and maps it to the code.
 
 ---
 
-## The model (summary — full version + diagrams in the canonical copy)
+## 1. One map, three projections
 
-There is **ONE map**: a grid of cells/blocks, each holding a **tile**. A house, a road, a mountain are all
-just **tiles in cells/blocks, stacked like legos**. The three views are **projections of that one map** through
-the **same tile builder**, so **they must match**.
+There is **ONE map**: a grid of cells/blocks, each holding a **tile** (the art). Nothing is special-cased —
+a house, a road, a mountain are all just **tiles in cells/blocks, stacked like legos / minecraft**. The three
+views are **three projections of that one map**, rendered through the **same tile builder**. Because they are
+the same map, **the views must match.**
+
+```mermaid
+flowchart TD
+  MAP["ONE MAP — a grid of cells/blocks, each holds a TILE"]
+  MAP -->|look from above| TOP["TOP view — Width x Depth (footprint), no height"]
+  MAP -->|look from the front| TWOD["2D view — Width x Height (front elevation), depth collapsed"]
+  MAP -->|full 3D| ISO["ISO view — Width x Height x Depth"]
+```
+
+## 2. What each view shows / hides
 
 | View | You see | Axes | Hidden |
 |------|---------|------|--------|
-| **TOP** | from directly above | **Width × Depth** (footprint) | height / elevation |
-| **2D**  | from the front | **Width × Height** (front elevation) | depth (collapsed) |
-| **ISO** | in 3D | **Width × Height × Depth** | nothing |
+| **TOP** | the map from directly above | **Width × Depth** (footprint) | height / elevation |
+| **2D**  | the map from the front | **Width × Height** (front elevation) | depth (collapsed) |
+| **ISO** | the map in 3D | **Width × Height × Depth** | nothing |
 
-Matching rules: **Width** = 2D = TOP = ISO-front · **Height** = 2D = ISO · **Depth** = TOP = ISO. Same tiles
-(roof red, walls gray, door/windows) in every view.
+Example — the SAME house in all three (the reference sketch):
+- **TOP**: a roof **rectangle** (the footprint) + a door notch, on green ground.
+- **2D**: gray wall rows + a red roof **gable / triangle** + windows + door — the front face; green ground, sky above.
+- **ISO**: the full 3D house — walls + red gable roof + door/windows.
 
-- **BLOCK** = a 3D unit `(col, row, level)` (ISO). **CELL** = a 2D square `(col, row)` (2D/TOP). **TILE** = the
-  art inside, from the DB tileset (ascii + emoji are two tilesets of the same tile). A cell/block **has
-  collision or not** (blocks movement or not), independent of its tile. A character/unit = a depth-0 tile.
-- **No special renderer per view.** Each view projects the same stamped tiles. The roof is a **stack of roof
-  tiles** (a gable) → triangle (2D), 3D gable (ISO), footprint (TOP).
-- **Elevation** = stacked cells/blocks + collision (the `height` grid). Open work = expand generators + tiles
-  to place PLACES with elevation; not new render logic.
+## 3. The matching rules — the views are consistent by construction
 
-## Where this maps in the code
+The same thing appears in all three, so its dimensions are shared:
 
-| Concern | File(s) |
-|---------|---------|
-| The one grid: ground / **height (elevation)** / collision / assets; `setHeight`/`getHeight` | `src/engine/IsometricGrid.ts` |
-| Tiles — ASCII tileset (ground colors) | `src/levels/village.ts` (`GROUND_COLORS`) |
-| Tiles — EMOJI tileset | `src/engine/tileset/emojiTileset.ts` (`EMOJI_TILESET`) |
-| Tiles — label → kind (the type→art mapping both tilesets share) | `src/game/artStyle.ts` (`groundKind`, `EMOJI_STYLE`/`ASCII_STYLE`) |
-| Tileset data model + backend load | `src/engine/tileset/{tileset.ts,asciiTileset.ts,tilesetLoader.ts}`, `src/lib/nebulithApi.ts` |
-| Tile Library **sidebar** + per-element override resolution (read the LOADED tileset) | `src/game/artStyle.ts` (`tilesForStyle`, `visualForTileId`), `src/components/game/editorChrome.tsx` (`TileCategoryGrid`) |
-| Tileset **seed pipeline** (one source → DB) | `src/game/data/{tileKinds.json,emojiCatalog.json,entityTiles.json}` → `scripts/gen-tileset-seeds.mjs` → `nebulith/priv/repo/tilesets/*.json` + `src/game/data/tilesetSeed.json` |
-| **TOP** render (projection) | `src/engine/render/birdseye.ts` (`renderTopView`) |
-| **2D** render (front elevation projection) | `src/engine/render/topdown.ts` (`render2D`) |
-| **ISO** render (3D projection) | `src/engine/render/iso.ts` (`render`, `drawIsoAssetAscii`, `drawIsoTileBlock`) |
-| A building as stacked per-cell tiles (one system, all views) | `src/game/runtime/buildings.ts` (`stampBuildingCells`), `src/engine/buildingComposer.ts`, `src/engine/gableRoof.ts` (roof = gable tile stack) |
-| Generators (stamp cells/blocks + tiles + collision) | `src/engine/stageGenerator.ts`, `src/engine/villageLayout.ts` |
-| Iso block picking / selection (pick == render) | `src/engine/render/iso.ts` (`pickIsoBlocksAll`, `nextPickIndex`), editor in `src/pages/personal-projects/game-engine/templates.tsx` |
+- **Width** — 2D = TOP = ISO front width.
+- **Height** — 2D = ISO. (TOP hides it.)
+- **Depth** — TOP = ISO. (2D hides it.)
+- **Tiles match** — roof red, walls gray, door/windows in the same places, in every view; ground green, road black, everywhere.
+- Change the map (add a floor, move the door) → **all three views change consistently**, because they read the same cells/blocks/tiles.
 
-## Invariants a change must preserve
-- A dimension can **never** differ between views (Width/Height/Depth match per the table above).
-- Everything on the map renders through the **regular tile path** — no per-view special drawer (units/NPCs aside).
-- Tiles come from the **DB tileset** (ascii + emoji), labeled correctly; the front end hardcodes no art.
-- The **Tile Library sidebar** reads the SAME loaded (DB) tileset the map renders from (`tilesForStyle`/`visualForTileId`) — never a parallel hardcoded catalog. A tile is browseable when its DB entry has a `category`. Add/change a tile via the seed pipeline (see canonical §8) + reseed, never in a component.
-- Use the exact terms **cell / block / tile**; never conflate them.
+```mermaid
+flowchart LR
+  W[Width] --- TOPw[TOP width]
+  W --- TWODw[2D width]
+  W --- ISOw[ISO front width]
+  H[Height] --- TWODh[2D height]
+  H --- ISOh[ISO height]
+  D[Depth] --- TOPd[TOP depth]
+  D --- ISOd[ISO depth]
+```
+
+## 4. Blocks, cells, tiles — the containers and their contents
+
+- **ISO grid = BLOCKS** — 3D containers `(col, row, level)`. Stack as many as you want for height/depth.
+- **2D grid = CELLS** — `(col, row)`; **stack cells** to simulate elevation (height). Depth is collapsed.
+- **TOP grid = cells** from above — elevation is not shown.
+- A **cell/block has collision or not** — it blocks movement or it doesn't. Collision is a property of the
+  cell/block, **independent of the tile** it holds.
+- A **TILE** is the art inside a cell/block — an ascii glyph, an emoji, or an image, coming from the **DB
+  tileset**. Ascii and emoji are just **two tilesets** of the same tile (same label, different art). The
+  front end renders; the tile data comes from the DB — the front end hardcodes nothing.
+
+**Terminology — never interchange:**
+- **CELL** = a 2D grid square `(col, row)`.
+- **BLOCK** = a 3D unit `(col, row, level)`.
+- **TILE** = the content/art placed into a cell/block.
+- A **character / unit** is a depth-0 tile — the one map exception to "everything is a stacked tile."
+
+## 5. Everything is tiles through ONE builder — no special renderer per view
+
+A building, a tree, a mountain — all are **collections of tiles in cells/blocks**. There is **NO special
+drawer** for a building, a roof, or anything (units/NPCs aside). Each view PROJECTS the same stamped tiles:
+ISO stacks the blocks into a 3D shape, 2D collapses depth and stacks the cells into a front elevation, TOP
+shows the footprint.
+
+The roof is the clearest example: it is a **stack of roof tiles** (a gable). The SAME roof tiles project to a
+**triangle** (2D front), a **3D gable** (ISO), and the **footprint rectangle** (TOP).
+
+```mermaid
+flowchart TD
+  STAMP["a building is stamped as per-cell TILES (walls stack by level, roof = gable tile stack)"]
+  STAMP --> REG["the REGULAR tile builder — one path, no special drawer"]
+  REG -->|project| TOPp["TOP: footprint rectangle"]
+  REG -->|project| TWODp["2D: front elevation, depth collapsed"]
+  REG -->|project| ISOp["ISO: 3D block stack with gable roof"]
+```
+
+## 6. Elevation is stacked cells/blocks + collision — not special logic
+
+A hill / mountain / cliff / staircase is just **cells/blocks stacked with collision**. The elevation system
+already exists (a per-cell `height` grid; the ISO + TOP renders raise cells and draw cliff faces). The open
+work is only **expanding the generators + tiles to place PLACES with elevation** (mountains, staircases,
+cliffs, hills) — **not** new render logic. "Segmented code" per view is fine; the **logic is one system**.
+
+## 7. The pipeline — generator → one grid → three renders
+
+```mermaid
+flowchart LR
+  GEN["generators — stamp cells/blocks + tiles + collision"] --> GRID["ONE grid — ground / height / collision / assets"]
+  GRID --> R1[renderTopView] --> TOP[TOP view]
+  GRID --> R2[render2D] --> TWOD[2D view]
+  GRID --> R3["render (iso)"] --> ISO[ISO view]
+```
+
+## 8. Tileset source of truth — the DB + one seed pipeline
+
+Tiles are **DB data**, served by the nebulith backend (`:4000`, `tilesets` table, one row per style key —
+`ascii`, `emoji`). Each tile entry carries its **art** (`glyph`/`char` + optional `image` + `color`) plus
+optional **sidebar metadata**: `category` (terrain/buildings/units/nature) marks a tile BROWSEABLE and groups
+it; `title` is its display name. Entries with no `category` (wall pieces, tree corners, entity reskin tiles)
+render on the map but never surface in the sidebar.
+
+**The app reads ONLY the DB tilesets — the front end hardcodes no tile art.** `tilesetLoader` fetches the rows
+on load and installs them (`EMOJI_TILESET` / `ASCII_TILESET`). BOTH the **map render** and the **Tile Library
+sidebar** (`tilesForStyle` / `visualForTileId`) derive from those loaded tilesets — so the sidebar always
+matches the map (no parallel hardcoded catalog that can drift).
+
+**Seed pipeline (one source → DB → app):**
+
+```mermaid
+flowchart LR
+  SRC["seed data (game-website): tileKinds.json + emojiCatalog.json + entityTiles.json"]
+  SRC --> GEN["scripts/gen-tileset-seeds.mjs"]
+  GEN --> NJSON["nebulith/priv/repo/tilesets/{emoji,ascii}.json"]
+  GEN --> SNAP["src/game/data/tilesetSeed.json (jest snapshot)"]
+  NJSON --> SEED["mix run priv/repo/seeds.exs"] --> DB[("tilesets DB")]
+  DB --> LOADER["tilesetLoader (:4000)"] --> APP["map render + Tile Library sidebar"]
+```
+
+**To add or change a tile:** edit the seed source — `tileKinds.json` (a kind's category/label/ascii glyph)
+or `emojiCatalog.json` (a browseable emoji tile) — then run `node scripts/gen-tileset-seeds.mjs` and
+`mix run priv/repo/seeds.exs`. NEVER hand-edit tile art into a component or the renderer.
+
+---
+
+## Keeping this current
+
+Update this doc (and its `game-website` mirror) whenever the model, the views, the tile system, or a feature
+changes. Every session, every prompt: **check docs → understand → do the work.** Per-feature docs (with their
+own mermaid flow) live alongside this and are written/updated as each feature is built or changed.
