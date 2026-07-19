@@ -47,6 +47,11 @@ authors a LIST of animations of two kinds (see `ANIMATION-SYSTEM.md`):
   the sprite kind only (it stores `EntityAnimation[]`, bridged to/from the sprite envelope); a tile offers both.
 - The live hero IS an entity — authoring a sprite animation on the player animates the running hero, no extra
   wiring (the renderer already plays `entity.animations` by trigger + direction).
+- **🎲 Random move** — beside the two Add buttons, a "Random move" button drops in a RANDOMIZED movement
+  animation you can then tweak, so you don't have to build every walk cycle by hand (Alexander: *"click animate
+  and add a random animation (movement) or build one manually like we do now"*). It appends a sprite-kind cycle
+  (`randomMovementAnimation`): a `move`-triggered, any-direction loop that swaps the unit's OWN tile (frame 0)
+  with its mirror (a visible step) at a randomized cadence — editable like any other row.
 
 ## 5. UI reorg (reduce scrolling)
 Current editor has TOO MUCH vertical scrolling. Target:
@@ -73,6 +78,37 @@ selected → a 40-cell well), like a building stamped from its backend compositi
   ember glow (was neutral gray). Keep pushing the molten read.
 - **Zone decorations:** **volcanoes** for lava, **mountains** for frozen — large multi-cell labeled
   decorations (render per-cell via the keystone path; emit from the generator + a label set).
+
+## 8. ◈ Unit — the top-nav creature picker (place enemies/units)
+Units are placed from the **top-nav ◈ Unit** dropdown, NOT the Paint palette (paint lists regular tiles only —
+§11 of the nebulith spec). The dropdown is the *enemy/creature* picker the user asked for (Alexander: *"I don't
+see the enemy tiles in the unit top nav option, how can I decide which enemies to add now? … move the enemy
+painting to the unit top nav and edit the functionality either randomize the enemies (scatter them) or add/remove
+them normally like we'd do when painting"*).
+
+- **The picker (`UnitPicker`)** lists the `units`-category tiles (`tilesForStyle(styleId).units`, placeable
+  figures only — FX/projectile units filtered via `placementFor`), so you SEE + pick WHICH creature to add. The
+  data agent folds monsters, animals and people into `units`, so one picker serves them all: the picked tile's
+  slug decides the entity KIND (`entityKindForUnitSlug`: person → npc, monster/animal → enemy, player → player).
+- **Two placement modes.** **＋ Add** — pick a creature, click the map to place it one at a time (like painting;
+  Erase removes). **⤳ Scatter** — randomize several of the picked creature across the free space (each with the
+  picked art pinned + a real `spawner` patrol so they wander); no pick → the mixed enemies+NPCs scatter.
+- **Static or animated.** In Add mode a **● Static / ✦ Animated** toggle decides the placed unit's motion. Static
+  pins a stationary single-waypoint pattern (§8 nebulith spec — a hand-placed enemy stays put). Animated attaches
+  a random wandering patrol PLUS a `randomMovementAnimation` (so it moves AND animates). Default is Static.
+- **Player / NPC / Erase / Collision** stay as utility tools in the dropdown; the old free-text "Enemy type"
+  field is gone (the visual picker replaces it).
+
+## 9. Editor panel hygiene (each surface does one job)
+Per Alexander, the panels were doing too much — trimmed so each surface is convenient and uncluttered:
+- **Paint (left) sidebar = pick a tile + place it, nothing else.** The **Height**, **Opacity** and **Clear
+  selected cells** controls are removed from Paint — those are Inspector (right-sidebar) concerns, edited
+  per-tile there. Paint is just the DB tile palette now.
+- **No STYLE card in the Inspector.** The right sidebar's nothing-selected state no longer shows a Style card
+  (style is set from the top-nav 🎨 Style dropdown) — just a compact "nothing selected" hint.
+- **No tutorial prose on the cards.** The long instructional paragraphs ("How to build a house", "Pick a
+  building and click the map to STAMP…", "A building is just its cells…", "…tiles — pick one, then click the
+  map…") are stripped. Cards keep their controls + at most a one-line functional status.
 
 ## Build order (after the current quest/inventory wiring)
 1. Composite asset scaling + persistence/render (§6) — concrete bug.
