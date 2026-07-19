@@ -173,6 +173,13 @@ data change (rewrite the column to bucket URLs), not a code change — the reaso
 - The **bundled default art** in `src/engine/tileset/asciiTileset.ts` + `emojiTileset.ts`
   (`CELL_GLYPHS`, `COLOR_ROLE_BY_LABEL`, `POSITION_BY_LABEL`, zone palettes, and any emoji defaults).
   Keep only the in-memory holder + setter; **holders start empty** and are filled by the API.
+- The **stage-generator zone/prop palettes** in `src/engine/zones.ts` — `ZONE_PALETTES`,
+  `TEMPLE_PALETTES`, `CAVE_PALETTES`, `ZONE_FLOWERS`, `ROCK_SHADES`, `CAVE_DECOR`, `MUSHROOM_TONES`,
+  `LIVING_TREE_VARIANTS`, `PROP_ART`. **Consolidated** here (compliance item B — they used to be
+  scattered hex/glyph literals inside `stageGenerator.ts`; the generator now READS them from this one
+  place per zone). **Follow-up: move these zone palettes to the nebulith backend** so the generator
+  fetches palette/prop colours instead of shipping them — the same relocation this doc tracks for the
+  bundled tile art.
 
 **Renderer swap (art → image, geometry stays):**
 - `drawIsoTileBlock` (`render/iso.ts`): stop drawing a glyph; draw the tile's `image_url` on the
