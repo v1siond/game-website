@@ -35,6 +35,19 @@ Some assets/structures carry **timed actions** and **looping animations**:
 - Model: an asset can hold `actions[]` (timed/triggered) and `animation` (loop spec). The renderer
   plays the animation; the loop fires the actions on their interval.
 
+### 4.1 The ✦ Animate… modal — ONE shared editor for tiles AND units
+Selecting a **tile OR a unit** and pressing **✦ Animate…** opens the SAME `TileAnimationEditor` modal. It
+authors a LIST of animations of two kinds (see `ANIMATION-SYSTEM.md`):
+- **settings** — tween render values (opacity / y-rise / colour / zoom / height…) from → to (the fountain
+  water grow). Tiles only.
+- **sprite** — a frame-swap cycle (walk / idle / attack): a frame strip whose thumbnails are the tiles' **baked
+  images** (resolved label→image — never a raw glyph), an entity trigger (idle / move / attack / interact /
+  key) + direction, timing + loop. This is the former standalone *character animation* editor, now folded in as
+  the sprite kind, so **units inherit the animation authoring like every other tile feature**. A unit offers
+  the sprite kind only (it stores `EntityAnimation[]`, bridged to/from the sprite envelope); a tile offers both.
+- The live hero IS an entity — authoring a sprite animation on the player animates the running hero, no extra
+  wiring (the renderer already plays `entity.animations` by trigger + direction).
+
 ## 5. UI reorg (reduce scrolling)
 Current editor has TOO MUCH vertical scrolling. Target:
 - **TOP NAV BAR:** **Export** + **Save / Load template** move here (out of the right sidebar).
