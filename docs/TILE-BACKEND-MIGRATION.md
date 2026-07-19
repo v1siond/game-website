@@ -239,3 +239,37 @@ Playwright and confirm the look on his server — never self-certify a headless 
   add a backend test asserting the shape, so drift fails loudly.
 - **Two-repo coordination** (schema + API + frontend shape must land together) → the phased order
   above keeps each step runnable; the shape cutover (steps 3–4) is the one lockstep change.
+
+## 11. Legacy per-type ASCII prop art (frontend-invented fallback — still to migrate)
+
+A handful of asset **types** have no baked ASCII tile (`public/tiles/` ships `emoji/` only), so under the
+**ASCII style** they still draw glyph art invented in the frontend — the last frontend-invented art left in
+the render path. This is a FALLBACK: it fires only when `resolveAssetDraw` returns no image (i.e. ASCII, whose
+kind catalog has no prop tiles). Under **emoji** every one of these types already resolves a baked tile in
+`drawIsoAssetAscii`'s `adv.image` branch and never reaches the fallback.
+
+**Structure (done — behavior-preserving, no visual change):** the old `if (asset.type === …)` chains are now
+**dispatch maps** of small, named per-type drawers — `ISO_ASCII_DRAWERS` in `render/iso.ts` (tree/lamp/lantern/
+bush/npc/flower/rock/decoration → `drawIso*Ascii`, unmapped → `drawIsoDefaultAscii`; the shared stack loop is
+`drawIsoGlyphStack`) and `TOP_ASCII_DRAWERS` in `render/topdown.ts` (tree/lamp/npc, everything else → the
+default plate). `perTypeStackBounds` is a keyed table (`ISO_ASCII_STACK`). Locked by
+`__tests__/render/asciiPerType.realcanvas.test.ts` (silhouette + distinct-routing + colour signatures) and a
+one-time before/after pixel-parity proof (byte-identical vs the pre-restructure baseline).
+
+**Follow-up (needs BACKEND work — cannot be de-hardcoded from the frontend):** give each of these types a baked
+**ASCII TileSource** (`image_url=/tiles/ascii/<label>.png` → `priv/tilegen/tiles.json` → `bake.mjs` → seed) so
+the `adv.image` path catches it upstream and the frontend drawer can be deleted:
+
+| Type | ISO art | 2D art | Needs ASCII tile |
+|---|---|---|---|
+| `tree` | bark trunk + tinted canopy pyramid (5 layers) | trunk + canopy (fillRect columns) | yes |
+| `lamp` / `lantern` | lit-bulb post (3 layers) | lit-bulb post | yes (lantern reuses the lamp drawer) |
+| `bush` | 2 green foliage layers | — (falls to default) | yes |
+| `npc` | humanoid legs/body/head + shadow (3 layers) | humanoid figure | yes |
+| `flower` | single swaying glyph (`assetAnimFrame`) | — (falls to default) | yes |
+| `rock` / `decoration` | grey `O` pebble on a plate | — (falls to default) | yes |
+| _default_ | asset's own art glyph on a darkened plate | same | n/a (generic glyph, no fixed label) |
+
+Only the ISO view has bespoke bush/flower/rock/decoration drawers; the 2D view has only tree/lamp/npc bespoke
+(the rest already use the generic default plate). De-hardcoding is per-type and independent: add a tile, drop
+the drawer + its map entry, keep the parity test green.
