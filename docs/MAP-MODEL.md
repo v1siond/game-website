@@ -100,12 +100,15 @@ flowchart TD
 ### Per-tile FORM modifier: `shape` — round the silhouette, keep the painting
 
 A tile's `shape` setting (`'square'` = the default cube · `'circle'`) is a **FORM modifier, NOT a repaint** —
-it changes only the tile's **silhouette**, never its painting. `circle` draws the tile's **normal cube/cell**
-(its baked art, colour filter and every other setting intact) and then **clips it to a ball** inscribed in the
-same block volume, plus a soft sphere-shade overlay. So a `circle` tile shows **exactly what the cube shows,
-just rounded** — a unit block → a round ball, a `scaleY` block → an ellipsoid. It is **not** a solid-colour
-ball and **not** a flat disc; an earlier version filled a solid ball and threw the tile's art away (the "shade
-loses the tile's painting" bug — this design fixes it). All three views round the same way: ISO (`drawIsoBall`
+it changes only the tile's **silhouette**, never its painting. `circle` **bends the corners OF THE CUBOID**: it
+draws the tile's **normal cube/cell** (its baked art, colour filter, per-face shading and every other setting
+intact) and then **clips it to an ellipse of the block's OWN projected extent** — horizontal radius = the
+footprint half-width, vertical radius = half the full vertical silhouette (stack height + base/top diamond),
+centred at the volume's mid-height. So the outline is rounded but **PROPORTIONAL to the block**: a tall block →
+a **tall OVAL** (an egg standing up), a unit cube → a rounder blob. The three shaded faces and the painted art
+all stay — it is the cuboid with its corners rounded away, **not** a repainted sphere. There is **no** spherical
+relight, **no** single flat surface and **no** fixed circle (`rx==ry`) — those were rejected "ball" attempts; the
+ONLY change from the cube is the rounding clip. All three views round the same way: ISO (`drawIsoRoundedBlock`
 clips `drawIsoTileBlock`), 2D (`draw2DLabeledCell`), TOP (footprint). New shapes plug into a dispatch map
 (`ISO_SHAPE_DRAWERS`) keyed by the setting — one drawer per shape, never a new `if`.
 
