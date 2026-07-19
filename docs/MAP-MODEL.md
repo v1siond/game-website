@@ -102,15 +102,20 @@ flowchart TD
 A tile's `shape` setting (`'square'` = the default cube · `'circle'`) is a **FORM modifier, NOT a repaint** —
 it changes only the tile's **silhouette**, never its painting. `circle` **bends the corners OF THE CUBOID**: it
 draws the tile's **normal cube/cell** (its baked art, colour filter, per-face shading and every other setting
-intact) and then **clips it to an ellipse of the block's OWN projected extent** — horizontal radius = the
-footprint half-width, vertical radius = half the full vertical silhouette (stack height + base/top diamond),
-centred at the volume's mid-height. So the outline is rounded but **PROPORTIONAL to the block**: a tall block →
-a **tall OVAL** (an egg standing up), a unit cube → a rounder blob. The three shaded faces and the painted art
-all stay — it is the cuboid with its corners rounded away, **not** a repainted sphere. There is **no** spherical
-relight, **no** single flat surface and **no** fixed circle (`rx==ry`) — those were rejected "ball" attempts; the
-ONLY change from the cube is the rounding clip. All three views round the same way: ISO (`drawIsoRoundedBlock`
-clips `drawIsoTileBlock`), 2D (`draw2DLabeledCell`), TOP (footprint). New shapes plug into a dispatch map
-(`ISO_SHAPE_DRAWERS`) keyed by the setting — one drawer per shape, never a new `if`.
+intact) and then **clips it to an INSCRIBED ellipse of the block's OWN projected extent** — horizontal radius =
+the footprint half-width, vertical radius **tangent to the four slanted faces** (`ry² = (stack/2)² + stack·tileH`),
+centred at the volume's mid-height. Inscribing pushes every one of the 6 silhouette vertices strictly OUTSIDE the
+ellipse, so the clip bends them ALL away with no straight-edge/arc kink. So the outline is rounded but **PROPORTIONAL
+to the block**: a tall block → a **tall OVAL** (an egg standing up), a unit cube → a rounder blob. The outer clip
+only reaches the SILHOUETTE, so the ONE corner it can't bend — the top face's **interior front vertex** (where the
+bright top diamond's front point meets the two front walls, Image #61) — is beveled separately by
+`roundIsoTopFrontCorner`: it overpaints that sharp tip with the front-wall shades up to a rounded arc, so the bright
+top recedes to a curved front instead of a downward point. Now **every** corner is bent. The three shaded faces and
+the painted art all stay — it is the cuboid with its corners rounded away, **not** a repainted sphere. There is **no**
+spherical relight, **no** single flat surface and **no** fixed circle (`rx==ry`) — those were rejected "ball" attempts.
+All three views round the same way: ISO (`drawIsoRoundedBlock` clips `drawIsoTileBlock`, then bevels the top-front
+vertex), 2D (`draw2DLabeledCell`) and TOP (footprint) draw ONE ellipse-clipped face so they have no such interior
+seam. New shapes plug into a dispatch map (`ISO_SHAPE_DRAWERS`) keyed by the setting — one drawer per shape, never a new `if`.
 
 ## 6. Elevation is stacked cells/blocks + collision — not special logic
 
