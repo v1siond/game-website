@@ -231,7 +231,12 @@ Playwright and confirm the look on his server — never self-certify a headless 
 
 ## 10. Risks
 
-- **First-frame flash** before images preload → neutral placeholder rect until resolved.
+- **First-frame flash** — SOLVED: the render gate waits for the baked images to be DECODED, not just the
+  JSON installed. `loadTilesetsFromBackend` preloads + decodes every installed tile image
+  (`preloadTileImages`) before it resolves, so the loader → correct DB style with no glyph-fallback frame in
+  between (opening on the JSON alone flashed the tile's glyph — brick faces / crate-hero — for ~1s while the
+  PNGs decoded). The glyph is only the after-load fallback for a genuinely image-less / unknown label, never
+  a pre-load placeholder. Canonical detail: `nebulith/docs/TILE-BACKEND-MIGRATION.md` §10.
 - **Ascii legibility as a flat tile** (a single glyph on a square can look sparse vs. the current
   face-drawn glyph) → tune atlas cell size / glyph scale in the bake; it's a bake-tuning knob, not
   an architecture change.
