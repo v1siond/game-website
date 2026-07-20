@@ -1,4 +1,12 @@
 import '@testing-library/jest-dom'
+import v8 from 'node:v8'
+
+// jsdom doesn't expose structuredClone (browsers + Node do). Polyfill it with v8 serialize/deserialize — a
+// TRUE structured clone (preserves undefined, nested arrays) — so editor snapshot code (mapSnapshot) tests
+// against the same deep-clone semantics the real browser runtime provides.
+if (typeof globalThis.structuredClone !== 'function') {
+  globalThis.structuredClone = <T>(value: T): T => v8.deserialize(v8.serialize(value)) as T
+}
 
 // Mock next/navigation
 jest.mock('next/navigation', () => ({

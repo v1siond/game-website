@@ -126,6 +126,21 @@ place and I want to put another in the same place, I should be able to"*).
 - The old rule (occupied / road / water → invalid) applied only to the manual place tool; the **world
   generator still avoids overlaps** (`canPlaceBuildingComposition`) so auto-layouts don't stack buildings.
 
+## 11. Undo / redo (Ctrl+Z / Ctrl+Y) — a bounded editor history
+Map edits are undoable (Alexander: *"ctrl + y and ctrl + z functionalities … replace a building for another,
+then ctrl+z to go back to previous building or ctrl+y to go forward … 4-5 steps forward and backwards"*).
+- **Model:** a bounded **snapshot ring** of the MAP — grid layers (ground / height / collision / floor colour
+  / floor dims) + placed assets + entities. UI-only state (selection, panels, camera) is **not** captured.
+  `useEditorHistory` (with the pure `editorHistory` stack + `mapSnapshot` capture/restore) checkpoints the
+  pre-edit map at the START of each map-mutating edit; **Ctrl+Z** restores it exactly, **Ctrl+Y** (or
+  **Ctrl+Shift+Z**) re-applies. Bound = **5 steps** each way (`HISTORY_LIMIT`); a new edit truncates the redo
+  branch; loading a template or generating a stage resets the history.
+- **Captured edits:** place/replace composition, paint / stack / erase a tile, unit add / erase / scatter /
+  clear-all, collision toggle, clear-region. Continuous slider tweaks (per-tile W/H/D sliders) are **not** in
+  history — they'd flood the 5-step buffer; they'd need per-gesture batching to be added cleanly.
+- **UX:** the keys fire only when the editor/canvas is focused — **ignored while typing in an input/textarea**
+  (so Ctrl+Z in a text field still edits text, not the map).
+
 ## Build order (after the current quest/inventory wiring)
 1. Composite asset scaling + persistence/render (§6) — concrete bug.
 2. UI reorg (§5) — top nav + expandable assets + right-side connectors/entities/selection.
