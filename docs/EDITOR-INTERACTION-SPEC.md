@@ -110,6 +110,22 @@ Per Alexander, the panels were doing too much — trimmed so each surface is con
   building and click the map to STAMP…", "A building is just its cells…", "…tiles — pick one, then click the
   map…") are stripped. Cards keep their controls + at most a one-line functional status.
 
+## 10. Placement REPLACES anything — red ONLY when it doesn't fit
+Placing a composition (building / tree / fountain / lamp post) works on a **replace-anything** basis
+(Alexander: *"the map should work on a 'replace anything if I want to' type of thing … it's only red when
+there's not enough cells or blocks in the area I want to put the composition … if there's a building in a
+place and I want to put another in the same place, I should be able to"*).
+- **Validity = fit only.** The ghost is **red only when the footprint runs OFF the map** (out of bounds / not
+  enough cells). Occupied cells and roads are **fine** — the ghost is green wherever the footprint fits. Pure
+  rule: `compositionFits(grid, cells)` (buildingCatalog) checks in-bounds and nothing else; `planComposition`
+  sets `plan.valid` from it (the render tints the ghost green/valid, red/invalid).
+- **Stamp REPLACES.** On placement (`placeComposition`, templates), every footprint cell is **cleared first**
+  (`grid.clearAssetsAtCell` drops the cell's assets + collision + height), then the new composition is stamped
+  onto the clean cells — so dropping a building on top of another swaps it with **no stray stacked remnant**.
+  Hand-placing a pre-built building routes through this SAME path (a building is just a composition).
+- The old rule (occupied / road / water → invalid) applied only to the manual place tool; the **world
+  generator still avoids overlaps** (`canPlaceBuildingComposition`) so auto-layouts don't stack buildings.
+
 ## Build order (after the current quest/inventory wiring)
 1. Composite asset scaling + persistence/render (§6) — concrete bug.
 2. UI reorg (§5) — top nav + expandable assets + right-side connectors/entities/selection.
