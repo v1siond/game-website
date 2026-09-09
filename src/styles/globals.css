@@ -1,5 +1,7 @@
 /* Theme component layers (ITCSS) — gothic surfaces, instead of inline styles */
 @import "./themes/dark-fantasy.css";
+/* The game-engine editor shell. Every rule is scoped under `.neb`. */
+@import "./themes/nebulith-editor.css";
 
 @tailwind base;
 @tailwind components;

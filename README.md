@@ -48,7 +48,8 @@ npm run dev            # next dev --turbopack → http://localhost:3000
 ```
 
 The editor lives at **`/personal-projects/game-engine/templates`**. It fetches tiles from the nebulith
-backend at `NEXT_PUBLIC_NEBULITH_API` (default `http://localhost:4001/api`) — **start the backend
+backend at `NEXT_PUBLIC_NEBULITH_API` (set in `.env.local`, default `http://localhost:6328/api`;
+nebulith reads the same port from `PORT`) — **start the backend
 first** (see [`nebulith/README.md`](../nebulith/README.md)) or the tileset load falls back and the map
 renders blank/placeholder.
 
