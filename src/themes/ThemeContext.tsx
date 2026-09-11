@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
-import { Theme, themes, DEFAULT_THEME_ID, getThemeById } from './themes'
+import { Theme, themes, DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from './themes'
 import { PreviewProvider } from './PreviewContext'
 
 interface ThemeContextType {
@@ -11,8 +11,6 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
-
-const STORAGE_KEY = 'portfolio-theme'
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   // Boot into the last-chosen world, defaulting to neon-cyber when nothing is stored.
@@ -28,7 +26,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setTheme(getThemeById(capture))
       return
     }
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(THEME_STORAGE_KEY)
     if (stored) setTheme(getThemeById(stored))
   }, [])
 
@@ -36,7 +34,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const newTheme = getThemeById(id)
     setTheme(newTheme)
     if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, newTheme.id)
+      localStorage.setItem(THEME_STORAGE_KEY, newTheme.id)
     }
   }, [])
 

@@ -545,6 +545,11 @@ export const themes: Theme[] = [
 
 export const DEFAULT_THEME_ID = 'neon-cyber'
 
+/** Where the chosen world is remembered. Exported because the failure screen has to read the world
+ *  WITHOUT the ThemeProvider: a root-layout crash unmounts the providers, and the Pages Router tree
+ *  never had one, so `useTheme()` would throw exactly where nothing is allowed to. */
+export const THEME_STORAGE_KEY = 'portfolio-theme'
+
 export function getThemeById(id: string): Theme {
   return themes.find(t => t.id === id) || themes[0]
 }

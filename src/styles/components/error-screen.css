@@ -1,0 +1,146 @@
+/* ===================================================================
+   ITCSS Components — THE ERROR SCREEN
+   ===================================================================
+   One screen behind every failure the site can hit: a 404, a 500, a page that threw while
+   rendering, and the root-layout crash that has no providers left. It is theme-driven rather
+   than fixed: the colours and the type family arrive as custom properties set by the React
+   component from the WORLD the visitor is currently in, so an error looks like the place it
+   happened instead of like a different website. Defaults below are neon-cyber, the site's
+   default world, so the screen is still legible if it ever renders with nothing set.
+   =================================================================== */
+
+.c-error {
+  --err-bg: #05070f;
+  --err-surface: #0b1020;
+  --err-text: #d6e4ff;
+  --err-muted: #7f8bad;
+  --err-accent: #27e8c8;
+  --err-border: #1d2745;
+  --err-font: monospace;
+
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 2rem 1.25rem;
+  background: var(--err-bg);
+  color: var(--err-text);
+  font-family: var(--err-font);
+}
+
+/* The readable column. Capped in ch so the measure holds whatever family the world sets. */
+.c-error__body {
+  width: 100%;
+  max-width: 62ch;
+}
+
+/* THE STATUS, as the screen's one loud element. A status code is the single fact a person
+   needs first, so it gets the scale and everything else stays quiet. Tabular figures keep
+   404 and 500 the same width so the rule below them never shifts. */
+.c-error__status {
+  margin: 0;
+  font-size: clamp(4rem, 18vw, 9rem);
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--err-accent);
+}
+
+.c-error__rule {
+  height: 2px;
+  margin: 1.25rem 0 1.5rem;
+  background: var(--err-border);
+  border: 0;
+}
+
+.c-error__headline {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.c-error__detail {
+  margin: 0;
+  color: var(--err-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.c-error__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.c-error__action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;            /* WCAG 2.5.8 target size */
+  padding: 0.6rem 1.1rem;
+  border: 2px solid var(--err-border);
+  border-radius: 2px;
+  background: var(--err-surface);
+  color: var(--err-text);
+  font: inherit;
+  font-size: 0.95rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.c-error__action:hover,
+.c-error__action:focus-visible {
+  border-color: var(--err-accent);
+  color: var(--err-accent);
+}
+
+.c-error__action:focus-visible {
+  outline: 2px solid var(--err-accent);
+  outline-offset: 2px;
+}
+
+.c-error__action--primary {
+  border-color: var(--err-accent);
+  color: var(--err-accent);
+}
+
+/* The thrown message. Present for whoever needs it, collapsed so it is not the first thing read. */
+.c-error__technical {
+  margin-top: 2rem;
+  color: var(--err-muted);
+  font-size: 0.875rem;
+}
+
+.c-error__technical summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.c-error__technical summary:focus-visible {
+  outline: 2px solid var(--err-accent);
+  outline-offset: 2px;
+}
+
+.c-error__trace {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem 0.9rem;
+  overflow-x: auto;
+  border-left: 2px solid var(--err-border);
+  background: var(--err-surface);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-error__action {
+    transition: none;
+  }
+}

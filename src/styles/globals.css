@@ -2,6 +2,8 @@
 @import "./themes/dark-fantasy.css";
 /* The game-engine editor shell. Every rule is scoped under `.neb`. */
 @import "./themes/nebulith-editor.css";
+/* The failure screen (404 / 500 / crash). Theme-driven through custom properties. */
+@import "./components/error-screen.css";
 
 @tailwind base;
 @tailwind components;
