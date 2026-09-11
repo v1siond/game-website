@@ -134,6 +134,13 @@ A tile's `scaleZ` is its **THICKNESS**: how much of its own block it fills along
 (`nebulith/lib/nebulith/catalog/tile_source.ex`, Alexander: *"they should be thin"*). Drawn at the default
 thickness a door renders as a solid block and stops reading as a door at all.
 
+**THE GRID'S OWN BODY is a fourth thing again, and it is not a tile's anything.** `GridConfig.slabBlocks`
+is how deep the MAP stands, drawn as a skirt where the map stops (`drawGridSkirt`). A floor is a flat skin
+laid on top of it, which is what lets a generator put height 0 on every floor tile and still have the map
+read as ground. It is map DATA: it round-trips through the save payload and, since 2026-09-10, through the
+`Template.slabBlocks` column (it was silently dropped before that, because the column did not exist). It is
+edited in the editor's **Grid** rail section, never in a frontend constant — see EDITOR-INTERACTION-SPEC §17.
+
 **THICKNESS IS NOT FOOTPRINT.** They were once conflated, and the thickness control was deleted as
 "redundant" — it is not:
 
