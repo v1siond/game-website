@@ -31,7 +31,15 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const TILESET_JSON =
   process.env.TILESET_JSON ||
   '/home/visiond/projects/game-engine/nebulith/priv/repo/tilesets/emoji.json'
-const OUT_DIR = process.env.OUT_DIR || path.join(REPO_ROOT, 'public/tiles/emoji/baked')
+// WHERE THE ART LANDS: the BACKEND's static root, never this repo's public/.
+//
+// Alexander, 2026-09-12: *"all those tiles in the frontend shouldn't exist at all, all tils should come from
+// backend"*. The frontend's copy is deleted, and this default is what would have quietly recreated it on the
+// next bake. nebulith's own bake.mjs already writes to priv/static/tiles; this matches it now.
+//
+// The SERVED URL does not change: the backend serves priv/static at "/", so a tile still resolves at
+// /tiles/emoji/baked/<key>.png, absolutised against the backend origin by the tileset loader.
+const OUT_DIR = process.env.OUT_DIR || path.join(REPO_ROOT, '..', 'nebulith/priv/static/tiles/emoji/baked')
 // The public URL the tileset entry points at (OUT_DIR served from /public).
 const PUBLIC_PREFIX = process.env.PUBLIC_PREFIX || '/tiles/emoji/baked'
 // Force Noto so the bake is the SAME art on every machine (never the host's default emoji font).

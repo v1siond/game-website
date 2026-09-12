@@ -8,7 +8,15 @@ import { fileURLToPath } from 'url'
 import { bakeGlyph, openBakePage } from './lib/emoji-bake.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const OUT = path.join(ROOT, 'public/tiles/emoji/baked')
+// WHERE THE ART LANDS: the BACKEND's static root, never this repo's public/.
+//
+// Alexander, 2026-09-12: *"all those tiles in the frontend shouldn't exist at all, all tils should come from
+// backend"*. The frontend's copy is deleted, and this default is what would have quietly recreated it on the
+// next bake. nebulith's own bake.mjs already writes to priv/static/tiles; this matches it now.
+//
+// The SERVED URL does not change: the backend serves priv/static at "/", so a tile still resolves at
+// /tiles/emoji/baked/<key>.png, absolutised against the backend origin by the tileset loader.
+const OUT = process.env.OUT_DIR || path.join(ROOT, '..', 'nebulith/priv/static/tiles/emoji/baked')
 const POSES = [['walk', '🚶'], ['run', '🏃']]
 
 fs.mkdirSync(OUT, { recursive: true })
