@@ -72,12 +72,21 @@ receives" principle from [`../README.md`](../README.md).
 > (`nebulith/lib/nebulith/catalog/generator_source.ex` → `generator_categories` / `generators`; client +
 > selectors in `game-website/src/lib/generatorCatalog.ts`; T-113).
 >
-> The shipped catalog: seasons `spring · summer · autumn · winter · desert`, categories
-> `forest · town · city · cave · temple`, and `forest` carries two layouts (`meadow`, `meadow_river`).
+> The shipped catalog, read off the live API 2026-09-12: seasons `spring · summer · autumn · winter ·
+> desert`, and FOUR categories, `forest · settlement · cave · temple`. Town and city merged into one
+> `settlement` category (they are two presets of one kind of place, his *"City and town options are the same,
+> it'd put them in a single category"*), and `forest` carries three layouts (`woodland`, `jungle`, `meadow`);
+> `meadow_river` is gone, a river is an OPTION now. The catalog is a TREE: 24 generator rows, each a kind with
+> its variations underneath (`generators.parent_id`, merged by `generator_tree/1`).
+>
 > Each generator's `config` carries its own grid range (`cols`/`rows` min-max, `cellSize`, `isoScale`),
-> `units` (`townsfolk` / `enemies` / `enemyTypes`), and — for a settlement — `nature`, `settlement`
-> tuning and the `buildings` material + colour palette. The zone PALETTES are still frontend
-> (`src/engine/zones.ts`, §3.14b Tier-1 #4, not yet migrated).
+> `units` (`townsfolk` / `enemies` / `enemyTypes`), and, for a settlement, `nature`, `settlement` tuning and
+> the `buildings` material + colour palette.
+>
+> The zone PALETTES are MIGRATED (this sentence used to say they were not). They come from `GET /api/zones`
+> plus the season-independent tables in `game_rules`; `src/engine/zones.ts` is now a set of READERS over that
+> catalog, and the 302 lines of authored values are gone. A season the backend does not serve has no palette,
+> and a caller with no palette plants nothing.
 >
 > The frontend holds **no** list of seasons, map types or layouts: the four tables that used to
 > (`editorConfig.ts` `STAGE_ZONES` / `STAGE_VARIANTS` / `STAGE_VARIANT_LABELS` / `VARIANT_LAYOUTS`) were
@@ -88,8 +97,21 @@ receives" principle from [`../README.md`](../README.md).
 >
 > **Still frontend, deliberately:** the five generator LAYERS (`GENERATOR_LAYERS`, `editorConfig.ts`) are
 > engine PASSES (`stageGenerator.ts` `LAYER_IDS`), not generator records, and `/api/generators` serves no
-> layer list. **Not yet migrated:** the settlement tuning + nature densities still live as constants in
-> `engine/villageLayout.ts` and `engine/stageGenerator.ts` even though the catalog already serves them.
+> layer list.
+>
+> **Not yet migrated, measured 2026-09-12 rather than assumed.** The settlement tuning constants in
+> `engine/villageLayout.ts` are fine: every one resolves `served ?? CONSTANT`, so they are documented defaults
+> and the served value always wins. Three siblings are NOT fine, because they shadow served data outright and
+> the served value can never take effect:
+>
+> - `NATURE_MULT` (`stageGenerator.ts:913`) against the served `settlement.natureMultiplier`, which the backend
+>   carries on EIGHT rows (town 1.3, city 0.5, town_small 1.8, town_forest 2.4, town_swamp 2.0, and more).
+> - the `naturePass` literals `scatterGroundCover(ctx, 0.12)` / `scatterFlowers(ctx, 0.06)`
+>   (`stageGenerator.ts:1005-1006`) against the served `nature` block that is already in scope. Its sibling
+>   `tallGrass` IS read from the served block, which is what proves the wiring exists and these two bypass it.
+> - the save path's `isoScale: 1.4` (`stageGenerator.ts:4907`) against a served `2.5`.
+>
+> The wider audit of frontend-held data lives in the workspace board, section B2.
 
 Replace today's ~30 messy presets (many dead cultural themes) with a small, manageable matrix:
 - **Zone** = elemental theme → palette + prop set. MVP: **lava** and **frozen** ONLY.
