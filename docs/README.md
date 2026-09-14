@@ -13,6 +13,13 @@ and update the relevant doc in the same change.
 - [`TILE-VOCABULARY-CONTRACT.md`](TILE-VOCABULARY-CONTRACT.md) — the `<base>_<edge>` tile naming.
 - [`TILESET-AUTHORING.md`](TILESET-AUTHORING.md) · [`TILE-BACKEND-MIGRATION.md`](TILE-BACKEND-MIGRATION.md) — how tiles are authored and owned by the backend.
 
+## Authoring objects
+
+- [`OBJECT-CONSTRUCTION.md`](OBJECT-CONSTRUCTION.md), how an object (a tile composition) is built so it looks like the thing it is named after: the reference-first process, the engine facts sheet, the six patterns, the checklist. Read it before authoring any composition.
+- [`HITBOXES-AND-ELEVATION.md`](HITBOXES-AND-ELEVATION.md), the hitbox and elevation implementation spec.
+- [`DESIGN-ENTRANCES.md`](DESIGN-ENTRANCES.md), the design for the four map entrances, with the honest render comparison.
+- [`references/SOURCES.md`](references/SOURCES.md), the isometric reference art every object is modelled against, with sources and licences.
+
 ## Features & systems
 
 - [`FEATURES.md`](FEATURES.md) — per-feature flows and where they live in the code.
