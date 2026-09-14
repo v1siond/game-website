@@ -6,24 +6,22 @@ import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, type Theme, getThemeById } from '@
 /**
  * THE FAILURE SCREEN — one page behind every error the site can serve.
  *
- * Alexander, 2026-09-10: *"let's correctly handle errors in frontend, like 404, 500, etc. We need an
- * actual real page and good UX"*. Before this the site had no error page at all: `src/pages` held only
- * `_app`/`_document` and the game-engine routes, `src/app` had no `not-found`/`error`, so every miss
- * fell through to Next's own grey stock page in production and to the dev overlay in development.
+ * Before this the site had no error page at all: `src/pages` held only `_app`/`_document` and the game-engine routes,
+ * `src/app` had no `not-found`/`error`, so every miss fell through to Next's own grey stock page in production and to
+ * the dev overlay in development.
  *
- * ONE component, six entry points (`app/not-found`, `app/error`, `app/global-error`, `pages/404`,
- * `pages/500`, `pages/_error`), so a 404 in the App Router and a 404 in the Pages Router are the same
- * screen rather than two that drift.
+ * ONE component, six entry points (`app/not-found`, `app/error`, `app/global-error`, `pages/404`, `pages/500`,
+ * `pages/_error`), so a 404 in the App Router and a 404 in the Pages Router are the same screen rather than two that
+ * drift.
  *
  * ## Why it reads the world itself instead of `useTheme()`
  *
- * The site is a world select: the visitor picks one of 17 game worlds and the whole portfolio renders
- * in it. An error should look like the place it happened, so this screen wears the current world's
- * palette. It cannot ask the provider for it, though — `useTheme()` THROWS when no `ThemeProvider` is
- * mounted, and two of the six entry points have none: `global-error` replaces the root layout after it
- * crashed, and the Pages Router tree never had one. A screen whose job is to survive a crash must not
- * be able to cause one, so it reads the same stored world the provider reads, and starts from the
- * default world until it is mounted (the provider's own hydration dance).
+ * The site is a world select: the visitor picks one of 17 game worlds and the whole portfolio renders in it. An error
+ * should look like the place it happened, so this screen wears the current world's palette. It cannot ask the
+ * provider for it, though — `useTheme()` THROWS when no `ThemeProvider` is mounted, and two of the six entry points
+ * have none: `global-error` replaces the root layout after it crashed, and the Pages Router tree never had one. A
+ * screen whose job is to survive a crash must not be able to cause one, so it reads the same stored world the
+ * provider reads, and starts from the default world until it is mounted (the provider's own hydration dance).
  */
 
 /** One thing the visitor can do next. A `href` navigates, an `onClick` acts in place (retry, reset). */

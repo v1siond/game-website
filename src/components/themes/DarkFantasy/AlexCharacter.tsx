@@ -3,11 +3,9 @@
 import { memo, useEffect, useState, useRef, useCallback, ReactNode } from 'react'
 
 /**
- * ALEX CHARACTER - KNIGHT BODY WITH ALEXANDER'S HEAD
- * ===================================================
+ * ALEX CHARACTER - KNIGHT BODY WITH ALEXANDER'S HEAD ===================================================
  *
- * Dark fantasy warrior using the knight's body/cloak/sword
- * but with Alexander's distinctive head: brown skin, beard,
+ * Dark fantasy warrior using the knight's body/cloak/sword but with Alexander's distinctive head: brown skin, beard,
  * short dark hair - adapted to the ethereal theme style.
  *
  * Based on the sprite from /src/assets/sprites/stop_front.png
