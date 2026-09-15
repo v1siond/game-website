@@ -189,8 +189,8 @@ COMPLETION"*. Units are a layer of elements even though the generator does not s
 |---|---|---|---|
 | 1 | **grid + terrain** | the grid (size, cell, rows) and the terrain built on it, by zone / region / season, which determines what objects will be added and the type of floor | layout |
 | 2 | **water** | blocks pathways | layout |
-| 3 | **pathways** | adapts to the space water left on the grid; carries the exits | layout |
-| 4 | **objects** | where the generator enters into play. Tile compositions: buildings, nature, decor. Houses, fountains, trees. Content AND ordering differ per zone: a jungle's objects are not a town's | objects |
+| 3 | **pathways** | the map's STRUCTURE. Adapts to the space water left on the grid. What is a pathway, what is a section to put objects in, where the exits are, how the pathway is drawn | layout |
+| 4 | **objects** | where the generator enters into play. Tile compositions: buildings, nature, decor. Houses, fountains, trees. The LOOK of the pathway and of the exits is picked here too. Content AND ordering differ per zone: a jungle's objects are not a town's | objects |
 | 5 | **units** | the creatures and townsfolk. Depends on everything above | |
 | 6 | **fog** | to optimize, handle distance. NOT IMPLEMENTED | |
 | 7 | **lightning** | affects all elements. NOT IMPLEMENTED | |
@@ -206,7 +206,33 @@ them, and today only `objects` differs: *"basically the only layer that changes 
 layer, in the future the light, fog and shadow will also change, because they depend on the base objects
 layout"*.
 
-### 5.2 What is NOT a layer
+### 5.2 Structure is pathways, LOOK is objects
+
+The line between layers 3 and 4 is structure against appearance, and it is easy to put on the wrong side:
+
+*"pathways doesn't necessarilly determines the LOOK of the pathway, that's usually done in the objects aprt,
+where floor is actually painted with tiles specific to each map/region, etc. What the pathways determine is the
+map structure, what is a pathway, what is a section to put objects, what are the exits, how's the pathway draw,
+etc. then on the objects phase we can pick the type of pathway, type of exit, etc"*.
+
+| pathways (layer 3) decides | objects (layer 4) decides |
+|---|---|
+| where the ways run and how they are drawn | which tile the way is surfaced with |
+| how wide a way is | what lies ON it and what stands BESIDE it |
+| which cells are a way and which are a section for objects | which entrance composition an exit wears |
+| where the exits are and how many | what an exit looks like |
+
+So a template's served pathway block is two things wearing one name, and they belong to different layers: the
+width and the shape of the way are structure, the surface, the scatter and the lining are look.
+
+**Anything added is a TILE or an OBJECT.** *"anything added should be part of tiles and/or objects"*. No layer
+invents a drawing primitive of its own.
+
+**The exits and pathways chosen need a PREVIEW**: *"we should also have preview for the exits and pathways
+selected"*. It shows the structure layer 3 produced before the objects layer dresses it, which is the same
+thing as the layout filter stopping at layer 3.
+
+### 5.3 What is NOT a layer
 
 - **Region** and **elevation** are elements used INSIDE the terrain layer. *"region is not a layer, elevation
   is not a layer either"*.
@@ -218,7 +244,7 @@ layout"*.
   specific context instead of globally, hence why all your fixes suck and none was ever implemented as expected
   or only worked in a single map and not all"*.
 
-### 5.3 Inputs are parameters ON a layer
+### 5.4 Inputs are parameters ON a layer
 
 Every input on the generator UI is a parameter of one layer: *"THE INPUTS ARE WHAT DEFINE THE PARAMETERS OF THE
 FIRST LAYER, IN FACT EVERY INPUT FROM THE GENERATOR UI DOES EXACTLY THE SAME, IS A PARAMETER IN A GIVEN LAYER OF
@@ -230,7 +256,7 @@ ONLY EXECUTE THE SYSTEM UP TO THIS SPECIFIC LAYER. IE: ONLY GIVE ME AN EMPTY MAP
 EMPTY MAP WITH A RIVER, GIVE THE FULL MAP, ETC"*. So the generator runs layers 1..N where N is what was asked
 for.
 
-### 5.4 Where the layers live
+### 5.5 Where the layers live
 
 The layer LIST is backend data (`/api/generation_layers`): key, label, hint, position, seedable. The engine
 binds a pass to each key and runs them in the served order, so adding fog is a row in the backend rather than a
@@ -240,7 +266,7 @@ does not run either.
 Seeding is per layer (`makeRng`, `GenerateOptions.seeds`), so re-rolling one layer changes only that layer:
 every other layer, fed the same seed, reproduces identically.
 
-### 5.5 What the code has instead, as of 2026-09-15
+### 5.6 What the code has instead, as of 2026-09-15
 
 `STAGE_LAYERS` has ten entries and only two of them are layers. Recorded here because the gap is the work:
 
@@ -265,7 +291,7 @@ Two consequences worth naming:
 The backend list is wrong in the same way: it serves `ways` as a sibling BEFORE `layout`, when pathways belong
 inside it, and it has no fog, lightning, shadow or post-processing rows.
 
-### 5.6 Forest = the MEADOW layouts (rebuilt 2026-07-25 to match #24 / #14)
+### 5.7 Forest = the MEADOW layouts (rebuilt 2026-07-25 to match #24 / #14)
 
 The forest variant builds one of three **meadow** layouts (references #14 = meadow, #24 = meadow + river, #26 =
 meadow + two ways); the earlier `passages` / `open` / `lake` generators were **retired**. A `ForestLayout` is
