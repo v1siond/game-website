@@ -266,30 +266,47 @@ does not run either.
 Seeding is per layer (`makeRng`, `GenerateOptions.seeds`), so re-rolling one layer changes only that layer:
 every other layer, fed the same seed, reproduces identically.
 
-### 5.6 What the code has instead, as of 2026-09-15
+### 5.6 How the code is built to it
 
-`STAGE_LAYERS` has ten entries and only two of them are layers. Recorded here because the gap is the work:
+**A VARIANT DECLARES PHASES, IT DOES NOT OWN A PIPELINE.** Every variant states `terrain`, `water`,
+`pathways` and `objects`, and the layers call them. What a variant does not do it does not declare, rather
+than the engine leaving a call out.
 
-| in `STAGE_LAYERS` | what it actually is |
-|---|---|
-| `ways` | pathways, but running FIRST, before terrain and water |
-| `terrain` | terrain + water + objects in one entry, dispatching to EIGHT private per-variant pipelines |
-| `edge`, `gates`, `ways-clear`, `sightlines` | steps inside pathways |
-| `pathway` | pathways AGAIN, a second entry under a second name |
-| `entrances` | a step inside objects |
-| `floors`, `transitions` | steps inside terrain |
+```ts
+interface VariantPhases {
+  terrain:   (ctx, rngs) => void   // the grid's ground, by zone, region and season
+  water?:    (ctx, rngs) => void   // laid BEFORE the pathways, because it is what they go around
+  pathways?: (ctx, rngs) => void   // the map's STRUCTURE
+  objects?:  (ctx, rngs) => void   // everything placed, and the LOOK of the pathways and the exits
+}
+```
 
-Two consequences worth naming:
+All eight went across: woodland, jungle, meadow, town, city, cave, temple, boss stage. Before this they were
+eight private call sequences inside one 5,000-line file, and `terrain` was three layers behind one name.
 
-1. **The water dependency runs backwards.** Pathways are planned first and water is carved later, inside
-   `terrain`, so a path cannot adapt to the space water left.
-2. **The same job has one implementation per variant.** Measured: 22 functions assign a floor colour, 7 of them
-   a base floor paint; 7 implementations of paving a way; 3 of repairing connectivity with 2 variants having
-   none; regions and elevation built for 2 of the 8 pipelines. `paintJungleFloor` is the only function that
-   applies a template's served `palette.floor`, so five woodland templates serve a floor colour nothing reads.
+**FREE SPACE IS A REAL THING, `ctx.claimed`.** *"objects are put in the free spaces that the map has after
+pathways and river has run"*. Water, the pathways, the gate mouths and a wood's clearings all claim ground
+before anything is placed, so the objects layer chooses from what is left rather than choosing anywhere and
+being corrected afterwards. That replaced a SWEEP, which only works while the planting happens before the
+pathways exist.
 
-The backend list is wrong in the same way: it serves `ways` as a sibling BEFORE `layout`, when pathways belong
-inside it, and it has no fog, lightning, shadow or post-processing rows.
+**TWO ENTRIES ARE NOT LAYERS AND ARE NAMED FOR WHY.** The PLAN is made ahead of terrain because a cave's
+tunnels and a temple's corridors ARE its pathways and its rock is carved out of them; nothing outdoors reads
+it during terrain. `terrain:finish` is the terrain layer's last word, because a shoreline cannot be blended
+before the thing it borders exists.
+
+**What the migration fixed on the way, each measured:**
+
+| | before | after |
+|---|---|---|
+| a town with a river | severed, 1 to 3 buildings in the water | 113 to 203 water cells, 24 to 60 deck cells, none in the water, one piece |
+| a woodland's served `palette.floor` | read by nothing | painted, and its path is now lighter than its ground |
+| a path against its ground | jungle path darker than the field (79.1 vs 85.0) | lighter, as all nine references are |
+| the border treeline | ran in pathways, and the floor repair cut back out through it | runs in objects, six holes closed |
+| a pathway's own network | the sweep cleared 170 of the 487 cells a woodland cuts | all of them, by construction |
+| floor painters | 7, one per variant | 1, `paintFloor(data)` |
+| stranded-pocket sealers | 3 | 2 policies, interior and outdoors |
+| the `ways` name | 135 uses across 43 files | gone; it is `pathways` |
 
 ### 5.7 Forest = the MEADOW layouts (rebuilt 2026-07-25 to match #24 / #14)
 
