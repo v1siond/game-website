@@ -43,3 +43,38 @@ row before the file is used. Do not commit licensed stock into this repository.
 
 His list, not yet gathered: entrances to **Pokemon** towns and cities, **Zelda**, **Death's Door**, **Ori**,
 **Hollow Knight**.
+
+## Recovered from the whole prompt history, 2026-09-15
+
+*"IF I PASS A FUCKING REFERENCE, IS BECAUSE I WANT TO SAVE IT, STORE IT AND WORK IN THE FUCKING OBJECT OR
+DESIGN UNTIL IT MATCHES THE REFERENCE AS CLOSE TO 100% AS POSIBLE, ANYTHING LESS THAN THAT IS UNACEPTABLE"*.
+
+The sheets above were gathered for the bridge and entrance work. They are not everything he has sent: sweeping
+every prompt turned up **41 more** that had only ever existed in the chat, against 10 already held. They are
+in `.claude-workspace/game-website/references/by-subject/`, filed by what they are, with the sentence he typed
+around each recorded in `_recovered.json`. Same rule as above: the FILES stay out of this repository.
+
+Nine were filtered back OUT. They were screenshots of our own renders, which he sends to report a defect: the
+opposite of a reference, the thing to change rather than the thing to match.
+
+| subject | count | what is in it |
+|---|---|---|
+| `by-subject/bridges/` | 2 | more crossings in context, on actual water |
+| `by-subject/buildings/` | 6 | church and cathedral photographs, and an isometric modern block |
+| `by-subject/entrances/` | 5 | a cave mouth in lush vegetation, the isometric forest whose canopy closes over the path, and the dense forest entrance he called good |
+| `by-subject/objects/` | 3 | objects he pointed at while asking for the compositions list to be kept up to date |
+| `by-subject/pathways/` | 9 | the nine he sent for pathway variance (beach city street, clifftop path, rocky track, woodland crossroads, park path, trail beside a river, swamp boardwalk to a cave, swamp trail to a temple, swamp island), plus a park with a plank bridge and a forest path winding between trees |
+| `by-subject/trees/` | 5 | the five behind 'we need to have more variance of trees, like we are using the same for all forest variations' |
+| `by-subject/units/` | 1 | how a human unit should read |
+| `by-subject/unsorted/` | 2 | shared without a sentence naming them; open them before using them |
+| `by-subject/water/` | 7 | rivers and banks in context, and the shots behind 'we should use optimized tiles with z-width' and the swamp water complaints |
+| `by-subject/whole-map/` | 1 | whole isometric scenes to model the overall read against: an RPG town with market stalls and wooden paths, and a conifer forest |
+
+### Still missing
+
+Vecteezy refuses every automated request, so three he linked are recorded by URL and label only, and need
+saving by hand from a browser:
+
+- *"pathway from rocky terrain, rocky rustic pathway"*, `static.vecteezy.com/.../051/331/589/non_2x/isometric-forest-path-illustration...`
+- isometric hill with river, `static.vecteezy.com/.../073/164/866/small/isometric-hill-with-r...`
+- isometric park or forest, `static.vecteezy.com/.../025/339/328/small/isometric-park-or-for...`
