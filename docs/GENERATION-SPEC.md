@@ -217,13 +217,27 @@ etc. then on the objects phase we can pick the type of pathway, type of exit, et
 
 | pathways (layer 3) decides | objects (layer 4) decides |
 |---|---|
-| where the ways run and how they are drawn | which tile the way is surfaced with |
+| where the ways run and how they are drawn | which tile the way is surfaced with, and in what colour |
 | how wide a way is | what lies ON it and what stands BESIDE it |
 | which cells are a way and which are a section for objects | which entrance composition an exit wears |
 | where the exits are and how many | what an exit looks like |
 
 So a template's served pathway block is two things wearing one name, and they belong to different layers: the
-width and the shape of the way are structure, the surface, the scatter and the lining are look.
+width and the shape of the way are structure, the surface, its tone, the marking, the scatter and the lining
+are look.
+
+**The way's COLOUR belongs to the pathway kind, and to nothing else.** It lived in two places, the kind's
+`surface` and the template's `palette.trail`, and the palette won every disagreement. So a mountain forest
+asked for a gravel track and its inherited woodland palette painted the gravel brown, a swamp asked for a
+boardwalk and the jungle palette painted the planks dirt, and a meadow, whose palette states no trail at all,
+fell through to the raw tile and came out with a park path 45 points of luminance DARKER than its own lawn.
+Every one of those is a template stating what its way is made of and losing to something it inherited. The
+kind carries `tone` now and the palettes carry no trail, so there is one answer. A palette owns the ground,
+the water and the shore; the pathway owns the way.
+
+**A pathway is served WHOLE.** A subtype that names a different kind gets that kind and nothing of the one it
+replaced. Merged key by key, a medieval city swapped asphalt for cobbles and went on inheriting the asphalt's
+white centre line.
 
 **Anything added is a TILE or an OBJECT.** *"anything added should be part of tiles and/or objects"*. No layer
 invents a drawing primitive of its own.
