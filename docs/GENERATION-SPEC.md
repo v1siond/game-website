@@ -174,58 +174,98 @@ Depends on a usable editor (the UI rebuild) to author/preview, and feeds the AI 
 
 ---
 
-## 5. Layer-pass architecture (the macro/micro randomize foundation) — SHIPPED 2026-07
+## 5. THE LAYERS
 
-The stage generator is built from independent, **seedable LAYER passes** rather than one monolithic
-pass, so the user can randomize the whole map OR just one layer ("randomize the map… only trees…
-only buildings… just the MAP which contains the distribution of things without actual structures").
-This is the foundation for the editor's scoped **Generate ▾** randomize (macro) and the selection
-re-roll (micro).
+A LAYER IS A SET OF THINGS IN A GIVEN CONTEXT. It is a subsystem, not a function, not a pass, not a call site:
+*"a layer IS NOT a function or a method used in the engine, is the overal system that generates something"*.
 
-### 5.1 The layers (`stageGenerator.ts` `LayerId` / `LAYER_IDS`)
+The context here is A LEVEL BEING COMPLETE. That is wider than the map generator, and the two must not be
+conflated: *"A LAYER DOESN'T NECESSARILLY RUNS IN THE GENERATOR, IS JUST A THING IN THE CONTEXT OF THE LEVEL
+COMPLETION"*. Units are a layer of elements even though the generator does not scatter them.
 
-| Layer | Pass | What it owns |
-|-------|------|--------------|
-| **layout** | `layoutPass(ctx, settlement) → VillageLayout` | terrain/ground distribution + roads + plots + plaza — the "map without structures nor nature" |
-| **buildings** | `buildingsPass(ctx, layout)` | one typed composition stamped per plot (kind is a plot decision; appearance variety is rolled at load) |
-| **nature** | `naturePass(ctx, layout, settlement)` | trees / bushes / flowers / ground cover |
-| **decor** | `decorPass(ctx, layout)` | plaza centrepiece (well/fountain) + street lamps |
-| **units** | *(editor)* | enemy/npc scatter — owned by the editor's entity store, not the generator |
+### 5.1 The layers, in order
 
-### 5.2 Seeding contract (`makeRng`, `GenerateOptions.seeds`)
+| # | layer | what it is | group |
+|---|---|---|---|
+| 1 | **grid + terrain** | the grid (size, cell, rows) and the terrain built on it, by zone / region / season, which determines what objects will be added and the type of floor | layout |
+| 2 | **water** | blocks pathways | layout |
+| 3 | **pathways** | adapts to the space water left on the grid; carries the exits | layout |
+| 4 | **objects** | where the generator enters into play. Tile compositions: buildings, nature, decor. Houses, fountains, trees. Content AND ordering differ per zone: a jungle's objects are not a town's | objects |
+| 5 | **units** | the creatures and townsfolk. Depends on everything above | |
+| 6 | **fog** | to optimize, handle distance. NOT IMPLEMENTED | |
+| 7 | **lightning** | affects all elements. NOT IMPLEMENTED | |
+| 8 | **shadow** | depends on lightning and on positioned elements. NOT IMPLEMENTED | |
+| 9 | **post processing / optimization** | NOT IMPLEMENTED | |
 
-- Every stochastic helper draws from **`ctx.rand`** (a `Rng = () => number`), never `Math.random`
-  directly, so a pass is **pure given its rng**.
-- `generateStage({ …, seeds })` takes an optional **per-layer seed**. A layer with a seed draws from
-  a reproducible `makeRng(seed)` (mulberry32) stream; a layer left out draws from the global
-  `Math.random`. **Omitting `seeds` entirely reproduces the pre-split generator byte-for-byte** — the
-  behaviour-preservation guarantee (locked by `stageGenerator.layers.test.ts`'s seeded digest
-  baselines).
-- **Re-roll one layer** = change only that layer's seed and regenerate: the other layers, fed the same
-  seeds, reproduce identically, so only the re-rolled layer changes.
+`layout` is the name for 1 to 3 together: *"layout refers to the underlying subsystem already mentioned (grid,
+terrain, water, pathways), it groups them under it, we can name it differently, but basically those are the
+'main' layers"*. `buildings` / `nature` / `decor` are the objects layer seen closer up.
 
-### 5.3 Order is load-bearing
+**EVERY TEMPLATE RUNS THE SAME LAYERS.** A template does not own a pipeline. It varies by the DATA it feeds
+them, and today only `objects` differs: *"basically the only layer that changes (sat the moment) is the objects
+layer, in the future the light, fog and shadow will also change, because they depend on the base objects
+layout"*.
 
-`placeSettlement` composes the passes **layout → buildings → decor → nature** (the same order the
-generator always ran): layout carves roads before buildings reserve plots, and **decor paves the
-plaza before nature plants** so no tree lands on the square. The `LayerId` list orders layout,
-buildings, nature, decor, units for the *menu*; the settlement *executes* decor before nature.
+### 5.2 What is NOT a layer
 
-### 5.4 Honest scope (what has real generator randomness)
+- **Region** and **elevation** are elements used INSIDE the terrain layer. *"region is not a layer, elevation
+  is not a layer either"*.
+- **Anything that is a step inside a layer.** Sealing the border, cutting the gates, keeping a way walkable and
+  clearing what stands in it are all PATHWAYS. Flattening floors and blending transitions are TERRAIN. Stamping
+  an entrance is OBJECTS. None of them is a layer, and each one that was given its own entry split logic that
+  then only ever changed in one context: *"every time I've requested something, you've added a new thing that
+  alñready existed and segmented logic into many code sections, then when one is changed, it only changes on a
+  specific context instead of globally, hence why all your fixes suck and none was ever implemented as expected
+  or only worked in a single map and not all"*.
 
-Only **layout** and **nature** carry stochastic generator RNG today. **buildings** are
-deterministic from the layout (a building's kind comes from its plot; the plaza variant from
-settlement size) — their visible re-roll is an **appearance** re-roll (material / roof / wall colour)
-performed at load in the editor's `applyStageToGrid`, not new generator geometry. **decor** is
-deterministic in its GEOMETRY (the plaza centrepiece + the lamp POSITIONS come from the layout), but
-it does carry ONE small stochastic pick from the **decor** rng: `markFailingLamps` flips a tiny random
-subset of the placed lamps (usually 1, sometimes 2, occasionally 0) to the flickering
-`lamp_post_failing` variant, so a decor re-roll re-picks WHICH lamps flicker while the rest stay steady
-(see `LIGHTING.md` §4 — "only 1 or 2 lamps flicker"). **units** are an editor entity concern. The non-settlement archetypes (forest / cave / temple / boss) remain
-single whole-map generators reading `ctx.rand` (seeded via the layout rng); they are not decomposed
-into these layers.
+### 5.3 Inputs are parameters ON a layer
 
-### 5.5 Forest = the MEADOW layouts (rebuilt 2026-07-25 to match #24 / #14)
+Every input on the generator UI is a parameter of one layer: *"THE INPUTS ARE WHAT DEFINE THE PARAMETERS OF THE
+FIRST LAYER, IN FACT EVERY INPUT FROM THE GENERATOR UI DOES EXACTLY THE SAME, IS A PARAMETER IN A GIVEN LAYER OF
+THE SYSTEM"*. Size, cell and rows are parameters of layer 1. The river course is a parameter of layer 2. Exits
+and pathway count are parameters of layer 3. The tree mix and the pathway surface are parameters of layer 4.
+
+The UI's "layout" choice is ALSO a parameter, and it is a FILTER: *"LAYOUT IN THE UI JUST REFERS TO I WANT TO
+ONLY EXECUTE THE SYSTEM UP TO THIS SPECIFIC LAYER. IE: ONLY GIVE ME AN EMPTY MAP WITH ALL PATHWAYS, GIVE AN
+EMPTY MAP WITH A RIVER, GIVE THE FULL MAP, ETC"*. So the generator runs layers 1..N where N is what was asked
+for.
+
+### 5.4 Where the layers live
+
+The layer LIST is backend data (`/api/generation_layers`): key, label, hint, position, seedable. The engine
+binds a pass to each key and runs them in the served order, so adding fog is a row in the backend rather than a
+release in this repo. A served layer the engine has no pass for does not run; a pass whose layer is not served
+does not run either.
+
+Seeding is per layer (`makeRng`, `GenerateOptions.seeds`), so re-rolling one layer changes only that layer:
+every other layer, fed the same seed, reproduces identically.
+
+### 5.5 What the code has instead, as of 2026-09-15
+
+`STAGE_LAYERS` has ten entries and only two of them are layers. Recorded here because the gap is the work:
+
+| in `STAGE_LAYERS` | what it actually is |
+|---|---|
+| `ways` | pathways, but running FIRST, before terrain and water |
+| `terrain` | terrain + water + objects in one entry, dispatching to EIGHT private per-variant pipelines |
+| `edge`, `gates`, `ways-clear`, `sightlines` | steps inside pathways |
+| `pathway` | pathways AGAIN, a second entry under a second name |
+| `entrances` | a step inside objects |
+| `floors`, `transitions` | steps inside terrain |
+
+Two consequences worth naming:
+
+1. **The water dependency runs backwards.** Pathways are planned first and water is carved later, inside
+   `terrain`, so a path cannot adapt to the space water left.
+2. **The same job has one implementation per variant.** Measured: 22 functions assign a floor colour, 7 of them
+   a base floor paint; 7 implementations of paving a way; 3 of repairing connectivity with 2 variants having
+   none; regions and elevation built for 2 of the 8 pipelines. `paintJungleFloor` is the only function that
+   applies a template's served `palette.floor`, so five woodland templates serve a floor colour nothing reads.
+
+The backend list is wrong in the same way: it serves `ways` as a sibling BEFORE `layout`, when pathways belong
+inside it, and it has no fog, lightning, shadow or post-processing rows.
+
+### 5.6 Forest = the MEADOW layouts (rebuilt 2026-07-25 to match #24 / #14)
 
 The forest variant builds one of three **meadow** layouts (references #14 = meadow, #24 = meadow + river, #26 =
 meadow + two ways); the earlier `passages` / `open` / `lake` generators were **retired**. A `ForestLayout` is
