@@ -135,7 +135,7 @@ describe('the three screens the routes render', () => {
     jest.restoreAllMocks()
   })
 
-  it('404 names the miss and offers two ways on', () => {
+  it('404 names the miss and offers two pathways on', () => {
     render(<NotFoundScreen />)
     expect(screen.getByText('404')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Go to the home page' })).toHaveAttribute('href', '/')

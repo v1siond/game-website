@@ -7,7 +7,7 @@ import { ErrorScreen } from './ErrorScreen'
  *
  * Both routers are live here (`src/app` and `src/pages`), so each failure has two entry points and
  * they must not drift into two different pages. The route files are one line each; the words and the
- * ways out live here.
+ * pathways out live here.
  *
  * The copy follows one rule: say what happened, then say what to do about it. No apology, no "oops",
  * nothing vague. A person who lands on one of these wants out of it, and the fastest way out is the
