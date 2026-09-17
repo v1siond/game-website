@@ -3,10 +3,13 @@
 These docs **mirror the engine model**; the canonical copies live in
 [`nebulith/docs/`](../../nebulith/docs/) and win on any conflict. This repo's copies map the model to
 the frontend code (`src/engine/*`, `src/game/*`, `src/components/game/*`,
-`src/pages/personal-projects/game-engine/*`). Working rule: **check docs → understand → do the work**,
-and update the relevant doc in the same change.
+`src/pages/personal-projects/game-engine/*`). Working rule: **open [`FRAMEWORKS.md`](FRAMEWORKS.md) first**, follow the framework it names for
+whatever is being worked on, and if there is no framework for it, research and write one before starting.
+Then: check docs, understand, do the work, and update the relevant doc in the same change.
 
 ## Read first — the model
+
+- [`FRAMEWORKS.md`](FRAMEWORKS.md) — **the index of every framework and every missing one, and the rule that binds them.** Open this before anything else.
 
 - [`MAP-MODEL.md`](MAP-MODEL.md) — the cell/block/tile model and the three views (ISO/2D/TOP). **Start here.**
 - [`ENGINE-ARCHITECTURE.md`](ENGINE-ARCHITECTURE.md) — one grid → three renders; the data flow and invariants.
@@ -26,6 +29,7 @@ and update the relevant doc in the same change.
 - [`EDITOR-INTERACTION-SPEC.md`](EDITOR-INTERACTION-SPEC.md) — the editor interaction model.
 - [`ANIMATION-SYSTEM.md`](ANIMATION-SYSTEM.md) — the `Animation` envelope + z-index draw priority.
 - [`LIGHTING.md`](LIGHTING.md) — the night ground-glow lighting model.
+- [`WATER.md`](WATER.md) — the water layer stack: bed, depth tint, caustics, animated surface, reflections, shoreline.
 - [`GENERATION-SPEC.md`](GENERATION-SPEC.md) — the layer-pass stage/town generator.
 - [`ALGORITHMS.md`](ALGORITHMS.md) — the algorithm decision database for generator problems.
 - [`COMBAT-AND-SYSTEMS-SPEC.md`](COMBAT-AND-SYSTEMS-SPEC.md) · [`TRIGGERS-SPEC.md`](TRIGGERS-SPEC.md) — the game layer and the trigger system.
