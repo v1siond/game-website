@@ -4,7 +4,7 @@ import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, type Theme, getThemeById } from '@/themes/themes'
 
 /**
- * THE FAILURE SCREEN — one page behind every error the site can serve.
+ * THE FAILURE SCREEN, one page behind every error the site can serve.
  *
  * Before this the site had no error page at all: `src/pages` held only
  * `_app`/`_document` and the game-engine routes, `src/app` had no `not-found`/`error`, so every miss
@@ -18,7 +18,7 @@ import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, type Theme, getThemeById } from '@
  *
  * The site is a world select: the visitor picks one of 17 game worlds and the whole portfolio renders
  * in it. An error should look like the place it happened, so this screen wears the current world's
- * palette. It cannot ask the provider for it, though — `useTheme()` THROWS when no `ThemeProvider` is
+ * palette. It cannot ask the provider for it, though, `useTheme()` THROWS when no `ThemeProvider` is
  * mounted, and two of the six entry points have none: `global-error` replaces the root layout after it
  * crashed, and the Pages Router tree never had one. A screen whose job is to survive a crash must not
  * be able to cause one, so it reads the same stored world the provider reads, and starts from the

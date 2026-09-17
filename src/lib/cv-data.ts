@@ -8,7 +8,7 @@ import { NEBULITH_API } from './nebulithApi'
 // `src/app/cv/page.tsx` already falls back to `getStaticCVData` when this throws / returns empty.
 // Base URL from the shared, env-configurable NEBULITH_API (see src/lib/nebulithApi.ts).
 
-/** The CV payload shape — reuse the static mirror's type so the page stays fully typed. */
+/** The CV payload shape, reuse the static mirror's type so the page stays fully typed. */
 export type CVData = Awaited<ReturnType<typeof getStaticCVData>>
 
 /** Fetch the whole CV payload for a locale from the Elixir backend. Throws on a non-OK response so the

@@ -55,7 +55,7 @@ const CHANGESET = {
 /** A proxy in front of a dead backend answers HTML, not JSON. The error path must survive reading it. */
 const DEAD_PROXY = { status: 502, statusText: 'Bad Gateway', body: '<html><body>502 Bad Gateway</body></html>' }
 
-/** Serve one response whose `json()` genuinely `JSON.parse`s the captured bytes — so the HTML body really
+/** Serve one response whose `json()` genuinely `JSON.parse`s the captured bytes, so the HTML body really
  *  throws, exactly as a browser's Response does, instead of a hardcoded rejection standing in for it. */
 function serving({ status, statusText, body }: { status: number; statusText: string; body: unknown }): jest.Mock {
   const payload = typeof body === 'string' ? body : JSON.stringify(body)
@@ -114,7 +114,7 @@ describe('a backend failure reaches the user in the backend’s own words', () =
     serving(DEAD_PROXY)
     const error = await failureFrom(() => getTemplate('7'))
 
-    // No JSON to read, so the wrapper's own sentence is the honest answer — and the status still separates
+    // No JSON to read, so the wrapper's own sentence is the honest answer, and the status still separates
     // "the server broke, retry" from "your map is gone, pick another".
     expect(error.message).toBe('This map could not be loaded')
     expect(error.status).toBe(502)

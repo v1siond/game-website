@@ -15,7 +15,7 @@ export const PROFESSIONAL_SUMMARY: Record<Profession, { headline: string; taglin
   },
   drummer: {
     headline: 'Professional Drummer • 15 Years • Any Genre',
-    tagline: 'From brutal death metal to smooth salsa — I lock in the pocket.',
+    tagline: 'From brutal death metal to smooth salsa, I lock in the pocket.',
   },
   fighter: {
     headline: 'Martial Artist • BJJ Instructor • 6 Years Training',

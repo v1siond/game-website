@@ -1,7 +1,7 @@
 import { Component, type ReactNode } from 'react'
 
 /**
- * A React error boundary — the safety net for render-time crashes. React has no hook equivalent for
+ * A React error boundary, the safety net for render-time crashes. React has no hook equivalent for
  * `componentDidCatch`, so this is (necessarily) a class component. When a child throws while rendering,
  * we swallow the crash and show `fallback` instead of letting the whole tree unmount to a blank white
  * screen. `onError` lets the caller react (log, fire a toast) with the thrown error.

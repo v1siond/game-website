@@ -429,7 +429,7 @@ const GothicWindow = memo(function GothicWindow({ side }: { side: 'left' | 'righ
   )
 })
 
-// Hollow Knight boss-arena depth — a gothic STAGE: a distant back wall with small,
+// Hollow Knight boss-arena depth, a gothic STAGE: a distant back wall with small,
 // receded lancet windows, a FLOOR in front (cornice + perspective lines + soft stage
 // light) so there's a clear floor/wall read, framed by interior columns and hanging
 // soul-lamps, distant towers beyond, fog and drifting soul motes. Profession floor props
@@ -519,11 +519,11 @@ const HollowDepths = memo(function HollowDepths() {
         {/* small, distant lancet windows, high on the wall */}
         {Array.from({ length: 12 }, (_, i) => lancet(150 + i * 145, 430, 96, 250, `w${i}`, 0.1))}
 
-        {/* CORNICE — wall/floor boundary (contrast) */}
+        {/* CORNICE, wall/floor boundary (contrast) */}
         <rect x="0" y={HORIZON - 5} width="1920" height="9" fill={DF.stoneGrey} opacity="0.2" />
         <rect x="0" y={HORIZON + 4} width="1920" height="22" fill={DF.void} opacity="0.4" />
 
-                {/* FLOOR — flat 2D side-view plane + foreground balustrade ledge (no perspective) */}
+                {/* FLOOR, flat 2D side-view plane + foreground balustrade ledge (no perspective) */}
         <rect x="0" y={HORIZON} width="1920" height={1080 - HORIZON} fill={DF.voidDeep} opacity="0.3" />
         <rect x="0" y="1004" width="1920" height="14" fill={DF.void} opacity="0.92" />
         <rect x="0" y="1056" width="1920" height="24" fill={DF.void} opacity="0.96" />
@@ -626,7 +626,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY }: { scrollY
   const GLOW = DF.ethereal
   void SHELL
 
-  // brass-framed "arcane terminal" monitor — small; glowing code lines + blinking cursor
+  // brass-framed "arcane terminal" monitor, small; glowing code lines + blinking cursor
   const monitor = (cx: number, cy: number, w: number, h: number, k: string, rot: number) => (
     <g key={k} transform={`translate(${cx},${cy}) rotate(${rot})`}>
       <rect x={-6} y={h / 2} width={12} height={18} fill="url(#egBrass)" />
@@ -771,7 +771,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY }: { scrollY
         </linearGradient>
       </defs>
 
-      {/* FEATURED — compact dual-monitor desk rig, right of centre (kept smaller than the drum kit) */}
+      {/* FEATURED, compact dual-monitor desk rig, right of centre (kept smaller than the drum kit) */}
       {chair(1648, 712, 0.5, 'chair')}
       {desk(1648, 660, 196, 'desk')}
       {monitor(1604, 596, 84, 78, 'monL', -6)}
@@ -780,12 +780,12 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY }: { scrollY
       {lamp(1560, 660, 0.55, 'lamp')}
       {mug(1726, 648, 0.7, 'mug')}
 
-      {/* LEFT gutter — server tower, laptop, books */}
+      {/* LEFT gutter, server tower, laptop, books */}
       {tower(130, 706, 0.55, 'tower')}
       {laptop(330, 668, 0.5, 'laptop')}
       {books(470, 700, 0.6, 'books')}
 
-      {/* RIGHT gutter / accents — CRT terminal, circuit chip */}
+      {/* RIGHT gutter / accents, CRT terminal, circuit chip */}
       {crt(1850, 660, 0.5, 'crt')}
       {chip(540, 470, 0.55, 'chip')}
 
@@ -797,7 +797,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY }: { scrollY
   )
 })
 
-// Drummer "concert stage" — a Hollow Knight gothic chamber ensemble: drum kit, keyboard,
+// Drummer "concert stage", a Hollow Knight gothic chamber ensemble: drum kit, keyboard,
 // trumpets, guitar, cello + violin, set BACK (smaller, high near the windows) in the side
 // negative spaces so they read as distant stage-dressing and never touch the content.
 // Solid dark shells, tarnished brass, ornate detail, gradient shading. Drummer only.
@@ -926,7 +926,7 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY
     </g>
   )
 
-  // gothic harp — triangular frame (foot + front pillar + curved neck) with fanned strings
+  // gothic harp, triangular frame (foot + front pillar + curved neck) with fanned strings
   const harp = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <path d="M-8,0 L86,0 L74,20 L4,20 Z" fill="url(#hkShellV)" stroke={RIM} strokeWidth="2.5" />
@@ -944,7 +944,7 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY
     </g>
   )
 
-  // tubular bells / chimes — a cathedral-appropriate hanging brass rack
+  // tubular bells / chimes, a cathedral-appropriate hanging brass rack
   const chimes = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <line x1="-104" y1="14" x2="-104" y2="-300" stroke={HW} strokeWidth="6" opacity="0.6" />
@@ -986,7 +986,7 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY
     </g>
   )
 
-  // idle: drum kit gives a small struck-note burst (no rings — those read as blue circles)
+  // idle: drum kit gives a small struck-note burst (no rings, those read as blue circles)
   const drumFx = (x: number, y: number, k: string) => (
     <g key={k} aria-hidden="true">
       <text x={x} y={y - 34} className="hk-thump" style={{ animationDelay: '0.5s' }} fill={RIM_H} fontSize="26" textAnchor="middle" opacity="0">✺</text>
@@ -1020,10 +1020,10 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY
       </defs>
 
       {/* harp set far BACK and small, floated up near the gothic windows (a distant
-          back-row instrument, like the violin) — sits just above the drum kit */}
+          back-row instrument, like the violin), sits just above the drum kit */}
       {harp(1660, 560, 0.38, 'harp')}
 
-      {/* === DRUM KIT — right gutter, set back (small + high) === */}
+      {/* === DRUM KIT, right gutter, set back (small + high) === */}
       <g transform="translate(1372, 392) scale(0.3)">
         <circle cx="960" cy="640" r="210" fill={GLOW} opacity="0.05" />
         {cymbal(675, 1004, 596, 112, -13, 'crash')}
@@ -1062,7 +1062,7 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY }: { scrollY
   )
 })
 
-// Muay Thai "gym" boss-stage — gothic-relic gym gear (hanging heavy bags, gloves, ring
+// Muay Thai "gym" boss-stage, gothic-relic gym gear (hanging heavy bags, gloves, ring
 // corner posts + ropes, corner stool) set BACK in the side negative spaces, behind the
 // columns. Same treatment as the music stage: solid dark leather, tarnished brass, idle
 // swing. Fighter only.
@@ -1076,7 +1076,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
   const HW = DF.stoneGrey
   const GLOW = DF.ethereal
 
-  // hanging heavy bag — chain + leather cylinder + brass cap/straps; swings on its hang point
+  // hanging heavy bag, chain + leather cylinder + brass cap/straps; swings on its hang point
   const heavyBag = (tx: number, ty: number, s: number, k: string, delay: number) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.92">
       <g className="hk-swing" style={{ animationDelay: `${delay}s` }}>
@@ -1142,7 +1142,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
     </g>
   )
 
-  // speed bag — teardrop bag under a round wall platform; sways
+  // speed bag, teardrop bag under a round wall platform; sways
   const speedBag = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <ellipse cx="0" cy="-110" rx="58" ry="14" fill="url(#fgBrass)" stroke={RIM_S} strokeWidth="1.5" />
@@ -1155,7 +1155,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
     </g>
   )
 
-  // double-end bag — small ball tethered top + bottom
+  // double-end bag, small ball tethered top + bottom
   const doubleEndBag = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <line x1="0" y1="-200" x2="0" y2="-70" stroke={HW} strokeWidth="2.5" opacity="0.5" strokeDasharray="6 5" />
@@ -1192,7 +1192,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
     </g>
   )
 
-  // mongkol — the sacred Muay Thai headband, hanging from a hook; sways
+  // mongkol, the sacred Muay Thai headband, hanging from a hook; sways
   const mongkol = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-90" r="4" fill={RIM} />
@@ -1206,7 +1206,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
     </g>
   )
 
-  // Thai kick shield — a big curved pad leaning (a prominent piece)
+  // Thai kick shield, a big curved pad leaning (a prominent piece)
   const kickShield = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <rect x="-46" y="-300" width="92" height="300" rx="40" fill="url(#fgLeather)" stroke={RIM} strokeWidth="3" />
@@ -1216,7 +1216,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
     </g>
   )
 
-  // focus mitts — a pair of round target pads
+  // focus mitts, a pair of round target pads
   const focusMitts = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.88">
       {[-1, 1].map((dir, i) => (
@@ -1285,7 +1285,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
         </linearGradient>
       </defs>
 
-      {/* ring corner posts framing the stage — bigger now, more prominent */}
+      {/* ring corner posts framing the stage, bigger now, more prominent */}
       {ringPost(48, 762, 0.58, 1, 'postL')}
       {ringPost(1872, 762, 0.58, -1, 'postR')}
 
@@ -1294,7 +1294,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
       {kickShield(1500, 700, 0.5, 'shield')}
       {mongkol(1574, 424, 0.44, 'mongkol')}
 
-      {/* left gutter — heavy bag, double-end bag, gloves, jump rope, hand wraps, kettlebell */}
+      {/* left gutter, heavy bag, double-end bag, gloves, jump rope, hand wraps, kettlebell */}
       {heavyBag(255, 452, 0.42, 'bagL', 0)}
       {doubleEndBag(560, 466, 0.5, 'deBag')}
       {gloves(420, 562, 0.5, 'glovesL', 0.8)}
@@ -1302,7 +1302,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY }: { scrollY: 
       {handWraps(118, 556, 0.48, 'wraps')}
       {kettlebell(640, 714, 0.4, 'kb')}
 
-      {/* right corner — speed bag overhead, focus mitts, stool, bucket */}
+      {/* right corner, speed bag overhead, focus mitts, stool, bucket */}
       {speedBag(1796, 456, 0.66, 'speed')}
       {focusMitts(1720, 716, 0.42, 'mitts')}
       {stool(1806, 714, 0.4, 'stool')}
@@ -2439,8 +2439,7 @@ export default function DarkFantasyTheme() {
   // Each animated section gets its own trigger based on ACTUAL element position
   const experienceTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
   const projectsTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
-  // fire the final battle just slightly before it's centered (small positive bottom margin) —
-  // a touch later than the previous +18% which kicked off before you'd even seen the section
+  // fire the final battle just slightly before it's centered (small positive bottom margin), // a touch later than the previous +18% which kicked off before you'd even seen the section
   const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
 
   // Memoize expensive data operations

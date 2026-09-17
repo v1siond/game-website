@@ -18,7 +18,7 @@ import { ErrorScreen } from './ErrorScreen'
 const HOME = '/'
 const GAME_ENGINE = '/personal-projects/game-engine'
 
-/** 404 — the address matches nothing. */
+/** 404, the address matches nothing. */
 export function NotFoundScreen() {
   return (
     <ErrorScreen
@@ -33,7 +33,7 @@ export function NotFoundScreen() {
   )
 }
 
-/** 5xx — the server broke. Retrying is honest advice here, so it leads. */
+/** 5xx, the server broke. Retrying is honest advice here, so it leads. */
 export function ServerErrorScreen({ status = 500, technical }: { status?: number; technical?: string }) {
   return (
     <ErrorScreen
@@ -52,7 +52,7 @@ export function ServerErrorScreen({ status = 500, technical }: { status?: number
 /**
  * A page that threw while rendering. No status: nothing failed over the wire, the page itself did.
  *
- * `reset` is React's own retry — it re-renders the segment that threw. It is the primary action
+ * `reset` is React's own retry, it re-renders the segment that threw. It is the primary action
  * because a crash from a one-off state (a half-loaded catalog, a stale prop) survives a reload but
  * not a re-render, and a reload is one click further along anyway.
  */

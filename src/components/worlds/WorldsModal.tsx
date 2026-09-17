@@ -6,7 +6,7 @@ import { useWorldTransition } from '@/themes/WorldTransitionContext'
 import WorldsGrid from './WorldsGrid'
 
 /**
- * WorldsModal — the "Enter Another World" picker, lifted OUT of the page content flow
+ * WorldsModal, the "Enter Another World" picker, lifted OUT of the page content flow
  * into a modal. Opened by the theme-selector launcher, closed by the ✕, the backdrop, or
  * Escape. The grid inside styles itself from the current theme, so it keeps its look. */
 export default function WorldsModal() {

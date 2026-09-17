@@ -39,7 +39,7 @@ export const WORLD_CATEGORIES: WorldCategoryMeta[] = [
 ]
 
 export interface World {
-  /** Matches the Theme id in themes.ts — drives `?t=<id>` and ThemeContext. */
+  /** Matches the Theme id in themes.ts, drives `?t=<id>` and ThemeContext. */
   id: string
   /** The full themed layout rendered when you enter the world. */
   component: ComponentType

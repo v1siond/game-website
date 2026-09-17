@@ -9,7 +9,7 @@ export const PORTAL_VARIANTS: PortalVariant[] = ['vortex', 'wormhole', 'hyperspa
 interface WorldPortalProps {
   variant: PortalVariant
   phase: 'cover' | 'reveal'
-  /** Destination world colors — the portal is tinted to where you're going. */
+  /** Destination world colors, the portal is tinted to where you're going. */
   accent: string
   secondary: string
   background: string

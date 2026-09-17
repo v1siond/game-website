@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { CrashScreen } from '@/components/errorScreens'
 
 /**
- * App Router segment error boundary — a page under `src/app` that threw while rendering.
+ * App Router segment error boundary, a page under `src/app` that threw while rendering.
  *
  * Next hands us `reset`, which re-renders the segment. It is logged first: a crash the visitor
  * recovers from with one click still has to be findable afterwards.

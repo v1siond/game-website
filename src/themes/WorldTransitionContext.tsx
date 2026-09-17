@@ -79,7 +79,7 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
       setDestId(id)
       setPhase('cover')
 
-      // At the cover peak the screen is fully obscured — swap the world + jump to top.
+      // At the cover peak the screen is fully obscured, swap the world + jump to top.
       const t1 = window.setTimeout(() => {
         setThemeById(id)
         window.scrollTo(0, 0)

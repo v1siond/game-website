@@ -89,7 +89,7 @@ export const KnightCharacter = memo(function KnightCharacter({
         filter: `drop-shadow(0 4px 3px rgba(0,0,0,0.45)) drop-shadow(0 0 5px ${DF.ethereal}22)`,
       }}
     >
-      {/* Ground contact shadow — two soft stacked ellipses (replaces the old glow-only shadow) */}
+      {/* Ground contact shadow, two soft stacked ellipses (replaces the old glow-only shadow) */}
       <ellipse cx="30" cy="79" rx="21" ry="4.5" fill={DF.void} opacity="0.22" />
       <ellipse cx="30" cy="79" rx="14" ry="3" fill={DF.void} opacity="0.4" />
       {/* === KNIGHT - 3/4 VIEW FACING RIGHT === */}

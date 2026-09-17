@@ -1286,7 +1286,7 @@ const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PRO
       <p className="text-sm mt-2" style={{ color: GOW.silver }}>{project.tagline}</p>
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: GOW.gold }}>
-          <span aria-hidden="true">— </span>
+          <span aria-hidden="true">, </span>
           <span className="sr-only">Impact: </span>{project.impact}
         </p>
       )}

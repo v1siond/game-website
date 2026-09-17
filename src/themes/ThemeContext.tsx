@@ -19,7 +19,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setMounted(true)
-    // `?capture=<id>` forces a specific world on load — used by the world-preview
+    // `?capture=<id>` forces a specific world on load, used by the world-preview
     // screenshot script (scripts/capture-world-previews.mjs). Harmless otherwise.
     const capture = new URLSearchParams(window.location.search).get('capture')
     if (capture && themes.some((t) => t.id === capture)) {

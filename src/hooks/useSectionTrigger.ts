@@ -46,7 +46,7 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
   const observerRef = useRef<IntersectionObserver | null>(null)
 
   // In a World Select preview, sections are clipped/frozen so the observer never
-  // fires — force everything "triggered" so the hero renders instead of staying blank.
+  // fires, force everything "triggered" so the hero renders instead of staying blank.
   const isPreview = usePreview()
 
   const setRef = useCallback((element: HTMLElement | null) => {

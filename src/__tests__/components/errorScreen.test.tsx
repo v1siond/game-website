@@ -8,7 +8,7 @@ import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from '@/themes/them
  *
  * It has to be THIS mock: `jest.setup.ts` replaces `window.localStorage` wholesale with an object of
  * `jest.fn()`s, so a `jest.spyOn(Storage.prototype, 'getItem')` intercepts nothing and the assertion
- * silently reads the default world instead of the stored one — a green test proving nothing.
+ * silently reads the default world instead of the stored one, a green test proving nothing.
  */
 const localStorageGetItem = window.localStorage.getItem as jest.Mock
 

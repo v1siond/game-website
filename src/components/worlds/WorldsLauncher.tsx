@@ -4,7 +4,7 @@ import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
 
 /**
- * WorldsLauncher — the re-added "theme selector". A small floating button (bottom-left,
+ * WorldsLauncher, the re-added "theme selector". A small floating button (bottom-left,
  * so it clears the Dark Fantasy knight in the bottom-right) that opens the WorldsModal.
  * Styled from the current theme so it fits whichever world you're in. */
 export default function WorldsLauncher() {

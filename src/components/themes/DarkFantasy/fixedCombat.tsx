@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react'
 
 /**
- * useInView — continuous "is this element currently in the viewport?" signal.
+ * useInView, continuous "is this element currently in the viewport?" signal.
  *
  * Unlike `useSectionTrigger` (one-shot `triggered` that latches true), this toggles
  * back to false when the element scrolls out of view. We use it to fade the fixed
@@ -27,7 +27,7 @@ export function useInView(rootMargin = '-30% 0px -30% 0px') {
 }
 
 /**
- * FixedCombatLayer — pins the knight/bug combat to the viewport so only the section
+ * FixedCombatLayer, pins the knight/bug combat to the viewport so only the section
  * CONTENT scrolls. `fixed inset-0` makes this a full-viewport box, so any child with
  * `left/right/bottom` percentages resolves against the viewport (knight ~15-20% from a
  * side, ~15-20% from the bottom). Fades out when the section leaves view. The reveals
