@@ -48,3 +48,10 @@ recordings/
 test-results/
 playwright-report/
 erl_crash.dump
+
+# Licensed stock reference IMAGES stay out of the repo. SOURCES.md records the URL and what was measured
+# from each one, which is the part that belongs with the code.
+docs/references/**/*.jpg
+docs/references/**/*.jpeg
+docs/references/**/*.png
+docs/references/**/*.webp
