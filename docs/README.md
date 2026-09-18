@@ -1,40 +1,17 @@
-# game-website docs — index
+# game-website docs
 
-These docs **mirror the engine model**; the canonical copies live in
-[`nebulith/docs/`](../../nebulith/docs/) and win on any conflict. This repo's copies map the model to
-the frontend code (`src/engine/*`, `src/game/*`, `src/components/game/*`,
-`src/pages/personal-projects/game-engine/*`). Working rule: **open [`FRAMEWORKS.md`](FRAMEWORKS.md) first**, follow the framework it names for
-whatever is being worked on, and if there is no framework for it, research and write one before starting.
-Then: check docs, understand, do the work, and update the relevant doc in the same change.
+This repo is the CV site: the portfolio, the world themes, and the links out to the personal
+projects. Only the design docs for THAT live here.
 
-## Read first — the model
+- [`CV-THEME-SYSTEM.md`](CV-THEME-SYSTEM.md) — the multi-theme homepage, the four career paths, how a
+  theme is chosen and remembered.
+- [`CV-HOMEPAGE-SECTIONS.md`](CV-HOMEPAGE-SECTIONS.md) — the section structure of the homepage.
 
-- [`FRAMEWORKS.md`](FRAMEWORKS.md) — **the index of every framework and every missing one, and the rule that binds them.** Open this before anything else.
+**The game engine's documentation is not here any more.** The engine moved to its own deployment and
+its docs went with it, as one copy rather than two that drift. They live in
+[`nebulith/docs/`](../../nebulith/docs/), starting at `FRAMEWORKS.md`, and are also browsable at
+`/docs` on the running engine.
 
-- [`MAP-MODEL.md`](MAP-MODEL.md) — the cell/block/tile model and the three views (ISO/2D/TOP). **Start here.**
-- [`ENGINE-ARCHITECTURE.md`](ENGINE-ARCHITECTURE.md) — one grid → three renders; the data flow and invariants.
-- [`TILE-VOCABULARY-CONTRACT.md`](TILE-VOCABULARY-CONTRACT.md) — the `<base>_<edge>` tile naming.
-- [`TILESET-AUTHORING.md`](TILESET-AUTHORING.md) · [`TILE-BACKEND-MIGRATION.md`](TILE-BACKEND-MIGRATION.md) — how tiles are authored and owned by the backend.
-
-## Authoring objects
-
-- [`OBJECT-CONSTRUCTION.md`](OBJECT-CONSTRUCTION.md), how an object (a tile composition) is built so it looks like the thing it is named after: the reference-first process, the engine facts sheet, the six patterns, the checklist. Read it before authoring any composition.
-- [`HITBOXES-AND-ELEVATION.md`](HITBOXES-AND-ELEVATION.md), the hitbox and elevation implementation spec.
-- [`DESIGN-ENTRANCES.md`](DESIGN-ENTRANCES.md), the design for the four map entrances, with the honest render comparison.
-- [`references/SOURCES.md`](references/SOURCES.md), the isometric reference art every object is modelled against, with sources and licences.
-
-## Features & systems
-
-- [`FEATURES.md`](FEATURES.md) — per-feature flows and where they live in the code.
-- [`EDITOR-INTERACTION-SPEC.md`](EDITOR-INTERACTION-SPEC.md) — the editor interaction model.
-- [`ANIMATION-SYSTEM.md`](ANIMATION-SYSTEM.md) — the `Animation` envelope + z-index draw priority.
-- [`LIGHTING.md`](LIGHTING.md) — the night ground-glow lighting model.
-- [`WATER.md`](WATER.md) — the water layer stack: bed, depth tint, caustics, animated surface, reflections, shoreline.
-- [`GENERATION-SPEC.md`](GENERATION-SPEC.md) — the layer-pass stage/town generator.
-- [`ALGORITHMS.md`](ALGORITHMS.md) — the algorithm decision database for generator problems.
-- [`COMBAT-AND-SYSTEMS-SPEC.md`](COMBAT-AND-SYSTEMS-SPEC.md) · [`TRIGGERS-SPEC.md`](TRIGGERS-SPEC.md) — the game layer and the trigger system.
-
-## Standards & roadmap
-
-- [`CODING-STANDARDS.md`](CODING-STANDARDS.md) — **the senior bar for this repo** (TypeScript, React, ITCSS, canvas/game-loop).
-- [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`NEBULITH-SOURCE-OF-TRUTH.md`](NEBULITH-SOURCE-OF-TRUTH.md) · [`GAPS-AND-ROADMAP.md`](GAPS-AND-ROADMAP.md) — the wider system, vision, and roadmap.
+The mirror that used to sit here was stale in ways nobody could see: its `GENERATION-SPEC.md` was
+missing the entire layer-model section that `FRAMEWORKS.md` pointed at. One copy, in the repo that
+owns the code.
