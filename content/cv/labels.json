@@ -1,0 +1,374 @@
+{
+  "en": {
+    "labels": {
+      "sections": {
+        "about": "About",
+        "workExperience": "Work Experience",
+        "techStack": "Tech Stack",
+        "projects": "Projects",
+        "featuredWork": "Featured Work",
+        "ventures": "Ventures",
+        "bands": "Bands",
+        "muayThai": "Muay Thai",
+        "contact": "Contact",
+        "posts": "Posts"
+      },
+      "professions": {
+        "engineer": "System Engineer",
+        "drummer": "Musician",
+        "fighter": "Martial Artist"
+      },
+      "professionFields": {
+        "engineer": "Software",
+        "drummer": "Drums",
+        "fighter": "Muay Thai"
+      },
+      "navigation": {
+        "contactAndCv": "Contact and CV",
+        "professionSelection": "Profession selection",
+        "profession": "Profession",
+        "professionDetails": "{profession} profession details",
+        "selectYourProfession": "Select Your Profession",
+        "primaryNavigation": "Primary navigation",
+        "skipToContent": "Skip to main content",
+        "loadingTheme": "Loading theme",
+        "loading": "Loading...",
+        "systemTerminal": "System terminal",
+        "battleInProgress": "Battle animation in progress",
+        "contentRevealed": "Content revealed",
+        "copyright": "Copyright",
+        "active": "Active"
+      },
+      "actions": {
+        "getInTouch": "Get In Touch",
+        "downloadCv": "Download CV",
+        "cv": "CV",
+        "getCv": "Get the CV",
+        "resume": "Resume",
+        "engine": "Nebulith",
+        "engineShort": "Game",
+        "viewEngine": "View Nebulith game engine project",
+        "playDemo": "Play demo",
+        "play": "Play",
+        "portfolio": "Portfolio",
+        "enter": "Enter",
+        "emailMe": "Email me",
+        "emailMeAt": "Email me at {email}",
+        "linkedin": "LinkedIn",
+        "readFile": "Read file",
+        "closeFile": "Close file",
+        "streamLink": "Stream link"
+      },
+      "links": {
+        "website": "Website",
+        "app": "App",
+        "marketplace": "Marketplace",
+        "story": "Story",
+        "released": "Released",
+        "noPublicLink": "No public link",
+        "newTab": "{name} (opens in a new tab)",
+        "linkOf": "{link} of {project}"
+      },
+      "cards": {
+        "keyAchievements": "Key achievements",
+        "technologiesUsed": "Technologies used",
+        "skillsUsed": "Skills used",
+        "categoryTechnologies": "{name} technologies",
+        "techByCategory": "Technical skills by category",
+        "featured": "Featured",
+        "impact": "Impact",
+        "tech": "Tech",
+        "noPosts": "No posts yet",
+        "jobSpan": "{title} at {company}, {start} to {end}",
+        "cyberware": "{type} cyberware"
+      },
+      "years": {
+        "present": "Present",
+        "since": "Since {year}",
+        "range": "{start} to {end}",
+        "yearOne": "{count} year",
+        "yearMany": "{count} years",
+        "drumsSince": "Drums since {since}, {years} years"
+      },
+      "record": {
+        "dojo": "Dojo",
+        "rank": "Rank",
+        "now": "Now",
+        "alsoTraining": "Also training",
+        "background": "Background",
+        "achievements": "Achievements",
+        "dojoLine": "{dojo}, {place}, founded by {founder}",
+        "training": "{discipline} at {academy}, under {instructor}",
+        "trainingNow": "{discipline} at {academy}, under {instructor}, now",
+        "practice": "{training} training, {teaching} teaching"
+      },
+      "cvPage": {
+        "backToSite": "Back to the site",
+        "downloadPdf": "Download PDF",
+        "generating": "Generating...",
+        "language": "Language:",
+        "professionalSummary": "Professional Summary",
+        "coreCompetencies": "Core Competencies",
+        "currentPositions": "Current Positions",
+        "keyProjects": "Key Projects & Achievements",
+        "technicalSkills": "Technical Skills",
+        "professionalExperience": "Professional Experience",
+        "education": "Education & Continuous Learning",
+        "educationText": "Self-taught engineer with 10+ years of practical experience building production systems. Continuous learner through hands-on project work, technical documentation, and staying current with industry developments."
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español",
+        "it": "Italiano"
+      }
+    }
+  },
+  "es": {
+    "labels": {
+      "sections": {
+        "about": "Sobre mí",
+        "workExperience": "Experiencia laboral",
+        "techStack": "Tecnologías",
+        "projects": "Proyectos",
+        "featuredWork": "Trabajo destacado",
+        "ventures": "Empresas",
+        "bands": "Bandas",
+        "muayThai": "Muay Thai",
+        "contact": "Contacto",
+        "posts": "Publicaciones"
+      },
+      "professions": {
+        "engineer": "Ingeniero de Sistemas",
+        "drummer": "Músico",
+        "fighter": "Artista Marcial"
+      },
+      "professionFields": {
+        "engineer": "Software",
+        "drummer": "Batería",
+        "fighter": "Muay Thai"
+      },
+      "navigation": {
+        "contactAndCv": "Contacto y CV",
+        "professionSelection": "Selección de profesión",
+        "profession": "Profesión",
+        "professionDetails": "Detalles de la profesión {profession}",
+        "selectYourProfession": "Elige tu profesión",
+        "primaryNavigation": "Navegación principal",
+        "skipToContent": "Saltar al contenido principal",
+        "loadingTheme": "Cargando tema",
+        "loading": "Cargando...",
+        "systemTerminal": "Terminal del sistema",
+        "battleInProgress": "Animación de batalla en curso",
+        "contentRevealed": "Contenido revelado",
+        "copyright": "Derechos de autor",
+        "active": "Activo"
+      },
+      "actions": {
+        "getInTouch": "Contáctame",
+        "downloadCv": "Descargar CV",
+        "cv": "CV",
+        "getCv": "Obtener el CV",
+        "resume": "Currículum",
+        "engine": "Nebulith",
+        "engineShort": "Juego",
+        "viewEngine": "Ver el proyecto del motor de juegos Nebulith",
+        "playDemo": "Jugar la demo",
+        "play": "Jugar",
+        "portfolio": "Portafolio",
+        "enter": "Entrar",
+        "emailMe": "Escríbeme",
+        "emailMeAt": "Escríbeme a {email}",
+        "linkedin": "LinkedIn",
+        "readFile": "Leer archivo",
+        "closeFile": "Cerrar archivo",
+        "streamLink": "Enlace para escuchar"
+      },
+      "links": {
+        "website": "Sitio web",
+        "app": "App",
+        "marketplace": "Marketplace",
+        "story": "Historia",
+        "released": "Publicado",
+        "noPublicLink": "Sin enlace público",
+        "newTab": "{name} (se abre en una pestaña nueva)",
+        "linkOf": "{link} de {project}"
+      },
+      "cards": {
+        "keyAchievements": "Logros clave",
+        "technologiesUsed": "Tecnologías usadas",
+        "skillsUsed": "Habilidades usadas",
+        "categoryTechnologies": "Tecnologías de {name}",
+        "techByCategory": "Habilidades técnicas por categoría",
+        "featured": "Destacado",
+        "impact": "Impacto",
+        "tech": "Tecnologías",
+        "noPosts": "Aún no hay publicaciones",
+        "jobSpan": "{title} en {company}, de {start} a {end}",
+        "cyberware": "Ciberimplante {type}"
+      },
+      "years": {
+        "present": "Presente",
+        "since": "Desde {year}",
+        "range": "{start} a {end}",
+        "yearOne": "{count} año",
+        "yearMany": "{count} años",
+        "drumsSince": "Batería desde {since}, {years} años"
+      },
+      "record": {
+        "dojo": "Dojo",
+        "rank": "Rango",
+        "now": "Ahora",
+        "alsoTraining": "También entrena",
+        "background": "Trayectoria",
+        "achievements": "Logros",
+        "dojoLine": "{dojo}, {place}, fundado por {founder}",
+        "training": "{discipline} en {academy}, con {instructor}",
+        "trainingNow": "{discipline} en {academy}, con {instructor}, actualmente",
+        "practice": "{training} entrenando, {teaching} enseñando"
+      },
+      "cvPage": {
+        "backToSite": "Volver al sitio",
+        "downloadPdf": "Descargar PDF",
+        "generating": "Generando...",
+        "language": "Idioma:",
+        "professionalSummary": "Resumen Profesional",
+        "coreCompetencies": "Competencias Principales",
+        "currentPositions": "Posiciones Actuales",
+        "keyProjects": "Proyectos Clave y Logros",
+        "technicalSkills": "Habilidades Técnicas",
+        "professionalExperience": "Experiencia Profesional",
+        "education": "Educación y Aprendizaje Continuo",
+        "educationText": "Ingeniero autodidacta con más de 10 años de experiencia práctica construyendo sistemas de producción. Aprendiz continuo a través de trabajo en proyectos, documentación técnica y manteniéndose actualizado con los desarrollos de la industria."
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español",
+        "it": "Italiano"
+      }
+    }
+  },
+  "it": {
+    "labels": {
+      "sections": {
+        "about": "Chi sono",
+        "workExperience": "Esperienza lavorativa",
+        "techStack": "Tecnologie",
+        "projects": "Progetti",
+        "featuredWork": "Lavori in evidenza",
+        "ventures": "Imprese",
+        "bands": "Band",
+        "muayThai": "Muay Thai",
+        "contact": "Contatti",
+        "posts": "Articoli"
+      },
+      "professions": {
+        "engineer": "Ingegnere di Sistemi",
+        "drummer": "Musicista",
+        "fighter": "Artista Marziale"
+      },
+      "professionFields": {
+        "engineer": "Software",
+        "drummer": "Batteria",
+        "fighter": "Muay Thai"
+      },
+      "navigation": {
+        "contactAndCv": "Contatti e CV",
+        "professionSelection": "Selezione della professione",
+        "profession": "Professione",
+        "professionDetails": "Dettagli della professione {profession}",
+        "selectYourProfession": "Scegli la tua professione",
+        "primaryNavigation": "Navigazione principale",
+        "skipToContent": "Vai al contenuto principale",
+        "loadingTheme": "Caricamento del tema",
+        "loading": "Caricamento...",
+        "systemTerminal": "Terminale di sistema",
+        "battleInProgress": "Animazione della battaglia in corso",
+        "contentRevealed": "Contenuto rivelato",
+        "copyright": "Copyright",
+        "active": "Attivo"
+      },
+      "actions": {
+        "getInTouch": "Contattami",
+        "downloadCv": "Scarica il CV",
+        "cv": "CV",
+        "getCv": "Ottieni il CV",
+        "resume": "Curriculum",
+        "engine": "Nebulith",
+        "engineShort": "Gioco",
+        "viewEngine": "Vedi il progetto del motore di gioco Nebulith",
+        "playDemo": "Gioca la demo",
+        "play": "Gioca",
+        "portfolio": "Portfolio",
+        "enter": "Entra",
+        "emailMe": "Scrivimi",
+        "emailMeAt": "Scrivimi a {email}",
+        "linkedin": "LinkedIn",
+        "readFile": "Leggi il file",
+        "closeFile": "Chiudi il file",
+        "streamLink": "Link per ascoltare"
+      },
+      "links": {
+        "website": "Sito web",
+        "app": "App",
+        "marketplace": "Marketplace",
+        "story": "Storia",
+        "released": "Pubblicato",
+        "noPublicLink": "Nessun link pubblico",
+        "newTab": "{name} (si apre in una nuova scheda)",
+        "linkOf": "{link} di {project}"
+      },
+      "cards": {
+        "keyAchievements": "Risultati chiave",
+        "technologiesUsed": "Tecnologie usate",
+        "skillsUsed": "Competenze usate",
+        "categoryTechnologies": "Tecnologie {name}",
+        "techByCategory": "Competenze tecniche per categoria",
+        "featured": "In evidenza",
+        "impact": "Impatto",
+        "tech": "Tecnologie",
+        "noPosts": "Ancora nessun articolo",
+        "jobSpan": "{title} presso {company}, dal {start} al {end}",
+        "cyberware": "Cyberware {type}"
+      },
+      "years": {
+        "present": "Presente",
+        "since": "Dal {year}",
+        "range": "Dal {start} al {end}",
+        "yearOne": "{count} anno",
+        "yearMany": "{count} anni",
+        "drumsSince": "Batteria dal {since}, {years} anni"
+      },
+      "record": {
+        "dojo": "Dojo",
+        "rank": "Grado",
+        "now": "Ora",
+        "alsoTraining": "Si allena anche",
+        "background": "Percorso",
+        "achievements": "Risultati",
+        "dojoLine": "{dojo}, {place}, fondato da {founder}",
+        "training": "{discipline} presso {academy}, con {instructor}",
+        "trainingNow": "{discipline} presso {academy}, con {instructor}, attualmente",
+        "practice": "{training} di allenamento, {teaching} di insegnamento"
+      },
+      "cvPage": {
+        "backToSite": "Torna al sito",
+        "downloadPdf": "Scarica PDF",
+        "generating": "Generazione...",
+        "language": "Lingua:",
+        "professionalSummary": "Riepilogo Professionale",
+        "coreCompetencies": "Competenze Principali",
+        "currentPositions": "Posizioni Attuali",
+        "keyProjects": "Progetti Chiave e Risultati",
+        "technicalSkills": "Competenze Tecniche",
+        "professionalExperience": "Esperienza Professionale",
+        "education": "Formazione e Apprendimento Continuo",
+        "educationText": "Ingegnere autodidatta con oltre 10 anni di esperienza pratica nella costruzione di sistemi in produzione. Apprendista continuo attraverso lavoro su progetti, documentazione tecnica e aggiornamento costante sugli sviluppi del settore."
+      },
+      "languages": {
+        "en": "English",
+        "es": "Español",
+        "it": "Italiano"
+      }
+    }
+  }
+}

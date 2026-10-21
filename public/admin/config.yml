@@ -242,3 +242,169 @@ collections:
               - { <<: *text, label: Name, name: name }
               - { <<: *fixed, label: Icon, name: icon }
               - { label: Items, name: items, widget: list, i18n: true, required: false }
+
+      - name: labels
+        label: Site text
+        file: content/cv/labels.json
+        i18n: true
+        # Every word the worlds and /cv print around the CV facts. A {slot} is filled in by the page: keep
+        # each slot of the English text in every translation.
+        fields:
+          - label: Site text
+            name: labels
+            widget: object
+            i18n: true
+            fields:
+              - label: Section titles
+                name: sections
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "About", name: about }
+                  - { <<: *text, label: "Work experience", name: workExperience }
+                  - { <<: *text, label: "Tech stack", name: techStack }
+                  - { <<: *text, label: "Projects", name: projects }
+                  - { <<: *text, label: "Featured work", name: featuredWork }
+                  - { <<: *text, label: "Ventures", name: ventures }
+                  - { <<: *text, label: "Bands", name: bands }
+                  - { <<: *text, label: "Muay thai", name: muayThai }
+                  - { <<: *text, label: "Contact", name: contact }
+                  - { <<: *text, label: "Posts", name: posts }
+              - label: Profession names
+                name: professions
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Engineer", name: engineer }
+                  - { <<: *text, label: "Drummer", name: drummer }
+                  - { <<: *text, label: "Fighter", name: fighter }
+              - label: Profession fields (short, under a name)
+                name: professionFields
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Engineer", name: engineer }
+                  - { <<: *text, label: "Drummer", name: drummer }
+                  - { <<: *text, label: "Fighter", name: fighter }
+              - label: Navigation and accessible names
+                name: navigation
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Contact and CV", name: contactAndCv }
+                  - { <<: *text, label: "Profession selection", name: professionSelection }
+                  - { <<: *text, label: "Profession", name: profession }
+                  - { <<: *text, label: "Profession details", name: professionDetails, hint: 'Keep {profession}' }
+                  - { <<: *text, label: "Select your profession", name: selectYourProfession }
+                  - { <<: *text, label: "Primary navigation", name: primaryNavigation }
+                  - { <<: *text, label: "Skip to content", name: skipToContent }
+                  - { <<: *text, label: "Loading theme", name: loadingTheme }
+                  - { <<: *text, label: "Loading", name: loading }
+                  - { <<: *text, label: "System terminal", name: systemTerminal }
+                  - { <<: *text, label: "Battle in progress", name: battleInProgress }
+                  - { <<: *text, label: "Content revealed", name: contentRevealed }
+                  - { <<: *text, label: "Copyright", name: copyright }
+                  - { <<: *text, label: "Active", name: active }
+              - label: Buttons and links
+                name: actions
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Get in touch", name: getInTouch }
+                  - { <<: *text, label: "Download CV", name: downloadCv }
+                  - { <<: *text, label: "CV", name: cv }
+                  - { <<: *text, label: "Get the CV", name: getCv }
+                  - { <<: *text, label: "Resume", name: resume }
+                  - { <<: *text, label: "Engine", name: engine }
+                  - { <<: *text, label: "Engine short", name: engineShort }
+                  - { <<: *text, label: "View engine", name: viewEngine }
+                  - { <<: *text, label: "Play demo", name: playDemo }
+                  - { <<: *text, label: "Play", name: play }
+                  - { <<: *text, label: "Portfolio", name: portfolio }
+                  - { <<: *text, label: "Enter", name: enter }
+                  - { <<: *text, label: "Email me", name: emailMe }
+                  - { <<: *text, label: "Email me at", name: emailMeAt, hint: 'Keep {email}' }
+                  - { <<: *text, label: "Linkedin", name: linkedin }
+                  - { <<: *text, label: "Read file", name: readFile }
+                  - { <<: *text, label: "Close file", name: closeFile }
+                  - { <<: *text, label: "Stream link", name: streamLink }
+              - label: Link words
+                name: links
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Website", name: website }
+                  - { <<: *text, label: "App", name: app }
+                  - { <<: *text, label: "Marketplace", name: marketplace }
+                  - { <<: *text, label: "Story", name: story }
+                  - { <<: *text, label: "Released", name: released }
+                  - { <<: *text, label: "No public link", name: noPublicLink }
+                  - { <<: *text, label: "New tab", name: newTab, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Link of", name: linkOf, hint: 'Keep {link} {project}' }
+              - label: Card text
+                name: cards
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Key achievements", name: keyAchievements }
+                  - { <<: *text, label: "Technologies used", name: technologiesUsed }
+                  - { <<: *text, label: "Skills used", name: skillsUsed }
+                  - { <<: *text, label: "Category technologies", name: categoryTechnologies, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Tech by category", name: techByCategory }
+                  - { <<: *text, label: "Featured", name: featured }
+                  - { <<: *text, label: "Impact", name: impact }
+                  - { <<: *text, label: "Tech", name: tech }
+                  - { <<: *text, label: "No posts", name: noPosts }
+                  - { <<: *text, label: "Job span", name: jobSpan, hint: 'Keep {title} {company} {start} {end}' }
+                  - { <<: *text, label: "Cyberware", name: cyberware, hint: 'Keep {type}' }
+              - label: Years
+                name: years
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Present", name: present }
+                  - { <<: *text, label: "Since", name: since, hint: 'Keep {year}' }
+                  - { <<: *text, label: "Range", name: range, hint: 'Keep {start} {end}' }
+                  - { <<: *text, label: "Year one", name: yearOne, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Year many", name: yearMany, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Drums since", name: drumsSince, hint: 'Keep {since} {years}' }
+              - label: Muay Thai record
+                name: record
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Dojo", name: dojo }
+                  - { <<: *text, label: "Rank", name: rank }
+                  - { <<: *text, label: "Now", name: now }
+                  - { <<: *text, label: "Also training", name: alsoTraining }
+                  - { <<: *text, label: "Background", name: background }
+                  - { <<: *text, label: "Achievements", name: achievements }
+                  - { <<: *text, label: "Dojo line", name: dojoLine, hint: 'Keep {dojo} {place} {founder}' }
+                  - { <<: *text, label: "Training", name: training, hint: 'Keep {discipline} {academy} {instructor}' }
+                  - { <<: *text, label: "Training now", name: trainingNow, hint: 'Keep {discipline} {academy} {instructor}' }
+                  - { <<: *text, label: "Practice", name: practice, hint: 'Keep {training} {teaching}' }
+              - label: The /cv page
+                name: cvPage
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Back to site", name: backToSite }
+                  - { <<: *text, label: "Download PDF", name: downloadPdf }
+                  - { <<: *text, label: "Generating", name: generating }
+                  - { <<: *text, label: "Language", name: language }
+                  - { <<: *text, label: "Professional summary", name: professionalSummary }
+                  - { <<: *text, label: "Core competencies", name: coreCompetencies }
+                  - { <<: *text, label: "Current positions", name: currentPositions }
+                  - { <<: *text, label: "Key projects", name: keyProjects }
+                  - { <<: *text, label: "Technical skills", name: technicalSkills }
+                  - { <<: *text, label: "Professional experience", name: professionalExperience }
+                  - { <<: *text, label: "Education", name: education }
+                  - { <<: *prose, label: "Education text", name: educationText }
+              - label: Language names (each in its own language)
+                name: languages
+                widget: object
+                i18n: duplicate
+                fields:
+                  - { <<: *fixed, label: "English", name: en }
+                  - { <<: *fixed, label: "Spanish", name: es }
+                  - { <<: *fixed, label: "Italian", name: it }

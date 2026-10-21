@@ -1,7 +1,9 @@
 import type { Locale } from '@/i18n/config'
+import { labelsFor, type Labels, type LabelsFile } from './labels'
 
 // The shape of the Decap content in content/cv. Each file holds one block per locale (i18n
-// single_file); English is the complete block every other locale falls back to.
+// single_file); English is the complete block every other locale falls back to. labels.json, the
+// interface text, has its own shape and key by key fallback in ./labels.
 
 export interface ProfessionalSummary {
   headline: string
@@ -133,9 +135,10 @@ export interface CVContentSections {
   roles: { currentRoles: Role[] }
 }
 
-export type CVContentFile = keyof CVContentSections
+export type CVSectionFile = keyof CVContentSections
 
-export const CV_CONTENT_FILES: readonly CVContentFile[] = [
+// The content files whose blocks merge into the CV, section by section.
+const CV_SECTION_FILES: readonly CVSectionFile[] = [
   'summary',
   'contact',
   'experience',
@@ -147,10 +150,15 @@ export const CV_CONTENT_FILES: readonly CVContentFile[] = [
   'roles',
 ]
 
+/** Every file in content/cv the loader reads: the CV sections and the interface labels. */
+export type CVContentFile = CVSectionFile | 'labels'
+
+export const CV_CONTENT_FILES: readonly CVContentFile[] = [...CV_SECTION_FILES, 'labels']
+
 /** One file as stored: the English block always, the others possibly missing or partial. */
 export type LocalisedFile<Section> = { en: Section } & Partial<Record<Exclude<Locale, 'en'>, Partial<Section>>>
 
-export type CVContentFiles = { [File in CVContentFile]: LocalisedFile<CVContentSections[File]> }
+export type CVContentFiles = { [File in CVSectionFile]: LocalisedFile<CVContentSections[File]> } & { labels: LabelsFile }
 
 // Every file's sections side by side: the content of one locale.
 type CVContent = CVContentSections['summary'] &
@@ -172,6 +180,7 @@ export type CVData = Omit<CVContent, 'workExperience' | 'currentRoles' | 'compan
   companies: Array<Company & { slug: string }>
   techStack: Array<TechCategory & { id: string }>
   featuredProjects: Project[]
+  labels: Labels
 }
 
 // A key missing from the locale block keeps its English value, so a half translated file still renders.
@@ -191,7 +200,7 @@ const withSlug = <Entry extends { id: string }>(entry: Entry): Entry & { slug: s
 
 /** Picks one locale out of the parsed content files and shapes it for the pages. */
 export function cvDataFrom(files: CVContentFiles, locale: Locale): CVData {
-  const content = CV_CONTENT_FILES.reduce(
+  const content = CV_SECTION_FILES.reduce(
     (merged, name) => ({ ...merged, ...sectionFor<object>(files[name], locale) }),
     {},
   ) as CVContent
@@ -203,5 +212,6 @@ export function cvDataFrom(files: CVContentFiles, locale: Locale): CVData {
     companies: content.companies.map(withSlug),
     techStack: content.techStack.map((category) => ({ ...category, id: category.name })),
     featuredProjects: content.projects.filter((project) => project.featured),
+    labels: labelsFor(files.labels, locale),
   }
 }
