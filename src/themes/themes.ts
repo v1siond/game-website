@@ -1,5 +1,4 @@
-// Each rebuilt world owns its colours in its palette.ts; its registry entry reads them from there. Dark
-// Fantasy and Medieval Fantasy have no palette module yet, so their hex stays here.
+// Every world owns its colours in its palette.ts; its registry entry reads them from there.
 import { TRAIL } from '@/components/themes/AdventurePaths/palette'
 import { DECO_COLORS } from '@/components/themes/ArtDeco/palette'
 import { DARK_FANTASY } from '@/components/themes/DarkFantasy/palette'
@@ -52,7 +51,7 @@ export interface Theme {
 }
 
 export const themes: Theme[] = [
-  // 1. Dark Fantasy - an ethereal ruined kingdom
+  // 1. Dark Fantasy - an ethereal ruined kingdom of spirits and lanterns, him as its masked knight
   {
     id: 'dark-fantasy',
     name: 'Dark Fantasy',
@@ -82,7 +81,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 2. Survival Horror - an old house at night, one lamp at a time
+  // 2. Survival Horror - an old house at night with fixed camera rooms, the item box and the last corridor
   {
     id: 'survival-horror',
     name: 'Survival Horror',
@@ -112,7 +111,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 3. Neon Portals - orange portal in, blue portal out
+  // 3. Neon Portals - a time machine's warp room and levels, crates and crystals, him as its orange hero
   {
     id: 'neon-portals',
     name: 'Neon Portals',
@@ -142,7 +141,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 4. Soul Map - deep blue caverns of a map exploration game
+  // 4. Soul Map - an ash and bonfire world of a hard knight game: the shrine, the class pick, the fog wall
   {
     id: 'soul-map',
     name: 'Soul Map',
@@ -172,7 +171,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 5. Adventure Paths - an explorer's map at dusk
+  // 5. Adventure Paths - an explorer's overworld map whose regions hold each profession, ending at the goal gate
   {
     id: 'adventure-paths',
     name: 'Adventure Paths',
@@ -202,7 +201,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 6. Rubber Hose - a 1930s rubber hose cartoon in sepia
+  // 6. Rubber Hose - a 1930s rubber hose cartoon in sepia with the iris, him as the cup headed toon
   {
     id: 'rubber-hose',
     name: 'Rubber Hose',
@@ -232,7 +231,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 7. Retro RPG - a 16 bit role playing game at night
+  // 7. Retro RPG - a lo-fi pixel role playing game's encounter screen, its boxes and the save point
   {
     id: 'retro-rpg',
     name: 'Retro RPG',
@@ -262,7 +261,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 8. Bold Noir - a graphic novel night with one red accent
+  // 8. Bold Noir - a stylish heist night in black, paper and one red: calling cards, the menu cut-in, the finisher
   {
     id: 'bold-noir',
     name: 'Bold Noir',
@@ -292,7 +291,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 9. Fighter Select - an arcade fighting game's select screen and stages
+  // 9. Fighter Select - an arcade fighting game's select screen and its matches, a challenger at the end
   {
     id: 'fighter-select',
     name: 'Fighter Select',
@@ -322,7 +321,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 10. Art Deco - a 1920s city under the sea
+  // 10. Art Deco - a 1920s city at the bottom of the sea in brass and gold, reached by bathysphere
   {
     id: 'art-deco',
     name: 'Art Deco',
@@ -352,7 +351,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 11. Retro Atomic - an atomic age shelter
+  // 11. Retro Atomic - an atomic age fallout shelter seen through his wrist terminal, out to the wasteland
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',
@@ -382,7 +381,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 12. Neon Cyber - a neon city at night
+  // 12. Neon Cyber - the default world: a netrunner's night city through the optics HUD, with quickhacks and scan mode
   {
     id: 'neon-cyber',
     name: 'Neon Cyber',
@@ -412,7 +411,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 13. Cell Shaded - a toon shaded comic
+  // 13. Cell Shaded - an inked wasteland looter shooter, one desert day from the intro card to the respawn station
   {
     id: 'cell-shaded',
     name: 'Cell Shaded',
@@ -442,7 +441,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 14. Silhouette - black shapes on a lit sky
+  // 14. Silhouette - a black forest in the fog, a monochrome puzzle platformer with levers, ropes and death cuts
   {
     id: 'silhouette',
     name: 'Silhouette',
@@ -472,7 +471,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 15. Mythic - a sunlit Aegean noon over marble temples
+  // 15. Mythic - an underworld escape painted in ink over colour, from the great hall up to the dawn
   {
     id: 'mythic',
     name: 'Mythic',
@@ -502,7 +501,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 16. Tropical Platformer - an island at midday
+  // 16. Tropical Platformer - a jungle barrel platformer from sunset to night, shot out of his tree house
   {
     id: 'tropical-platformer',
     name: 'Tropical Platformer',
@@ -532,7 +531,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 17. Medieval Fantasy - RTS-inspired gold and stone
+  // 17. Medieval Fantasy - a real time strategy kingdom in gold and stone
   {
     id: 'medieval-fantasy',
     name: 'Medieval Fantasy',
