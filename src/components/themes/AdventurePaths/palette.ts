@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Adventure Paths' palette: an explorer's map at dusk. Night forest behind the page, parchment for the
 // field journal, the red route line drawn across the map, compass gold, mossy stone ruins and the teal
@@ -32,14 +32,8 @@ export const TRAIL = {
   BARK: '#3e2a1a',
 } as const
 
-type Tone = keyof typeof TRAIL
-
-const cssName = (tone: Tone) => `--ap-${tone.toLowerCase().replace(/_/g, '-')}`
-
 /** The palette as CSS variables, set once on the world's root. */
-export const TRAIL_VARS = Object.fromEntries(
-  (Object.keys(TRAIL) as Tone[]).map((tone) => [cssName(tone), TRAIL[tone]]),
-) as CSSProperties
+export const TRAIL_VARS = paletteVars('ap', TRAIL)
 
 // Field journal type: the serif of an expedition log for headings, a plain sans for reading.
 export const JOURNAL_SERIF = "font-['Georgia','Times_New_Roman',serif]"

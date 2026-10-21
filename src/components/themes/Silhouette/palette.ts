@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Silhouette's palette: black shapes against a lit sky, depth by fog. The page is near black with fog
 // grey text; each profession's level is lit by its own sky, cold dawn for the System Engineer, an ember
@@ -85,30 +85,7 @@ export const SKY: Record<'dawn' | 'ember' | 'crimson', SkyLight> = {
 }
 
 /** The palette as CSS variables (--sh-black, --sh-dawn-top and so on), set once on the world's root. */
-export const SHADE_VARS = {
-  '--sh-black': SHADE.black,
-  '--sh-void': SHADE.void,
-  '--sh-night': SHADE.night,
-  '--sh-panel': SHADE.panel,
-  '--sh-raised': SHADE.raised,
-  '--sh-edge': SHADE.edge,
-  '--sh-fog': SHADE.fog,
-  '--sh-dim': SHADE.dim,
-  '--sh-muted': SHADE.muted,
-  '--sh-text': SHADE.text,
-  '--sh-heading': SHADE.heading,
-  '--sh-glow': SHADE.glow,
-  '--sh-rim': SHADE.rim,
-  '--sh-dawn-top': SHADE.dawnTop,
-  '--sh-dawn-low': SHADE.dawnLow,
-  '--sh-dawn-fog': SHADE.dawnFog,
-  '--sh-ember-top': SHADE.emberTop,
-  '--sh-ember-low': SHADE.emberLow,
-  '--sh-ember-fog': SHADE.emberFog,
-  '--sh-crimson-top': SHADE.crimsonTop,
-  '--sh-crimson-low': SHADE.crimsonLow,
-  '--sh-crimson-fog': SHADE.crimsonFog,
-} as CSSProperties
+export const SHADE_VARS = paletteVars('sh', SHADE)
 
 // Typewriter type, the title cards of a silhouette game.
 export const TYPEWRITER = "font-['Courier_New',Consolas,monospace]"

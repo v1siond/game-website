@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Tropical Platformer's palette: an island at midday, jungle greens, warm wood, lagoon blues, ripe fruit
 // and sun gold, the saturated colours of 3D tropical platformers. SVG art reads COLORS directly; Tailwind
@@ -57,9 +57,5 @@ export const COLORS = {
 
 export type ColorName = keyof typeof COLORS
 
-const toVarName = (name: string) => `--tp-${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`
-
 // Every colour as --tp-<name> (camelCase becomes kebab case: leafDark is --tp-leaf-dark).
-export const PALETTE_VARS = Object.fromEntries(
-  Object.entries(COLORS).map(([name, value]) => [toVarName(name), value]),
-) as CSSProperties
+export const PALETTE_VARS = paletteVars('tp', COLORS)

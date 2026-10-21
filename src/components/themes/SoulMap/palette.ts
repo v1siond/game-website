@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Soul Map's palette, every colour of the world once: the deep blue caverns of a map exploration game,
 // the cyan glow of the paths between its rooms, the warm lantern of a rest point, and the three zone
@@ -35,8 +35,4 @@ export const SOUL = {
 
 export type SoulColor = keyof typeof SOUL
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
-
-export const SOUL_VARS = Object.fromEntries(
-  Object.entries(SOUL).map(([name, value]) => [`--soul-${kebab(name)}`, value]),
-) as CSSProperties
+export const SOUL_VARS = paletteVars('soul', SOUL)

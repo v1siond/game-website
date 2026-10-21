@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Survival Horror's palette: an old house at night lit by one lamp at a time. Near black shadows, the
 // sepia browns of panelled wood and old paper, olive for the damp, rust for worn metal, a dark red
@@ -33,18 +33,4 @@ export const SH = {
   boot: '#20160f',
 } as const
 
-export const SH_VARS = {
-  '--sh-void': SH.void,
-  '--sh-shadow': SH.shadow,
-  '--sh-panel': SH.panel,
-  '--sh-paper': SH.paper,
-  '--sh-sepia': SH.sepia,
-  '--sh-wood': SH.wood,
-  '--sh-rust': SH.rust,
-  '--sh-brass': SH.brass,
-  '--sh-flame': SH.flame,
-  '--sh-cream': SH.cream,
-  '--sh-ivory': SH.ivory,
-  '--sh-fog': SH.fog,
-  '--sh-ash': SH.ash,
-} as CSSProperties
+export const SH_VARS = paletteVars('sh', SH)

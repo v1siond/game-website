@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Rubber Hose's palette, every colour of the world once: the sepia paper of a 1930s cartoon, its ink
 // line, the faded red and gold of a theatre poster, the film stock round the frame. The SVG art reads
@@ -32,11 +32,4 @@ export const HOSE = {
   filmHole: '#0a0805',
 } as const
 
-type HoseColor = keyof typeof HOSE
-
-// paperSepia becomes --hose-paper-sepia.
-const varName = (key: HoseColor) => `--hose-${key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`
-
-export const HOSE_VARS = Object.fromEntries(
-  (Object.keys(HOSE) as HoseColor[]).map((key) => [varName(key), HOSE[key]]),
-) as CSSProperties
+export const HOSE_VARS = paletteVars('hose', HOSE)

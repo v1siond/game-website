@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Mythic's palette, every colour of the world once: a sunlit Aegean noon over marble temples, the
 // terracotta and black of figure painted pottery, the gold of laurel and bronze, the brazier's flame and
@@ -45,19 +45,4 @@ export const MYTH = {
   aegean: '#0f3d66',
 } as const
 
-export const MYTH_VARS = {
-  '--myth-sky-high': MYTH.skyHigh,
-  '--myth-sky': MYTH.sky,
-  '--myth-sea': MYTH.sea,
-  '--myth-sea-deep': MYTH.seaDeep,
-  '--myth-marble': MYTH.marble,
-  '--myth-marble-shade': MYTH.marbleShade,
-  '--myth-stone': MYTH.stone,
-  '--myth-sand': MYTH.sand,
-  '--myth-ink': MYTH.ink,
-  '--myth-ink-soft': MYTH.inkSoft,
-  '--myth-terracotta': MYTH.terracotta,
-  '--myth-terracotta-deep': MYTH.terracottaDeep,
-  '--myth-gold': MYTH.gold,
-  '--myth-aegean': MYTH.aegean,
-} as CSSProperties
+export const MYTH_VARS = paletteVars('myth', MYTH)

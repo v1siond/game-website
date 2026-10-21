@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import { paletteVars } from '../shared/paletteVars'
 
 // Retro RPG's palette: a 16 bit role playing game at night. The page is a deep night blue; every panel
 // is a dialogue window (a blue gradient inside a white pixel border with a grey inner line), its cursor
@@ -71,30 +71,7 @@ export const RPG = {
 } as const
 
 /** The palette as CSS variables (--rpg-void, --rpg-window-top and so on), set once on the world's root. */
-export const RPG_VARS = {
-  '--rpg-void': RPG.void,
-  '--rpg-night': RPG.night,
-  '--rpg-window-top': RPG.windowTop,
-  '--rpg-window-low': RPG.windowLow,
-  '--rpg-border': RPG.border,
-  '--rpg-border-shade': RPG.borderShade,
-  '--rpg-text': RPG.text,
-  '--rpg-muted': RPG.muted,
-  '--rpg-gold': RPG.gold,
-  '--rpg-green': RPG.green,
-  '--rpg-sky': RPG.sky,
-  '--rpg-day-top': RPG.dayTop,
-  '--rpg-day-low': RPG.dayLow,
-  '--rpg-night-top': RPG.nightTop,
-  '--rpg-night-low': RPG.nightLow,
-  '--rpg-dusk-top': RPG.duskTop,
-  '--rpg-dusk-low': RPG.duskLow,
-  '--rpg-grass': RPG.grass,
-  '--rpg-path': RPG.path,
-  '--rpg-hill': RPG.hill,
-  '--rpg-sand': RPG.sand,
-  '--rpg-sand-edge': RPG.sandEdge,
-} as CSSProperties
+export const RPG_VARS = paletteVars('rpg', RPG)
 
 // Pixel type, the menus of a 16 bit role playing game: the Silkscreen face the root shell loads
 // (RootShell.tsx sets --font-silkscreen), a monospace face until it arrives.
