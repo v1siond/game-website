@@ -10,7 +10,7 @@ const DEFAULT_HISTORY =
   '/home/visiond/projects/insurance_apps/.claude-workspace/game-engine/specs/10-21-cv-site/HISTORY.md'
 const CONTENT_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'content', 'cv')
 
-// Files whose English comes from the history. companies, roles and tech-stack are copies of src/data.
+// Files whose English comes from the history. companies, roles and tech-stack were first copied from the old hand written data files.
 const HISTORY_FILES = ['summary', 'contact', 'experience', 'projects', 'bands', 'martial-arts']
 
 // Keys that hold identifiers or machine values, never prose from the history. Project `details` are
