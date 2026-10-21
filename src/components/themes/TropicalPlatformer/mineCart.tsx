@@ -11,6 +11,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { Band, Musician } from '@/lib/cv/content'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
+import { CaveCeiling } from './scenery'
 import look from './jungle.module.css'
 import cart from './mineCart.module.css'
 
@@ -124,6 +125,7 @@ export function CartRide({ bands, musician }: { bands: Band[]; musician: Musicia
       <p className={`mx-auto mb-8 w-fit rounded-xl px-5 py-2 text-center text-base text-[color:var(--tp-parchment)] ${look.board}`}>{drumsSince(musician, labels.years)}</p>
 
       <div className={`relative mb-10 h-32 overflow-hidden rounded-3xl sm:h-36 ${cart.tunnel}`} style={{ '--n': bands.length } as CSSProperties} aria-hidden="true">
+        <CaveCeiling />
         <Rails stations={bands.length} />
         <div className={`absolute bottom-2 left-0 ${cart.track}`} style={{ '--stop': stop } as CSSProperties} data-riding={riding || undefined}>
           <div key={ride.count} className={`relative mx-auto w-full max-w-[6rem] ${cart.hop}`} style={{ '--hops': Math.max(ride.hops, 1) } as CSSProperties}>
@@ -143,7 +145,7 @@ export function CartRide({ bands, musician }: { bands: Band[]; musician: Musicia
         }}
       />
 
-      <p role="status" className="mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)]">
+      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
         {status}
       </p>
     </div>

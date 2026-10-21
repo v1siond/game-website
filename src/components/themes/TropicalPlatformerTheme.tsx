@@ -11,6 +11,8 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { PALETTE_VARS } from './TropicalPlatformer/palette'
 import { JungleDefs } from './TropicalPlatformer/barrel'
 import { Canopy } from './TropicalPlatformer/canopy'
+import { Backdrop, SceneryDefs } from './TropicalPlatformer/scenery'
+import { HudProvider } from './TropicalPlatformer/hud'
 import { SunsetHero } from './TropicalPlatformer/sunset'
 import { PartnerBarrel } from './TropicalPlatformer/partnerBarrel'
 import { PostsLevel, SECTION_VIEWS } from './TropicalPlatformer/sections'
@@ -24,7 +26,9 @@ const jungleFace = Lilita_One({ weight: '400', subsets: ['latin'], display: 'swa
 // out of his tree house in the sunset (the hero), picks a profession at the partner barrel, crosses the
 // picked profession's levels (./TropicalPlatformer/sections) and ends the run at night by the tree house
 // (contact). The root carries the palette as --tp-* variables, the pointer as --mx and --my for the
-// sunset's planes, and the shared gradients every barrel is drawn with.
+// sunset's planes, the shared gradients every barrel is drawn with and the scenery's shapes every scene
+// is built from. Each part stands in its own scene (the sunset, the dusk, each level's, the night) and
+// the banana counter in the top left counts the levels reached (./TropicalPlatformer/hud).
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
 // scroll container and break the fixed canopy.
@@ -45,14 +49,18 @@ export default function TropicalPlatformerTheme() {
 
   return (
     <div ref={pointer} style={PALETTE_VARS} className={`relative min-h-screen overflow-x-clip ${look.root} ${jungleFace.variable}`}>
+      <HudProvider>
       <JungleDefs />
+      <SceneryDefs />
       <Canopy />
 
-      <header className="relative z-30 px-4 pb-10 pt-10 sm:px-8 sm:pt-16 md:px-20">
+      <header className="relative isolate z-30 px-4 pb-10 pt-10 sm:px-8 sm:pt-16 md:px-20">
+        <Backdrop kind="sunset" placement="band" />
         <SunsetHero />
       </header>
 
-      <section className="relative z-20 px-4 py-12 sm:px-8 md:px-20" aria-label={navigation.professionSelection}>
+      <section className="relative isolate z-20 px-4 py-12 sm:px-8 md:px-20" aria-label={navigation.professionSelection}>
+        <Backdrop kind="dusk" placement="band" />
         <PartnerBarrel />
       </section>
 
@@ -64,6 +72,8 @@ export default function TropicalPlatformerTheme() {
       </main>
 
       <TreehouseContact />
+
+      </HudProvider>
 
       <footer className="relative z-20 bg-[color:var(--tp-night-deep)] py-10 text-center">
         <p className="text-sm text-[color:var(--tp-plank-light)]">

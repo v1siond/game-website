@@ -10,12 +10,15 @@ import { BarrelArt, MuzzleBurst } from './barrel'
 import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
+import { ToneScope } from './scenery'
 import look from './jungle.module.css'
+import scenery from './scenery.module.css'
 import sunset from './sunset.module.css'
 
-// The recruiter first screen as the opening of the level: a sunset drawn in five planes, the sky and the
-// sun at the back, then a hazy ridge, the palms, his tree house on stilts and the near fronds, every
-// plane but the sky a black shape against the light. The tree house barrel shakes, recoils with a white
+// The recruiter first screen as the opening of the level: a sunset drawn in five planes, the stepped sky
+// and the sun at the back, then the banded treeline in haze, the palms, his tree house on stilts and the
+// near fronds, every plane but the sky a black shape against the light with its sunward edges lit
+// (the scenery's shapes in the sunset tone). The tree house barrel shakes, recoils with a white
 // flash and blasts him out in an arc; he flies rolled into a spinning ball, lands with a squash in silhouette
 // (only his clothes keep their colour), hoists a barrel and throws it off the scene, then his name drops onto the plank letter by letter and the headline
 // and the actions rise beside it.
@@ -31,69 +34,72 @@ import sunset from './sunset.module.css'
 // frame at every width.
 const VIEW = '0 0 400 300'
 
+// The sky in the flat steps the source's sunsets are painted in, the sun swelling behind streaks of
+// cloud, and birds.
+const SKY_STEPS = [0, 24, 48, 72, 96, 120, 144, 168, 192, 216]
+const CLOUD_STREAKS: ReadonlyArray<readonly [number, number, number]> = [
+  // x, y, width
+  [170, 168, 150],
+  [210, 182, 120],
+  [150, 214, 190],
+]
+
 function Sky() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <rect width="400" height="300" fill="url(#tp-sky)" />
+      {SKY_STEPS.map((y) => (
+        <rect key={y} y={y + 12} width="400" height="12" fill={C.shadow} opacity="0.07" />
+      ))}
       <g className={sunset.sun}>
         <circle cx="255" cy="196" r="130" fill="url(#tp-sun)" />
         <circle cx="255" cy="196" r="44" fill={C.sunCore} />
       </g>
+      {CLOUD_STREAKS.map(([x, y, width]) => (
+        <rect key={y} x={x} y={y} width={width} height="5" rx="2.5" fill={C.dusk} opacity="0.55" />
+      ))}
       <path d="M60 70 q6 -5 12 0 q6 -5 12 0 M96 52 q4 -4 8 0 q4 -4 8 0 M318 64 q5 -4 10 0 q5 -4 10 0" fill="none" stroke={C.shadowSoft} strokeWidth="2" />
     </svg>
   )
 }
 
+// The far jungle: the banded treeline in the dusk's purple haze over a low ridge.
 function Ridge() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-      <path d="M-30 236 Q30 196 90 214 T200 202 T300 222 T430 196 V300 H-30 Z" fill={C.dusk} />
+      <use href="#tp-treeline" transform="translate(-20 178) scale(1.1 0.9)" />
       <path d="M-30 250 Q60 228 140 240 T300 236 T430 230 V300 H-30 Z" fill={C.duskDeep} />
     </svg>
   )
 }
 
-// A palm: a bent trunk and a crown of drooping fronds, all one shape.
-function Palm({ x, lean, height }: { x: number; lean: number; height: number }) {
-  const top = 262 - height
-  const crownX = x + lean
-  return (
-    <g>
-      <path d={`M${x} 264 Q${x + lean * 0.2} ${top + height * 0.4} ${crownX} ${top}`} fill="none" stroke={C.shadowSoft} strokeWidth="7" strokeLinecap="round" />
-      {[-150, -110, -60, -20, 25].map((angle) => (
-        <path
-          key={angle}
-          d={`M${crownX} ${top} q22 -14 46 6 q-22 -6 -46 4 Z`}
-          fill={C.shadowSoft}
-          transform={`rotate(${angle} ${crownX} ${top})`}
-        />
-      ))}
-    </g>
-  )
-}
-
+// The palms, black against the light with the sun catching their edges; the one furthest off in haze.
 function Palms() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-      <Palm x={318} lean={-24} height={150} />
-      <Palm x={360} lean={18} height={118} />
-      <Palm x={200} lean={14} height={96} />
+      <use href="#tp-palm" transform="translate(200 262) rotate(5) scale(0.55)" className={scenery.haze} />
+      <use href="#tp-palm" transform="translate(318 266) rotate(-9) scale(0.86)" />
+      <use href="#tp-palm" transform="translate(362 266) rotate(7) scale(0.68)" />
       <path d="M-30 262 Q100 250 200 258 T430 254 V300 H-30 Z" fill={C.shadowSoft} />
     </svg>
   )
 }
 
-// His tree house on four stilts, a thatched roof, the doorway and the ladder; the barrel cannon stands on
-// the platform's edge (drawn in the HTML layer above, so it can be a button).
+// His tree house on four stilts: a plank wall, a thatched roof, the doorway and the ladder, every edge
+// that faces the sun lit; the barrel cannon stands on the platform's edge (drawn in the HTML layer above,
+// so it can be a button).
 function TreeHouse() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <path d="M30 160 Q24 220 34 300 H52 Q44 220 48 160 Z M118 160 Q124 220 116 300 H98 Q106 220 104 160 Z" fill={C.shadow} />
       <rect x="18" y="150" width="122" height="12" rx="3" fill={C.shadow} />
       <path d="M34 150 V104 H118 V150 Z" fill={C.shadow} />
+      <path d="M38 114 H114 M38 126 H114 M38 138 H114" stroke={C.shadowSoft} strokeWidth="2" />
       <path d="M22 108 L76 66 L132 108 Z" fill={C.shadow} />
+      <path d="M40 98 L50 90 M56 86 L64 80 M88 80 L96 86 M104 90 L114 98" stroke={C.shadowSoft} strokeWidth="2" />
       <path d="M26 108 l-6 8 M44 108 l-4 9 M62 108 l-3 9 M90 108 l3 9 M108 108 l4 9 M126 108 l6 8" stroke={C.shadow} strokeWidth="3" />
       <path d="M62 150 V120 Q62 112 70 112 H80 Q88 112 88 120 V150 Z" fill={C.dusk} opacity="0.55" />
+      <path d="M76 66 L132 108 M118 104 V150 M18 150 H140 M118 160 Q124 220 116 300" fill="none" stroke={C.sunsetOrange} strokeWidth="1.6" opacity="0.6" />
       <path d="M130 162 L144 300 M150 162 L164 300" stroke={C.shadow} strokeWidth="3" />
       {[180, 200, 220, 240, 260, 280].map((y) => (
         <path key={y} d={`M${132 + (y - 162) * 0.1} ${y} H${152 + (y - 162) * 0.1}`} stroke={C.shadow} strokeWidth="3" />
@@ -102,13 +108,18 @@ function TreeHouse() {
   )
 }
 
+// The leaves right in front, out of the light: fronds and round leaves in the corners, a fern tuft,
+// fronds hanging into the top corners.
 function NearFronds() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-      <path d="M-10 300 Q30 250 90 262 Q60 270 40 300 Z M-10 300 Q10 230 60 214 Q30 250 24 300 Z" fill={C.shadow} />
-      <path d="M410 300 Q360 240 300 256 Q340 266 356 300 Z M410 300 Q396 226 346 206 Q378 248 380 300 Z" fill={C.shadow} />
-      <path d="M150 300 l6 -18 l4 18 M240 300 l5 -14 l5 14 M268 300 l3 -10 l4 10" fill={C.shadow} />
-      <path d="M-10 0 Q40 20 70 0 Z M410 0 Q350 26 330 0 Z" fill={C.shadow} />
+      <use href="#tp-frond" transform="translate(-10 300) rotate(-40) scale(1.1)" />
+      <use href="#tp-broad" transform="translate(34 286) rotate(10) scale(0.9)" />
+      <use href="#tp-frond" transform="translate(410 300) scale(-1 1) rotate(-40)" />
+      <use href="#tp-broad" transform="translate(378 290) rotate(-12) scale(0.7)" />
+      <use href="#tp-fern" transform="translate(210 300) scale(0.45)" />
+      <use href="#tp-frond" transform="translate(-10 -4) rotate(24) scale(0.85)" />
+      <use href="#tp-frond" transform="translate(410 -4) scale(-1 1) rotate(28) scale(0.75)" />
     </svg>
   )
 }
@@ -118,6 +129,7 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
 
   return (
     <div className={`relative aspect-[4/3] w-full overflow-hidden rounded-[2rem] border-4 border-[color:var(--tp-bark-dark)] ${sunset.frame}`}>
+      <ToneScope tone="sunset" className="absolute inset-0">
       <Sky />
       <div className={`absolute inset-0 ${sunset.far}`}>
         <Ridge />
@@ -152,6 +164,7 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
       <div className={`pointer-events-none absolute inset-0 ${sunset.near}`}>
         <NearFronds />
       </div>
+      </ToneScope>
     </div>
   )
 }
@@ -195,7 +208,7 @@ export function SunsetHero() {
             <h1 className={`inline-block rounded-2xl px-6 pb-4 pt-6 text-[clamp(1.5rem,7.5vw,3rem)] uppercase text-[color:var(--tp-sun-gold)] md:text-[clamp(1.75rem,3.75vw,3rem)] ${look.board} ${look.display} ${look.outlined} ${sunset.plank}`}>
               <PlankName name={name} />
             </h1>
-            <div className={sunset.after}>
+            <div className={`mt-6 rounded-3xl px-5 pb-6 pt-1 ${look.board} ${sunset.after}`}>
               <p className={`mt-5 text-xl text-[color:var(--tp-parchment)] ${look.display}`}>{headline}</p>
               <p className="mt-2 text-base italic text-[color:var(--tp-sun-gold)]">{tagline}</p>
               <p className="mt-2 text-base text-[color:var(--tp-parchment)]">{line}</p>

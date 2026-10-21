@@ -1,0 +1,108 @@
+/*
+ * The jungle scenery (scenery.tsx). Every shape is drawn once in the defs and paints itself from three
+ * leaf shades, a rim light and the far haze; the scene it is used in sets those from its tone (the
+ * --tone-* variables of palette.ts). Custom properties inherit into <use> copies, so one palm is a day
+ * palm, a dusk palm, a backlit black palm or a teal night palm by where it stands.
+ *
+ * The planes: .back darkens a frond that sits behind the others, .haze turns a shape into the far, misty
+ * layer. Nothing here moves.
+ */
+
+.scene {
+  --leaf-a: var(--tone-leaf-lit);
+  --leaf-b: var(--tone-leaf);
+  --leaf-c: var(--tone-leaf-shade);
+  --rim: var(--tone-rim);
+}
+
+/* One step darker than whatever plane it sits in (a back frond of a hazy palm stays hazy): each shade
+   takes the next darker one it inherited. No cycle: --leaf-c is not redefined here. */
+.back {
+  --leaf-a: var(--leaf-b);
+  --leaf-b: var(--leaf-c);
+}
+
+.haze {
+  --leaf-a: var(--tone-far-lit);
+  --leaf-b: var(--tone-far);
+  --leaf-c: var(--tone-far);
+  --rim: var(--tone-far-lit);
+}
+
+.leafLit {
+  fill: var(--leaf-a);
+}
+
+.leaf {
+  fill: var(--leaf-b);
+}
+
+.leafShade {
+  fill: var(--leaf-c);
+}
+
+.rim {
+  fill: none;
+  stroke: var(--rim);
+  stroke-linecap: round;
+}
+
+.rib {
+  fill: none;
+  stroke: var(--leaf-c);
+  stroke-linecap: round;
+}
+
+.vine {
+  fill: none;
+  stroke: var(--leaf-b);
+  stroke-linecap: round;
+}
+
+.far {
+  fill: var(--tone-far);
+}
+
+.farLit {
+  fill: var(--tone-far-lit);
+}
+
+.trunk {
+  fill: var(--tone-trunk);
+}
+
+.bloom {
+  fill: var(--tone-bloom);
+}
+
+.fold {
+  fill: var(--leaf-c);
+  opacity: 0.45;
+}
+
+.deck {
+  fill: var(--tp-plank);
+}
+
+.deckEdge {
+  fill: var(--tp-bark);
+}
+
+.rope {
+  fill: none;
+  stroke: var(--tp-plank-light);
+}
+
+.lamp {
+  fill: var(--tp-lamp);
+}
+
+/* The sky behind the treeline: the tone's high colour fading to its horizon, then to nothing. */
+.sky {
+  background: linear-gradient(180deg, var(--tone-sky-high), var(--tone-sky-low) 62%, transparent);
+}
+
+/* A section's backdrop fades in and out at its ends, so one level's jungle runs into the next. */
+.fade {
+  mask-image: linear-gradient(180deg, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+}

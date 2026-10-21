@@ -9,18 +9,16 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { JungleAction, JungleCVLink } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
+import { Backdrop, NightFront, NightSky, ToneScope } from './scenery'
 import look from './jungle.module.css'
 import night from './nightfall.module.css'
 
-// Contact at the end of the level, where the source's levels end: night. The moon is up over his tree
-// house, the window lights, fireflies drift; he rolls in along the ground as a spinning ball and pops up
+// Contact at the end of the level, where the source's levels end: night, in the teal the source tints
+// its night jungle with, the same jungle round the section. The moon is up over his tree house, the
+// window lights, fireflies drift; he rolls in along the ground as a spinning ball and pops up
 // by the ladder, chest pounding, and the contact sign drops on two vines and swings to rest. Pointing at
 // the sign rocks it. Pattern: CSS off one trigger (data-on), the roll 0 to 0.9 s, the window at 0.6 s,
 // the sign from 1 s.
-
-const STARS: ReadonlyArray<readonly [number, number]> = [
-  [20, 18], [60, 40], [110, 14], [150, 52], [200, 24], [240, 60], [280, 20], [330, 44], [370, 16], [90, 70], [300, 84],
-]
 
 // The four fireflies: where each drifts from and its delay.
 const FIREFLIES = [
@@ -30,25 +28,31 @@ const FIREFLIES = [
   { left: '86%', top: '30%', delay: '1.7s' },
 ]
 
+// The tree house in teal moonlight, the way the source tints its night levels: the night sky and palms
+// behind, the house on its stilts with a plank wall, a thatched roof and the lamp in the window, the
+// ladder, and the night's leaves in the corners.
 function NightHouse() {
   return (
     <svg viewBox="0 0 400 260" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
-      {STARS.map(([x, y]) => (
-        <circle key={`${x}-${y}`} cx={x} cy={y} r="1.6" fill={C.moon} opacity="0.75" />
-      ))}
-      <circle cx="320" cy="56" r="26" fill={C.moon} />
-      <circle cx="310" cy="50" r="5" fill={C.nightSky} opacity="0.15" />
+      <NightSky />
       <path d="M-10 220 Q80 196 160 210 T420 200 V260 H-10 Z" fill={C.jungleDeep} />
       <path d="M44 132 Q40 190 48 260 H62 Q56 190 60 132 Z M122 132 Q126 190 118 260 H104 Q110 190 108 132 Z" fill={C.shadow} />
       <rect x="32" y="124" width="104" height="10" rx="3" fill={C.shadow} />
       <path d="M46 124 V84 H122 V124 Z" fill={C.shadow} />
+      <path d="M50 92 H118 M50 102 H118 M50 112 H118" stroke={C.nightSky} strokeWidth="1.5" opacity="0.8" />
       <path d="M36 88 L84 50 L134 88 Z" fill={C.shadow} />
+      <path d="M44 82 l-4 9 M58 76 l-3 12 M72 66 l-2 12 M96 66 l2 12 M110 76 l3 12 M124 82 l4 9" stroke={C.shadow} strokeWidth="3" />
+      <path d="M84 50 L134 88 M122 84 V124 M108 132 Q110 190 104 260" fill="none" stroke={C.moon} strokeWidth="1.4" opacity="0.35" />
+      <g opacity="0.14">
+        <circle cx="83" cy="106" r="24" fill={C.lamp} className={night.window} />
+      </g>
       <rect x="70" y="96" width="26" height="20" rx="3" fill={C.lamp} className={night.window} />
       <path d="M83 96 V116 M70 106 H96" stroke={C.shadow} strokeWidth="2.5" className={night.window} />
       <path d="M140 134 L152 260 M158 134 L170 260" stroke={C.shadow} strokeWidth="3" />
       {[156, 176, 196, 216, 236].map((y) => (
         <path key={y} d={`M${141 + (y - 134) * 0.095} ${y} H${159 + (y - 134) * 0.095}`} stroke={C.shadow} strokeWidth="3" />
       ))}
+      <NightFront />
     </svg>
   )
 }
@@ -61,9 +65,12 @@ export function TreehouseContact() {
 
   return (
     <section ref={ref} data-on={triggered || undefined} aria-labelledby={id} className={`relative z-20 px-4 pb-10 pt-16 ${night.contact}`}>
+      <Backdrop kind="night" placement="band" />
       <div className="mx-auto grid max-w-6xl items-end gap-8 md:grid-cols-2">
         <div className={`relative h-72 overflow-hidden rounded-[2rem] border-4 border-[color:var(--tp-bark-dark)] sm:h-80 ${night.scene}`}>
-          <NightHouse />
+          <ToneScope tone="night" className="absolute inset-0">
+            <NightHouse />
+          </ToneScope>
           {FIREFLIES.map((fly) => (
             <span
               key={fly.left}

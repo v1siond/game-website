@@ -180,7 +180,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={run.run}>
-      <p className="mb-8 text-center text-base text-[color:var(--tp-parchment)]">{labels.jungle.cannonHint}</p>
+      <p className={`mb-8 text-center text-base text-[color:var(--tp-parchment)] ${look.caption}`}>{labels.jungle.cannonHint}</p>
       <div ref={stage} className="relative">
         <ul className={MASONRY_LIST}>
           {jobs.map((entry, index) => (
@@ -212,7 +212,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
           </div>
         )}
       </div>
-      <p role="status" className="mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)]">
+      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
         {status}
       </p>
     </div>

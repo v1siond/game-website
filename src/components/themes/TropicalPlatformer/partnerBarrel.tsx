@@ -9,6 +9,7 @@ import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
 import { BarrelArt } from './barrel'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
+import { DuskStage } from './scenery'
 import look from './jungle.module.css'
 import partner from './partnerBarrel.module.css'
 
@@ -71,6 +72,7 @@ function BarrelStage() {
 
   return (
     <div className={`relative h-72 overflow-hidden rounded-[2rem] border-4 border-[color:var(--tp-bark-dark)] sm:h-80 ${partner.stage}`} aria-hidden="true">
+      <DuskStage />
       <div className={`absolute inset-x-0 bottom-0 h-12 ${partner.ledge}`} />
 
       {cast.leaving && (

@@ -37,11 +37,41 @@
   }
 }
 
+.bunch {
+  transform-origin: 50% 50%;
+}
+
+/* The bunch by the sign is collected once the level is in: it jumps and fades (0.45 s, after the sign
+   has landed). */
+.level[data-on] .bunch {
+  animation: bunch-collect 0.45s ease-in 0.9s forwards;
+}
+
+@keyframes bunch-collect {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(0, -120%, 0) scale(1.25);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -260%, 0) scale(0.6);
+  }
+}
+
 .post {
   background: linear-gradient(90deg, var(--tp-bark-dark), var(--tp-bark) 50%, var(--tp-bark-dark));
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .level[data-on] .bunch {
+    animation: none;
+    opacity: 0;
+  }
+
   .sign,
   .level[data-on] .sign {
     opacity: 1;

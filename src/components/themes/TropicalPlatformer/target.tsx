@@ -147,11 +147,11 @@ export function TargetRecord({ martialArts }: { martialArts: MartialArts }) {
       />
       <div className="flex flex-col items-center gap-4">
         <TargetRig achievements={achievements} won={won} phase={phase} />
-        <p className="text-center text-base text-[color:var(--tp-parchment)]">{jungle.jumpHint}</p>
+        <p className={`text-center text-base text-[color:var(--tp-parchment)] ${look.caption}`}>{jungle.jumpHint}</p>
         <button type="button" onClick={jump} className={`min-h-[44px] rounded-xl px-6 text-base ${look.button} ${look.buttonGold} ${look.focus}`}>
           {all ? jungle.jumpAgain : jungle.jump}
         </button>
-        <p role="status" className="min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)]">
+        <p role="status" className={`min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
           {status}
         </p>
       </div>

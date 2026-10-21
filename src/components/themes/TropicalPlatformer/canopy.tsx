@@ -1,15 +1,26 @@
-import { COLORS as C } from './palette'
+import { ToneScope } from './scenery'
+import paint from './scenery.module.css'
 
-// The jungle round the page: dark canopy silhouettes hanging down both edges, fixed while the page
-// scrolls, from md up (on a phone they would cover the cards). Still, decoration only.
+// The jungle round the page: fronds hanging down both edges in the shade under the canopy, fixed while
+// the page scrolls, from md up (on a phone they would cover the cards). Still, decoration only. The
+// fronds are the scenery's own shape, darkened as a back layer.
+
+const HANGING: ReadonlyArray<readonly [number, number, number]> = [
+  // y, angle, scale
+  [40, 70, 0.7],
+  [190, 96, 0.6],
+  [330, 64, 0.75],
+  [480, 100, 0.55],
+  [620, 72, 0.7],
+  [770, 92, 0.6],
+]
 
 function Fronds({ flip }: { flip: boolean }) {
   return (
-    <svg viewBox="0 0 80 800" preserveAspectRatio="none" className={`h-full w-full ${flip ? '-scale-x-100' : ''}`} aria-hidden="true" focusable="false">
-      <path d="M0 0 H50 Q30 60 40 120 Q20 200 34 280 Q14 360 30 440 Q10 540 26 640 Q8 720 18 800 H0 Z" fill={C.jungleDeep} />
-      <path d="M0 0 H26 Q12 90 20 180 Q6 300 16 420 Q4 560 12 800 H0 Z" fill={C.shadow} opacity="0.8" />
-      {[90, 230, 380, 520, 660].map((y) => (
-        <path key={y} d={`M24 ${y} q30 -10 46 12 q-24 -2 -46 -12 Z`} fill={C.moss} opacity="0.7" />
+    <svg viewBox="0 0 80 800" preserveAspectRatio="xMinYMid slice" className={`h-full w-full ${flip ? '-scale-x-100' : ''}`} aria-hidden="true" focusable="false">
+      <path d="M0 0 H22 Q10 200 18 400 Q8 600 16 800 H0 Z" className={paint.leafShade} />
+      {HANGING.map(([y, angle, scale]) => (
+        <use key={y} href="#tp-frond" transform={`translate(4 ${y}) rotate(${angle}) scale(${scale})`} className={paint.back} />
       ))}
     </svg>
   )
@@ -17,13 +28,13 @@ function Fronds({ flip }: { flip: boolean }) {
 
 export function Canopy() {
   return (
-    <div className="pointer-events-none fixed inset-y-0 left-0 right-0 z-[5] hidden md:block" aria-hidden="true">
-      <div className="absolute inset-y-0 left-0 w-12 lg:w-16">
+    <ToneScope tone="jungle" className="pointer-events-none fixed inset-y-0 left-0 right-0 z-[5] hidden md:block">
+      <div className="absolute inset-y-0 left-0 w-12 lg:w-16" aria-hidden="true">
         <Fronds flip={false} />
       </div>
-      <div className="absolute inset-y-0 right-0 w-12 lg:w-16">
+      <div className="absolute inset-y-0 right-0 w-12 lg:w-16" aria-hidden="true">
         <Fronds flip />
       </div>
-    </div>
+    </ToneScope>
   )
 }

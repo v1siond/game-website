@@ -12,10 +12,12 @@
     linear-gradient(180deg, var(--tp-dusk) 0%, var(--tp-dusk-deep) 45%, var(--tp-jungle-deep) 100%);
 }
 
+/* The ledge is the source's jungle path: a grass lip over speckled sandy dirt, shaded towards the front. */
 .ledge {
   background:
-    linear-gradient(180deg, var(--tp-fern) 0 0.4rem, var(--tp-moss) 0.4rem 0.75rem, transparent 0.75rem),
-    linear-gradient(180deg, var(--tp-bark) 0%, var(--tp-bark-dark) 100%);
+    linear-gradient(180deg, var(--tp-fern) 0 0.35rem, var(--tp-moss) 0.35rem 0.6rem, transparent 0.6rem),
+    var(--tp-grain),
+    linear-gradient(180deg, var(--tp-dirt) 0.6rem, var(--tp-dirt-dark) 100%);
 }
 
 .band {

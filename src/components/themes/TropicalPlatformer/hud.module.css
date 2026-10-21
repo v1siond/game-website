@@ -1,0 +1,79 @@
+/*
+ * The banana counter (hud.tsx). Each new count remounts the row: it drops in from above the corner with
+ * a bounce and the numerals pop. Below md the row then rolls back up out of view after 2.4 s; from md up
+ * it stays. Transform and opacity only. Reduced motion: no roll, shown from md up only.
+ */
+
+.count {
+  display: inline-block;
+  min-width: 1.5ch;
+  font-variant-numeric: tabular-nums;
+}
+
+.roll {
+  animation: counter-flash 3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.roll .count {
+  animation: count-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+}
+
+@keyframes counter-flash {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -150%, 0);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -150%, 0);
+  }
+}
+
+@keyframes count-pop {
+  0% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (min-width: 768px) {
+  .roll {
+    animation-name: counter-drop;
+    animation-duration: 0.5s;
+  }
+}
+
+@keyframes counter-drop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -150%, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .counter {
+    display: none;
+  }
+
+  .roll,
+  .roll .count {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (min-width: 768px) {
+  .counter {
+    display: block;
+  }
+}
