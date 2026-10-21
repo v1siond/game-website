@@ -13,6 +13,7 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
@@ -930,30 +931,6 @@ const WaystationNode = memo(function WaystationNode({
   )
 })
 
-// Abstract profession icons (not character silhouettes)
-const GearIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12,8 L14,4 L10,4 Z M12,16 L14,20 L10,20 Z M8,12 L4,14 L4,10 Z M16,12 L20,14 L20,10 Z" />
-    <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.5" />
-    <circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.5" />
-  </svg>
-)
-
-const WaveIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <path d="M4,12 Q7,8 10,12 Q13,16 16,12 Q19,8 22,12" strokeLinecap="round" />
-    <path d="M4,16 Q7,12 10,16 Q13,20 16,16 Q19,12 22,16" strokeLinecap="round" opacity="0.5" />
-  </svg>
-)
-
-const DiamondIcon = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12,2 L22,12 L12,22 L2,12 Z" fill="none" stroke="currentColor" strokeWidth="2" />
-    <path d="M12,6 L18,12 L12,18 L6,12 Z" opacity="0.3" />
-    <circle cx="12" cy="12" r="2" />
-  </svg>
-)
-
 const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; sublabel: string; color: string }> = {
   drummer: { icon: <WaveIcon />, sublabel: 'Drums', color: DF.lavender },
   engineer: { icon: <GearIcon />, sublabel: 'Software', color: DF.ethereal },
@@ -1623,9 +1600,7 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
   )
 })
 
-// Profession sections. Each animated section gets its own trigger based on ACTUAL element position.
-const SECTION_TRIGGER = { threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
-
+// Profession sections. Each animated section gets its own useSectionTrigger, from its real position.
 const DF_BUTTON =
   'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0a1a]'
 
@@ -1661,7 +1636,7 @@ function FramedSection({ title, delay, children }: { title: string; delay?: numb
 
 // Knight Slash Reveal: the knight cuts in and the frame slides from the right.
 function SlashRevealSection({ title, children }: { title: string; children: React.ReactNode }) {
-  const trigger = useSectionTrigger(SECTION_TRIGGER)
+  const trigger = useSectionTrigger()
 
   return (
     <div ref={trigger.ref}>
@@ -1678,7 +1653,7 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
 
 function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
-  const projectsTrigger = useSectionTrigger(SECTION_TRIGGER)
+  const projectsTrigger = useSectionTrigger()
   const { jobs, techStack, projects, companies } = sections
 
   return (
