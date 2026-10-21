@@ -1,13 +1,20 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import type { Profession } from '@/lib/cv/professions'
+import { Actor, useCourse } from './actor'
 import { cssVars } from './art'
-import { PAPER_CARD, Region } from './region'
+import { BigSwitch } from './blocks'
+import type { Course } from './course'
+import { PAPER_CARD, Playfield, Region } from './region'
+import { Pipe, type Zone } from './world'
+import side from './side.module.css'
 import { JOURNAL_SERIF, TRAIL } from './palette'
 import map from './map.module.css'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -18,6 +25,11 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 // switch's colour, and opens the message box from its centre with the project's details, the way the
 // palace explains what the switch did. A project with more than one link has a red tile: its extra links
 // are its secret exits.
+//
+// Above the palaces is the stretch he crosses (research images 04, 12, 20): he runs in, jumps onto the
+// big switch and stomps it flat, which fills every palace's blocks at once, then hops onto the pipe at
+// the end and sinks down it, out of sight, toward the underground room of the next section. The big
+// switch is also a button that fills or empties every palace's blocks.
 
 interface SwitchColour {
   fill: string
@@ -49,6 +61,31 @@ function SwitchBlock({ colour }: { colour: SwitchColour }) {
       </g>
     </svg>
   )
+}
+
+type SwitchPose = 'run' | 'jump' | 'stomp' | 'hop' | 'sink' | 'gone'
+
+const COURSE: Course<SwitchPose> = {
+  start: { x: -20, lift: 0 },
+  legs: [
+    { pose: 'run', frame: 'run', path: 'line', to: { x: 30, lift: 0 }, ms: 560 },
+    { pose: 'jump', frame: 'jump', path: 'arc', to: { x: 44, lift: 40 }, ms: 380, peak: 44 },
+    { pose: 'stomp', frame: 'stomp', path: 'line', to: { x: 44, lift: 16 }, ms: 160, ease: 'ease-in' },
+    { pose: 'hop', frame: 'jump', path: 'arc', to: { x: 80, lift: 52 }, ms: 460, peak: 40 },
+    { pose: 'sink', frame: 'stand', path: 'line', to: { x: 80, lift: -90 }, ms: 700, ease: 'ease-in' },
+  ],
+  rest: { pose: 'gone', frame: 'stand' },
+}
+
+function PipeScene({ profession, onStomp }: { profession: Profession; onStomp: () => void }) {
+  const course = useCourse(COURSE)
+  const stomped = course.past('jump')
+
+  useEffect(() => {
+    if (stomped) onStomp()
+  }, [stomped, onStomp])
+
+  return <Actor motion={course.motion} profession={profession} onAnimationEnd={course.onOwnAnimationEnd} />
 }
 
 function TechBlocks({ items, colour, pressed, label }: { items: string[]; colour: SwitchColour; pressed: boolean; label: string }) {
@@ -85,7 +122,7 @@ function MessageBox({ project, id }: { project: Project; id: string }) {
   )
 }
 
-function SwitchPalace({ slot, colour }: { slot: ProjectSlot; colour: SwitchColour }) {
+function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: SwitchColour; filled: boolean }) {
   const { project, years, links } = slot
   const { cards, trail } = useLabels()
   const [pressed, setPressed] = useState(false)
@@ -114,7 +151,7 @@ function SwitchPalace({ slot, colour }: { slot: ProjectSlot; colour: SwitchColou
       </div>
       <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
       {project.impact && <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">{project.impact}</p>}
-      <TechBlocks items={project.techStack} colour={colour} pressed={pressed} label={cards.technologiesUsed} />
+      <TechBlocks items={project.techStack} colour={colour} pressed={pressed || filled} label={cards.technologiesUsed} />
       {pressed && <MessageBox project={project} id={boxId} />}
       {main && (
         <div className="mt-4 flex flex-wrap gap-2">
@@ -134,17 +171,35 @@ function SwitchPalace({ slot, colour }: { slot: ProjectSlot; colour: SwitchColou
   )
 }
 
-export function SwitchPalaces({ projects }: { projects: Project[] }) {
+export function SwitchPalaces({ projects, profession }: { projects: Project[]; profession: Profession }) {
   const { sections, trail } = useLabels()
+  const { ref, on } = useZoneStage<Zone>('plains')
+  const [filled, setFilled] = useState(false)
+  const fill = useCallback(() => setFilled(true), [])
   const colourOf = (project: Project) => SWITCH_COLOURS[projects.indexOf(project) % SWITCH_COLOURS.length]
 
   return (
-    <Region title={sections.projects} hint={trail.switchHint}>
+    <Region title={sections.projects} hint={trail.switchHint} stageRef={ref} on={on}>
+      <Playfield>
+        <button
+          type="button"
+          aria-pressed={filled}
+          aria-label={trail.pressBigSwitch}
+          onClick={() => setFilled((now) => !now)}
+          className={`${side.bigSwitch} rounded-sm`}
+        >
+          <BigSwitch />
+        </button>
+        <div className={side.pipe} aria-hidden="true">
+          <Pipe className="h-full w-full" />
+        </div>
+        {on && <PipeScene profession={profession} onStomp={fill} />}
+      </Playfield>
       <ProjectList
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => <SwitchPalace slot={slot} colour={colourOf(slot.project)} />}
+        renderProject={(slot) => <SwitchPalace slot={slot} colour={colourOf(slot.project)} filled={filled} />}
       />
     </Region>
   )

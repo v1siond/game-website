@@ -59,14 +59,6 @@ export function MapDefs() {
           <stop offset="0.6" stopColor={TRAIL.ROUTE} />
           <stop offset="1" stopColor="#6e1f12" />
         </radialGradient>
-        <radialGradient id="ap-night-sky" cx="0.5" cy="0.2" r="0.9">
-          <stop offset="0" stopColor="#2c4a5e" />
-          <stop offset="1" stopColor={TRAIL.NIGHT} />
-        </radialGradient>
-        <radialGradient id="ap-glow" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor={TRAIL.LANTERN} stopOpacity={0.9} />
-          <stop offset="1" stopColor={TRAIL.LANTERN} stopOpacity={0} />
-        </radialGradient>
         <pattern id="ap-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
           <rect width="6" height="6" fill="none" />
           <path d="M0 0 V6" stroke={TRAIL.INK_SOFT} strokeWidth={0.7} opacity={0.35} />
@@ -209,16 +201,6 @@ export function Cloud({ x, y, s, i, depth }: { x: number; y: number; s: number; 
           <path d="M-30 12 H34" stroke={TRAIL.EDGE} strokeWidth={3} strokeLinecap="round" />
         </g>
       </g>
-    </g>
-  )
-}
-
-/** The pennant planted on a cleared stop. */
-export function Pennant({ x, y, className }: { x: number; y: number; className?: string }) {
-  return (
-    <g className={className}>
-      <rect x={x - 1} y={y - 26} width={2.4} height={26} fill={TRAIL.BARK} />
-      <path d={`M${x + 1.4} ${y - 25} L${x + 15} ${y - 20} L${x + 1.4} ${y - 15} Z`} fill={TRAIL.ROUTE} stroke={TRAIL.INK} strokeWidth={1} />
     </g>
   )
 }

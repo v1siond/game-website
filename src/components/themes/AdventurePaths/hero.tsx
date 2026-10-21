@@ -356,7 +356,7 @@ export function ExpeditionHero({ name }: { name: string }) {
             </div>
           </div>
         </div>
-        <p className="mt-3 text-center text-sm text-[color:var(--ap-edge)]">{trail.walkHint}</p>
+        <p className="mx-auto mt-3 w-fit rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-center text-sm text-white">{trail.walkHint}</p>
       </section>
     </div>
   )

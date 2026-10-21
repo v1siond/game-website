@@ -463,22 +463,25 @@ collections:
                   - { <<: *text, label: "Walk hint", name: walkHint }
                   - { <<: *text, label: "Standing at", name: standingAt, hint: 'Keep {place}' }
                   - { <<: *text, label: "Stop", name: stopOf, hint: 'Keep {n} {place}' }
-                  - { <<: *text, label: "Walk to", name: walkTo, hint: 'Keep {place}' }
                   - { <<: *text, label: "Cleared", name: cleared }
-                  - { <<: *text, label: "Exits", name: exits }
                   - { <<: *text, label: "Secret exit", name: secretExit }
                   - { <<: *text, label: "Press the switch", name: pressSwitch, hint: 'Keep {name}' }
                   - { <<: *text, label: "Switch hint", name: switchHint }
-                  - { <<: *text, label: "Star road", name: starRoad }
-                  - { <<: *text, label: "Star of", name: starOf, hint: 'Keep {name}' }
                   - { <<: *text, label: "Fortress cleared", name: fortressCleared }
                   - { <<: *text, label: "Goal", name: goal }
                   - { <<: *text, label: "Trail cleared", name: trailCleared }
-                  - { <<: *text, label: "Reserve box", name: reserveBox }
                   - { <<: *text, label: "Job hint", name: jobHint }
                   - { <<: *text, label: "Band hint", name: bandHint }
                   - { <<: *text, label: "Fortress hint", name: fortressHint }
-                  - { <<: *text, label: "Break the tape", name: breakTape }
+                  - { <<: *text, label: "Block hint", name: blockHint }
+                  - { <<: *text, label: "Hit the block", name: hitBlock }
+                  - { <<: *text, label: "Jump to", name: jumpTo, hint: 'Keep {place}' }
+                  - { <<: *text, label: "Kick again", name: kickAgain }
+                  - { <<: *text, label: "Fill every block", name: pressBigSwitch }
+                  - { <<: *text, label: "Bounce to", name: bounceTo, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Playing with", name: playingWith, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Stomp again", name: stompAgain }
+                  - { <<: *text, label: "Grab the pole again", name: grabAgain }
               - label: Black forest world (silhouette)
                 name: shade
                 widget: object

@@ -24,7 +24,7 @@
 
 /* ---------------------------------------------------------------------------------------------------
  * The hub map: unrolled on arrival, inked, the trail dotted in, then he walks to his landmark.
- * Phases are data attributes on a scene's root, each 'false' until reached (see hero.tsx, journey.tsx).
+ * Phases are data attributes on a scene's root, each 'false' until reached (see hero.tsx).
  * ------------------------------------------------------------------------------------------------- */
 
 /* The map held in two hands: it leans a few degrees toward the pointer. */
@@ -488,188 +488,6 @@
   }
 }
 
-/* ---- the star road (starRoad.tsx): the sky's specks twinkle in two frames, the warp stars turn
- * slowly, and he spins up out of sight and drops onto the next star ---- */
-
-.twinkle {
-  animation: twinkle 1.2s steps(2, jump-none) infinite;
-  animation-delay: calc(var(--i, 0) * -0.35s);
-}
-
-@keyframes twinkle {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0.25;
-  }
-}
-
-.warpStar {
-  animation: warp-star 6s linear infinite;
-}
-
-@keyframes warp-star {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.warp {
-  transform-origin: 50% 70%;
-  transition:
-    transform 380ms var(--glide),
-    opacity 380ms ease-in;
-}
-
-.warp[data-out='true'] {
-  opacity: 0;
-  transform: translate3d(0, -90px, 0) rotate(720deg) scale(0.4);
-}
-
-/* ---- the fortresses (fortresses.tsx): each is pressed down into the ground in steps and its ruin
- * rises in its place; pointing at its achievement shakes it ---- */
-
-.fort,
-.ruin {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-}
-
-.fort {
-  transition:
-    transform 560ms steps(5, jump-none),
-    opacity 120ms linear 560ms;
-}
-
-.fort[data-crushed='true'] {
-  opacity: 0;
-  transform: scale(1.1, 0.1);
-}
-
-.ruin {
-  opacity: 0;
-  transform: scale(1, 0.4);
-  transition:
-    opacity 80ms linear 480ms,
-    transform 240ms var(--pop) 480ms;
-}
-
-.ruin[data-crushed='true'] {
-  opacity: 1;
-  transform: none;
-}
-
-.shake[data-shaking='true'] {
-  animation: fort-shake 240ms steps(2, jump-none) infinite;
-}
-
-@keyframes fort-shake {
-  from {
-    transform: translate3d(-2px, 0, 0);
-  }
-  to {
-    transform: translate3d(2px, 0, 0);
-  }
-}
-
-/* ---- the goal (goal.tsx): the tape slides up and down between the posts at a steady pace; broken, it
- * holds where it was hit and its halves fall away, the stars burst out, the letter drops from the
- * reserve box and he walks through the gate with a fist up ---- */
-
-.tape {
-  animation: tape-run var(--period, 2400ms) linear infinite;
-}
-
-@keyframes tape-run {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, 100%, 0);
-  }
-}
-
-[data-broken='true'] .tape {
-  animation: none;
-  transform: translate3d(0, var(--held, 0%), 0);
-}
-
-.tapeLeft,
-.tapeRight {
-  transition:
-    transform 600ms ease-in,
-    opacity 600ms ease-in;
-}
-
-.tapeLeft {
-  transform-origin: 0 50%;
-}
-
-.tapeRight {
-  transform-origin: 100% 50%;
-}
-
-[data-broken='true'] .tapeLeft {
-  opacity: 0;
-  transform: translate3d(-10px, 60px, 0) rotate(60deg);
-}
-
-[data-broken='true'] .tapeRight {
-  opacity: 0;
-  transform: translate3d(10px, 60px, 0) rotate(-60deg);
-}
-
-.burst {
-  opacity: 0;
-}
-
-.burst[data-on='true'] {
-  animation: star-burst 900ms var(--glide) calc(var(--i, 0) * 60ms) 1 both;
-}
-
-@keyframes star-burst {
-  0% {
-    opacity: 1;
-    transform: translate(280px, 110px) scale(0.4);
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-    transform: translate(calc(280px + var(--dx, 0px)), 30px) scale(1.4);
-  }
-}
-
-.letter {
-  opacity: 0;
-}
-
-[data-broken='true'] .letter {
-  animation: letter-drop 700ms steps(7, jump-none) 500ms 1 both;
-}
-
-@keyframes letter-drop {
-  from {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 150px, 0);
-  }
-}
-
-.goalWalker {
-  transition: transform 1400ms linear 900ms;
-}
-
-[data-broken='true'] .goalWalker {
-  transform: translate3d(calc(-50% + 140%), 0, 0);
-}
-
 /* ---------------------------------------------------------------------------------------------------
  * Reduced motion: every reveal shows its resting frame, every loop stands still.
  * ------------------------------------------------------------------------------------------------- */
@@ -700,29 +518,12 @@
     opacity: 1;
   }
 
-  [data-broken='true'] .letter {
-    animation: none;
-    opacity: 1;
-    transform: translate3d(0, 150px, 0);
-  }
-
-  .messageBox,
-  .tape,
-  .burst[data-on='true'],
-  .shake[data-shaking='true'],
-  .twinkle,
-  .warpStar {
+  .messageBox {
     animation: none;
   }
 
   .switchCap,
   .block,
-  .warp,
-  .fort,
-  .ruin,
-  .tapeLeft,
-  .tapeRight,
-  .goalWalker,
   .cover,
   .inked,
   .dot,

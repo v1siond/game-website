@@ -1,0 +1,970 @@
+/*
+ * The side view levels: the living world behind the page (world.tsx) and each section's playfield,
+ * where he runs, jumps, kicks and stomps (actor.tsx and the scene files). Transform and opacity only.
+ * Sprites change frame in one step (steps(1)) as 16 bit sprites do; his moves are the two paths below,
+ * a straight line and a jump arc, between the spots a scene's legs name in --from-x / --from-lift and
+ * --to-x / --to-lift (x in % of the playfield, lift in px above the ground). Under reduced motion
+ * (the block at the end) nothing plays and every part shows its resting state: he stands where his
+ * last leg ends and every card is shown.
+ */
+
+/* ---------------------------------------------------------------------------------------------------
+ * Sprites
+ * ------------------------------------------------------------------------------------------------- */
+
+.heroSprite {
+  display: block;
+  width: 48px;
+  height: 78px;
+  overflow: visible;
+}
+
+.foeSprite {
+  display: block;
+  overflow: visible;
+}
+
+/* A two frame cycle: frame A shows the first half of the beat, frame B the second. */
+.frameA {
+  animation: frame-a var(--beat, 260ms) steps(1, end) infinite;
+}
+
+.frameB {
+  opacity: 0;
+  animation: frame-b var(--beat, 260ms) steps(1, end) infinite;
+}
+
+@keyframes frame-a {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes frame-b {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* The skin coloured lid over his eye, shown for a moment every few seconds. */
+.blink {
+  opacity: 0;
+  animation: blink 4.2s steps(1, end) infinite;
+}
+
+@keyframes blink {
+  0%,
+  94% {
+    opacity: 0;
+  }
+  95% {
+    opacity: 1;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * The rig: the track spans the playfield, so a translate in % is a share of the playfield's width.
+ * ------------------------------------------------------------------------------------------------- */
+
+.track {
+  position: absolute;
+  bottom: 32px;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+  z-index: 2;
+  transform: translate(calc(var(--to-x, 0) * 1%), calc(var(--to-lift, 0) * -1px));
+}
+
+.hop {
+  width: 48px;
+}
+
+.track[data-path='line'] {
+  animation: path-line calc(var(--ms, 400) * 1ms) var(--ease, linear) 1 both;
+}
+
+.track[data-path='arc'] {
+  animation: path-arc calc(var(--ms, 400) * 1ms) linear 1 both;
+}
+
+/* A move between spots that are already set eases over, the way he steps to another block. */
+.track[data-path='glide'] {
+  transition: transform 460ms cubic-bezier(0.45, 0, 0.3, 1);
+}
+
+@keyframes path-line {
+  from {
+    transform: translate(calc(var(--from-x) * 1%), calc(var(--from-lift) * -1px));
+  }
+  to {
+    transform: translate(calc(var(--to-x) * 1%), calc(var(--to-lift) * -1px));
+  }
+}
+
+/* Up fast and down fast, the jump of the games: ease out to the top, ease in to the landing. */
+@keyframes path-arc {
+  from {
+    transform: translate(calc(var(--from-x) * 1%), calc(var(--from-lift) * -1px));
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  }
+  50% {
+    transform: translate(
+      calc((var(--from-x) + var(--to-x)) * 0.5%),
+      calc((max(var(--from-lift), var(--to-lift)) + var(--peak, 40)) * -1px)
+    );
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  to {
+    transform: translate(calc(var(--to-x) * 1%), calc(var(--to-lift) * -1px));
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Playfield, ground, cards
+ * ------------------------------------------------------------------------------------------------- */
+
+.playfield {
+  border-radius: 6px;
+}
+
+.ground {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 32px;
+  border-top: 3px solid var(--ap-hud);
+  z-index: 3;
+}
+
+.ground[data-ground='grass'] {
+  background:
+    linear-gradient(var(--ap-grass) 0 7px, var(--ap-hill-near-dark) 7px 10px, transparent 10px),
+    repeating-linear-gradient(90deg, var(--ap-soil) 0 14px, var(--ap-soil-dark) 14px 16px);
+}
+
+.ground[data-ground='brick'] {
+  background:
+    linear-gradient(var(--ap-cave-brick-dark) 0 2px, transparent 2px 14px, var(--ap-cave-brick-dark) 14px 16px, transparent 16px),
+    repeating-linear-gradient(90deg, var(--ap-cave-brick) 0 30px, var(--ap-cave-brick-dark) 30px 32px);
+}
+
+.ground[data-ground='gold'] {
+  background:
+    linear-gradient(var(--ap-fort-gold) 0 4px, transparent 4px),
+    repeating-linear-gradient(90deg, var(--ap-fort-gold) 0 28px, var(--ap-fort-gold-dark) 28px 32px);
+}
+
+/* A card shown once the level's action reaches it ([data-shown] on an ancestor), at its --delay. */
+.popCard {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0) scale(0.92);
+}
+
+[data-shown='true'] .popCard {
+  animation: pop-card 320ms steps(4, jump-none) var(--delay, 0ms) 1 both;
+}
+
+@keyframes pop-card {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The score that pops from a stomp or a block, on its own black chip. */
+.score {
+  opacity: 0;
+}
+
+[data-scored='true'] > .score {
+  animation: score-rise 900ms ease-out 1 both;
+}
+
+@keyframes score-rise {
+  0% {
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -46px, 0);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * About: the ? block he hits from below, the coin it pops and the message window that unfolds
+ * ------------------------------------------------------------------------------------------------- */
+
+.qBlock {
+  position: absolute;
+  left: calc(44% - 2px);
+  bottom: 174px;
+  width: 48px;
+  height: 48px;
+  z-index: 1;
+}
+
+.qFace {
+  display: block;
+  height: 100%;
+}
+
+.qBlock[data-hit='true'] .qFace {
+  animation: block-bump 220ms ease-out 1 both;
+}
+
+.qBlock[data-hit='again'] .qFace {
+  animation: block-bump 220ms ease-out 270ms 1 both;
+}
+
+@keyframes block-bump {
+  50% {
+    transform: translate3d(0, -12px, 0);
+  }
+}
+
+.qMark,
+.qUsed {
+  transition: opacity 1ms 110ms;
+}
+
+.qUsed {
+  opacity: 0;
+}
+
+.qBlock:not([data-hit='false']) .qMark {
+  opacity: 0;
+}
+
+.qBlock:not([data-hit='false']) .qUsed {
+  opacity: 1;
+}
+
+.qCoin {
+  position: absolute;
+  left: 50%;
+  top: -6px;
+  width: 22px;
+  height: 30px;
+  margin-left: -11px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.qBlock[data-hit='true'] .qCoin {
+  animation: coin-pop 640ms ease-out 1 both;
+}
+
+.qBlock[data-hit='again'] .qCoin {
+  animation: coin-pop 640ms ease-out 270ms 1 both;
+}
+
+@keyframes coin-pop {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(0, -60px, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -40px, 0);
+  }
+}
+
+/* The message window opens from its top edge in six steps, as the game's text box does. */
+.unfold {
+  opacity: 0;
+  transform-origin: 50% 0;
+}
+
+[data-hit='true'] .unfold {
+  animation: unfold 380ms steps(6, jump-none) 1 both;
+}
+
+[data-hit='again'] .unfold {
+  animation: unfold 380ms steps(6, jump-none) 270ms 1 both;
+}
+
+@keyframes unfold {
+  from {
+    opacity: 1;
+    transform: scaleY(0.06);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Experience: the platforms he jumps across, one per job
+ * ------------------------------------------------------------------------------------------------- */
+
+.platform {
+  position: absolute;
+  left: calc(var(--x) * 1% - 4px);
+  bottom: calc(32px + var(--y) * 1px);
+  width: 56px;
+  height: 44px;
+  z-index: 1;
+}
+
+.platform:hover .ledge,
+.platform:focus-visible .ledge,
+.platform[aria-current='true'] .ledge {
+  transform: translate3d(0, -3px, 0);
+}
+
+.ledge {
+  transition: transform 120ms steps(2, jump-none);
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Tech stack: the shell he kicks slides along the ground and breaks one brick per category
+ * ------------------------------------------------------------------------------------------------- */
+
+.shellTrack {
+  position: absolute;
+  left: 0;
+  bottom: 32px;
+  width: 100%;
+  pointer-events: none;
+  transform: translate3d(26%, 0, 0);
+}
+
+[data-kicked='true'] > .shellTrack {
+  animation: shell-slide 900ms linear 120ms 1 both;
+}
+
+@keyframes shell-slide {
+  to {
+    transform: translate3d(110%, 0, 0);
+  }
+}
+
+.brick {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  bottom: 32px;
+  width: 40px;
+  height: 40px;
+}
+
+[data-kicked='true'] > .brick {
+  animation: brick-break 240ms steps(3, jump-none) var(--delay) 1 both;
+}
+
+@keyframes brick-break {
+  40% {
+    opacity: 1;
+    transform: translate3d(0, -8px, 0) scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -14px, 0) scale(0.3);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Projects: the big switch he stomps and the pipe he sinks into
+ * ------------------------------------------------------------------------------------------------- */
+
+.bigSwitch {
+  position: absolute;
+  left: calc(44% - 4px);
+  bottom: 32px;
+  width: 56px;
+  height: 44px;
+  z-index: 1;
+}
+
+.bigCap {
+  transform-origin: 50% 100%;
+  transition: transform 160ms steps(2, jump-none);
+}
+
+.bigSwitch[aria-pressed='true'] .bigCap {
+  transform: scale(1.06, 0.4);
+}
+
+.pipe {
+  position: absolute;
+  left: calc(80% - 8px);
+  bottom: 32px;
+  width: 64px;
+  height: 52px;
+  z-index: 3;
+}
+
+.pipeCeiling {
+  position: absolute;
+  left: calc(10% - 8px);
+  top: 0;
+  width: 64px;
+  height: 52px;
+  z-index: 3;
+  transform: scaleY(-1);
+}
+
+.track[data-pose='gone'] {
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Ventures: the coins he runs through in the underground room
+ * ------------------------------------------------------------------------------------------------- */
+
+.coin {
+  position: absolute;
+  left: calc(var(--x) * 1% + 12px);
+  bottom: 62px;
+  width: 22px;
+  height: 30px;
+}
+
+[data-shown='true'] > .coin {
+  animation: coin-take 300ms steps(3, jump-none) var(--delay) 1 both;
+}
+
+@keyframes coin-take {
+  to {
+    opacity: 0;
+    transform: translate3d(0, -26px, 0) scale(0.5);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Bands: the note blocks he bounces on, and the note each bounce sends up
+ * ------------------------------------------------------------------------------------------------- */
+
+.noteBlock {
+  position: absolute;
+  left: calc(var(--x) * 1% - 2px);
+  bottom: 56px;
+  width: 52px;
+  height: 52px;
+  z-index: 1;
+}
+
+.noteFace {
+  display: block;
+  height: 100%;
+  transform-origin: 50% 100%;
+}
+
+.noteBlock[aria-current='true'] .noteFace {
+  animation: note-squash 720ms linear infinite;
+}
+
+@keyframes note-squash {
+  0%,
+  100% {
+    transform: scaleY(0.84);
+  }
+  14%,
+  86% {
+    transform: none;
+  }
+}
+
+.bounce {
+  animation: bounce 720ms infinite;
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0.2, 0.6, 0.4, 1);
+  }
+  50% {
+    transform: translate3d(0, -70px, 0);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+}
+
+.note {
+  position: absolute;
+  left: 15px;
+  bottom: 0;
+  opacity: 0;
+  animation: note-rise 720ms ease-out infinite;
+}
+
+@keyframes note-rise {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(10px, -44px, 0);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Muay Thai: the foes he stomps in a chain, flattened where he lands
+ * ------------------------------------------------------------------------------------------------- */
+
+.foe {
+  position: absolute;
+  left: calc(var(--x) * 1% + 6px);
+  bottom: 32px;
+  width: 36px;
+  height: 48px;
+}
+
+.foeFlat {
+  opacity: 0;
+}
+
+.foe[data-scored='true'] .foeLive {
+  opacity: 0;
+}
+
+.foe[data-scored='true'] .foeFlat {
+  animation: foe-gone 700ms steps(1, end) 1 both;
+}
+
+@keyframes foe-gone {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Contact: the flagpole he grabs, the flag he slides down with, the castle and its fireworks
+ * ------------------------------------------------------------------------------------------------- */
+
+.pole {
+  position: absolute;
+  left: calc(54% + 14px);
+  bottom: 32px;
+  width: 44px;
+  height: 236px;
+  z-index: 1;
+}
+
+/* The flag hangs off the left of the pole's top, where his hands meet the pole as he grabs it. */
+.flagOnPole {
+  position: absolute;
+  left: calc(54% - 4px);
+  bottom: 214px;
+  width: 40px;
+  height: 30px;
+  pointer-events: none;
+}
+
+.flag {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+[data-flag='down'] .flag {
+  animation: flag-down 800ms linear 1 both;
+}
+
+[data-flag='low'] .flag {
+  transform: translate3d(0, 168px, 0);
+}
+
+@keyframes flag-down {
+  to {
+    transform: translate3d(0, 168px, 0);
+  }
+}
+
+.firework {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  opacity: 0;
+}
+
+[data-cleared='true'] > .firework {
+  animation: firework 700ms steps(4, jump-none) var(--delay) 1 both;
+}
+
+@keyframes firework {
+  0% {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * The living world behind the page (world.tsx). Each zone sets the colours of the hills, the clouds
+ * and the ground, and whether hills and clouds show at all; the sky layers crossfade between zones.
+ * ------------------------------------------------------------------------------------------------- */
+
+.world {
+  --far: var(--ap-hill-far);
+  --far-edge: var(--ap-hill-far-edge);
+  --near: var(--ap-hill-near);
+  --near-edge: var(--ap-hill-near-dark);
+  --cloud: var(--ap-cloud);
+  --hills: 1;
+  --clouds: 1;
+}
+
+.world[data-zone='sky'] {
+  --hills: 0;
+  --cloud: var(--ap-page);
+}
+
+.world[data-zone='underground'],
+.world[data-zone='fortress'] {
+  --hills: 0;
+  --clouds: 0;
+}
+
+.world[data-zone='night'] {
+  --far: var(--ap-night-hill);
+  --far-edge: var(--ap-hud);
+  --near: #2c6048;
+  --near-edge: var(--ap-hud);
+  --cloud: #8098c0;
+}
+
+.world[data-zone='sunset'] {
+  --far: var(--ap-rock);
+  --far-edge: var(--ap-rock-dark);
+  --near: var(--ap-pipe);
+  --near-edge: var(--ap-pipe-dark);
+}
+
+.sky {
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.sky[data-sky='plains'] {
+  background: linear-gradient(var(--ap-sky-high), var(--ap-sky-low) 70%);
+}
+
+.sky[data-sky='sky'] {
+  background: linear-gradient(var(--ap-sky-high), var(--ap-mint));
+}
+
+.sky[data-sky='underground'] {
+  background:
+    linear-gradient(var(--ap-cave-brick-dark) 0 3px, transparent 3px) 0 0 / 64px 32px,
+    linear-gradient(90deg, var(--ap-cave-brick-dark) 0 3px, transparent 3px) 0 0 / 64px 64px,
+    linear-gradient(var(--ap-cave-brick) 0 96px, var(--ap-cave) 96px);
+}
+
+.sky[data-sky='night'] {
+  background: linear-gradient(var(--ap-night-sky), #3c5c8c);
+}
+
+.sky[data-sky='fortress'] {
+  background:
+    linear-gradient(var(--ap-fort-gold-dark) 0 4px, transparent 4px) 0 0 / 72px 72px,
+    linear-gradient(90deg, var(--ap-fort-gold-dark) 0 4px, transparent 4px) 0 0 / 72px 72px,
+    var(--ap-fort);
+}
+
+.sky[data-sky='sunset'] {
+  background: linear-gradient(var(--ap-sunset-high), var(--ap-sunset-low) 75%);
+}
+
+.world[data-zone='plains'] .sky[data-sky='plains'],
+.world[data-zone='sky'] .sky[data-sky='sky'],
+.world[data-zone='underground'] .sky[data-sky='underground'],
+.world[data-zone='night'] .sky[data-sky='night'],
+.world[data-zone='fortress'] .sky[data-sky='fortress'],
+.world[data-zone='sunset'] .sky[data-sky='sunset'] {
+  opacity: 1;
+}
+
+/* The two ranges slide left at two speeds, as the far and near layers of a running level do. */
+.farStrip,
+.nearStrip {
+  transform-origin: 0 100%;
+  opacity: var(--hills);
+  transition: opacity 600ms ease;
+}
+
+.farStrip {
+  animation: strip-slide 120s linear infinite;
+}
+
+.nearStrip {
+  animation: strip-slide 52s linear infinite;
+}
+
+@keyframes strip-slide {
+  to {
+    transform: translate3d(-1600px, 0, 0);
+  }
+}
+
+@media (max-width: 767px) {
+  .farStrip,
+  .nearStrip {
+    scale: 0.6;
+  }
+}
+
+.farFill {
+  fill: var(--far);
+  stroke: var(--far-edge);
+}
+
+.farShine {
+  fill: var(--ap-page);
+  opacity: 0.45;
+}
+
+.nearFill {
+  fill: var(--near);
+  stroke: var(--near-edge);
+}
+
+.hillEye {
+  fill: var(--ap-hud);
+}
+
+/* Clouds with faces drift in from the right at three speeds, their delays spreading them out. */
+.cloud {
+  opacity: var(--clouds);
+  transition: opacity 600ms ease;
+  animation: cloud-drift 70s linear infinite;
+}
+
+.cloud[data-i='1'] {
+  animation-duration: 95s;
+  animation-delay: -40s;
+}
+
+.cloud[data-i='2'] {
+  animation-duration: 120s;
+  animation-delay: -90s;
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translate3d(100vw, 0, 0);
+  }
+  to {
+    transform: translate3d(-140px, 0, 0);
+  }
+}
+
+.cloudFill {
+  fill: var(--cloud);
+  stroke: var(--ap-hud);
+}
+
+.cloudEye {
+  fill: var(--ap-hud);
+}
+
+.sparkle {
+  background: var(--ap-coin);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  animation: sparkle 2.6s steps(3, jump-none) infinite;
+}
+
+.sparkle:nth-of-type(2n) {
+  animation-delay: -1.3s;
+}
+
+@keyframes sparkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.worldGround {
+  border-top: 4px solid var(--ap-hud);
+  background:
+    linear-gradient(var(--ap-grass) 0 8px, var(--ap-hill-near-dark) 8px 11px, transparent 11px),
+    repeating-linear-gradient(90deg, var(--ap-soil) 0 18px, var(--ap-soil-dark) 18px 20px);
+}
+
+.world[data-zone='underground'] .worldGround {
+  background: repeating-linear-gradient(90deg, var(--ap-cave-brick) 0 30px, var(--ap-cave-brick-dark) 30px 32px);
+}
+
+.world[data-zone='fortress'] .worldGround {
+  background: repeating-linear-gradient(90deg, var(--ap-fort-gold) 0 28px, var(--ap-fort-gold-dark) 28px 32px);
+}
+
+.world[data-zone='sunset'] .worldGround {
+  background:
+    linear-gradient(var(--ap-rock) 0 8px, transparent 8px),
+    repeating-linear-gradient(90deg, var(--ap-rock) 0 18px, var(--ap-rock-dark) 18px 20px);
+}
+
+.pipeBody {
+  fill: var(--ap-pipe);
+  stroke: var(--ap-hud);
+}
+
+.pipeShine {
+  fill: var(--ap-pipe-light);
+}
+
+/* The plant rises out of its pipe, holds, and sinks back, hidden by the pipe in front of it. */
+.plantPot {
+  overflow: hidden;
+}
+
+.plant {
+  animation: plant-bob 4.6s ease-in-out infinite;
+}
+
+@keyframes plant-bob {
+  0%,
+  20%,
+  100% {
+    transform: translate3d(0, 64px, 0);
+  }
+  38%,
+  78% {
+    transform: none;
+  }
+}
+
+/* The mushroom walks left across the ground, the turtle right, each on a long loop. */
+.patrol[data-foe='walker'] {
+  animation: patrol-left 30s linear infinite;
+}
+
+.patrol[data-foe='turtle'] {
+  animation: patrol-right 42s linear -18s infinite;
+}
+
+@keyframes patrol-left {
+  from {
+    transform: translate3d(100%, 0, 0);
+  }
+  to {
+    transform: translate3d(-48px, 0, 0);
+  }
+}
+
+@keyframes patrol-right {
+  from {
+    transform: translate3d(-48px, 0, 0);
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Reduced motion: nothing plays; every part rests where its action ends.
+ * ------------------------------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .frameA,
+  .frameB,
+  .blink,
+  .track,
+  .qFace,
+  .qCoin,
+  .shellTrack,
+  .brick,
+  .coin,
+  .noteFace,
+  .bounce,
+  .note,
+  .foeFlat,
+  .flag,
+  .firework,
+  .score,
+  .farStrip,
+  .nearStrip,
+  .cloud,
+  .sparkle,
+  .plant,
+  .patrol {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .frameB,
+  .note,
+  .qCoin,
+  .firework,
+  .score,
+  .sparkle {
+    opacity: 0;
+  }
+
+  .popCard,
+  .unfold {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .sky,
+  .ledge,
+  .bigCap,
+  .qMark,
+  .qUsed {
+    transition: none;
+  }
+
+  .patrol[data-foe='walker'] {
+    transform: translate3d(70vw, 0, 0);
+  }
+
+  .patrol[data-foe='turtle'] {
+    transform: translate3d(18vw, 0, 0);
+  }
+
+  .cloud {
+    transform: translate3d(60vw, 0, 0);
+  }
+
+  .cloud[data-i='1'] {
+    transform: translate3d(14vw, 0, 0);
+  }
+
+  .cloud[data-i='2'] {
+    transform: translate3d(40vw, 0, 0);
+  }
+
+  .plant {
+    transform: none;
+  }
+}
