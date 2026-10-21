@@ -1,17 +1,17 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
-import { useProfession, PROFESSION_CONFIGS } from '@/contexts/ProfessionContext'
+import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { PROFESSION_LABELS, type Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // Hook to detect prefers-reduced-motion
 function useReducedMotion() {
@@ -778,86 +778,8 @@ function CyberwareIcon({ type }: { type: 'eye' | 'arm' | 'chip' | 'jack' }) {
   )
 }
 
-// Tech skill chip with cyber styling - replaces proficiency bars with achievement style
-function SkillChip({
-  name,
-  achievement
-}: {
-  name: string
-  achievement?: string
-}) {
-  const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ff0066', '#00ff66']
-  const color = colors[name.length % colors.length]
-  const reducedMotion = useReducedMotion()
-
-  return (
-    <div
-      className="px-3 py-2 text-sm relative overflow-hidden group cursor-default transition-all hover:scale-105"
-      style={{
-        background: `${color}15`,
-        border: `1px solid ${color}60`,
-        color: color,
-        clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)',
-      }}
-      role="listitem"
-      aria-label={achievement ? `${name}: ${achievement}` : name}
-    >
-      {/* Scan line effect */}
-      {!reducedMotion && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{
-            background: `linear-gradient(90deg, transparent, ${color}40, transparent)`,
-            animation: 'scan 0.8s ease-in-out infinite',
-          }}
-          aria-hidden="true"
-        />
-      )}
-      <div className="relative z-10">
-        <span className="font-mono font-bold">{name}</span>
-        {achievement && (
-          <span className="block text-sm text-white/60 mt-0.5 italic">{achievement}</span>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// Role badge with cyber styling - active contracts display
-function RoleBadge({
-  title,
-  company,
-  type
-}: {
-  title: string
-  company: string
-  type: 'employment' | 'leadership'
-}) {
-  const color = type === 'leadership' ? '#ff00ff' : '#00ffff'
-  const reducedMotion = useReducedMotion()
-
-  return (
-    <article
-      className={`px-4 py-2 text-center transition-all hover:scale-105 ${!reducedMotion ? 'hover:shadow-lg' : ''}`}
-      style={{
-        background: `linear-gradient(135deg, ${color}15, transparent)`,
-        border: `1px solid ${color}50`,
-        clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-        boxShadow: !reducedMotion ? `0 0 20px ${color}20` : undefined,
-      }}
-      aria-label={`${type === 'leadership' ? 'Leadership' : 'Employment'}: ${title} at ${company}`}
-    >
-      <div className="text-sm tracking-wider" style={{ color: color }}>
-        {type === 'leadership' ? '// LEADERSHIP' : '// EMPLOYMENT'}
-      </div>
-      <div className="text-sm font-bold text-white">{title}</div>
-      <div className="text-xs" style={{ color: color }}>{company}</div>
-    </article>
-  )
-}
-
 // Company card - Night City megacorp style (Arasaka, Militech, Kang Tao)
-function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
+function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   const reducedMotion = useReducedMotion()
 
   return (
@@ -919,85 +841,79 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
 }
 
 // Band card - Johnny Silverhand style music legacy
-function BandCard({ band }: { band: typeof BANDS[0] }) {
+function BandCard({ band, years, linkProps }: BandSlot) {
   const reducedMotion = useReducedMotion()
 
   const content = (
     <article
-      className={`p-4 transition-all ${!reducedMotion ? 'hover:scale-[1.02]' : ''} group`}
+      className={`p-4 h-full transition-all ${!reducedMotion ? 'hover:scale-[1.02]' : ''} group`}
       style={{
         background: 'linear-gradient(135deg, rgba(153,102,204,0.1), rgba(0,255,255,0.05))',
         border: '1px solid #9966cc50',
         clipPath: 'polygon(0 0, calc(100% - 15px) 0, 100% 15px, 100% 100%, 15px 100%, 0 calc(100% - 15px))',
       }}
-      aria-label={`Band: ${band.name} - ${band.genre}, Role: ${band.role}`}
     >
       <h3 className="text-sm font-bold text-white group-hover:text-pink-400 transition-colors">
         {band.name}
       </h3>
-      <p className="text-sm mt-1" style={{ color: '#9966cc' }}>
-        {band.genre} | {band.role}
+      <p className="text-sm mt-1 text-[#c4a3e6]">
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years && <span>{years}</span>}
       </p>
-      <p className="text-xs text-white/70 mt-2">{band.description}</p>
-      {band.url ? (
-        <div className="text-sm text-cyan-400/70 mt-2">[STREAM_LINK]</div>
-      ) : (
-        <div className="text-sm text-white/30 mt-2 italic">[LINK_PENDING]</div>
+      {band.release && (
+        <p className="text-sm text-white/80 mt-2">
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
       )}
+      {linkProps && <div className="text-sm text-cyan-400 mt-2" aria-hidden="true">[STREAM_LINK]</div>}
     </article>
   )
 
-  if (band.url) {
-    return (
-      <a href={band.url} target="_blank" rel="noopener noreferrer" className="block">
-        {content}
-      </a>
-    )
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a {...linkProps} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400">
+      {content}
+    </a>
+  )
 }
 
-// Work experience card - cyber dossier / personnel file style
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'ACTIVE'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+// Work experience card - cyber dossier / personnel file style. Dates are date only strings (UTC
+// midnight), so the year is read in UTC: a January start shows its own year west of UTC.
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'ACTIVE'
+  const startDisplay = entry.startDate.getUTCFullYear()
   const reducedMotion = useReducedMotion()
 
   return (
     <article
-      className={`p-4 border border-white/10 transition-all ${!reducedMotion ? 'hover:border-cyan-400/50' : ''} group`}
+      className={`relative p-4 border border-white/10 transition-all ${!reducedMotion ? 'hover:border-cyan-400/50' : ''} group`}
       style={{
         background: 'linear-gradient(135deg, rgba(0,255,255,0.05), transparent)',
         clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
       }}
-      aria-label={`${entry.title} at ${entry.organization}, ${startDisplay} to ${endDisplay}`}
+      aria-label={`${entry.title} at ${entry.company}, ${startDisplay} to ${endDisplay}`}
     >
-      {/* Dossier classification marker */}
-      <div className="absolute top-1 right-2 text-[6px] text-pink-500/30 font-mono" aria-hidden="true">
-        FILE_#{entry.id.slice(-4).toUpperCase()}
-      </div>
-
       {/* Header with title and dates */}
-      <header className="flex justify-between items-start mb-2">
+      <header className="flex justify-between items-start gap-2 mb-2">
         <div>
           <h3 className="text-sm text-cyan-400 group-hover:text-pink-400 transition-colors font-mono">
             {entry.title}
           </h3>
-          <div className="text-sm text-pink-500 mt-0.5">{entry.organization}</div>
+          <div className="text-sm text-pink-500 mt-0.5">{entry.company}</div>
         </div>
-        <span className="text-sm text-white/50 font-mono px-2 py-0.5 bg-white/5 border border-white/10">
+        <span className="text-sm text-white/70 font-mono px-2 py-0.5 bg-white/5 border border-white/10 whitespace-nowrap">
           {startDisplay} - {endDisplay}
         </span>
       </header>
 
-      {/* Description */}
-      <p className="text-[11px] text-white/70 mb-2 font-mono">{entry.description}</p>
+      {entry.description && <p className="text-sm text-white/80 mb-2 font-mono">{entry.description}</p>}
 
       {/* Highlights as impact statements */}
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.highlights.length > 0 && (
         <ul className="space-y-1 mb-2" aria-label="Key achievements">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-sm text-cyan-400 flex items-start gap-2 font-mono">
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm text-cyan-400 flex items-start gap-2 font-mono">
               <span className="text-pink-500" aria-hidden="true">&gt;</span>
               {highlight}
             </li>
@@ -1006,23 +922,68 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
       )}
 
       {/* Skills tags */}
-      <div className="flex flex-wrap gap-1 mt-2" role="list" aria-label="Skills used">
-        {entry.skills.slice(0, 5).map((skill) => (
-          <span
-            key={skill}
-            className="text-sm px-2 py-0.5 bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 font-mono"
-            role="listitem"
-          >
-            {skill}
-          </span>
-        ))}
-      </div>
+      {entry.skills.length > 0 && (
+        <ul className="flex flex-wrap gap-1 mt-2" aria-label="Skills used">
+          {entry.skills.slice(0, 5).map((skill) => (
+            <li
+              key={skill}
+              className="text-sm px-2 py-0.5 bg-cyan-400/10 border border-cyan-400/30 text-cyan-400 font-mono"
+            >
+              {skill}
+            </li>
+          ))}
+        </ul>
+      )}
+    </article>
+  )
+}
+
+// Project card - netrunner gig file: his role, the result line and the links that open the project
+function ProjectCard({ project, years, links }: ProjectSlot) {
+  const reducedMotion = useReducedMotion()
+
+  return (
+    <article
+      className={`h-full p-3 border border-white/10 ${!reducedMotion ? 'hover:border-pink-500/50' : ''} transition-colors group`}
+      style={{ background: 'linear-gradient(135deg, rgba(255,0,255,0.05), transparent)' }}
+    >
+      <header className="flex justify-between items-start gap-2">
+        <h3 className="text-sm text-cyan-400 group-hover:text-pink-400 transition-colors font-mono">{project.name}</h3>
+        {years && <span className="text-sm text-white/70 font-mono whitespace-nowrap">{years}</span>}
+      </header>
+      <p className="text-sm text-yellow-300 mt-1 font-mono">{project.role}</p>
+      <p className="text-sm text-white/80 mt-1">{project.tagline}</p>
+      {project.impact && <p className="text-sm text-pink-400 mt-1 italic">&gt; {project.impact}</p>}
+      {project.techStack.length > 0 && (
+        <ul className="flex gap-2 mt-2 flex-wrap" aria-label="Technologies used">
+          {project.techStack.slice(0, 4).map((tech) => (
+            <li key={tech} className="text-sm px-1 py-0.5 bg-white/5 text-cyan-400 font-mono">
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )}
+      {links.length > 0 ? (
+        <div className="flex gap-3 mt-3 flex-wrap">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-3 text-sm font-mono border border-cyan-400/60 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pink-500"
+            >
+              [{label.toUpperCase()}]
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-white/70 mt-3 font-mono">No public link</p>
+      )}
     </article>
   )
 }
 
 // Tech category display - cyberware/netrunner deck style
-function TechCategory({ category }: { category: ReturnType<typeof getEngineerSkills>[0] }) {
+function TechCategory({ category }: { category: CVData['techStack'][number] }) {
   return (
     <div className="mb-4" role="region" aria-labelledby={`tech-cat-${category.name.toLowerCase().replace(/\s+/g, '-')}`}>
       <header className="flex items-center gap-2 mb-2">
@@ -1049,41 +1010,6 @@ function TechCategory({ category }: { category: ReturnType<typeof getEngineerSki
           >
             {tech}
           </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// Drummer/Fighter skills with achievements instead of proficiency bars
-function SkillCategoryDisplay({ category }: { category: ReturnType<typeof getSkillsByProfession>[0] }) {
-  // Map proficiency to achievement/context descriptions
-  const getAchievementText = (skillName: string, proficiency: number): string | undefined => {
-    // Generate contextual achievement text based on skill type
-    if (proficiency >= 5) return 'Expert level'
-    if (proficiency >= 4) return 'Advanced'
-    if (proficiency >= 3) return 'Proficient'
-    return undefined
-  }
-
-  return (
-    <div className="mb-4 last:mb-0" role="region" aria-labelledby={`skill-cat-${category.name.toLowerCase().replace(/\s+/g, '-')}`}>
-      <header className="flex items-center gap-2 mb-2">
-        <span role="img" aria-hidden="true">{category.icon}</span>
-        <h3
-          id={`skill-cat-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
-          className="text-xs text-pink-500 font-mono tracking-wider"
-        >
-          {category.name.toUpperCase()}:
-        </h3>
-      </header>
-      <div className="flex flex-wrap gap-2" role="list">
-        {category.skills.map((skill) => (
-          <SkillChip
-            key={skill.name}
-            name={skill.name}
-            achievement={getAchievementText(skill.name, skill.proficiency)}
-          />
         ))}
       </div>
     </div>
@@ -1121,19 +1047,166 @@ function ChromaticBorder({ children }: { children: React.ReactNode }) {
   )
 }
 
+// The cyberware slot each profession's selector option shows.
+const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> = {
+  drummer: 'jack',
+  engineer: 'chip',
+  fighter: 'arm',
+}
+
+// The selector's state line reads the profession the way the terminal would type it.
+const terminalName = (profession: Profession): string => PROFESSION_LABELS[profession].toUpperCase().replace(/\s+/g, '_')
+
+// Email is the lit primary action, LinkedIn the outlined one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-pink-500 text-black hover:bg-pink-400',
+  linkedin: 'border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black',
+}
+
+const HUD_BUTTON =
+  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 [clip-path:polygon(8px_0,100%_0,calc(100%-8px)_100%,0_100%)]'
+
+function HeroAction({ action }: { action: HeroActionSlot }) {
+  return (
+    <a {...action.linkProps} className={`${HUD_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+      [{action.label.toUpperCase()}]
+    </a>
+  )
+}
+
+function CVLink() {
+  return (
+    <Link href="/cv" className={`${HUD_BUTTON} border border-white/60 text-white hover:bg-white hover:text-black`}>
+      [GET_THE_CV]
+    </Link>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary, companies } = useCVData()
+
+  return (
+    <>
+      <div className="mb-8">
+        <CyberPanel title="About" accentColor="#ffff00" holographic>
+          <p className="text-sm text-white/80 leading-relaxed font-mono">{professionalSummary.bio}</p>
+        </CyberPanel>
+      </div>
+
+      <CyberArtSection variant="neon" />
+
+      {sections.jobs.length > 0 && (
+        <div className="mb-8">
+          <CyberPanel title="Work Experience" accentColor="#00ff66" holographic>
+            <div className="space-y-3">
+              {sections.jobs.map((entry) => (
+                <ExperienceCard key={entry.id} entry={entry} />
+              ))}
+            </div>
+          </CyberPanel>
+        </div>
+      )}
+
+      <CyberArtSection variant="circuit" />
+
+      <div className="mb-8">
+        <CyberPanel title="Tech Stack" accentColor="#00ffff" holographic megacorpStyle>
+          {sections.techStack.map((category) => (
+            <TechCategory key={category.id} category={category} />
+          ))}
+        </CyberPanel>
+      </div>
+
+      <div className="mb-8">
+        <CyberPanel title="Projects" accentColor="#ff00ff" holographic>
+          <ProjectList
+            projects={sections.projects}
+            className="grid md:grid-cols-2 gap-3"
+            renderProject={(slot) => <ProjectCard {...slot} />}
+          />
+        </CyberPanel>
+      </div>
+
+      <div className="mb-8">
+        <CyberPanel title="Ventures" accentColor="#ff00ff" holographic megacorpStyle>
+          <div className="grid md:grid-cols-3 gap-4">
+            {companies.map((company) => (
+              <CompanyCard key={company.id} company={company} />
+            ))}
+          </div>
+        </CyberPanel>
+      </div>
+    </>
+  )
+}
+
+function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <div className="mb-8">
+      <CyberPanel title="Bands" accentColor="#9966cc" holographic>
+        <p className="text-sm text-white/80 font-mono mb-4">
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList
+          bands={bands}
+          className="grid md:grid-cols-2 gap-4"
+          renderBand={(slot: BandSlot) => <BandCard {...slot} />}
+        />
+        <p className="text-sm text-white/80 font-mono mt-4">
+          <span className="text-pink-400" aria-hidden="true">&gt; </span>
+          {musician.line}
+        </p>
+      </CyberPanel>
+    </div>
+  )
+}
+
+function MartialArtistPanels({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <div className="mb-8">
+      <CyberPanel title="Muay Thai" accentColor="#ff0066" holographic>
+        <h3 className="text-base text-pink-400 font-mono mb-4">{martialArts.primary.title}</h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+            fact: 'p-3 border border-white/10 bg-white/5',
+            term: 'text-sm tracking-wider text-cyan-400 font-mono uppercase',
+            value: 'text-sm text-white/90 mt-1',
+            achievements: 'space-y-1',
+            achievement: 'text-sm text-yellow-300 font-mono',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span className="text-pink-400" aria-hidden="true">&gt; </span>
+              {achievement}
+            </>
+          )}
+        />
+      </CyberPanel>
+    </div>
+  )
+}
+
+function ProfessionPanels({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianPanels sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistPanels sections={sections} />
+  return <EngineerPanels sections={sections} />
+}
+
 export default function NeonCyberTheme() {
-  const { theme } = useTheme()
-  const { active, config } = useProfession()
+  const { active } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
   const [glitchScreen, setGlitchScreen] = useState(false)
   const [screenTear, setScreenTear] = useState<number | null>(null)
   const reducedMotion = useReducedMotion()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
@@ -1167,7 +1240,7 @@ export default function NeonCyberTheme() {
         transform: glitchScreen && !reducedMotion ? `translateX(${Math.random() * 8 - 4}px)` : 'none',
       }}
       role="main"
-      aria-label="Alexander Pulido - Cyberpunk themed portfolio"
+      aria-label={`${view.hero.name} - Cyberpunk themed portfolio`}
     >
       {/* Screen tear effect */}
       {screenTear && !reducedMotion && (
@@ -1220,7 +1293,7 @@ export default function NeonCyberTheme() {
 
       {/* Top HUD elements - Kiroshi optics overlay style */}
       <div
-        className="fixed top-4 left-4 z-40 text-sm text-cyan-400/50 font-mono space-y-1"
+        className="hidden sm:block fixed top-4 left-4 z-40 pointer-events-none text-sm text-cyan-400/50 font-mono space-y-1"
         role="presentation"
         aria-hidden="true"
       >
@@ -1230,7 +1303,7 @@ export default function NeonCyberTheme() {
         <div className="mt-2 text-pink-500/50">THREAT_LVL: MINIMAL</div>
       </div>
       <div
-        className="fixed top-4 right-20 z-40 text-sm text-pink-500/50 font-mono text-right space-y-1"
+        className="hidden sm:block fixed top-4 right-20 z-40 pointer-events-none text-sm text-pink-500/50 font-mono text-right space-y-1"
         role="presentation"
         aria-hidden="true"
       >
@@ -1240,79 +1313,48 @@ export default function NeonCyberTheme() {
         <div className="mt-2 text-cyan-400/50">EDDIES: ∞</div>
       </div>
 
-      {/* Header */}
-      <header className="relative z-30 p-6 pt-16">
+      {/* Header - the recruiter first screen */}
+      <header className="relative z-30 px-4 pt-6 pb-4 sm:p-6 sm:pt-16">
         <div className="max-w-6xl mx-auto">
           <ChromaticBorder>
             <ScannerCorners>
-              <div className="p-4 bg-black/40">
-                <div className="flex justify-between items-start flex-wrap gap-4">
-                  <div>
-                    <h1 className="text-4xl tracking-[0.2em] font-bold">
-                      <GlitchText text="ALEXANDER" className="text-pink-500" intensity="high" />
-                      <span className="text-white mx-2" aria-hidden="true">{'/'}</span>
-                      <GlitchText text="PULIDO" className="text-cyan-400" intensity="high" />
-                    </h1>
-                    <p className="mt-3 text-sm text-white/90">
-                      {PROFESSIONAL_SUMMARY[active].headline}
-                    </p>
-                    <div className="flex items-center gap-3 mt-2">
-                      <span
-                        className={`w-2 h-2 rounded-full bg-green-400 ${!reducedMotion ? 'animate-pulse' : ''}`}
-                        style={{ boxShadow: '0 0 10px #00ff00' }}
-                        aria-label="Online status indicator"
-                      />
-                      <span className="text-xs text-pink-500 tracking-wider italic">
-                        &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
-                      </span>
-                    </div>
-                  </div>
+              <RecruiterHero
+                render={({ name, headline, tagline, line, actions }) => {
+                  const [first, ...rest] = name.split(' ')
+                  return (
+                    <div className="p-4 bg-black/40 flex justify-between items-start flex-wrap gap-4">
+                      <div>
+                        <h1 className="text-3xl sm:text-4xl tracking-[0.2em] font-bold uppercase">
+                          <GlitchText text={first} className="text-pink-500" intensity="high" />{' '}
+                          <span className="text-white" aria-hidden="true">{'/'}</span>{' '}
+                          <GlitchText text={rest.join(' ')} className="text-cyan-400" intensity="high" />
+                        </h1>
+                        <p className="mt-3 text-sm text-white/90">{headline}</p>
+                        <div className="flex items-center gap-3 mt-2">
+                          <span
+                            className={`w-2 h-2 shrink-0 rounded-full bg-green-400 ${!reducedMotion ? 'animate-pulse' : ''}`}
+                            style={{ boxShadow: '0 0 10px #00ff00' }}
+                            aria-hidden="true"
+                          />
+                          <q className="text-sm text-pink-400 tracking-wider italic">{tagline}</q>
+                        </div>
+                        <p className="mt-2 text-sm text-cyan-300 font-mono">{line}</p>
+                      </div>
 
-                  <nav className="flex gap-3 items-center flex-wrap" aria-label="Main navigation">
-                    <Link
-                      href="/cv"
-                      className="px-4 py-2 text-xs tracking-wider border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all font-mono"
-                      style={{ clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)' }}
-                      aria-label="Download CV"
-                    >
-                      [DOWNLOAD.exe]
-                    </Link>
-                    <Link
-                      href="/personal-projects/game-engine"
-                      className="px-4 py-2 text-xs tracking-wider bg-pink-500 text-black hover:bg-pink-400 transition-all font-mono"
-                      style={{ clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)' }}
-                      aria-label="View Nebulith game engine project"
-                    >
-                      [NEBULITH.run]
-                    </Link>
-                  </nav>
-                </div>
-              </div>
+                      <nav className="flex gap-3 items-center flex-wrap" aria-label="Contact and CV">
+                        {actions.map((action) => (
+                          <HeroAction key={action.id} action={action} />
+                        ))}
+                        <CVLink />
+                      </nav>
+                    </div>
+                  )
+                }}
+              />
             </ScannerCorners>
           </ChromaticBorder>
         </div>
       </header>
-
-      {/* Current Roles - Active contracts */}
-      <section className="relative z-20 py-6 px-6" aria-labelledby="roles-heading">
-        <div className="max-w-6xl mx-auto">
-          <h2 id="roles-heading" className="text-center mb-4">
-            <span className="text-sm tracking-[0.3em] text-cyan-400/70 font-mono">
-              {'//'} ACTIVE_CONTRACTS
-            </span>
-          </h2>
-          <div className="flex flex-wrap justify-center gap-4">
-            {CURRENT_ROLES.map((role) => (
-              <RoleBadge
-                key={role.id}
-                title={role.title}
-                company={role.company}
-                type={role.type}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Neon signs - Night City advertising */}
       <div className="relative z-20 py-4" aria-hidden="true">
@@ -1326,7 +1368,7 @@ export default function NeonCyberTheme() {
       </div>
 
       {/* Main content */}
-      <main className="relative z-20 px-6 py-8">
+      <main className="relative z-20 px-4 sm:px-6 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Terminal header - V's access point */}
           <HolographicShimmer intensity="low">
@@ -1335,11 +1377,11 @@ export default function NeonCyberTheme() {
                 <div className="w-3 h-3 rounded-full bg-red-500" style={{ boxShadow: '0 0 5px #ff0000' }} />
                 <div className="w-3 h-3 rounded-full bg-yellow-500" style={{ boxShadow: '0 0 5px #ffff00' }} />
                 <div className="w-3 h-3 rounded-full bg-green-500" style={{ boxShadow: '0 0 5px #00ff00' }} />
-                <span className="ml-4 text-xs text-white/50 font-mono">v-term@night-city:~</span>
+                <span className="ml-4 text-sm text-white/70 font-mono">v-term@night-city:~</span>
               </div>
               <TerminalLine prefix="$ " text="cat /netrunner/alex/profile.db" delay={0} />
-              <TerminalLine prefix="> " text={PROFESSIONAL_SUMMARY[active].tagline} delay={800} />
-              <TerminalLine prefix="$ " text={`set PROFESSION=${active.toUpperCase()}`} delay={2500} />
+              <TerminalLine prefix="> " text={view.hero.tagline} delay={800} />
+              <TerminalLine prefix="$ " text={`set PROFESSION=${terminalName(active)}`} delay={2500} />
             </div>
           </HolographicShimmer>
 
@@ -1347,23 +1389,23 @@ export default function NeonCyberTheme() {
           <ProfessionSwitch
             className="grid grid-cols-3 gap-4 mb-8"
             label="Select profession view"
-            renderOption={({ id: prof, label, optionProps }) => (
+            renderOption={({ id: prof, label, selected, optionProps }) => (
               <button
                 type="button"
                 {...optionProps}
                 className={`p-4 text-left transition-all relative overflow-hidden ${
-                  active === prof ? 'scale-105' : 'opacity-60 hover:opacity-100'
+                  selected ? 'scale-105' : 'opacity-60 hover:opacity-100'
                 }`}
                 style={{
-                  background: active === prof
+                  background: selected
                     ? 'linear-gradient(135deg, rgba(255,0,255,0.2), rgba(0,255,255,0.1))'
                     : 'rgba(0,255,255,0.05)',
-                  border: `2px solid ${active === prof ? '#ff00ff' : '#00ffff40'}`,
+                  border: `2px solid ${selected ? '#ff00ff' : '#00ffff40'}`,
                   clipPath: 'polygon(15px 0, 100% 0, calc(100% - 15px) 100%, 0 100%)',
                 }}
               >
                 {/* Animated scan line */}
-                {active === prof && !reducedMotion && (
+                {selected && !reducedMotion && (
                   <div
                     className="absolute inset-0 opacity-30"
                     style={{
@@ -1376,18 +1418,15 @@ export default function NeonCyberTheme() {
 
                 <div className="relative z-10">
                   <div className="flex items-center gap-2 mb-2">
-                    <CyberwareIcon type={prof === 'engineer' ? 'chip' : prof === 'drummer' ? 'jack' : 'arm'} />
+                    <CyberwareIcon type={PROFESSION_CYBERWARE[prof]} />
                     <span
                       className="text-sm tracking-wider font-mono"
-                      style={{ color: active === prof ? '#ff00ff' : '#00ffff' }}
+                      style={{ color: selected ? '#ff00ff' : '#00ffff' }}
                     >
                       {label.toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-sm text-white/50 block font-mono">
-                    EXP: {PROFESSION_CONFIGS[prof].years.toUpperCase()}
-                  </span>
-                  {active === prof && (
+                  {selected && (
                     <span className="text-sm text-green-400 block mt-1 font-mono">[ACTIVE]</span>
                   )}
                 </div>
@@ -1395,139 +1434,13 @@ export default function NeonCyberTheme() {
             )}
           />
 
-          {/* About section - Personnel dossier */}
-          <div className="mb-8" role="region" aria-label={`${active} profession details`}>
-            <CyberPanel title="About" accentColor="#ffff00" holographic>
-              <p className="text-sm text-white/80 leading-relaxed mb-4 font-mono">{aboutData.bio}</p>
-              <div className="flex flex-wrap gap-2" role="list" aria-label="Quick facts">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span
-                    key={i}
-                    className="text-sm px-2 py-1 bg-yellow-400/10 border border-yellow-400/30 text-yellow-400 font-mono"
-                    role="listitem"
-                  >
-                    [{fact}]
-                  </span>
-                ))}
-              </div>
-            </CyberPanel>
-          </div>
-
-          {/* ART SECTION 1 - Neon signs break */}
-          <CyberArtSection variant="neon" />
-
-          {/* Work Experience section - Completed gigs dossier */}
-          {experience.length > 0 && (
-            <div className="mb-8">
-              <CyberPanel title="Work Experience" accentColor="#00ff66" holographic>
-                <div className="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-                  {experience.map((entry) => (
-                    <ExperienceCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </CyberPanel>
-            </div>
-          )}
-
-          {/* ART SECTION 2 - Circuit board break */}
-          <CyberArtSection variant="circuit" />
-
-          {/* Tech Stack / Skills panel */}
-          <div className="mb-8">
-            <CyberPanel
-              title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
-              accentColor="#00ffff"
-              holographic
-              megacorpStyle={active === 'engineer'}
-            >
-              {active === 'engineer' ? (
-                <div className="max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-                  {engineerTech.map((category) => (
-                    <TechCategory key={category.name} category={category} />
-                  ))}
-                </div>
-              ) : (
-                <div className="max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-                  {otherSkills.map((category) => (
-                    <SkillCategoryDisplay key={category.name} category={category} />
-                  ))}
-                </div>
-              )}
-            </CyberPanel>
-          </div>
-
-          {/* Featured Work (Projects) panel */}
-          <div className="mb-8">
-            <CyberPanel title="Featured Work" accentColor="#ff00ff" holographic>
-              <div className="space-y-3 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
-                {projects.slice(0, 5).map((project) => (
-                  <article
-                    key={project.id}
-                    className={`p-3 border border-white/10 ${!reducedMotion ? 'hover:border-pink-500/50' : ''} transition-colors cursor-pointer group`}
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(255,0,255,0.05), transparent)',
-                    }}
-                    aria-label={`Project: ${project.name} - ${project.tagline}`}
-                  >
-                    <header className="flex justify-between items-start">
-                      <h3 className="text-sm text-cyan-400 group-hover:text-pink-400 transition-colors font-mono">
-                        {project.name}
-                      </h3>
-                      {project.featured && (
-                        <span className="text-sm px-2 py-0.5 bg-yellow-400 text-black font-bold">
-                          PREEM
-                        </span>
-                      )}
-                    </header>
-                    <p className="text-sm text-white/50 mt-1">{project.tagline}</p>
-                    {project.impact && (
-                      <p className="text-sm text-pink-500 mt-1 italic">&gt; {project.impact}</p>
-                    )}
-                    <div className="flex gap-2 mt-2 flex-wrap" role="list" aria-label="Technologies used">
-                      {project.techStack.slice(0, 4).map((tech) => (
-                        <span
-                          key={tech}
-                          className="text-sm px-1 py-0.5 bg-white/5 text-cyan-400 font-mono"
-                          role="listitem"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </CyberPanel>
+          {/* The picked profession's sections, and only those */}
+          <div role="region" aria-label={`${active} profession details`}>
+            <ProfessionPanels sections={view.sections} />
           </div>
 
           {/* ART SECTION 3 - Night City skyline break */}
           <CyberArtSection variant="skyline" />
-
-          {/* Ventures section - Companies (Engineer) - Megacorp affiliations */}
-          {active === 'engineer' && (
-            <div className="mb-8">
-              <CyberPanel title="Ventures" accentColor="#ff00ff" holographic megacorpStyle>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {COMPANIES.map((company) => (
-                    <CompanyCard key={company.id} company={company} />
-                  ))}
-                </div>
-              </CyberPanel>
-            </div>
-          )}
-
-          {/* Ventures section - Bands (Drummer) - Rockerboy legacy */}
-          {active === 'drummer' && (
-            <div className="mb-8">
-              <CyberPanel title="Bands" accentColor="#9966cc" holographic>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {BANDS.map((band) => (
-                    <BandCard key={band.id} band={band} />
-                  ))}
-                </div>
-              </CyberPanel>
-            </div>
-          )}
 
           {/* Posts section - placeholder for future blog/posts content */}
           <div className="mb-8">
@@ -1547,43 +1460,26 @@ export default function NeonCyberTheme() {
       </main>
 
       {/* Contact CTA */}
-      <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <h2 className="text-xl tracking-wider mb-3 font-mono" style={{ color: '#00ffff' }}>
-              READY_TO_JACK_IN?
-            </h2>
-            <p className="text-sm font-mono" style={{ color: '#ff00ff' }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-wider uppercase transition-all hover:scale-105 min-h-[44px] font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-              style={{
-                background: 'linear-gradient(90deg, #00ffff, #ff00ff)',
-                color: '#0a0a0a',
-              }}
-            >
-              ESTABLISH_LINK
-            </a>
-            <Link
-              href="/cv"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-wider uppercase transition-all hover:scale-105 min-h-[44px] font-mono focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-              style={{
-                background: 'transparent',
-                border: '2px solid #00ffff',
-                color: '#00ffff',
-              }}
-            >
-              DOWNLOAD_CV.exe
-            </Link>
-          </div>
-        </div>
+      <section className="relative z-20 py-16 px-6" aria-labelledby="neon-contact-heading">
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <h2 id="neon-contact-heading" className="text-xl tracking-wider mb-3 font-mono text-cyan-400">
+                  READY_TO_JACK_IN?
+                </h2>
+                <p className="text-sm font-mono text-pink-400">{line}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {actions.map((action) => (
+                  <HeroAction key={action.id} action={action} />
+                ))}
+                <CVLink />
+              </div>
+            </div>
+          )}
+        />
       </section>
-
-      
 
       {/* Footer - System status */}
       <footer className="relative z-20 py-8 text-center" role="contentinfo">
@@ -1593,7 +1489,7 @@ export default function NeonCyberTheme() {
           <div className="w-16 h-px bg-gradient-to-r from-transparent via-pink-500 to-transparent" aria-hidden="true" />
         </div>
         <p className="text-sm text-white/30 tracking-widest font-mono">
-          © {new Date().getFullYear()} Alexander Pulido
+          © {new Date().getFullYear()} {view.hero.name}
         </p>
       </footer>
 

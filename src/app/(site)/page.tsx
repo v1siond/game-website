@@ -1,15 +1,15 @@
-'use client'
+import { getAllCVData } from '@/lib/cv-data'
+import { CVDataProvider } from '@/components/cv/CVDataProvider'
+import { WorldRenderer } from './WorldRenderer'
 
-import { useTheme } from '@/themes/ThemeContext'
-import { getWorldComponent } from '@/themes/worlds'
+// The worlds are written in English only (see the site layout), so the site loads the English CV once
+// and every world reads it from the provider.
+export default async function Home() {
+  const cv = await getAllCVData('en')
 
-export default function Home() {
-  const { theme } = useTheme()
-
-  // Boot straight into the current world (neon-cyber by default). Each themed layout owns
-  // its own in-theme "Enter another world" section (see <WorldsGrid/>), so there's nothing
-  // to append here.
-  const WorldComponent = getWorldComponent(theme.id) ?? getWorldComponent('neon-cyber')!
-
-  return <WorldComponent />
+  return (
+    <CVDataProvider cv={cv}>
+      <WorldRenderer />
+    </CVDataProvider>
+  )
 }
