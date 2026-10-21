@@ -566,6 +566,105 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* ---------------------------------------------------------------- the volcano (volcano.tsx)
+   One cycle of 6s from the stage's first showing: a rumble, the burst, the rocks thrown in arcs (each
+   rock's sideways run is linear on its group, its rise and fall eased on the rock, so it flies a
+   parabola). The flows run down once and stay; the crater glows on its own beat. */
+
+.volcanoScene {
+  background: radial-gradient(ellipse at 50% 100%, rgb(255 106 26 / 35%) 0%, transparent 60%),
+    linear-gradient(180deg, var(--myth-asp-high) 0%, var(--myth-asp-low) 100%);
+  border: 2px solid var(--myth-gold-deep);
+}
+
+.volcanoScene * {
+  transform-box: view-box;
+}
+
+.tremble { transform-origin: 200px 200px; }
+
+[data-on] .tremble {
+  animation: rumble 6s linear 0.2s infinite;
+}
+
+@keyframes rumble {
+  0%, 14%, 100% { transform: translate3d(0, 0, 0); }
+  2%, 6%, 10% { transform: translate3d(-1.5px, 0.5px, 0); }
+  4%, 8%, 12% { transform: translate3d(1.5px, -0.5px, 0); }
+}
+
+.burst {
+  opacity: 0;
+  transform-origin: 200px 78px;
+  transform: scaleY(0.3);
+}
+
+[data-on] .burst {
+  animation: burst 6s ease-out 0.2s infinite;
+}
+
+@keyframes burst {
+  0%, 15% { opacity: 0; transform: scaleY(0.3); }
+  18% { opacity: 0.9; transform: scaleY(1); }
+  32%, 100% { opacity: 0; transform: scaleY(0.6); }
+}
+
+.craterGlow {
+  opacity: 0.75;
+  transform-origin: 200px 74px;
+}
+
+[data-on] .craterGlow {
+  animation: crater-glow 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes crater-glow {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.15); }
+}
+
+.lavaFlow {
+  opacity: 0;
+  transform-origin: 200px 76px;
+  transform: scaleY(0);
+}
+
+[data-on] .lavaFlow {
+  animation: lava-run 2.6s cubic-bezier(0.3, 0.6, 0.4, 1) 1.3s forwards;
+}
+
+@keyframes lava-run {
+  0% { opacity: 1; transform: scaleY(0); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+[data-on] .rockX {
+  animation: rock-x 6s linear infinite;
+  animation-delay: calc(0.2s + var(--i) * 0.06s);
+}
+
+@keyframes rock-x {
+  0%, 17% { transform: translate3d(0, 0, 0); }
+  48%, 100% { transform: translate3d(var(--dx), 0, 0); }
+}
+
+.rockY {
+  opacity: 0;
+}
+
+[data-on] .rockY {
+  animation: rock-y 6s infinite;
+  animation-delay: calc(0.2s + var(--i) * 0.06s);
+}
+
+@keyframes rock-y {
+  0%, 17% { opacity: 0; transform: translate3d(0, 0, 0); animation-timing-function: ease-out; }
+  18% { opacity: 1; animation-timing-function: ease-out; }
+  30% { opacity: 1; transform: translate3d(0, var(--peak), 0); animation-timing-function: ease-in; }
+  44% { opacity: 1; }
+  48%, 100% { opacity: 0; transform: translate3d(0, 110px, 0); }
+}
+
 /* ---------------------------------------------------------------- keepsakes (keepsakes.tsx) */
 
 .slot {
@@ -698,6 +797,7 @@
   .heroRest,
   .reveal,
   .boon,
+  .lavaFlow,
   .chamberText,
   .stamp,
   .fulfilled,
@@ -710,7 +810,8 @@
   .scroll,
   .heroRest,
   .reveal,
-  .boon {
+  .boon,
+  .lavaFlow {
     transform: none !important;
   }
 

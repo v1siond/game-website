@@ -7,14 +7,15 @@ import { Stage } from './stage'
 import { Chambers } from './chambers'
 import { Codex } from './codex'
 import { Boons } from './boons'
+import { Volcano } from './volcano'
 import { Keepsakes } from './keepsakes'
 import { Portraits } from './portraits'
 import { Prophecies } from './prophecies'
 import u from './underworld.module.css'
 
 // The picked profession's sections, each a stage in the descent: About in the great hall, the chambers
-// and the codex in the teal brick vaults, the boons and the keepsakes over the magma, the portraits and
-// the arena in the green fields. The last gate of the red temple closes the page (gate.tsx).
+// and the codex in the teal brick vaults, the volcano erupting over the boons and the keepsakes in the
+// magma, the portraits and the arena in the green fields. The last gate of the red temple closes the page (gate.tsx).
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -42,6 +43,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.projects.length > 0 && (
         <Stage title={titles.projects} zone="magma">
+          <Volcano />
           <Boons projects={sections.projects} />
         </Stage>
       )}
