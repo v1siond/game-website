@@ -27,7 +27,7 @@ export const useHouse = () => useContext(HouseContext)
 
 export const mythHeadingId = (title: string) => headingId('myth', title)
 
-function Laurel({ flip = false }: { flip?: boolean }) {
+export function Laurel({ flip = false }: { flip?: boolean }) {
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 shrink-0 ${flip ? '-scale-x-100' : ''}`} aria-hidden="true">
       <path d="M20 21 Q8 18 5 4" fill="none" stroke="currentColor" strokeWidth={1.6} />

@@ -7,44 +7,87 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
-import { SpartanSprite } from './sprite'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
+import { SpartanSprite } from './sprite'
+import { BronzeDoors } from './doors'
+import { Laurel } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
 // Work Experience as the chambers of the escape: each job a chamber behind its bronze doors. When a
-// chamber first scrolls into view (and the one before it is done) a shade rises in it, he dashes in and
-// cleaves it with the chain combo, the cleared stamp strikes, the doors swing open and the job is read in
-// the doorway's light. Each chamber cleared fills one cell of the counter above them, which says its
-// count in words too. Pointing at a chamber lights the laurel over its door.
+// chamber first scrolls into view (and the one before it is done) a foe rises in it, he dashes in and
+// cleaves it with the chain combo, the cleared stamp strikes, the doors swing open, he walks through them
+// and the job is read in the doorway's light. The foe changes from chamber to chamber (a wraith, a
+// floating skull, a winged fury), and a cleared chamber is left empty, so the list never shows the same
+// fight twice over. Each chamber cleared fills one cell of the counter above them, which says its count
+// in words too. Pointing at a chamber lights the laurel over its door.
 
-function Shade() {
+const INK = MYTH.inkLine
+
+function Wraith() {
+  return (
+    <>
+      <path d="M30 4 Q50 6 50 30 L54 84 Q44 76 38 86 Q30 76 22 86 Q16 76 6 84 L10 30 Q10 6 30 4 Z" fill={MYTH.soul} opacity={0.75} stroke={INK} strokeWidth={2.5} />
+      <path d="M20 28 L26 32 M40 28 L34 32" stroke={INK} strokeWidth={3} strokeLinecap="round" />
+    </>
+  )
+}
+
+function FloatingSkull() {
+  return (
+    <>
+      <path d="M30 50 Q44 60 40 74 M30 50 Q16 60 20 74" fill="none" stroke={MYTH.soul} strokeWidth={3} opacity={0.6} />
+      <path d="M30 10 Q52 10 52 34 Q52 44 44 48 L44 56 L16 56 L16 48 Q8 44 8 34 Q8 10 30 10 Z" fill={MYTH.bone} stroke={INK} strokeWidth={2.5} />
+      <ellipse cx={21} cy={34} rx={6} ry={7} fill={INK} />
+      <ellipse cx={39} cy={34} rx={6} ry={7} fill={INK} />
+      <circle cx={21} cy={35} r={2} fill={MYTH.soul} />
+      <circle cx={39} cy={35} r={2} fill={MYTH.soul} />
+      <path d="M22 50 L22 56 M30 50 L30 56 M38 50 L38 56" stroke={INK} strokeWidth={2} />
+    </>
+  )
+}
+
+function WingedFury() {
+  return (
+    <>
+      <path d="M26 30 Q6 14 2 36 Q10 32 14 40 Q18 34 24 40 Z M34 30 Q54 14 58 36 Q50 32 46 40 Q42 34 36 40 Z" fill={MYTH.crimson} stroke={INK} strokeWidth={2.2} strokeLinejoin="round" />
+      <path d="M30 18 Q40 20 38 44 L42 84 L30 74 L18 84 L22 44 Q20 20 30 18 Z" fill={MYTH.terracottaDeep} stroke={INK} strokeWidth={2.5} />
+      <path d="M24 12 Q30 4 36 12 L36 22 L24 22 Z" fill={MYTH.inkSoft} stroke={INK} strokeWidth={2} />
+      <path d="M26 26 L29 28 M34 26 L31 28" stroke={MYTH.fireCore} strokeWidth={2.4} strokeLinecap="round" />
+    </>
+  )
+}
+
+// The foe each chamber holds, in turn down the list.
+const FOES = [Wraith, FloatingSkull, WingedFury]
+
+function Foe({ index }: { index: number }) {
+  const Drawing = FOES[index % FOES.length]
   return (
     <svg viewBox="0 0 60 90" className={`absolute bottom-3 right-[14%] h-28 w-20 ${u.shade}`} aria-hidden="true">
-      <path d="M30 4 Q50 6 50 30 L54 84 Q44 76 38 86 Q30 76 22 86 Q16 76 6 84 L10 30 Q10 6 30 4 Z" fill={MYTH.soul} opacity={0.75} stroke={MYTH.inkLine} strokeWidth={2.5} />
-      <path d="M20 28 L26 32 M40 28 L34 32" stroke={MYTH.inkLine} strokeWidth={3} strokeLinecap="round" />
+      <Drawing />
     </svg>
   )
 }
+
+const DOOR_LEAVES = { left: u.doorLeft, right: u.doorRight }
 
 function ChamberScene({ index, on }: { index: number; on: boolean }) {
   const { myth } = useLabels()
 
   return (
     <div className={`relative h-44 overflow-hidden ${u.chamberScene}`} aria-hidden="true">
-      {/* the doorway: an arch of brick, gold light behind the doors */}
-      <div className="absolute bottom-0 left-1/2 h-32 w-28 -translate-x-1/2 overflow-hidden rounded-t-full border-2 border-[var(--myth-ink)] bg-[radial-gradient(ellipse_at_50%_70%,var(--myth-gold-pale),var(--myth-gold)_40%,var(--myth-gold-deep))]">
-        <div className={`absolute inset-y-0 left-0 w-1/2 border-r-2 border-[var(--myth-ink)] bg-[linear-gradient(90deg,var(--myth-bronze),var(--myth-gold-deep))] ${u.doorLeft}`} />
-        <div className={`absolute inset-y-0 right-0 w-1/2 border-l-2 border-[var(--myth-ink)] bg-[linear-gradient(270deg,var(--myth-bronze),var(--myth-gold-deep))] ${u.doorRight}`} />
-      </div>
-      <svg viewBox="0 0 80 24" className={`absolute left-1/2 top-2 h-6 w-20 -translate-x-1/2 ${u.laurel}`}>
-        <path d="M6 18 Q40 30 74 18" fill="none" stroke={MYTH.gold} strokeWidth={2} />
-        {[10, 20, 30, 50, 60, 70].map((x) => (
-          <ellipse key={x} cx={x} cy={x < 40 ? 14 - (x - 10) / 6 : 14 - (70 - x) / 6} rx={5} ry={2.5} fill={MYTH.gold} transform={`rotate(${x < 40 ? -30 : 30} ${x} 14)`} />
-        ))}
-      </svg>
+      {/* the doorway: gold light behind the bronze doors, the laurel over it */}
+      <BronzeDoors
+        className="absolute bottom-0 left-1/2 h-32 w-28 -translate-x-1/2 border-2 bg-[radial-gradient(ellipse_at_50%_70%,var(--myth-gold-pale),var(--myth-gold)_40%,var(--myth-gold-deep))]"
+        leaves={DOOR_LEAVES}
+      />
+      <span className={`absolute left-1/2 top-2 flex -translate-x-1/2 gap-6 text-[var(--myth-gold)] ${u.laurel}`}>
+        <Laurel />
+        <Laurel flip />
+      </span>
       <span className={`absolute left-3 top-2 text-sm text-[var(--myth-gold-pale)] ${u.display}`}>{fillLabel(myth.chamberOf, { number: index + 1 })}</span>
-      <Shade />
+      <Foe index={index} />
       <div className={`absolute bottom-0 left-[6%] h-36 w-28 ${u.dasher}`}>
         <SpartanSprite profession="engineer" motion={on ? 'action' : 'still'} className="h-full w-full" />
       </div>

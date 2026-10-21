@@ -407,7 +407,8 @@
 
 .counterFill[data-on] { transform: scaleX(1); }
 
-/* The chamber's scene: bronze doors, a shade, him dashing in and cleaving it. */
+/* The chamber's scene: bronze doors, a foe, him dashing in, cleaving it and walking out through the
+   opened doors, so a cleared chamber stands empty. */
 .chamberScene {
   background: linear-gradient(180deg, var(--myth-tart-high) 0%, var(--myth-brick) 100%);
   border-bottom: 2px solid var(--myth-gold-deep);
@@ -435,12 +436,17 @@
 }
 
 [data-on] .dasher {
-  animation: dash 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both;
+  animation: dash 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both, through-door 0.8s ease-in 2.2s forwards;
 }
 
 @keyframes dash {
   0% { transform: translate3d(-120%, 0, 0); }
   100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes through-door {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(95%, -8%, 0) scale(0.6); }
 }
 
 /* The doors swing open on the chamber's hinge sides once it is cleared. */
@@ -681,6 +687,7 @@
   .drip,
   .swirl,
   .shade,
+  .dasher,
   .sigilFly {
     opacity: 0 !important;
   }
@@ -691,7 +698,6 @@
   .heroRest,
   .reveal,
   .boon,
-  .dasher,
   .chamberText,
   .stamp,
   .fulfilled,
@@ -704,8 +710,7 @@
   .scroll,
   .heroRest,
   .reveal,
-  .boon,
-  .dasher {
+  .boon {
     transform: none !important;
   }
 

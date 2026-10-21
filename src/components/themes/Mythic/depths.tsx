@@ -2,9 +2,11 @@ import { MYTH } from './palette'
 import u from './underworld.module.css'
 
 // The fixed painting behind the page, one layer per region the page goes down: the great hall of
-// crimson marble with its braziers and the pool's glow, the teal brick vaults with their soul lamps, the
-// basalt and the magma river, the gold light over the green fields with their ruined columns, and the
-// red temple under the surface's dawn. The root's data-zone fades the region in view up (stage.tsx);
+// crimson marble with its braziers (the pool itself is the one he rises from, poolRise.tsx), the teal
+// brick vaults with their soul lamps, the basalt and the magma river, the gold light over the green
+// fields with their broken columns, and the red temple under the surface's dawn. Each region keeps its
+// own furniture: the braziers burn only in the hall, whole columns stand only in the hall and the
+// temple, the fields hold only their ruins. The root's data-zone fades the region in view up (stage.tsx);
 // each region's far and near art drifts against the pointer at two depths (--mx, --my).
 
 const INK = MYTH.inkLine
@@ -30,8 +32,28 @@ function Brazier({ x, y }: { x: number; y: number }) {
   )
 }
 
-// A fluted column with a capital and a base; the light falls on its left edge.
-function Column({ x, top, bottom, width, tone = MYTH.column, light = MYTH.columnLight }: { x: number; top: number; bottom: number; width: number; tone?: string; light?: string }) {
+interface ColumnProps {
+  x: number
+  top: number
+  bottom: number
+  width: number
+  tone?: string
+  light?: string
+  // a ruin: the shaft snapped off in a jagged break, no capital
+  broken?: boolean
+}
+
+// The top of a column: its capital, or the jagged break of a ruin.
+function ColumnTop({ x, top, width, tone, broken }: Required<Omit<ColumnProps, 'bottom' | 'light'>>) {
+  const half = width / 2
+  if (broken) {
+    return <path d={`M${x - half} ${top} L${x - half * 0.4} ${top - 14} L${x} ${top - 4} L${x + half * 0.5} ${top - 20} L${x + half} ${top - 6} Z`} fill={tone} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
+  }
+  return <rect x={x - half - 12} y={top - 18} width={width + 24} height={20} fill={tone} stroke={INK} strokeWidth={3} />
+}
+
+// A fluted column with a capital and a base, or its ruin; the light falls on its left edge.
+function Column({ x, top, bottom, width, tone = MYTH.column, light = MYTH.columnLight, broken = false }: ColumnProps) {
   const half = width / 2
   return (
     <g>
@@ -40,7 +62,7 @@ function Column({ x, top, bottom, width, tone = MYTH.column, light = MYTH.column
       {[0.42, 0.62, 0.82].map((at) => (
         <path key={at} d={`M${x - half + width * at} ${top + 6} L${x - half + width * at} ${bottom - 6}`} stroke={INK} strokeWidth={2} opacity={0.5} />
       ))}
-      <rect x={x - half - 12} y={top - 18} width={width + 24} height={20} fill={tone} stroke={INK} strokeWidth={3} />
+      <ColumnTop x={x} top={top} width={width} tone={tone} broken={broken} />
       <rect x={x - half - 16} y={bottom} width={width + 32} height={18} fill={tone} stroke={INK} strokeWidth={3} />
     </g>
   )
@@ -55,8 +77,6 @@ function HallArt() {
         ))}
         <path d="M0 120 L1200 120 L1200 150 L0 150 Z" fill={MYTH.crimson} stroke={INK} strokeWidth={3} />
         <path d="M0 640 L1200 640 L1200 800 L0 800 Z" fill={MYTH.column} />
-        <ellipse cx={600} cy={720} rx={320} ry={46} fill={MYTH.pool} stroke={INK} strokeWidth={4} />
-        <ellipse cx={600} cy={712} rx={250} ry={22} fill={MYTH.poolLight} opacity={0.35} />
       </svg>
       <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.near}`}>
         <Column x={40} top={40} bottom={780} width={110} />
@@ -110,8 +130,8 @@ function FieldsArt() {
       ))}
       <path d="M0 560 Q300 470 620 560 T1200 520 L1200 800 L0 800 Z" fill={MYTH.elyLow} stroke={INK} strokeWidth={4} />
       <path d="M0 650 Q400 580 800 650 T1200 640 L1200 800 L0 800 Z" fill={MYTH.elyGreen} opacity={0.55} stroke={INK} strokeWidth={3} />
-      <Column x={180} top={420} bottom={600} width={40} tone={MYTH.marbleShade} light={MYTH.marble} />
-      <Column x={1040} top={470} bottom={590} width={40} tone={MYTH.marbleShade} light={MYTH.marble} />
+      <Column x={180} top={420} bottom={600} width={40} tone={MYTH.marbleShade} light={MYTH.marble} broken />
+      <Column x={1040} top={470} bottom={590} width={40} tone={MYTH.marbleShade} light={MYTH.marble} broken />
       <path d="M1000 470 L1080 452 L1084 468 L1004 486 Z" fill={MYTH.marbleShade} stroke={INK} strokeWidth={3} />
     </svg>
   )
@@ -119,23 +139,17 @@ function FieldsArt() {
 
 function TempleArt() {
   return (
-    <>
-      <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
-        <circle cx={600} cy={130} r={110} fill={MYTH.dawn} opacity={0.35} />
-        <path d="M300 300 L600 160 L900 300 Z" fill={MYTH.kiltShade} stroke={INK} strokeWidth={4} />
-        <path d="M300 300 L900 300 L900 330 L300 330 Z" fill={MYTH.terracottaDeep} stroke={INK} strokeWidth={3} />
-        {[350, 450, 750, 850].map((x) => (
-          <Column key={x} x={x} top={340} bottom={620} width={48} tone={MYTH.terracottaDeep} light={MYTH.crimson} />
-        ))}
-        {[0, 1, 2, 3].map((step) => (
-          <path key={step} d={`M${240 - step * 60} ${640 + step * 40} L${960 + step * 60} ${640 + step * 40} L${960 + step * 60} ${680 + step * 40} L${240 - step * 60} ${680 + step * 40} Z`} fill={MYTH.styxLow} stroke={INK} strokeWidth={3} />
-        ))}
-      </svg>
-      <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.near}`}>
-        <Brazier x={170} y={560} />
-        <Brazier x={1030} y={560} />
-      </svg>
-    </>
+    <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
+      <circle cx={600} cy={130} r={110} fill={MYTH.dawn} opacity={0.35} />
+      <path d="M300 300 L600 160 L900 300 Z" fill={MYTH.kiltShade} stroke={INK} strokeWidth={4} />
+      <path d="M300 300 L900 300 L900 330 L300 330 Z" fill={MYTH.terracottaDeep} stroke={INK} strokeWidth={3} />
+      {[350, 450, 750, 850].map((x) => (
+        <Column key={x} x={x} top={340} bottom={620} width={48} tone={MYTH.terracottaDeep} light={MYTH.crimson} />
+      ))}
+      {[0, 1, 2, 3].map((step) => (
+        <path key={step} d={`M${240 - step * 60} ${640 + step * 40} L${960 + step * 60} ${640 + step * 40} L${960 + step * 60} ${680 + step * 40} L${240 - step * 60} ${680 + step * 40} Z`} fill={MYTH.styxLow} stroke={INK} strokeWidth={3} />
+      ))}
+    </svg>
   )
 }
 

@@ -5,6 +5,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { SpartanSprite } from './sprite'
+import { BronzeDoors } from './doors'
 import { ContactActions, SlabButton } from './buttons'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { SectionTitle, mythHeadingId, useHouse, type Zone } from './stage'
@@ -16,6 +17,8 @@ import u from './underworld.module.css'
 // up into it; the contact panel under the gate holds the line and the four ways to reach him. Return to
 // the house takes the visitor back to the top, where he rises from the pool again (the escape always
 // starts over).
+
+const GATE_LEAVES = { left: u.gateLeft, right: u.gateRight }
 
 export function LastGate({ profession }: { profession: Profession }) {
   const { sections, myth, navigation } = useLabels()
@@ -31,10 +34,7 @@ export function LastGate({ profession }: { profession: Profession }) {
         {/* the dawn behind the gate */}
         <div className={`absolute inset-x-[22%] bottom-0 top-8 rounded-t-full bg-[radial-gradient(ellipse_at_50%_80%,var(--myth-dawn-pale),var(--myth-dawn)_45%,var(--myth-blood)_100%)] ${u.dawn}`} />
         {/* the gate's arch and its two bronze leaves */}
-        <div className="absolute inset-x-[22%] bottom-0 top-8 overflow-hidden rounded-t-full border-4 border-[var(--myth-ink)]">
-          <div className={`absolute inset-y-0 left-0 w-1/2 border-r-2 border-[var(--myth-ink)] bg-[linear-gradient(90deg,var(--myth-bronze),var(--myth-gold-deep))] ${u.gateLeft}`} />
-          <div className={`absolute inset-y-0 right-0 w-1/2 border-l-2 border-[var(--myth-ink)] bg-[linear-gradient(270deg,var(--myth-bronze),var(--myth-gold-deep))] ${u.gateRight}`} />
-        </div>
+        <BronzeDoors className="absolute inset-x-[22%] bottom-0 top-8 border-4" leaves={GATE_LEAVES} />
         <svg viewBox="0 0 400 40" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-10 w-full">
           <path d="M0 10 L400 10 L400 40 L0 40 Z" fill={MYTH.styxHigh} stroke={MYTH.inkLine} strokeWidth={3} />
         </svg>
