@@ -88,16 +88,6 @@ describe('ProfessionContext', () => {
       expect(result.current.active).toBe('engineer')
       expect(result.current.config).toEqual(PROFESSION_CONFIGS.engineer)
     })
-
-    it('persists profession selection to localStorage', () => {
-      const { result } = renderHook(() => useProfession(), { wrapper })
-
-      act(() => {
-        result.current.setActive('drummer')
-      })
-
-      expect(localStorage.setItem).toHaveBeenCalledWith('portfolio-profession', 'drummer')
-    })
   })
 
   describe('PROFESSION_CONFIGS', () => {
@@ -138,13 +128,13 @@ describe('ProfessionContext', () => {
     })
 
     it('drummer has specific values', () => {
-      expect(PROFESSION_CONFIGS.drummer.title).toBe('Professional Drummer')
+      expect(PROFESSION_CONFIGS.drummer.title).toBe('Musician')
       expect(PROFESSION_CONFIGS.drummer.years).toBe('15 years')
     })
 
     it('fighter has specific values', () => {
-      expect(PROFESSION_CONFIGS.fighter.title).toBe('Martial Arts Instructor')
-      expect(PROFESSION_CONFIGS.fighter.years).toBe('6 years')
+      expect(PROFESSION_CONFIGS.fighter.title).toBe('Martial Artist')
+      expect(PROFESSION_CONFIGS.fighter.years).toBe('4 years')
     })
   })
 })

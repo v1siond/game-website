@@ -1,8 +1,15 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import {
+  type Profession,
+  DEFAULT_PROFESSION,
+  PROFESSION_LABELS,
+  PROFESSION_ORDER,
+  professionFromSearch,
+} from '@/lib/cv/professions'
 
-export type Profession = 'engineer' | 'drummer' | 'fighter'
+export type { Profession }
 
 export interface ProfessionConfig {
   id: Profession
@@ -16,7 +23,7 @@ export interface ProfessionConfig {
 export const PROFESSION_CONFIGS: Record<Profession, ProfessionConfig> = {
   engineer: {
     id: 'engineer',
-    title: 'System Engineer',
+    title: PROFESSION_LABELS.engineer,
     tagline: 'Building systems that scale',
     icon: '//--',
     color: '#41c8e8',
@@ -24,7 +31,7 @@ export const PROFESSION_CONFIGS: Record<Profession, ProfessionConfig> = {
   },
   drummer: {
     id: 'drummer',
-    title: 'Professional Drummer',
+    title: PROFESSION_LABELS.drummer,
     tagline: 'Rhythm is the architecture of music',
     icon: '(O)',
     color: '#9966cc',
@@ -32,11 +39,11 @@ export const PROFESSION_CONFIGS: Record<Profession, ProfessionConfig> = {
   },
   fighter: {
     id: 'fighter',
-    title: 'Martial Arts Instructor',
+    title: PROFESSION_LABELS.fighter,
     tagline: 'Discipline through combat',
     icon: '/|\\',
     color: '#ff4444',
-    years: '6 years',
+    years: '4 years',
   },
 }
 
@@ -49,37 +56,22 @@ interface ProfessionContextType {
 
 const ProfessionContext = createContext<ProfessionContextType | undefined>(undefined)
 
-const STORAGE_KEY = 'portfolio-profession'
-
+// Every visit opens on the default profession: a pick lasts for the visit and is never restored, so a
+// recruiter coming back always lands on System Engineer. Only `?profession=` overrides it.
 export function ProfessionProvider({ children }: { children: ReactNode }) {
-  const [active, setActiveState] = useState<Profession>('engineer')
-  const [mounted, setMounted] = useState(false)
+  const [active, setActive] = useState<Profession>(DEFAULT_PROFESSION)
 
+  // Read after mount so the server render and the first client render agree.
   useEffect(() => {
-    setMounted(true)
-    // `?profession=<id>` forces a profession on load (used by the preview screenshot /
-    // ornament audit script). Harmless otherwise.
-    const param = new URLSearchParams(window.location.search).get('profession') as Profession | null
-    if (param && PROFESSION_CONFIGS[param]) {
-      setActiveState(param)
-      return
-    }
-    const stored = localStorage.getItem(STORAGE_KEY) as Profession | null
-    if (stored && PROFESSION_CONFIGS[stored]) {
-      setActiveState(stored)
-    }
+    const forced = professionFromSearch(window.location.search)
+    if (forced) setActive(forced)
   }, [])
 
-  const setActive = (p: Profession) => {
-    setActiveState(p)
-    localStorage.setItem(STORAGE_KEY, p)
-  }
-
   const value: ProfessionContextType = {
-    active: mounted ? active : 'engineer',
+    active,
     setActive,
-    config: PROFESSION_CONFIGS[mounted ? active : 'engineer'],
-    allProfessions: Object.values(PROFESSION_CONFIGS),
+    config: PROFESSION_CONFIGS[active],
+    allProfessions: PROFESSION_ORDER.map((id) => PROFESSION_CONFIGS[id]),
   }
 
   return (

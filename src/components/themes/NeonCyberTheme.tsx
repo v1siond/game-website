@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import { useTheme } from '@/themes/ThemeContext'
-import { useProfession } from '@/contexts/ProfessionContext'
+import { useProfession, PROFESSION_CONFIGS } from '@/contexts/ProfessionContext'
+import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
 import { PROJECTS_DATA } from '@/data/projects'
 import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
@@ -1122,7 +1123,7 @@ function ChromaticBorder({ children }: { children: React.ReactNode }) {
 
 export default function NeonCyberTheme() {
   const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
+  const { active, config } = useProfession()
   const [mounted, setMounted] = useState(false)
   const [glitchScreen, setGlitchScreen] = useState(false)
   const [screenTear, setScreenTear] = useState<number | null>(null)
@@ -1343,17 +1344,13 @@ export default function NeonCyberTheme() {
           </HolographicShimmer>
 
           {/* Profession selector - Cyberware slot selection */}
-          <div
+          <ProfessionSwitch
             className="grid grid-cols-3 gap-4 mb-8"
-            role="tablist"
-            aria-label="Select profession view"
-          >
-            {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
+            label="Select profession view"
+            renderOption={({ id: prof, label, optionProps }) => (
               <button
-                key={prof}
-                onClick={() => setActive(prof)}
-                role="tab"
-                aria-selected={active === prof}
+                type="button"
+                {...optionProps}
                 aria-controls={`profession-panel-${prof}`}
                 className={`p-4 text-left transition-all relative overflow-hidden ${
                   active === prof ? 'scale-105' : 'opacity-60 hover:opacity-100'
@@ -1385,19 +1382,19 @@ export default function NeonCyberTheme() {
                       className="text-sm tracking-wider font-mono"
                       style={{ color: active === prof ? '#ff00ff' : '#00ffff' }}
                     >
-                      {prof.toUpperCase()}
+                      {label.toUpperCase()}
                     </span>
                   </div>
                   <span className="text-sm text-white/50 block font-mono">
-                    {prof === 'engineer' ? 'EXP: 10+ YEARS' : prof === 'drummer' ? 'EXP: 15 YEARS' : 'EXP: 6 YEARS'}
+                    EXP: {PROFESSION_CONFIGS[prof].years.toUpperCase()}
                   </span>
                   {active === prof && (
                     <span className="text-sm text-green-400 block mt-1 font-mono">[ACTIVE]</span>
                   )}
                 </div>
               </button>
-            ))}
-          </div>
+            )}
+          />
 
           {/* About section - Personnel dossier */}
           <div className="mb-8" id={`profession-panel-${active}`} role="tabpanel" aria-label={`${active} profession details`}>

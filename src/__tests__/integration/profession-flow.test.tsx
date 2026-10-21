@@ -28,14 +28,14 @@ describe('Profession Flow Integration', () => {
         result.current.setActive('drummer')
       })
       expect(result.current.active).toBe('drummer')
-      expect(result.current.config.title).toBe('Professional Drummer')
+      expect(result.current.config.title).toBe('Musician')
 
       // Switch to fighter
       act(() => {
         result.current.setActive('fighter')
       })
       expect(result.current.active).toBe('fighter')
-      expect(result.current.config.title).toBe('Martial Arts Instructor')
+      expect(result.current.config.title).toBe('Martial Artist')
 
       // Switch back to engineer
       act(() => {
@@ -71,35 +71,13 @@ describe('Profession Flow Integration', () => {
     })
   })
 
-  describe('Profession persistence', () => {
-    it('saves each profession change to localStorage', () => {
-      const { result } = renderHook(() => useProfession(), { wrapper })
-
-      act(() => {
-        result.current.setActive('drummer')
-      })
-      expect(localStorage.setItem).toHaveBeenCalledWith('portfolio-profession', 'drummer')
-
-      act(() => {
-        result.current.setActive('fighter')
-      })
-      expect(localStorage.setItem).toHaveBeenCalledWith('portfolio-profession', 'fighter')
-
-      act(() => {
-        result.current.setActive('engineer')
-      })
-      expect(localStorage.setItem).toHaveBeenCalledWith('portfolio-profession', 'engineer')
-    })
-
-    it('restores profession from localStorage on mount', () => {
+  describe('No persistence across visits', () => {
+    it('opens on engineer even when an older visit stored another profession', () => {
       ;(localStorage.getItem as jest.Mock).mockReturnValue('drummer')
 
       const { result } = renderHook(() => useProfession(), { wrapper })
 
-      // After mount effect runs, should have drummer
-      // Note: In test environment, the initial render may show engineer
-      // then useEffect runs to update. We verify the localStorage was checked.
-      expect(localStorage.getItem).toHaveBeenCalled()
+      expect(result.current.active).toBe('engineer')
     })
   })
 
@@ -145,7 +123,7 @@ describe('Profession Context Edge Cases', () => {
 
     // Final state should be fighter
     expect(result.current.active).toBe('fighter')
-    expect(result.current.config.title).toBe('Martial Arts Instructor')
+    expect(result.current.config.title).toBe('Martial Artist')
   })
 
   it('handles setting same profession multiple times', () => {
