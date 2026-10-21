@@ -76,7 +76,7 @@
 
 /* ---- contact: the round hatch turns, then rolls aside to his corner ---- */
 
-.vaultDoor {
+.hatchDoor {
   transform: translate3d(calc(clamp(0, var(--p) * 1.6 - 0.2, 1) * 105%), 0, 0);
 }
 

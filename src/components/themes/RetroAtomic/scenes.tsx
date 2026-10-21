@@ -8,7 +8,7 @@ import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { PROFESSION_STAGES } from './stages'
 import { CVLink, HeroAction } from './actions'
-import { CHROME, STEEL_EDGE, STEEL_LIGHT, VAULT_BLUE_DARK, VAULT_YELLOW } from './palette'
+import { CHROME, STEEL_EDGE, STEEL_LIGHT, SHELTER_BLUE_DARK, ATOMIC_YELLOW } from './palette'
 import styles from './scenes.module.css'
 
 // Retro Atomic's scroll scenes on the shared stage (src/components/scroll/stage.tsx): scroll position
@@ -70,14 +70,14 @@ const COG_TEETH = Array.from({ length: 10 }, (_, i) => i * 36)
 
 function RoundHatch() {
   return (
-    <div className={`absolute inset-0 bg-[#23261f] ${styles.vaultDoor}`}>
+    <div className={`absolute inset-0 bg-[#23261f] ${styles.hatchDoor}`}>
       <svg viewBox="0 0 100 100" className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2" focusable="false">
         <g className={styles.cog}>
           {COG_TEETH.map((angle) => (
             <rect key={angle} x={45} y={0} width={10} height={12} fill={STEEL_EDGE} transform={`rotate(${angle} 50 50)`} />
           ))}
-          <circle cx={50} cy={50} r={42} fill={VAULT_BLUE_DARK} stroke={STEEL_LIGHT} strokeWidth={3} />
-          <circle cx={50} cy={50} r={30} fill="none" stroke={VAULT_YELLOW} strokeWidth={2} />
+          <circle cx={50} cy={50} r={42} fill={SHELTER_BLUE_DARK} stroke={STEEL_LIGHT} strokeWidth={3} />
+          <circle cx={50} cy={50} r={30} fill="none" stroke={ATOMIC_YELLOW} strokeWidth={2} />
           <path d="M50 22 V78 M22 50 H78" stroke={CHROME} strokeWidth={3} />
           <circle cx={50} cy={50} r={7} fill={CHROME} />
         </g>

@@ -1,59 +1,31 @@
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import {
-  FADED_TEXT,
-  NUKA_GLOW_TEXT,
-  NUKA_RED,
-  PIPBOY_GREEN,
-  PIPBOY_GREEN_DIM,
-  PIPBOY_GREEN_GLOW,
-  TERMINAL_AMBER,
-  TERMINAL_BG,
-  TERMINAL_TEXT,
-  VAULT_BLUE,
-  VAULT_YELLOW,
-  pipboyScreenBg,
-  rustTexture,
-  wornPaperBg,
-} from './palette'
-import { RadiationSymbol } from './icons'
 import { jobYears } from '@/components/cv/sectionText'
+import { TERMINAL_AMBER } from './palette'
+import { RadiationSymbol } from './icons'
+import world from './world.module.css'
 
 // The selector tab and the cards each section lists.
 
-// The Pip-Boy stat each profession tab carries, a S.P.E.C.I.A.L. letter and no score.
-export const PIPBOY_STATS: Record<Profession, string> = {
-  drummer: 'AGL',
-  engineer: 'INT',
-  fighter: 'STR',
+const TAB_LOOK = {
+  on: { frame: `border-[#14FF00] ${world.tabLit}`, lamp: 'bg-[#FFD700]', label: `text-[#14FF00] ${world.glowGreenSoft}` },
+  off: { frame: 'border-[#10CC00] bg-transparent', lamp: 'bg-[#3d4136]', label: 'text-[#10CC00]' },
 }
 
-// One Pip-Boy tab of the shared profession switch.
-export function PipBoyTab({ id, label, selected, optionProps }: ProfessionOption) {
+// One tab of the shared profession switch: a panel lamp that lights over the chosen profession.
+export function ProfessionTab({ label, selected, optionProps }: ProfessionOption) {
+  const look = TAB_LOOK[selected ? 'on' : 'off']
+
   return (
     <button
       type="button"
       {...optionProps}
-      className="relative w-full md:w-auto px-3 md:px-6 py-3 font-mono focus:outline-none focus-visible:ring-2 transition-all"
-      style={{
-        background: selected ? `linear-gradient(180deg, ${PIPBOY_GREEN}20, ${PIPBOY_GREEN}05)` : 'transparent',
-        border: `2px solid ${selected ? PIPBOY_GREEN : PIPBOY_GREEN_DIM}`,
-        boxShadow: selected ? `0 0 20px ${PIPBOY_GREEN_GLOW}, inset 0 0 20px ${PIPBOY_GREEN}10` : 'none',
-      }}
+      className={`relative w-full border-2 px-3 py-3 font-mono transition-all focus:outline-none focus-visible:ring-2 md:w-auto md:px-6 ${look.frame}`}
     >
-      <span className="block text-sm mb-1" style={{ color: selected ? VAULT_YELLOW : FADED_TEXT }} aria-hidden="true">
-        [{PIPBOY_STATS[id]}]
-      </span>
-      <span
-        className="block text-sm font-bold tracking-wider uppercase"
-        style={{
-          color: selected ? PIPBOY_GREEN : PIPBOY_GREEN_DIM,
-          textShadow: selected ? `0 0 8px ${PIPBOY_GREEN_GLOW}` : 'none',
-        }}
-      >
+      <span className={`mx-auto mb-2 block h-2.5 w-2.5 rounded-full ${look.lamp}`} aria-hidden="true" />
+      <span className={`block text-sm font-bold uppercase tracking-wider ${look.label}`}>
         {selected && <span aria-hidden="true">{'> '}</span>}
         {label}
       </span>
@@ -61,28 +33,23 @@ export function PipBoyTab({ id, label, selected, optionProps }: ProfessionOption
   )
 }
 
+const CHIP = 'border border-[#14FF00]/25 bg-[#14FF00]/10 px-2 py-0.5 text-sm text-[#10CC00]'
+
 export function TechStackTerminal({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6 font-mono">
       {categories.map((cat, idx) => (
         <div key={cat.id}>
-          <h3 className="text-sm tracking-wider mb-3 flex items-center gap-2" style={{ color: PIPBOY_GREEN }}>
-            <span style={{ color: VAULT_YELLOW }} aria-hidden="true">[{String(idx + 1).padStart(2, '0')}]</span>
+          <h3 className="mb-3 flex items-center gap-2 text-sm tracking-wider text-[#14FF00]">
+            <span className="text-[#FFD700]" aria-hidden="true">
+              [{String(idx + 1).padStart(2, '0')}]
+            </span>
             <span aria-hidden="true">{cat.icon}</span>
             {cat.name.toUpperCase()}
           </h3>
           <ul className="flex flex-wrap gap-2" aria-label={`${cat.name} technologies`}>
             {cat.items.map((tech) => (
-              <li
-                key={tech}
-                className="px-3 py-1 text-sm font-bold"
-                style={{
-                  background: TERMINAL_BG,
-                  border: `1px solid ${PIPBOY_GREEN}`,
-                  color: PIPBOY_GREEN,
-                  textShadow: `0 0 4px ${PIPBOY_GREEN}40`,
-                }}
-              >
+              <li key={tech} className="border border-[#14FF00] bg-[#0a0a08] px-3 py-1 text-sm font-bold text-[#14FF00]">
                 {tech}
               </li>
             ))}
@@ -93,58 +60,30 @@ export function TechStackTerminal({ categories }: { categories: CVData['techStac
   )
 }
 
-// Dates are date only strings (UTC midnight), so the year is read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { start: startYear, end: endYear } = jobYears(entry, 'PRESENT')
-  const isActive = !entry.endDate
+  const frame = entry.endDate ? 'border-[#A3A38C]/25' : 'border-[#14FF00]/25'
 
   return (
-    <article
-      className="relative p-4 font-mono"
-      style={{
-        background: wornPaperBg,
-        backgroundColor: TERMINAL_BG,
-        border: `1px solid ${isActive ? PIPBOY_GREEN : FADED_TEXT}40`,
-      }}
-    >
-      {/* Status stamp */}
-      <div
-        className="absolute top-2 right-2 px-2 py-0.5 text-sm font-bold"
-        style={{
-          border: `1px solid ${isActive ? PIPBOY_GREEN : FADED_TEXT}`,
-          color: isActive ? PIPBOY_GREEN : FADED_TEXT,
-          transform: 'rotate(-3deg)',
-        }}
-        aria-hidden="true"
-      >
-        {isActive ? 'ACTIVE DUTY' : 'ARCHIVED'}
+    <article className={`relative border p-4 font-mono ${world.wornCard} ${frame}`}>
+      <div className="mb-2">
+        <h3 className="text-base font-bold uppercase tracking-wide text-[#14FF00]">{entry.title}</h3>
+        <p className="mt-1 text-sm text-[#FFD700]">{entry.company}</p>
       </div>
 
-      <div className="pr-28 mb-2">
-        <h3 className="text-base font-bold uppercase tracking-wide" style={{ color: PIPBOY_GREEN }}>
-          {entry.title}
-        </h3>
-        <p className="text-sm mt-1" style={{ color: VAULT_YELLOW }}>{entry.company}</p>
-      </div>
-
-      <div
-        className="inline-block px-2 py-1 text-sm mb-3"
-        style={{
-          background: `${VAULT_BLUE}30`,
-          border: `1px solid ${VAULT_BLUE}`,
-          color: VAULT_YELLOW,
-        }}
-      >
+      <div className="mb-3 inline-block border border-[#0066CC] bg-[#0066CC]/20 px-2 py-1 text-sm text-[#FFD700]">
         {startYear} - {endYear}
       </div>
 
-      {entry.description && <p className="text-sm mb-3" style={{ color: FADED_TEXT }}>{entry.description}</p>}
+      {entry.description && <p className="mb-3 text-sm text-[#A3A38C]">{entry.description}</p>}
 
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1 border-t pt-2" style={{ borderColor: `${PIPBOY_GREEN}30` }} aria-label="Key achievements">
+        <ul className="space-y-1 border-t border-[#14FF00]/20 pt-2" aria-label="Key achievements">
           {entry.highlights.map((h) => (
-            <li key={h} className="text-sm flex items-start gap-2" style={{ color: TERMINAL_TEXT }}>
-              <span style={{ color: TERMINAL_AMBER }} aria-hidden="true">+</span>
+            <li key={h} className="flex items-start gap-2 text-sm text-[#14FF00]">
+              <span className="text-[#FF9900]" aria-hidden="true">
+                +
+              </span>
               {h}
             </li>
           ))}
@@ -152,13 +91,9 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       )}
 
       {entry.skills.length > 0 && (
-        <ul className="flex flex-wrap gap-1 mt-3" aria-label="Skills used">
+        <ul className="mt-3 flex flex-wrap gap-1" aria-label="Skills used">
           {entry.skills.slice(0, 5).map((skill) => (
-            <li
-              key={skill}
-              className="text-sm px-2 py-0.5"
-              style={{ background: `${PIPBOY_GREEN}15`, border: `1px solid ${PIPBOY_GREEN}40`, color: PIPBOY_GREEN_DIM }}
-            >
+            <li key={skill} className={CHIP}>
               {skill}
             </li>
           ))}
@@ -168,59 +103,37 @@ export function ExperienceCard({ entry }: { entry: Job }) {
   )
 }
 
+const LINK_BUTTON =
+  'inline-flex min-h-[44px] items-center border-2 border-[#14FF00] bg-[#0a0a08] px-4 text-sm font-bold uppercase tracking-wider text-[#14FF00] transition-all hover:scale-105 focus:outline-none focus-visible:ring-2'
+
+// A highlight project sits on rusted steel in yellow, the others on the phosphor screen in green.
+const PROJECT_LOOK = {
+  highlight: `${world.rust} ${world.highlightCard} border-[#FFD700]/30`,
+  plain: `${world.phosphorScreen} border-[#14FF00]/30`,
+}
+
 // His role, the result line and the links.
 export function ProjectCard({ project, years, links }: ProjectSlot) {
-  const isHighlight = project.highlight
-
   return (
-    <article
-      className="relative p-4 font-mono h-full"
-      style={{
-        background: isHighlight ? rustTexture : pipboyScreenBg,
-        backgroundColor: isHighlight ? `${VAULT_BLUE}10` : TERMINAL_BG,
-        border: `2px solid ${isHighlight ? VAULT_YELLOW : PIPBOY_GREEN}50`,
-        boxShadow: isHighlight ? `0 0 15px ${VAULT_YELLOW}15` : 'none',
-      }}
-    >
-      <div className="flex justify-between items-start gap-2">
-        <h3 className="text-base font-bold uppercase tracking-wide" style={{ color: PIPBOY_GREEN }}>
-          {project.name}
-        </h3>
-        {years && (
-          <span className="text-sm whitespace-nowrap" style={{ color: VAULT_YELLOW }}>
-            {years}
-          </span>
-        )}
+    <article className={`relative h-full border-2 p-4 font-mono ${PROJECT_LOOK[project.highlight ? 'highlight' : 'plain']}`}>
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="text-base font-bold uppercase tracking-wide text-[#14FF00]">{project.name}</h3>
+        {years && <span className="whitespace-nowrap text-sm text-[#FFD700]">{years}</span>}
       </div>
-      <p className="text-sm mt-1 font-bold" style={{ color: VAULT_YELLOW }}>{project.role}</p>
-      <p className="text-sm mt-1" style={{ color: FADED_TEXT }}>{project.tagline}</p>
+      <p className="mt-1 text-sm font-bold text-[#FFD700]">{project.role}</p>
+      <p className="mt-1 text-sm text-[#A3A38C]">{project.tagline}</p>
 
       {project.impact && (
-        <p
-          className="text-sm mt-3 p-2 flex items-start gap-2"
-          style={{
-            background: `${TERMINAL_AMBER}10`,
-            border: `1px solid ${TERMINAL_AMBER}40`,
-            color: TERMINAL_AMBER,
-          }}
-        >
+        <p className="mt-3 flex items-start gap-2 border border-[#FF9900]/25 bg-[#FF9900]/5 p-2 text-sm text-[#FF9900]">
           <RadiationSymbol size={12} color={TERMINAL_AMBER} />
           {project.impact}
         </p>
       )}
 
       {project.techStack.length > 0 && (
-        <ul className="flex flex-wrap gap-1 mt-3" aria-label="Technologies used">
+        <ul className="mt-3 flex flex-wrap gap-1" aria-label="Technologies used">
           {project.techStack.slice(0, 5).map((tech) => (
-            <li
-              key={tech}
-              className="text-sm px-1.5 py-0.5 font-bold"
-              style={{
-                background: `${PIPBOY_GREEN}15`,
-                border: `1px solid ${PIPBOY_GREEN}40`,
-                color: PIPBOY_GREEN_DIM,
-              }}
-            >
+            <li key={tech} className={`${CHIP} font-bold`}>
               {tech}
             </li>
           ))}
@@ -228,20 +141,15 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
       )}
 
       {links.length > 0 ? (
-        <div className="flex flex-wrap gap-3 mt-4">
+        <div className="mt-4 flex flex-wrap gap-3">
           {links.map(({ kind, label, linkProps }) => (
-            <a
-              key={kind}
-              {...linkProps}
-              className="inline-flex items-center min-h-[44px] px-4 text-sm font-bold tracking-wider uppercase focus:outline-none focus-visible:ring-2 transition-all hover:scale-105"
-              style={{ background: TERMINAL_BG, border: `2px solid ${PIPBOY_GREEN}`, color: PIPBOY_GREEN }}
-            >
+            <a key={kind} {...linkProps} className={LINK_BUTTON}>
               [{label}]
             </a>
           ))}
         </div>
       ) : (
-        <p className="text-sm mt-4" style={{ color: FADED_TEXT }}>No public link</p>
+        <p className="mt-4 text-sm text-[#A3A38C]">No public link</p>
       )}
     </article>
   )
@@ -254,26 +162,18 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
-      className="block h-full p-4 font-mono transition-all hover:scale-[1.02]"
-      style={{
-        background: pipboyScreenBg,
-        backgroundColor: TERMINAL_BG,
-        border: `1px solid ${VAULT_BLUE}`,
-      }}
+      className={`block h-full border border-[#0066CC] p-4 font-mono transition-all hover:scale-[1.02] focus:outline-none focus-visible:ring-2 ${world.phosphorScreen}`}
     >
-      <div className="flex items-center gap-3 mb-2">
-        <span className="text-2xl" aria-hidden="true">{company.icon}</span>
+      <div className="mb-2 flex items-center gap-3">
+        <span className="text-2xl" aria-hidden="true">
+          {company.icon}
+        </span>
         <div>
-          <h3 className="text-base font-bold uppercase tracking-wide" style={{ color: PIPBOY_GREEN }}>
-            {company.name}
-          </h3>
-          <p className="text-sm" style={{ color: VAULT_YELLOW }}>{company.tagline}</p>
+          <h3 className="text-base font-bold uppercase tracking-wide text-[#14FF00]">{company.name}</h3>
+          <p className="text-sm text-[#FFD700]">{company.tagline}</p>
         </div>
       </div>
-      <p className="text-sm" style={{ color: FADED_TEXT }}>{company.description}</p>
-      <div className="mt-2 text-sm" style={{ color: PIPBOY_GREEN_DIM }} aria-hidden="true">
-        [ACCESS TERMINAL &gt;]
-      </div>
+      <p className="text-sm text-[#A3A38C]">{company.description}</p>
     </a>
   )
 }
@@ -281,24 +181,15 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 // His role, the years and the release.
 export function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
-    <article
-      className="p-4 font-mono h-full"
-      style={{
-        background: rustTexture,
-        backgroundColor: TERMINAL_BG,
-        border: `1px solid ${NUKA_RED}50`,
-      }}
-    >
-      <h3 className="text-base font-bold uppercase tracking-wide" style={{ color: NUKA_GLOW_TEXT }}>
-        {band.name}
-      </h3>
-      <p className="text-sm mt-1" style={{ color: VAULT_YELLOW }}>
+    <article className={`h-full border border-[#CC0000]/30 p-4 font-mono ${world.rust}`}>
+      <h3 className="text-base font-bold uppercase tracking-wide text-[#FF4D4D]">{band.name}</h3>
+      <p className="mt-1 text-sm text-[#FFD700]">
         {band.role}
         {years && <span aria-hidden="true"> {'//'} </span>}
         {years && <span>{years}</span>}
       </p>
       {band.release && (
-        <p className="text-sm mt-2" style={{ color: FADED_TEXT }}>
+        <p className="mt-2 text-sm text-[#A3A38C]">
           Released <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
@@ -307,7 +198,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 
   if (!linkProps) return content
   return (
-    <a {...linkProps} className="block h-full transition-all hover:scale-[1.02]">
+    <a {...linkProps} className="block h-full transition-all hover:scale-[1.02] focus:outline-none focus-visible:ring-2">
       {content}
     </a>
   )

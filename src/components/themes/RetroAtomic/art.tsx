@@ -1,103 +1,54 @@
-import {
-  FADED_TEXT,
-  IRRADIATED_GREEN,
-  NUKA_GLOW,
-  NUKA_RED,
-  NUKA_RED_DARK,
-  TERMINAL_AMBER,
-  VAULT_YELLOW,
-  VAULT_YELLOW_DIM,
-} from './palette'
-import { AtomSymbol, BottleCap, NukaColaBottle, RadiationSymbol, VaultBoy, VaultDoor, WastelandSilhouette } from './icons'
+import { ATOMIC_YELLOW, ATOMIC_YELLOW_DIM, PHOSPHOR_GREEN } from './palette'
+import { AtomSymbol, RadiationSymbol, Rocket, ShelterHatch, Starburst, TownSkyline } from './icons'
+import world from './world.module.css'
 
-// The art separators between sections: Vault-Tec, the wasteland, Nuka-Cola.
+// The art separators between sections, all atomic age and all decoration: the shelter hatch between
+// two atoms, the town skyline at dusk, the rocket between two starbursts.
 
-export function VaultTecArt() {
+const TREFOILS = [0, 1, 2, 3, 4]
+const STARS = [0, 1, 2, 3, 4, 5, 6]
+
+export function ShelterArt() {
   return (
-    <div className="py-12 flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-4 py-12" aria-hidden="true">
       <div className="flex items-center gap-6">
-        <div style={{ transform: 'scaleX(-1)' }}>
-          <VaultBoy size={60} expression="pointing" />
-        </div>
-        <VaultDoor size={80} />
-        <VaultBoy size={60} expression="pointing" />
-      </div>
-      <div
-        className="font-mono text-sm tracking-[0.5em] uppercase"
-        style={{ color: VAULT_YELLOW }}
-      >
-        Vault-Tec: Prepare for the Future
+        <AtomSymbol size={56} color={ATOMIC_YELLOW} />
+        <ShelterHatch size={80} />
+        <AtomSymbol size={56} color={ATOMIC_YELLOW} />
       </div>
       <div className="flex items-center gap-4">
-        {[...Array(5)].map((_, i) => (
-          <RadiationSymbol key={i} size={16} color={VAULT_YELLOW_DIM} />
+        {TREFOILS.map((i) => (
+          <RadiationSymbol key={i} size={16} color={ATOMIC_YELLOW_DIM} />
         ))}
       </div>
     </div>
   )
 }
 
-export function WastelandArt() {
+export function SkylineArt() {
   return (
-    <div className="py-8">
-      <WastelandSilhouette />
-      <div className="flex justify-center items-center gap-6 -mt-8 relative z-10">
-        <AtomSymbol size={40} color={IRRADIATED_GREEN} />
-        <div className="text-center">
-          <p
-            className="font-mono text-sm font-bold"
-            style={{
-              color: TERMINAL_AMBER,
-              textShadow: `0 0 10px ${TERMINAL_AMBER}60`,
-            }}
-          >
-            CAUTION: IRRADIATED ZONE
-          </p>
-          <p
-            className="font-mono text-sm mt-1"
-            style={{ color: FADED_TEXT }}
-          >
-            Radiation Level: Moderate
-          </p>
-        </div>
-        <AtomSymbol size={40} color={IRRADIATED_GREEN} />
+    <div className="py-8" aria-hidden="true">
+      <TownSkyline />
+      <div className="relative z-10 -mt-8 flex items-center justify-center gap-6">
+        <AtomSymbol size={40} color={PHOSPHOR_GREEN} />
+        <Starburst size={28} color={ATOMIC_YELLOW} />
+        <AtomSymbol size={40} color={PHOSPHOR_GREEN} />
       </div>
     </div>
   )
 }
 
-export function NukaColaArt() {
+export function RocketArt() {
   return (
-    <div
-      className="py-10 flex flex-col items-center gap-4"
-      style={{
-        background: `linear-gradient(180deg, transparent, ${NUKA_RED}08, transparent)`,
-      }}
-    >
+    <div className={`flex flex-col items-center gap-4 py-10 ${world.rocketBand}`} aria-hidden="true">
       <div className="flex items-center gap-8">
-        <NukaColaBottle size={70} />
-        <div className="text-center">
-          <p
-            className="font-serif text-2xl font-bold italic"
-            style={{
-              color: NUKA_RED,
-              textShadow: `0 0 15px ${NUKA_GLOW}, 2px 2px 0 ${NUKA_RED_DARK}`,
-            }}
-          >
-            Nuka-Cola
-          </p>
-          <p
-            className="font-serif text-sm mt-1"
-            style={{ color: VAULT_YELLOW }}
-          >
-            Take the taste of Nuka-Cola with you!
-          </p>
-        </div>
-        <NukaColaBottle size={70} />
+        <Starburst size={44} color={ATOMIC_YELLOW} />
+        <Rocket size={80} />
+        <Starburst size={44} color={ATOMIC_YELLOW} />
       </div>
       <div className="flex items-center gap-3">
-        {[...Array(7)].map((_, i) => (
-          <BottleCap key={i} size={18} />
+        {STARS.map((i) => (
+          <Starburst key={i} size={14} color={ATOMIC_YELLOW_DIM} />
         ))}
       </div>
     </div>

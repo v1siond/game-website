@@ -6,30 +6,31 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
-import {
-  FADED_TEXT,
-  PIPBOY_GREEN,
-  PIPBOY_GREEN_DIM,
-  PIPBOY_GREEN_GLOW,
-  TERMINAL_AMBER,
-  TERMINAL_BG,
-  TERMINAL_TEXT,
-  VAULT_YELLOW,
-  crtScanlinesBg,
-} from './RetroAtomic/palette'
-import { AtomSymbol, BottleCap, RadiationSymbol } from './RetroAtomic/icons'
-import { PipBoyTab } from './RetroAtomic/cards'
-import { CVLink, HeroAction, TERMINAL_BUTTON } from './RetroAtomic/actions'
-import { SECTION_VIEWS } from './RetroAtomic/sections'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { ATOMIC_YELLOW, PHOSPHOR_GREEN, PHOSPHOR_GREEN_DIM } from './RetroAtomic/palette'
+import { AtomSymbol, RadiationSymbol, Starburst } from './RetroAtomic/icons'
+import { ProfessionTab } from './RetroAtomic/cards'
+import { BUTTON_LOOK, CVLink, HeroAction, TERMINAL_BUTTON } from './RetroAtomic/actions'
+import { SECTION_VIEWS } from './RetroAtomic/sections'
 import { ContactScene } from './RetroAtomic/scenes'
+import world from './RetroAtomic/world.module.css'
 
 // Retro Atomic: the page composition. Its palette, icons, panels, art separators, cards, character,
 // profession stages, scroll scenes and per profession sections live in ./RetroAtomic.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
 // scroll container and stop the scenes' strips from sticking to the viewport.
+
+// The faint hazard trefoils behind the page: place and size of each.
+const BACKDROP_TREFOILS = [
+  { place: 'left-[10%] top-[15%]', size: 60 },
+  { place: 'left-[26%] top-[40%]', size: 70 },
+  { place: 'left-[42%] top-[65%]', size: 80 },
+  { place: 'left-[58%] top-[15%]', size: 90 },
+  { place: 'left-[74%] top-[40%]', size: 100 },
+  { place: 'left-[90%] top-[65%]', size: 110 },
+]
 
 export default function RetroAtomicTheme() {
   const { active } = useProfession()
@@ -44,93 +45,42 @@ export default function RetroAtomicTheme() {
   if (!mounted) return null
 
   return (
-    <div
-      className="relative min-h-screen overflow-x-clip"
-      style={{
-        background: TERMINAL_BG,
-        fontFamily: 'monospace',
-      }}
-    >
-      {/* CRT Scanlines overlay */}
-      {!reducedMotion && (
-        <div
-          className="fixed inset-0 pointer-events-none z-[100]"
-          style={{
-            background: crtScanlinesBg,
-            opacity: 0.3,
-          }}
-          aria-hidden="true"
-        />
-      )}
+    <div className={`relative min-h-screen overflow-x-clip ${world.root}`}>
+      {!reducedMotion && <div className={`pointer-events-none fixed inset-0 z-[100] ${world.scanlines}`} aria-hidden="true" />}
 
-      {/* Subtle radiation symbols in background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0" aria-hidden="true">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute"
-            style={{
-              left: `${10 + i * 16}%`,
-              top: `${15 + (i % 3) * 25}%`,
-              opacity: 0.04,
-            }}
-          >
-            <RadiationSymbol size={60 + i * 10} color={PIPBOY_GREEN} />
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden opacity-[0.04]" aria-hidden="true">
+        {BACKDROP_TREFOILS.map(({ place, size }) => (
+          <div key={place} className={`absolute ${place}`}>
+            <RadiationSymbol size={size} color={PHOSPHOR_GREEN} />
           </div>
         ))}
       </div>
 
-      {/* ================================================================ */}
-      {/* HEADER - the recruiter first screen */}
-      {/* ================================================================ */}
+      {/* the recruiter first screen */}
       <header className="relative z-30 p-4 md:p-6">
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
-            <div className="max-w-6xl mx-auto">
-              <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-4">
+            <div className="mx-auto max-w-6xl">
+              <div className="mb-4 flex flex-col items-start justify-between gap-4 md:flex-row">
                 <div>
-                  {/* Vault-Tec header */}
-                  <div className="flex items-center gap-4 pb-3 mb-3" style={{ borderBottom: `2px solid ${VAULT_YELLOW}` }}>
-                    <RadiationSymbol size={36} color={VAULT_YELLOW} />
-                    <div>
-                      <h1
-                        className="text-xl md:text-3xl font-bold tracking-wider uppercase"
-                        style={{
-                          color: PIPBOY_GREEN,
-                          textShadow: `0 0 20px ${PIPBOY_GREEN_GLOW}, 0 0 40px ${PIPBOY_GREEN}30`,
-                        }}
-                      >
-                        {name}
-                      </h1>
-                      <p className="text-sm tracking-widest" style={{ color: VAULT_YELLOW }} aria-hidden="true">
-                        VAULT-TEC PERSONNEL FILE
-                      </p>
-                    </div>
+                  <div className="mb-3 flex items-center gap-4 border-b-2 border-[#FFD700] pb-3">
+                    <RadiationSymbol size={36} color={ATOMIC_YELLOW} />
+                    <h1 className={`text-xl font-bold uppercase tracking-wider text-[#14FF00] md:text-3xl ${world.glowGreen}`}>{name}</h1>
                   </div>
-                  <p className="text-base max-w-xl" style={{ color: TERMINAL_TEXT }}>
-                    {headline}
-                  </p>
-                  <p className="text-sm mt-1 italic" style={{ color: TERMINAL_AMBER }}>
-                    {tagline}
-                  </p>
-                  <p className="text-sm mt-1" style={{ color: TERMINAL_TEXT }}>
-                    {line}
-                  </p>
+                  <p className="max-w-xl text-base text-[#14FF00]">{headline}</p>
+                  <p className="mt-1 text-sm italic text-[#FF9900]">{tagline}</p>
+                  <p className="mt-1 text-sm text-[#14FF00]">{line}</p>
                 </div>
 
-                <div className="flex flex-col items-start md:items-end gap-3">
-                  <BottleCap size={24} />
-                  <nav className="flex gap-2 flex-wrap md:justify-end" aria-label="Contact and CV">
+                <div className="flex flex-col items-start gap-3 md:items-end">
+                  <Starburst size={24} color={ATOMIC_YELLOW} />
+                  <nav className="flex flex-wrap gap-2 md:justify-end" aria-label="Contact and CV">
                     {actions.map((action) => (
                       <HeroAction key={action.id} action={action} />
                     ))}
                     <CVLink />
-                    <Link
-                      href="/personal-projects/game-engine"
-                      className={TERMINAL_BUTTON}
-                      style={{ background: TERMINAL_BG, border: `2px solid ${PIPBOY_GREEN}`, color: PIPBOY_GREEN }}
-                    >
-                      [N] NEBULITH
+                    <Link href="/personal-projects/game-engine" className={`${TERMINAL_BUTTON} ${BUTTON_LOOK.green}`}>
+                      Nebulith
                     </Link>
                   </nav>
                 </div>
@@ -140,14 +90,12 @@ export default function RetroAtomicTheme() {
         />
       </header>
 
-      {/* ================================================================ */}
-      {/* PROFESSION SELECTOR - Pip-Boy tabs, System Engineer in the centre */}
-      {/* ================================================================ */}
-      <section className="relative z-20 py-4 px-4" aria-label="Profession selection">
+      {/* the profession switch, System Engineer in the centre */}
+      <section className="relative z-20 px-4 py-4" aria-label="Profession selection">
         <ProfessionSwitch
-          className="grid grid-cols-3 gap-2 max-w-xl mx-auto md:flex md:justify-center md:gap-6 md:max-w-none"
+          className="mx-auto grid max-w-xl grid-cols-3 gap-2 md:flex md:max-w-none md:justify-center md:gap-6"
           label="Profession"
-          renderOption={(option) => <PipBoyTab {...option} />}
+          renderOption={(option) => <ProfessionTab {...option} />}
         />
       </section>
 
@@ -155,18 +103,15 @@ export default function RetroAtomicTheme() {
         <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
       </div>
 
-      {/* CONTACT - the round shelter hatch rolls aside to his corner */}
+      {/* contact: the round shelter hatch rolls aside to his corner */}
       <ContactScene profession={active} />
 
-      {/* ================================================================ */}
-      {/* FOOTER */}
-      {/* ================================================================ */}
       <footer className="relative z-20 py-12 text-center" role="contentinfo">
-        <div className="flex justify-center gap-4 mb-4">
-          <AtomSymbol size={40} color={PIPBOY_GREEN_DIM} />
+        <div className="mb-4 flex justify-center gap-4">
+          <AtomSymbol size={40} color={PHOSPHOR_GREEN_DIM} />
         </div>
-        <p className="text-sm font-mono" style={{ color: FADED_TEXT }}>
-          © {new Date().getFullYear()} Alexander Pulido
+        <p className="font-mono text-sm text-[#A3A38C]">
+          © {new Date().getFullYear()} {view.hero.name}
         </p>
       </footer>
     </div>

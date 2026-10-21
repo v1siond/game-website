@@ -8,18 +8,18 @@ import {
   CASING,
   CHROME,
   LAMP_GLOW,
-  NUKA_RED,
-  PIPBOY_GREEN,
-  PIPBOY_GREEN_DARK,
-  PIPBOY_SCREEN_BG,
+  ROCKET_RED,
+  PHOSPHOR_GREEN,
+  PHOSPHOR_GREEN_DARK,
+  SCREEN_BG,
   STEEL,
   STEEL_EDGE,
   STEEL_LIGHT,
   TERMINAL_AMBER,
-  VAULT_BG,
-  VAULT_BLUE,
-  VAULT_BLUE_DARK,
-  VAULT_YELLOW,
+  BUNKER_BG,
+  SHELTER_BLUE,
+  SHELTER_BLUE_DARK,
+  ATOMIC_YELLOW,
   VELVET,
   VELVET_FOLD,
 } from './palette'
@@ -105,8 +105,8 @@ function Bulkheads() {
             className={`absolute inset-x-0 top-0 h-[calc(100%_-_0.75rem)] w-full ${styles.hatch}`}
             focusable="false"
           >
-            <rect width={20} height={100} fill={VAULT_BLUE_DARK} />
-            <path d="M0 10 L20 0 V8 L0 18 Z M0 82 L20 72 V80 L0 90 Z" fill={VAULT_YELLOW} />
+            <rect width={20} height={100} fill={SHELTER_BLUE_DARK} />
+            <path d="M0 10 L20 0 V8 L0 18 Z M0 82 L20 72 V80 L0 90 Z" fill={ATOMIC_YELLOW} />
             <circle cx={10} cy={46} r={4} fill="none" stroke={CHROME} strokeWidth={1.5} />
           </svg>
         </div>
@@ -122,12 +122,12 @@ const LAB_PANELS = Array.from({ length: 12 }, (_, i) => i * 50)
 function LabWall() {
   return (
     <Wall>
-      <rect width={600} height={100} fill={VAULT_BG} />
+      <rect width={600} height={100} fill={BUNKER_BG} />
       {LAB_PANELS.map((x) => (
         <rect key={x} x={x + 2} y={12} width={46} height={60} fill={STEEL} stroke={STEEL_LIGHT} strokeWidth={1} />
       ))}
-      <rect y={3} width={600} height={5} fill={VAULT_BLUE_DARK} />
-      <path d="M0 80 H90 L98 72 H230 M260 82 H340 L348 74 H460 M500 80 H600" stroke={PIPBOY_GREEN_DARK} strokeWidth={1.2} fill="none" />
+      <rect y={3} width={600} height={5} fill={SHELTER_BLUE_DARK} />
+      <path d="M0 80 H90 L98 72 H230 M260 82 H340 L348 74 H460 M500 80 H600" stroke={PHOSPHOR_GREEN_DARK} strokeWidth={1.2} fill="none" />
     </Wall>
   )
 }
@@ -137,7 +137,7 @@ function Mainframe({ position }: { position: number }) {
   return (
     <svg viewBox="0 0 36 52" className={`${PROP_SLOT} h-14 w-10 sm:h-20 sm:w-14 ${atClass(position)}`} aria-hidden="true" focusable="false">
       <rect x={1} y={1} width={34} height={50} rx={2} fill={CASING} />
-      <rect x={4} y={4} width={28} height={22} fill={PIPBOY_SCREEN_BG} />
+      <rect x={4} y={4} width={28} height={22} fill={SCREEN_BG} />
       {[11, 25].map((cx) => (
         <g key={cx} className={styles.reel}>
           <circle cx={cx} cy={15} r={6} fill="none" stroke={CHROME} strokeWidth={2} />
@@ -145,8 +145,8 @@ function Mainframe({ position }: { position: number }) {
         </g>
       ))}
       <rect x={6} y={31} width={4} height={3} fill={TERMINAL_AMBER} />
-      <rect x={13} y={31} width={4} height={3} fill={PIPBOY_GREEN} />
-      <rect x={20} y={31} width={4} height={3} fill={NUKA_RED} />
+      <rect x={13} y={31} width={4} height={3} fill={PHOSPHOR_GREEN} />
+      <rect x={20} y={31} width={4} height={3} fill={ROCKET_RED} />
       <path d="M5 40 H31 M5 44 H31" stroke={STEEL} strokeWidth={1.5} />
     </svg>
   )
@@ -156,7 +156,7 @@ const PROP_POSITIONS = [0.2, 0.52, 0.84]
 
 const ENGINEER_PROPS: Record<LevelZone, ReactNode> = {
   record: PROP_POSITIONS.map((position) => (
-    <Terminal key={position} position={position} body={CASING} screen={PIPBOY_GREEN} stand={STEEL_EDGE} />
+    <Terminal key={position} position={position} body={CASING} screen={PHOSPHOR_GREEN} stand={STEEL_EDGE} />
   )),
   work: PROP_POSITIONS.map((position) => <Mainframe key={position} position={position} />),
 }
@@ -165,7 +165,7 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
   return (
     <>
       <LabWall />
-      <RoomLamps glow={PIPBOY_GREEN} />
+      <RoomLamps glow={PHOSPHOR_GREEN} />
       <Bulkheads />
       <Floor tone="bg-[#23261f]" />
       {ENGINEER_PROPS[zone]}
@@ -177,9 +177,9 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
 
 const KIT: DrumKitColors = {
   stand: CHROME,
-  shell: NUKA_RED,
+  shell: ROCKET_RED,
   rim: CHROME,
-  bass: VAULT_YELLOW,
+  bass: ATOMIC_YELLOW,
   cymbal: styles.cymbal,
 }
 
@@ -192,7 +192,7 @@ function LoungeWall() {
       {CURTAIN_FOLDS.map((x) => (
         <rect key={x} x={x + 4} y={0} width={14} height={100} fill={VELVET} />
       ))}
-      <rect y={0} width={600} height={7} fill={VAULT_YELLOW} opacity={0.7} />
+      <rect y={0} width={600} height={7} fill={ATOMIC_YELLOW} opacity={0.7} />
     </Wall>
   )
 }
@@ -209,7 +209,7 @@ function ValveAmp() {
       <rect x={1} y={1} width={46} height={42} rx={4} fill={CASING} />
       <rect x={5} y={5} width={22} height={14} rx={2} fill={LAMP_GLOW} />
       <path d="M8 16 A9 9 0 0 1 24 16" stroke={STEEL} strokeWidth={1} fill="none" />
-      <rect x={15.5} y={8} width={1.5} height={10} fill={NUKA_RED} className={styles.needle} />
+      <rect x={15.5} y={8} width={1.5} height={10} fill={ROCKET_RED} className={styles.needle} />
       {[32, 37, 42].map((x) => (
         <rect key={x} x={x - 1.5} y={6} width={3} height={12} rx={1.5} fill={TERMINAL_AMBER} className={styles.valve} />
       ))}
@@ -278,13 +278,13 @@ function GymWall() {
           <rect x={x - 19} y={28} width={38} height={18} fill={STEEL_LIGHT} />
         </g>
       ))}
-      <path d="M0 58 H600" stroke={VAULT_YELLOW} strokeWidth={4} strokeDasharray="14 10" />
+      <path d="M0 58 H600" stroke={ATOMIC_YELLOW} strokeWidth={4} strokeDasharray="14 10" />
       {[30, 570].map((x) => (
         <rect key={x} x={x} y={28} width={6} height={72} fill={CHROME} />
       ))}
-      <line x1={0} y1={44} x2={600} y2={44} stroke={NUKA_RED} strokeWidth={1.5} />
+      <line x1={0} y1={44} x2={600} y2={44} stroke={ROCKET_RED} strokeWidth={1.5} />
       <line x1={0} y1={60} x2={600} y2={60} stroke={CHROME} strokeWidth={1.5} />
-      <line x1={0} y1={76} x2={600} y2={76} stroke={VAULT_BLUE} strokeWidth={1.5} />
+      <line x1={0} y1={76} x2={600} y2={76} stroke={SHELTER_BLUE} strokeWidth={1.5} />
     </Wall>
   )
 }
@@ -301,7 +301,7 @@ function PadRobot() {
       focusable="false"
     >
       <line x1={22} y1={2} x2={22} y2={12} stroke={CHROME} strokeWidth={1.5} />
-      <circle cx={22} cy={3} r={2.5} fill={NUKA_RED} />
+      <circle cx={22} cy={3} r={2.5} fill={ROCKET_RED} />
       <rect x={12} y={12} width={20} height={16} rx={3} fill={CHROME} />
       <circle cx={17} cy={20} r={2.5} fill={TERMINAL_AMBER} />
       <circle cx={27} cy={20} r={2.5} fill={TERMINAL_AMBER} />
@@ -310,8 +310,8 @@ function PadRobot() {
       <rect x={8} y={68} width={28} height={22} rx={6} fill={STEEL_LIGHT} />
       <circle cx={14} cy={84} r={3} fill={STEEL_EDGE} />
       <circle cx={30} cy={84} r={3} fill={STEEL_EDGE} />
-      <rect x={0} y={32} width={8} height={14} rx={3} fill={NUKA_RED} className={scene.padHigh} />
-      <rect x={0} y={52} width={8} height={16} rx={3} fill={NUKA_RED} className={scene.padLow} />
+      <rect x={0} y={32} width={8} height={14} rx={3} fill={ROCKET_RED} className={scene.padHigh} />
+      <rect x={0} y={52} width={8} height={16} rx={3} fill={ROCKET_RED} className={scene.padLow} />
     </svg>
   )
 }
@@ -328,7 +328,7 @@ function FighterLevel() {
 }
 
 function AtomicFlash() {
-  return <StrikeFlash color={VAULT_YELLOW} />
+  return <StrikeFlash color={ATOMIC_YELLOW} />
 }
 
 // ---- the contact corners: where each profession ends the page, behind the round hatch ----
@@ -339,7 +339,7 @@ function EngineerCorner() {
       hero={<HeroCharacter profession="engineer" className={scene.hero} />}
       colors={{
         panel: CASING,
-        screens: [PIPBOY_GREEN, TERMINAL_AMBER],
+        screens: [PHOSPHOR_GREEN, TERMINAL_AMBER],
         desk: STEEL_EDGE,
         keyboard: CASING,
       }}
@@ -348,7 +348,7 @@ function EngineerCorner() {
 }
 
 function MusicianCorner() {
-  return <KitCorner hero={<HeroCharacter profession="drummer" className={scene.hero} />} kit={KIT} waves={[TERMINAL_AMBER, PIPBOY_GREEN]} />
+  return <KitCorner hero={<HeroCharacter profession="drummer" className={scene.hero} />} kit={KIT} waves={[TERMINAL_AMBER, PHOSPHOR_GREEN]} />
 }
 
 function RingCorner() {
@@ -356,9 +356,9 @@ function RingCorner() {
     <div className={`absolute inset-0 ${scene.guard}`}>
       <svg viewBox="0 0 160 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
         <rect x={4} y={20} width={8} height={80} fill={CHROME} />
-        <line x1={10} y1={34} x2={160} y2={34} stroke={NUKA_RED} strokeWidth={1.5} />
+        <line x1={10} y1={34} x2={160} y2={34} stroke={ROCKET_RED} strokeWidth={1.5} />
         <line x1={10} y1={52} x2={160} y2={52} stroke={CHROME} strokeWidth={1.5} />
-        <line x1={10} y1={70} x2={160} y2={70} stroke={VAULT_BLUE} strokeWidth={1.5} />
+        <line x1={10} y1={70} x2={160} y2={70} stroke={SHELTER_BLUE} strokeWidth={1.5} />
       </svg>
       <div className="absolute bottom-1 left-1/3">
         <HeroCharacter profession="fighter" className={scene.hero} />

@@ -6,9 +6,8 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { TERMINAL_AMBER, TERMINAL_TEXT, VAULT_YELLOW } from './palette'
-import { PipBoyFrame, RustedPanel, VaultTecPanel, WornDocumentPanel } from './panels'
-import { NukaColaArt, VaultTecArt, WastelandArt } from './art'
+import { PhosphorFrame, RustedPanel, ShelterPanel, WornDocumentPanel } from './panels'
+import { RocketArt, ShelterArt, SkylineArt } from './art'
 import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechStackTerminal } from './cards'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { LevelScene } from '@/components/scroll/stage'
@@ -29,7 +28,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
             <WornDocumentPanel title="About">
-              <p className="text-base leading-relaxed font-mono" style={{ color: TERMINAL_TEXT }}>
+              <p className="font-mono text-base leading-relaxed text-[#14FF00]">
                 {professionalSummary.bio}
               </p>
             </WornDocumentPanel>
@@ -37,8 +36,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </div>
       </FadeInScene>
 
-      {/* ART: VAULT-TEC */}
-      <VaultTecArt />
+      <ShelterArt />
 
       {sections.jobs.length > 0 && (
         <LevelScene>
@@ -61,15 +59,14 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </LevelScene>
       )}
 
-      {/* ART: WASTELAND */}
-      <WastelandArt />
+      <SkylineArt />
 
       <FadeInScene>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
-            <PipBoyFrame title="Tech Stack">
+            <PhosphorFrame title="Tech Stack">
               <TechStackTerminal categories={sections.techStack} />
-            </PipBoyFrame>
+            </PhosphorFrame>
           </div>
         </div>
       </FadeInScene>
@@ -93,19 +90,18 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </div>
       </LevelScene>
 
-      {/* ART: NUKA-COLA */}
-      <NukaColaArt />
+      <RocketArt />
 
       <FadeInScene>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
-            <VaultTecPanel title="Ventures">
+            <ShelterPanel title="Ventures">
               <div className="grid md:grid-cols-3 gap-4">
                 {sections.companies.map((company) => (
                   <CompanyCard key={company.id} company={company} />
                 ))}
               </div>
-            </VaultTecPanel>
+            </ShelterPanel>
           </div>
         </div>
       </FadeInScene>
@@ -118,13 +114,13 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
   return (
     <>
-      <NukaColaArt />
+      <RocketArt />
       <LevelScene>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
             <Lane profession="drummer" zone="record" />
             <RustedPanel title="Bands">
-              <p className="text-base mb-4 font-mono" style={{ color: TERMINAL_TEXT }}>
+              <p className="mb-4 font-mono text-base text-[#14FF00]">
                 Drums since {musician.since}, {musician.yearsPlaying} years
               </p>
               <BandList
@@ -136,7 +132,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
                   </SceneItem>
                 )}
               />
-              <p className="text-sm mt-4 italic font-mono" style={{ color: TERMINAL_AMBER }}>
+              <p className="mt-4 font-mono text-sm italic text-[#FF9900]">
                 {musician.line}
               </p>
             </RustedPanel>
@@ -152,13 +148,13 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
 
   return (
     <>
-      <WastelandArt />
+      <SkylineArt />
       <LevelScene>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
             <Lane profession="fighter" zone="record" />
-            <PipBoyFrame title="Muay Thai">
-              <h3 className="text-lg font-bold uppercase tracking-wide mb-4 font-mono" style={{ color: VAULT_YELLOW }}>
+            <PhosphorFrame title="Muay Thai">
+              <h3 className="mb-4 font-mono text-lg font-bold uppercase tracking-wide text-[#FFD700]">
                 {martialArts.primary.title}
               </h3>
               <MuayThaiRecord
@@ -182,7 +178,7 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
                   </SceneItem>
                 )}
               />
-            </PipBoyFrame>
+            </PhosphorFrame>
           </div>
         </div>
       </LevelScene>
