@@ -7,7 +7,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { HeroCharacter, type SpritePose } from './character'
-import { Layer, pinePath } from './depth'
+import { Layer } from './depth'
 import { GROUND, PROFESSION_SKY, Sky, Soft } from './places'
 import { useCut } from './cut'
 import { CVLink, HeroActions } from './actions'
@@ -15,60 +15,82 @@ import { SHADE, TYPEWRITER } from './palette'
 import world from './world.module.css'
 import shade from './shade.module.css'
 
-// Contact: a clearing at the end of the forest, where the fog lifts as the section scrolls in and the
-// way to reach him sits beside a sprung trap, the oldest joke of a silhouette platformer. The visitor
-// can spring it: he runs straight at it, the jaws snap, the screen cuts to black and he respawns at
-// the start, getting up from the grass, the death the genre is played through. Reduced motion skips
-// the run and the snap.
+// Contact: the edge of the city at the end of the page, past the last factory, where the fog lifts as
+// the section scrolls in and the way to reach him sits beside a bear trap on the path, the oldest joke
+// of a silhouette platformer. The visitor can spring it: he runs straight at it, the jaws snap, the
+// screen cuts to black and he drops back in from above at the checkpoint, the death the genre is
+// played through. The scene stands beside the words from a laptop up and above them on a phone.
+// Reduced motion skips the run and the snap.
 //
-// Animated: the fog, his parts and his run, the two jaws, the layers' lean.
+// Animated: the fog, his parts and his run or drop, the two jaws, the layers' lean.
 
 type Trap = 'ready' | 'run' | 'snap' | 'respawn'
 
 const RUN_MS = 550
 const SNAP_MS = 220
-const RISE_MS = 1300
+const DROP_MS = 900
 
-const POSE: Record<Trap, SpritePose> = { ready: 'idle', run: 'run', snap: 'fall', respawn: 'rise' }
+const POSE: Record<Trap, SpritePose> = {
+  ready: 'idle',
+  run: 'run',
+  snap: 'fall',
+  respawn: 'hang',
+}
 const RUNNER: Record<Trap, string> = {
   ready: '',
   run: `${shade.runner} ${shade.runnerAtTrap}`,
   snap: `${shade.runner} ${shade.runnerAtTrap}`,
-  respawn: '',
+  respawn: shade.dropIn,
 }
 
-const JAW_BACK = 'M450 176 H435 L437 170 L440 172 L441 166 L444 168 L446 163 L450 166 Z'
-const JAW_FRONT = 'M450 176 H465 L463 170 L460 172 L459 166 L456 168 L454 163 L450 166 Z'
+const JAW_BACK = 'M400 176 H385 L387 170 L390 172 L391 166 L394 168 L396 163 L400 166 Z'
+const JAW_FRONT = 'M400 176 H415 L413 170 L410 172 L409 166 L406 168 L404 163 L400 166 Z'
+
+// The city's far edge: chimneys and a gasholder, and the chain link fence in front of them.
+const CHIMNEYS = [150, 196, 420, 452]
+const FENCE_POSTS = [120, 200, 280, 360, 440]
 
 function ClearingScene({ profession, trap }: { profession: Profession; trap: Trap }) {
   const light = PROFESSION_SKY[profession]
   const shut = trap === 'snap' ? shade.jawShut : ''
 
   return (
-    <div className="relative h-[34vh] min-h-[220px] max-h-[380px] overflow-hidden border-y-2 border-[color:var(--sh-black)]" aria-hidden="true">
+    <div className="relative aspect-[16/10] w-full overflow-hidden border-2 border-[color:var(--sh-black)]" aria-hidden="true">
       <Sky light={light} />
       <Layer depth="far">
-        {[40, 96, 150, 470, 520, 572].map((x, index) => (
-          <path key={x} d={pinePath(x, 80 + (index % 3) * 20, 176)} fill={light.far} />
+        <path d="M0 176 V150 H130 V130 H230 V146 H300 V120 H380 V140 H470 V126 H600 V176 Z" fill={light.far} />
+        {CHIMNEYS.map((x) => (
+          <rect key={x} x={x} y={70} width={10} height={80} fill={light.far} />
         ))}
+        <path d="M250 120 A40 40 0 0 1 330 120 Z" fill={light.far} />
       </Layer>
       <Layer depth="mid">
-        <path d="M0 200 V170 Q120 150 220 166 Q300 176 380 164 Q500 150 600 170 V200 Z" fill={light.mid} />
+        <path d="M0 200 V172 Q150 164 300 170 T600 168 V200 Z" fill={light.mid} />
+        {FENCE_POSTS.map((x) => (
+          <rect key={x} x={x} y={120} width={4} height={54} fill={light.mid} />
+        ))}
+        <path
+          d="M120 124 H444 M120 172 H444 M120 124 L170 172 M170 124 L120 172 M200 124 L250 172 M250 124 L200 172 M280 124 L330 172 M330 124 L280 172 M360 124 L410 172 M410 124 L360 172"
+          stroke={light.mid}
+          strokeWidth={1}
+          fill="none"
+        />
       </Layer>
       <Layer depth="plane">
         <path d={GROUND} fill={SHADE.black} />
-        <rect x={430} y={175} width={40} height={4} fill={SHADE.black} />
+        <rect x={380} y={175} width={40} height={4} fill={SHADE.black} />
         <path d={JAW_BACK} fill={SHADE.black} className={`${shade.jawBack} ${shut}`} />
         <path d={JAW_FRONT} fill={SHADE.black} className={`${shade.jawFront} ${shut}`} />
         <g className={RUNNER[trap]}>
-          <HeroCharacter profession={profession} pose={POSE[trap]} place={{ x: 280, y: 180, height: 54 }} />
+          <HeroCharacter profession={profession} pose={POSE[trap]} place={{ x: 180, y: 180, height: 54 }} />
         </g>
       </Layer>
       <Layer depth="near">
-        <Soft d="M0 200 L0 110 L12 150 L24 96 L36 160 L50 130 L60 200 Z" />
-        <Soft d="M600 200 L600 120 L590 160 L578 104 L566 168 L552 200 Z" />
+        <Soft d="M150 200 L156 120 L166 122 L162 200 Z M440 200 L446 136 L456 138 L452 200 Z" />
       </Layer>
-      <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[color:var(--sh-fog)] via-[color:var(--sh-edge)] to-transparent ${shade.fogLift}`} />
+      <div
+        className={`pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-[color:var(--sh-fog)] via-[color:var(--sh-edge)] to-transparent ${shade.fogLift}`}
+      />
     </div>
   )
 }
@@ -84,7 +106,7 @@ export function Clearing({ profession }: { profession: Profession }) {
 
   const respawn = () => {
     setTrap('respawn')
-    timers.current.push(window.setTimeout(() => setTrap('ready'), RISE_MS))
+    timers.current.push(window.setTimeout(() => setTrap('ready'), DROP_MS))
   }
 
   const spring = () => {
@@ -94,23 +116,24 @@ export function Clearing({ profession }: { profession: Profession }) {
       return
     }
     setTrap('run')
-    timers.current = [
-      window.setTimeout(() => setTrap('snap'), RUN_MS),
-      window.setTimeout(() => cut(respawn), RUN_MS + SNAP_MS),
-    ]
+    timers.current = [window.setTimeout(() => setTrap('snap'), RUN_MS), window.setTimeout(() => cut(respawn), RUN_MS + SNAP_MS)]
   }
 
   return (
-    <section ref={ref} className="relative z-20 mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-labelledby="silhouette-contact-heading">
+    <section
+      ref={ref}
+      className="relative z-20 mx-auto grid max-w-6xl items-center gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]"
+      aria-labelledby="silhouette-contact-heading"
+    >
       <ClearingScene profession={profession} trap={trap} />
       <RecruiterHero
         render={({ line, actions }) => (
-          <div className="mt-8 flex flex-col items-center gap-4 text-center">
+          <div className="flex flex-col items-center gap-4 text-center lg:items-start lg:text-left">
             <h2 id="silhouette-contact-heading" className={`text-xl font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] ${TYPEWRITER}`}>
               {sections.contact}
             </h2>
             <p className="max-w-xl text-sm text-[color:var(--sh-muted)]">{line}</p>
-            <div className="flex flex-wrap items-center justify-center gap-3">
+            <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
               <HeroActions actions={actions} />
               <CVLink />
               <button

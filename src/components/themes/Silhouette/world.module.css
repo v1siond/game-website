@@ -119,6 +119,37 @@
   box-shadow: 4px 4px 0 var(--sh-black);
 }
 
+/* ---- the set pieces' grounds ---- */
+
+/* The flooded hold the crates float in: dark water rising from the floor of the section. */
+.hold {
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--sh-dawn-mid) 35%, transparent) 55%, color-mix(in srgb, var(--sh-dawn-far) 30%, transparent) 100%);
+}
+
+/* A crate's planks: dark wood grain in bands, under a hard black offset shadow. */
+.crate {
+  background: repeating-linear-gradient(180deg, var(--sh-raised) 0 14px, var(--sh-edge) 14px 16px);
+  box-shadow: 4px 4px 0 var(--sh-black);
+}
+
+/* The water the crate rides on: a lit ripple line fading into the dark below. */
+.ripple {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--sh-dawn-rim) 45%, transparent) 0 1px, color-mix(in srgb, var(--sh-dawn-mid) 50%, transparent) 2px, transparent 100%);
+}
+
+/* The sawmill: steel girders standing in the dark behind the cards. */
+.mill {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 6px), color-mix(in srgb, var(--sh-raised) 70%, transparent) calc(25% - 6px) 25%),
+    linear-gradient(180deg, var(--sh-night), var(--sh-void));
+}
+
+/* A steel floor plate: brushed grey with a hard black offset shadow. */
+.plate {
+  background: linear-gradient(160deg, var(--sh-raised) 0%, var(--sh-panel) 60%, var(--sh-raised) 100%);
+  box-shadow: 4px 4px 0 var(--sh-black);
+}
+
 /* ---- the offset block button: a fog grey block sits behind it (a static shadow) and the button
    lifts off it on hover and presses into it on click ---- */
 

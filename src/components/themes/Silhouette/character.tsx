@@ -16,11 +16,12 @@ import sprite from './sprite.module.css'
 //
 // The parts are separate groups (back arm, back leg, body and head, front leg, front arm), each turning
 // round its own joint, so sprite.module.css can run his poses with transforms only: idle (breath and
-// blink), the heavy run, push, fall, lie, rise, and one action per profession (typing, drumming, the
-// roundhouse kick). His eyes follow the visitor's pointer (--mx and --my from the world root).
+// blink), the heavy run, push, fall, lie, rise, hang from a rope, and one action per profession
+// (typing, drumming, the roundhouse kick). His eyes follow the visitor's pointer (--mx and --my from
+// the world root).
 // viewBox units: 40 by 64, feet on y 63.
 
-export type SpritePose = 'idle' | 'run' | 'push' | 'fall' | 'lie' | 'rise' | 'act'
+export type SpritePose = 'idle' | 'run' | 'push' | 'fall' | 'lie' | 'rise' | 'hang' | 'act'
 
 const BLACK = SHADE.black
 const EYE_GLOW = SHADE.glow

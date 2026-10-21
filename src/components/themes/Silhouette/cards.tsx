@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
-import type { CVData, Job } from '@/lib/cv/content'
+import type { Job } from '@/lib/cv/content'
 import { jobYears } from '@/components/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
 // Silhouette's panels and cards: near black slabs with a hard black offset shadow, the way a silhouette
-// game frames its few words, the section header, the tech stack, and the job and project cards the
-// ropes (./ropes) and the spider's webbing (./spider) hold.
+// game frames its few words, the section header, and the job and project cards the rope (./ropes) and
+// the sawmill floor (./mill) hold.
 
 const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--sh-glow)]'
 const CARD_TITLE = 'text-sm font-bold uppercase tracking-wider text-[color:var(--sh-text)]'
@@ -33,36 +33,10 @@ export function SectionHeader({ id, title }: { id: string; title: string }) {
   return (
     <div className="mb-4 flex items-center gap-3">
       <div className="h-px flex-1 bg-[color:var(--sh-fog)]" aria-hidden="true" />
-      <h2 id={id} className={`text-sm uppercase tracking-[0.4em] text-[color:var(--sh-muted)] ${TYPEWRITER}`}>{title}</h2>
+      <h2 id={id} className={`text-sm uppercase tracking-[0.4em] text-[color:var(--sh-muted)] ${TYPEWRITER}`}>
+        {title}
+      </h2>
       <div className="h-px flex-1 bg-[color:var(--sh-fog)]" aria-hidden="true" />
-    </div>
-  )
-}
-
-export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
-  const { cards } = useLabels()
-  return (
-    <div className="space-y-4" role="list" aria-label={cards.techByCategory}>
-      {categories.map((category) => (
-        <div key={category.id} role="listitem">
-          <h3 className="mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-[color:var(--sh-dim)]">
-            <span className="grayscale" aria-hidden="true">
-              {category.icon}
-            </span>
-            {category.name}
-          </h3>
-          <div className="flex flex-wrap gap-1.5">
-            {category.items.map((tech) => (
-              <span
-                key={tech}
-                className="inline-block border border-[color:var(--sh-fog)] px-2 py-1 text-sm uppercase tracking-wider text-[color:var(--sh-muted)]"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
     </div>
   )
 }

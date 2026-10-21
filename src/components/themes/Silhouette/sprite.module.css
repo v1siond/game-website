@@ -8,6 +8,8 @@
  * - push: leaning into the load, arms out straight, short slow steps (a crate, a lever, a door).
  * - fall: the knees go, he pitches forward onto the ground; lie holds him there; rise gets him up in
  *   three beats, onto his hands, up to one knee, standing with a small settle.
+ * - hang: both hands up on a rope over his head, legs together, a slow sway from the grip (sliding
+ *   down the rope, dropping back in after a death).
  * - act: one action per profession, typing, drumming, the roundhouse kick from a high guard.
  */
 
@@ -406,6 +408,36 @@
   52%,
   62% {
     transform: rotate(-30deg);
+  }
+}
+
+/* ---- hang ---- */
+
+.hang .armFront,
+.hang .armBack {
+  transform: rotate(-168deg);
+}
+
+.hang .legBack {
+  transform: rotate(6deg);
+}
+
+.hang .legFront {
+  transform: rotate(-4deg);
+}
+
+.hang .whole {
+  transform-origin: 20px 2px;
+  animation: hang-sway 2.4s ease-in-out infinite;
+}
+
+@keyframes hang-sway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
   }
 }
 

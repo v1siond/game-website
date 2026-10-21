@@ -5,17 +5,21 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { drumsSince, headingId } from '@/components/cv/sectionText'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { Panel, SectionHeader, TechCloud } from './cards'
+import { SectionHeader } from './cards'
+import { ChaseAbout } from './chase'
 import { HangingJobs } from './ropes'
-import { SpiderProjects } from './spider'
-import { BandSigns, VentureSigns } from './signs'
+import { FloatingCrates } from './crates'
+import { MillProjects } from './mill'
+import { VentureSigns } from './signs'
+import { ShockStage } from './stage'
 import { GravityRecord } from './gravity'
 
-// Each profession's sections, and only those, each with its own mechanic of the black forest: the
-// System Engineer's jobs hang on ropes, his projects lie under the spider's webbing, his ventures are
-// lit signs on the rooftops; the Musician's bands are rooftop signs under an ember sky; the Martial
-// Artist's record sits in the gravity room. About and the Tech Stack are the plain panels between.
+// Each profession's sections, and only those, each its own set piece on the walk from the dark forest
+// to the machine city, so no two look or move alike: the System Engineer's about is a spider chase
+// through the thicket, his jobs hang down one rope into a chasm, his tech stack floats as crates in a
+// flooded hold, his projects lie on a sawmill floor under a running saw and his ventures are lit signs
+// over the city; the Musician's bands are plates on an electrified floor stepping in time; the Martial
+// Artist's record sits in the gravity room.
 
 function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
   const id = headingId('silhouette', title)
@@ -35,13 +39,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
   return (
     <>
-      <FadeInScene>
-        <Block title={titles.about}>
-          <Panel>
-            <p className="text-sm leading-relaxed text-[color:var(--sh-muted)]">{professionalSummary.bio}</p>
-          </Panel>
-        </Block>
-      </FadeInScene>
+      <Block title={titles.about}>
+        <ChaseAbout bio={professionalSummary.bio} />
+      </Block>
 
       {sections.jobs.length > 0 && (
         <Block title={titles.workExperience} wide>
@@ -49,16 +49,12 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </Block>
       )}
 
-      <FadeInScene>
-        <Block title={titles.techStack}>
-          <Panel>
-            <TechCloud categories={sections.techStack} />
-          </Panel>
-        </Block>
-      </FadeInScene>
+      <Block title={titles.techStack} wide>
+        <FloatingCrates categories={sections.techStack} />
+      </Block>
 
       <Block title={titles.featuredWork} wide>
-        <SpiderProjects projects={sections.projects} />
+        <MillProjects projects={sections.projects} />
       </Block>
 
       {sections.companies.length > 0 && (
@@ -77,7 +73,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   return (
     <Block title={titles.bands} wide>
       <p className="mb-6 text-center text-sm text-[color:var(--sh-text)]">{drumsSince(musician, years)}</p>
-      <BandSigns bands={bands} />
+      <ShockStage bands={bands} />
       <p className="mt-6 text-center text-sm italic text-[color:var(--sh-muted)]">{musician.line}</p>
     </Block>
   )
