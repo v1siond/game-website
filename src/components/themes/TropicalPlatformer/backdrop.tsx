@@ -1,177 +1,113 @@
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import type { ReactNode } from 'react'
+import type { Profession } from '@/lib/cv/professions'
 import { COLORS } from './palette'
-import { Crystal, GemIcon, WoodenCrate, WumpaFruit } from './icons'
+import { Crate, Crystal, Gem, Mango, type GemColor } from './icons'
+import world from './world.module.css'
 
-// Tropical Platformer: the fixed backdrop layers behind the page (vines, ocean, floating collectibles).
+// Tropical Platformer's fixed backdrop behind the page: the canopy fringe at the top, a vine down each
+// side, the lagoon rolling in at the bottom and five collectibles floating at the edges, a set per
+// profession. Eight idle loops in all.
 
-// ============================================================================
-// JUNGLE VINE - Side decoration
-// ============================================================================
-export function JungleVine({ side = 'left', className = '' }: { side?: 'left' | 'right'; className?: string }) {
+export function Canopy() {
   return (
-    <div
-      className={`absolute top-0 ${side === 'left' ? 'left-0' : 'right-0'} w-20 h-full pointer-events-none ${className}`}
-      style={{
-        background: side === 'left'
-          ? `linear-gradient(90deg, ${COLORS.jungleDark}60 0%, transparent 100%)`
-          : `linear-gradient(-90deg, ${COLORS.jungleDark}60 0%, transparent 100%)`,
-      }}
-      aria-hidden="true"
-    >
+    <div className={`pointer-events-none fixed inset-x-0 top-0 z-[2] h-36 ${world.canopy}`} aria-hidden="true">
+      <svg viewBox="0 0 100 25" preserveAspectRatio="none" className="absolute bottom-0 h-16 w-full opacity-70" focusable="false">
+        <path d="M0 25 Q8 8 16 25 Q24 12 32 25 Q40 5 48 25 Q56 15 64 25 Q72 8 80 25 Q88 12 96 25 L100 25" fill={COLORS.canopy} />
+      </svg>
+    </div>
+  )
+}
+
+const VINE_LEAVES = [80, 180, 280, 380, 480]
+
+export function JungleVine({ side }: { side: 'left' | 'right' }) {
+  const placement = side === 'left' ? `left-0 ${world.vineShade}` : `right-0 ${world.vineShadeRight}`
+
+  return (
+    <div className={`pointer-events-none absolute top-0 hidden h-full w-20 sm:block ${placement}`} aria-hidden="true">
       <svg
         viewBox="0 0 80 500"
         width={80}
         height="100%"
         preserveAspectRatio="none"
-        className={side === 'right' ? 'scale-x-[-1]' : ''}
+        className={side === 'right' ? '-scale-x-100' : ''}
+        focusable="false"
       >
-        {/* Main vine curves */}
-        <path
-          d="M40 0 Q10 60 30 120 Q50 180 20 240 Q-10 300 30 360 Q70 420 30 500"
-          stroke={COLORS.jungleGreen}
-          strokeWidth="6"
-          fill="none"
-        />
-        <path
-          d="M50 0 Q20 80 40 140 Q60 200 30 260 Q0 320 40 380 Q80 440 40 500"
-          stroke={COLORS.jungleLime}
-          strokeWidth="4"
-          fill="none"
-        />
-
-        {/* Leaves along the vine */}
-        {[80, 180, 280, 380, 480].map((y) => (
+        <path d="M40 0 Q10 60 30 120 Q50 180 20 240 Q-10 300 30 360 Q70 420 30 500" stroke={COLORS.leaf} strokeWidth={6} fill="none" />
+        <path d="M50 0 Q20 80 40 140 Q60 200 30 260 Q0 320 40 380 Q80 440 40 500" stroke={COLORS.leafLight} strokeWidth={4} fill="none" />
+        {VINE_LEAVES.map((y) => (
           <g key={y}>
-            <ellipse cx="30" cy={y} rx="18" ry="8" fill={COLORS.jungleLime} transform={`rotate(-30 30 ${y})`} />
-            <ellipse cx="40" cy={y + 30} rx="15" ry="7" fill={COLORS.jungleGreen} transform={`rotate(25 40 ${y + 30})`} />
-            {/* Leaf vein */}
-            <line
-              x1="18" y1={y}
-              x2="42" y2={y}
-              stroke={COLORS.jungleDark}
-              strokeWidth="1"
-              opacity="0.4"
-              transform={`rotate(-30 30 ${y})`}
-            />
+            <ellipse cx={30} cy={y} rx={18} ry={8} fill={COLORS.leafLight} transform={`rotate(-30 30 ${y})`} />
+            <ellipse cx={40} cy={y + 30} rx={15} ry={7} fill={COLORS.leaf} transform={`rotate(25 40 ${y + 30})`} />
           </g>
         ))}
-
-        {/* Small wumpa fruits on vine */}
-        <circle cx="35" cy="150" r="8" fill={COLORS.wumpaOrange} />
-        <circle cx="25" cy="350" r="8" fill={COLORS.wumpaOrange} />
+        <circle cx={35} cy={150} r={8} fill={COLORS.fruit} />
+        <circle cx={25} cy={350} r={8} fill={COLORS.fruit} />
       </svg>
     </div>
   )
 }
 
-// ============================================================================
-// OCEAN WAVES - Bottom decoration
-// ============================================================================
-export function OceanWaves({ className = '' }: { className?: string }) {
-  const reducedMotion = useReducedMotion()
+const WAVES = [
+  { d: 'M0 80 Q180 30 360 80 T720 80 T1080 80 T1440 80 T1800 80 L1800 150 L0 150 Z', fill: COLORS.seaDeep, period: '[--period:12s]' },
+  { d: 'M0 100 Q180 60 360 100 T720 100 T1080 100 T1440 100 T1800 100 L1800 150 L0 150 Z', fill: COLORS.sea, period: '[--period:8s]' },
+  { d: 'M0 115 Q180 85 360 115 T720 115 T1080 115 T1440 115 T1800 115 L1800 150 L0 150 Z', fill: COLORS.seaLight, period: '[--period:6s]' },
+]
 
+export function OceanWaves() {
   return (
-    <div
-      className={`absolute bottom-0 left-0 right-0 h-40 pointer-events-none overflow-hidden ${className}`}
-      aria-hidden="true"
-    >
-      {/* Deep water gradient */}
-      <div
-        className="absolute inset-0"
-        style={{ background: `linear-gradient(180deg, transparent 0%, ${COLORS.oceanRoyal}80 50%, ${COLORS.oceanBlue} 100%)` }}
-      />
-
-      {/* Wave layers */}
-      <svg viewBox="0 0 1440 150" preserveAspectRatio="none" className="absolute bottom-0 w-full h-28">
-        {/* Back wave */}
-        <path
-          d="M0 80 Q180 30 360 80 T720 80 T1080 80 T1440 80 L1440 150 L0 150 Z"
-          fill={COLORS.oceanRoyal}
-          className={reducedMotion ? '' : 'animate-wave-slow'}
-        />
-        {/* Middle wave */}
-        <path
-          d="M0 100 Q180 60 360 100 T720 100 T1080 100 T1440 100 L1440 150 L0 150 Z"
-          fill={COLORS.oceanBlue}
-          className={reducedMotion ? '' : 'animate-wave-medium'}
-        />
-        {/* Front wave */}
-        <path
-          d="M0 115 Q180 85 360 115 T720 115 T1080 115 T1440 115 L1440 150 L0 150 Z"
-          fill={COLORS.oceanSky}
-          className={reducedMotion ? '' : 'animate-wave-fast'}
-        />
-
-        {/* Foam patches */}
-        <ellipse cx="120" cy="118" rx="40" ry="6" fill="white" opacity="0.7" />
-        <ellipse cx="500" cy="115" rx="35" ry="5" fill="white" opacity="0.6" />
-        <ellipse cx="900" cy="120" rx="45" ry="6" fill="white" opacity="0.7" />
-        <ellipse cx="1300" cy="116" rx="38" ry="5" fill="white" opacity="0.6" />
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 overflow-hidden" aria-hidden="true">
+      <div className={`absolute inset-0 ${world.lagoon}`} />
+      <svg viewBox="0 0 1440 150" preserveAspectRatio="none" className="absolute bottom-0 h-28 w-full" focusable="false">
+        {WAVES.map(({ d, fill, period }) => (
+          <path key={period} d={d} fill={fill} className={`${world.roll} ${period}`} />
+        ))}
       </svg>
-
-      {/* Beach sand strip */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-5"
-        style={{ background: `linear-gradient(180deg, ${COLORS.beachSand} 0%, ${COLORS.beachBrown} 100%)` }}
-      />
+      <div className={`absolute inset-x-0 bottom-0 h-5 ${world.shore}`} />
     </div>
   )
 }
 
-// ============================================================================
-// FLOATING JUNGLE ELEMENTS
-// ============================================================================
-export function JungleFloaters({
-  profession,
-  reducedMotion = false
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  reducedMotion?: boolean
-}) {
-  const floatersByProfession = {
-    engineer: [
-      { type: 'wumpa', x: 5, y: 12 },
-      { type: 'gem', x: 92, y: 22, color: 'blue' as const },
-      { type: 'crate', x: 7, y: 55 },
-      { type: 'gem', x: 88, y: 70, color: 'green' as const },
-      { type: 'crystal', x: 10, y: 85 },
-    ],
-    drummer: [
-      { type: 'wumpa', x: 6, y: 18 },
-      { type: 'gem', x: 90, y: 28, color: 'purple' as const },
-      { type: 'wumpa', x: 8, y: 50 },
-      { type: 'crate', x: 88, y: 65 },
-      { type: 'gem', x: 5, y: 78, color: 'yellow' as const },
-    ],
-    fighter: [
-      { type: 'gem', x: 6, y: 15, color: 'red' as const },
-      { type: 'wumpa', x: 91, y: 25 },
-      { type: 'crate', x: 7, y: 48 },
-      { type: 'wumpa', x: 89, y: 62 },
-      { type: 'crystal', x: 8, y: 80 },
-    ],
-  }
+type Floater = { icon: ReactNode; place: string }
 
-  const floaters = floatersByProfession[profession]
+const mango = <Mango size={32} />
+const crate = <Crate size={30} />
+const crystal = <Crystal size={28} />
+const gem = (color: GemColor) => <Gem size={26} color={color} />
 
+const FLOATERS: Record<Profession, Floater[]> = {
+  engineer: [
+    { icon: mango, place: 'left-[5%] top-[12%]' },
+    { icon: gem('blue'), place: 'left-[92%] top-[22%]' },
+    { icon: crate, place: 'left-[7%] top-[55%]' },
+    { icon: gem('green'), place: 'left-[88%] top-[70%]' },
+    { icon: crystal, place: 'left-[10%] top-[85%]' },
+  ],
+  drummer: [
+    { icon: mango, place: 'left-[6%] top-[18%]' },
+    { icon: gem('purple'), place: 'left-[90%] top-[28%]' },
+    { icon: mango, place: 'left-[8%] top-[50%]' },
+    { icon: crate, place: 'left-[88%] top-[65%]' },
+    { icon: gem('yellow'), place: 'left-[5%] top-[78%]' },
+  ],
+  fighter: [
+    { icon: gem('red'), place: 'left-[6%] top-[15%]' },
+    { icon: mango, place: 'left-[91%] top-[25%]' },
+    { icon: crate, place: 'left-[7%] top-[48%]' },
+    { icon: mango, place: 'left-[89%] top-[62%]' },
+    { icon: crystal, place: 'left-[8%] top-[80%]' },
+  ],
+}
+
+// Each floater's loop starts at its own point, as literal classes so the build generates them.
+const FLOAT_DELAYS = ['[--delay:0s]', '[--delay:-2s]', '[--delay:-4s]', '[--delay:-6s]', '[--delay:-8s]']
+
+export function JungleFloaters({ profession }: { profession: Profession }) {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden" aria-hidden="true">
-      {floaters.map((f, i) => (
-        <div
-          key={i}
-          className="absolute"
-          style={{
-            left: `${f.x}%`,
-            top: `${f.y}%`,
-            opacity: 0.6,
-            animation: reducedMotion ? 'none' : `jungleFloat ${10 + i * 3}s ease-in-out infinite`,
-            animationDelay: `${-i * 2}s`,
-          }}
-        >
-          {f.type === 'wumpa' && <WumpaFruit size={32} />}
-          {f.type === 'gem' && <GemIcon size={26} color={f.color || 'clear'} />}
-          {f.type === 'crate' && <WoodenCrate size={30} />}
-          {f.type === 'crystal' && <Crystal size={28} />}
+    <div className="pointer-events-none fixed inset-0 z-[4] hidden overflow-hidden sm:block" aria-hidden="true">
+      {FLOATERS[profession].map(({ icon, place }, i) => (
+        <div key={place} className={`absolute opacity-60 ${place} ${world.float} ${FLOAT_DELAYS[i]}`}>
+          {icon}
         </div>
       ))}
     </div>

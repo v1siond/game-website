@@ -1,75 +1,65 @@
-// Tropical Platformer: the world palette, read by every piece in this folder.
+import type { CSSProperties } from 'react'
 
-// ============================================================================
-// CRASH BANDICOOT EXACT COLOR PALETTE
-// Deep research from Crash Bandicoot 1/2/3 gameplay
-// ============================================================================
+// Tropical Platformer's palette: an island at midday, jungle greens, warm wood, lagoon blues, ripe fruit
+// and sun gold, the saturated colours of 3D tropical platformers. SVG art reads COLORS directly; Tailwind
+// classes read the same values as CSS variables, set once on the world's root by PALETTE_VARS.
+
 export const COLORS = {
-  // Crash Orange - The bandicoot himself
-  crashOrange: '#FF6B00',
-  crashOrangeBright: '#FF8C00',
-  crashOrangeDark: '#E85D00',
-
-  // Jungle Green - N. Sanity Island, jungle levels
-  jungleGreen: '#228B22',
-  jungleLime: '#32CD32',
-  jungleDark: '#006400',
-
-  // Tropical Teal - Water, streams, tropical accents
-  tropicalTeal: '#008B8B',
-  tropicalCyan: '#00CED1',
-  tropicalTurquoise: '#40E0D0',
-
-  // Beach Sand - N. Sanity Beach, sandy paths
-  beachSand: '#F4A460',
-  beachTan: '#DEB887',
-  beachBrown: '#D2691E',
-
-  // Ocean Blue - Jet-ski levels, beach water
-  oceanBlue: '#1E90FF',
-  oceanSky: '#00BFFF',
-  oceanRoyal: '#4169E1',
-
-  // TNT Red - Explosive crates
-  tntRed: '#FF0000',
-  tntDark: '#CC0000',
-
-  // Wumpa Fruit Orange - The iconic collectible
-  wumpaOrange: '#FF6600',
-  wumpaGold: '#FF9900',
-
-  // Aku Aku Mask Yellow/Gold - The protective spirit
-  maskYellow: '#FFD700',
-  maskGold: '#FFC125',
-
-  // Crate Wood - All wooden crate varieties
-  crateWood: '#8B4513',
-  crateSienna: '#A0522D',
-  cratePeru: '#CD853F',
-
-  // Cortex Purple - Dr. Neo Cortex, lab levels
-  cortexPurple: '#6B238E',
-  cortexOrchid: '#9932CC',
-
-  // Nitro Green - Instant explosion crates
-  nitroGreen: '#00CC00',
-  nitroBright: '#44FF44',
-
-  // Gem colors - Collectible gems
+  // jungle
+  leaf: '#228B22',
+  leafLight: '#32CD32',
+  leafDark: '#0b4d0b',
+  canopy: '#063806',
+  // lagoon and sky
+  lagoon: '#00CED1',
+  lagoonDeep: '#008B8B',
+  sea: '#1E90FF',
+  seaLight: '#00BFFF',
+  seaDeep: '#1f4fbf',
+  night: '#0a1f5c',
+  // beach
+  sand: '#F4A460',
+  sandLight: '#DEB887',
+  sandDark: '#D2691E',
+  // the light text on dark wood and leaf
+  parchment: '#f6e7c8',
+  // wood
+  wood: '#8B4513',
+  woodMid: '#A0522D',
+  woodLight: '#CD853F',
+  woodDark: '#4a2208',
+  // fruit and sun
+  fruit: '#FF6600',
+  fruitGold: '#FF9900',
+  fruitShine: '#FFCC66',
+  sunset: '#E85D00',
+  ember: '#a33f00',
+  sun: '#FFD700',
+  // crates and danger
+  hazard: '#e02020',
+  hazardDark: '#9e1010',
+  iron: '#6b7078',
+  ironLight: '#9aa0a8',
+  // gems
   gemClear: '#E0E0E0',
   gemRed: '#FF3366',
   gemBlue: '#00CCFF',
   gemGreen: '#00FF99',
   gemYellow: '#FFFF00',
   gemPurple: '#CC44FF',
-
-  // Time Trial - Clock and relic colors
-  timeGold: '#FFD700',
-  timeSapphire: '#0066FF',
-  timePlatinum: '#E5E4E2',
-
-  // Warp Room - Portal swirls
-  warpPurple: '#8B00FF',
-  warpBlue: '#00BFFF',
+  // the warp portal
+  warp: '#8B00FF',
   warpPink: '#FF69B4',
-}
+  crystal: '#6B238E',
+  crystalLight: '#9932CC',
+  lime: '#44FF44',
+} as const
+
+export type ColorName = keyof typeof COLORS
+
+const toVarName = (name: string) => `--tp-${name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)}`
+
+// Every colour as --tp-<name> (camelCase becomes kebab case: leafDark is --tp-leaf-dark).
+export const PALETTE_VARS = Object.fromEntries(
+  Object.entries(COLORS).map(([name, value]) => [toVarName(name), value]),
+) as CSSProperties

@@ -1,150 +1,88 @@
+import type { ReactNode } from 'react'
 import { headingId } from '@/components/cv/sectionText'
-import { COLORS } from './palette'
+import world from './world.module.css'
 
-// Tropical Platformer: the crate panel every section is framed in.
+// Tropical Platformer's crate panel, the frame every section sits in: a plank crate or a lagoon, leaf or
+// hazard board, gold brackets at the corners, a title bar in the chunky display type.
 
-// ============================================================================
-// SECTION CARD - Wooden crate panel style with plank texture
-// ============================================================================
-export function CratePanel({
-  children,
-  title,
-  titleIcon,
-  variant = 'wood',
-  className = '',
-}: {
-  children: React.ReactNode
+export type PanelVariant = 'wood' | 'hazard' | 'lagoon' | 'temple' | 'leaf'
+
+interface PanelLook {
+  body: string
+  titleBar: string
+  // The corner brackets.
+  accent: string
+  planks: boolean
+}
+
+const PANEL_LOOK: Record<PanelVariant, PanelLook> = {
+  wood: {
+    body: 'border-[var(--tp-wood-light)] bg-[linear-gradient(145deg,var(--tp-wood),var(--tp-wood-dark))]',
+    titleBar: 'border-[var(--tp-wood-light)] bg-[var(--tp-wood)]',
+    accent: 'border-[var(--tp-sun)]',
+    planks: true,
+  },
+  hazard: {
+    body: 'border-[var(--tp-hazard)] bg-[linear-gradient(145deg,var(--tp-hazard-dark),var(--tp-wood-dark))]',
+    titleBar: 'border-[var(--tp-hazard)] bg-[var(--tp-hazard-dark)]',
+    accent: 'border-[var(--tp-sun)]',
+    planks: false,
+  },
+  lagoon: {
+    body: 'border-[var(--tp-sea-light)] bg-[linear-gradient(145deg,var(--tp-night),var(--tp-sea-deep))]',
+    titleBar: 'border-[var(--tp-sea-light)] bg-[var(--tp-sea-deep)]',
+    accent: 'border-[var(--tp-sea-light)]',
+    planks: false,
+  },
+  temple: {
+    body: 'border-[var(--tp-fruit-gold)] bg-[linear-gradient(145deg,var(--tp-ember),var(--tp-wood-dark))]',
+    titleBar: 'border-[var(--tp-fruit-gold)] bg-[var(--tp-ember)]',
+    accent: 'border-[var(--tp-sun)]',
+    planks: true,
+  },
+  leaf: {
+    body: 'border-[var(--tp-lime)] bg-[linear-gradient(145deg,var(--tp-leaf-dark),var(--tp-canopy))]',
+    titleBar: 'border-[var(--tp-lime)] bg-[var(--tp-canopy)]',
+    accent: 'border-[var(--tp-lime)]',
+    planks: false,
+  },
+}
+
+const BRACKETS = [
+  '-left-3 -top-3 rounded-tl border-l-4 border-t-4',
+  '-right-3 -top-3 rounded-tr border-r-4 border-t-4',
+  '-bottom-3 -left-3 rounded-bl border-b-4 border-l-4',
+  '-bottom-3 -right-3 rounded-br border-b-4 border-r-4',
+]
+
+interface CratePanelProps {
+  children: ReactNode
   title: string
-  titleIcon?: React.ReactNode
-  variant?: 'wood' | 'tnt' | 'checkpoint' | 'temple' | 'nitro'
-  className?: string
-}) {
-  const variants = {
-    wood: {
-      bg: `linear-gradient(145deg, ${COLORS.crateWood}ee, ${COLORS.crateSienna}dd)`,
-      border: COLORS.cratePeru,
-      titleBg: COLORS.crateWood,
-      accent: COLORS.maskYellow,
-    },
-    tnt: {
-      bg: `linear-gradient(145deg, ${COLORS.tntRed}dd, ${COLORS.tntDark}ee)`,
-      border: COLORS.tntRed,
-      titleBg: COLORS.tntDark,
-      accent: COLORS.maskYellow,
-    },
-    checkpoint: {
-      bg: `linear-gradient(145deg, ${COLORS.oceanBlue}30, ${COLORS.oceanRoyal}50)`,
-      border: COLORS.oceanSky,
-      titleBg: COLORS.oceanRoyal,
-      accent: COLORS.oceanSky,
-    },
-    temple: {
-      bg: `linear-gradient(145deg, ${COLORS.beachBrown}cc, ${COLORS.crateWood}dd)`,
-      border: COLORS.maskGold,
-      titleBg: COLORS.beachBrown,
-      accent: COLORS.maskYellow,
-    },
-    nitro: {
-      bg: `linear-gradient(145deg, ${COLORS.nitroGreen}30, ${COLORS.jungleDark}60)`,
-      border: COLORS.nitroBright,
-      titleBg: COLORS.jungleDark,
-      accent: COLORS.nitroBright,
-    },
-  }
-  const v = variants[variant]
+  titleIcon?: ReactNode
+  variant?: PanelVariant
+}
+
+export function CratePanel({ children, title, titleIcon, variant = 'wood' }: CratePanelProps) {
+  const look = PANEL_LOOK[variant]
+  const id = headingId('section', title)
 
   return (
-    <section
-      className={`relative ${className}`}
-      aria-labelledby={headingId('section', title)}
-    >
-      {/* Tiki corner decorations */}
-      <div
-        className="absolute -top-3 -left-3 w-10 h-10"
-        style={{
-          borderLeft: `4px solid ${v.accent}`,
-          borderTop: `4px solid ${v.accent}`,
-          borderRadius: '4px 0 0 0',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute -top-3 -right-3 w-10 h-10"
-        style={{
-          borderRight: `4px solid ${v.accent}`,
-          borderTop: `4px solid ${v.accent}`,
-          borderRadius: '0 4px 0 0',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute -bottom-3 -left-3 w-10 h-10"
-        style={{
-          borderLeft: `4px solid ${v.accent}`,
-          borderBottom: `4px solid ${v.accent}`,
-          borderRadius: '0 0 0 4px',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute -bottom-3 -right-3 w-10 h-10"
-        style={{
-          borderRight: `4px solid ${v.accent}`,
-          borderBottom: `4px solid ${v.accent}`,
-          borderRadius: '0 0 4px 0',
-        }}
-        aria-hidden="true"
-      />
+    <section className="relative" aria-labelledby={id}>
+      {BRACKETS.map((place) => (
+        <div key={place} className={`absolute h-10 w-10 ${place} ${look.accent}`} aria-hidden="true" />
+      ))}
 
-      <div
-        className="relative rounded-lg overflow-hidden"
-        style={{
-          background: v.bg,
-          border: `4px solid ${v.border}`,
-          boxShadow: `0 8px 32px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.15)`,
-        }}
-      >
-        {/* Wood plank texture overlay */}
-        {(variant === 'wood' || variant === 'temple') && (
-          <div
-            className="absolute inset-0 pointer-events-none opacity-15"
-            style={{
-              backgroundImage: `
-                repeating-linear-gradient(90deg, transparent, transparent 60px, ${COLORS.beachBrown}40 60px, ${COLORS.beachBrown}40 62px),
-                repeating-linear-gradient(0deg, transparent, transparent 40px, ${COLORS.beachBrown}30 40px, ${COLORS.beachBrown}30 41px)
-              `,
-            }}
-            aria-hidden="true"
-          />
-        )}
+      <div className={`relative overflow-hidden rounded-lg border-4 ${look.body} ${world.panelDepth}`}>
+        {look.planks && <div className={`pointer-events-none absolute inset-0 ${world.planks}`} aria-hidden="true" />}
 
-        {/* Title bar with jungle leaf border feel */}
-        <div
-          className="px-6 py-4 flex items-center gap-4"
-          style={{
-            background: `linear-gradient(180deg, ${v.titleBg}, ${v.titleBg}cc)`,
-            borderBottom: `3px solid ${v.border}`,
-          }}
-        >
+        <div className={`relative flex items-center gap-4 border-b-[3px] px-4 py-4 sm:px-6 ${look.titleBar}`}>
           {titleIcon}
-          <h2
-            id={headingId('section', title)}
-            className="text-xl font-black tracking-wider uppercase"
-            style={{
-              color: '#fff',
-              textShadow: '3px 3px 0 rgba(0,0,0,0.6)',
-              fontFamily: 'Impact, Arial Black, sans-serif',
-              letterSpacing: '0.1em',
-            }}
-          >
+          <h2 id={id} className={`text-xl font-black uppercase tracking-widest text-white ${world.display} ${world.outlined}`}>
             {title}
           </h2>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {children}
-        </div>
+        <div className="relative p-4 sm:p-6">{children}</div>
       </div>
     </section>
   )

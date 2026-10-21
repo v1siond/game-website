@@ -1,0 +1,202 @@
+/*
+ * Tropical Platformer's page look outside the scroll scenes: the display type, its cartoon outlines,
+ * the panel and button surfaces, and the idle loops of the backdrop and the art scenes (the floating
+ * collectibles, the lagoon waves, the warp portal rings). Idle loops are transform and opacity only,
+ * a handful in view at once, and stop under reduced motion. Colours are the --tp-* variables the
+ * world's root sets from palette.ts.
+ */
+
+.display {
+  font-family: Impact, 'Arial Black', sans-serif;
+}
+
+/* The chunky outlined title of a 3D platformer's level card. */
+.title {
+  font-family: Impact, 'Arial Black', sans-serif;
+  letter-spacing: 0.05em;
+  color: var(--tp-sunset);
+  text-shadow:
+    4px 4px 0 var(--tp-canopy),
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px 2px 0 #000;
+}
+
+.outlined {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.7);
+}
+
+/* The page: sky over the canopy, down the jungle to the beach and the lagoon. */
+.island {
+  background: linear-gradient(
+    180deg,
+    var(--tp-lagoon) 0%,
+    var(--tp-leaf) 15%,
+    var(--tp-leaf-dark) 40%,
+    var(--tp-sand-dark) 70%,
+    var(--tp-sea-deep) 100%
+  );
+}
+
+.canopy {
+  background: linear-gradient(180deg, var(--tp-canopy) 0%, rgba(34, 139, 34, 0.55) 50%, transparent 100%);
+}
+
+.vineShade {
+  background: linear-gradient(90deg, rgba(6, 56, 6, 0.4) 0%, transparent 100%);
+}
+
+.vineShadeRight {
+  background: linear-gradient(-90deg, rgba(6, 56, 6, 0.4) 0%, transparent 100%);
+}
+
+.lagoon {
+  background: linear-gradient(180deg, transparent 0%, rgba(31, 79, 191, 0.5) 50%, var(--tp-sea) 100%);
+}
+
+.shore {
+  background: linear-gradient(180deg, var(--tp-sand) 0%, var(--tp-sand-dark) 100%);
+}
+
+/* ---- surfaces: crate panels, cards, buttons ---- */
+
+.planks {
+  background-image:
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(210, 105, 30, 0.25) 60px, rgba(210, 105, 30, 0.25) 62px),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(210, 105, 30, 0.2) 40px, rgba(210, 105, 30, 0.2) 41px);
+}
+
+.panelDepth {
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* A wooden card over jungle shade: dark enough for the parchment text at 4.5:1 or more. */
+.card {
+  background: linear-gradient(135deg, var(--tp-wood-dark), var(--tp-canopy));
+}
+
+.bandCard {
+  background: linear-gradient(135deg, var(--tp-crystal), var(--tp-wood-dark));
+}
+
+/* A chunky button pressed into the page, its base a darker block below it. */
+.buttonFruit {
+  background: linear-gradient(180deg, var(--tp-sunset), var(--tp-ember));
+  box-shadow:
+    0 5px 0 #663000,
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.buttonWood {
+  background: linear-gradient(180deg, var(--tp-wood), #5c2d0c);
+  box-shadow:
+    0 5px 0 #3a2010,
+    inset 0 2px 0 rgba(255, 255, 255, 0.2);
+}
+
+.buttonGem {
+  background: linear-gradient(180deg, var(--tp-night), var(--tp-wood-dark));
+  box-shadow:
+    0 5px 0 #001a33,
+    inset 0 2px 0 rgba(255, 255, 255, 0.15);
+}
+
+.chip {
+  background: linear-gradient(180deg, var(--tp-wood), var(--tp-sand-dark));
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.2),
+    0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* A warp zone's glow: a soft radial halo, no filter, faded in when the zone is picked. */
+.halo {
+  background: radial-gradient(circle, var(--halo) 0%, transparent 70%);
+}
+
+/* ---- idle loops ---- */
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(0, -14px, 0) rotate(6deg);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+
+@keyframes glint {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes roll {
+  to {
+    transform: translate3d(-360px, 0, 0);
+  }
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.float {
+  animation: float 12s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.bob {
+  animation: bob 2s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.glint {
+  animation: glint 2.5s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.roll {
+  animation: roll var(--period, 8s) linear infinite;
+}
+
+.spin,
+.spinBack {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: turn 8s linear infinite;
+}
+
+.spinBack {
+  animation-duration: 6s;
+  animation-direction: reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float,
+  .bob,
+  .glint,
+  .roll,
+  .spin,
+  .spinBack {
+    animation: none;
+  }
+}

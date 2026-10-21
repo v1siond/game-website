@@ -1,159 +1,191 @@
+'use client'
+
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { COLORS } from './palette'
-import { AkuAkuMask, Crystal, GemIcon, TNTCrate, WoodenCrate, WumpaFruit } from './icons'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
+import { Crate, Crystal, Gem, Mango, TikiMask } from './icons'
 import { CratePanel } from './panels'
 import { CrateStackArt, JungleSceneArt, WarpPortalArt } from './art'
 import { BandCard, ExperienceCard, ProjectCard, TechCrates, VentureCard } from './cards'
+import { Lane, SceneItem } from './scenes'
+import world from './world.module.css'
 
-// ============================================================================
-// PROFESSION SECTIONS - what each profession shows, from the content files
-// ============================================================================
+// Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
+// Projects, Bands and the Muay Thai record are island runs he crosses, each entry arriving as part of
+// the level (a crate bursting open, a card swinging in on a vine).
 
-export function EngineerSections({ sections, reducedMotion }: { sections: SectionsOf<'engineer'>; reducedMotion: boolean }) {
+const SECTION_WRAP = 'relative z-20 px-4 py-6 sm:px-6'
+const COLUMN = 'mx-auto max-w-4xl'
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      <div className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel title="About" titleIcon={<AkuAkuMask size={35} animated={!reducedMotion} />} variant="checkpoint">
-            <p className="text-base leading-relaxed" style={{ color: '#fff' }}>
-              {professionalSummary.bio}
-            </p>
-          </CratePanel>
+      <FadeInScene>
+        <div className={SECTION_WRAP}>
+          <div className={COLUMN}>
+            <CratePanel title="About" titleIcon={<TikiMask size={30} />} variant="lagoon">
+              <p className="text-base leading-relaxed text-white">{professionalSummary.bio}</p>
+            </CratePanel>
+          </div>
         </div>
-      </div>
+      </FadeInScene>
 
-      {/* ART SECTION 1: JUNGLE SCENE (After About) */}
-      <JungleSceneArt reducedMotion={reducedMotion} />
+      <JungleSceneArt />
 
       {sections.jobs.length > 0 && (
-        <div className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <CratePanel title="Work Experience" titleIcon={<WoodenCrate size={28} variant="checkpoint" />} variant="temple">
-              <div className="space-y-4">
-                {sections.jobs.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </CratePanel>
+        <LevelScene>
+          <div className={SECTION_WRAP}>
+            <div className={COLUMN}>
+              <Lane profession="engineer" zone="record" />
+              <CratePanel title="Work Experience" titleIcon={<Crate size={28} variant="flag" />} variant="temple">
+                <ul className="space-y-4">
+                  {sections.jobs.map((entry) => (
+                    <li key={entry.id}>
+                      <SceneItem kind="crate">
+                        <ExperienceCard entry={entry} />
+                      </SceneItem>
+                    </li>
+                  ))}
+                </ul>
+              </CratePanel>
+            </div>
           </div>
-        </div>
+        </LevelScene>
       )}
 
-      {/* ART SECTION 2: CRATE STACK (After Experience) */}
-      <CrateStackArt reducedMotion={reducedMotion} />
+      <CrateStackArt />
 
-      <div className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel title="Tech Stack" titleIcon={<WoodenCrate size={28} />} variant="wood">
-            <TechCrates categories={sections.techStack} />
-          </CratePanel>
-        </div>
-      </div>
-
-      <div className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel title="Projects" titleIcon={<TNTCrate size={32} />} variant="tnt">
-            <ProjectList
-              projects={sections.projects}
-              className="grid md:grid-cols-2 gap-4"
-              renderProject={(slot) => <ProjectCard {...slot} />}
-            />
-          </CratePanel>
-        </div>
-      </div>
-
-      {/* ART SECTION 3: WARP PORTAL (After Projects) */}
-      <WarpPortalArt reducedMotion={reducedMotion} />
-
-      {sections.companies.length > 0 && (
-        <div className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <CratePanel title="Ventures" titleIcon={<Crystal size={28} />} variant="checkpoint">
-              <div className="grid md:grid-cols-3 gap-4">
-                {sections.companies.map((company) => (
-                  <VentureCard key={company.id} company={company} />
-                ))}
-              </div>
+      <FadeInScene>
+        <div className={SECTION_WRAP}>
+          <div className={COLUMN}>
+            <CratePanel title="Tech Stack" titleIcon={<Crate size={28} />} variant="wood">
+              <TechCrates categories={sections.techStack} />
             </CratePanel>
           </div>
         </div>
+      </FadeInScene>
+
+      <LevelScene>
+        <div className={SECTION_WRAP}>
+          <div className={COLUMN}>
+            <Lane profession="engineer" zone="work" />
+            <CratePanel title="Projects" titleIcon={<Crate size={32} variant="hazard" />} variant="hazard">
+              <ProjectList
+                projects={sections.projects}
+                className="grid gap-x-4 gap-y-10 pt-6 md:grid-cols-2"
+                renderProject={(slot) => (
+                  <SceneItem kind="vine">
+                    <ProjectCard {...slot} />
+                  </SceneItem>
+                )}
+              />
+            </CratePanel>
+          </div>
+        </div>
+      </LevelScene>
+
+      <WarpPortalArt profession="engineer" />
+
+      {sections.companies.length > 0 && (
+        <FadeInScene>
+          <div className={SECTION_WRAP}>
+            <div className={COLUMN}>
+              <CratePanel title="Ventures" titleIcon={<Crystal size={28} />} variant="lagoon">
+                <div className="grid gap-4 md:grid-cols-3">
+                  {sections.companies.map((company) => (
+                    <VentureCard key={company.id} company={company} />
+                  ))}
+                </div>
+              </CratePanel>
+            </div>
+          </div>
+        </FadeInScene>
       )}
     </>
   )
 }
 
-export function MusicianSections({ sections, reducedMotion }: { sections: SectionsOf<'drummer'>; reducedMotion: boolean }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
     <>
-      <JungleSceneArt reducedMotion={reducedMotion} />
-      <div className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel title="Bands" titleIcon={<GemIcon size={26} color="purple" />} variant="nitro">
-            <p className="text-base mb-6" style={{ color: '#fff' }}>
-              Drums since {musician.since}, {musician.yearsPlaying} years
-            </p>
-            <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandCard {...slot} />} />
-            <p className="text-sm mt-6 italic" style={{ color: COLORS.nitroBright }}>
-              {musician.line}
-            </p>
-          </CratePanel>
+      <JungleSceneArt />
+      <LevelScene>
+        <div className={SECTION_WRAP}>
+          <div className={COLUMN}>
+            <Lane profession="drummer" zone="record" />
+            <CratePanel title="Bands" titleIcon={<Gem size={26} color="purple" />} variant="leaf">
+              <p className="mb-6 text-base text-white">
+                Drums since {musician.since}, {musician.yearsPlaying} years
+              </p>
+              <BandList
+                bands={bands}
+                className="grid gap-x-4 gap-y-10 pt-6 md:grid-cols-3"
+                renderBand={(slot) => (
+                  <SceneItem kind="vine">
+                    <BandCard {...slot} />
+                  </SceneItem>
+                )}
+              />
+              <p className="mt-6 text-sm italic text-[var(--tp-lime)]">{musician.line}</p>
+            </CratePanel>
+          </div>
         </div>
-      </div>
-      <CrateStackArt reducedMotion={reducedMotion} />
+      </LevelScene>
+      <CrateStackArt />
     </>
   )
 }
 
-export function MartialArtistSections({ sections, reducedMotion }: { sections: SectionsOf<'fighter'>; reducedMotion: boolean }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
     <>
-      <CrateStackArt reducedMotion={reducedMotion} />
-      <div className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel title="Muay Thai" titleIcon={<TNTCrate size={32} />} variant="tnt">
-            <h3
-              className="text-xl font-black mb-6"
-              style={{ color: '#fff', fontFamily: 'Impact, Arial Black, sans-serif', textShadow: '2px 2px 0 #000' }}
-            >
-              {martialArts.primary.title}
-            </h3>
-            <MuayThaiRecord
-              martialArts={martialArts}
-              classNames={{
-                facts: 'grid sm:grid-cols-2 gap-4 mb-6',
-                fact: 'p-3 rounded-lg border-2 border-[#FFD700] bg-[#5c1a00]',
-                term: 'text-sm tracking-widest uppercase font-black text-[#FFD700]',
-                value: 'text-sm mt-1 text-white',
-                achievements: 'space-y-2',
-                achievement: 'text-sm flex items-start gap-2 text-white',
-              }}
-              renderAchievement={(achievement) => (
-                <>
-                  <WumpaFruit size={14} className="flex-shrink-0 mt-0.5" />
-                  <span>{achievement}</span>
-                </>
-              )}
-            />
-          </CratePanel>
+      <CrateStackArt />
+      <LevelScene>
+        <div className={SECTION_WRAP}>
+          <div className={COLUMN}>
+            <Lane profession="fighter" zone="record" />
+            <CratePanel title="Muay Thai" titleIcon={<Crate size={32} variant="hazard" />} variant="hazard">
+              <h3 className={`mb-6 text-xl font-black text-white ${world.display} ${world.outlined}`}>{martialArts.primary.title}</h3>
+              <MuayThaiRecord
+                martialArts={martialArts}
+                classNames={{
+                  facts: 'mb-6 grid gap-4 sm:grid-cols-2',
+                  fact: 'rounded-lg border-2 border-[var(--tp-sun)] bg-[#5c1a00] p-3',
+                  term: 'text-sm font-black uppercase tracking-widest text-[var(--tp-sun)]',
+                  value: 'mt-1 text-sm text-white',
+                  achievements: 'space-y-2',
+                  achievement: 'text-sm text-white',
+                }}
+                renderAchievement={(achievement) => (
+                  <SceneItem kind="crate">
+                    <p className="flex items-start gap-2 rounded-lg border-2 border-[var(--tp-sun)] bg-[var(--tp-wood-dark)] p-2">
+                      <Mango size={14} className="mt-0.5 flex-shrink-0" />
+                      <span>{achievement}</span>
+                    </p>
+                  </SceneItem>
+                )}
+              />
+            </CratePanel>
+          </div>
         </div>
-      </div>
-      <WarpPortalArt reducedMotion={reducedMotion} />
+      </LevelScene>
+      <WarpPortalArt profession="fighter" />
     </>
   )
 }
 
-export const SECTION_VIEWS: ProfessionSectionViews<{ reducedMotion: boolean }> = {
+export const SECTION_VIEWS: ProfessionSectionViews = {
   engineer: EngineerSections,
   drummer: MusicianSections,
   fighter: MartialArtistSections,
