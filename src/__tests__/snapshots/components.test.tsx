@@ -1,15 +1,6 @@
 import { render } from '@testing-library/react'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
-import { ThemeProvider } from '@/themes/ThemeContext'
-import { ProfessionProvider } from '@/contexts/ProfessionContext'
-
-// Provider wrapper
-const AllProviders = ({ children }: { children: React.ReactNode }) => (
-  <ThemeProvider>
-    <ProfessionProvider>{children}</ProfessionProvider>
-  </ThemeProvider>
-)
 
 describe('Component Snapshots', () => {
   describe('DownloadPdfButton', () => {
