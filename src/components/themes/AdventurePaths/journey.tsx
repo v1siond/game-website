@@ -17,6 +17,7 @@ import { buildTrail, dotsAlong, shareOf, type Point } from './trail'
 import { useTrailWalker } from './walk'
 import { TrailWalker } from './walker'
 import map from './map.module.css'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
 // Work Experience as a region of the map he crosses, the overworld's long scrolling stretch: a trail
 // from the signpost on the left through one tile per job, oldest first, to the castle of the job he holds
@@ -154,7 +155,7 @@ function JobCard({ job, stop, onPoint }: { job: Job; stop: number; onPoint: () =
       <div className="mb-2 flex flex-wrap items-start justify-between gap-2 pl-4">
         <div className="min-w-0">
           <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{job.title}</h3>
-          <p className="text-sm font-semibold text-[color:var(--ap-route)]">{job.company}</p>
+          <p className="text-sm font-semibold text-[color:var(--ap-route)]"><SlashBreaks text={job.company} /></p>
         </div>
         <span className="rounded-sm bg-[color:var(--ap-ink)] px-2 py-1 text-sm text-[color:var(--ap-parchment)]">{fillLabel(years.range, { start, end })}</span>
       </div>

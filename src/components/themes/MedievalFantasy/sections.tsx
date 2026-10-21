@@ -11,6 +11,7 @@ import { drumsSince, newTabName } from '@/components/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { REALM } from './palette'
 import { InnerCard, RealmFrame } from './panels'
 import { BandCard, CARD_BODY, CARD_SUBTITLE, CARD_TITLE, JobCard, ProjectCard } from './cards'
@@ -142,7 +143,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
             <RealmFrame title={labels.sections.projects} zone="ft">
               <ProjectList
                 projects={projects}
-                className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3"
+                className="grid grid-cols-[repeat(auto-fit,minmax(min(220px,100%),1fr))] gap-3"
                 renderProject={(slot) => <ProjectCard slot={slot} />}
               />
             </RealmFrame>
@@ -160,10 +161,10 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
         <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <RealmFrame title={labels.sections.ventures} zone="ft">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '0.75rem' }}>
                 {companies.map((company) => (
                   <InnerCard key={company.id} zone="ft">
-                    <h3 style={CARD_TITLE}>{company.name}</h3>
+                    <h3 style={CARD_TITLE}><SlashBreaks text={company.name} /></h3>
                     <p style={{ ...CARD_SUBTITLE, fontSize: '1rem' }}>{company.tagline}</p>
                     <p style={CARD_BODY}>{company.description}</p>
                     <a
@@ -171,7 +172,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={newTabName(labels.links, company.name)}
-                      style={{ color: REALM.frostIceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem' }}
+                      style={{ color: REALM.frostIceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem', overflowWrap: 'anywhere' }}
                     >
                       {company.url}
                     </a>
@@ -205,7 +206,7 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
               </p>
               <BandList
                 bands={bands}
-                className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3"
+                className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3"
                 renderBand={(slot) => <BandCard {...slot} />}
               />
               <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontStyle: 'italic', marginTop: '1rem' }}>{musician.line}</p>

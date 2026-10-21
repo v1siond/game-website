@@ -57,11 +57,11 @@ export default function MedievalFantasyTheme() {
   }
 
   return (
-    <div style={{ ...REALM_VARS, minHeight: '100vh', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
+    <div style={{ ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
       <DualZoneAtmosphere />
 
       {/* ============ MAIN CONTENT - Starts at top like Dark Fantasy ============ */}
-      <div style={{ position: 'relative', zIndex: 2, padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
+      <div style={{ position: 'relative', zIndex: 2, padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '900px', margin: '0 auto' }}>
 
         {/* ============ REIGN OF CHAOS ZONE ============ */}
 
@@ -126,7 +126,7 @@ export default function MedievalFantasyTheme() {
               <FelPaths active={active} isLargeScreen={isLargeScreen} />
               <ProfessionSwitch
                 label={navigation.professionSelection}
-                className="relative flex justify-between items-stretch w-full px-4 h-full py-2"
+                className="relative flex justify-between items-stretch w-full px-0 sm:px-4 h-full py-2"
                 renderOption={(option) => <ProfessionNode option={option} isLargeScreen={isLargeScreen} />}
               />
             </div>

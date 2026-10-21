@@ -10,6 +10,7 @@ import { cssVars } from './art'
 import { PAPER_CARD, Region } from './region'
 import { JOURNAL_SERIF, TRAIL } from './palette'
 import map from './map.module.css'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
 // Projects as switch palaces, the overworld's coloured switch blocks: each project has its own switch in
 // one of four colours, taken in turn. Its tech stack stands under it as outlined blocks, dashed and empty.
@@ -95,7 +96,7 @@ function SwitchPalace({ slot, colour }: { slot: ProjectSlot; colour: SwitchColou
     <article className={PAPER_CARD}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{project.name}</h3>
+          <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}><SlashBreaks text={project.name} /></h3>
           <p className="text-sm font-semibold text-[color:var(--ap-route)]">{project.role}</p>
           {years && <p className="text-sm text-[color:var(--ap-ink-soft)]">{years}</p>}
         </div>

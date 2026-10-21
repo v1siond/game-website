@@ -55,7 +55,7 @@ export default function RetroRPGTheme() {
           <RecruiterHero
             render={({ name, headline, tagline, line, actions }) => (
               <Box className={`mt-4 ${world.opens}`}>
-                <h1 className={`text-lg uppercase tracking-[0.15em] text-[color:var(--rpg-text)] sm:text-2xl ${PIXEL}`}>
+                <h1 className={`text-[clamp(1.125rem,5.5vw,1.5rem)] uppercase tracking-[0.15em] text-[color:var(--rpg-text)] ${PIXEL}`}>
                   <Typed pace="short" delay="open">
                     <NameWords name={name} />
                   </Typed>

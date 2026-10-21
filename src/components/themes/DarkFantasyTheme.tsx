@@ -24,6 +24,7 @@ import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 
@@ -513,10 +514,11 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
  * energy travels THROUGH the hub node (System Engineer).
  */
 
+// The side stations sit near the edges so the three cards never overlap on a 320px phone.
 const WAYSTATION_POSITIONS: Record<Profession, { x: number; y: number }> = {
-  drummer: { x: 25, y: 55 },
+  drummer: { x: 17, y: 55 },
   engineer: { x: 50, y: 30 },
-  fighter: { x: 75, y: 55 },
+  fighter: { x: 83, y: 55 },
 }
 
 // Calculate the wire path segments between two professions
@@ -717,7 +719,7 @@ const WaystationNode = memo(function WaystationNode({
       />
       {/* Main container - VoidFrame style with decorative elements */}
       <div
-        className={`df-card bg-df-panel relative z-0 w-24 h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
+        className={`df-card bg-df-panel relative z-0 w-[5.5rem] h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
           isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
         style={{ animation: isReceivingEnergy ? 'nodeArrival 400ms ease-out' : undefined }}
@@ -1068,7 +1070,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
         </span>
       )}
       <h3 className="text-lg mt-1 transition-colors" style={{ color: DARK_FANTASY.bone }}>
-        {project.name}
+        <SlashBreaks text={project.name} />
       </h3>
       <p className="text-sm mt-1" style={{ color: DARK_FANTASY.ethereal }}>
         {project.role}
@@ -1124,9 +1126,9 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl" aria-hidden="true">{company.icon}</span>
-        <div>
+        <div className="min-w-0">
           <h3 className="text-lg transition-colors" style={{ color: DARK_FANTASY.bone }}>
-            {company.name}
+            <SlashBreaks text={company.name} />
           </h3>
           <p className="text-sm" style={{ color: DARK_FANTASY.spiritGold }}>{company.tagline}</p>
         </div>
@@ -1184,9 +1186,9 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
   return (
     <article className="py-4">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
-        <div>
+        <div className="min-w-0">
           <h3 className="text-lg font-medium" style={{ color: DARK_FANTASY.bone }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: DARK_FANTASY.ethereal }}>{entry.company}</p>
+          <p className="text-sm" style={{ color: DARK_FANTASY.ethereal }}><SlashBreaks text={entry.company} /></p>
         </div>
         <span
           className="text-sm"
@@ -1777,7 +1779,7 @@ export default function DarkFantasyTheme() {
 
       {/* Fixed Navigation Bar */}
       <nav
-        className="fixed top-0 left-0 right-0 z-[50] px-4 py-3 md:px-6 md:py-4"
+        className="fixed top-0 left-0 right-0 z-[50] pl-4 pr-16 py-3 sm:pr-36 md:pl-6 md:py-4"
         style={{
           background: `linear-gradient(180deg, ${DARK_FANTASY.void}f5 0%, ${DARK_FANTASY.void}e0 70%, transparent 100%)`,
         }}
@@ -1785,7 +1787,7 @@ export default function DarkFantasyTheme() {
       >
         <div className="max-w-6xl mx-auto flex justify-between items-center gap-2 md:gap-4">
           {/* Name - compact on mobile */}
-          <Link href="/" className="flex items-center gap-2 md:gap-3 group">
+          <Link href="/" className="flex min-h-[44px] min-w-0 items-center gap-2 md:gap-3 group">
             <div aria-hidden="true" className="hidden sm:block">
               <SpiritWisp size={32} color={DARK_FANTASY.spiritGold} />
             </div>
@@ -1804,13 +1806,13 @@ export default function DarkFantasyTheme() {
           <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
             >
               {actionLabels.cv}
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
             >
               <span className="hidden sm:inline">{actionLabels.engine}</span>
               <span className="sm:hidden">{actionLabels.engineShort}</span>
@@ -1872,11 +1874,11 @@ export default function DarkFantasyTheme() {
                     <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
                   </linearGradient>
                 </defs>
-                <line x1="25%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-                <line x1="50%" y1="30%" x2="75%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                <line x1="17%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                <line x1="50%" y1="30%" x2="83%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
                 {/* Gear decorations at intersections */}
-                <circle cx="37.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
-                <circle cx="62.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+                <circle cx="33.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+                <circle cx="66.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
               </svg>
 
               {/* Energy flow animation between nodes */}

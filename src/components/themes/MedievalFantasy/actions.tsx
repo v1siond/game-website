@@ -48,9 +48,11 @@ export function RealmButton({
     textTransform: 'uppercase',
     letterSpacing: '0.1em',
     padding: '0.5rem 1rem',
+    minHeight: '44px',
     cursor: 'pointer',
     textDecoration: 'none',
-    display: 'inline-block',
+    display: 'inline-flex',
+    alignItems: 'center',
   }
 
   if (linkProps) return <a {...linkProps} style={style}>{children}</a>
@@ -94,6 +96,7 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
           textTransform: 'uppercase',
           letterSpacing: '0.08em',
           padding: '0.5rem 0.75rem',
+          minHeight: '44px',
           cursor: isPending ? 'wait' : 'pointer',
           display: 'flex',
           alignItems: 'center',
@@ -125,6 +128,7 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
               style={{
                 width: '100%',
                 padding: '0.5rem 0.75rem',
+                minHeight: '44px',
                 background: currentLocale === locale ? `${REALM.chaosFelDark}40` : 'transparent',
                 border: 'none',
                 borderBottom: locale !== locales[locales.length - 1] ? `1px solid ${REALM.metalDark}50` : 'none',

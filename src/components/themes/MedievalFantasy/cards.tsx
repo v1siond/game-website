@@ -4,6 +4,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import { jobYears } from '@/components/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { REALM } from './palette'
 import { InnerCard } from './panels'
 import { RealmButton } from './actions'
@@ -30,10 +31,10 @@ export function JobCard({ job }: { job: Job }) {
   const { years } = useLabels()
   return (
     <InnerCard highlight={job.endDate === null} zone="roc">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '0.375rem' }}>
-        <div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.25rem 0.75rem', marginBottom: '0.375rem' }}>
+        <div style={{ minWidth: 0 }}>
           <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{job.title}</h3>
-          <p style={{ color: REALM.goldMid, fontSize: '0.875rem' }}>{job.company}</p>
+          <p style={{ color: REALM.goldMid, fontSize: '0.875rem' }}><SlashBreaks text={job.company} /></p>
         </div>
         <span style={{ color: REALM.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYearsLabel(job, years.present)}</span>
       </div>
@@ -61,7 +62,7 @@ export function JobCard({ job }: { job: Job }) {
 export function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
   return (
     <InnerCard zone="ft">
-      <h3 style={CARD_TITLE}>{project.name}</h3>
+      <h3 style={CARD_TITLE}><SlashBreaks text={project.name} /></h3>
       <p style={CARD_SUBTITLE}>
         {project.role}
         {years && <span aria-hidden="true"> | </span>}

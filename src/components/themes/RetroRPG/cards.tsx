@@ -6,6 +6,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import { MONO, PIXEL } from './palette'
 import { Command, FOCUS } from './actions'
@@ -69,7 +70,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           <h3 className={TITLE}>
             <Typed delay="open">{entry.title}</Typed>
           </h3>
-          <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}>{entry.company}</p>
+          <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}><SlashBreaks text={entry.company} /></p>
         </div>
         <span className={`whitespace-nowrap text-sm tabular-nums text-[color:var(--rpg-sky)] ${MONO} ${SHOW_AFTER.second}`}>
           {start} - {end}
@@ -133,10 +134,12 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
   return (
     <article className={`relative overflow-hidden ${world.target}`} onPointerEnter={aim} onPointerDown={strike}>
       <div ref={body} className={`p-4 sm:p-5 ${world.box}`}>
-        <div className="mb-2 flex items-start justify-between gap-2">
-          <h3 className={`flex items-start gap-2 ${TITLE}`}>
+        <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+          <h3 className={`flex min-w-0 items-start gap-2 ${TITLE}`}>
             <Soul className={`mt-0.5 h-3.5 w-4 shrink-0 ${world.targetCursor}`} />
-            {project.name}
+            <span className="min-w-0">
+              <SlashBreaks text={project.name} />
+            </span>
           </h3>
           {years && <span className={`whitespace-nowrap text-sm text-[color:var(--rpg-sky)] ${MONO}`}>{years}</span>}
         </div>
@@ -187,8 +190,10 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
         <span className="text-xl" aria-hidden="true">
           {company.icon}
         </span>
-        <div>
-          <h3 className={`${TITLE} group-hover:text-[color:var(--rpg-gold)]`}>{company.name}</h3>
+        <div className="min-w-0">
+          <h3 className={`${TITLE} group-hover:text-[color:var(--rpg-gold)] group-focus-visible:text-[color:var(--rpg-gold)]`}>
+            <SlashBreaks text={company.name} />
+          </h3>
           <p className={`mt-1 ${META}`}>{company.tagline}</p>
         </div>
       </div>

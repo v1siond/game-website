@@ -38,7 +38,7 @@ export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactN
           <div style={{ background: REALM.metalDark, padding: '2px' }}>
             <div style={{
               background: `radial-gradient(ellipse at 50% 0%, ${REALM.bgDeep} 0%, ${REALM.bgVoid} 100%)`,
-              padding: '1.5rem 1.75rem',
+              padding: 'clamp(1rem, 4vw, 1.5rem) clamp(0.75rem, 4vw, 1.75rem)',
               boxShadow: `inset 0 2px 12px rgba(0,0,0,0.8)`,
             }}>
               {title && (

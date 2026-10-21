@@ -31,7 +31,9 @@ const PROFESSION_NODE_ICONS: Record<Profession, (color: string) => ReactNode> = 
 export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOption; isLargeScreen: boolean }) {
   const { id, label, selected, optionProps } = option
   const isCentre = id === 'engineer'
-  const size = isCentre ? (isLargeScreen ? '8rem' : '6rem') : (isLargeScreen ? '7rem' : '5.5rem')
+  // The three nodes share one row, so on a phone each shrinks with the width (a third of it at most) and the
+  // longest label word still fits inside the border.
+  const size = isCentre ? (isLargeScreen ? 'clamp(5.75rem, 30vw, 8rem)' : 'clamp(5.5rem, 30vw, 6rem)') : (isLargeScreen ? 'clamp(5.5rem, 28vw, 7rem)' : '5.5rem')
   const tint = selected ? REALM.chaosFelBright : REALM.textMid
 
   return (
@@ -56,7 +58,7 @@ export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOp
         position: 'relative',
         alignSelf: isCentre ? 'flex-start' : 'flex-end',
         marginTop: isCentre ? (isLargeScreen ? '0.5rem' : '0.25rem') : undefined,
-        padding: '0.25rem',
+        padding: '0.25rem 0',
       }}
     >
       {/* The selected rim and its fel glow are drawn once over the border and fade in, so selecting a node

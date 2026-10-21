@@ -13,6 +13,7 @@ import { PAPER_CARD, Region } from './region'
 import { StarRoad } from './starRoad'
 import { SwitchPalaces } from './switches'
 import { JOURNAL_SERIF } from './palette'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
 // Each profession's regions of the map, and only those. About, Tech Stack and Ventures are journal pages
 // that fade in; Experience is the region he walks, Projects the switch palaces, Bands the star road and
@@ -72,7 +73,7 @@ function CampsPage({ companies }: { companies: SectionsOf<'engineer'>['companies
                 className="block h-full transition-transform hover:-translate-y-1 motion-reduce:transition-none"
               >
                 <article className={`${PAPER_CARD} h-full border-t-8 border-t-[color:var(--ap-route)]`}>
-                  <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{company.name}</h3>
+                  <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}><SlashBreaks text={company.name} /></h3>
                   <p className="text-sm font-semibold text-[color:var(--ap-route)]">{company.tagline}</p>
                   <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{company.description}</p>
                 </article>

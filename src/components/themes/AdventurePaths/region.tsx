@@ -33,7 +33,7 @@ export function MapFrame({ children, className = '' }: { children: ReactNode; cl
 export function MapBanner({ children }: { children: ReactNode }) {
   return (
     <p
-      className={`flex min-h-[2.75rem] items-center justify-center border-b-4 border-[color:var(--ap-wood)] bg-[color:var(--ap-ink)] px-4 py-2 text-center text-base font-bold tracking-wide text-[color:var(--ap-page)] ${JOURNAL_SERIF}`}
+      className={`flex min-h-[2.75rem] items-center justify-center border-b-4 border-[color:var(--ap-wood)] bg-[color:var(--ap-ink)] px-4 py-2 text-center text-base font-bold tracking-wide text-[color:var(--ap-page)] [overflow-wrap:anywhere] ${JOURNAL_SERIF}`}
       aria-live="polite"
     >
       {children}
