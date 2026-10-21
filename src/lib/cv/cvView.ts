@@ -75,7 +75,7 @@ const bandEnd = (band: Band): number => {
 
 const jobsFor = (cv: CVData, keep: Keep): Job[] =>
   cv.workExperience
-    .filter((job) => keep(job, job.endDate ? job.endDate.getFullYear() : null))
+    .filter((job) => keep(job, job.endDate ? job.endDate.getUTCFullYear() : null))
     .sort(byRecency(jobEnd, (job) => job.startDate.getTime()))
 
 // Projects keep the order he sets in Decap (position), the order the Contract fixes for them.
