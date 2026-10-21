@@ -3,15 +3,16 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // Check for reduced motion preference
@@ -718,44 +719,45 @@ function AllOutAttackSplash({ children, featured = false }: { children: React.Re
   )
 }
 
-// Persona-style character portrait with Tarot card motif
+// Tarot card art per profession: the glyph and the arcana under the label.
+const TAROT: Record<Profession, { icon: string; arcana: string }> = {
+  drummer: { icon: '🥁', arcana: 'V - THE HIEROPHANT' },
+  engineer: { icon: '💻', arcana: 'XII - THE HANGED MAN' },
+  fighter: { icon: '🥊', arcana: 'XI - STRENGTH' },
+}
+
+// Persona-style character portrait with Tarot card motif, one option of the shared profession switch
 function CharacterCard({
-  profession,
-  isActive,
-  onClick,
+  id,
+  label,
+  selected,
+  optionProps,
   prefersReducedMotion = false,
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  isActive: boolean
-  onClick: () => void
-  prefersReducedMotion?: boolean
-}) {
-  const icons = { engineer: '💻', drummer: '🥁', fighter: '🥋' }
-  const titles = { engineer: 'THE ENGINEER', drummer: 'THE MUSICIAN', fighter: 'THE FIGHTER' }
-  const arcanas = { engineer: 'XII - THE HANGED MAN', drummer: 'V - THE HIEROPHANT', fighter: 'XI - STRENGTH' }
+}: ProfessionOption & { prefersReducedMotion?: boolean }) {
+  const { icon, arcana } = TAROT[id]
+  const numeral = arcana.split(' - ')[0]
 
   return (
     <button
-      onClick={onClick}
+      type="button"
+      {...optionProps}
       className={`relative group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black ${
-        isActive ? 'scale-105 z-10' : 'opacity-60 hover:opacity-100'
+        selected ? 'scale-105 z-10' : 'opacity-70 hover:opacity-100'
       }`}
       style={{
         transform: prefersReducedMotion
-          ? isActive ? 'scale(1.05)' : 'none'
-          : `skewX(-5deg) ${isActive ? 'scale(1.05)' : ''}`,
+          ? selected ? 'scale(1.05)' : 'none'
+          : `skewX(-5deg) ${selected ? 'scale(1.05)' : ''}`,
       }}
-      aria-pressed={isActive}
-      aria-label={`Select ${titles[profession]} persona - ${arcanas[profession]}`}
     >
       {/* Card background with Tarot styling */}
       <div
-        className="p-6 relative overflow-hidden"
+        className="px-4 py-5 sm:p-6 relative overflow-hidden"
         style={{
-          background: isActive
+          background: selected
             ? 'linear-gradient(135deg, #ff0033, #990022)'
             : 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-          border: `3px solid ${isActive ? '#ff0033' : '#333'}`,
+          border: `3px solid ${selected ? '#ff0033' : '#333'}`,
         }}
       >
         {/* Diagonal stripes - Persona 5 pattern */}
@@ -770,17 +772,17 @@ function CharacterCard({
         {/* Corner Tarot decorations */}
         <div
           className="absolute top-1 left-1 text-[8px] font-bold"
-          style={{ color: isActive ? '#000' : '#ff6666' }}
+          style={{ color: selected ? '#000' : '#ff6666' }}
           aria-hidden="true"
         >
-          {arcanas[profession].split(' - ')[0]}
+          {numeral}
         </div>
         <div
           className="absolute bottom-1 right-1 text-[8px] font-bold rotate-180"
-          style={{ color: isActive ? '#000' : '#ff6666' }}
+          style={{ color: selected ? '#000' : '#ff6666' }}
           aria-hidden="true"
         >
-          {arcanas[profession].split(' - ')[0]}
+          {numeral}
         </div>
 
         {/* Content - counter-skew */}
@@ -788,23 +790,24 @@ function CharacterCard({
           className="relative z-10"
           style={{ transform: prefersReducedMotion ? 'none' : 'skewX(5deg)' }}
         >
-          <span className="text-5xl block mb-3" aria-hidden="true">{icons[profession]}</span>
+          <span className="text-4xl sm:text-5xl block mb-3" aria-hidden="true">{icon}</span>
           <span
-            className="text-lg font-black tracking-wider block"
-            style={{ color: isActive ? '#000' : '#fff' }}
+            className="text-base sm:text-lg font-black tracking-wider block uppercase"
+            style={{ color: selected ? '#000' : '#fff' }}
           >
-            {titles[profession]}
+            {label}
           </span>
           <span
-            className="text-[10px] tracking-widest block mt-1"
-            style={{ color: isActive ? '#1a0000' : '#ff6666' }}
+            className="text-sm tracking-widest block mt-1"
+            style={{ color: selected ? '#1a0000' : '#ff6666' }}
+            aria-hidden="true"
           >
-            {arcanas[profession]}
+            {arcana}
           </span>
         </div>
 
         {/* Selection indicator */}
-        {isActive && !prefersReducedMotion && (
+        {selected && !prefersReducedMotion && (
           <div className="absolute -right-2 top-1/2 -translate-y-1/2" aria-hidden="true">
             <span className="text-2xl animate-pulse">◀</span>
           </div>
@@ -814,71 +817,33 @@ function CharacterCard({
   )
 }
 
-// Role card with stylish display - Persona 5 menu item style
-function RoleCard({
-  role,
-  prefersReducedMotion = false,
-}: {
-  role: typeof CURRENT_ROLES[0]
-  prefersReducedMotion?: boolean
-}) {
-  return (
-    <article
-      className="px-4 py-2 relative overflow-hidden group"
-      style={{
-        background: 'linear-gradient(90deg, rgba(255,0,51,0.1), transparent)',
-        borderLeft: '3px solid #ff0033',
-        transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
-      }}
-      aria-label={`${role.title} at ${role.company}`}
-    >
-      {/* Hover slash effect */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-        style={{
-          background: 'linear-gradient(90deg, transparent, rgba(255,0,51,0.05), transparent)',
-        }}
-        aria-hidden="true"
-      />
-      <div style={{ transform: prefersReducedMotion ? 'none' : 'skewX(3deg)' }}>
-        <span className="text-xs tracking-wider font-medium" style={{ color: '#ff6666' }}>
-          {role.title}
-        </span>
-        <span className="text-sm font-bold block" style={{ color: '#fff' }}>
-          {role.company}
-        </span>
-      </div>
-    </article>
-  )
-}
-
 // Tech stack display for engineer (ALL OUT ATTACK style)
-function TechStackDisplay({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+function TechStackDisplay({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6">
       {categories.map((category, catIndex) => (
-        <div key={category.name} className="relative">
+        <div key={category.id} className="relative">
           {/* Category header */}
           <div
             className="flex items-center gap-3 mb-3"
             style={{ transform: 'skewX(-3deg)' }}
           >
-            <span className="text-xl">{category.icon}</span>
+            <span className="text-xl" aria-hidden="true">{category.icon}</span>
             <h3
               className="text-sm font-black tracking-wider"
               style={{ color: '#ff0033' }}
             >
               {category.name.toUpperCase()}
             </h3>
-            <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #ff0033, transparent)' }} />
+            <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #ff0033, transparent)' }} aria-hidden="true" />
           </div>
 
           {/* Tech items */}
-          <div className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
             {category.items.map((tech, techIndex) => (
-              <span
+              <li
                 key={tech}
-                className="px-3 py-1 text-xs transition-all hover:scale-105 cursor-default"
+                className="px-3 py-1 text-sm transition-all hover:scale-105 cursor-default"
                 style={{
                   background: `rgba(255,0,51,${0.05 + (techIndex % 3) * 0.05})`,
                   border: '1px solid #ff003340',
@@ -890,120 +855,25 @@ function TechStackDisplay({ categories }: { categories: ReturnType<typeof getEng
                 <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
                   {tech}
                 </span>
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       ))}
     </div>
   )
 }
 
-// Skill display with achievement/impact statements instead of bars
-// Persona 5 cut-in style skill card
-function SkillCutIn({
-  name,
-  achievement,
-  index = 0,
-}: {
-  name: string
-  achievement?: string
-  index?: number
-}) {
-  const [revealed, setRevealed] = useState(false)
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setRevealed(true), 100 + index * 80)
-    return () => clearTimeout(timeout)
-  }, [index])
-
-  return (
-    <div
-      className={`relative overflow-hidden group transition-all duration-300 ${
-        revealed ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8'
-      }`}
-      style={{
-        background: 'linear-gradient(90deg, #ff003320, transparent 80%)',
-        borderLeft: '3px solid #ff0033',
-        transform: 'skewX(-3deg)',
-      }}
-      role="listitem"
-      aria-label={`${name}${achievement ? `: ${achievement}` : ''}`}
-    >
-      {/* Slash accent on hover */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-        style={{
-          background: 'linear-gradient(135deg, transparent 40%, rgba(255,0,51,0.1) 50%, transparent 60%)',
-        }}
-      />
-
-      <div className="px-4 py-2" style={{ transform: 'skewX(3deg)' }}>
-        <span
-          className="text-sm font-bold tracking-wider block"
-          style={{ color: '#fff' }}
-        >
-          {name}
-        </span>
-        {achievement && (
-          <span className="text-sm block mt-0.5" style={{ color: '#e0e0e0' }}>
-            {achievement}
-          </span>
-        )}
-      </div>
-
-      {/* Red accent slash */}
-      <div
-        className="absolute top-0 right-0 w-8 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        style={{
-          background: 'linear-gradient(135deg, transparent 50%, #ff003340 50%)',
-        }}
-      />
-    </div>
-  )
-}
-
-// Drummer/Fighter skills with impact statements
-const SKILL_ACHIEVEMENTS: Record<string, string> = {
-  // Drummer
-  'Rock/Metal': 'National tours, 30+ cities',
-  'Progressive': 'Complex time signatures mastery',
-  'Latin/Salsa': 'Authentic clave patterns',
-  'Jazz Fusion': 'Improvisational freedom',
-  'Funk/Soul': 'Deep pocket grooves',
-  'Double Bass': 'Clean 200+ BPM patterns',
-  'Polyrhythms': '5 over 4, 7 over 4 fluency',
-  'Odd Time Signatures': '7/8, 11/8, mixed meters',
-  'Ghost Notes': 'Subtle dynamics control',
-  'Linear Drumming': 'Single-surface flow',
-  'Studio Recording': 'Multiple album credits',
-  'Live Touring': '100+ shows performed',
-  'Session Work': 'Multiple genre adaptability',
-  'Music Production': 'Drum programming, mixing',
-  // Fighter
-  'Muay Thai (3 years)': 'Traditional clinch & elbow work',
-  'Brazilian Jiu-Jitsu (2 years)': 'Guard specialist',
-  'MMA (1 year)': 'Striking-to-grappling transitions',
-  'Wrestling': 'Takedown defense focus',
-  'Striking': 'Boxing, kicks, knees, elbows',
-  'Clinch Work': 'Thai plum, dirty boxing',
-  'Ground Game': 'Sweeps and positional control',
-  'Submissions': 'Chokes and joint locks',
-  'Fundamentals Instruction': 'Teaching 3 classes/week',
-  'Competition Prep': '20+ students to competition',
-  'Self Defense': 'Real-world scenario focus',
-  'Private Coaching': 'Personalized training plans',
-}
-
 // Company card with Persona flair
-function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
+function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <AllOutAttackSplash featured>
       <a
         href={company.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block relative overflow-hidden group"
+        aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+        className="block relative overflow-hidden group h-full"
         style={{
           background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
           border: '2px solid #330011',
@@ -1014,43 +884,31 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
         <div
           className="absolute top-0 left-0 w-full h-1 transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100"
           style={{ background: '#ff0033' }}
+          aria-hidden="true"
         />
 
         <div className="p-4" style={{ transform: 'skewX(2deg)' }}>
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-3xl">{company.icon}</span>
+            <span className="text-3xl" aria-hidden="true">{company.icon}</span>
             <div>
-              <h4 className="text-sm font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
+              <h3 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
                 {company.name}
-              </h4>
+              </h3>
               <p className="text-sm" style={{ color: '#ff6666' }}>{company.tagline}</p>
             </div>
           </div>
           <p className="text-sm" style={{ color: '#b8b8b8' }}>{company.description}</p>
-
-          {/* Services tags */}
-          <div className="flex flex-wrap gap-1 mt-3">
-            {company.services.slice(0, 3).map((service) => (
-              <span
-                key={service}
-                className="text-sm px-2 py-0.5"
-                style={{ background: '#ff003330', color: '#fff' }}
-              >
-                {service}
-              </span>
-            ))}
-          </div>
         </div>
       </a>
     </AllOutAttackSplash>
   )
 }
 
-// Band card with musical flair
-function BandCard({ band }: { band: typeof BANDS[0] }) {
+// Band card with musical flair: his role, the years and the release
+function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <div
-      className="p-4 relative overflow-hidden group"
+      className="p-4 relative overflow-hidden group h-full"
       style={{
         background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
         border: '2px solid #330011',
@@ -1061,44 +919,44 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
       <div
         className="absolute top-2 right-2 text-2xl opacity-20 group-hover:opacity-40 transition-opacity"
         style={{ color: '#ff0033' }}
+        aria-hidden="true"
       >
         ♪
       </div>
 
       <div style={{ transform: 'skewX(2deg)' }}>
-        <h4 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
+        <h3 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
           {band.name}
-        </h4>
+        </h3>
         <p className="text-sm mt-1" style={{ color: '#ff6666' }}>
-          {band.genre} | {band.role}
+          {band.role}
+          {years && <span aria-hidden="true"> | </span>}
+          {years && <span>{years}</span>}
         </p>
-        <p className="text-sm mt-2" style={{ color: '#b8b8b8' }}>{band.description}</p>
-        {!band.url && (
-          <p className="text-sm mt-2 italic" style={{ color: '#999' }}>
-            Website coming soon
+        {band.release && (
+          <p className="text-sm mt-2" style={{ color: '#b8b8b8' }}>
+            Released <cite>&ldquo;{band.release}&rdquo;</cite>
           </p>
         )}
       </div>
     </div>
   )
 
-  if (band.url) {
-    return (
-      <a href={band.url} target="_blank" rel="noopener noreferrer" className="block">
-        {content}
-      </a>
-    )
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a {...linkProps} className="block h-full">
+      {content}
+    </a>
+  )
 }
 
-// Work experience card with Persona 5 styling
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+// Work experience card with Persona 5 styling. Dates are date only strings (UTC midnight), so the year is read in UTC.
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
-    <div
+    <article
       className="relative overflow-hidden group"
       style={{
         background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
@@ -1110,16 +968,17 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
       <div
         className="absolute top-0 left-0 w-1 h-full transition-all duration-300 group-hover:w-2"
         style={{ background: '#ff0033' }}
+        aria-hidden="true"
       />
 
       <div className="p-4 pl-5" style={{ transform: 'skewX(2deg)' }}>
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-start gap-3 mb-2 flex-wrap">
           <div>
-            <h4 className="text-sm font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
+            <h3 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
               {entry.title}
-            </h4>
+            </h3>
             <p className="text-sm mt-0.5" style={{ color: '#ff6666' }}>
-              {entry.organization}
+              {entry.company}
             </p>
           </div>
           <span
@@ -1134,44 +993,47 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           </span>
         </div>
 
-        <p className="text-sm mb-3" style={{ color: '#b8b8b8' }}>
-          {entry.description}
-        </p>
+        {entry.description && (
+          <p className="text-sm mb-3" style={{ color: '#b8b8b8' }}>
+            {entry.description}
+          </p>
+        )}
 
-        {entry.highlights && entry.highlights.length > 0 && (
-          <ul className="space-y-1.5">
-            {entry.highlights.map((highlight, i) => (
+        {entry.highlights.length > 0 && (
+          <ul className="space-y-1.5" aria-label="Key achievements">
+            {entry.highlights.map((highlight) => (
               <li
-                key={i}
+                key={highlight}
                 className="text-sm flex items-start gap-2"
                 style={{ color: '#e0e0e0' }}
               >
-                <span style={{ color: '#ff6666' }}>▸</span>
+                <span style={{ color: '#ff6666' }} aria-hidden="true">▸</span>
                 {highlight}
               </li>
             ))}
           </ul>
         )}
 
-        {/* Skills tags */}
-        <div className="flex flex-wrap gap-1 mt-3">
-          {entry.skills.slice(0, 4).map((skill) => (
-            <span
-              key={skill}
-              className="text-sm px-2 py-0.5"
-              style={{ background: '#ff003330', color: '#fff' }}
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
+        {entry.skills.length > 0 && (
+          <ul className="flex flex-wrap gap-1 mt-3" aria-label="Skills used">
+            {entry.skills.slice(0, 4).map((skill) => (
+              <li
+                key={skill}
+                className="text-sm px-2 py-0.5"
+                style={{ background: '#ff003330', color: '#fff' }}
+              >
+                {skill}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
-    </div>
+    </article>
   )
 }
 
-// Project card with reveal effect
-function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; index: number }) {
+// Project card with reveal effect: his role, the result line and the links
+function ProjectCard({ project, years, links, index }: ProjectSlot & { index: number }) {
   const [revealed, setRevealed] = useState(false)
 
   useEffect(() => {
@@ -1180,20 +1042,20 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
   }, [index])
 
   return (
-    <AllOutAttackSplash featured={project.featured}>
+    <AllOutAttackSplash featured={project.highlight}>
       <div
-        className={`relative transition-all duration-500 ${
+        className={`relative h-full transition-all duration-500 ${
           revealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}
         style={{
           transform: `skewX(-2deg)`,
         }}
       >
-        <div
-          className="p-4 relative overflow-hidden group cursor-pointer"
+        <article
+          className="p-4 relative overflow-hidden group h-full"
           style={{
             background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-            border: `2px solid ${project.featured ? '#ff0033' : '#330011'}`,
+            border: `2px solid ${project.highlight ? '#ff0033' : '#330011'}`,
           }}
         >
           {/* Red reveal line */}
@@ -1204,48 +1066,67 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
               transform: 'scaleX(0)',
               transformOrigin: 'left',
             }}
+            aria-hidden="true"
           />
 
           <div style={{ transform: 'skewX(2deg)' }}>
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-sm font-bold" style={{ color: '#ff0033' }}>
+            <div className="flex justify-between items-start gap-2 mb-2">
+              <h3 className="text-base font-bold" style={{ color: '#ff0033' }}>
                 {project.name}
-              </span>
-              {project.featured && (
-                <span
-                  className="text-sm px-2 py-1 font-bold animate-pulse"
-                  style={{ background: '#ff0033', color: '#000' }}
-                >
-                  ALL OUT
+              </h3>
+              {years && (
+                <span className="text-sm px-2 py-1 font-bold whitespace-nowrap" style={{ background: '#ff0033', color: '#000' }}>
+                  {years}
                 </span>
               )}
             </div>
-            <p className="text-sm" style={{ color: '#b8b8b8' }}>
+            <p className="text-sm font-bold" style={{ color: '#fff' }}>
+              {project.role}
+            </p>
+            <p className="text-sm mt-1" style={{ color: '#b8b8b8' }}>
               {project.tagline}
             </p>
             {project.impact && (
               <p className="text-sm mt-2 italic" style={{ color: '#ff6666' }}>
-                → {project.impact}
+                <span aria-hidden="true">→ </span>
+                {project.impact}
               </p>
             )}
-            <div className="flex gap-2 mt-2 flex-wrap">
-              {project.techStack.slice(0, 4).map((tech) => (
-                <span
-                  key={tech}
-                  className="text-sm px-2 py-0.5"
-                  style={{ background: '#ff003330', color: '#fff' }}
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+            {project.techStack.length > 0 && (
+              <ul className="flex gap-2 mt-2 flex-wrap" aria-label="Technologies used">
+                {project.techStack.slice(0, 4).map((tech) => (
+                  <li
+                    key={tech}
+                    className="text-sm px-2 py-0.5"
+                    style={{ background: '#ff003330', color: '#fff' }}
+                  >
+                    {tech}
+                  </li>
+                ))}
+              </ul>
+            )}
+            {links.length > 0 ? (
+              <div className="flex flex-wrap gap-3 mt-4">
+                {links.map(({ kind, label, linkProps }) => (
+                  <a
+                    key={kind}
+                    {...linkProps}
+                    className="inline-flex items-center min-h-[44px] px-4 text-sm font-bold tracking-wider transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    style={{ border: '3px solid #ff0033', color: '#ff0033' }}
+                  >
+                    {label.toUpperCase()}
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm mt-4" style={{ color: '#999' }}>No public link</p>
+            )}
           </div>
-        </div>
+        </article>
       </div>
     </AllOutAttackSplash>
   )
 }
-
 // Dramatic TAKE YOUR TIME - iconic Persona 5 loading screen text
 function TakeYourTime({ prefersReducedMotion = false }: { prefersReducedMotion?: boolean }) {
   const [phase, setPhase] = useState(prefersReducedMotion ? 3 : 0)
@@ -1357,17 +1238,201 @@ function TakeYourTime({ prefersReducedMotion = false }: { prefersReducedMotion?:
   )
 }
 
+const SKEW_BUTTON =
+  'inline-flex items-center justify-center min-h-[44px] px-5 py-2 text-sm tracking-wider font-bold transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black'
+
+// Email is the solid red primary action, LinkedIn and the CV the outlined ones.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
+  email: { background: '#ff0033', color: '#000', border: '3px solid #ff0033' },
+  linkedin: { background: 'transparent', border: '3px solid #ff0033', color: '#ff0033' },
+}
+
+function skew(prefersReducedMotion: boolean, deg: number): string {
+  return prefersReducedMotion ? 'none' : `skewX(${deg}deg)`
+}
+
+function HeroAction({ action, prefersReducedMotion }: { action: HeroActionSlot; prefersReducedMotion: boolean }) {
+  return (
+    <a
+      {...action.linkProps}
+      className={SKEW_BUTTON}
+      style={{ ...HERO_ACTION_LOOK[action.id], transform: skew(prefersReducedMotion, -5) }}
+    >
+      <span style={{ display: 'inline-block', transform: skew(prefersReducedMotion, 5) }}>
+        {action.label.toUpperCase()}
+      </span>
+    </a>
+  )
+}
+
+function CVLink({ prefersReducedMotion }: { prefersReducedMotion: boolean }) {
+  return (
+    <Link
+      href="/cv"
+      className={`${SKEW_BUTTON} hover:bg-red-900/20`}
+      style={{ ...HERO_ACTION_LOOK.linkedin, transform: skew(prefersReducedMotion, -5) }}
+    >
+      <span style={{ display: 'inline-block', transform: skew(prefersReducedMotion, 5) }}>CV</span>
+    </Link>
+  )
+}
+
+function SectionHeading({ children, prefersReducedMotion }: { children: React.ReactNode; prefersReducedMotion: boolean }) {
+  return (
+    <h2
+      className="mb-4 text-xl font-black"
+      style={{ color: '#ff0033', transform: skew(prefersReducedMotion, -3) }}
+    >
+      {children}
+    </h2>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections, prefersReducedMotion }: { sections: SectionsOf<'engineer'>; prefersReducedMotion: boolean }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      <section aria-label="About">
+        <SkewedPanel color="#ff0033" direction="right" delay={200}>
+          <h2 className="text-xl font-black mb-3" style={{ color: '#ff0033' }}>
+            ABOUT
+          </h2>
+          <p className="text-base leading-relaxed" style={{ color: '#ccc' }}>
+            {professionalSummary.bio}
+          </p>
+        </SkewedPanel>
+      </section>
+
+      {/* ART SECTION 1: Phantom masks + action lines */}
+      {!prefersReducedMotion && <ArtSection variant={1} />}
+
+      {sections.jobs.length > 0 && (
+        <section className="mt-8" aria-label="Work experience">
+          <SkewedPanel color="#ff0033" direction="left" delay={300}>
+            <h2 className="text-xl font-black mb-4" style={{ color: '#ff0033' }}>
+              WORK EXPERIENCE
+            </h2>
+            <div className="space-y-4">
+              {sections.jobs.map((entry) => (
+                <ExperienceCard key={entry.id} entry={entry} />
+              ))}
+            </div>
+          </SkewedPanel>
+        </section>
+      )}
+
+      {/* ART SECTION 2: Paint splatters + card suits */}
+      {!prefersReducedMotion && <ArtSection variant={2} />}
+
+      <section className="mt-8" aria-label="Tech stack">
+        <SkewedPanel color="#ff0033" direction="left" delay={400}>
+          <h2 className="text-xl font-black mb-4" style={{ color: '#ff0033' }}>
+            TECH STACK
+          </h2>
+          <TechStackDisplay categories={sections.techStack} />
+        </SkewedPanel>
+      </section>
+
+      <section className="mt-8" aria-label="Projects">
+        <SectionHeading prefersReducedMotion={prefersReducedMotion}>PROJECTS</SectionHeading>
+        <ProjectList
+          projects={sections.projects}
+          className="grid md:grid-cols-2 gap-4"
+          renderProject={(slot) => <ProjectCard {...slot} index={sections.projects.indexOf(slot.project)} />}
+        />
+      </section>
+
+      {/* ART SECTION 3: Speed lines + chain break */}
+      {!prefersReducedMotion && <ArtSection variant={3} />}
+
+      <section className="mt-8" aria-label="Ventures">
+        <SectionHeading prefersReducedMotion={prefersReducedMotion}>VENTURES</SectionHeading>
+        <div className="grid md:grid-cols-3 gap-4">
+          {sections.companies.map((company) => (
+            <CompanyCard key={company.id} company={company} />
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+function MusicianSections({ sections, prefersReducedMotion }: { sections: SectionsOf<'drummer'>; prefersReducedMotion: boolean }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      {!prefersReducedMotion && <ArtSection variant={2} />}
+      <section className="mt-8" aria-label="Bands">
+        <SectionHeading prefersReducedMotion={prefersReducedMotion}>BANDS</SectionHeading>
+        <p className="text-base mb-4" style={{ color: '#ccc' }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList
+          bands={bands}
+          className="grid md:grid-cols-3 gap-4"
+          renderBand={(slot) => <BandCard {...slot} />}
+        />
+        <p className="text-sm mt-4 italic" style={{ color: '#ff6666' }}>
+          {musician.line}
+        </p>
+      </section>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections, prefersReducedMotion }: { sections: SectionsOf<'fighter'>; prefersReducedMotion: boolean }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      {!prefersReducedMotion && <ArtSection variant={3} />}
+      <section className="mt-8" aria-label="Muay Thai">
+        <SkewedPanel color="#ff0033" direction="right" delay={200}>
+          <h2 className="text-xl font-black mb-2" style={{ color: '#ff0033' }}>
+            MUAY THAI
+          </h2>
+          <h3 className="text-lg font-bold mb-4" style={{ color: '#fff' }}>
+            {martialArts.primary.title}
+          </h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'grid sm:grid-cols-2 gap-3 mb-5',
+              fact: 'px-4 py-3 border-l-4 border-[#ff0033] bg-[#ff0033]/10',
+              term: 'text-sm tracking-widest uppercase font-bold text-[#ff6666]',
+              value: 'text-sm mt-1 text-white',
+              achievements: 'space-y-2',
+              achievement: 'text-sm flex items-start gap-2 text-[#e0e0e0]',
+            }}
+            renderAchievement={(achievement) => (
+              <>
+                <span className="text-[#ff6666]" aria-hidden="true">▸</span>
+                <span>{achievement}</span>
+              </>
+            )}
+          />
+        </SkewedPanel>
+      </section>
+    </>
+  )
+}
+
+function ProfessionDetails(props: { sections: ProfessionSections; prefersReducedMotion: boolean }) {
+  const { sections, prefersReducedMotion } = props
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} prefersReducedMotion={prefersReducedMotion} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} prefersReducedMotion={prefersReducedMotion} />
+  return <EngineerSections sections={sections} prefersReducedMotion={prefersReducedMotion} />
+}
+
 export default function BoldNoirTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
+  const { active } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
   const prefersReducedMotion = usePrefersReducedMotion()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
@@ -1382,8 +1447,6 @@ export default function BoldNoirTheme() {
         background: '#0a0a0a',
         fontFamily: '"Bebas Neue", "Impact", sans-serif',
       }}
-      role="main"
-      aria-label="Alexander Pulido Portfolio - Persona 5 Theme"
     >
       {/* Background layers - disabled when user prefers reduced motion */}
       {!prefersReducedMotion && (
@@ -1405,361 +1468,117 @@ export default function BoldNoirTheme() {
         style={{
           background: 'linear-gradient(225deg, rgba(255, 0, 51, 0.3), transparent 60%)',
         }}
+        aria-hidden="true"
       />
 
-      {/* Header */}
-      <header className="relative z-30 p-6" role="banner">
-        <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div style={{ transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)' }}>
-            {/* Persona 5 style name with paint splatter accent */}
-            <div className="relative inline-block">
-              <h1
-                className="text-4xl md:text-5xl font-black tracking-wider relative z-10"
-                style={{
-                  color: '#ff0033',
-                  textShadow: '3px 3px 0 #000, 6px 6px 0 #330011',
-                }}
-              >
-                ALEXANDER PULIDO
-              </h1>
-              {/* Paint splatter decoration behind name */}
-              <div
-                className="absolute -inset-4 -z-10 opacity-20"
-                style={{
-                  background: `radial-gradient(ellipse at 20% 50%, #ff0033 0%, transparent 50%),
-                               radial-gradient(ellipse at 80% 30%, #ff0033 0%, transparent 40%)`,
-                }}
-                aria-hidden="true"
-              />
-            </div>
-            <p
-              className="text-sm md:text-base tracking-wider mt-2 font-medium"
-              style={{ color: '#ccc' }}
-            >
-              {PROFESSIONAL_SUMMARY[active].headline}
-            </p>
-            <p
-              className="text-xs md:text-sm tracking-wider mt-1 italic"
-              style={{ color: '#ff0033' }}
-            >
-              {PROFESSIONAL_SUMMARY[active].tagline}
-            </p>
-          </div>
+      {/* Header - the recruiter first screen */}
+      <header className="relative z-30 px-4 py-6 sm:p-6">
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-6xl mx-auto flex justify-between items-start flex-wrap gap-6">
+              <div style={{ transform: skew(prefersReducedMotion, -3) }}>
+                {/* Persona 5 style name with paint splatter accent */}
+                <div className="relative inline-block">
+                  <h1
+                    className="text-3xl md:text-5xl font-black tracking-wider uppercase relative z-10"
+                    style={{
+                      color: '#ff0033',
+                      textShadow: '3px 3px 0 #000, 6px 6px 0 #330011',
+                    }}
+                  >
+                    {name}
+                  </h1>
+                  {/* Paint splatter decoration behind name */}
+                  <div
+                    className="absolute -inset-4 -z-10 opacity-20"
+                    style={{
+                      background: `radial-gradient(ellipse at 20% 50%, #ff0033 0%, transparent 50%),
+                                   radial-gradient(ellipse at 80% 30%, #ff0033 0%, transparent 40%)`,
+                    }}
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="text-base tracking-wider mt-2 font-medium" style={{ color: '#ccc' }}>
+                  {headline}
+                </p>
+                <p className="text-sm md:text-base tracking-wider mt-1 italic" style={{ color: '#ff3355' }}>
+                  {tagline}
+                </p>
+                <p className="text-sm tracking-wider mt-1" style={{ color: '#e0e0e0' }}>
+                  {line}
+                </p>
+              </div>
 
-          <nav
-            className="flex gap-3 items-center"
-            style={{ transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)' }}
-            aria-label="Main navigation"
-          >
-            <Link
-              href="/cv"
-              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black"
-              style={{
-                background: 'transparent',
-                border: '3px solid #ff0033',
-                color: '#ff0033',
-              }}
-              aria-label="View full profile and CV"
-            >
-              PROFILE
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black"
-              style={{
-                background: '#ff0033',
-                color: '#000',
-              }}
-              aria-label="Play the game engine demo"
-            >
-              PLAY
-            </Link>
-          </nav>
-        </div>
+              <nav
+                className="flex gap-3 items-center flex-wrap"
+                aria-label="Contact and CV"
+              >
+                {actions.map((action) => (
+                  <HeroAction key={action.id} action={action} prefersReducedMotion={prefersReducedMotion} />
+                ))}
+                <CVLink prefersReducedMotion={prefersReducedMotion} />
+                <Link
+                  href="/personal-projects/game-engine"
+                  className={SKEW_BUTTON}
+                  style={{ ...HERO_ACTION_LOOK.email, transform: skew(prefersReducedMotion, -5) }}
+                  aria-label="Play the game engine demo"
+                >
+                  <span style={{ display: 'inline-block', transform: skew(prefersReducedMotion, 5) }}>PLAY</span>
+                </Link>
+              </nav>
+            </div>
+          )}
+        />
       </header>
 
-      {/* Current Roles - Persona 5 status display */}
-      <section
-        className="relative z-20 py-4 px-6"
-        aria-label="Current professional roles"
-      >
-        <div className="max-w-6xl mx-auto">
-          <h2 className="sr-only">Current Roles</h2>
-          <div className="flex flex-wrap justify-center gap-6">
-            {CURRENT_ROLES.map((role) => (
-              <RoleCard
-                key={role.id}
-                role={role}
-                prefersReducedMotion={prefersReducedMotion}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Main content */}
-      <main className="relative z-20 px-6 py-8">
+      <main className="relative z-20 px-4 sm:px-6 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Take Your Time message - iconic Persona 5 loading screen */}
           <TakeYourTime prefersReducedMotion={prefersReducedMotion} />
 
-          {/* Character selection - Persona 5 party member selection */}
-          <section
-            className="mb-12 mt-8"
-            aria-label="Select profession persona"
-            role="group"
-          >
-            <h2 className="sr-only">Choose Your Persona</h2>
-            <div className="flex justify-center gap-6 flex-wrap">
-              {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-                <CharacterCard
-                  key={prof}
-                  profession={prof}
-                  isActive={active === prof}
-                  onClick={() => setActive(prof)}
-                  prefersReducedMotion={prefersReducedMotion}
-                />
-              ))}
-            </div>
+          {/* Character selection - Persona 5 party member selection, System Engineer in the centre */}
+          <section className="mb-12 mt-8" aria-label="Profession selection">
+            <ProfessionSwitch
+              className="grid grid-cols-3 gap-3 sm:flex sm:justify-center sm:gap-6"
+              label="Profession"
+              renderOption={(option) => <CharacterCard {...option} prefersReducedMotion={prefersReducedMotion} />}
+            />
           </section>
 
-          {/* About section */}
-          <section aria-labelledby="about-heading">
-            <SkewedPanel color="#ff0033" direction="right" delay={200}>
-              <h2
-                id="about-heading"
-                className="text-xl font-black mb-3"
-                style={{ color: '#ff0033' }}
-              >
-                ABOUT
-              </h2>
-              <p className="text-sm leading-relaxed" style={{ color: '#ccc' }}>
-                {aboutData.bio}
-              </p>
-              <ul
-                className="flex flex-wrap gap-2 mt-4"
-                aria-label="Quick facts"
-              >
-                {aboutData.quickFacts.map((fact, i) => (
-                  <li
-                    key={i}
-                    className="text-[10px] px-3 py-1 font-bold"
-                    style={{
-                      background: '#ff003330',
-                      border: '1px solid #ff0033',
-                      color: '#fff',
-                      transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)',
-                    }}
-                  >
-                    {fact}
-                  </li>
-                ))}
-              </ul>
-            </SkewedPanel>
-          </section>
-
-          {/* ART SECTION 1: Phantom masks + action lines */}
-          {!prefersReducedMotion && <ArtSection variant={1} />}
-
-          {/* Work Experience section */}
-          {experience.length > 0 && (
-            <section className="mt-8" aria-labelledby="experience-heading">
-              <SkewedPanel color="#ff0033" direction="left" delay={300}>
-                <h2
-                  id="experience-heading"
-                  className="text-xl font-black mb-4"
-                  style={{ color: '#ff0033' }}
-                >
-                  WORK EXPERIENCE
-                </h2>
-                <div className="space-y-4" role="list">
-                  {experience.map((entry) => (
-                    <ExperienceCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </SkewedPanel>
-            </section>
-          )}
-
-          {/* ART SECTION 2: Paint splatters + card suits */}
-          {!prefersReducedMotion && <ArtSection variant={2} />}
-
-          {/* Skills / Tech Stack section */}
-          <div className="mt-8">
-            {active === 'engineer' ? (
-              <SkewedPanel color="#ff0033" direction="left" delay={400}>
-                <h2
-                  id="tech-stack-heading"
-                  className="text-xl font-black mb-4"
-                  style={{ color: '#ff0033' }}
-                >
-                  TECH STACK
-                </h2>
-                <div aria-labelledby="tech-stack-heading">
-                  <TechStackDisplay categories={engineerTech} />
-                </div>
-              </SkewedPanel>
-            ) : (
-              <SkewedPanel color="#ff0033" direction="left" delay={400}>
-                <h2
-                  id="skills-heading"
-                  className="text-xl font-black mb-4"
-                  style={{ color: '#ff0033' }}
-                >
-                  SKILLS
-                </h2>
-                <div aria-labelledby="skills-heading">
-                  {otherSkills.map((category) => (
-                    <div key={category.name} className="mb-5 last:mb-0">
-                      <h3
-                        className="text-xs tracking-widest mb-3 flex items-center gap-2"
-                        style={{ color: '#ff0033' }}
-                      >
-                        <span aria-hidden="true">{category.icon}</span>
-                        <span className="font-bold">{category.name.toUpperCase()}</span>
-                        <div
-                          className="flex-1 h-px"
-                          style={{ background: 'linear-gradient(90deg, #ff003350, transparent)' }}
-                          aria-hidden="true"
-                        />
-                      </h3>
-                      <div className="space-y-2" role="list">
-                        {category.skills.map((skill, idx) => (
-                          <SkillCutIn
-                            key={skill.name}
-                            name={skill.name}
-                            achievement={SKILL_ACHIEVEMENTS[skill.name]}
-                            index={idx}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </SkewedPanel>
-            )}
+          <div role="region" aria-label={`${active} profession details`}>
+            <ProfessionDetails sections={view.sections} prefersReducedMotion={prefersReducedMotion} />
           </div>
-
-          {/* Projects / Featured Work section */}
-          <section className="mt-8" aria-labelledby="projects-heading">
-            <h2
-              id="projects-heading"
-              className="mb-4 text-xl font-black"
-              style={{
-                color: '#ff0033',
-                transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
-              }}
-            >
-              FEATURED WORK
-            </h2>
-            <div className="grid md:grid-cols-2 gap-4" role="list">
-              {projects.slice(0, 6).map((project, i) => (
-                <div key={project.id} role="listitem">
-                  <ProjectCard project={project} index={i} />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* ART SECTION 3: Speed lines + chain break */}
-          {!prefersReducedMotion && <ArtSection variant={3} />}
-
-          {/* Ventures: Companies (Engineer) / Bands (Drummer) */}
-          {active === 'engineer' && (
-            <section className="mt-8" aria-labelledby="companies-heading">
-              <h2
-                id="companies-heading"
-                className="mb-4 text-xl font-black"
-                style={{
-                  color: '#ff0033',
-                  transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
-                }}
-              >
-                VENTURES
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4" role="list">
-                {COMPANIES.map((company) => (
-                  <div key={company.id} role="listitem">
-                    <CompanyCard company={company} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {active === 'drummer' && (
-            <section className="mt-8" aria-labelledby="bands-heading">
-              <h2
-                id="bands-heading"
-                className="mb-4 text-xl font-black"
-                style={{
-                  color: '#ff0033',
-                  transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
-                }}
-              >
-                BANDS
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4" role="list">
-                {BANDS.map((band) => (
-                  <div key={band.id} role="listitem">
-                    <BandCard band={band} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
         </div>
       </main>
 
       {/* Contact CTA - Persona 5 style */}
-      <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <SkewedPanel color="#ff0033" direction="right" delay={0}>
-            <div className="py-4">
-              <h2
-                className="text-xl font-black mb-3"
-                style={{
-                  color: '#ff0033',
-                  transform: prefersReducedMotion ? 'none' : 'skewX(-3deg)',
-                }}
-              >
-                READY TO WORK TOGETHER?
-              </h2>
-              <p className="text-sm mb-6" style={{ color: '#ccc' }}>
-                10+ years delivering production systems. Let&apos;s build something.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="mailto:alexanderpulido81@gmail.com"
-                  className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 font-bold"
-                  style={{
-                    background: '#ff0033',
-                    color: '#000',
-                    transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)',
-                  }}
-                >
-                  <span style={{ display: 'inline-block', transform: prefersReducedMotion ? 'none' : 'skewX(5deg)' }}>
-                    GET IN TOUCH
-                  </span>
-                </a>
-                <Link
-                  href="/cv"
-                  className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 hover:bg-red-900/20 font-bold"
-                  style={{
-                    background: 'transparent',
-                    border: '3px solid #ff0033',
-                    color: '#ff0033',
-                    transform: prefersReducedMotion ? 'none' : 'skewX(-5deg)',
-                  }}
-                >
-                  <span style={{ display: 'inline-block', transform: prefersReducedMotion ? 'none' : 'skewX(5deg)' }}>
-                    VIEW CV
-                  </span>
-                </Link>
-              </div>
+      <section className="relative z-20 py-16 px-4 sm:px-6" aria-label="Contact">
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <SkewedPanel color="#ff0033" direction="right" delay={0}>
+                <div className="py-4">
+                  <h2
+                    className="text-xl font-black mb-3"
+                    style={{ color: '#ff0033', transform: skew(prefersReducedMotion, -3) }}
+                  >
+                    READY TO WORK TOGETHER?
+                  </h2>
+                  <p className="text-sm mb-6" style={{ color: '#ccc' }}>
+                    {line}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    {actions.map((action) => (
+                      <HeroAction key={action.id} action={action} prefersReducedMotion={prefersReducedMotion} />
+                    ))}
+                    <CVLink prefersReducedMotion={prefersReducedMotion} />
+                  </div>
+                </div>
+              </SkewedPanel>
             </div>
-          </SkewedPanel>
-        </div>
+          )}
+        />
       </section>
 
       
