@@ -468,6 +468,15 @@
   transform-origin: 178px 146px;
 }
 
+/* ---------------------------------------------------------------- the throw (hurl.tsx) */
+
+/* The shards turn about their own middles; the freed keepsake grows from its own. */
+.shard,
+.freed {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
 /* ---------------------------------------------------------------- the boons (boons.tsx) */
 
 .boon[data-rarity='common'] { --rarity: var(--myth-common); }

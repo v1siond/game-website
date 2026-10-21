@@ -7,6 +7,7 @@ import { Stage } from './stage'
 import { Trials } from './trials'
 import { ChainHaul } from './chains'
 import { ChestHeave } from './chest'
+import { BladeThrow } from './hurl'
 import { Codex } from './codex'
 import { Boons } from './boons'
 import { Volcano } from './volcano'
@@ -52,6 +53,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.companies.length > 0 && (
         <Stage title={titles.ventures} zone="magma">
+          <BladeThrow />
           <Keepsakes companies={sections.companies} />
         </Stage>
       )}
