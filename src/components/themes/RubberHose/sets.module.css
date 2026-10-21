@@ -1,0 +1,374 @@
+/*
+ * Rubber Hose's profession sets (sets.tsx): the inked frame, the watercolour skies, the two ink weights,
+ * the parallax of the cut out layers and the loops of the props. Most loops run in steps sized to about
+ * 24 drawings a second (a 0.5s half loop in steps(12)), so they move like hand drawn cels rather than a
+ * smooth tween; the parallax alone eases, as a camera would. Transform and opacity only; every loop
+ * stops and every layer sits still under reduced motion.
+ */
+
+.frame {
+  --hose-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  background: var(--hose-paper);
+  border: 4px solid var(--hose-ink);
+  box-shadow: 6px 6px 0 var(--hose-shadow-dark);
+}
+
+/* The skies, a watercolour wash: a pale bloom of light over the colour going down to the paper. */
+.skyDay {
+  background:
+    radial-gradient(ellipse at 28% 18%, var(--hose-highlight), transparent 55%),
+    linear-gradient(180deg, var(--hose-sky-wash), var(--hose-paper-sepia));
+}
+
+.skyDusk {
+  background:
+    radial-gradient(ellipse at 70% 12%, var(--hose-highlight), transparent 50%),
+    linear-gradient(180deg, var(--hose-paper-sepia), var(--hose-orange));
+}
+
+/* Two ink weights, the old cartoon's thick and thin line: thick round a silhouette, thin for the
+   detail inside it (declared after, so a thin group inside a thick one wins). */
+.thick :is(path, rect, circle, ellipse),
+:is(path, rect, circle, ellipse).thick {
+  stroke: var(--hose-ink);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+.thin :is(path, rect, circle, ellipse),
+:is(path, rect, circle, ellipse).thin {
+  stroke: var(--hose-ink);
+  stroke-width: 1.2px;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ---- parallax: each layer slides against the pointer by its depth (--look-x, --look-y, -1 to 1) ---- */
+
+.far,
+.mid,
+.near {
+  transition: transform 0.45s ease-out;
+}
+
+.far {
+  transform: translate3d(calc(var(--look-x, 0) * -6px), calc(var(--look-y, 0) * -2px), 0);
+}
+
+.mid {
+  transform: translate3d(calc(var(--look-x, 0) * -14px), calc(var(--look-y, 0) * -4px), 0);
+}
+
+.near {
+  transform: translate3d(calc(var(--look-x, 0) * -26px), calc(var(--look-y, 0) * -6px), 0);
+}
+
+/* A prop takes the pointer even though its layer lets it through, and squashes when it lands. */
+.prop {
+  pointer-events: auto;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.prop:hover {
+  animation: squash 0.5s steps(12, end);
+}
+
+@keyframes squash {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.25, 0.75);
+  }
+  60% {
+    transform: scale(0.88, 1.15);
+  }
+}
+
+/* ---- him ---- */
+
+.himBob {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: beat 1s steps(12, end) infinite alternate;
+}
+
+@keyframes beat {
+  from {
+    transform: scale(1.04, 0.96);
+  }
+  to {
+    transform: translate3d(0, -3%, 0) scale(0.97, 1.03);
+  }
+}
+
+/* ---- the workshop town ---- */
+
+.cloudDrift {
+  animation: cloudDrift 18s steps(216, end) infinite alternate;
+}
+
+@keyframes cloudDrift {
+  to {
+    transform: translate3d(40px, 0, 0);
+  }
+}
+
+.houseBob {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: beat 0.7s steps(8, end) infinite alternate;
+  animation-delay: var(--delay, 0s);
+}
+
+.propBob {
+  animation: beat 0.7s steps(8, end) infinite alternate;
+}
+
+.propBob:hover {
+  animation: squash 0.5s steps(12, end);
+}
+
+/* A smoke ring leaves the stack, swells and fades as it climbs. */
+.puff {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  animation: puff 2.7s steps(32, end) infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes puff {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.4);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-24px, -44px, 0) scale(1.6);
+  }
+}
+
+/* ---- the vaudeville stage ---- */
+
+.curtainSway {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: curtainSway 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes curtainSway {
+  from {
+    transform: skewX(-1.5deg);
+  }
+  to {
+    transform: skewX(1.5deg);
+  }
+}
+
+/* The footlights flicker in two rows, one dimming as the other comes up. */
+.footA,
+.footB {
+  animation: footlight 0.6s steps(2, jump-none) infinite alternate;
+}
+
+.footB {
+  animation-delay: -0.6s;
+}
+
+@keyframes footlight {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.cymbalTip {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cymbalTip 0.35s var(--hose-bounce) infinite alternate;
+}
+
+@keyframes cymbalTip {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}
+
+.bassThump {
+  animation: thump 0.7s steps(8, end) infinite;
+}
+
+@keyframes thump {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.1, 0.92);
+  }
+  45% {
+    transform: scale(0.97, 1.04);
+  }
+}
+
+.bassThump:hover {
+  animation: squash 0.5s steps(12, end);
+}
+
+.hornPump {
+  transform-box: fill-box;
+  transform-origin: 70% 100%;
+  animation: thump 0.7s steps(8, end) infinite;
+  animation-delay: -0.35s;
+}
+
+/* ---- the prize ring ---- */
+
+.flagWave {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: flagWave 0.5s steps(6, end) infinite alternate;
+}
+
+@keyframes flagWave {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(0.8, 1.25) skewY(8deg);
+  }
+}
+
+.buntingSway {
+  transform-origin: 50% 0;
+  animation: buntingSway 3s ease-in-out infinite alternate;
+}
+
+@keyframes buntingSway {
+  from {
+    transform: translate3d(0, -2px, 0);
+  }
+  to {
+    transform: translate3d(0, 3px, 0);
+  }
+}
+
+/* The bag on the jab's beat (1.4s): it waits, takes the glove at 55%, swings back and settles. */
+.bagSwing {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: bagSwing 1.4s steps(17, end) infinite;
+}
+
+@keyframes bagSwing {
+  0%,
+  52% {
+    transform: rotate(0deg);
+  }
+  62% {
+    transform: rotate(-14deg) scale(0.92, 1.04);
+  }
+  78% {
+    transform: rotate(6deg);
+  }
+  90%,
+  100% {
+    transform: rotate(-2deg);
+  }
+}
+
+.bagSwing:hover {
+  animation: squash 0.5s steps(12, end);
+}
+
+/* The impact star where the glove lands, lit for the frames of the hit. */
+.impact {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: 0;
+  animation: impact 1.4s steps(17, end) infinite;
+}
+
+@keyframes impact {
+  0%,
+  52%,
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  56%,
+  64% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.crowdA,
+.crowdB {
+  animation: crowd 0.7s steps(8, end) infinite alternate;
+}
+
+.crowdB {
+  animation-delay: -0.7s;
+}
+
+@keyframes crowd {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .far,
+  .mid,
+  .near {
+    transition: none;
+    transform: none;
+  }
+
+  .prop:hover,
+  .himBob,
+  .cloudDrift,
+  .houseBob,
+  .propBob,
+  .propBob:hover,
+  .puff,
+  .curtainSway,
+  .footA,
+  .footB,
+  .cymbalTip,
+  .bassThump,
+  .bassThump:hover,
+  .hornPump,
+  .flagWave,
+  .buntingSway,
+  .bagSwing,
+  .bagSwing:hover,
+  .impact,
+  .crowdA,
+  .crowdB {
+    animation: none;
+  }
+
+  .puff,
+  .impact {
+    opacity: 0;
+  }
+}

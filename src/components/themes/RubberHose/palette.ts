@@ -1,10 +1,10 @@
 import { paletteVars } from '../shared/paletteVars'
 
 // Rubber Hose's palette, every colour of the world once: the sepia paper of a 1930s cartoon, its ink
-// line, the faded red and gold of a theatre poster, the film stock round the frame. The SVG art reads
-// HOSE; HOSE_VARS puts the same values on the world's root as --hose-* variables, which
-// world.module.css, scenes.module.css and the few Tailwind arbitrary values read, so no colour is
-// written twice.
+// line, the parry pink, the watercolour washes of the profession sets, the faded red and gold of a
+// theatre poster, the film stock round the frame. The SVG art reads HOSE; HOSE_VARS puts the same
+// values on the world's root as --hose-* variables, which the CSS modules and the few Tailwind
+// arbitrary values read, so no colour is written twice.
 
 export const HOSE = {
   // The paper, light to dark
@@ -26,6 +26,14 @@ export const HOSE = {
   blue: '#2b4570',
   gold: '#c9a227',
   orange: '#d4652f',
+
+  // The parry pink: the one colour a visitor may slap
+  parry: '#ff4fa3',
+
+  // The watercolour washes behind the sets: a pale sky, the meadow and its shade
+  skyWash: '#d9e2d0',
+  meadow: '#9aa86f',
+  meadowDark: '#6f7d4a',
 
   // The film stock round the frame and its sprocket holes
   film: '#1a1510',

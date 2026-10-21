@@ -3,26 +3,40 @@
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { FadeInScene, ScrollScene } from '@/components/scroll/ScrollScene'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { ArtBreak, CurlBanner, PieEyes } from './art'
 import { HOSE } from './palette'
 import { BandRecord, CompanyPoster, ExperienceCard, TechBubbleCloud } from './cards'
-import { Reveal, staggerAt } from './scenes'
+import { Reveal, RunBar, staggerAt } from './scenes'
 import { ParryBoard } from './parry'
 import world from './world.module.css'
 import styles from './scenes.module.css'
 import { drumsSince } from '@/components/cv/sectionText'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in. Work Experience is a boss's
-// phases: each job a phase card dropping in with a squash, in masonry. Featured Work is the parry board
-// (./parry). Bands is the shop shelf, each record's disc spinning up under the pointer. The Muay Thai
-// record opens on the knockout slam, its achievements landing as hit stars, the bell swinging on hover.
-// The art breaks between them are a film leader, a sing along line and pie eyed balls.
+// phases: each job a phase card dropping in with a squash, in masonry, under the run bar his figure runs
+// along as the jobs scroll by. Featured Work is the parry board (./parry). Bands is the shop shelf, each
+// record's disc spinning up under the pointer. The Muay Thai record opens on the knockout slam over an
+// ink starburst, its achievements landing as hit stars, the bell swinging on hover. The art breaks
+// between them are a film leader, a sing along line and pie eyed balls.
 
 const LEAD = `text-center text-base ${world.ink}`
+
+// The run bar's scroll lines: it starts as the section's top passes the middle of the screen and he
+// reaches the last flag as the section's top is most of a screen above it (the jobs scrolled by).
+const RUN_START = 0.5
+const RUN_END = -0.9
+
+// The knockout starburst's points, long and short rays in turn round an oval 200 by 60.
+const KO_RAYS = 18
+const KO_BURST = Array.from({ length: KO_RAYS * 2 }, (_, i) => {
+  const angle = (Math.PI * i) / KO_RAYS
+  const reach = i % 2 === 0 ? 1 : 0.62
+  return `${(100 + Math.cos(angle) * 98 * reach).toFixed(1)},${(30 + Math.sin(angle) * 29 * reach).toFixed(1)}`
+}).join(' ')
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -39,22 +53,27 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <ArtBreak kind="filmLeader" />
 
       {sections.jobs.length > 0 && (
-        <section aria-labelledby="hose-work-experience" className="mb-8">
-          <CurlBanner id="hose-work-experience">Work Experience</CurlBanner>
-          <Reveal>
-            {({ played }) => (
-              <ul className={`pt-4 ${MASONRY_LIST}`}>
-                {sections.jobs.map((entry, index) => (
-                  <li key={entry.id} className={`${MASONRY_ITEM} pt-4 ${staggerAt(index)} ${played ? styles.phaseIn : styles.phaseWait}`}>
-                    <div className={styles.breathe}>
-                      <ExperienceCard entry={entry} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </Reveal>
-        </section>
+        <ScrollScene reveal={false} start={RUN_START} end={RUN_END}>
+          <section aria-labelledby="hose-work-experience" className="mb-8">
+            <CurlBanner id="hose-work-experience">Work Experience</CurlBanner>
+            <div className="sticky top-3 z-30 mb-2">
+              <RunBar profession="engineer" stops={sections.jobs.length} />
+            </div>
+            <Reveal>
+              {({ played }) => (
+                <ul className={`pt-4 ${MASONRY_LIST}`}>
+                  {sections.jobs.map((entry, index) => (
+                    <li key={entry.id} className={`${MASONRY_ITEM} pt-4 ${staggerAt(index)} ${played ? styles.phaseIn : styles.phaseWait}`}>
+                      <div className={styles.breathe}>
+                        <ExperienceCard entry={entry} />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Reveal>
+          </section>
+        </ScrollScene>
       )}
 
       <ArtBreak kind="singAlong" />
@@ -121,9 +140,14 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
           {({ played }) => (
             <>
             <RingBell />
-            <h3 className={`mb-6 text-center text-2xl ${world.red} ${world.lettering} ${world.dropText} ${played ? styles.koSlam : styles.koWait}`}>
-              {martialArts.primary.title}
-            </h3>
+            <div className="relative mb-6 flex min-h-24 items-center justify-center px-6">
+              <svg viewBox="0 0 200 60" preserveAspectRatio="none" className={`absolute inset-0 h-full w-full ${world.inked} ${played ? styles.koBurst : styles.koBurstWait}`} aria-hidden="true" focusable="false">
+                <polygon points={KO_BURST} fill={HOSE.highlight} />
+              </svg>
+              <h3 className={`relative text-center text-2xl ${world.red} ${world.lettering} ${world.dropText} ${played ? styles.koSlam : styles.koWait}`}>
+                {martialArts.primary.title}
+              </h3>
+            </div>
             <MuayThaiRecord
               martialArts={martialArts}
               classNames={{

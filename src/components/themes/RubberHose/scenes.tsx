@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode, type PointerEvent } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode, type PointerEvent } from 'react'
 import { usePreview } from '@/themes/PreviewContext'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -18,6 +18,9 @@ import styles from './scenes.module.css'
 // - IrisWipe: the scene change. Keyed on the profession by the caller, so every switch opens a new iris.
 // - Reveal: one scroll trigger (the shared useSectionTrigger, once only) handing a wait or play class to
 //   its children, for the phase cards, the knockout and the hit stars.
+// - RunBar: the run bar of a lost round, his little figure running along a line past a flag per stop.
+//   Scroll driven: it reads the --scene-progress the shared ScrollScene writes round the section, so a
+//   frame never renders React, and each flag goes up as he passes it (scenes.module.css .flag).
 // - SunWatcher: the pie eyed sun over the contact card, its pupils following the pointer through two CSS
 //   variables written on pointer move (no React render per move).
 
@@ -66,9 +69,11 @@ export function TitleCardIntro({ children }: { children: (look: IntroLook) => Re
   )
 }
 
+// overflow-clip, not hidden: hidden would make the wipe a scroll container and stop the run bar inside
+// it from sticking to the viewport.
 export function IrisWipe({ children }: { children: ReactNode }) {
   return (
-    <div className={`relative overflow-hidden ${styles.scene}`}>
+    <div className={`relative overflow-clip ${styles.scene}`}>
       {children}
       <IrisRing className={`z-30 ${styles.iris} ${styles.irisOpen}`} />
     </div>
@@ -93,6 +98,36 @@ export function Reveal({ children, className = '' }: { children: (look: RevealLo
 export const STAGGER = ['[--i:0]', '[--i:1]', '[--i:2]', '[--i:3]', '[--i:4]', '[--i:5]', '[--i:6]', '[--i:7]']
 export const staggerAt = (index: number) => STAGGER[Math.min(index, STAGGER.length - 1)]
 
+// A stop's place along the bar, 0 to 1, as the --at variable its flag reads.
+const stopAt = (index: number, stops: number): CSSProperties => ({ '--at': stops > 1 ? index / (stops - 1) : 1 }) as CSSProperties
+
+export function RunBar({ profession, stops }: { profession: Profession; stops: number }) {
+  return (
+    <div className={`relative h-16 px-3 ${world.titleCard}`} aria-hidden="true">
+      <div className="absolute inset-x-3 bottom-4 h-1.5 rounded-full bg-[var(--hose-ink)]" />
+      <div className={`absolute inset-x-3 inset-y-0 ${styles.runLane}`}>
+        {Array.from({ length: stops }, (_, index) => (
+          <svg
+            key={index}
+            viewBox="0 0 16 24"
+            className={`absolute bottom-5 left-[calc(var(--at)*(100%_-_2.5rem)_+_1rem)] h-7 w-5 ${world.inked} ${styles.flag}`}
+            style={stopAt(index, stops)}
+            focusable="false"
+          >
+            <rect x={2} y={2} width={2} height={22} fill={HOSE.ink} />
+            <path d="M4 3 L15 7 L4 11 Z" fill={HOSE.red} />
+          </svg>
+        ))}
+        <div className={`absolute bottom-3 left-0 h-12 w-10 ${styles.runner}`}>
+          <div className={`h-full w-full ${styles.heroBob}`}>
+            <HeroCharacter profession={profession} className="h-full w-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Sun() {
   return (
     <svg viewBox="0 0 80 80" className={`h-24 w-24 sm:h-28 sm:w-28 ${world.inked}`} aria-hidden="true" focusable="false">
@@ -113,16 +148,18 @@ function Sun() {
 
 const clampUnit = (value: number) => Math.max(-1, Math.min(1, value))
 
+// Writes where the pointer is over a box as --look-x and --look-y (each -1 to 1) on that box, for the
+// sun's pupils and the sets' parallax layers to read in CSS, so a pointer move never renders React.
+export function trackPointer(event: PointerEvent<HTMLElement>) {
+  const box = event.currentTarget.getBoundingClientRect()
+  event.currentTarget.style.setProperty('--look-x', String(clampUnit(((event.clientX - box.left) / box.width) * 2 - 1)))
+  event.currentTarget.style.setProperty('--look-y', String(clampUnit(((event.clientY - box.top) / box.height) * 2 - 1)))
+}
+
 // The contact frame: the iris closes round him waving under the sun, whose eyes follow the pointer.
 export function SunWatcher({ profession }: { profession: Profession }) {
-  const look = (event: PointerEvent<HTMLDivElement>) => {
-    const box = event.currentTarget.getBoundingClientRect()
-    event.currentTarget.style.setProperty('--look-x', String(clampUnit(((event.clientX - box.left) / box.width) * 2 - 1)))
-    event.currentTarget.style.setProperty('--look-y', String(clampUnit(((event.clientY - box.top) / box.height) * 2 - 1)))
-  }
-
   return (
-    <div onPointerMove={look} className={`relative h-48 overflow-hidden ${world.titleCard} ${styles.scene}`} aria-hidden="true">
+    <div onPointerMove={trackPointer} className={`relative h-48 overflow-hidden ${world.titleCard} ${styles.scene}`} aria-hidden="true">
       <svg viewBox="0 0 400 120" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" focusable="false">
         <defs>
           <linearGradient id="hose-contact-sky" x1="0" y1="0" x2="0" y2="1">
@@ -138,7 +175,7 @@ export function SunWatcher({ profession }: { profession: Profession }) {
         <Sun />
       </div>
       <div className={`absolute bottom-2 left-[18%] h-28 w-20 ${styles.heroBob}`}>
-        <HeroCharacter profession={profession} wave className="h-full w-full" />
+        <HeroCharacter profession={profession} pose="wave" className="h-full w-full" />
       </div>
       <IrisRing className={`${styles.iris} ${styles.irisClose}`} />
     </div>

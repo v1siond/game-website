@@ -206,7 +206,7 @@ export const themes: Theme[] = [
   {
     id: 'rubber-hose',
     name: 'Rubber Hose',
-    description: '1930s rubber hose cartoon - sepia, one ink line, film grain',
+    description: '1930s rubber hose cartoon: sepia sets, the pink parry slap, the knockout',
     colors: {
       background: HOSE.paper,
       backgroundGradient: `linear-gradient(to bottom, ${HOSE.paper}, ${HOSE.paperSepia})`,

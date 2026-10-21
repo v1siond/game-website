@@ -13,15 +13,17 @@ import { CartoonCharacter } from './RubberHose/selector'
 import { CVLink, EngineLink, HeroAction } from './RubberHose/actions'
 import { SECTION_VIEWS } from './RubberHose/sections'
 import { IrisWipe, SunWatcher, TitleCardIntro, staggerAt } from './RubberHose/scenes'
+import { ProfessionSet } from './RubberHose/sets'
 import { headingId } from '@/components/cv/sectionText'
 import world from './RubberHose/world.module.css'
 
 // Rubber Hose, a 1930s rubber hose cartoon in sepia (one ink line, pie eyed props, film grain, the iris,
 // everything bobbing on the beat): the page composition. Its palette, backdrop, art, cards, his costume,
-// the profession stages, the scroll scenes and the per profession sections live in ./RubberHose.
+// the profession sets, the scroll scenes and the per profession sections live in ./RubberHose.
 //
-// The hero is the boss intro title card, a profession switch opens the sections on a new iris, the
-// contact frame closes on the iris out round him waving under the pie eyed sun (./RubberHose/scenes).
+// The hero is the boss intro title card, a profession switch opens that profession's set and sections
+// on a new iris (./RubberHose/sets), the contact frame closes on the iris out round him waving under the
+// pie eyed sun (./RubberHose/scenes).
 //
 // The root carries the palette as --hose-* variables (the one inline style, variables only) and clips
 // sideways overflow with overflow-x: clip, not hidden: hidden would make the root a scroll container and
@@ -92,6 +94,7 @@ export default function RubberHoseTheme() {
         <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">
           <div className="mx-auto max-w-6xl" role="region" aria-label={`${active} profession details`}>
             <IrisWipe key={active}>
+              <ProfessionSet profession={active} />
               <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
             </IrisWipe>
           </div>

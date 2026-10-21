@@ -103,9 +103,22 @@ const OUTFIT: Record<Profession, Outfit> = {
   },
 }
 
-// `wave` lifts his front arm (x 41) into the rubber hose wave of the contact frame.
-export function HeroCharacter({ profession, className = '', wave = false }: { profession: Profession; className?: string; wave?: boolean }) {
+// What his arms do in a scene: the wave of the contact frame, typing at the terminal, the sticks
+// falling on the kit, the rubber hose jab that stretches his front arm. Each pose names the class of
+// the front arm (x 41) and the back arm (x 23); scenes.module.css draws the moves.
+export type HeroPose = 'stand' | 'wave' | 'type' | 'drum' | 'jab'
+
+const POSE_ARMS: Record<HeroPose, { front?: string; back?: string }> = {
+  stand: {},
+  wave: { front: styles.wave },
+  type: { front: styles.typeFront, back: styles.typeBack },
+  drum: { front: styles.drumFront, back: styles.drumBack },
+  jab: { front: styles.jab, back: styles.guard },
+}
+
+export function HeroCharacter({ profession, className = '', pose = 'stand' }: { profession: Profession; className?: string; pose?: HeroPose }) {
   const outfit = OUTFIT[profession]
+  const arms = POSE_ARMS[pose]
 
   return (
     <HeroFigure
@@ -113,7 +126,7 @@ export function HeroCharacter({ profession, className = '', wave = false }: { pr
       eye={EYE}
       torso={outfit.torso}
       arm={(x) => (
-        <g className={wave && x > 32 ? styles.wave : undefined}>
+        <g className={x > 32 ? arms.front : arms.back}>
           <HeroArm x={x} sleeve={outfit.sleeve} forearm={15} hand={(y) => HAND_DRAW[outfit.hand](x, y)} />
         </g>
       )}

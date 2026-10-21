@@ -202,6 +202,92 @@
   transform: rotateY(0deg) translate3d(0, -6px, 0) scale(1);
 }
 
+/* The white glove that slaps the star: it pops out of the corner, lands a beat, and is gone. */
+.slapHand {
+  transform-origin: 30% 30%;
+  animation: slapHand 0.45s steps(11, end) both;
+}
+
+@keyframes slapHand {
+  0% {
+    opacity: 0;
+    transform: translate3d(-12px, -12px, 0) scale(0.4) rotate(-30deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translate3d(4px, 4px, 0) scale(1.15) rotate(10deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-6px, -6px, 0) scale(0.8);
+  }
+}
+
+/* The poster turns parry pink for a few frames, the way the slapper does in the game. */
+.pinkFlash {
+  background: var(--hose-parry);
+  opacity: 0;
+  animation: pinkFlash 0.3s steps(1, end) both;
+}
+
+@keyframes pinkFlash {
+  0%,
+  40% {
+    opacity: 0.45;
+  }
+  20%,
+  60% {
+    opacity: 0.2;
+  }
+  80%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The full super: every card of the meter spins once. */
+.superSpin > * {
+  animation: superSpin 0.9s var(--hose-bounce) both;
+}
+
+.superSpin > :nth-child(even) {
+  animation-delay: 80ms;
+}
+
+@keyframes superSpin {
+  from {
+    transform: rotateY(0deg) translate3d(0, -6px, 0);
+  }
+  60% {
+    transform: rotateY(360deg) translate3d(0, -16px, 0) scale(1.15);
+  }
+  to {
+    transform: rotateY(360deg) translate3d(0, -6px, 0);
+  }
+}
+
+/* ---- the run bar (Experience) ---- */
+
+/* The bar his little figure runs along as the jobs scroll by, like the run bar after a lost round: he
+   moves with --scene-progress across the lane's width, each job's flag goes up as he passes its --at. */
+.runLane {
+  container-type: inline-size;
+}
+
+.runner {
+  transform: translate3d(calc(var(--scene-progress, 0) * (100cqw - 2.5rem)), 0, 0);
+}
+
+.flag {
+  transform-origin: 50% 100%;
+  opacity: clamp(0.25, calc((var(--scene-progress, 0) - var(--at, 0)) * 20 + 0.25), 1);
+  transform: scaleY(clamp(0.3, calc((var(--scene-progress, 0) - var(--at, 0)) * 20 + 0.3), 1));
+}
+
 /* ---- the shop shelf (Bands) ---- */
 
 .disc {
@@ -218,6 +304,31 @@
 .koWait {
   opacity: 0;
   transform: scale(3);
+}
+
+/* The ink starburst behind the knockout word, punched out at the slam's landing. */
+.koBurstWait {
+  opacity: 0;
+  transform: scale(0);
+}
+
+.koBurst {
+  animation: koBurst 0.7s steps(8, end) 0.15s both;
+}
+
+@keyframes koBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2) rotate(8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
 }
 
 /* The title slams in from huge, holds, then shakes. */
@@ -311,6 +422,96 @@
   }
 }
 
+/* At the terminal his hands type in turn, on 24 frames a second (steps). */
+.typeFront,
+.typeBack {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: typeFront 0.33s steps(4, end) infinite alternate;
+}
+
+.typeBack {
+  animation-name: typeBack;
+  animation-delay: -0.16s;
+}
+
+@keyframes typeFront {
+  from {
+    transform: rotate(-28deg);
+  }
+  to {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes typeBack {
+  from {
+    transform: rotate(28deg);
+  }
+  to {
+    transform: rotate(18deg);
+  }
+}
+
+/* The sticks fall on the beat, one arm then the other. */
+.drumFront,
+.drumBack {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: drumFront 0.35s var(--hose-bounce) infinite alternate;
+}
+
+.drumBack {
+  animation-name: drumBack;
+  animation-delay: -0.35s;
+}
+
+@keyframes drumFront {
+  from {
+    transform: rotate(-70deg);
+  }
+  to {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes drumBack {
+  from {
+    transform: rotate(70deg);
+  }
+  to {
+    transform: rotate(25deg);
+  }
+}
+
+/* The rubber hose jab: the front arm swings up, stretches half its length again on the hit, snaps back. */
+.jab {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: jab 1.4s steps(17, end) infinite;
+}
+
+@keyframes jab {
+  0%,
+  40% {
+    transform: rotate(-40deg);
+  }
+  55%,
+  62% {
+    transform: rotate(-95deg) scale(1, 1.6);
+  }
+  80%,
+  100% {
+    transform: rotate(-40deg);
+  }
+}
+
+.guard {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transform: rotate(45deg);
+}
+
 /* ---- the pie eyed sun (Contact) ---- */
 
 /* The pupils follow the pointer through --look-x and --look-y (each -1 to 1), written by the scene. */
@@ -349,6 +550,8 @@
   .phaseIn,
   .koWait,
   .koSlam,
+  .koBurstWait,
+  .koBurst,
   .hitWait,
   .hitIn {
     animation: none;
@@ -359,6 +562,14 @@
   .parryStar,
   .parryGone,
   .slap,
+  .slapHand,
+  .pinkFlash,
+  .superSpin > *,
+  .typeFront,
+  .typeBack,
+  .drumFront,
+  .drumBack,
+  .jab,
   .heroBob,
   .wave,
   .sunRays,
@@ -373,7 +584,9 @@
     transition: none;
   }
 
-  .parryGone {
+  .parryGone,
+  .slapHand,
+  .pinkFlash {
     opacity: 0;
   }
 }
