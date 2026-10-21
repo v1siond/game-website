@@ -75,12 +75,7 @@
     animation: banner 900ms cubic-bezier(0.2, 0.9, 0.2, 1) 200ms both;
   }
 
-  /* ---- loops: the fighter's idle stance and the blinking coin call ---- */
-
-  .stance {
-    animation: stance 900ms steps(3, jump-none) infinite alternate;
-    transform-origin: 50% 100%;
-  }
+  /* ---- loops: the blinking coin call ---- */
 
   .blink {
     animation: blink 1s steps(1, end) infinite;
@@ -342,15 +337,6 @@
   100% {
     opacity: 0;
     transform: translate3d(100%, 0, 0) skewX(-20deg);
-  }
-}
-
-@keyframes stance {
-  from {
-    transform: translate3d(0, 0, 0) scaleY(1);
-  }
-  to {
-    transform: translate3d(0, 2px, 0) scaleY(0.97);
   }
 }
 

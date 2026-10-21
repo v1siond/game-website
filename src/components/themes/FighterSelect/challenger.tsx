@@ -4,7 +4,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { HeroCharacter } from './character'
+import { ArenaFighter } from './arena'
 import { CabinetPanel } from './frames'
 import { StageBackdrop } from './stages'
 import { CVLink, HeroAction } from './actions'
@@ -71,9 +71,12 @@ export function ChallengerScene({ profession }: { profession: Profession }) {
 
               <div className="relative h-48 overflow-hidden border-4 border-[color:var(--fs-gold)] sm:h-64" aria-hidden="true">
                 <StageBackdrop profession={profession} />
-                <div className={`absolute bottom-2 left-[8%] ${fight.enter} ${fight.portraitIn}`}>
-                  <HeroCharacter profession={profession} className={`h-36 w-24 sm:h-52 sm:w-36 ${fight.stance}`} />
-                </div>
+                <ArenaFighter
+                  profession={profession}
+                  rest="win"
+                  className={`absolute bottom-0 left-[4%] ${fight.enter} ${fight.portraitIn}`}
+                  spriteClass="h-44 w-[10.25rem] sm:h-60 sm:w-[14rem]"
+                />
                 <div className="absolute bottom-2 right-[8%]">
                   <OpenSlot />
                 </div>

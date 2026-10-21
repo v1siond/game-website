@@ -4,7 +4,8 @@ import { useState } from 'react'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
-import { HeroCharacter } from './character'
+import { Fighter } from './fighter'
+import { ArenaFighter } from './arena'
 import { StageBackdrop } from './stages'
 import { RoundCall } from './badges'
 import { FS } from './palette'
@@ -36,7 +37,7 @@ function Slot({ id, label, selected, optionProps, aimed, onAim }: SlotProps) {
       className={`relative flex flex-col items-center px-1 pb-2 pt-3 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--fs-gold)] sm:px-3 ${fight.press}`}
     >
       <span className={`relative flex h-24 w-full items-end justify-center overflow-hidden border-4 sm:h-36 ${look.portrait} ${selected ? look.portraitPicked : look.portraitOpen}`} aria-hidden="true">
-        <HeroCharacter profession={id} className={`relative h-20 w-14 sm:h-32 sm:w-24 ${aimed ? fight.stance : ''}`} />
+        <Fighter profession={id} pose="stance" still={!aimed} className="relative h-24 w-[5.75rem] sm:h-36 sm:w-[8.5rem]" />
         {selected && <span key={id} className={`absolute inset-0 bg-white opacity-0 ${fight.pickFlash}`} />}
       </span>
       <span className={`mt-2 w-full px-2 py-1.5 text-center text-sm uppercase ${look.display} ${look.nameplate} ${selected ? 'bg-[color:var(--fs-p1-light)] text-[color:var(--fs-ink)]' : 'bg-[color:var(--fs-steel)] text-white'}`}>
@@ -73,9 +74,13 @@ export function SelectScreen({ active, title }: { active: Profession; title: str
 
       <div key={active} className="relative mt-6 h-48 overflow-hidden border-4 border-[color:var(--fs-gold)] sm:h-64">
         <StageBackdrop profession={active} />
-        <div className={`absolute bottom-2 left-[12%] ${fight.previewIn}`}>
-          <HeroCharacter profession={active} className={`h-36 w-24 sm:h-52 sm:w-36 ${fight.stance}`} />
-        </div>
+        <ArenaFighter
+          profession={active}
+          rest="act"
+          intro="walk"
+          className={`absolute bottom-0 left-[6%] ${fight.previewIn}`}
+          spriteClass="h-44 w-[10.25rem] sm:h-60 sm:w-[14rem]"
+        />
         <div className={`absolute inset-x-0 top-1/3 ${fight.callIn}`}>
           <RoundCall text={title} />
         </div>

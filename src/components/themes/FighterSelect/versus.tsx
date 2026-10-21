@@ -3,7 +3,7 @@
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
-import { HeroCharacter } from './character'
+import { ArenaFighter } from './arena'
 import { StageBackdrop } from './stages'
 import { CVLink, HeroAction, PortfolioLink } from './actions'
 import { ClashEmblem } from './badges'
@@ -30,9 +30,12 @@ export function HeroSplash({ profession }: { profession: Profession }) {
             <div className={`relative h-56 overflow-hidden border-4 border-[color:var(--fs-p1-light)] sm:h-72 ${look.splashLeft} ${fight.enter} ${fight.slashIn}`}>
               <StageBackdrop profession={profession} />
               <div className={`absolute inset-0 bg-white ${fight.enter} ${fight.flash} [--delay:360ms] opacity-0`} aria-hidden="true" />
-              <div className={`absolute bottom-2 left-1/2 -translate-x-1/2 ${fight.enter} ${fight.portraitIn}`}>
-                <HeroCharacter profession={profession} className={`h-40 w-28 sm:h-56 sm:w-36 ${fight.stance}`} />
-              </div>
+              <ArenaFighter
+                profession={profession}
+                rest="stance"
+                className={`absolute bottom-0 left-[12%] ${fight.enter} ${fight.portraitIn}`}
+                spriteClass="h-48 w-[11.25rem] sm:h-64 sm:w-60"
+              />
             </div>
 
             <div className="absolute left-[40%] top-1/2 z-10 hidden -translate-x-1/2 -translate-y-1/2 lg:block" aria-hidden="true">

@@ -1,0 +1,80 @@
+/*
+ * His sprite strip (fighter.tsx): the frames of one pose stand side by side, 160 units apart, and the
+ * strip steps one cell at a time like a sprite sheet. --cycle, --runs and --key come from the motion
+ * table in moves.ts. The stance plays its four frames there and back (the classic bounce), a walk back
+ * plays the walk frames in reverse, everything else plays forward. Reduced motion holds the key frame.
+ */
+
+.sprite {
+  overflow: visible;
+}
+
+.strip {
+  transform: translateX(calc(var(--key, 0) * -160px));
+}
+
+.ball {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sprite:not([data-still])[data-mode='pingpong'] .strip {
+    animation: strip-bounce var(--cycle) steps(3, jump-none) var(--runs) alternate;
+  }
+
+  .sprite:not([data-still])[data-mode='forward'] .strip {
+    animation: strip-forward var(--cycle) steps(4) var(--runs);
+  }
+
+  .sprite:not([data-still])[data-mode='backward'] .strip {
+    animation: strip-backward var(--cycle) steps(4) var(--runs);
+  }
+
+  .sprite:not([data-still]) .ball {
+    animation: ball var(--cycle) linear var(--runs);
+  }
+}
+
+@keyframes strip-bounce {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-480px);
+  }
+}
+
+@keyframes strip-forward {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-640px);
+  }
+}
+
+@keyframes strip-backward {
+  from {
+    transform: translateX(-480px);
+  }
+  to {
+    transform: translateX(160px);
+  }
+}
+
+/* The ball leaves the palms on the thrust frame, halfway through the cycle, and flies off the stage. */
+@keyframes ball {
+  0%,
+  49.9% {
+    opacity: 0;
+    transform: translate(118px, 72px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(118px, 72px);
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate(300px, 72px);
+  }
+}

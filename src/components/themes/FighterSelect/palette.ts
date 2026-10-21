@@ -21,6 +21,12 @@ export const FS = {
   steel: '#5b6078',
   ink: '#03030a',
   flash: '#ffffff',
+  // His gi, lit and in its two cel shades, the black belt, and the deepest tone of his skin for far limbs
+  gi: '#f4f1ea',
+  giShade: '#b8bdd6',
+  giDeep: '#7d84a6',
+  belt: '#17171f',
+  skinDeep: '#5e3219',
 } as const
 
 export const FS_VARS = paletteVars('fs', FS)
