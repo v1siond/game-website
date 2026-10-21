@@ -1,0 +1,283 @@
+/*
+ * The painted isles behind the page (isles.tsx) and his act in each section (stages.tsx). The beat is drawn
+ * on twos: loops step between two or three drawings (steps timing) like 1930s cels at 24 a second, one
+ * shot moves overshoot on --hose-bounce. Transform and opacity only. Under reduced motion every loop is off
+ * and every one shot scene shows its end drawing (the components hand it the end beat).
+ */
+
+.ko,
+.shop,
+.theatre,
+.bagScene {
+  --hose-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* ---- the isles ---- */
+
+.isle {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.isle[data-on] {
+  opacity: 1;
+}
+
+.isle:not([data-on]) * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .drift {
+    animation: drift 26s steps(52) infinite alternate;
+  }
+
+  .driftSlow {
+    animation: drift 40s steps(80) infinite alternate-reverse;
+  }
+
+  .sway {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: sway 1s steps(2) infinite;
+  }
+
+  .swayLate {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: sway 1s steps(2) 0.5s infinite;
+  }
+
+  .moon {
+    animation: bob 1s steps(2) infinite;
+  }
+
+  .wheel {
+    animation: spin 30s linear infinite;
+  }
+
+  .bassDrum {
+    animation: bob 0.5s steps(2) infinite;
+  }
+
+  .footlight {
+    animation: glow 1.2s steps(3) infinite alternate;
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: translate3d(120px, 0, 0);
+  }
+}
+
+@keyframes sway {
+  0% {
+    transform: rotate(-6deg) scaleY(1);
+  }
+  100% {
+    transform: rotate(6deg) scaleY(0.94);
+  }
+}
+
+@keyframes bob {
+  to {
+    transform: translate3d(0, -4px, 0) scale(1.03, 0.97);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glow {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- the flower knockout (About) ---- */
+
+.boss {
+  transform-origin: 50% 100%;
+  transform: translate3d(0, 110%, 0);
+  transition: transform 0.6s var(--hose-bounce);
+}
+
+.ko:not([data-beat='wait']) .boss {
+  transform: none;
+}
+
+.ko[data-beat='hit'] .boss,
+.ko[data-beat='hit2'] .boss {
+  transform: translate3d(6px, 0, 0) rotate(8deg) scale(0.94, 1.04);
+  transition-duration: 0.12s;
+}
+
+.ko[data-beat='down'] .boss,
+.ko[data-beat='open'] .boss {
+  transform: translate3d(14px, 30%, 0) rotate(70deg) scale(0.9);
+  transition-duration: 0.5s;
+}
+
+.bossOut,
+.ko[data-beat='down'] .bossAngry,
+.ko[data-beat='open'] .bossAngry {
+  opacity: 0;
+}
+
+.ko[data-beat='down'] .bossOut,
+.ko[data-beat='open'] .bossOut {
+  opacity: 1;
+}
+
+.koStar {
+  opacity: 0;
+  transform: scale(0.2) rotate(-30deg);
+}
+
+.ko[data-beat='down'] .koStar {
+  opacity: 1;
+  transform: none;
+  transition: transform 0.3s var(--hose-bounce), opacity 0.1s;
+}
+
+.unfold {
+  transform-origin: 50% 0;
+  transform: scaleY(0.04);
+  opacity: 0;
+}
+
+.unfoldOpen {
+  transform: none;
+  opacity: 1;
+  transition: transform 0.5s var(--hose-bounce), opacity 0.2s;
+}
+
+/* ---- the shop counter (Tech Stack) ---- */
+
+.coin {
+  opacity: 0;
+  transform: translate3d(0, -20px, 0);
+}
+
+.shop[data-beat='coin'] .coin {
+  opacity: 1;
+  transform: translate3d(36px, 56px, 0) rotate(360deg);
+  transition: transform 0.55s cubic-bezier(0.5, 0, 0.8, 0.4), opacity 0.1s;
+}
+
+.shop[data-beat='ring'] .till {
+  transform: translate3d(0, -6px, 0) scale(1.08, 0.92);
+}
+
+.till {
+  transform-origin: 50% 100%;
+  transition: transform 0.15s var(--hose-bounce);
+}
+
+/* every item on the shelf lifts once he has paid, and again under the pointer or focus */
+.shop:not([data-beat='lift']) .shelf > ul > li {
+  transform: translate3d(0, 10px, 0);
+  opacity: 0.55;
+}
+
+.shop[data-beat='lift'] .shelf > ul > li {
+  transition: transform 0.45s var(--hose-bounce), opacity 0.3s;
+}
+
+.shelf > ul > li:hover,
+.shelf > ul > li:focus-within {
+  transform: translate3d(0, -6px, 0);
+}
+
+/* ---- the curtains (Ventures) ---- */
+
+.curtain {
+  background: repeating-linear-gradient(90deg, var(--hose-redDark) 0 18px, var(--hose-red) 18px 30px);
+  transition: transform 1.1s var(--hose-bounce);
+}
+
+.curtainLeft {
+  transform-origin: 0 50%;
+}
+
+.curtainRight {
+  transform-origin: 100% 50%;
+}
+
+.theatre[data-open] .curtain {
+  transform: scaleX(0.08);
+}
+
+.bow {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+}
+
+.theatre[data-open] .bow {
+  opacity: 1;
+  transform: none;
+  transition: transform 0.5s var(--hose-bounce) 0.9s, opacity 0.2s 0.9s;
+}
+
+/* ---- the heavy bag (Muay Thai) ---- */
+
+.bag {
+  transform-origin: 50% 0;
+}
+
+.bagScene[data-on] .bag {
+  animation: bagDown 1.6s var(--hose-bounce) 0.3s both;
+}
+
+@keyframes bagDown {
+  0% {
+    transform: none;
+  }
+  25% {
+    transform: rotate(-28deg);
+  }
+  45% {
+    transform: rotate(12deg);
+  }
+  70% {
+    transform: translate3d(0, 30px, 0) rotate(-6deg);
+  }
+  100% {
+    transform: translate3d(6px, 52px, 0) rotate(84deg);
+  }
+}
+
+/* ---- the map run (between sections) ---- */
+
+.mapLane {
+  container-type: inline-size;
+}
+
+.mapRunner {
+  transform: translate3d(calc(var(--scene-progress, 0) * (100cqw - 2.5rem)), 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boss,
+  .koStar,
+  .unfold,
+  .coin,
+  .till,
+  .curtain,
+  .bow,
+  .shelf > ul > li {
+    transition: none !important;
+  }
+
+  .bagScene[data-on] .bag {
+    animation: none;
+    transform: translate3d(6px, 52px, 0) rotate(84deg);
+  }
+}

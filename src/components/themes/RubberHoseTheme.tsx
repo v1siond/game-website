@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
@@ -9,6 +9,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
+import { ZoneStageProvider } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { HOSE_VARS } from './RubberHose/palette'
 import { FilmFrame, FilmGrain, RisingNotes } from './RubberHose/backdrop'
@@ -18,6 +19,8 @@ import { CVLink, EngineLink, HeroAction } from './RubberHose/actions'
 import { SECTION_VIEWS } from './RubberHose/sections'
 import { IrisWipe, SunWatcher, TitleCardIntro, staggerAt } from './RubberHose/scenes'
 import { ProfessionSet } from './RubberHose/sets'
+import { IsleStage, Isles, type Isle } from './RubberHose/isles'
+import { HeroCharacter } from './RubberHose/cup'
 import { headingId } from '@/components/cv/sectionText'
 import world from './RubberHose/world.module.css'
 
@@ -25,7 +28,11 @@ import world from './RubberHose/world.module.css'
 // everything bobbing on the beat): the page composition. Its palette, backdrop, art, cards, his costume,
 // the profession sets, the scroll scenes and the per profession sections live in ./RubberHose.
 //
-// The hero is the boss intro title card, a profession switch opens that profession's set and sections
+// Behind it all the painted isles (./RubberHose/isles), fixed like the game's watercolour sets and walking
+// from the meadow to the carnival to the casino as the visitor scrolls: each section hands its isle up
+// through the shared ZoneStageProvider. He acts in every section (./RubberHose/stages).
+//
+// The hero is the boss intro title card with him popping up beside it finger gun first, a profession switch opens that profession's set and sections
 // on a new iris (./RubberHose/sets), the contact frame closes on the iris out round him waving under the
 // pie eyed sun (./RubberHose/scenes).
 //
@@ -43,6 +50,9 @@ export default function RubberHoseTheme() {
   const reducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
   const rootRef = usePointerVars(mounted && !reducedMotion)
+  const [isle, setIsle] = useState<Isle>('meadow')
+  const onZone = useCallback((zone: Isle) => setIsle(zone), [])
+  const zoneStage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
 
   useEffect(() => {
     setMounted(true)
@@ -56,6 +66,8 @@ export default function RubberHoseTheme() {
         {navigation.skipToContent}
       </a>
 
+      <ZoneStageProvider value={zoneStage}>
+      <Isles current={isle} />
       <FilmFrame />
       <FilmGrain />
       <RisingNotes />
@@ -63,12 +75,17 @@ export default function RubberHoseTheme() {
       {/* the page sits inside the film frame */}
       <div className="mx-6 sm:mx-14">
         {/* the recruiter first screen */}
+        <IsleStage isle="meadow">
+        {() => (
         <header className="relative z-30 px-2 py-6 sm:p-6">
           <RecruiterHero
             render={({ name, headline, tagline, line, actions }) => (
               <TitleCardIntro>
                 {(look) => (
-                  <div className={`mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-8 text-center sm:px-10 ${world.titleCard} ${look.card}`}>
+                  <div className={`relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-8 text-center sm:px-10 ${world.titleCard} ${look.card}`}>
+                    <div className={`pointer-events-none absolute -bottom-2 -left-10 hidden h-36 w-24 lg:block ${look.word}`} aria-hidden="true">
+                      <HeroCharacter profession={active} pose="idle" className="h-full w-full" />
+                    </div>
                     <div>
                       <CartoonTitle text={name.toUpperCase()} />
                       <p className={`mt-4 text-base tracking-[0.1em] ${world.muted} ${staggerAt(0)} ${look.word}`}>{headline}</p>
@@ -89,6 +106,8 @@ export default function RubberHoseTheme() {
             )}
           />
         </header>
+        )}
+        </IsleStage>
 
         {/* the profession switch, a row of cast badges with him in each costume */}
         <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
@@ -108,6 +127,8 @@ export default function RubberHoseTheme() {
           </div>
         </main>
 
+        <IsleStage isle="casino">
+        {() => (
         <section className="relative z-20 mx-auto max-w-3xl px-2 py-8" aria-labelledby={CONTACT_HEADING}>
           <SunWatcher key={active} profession={active} />
           <RecruiterHero
@@ -127,17 +148,20 @@ export default function RubberHoseTheme() {
             )}
           />
         </section>
+        )}
+        </IsleStage>
 
         <footer className="relative z-20 py-8 text-center">
           <div className="flex items-center justify-center gap-4">
             <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
-            <p className={`text-sm tracking-widest ${world.muted}`}>
+            <p className={`px-3 py-1 text-sm tracking-widest ${world.chip}`}>
               © {new Date().getFullYear()} <NameWords name={view.hero.name} />
             </p>
             <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
           </div>
         </footer>
       </div>
+      </ZoneStageProvider>
     </div>
   )
 }

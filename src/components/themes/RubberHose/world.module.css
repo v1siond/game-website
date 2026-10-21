@@ -303,38 +303,6 @@
   transform: scale(1);
 }
 
-/* An art break's sprocket row running sideways. */
-.sprocketRow {
-  background-image: linear-gradient(90deg, transparent 0 0.5rem, var(--hose-paper) 0.5rem 1.5rem, transparent 1.5rem 2rem);
-  background-size: 2rem 1rem;
-  background-repeat: repeat-x;
-  background-position: left center;
-  animation: sprocketSide 1.2s linear infinite;
-}
-
-.sprocketRowReverse {
-  animation-direction: reverse;
-}
-
-@keyframes sprocketSide {
-  to {
-    transform: translate3d(-2rem, 0, 0);
-  }
-}
-
-/* The countdown leader's sweep going round. */
-.leaderSweep {
-  transform-box: fill-box;
-  transform-origin: 0 100%;
-  animation: leaderSweep 2s steps(8) infinite;
-}
-
-@keyframes leaderSweep {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* The lane the sing along ball crosses, measured so the hop can cross its whole width. */
 .hopLane {
   container-type: inline-size;
@@ -388,8 +356,6 @@
   .flicker,
   .beatBounce,
   .titleBounce,
-  .sprocketRow,
-  .leaderSweep,
   .hop,
   .hop > *,
   .ballBounce {

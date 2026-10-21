@@ -6,7 +6,7 @@ import styles from './scenes.module.css'
 
 // Rubber Hose's art pieces, drawn in SVG in the palette's ink and paper: the pie eyes its props wear
 // (never him), a music note, the ink blot a poster throws, the curled title banner, the bouncing title,
-// and the three art breaks between sections (a film leader counting down, a sing along line with its
+// and the two art breaks between sections (a sing along line with its
 // bouncing ball, pie eyed balls bouncing in a row).
 
 // Two pie eyes, the black ovals with the slice cut out of each, centred on (cx, cy) at width `size`.
@@ -103,31 +103,6 @@ export function IrisRing({ className }: { className: string }) {
 
 // ---- the art breaks ----
 
-function FilmLeader() {
-  return (
-    <div className="relative my-8 overflow-hidden py-12" aria-hidden="true">
-      <div className={`absolute inset-x-0 top-0 h-8 overflow-hidden ${world.filmStrip}`}>
-        <div className={`absolute inset-y-0 -right-8 left-0 ${world.sprocketRow}`} />
-      </div>
-      <div className="flex items-center justify-center gap-8 py-4">
-        <div className="h-px w-16 bg-[var(--hose-ink)]" />
-        {/* the countdown leader: the crosshair rings and the sweep going round */}
-        <svg viewBox="0 0 80 80" className="h-20 w-20" focusable="false">
-          <circle cx={40} cy={40} r={36} fill={HOSE.paperDark} stroke={HOSE.ink} strokeWidth={4} />
-          <circle cx={40} cy={40} r={26} fill="none" stroke={HOSE.ink} strokeWidth={1.5} />
-          <path d="M40 4 V76 M4 40 H76" stroke={HOSE.ink} strokeWidth={1} />
-          <path d="M40 40 V6 A34 34 0 0 1 64 16 Z" fill={HOSE.ink} opacity={0.35} className={world.leaderSweep} />
-          <PieEyes cx={40} cy={40} size={24} paper={HOSE.paperDark} />
-        </svg>
-        <div className="h-px w-16 bg-[var(--hose-ink)]" />
-      </div>
-      <div className={`absolute inset-x-0 bottom-0 h-8 overflow-hidden ${world.filmStrip}`}>
-        <div className={`absolute inset-y-0 -right-8 left-0 ${world.sprocketRow} ${world.sprocketRowReverse}`} />
-      </div>
-    </div>
-  )
-}
-
 const SING_ALONG_NOTES = 6
 
 function SingAlong() {
@@ -170,10 +145,9 @@ function BouncingBalls() {
   )
 }
 
-export type ArtBreakKind = 'filmLeader' | 'singAlong' | 'bouncingBalls'
+export type ArtBreakKind = 'singAlong' | 'bouncingBalls'
 
 const ART_BREAKS: Record<ArtBreakKind, () => ReactNode> = {
-  filmLeader: FilmLeader,
   singAlong: SingAlong,
   bouncingBalls: BouncingBalls,
 }
