@@ -14,8 +14,7 @@ picked profession, then a contact corner. What the sections hold comes from `vie
    Engineer, Martial Artist, in that order, the engineer in the centre and opened by default.
 3. **Profession sections** (`ProfessionSectionsView`, `src/components/cv/ProfessionSectionsView.tsx`): the
    world's component for the shown profession, from its `SECTION_VIEWS` map in `<Name>/sections.tsx`.
-4. **Contact** (`ContactStage`, `src/components/scroll/stage.tsx`): the world's closing corner, from its
-   `scenes.tsx`.
+4. **Contact**: the world's closing corner, drawn in its own folder.
 
 ## Sections per profession
 
@@ -39,7 +38,7 @@ formats the same way (year spans, job years, project links, the Muay Thai facts,
 
 ## How a section moves
 
-Scroll levels sit in `LevelScene` with the world's lane (`worldLane`) and arriving entries (`arrivalItem`);
+Each world moves its sections with its own scenes on the shared `useScrollScene` and `useSectionTrigger`;
 plain blocks between levels (About, Tech Stack, Ventures) sit in `FadeInScene`. Both read
 `--scene-progress` and animate transform and opacity only. With reduced motion (or in a World Select preview) every scene starts done, so each section shows in place.
 

@@ -59,13 +59,7 @@ the shown profession from the world's map.
 | Piece | File | What it does |
 |-------|------|--------------|
 | ScrollScene, FadeInScene | `src/components/scroll/ScrollScene.tsx` | A section whose scene follows scroll: writes `--scene-progress` (0 to 1) so children animate with classes, no React re-render. FadeInScene is the plain fade block between levels. |
-| LevelScene, LevelStrip, SceneEntry, ContactStage, atClass, LevelArt, LevelGround | `src/components/scroll/stage.tsx` | The level a profession plays on: the strip he walks, entries that arrive along it, the contact corner, positions on the track. |
-| worldLane, arrivalItem | `src/components/scroll/arrivals.tsx` | Build a world's lane and its arrival kinds once; a world passes only its look. |
-| Terminal, DrumKit, SoundWaves, RingCorner, DeskCorner, KitCorner and the other props | `src/components/scroll/stageProps.tsx` | The stage props, coloured by the world. |
-| HeroFigure, HeroArm, HeroLeg, HERO_TORSO, HERO_SKIN_SHADE | `src/components/scroll/HeroFigure.tsx` | His figure. A world passes skin and hair colours as props. |
-| HeroFist, HeroStick, HeroGlove | `src/components/scroll/heroHands.tsx` | His hands for each profession. |
-| Mongkhon | `src/components/scroll/Mongkhon.tsx` | The Muay Thai headband. |
-| heroScene.module.css | `src/components/scroll/heroScene.module.css` | The walk, advance, limb, stick and wave motion. A world sets only numbers (`--strides`, `--swing`, `--stick-hits`, `--walk-inset` and the others) in its `.tempo` class. |
+| HERO_IDENTITY | `src/components/cv/heroIdentity.ts` | The only shared part of his character: skin, short dark hair, full dark beard, oval eyes. Each world maps these into its own palette. |
 | sectionText | `src/components/cv/sectionText.ts` | Shared text: project links, year spans, job years, Muay Thai facts, heading ids. |
 | RecruiterHero, ProfessionSwitch, ProfessionSectionsView | `src/components/cv/` | The hero, the profession switch, the per profession dispatch. |
 | useReducedMotion, useScrollScene, useSectionTrigger, useZoneStage | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the zone in view handed to a page whose backdrop follows it. |
@@ -83,9 +77,9 @@ Each world's `palette.ts` is its only colour source. The world root sets the pal
 A world is `src/components/themes/<Name>Theme.tsx` plus a `<Name>/` folder holding only that world's look:
 
 - `palette.ts`: its colours.
-- `character.tsx`: his figure dressed for the world, built on `HeroFigure`.
-- `scenes.tsx` and `scenes.module.css`: its contact scene and the `.tempo` numbers.
-- `stages.tsx` (where present): its three profession stages, built on `stage.tsx` and `stageProps.tsx`.
+- its character file (`character.tsx`, `sprite.tsx` or a name of its own): him drawn by this world alone, see
+  "His character" below.
+- its scenes and their css module: the hero, the profession switch, the contact corner, with its own motion.
 - `sections.tsx`, `cards.tsx`, `actions.tsx`, `backdrop.tsx` and similar: its section frames and art.
 
 Sixteen worlds draw their own profession stages and are listed in `WORLDS_WITH_OWN_STAGE`
@@ -94,11 +88,21 @@ its folder `src/components/themes/MedievalFantasy/` has no `stages.tsx` or `scen
 `GlobalProfessionStage` draws its stage. Dark Fantasy is the oldest world and keeps its own combat files in
 `DarkFantasy/`, with its reveals on the shared `ScrollScene`.
 
+## His character
+
+Each world draws its own character. There is no shared figure component: the old `HeroFigure` and its hands,
+headband and level strip were removed. The character is him as a parody of the source game's own hero: the
+hero's costume, silhouette, signature weapon, moves and frames, drawn in that game's style and size. Where the
+hero shows a face it carries his traits from `HERO_IDENTITY`; a hero who wears a mask keeps the mask. It has an
+idle, a walk or run, one action per profession, and a reaction to the visitor. The only thing every world shares
+for him is `HERO_IDENTITY`. The bar is Dark Fantasy's `KnightCharacter.tsx` and Medieval Fantasy's
+`character.tsx`.
+
 ## Rules every world follows
 
 - His rule: "DUPLICATION APPROACH IS PROHIBITED". One shared piece per concept. A world never copies a
-  hook, a scroll scene, the hero, a stage prop or a text helper; it imports the shared one and passes its
-  look. A helper two worlds need moves to `src/components/scroll/`, `src/components/cv/`, `src/hooks/` or
+  hook, a scroll scene or a text helper; it imports the shared one and passes its look. Shared means data,
+  hooks and helpers only: each world's character, scenes and motion are its own. A helper two worlds need moves to `src/components/scroll/`, `src/components/cv/`, `src/hooks/` or
   `src/components/themes/shared/`.
 - No source game characters, mascots, brand or game names, in art, text or file and component names. The
   character is him, with his beard.
@@ -114,13 +118,12 @@ its folder `src/components/themes/MedievalFantasy/` has no `stages.tsx` or `scen
 
 1. Pick an id and a name. Create `src/components/themes/<Name>/palette.ts` with its colours, the only hex
    for this world.
-2. Write `character.tsx` on `HeroFigure`, `HeroArm`, `HeroLeg` and the hands in `heroHands.tsx`, passing
-   skin and hair colours. No new figure.
-3. Write `stages.tsx` with one `StageLook` per profession, using `stage.tsx` and the props in
-   `stageProps.tsx`. Build the lane with `worldLane` and entries with `arrivalItem`. Add the id to
-   `WORLDS_WITH_OWN_STAGE`. Skip this step to use the shared stage instead.
-4. Write `scenes.tsx` with its `ContactStage` corner, and `scenes.module.css` with a `.tempo` class that
-   sets only the numbers `heroScene.module.css` reads.
+2. Draw his character in the world's own file, from 10 or more images of the source game's hero, reading
+   his traits from `HERO_IDENTITY`. No shared figure.
+3. Write the world's scenes (hero, profession switch, contact corner) with their own motion. Add the id to
+   `WORLDS_WITH_OWN_STAGE`, or skip that to use the shared `GlobalProfessionStage`.
+4. Load the world's lettering through `next/font/google` in `<Name>Theme.tsx`, set its `variable` class on
+   the root and read the variable from the world's css.
 5. Write `sections.tsx`: one component per profession in a map for `ProfessionSectionsView`, text from
    `sectionText.ts`, wrapped in `ScrollScene` or `FadeInScene`.
 6. Write `<Name>Theme.tsx`: read `useWorldView()`, render `RecruiterHero`, `ProfessionSwitch` and the
