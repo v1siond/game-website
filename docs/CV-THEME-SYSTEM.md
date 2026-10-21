@@ -84,8 +84,11 @@ A world is `src/components/themes/<Name>Theme.tsx` plus a `<Name>/` folder holdi
 
 Sixteen worlds draw their own profession stages and are listed in `WORLDS_WITH_OWN_STAGE`
 (`src/components/themes/shared/professionStage.tsx`). Medieval Fantasy is the one world without its own:
-its folder `src/components/themes/MedievalFantasy/` has no `stages.tsx` or `scenes.tsx`, and the shared
-`GlobalProfessionStage` draws its stage. Dark Fantasy is the oldest world and keeps its own combat files in
+the shared `GlobalProfessionStage` draws its stage. Its folder `src/components/themes/MedievalFantasy/` has
+no `stages.tsx` or `scenes.tsx`; its scenes are the two zone backdrops, `chaosZone.tsx` (the fel storm, the
+meteors and the golem that lands) and `frostZone.tsx` (the blizzard, the frozen throne and the undead horse),
+switched on scroll by `backdrop.tsx`. Him in the frost zone is `hero.tsx`; `character.tsx` holds the infernal
+golem. Dark Fantasy is the oldest world and keeps its own combat files in
 `DarkFantasy/`, with its reveals on the shared `ScrollScene`.
 
 ## His character
@@ -96,7 +99,7 @@ hero's costume, silhouette, signature weapon, moves and frames, drawn in that ga
 hero shows a face it carries his traits from `HERO_IDENTITY`; a hero who wears a mask keeps the mask. It has an
 idle, a walk or run, one action per profession, and a reaction to the visitor. The only thing every world shares
 for him is `HERO_IDENTITY`. The bar is Dark Fantasy's `KnightCharacter.tsx` and Medieval Fantasy's
-`character.tsx`.
+`hero.tsx`.
 
 ## Rules every world follows
 
