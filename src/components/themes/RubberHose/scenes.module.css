@@ -1,53 +1,19 @@
 /*
- * Rubber Hose's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
- * which owns --p, the strip, his figure, the poses, his walk and advance, the strikes, the props that
- * answer progress and reduced motion). Transform and opacity only; progress 1 is the final frame, which
- * reduced motion and the World Select preview show at once.
- *
- * The world's move is the 1930s rubber hose cartoon: everything bobs on one beat, he bounces on every
- * footfall, things land with a squash and a stretch, and a scene opens and closes on the iris of an old
- * film. One beat (--beats) drives the bobbing of the level, his bounce follows his own strides.
+ * Rubber Hose's own scenes, the moves of a 1930s rubber hose run and gun: the boss intro title card, the
+ * iris wipe between scenes, phase cards dropping in with a squash, the pink parry slap and the super
+ * cards flipping, the record spinning up on the shop shelf, the knockout slam and the bell, the pie eyed
+ * sun. One overshoot curve (--hose-bounce) and hard holds before every slam. Transform and opacity only;
+ * every move stops under reduced motion (the final frame shows).
  */
 
-/* The world's tempo: six bouncy strides across the street with a wide swing, ten stick hits per arm,
-   the sound bars resting at a quarter of their height, the level bobbing on twelve beats; in the ring
-   he reaches the pads by 40% of the scene and works them for the rest. */
-.tempo {
-  --cymbal-lift: -2px;
-  --cymbal-tip: -16deg;
-  --pop-floor: 0.3;
-  --pop-start: 0.7;
-  --pop-bounce: 0.15;
-  --pop-width: 0;
-  --pump-grow-y: -0.08;
-  --pump-origin: 0% 100%;
-  --strides: 6turn;
-  --swing: 38deg;
-  --stick-hits: 10turn;
-  --wave-rest: 0.25;
-  --walk-inset: 5.5rem;
-  --advance-to: 38%;
-  --advance-until: 0.4;
-  --beats: 12turn;
-  --bob: -5px;
-}
-
-/* The strip's frame: a thick ink line with rounded corners like an old cartoon's frame. */
-.frame {
-  border: 5px solid var(--hose-ink);
-  border-radius: 1rem;
-  background: var(--hose-paper);
-}
-
-/* He bounces on every footfall: sin squared peaks twice per stride. */
-.bob {
-  transform: translate3d(0, calc(sin(var(--p) * var(--strides)) * sin(var(--p) * var(--strides)) * var(--bob)), 0);
+.scene {
+  --hose-bounce: cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
 /* ---- the iris ---- */
 
-/* The iris is a square as wide as its strip or corner, centred on it, holding a ring of ink with a round
-   hole; scaling the square opens or closes the hole, composited. */
+/* A square as wide as the box it covers, centred, holding an ink ring round a round hole; scaling it
+   opens the hole. */
 .iris {
   position: absolute;
   left: 0;
@@ -55,75 +21,359 @@
   width: 100%;
   aspect-ratio: 1;
   transform-origin: 50% 50%;
+  transform: translate3d(0, -50%, 0) scale(6);
+  opacity: 0;
 }
 
-/* A level opens on an iris in: the hole grows from a twentieth of the strip's width to past its corners
-   over the first 15% of the scene, then the ring fades away. */
-.irisIn {
-  opacity: clamp(0, (0.2 - var(--p)) * 20, 1);
-  transform: translate3d(0, -50%, 0) scale(calc(0.5 + clamp(0, var(--p) / 0.15, 1) * 5.5));
+/* The iris in: the hole opens from a pin prick past the corners, then the ring is gone. */
+.irisOpen {
+  animation: irisOpen 0.9s var(--hose-bounce) both;
 }
 
-/* The contact corner closes on an iris out, the ending of an old short: the hole shrinks from past the
-   corners to a round frame three fifths of the corner's width across, and holds there. */
-.irisOut {
-  transform: translate3d(0, -50%, 0) scale(calc(6 - clamp(0, var(--p) * 1.5 - 0.1, 1) * 3));
+@keyframes irisOpen {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0) scale(0.3);
+  }
+  20% {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0) scale(0.3);
+  }
+  90% {
+    opacity: 1;
+    transform: translate3d(0, -50%, 0) scale(6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -50%, 0) scale(6);
+  }
 }
 
-/* ---- the cartoon street ---- */
+/* The iris out of the contact frame: the hole closes to a round frame and holds there. */
+.irisClose {
+  opacity: 1;
+  transform: translate3d(0, -50%, 0) scale(3);
+  animation: irisClose 1.1s var(--hose-bounce) both;
+}
 
-/* The street's houses squash and stretch from the ground on the beat, the two rows half a beat apart. */
-.bobRow {
+@keyframes irisClose {
+  from {
+    transform: translate3d(0, -50%, 0) scale(6);
+  }
+  to {
+    transform: translate3d(0, -50%, 0) scale(3);
+  }
+}
+
+/* ---- the boss intro title card (hero entrance) ---- */
+
+/* Waiting phases: the card hangs above, out of sight. */
+.cardWait {
+  opacity: 0;
+  transform: translate3d(0, -40vh, 0) rotate(-6deg);
+}
+
+/* The drop: it falls, overshoots, squashes on landing and settles with a wobble. */
+.cardDrop {
   transform-origin: 50% 100%;
-  transform: scale(
-    calc(1 - sin(var(--p) * var(--beats) + var(--phase, 0turn)) * 0.03),
-    calc(1 + sin(var(--p) * var(--beats) + var(--phase, 0turn)) * 0.06)
-  );
+  animation: cardDrop 0.75s var(--hose-bounce) both;
 }
 
-/* ---- the vaudeville stage ---- */
-
-/* ---- the prize ring ---- */
-
-/* The crowd behind the ropes bobs on the beat. */
-.crowd {
-  transform: translate3d(0, calc(sin(var(--p) * var(--beats)) * sin(var(--p) * var(--beats)) * -4px), 0);
+@keyframes cardDrop {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, -40vh, 0) rotate(-6deg);
+  }
+  55% {
+    transform: translate3d(0, 0, 0) scale(1.12, 0.86) rotate(1deg);
+  }
+  75% {
+    transform: translate3d(0, -12px, 0) scale(0.96, 1.05) rotate(-1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
 }
 
-/* The ring bell on the corner post swings on every kick, knee and elbow (the strip carries the three). */
+/* The words on the card pop in one after another (--i), each overshooting. */
+.wordWait {
+  opacity: 0;
+  transform: scale(0.2);
+}
+
+.wordPop {
+  animation: wordPop 0.45s var(--hose-bounce) both;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+@keyframes wordPop {
+  from {
+    opacity: 0;
+    transform: scale(0.2) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* ---- boss phase cards (Experience) ---- */
+
+.phaseWait {
+  opacity: 0;
+  transform: translate3d(0, -3rem, 0) rotate(-3deg);
+}
+
+.phaseIn {
+  transform-origin: 50% 100%;
+  animation: cardDrop 0.7s var(--hose-bounce) both;
+  animation-delay: calc(var(--i, 0) * 140ms);
+}
+
+/* A phase card bulges toward the pointer like a cartoon breathing in. */
+.breathe {
+  transition: transform 0.3s var(--hose-bounce);
+}
+
+.breathe:hover {
+  transform: scale(1.03, 1.05) rotate(-0.6deg);
+}
+
+/* ---- parry (Projects) ---- */
+
+/* The pink parry star pulses on the beat, waiting to be slapped. */
+.parryStar {
+  animation: parryPulse 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes parryPulse {
+  from {
+    transform: scale(0.9) rotate(-10deg);
+  }
+  to {
+    transform: scale(1.1) rotate(10deg);
+  }
+}
+
+/* Once slapped the star bursts away. */
+.parryGone {
+  animation: parryBurst 0.35s ease-out both;
+}
+
+@keyframes parryBurst {
+  to {
+    opacity: 0;
+    transform: scale(2.4) rotate(90deg);
+  }
+}
+
+/* The poster takes the slap: a freeze frame (the hold), then a hard shake. */
+.slap {
+  animation: slap 0.5s steps(1, end) both;
+}
+
+@keyframes slap {
+  0%,
+  30% {
+    transform: scale(1.04);
+  }
+  45% {
+    transform: translate3d(-6px, 2px, 0) rotate(-1.5deg);
+  }
+  60% {
+    transform: translate3d(6px, -2px, 0) rotate(1.5deg);
+  }
+  75% {
+    transform: translate3d(-3px, 0, 0);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* A super card in the meter flips face up when a poster is parried. */
+.superCard {
+  transition: transform 0.45s var(--hose-bounce);
+  transform: rotateY(180deg) scale(0.9);
+}
+
+.superFull {
+  transform: rotateY(0deg) translate3d(0, -6px, 0) scale(1);
+}
+
+/* ---- the shop shelf (Bands) ---- */
+
+.disc {
+  transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.record:hover .disc,
+.record:focus-visible .disc {
+  transform: rotate(720deg);
+}
+
+/* ---- the knockout (Muay Thai) ---- */
+
+.koWait {
+  opacity: 0;
+  transform: scale(3);
+}
+
+/* The title slams in from huge, holds, then shakes. */
+.koSlam {
+  animation: koSlam 0.8s steps(8, end) both;
+}
+
+@keyframes koSlam {
+  0% {
+    opacity: 0;
+    transform: scale(3);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(0.92);
+  }
+  45% {
+    transform: scale(1.05) translate3d(-4px, 0, 0);
+  }
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+  80% {
+    transform: translate3d(-2px, 0, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hitWait {
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.hitIn {
+  animation: wordPop 0.4s var(--hose-bounce) both;
+  animation-delay: calc(0.6s + var(--i, 0) * 160ms);
+}
+
+/* The ring bell swings when the pointer lands on it. */
 .bell {
-  transform-box: fill-box;
-  transform-origin: 50% 0%;
-  transform: rotate(calc(var(--kick, 0) * 18deg - var(--elbow, 0) * 18deg + var(--knee, 0) * 10deg));
+  transform-origin: 50% 0;
 }
 
-/* ---- per item arrivals (their own scene each, so --p is the item's own progress) ---- */
+.bellBox:hover .bell {
+  animation: bellSwing 0.6s ease-in-out 2;
+}
 
-/* A job or a record line drops in as a title card and bounces to a stop: three bounces, each lower
-   (cos squared touches zero three times as the drop shrinks), squashing at each landing. */
-.bounceIn {
-  --land: clamp(0, var(--p) * 1.5, 1);
+@keyframes bellSwing {
+  25% {
+    transform: rotate(18deg);
+  }
+  75% {
+    transform: rotate(-18deg);
+  }
+}
+
+/* ---- him ---- */
+
+/* His bounce on the beat: a squash on landing, a stretch at the top, the whole figure from his feet. */
+.heroBob {
   transform-origin: 50% 100%;
-  opacity: clamp(0, var(--p) * 4, 1);
-  transform: translate3d(0, calc((1 - var(--land)) * cos(var(--land) * 1.5turn) * cos(var(--land) * 1.5turn) * -3rem), 0)
-    scaleY(calc(1 - (1 - var(--land)) * sin(var(--land) * 1.5turn) * sin(var(--land) * 1.5turn) * 0.08));
+  animation: heroBob 0.7s var(--hose-bounce) infinite;
 }
 
-/* The card's shadow on the floor tightens as it lands. */
-.landShadow {
-  opacity: clamp(0, var(--p) * 3, 0.25);
-  transform: scaleX(calc(0.5 + clamp(0, var(--p) * 1.5, 1) * 0.5));
+@keyframes heroBob {
+  0%,
+  100% {
+    transform: scale(1.06, 0.95);
+  }
+  50% {
+    transform: translate3d(0, -6%, 0) scale(0.96, 1.04);
+  }
 }
 
-/* A project or a band unrolls from its top like a show poster pasted up, wobbling as it hangs. */
-.unroll {
-  --hang: clamp(0, var(--p) * 1.6, 1);
-  transform-origin: 50% 0%;
-  opacity: clamp(0, var(--p) * 3, 1);
-  transform: scaleY(calc(0.15 + var(--hang) * 0.85)) rotate(calc((1 - var(--hang)) * sin(var(--hang) * 2turn) * 4deg));
+/* His front arm waves from the shoulder, the rubber hose way. */
+.wave {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: wave 0.7s ease-in-out infinite alternate;
 }
 
-/* The paste board the poster hangs from. */
-.roller {
-  opacity: clamp(0, var(--p) * 5, 1);
+@keyframes wave {
+  from {
+    transform: rotate(-150deg);
+  }
+  to {
+    transform: rotate(-110deg);
+  }
+}
+
+/* ---- the pie eyed sun (Contact) ---- */
+
+/* The pupils follow the pointer through --look-x and --look-y (each -1 to 1), written by the scene. */
+.pupils {
+  transition: transform 0.2s ease-out;
+  transform: translate3d(calc(var(--look-x, 0) * 3px), calc(var(--look-y, 0) * 3px), 0);
+}
+
+.sunRays {
+  animation: spin 12s linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iris,
+  .irisOpen {
+    animation: none;
+    opacity: 0;
+  }
+
+  .irisClose {
+    animation: none;
+  }
+
+  .cardWait,
+  .cardDrop,
+  .wordWait,
+  .wordPop,
+  .phaseWait,
+  .phaseIn,
+  .koWait,
+  .koSlam,
+  .hitWait,
+  .hitIn {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .parryStar,
+  .parryGone,
+  .slap,
+  .heroBob,
+  .wave,
+  .sunRays,
+  .bellBox:hover .bell {
+    animation: none;
+  }
+
+  .breathe,
+  .superCard,
+  .disc,
+  .pupils {
+    transition: none;
+  }
+
+  .parryGone {
+    opacity: 0;
+  }
 }

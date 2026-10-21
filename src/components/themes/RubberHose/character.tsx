@@ -5,6 +5,7 @@ import { Mongkhon } from '@/components/scroll/Mongkhon'
 import { HeroFist, HeroGlove, HeroStick } from '@/components/scroll/heroHands'
 import { HOSE } from './palette'
 import world from './world.module.css'
+import styles from './scenes.module.css'
 
 // Him in Rubber Hose (the shared HeroFigure), drawn the 1930s cartoon way, flat sepia fills under one
 // ink line, white cartoon gloves and big round shoes: the System Engineer in a paper shirt with ink
@@ -102,7 +103,8 @@ const OUTFIT: Record<Profession, Outfit> = {
   },
 }
 
-export function HeroCharacter({ profession, className = '' }: { profession: Profession; className?: string }) {
+// `wave` lifts his front arm (x 41) into the rubber hose wave of the contact frame.
+export function HeroCharacter({ profession, className = '', wave = false }: { profession: Profession; className?: string; wave?: boolean }) {
   const outfit = OUTFIT[profession]
 
   return (
@@ -110,7 +112,11 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
       className={`${world.inked} ${className}`}
       eye={EYE}
       torso={outfit.torso}
-      arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={15} hand={(y) => HAND_DRAW[outfit.hand](x, y)} />}
+      arm={(x) => (
+        <g className={wave && x > 32 ? styles.wave : undefined}>
+          <HeroArm x={x} sleeve={outfit.sleeve} forearm={15} hand={(y) => HAND_DRAW[outfit.hand](x, y)} />
+        </g>
+      )}
       leg={(x) => <HeroLeg x={x} legs={outfit.legs} long={outfit.long} shorts={11} feet={outfit.feet} />}
       overHair={outfit.head}
     />

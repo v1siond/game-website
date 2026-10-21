@@ -1,21 +1,25 @@
 'use client'
 
 import { useCVData } from '@/components/cv/CVDataProvider'
-import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { LevelScene } from '@/components/scroll/stage'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { ArtBreak, CurlBanner } from './art'
-import { BandRecord, CompanyPoster, ExperienceCard, TechBubbleCloud, VintagePoster } from './cards'
-import { SceneItem, Strip } from './scenes'
+import { ArtBreak, CurlBanner, PieEyes } from './art'
+import { HOSE } from './palette'
+import { BandRecord, CompanyPoster, ExperienceCard, TechBubbleCloud } from './cards'
+import { Reveal, staggerAt } from './scenes'
+import { ParryBoard } from './parry'
 import world from './world.module.css'
+import styles from './scenes.module.css'
 import { drumsSince } from '@/components/cv/sectionText'
 
-// The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
-// Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
+// The picked profession's sections. About, Tech Stack and Ventures fade in. Work Experience is a boss's
+// phases: each job a phase card dropping in with a squash, in masonry. Featured Work is the parry board
+// (./parry). Bands is the shop shelf, each record's disc spinning up under the pointer. The Muay Thai
+// record opens on the knockout slam, its achievements landing as hit stars, the bell swinging on hover.
 // The art breaks between them are a film leader, a sing along line and pie eyed balls.
 
 const LEAD = `text-center text-base ${world.ink}`
@@ -35,21 +39,22 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <ArtBreak kind="filmLeader" />
 
       {sections.jobs.length > 0 && (
-        <LevelScene>
-          <Strip profession="engineer" zone="record" />
-          <section aria-labelledby="hose-work-experience">
-            <CurlBanner id="hose-work-experience">Work Experience</CurlBanner>
-            <ul className="mx-auto max-w-3xl space-y-8">
-              {sections.jobs.map((entry) => (
-                <li key={entry.id}>
-                  <SceneItem kind="bounce">
-                    <ExperienceCard entry={entry} />
-                  </SceneItem>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </LevelScene>
+        <section aria-labelledby="hose-work-experience" className="mb-8">
+          <CurlBanner id="hose-work-experience">Work Experience</CurlBanner>
+          <Reveal>
+            {({ played }) => (
+              <ul className={`pt-4 ${MASONRY_LIST}`}>
+                {sections.jobs.map((entry, index) => (
+                  <li key={entry.id} className={`${MASONRY_ITEM} pt-4 ${staggerAt(index)} ${played ? styles.phaseIn : styles.phaseWait}`}>
+                    <div className={styles.breathe}>
+                      <ExperienceCard entry={entry} />
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Reveal>
+        </section>
       )}
 
       <ArtBreak kind="singAlong" />
@@ -63,21 +68,10 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </section>
       </FadeInScene>
 
-      <LevelScene>
-        <Strip profession="engineer" zone="work" />
-        <section aria-labelledby="hose-featured-work">
-          <CurlBanner id="hose-featured-work">Featured Work</CurlBanner>
-          <ProjectList
-            projects={sections.projects}
-            className="grid gap-8 md:grid-cols-2"
-            renderProject={(slot) => (
-              <SceneItem kind="unroll">
-                <VintagePoster {...slot} />
-              </SceneItem>
-            )}
-          />
-        </section>
-      </LevelScene>
+      <section aria-labelledby="hose-featured-work" className="mb-8">
+        <CurlBanner id="hose-featured-work">Featured Work</CurlBanner>
+        <ParryBoard projects={sections.projects} />
+      </section>
 
       <ArtBreak kind="bouncingBalls" />
 
@@ -103,25 +97,14 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   return (
     <>
       <ArtBreak kind="singAlong" />
-      <LevelScene>
-        <Strip profession="drummer" zone="record" />
-        <section aria-labelledby="hose-bands">
+      <section aria-labelledby="hose-bands" className="mb-8">
           <CurlBanner id="hose-bands">Bands</CurlBanner>
           <p className={`mb-6 ${LEAD}`}>
             {drumsSince(musician)}
           </p>
-          <BandList
-            bands={bands}
-            className="grid gap-8 md:grid-cols-3"
-            renderBand={(slot) => (
-              <SceneItem kind="unroll">
-                <BandRecord {...slot} />
-              </SceneItem>
-            )}
-          />
+          <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandRecord {...slot} />} />
           <p className={`mt-6 italic ${LEAD} ${world.red}`}>{musician.line}</p>
         </section>
-      </LevelScene>
     </>
   )
 }
@@ -132,12 +115,15 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
   return (
     <>
       <ArtBreak kind="bouncingBalls" />
-      <LevelScene>
-        <Strip profession="fighter" zone="record" />
-        <section aria-labelledby="hose-muay-thai">
-          <CurlBanner id="hose-muay-thai">Muay Thai</CurlBanner>
-          <div className={`mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
-            <h3 className={`mb-6 text-center text-xl ${world.red} ${world.lettering}`}>{martialArts.primary.title}</h3>
+      <section aria-labelledby="hose-muay-thai" className="mb-8">
+        <CurlBanner id="hose-muay-thai">Muay Thai</CurlBanner>
+        <Reveal className={`relative mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
+          {({ played }) => (
+            <>
+            <RingBell />
+            <h3 className={`mb-6 text-center text-2xl ${world.red} ${world.lettering} ${world.dropText} ${played ? styles.koSlam : styles.koWait}`}>
+              {martialArts.primary.title}
+            </h3>
             <MuayThaiRecord
               martialArts={martialArts}
               classNames={{
@@ -149,20 +135,36 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
                 achievement: `text-sm ${world.ink}`,
               }}
               renderAchievement={(achievement) => (
-                <SceneItem kind="bounce">
-                  <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
-                    <span className={world.red} aria-hidden="true">
-                      ★
-                    </span>
-                    <span>{achievement}</span>
-                  </p>
-                </SceneItem>
+                <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
+                  <span className={`inline-block ${world.red} ${staggerAt(martialArts.primary.achievements.indexOf(achievement))} ${played ? styles.hitIn : styles.hitWait}`} aria-hidden="true">
+                    ★
+                  </span>
+                  <span>{achievement}</span>
+                </p>
               )}
             />
-          </div>
-        </section>
-      </LevelScene>
+            </>
+          )}
+        </Reveal>
+      </section>
     </>
+  )
+}
+
+// The ring bell in the poster's corner, swinging when the pointer lands on it.
+function RingBell() {
+  return (
+    <div className={`absolute right-3 top-3 h-12 w-10 ${styles.bellBox}`} aria-hidden="true">
+      <svg viewBox="0 0 24 30" className={`h-full w-full ${world.inked}`} focusable="false">
+        <rect x={10} y={0} width={4} height={6} fill={HOSE.ink} />
+        <g className={styles.bell}>
+          <path d="M3 24 Q3 6 12 6 Q21 6 21 24 Z" fill={HOSE.gold} />
+          <ellipse cx={9} cy={13} rx={2} ry={4} fill={HOSE.highlight} opacity={0.6} />
+          <PieEyes cx={12} cy={15} size={9} paper={HOSE.gold} />
+          <rect x={1} y={23} width={22} height={3} rx={1.5} fill={HOSE.shadowDark} />
+        </g>
+      </svg>
+    </div>
   )
 }
 

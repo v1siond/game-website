@@ -12,16 +12,22 @@ import { CartoonTitle } from './RubberHose/art'
 import { CartoonCharacter } from './RubberHose/selector'
 import { CVLink, EngineLink, HeroAction } from './RubberHose/actions'
 import { SECTION_VIEWS } from './RubberHose/sections'
-import { ContactScene } from './RubberHose/scenes'
+import { IrisWipe, SunWatcher, TitleCardIntro, staggerAt } from './RubberHose/scenes'
+import { headingId } from '@/components/cv/sectionText'
 import world from './RubberHose/world.module.css'
 
 // Rubber Hose, a 1930s rubber hose cartoon in sepia (one ink line, pie eyed props, film grain, the iris,
 // everything bobbing on the beat): the page composition. Its palette, backdrop, art, cards, his costume,
 // the profession stages, the scroll scenes and the per profession sections live in ./RubberHose.
 //
+// The hero is the boss intro title card, a profession switch opens the sections on a new iris, the
+// contact frame closes on the iris out round him waving under the pie eyed sun (./RubberHose/scenes).
+//
 // The root carries the palette as --hose-* variables (the one inline style, variables only) and clips
 // sideways overflow with overflow-x: clip, not hidden: hidden would make the root a scroll container and
-// stop the scenes' level strips from sticking to the viewport.
+// stop sticky children from sticking to the viewport.
+
+const CONTACT_HEADING = headingId('hose', 'Contact')
 
 export default function RubberHoseTheme() {
   const { active } = useProfession()
@@ -50,22 +56,26 @@ export default function RubberHoseTheme() {
         <header className="relative z-30 px-2 py-6 sm:p-6">
           <RecruiterHero
             render={({ name, headline, tagline, line, actions }) => (
-              <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 text-center">
-                <div>
-                  <CartoonTitle text={name.toUpperCase()} />
-                  <p className={`mt-4 text-base tracking-[0.1em] ${world.muted}`}>{headline}</p>
-                  <p className={`mt-2 text-sm italic tracking-widest ${world.red}`}>{tagline}</p>
-                  <p className={`mt-2 text-sm ${world.ink}`}>{line}</p>
-                </div>
+              <TitleCardIntro>
+                {(look) => (
+                  <div className={`mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-8 text-center sm:px-10 ${world.titleCard} ${look.card}`}>
+                    <div>
+                      <CartoonTitle text={name.toUpperCase()} />
+                      <p className={`mt-4 text-base tracking-[0.1em] ${world.muted} ${staggerAt(0)} ${look.word}`}>{headline}</p>
+                      <p className={`mt-2 text-sm italic tracking-widest ${world.red} ${staggerAt(1)} ${look.word}`}>{tagline}</p>
+                      <p className={`mt-2 text-sm ${world.ink} ${staggerAt(2)} ${look.word}`}>{line}</p>
+                    </div>
 
-                <nav className="flex flex-wrap items-center justify-center gap-3" aria-label="Contact and CV">
-                  {actions.map((action) => (
-                    <HeroAction key={action.id} action={action} />
-                  ))}
-                  <CVLink />
-                  <EngineLink />
-                </nav>
-              </div>
+                    <nav className={`flex flex-wrap items-center justify-center gap-3 ${staggerAt(3)} ${look.word}`} aria-label="Contact and CV">
+                      {actions.map((action) => (
+                        <HeroAction key={action.id} action={action} />
+                      ))}
+                      <CVLink />
+                      <EngineLink />
+                    </nav>
+                  </div>
+                )}
+              </TitleCardIntro>
             )}
           />
         </header>
@@ -80,12 +90,32 @@ export default function RubberHoseTheme() {
         </section>
 
         <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">
-          <div className="mx-auto max-w-4xl" role="region" aria-label={`${active} profession details`}>
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+          <div className="mx-auto max-w-6xl" role="region" aria-label={`${active} profession details`}>
+            <IrisWipe key={active}>
+              <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+            </IrisWipe>
           </div>
         </main>
 
-        <ContactScene profession={active} />
+        <section className="relative z-20 mx-auto max-w-3xl px-2 py-8" aria-labelledby={CONTACT_HEADING}>
+          <SunWatcher key={active} profession={active} />
+          <RecruiterHero
+            render={({ line, actions }) => (
+              <div className={`relative mt-6 p-6 text-center sm:text-left ${world.titleCard}`}>
+                <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase ${world.lettering} ${world.dropText}`}>
+                  Contact
+                </h2>
+                <p className={`mb-6 text-base ${world.ink}`}>{line}</p>
+                <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+                  {actions.map((action) => (
+                    <HeroAction key={action.id} action={action} />
+                  ))}
+                  <CVLink />
+                </div>
+              </div>
+            )}
+          />
+        </section>
 
         <footer className="relative z-20 py-8 text-center">
           <div className="flex items-center justify-center gap-4">

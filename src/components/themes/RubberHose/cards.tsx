@@ -5,6 +5,7 @@ import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
+import styles from './scenes.module.css'
 
 // Rubber Hose's cards, sepia posters and title cards under one ink line: the tech bubbles, a job's title
 // card, a project's show poster, a venture's advertisement and a band's record label. A poster throws an
@@ -155,12 +156,20 @@ export function CompanyPoster({ company }: { company: CVData['companies'][number
   )
 }
 
-// A band on a record label: the disc in the corner, his role, the years and the release.
+// A band on a record label on the shop shelf: the disc in the corner spins up when the pointer lands
+// on the record, his role, the years and the release.
 export function BandRecord({ band, years, linkProps }: BandSlot) {
   const content = (
-    <article className={`group relative h-full p-4 transition-transform hover:rotate-1 hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
-      <svg viewBox="0 0 48 48" className="absolute -right-3 -top-3 h-12 w-12" aria-hidden="true" focusable="false">
-        <circle cx={24} cy={24} r={23} fill={HOSE.ink} />
+    <article className={`group relative h-full p-4 ${world.poster} ${styles.record}`} tabIndex={linkProps ? undefined : -1}>
+      <svg viewBox="0 0 48 48" className={`absolute -right-3 -top-3 h-14 w-14 ${styles.disc}`} aria-hidden="true" focusable="false">
+        <defs>
+          <radialGradient id="hose-disc-sheen" cx="0.35" cy="0.3" r="0.8">
+            <stop offset="0" stopColor={HOSE.inkSoft} />
+            <stop offset="1" stopColor={HOSE.ink} />
+          </radialGradient>
+        </defs>
+        <circle cx={24} cy={24} r={23} fill="url(#hose-disc-sheen)" />
+        <path d="M10 14 Q16 8 24 7" fill="none" stroke={HOSE.shadow} strokeWidth={1.4} strokeLinecap="round" />
         <circle cx={24} cy={24} r={16} fill="none" stroke={HOSE.inkSoft} strokeWidth={1} />
         <circle cx={24} cy={24} r={8} fill={HOSE.redDark} />
         <circle cx={24} cy={24} r={1.5} fill={HOSE.paper} />
@@ -182,7 +191,7 @@ export function BandRecord({ band, years, linkProps }: BandSlot) {
   if (!linkProps) return content
 
   return (
-    <a {...linkProps} className="block h-full">
+    <a {...linkProps} className={`block h-full ${styles.record}`}>
       {content}
     </a>
   )
