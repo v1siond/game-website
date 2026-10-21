@@ -15,7 +15,7 @@
 
   background: var(--noir-ink);
   color: var(--noir-paper);
-  font-family: 'Bebas Neue', 'Impact', 'Arial Narrow', sans-serif;
+  font-family: var(--font-bebas-neue), 'Impact', 'Arial Narrow', sans-serif;
 }
 
 .copy {

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
+import { Bebas_Neue } from "next/font/google";
 import "../../styles/globals.css";
 import ClientProviders from "../providers/ClientProviders";
 
@@ -31,6 +32,16 @@ const permanentMarker = localFont({
   ],
   display: 'swap',
   preload: true,
+});
+
+// Bold Noir's display face. Only that world sets it (through --font-bebas-neue), so it is not preloaded
+// on every page.
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+  variable: '--font-bebas-neue',
 });
 
 export const viewport: Viewport = {
@@ -92,7 +103,7 @@ export default function RootShell({ lang, children }: Readonly<RootShellProps>) 
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body
-        className={`${silkScreen.className} ${silkScreen.variable} ${permanentMarker.className} antialiased`}
+        className={`${silkScreen.className} ${silkScreen.variable} ${permanentMarker.className} ${bebasNeue.variable} antialiased`}
       >
         <ClientProviders>
           {children}
