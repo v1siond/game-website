@@ -1,3 +1,5 @@
+import { TRAIL } from '@/components/themes/AdventurePaths/palette'
+
 export interface ThemeColors {
   background: string
   backgroundGradient: string
@@ -152,23 +154,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 5. Adventure Paths - Mario world map
+  // 5. Adventure Paths - an explorer's map at dusk, colours from its own palette
   {
     id: 'adventure-paths',
     name: 'Adventure Paths',
-    description: 'Mario World - cheerful path nodes',
+    description: "An explorer's map at dusk - trails, ruins and a red route",
     colors: {
-      background: '#1a4422',
-      backgroundGradient: 'linear-gradient(to bottom, #2a6633, #1a4422)',
-      accent: '#ffcc00',
-      text: '#ffffff',
-      textMuted: '#aaccaa',
-      secondary: '#ff4444',
-      highlight: '#44ddff',
-      border: '#336633',
-      borderHover: '#ffcc00',
-      surface: '#225533',
-      surfaceHover: '#2a6644',
+      background: TRAIL.NIGHT,
+      backgroundGradient: `linear-gradient(to bottom, ${TRAIL.CANOPY}, ${TRAIL.NIGHT})`,
+      accent: TRAIL.GOLD,
+      text: TRAIL.PARCHMENT,
+      textMuted: TRAIL.EDGE,
+      secondary: TRAIL.ROUTE,
+      highlight: TRAIL.RUNE,
+      border: TRAIL.FOREST,
+      borderHover: TRAIL.GOLD,
+      surface: TRAIL.CANOPY,
+      surfaceHover: TRAIL.FOREST,
     },
     font: 'sans-serif',
     effects: {
