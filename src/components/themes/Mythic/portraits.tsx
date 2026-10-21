@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/components/cv/sectionText'
@@ -12,15 +13,16 @@ import u from './underworld.module.css'
 // The bands as the portraits and dialogue boxes of the house: each band a painted portrait plate with
 // its initial in the laurel and a framed dialogue box with its name, his role, the years and the release.
 // Beside them he stands at the great war drum; pointing at or focusing a band, he brings the hilts down
-// on the skin and fire bursts from it.
+// on the skin, fire bursts from it and the band's portrait flares on each hit.
 
-function BandCard({ slot, onStrike }: { slot: BandSlot; onStrike: () => void }) {
+function BandCard({ slot, flare, onStrike }: { slot: BandSlot; flare: number; onStrike: () => void }) {
   const { links } = useLabels()
   const { band, years, linkProps } = slot
 
   return (
     <article className={`flex gap-4 ${u.bandCard}`} onPointerEnter={onStrike} onFocus={onStrike}>
-      <div className={`flex h-24 w-20 shrink-0 items-center justify-center ${u.portrait}`} aria-hidden="true">
+      <div className={`relative flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden ${u.portrait}`} aria-hidden="true">
+        {flare > 0 && <span key={flare} className={`absolute inset-0 bg-[radial-gradient(circle,var(--myth-fire-core),transparent_70%)] ${u.flare}`} />}
         <span className={`text-3xl text-[var(--myth-ink)] ${u.display}`}>{band.name.charAt(0)}</span>
       </div>
       <div className={`min-w-0 flex-1 p-4 ${u.dialogue}`}>
@@ -48,6 +50,7 @@ function BandCard({ slot, onStrike }: { slot: BandSlot; onStrike: () => void }) 
 
 export function Portraits({ musician, bands }: { musician: Musician; bands: Band[] }) {
   const { years, myth } = useLabels()
+  const [struck, setStruck] = useState<string | null>(null)
   const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
 
   return (
@@ -64,7 +67,16 @@ export function Portraits({ musician, bands }: { musician: Musician; bands: Band
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => <BandCard slot={slot} onStrike={() => play('drum')} />}
+        renderBand={(slot) => (
+          <BandCard
+            slot={slot}
+            flare={struck === slot.band.id ? take : 0}
+            onStrike={() => {
+              setStruck(slot.band.id)
+              play('drum')
+            }}
+          />
+        )}
       />
     </div>
   )

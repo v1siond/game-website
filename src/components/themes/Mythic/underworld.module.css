@@ -688,6 +688,20 @@
   transform: translate3d(0, -4px, 0);
 }
 
+/* The struck band's portrait flares on both drum hits. */
+.flare {
+  opacity: 0;
+  animation: band-flare 1.3s ease-out both;
+}
+
+@keyframes band-flare {
+  0%, 10% { opacity: 0; transform: scale(0.6); }
+  18% { opacity: 1; transform: scale(1); }
+  40% { opacity: 0.2; }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0; transform: scale(1.2); }
+}
+
 /* ---------------------------------------------------------------- the arena and the prophecies (prophecies.tsx) */
 
 .arena {
