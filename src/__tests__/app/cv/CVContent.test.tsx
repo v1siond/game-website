@@ -28,6 +28,14 @@ describe('CVContent', () => {
       expect(screen.getByText(cv.contact.email)).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /linkedin\.com/i })).toHaveAttribute('href', cv.contact.linkedin)
     })
+
+    it('links only his email and LinkedIn, no GitHub or employer site', () => {
+      renderCV()
+
+      const header = screen.getByRole('heading', { level: 1 }).closest('header')
+      if (!header) throw new Error('the name sits outside the header')
+      expect(within(header).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([cv.contact.linkedin])
+    })
   })
 
   describe('sections', () => {
@@ -61,10 +69,12 @@ describe('CVContent', () => {
       })
     })
 
-    it('shows the education text from the labels', () => {
+    it('shows his degree and the languages he speaks from the summary file', () => {
       renderCV()
 
-      expect(screen.getByText(cvPage.educationText)).toBeInTheDocument()
+      const section = sectionTitled(cvPage.education)
+      expect(section.getByText(cv.professionalSummary!.education)).toBeInTheDocument()
+      expect(section.getByText(cv.professionalSummary!.languages)).toBeInTheDocument()
     })
   })
 
@@ -77,10 +87,11 @@ describe('CVContent', () => {
       )
     })
 
-    it('drops the summary and competencies when there is no summary', () => {
+    it('drops the summary, competencies and education when there is no summary', () => {
       renderCV({ ...cv, professionalSummary: null })
 
       expect(screen.queryByRole('heading', { name: cvPage.professionalSummary })).not.toBeInTheDocument()
+      expect(screen.queryByRole('heading', { name: cvPage.education })).not.toBeInTheDocument()
       expect(screen.queryByRole('heading', { name: cvPage.coreCompetencies })).not.toBeInTheDocument()
     })
   })

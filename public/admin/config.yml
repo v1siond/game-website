@@ -47,6 +47,8 @@ collections:
               - { <<: *text, label: Headline, name: headline }
               - { <<: *text, label: Tagline, name: tagline }
               - { <<: *prose, label: Bio, name: bio }
+              - { <<: *text, label: Education, name: education }
+              - { <<: *text, label: Languages spoken, name: languages }
               - { label: Highlights, name: highlights, widget: list, i18n: true, field: { <<: *prose, label: Highlight, name: highlight } }
 
       - name: contact
@@ -444,7 +446,6 @@ collections:
                   - { <<: *text, label: "Technical skills", name: technicalSkills }
                   - { <<: *text, label: "Professional experience", name: professionalExperience }
                   - { <<: *text, label: "Education", name: education }
-                  - { <<: *prose, label: "Education text", name: educationText }
               - label: Game HUD words
                 name: hud
                 widget: object

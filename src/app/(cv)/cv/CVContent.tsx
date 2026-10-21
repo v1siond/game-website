@@ -58,17 +58,6 @@ export function CVContent() {
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
             <span>{contact.email}</span>
             <span>|</span>
-            <a href="https://dbadbadba.com" className="text-blue-700 underline">
-              dbadbadba.com
-            </a>
-            <span>|</span>
-            <a
-              href="https://github.com/alexanderpulido"
-              className="text-blue-700 underline"
-            >
-              github.com/alexanderpulido
-            </a>
-            <span>|</span>
             <a href={contact.linkedin} className="text-blue-700 underline">
               {shownUrl(contact.linkedin)}
             </a>
@@ -192,13 +181,16 @@ export function CVContent() {
           </section>
         )}
 
-        {/* Education & Certifications */}
-        <section className="mb-6">
-          <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-            {cvPage.education}
-          </h2>
-          <p className="text-sm">{cvPage.educationText}</p>
-        </section>
+        {/* Education and the languages he speaks */}
+        {professionalSummary && (
+          <section className="mb-6">
+            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
+              {cvPage.education}
+            </h2>
+            <p className="text-sm">{professionalSummary.education}</p>
+            <p className="text-sm">{professionalSummary.languages}</p>
+          </section>
+        )}
 
         {/* Print styles */}
         <style jsx global>{`

@@ -21,10 +21,6 @@ const SKIPPED_KEYS = new Set(['id', 'slug', 'startDate', 'endDate', 'status', 'i
 const APPROVED = new Map([
   ['Always interested in hearing new ideas and proposals', 'contact line fixed in cv-site.md Contract'],
   ['Lima, Peru', 'HISTORY: "a dojo in lima peru", written as a place'],
-  [
-    'GRCTechMe, CTO: he got it onto the Google Cloud Marketplace, passing review on the first try with no fixes',
-    'HISTORY project table: role "CTO" and result line, joined under the project name',
-  ],
 ])
 
 const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase()

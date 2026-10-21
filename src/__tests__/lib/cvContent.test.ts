@@ -22,6 +22,17 @@ describe('cvDataFrom', () => {
     expect(cvDataFrom(files, 'es').contact.line).not.toBe(cvDataFrom(files, 'en').contact.line)
   })
 
+  it('reads his degree and languages from the summary file in each locale', () => {
+    const files = readFiles()
+    const english = cvDataFrom(files, 'en').professionalSummary
+    const spanish = cvDataFrom(files, 'es').professionalSummary
+
+    expect(english.education).toBe('Ingeniero en Sistemas, UNEFA, 2008 to 2014')
+    expect(english.languages).toBe('Spanish and English native, Italian basic')
+    expect(spanish.education).toBe(files.summary.es?.professionalSummary?.education)
+    expect(spanish.languages).not.toBe(english.languages)
+  })
+
   it('falls back to English when a file has no block for the locale', () => {
     const files = readFiles()
     const withoutItalian = { en: files.summary.en, es: files.summary.es }

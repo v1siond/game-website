@@ -4,13 +4,18 @@
     "professionalSummary": {
       "headline": "Senior Staff Full-Stack & AI Systems Engineer with 10+ years of proven success",
       "tagline": "Lead, sole or key developer on every project",
-      "bio": "Long-term core engineer and architect trusted by high-profile enterprise companies and scaling startups to lead critical system overhauls, compliance-driven deployments, and zero-to-one product development. Ingeniero en Sistemas, UNEFA, 2008 to 2014. Spanish and English native, Italian basic.",
+      "bio": "Senior Staff Full-Stack & AI Systems Engineer with 10+ years of proven success architecting elite digital products, high-throughput Fintech/InsureTech infrastructure, and advanced AI integrations. Recognized for entering complex, high-stakes environments to engineer custom technical solutions, rescue failing critical paths, and architect systems from zero to production or acquisition. Deeply versatile across systems programming, concurrent functional paradigms and enterprise ecosystems",
+      "education": "Ingeniero en Sistemas, UNEFA, 2008 to 2014",
+      "languages": "Spanish and English native, Italian basic",
       "highlights": [
-        "SecureBancard (critical project rescue): saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines.",
-        "Engineering leader for the Clutch Prep B2B product, driving the technical milestones that led to the acquisition by Pearson.",
-        "InsurAdmin and Agency Rocket (InsureTech automation): developed InsurAdmin from scratch, a platform managing complex carrier feeds and agency teams. Engineered core automation parsers (Annuity, IUL, Whole Life) and fully integrated the Stripe billing engine for the Agency Rocket marketing suite (My New Retirement, Wealth United, etc.).",
-        "PMX Affiliate Marketplace: engineered, developed and launched the full-stack architecture of the affiliate marketplace, with a native integration into the Shopify ecosystem.",
-        "GRCTechMe, CTO: he got it onto the Google Cloud Marketplace, passing review on the first try with no fixes"
+        "EdTech Leadership & M&A: Spearheaded the B2B product at Clutch Prep that drove its acquisition by Pearson. Co-architected Pearson Channels nearly from the ground up and engineered the critical, highly complex data migration pipeline from relational databases to Pearson's NoSQL infrastructure with zero downtime.",
+        "Scalable Social Infrastructure: Acted as a core backend developer in the foundational stages of Truth Social, optimizing the Ruby on Rails infrastructure alongside Mastodon core developers.",
+        "FinTech & High-Stakes Recovery: Saved a critical launch at SecureBancard by single-handedly executing 80% of the architecture for Dual BIN support, preventing project failure.",
+        "Fully engineered PMX Affiliate Marketplace and seamlessly integrated it into the Shopify ecosystem.",
+        "AI Architecture & Compliance: Successfully navigated compliance to launch GRCTechMe on the Google Workspace Marketplace. Expert in secure LLM orchestration (Gemini, Claude), secure enterprise AI portals, and custom audio TTS synthesis pipelines (e.g., edge-tts).",
+        "InsureTech & Automation Architect: Engineered InsurAdmin from scratch, a robust platform managing complex carrier feeds and agency teams. Developed the core infrastructure for Agency Rocket, including proprietary automation parsers and complex Stripe billing frameworks.",
+        "Nebulith: Creator and lead architect of a proprietary, highly optimized custom game engine, launching to the commercial market soon.",
+        "Deep Learning: Actively engineering custom neural network architectures from scratch to bridge the gap between traditional backend systems and custom AI agents."
       ]
     }
   },
@@ -18,13 +23,18 @@
     "professionalSummary": {
       "headline": "Ingeniero Senior Staff Full-Stack y de Sistemas de IA con más de 10 años de éxito comprobado",
       "tagline": "Líder, desarrollador único o clave en cada proyecto",
-      "bio": "Ingeniero y arquitecto central de largo plazo, de confianza para grandes empresas y startups en crecimiento, para liderar renovaciones de sistemas críticos, despliegues regidos por normativas y desarrollo de productos desde cero. Ingeniero en Sistemas, UNEFA, 2008 a 2014. Español e inglés nativos, italiano básico.",
+      "bio": "Ingeniero Senior Staff Full-Stack y de Sistemas de IA con más de 10 años de éxito comprobado diseñando productos digitales de primer nivel, infraestructura Fintech/InsureTech de alto rendimiento e integraciones avanzadas de IA. Reconocido por entrar en entornos complejos y de alto riesgo para crear soluciones técnicas a medida, rescatar rutas críticas que fallan y diseñar sistemas desde cero hasta producción o adquisición. Muy versátil en programación de sistemas, paradigmas funcionales concurrentes y ecosistemas empresariales",
+      "education": "Ingeniero en Sistemas, UNEFA, 2008 a 2014",
+      "languages": "Español e inglés nativos, italiano básico",
       "highlights": [
-        "SecureBancard (rescate de un proyecto crítico): salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa.",
-        "Líder de ingeniería del producto B2B de Clutch Prep, impulsando los hitos técnicos que llevaron a la adquisición por Pearson.",
-        "InsurAdmin y Agency Rocket (automatización InsureTech): desarrolló InsurAdmin desde cero, una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias. Desarrolló los parsers de automatización centrales (Annuity, IUL, Whole Life) e integró por completo el motor de cobros con Stripe de la suite de marketing Agency Rocket (My New Retirement, Wealth United, etc.).",
-        "PMX Affiliate Marketplace: diseñó, desarrolló y lanzó la arquitectura full-stack del marketplace de afiliados, con una integración nativa en el ecosistema de Shopify.",
-        "GRCTechMe, CTO: la llevó al Google Cloud Marketplace, aprobando la revisión al primer intento sin correcciones"
+        "Liderazgo EdTech y fusiones y adquisiciones: impulsó el producto B2B de Clutch Prep que llevó a su adquisición por Pearson. Coarquitecto de Pearson Channels casi desde cero, y desarrolló el pipeline de migración de datos, crítico y muy complejo, de bases de datos relacionales a la infraestructura NoSQL de Pearson sin tiempo de inactividad.",
+        "Infraestructura social escalable: desarrollador backend central en las etapas fundacionales de Truth Social, optimizando la infraestructura Ruby on Rails junto a desarrolladores del núcleo de Mastodon.",
+        "FinTech y rescate de alto riesgo: salvó un lanzamiento crítico en SecureBancard ejecutando él solo el 80% de la arquitectura del soporte Dual BIN, evitando el fracaso del proyecto.",
+        "Desarrolló por completo PMX Affiliate Marketplace y lo integró sin fricciones en el ecosistema de Shopify.",
+        "Arquitectura de IA y cumplimiento normativo: superó los requisitos de cumplimiento para lanzar GRCTechMe en Google Workspace Marketplace. Experto en orquestación segura de LLM (Gemini, Claude), portales empresariales seguros de IA y pipelines de síntesis de voz TTS a medida (por ejemplo, edge-tts).",
+        "Arquitecto InsureTech y de automatización: desarrolló InsurAdmin desde cero, una plataforma robusta que gestiona feeds complejos de aseguradoras y equipos de agencias. Desarrolló la infraestructura central de Agency Rocket, incluidos parsers de automatización propios y complejos sistemas de cobro con Stripe.",
+        "Nebulith: creador y arquitecto principal de un motor de videojuegos propio y muy optimizado, que pronto llega al mercado comercial.",
+        "Deep Learning: desarrolla arquitecturas de redes neuronales propias desde cero para unir los sistemas backend tradicionales con agentes de IA a medida."
       ]
     }
   },
@@ -32,13 +42,18 @@
     "professionalSummary": {
       "headline": "Ingegnere Senior Staff Full-Stack e di Sistemi di IA con oltre 10 anni di successi comprovati",
       "tagline": "Lead, sviluppatore unico o chiave in ogni progetto",
-      "bio": "Ingegnere e architetto centrale di lungo corso, scelto da grandi aziende e startup in crescita per guidare il rinnovo di sistemi critici, rilasci vincolati alla conformità e lo sviluppo di prodotti da zero. Ingegnere dei Sistemi, UNEFA, dal 2008 al 2014. Spagnolo e inglese madrelingua, italiano base.",
+      "bio": "Ingegnere Senior Staff Full-Stack e di Sistemi di IA con oltre 10 anni di successi comprovati nella progettazione di prodotti digitali d'eccellenza, infrastrutture Fintech/InsureTech ad alto throughput e integrazioni avanzate di IA. Riconosciuto per entrare in contesti complessi e ad alto rischio per creare soluzioni tecniche su misura, salvare percorsi critici in difficoltà e progettare sistemi da zero fino alla produzione o all'acquisizione. Molto versatile tra programmazione di sistema, paradigmi funzionali concorrenti ed ecosistemi enterprise",
+      "education": "Ingeniero en Sistemas, UNEFA, dal 2008 al 2014",
+      "languages": "Spagnolo e inglese madrelingua, italiano base",
       "highlights": [
-        "SecureBancard (salvataggio di un progetto critico): ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide.",
-        "Responsabile tecnico del prodotto B2B di Clutch Prep, alla guida delle tappe tecniche che hanno portato all'acquisizione da parte di Pearson.",
-        "InsurAdmin e Agency Rocket (automazione InsureTech): ha sviluppato InsurAdmin da zero, una piattaforma che gestisce feed complessi delle compagnie e team di agenzia. Ha sviluppato i parser di automazione principali (Annuity, IUL, Whole Life) e integrato completamente il motore di fatturazione Stripe della suite di marketing Agency Rocket (My New Retirement, Wealth United, ecc.).",
-        "PMX Affiliate Marketplace: ha progettato, sviluppato e lanciato l'architettura full-stack del marketplace di affiliazione, con un'integrazione nativa nell'ecosistema Shopify.",
-        "GRCTechMe, CTO: l'ha portata sul Google Cloud Marketplace, superando la revisione al primo tentativo senza correzioni"
+        "Leadership EdTech e M&A: ha guidato il prodotto B2B di Clutch Prep che ha portato alla sua acquisizione da parte di Pearson. Ha co-progettato Pearson Channels quasi da zero e sviluppato la pipeline di migrazione dei dati, critica e molto complessa, dai database relazionali all'infrastruttura NoSQL di Pearson senza tempi di inattività.",
+        "Infrastruttura social scalabile: sviluppatore backend centrale nelle fasi fondative di Truth Social, ottimizzando l'infrastruttura Ruby on Rails insieme agli sviluppatori core di Mastodon.",
+        "FinTech e salvataggio ad alto rischio: ha salvato un lancio critico in SecureBancard realizzando da solo l'80% dell'architettura del supporto Dual BIN, evitando il fallimento del progetto.",
+        "Ha sviluppato per intero PMX Affiliate Marketplace e lo ha integrato senza attriti nell'ecosistema Shopify.",
+        "Architettura IA e conformità: ha superato i requisiti di conformità per lanciare GRCTechMe sul Google Workspace Marketplace. Esperto in orchestrazione sicura di LLM (Gemini, Claude), portali enterprise sicuri di IA e pipeline di sintesi vocale TTS su misura (ad esempio edge-tts).",
+        "Architetto InsureTech e di automazione: ha sviluppato InsurAdmin da zero, una piattaforma robusta che gestisce feed complessi delle compagnie e team di agenzia. Ha sviluppato l'infrastruttura centrale di Agency Rocket, inclusi parser di automazione proprietari e complessi sistemi di fatturazione Stripe.",
+        "Nebulith: creatore e architetto principale di un motore di gioco proprietario e altamente ottimizzato, in arrivo a breve sul mercato commerciale.",
+        "Deep Learning: sviluppa da zero architetture di reti neurali su misura per collegare i sistemi backend tradizionali con agenti di IA su misura."
       ]
     }
   }

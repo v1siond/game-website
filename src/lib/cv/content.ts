@@ -9,6 +9,8 @@ export interface ProfessionalSummary {
   headline: string
   tagline: string
   bio: string
+  education: string
+  languages: string
   highlights: string[]
 }
 
