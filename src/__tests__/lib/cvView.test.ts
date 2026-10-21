@@ -142,7 +142,7 @@ describe('viewFor: the five year cut in a world', () => {
 
   it('on the real content drops the 2014 to 2017 jobs and keeps the highlights', () => {
     const { jobs } = engineerOf(viewFor(realCV(), 'engineer', 'world', NOW))
-    expect(ids(jobs)).toEqual(['dba-staff', 'pearson', 'clutchprep', 'smoothterminal', 'dba-frontend'])
+    expect(ids(jobs)).toEqual(['dba-staff', 'pearson', 'clutchprep', 'smoothterminal'])
   })
 })
 
