@@ -1,0 +1,716 @@
+/*
+ * Mythic, the underworld escape: every look and every motion of the world except his sprite
+ * (sprite.module.css). Colours are the palette's --myth-* variables, set once on the root (paletteVars).
+ * Motion is transform and opacity only; shadows, borders and gradients are fixed, never animated. Each
+ * block names the component that uses it. Under prefers-reduced-motion every animation and transition
+ * is off and every reveal is in its final state (the components also pass their end state from the start).
+ */
+
+/* ---------------------------------------------------------------- page */
+
+.root {
+  background: var(--myth-hall-high);
+  color: var(--myth-bone);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+/* Carved inscriptional capitals for titles and buttons; the text face is Georgia. */
+.display {
+  font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.root :focus-visible {
+  outline: 3px solid var(--myth-gold-pale);
+  outline-offset: 3px;
+}
+
+/* A painted panel: near black lacquer, a gold edge and a thin inner gilt line. */
+.panel {
+  background: linear-gradient(180deg, var(--myth-panel) 0%, var(--myth-ink) 100%);
+  border: 2px solid var(--myth-gold-deep);
+  box-shadow: inset 0 0 0 4px var(--myth-panel), inset 0 0 0 5px var(--myth-gold-deep), 0 10px 30px rgb(0 0 0 / 45%);
+}
+
+/* Parchment: the codex and the prophecy tablet, dark ink on it. */
+.parchment {
+  background: linear-gradient(170deg, var(--myth-marble) 0%, var(--myth-marble-shade) 100%);
+  color: var(--myth-ink);
+  border: 2px solid var(--myth-gold-deep);
+  box-shadow: 0 10px 26px rgb(0 0 0 / 40%);
+}
+
+.hint {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-left: 3px solid var(--myth-gold);
+  background: rgb(0 0 0 / 55%);
+  color: var(--myth-bone);
+  font-size: 0.9375rem;
+  font-style: italic;
+}
+
+/* ---------------------------------------------------------------- the depths behind the page (depths.tsx) */
+
+.depths {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* One painted layer per region; the root's data-zone fades the one in view up. */
+.zone {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.1s ease;
+}
+
+.root[data-zone='hall'] .zoneHall,
+.root[data-zone='depths'] .zoneDepths,
+.root[data-zone='magma'] .zoneMagma,
+.root[data-zone='fields'] .zoneFields,
+.root[data-zone='temple'] .zoneTemple {
+  opacity: 1;
+}
+
+.zoneHall {
+  background: radial-gradient(ellipse at 50% 105%, var(--myth-pool) 0%, transparent 45%),
+    linear-gradient(180deg, var(--myth-hall-high) 0%, var(--myth-hall-low) 100%);
+}
+
+.zoneDepths {
+  background: radial-gradient(ellipse at 50% 30%, rgb(111 224 207 / 18%) 0%, transparent 55%),
+    linear-gradient(180deg, var(--myth-tart-high) 0%, var(--myth-tart-low) 100%);
+}
+
+.zoneMagma {
+  background: radial-gradient(ellipse at 50% 110%, var(--myth-magma) 0%, transparent 40%),
+    linear-gradient(180deg, var(--myth-asp-high) 0%, var(--myth-asp-low) 100%);
+}
+
+.zoneFields {
+  background: radial-gradient(ellipse at 50% -10%, var(--myth-ely-light) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-ely-high) 0%, var(--myth-ely-low) 100%);
+}
+
+.zoneTemple {
+  background: radial-gradient(ellipse at 50% 0%, rgb(255 178 122 / 35%) 0%, transparent 45%),
+    linear-gradient(180deg, var(--myth-styx-high) 0%, var(--myth-styx-low) 100%);
+}
+
+/* The far and near art of a region drift against the pointer at two depths. */
+.far {
+  transform: translate3d(calc(var(--mx, 0) * -8px), calc(var(--my, 0) * -4px), 0);
+}
+
+.near {
+  transform: translate3d(calc(var(--mx, 0) * -22px), calc(var(--my, 0) * -8px), 0);
+}
+
+/* Embers drifting up through every region. */
+.ember {
+  position: absolute;
+  bottom: -2rem;
+  left: var(--left);
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--myth-fire-core);
+  opacity: 0;
+  animation: ember-rise 9s linear infinite;
+  animation-delay: calc(var(--i) * -1.3s);
+}
+
+@keyframes ember-rise {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 0; }
+  10% { opacity: 0.9; }
+  70% { opacity: 0.6; }
+  100% { transform: translate3d(calc(var(--drift) * 1px), -110vh, 0) scale(0.4); opacity: 0; }
+}
+
+/* The braziers and soul lamps: the flame scales on its base. */
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flicker 0.9s ease-in-out infinite alternate;
+}
+
+@keyframes flicker {
+  0% { transform: scale(1, 1); }
+  50% { transform: scale(0.92, 1.12); }
+  100% { transform: scale(1.06, 0.94); }
+}
+
+/* ---------------------------------------------------------------- stage and section title (stage.tsx) */
+
+/* The title is carved into a gilded plate with a laurel each side. */
+.plate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 1.4rem 0.45rem;
+  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 45%, var(--myth-gold-deep) 100%);
+  color: var(--myth-ink);
+  border: 2px solid var(--myth-ink);
+  box-shadow: inset 0 0 0 2px var(--myth-gold-pale), 0 6px 0 var(--myth-ink);
+  clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 14px 100%, 0 50%);
+}
+
+/* Anything marked reveal rises in once when its stage first shows. */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 110ms);
+}
+
+[data-on] .reveal,
+[data-on].reveal {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------------------------------------------------------------- buttons (buttons.tsx) */
+
+.btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.15rem;
+  border: 2px solid var(--myth-ink);
+  font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', Georgia, serif;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 0 var(--myth-ink);
+  transition: transform 0.15s ease;
+  cursor: pointer;
+}
+
+.btn:hover { transform: translate3d(0, -2px, 0); }
+.btn:active { transform: translate3d(0, 3px, 0); }
+
+.btnGold {
+  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 60%, var(--myth-gold-deep) 100%);
+  color: var(--myth-ink);
+}
+
+.btnBlood {
+  background: linear-gradient(180deg, var(--myth-blood) 0%, var(--myth-terracotta-deep) 100%);
+  color: var(--myth-bone);
+  border-color: var(--myth-gold-deep);
+}
+
+.btnStone {
+  background: var(--myth-panel);
+  color: var(--myth-bone);
+  border-color: var(--myth-gold-deep);
+}
+
+/* ---------------------------------------------------------------- the rise from the pool (poolRise.tsx) */
+
+.hall {
+  min-height: 92vh;
+}
+
+/* The columns and braziers of the great hall, the pointer moves them (near). */
+.hallArt {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* He rises out of the pool: the riser starts sunk below the surface, the pool's lip hides his legs. */
+.riser {
+  transform: translate3d(0, 78%, 0);
+  transition: transform 1.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+[data-rise] .riser { transform: translate3d(0, 0, 0); }
+
+/* The blood streaming off him as he comes up: drops fall away while he rises. */
+.drip {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 7px;
+  height: 12px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: var(--myth-blood);
+  opacity: 0;
+}
+
+[data-rise]:not([data-done]) .drip {
+  animation: drip 1.1s ease-in both;
+  animation-delay: calc(0.35s + var(--i) * 0.14s);
+}
+
+@keyframes drip {
+  0% { opacity: 1; transform: translate3d(0, 0, 0); }
+  100% { opacity: 0; transform: translate3d(0, 90px, 0); }
+}
+
+/* The pool's surface rings out from him as he breaks it. */
+.ripple {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+[data-rise]:not([data-done]) .ripple {
+  animation: ripple 1.6s ease-out both;
+  animation-delay: calc(var(--i) * 0.3s);
+}
+
+@keyframes ripple {
+  0% { opacity: 0.9; transform: scale(0.3); }
+  100% { opacity: 0; transform: scale(1.5); }
+}
+
+/* The roar shakes the hall once. */
+[data-roar]:not([data-done]) .shake {
+  animation: shake 0.5s ease-in-out both;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-6px, 3px, 0); }
+  40% { transform: translate3d(5px, -3px, 0); }
+  60% { transform: translate3d(-4px, 2px, 0); }
+  80% { transform: translate3d(3px, -1px, 0); }
+}
+
+/* His name is struck onto the gilded plate, the headline unrolls under it, the rest follows. */
+.namePlate {
+  opacity: 0;
+  transform: scale(1.35);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+[data-name] .namePlate { opacity: 1; transform: none; }
+
+.scroll {
+  opacity: 0;
+  transform: scaleX(0.05);
+  transform-origin: 50% 50%;
+  transition: opacity 0.3s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+[data-title] .scroll { opacity: 1; transform: none; }
+
+.heroRest {
+  opacity: 0;
+  transform: translate3d(0, 14px, 0);
+  transition: opacity 0.6s ease 0.25s, transform 0.6s ease 0.25s;
+}
+
+[data-title] .heroRest { opacity: 1; transform: none; }
+
+/* His figure is a button in the hero: a click throws the chain combo. */
+.heroFigure {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------- the mirror (mirror.tsx) */
+
+.mirrorFrame {
+  background: linear-gradient(180deg, var(--myth-gold) 0%, var(--myth-gold-deep) 100%);
+  border: 2px solid var(--myth-ink);
+  border-radius: 9999px 9999px 0.5rem 0.5rem;
+  padding: 10px;
+}
+
+.glass {
+  border-radius: 9999px 9999px 0.25rem 0.25rem;
+  background: radial-gradient(ellipse at 50% 30%, var(--myth-darkness-deep) 0%, var(--myth-ink) 75%);
+  border: 2px solid var(--myth-ink);
+}
+
+/* A pick swirls darkness over the glass: the cloud turns and closes, then opens on the new reflection. */
+.swirl {
+  opacity: 0;
+  transform: rotate(0deg) scale(0.4);
+}
+
+.swirl[data-take] {
+  animation: swirl 0.9s ease-in-out both;
+}
+
+@keyframes swirl {
+  0% { opacity: 0; transform: rotate(0deg) scale(0.4); }
+  45% { opacity: 1; transform: rotate(200deg) scale(1.15); }
+  100% { opacity: 0; transform: rotate(360deg) scale(1.4); }
+}
+
+.reflection[data-take] {
+  animation: reflect 0.9s ease-in-out both;
+}
+
+@keyframes reflect {
+  0%, 30% { opacity: 1; }
+  45% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+/* A talent plate: stone when idle, its lit face (gold) when picked; a new pick turns it over. */
+.talent {
+  min-height: 44px;
+  cursor: pointer;
+  background: var(--myth-panel);
+  border: 2px solid var(--myth-gold-deep);
+  color: var(--myth-bone);
+  transition: transform 0.2s ease;
+}
+
+.talent:hover { transform: translate3d(0, -3px, 0); }
+
+.talent[aria-checked='true'] {
+  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 55%, var(--myth-gold-deep) 100%);
+  color: var(--myth-ink);
+  border-color: var(--myth-ink);
+}
+
+.talent[aria-checked='true'][data-turned] {
+  animation: turn-over 0.6s ease-in-out both;
+}
+
+@keyframes turn-over {
+  0% { transform: perspective(600px) rotateY(0deg); }
+  50% { transform: perspective(600px) rotateY(90deg); }
+  100% { transform: perspective(600px) rotateY(0deg); }
+}
+
+/* ---------------------------------------------------------------- chambers (chambers.tsx) */
+
+.counterCell {
+  background: rgb(0 0 0 / 50%);
+  border: 1px solid var(--myth-gold-deep);
+}
+
+.counterFill {
+  background: linear-gradient(180deg, var(--myth-gold-pale), var(--myth-gold));
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.5s ease;
+}
+
+.counterFill[data-on] { transform: scaleX(1); }
+
+/* The chamber's scene: bronze doors, a shade, him dashing in and cleaving it. */
+.chamberScene {
+  background: linear-gradient(180deg, var(--myth-tart-high) 0%, var(--myth-brick) 100%);
+  border-bottom: 2px solid var(--myth-gold-deep);
+}
+
+.shade {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+}
+
+[data-on] .shade {
+  animation: shade-life 1.8s ease-out both;
+}
+
+@keyframes shade-life {
+  0% { opacity: 0; transform: translate3d(0, 30px, 0); }
+  25% { opacity: 1; transform: translate3d(0, 0, 0); }
+  55% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  75% { opacity: 0; transform: translate3d(14px, -6px, 0) scale(1.4, 0.4); }
+  100% { opacity: 0; transform: translate3d(14px, -6px, 0) scale(1.4, 0.4); }
+}
+
+.dasher {
+  transform: translate3d(-120%, 0, 0);
+}
+
+[data-on] .dasher {
+  animation: dash 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both;
+}
+
+@keyframes dash {
+  0% { transform: translate3d(-120%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* The doors swing open on the chamber's hinge sides once it is cleared. */
+.doorLeft,
+.doorRight {
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 1.5s;
+}
+
+.doorLeft { transform-origin: 0 50%; }
+.doorRight { transform-origin: 100% 50%; }
+
+[data-on] .doorLeft,
+[data-on] .doorRight {
+  transform: scaleX(0.12);
+}
+
+.stamp {
+  opacity: 0;
+  transform: scale(2.2) rotate(-8deg);
+  transition: opacity 0.2s ease 1.25s, transform 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) 1.25s;
+}
+
+[data-on] .stamp {
+  opacity: 1;
+  transform: scale(1) rotate(-8deg);
+}
+
+/* Pointing at or focusing a chamber lights its laurel over the door. */
+.laurel {
+  opacity: 0.35;
+  transition: opacity 0.25s ease;
+}
+
+.chamber:hover .laurel,
+.chamber:focus-within .laurel {
+  opacity: 1;
+}
+
+.chamberText {
+  opacity: 0;
+  transition: opacity 0.6s ease 1.6s;
+}
+
+[data-on] .chamberText { opacity: 1; }
+
+/* ---------------------------------------------------------------- the boons (boons.tsx) */
+
+.orb {
+  animation: orb-pulse 2.8s ease-in-out infinite;
+}
+
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+.boon[data-rarity='common'] { --rarity: var(--myth-common); }
+.boon[data-rarity='rare'] { --rarity: var(--myth-rare); }
+.boon[data-rarity='epic'] { --rarity: var(--myth-epic); }
+.boon[data-rarity='heroic'] { --rarity: var(--myth-heroic); }
+
+/* Each wave of three comes out of the orb above the list, one after the other. */
+.boon {
+  opacity: 0;
+  transform: translate3d(0, -60px, 0) scale(0.8);
+  transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+  transition-delay: calc(var(--w) * 450ms + var(--k) * 120ms);
+}
+
+[data-on] .boon { opacity: 1; transform: none; }
+
+.boonFrame {
+  border: 3px solid var(--rarity);
+  background: linear-gradient(180deg, var(--myth-panel) 0%, var(--myth-ink) 100%);
+  box-shadow: inset 0 0 0 3px var(--myth-ink), inset 0 0 0 4px var(--rarity);
+}
+
+.rarityWord {
+  color: var(--rarity);
+}
+
+.sigil {
+  transition: transform 0.25s ease;
+}
+
+.sigilGlow {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.boon:hover .sigil,
+.boon:focus-within .sigil {
+  transform: scale(1.15) rotate(8deg);
+}
+
+.boon:hover .sigilGlow,
+.boon:focus-within .sigilGlow {
+  opacity: 1;
+}
+
+/* Choose: the sigil lifts off the card toward the tray and a copy lands in the tray. */
+.sigilFly {
+  animation: sigil-fly 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes sigil-fly {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(0, -160px, 0) scale(0.4); }
+}
+
+.trayLand {
+  animation: tray-land 0.45s cubic-bezier(0.3, 1.5, 0.5, 1) 0.45s both;
+}
+
+@keyframes tray-land {
+  0% { opacity: 0; transform: scale(0); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---------------------------------------------------------------- keepsakes (keepsakes.tsx) */
+
+.slot {
+  background: radial-gradient(ellipse at 50% 40%, var(--myth-crimson) 0%, var(--myth-blood-deep) 80%);
+  border: 2px solid var(--myth-gold-deep);
+  box-shadow: inset 0 6px 16px rgb(0 0 0 / 60%);
+}
+
+.keepsake {
+  transition: transform 0.35s cubic-bezier(0.3, 1.4, 0.5, 1);
+}
+
+.cabinetItem:hover .keepsake,
+.cabinetItem:focus-within .keepsake {
+  transform: translate3d(0, -12px, 0) rotate(-6deg) scale(1.08);
+}
+
+/* ---------------------------------------------------------------- portraits (portraits.tsx) */
+
+.portrait {
+  background: radial-gradient(ellipse at 50% 35%, var(--myth-ely-light) 0%, var(--myth-ely-low) 70%);
+  border: 3px solid var(--myth-gold);
+  box-shadow: inset 0 0 0 2px var(--myth-ink);
+}
+
+.dialogue {
+  background: rgb(10 5 8 / 88%);
+  border: 2px solid var(--myth-gold-deep);
+  border-top: 4px solid var(--myth-gold);
+}
+
+.bandCard {
+  transition: transform 0.2s ease;
+}
+
+.bandCard:hover,
+.bandCard:focus-within {
+  transform: translate3d(0, -4px, 0);
+}
+
+/* ---------------------------------------------------------------- the arena and the prophecies (prophecies.tsx) */
+
+.arena {
+  background: radial-gradient(ellipse at 50% 100%, var(--myth-ely-green) 0%, transparent 60%),
+    linear-gradient(180deg, var(--myth-ely-high) 0%, var(--myth-ely-low) 100%);
+  border: 2px solid var(--myth-gold-deep);
+}
+
+.strikeName {
+  animation: strike-call 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+}
+
+@keyframes strike-call {
+  0% { opacity: 0; transform: scale(1.8); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.fulfilled {
+  opacity: 0;
+  transform: scale(2) rotate(-10deg);
+  transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.3, 1.5, 0.5, 1);
+  transition-delay: calc(0.4s + var(--i) * 0.25s);
+}
+
+[data-on] .fulfilled {
+  opacity: 1;
+  transform: scale(1) rotate(-10deg);
+}
+
+/* ---------------------------------------------------------------- the last gate (gate.tsx) */
+
+.gateScene {
+  background: linear-gradient(180deg, var(--myth-styx-high) 0%, var(--myth-styx-low) 100%);
+  border: 2px solid var(--myth-gold-deep);
+}
+
+.dawn {
+  opacity: 0;
+  transition: opacity 1.2s ease 0.4s;
+}
+
+[data-open] .dawn { opacity: 1; }
+
+.gateLeft,
+.gateRight {
+  transition: transform 1.1s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.gateLeft { transform-origin: 0 50%; }
+.gateRight { transform-origin: 100% 50%; }
+
+[data-open] .gateLeft,
+[data-open] .gateRight {
+  transform: scaleX(0.1);
+}
+
+/* Once the gate is open he walks into the dawn and is gone. */
+.walker {
+  transition: transform 2.4s linear 0.6s, opacity 0.6s ease 2.6s;
+}
+
+[data-open] .walker {
+  transform: translate3d(0, -18%, 0) scale(0.55);
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .root *,
+  .root *::before,
+  .root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .ember,
+  .ripple,
+  .drip,
+  .swirl,
+  .shade,
+  .sigilFly {
+    opacity: 0 !important;
+  }
+
+  .riser,
+  .namePlate,
+  .scroll,
+  .heroRest,
+  .reveal,
+  .boon,
+  .dasher,
+  .chamberText,
+  .stamp,
+  .fulfilled,
+  .trayLand {
+    opacity: 1 !important;
+  }
+
+  .riser,
+  .namePlate,
+  .scroll,
+  .heroRest,
+  .reveal,
+  .boon,
+  .dasher {
+    transform: none !important;
+  }
+
+  .far,
+  .near {
+    transform: none !important;
+  }
+}

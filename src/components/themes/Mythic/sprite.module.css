@@ -1,0 +1,332 @@
+/*
+ * His sprite's motion (sprite.tsx): transform and opacity only. Every part turns round its own joint,
+ * given in the viewBox's units (transform-box: view-box), so a forearm inside an arm turns at the elbow
+ * wherever the shoulder has taken it. The kit classes set a profession's resting pose (the fighter's
+ * guard, the drummer's hilts over the drum); a motion class plays a cycle over it. Glows, arcs, the
+ * ring, the rune and the flames rest at opacity 0 and only show inside a motion.
+ */
+
+.sprite * {
+  transform-box: view-box;
+}
+
+.body { transform-origin: 90px 198px; }
+.chest { transform-origin: 84px 114px; }
+.head { transform-origin: 86px 56px; }
+.armBack { transform-origin: 51px 68px; }
+.foreBack { transform-origin: 49px 96px; }
+.armFront { transform-origin: 115px 68px; }
+.foreFront { transform-origin: 119px 96px; }
+.thighBack { transform-origin: 70px 128px; }
+.shinBack { transform-origin: 70px 160px; }
+.thighFront { transform-origin: 98px 128px; }
+.shinFront { transform-origin: 105px 158px; }
+.chain { transform-origin: 80px 118px; }
+.eyes { transform-origin: 92px 37px; }
+
+.rageGlow,
+.mouth,
+.ring,
+.arc1,
+.arc2,
+.arc3,
+.rune,
+.flameFront,
+.flameBack {
+  opacity: 0;
+}
+
+.ring { transform-box: fill-box; transform-origin: 50% 50%; }
+.rune { transform-origin: 128px 196px; }
+.flameFront { transform-origin: 145px 126px; }
+.flameBack { transform-origin: 122px 126px; }
+
+/* ---------------------------------------------------------------- resting poses per kit */
+
+/* the fighter's guard: fists up by the chin */
+.kitFists .armFront { transform: rotate(-35deg); }
+.kitFists .foreFront { transform: rotate(-140deg); }
+.kitFists .armBack { transform: rotate(-20deg); }
+.kitFists .foreBack { transform: rotate(-150deg); }
+
+/* the drummer's hilts held over the drum skin */
+.kitDrum .armFront { transform: rotate(-35deg); }
+.kitDrum .foreFront { transform: rotate(40deg); }
+.kitDrum .armBack { transform: rotate(-35deg); }
+.kitDrum .foreBack { transform: rotate(40deg); }
+
+/* ---------------------------------------------------------------- idle: breath, blink, the chains sway */
+
+.idle .chest { animation: breathe 3.4s ease-in-out infinite; }
+.idle .eyes { animation: blink 5s step-end infinite; }
+.idle .chain { animation: sway 2.6s ease-in-out infinite; }
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-1px) scaleY(1.018); }
+}
+
+@keyframes blink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* ---------------------------------------------------------------- walk: a heavy stride */
+
+.walk .body { animation: stride-bob 0.9s ease-in-out infinite; }
+.walk .thighBack { animation: stride-a 0.9s ease-in-out infinite; }
+.walk .thighFront { animation: stride-b 0.9s ease-in-out infinite; }
+.walk .armBack { animation: stride-b 0.9s ease-in-out infinite; }
+.walk .armFront { animation: stride-a 0.9s ease-in-out infinite; }
+
+@keyframes stride-a {
+  0%, 100% { transform: rotate(18deg); }
+  50% { transform: rotate(-18deg); }
+}
+
+@keyframes stride-b {
+  0%, 100% { transform: rotate(-18deg); }
+  50% { transform: rotate(18deg); }
+}
+
+@keyframes stride-bob {
+  0%, 50%, 100% { transform: translateY(0); }
+  25%, 75% { transform: translateY(-3px); }
+}
+
+/* ---------------------------------------------------------------- the chain combo (System Engineer)
+   forward slash with the front blade, back slash with the other, both raised and slammed; each swing
+   draws its chain arc for a beat, the slam burns the rune and lights the rage for a moment */
+
+.kitBlades.action .armFront { animation: combo-front 1.6s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.kitBlades.action .armBack { animation: combo-back 1.6s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.kitBlades.action .body { animation: combo-body 1.6s ease-in-out both; }
+.kitBlades.action .arc1 { animation: arc-one 1.6s linear both; }
+.kitBlades.action .arc2 { animation: arc-two 1.6s linear both; }
+.kitBlades.action .arc3 { animation: arc-three 1.6s linear both; }
+.kitBlades.action .rune { animation: rune 1.6s ease-out both; }
+.kitBlades.action .rageGlow { animation: slam-rage 1.6s ease-out both; }
+
+@keyframes combo-front {
+  0% { transform: rotate(0deg); }
+  12% { transform: rotate(150deg); }
+  26%, 40% { transform: rotate(-70deg); }
+  68% { transform: rotate(185deg); }
+  80%, 90% { transform: rotate(-40deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes combo-back {
+  0%, 26% { transform: rotate(0deg); }
+  38% { transform: rotate(140deg); }
+  52%, 58% { transform: rotate(-85deg); }
+  68% { transform: rotate(180deg); }
+  80%, 90% { transform: rotate(-35deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes combo-body {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  12% { transform: translate(-3px, 0) rotate(-3deg); }
+  26% { transform: translate(6px, 0) rotate(3deg); }
+  52% { transform: translate(8px, 0) rotate(2deg); }
+  68% { transform: translate(4px, -6px) rotate(-4deg); }
+  80% { transform: translate(8px, 5px) rotate(4deg); }
+}
+
+@keyframes arc-one {
+  0%, 20%, 36%, 100% { opacity: 0; transform: rotate(-8deg); }
+  24% { opacity: 1; transform: rotate(0deg); }
+}
+
+@keyframes arc-two {
+  0%, 46%, 62%, 100% { opacity: 0; transform: rotate(8deg); }
+  50% { opacity: 1; transform: rotate(0deg); }
+}
+
+@keyframes arc-three {
+  0%, 72%, 90%, 100% { opacity: 0; }
+  78% { opacity: 1; }
+}
+
+@keyframes rune {
+  0%, 78% { opacity: 0; transform: scale(0.4); }
+  82% { opacity: 1; transform: scale(1.1); }
+  92% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes slam-rage {
+  0%, 76%, 100% { opacity: 0; }
+  82%, 90% { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- the war drum (Musician): the hilts come
+   down in turn, fire bursts from the skin on each hit */
+
+.kitDrum.action .armFront { animation: drum-hit 0.64s cubic-bezier(0.5, 0, 0.3, 1) infinite; }
+.kitDrum.action .armBack { animation: drum-hit 0.64s cubic-bezier(0.5, 0, 0.3, 1) -0.32s infinite; }
+.kitDrum.action .flameFront { animation: drum-fire 0.64s ease-out infinite; }
+.kitDrum.action .flameBack { animation: drum-fire 0.64s ease-out -0.32s infinite; }
+
+@keyframes drum-hit {
+  0%, 100% { transform: rotate(-75deg); }
+  45% { transform: rotate(-35deg); }
+}
+
+@keyframes drum-fire {
+  0%, 40%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.1); }
+  80% { opacity: 0.4; transform: scale(1.25) translateY(-4px); }
+}
+
+/* ---------------------------------------------------------------- strikes (Martial Artist) */
+
+.knee .thighFront { animation: knee-thigh 0.75s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.knee .shinFront { animation: knee-shin 0.75s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.knee .body { animation: lean-in 0.75s ease-in-out both; }
+
+@keyframes knee-thigh {
+  0%, 100% { transform: rotate(0deg); }
+  35%, 60% { transform: rotate(-80deg); }
+}
+
+@keyframes knee-shin {
+  0%, 100% { transform: rotate(0deg); }
+  35%, 60% { transform: rotate(95deg); }
+}
+
+@keyframes lean-in {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  35%, 60% { transform: translate(6px, -4px) rotate(-5deg); }
+}
+
+.elbow .armFront { animation: elbow-upper 0.7s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.elbow .foreFront { animation: elbow-fore 0.7s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.elbow .body { animation: twist 0.7s ease-in-out both; }
+
+@keyframes elbow-upper {
+  0%, 100% { transform: rotate(-35deg); }
+  40%, 60% { transform: rotate(-105deg); }
+}
+
+@keyframes elbow-fore {
+  0%, 100% { transform: rotate(-140deg); }
+  40%, 60% { transform: rotate(170deg); }
+}
+
+@keyframes twist {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  40%, 60% { transform: translateX(8px) rotate(3deg); }
+}
+
+.kick .thighFront { animation: kick-thigh 0.85s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.kick .shinFront { animation: kick-shin 0.85s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.kick .body { animation: lean-back 0.85s ease-in-out both; }
+.kick .armBack { animation: counter-swing 0.85s ease-in-out both; }
+
+@keyframes kick-thigh {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-60deg); }
+  40%, 62% { transform: rotate(-98deg); }
+}
+
+@keyframes kick-shin {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(70deg); }
+  40%, 62% { transform: rotate(4deg); }
+}
+
+@keyframes lean-back {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  40%, 62% { transform: translate(-4px, 0) rotate(-9deg); }
+}
+
+@keyframes counter-swing {
+  0%, 100% { transform: rotate(-20deg); }
+  40%, 62% { transform: rotate(40deg); }
+}
+
+/* the fighter's own action: knee, elbow, kick in one string */
+.kitFists.action .thighFront { animation: string-thigh 2.1s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.kitFists.action .shinFront { animation: string-shin 2.1s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.kitFists.action .armFront { animation: string-upper 2.1s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.kitFists.action .foreFront { animation: string-fore 2.1s cubic-bezier(0.3, 0, 0.2, 1) both; }
+
+@keyframes string-thigh {
+  0%, 30%, 64%, 100% { transform: rotate(0deg); }
+  12%, 20% { transform: rotate(-80deg); }
+  76%, 86% { transform: rotate(-98deg); }
+}
+
+@keyframes string-shin {
+  0%, 30%, 64%, 100% { transform: rotate(0deg); }
+  12%, 20% { transform: rotate(95deg); }
+  70% { transform: rotate(70deg); }
+  76%, 86% { transform: rotate(4deg); }
+}
+
+@keyframes string-upper {
+  0%, 30%, 60%, 100% { transform: rotate(-35deg); }
+  42%, 50% { transform: rotate(-105deg); }
+}
+
+@keyframes string-fore {
+  0%, 30%, 60%, 100% { transform: rotate(-140deg); }
+  42%, 50% { transform: rotate(170deg); }
+}
+
+/* ---------------------------------------------------------------- the roar: head back, mouth open, the
+   tattoo and the eyes lit, arms flexed out, a shockwave ring leaving him */
+
+.roar .head { animation: roar-head 1.3s ease-out both; }
+.roar .mouth { animation: roar-glow 1.3s ease-out both; }
+.roar .rageGlow { animation: roar-glow 1.3s ease-out both; }
+.roar .ring { animation: roar-ring 1.3s ease-out both; }
+.roar .armFront { animation: flex-front 1.3s ease-out both; }
+.roar .armBack { animation: flex-back 1.3s ease-out both; }
+.roar .body { animation: roar-body 1.3s ease-out both; }
+
+@keyframes roar-head {
+  0%, 100% { transform: rotate(0deg); }
+  15%, 75% { transform: rotate(-9deg); }
+}
+
+@keyframes roar-glow {
+  0%, 100% { opacity: 0; }
+  12%, 80% { opacity: 1; }
+}
+
+@keyframes roar-ring {
+  0%, 15% { opacity: 0; transform: scale(0.3); }
+  25% { opacity: 0.9; }
+  75%, 100% { opacity: 0; transform: scale(1.6); }
+}
+
+@keyframes flex-front {
+  0%, 100% { transform: rotate(0deg); }
+  15%, 75% { transform: rotate(-40deg); }
+}
+
+@keyframes flex-back {
+  0%, 100% { transform: rotate(0deg); }
+  15%, 75% { transform: rotate(35deg); }
+}
+
+@keyframes roar-body {
+  0%, 100% { transform: translateY(0); }
+  12% { transform: translateY(3px); }
+  20%, 75% { transform: translateY(-2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite *,
+  .sprite {
+    animation: none !important;
+  }
+}

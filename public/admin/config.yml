@@ -488,6 +488,37 @@ collections:
                   - { <<: *text, label: "Light hint", name: lightHint }
                   - { <<: *text, label: "Flip gravity", name: flipGravity }
                   - { <<: *text, label: "Spring the trap", name: springTrap }
+              - label: Underworld world (mythic)
+                name: myth
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Hero combo button", name: combo }
+                  - { <<: *text, label: "Hero combo hint", name: comboHint }
+                  - { <<: *text, label: "Mirror hint", name: mirrorHint }
+                  - { <<: *text, label: "Chamber number", name: chamberOf, hint: 'Keep {number}' }
+                  - { <<: *text, label: "Chamber cleared", name: chamberCleared }
+                  - { <<: *text, label: "Chambers cleared counter", name: chambersCleared, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Door hint", name: doorHint }
+                  - { <<: *text, label: "Rarity heroic", name: rarityHeroic }
+                  - { <<: *text, label: "Choose", name: choose }
+                  - { <<: *text, label: "Chosen", name: chosen }
+                  - { <<: *text, label: "Choose boon", name: chooseBoon, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Boon tray", name: boonTray }
+                  - { <<: *text, label: "Boon counter", name: boonCount, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Boon hint", name: boonHint }
+                  - { <<: *text, label: "Keepsake hint", name: keepsakeHint }
+                  - { <<: *text, label: "Drum hint", name: drumHint }
+                  - { <<: *text, label: "Prophecy fulfilled stamp", name: fulfilled }
+                  - { <<: *text, label: "Strike button", name: strike }
+                  - { <<: *text, label: "Strike hint", name: strikeHint }
+                  - { <<: *text, label: "Strike knee", name: strikeKnee }
+                  - { <<: *text, label: "Strike elbow", name: strikeElbow }
+                  - { <<: *text, label: "Strike kick", name: strikeKick }
+                  - { <<: *text, label: "Strike roar", name: strikeRoar }
+                  - { <<: *text, label: "Open the gate", name: openGate }
+                  - { <<: *text, label: "Gate open status", name: gateOpen }
+                  - { <<: *text, label: "Return to the house", name: returnHouse }
               - label: Night house world (survival horror)
                 name: horror
                 widget: object
