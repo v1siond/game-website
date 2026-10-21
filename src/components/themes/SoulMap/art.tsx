@@ -1,309 +1,61 @@
-'use client'
+import { SOUL } from './palette'
 
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { COLORS } from './palette'
+// Soul Map's own drawings, used across the page and the scenes: the rest point where he stops (a carved
+// stone seat under a hanging lantern), a crystal cluster from the cavern walls, the map room glyph that
+// marks a heading, and the glowing path that breaks one section from the next.
 
-// Praise the Sun gesture silhouette
-export function PraiseTheSun({ size = 80, className = '' }: { size?: number; className?: string }) {
+// The rest point: a stone seat with a lantern on its post. `lit` is the lantern's light, a class so a
+// scene can bring it up with progress; a static place passes a plain opacity class.
+export function RestPoint({ className = '', lit = 'opacity-100' }: { className?: string; lit?: string }) {
   return (
-    <div
-      className={`relative ${className}`}
-      style={{ width: size, height: size }}
-      role="img"
-      aria-label="Praise the Sun gesture - iconic Dark Souls pose"
-    >
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        {/* Sun rays */}
-        <g className="animate-sun-pulse" style={{ transformOrigin: '50px 25px' }}>
-          {[...Array(8)].map((_, i) => (
-            <line
-              key={i}
-              x1="50"
-              y1="25"
-              x2={50 + Math.cos((i * Math.PI) / 4) * 18}
-              y2={25 + Math.sin((i * Math.PI) / 4) * 18}
-              stroke={COLORS.gold}
-              strokeWidth="2"
-              opacity="0.6"
-            />
-          ))}
-          <circle cx="50" cy="25" r="10" fill={COLORS.gold} opacity="0.8" />
-        </g>
-        {/* Knight silhouette - arms raised */}
-        <g fill={COLORS.ash}>
-          {/* Head */}
-          <ellipse cx="50" cy="45" rx="6" ry="7" />
-          {/* Body */}
-          <path d="M42 52 L50 75 L58 52 Z" />
-          {/* Left arm raised */}
-          <path d="M43 55 L28 35 L32 33 L45 50 Z" />
-          {/* Right arm raised */}
-          <path d="M57 55 L72 35 L68 33 L55 50 Z" />
-          {/* Legs */}
-          <path d="M46 72 L44 95 L48 95 L50 78 L52 95 L56 95 L54 72 Z" />
-        </g>
+    <svg viewBox="0 0 60 60" className={className} aria-hidden="true" focusable="false">
+      <circle cx={42} cy={20} r={16} fill={SOUL.lantern} opacity={0.18} className={lit} />
+      <rect x={40} y={10} width={3} height={46} fill={SOUL.rockLight} />
+      <path d="M36 14 H48 L46 28 H38 Z" fill={SOUL.rock} stroke={SOUL.ridge} strokeWidth={1} />
+      <rect x={39} y={17} width={6} height={8} rx={1} fill={SOUL.lantern} className={lit} />
+      <path d="M4 44 Q4 38 10 38 H32 Q36 38 36 44 V48 H4 Z" fill={SOUL.rockLight} />
+      <rect x={6} y={48} width={6} height={10} fill={SOUL.rock} />
+      <rect x={28} y={48} width={6} height={10} fill={SOUL.rock} />
+      <rect x={0} y={57} width={60} height={3} fill={SOUL.ridge} />
+    </svg>
+  )
+}
+
+// A crystal cluster, three shards from one root.
+export function Crystal({ className = '', color = SOUL.glow }: { className?: string; color?: string }) {
+  return (
+    <svg viewBox="0 0 30 40" className={className} aria-hidden="true" focusable="false">
+      <path d="M15 2 L21 26 L15 38 L9 26 Z" fill={color} />
+      <path d="M15 2 L15 38 L9 26 Z" fill={SOUL.glowDeep} opacity={0.6} />
+      <path d="M5 16 L10 30 L6 38 L1 30 Z" fill={color} opacity={0.75} />
+      <path d="M25 20 L29 32 L25 38 L21 32 Z" fill={color} opacity={0.75} />
+    </svg>
+  )
+}
+
+// A heading's mark: a lit map room with its two doors.
+export function RoomGlyph({ color = SOUL.glow }: { color?: string }) {
+  return (
+    <svg viewBox="0 0 24 16" className="h-4 w-6 flex-shrink-0" aria-hidden="true" focusable="false">
+      <rect x={5} y={2} width={14} height={12} fill="none" stroke={color} strokeWidth={1.5} />
+      <rect x={8} y={5} width={8} height={6} fill={color} opacity={0.5} />
+      <path d="M0 8 H5 M19 8 H24" stroke={color} strokeWidth={1.5} />
+    </svg>
+  )
+}
+
+// The path between two sections: a glowing trail across the cavern floor, a rest point in the middle,
+// unexplored rooms dimming at both ends.
+export function PathBreak() {
+  return (
+    <div className="relative mx-auto my-10 h-16 max-w-3xl" aria-hidden="true">
+      <svg viewBox="0 0 400 60" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" focusable="false">
+        <rect x={6} y={22} width={34} height={22} fill="none" stroke={SOUL.rock} strokeWidth={1.5} strokeDasharray="3 3" />
+        <rect x={360} y={22} width={34} height={22} fill="none" stroke={SOUL.rock} strokeWidth={1.5} strokeDasharray="3 3" />
+        <path d="M40 33 H360" stroke={SOUL.glowDeep} strokeWidth={4} opacity={0.35} />
+        <path d="M40 33 H360" stroke={SOUL.glow} strokeWidth={1.5} />
       </svg>
-      {/* Glow effect */}
-      <div
-        className="absolute inset-0 rounded-full"
-        style={{
-          background: `radial-gradient(circle at 50% 25%, ${COLORS.gold}40 0%, transparent 50%)`,
-        }}
-        aria-hidden="true"
-      />
-    </div>
-  )
-}
-
-// Animated Bonfire component - enhanced with more realistic flames
-export function Bonfire({ size = 'normal', label }: { size?: 'small' | 'normal' | 'large'; label?: string }) {
-  const scales = { small: 0.5, normal: 1, large: 1.5 }
-  const scale = scales[size]
-  const prefersReducedMotion = useReducedMotion()
-
-  return (
-    <div
-      className="relative"
-      style={{ transform: `scale(${scale})` }}
-      role="img"
-      aria-label={label || 'Bonfire checkpoint'}
-    >
-      {/* Coiled sword in ground */}
-      <div
-        className="absolute -top-14 left-1/2 -translate-x-1/2 w-2 h-16"
-        style={{
-          background: `linear-gradient(to bottom, #aaa, #666 30%, #444)`,
-          boxShadow: '0 0 5px rgba(0,0,0,0.8)',
-          clipPath: 'polygon(30% 0, 70% 0, 60% 100%, 40% 100%)',
-        }}
-        aria-hidden="true"
-      >
-        {/* Sword crossguard - curved like coiled sword */}
-        <div
-          className="absolute top-2 left-1/2 -translate-x-1/2 w-10 h-3"
-          style={{
-            background: `linear-gradient(to bottom, #777, #555)`,
-            borderRadius: '0 0 50% 50%',
-          }}
-        />
-        {/* Sword handle wrap */}
-        <div
-          className="absolute -top-4 left-1/2 -translate-x-1/2 w-2 h-5"
-          style={{ background: '#442211' }}
-        />
-      </div>
-
-      {/* Fire base container */}
-      <div className="relative w-20 h-16">
-        {/* Main flames - more organic shapes */}
-        {[...Array(7)].map((_, i) => (
-          <div
-            key={i}
-            className={prefersReducedMotion ? '' : 'animate-flame'}
-            style={{
-              position: 'absolute',
-              bottom: '8px',
-              left: `${5 + i * 12}%`,
-              width: `${14 + Math.sin(i) * 6}px`,
-              height: `${24 + Math.cos(i * 2) * 16}px`,
-              background: `linear-gradient(to top,
-                ${COLORS.darksign} 0%,
-                ${COLORS.bonfire} 30%,
-                ${COLORS.ember} 60%,
-                ${COLORS.gold} 85%,
-                transparent 100%
-              )`,
-              borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
-              animationDelay: `${i * 0.12}s`,
-              filter: 'blur(0.5px)',
-              opacity: 0.95,
-            }}
-            aria-hidden="true"
-          />
-        ))}
-
-        {/* Inner bright core */}
-        <div
-          className="absolute bottom-2 left-1/2 -translate-x-1/2 w-8 h-6"
-          style={{
-            background: `radial-gradient(ellipse at 50% 80%, ${COLORS.gold}, ${COLORS.ember} 50%, transparent 80%)`,
-            filter: 'blur(2px)',
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Rising embers */}
-        {!prefersReducedMotion && [...Array(12)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 rounded-full animate-ember"
-            style={{
-              left: `${25 + Math.random() * 50}%`,
-              bottom: '40%',
-              background: i % 3 === 0 ? COLORS.gold : i % 2 === 0 ? COLORS.bonfire : COLORS.ember,
-              animationDelay: `${i * 0.25}s`,
-              boxShadow: `0 0 4px ${COLORS.bonfire}`,
-            }}
-            aria-hidden="true"
-          />
-        ))}
-
-        {/* Ambient glow */}
-        <div
-          className="absolute -inset-8"
-          style={{
-            background: `radial-gradient(ellipse at 50% 80%, ${COLORS.bonfire}60, ${COLORS.darksign}30 40%, transparent 70%)`,
-            filter: 'blur(8px)',
-          }}
-          aria-hidden="true"
-        />
-      </div>
-
-      {/* Coal/ash base */}
-      <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-24 h-5 rounded-full"
-        style={{
-          background: `radial-gradient(ellipse, #331100, #1a0800 60%, #0a0400)`,
-          boxShadow: `inset 0 2px 8px ${COLORS.darksign}40`,
-        }}
-        aria-hidden="true"
-      />
-    </div>
-  )
-}
-
-// Estus Flask - enhanced
-export function EstusFlask({ charges = 5, maxCharges = 5 }: { charges?: number; maxCharges?: number }) {
-  const prefersReducedMotion = useReducedMotion()
-
-  return (
-    <div
-      className="flex items-center gap-2"
-      role="status"
-      aria-label={`Estus Flask: ${charges} of ${maxCharges} charges`}
-    >
-      <div className="relative w-8 h-14">
-        {/* Flask body - more rounded like actual Estus */}
-        <div
-          className="absolute bottom-0 w-full h-11 rounded-b-xl rounded-t-lg"
-          style={{
-            background: `linear-gradient(to right, #4a3520, #6b4c30, #4a3520)`,
-            border: '2px solid #3a2810',
-            boxShadow: 'inset 0 0 8px rgba(0,0,0,0.5)',
-          }}
-          aria-hidden="true"
-        />
-        {/* Flask neck */}
-        <div
-          className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-5 rounded-t-lg"
-          style={{
-            background: `linear-gradient(to right, #3a2810, #4a3520, #3a2810)`,
-          }}
-          aria-hidden="true"
-        />
-        {/* Cork */}
-        <div
-          className="absolute -top-1 left-1/2 -translate-x-1/2 w-3 h-2 rounded-t"
-          style={{ background: '#2a1808' }}
-          aria-hidden="true"
-        />
-        {/* Liquid */}
-        <div
-          className={`absolute bottom-1 left-1 right-1 rounded-b-lg ${!prefersReducedMotion ? 'animate-liquid-glow' : ''}`}
-          style={{
-            height: `${(charges / maxCharges) * 75}%`,
-            background: `linear-gradient(to top, ${COLORS.darksign}, ${COLORS.bonfire}, ${COLORS.ember})`,
-            boxShadow: `0 0 12px ${COLORS.bonfire}, inset 0 0 12px ${COLORS.gold}80`,
-          }}
-          aria-hidden="true"
-        />
-      </div>
-      <span className="text-sm font-bold" style={{ color: COLORS.bonfire }}>
-        {charges}/{maxCharges}
-      </span>
-    </div>
-  )
-}
-
-// Darksign - Sun eclipse symbol - enhanced
-export function Darksign({ size = 40 }: { size?: number }) {
-  const prefersReducedMotion = useReducedMotion()
-
-  return (
-    <div
-      className="relative"
-      style={{ width: size, height: size }}
-      role="img"
-      aria-label="Darksign - mark of the undead"
-    >
-      {/* Outer ring - dark flame corona */}
-      <div
-        className={prefersReducedMotion ? '' : 'animate-darksign-pulse'}
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: '50%',
-          background: `radial-gradient(circle,
-            transparent 35%,
-            ${COLORS.darksign} 45%,
-            ${COLORS.bonfire} 50%,
-            ${COLORS.blood} 60%,
-            #330000 70%,
-            transparent 78%
-          )`,
-          boxShadow: `0 0 25px ${COLORS.darksign}50, inset 0 0 20px ${COLORS.darksign}30`,
-        }}
-        aria-hidden="true"
-      />
-      {/* Inner dark circle - the hollow sun */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '20%',
-          left: '20%',
-          right: '20%',
-          bottom: '20%',
-          borderRadius: '50%',
-          background: `radial-gradient(circle at 35% 35%, #1a1a1a, ${COLORS.humanity})`,
-          boxShadow: 'inset 0 0 12px rgba(0,0,0,0.9)',
-        }}
-        aria-hidden="true"
-      />
-    </div>
-  )
-}
-// Sword stuck in ground - rest point marker
-export function SwordMarker() {
-  return (
-    <div className="relative w-6 h-16" role="img" aria-label="Bonfire sword marker">
-      {/* Blade */}
-      <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-10"
-        style={{
-          background: `linear-gradient(to bottom, #ddd, #999 20%, #777)`,
-          boxShadow: '0 0 5px rgba(0,0,0,0.5)',
-          clipPath: 'polygon(30% 0, 70% 0, 55% 100%, 45% 100%)',
-        }}
-        aria-hidden="true"
-      />
-      {/* Crossguard */}
-      <div
-        className="absolute top-8 left-1/2 -translate-x-1/2 w-6 h-1.5 rounded"
-        style={{ background: `linear-gradient(to bottom, #666, ${COLORS.ash})` }}
-        aria-hidden="true"
-      />
-      {/* Handle */}
-      <div
-        className="absolute top-9 left-1/2 -translate-x-1/2 w-1.5 h-4"
-        style={{ background: '#3a2211' }}
-        aria-hidden="true"
-      />
-      {/* Pommel */}
-      <div
-        className="absolute top-12 left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full"
-        style={{ background: `linear-gradient(135deg, #444, #222)` }}
-        aria-hidden="true"
-      />
+      <RestPoint className="absolute left-1/2 top-0 h-14 w-14 -translate-x-1/2" />
     </div>
   )
 }

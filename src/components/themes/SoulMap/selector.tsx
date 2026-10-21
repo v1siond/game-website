@@ -1,149 +1,69 @@
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import type { Profession } from '@/lib/cv/professions'
-import { COLORS } from './palette'
-import { Bonfire, SwordMarker } from './art'
+import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
+import { HeroCharacter } from './character'
+import { RestPoint } from './art'
+import world from './world.module.css'
 
-// Zone/Room node on the map - Dark Souls bonfire style
-type Direction = 'up' | 'down' | 'left' | 'right'
+// The profession switch drawn as the world map: each profession is a zone, a room with him inside in
+// that zone's costume, joined to its neighbours by glowing paths. The picked zone is lit with its rest
+// point under it, a zone already visited stays drawn, one never visited waits under fog. The small map
+// in the corner repeats the same three rooms.
 
-// Each zone keeps its own colour, a short plain sublabel and the stone paths to its neighbours. The
-// switch lays the zones out Musician, System Engineer, Martial Artist, so the engineer zone is the hub.
-export const ZONES: Record<Profession, { color: string; description: string; connections: Direction[] }> = {
-  drummer: { color: '#9966ff', description: 'Drums', connections: ['right'] },
-  engineer: { color: COLORS.bonfire, description: 'Software', connections: ['left', 'right'] },
-  fighter: { color: '#ff4444', description: 'Muay Thai', connections: ['left'] },
+export type ZoneState = 'lit' | 'explored' | 'fogged'
+
+// Each zone's accent, as a literal class so the build generates all three.
+const ZONE_ACCENT: Record<Profession, string> = {
+  drummer: '[--zone:var(--soul-rose)]',
+  engineer: '[--zone:var(--soul-moss)]',
+  fighter: '[--zone:var(--soul-ember)]',
 }
 
-export const CONNECTION_PLACEMENT: Record<Direction, string> = {
-  up: '-top-[30px] left-1/2 w-[3px] h-[30px] -translate-x-1/2',
-  down: '-bottom-[30px] left-1/2 w-[3px] h-[30px] -translate-x-1/2',
-  left: '-left-[30px] top-1/2 w-[30px] h-[3px] -translate-y-1/2',
-  right: '-right-[30px] top-1/2 w-[30px] h-[3px] -translate-y-1/2',
+const ZONE_LOOK: Record<ZoneState, { room: string; figure: string }> = {
+  lit: { room: world.zoneLit, figure: 'opacity-100' },
+  explored: { room: `${world.zoneExplored} hover:border-[var(--soul-glow-deep)]`, figure: 'opacity-70' },
+  fogged: { room: `${world.zoneFogged} hover:border-[var(--soul-rock-light)]`, figure: 'opacity-30' },
 }
 
-export function ZoneNode({ option, isExplored }: { option: ProfessionOption; isExplored: boolean }) {
-  const { id, label, selected: isActive, optionProps } = option
-  const zone = ZONES[id]
+export const zoneState = (selected: boolean, explored: boolean): ZoneState => {
+  if (selected) return 'lit'
+  return explored ? 'explored' : 'fogged'
+}
+
+// The path to the next zone on the map, drawn from each zone but the last.
+const hasPathRight = (id: Profession) => PROFESSION_ORDER.indexOf(id) < PROFESSION_ORDER.length - 1
+
+export function ZoneNode({ option, state }: { option: ProfessionOption; state: ZoneState }) {
+  const { id, label, optionProps } = option
+  const look = ZONE_LOOK[state]
 
   return (
-    <button
-      type="button"
-      {...optionProps}
-      className={`relative transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6a00] ${
-        isActive ? 'scale-110 z-20' : 'hover:scale-105 opacity-80 hover:opacity-100'
-      }`}
-    >
-      {/* Connection lines - ancient stone paths */}
-      {zone.connections.map((direction) => (
-        <div
-          key={direction}
-          className={`absolute ${CONNECTION_PLACEMENT[direction]}`}
-          style={{
-            background: `linear-gradient(${direction === 'left' || direction === 'right' ? '90deg' : '180deg'}, transparent, ${COLORS.ash}80, transparent)`,
-          }}
-          aria-hidden="true"
-        />
-      ))}
-
-      {/* Zone container - gothic stone frame */}
-      <div
-        className="w-36 h-24 flex flex-col items-center justify-center relative"
-        style={{
-          background: isActive
-            ? `radial-gradient(ellipse at 50% 80%, ${zone.color}30, ${COLORS.stone} 70%)`
-            : isExplored
-            ? `linear-gradient(180deg, ${COLORS.stone}, #151015)`
-            : '#0a0808',
-          border: `2px solid ${isActive ? zone.color : isExplored ? '#2a2025' : '#151015'}`,
-          boxShadow: isActive
-            ? `0 0 40px ${zone.color}30, inset 0 0 30px ${zone.color}15`
-            : 'inset 0 0 20px rgba(0,0,0,0.5)',
-        }}
-        aria-hidden="true"
-      >
-        {/* Mini bonfire when active */}
-        {isActive && (
-          <div className="absolute -top-8">
-            <Bonfire size="small" />
-          </div>
-        )}
-
-        {/* Zone icon - sword marker when not active */}
-        {!isActive && isExplored && (
-          <div className="absolute -top-10 scale-50">
-            <SwordMarker />
-          </div>
-        )}
-
-        <span
-          className="text-sm tracking-[0.15em] font-bold mt-2 uppercase text-center leading-tight"
-          style={{ color: isActive ? zone.color : '#8a8070' }}
-        >
-          {label}
-        </span>
-        <span className="text-sm tracking-wider mt-1" style={{ color: isActive ? '#bbb' : '#777' }}>
-          {zone.description}
-        </span>
-      </div>
-
-      {/* Rest at bonfire prompt */}
-      {isActive && (
-        <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap" aria-hidden="true">
-          <span className="text-sm tracking-widest animate-pulse" style={{ color: `${COLORS.bonfire}80` }}>
-            BONFIRE LIT
-          </span>
-        </div>
-      )}
+    <button type="button" {...optionProps} className={`relative w-full sm:w-44 ${ZONE_ACCENT[id]}`}>
+      {hasPathRight(id) && <span className={`absolute -right-3 top-1/2 hidden h-[3px] w-3 sm:-right-8 sm:block sm:w-8 ${world.zonePath}`} aria-hidden="true" />}
+      <span className={`relative flex flex-col items-center px-2 pb-3 pt-2 ${look.room}`}>
+        <HeroCharacter profession={id} className={`h-20 w-14 sm:h-28 sm:w-20 ${look.figure}`} />
+        <span className={`mt-1 block text-sm uppercase leading-tight text-[var(--soul-text)] ${world.lettering}`}>{label}</span>
+      </span>
+      {state === 'lit' && <RestPoint className="absolute -bottom-7 left-1/2 h-8 w-8 -translate-x-1/2" />}
     </button>
   )
 }
 
-// Mini-map component - Dark Souls style. The middle row is the zone row: Musician, System Engineer,
-// Martial Artist, the order the switch lays them out.
-export const MINI_MAP_CELL: Record<Profession, number> = { drummer: 3, engineer: 4, fighter: 5 }
-export const MINI_MAP_AREAS = ['', '', '', 'Musician', 'System Engineer', 'Martial Artist', '', '', '']
+const HUD_CELL: Record<ZoneState, string> = {
+  lit: 'bg-[var(--soul-lantern)] border-[var(--soul-lantern)]',
+  explored: 'bg-[var(--soul-glow-deep)] border-[var(--soul-glow)]',
+  fogged: 'bg-[var(--soul-abyss)] border-[var(--soul-rock)] border-dashed',
+}
 
-export function MiniMap({ active }: { active: Profession }) {
-  const currentCell = MINI_MAP_CELL[active]
-
+// The corner map: the three zones in the switch's order, the current one lit.
+export function ZoneHud({ stateOf }: { stateOf: (id: Profession) => ZoneState }) {
   return (
-    <div
-      className="fixed bottom-6 right-6 p-3 z-30"
-      style={{
-        background: `linear-gradient(180deg, ${COLORS.stone}ee, #05050899)`,
-        border: `2px solid ${COLORS.ash}`,
-        boxShadow: '0 0 20px rgba(0,0,0,0.8)',
-      }}
-      aria-hidden="true"
-    >
-      <div className="text-sm tracking-widest mb-2 text-center" style={{ color: '#888070' }}>
-        LORDRAN
-      </div>
-      <div className="grid grid-cols-3 gap-1">
-        {MINI_MAP_AREAS.map((area, cell) => {
-          const isCurrent = cell === currentCell
-          return (
-            <div
-              key={cell}
-              title={area || undefined}
-              className="w-4 h-4 relative"
-              style={{
-                background: isCurrent
-                  ? `radial-gradient(circle, ${COLORS.bonfire}, ${COLORS.darksign}80)`
-                  : '#1a1815',
-                boxShadow: isCurrent ? `0 0 10px ${COLORS.bonfire}60` : 'none',
-                border: `1px solid ${COLORS.ash}`,
-              }}
-            >
-              {isCurrent && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
+    <div className={`fixed bottom-4 right-4 z-30 hidden items-center p-2 sm:flex ${world.room}`} aria-hidden="true">
+      {PROFESSION_ORDER.map((id, i) => (
+        <span key={id} className="flex items-center">
+          {i > 0 && <span className={`block h-[2px] w-3 ${world.zonePath}`} />}
+          <span className={`block h-4 w-5 border ${HUD_CELL[stateOf(id)]}`} />
+        </span>
+      ))}
     </div>
   )
 }

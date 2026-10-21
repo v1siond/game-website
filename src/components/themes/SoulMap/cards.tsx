@@ -2,208 +2,59 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobYears } from '@/components/cv/sectionText'
-import { COLORS } from './palette'
-import { Darksign } from './art'
+import { RoomGlyph } from './art'
+import { SOUL } from './palette'
+import world from './world.module.css'
 
-// Save room style project card - bonfire checkpoint with his role, the years, the result and the links
-export function SaveRoomCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
-  return (
-    <article
-      className="h-full p-4 group transition-all relative overflow-hidden"
-      style={{
-        background: `linear-gradient(180deg, #12100f, #0a0908)`,
-        border: `1px solid ${COLORS.ash}`,
-      }}
-    >
-      {/* Ember glow on hover */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-        style={{
-          background: `radial-gradient(ellipse at 50% 100%, ${COLORS.bonfire}10, transparent 70%)`,
-        }}
-        aria-hidden="true"
-      />
+// The cards each section lists, drawn as the rooms and finds of the cavern map: a job is a room with its
+// years on the wall, a project or a band a find with its links as doors out.
 
-      {/* Save point indicator - small ember */}
-      <div className="flex items-center gap-2 mb-1 relative">
-        <div
-          className="w-3 h-3 rounded-full flex-shrink-0"
-          style={{
-            background: project.featured
-              ? `radial-gradient(circle, ${COLORS.gold}, ${COLORS.bonfire})`
-              : `radial-gradient(circle, #666, ${COLORS.ash})`,
-            boxShadow: project.featured ? `0 0 10px ${COLORS.bonfire}60` : 'none',
-          }}
-          aria-hidden="true"
-        />
-        <h3 className="text-sm tracking-wide" style={{ color: project.featured ? '#ffaa66' : '#c0b0a0' }}>
-          {project.name}
-        </h3>
-      </div>
-      <p className="text-sm mb-2 relative" style={{ color: COLORS.ember }}>
-        {project.role}
-        {years && <span aria-hidden="true"> | </span>}
-        {years}
-      </p>
-      <p className="text-sm mb-2 leading-relaxed relative" style={{ color: '#a09080' }}>
-        {project.tagline}
-      </p>
-      {project.impact && (
-        <p className="text-sm mb-3 leading-relaxed relative" style={{ color: '#b0a090' }}>
-          {project.impact}
-        </p>
-      )}
-      <div className="flex gap-1 flex-wrap mb-3 relative">
-        {project.techStack.map((tech) => (
-          <span
-            key={tech}
-            className="text-sm px-2 py-0.5 tracking-wide"
-            style={{ background: '#1a1815', color: '#a09080', border: `1px solid ${COLORS.ash}` }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-      <div className="flex flex-wrap gap-2 relative">
-        {links.map(({ kind, label, linkProps }) => (
-          <a
-            key={kind}
-            {...linkProps}
-            className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.15em] uppercase transition-all hover:bg-[#1a1815] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6a00] border border-[#ff6a00]/40 text-[#ff8c42] bg-[#252321]"
-          >
-            {label}
-          </a>
-        ))}
-      </div>
-    </article>
-  )
+const BODY = 'text-sm leading-relaxed text-[var(--soul-text-soft)]'
+const NAME = `text-lg uppercase text-[var(--soul-text)] ${world.lettering}`
+const DOOR = `inline-flex min-h-[44px] items-center px-3 text-sm uppercase tracking-wider transition-colors motion-reduce:transition-none ${world.stone}`
+
+// A bullet: a small lit room.
+export function Marker({ color = 'bg-[var(--soul-glow)]' }: { color?: string }) {
+  return <span className={`mt-1.5 block h-2 w-2.5 flex-shrink-0 ${color}`} aria-hidden="true" />
 }
 
-// Company card - Dark Souls merchant style
-export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+export function TechStack({ categories }: { categories: CVData['techStack'] }) {
   return (
-    <a
-      href={company.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block p-4 group transition-all relative overflow-hidden"
-      style={{
-        background: `linear-gradient(180deg, #12100f, #0a0908)`,
-        border: `1px solid ${COLORS.ash}`,
-      }}
-      aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
-    >
-      {/* Hover glow */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{
-          background: `radial-gradient(ellipse at 50% 0%, ${COLORS.bonfire}10, transparent 70%)`,
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="flex items-center gap-3 mb-2 relative">
-        <span className="text-2xl" aria-hidden="true">{company.icon}</span>
-        <div>
-          <h3 className="text-sm tracking-wide group-hover:text-orange-300 transition-colors" style={{ color: '#c0a080' }}>
-            {company.name}
-          </h3>
-          <p className="text-sm" style={{ color: COLORS.bonfire }}>{company.tagline}</p>
+    <div className="space-y-5">
+      {categories.map((category) => (
+        <div key={category.id}>
+          <h3 className={`mb-2 text-base uppercase text-[var(--soul-lantern)] ${world.lettering}`}>{category.name}</h3>
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+            {category.items.map((tech) => (
+              <li key={tech} className={`px-2.5 py-1 text-sm ${world.chip}`}>
+                {tech}
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
-      <p className="text-sm leading-relaxed relative" style={{ color: '#a09080' }}>{company.description}</p>
-
-      {/* External link indicator */}
-      <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
-        <span className="text-sm" style={{ color: `${COLORS.bonfire}60` }}>TRAVEL</span>
-      </div>
-    </a>
+      ))}
+    </div>
   )
 }
 
-// Band card - Dark Souls covenant style
-export function BandCard({ band, years, linkProps }: BandSlot) {
-  const content = (
-    <article
-      className="h-full p-4 group transition-all relative overflow-hidden"
-      style={{
-        background: `linear-gradient(180deg, #12100f, #0a0908)`,
-        border: `1px solid ${COLORS.ash}`,
-      }}
-    >
-      {/* Hover glow - purple for music */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{
-          background: `radial-gradient(ellipse at 50% 0%, #9966ff10, transparent 70%)`,
-        }}
-        aria-hidden="true"
-      />
-
-      <h3 className="text-sm tracking-wide group-hover:text-purple-300 transition-colors relative" style={{ color: '#c0a0e0' }}>
-        {band.name}
-      </h3>
-      <p className="text-sm mt-1 relative" style={{ color: '#b090ff' }}>
-        {band.role}
-        {years && <span aria-hidden="true"> | </span>}
-        {years}
-      </p>
-      {band.release && (
-        <p className="text-sm mt-2 leading-relaxed relative" style={{ color: '#a09080' }}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
-        </p>
-      )}
-    </article>
-  )
-
-  if (!linkProps) return content
-  return (
-    <a {...linkProps} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9966ff]">
-      {content}
-    </a>
-  )
-}
-
-// Work experience card - Dark Souls item description style. Dates are date only strings (UTC
-// midnight), so the year is read in UTC: a January start keeps its own year west of UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
+  const { start, end } = jobYears(entry, 'Present')
 
   return (
-    <article
-      className="p-4 relative"
-      style={{
-        background: `linear-gradient(180deg, #12100f, #0a0908)`,
-        border: `1px solid ${COLORS.ash}`,
-      }}
-    >
-      {/* Ember accent on left */}
-      <div
-        className="absolute left-0 top-4 bottom-4 w-1"
-        style={{
-          background: `linear-gradient(to bottom, ${COLORS.bonfire}00, ${COLORS.bonfire}, ${COLORS.bonfire}00)`,
-          boxShadow: `0 0 8px ${COLORS.bonfire}40`,
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="flex justify-between items-start gap-3 mb-2 pl-3">
-        <div>
-          <h3 className="text-sm tracking-wide" style={{ color: '#c0a080' }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: COLORS.bonfire }}>{entry.company}</p>
-        </div>
-        <span className="text-sm tracking-wide whitespace-nowrap" style={{ color: '#a09080' }}>
-          {startDisplay} - {endDisplay}
-        </span>
+    <article className={`p-4 sm:p-5 ${world.card}`}>
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 className={NAME}>{entry.title}</h3>
+        <p className="text-sm tracking-wider text-[var(--soul-lantern)]">
+          {start} - {end}
+        </p>
       </div>
-      {entry.description && (
-        <p className="text-sm mb-2 pl-3 leading-relaxed" style={{ color: '#a09080' }}>{entry.description}</p>
-      )}
+      <p className="mb-2 text-base text-[var(--soul-glow)]">{entry.company}</p>
+      {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="pl-3 space-y-1" aria-label="Achievements">
+        <ul className="mt-3 space-y-1.5" aria-label="Key accomplishments">
           {entry.highlights.map((highlight) => (
-            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: '#b0a090' }}>
-              <span style={{ color: `${COLORS.bonfire}80` }} aria-hidden="true">◆</span>
+            <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
+              <Marker />
               {highlight}
             </li>
           ))}
@@ -213,31 +64,81 @@ export function ExperienceCard({ entry }: { entry: Job }) {
   )
 }
 
-// Tech stack for engineer - Dark Souls attribute style
-export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
+export function ProjectCard({ project, years, links }: ProjectSlot) {
   return (
-    <div className="space-y-6">
-      {categories.map((category) => (
-        <div key={category.id}>
-          <div className="flex items-center gap-2 mb-2">
-            <Darksign size={12} />
-            <h3 className="text-sm tracking-[0.2em] uppercase" style={{ color: '#b08850' }}>
-              {category.name}
-            </h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {category.items.map((tech) => (
-              <span
-                key={tech}
-                className="px-3 py-1 text-sm transition-all hover:scale-105 cursor-default"
-                style={{ background: '#12100f', border: `1px solid ${COLORS.ash}`, color: '#a09080' }}
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
+    <article className={`h-full p-4 ${world.card}`} aria-labelledby={`soul-project-${project.id}`}>
+      <div className="mb-1 flex items-start gap-2">
+        <span className="mt-1.5">
+          <RoomGlyph color={project.featured ? SOUL.lantern : SOUL.glow} />
+        </span>
+        <h3 id={`soul-project-${project.id}`} className={NAME}>
+          {project.name}
+        </h3>
+      </div>
+      <p className="mb-2 text-sm text-[var(--soul-glow)]">
+        {project.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      <p className={`mb-2 ${BODY}`}>{project.tagline}</p>
+      {project.impact && <p className="mb-3 border-l-2 border-[var(--soul-lantern)] pl-2 text-sm text-[var(--soul-text)]">{project.impact}</p>}
+      <ul className="mb-3 flex flex-wrap gap-1.5" aria-label={`${project.name} technologies`}>
+        {project.techStack.map((tech) => (
+          <li key={tech} className={`px-2 py-0.5 text-sm ${world.chip}`}>
+            {tech}
+          </li>
+        ))}
+      </ul>
+      {links.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {links.map(({ kind, label, linkProps }) => (
+            <a key={kind} {...linkProps} className={DOOR}>
+              {label}
+            </a>
+          ))}
         </div>
-      ))}
-    </div>
+      )}
+    </article>
+  )
+}
+
+export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  return (
+    <a
+      href={company.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
+      className={`block h-full p-4 transition-colors hover:bg-[var(--soul-rock)] motion-reduce:transition-none ${world.card}`}
+    >
+      <h3 className={NAME}>{company.name}</h3>
+      <p className="mb-2 text-sm text-[var(--soul-glow)]">{company.tagline}</p>
+      <p className={BODY}>{company.description}</p>
+    </a>
+  )
+}
+
+export function BandCard({ band, years, linkProps }: BandSlot) {
+  const card = (
+    <article className={`h-full p-4 ${world.card}`}>
+      <h3 className={NAME}>{band.name}</h3>
+      <p className="mt-1 text-sm text-[var(--soul-rose)]">
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      {band.release && (
+        <p className={`mt-2 ${BODY}`}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
+    </article>
+  )
+
+  if (!linkProps) return card
+  return (
+    <a {...linkProps} className="block h-full">
+      {card}
+    </a>
   )
 }

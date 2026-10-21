@@ -1,24 +1,37 @@
+import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { Darksign } from './art'
+import world from './world.module.css'
 
-export const SM_BUTTON =
-  'inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2 text-sm tracking-[0.2em] uppercase transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]'
+// The world's actions, in the hero and again in the contact section: email, LinkedIn, the CV, and the
+// link out to Nebulith. Email carries the rest point's warm lantern light; the rest are carved stone.
 
-// Email is the lit bonfire action, LinkedIn the stone one.
-export const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-gradient-to-b from-[#ff6a00] to-[#cc6600] text-[#0a0808] border-2 border-[#ff8c42] hover:scale-105',
-  linkedin: 'bg-[#252321] border border-[#ff6a00]/40 text-[#ff8c42] hover:bg-[#1a1815]',
+const BUTTON = `inline-flex min-h-[44px] items-center justify-center px-5 py-2 text-sm uppercase transition-colors motion-reduce:transition-none ${world.lettering}`
+
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: world.lanternLit,
+  linkedin: world.stone,
 }
 
-export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+export function HeroAction({ action }: { action: HeroActionSlot }) {
   return (
-    <>
-      {actions.map((action) => (
-        <a key={action.id} {...action.linkProps} className={`${SM_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
-          {action.id === 'email' && <Darksign size={14} />}
-          {action.label}
-        </a>
-      ))}
-    </>
+    <a {...action.linkProps} className={`${BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+      {action.label}
+    </a>
+  )
+}
+
+export function CVLink() {
+  return (
+    <Link href="/cv" className={`${BUTTON} ${world.stone}`}>
+      CV
+    </Link>
+  )
+}
+
+export function EngineLink() {
+  return (
+    <Link href="/personal-projects/game-engine" className={`${BUTTON} ${world.stone}`}>
+      Nebulith
+    </Link>
   )
 }

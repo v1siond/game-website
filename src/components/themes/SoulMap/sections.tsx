@@ -4,140 +4,158 @@ import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { COLORS } from './palette'
-import { Darksign } from './art'
-import { BonfireArtSection, FogGate, FogGateArtSection, PraiseTheSunArtSection } from './breaks'
-import { SectionHeading, StoneSectionCard } from './panels'
-import { CompanyCard, BandCard, ExperienceCard, SaveRoomCard, TechCloud } from './cards'
+import { PathBreak } from './art'
+import { MapPanel, OpenSection } from './panels'
+import { BandCard, CompanyCard, ExperienceCard, Marker, ProjectCard, TechStack } from './cards'
+import { SceneItem, Strip } from './scenes'
+import world from './world.module.css'
 
-export function EngineerZone({ sections }: { sections: SectionsOf<'engineer'> }) {
+// The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
+// Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
+
+const LEAD = 'text-base text-[var(--soul-text-soft)]'
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      {/* Bio panel - item description style */}
-      <StoneSectionCard className="mb-8" ariaLabelledby="about-heading">
-        <SectionHeading id="about-heading">About</SectionHeading>
-        <p className="text-sm leading-relaxed" style={{ color: '#b0a090' }}>
-          {professionalSummary.bio}
-        </p>
-      </StoneSectionCard>
+      <FadeInScene>
+        <MapPanel title="About">
+          <p className={`leading-relaxed ${LEAD}`}>{professionalSummary.bio}</p>
+        </MapPanel>
+      </FadeInScene>
 
-      {/* ART SECTION: Bonfire - after About, before Experience */}
-      <BonfireArtSection />
+      <PathBreak />
 
       {sections.jobs.length > 0 && (
-        <StoneSectionCard className="mb-8" ariaLabelledby="experience-heading">
-          <SectionHeading id="experience-heading">Work Experience</SectionHeading>
-          <div className="space-y-3">
-            {sections.jobs.map((entry) => (
-              <ExperienceCard key={entry.id} entry={entry} />
-            ))}
-          </div>
-        </StoneSectionCard>
+        <LevelScene>
+          <Strip profession="engineer" zone="record" />
+          <OpenSection title="Work Experience">
+            <ul className="space-y-6">
+              {sections.jobs.map((entry) => (
+                <li key={entry.id}>
+                  <SceneItem kind="room">
+                    <ExperienceCard entry={entry} />
+                  </SceneItem>
+                </li>
+              ))}
+            </ul>
+          </OpenSection>
+        </LevelScene>
       )}
 
-      {/* ART SECTION: Fog Gate - after Experience, before the stack */}
-      <FogGateArtSection />
+      <PathBreak />
 
-      <StoneSectionCard className="mb-8" ariaLabelledby="skills-heading">
-        <h2 id="skills-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2 uppercase" style={{ color: COLORS.bonfire }}>
-          <Darksign size={16} />
-          Tech Stack
-        </h2>
-        <TechCloud categories={sections.techStack} />
-      </StoneSectionCard>
+      <FadeInScene>
+        <MapPanel title="Tech Stack">
+          <TechStack categories={sections.techStack} />
+        </MapPanel>
+      </FadeInScene>
 
-      {/* Save rooms / Projects */}
-      <section aria-labelledby="projects-heading" className="mb-8">
-        <h2 id="projects-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2 uppercase" style={{ color: '#88cc55' }}>
-          <span className="w-3 h-3 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: '0 0 10px #88cc55' }} aria-hidden="true" />
-          Projects
-        </h2>
-        <ProjectList
-          projects={sections.projects}
-          className="grid md:grid-cols-2 gap-3"
-          renderProject={(slot) => <SaveRoomCard slot={slot} />}
-        />
-      </section>
+      <PathBreak />
 
-      {/* ART SECTION: Praise the Sun - after Projects, before Ventures */}
-      <PraiseTheSunArtSection />
+      <LevelScene>
+        <Strip profession="engineer" zone="work" />
+        <OpenSection title="Featured Work">
+          <ProjectList
+            projects={sections.projects}
+            className="grid gap-6 md:grid-cols-2"
+            renderProject={(slot) => (
+              <SceneItem kind="find">
+                <ProjectCard {...slot} />
+              </SceneItem>
+            )}
+          />
+        </OpenSection>
+      </LevelScene>
 
-      <section className="mt-8" aria-labelledby="companies-heading">
-        <FogGate />
-        <h2 id="companies-heading" className="text-sm tracking-[0.3em] mb-4 text-center uppercase" style={{ color: COLORS.bonfire }}>
-          Ventures
-        </h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          {sections.companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
-          ))}
-        </div>
-      </section>
+      <PathBreak />
+
+      <FadeInScene>
+        <OpenSection title="Ventures">
+          <ul className="grid gap-4 md:grid-cols-3">
+            {sections.companies.map((company) => (
+              <li key={company.id}>
+                <CompanyCard company={company} />
+              </li>
+            ))}
+          </ul>
+        </OpenSection>
+      </FadeInScene>
     </>
   )
 }
 
-export function MusicianZone({ sections }: { sections: SectionsOf<'drummer'> }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
     <>
-      <BonfireArtSection />
-
-      <StoneSectionCard className="mb-8" ariaLabelledby="bands-heading" glowColor="#9966ff">
-        <SectionHeading id="bands-heading" color="#b090ff">Bands</SectionHeading>
-        <p className="text-sm mb-4" style={{ color: '#b0a090' }}>
-          Drums since {musician.since}, {musician.yearsPlaying} years
-        </p>
-        <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandCard {...slot} />} />
-        <p className="text-sm mt-4 italic" style={{ color: '#c0b0a0' }}>{musician.line}</p>
-      </StoneSectionCard>
-
-      <PraiseTheSunArtSection />
+      <PathBreak />
+      <LevelScene>
+        <Strip profession="drummer" zone="record" />
+        <OpenSection title="Bands">
+          <p className={`mb-6 ${LEAD}`}>
+            Drums since {musician.since}, {musician.yearsPlaying} years
+          </p>
+          <BandList
+            bands={bands}
+            className="grid gap-6 md:grid-cols-3"
+            renderBand={(slot) => (
+              <SceneItem kind="find">
+                <BandCard {...slot} />
+              </SceneItem>
+            )}
+          />
+          <p className={`mt-6 italic ${LEAD}`}>{musician.line}</p>
+        </OpenSection>
+      </LevelScene>
     </>
   )
 }
 
-export function MartialArtistZone({ sections }: { sections: SectionsOf<'fighter'> }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
     <>
-      <FogGateArtSection />
-
-      <StoneSectionCard className="mb-8" ariaLabelledby="muay-thai-heading" glowColor="#ff4444">
-        <SectionHeading id="muay-thai-heading" color="#ff7070">Muay Thai</SectionHeading>
-        <h3 className="text-base tracking-wider mb-4" style={{ color: '#c0a080' }}>{martialArts.primary.title}</h3>
-        <MuayThaiRecord
-          martialArts={martialArts}
-          classNames={{
-            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-            fact: 'p-3 bg-[#12100f] border border-[#3a3633]',
-            term: 'text-sm tracking-[0.2em] uppercase text-[#ff8c42]',
-            value: 'text-sm mt-1 text-[#c0b0a0]',
-            achievements: 'space-y-1',
-            achievement: 'text-sm flex items-start gap-2 text-[#b0a090]',
-          }}
-          renderAchievement={(achievement) => (
-            <>
-              <span className="text-[#ff6a00]/80" aria-hidden="true">◆</span>
-              {achievement}
-            </>
-          )}
-        />
-      </StoneSectionCard>
-
-      <PraiseTheSunArtSection />
+      <PathBreak />
+      <LevelScene>
+        <Strip profession="fighter" zone="record" />
+        <MapPanel title="Muay Thai">
+          <h3 className={`mb-4 text-lg uppercase text-[var(--soul-text)] ${world.lettering}`}>{martialArts.primary.title}</h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'mb-5 grid gap-3 sm:grid-cols-2',
+              fact: `p-3 ${world.card}`,
+              term: `text-sm uppercase text-[var(--soul-lantern)] ${world.lettering}`,
+              value: 'mt-1 text-sm text-[var(--soul-text)]',
+              achievements: 'space-y-3',
+              achievement: 'text-sm text-[var(--soul-text-soft)]',
+            }}
+            renderAchievement={(achievement) => (
+              <SceneItem kind="room">
+                <p className={`flex items-start gap-2 p-3 ${world.card}`}>
+                  <Marker color="bg-[var(--soul-ember)]" />
+                  <span>{achievement}</span>
+                </p>
+              </SceneItem>
+            )}
+          />
+        </MapPanel>
+      </LevelScene>
     </>
   )
 }
 
 export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerZone,
-  drummer: MusicianZone,
-  fighter: MartialArtistZone,
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }

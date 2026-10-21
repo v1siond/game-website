@@ -1,0 +1,79 @@
+/*
+ * Soul Map's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses, his walk and advance, the props that answer progress,
+ * the strike values and reduced motion). Transform and opacity only; progress 1 is the final frame, which
+ * reduced motion and the World Select preview show at once.
+ *
+ * The world's move is the map of an exploration game: floaty and unhurried, the rooms of the map drawn
+ * one by one as he enters them, the fog over each room lifting as he arrives, the paths between them
+ * lighting up behind him and soft motes of light rising through the caverns.
+ */
+
+/* The world's tempo: seven slow strides across the cavern with a soft swing, ten stick hits per arm in
+   the echo hall, the sound bars resting at a quarter of their height; in the arena he reaches the pads by
+   half the scene and works them for the rest. */
+.tempo {
+  --strides: 7turn;
+  --swing: 22deg;
+  --stick-hits: 10turn;
+  --wave-rest: 0.25;
+  --walk-inset: 5.5rem;
+  --advance-to: 40%;
+  --advance-until: 0.5;
+}
+
+/* ---- the cavern crossing ---- */
+
+/* The map fog over a room at --at clears as he walks in, so the room under it is revealed. */
+.fogLift {
+  opacity: clamp(0, 1 - (var(--p) - var(--at, 0)) * 7, 1);
+}
+
+/* The motes of the level rise slowly while he crosses it. */
+.motes {
+  transform: translate3d(0, calc(var(--p) * -28%), 0);
+}
+
+/* ---- the echo hall ---- */
+
+/* A crystal glows on the stick hits, each on its own --phase. */
+.pulse {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: calc(0.45 + max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 0.55);
+  transform: scale(calc(1 + max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 0.08));
+}
+
+/* The echo ring behind the kit swells out on each hit and fades as it grows. */
+.echo {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: calc(0.7 - max(0, sin(var(--p) * var(--stick-hits))) * 0.5);
+  transform: scale(calc(0.7 + max(0, sin(var(--p) * var(--stick-hits))) * 0.45));
+}
+
+/* ---- per entry reveals (their own scene each, so --p is the entry's own progress) ---- */
+
+/* A job or a record line is a room on the map: its glowing outline is drawn in first, then the fog over
+   it lifts and the room's contents rise into place. */
+.roomFrame {
+  opacity: clamp(0, var(--p) * 3, 1);
+  transform: scale(calc(0.94 + clamp(0, var(--p) * 2, 1) * 0.06));
+}
+
+.enterRoom {
+  opacity: clamp(0, var(--p) * 2.2 - 0.6, 1);
+  transform: translate3d(0, calc((1 - clamp(0, var(--p) * 1.5, 1)) * 0.9rem), 0);
+}
+
+/* A project or a band is found along a path: the glowing path runs in from the left over its top edge,
+   and the find drifts in along it. */
+.pathLine {
+  transform-origin: 0 50%;
+  transform: scaleX(clamp(0.02, var(--p) * 1.8, 1));
+}
+
+.alongPath {
+  opacity: clamp(0, var(--p) * 2.2 - 0.5, 1);
+  transform: translate3d(calc((1 - clamp(0, var(--p) * 1.5, 1)) * -1.75rem), 0, 0);
+}

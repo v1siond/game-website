@@ -1,203 +1,42 @@
-'use client'
+import { SOUL } from './palette'
+import world from './world.module.css'
 
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { COLORS } from './palette'
+// The cavern behind the whole page, fixed under the content: stalactites hanging from the dark above,
+// the far rock walls, and soft motes of light drifting up through the blue. The motes are the one
+// ambient loop (world.module.css), ten of them, each with its own place, length and delay as literal
+// classes so the build generates them; reduced motion leaves them out.
 
-// Knight silhouette - hollowed form
-export function HollowKnight({ variant = 'standing', className = '' }: { variant?: 'standing' | 'kneeling' | 'combat'; className?: string }) {
-  const paths = {
-    standing: 'M50 15 L47 20 L53 20 Z M45 22 L50 45 L55 22 Z M43 25 L35 35 L37 36 L44 28 Z M57 25 L65 35 L63 36 L56 28 Z M46 42 L44 70 L48 70 L50 50 L52 70 L56 70 L54 42 Z',
-    kneeling: 'M50 25 L47 30 L53 30 Z M45 32 L50 50 L55 32 Z M43 35 L30 40 L32 42 L44 38 Z M50 48 L45 65 L50 60 L55 65 L50 48 Z M42 60 L38 70 L50 70 L45 60 Z M58 60 L62 70 L50 70 L55 60 Z',
-    combat: 'M50 15 L47 20 L53 20 Z M45 22 L50 40 L55 22 Z M43 25 L25 20 L26 23 L42 28 Z M57 25 L75 35 L73 38 L56 30 Z M46 38 L44 65 L48 65 L50 45 L52 65 L56 65 L54 38 Z',
-  }
+const MOTES = [
+  'left-[6%] bottom-[8%] [--mote-time:15s] [--mote-delay:-2s]',
+  'left-[14%] bottom-[30%] [--mote-time:18s] [--mote-delay:-9s]',
+  'left-[23%] bottom-[2%] [--mote-time:13s] [--mote-delay:-5s]',
+  'left-[35%] bottom-[18%] [--mote-time:17s] [--mote-delay:-12s]',
+  'left-[47%] bottom-[5%] [--mote-time:14s] [--mote-delay:-1s]',
+  'left-[58%] bottom-[26%] [--mote-time:19s] [--mote-delay:-7s]',
+  'left-[67%] bottom-[10%] [--mote-time:12s] [--mote-delay:-4s]',
+  'left-[76%] bottom-[34%] [--mote-time:16s] [--mote-delay:-10s]',
+  'left-[86%] bottom-[4%] [--mote-time:15s] [--mote-delay:-6s]',
+  'left-[94%] bottom-[20%] [--mote-time:18s] [--mote-delay:-13s]',
+]
 
+const STALACTITES =
+  'M0 0 H1200 V18 L1170 40 L1150 16 L1110 62 L1080 20 L1040 34 L1000 14 L960 70 L930 22 L880 40 L850 12 L800 52 L770 18 L720 30 L690 10 L650 66 L610 20 L570 36 L540 12 L500 58 L460 18 L420 30 L390 10 L350 74 L320 20 L280 42 L250 14 L200 56 L170 18 L130 34 L100 12 L60 60 L30 20 L0 30 Z'
+
+const FAR_WALLS =
+  'M0 200 V120 L80 96 L150 118 L230 84 L300 110 L380 90 L460 122 L540 88 L620 112 L700 80 L780 108 L860 92 L940 120 L1020 86 L1100 112 L1200 96 V200 Z'
+
+export function CavernBackdrop() {
   return (
-    <div
-      className={`opacity-20 ${className}`}
-      role="img"
-      aria-label={`Hollow knight silhouette in ${variant} pose`}
-    >
-      <svg viewBox="0 0 100 80" fill={COLORS.ash} width="60" height="48">
-        <path d={paths[variant]} />
+    <div className={`pointer-events-none fixed inset-0 z-0 ${world.backdrop}`} aria-hidden="true">
+      <svg viewBox="0 0 1200 80" preserveAspectRatio="none" className="absolute inset-x-0 top-0 h-20 w-full" focusable="false">
+        <path d={STALACTITES} fill={SOUL.ink} opacity={0.85} />
       </svg>
-    </div>
-  )
-}
-
-// Gothic stone texture overlay
-export function StoneTexture() {
-  return (
-    <div
-      className="fixed inset-0 pointer-events-none z-[1] opacity-[0.03]"
-      aria-hidden="true"
-      style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
-      }}
-    />
-  )
-}
-
-// Profession-specific ember ornaments
-export function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
-  const prefersReducedMotion = useReducedMotion()
-
-  const ornamentsByProfession = {
-    engineer: [
-      { icon: '⚙️', x: 5, y: 20, size: 28 },
-      { icon: '💻', x: 92, y: 30, size: 26 },
-      { icon: '🔧', x: 6, y: 70, size: 24 },
-      { icon: '📟', x: 90, y: 75, size: 26 },
-    ],
-    drummer: [
-      { icon: '🥁', x: 4, y: 25, size: 30 },
-      { icon: '🎹', x: 90, y: 20, size: 28 },
-      { icon: '🎵', x: 6, y: 65, size: 24 },
-      { icon: '🎶', x: 92, y: 70, size: 26 },
-    ],
-    fighter: [
-      { icon: '⚔️', x: 5, y: 22, size: 28 },
-      { icon: '🛡️', x: 90, y: 28, size: 26 },
-      { icon: '👊', x: 6, y: 68, size: 26 },
-      { icon: '🔥', x: 92, y: 72, size: 28 },
-    ],
-  }
-
-  const items = ornamentsByProfession[profession]
-
-  if (prefersReducedMotion) {
-    return (
-      <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden" aria-hidden="true">
-        {items.map((item, i) => (
-          <div
-            key={i}
-            className="absolute"
-            style={{
-              left: `${item.x}%`,
-              top: `${item.y}%`,
-              fontSize: item.size,
-              opacity: 0.3,
-              filter: `drop-shadow(0 0 8px ${COLORS.bonfire}99)`,
-            }}
-          >
-            {item.icon}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[4] overflow-hidden" aria-hidden="true">
-      {items.map((item, i) => (
-        <div
-          key={i}
-          className="absolute animate-ember-float"
-          style={{
-            left: `${item.x}%`,
-            top: `${item.y}%`,
-            fontSize: item.size,
-            opacity: 0.4,
-            filter: `drop-shadow(0 0 8px ${COLORS.bonfire}99)`,
-            animation: `emberFloat ${12 + i * 3}s ease-in-out infinite`,
-            animationDelay: `${-i * 2}s`,
-          }}
-        >
-          {item.icon}
-        </div>
+      <svg viewBox="0 0 1200 200" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-48 w-full" focusable="false">
+        <path d={FAR_WALLS} fill={SOUL.cavern} opacity={0.55} />
+      </svg>
+      {MOTES.map((place) => (
+        <span key={place} className={`absolute block h-1.5 w-1.5 rounded-full bg-[var(--soul-glow)] ${world.mote} ${place}`} />
       ))}
-    </div>
-  )
-}
-
-// Souls counter - floating soul particles
-export function SoulsCounter({ count }: { count: number }) {
-  const prefersReducedMotion = useReducedMotion()
-
-  return (
-    <div
-      className="fixed top-6 right-24 z-40 flex items-center gap-2"
-      role="status"
-      aria-label={`Souls: ${count.toLocaleString()}`}
-    >
-      <div className="relative">
-        <div
-          className={`w-6 h-6 rounded-full ${!prefersReducedMotion ? 'animate-pulse' : ''}`}
-          style={{
-            background: `radial-gradient(circle at 30% 30%, ${COLORS.soul}, #00aacc 50%, #006688)`,
-            boxShadow: `0 0 15px ${COLORS.soul}, 0 0 30px #00aacc40`,
-          }}
-          aria-hidden="true"
-        />
-        {!prefersReducedMotion && [...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-cyan-400 animate-soul-float"
-            style={{
-              left: '50%',
-              top: '50%',
-              animationDelay: `${i * 0.3}s`,
-            }}
-            aria-hidden="true"
-          />
-        ))}
-      </div>
-      <span
-        className="text-sm font-bold tracking-wider"
-        style={{ color: COLORS.soul, textShadow: `0 0 10px ${COLORS.soul}` }}
-      >
-        {count.toLocaleString()}
-      </span>
-    </div>
-  )
-}
-
-// Bloodstain decoration
-export function Bloodstain({ className = '' }: { className?: string }) {
-  return (
-    <div className={`relative ${className}`} aria-hidden="true">
-      <svg width="35" height="35" viewBox="0 0 35 35" className="opacity-25">
-        <ellipse cx="17" cy="22" rx="14" ry="9" fill="#550000" />
-        <ellipse cx="17" cy="19" rx="9" ry="6" fill={COLORS.blood} />
-        <circle cx="11" cy="11" r="4" fill="#660000" />
-        <circle cx="23" cy="9" r="2.5" fill="#550000" />
-        <ellipse cx="8" cy="18" rx="2" ry="3" fill="#440000" />
-      </svg>
-    </div>
-  )
-}
-
-// Map fog/unexplored area effect - Dark Souls style
-export function MapFog() {
-  const prefersReducedMotion = useReducedMotion()
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[2]" aria-hidden="true">
-      {/* Dark vignette - heavier for Dark Souls feel */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(circle at 50% 50%, transparent 20%, rgba(5, 5, 8, 0.85) 100%)
-          `,
-        }}
-      />
-      {/* Ash particles */}
-      {!prefersReducedMotion && (
-        <div className="absolute inset-0 opacity-15">
-          {[...Array(40)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 rounded-full bg-gray-500 animate-ash-fall"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 12}s`,
-                animationDuration: `${12 + Math.random() * 12}s`,
-              }}
-            />
-          ))}
-        </div>
-      )}
     </div>
   )
 }
