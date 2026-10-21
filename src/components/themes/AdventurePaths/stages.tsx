@@ -1,7 +1,18 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
-import { DeskCorner, DrumKit, KitCorner, PadHolder, SoundWaves, StrikeFlash, Terminal, type DrumKitColors } from '@/components/scroll/stageProps'
+import {
+  DeskCorner,
+  DrumKit,
+  KitCorner,
+  PadHolder,
+  RingCorner,
+  SoundWaves,
+  StrikeFlash,
+  Terminal,
+  ringPost,
+  type DrumKitColors,
+} from '@/components/scroll/stageProps'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { WaypointFlag } from './icons'
@@ -288,19 +299,14 @@ function MusicianCorner() {
   return <KitCorner hero={<HeroCharacter profession="drummer" className={scene.hero} />} kit={KIT} waves={[TRAIL.GOLD, TRAIL.LANTERN]} />
 }
 
-function RingCorner() {
+function RingCornerScene() {
   return (
-    <div className={`absolute inset-0 ${scene.guard}`}>
-      <svg viewBox="0 0 160 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-        <rect x={4} y={20} width={8} height={80} fill={TRAIL.WOOD} />
-        <line x1={10} y1={34} x2={160} y2={34} stroke={TRAIL.ROUTE} strokeWidth={1.5} />
-        <line x1={10} y1={52} x2={160} y2={52} stroke={TRAIL.PARCHMENT} strokeWidth={1.5} />
-        <line x1={10} y1={70} x2={160} y2={70} stroke={TRAIL.GOLD} strokeWidth={1.5} />
-      </svg>
-      <div className="absolute bottom-1 left-1/3">
-        <HeroCharacter profession="fighter" className={scene.hero} />
-      </div>
-    </div>
+    <RingCorner
+      hero={<HeroCharacter profession="fighter" className={scene.hero} />}
+      side="left"
+      post={ringPost('left', TRAIL.WOOD)}
+      ropes={[TRAIL.ROUTE, TRAIL.PARCHMENT, TRAIL.GOLD]}
+    />
   )
 }
 
@@ -308,7 +314,7 @@ export const PROFESSION_STAGES: Record<Profession, StageLook> = {
   engineer: {
     Level: EngineerLevel,
     pose: scene.stride,
-    travel: styles.walk,
+    travel: scene.walk,
     Companion: null,
     Corner: EngineerCorner,
   },
@@ -322,8 +328,8 @@ export const PROFESSION_STAGES: Record<Profession, StageLook> = {
   fighter: {
     Level: FighterLevel,
     pose: scene.strike,
-    travel: styles.advance,
+    travel: scene.advance,
     Companion: GoldFlash,
-    Corner: RingCorner,
+    Corner: RingCornerScene,
   },
 }
