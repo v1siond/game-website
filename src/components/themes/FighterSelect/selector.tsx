@@ -1,123 +1,34 @@
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import type { Profession } from '@/lib/cv/professions'
-import { PlayerIndicator } from './badges'
-import { COLORS, metallicTexture } from './palette'
+import { HeroCharacter } from './character'
+import { FS } from './palette'
+import look from './world.module.css'
 
-// =============================================================================
-// CHARACTER PORTRAIT - NEON FRAME, DRAMATIC SELECTION
-// One option of the shared profession switch. The picked fighter is player one.
-// =============================================================================
-const FIGHTER_ICONS: Record<Profession, string> = {
-  drummer: '🥁',
-  engineer: '💻',
-  fighter: '🥊',
+// One slot of the select grid: him in that profession's costume, standing in a slanted portrait frame,
+// the label on its nameplate. The picked slot glows player one blue and carries the bobbing P1 cursor.
+
+const SLOT_LOOK = {
+  picked: { frame: look.portraitPicked, plate: 'bg-[color:var(--fs-p1-light)] text-[color:var(--fs-ink)]', lift: 'z-10 scale-105' },
+  open: { frame: look.portraitOpen, plate: 'bg-[color:var(--fs-steel)] text-white', lift: 'opacity-80 hover:opacity-100' },
 }
 
-// The outer portraits lean towards the centre slot, like the two sides of a versus screen.
-const FIGHTER_SIDES: Record<Profession, 'left' | 'right'> = {
-  drummer: 'left',
-  engineer: 'left',
-  fighter: 'right',
-}
-
-export function CharacterPortrait({ id, label, selected, optionProps }: ProfessionOption) {
-  const playerColor = selected ? COLORS.p1Blue : COLORS.p2Red
-  const side = FIGHTER_SIDES[id]
-  const clipPath =
-    side === 'left' ? 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' : 'polygon(8% 0, 100% 0, 100% 100%, 0 100%)'
+export function FighterPortrait({ id, label, selected, optionProps }: ProfessionOption) {
+  const slot = SLOT_LOOK[selected ? 'picked' : 'open']
 
   return (
     <button
       type="button"
       {...optionProps}
-      className={`relative px-3 pt-6 pb-4 sm:p-6 w-full sm:w-auto sm:min-w-[200px] focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 transition-all duration-150 ${
-        selected ? 'scale-105 z-10' : 'opacity-70 hover:opacity-100'
-      }`}
-      style={{
-        background: selected
-          ? `linear-gradient(${side === 'left' ? '135deg' : '-135deg'}, ${playerColor}60, ${COLORS.arcadeBlack}80)`
-          : metallicTexture,
-        border: `4px solid ${selected ? playerColor : COLORS.chromeDark}`,
-        clipPath,
-        boxShadow: selected
-          ? `
-            0 0 40px ${playerColor}99,
-            0 0 80px ${playerColor}40,
-            inset 0 0 30px ${playerColor}30
-          `
-          : `
-            inset 0 2px 4px rgba(255,255,255,0.1),
-            inset 0 -2px 4px rgba(0,0,0,0.5),
-            0 4px 12px rgba(0,0,0,0.4)
-          `,
-      }}
+      className={`relative flex w-full flex-col items-center px-2 pb-3 pt-6 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--fs-gold)] motion-safe:transition-transform sm:w-auto sm:min-w-[11rem] sm:px-5 ${slot.lift}`}
     >
-      {/* Player indicator when selected */}
       {selected && (
-        <span aria-hidden="true">
-          <PlayerIndicator player={1} side={side} />
-        </span>
+        <svg viewBox="0 0 20 14" className={`absolute -top-3 left-1/2 h-4 w-6 -translate-x-1/2 ${look.bob}`} aria-hidden="true" focusable="false">
+          <path d="M0 0 H20 L10 14 Z" fill={FS.p1Light} stroke={FS.ink} strokeWidth={1.5} />
+        </svg>
       )}
-
-      {/* Animated neon border when selected */}
-      {selected && (
-        <div
-          className="absolute inset-0 pointer-events-none"
-          aria-hidden="true"
-          style={{
-            border: `2px solid ${playerColor}`,
-            clipPath,
-            boxShadow: `inset 0 0 20px ${playerColor}80`,
-          }}
-        />
-      )}
-
-      {/* Character icon with glow */}
-      <div
-        className="text-5xl sm:text-8xl mb-4"
-        aria-hidden="true"
-        style={{
-          filter: selected ? `drop-shadow(0 0 30px ${playerColor})` : 'none',
-        }}
-      >
-        {FIGHTER_ICONS[id]}
-      </div>
-
-      {/* Name plate - hexagonal arcade style */}
-      <div
-        className="py-2 -mx-3 px-3 sm:-mx-6 sm:px-6"
-        style={{
-          background: selected
-            ? `linear-gradient(90deg, ${playerColor}, ${playerColor}dd)`
-            : `linear-gradient(90deg, ${COLORS.chromeDark}80, ${COLORS.chrome}99)`,
-          clipPath: 'polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0 50%)',
-        }}
-      >
-        <div
-          className="text-sm font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase"
-          style={{
-            fontFamily: '"Impact", "Arial Black", sans-serif',
-            color: selected ? '#000' : '#FFF',
-            textShadow: selected ? 'none' : '0 2px 4px rgba(0,0,0,0.5)',
-          }}
-        >
-          {label}
-        </div>
-      </div>
-
-      {/* Selection arrow when selected */}
-      {selected && (
-        <div
-          className="absolute -top-4 left-1/2 -translate-x-1/2 text-3xl"
-          aria-hidden="true"
-          style={{
-            color: playerColor,
-            filter: `drop-shadow(0 0 10px ${playerColor})`,
-          }}
-        >
-          ▼
-        </div>
-      )}
+      <span className={`flex h-24 w-full items-end justify-center border-4 sm:h-32 ${look.portrait} ${slot.frame}`} aria-hidden="true">
+        <HeroCharacter profession={id} className="h-20 w-14 sm:h-28 sm:w-20" />
+      </span>
+      <span className={`mt-2 w-full px-3 py-1.5 text-center text-sm uppercase ${look.display} ${look.nameplate} ${slot.plate}`}>{label}</span>
     </button>
   )
 }

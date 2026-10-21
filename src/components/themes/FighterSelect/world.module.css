@@ -1,0 +1,224 @@
+/*
+ * Fighter Select's page look: an arcade cabinet's screen at night. The stage gradient, the CRT scanlines
+ * and vignette, the brushed cabinet metal of the panels, the glowing display type of the round calls, and
+ * the two idle loops of the select screen (the clash emblem's pulse and the picked fighter's cursor bob).
+ * The loops animate transform and opacity only and stop under reduced motion; the scroll scenes live in
+ * scenes.module.css.
+ */
+
+.root {
+  --fs-night: #07081a;
+  --fs-panel: #12142e;
+  --fs-panel-light: #1d2046;
+  --fs-p1: #2f7bff;
+  --fs-p1-light: #6aa6ff;
+  --fs-p2: #ff2e4d;
+  --fs-gold: #ffd23f;
+  --fs-orange: #ff8a1f;
+  --fs-health: #3ddc6a;
+  --fs-cyan: #3fe6f0;
+  --fs-chrome: #c9cede;
+  --fs-steel: #5b6078;
+  --fs-ink: #03030a;
+
+  background: radial-gradient(ellipse at 50% 20%, #1a1a3e 0%, var(--fs-night) 55%, #050510 100%);
+  color: var(--fs-chrome);
+  font-family: system-ui, sans-serif;
+}
+
+/* The arcade display face for names, titles and buttons. */
+.display {
+  font-family: Impact, 'Arial Black', sans-serif;
+  letter-spacing: 0.08em;
+}
+
+/* ---- the screen: still layers behind the content ---- */
+
+.scanlines {
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgb(0 0 0 / 0.28) 2px 4px);
+  opacity: 0.45;
+}
+
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 45%, rgb(0 0 0 / 0.6) 100%);
+}
+
+.glow {
+  background:
+    radial-gradient(ellipse at 15% 30%, rgb(47 123 255 / 0.1) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 70%, rgb(255 46 77 / 0.08) 0%, transparent 45%);
+}
+
+/* ---- the cabinet panels and cards ---- */
+
+.metal {
+  background:
+    linear-gradient(135deg, #22243a 0%, #15172a 30%, #2a2c44 55%, #15172a 80%, #22243a 100%),
+    repeating-linear-gradient(90deg, transparent 0 4px, rgb(255 255 255 / 0.02) 4px 5px);
+  box-shadow:
+    inset 0 0 40px rgb(0 0 0 / 0.65),
+    inset 2px 2px 0 rgb(255 255 255 / 0.05);
+}
+
+/* The panel's screen glass: scanlines over the inner screen, under its text. */
+.screen {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2px, rgb(0 0 0 / 0.18) 2px 4px),
+    radial-gradient(ellipse at 50% 0%, rgb(63 230 240 / 0.06), transparent 60%);
+}
+
+/* The colour a panel or card glows in is set by its accent class on --accent. */
+.accentP1 {
+  --accent: var(--fs-p1-light);
+}
+
+.accentP2 {
+  --accent: var(--fs-p2);
+}
+
+.accentGold {
+  --accent: var(--fs-gold);
+}
+
+.accentCyan {
+  --accent: var(--fs-cyan);
+}
+
+.accentHealth {
+  --accent: var(--fs-health);
+}
+
+.frame {
+  border: 4px solid var(--accent);
+  box-shadow:
+    0 0 18px color-mix(in srgb, var(--accent) 35%, transparent),
+    inset 0 0 40px rgb(0 0 0 / 0.65);
+}
+
+.titleBar {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, transparent), transparent);
+  border-bottom: 3px solid color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.titleText {
+  color: var(--accent);
+  text-shadow:
+    0 0 10px color-mix(in srgb, var(--accent) 60%, transparent),
+    3px 3px 0 var(--fs-ink);
+}
+
+/* An arcade button: the domed cap in the panel's colour. */
+.buttonCap {
+  background: radial-gradient(circle at 40% 35%, #fff 0%, var(--accent) 30%, color-mix(in srgb, var(--accent) 50%, black) 100%);
+  border: 4px solid #1a1a1a;
+  box-shadow: inset 0 -3px 6px rgb(0 0 0 / 0.5);
+}
+
+.bolt {
+  background: radial-gradient(circle at 30% 30%, #e6e6e6, #a0a0a0, #707070);
+  border: 2px solid #1a1a1a;
+}
+
+.card {
+  border: 3px solid var(--accent);
+  box-shadow:
+    0 0 14px color-mix(in srgb, var(--accent) 25%, transparent),
+    inset 0 0 20px rgb(0 0 0 / 0.5);
+}
+
+/* The cut corner of a fight card. */
+.cutCorner {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+}
+
+.cornerTab {
+  background: linear-gradient(135deg, var(--accent), var(--fs-gold));
+  clip-path: polygon(100% 0, 100% 100%, 0 100%);
+}
+
+.tag {
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+}
+
+.impact {
+  border-left: 4px solid var(--accent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent);
+}
+
+/* ---- type ---- */
+
+/* The fighter's name on the title screen, lit like a marquee. */
+.marquee {
+  color: var(--fs-gold);
+  text-shadow:
+    0 0 12px rgb(255 210 63 / 0.6),
+    0 0 28px rgb(255 138 31 / 0.35),
+    4px 4px 0 var(--fs-ink);
+}
+
+/* The round call: the picked profession across the stage in gold. */
+.roundCall {
+  color: var(--fs-gold);
+  text-shadow:
+    0 0 12px rgb(255 210 63 / 0.55),
+    3px 3px 0 var(--fs-ink),
+    -1px -1px 0 var(--fs-ink);
+}
+
+.roundBand {
+  background:
+    linear-gradient(90deg, transparent, rgb(255 46 77 / 0.35) 20%, rgb(255 138 31 / 0.35) 50%, rgb(255 46 77 / 0.35) 80%, transparent),
+    repeating-linear-gradient(90deg, transparent 0 40px, rgb(255 46 77 / 0.15) 40px 42px);
+}
+
+/* ---- the select screen ---- */
+
+.portrait {
+  clip-path: polygon(6% 0, 100% 0, 94% 100%, 0 100%);
+}
+
+.portraitPicked {
+  border-color: var(--fs-p1-light);
+  background: linear-gradient(160deg, rgb(47 123 255 / 0.45), rgb(3 3 10 / 0.8));
+}
+
+.portraitOpen {
+  border-color: var(--fs-steel);
+}
+
+.nameplate {
+  clip-path: polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0 50%);
+}
+
+/* The clash emblem between the portraits beats slowly; the player one cursor bobs over the pick. */
+@media (prefers-reduced-motion: no-preference) {
+  .pulse {
+    animation: pulse 1.6s ease-in-out infinite;
+  }
+
+  .bob {
+    animation: bob 1s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 4px, 0);
+  }
+}

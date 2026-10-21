@@ -1,76 +1,28 @@
-'use client'
+import { FS } from './palette'
 
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { COLORS, metallicTexture } from './palette'
+// The cabinet's control panel closes the page: the stick and the six attack buttons, still art.
 
-// =============================================================================
-// INSERT COIN FOOTER
-// =============================================================================
-export function InsertCoinFooter() {
-  const reducedMotion = useReducedMotion()
+const BUTTONS = [
+  { x: 92, y: 18, color: FS.p1Light },
+  { x: 116, y: 14, color: FS.p1Light },
+  { x: 140, y: 18, color: FS.p1Light },
+  { x: 92, y: 40, color: FS.p2 },
+  { x: 116, y: 36, color: FS.p2 },
+  { x: 140, y: 40, color: FS.p2 },
+]
 
+export function ControlPanel() {
   return (
-    <footer className="relative z-20 py-12 text-center">
-      <p
-        className="text-sm tracking-[0.4em] uppercase"
-        style={{
-          fontFamily: '"Impact", "Arial Black", sans-serif',
-          color: COLORS.chromeDark,
-        }}
-      >
-        PRESS START TO CONTINUE
-      </p>
-
-      <p
-        className="text-sm mt-4 tracking-[0.3em]"
-        style={{
-          color: COLORS.specialBlue,
-          textShadow: `0 0 10px ${COLORS.specialBlue}`,
-        }}
-      >
-        MMXXVI ALEXANDER PULIDO
-      </p>
-
-      {/* Insert coin slot */}
-      <div
-        className="mt-6 inline-flex items-center gap-4 px-8 py-4"
-        aria-hidden="true"
-        style={{
-          background: metallicTexture,
-          border: `3px solid ${COLORS.chromeDark}`,
-          borderRadius: '4px',
-          boxShadow: 'inset 0 3px 8px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.4)',
-        }}
-      >
-        {/* Worn coin slot */}
-        <div
-          className="w-16 h-3"
-          style={{
-            background: `linear-gradient(180deg, ${COLORS.arcadeBlack}, #050505)`,
-            border: `2px solid ${COLORS.chromeDarker}`,
-            borderRadius: '4px',
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.9)',
-          }}
-        />
-        <span
-          className="text-sm tracking-[0.3em] uppercase"
-          style={{
-            fontFamily: '"Impact", "Arial Black", sans-serif',
-            color: COLORS.chromeDark,
-          }}
-        >
-          INSERT COIN
-        </span>
-        <span
-          className={`text-2xl ${!reducedMotion ? 'animate-blink' : ''}`}
-          style={{
-            color: COLORS.gold,
-            textShadow: `0 0 15px ${COLORS.gold}`,
-          }}
-        >
-          ●
-        </span>
-      </div>
+    <footer className="relative z-20 flex justify-center py-12" aria-hidden="true">
+      <svg viewBox="0 0 170 60" className="h-16 w-44 opacity-70" focusable="false">
+        <rect x={2} y={2} width={166} height={56} rx={6} fill={FS.panel} stroke={FS.steel} strokeWidth={2} />
+        <circle cx={40} cy={34} r={12} fill={FS.ink} stroke={FS.steel} />
+        <rect x={38} y={14} width={4} height={20} fill={FS.chrome} />
+        <circle cx={40} cy={14} r={8} fill={FS.p2} />
+        {BUTTONS.map(({ x, y, color }) => (
+          <circle key={`${x}-${y}`} cx={x} cy={y} r={7} fill={color} stroke={FS.ink} strokeWidth={2} />
+        ))}
+      </svg>
     </footer>
   )
 }

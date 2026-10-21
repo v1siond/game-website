@@ -1,193 +1,63 @@
-import { COLORS, crtScanlines, metallicTexture, screenGlow, screenVignette } from './palette'
+import type { ReactNode } from 'react'
+import look from './world.module.css'
 
-// =============================================================================
-// ARCADE CABINET FRAME SVG - WORN METAL WITH BOLTS
-// =============================================================================
-function ArcadeCabinetFrame({ children, color = COLORS.specialBlue }: { children: React.ReactNode; color?: string }) {
+// The arcade cabinet panel every section sits in: brushed metal, a glowing border in the section's
+// accent, a bolt in each corner, the screen glass inside, and a title bar with its arcade button.
+
+export type Accent = 'p1' | 'p2' | 'gold' | 'cyan' | 'health'
+
+export const ACCENT: Record<Accent, string> = {
+  p1: look.accentP1,
+  p2: look.accentP2,
+  gold: look.accentGold,
+  cyan: look.accentCyan,
+  health: look.accentHealth,
+}
+
+const BOLTS = ['left-2 top-2', 'right-2 top-2', 'bottom-2 left-2', 'bottom-2 right-2']
+
+function CabinetFrame({ accent, children }: { accent: Accent; children: ReactNode }) {
   return (
-    <div
-      className="relative"
-      style={{
-        background: metallicTexture,
-        border: `4px solid ${color}`,
-        borderRadius: '4px',
-        boxShadow: `
-          0 0 20px ${color}60,
-          0 0 40px ${color}30,
-          inset 0 0 40px rgba(0,0,0,0.7),
-          inset 2px 2px 0 rgba(255,255,255,0.05),
-          inset -2px -2px 0 rgba(0,0,0,0.4)
-        `,
-      }}
-    >
-      {/* Corner bolts/rivets */}
-      {[
-        { top: '8px', left: '8px' },
-        { top: '8px', right: '8px' },
-        { bottom: '8px', left: '8px' },
-        { bottom: '8px', right: '8px' },
-      ].map((pos, i) => (
-        <div
-          key={i}
-          className="absolute w-5 h-5 z-20"
-          aria-hidden="true"
-          style={{
-            ...pos,
-            background: `radial-gradient(circle at 30% 30%, ${COLORS.chrome}, ${COLORS.chromeDark}, ${COLORS.chromeDarker})`,
-            border: `2px solid ${COLORS.arcadeGray}`,
-            borderRadius: '50%',
-            boxShadow: `
-              inset 0 2px 3px rgba(255,255,255,0.5),
-              inset 0 -2px 3px rgba(0,0,0,0.7),
-              0 2px 4px rgba(0,0,0,0.5)
-            `,
-          }}
-        >
-          {/* Phillips head screw */}
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{ width: '10px', height: '2px', background: COLORS.arcadeGray }}
-          />
-          <div
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-            style={{ width: '2px', height: '10px', background: COLORS.arcadeGray }}
-          />
-        </div>
+    <div className={`relative rounded ${look.metal} ${look.frame} ${ACCENT[accent]}`}>
+      {BOLTS.map((place) => (
+        <span key={place} className={`absolute z-20 h-4 w-4 rounded-full ${look.bolt} ${place}`} aria-hidden="true" />
       ))}
-
-      {/* Worn scratches on metal - subtle */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-10"
-        aria-hidden="true"
-        style={{
-          background: `
-            repeating-linear-gradient(45deg, transparent 0px, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 21px),
-            repeating-linear-gradient(-45deg, transparent 0px, transparent 30px, rgba(0,0,0,0.05) 30px, rgba(0,0,0,0.05) 31px)
-          `,
-        }}
-      />
-
-      {children}
+      <div className={`pointer-events-none absolute inset-0 ${look.screen}`} aria-hidden="true" />
+      <div className="relative">{children}</div>
     </div>
   )
 }
 
-// =============================================================================
-// CRT SCREEN EFFECT WRAPPER
-// =============================================================================
-function CRTScreen({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative ${className}`}>
-      {/* Screen glow */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0"
-        aria-hidden="true"
-        style={{ background: screenGlow }}
-      />
-
-      {/* Content */}
-      <div className="relative z-10">{children}</div>
-
-      {/* CRT scanlines overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none z-30"
-        aria-hidden="true"
-        style={{ background: crtScanlines, opacity: 0.4 }}
-      />
-
-      {/* Screen curvature vignette */}
-      <div
-        className="absolute inset-0 pointer-events-none z-20"
-        aria-hidden="true"
-        style={{ background: screenVignette }}
-      />
-    </div>
-  )
-}
-
-// =============================================================================
-// SECTION CARD - ARCADE PANEL WITH NEON BORDER
-// =============================================================================
-export function ArcadeSectionCard({
-  children,
-  color = COLORS.specialBlue,
-  title,
-  titleIcon,
-  id,
-}: {
-  children: React.ReactNode
-  color?: string
+interface ArcadePanelProps {
+  accent: Accent
   title?: string
-  titleIcon?: string
   id?: string
-}) {
+  children: ReactNode
+}
+
+export function ArcadePanel({ accent, title, id, children }: ArcadePanelProps) {
   return (
-    <section
-      aria-labelledby={id}
-      className="relative mb-10"
-    >
-      <ArcadeCabinetFrame color={color}>
-        {/* CRT effect inside */}
-        <CRTScreen>
-          {/* Title bar with arcade button */}
-          {title && (
-            <div
-              id={id}
-              className="relative px-8 py-4 flex items-center gap-4"
-              style={{
-                background: `linear-gradient(180deg, ${color}40, ${color}15, transparent)`,
-                borderBottom: `3px solid ${color}80`,
-              }}
-            >
-              {/* Arcade button decoration */}
-              <div
-                className="w-10 h-10 flex items-center justify-center shrink-0"
-                aria-hidden="true"
-                style={{
-                  background: `radial-gradient(circle at 40% 35%, ${color}, ${color}99, ${color}66)`,
-                  border: `4px solid ${COLORS.arcadeGray}`,
-                  borderRadius: '50%',
-                  boxShadow: `
-                    inset 0 3px 6px rgba(255,255,255,0.5),
-                    inset 0 -3px 6px rgba(0,0,0,0.5),
-                    0 0 15px ${color}80,
-                    0 4px 8px rgba(0,0,0,0.5)
-                  `,
-                }}
-              >
-                <span
-                  className="text-lg font-bold"
-                  style={{
-                    color: COLORS.arcadeBlack,
-                    textShadow: `0 1px 0 rgba(255,255,255,0.4)`,
-                  }}
-                >
-                  {titleIcon}
-                </span>
-              </div>
-
-              <h2
-                className="text-2xl tracking-[0.2em] font-black uppercase"
-                style={{
-                  color,
-                  textShadow: `
-                    0 0 10px ${color},
-                    0 0 20px ${color}80,
-                    0 0 30px ${color}40,
-                    3px 3px 0 ${COLORS.arcadeBlack},
-                    -1px -1px 0 ${COLORS.arcadeBlack}
-                  `,
-                  fontFamily: '"Impact", "Arial Black", sans-serif',
-                }}
-              >
-                {title}
-              </h2>
-            </div>
-          )}
-
-          <div className="relative p-8">{children}</div>
-        </CRTScreen>
-      </ArcadeCabinetFrame>
+    <section aria-labelledby={id} className="relative mb-10">
+      <CabinetFrame accent={accent}>
+        {title && (
+          <div className={`flex items-center gap-4 px-5 py-4 sm:px-8 ${look.titleBar}`}>
+            <span className={`h-9 w-9 shrink-0 rounded-full ${look.buttonCap}`} aria-hidden="true" />
+            <h2 id={id} className={`text-xl uppercase sm:text-2xl ${look.display} ${look.titleText}`}>
+              {title}
+            </h2>
+          </div>
+        )}
+        <div className="p-5 sm:p-8">{children}</div>
+      </CabinetFrame>
     </section>
+  )
+}
+
+// The cabinet frame alone, for the header and the contact panel.
+export function CabinetPanel({ accent, children }: { accent: Accent; children: ReactNode }) {
+  return (
+    <CabinetFrame accent={accent}>
+      <div className="p-5 sm:p-8">{children}</div>
+    </CabinetFrame>
   )
 }
