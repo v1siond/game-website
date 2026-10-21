@@ -16,7 +16,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { KratosChainPullReveal } from './Mythic/KratosSprite'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, headingId } from '@/components/cv/sectionText'
 
 // =============================================================================
 // GOD OF WAR 3 COLOR PALETTE
@@ -1032,10 +1032,10 @@ const SpartanFrame = memo(function SpartanFrame({
   headingLevel?: 'h2' | 'h3'
 }) {
   const HeadingTag = headingLevel
-  const headingId = `section-${title.toLowerCase().replace(/\s+/g, '-')}`
+  const sectionHeadingId = headingId('section', title)
 
   return (
-    <div className="relative pt-4 pb-4" role="region" aria-labelledby={headingId}>
+    <div className="relative pt-4 pb-4" role="region" aria-labelledby={sectionHeadingId}>
       {/* Greek meander border top */}
       <GreekMeander color={GOW.gold} opacity={0.2} />
 
@@ -1060,7 +1060,7 @@ const SpartanFrame = memo(function SpartanFrame({
       >
         <div className="pt-6 pb-4 px-6 text-center">
           <HeadingTag
-            id={headingId}
+            id={sectionHeadingId}
             className="text-sm tracking-[0.35em] uppercase inline-block"
             style={{
               color: GOW.goldBright,

@@ -14,7 +14,7 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, headingId } from '@/components/cv/sectionText'
 
 // ============================================================================
 // CRASH BANDICOOT EXACT COLOR PALETTE
@@ -1211,7 +1211,7 @@ function CratePanel({
   return (
     <section
       className={`relative ${className}`}
-      aria-labelledby={`section-${title.toLowerCase().replace(/\s+/g, '-')}`}
+      aria-labelledby={headingId('section', title)}
     >
       {/* Tiki corner decorations */}
       <div
@@ -1283,7 +1283,7 @@ function CratePanel({
         >
           {titleIcon}
           <h2
-            id={`section-${title.toLowerCase().replace(/\s+/g, '-')}`}
+            id={headingId('section', title)}
             className="text-xl font-black tracking-wider uppercase"
             style={{
               color: '#fff',

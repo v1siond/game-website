@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, headingId } from '@/components/cv/sectionText'
 
 // Neon Portals' panels and cards. Static classes only (no blur, no animated glow), so a card costs
 // nothing while the page scrolls; the scenes in scenes.tsx move them. Colours are the palette.ts values.
@@ -27,7 +27,7 @@ const SIDE_LOOK: Record<PortalSide, { text: string; border: string; chip: string
   },
 }
 
-const panelId = (title: string) => `portal-${title.toLowerCase().replace(/\s+/g, '-')}`
+const panelId = (title: string) => headingId('portal', title)
 
 const LINK_FOCUS = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#07060f]'
 

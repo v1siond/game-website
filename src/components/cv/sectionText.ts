@@ -84,3 +84,6 @@ export function muayThaiFacts({ primary, training, background }: MartialArts): R
     { label: 'Background', value: background },
   ].filter((fact) => fact.value)
 }
+
+/** The id a section heading carries so its region can name it: `section-tech-stack`. */
+export const headingId = (prefix: string, title: string): string => `${prefix}-${title.toLowerCase().replace(/\s+/g, '-')}`

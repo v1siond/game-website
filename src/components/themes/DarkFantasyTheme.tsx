@@ -20,7 +20,7 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, headingId } from '@/components/cv/sectionText'
 
 // Blended Dark Fantasy Metroidvania palette
 // Hollow Knight ethereal blues + Iconoclast brass/copper + Ori spirit gold + Salt & Sanctuary stone
@@ -1080,10 +1080,10 @@ const VoidFrame = memo(function VoidFrame({
   headingLevel?: 'h2' | 'h3'
 }) {
   const HeadingTag = headingLevel
-  const headingId = `section-${title.toLowerCase().replace(/\s+/g, '-')}`
+  const sectionHeadingId = headingId('section', title)
 
   return (
-    <div className="relative pt-4 pb-4" role="region" aria-labelledby={headingId}>
+    <div className="relative pt-4 pb-4" role="region" aria-labelledby={sectionHeadingId}>
       {/* Main dialogue box container */}
       <div className="df-panel bg-df-panel relative">
         {/* Top decorative flourish - elegant vine-like pattern */}
@@ -1092,7 +1092,7 @@ const VoidFrame = memo(function VoidFrame({
         {/* Title header - elegant centered text like HK dialogue speaker name */}
         <div className="pt-6 pb-4 px-6 text-center">
           <HeadingTag
-            id={headingId}
+            id={sectionHeadingId}
             className="text-sm tracking-[0.3em] uppercase inline-block"
             style={{
               color: DF.bone,

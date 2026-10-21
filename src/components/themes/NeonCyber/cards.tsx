@@ -6,7 +6,7 @@ import { CircuitPattern } from './effects'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, headingId } from '@/components/cv/sectionText'
 
 export type PanelAccent = 'yellow' | 'green' | 'cyan' | 'magenta' | 'violet' | 'red' | 'orange'
 
@@ -22,7 +22,7 @@ const PANEL_ACCENT: Record<PanelAccent, { text: string; border: string; dot: str
   red: { text: 'text-[#ff3385]', border: 'border-[#ff0066]', dot: 'bg-[#ff0066]', rule: 'from-[#ff0066]/40', hex: '#ff0066' },
 }
 
-const panelId = (title: string) => `panel-${title.toLowerCase().replace(/\s+/g, '-')}`
+const panelId = (title: string) => headingId('panel', title)
 
 // Cyber panel with neon border and circuit corners - Arasaka/Militech corporate UI
 export function CyberPanel({
@@ -260,11 +260,11 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 // Tech category display - cyberware/netrunner deck style
 export function TechCategory({ category }: { category: CVData['techStack'][number] }) {
   return (
-    <div className="mb-4" role="region" aria-labelledby={`tech-cat-${category.name.toLowerCase().replace(/\s+/g, '-')}`}>
+    <div className="mb-4" role="region" aria-labelledby={headingId('tech-cat', category.name)}>
       <header className="flex items-center gap-2 mb-2">
         <span className="text-base" role="img" aria-hidden="true">{category.icon}</span>
         <h3
-          id={`tech-cat-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+          id={headingId('tech-cat', category.name)}
           className="text-sm text-pink-500 tracking-wider font-mono"
         >
           {category.name.toUpperCase()}
