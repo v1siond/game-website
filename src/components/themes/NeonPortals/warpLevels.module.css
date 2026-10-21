@@ -1,0 +1,44 @@
+/*
+ * The job level portals (warpLevels.tsx): the period in the window drifts toward the pointer, and the
+ * crystal rises out of it once when taken. Transforms and opacity only.
+ */
+
+.window {
+  transform: scale(1.08) translate(calc(var(--mx, 0) * -3%), calc(var(--my, 0) * -2%));
+  transition: transform 0.6s ease-out;
+}
+
+.rise {
+  animation: crystal-rise 1100ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes crystal-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 40%) scale(0.4) rotateY(0);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, -10%) scale(1.1) rotateY(360deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, -20%) scale(1) rotateY(540deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -160%) scale(0.5) rotateY(720deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .window {
+    transform: scale(1.08);
+    transition: none;
+  }
+
+  .rise {
+    animation: none;
+    opacity: 0;
+  }
+}

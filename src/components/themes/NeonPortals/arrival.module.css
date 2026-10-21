@@ -1,0 +1,200 @@
+/*
+ * The arrival (arrival.tsx): the beam, his forming and landing, the letters, the pad crates. Keyed on
+ * the layout's data-phase; the resting frame is the plain style, so 'ready', reduced motion and a
+ * preview show it still. Six to eight things move at most: three beam rings, him, the two crates' bob,
+ * the letters in turn (each plays once) and the chamber's lean to the pointer.
+ */
+
+.frame {
+  box-shadow: inset 0 0 0 3px var(--np-brass-dark);
+}
+
+/* The chamber leans against the pointer so the pad reads in depth. */
+.back {
+  transform: translate(calc(var(--mx, 0) * -6px), calc(var(--my, 0) * -4px));
+  transition: transform 0.5s ease-out;
+}
+
+/* ---- the beam: three rings fall down a column of light, during beam and form only ---- */
+
+.beam {
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--np-teal) 45%, transparent), transparent);
+  transform-origin: 50% 100%;
+}
+
+.arrival[data-phase='beam'] .beam,
+.arrival[data-phase='form'] .beam {
+  opacity: 1;
+  animation: beam-in 450ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.arrival[data-phase='land'] .beam {
+  opacity: 0;
+  transition: opacity 300ms linear;
+}
+
+@keyframes beam-in {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.ring {
+  top: 0;
+  opacity: 0;
+}
+
+.arrival[data-phase='beam'] .ring,
+.arrival[data-phase='form'] .ring {
+  animation: ring-fall 600ms linear infinite;
+  animation-delay: calc(var(--i) * 200ms);
+}
+
+@keyframes ring-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.7);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(820%) scale(1.1);
+  }
+}
+
+/* ---- him: unseen, then formed in the beam spinning, then off the beam with a squash ---- */
+
+.landing {
+  transform-origin: 50% 100%;
+}
+
+.arrival[data-phase='wait'] .landing,
+.arrival[data-phase='beam'] .landing {
+  opacity: 0;
+  transform: scaleX(0.05);
+}
+
+.arrival[data-phase='form'] .landing {
+  animation: form 500ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes form {
+  0% {
+    opacity: 0;
+    transform: translateY(-16%) scaleX(0.05);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-16%) scaleX(-1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(-16%) scaleX(1);
+  }
+}
+
+.arrival[data-phase='land'] .landing {
+  animation: land 350ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes land {
+  0% {
+    transform: translateY(-16%);
+  }
+  55% {
+    transform: translateY(0) scale(1.18, 0.8);
+  }
+  80% {
+    transform: scale(0.94, 1.08);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* ---- the crates on the pad bob a little until broken ---- */
+
+.crateBob {
+  animation: crate-bob 2.2s ease-in-out infinite;
+}
+
+@keyframes crate-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4%);
+  }
+}
+
+/* ---- the name, letter by letter, and the rest after it ---- */
+
+.arrival[data-phase='wait'] .letter,
+.arrival[data-phase='beam'] .letter,
+.arrival[data-phase='form'] .letter,
+.arrival[data-phase='land'] .letter,
+.arrival[data-phase='wait'] .afterTitle,
+.arrival[data-phase='beam'] .afterTitle,
+.arrival[data-phase='form'] .afterTitle,
+.arrival[data-phase='land'] .afterTitle {
+  opacity: 0;
+}
+
+.arrival[data-phase='title'] .letter {
+  animation: letter-drop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+@keyframes letter-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-120%) rotate(-12deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.arrival[data-phase='title'] .afterTitle {
+  animation: slide-up 500ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back {
+    transform: none;
+    transition: none;
+  }
+
+  .beam,
+  .ring {
+    display: none;
+  }
+
+  .landing,
+  .letter,
+  .afterTitle,
+  .crateBob {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

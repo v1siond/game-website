@@ -561,6 +561,90 @@ collections:
                   - { <<: *text, label: "Save hint", name: saveHint }
                   - { <<: *text, label: "Ink ribbons", name: inkRibbons, hint: 'Keep {count}' }
                   - { <<: *text, label: "Saved", name: saved }
+              - label: Time machine world (time travel platformer)
+                name: warp
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Spin", name: spin }
+                  - { <<: *text, label: "Arrival hint", name: arrivalHint }
+                  - { <<: *text, label: "Fruit count", name: fruitCount, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Mask score", name: maskScore, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Invincible", name: invincible }
+                  - { <<: *text, label: "Level button hint", name: hubHint }
+                  - { <<: *text, label: "Boss door", name: bossDoor }
+                  - { <<: *text, label: "Boss door link", name: toContact }
+                  - { <<: *text, label: "Crystal score", name: crystalScore, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Level hint", name: levelHint }
+                  - { <<: *text, label: "Crate hint", name: crateHint }
+                  - { <<: *text, label: "Body slam", name: bodySlam }
+                  - { <<: *text, label: "TNT crate word", name: tnt }
+                  - { <<: *text, label: "Nitro crate word", name: nitro }
+                  - { <<: *text, label: "Time trial hint", name: trialHint }
+                  - { <<: *text, label: "Start time trial", name: trial, hint: 'Keep {band}' }
+                  - { <<: *text, label: "Relic won", name: relicWon }
+                  - { <<: *text, label: "Relic score", name: relicScore, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Spin kick", name: kick }
+                  - { <<: *text, label: "Boss hint", name: bossHint }
+                  - { <<: *text, label: "Boss health", name: bossHealth, hint: 'Keep {left} {total}' }
+                  - { <<: *text, label: "Power score", name: powerScore, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Double jump", name: doubleJump }
+                  - { <<: *text, label: "Tornado spin", name: tornadoSpin }
+                  - { <<: *text, label: "Power unlocked", name: powerUnlocked, hint: 'Keep {power}' }
+                  - { <<: *text, label: "Level complete", name: levelComplete }
+                  - { <<: *text, label: "Tally fruit", name: tallyFruit }
+                  - { <<: *text, label: "Tally crates", name: tallyCrates }
+                  - { <<: *text, label: "Tally crystals", name: tallyCrystals }
+                  - { <<: *text, label: "Tally relics", name: tallyRelics }
+                  - { <<: *text, label: "Tally powers", name: tallyPowers }
+                  - { <<: *text, label: "Tally masks", name: tallyMasks }
+                  - { <<: *text, label: "Tally line", name: tallyLine, hint: 'Keep {name} {count} {total}' }
+                  - { <<: *text, label: "Dance again", name: danceAgain }
+              - label: Bonfire world (soul-map)
+                name: souls
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Fire kindled banner", name: kindled }
+                  - { <<: *text, label: "Rest at the fire", name: rest }
+                  - { <<: *text, label: "Roll", name: roll }
+                  - { <<: *text, label: "Hero hint", name: restHint }
+                  - { <<: *text, label: "Class hint", name: classHint }
+                  - { <<: *text, label: "Status", name: status }
+                  - { <<: *text, label: "Lift hint", name: liftHint }
+                  - { <<: *text, label: "Pick up", name: pickUp }
+                  - { <<: *text, label: "Pick up a project", name: pickUpOf }
+                  - { <<: *text, label: "Picked up", name: pickedUp }
+                  - { <<: *text, label: "Item found", name: found }
+                  - { <<: *text, label: "Item hint", name: itemHint }
+                  - { <<: *text, label: "Message hint", name: messageHint }
+                  - { <<: *text, label: "Appraise", name: appraise }
+                  - { <<: *text, label: "Appraise a message", name: appraiseOf }
+                  - { <<: *text, label: "Appraised", name: appraised }
+                  - { <<: *text, label: "Summon", name: summon }
+                  - { <<: *text, label: "Summon a band", name: summonOf }
+                  - { <<: *text, label: "Band summoned banner", name: summoned }
+                  - { <<: *text, label: "Summon hint", name: summonHint }
+                  - { <<: *text, label: "Fog hint", name: fogHint }
+                  - { <<: *text, label: "Traverse the fog", name: traverse }
+                  - { <<: *text, label: "Sparring partner", name: partner }
+                  - { <<: *text, label: "Strike", name: strike }
+                  - { <<: *text, label: "Guard", name: guard }
+                  - { <<: *text, label: "Spar hint", name: sparHint }
+                  - { <<: *text, label: "Out of stamina", name: winded }
+                  - { <<: *text, label: "Knocked down banner", name: knockedDown }
+                  - { <<: *text, label: "Round won banner", name: roundWon }
+                  - { <<: *text, label: "Spar again", name: again }
+                  - { <<: *text, label: "Kindle the fire", name: kindle }
+                  - { <<: *text, label: "Kindle hint", name: kindleHint }
+                  - { <<: *text, label: "HUD name", name: runStatus }
+                  - { <<: *text, label: "Stamina", name: stamina }
+                  - { <<: *text, label: "Flask", name: flask }
+                  - { <<: *text, label: "Drink from the flask", name: drink }
+                  - { <<: *text, label: "Flask empty", name: flaskEmpty }
+                  - { <<: *text, label: "Health full", name: healthFull }
+                  - { <<: *text, label: "Souls", name: souls }
+                  - { <<: *text, label: "Souls gained", name: gained }
               - label: The /cv page
                 name: cvPage
                 widget: object
@@ -586,16 +670,11 @@ collections:
                   - { <<: *text, label: "Hits", name: hits }
                   - { <<: *text, label: "HP", name: hp }
                   - { <<: *text, label: "Parry meter", name: parryMeter, hint: 'Keep {parried} {total}' }
-                  - { <<: *text, label: "Fruit score", name: fruitScore, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Crate score", name: crateScore, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Gem awarded", name: gemAwarded }
                   - { <<: *text, label: "Break crate", name: breakCrate, hint: 'Keep {project}' }
-                  - { <<: *text, label: "Spin all crates", name: spinAll }
-                  - { <<: *text, label: "Crate hint", name: crateHint }
-                  - { <<: *text, label: "Fruit hint", name: fruitHint }
                   - { <<: *text, label: "Level number", name: level, hint: 'Keep {number}' }
                   - { <<: *text, label: "Time", name: time }
-                  - { <<: *text, label: "Portal hint", name: hubHint }
                   - { <<: *text, label: "XP", name: xp }
                   - { <<: *text, label: "XP bar", name: xpBar, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Level up", name: levelUp }

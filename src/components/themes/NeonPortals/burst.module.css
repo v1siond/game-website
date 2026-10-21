@@ -1,0 +1,81 @@
+/*
+ * Crate bursts (burst.tsx): planks thrown out on their own arcs, the content popping up, a blast ring.
+ * Each plays once on mount; transforms and opacity only.
+ */
+
+.plank {
+  opacity: 0;
+  animation: plank 760ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes plank {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--spin));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), calc(var(--dy) + 120%)) rotate(var(--spin));
+  }
+}
+
+.pop {
+  animation: pop 640ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes pop {
+  0% {
+    opacity: 0;
+    transform: translateY(40%) scale(0.3);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.blast {
+  opacity: 0;
+  animation: blast 620ms ease-out forwards;
+}
+
+.tnt {
+  background: radial-gradient(circle, var(--np-gold) 0 20%, var(--np-orange) 35%, var(--np-tnt) 55%, transparent 70%);
+}
+
+.nitro {
+  background: radial-gradient(circle, var(--np-white) 0 15%, var(--np-nitro) 40%, transparent 70%);
+}
+
+.slam {
+  background: radial-gradient(circle, transparent 0 45%, var(--np-white) 50%, transparent 62%);
+}
+
+@keyframes blast {
+  0% {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plank,
+  .blast {
+    display: none;
+  }
+
+  .pop {
+    animation: none;
+  }
+}

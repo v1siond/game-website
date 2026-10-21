@@ -1,0 +1,203 @@
+/*
+ * The warp room (warpRoom.tsx): the level buttons and their holograms, his slam onto the picked one,
+ * the tunnel, the boss door and the period below. Phases on data-warp; transforms and opacity only.
+ * Moving at most: three orbs turning on hover, him (idle or slam), the six tunnel rings while the
+ * tunnel runs, the flash, the period drop and its worker.
+ */
+
+.room {
+  background:
+    radial-gradient(circle at 50% 18%, var(--np-teal-deep), transparent 40%),
+    linear-gradient(var(--np-void), var(--np-chamber) 60%, var(--np-plate));
+  box-shadow: inset 0 0 0 3px var(--np-brass-dark);
+}
+
+/* ---- the level buttons ---- */
+
+.button {
+  transition: transform 160ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.button:hover,
+.button:focus-visible {
+  transform: translateY(-3px);
+}
+
+.padTop {
+  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* The picked button is pressed into the floor: a non-colour signal of the pick. */
+.button[data-selected] .padTop {
+  transform: translateY(5px);
+}
+
+/* The hologram: the period's orb always shows small; pointing or focus opens it full with its words. */
+.hologram {
+  transform: translate(-50%, 18%) scale(0.62);
+  transform-origin: 50% 100%;
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hologram > span:last-child {
+  opacity: 0;
+  transition: opacity 160ms linear;
+}
+
+.button:hover .hologram,
+.button:focus-visible .hologram {
+  transform: translate(-50%, 0) scale(1);
+}
+
+.button:hover .hologram > span:last-child,
+.button:focus-visible .hologram > span:last-child {
+  opacity: 1;
+}
+
+.orb {
+  opacity: 0.85;
+}
+
+.button:hover .orb,
+.button:focus-visible .orb {
+  opacity: 1;
+  animation: orb-turn 4s linear infinite;
+}
+
+@keyframes orb-turn {
+  0%,
+  100% {
+    transform: perspective(300px) rotateY(-14deg);
+  }
+  50% {
+    transform: perspective(300px) rotateY(14deg);
+  }
+}
+
+/* He drops onto the new button from above. */
+.standing[data-warp='slam'] {
+  animation: drop-in 560ms cubic-bezier(0.5, 0, 0.75, 0) both;
+}
+
+@keyframes drop-in {
+  0% {
+    transform: translate(-50%, -80%);
+  }
+  70% {
+    transform: translate(-50%, 0) scale(1.15, 0.82);
+  }
+  100% {
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ---- the tunnel ---- */
+
+.tunnel {
+  background: radial-gradient(circle, var(--np-white) 0 4%, var(--np-blue-deep) 30%, var(--np-void) 75%);
+  opacity: 0;
+}
+
+.tunnel[data-warp='pull'],
+.tunnel[data-warp='flash'] {
+  opacity: 1;
+  transition: opacity 200ms linear;
+}
+
+.tunnel[data-warp='out'] {
+  opacity: 0;
+  transition: opacity 400ms linear;
+}
+
+.tunnelRing {
+  opacity: 0;
+}
+
+.tunnel[data-warp='pull'] .tunnelRing,
+.tunnel[data-warp='flash'] .tunnelRing {
+  animation: stream 600ms linear infinite;
+  animation-delay: calc(var(--i) * 100ms);
+}
+
+@keyframes stream {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.05);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(4);
+  }
+}
+
+.flash {
+  opacity: 0;
+}
+
+.tunnel[data-warp='flash'] .flash {
+  opacity: 1;
+}
+
+.tunnel[data-warp='out'] .flash {
+  opacity: 0;
+  transition: opacity 300ms linear;
+}
+
+/* ---- the boss door: its leaves part a little on hover or focus ---- */
+
+.doorLeaf {
+  transform-box: view-box;
+  transform-origin: 60px 108px;
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.door:hover .doorLeaf,
+.door:focus-visible .doorLeaf {
+  transform: scaleX(0.86);
+}
+
+/* ---- the period below ---- */
+
+.period[data-warp='slam'],
+.period[data-warp='pull'],
+.period[data-warp='flash'] {
+  opacity: 0;
+}
+
+.period[data-warp='out'] {
+  animation: period-drop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes period-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .padTop,
+  .hologram,
+  .doorLeaf,
+  .hologram > span:last-child {
+    transition: none;
+  }
+
+  .orb,
+  .standing,
+  .period {
+    animation: none !important;
+  }
+
+  .tunnel {
+    display: none;
+  }
+}

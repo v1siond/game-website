@@ -1,0 +1,81 @@
+/*
+ * The boss round (bossRound.tsx): his lunge on the kick, the totem's flash and shake, its tiers
+ * tumbling when beaten, a power gem's pop. Transforms and opacity only.
+ */
+
+.arena {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 100%, var(--np-plate), transparent 70%),
+    var(--np-panel);
+}
+
+.lunge {
+  animation: lunge 900ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+@keyframes lunge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  40%,
+  60% {
+    transform: translateX(60%);
+  }
+}
+
+.totem[data-hit] {
+  animation: totem-hit 300ms linear 2;
+  animation-delay: 300ms;
+}
+
+@keyframes totem-hit {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(6%);
+    opacity: 0.5;
+  }
+}
+
+.tier {
+  transform-box: view-box;
+  transform-origin: 40px 116px;
+  transition:
+    transform 600ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 600ms linear;
+  transition-delay: calc(var(--i) * 120ms);
+}
+
+.totem[data-beaten] .tier {
+  opacity: 0.35;
+  transform: translateY(calc(var(--i) * -2px + 70px)) rotate(calc((var(--i) - 1) * 24deg));
+}
+
+.gemOn {
+  animation: gem-on 600ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes gem-on {
+  from {
+    transform: scale(0) rotate(-180deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lunge,
+  .totem[data-hit],
+  .gemOn {
+    animation: none;
+  }
+
+  .tier {
+    transition: none;
+  }
+}
