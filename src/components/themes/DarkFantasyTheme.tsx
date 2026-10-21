@@ -13,6 +13,7 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
@@ -22,49 +23,6 @@ import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, RELEASED } from '@/components/cv/sectionText'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
-
-/**
- * SECTION TRIGGER WRAPPER
- * =======================
- * Uses IntersectionObserver to detect when sections enter viewport.
- * NO hardcoded percentages - triggers based on ACTUAL element position.
- *
- * Pattern: IntersectionObserver (browser-native, performant)
- * Why chosen: Automatically handles content size changes, responsive,
- * works correctly regardless of font size or content length.
- */
-const FadeInSection = memo(function FadeInSection({
-  children,
-  className = '',
-  delay = 0,
-}: {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-}) {
-  const { ref, triggered } = useSectionTrigger({
-    threshold: 0.1,
-    rootMargin: '0px 0px -5% 0px',
-  })
-
-  return (
-    <div
-      ref={ref}
-      /* relative z-20: the transform below creates a stacking context, which would
-         otherwise trap the inner section's z-20 as a LOCAL value and let the fixed
-         z-[1..6] background layers (windows/fog) paint over the content. An explicit
-         positive z-index on this wrapper keeps the whole faded block above them. */
-      className={`relative z-20 ${className}`}
-      style={{
-        opacity: triggered ? 1 : 0,
-        transform: triggered ? 'translateY(0)' : 'translateY(20px)',
-        transition: `opacity 0.5s ease-out ${delay}ms, transform 0.5s ease-out ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  )
-})
 
 // Abstract spirit wisp - optimized: no SVG filter
 const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.ethereal }: { size?: number; color?: string }) {
@@ -1588,15 +1546,15 @@ function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   )
 }
 
-function FramedSection({ title, delay, children }: { title: string; delay?: number; children: React.ReactNode }) {
+function FramedSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <FadeInSection delay={delay}>
+    <ScrollScene>
       <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <VoidFrame title={title}>{children}</VoidFrame>
         </div>
       </section>
-    </FadeInSection>
+    </ScrollScene>
   )
 }
 
@@ -1624,14 +1582,14 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
 
   return (
     <>
-      <FramedSection title="About" delay={100}>
+      <FramedSection title="About">
         <p className="leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{professionalSummary.bio}</p>
       </FramedSection>
 
       {/* Art Section 1 - Spirits and Gears */}
-      <FadeInSection delay={150}>
+      <ScrollScene>
         <ArtSectionSpirits />
-      </FadeInSection>
+      </ScrollScene>
 
       {/* Work Experience - Knight Slash Reveal (content slides from right) */}
       {jobs.length > 0 && (
@@ -1645,9 +1603,9 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
       )}
 
       {/* Art Section 2 - Lanterns */}
-      <FadeInSection>
+      <ScrollScene>
         <ArtSectionLanterns />
-      </FadeInSection>
+      </ScrollScene>
 
       <FramedSection title="Tech Stack">
         <TechCloud categories={techStack} />
@@ -1671,9 +1629,9 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
       </div>
 
       {/* Art Section 3 - Crystals */}
-      <FadeInSection>
+      <ScrollScene>
         <ArtSectionCrystals />
-      </FadeInSection>
+      </ScrollScene>
 
       <FramedSection title="Ventures">
         <div className="grid md:grid-cols-3 gap-3 md:gap-4">
@@ -1691,9 +1649,9 @@ function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
 
   return (
     <>
-      <FadeInSection delay={150}>
+      <ScrollScene>
         <ArtSectionSpirits />
-      </FadeInSection>
+      </ScrollScene>
 
       <SlashRevealSection title="Bands">
         <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
@@ -1703,9 +1661,9 @@ function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
         <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
       </SlashRevealSection>
 
-      <FadeInSection>
+      <ScrollScene>
         <ArtSectionLanterns />
-      </FadeInSection>
+      </ScrollScene>
     </>
   )
 }
@@ -1715,9 +1673,9 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
 
   return (
     <>
-      <FadeInSection delay={150}>
+      <ScrollScene>
         <ArtSectionSpirits />
-      </FadeInSection>
+      </ScrollScene>
 
       <SlashRevealSection title="Muay Thai">
         <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
@@ -1740,9 +1698,9 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
         />
       </SlashRevealSection>
 
-      <FadeInSection>
+      <ScrollScene>
         <ArtSectionCrystals />
-      </FadeInSection>
+      </ScrollScene>
     </>
   )
 }
@@ -1926,7 +1884,7 @@ export default function DarkFantasyTheme() {
       <main id="main-content" tabIndex={-1} className="outline-none">
 
       {/* Profession Selector - Waystation style */}
-      <FadeInSection>
+      <ScrollScene>
         <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
           <h2 id="profession-heading" className="sr-only">Select Your Profession</h2>
           <div className="max-w-6xl mx-auto px-4 md:px-6">
@@ -1970,7 +1928,7 @@ export default function DarkFantasyTheme() {
             </div>
           </div>
         </section>
-      </FadeInSection>
+      </ScrollScene>
 
       <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
