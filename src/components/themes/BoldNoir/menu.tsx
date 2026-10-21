@@ -38,16 +38,16 @@ function MenuSlab({ id, label, selected, optionProps }: ProfessionOption) {
     <button
       type="button"
       {...optionProps}
-      className={`group relative flex min-h-[44px] w-full flex-col items-center bg-transparent px-2 pb-3 pt-2 text-[color:var(--noir-paper)] sm:w-44 ${world.menuItem} ${DETECTIVE_HOST.badge}`}
+      className={`group relative flex min-h-[44px] w-full min-w-0 flex-col items-center bg-transparent px-1 pb-3 pt-2 sm:px-2 text-[color:var(--noir-paper)] sm:w-44 ${world.menuItem} ${DETECTIVE_HOST.badge}`}
     >
       <svg viewBox="0 0 200 100" preserveAspectRatio="none" className={`absolute -inset-x-3 -inset-y-2 h-[calc(100%+1rem)] w-[calc(100%+1.5rem)] ${world.jag}`} aria-hidden="true" focusable="false">
         <path d={JAG} fill={NOIR.red} />
       </svg>
-      <span className={`relative flex w-full flex-col items-center ${world.slab} px-2 pb-2 pt-3`}>
+      <span className={`relative flex w-full flex-col items-center ${world.slab} px-1 pb-2 pt-3 sm:px-2`}>
         <span className={`block ${world.unskew}`}>
           <SlabFigure profession={id} />
         </span>
-        <span className={`mt-1 block text-center text-lg uppercase leading-tight tracking-wider sm:text-2xl ${world.unskew} ${selected ? 'text-[color:var(--noir-paper)]' : 'text-[color:var(--noir-fog)]'}`}>
+        <span className={`mt-1 block text-center text-base uppercase leading-tight tracking-wider sm:text-2xl ${world.unskew} ${selected ? 'text-[color:var(--noir-paper)]' : 'text-[color:var(--noir-fog)]'}`}>
           {label}
         </span>
       </span>
@@ -101,7 +101,7 @@ export function ProfessionMenu({ active }: { active: Profession }) {
   return (
     <>
       <ProfessionSwitch
-        className="mx-auto grid max-w-xl grid-cols-3 gap-4 sm:flex sm:max-w-none sm:justify-center sm:gap-10"
+        className="mx-auto grid max-w-xl grid-cols-3 gap-2 sm:flex sm:max-w-none sm:justify-center sm:gap-10"
         label={navigation.profession}
         renderOption={(option) => <MenuSlab {...option} />}
       />

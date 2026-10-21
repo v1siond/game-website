@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { compareStat, rarityOf, statsOf, type Rarity, type Stat, type StatKey, type Trend } from './loot'
@@ -98,7 +99,9 @@ function LootCard({ slot, index, equipped, onEquip }: LootCardProps) {
           {isEquipped && <span>{hud.equipped}</span>}
         </p>
         <div className="p-4">
-          <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>{project.name}</h3>
+          <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>
+            <SlashBreaks text={project.name} />
+          </h3>
           <p className="mt-1 text-sm font-bold">
             {project.role}
             {years && ` · ${years}`}
@@ -139,7 +142,7 @@ function LootCard({ slot, index, equipped, onEquip }: LootCardProps) {
               {isEquipped ? hud.equipped : hud.equip}
             </InkButton>
             {links.map((link) => (
-              <a key={link.kind} {...link.linkProps} className="text-base font-bold underline decoration-[3px] underline-offset-4">
+              <a key={link.kind} {...link.linkProps} className="inline-flex min-h-[44px] items-center text-base font-bold underline decoration-[3px] underline-offset-4">
                 {link.label}
               </a>
             ))}

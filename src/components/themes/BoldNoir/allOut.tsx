@@ -143,7 +143,7 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
         >
           <span aria-hidden="true">X</span>
         </button>
-        <h2 id="all-out-title" className="pr-14 text-4xl leading-none tracking-wide sm:text-5xl">
+        <h2 id="all-out-title" className="pr-14 text-3xl leading-none tracking-wide sm:text-5xl">
           {project.name}
         </h2>
         <p className={`mt-2 text-base font-bold text-[color:var(--noir-paper)] ${world.copy}`}>

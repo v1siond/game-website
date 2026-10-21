@@ -1,6 +1,7 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { Starburst } from './ink'
 import { CEL } from './palette'
 import cel from './cel.module.css'
@@ -32,7 +33,9 @@ function PlateFace({ company, tone }: { company: Company; tone: string }) {
           {company.name.charAt(0)}
         </span>
       </div>
-      <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>{company.name}</h3>
+      <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>
+        <SlashBreaks text={company.name} />
+      </h3>
       {company.tagline && <p className={`mt-1 text-base font-bold italic ${cel.flavour}`}>{company.tagline}</p>}
       <p className="mt-2 text-base leading-relaxed">{company.description}</p>
       {company.services.length > 0 && (

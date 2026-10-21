@@ -195,7 +195,8 @@
   cursor: pointer;
 }
 
-.btn:hover { transform: translate3d(0, -2px, 0); }
+.btn:hover,
+.btn:focus-visible { transform: translate3d(0, -2px, 0); }
 .btn:active { transform: translate3d(0, 3px, 0); }
 
 .btnGold {
@@ -373,7 +374,8 @@
   transition: transform 0.2s ease;
 }
 
-.talent:hover { transform: translate3d(0, -3px, 0); }
+.talent:hover,
+.talent:focus-visible { transform: translate3d(0, -3px, 0); }
 
 .talent[aria-checked='true'] {
   background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 55%, var(--myth-gold-deep) 100%);

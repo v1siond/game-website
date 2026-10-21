@@ -8,6 +8,7 @@ import { HitStar } from './backdrop'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
 // The cards each section lists, each a crooked slab whose words sit level so they read. Every card sits
 // in two layers: the outer one plays the entrance once when its stage fires (rank flip, result slide),
@@ -72,7 +73,9 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
           </span>
         </p>
         <h3 className="text-3xl leading-none tracking-wide">{entry.title}</h3>
-        <p className={`mt-1 font-bold uppercase tracking-wider text-[color:var(--noir-paper)] ${world.copy} text-sm`}>{entry.company}</p>
+        <p className={`mt-1 font-bold uppercase tracking-wider text-[color:var(--noir-paper)] ${world.copy} text-sm`}>
+          <SlashBreaks text={entry.company} />
+        </p>
         {entry.description && <p className={`mt-3 ${BODY}`}>{entry.description}</p>}
         {entry.highlights.length > 0 && (
           <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
@@ -102,8 +105,10 @@ export function CaseCard({ slot, index, onOpen }: { slot: ProjectSlot; index: nu
         aria-haspopup="dialog"
         className={`group block w-full bg-transparent p-6 text-left text-[color:var(--noir-paper)] ${world.slab} ${world.kick}`}
       >
-        <span className="flex items-baseline justify-between gap-3">
-          <span className="text-3xl leading-none tracking-wide">{project.name}</span>
+        <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <span className="min-w-0 text-3xl leading-none tracking-wide">
+            <SlashBreaks text={project.name} />
+          </span>
           {years && <span className={`whitespace-nowrap text-sm font-bold text-[color:var(--noir-fog)] ${world.copy}`}>{years}</span>}
         </span>
         <span className={`mt-1 block font-bold ${BODY}`}>{project.role}</span>
@@ -131,8 +136,10 @@ export function CompanyTag({ company }: { company: CVData['companies'][number] }
         <span className="text-3xl" aria-hidden="true">
           {company.icon}
         </span>
-        <span>
-          <span className="block text-2xl tracking-wide">{company.name}</span>
+        <span className="min-w-0">
+          <span className="block text-2xl tracking-wide">
+            <SlashBreaks text={company.name} />
+          </span>
           <span className={`block font-bold ${BODY}`}>{company.tagline}</span>
         </span>
       </span>

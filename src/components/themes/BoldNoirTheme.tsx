@@ -46,7 +46,7 @@ export default function BoldNoirTheme() {
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={NOIR_VARS}>
       <NoirBackdrop />
 
-      <header className="relative z-30 px-4 py-10 sm:px-6 sm:py-16">
+      <header className="relative z-30 px-4 pb-10 pt-16 sm:px-6 sm:py-16">
         <CallingCardHero />
       </header>
 

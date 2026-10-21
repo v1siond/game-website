@@ -60,7 +60,7 @@ function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
         )}
         {linkProps && (
           <p className="mt-3">
-            <a {...linkProps} className="inline-block bg-[var(--cel-paper)] px-1 text-base font-bold underline decoration-[3px] underline-offset-4">
+            <a {...linkProps} className="inline-flex min-h-[44px] items-center bg-[var(--cel-paper)] px-2 text-base font-bold underline decoration-[3px] underline-offset-4">
               {links.website}
             </a>
           </p>

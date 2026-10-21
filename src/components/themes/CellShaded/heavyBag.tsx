@@ -68,7 +68,7 @@ export function HeavyBag({ martialArts, on }: { martialArts: MartialArts; on: bo
                 <div className={`absolute -left-8 -top-8 h-16 w-16 ${cel.impact}`}>
                   <Starburst fill={critical ? CEL.crit : CEL.sun} />
                 </div>
-                <p className={`absolute -left-28 bottom-6 w-56 text-center text-base font-black ${cel.pop}`}>
+                <p className={`absolute -left-36 bottom-6 w-44 text-center sm:-left-28 sm:w-56 text-base font-black ${cel.pop}`}>
                   {critical && <span className={`block text-3xl ${cel.display} ${cel.crit}`}>{hud.critical}</span>}
                   <span className="bg-[var(--cel-paper)] px-1 text-[var(--cel-ink)]">{achievements[current]}</span>
                 </p>

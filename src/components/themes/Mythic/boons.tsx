@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
@@ -72,7 +73,9 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
             {chosen && <Sigil rarity={rarity} className={`absolute inset-0 h-full w-full ${u.sigilFly}`} />}
           </div>
         </div>
-        <h3 className={`mt-1 text-xl leading-tight text-[var(--myth-gold)] ${u.display}`}>{project.name}</h3>
+        <h3 className={`mt-1 text-xl leading-tight text-[var(--myth-gold)] ${u.display}`}>
+          <SlashBreaks text={project.name} />
+        </h3>
         <p className="mt-1 text-sm text-[var(--myth-bone-shade)]">
           {project.role}
           {years && ` · ${years}`}
@@ -104,7 +107,7 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
             {chosen ? myth.chosen : myth.choose}
           </SlabButton>
           {links.map((link) => (
-            <a key={link.kind} {...link.linkProps} className="text-base text-[var(--myth-gold-pale)] underline decoration-2 underline-offset-4">
+            <a key={link.kind} {...link.linkProps} className="inline-flex min-h-[44px] items-center text-base text-[var(--myth-gold-pale)] underline decoration-2 underline-offset-4">
               {link.label}
             </a>
           ))}

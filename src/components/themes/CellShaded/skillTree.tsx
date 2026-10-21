@@ -13,7 +13,7 @@ import cel from './cel.module.css'
 // The Tech Stack as the hunter's skill tree, opened by his action skill: when the tree first scrolls
 // into view he deploys the turret and works it from the wrist computer. The tree: one branch per category, the category on top as the
 // branch's action skill and its tools as the nodes down the tiers, joined by the spine. Pointing at a
-// node lights its branch from the top down to it, the way a tree shows the points it took to get
+// node, or tapping it, lights its branch from the top down to it, the way a tree shows the points it took to get
 // there. The light is a pointer extra over a plain list: the nodes are not tab stops (sixty of them
 // would bury the page's keyboard path), and a screen reader reads each branch as a titled list.
 
@@ -33,6 +33,7 @@ function Branch({ category, index, lit, onLight }: { category: Category; index: 
       <div
         className={`relative z-10 mx-auto w-fit px-4 py-2 text-xl ${cel.display} ${cel.skill}`}
         onPointerEnter={() => onLight({ branch: category.id, depth: 0 })}
+        onClick={() => onLight({ branch: category.id, depth: 0 })}
       >
         <span data-on={depth >= 0 || undefined} className={`absolute inset-0 ${cel.skillLit}`} style={{ ['--t' as string]: 0 }} aria-hidden="true" />
         <span className="relative">{category.name}</span>
@@ -45,6 +46,7 @@ function Branch({ category, index, lit, onLight }: { category: Category; index: 
               key={item}
               className={`relative px-3 py-1.5 text-base font-bold ${cel.skill}`}
               onPointerEnter={() => onLight({ branch: category.id, depth: tier + 1 })}
+              onClick={() => onLight({ branch: category.id, depth: tier + 1 })}
             >
               <span data-on={tier + 1 <= depth || undefined} className={`absolute inset-0 ${cel.skillLit}`} style={{ ['--t' as string]: tier + 1 }} aria-hidden="true" />
               <span className="relative">{item}</span>

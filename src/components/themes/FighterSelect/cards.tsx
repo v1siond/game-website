@@ -10,6 +10,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
 // The fight cards every list entry sits on: a flat dark box ruled in its accent, ringed in black, with
 // the cut corner of a move list panel; highlights are marked with a hit spark. A running job is ruled
@@ -51,7 +52,9 @@ export function ExperienceCard({ entry }: { entry: Job }) {
     <FightCard accent={running ? 'health' : 'cyan'}>
       <div className="mb-4">
         <h3 className={TITLE}>{entry.title}</h3>
-        <p className="text-sm text-[color:var(--accent)]">{entry.company}</p>
+        <p className="text-sm text-[color:var(--accent)]">
+          <SlashBreaks text={entry.company} />
+        </p>
       </div>
 
       {entry.description && <p className={`mb-4 ${BODY}`}>{entry.description}</p>}
@@ -76,8 +79,10 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
   const labels = useLabels()
   return (
     <FightCard accent={project.highlight ? 'gold' : 'cyan'}>
-      <div className="mb-2 flex items-start justify-between gap-2">
-        <h3 className={TITLE}>{project.name}</h3>
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
+        <h3 className={`min-w-0 ${TITLE}`}>
+          <SlashBreaks text={project.name} />
+        </h3>
         {years && <span className={`whitespace-nowrap text-sm text-[color:var(--accent)] ${look.display}`}>{years}</span>}
       </div>
       <p className="mb-2 text-sm font-bold text-white">{project.role}</p>
@@ -149,8 +154,10 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
           <span className="text-4xl" aria-hidden="true">
             {company.icon}
           </span>
-          <div>
-            <h3 className={TITLE}>{company.name}</h3>
+          <div className="min-w-0">
+            <h3 className={TITLE}>
+              <SlashBreaks text={company.name} />
+            </h3>
             <p className="text-sm text-[color:var(--accent)]">{company.tagline}</p>
           </div>
         </div>
@@ -174,10 +181,10 @@ export function MoveList({ categories }: { categories: CVData['techStack'] }) {
               <span aria-hidden="true">{category.icon}</span>
               {category.name}
             </h3>
-            <ul className="grid grid-cols-2 gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
+            <ul className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
               {category.items.map((tech) => (
                 <li key={tech} className="min-w-0 break-words border border-[color:var(--fs-steel)] bg-black px-3 py-2 text-sm text-white">
-                  {tech}
+                  <SlashBreaks text={tech} />
                 </li>
               ))}
             </ul>

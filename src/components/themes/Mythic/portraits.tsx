@@ -26,7 +26,7 @@ function BandCard({ slot, onStrike }: { slot: BandSlot; onStrike: () => void }) 
       <div className={`min-w-0 flex-1 p-4 ${u.dialogue}`}>
         <h3 className={`text-lg leading-tight text-[var(--myth-gold)] ${u.display}`}>
           {linkProps ? (
-            <a {...linkProps} className="underline decoration-2 underline-offset-4">
+            <a {...linkProps} className="inline-flex min-h-[44px] items-center underline decoration-2 underline-offset-4">
               {band.name}
             </a>
           ) : (

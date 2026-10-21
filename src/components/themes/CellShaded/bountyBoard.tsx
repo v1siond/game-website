@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
@@ -36,7 +37,9 @@ function Notice({ job, index, onRead }: { job: Job; index: number; onRead: (id: 
         <p className={`float-right ml-3 px-2 py-0.5 text-sm ${cel.display} ${cel.stamp} [-webkit-text-stroke:0]`}>
           {job.current ? navigation.active : hud.completed}
         </p>
-        <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>{job.company}</h3>
+        <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>
+          <SlashBreaks text={job.company} />
+        </h3>
         <p className="mt-1 text-base font-bold">{job.title}</p>
         <p className="text-sm font-bold text-[var(--cel-plank-shade)]">
           {fillLabel(years.range, { start, end })}

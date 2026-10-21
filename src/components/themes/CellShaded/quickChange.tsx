@@ -21,12 +21,12 @@ function OutfitTab({ id, label, selected, optionProps }: ProfessionOption) {
   return (
     <div
       {...optionProps}
-      className={`flex min-h-[44px] cursor-pointer flex-col items-center gap-2 border-4 border-[var(--cel-ink)] px-3 pb-3 pt-2 shadow-[4px_4px_0_var(--cel-ink)] ${cel.outfit} ${
+      className={`flex min-h-[44px] min-w-0 cursor-pointer flex-col items-center gap-2 border-4 border-[var(--cel-ink)] px-1 pb-3 sm:px-3 pt-2 shadow-[4px_4px_0_var(--cel-ink)] ${cel.outfit} ${
         selected ? 'bg-[var(--cel-sun)]' : 'bg-[var(--cel-paper)]'
       }`}
     >
       <VaultSprite profession={id} motion="still" className="h-24 w-14" />
-      <span className={`text-base ${cel.display} [-webkit-text-stroke:0]`}>{label}</span>
+      <span className={`text-center text-sm sm:text-base ${cel.display} [-webkit-text-stroke:0]`}>{label}</span>
     </div>
   )
 }
@@ -52,7 +52,7 @@ export function QuickChange({ profession }: { profession: Profession }) {
 
   return (
     <section ref={ref} className="relative z-20 px-4 py-10 sm:px-6" aria-label={navigation.professionSelection}>
-      <div className={`mx-auto grid max-w-5xl items-center gap-6 p-5 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)] ${cel.darkPaper}`}>
+      <div className={`mx-auto grid max-w-5xl items-center gap-6 p-3 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)] ${cel.darkPaper}`}>
         <div className="relative mx-auto h-64 w-44" aria-hidden="true">
           {/* the booth: its frame inked and hatched, the pad glowing under him */}
           <svg viewBox="0 0 176 256" className={`absolute inset-0 h-full w-full ${cel.inked}`}>
@@ -70,7 +70,7 @@ export function QuickChange({ profession }: { profession: Profession }) {
         <div className="min-w-0">
           <p className={`mb-4 text-2xl text-[var(--cel-sun)] sm:text-3xl ${cel.display}`}>{navigation.selectYourProfession}</p>
           <ProfessionSwitch
-            className="grid grid-cols-3 gap-3"
+            className="grid grid-cols-3 gap-2 sm:gap-3"
             label={navigation.profession}
             renderOption={(option) => <OutfitTab {...option} />}
           />

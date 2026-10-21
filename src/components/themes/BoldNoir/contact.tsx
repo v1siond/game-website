@@ -29,7 +29,7 @@ export function DeliveredCard() {
         render={({ line, actions }) => (
           <div className={`relative px-6 pb-10 pt-12 sm:px-10 ${world.slab} ${world.delivered}`}>
             <HitStar className="absolute -left-6 -top-8 h-16 w-16" />
-            <h2 id={CONTACT_HEADING} className="mb-4 text-4xl uppercase sm:text-5xl">
+            <h2 id={CONTACT_HEADING} className="mb-4 text-3xl uppercase sm:text-5xl">
               <RansomWord text={sections.contact} />
             </h2>
             <p className={`mb-8 text-base text-[color:var(--noir-paper)] ${world.copy}`}>{line}</p>

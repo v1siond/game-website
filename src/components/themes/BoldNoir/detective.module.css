@@ -168,7 +168,8 @@
   animation: badgeFlash 420ms ease-out both;
 }
 
-.badgeHost:hover .notebook {
+.badgeHost:hover .notebook,
+.badgeHost:focus-visible .notebook {
   opacity: 0;
 }
 

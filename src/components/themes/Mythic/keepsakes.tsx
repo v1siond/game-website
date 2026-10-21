@@ -1,4 +1,5 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { newTabName } from '@/components/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
 import { MYTH } from './palette'
@@ -32,7 +33,9 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
         </div>
       </div>
       <div className="flex-1 border-x-2 border-b-2 border-[var(--myth-gold-deep)] bg-[var(--myth-panel)] p-5">
-        <h3 className={`text-lg text-[var(--myth-gold)] ${u.display}`}>{company.name}</h3>
+        <h3 className={`text-lg text-[var(--myth-gold)] ${u.display}`}>
+          <SlashBreaks text={company.name} />
+        </h3>
         {company.tagline && <p className="mt-1 text-base italic text-[var(--myth-gold-pale)]">{company.tagline}</p>}
         <p className="mt-2 text-base leading-relaxed">{company.description}</p>
         {company.services.length > 0 && (
