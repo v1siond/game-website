@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useState, useMemo, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
-import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { CURRENT_ROLES } from '@/data/roles'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { PROJECTS_DATA } from '@/data/projects'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // ============================================================================
 // PORTAL COLOR PALETTE - Authentic Game Colors
@@ -866,38 +866,31 @@ function TestChamberSection({
 
 // ============================================================================
 // PORTAL PROFESSION SELECTOR
+// ProfessionSwitch owns the order (Musician, System Engineer, Martial Artist), the pick and the
+// keyboard; each portal only draws itself.
 // ============================================================================
 
-function PortalSelector({
-  profession,
-  isActive,
-  onClick,
-  label,
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  isActive: boolean
-  onClick: () => void
-  label: string
-}) {
-  const prefersReducedMotion = usePrefersReducedMotion()
-  const colors = {
-    engineer: { primary: PORTAL.BLUE, glow: PORTAL.BLUE_GLOW },
-    drummer: { primary: PORTAL.ORANGE, glow: PORTAL.ORANGE_GLOW },
-    fighter: { primary: '#00DD66', glow: '#00FF88' },
-  }
-  const icons = { engineer: '</>', drummer: '///', fighter: '+ +' }
+const PORTAL_COLORS: Record<Profession, { primary: string; glow: string }> = {
+  engineer: { primary: PORTAL.BLUE, glow: PORTAL.BLUE_GLOW },
+  drummer: { primary: PORTAL.ORANGE, glow: PORTAL.ORANGE_GLOW },
+  fighter: { primary: '#00DD66', glow: '#00FF88' },
+}
 
-  const color = colors[profession]
+const PORTAL_ICONS: Record<Profession, string> = { engineer: '</>', drummer: '///', fighter: '+ +' }
+
+function PortalSelector({ option }: { option: ProfessionOption }) {
+  const { id: profession, label, selected: isActive, optionProps } = option
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const color = PORTAL_COLORS[profession]
 
   return (
     <button
-      onClick={onClick}
-      className={`relative flex flex-col items-center gap-2 p-4 transition-transform ${
+      type="button"
+      {...optionProps}
+      className={`relative flex flex-col items-center gap-2 p-2 sm:p-4 transition-transform ${
         isActive ? 'scale-105' : 'hover:scale-102'
       }`}
       style={{ willChange: 'transform' }}
-      aria-label={`Select ${label} profile${isActive ? ' (currently selected)' : ''}`}
-      aria-pressed={isActive}
     >
       {/* Portal ring */}
       <div
@@ -932,15 +925,12 @@ function PortalSelector({
           style={{ color: color.primary, textShadow: `0 0 15px ${color.primary}` }}
           aria-hidden="true"
         >
-          {icons[profession]}
+          {PORTAL_ICONS[profession]}
         </span>
       </div>
 
       {/* Label */}
-      <span
-        className="text-[10px] tracking-[0.15em] font-medium"
-        style={{ color: color.primary }}
-      >
+      <span className="text-sm tracking-[0.1em] font-medium uppercase text-center" style={{ color: color.primary }} aria-hidden="true">
         {label}
       </span>
 
@@ -962,16 +952,16 @@ function PortalSelector({
 // TECH TERMINAL - Engineer Skills (no proficiency bars)
 // ============================================================================
 
-function TechTerminal({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+function TechTerminal({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6" role="list" aria-label="Technical Skills">
       {categories.map((category, catIndex) => (
-        <div key={category.name} role="listitem">
+        <div key={category.id} role="listitem">
           <h3
-            className="text-[10px] tracking-[0.12em] mb-3 flex items-center gap-2 uppercase"
+            className="text-sm tracking-[0.12em] mb-3 flex items-center gap-2 uppercase"
             style={{ color: catIndex % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE }}
           >
-            <span className="text-sm">{category.icon}</span>
+            <span className="text-sm" aria-hidden="true">{category.icon}</span>
             <span>{category.name}</span>
             <span
               className="flex-1 h-px ml-1"
@@ -985,7 +975,7 @@ function TechTerminal({ categories }: { categories: ReturnType<typeof getEnginee
             {category.items.map((tech, i) => (
               <span
                 key={tech}
-                className="px-2 py-1 text-[10px] cursor-default transition-colors hover:brightness-110"
+                className="px-2 py-1 text-sm cursor-default transition-colors hover:brightness-110"
                 style={{
                   background: `${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}10`,
                   border: `1px solid ${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}30`,
@@ -1004,57 +994,16 @@ function TechTerminal({ categories }: { categories: ReturnType<typeof getEnginee
 }
 
 // ============================================================================
-// SKILLS PANEL - Drummer/Fighter Skills (no proficiency bars)
-// ============================================================================
-
-function SkillsPanel({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
-  return (
-    <div className="grid md:grid-cols-3 gap-6" role="list" aria-label="Skills">
-      {categories.map((category, catIndex) => (
-        <div key={category.name} role="listitem">
-          <h3
-            className="text-[10px] tracking-[0.12em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: catIndex % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE }}
-          >
-            <span>{category.icon}</span>
-            {category.name}
-          </h3>
-          <ul className="space-y-2" role="list">
-            {category.skills.map((skill, i) => (
-              <li
-                key={skill.name}
-                className="text-xs flex items-center gap-2"
-                style={{ color: PORTAL.PANEL_WHITE }}
-              >
-                <span
-                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-                  style={{
-                    background: i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE,
-                    boxShadow: `0 0 5px ${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}`,
-                  }}
-                  aria-hidden="true"
-                />
-                {skill.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ============================================================================
 // PROJECT CARD - Test Chamber Style
 // ============================================================================
 
-function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; index: number }) {
+function ProjectCard({ slot: { project, years, links }, index }: { slot: ProjectSlot; index: number }) {
   const isOrange = index % 2 === 0
   const color = isOrange ? PORTAL.ORANGE : PORTAL.BLUE
 
   return (
     <article
-      className="relative p-4 transition-all hover:scale-[1.01] group cursor-default"
+      className="relative h-full p-4 transition-all hover:scale-[1.01] group"
       style={{
         background: `linear-gradient(180deg, ${PORTAL.CHAMBER_BG}, ${PORTAL.VOID})`,
         border: `1.5px solid ${PORTAL.METAL_DARK}`,
@@ -1086,29 +1035,20 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
         {String(index + 1).padStart(2, '0')}
       </div>
 
-      {project.featured && (
-        <span
-          className="text-[8px] tracking-[0.1em] uppercase"
-          style={{ color: PORTAL.CAUTION_YELLOW }}
-        >
-          * Featured Test
-        </span>
-      )}
-
-      <h3
-        id={`project-${project.id}`}
-        className="text-xs font-medium mt-0.5"
-        style={{ color }}
-      >
-        {project.name}
-      </h3>
-      <p className="text-[10px] mt-1 mb-1" style={{ color: PORTAL.PANEL_SCUFFED }}>
+      <div className="flex justify-between items-start gap-2 pr-5">
+        <h3 id={`project-${project.id}`} className="text-sm font-medium" style={{ color }}>
+          {project.name}
+        </h3>
+        {years && <span className="text-sm whitespace-nowrap text-[#C8C8C8]">{years}</span>}
+      </div>
+      <p className="text-sm mt-1 text-[#FFCC00]">{project.role}</p>
+      <p className="text-sm mt-1 mb-1" style={{ color: PORTAL.PANEL_SCUFFED }}>
         {project.tagline}
       </p>
 
       {project.impact && (
         <p
-          className="text-[10px] italic mb-2 px-2 py-1"
+          className="text-sm italic mb-2 px-2 py-1"
           style={{
             color: PORTAL.BLUE,
             background: `${PORTAL.BLUE}08`,
@@ -1123,7 +1063,7 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
         {project.techStack.slice(0, 4).map((tech, i) => (
           <span
             key={tech}
-            className="text-[8px] px-1.5 py-0.5"
+            className="text-sm px-1.5 py-0.5"
             style={{
               background: `${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}12`,
               color: i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE,
@@ -1133,19 +1073,39 @@ function ProjectCard({ project, index }: { project: typeof PROJECTS_DATA[0]; ind
           </span>
         ))}
       </div>
+
+      {links.length > 0 ? (
+        <div className="flex gap-2 flex-wrap mt-3">
+          {links.map(({ kind, label, linkProps }, i) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className={`inline-flex items-center min-h-[44px] px-3 text-sm tracking-wider uppercase border-[1.5px] transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
+                i % 2 === 0 ? 'border-[#FF9A00] text-[#FF9A00]' : 'border-[#00A2FF] text-[#00A2FF]'
+              }`}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm mt-3 italic" style={{ color: PORTAL.PANEL_SCUFFED }}>No public link</p>
+      )}
     </article>
   )
 }
 
 // ============================================================================
 // EXPERIENCE CARD
+// Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps its
+// own year west of UTC.
 // ============================================================================
 
-function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; index: number }) {
+function ExperienceCard({ entry, index }: { entry: Job; index: number }) {
   const isOrange = index % 2 === 0
   const color = isOrange ? PORTAL.ORANGE : PORTAL.BLUE
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'PRESENT'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'PRESENT'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
     <article
@@ -1160,35 +1120,37 @@ function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; in
         <div>
           <h4
             id={`exp-${entry.id}`}
-            className="text-xs font-medium"
+            className="text-sm font-medium"
             style={{ color: PORTAL.PANEL_WHITE }}
           >
             {entry.title}
           </h4>
-          <p className="text-[10px] mt-0.5" style={{ color }}>
-            {entry.organization}
+          <p className="text-sm mt-0.5" style={{ color }}>
+            {entry.company}
           </p>
         </div>
         <span
-          className="text-[9px] tracking-wider px-1.5 py-0.5"
+          className="text-sm tracking-wider px-1.5 py-0.5"
           style={{ background: `${color}12`, color }}
         >
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-[10px] mb-2" style={{ color: PORTAL.PANEL_SCUFFED }}>
-        {entry.description}
-      </p>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.description && (
+        <p className="text-sm mb-2" style={{ color: PORTAL.PANEL_SCUFFED }}>
+          {entry.description}
+        </p>
+      )}
+      {entry.highlights.length > 0 && (
         <ul className="space-y-1.5" role="list">
           {entry.highlights.map((highlight, i) => (
             <li
-              key={i}
-              className="text-[10px] flex items-start gap-2"
+              key={highlight}
+              className="text-sm flex items-start gap-2"
               style={{ color: PORTAL.PANEL_WHITE }}
             >
               <span
-                className="mt-1 w-1 h-1 rounded-full flex-shrink-0"
+                className="mt-1.5 w-1 h-1 rounded-full flex-shrink-0"
                 style={{
                   background: i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE,
                   boxShadow: `0 0 4px ${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}`,
@@ -1208,7 +1170,7 @@ function ExperienceCard({ entry, index }: { entry: typeof EXPERIENCE_DATA[0]; in
 // VENTURE CARD
 // ============================================================================
 
-function VentureCard({ company }: { company: typeof COMPANIES[0] }) {
+function VentureCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
@@ -1219,26 +1181,26 @@ function VentureCard({ company }: { company: typeof COMPANIES[0] }) {
         background: `linear-gradient(180deg, ${PORTAL.CHAMBER_BG}, ${PORTAL.VOID})`,
         border: `1px solid ${PORTAL.BLUE}25`,
       }}
-      aria-label={`${company.name} - ${company.tagline}`}
+      aria-label={`${company.name} - ${company.tagline} (opens in a new tab)`}
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-xl" aria-hidden="true">{company.icon}</span>
         <div>
           <h4
-            className="text-xs group-hover:brightness-125 transition-all"
+            className="text-sm group-hover:brightness-125 transition-all"
             style={{ color: PORTAL.PANEL_WHITE }}
           >
             {company.name}
           </h4>
-          <p className="text-[9px]" style={{ color: PORTAL.ORANGE }}>{company.tagline}</p>
+          <p className="text-sm" style={{ color: PORTAL.ORANGE }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-[10px] mb-2" style={{ color: PORTAL.PANEL_SCUFFED }}>{company.description}</p>
+      <p className="text-sm mb-2" style={{ color: PORTAL.PANEL_SCUFFED }}>{company.description}</p>
       <div className="flex flex-wrap gap-1">
         {company.services.slice(0, 3).map((service) => (
           <span
             key={service}
-            className="text-[8px] px-1.5 py-0.5"
+            className="text-sm px-1.5 py-0.5"
             style={{ background: `${PORTAL.BLUE}12`, color: PORTAL.BLUE }}
           >
             {service}
@@ -1253,49 +1215,183 @@ function VentureCard({ company }: { company: typeof COMPANIES[0] }) {
 // BAND CARD
 // ============================================================================
 
-function BandCard({ band }: { band: typeof BANDS[0] }) {
+function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <article
-      className="p-4 transition-all hover:scale-[1.01] group"
+      className="h-full p-4 transition-all hover:scale-[1.01] group"
       style={{
         background: `linear-gradient(180deg, ${PORTAL.CHAMBER_BG}, ${PORTAL.VOID})`,
         border: `1px solid ${PORTAL.ORANGE}25`,
       }}
-      aria-labelledby={`band-${band.id}`}
     >
-      <h4
-        id={`band-${band.id}`}
-        className="text-xs group-hover:brightness-125 transition-all"
+      <h3
+        className="text-sm group-hover:brightness-125 transition-all"
         style={{ color: PORTAL.PANEL_WHITE }}
       >
         {band.name}
-      </h4>
-      <p className="text-[9px] mt-0.5" style={{ color: PORTAL.ORANGE }}>
-        {band.genre} | {band.role}
+      </h3>
+      <p className="text-sm mt-0.5" style={{ color: PORTAL.ORANGE }}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
       </p>
-      <p className="text-[10px] mt-1.5" style={{ color: PORTAL.PANEL_SCUFFED }}>{band.description}</p>
-      {!band.url && (
-        <p className="text-[9px] mt-1.5 italic" style={{ color: PORTAL.METAL_MID }}>
-          [Audio logs pending]
+      {band.release && (
+        <p className="text-sm mt-1.5" style={{ color: PORTAL.PANEL_SCUFFED }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>
   )
 
-  if (band.url) {
-    return (
-      <a
-        href={band.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-        aria-label={`${band.name} - ${band.genre}`}
-      >
-        {content}
-      </a>
-    )
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a {...linkProps} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+      {content}
+    </a>
+  )
+}
+
+// ============================================================================
+// HERO ACTIONS - email lit orange, LinkedIn outlined blue
+// ============================================================================
+
+const PORTAL_BUTTON =
+  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider uppercase transition-all hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
+
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-[#FF9A00] text-[#1A1A1A]',
+  linkedin: 'border-[1.5px] border-[#00A2FF] text-[#00A2FF] bg-[#00A2FF]/10',
+}
+
+function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+  return (
+    <>
+      {actions.map((action) => (
+        <a key={action.id} {...action.linkProps} className={`${PORTAL_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+          {action.label}
+        </a>
+      ))}
+    </>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      {/* 1. ABOUT */}
+      <TestChamberSection title="About" notice="CLEARANCE LEVEL: AUTHORIZED" id="about">
+        <p className="text-sm leading-relaxed" style={{ color: PORTAL.PANEL_WHITE }}>
+          {professionalSummary.bio}
+        </p>
+      </TestChamberSection>
+
+      {/* 2. ART SECTION - Portals */}
+      <ArtSectionPortals />
+
+      {/* 3. EXPERIENCE */}
+      {sections.jobs.length > 0 && (
+        <TestChamberSection title="Work Experience" id="experience">
+          <div className="space-y-3">
+            {sections.jobs.map((entry, i) => (
+              <ExperienceCard key={entry.id} entry={entry} index={i} />
+            ))}
+          </div>
+        </TestChamberSection>
+      )}
+
+      {/* 4. ART SECTION - Cube & Turrets */}
+      <ArtSectionCubeAndTurrets />
+
+      {/* 5. TECH STACK */}
+      <TestChamberSection title="Tech Stack" id="skills">
+        <TechTerminal categories={sections.techStack} />
+      </TestChamberSection>
+
+      {/* 6. PROJECTS */}
+      <TestChamberSection title="Projects" notice="RESULTS VERIFIED" id="projects">
+        <ProjectList
+          projects={sections.projects}
+          className="grid md:grid-cols-2 gap-4"
+          renderProject={(slot) => <ProjectCard slot={slot} index={sections.projects.indexOf(slot.project)} />}
+        />
+      </TestChamberSection>
+
+      {/* 7. ART SECTION - Test Chamber Elements */}
+      <ArtSectionTestChamber />
+
+      {/* 8. VENTURES */}
+      <TestChamberSection title="Ventures" id="ventures">
+        <div className="grid md:grid-cols-3 gap-4">
+          {sections.companies.map((company) => (
+            <VentureCard key={company.id} company={company} />
+          ))}
+        </div>
+      </TestChamberSection>
+    </>
+  )
+}
+
+function MusicianChambers({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <ArtSectionPortals />
+
+      <TestChamberSection title="Bands" id="bands">
+        <p className="text-sm mb-4" style={{ color: PORTAL.PANEL_WHITE }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandCard {...slot} />} />
+        <p className="text-sm mt-4 italic" style={{ color: PORTAL.BLUE }}>{musician.line}</p>
+      </TestChamberSection>
+
+      <ArtSectionTestChamber />
+    </>
+  )
+}
+
+function MartialArtistChambers({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <ArtSectionCubeAndTurrets />
+
+      <TestChamberSection title="Muay Thai" id="muay-thai">
+        <h3 className="text-sm tracking-wider uppercase mb-4 text-[#FF9A00]">{martialArts.primary.title}</h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+            fact: 'p-3 border border-[#00A2FF]/25 bg-[#00A2FF]/5',
+            term: 'text-sm tracking-wider uppercase text-[#00A2FF]',
+            value: 'text-sm mt-1 text-[#E8E8E8]',
+            achievements: 'space-y-1.5',
+            achievement: 'text-sm flex items-start gap-2 text-[#E8E8E8]',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span className="text-[#FF9A00]" aria-hidden="true">^</span>
+              {achievement}
+            </>
+          )}
+        />
+      </TestChamberSection>
+
+      <ArtSectionTestChamber />
+    </>
+  )
+}
+
+function ProfessionChambers({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianChambers sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistChambers sections={sections} />
+  return <EngineerChambers sections={sections} />
 }
 
 // ============================================================================
@@ -1303,15 +1399,8 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
 // ============================================================================
 
 export default function NeonPortalsTheme() {
-  const { theme } = useTheme()
-  const { active, setActive } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
@@ -1339,83 +1428,45 @@ export default function NeonPortalsTheme() {
       <TestChamberBackground />
 
       {/* ================================================================== */}
-      {/* HEADER */}
+      {/* HEADER - the recruiter first screen */}
       {/* ================================================================== */}
       <header className="relative z-30 p-5" role="banner">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-start gap-4">
-          <div className="flex items-center gap-5">
-            <ApertureLogo size={50} color={PORTAL.PANEL_WHITE} spinning />
-            <div>
-              <h1
-                className="text-xl md:text-2xl tracking-wide font-light"
-                style={{
-                  color: PORTAL.PANEL_WHITE,
-                  textShadow: `0 0 20px ${PORTAL.BLUE}30`,
-                }}
-              >
-                ALEXANDER PULIDO
-              </h1>
-              <p className="text-xs mt-0.5" style={{ color: PORTAL.BLUE }}>
-                {PROFESSIONAL_SUMMARY[active].headline}
-              </p>
-              <p className="text-[10px] mt-0.5 italic" style={{ color: PORTAL.ORANGE }}>
-                {PROFESSIONAL_SUMMARY[active].tagline}
-              </p>
-            </div>
-          </div>
-
-          <nav className="flex gap-2 items-center" aria-label="Main navigation">
-            <Link
-              href="/cv"
-              className="px-3 py-1.5 text-xs tracking-wider transition-all hover:brightness-110 focus:outline-2 focus:outline-offset-2"
-              style={{
-                background: `${PORTAL.BLUE}12`,
-                border: `1.5px solid ${PORTAL.BLUE}`,
-                color: PORTAL.BLUE,
-                boxShadow: `0 0 12px ${PORTAL.BLUE}20`,
-              }}
-            >
-              VIEW CV
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="px-3 py-1.5 text-xs tracking-wider transition-all hover:brightness-110 focus:outline-2 focus:outline-offset-2"
-              style={{
-                background: PORTAL.ORANGE,
-                color: PORTAL.CAUTION_BLACK,
-                boxShadow: `0 0 15px ${PORTAL.ORANGE}40`,
-              }}
-            >
-              PLAY DEMO
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Current Roles */}
-      <section className="relative z-20 py-3 px-5" aria-label="Current roles">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-5 md:gap-8">
-            {CURRENT_ROLES.map((role, i) => (
-              <div
-                key={role.id}
-                className="text-center px-3 md:px-5 py-1"
-                style={{
-                  borderLeft: i > 0 ? `1px solid ${PORTAL.BLUE}20` : 'none',
-                }}
-              >
-                <p
-                  className="text-[10px] tracking-wider"
-                  style={{ color: i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE }}
-                >
-                  {role.title}
-                </p>
-                <p className="text-xs mt-0.5" style={{ color: PORTAL.PANEL_WHITE }}>{role.company}</p>
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-start gap-4">
+              <div className="flex items-start gap-5 min-w-0">
+                <div className="hidden sm:block shrink-0">
+                  <ApertureLogo size={50} color={PORTAL.PANEL_WHITE} spinning />
+                </div>
+                <div className="min-w-0">
+                  <h1
+                    className="text-xl md:text-2xl tracking-wide font-light uppercase"
+                    style={{
+                      color: PORTAL.PANEL_WHITE,
+                      textShadow: `0 0 20px ${PORTAL.BLUE}30`,
+                    }}
+                  >
+                    {name}
+                  </h1>
+                  <p className="text-sm mt-1" style={{ color: PORTAL.BLUE }}>{headline}</p>
+                  <p className="text-sm mt-1 italic" style={{ color: PORTAL.ORANGE }}>{tagline}</p>
+                  <p className="text-sm mt-1" style={{ color: PORTAL.PANEL_WHITE }}>{line}</p>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
+              <nav className="flex flex-wrap gap-2 items-center" aria-label="Contact and CV">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${PORTAL_BUTTON} border-[1.5px] border-[#00A2FF] text-[#00A2FF]`}>
+                  VIEW CV
+                </Link>
+                <Link href="/personal-projects/game-engine" className={`${PORTAL_BUTTON} bg-[#FF9A00] text-[#1A1A1A]`}>
+                  PLAY DEMO
+                </Link>
+              </nav>
+            </div>
+          )}
+        />
+      </header>
 
       {/* Portal Profession Selection */}
       <section className="relative z-20 py-8" aria-label="Select profession">
@@ -1435,135 +1486,27 @@ export default function NeonPortalsTheme() {
                 border: `1px solid ${PORTAL.CAUTION_YELLOW}40`,
               }}
             >
-              <span className="text-[9px] font-bold tracking-wider" style={{ color: PORTAL.CAUTION_YELLOW }}>
+              <span className="text-sm font-bold tracking-wider" style={{ color: PORTAL.CAUTION_YELLOW }}>
                 SELECT TESTING PROTOCOL
               </span>
             </div>
           </div>
 
           {/* Portals */}
-          <div className="flex justify-center gap-8 md:gap-16">
-            <PortalSelector
-              profession="engineer"
-              isActive={active === 'engineer'}
-              onClick={() => setActive('engineer')}
-              label="ENGINEER"
-            />
-            <PortalSelector
-              profession="drummer"
-              isActive={active === 'drummer'}
-              onClick={() => setActive('drummer')}
-              label="MUSICIAN"
-            />
-            <PortalSelector
-              profession="fighter"
-              isActive={active === 'fighter'}
-              onClick={() => setActive('fighter')}
-              label="FIGHTER"
-            />
-          </div>
+          <ProfessionSwitch
+            className="flex justify-center gap-4 sm:gap-8 md:gap-16"
+            label="Select profession"
+            renderOption={(option) => <PortalSelector option={option} />}
+          />
         </div>
       </section>
 
       {/* ================================================================== */}
-      {/* MAIN CONTENT - Layout: Header > About > Art > Experience > Art > Skills > Projects > Art > Ventures > Posts */}
+      {/* MAIN CONTENT - the picked profession's chambers with the art between them */}
       {/* ================================================================== */}
       <main id="main-content" className="relative z-20">
         <div className="max-w-4xl mx-auto px-5 space-y-0">
-
-          {/* 1. ABOUT */}
-          <TestChamberSection
-            title="About"
-            notice="CLEARANCE LEVEL: AUTHORIZED"
-            id="about"
-          >
-            <p className="text-xs leading-relaxed mb-4" style={{ color: PORTAL.PANEL_WHITE }}>
-              {aboutData.bio}
-            </p>
-            <div className="flex flex-wrap gap-1.5" role="list" aria-label="Quick facts">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="text-[10px] px-2 py-1"
-                  style={{
-                    background: `${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}10`,
-                    border: `1px solid ${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}`,
-                    color: i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE,
-                  }}
-                  role="listitem"
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </TestChamberSection>
-
-          {/* 2. ART SECTION - Portals */}
-          <ArtSectionPortals />
-
-          {/* 3. EXPERIENCE */}
-          {experience.length > 0 && (
-            <TestChamberSection title="Work Experience" id="experience">
-              <div className="space-y-3">
-                {experience.map((entry, i) => (
-                  <ExperienceCard key={entry.id} entry={entry} index={i} />
-                ))}
-              </div>
-            </TestChamberSection>
-          )}
-
-          {/* 4. ART SECTION - Cube & Turrets */}
-          <ArtSectionCubeAndTurrets />
-
-          {/* 5. SKILLS */}
-          <TestChamberSection
-            title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
-            id="skills"
-          >
-            {active === 'engineer' ? (
-              <TechTerminal categories={engineerTech} />
-            ) : (
-              <SkillsPanel categories={otherSkills} />
-            )}
-          </TestChamberSection>
-
-          {/* 6. PROJECTS */}
-          <TestChamberSection title="Featured Work" notice="RESULTS VERIFIED" id="projects">
-            <div className="grid md:grid-cols-2 gap-4">
-              {projects.filter(p => p.featured).slice(0, 6).map((project, i) => (
-                <ProjectCard key={project.id} project={project} index={i} />
-              ))}
-            </div>
-          </TestChamberSection>
-
-          {/* 7. ART SECTION - Test Chamber Elements */}
-          <ArtSectionTestChamber />
-
-          {/* 8. VENTURES (Engineer) */}
-          {active === 'engineer' && (
-            <TestChamberSection title="Ventures" id="ventures">
-              <div className="grid md:grid-cols-3 gap-4">
-                {COMPANIES.map((company) => (
-                  <VentureCard key={company.id} company={company} />
-                ))}
-              </div>
-            </TestChamberSection>
-          )}
-
-          {/* 9. BANDS (Drummer) */}
-          {active === 'drummer' && (
-            <TestChamberSection title="Bands" id="bands">
-              <div className="grid md:grid-cols-3 gap-4">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </TestChamberSection>
-          )}
-
-          {/* 10. POSTS - Placeholder for future blog content */}
-          {/* TODO: Add posts section when data is available */}
-
+          <ProfessionChambers sections={view.sections} />
         </div>
       </main>
 
@@ -1571,39 +1514,24 @@ export default function NeonPortalsTheme() {
       {/* CONTACT CTA */}
       {/* ================================================================== */}
       <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <h2 className="text-lg tracking-[0.2em] mb-3" style={{ color: PORTAL.METAL_LIGHT }}>
-              READY FOR TESTING?
-            </h2>
-            <p className="text-sm" style={{ color: PORTAL.METAL_MID }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
-              style={{
-                background: PORTAL.ORANGE,
-                color: PORTAL.CHAMBER_BG,
-              }}
-            >
-              Initiate Contact
-            </a>
-            <Link
-              href="/cv"
-              className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
-              style={{
-                background: 'transparent',
-                border: `2px solid ${PORTAL.BLUE}`,
-                color: PORTAL.BLUE,
-              }}
-            >
-              Download CV
-            </Link>
-          </div>
-        </div>
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <h2 className="text-lg tracking-[0.2em] mb-3" style={{ color: PORTAL.METAL_LIGHT }}>
+                  READY FOR TESTING?
+                </h2>
+                <p className="text-sm" style={{ color: PORTAL.METAL_LIGHT }}>{line}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${PORTAL_BUTTON} border-2 border-[#00A2FF] text-[#00A2FF]`}>
+                  Get the CV
+                </Link>
+              </div>
+            </div>
+          )}
+        />
       </section>
 
       {/* ================================================================== */}
@@ -1618,7 +1546,7 @@ export default function NeonPortalsTheme() {
               className="text-[9px] tracking-[0.25em]"
               style={{ color: PORTAL.METAL_MID }}
             >
-              © {new Date().getFullYear()} Alexander Pulido
+              © {new Date().getFullYear()} {view.hero.name}
             </p>
           </div>
         </div>
