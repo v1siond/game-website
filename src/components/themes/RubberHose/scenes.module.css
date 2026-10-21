@@ -406,115 +406,6 @@
   }
 }
 
-/* His front arm waves from the shoulder, the rubber hose way. */
-.wave {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: wave 0.7s ease-in-out infinite alternate;
-}
-
-@keyframes wave {
-  from {
-    transform: rotate(-150deg);
-  }
-  to {
-    transform: rotate(-110deg);
-  }
-}
-
-/* At the terminal his hands type in turn, on 24 frames a second (steps). */
-.typeFront,
-.typeBack {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: typeFront 0.33s steps(4, end) infinite alternate;
-}
-
-.typeBack {
-  animation-name: typeBack;
-  animation-delay: -0.16s;
-}
-
-@keyframes typeFront {
-  from {
-    transform: rotate(-28deg);
-  }
-  to {
-    transform: rotate(-18deg);
-  }
-}
-
-@keyframes typeBack {
-  from {
-    transform: rotate(28deg);
-  }
-  to {
-    transform: rotate(18deg);
-  }
-}
-
-/* The sticks fall on the beat, one arm then the other. */
-.drumFront,
-.drumBack {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: drumFront 0.35s var(--hose-bounce) infinite alternate;
-}
-
-.drumBack {
-  animation-name: drumBack;
-  animation-delay: -0.35s;
-}
-
-@keyframes drumFront {
-  from {
-    transform: rotate(-70deg);
-  }
-  to {
-    transform: rotate(-25deg);
-  }
-}
-
-@keyframes drumBack {
-  from {
-    transform: rotate(70deg);
-  }
-  to {
-    transform: rotate(25deg);
-  }
-}
-
-/* The rubber hose jab: the front arm swings up, stretches half its length again on the hit, snaps back. */
-.jab {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  animation: jab 1.4s steps(17, end) infinite;
-}
-
-@keyframes jab {
-  0%,
-  40% {
-    transform: rotate(-40deg);
-  }
-  55%,
-  62% {
-    transform: rotate(-95deg) scale(1, 1.6);
-  }
-  80%,
-  100% {
-    transform: rotate(-40deg);
-  }
-}
-
-.guard {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  transform: rotate(45deg);
-}
-
-/* ---- the pie eyed sun (Contact) ---- */
-
-/* The pupils follow the pointer through --mx and --my (each -1 to 1), written on the theme root by usePointerVars. */
 .pupils {
   transition: transform 0.2s ease-out;
   transform: translate3d(calc(var(--mx, 0) * 3px), calc(var(--my, 0) * 3px), 0);
@@ -565,13 +456,7 @@
   .slapHand,
   .pinkFlash,
   .superSpin > *,
-  .typeFront,
-  .typeBack,
-  .drumFront,
-  .drumBack,
-  .jab,
   .heroBob,
-  .wave,
   .sunRays,
   .bellBox:hover .bell {
     animation: none;

@@ -1,0 +1,360 @@
+/*
+ * His poses (cup.tsx), transform keyframes keyed off the svg's data-pose, timed to a 1930s bounce beat.
+ * Pivots: the feet for the bounce (50, 146), the shoulders (39, 70) and (61, 70) and the hips (45, 94) and
+ * (55, 94) are the origins of the arm and leg groups, each translated there, so they rotate about 0 0.
+ * The held angle of each pose sits outside the motion query, so reduced motion shows the pose still.
+ */
+
+.figure {
+  overflow: visible;
+}
+
+.bounce,
+.dash,
+.head,
+.straw,
+.eyes,
+.bullet,
+.parry {
+  transform-box: view-box;
+}
+
+.bounce,
+.dash {
+  transform-origin: 50px 146px;
+}
+
+.head {
+  transform-origin: 50px 60px;
+}
+
+.straw {
+  transform-origin: 58px 12px;
+}
+
+.eyes {
+  transform-origin: 50px 31px;
+}
+
+.armBack,
+.armFront,
+.legBack,
+.legFront {
+  transform-origin: 0 0;
+}
+
+.bullet,
+.parry {
+  opacity: 0;
+}
+
+.bullet {
+  transform-origin: 84px 70px;
+}
+
+.parry {
+  transform-origin: 80px 52px;
+}
+
+/* ---- held angles ---- */
+
+.figure[data-pose='shoot'] .armFront {
+  transform: rotate(-75deg);
+}
+
+.figure[data-pose='cheer'] .armFront {
+  transform: rotate(-150deg);
+}
+
+.figure[data-pose='cheer'] .armBack {
+  transform: rotate(150deg);
+}
+
+.figure[data-pose='type'] .armFront,
+.figure[data-pose='type'] .armBack {
+  transform: rotate(-30deg);
+}
+
+.figure[data-pose='jab'] .armBack {
+  transform: rotate(-120deg) scale(0.8);
+}
+
+.figure[data-pose='jab'] .armFront {
+  transform: rotate(-80deg) scale(1, 1.5);
+}
+
+.figure[data-pose='run'] .bounce {
+  transform: rotate(8deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .eyes {
+    animation: blink 3.4s steps(1, end) infinite;
+  }
+
+  .straw {
+    animation: straw 0.5s ease-in-out infinite alternate;
+  }
+
+  /* The bounce that never stops: squash on the beat, stretch on the up, the head a beat behind. */
+  .figure:not([data-pose='run']) .bounce {
+    animation: bounce 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  }
+
+  .head {
+    animation: head-lag 0.5s ease-in-out -0.1s infinite;
+  }
+
+  .figure[data-pose='idle'] .armBack,
+  .figure[data-pose='idle'] .legFront {
+    animation: swing 0.5s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='idle'] .armFront,
+  .figure[data-pose='idle'] .legBack {
+    animation: swing 0.5s ease-in-out -0.5s infinite alternate-reverse;
+  }
+
+  /* The run: leaning in, stretched on the push and squashed on the landing, legs and arms wheeling,
+     and every few strides a dash burst. */
+  .figure[data-pose='run'] .bounce {
+    animation: run-bob 0.18s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='run'] .legBack,
+  .figure[data-pose='run'] .armFront {
+    animation: stride 0.36s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='run'] .legFront,
+  .figure[data-pose='run'] .armBack {
+    animation: stride 0.36s ease-in-out -0.36s infinite alternate-reverse;
+  }
+
+  .figure[data-pose='run'] .dash {
+    animation: dash 2.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  }
+
+  /* The finger gun: the arm kicks back with each shot and the shot flies out. */
+  .figure[data-pose='shoot'] .armFront {
+    animation: recoil 0.4s ease-out infinite;
+  }
+
+  .figure[data-pose='shoot'] .bullet {
+    animation: shot 0.4s linear infinite;
+  }
+
+  .figure[data-pose='cheer'] .armFront {
+    animation: cheer-front 0.5s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='cheer'] .armBack {
+    animation: cheer-back 0.5s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='type'] .armFront {
+    animation: tap 0.2s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='type'] .armBack {
+    animation: tap 0.2s ease-in-out -0.1s infinite alternate;
+  }
+
+  .figure[data-pose='drum'] .armFront {
+    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) infinite alternate;
+  }
+
+  .figure[data-pose='drum'] .armBack {
+    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) -0.25s infinite alternate-reverse;
+  }
+
+  /* The rubber hose jab: the arm shoots out twice its length and snaps back. */
+  .figure[data-pose='jab'] .armFront {
+    animation: jab 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+  }
+
+  /* The parry: pointing at him makes him slap upward and flash the pink star. */
+  .figure:hover .armFront {
+    animation: slap 0.45s cubic-bezier(0.68, -0.55, 0.27, 1.55) both;
+  }
+
+  .figure:hover .parry {
+    animation: parry 0.45s ease-out both;
+  }
+}
+
+@keyframes blink {
+  0%,
+  92% {
+    transform: scale(1, 1);
+  }
+  94%,
+  97% {
+    transform: scale(1, 0.1);
+  }
+}
+
+@keyframes straw {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(1.06, 0.92);
+  }
+  50% {
+    transform: translate(0, -6px) scale(0.95, 1.06);
+  }
+}
+
+@keyframes head-lag {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: translate(0, -2px) rotate(3deg);
+  }
+}
+
+@keyframes swing {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes run-bob {
+  from {
+    transform: rotate(8deg) scale(1.08, 0.9);
+  }
+  to {
+    transform: rotate(8deg) translate(0, -8px) scale(0.92, 1.1);
+  }
+}
+
+@keyframes stride {
+  from {
+    transform: rotate(-40deg);
+  }
+  to {
+    transform: rotate(40deg);
+  }
+}
+
+@keyframes dash {
+  0%,
+  78%,
+  100% {
+    transform: translate(0, 0) scale(1, 1);
+  }
+  84% {
+    transform: translate(18px, 0) scale(1.3, 0.82);
+  }
+  90% {
+    transform: translate(4px, 0) scale(0.94, 1.06);
+  }
+}
+
+@keyframes recoil {
+  0%,
+  100% {
+    transform: rotate(-75deg);
+  }
+  20% {
+    transform: rotate(-90deg);
+  }
+}
+
+@keyframes shot {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(60px, 0) scale(0.8);
+  }
+}
+
+@keyframes cheer-front {
+  from {
+    transform: rotate(-150deg);
+  }
+  to {
+    transform: rotate(-175deg);
+  }
+}
+
+@keyframes cheer-back {
+  from {
+    transform: rotate(150deg);
+  }
+  to {
+    transform: rotate(175deg);
+  }
+}
+
+@keyframes tap {
+  from {
+    transform: rotate(-24deg);
+  }
+  to {
+    transform: rotate(-36deg);
+  }
+}
+
+@keyframes drum {
+  from {
+    transform: rotate(-70deg);
+  }
+  to {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes jab {
+  0%,
+  45%,
+  100% {
+    transform: rotate(-80deg) scale(1, 1);
+  }
+  60% {
+    transform: rotate(-90deg) scale(1, 2);
+  }
+}
+
+@keyframes slap {
+  0% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(-170deg) scale(1, 1.3);
+  }
+  100% {
+    transform: rotate(-120deg);
+  }
+}
+
+@keyframes parry {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2) rotate(20deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1) rotate(40deg);
+  }
+}

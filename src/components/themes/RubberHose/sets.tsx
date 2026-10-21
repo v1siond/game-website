@@ -3,7 +3,7 @@
 import type { ComponentProps, ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { PieEyes } from './art'
-import { HeroCharacter, type HeroPose } from './character'
+import { HeroCharacter, type HeroPose } from './cup'
 import { HOSE } from './palette'
 import styles from './sets.module.css'
 
@@ -45,7 +45,7 @@ function Layer({ depth, children }: { depth: Depth; children: ReactNode }) {
 }
 
 // Him standing on the set at x with his feet on `ground`, `height` units tall. His figure's own view box
-// (64 by 96) fills the 600 by 200 set box centred, so the group scales it and moves it into place.
+// (100 by 170) fills the 600 by 200 set box centred, so the group scales it and moves it into place.
 function Him({ profession, pose, x, ground, height }: { profession: Profession; pose: HeroPose; x: number; ground: number; height: number }) {
   const scale = height / 200
 

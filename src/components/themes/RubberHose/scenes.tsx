@@ -6,7 +6,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
 import { IrisRing, PieEyes } from './art'
-import { HeroCharacter } from './character'
+import { HeroCharacter } from './cup'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
@@ -120,7 +120,7 @@ export function RunBar({ profession, stops }: { profession: Profession; stops: n
         ))}
         <div className={`absolute bottom-3 left-0 h-12 w-10 ${styles.runner}`}>
           <div className={`h-full w-full ${styles.heroBob}`}>
-            <HeroCharacter profession={profession} className="h-full w-full" />
+            <HeroCharacter profession={profession} pose="run" className="h-full w-full" />
           </div>
         </div>
       </div>
@@ -165,7 +165,7 @@ export function SunWatcher({ profession }: { profession: Profession }) {
         <Sun />
       </div>
       <div className={`absolute bottom-2 left-[18%] h-28 w-20 ${styles.heroBob}`}>
-        <HeroCharacter profession={profession} pose="wave" className="h-full w-full" />
+        <HeroCharacter profession={profession} pose="cheer" className="h-full w-full" />
       </div>
       <IrisRing className={`${styles.iris} ${styles.irisClose}`} />
     </div>
