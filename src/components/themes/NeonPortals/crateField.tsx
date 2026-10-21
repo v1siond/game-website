@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type AnimationEvent, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
@@ -31,7 +32,9 @@ import ui from './warped.module.css'
 // Over the field a strip shows him with two buttons, the way the game gives you two moves for crates:
 // Spin opens every crate but the steel ones (a TNT caught in a spin blows at once), and Body slam
 // opens the steel ones. The box counter in the strip and the score bar count them against the total;
-// when the last one opens the counter turns into the gem and he dances.
+// when the last one opens the counter turns into the gem and he dances. When the field scrolls in he
+// runs into the strip from its left while the crates rise, and every crate the visitor breaks by hand
+// makes him jump, the way he hops onto a crate to bust it.
 // A crate opened by the visitor's own click hands focus to the card it held. Reduced motion and a
 // World Select preview open every crate at once, with the score to match.
 
@@ -235,12 +238,24 @@ function Prize({ kind }: { kind: CrateKind }) {
   return <Fruit className="h-full w-full" />
 }
 
-function ProjectCrate({ slot, index, spin, slam }: { slot: ProjectSlot; index: number; spin: number; slam: number }) {
+interface ProjectCrateProps {
+  slot: ProjectSlot
+  index: number
+  spin: number
+  slam: number
+  onHit: () => void
+}
+
+function ProjectCrate({ slot, index, spin, slam, onHit }: ProjectCrateProps) {
   const kind = kindAt(index)
   const { state, strikeByHand, byHand } = useCrate(slot.project.id, kind, spin, slam, index)
   const opening = OPENING[kind]
+  const strike = () => {
+    strikeByHand()
+    onHit()
+  }
 
-  if (state !== 'burst' && state !== 'open') return <ClosedCrate slot={slot} kind={kind} state={state} onStrike={strikeByHand} />
+  if (state !== 'burst' && state !== 'open') return <ClosedCrate slot={slot} kind={kind} state={state} onStrike={strike} />
 
   return (
     <div className="relative" data-crate={state}>
@@ -262,20 +277,47 @@ function ProjectCrate({ slot, index, spin, slam }: { slot: ProjectSlot; index: n
 
 const MOVE_MS = 1000
 
+type Move = 'spin' | 'slam' | 'jump'
+
+/** A move he plays over his resting pose; the count replays it when the same move comes again. */
+interface Played {
+  move: Move
+  count: number
+}
+
+/** What he does at rest: the run in while the field rises, then the idle, or the dance once all are open. */
+function restingPose(arrived: boolean, gem: boolean): BandicootPose {
+  if (!arrived) return 'run'
+  return gem ? 'dance' : 'idle'
+}
+
+interface MoveStripProps {
+  onSpin: () => void
+  onSlam: () => void
+  played: Played | null
+}
+
 /** The strip over the field: him, the two moves, the box counter. */
-function MoveStrip({ onSpin, onSlam, move }: { onSpin: () => void; onSlam: () => void; move: 'spin' | 'slam' | null }) {
+function MoveStrip({ onSpin, onSlam, played }: MoveStripProps) {
   const { hud, warp } = useLabels()
   const { score } = useScore()
+  const { ref, triggered } = useSectionTrigger()
+  const [arrived, setArrived] = useState(false)
   const gem = allCratesOpen(score)
-  const pose: BandicootPose = move ?? (gem ? 'dance' : 'idle')
+  const pose: BandicootPose = played?.move ?? restingPose(arrived, gem)
   const { crates: opened } = score.counts
   const total = score.totals.crates
 
+  const arrive = (event: AnimationEvent<HTMLSpanElement>) => {
+    if (event.target !== event.currentTarget) return
+    setArrived(true)
+  }
+
   return (
-    <div className={`mb-8 flex flex-wrap items-center gap-4 p-4 ${ui.panel}`}>
-      <span className="relative block h-24 w-16 shrink-0" aria-hidden="true">
-        {move === 'slam' && <Blast tone="slam" />}
-        <Bandicoot profession="engineer" pose={pose} className="h-full w-full" />
+    <div ref={ref} className={`mb-8 flex flex-wrap items-center gap-4 overflow-hidden p-4 ${ui.panel}`}>
+      <span className={`relative block h-24 w-16 shrink-0 ${triggered ? crates.runIn : crates.offStage}`} onAnimationEnd={arrive} aria-hidden="true">
+        {played?.move === 'slam' && <Blast tone="slam" />}
+        <Bandicoot key={played?.count ?? 0} profession="engineer" pose={pose} className="h-full w-full" />
       </span>
       <div className="flex flex-wrap gap-3">
         <button type="button" onClick={onSpin} className={`${ui.button} ${ui.lit}`}>
@@ -305,25 +347,27 @@ function MoveStrip({ onSpin, onSlam, move }: { onSpin: () => void; onSlam: () =>
 export function CrateField({ projects }: { projects: SectionsOf<'engineer'>['projects'] }) {
   const [spin, setSpin] = useState(0)
   const [slam, setSlam] = useState(0)
-  const [move, setMove] = useState<'spin' | 'slam' | null>(null)
+  const [played, setPlayed] = useState<Played | null>(null)
 
   useEffect(() => {
-    if (!move) return
-    const timer = window.setTimeout(() => setMove(null), MOVE_MS)
+    if (!played) return
+    const timer = window.setTimeout(() => setPlayed(null), MOVE_MS)
     return () => window.clearTimeout(timer)
-  }, [move, spin, slam])
+  }, [played])
+
+  const play = (move: Move) => setPlayed((now) => ({ move, count: (now?.count ?? 0) + 1 }))
 
   return (
     <>
       <MoveStrip
-        move={move}
+        played={played}
         onSpin={() => {
           setSpin((count) => count + 1)
-          setMove('spin')
+          play('spin')
         }}
         onSlam={() => {
           setSlam((count) => count + 1)
-          setMove('slam')
+          play('slam')
         }}
       />
       <ProjectList
@@ -334,7 +378,7 @@ export function CrateField({ projects }: { projects: SectionsOf<'engineer'>['pro
           const index = projects.indexOf(slot.project)
           return (
             <div className={ui.rise} style={{ '--i': index } as CSSProperties}>
-              <ProjectCrate slot={slot} index={index} spin={spin} slam={slam} />
+              <ProjectCrate slot={slot} index={index} spin={spin} slam={slam} onHit={() => play('jump')} />
             </div>
           )
         }}

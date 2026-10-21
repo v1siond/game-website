@@ -92,7 +92,37 @@
   }
 }
 
+/* The strip's hero: off its left edge until the field scrolls in, then he runs in while the crates rise. */
+.offStage {
+  opacity: 0;
+  transform: translate3d(-300%, 0, 0);
+}
+
+.runIn {
+  animation: runIn 1.4s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes runIn {
+  from {
+    opacity: 1;
+    transform: translate3d(-300%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .offStage {
+    opacity: 1;
+    transform: none;
+  }
+
+  .runIn {
+    animation: none;
+  }
+
   .body {
     transition: none;
     animation: none !important;
