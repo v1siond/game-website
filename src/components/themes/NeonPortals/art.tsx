@@ -10,6 +10,9 @@ type ArtProps = { className?: string }
 const svgProps = (className = ''): SVGProps<SVGSVGElement> => ({ className, 'aria-hidden': true, focusable: false })
 
 /** Every gradient the art uses, once per page. */
+/** The coloured gems besides the clear one: blue, green and purple, never orange (the fruit's colour). */
+export const GEM_COLOURS = ['BLUE', 'GREEN', 'VIOLET'] as const
+
 export function WarpDefs() {
   return (
     <svg width="0" height="0" className="absolute" aria-hidden="true" focusable="false">
@@ -43,6 +46,13 @@ export function WarpDefs() {
           <stop offset="0" stopColor={PORTAL.STONE_LIT} />
           <stop offset="1" stopColor={PORTAL.STONE_DARK} />
         </radialGradient>
+        {GEM_COLOURS.map((tone) => (
+          <linearGradient key={tone} id={`np-gem-${tone}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#ffffff" />
+            <stop offset="0.45" stopColor={PORTAL[tone]} />
+            <stop offset="1" stopColor={PORTAL.CHAMBER} />
+          </linearGradient>
+        ))}
         {(['BLUE', 'VIOLET', 'GREEN', 'ORANGE'] as const).map((tone) => (
           <radialGradient key={tone} id={`np-swirl-${tone}`} cx="0.5" cy="0.5" r="0.5">
             <stop offset="0" stopColor="#ffffff" />

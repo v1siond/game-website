@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { BandSlot } from '@/components/cv/BandList'
-import { Gem, Swirl, type SwirlTone } from './art'
+import { GEM_COLOURS, Gem, Swirl, type SwirlTone } from './art'
 import world from './world.module.css'
 
 // The musician's bands and the fighter's record, each in the world's own reward language.
@@ -50,7 +50,7 @@ export function BandWarp({ slot, index }: { slot: BandSlot; index: number }) {
   )
 }
 
-const GEM_TONES = ['url(#np-gem)', 'url(#np-crystal)', 'url(#np-fruit)', 'url(#np-gem)']
+const GEM_TONES = ['url(#np-gem)', ...GEM_COLOURS.map((tone) => `url(#np-gem-${tone})`)]
 
 export function GemLine({ achievement, index }: { achievement: string; index: number }) {
   return (
