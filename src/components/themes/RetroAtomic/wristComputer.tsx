@@ -8,6 +8,7 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
 import type { CVData } from '@/lib/cv/content'
+import { NameWords } from '@/components/cv/NameWords'
 import { DWELLER_ACTION, DwellerSprite } from './dweller'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
@@ -58,10 +59,10 @@ function TypedLine({ text, shown, className, as: Tag = 'p' }: { text: string; sh
     <Tag className={`relative ${className}`}>
       <span className="sr-only">{text}</span>
       <span className="invisible" aria-hidden="true">
-        {text}
+        <NameWords name={text} />
       </span>
       <span className="absolute inset-0" aria-hidden="true">
-        {visible}
+        <NameWords name={visible} />
         {typing && <span className={atomic.cursor} />}
       </span>
     </Tag>
@@ -76,7 +77,7 @@ function BootText({ lines, running, instant }: { lines: [string, string, string,
 
   return (
     <div className="space-y-2">
-      <TypedLine as="h1" text={name} shown={shownOf(0)} className={`text-2xl font-bold uppercase tracking-[0.18em] text-atomic-phosphor sm:text-4xl ${atomic.glow}`} />
+      <TypedLine as="h1" text={name} shown={shownOf(0)} className={`text-[clamp(1.5rem,7vw,2.25rem)] font-bold uppercase tracking-[0.18em] text-atomic-phosphor ${atomic.glow}`} />
       <TypedLine text={headline} shown={shownOf(1)} className="text-base text-atomic-phosphor sm:text-lg" />
       <TypedLine text={tagline} shown={shownOf(2)} className="text-base text-atomic-phosphor-dim" />
       <TypedLine text={line} shown={shownOf(3)} className="text-sm text-atomic-phosphor-dim" />

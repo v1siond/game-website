@@ -36,7 +36,7 @@ export function CallingCardHero() {
             </div>
             <div className={world.lean}>
               <div className={`relative px-5 py-8 sm:px-8 sm:py-10 ${world.card} ${world.slab}`}>
-                <h1 className="text-5xl uppercase sm:text-7xl">
+                <h1 className="text-[clamp(1.5rem,7.5vw,3rem)] uppercase md:text-[clamp(2.25rem,4.5vw,3.75rem)]">
                   <RansomWord text={name} />
                 </h1>
                 <p className={`mt-5 inline-block px-3 py-1 text-xl uppercase tracking-widest ${world.heading} ${world.after}`}>{headline}</p>

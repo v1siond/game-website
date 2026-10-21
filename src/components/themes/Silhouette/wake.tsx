@@ -6,6 +6,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { usePreview } from '@/themes/PreviewContext'
+import { NameWords } from '@/components/cv/NameWords'
 import { HeroCharacter, type SpritePose } from './character'
 import { Layer, pinePath } from './depth'
 import { GROUND, Sky, Soft } from './places'
@@ -115,8 +116,8 @@ export function WakeHero({ profession }: { profession: Profession }) {
         <div className="mx-auto max-w-6xl">
           <div className={`px-4 pb-6 pt-8 text-center sm:pt-12 ${TEXT_SHOWN(shown)}`}>
             <div className="mx-auto mb-4 h-px w-24 bg-[color:var(--sh-fog)]" aria-hidden="true" />
-            <h1 className={`break-words text-2xl font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] sm:text-4xl sm:tracking-[0.45em] ${TYPEWRITER}`}>
-              {name}
+            <h1 className={`text-[clamp(1.5rem,7vw,2.25rem)] font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] sm:tracking-[0.45em] ${TYPEWRITER}`}>
+              <NameWords name={name} />
             </h1>
             <p className="mt-3 text-sm tracking-[0.2em] text-[color:var(--sh-text)] sm:text-base">{headline}</p>
             <p className="mt-1 text-sm italic tracking-wider text-[color:var(--sh-muted)]">{tagline}</p>

@@ -5,6 +5,7 @@ import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useWorldView, useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { NameWords } from '@/components/cv/NameWords'
 import { MONO, PIXEL, RPG_VARS } from './RetroRPG/palette'
 import { ActionOptions, FOCUS } from './RetroRPG/actions'
 import { Box, Mark, SHOW_AFTER, Typed } from './RetroRPG/panels'
@@ -54,9 +55,9 @@ export default function RetroRPGTheme() {
           <RecruiterHero
             render={({ name, headline, tagline, line, actions }) => (
               <Box className={`mt-4 ${world.opens}`}>
-                <h1 className={`break-words text-lg uppercase tracking-[0.15em] text-[color:var(--rpg-text)] sm:text-2xl ${PIXEL}`}>
+                <h1 className={`text-lg uppercase tracking-[0.15em] text-[color:var(--rpg-text)] sm:text-2xl ${PIXEL}`}>
                   <Typed pace="short" delay="open">
-                    {name}
+                    <NameWords name={name} />
                   </Typed>
                 </h1>
                 <div className="mt-4 space-y-2">

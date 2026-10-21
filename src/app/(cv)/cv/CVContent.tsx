@@ -5,6 +5,7 @@ import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/components/cv/sectionText'
+import { NameWords } from '@/components/cv/NameWords'
 
 // A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
 const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
@@ -57,7 +58,9 @@ export function CVContent() {
       >
         {/* Header / Contact */}
         <header className="border-b-2 border-black pb-4 mb-6">
-          <h1 className="text-3xl font-bold mb-1">{fullName}</h1>
+          <h1 className="text-[clamp(1.75rem,8vw,1.875rem)] font-bold mb-1">
+            <NameWords name={fullName} />
+          </h1>
           {professionalSummary && (
             <p className="text-lg text-gray-700 mb-2">{professionalSummary.headline}</p>
           )}

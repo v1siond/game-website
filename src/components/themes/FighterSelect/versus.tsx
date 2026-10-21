@@ -3,6 +3,7 @@
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
+import { NameWords } from '@/components/cv/NameWords'
 import { ArenaFighter } from './arena'
 import { StageBackdrop } from './stages'
 import { CVLink, HeroAction, PortfolioLink } from './actions'
@@ -45,7 +46,9 @@ export function HeroSplash({ profession }: { profession: Profession }) {
             </div>
 
             <div className={`relative p-5 sm:p-8 ${look.metal} ${look.frame} ${look.accentP2} ${look.splashRight} ${fight.enter} ${fight.slashInRight}`}>
-              <h1 className={`break-words text-3xl uppercase leading-tight md:text-5xl ${look.display} ${look.marquee} ${fight.enter} ${fight.slam}`}>{name}</h1>
+              <h1 className={`text-[clamp(1.75rem,8vw,3rem)] uppercase leading-tight ${look.display} ${look.marquee} ${fight.enter} ${fight.slam}`}>
+                <NameWords name={name} />
+              </h1>
               <p className={`mt-4 max-w-2xl text-base md:text-lg ${fight.enter} ${fight.rise} ${RISE_DELAYS[0]}`}>{headline}</p>
               <p className={`mt-2 text-base italic text-[color:var(--fs-cyan)] ${fight.enter} ${fight.rise} ${RISE_DELAYS[1]}`}>{tagline}</p>
               <p className={`mt-2 text-sm ${fight.enter} ${fight.rise} ${RISE_DELAYS[2]}`}>{line}</p>

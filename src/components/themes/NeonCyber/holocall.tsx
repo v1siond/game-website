@@ -5,6 +5,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction } from './actions'
 import { MercSprite } from './merc'
 import { panelHeadingId } from './hud'
@@ -57,7 +58,9 @@ export function HoloCall({ profession }: { profession: Profession }) {
               </div>
 
               <div className="min-w-0 text-center sm:text-left">
-                <p className="text-2xl uppercase tracking-[0.12em] text-[color:var(--neon-ice)]">{name}</p>
+                <p className="text-[clamp(1.25rem,7vw,1.5rem)] uppercase tracking-[0.12em] text-[color:var(--neon-ice)]">
+                  <NameWords name={name} />
+                </p>
                 <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{line}</p>
                 <nav className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start" aria-label={navigation.contactAndCv}>
                   {actions.map((action) => (

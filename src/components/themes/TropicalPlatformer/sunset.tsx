@@ -5,6 +5,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { NameWords } from '@/components/cv/NameWords'
 import { BarrelArt, MuzzleBurst } from './barrel'
 import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
 import { HeroCharacter } from './character'
@@ -161,11 +162,14 @@ function PlankName({ name }: { name: string }) {
     <>
       <span className="sr-only">{name}</span>
       <span aria-hidden="true">
-        {Array.from(name).map((letter, i) => (
-          <span key={i} className={sunset.letter} style={{ '--i': i } as CSSProperties}>
-            {letter === ' ' ? ' ' : letter}
-          </span>
-        ))}
+        <NameWords
+          name={name}
+          letter={(letter, i) => (
+            <span className={sunset.letter} style={{ '--i': i } as CSSProperties}>
+              {letter}
+            </span>
+          )}
+        />
       </span>
     </>
   )
@@ -188,7 +192,7 @@ export function SunsetHero() {
           <SunsetScene shot={shot} onBlast={() => setShot((count) => count + 1)} blastLabel={jungle.blastAgain} />
 
           <div className="text-center md:text-left">
-            <h1 className={`inline-block rounded-2xl px-6 pb-4 pt-6 text-3xl uppercase text-[color:var(--tp-sun-gold)] sm:text-5xl ${look.board} ${look.display} ${look.outlined} ${sunset.plank}`}>
+            <h1 className={`inline-block rounded-2xl px-6 pb-4 pt-6 text-[clamp(1.5rem,7.5vw,3rem)] uppercase text-[color:var(--tp-sun-gold)] md:text-[clamp(1.75rem,3.75vw,3rem)] ${look.board} ${look.display} ${look.outlined} ${sunset.plank}`}>
               <PlankName name={name} />
             </h1>
             <div className={sunset.after}>

@@ -5,6 +5,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction } from './actions'
 import { MercSprite, type MercMotion } from './merc'
 import { ScanToggle } from './scanner'
@@ -104,8 +105,10 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
 
             <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
               <div className="min-w-0">
-                <h1 className="relative text-3xl font-bold uppercase leading-tight tracking-[0.12em] text-[color:var(--neon-ice)] sm:text-5xl">
-                  <span className={`block ${world.nameIn}`}>{name}</span>
+                <h1 className="relative text-[clamp(1.75rem,8vw,3rem)] font-bold uppercase leading-tight tracking-[0.12em] text-[color:var(--neon-ice)]">
+                  <span className={`block ${world.nameIn}`}>
+                    <NameWords name={name} />
+                  </span>
                   {GHOSTS.map(({ color, slice, x }) => (
                     <span
                       key={x}
@@ -113,7 +116,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                       style={{ '--ghost-x': x } as CSSProperties}
                       aria-hidden="true"
                     >
-                      {name}
+                      <NameWords name={name} />
                     </span>
                   ))}
                 </h1>

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { NameWords } from '@/components/cv/NameWords'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
@@ -81,15 +82,7 @@ export function CartoonTitle({ text }: { text: string }) {
     <h1 className={`text-[clamp(2rem,5vw,3.5rem)] leading-tight ${world.lettering}`}>
       <span className="sr-only">{text}</span>
       <span className={`inline-flex flex-wrap justify-center gap-x-4 ${world.title} ${world.titleBounce}`} aria-hidden="true">
-        {text.split(' ').map((word, w) => (
-          <span key={`${w}-${word}`} className="inline-flex gap-x-1 whitespace-nowrap">
-            {Array.from(word).map((char, i) => (
-              <span key={`${i}-${char}`} className="inline-block">
-                {char}
-              </span>
-            ))}
-          </span>
-        ))}
+        <NameWords name={text} wordClassName="inline-flex gap-x-1" letter={(char) => <span className="inline-block">{char}</span>} />
       </span>
     </h1>
   )

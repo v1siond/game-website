@@ -5,6 +5,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePreview } from '@/themes/PreviewContext'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { NameWords } from '@/components/cv/NameWords'
 import { Bonfire, type FireState } from './bonfire'
 import { Knight } from './knight'
 import { usePoseScript } from './poses'
@@ -207,7 +208,9 @@ export function ShrineHero() {
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
           <div className={`${souls.heroWords} ${ready ? souls.heroWordsOn : ''} relative z-10 mx-auto -mt-10 max-w-3xl px-4 text-center sm:-mt-16`}>
-            <h1 className={`${CARVED} text-4xl uppercase tracking-[0.16em] text-[color:var(--soul-text)] sm:text-6xl`}>{name}</h1>
+            <h1 className={`${CARVED} text-[clamp(1.75rem,8vw,3.75rem)] uppercase tracking-[0.16em] text-[color:var(--soul-text)]`}>
+              <NameWords name={name} />
+            </h1>
             <div className="mx-auto mt-3 flex max-w-md items-center gap-3" aria-hidden="true">
               <span className="h-px flex-1 bg-[color:var(--soul-glow-deep)]" />
               <span className="h-1.5 w-1.5 rotate-45 bg-[color:var(--soul-glow)]" />

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
+import { NameWords } from '@/components/cv/NameWords'
 import { NOIR } from './palette'
 import world from './world.module.css'
 
@@ -56,21 +57,21 @@ function GapStar() {
 
 /**
  * A word in ransom note lettering: letters cut from different prints, some boxed, some bare, a star in
- * each gap. The letters are hidden from screen readers; the word is read whole. Each letter carries --i
+ * each gap. Each word stays whole on its line; the row wraps only at a star. The letters are hidden from screen readers; the word is read whole. Each letter carries --i
  * so a reveal can drop them in turn.
  */
 export function RansomWord({ text, className = '', letterClassName = '' }: { text: string; className?: string; letterClassName?: string }) {
   return (
     <span className={className}>
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true" className="inline-flex flex-wrap items-end gap-x-1 gap-y-2">
-        {text.split('').map((char, i) =>
-          char === ' ' ? (
-            <GapStar key={i} />
-          ) : (
+      <span aria-hidden="true" className="inline-flex flex-wrap items-end gap-x-[0.08em] gap-y-2">
+        <NameWords
+          name={text}
+          gap={<GapStar />}
+          wordClassName="inline-flex items-end gap-x-[0.08em]"
+          letter={(char, i) => (
             <span
-              key={i}
-              className={`${world.letter} ${LETTER_LOOKS[i % LETTER_LOOKS.length]} ${LETTER_SIZES[i % LETTER_SIZES.length]} px-1.5 leading-none ${letterClassName}`}
+              className={`${world.letter} ${LETTER_LOOKS[i % LETTER_LOOKS.length]} ${LETTER_SIZES[i % LETTER_SIZES.length]} px-[0.12em] leading-none ${letterClassName}`}
               style={
                 {
                   '--r': `${LETTER_TILTS[i % LETTER_TILTS.length]}deg`,
@@ -81,8 +82,8 @@ export function RansomWord({ text, className = '', letterClassName = '' }: { tex
             >
               {char}
             </span>
-          ),
-        )}
+          )}
+        />
       </span>
     </span>
   )

@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction, PortfolioLink } from './actions'
 import { DECO_COLORS as C } from './palette'
 import descent from './descent.module.css'
@@ -247,11 +248,14 @@ function NeonName({ name }: { name: string }) {
     <>
       <span className="sr-only">{name}</span>
       <span aria-hidden="true">
-        {Array.from(name).map((letter, i) => (
-          <span key={i} className={descent.letter} style={{ '--i': i } as CSSProperties}>
-            {letter === ' ' ? ' ' : letter}
-          </span>
-        ))}
+        <NameWords
+          name={name}
+          letter={(letter, i) => (
+            <span className={descent.letter} style={{ '--i': i } as CSSProperties}>
+              {letter}
+            </span>
+          )}
+        />
       </span>
     </>
   )
@@ -273,7 +277,7 @@ export function BathysphereHero() {
           <Porthole />
 
           <div className="text-center md:text-left">
-            <h1 className={`break-words text-3xl uppercase sm:text-5xl ${descent.sign}`}>
+            <h1 className={`text-[clamp(1.75rem,8vw,3rem)] uppercase ${descent.sign}`}>
               <NeonName name={name} />
             </h1>
             <div className={descent.after}>

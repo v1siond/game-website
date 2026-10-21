@@ -23,6 +23,7 @@ import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
+import { NameWords } from '@/components/cv/NameWords'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 
 // Abstract spirit wisp - optimized: no SVG filter
@@ -1823,10 +1824,10 @@ export default function DarkFantasyTheme() {
           render={({ name, headline, tagline, line, actions }) => (
             <div className="max-w-4xl mx-auto text-center">
               <h1
-                className="text-2xl md:text-4xl tracking-[0.15em] uppercase mb-3"
+                className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3"
                 style={{ color: DARK_FANTASY.bone, textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30` }}
               >
-                {name}
+                <NameWords name={name} />
               </h1>
               <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silver }}>
                 {headline}

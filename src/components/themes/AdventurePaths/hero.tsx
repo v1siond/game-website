@@ -10,6 +10,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
+import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction, PlayLink } from './actions'
 import { cssVars } from './art'
 import { ARRIVAL, BRANCHES, HUB, HubCompass, HubMapArt, landmarkPoint } from './hubMap'
@@ -213,7 +214,9 @@ function NamePlaque() {
               {(['left-2 top-2', 'right-2 top-2', 'left-2 bottom-2', 'right-2 bottom-2'] as const).map((corner) => (
                 <span key={corner} className={`absolute ${corner} h-2 w-2 rounded-full bg-[color:var(--ap-bark)]`} aria-hidden="true" />
               ))}
-              <h1 className={`break-words text-3xl font-bold tracking-wide sm:text-4xl ${JOURNAL_SERIF}`}>{name}</h1>
+              <h1 className={`text-[clamp(1.75rem,8vw,2.25rem)] font-bold tracking-wide ${JOURNAL_SERIF}`}>
+                <NameWords name={name} />
+              </h1>
               <p className="mt-2 text-base font-semibold text-[color:var(--ap-route)]">{headline}</p>
               <p className="mt-1 text-sm italic text-[color:var(--ap-ink-soft)]">{tagline}</p>
               <p className="mt-1 text-sm">{line}</p>

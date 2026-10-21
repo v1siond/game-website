@@ -7,6 +7,7 @@ import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
+import { NameWords } from '@/components/cv/NameWords'
 import { REALM, REALM_VARS } from './MedievalFantasy/palette'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
 import { RealmFrame } from './MedievalFantasy/panels'
@@ -75,14 +76,14 @@ export default function MedievalFantasyTheme() {
                     <div style={{ minWidth: 0 }}>
                       <h1 style={{
                         color: REALM.goldBright,
-                        fontSize: '1.5rem',
+                        fontSize: 'clamp(1.25rem, 6.5vw, 1.5rem)',
                         fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.12em',
                         textShadow: `2px 2px 4px ${REALM.bgVoid}`,
                         marginBottom: '0.375rem'
                       }}>
-                        {name}
+                        <NameWords name={name} />
                       </h1>
                       <p style={{ color: REALM.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{headline}</p>
                       <p style={{ color: REALM.textMid, fontSize: '0.875rem', fontStyle: 'italic', marginBottom: '0.25rem' }}>{tagline}</p>

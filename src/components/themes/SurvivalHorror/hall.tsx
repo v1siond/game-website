@@ -6,6 +6,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { usePreview } from '@/themes/PreviewContext'
+import { NameWords } from '@/components/cv/NameWords'
 import { Survivor, type SurvivorPose } from './survivor'
 import { ENTRANCE_MS } from './door'
 import { CVLink, HeroAction, PortfolioLink } from './actions'
@@ -165,7 +166,9 @@ export function HallHero({ profession }: { profession: Profession }) {
 
           <div className={`relative mx-auto mt-6 max-w-4xl p-6 ${look.panel}`}>
             <div className="relative overflow-hidden">
-              <h1 className={`break-words text-2xl uppercase tracking-[0.15em] text-[color:var(--sh-ivory)] md:text-4xl ${look.typed}`}>{name}</h1>
+              <h1 className={`text-[clamp(1.5rem,7vw,2.25rem)] uppercase tracking-[0.15em] text-[color:var(--sh-ivory)] ${look.typed}`}>
+                <NameWords name={name} />
+              </h1>
               <span className={`${horror.typeCover} ${TYPED(shown)}`} aria-hidden="true" />
             </div>
             <p className="mt-3 text-base text-[color:var(--sh-cream)]">{headline}</p>
