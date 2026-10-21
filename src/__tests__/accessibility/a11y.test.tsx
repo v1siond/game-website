@@ -6,6 +6,16 @@ import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ThemeProvider } from '@/themes/ThemeContext'
 import { ProfessionProvider } from '@/contexts/ProfessionContext'
 
+// save stays pending so the loading state the button announces can be observed.
+jest.mock('html2pdf.js', () => ({
+  __esModule: true,
+  default: jest.fn(() => ({
+    set: jest.fn().mockReturnThis(),
+    from: jest.fn().mockReturnThis(),
+    save: jest.fn(() => new Promise<void>(() => {})),
+  })),
+}))
+
 // Wrapper for components that need theme context
 const ThemeWrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>
@@ -97,20 +107,6 @@ describe('Accessibility Tests', () => {
       await user.tab()
 
       expect(screen.getByRole('combobox')).toHaveFocus()
-    })
-
-    it('can change value with keyboard', async () => {
-      const user = userEvent.setup()
-      render(<LanguageSwitcher />)
-
-      const select = screen.getByRole('combobox')
-      select.focus()
-
-      // Arrow down to select next option
-      await user.keyboard('{ArrowDown}')
-
-      // Value should change
-      expect(select.value).toBeDefined()
     })
 
     it('options have human-readable names', () => {

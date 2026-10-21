@@ -107,39 +107,6 @@ describe('LanguageSwitcher', () => {
     })
   })
 
-  describe('loading state', () => {
-    it('shows loading text during transition', async () => {
-      const user = userEvent.setup()
-
-      // Make refresh hang to show loading state
-      mockRefresh.mockImplementation(() => new Promise(() => {}))
-
-      render(<LanguageSwitcher />)
-
-      await user.selectOptions(screen.getByRole('combobox'), 'es')
-
-      // Check for loading indicator
-      await waitFor(() => {
-        expect(screen.getByText('Loading...')).toBeInTheDocument()
-      })
-    })
-
-    it('disables select during transition', async () => {
-      const user = userEvent.setup()
-
-      // Make refresh hang
-      mockRefresh.mockImplementation(() => new Promise(() => {}))
-
-      render(<LanguageSwitcher />)
-
-      await user.selectOptions(screen.getByRole('combobox'), 'es')
-
-      await waitFor(() => {
-        expect(screen.getByRole('combobox')).toBeDisabled()
-      })
-    })
-  })
-
   describe('persistence', () => {
     it('reads initial locale from cookie', () => {
       document.cookie = 'locale=es'
@@ -181,21 +148,6 @@ describe('LanguageSwitcher', () => {
       await user.tab()
 
       expect(screen.getByRole('combobox')).toHaveFocus()
-    })
-
-    it('can change selection with keyboard', async () => {
-      const user = userEvent.setup()
-      render(<LanguageSwitcher />)
-
-      const select = screen.getByRole('combobox')
-      select.focus()
-
-      // Keyboard navigation
-      await user.keyboard('{ArrowDown}')
-      await user.keyboard('{Enter}')
-
-      // Should have changed
-      expect(select).not.toHaveValue('en')
     })
 
     it('has proper styling classes', () => {

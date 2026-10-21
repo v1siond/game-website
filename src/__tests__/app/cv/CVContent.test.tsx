@@ -1,7 +1,14 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import { render } from '@testing-library/react'
 import { CVContent } from '@/app/(cv)/cv/CVContent'
 import type { Locale } from '@/i18n/config'
+
+// The same title can sit in two sections (a current role is also a job), so queries scope to one section.
+const sectionTitled = (title: string) => {
+  const section = screen.getByRole('heading', { name: title }).closest('section')
+  if (!section) throw new Error(`no section holds the heading ${title}`)
+  return within(section)
+}
 
 // Sample test data that mirrors the real data structure
 const mockCVData = {
@@ -214,9 +221,10 @@ describe('CVContent', () => {
     it('renders all current roles', () => {
       render(<CVContent cvData={mockCVData} translations={mockTranslations} locale="en" />)
 
+      const section = sectionTitled('Current Positions')
       mockCVData.currentRoles.forEach((role) => {
-        expect(screen.getByText(role.title)).toBeInTheDocument()
-        expect(screen.getByText(new RegExp(role.company))).toBeInTheDocument()
+        expect(section.getByText(role.title)).toBeInTheDocument()
+        expect(section.getByText(new RegExp(role.company))).toBeInTheDocument()
       })
     })
 
@@ -298,8 +306,9 @@ describe('CVContent', () => {
     it('renders job titles', () => {
       render(<CVContent cvData={mockCVData} translations={mockTranslations} locale="en" />)
 
-      expect(screen.getByText('Senior Staff Engineer')).toBeInTheDocument()
-      expect(screen.getByText('Software Engineer')).toBeInTheDocument()
+      const section = sectionTitled('Professional Experience')
+      expect(section.getByText('Senior Staff Engineer')).toBeInTheDocument()
+      expect(section.getByText('Software Engineer')).toBeInTheDocument()
     })
 
     it('renders companies', () => {

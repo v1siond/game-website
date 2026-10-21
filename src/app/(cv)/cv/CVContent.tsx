@@ -88,15 +88,17 @@ function formatDateRange(
   current: boolean,
   presentLabel: string
 ): string {
+  // Content dates are date only ISO strings, parsed as UTC midnight; a local year would show the year
+  // before for a January 1 date anywhere west of UTC.
   const start = new Date(startDate)
-  const startYear = start.getFullYear()
+  const startYear = start.getUTCFullYear()
 
   if (current || !endDate) {
     return `${startYear} - ${presentLabel}`
   }
 
   const end = new Date(endDate)
-  const endYear = end.getFullYear()
+  const endYear = end.getUTCFullYear()
 
   return `${startYear} - ${endYear}`
 }

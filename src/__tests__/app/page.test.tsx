@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import Home from '@/app/(site)/page'
-import { render } from '../test-utils'
+import { render } from '../helpers/test-utils'
 
 // Mock the heavy themed layouts: we only care that the right *world* renders.
 jest.mock('@/components/themes/DarkFantasyTheme', () => ({ __esModule: true, default: () => <div data-testid="theme-dark-fantasy" /> }))

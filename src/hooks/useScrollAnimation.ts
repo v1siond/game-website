@@ -162,5 +162,7 @@ export function clamp(value: number, min: number, max: number): number {
  * Map a value from one range to another
  */
 export function mapRange(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number {
-  return clamp(((value - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin, outMin, outMax)
+  // An inverted target range (outMin > outMax) is valid, so clamp to its real bounds, not the argument order.
+  const mapped = ((value - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin
+  return clamp(mapped, Math.min(outMin, outMax), Math.max(outMin, outMax))
 }

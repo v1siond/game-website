@@ -17,6 +17,10 @@ jest.mock('html2pdf.js', () => ({
   })),
 }))
 
+// The mocked save resolves at once, so the generating state is gone before a test can look at it; a test
+// about that state keeps save pending.
+const holdSaveOpen = () => mockSave.mockReturnValueOnce(new Promise<void>(() => {}))
+
 describe('DownloadPdfButton', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -66,6 +70,7 @@ describe('DownloadPdfButton', () => {
   describe('click behavior', () => {
     it('shows generating state when clicked', async () => {
       const user = userEvent.setup()
+      holdSaveOpen()
       render(<DownloadPdfButton label="Download PDF" />)
 
       const button = screen.getByRole('button')
@@ -79,6 +84,7 @@ describe('DownloadPdfButton', () => {
 
     it('disables button while generating', async () => {
       const user = userEvent.setup()
+      holdSaveOpen()
       render(<DownloadPdfButton label="Download PDF" />)
 
       const button = screen.getByRole('button')
@@ -91,6 +97,7 @@ describe('DownloadPdfButton', () => {
 
     it('shows spinner animation while generating', async () => {
       const user = userEvent.setup()
+      holdSaveOpen()
       render(<DownloadPdfButton label="Download PDF" />)
 
       const button = screen.getByRole('button')
@@ -186,6 +193,7 @@ describe('DownloadPdfButton', () => {
   describe('accessibility', () => {
     it('button is keyboard accessible', async () => {
       const user = userEvent.setup()
+      holdSaveOpen()
       render(<DownloadPdfButton label="Download PDF" />)
 
       // Tab to button and press Enter

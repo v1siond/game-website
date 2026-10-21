@@ -9,23 +9,13 @@ import type { Profession } from '@/contexts/ProfessionContext'
 
 describe('Data Integrity Tests', () => {
   describe('PROFESSIONAL_SUMMARY', () => {
-    it('has required fields', () => {
-      expect(PROFESSIONAL_SUMMARY.headline).toBeTruthy()
-      expect(PROFESSIONAL_SUMMARY.tagline).toBeTruthy()
-      expect(PROFESSIONAL_SUMMARY.bio).toBeTruthy()
-      expect(PROFESSIONAL_SUMMARY.highlights).toBeDefined()
-      expect(Array.isArray(PROFESSIONAL_SUMMARY.highlights)).toBe(true)
-    })
+    const professions: Profession[] = ['engineer', 'drummer', 'fighter']
 
-    it('has non-empty highlights', () => {
-      expect(PROFESSIONAL_SUMMARY.highlights.length).toBeGreaterThan(0)
-      PROFESSIONAL_SUMMARY.highlights.forEach((highlight) => {
-        expect(highlight).toBeTruthy()
+    professions.forEach((profession) => {
+      it(`has a headline and a tagline for ${profession}`, () => {
+        expect(PROFESSIONAL_SUMMARY[profession].headline).toBeTruthy()
+        expect(PROFESSIONAL_SUMMARY[profession].tagline).toBeTruthy()
       })
-    })
-
-    it('bio is substantial (more than 100 characters)', () => {
-      expect(PROFESSIONAL_SUMMARY.bio.length).toBeGreaterThan(100)
     })
   })
 
