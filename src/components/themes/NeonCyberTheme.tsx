@@ -1351,7 +1351,6 @@ export default function NeonCyberTheme() {
               <button
                 type="button"
                 {...optionProps}
-                aria-controls={`profession-panel-${prof}`}
                 className={`p-4 text-left transition-all relative overflow-hidden ${
                   active === prof ? 'scale-105' : 'opacity-60 hover:opacity-100'
                 }`}
@@ -1397,7 +1396,7 @@ export default function NeonCyberTheme() {
           />
 
           {/* About section - Personnel dossier */}
-          <div className="mb-8" id={`profession-panel-${active}`} role="tabpanel" aria-label={`${active} profession details`}>
+          <div className="mb-8" role="region" aria-label={`${active} profession details`}>
             <CyberPanel title="About" accentColor="#ffff00" holographic>
               <p className="text-sm text-white/80 leading-relaxed mb-4 font-mono">{aboutData.bio}</p>
               <div className="flex flex-wrap gap-2" role="list" aria-label="Quick facts">

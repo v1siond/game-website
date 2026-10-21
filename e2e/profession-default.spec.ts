@@ -39,3 +39,14 @@ test('arrow keys move the pick along the selector', async ({ page }) => {
   await page.keyboard.press('ArrowLeft')
   await expect(options.nth(2)).toHaveAttribute('aria-checked', 'true')
 })
+
+test('the profession options point at no panel that is missing, and the panel is a named region', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByRole('region', { name: /engineer profession details/i })).toBeVisible()
+  const dangling = await page.evaluate(() =>
+    [...document.querySelectorAll('[aria-controls]')]
+      .flatMap((el) => (el.getAttribute('aria-controls') ?? '').split(/\s+/))
+      .filter((id) => id && !document.getElementById(id)),
+  )
+  expect(dangling).toEqual([])
+})
