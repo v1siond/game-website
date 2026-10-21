@@ -107,14 +107,25 @@
 }
 
 .stationPlate {
+  position: relative;
   border: 2px solid rgb(212 175 55 / 0.35);
   background: rgb(5 16 26 / 0.85);
   color: var(--deco-cream);
-  transition: border-color 0.4s;
 }
 
-.station[data-flowed] .stationPlate {
-  border-color: var(--deco-gold-bright);
+/* The bright gold frame the water lights: an overlay over the dim border that fades in. */
+.stationPlate::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--deco-gold-bright);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+.station[data-flowed] .stationPlate::after {
+  opacity: 1;
 }
 
 .lamp {
@@ -147,7 +158,7 @@
   .mainWater,
   .water,
   .pipe,
-  .stationPlate,
+  .stationPlate::after,
   .lamp::after {
     transition: none;
   }

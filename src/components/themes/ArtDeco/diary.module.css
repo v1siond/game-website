@@ -77,8 +77,32 @@
 }
 
 .line {
+  position: relative;
+  isolation: isolate;
   color: var(--deco-cream);
-  transition: color 0.3s;
+}
+
+/* A lit line: the gold light band wipes across behind it, transform and opacity only; the text takes
+   the bright gold at once over the band. */
+.line::before {
+  content: '';
+  position: absolute;
+  inset: -2px -6px;
+  z-index: -1;
+  border-left: 2px solid var(--deco-gold-bright);
+  background: rgb(212 175 55 / 0.12);
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+  transition:
+    transform 0.3s ease-out,
+    opacity 0.3s;
+}
+
+.line[data-lit]::before {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .line svg {
@@ -134,6 +158,10 @@
 
   .card[data-playing] .reel {
     animation: none;
+  }
+
+  .line::before {
+    transition: none;
   }
 
   .card[data-playing] .counter {
