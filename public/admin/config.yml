@@ -488,6 +488,48 @@ collections:
                   - { <<: *text, label: "Light hint", name: lightHint }
                   - { <<: *text, label: "Flip gravity", name: flipGravity }
                   - { <<: *text, label: "Spring the trap", name: springTrap }
+              - label: Night house world (survival horror)
+                name: horror
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Aim hint", name: aimHint }
+                  - { <<: *text, label: "Item box hint", name: itemBoxHint }
+                  - { <<: *text, label: "Item box", name: itemBox }
+                  - { <<: *text, label: "Condition", name: condition }
+                  - { <<: *text, label: "Fine", name: fine }
+                  - { <<: *text, label: "Caution", name: caution }
+                  - { <<: *text, label: "Danger", name: danger }
+                  - { <<: *text, label: "Map", name: map }
+                  - { <<: *text, label: "Rooms searched", name: roomsSearched, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Search complete", name: searchComplete }
+                  - { <<: *text, label: "File hint", name: fileHint }
+                  - { <<: *text, label: "Case hint", name: caseHint }
+                  - { <<: *text, label: "Examine", name: examine }
+                  - { <<: *text, label: "Examine item", name: examineItem, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Put back", name: putBack }
+                  - { <<: *text, label: "Wares hint", name: waresHint }
+                  - { <<: *text, label: "Spade", name: spade }
+                  - { <<: *text, label: "Heart", name: heart }
+                  - { <<: *text, label: "Diamond", name: diamond }
+                  - { <<: *text, label: "Club", name: club }
+                  - { <<: *text, label: "Use key", name: useKey, hint: 'Keep {suit}' }
+                  - { <<: *text, label: "Use key on", name: useKeyOn, hint: 'Keep {suit} {band}' }
+                  - { <<: *text, label: "Unlocked", name: unlocked }
+                  - { <<: *text, label: "Key hint", name: keyHint }
+                  - { <<: *text, label: "Green herb", name: greenHerb }
+                  - { <<: *text, label: "Red herb", name: redHerb }
+                  - { <<: *text, label: "Mixed herb", name: mixedHerb }
+                  - { <<: *text, label: "Herb hint", name: herbHint }
+                  - { <<: *text, label: "Kick", name: kick }
+                  - { <<: *text, label: "Suplex", name: suplex }
+                  - { <<: *text, label: "To the safe room", name: toSafeRoom }
+                  - { <<: *text, label: "Corridor hint", name: corridorHint }
+                  - { <<: *text, label: "Safe room", name: safeRoom }
+                  - { <<: *text, label: "Save", name: save }
+                  - { <<: *text, label: "Save hint", name: saveHint }
+                  - { <<: *text, label: "Ink ribbons", name: inkRibbons, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Saved", name: saved }
               - label: The /cv page
                 name: cvPage
                 widget: object

@@ -3,7 +3,7 @@
  * camera room, a damask wallpaper sits faint behind everything, fog lies low, one warm lamp glow hangs
  * over the top of the page and flickers, and a fine film grain moves over it all. Every colour reads the
  * --sh-* variables set from palette.ts. The loops animate transform and opacity only and stop under
- * reduced motion; the scroll scenes live in scenes.module.css.
+ * reduced motion; the scenes and their motion live in horror.module.css.
  */
 
 .root {
@@ -107,7 +107,7 @@
   }
 }
 
-/* ---- surfaces: the paper panels, the found documents, the item box ---- */
+/* ---- surfaces: the paper panels, the found documents, the inventory slots ---- */
 
 .panel {
   background-color: var(--sh-paper);
@@ -124,11 +124,6 @@
 .slot {
   background: linear-gradient(135deg, var(--sh-sepia), var(--sh-shadow));
   box-shadow: inset 0 0 24px color-mix(in srgb, var(--sh-void) 70%, transparent);
-}
-
-.emptySlot {
-  border: 1px dashed color-mix(in srgb, var(--sh-wood) 50%, transparent);
-  background: color-mix(in srgb, var(--sh-shadow) 40%, transparent);
 }
 
 /* One focus ring for every control in the world: the lamp flame. */

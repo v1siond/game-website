@@ -1,0 +1,742 @@
+/*
+ * Survival Horror's scenes and their motion: the door between rooms, the fixed camera frames, the hall's
+ * walk in, the rooms' props, the condition screen, the map and its files, the case, the trader's coat, the
+ * suit doors, the herb recovery and the corridor to the safe room. SVG groups turn in their own box
+ * (transform-box: fill-box) unless they say otherwise; lengths on SVG groups are viewBox units.
+ * Transform and opacity only; every loop and every one time move stops under reduced motion, where each
+ * scene shows its last frame.
+ */
+
+/* ---- the door: the world's one transition (door.tsx) ---- */
+
+.door {
+  opacity: 1;
+}
+
+.doorCover {
+  animation: door-cover 0.26s ease-in both;
+}
+
+@keyframes door-cover {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.doorWay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: min(70vh, 120vw);
+  aspect-ratio: 120 / 200;
+  transform: translate(-50%, -50%);
+}
+
+/* The leaf fills the frame's opening (x 14 to 106, y 12 to 200 of the 120 by 200 frame). */
+.doorLeaf {
+  position: absolute;
+  left: 11.67%;
+  top: 6%;
+  width: 76.67%;
+  height: 94%;
+  transform-origin: 0% 50%;
+  animation: door-creak 0.52s ease-in-out both;
+}
+
+/* Shut, it gives a little on its hinge, the creak before it opens. */
+@keyframes door-creak {
+  0%,
+  100% {
+    transform: perspective(900px) rotateY(0deg);
+  }
+  45% {
+    transform: perspective(900px) rotateY(-5deg);
+  }
+  70% {
+    transform: perspective(900px) rotateY(-2deg);
+  }
+}
+
+.doorOpen .doorLeaf {
+  animation: none;
+  transform: perspective(900px) rotateY(-100deg);
+  transition: transform 1s cubic-bezier(0.45, 0, 0.3, 1);
+}
+
+.doorThrough {
+  opacity: 0;
+  transition: opacity 0.6s ease-in;
+}
+
+.doorThrough .doorWay {
+  transform: translate(-50%, -50%) scale(3.2);
+  transition: transform 0.6s ease-in;
+}
+
+/* ---- the fixed camera frames ---- */
+
+/* The frame darkens to its corners, the pre-rendered room's vignette, drawn over the scene. */
+.cameraFrame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 45%, transparent 45%, color-mix(in srgb, var(--sh-void) 75%, transparent) 100%);
+}
+
+/* ---- the hall (hall.tsx) ---- */
+
+.hallWalker {
+  transform-box: view-box;
+}
+
+.hallOffstage {
+  transform: translateX(-300px);
+}
+
+.hallWalkIn {
+  animation: walk-in 1.4s linear both;
+}
+
+@keyframes walk-in {
+  from {
+    transform: translateX(-300px);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.hallPool {
+  animation: pool 6s ease-in-out infinite;
+}
+
+@keyframes pool {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.chandelier,
+.bulb {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: sway 5.5s ease-in-out infinite;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+/* His name typed onto the file card: a cover the colour of the card pulls back a letter at a time. */
+.typeCover {
+  position: absolute;
+  inset: 0;
+  background: var(--sh-paper);
+  transform-origin: 100% 50%;
+}
+
+.typeCoverPaper {
+  background: var(--sh-ivory);
+}
+
+.typeIn {
+  animation: type-in 1.4s steps(28, end) both;
+}
+
+@keyframes type-in {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* ---- the profession rooms (rooms.tsx) ---- */
+
+.screenFlicker {
+  animation: screen-flicker 3.2s steps(1, end) infinite;
+}
+
+@keyframes screen-flicker {
+  0%,
+  100% {
+    opacity: 0.16;
+  }
+  40% {
+    opacity: 0.5;
+  }
+  43% {
+    opacity: 0.1;
+  }
+  46% {
+    opacity: 0.4;
+  }
+}
+
+.cymbal {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: cymbal 0.5s ease-out infinite;
+}
+
+@keyframes cymbal {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-7deg);
+  }
+}
+
+/* The bag takes the roundhouse when it lands (66% of his 2.2s loop in survivor.module.css). */
+.heavyBag {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: bag-hit 2.2s ease-out infinite;
+}
+
+@keyframes bag-hit {
+  0%,
+  64%,
+  100% {
+    transform: rotate(0deg);
+  }
+  70% {
+    transform: rotate(-9deg);
+  }
+  82% {
+    transform: rotate(4deg);
+  }
+  92% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+/* ---- the condition screen (ecg.tsx) ---- */
+
+.ecgTrace {
+  animation: ecg 1.6s linear infinite;
+}
+
+.ecgFine {
+  animation-duration: 1.6s;
+}
+
+.ecgCaution {
+  animation-duration: 1.1s;
+}
+
+.ecgDanger {
+  animation-duration: 0.7s;
+}
+
+@keyframes ecg {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.conditionFlash {
+  animation: condition-flash 1.2s steps(1, end) infinite;
+}
+
+@keyframes condition-flash {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.55;
+  }
+}
+
+/* ---- the item box (itemBox.tsx) ---- */
+
+.examineStage {
+  perspective: 400px;
+}
+
+.examineTurn {
+  animation: examine-turn 7s linear infinite;
+}
+
+@keyframes examine-turn {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+/* ---- the map and the files (files.tsx) ---- */
+
+.mapRoom {
+  background: var(--sh-room-left);
+}
+
+.mapRoomSearched {
+  background: var(--sh-room-searched);
+}
+
+.youAreHere {
+  animation: here 1s ease-in-out infinite;
+}
+
+@keyframes here {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -3px);
+  }
+}
+
+.searchBar {
+  transform: scaleX(var(--searched, 0));
+  transition: transform 0.6s ease-out;
+}
+
+.fileSheet {
+  box-shadow: 0 6px 14px color-mix(in srgb, var(--sh-void) 60%, transparent);
+}
+
+.fileOpen {
+  animation: file-open 0.4s ease-out both;
+}
+
+@keyframes file-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* A file or a case cell lands in place, one after another (--i), once the section is in view. */
+.fileDrop,
+.cellDrop {
+  opacity: 0;
+}
+
+.fileDropped {
+  animation: file-drop 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+  animation-delay: calc(var(--i, 0) * 120ms);
+}
+
+@keyframes file-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+.cellDropped {
+  animation: cell-drop 0.5s ease-out both;
+  animation-delay: calc(0.5s + var(--i, 0) * 100ms);
+}
+
+@keyframes cell-drop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- the attache case (case.tsx) ---- */
+
+.caseHinge {
+  perspective: 1400px;
+}
+
+.caseLid {
+  height: 2.5rem;
+  border: 3px solid var(--sh-strap);
+  border-bottom: none;
+  background: linear-gradient(180deg, var(--sh-bomber-lit), var(--sh-bomber-shade));
+  transform-origin: 50% 100%;
+  transform: rotateX(-70deg);
+}
+
+.caseLidOpen {
+  transform: rotateX(0deg);
+  transition: transform 0.8s cubic-bezier(0.3, 0.6, 0.3, 1);
+}
+
+.caseBody {
+  border: 6px solid var(--sh-bomber-shade);
+  background-color: var(--sh-felt);
+  background-image: repeating-linear-gradient(0deg, transparent 0 22px, color-mix(in srgb, var(--sh-felt-line) 45%, transparent) 22px 23px),
+    repeating-linear-gradient(90deg, transparent 0 22px, color-mix(in srgb, var(--sh-felt-line) 45%, transparent) 22px 23px);
+}
+
+.examineCell {
+  perspective: 1000px;
+}
+
+.flip {
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flipped {
+  transform: rotateY(180deg);
+}
+
+.face {
+  backface-visibility: hidden;
+  border: 2px solid var(--sh-felt-line);
+  background: color-mix(in srgb, var(--sh-void) 55%, var(--sh-felt));
+}
+
+.faceBack {
+  transform: rotateY(180deg);
+}
+
+/* ---- the trader (trader.tsx) ---- */
+
+.brazier {
+  animation: brazier 2.6s ease-in-out infinite;
+}
+
+@keyframes brazier {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.7;
+  }
+  55% {
+    opacity: 0.9;
+  }
+}
+
+.brazierFlame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flame 0.9s ease-in-out infinite;
+}
+
+@keyframes flame {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.15);
+  }
+}
+
+.flapLeft,
+.flapRight {
+  transform-box: fill-box;
+  transition: transform 0.9s cubic-bezier(0.3, 0.6, 0.3, 1) 0.2s;
+}
+
+.flapLeft {
+  transform-origin: 100% 0%;
+}
+
+.flapRight {
+  transform-origin: 0% 0%;
+}
+
+.flapLeft.flapOpen {
+  transform: rotate(16deg) translateX(-34px);
+}
+
+.flapRight.flapOpen {
+  transform: rotate(-16deg) translateX(34px);
+}
+
+.ware {
+  transition: transform 0.25s ease-out;
+}
+
+.ware:hover,
+.ware:focus-visible {
+  transform: translateY(-6px) scale(1.02);
+}
+
+/* ---- the suit doors (keys.tsx) ---- */
+
+.doorFrame {
+  perspective: 700px;
+}
+
+.bandDoor {
+  transform-origin: 0% 50%;
+  transition: transform 0.9s cubic-bezier(0.45, 0, 0.3, 1) 0.6s;
+}
+
+.bandDoorOpen {
+  transform: rotateY(-102deg);
+}
+
+.key {
+  transform-origin: 30% 50%;
+}
+
+.keyTurned {
+  animation: key-turn 0.6s ease-in-out both;
+}
+
+@keyframes key-turn {
+  0% {
+    transform: translateX(-6px) rotate(0deg);
+  }
+  40% {
+    transform: translateX(0) rotate(0deg);
+  }
+  100% {
+    transform: translateX(0) rotate(90deg);
+  }
+}
+
+/* ---- the herb recovery (condition.tsx) ---- */
+
+.stamp {
+  transform-origin: 50% 50%;
+}
+
+.stamped {
+  animation: stamp 0.45s cubic-bezier(0.5, 0, 0.75, 0) both;
+  animation-delay: calc(0.6s + var(--i, 0) * 220ms);
+}
+
+@keyframes stamp {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ---- the corridor and the stalker (saferoom.tsx) ---- */
+
+.stalkerHidden {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.stalkerBurst {
+  animation: stalker-burst 0.7s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes stalker-burst {
+  from {
+    opacity: 0;
+    transform: translateX(30px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.stalkerLoom {
+  transform-origin: 50% 100%;
+  animation: loom 2.4s ease-in-out infinite;
+}
+
+@keyframes loom {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-2deg) translateX(-3px);
+  }
+}
+
+.stalkerStagger {
+  transform-origin: 50% 100%;
+  animation: stagger 0.7s ease-out both;
+}
+
+@keyframes stagger {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(8deg) translateX(14px);
+  }
+  100% {
+    transform: rotate(5deg) translateX(10px);
+  }
+}
+
+.stalkerStaggered {
+  transform-origin: 50% 100%;
+  transform: rotate(5deg) translateX(10px);
+}
+
+.stalkerThrown {
+  transform-origin: 50% 100%;
+  animation: thrown 0.9s ease-in both;
+}
+
+@keyframes thrown {
+  0% {
+    opacity: 1;
+    transform: rotate(5deg) translateX(10px);
+  }
+  50% {
+    opacity: 1;
+    transform: rotate(-30deg) translate(-40px, -20px);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(40deg) translate(60px, 0);
+  }
+}
+
+.wallPiece {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.wallPieceOut {
+  animation: wall-out 0.6s ease-out both;
+}
+
+@keyframes wall-out {
+  to {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, 0)) rotate(25deg) scale(1.3);
+  }
+}
+
+.typeBar {
+  transform-box: fill-box;
+  animation: type-bar 0.3s steps(2, end) infinite;
+}
+
+@keyframes type-bar {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-4px);
+  }
+}
+
+.prompt {
+  animation: prompt 1s ease-in-out infinite;
+}
+
+@keyframes prompt {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ---- reduced motion: every scene on its last frame ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .door {
+    display: none;
+  }
+
+  .doorLeaf,
+  .hallPool,
+  .chandelier,
+  .bulb,
+  .screenFlicker,
+  .cymbal,
+  .heavyBag,
+  .ecgTrace,
+  .conditionFlash,
+  .examineTurn,
+  .youAreHere,
+  .fileOpen,
+  .brazier,
+  .brazierFlame,
+  .keyTurned,
+  .stamped,
+  .stalkerLoom,
+  .typeBar,
+  .prompt {
+    animation: none;
+  }
+
+  .hallOffstage,
+  .hallWalkIn {
+    animation: none;
+    transform: none;
+  }
+
+  .typeCover {
+    display: none;
+  }
+
+  .fileDrop,
+  .cellDrop {
+    animation: none;
+    opacity: 1;
+  }
+
+  .searchBar,
+  .flip,
+  .flapLeft,
+  .flapRight,
+  .ware,
+  .bandDoor,
+  .caseLidOpen {
+    transition: none;
+  }
+
+  .caseLid {
+    transform: none;
+  }
+
+  .ware:hover,
+  .ware:focus-visible {
+    transform: none;
+  }
+
+  .keyTurned {
+    transform: rotate(90deg);
+  }
+}
