@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
@@ -49,6 +50,7 @@ function SunburstMedallion() {
 export default function ArtDecoTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation, professions, sections, cards } = useLabels()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export default function ArtDecoTheme() {
                 </div>
               </div>
 
-              <nav className="flex flex-wrap items-center gap-3 sm:gap-4" aria-label="Contact and CV">
+              <nav className="flex flex-wrap items-center gap-3 sm:gap-4" aria-label={navigation.contactAndCv}>
                 {actions.map((action) => (
                   <HeroAction key={action.id} action={action} />
                 ))}
@@ -98,23 +100,23 @@ export default function ArtDecoTheme() {
       </header>
 
       {/* The profession switch: a row of tonic bottles, System Engineer in the centre */}
-      <section className="relative z-20 px-4 py-8" aria-label="Profession selection">
+      <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
         <ProfessionSwitch
           className="grid grid-cols-3 gap-3 sm:flex sm:justify-center sm:gap-8"
-          label="Profession"
+          label={navigation.profession}
           renderOption={(option) => <TonicBottle {...option} />}
         />
       </section>
 
       {/* The picked profession's sections and stages, and only those */}
       <main className="relative z-20 px-4 py-10 sm:px-8">
-        <div className="mx-auto max-w-5xl" role="region" aria-label={`${active} profession details`}>
+        <div className="mx-auto max-w-5xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
           <div className="pt-8">
             <FadeInScene>
-              <GoldFrame title="Posts">
-                <p className="py-8 text-center text-base italic text-[#d0c8b8]">No posts yet</p>
+              <GoldFrame title={sections.posts}>
+                <p className="py-8 text-center text-base italic text-[#d0c8b8]">{cards.noPosts}</p>
               </GoldFrame>
             </FadeInScene>
           </div>

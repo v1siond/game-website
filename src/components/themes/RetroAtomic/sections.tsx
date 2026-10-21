@@ -3,7 +3,7 @@
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { PhosphorFrame, RustedPanel, ShelterPanel, WornDocumentPanel } from './panels'
@@ -22,13 +22,14 @@ export const SECTION_WRAP = 'relative z-20 py-6 px-4 md:px-6'
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const labels = useLabels()
 
   return (
     <>
       <FadeInScene>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
-            <WornDocumentPanel title="About">
+            <WornDocumentPanel title={labels.sections.about}>
               <p className="font-mono text-base leading-relaxed text-atomic-phosphor">
                 {professionalSummary.bio}
               </p>
@@ -44,7 +45,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <div className={SECTION_WRAP}>
             <div className="max-w-4xl mx-auto">
               <Lane profession="engineer" zone="record" />
-              <RustedPanel title="Work Experience">
+              <RustedPanel title={labels.sections.workExperience}>
                 <ul className="space-y-4 pl-2">
                   {sections.jobs.map((entry) => (
                     <li key={entry.id}>
@@ -65,7 +66,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <FadeInScene>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
-            <PhosphorFrame title="Tech Stack">
+            <PhosphorFrame title={labels.sections.techStack}>
               <TechStackTerminal categories={sections.techStack} />
             </PhosphorFrame>
           </div>
@@ -76,7 +77,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
             <Lane profession="engineer" zone="work" />
-            <RustedPanel title="Projects">
+            <RustedPanel title={labels.sections.projects}>
               <ProjectList
                 projects={sections.projects}
                 className="grid md:grid-cols-2 gap-4"
@@ -96,7 +97,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <FadeInScene>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
-            <ShelterPanel title="Ventures">
+            <ShelterPanel title={labels.sections.ventures}>
               <div className="grid md:grid-cols-3 gap-4">
                 {sections.companies.map((company) => (
                   <CompanyCard key={company.id} company={company} />
@@ -112,6 +113,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const labels = useLabels()
 
   return (
     <>
@@ -120,9 +122,9 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
             <Lane profession="drummer" zone="record" />
-            <RustedPanel title="Bands">
+            <RustedPanel title={labels.sections.bands}>
               <p className="mb-4 font-mono text-base text-atomic-phosphor">
-                {drumsSince(musician)}
+                {drumsSince(musician, labels.years)}
               </p>
               <BandList
                 bands={bands}
@@ -146,6 +148,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const labels = useLabels()
 
   return (
     <>
@@ -154,7 +157,7 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
         <div className={SECTION_WRAP}>
           <div className="max-w-4xl mx-auto">
             <Lane profession="fighter" zone="record" />
-            <PhosphorFrame title="Muay Thai">
+            <PhosphorFrame title={labels.sections.muayThai}>
               <h3 className="mb-4 font-mono text-lg font-bold uppercase tracking-wide text-atomic-yellow">
                 {martialArts.primary.title}
               </h3>

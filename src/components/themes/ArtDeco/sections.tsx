@@ -1,6 +1,6 @@
 'use client'
 
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -20,11 +20,12 @@ const LEAD = 'text-center text-base text-[#e8e0d0]'
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const labels = useLabels()
 
   return (
     <>
       <FadeInScene>
-        <GoldFrame title="About">
+        <GoldFrame title={labels.sections.about}>
           <p className={`leading-relaxed ${LEAD}`}>{professionalSummary.bio}</p>
         </GoldFrame>
       </FadeInScene>
@@ -34,7 +35,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.jobs.length > 0 && (
         <LevelScene>
           <Strip profession="engineer" zone="record" />
-          <GoldFrame title="Work Experience">
+          <GoldFrame title={labels.sections.workExperience}>
             <ul className="space-y-6">
               {sections.jobs.map((entry) => (
                 <li key={entry.id}>
@@ -51,7 +52,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <ArtDecoChevron />
 
       <FadeInScene>
-        <GoldFrame title="Tech Stack">
+        <GoldFrame title={labels.sections.techStack}>
           <TechCloud categories={sections.techStack} />
         </GoldFrame>
       </FadeInScene>
@@ -60,7 +61,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <LevelScene>
         <Strip profession="engineer" zone="work" />
-        <GoldFrame title="Projects">
+        <GoldFrame title={labels.sections.projects}>
           <ProjectList
             projects={sections.projects}
             className="grid gap-6 md:grid-cols-2"
@@ -76,7 +77,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <ArtDecoSunburst />
 
       <FadeInScene>
-        <GoldFrame title="Ventures">
+        <GoldFrame title={labels.sections.ventures}>
           <ul className="grid gap-5 md:grid-cols-3">
             {sections.companies.map((company) => (
               <li key={company.id}>
@@ -92,15 +93,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const labels = useLabels()
 
   return (
     <>
       <ArtDecoSunburst />
       <LevelScene>
         <Strip profession="drummer" zone="record" />
-        <GoldFrame title="Bands">
+        <GoldFrame title={labels.sections.bands}>
           <p className={`mb-5 ${LEAD}`}>
-            {drumsSince(musician)}
+            {drumsSince(musician, labels.years)}
           </p>
           <BandList
             bands={bands}
@@ -120,13 +122,14 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const labels = useLabels()
 
   return (
     <>
       <ArtDecoSunburst />
       <LevelScene>
         <Strip profession="fighter" zone="record" />
-        <GoldFrame title="Muay Thai">
+        <GoldFrame title={labels.sections.muayThai}>
           <h3 className={`mb-6 text-center text-xl ${CARD_TITLE}`}>{martialArts.primary.title}</h3>
           <MuayThaiRecord
             martialArts={martialArts}

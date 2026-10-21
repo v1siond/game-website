@@ -6,7 +6,9 @@ import { CircuitPattern } from './effects'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { headingId, jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { headingId, jobYears } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { NEON } from './palette'
 
 // The tube colours a tech chip cycles through, one per chip in order.
@@ -27,6 +29,9 @@ const PANEL_ACCENT: Record<PanelAccent, { text: string; border: string; dot: str
 }
 
 const panelId = (title: string) => headingId('panel', title)
+
+// HUD text reads a label the way the terminal would type it: GET THE CV is GET_THE_CV.
+export const terminalName = (text: string): string => text.toUpperCase().replace(/\s+/g, '_')
 
 // Cyber panel with neon border and circuit corners - Arasaka/Militech corporate UI
 export function CyberPanel({
@@ -123,6 +128,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 // Band card - Johnny Silverhand style music legacy
 export function BandCard({ band, years, linkProps }: BandSlot) {
   const reducedMotion = useReducedMotion()
+  const { links, actions } = useLabels()
 
   const content = (
     <article
@@ -143,10 +149,10 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="text-sm text-white/80 mt-2">
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
-      {linkProps && <div className="text-sm text-cyan-400 mt-2" aria-hidden="true">[STREAM_LINK]</div>}
+      {linkProps && <div className="text-sm text-cyan-400 mt-2" aria-hidden="true">[{terminalName(actions.streamLink)}]</div>}
     </article>
   )
 
@@ -161,7 +167,8 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 // Work experience card - cyber dossier / personnel file style. Dates are date only strings (UTC
 // midnight), so the year is read in UTC: a January start shows its own year west of UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'ACTIVE')
+  const { navigation, cards } = useLabels()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, navigation.active.toUpperCase())
   const reducedMotion = useReducedMotion()
 
   return (
@@ -171,7 +178,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         background: 'linear-gradient(135deg, rgba(0,255,255,0.05), transparent)',
         clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
       }}
-      aria-label={`${entry.title} at ${entry.company}, ${startDisplay} to ${endDisplay}`}
+      aria-label={fillLabel(cards.jobSpan, { title: entry.title, company: entry.company, start: startDisplay, end: endDisplay })}
     >
       {/* Header with title and dates */}
       <header className="flex justify-between items-start gap-2 mb-2">
@@ -190,7 +197,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 
       {/* Highlights as impact statements */}
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1 mb-2" aria-label="Key achievements">
+        <ul className="space-y-1 mb-2" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className="text-sm text-cyan-400 flex items-start gap-2 font-mono">
               <span className="text-pink-500" aria-hidden="true">&gt;</span>
@@ -202,7 +209,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 
       {/* Skills tags */}
       {entry.skills.length > 0 && (
-        <ul className="flex flex-wrap gap-1 mt-2" aria-label="Skills used">
+        <ul className="flex flex-wrap gap-1 mt-2" aria-label={cards.skillsUsed}>
           {entry.skills.slice(0, 5).map((skill) => (
             <li
               key={skill}
@@ -220,6 +227,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 // Project card - netrunner gig file: his role, the result line and the links that open the project
 export function ProjectCard({ project, years, links }: ProjectSlot) {
   const reducedMotion = useReducedMotion()
+  const labels = useLabels()
 
   return (
     <article
@@ -234,7 +242,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
       <p className="text-sm text-white/80 mt-1">{project.tagline}</p>
       {project.impact && <p className="text-sm text-pink-400 mt-1 italic">&gt; {project.impact}</p>}
       {project.techStack.length > 0 && (
-        <ul className="flex gap-2 mt-2 flex-wrap" aria-label="Technologies used">
+        <ul className="flex gap-2 mt-2 flex-wrap" aria-label={labels.cards.technologiesUsed}>
           {project.techStack.slice(0, 4).map((tech) => (
             <li key={tech} className="text-sm px-1 py-0.5 bg-white/5 text-cyan-400 font-mono">
               {tech}
@@ -255,7 +263,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-white/70 mt-3 font-mono">{NO_PUBLIC_LINK}</p>
+        <p className="text-sm text-white/70 mt-3 font-mono">{labels.links.noPublicLink}</p>
       )}
     </article>
   )
@@ -263,6 +271,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 
 // Tech category display - cyberware/netrunner deck style
 export function TechCategory({ category }: { category: CVData['techStack'][number] }) {
+  const { cards } = useLabels()
   return (
     <div className="mb-4" role="region" aria-labelledby={headingId('tech-cat', category.name)}>
       <header className="flex items-center gap-2 mb-2">
@@ -275,7 +284,7 @@ export function TechCategory({ category }: { category: CVData['techStack'][numbe
         </h3>
         <div className="flex-1 h-px bg-gradient-to-r from-pink-500/30 to-transparent" aria-hidden="true" />
       </header>
-      <div className="flex flex-wrap gap-2" role="list" aria-label={`${category.name} technologies`}>
+      <div className="flex flex-wrap gap-2" role="list" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
         {category.items.map((tech, i) => (
           <span
             key={tech}

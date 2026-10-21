@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import { ContactStage } from '@/components/scroll/stage'
@@ -81,6 +82,7 @@ const CONTACT_HEADING = headingId('deco', 'Contact')
 
 export function ContactScene({ profession }: { profession: Profession }) {
   const { Corner } = PROFESSION_STAGES[profession]
+  const { sections } = useLabels()
 
   return (
     <ContactStage
@@ -102,7 +104,7 @@ export function ContactScene({ profession }: { profession: Profession }) {
             <GoldFrame>
               <div className="text-center sm:text-left">
                 <h2 id={CONTACT_HEADING} className="mb-4 text-lg uppercase tracking-[0.25em]">
-                  <NeonSign text="Contact" flicker delay="-3s" />
+                  <NeonSign text={sections.contact} flicker delay="-3s" />
                 </h2>
                 <p className="mb-6 text-sm text-[#e8e0d0]">{line}</p>
                 <div className="flex flex-col justify-center gap-4 sm:flex-row sm:flex-wrap sm:justify-start">

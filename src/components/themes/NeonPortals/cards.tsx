@@ -2,7 +2,8 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { headingId, jobYears, RELEASED } from '@/components/cv/sectionText'
+import { headingId, jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // Neon Portals' panels and cards. Static classes only (no blur, no animated glow), so a card costs
 // nothing while the page scrolls; the scenes in scenes.tsx move them. Colours are the palette.ts values.
@@ -77,7 +78,8 @@ export function TechCategoryList({ categories }: { categories: CVData['techStack
 
 export function ExperienceCard({ entry, index }: { entry: Job; index: number }) {
   const look = SIDE_LOOK[sideOf(index)]
-  const { start, end } = jobYears(entry, 'Present')
+  const { years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className={`border bg-[#12111c] p-4 ${look.border}`} aria-labelledby={`portal-exp-${entry.id}`}>
@@ -155,13 +157,14 @@ export function ProjectCard({ slot: { project, years, links }, index }: { slot: 
 }
 
 export function VentureCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
       className={`group block h-full border border-[#00a2ff]/30 bg-[#12111c] p-4 transition-colors hover:border-[#00a2ff] ${LINK_FOCUS}`}
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
     >
       <div className="mb-2 flex items-center gap-3">
         <span className="text-xl" aria-hidden="true">{company.icon}</span>
@@ -183,6 +186,7 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const content = (
     <article className="h-full bg-[#12111c] p-4">
       <h3 className="text-base text-[#edebe4]">{band.name}</h3>
@@ -193,7 +197,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="mt-1.5 text-sm text-[#a9a6b8]">
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

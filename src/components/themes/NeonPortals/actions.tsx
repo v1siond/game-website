@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // The world's actions, in the hero and again in the contact scene: email lit orange (the way in),
 // LinkedIn outlined blue (the way out), the CV outlined white.
@@ -25,20 +26,22 @@ export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${PORTAL_BUTTON} border-[1.5px] border-[#edebe4] text-[#edebe4] hover:bg-white/10`}>
-      Get the CV
+      {actions.getCv}
     </Link>
   )
 }
 
 export function DemoLink() {
+  const { actions } = useLabels()
   return (
     <Link
       href="/personal-projects/game-engine"
       className={`${PORTAL_BUTTON} border-[1.5px] border-[#b57bff] text-[#b57bff] hover:bg-[#b57bff]/15`}
     >
-      Play demo
+      {actions.playDemo}
     </Link>
   )
 }

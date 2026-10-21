@@ -3,10 +3,10 @@
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { PROFESSION_LABELS, type Profession } from '@/lib/cv/professions'
+import type { Profession } from '@/lib/cv/professions'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { CompanyCard, BandCard, CyberPanel, ExperienceCard, ProjectCard, TechCategory } from './cards'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { LevelScene } from '@/components/scroll/stage'
@@ -20,16 +20,14 @@ export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> =
   fighter: 'arm',
 }
 
-// The selector's state line reads the profession the way the terminal would type it.
-export const terminalName = (profession: Profession): string => PROFESSION_LABELS[profession].toUpperCase().replace(/\s+/g, '_')
-
 export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary, companies } = useCVData()
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <FadeInScene>
-        <CyberPanel title="About" accent="yellow">
+        <CyberPanel title={titles.about} accent="yellow">
           <p className="text-sm text-white/80 leading-relaxed font-mono">{professionalSummary.bio}</p>
         </CyberPanel>
       </FadeInScene>
@@ -37,7 +35,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
       {sections.jobs.length > 0 && (
         <LevelScene>
           <LevelStrip profession="engineer" zone="record" />
-          <CyberPanel title="Work Experience" accent="green">
+          <CyberPanel title={titles.workExperience} accent="green">
             <ul className="space-y-4">
               {sections.jobs.map((entry) => (
                 <li key={entry.id}>
@@ -52,7 +50,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
       )}
 
       <FadeInScene>
-        <CyberPanel title="Tech Stack" accent="cyan" megacorpStyle>
+        <CyberPanel title={titles.techStack} accent="cyan" megacorpStyle>
           {sections.techStack.map((category) => (
             <TechCategory key={category.id} category={category} />
           ))}
@@ -61,7 +59,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
 
       <LevelScene>
         <LevelStrip profession="engineer" zone="work" />
-        <CyberPanel title="Projects" accent="magenta">
+        <CyberPanel title={titles.projects} accent="magenta">
           <ProjectList
             projects={sections.projects}
             className="grid md:grid-cols-2 gap-4"
@@ -75,7 +73,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
       </LevelScene>
 
       <FadeInScene>
-        <CyberPanel title="Ventures" accent="magenta" megacorpStyle>
+        <CyberPanel title={titles.ventures} accent="magenta" megacorpStyle>
           <div className="grid md:grid-cols-3 gap-4">
             {companies.map((company) => (
               <CompanyCard key={company.id} company={company} />
@@ -89,13 +87,14 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
 
 export function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const labels = useLabels()
 
   return (
     <LevelScene>
       <LevelStrip profession="drummer" zone="record" />
-      <CyberPanel title="Bands" accent="violet">
+      <CyberPanel title={labels.sections.bands} accent="violet">
         <p className="text-sm text-white/80 font-mono mb-4">
-          {drumsSince(musician)}
+          {drumsSince(musician, labels.years)}
         </p>
         <BandList
           bands={bands}
@@ -117,11 +116,12 @@ export function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }
 
 export function MartialArtistPanels({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const { sections: titles } = useLabels()
 
   return (
     <LevelScene>
       <LevelStrip profession="fighter" zone="record" />
-      <CyberPanel title="Muay Thai" accent="red">
+      <CyberPanel title={titles.muayThai} accent="red">
         <h3 className="text-base text-pink-400 font-mono mb-4">{martialArts.primary.title}</h3>
         <MuayThaiRecord
           martialArts={martialArts}

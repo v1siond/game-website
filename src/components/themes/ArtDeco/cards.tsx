@@ -2,7 +2,9 @@ import type { ReactNode } from 'react'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { GOLD_OUTLINE } from './actions'
 import look from './world.module.css'
 
@@ -46,7 +48,8 @@ export function BrassCard({ children }: { children: ReactNode }) {
 }
 
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { years, cards } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <BrassCard>
@@ -63,7 +66,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       {entry.description && <p className={`mb-4 ${BODY}`}>{entry.description}</p>}
 
       {entry.highlights.length > 0 && (
-        <ul className="mb-4 space-y-1.5" aria-label="Key achievements">
+        <ul className="mb-4 space-y-1.5" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className={`flex items-start gap-2 ${TEXT}`}>
               <Bullet />
@@ -74,7 +77,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       )}
 
       {entry.skills.length > 0 && (
-        <ul className="flex flex-wrap gap-2" aria-label="Skills used">
+        <ul className="flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
           {entry.skills.slice(0, 4).map((skill) => (
             <li key={skill} className={TAG}>
               {skill}
@@ -87,6 +90,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 }
 
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
     <div className="space-y-5">
       {categories.map((category) => (
@@ -95,7 +99,7 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li key={tech} className="border border-[#D4AF37]/45 bg-[#D4AF37]/10 px-3 py-1.5 text-sm text-[#e8e0d0]">
                 {tech}
@@ -110,6 +114,7 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
 
 // A project as a poster of the city: his role, the result line and the links.
 export function ProjectCard({ project, years, links }: ProjectSlot) {
+  const labels = useLabels()
   return (
     <BrassCard>
       <div className="mb-2 flex items-start justify-between gap-2">
@@ -125,7 +130,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         </p>
       )}
       {project.techStack.length > 0 && (
-        <ul className="flex flex-wrap gap-2" aria-label="Technologies used">
+        <ul className="flex flex-wrap gap-2" aria-label={labels.cards.technologiesUsed}>
           {project.techStack.slice(0, 4).map((tech) => (
             <li key={tech} className={TAG}>
               {tech}
@@ -142,19 +147,20 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className={`mt-4 ${BODY}`}>{NO_PUBLIC_LINK}</p>
+        <p className={`mt-4 ${BODY}`}>{labels.links.noPublicLink}</p>
       )}
     </BrassCard>
   )
 }
 
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
       className="block h-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F0C850]"
     >
       <BrassCard>
@@ -174,6 +180,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const content = (
     <BrassCard>
       <h3 className={`text-base ${CARD_TITLE}`}>{band.name}</h3>
@@ -184,7 +191,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${TEXT}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </BrassCard>

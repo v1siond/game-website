@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { NEON } from './palette'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 
 // Intense glitch text effect with RGB split - neon city chromatic aberration
 export function GlitchText({
@@ -186,6 +188,7 @@ export function CircuitPattern({ color = NEON.magenta }: { color?: string }) {
 
 // Cyberware icon - implant status indicators
 export function CyberwareIcon({ type }: { type: 'eye' | 'arm' | 'chip' | 'jack' }) {
+  const { cards } = useLabels()
   const icons = {
     eye: '⦿', // Kiroshi optics
     arm: '⟨⟩', // Gorilla arms
@@ -197,7 +200,7 @@ export function CyberwareIcon({ type }: { type: 'eye' | 'arm' | 'chip' | 'jack' 
       className="text-cyan-400 text-sm"
       style={{ textShadow: `0 0 5px ${NEON.cyan}` }}
       role="img"
-      aria-label={`${type} cyberware`}
+      aria-label={fillLabel(cards.cyberware, { type })}
     >
       {icons[type]}
     </span>

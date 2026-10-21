@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { terminalName } from './cards'
 
 // The world's three actions, in the hero and again in the contact scene: email, LinkedIn, the CV.
 
@@ -22,9 +24,10 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${HUD_BUTTON} border border-white/60 text-white hover:bg-white hover:text-black`}>
-      [GET_THE_CV]
+      [{terminalName(actions.getCv)}]
     </Link>
   )
 }

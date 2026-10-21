@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { DimensionBackdrop, PortalPair } from './NeonPortals/backdrop'
 import { PortalSelector } from './NeonPortals/selector'
@@ -21,6 +21,7 @@ import { ContactScene } from './NeonPortals/scenes'
 export default function NeonPortalsTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation } = useLabels()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function NeonPortalsTheme() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-black"
       >
-        Skip to main content
+        {navigation.skipToContent}
       </a>
 
       <DimensionBackdrop />
@@ -55,7 +56,7 @@ export default function NeonPortalsTheme() {
                 </div>
               </div>
 
-              <nav className="flex flex-wrap items-center gap-2" aria-label="Contact and CV">
+              <nav className="flex flex-wrap items-center gap-2" aria-label={navigation.contactAndCv}>
                 <HeroActions actions={actions} />
                 <CVLink />
                 <DemoLink />
@@ -66,10 +67,10 @@ export default function NeonPortalsTheme() {
       </header>
 
       {/* One portal per profession */}
-      <section className="relative z-20 py-8" aria-label="Select profession">
+      <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
         <ProfessionSwitch
           className="mx-auto flex max-w-3xl justify-center gap-2 px-4 sm:gap-8 md:gap-16"
-          label="Select profession"
+          label={navigation.profession}
           renderOption={(option) => <PortalSelector option={option} />}
         />
       </section>

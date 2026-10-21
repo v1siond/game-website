@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import world from './world.module.css'
 
 // The world's actions, in the hero and again in the contact section: email, LinkedIn, the CV.
@@ -29,9 +30,10 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${TERMINAL_BUTTON} ${BUTTON_LOOK.yellow}`}>
-      CV
+      {actions.cv}
     </Link>
   )
 }

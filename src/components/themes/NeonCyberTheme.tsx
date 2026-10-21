@@ -3,15 +3,16 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ChromaticBorder, CyberwareIcon, GlitchText, ScannerCorners, TerminalLine } from './NeonCyber/effects'
 import { DataStream, NightCitySkyline, RainOverlay } from './NeonCyber/backdrop'
-import { CyberPanel } from './NeonCyber/cards'
+import { CyberPanel, terminalName } from './NeonCyber/cards'
 import { CVLink, HeroAction } from './NeonCyber/actions'
-import { PROFESSION_CYBERWARE, SECTION_VIEWS, terminalName } from './NeonCyber/sections'
+import { PROFESSION_CYBERWARE, SECTION_VIEWS } from './NeonCyber/sections'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ContactScene } from './NeonCyber/scenes'
 import { NEON_VARS } from './NeonCyber/palette'
@@ -25,6 +26,7 @@ import { NEON_VARS } from './NeonCyber/palette'
 export default function NeonCyberTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { sections, professions, navigation, cards } = useLabels()
   const [mounted, setMounted] = useState(false)
   const [screenTear, setScreenTear] = useState<number | null>(null)
   const reducedMotion = useReducedMotion()
@@ -101,7 +103,7 @@ export default function NeonCyberTheme() {
                         <p className="mt-2 text-sm text-cyan-300 font-mono">{line}</p>
                       </div>
 
-                      <nav className="flex gap-3 items-center flex-wrap" aria-label="Contact and CV">
+                      <nav className="flex gap-3 items-center flex-wrap" aria-label={navigation.contactAndCv}>
                         {actions.map((action) => (
                           <HeroAction key={action.id} action={action} />
                         ))}
@@ -119,21 +121,21 @@ export default function NeonCyberTheme() {
       <main className="relative z-20 px-4 sm:px-6 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Terminal - the tagline and the profession picked, typed */}
-          <div className="mb-8 p-4 bg-black/80 border border-cyan-400/30" role="region" aria-label="System terminal">
+          <div className="mb-8 p-4 bg-black/80 border border-cyan-400/30" role="region" aria-label={navigation.systemTerminal}>
             <div className="flex items-center gap-2 mb-4" aria-hidden="true">
               <span className="w-3 h-3 rounded-full bg-red-500" />
               <span className="w-3 h-3 rounded-full bg-yellow-500" />
               <span className="w-3 h-3 rounded-full bg-green-500" />
             </div>
             <TerminalLine prefix="> " text={view.hero.tagline} delay={0} />
-            <TerminalLine prefix="$ " text={`set PROFESSION=${terminalName(active)}`} delay={1200} />
+            <TerminalLine prefix="$ " text={`set PROFESSION=${terminalName(professions[active])}`} delay={1200} />
           </div>
 
           {/* Profession selector - Cyberware slot selection. The slanted cut would clip the focus ring,
               so a focused slot drops it. */}
           <ProfessionSwitch
             className="grid grid-cols-3 gap-2 sm:gap-4 mb-8"
-            label="Select profession view"
+            label={navigation.professionSelection}
             renderOption={({ id: prof, label, selected, optionProps }) => (
               <button
                 type="button"
@@ -158,24 +160,24 @@ export default function NeonCyberTheme() {
                       {label.toUpperCase()}
                     </span>
                   </span>
-                  {selected && <span className="text-sm text-green-400 block mt-1 font-mono">[ACTIVE]</span>}
+                  {selected && <span className="text-sm text-green-400 block mt-1 font-mono">[{terminalName(navigation.active)}]</span>}
                 </span>
               </button>
             )}
           />
 
           {/* The picked profession's sections and stages, and only those */}
-          <div role="region" aria-label={`${active} profession details`}>
+          <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           </div>
 
           <ScrollScene className="mb-8">
-            <CyberPanel title="Posts" accent="orange">
+            <CyberPanel title={sections.posts} accent="orange">
               <div className="text-center py-8">
                 <div className="text-6xl mb-4 text-white/20 font-mono" aria-hidden="true">
                   &#123; &#125;
                 </div>
-                <p className="text-sm text-white/80 font-mono tracking-wider">No posts yet</p>
+                <p className="text-sm text-white/80 font-mono tracking-wider">{cards.noPosts}</p>
               </div>
             </CyberPanel>
           </ScrollScene>

@@ -2,7 +2,9 @@ import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { TERMINAL_AMBER } from './palette'
 import { RadiationSymbol } from './icons'
 import world from './world.module.css'
@@ -36,6 +38,7 @@ export function ProfessionTab({ label, selected, optionProps }: ProfessionOption
 const CHIP = 'border border-atomic-phosphor/25 bg-atomic-phosphor/10 px-2 py-0.5 text-sm text-atomic-phosphor-dim'
 
 export function TechStackTerminal({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
     <div className="space-y-6 font-mono">
       {categories.map((cat, idx) => (
@@ -47,7 +50,7 @@ export function TechStackTerminal({ categories }: { categories: CVData['techStac
             <span aria-hidden="true">{cat.icon}</span>
             {cat.name.toUpperCase()}
           </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${cat.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: cat.name })}>
             {cat.items.map((tech) => (
               <li key={tech} className="border border-atomic-phosphor bg-atomic-ink px-3 py-1 text-sm font-bold text-atomic-phosphor">
                 {tech}
@@ -61,7 +64,8 @@ export function TechStackTerminal({ categories }: { categories: CVData['techStac
 }
 
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start: startYear, end: endYear } = jobYears(entry, 'PRESENT')
+  const { years, cards } = useLabels()
+  const { start: startYear, end: endYear } = jobYears(entry, years.present.toUpperCase())
   const frame = entry.endDate ? 'border-atomic-ash/25' : 'border-atomic-phosphor/25'
 
   return (
@@ -78,7 +82,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       {entry.description && <p className="mb-3 text-sm text-atomic-ash">{entry.description}</p>}
 
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1 border-t border-atomic-phosphor/20 pt-2" aria-label="Key achievements">
+        <ul className="space-y-1 border-t border-atomic-phosphor/20 pt-2" aria-label={cards.keyAchievements}>
           {entry.highlights.map((h) => (
             <li key={h} className="flex items-start gap-2 text-sm text-atomic-phosphor">
               <span className="text-atomic-amber" aria-hidden="true">
@@ -91,7 +95,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       )}
 
       {entry.skills.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1" aria-label="Skills used">
+        <ul className="mt-3 flex flex-wrap gap-1" aria-label={cards.skillsUsed}>
           {entry.skills.slice(0, 5).map((skill) => (
             <li key={skill} className={CHIP}>
               {skill}
@@ -114,6 +118,7 @@ const PROJECT_LOOK = {
 
 // His role, the result line and the links.
 export function ProjectCard({ project, years, links }: ProjectSlot) {
+  const labels = useLabels()
   return (
     <article className={`relative h-full border-2 p-4 font-mono ${PROJECT_LOOK[project.highlight ? 'highlight' : 'plain']}`}>
       <div className="flex items-start justify-between gap-2">
@@ -131,7 +136,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
       )}
 
       {project.techStack.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1" aria-label="Technologies used">
+        <ul className="mt-3 flex flex-wrap gap-1" aria-label={labels.cards.technologiesUsed}>
           {project.techStack.slice(0, 5).map((tech) => (
             <li key={tech} className={`${CHIP} font-bold`}>
               {tech}
@@ -149,19 +154,20 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-atomic-ash">{NO_PUBLIC_LINK}</p>
+        <p className="mt-4 text-sm text-atomic-ash">{labels.links.noPublicLink}</p>
       )}
     </article>
   )
 }
 
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
       className={`block h-full border border-atomic-blue p-4 font-mono transition-all hover:scale-[1.02] focus:outline-none focus-visible:ring-2 ${world.phosphorScreen}`}
     >
       <div className="mb-2 flex items-center gap-3">
@@ -180,6 +186,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 
 // His role, the years and the release.
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const content = (
     <article className={`h-full border border-atomic-red/30 p-4 font-mono ${world.rust}`}>
       <h3 className="text-base font-bold uppercase tracking-wide text-atomic-red-light">{band.name}</h3>
@@ -190,7 +197,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="mt-2 text-sm text-atomic-ash">
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -35,6 +36,8 @@ const BACKDROP_TREFOILS = [
 export default function RetroAtomicTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const labels = useLabels()
+  const { navigation, professions } = labels
   const [mounted, setMounted] = useState(false)
   const reducedMotion = useReducedMotion()
 
@@ -74,13 +77,13 @@ export default function RetroAtomicTheme() {
 
                 <div className="flex flex-col items-start gap-3 md:items-end">
                   <Starburst size={24} color={ATOMIC_YELLOW} />
-                  <nav className="flex flex-wrap gap-2 md:justify-end" aria-label="Contact and CV">
+                  <nav className="flex flex-wrap gap-2 md:justify-end" aria-label={navigation.contactAndCv}>
                     {actions.map((action) => (
                       <HeroAction key={action.id} action={action} />
                     ))}
                     <CVLink />
                     <Link href="/personal-projects/game-engine" className={`${TERMINAL_BUTTON} ${BUTTON_LOOK.green}`}>
-                      Nebulith
+                      {labels.actions.engine}
                     </Link>
                   </nav>
                 </div>
@@ -91,15 +94,15 @@ export default function RetroAtomicTheme() {
       </header>
 
       {/* the profession switch, System Engineer in the centre */}
-      <section className="relative z-20 px-4 py-4" aria-label="Profession selection">
+      <section className="relative z-20 px-4 py-4" aria-label={navigation.professionSelection}>
         <ProfessionSwitch
           className="mx-auto grid max-w-xl grid-cols-3 gap-2 md:flex md:max-w-none md:justify-center md:gap-6"
-          label="Profession"
+          label={navigation.profession}
           renderOption={(option) => <ProfessionTab {...option} />}
         />
       </section>
 
-      <div role="region" aria-label={`${active} profession details`}>
+      <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
         <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
       </div>
 

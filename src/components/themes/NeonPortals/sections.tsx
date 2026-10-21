@@ -1,6 +1,6 @@
 'use client'
 
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -17,11 +17,12 @@ import { drumsSince } from '@/components/cv/sectionText'
 
 function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const labels = useLabels()
 
   return (
     <>
       <FadeInScene>
-        <ChamberPanel title="About">
+        <ChamberPanel title={labels.sections.about}>
           <p className="text-sm leading-relaxed text-[#edebe4]">{professionalSummary.bio}</p>
         </ChamberPanel>
       </FadeInScene>
@@ -29,7 +30,7 @@ function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
       {sections.jobs.length > 0 && (
         <LevelScene>
           <Lane profession="engineer" zone="record" />
-          <ChamberPanel title="Work Experience">
+          <ChamberPanel title={labels.sections.workExperience}>
             <ul className="space-y-4 pl-2">
               {sections.jobs.map((entry, i) => (
                 <li key={entry.id}>
@@ -44,14 +45,14 @@ function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
       )}
 
       <FadeInScene>
-        <ChamberPanel title="Tech Stack">
+        <ChamberPanel title={labels.sections.techStack}>
           <TechCategoryList categories={sections.techStack} />
         </ChamberPanel>
       </FadeInScene>
 
       <LevelScene>
         <Lane profession="engineer" zone="work" />
-        <ChamberPanel title="Projects">
+        <ChamberPanel title={labels.sections.projects}>
           <ProjectList
             projects={sections.projects}
             className="grid gap-4 md:grid-cols-2"
@@ -65,7 +66,7 @@ function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
       </LevelScene>
 
       <FadeInScene>
-        <ChamberPanel title="Ventures">
+        <ChamberPanel title={labels.sections.ventures}>
           <ul className="grid gap-4 md:grid-cols-3">
             {sections.companies.map((company) => (
               <li key={company.id}>
@@ -81,13 +82,14 @@ function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
 
 function MusicianChambers({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const labels = useLabels()
 
   return (
     <LevelScene>
       <Lane profession="drummer" zone="record" />
-      <ChamberPanel title="Bands">
+      <ChamberPanel title={labels.sections.bands}>
         <p className="mb-4 text-sm text-[#edebe4]">
-          {drumsSince(musician)}
+          {drumsSince(musician, labels.years)}
         </p>
         <BandList
           bands={bands}
@@ -106,11 +108,12 @@ function MusicianChambers({ sections }: { sections: SectionsOf<'drummer'> }) {
 
 function MartialArtistChambers({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const labels = useLabels()
 
   return (
     <LevelScene>
       <Lane profession="fighter" zone="record" />
-      <ChamberPanel title="Muay Thai">
+      <ChamberPanel title={labels.sections.muayThai}>
         <h3 className="mb-4 text-base uppercase tracking-wider text-[#ff9a00]">{martialArts.primary.title}</h3>
         <MuayThaiRecord
           martialArts={martialArts}

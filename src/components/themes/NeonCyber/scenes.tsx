@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { ContactStage } from '@/components/scroll/stage'
 import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
@@ -42,6 +43,7 @@ export const SceneItem = arrivalItem<SceneItemKind>({
 
 export function ContactScene({ profession }: { profession: Profession }) {
   const { Corner } = PROFESSION_STAGES[profession]
+  const { sections } = useLabels()
 
   return (
     <ContactStage
@@ -56,7 +58,7 @@ export function ContactScene({ profession }: { profession: Profession }) {
         render={({ line, actions }) => (
           <div className={`text-center sm:text-left ${scene.arrive}`}>
             <h2 id="neon-contact-heading" className="mb-3 font-mono text-xl tracking-wider text-cyan-400">
-              Contact
+              {sections.contact}
             </h2>
             <p className="mb-6 font-mono text-sm text-pink-400">{line}</p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row sm:flex-wrap sm:justify-start">
