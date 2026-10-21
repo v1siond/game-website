@@ -2,15 +2,16 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // ============================================================================
 // BIOSHOCK RAPTURE COLOR PALETTE
@@ -74,41 +75,6 @@ function useReducedMotion(): boolean {
   return reducedMotion
 }
 
-// ============================================================================
-// SKILL ACHIEVEMENTS DATA (No proficiency bars - show impact)
-// ============================================================================
-const SKILL_ACHIEVEMENTS: Record<string, Record<string, string[]>> = {
-  drummer: {
-    'Rock/Metal': ['Toured 30+ cities nationally', 'Studio albums with 3 metal bands'],
-    'Progressive': ['Complex time signatures (7/8, 11/8)', 'Dream Theater-inspired fills'],
-    'Latin/Salsa': ['Traditional Cuban rhythms mastery', 'Latin jazz ensemble work'],
-    'Jazz Fusion': ['Improvisation across 4 octave range', 'Session work with fusion artists'],
-    'Funk/Soul': ['Pocket grooves, ghost notes specialist', 'James Brown tribute performances'],
-    'Double Bass': ['200+ BPM sustained patterns', 'Heel-toe technique mastery'],
-    'Polyrhythms': ['4 over 3, 5 over 4 independence', 'West African rhythm integration'],
-    'Odd Time Signatures': ['Tool/Meshuggah-style grooves', 'Seamless time transitions'],
-    'Ghost Notes': ['Dynamic control, felt not heard', 'Signature snare patterns'],
-    'Linear Drumming': ['Hands-feet independence', 'Modern gospel chops'],
-    'Studio Recording': ['Multi-track session experience', 'Pro Tools, Logic certified'],
-    'Live Touring': ['Festival stages, club circuits', 'In-ear monitoring expertise'],
-    'Session Work': ['Quick learning, chart reading', 'Diverse genre adaptability'],
-    'Music Production': ['Drum programming, mixing', 'Home studio production'],
-  },
-  fighter: {
-    'Muay Thai (3 years)': ['Traditional clinch techniques', 'Elbow/knee combinations'],
-    'Brazilian Jiu-Jitsu (2 years)': ['Blue belt competitor', 'Triangle choke specialist'],
-    'MMA (1 year)': ['Integrated striking/grappling', 'Cage control fundamentals'],
-    'Wrestling': ['Double/single leg takedowns', 'Mat return techniques'],
-    'Striking': ['Boxing combos, head movement', 'Distance management'],
-    'Clinch Work': ['Thai plum control', 'Dirty boxing integration'],
-    'Ground Game': ['Guard passing, sweeps', 'Position before submission'],
-    'Submissions': ['Triangle, armbar, RNC', '15+ competition submissions'],
-    'Fundamentals Instruction': ['20+ students to competition', '3 classes weekly'],
-    'Competition Prep': ['Fight camp programming', 'Weight cut protocols'],
-    'Self Defense': ['Real-world scenario training', 'De-escalation techniques'],
-    'Private Coaching': ['Personalized curricula', 'Video analysis sessions'],
-  },
-}
 
 // ============================================================================
 // SVG DEFINITIONS COMPONENT - Shared gradients and patterns
@@ -1008,104 +974,72 @@ function GoldFrame({
 // ============================================================================
 // PLASMID BUTTON - Profession switcher (Bioshock plasmid vending style)
 // ============================================================================
-function PlasmidButton({
-  profession,
-  isActive,
-  onClick,
-  reducedMotion = false,
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  isActive: boolean
-  onClick: () => void
-  reducedMotion?: boolean
-}) {
-  const plasmids = {
-    engineer: {
-      name: 'SYSTEM ENGINEER',
-      desc: 'Senior Staff • CTO',
-      icon: (
-        <svg viewBox="0 0 40 40" className="w-12 h-12">
-          <path d="M20 5 L25 18 L32 18 L18 35 L22 22 L15 22 Z" fill={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="1" />
-        </svg>
-      ),
-    },
-    drummer: {
-      name: 'MUSICIAN',
-      desc: 'Professional Drummer',
-      icon: (
-        <svg viewBox="0 0 40 40" className="w-12 h-12">
-          <circle cx="20" cy="20" r="10" fill="none" stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="2" />
-          <circle cx="20" cy="20" r="5" fill={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} />
-          <path d="M8 20 Q3 20 3 15 M32 20 Q37 20 37 15" fill="none" stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="2" />
-        </svg>
-      ),
-    },
-    fighter: {
-      name: 'MARTIAL ARTIST',
-      desc: 'BJJ Instructor',
-      icon: (
-        <svg viewBox="0 0 40 40" className="w-12 h-12">
-          <path d="M10 30 L20 10 L30 30" fill="none" stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M13 25 L27 25" stroke={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} strokeWidth="2" />
-          <circle cx="20" cy="8" r="3" fill={isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold} />
-        </svg>
-      ),
-    },
-  }
 
-  const plasmid = plasmids[profession]
+// The plasmid glyph each profession's bottle carries, drawn in the bottle's ink colour.
+const PLASMID_ICONS: Record<Profession, (ink: string) => React.ReactNode> = {
+  drummer: (ink) => (
+    <svg viewBox="0 0 40 40" className="w-10 h-10 sm:w-12 sm:h-12 mx-auto">
+      <circle cx="20" cy="20" r="10" fill="none" stroke={ink} strokeWidth="2" />
+      <circle cx="20" cy="20" r="5" fill={ink} />
+      <path d="M8 20 Q3 20 3 15 M32 20 Q37 20 37 15" fill="none" stroke={ink} strokeWidth="2" />
+    </svg>
+  ),
+  engineer: (ink) => (
+    <svg viewBox="0 0 40 40" className="w-10 h-10 sm:w-12 sm:h-12 mx-auto">
+      <path d="M20 5 L25 18 L32 18 L18 35 L22 22 L15 22 Z" fill={ink} stroke={ink} strokeWidth="1" />
+    </svg>
+  ),
+  fighter: (ink) => (
+    <svg viewBox="0 0 40 40" className="w-10 h-10 sm:w-12 sm:h-12 mx-auto">
+      <path d="M10 30 L20 10 L30 30" fill="none" stroke={ink} strokeWidth="2.5" strokeLinecap="round" />
+      <path d="M13 25 L27 25" stroke={ink} strokeWidth="2" />
+      <circle cx="20" cy="8" r="3" fill={ink} />
+    </svg>
+  ),
+}
+
+function PlasmidButton({ id, label, selected, optionProps, reducedMotion }: ProfessionOption & { reducedMotion: boolean }) {
+  const ink = selected ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold
 
   return (
     <button
-      onClick={onClick}
-      aria-pressed={isActive}
-      aria-label={`Select ${profession} profession: ${plasmid.name}`}
+      type="button"
+      {...optionProps}
       className={`relative group ${reducedMotion ? '' : 'transition-all duration-300'} ${
-        isActive ? 'scale-110' : 'opacity-70 hover:opacity-100 hover:scale-105'
+        selected ? 'scale-105 sm:scale-110' : 'opacity-80 hover:opacity-100 hover:scale-105'
       }`}
     >
       {/* Plasmid Bottle Shape */}
       <div
-        className="relative p-6 text-center"
+        className="relative px-3 py-4 sm:p-6 text-center"
         style={{
-          background: isActive
+          background: selected
             ? `linear-gradient(180deg, ${RAPTURE_COLORS.goldBright}, ${RAPTURE_COLORS.gold}, ${RAPTURE_COLORS.brassDark})`
             : `linear-gradient(180deg, ${RAPTURE_COLORS.deepSeaMid}, ${RAPTURE_COLORS.deepSea})`,
-          border: `3px solid ${isActive ? RAPTURE_COLORS.goldBright : RAPTURE_COLORS.gold}80`,
+          border: `3px solid ${selected ? RAPTURE_COLORS.goldBright : RAPTURE_COLORS.gold}80`,
           borderRadius: '8px 8px 20px 20px',
-          boxShadow: isActive
+          boxShadow: selected
             ? `0 0 40px ${RAPTURE_COLORS.gold}60, inset 0 0 20px ${RAPTURE_COLORS.goldBright}40`
             : `0 0 15px ${RAPTURE_COLORS.gold}20`,
           clipPath: 'polygon(10% 0, 90% 0, 100% 15%, 100% 100%, 0 100%, 0 15%)',
         }}
       >
-        {/* Icon */}
         <div className="mb-3" aria-hidden="true">
-          {plasmid.icon}
+          {PLASMID_ICONS[id](ink)}
         </div>
 
-        {/* Name */}
         <div
-          className="text-sm font-bold tracking-wider"
+          className="text-sm font-bold tracking-wider uppercase"
           style={{
-            color: isActive ? RAPTURE_COLORS.deepSea : RAPTURE_COLORS.gold,
+            color: ink,
             fontFamily: '"Playfair Display", serif',
-            textShadow: isActive ? 'none' : `0 0 10px ${RAPTURE_COLORS.gold}60`,
+            textShadow: selected ? 'none' : `0 0 10px ${RAPTURE_COLORS.gold}60`,
           }}
         >
-          {plasmid.name}
+          {label}
         </div>
 
-        {/* Description */}
-        <div
-          className="text-xs mt-1"
-          style={{ color: isActive ? RAPTURE_COLORS.deepSeaMid : RAPTURE_COLORS.warmWhite }}
-        >
-          {plasmid.desc}
-        </div>
-
-        {/* Glow effect when active */}
-        {isActive && (
+        {selected && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
@@ -1117,7 +1051,7 @@ function PlasmidButton({
       </div>
 
       {/* Selection indicator */}
-      {isActive && (
+      {selected && (
         <div className="absolute -bottom-4 left-1/2 -translate-x-1/2" aria-hidden="true">
           <svg width="30" height="15" viewBox="0 0 30 15">
             <path d="M0 0 L15 15 L30 0" fill={RAPTURE_COLORS.gold} />
@@ -1128,324 +1062,19 @@ function PlasmidButton({
   )
 }
 
-// ============================================================================
-// SKILL ACHIEVEMENT CARD - No proficiency bars, show impact
-// ============================================================================
-function SkillAchievementCard({
-  skillName,
-  profession,
-  reducedMotion = false,
+// The brass card every list entry sits on: caustic shimmer, deco top line and hover gleam.
+function BrassCard({
+  children,
+  reducedMotion,
+  className = '',
 }: {
-  skillName: string
-  profession: 'drummer' | 'fighter'
-  reducedMotion?: boolean
-}) {
-  const achievements = SKILL_ACHIEVEMENTS[profession]?.[skillName] || []
-
-  return (
-    <div
-      className="relative p-4 mb-3 overflow-hidden group"
-      style={{
-        background: `
-          linear-gradient(180deg, ${RAPTURE_COLORS.deepSeaMid}e0, ${RAPTURE_COLORS.abyss}f0),
-          repeating-linear-gradient(
-            30deg,
-            transparent,
-            transparent 8px,
-            ${RAPTURE_COLORS.gold}02 8px,
-            ${RAPTURE_COLORS.gold}02 16px
-          )
-        `,
-        border: `1px solid ${RAPTURE_COLORS.gold}50`,
-        boxShadow: `inset 0 0 30px ${RAPTURE_COLORS.abyss}80`,
-      }}
-    >
-      {/* Caustic shimmer */}
-      <div
-        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.04]' : 'animate-card-caustics opacity-[0.08]'}`}
-        style={{
-          background: `radial-gradient(ellipse 50% 40% at 20% 30%, ${RAPTURE_COLORS.waterGlow}20 0%, transparent 50%)`,
-        }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10">
-        <h4
-          className="text-base font-bold mb-2"
-          style={{
-            color: RAPTURE_COLORS.gold,
-            fontFamily: '"Playfair Display", serif',
-            textShadow: `0 0 10px ${RAPTURE_COLORS.gold}40`,
-          }}
-        >
-          {skillName}
-        </h4>
-        {achievements.length > 0 ? (
-          <ul className="space-y-1.5">
-            {achievements.map((achievement, i) => (
-              <li
-                key={i}
-                className="text-sm flex items-start gap-2"
-                style={{ color: RAPTURE_COLORS.parchment }}
-              >
-                <span style={{ color: RAPTURE_COLORS.gold }} aria-hidden="true">{'>'}</span>
-                {achievement}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm" style={{ color: RAPTURE_COLORS.warmWhite }}>
-            Demonstrated proficiency
-          </p>
-        )}
-      </div>
-
-      {/* Hover brass gleam */}
-      {!reducedMotion && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-          style={{ boxShadow: `inset 0 0 40px ${RAPTURE_COLORS.gold}15` }}
-          aria-hidden="true"
-        />
-      )}
-    </div>
-  )
-}
-
-// ============================================================================
-// EXPERIENCE CARD - Work history with Rapture styling
-// ============================================================================
-function ExperienceCard({
-  entry,
-  reducedMotion = false,
-}: {
-  entry: typeof EXPERIENCE_DATA[0]
-  reducedMotion?: boolean
-}) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
-
-  return (
-    <article
-      className="relative p-5 group overflow-hidden"
-      style={{
-        background: `
-          linear-gradient(180deg, ${RAPTURE_COLORS.deepSeaMid}f5, ${RAPTURE_COLORS.abyss}fa),
-          repeating-linear-gradient(
-            60deg,
-            transparent,
-            transparent 15px,
-            ${RAPTURE_COLORS.gold}02 15px,
-            ${RAPTURE_COLORS.gold}02 30px
-          )
-        `,
-        border: `1px solid ${RAPTURE_COLORS.gold}60`,
-        boxShadow: `inset 0 0 50px ${RAPTURE_COLORS.abyss}90`,
-      }}
-    >
-      {/* Water caustic effect */}
-      <div
-        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.05]' : 'animate-card-caustics opacity-[0.1]'}`}
-        style={{
-          background: `
-            radial-gradient(ellipse 50% 40% at 10% 20%, ${RAPTURE_COLORS.waterGlow}15 0%, transparent 50%),
-            radial-gradient(ellipse 40% 50% at 90% 80%, ${RAPTURE_COLORS.gold}10 0%, transparent 50%)
-          `,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Art deco header line */}
-      <div className="absolute top-0 left-0 right-0 flex items-center" aria-hidden="true">
-        <svg className="w-5 h-5" viewBox="0 0 20 20">
-          <path d="M0,10 L10,0 L10,10 L0,10" fill={RAPTURE_COLORS.gold} opacity="0.4" />
-        </svg>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${RAPTURE_COLORS.gold}, ${RAPTURE_COLORS.gold}30, ${RAPTURE_COLORS.gold})` }} />
-        <svg className="w-5 h-5" viewBox="0 0 20 20">
-          <path d="M20,10 L10,0 L10,10 L20,10" fill={RAPTURE_COLORS.gold} opacity="0.4" />
-        </svg>
-      </div>
-
-      {/* Bubble accent */}
-      <div
-        className={`absolute top-4 right-5 w-2.5 h-2.5 rounded-full ${reducedMotion ? '' : 'animate-bubble-gentle'}`}
-        style={{ background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.4), ${RAPTURE_COLORS.waterGlow}15)` }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10 pt-3">
-        <div className="flex justify-between items-start mb-3">
-          <div>
-            <h4
-              className="text-lg"
-              style={{
-                color: RAPTURE_COLORS.gold,
-                fontFamily: '"Playfair Display", serif',
-                textShadow: `0 0 15px ${RAPTURE_COLORS.gold}30`,
-              }}
-            >
-              {entry.title}
-            </h4>
-            <p className="text-sm mt-1" style={{ color: RAPTURE_COLORS.parchment }}>{entry.organization}</p>
-          </div>
-          <time
-            className="text-sm px-3 py-1"
-            style={{
-              background: `${RAPTURE_COLORS.gold}20`,
-              border: `1px solid ${RAPTURE_COLORS.gold}50`,
-              color: RAPTURE_COLORS.gold,
-              boxShadow: `0 0 12px ${RAPTURE_COLORS.gold}15`,
-            }}
-          >
-            {startDisplay} - {endDisplay}
-          </time>
-        </div>
-
-        <p className="text-sm mb-4" style={{ color: RAPTURE_COLORS.warmWhite }}>{entry.description}</p>
-
-        {entry.highlights && entry.highlights.length > 0 && (
-          <ul className="space-y-1.5 mb-4">
-            {entry.highlights.map((highlight, i) => (
-              <li key={i} className="text-sm flex items-start gap-2" style={{ color: RAPTURE_COLORS.parchment }}>
-                <span style={{ color: RAPTURE_COLORS.gold }} aria-hidden="true">{'>'}</span>
-                {highlight}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        <div className="flex gap-2 flex-wrap">
-          {entry.skills.slice(0, 4).map((skill) => (
-            <span
-              key={skill}
-              className="text-xs px-2 py-1"
-              style={{
-                background: `${RAPTURE_COLORS.gold}15`,
-                border: `1px solid ${RAPTURE_COLORS.gold}30`,
-                color: RAPTURE_COLORS.gold,
-              }}
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Hover glow */}
-      {!reducedMotion && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-          style={{
-            boxShadow: `inset 0 0 60px ${RAPTURE_COLORS.gold}20`,
-            background: `linear-gradient(180deg, ${RAPTURE_COLORS.waterGlow}05 0%, transparent 30%, ${RAPTURE_COLORS.gold}08 100%)`,
-          }}
-          aria-hidden="true"
-        />
-      )}
-    </article>
-  )
-}
-
-// ============================================================================
-// TECH CLOUD - Engineer skills display
-// ============================================================================
-function TechCloud({
-  categories,
-  reducedMotion = false,
-}: {
-  categories: ReturnType<typeof getEngineerSkills>
-  reducedMotion?: boolean
-}) {
-  return (
-    <div className="space-y-5">
-      {categories.map((category) => (
-        <div key={category.name}>
-          <h3
-            className="text-sm tracking-[0.2em] mb-3 flex items-center gap-2"
-            style={{
-              color: RAPTURE_COLORS.gold,
-              textShadow: `0 0 10px ${RAPTURE_COLORS.gold}40`,
-            }}
-          >
-            <span aria-hidden="true">{category.icon}</span>
-            {category.name.toUpperCase()}
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {category.items.map((tech) => (
-              <span
-                key={tech}
-                className={`text-sm px-3 py-1.5 ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-                style={{
-                  background: `${RAPTURE_COLORS.gold}18`,
-                  border: `1px solid ${RAPTURE_COLORS.gold}45`,
-                  color: RAPTURE_COLORS.parchment,
-                }}
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ============================================================================
-// SKILLS WITH ACHIEVEMENTS - Drummer/Fighter display
-// ============================================================================
-function SkillsWithAchievements({
-  categories,
-  profession,
-  reducedMotion = false,
-}: {
-  categories: ReturnType<typeof getSkillsByProfession>
-  profession: 'drummer' | 'fighter'
-  reducedMotion?: boolean
-}) {
-  return (
-    <div className="space-y-5">
-      {categories.map((category) => (
-        <div key={category.name}>
-          <h3
-            className="text-sm tracking-[0.2em] mb-3 flex items-center gap-2"
-            style={{
-              color: RAPTURE_COLORS.gold,
-              textShadow: `0 0 10px ${RAPTURE_COLORS.gold}40`,
-            }}
-          >
-            <span aria-hidden="true">{category.icon}</span>
-            {category.name.toUpperCase()}
-          </h3>
-          <div className="space-y-2">
-            {category.skills.map((skill) => (
-              <SkillAchievementCard
-                key={skill.name}
-                skillName={skill.name}
-                profession={profession}
-                reducedMotion={reducedMotion}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ============================================================================
-// PROJECT CARD - Vintage Rapture poster style
-// ============================================================================
-function ProjectCard({
-  project,
-  reducedMotion = false,
-}: {
-  project: typeof PROJECTS_DATA[0]
-  reducedMotion?: boolean
+  children: React.ReactNode
+  reducedMotion: boolean
+  className?: string
 }) {
   return (
     <article
-      className="relative p-5 group cursor-pointer overflow-hidden"
+      className={`relative h-full p-5 group overflow-hidden ${className}`}
       style={{
         background: `
           linear-gradient(180deg, ${RAPTURE_COLORS.deepSeaMid}f5, ${RAPTURE_COLORS.abyss}fa),
@@ -1461,7 +1090,6 @@ function ProjectCard({
         boxShadow: `inset 0 0 40px ${RAPTURE_COLORS.abyss}70`,
       }}
     >
-      {/* Water caustic shimmer */}
       <div
         className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.06]' : 'animate-card-caustics opacity-[0.12]'}`}
         style={{
@@ -1473,73 +1101,14 @@ function ProjectCard({
         aria-hidden="true"
       />
 
-      {/* Art deco top line */}
       <div className="absolute top-0 left-0 right-0 flex items-center" aria-hidden="true">
         <div className="w-4 h-4 border-l-2 border-t-2" style={{ borderColor: RAPTURE_COLORS.gold }} />
         <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${RAPTURE_COLORS.gold}, ${RAPTURE_COLORS.gold}40, ${RAPTURE_COLORS.gold})` }} />
         <div className="w-4 h-4 border-r-2 border-t-2" style={{ borderColor: RAPTURE_COLORS.gold }} />
       </div>
 
-      {/* Bubble accents */}
-      <div className="absolute top-3 right-4 w-2 h-2 rounded-full" style={{ background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), ${RAPTURE_COLORS.waterGlow}12)` }} aria-hidden="true" />
-      <div className="absolute bottom-5 left-3 w-2.5 h-2.5 rounded-full" style={{ background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.25), ${RAPTURE_COLORS.waterGlow}10)` }} aria-hidden="true" />
+      <div className="relative z-10 pt-3">{children}</div>
 
-      <div className="relative z-10 pt-3">
-        <div className="flex justify-between items-start mb-3">
-          <h3
-            className="text-lg"
-            style={{
-              color: RAPTURE_COLORS.gold,
-              fontFamily: '"Playfair Display", serif',
-              textShadow: `0 0 15px ${RAPTURE_COLORS.gold}30`,
-            }}
-          >
-            {project.name}
-          </h3>
-          {project.featured && (
-            <span
-              className="text-xs px-2 py-1 tracking-wider"
-              style={{
-                background: RAPTURE_COLORS.gold,
-                color: RAPTURE_COLORS.deepSea,
-                fontWeight: 'bold',
-              }}
-            >
-              FEATURED
-            </span>
-          )}
-        </div>
-        <p className="text-sm mb-3" style={{ color: RAPTURE_COLORS.warmWhite }}>
-          {project.tagline}
-        </p>
-        {/* Impact statement - quantified achievement */}
-        {project.impact && (
-          <p
-            className="text-sm mb-3 flex items-start gap-2"
-            style={{ color: RAPTURE_COLORS.parchment }}
-          >
-            <span style={{ color: RAPTURE_COLORS.goldBright }} aria-hidden="true">{'>'}</span>
-            <span className="italic">{project.impact}</span>
-          </p>
-        )}
-        <div className="flex gap-2 flex-wrap">
-          {project.techStack.slice(0, 4).map((tech) => (
-            <span
-              key={tech}
-              className="text-xs px-2 py-1"
-              style={{
-                background: `${RAPTURE_COLORS.gold}25`,
-                border: `1px solid ${RAPTURE_COLORS.gold}50`,
-                color: RAPTURE_COLORS.gold,
-              }}
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Hover glow */}
       {!reducedMotion && (
         <div
           className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -1554,86 +1123,189 @@ function ProjectCard({
   )
 }
 
+const CARD_TITLE_STYLE: React.CSSProperties = {
+  color: RAPTURE_COLORS.gold,
+  fontFamily: '"Playfair Display", serif',
+  textShadow: `0 0 15px ${RAPTURE_COLORS.gold}30`,
+}
+
+// ============================================================================
+// EXPERIENCE CARD - Work history with Rapture styling. Dates are date only strings (UTC midnight),
+// so the year is read in UTC.
+// ============================================================================
+function ExperienceCard({ entry, reducedMotion }: { entry: Job; reducedMotion: boolean }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
+
+  return (
+    <BrassCard reducedMotion={reducedMotion}>
+      <div className="flex justify-between items-start gap-3 mb-3 flex-wrap">
+        <div>
+          <h3 className="text-lg" style={CARD_TITLE_STYLE}>{entry.title}</h3>
+          <p className="text-sm mt-1" style={{ color: RAPTURE_COLORS.parchment }}>{entry.company}</p>
+        </div>
+        <span
+          className="text-sm px-3 py-1"
+          style={{
+            background: `${RAPTURE_COLORS.gold}20`,
+            border: `1px solid ${RAPTURE_COLORS.gold}50`,
+            color: RAPTURE_COLORS.gold,
+          }}
+        >
+          {startDisplay} - {endDisplay}
+        </span>
+      </div>
+
+      {entry.description && <p className="text-sm mb-4" style={{ color: RAPTURE_COLORS.warmWhite }}>{entry.description}</p>}
+
+      {entry.highlights.length > 0 && (
+        <ul className="space-y-1.5 mb-4" aria-label="Key achievements">
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: RAPTURE_COLORS.parchment }}>
+              <span style={{ color: RAPTURE_COLORS.gold }} aria-hidden="true">{'>'}</span>
+              {highlight}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {entry.skills.length > 0 && (
+        <ul className="flex gap-2 flex-wrap" aria-label="Skills used">
+          {entry.skills.slice(0, 4).map((skill) => (
+            <li
+              key={skill}
+              className="text-sm px-2 py-1"
+              style={{
+                background: `${RAPTURE_COLORS.gold}15`,
+                border: `1px solid ${RAPTURE_COLORS.gold}30`,
+                color: RAPTURE_COLORS.gold,
+              }}
+            >
+              {skill}
+            </li>
+          ))}
+        </ul>
+      )}
+    </BrassCard>
+  )
+}
+
+// ============================================================================
+// TECH CLOUD - Engineer tech stack
+// ============================================================================
+function TechCloud({ categories, reducedMotion }: { categories: CVData['techStack']; reducedMotion: boolean }) {
+  return (
+    <div className="space-y-5">
+      {categories.map((category) => (
+        <div key={category.id}>
+          <h3
+            className="text-sm tracking-[0.2em] mb-3 flex items-center gap-2"
+            style={{
+              color: RAPTURE_COLORS.gold,
+              textShadow: `0 0 10px ${RAPTURE_COLORS.gold}40`,
+            }}
+          >
+            <span aria-hidden="true">{category.icon}</span>
+            {category.name.toUpperCase()}
+          </h3>
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+            {category.items.map((tech) => (
+              <li
+                key={tech}
+                className={`text-sm px-3 py-1.5 ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+                style={{
+                  background: `${RAPTURE_COLORS.gold}18`,
+                  border: `1px solid ${RAPTURE_COLORS.gold}45`,
+                  color: RAPTURE_COLORS.parchment,
+                }}
+              >
+                {tech}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// ============================================================================
+// PROJECT CARD - Vintage Rapture poster style: his role, the result line and the links
+// ============================================================================
+function ProjectCard({ project, years, links, reducedMotion }: ProjectSlot & { reducedMotion: boolean }) {
+  return (
+    <BrassCard reducedMotion={reducedMotion}>
+      <div className="flex justify-between items-start gap-2 mb-2">
+        <h3 className="text-lg" style={CARD_TITLE_STYLE}>{project.name}</h3>
+        {years && <span className="text-sm whitespace-nowrap" style={{ color: RAPTURE_COLORS.gold }}>{years}</span>}
+      </div>
+      <p className="text-sm mb-2 tracking-wider" style={{ color: RAPTURE_COLORS.goldBright }}>{project.role}</p>
+      <p className="text-sm mb-3" style={{ color: RAPTURE_COLORS.warmWhite }}>{project.tagline}</p>
+      {project.impact && (
+        <p className="text-sm mb-3 flex items-start gap-2" style={{ color: RAPTURE_COLORS.parchment }}>
+          <span style={{ color: RAPTURE_COLORS.goldBright }} aria-hidden="true">{'>'}</span>
+          <span className="italic">{project.impact}</span>
+        </p>
+      )}
+      {project.techStack.length > 0 && (
+        <ul className="flex gap-2 flex-wrap" aria-label="Technologies used">
+          {project.techStack.slice(0, 4).map((tech) => (
+            <li
+              key={tech}
+              className="text-sm px-2 py-1"
+              style={{
+                background: `${RAPTURE_COLORS.gold}25`,
+                border: `1px solid ${RAPTURE_COLORS.gold}50`,
+                color: RAPTURE_COLORS.gold,
+              }}
+            >
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )}
+      {links.length > 0 ? (
+        <div className="flex flex-wrap gap-3 mt-4">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className={`inline-flex items-center min-h-[44px] px-4 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+              style={{ border: `2px solid ${RAPTURE_COLORS.gold}`, color: RAPTURE_COLORS.gold }}
+            >
+              {label.toUpperCase()}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm mt-4" style={{ color: RAPTURE_COLORS.warmWhite }}>No public link</p>
+      )}
+    </BrassCard>
+  )
+}
+
 // ============================================================================
 // COMPANY CARD - Ventures display
 // ============================================================================
-function CompanyCard({
-  company,
-  reducedMotion = false,
-}: {
-  company: typeof COMPANIES[0]
-  reducedMotion?: boolean
-}) {
+function CompanyCard({ company, reducedMotion }: { company: CVData['companies'][number]; reducedMotion: boolean }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative block p-5 group overflow-hidden"
-      style={{
-        background: `
-          linear-gradient(180deg, ${RAPTURE_COLORS.deepSeaMid}f5, ${RAPTURE_COLORS.abyss}fa),
-          repeating-linear-gradient(
-            -30deg,
-            transparent,
-            transparent 10px,
-            ${RAPTURE_COLORS.gold}02 10px,
-            ${RAPTURE_COLORS.gold}02 20px
-          )
-        `,
-        border: `1px solid ${RAPTURE_COLORS.gold}50`,
-        boxShadow: `inset 0 0 35px ${RAPTURE_COLORS.abyss}70`,
-      }}
+      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      className="block h-full"
     >
-      {/* Caustic shimmer */}
-      <div
-        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.05]' : 'animate-card-caustics opacity-[0.1]'}`}
-        style={{
-          background: `
-            radial-gradient(ellipse 45% 35% at 80% 20%, ${RAPTURE_COLORS.waterGlow}18 0%, transparent 50%),
-            radial-gradient(ellipse 35% 45% at 20% 80%, ${RAPTURE_COLORS.gold}12 0%, transparent 50%)
-          `,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Bubble */}
-      <div
-        className={`absolute top-3 right-3 w-2 h-2 rounded-full ${reducedMotion ? '' : 'animate-bubble-gentle'}`}
-        style={{ background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), ${RAPTURE_COLORS.waterGlow}12)` }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10">
+      <BrassCard reducedMotion={reducedMotion}>
         <div className="flex items-center gap-3 mb-3">
           <span className="text-3xl" aria-hidden="true">{company.icon}</span>
           <div>
-            <h4
-              className={`text-base ${reducedMotion ? '' : 'group-hover:text-amber-300 transition-colors'}`}
-              style={{
-                color: RAPTURE_COLORS.gold,
-                fontFamily: '"Playfair Display", serif',
-              }}
-            >
-              {company.name}
-            </h4>
+            <h3 className="text-base" style={CARD_TITLE_STYLE}>{company.name}</h3>
             <p className="text-sm" style={{ color: RAPTURE_COLORS.warmWhite }}>{company.tagline}</p>
           </div>
         </div>
         <p className="text-sm" style={{ color: RAPTURE_COLORS.parchment }}>{company.description}</p>
-      </div>
-
-      {/* Hover brass gleam */}
-      {!reducedMotion && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-          style={{
-            boxShadow: `inset 0 0 45px ${RAPTURE_COLORS.gold}25`,
-            background: `linear-gradient(180deg, ${RAPTURE_COLORS.gold}06 0%, transparent 40%)`,
-          }}
-          aria-hidden="true"
-        />
-      )}
+      </BrassCard>
     </a>
   )
 }
@@ -1641,103 +1313,193 @@ function CompanyCard({
 // ============================================================================
 // BAND CARD - Musical projects display
 // ============================================================================
-function BandCard({
-  band,
-  reducedMotion = false,
-}: {
-  band: typeof BANDS[0]
-  reducedMotion?: boolean
-}) {
+function BandCard({ band, years, linkProps, reducedMotion }: BandSlot & { reducedMotion: boolean }) {
   const content = (
-    <div
-      className="relative p-5 group overflow-hidden"
-      style={{
-        background: `
-          linear-gradient(180deg, ${RAPTURE_COLORS.deepSeaMid}f5, ${RAPTURE_COLORS.abyss}fa),
-          repeating-linear-gradient(
-            45deg,
-            transparent,
-            transparent 10px,
-            ${RAPTURE_COLORS.gold}02 10px,
-            ${RAPTURE_COLORS.gold}02 20px
-          )
-        `,
-        border: `1px solid ${RAPTURE_COLORS.gold}50`,
-        boxShadow: `inset 0 0 35px ${RAPTURE_COLORS.abyss}70`,
-      }}
-    >
-      {/* Caustic shimmer */}
-      <div
-        className={`absolute inset-0 pointer-events-none ${reducedMotion ? 'opacity-[0.05]' : 'animate-card-caustics opacity-[0.1]'}`}
-        style={{
-          background: `
-            radial-gradient(ellipse 45% 35% at 70% 30%, ${RAPTURE_COLORS.waterGlow}18 0%, transparent 50%),
-            radial-gradient(ellipse 35% 45% at 30% 70%, ${RAPTURE_COLORS.gold}12 0%, transparent 50%)
-          `,
-        }}
-        aria-hidden="true"
-      />
-
-      {/* Bubble */}
-      <div
-        className={`absolute top-4 right-4 w-2.5 h-2.5 rounded-full ${reducedMotion ? '' : 'animate-bubble-gentle'}`}
-        style={{ background: `radial-gradient(circle at 30% 30%, rgba(255,255,255,0.35), ${RAPTURE_COLORS.waterGlow}12)` }}
-        aria-hidden="true"
-      />
-
-      <div className="relative z-10">
-        <h4
-          className={`text-base ${reducedMotion ? '' : 'group-hover:text-amber-300 transition-colors'}`}
-          style={{
-            color: RAPTURE_COLORS.gold,
-            fontFamily: '"Playfair Display", serif',
-          }}
-        >
-          {band.name}
-        </h4>
-        <p className="text-sm mt-1" style={{ color: RAPTURE_COLORS.warmWhite }}>{band.genre} - {band.role}</p>
-        <p className="text-sm mt-2" style={{ color: RAPTURE_COLORS.parchment }}>{band.description}</p>
-        {!band.url && <p className="text-sm mt-2 italic" style={{ color: RAPTURE_COLORS.warmWhite }}>Website coming soon</p>}
-      </div>
-
-      {/* Hover brass gleam */}
-      {!reducedMotion && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-          style={{
-            boxShadow: `inset 0 0 45px ${RAPTURE_COLORS.gold}25`,
-            background: `linear-gradient(180deg, ${RAPTURE_COLORS.gold}06 0%, transparent 40%)`,
-          }}
-          aria-hidden="true"
-        />
+    <BrassCard reducedMotion={reducedMotion}>
+      <h3 className="text-base" style={CARD_TITLE_STYLE}>{band.name}</h3>
+      <p className="text-sm mt-1" style={{ color: RAPTURE_COLORS.warmWhite }}>
+        {band.role}
+        {years && <span aria-hidden="true"> - </span>}
+        {years && <span>{years}</span>}
+      </p>
+      {band.release && (
+        <p className="text-sm mt-2" style={{ color: RAPTURE_COLORS.parchment }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
       )}
-    </div>
+    </BrassCard>
   )
 
-  if (band.url) {
-    return (
-      <a href={band.url} target="_blank" rel="noopener noreferrer" className="block">
-        {content}
-      </a>
-    )
-  }
-  return <article>{content}</article>
+  if (!linkProps) return content
+  return (
+    <a {...linkProps} className="block h-full">
+      {content}
+    </a>
+  )
+}
+
+const DECO_BUTTON = 'inline-flex items-center justify-center min-h-[44px] px-5 py-2.5 text-sm tracking-wider'
+
+// Email is the gold primary action, LinkedIn the outlined one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
+  email: {
+    background: RAPTURE_COLORS.gold,
+    color: RAPTURE_COLORS.deepSea,
+    border: `2px solid ${RAPTURE_COLORS.goldBright}`,
+  },
+  linkedin: {
+    background: 'transparent',
+    border: `2px solid ${RAPTURE_COLORS.gold}`,
+    color: RAPTURE_COLORS.gold,
+  },
+}
+
+function HeroAction({ action, reducedMotion }: { action: HeroActionSlot; reducedMotion: boolean }) {
+  return (
+    <a
+      {...action.linkProps}
+      className={`${DECO_BUTTON} ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+      style={HERO_ACTION_LOOK[action.id]}
+    >
+      {action.label.toUpperCase()}
+    </a>
+  )
+}
+
+function CVLink({ reducedMotion }: { reducedMotion: boolean }) {
+  return (
+    <Link
+      href="/cv"
+      className={`${DECO_BUTTON} ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+      style={HERO_ACTION_LOOK.linkedin}
+    >
+      CV
+    </Link>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections, reducedMotion }: { sections: SectionsOf<'engineer'>; reducedMotion: boolean }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      <GoldFrame title="ABOUT" reducedMotion={reducedMotion}>
+        <p className="text-base leading-relaxed text-center" style={{ color: RAPTURE_COLORS.parchment }}>
+          {professionalSummary.bio}
+        </p>
+      </GoldFrame>
+
+      <ArtDecoSunburst />
+
+      {sections.jobs.length > 0 && (
+        <GoldFrame title="WORK EXPERIENCE" reducedMotion={reducedMotion}>
+          <div className="space-y-5">
+            {sections.jobs.map((entry) => (
+              <ExperienceCard key={entry.id} entry={entry} reducedMotion={reducedMotion} />
+            ))}
+          </div>
+        </GoldFrame>
+      )}
+
+      <ArtDecoChevron />
+
+      <GoldFrame title="TECH STACK" reducedMotion={reducedMotion}>
+        <TechCloud categories={sections.techStack} reducedMotion={reducedMotion} />
+      </GoldFrame>
+
+      <div className="pt-8">
+        <GoldFrame title="PROJECTS" reducedMotion={reducedMotion}>
+          <ProjectList
+            projects={sections.projects}
+            className="grid md:grid-cols-2 gap-5"
+            renderProject={(slot) => <ProjectCard {...slot} reducedMotion={reducedMotion} />}
+          />
+        </GoldFrame>
+      </div>
+
+      <ArtDecoFan />
+
+      <GoldFrame title="VENTURES" reducedMotion={reducedMotion}>
+        <div className="grid md:grid-cols-3 gap-5">
+          {sections.companies.map((company) => (
+            <CompanyCard key={company.id} company={company} reducedMotion={reducedMotion} />
+          ))}
+        </div>
+      </GoldFrame>
+    </>
+  )
+}
+
+function MusicianSections({ sections, reducedMotion }: { sections: SectionsOf<'drummer'>; reducedMotion: boolean }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <ArtDecoSunburst />
+      <GoldFrame title="BANDS" reducedMotion={reducedMotion}>
+        <p className="text-base text-center mb-5" style={{ color: RAPTURE_COLORS.parchment }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList
+          bands={bands}
+          className="grid md:grid-cols-2 gap-5"
+          renderBand={(slot) => <BandCard {...slot} reducedMotion={reducedMotion} />}
+        />
+        <p className="text-sm text-center mt-5 italic" style={{ color: RAPTURE_COLORS.gold }}>
+          {musician.line}
+        </p>
+      </GoldFrame>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections, reducedMotion }: { sections: SectionsOf<'fighter'>; reducedMotion: boolean }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <ArtDecoSunburst />
+      <GoldFrame title="MUAY THAI" reducedMotion={reducedMotion}>
+        <h3 className="text-xl text-center mb-6" style={CARD_TITLE_STYLE}>{martialArts.primary.title}</h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-4 mb-6',
+            fact: 'p-4 border border-[#D4AF37]/50 bg-[#0d1f2d]/80',
+            term: 'text-sm tracking-[0.2em] uppercase text-[#D4AF37]',
+            value: 'text-sm mt-1 text-[#F5E6C8]',
+            achievements: 'space-y-2',
+            achievement: 'text-sm flex items-start gap-2 text-[#F5E6C8]',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span className="text-[#D4AF37]" aria-hidden="true">{'>'}</span>
+              <span>{achievement}</span>
+            </>
+          )}
+        />
+      </GoldFrame>
+    </>
+  )
+}
+
+function ProfessionDetails(props: { sections: ProfessionSections; reducedMotion: boolean }) {
+  const { sections, reducedMotion } = props
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} reducedMotion={reducedMotion} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} reducedMotion={reducedMotion} />
+  return <EngineerSections sections={sections} reducedMotion={reducedMotion} />
 }
 
 // ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 export default function ArtDecoTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
+  const { active } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
   const reducedMotion = useReducedMotion()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
@@ -1776,239 +1538,91 @@ export default function ArtDecoTheme() {
       />
 
       {/* ================================================================== */}
-      {/* HEADER */}
+      {/* HEADER - the recruiter first screen */}
       {/* ================================================================== */}
-      <header className="relative z-30 p-6 pt-20 pb-10">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-start mb-8">
-            <div className="flex items-center gap-5">
-              {/* Art Deco Sunburst Logo */}
-              <div className="relative w-20 h-20 pointer-events-none flex-shrink-0" aria-hidden="true">
-                {/* Sunburst rays */}
-                {Array.from({ length: 12 }).map((_, i) => (
+      <header className="relative z-30 px-4 py-6 sm:p-6 sm:pt-20 sm:pb-10">
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-6xl mx-auto flex justify-between items-start flex-wrap gap-6">
+              <div className="flex items-center gap-5">
+                {/* Art Deco Sunburst Logo */}
+                <div className="relative w-20 h-20 pointer-events-none flex-shrink-0 hidden sm:block" aria-hidden="true">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="absolute top-1/2 left-1/2 w-0.5"
+                      style={{
+                        height: '45px',
+                        background: `linear-gradient(to top, ${RAPTURE_COLORS.gold}, transparent)`,
+                        transform: `translate(-50%, -100%) rotate(${i * 30}deg)`,
+                        transformOrigin: 'bottom center',
+                        opacity: i % 2 === 0 ? 0.5 : 0.3,
+                      }}
+                    />
+                  ))}
                   <div
-                    key={i}
-                    className="absolute top-1/2 left-1/2 w-0.5"
+                    className="absolute top-1/2 left-1/2 w-10 h-10 rounded-full -translate-x-1/2 -translate-y-1/2"
                     style={{
-                      height: '45px',
-                      background: `linear-gradient(to top, ${RAPTURE_COLORS.gold}, transparent)`,
-                      transform: `translate(-50%, -100%) rotate(${i * 30}deg)`,
-                      transformOrigin: 'bottom center',
-                      opacity: i % 2 === 0 ? 0.5 : 0.3,
+                      background: `radial-gradient(circle, ${RAPTURE_COLORS.goldBright}60, ${RAPTURE_COLORS.gold}30)`,
+                      border: `2px solid ${RAPTURE_COLORS.gold}`,
                     }}
                   />
+                </div>
+                <div>
+                  <h1
+                    className="text-2xl sm:text-4xl tracking-[0.2em] uppercase"
+                    style={{ textShadow: `0 0 50px ${RAPTURE_COLORS.gold}70` }}
+                  >
+                    <NeonSign text={name} reducedMotion={reducedMotion} />
+                  </h1>
+                  <p className="text-base tracking-wider mt-2" style={{ color: RAPTURE_COLORS.parchment }}>
+                    {headline}
+                  </p>
+                  <p className="text-sm tracking-wider mt-1 italic" style={{ color: RAPTURE_COLORS.gold }}>
+                    {tagline}
+                  </p>
+                  <p className="text-sm tracking-wider mt-1" style={{ color: RAPTURE_COLORS.warmWhite }}>
+                    {line}
+                  </p>
+                </div>
+              </div>
+
+              <nav className="flex gap-3 sm:gap-4 items-center flex-wrap" aria-label="Contact and CV">
+                {actions.map((action) => (
+                  <HeroAction key={action.id} action={action} reducedMotion={reducedMotion} />
                 ))}
-                {/* Center circle */}
-                <div
-                  className="absolute top-1/2 left-1/2 w-10 h-10 rounded-full -translate-x-1/2 -translate-y-1/2"
-                  style={{
-                    background: `radial-gradient(circle, ${RAPTURE_COLORS.goldBright}60, ${RAPTURE_COLORS.gold}30)`,
-                    border: `2px solid ${RAPTURE_COLORS.gold}`,
-                  }}
-                />
-              </div>
-              <div>
-                <h1
-                  className="text-4xl tracking-[0.2em]"
-                  style={{
-                    textShadow: `0 0 50px ${RAPTURE_COLORS.gold}70`,
-                  }}
+                <CVLink reducedMotion={reducedMotion} />
+                <Link
+                  href="/personal-projects/game-engine"
+                  className={`${DECO_BUTTON} ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
+                  style={HERO_ACTION_LOOK.linkedin}
                 >
-                  <NeonSign text="ALEXANDER PULIDO" reducedMotion={reducedMotion} />
-                </h1>
-                <p className="text-base tracking-wider mt-2" style={{ color: RAPTURE_COLORS.parchment }}>
-                  {PROFESSIONAL_SUMMARY[active].headline}
-                </p>
-                <p className="text-sm tracking-wider mt-1 italic" style={{ color: RAPTURE_COLORS.gold }}>
-                  {PROFESSIONAL_SUMMARY[active].tagline}
-                </p>
-              </div>
+                  PORTFOLIO
+                </Link>
+              </nav>
             </div>
-
-            <nav className="flex gap-4 items-center">
-              <Link
-                href="/cv"
-                className={`px-5 py-2.5 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-                style={{
-                  background: 'transparent',
-                  border: `2px solid ${RAPTURE_COLORS.gold}`,
-                  color: RAPTURE_COLORS.gold,
-                }}
-              >
-                CV
-              </Link>
-              <Link
-                href="/personal-projects/game-engine"
-                className={`px-5 py-2.5 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-                style={{
-                  background: RAPTURE_COLORS.gold,
-                  color: RAPTURE_COLORS.deepSea,
-                }}
-              >
-                PORTFOLIO
-              </Link>
-            </nav>
-          </div>
-
-          {/* Current Roles - integrated into header */}
-          <div className="flex flex-wrap justify-center gap-6">
-            {CURRENT_ROLES.map((role) => (
-              <article
-                key={role.id}
-                className="text-center px-6 py-3"
-                style={{
-                  background: `${RAPTURE_COLORS.deepSeaMid}90`,
-                  border: `1px solid ${RAPTURE_COLORS.gold}50`,
-                }}
-              >
-                <p className="text-sm tracking-wider" style={{ color: RAPTURE_COLORS.gold }}>{role.title}</p>
-                <p className="text-base" style={{ color: RAPTURE_COLORS.parchment }}>{role.company}</p>
-              </article>
-            ))}
-          </div>
-        </div>
+          )}
+        />
       </header>
 
       {/* ================================================================== */}
-      {/* PLASMID SELECTION - Profession Switcher */}
+      {/* PLASMID SELECTION - Profession Switcher, System Engineer in the centre */}
       {/* ================================================================== */}
-      <section className="relative z-20 py-8">
-        <div className="flex justify-center gap-8">
-          {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-            <PlasmidButton
-              key={prof}
-              profession={prof}
-              isActive={active === prof}
-              onClick={() => setActive(prof)}
-              reducedMotion={reducedMotion}
-            />
-          ))}
-        </div>
+      <section className="relative z-20 py-8 px-4" aria-label="Profession selection">
+        <ProfessionSwitch
+          className="grid grid-cols-3 gap-3 sm:flex sm:justify-center sm:gap-8"
+          label="Profession"
+          renderOption={(option) => <PlasmidButton {...option} reducedMotion={reducedMotion} />}
+        />
       </section>
 
       {/* ================================================================== */}
-      {/* MAIN CONTENT */}
+      {/* MAIN CONTENT - the picked profession's sections, and only those */}
       {/* ================================================================== */}
-      <main className="relative z-20 px-8 py-10">
-        <div className="max-w-5xl mx-auto space-y-0">
-          {/* ============================================================ */}
-          {/* ABOUT SECTION */}
-          {/* ============================================================ */}
-          <GoldFrame title="ABOUT" reducedMotion={reducedMotion}>
-            <p className="text-base leading-relaxed text-center" style={{ color: RAPTURE_COLORS.parchment }}>
-              {aboutData.bio}
-            </p>
-            <div className="flex justify-center gap-4 mt-5 flex-wrap">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="text-sm px-4 py-1.5"
-                  style={{
-                    background: `${RAPTURE_COLORS.gold}15`,
-                    border: `1px solid ${RAPTURE_COLORS.gold}45`,
-                    color: RAPTURE_COLORS.gold,
-                  }}
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </GoldFrame>
+      <main className="relative z-20 px-4 sm:px-8 py-10">
+        <div className="max-w-5xl mx-auto space-y-0" role="region" aria-label={`${active} profession details`}>
+          <ProfessionDetails sections={view.sections} reducedMotion={reducedMotion} />
 
-          {/* ============================================================ */}
-          {/* ART DIVIDER 1 - Sunburst */}
-          {/* ============================================================ */}
-          <ArtDecoSunburst />
-
-          {/* ============================================================ */}
-          {/* EXPERIENCE SECTION */}
-          {/* ============================================================ */}
-          {experience.length > 0 && (
-            <GoldFrame title="WORK EXPERIENCE" reducedMotion={reducedMotion}>
-              <div className="space-y-5">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} reducedMotion={reducedMotion} />
-                ))}
-              </div>
-            </GoldFrame>
-          )}
-
-          {/* ============================================================ */}
-          {/* ART DIVIDER 2 - Chevron */}
-          {/* ============================================================ */}
-          <ArtDecoChevron />
-
-          {/* ============================================================ */}
-          {/* SKILLS SECTION */}
-          {/* ============================================================ */}
-          <GoldFrame
-            title={active === 'engineer' ? 'TECH STACK' : 'SKILLS'}
-            reducedMotion={reducedMotion}
-          >
-            {active === 'engineer' ? (
-              <TechCloud categories={engineerTech} reducedMotion={reducedMotion} />
-            ) : (
-              <SkillsWithAchievements
-                categories={otherSkills}
-                profession={active as 'drummer' | 'fighter'}
-                reducedMotion={reducedMotion}
-              />
-            )}
-          </GoldFrame>
-
-          {/* ============================================================ */}
-          {/* PROJECTS SECTION */}
-          {/* ============================================================ */}
-          <div className="pt-8">
-            <div className="text-center mb-6">
-              <NeonSign text="FEATURED WORK" className="text-lg tracking-[0.4em]" reducedMotion={reducedMotion} />
-              <div
-                className="w-40 h-px mx-auto mt-3"
-                style={{ background: `linear-gradient(90deg, transparent, ${RAPTURE_COLORS.gold}, transparent)` }}
-                aria-hidden="true"
-              />
-            </div>
-            <div className="grid md:grid-cols-2 gap-5">
-              {projects.slice(0, 6).map((project) => (
-                <ProjectCard key={project.id} project={project} reducedMotion={reducedMotion} />
-              ))}
-            </div>
-          </div>
-
-          {/* ============================================================ */}
-          {/* ART DIVIDER 3 - Fan */}
-          {/* ============================================================ */}
-          <ArtDecoFan />
-
-          {/* ============================================================ */}
-          {/* VENTURES SECTION (Engineer) */}
-          {/* ============================================================ */}
-          {active === 'engineer' && (
-            <GoldFrame title="VENTURES" reducedMotion={reducedMotion}>
-              <div className="grid md:grid-cols-3 gap-5">
-                {COMPANIES.map((company) => (
-                  <CompanyCard key={company.id} company={company} reducedMotion={reducedMotion} />
-                ))}
-              </div>
-            </GoldFrame>
-          )}
-
-          {/* ============================================================ */}
-          {/* BANDS SECTION (Drummer) */}
-          {/* ============================================================ */}
-          {active === 'drummer' && (
-            <GoldFrame title="BANDS" reducedMotion={reducedMotion}>
-              <div className="grid md:grid-cols-3 gap-5">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} reducedMotion={reducedMotion} />
-                ))}
-              </div>
-            </GoldFrame>
-          )}
-
-          {/* ============================================================ */}
-          {/* POSTS SECTION - Placeholder */}
-          {/* ============================================================ */}
           <div className="pt-8">
             <GoldFrame title="POSTS" reducedMotion={reducedMotion}>
               <div className="text-center py-8">
@@ -2024,46 +1638,31 @@ export default function ArtDecoTheme() {
       {/* ================================================================== */}
       {/* CONTACT CTA */}
       {/* ================================================================== */}
-      <section className="relative z-20 py-16 px-8" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <GoldFrame reducedMotion={reducedMotion}>
-            <div className="mb-6">
-              <NeonSign
-                text="READY TO WORK TOGETHER?"
-                className="text-lg tracking-[0.25em]"
-                reducedMotion={reducedMotion}
-              />
+      <section className="relative z-20 py-16 px-4 sm:px-8" aria-label="Contact">
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <GoldFrame reducedMotion={reducedMotion}>
+                <h2 className="mb-6">
+                  <NeonSign
+                    text="READY TO WORK TOGETHER?"
+                    className="text-lg tracking-[0.25em]"
+                    reducedMotion={reducedMotion}
+                  />
+                </h2>
+                <p className="text-sm mb-8" style={{ color: RAPTURE_COLORS.parchment }}>
+                  {line}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {actions.map((action) => (
+                    <HeroAction key={action.id} action={action} reducedMotion={reducedMotion} />
+                  ))}
+                  <CVLink reducedMotion={reducedMotion} />
+                </div>
+              </GoldFrame>
             </div>
-            <p className="text-sm mb-8" style={{ color: RAPTURE_COLORS.parchment }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:alexanderpulido81@gmail.com"
-                className={`px-6 py-3 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-                style={{
-                  background: RAPTURE_COLORS.gold,
-                  color: RAPTURE_COLORS.deepSea,
-                  border: `2px solid ${RAPTURE_COLORS.goldBright}`,
-                  boxShadow: `0 0 20px ${RAPTURE_COLORS.gold}40`,
-                }}
-              >
-                GET IN TOUCH
-              </a>
-              <Link
-                href="/cv"
-                className={`px-6 py-3 text-sm tracking-wider ${reducedMotion ? '' : 'transition-all hover:scale-105'}`}
-                style={{
-                  background: 'transparent',
-                  border: `2px solid ${RAPTURE_COLORS.gold}`,
-                  color: RAPTURE_COLORS.gold,
-                }}
-              >
-                VIEW CV
-              </Link>
-            </div>
-          </GoldFrame>
-        </div>
+          )}
+        />
       </section>
 
       {/* ================================================================== */}
