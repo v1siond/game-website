@@ -393,7 +393,7 @@
   100% { transform: perspective(600px) rotateY(0deg); }
 }
 
-/* ---------------------------------------------------------------- chambers (chambers.tsx) */
+/* ---------------------------------------------------------------- the arena counter (trials.tsx): a cell fills as the orbs land */
 
 .counterCell {
   background: rgb(0 0 0 / 50%);
@@ -404,95 +404,48 @@
   background: linear-gradient(180deg, var(--myth-gold-pale), var(--myth-gold));
   transform: scaleX(0);
   transform-origin: 0 50%;
-  transition: transform 0.5s ease;
+  transition: transform 0.5s ease 1.5s;
 }
 
 .counterFill[data-on] { transform: scaleX(1); }
 
-/* The chamber's scene: bronze doors, a foe, him dashing in, cleaving it and walking out through the
-   opened doors, so a cleared chamber stands empty. */
-.chamberScene {
-  background: linear-gradient(180deg, var(--myth-tart-high) 0%, var(--myth-brick) 100%);
-  border-bottom: 2px solid var(--myth-gold-deep);
+/* The arena (trials.tsx): its props move by Web Animations in the scene's own units. */
+.sceneProp {
+  transform-box: view-box;
 }
 
-.shade {
-  opacity: 0;
-  transform: translate3d(0, 30px, 0);
+/* The serpent sways in the storm; the rain falls on a loop. */
+.serpent {
+  transform-box: view-box;
+  transform-origin: 284px 160px;
+  animation: serpent-sway 6s ease-in-out infinite;
 }
 
-[data-on] .shade {
-  animation: shade-life 1.8s ease-out both;
+@keyframes serpent-sway {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
 }
 
-@keyframes shade-life {
-  0% { opacity: 0; transform: translate3d(0, 30px, 0); }
-  25% { opacity: 1; transform: translate3d(0, 0, 0); }
-  55% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-  75% { opacity: 0; transform: translate3d(14px, -6px, 0) scale(1.4, 0.4); }
-  100% { opacity: 0; transform: translate3d(14px, -6px, 0) scale(1.4, 0.4); }
+.rain {
+  animation: rain-fall 0.9s linear infinite;
 }
 
-.dasher {
-  transform: translate3d(-120%, 0, 0);
+@keyframes rain-fall {
+  0% { transform: translate3d(0, -40px, 0); }
+  100% { transform: translate3d(-14px, 0, 0); }
 }
 
-[data-on] .dasher {
-  animation: dash 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) 0.35s both, through-door 0.8s ease-in 2.2s forwards;
+/* A job's seal lights once its foe is down. */
+.seal {
+  color: var(--myth-bone-shade);
+  opacity: 0.45;
+  transition: opacity 0.4s ease 1.4s, color 0.4s ease 1.4s;
 }
 
-@keyframes dash {
-  0% { transform: translate3d(-120%, 0, 0); }
-  100% { transform: translate3d(0, 0, 0); }
-}
-
-@keyframes through-door {
-  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-  100% { opacity: 0; transform: translate3d(95%, -8%, 0) scale(0.6); }
-}
-
-/* The doors swing open on the chamber's hinge sides once it is cleared. */
-.doorLeft,
-.doorRight {
-  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1) 1.5s;
-}
-
-.doorLeft { transform-origin: 0 50%; }
-.doorRight { transform-origin: 100% 50%; }
-
-[data-on] .doorLeft,
-[data-on] .doorRight {
-  transform: scaleX(0.12);
-}
-
-.stamp {
-  opacity: 0;
-  transform: scale(2.2) rotate(-8deg);
-  transition: opacity 0.2s ease 1.25s, transform 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) 1.25s;
-}
-
-[data-on] .stamp {
-  opacity: 1;
-  transform: scale(1) rotate(-8deg);
-}
-
-/* Pointing at or focusing a chamber lights its laurel over the door. */
-.laurel {
-  opacity: 0.35;
-  transition: opacity 0.25s ease;
-}
-
-.chamber:hover .laurel,
-.chamber:focus-within .laurel {
+.trial[data-on] .seal {
+  color: var(--myth-gold-pale);
   opacity: 1;
 }
-
-.chamberText {
-  opacity: 0;
-  transition: opacity 0.6s ease 1.6s;
-}
-
-[data-on] .chamberText { opacity: 1; }
 
 /* ---------------------------------------------------------------- the boons (boons.tsx) */
 
@@ -787,8 +740,6 @@
   .ripple,
   .drip,
   .swirl,
-  .shade,
-  .dasher,
   .sigilFly {
     opacity: 0 !important;
   }
@@ -800,8 +751,6 @@
   .reveal,
   .boon,
   .lavaFlow,
-  .chamberText,
-  .stamp,
   .fulfilled,
   .trayLand {
     opacity: 1 !important;

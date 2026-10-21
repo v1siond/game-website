@@ -5,9 +5,9 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Labels } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
-import { SpartanSprite } from './sprite'
+import { SpartanSprite, type SpriteMotion } from './sprite'
 import { nextStrike, type Strike } from './fates'
-import { useMove } from './moves'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { SlabButton } from './buttons'
 import u from './underworld.module.css'
 
@@ -25,7 +25,7 @@ const STRIKE_NAME: Record<Strike, (labels: Labels['myth']) => string> = {
 
 function Arena() {
   const { myth } = useLabels()
-  const { motion, take, play } = useMove('fighter')
+  const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
   const [last, setLast] = useState<Strike | null>(null)
 
   const strike = () => {
@@ -44,7 +44,7 @@ function Arena() {
         )}
       </p>
       <div className="h-64 w-52" aria-hidden="true">
-        <SpartanSprite key={take} profession="fighter" motion={motion} className="h-full w-full" />
+        <SpartanSprite key={take} profession="fighter" motion={pose} onDone={settle} className="h-full w-full" />
       </div>
       <SlabButton tone="blood" className="mt-4" onClick={strike}>
         {myth.strike}

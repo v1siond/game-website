@@ -72,6 +72,28 @@ export const MYTH = {
   darkness: '#8a52e0',
   darknessDeep: '#2a0f52',
 
+  // ---- the storm at sea and its serpent (the experience arena), the red orbs it drops
+  storm: '#384838',
+  stormHigh: '#0e1a1c',
+  rain: '#9fb8b0',
+  hydra: '#5a6a52',
+  hydraShade: '#2c3628',
+  hydraEye: '#9ef06a',
+  orb: '#ff3b4e',
+  orbCore: '#ffe0e6',
+  deck: '#4a3020',
+
+  // ---- the bronze giant over the harbour at night and the ice the axe breaks
+  giant: '#4a6a58',
+  giantEye: '#7fd8ff',
+  harbourNight: '#202838',
+  frost: '#bfe6ff',
+  frostDeep: '#4f8fc0',
+
+  // ---- the mountain over the clouds at dawn
+  olympus: '#a88868',
+  olympusMarble: '#485868',
+
   // ---- the boons' rarity ladder, lowest to highest
   common: '#f2ede4',
   rare: '#57b2ff',

@@ -4,7 +4,7 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { Stage } from './stage'
-import { Chambers } from './chambers'
+import { Trials } from './trials'
 import { Codex } from './codex'
 import { Boons } from './boons'
 import { Volcano } from './volcano'
@@ -31,7 +31,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.jobs.length > 0 && (
         <Stage title={titles.workExperience} zone="depths">
-          <Chambers jobs={sections.jobs} />
+          <Trials jobs={sections.jobs} />
         </Stage>
       )}
 

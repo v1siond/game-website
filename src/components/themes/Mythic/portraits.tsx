@@ -5,8 +5,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import type { Band, Musician } from '@/lib/cv/content'
-import { SpartanSprite } from './sprite'
-import { useMove } from './moves'
+import { SpartanSprite, type SpriteMotion } from './sprite'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import u from './underworld.module.css'
 
 // The bands as the portraits and dialogue boxes of the house: each band a painted portrait plate with
@@ -48,13 +48,13 @@ function BandCard({ slot, onStrike }: { slot: BandSlot; onStrike: () => void }) 
 
 export function Portraits({ musician, bands }: { musician: Musician; bands: Band[] }) {
   const { years, myth } = useLabels()
-  const { motion, take, play } = useMove('drummer')
+  const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
 
   return (
     <div className="grid gap-8 lg:grid-cols-[18rem_minmax(0,1fr)]">
       <div className={`p-5 ${u.panel} ${u.reveal} lg:sticky lg:top-8 lg:self-start`}>
         <div className="mx-auto h-64 w-52" aria-hidden="true">
-          <SpartanSprite key={take} profession="drummer" motion={motion} className="h-full w-full" />
+          <SpartanSprite key={take} profession="drummer" motion={pose} onDone={settle} className="h-full w-full" />
         </div>
         <p className={`mt-4 text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
         {musician.line && <p className="mt-2 text-base leading-relaxed">{musician.line}</p>}
@@ -64,7 +64,7 @@ export function Portraits({ musician, bands }: { musician: Musician; bands: Band
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => <BandCard slot={slot} onStrike={() => play('action')} />}
+        renderBand={(slot) => <BandCard slot={slot} onStrike={() => play('drum')} />}
       />
     </div>
   )

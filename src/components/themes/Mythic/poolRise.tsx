@@ -8,7 +8,8 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
 import { SpartanSprite, type SpriteMotion } from './sprite'
 import { ContactActions, SlabButton } from './buttons'
-import { useMove } from './moves'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
+import type { Move } from './rig'
 import { useHouse } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
@@ -42,10 +43,13 @@ const phaseFlags = (reached: ReadonlySet<Phase>) =>
 
 // His pose through the entrance: still while he comes up, the roar, then his idle.
 const entranceMotion = (reached: ReadonlySet<Phase>): SpriteMotion => {
-  if (reached.has('name')) return 'idle'
+  if (reached.has('title')) return 'idle'
   if (reached.has('roar')) return 'roar'
   return 'still'
 }
+
+// What a click on him throws, per kit: the blade combo, two drum hits, the kick.
+const HERO_MOVE: Record<Profession, Move> = { engineer: 'combo', drummer: 'drum', fighter: 'kick' }
 
 const DRIPS = [
   { x: 40, y: 34 },
@@ -81,7 +85,7 @@ function useRise(reduced: boolean) {
 export function PoolRise({ profession, reduced }: { profession: Profession; reduced: boolean }) {
   const { hud, navigation, myth } = useLabels()
   const { ref, shown, done, skip } = useRise(reduced)
-  const { motion, take, play } = useMove(profession)
+  const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
 
   return (
     <header ref={ref} className={`relative z-20 overflow-hidden ${u.hall}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
@@ -98,8 +102,8 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
           <div className="relative h-72 overflow-hidden sm:h-80">
             <div className={`absolute inset-0 ${u.riser}`}>
               {done ? (
-                <button type="button" className={`h-full w-full ${u.heroFigure}`} aria-label={myth.combo} title={myth.comboHint} onClick={() => play('action')}>
-                  <SpartanSprite key={take} profession={profession} motion={motion} className="h-full w-full" />
+                <button type="button" className={`h-full w-full ${u.heroFigure}`} aria-label={myth.combo} title={myth.comboHint} onClick={() => play(HERO_MOVE[profession])}>
+                  <SpartanSprite key={take} profession={profession} motion={pose} onDone={settle} className="h-full w-full" />
                 </button>
               ) : (
                 <SpartanSprite profession={profession} motion={entranceMotion(shown)} className="h-full w-full" />

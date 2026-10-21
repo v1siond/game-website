@@ -501,10 +501,9 @@ collections:
                   - { <<: *text, label: "Hero combo button", name: combo }
                   - { <<: *text, label: "Hero combo hint", name: comboHint }
                   - { <<: *text, label: "Mirror hint", name: mirrorHint }
-                  - { <<: *text, label: "Chamber number", name: chamberOf, hint: 'Keep {number}' }
-                  - { <<: *text, label: "Chamber cleared", name: chamberCleared }
-                  - { <<: *text, label: "Chambers cleared counter", name: chambersCleared, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Door hint", name: doorHint }
+                  - { <<: *text, label: "Roles cleared counter", name: rolesCleared, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Role cleared seal", name: roleCleared }
+                  - { <<: *text, label: "Arena hint", name: arenaHint }
                   - { <<: *text, label: "Rarity heroic", name: rarityHeroic }
                   - { <<: *text, label: "Choose", name: choose }
                   - { <<: *text, label: "Chosen", name: chosen }
