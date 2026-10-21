@@ -1,51 +1,45 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useTransition, useEffect, useState } from 'react'
+import { useTransition, useEffect, useState, type ReactNode } from 'react'
 import { locales, localeNames, type Locale } from '@/i18n/config'
 
-export function LanguageSwitcher() {
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [currentLocale, setCurrentLocale] = useState<Locale>('en')
+// The one language switcher. It owns reading and writing the locale (cookie for the server, localStorage
+// as a fallback) and the refresh; a world that wants its own look passes `render` and draws the state.
 
-  useEffect(() => {
-    // Read current locale from cookie or localStorage
-    const cookieLocale = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('locale='))
-      ?.split('=')[1] as Locale | undefined
+export interface LocaleSwitchState {
+  currentLocale: Locale
+  isPending: boolean
+  changeLocale: (locale: Locale) => void
+}
 
-    const storedLocale = localStorage.getItem('locale') as Locale | null
+interface LanguageSwitcherProps {
+  render?: (state: LocaleSwitchState) => ReactNode
+}
 
-    if (cookieLocale && locales.includes(cookieLocale)) {
-      setCurrentLocale(cookieLocale)
-    } else if (storedLocale && locales.includes(storedLocale)) {
-      setCurrentLocale(storedLocale)
-    }
-  }, [])
+const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
-  const handleLocaleChange = (newLocale: Locale) => {
-    // Store in localStorage
-    localStorage.setItem('locale', newLocale)
+function isLocale(value: string | null | undefined): value is Locale {
+  return !!value && (locales as readonly string[]).includes(value)
+}
 
-    // Set cookie for server-side reading
-    document.cookie = `locale=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}`
+function storedLocale(): Locale | null {
+  const fromCookie = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith('locale='))
+    ?.split('=')[1]
+  if (isLocale(fromCookie)) return fromCookie
+  const fromStorage = localStorage.getItem('locale')
+  return isLocale(fromStorage) ? fromStorage : null
+}
 
-    setCurrentLocale(newLocale)
-
-    // Refresh the page to apply new locale
-    startTransition(() => {
-      router.refresh()
-    })
-  }
-
+function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
   return (
     <div className="flex items-center gap-2 print:hidden">
       <span className="text-sm text-gray-600">Language:</span>
       <select
         value={currentLocale}
-        onChange={(e) => handleLocaleChange(e.target.value as Locale)}
+        onChange={(e) => changeLocale(e.target.value as Locale)}
         disabled={isPending}
         className="text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
@@ -60,4 +54,28 @@ export function LanguageSwitcher() {
       )}
     </div>
   )
+}
+
+const renderSelect = (state: LocaleSwitchState) => <SelectSwitcher {...state} />
+
+export function LanguageSwitcher({ render = renderSelect }: LanguageSwitcherProps) {
+  const router = useRouter()
+  const [isPending, startTransition] = useTransition()
+  const [currentLocale, setCurrentLocale] = useState<Locale>('en')
+
+  useEffect(() => {
+    const stored = storedLocale()
+    if (stored) setCurrentLocale(stored)
+  }, [])
+
+  const changeLocale = (newLocale: Locale) => {
+    localStorage.setItem('locale', newLocale)
+    document.cookie = `locale=${newLocale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}`
+    setCurrentLocale(newLocale)
+    startTransition(() => {
+      router.refresh()
+    })
+  }
+
+  return <>{render({ currentLocale, isPending, changeLocale })}</>
 }

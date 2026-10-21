@@ -12,6 +12,8 @@ export default defineConfig({
   retries: 0,
   reporter: 'list',
   timeout: 60_000,
+  // The dev server compiles a route on its first visit, which can take longer than the default 5s.
+  expect: { timeout: 20_000 },
   use: {
     baseURL,
     trace: 'retain-on-failure',

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "../../styles/globals.css";
+import { getLocale } from "next-intl/server";
 import ClientProviders from "../providers/ClientProviders";
 
 const silkScreen = localFont({
@@ -73,13 +74,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // The locale next-intl resolved for this request (cookie, then Accept-Language), so screen readers
+  // and the browser read the translated /cv in the right language.
+  const locale = await getLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

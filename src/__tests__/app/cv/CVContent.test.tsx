@@ -113,6 +113,7 @@ const mockCVData = {
 
 const mockTranslations = {
   downloadPdf: 'Download PDF',
+  backToSite: 'Back to the site',
   professionalSummary: 'Professional Summary',
   coreCompetencies: 'Core Competencies',
   currentPositions: 'Current Positions',

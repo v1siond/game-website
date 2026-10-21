@@ -23,6 +23,7 @@ export default async function CVPage() {
 
   const translations = {
     downloadPdf: t('downloadPdf'),
+    backToSite: t('backToSite'),
     professionalSummary: t('professionalSummary'),
     coreCompetencies: t('coreCompetencies'),
     currentPositions: t('currentPositions'),

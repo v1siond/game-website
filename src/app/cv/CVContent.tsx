@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import type { Locale } from '@/i18n/config'
@@ -61,6 +62,7 @@ interface CVData {
 
 interface Translations {
   downloadPdf: string
+  backToSite: string
   professionalSummary: string
   coreCompetencies: string
   currentPositions: string
@@ -110,10 +112,20 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
 
   return (
     <>
-      {/* Toolbar - hidden in print */}
-      <div className="max-w-[850px] mx-auto px-8 pt-6 pb-4 flex justify-between items-center print:hidden">
-        <LanguageSwitcher />
-        <DownloadPdfButton label={translations.downloadPdf} />
+      {/* Toolbar - hidden in print. Leaving the CV on the left, the CV's own controls together on the right.
+          A client side link keeps the world and the profession picked before opening the CV. */}
+      <div className="max-w-[850px] mx-auto px-8 pt-6 pb-4 flex flex-wrap justify-between items-center gap-4 print:hidden">
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-sm text-gray-700 rounded px-1 py-1 hover:text-black hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
+          <span aria-hidden="true">&larr;</span>
+          {translations.backToSite}
+        </Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <LanguageSwitcher />
+          <DownloadPdfButton label={translations.downloadPdf} />
+        </div>
       </div>
 
       {/* CV Content - this is what gets converted to PDF */}

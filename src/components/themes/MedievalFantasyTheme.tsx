@@ -1,10 +1,10 @@
 'use client'
 
-import { memo, useEffect, useState, useMemo, useCallback, useRef, useTransition } from 'react'
+import { memo, useEffect, useState, useMemo, useCallback, useRef } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useTheme } from '@/themes/ThemeContext'
 import { locales, localeNames, type Locale } from '@/i18n/config'
+import { LanguageSwitcher, type LocaleSwitchState } from '@/components/cv/LanguageSwitcher'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
@@ -235,30 +235,12 @@ function WC3Button({
 }
 
 // =============================================================================
-// WC3 LANGUAGE SWITCHER - Themed dropdown
+// WC3 LANGUAGE MENU - the shared LanguageSwitcher drawn as a themed dropdown
 // =============================================================================
 
-function WC3LanguageSwitcher() {
-  const router = useRouter()
-  const [isPending, startTransition] = useTransition()
-  const [currentLocale, setCurrentLocale] = useState<Locale>('en')
+function WC3LanguageMenu({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const cookieLocale = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('locale='))
-      ?.split('=')[1] as Locale | undefined
-
-    const storedLocale = localStorage.getItem('locale') as Locale | null
-
-    if (cookieLocale && locales.includes(cookieLocale)) {
-      setCurrentLocale(cookieLocale)
-    } else if (storedLocale && locales.includes(storedLocale)) {
-      setCurrentLocale(storedLocale)
-    }
-  }, [])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -271,13 +253,8 @@ function WC3LanguageSwitcher() {
   }, [])
 
   const handleLocaleChange = (newLocale: Locale) => {
-    localStorage.setItem('locale', newLocale)
-    document.cookie = `locale=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}`
-    setCurrentLocale(newLocale)
     setIsOpen(false)
-    startTransition(() => {
-      router.refresh()
-    })
+    changeLocale(newLocale)
   }
 
   return (
@@ -4474,7 +4451,7 @@ export default function MedievalFantasyTheme() {
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                   <WC3Button href="/cv" zone="roc">CV</WC3Button>
                   <WC3Button href="/personal-projects/game-engine" zone="roc">Nebulith</WC3Button>
-                  <WC3LanguageSwitcher />
+                  <LanguageSwitcher render={(state) => <WC3LanguageMenu {...state} />} />
                 </div>
               </div>
               <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: `1px solid ${WC3.metalDark}`, display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
