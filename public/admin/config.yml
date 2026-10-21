@@ -721,6 +721,15 @@ collections:
                   - { <<: *text, label: "Health full", name: healthFull }
                   - { <<: *text, label: "Souls", name: souls }
                   - { <<: *text, label: "Souls gained", name: gained }
+              - label: Pixel underground world (retro rpg)
+                name: rpg
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Check", name: check }
+                  - { <<: *text, label: "Check again", name: checkAgain }
+                  - { <<: *text, label: "Reset the puzzle", name: resetPuzzle }
+                  - { <<: *text, label: "Spar again", name: sparAgain }
               - label: The /cv page
                 name: cvPage
                 widget: object

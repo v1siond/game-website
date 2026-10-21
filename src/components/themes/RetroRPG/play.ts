@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 
 // The world's reveal clock on the shared section trigger: a block is 'idle' until it enters the
@@ -9,16 +9,20 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 
 export type Play = 'idle' | 'on' | 'done'
 
+/** False while a room's event still plays (rooms.tsx): the blocks it holds wait for him, then reveal. */
+export const RoomOpen = createContext(true)
+
 export function usePlay(lengthMs: number) {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
+  const open = useContext(RoomOpen)
   const [play, setPlay] = useState<Play>('idle')
 
   useEffect(() => {
-    if (!triggered) return
+    if (!triggered || !open) return
     setPlay('on')
     const timer = window.setTimeout(() => setPlay('done'), lengthMs)
     return () => window.clearTimeout(timer)
-  }, [triggered, lengthMs])
+  }, [triggered, open, lengthMs])
 
   return { ref, play }
 }

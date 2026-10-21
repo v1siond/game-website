@@ -3,6 +3,8 @@ import type { Profession } from '@/lib/cv/professions'
 import { RPG } from './palette'
 import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, pixelRuns, walkPose, type Facing, type Pose } from './sprite'
 import sprite from './sprite.module.css'
+import rooms from './rooms.module.css'
+import type { PixelSprite } from './npcs'
 
 // Him as the room walker (the pixel data in sprite.ts), drawn as one rect per run of a colour on the
 // 20 by 30 grid with crisp edges. Each component draws only the frames its place needs; sprite.module.css
@@ -137,5 +139,60 @@ export function Sparkles({ className = '' }: { className?: string }) {
         <path key={x} className={sprite.sparkle} d={`M${x + 2} ${y} h1 v2 h2 v1 h-2 v2 h-1 v-2 h-2 v-1 h2 Z`} fill={RPG.gold} />
       ))}
     </svg>
+  )
+}
+
+/** A cast sprite (npcs.ts) as one rect per run, placed at x, y inside a room's SVG. */
+export function PixelArt({ sprite: { rows, colours }, x = 0, y = 0, className }: { sprite: PixelSprite; x?: number; y?: number; className?: string }) {
+  return (
+    <g className={className}>
+      {pixelRuns(rows, y, x).map((run) => (
+        <rect key={`${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={colours[run.key]} />
+      ))}
+    </g>
+  )
+}
+
+interface ActorProps {
+  profession: Profession
+  /** The way he walks in. */
+  walk: Facing
+  /** The way he faces once he has arrived. */
+  rest: Facing
+  /** Draw his profession's two action frames, played while the room says act. */
+  acts?: boolean
+}
+
+/**
+ * Him inside a room's SVG (rooms.tsx), on the room's own 20 by 30 grid: two step frames while the room
+ * walks (data-room="walk"), his rest facing once he has arrived, his action frames while it acts. The
+ * room moves the whole actor by transform; rooms.module.css swaps the frames.
+ */
+export function Actor({ profession, walk, rest, acts = false }: ActorProps) {
+  const colours = COLOURS[profession]
+
+  return (
+    <>
+      <rect x={4} y={SPRITE.height - 1} width={12} height={1} fill={RPG.void} opacity={0.35} />
+      <g className={rooms.stepA}>
+        <Pixels pose={walkPose(profession, walk, 'stepA')} colours={colours} />
+      </g>
+      <g className={rooms.stepB}>
+        <Pixels pose={walkPose(profession, walk, 'stepB')} colours={colours} />
+      </g>
+      <g className={acts ? rooms.restActs : rooms.rest}>
+        <Pixels pose={walkPose(profession, rest, 'stand')} colours={colours} />
+      </g>
+      {acts && (
+        <>
+          <g className={rooms.actA}>
+            <Pixels pose={actionPose(profession, 'actA')} colours={colours} />
+          </g>
+          <g className={rooms.actB}>
+            <Pixels pose={actionPose(profession, 'actB')} colours={colours} />
+          </g>
+        </>
+      )}
+    </>
   )
 }

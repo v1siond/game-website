@@ -16,6 +16,7 @@ import { Soul } from './soul'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/components/cv/masonry'
+import { ITEM, SentryPortrait, TALKS } from './rooms'
 
 // Retro RPG's entries, each a box of the encounter screen:
 // - a job is a dialogue: the box opens (a line, then full height), the title types, the rest of the
@@ -64,9 +65,10 @@ export function ExperienceCard({ entry }: { entry: Job }) {
   const { ref, play } = usePlay(LINE_START_MS + entry.highlights.length * LINE_GAP_MS + 600)
 
   return (
-    <article ref={ref} data-play={play} className={`p-4 sm:p-5 ${world.box} ${world.opens}`}>
+    <article ref={ref} data-play={play} className={`p-4 sm:p-5 ${world.box} ${world.opens} ${TALKS}`}>
       <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
+        <SentryPortrait />
+        <div className="min-w-0 flex-1">
           <h3 className={TITLE}>
             <Typed delay="open">{entry.title}</Typed>
           </h3>
@@ -252,7 +254,7 @@ export function ItemBag({ categories }: { categories: CVData['techStack'] }) {
           </h3>
           <ul className={`${MASONRY_TILES} gap-x-4 gap-y-1`} aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
-              <li key={tech} className={`flex items-center gap-2 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] ${MONO} ${world.pick}`}>
+              <li key={tech} className={`flex items-center gap-2 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] ${MONO} ${world.pick} ${ITEM}`}>
                 <Soul className={`h-3 w-3.5 shrink-0 ${world.cursor}`} />
                 {tech}
               </li>

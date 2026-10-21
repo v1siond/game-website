@@ -1,0 +1,426 @@
+/*
+ * The overworld rooms (rooms.tsx): every section opens with him in a small room doing that room's event,
+ * then the content shows. The room's beat is data-room on its root: idle (not yet seen), walk, act, done;
+ * data-shown turns true at the first done and stays. The game runs on a locked frame clock, so every move
+ * is steps(), never an ease. Transform and opacity only.
+ */
+
+/* ---- him: frames and the walk ---- */
+
+@keyframes frameA {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes frameB {
+  0%, 49% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
+.stepA,
+.stepB,
+.actA,
+.actB {
+  opacity: 0;
+}
+
+[data-room='walk'] .stepA {
+  animation: frameA 320ms steps(1, end) infinite;
+}
+
+[data-room='walk'] .stepB {
+  animation: frameB 320ms steps(1, end) infinite;
+}
+
+[data-room='idle'] .rest,
+[data-room='walk'] .rest,
+[data-room='idle'] .restActs,
+[data-room='walk'] .restActs,
+[data-room='act'] .restActs {
+  opacity: 0;
+}
+
+[data-room='act'] .actA {
+  animation: frameA 500ms steps(1, end) infinite;
+}
+
+[data-room='act'] .actB {
+  animation: frameB 500ms steps(1, end) infinite;
+}
+
+/* The actor walks from --walk-from to --walk-to along the floor (--walk-y), a tile a step. */
+@keyframes walkAcross {
+  from { transform: translate(var(--walk-from), var(--walk-y)); }
+  to { transform: translate(var(--walk-to), var(--walk-y)); }
+}
+
+.actor {
+  transform: translate(var(--walk-to), var(--walk-y));
+}
+
+[data-room='idle'] .actor {
+  transform: translate(var(--walk-from), var(--walk-y));
+}
+
+[data-room='walk'] .actor {
+  animation: walkAcross var(--walk-ms) steps(var(--walk-steps), end) both;
+}
+
+/* ---- the content waits for his event ---- */
+
+@keyframes rise {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+[data-shown='false'] .gated {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+[data-shown='true'] .gated {
+  animation: rise 300ms steps(3, end) both;
+}
+
+/* ---- About: the encounter, ACT then Check ---- */
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+.monsterBob {
+  animation: bob 900ms steps(1, end) infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-1px); }
+  80% { transform: translateX(1px); }
+}
+
+[data-room='act'] .monsterShake {
+  animation: shake 400ms steps(5, end) 2;
+}
+
+/* Spared: its name colour (yellow) shows, then it hops away up and out. */
+.spareable {
+  opacity: 0;
+}
+
+@keyframes spared {
+  0% { opacity: 1; transform: translateY(0); }
+  60% { opacity: 1; transform: translateY(0); }
+  80% { opacity: 1; transform: translateY(-6px); }
+  100% { opacity: 0; transform: translateY(-24px); }
+}
+
+@keyframes leave {
+  0%, 60% { opacity: 1; }
+  61%, 100% { opacity: 0; }
+}
+
+[data-room='done'] .spareable {
+  animation: spared 1400ms steps(7, end) 600ms both;
+}
+
+[data-room='done'] .monster {
+  animation: leave 1400ms steps(1, end) 600ms both;
+}
+
+/* The heart steps in beside Check, then Check lights. */
+@keyframes heartIn {
+  from { transform: translateX(-40px); }
+  to { transform: translateX(0); }
+}
+
+.checkHeart {
+  opacity: 0;
+}
+
+[data-room='walk'] .checkHeart {
+  opacity: 1;
+  animation: heartIn 600ms steps(4, end) both;
+}
+
+[data-room='act'] .checkHeart,
+[data-room='done'] .checkHeart {
+  opacity: 1;
+}
+
+[data-room='act'] .checkWord,
+[data-room='done'] .checkWord {
+  color: var(--rpg-gold);
+}
+
+/* ---- Experience: the sentry pops up behind its booth ---- */
+
+.sentry {
+  transform: translateY(9px);
+}
+
+@keyframes popUp {
+  0% { transform: translateY(9px); }
+  100% { transform: translateY(0); }
+}
+
+[data-room='act'] .sentry,
+[data-room='done'] .sentry {
+  animation: popUp 200ms steps(2, end) both;
+}
+
+.bang {
+  opacity: 0;
+}
+
+@keyframes bang {
+  0% { opacity: 1; transform: translateY(2px); }
+  30% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+[data-room='act'] .bang {
+  animation: bang 900ms steps(4, end) both;
+}
+
+/* The portrait in each job box talks: its mouth flaps while the title types and under the pointer. */
+.mouthOpen {
+  opacity: 0;
+}
+
+[data-play='on'] .mouthOpen,
+.talks:hover .mouthOpen,
+.talks:focus-within .mouthOpen {
+  animation: frameA 240ms steps(1, end) 6;
+}
+
+/* ---- Tech stack: the shop counter ---- */
+
+.paw {
+  opacity: 0;
+}
+
+@keyframes wave {
+  0%, 100% { opacity: 1; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+[data-room='act'] .paw {
+  animation: wave 300ms steps(1, end) 3;
+}
+
+@keyframes hop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.shop:has(.item:hover) .keeper,
+.shop:has(.item:focus-visible) .keeper {
+  animation: hop 300ms steps(2, end) infinite;
+}
+
+/* ---- Projects: the switch puzzle ---- */
+
+.switchLit {
+  opacity: 0;
+}
+
+@keyframes click {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+[data-room='walk'] .switchLit {
+  animation: click 1ms steps(1, end) var(--click-at) both;
+}
+
+[data-room='act'] .switchLit,
+[data-room='done'] .switchLit {
+  opacity: 1;
+}
+
+@keyframes sink {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(10px); opacity: 0; }
+}
+
+[data-room='act'] .spikes {
+  animation: sink 400ms steps(4, end) both;
+}
+
+[data-room='done'] .spikes {
+  opacity: 0;
+}
+
+@keyframes steam {
+  0% { opacity: 0; transform: translateY(0); }
+  30% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-14px); }
+}
+
+.steam {
+  opacity: 0;
+  animation: steam 1800ms steps(6, end) infinite;
+}
+
+.steam:nth-of-type(2) {
+  animation-delay: 900ms;
+}
+
+/* ---- Ventures: the street, doors open as he passes ---- */
+
+.door {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+}
+
+@keyframes doorOpen {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0.15); }
+}
+
+[data-room='walk'] .door {
+  animation: doorOpen 200ms steps(2, end) var(--open-at) both;
+}
+
+[data-room='act'] .door,
+[data-room='done'] .door {
+  transform: scaleX(0.15);
+}
+
+@keyframes drive {
+  from { transform: translateX(-60px); }
+  to { transform: translateX(340px); }
+}
+
+.taxi {
+  animation: drive 5200ms steps(40, end) infinite;
+}
+
+/* ---- Bands: echo flowers ring as he passes ---- */
+
+.ring {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+@keyframes ring {
+  0% { opacity: 1; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(2.4); }
+}
+
+[data-room='walk'] .ring {
+  animation: ring 700ms steps(5, end) var(--ring-at) 2;
+}
+
+.ringing .ring {
+  animation: ring 700ms steps(5, end) 2 !important;
+}
+
+.flowerLit {
+  opacity: 0;
+}
+
+[data-room='walk'] .flowerLit {
+  animation: click 1ms steps(1, end) var(--ring-at) both;
+}
+
+[data-room='done'] .flowerLit,
+.ringing .flowerLit {
+  opacity: 1;
+}
+
+/* ---- Muay Thai: three knees on the dummy ---- */
+
+@keyframes hits {
+  0%, 12%, 34%, 46%, 68%, 80%, 100% { transform: translateX(0); }
+  16%, 50%, 84% { transform: translateX(3px); }
+  20%, 54%, 88% { transform: translateX(-2px); }
+}
+
+[data-room='act'] .dummy {
+  animation: hits 1500ms steps(25, end) both;
+}
+
+.slash {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+}
+
+@keyframes slashes {
+  0%, 10%, 24%, 44%, 58%, 78%, 92%, 100% { opacity: 0; transform: scaleX(0); }
+  14%, 48%, 82% { opacity: 1; transform: scaleX(1); }
+}
+
+[data-room='act'] .slash {
+  animation: slashes 1500ms steps(25, end) both;
+}
+
+/* ---- the overworld backdrop's life (overworld.tsx) ---- */
+
+.zone {
+  transition: opacity 600ms steps(4, end);
+}
+
+.zone[data-active='false'] * {
+  animation-play-state: paused !important;
+}
+
+@keyframes fall {
+  from { transform: translate(0, -20px); }
+  to { transform: translate(var(--drift, 12px), 200px); }
+}
+
+.falls {
+  animation: fall var(--fall-ms, 9000ms) steps(60, end) var(--fall-at, 0ms) infinite;
+}
+
+@keyframes riseUp {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-80px); }
+}
+
+.rises {
+  opacity: 0;
+  animation: riseUp 6000ms steps(30, end) var(--fall-at, 0ms) infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.flicker {
+  animation: flicker 1200ms steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .monsterBob,
+  .taxi,
+  .steam,
+  .falls,
+  .rises,
+  .flicker,
+  .keeper,
+  .mouthOpen,
+  .monster,
+  .spareable {
+    animation: none !important;
+  }
+
+  .falls,
+  .rises,
+  .steam {
+    opacity: 0;
+  }
+
+  .zone {
+    transition: none;
+  }
+}
