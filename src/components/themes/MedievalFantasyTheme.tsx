@@ -9,8 +9,8 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { REALM, REALM_VARS } from './MedievalFantasy/palette'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
-import { WC3Frame } from './MedievalFantasy/panels'
-import { HeroActions, WC3Button, WC3LanguageMenu } from './MedievalFantasy/actions'
+import { RealmFrame } from './MedievalFantasy/panels'
+import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/actions'
 import { FTArtDivider } from './MedievalFantasy/ornaments'
 import { ProfessionNode } from './MedievalFantasy/professions'
 import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy/sections'
@@ -67,7 +67,7 @@ export default function MedievalFantasyTheme() {
         <div style={{ position: 'relative', zIndex: 100 }}>
         <ScrollScene>
           <header style={{ marginBottom: sectionSpacing }}>
-            <WC3Frame zone="roc">
+            <RealmFrame zone="roc">
               <RecruiterHero
                 render={({ name, headline, tagline, line, actions }) => (
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
@@ -89,14 +89,14 @@ export default function MedievalFantasyTheme() {
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <HeroActions actions={actions} zone="roc" />
-                      <WC3Button href="/cv" zone="roc">CV</WC3Button>
-                      <WC3Button href="/personal-projects/game-engine" zone="roc">Nebulith</WC3Button>
-                      <LanguageSwitcher render={(state) => <WC3LanguageMenu {...state} />} />
+                      <RealmButton href="/cv" zone="roc">CV</RealmButton>
+                      <RealmButton href="/personal-projects/game-engine" zone="roc">Nebulith</RealmButton>
+                      <LanguageSwitcher render={(state) => <RealmLanguageMenu {...state} />} />
                     </div>
                   </div>
                 )}
               />
-            </WC3Frame>
+            </RealmFrame>
           </header>
         </ScrollScene>
         </div>
@@ -191,7 +191,7 @@ export default function MedievalFantasyTheme() {
                   <p style={{ color: REALM.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <HeroActions actions={actions} zone="ft" />
-                    <WC3Button href="/cv" zone="ft">Download CV</WC3Button>
+                    <RealmButton href="/cv" zone="ft">Download CV</RealmButton>
                   </div>
                 </>
               )}

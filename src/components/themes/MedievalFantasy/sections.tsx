@@ -10,7 +10,7 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { drumsSince } from '@/components/cv/sectionText'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { REALM } from './palette'
-import { InnerCard, WC3Frame } from './panels'
+import { InnerCard, RealmFrame } from './panels'
 import { BandCard, CARD_BODY, CARD_SUBTITLE, CARD_TITLE, JobCard, ProjectCard } from './cards'
 import { FTArtDivider, FTOrnament, RoCArtDivider, RoCOrnament } from './ornaments'
 
@@ -57,14 +57,14 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
       {/* About - More breathing room */}
       <ScrollScene>
         <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
-          <WC3Frame title="About" zone="roc">
+          <RealmFrame title="About" zone="roc">
             <p style={{
               color: REALM.textBright,
               lineHeight: 1.8,
               fontSize: isLargeScreen ? '1.125rem' : '1rem',
               padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
             }}>{professionalSummary.bio}</p>
-          </WC3Frame>
+          </RealmFrame>
         </section>
       </ScrollScene>
 
@@ -81,13 +81,13 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
             rightOrnament={<RoCOrnament side="right" type="weapons" />}
           >
             <section style={{ marginBottom: layout.sectionSpacing }}>
-              <WC3Frame title="Work Experience" zone="roc">
+              <RealmFrame title="Work Experience" zone="roc">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {jobs.map((job) => (
                     <JobCard key={job.id} job={job} />
                   ))}
                 </div>
-              </WC3Frame>
+              </RealmFrame>
             </section>
           </SectionWithOrnament>
         </ScrollScene>
@@ -102,7 +102,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
       <ScrollScene>
         <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <WC3Frame title="Tech Stack" zone="roc">
+            <RealmFrame title="Tech Stack" zone="roc">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                 {techStack.map((category) => (
                   <div key={category.id}>
@@ -117,7 +117,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
                   </div>
                 ))}
               </div>
-            </WC3Frame>
+            </RealmFrame>
           </section>
         </SectionWithOrnament>
       </ScrollScene>
@@ -136,13 +136,13 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
           rightOrnament={<FTOrnament side="right" type="rune" />}
         >
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <WC3Frame title="Projects" zone="ft">
+            <RealmFrame title="Projects" zone="ft">
               <ProjectList
                 projects={projects}
                 className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3"
                 renderProject={(slot) => <ProjectCard slot={slot} />}
               />
-            </WC3Frame>
+            </RealmFrame>
           </section>
         </SectionWithOrnament>
       </ScrollScene>
@@ -156,7 +156,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
       <ScrollScene>
         <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <WC3Frame title="Ventures" zone="ft">
+            <RealmFrame title="Ventures" zone="ft">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                 {companies.map((company) => (
                   <InnerCard key={company.id} zone="ft">
@@ -175,7 +175,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
                   </InnerCard>
                 ))}
               </div>
-            </WC3Frame>
+            </RealmFrame>
           </section>
         </SectionWithOrnament>
       </ScrollScene>
@@ -195,7 +195,7 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
       <ScrollScene>
         <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <WC3Frame title="Bands" zone="ft">
+            <RealmFrame title="Bands" zone="ft">
               <p style={{ color: REALM.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
                 {drumsSince(musician)}
               </p>
@@ -205,7 +205,7 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
                 renderBand={(slot) => <BandCard {...slot} />}
               />
               <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontStyle: 'italic', marginTop: '1rem' }}>{musician.line}</p>
-            </WC3Frame>
+            </RealmFrame>
           </section>
         </SectionWithOrnament>
       </ScrollScene>
@@ -225,7 +225,7 @@ function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fig
       <ScrollScene>
         <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <WC3Frame title="Muay Thai" zone="roc">
+            <RealmFrame title="Muay Thai" zone="roc">
               <h3 style={{ ...CARD_TITLE, marginBottom: '1rem' }}>{martialArts.primary.title}</h3>
               <MuayThaiRecord
                 martialArts={martialArts}
@@ -244,7 +244,7 @@ function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fig
                   </>
                 )}
               />
-            </WC3Frame>
+            </RealmFrame>
           </section>
         </SectionWithOrnament>
       </ScrollScene>

@@ -3,7 +3,7 @@ import { REALM } from './palette'
 
 // The heavy metal frame with gold bevels and the inner card the sections sit in, tinted per zone.
 
-export function WC3Frame({ children, title, zone = 'roc' }: { children: ReactNode; title?: string; zone?: 'roc' | 'ft' }) {
+export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactNode; title?: string; zone?: 'roc' | 'ft' }) {
   const accentColor = zone === 'ft' ? REALM.frostIceMid : REALM.chaosFelMid
 
   return (

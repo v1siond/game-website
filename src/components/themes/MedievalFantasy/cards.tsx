@@ -5,7 +5,7 @@ import type { BandSlot } from '@/components/cv/BandList'
 import { jobYears, RELEASED } from '@/components/cv/sectionText'
 import { REALM } from './palette'
 import { InnerCard } from './panels'
-import { WC3Button } from './actions'
+import { RealmButton } from './actions'
 
 // One card per job, project and band, read from the shared section slots.
 
@@ -70,7 +70,7 @@ export function ProjectCard({ slot: { project, years, links } }: { slot: Project
       {links.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
           {links.map(({ kind, label, linkProps }) => (
-            <WC3Button key={kind} linkProps={linkProps} zone="ft">{label}</WC3Button>
+            <RealmButton key={kind} linkProps={linkProps} zone="ft">{label}</RealmButton>
           ))}
         </div>
       )}

@@ -10,7 +10,7 @@ import { REALM } from './palette'
 // The world's buttons: the bevelled metal button, the language dropdown drawn for the shared
 // LanguageSwitcher, and the hero's contact actions as buttons.
 
-export function WC3Button({
+export function RealmButton({
   children,
   onClick,
   active,
@@ -57,7 +57,7 @@ export function WC3Button({
   return <button onClick={onClick} style={style}>{children}</button>
 }
 
-export function WC3LanguageMenu({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
+export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -162,9 +162,9 @@ export function HeroActions({ actions, zone }: { actions: HeroActionSlot[]; zone
   return (
     <>
       {actions.map((action) => (
-        <WC3Button key={action.id} linkProps={action.linkProps} variant={action.id === 'email' ? 'primary' : 'default'} zone={zone}>
+        <RealmButton key={action.id} linkProps={action.linkProps} variant={action.id === 'email' ? 'primary' : 'default'} zone={zone}>
           {action.label}
-        </WC3Button>
+        </RealmButton>
       ))}
     </>
   )
