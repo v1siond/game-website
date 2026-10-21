@@ -3,7 +3,7 @@
 exports[`Component Snapshots DownloadPdfButton matches default state snapshot 1`] = `
 <div>
   <button
-    class="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
+    class="inline-flex min-h-11 items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
   >
     <svg
       class="h-4 w-4"
@@ -27,7 +27,7 @@ exports[`Component Snapshots DownloadPdfButton matches default state snapshot 1`
 exports[`Component Snapshots DownloadPdfButton matches different label snapshot 1`] = `
 <div>
   <button
-    class="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
+    class="inline-flex min-h-11 items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
   >
     <svg
       class="h-4 w-4"
@@ -59,7 +59,7 @@ exports[`Component Snapshots LanguageSwitcher matches default snapshot 1`] = `
       Language:
     </span>
     <select
-      class="text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="min-h-11 text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
     >
       <option
         value="en"
