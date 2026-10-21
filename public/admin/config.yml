@@ -6,8 +6,10 @@ backend:
   name: github
   repo: v1siond/game-website
   branch: main
-  # base_url: https://<production host>   # GitHub OAuth route, set up in T3b
-  # auth_endpoint: api/decap-auth
+  # Production sign in goes through the site's own OAuth route (src/app/api/decap-auth). base_url is
+  # the production origin and must be filled in before /admin can sign in there (see the runbook).
+  # base_url: https://<production origin>
+  auth_endpoint: api/decap-auth
 
 # `npx decap-server` (port 8081) lets the local admin write the files directly.
 local_backend: true

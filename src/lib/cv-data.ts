@@ -1,20 +1,21 @@
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import type { Locale } from '@/i18n/config'
-import { getStaticCVData } from './cv-data-static'
-import { CV_API } from './cvApi'
+import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData } from './cv/content'
 
-// CV/portfolio data now comes from the nebulith ELIXIR backend (GET /api/cv?locale=…)
-// The endpoint does the queries + i18n field selection server-side and returns the SAME shape the page
-// consumes (professionalSummary, currentRoles, companies, featuredProjects, techStack, workExperience).
-// `src/app/cv/page.tsx` already falls back to `getStaticCVData` when this throws / returns empty.
-// Base URL from the site's own env-configurable CV_API (see src/lib/cvApi.ts).
+export type { CVData } from './cv/content'
 
-/** The CV payload shape, reuse the static mirror's type so the page stays fully typed. */
-export type CVData = Awaited<ReturnType<typeof getStaticCVData>>
+// Decap edits these files (locally through decap-server, in production as commits), so they are read
+// on each render and an edit shows without a code change.
+const CONTENT_DIR = join(process.cwd(), 'content', 'cv')
 
-/** Fetch the whole CV payload for a locale from the Elixir backend. Throws on a non-OK response so the
- *  page's try/catch can fall back to the static data. */
+const readContentFile = async (name: string): Promise<[string, unknown]> => [
+  name,
+  JSON.parse(await readFile(join(CONTENT_DIR, `${name}.json`), 'utf8')),
+]
+
+/** The CV of one locale, read from content/cv. Throws when a file is missing or is not valid JSON. */
 export async function getAllCVData(locale: Locale): Promise<CVData> {
-  const res = await fetch(`${CV_API}/cv?locale=${locale}`, { cache: 'no-store' })
-  if (!res.ok) throw new Error(`CV fetch failed: ${res.status} ${res.statusText}`)
-  return (await res.json()) as CVData
+  const entries = await Promise.all(CV_CONTENT_FILES.map(readContentFile))
+  return cvDataFrom(Object.fromEntries(entries) as CVContentFiles, locale)
 }
