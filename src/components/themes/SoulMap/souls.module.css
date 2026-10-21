@@ -1,0 +1,586 @@
+/*
+ * The bonfire world's scenes and HUD (hud.tsx, bonfire.tsx, shrine.tsx, classSelect.tsx, descent.tsx,
+ * items.tsx, messages.tsx, summons.tsx, arena.tsx, lastFire.tsx). Heavy and slow with ease out, the way
+ * the hard knight action game moves. Transforms and opacity only; every loop and every entrance runs only
+ * with no motion preference, and the state it ends in is the plain rule, so reduced motion shows it still.
+ * Colours are the --soul-* variables the world's root sets (palette.ts).
+ */
+
+/* ================================================================ HUD ================================== */
+
+/* The wide banner: a black band that fades in across the middle, the words in carved capitals. */
+.banner {
+  background: linear-gradient(180deg, transparent, rgb(5 4 4 / 0.82) 22%, rgb(5 4 4 / 0.82) 78%, transparent);
+}
+
+.bannerText {
+  text-shadow: 0 0 18px rgb(0 0 0 / 0.9);
+}
+
+.itemBox {
+  background: linear-gradient(180deg, rgb(23 20 15 / 0.96), rgb(11 10 9 / 0.96));
+  border-top: 1px solid var(--soul-glow-deep);
+  border-bottom: 1px solid var(--soul-glow-deep);
+}
+
+.gauges,
+.counter {
+  background: rgb(5 4 4 / 0.72);
+  border: 1px solid var(--soul-ridge);
+}
+
+.barTrack {
+  background: var(--soul-ink);
+  border: 1px solid var(--soul-stone-light);
+  overflow: hidden;
+}
+
+.barFill,
+.barTrail {
+  transform-origin: left center;
+  transform: scaleX(var(--fill, 1));
+}
+
+.barTrail {
+  background: var(--soul-glow-deep);
+}
+
+.hpFill {
+  background: linear-gradient(180deg, var(--soul-blood-bright), var(--soul-blood));
+}
+
+.staminaFill {
+  background: linear-gradient(180deg, var(--soul-moss), var(--soul-stamina));
+}
+
+.flask {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .banner {
+    animation: banner-band 3.4s ease-out both;
+  }
+
+  .bannerText {
+    animation: banner-words 3.4s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+  }
+
+  .itemBox {
+    animation: item-box 2.8s ease-out both;
+  }
+
+  .barFill {
+    transition: transform 0.25s ease-out;
+  }
+
+  /* The lost health lingers a moment behind the bar, then drains. */
+  .barTrail {
+    transition: transform 0.9s ease-in 0.45s;
+  }
+
+  .gain {
+    animation: gain 1.4s ease-out both;
+  }
+}
+
+@keyframes banner-band {
+  0% { opacity: 0; }
+  14% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes banner-words {
+  0% { opacity: 0; transform: scale(1.08); }
+  18% { opacity: 1; }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes item-box {
+  0% { opacity: 0; transform: translateY(10px); }
+  12% { opacity: 1; transform: translateY(0); }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes gain {
+  0% { opacity: 0; transform: translateY(6px); }
+  20% { opacity: 1; transform: translateY(0); }
+  75% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+
+/* ============================================================ bonfire ================================== */
+
+.fire {
+  overflow: visible;
+}
+
+.fire g,
+.fire path,
+.fire ellipse,
+.fire circle {
+  transform-box: view-box;
+}
+
+.flames,
+.flameOuter,
+.flameMid,
+.flameCore {
+  transform-origin: 50px 98px;
+}
+
+.fireGlow {
+  transform-origin: 50px 80px;
+}
+
+.spark {
+  opacity: 0;
+}
+
+/* out: no flame, the glow nearly gone, one ember left */
+.fireOut .flames {
+  opacity: 0;
+  transform: scale(0.2, 0);
+}
+
+.fireOut .fireGlow {
+  opacity: 0.12;
+}
+
+/* ember: a low glow and a small flame */
+.fireEmber .flames {
+  opacity: 0.9;
+  transform: scale(0.55, 0.35);
+}
+
+.fireEmber .fireGlow {
+  opacity: 0.55;
+}
+
+.fireLit .flames {
+  opacity: 1;
+  transform: none;
+}
+
+.fireLit .fireGlow {
+  opacity: 1;
+}
+
+.fireLit .lastEmber {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flames,
+  .fireGlow {
+    transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.9s ease-out;
+  }
+
+  .fireLit .flameOuter {
+    animation: flicker-outer 1.7s ease-in-out infinite;
+  }
+
+  .fireLit .flameMid {
+    animation: flicker-mid 1.1s ease-in-out infinite;
+  }
+
+  .fireLit .flameCore {
+    animation: flicker-core 0.8s ease-in-out infinite;
+  }
+
+  .fireLit .fireGlow {
+    animation: glow-breathe 2.6s ease-in-out infinite;
+  }
+
+  .fireLit .spark {
+    animation: spark-rise 2.4s ease-out infinite;
+  }
+
+  .fireLit .spark:nth-child(2) {
+    animation-delay: 0.8s;
+    animation-duration: 2.9s;
+  }
+
+  .fireLit .spark:nth-child(3) {
+    animation-delay: 1.6s;
+    animation-duration: 2.1s;
+  }
+
+  .fireOut .lastEmber,
+  .fireEmber .lastEmber {
+    animation: ember-pulse 2.2s ease-in-out infinite;
+  }
+}
+
+@keyframes flicker-outer {
+  0%, 100% { transform: scale(1, 1) skewX(0deg); }
+  30% { transform: scale(1.04, 0.95) skewX(-2deg); }
+  65% { transform: scale(0.97, 1.05) skewX(2deg); }
+}
+
+@keyframes flicker-mid {
+  0%, 100% { transform: scale(1, 1); }
+  40% { transform: scale(0.95, 1.07); }
+  70% { transform: scale(1.03, 0.96); }
+}
+
+@keyframes flicker-core {
+  0%, 100% { transform: scale(1, 1); opacity: 1; }
+  50% { transform: scale(1.06, 0.9); opacity: 0.85; }
+}
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.96); }
+}
+
+@keyframes spark-rise {
+  0% { opacity: 0; transform: translate(0, 0); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(6px, -44px); }
+}
+
+@keyframes ember-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+/* ============================================================= shrine ================================== */
+
+/* A drawn thing that is a button (the fire, him): no button chrome, a gold ring on keyboard focus. */
+.target {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.target:disabled {
+  cursor: default;
+}
+
+.target:focus-visible {
+  outline: 2px solid var(--soul-glow);
+  outline-offset: 4px;
+}
+
+.layerFar {
+  transform: translate(calc(var(--mx, 0) * -6px), calc(var(--my, 0) * -3px));
+}
+
+.layerMid {
+  transform: translate(calc(var(--mx, 0) * -14px), calc(var(--my, 0) * -5px));
+}
+
+.layerNear {
+  transform: translate(calc(var(--mx, 0) * -24px), calc(var(--my, 0) * -6px));
+}
+
+.heroWords {
+  opacity: 0;
+}
+
+.heroWordsOn {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fogBand {
+    animation: fog-drift 26s ease-in-out infinite alternate;
+  }
+
+  .heroWords {
+    transform: translateY(12px);
+    transition: opacity 1.4s ease-out, transform 1.4s ease-out;
+  }
+
+  .heroWordsOn {
+    transform: none;
+  }
+}
+
+@keyframes fog-drift {
+  0% { transform: translateX(-60px); }
+  100% { transform: translateX(80px); }
+}
+
+/* ======================================================= class select ================================== */
+
+.blackout {
+  opacity: 0;
+}
+
+.forgeSparks {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* A new pick cuts to black and back, the way the game fades between screens. */
+  .blackout {
+    animation: blackout 1s ease-in-out both;
+  }
+
+  /* Sparks fly from the anvil as the hammer lands (52% into his 1.6s hammer loop). */
+  .forgeSparks {
+    animation: forge-sparks 1.6s ease-out infinite;
+  }
+
+  .drumHead {
+    animation: drum-flash 0.4s ease-out infinite;
+  }
+
+  .post {
+    transform-origin: 50% 100%;
+    animation: post-shake 4s ease-out infinite;
+  }
+}
+
+/* The blackout is drawn only after a change of class (classSelect.tsx), so the first draw has none. */
+@keyframes blackout {
+  0% { opacity: 1; }
+  40% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes forge-sparks {
+  0%, 50% { opacity: 0; transform: translate(0, 0); }
+  53% { opacity: 1; }
+  75% { opacity: 0; transform: translate(4px, -10px); }
+  100% { opacity: 0; }
+}
+
+.drumHead {
+  opacity: 0;
+}
+
+@keyframes drum-flash {
+  0% { opacity: 0.35; }
+  100% { opacity: 0; }
+}
+
+@keyframes post-shake {
+  /* the roundhouse lands at 16%, the knee at 48%, the elbow at 74% of his 4s cycle */
+  0%, 15%, 24%, 47%, 56%, 73%, 82%, 100% { transform: rotate(0deg); }
+  17%, 49%, 75% { transform: rotate(3deg); }
+}
+
+/* ============================================================ descent ================================== */
+
+/* The shaft's stone, dark courses of masonry down its whole height. */
+.shaft {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 46px, rgb(5 4 4 / 0.6) 46px 48px),
+    linear-gradient(90deg, var(--soul-ink), var(--soul-cavern) 30%, var(--soul-cavern) 70%, var(--soul-ink));
+}
+
+/* The car rides the shaft with the scroll: 0 at the top, 1 at the bottom of its track. */
+.liftRide {
+  transform: translateY(calc(var(--scene-progress, 0) * 100%));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .stop .areaName,
+  .stop .stopCard {
+    opacity: 0;
+  }
+
+  .stopOn .areaName {
+    animation: area-name 1.3s ease-out both;
+  }
+
+  .stopOn .stopCard {
+    animation: rise-in 0.9s ease-out 0.5s both;
+  }
+}
+
+/* An area's name: it swells in out of the dark and settles. */
+@keyframes area-name {
+  0% { opacity: 0; transform: scale(1.12); }
+  60% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes rise-in {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ============================================================== items ================================== */
+
+.glintHalo {
+  opacity: 0.25;
+  transform: scale(0.6);
+}
+
+.glintRay {
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Lying on the ground: the glint pulses until the visitor comes near. */
+  .item:not(.itemOn) .glintHalo {
+    animation: glint-pulse 1.8s ease-in-out infinite;
+  }
+
+  .item:not(.itemOn) .glintRay {
+    animation: glint-ray 1.8s ease-in-out infinite;
+  }
+
+  .item:not(.itemOn) .itemCard {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+
+  /* Near: it flares once and the card rises out of it. */
+  .itemOn .glintHalo {
+    animation: glint-flare 0.9s ease-out both;
+  }
+
+  .itemOn .itemCard {
+    animation: item-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both;
+  }
+}
+
+@keyframes glint-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(0.5); }
+  50% { opacity: 0.45; transform: scale(0.8); }
+}
+
+@keyframes glint-ray {
+  0%, 100% { opacity: 0.2; transform: scale(0.6) rotate(0deg); }
+  50% { opacity: 0.8; transform: scale(1) rotate(45deg); }
+}
+
+@keyframes glint-flare {
+  0% { opacity: 0.6; transform: scale(0.6); }
+  40% { opacity: 0.9; transform: scale(1.6); }
+  100% { opacity: 0.25; transform: scale(0.6); }
+}
+
+@keyframes item-rise {
+  0% { opacity: 0; transform: translateY(24px) scale(0.97); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* =========================================================== messages ================================== */
+
+/* A floor slab: worn stone with two cracks across it. */
+.slab {
+  background:
+    linear-gradient(115deg, transparent 47%, rgb(5 4 4 / 0.5) 47.5%, transparent 48.5%),
+    linear-gradient(170deg, transparent 70%, rgb(5 4 4 / 0.4) 70.4%, transparent 71.2%),
+    linear-gradient(180deg, var(--soul-slab), var(--soul-rock));
+  border: 1px solid var(--soul-ridge);
+}
+
+/* The orange script, glowing a little off the stone. */
+.inscription {
+  text-shadow: 0 0 10px rgb(243 154 79 / 0.45);
+  opacity: 0.88;
+}
+
+.slab:hover .inscription,
+.slab:focus-within .inscription {
+  opacity: 1;
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .inscription {
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  }
+}
+
+/* ============================================================ summons ================================== */
+
+.sigil {
+  opacity: 0.55;
+  transform-origin: 50% 65%;
+}
+
+.sigilLit {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sigilLit {
+    animation: sigil-flare 1.1s ease-out both;
+  }
+
+  /* The phantom rises out of the sign in gold light. */
+  .phantomRise {
+    animation: phantom-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+}
+
+@keyframes sigil-flare {
+  0% { opacity: 0.55; transform: scale(1); }
+  35% { opacity: 1; transform: scale(1.12); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes phantom-rise {
+  0% { opacity: 0; transform: translateY(28px) scaleY(0.4); }
+  60% { opacity: 0.9; }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ============================================================== arena ================================== */
+
+/* The fog wall: two sheets of white fog over the ring's way in. */
+.fogLayer {
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 40%, rgb(217 212 199 / 0.5), transparent 70%),
+    radial-gradient(ellipse 50% 45% at 70% 60%, rgb(217 212 199 / 0.42), transparent 70%);
+}
+
+.fogLayerBack {
+  opacity: 0.7;
+  transform: scale(1.3) translateX(8%);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fogLayer {
+    animation: fog-swirl 9s ease-in-out infinite alternate;
+  }
+
+  .fogLayerBack {
+    animation-duration: 13s;
+    animation-direction: alternate-reverse;
+  }
+
+  /* The partner steps out of the fog as it parts. */
+  .partnerIn {
+    animation: partner-in 1.2s ease-out both;
+  }
+}
+
+@keyframes fog-swirl {
+  0% { transform: translateX(-6%) scale(1.1); }
+  100% { transform: translateX(6%) scale(1.25); }
+}
+
+@keyframes partner-in {
+  0% { opacity: 0; transform: translateX(30px); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ========================================================== last fire ================================== */
+
+.lastGround {
+  background: radial-gradient(ellipse at 50% 40%, var(--soul-slab), var(--soul-rock) 60%, transparent 72%);
+}
+
+/* Kindled: he walks the last steps to the fire and sits by it. */
+.atFire {
+  transform: translateX(2.5rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .atFire {
+    transition: transform 0.9s ease-in-out;
+  }
+}

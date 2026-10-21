@@ -1,0 +1,144 @@
+/*
+ * The bonfire world's chrome: the page of ash and stone, the falling ash, the vignette, the menu panels
+ * and the buttons (links.tsx, menu.tsx, backdrop in ash.tsx). Colours are the --soul-* variables the
+ * world's root sets (palette.ts). Transforms and opacity only; the ash falls only with no motion
+ * preference.
+ */
+
+.world {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgb(122 110 90 / 0.18), transparent 70%),
+    linear-gradient(180deg, var(--soul-deep) 0%, var(--soul-abyss) 40%, var(--soul-ink) 100%);
+  color: var(--soul-text);
+}
+
+/* The dark at the edges of the screen, the game's vignette. */
+.vignette {
+  background: radial-gradient(ellipse 75% 70% at 50% 45%, transparent 55%, rgb(0 0 0 / 0.65) 100%);
+}
+
+/* Ash drifting down through the whole page: eight flakes, each on its own slow fall and sway. */
+.flake {
+  position: absolute;
+  top: -2vh;
+  width: 3px;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--soul-haze);
+  opacity: 0.35;
+}
+
+.flake:nth-child(1) { left: 6%; }
+.flake:nth-child(2) { left: 19%; width: 2px; height: 2px; }
+.flake:nth-child(3) { left: 33%; }
+.flake:nth-child(4) { left: 47%; width: 4px; height: 3px; }
+.flake:nth-child(5) { left: 58%; width: 2px; height: 2px; }
+.flake:nth-child(6) { left: 71%; }
+.flake:nth-child(7) { left: 84%; width: 2px; height: 2px; }
+.flake:nth-child(8) { left: 93%; }
+
+/* Without motion the flakes rest scattered down the screen instead of falling. */
+.flake:nth-child(odd) { transform: translateY(38vh); }
+.flake:nth-child(even) { transform: translateY(71vh); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .flake {
+    animation: ash-fall 19s linear infinite;
+  }
+
+  .flake:nth-child(2) { animation-duration: 23s; animation-delay: -6s; }
+  .flake:nth-child(3) { animation-duration: 17s; animation-delay: -11s; }
+  .flake:nth-child(4) { animation-duration: 26s; animation-delay: -3s; }
+  .flake:nth-child(5) { animation-duration: 21s; animation-delay: -15s; }
+  .flake:nth-child(6) { animation-duration: 18s; animation-delay: -8s; }
+  .flake:nth-child(7) { animation-duration: 24s; animation-delay: -18s; }
+  .flake:nth-child(8) { animation-duration: 20s; animation-delay: -12s; }
+}
+
+@keyframes ash-fall {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(14px, 27vh); }
+  50% { transform: translate(-8px, 54vh); }
+  75% { transform: translate(10px, 79vh); }
+  100% { transform: translate(-4px, 106vh); }
+}
+
+/* The menu panel: dark stone, a thin worn gold frame and a darker inner edge. */
+.panel {
+  background: linear-gradient(180deg, rgb(28 25 21 / 0.94), rgb(20 18 16 / 0.96));
+  border: 1px solid var(--soul-ridge);
+  box-shadow: inset 0 0 0 3px var(--soul-ink), inset 0 0 0 4px rgb(143 115 55 / 0.35);
+}
+
+/* An item slot in the tech stack and the status lists. */
+.slot {
+  background: var(--soul-ink);
+  border: 1px solid var(--soul-rock);
+}
+
+/* The game's lit menu line: a band of gold light that fades out to the right, behind the selected word. */
+.highlight {
+  position: relative;
+  isolation: isolate;
+}
+
+.highlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, rgb(227 194 122 / 0.28), rgb(227 194 122 / 0.08) 70%, transparent);
+  transform-origin: left center;
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+.highlightOn::before,
+.highlight:hover::before,
+.highlight:focus-visible::before {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.button {
+  position: relative;
+  isolation: isolate;
+  background: rgb(11 10 9 / 0.85);
+  border-top: 1px solid var(--soul-glow-deep);
+  border-bottom: 1px solid var(--soul-glow-deep);
+}
+
+.button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent, rgb(227 194 122 / 0.22), transparent);
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+.button:hover::before,
+.button:focus-visible::before {
+  transform: scaleX(1);
+  opacity: 1;
+}
+
+.button:disabled {
+  opacity: 0.6;
+}
+
+.button:disabled::before {
+  opacity: 0;
+}
+
+.buttonLit {
+  border-color: var(--soul-glow);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .highlight::before,
+  .button::before {
+    transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+  }
+}
