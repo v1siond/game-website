@@ -96,5 +96,6 @@ export const RPG_VARS = {
   '--rpg-sand-edge': RPG.sandEdge,
 } as CSSProperties
 
-// Pixel type, the menus of a 16 bit role playing game; a monospace face where the pixel face is missing.
-export const PIXEL = "font-['Press_Start_2P','Courier_New',monospace]"
+// Pixel type, the menus of a 16 bit role playing game: the Silkscreen face the root shell loads
+// (RootShell.tsx sets --font-silkscreen), a monospace face until it arrives.
+export const PIXEL = "[font-family:var(--font-silkscreen),'Courier_New',monospace]"

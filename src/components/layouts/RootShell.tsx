@@ -18,6 +18,7 @@ const silkScreen = localFont({
   ],
   display: 'swap',
   preload: true,
+  variable: '--font-silkscreen',
 });
 
 const permanentMarker = localFont({
@@ -91,7 +92,7 @@ export default function RootShell({ lang, children }: Readonly<RootShellProps>) 
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body
-        className={`${silkScreen.className} ${permanentMarker.className} antialiased`}
+        className={`${silkScreen.className} ${silkScreen.variable} ${permanentMarker.className} antialiased`}
       >
         <ClientProviders>
           {children}
