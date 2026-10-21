@@ -9,6 +9,7 @@ import { SectionHeader } from './cards'
 import { ChaseAbout } from './chase'
 import { HangingJobs } from './ropes'
 import { FloatingCrates } from './crates'
+import { TrapLine } from './traps'
 import { MillProjects } from './mill'
 import { VentureSigns } from './signs'
 import { ShockStage } from './stage'
@@ -17,8 +18,8 @@ import { GravityRecord } from './gravity'
 // Each profession's sections, and only those, each its own set piece on the walk from the dark forest
 // to the machine city, so no two look or move alike: the System Engineer's about is a spider chase
 // through the thicket, his jobs hang down one rope into a chasm, his tech stack floats as crates in a
-// flooded hold, his projects lie on a sawmill floor under a running saw and his ventures are lit signs
-// over the city; the Musician's bands are plates on an electrified floor stepping in time; the Martial
+// flooded hold, the spider loses a leg in the trap line, his projects lie on a sawmill floor under a
+// running saw and his ventures are lit signs over the city; the Musician's bands are plates on an electrified floor stepping in time; the Martial
 // Artist's record sits in the gravity room.
 
 function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
@@ -52,6 +53,8 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <Block title={titles.techStack} wide>
         <FloatingCrates categories={sections.techStack} />
       </Block>
+
+      <TrapLine />
 
       <Block title={titles.featuredWork} wide>
         <MillProjects projects={sections.projects} />

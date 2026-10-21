@@ -489,6 +489,7 @@ collections:
                   - { <<: *text, label: "Light hint", name: lightHint }
                   - { <<: *text, label: "Flip gravity", name: flipGravity }
                   - { <<: *text, label: "Spring the trap", name: springTrap }
+                  - { <<: *text, label: "Run from it again", name: chaseAgain }
               - label: Underworld world (mythic)
                 name: myth
                 widget: object

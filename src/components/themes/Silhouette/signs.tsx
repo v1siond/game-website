@@ -6,6 +6,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { HeroCharacter } from './character'
 import { PROFESSION_SKY } from './places'
 import { SHADE, type SkyLight } from './palette'
 import shade from './shade.module.css'
@@ -14,9 +15,10 @@ import shade from './shade.module.css'
 // broken hotel sign of a silhouette platformer's town: when the section comes into view each sign
 // stutters on in turn (once), and a sign the visitor touches or tabs to shorts out and comes back:
 // the short is on the sign's light only, its words stay readable. One row from a tablet up, the
-// signs side by side on their posts; stacked on a phone.
+// signs side by side on their posts; stacked on a phone. A power cable runs over the signs, and as
+// they light he crosses it hand over hand from one end to the other, once, and hangs there.
 //
-// Animated: one sign per entry (once), the one being touched.
+// Animated: one sign per entry (once), the one being touched, him on the cable (once) and his parts.
 
 const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]'
 const TITLE = 'text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--sh-heading)]'
@@ -60,6 +62,19 @@ function Sign({ index, lit, href, children }: { index: number; lit: boolean; hre
   )
 }
 
+// The cable over the signs, and him on it: he rides a track one hand span short of the cable, so moving
+// the track by its own width brings him to the far end.
+function Cable({ crossing }: { crossing: boolean }) {
+  return (
+    <div className="relative mb-6 h-20" aria-hidden="true">
+      <div className="absolute inset-x-0 top-1 h-0.5 bg-[color:var(--sh-black)]" />
+      <div className={`absolute left-0 right-12 top-0 ${shade.cableCross} ${crossing ? shade.cableCrossed : ''}`}>
+        <HeroCharacter profession="engineer" pose="hang" className="block h-16 w-10" />
+      </div>
+    </div>
+  )
+}
+
 function Rooftops({ light, children }: { light: SkyLight; children: ReactNode }) {
   return (
     <div className={`relative overflow-hidden border-y-2 border-[color:var(--sh-black)] bg-gradient-to-b px-4 pb-10 pt-8 sm:px-6 ${light.sky}`}>
@@ -78,6 +93,7 @@ export function VentureSigns({ companies }: { companies: CVData['companies'] }) 
   return (
     <div ref={ref}>
       <Rooftops light={PROFESSION_SKY.engineer}>
+        <Cable crossing={triggered} />
         <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {companies.map((company, index) => (
             <li key={company.id}>

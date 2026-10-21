@@ -5,6 +5,7 @@ import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { HeroCharacter } from './character'
+import { ReachingLegs } from './spider'
 import { ExperienceCard } from './cards'
 import shade from './shade.module.css'
 
@@ -12,10 +13,11 @@ import shade from './shade.module.css'
 // from the cliff edge down the whole section and each job hangs from a knot on it, on alternating sides
 // from a tablet up (on a phone the rope runs down the left edge and every job hangs to its right). He
 // slides down the rope hand over hand as the visitor scrolls, and stands on the last knot when the
-// section has scrolled by. A card the visitor touches swings away from the side the pointer came in,
+// section has scrolled by. Above him the spider's two forelegs reach down over the cliff edge after
+// him as he starts down, and stop short. A card the visitor touches swings away from the side the pointer came in,
 // then settles. Reduced motion and the World Select preview start with him at the bottom.
 //
-// Animated: him (moved by --scene-progress) and his parts, the one card being swung.
+// Animated: him and the reaching legs (moved by --scene-progress), his parts, the one card being swung.
 
 type Swing = 'left' | 'right'
 
@@ -86,10 +88,13 @@ export function HangingJobs({ jobs }: { jobs: Job[] }) {
       <p className="mb-6 text-center text-sm italic tracking-wider text-[color:var(--sh-muted)]">{words.swingHint}</p>
       <div className="relative pb-16">
         <div className="pointer-events-none absolute inset-x-0 -top-2 h-3 border-t-4 border-[color:var(--sh-black)]" aria-hidden="true" />
+        <div className={`pointer-events-none absolute -top-2 h-16 w-16 -translate-x-1/2 overflow-hidden md:h-20 md:w-24 ${ROPE_X}`} aria-hidden="true">
+          <ReachingLegs className={`h-full w-full ${shade.reach}`} />
+        </div>
         <span className={`pointer-events-none absolute -top-2 bottom-0 w-px -translate-x-1/2 bg-[color:var(--sh-dim)] ${ROPE_X}`} aria-hidden="true" />
-        <div className={`pointer-events-none absolute -top-2 bottom-16 w-8 -translate-x-1/2 ${ROPE_X}`} aria-hidden="true">
+        <div className={`pointer-events-none absolute -top-2 bottom-24 w-8 -translate-x-1/2 md:w-14 ${ROPE_X}`} aria-hidden="true">
           <div className={`h-full ${shade.slide}`}>
-            <HeroCharacter profession="engineer" pose={phase === 'done' ? 'idle' : 'hang'} className="block h-12 w-8" />
+            <HeroCharacter profession="engineer" pose={phase === 'done' ? 'idle' : 'hang'} className="block h-12 w-8 md:h-20 md:w-[3.125rem]" />
           </div>
         </div>
         <ol className="relative space-y-8">

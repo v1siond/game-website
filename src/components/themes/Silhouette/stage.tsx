@@ -2,6 +2,8 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { HeroCharacter } from './character'
+import { SHADE } from './palette'
 import world from './world.module.css'
 import shade from './shade.module.css'
 
@@ -10,9 +12,9 @@ import shade from './shade.module.css'
 // runs the cable plate to plate in a steady four count, each plate's edge lighting on its beat the way
 // a drum machine steps through a bar. The plates stand in one row on a wide screen, two by two on a
 // tablet and in one column down the cable on a phone. The current stops under reduced motion, every
-// plate edge lit.
+// plate edge lit. At the cable's head he beats an oil drum, and the current steps on his strokes.
 //
-// Animated: one current per band.
+// Animated: one current per band, his parts.
 
 const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]'
 
@@ -41,11 +43,27 @@ function Plate({ index, link, children }: { index: number; link: BandSlot['linkP
   )
 }
 
+// An oil drum: a black barrel with two hoops, its lid the drum head.
+function OilDrum() {
+  return (
+    <svg viewBox="0 0 30 40" className="h-12 w-9" focusable="false">
+      <rect x={2} y={4} width={26} height={36} rx={2} fill={SHADE.black} />
+      <rect x={2} y={14} width={26} height={2} fill={SHADE.fog} />
+      <rect x={2} y={28} width={26} height={2} fill={SHADE.fog} />
+      <ellipse cx={15} cy={4} rx={13} ry={3} fill={SHADE.fog} />
+    </svg>
+  )
+}
+
 export function ShockStage({ bands }: { bands: Band[] }) {
   const { links } = useLabels()
 
   return (
     <div className="relative">
+      <div className="mb-2 flex items-end gap-0.5 lg:mb-6" aria-hidden="true">
+        <HeroCharacter profession="drummer" pose="act" className="block h-20 w-[3.125rem]" />
+        <OilDrum />
+      </div>
       <div
         className="pointer-events-none absolute bottom-0 left-4 top-0 w-1 bg-[color:var(--sh-black)] lg:inset-x-0 lg:bottom-auto lg:top-1/2 lg:h-1 lg:w-auto"
         aria-hidden="true"

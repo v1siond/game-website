@@ -199,3 +199,7 @@ export function Place({ profession, pose }: { profession: Profession; pose: Spri
   const Scene = PLACES[profession]
   return <Scene pose={pose} />
 }
+
+// The black brush at a strip's left edge, where the spider waits: solid black, its right side ragged
+// with thorns, in a 600 by 200 strip.
+export const BRUSH = 'M0 0 H96 L84 22 L104 34 L88 58 L112 74 L92 96 L118 110 L96 132 L122 150 L100 170 L116 200 H0 Z'

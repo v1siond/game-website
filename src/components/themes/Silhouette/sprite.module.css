@@ -8,6 +8,7 @@
  * - push: leaning into the load, arms out straight, short slow steps (a crate, a lever, a door).
  * - fall: the knees go, he pitches forward onto the ground; lie holds him there; rise gets him up in
  *   three beats, onto his hands, up to one knee, standing with a small settle.
+ * - jump: a crouch, the knees tuck and the arms reach forward over a gap, then he lands.
  * - hang: both hands up on a rope over his head, legs together, a slow sway from the grip (sliding
  *   down the rope, dropping back in after a death).
  * - act: one action per profession, typing, drumming, the roundhouse kick from a high guard.
@@ -438,6 +439,79 @@
   }
   50% {
     transform: rotate(4deg);
+  }
+}
+
+/* ---- jump: a crouch, then knees tucked and arms reaching forward over the gap, and the landing ---- */
+
+.jump .whole {
+  animation: jump-arc 0.65s cubic-bezier(0.3, 0, 0.4, 1) both;
+}
+
+.jump .body {
+  transform: rotate(6deg);
+}
+
+.jump .legFront {
+  animation: jump-tuck 0.65s ease-out both;
+}
+
+.jump .legBack {
+  animation: jump-trail 0.65s ease-out both;
+}
+
+.jump .armFront,
+.jump .armBack {
+  animation: jump-reach 0.65s ease-out both;
+}
+
+@keyframes jump-arc {
+  0% {
+    transform: translateY(0);
+  }
+  18% {
+    transform: translateY(1.5px);
+  }
+  55% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes jump-tuck {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30%,
+  75% {
+    transform: rotate(-48deg);
+  }
+}
+
+@keyframes jump-trail {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30%,
+  75% {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes jump-reach {
+  0% {
+    transform: rotate(10deg);
+  }
+  35%,
+  75% {
+    transform: rotate(-78deg);
+  }
+  100% {
+    transform: rotate(-20deg);
   }
 }
 

@@ -7,6 +7,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { HeroCharacter, type SpritePose } from './character'
+import { GiantSpider } from './spider'
 import { Layer } from './depth'
 import { GROUND, PROFESSION_SKY, Sky, Soft } from './places'
 import { useCut } from './cut'
@@ -20,9 +21,10 @@ import shade from './shade.module.css'
 // of a silhouette platformer. The visitor can spring it: he runs straight at it, the jaws snap, the
 // screen cuts to black and he drops back in from above at the checkpoint, the death the genre is
 // played through. The scene stands beside the words from a laptop up and above them on a phone.
+// The spider, lame since the trap line, lurks at the left edge and flinches back when the jaws snap.
 // Reduced motion skips the run and the snap.
 //
-// Animated: the fog, his parts and his run or drop, the two jaws, the layers' lean.
+// Animated: the fog, his parts and his run or drop, the two jaws, the layers' lean, the spider.
 
 type Trap = 'ready' | 'run' | 'snap' | 'respawn'
 
@@ -78,6 +80,7 @@ function ClearingScene({ profession, trap }: { profession: Profession; trap: Tra
       </Layer>
       <Layer depth="plane">
         <path d={GROUND} fill={SHADE.black} />
+        <GiantSpider pose={trap === 'snap' ? 'flinch' : 'lurk'} lame place={{ x: -70, y: 180, height: 120 }} />
         <rect x={380} y={175} width={40} height={4} fill={SHADE.black} />
         <path d={JAW_BACK} fill={SHADE.black} className={`${shade.jawBack} ${shut}`} />
         <path d={JAW_FRONT} fill={SHADE.black} className={`${shade.jawFront} ${shut}`} />

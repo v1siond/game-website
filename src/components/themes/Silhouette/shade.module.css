@@ -1,10 +1,10 @@
 /*
  * Silhouette's scenes and mechanics: the death cut, the four plane lean, the props that move in each
- * place, the wake iris, the lever and the rotating room, the spider chase, the rope down the chasm, the
- * floating crates, the sawmill, the rooftop signs, the electrified floor, the gravity switch and the
- * trap at the city's edge. Transform and opacity only; every loop stops under
- * reduced motion, and every reveal shows its last frame. The pointer arrives as --mx and --my (-1 to 1,
- * usePointerVars on the world root), a reveal's order as --i, set on the element.
+ * place, the wake iris, the lever and the rotating room, the spider chase, the trap line, the rope down
+ * the chasm, the floating crates and the waterline, the sawmill, the rooftop signs and their cable, the
+ * electrified floor, the gravity switch and the trap at the city's edge. Transform and opacity only;
+ * every loop stops under reduced motion, and every reveal shows its last frame. The pointer arrives as
+ * --mx and --my (-1 to 1, usePointerVars on the world root), a reveal's order as --i, set on the element.
  */
 
 /* ---- the death cut (cut.tsx) ---- */
@@ -273,33 +273,36 @@
   }
 }
 
-/* ---- the spider chase (chase.tsx): he runs and the spider follows as the section scrolls in ---- */
+/* ---- the spider chase (chase.tsx): each beat moves the spider and him to their next mark over the beat's
+   length (--ms), and an invisible timer as long as the beat steps the chase on when it ends ---- */
 
-.runAway {
-  transform: translateX(calc(var(--scene-progress, 0) * 440px));
+.walker {
+  transform: translateX(calc(var(--x, 0) * 1px));
+  transition: transform var(--ms, 600ms) cubic-bezier(0.4, 0, 0.3, 1);
 }
 
-.chase {
-  transform: translate(calc(var(--scene-progress, 0) * 360px - 30px), 12px);
+.beat {
+  animation: beat var(--ms, 600ms) linear both;
 }
 
-.stab {
-  transform-box: view-box;
-  transform-origin: 0 0;
-  animation: stab 0.7s cubic-bezier(0.7, 0, 0.3, 1) calc(var(--i, 0) * -0.35s) infinite;
+@keyframes beat {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0;
+  }
 }
 
-@keyframes stab {
-  0%,
-  100% {
-    transform: rotate(0deg) scaleY(1);
-  }
-  40% {
-    transform: rotate(-8deg) scaleY(0.82);
-  }
-  55% {
-    transform: rotate(2deg) scaleY(1.04);
-  }
+/* ---- the trap line (traps.tsx): the leg the trap keeps shows once the spider has torn free ---- */
+
+.tornOut {
+  opacity: 0;
+}
+
+.tornIn {
+  opacity: 1;
+  transition: opacity 300ms ease-out;
 }
 
 /* ---- the rope down the chasm (ropes.tsx): he slides down as the section scrolls, a touched job swings
@@ -307,6 +310,11 @@
 
 .slide {
   transform: translateY(calc(var(--scene-progress, 0) * 100%));
+}
+
+/* The spider's forelegs come down over the edge in the first quarter of his slide, and stop short. */
+.reach {
+  transform: translateY(calc(min(var(--scene-progress, 0) * 4, 1) * 70% - 80%));
 }
 
 .knotHang {
@@ -369,6 +377,12 @@
   }
 }
 
+/* ---- the waterline (crates.tsx): he pushes a crate along it as the hold scrolls by ---- */
+
+.pushAlong {
+  transform: translateX(calc(var(--scene-progress, 0) * 100%));
+}
+
 /* ---- the sawmill (mill.tsx): the carriage runs the rail once, the blade spins ---- */
 
 .carriage {
@@ -390,6 +404,17 @@
 .lantern {
   transform: translate3d(calc(var(--mx, 0) * 45vw), calc(var(--my, 0) * 45vh), 0);
   transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* ---- the cable over the signs (signs.tsx): he crosses it once ---- */
+
+.cableCross {
+  transform: translate3d(0, 0, 0);
+}
+
+.cableCrossed {
+  transform: translate3d(100%, 0, 0);
+  transition: transform 4.5s linear 0.4s;
 }
 
 /* ---- the electrified floor (stage.tsx): the current lights one plate per beat of a four count ---- */
@@ -545,7 +570,7 @@
 .jawBack,
 .jawFront {
   transform-box: view-box;
-  transform-origin: 450px 176px;
+  transform-origin: var(--pivot, 400px 176px);
   transition: transform 120ms cubic-bezier(0.7, 0, 1, 0.5);
 }
 
@@ -577,7 +602,6 @@
   .swingRight,
   .roomOut,
   .roomIn,
-  .stab,
   .bob,
   .blade,
   .dropIn,
@@ -614,10 +638,13 @@
   .leverHandle,
   .cogRing,
   .carriageRun,
+  .cableCrossed,
   .gravity,
   .runner,
   .jawBack,
-  .jawFront {
+  .jawFront,
+  .walker,
+  .tornIn {
     transition: none;
   }
 }

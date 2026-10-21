@@ -189,7 +189,8 @@
         "swingHint": "Touch a card to set it swinging",
         "lightHint": "Point into the dark to light a project",
         "flipGravity": "Flip gravity",
-        "springTrap": "Spring the trap"
+        "springTrap": "Spring the trap",
+        "chaseAgain": "Run from it again"
       },
       "myth": {
         "combo": "Strike the chain combo",
@@ -601,7 +602,8 @@
         "swingHint": "Toca una tarjeta para hacerla balancear",
         "lightHint": "Apunta a la oscuridad para iluminar un proyecto",
         "flipGravity": "Invertir la gravedad",
-        "springTrap": "Activar la trampa"
+        "springTrap": "Activar la trampa",
+        "chaseAgain": "Huye otra vez"
       },
       "myth": {
         "combo": "Lanzar el combo de cadenas",
@@ -1013,7 +1015,8 @@
         "swingHint": "Tocca una scheda per farla oscillare",
         "lightHint": "Punta nel buio per illuminare un progetto",
         "flipGravity": "Inverti la gravità",
-        "springTrap": "Fai scattare la trappola"
+        "springTrap": "Fai scattare la trappola",
+        "chaseAgain": "Scappa di nuovo"
       },
       "myth": {
         "combo": "Sferra la combo di catene",

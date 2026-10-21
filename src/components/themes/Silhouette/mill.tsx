@@ -5,6 +5,7 @@ import { ProjectList } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { HeroCharacter } from './character'
 import { ProjectCard } from './cards'
 import { SHADE } from './palette'
 import shade from './shade.module.css'
@@ -14,12 +15,14 @@ import world from './world.module.css'
 // runs over the section with a circular saw blade spinning in its carriage, and when the section comes
 // into view the carriage runs the rail once from one end to the other, the way the saws sweep a room
 // in the game. Girders stand in the dark behind the cards, and a lantern pool of warm light follows the
-// visitor's pointer over the floor, held to the screen while it scrolls by.
+// visitor's pointer over the floor, held to the screen while it scrolls by. He stands at the saw's
+// control box at the rail's start and works its keys when the section comes in, which sends the
+// carriage on its run.
 //
 // The carriage rides a track 4rem short of the rail (the carriage's width), so translating the track
 // by its own full width brings the carriage to the rail's far end.
 //
-// Animated: the carriage (once), the blade, the lantern.
+// Animated: the carriage (once), the blade, the lantern, his parts.
 
 // A saw blade: a disc with 16 hooked teeth and a hub, centred on (0, 0).
 const BLADE = (() => {
@@ -30,9 +33,30 @@ const BLADE = (() => {
   return `M${points.join(' L')} Z M-4 0 A4 4 0 1 0 4 0 A4 4 0 1 0 -4 0 Z`
 })()
 
+// The control box on its post, the screen lit while the saw runs.
+function ControlBox({ running }: { running: boolean }) {
+  return (
+    <svg viewBox="0 0 24 40" className="h-16 w-10" focusable="false">
+      <rect x={10} y={18} width={4} height={22} fill={SHADE.black} />
+      <rect x={2} y={4} width={20} height={16} fill={SHADE.black} />
+      <rect x={5} y={7} width={14} height={6} fill={running ? SHADE.rim : SHADE.fog} />
+    </svg>
+  )
+}
+
 function SawRail({ running }: { running: boolean }) {
   return (
-    <div className="relative mb-6 h-16" aria-hidden="true">
+    <div className="mb-6 flex items-end gap-1" aria-hidden="true">
+      <HeroCharacter profession="engineer" pose={running ? 'act' : 'idle'} className="block h-16 w-10 shrink-0" />
+      <ControlBox running={running} />
+      <Rail running={running} />
+    </div>
+  )
+}
+
+function Rail({ running }: { running: boolean }) {
+  return (
+    <div className="relative h-16 min-w-0 flex-1">
       <div className="absolute inset-x-0 top-3 h-2 bg-[color:var(--sh-black)]" />
       <div className={`absolute left-0 right-16 top-0 h-16 ${shade.carriage} ${running ? shade.carriageRun : ''}`}>
         <svg viewBox="-32 -14 64 64" className="h-16 w-16 overflow-visible" focusable="false">
