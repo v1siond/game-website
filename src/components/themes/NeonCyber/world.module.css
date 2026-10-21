@@ -6,7 +6,7 @@
 .root {
   --mx: 0;
   --my: 0;
-  font-family: 'Share Tech Mono', ui-monospace, 'Courier New', monospace;
+  font-family: var(--neon-face), ui-monospace, 'Courier New', monospace;
   color: var(--neon-ice);
   background: var(--neon-ink);
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Lilita_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
@@ -15,6 +16,9 @@ import { PartnerBarrel } from './TropicalPlatformer/partnerBarrel'
 import { PostsLevel, SECTION_VIEWS } from './TropicalPlatformer/sections'
 import { TreehouseContact } from './TropicalPlatformer/nightfall'
 import look from './TropicalPlatformer/jungle.module.css'
+
+// The world's own lettering: the root carries its --tp-face variable and the world's css reads it.
+const jungleFace = Lilita_One({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--tp-face' })
 
 // Tropical Platformer, a jungle barrel platformer from sunset to night: the page composition. He is shot
 // out of his tree house in the sunset (the hero), picks a profession at the partner barrel, crosses the
@@ -40,7 +44,7 @@ export default function TropicalPlatformerTheme() {
   if (!mounted) return null
 
   return (
-    <div ref={pointer} style={PALETTE_VARS} className={`relative min-h-screen overflow-x-clip ${look.root}`}>
+    <div ref={pointer} style={PALETTE_VARS} className={`relative min-h-screen overflow-x-clip ${look.root} ${jungleFace.variable}`}>
       <JungleDefs />
       <Canopy />
 

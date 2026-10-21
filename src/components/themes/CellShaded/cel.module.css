@@ -16,7 +16,7 @@
 
 /* The display lettering: a heavy condensed face, upper case, the ink line round each letter. */
 .display {
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
+  font-family: var(--cel-face), Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
   font-weight: 400;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -89,7 +89,7 @@
   border: 4px solid var(--cel-ink);
   box-shadow: 4px 4px 0 var(--cel-ink);
   color: var(--cel-ink);
-  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
+  font-family: var(--cel-face), Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
   font-size: 1.125rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;

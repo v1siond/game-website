@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -17,6 +18,9 @@ import { QuickChange } from './CellShaded/quickChange'
 import { SECTION_VIEWS } from './CellShaded/sections'
 import { RespawnStation } from './CellShaded/respawn'
 import cel from './CellShaded/cel.module.css'
+
+// The world's own lettering: the root carries its --cel-face variable and the world's css reads it.
+const celFace = Bangers({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--cel-face' })
 
 // Cell Shaded, the inked wasteland looter shooter: the page is one day in the desert. He arrives in a
 // freeze frame intro card at noon, the quick change station switches his outfit, the town's bounty
@@ -47,7 +51,7 @@ export default function CellShadedTheme() {
   if (!mounted) return null
 
   return (
-    <div ref={pointerRef} style={ROOT_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${cel.root}`}>
+    <div ref={pointerRef} style={ROOT_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>
       <HatchDefs />
       <Wasteland />
       <ZoneStageProvider value={{ reduced, onZone }}>

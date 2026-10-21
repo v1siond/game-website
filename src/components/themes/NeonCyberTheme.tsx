@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
@@ -15,6 +16,9 @@ import { SECTION_VIEWS } from './NeonCyber/views'
 import { HoloCall } from './NeonCyber/holocall'
 import { NEON_VARS } from './NeonCyber/palette'
 import world from './NeonCyber/world.module.css'
+
+// The world's own lettering: the root carries its --neon-face variable and the world's css reads it.
+const neonFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--neon-face' })
 
 // Neon Cyber, the default world: a netrunner's night city seen through the optics HUD. The page
 // composition: the hero boots the optics (./NeonCyber/boot), the profession switch is the quickhack
@@ -44,7 +48,7 @@ export default function NeonCyberTheme() {
   if (!mounted) return null
 
   return (
-    <div ref={rootRef} data-scan={scanning ? 'on' : 'off'} className={`relative min-h-screen overflow-x-clip ${world.root}`} style={NEON_VARS}>
+    <div ref={rootRef} data-scan={scanning ? 'on' : 'off'} className={`relative min-h-screen overflow-x-clip ${world.root} ${neonFace.variable}`} style={NEON_VARS}>
       <CityBackdrop />
       <ScanVeil />
 

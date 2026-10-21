@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
@@ -13,6 +14,9 @@ import { WristComputer } from './RetroAtomic/wristComputer'
 import { SECTION_VIEWS } from './RetroAtomic/sections'
 import { ContactTerminal } from './RetroAtomic/terminal'
 import atomic from './RetroAtomic/atomic.module.css'
+
+// The world's own lettering: the root carries its --atomic-face variable and the world's css reads it.
+const atomicFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--atomic-face' })
 
 // Retro Atomic, a fallout shelter of the atomic age seen through his wrist terminal: the page
 // composition. The visit opens on the shelter's cog door rolling aside (./RetroAtomic/vaultDoor); behind
@@ -42,7 +46,7 @@ export default function RetroAtomicTheme() {
   if (!mounted) return null
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${atomic.root}`}>
+    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${atomic.root} ${atomicFace.variable}`}>
       <ShelterBackdrop />
       {!reducedMotion && <VaultEntrance onOpened={onOpened} />}
 

@@ -9,7 +9,7 @@
  */
 
 .root {
-  --tp-display: 'Arial Rounded MT Bold', 'Trebuchet MS', 'Arial Black', system-ui, sans-serif;
+  --tp-display: var(--tp-face), 'Arial Rounded MT Bold', 'Trebuchet MS', 'Arial Black', system-ui, sans-serif;
   font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: var(--tp-parchment);
   background: linear-gradient(

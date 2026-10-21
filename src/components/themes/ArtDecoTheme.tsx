@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
@@ -16,6 +17,9 @@ import { BrassPanel, Chamber } from './ArtDeco/plaque'
 import { POSTS_DEPTH, SECTION_VIEWS } from './ArtDeco/sections'
 import { ContactHatch } from './ArtDeco/hatch'
 import look from './ArtDeco/world.module.css'
+
+// The world's own lettering: the root carries its --deco-face variable and the world's css reads it.
+const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--deco-face' })
 
 // Art Deco, the 1920s city at the bottom of the sea in brass, gold and lamplight: the page composition.
 // The visitor arrives in the bathysphere as it sinks past the lighthouse to the city (the hero), picks a
@@ -41,7 +45,7 @@ export default function ArtDecoTheme() {
   if (!mounted) return null
 
   return (
-    <div ref={pointer} style={DECO_VARS} className={`relative min-h-screen overflow-x-clip ${look.root}`}>
+    <div ref={pointer} style={DECO_VARS} className={`relative min-h-screen overflow-x-clip ${look.root} ${decoFace.variable}`}>
       <DecoSVGDefs />
 
       <DecoPatternBackground />

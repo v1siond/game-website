@@ -14,7 +14,7 @@
 .root {
   background: theme('colors.atomic.ink');
   color: theme('colors.atomic.phosphor');
-  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-family: var(--atomic-face), ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .root:has([data-vats='on']) .ambient,

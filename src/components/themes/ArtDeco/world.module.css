@@ -8,7 +8,7 @@
 
 .root {
   /* The type: the geometric sans of the city's signs and a book serif for reading, both from the system. */
-  --deco-display: 'Century Gothic', 'Futura', 'Avenir Next', 'Trebuchet MS', sans-serif;
+  --deco-display: var(--deco-face), 'Century Gothic', 'Futura', 'Avenir Next', 'Trebuchet MS', sans-serif;
   --deco-body: Georgia, 'Times New Roman', serif;
 
   background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-deep-sea), var(--deco-abyss));
