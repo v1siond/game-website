@@ -9,7 +9,7 @@ import { paletteVars } from '../shared/paletteVars'
 // world's root as --myth-* variables for the CSS modules and the Tailwind arbitrary values.
 
 export const MYTH = {
-  // ---- the registry's keys (src/themes/themes.ts reads these for the worlds menu and the error screen)
+  // ---- the backdrop and the codex (src/themes/themes.ts reads sky, bone, panel and gold for the worlds menu and the error screen)
   // the backdrop the world opens on
   sky: '#1d0b14',
   // the parchment of the codex and the prophecies, and the dark ink set on it
