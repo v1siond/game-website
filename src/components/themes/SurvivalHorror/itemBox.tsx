@@ -69,13 +69,13 @@ function ItemSlot({ option, onTake }: { option: ProfessionOption; onTake: () => 
       type="button"
       {...option.optionProps}
       onClick={onTake}
-      className={`relative flex min-h-[44px] flex-col items-center justify-center gap-2 border-2 p-2 ${look.slot} ${look.focus} ${slot.frame}`}
+      className={`relative flex min-h-[44px] min-w-0 flex-col items-center justify-center gap-2 border-2 p-2 ${look.slot} ${look.focus} ${slot.frame}`}
     >
       {CORNER_MARKS.map((place) => (
         <span key={place} className={`absolute h-3 w-3 ${place} ${slot.corner}`} aria-hidden="true" />
       ))}
       <ItemIcon profession={option.id} className="h-10 w-10 sm:h-12 sm:w-12" />
-      <span className={`text-center text-sm leading-tight ${slot.label}`} aria-hidden="true">
+      <span className={`max-w-full text-center text-sm leading-tight [overflow-wrap:anywhere] ${slot.label}`} aria-hidden="true">
         {option.label}
       </span>
     </button>
@@ -125,7 +125,7 @@ export function ItemBox() {
           </div>
           <div>
             <p className={`mb-2 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-brass)] ${look.typed}`}>{words.itemBox}</p>
-            <ProfessionSwitch className="grid grid-cols-3 gap-3" label={navigation.profession} renderOption={(option) => <ItemSlot option={option} onTake={() => take(option)} />} />
+            <ProfessionSwitch className="grid grid-cols-3 gap-2 sm:gap-3" label={navigation.profession} renderOption={(option) => <ItemSlot option={option} onTake={() => take(option)} />} />
             <p className="mt-3 text-sm italic text-[color:var(--sh-fog)]">{words.itemBoxHint}</p>
           </div>
         </div>

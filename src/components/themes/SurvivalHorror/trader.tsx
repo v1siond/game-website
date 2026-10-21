@@ -5,6 +5,7 @@ import type { Company } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SH } from './palette'
 import horror from './horror.module.css'
@@ -70,7 +71,9 @@ function Ware({ company }: { company: Company }) {
       className={`relative block p-4 ${look.file} ${look.focus} ${horror.ware}`}
     >
       <span className="absolute -top-2 left-1/2 h-4 w-1 -translate-x-1/2 bg-[color:var(--sh-brass)]" aria-hidden="true" />
-      <h3 className="text-base text-[color:var(--sh-ivory)]">{company.name}</h3>
+      <h3 className="text-base text-[color:var(--sh-ivory)]">
+        <SlashBreaks text={company.name} />
+      </h3>
       <p className="mb-2 text-sm text-[color:var(--sh-brass)]">{company.tagline}</p>
       <p className="text-sm leading-relaxed text-[color:var(--sh-fog)]">{company.description}</p>
       {company.services.length > 0 && (

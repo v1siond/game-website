@@ -5,6 +5,7 @@ import { newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { Board } from './levelSign'
 import look from './jungle.module.css'
 
@@ -56,8 +57,10 @@ export function VentureBoard({ companies }: { companies: CVData['companies'] }) 
               <span className="text-2xl" aria-hidden="true">
                 {company.icon}
               </span>
-              <span>
-                <span className={`block text-lg ${look.display}`}>{company.name}</span>
+              <span className="min-w-0">
+                <span className={`block text-lg ${look.display}`}>
+                  <SlashBreaks text={company.name} />
+                </span>
                 <span className="block text-sm">{company.tagline}</span>
               </span>
             </span>

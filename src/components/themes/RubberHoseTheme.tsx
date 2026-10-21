@@ -130,11 +130,11 @@ export default function RubberHoseTheme() {
 
         <footer className="relative z-20 py-8 text-center">
           <div className="flex items-center justify-center gap-4">
-            <div className="h-0.5 w-16 bg-[var(--hose-ink)]" aria-hidden="true" />
+            <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
             <p className={`text-sm tracking-widest ${world.muted}`}>
               © {new Date().getFullYear()} <NameWords name={view.hero.name} />
             </p>
-            <div className="h-0.5 w-16 bg-[var(--hose-ink)]" aria-hidden="true" />
+            <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
           </div>
         </footer>
       </div>

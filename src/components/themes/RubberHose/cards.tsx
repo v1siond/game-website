@@ -9,6 +9,7 @@ import world from './world.module.css'
 import styles from './scenes.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
 // Rubber Hose's cards, sepia posters and title cards under one ink line: the tech bubbles, a job's title
 // card, a project's show poster, a venture's advertisement and a band's record label. A poster throws an
@@ -81,7 +82,9 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         {start} - {end}
       </p>
       <h3 className={`text-lg ${world.lettering}`}>{entry.title}</h3>
-      <p className={`mb-2 text-sm ${world.red}`}>{entry.company}</p>
+      <p className={`mb-2 text-sm ${world.red}`}>
+        <SlashBreaks text={entry.company} />
+      </p>
       {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
         <ul className="space-y-1" aria-label={cards.keyAchievements}>
@@ -110,7 +113,9 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
       <CornerTicks />
       <InkBlot />
       <div className="mt-1 flex items-start justify-between gap-2">
-        <h3 className={`text-base uppercase ${world.red} ${world.lettering}`}>{project.name}</h3>
+        <h3 className={`min-w-0 text-base uppercase ${world.red} ${world.lettering}`}>
+          <SlashBreaks text={project.name} />
+        </h3>
         {years && <span className={`whitespace-nowrap ${BODY}`}>{years}</span>}
       </div>
       <p className={`mb-1 font-bold ${BODY}`}>{project.role}</p>
@@ -155,8 +160,10 @@ export function CompanyPoster({ company }: { company: CVData['companies'][number
         <span className="text-3xl" aria-hidden="true">
           {company.icon}
         </span>
-        <div>
-          <h3 className={`text-base font-bold ${world.ink}`}>{company.name}</h3>
+        <div className="min-w-0">
+          <h3 className={`text-base font-bold ${world.ink}`}>
+            <SlashBreaks text={company.name} />
+          </h3>
           <p className={`text-sm ${world.red}`}>{company.tagline}</p>
         </div>
       </div>

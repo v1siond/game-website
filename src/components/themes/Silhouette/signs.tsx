@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { PROFESSION_SKY } from './places'
 import { SHADE, type SkyLight } from './palette'
@@ -98,7 +99,7 @@ export function VentureSigns({ companies }: { companies: CVData['companies'] }) 
                   <span className="mr-2 grayscale" aria-hidden="true">
                     {company.icon}
                   </span>
-                  {company.name}
+                  <SlashBreaks text={company.name} />
                 </h3>
                 <p className={`mt-1 ${META}`}>{company.tagline}</p>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-text)]">{company.description}</p>

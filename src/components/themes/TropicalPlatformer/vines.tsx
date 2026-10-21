@@ -4,6 +4,7 @@ import { useRef, useState, type CSSProperties } from 'react'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
@@ -60,6 +61,10 @@ interface CardProps {
   onCollect: (index: number) => void
 }
 
+// The coins hang over the card's top right corner. Where the card is narrow (a phone, the two up tablet
+// columns) the name starts below them; from lg up the card is wide enough to run beside them.
+const CLEAR_COINS = 'pt-6 lg:pr-24 lg:pt-0'
+
 function HangingCard({ slot, index, letters, found, onCollect }: CardProps) {
   const labels = useLabels()
   const { project, years, links } = slot
@@ -90,7 +95,9 @@ function HangingCard({ slot, index, letters, found, onCollect }: CardProps) {
           </div>
         )}
 
-        <h3 className={`pr-24 text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>{project.name}</h3>
+        <h3 className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display} ${letters.length > 0 ? CLEAR_COINS : ''}`}>
+          <SlashBreaks text={project.name} />
+        </h3>
         {project.role && <p className="mt-1 text-sm font-bold text-[color:var(--tp-plank-light)]">{project.role}</p>}
         {years && <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{years}</p>}
         {project.tagline && <p className="mt-3 text-base leading-relaxed text-[color:var(--tp-parchment)]">{project.tagline}</p>}

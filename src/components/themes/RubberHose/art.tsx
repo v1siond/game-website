@@ -79,7 +79,7 @@ export function CurlBanner({ id, children }: { id?: string; children: ReactNode 
 // eye, a word never breaking across lines; the heading is read as the plain name.
 export function CartoonTitle({ text }: { text: string }) {
   return (
-    <h1 className={`text-[clamp(2rem,5vw,3.5rem)] leading-tight ${world.lettering}`}>
+    <h1 className={`text-[clamp(1.5rem,7.5vw,2rem)] leading-tight sm:text-[clamp(2rem,5vw,3.5rem)] ${world.lettering}`}>
       <span className="sr-only">{text}</span>
       <span className={`inline-flex flex-wrap justify-center gap-x-4 ${world.title} ${world.titleBounce}`} aria-hidden="true">
         <NameWords name={text} wordClassName="inline-flex gap-x-1" letter={(char) => <span className="inline-block">{char}</span>} />

@@ -3,6 +3,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { Job } from '@/lib/cv/content'
 import { jobYears } from '@/components/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
@@ -52,7 +53,9 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       <div className="mb-1 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className={CARD_TITLE}>{entry.title}</h3>
-          <p className={`mt-0.5 ${CARD_META}`}>{entry.company}</p>
+          <p className={`mt-0.5 ${CARD_META}`}>
+            <SlashBreaks text={entry.company} />
+          </p>
         </div>
         <span className={`whitespace-nowrap uppercase ${CARD_META}`}>
           {start} - {end}
@@ -88,7 +91,9 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
   return (
     <Card>
       <div className="flex items-start justify-between gap-2">
-        <h3 className={CARD_TITLE}>{project.name}</h3>
+        <h3 className={`min-w-0 ${CARD_TITLE}`}>
+          <SlashBreaks text={project.name} />
+        </h3>
         {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
       </div>
       <p className="mt-0.5 text-sm text-[color:var(--sh-text)]">{project.role}</p>

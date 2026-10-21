@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { jobYears } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
@@ -85,7 +86,9 @@ function Platform({ entry, index, occupied, landed, aim, nextName, onBlast, barr
 
       <div className="pr-16">
         <h3 className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>{entry.title}</h3>
-        <p className="mt-1 text-base text-[color:var(--tp-parchment)]">{entry.company}</p>
+        <p className="mt-1 text-base text-[color:var(--tp-parchment)]">
+          <SlashBreaks text={entry.company} />
+        </p>
         <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{fillLabel(years.range, { start, end })}</p>
       </div>
 

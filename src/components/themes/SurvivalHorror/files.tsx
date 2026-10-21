@@ -6,6 +6,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { jobYears } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
 import { Mark, STAMP } from './cards'
@@ -49,7 +50,9 @@ function MapRoom({ job, searched, here }: { job: Job; searched: boolean; here: b
       className={`relative flex min-h-[56px] min-w-[8rem] flex-1 items-center gap-2 border-2 border-[color:var(--sh-void)] px-3 py-2 text-sm text-[color:var(--sh-ivory)] ${horror.mapRoom} ${searched ? horror.mapRoomSearched : ''}`}
     >
       {searched ? <Check /> : <Unsearched />}
-      <span className="min-w-0">{job.company}</span>
+      <span className="min-w-0">
+        <SlashBreaks text={job.company} />
+      </span>
       {here && (
         <svg viewBox="0 0 12 12" className={`absolute -top-3 left-1/2 h-4 w-4 -translate-x-1/2 ${horror.youAreHere}`} aria-hidden="true" focusable="false">
           <path d="M6 12 L0 2 H12 Z" fill="var(--sh-flame)" />
@@ -95,7 +98,9 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
       <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="text-base text-[color:var(--sh-ivory)]">{job.title}</h3>
-          <p className="text-sm text-[color:var(--sh-brass)]">{job.company}</p>
+          <p className="text-sm text-[color:var(--sh-brass)]">
+            <SlashBreaks text={job.company} />
+          </p>
         </div>
         <span className={STAMP}>
           {start} - {end}

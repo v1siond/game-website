@@ -5,6 +5,7 @@ import type { Project } from '@/lib/cv/content'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
@@ -78,7 +79,9 @@ function ItemFront({ slot, index, onExamine }: { slot: ProjectSlot; index: numbe
   return (
     <div className="flex h-full flex-col items-center gap-3 p-4 text-center">
       <ItemPicture index={index} />
-      <h3 className="text-base text-[color:var(--sh-ivory)]">{project.name}</h3>
+      <h3 className="text-base text-[color:var(--sh-ivory)]">
+        <SlashBreaks text={project.name} />
+      </h3>
       <p className="text-sm text-[color:var(--sh-cream)]">{project.role}</p>
       {years && <span className={STAMP}>{years}</span>}
       <p className="text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.tagline}</p>
@@ -110,7 +113,9 @@ function ItemBack({ slot, onPutBack }: { slot: ProjectSlot; onPutBack: () => voi
 
   return (
     <div className="flex h-full flex-col p-4">
-      <h3 className={`text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>{project.name}</h3>
+      <h3 className={`text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>
+        <SlashBreaks text={project.name} />
+      </h3>
       <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.description}</p>
       {project.impact && <p className="mt-2 text-sm italic text-[color:var(--sh-ivory)]">{project.impact}</p>}
       <ToolList project={project} />
