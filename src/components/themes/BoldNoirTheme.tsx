@@ -11,6 +11,7 @@ import { ProfessionCard } from './BoldNoir/cards'
 import { CVLink, EngineLink, HeroAction } from './BoldNoir/actions'
 import { SECTION_VIEWS } from './BoldNoir/sections'
 import { ContactScene } from './BoldNoir/scenes'
+import { NOIR_VARS } from './BoldNoir/palette'
 import world from './BoldNoir/world.module.css'
 
 // Bold Noir, the graphic novel night (black, white and one red accent, rain, venetian blind light, hard
@@ -32,7 +33,7 @@ export default function BoldNoirTheme() {
   if (!mounted) return null
 
   return (
-    <div className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`}>
+    <div className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={NOIR_VARS}>
       <NoirBackdrop />
 
       {/* the recruiter first screen */}
@@ -43,8 +44,8 @@ export default function BoldNoirTheme() {
               <div className="min-w-0">
                 <h1 className={`break-words text-5xl uppercase tracking-wider sm:text-7xl ${world.title}`}>{name}</h1>
                 <p className={`mt-3 inline-block px-3 py-1 text-base font-bold ${world.typed} ${world.caption}`}>{headline}</p>
-                <p className={`mt-3 text-base italic text-[#f2efe6] ${world.copy}`}>{tagline}</p>
-                <p className={`mt-1 text-sm text-[#a3a3a3] ${world.copy}`}>{line}</p>
+                <p className={`mt-3 text-base italic text-[color:var(--noir-paper)] ${world.copy}`}>{tagline}</p>
+                <p className={`mt-1 text-sm text-[color:var(--noir-fog)] ${world.copy}`}>{line}</p>
               </div>
 
               <nav className="flex flex-wrap items-center gap-3" aria-label="Contact and CV">
@@ -77,11 +78,11 @@ export default function BoldNoirTheme() {
       <ContactScene profession={active} />
 
       <footer className="relative z-20 flex items-center justify-center gap-3 py-10" role="contentinfo">
-        <span className="block h-1 w-10 bg-[#ff0033]" aria-hidden="true" />
-        <p className={`text-sm text-[#a3a3a3] ${world.copy}`}>
+        <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />
+        <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>
           © {new Date().getFullYear()} {view.hero.name}
         </p>
-        <span className="block h-1 w-10 bg-[#ff0033]" aria-hidden="true" />
+        <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />
       </footer>
     </div>
   )

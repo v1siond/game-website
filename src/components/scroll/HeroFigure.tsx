@@ -7,7 +7,7 @@ import scene from './heroScene.module.css'
 // guard in heroScene.module.css) swings them from the shoulder or hip with transforms only.
 
 export const HERO_SKIN = '#b5703f'
-const SKIN_SHADE = '#8a4f2b'
+export const HERO_SKIN_SHADE = '#8a4f2b'
 const HAIR = '#241a24'
 
 interface ArmProps {
@@ -67,7 +67,7 @@ export function HeroFigure({ className = '', eye, torso, arm, leg, overHair = nu
       <g className={`${scene.limb} ${scene.legBack}`}>{leg(28)}</g>
 
       {torso}
-      <rect x={29} y={26} width={6} height={5} fill={SKIN_SHADE} />
+      <rect x={29} y={26} width={6} height={5} fill={HERO_SKIN_SHADE} />
 
       {/* head: ears, face, the short hair, the full beard, the oval eyes */}
       <circle cx={21.5} cy={19} r={2.6} fill={HERO_SKIN} />

@@ -10,8 +10,8 @@ import world from './world.module.css'
 // captions, with the red accent on what the eye must land on.
 
 const SELECT_LOOK = {
-  on: 'border-[#ff0033] -translate-y-1',
-  off: 'border-[#5c5c5c] hover:border-[#f2efe6]',
+  on: 'border-[color:var(--noir-red)] -translate-y-1',
+  off: 'border-[color:var(--noir-ash)] hover:border-[color:var(--noir-paper)]',
 }
 
 // One card of the shared profession switch, a lineup: him in that profession's costume against the
@@ -31,8 +31,8 @@ export function ProfessionCard({ id, label, selected, optionProps }: ProfessionO
   )
 }
 
-const BODY = `text-sm text-[#d6d3cb] ${world.copy}`
-const CHIP = `border border-[#5c5c5c] px-2 py-0.5 text-sm text-[#f2efe6] ${world.copy}`
+const BODY = `text-sm text-[color:var(--noir-paper-dim)] ${world.copy}`
+const CHIP = `border border-[color:var(--noir-ash)] px-2 py-0.5 text-sm text-[color:var(--noir-paper)] ${world.copy}`
 
 export function TechStackBoard({ categories }: { categories: CVData['techStack'] }) {
   return (
@@ -40,7 +40,7 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
       {categories.map((category) => (
         <div key={category.id}>
           <h3 className="mb-2 flex items-center gap-3 text-xl uppercase tracking-widest">
-            <span className="block h-3 w-3 bg-[#ff0033]" aria-hidden="true" />
+            <span className="block h-3 w-3 bg-[color:var(--noir-red)]" aria-hidden="true" />
             {category.name}
           </h3>
           <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
@@ -66,7 +66,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           <h3 className="text-2xl tracking-wide">{entry.title}</h3>
           <p className={`font-bold ${BODY}`}>{entry.company}</p>
         </div>
-        <p className={`whitespace-nowrap bg-[#ff0033] px-2 py-0.5 text-sm font-bold text-[#0a0a0a] ${world.typed}`}>
+        <p className={`whitespace-nowrap bg-[color:var(--noir-red)] px-2 py-0.5 text-sm font-bold text-[color:var(--noir-ink)] ${world.typed}`}>
           {start} - {end}
         </p>
       </div>
@@ -75,7 +75,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         <ul className="mt-3 space-y-1.5" aria-label="Key achievements">
           {entry.highlights.map((highlight) => (
             <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
-              <span className="mt-1.5 block h-2 w-2 flex-shrink-0 bg-[#ff0033]" aria-hidden="true" />
+              <span className="mt-1.5 block h-2 w-2 flex-shrink-0 bg-[color:var(--noir-red)]" aria-hidden="true" />
               {highlight}
             </li>
           ))}
@@ -94,7 +94,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
   )
 }
 
-const LINK_BUTTON = `inline-flex min-h-[44px] items-center border-2 border-[#f2efe6] px-3 text-base uppercase tracking-wider text-[#f2efe6] transition-colors hover:bg-[#f2efe6] hover:text-[#0a0a0a] motion-reduce:transition-none`
+const LINK_BUTTON = `inline-flex min-h-[44px] items-center border-2 border-[color:var(--noir-paper)] px-3 text-base uppercase tracking-wider text-[color:var(--noir-paper)] transition-colors hover:bg-[color:var(--noir-paper)] hover:text-[color:var(--noir-ink)] motion-reduce:transition-none`
 
 export function ProjectCard({ project, years, links }: ProjectSlot) {
   const titleId = `noir-project-${project.id}`
@@ -105,7 +105,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         <h3 id={titleId} className="text-2xl tracking-wide">
           {project.name}
         </h3>
-        {years && <span className={`whitespace-nowrap text-sm font-bold text-[#a3a3a3] ${world.typed}`}>{years}</span>}
+        {years && <span className={`whitespace-nowrap text-sm font-bold text-[color:var(--noir-fog)] ${world.typed}`}>{years}</span>}
       </div>
       <p className={`mb-1 font-bold ${BODY}`}>{project.role}</p>
       <p className={`mb-3 ${BODY}`}>{project.tagline}</p>
@@ -139,7 +139,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
-      className={`block h-full p-4 transition-colors hover:border-[#f2efe6] motion-reduce:transition-none ${world.card}`}
+      className={`block h-full p-4 transition-colors hover:border-[color:var(--noir-paper)] motion-reduce:transition-none ${world.card}`}
     >
       <div className="mb-2 flex items-center gap-3">
         <span className="text-3xl" aria-hidden="true">

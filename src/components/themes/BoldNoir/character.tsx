@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_SKIN as SKIN, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { HERO_SKIN as SKIN, HERO_SKIN_SHADE, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
 import { NOIR } from './palette'
 
 // Him in Bold Noir (the shared HeroFigure), dressed in black, white and greys with one touch of red:
@@ -92,7 +92,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     torso: (
       <>
         <path d={TORSO} fill={SKIN} />
-        <path d="M26 40 Q32 43 38 40 M32 44 V54" fill="none" stroke="#8a4f2b" strokeWidth={0.8} />
+        <path d="M26 40 Q32 43 38 40 M32 44 V54" fill="none" stroke={HERO_SKIN_SHADE} strokeWidth={0.8} />
         <rect x={23} y={55} width={18} height={4} fill={NOIR.red} />
       </>
     ),

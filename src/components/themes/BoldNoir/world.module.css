@@ -6,15 +6,8 @@
  * and it stops under reduced motion.
  */
 
+/* The colours come from palette.ts as --noir-* (NOIR_VARS on the root). */
 .root {
-  --noir-ink: #0a0a0a;
-  --noir-coal: #161616;
-  --noir-smoke: #2a2a2a;
-  --noir-ash: #5c5c5c;
-  --noir-fog: #a3a3a3;
-  --noir-paper: #f2efe6;
-  --noir-red: #ff0033;
-
   background: var(--noir-ink);
   color: var(--noir-paper);
   font-family: 'Bebas Neue', 'Impact', 'Arial Narrow', sans-serif;

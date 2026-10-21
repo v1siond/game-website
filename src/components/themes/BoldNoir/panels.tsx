@@ -26,7 +26,7 @@ export function SectionTitle({ children }: { children: string }) {
   return (
     <div className="mb-8 flex items-center gap-4">
       <h2 className={CAPTION}>{children}</h2>
-      <span className="h-1 flex-1 bg-[#ff0033]" aria-hidden="true" />
+      <span className="h-1 flex-1 bg-[color:var(--noir-red)]" aria-hidden="true" />
     </div>
   )
 }
@@ -34,7 +34,7 @@ export function SectionTitle({ children }: { children: string }) {
 // His bio as the narration of the opening panel: typed on paper, the red bar down its edge.
 export function Narration({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <section className={`relative border-l-8 border-[#ff0033] p-6 ${world.caption}`} aria-label={label}>
+    <section className={`relative border-l-8 border-[color:var(--noir-red)] p-6 ${world.caption}`} aria-label={label}>
       {children}
     </section>
   )

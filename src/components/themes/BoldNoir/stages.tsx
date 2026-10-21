@@ -26,7 +26,7 @@ import styles from './scenes.module.css'
 // the strike flash.
 
 function Street() {
-  return <LevelGround className="border-[#5c5c5c] bg-[#0a0a0a]" />
+  return <LevelGround className="border-[color:var(--noir-ash)] bg-[color:var(--noir-ink)]" />
 }
 
 // ---- System Engineer: the wet street at night ----

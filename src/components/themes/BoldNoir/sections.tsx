@@ -18,7 +18,7 @@ import { drumsSince } from '@/components/cv/sectionText'
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
 // Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
 
-const LEAD = `text-base text-[#d6d3cb] ${world.copy}`
+const LEAD = `text-base text-[color:var(--noir-paper-dim)] ${world.copy}`
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -131,16 +131,16 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
             martialArts={martialArts}
             classNames={{
               facts: `mb-5 grid gap-3 sm:grid-cols-2 ${world.copy}`,
-              fact: 'border-l-4 border-[#ff0033] bg-[#0a0a0a] px-4 py-3',
-              term: `text-sm font-bold uppercase tracking-widest text-[#a3a3a3] ${world.typed}`,
-              value: 'mt-1 text-sm text-[#f2efe6]',
+              fact: 'border-l-4 border-[color:var(--noir-red)] bg-[color:var(--noir-ink)] px-4 py-3',
+              term: `text-sm font-bold uppercase tracking-widest text-[color:var(--noir-fog)] ${world.typed}`,
+              value: 'mt-1 text-sm text-[color:var(--noir-paper)]',
               achievements: `space-y-3 ${world.copy}`,
-              achievement: 'text-sm text-[#f2efe6]',
+              achievement: 'text-sm text-[color:var(--noir-paper)]',
             }}
             renderAchievement={(achievement) => (
               <SceneItem kind="panel">
                 <p className={`flex items-start gap-2 p-3 ${world.card}`}>
-                  <span className="mt-1.5 block h-2 w-2 flex-shrink-0 bg-[#ff0033]" aria-hidden="true" />
+                  <span className="mt-1.5 block h-2 w-2 flex-shrink-0 bg-[color:var(--noir-red)]" aria-hidden="true" />
                   <span>{achievement}</span>
                 </p>
               </SceneItem>

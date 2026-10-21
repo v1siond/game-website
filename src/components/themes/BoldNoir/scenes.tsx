@@ -8,6 +8,7 @@ import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/componen
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { RainStreaks } from './backdrop'
+import { NOIR } from './palette'
 import { PROFESSION_STAGES } from './stages'
 import { CVLink, HeroAction } from './actions'
 import { CAPTION } from './panels'
@@ -30,7 +31,7 @@ export function Strip({ profession, zone }: { profession: Profession; zone: Leve
     <LevelStrip
       stage={PROFESSION_STAGES[profession]}
       zone={zone}
-      className={`${styles.tempo} h-28 border-[3px] border-[#f2efe6] bg-[#161616] sm:h-40`}
+      className={`${styles.tempo} h-28 border-[3px] border-[color:var(--noir-paper)] bg-[color:var(--noir-coal)] sm:h-40`}
       hero={
         <div className="absolute bottom-1 left-2">
           <HeroCharacter profession={profession} className={scene.hero} />
@@ -43,11 +44,11 @@ export function Strip({ profession, zone }: { profession: Profession; zone: Leve
 export type SceneItemKind = 'panel' | 'photo'
 
 function PanelFrame() {
-  return <div className={`pointer-events-none absolute -top-2 left-0 h-1 w-full bg-[#ff0033] ${styles.panelLine}`} aria-hidden="true" />
+  return <div className={`pointer-events-none absolute -top-2 left-0 h-1 w-full bg-[color:var(--noir-red)] ${styles.panelLine}`} aria-hidden="true" />
 }
 
 function PhotoFrame() {
-  return <div className={`pointer-events-none absolute -inset-2 bg-[#f2efe6] ${styles.flash}`} aria-hidden="true" />
+  return <div className={`pointer-events-none absolute -inset-2 bg-[color:var(--noir-paper)] ${styles.flash}`} aria-hidden="true" />
 }
 
 const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
@@ -73,7 +74,7 @@ function OpeningBlinds() {
     <svg viewBox="0 0 160 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <g transform="skewY(-12) translate(0 20)">
         {SLATS.map((y) => (
-          <rect key={y} x={-10} y={y} width={180} height={9} fill="#f2efe6" fillOpacity={0.14} className={styles.slat} />
+          <rect key={y} x={-10} y={y} width={180} height={9} fill={NOIR.paper} fillOpacity={0.14} className={styles.slat} />
         ))}
       </g>
     </svg>
@@ -89,10 +90,10 @@ export function ContactScene({ profession }: { profession: Profession }) {
     <ContactStage
       headingId={CONTACT_HEADING}
       corner={
-        <div className={`relative h-44 overflow-hidden border-[3px] border-[#f2efe6] bg-[#161616] ${styles.tempo}`} aria-hidden="true">
+        <div className={`relative h-44 overflow-hidden border-[3px] border-[color:var(--noir-paper)] bg-[color:var(--noir-coal)] ${styles.tempo}`} aria-hidden="true">
           <OpeningBlinds />
           <RainStreaks className="absolute inset-0 h-full w-full opacity-60" />
-          <div className="absolute inset-x-0 bottom-0 h-2 bg-[#2a2a2a]" />
+          <div className="absolute inset-x-0 bottom-0 h-2 bg-[color:var(--noir-smoke)]" />
           <Corner />
         </div>
       }
@@ -104,7 +105,7 @@ export function ContactScene({ profession }: { profession: Profession }) {
               <h2 id={CONTACT_HEADING} className={`absolute -top-5 left-6 ${CAPTION}`}>
                 Contact
               </h2>
-              <p className={`mb-6 text-base text-[#d6d3cb] ${world.copy}`}>{line}</p>
+              <p className={`mb-6 text-base text-[color:var(--noir-paper-dim)] ${world.copy}`}>{line}</p>
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
                 {actions.map((action) => (
                   <HeroAction key={action.id} action={action} />
