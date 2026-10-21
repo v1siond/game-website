@@ -1,19 +1,19 @@
 import type { CSSProperties } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { HeroCharacter } from './character'
+import { DwellerSprite, type DwellerMotion } from './dweller'
 import { CREAM, POSTER_BLUE, POSTER_INK, SHELTER_YELLOW } from './palette'
 import atomic from './atomic.module.css'
 
 // The Muay Thai record as the perk chart: the page leaves the green tube for the printed poster (cream
 // paper, flat poster blue, ink outlines, the sunburst behind). The facts are the chart's columns, each
 // headed by its term on a blue band; each achievement is a perk card with him on it in the mascot style
-// (the poster tone, outlined in ink), each card in its own pose: the glove raised, the guard, the
-// teaching point. When the section's trigger fires the cards flip in one after another (rotateY with
+// (the poster tone, outlined in ink), each card in its own pose: the thumbs up, the knee and kick,
+// the targeting stance. When the section's trigger fires the cards flip in one after another (rotateY with
 // perspective, staggered by --i) and the star stamps down; under the pointer a card lifts, he hops and
 // the star turns.
 
-const POSES = [atomic.poseRaise, atomic.poseGuard, atomic.posePoint]
+const POSES: DwellerMotion[] = ['thumbsUp', 'strike', 'target']
 
 function Sunburst() {
   return (
@@ -40,7 +40,7 @@ function PerkCard({ achievement, index }: { achievement: string; index: number }
       <div className="relative h-44 overflow-hidden border-b-4 border-atomic-poster-ink">
         <Sunburst />
         <div className={`absolute inset-x-0 bottom-0 mx-auto h-40 w-28 ${atomic.perkHop}`}>
-          <HeroCharacter profession="fighter" className={`h-full w-full ${atomic.poster} ${POSES[index % POSES.length]}`} />
+          <DwellerSprite profession="fighter" motion={POSES[index % POSES.length]} className="h-full w-full" />
         </div>
         <span className="absolute right-3 top-3">
           <Star />

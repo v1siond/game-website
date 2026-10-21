@@ -1,0 +1,152 @@
+/*
+ * The dweller's motion (dweller.tsx): transform and opacity only, in the bouncy overshoot timing of the
+ * poster cartoons. Every part turns round its own joint in the viewBox's units, so a forearm turns at the
+ * elbow wherever the shoulder took it. The kit classes set a profession's resting pose, a motion class
+ * plays over it. The wink line, the reticle and the star rest hidden.
+ */
+
+.sprite * { transform-box: view-box; }
+
+.body { transform-origin: 50px 144px; }
+.chest { transform-origin: 50px 96px; }
+.head { transform-origin: 50px 56px; }
+.armRight { transform-origin: 34px 60px; }
+.foreRight { transform-origin: 32px 77px; }
+.armLeft { transform-origin: 66px 60px; }
+.foreLeft { transform-origin: 68px 77px; }
+.thighRight { transform-origin: 42px 95px; }
+.shinRight { transform-origin: 43px 119px; }
+.thighLeft { transform-origin: 57px 95px; }
+.shinLeft { transform-origin: 57px 119px; }
+.eyeOpen, .eyeShut { transform-origin: 50px 30.5px; }
+.star { transform-origin: 14px 31px; }
+.reticle { transform-origin: 88px 48px; }
+
+.winkLine, .star, .reticle { opacity: 0; }
+
+/* ---------------------------------------------------------------- resting poses per kit */
+
+.kitSticks .armRight { transform: rotate(-20deg); }
+.kitSticks .foreRight { transform: rotate(-40deg); }
+.kitSticks .armLeft { transform: rotate(20deg); }
+.kitSticks .foreLeft { transform: rotate(40deg); }
+
+.kitGuard .armRight { transform: rotate(25deg); }
+.kitGuard .foreRight { transform: rotate(150deg); }
+.kitGuard .armLeft { transform: rotate(-25deg); }
+.kitGuard .foreLeft { transform: rotate(-150deg); }
+
+/* ---------------------------------------------------------------- idle: the cartoon bounce and a blink */
+
+.idle .body { animation: bounce 1.6s ease-in-out infinite; }
+.idle .eyeOpen, .idle .eyeShut { animation: blink 4s step-end infinite; }
+
+@keyframes bounce {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.975) translateY(1px); }
+}
+
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+/* ---------------------------------------------------------------- walk: the jaunty poster stroll */
+
+.walk .body { animation: strut 0.7s ease-in-out infinite; }
+.walk .thighRight, .walk .armLeft { animation: swing-a 0.7s ease-in-out infinite; }
+.walk .thighLeft, .walk .armRight { animation: swing-b 0.7s ease-in-out infinite; }
+.walk .head { animation: tilt 1.4s ease-in-out infinite; }
+
+@keyframes strut {
+  0%, 50%, 100% { transform: translateY(0); }
+  25%, 75% { transform: translateY(-3px); }
+}
+
+@keyframes swing-a {
+  0%, 100% { transform: rotate(14deg); }
+  50% { transform: rotate(-14deg); }
+}
+
+@keyframes swing-b {
+  0%, 100% { transform: rotate(-14deg); }
+  50% { transform: rotate(14deg); }
+}
+
+@keyframes tilt {
+  0%, 100% { transform: rotate(-4deg); }
+  50% { transform: rotate(4deg); }
+}
+
+/* ---------------------------------------------------------------- level up: the thumbs up, the wink, the star */
+
+.thumbsUp .armRight { animation: thumb-arm 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both; }
+.thumbsUp .foreRight { animation: thumb-fore 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both; }
+.thumbsUp .body { animation: hop 0.5s cubic-bezier(0.3, 0, 0.3, 1) both; }
+.thumbsUp .eyeShut { animation: hide 0.3s linear 0.6s both; }
+.thumbsUp .winkLine { animation: show 0.3s linear 0.6s both; }
+.thumbsUp .star { animation: star 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s both; }
+
+@keyframes thumb-arm { from { transform: rotate(0deg); } to { transform: rotate(70deg); } }
+@keyframes thumb-fore { from { transform: rotate(0deg); } to { transform: rotate(110deg); } }
+@keyframes hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+@keyframes hide { to { opacity: 0; } }
+@keyframes show { to { opacity: 1; } }
+@keyframes star { from { opacity: 0; transform: scale(0) rotate(-90deg); } to { opacity: 1; transform: scale(1) rotate(0deg); } }
+
+/* ---------------------------------------------------------------- the targeting stance: arm out, reticle locks */
+
+.target .armLeft { animation: aim 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.target .armRight { animation: brace 0.5s ease-out both; }
+.target .foreRight { animation: brace-fore 0.5s ease-out both; }
+.target .reticle { animation: lock 1.2s steps(1) 0.4s infinite; }
+
+@keyframes aim { to { transform: rotate(-80deg); } }
+@keyframes brace { to { transform: rotate(-60deg); } }
+@keyframes brace-fore { to { transform: rotate(-30deg); } }
+@keyframes lock { 0%, 60% { opacity: 1; } 80% { opacity: 0.3; } }
+
+/* ---------------------------------------------------------------- System Engineer: raise the wrist terminal and key it in */
+
+.type .armLeft { animation: raise-left 0.5s ease-out both; }
+.type .foreLeft { animation: raise-fore 0.5s ease-out both; }
+.type .armRight { animation: reach 0.5s ease-out both; }
+.type .foreRight { animation: key 0.3s ease-in-out 0.5s infinite alternate both; }
+.type .screen { animation: flicker 0.4s steps(2) infinite; }
+
+@keyframes raise-left { to { transform: rotate(25deg); } }
+@keyframes raise-fore { to { transform: rotate(85deg); } }
+@keyframes reach { to { transform: rotate(-30deg); } }
+@keyframes key { from { transform: rotate(-70deg); } to { transform: rotate(-60deg); } }
+@keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+
+/* ---------------------------------------------------------------- Musician: the drum roll */
+
+.drum .foreRight { animation: hit-right 0.3s ease-in infinite alternate; }
+.drum .foreLeft { animation: hit-left 0.3s ease-in -0.15s infinite alternate; }
+.drum .head { animation: tilt 0.6s ease-in-out infinite; }
+
+@keyframes hit-right { from { transform: rotate(-40deg); } to { transform: rotate(-10deg); } }
+@keyframes hit-left { from { transform: rotate(40deg); } to { transform: rotate(10deg); } }
+
+/* ---------------------------------------------------------------- Martial Artist: the knee then the side kick */
+
+.strike .thighLeft { animation: knee-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.strike .shinLeft { animation: shin-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+
+@keyframes knee-kick {
+  0%, 100% { transform: rotate(0deg); }
+  18%, 30% { transform: rotate(-50deg); }
+  42% { transform: rotate(0deg); }
+  60%, 74% { transform: rotate(-85deg); }
+}
+
+@keyframes shin-kick {
+  0%, 42%, 100% { transform: rotate(0deg); }
+  18%, 30% { transform: rotate(80deg); }
+  60%, 74% { transform: rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite, .sprite * { animation: none !important; }
+}

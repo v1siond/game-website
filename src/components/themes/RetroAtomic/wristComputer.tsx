@@ -8,7 +8,7 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
 import type { CVData } from '@/lib/cv/content'
-import { HeroCharacter } from './character'
+import { DwellerSprite } from './dweller'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
 import { BRASS, CHROME, OLIVE, OLIVE_DARK, OLIVE_LIGHT, RUBBER, STEEL_LIGHT } from './palette'
@@ -123,7 +123,7 @@ function StatusFigure({ profession }: { profession: Profession }) {
     <div className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
       <span className={atomic.statusBrackets} aria-hidden="true" />
       <div className={`absolute inset-3 ${atomic.statusFigure}`}>
-        <HeroCharacter profession={profession} tone="phosphor" className={`h-full w-full ${atomic.thumbsUp} ${atomic.phosphorLine}`} />
+        <DwellerSprite key={profession} profession={profession} tone="phosphor" motion="thumbsUp" className="h-full w-full" />
       </div>
     </div>
   )

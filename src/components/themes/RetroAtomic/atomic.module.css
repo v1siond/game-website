@@ -368,64 +368,6 @@
   }
 }
 
-/* ---- him: the two tones and the poses (character.tsx on the shared HeroFigure) ---- */
-
-/* The poster tone's ink outline, a stroke under each fill. */
-.poster :is(path, rect, circle, ellipse) {
-  stroke: theme('colors.atomic.poster-ink');
-  stroke-width: 1.1px;
-  stroke-linejoin: round;
-  paint-order: stroke;
-}
-
-/* The status screen's line figure. */
-.phosphorLine :is(path, rect, circle, ellipse) {
-  stroke: theme('colors.atomic.phosphor');
-  stroke-width: 0.7px;
-  stroke-linejoin: round;
-  paint-order: stroke;
-}
-
-/* The front arm is the svg's last group, the back arm its first; each turns from its shoulder. */
-.thumbsUp > g:last-of-type,
-.poseRaise > g:last-of-type,
-.poseGuard > g:last-of-type,
-.posePoint > g:last-of-type {
-  transform-box: view-box;
-  transform-origin: 41px 33px;
-}
-
-.poseGuard > g:first-of-type {
-  transform-box: view-box;
-  transform-origin: 23px 33px;
-  transform: rotate(70deg);
-}
-
-.thumbsUp > g:last-of-type {
-  animation: thumbUp 620ms cubic-bezier(0.34, 1.56, 0.64, 1) 260ms both;
-}
-
-.poseRaise > g:last-of-type {
-  transform: rotate(-150deg);
-}
-
-.poseGuard > g:last-of-type {
-  transform: rotate(-70deg);
-}
-
-.posePoint > g:last-of-type {
-  transform: rotate(-95deg);
-}
-
-@keyframes thumbUp {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(-150deg);
-  }
-}
-
 /* ---- surfaces and rows shared by the sections ---- */
 
 .panel {
@@ -900,7 +842,6 @@
   }
 
   .powerOn,
-  .thumbsUp > g:last-of-type,
   .device[data-booted] .tube,
   .stage[data-on] .cardOn,
   .stage[data-on] .perkCard,

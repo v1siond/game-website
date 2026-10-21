@@ -5,7 +5,7 @@ import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvid
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import { ActionMenu } from './controls'
-import { HeroCharacter } from './character'
+import { DwellerSprite } from './dweller'
 import { DoorArt } from './vaultDoor'
 import { atomicId } from './anchors'
 import { buildBoard, hackReducer, initialHack, MAX_ATTEMPTS, type HackAction, type HackBoard, type HackCell, type HackLogEntry, type HackState } from './hacking'
@@ -35,7 +35,7 @@ function Wasteland() {
         <DoorArt className={`h-auto w-full ${atomic.doorAside}`} />
       </div>
       <div className="absolute bottom-[6%] right-[4%] hidden h-40 w-28 lg:block">
-        <HeroCharacter profession="engineer" className={`h-full w-full ${atomic.poster} ${atomic.poseRaise}`} />
+        <DwellerSprite profession="engineer" motion="type" className="h-full w-full" />
       </div>
       <span className="absolute inset-x-0 bottom-0 h-2 bg-atomic-ink" />
     </div>
@@ -155,7 +155,7 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
       {state.status === 'granted' && (
         <div className={`mt-4 flex items-center gap-4 border-2 border-atomic-phosphor p-3 ${atomic.powerOn}`}>
           <div className="h-24 w-16 shrink-0">
-            <HeroCharacter profession="engineer" tone="phosphor" className={`h-full w-full ${atomic.phosphorLine} ${atomic.thumbsUp}`} />
+            <DwellerSprite profession="engineer" tone="phosphor" motion="thumbsUp" className="h-full w-full" />
           </div>
           <p className={`text-xl font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.glow}`}>{hud.accessGranted}</p>
         </div>
