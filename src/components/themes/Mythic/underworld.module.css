@@ -726,7 +726,7 @@
 
 .dawn {
   opacity: 0;
-  transition: opacity 1.2s ease 0.4s;
+  transition: opacity 1.2s ease 1.2s;
 }
 
 [data-open] .dawn { opacity: 1; }
@@ -739,17 +739,19 @@
 .gateLeft { transform-origin: 0 50%; }
 .gateRight { transform-origin: 100% 50%; }
 
+/* The leaves give once he has leaned his weight in, halfway through the push. */
 [data-open] .gateLeft,
 [data-open] .gateRight {
   transform: scaleX(0.1);
+  transition-delay: 1s;
 }
 
 /* Once the gate is open he walks into the dawn and is gone. */
 .walker {
-  transition: transform 2.4s linear 0.6s, opacity 0.6s ease 2.6s;
+  transition: transform 2.4s linear 0.2s, opacity 0.6s ease 2.2s;
 }
 
-[data-open] .walker {
+[data-through] .walker {
   transform: translate3d(0, -18%, 0) scale(0.55);
   opacity: 0;
 }
