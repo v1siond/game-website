@@ -2,14 +2,15 @@
 
 import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
-import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
@@ -1376,35 +1377,25 @@ const ProfessionOrnaments = memo(function ProfessionOrnaments({ profession }: { 
  * ELECTRICITY THROUGH WIRE ANIMATION
  * ===================================
  * Energy flows along the actual wire paths between profession nodes.
- * The path goes: Engineer (25%,50%) ↔ Drummer (50%,30%) ↔ Fighter (75%,50%)
+ * The path goes: Musician (25%,55%) ↔ System Engineer (50%,30%) ↔ Martial Artist (75%,55%),
+ * the order the shared ProfessionSwitch lays the nodes out, with the engineer as the raised hub.
  *
- * When switching between non-adjacent nodes (Engineer↔Fighter),
- * energy travels THROUGH the middle node (Drummer).
+ * When switching between the two outer nodes (Musician↔Martial Artist),
+ * energy travels THROUGH the hub node (System Engineer).
  */
 
-// Calculate the wire path segments between two professions
-function getWirePath(from: string, to: string): Array<{ x: number; y: number }> {
-  const positions: Record<string, { x: number; y: number }> = {
-    engineer: { x: 25, y: 50 },
-    drummer: { x: 50, y: 30 },
-    fighter: { x: 75, y: 50 },
-  }
+const WAYSTATION_POSITIONS: Record<Profession, { x: number; y: number }> = {
+  drummer: { x: 25, y: 55 },
+  engineer: { x: 50, y: 30 },
+  fighter: { x: 75, y: 55 },
+}
 
-  // Direct adjacent paths
-  if ((from === 'engineer' && to === 'drummer') || (from === 'drummer' && to === 'engineer')) {
-    return [positions[from], positions[to]]
-  }
-  if ((from === 'drummer' && to === 'fighter') || (from === 'fighter' && to === 'drummer')) {
-    return [positions[from], positions[to]]
-  }
-  // Non-adjacent: go through drummer
-  if (from === 'engineer' && to === 'fighter') {
-    return [positions.engineer, positions.drummer, positions.fighter]
-  }
-  if (from === 'fighter' && to === 'engineer') {
-    return [positions.fighter, positions.drummer, positions.engineer]
-  }
-  return [positions[from], positions[to]]
+// Calculate the wire path segments between two professions
+function getWirePath(from: Profession, to: Profession): Array<{ x: number; y: number }> {
+  const throughHub = from !== 'engineer' && to !== 'engineer'
+  return throughHub
+    ? [WAYSTATION_POSITIONS[from], WAYSTATION_POSITIONS.engineer, WAYSTATION_POSITIONS[to]]
+    : [WAYSTATION_POSITIONS[from], WAYSTATION_POSITIONS[to]]
 }
 
 // Single energy particle that travels along a path
@@ -1507,12 +1498,10 @@ const EnergyFlowAnimation = memo(function EnergyFlowAnimation({
   fromProfession,
   toProfession,
   isAnimating,
-  nodes,
 }: {
-  fromProfession: string | null
-  toProfession: string
+  fromProfession: Profession | null
+  toProfession: Profession
   isAnimating: boolean
-  nodes: Array<{ id: string; position: { x: number; y: number }; color: string }>
 }) {
   if (!isAnimating || !fromProfession || fromProfession === toProfession) {
     return null
@@ -1554,27 +1543,20 @@ const EnergyFlowAnimation = memo(function EnergyFlowAnimation({
 
 // Waystation node for profession selection (generic rest point, not HK bench)
 const WaystationNode = memo(function WaystationNode({
-  icon,
-  label,
-  sublabel,
-  color,
-  isActive,
+  option,
   isReceivingEnergy,
-  onClick,
-  position,
 }: {
-  icon: React.ReactNode
-  label: string
-  sublabel: string
-  color: string
-  isActive: boolean
+  option: ProfessionOption
   isReceivingEnergy?: boolean
-  onClick: () => void
-  position: { x: number; y: number }
 }) {
+  const { id, label, selected: isActive, optionProps } = option
+  const { icon, sublabel, color } = WAYSTATIONS[id]
+  const position = WAYSTATION_POSITIONS[id]
+
   return (
     <button
-      onClick={onClick}
+      type="button"
+      {...optionProps}
       className="absolute transform -translate-x-1/2 -translate-y-1/2 group min-w-[70px] md:min-w-[100px] min-h-[70px] md:min-h-[100px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       style={{
         left: `${position.x}%`,
@@ -1582,10 +1564,6 @@ const WaystationNode = memo(function WaystationNode({
         ['--tw-ring-color' as string]: color,
         ['--tw-ring-offset-color' as string]: DF.void,
       }}
-      aria-pressed={isActive}
-      aria-label={`Select ${label} - ${sublabel} profession${isActive ? ' (currently selected)' : ''}`}
-      role="tab"
-      tabIndex={isActive ? 0 : -1}
     >
       {/* Energy arrival burst - shows when this node receives energy */}
       {isReceivingEnergy && (
@@ -1610,7 +1588,7 @@ const WaystationNode = memo(function WaystationNode({
       />
       {/* Main container - VoidFrame style with decorative elements */}
       <div
-        className={`df-card bg-df-panel relative w-20 h-20 md:w-28 md:h-28 flex flex-col items-center justify-center transition-all duration-300 ${
+        className={`df-card bg-df-panel relative w-24 h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-all duration-300 ${
           isActive ? 'df-card--active scale-110' : 'group-hover:scale-105'
         }`}
         style={{
@@ -1652,7 +1630,7 @@ const WaystationNode = memo(function WaystationNode({
           {icon}
         </div>
         <span
-          className="text-sm tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
+          className="text-sm tracking-[0.05em] md:tracking-[0.1em] uppercase font-medium text-center leading-tight"
           style={{
             color: isActive ? color : DF.silver,
             fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
@@ -1726,6 +1704,12 @@ const DiamondIcon = () => (
     <circle cx="12" cy="12" r="2" />
   </svg>
 )
+
+const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; sublabel: string; color: string }> = {
+  drummer: { icon: <WaveIcon />, sublabel: 'Drums', color: DF.lavender },
+  engineer: { icon: <GearIcon />, sublabel: 'Software', color: DF.ethereal },
+  fighter: { icon: <DiamondIcon />, sublabel: 'Muay Thai', color: DF.spiritGold },
+}
 
 /**
  * Hollow Knight-style Decorative Flourish
@@ -1918,15 +1902,17 @@ const VoidFrame = memo(function VoidFrame({
   )
 })
 
+const DF_FONT = '"Comic Sans MS", "Comic Sans", cursive'
+
 // Tech stack display
-const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6">
-      {categories.slice(0, 5).map((category) => (
-        <div key={category.name}>
+      {categories.map((category) => (
+        <div key={category.id}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DF.silver, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
+            style={{ color: DF.silver, fontFamily: DF_FONT }}
           >
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -1953,46 +1939,16 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnTy
   )
 })
 
-// Skills list
-const SkillsList = memo(function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
-  return (
-    <div className="grid md:grid-cols-3 gap-6">
-      {categories.map((category) => (
-        <div key={category.name}>
-          <h3
-            className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DF.silver, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}
-          >
-            <span aria-hidden="true">{category.icon}</span>
-            {category.name}
-          </h3>
-          <ul className="space-y-2" aria-label={`${category.name} skills`}>
-            {category.skills.map((skill) => (
-              <li key={skill.name} className="text-sm flex items-center gap-2" style={{ color: DF.bone }}>
-                <span style={{ color: DF.spiritGold }} aria-hidden="true">*</span>
-                {skill.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  )
-})
-
-// Project card
-const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+// Project card - his role, the years, the result and the links
+const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
   return (
     <article
-      className="p-4 transition-transform hover:scale-[1.02] cursor-pointer group"
+      className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple})`,
         border: `1px solid ${project.featured ? DF.spiritGold : DF.stoneDark}`,
         borderRadius: '4px',
       }}
-      tabIndex={0}
-      role="button"
-      aria-label={`View ${project.name} project details`}
     >
       {project.featured && (
         <span className="text-sm tracking-[0.15em] uppercase" style={{ color: DF.spiritGold }}>
@@ -2002,47 +1958,62 @@ const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PRO
       <h3 className="text-lg mt-1 transition-colors" style={{ color: DF.bone }}>
         {project.name}
       </h3>
+      <p className="text-sm mt-1" style={{ color: DF.ethereal }}>
+        {project.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
       <p className="text-sm mt-2" style={{ color: DF.silver }}>{project.tagline}</p>
       {project.impact && (
-        <p className="text-sm mt-2 italic" style={{ color: DF.ethereal }}>
+        <p className="text-sm mt-2 italic" style={{ color: DF.bone }}>
           <span aria-hidden="true">- </span>
           <span className="sr-only">Impact: </span>{project.impact}
         </p>
       )}
       <div className="flex flex-wrap gap-1 mt-3" aria-label="Technologies used">
-        {project.techStack.slice(0, 4).map((tech) => (
+        {project.techStack.map((tech) => (
           <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${DF.ethereal}12`, color: DF.silver }}>
             {tech}
           </span>
         ))}
       </div>
+      {links.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] border border-[#41c8e8] text-[#41c8e8] bg-[#41c8e8]/10"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      )}
     </article>
   )
 })
 
 // Company card
-const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
+const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0a1a]"
       style={{
         background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple})`,
         border: `1px solid ${DF.stoneDark}`,
         borderRadius: '4px',
-        ['--tw-ring-color' as string]: DF.spiritGold,
-        ['--tw-ring-offset-color' as string]: DF.void,
       }}
-      aria-label={`${company.name} - ${company.tagline}. Opens in new tab.`}
+      aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl" aria-hidden="true">{company.icon}</span>
         <div>
           <h3 className="text-lg transition-colors" style={{ color: DF.bone }}>
             {company.name}
-            <span className="sr-only"> (opens in new tab)</span>
           </h3>
           <p className="text-sm" style={{ color: DF.spiritGold }}>{company.tagline}</p>
         </div>
@@ -2053,10 +2024,10 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COM
 })
 
 // Band card
-const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
+const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <article
-      className="p-4 transition-transform hover:scale-[1.02] group"
+      className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(135deg, ${DF.void}, ${DF.voidDeep})`,
         border: `1px solid ${DF.lavender}60`,
@@ -2065,47 +2036,43 @@ const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
     >
       <h3 className="text-lg transition-colors" style={{ color: DF.bone }}>
         {band.name}
-        {band.url && <span className="sr-only"> (opens in new tab)</span>}
       </h3>
       <p className="text-sm mt-1" style={{ color: DF.lavender }}>
-        {band.genre} <span aria-hidden="true">|</span> {band.role}
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
       </p>
-      <p className="text-sm mt-2" style={{ color: DF.silver }}>{band.description}</p>
-      {!band.url && <p className="text-sm mt-2 italic" style={{ color: DF.silver }}>Website coming soon</p>}
+      {band.release && (
+        <p className="text-sm mt-2" style={{ color: DF.silver }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
     </article>
   )
 
-  if (band.url) {
-    return (
-      <a
-        href={band.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-        style={{
-          ['--tw-ring-color' as string]: DF.lavender,
-          ['--tw-ring-offset-color' as string]: DF.void,
-        }}
-        aria-label={`${band.name} - ${band.genre}. Opens in new tab.`}
-      >
-        {content}
-      </a>
-    )
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a
+      {...linkProps}
+      className="block h-full min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b7a9d9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0a1a]"
+    >
+      {content}
+    </a>
+  )
 })
 
-// Work experience card
-const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: typeof EXPERIENCE_DATA[0]; isLast?: boolean }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+// Work experience card. Dates are date only strings (UTC midnight), so the year is read in UTC: a
+// January start keeps its own year west of UTC.
+const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: Job; isLast?: boolean }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
     <article className="py-4">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
           <h3 className="text-lg font-medium" style={{ color: DF.bone }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: DF.ethereal }}>{entry.organization}</p>
+          <p className="text-sm" style={{ color: DF.ethereal }}>{entry.company}</p>
         </div>
         <span
           className="text-sm"
@@ -2114,11 +2081,11 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
           <time>{startDisplay}</time> - <time>{endDisplay}</time>
         </span>
       </div>
-      <p className="text-sm mb-2" style={{ color: DF.silver }}>{entry.description}</p>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.description && <p className="text-sm mb-2" style={{ color: DF.silver }}>{entry.description}</p>}
+      {entry.highlights.length > 0 && (
         <ul className="space-y-1" aria-label="Key achievements">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-sm flex items-start gap-2" style={{ color: DF.bone }}>
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DF.bone }}>
               <span style={{ color: DF.spiritGold }} aria-hidden="true">*</span>
               {highlight}
             </li>
@@ -2136,6 +2103,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
     </article>
   )
 })
+
 
 // Art Section 1 - Spirit wisps with mechanical gears (blend of Ori + Iconoclast)
 const ArtSectionSpirits = memo(function ArtSectionSpirits() {
@@ -2407,53 +2375,227 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
   )
 })
 
+// Profession sections. Each animated section gets its own trigger based on ACTUAL element position.
+const SECTION_TRIGGER = { threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
+
+const DF_BUTTON =
+  'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0a1a]'
+
+// Email is the brass action, LinkedIn the outlined one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-[#b08d57] text-[#0f0a1a]',
+  linkedin: 'bg-transparent border-2 border-[#b08d57] text-[#b08d57]',
+}
+
+function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+  return (
+    <>
+      {actions.map((action) => (
+        <a key={action.id} {...action.linkProps} className={`${DF_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+          {action.label}
+        </a>
+      ))}
+    </>
+  )
+}
+
+function FramedSection({ title, delay, children }: { title: string; delay?: number; children: React.ReactNode }) {
+  return (
+    <FadeInSection delay={delay}>
+      <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto">
+          <VoidFrame title={title}>{children}</VoidFrame>
+        </div>
+      </section>
+    </FadeInSection>
+  )
+}
+
+// Knight Slash Reveal: the knight cuts in and the frame slides from the right.
+function SlashRevealSection({ title, children }: { title: string; children: React.ReactNode }) {
+  const trigger = useSectionTrigger(SECTION_TRIGGER)
+
+  return (
+    <div ref={trigger.ref}>
+      <KnightSlashReveal triggered={trigger.triggered}>
+        <section className="relative z-20 py-8 px-6">
+          <div className="max-w-4xl mx-auto">
+            <VoidFrame title={title}>{children}</VoidFrame>
+          </div>
+        </section>
+      </KnightSlashReveal>
+    </div>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+  const projectsTrigger = useSectionTrigger(SECTION_TRIGGER)
+  const { jobs, techStack, projects, companies } = sections
+
+  return (
+    <>
+      <FramedSection title="About" delay={100}>
+        <p className="leading-relaxed" style={{ color: DF.bone }}>{professionalSummary.bio}</p>
+      </FramedSection>
+
+      {/* Art Section 1 - Spirits and Gears */}
+      <FadeInSection delay={150}>
+        <ArtSectionSpirits />
+      </FadeInSection>
+
+      {/* Work Experience - Knight Slash Reveal (content slides from right) */}
+      {jobs.length > 0 && (
+        <SlashRevealSection title="Work Experience">
+          <div>
+            {jobs.map((entry, index) => (
+              <ExperienceCard key={entry.id} entry={entry} isLast={index === jobs.length - 1} />
+            ))}
+          </div>
+        </SlashRevealSection>
+      )}
+
+      {/* Art Section 2 - Lanterns */}
+      <FadeInSection>
+        <ArtSectionLanterns />
+      </FadeInSection>
+
+      <FramedSection title="Tech Stack">
+        <TechCloud categories={techStack} />
+      </FramedSection>
+
+      {/* Projects - Bug Pull Reveal */}
+      <div ref={projectsTrigger.ref}>
+        <BugPullReveal triggered={projectsTrigger.triggered}>
+          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              <VoidFrame title="Projects">
+                <ProjectList
+                  projects={projects}
+                  className="grid md:grid-cols-2 gap-3 md:gap-4"
+                  renderProject={(slot) => <ProjectCard slot={slot} />}
+                />
+              </VoidFrame>
+            </div>
+          </section>
+        </BugPullReveal>
+      </div>
+
+      {/* Art Section 3 - Crystals */}
+      <FadeInSection>
+        <ArtSectionCrystals />
+      </FadeInSection>
+
+      <FramedSection title="Ventures">
+        <div className="grid md:grid-cols-3 gap-3 md:gap-4">
+          {companies.map((company) => (
+            <CompanyCard key={company.id} company={company} />
+          ))}
+        </div>
+      </FramedSection>
+    </>
+  )
+}
+
+function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <FadeInSection delay={150}>
+        <ArtSectionSpirits />
+      </FadeInSection>
+
+      <SlashRevealSection title="Bands">
+        <p className="text-sm mb-4 text-center" style={{ color: DF.bone }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
+        <p className="text-sm mt-4 italic text-center" style={{ color: DF.lavender }}>{musician.line}</p>
+      </SlashRevealSection>
+
+      <FadeInSection>
+        <ArtSectionLanterns />
+      </FadeInSection>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <FadeInSection delay={150}>
+        <ArtSectionSpirits />
+      </FadeInSection>
+
+      <SlashRevealSection title="Muay Thai">
+        <h3 className="text-lg font-medium mb-4" style={{ color: DF.bone }}>{martialArts.primary.title}</h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+            fact: 'p-3 rounded bg-gradient-to-br from-[#0f0a1a] to-[#150f25] border border-[#333333]',
+            term: 'text-sm tracking-[0.15em] uppercase text-[#e8c841]',
+            value: 'text-sm mt-1 text-[#e8e4dc]',
+            achievements: 'space-y-1',
+            achievement: 'text-sm flex items-start gap-2 text-[#e8e4dc]',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span className="text-[#e8c841]" aria-hidden="true">*</span>
+              {achievement}
+            </>
+          )}
+        />
+      </SlashRevealSection>
+
+      <FadeInSection>
+        <ArtSectionCrystals />
+      </FadeInSection>
+    </>
+  )
+}
+
+function ProfessionSectionsView({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
+  return <EngineerSections sections={sections} />
+}
+
+
 export default function DarkFantasyTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
+  const view = useWorldView()
+  const active = view.profession
   const [mounted, setMounted] = useState(false)
 
   // Track previous profession for energy flow animation
-  const previousProfession = useRef<string | null>(null)
+  const previousProfession = useRef<Profession>(active)
   const [isEnergyFlowing, setIsEnergyFlowing] = useState(false)
-  const [animatingFrom, setAnimatingFrom] = useState<string | null>(null)
+  const [animatingFrom, setAnimatingFrom] = useState<Profession | null>(null)
 
-  // Handle profession change with energy flow animation
-  const handleProfessionChange = (newProfession: 'engineer' | 'drummer' | 'fighter') => {
-    if (newProfession === active) return
+  // On a profession change, run the energy along the wire from the old node to the new one
+  useEffect(() => {
+    const from = previousProfession.current
+    previousProfession.current = active
+    if (from === active) return
 
-    // Trigger energy flow animation
-    setAnimatingFrom(active)
+    setAnimatingFrom(from)
     setIsEnergyFlowing(true)
 
-    // Update the profession
-    setActive(newProfession)
-
     // Clear animation state after animation completes
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsEnergyFlowing(false)
       setAnimatingFrom(null)
     }, 500)
-  }
+    return () => clearTimeout(timer)
+  }, [active])
 
-  // Section triggers using IntersectionObserver
-  // Each animated section gets its own trigger based on ACTUAL element position
-  const experienceTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
-  const projectsTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
   // fire the final battle just slightly before it's centered (small positive bottom margin), // a touch later than the previous +18% which kicked off before you'd even seen the section
   const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
-
-  // Memoize expensive data operations
-  const aboutData = useMemo(() => ABOUT_DATA[active], [active])
-  const engineerTech = useMemo(() => getEngineerSkills(), [])
-  const otherSkills = useMemo(() => getSkillsByProfession(active), [active])
-  const projects = useMemo(
-    () => PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured),
-    [active]
-  )
-  const experience = useMemo(
-    () => filterExperienceByProfession(EXPERIENCE_DATA, active),
-    [active]
-  )
 
   useEffect(() => {
     setMounted(true)
@@ -2474,33 +2616,6 @@ export default function DarkFantasyTheme() {
       </div>
     )
   }
-
-  const professionNodes = [
-    {
-      id: 'engineer',
-      icon: <GearIcon />,
-      label: 'System',
-      sublabel: 'Engineer / CTO',
-      color: DF.ethereal,
-      position: { x: 25, y: 50 }
-    },
-    {
-      id: 'drummer',
-      icon: <WaveIcon />,
-      label: 'Musician',
-      sublabel: 'Pro Drummer',
-      color: DF.lavender,
-      position: { x: 50, y: 30 }
-    },
-    {
-      id: 'fighter',
-      icon: <DiamondIcon />,
-      label: 'Martial',
-      sublabel: 'Muay Thai',
-      color: DF.spiritGold,
-      position: { x: 75, y: 50 }
-    },
-  ]
 
   return (
     <div
@@ -2557,7 +2672,6 @@ export default function DarkFantasyTheme() {
         style={{
           background: `linear-gradient(180deg, ${DF.void}f5 0%, ${DF.void}e0 70%, transparent 100%)`,
         }}
-        role="banner"
         aria-label="Primary navigation"
       >
         <div className="max-w-6xl mx-auto flex justify-between items-center gap-2 md:gap-4">
@@ -2566,40 +2680,28 @@ export default function DarkFantasyTheme() {
             <div aria-hidden="true" className="hidden sm:block">
               <SpiritWisp size={32} color={DF.spiritGold} />
             </div>
-            <h1
+            <span
               className="text-sm md:text-lg tracking-[0.15em] md:tracking-[0.2em] font-normal uppercase whitespace-nowrap"
               style={{
                 color: DF.bone,
                 textShadow: `0 0 20px ${DF.ethereal}30`,
               }}
             >
-              Alexander Pulido
-            </h1>
+              {view.hero.name}
+            </span>
           </Link>
 
           {/* Nav Links */}
           <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
-              style={{
-                border: `1px solid ${DF.stoneDark}`,
-                color: DF.silver,
-                background: `${DF.void}cc`,
-                borderRadius: '4px',
-              }}
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] border border-[#333333] text-[#a0a0a0] bg-[#0f0a1a]/80"
             >
               CV
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
-              style={{
-                border: `1px solid ${DF.ethereal}`,
-                color: DF.ethereal,
-                background: `${DF.ethereal}15`,
-                borderRadius: '4px',
-              }}
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] border border-[#41c8e8] text-[#41c8e8] bg-[#41c8e8]/10"
             >
               <span className="hidden sm:inline">Nebulith</span>
               <span className="sm:hidden">Game</span>
@@ -2608,19 +2710,33 @@ export default function DarkFantasyTheme() {
         </div>
       </nav>
 
-      {/* Hero Section - below fixed nav, changes with profession */}
+      {/* Hero Section - below fixed nav, the recruiter first screen */}
       <header className="relative z-20 pt-20 md:pt-24 pb-6 px-4 md:px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DF.silver }}>
-            {PROFESSIONAL_SUMMARY[active].headline}
-          </p>
-          <p
-            className="text-sm tracking-wider italic"
-            style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
-          >
-            {PROFESSIONAL_SUMMARY[active].tagline}
-          </p>
-        </div>
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-4xl mx-auto text-center">
+              <h1
+                className="text-2xl md:text-4xl tracking-[0.15em] uppercase mb-3"
+                style={{ color: DF.bone, textShadow: `0 0 20px ${DF.ethereal}30` }}
+              >
+                {name}
+              </h1>
+              <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DF.silver }}>
+                {headline}
+              </p>
+              <p
+                className="text-sm tracking-wider italic"
+                style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
+              >
+                {tagline}
+              </p>
+              <p className="text-sm mt-2" style={{ color: DF.bone }}>{line}</p>
+              <div className="flex flex-wrap gap-3 justify-center mt-4">
+                <HeroActions actions={actions} />
+              </div>
+            </div>
+          )}
+        />
       </header>
 
       {/* Main content */}
@@ -2637,8 +2753,6 @@ export default function DarkFantasyTheme() {
                 background: `linear-gradient(180deg, transparent, ${DF.voidPurple}30)`,
                 borderRadius: '4px',
               }}
-              role="tablist"
-              aria-label="Profession selector"
             >
               {/* Connection paths */}
               <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
@@ -2649,11 +2763,11 @@ export default function DarkFantasyTheme() {
                     <stop offset="100%" stopColor={DF.brass} stopOpacity="0" />
                   </linearGradient>
                 </defs>
-                <line x1="25%" y1="50%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-                <line x1="50%" y1="30%" x2="75%" y2="50%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                <line x1="25%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                <line x1="50%" y1="30%" x2="75%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
                 {/* Gear decorations at intersections */}
-                <circle cx="37.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
-                <circle cx="62.5%" cy="40%" r="3" fill={DF.copper} opacity="0.3" />
+                <circle cx="37.5%" cy="42.5%" r="3" fill={DF.copper} opacity="0.3" />
+                <circle cx="62.5%" cy="42.5%" r="3" fill={DF.copper} opacity="0.3" />
               </svg>
 
               {/* Energy flow animation between nodes */}
@@ -2661,164 +2775,21 @@ export default function DarkFantasyTheme() {
                 fromProfession={animatingFrom}
                 toProfession={active}
                 isAnimating={isEnergyFlowing}
-                nodes={professionNodes}
               />
 
-              {professionNodes.map((node) => (
-                <WaystationNode
-                  key={node.id}
-                  {...node}
-                  isActive={active === node.id}
-                  isReceivingEnergy={isEnergyFlowing && active === node.id}
-                  onClick={() => handleProfessionChange(node.id as 'engineer' | 'drummer' | 'fighter')}
-                />
-              ))}
+              <ProfessionSwitch
+                className="absolute inset-0"
+                label="Profession selector"
+                renderOption={(option) => (
+                  <WaystationNode option={option} isReceivingEnergy={isEnergyFlowing && option.selected} />
+                )}
+              />
             </div>
           </div>
         </section>
       </FadeInSection>
 
-      {/* About */}
-      <FadeInSection delay={100}>
-        <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <VoidFrame title="About">
-              <p className="leading-relaxed mb-4" style={{ color: DF.bone }}>{aboutData.bio}</p>
-              <div className="flex flex-wrap gap-2 md:gap-3">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span
-                    key={i}
-                    className="px-2 md:px-3 py-1"
-                    style={{
-                      background: `${DF.ethereal}12`,
-                      border: `1px solid ${DF.ethereal}30`,
-                      color: DF.ethereal,
-                      borderRadius: '3px',
-                    }}
-                  >
-                    * {fact}
-                  </span>
-                ))}
-              </div>
-            </VoidFrame>
-          </div>
-        </section>
-      </FadeInSection>
-
-      {/* Art Section 1 - Spirits and Gears */}
-      <FadeInSection delay={150}>
-        <ArtSectionSpirits />
-      </FadeInSection>
-
-      {/* Work Experience - Knight Slash Reveal (content slides from right) */}
-      {experience.length > 0 && (
-        <div ref={experienceTrigger.ref}>
-          <KnightSlashReveal triggered={experienceTrigger.triggered}>
-          <section className="relative z-20 py-8 px-6">
-            <div className="max-w-4xl mx-auto">
-              <VoidFrame title="Work Experience">
-                <div>
-                  {experience.map((entry, index) => (
-                    <ExperienceCard key={entry.id} entry={entry} isLast={index === experience.length - 1} />
-                  ))}
-                </div>
-              </VoidFrame>
-            </div>
-          </section>
-          </KnightSlashReveal>
-        </div>
-      )}
-
-      {/* Art Section 2 - Lanterns */}
-      <FadeInSection>
-        <ArtSectionLanterns />
-      </FadeInSection>
-
-      {/* Tech Stack / Skills */}
-      <FadeInSection>
-        <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <VoidFrame title={active === 'engineer' ? 'Tech Stack' : 'Skills'}>
-              {active === 'engineer' ? (
-                <TechCloud categories={engineerTech} />
-              ) : (
-                <SkillsList categories={otherSkills} />
-              )}
-            </VoidFrame>
-          </div>
-        </section>
-      </FadeInSection>
-
-      {/* Projects - Bug Pull Reveal */}
-      <div ref={projectsTrigger.ref}>
-        <BugPullReveal triggered={projectsTrigger.triggered}>
-          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <VoidFrame title="Featured Work">
-                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
-                  {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
-                </div>
-              </VoidFrame>
-            </div>
-          </section>
-        </BugPullReveal>
-      </div>
-
-      {/* Art Section 3 - Crystals */}
-      <FadeInSection>
-        <ArtSectionCrystals />
-      </FadeInSection>
-
-      {/* Ventures (Companies/Bands) */}
-      <FadeInSection>
-        {active === 'engineer' && (
-          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <VoidFrame title="Ventures">
-                <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-                  {COMPANIES.map((company) => (
-                    <CompanyCard key={company.id} company={company} />
-                  ))}
-                </div>
-              </VoidFrame>
-            </div>
-          </section>
-        )}
-
-        {active === 'drummer' && (
-          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <VoidFrame title="Bands">
-                <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-                  {BANDS.map((band) => (
-                    <BandCard key={band.id} band={band} />
-                  ))}
-                </div>
-              </VoidFrame>
-            </div>
-          </section>
-        )}
-      </FadeInSection>
-
-      {/* Posts */}
-      <FadeInSection>
-        <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <VoidFrame title="Posts">
-              <div className="text-center py-6 md:py-8">
-                <p style={{ color: DF.silver }}>
-                  Writings and thoughts coming soon...
-                </p>
-                <p className="mt-2 italic" style={{ color: DF.ethereal }}>
-                  * Check back for updates on development, music, and martial arts
-                </p>
-              </div>
-            </VoidFrame>
-          </div>
-        </section>
-      </FadeInSection>
+      <ProfessionSectionsView sections={view.sections} />
 
       </main>
 
@@ -2826,47 +2797,26 @@ export default function DarkFantasyTheme() {
       <div ref={contactTrigger.ref}>
         <BattleReveal triggered={contactTrigger.triggered}>
         <section className="relative z-20 py-16 px-6" aria-label="Contact">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="mb-8">
-              <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
-                Ready to Work Together?
-              </h2>
-              <p className="text-sm" style={{ color: DF.silver }}>
-                10+ years delivering production systems. Let&apos;s build something.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:alexanderpulido81@gmail.com"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                style={{
-                  background: DF.brass,
-                  color: DF.void,
-                  fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
-                  borderRadius: '4px',
-                }}
-              >
-                Get In Touch
-              </a>
-              <Link
-                href="/cv"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                style={{
-                  background: 'transparent',
-                  border: `2px solid ${DF.brass}`,
-                  color: DF.brass,
-                  fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
-                  borderRadius: '4px',
-                }}
-              >
-                Download CV
-              </Link>
-            </div>
-          </div>
+          <RecruiterHero
+            render={({ line, actions }) => (
+              <div className="max-w-2xl mx-auto text-center">
+                <div className="mb-8">
+                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: DF_FONT }}>
+                    Get In Touch
+                  </h2>
+                  <p className="text-sm" style={{ color: DF.silver }}>{line}</p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <HeroActions actions={actions} />
+                  <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[#b08d57] text-[#b08d57]`}>
+                    Download CV
+                  </Link>
+                </div>
+              </div>
+            )}
+          />
         </section>
         </BattleReveal>
-
-        
       </div>
 
       {/* Bottom obscure overlay - content fades into darkness */}
@@ -2882,8 +2832,8 @@ export default function DarkFantasyTheme() {
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
         <div className="inline-flex items-center gap-4" style={{ color: DF.silver }}>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
-          <span className="text-sm tracking-[0.2em]" style={{ fontFamily: '"Comic Sans MS", "Comic Sans", cursive' }}>
-            <span className="sr-only">Copyright </span>© {new Date().getFullYear()} Alexander Pulido
+          <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
+            <span className="sr-only">Copyright </span>© {new Date().getFullYear()} {view.hero.name}
           </span>
           <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
         </div>
