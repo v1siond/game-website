@@ -1,219 +1,105 @@
-'use client'
-
+import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { PORTAL } from './palette'
 
-// ============================================================================
-// TECH TERMINAL - Engineer Skills (no proficiency bars)
-// ============================================================================
+// Neon Portals' panels and cards. Static classes only (no blur, no animated glow), so a card costs
+// nothing while the page scrolls; the scenes in scenes.tsx move them. Colours are the palette.ts values.
 
-export function TechTerminal({ categories }: { categories: CVData['techStack'] }) {
+export type PortalSide = 'orange' | 'blue'
+
+// Entries alternate the two portal colours, in then out, down a list.
+export const sideOf = (index: number): PortalSide => (index % 2 === 0 ? 'orange' : 'blue')
+
+const SIDE_LOOK: Record<PortalSide, { text: string; border: string; chip: string; dot: string }> = {
+  orange: {
+    text: 'text-[#ff9a00]',
+    border: 'border-[#ff9a00]/40',
+    chip: 'bg-[#ff9a00]/10 text-[#ff9a00]',
+    dot: 'bg-[#ff9a00]',
+  },
+  blue: {
+    text: 'text-[#00a2ff]',
+    border: 'border-[#00a2ff]/40',
+    chip: 'bg-[#00a2ff]/10 text-[#00a2ff]',
+    dot: 'bg-[#00a2ff]',
+  },
+}
+
+const panelId = (title: string) => `portal-${title.toLowerCase().replace(/\s+/g, '-')}`
+
+const LINK_FOCUS = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#07060f]'
+
+// A chamber panel: a dark panel framed by an orange seam on its left (where he comes in) and a blue seam
+// on its right (where he leaves).
+export function ChamberPanel({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="space-y-6" role="list" aria-label="Technical Skills">
-      {categories.map((category, catIndex) => (
-        <div key={category.id} role="listitem">
-          <h3
-            className="text-sm tracking-[0.12em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: catIndex % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE }}
-          >
-            <span className="text-sm" aria-hidden="true">{category.icon}</span>
-            <span>{category.name}</span>
-            <span
-              className="flex-1 h-px ml-1"
-              style={{
-                background: `linear-gradient(90deg, ${catIndex % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}30, transparent)`
-              }}
-              aria-hidden="true"
-            />
-          </h3>
-          <div className="flex flex-wrap gap-1.5" role="list">
-            {category.items.map((tech, i) => (
-              <span
-                key={tech}
-                className="px-2 py-1 text-sm cursor-default transition-colors hover:brightness-110"
-                style={{
-                  background: `${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}10`,
-                  border: `1px solid ${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}30`,
-                  color: PORTAL.PANEL_WHITE,
-                }}
-                role="listitem"
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
+    <section className="relative" aria-labelledby={panelId(title)}>
+      <div className="relative border border-[#2c2a3d] border-l-2 border-l-[#ff9a00] border-r-2 border-r-[#00a2ff] bg-[#12111c]/95 px-4 py-5 sm:px-6">
+        <header className="mb-5 flex items-center gap-3">
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-[#ff9a00]/50" aria-hidden="true" />
+          <h2 id={panelId(title)} className="text-sm font-medium uppercase tracking-[0.2em] text-[#00a2ff]">
+            {title}
+          </h2>
+          <span className="h-px flex-1 bg-gradient-to-r from-[#00a2ff]/50 to-transparent" aria-hidden="true" />
+        </header>
+        {children}
+      </div>
+    </section>
   )
 }
 
-// ============================================================================
-// PROJECT CARD - Test Chamber Style
-// ============================================================================
-
-export function ProjectCard({ slot: { project, years, links }, index }: { slot: ProjectSlot; index: number }) {
-  const isOrange = index % 2 === 0
-  const color = isOrange ? PORTAL.ORANGE : PORTAL.BLUE
-
+export function TechCategoryList({ categories }: { categories: CVData['techStack'] }) {
   return (
-    <article
-      className="relative h-full p-4 transition-all hover:scale-[1.01] group"
-      style={{
-        background: `linear-gradient(180deg, ${PORTAL.CHAMBER_BG}, ${PORTAL.VOID})`,
-        border: `1.5px solid ${PORTAL.METAL_DARK}`,
-      }}
-      aria-labelledby={`project-${project.id}`}
-    >
-      {/* Hover glow edges */}
-      <div
-        className="absolute top-0 bottom-0 left-0 w-px opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ background: PORTAL.ORANGE, boxShadow: `0 0 8px ${PORTAL.ORANGE}` }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute top-0 bottom-0 right-0 w-px opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ background: PORTAL.BLUE, boxShadow: `0 0 8px ${PORTAL.BLUE}` }}
-        aria-hidden="true"
-      />
-
-      {/* Chamber number */}
-      <div
-        className="absolute -top-2 -right-2 w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold"
-        style={{
-          background: color,
-          color: PORTAL.CAUTION_BLACK,
-          boxShadow: `0 0 12px ${color}60`,
-        }}
-        aria-hidden="true"
-      >
-        {String(index + 1).padStart(2, '0')}
-      </div>
-
-      <div className="flex justify-between items-start gap-2 pr-5">
-        <h3 id={`project-${project.id}`} className="text-sm font-medium" style={{ color }}>
-          {project.name}
-        </h3>
-        {years && <span className="text-sm whitespace-nowrap text-[#C8C8C8]">{years}</span>}
-      </div>
-      <p className="text-sm mt-1 text-[#FFCC00]">{project.role}</p>
-      <p className="text-sm mt-1 mb-1" style={{ color: PORTAL.PANEL_SCUFFED }}>
-        {project.tagline}
-      </p>
-
-      {project.impact && (
-        <p
-          className="text-sm italic mb-2 px-2 py-1"
-          style={{
-            color: PORTAL.BLUE,
-            background: `${PORTAL.BLUE}08`,
-            borderLeft: `2px solid ${PORTAL.BLUE}`,
-          }}
-        >
-          {project.impact}
-        </p>
-      )}
-
-      <div className="flex gap-1 flex-wrap">
-        {project.techStack.slice(0, 4).map((tech, i) => (
-          <span
-            key={tech}
-            className="text-sm px-1.5 py-0.5"
-            style={{
-              background: `${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}12`,
-              color: i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE,
-            }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
-
-      {links.length > 0 ? (
-        <div className="flex gap-2 flex-wrap mt-3">
-          {links.map(({ kind, label, linkProps }, i) => (
-            <a
-              key={kind}
-              {...linkProps}
-              className={`inline-flex items-center min-h-[44px] px-3 text-sm tracking-wider uppercase border-[1.5px] transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-white ${
-                i % 2 === 0 ? 'border-[#FF9A00] text-[#FF9A00]' : 'border-[#00A2FF] text-[#00A2FF]'
-              }`}
-            >
-              {label}
-            </a>
-          ))}
-        </div>
-      ) : (
-        <p className="text-sm mt-3 italic" style={{ color: PORTAL.PANEL_SCUFFED }}>No public link</p>
-      )}
-    </article>
+    <ul className="space-y-6">
+      {categories.map((category, index) => {
+        const look = SIDE_LOOK[sideOf(index)]
+        return (
+          <li key={category.id}>
+            <h3 className={`mb-3 flex items-center gap-2 text-sm uppercase tracking-[0.12em] ${look.text}`}>
+              <span aria-hidden="true">{category.icon}</span>
+              {category.name}
+            </h3>
+            <ul className="flex flex-wrap gap-1.5">
+              {category.items.map((tech) => (
+                <li key={tech} className="border border-[#2c2a3d] bg-[#1c1b29] px-2 py-1 text-sm text-[#edebe4]">
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 
-// ============================================================================
-// EXPERIENCE CARD
 // Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps its
 // own year west of UTC.
-// ============================================================================
+const yearOf = (date: Date | null | undefined) => (date ? String(date.getUTCFullYear()) : 'Present')
 
 export function ExperienceCard({ entry, index }: { entry: Job; index: number }) {
-  const isOrange = index % 2 === 0
-  const color = isOrange ? PORTAL.ORANGE : PORTAL.BLUE
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'PRESENT'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const look = SIDE_LOOK[sideOf(index)]
 
   return (
-    <article
-      className="p-4"
-      style={{
-        background: `linear-gradient(180deg, ${PORTAL.CHAMBER_BG}, ${PORTAL.VOID})`,
-        border: `1px solid ${color}25`,
-      }}
-      aria-labelledby={`exp-${entry.id}`}
-    >
-      <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
+    <article className={`border bg-[#12111c] p-4 ${look.border}`} aria-labelledby={`portal-exp-${entry.id}`}>
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h4
-            id={`exp-${entry.id}`}
-            className="text-sm font-medium"
-            style={{ color: PORTAL.PANEL_WHITE }}
-          >
+          <h3 id={`portal-exp-${entry.id}`} className="text-base font-medium text-[#edebe4]">
             {entry.title}
-          </h4>
-          <p className="text-sm mt-0.5" style={{ color }}>
-            {entry.company}
-          </p>
+          </h3>
+          <p className={`mt-0.5 text-sm ${look.text}`}>{entry.company}</p>
         </div>
-        <span
-          className="text-sm tracking-wider px-1.5 py-0.5"
-          style={{ background: `${color}12`, color }}
-        >
-          {startDisplay} - {endDisplay}
+        <span className={`px-1.5 py-0.5 text-sm tracking-wider ${look.chip}`}>
+          {yearOf(entry.startDate)} - {yearOf(entry.endDate)}
         </span>
       </div>
-      {entry.description && (
-        <p className="text-sm mb-2" style={{ color: PORTAL.PANEL_SCUFFED }}>
-          {entry.description}
-        </p>
-      )}
+      {entry.description && <p className="mb-2 text-sm text-[#a9a6b8]">{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1.5" role="list">
+        <ul className="space-y-1.5">
           {entry.highlights.map((highlight, i) => (
-            <li
-              key={highlight}
-              className="text-sm flex items-start gap-2"
-              style={{ color: PORTAL.PANEL_WHITE }}
-            >
-              <span
-                className="mt-1.5 w-1 h-1 rounded-full flex-shrink-0"
-                style={{
-                  background: i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE,
-                  boxShadow: `0 0 4px ${i % 2 === 0 ? PORTAL.BLUE : PORTAL.ORANGE}`,
-                }}
-                aria-hidden="true"
-              />
+            <li key={highlight} className="flex items-start gap-2 text-sm text-[#edebe4]">
+              <span className={`mt-2 h-1 w-1 shrink-0 rounded-full ${SIDE_LOOK[sideOf(i)].dot}`} aria-hidden="true" />
               {highlight}
             </li>
           ))}
@@ -223,9 +109,52 @@ export function ExperienceCard({ entry, index }: { entry: Job; index: number }) 
   )
 }
 
-// ============================================================================
-// VENTURE CARD
-// ============================================================================
+export function ProjectCard({ slot: { project, years, links }, index }: { slot: ProjectSlot; index: number }) {
+  const look = SIDE_LOOK[sideOf(index)]
+
+  return (
+    <article className="h-full bg-[#12111c] p-4" aria-labelledby={`portal-project-${project.id}`}>
+      <div className="flex items-start justify-between gap-2">
+        <h3 id={`portal-project-${project.id}`} className={`text-base font-medium ${look.text}`}>
+          {project.name}
+        </h3>
+        {years && <span className="whitespace-nowrap text-sm text-[#a9a6b8]">{years}</span>}
+      </div>
+      <p className="mt-1 text-sm text-[#b57bff]">{project.role}</p>
+      <p className="mb-2 mt-1 text-sm text-[#a9a6b8]">{project.tagline}</p>
+
+      {project.impact && (
+        <p className="mb-2 border-l-2 border-[#00a2ff] bg-[#00a2ff]/5 px-2 py-1 text-sm italic text-[#edebe4]">
+          {project.impact}
+        </p>
+      )}
+
+      <ul className="flex flex-wrap gap-1">
+        {project.techStack.slice(0, 4).map((tech, i) => (
+          <li key={tech} className={`px-1.5 py-0.5 text-sm ${SIDE_LOOK[sideOf(i)].chip}`}>
+            {tech}
+          </li>
+        ))}
+      </ul>
+
+      {links.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {links.map(({ kind, label, linkProps }, i) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className={`inline-flex min-h-[44px] items-center border-[1.5px] px-3 text-sm uppercase tracking-wider transition-colors hover:bg-white/5 ${LINK_FOCUS} ${
+                i % 2 === 0 ? 'border-[#ff9a00] text-[#ff9a00]' : 'border-[#00a2ff] text-[#00a2ff]'
+              }`}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      )}
+    </article>
+  )
+}
 
 export function VentureCard({ company }: { company: CVData['companies'][number] }) {
   return (
@@ -233,67 +162,39 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-all hover:scale-[1.01] group"
-      style={{
-        background: `linear-gradient(180deg, ${PORTAL.CHAMBER_BG}, ${PORTAL.VOID})`,
-        border: `1px solid ${PORTAL.BLUE}25`,
-      }}
-      aria-label={`${company.name} - ${company.tagline} (opens in a new tab)`}
+      className={`group block h-full border border-[#00a2ff]/30 bg-[#12111c] p-4 transition-colors hover:border-[#00a2ff] ${LINK_FOCUS}`}
+      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
     >
-      <div className="flex items-center gap-3 mb-2">
+      <div className="mb-2 flex items-center gap-3">
         <span className="text-xl" aria-hidden="true">{company.icon}</span>
         <div>
-          <h4
-            className="text-sm group-hover:brightness-125 transition-all"
-            style={{ color: PORTAL.PANEL_WHITE }}
-          >
-            {company.name}
-          </h4>
-          <p className="text-sm" style={{ color: PORTAL.ORANGE }}>{company.tagline}</p>
+          <h3 className="text-base text-[#edebe4]">{company.name}</h3>
+          <p className="text-sm text-[#ff9a00]">{company.tagline}</p>
         </div>
       </div>
-      <p className="text-sm mb-2" style={{ color: PORTAL.PANEL_SCUFFED }}>{company.description}</p>
-      <div className="flex flex-wrap gap-1">
+      <p className="mb-2 text-sm text-[#a9a6b8]">{company.description}</p>
+      <ul className="flex flex-wrap gap-1">
         {company.services.slice(0, 3).map((service) => (
-          <span
-            key={service}
-            className="text-sm px-1.5 py-0.5"
-            style={{ background: `${PORTAL.BLUE}12`, color: PORTAL.BLUE }}
-          >
+          <li key={service} className="bg-[#00a2ff]/10 px-1.5 py-0.5 text-sm text-[#00a2ff]">
             {service}
-          </span>
+          </li>
         ))}
-      </div>
+      </ul>
     </a>
   )
 }
 
-// ============================================================================
-// BAND CARD
-// ============================================================================
-
 export function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
-    <article
-      className="h-full p-4 transition-all hover:scale-[1.01] group"
-      style={{
-        background: `linear-gradient(180deg, ${PORTAL.CHAMBER_BG}, ${PORTAL.VOID})`,
-        border: `1px solid ${PORTAL.ORANGE}25`,
-      }}
-    >
-      <h3
-        className="text-sm group-hover:brightness-125 transition-all"
-        style={{ color: PORTAL.PANEL_WHITE }}
-      >
-        {band.name}
-      </h3>
-      <p className="text-sm mt-0.5" style={{ color: PORTAL.ORANGE }}>
+    <article className="h-full bg-[#12111c] p-4">
+      <h3 className="text-base text-[#edebe4]">{band.name}</h3>
+      <p className="mt-0.5 text-sm text-[#ff9a00]">
         {band.role}
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
       {band.release && (
-        <p className="text-sm mt-1.5" style={{ color: PORTAL.PANEL_SCUFFED }}>
+        <p className="mt-1.5 text-sm text-[#a9a6b8]">
           Released <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
@@ -302,7 +203,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 
   if (!linkProps) return content
   return (
-    <a {...linkProps} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white">
+    <a {...linkProps} className={`block h-full ${LINK_FOCUS}`}>
       {content}
     </a>
   )
