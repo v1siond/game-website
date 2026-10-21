@@ -38,7 +38,7 @@ function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitch
         value={currentLocale}
         onChange={(e) => changeLocale(e.target.value as Locale)}
         disabled={isPending}
-        className="text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="min-h-11 text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
       >
         {locales.map((locale) => (
           <option key={locale} value={locale}>
@@ -47,7 +47,7 @@ function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitch
         ))}
       </select>
       {isPending && (
-        <span className="text-xs text-gray-500">{navigation.loading}</span>
+        <span className="text-sm text-gray-600">{navigation.loading}</span>
       )}
     </div>
   )

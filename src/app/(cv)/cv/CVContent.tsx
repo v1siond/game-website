@@ -6,6 +6,7 @@ import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/components/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 
 // A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
@@ -32,15 +33,17 @@ export function CVContent() {
     <>
       {/* Toolbar - hidden in print, pinned to the top at every width. Leaving the CV on the left, the CV's own
           controls together on the right. A client side link keeps the world and the profession picked before
-          opening the CV. */}
+          opening the CV. The right padding keeps those controls clear of the fixed Worlds button in the top
+          right corner (an icon on a phone, the labelled pill from sm) until the page is wide enough that
+          the centred toolbar ends left of it. */}
       <nav
         aria-label={labels.navigation.primaryNavigation}
         className="sticky top-0 z-40 border-b border-gray-200 bg-white print:hidden"
       >
-        <div className="max-w-[850px] mx-auto px-4 py-3 sm:px-8 flex flex-wrap justify-between items-center gap-x-4 gap-y-2">
+        <div className="max-w-[850px] mx-auto py-3 pl-4 pr-16 sm:pl-8 sm:pr-36 xl:pr-8 flex flex-wrap justify-between items-center gap-x-4 gap-y-2">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-gray-700 rounded px-1 py-1 hover:text-black hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="flex min-h-11 items-center gap-2 text-sm text-gray-700 rounded px-1 py-1 hover:text-black hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
             <span aria-hidden="true">&larr;</span>
             {cvPage.backToSite}
@@ -65,7 +68,7 @@ export function CVContent() {
           {professionalSummary && (
             <p className="text-lg text-gray-700 mb-2">{professionalSummary.headline}</p>
           )}
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]">
             <span>{contact.email}</span>
             <span aria-hidden="true">|</span>
             <a href={contact.linkedin} className="text-blue-700 underline">
@@ -113,7 +116,7 @@ export function CVContent() {
                     <span className="text-sm text-gray-600">{labels.years.present}</span>
                   </div>
                   <p className="text-sm italic text-gray-700">
-                    {role.company}
+                    <SlashBreaks text={role.company} />
                     {companyUrl && ` - ${companyUrl}`}
                   </p>
                   <p className="text-sm mt-1">{role.description}</p>
@@ -131,7 +134,9 @@ export function CVContent() {
             </h2>
             {featuredProjects.map((project) => (
               <div key={project.id} className="mb-4">
-                <h3 className="text-base font-semibold">{project.name}</h3>
+                <h3 className="text-base font-semibold">
+                  <SlashBreaks text={project.name} />
+                </h3>
                 <p className="text-sm italic text-gray-700">{project.tagline}</p>
                 <p className="text-sm mt-1">{project.description}</p>
                 {project.impact && (
@@ -139,7 +144,7 @@ export function CVContent() {
                     {labels.cards.impact}: {project.impact}
                   </p>
                 )}
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 mt-1">
                   {labels.cards.tech}: {project.techStack.join(', ')}
                 </p>
               </div>
@@ -178,7 +183,9 @@ export function CVContent() {
                     {yearRange(exp)}
                   </span>
                 </div>
-                <p className="text-sm italic text-gray-700">{exp.company}</p>
+                <p className="text-sm italic text-gray-700">
+                  <SlashBreaks text={exp.company} />
+                </p>
                 {exp.highlights && exp.highlights.length > 0 && (
                   <ul className="text-sm list-disc list-inside mt-1 space-y-1">
                     {exp.highlights.map((highlight, i) => (

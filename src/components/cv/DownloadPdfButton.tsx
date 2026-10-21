@@ -57,7 +57,7 @@ export function DownloadPdfButton({ label }: DownloadPdfButtonProps) {
     <button
       onClick={handleDownload}
       disabled={isGenerating}
-      className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
+      className="inline-flex min-h-11 items-center gap-2 px-4 py-2 bg-black text-white text-sm font-medium rounded hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors print:hidden"
     >
       {isGenerating ? (
         <>
