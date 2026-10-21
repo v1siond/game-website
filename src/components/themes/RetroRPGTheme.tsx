@@ -73,7 +73,7 @@ export default function RetroRPGTheme() {
           />
 
           <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-text)] ${PIXEL} ${SHOW_AFTER.last}`}>
-            <span>{view.hero.name}</span>
+            <span><NameWords name={view.hero.name} /></span>
             <span className="text-[color:var(--rpg-gold)]">{labels.professions[active]}</span>
             <span className="h-4 w-24 bg-[color:var(--rpg-gold)]" aria-hidden="true" />
           </div>
@@ -95,7 +95,7 @@ export default function RetroRPGTheme() {
 
       <footer className="relative z-20 py-10 text-center">
         <p className={`text-sm text-[color:var(--rpg-muted)] ${MONO}`}>
-          © {new Date().getFullYear()} {view.hero.name}
+          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
         </p>
       </footer>
     </div>

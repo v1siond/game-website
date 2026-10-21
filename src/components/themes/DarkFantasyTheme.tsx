@@ -1790,13 +1790,13 @@ export default function DarkFantasyTheme() {
               <SpiritWisp size={32} color={DARK_FANTASY.spiritGold} />
             </div>
             <span
-              className="text-sm md:text-lg tracking-[0.15em] md:tracking-[0.2em] font-normal uppercase whitespace-nowrap"
+              className="text-sm md:text-lg tracking-[0.15em] md:tracking-[0.2em] font-normal uppercase"
               style={{
                 color: DARK_FANTASY.bone,
                 textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30`,
               }}
             >
-              {view.hero.name}
+              <NameWords name={view.hero.name} />
             </span>
           </Link>
 
@@ -1942,7 +1942,7 @@ export default function DarkFantasyTheme() {
         <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silver }}>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
-            <span className="sr-only">{navigation.copyright} </span>© {new Date().getFullYear()} {view.hero.name}
+            <span className="sr-only">{navigation.copyright} </span>© {new Date().getFullYear()} <NameWords name={view.hero.name} />
           </span>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
         </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -67,7 +68,7 @@ export default function AdventurePathsTheme() {
         <RecruiterHero
           render={({ name }) => (
             <p className="text-sm text-[color:var(--ap-edge)]">
-              © {new Date().getFullYear()} {name}
+              © {new Date().getFullYear()} <NameWords name={name} />
             </p>
           )}
         />

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { NameWords } from '@/components/cv/NameWords'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -69,7 +70,7 @@ export default function CellShadedTheme() {
 
       <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <p className="inline-block bg-[var(--cel-ink)] px-3 py-1 text-base font-bold text-[var(--cel-paper)]">
-          © {new Date().getFullYear()} {view.hero.name}
+          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
         </p>
       </footer>
     </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { Lilita_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { NameWords } from '@/components/cv/NameWords'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -77,7 +78,7 @@ export default function TropicalPlatformerTheme() {
 
       <footer className="relative z-20 bg-[color:var(--tp-night-deep)] py-10 text-center">
         <p className="text-sm text-[color:var(--tp-plank-light)]">
-          © {new Date().getFullYear()} {view.hero.name}
+          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
         </p>
       </footer>
     </div>

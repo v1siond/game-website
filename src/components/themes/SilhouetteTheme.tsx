@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { NameWords } from '@/components/cv/NameWords'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -63,7 +64,7 @@ export default function SilhouetteTheme() {
             <div className="h-px w-6 bg-[color:var(--sh-edge)]" />
           </div>
           <p className="text-sm text-[color:var(--sh-dim)]">
-            © {new Date().getFullYear()} {view.hero.name}
+            © {new Date().getFullYear()} <NameWords name={view.hero.name} />
           </p>
         </footer>
       </div>

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { NameWords } from '@/components/cv/NameWords'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -64,7 +65,7 @@ export default function RetroAtomicTheme() {
 
       <footer className="relative z-20 bg-atomic-ink py-8 text-center" role="contentinfo">
         <p className="text-sm text-atomic-ash">
-          © {new Date().getFullYear()} {view.hero.name}
+          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
         </p>
       </footer>
     </div>

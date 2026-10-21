@@ -172,7 +172,7 @@ export default function MedievalFantasyTheme() {
         {/* Footer */}
         <footer style={{ textAlign: 'center', paddingTop: '0.75rem' }}>
           <p style={{ color: REALM.textDim, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            © {new Date().getFullYear()} {view.hero.name}
+            © {new Date().getFullYear()} <NameWords name={view.hero.name} />
           </p>
         </footer>
       </div>

@@ -1,9 +1,10 @@
 'use client'
 
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
@@ -98,20 +99,6 @@ function ChamberScene({ index, on }: { index: number; on: boolean }) {
   )
 }
 
-// A company written as two names joined by a slash may wrap after the slash, so the carved capitals of a
-// long pair fit a narrow chamber without breaking inside a name.
-const withSlashBreaks = (text: string) =>
-  text.split('/').map((part, index) => (
-    <Fragment key={index}>
-      {index > 0 && (
-        <>
-          /<wbr />
-        </>
-      )}
-      {part}
-    </Fragment>
-  ))
-
 function Chamber({ job, index, on, onEnter }: { job: Job; index: number; on: boolean; onEnter: (id: string) => void }) {
   const { years, cards } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.35 })
@@ -125,7 +112,7 @@ function Chamber({ job, index, on, onEnter }: { job: Job; index: number; on: boo
     <article ref={ref} data-on={on || undefined} className={`overflow-hidden ${u.panel} ${u.chamber}`}>
       <ChamberScene index={index} on={on} />
       <div className={`p-5 ${u.chamberText}`}>
-        <h3 className={`text-xl leading-tight text-[var(--myth-gold)] ${u.display}`}>{withSlashBreaks(job.company)}</h3>
+        <h3 className={`text-xl leading-tight text-[var(--myth-gold)] ${u.display}`}><SlashBreaks text={job.company} /></h3>
         <p className="mt-1 text-base font-bold">{job.title}</p>
         <p className="text-sm text-[var(--myth-bone-shade)]">
           {fillLabel(years.range, { start, end })}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
@@ -131,7 +132,7 @@ export default function RubberHoseTheme() {
           <div className="flex items-center justify-center gap-4">
             <div className="h-0.5 w-16 bg-[var(--hose-ink)]" aria-hidden="true" />
             <p className={`text-sm tracking-widest ${world.muted}`}>
-              © {new Date().getFullYear()} {view.hero.name}
+              © {new Date().getFullYear()} <NameWords name={view.hero.name} />
             </p>
             <div className="h-0.5 w-16 bg-[var(--hose-ink)]" aria-hidden="true" />
           </div>
