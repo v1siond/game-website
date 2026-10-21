@@ -29,23 +29,25 @@ export interface DrumKitColors {
   // The snare and floor tom rims, and the bass drum's.
   rim: string
   bass: string
+  // The cymbals' brass; a world with its own metal passes it.
+  cymbal?: string
   // The cymbals tip on each stick hit (heroScene's .cymbal, the world's numbers in its tempo).
   cymbalsTip?: boolean
 }
 
-const CYMBAL = '#f5d28a'
+const BRASS = '#f5d28a'
 
 // His kit: bass drum, snare, floor tom, hi-hat and the crash.
 export function DrumKit({ className = '', colors }: { className?: string; colors: DrumKitColors }) {
-  const { stand, shell, rim, bass, cymbalsTip = false } = colors
-  const cymbal = cymbalsTip ? scene.cymbal : ''
+  const { stand, shell, rim, bass, cymbal = BRASS, cymbalsTip = false } = colors
+  const tip = cymbalsTip ? scene.cymbal : ''
 
   return (
     <svg viewBox="0 0 80 60" className={className} aria-hidden="true" focusable="false">
       <line x1={8} y1={18} x2={8} y2={58} stroke={stand} strokeWidth={1.5} />
-      <ellipse cx={8} cy={18} rx={9} ry={2} fill={CYMBAL} className={cymbal} />
+      <ellipse cx={8} cy={18} rx={9} ry={2} fill={cymbal} className={tip} />
       <line x1={70} y1={10} x2={70} y2={58} stroke={stand} strokeWidth={1.5} />
-      <ellipse cx={70} cy={10} rx={11} ry={2.2} fill={CYMBAL} className={`${cymbal} [--phase:0.5turn]`} />
+      <ellipse cx={70} cy={10} rx={11} ry={2.2} fill={cymbal} className={`${tip} [--phase:0.5turn]`} />
       <rect x={14} y={30} width={16} height={9} rx={2} fill={shell} stroke={rim} strokeWidth={1} />
       <rect x={52} y={34} width={14} height={22} rx={2} fill={shell} stroke={rim} strokeWidth={1} />
       <circle cx={38} cy={44} r={15} fill={shell} stroke={bass} strokeWidth={2} />

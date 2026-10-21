@@ -106,7 +106,7 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
 
 // ---- Musician: the club stage, red curtains, spotlights and his kit ----
 
-const KIT: DrumKitColors = { stand: NOIR.fog, shell: NOIR.smoke, rim: NOIR.paper, bass: NOIR.red }
+const KIT: DrumKitColors = { stand: NOIR.fog, shell: NOIR.smoke, rim: NOIR.paper, bass: NOIR.red, cymbal: NOIR.fog }
 const WAVES: [string, string] = [NOIR.paper, NOIR.red]
 
 const SPOTLIGHTS = [
