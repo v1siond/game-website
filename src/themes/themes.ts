@@ -2,6 +2,7 @@
 // Fantasy and Medieval Fantasy have no palette module yet, so their hex stays here.
 import { TRAIL } from '@/components/themes/AdventurePaths/palette'
 import { DECO_COLORS } from '@/components/themes/ArtDeco/palette'
+import { DARK_FANTASY } from '@/components/themes/DarkFantasy/palette'
 import { NOIR } from '@/components/themes/BoldNoir/palette'
 import { CEL } from '@/components/themes/CellShaded/palette'
 import { FS } from '@/components/themes/FighterSelect/palette'
@@ -56,17 +57,17 @@ export const themes: Theme[] = [
     name: 'Dark Fantasy',
     description: 'Ethereal ruined kingdom - an interconnected map',
     colors: {
-      background: '#0f0a1a',
-      backgroundGradient: 'linear-gradient(to bottom, #0f0a1a, #1a1025)',
-      accent: '#41c8e8',
-      text: '#c8d4e8',
-      textMuted: '#6b7a94',
-      secondary: '#9966cc',
-      highlight: '#e8c841',
-      border: '#2a2540',
-      borderHover: '#41c8e8',
-      surface: '#150f25',
-      surfaceHover: '#1f1835',
+      background: DARK_FANTASY.void,
+      backgroundGradient: `linear-gradient(to bottom, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidDeep})`,
+      accent: DARK_FANTASY.ethereal,
+      text: DARK_FANTASY.text,
+      textMuted: DARK_FANTASY.textMuted,
+      secondary: DARK_FANTASY.violet,
+      highlight: DARK_FANTASY.spiritGold,
+      border: DARK_FANTASY.rim,
+      borderHover: DARK_FANTASY.ethereal,
+      surface: DARK_FANTASY.voidPurple,
+      surfaceHover: DARK_FANTASY.surfaceHover,
     },
     font: 'serif',
     effects: {
