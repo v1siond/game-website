@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
-import { bandSpan } from './sectionText'
+import type { Labels } from '@/lib/cv/labels'
+import { useLabels } from './CVDataProvider'
+import { bandSpan, newTabName } from './sectionText'
 
 // The bands (R5) as a list without a look, in the order viewFor gives (current first). A band with a
 // site carries `linkProps` for the world's anchor; one without carries null and is drawn as text.
@@ -18,20 +20,21 @@ interface BandListProps {
   itemClassName?: string
 }
 
-const slotFor = (band: Band): BandSlot => ({
+const slotFor = (band: Band, labels: Labels): BandSlot => ({
   band,
-  years: bandSpan(band),
+  years: bandSpan(band, labels.years),
   linkProps: band.url
-    ? { href: band.url, target: '_blank', rel: 'noopener noreferrer', 'aria-label': `${band.name} (opens in a new tab)` }
+    ? { href: band.url, target: '_blank', rel: 'noopener noreferrer', 'aria-label': newTabName(labels.links, band.name) }
     : null,
 })
 
 export function BandList({ bands, renderBand, className, itemClassName }: BandListProps) {
+  const labels = useLabels()
   return (
     <ul className={className}>
       {bands.map((band) => (
         <li key={band.id} className={itemClassName}>
-          {renderBand(slotFor(band))}
+          {renderBand(slotFor(band, labels))}
         </li>
       ))}
     </ul>

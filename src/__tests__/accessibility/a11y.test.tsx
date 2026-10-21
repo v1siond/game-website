@@ -1,10 +1,8 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { render } from '@testing-library/react'
+import { renderWithCV as render, testCV } from '../helpers/test-utils'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
-import { ThemeProvider } from '@/themes/ThemeContext'
-import { ProfessionProvider } from '@/contexts/ProfessionContext'
 
 // save stays pending so the loading state the button announces can be observed.
 jest.mock('html2pdf.js', () => ({
@@ -16,12 +14,7 @@ jest.mock('html2pdf.js', () => ({
   })),
 }))
 
-// Wrapper for components that need theme context
-const ThemeWrapper = ({ children }: { children: React.ReactNode }) => (
-  <ThemeProvider>
-    <ProfessionProvider>{children}</ProfessionProvider>
-  </ThemeProvider>
-)
+const { cvPage } = testCV().labels
 
 describe('Accessibility Tests', () => {
   describe('DownloadPdfButton Accessibility', () => {
@@ -96,7 +89,7 @@ describe('Accessibility Tests', () => {
     it('has accessible select with label', () => {
       render(<LanguageSwitcher />)
 
-      expect(screen.getByText('Language:')).toBeInTheDocument()
+      expect(screen.getByText(cvPage.language)).toBeInTheDocument()
       expect(screen.getByRole('combobox')).toBeInTheDocument()
     })
 
@@ -113,7 +106,7 @@ describe('Accessibility Tests', () => {
       render(<LanguageSwitcher />)
 
       expect(screen.getByRole('option', { name: 'English' })).toBeInTheDocument()
-      expect(screen.getByRole('option', { name: 'Espanol' })).toBeInTheDocument()
+      expect(screen.getByRole('option', { name: 'Español' })).toBeInTheDocument()
       expect(screen.getByRole('option', { name: 'Italiano' })).toBeInTheDocument()
     })
 
@@ -144,8 +137,7 @@ describe('Accessibility Tests', () => {
       render(
         <div>
           <DownloadPdfButton label="Download" />
-        </div>,
-        { wrapper: ThemeWrapper }
+        </div>
       )
 
       const buttons = screen.getAllByRole('button')
@@ -167,7 +159,7 @@ describe('Accessibility Tests', () => {
       expect(downloadButton).toHaveClass('print:hidden')
 
       // Language switcher container should be hidden in print
-      const container = screen.getByText('Language:').parentElement
+      const container = screen.getByText(cvPage.language).parentElement
       expect(container).toHaveClass('print:hidden')
     })
   })

@@ -1,7 +1,9 @@
 import type { Band, Job, MartialArts, Musician, Project, ProjectLinks } from '@/lib/cv/content'
+import { fillLabel, type Labels } from '@/lib/cv/labels'
 
-// The words every world prints around the CV facts: link labels, year spans, the Muay Thai record
-// lines. One place, so the 17 worlds say the same thing and only draw it differently.
+// The phrases every world prints around the CV facts: link labels, year spans, the Muay Thai record
+// lines. The words are the labels (content/cv/labels.json, read through useLabels); these functions only
+// put the facts into them, so the 17 worlds say the same thing and only draw it differently.
 
 export type ProjectLinkKind = keyof ProjectLinks
 
@@ -11,22 +13,30 @@ export interface ProjectLink {
   href: string
 }
 
-// Listing order on a card; `store` is a marketplace page (Shopify App Store, Google Cloud Marketplace).
-const PROJECT_LINK_LABELS: ReadonlyArray<readonly [ProjectLinkKind, string]> = [
-  ['site', 'Website'],
-  ['app', 'App'],
-  ['store', 'Marketplace'],
-  ['story', 'Story'],
+// Listing order on a card, each kind with its label; `store` is a marketplace page (Shopify App Store,
+// Google Cloud Marketplace).
+const PROJECT_LINK_LABELS: ReadonlyArray<readonly [ProjectLinkKind, keyof Labels['links']]> = [
+  ['site', 'website'],
+  ['app', 'app'],
+  ['store', 'marketplace'],
+  ['story', 'story'],
 ]
 
 /** The links a project card shows, in a fixed order; an empty one (Decap stores it as "") is left out. */
-export function projectLinks(project: Pick<Project, 'links'>): ProjectLink[] {
+export function projectLinks(project: Pick<Project, 'links'>, links: Labels['links']): ProjectLink[] {
   return PROJECT_LINK_LABELS.filter(([kind]) => project.links[kind]).map(([kind, label]) => ({
     kind,
-    label,
+    label: links[label],
     href: project.links[kind],
   }))
 }
+
+/** The accessible name of a link that opens a new tab: "Lumi (opens in a new tab)". */
+export const newTabName = (links: Labels['links'], name: string): string => fillLabel(links.newTab, { name })
+
+/** "1 year", "4 years". */
+const yearCount = (count: number, labels: Labels['years']): string =>
+  fillLabel(count === 1 ? labels.yearOne : labels.yearMany, { count })
 
 interface Span {
   startYear: number | null
@@ -39,31 +49,27 @@ interface Span {
  * "Since 2018" while it runs, "2016 to 2018" or "2023" once it ended, "2 years" when only a length is
  * known, "" when nothing is.
  */
-export function yearSpan({ startYear, endYear, current, years = null }: Span): string {
-  if (current && startYear !== null) return `Since ${startYear}`
-  if (startYear !== null && endYear !== null) return startYear === endYear ? `${startYear}` : `${startYear} to ${endYear}`
-  if (years !== null) return `${years} years`
+export function yearSpan({ startYear, endYear, current, years = null }: Span, labels: Labels['years']): string {
+  if (current && startYear !== null) return fillLabel(labels.since, { year: startYear })
+  if (startYear !== null && endYear !== null) {
+    return startYear === endYear ? `${startYear}` : fillLabel(labels.range, { start: startYear, end: endYear })
+  }
+  if (years !== null) return yearCount(years, labels)
   return ''
 }
 
-export const bandSpan = (band: Band): string => yearSpan(band)
+export const bandSpan = (band: Band, labels: Labels['years']): string => yearSpan(band, labels)
 
 /** The line over the bands: "Drums since 2005, 19 years". */
-export const drumsSince = ({ since, yearsPlaying }: Pick<Musician, 'since' | 'yearsPlaying'>): string =>
-  `Drums since ${since}, ${yearsPlaying} years`
-
-/** The word before a band's release title, which the world sets in its own <cite>. */
-export const RELEASED = 'Released'
-
-/** What a project card says when it has no link to show. */
-export const NO_PUBLIC_LINK = 'No public link'
+export const drumsSince = ({ since, yearsPlaying }: Pick<Musician, 'since' | 'yearsPlaying'>, labels: Labels['years']): string =>
+  fillLabel(labels.drumsSince, { since, years: yearsPlaying })
 
 export interface JobYears {
   start: number
   end: number | string
 }
 
-/** A job's start and end year; a running job ends in the world's own word for now ("Present", "NOW").
+/** A job's start and end year; a running job ends in the label for now the world passes (years.present).
  *  Dates are date only strings (UTC midnight), so the year is read in UTC. */
 export function jobYears(job: Pick<Job, 'startDate' | 'endDate'>, openLabel: string): JobYears {
   return { start: job.startDate.getUTCFullYear(), end: job.endDate ? job.endDate.getUTCFullYear() : openLabel }
@@ -74,24 +80,23 @@ export interface RecordFact {
   value: string
 }
 
-const plural = (count: number, noun: string): string => `${count} ${noun}${count === 1 ? '' : 's'}`
-
 /** The Muay Thai record as label and value lines, in reading order. */
-export function muayThaiFacts({ primary, training, background }: MartialArts): RecordFact[] {
-  const alsoTraining = training.map(
-    ({ discipline, academy, instructor, current }) =>
-      `${discipline} at ${academy}, under ${instructor}${current ? ', now' : ''}`,
-  )
+export function muayThaiFacts({ primary, training, background }: MartialArts, labels: Pick<Labels, 'record' | 'years'>): RecordFact[] {
+  const { record, years } = labels
+  const alsoTraining = training.map(({ current, ...place }) => fillLabel(current ? record.trainingNow : record.training, place))
   return [
-    { label: 'Dojo', value: `${primary.dojo}, ${primary.place}, founded by ${primary.founder}` },
-    { label: 'Rank', value: primary.rank },
+    { label: record.dojo, value: fillLabel(record.dojoLine, { dojo: primary.dojo, place: primary.place, founder: primary.founder }) },
+    { label: record.rank, value: primary.rank },
     {
       label: primary.discipline,
-      value: `${plural(primary.yearsTraining, 'year')} training, ${plural(primary.yearsTeaching, 'year')} teaching`,
+      value: fillLabel(record.practice, {
+        training: yearCount(primary.yearsTraining, years),
+        teaching: yearCount(primary.yearsTeaching, years),
+      }),
     },
-    { label: 'Now', value: primary.now },
-    ...alsoTraining.map((value) => ({ label: 'Also training', value })),
-    { label: 'Background', value: background },
+    { label: record.now, value: primary.now },
+    ...alsoTraining.map((value) => ({ label: record.alsoTraining, value })),
+    { label: record.background, value: background },
   ].filter((fact) => fact.value)
 }
 

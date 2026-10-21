@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Project } from '@/lib/cv/content'
-import { projectLinks, yearSpan, type ProjectLink } from './sectionText'
+import { fillLabel, type Labels } from '@/lib/cv/labels'
+import { useLabels } from './CVDataProvider'
+import { newTabName, projectLinks, yearSpan, type ProjectLink } from './sectionText'
 
 // The projects of a world (R4) as a list without a look: one item per project in the order viewFor
 // gives, each with its year span and its links ready to spread on an anchor (new tab, a name that says
@@ -23,26 +25,27 @@ interface ProjectListProps {
   itemClassName?: string
 }
 
-const slotFor = (project: Project): ProjectSlot => ({
+const slotFor = (project: Project, labels: Labels): ProjectSlot => ({
   project,
-  years: yearSpan(project),
-  links: projectLinks(project).map((link) => ({
+  years: yearSpan(project, labels.years),
+  links: projectLinks(project, labels.links).map((link) => ({
     ...link,
     linkProps: {
       href: link.href,
       target: '_blank',
       rel: 'noopener noreferrer',
-      'aria-label': `${link.label} of ${project.name} (opens in a new tab)`,
+      'aria-label': newTabName(labels.links, fillLabel(labels.links.linkOf, { link: link.label, project: project.name })),
     },
   })),
 })
 
 export function ProjectList({ projects, renderProject, className, itemClassName }: ProjectListProps) {
+  const labels = useLabels()
   return (
     <ul className={className}>
       {projects.map((project) => (
         <li key={project.id} className={itemClassName}>
-          {renderProject(slotFor(project))}
+          {renderProject(slotFor(project, labels))}
         </li>
       ))}
     </ul>

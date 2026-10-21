@@ -3,108 +3,22 @@
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
-import type { Locale } from '@/i18n/config'
+import { useCVData } from '@/components/cv/CVDataProvider'
+import { jobYears } from '@/components/cv/sectionText'
 
-interface CVData {
-  professionalSummary: {
-    headline: string
-    tagline: string
-    bio: string
-    highlights: string[]
-  } | null
-  currentRoles: Array<{
-    id: string
-    slug: string
-    title: string
-    company: string
-    type: string
-    description: string
-  }>
-  companies: Array<{
-    id: string
-    slug: string
-    name: string
-    tagline: string
-    description: string
-    url: string
-    services: string[]
-    icon: string
-  }>
-  featuredProjects: Array<{
-    id: string
-    slug: string
-    name: string
-    tagline: string
-    description: string
-    impact: string | null
-    techStack: string[]
-    status: string
-    links: { demo?: string; github?: string; site?: string } | null
-  }>
-  techStack: Array<{
-    id: string
-    name: string
-    icon: string
-    items: string[]
-  }>
-  workExperience: Array<{
-    id: string
-    title: string
-    company: string
-    description: string
-    startDate: Date
-    endDate: Date | null
-    current: boolean
-    highlights: string[] | null
-    skills: string[]
-  }>
-}
+// A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
+const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
-interface Translations {
-  downloadPdf: string
-  backToSite: string
-  professionalSummary: string
-  coreCompetencies: string
-  currentPositions: string
-  keyProjects: string
-  technicalSkills: string
-  professionalExperience: string
-  education: string
-  educationText: string
-  present: string
-  impact: string
-  tech: string
-}
+export function CVContent() {
+  const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, workExperience, labels } =
+    useCVData()
+  const { cvPage } = labels
 
-interface CVContentProps {
-  cvData: CVData
-  translations: Translations
-  locale: Locale
-}
-
-function formatDateRange(
-  startDate: Date,
-  endDate: Date | null,
-  current: boolean,
-  presentLabel: string
-): string {
-  // Content dates are date only ISO strings, parsed as UTC midnight; a local year would show the year
-  // before for a January 1 date anywhere west of UTC.
-  const start = new Date(startDate)
-  const startYear = start.getUTCFullYear()
-
-  if (current || !endDate) {
-    return `${startYear} - ${presentLabel}`
+  // A running job has no end date, so it ends in the label for now.
+  const yearRange = (job: (typeof workExperience)[number]): string => {
+    const { start, end } = jobYears(job, labels.years.present)
+    return `${start} - ${end}`
   }
-
-  const end = new Date(endDate)
-  const endYear = end.getUTCFullYear()
-
-  return `${startYear} - ${endYear}`
-}
-
-export function CVContent({ cvData, translations, locale }: CVContentProps) {
-  const { professionalSummary, currentRoles, companies, featuredProjects, techStack, workExperience } = cvData
 
   // Find company URL by slug matching role slug
   const getCompanyUrl = (roleSlug: string): string | undefined => {
@@ -122,11 +36,11 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
           className="flex items-center gap-2 text-sm text-gray-700 rounded px-1 py-1 hover:text-black hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         >
           <span aria-hidden="true">&larr;</span>
-          {translations.backToSite}
+          {cvPage.backToSite}
         </Link>
         <div className="flex flex-wrap items-center gap-4">
           <LanguageSwitcher />
-          <DownloadPdfButton label={translations.downloadPdf} />
+          <DownloadPdfButton label={cvPage.downloadPdf} />
         </div>
       </div>
 
@@ -137,12 +51,12 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
       >
         {/* Header / Contact */}
         <header className="border-b-2 border-black pb-4 mb-6">
-          <h1 className="text-3xl font-bold mb-1">Alexander Pulido</h1>
+          <h1 className="text-3xl font-bold mb-1">{fullName}</h1>
           {professionalSummary && (
             <p className="text-lg text-gray-700 mb-2">{professionalSummary.headline}</p>
           )}
           <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-            <span>alexanderpulido81@gmail.com</span>
+            <span>{contact.email}</span>
             <span>|</span>
             <a href="https://dbadbadba.com" className="text-blue-700 underline">
               dbadbadba.com
@@ -155,11 +69,8 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
               github.com/alexanderpulido
             </a>
             <span>|</span>
-            <a
-              href="https://linkedin.com/in/alexanderpulido"
-              className="text-blue-700 underline"
-            >
-              linkedin.com/in/alexanderpulido
+            <a href={contact.linkedin} className="text-blue-700 underline">
+              {shownUrl(contact.linkedin)}
             </a>
           </div>
         </header>
@@ -168,7 +79,7 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
         {professionalSummary && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {translations.professionalSummary}
+              {cvPage.professionalSummary}
             </h2>
             <p className="text-sm leading-relaxed">{professionalSummary.bio}</p>
           </section>
@@ -178,7 +89,7 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
         {professionalSummary && professionalSummary.highlights.length > 0 && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {translations.coreCompetencies}
+              {cvPage.coreCompetencies}
             </h2>
             <ul className="text-sm list-disc list-inside columns-2 gap-8">
               {professionalSummary.highlights.map((h, i) => (
@@ -192,7 +103,7 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
         {currentRoles.length > 0 && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {translations.currentPositions}
+              {cvPage.currentPositions}
             </h2>
             {currentRoles.map((role) => {
               const companyUrl = getCompanyUrl(role.slug)
@@ -200,7 +111,7 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
                 <div key={role.id} className="mb-4">
                   <div className="flex justify-between items-baseline">
                     <h3 className="text-base font-semibold">{role.title}</h3>
-                    <span className="text-sm text-gray-600">{translations.present}</span>
+                    <span className="text-sm text-gray-600">{labels.years.present}</span>
                   </div>
                   <p className="text-sm italic text-gray-700">
                     {role.company}
@@ -217,7 +128,7 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
         {featuredProjects.length > 0 && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {translations.keyProjects}
+              {cvPage.keyProjects}
             </h2>
             {featuredProjects.map((project) => (
               <div key={project.id} className="mb-4">
@@ -226,11 +137,11 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
                 <p className="text-sm mt-1">{project.description}</p>
                 {project.impact && (
                   <p className="text-sm mt-1 font-medium">
-                    {translations.impact}: {project.impact}
+                    {labels.cards.impact}: {project.impact}
                   </p>
                 )}
                 <p className="text-xs text-gray-600 mt-1">
-                  {translations.tech}: {project.techStack.join(', ')}
+                  {labels.cards.tech}: {project.techStack.join(', ')}
                 </p>
               </div>
             ))}
@@ -241,7 +152,7 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
         {techStack.length > 0 && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {translations.technicalSkills}
+              {cvPage.technicalSkills}
             </h2>
             <div className="text-sm space-y-2">
               {techStack.map((category) => (
@@ -258,14 +169,14 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
         {workExperience.length > 0 && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-              {translations.professionalExperience}
+              {cvPage.professionalExperience}
             </h2>
             {workExperience.map((exp) => (
               <div key={exp.id} className="mb-4">
                 <div className="flex justify-between items-baseline">
                   <h3 className="text-base font-semibold">{exp.title}</h3>
                   <span className="text-sm text-gray-600">
-                    {formatDateRange(exp.startDate, exp.endDate, exp.current, translations.present)}
+                    {yearRange(exp)}
                   </span>
                 </div>
                 <p className="text-sm italic text-gray-700">{exp.company}</p>
@@ -284,9 +195,9 @@ export function CVContent({ cvData, translations, locale }: CVContentProps) {
         {/* Education & Certifications */}
         <section className="mb-6">
           <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
-            {translations.education}
+            {cvPage.education}
           </h2>
-          <p className="text-sm">{translations.educationText}</p>
+          <p className="text-sm">{cvPage.educationText}</p>
         </section>
 
         {/* Print styles */}

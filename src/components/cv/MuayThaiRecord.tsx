@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
+import { useLabels } from './CVDataProvider'
 import { muayThaiFacts } from './sectionText'
 
 // The Muay Thai record (R6) without a look: the facts as a description list and the achievements as a
@@ -22,17 +23,18 @@ interface MuayThaiRecordProps {
 }
 
 export function MuayThaiRecord({ martialArts, classNames = {}, renderAchievement = (text) => text }: MuayThaiRecordProps) {
+  const labels = useLabels()
   return (
     <>
       <dl className={classNames.facts}>
-        {muayThaiFacts(martialArts).map(({ label, value }) => (
+        {muayThaiFacts(martialArts, labels).map(({ label, value }) => (
           <div key={`${label}-${value}`} className={classNames.fact}>
             <dt className={classNames.term}>{label}</dt>
             <dd className={classNames.value}>{value}</dd>
           </div>
         ))}
       </dl>
-      <ul className={classNames.achievements} aria-label="Achievements">
+      <ul className={classNames.achievements} aria-label={labels.record.achievements}>
         {martialArts.primary.achievements.map((achievement) => (
           <li key={achievement} className={classNames.achievement}>
             {renderAchievement(achievement)}

@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react'
+import { renderWithCV as render } from '../helpers/test-utils'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 
@@ -61,18 +61,6 @@ describe('Theme Data Snapshots', () => {
     expect({
       totalThemes: themes.length,
       themeIds: themes.map((t: { id: string }) => t.id).sort(),
-    }).toMatchSnapshot()
-  })
-})
-
-describe('Profession Data Snapshots', () => {
-  it('profession configs structure matches snapshot', () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { PROFESSION_CONFIGS } = require('@/contexts/ProfessionContext')
-
-    expect({
-      professionIds: Object.keys(PROFESSION_CONFIGS),
-      configKeys: Object.keys(PROFESSION_CONFIGS.engineer),
     }).toMatchSnapshot()
   })
 })

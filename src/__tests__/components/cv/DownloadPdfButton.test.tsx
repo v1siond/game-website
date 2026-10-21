@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { render } from '@testing-library/react'
+import { renderWithCV as render } from '../../helpers/test-utils'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 
 // Mock html2pdf.js

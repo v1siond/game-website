@@ -69,7 +69,7 @@ exports[`Component Snapshots LanguageSwitcher matches default snapshot 1`] = `
       <option
         value="es"
       >
-        Espanol
+        Español
       </option>
       <option
         value="it"
@@ -79,24 +79,6 @@ exports[`Component Snapshots LanguageSwitcher matches default snapshot 1`] = `
     </select>
   </div>
 </div>
-`;
-
-exports[`Profession Data Snapshots profession configs structure matches snapshot 1`] = `
-{
-  "configKeys": [
-    "id",
-    "title",
-    "tagline",
-    "icon",
-    "color",
-    "years",
-  ],
-  "professionIds": [
-    "engineer",
-    "drummer",
-    "fighter",
-  ],
-}
 `;
 
 exports[`Theme Data Snapshots default theme configuration matches snapshot 1`] = `

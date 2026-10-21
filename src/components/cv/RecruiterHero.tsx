@@ -1,7 +1,9 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useWorldView } from './CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
+import { useLabels, useWorldView } from './CVDataProvider'
+import { newTabName } from './sectionText'
 
 // The recruiter first screen (R7) without a look: his name, the headline, the tagline, the contact
 // line and the two actions, email and LinkedIn. Each world draws it through `render`, spreading
@@ -32,6 +34,7 @@ export interface RecruiterHeroSlots {
 
 export function RecruiterHero({ render }: { render: (hero: RecruiterHeroSlots) => ReactNode }) {
   const { hero } = useWorldView()
+  const { actions, links } = useLabels()
   const { email, linkedin } = hero.actions
 
   return render({
@@ -42,19 +45,19 @@ export function RecruiterHero({ render }: { render: (hero: RecruiterHeroSlots) =
     actions: [
       {
         id: 'email',
-        label: 'Email me',
+        label: actions.emailMe,
         value: email.value,
-        linkProps: { href: email.href, 'aria-label': `Email me at ${email.value}` },
+        linkProps: { href: email.href, 'aria-label': fillLabel(actions.emailMeAt, { email: email.value }) },
       },
       {
         id: 'linkedin',
-        label: 'LinkedIn',
+        label: actions.linkedin,
         value: linkedin.value,
         linkProps: {
           href: linkedin.href,
           target: '_blank',
           rel: 'noopener noreferrer',
-          'aria-label': 'LinkedIn (opens in a new tab)',
+          'aria-label': newTabName(links, actions.linkedin),
         },
       },
     ],

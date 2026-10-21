@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useTransition, useEffect, useState, type ReactNode } from 'react'
-import { locales, localeNames, type Locale } from '@/i18n/config'
+import { isLocale, locales, type Locale } from '@/i18n/config'
+import { useLabels } from './CVDataProvider'
 
 // The one language switcher. It owns reading and writing the locale cookie and the refresh; a world that
 // wants its own look passes `render` and draws the state. The cookie is the only store: it is what the
@@ -20,10 +21,6 @@ interface LanguageSwitcherProps {
 
 const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
 
-function isLocale(value: string | null | undefined): value is Locale {
-  return !!value && (locales as readonly string[]).includes(value)
-}
-
 function storedLocale(): Locale | null {
   const fromCookie = document.cookie
     .split('; ')
@@ -33,9 +30,10 @@ function storedLocale(): Locale | null {
 }
 
 function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
+  const { cvPage, languages, navigation } = useLabels()
   return (
     <div className="flex items-center gap-2 print:hidden">
-      <span className="text-sm text-gray-600">Language:</span>
+      <span className="text-sm text-gray-600">{cvPage.language}</span>
       <select
         value={currentLocale}
         onChange={(e) => changeLocale(e.target.value as Locale)}
@@ -44,12 +42,12 @@ function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitch
       >
         {locales.map((locale) => (
           <option key={locale} value={locale}>
-            {localeNames[locale]}
+            {languages[locale]}
           </option>
         ))}
       </select>
       {isPending && (
-        <span className="text-xs text-gray-500">Loading...</span>
+        <span className="text-xs text-gray-500">{navigation.loading}</span>
       )}
     </div>
   )

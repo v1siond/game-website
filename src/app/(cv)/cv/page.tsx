@@ -1,29 +1,15 @@
-import { getTranslations, getLocale } from 'next-intl/server'
 import { getAllCVData } from '@/lib/cv-data'
-import type { Locale } from '@/i18n/config'
+import { requestLocale } from '@/i18n/requestLocale'
+import { CVDataProvider } from '@/components/cv/CVDataProvider'
 import { CVContent } from './CVContent'
 
+// The CV of the request's locale, its facts and its labels from content/cv, read like the worlds read it.
 export default async function CVPage() {
-  const locale = (await getLocale()) as Locale
-  const t = await getTranslations('cv')
+  const cv = await getAllCVData(await requestLocale())
 
-  const cvData = await getAllCVData(locale)
-
-  const translations = {
-    downloadPdf: t('downloadPdf'),
-    backToSite: t('backToSite'),
-    professionalSummary: t('professionalSummary'),
-    coreCompetencies: t('coreCompetencies'),
-    currentPositions: t('currentPositions'),
-    keyProjects: t('keyProjects'),
-    technicalSkills: t('technicalSkills'),
-    professionalExperience: t('professionalExperience'),
-    education: t('education'),
-    educationText: t('educationText'),
-    present: t('present'),
-    impact: t('impact'),
-    tech: t('tech'),
-  }
-
-  return <CVContent cvData={cvData} translations={translations} locale={locale} />
+  return (
+    <CVDataProvider cv={cv}>
+      <CVContent />
+    </CVDataProvider>
+  )
 }

@@ -1,8 +1,10 @@
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { render } from '@testing-library/react'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
-import { locales, localeNames } from '@/i18n/config'
+import { locales } from '@/i18n/config'
+import { renderWithCV as render, testCV } from '../../helpers/test-utils'
+
+const { languages, cvPage } = testCV().labels
 
 // Mock next/navigation
 const mockRefresh = jest.fn()
@@ -23,7 +25,7 @@ describe('LanguageSwitcher', () => {
     it('renders language label', () => {
       render(<LanguageSwitcher />)
 
-      expect(screen.getByText('Language:')).toBeInTheDocument()
+      expect(screen.getByText(cvPage.language)).toBeInTheDocument()
     })
 
     it('renders a select dropdown', () => {
@@ -36,7 +38,7 @@ describe('LanguageSwitcher', () => {
       render(<LanguageSwitcher />)
 
       locales.forEach((locale) => {
-        expect(screen.getByRole('option', { name: localeNames[locale] })).toBeInTheDocument()
+        expect(screen.getByRole('option', { name: languages[locale] })).toBeInTheDocument()
       })
     })
 
@@ -181,10 +183,8 @@ describe('LanguageSwitcher', () => {
       expect(locales).toContain('it')
     })
 
-    it('localeNames has correct mappings', () => {
-      expect(localeNames.en).toBe('English')
-      expect(localeNames.es).toBe('Espanol')
-      expect(localeNames.it).toBe('Italiano')
+    it('names every language in its own tongue, from the labels', () => {
+      expect(languages).toEqual({ en: 'English', es: 'Español', it: 'Italiano' })
     })
   })
 })
