@@ -46,6 +46,28 @@
   clip-path: none;
 }
 
+/* A HUD button lights on hover through an overlay: its --lit tint fades in over the fill and under the
+   label, absolute in its own stacking context, so nothing repaints or moves. */
+.lit {
+  position: relative;
+  isolation: isolate;
+}
+
+.lit::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--lit);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+
+.lit:hover::after {
+  opacity: 1;
+}
+
 .ticks {
   height: 6px;
   background: repeating-linear-gradient(90deg, var(--neon-chrome-red) 0 1px, transparent 1px 8px);
@@ -779,12 +801,9 @@
   }
 }
 
-/* Doubled so it outweighs the button's own colour transition. */
-.answer.answer {
-  transition:
-    transform 0.15s ease-out,
-    background-color 0.15s,
-    color 0.15s;
+/* An answer on the call kicks out a step when pointed at; its tint is the .lit overlay. */
+.answer {
+  transition: transform 0.15s ease-out;
 }
 
 .answer:hover {

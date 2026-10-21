@@ -425,7 +425,7 @@ collections:
                   - { <<: *text, label: "Prize won", name: prizeWon, hint: 'Keep {achievement}' }
                   - { <<: *text, label: "All prizes", name: allPrizes }
                   - { <<: *text, label: "Won", name: won }
-              - label: Night city world (neon cyber)
+              - label: Neon cyber world (neon cyber)
                 name: cyber
                 widget: object
                 i18n: true
@@ -453,6 +453,7 @@ collections:
                   - { <<: *text, label: "Try again", name: retry }
                   - { <<: *text, label: "Data tab", name: dataTab }
                   - { <<: *text, label: "Incoming call", name: incomingCall }
+                  - { <<: *text, label: "Double jump", name: doubleJump }
               - label: Explorer's map world (adventure paths)
                 name: trail
                 widget: object

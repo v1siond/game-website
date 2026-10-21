@@ -139,7 +139,8 @@
         "bufferFull": "Buffer full",
         "retry": "Try again",
         "dataTab": "Data",
-        "incomingCall": "Incoming call"
+        "incomingCall": "Incoming call",
+        "doubleJump": "Double jump"
       },
       "trail": {
         "mapOf": "Expedition map of {name}",
@@ -550,7 +551,8 @@
         "bufferFull": "Búfer lleno",
         "retry": "Intentar de nuevo",
         "dataTab": "Datos",
-        "incomingCall": "Llamada entrante"
+        "incomingCall": "Llamada entrante",
+        "doubleJump": "Doble salto"
       },
       "trail": {
         "mapOf": "Mapa de la expedición de {name}",
@@ -961,7 +963,8 @@
         "bufferFull": "Buffer pieno",
         "retry": "Riprova",
         "dataTab": "Dati",
-        "incomingCall": "Chiamata in arrivo"
+        "incomingCall": "Chiamata in arrivo",
+        "doubleJump": "Doppio salto"
       },
       "trail": {
         "mapOf": "Mappa della spedizione di {name}",
