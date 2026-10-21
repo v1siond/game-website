@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { HitSpark } from './badges'
 import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
@@ -39,20 +39,15 @@ function Tags({ items, label }: { items: string[]; label: string }) {
   )
 }
 
+// The job's years stand on the round's life bars above the card (./rounds), not on the card.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Now')
   const running = !entry.endDate
 
   return (
     <FightCard accent={running ? 'health' : 'cyan'}>
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className={TITLE}>{entry.title}</h3>
-          <p className="text-sm text-[color:var(--accent)]">{entry.company}</p>
-        </div>
-        <span className={`px-3 py-1 text-sm ${look.display} ${look.tag}`}>
-          {start} - {end}
-        </span>
+      <div className="mb-4">
+        <h3 className={TITLE}>{entry.title}</h3>
+        <p className="text-sm text-[color:var(--accent)]">{entry.company}</p>
       </div>
 
       {entry.description && <p className={`mb-4 ${BODY}`}>{entry.description}</p>}

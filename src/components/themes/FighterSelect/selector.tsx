@@ -1,34 +1,83 @@
-import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
+'use client'
+
+import { useState } from 'react'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
 import { HeroCharacter } from './character'
+import { StageBackdrop } from './stages'
+import { RoundCall } from './badges'
 import { FS } from './palette'
 import look from './world.module.css'
+import fight from './fight.module.css'
 
-// One slot of the select grid: him in that profession's costume, standing in a slanted portrait frame,
-// the label on its nameplate. The picked slot glows player one blue and carries the bobbing P1 cursor.
+// The select screen. The shared ProfessionSwitch owns the pick and the keys; this draws the grid.
+// The player one cursor is one frame in player one's blue, carrying its 1P tag, that snaps (steps) to
+// the slot under the pointer or focus and returns to the pick when the pointer leaves, like a cursor
+// roaming the roster. The fighter under the cursor idles in his stance while he is weighed up. A pick
+// flashes its slot white and re-runs the preview below: the stage, him landing in his stance and the
+// profession title slammed across it (keyed by the pick, so each pick plays it again).
 
-const SLOT_LOOK = {
-  picked: { frame: look.portraitPicked, plate: 'bg-[color:var(--fs-p1-light)] text-[color:var(--fs-ink)]', lift: 'z-10 scale-105' },
-  open: { frame: look.portraitOpen, plate: 'bg-[color:var(--fs-steel)] text-white', lift: 'opacity-80 hover:opacity-100' },
+// Static classes so Tailwind sees each one; the cursor reads --slot.
+const SLOT_VAR = ['[--slot:0]', '[--slot:1]', '[--slot:2]']
+
+interface SlotProps extends ProfessionOption {
+  aimed: boolean
+  onAim: (id: Profession) => void
 }
 
-export function FighterPortrait({ id, label, selected, optionProps }: ProfessionOption) {
-  const slot = SLOT_LOOK[selected ? 'picked' : 'open']
-
+function Slot({ id, label, selected, optionProps, aimed, onAim }: SlotProps) {
   return (
     <button
       type="button"
       {...optionProps}
-      className={`relative flex w-full flex-col items-center px-2 pb-3 pt-6 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--fs-gold)] motion-safe:transition-transform sm:w-auto sm:min-w-[11rem] sm:px-5 ${slot.lift}`}
+      onPointerEnter={() => onAim(id)}
+      onFocus={() => onAim(id)}
+      className={`relative flex flex-col items-center px-1 pb-2 pt-3 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--fs-gold)] sm:px-3 ${fight.press}`}
     >
-      {selected && (
-        <svg viewBox="0 0 20 14" className={`absolute -top-3 left-1/2 h-4 w-6 -translate-x-1/2 ${look.bob}`} aria-hidden="true" focusable="false">
-          <path d="M0 0 H20 L10 14 Z" fill={FS.p1Light} stroke={FS.ink} strokeWidth={1.5} />
-        </svg>
-      )}
-      <span className={`flex h-24 w-full items-end justify-center border-4 sm:h-32 ${look.portrait} ${slot.frame}`} aria-hidden="true">
-        <HeroCharacter profession={id} className="h-20 w-14 sm:h-28 sm:w-20" />
+      <span className={`relative flex h-24 w-full items-end justify-center overflow-hidden border-4 sm:h-36 ${look.portrait} ${selected ? look.portraitPicked : look.portraitOpen}`} aria-hidden="true">
+        <HeroCharacter profession={id} className={`relative h-20 w-14 sm:h-32 sm:w-24 ${aimed ? fight.stance : ''}`} />
+        {selected && <span key={id} className={`absolute inset-0 bg-white opacity-0 ${fight.pickFlash}`} />}
       </span>
-      <span className={`mt-2 w-full px-3 py-1.5 text-center text-sm uppercase ${look.display} ${look.nameplate} ${slot.plate}`}>{label}</span>
+      <span className={`mt-2 w-full px-2 py-1.5 text-center text-sm uppercase ${look.display} ${look.nameplate} ${selected ? 'bg-[color:var(--fs-p1-light)] text-[color:var(--fs-ink)]' : 'bg-[color:var(--fs-steel)] text-white'}`}>
+        {label}
+      </span>
     </button>
+  )
+}
+
+export function SelectScreen({ active, title }: { active: Profession; title: string }) {
+  const [aim, setAim] = useState<Profession | null>(null)
+  const aimed = aim ?? active
+  const slot = PROFESSION_ORDER.indexOf(aimed)
+
+  return (
+    <div>
+      <div className="relative" onPointerLeave={() => setAim(null)}>
+        <ProfessionSwitch
+          className="grid grid-cols-3"
+          label="Profession"
+          renderOption={(option) => <Slot {...option} aimed={option.id === aimed} onAim={setAim} />}
+        />
+        <div className={`pointer-events-none absolute inset-y-0 left-0 w-1/3 ${fight.cursor} ${SLOT_VAR[slot]}`} aria-hidden="true">
+          <div className="absolute inset-x-0 bottom-9 top-1 border-4 border-[color:var(--fs-p1-light)] sm:inset-x-1" />
+          <span className={`absolute -top-3 left-1/2 flex -translate-x-1/2 flex-col items-center ${look.display}`}>
+            <span className="bg-[color:var(--fs-p1-light)] px-2 text-sm leading-5 text-[color:var(--fs-ink)]">1P</span>
+            <svg viewBox="0 0 20 10" className="h-2 w-5" focusable="false">
+              <path d="M0 0 H20 L10 10 Z" fill={FS.p1Light} />
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <div key={active} className="relative mt-6 h-48 overflow-hidden border-4 border-[color:var(--fs-gold)] sm:h-64">
+        <StageBackdrop profession={active} />
+        <div className={`absolute bottom-2 left-[12%] ${fight.previewIn}`}>
+          <HeroCharacter profession={active} className={`h-36 w-24 sm:h-52 sm:w-36 ${fight.stance}`} />
+        </div>
+        <div className={`absolute inset-x-0 top-1/3 ${fight.callIn}`}>
+          <RoundCall text={title} />
+        </div>
+      </div>
+    </div>
   )
 }

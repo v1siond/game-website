@@ -296,7 +296,7 @@ export const themes: Theme[] = [
   {
     id: 'fighter-select',
     name: 'Fighter Select',
-    description: 'Arcade fighting game - select screen, match HUD and stages',
+    description: 'Arcade fighting game: the versus splash, a select grid with the player one cursor, jobs as rounds, projects taking combo hits, a challenger stepping in',
     colors: {
       background: FS.night,
       backgroundGradient: `linear-gradient(to bottom, ${FS.panel}, ${FS.night})`,

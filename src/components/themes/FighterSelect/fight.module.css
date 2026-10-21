@@ -1,0 +1,402 @@
+/*
+ * Fighter Select's fight choreography, all CSS keyframes on transform and opacity. A cue is a shared
+ * ScrollScene (reveal off) whose data-scene-phase leaves idle once it is armed in view; everything under
+ * it plays once from there, chained by animation delays. Fighting game timing: hard snaps, a short hold,
+ * an overshoot on landing, steps() for the cursor and the timer. The final state is the element's own
+ * style, so reduced motion simply drops the animations and shows it at once.
+ */
+
+/* ---- the cue: hidden while idle, played once armed ---- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .cue[data-scene-phase='idle'] .enter {
+    opacity: 0;
+  }
+
+  .cue:not([data-scene-phase='idle']) .slashIn {
+    animation: slash-in 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .slashInRight {
+    animation: slash-in-right 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .portraitIn {
+    animation: portrait-in 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 260ms both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .slam {
+    animation: slam 360ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay, 520ms) both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .rise {
+    animation: rise 320ms ease-out var(--delay, 760ms) both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .flash {
+    animation: flash 520ms ease-out var(--delay, 0ms) both;
+  }
+
+  /* A round: the number badge slams down over the card, holds, then flies off as the card steps in. */
+  .cue:not([data-scene-phase='idle']) .roundBadge {
+    animation: round-badge 1100ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .challengerIn {
+    animation: challenger-in 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 620ms both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .barFill,
+  .cue:not([data-scene-phase='idle']) .barFillRight {
+    animation: bar-fill 600ms cubic-bezier(0.2, 0.9, 0.2, 1) var(--delay, 900ms) both;
+  }
+
+  /* A select slot locking in: the box closes from large to size with one overshoot. */
+  .cue:not([data-scene-phase='idle']) .lockIn {
+    animation: lock-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* A result stamp: dropped from above the page, tilted, landing hard. */
+  .cue:not([data-scene-phase='idle']) .stamp {
+    animation: stamp 260ms cubic-bezier(0.5, 0, 0.75, 0) calc(var(--i, 0) * 180ms + 200ms) both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .pip {
+    animation: pip 200ms steps(2, end) calc(var(--i, 0) * 260ms + 300ms) both;
+  }
+
+  /* The challenge clock on player two's side: the digit strip ticks down one digit a second, nine to
+   * zero, then stops, like the arcade's ten second window for another player to step in. */
+  .cue:not([data-scene-phase='idle']) .countdown {
+    animation: countdown 9s steps(9, end) 900ms both;
+  }
+
+  .cue:not([data-scene-phase='idle']) .banner {
+    animation: banner 900ms cubic-bezier(0.2, 0.9, 0.2, 1) 200ms both;
+  }
+
+  /* ---- loops: the fighter's idle stance and the blinking coin call ---- */
+
+  .stance {
+    animation: stance 900ms steps(3, jump-none) infinite alternate;
+    transform-origin: 50% 100%;
+  }
+
+  .blink {
+    animation: blink 1s steps(1, end) infinite;
+  }
+
+  /* ---- the select screen: the player one cursor snaps between slots, a pick re-runs the splash ---- */
+
+  .cursor {
+    transition: transform 110ms steps(3, end);
+  }
+
+  .previewIn {
+    animation: portrait-in 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .callIn {
+    animation: slam 340ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms both;
+  }
+
+  .pickFlash {
+    animation: flash 420ms ease-out both;
+  }
+
+  /* ---- a landed hit on a project card ----
+   * Hitstop: about 14 frames at 60fps (233ms) on every strength in the source series, the struck body
+   * vibrating side to side and settling as the freeze ends; steps(14) keeps it on whole frames. The
+   * burst at the point of contact lives a few frames longer and is gone before the next hit can land. */
+
+  .hitShake {
+    animation: hit-shake 233ms steps(14, end);
+  }
+
+  .spark {
+    animation: spark 300ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
+  .comboPop {
+    animation: combo-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* ---- a band's stage card leans with the cursor, its layers at three depths ---- */
+
+  .lean {
+    transition: transform 160ms ease-out;
+  }
+
+  .depthFar,
+  .depthMid,
+  .depthNear {
+    transition: transform 160ms ease-out;
+  }
+}
+
+/* The arcade button presses into the panel. Not motion, so it stays under reduced motion too. */
+.press:active {
+  transform: translate3d(0, 3px, 0);
+}
+
+.cursor {
+  transform: translate3d(calc(var(--slot, 0) * 100%), 0, 0);
+}
+
+.lean {
+  transform: perspective(700px) rotateY(calc(var(--mx, 0) * 5deg)) rotateX(calc(var(--my, 0) * -4deg));
+}
+
+.depthFar {
+  transform: translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -3px), 0);
+}
+
+.depthMid {
+  transform: translate3d(calc(var(--mx, 0) * -9px), calc(var(--my, 0) * -5px), 0);
+}
+
+.depthNear {
+  transform: translate3d(calc(var(--mx, 0) * -16px), calc(var(--my, 0) * -8px), 0);
+}
+
+.spark,
+.roundBadge,
+.banner {
+  opacity: 0;
+}
+
+/* Life bars drain toward the centre of the HUD, so each fills from its outer edge. */
+.barFill {
+  transform-origin: left center;
+}
+
+.barFillRight {
+  transform-origin: right center;
+}
+
+.countdown {
+  transform: translate3d(0, -90%, 0);
+}
+
+@keyframes slash-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-110%, 0, 0) skewX(-18deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+@keyframes slash-in-right {
+  from {
+    opacity: 0;
+    transform: translate3d(110%, 0, 0) skewX(18deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+@keyframes portrait-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-3rem, 0, 0) scale(1.15);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes slam {
+  from {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes flash {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes round-badge {
+  0% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(3);
+  }
+  22% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+  62% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(120%, -50%, 0) scale(0.6);
+  }
+}
+
+@keyframes challenger-in {
+  from {
+    opacity: 0;
+    transform: translate3d(4rem, 0, 0) skewX(-10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+@keyframes bar-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes lock-in {
+  from {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -1.5rem, 0) scale(1.6) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0);
+  }
+}
+
+@keyframes pip {
+  from {
+    opacity: 0.2;
+    transform: scale(0.6) rotate(45deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+}
+
+@keyframes countdown {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -90%, 0);
+  }
+}
+
+@keyframes banner {
+  0% {
+    opacity: 0;
+    transform: translate3d(-100%, 0, 0) skewX(-20deg);
+  }
+  35% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(-20deg);
+  }
+  75% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(-20deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0) skewX(-20deg);
+  }
+}
+
+@keyframes stance {
+  from {
+    transform: translate3d(0, 0, 0) scaleY(1);
+  }
+  to {
+    transform: translate3d(0, 2px, 0) scaleY(0.97);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes hit-shake {
+  0% {
+    transform: translate3d(-5px, 0, 0);
+  }
+  20% {
+    transform: translate3d(4px, 0, 0);
+  }
+  40% {
+    transform: translate3d(-3px, 0, 0);
+  }
+  60% {
+    transform: translate3d(2px, 0, 0);
+  }
+  80% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes spark {
+  0% {
+    opacity: 1;
+    transform: translate3d(-50%, -50%, 0) scale(0.3) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-50%, -50%, 0) scale(1.4) rotate(35deg);
+  }
+}
+
+@keyframes combo-pop {
+  from {
+    transform: scale(1.5);
+  }
+  to {
+    transform: scale(1);
+  }
+}

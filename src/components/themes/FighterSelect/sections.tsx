@@ -3,26 +3,27 @@
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
-import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { LevelScene } from '@/components/scroll/stage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { ArcadePanel } from './frames'
-import { HitSpark } from './badges'
-import { BandCard, ExperienceCard, MoveList, ProjectCard, VentureCard } from './cards'
-import { ClashSeparator, LightningLine, RoundWins } from './separators'
-import { SceneItem, Strip } from './scenes'
-import look from './world.module.css'
 import { drumsSince } from '@/components/cv/sectionText'
+import { ArcadePanel } from './frames'
+import { MoveList, ProjectCard, VentureCard } from './cards'
+import { ClashSeparator, LightningLine, RoundWins } from './separators'
+import { ComboZone, HitCard } from './combo'
+import { BandStage, LockIn, ResultRecord, RoundEntry } from './rounds'
 
-// The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Projects,
-// Bands and the Muay Thai record are stages he crosses, each entry arriving as part of the match.
+// The picked profession's sections. About, Tech Stack and Ventures fade in. Work Experience is the
+// match's rounds, one job a round (./rounds), in masonry. Projects lock into their slots and take hits
+// under the pointer, the combo counter climbing (./combo), in masonry. Bands stand on the concert stage,
+// each card leaning with the pointer, in masonry. The Muay Thai record is the result screen.
 
 const LEAD = 'text-base leading-relaxed'
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const { jobs } = sections
 
   return (
     <>
@@ -34,21 +35,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <ClashSeparator />
 
-      {sections.jobs.length > 0 && (
-        <LevelScene>
-          <Strip profession="engineer" zone="record" />
-          <ArcadePanel accent="p1" title="Work Experience" id="experience-heading">
-            <ul className="space-y-6">
-              {sections.jobs.map((entry) => (
-                <li key={entry.id}>
-                  <SceneItem kind="challenger">
-                    <ExperienceCard entry={entry} />
-                  </SceneItem>
-                </li>
-              ))}
-            </ul>
-          </ArcadePanel>
-        </LevelScene>
+      {jobs.length > 0 && (
+        <ArcadePanel accent="p1" title="Work Experience" id="experience-heading">
+          <ul className={MASONRY_LIST}>
+            {jobs.map((entry, index) => (
+              <li key={entry.id} className={MASONRY_ITEM}>
+                <RoundEntry entry={entry} round={jobs.length - index} />
+              </li>
+            ))}
+          </ul>
+        </ArcadePanel>
       )}
 
       <LightningLine />
@@ -59,20 +55,22 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </ArcadePanel>
       </FadeInScene>
 
-      <LevelScene>
-        <Strip profession="engineer" zone="work" />
-        <ArcadePanel accent="gold" title="Projects" id="projects-heading">
+      <ArcadePanel accent="gold" title="Projects" id="projects-heading">
+        <ComboZone>
           <ProjectList
             projects={sections.projects}
-            className="grid gap-6 md:grid-cols-2"
+            className={MASONRY_LIST}
+            itemClassName={MASONRY_ITEM}
             renderProject={(slot) => (
-              <SceneItem kind="portrait">
-                <ProjectCard {...slot} />
-              </SceneItem>
+              <LockIn>
+                <HitCard>
+                  <ProjectCard {...slot} />
+                </HitCard>
+              </LockIn>
             )}
           />
-        </ArcadePanel>
-      </LevelScene>
+        </ComboZone>
+      </ArcadePanel>
 
       <RoundWins />
 
@@ -97,59 +95,22 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   return (
     <>
       <LightningLine />
-      <LevelScene>
-        <Strip profession="drummer" zone="record" />
-        <ArcadePanel accent="p2" title="Bands" id="bands-heading">
-          <p className={`mb-6 ${LEAD}`}>
-            {drumsSince(musician)}
-          </p>
-          <BandList
-            bands={bands}
-            className="grid gap-6 md:grid-cols-3"
-            renderBand={(slot) => (
-              <SceneItem kind="portrait">
-                <BandCard {...slot} />
-              </SceneItem>
-            )}
-          />
-          <p className="mt-6 text-sm italic text-[color:var(--fs-gold)]">{musician.line}</p>
-        </ArcadePanel>
-      </LevelScene>
+      <ArcadePanel accent="p2" title="Bands" id="bands-heading">
+        <p className={`mb-6 ${LEAD}`}>{drumsSince(musician)}</p>
+        <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandStage {...slot} />} />
+        <p className="mt-6 text-sm italic text-[color:var(--fs-gold)]">{musician.line}</p>
+      </ArcadePanel>
     </>
   )
 }
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { martialArts } = sections
-
   return (
     <>
       <RoundWins />
-      <LevelScene>
-        <Strip profession="fighter" zone="record" />
-        <ArcadePanel accent="p2" title="Muay Thai" id="muay-thai-heading">
-          <h3 className={`mb-6 text-xl uppercase ${look.display} ${look.roundCall}`}>{martialArts.primary.title}</h3>
-          <MuayThaiRecord
-            martialArts={martialArts}
-            classNames={{
-              facts: 'grid sm:grid-cols-2 gap-4 mb-6',
-              fact: 'px-4 py-3 border-l-4 border-[color:var(--fs-orange)] bg-[#ff8a1f]/10',
-              term: `text-sm uppercase text-[color:var(--fs-gold)] ${look.display}`,
-              value: 'text-sm mt-1 text-white',
-              achievements: 'space-y-3',
-              achievement: 'text-sm text-white',
-            }}
-            renderAchievement={(achievement) => (
-              <SceneItem kind="portrait">
-                <p className="flex items-start gap-3 border border-[color:var(--fs-steel)] bg-[color:var(--fs-panel)] p-3">
-                  <HitSpark />
-                  <span>{achievement}</span>
-                </p>
-              </SceneItem>
-            )}
-          />
-        </ArcadePanel>
-      </LevelScene>
+      <ArcadePanel accent="p2" title="Muay Thai" id="muay-thai-heading">
+        <ResultRecord martialArts={sections.martialArts} />
+      </ArcadePanel>
     </>
   )
 }

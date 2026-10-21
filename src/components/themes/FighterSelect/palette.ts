@@ -1,6 +1,9 @@
 // The arcade versus palette, for the world's SVG art: the night of the stage, player one blue (him),
 // player two red (the challenger), the gold of the round call, the green of a full health bar, chrome for
-// the cabinet metal. world.module.css carries the same values as CSS variables for the page's classes.
+// the cabinet metal. FS_VARS puts the same values on the world's root as --fs-* variables, which
+// world.module.css, fight.module.css and the Tailwind arbitrary values read, so no colour is written twice.
+
+import { paletteVars } from '../shared/paletteVars'
 
 export const FS = {
   night: '#07081a',
@@ -17,4 +20,7 @@ export const FS = {
   chrome: '#c9cede',
   steel: '#5b6078',
   ink: '#03030a',
+  flash: '#ffffff',
 } as const
+
+export const FS_VARS = paletteVars('fs', FS)

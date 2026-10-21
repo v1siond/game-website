@@ -2,7 +2,8 @@ import { FS } from './palette'
 import look from './world.module.css'
 
 // The versus screen's art: the clash emblem (two lightning bolts striking at one point, the moment two
-// fighters meet), the round call band, and the hit spark that marks a highlight on a card.
+// fighters meet), the round call band, the hit spark that marks a highlight on a card and the impact
+// burst of a landed hit.
 
 export function ClashEmblem({ large = false }: { large?: boolean }) {
   return (
@@ -35,6 +36,29 @@ export function HitSpark({ color = FS.gold }: { color?: string }) {
   return (
     <svg viewBox="0 0 16 16" className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" focusable="false">
       <path d="M8 0 L9.6 5.4 L16 6 L10.8 9.4 L12.6 16 L8 12 L3.4 16 L5.2 9.4 L0 6 L6.4 5.4 Z" fill={color} stroke={FS.ink} strokeWidth={0.8} />
+    </svg>
+  )
+}
+
+// The burst where a hit lands: twelve rays, long and short in turn, round a white hot core, the shape a
+// fighting game paints for a frame or two at the point of contact (a sharp starburst, not a star).
+const RAYS = Array.from({ length: 12 }, (_, i) => ({ angle: i * 30, long: i % 2 === 0 }))
+
+export function ImpactBurst({ className }: { className: string }) {
+  return (
+    <svg viewBox="-50 -50 100 100" className={className} aria-hidden="true" focusable="false">
+      {RAYS.map(({ angle, long }) => (
+        <path
+          key={angle}
+          d={long ? 'M-5 -12 L0 -50 L5 -12 Z' : 'M-4 -10 L0 -32 L4 -10 Z'}
+          fill={long ? FS.gold : FS.orange}
+          stroke={FS.ink}
+          strokeWidth={1.5}
+          transform={`rotate(${angle})`}
+        />
+      ))}
+      <circle r={15} fill={FS.orange} />
+      <circle r={9} fill={FS.flash} />
     </svg>
   )
 }

@@ -1,26 +1,12 @@
 /*
  * Fighter Select's page look: an arcade cabinet's screen at night. The stage gradient, the CRT scanlines
  * and vignette, the brushed cabinet metal of the panels, the glowing display type of the round calls, and
- * the two idle loops of the select screen (the clash emblem's pulse and the picked fighter's cursor bob).
- * The loops animate transform and opacity only and stop under reduced motion; the scroll scenes live in
- * scenes.module.css.
+ * the clash emblem's slow pulse (transform only, stopped under reduced motion). The colours are the
+ * --fs-* variables FS_VARS (palette.ts) sets on the root; the fight choreography lives in
+ * fight.module.css.
  */
 
 .root {
-  --fs-night: #07081a;
-  --fs-panel: #12142e;
-  --fs-panel-light: #1d2046;
-  --fs-p1: #2f7bff;
-  --fs-p1-light: #6aa6ff;
-  --fs-p2: #ff2e4d;
-  --fs-gold: #ffd23f;
-  --fs-orange: #ff8a1f;
-  --fs-health: #3ddc6a;
-  --fs-cyan: #3fe6f0;
-  --fs-chrome: #c9cede;
-  --fs-steel: #5b6078;
-  --fs-ink: #03030a;
-
   background: radial-gradient(ellipse at 50% 20%, #1a1a3e 0%, var(--fs-night) 55%, #050510 100%);
   color: var(--fs-chrome);
   font-family: system-ui, sans-serif;
@@ -173,6 +159,16 @@
     repeating-linear-gradient(90deg, transparent 0 40px, rgb(255 46 77 / 0.15) 40px 42px);
 }
 
+/* ---- the versus splash: the two panels cut on the diagonal where they meet ---- */
+
+.splashLeft {
+  clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+}
+
+.splashRight {
+  clip-path: polygon(3% 0, 100% 0, 100% 100%, 0 100%);
+}
+
 /* ---- the select screen ---- */
 
 .portrait {
@@ -192,14 +188,10 @@
   clip-path: polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0 50%);
 }
 
-/* The clash emblem between the portraits beats slowly; the player one cursor bobs over the pick. */
+/* The clash emblem beats slowly. */
 @media (prefers-reduced-motion: no-preference) {
   .pulse {
     animation: pulse 1.6s ease-in-out infinite;
-  }
-
-  .bob {
-    animation: bob 1s ease-in-out infinite;
   }
 }
 
@@ -210,15 +202,5 @@
   }
   50% {
     transform: scale(1.08);
-  }
-}
-
-@keyframes bob {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-  50% {
-    transform: translate3d(0, 4px, 0);
   }
 }
