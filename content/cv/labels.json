@@ -167,6 +167,18 @@
         "stompAgain": "Stomp the chain again",
         "grabAgain": "Grab the flagpole again"
       },
+      "arcade": {
+        "smashAgain": "Smash the car again",
+        "throwAgain": "Throw the blasts again",
+        "superAgain": "Play the super move again",
+        "parryAgain": "Play the parries again",
+        "sparAgain": "Spar the round again",
+        "bonus": "Bonus stage",
+        "perfect": "Perfect",
+        "ko": "K.O.",
+        "superMove": "Super move",
+        "continueCall": "Continue?"
+      },
       "jungle": {
         "blastAgain": "Fire the tree house barrel again",
         "cannonHint": "He sits in the lit barrel. Blast him to the next job.",
@@ -594,6 +606,18 @@
         "stompAgain": "Aplastar la cadena otra vez",
         "grabAgain": "Agarrar el mástil otra vez"
       },
+      "arcade": {
+        "smashAgain": "Destrozar el auto otra vez",
+        "throwAgain": "Lanzar las ráfagas otra vez",
+        "superAgain": "Repetir el súper movimiento",
+        "parryAgain": "Repetir los bloqueos",
+        "sparAgain": "Repetir el asalto",
+        "bonus": "Etapa de bonus",
+        "perfect": "Perfecto",
+        "ko": "K.O.",
+        "superMove": "Súper movimiento",
+        "continueCall": "¿Continuar?"
+      },
       "jungle": {
         "blastAgain": "Disparar otra vez el barril de la casa del árbol",
         "cannonHint": "Está en el barril iluminado. Dispáralo al siguiente trabajo.",
@@ -1020,6 +1044,18 @@
         "playingWith": "Suona con {name}",
         "stompAgain": "Schiaccia di nuovo la catena",
         "grabAgain": "Afferra di nuovo l'asta"
+      },
+      "arcade": {
+        "smashAgain": "Distruggi di nuovo l'auto",
+        "throwAgain": "Lancia di nuovo le sfere",
+        "superAgain": "Rivedi la mossa super",
+        "parryAgain": "Rivedi le parate",
+        "sparAgain": "Rivedi il round",
+        "bonus": "Livello bonus",
+        "perfect": "Perfetto",
+        "ko": "K.O.",
+        "superMove": "Mossa super",
+        "continueCall": "Continui?"
       },
       "jungle": {
         "blastAgain": "Spara di nuovo il barile della casa sull’albero",

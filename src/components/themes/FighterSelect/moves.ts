@@ -30,22 +30,31 @@ const MOTION: Record<Exclude<FighterPose, 'act'>, Motion> = {
   shoryuken: { mode: 'forward', cycleMs: 760, key: 2, runs: 1 },
   tatsumaki: { mode: 'forward', cycleMs: 360, key: 0, runs: 3 },
   win: { mode: 'forward', cycleMs: 520, key: 0, runs: 'infinite' },
+  punch: { mode: 'forward', cycleMs: 420, key: 1, runs: 1 },
+  hurt: { mode: 'forward', cycleMs: 480, key: 0, runs: 1 },
+  parry: { mode: 'forward', cycleMs: 400, key: 1, runs: 1 },
+  // Played once, then the strip rests on its key frame: flat on the floor.
+  down: { mode: 'forward', cycleMs: 720, key: 3, runs: 1 },
 }
 
 const ACT_MOTION: Record<Profession, Motion> = {
-  engineer: { mode: 'forward', cycleMs: 1600, key: 2, runs: 'infinite', ball: 'code' },
+  engineer: {
+    mode: 'forward',
+    cycleMs: 1600,
+    key: 2,
+    runs: 'infinite',
+    ball: 'code',
+  },
   drummer: { mode: 'forward', cycleMs: 520, key: 0, runs: 'infinite' },
   fighter: { mode: 'forward', cycleMs: 1300, key: 2, runs: 'infinite' },
 }
 
-export const motionFor = (pose: FighterPose, profession: Profession): Motion =>
-  pose === 'act' ? ACT_MOTION[profession] : MOTION[pose]
+export const motionFor = (pose: FighterPose, profession: Profession): Motion => (pose === 'act' ? ACT_MOTION[profession] : MOTION[pose])
 
 export const SPECIALS = ['hadouken', 'shoryuken', 'tatsumaki'] as const
 export type Special = (typeof SPECIALS)[number]
 
-export const nextSpecial = (last: Special | null): Special =>
-  SPECIALS[last === null ? 0 : (SPECIALS.indexOf(last) + 1) % SPECIALS.length]
+export const nextSpecial = (last: Special | null): Special => SPECIALS[last === null ? 0 : (SPECIALS.indexOf(last) + 1) % SPECIALS.length]
 
 // How far he may walk from his mark either way, in steps.
 export const MAX_STEP = 2
@@ -73,7 +82,11 @@ export const endMove = (state: MoveState): MoveState => (state.playing ? { ...st
 
 export function useMoves(rest: FighterPose, intro: FighterPose | null = null) {
   const reducedMotion = useReducedMotion()
-  const [state, setState] = useState<MoveState>({ playing: intro, last: null, step: 0 })
+  const [state, setState] = useState<MoveState>({
+    playing: intro,
+    last: null,
+    step: 0,
+  })
 
   const special = useCallback(() => {
     if (!reducedMotion) setState(startSpecial)

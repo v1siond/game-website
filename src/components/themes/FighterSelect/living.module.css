@@ -1,0 +1,328 @@
+/*
+ * The living page (backdrop.tsx and the bout scenes): the stage behind the page that changes as the
+ * visitor scrolls, its crowds bobbing and cheering, and the one shot effects of the bouts (the car's
+ * flying parts, the ki blast across a row, the super move's dark flash and cut in, the parry glow, the
+ * plane between pins, the K.O. and Perfect calls). Transform and opacity only. Reduced motion drops
+ * every keyframe and transition: the stage holds still and each scene shows its last beat.
+ */
+
+/* ---- the stage behind the page ---- */
+
+.zone {
+  opacity: 0;
+}
+
+.zone[data-on] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .zone {
+    transition: opacity 700ms ease;
+  }
+
+  /* Onlookers bob in groups, out of step, the way a sprite crowd loops two or three frames. */
+  .bob {
+    animation: bob 900ms steps(2, jump-none) infinite alternate;
+    animation-delay: calc(var(--i, 0) * -300ms);
+  }
+
+  .sway {
+    animation: sway 2400ms ease-in-out infinite alternate;
+    animation-delay: calc(var(--i, 0) * -700ms);
+  }
+
+  .rock {
+    animation: rock 3200ms ease-in-out infinite alternate;
+  }
+
+  /* A rider crossing the market street now and then. */
+  .ride {
+    animation: ride 14s linear infinite;
+  }
+
+  /* A stage that is not in view holds its crowd still. */
+  .zone:not([data-on]) .bob,
+  .zone:not([data-on]) .sway,
+  .zone:not([data-on]) .rock,
+  .zone:not([data-on]) .ride {
+    animation-play-state: paused;
+  }
+
+  /* The deck crowd cheering when the pointer lands on a band: they jump higher and faster. */
+  [data-cheer] .bob {
+    animation: cheer 360ms steps(2, jump-none) infinite alternate;
+  }
+}
+
+@keyframes bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes cheer {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: rotate(-6deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes rock {
+  from {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  to {
+    transform: translateY(4px) rotate(0.6deg);
+  }
+}
+
+@keyframes ride {
+  from {
+    transform: translateX(-160px);
+  }
+  to {
+    transform: translateX(1760px);
+  }
+}
+
+/* Hanging things swing from their top edge. */
+.sway {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+/* ---- the bouts ---- */
+
+.ring {
+  container-type: inline-size;
+}
+
+/* The partner faces him: the same rig mirrored. */
+.mirror {
+  transform: scaleX(-1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* A fighter's mark slides along the floor between beats. */
+  .slide {
+    transition:
+      transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1),
+      translate 420ms cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+
+  /* The car's parts thrown off on the wreck, each on its own line (--fx, --fy, --fr). */
+  .debris {
+    animation: debris 900ms cubic-bezier(0.2, 0.6, 0.4, 1) both;
+  }
+
+  /* The struck car shudders like a hit fighter. */
+  .shudder {
+    animation: shudder 240ms steps(6) both;
+  }
+
+  /* The ki blast flying the width of the row, from his palms to the card it lights. */
+  .blast {
+    animation: blast 620ms linear both;
+  }
+
+  /* The super move: the screen goes dark round him, his face cuts in on a band across it, then the
+   * white flash as the move goes off. */
+  .dim {
+    animation: dim 1500ms ease-out both;
+  }
+
+  .cutIn {
+    animation: cut-in 1100ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
+  .superFlash {
+    animation: super-flash 380ms ease-out 1100ms both;
+  }
+
+  /* A card lit by the blast or the parry. */
+  .lit {
+    animation: lit 520ms ease-out both;
+  }
+
+  /* The round calls slammed onto the ring. */
+  .call {
+    animation: call 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* The plane between pins. */
+  .plane {
+    transition: transform 1200ms cubic-bezier(0.45, 0, 0.25, 1);
+  }
+
+  .popScore {
+    animation: pop-score 900ms ease-out both;
+  }
+}
+
+/* Resting states of the one shot effects, so a finished effect leaves nothing behind. */
+.dim,
+.superFlash {
+  opacity: 0;
+}
+
+.cutIn {
+  transform: translateX(-110%);
+}
+
+/* The plane sits on its pin, written as --px and --py in the map's units. */
+.plane {
+  transform: translate(var(--px), var(--py));
+}
+
+/* What a lit card keeps once lit: a bright rule round it. */
+.litFrame {
+  box-shadow:
+    0 0 0 3px var(--fs-cyan),
+    6px 6px 0 3px #000;
+}
+
+.parriedFrame {
+  box-shadow:
+    0 0 0 3px var(--fs-parry),
+    6px 6px 0 3px #000;
+}
+
+@keyframes debris {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--fx, 40px), var(--fy, -60px)) rotate(var(--fr, 90deg));
+    opacity: 0;
+  }
+}
+
+@keyframes shudder {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(4px);
+  }
+  40% {
+    transform: translateX(-3px);
+  }
+  60% {
+    transform: translateX(2px);
+  }
+  80% {
+    transform: translateX(-1px);
+  }
+}
+
+@keyframes blast {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(78cqw);
+    opacity: 0;
+  }
+}
+
+@keyframes dim {
+  0% {
+    opacity: 0;
+  }
+  15%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes cut-in {
+  0% {
+    transform: translateX(-100%);
+  }
+  25%,
+  70% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(110%);
+  }
+}
+
+@keyframes super-flash {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes lit {
+  0% {
+    transform: scale(1.05);
+  }
+  40% {
+    transform: scale(0.98);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes call {
+  from {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pop-score {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-40px);
+    opacity: 0;
+  }
+}
+
+/* One shot effects are not drawn at all when motion is reduced. */
+@media (prefers-reduced-motion: reduce) {
+  .blast,
+  .dim,
+  .cutIn,
+  .superFlash,
+  .debris,
+  .popScore {
+    display: none;
+  }
+}

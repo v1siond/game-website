@@ -41,6 +41,15 @@ export const FS = {
   giDeep: '#7d84a6',
   belt: '#17171f',
   skinDeep: '#5e3219',
+  // The parry's cold blue flash
+  parry: '#4fb4ff',
+  // His sparring partner: the red gi in its two cel shades, the fairer skin, the blond hair
+  rivalGi: '#e0262f',
+  rivalGiShade: '#a3141e',
+  rivalGiDeep: '#6a0c14',
+  rivalSkin: '#f2c49b',
+  rivalSkinShade: '#c98f66',
+  rivalHair: '#f6c945',
 } as const
 
 export const FS_VARS = paletteVars('fs', FS)

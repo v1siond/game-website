@@ -28,26 +28,61 @@ interface Tone {
   shade: string
 }
 
-const SKIN: Tone = { base: HERO_IDENTITY.skin, shade: HERO_IDENTITY.skinShade }
-const SKIN_FAR: Tone = { base: HERO_IDENTITY.skinShade, shade: FS.skinDeep }
-const GI: Tone = { base: FS.gi, shade: FS.giShade }
-const GI_FAR: Tone = { base: FS.giShade, shade: FS.giDeep }
 const RED: Tone = { base: FS.p2, shade: FS.p2Dark }
 const SHORTS: Tone = { base: FS.p1, shade: '#1a4fb0' }
 const GOLD: Tone = { base: FS.gold, shade: FS.orange }
 
-interface Costume {
+// Who wears the rig: his own skin, hair and beard in the white gi, or his sparring partner, the rival
+// of the same school in the red gi with the long swept back blond hair, clean shaven and bare headed.
+export type Who = 'hero' | 'partner'
+
+interface Look {
+  skin: Tone
+  skinFar: Tone
+  gi: Tone
+  giFar: Tone
+  wrap: Tone
+  hair: string
+  beard: boolean
+}
+
+const LOOKS: Record<Who, Look> = {
+  hero: {
+    skin: { base: HERO_IDENTITY.skin, shade: HERO_IDENTITY.skinShade },
+    skinFar: { base: HERO_IDENTITY.skinShade, shade: FS.skinDeep },
+    gi: { base: FS.gi, shade: FS.giShade },
+    giFar: { base: FS.giShade, shade: FS.giDeep },
+    wrap: RED,
+    hair: HERO_IDENTITY.hair,
+    beard: true,
+  },
+  partner: {
+    skin: { base: FS.rivalSkin, shade: FS.rivalSkinShade },
+    skinFar: { base: FS.rivalSkinShade, shade: FS.skinDeep },
+    gi: { base: FS.rivalGi, shade: FS.rivalGiShade },
+    giFar: { base: FS.rivalGiShade, shade: FS.rivalGiDeep },
+    wrap: { base: FS.belt, shade: INK },
+    hair: FS.rivalHair,
+    beard: false,
+  },
+}
+
+interface Costume extends Look {
   top: 'gi' | 'bare'
   legs: 'gi' | 'shorts'
-  head: 'band' | 'mongkhon'
+  head: 'band' | 'mongkhon' | 'none'
   hands: 'wraps' | 'sticks' | 'gloves'
 }
 
-const COSTUME: Record<Profession, Costume> = {
+const GEAR: Record<Profession, Omit<Costume, keyof Look>> = {
   engineer: { top: 'gi', legs: 'gi', head: 'band', hands: 'wraps' },
   drummer: { top: 'gi', legs: 'gi', head: 'band', hands: 'sticks' },
   fighter: { top: 'bare', legs: 'shorts', head: 'mongkhon', hands: 'gloves' },
 }
+
+// The partner always spars in his gi and wraps, whatever his opponent's profession.
+const costumeOf = (who: Who, profession: Profession): Costume =>
+  who === 'partner' ? { ...LOOKS.partner, top: 'gi', legs: 'gi', head: 'none', hands: 'wraps' } : { ...LOOKS.hero, ...GEAR[profession] }
 
 // ---- geometry ----
 
@@ -114,7 +149,10 @@ function Round({ at, r, tone }: { at: Pt; r: number; tone: Tone }) {
   return (
     <>
       <circle cx={r1(at[0])} cy={r1(at[1])} r={r} fill={tone.base} stroke={INK} strokeWidth={LINE} />
-      <path d={`M${pt([at[0] + r * 0.2, at[1] + r * 0.95])} A${r} ${r} 0 0 0 ${pt([at[0] + r * 0.95, at[1] - r * 0.2])} A${r * 1.1} ${r * 1.1} 0 0 1 ${pt([at[0] + r * 0.2, at[1] + r * 0.95])}Z`} fill={tone.shade} />
+      <path
+        d={`M${pt([at[0] + r * 0.2, at[1] + r * 0.95])} A${r} ${r} 0 0 0 ${pt([at[0] + r * 0.95, at[1] - r * 0.2])} A${r * 1.1} ${r * 1.1} 0 0 1 ${pt([at[0] + r * 0.2, at[1] + r * 0.95])}Z`}
+        fill={tone.shade}
+      />
     </>
   )
 }
@@ -139,14 +177,23 @@ function Hand({ arm, costume, skin }: { arm: ArmPose; costume: Costume; skin: To
       </>
     )
   }
-  const wrap = <Limb from={plus(arm.h, u, -4.5)} to={plus(arm.h, u, -0.5)} w1={8.6} w2={8.6} tone={RED} />
+  const wrap = <Limb from={plus(arm.h, u, -4.5)} to={plus(arm.h, u, -0.5)} w1={8.6} w2={8.6} tone={costume.wrap} />
   if (arm.hand === 'palm') {
     const centre = plus(arm.h, u, 3)
     const angle = (Math.atan2(u[1], u[0]) * 180) / Math.PI
     return (
       <>
         {wrap}
-        <ellipse cx={r1(centre[0])} cy={r1(centre[1])} rx={3.6} ry={5.8} transform={`rotate(${r1(angle)} ${pt(centre)})`} fill={skin.base} stroke={INK} strokeWidth={LINE} />
+        <ellipse
+          cx={r1(centre[0])}
+          cy={r1(centre[1])}
+          rx={3.6}
+          ry={5.8}
+          transform={`rotate(${r1(angle)} ${pt(centre)})`}
+          fill={skin.base}
+          stroke={INK}
+          strokeWidth={LINE}
+        />
       </>
     )
   }
@@ -172,12 +219,12 @@ function TornSleeve({ arm, tone }: { arm: ArmPose; tone: Tone }) {
 }
 
 function Arm({ arm, costume, far }: { arm: ArmPose; costume: Costume; far: boolean }) {
-  const skin = far ? SKIN_FAR : SKIN
+  const skin = far ? costume.skinFar : costume.skin
   return (
     <g>
       <Limb from={arm.s} to={arm.e} w1={10.4} w2={8.6} tone={skin} />
       <Limb from={arm.e} to={arm.h} w1={8.8} w2={7.4} tone={skin} />
-      {costume.top === 'gi' && <TornSleeve arm={arm} tone={far ? GI_FAR : GI} />}
+      {costume.top === 'gi' && <TornSleeve arm={arm} tone={far ? costume.giFar : costume.gi} />}
       {costume.top === 'bare' && <Limb from={lerp(arm.s, arm.e, 0.3)} to={lerp(arm.s, arm.e, 0.42)} w1={11.4} w2={11} tone={RED} />}
       <Hand arm={arm} costume={costume} skin={skin} />
     </g>
@@ -185,7 +232,7 @@ function Arm({ arm, costume, far }: { arm: ArmPose; costume: Costume; far: boole
 }
 
 function Leg({ leg, hip, costume, far }: { leg: LegPose; hip: Pt; costume: Costume; far: boolean }) {
-  const skin = far ? SKIN_FAR : SKIN
+  const skin = far ? costume.skinFar : costume.skin
   const foot = <Limb from={leg.a} to={leg.toe} w1={7.4} w2={5.6} tone={skin} />
   if (costume.legs === 'shorts') {
     return (
@@ -197,7 +244,7 @@ function Leg({ leg, hip, costume, far }: { leg: LegPose; hip: Pt; costume: Costu
       </g>
     )
   }
-  const gi = far ? GI_FAR : GI
+  const gi = far ? costume.giFar : costume.gi
   return (
     <g>
       {foot}
@@ -209,7 +256,7 @@ function Leg({ leg, hip, costume, far }: { leg: LegPose; hip: Pt; costume: Costu
 
 function Torso({ frame, costume }: { frame: Frame; costume: Costume }) {
   const { neck: n, hip: h, back, front } = frame
-  const neckBase = <Limb from={n} to={[frame.head[0] - 1, frame.head[1] + 7]} w1={9} w2={8} tone={SKIN} />
+  const neckBase = <Limb from={n} to={[frame.head[0] - 1, frame.head[1] + 7]} w1={9} w2={8} tone={costume.skin} />
   if (costume.top === 'bare') {
     const d = `M${pt([back.s[0] - 4, back.s[1]])} L${pt([n[0] - 3, n[1]])} L${pt([n[0] + 4, n[1]])} L${pt([front.s[0] + 4, front.s[1] + 1])} Q${pt([h[0] + 14, (n[1] + h[1]) / 2])} ${pt([h[0] + 10, h[1] - 4])} L${pt([h[0] - 10, h[1] - 4])} Q${pt([h[0] - 13, (n[1] + h[1]) / 2])} ${pt([back.s[0] - 4, back.s[1]])}Z`
     const shade = `M${pt([back.s[0] - 4, back.s[1]])} L${pt(lerp(n, h, 0.5))} L${pt([h[0] - 2, h[1] - 4])} L${pt([h[0] - 10, h[1] - 4])}Z`
@@ -217,29 +264,64 @@ function Torso({ frame, costume }: { frame: Frame; costume: Costume }) {
     return (
       <g>
         {neckBase}
-        <Shaded d={d} shade={shade} tone={SKIN} />
-        <path d={`M${pt([chest[0] - 7, chest[1]])} Q${pt([chest[0] - 1, chest[1] + 5])} ${pt([chest[0] + 7, chest[1] + 1])} M${pt(lerp(n, h, 0.5))} L${pt(lerp(n, h, 0.82))} M${pt([h[0] - 5, h[1] - 18])} H${r1(h[0] + 5)}`} fill="none" stroke={HERO_IDENTITY.skinShade} strokeWidth={1.4} strokeLinecap="round" />
+        <Shaded d={d} shade={shade} tone={costume.skin} />
+        <path
+          d={`M${pt([chest[0] - 7, chest[1]])} Q${pt([chest[0] - 1, chest[1] + 5])} ${pt([chest[0] + 7, chest[1] + 1])} M${pt(lerp(n, h, 0.5))} L${pt(lerp(n, h, 0.82))} M${pt([h[0] - 5, h[1] - 18])} H${r1(h[0] + 5)}`}
+          fill="none"
+          stroke={HERO_IDENTITY.skinShade}
+          strokeWidth={1.4}
+          strokeLinecap="round"
+        />
         <Limb from={[h[0] - 12, h[1] - 4]} to={[h[0] + 12, h[1] - 4]} w1={5.6} w2={5.6} tone={GOLD} />
         <Limb from={[h[0] - 11, h[1] + 1]} to={[h[0] + 11, h[1] + 1]} w1={8} w2={8} tone={SHORTS} />
       </g>
     )
   }
-  const hemBack: Pt = [h[0] - 12, h[1] + 12]
-  const hemFront: Pt = [h[0] + 12, h[1] + 12]
-  const sternum = plus(lerp(n, h, 0.42), [1, 0], 2)
-  const top = `M${pt([back.s[0] - 3, back.s[1] - 1])} L${pt([n[0] - 2, n[1] - 1])} L${pt([n[0] + 5, n[1] - 1])} L${pt([front.s[0] + 4, front.s[1]])} Q${pt([h[0] + 15, (n[1] + h[1]) / 2])} ${pt(hemFront)} L${pt(hemBack)} Q${pt([h[0] - 14, (n[1] + h[1]) / 2])} ${pt([back.s[0] - 3, back.s[1] - 1])}Z`
-  const shade = `M${pt([back.s[0] - 3, back.s[1] - 1])} L${pt(plus(lerp(n, h, 0.5), [1, 0], -4))} L${pt([h[0] - 2, h[1] + 12])} L${pt(hemBack)}Z`
+  // The jacket hangs along the spine, so a leaning or falling body keeps its hem below the belt: down
+  // the spine from the hip, across it to either side.
+  const { u: down, n: across } = axis(n, h)
+  const side: Pt = [-across[0], -across[1]]
+  const along = (from: Pt, d: number, s: number): Pt => plus(plus(from, down, d), side, s)
+  const hemBack = along(h, 12, -12)
+  const hemFront = along(h, 12, 12)
+  const middle = lerp(n, h, 0.5)
+  const sternum = along(lerp(n, h, 0.42), 0, 2)
+  const top = `M${pt([back.s[0] - 3, back.s[1] - 1])} L${pt([n[0] - 2, n[1] - 1])} L${pt([n[0] + 5, n[1] - 1])} L${pt([front.s[0] + 4, front.s[1]])} Q${pt(along(middle, 0, 15))} ${pt(hemFront)} L${pt(hemBack)} Q${pt(along(middle, 0, -14))} ${pt([back.s[0] - 3, back.s[1] - 1])}Z`
+  const shade = `M${pt([back.s[0] - 3, back.s[1] - 1])} L${pt(along(middle, 0, -4))} L${pt(along(h, 12, -2))} L${pt(hemBack)}Z`
   const swing = frame.wind % 2 ? 1 : -1
-  const knot: Pt = [h[0] + 6, h[1] - 4.5]
+  const belt = (s: number) => along(h, -4.5, s)
+  const knot = belt(6)
   return (
     <g>
       {neckBase}
-      <Shaded d={top} shade={shade} tone={GI} />
-      <path d={`M${pt([n[0] - 1, n[1]])} L${pt([n[0] + 5, n[1]])} L${pt(sternum)}Z`} fill={SKIN.base} stroke={INK} strokeWidth={1.2} strokeLinejoin="round" />
-      <path d={`M${pt([n[0] + 5, n[1]])} L${pt(sternum)} L${pt([h[0] - 4, h[1] - 5])} M${pt([front.s[0], front.s[1] + 7])} L${pt([h[0] + 8, h[1] - 8])}`} fill="none" stroke={FS.giShade} strokeWidth={1.4} strokeLinecap="round" />
-      <Limb from={[h[0] - 12.5, h[1] - 4.5]} to={[h[0] + 12.5, h[1] - 4.5]} w1={5.2} w2={5.2} tone={{ base: FS.belt, shade: INK }} />
-      <path d={`M${pt(knot)} L${pt([knot[0] + swing * 2, knot[1] + 17])} M${pt(knot)} L${pt([knot[0] + 4 + swing * 3, knot[1] + 14])}`} stroke={INK} strokeWidth={4.6} strokeLinecap="round" />
-      <path d={`M${pt(knot)} L${pt([knot[0] + swing * 2, knot[1] + 17])} M${pt(knot)} L${pt([knot[0] + 4 + swing * 3, knot[1] + 14])}`} stroke={FS.belt} strokeWidth={2.6} strokeLinecap="round" />
+      <Shaded d={top} shade={shade} tone={costume.gi} />
+      <path
+        d={`M${pt([n[0] - 1, n[1]])} L${pt([n[0] + 5, n[1]])} L${pt(sternum)}Z`}
+        fill={costume.skin.base}
+        stroke={INK}
+        strokeWidth={1.2}
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${pt([n[0] + 5, n[1]])} L${pt(sternum)} L${pt(along(h, -5, -4))} M${pt([front.s[0], front.s[1] + 7])} L${pt(along(h, -8, 8))}`}
+        fill="none"
+        stroke={costume.gi.shade}
+        strokeWidth={1.4}
+        strokeLinecap="round"
+      />
+      <Limb from={belt(-12.5)} to={belt(12.5)} w1={5.2} w2={5.2} tone={{ base: FS.belt, shade: INK }} />
+      <path
+        d={`M${pt(knot)} L${pt([knot[0] + swing * 2, knot[1] + 17])} M${pt(knot)} L${pt([knot[0] + 4 + swing * 3, knot[1] + 14])}`}
+        stroke={INK}
+        strokeWidth={4.6}
+        strokeLinecap="round"
+      />
+      <path
+        d={`M${pt(knot)} L${pt([knot[0] + swing * 2, knot[1] + 17])} M${pt(knot)} L${pt([knot[0] + 4 + swing * 3, knot[1] + 14])}`}
+        stroke={FS.belt}
+        strokeWidth={2.6}
+        strokeLinecap="round"
+      />
       <rect x={r1(knot[0] - 2.6)} y={r1(knot[1] - 2.6)} width={5.2} height={5.2} rx={1} fill={FS.belt} stroke={INK} strokeWidth={1.2} />
     </g>
   )
@@ -268,13 +350,21 @@ function Tails({ wind, stream }: { wind: number; stream: boolean }) {
       {[22, 17].map((length, i) => {
         const [a, b] = TAIL_WAVE[(wind + i) % TAIL_WAVE.length]
         const end: Pt = stream ? [-16 - length, -4 + b * 0.6] : [-10 - length * 0.6, -3 + length * 0.75 + a * 0.5]
-        return <Ribbon key={length} d={`M-10 -3 C-16 ${-3 + a} ${r1(-10 - length * 0.55)} ${-3 + b + (stream ? -2 : 6)} ${pt(end)}`} color={FS.p2} width={2.8} />
+        return (
+          <Ribbon
+            key={length}
+            d={`M-10 -3 C-16 ${-3 + a} ${r1(-10 - length * 0.55)} ${-3 + b + (stream ? -2 : 6)} ${pt(end)}`}
+            color={FS.p2}
+            width={2.8}
+          />
+        )
       })}
     </>
   )
 }
 
 function Headgear({ costume }: { costume: Costume }) {
+  if (costume.head === 'none') return null
   if (costume.head === 'mongkhon') {
     return (
       <g>
@@ -287,27 +377,74 @@ function Headgear({ costume }: { costume: Costume }) {
   }
   return (
     <g>
-      <path d="M9.6 -6.5 C3 -8.6 -4 -8 -9.8 -4.6 L-9.4 -0.8 C-4 -4.4 3 -5 9.6 -3 Z" fill={FS.p2} stroke={INK} strokeWidth={1.2} strokeLinejoin="round" />
+      <path
+        d="M9.6 -6.5 C3 -8.6 -4 -8 -9.8 -4.6 L-9.4 -0.8 C-4 -4.4 3 -5 9.6 -3 Z"
+        fill={FS.p2}
+        stroke={INK}
+        strokeWidth={1.2}
+        strokeLinejoin="round"
+      />
       <path d="M9.6 -4.4 C3 -6.4 -4 -5.8 -9.6 -2.4" fill="none" stroke={FS.p2Dark} strokeWidth={1.2} />
       <circle cx={-10} cy={-3} r={2.2} fill={FS.p2} stroke={INK} strokeWidth={1.1} />
     </g>
   )
 }
 
-// His head in three quarter view facing right: the spiky short hair, the ear, the heavy brow over the oval
-// eye, the nose, and the full beard over the jaw and round the mouth.
+// The partner's long blond hair, swept back off the brow and falling to the nape in three locks that
+// trail the wind like the headband tails do.
+function SweptHair({ color, wind }: { color: string; wind: number }) {
+  const sway = TAIL_WAVE[wind % TAIL_WAVE.length][0] * 0.4
+  return (
+    <path
+      d={`M-9 4 C-12 -2 -10 -11 0 -13 C6 -14 10 -11 10.4 -7 C7 -8.6 3 -8.4 -1 -6.6 C-3 -4 -4 -1 -4.4 3 L-7 3 C-9 7 ${r1(-14 + sway)} 9 ${r1(-17 + sway)} 8 C-14 6 -12 5 -11 3 C${r1(-14 + sway)} 3 ${r1(-17 + sway)} 1 ${r1(-18 + sway)} -2 C-14 -1 -12 0 -10.4 0 Z`}
+      fill={color}
+      stroke={INK}
+      strokeWidth={1.2}
+      strokeLinejoin="round"
+    />
+  )
+}
+
+// The head in three quarter view facing right: the ear, the heavy brow over the oval eye, the nose. Him
+// with the spiky short hair and the full beard over the jaw and round the mouth; the partner clean
+// shaven under the swept back hair.
 function Head({ frame, costume }: { frame: Frame; costume: Costume }) {
   const stream = frame.stream ?? false
+  const { skin } = costume
   return (
     <g transform={`translate(${pt(frame.head)}) rotate(${frame.tilt ?? 0})`}>
       {costume.head === 'band' && <Tails wind={frame.wind} stream={stream} />}
-      <path d="M-8 -2 C-8 -9 -3 -11 1 -11 C6 -11 9 -7 9 -2 L9.6 2 L8 5 C7 9 4 11 0 11 C-5 11 -8 7 -8 -2 Z" fill={SKIN.base} stroke={INK} strokeWidth={LINE} strokeLinejoin="round" />
-      <path d="M-8 -2 C-8 7 -5 11 0 11 C-4 8 -5 3 -5 -2 Z" fill={SKIN.shade} />
-      <path d="M9 -1.5 L11.2 2.8 L8.8 3.4" fill={SKIN.base} stroke={INK} strokeWidth={1.1} strokeLinejoin="round" />
-      <path d="M-0.8 -2 L0.8 -2 C1.5 1.5 4 3 6.6 3.2 C7.6 3 8.6 3.3 9.6 4 L9.4 5.2 C9 9 5 12 0.5 11.8 C-3 11.5 -5.2 8 -4.6 3 Z" fill={HERO_IDENTITY.beard} stroke={INK} strokeWidth={1.1} strokeLinejoin="round" />
-      <path d="M6 6.4 L8.8 6.2" stroke={HERO_IDENTITY.skinShade} strokeWidth={1.1} strokeLinecap="round" />
-      <ellipse cx={-2.6} cy={0.8} rx={2} ry={2.8} fill={SKIN.base} stroke={INK} strokeWidth={1.1} />
-      <path d="M-9 2 C-10 -6 -6 -12 1 -12.5 L3 -15.4 L4.2 -12.2 L7.2 -13.8 L7.6 -10.6 L10.2 -10 C9.6 -7 8.6 -6 7 -5.4 C3 -7 -2 -6 -4 -3 L-5 2 Z" fill={HERO_IDENTITY.hair} stroke={INK} strokeWidth={1.2} strokeLinejoin="round" />
+      <path
+        d="M-8 -2 C-8 -9 -3 -11 1 -11 C6 -11 9 -7 9 -2 L9.6 2 L8 5 C7 9 4 11 0 11 C-5 11 -8 7 -8 -2 Z"
+        fill={skin.base}
+        stroke={INK}
+        strokeWidth={LINE}
+        strokeLinejoin="round"
+      />
+      <path d="M-8 -2 C-8 7 -5 11 0 11 C-4 8 -5 3 -5 -2 Z" fill={skin.shade} />
+      <path d="M9 -1.5 L11.2 2.8 L8.8 3.4" fill={skin.base} stroke={INK} strokeWidth={1.1} strokeLinejoin="round" />
+      {costume.beard && (
+        <path
+          d="M-0.8 -2 L0.8 -2 C1.5 1.5 4 3 6.6 3.2 C7.6 3 8.6 3.3 9.6 4 L9.4 5.2 C9 9 5 12 0.5 11.8 C-3 11.5 -5.2 8 -4.6 3 Z"
+          fill={HERO_IDENTITY.beard}
+          stroke={INK}
+          strokeWidth={1.1}
+          strokeLinejoin="round"
+        />
+      )}
+      <path d="M6 6.4 L8.8 6.2" stroke={skin.shade} strokeWidth={1.1} strokeLinecap="round" />
+      <ellipse cx={-2.6} cy={0.8} rx={2} ry={2.8} fill={skin.base} stroke={INK} strokeWidth={1.1} />
+      {costume.beard ? (
+        <path
+          d="M-9 2 C-10 -6 -6 -12 1 -12.5 L3 -15.4 L4.2 -12.2 L7.2 -13.8 L7.6 -10.6 L10.2 -10 C9.6 -7 8.6 -6 7 -5.4 C3 -7 -2 -6 -4 -3 L-5 2 Z"
+          fill={costume.hair}
+          stroke={INK}
+          strokeWidth={1.2}
+          strokeLinejoin="round"
+        />
+      ) : (
+        <SweptHair color={costume.hair} wind={frame.wind} />
+      )}
       <Headgear costume={costume} />
       <path d="M3 -3.4 L7.8 -2.2" stroke={INK} strokeWidth={1.8} strokeLinecap="round" />
       <ellipse cx={5.6} cy={-0.4} rx={1.1} ry={1.7} fill={HERO_IDENTITY.eyes} />
@@ -359,20 +496,49 @@ const FX_DRAW: Record<Fx['kind'], (fx: Fx) => ReactNode> = {
     const mid = lerp(fx.from, fx.to, 0.5)
     return (
       <g>
-        <path d={`M${pt(fx.from)} Q${pt([mid[0] + 20, mid[1]])} ${pt(fx.to)} Q${pt([mid[0] + 6, mid[1]])} ${pt(fx.from)}Z`} fill={FS.orange} opacity={0.85} />
-        <path d={`M${pt(fx.from)} Q${pt([mid[0] + 12, mid[1]])} ${pt(fx.to)} Q${pt([mid[0] + 7, mid[1]])} ${pt(fx.from)}Z`} fill={FS.flash} opacity={0.9} />
+        <path
+          d={`M${pt(fx.from)} Q${pt([mid[0] + 20, mid[1]])} ${pt(fx.to)} Q${pt([mid[0] + 6, mid[1]])} ${pt(fx.from)}Z`}
+          fill={FS.orange}
+          opacity={0.85}
+        />
+        <path
+          d={`M${pt(fx.from)} Q${pt([mid[0] + 12, mid[1]])} ${pt(fx.to)} Q${pt([mid[0] + 7, mid[1]])} ${pt(fx.from)}Z`}
+          fill={FS.flash}
+          opacity={0.9}
+        />
       </g>
     )
   },
   spark: (fx) => fx.kind === 'spark' && <Spark at={fx.at} r={fx.r} />,
   spin: (fx) =>
     fx.kind === 'spin' && (
-      <ellipse cx={58} cy={88} rx={40} ry={9} fill="none" stroke={FS.flash} strokeWidth={3} strokeDasharray="46 160" strokeDashoffset={fx.phase * -52} opacity={0.75} />
+      <ellipse
+        cx={58}
+        cy={88}
+        rx={40}
+        ry={9}
+        fill="none"
+        stroke={FS.flash}
+        strokeWidth={3}
+        strokeDasharray="46 160"
+        strokeDashoffset={fx.phase * -52}
+        opacity={0.75}
+      />
     ),
   kit: (fx) => fx.kind === 'kit' && <DrumKit swing={fx.swing} />,
+  // The parry's blue flash: the whole body lit in a cold blue halo, a ring and a glint where the palm
+  // turns the blow aside.
+  parry: (fx) =>
+    fx.kind === 'parry' && (
+      <g>
+        <ellipse cx={66} cy={100} rx={44} ry={66} fill={FS.parry} opacity={0.35} />
+        <circle cx={fx.at[0]} cy={fx.at[1]} r={13} fill="none" stroke={FS.parry} strokeWidth={4} />
+        <circle cx={fx.at[0]} cy={fx.at[1]} r={6} fill={FS.flash} />
+      </g>
+    ),
 }
 
-const BEHIND: ReadonlySet<Fx['kind']> = new Set(['flame'])
+const BEHIND: ReadonlySet<Fx['kind']> = new Set(['flame', 'parry'])
 
 function Effects({ fx = [], behind }: { fx?: Fx[]; behind: boolean }) {
   return (
@@ -414,7 +580,9 @@ function KiBall({ kind }: { kind: BallKind }) {
       <circle r={13} fill={FS.p1} opacity={0.4} />
       <circle r={9.5} fill={FS.cyan} />
       <circle r={kind === 'code' ? 7 : 5.5} fill={FS.flash} />
-      {kind === 'code' && <path d="M-4 -3 L-0.6 0 L-4 3 M0.6 3.6 H4.6" fill="none" stroke={FS.night} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />}
+      {kind === 'code' && (
+        <path d="M-4 -3 L-0.6 0 L-4 3 M0.6 3.6 H4.6" fill="none" stroke={FS.night} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+      )}
     </g>
   )
 }
@@ -422,17 +590,24 @@ function KiBall({ kind }: { kind: BallKind }) {
 interface FighterProps {
   profession: Profession
   pose: FighterPose
+  who?: Who
+  // Bumped to replay the same pose from its first frame (two punches in a row).
+  take?: number
   className?: string
   // A held frame: the slot of a fighter not under the cursor.
   still?: boolean
   onMoveEnd?: () => void
 }
 
-export function Fighter({ profession, pose, className = '', still = false, onMoveEnd }: FighterProps) {
+export function Fighter({ profession, pose, who = 'hero', take = 0, className = '', still = false, onMoveEnd }: FighterProps) {
   const clip = `fs-${useId().replace(/:/g, '')}`
   const motion = motionFor(pose, profession)
-  const costume = COSTUME[profession]
-  const vars = { '--cycle': `${motion.cycleMs}ms`, '--key': motion.key, '--runs': String(motion.runs) } as CSSProperties
+  const costume = costumeOf(who, profession)
+  const vars = {
+    '--cycle': `${motion.cycleMs}ms`,
+    '--key': motion.key,
+    '--runs': String(motion.runs),
+  } as CSSProperties
 
   return (
     <svg
@@ -451,13 +626,13 @@ export function Fighter({ profession, pose, className = '', still = false, onMov
       </defs>
       <ellipse cx={62} cy={CELL.ground} rx={34} ry={3.8} fill={INK} opacity={0.4} />
       <g clipPath={`url(#${clip})`}>
-        <g key={`${pose}-${profession}`} className={sprite.strip} onAnimationEnd={onMoveEnd}>
+        <g key={`${pose}-${profession}-${take}`} className={sprite.strip} onAnimationEnd={onMoveEnd}>
           {framesFor(pose, profession).map((frame, index) => (
             <FrameArt key={index} frame={frame} costume={costume} index={index} />
           ))}
         </g>
       </g>
-      {motion.ball && <KiBall key={pose} kind={motion.ball} />}
+      {motion.ball && <KiBall key={`${pose}-${take}`} kind={motion.ball} />}
     </svg>
   )
 }

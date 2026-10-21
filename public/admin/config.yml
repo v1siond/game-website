@@ -402,6 +402,21 @@ collections:
                   - { <<: *text, label: "Turn pipe", name: turnPipe, hint: 'Keep {achievement}' }
                   - { <<: *text, label: "Flow waiting", name: flowWaiting }
                   - { <<: *text, label: "Flow done", name: flowDone }
+              - label: Arcade world (fighter select)
+                name: arcade
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Smash again", name: smashAgain }
+                  - { <<: *text, label: "Throw again", name: throwAgain }
+                  - { <<: *text, label: "Super again", name: superAgain }
+                  - { <<: *text, label: "Parry again", name: parryAgain }
+                  - { <<: *text, label: "Spar again", name: sparAgain }
+                  - { <<: *text, label: "Bonus stage call", name: bonus }
+                  - { <<: *text, label: "Perfect call", name: perfect }
+                  - { <<: *text, label: "Knockout call", name: ko }
+                  - { <<: *text, label: "Super move banner", name: superMove }
+                  - { <<: *text, label: "Continue call", name: continueCall }
               - label: Jungle world (tropical platformer)
                 name: jungle
                 widget: object

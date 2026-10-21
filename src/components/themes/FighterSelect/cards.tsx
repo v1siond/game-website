@@ -9,7 +9,6 @@ import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
 // The fight cards every list entry sits on: a flat dark box ruled in its accent, ringed in black, with
@@ -167,30 +166,28 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
   )
 }
 
-// The tech stack as a move list: each category its own command card in the shared masonry, its
-// technologies a grid of command slots.
-export function MoveList({ categories }: { categories: CVData['techStack'] }) {
+// One tech stack category as a move list card: its technologies a grid of command slots.
+export function MoveCard({ category }: { category: CVData['techStack'][number] }) {
   const { cards } = useLabels()
 
   return (
-    <ul className={MASONRY_LIST}>
-      {categories.map((category) => (
-        <li key={category.id} className={MASONRY_ITEM}>
-          <FightCard accent="cyan">
-            <h3 className={`mb-4 flex items-center gap-3 ${TITLE}`}>
-              <span aria-hidden="true">{category.icon}</span>
-              {category.name}
-            </h3>
-            <ul className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
-              {category.items.map((tech) => (
-                <li key={tech} className="min-w-0 break-words border border-[color:var(--fs-steel)] bg-black px-3 py-2 text-sm text-white">
-                  <SlashBreaks text={tech} />
-                </li>
-              ))}
-            </ul>
-          </FightCard>
-        </li>
-      ))}
-    </ul>
+    <FightCard accent="cyan">
+      <h3 className={`mb-4 flex items-center gap-3 ${TITLE}`}>
+        <span aria-hidden="true">{category.icon}</span>
+        {category.name}
+      </h3>
+      <ul
+        className="grid grid-cols-1 gap-2 min-[360px]:grid-cols-2"
+        aria-label={fillLabel(cards.categoryTechnologies, {
+          name: category.name,
+        })}
+      >
+        {category.items.map((tech) => (
+          <li key={tech} className="min-w-0 break-words border border-[color:var(--fs-steel)] bg-black px-3 py-2 text-sm text-white">
+            <SlashBreaks text={tech} />
+          </li>
+        ))}
+      </ul>
+    </FightCard>
   )
 }
