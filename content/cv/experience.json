@@ -9,10 +9,12 @@
         "employment": "Independent",
         "description": "Long-term core engineer and architect trusted by high-profile enterprise companies and scaling startups to lead critical system overhauls, compliance-driven deployments, and zero-to-one product development.",
         "highlights": [
-          "Truth Social (foundational stages): embedded as a backend engineer during the foundational architecture phases, collaborating closely with Mastodon core developers to scale and optimize the Ruby on Rails backend.",
-          "InsurAdmin and Agency Rocket (InsureTech automation): developed InsurAdmin from scratch, a platform managing complex carrier feeds and agency teams. Engineered core automation parsers (Annuity, IUL, Whole Life) and fully integrated the Stripe billing engine for the Agency Rocket marketing suite (My New Retirement, Wealth United, etc.).",
+          "InsurAdmin (InsureTech automation): developed InsurAdmin from scratch, a platform managing complex carrier feeds and agency teams.",
+          "Agency Rocket: engineered core automation parsers (Annuity, IUL, Whole Life) and fully integrated the Stripe billing engine for the Agency Rocket marketing suite (My New Retirement, Wealth United, Debt Action Plan).",
+          "Datepal: co PM and development lead of a dating app where singles are invited by their coupled friends to events and get to meet other people from those circles. Built Veriff identity and age verification, ranking APIs with card stacks, SMS notifications on lifecycle events and Stripe checkout in the Phoenix and Ash backend.",
           "PMX Affiliate Marketplace: engineered, developed and launched the full-stack architecture of the affiliate marketplace, with a native integration into the Shopify ecosystem.",
-          "SecureBancard (critical project rescue): saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines."
+          "SecureBancard (critical project rescue): saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines.",
+          "Truth Social (foundational stages): embedded as a backend engineer during the foundational architecture phases, collaborating closely with Mastodon core developers to scale and optimize the Ruby on Rails backend."
         ],
         "skills": [],
         "title": "Senior Staff Software Engineer",
@@ -145,10 +147,12 @@
         "employment": "Independiente",
         "description": "Ingeniero y arquitecto central de largo plazo, de confianza para grandes empresas y startups en crecimiento, para liderar renovaciones de sistemas críticos, despliegues regidos por normativas y desarrollo de productos desde cero.",
         "highlights": [
-          "Truth Social (etapas fundacionales): integrado como ingeniero backend durante las fases de arquitectura fundacional, colaborando estrechamente con desarrolladores del núcleo de Mastodon para escalar y optimizar el backend en Ruby on Rails.",
-          "InsurAdmin y Agency Rocket (automatización InsureTech): desarrolló InsurAdmin desde cero, una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias. Desarrolló los parsers de automatización centrales (Annuity, IUL, Whole Life) e integró por completo el motor de cobros con Stripe de la suite de marketing Agency Rocket (My New Retirement, Wealth United, etc.).",
+          "InsurAdmin (automatización InsureTech): desarrolló InsurAdmin desde cero, una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias.",
+          "Agency Rocket: desarrolló los parsers de automatización centrales (Annuity, IUL, Whole Life) e integró por completo el motor de cobros con Stripe de la suite de marketing Agency Rocket (My New Retirement, Wealth United, Debt Action Plan).",
+          "Datepal: co PM y líder de desarrollo de una app de citas donde los solteros son invitados por sus amigos en pareja a eventos y conocen a otras personas de esos círculos. Desarrolló la verificación de identidad y edad con Veriff, APIs de ranking con pilas de tarjetas, notificaciones SMS en eventos del ciclo de vida y el checkout de Stripe en el backend con Phoenix y Ash.",
           "PMX Affiliate Marketplace: diseñó, desarrolló y lanzó la arquitectura full-stack del marketplace de afiliados, con una integración nativa en el ecosistema de Shopify.",
-          "SecureBancard (rescate de un proyecto crítico): salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa."
+          "SecureBancard (rescate de un proyecto crítico): salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa.",
+          "Truth Social (etapas fundacionales): integrado como ingeniero backend durante las fases de arquitectura fundacional, colaborando estrechamente con desarrolladores del núcleo de Mastodon para escalar y optimizar el backend en Ruby on Rails."
         ],
         "skills": [],
         "title": "Ingeniero de Software Senior Staff",
@@ -281,10 +285,12 @@
         "employment": "Indipendente",
         "description": "Ingegnere e architetto centrale di lungo corso, scelto da grandi aziende e startup in crescita per guidare il rinnovo di sistemi critici, rilasci vincolati alla conformità e lo sviluppo di prodotti da zero.",
         "highlights": [
-          "Truth Social (fasi iniziali): inserito come ingegnere backend durante le fasi di architettura iniziale, collaborando a stretto contatto con gli sviluppatori del core di Mastodon per scalare e ottimizzare il backend in Ruby on Rails.",
-          "InsurAdmin e Agency Rocket (automazione InsureTech): ha sviluppato InsurAdmin da zero, una piattaforma che gestisce feed complessi delle compagnie e team di agenzia. Ha sviluppato i parser di automazione principali (Annuity, IUL, Whole Life) e integrato completamente il motore di fatturazione Stripe della suite di marketing Agency Rocket (My New Retirement, Wealth United, ecc.).",
+          "InsurAdmin (automazione InsureTech): ha sviluppato InsurAdmin da zero, una piattaforma che gestisce feed complessi delle compagnie e team di agenzia.",
+          "Agency Rocket: ha sviluppato i parser di automazione principali (Annuity, IUL, Whole Life) e integrato completamente il motore di fatturazione Stripe della suite di marketing Agency Rocket (My New Retirement, Wealth United, Debt Action Plan).",
+          "Datepal: co-PM e responsabile dello sviluppo di un'app di incontri in cui i single vengono invitati dagli amici in coppia a eventi e conoscono altre persone di quelle cerchie. Ha sviluppato la verifica di identità ed età con Veriff, le API di ranking con pile di carte, le notifiche SMS sugli eventi del ciclo di vita e il checkout Stripe nel backend Phoenix e Ash.",
           "PMX Affiliate Marketplace: ha progettato, sviluppato e lanciato l'architettura full-stack del marketplace di affiliazione, con un'integrazione nativa nell'ecosistema Shopify.",
-          "SecureBancard (salvataggio di un progetto critico): ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide."
+          "SecureBancard (salvataggio di un progetto critico): ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide.",
+          "Truth Social (fasi iniziali): inserito come ingegnere backend durante le fasi di architettura iniziale, collaborando a stretto contatto con gli sviluppatori del core di Mastodon per scalare e ottimizzare il backend in Ruby on Rails."
         ],
         "skills": [],
         "title": "Ingegnere del Software Senior Staff",
