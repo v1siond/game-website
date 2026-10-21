@@ -5,13 +5,14 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { jobYears } from '@/components/cv/sectionText'
 import { MONO, PIXEL } from './palette'
 import { Command, FOCUS } from './actions'
 import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
 import { usePlay } from './play'
 import { Soul } from './soul'
 import world from './world.module.css'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // Retro RPG's entries, each a box of the encounter screen:
 // - a job is a dialogue: the box opens (a line, then full height), the title types, the rest of the
@@ -106,6 +107,7 @@ const JUMP: Keyframe[] = [{ transform: 'translateY(0)' }, { transform: 'translat
 const stepped = (duration: number, frames: number, delay = 0): KeyframeAnimationOptions => ({ duration, delay, easing: `steps(${frames}, end)` })
 
 export function ProjectCard({ project, years, links }: ProjectSlot) {
+  const labels = useLabels()
   const aimedAt = useRef(0)
   const body = useRef<HTMLDivElement>(null)
   const slash = useRef<HTMLSpanElement>(null)
@@ -153,7 +155,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
             ))}
           </div>
         ) : (
-          <p className={`mt-4 ${BODY}`}>{NO_PUBLIC_LINK}</p>
+          <p className={`mt-4 ${BODY}`}>{labels.links.noPublicLink}</p>
         )}
         <div className={`relative mt-4 h-6 border-2 border-[color:var(--rpg-text)] ${world.meter}`} aria-hidden="true">
           <span className="absolute inset-y-0 left-1/2 w-1 -translate-x-1/2 bg-[color:var(--rpg-gold)]" />
@@ -198,6 +200,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const labels = useLabels()
   const content = (
     <div className={`p-4 sm:p-5 ${world.box}`}>
       <h3 className={`flex items-start gap-2 ${TITLE} group-hover:text-[color:var(--rpg-gold)] group-focus-visible:text-[color:var(--rpg-gold)]`}>
@@ -211,7 +214,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${BODY}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </div>

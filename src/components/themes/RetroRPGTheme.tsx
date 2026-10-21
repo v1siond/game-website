@@ -2,10 +2,9 @@
 
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useWorldView, useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
-import { PROFESSION_LABELS } from '@/lib/cv/professions'
 import { MONO, PIXEL, RPG_VARS } from './RetroRPG/palette'
 import { ActionOptions, FOCUS } from './RetroRPG/actions'
 import { Box, Mark, SHOW_AFTER, Typed } from './RetroRPG/panels'
@@ -36,6 +35,7 @@ function Said({ children, className }: { children: string; className: string }) 
 }
 
 export default function RetroRPGTheme() {
+  const labels = useLabels()
   const { active } = useProfession()
   const view = useWorldView()
 
@@ -73,7 +73,7 @@ export default function RetroRPGTheme() {
 
           <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-text)] ${PIXEL} ${SHOW_AFTER.last}`}>
             <span>{view.hero.name}</span>
-            <span className="text-[color:var(--rpg-gold)]">{PROFESSION_LABELS[active]}</span>
+            <span className="text-[color:var(--rpg-gold)]">{labels.professions[active]}</span>
             <span className="h-4 w-24 bg-[color:var(--rpg-gold)]" aria-hidden="true" />
           </div>
 

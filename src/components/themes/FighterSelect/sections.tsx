@@ -1,6 +1,6 @@
 'use client'
 
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
@@ -90,13 +90,14 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 }
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const labels = useLabels()
   const { musician, bands } = sections
 
   return (
     <>
       <LightningLine />
       <ArcadePanel accent="p2" title="Bands" id="bands-heading">
-        <p className={`mb-6 ${LEAD}`}>{drumsSince(musician)}</p>
+        <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
         <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandStage {...slot} />} />
         <p className="mt-6 text-sm italic text-[color:var(--fs-gold)]">{musician.line}</p>
       </ArcadePanel>

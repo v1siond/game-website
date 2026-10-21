@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -105,11 +105,12 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 }
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const labels = useLabels()
   const { musician, bands } = sections
 
   return (
     <Block label="Bands" title="Bands" width={WIDE}>
-      <p className={`mb-6 text-center text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}>{drumsSince(musician)}</p>
+      <p className={`mb-6 text-center text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}>{drumsSince(musician, labels.years)}</p>
       <BulletBox profession="drummer" />
       <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandCard {...slot} />} />
       <p className={`mt-4 text-center ${BODY}`}>{musician.line}</p>

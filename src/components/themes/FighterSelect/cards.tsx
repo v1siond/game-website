@@ -2,11 +2,11 @@ import type { ReactNode } from 'react'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { HitSpark } from './badges'
 import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // The fight cards every list entry sits on: cabinet metal with the cut corner of a move list panel,
 // the accent border, highlights marked with a hit spark. A running job glows health green, a highlighted
@@ -69,6 +69,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 }
 
 export function ProjectCard({ project, years, links }: ProjectSlot) {
+  const labels = useLabels()
   return (
     <FightCard accent={project.highlight ? 'gold' : 'cyan'}>
       <div className="mb-2 flex items-start justify-between gap-2">
@@ -96,13 +97,14 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className={`mt-4 ${BODY}`}>{NO_PUBLIC_LINK}</p>
+        <p className={`mt-4 ${BODY}`}>{labels.links.noPublicLink}</p>
       )}
     </FightCard>
   )
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const labels = useLabels()
   const content = (
     <FightCard accent="p2">
       <h3 className={TITLE}>{band.name}</h3>
@@ -113,7 +115,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-3 ${BODY}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </FightCard>

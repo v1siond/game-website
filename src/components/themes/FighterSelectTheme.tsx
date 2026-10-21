@@ -1,7 +1,7 @@
 'use client'
 
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { FS_VARS } from './FighterSelect/palette'
 import { ArcadePanel } from './FighterSelect/frames'
@@ -23,8 +23,9 @@ import look from './FighterSelect/world.module.css'
 // and stop the sticky combo counter from sticking to the viewport.
 
 export default function FighterSelectTheme() {
-  const { active, config } = useProfession()
+  const { active } = useProfession()
   const view = useWorldView()
+  const labels = useLabels()
 
   return (
     <div className={`relative min-h-screen overflow-x-clip ${look.root}`} style={FS_VARS}>
@@ -39,7 +40,7 @@ export default function FighterSelectTheme() {
 
         <main className="mx-auto max-w-6xl px-4 sm:px-6">
           <ArcadePanel accent="cyan">
-            <SelectScreen active={active} title={config.title} />
+            <SelectScreen active={active} title={labels.professions[active]} />
           </ArcadePanel>
 
           <div role="region" aria-label={`${active} profession details`}>

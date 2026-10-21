@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
-import { NO_PUBLIC_LINK } from '@/components/cv/sectionText'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { GlassStar, HitStar } from './backdrop'
 import { HeroCharacter } from './character'
 import { NOIR } from './palette'
 import world from './world.module.css'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // The finisher a project open plays, then the project's finish card. The phases follow the game's
 // sequence, compressed from its 8 s to 1.9 s so a reader is not kept waiting:
@@ -114,6 +114,7 @@ function Rush() {
 }
 
 function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void }) {
+  const labels = useLabels()
   const { project, years, links } = slot
 
   return (
@@ -184,7 +185,7 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
               </a>
             ))
           ) : (
-            <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>{NO_PUBLIC_LINK}</p>
+            <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>{labels.links.noPublicLink}</p>
           )}
         </div>
       </article>

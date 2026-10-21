@@ -2,9 +2,10 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, RELEASED } from '@/components/cv/sectionText'
+import { jobYears } from '@/components/cv/sectionText'
 import { HitStar } from './backdrop'
 import world from './world.module.css'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // The cards each section lists, each a crooked slab whose words sit level so they read. Every card sits
 // in two layers: the outer one plays the entrance once when its stage fires (rank flip, result slide),
@@ -135,6 +136,7 @@ export function CompanyTag({ company }: { company: CVData['companies'][number] }
 
 // A band as a result panel sliding in from the side.
 export function BandPanel({ slot, index }: { slot: BandSlot; index: number }) {
+  const labels = useLabels()
   const { band, years, linkProps } = slot
   const body: ReactNode = (
     <>
@@ -146,7 +148,7 @@ export function BandPanel({ slot, index }: { slot: BandSlot; index: number }) {
       </span>
       {band.release && (
         <span className={`mt-2 block ${BODY}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </span>
       )}
     </>

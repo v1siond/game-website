@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, type CSSProperties, type ReactNode } from 'react'
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -118,11 +118,12 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 const TRAIL = 'M0 22 L70 14 L120 26 L190 8 L260 24 L330 12 L380 30 L450 10 L520 22 L600 6 L600 18 L520 34 L450 22 L380 42 L330 24 L260 36 L190 20 L120 38 L70 26 L0 34 Z'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const labels = useLabels()
   const { musician, bands } = sections
 
   return (
     <Stage title="Bands">
-      <p className={`mb-6 ${LEAD}`}>{drumsSince(musician)}</p>
+      <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
       <div className="relative">
         <svg viewBox="0 0 600 40" preserveAspectRatio="none" className={`pointer-events-none absolute inset-x-0 top-10 h-16 w-full ${world.trail}`} aria-hidden="true" focusable="false">
           <path d={TRAIL} fill={NOIR.red} />

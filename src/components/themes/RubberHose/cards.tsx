@@ -1,11 +1,12 @@
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { jobYears } from '@/components/cv/sectionText'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // Rubber Hose's cards, sepia posters and title cards under one ink line: the tech bubbles, a job's title
 // card, a project's show poster, a venture's advertisement and a band's record label. A poster throws an
@@ -98,6 +99,7 @@ const LINK_BUTTON = `inline-flex min-h-[44px] items-center px-4 text-sm tracking
 
 // A project on a show poster: the name, the years, his role, the result line and the links.
 export function VintagePoster({ project, years, links }: ProjectSlot) {
+  const labels = useLabels()
   return (
     <article className={`group relative h-full p-4 ${world.poster}`}>
       <CornerTicks />
@@ -124,7 +126,7 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className={`mt-4 italic ${BODY}`}>{NO_PUBLIC_LINK}</p>
+        <p className={`mt-4 italic ${BODY}`}>{labels.links.noPublicLink}</p>
       )}
     </article>
   )
@@ -159,6 +161,7 @@ export function CompanyPoster({ company }: { company: CVData['companies'][number
 // A band on a record label on the shop shelf: the disc in the corner spins up when the pointer lands
 // on the record, his role, the years and the release.
 export function BandRecord({ band, years, linkProps }: BandSlot) {
+  const labels = useLabels()
   const content = (
     <article className={`group relative h-full p-4 ${world.poster} ${styles.record}`} tabIndex={linkProps ? undefined : -1}>
       <svg viewBox="0 0 48 48" className={`absolute -right-3 -top-3 h-14 w-14 ${styles.disc}`} aria-hidden="true" focusable="false">
@@ -182,7 +185,7 @@ export function BandRecord({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${BODY}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { FadeInScene, ScrollScene } from '@/components/scroll/ScrollScene'
@@ -111,6 +111,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 }
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const labels = useLabels()
   const { musician, bands } = sections
 
   return (
@@ -119,7 +120,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
       <section aria-labelledby="hose-bands" className="mb-8">
           <CurlBanner id="hose-bands">Bands</CurlBanner>
           <p className={`mb-6 ${LEAD}`}>
-            {drumsSince(musician)}
+            {drumsSince(musician, labels.years)}
           </p>
           <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandRecord {...slot} />} />
           <p className={`mt-6 italic ${LEAD} ${world.red}`}>{musician.line}</p>

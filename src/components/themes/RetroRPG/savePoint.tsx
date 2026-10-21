@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/components/cv/sectionText'
-import { PROFESSION_LABELS, type Profession } from '@/lib/cv/professions'
+import type { Profession } from '@/lib/cv/professions'
 import { ActionOptions } from './actions'
 import { BODY, Box, Mark, Typed } from './panels'
 import { PIXEL, RPG } from './palette'
 import { usePlay } from './play'
 import world from './world.module.css'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // Contact as the save point: the yellow star twinkles over the closing box the way the game's save
 // point flickers in its room. Clicking the star saves: it spins once fast, the box flashes white and
@@ -35,6 +36,7 @@ function SaveStar() {
 }
 
 export function SavePoint({ profession }: { profession: Profession }) {
+  const labels = useLabels()
   const [saves, setSaves] = useState(0)
   const saved = saves > 0
   const { ref, play } = usePlay(2400)
@@ -66,7 +68,7 @@ export function SavePoint({ profession }: { profession: Profession }) {
               </h2>
               <p className={`mb-4 flex flex-wrap justify-between gap-2 text-sm uppercase tracking-[0.12em] ${PIXEL} ${saved ? 'text-[color:var(--rpg-gold)]' : 'text-[color:var(--rpg-text)]'}`}>
                 <span>{name}</span>
-                <span>{PROFESSION_LABELS[profession]}</span>
+                <span>{labels.professions[profession]}</span>
               </p>
               <p className={`mb-6 ${BODY}`}>
                 <Mark className="mr-2 text-[color:var(--rpg-gold)]" />
