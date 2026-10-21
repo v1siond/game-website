@@ -265,6 +265,21 @@
   }
 }
 
+/* Him walking into his slab from its left: three two step strides, in hard steps like the walk itself. */
+.walkOn {
+  animation: walkOn 1920ms steps(6, end) both;
+}
+
+@keyframes walkOn {
+  from {
+    opacity: 0;
+    transform: translate3d(-90%, 0, 0);
+  }
+  20% {
+    opacity: 1;
+  }
+}
+
 /* Him with the flat red silhouette offset behind (static, never animated). */
 .redShadow {
   filter: drop-shadow(5px 3px 0 var(--noir-red));
@@ -886,6 +901,7 @@
   .crash,
   .swing,
   .bagHit,
+  .walkOn,
   .menuItem[aria-checked='true'] .jag {
     animation: none !important;
     opacity: 1 !important;

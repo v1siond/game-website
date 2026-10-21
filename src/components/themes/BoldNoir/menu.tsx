@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type AnimationEvent } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { DETECTIVE_HOST, Detective } from './detective'
+import { DETECTIVE_HOST, Detective, type DetectiveMotion } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
 
@@ -13,10 +13,29 @@ import world from './world.module.css'
 // silhouette offset behind (the battle menu's outline), the label a heavy cut-out word. The pick swells
 // and tilts and a red jag jumps behind it, jittering between hard poses like the highlighter box that
 // never keeps its shape. Picking a profession plays the cut-in: a red diagonal band with his eyes in a
-// strip sweeps across the screen and out.
+// strip sweeps across the screen and out. When the menu first shows he walks into each slab from its
+// left on the two step walk and stops there, settling into the idle.
 
 // The jagged highlighter behind the pick, in a 200 by 100 box.
 const JAG = 'M6 18 L60 4 L72 14 L150 0 L196 22 L184 46 L198 70 L132 96 L118 84 L40 100 L2 74 L14 50 Z'
+
+/** Him in one slab: the walk in from the slab's left, then the idle; still under reduced motion. */
+function SlabFigure({ profession }: { profession: Profession }) {
+  const reducedMotion = useReducedMotion()
+  const [arrived, setArrived] = useState(false)
+  const pace: DetectiveMotion = arrived ? 'idle' : 'walk'
+
+  const arrive = (event: AnimationEvent<HTMLSpanElement>) => {
+    if (event.target !== event.currentTarget) return
+    setArrived(true)
+  }
+
+  return (
+    <span className={`block ${world.walkOn}`} onAnimationEnd={arrive}>
+      <Detective profession={profession} motion={reducedMotion ? 'still' : pace} className={`h-24 w-16 sm:h-32 sm:w-20 ${world.redShadow}`} />
+    </span>
+  )
+}
 
 function MenuSlab({ id, label, selected, optionProps }: ProfessionOption) {
   return (
@@ -30,7 +49,7 @@ function MenuSlab({ id, label, selected, optionProps }: ProfessionOption) {
       </svg>
       <span className={`relative flex w-full flex-col items-center ${world.slab} px-2 pb-2 pt-3`}>
         <span className={`block ${world.unskew}`}>
-          <Detective profession={id} className={`h-24 w-16 sm:h-32 sm:w-20 ${world.redShadow}`} />
+          <SlabFigure profession={id} />
         </span>
         <span className={`mt-1 block text-center text-lg uppercase leading-tight tracking-wider sm:text-2xl ${world.unskew} ${selected ? 'text-[color:var(--noir-paper)]' : 'text-[color:var(--noir-fog)]'}`}>
           {label}
