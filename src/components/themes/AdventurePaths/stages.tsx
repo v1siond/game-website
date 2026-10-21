@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { LevelArt, LevelGround, atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import {
   DeskCorner,
   DrumKit,
@@ -39,18 +39,6 @@ import styles from './scenes.module.css'
 const PROP_SLOT = 'absolute bottom-3 left-[calc(var(--at)*100%_-_1rem)]'
 
 const STOPS = [0.2, 0.52, 0.84]
-
-function Backdrop({ children }: { children: ReactNode }) {
-  return (
-    <svg viewBox="0 0 600 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-      {children}
-    </svg>
-  )
-}
-
-function Ground({ tone }: { tone: string }) {
-  return <div className={`absolute inset-x-0 bottom-0 h-3 border-t-2 border-[color:var(--ap-moss)] ${tone}`} aria-hidden="true" />
-}
 
 // ---- System Engineer: the ruins path, terminals, circuits ----
 
@@ -147,13 +135,13 @@ const ENGINEER_PROPS: Record<LevelZone, ReactNode> = {
 function EngineerLevel({ zone }: { zone: LevelZone }) {
   return (
     <>
-      <Backdrop>
+      <LevelArt>
         <rect width={600} height={100} fill={TRAIL.SKY} />
         <rect y={58} width={600} height={42} fill={TRAIL.DUSK} opacity={0.35} />
-      </Backdrop>
+      </LevelArt>
       <FarRidges />
       <NearRuins />
-      <Ground tone="bg-[color:var(--ap-stone-dark)]" />
+      <LevelGround className="border-[color:var(--ap-moss)] bg-[color:var(--ap-stone-dark)]" />
       <Route />
       <Waypoints />
       {ENGINEER_PROPS[zone]}
@@ -176,7 +164,7 @@ const NIGHT_STARS = [60, 160, 250, 330, 440, 540]
 
 function Clearing() {
   return (
-    <Backdrop>
+    <LevelArt>
       <rect width={600} height={100} fill={TRAIL.NIGHT} />
       {NIGHT_STARS.map((x, i) => (
         <circle key={x} cx={x} cy={10 + (i % 3) * 8} r={1.2} fill={TRAIL.PARCHMENT} opacity={0.7} />
@@ -185,7 +173,7 @@ function Clearing() {
         <path key={x} d={`M${x} 92 L${x + 22} ${30 + (i % 3) * 10} L${x + 44} 92 Z`} fill={i % 2 ? TRAIL.CANOPY : TRAIL.FOREST} />
       ))}
       <path d="M0 14 Q150 40 300 18 Q450 40 600 14" stroke={TRAIL.BARK} strokeWidth={1.2} fill="none" />
-    </Backdrop>
+    </LevelArt>
   )
 }
 
@@ -227,7 +215,7 @@ function MusicianLevel() {
     <>
       <Clearing />
       <Lanterns />
-      <Ground tone="bg-[color:var(--ap-bark)]" />
+      <LevelGround className="border-[color:var(--ap-moss)] bg-[color:var(--ap-bark)]" />
       <Campfire />
       <SoundWaves className="absolute bottom-3 right-3 h-12 w-14 sm:right-6 sm:h-16 sm:w-20" colors={[TRAIL.GOLD, TRAIL.LANTERN]} />
     </>
@@ -243,13 +231,13 @@ function KitByTheFire() {
 function Terrace() {
   return (
     <>
-      <Backdrop>
+      <LevelArt>
         <rect width={600} height={100} fill={TRAIL.DUSK} />
-      </Backdrop>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={`absolute inset-0 h-full w-full ${styles.sunset}`} aria-hidden="true" focusable="false">
+      </LevelArt>
+      <LevelArt className={`absolute inset-0 h-full w-full ${styles.sunset}`}>
         <circle cx={420} cy={34} r={16} fill={TRAIL.LANTERN} />
-      </svg>
-      <Backdrop>
+      </LevelArt>
+      <LevelArt>
         <path d="M330 92 V70 H350 V56 H370 V42 H390 V30 H450 V42 H470 V56 H490 V70 H510 V92 Z" fill={TRAIL.STONE_DARK} />
         <path d="M402 30 L420 14 L438 30 Z" fill={TRAIL.STONE} />
         <rect x={412} y={74} width={16} height={18} fill={TRAIL.NIGHT} />
@@ -260,7 +248,7 @@ function Terrace() {
         <line x1={24} y1={48} x2={583} y2={48} stroke={TRAIL.ROUTE} strokeWidth={1.8} />
         <line x1={24} y1={62} x2={583} y2={62} stroke={TRAIL.PARCHMENT} strokeWidth={1.8} />
         <line x1={24} y1={76} x2={583} y2={76} stroke={TRAIL.GOLD} strokeWidth={1.8} />
-      </Backdrop>
+      </LevelArt>
     </>
   )
 }
@@ -269,7 +257,7 @@ function FighterLevel() {
   return (
     <>
       <Terrace />
-      <Ground tone="bg-[color:var(--ap-stone)]" />
+      <LevelGround className="border-[color:var(--ap-moss)] bg-[color:var(--ap-stone)]" />
       <PadHolder className="left-[calc(40%_+_4.5rem)] sm:left-[calc(40%_+_5.5rem)]" body={TRAIL.CANOPY} pads={TRAIL.ROUTE} />
     </>
   )

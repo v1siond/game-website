@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { LevelArt, LevelGround, atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import {
   DeskCorner,
   DrumKit,
@@ -31,16 +31,6 @@ import styles from './scenes.module.css'
 // Animated elements per strip, at most 12: his travel, his moving limbs (four walking, two drumming, two
 // striking) and the props that answer progress (three towers and three terminals or signs and the fish;
 // three fan rays and five sound bars; two chandeliers and the strike flash). Everything else is static.
-
-const SVG_LAYER = 'absolute inset-0 h-full w-full'
-
-function Layer({ children }: { children: ReactNode }) {
-  return (
-    <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={SVG_LAYER} aria-hidden="true" focusable="false">
-      {children}
-    </svg>
-  )
-}
 
 // ---- System Engineer: the glass tunnel, terminals, the pipes he keeps running ----
 
@@ -87,7 +77,7 @@ const RIBS = [0, 75, 150, 225, 300, 375, 450, 525, 600]
 // The tunnel: dark water, the skyline, then the brass ribs of the glass walkway in front of it.
 function GlassTunnel() {
   return (
-    <Layer>
+    <LevelArt>
       <rect width={600} height={100} fill={C.abyss} />
       <rect width={600} height={60} fill={C.deepSea} opacity={0.6} />
       {FAR_TOWERS.map(({ x, width, height }) => (
@@ -105,7 +95,7 @@ function GlassTunnel() {
         </g>
       ))}
       <path d="M40 10 L70 80 M340 10 L370 80" stroke={C.waterGlow} strokeWidth={3} opacity={0.12} />
-    </Layer>
+    </LevelArt>
   )
 }
 
@@ -230,7 +220,7 @@ function SunburstFan() {
 function BallroomStage() {
   return (
     <>
-      <Layer>
+      <LevelArt>
         <rect width={600} height={100} fill={C.bloodDark} />
         {CURTAIN_FOLDS.map((x) => (
           <rect key={x} x={x} y={0} width={8} height={100} fill="#4a0000" />
@@ -241,9 +231,9 @@ function BallroomStage() {
           <circle key={x} cx={x} cy={8} r={2.2} fill={C.goldBright} />
         ))}
         <rect x={0} y={88} width={600} height={12} fill="#2a1408" />
-      </Layer>
+      </LevelArt>
       <SunburstFan />
-      <div className="absolute inset-x-0 bottom-0 h-3 border-t-2 border-[#D4AF37] bg-[#1a0f06]" aria-hidden="true" />
+      <LevelGround className="border-[#D4AF37] bg-[#1a0f06]" />
       <SoundWaves className="absolute bottom-4 right-12 h-12 w-14 sm:right-16 sm:h-16 sm:w-20" colors={WAVES} />
     </>
   )
@@ -295,7 +285,7 @@ const post = (x: number) => (
 function BallroomRing() {
   return (
     <>
-      <Layer>
+      <LevelArt>
         <rect width={600} height={100} fill={C.deepSeaDark} />
         {COLUMNS.map((x) => (
           <g key={x}>
@@ -308,8 +298,8 @@ function BallroomRing() {
         {[40, 300, 560].map(post)}
         {ropes(0, 600)}
         <rect x={0} y={88} width={600} height={12} fill={C.tealDark} />
-      </Layer>
-      <div className="absolute inset-x-0 bottom-0 h-3 border-t-2 border-[#D4AF37] bg-[#004444]" aria-hidden="true" />
+      </LevelArt>
+      <LevelGround className="border-[#D4AF37] bg-[#004444]" />
       {/* where his advance ends: 40% of the canvas, plus his own width */}
       <PadHolder className="left-[calc(40%_+_4.5rem)] sm:left-[calc(40%_+_5.5rem)]" body="#1b2a44" pads={C.blood} />
     </>

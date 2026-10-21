@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { LevelArt, LevelGround, atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import { DeskCorner, DrumKit, KitCorner, RingCorner, StrikeFlash, Terminal, ringPost, type DrumKitColors } from '@/components/scroll/stageProps'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
@@ -44,18 +44,6 @@ import styles from './scenes.module.css'
 const PROP_SLOT = 'absolute bottom-3 left-[calc(var(--at)*100%_-_1rem)]'
 
 // ---- the shelter pieces every level is built from ----
-
-function Wall({ children }: { children: ReactNode }) {
-  return (
-    <svg viewBox="0 0 600 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-      {children}
-    </svg>
-  )
-}
-
-function Floor({ tone }: { tone: string }) {
-  return <div className={`absolute inset-x-0 bottom-0 h-3 border-t-2 border-[#5a5e50] ${tone}`} aria-hidden="true" />
-}
 
 // One lamp per room, each switching on as he enters its room (the rooms start at 0, 1/3 and 2/3).
 const ROOM_LAMPS = [
@@ -121,14 +109,14 @@ const LAB_PANELS = Array.from({ length: 12 }, (_, i) => i * 50)
 
 function LabWall() {
   return (
-    <Wall>
+    <LevelArt>
       <rect width={600} height={100} fill={BUNKER_BG} />
       {LAB_PANELS.map((x) => (
         <rect key={x} x={x + 2} y={12} width={46} height={60} fill={STEEL} stroke={STEEL_LIGHT} strokeWidth={1} />
       ))}
       <rect y={3} width={600} height={5} fill={SHELTER_BLUE_DARK} />
       <path d="M0 80 H90 L98 72 H230 M260 82 H340 L348 74 H460 M500 80 H600" stroke={PHOSPHOR_GREEN_DARK} strokeWidth={1.2} fill="none" />
-    </Wall>
+    </LevelArt>
   )
 }
 
@@ -167,7 +155,7 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
       <LabWall />
       <RoomLamps glow={PHOSPHOR_GREEN} />
       <Bulkheads />
-      <Floor tone="bg-[#23261f]" />
+      <LevelGround className="border-[#5a5e50] bg-[#23261f]" />
       {ENGINEER_PROPS[zone]}
     </>
   )
@@ -187,13 +175,13 @@ const CURTAIN_FOLDS = Array.from({ length: 20 }, (_, i) => i * 30)
 
 function LoungeWall() {
   return (
-    <Wall>
+    <LevelArt>
       <rect width={600} height={100} fill={VELVET_FOLD} />
       {CURTAIN_FOLDS.map((x) => (
         <rect key={x} x={x + 4} y={0} width={14} height={100} fill={VELVET} />
       ))}
       <rect y={0} width={600} height={7} fill={ATOMIC_YELLOW} opacity={0.7} />
-    </Wall>
+    </LevelArt>
   )
 }
 
@@ -253,7 +241,7 @@ function MusicianLevel() {
           </g>
         </svg>
       ))}
-      <Floor tone="bg-[#4a3728]" />
+      <LevelGround className="border-[#5a5e50] bg-[#4a3728]" />
       <ValveAmp />
       <StageCurtain />
     </>
@@ -270,7 +258,7 @@ const GYM_BLOCKS = Array.from({ length: 15 }, (_, i) => i * 40)
 
 function GymWall() {
   return (
-    <Wall>
+    <LevelArt>
       <rect width={600} height={100} fill={STEEL} />
       {GYM_BLOCKS.map((x) => (
         <g key={x}>
@@ -285,7 +273,7 @@ function GymWall() {
       <line x1={0} y1={44} x2={600} y2={44} stroke={ROCKET_RED} strokeWidth={1.5} />
       <line x1={0} y1={60} x2={600} y2={60} stroke={CHROME} strokeWidth={1.5} />
       <line x1={0} y1={76} x2={600} y2={76} stroke={SHELTER_BLUE} strokeWidth={1.5} />
-    </Wall>
+    </LevelArt>
   )
 }
 
@@ -321,7 +309,7 @@ function FighterLevel() {
     <>
       <GymWall />
       <RoomLamps glow={LAMP_GLOW} />
-      <Floor tone="bg-[#3d4136]" />
+      <LevelGround className="border-[#5a5e50] bg-[#3d4136]" />
       <PadRobot />
     </>
   )

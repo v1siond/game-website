@@ -1,5 +1,5 @@
 import type { Profession } from '@/lib/cv/professions'
-import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { LevelArt, LevelGround, atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import {
   DeskCorner,
   DrumKit,
@@ -46,7 +46,7 @@ const MID_TOWERS = towers(12, 50, 3)
 function Skyline() {
   return (
     <>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={styles.far} aria-hidden="true" focusable="false">
+      <LevelArt className={styles.far}>
         {FAR_TOWERS.map(({ x, width, height }) => (
           <g key={x}>
             <rect x={x} y={100 - height} width={width} height={height} fill="#1a0a2a" />
@@ -54,8 +54,8 @@ function Skyline() {
             <rect x={x + width - 7} y={112 - height} width={2} height={2} fill={MAGENTA} opacity={0.5} />
           </g>
         ))}
-      </svg>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={styles.mid} aria-hidden="true" focusable="false">
+      </LevelArt>
+      <LevelArt className={styles.mid}>
         {MID_TOWERS.map(({ x, width, height }) => (
           <g key={x}>
             <rect x={x} y={100 - height * 0.8} width={width} height={height * 0.8} fill="#2a1240" />
@@ -64,13 +64,9 @@ function Skyline() {
         ))}
         <rect x={210} y={22} width={60} height={26} fill={VOID} stroke={CYAN} strokeWidth={1.2} />
         <line x1={240} y1={48} x2={240} y2={70} stroke="#3a2456" strokeWidth={3} />
-      </svg>
+      </LevelArt>
     </>
   )
-}
-
-function Ground({ edge }: { edge: string }) {
-  return <div className={`absolute inset-x-0 bottom-0 h-3 bg-[#1d1030] border-t-2 ${edge}`} aria-hidden="true" />
 }
 
 // A billboard on the roof edge: it lights as he passes under it.
@@ -106,7 +102,7 @@ function Rooftop({ zone }: { zone: LevelZone }) {
   return (
     <>
       <Skyline />
-      <Ground edge="border-cyan-400" />
+      <LevelGround className="border-cyan-400 bg-[#1d1030]" />
       <CircuitLedge />
       {zone === 'record' ? (
         <>
@@ -131,7 +127,7 @@ const WAVES: [string, string] = [MAGENTA, CYAN]
 function Stage() {
   return (
     <>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={styles.far} aria-hidden="true" focusable="false">
+      <LevelArt className={styles.far}>
         {FAR_TOWERS.map(({ x }) => (
           <g key={x} fill="#1a0a2a">
             <circle cx={x + 8} cy={84} r={6} />
@@ -139,15 +135,15 @@ function Stage() {
             <circle cx={x + 22} cy={86} r={5} />
           </g>
         ))}
-      </svg>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={styles.mid} aria-hidden="true" focusable="false">
+      </LevelArt>
+      <LevelArt className={styles.mid}>
         <line x1={0} y1={6} x2={600} y2={6} stroke="#3a2456" strokeWidth={3} />
         <polygon points="150,6 120,96 180,96" fill={MAGENTA} opacity={0.12} className={styles.beam} />
         <polygon points="390,6 360,96 420,96" fill={CYAN} opacity={0.12} className={styles.beam} />
         <rect x={60} y={50} width={30} height={50} fill="#1d1030" stroke="#3a2456" />
         <rect x={500} y={50} width={30} height={50} fill="#1d1030" stroke="#3a2456" />
-      </svg>
-      <Ground edge="border-pink-500" />
+      </LevelArt>
+      <LevelGround className="border-pink-500 bg-[#1d1030]" />
       <SoundWaves className="absolute bottom-4 right-4 h-12 w-14 sm:h-16 sm:w-20" colors={WAVES} />
     </>
   )
@@ -156,21 +152,21 @@ function Stage() {
 function Ring() {
   return (
     <>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={styles.far} aria-hidden="true" focusable="false">
+      <LevelArt className={styles.far}>
         {FAR_TOWERS.map(({ x }) => (
           <circle key={x} cx={x + 12} cy={12} r={2} fill={YELLOW} opacity={0.6} />
         ))}
         <rect x={0} y={70} width={600} height={30} fill="#1a0a2a" />
-      </svg>
-      <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={styles.mid} aria-hidden="true" focusable="false">
+      </LevelArt>
+      <LevelArt className={styles.mid}>
         {[40, 290, 540].map((x) => (
           <rect key={x} x={x} y={30} width={6} height={70} fill="#3a2456" />
         ))}
         <line x1={0} y1={40} x2={600} y2={40} stroke={HOT_PINK} strokeWidth={1.5} />
         <line x1={0} y1={56} x2={600} y2={56} stroke="#e0f0ff" strokeWidth={1.5} />
         <line x1={0} y1={72} x2={600} y2={72} stroke={CYAN} strokeWidth={1.5} />
-      </svg>
-      <Ground edge="border-cyan-400" />
+      </LevelArt>
+      <LevelGround className="border-cyan-400 bg-[#1d1030]" />
       <PadHolder className="left-[calc(38%_+_4.5rem)] sm:left-[calc(38%_+_5.5rem)]" body="#2d2a3d" pads={HOT_PINK} />
     </>
   )

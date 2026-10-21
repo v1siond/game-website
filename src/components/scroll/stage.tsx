@@ -10,6 +10,7 @@ import scene from './heroScene.module.css'
 //
 // - LevelScene: a section he crosses, its strip pinned inside it (TravelScene measures the section).
 // - LevelStrip: the strip itself, the world's level behind, him on the track in front.
+// - LevelArt and LevelGround: the level's stretched 600 by 100 picture and the ground band he stands on.
 // - SceneEntry: one entry (a job, a project, a band, an achievement) arriving as part of the level, on
 //   its own progress as it crosses the lower part of the screen.
 // - ContactStage: the closing section, the profession's corner beside the contact panel.
@@ -64,6 +65,23 @@ const AT_HUNDREDTHS = [
 export function atClass(position: number): string {
   const hundredths = Math.round(Math.min(Math.max(position, 0), 1) * 100)
   return `${scene.at} ${AT_TENTHS[Math.floor(hundredths / 10)]} ${AT_HUNDREDTHS[hundredths % 10]}`
+}
+
+const FULL_STRIP = 'absolute inset-0 h-full w-full'
+
+// The level's art in its 600 by 100 box, stretched over the strip. `className` replaces the whole strip
+// placement, for a parallax layer wider than the strip or a layer with its own motion.
+export function LevelArt({ className = FULL_STRIP, children }: { className?: string; children: ReactNode }) {
+  return (
+    <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={className} aria-hidden="true" focusable="false">
+      {children}
+    </svg>
+  )
+}
+
+// The ground band he stands on; `className` gives its fill and its top edge's colour.
+export function LevelGround({ className }: { className: string }) {
+  return <div className={`absolute inset-x-0 bottom-0 h-3 border-t-2 ${className}`} aria-hidden="true" />
 }
 
 export function LevelScene({ children }: { children: ReactNode }) {

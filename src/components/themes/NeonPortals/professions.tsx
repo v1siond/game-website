@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { LevelArt, LevelGround, atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import {
   DeskCorner,
   DrumKit,
@@ -41,16 +41,10 @@ const PROP_SLOT = 'absolute bottom-3 left-[calc(var(--at)*100%_-_1rem)]'
 // A dimension layer, full lane, stretched: `art` is the profession's own detail inside it.
 function Dimension({ layer, base, art }: { layer: string; base: ReactNode; art: ReactNode }) {
   return (
-    <svg
-      viewBox="0 0 600 100"
-      preserveAspectRatio="none"
-      className={`${styles.dimension} ${layer} h-full w-full`}
-      aria-hidden="true"
-      focusable="false"
-    >
+    <LevelArt className={`${styles.dimension} ${layer} h-full w-full`}>
       {base}
       {art}
-    </svg>
+    </LevelArt>
   )
 }
 
@@ -126,10 +120,6 @@ function Portal({ color, className }: { color: string; className: string }) {
   )
 }
 
-function Floor() {
-  return <div className="absolute inset-x-0 bottom-0 h-3 border-t-2 border-[#2c2a3d] bg-[#1c1b29]" aria-hidden="true" />
-}
-
 // The way in on the left, the way out on the right, both standing on the floor.
 function LanePortals() {
   return (
@@ -187,7 +177,7 @@ function EngineerLane({ zone }: { zone: LevelZone }) {
       <Dimensions chamber={circuits(PORTAL.SEAM)} grid={circuits(PORTAL.BLUE)} pocket={circuits(PORTAL.VIOLET)} />
       <Rifts />
       <LanePortals />
-      <Floor />
+      <LevelGround className="border-[#2c2a3d] bg-[#1c1b29]" />
       {ENGINEER_PROPS[zone]}
     </>
   )
@@ -230,7 +220,7 @@ function MusicianLane() {
       />
       <Rifts />
       <LanePortals />
-      <Floor />
+      <LevelGround className="border-[#2c2a3d] bg-[#1c1b29]" />
       <SoundWaves className="absolute bottom-4 right-16 h-12 w-14 sm:right-20 sm:h-16 sm:w-20" colors={WAVES} />
     </>
   )
@@ -260,7 +250,7 @@ function FighterLane() {
       <Dimensions chamber={ringRopes(PORTAL.SEAM)} grid={ringRopes(PORTAL.GRID)} pocket={ringRopes('#3a2466')} />
       <Rifts />
       <LanePortals />
-      <Floor />
+      <LevelGround className="border-[#2c2a3d] bg-[#1c1b29]" />
       {/* where his advance ends: 42% of the lane, plus his own width */}
       <PadHolder className="left-[calc(42%_+_4.5rem)] sm:left-[calc(42%_+_5.5rem)]" body={PORTAL.SEAM} pads={PORTAL.VIOLET} />
     </>
