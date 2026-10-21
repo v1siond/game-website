@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo, useReducer, useState, type AnimationEvent } from 'react'
+import { useMemo, useReducer, useState } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel } from '@/lib/cv/labels'
@@ -24,6 +24,8 @@ import atomic from './atomic.module.css'
 // A granted password powers on the reward line and he raises his thumb; a locked terminal offers a
 // reboot, which deals a fresh dump (a new seed remounts the game). The terminal powers on once when the section scrolls in.
 
+const WALK_OUT: readonly DwellerMotion[] = ['walk']
+
 /**
  * Him leaving the shelter: the strip he walks along spans the scene, so it starts pushed left with him
  * at the door and slides to rest with him at the post; its own animation ending turns the walk into
@@ -31,20 +33,12 @@ import atomic from './atomic.module.css'
  */
 function WalkOut({ walking }: { walking: boolean }) {
   const { active } = useProfession()
-  const reducedMotion = useReducedMotion()
-  const [arrived, setArrived] = useState(false)
-  const pace: DwellerMotion = arrived ? 'idle' : 'walk'
-  const motion: DwellerMotion = reducedMotion ? 'still' : pace
-
-  const arrive = (event: AnimationEvent<HTMLDivElement>) => {
-    if (event.target !== event.currentTarget) return
-    setArrived(true)
-  }
+  const { pose, onOwnAnimationEnd } = usePoseSequence<DwellerMotion>({ entrance: WALK_OUT, rest: 'idle', still: 'still' })
 
   return (
-    <div className={`absolute inset-x-0 bottom-[6%] hidden lg:block ${walking ? atomic.walkOut : atomic.atDoor}`} onAnimationEnd={arrive}>
+    <div className={`absolute inset-x-0 bottom-[6%] hidden lg:block ${walking ? atomic.walkOut : atomic.atDoor}`} onAnimationEnd={onOwnAnimationEnd}>
       <div className="ml-auto mr-[4%] h-40 w-28">
-        <DwellerSprite profession={active} motion={motion} className="h-full w-full" />
+        <DwellerSprite profession={active} motion={pose} className="h-full w-full" />
       </div>
     </div>
   )

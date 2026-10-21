@@ -1,11 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type AnimationEvent, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { usePoseSequence, type PoseSequence } from '@/hooks/usePoseSequence'
 import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
 import type { SectionsOf } from '@/lib/cv/cvView'
@@ -277,47 +278,30 @@ function ProjectCrate({ slot, index, spin, slam, onHit }: ProjectCrateProps) {
 
 const MOVE_MS = 1000
 
-type Move = 'spin' | 'slam' | 'jump'
-
-/** A move he plays over his resting pose; the count replays it when the same move comes again. */
-interface Played {
-  move: Move
-  count: number
-}
-
-/** What he does at rest: the run in while the field rises, then the idle, or the dance once all are open. */
-function restingPose(arrived: boolean, gem: boolean): BandicootPose {
-  if (!arrived) return 'run'
-  return gem ? 'dance' : 'idle'
-}
+/** The run in while the field rises; then the idle, or the dance once all are open. */
+const RUN_IN: readonly BandicootPose[] = ['run']
 
 interface MoveStripProps {
   onSpin: () => void
   onSlam: () => void
-  played: Played | null
+  figure: PoseSequence<BandicootPose>
+  gem: boolean
 }
 
 /** The strip over the field: him, the two moves, the box counter. */
-function MoveStrip({ onSpin, onSlam, played }: MoveStripProps) {
+function MoveStrip({ onSpin, onSlam, figure, gem }: MoveStripProps) {
   const { hud, warp } = useLabels()
   const { score } = useScore()
   const { ref, triggered } = useSectionTrigger()
-  const [arrived, setArrived] = useState(false)
-  const gem = allCratesOpen(score)
-  const pose: BandicootPose = played?.move ?? restingPose(arrived, gem)
   const { crates: opened } = score.counts
   const total = score.totals.crates
 
-  const arrive = (event: AnimationEvent<HTMLSpanElement>) => {
-    if (event.target !== event.currentTarget) return
-    setArrived(true)
-  }
-
   return (
     <div ref={ref} className={`mb-8 flex flex-wrap items-center gap-4 overflow-hidden p-4 ${ui.panel}`}>
-      <span className={`relative block h-24 w-16 shrink-0 ${triggered ? crates.runIn : crates.offStage}`} onAnimationEnd={arrive} aria-hidden="true">
-        {played?.move === 'slam' && <Blast tone="slam" />}
-        <Bandicoot key={played?.count ?? 0} profession="engineer" pose={pose} className="h-full w-full" />
+      <span className={`relative block h-24 w-16 shrink-0 ${triggered ? crates.runIn : crates.offStage}`} onAnimationEnd={figure.onOwnAnimationEnd} aria-hidden="true">
+        {figure.move === 'slam' && <Blast tone="slam" />}
+        {/* a move mounts him afresh so a repeat replays; its end remounts him on the rest pose */}
+        <Bandicoot key={figure.move ? figure.take : 0} profession="engineer" pose={figure.pose} className="h-full w-full" />
       </span>
       <div className="flex flex-wrap gap-3">
         <button type="button" onClick={onSpin} className={`${ui.button} ${ui.lit}`}>
@@ -347,20 +331,15 @@ function MoveStrip({ onSpin, onSlam, played }: MoveStripProps) {
 export function CrateField({ projects }: { projects: SectionsOf<'engineer'>['projects'] }) {
   const [spin, setSpin] = useState(0)
   const [slam, setSlam] = useState(0)
-  const [played, setPlayed] = useState<Played | null>(null)
-
-  useEffect(() => {
-    if (!played) return
-    const timer = window.setTimeout(() => setPlayed(null), MOVE_MS)
-    return () => window.clearTimeout(timer)
-  }, [played])
-
-  const play = (move: Move) => setPlayed((now) => ({ move, count: (now?.count ?? 0) + 1 }))
+  const gem = allCratesOpen(useScore().score)
+  const figure = usePoseSequence<BandicootPose>({ entrance: RUN_IN, rest: gem ? 'dance' : 'idle', moveMs: MOVE_MS, policy: 'always' })
+  const { play } = figure
 
   return (
     <>
       <MoveStrip
-        played={played}
+        figure={figure}
+        gem={gem}
         onSpin={() => {
           setSpin((count) => count + 1)
           play('spin')

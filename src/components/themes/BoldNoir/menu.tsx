@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState, type AnimationEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { DETECTIVE_HOST, Detective, type DetectiveMotion } from './detective'
 import { NOIR } from './palette'
@@ -19,20 +20,15 @@ import world from './world.module.css'
 // The jagged highlighter behind the pick, in a 200 by 100 box.
 const JAG = 'M6 18 L60 4 L72 14 L150 0 L196 22 L184 46 L198 70 L132 96 L118 84 L40 100 L2 74 L14 50 Z'
 
+const WALK_ON: readonly DetectiveMotion[] = ['walk']
+
 /** Him in one slab: the walk in from the slab's left, then the idle; still under reduced motion. */
 function SlabFigure({ profession }: { profession: Profession }) {
-  const reducedMotion = useReducedMotion()
-  const [arrived, setArrived] = useState(false)
-  const pace: DetectiveMotion = arrived ? 'idle' : 'walk'
-
-  const arrive = (event: AnimationEvent<HTMLSpanElement>) => {
-    if (event.target !== event.currentTarget) return
-    setArrived(true)
-  }
+  const { pose, onOwnAnimationEnd } = usePoseSequence<DetectiveMotion>({ entrance: WALK_ON, rest: 'idle', still: 'still' })
 
   return (
-    <span className={`block ${world.walkOn}`} onAnimationEnd={arrive}>
-      <Detective profession={profession} motion={reducedMotion ? 'still' : pace} className={`h-24 w-16 sm:h-32 sm:w-20 ${world.redShadow}`} />
+    <span className={`block ${world.walkOn}`} onAnimationEnd={onOwnAnimationEnd}>
+      <Detective profession={profession} motion={pose} className={`h-24 w-16 sm:h-32 sm:w-20 ${world.redShadow}`} />
     </span>
   )
 }

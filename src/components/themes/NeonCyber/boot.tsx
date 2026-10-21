@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, type AnimationEvent, type CSSProperties } from 'react'
+import type { CSSProperties, KeyboardEvent } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction } from './actions'
 import { MercSprite, type MercMotion } from './merc'
@@ -47,40 +47,39 @@ const GHOSTS = [
   { color: 'text-[color:var(--neon-data)]', slice: '[clip-path:inset(45%_0_0_0)]', x: '12px' },
 ]
 
-type Strike = Extract<MercMotion, 'blades' | 'jump'>
+const WALK_IN: readonly MercMotion[] = ['walk']
+
+// The keys that press a button, so the keyboard fires the same jump as a pointer press.
+const PRESS_KEYS: ReadonlySet<string> = new Set(['Enter', ' '])
 
 /**
- * Him in the optics frame, played like the game's merc: the walk in, then the idle. Pointing at him pops
- * the mantis blades for one slash, pressing him fires the double jump on the cyberlegs; each strike
- * plays one cycle and he drops back to the idle (the first animation iteration under him ends it).
- * Under reduced motion he stands still and takes no strikes.
+ * Him in the optics frame, played like the game's merc: the walk in, then the idle. Pointing at him (or
+ * focusing him) pops the mantis blades for one slash, pressing him (or Enter or Space) fires the double
+ * jump on the cyberlegs; each strike plays one cycle and he drops back to the idle (the first animation
+ * iteration under him ends it). Under reduced motion he stands still and takes no strikes.
  */
 function HeroMerc({ profession }: { profession: Profession }) {
-  const reducedMotion = useReducedMotion()
-  const [arrived, setArrived] = useState(false)
-  const [strike, setStrike] = useState<Strike | null>(null)
-  const rest: MercMotion = arrived ? 'idle' : 'walk'
-  const motion: MercMotion = reducedMotion ? 'still' : (strike ?? rest)
-
-  const arrive = (event: AnimationEvent<HTMLDivElement>) => {
-    if (event.target !== event.currentTarget) return
-    setArrived(true)
-  }
-  const play = (move: Strike) => () => {
-    if (!arrived || reducedMotion) return
-    setStrike(move)
+  const { cyber } = useLabels()
+  const { pose, play, settle, onOwnAnimationEnd } = usePoseSequence<MercMotion>({ entrance: WALK_IN, rest: 'idle', still: 'still' })
+  const pressKey = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!PRESS_KEYS.has(event.key)) return
+    play('jump')
   }
 
   return (
-    <div
-      className={`cursor-crosshair ${world.walkIn}`}
-      onAnimationEnd={arrive}
-      onAnimationIteration={() => setStrike(null)}
-      onPointerEnter={play('blades')}
-      onPointerDown={play('jump')}
+    <button
+      type="button"
+      aria-label={cyber.doubleJump}
+      className={`block w-full cursor-crosshair bg-transparent p-0 ${world.walkIn}`}
+      onAnimationEnd={onOwnAnimationEnd}
+      onAnimationIteration={settle}
+      onPointerEnter={() => play('blades')}
+      onFocus={() => play('blades')}
+      onPointerDown={() => play('jump')}
+      onKeyDown={pressKey}
     >
-      <MercSprite profession={profession} motion={motion} className="h-auto w-full" />
-    </div>
+      <MercSprite profession={profession} motion={pose} className="h-auto w-full" />
+    </button>
   )
 }
 
@@ -151,11 +150,11 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
               </div>
 
               {/* his portrait in the optics frame, built from one line, then he walks in */}
-              <div className="relative mx-auto w-32 overflow-hidden border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40" aria-hidden="true">
+              <div className="relative mx-auto w-32 overflow-hidden border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40">
                 <div className={world.build}>
                   <HeroMerc profession={profession} />
                 </div>
-                <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" />
+                <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" aria-hidden="true" />
               </div>
             </div>
           </div>
