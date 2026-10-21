@@ -1,0 +1,216 @@
+/*
+ * Art Deco's page look: the deep sea gradient, the gold neon type, the brass frames and cards, the
+ * tonic bottles of the profession switch, and the few ambient loops of the backdrop (rising bubbles, the
+ * caustic light, the lighthouse beam, a sign's rare flicker). Ambient loops animate transform and
+ * opacity only and stop under reduced motion; the scroll scenes live in scenes.module.css.
+ */
+
+.root {
+  --deco-gold: #d4af37;
+  --deco-gold-bright: #f0c850;
+  --deco-brass-dark: #8b7320;
+  --deco-sea: #0a2540;
+  --deco-sea-mid: #0d3050;
+  --deco-abyss: #05101a;
+  --deco-water: #41c8e8;
+
+  background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-sea), var(--deco-abyss));
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+.vignette {
+  background: radial-gradient(circle at 50% 25%, transparent 25%, rgb(5 16 26 / 0.56) 100%);
+}
+
+/* ---- type ---- */
+
+/* Gold neon lettering: a static glow, never animated. */
+.neon {
+  color: var(--deco-gold);
+  text-shadow:
+    0 0 5px var(--deco-gold),
+    0 0 15px var(--deco-gold),
+    0 0 30px rgb(212 175 55 / 0.5);
+}
+
+.cardTitle {
+  color: var(--deco-gold);
+  text-shadow: 0 0 15px rgb(212 175 55 / 0.19);
+}
+
+/* A failing sign: it dips twice every few seconds, on opacity only, each sign on its own --delay. */
+.flicker {
+  animation: flicker 7s steps(1, end) infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes flicker {
+  0%,
+  90% {
+    opacity: 1;
+  }
+  91% {
+    opacity: 0.45;
+  }
+  93% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0.45;
+  }
+  95%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---- frames and cards ---- */
+
+.frame {
+  background:
+    linear-gradient(180deg, rgb(13 48 80 / 0.97), rgb(5 16 26 / 0.99)),
+    repeating-linear-gradient(45deg, transparent, transparent 15px, rgb(212 175 55 / 0.02) 15px, rgb(212 175 55 / 0.02) 30px);
+  box-shadow:
+    inset 0 0 80px rgb(5 16 26 / 0.8),
+    0 0 30px rgb(212 175 55 / 0.12);
+}
+
+.frameLight {
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 25%, rgb(65 200 232 / 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 60% at 85% 75%, rgb(212 175 55 / 0.025) 0%, transparent 50%);
+}
+
+.card {
+  background: linear-gradient(180deg, rgb(13 48 80 / 0.96), rgb(5 16 26 / 0.98));
+  box-shadow: inset 0 0 40px rgb(5 16 26 / 0.44);
+}
+
+.cardLight {
+  background:
+    radial-gradient(ellipse 45% 35% at 25% 20%, rgb(65 200 232 / 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse 35% 45% at 75% 80%, rgb(212 175 55 / 0.09) 0%, transparent 50%);
+}
+
+.cardGleam {
+  background: linear-gradient(180deg, rgb(212 175 55 / 0.05) 0%, transparent 50%);
+  box-shadow: inset 0 0 50px rgb(212 175 55 / 0.19);
+}
+
+/* ---- the tonic bottles of the profession switch ---- */
+
+.bottle {
+  border-radius: 8px 8px 20px 20px;
+  clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 100%, 0 100%, 0 15%);
+  background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-sea));
+}
+
+.bottleFull {
+  background: linear-gradient(180deg, var(--deco-gold-bright), var(--deco-gold), var(--deco-brass-dark));
+}
+
+/* ---- the backdrop ---- */
+
+.rays {
+  background: linear-gradient(180deg, rgb(212 175 55 / 0.08), transparent 65%);
+}
+
+.causticsNear {
+  background:
+    radial-gradient(ellipse 40% 30% at 15% 20%, rgb(65 200 232 / 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 25% at 85% 75%, rgb(0 170 170 / 0.19) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgb(212 175 55 / 0.08) 0%, transparent 70%);
+  animation: caustics-near 18s ease-in-out infinite;
+}
+
+.causticsFar {
+  background:
+    radial-gradient(ellipse 30% 40% at 75% 25%, rgb(65 200 232 / 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 25% 80%, rgb(0 136 136 / 0.15) 0%, transparent 60%);
+  animation: caustics-far 14s ease-in-out -7s infinite;
+}
+
+@keyframes caustics-near {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.15;
+  }
+  33% {
+    transform: scale(1.08) translate(4%, -2%);
+    opacity: 0.22;
+  }
+  66% {
+    transform: scale(0.96) translate(-2%, 3%);
+    opacity: 0.12;
+  }
+}
+
+@keyframes caustics-far {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.12;
+  }
+  50% {
+    transform: scale(1.12) translate(-4%, 4%);
+    opacity: 0.2;
+  }
+}
+
+/* A bubble rises from below the page on its own --x, --size, --rise and --delay, drifting --drift. */
+.bubble {
+  left: var(--x);
+  bottom: -2rem;
+  width: var(--size);
+  height: var(--size);
+  border: 1px solid rgb(255 255 255 / 0.25);
+  background: radial-gradient(circle at 30% 30%, rgb(255 255 255 / 0.5), rgb(65 200 232 / 0.08));
+  opacity: 0;
+  animation: bubble-rise var(--rise) linear var(--delay) infinite;
+}
+
+@keyframes bubble-rise {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate3d(var(--drift), -110vh, 0);
+    opacity: 0;
+  }
+}
+
+.beam {
+  transform-box: view-box;
+  transform-origin: 30px 42px;
+  animation: beam-turn 10s linear infinite;
+}
+
+@keyframes beam-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Under reduced motion the loops stop; a bubble rests where its --rest puts it. */
+@media (prefers-reduced-motion: reduce) {
+  .flicker,
+  .causticsNear,
+  .causticsFar,
+  .beam {
+    animation: none;
+  }
+
+  .bubble {
+    animation: none;
+    opacity: 0.4;
+    transform: translate3d(0, calc(var(--rest) * -100vh), 0);
+  }
+}

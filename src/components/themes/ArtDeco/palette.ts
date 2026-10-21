@@ -1,42 +1,36 @@
-// Rapture's palette: deep sea blues, teal water, brass and gold, the neon of its failing signs.
+// The palette of the city under the sea, for the world's SVG art: deep sea blues, teal water, brass and
+// gold, the neon of its failing signs, and the maroon of its ballroom curtains. Class names carry the
+// same hex values through Tailwind.
 
-export const RAPTURE_COLORS = {
-  // Deep Sea Blues
+export const DECO_COLORS = {
+  // Deep sea blues
   deepSea: '#0A2540',
-  deepSeaMid: '#0D3050',
   deepSeaDark: '#102030',
   abyss: '#05101a',
 
-  // Teal/Cyan Water
+  // Teal water
   tealDark: '#006666',
-  tealMid: '#008888',
   tealLight: '#00AAAA',
   waterGlow: '#41c8e8',
 
-  // Brass/Gold (Art Deco)
+  // Brass and gold
   brassDark: '#8B7320',
   brassMid: '#B8860B',
   gold: '#D4AF37',
   goldBright: '#F0C850',
-  goldPure: '#FFD700',
 
   // Bronze
   bronzeDark: '#8B4513',
   bronze: '#CD7F32',
 
-  // Neon Signs
+  // Neon signs
   neonPink: '#FF0066',
-  neonGreen: '#00FF00',
-  neonYellow: '#FFFF00',
 
-  // Blood Red (Splicer/ADAM)
+  // Maroon
   bloodDark: '#660000',
   blood: '#8B0000',
-  adamRed: '#ff6b6b',
 
-  // Cream/Ivory (Art Deco accents) - WCAG AA compliant on deep sea backgrounds
+  // Ivory accents
   ivory: '#FFFFF0',
   cream: '#FAF0E6',
-  parchment: '#e8e0d0',    // contrast ~16:1 on deepSea - passes AA
-  warmWhite: '#d0c8b8',    // improved from #c0b0a0 for better contrast (~12:1)
-}
+} as const

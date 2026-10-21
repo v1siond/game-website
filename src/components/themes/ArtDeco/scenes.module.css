@@ -1,0 +1,69 @@
+/*
+ * Art Deco's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses and the props that answer progress). Transform and
+ * opacity only; progress 1 is the final frame, which is what reduced motion and the World Select preview
+ * show at once.
+ *
+ * The world's move is the drowned city coming back to life: the city outside the glass stays still and its towers,
+ * terminals, signs and stage fans light one by one as he reaches them (the shared lightAt), the way the
+ * lights come up section by section in BioShock. Medium tempo, nothing snaps.
+ */
+
+/* The world's tempo: six unhurried strides along the tunnel, eight stick hits per arm, the sound bars
+   resting at 30% height between hits. */
+.tempo {
+  --strides: 6turn;
+  --swing: 26deg;
+  --stick-hits: 8turn;
+  --wave-rest: 0.3;
+}
+
+/* He walks the tunnel's width minus his own. */
+.walk {
+  transform: translate3d(calc(var(--p) * (100% - 5.5rem)), 0, 0);
+}
+
+/* The fighter crosses the canvas to the pads in the first two thirds, then holds his ground. */
+.advance {
+  transform: translate3d(calc(min(var(--p) * 1.5, 1) * 40%), 0, 0);
+}
+
+/* A school of fish swims the other way outside the glass, bobbing as it goes. */
+.school {
+  transform: translate3d(calc((1 - var(--p)) * 55%), calc(sin(var(--p) * 3turn) * 0.25rem), 0);
+}
+
+/* ---- per item reveals (their own scene each, so --p is the item's own progress) ---- */
+
+/* A job surfaces through a bulkhead: the brass frame opens from its centre seam, then the card rises
+   into it like a bathysphere coming up to the dock. */
+.bulkhead {
+  transform-origin: 50% 50%;
+  transform: scaleX(clamp(0.04, var(--p) * 2.2, 1));
+  opacity: clamp(0, var(--p) * 3, 1);
+}
+
+.surface {
+  opacity: clamp(0, var(--p) * 2 - 0.6, 1);
+  transform: translate3d(0, calc((1 - clamp(0, var(--p) * 1.4, 1)) * 1.75rem), 0);
+}
+
+/* A project, band or title is a poster hung on its pin: it swings in from the top and settles. */
+.posterFrame {
+  opacity: clamp(0, var(--p) * 2.5, 1);
+}
+
+.poster {
+  transform-origin: 50% 0%;
+  opacity: clamp(0, var(--p) * 2 - 0.5, 1);
+  transform: rotate(calc((1 - clamp(0, var(--p) * 1.3, 1)) * -6deg));
+}
+
+/* ---- contact: the sunburst behind his corner fans open, then the panel arrives ---- */
+
+.sunburst {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: clamp(0, var(--p) * 2, 1);
+  transform: scale(calc(0.4 + min(var(--p) * 1.3, 1) * 0.6));
+}
