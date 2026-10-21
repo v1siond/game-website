@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import scene from './heroScene.module.css'
+import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 
 // His figure in a scroll scene, drawn from his sprite (src/assets/sprites/stop_front.png): short dark
 // hair, the full dark beard, oval eyes. A world dresses him (the torso, the sleeves, the legs, what he
@@ -7,9 +8,9 @@ import scene from './heroScene.module.css'
 // guard in heroScene.module.css) swings them from the shoulder or hip with transforms only. The skin and
 // hair default to his own; a world that draws him as a shape (Silhouette) passes its own.
 
-export const HERO_SKIN = '#b5703f'
-export const HERO_SKIN_SHADE = '#8a4f2b'
-const HERO_HAIR = '#241a24'
+export const HERO_SKIN = HERO_IDENTITY.skin
+export const HERO_SKIN_SHADE = HERO_IDENTITY.skinShade
+const HERO_HAIR = HERO_IDENTITY.hair
 
 // The tee, shirt, coat or bare chest outline under his neck; a world fills it with its costume.
 export const HERO_TORSO = 'M22 32 Q32 29 42 32 L41 59 L23 59 Z'
