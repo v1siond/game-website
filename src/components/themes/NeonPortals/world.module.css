@@ -1,0 +1,1018 @@
+/*
+ * The warp world's look and motion. Transform and opacity only, no animated shadow or blur. The resting
+ * frame of every reveal is the plain style, so reduced motion (the block at the end) and a World Select
+ * preview show it with nothing playing. Colours are the --np-* variables of palette.ts on the root;
+ * --mx and --my (-1 to 1) are the pointer from usePointerVars.
+ *
+ * The feel is the cartoon platformer's: quick, springy, with overshoot and squash. Two easings carry it:
+ * --spring for anything that lands or pops (an overshoot), --snap for anything thrown out (fast start).
+ */
+
+.root {
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --snap: cubic-bezier(0.2, 0.8, 0.3, 1);
+  --mx: 0;
+  --my: 0;
+  background: var(--np-void);
+  color: var(--np-white);
+  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* The night behind the whole page: still, so it never counts against the animated budget. A violet
+ * haze rises from below like the light of the warp room's floor, and a faint grid of stone seams sits
+ * over it. */
+.night {
+  background:
+    radial-gradient(ellipse 80% 45% at 50% 100%, var(--np-haze), transparent 70%),
+    radial-gradient(ellipse 60% 40% at 50% 0%, var(--np-night), transparent 75%),
+    var(--np-void);
+}
+
+.night::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  background-image:
+    linear-gradient(var(--np-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--np-grid) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+.root :focus-visible {
+  outline: 3px solid var(--np-gold);
+  outline-offset: 3px;
+}
+
+/* ---- type: the chunky title letters, orange with a dark outline and a hard drop ---- */
+
+.display {
+  font-family: 'Arial Black', 'Arial Rounded MT Bold', system-ui, sans-serif;
+  font-weight: 900;
+  color: var(--np-orange);
+  text-shadow:
+    -2px -2px 0 var(--np-void),
+    2px -2px 0 var(--np-void),
+    -2px 2px 0 var(--np-void),
+    2px 2px 0 var(--np-void),
+    0 4px 0 var(--np-orange-deep);
+}
+
+/* The same letters inked on the stone plate of a level card. */
+.displayInk {
+  color: var(--np-void);
+  text-shadow: none;
+}
+
+.title {
+  composes: display;
+  letter-spacing: 0.01em;
+}
+
+.plate {
+  font-family: 'Arial Black', system-ui, sans-serif;
+}
+
+/* ---- buttons: rounded, chunky, a hard bottom edge that presses down ---- */
+
+.chunkyButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--np-void);
+  border-radius: 0.9rem;
+  padding: 0.5rem 1.1rem;
+  font-family: 'Arial Black', system-ui, sans-serif;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--np-stone-lit);
+  color: var(--np-void);
+  box-shadow: 0 5px 0 var(--np-void);
+  transition: transform 120ms var(--snap);
+}
+
+.chunkyButton:hover {
+  transform: translateY(2px);
+}
+
+.chunkyButton:active {
+  transform: translateY(5px);
+}
+
+.chunkyLit {
+  background: var(--np-orange);
+}
+
+.chunkyStone {
+  background: var(--np-stone-lit);
+}
+
+.chunkyWarp {
+  background: var(--np-violet);
+}
+
+/* ---- the HUD: a counter drops in from the top when it changes, then slides away ---- */
+
+.hudCounter {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 3px solid var(--np-void);
+  border-radius: 999px;
+  background: var(--np-panel);
+  padding: 0.2rem 0.9rem 0.2rem 0.3rem;
+  opacity: 0;
+  transform: translateY(-140%);
+  transition:
+    transform 380ms var(--spring),
+    opacity 200ms linear;
+}
+
+.hudShown {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hudDigits {
+  font-family: 'Arial Black', system-ui, sans-serif;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--np-gold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The fruit icon turns on its upright while the count ticks, as the counter's icon does in the game. */
+.hudSpin {
+  animation: hud-spin 700ms linear 2;
+}
+
+@keyframes hud-spin {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.gemAward {
+  animation: gem-award 900ms var(--spring) both;
+}
+
+@keyframes gem-award {
+  from {
+    opacity: 0;
+    transform: translateY(-1.5rem) scale(0.2) rotate(-90deg);
+  }
+}
+
+/* ---- the hero: the run toward the camera ---- */
+
+.stageFrame {
+  background: var(--np-void);
+  box-shadow: 0 10px 0 var(--np-stone-dark);
+}
+
+/* The corridor leans apart with the pointer: the walls one way, the far warp the other. */
+.walls {
+  transform: translate3d(calc(var(--mx) * -10px), calc(var(--my) * -4px), 0);
+  transition: transform 300ms ease-out;
+}
+
+.far {
+  transform: translate3d(calc(var(--mx) * 6px), calc(var(--my) * 3px), 0);
+  transition: transform 300ms ease-out;
+}
+
+.swirlSlow {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: turn 6s linear infinite;
+}
+
+.swirlArms {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: turn 9s linear infinite;
+}
+
+.swirlFast {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: turn 0.9s linear infinite;
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.runnerTrack {
+  transform-origin: 50% 100%;
+}
+
+/* run: he grows from the far portal to the front of the corridor */
+.hero[data-phase='wait'] .runnerTrack,
+.hero[data-phase='wait'] .runnerShadow {
+  opacity: 0;
+}
+
+.hero[data-phase='run'] .runnerTrack {
+  animation: run-in 1300ms cubic-bezier(0.5, 0, 0.9, 0.6) both;
+}
+
+@keyframes run-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, -58%, 0) scale(0.14);
+  }
+  12% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(-50%, 0, 0) scale(1);
+  }
+}
+
+/* the stride bob, on the inner body, so it rides on top of the growth */
+.hero[data-phase='run'] .runner {
+  animation: stride-bob 216ms ease-in-out 6;
+}
+
+@keyframes stride-bob {
+  50% {
+    transform: translateY(-7%) rotate(3deg);
+  }
+}
+
+.hero[data-phase='run'] .runnerShadow {
+  animation: shadow-in 1300ms cubic-bezier(0.5, 0, 0.9, 0.6) both;
+}
+
+@keyframes shadow-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, -900%, 0) scale(0.14);
+  }
+}
+
+.hero[data-phase='jump'] .runner {
+  animation: hop 350ms cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+
+@keyframes hop {
+  50% {
+    transform: translateY(-22%) scale(0.94, 1.08);
+  }
+}
+
+.hero[data-phase='land'] .runner {
+  transform-origin: 50% 100%;
+  animation: squash 420ms var(--spring) both;
+}
+
+@keyframes squash {
+  0% {
+    transform: scale(1.22, 0.72);
+  }
+  45% {
+    transform: scale(0.9, 1.12);
+  }
+}
+
+/* the path fruit, from where they lie past the camera on the jump */
+.hero[data-phase='wait'] .pathFruit,
+.hero[data-phase='run'] .pathFruit {
+  animation: fruit-bob 600ms ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+@keyframes fruit-bob {
+  to {
+    transform: translateY(-20%);
+  }
+}
+
+.hero[data-phase='jump'] .pathFruit,
+.hero[data-phase='land'] .pathFruit,
+.hero[data-phase='title'] .pathFruit,
+.hero[data-phase='ready'] .pathFruit {
+  animation: fruit-past 520ms var(--snap) both;
+  animation-delay: calc(var(--i) * 60ms);
+}
+
+@keyframes fruit-past {
+  to {
+    opacity: 0;
+    transform: translate3d(calc((var(--i) - 1.5) * 160%), 180%, 0) scale(3);
+  }
+}
+
+/* the title card: hidden until he lands, then each letter drops with an overshoot */
+.hero[data-phase='wait'] .letter,
+.hero[data-phase='run'] .letter,
+.hero[data-phase='jump'] .letter,
+.hero[data-phase='land'] .letter,
+.hero[data-phase='wait'] .afterTitle,
+.hero[data-phase='run'] .afterTitle,
+.hero[data-phase='jump'] .afterTitle,
+.hero[data-phase='land'] .afterTitle {
+  opacity: 0;
+}
+
+.hero[data-phase='title'] .letter {
+  animation: letter-drop 520ms var(--spring) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+@keyframes letter-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-120%) scale(0.6, 1.3);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(8%) scale(1.15, 0.85);
+  }
+}
+
+.hero[data-phase='title'] .afterTitle {
+  animation: slide-up 480ms var(--spring) 300ms both;
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+
+/* ---- the hub: portals that spin up on point, hologram previews, the warp ---- */
+
+.hub {
+  background: linear-gradient(to bottom, var(--np-void), var(--np-night) 60%, var(--np-haze));
+  box-shadow: 0 10px 0 var(--np-stone-dark);
+}
+
+.hubSky {
+  transform: translate3d(calc(var(--mx) * 8px), calc(var(--my) * 4px), 0);
+  transition: transform 300ms ease-out;
+}
+
+.twinkle {
+  animation: twinkle 2.4s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * 300ms);
+}
+
+@keyframes twinkle {
+  to {
+    opacity: 0.2;
+  }
+}
+
+.portal {
+  transition: transform 220ms var(--spring);
+}
+
+.portal:hover,
+.portal:focus-visible {
+  transform: translateY(-6px);
+}
+
+.portalSwirl {
+  opacity: 0.55;
+  transform: scale(0.9);
+  transition:
+    opacity 200ms linear,
+    transform 300ms var(--spring);
+}
+
+.portal:hover .portalSwirl,
+.portal:focus-visible .portalSwirl,
+.portal[data-selected] .portalSwirl {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* the pointed portal's arms run four times faster */
+.portal:hover .swirlArms,
+.portal:focus-visible .swirlArms {
+  animation-duration: 2.2s;
+}
+
+.hologram {
+  opacity: 0;
+  transform: translate3d(-50%, 0.75rem, 0) scale(0.9);
+  transition:
+    opacity 180ms linear,
+    transform 260ms var(--spring);
+}
+
+.portal:hover .hologram,
+.portal:focus-visible .hologram {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0) scale(1);
+}
+
+.pickBar {
+  transform: scaleX(0);
+  transition: transform 260ms var(--spring);
+}
+
+.portal[data-selected] .pickBar {
+  transform: scaleX(1);
+}
+
+/* the warp across the whole screen */
+.warpSwirl {
+  transform: translate(-50%, -50%) scale(0);
+}
+
+.warp[data-warp='pull'] .warpSwirl {
+  animation: warp-pull 620ms cubic-bezier(0.6, 0, 0.8, 0.4) both;
+}
+
+@keyframes warp-pull {
+  from {
+    transform: translate(-50%, -50%) scale(0) rotate(0);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1) rotate(200deg);
+  }
+}
+
+.warp[data-warp='flash'] .warpSwirl {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.warp[data-warp='out'] .warpSwirl {
+  animation: warp-out 540ms var(--snap) both;
+}
+
+@keyframes warp-out {
+  from {
+    transform: translate(-50%, -50%) scale(1) rotate(200deg);
+  }
+  to {
+    transform: translate(-50%, -50%) scale(0) rotate(420deg);
+  }
+}
+
+.warpHero {
+  opacity: 0;
+}
+
+.warp[data-warp='pull'] .warpHero {
+  animation: warp-spin 620ms cubic-bezier(0.5, 0, 0.9, 0.5) both;
+}
+
+/* the spin: he turns on his upright faster and faster while the swirl swallows him */
+@keyframes warp-spin {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotateY(1440deg) scale(0.1);
+  }
+}
+
+.warpFlash {
+  opacity: 0;
+}
+
+.warp[data-warp='flash'] .warpFlash {
+  animation: flash 220ms linear both;
+}
+
+@keyframes flash {
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.6;
+  }
+}
+
+.warp[data-warp='out'] .warpFlash {
+  animation: flash-off 260ms linear both;
+}
+
+@keyframes flash-off {
+  from {
+    opacity: 0.6;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* the new level drops in under the hub when the warp lets go */
+.levelDrop[data-warp='pull'],
+.levelDrop[data-warp='flash'] {
+  opacity: 0;
+}
+
+.levelDrop[data-warp='out'] {
+  animation: level-drop 560ms var(--spring) both;
+}
+
+@keyframes level-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-3rem) scale(0.96);
+  }
+}
+
+/* ---- the profession levels: three depths, the pointer leaning them apart ---- */
+
+.level {
+  background: var(--np-void);
+  box-shadow: 0 10px 0 var(--np-stone-dark);
+}
+
+.depth_far,
+.depth_mid,
+.depth_near {
+  transition: transform 300ms ease-out;
+}
+
+.depth_far {
+  transform: translate3d(calc(var(--mx) * 4px), 0, 0);
+}
+
+.depth_mid {
+  transform: translate3d(calc(var(--mx) * -8px), 0, 0);
+}
+
+.depth_near {
+  transform: translate3d(calc(var(--mx) * -16px), 0, 0);
+}
+
+/* him idling the platformer way: a small springy bounce */
+.idle {
+  transform-origin: 50% 100%;
+  animation: idle 1.2s ease-in-out infinite;
+}
+
+@keyframes idle {
+  50% {
+    transform: scale(1.03, 0.97);
+  }
+}
+
+.guardBounce {
+  transform-origin: 50% 100%;
+  animation: guard 520ms ease-in-out infinite;
+}
+
+@keyframes guard {
+  50% {
+    transform: translateY(-4%) scale(0.98, 1.02);
+  }
+}
+
+.codeLine {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  animation: type-line 3.2s steps(6, end) infinite;
+  animation-delay: calc(var(--i) * 400ms);
+}
+
+@keyframes type-line {
+  from {
+    transform: scaleX(0);
+  }
+  60%,
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.panelGlow {
+  animation: none;
+}
+
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flame 380ms ease-in-out infinite alternate;
+}
+
+@keyframes flame {
+  to {
+    transform: scale(0.85, 1.12);
+  }
+}
+
+.cymbalLeft,
+.cymbalRight {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: cymbal 900ms var(--spring) infinite;
+}
+
+.cymbalRight {
+  animation-delay: 450ms;
+}
+
+@keyframes cymbal {
+  10% {
+    transform: rotate(-8deg);
+  }
+  40% {
+    transform: rotate(4deg);
+  }
+  70% {
+    transform: rotate(0);
+  }
+}
+
+.soundRing {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: ring-out 1.8s ease-out infinite;
+  animation-delay: calc(var(--i) * 600ms);
+}
+
+@keyframes ring-out {
+  from {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+}
+
+.raft {
+  animation: raft 3s ease-in-out infinite alternate;
+}
+
+@keyframes raft {
+  to {
+    transform: translateY(3px) rotate(0.4deg);
+  }
+}
+
+.cloud {
+  transform-box: fill-box;
+  animation: cloud 14s ease-in-out infinite alternate;
+}
+
+@keyframes cloud {
+  to {
+    transform: translateX(40px);
+  }
+}
+
+.island {
+  animation: island 4s ease-in-out infinite alternate;
+}
+
+@keyframes island {
+  to {
+    transform: translateY(-6px);
+  }
+}
+
+.bag {
+  transform-box: view-box;
+  transform-origin: 62.5% 0;
+  animation: bag 1.6s ease-in-out infinite;
+}
+
+@keyframes bag {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  12% {
+    transform: rotate(-7deg);
+  }
+  40% {
+    transform: rotate(4deg);
+  }
+  70% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+.floatFruit {
+  animation: fruit-bob 900ms ease-in-out infinite alternate;
+}
+
+/* ---- sections: each scrolls in once (data-on from useSectionTrigger) ---- */
+
+.sectionTitle {
+  composes: display;
+}
+
+.stage .levelCard,
+.stage .crateSlot,
+.stage .bandCard,
+.stage .gemLine {
+  opacity: 0;
+}
+
+.stage[data-on] .levelCard,
+.stage[data-on] .crateSlot,
+.stage[data-on] .bandCard {
+  animation: rise-in 560ms var(--spring) both;
+  animation-delay: calc(var(--i) * 110ms);
+}
+
+/* a level rises out of the floor: up from below, a squash as it stops */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(3rem) scale(1, 0.8);
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(-0.3rem) scale(1, 1.03);
+  }
+}
+
+.levelCard {
+  box-shadow: 0 8px 0 var(--np-stone-dark);
+}
+
+.clockDigits {
+  display: inline-block;
+}
+
+.stage[data-on] .clockDigits {
+  animation: digits-drop 420ms steps(4, end) both;
+  animation-delay: calc(var(--i) * 110ms + 450ms);
+}
+
+@keyframes digits-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+/* a collected fruit hops, then flies up and off toward the score */
+.fruitFly {
+  animation: fruit-fly 620ms var(--snap) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+@keyframes fruit-fly {
+  25% {
+    transform: translateY(-60%) scale(1.25);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(160%, -900%, 0) scale(0.5);
+  }
+}
+
+/* ---- crates ---- */
+
+.crateButton {
+  cursor: pointer;
+}
+
+.crateBody {
+  transform-origin: 50% 100%;
+  transition: transform 200ms var(--spring);
+}
+
+.crateButton:hover .crateBody,
+.crateButton:focus-visible .crateBody {
+  transform: translateY(-4px) rotate(-2deg);
+}
+
+.crateButton[data-crate='hit'] .crateBody {
+  animation: crate-hit 140ms ease-out both;
+}
+
+@keyframes crate-hit {
+  to {
+    transform: scale(1.12, 0.82);
+  }
+}
+
+.shard {
+  animation: shard-fly 640ms var(--snap) both;
+}
+
+@keyframes shard-fly {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(var(--dx), var(--dy), 0) rotate(var(--spin));
+  }
+}
+
+.popOut {
+  transform-origin: 50% 100%;
+  animation: pop-out 560ms var(--spring) both;
+}
+
+@keyframes pop-out {
+  from {
+    opacity: 0;
+    transform: translateY(2rem) scale(0.3);
+  }
+  55% {
+    opacity: 1;
+  }
+}
+
+.card {
+  box-shadow: 0 8px 0 var(--np-stone-dark);
+}
+
+/* the spin button: him turning on the spot, the tornado that breaks every crate */
+.spinHero {
+  transform-origin: 50% 100%;
+}
+
+.spinning {
+  animation: tornado 900ms cubic-bezier(0.3, 0, 0.7, 1) both;
+}
+
+@keyframes tornado {
+  to {
+    transform: rotateY(1800deg);
+  }
+}
+
+/* ---- bands and gems ---- */
+
+.bandCard {
+  box-shadow: 0 8px 0 var(--np-stone-dark);
+  transition: transform 220ms var(--spring);
+}
+
+.bandCard:hover,
+.bandCard:focus-visible {
+  transform: translateY(-6px);
+}
+
+.bandArms {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+}
+
+.bandCard:hover .bandArms,
+.bandCard:focus-visible .bandArms {
+  animation: turn 1.4s linear infinite;
+}
+
+.stage[data-on] .gemLine {
+  animation: slide-in 460ms var(--spring) both;
+  animation-delay: calc(var(--i) * 260ms + 200ms);
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(2rem);
+  }
+}
+
+.stage[data-on] .gemDrop {
+  animation: gem-drop 620ms var(--spring) both;
+  animation-delay: calc(var(--i) * 260ms);
+}
+
+@keyframes gem-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-3rem) rotate(-180deg) scale(0.4);
+  }
+}
+
+.gemLine:hover .gemSpin {
+  animation: hud-spin 700ms linear;
+}
+
+/* ---- contact: the crystal at the end of the level ---- */
+
+.exit .exitHop,
+.exit .crystalRise,
+.exit .exitRing,
+.exit .exitPanel {
+  opacity: 0;
+}
+
+.exit[data-on] .exitHop {
+  animation: exit-hop 520ms var(--spring) both;
+}
+
+@keyframes exit-hop {
+  from {
+    opacity: 0;
+    transform: translate3d(-3rem, 2rem, 0);
+  }
+  55% {
+    opacity: 1;
+    transform: translate3d(-1rem, -2.5rem, 0);
+  }
+}
+
+.exit[data-on] .crystalRise {
+  animation: crystal-rise 700ms var(--spring) 400ms both;
+}
+
+@keyframes crystal-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, 3rem, 0) scale(0.4);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.crystalRise {
+  transform: translate3d(-50%, 0, 0);
+}
+
+.exit[data-on] .exitRing {
+  animation: ring-open 500ms var(--spring) 900ms both;
+}
+
+@keyframes ring-open {
+  from {
+    opacity: 0;
+    transform: translate3d(-50%, 0, 0) scale(0.2, 0.2);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.exitRing {
+  transform: translate3d(-50%, 0, 0);
+}
+
+.exit[data-on] .exitPanel {
+  animation: slide-up 520ms var(--spring) 1100ms both;
+}
+
+.crystalTilt {
+  transform: rotate(calc(var(--mx) * 12deg)) translateY(calc(var(--my) * 6px));
+  transition: transform 300ms ease-out;
+}
+
+.crystalTurn {
+  animation: crystal-turn 4s linear infinite;
+}
+
+@keyframes crystal-turn {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+/* ---- reduced motion: every reveal on its last frame, every loop still ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .root *,
+  .root *::before,
+  .root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .root .letter,
+  .root .afterTitle,
+  .root .runnerTrack,
+  .root .runnerShadow,
+  .root .levelCard,
+  .root .crateSlot,
+  .root .bandCard,
+  .root .gemLine,
+  .root .exitHop,
+  .root .crystalRise,
+  .root .exitRing,
+  .root .exitPanel,
+  .root .levelDrop {
+    opacity: 1;
+  }
+
+  .root .pathFruit,
+  .root .fruitFly {
+    opacity: 0;
+  }
+
+  .root .walls,
+  .root .far,
+  .root .hubSky,
+  .root .depth_far,
+  .root .depth_mid,
+  .root .depth_near,
+  .root .crystalTilt {
+    transform: none;
+  }
+}

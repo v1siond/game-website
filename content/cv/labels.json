@@ -123,7 +123,17 @@
         "playerOne": "1P",
         "hits": "hits",
         "hp": "HP",
-        "parryMeter": "{parried} of {total} parried"
+        "parryMeter": "{parried} of {total} parried",
+        "fruitScore": "{count} of {total} fruit collected",
+        "crateScore": "{count} of {total} crates open",
+        "gemAwarded": "Every crate is open: gem awarded",
+        "breakCrate": "Break open the crate: {project}",
+        "spinAll": "Spin to open every crate",
+        "crateHint": "Click a crate to break it open, or spin to open them all",
+        "fruitHint": "Point at a level to collect its fruit",
+        "level": "Level {number}",
+        "time": "Time",
+        "hubHint": "Step into a portal"
       },
       "languages": {
         "en": "English",
@@ -256,7 +266,17 @@
         "playerOne": "1J",
         "hits": "golpes",
         "hp": "PV",
-        "parryMeter": "{parried} de {total} desviados"
+        "parryMeter": "{parried} de {total} desviados",
+        "fruitScore": "{count} de {total} frutas recogidas",
+        "crateScore": "{count} de {total} cajas abiertas",
+        "gemAwarded": "Todas las cajas abiertas: gema ganada",
+        "breakCrate": "Romper la caja: {project}",
+        "spinAll": "Girar para abrir todas las cajas",
+        "crateHint": "Haz clic en una caja para romperla, o gira para abrirlas todas",
+        "fruitHint": "Señala un nivel para recoger su fruta",
+        "level": "Nivel {number}",
+        "time": "Tiempo",
+        "hubHint": "Entra en un portal"
       },
       "languages": {
         "en": "English",
@@ -389,7 +409,17 @@
         "playerOne": "1G",
         "hits": "colpi",
         "hp": "PV",
-        "parryMeter": "{parried} di {total} parati"
+        "parryMeter": "{parried} di {total} parati",
+        "fruitScore": "{count} di {total} frutti raccolti",
+        "crateScore": "{count} di {total} casse aperte",
+        "gemAwarded": "Tutte le casse aperte: gemma ottenuta",
+        "breakCrate": "Rompi la cassa: {project}",
+        "spinAll": "Gira per aprire tutte le casse",
+        "crateHint": "Clicca una cassa per romperla, o gira per aprirle tutte",
+        "fruitHint": "Punta un livello per raccogliere la sua frutta",
+        "level": "Livello {number}",
+        "time": "Tempo",
+        "hubHint": "Entra in un portale"
       },
       "languages": {
         "en": "English",

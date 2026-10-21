@@ -412,6 +412,16 @@ collections:
                   - { <<: *text, label: "Hits", name: hits }
                   - { <<: *text, label: "HP", name: hp }
                   - { <<: *text, label: "Parry meter", name: parryMeter, hint: 'Keep {parried} {total}' }
+                  - { <<: *text, label: "Fruit score", name: fruitScore, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Crate score", name: crateScore, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Gem awarded", name: gemAwarded }
+                  - { <<: *text, label: "Break crate", name: breakCrate, hint: 'Keep {project}' }
+                  - { <<: *text, label: "Spin all crates", name: spinAll }
+                  - { <<: *text, label: "Crate hint", name: crateHint }
+                  - { <<: *text, label: "Fruit hint", name: fruitHint }
+                  - { <<: *text, label: "Level number", name: level, hint: 'Keep {number}' }
+                  - { <<: *text, label: "Time", name: time }
+                  - { <<: *text, label: "Portal hint", name: hubHint }
               - label: Language names (each in its own language)
                 name: languages
                 widget: object
