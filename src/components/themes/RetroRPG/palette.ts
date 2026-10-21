@@ -1,54 +1,100 @@
-import type { Profession } from '@/lib/cv/professions'
+import type { CSSProperties } from 'react'
 
-// =============================================================================
-// CHRONO TRIGGER EXACT COLOR PALETTE
-// =============================================================================
-export const CT_COLORS = {
-  // Time Portal Colors
-  portalBlue: '#3366FF',
-  portalBlueBright: '#6699FF',
-  portalPurple: '#9933CC',
-  portalMagenta: '#CC66FF',
+// Retro RPG's palette: a 16 bit role playing game at night. The page is a deep night blue; every panel
+// is a dialogue window (a blue gradient inside a white pixel border with a grey inner line), its cursor
+// gold. Each profession's level has its own light: a daytime overworld meadow for the System Engineer,
+// a starry night camp around the fire for the Musician, an arena courtyard at dusk for the Martial
+// Artist.
+//
+// This is the one source of the world's colours: SVG fills read the constants, class strings read the
+// same values as CSS variables (RPG_VARS, set once on the world's root).
+//
+// Text pairs: text on window low 16.8:1 and on window top 9.3:1, muted on window low 11.9:1 and on
+// window top 6.6:1, gold 12.1:1, green 11.2:1 and sky 10.5:1 on window low (5.8:1 or more on window
+// top), void on gold 14.1:1.
+export const RPG = {
+  void: '#060a1f',
+  night: '#0b1236',
+  windowTop: '#2a3d9e',
+  windowLow: '#0d1650',
+  border: '#f4f4f4',
+  borderShade: '#8a93b8',
+  text: '#ffffff',
+  muted: '#d3d8ee',
+  gold: '#ffd75e',
+  green: '#8ee69a',
+  sky: '#9fd3f7',
+  // The daytime overworld: sky, far mountains, the trees, the grass and the dirt path.
+  dayTop: '#3d7fd6',
+  dayLow: '#a9dcf5',
+  mountain: '#6f84c2',
+  snow: '#e9f1ff',
+  tree: '#22602f',
+  grass: '#3f9a3a',
+  grassDark: '#2a6b2c',
+  path: '#c9a26b',
+  pathEdge: '#8d6a3e',
+  // The towns along the path and the castle at its end.
+  wall: '#efe2c0',
+  roof: '#c4473a',
+  stone: '#8b8f9e',
+  stoneDark: '#4c5064',
+  lamp: '#ffe9a0',
+  // The night camp: the sky, the stars, the hills, the tents and the fire.
+  nightTop: '#050822',
+  nightLow: '#1d2a6b',
+  star: '#fff6c8',
+  hill: '#121a45',
+  tent: '#7a5a3a',
+  fire: '#ff8a2a',
+  fireCore: '#ffd75e',
+  // The arena at dusk: the sky, the walls, the sand, the banners and the ropes.
+  duskTop: '#2b1a4a',
+  duskLow: '#e88a5a',
+  arenaWall: '#6a4a5e',
+  sand: '#d9b77a',
+  sandEdge: '#a8834c',
+  banner: '#c4473a',
+  rope: '#f4f4f4',
+  // His clothes and the props he carries.
+  tunic: '#3554c4',
+  vest: '#b0302c',
+  trousers: '#5a3d2a',
+  boot: '#3a2416',
+  belt: '#ffd75e',
+  shorts: '#c4302c',
+  glove: '#b0202a',
+  stick: '#e9d3a0',
+  eye: '#120c18',
+  pad: '#ffd75e',
+  holder: '#2a2440',
+} as const
 
-  // Era Colors
-  medievalGreen: '#339933',
-  medievalGreenLight: '#66CC66',
-  futureChrome: '#99CCCC',
-  futureChromeLight: '#CCFFFF',
-  prehistoricOrange: '#FF6633',
-  prehistoricOrangeLight: '#FF9966',
+/** The palette as CSS variables (--rpg-void, --rpg-window-top and so on), set once on the world's root. */
+export const RPG_VARS = {
+  '--rpg-void': RPG.void,
+  '--rpg-night': RPG.night,
+  '--rpg-window-top': RPG.windowTop,
+  '--rpg-window-low': RPG.windowLow,
+  '--rpg-border': RPG.border,
+  '--rpg-border-shade': RPG.borderShade,
+  '--rpg-text': RPG.text,
+  '--rpg-muted': RPG.muted,
+  '--rpg-gold': RPG.gold,
+  '--rpg-green': RPG.green,
+  '--rpg-sky': RPG.sky,
+  '--rpg-day-top': RPG.dayTop,
+  '--rpg-day-low': RPG.dayLow,
+  '--rpg-night-top': RPG.nightTop,
+  '--rpg-night-low': RPG.nightLow,
+  '--rpg-dusk-top': RPG.duskTop,
+  '--rpg-dusk-low': RPG.duskLow,
+  '--rpg-grass': RPG.grass,
+  '--rpg-path': RPG.path,
+  '--rpg-hill': RPG.hill,
+  '--rpg-sand': RPG.sand,
+  '--rpg-sand-edge': RPG.sandEdge,
+} as CSSProperties
 
-  // Dark Blue Backgrounds
-  voidDark: '#000033',
-  voidMid: '#000066',
-  voidLight: '#000099',
-
-  // UI Colors
-  white: '#FFFFFF',
-  gold: '#FFD700',
-  silver: '#C0C0C0',
-  red: '#FF3333',
-  lavosRed: '#CC0033',
-  lavosPurple: '#660066',
-
-  // ATB Gauge Colors
-  atbGreen: '#00FF66',
-  atbYellow: '#FFFF00',
-  atbOrange: '#FF9900',
-
-  // Character Colors
-  cronoOrange: '#FF6600',
-  marleBlue: '#66CCFF',
-  frogGreen: '#33CC33',
-  lucca: '#9966CC',
-  robo: '#CCCC99',
-  ayla: '#FFCC66',
-  magus: '#6633CC',
-}
-
-// The command colour each profession's party menu option carries.
-export const PROFESSION_COLORS: Record<Profession, string> = {
-  drummer: CT_COLORS.portalPurple,
-  engineer: CT_COLORS.portalBlue,
-  fighter: CT_COLORS.prehistoricOrange,
-}
+// Pixel type, the menus of a 16 bit role playing game; a monospace face where the pixel face is missing.
+export const PIXEL = "font-['Press_Start_2P','Courier_New',monospace]"

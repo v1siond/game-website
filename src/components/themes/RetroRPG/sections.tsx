@@ -1,127 +1,162 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { CT_COLORS } from './palette'
-import { CharacterParty, LavosDramaticSection, TimePortalGateway } from './breaks'
-import { BattleFrame } from './panels'
-import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechInventory } from './cards'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
+import { BandCard, CompanyCard, ExperienceCard, ItemBag, ProjectCard } from './cards'
+import { SectionHeader, Window } from './panels'
+import { PIXEL } from './palette'
+import { Lane, SceneItem } from './scenes'
 
-function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+// Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
+// Featured Work, Bands and the Muay Thai record are overworld levels he crosses, each entry arriving as
+// part of the level.
+
+function Block({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <section className="px-4 py-8 sm:px-6" aria-label={label}>
+      <div className="mx-auto max-w-3xl">{children}</div>
+    </section>
+  )
+}
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      <BattleFrame title="ABOUT" era="present">
-        <div className="p-4" style={{
-          border: `2px solid ${CT_COLORS.portalBlue}30`,
-          background: `linear-gradient(90deg, ${CT_COLORS.voidDark} 0%, transparent 100%)`,
-        }}>
-          <p className="text-sm leading-relaxed tracking-wide" style={{ color: CT_COLORS.white }}>
-            {professionalSummary.bio}
-          </p>
-        </div>
-      </BattleFrame>
-
-      {/* ART SECTION 1: Character Party */}
-      <CharacterParty />
+      <FadeInScene>
+        <Block label="About">
+          <SectionHeader title="About" />
+          <Window>
+            <p className="text-sm leading-relaxed text-[color:var(--rpg-text)]">{professionalSummary.bio}</p>
+          </Window>
+        </Block>
+      </FadeInScene>
 
       {sections.jobs.length > 0 && (
-        <BattleFrame title="WORK EXPERIENCE" era="medieval">
-          <div className="space-y-4">
-            {sections.jobs.map((entry) => (
-              <ExperienceCard key={entry.id} entry={entry} />
-            ))}
-          </div>
-        </BattleFrame>
+        <LevelScene>
+          <Block label="Work experience">
+            <Lane profession="engineer" zone="record" />
+            <SectionHeader title="Work experience" />
+            <ul className="space-y-4">
+              {sections.jobs.map((entry) => (
+                <li key={entry.id}>
+                  <SceneItem kind="dialogue">
+                    <ExperienceCard entry={entry} />
+                  </SceneItem>
+                </li>
+              ))}
+            </ul>
+          </Block>
+        </LevelScene>
       )}
 
-      {/* ART SECTION 2: Time Portal Gateway */}
-      <TimePortalGateway />
+      <FadeInScene>
+        <Block label="Tech stack">
+          <SectionHeader title="Tech stack" />
+          <Window>
+            <ItemBag categories={sections.techStack} />
+          </Window>
+        </Block>
+      </FadeInScene>
 
-      <BattleFrame title="TECH STACK" era="future">
-        <TechInventory categories={sections.techStack} />
-      </BattleFrame>
+      <LevelScene>
+        <Block label="Projects">
+          <Lane profession="engineer" zone="work" />
+          <SectionHeader title="Featured work" />
+          <ProjectList
+            projects={sections.projects}
+            className="grid gap-4 md:grid-cols-2"
+            renderProject={(slot) => (
+              <SceneItem kind="menu">
+                <ProjectCard {...slot} />
+              </SceneItem>
+            )}
+          />
+        </Block>
+      </LevelScene>
 
-      <BattleFrame title="PROJECTS" era="present">
-        <ProjectList
-          projects={sections.projects}
-          className="grid md:grid-cols-2 gap-4"
-          renderProject={(slot) => <ProjectCard {...slot} />}
-        />
-      </BattleFrame>
-
-      {/* ART SECTION 3: Lavos Dramatic */}
-      <LavosDramaticSection />
-
-      <BattleFrame title="VENTURES" era="future">
-        <div className="grid md:grid-cols-3 gap-4">
-          {sections.companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
-          ))}
-        </div>
-      </BattleFrame>
+      <FadeInScene>
+        <Block label="Ventures">
+          <SectionHeader title="Ventures" />
+          <div className="grid gap-4 md:grid-cols-3">
+            {sections.companies.map((company) => (
+              <CompanyCard key={company.id} company={company} />
+            ))}
+          </div>
+        </Block>
+      </FadeInScene>
     </>
   )
 }
 
-function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
-    <>
-      <CharacterParty />
-      <BattleFrame title="BANDS" era="medieval">
-        <p className="text-sm mb-4" style={{ color: CT_COLORS.white }}>
+    <LevelScene>
+      <Block label="Bands">
+        <Lane profession="drummer" zone="record" />
+        <SectionHeader title="Bands" />
+        <p className="mb-4 text-sm text-[color:var(--rpg-text)]">
           Drums since {musician.since}, {musician.yearsPlaying} years
         </p>
         <BandList
           bands={bands}
-          className="grid md:grid-cols-2 gap-4"
-          renderBand={(slot) => <BandCard {...slot} />}
+          className="grid gap-4 md:grid-cols-3"
+          renderBand={(slot) => (
+            <SceneItem kind="menu">
+              <BandCard {...slot} />
+            </SceneItem>
+          )}
         />
-        <p className="text-sm mt-4" style={{ color: CT_COLORS.silver }}>
-          <span style={{ color: CT_COLORS.portalMagenta }} aria-hidden="true">◇ </span>
-          {musician.line}
-        </p>
-      </BattleFrame>
-    </>
+        <p className="mt-4 text-sm text-[color:var(--rpg-muted)]">{musician.line}</p>
+      </Block>
+    </LevelScene>
   )
 }
 
-function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
-    <>
-      <CharacterParty />
-      <BattleFrame title="MUAY THAI" era="prehistoric">
-        <h3 className="text-sm tracking-wide mb-4" style={{ color: CT_COLORS.prehistoricOrangeLight }}>
-          {martialArts.primary.title}
-        </h3>
-        <MuayThaiRecord
-          martialArts={martialArts}
-          classNames={{
-            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-            fact: 'p-3 border-2 border-white/20',
-            term: 'text-sm tracking-widest text-[#FFD700]',
-            value: 'text-sm text-white mt-2 leading-relaxed',
-            achievements: 'space-y-2',
-            achievement: 'text-sm text-[#00FF66] flex items-start gap-2',
-          }}
-          renderAchievement={(achievement) => (
-            <>
-              <span className="text-[#FFD700]" aria-hidden="true">★</span>
-              <span>{achievement}</span>
-            </>
-          )}
-        />
-      </BattleFrame>
-    </>
+    <LevelScene>
+      <Block label="Muay Thai">
+        <Lane profession="fighter" zone="record" />
+        <SectionHeader title="Muay Thai" />
+        <Window>
+          <h3 className={`mb-4 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] ${PIXEL}`}>{martialArts.primary.title}</h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'mb-4 grid gap-3 sm:grid-cols-2',
+              fact: 'border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-3',
+              term: 'text-sm uppercase tracking-widest text-[color:var(--rpg-gold)]',
+              value: 'mt-2 text-sm leading-relaxed text-[color:var(--rpg-text)]',
+              achievements: 'space-y-3',
+              achievement: 'text-sm text-[color:var(--rpg-green)]',
+            }}
+            renderAchievement={(achievement) => (
+              <SceneItem kind="dialogue">
+                <p className="flex items-start gap-2 border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-2">
+                  <span className="text-[color:var(--rpg-gold)]" aria-hidden="true">
+                    ★
+                  </span>
+                  {achievement}
+                </p>
+              </SceneItem>
+            )}
+          />
+        </Window>
+      </Block>
+    </LevelScene>
   )
 }
 

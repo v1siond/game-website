@@ -1,42 +1,79 @@
+import type { AnchorHTMLAttributes, ReactNode } from 'react'
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { CT_COLORS } from './palette'
 
-// Email is the lit primary command, LinkedIn the outlined one.
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
-  email: {
-    background: `linear-gradient(180deg, ${CT_COLORS.portalBlue}, ${CT_COLORS.portalPurple})`,
-    border: `3px solid ${CT_COLORS.white}`,
-    color: CT_COLORS.white,
-  },
-  linkedin: {
-    border: `3px solid ${CT_COLORS.portalBlue}`,
-    color: CT_COLORS.portalBlueBright,
-    background: CT_COLORS.voidDark,
-  },
+// Retro RPG's buttons are menu commands: a white bordered box, the gold cursor stepping in beside the
+// one under the pointer or the keyboard. Email is the lit command (gold), the rest are plain.
+
+export const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--rpg-gold)]'
+
+type CommandLook = 'lit' | 'plain'
+
+const LOOK: Record<CommandLook, string> = {
+  lit: 'bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)]',
+  plain: 'bg-[color:var(--rpg-window-low)] text-[color:var(--rpg-text)]',
 }
 
-export const COMMAND_BUTTON =
-  'inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 text-sm tracking-widest transition-all hover:scale-105 focus:outline-none focus:ring-2'
+const CURSOR_LOOK: Record<CommandLook, string> = {
+  lit: 'text-[color:var(--rpg-void)]',
+  plain: 'text-[color:var(--rpg-gold)]',
+}
 
-export function HeroAction({ action }: { action: HeroActionSlot }) {
+const commandClass = (look: CommandLook) =>
+  `group inline-flex min-h-[44px] items-center justify-center gap-2 border-2 border-[color:var(--rpg-border)] px-3 py-2 text-sm uppercase tracking-wider ${LOOK[look]} ${FOCUS}`
+
+function Cursor({ look }: { look: CommandLook }) {
   return (
-    <a {...action.linkProps} className={COMMAND_BUTTON} style={HERO_ACTION_LOOK[action.id]}>
-      <span aria-hidden="true">◈</span>
-      {action.label}
+    <span className={`opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 ${CURSOR_LOOK[look]}`} aria-hidden="true">
+      ▶
+    </span>
+  )
+}
+
+interface CommandProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+  look?: CommandLook
+  children: ReactNode
+}
+
+export function Command({ look = 'plain', children, ...linkProps }: CommandProps) {
+  return (
+    <a {...linkProps} className={commandClass(look)}>
+      <Cursor look={look} />
+      {children}
     </a>
   )
 }
 
-export function CVLink() {
+const ACTION_LOOK: Record<HeroActionSlot['id'], CommandLook> = {
+  email: 'lit',
+  linkedin: 'plain',
+}
+
+export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   return (
-    <Link
-      href="/cv"
-      className={COMMAND_BUTTON}
-      style={{ border: `3px solid ${CT_COLORS.gold}`, color: CT_COLORS.gold, background: CT_COLORS.voidDark }}
-    >
-      <span aria-hidden="true">◈</span>
-      CV
+    <>
+      {actions.map((action) => (
+        <Command key={action.id} look={ACTION_LOOK[action.id]} {...action.linkProps}>
+          {action.label}
+        </Command>
+      ))}
+    </>
+  )
+}
+
+function PageLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href} className={commandClass('plain')}>
+      <Cursor look="plain" />
+      {label}
     </Link>
   )
+}
+
+export function CVLink() {
+  return <PageLink href="/cv" label="CV" />
+}
+
+export function PlayLink() {
+  return <PageLink href="/personal-projects/game-engine" label="Game" />
 }

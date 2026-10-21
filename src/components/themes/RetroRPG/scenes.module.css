@@ -1,0 +1,86 @@
+/*
+ * Retro RPG's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses, .walk and .advance, the props that answer progress
+ * and reduced motion). Transform and opacity only; progress 1 is the final frame, which reduced motion
+ * and the World Select preview show at once.
+ *
+ * The world's move is a 16 bit role playing game: windows open in hard steps, menu entries snap in,
+ * sprites flip as they spin. The stepped values use round(); a browser without it drops those rules
+ * and shows the final frame, so every entry still reads.
+ */
+
+/* The world's tempo: a brisk overworld walk, twelve strides along the road with a wide swing, eight
+   stick hits per arm at the camp, the sound bars resting a fifth up between hits; the Martial Artist
+   crosses the ring to the pads by half the scene. */
+.tempo {
+  --strides: 12turn;
+  --swing: 26deg;
+  --stick-hits: 8turn;
+  --wave-rest: 0.2;
+  --advance-until: 0.5;
+}
+
+/* Musician plays at the camp, left of the fire. */
+.atCamp {
+  transform: translate3d(22%, 0, 0);
+}
+
+/* ---- System Engineer: the meadow road ---- */
+
+/* The castle's portcullis lifts into the tower as he comes to the end of the road. */
+.gate {
+  transform-box: fill-box;
+  transform: translate3d(0, calc(clamp(0, (var(--p) - 0.72) * 4, 1) * -80%), 0);
+}
+
+/* A save point's star turns like a sprite, its width flipping through the spin, four turns a scene. */
+.spin {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scaleX(cos(var(--p) * 4turn));
+}
+
+/* ---- Musician: the night camp ---- */
+
+/* Each star group brightens on its half of the stick hits (its --phase). */
+.twinkle {
+  opacity: calc(0.35 + max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 0.65);
+}
+
+/* The flames leap on the hits, each on its own --phase. */
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(calc(0.75 + max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 0.4));
+}
+
+/* ---- Martial Artist: the dusk arena ---- */
+
+/* The crowd jumps with the strikes (the strip carries --kick, --knee and --elbow): the high row on the
+   kick and the knee, the low row on the elbow and the knee. */
+.cheerHigh {
+  transform: translate3d(0, calc(max(var(--kick, 0), var(--knee, 0)) * -4%), 0);
+}
+
+.cheerLow {
+  transform: translate3d(0, calc(max(var(--elbow, 0), var(--knee, 0)) * -4%), 0);
+}
+
+/* ---- per item reveals (their own scene each, so --p is the item's own progress) ---- */
+
+/* A job or a record line opens as a dialogue window: it grows down from its top edge in four hard
+   steps by half its scene, then the gold cursor appears beside it. */
+.unfold {
+  transform-origin: 50% 0%;
+  transform: scaleY(clamp(0.04, round(down, var(--p) * 2, 0.25), 1));
+}
+
+.cursor {
+  opacity: clamp(0, (var(--p) - 0.5) * 10, 1);
+}
+
+/* A project or a band snaps into the menu from the right in four steps. */
+.snapIn {
+  opacity: clamp(0, var(--p) * 3 - 0.2, 1);
+  transform: translate3d(calc((1 - clamp(0, round(down, var(--p) * 2, 0.25), 1)) * 2rem), 0, 0);
+}
