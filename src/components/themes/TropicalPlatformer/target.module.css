@@ -1,0 +1,126 @@
+/*
+ * The end target (target.tsx), one block per phase of data-phase. fall (0.6 s): the high barrel recoils
+ * and he flies from it onto the pad, rolled into a ball; climb (0.8 s): he lands with a squash and the
+ * marker climbs the pole; roll (1.2 s): the prize window runs once through every achievement and stops
+ * on the next one (--prize of --count, each line 4rem tall). Transform and opacity only.
+ */
+
+.rig {
+  --line: 4rem;
+}
+
+.pole {
+  background: linear-gradient(90deg, var(--tp-bark-dark), var(--tp-plank) 45%, var(--tp-bark-dark));
+}
+
+.marker {
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.5s ease-in;
+}
+
+.rig[data-phase='climb'] .marker,
+.rig[data-phase='roll'] .marker {
+  transform: translate3d(0, -13rem, 0);
+  transition: transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+.reel {
+  transform: translate3d(0, calc(var(--prize) * var(--line) * -1), 0);
+}
+
+.rig[data-phase='roll'] .reel {
+  animation: prize-roll 1.2s cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+
+@keyframes prize-roll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, calc((var(--count) + var(--prize)) * var(--line) * -1), 0);
+  }
+}
+
+.prize {
+  height: var(--line);
+}
+
+.cannon {
+  transform: rotate(120deg);
+}
+
+.rig[data-phase='fall'] .cannon {
+  animation: high-recoil 0.3s ease-out;
+}
+
+@keyframes high-recoil {
+  0% {
+    transform: rotate(120deg) translate3d(0, 18%, 0) scale(1.1, 0.88);
+  }
+  100% {
+    transform: rotate(120deg);
+  }
+}
+
+.rig[data-phase='fall'] .jumperX {
+  animation: jump-across 0.6s linear both;
+}
+
+@keyframes jump-across {
+  from {
+    transform: translate3d(-170px, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.rig[data-phase='fall'] .jumperY {
+  animation: jump-drop 0.6s linear both;
+}
+
+@keyframes jump-drop {
+  0% {
+    transform: translate3d(0, -150px, 0);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  30% {
+    transform: translate3d(0, -190px, 0);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.5);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.jumperY {
+  transform-origin: 50% 100%;
+}
+
+.rig[data-phase='climb'] .jumperY {
+  animation: pad-squash 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes pad-squash {
+  0% {
+    transform: scale(1.25, 0.75);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marker,
+  .rig[data-phase='climb'] .marker,
+  .rig[data-phase='roll'] .marker {
+    transition: none;
+  }
+
+  .rig[data-phase] .reel,
+  .rig[data-phase] .cannon,
+  .rig[data-phase] .jumperX,
+  .rig[data-phase] .jumperY {
+    animation: none;
+  }
+}

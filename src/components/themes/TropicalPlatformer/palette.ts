@@ -1,58 +1,54 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Tropical Platformer's palette: an island at midday, jungle greens, warm wood, lagoon blues, ripe fruit
-// and sun gold, the saturated colours of 3D tropical platformers. SVG art reads COLORS directly; Tailwind
+// Tropical Platformer's palette: a jungle at sunset turning to night, warm barrel wood, steel hoops and
+// sun gold, the saturated pre-rendered colours of 3D jungle platformers. SVG art reads COLORS directly; Tailwind
 // classes read the same values as CSS variables, set once on the world's root by PALETTE_VARS.
 
 export const COLORS = {
-  // jungle
-  leaf: '#228B22',
-  leafLight: '#32CD32',
-  leafDark: '#0b4d0b',
+  // the world's card on the worlds list (src/themes/themes.ts reads these)
   canopy: '#063806',
-  // lagoon and sky
-  lagoon: '#00CED1',
-  lagoonDeep: '#008B8B',
-  sea: '#1E90FF',
-  seaLight: '#00BFFF',
-  seaDeep: '#1f4fbf',
-  night: '#0a1f5c',
-  // beach
-  sand: '#F4A460',
+  leafDark: '#0b4d0b',
+  fruitGold: '#FF9900',
   sandLight: '#DEB887',
-  sandDark: '#D2691E',
+  sun: '#FFD700',
+  wood: '#8B4513',
+  woodDark: '#4a2208',
   // the light text on dark wood and leaf
   parchment: '#f6e7c8',
-  // wood
-  wood: '#8B4513',
-  woodMid: '#A0522D',
-  woodLight: '#CD853F',
-  woodDark: '#4a2208',
-  // fruit and sun
-  fruit: '#FF6600',
-  fruitGold: '#FF9900',
-  fruitShine: '#FFCC66',
-  sunset: '#E85D00',
-  ember: '#a33f00',
-  sun: '#FFD700',
-  // crates and danger
-  hazard: '#e02020',
-  hazardDark: '#9e1010',
-  iron: '#6b7078',
-  ironLight: '#9aa0a8',
-  // gems
-  gemClear: '#E0E0E0',
-  gemRed: '#FF3366',
-  gemBlue: '#00CCFF',
-  gemGreen: '#00FF99',
-  gemYellow: '#FFFF00',
-  gemPurple: '#CC44FF',
-  // the warp portal
-  warp: '#8B00FF',
-  warpPink: '#FF69B4',
-  crystal: '#6B238E',
-  crystalLight: '#9932CC',
-  lime: '#44FF44',
+  // the laptop screen, and the fighter's mongkhon and shorts band
+  lagoon: '#00CED1',
+  seaDeep: '#1f4fbf',
+  // the sunset the hero stands in, and the black shapes in front of it
+  sunCore: '#fff4c2',
+  sunGold: '#ffc93c',
+  sunsetOrange: '#f2771f',
+  sunsetRed: '#cf3b26',
+  dusk: '#6e2747',
+  duskDeep: '#3a1430',
+  shadow: '#140b0a',
+  shadowSoft: '#2a1612',
+  // the jungle floor and its leaves
+  jungleDeep: '#0b2213',
+  jungle: '#17401f',
+  moss: '#2f6b2c',
+  fern: '#5fa83a',
+  // barrels, planks and steel hoops
+  bark: '#6b3f1d',
+  barkDark: '#2e1a0b',
+  plank: '#c98d4a',
+  plankLight: '#e8b874',
+  hoop: '#4f545c',
+  hoopLight: '#b9bec6',
+  burst: '#fffdf4',
+  // the four letters, the target rings
+  letter: '#ffd23f',
+  target: '#d1301f',
+  // night at the end of the level
+  nightSky: '#101a3a',
+  nightDeep: '#070c20',
+  moon: '#f6f0cf',
+  firefly: '#e9ff8f',
+  lamp: '#ffb347',
 } as const
 
 export type ColorName = keyof typeof COLORS

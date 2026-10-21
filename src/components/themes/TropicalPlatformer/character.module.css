@@ -1,0 +1,381 @@
+/*
+ * His poses (character.tsx), transform keyframes keyed off the svg's data-pose. The right arm and leg are
+ * the left ones mirrored on x = 50, so one set of keyframes moves both sides as mirror images; where the
+ * two must alternate (the pound, the run, the slaps, the jabs) the right side runs half a beat behind.
+ * Pivots in the left half's own units: the shoulder (24, 50), the elbow (19, 78), the hip (38, 90). A
+ * positive angle swings the hand outward and up, a negative one in toward his middle.
+ */
+
+.figure {
+  overflow: visible;
+}
+
+.body,
+.eyes,
+.tie,
+.armBack,
+.armFront,
+.foreBack,
+.foreFront,
+.legBack,
+.legFront,
+.ball,
+.held {
+  transform-box: view-box;
+}
+
+.body {
+  transform-origin: 50px 116px;
+}
+
+.eyes {
+  transform-origin: 50px 29.5px;
+}
+
+.tie {
+  transform-origin: 50px 48px;
+}
+
+.armBack,
+.armFront {
+  transform-origin: 24px 50px;
+}
+
+.foreBack,
+.foreFront {
+  transform-origin: 19px 78px;
+}
+
+.legBack,
+.legFront {
+  transform-origin: 38px 90px;
+}
+
+.ball {
+  transform-origin: 50px 81px;
+}
+
+/* Every pose moves only when the visitor allows motion; otherwise he stands at rest. */
+@media (prefers-reduced-motion: no-preference) {
+  .figure:not([data-pose='roll']) .eyes {
+    animation: blink 4.2s steps(1, end) infinite;
+  }
+
+  /* ---- idle: the big breath, then the chest pound ---- */
+
+  .figure[data-pose='idle'] .body,
+  .figure[data-pose='act'] .body {
+    animation: breathe 3.6s ease-in-out infinite;
+  }
+
+  .figure[data-pose='idle'] .tie {
+    animation: tie-sway 3.6s ease-in-out infinite;
+  }
+
+  .figure[data-pose='idle'] .armBack,
+  .figure[data-pose='idle'] .armFront {
+    animation: pound-upper 3.6s ease-in-out infinite;
+  }
+
+  .figure[data-pose='idle'] .foreBack {
+    animation: pound-fore 3.6s ease-in-out infinite;
+  }
+
+  .figure[data-pose='idle'] .foreFront {
+    animation: pound-fore 3.6s ease-in-out -0.11s infinite;
+  }
+
+  /* ---- run: the knuckle run ---- */
+
+  .figure[data-pose='run'] .body {
+    animation: run-bob 0.15s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='run'] .armBack,
+  .figure[data-pose='run'] .legBack {
+    animation: knuckle-plant 0.3s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='run'] .armFront,
+  .figure[data-pose='run'] .legFront {
+    animation: knuckle-plant 0.3s ease-in-out -0.3s infinite alternate-reverse;
+  }
+
+  /* ---- roll: the spinning ball ---- */
+
+  .figure[data-pose='roll'] .ball {
+    animation: roll-spin 0.45s linear infinite;
+  }
+
+  /* ---- throw: hoist the barrel, wind back, throw it, settle (once) ---- */
+
+  .figure[data-pose='throw'] .body {
+    animation: throw-body 1.3s ease-in-out var(--pose-delay, 0s) both;
+  }
+
+  .figure[data-pose='throw'] .armBack,
+  .figure[data-pose='throw'] .armFront {
+    animation: throw-upper 1.3s ease-in-out var(--pose-delay, 0s) both;
+  }
+
+  .figure[data-pose='throw'] .foreBack,
+  .figure[data-pose='throw'] .foreFront {
+    animation: throw-fore 1.3s ease-in-out var(--pose-delay, 0s) both;
+  }
+
+  .figure[data-pose='throw'] .held {
+    animation: throw-barrel 1.3s ease-in var(--pose-delay, 0s) both;
+  }
+
+  /* ---- act: typing with the knuckles ---- */
+
+  .figure[data-pose='act'][data-profession='engineer'] .armBack,
+  .figure[data-pose='act'][data-profession='engineer'] .armFront {
+    transform: rotate(-16deg);
+  }
+
+  .figure[data-pose='act'][data-profession='engineer'] .foreBack {
+    animation: type-tap 0.24s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='act'][data-profession='engineer'] .foreFront {
+    animation: type-tap 0.24s ease-in-out -0.12s infinite alternate;
+  }
+
+  /* ---- act: slapping the bongos ---- */
+
+  .figure[data-pose='act'][data-profession='drummer'] .armBack,
+  .figure[data-pose='act'][data-profession='drummer'] .armFront {
+    transform: rotate(-25deg);
+  }
+
+  .figure[data-pose='act'][data-profession='drummer'] .foreBack {
+    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) infinite alternate;
+  }
+
+  .figure[data-pose='act'][data-profession='drummer'] .foreFront {
+    animation: bongo-slap 0.3s cubic-bezier(0.6, 0, 0.9, 0.5) -0.3s infinite alternate;
+  }
+
+  /* ---- act: the guard and the jabs ---- */
+
+  .figure[data-pose='act'][data-profession='fighter'] .armBack {
+    animation: jab-upper 1.4s ease-out infinite;
+  }
+
+  .figure[data-pose='act'][data-profession='fighter'] .foreBack {
+    animation: jab-fore 1.4s ease-out infinite;
+  }
+
+  .figure[data-pose='act'][data-profession='fighter'] .armFront {
+    animation: jab-upper 1.4s ease-out -0.7s infinite;
+  }
+
+  .figure[data-pose='act'][data-profession='fighter'] .foreFront {
+    animation: jab-fore 1.4s ease-out -0.7s infinite;
+  }
+}
+
+@keyframes blink {
+  0%,
+  94% {
+    transform: scale(1, 1);
+  }
+  95%,
+  98% {
+    transform: scale(1, 0.1);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: translate(0, -1.5px) scale(1.035, 1.04);
+  }
+  50% {
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes tie-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  30% {
+    transform: rotate(4deg);
+  }
+  70% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes pound-upper {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+  62%,
+  90% {
+    transform: rotate(50deg);
+  }
+}
+
+@keyframes pound-fore {
+  0%,
+  55%,
+  100% {
+    transform: rotate(0deg);
+  }
+  62%,
+  71%,
+  80%,
+  90% {
+    transform: rotate(-150deg);
+  }
+  66%,
+  75%,
+  85% {
+    transform: rotate(-128deg);
+  }
+}
+
+@keyframes run-bob {
+  from {
+    transform: translate(0, 0) scale(1.04, 0.96);
+  }
+  to {
+    transform: translate(0, -7px) scale(0.98, 1.03);
+  }
+}
+
+@keyframes knuckle-plant {
+  from {
+    transform: translate(0, 0) rotate(-12deg);
+  }
+  to {
+    transform: translate(0, -5px) rotate(16deg);
+  }
+}
+
+@keyframes roll-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes throw-body {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  15% {
+    transform: scale(1.06, 0.9);
+  }
+  40% {
+    transform: translate(-2px, 0) scale(0.98, 1.05);
+  }
+  55% {
+    transform: translate(4px, 0) scale(1.04, 0.96);
+  }
+}
+
+@keyframes throw-upper {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25%,
+  40% {
+    transform: rotate(160deg);
+  }
+  55% {
+    transform: rotate(120deg);
+  }
+}
+
+@keyframes throw-fore {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25%,
+  40% {
+    transform: rotate(-35deg);
+  }
+  55% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes throw-barrel {
+  0% {
+    opacity: 0;
+    transform: translate(0, 50px);
+  }
+  20%,
+  42% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  75% {
+    opacity: 0;
+    transform: translate(90px, -30px) rotate(220deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(90px, -30px);
+  }
+}
+
+@keyframes type-tap {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(-18deg) translate(0, 1.5px);
+  }
+}
+
+@keyframes bongo-slap {
+  from {
+    transform: rotate(30deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes jab-upper {
+  0%,
+  20%,
+  45%,
+  100% {
+    transform: rotate(-20deg);
+  }
+  28% {
+    transform: rotate(80deg);
+  }
+}
+
+@keyframes jab-fore {
+  0%,
+  20%,
+  45%,
+  100% {
+    transform: rotate(-150deg);
+  }
+  28% {
+    transform: rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure[data-pose='throw'] .held {
+    opacity: 0;
+  }
+}

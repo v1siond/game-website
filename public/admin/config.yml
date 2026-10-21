@@ -402,6 +402,29 @@ collections:
                   - { <<: *text, label: "Turn pipe", name: turnPipe, hint: 'Keep {achievement}' }
                   - { <<: *text, label: "Flow waiting", name: flowWaiting }
                   - { <<: *text, label: "Flow done", name: flowDone }
+              - label: Jungle world (tropical platformer)
+                name: jungle
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Blast again", name: blastAgain }
+                  - { <<: *text, label: "Cannon hint", name: cannonHint }
+                  - { <<: *text, label: "Blast to", name: blastTo, hint: 'Keep {job}' }
+                  - { <<: *text, label: "Landed at", name: landedAt, hint: 'Keep {job}' }
+                  - { <<: *text, label: "Letters hint", name: lettersHint }
+                  - { <<: *text, label: "Letters found", name: lettersFound, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Collect letter", name: collectLetter, hint: 'Keep {letter}' }
+                  - { <<: *text, label: "Extra life", name: extraLife }
+                  - { <<: *text, label: "Ride", name: ride }
+                  - { <<: *text, label: "Cart here", name: cartHere }
+                  - { <<: *text, label: "Ride to", name: rideTo, hint: 'Keep {band}' }
+                  - { <<: *text, label: "Cart at", name: cartAt, hint: 'Keep {band}' }
+                  - { <<: *text, label: "Jump", name: jump }
+                  - { <<: *text, label: "Jump again", name: jumpAgain }
+                  - { <<: *text, label: "Jump hint", name: jumpHint }
+                  - { <<: *text, label: "Prize won", name: prizeWon, hint: 'Keep {achievement}' }
+                  - { <<: *text, label: "All prizes", name: allPrizes }
+                  - { <<: *text, label: "Won", name: won }
               - label: Night city world (neon cyber)
                 name: cyber
                 widget: object

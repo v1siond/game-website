@@ -1,0 +1,51 @@
+/*
+ * The level sign (levelSign.tsx): the plank drops from above and swings on its nails to rest (0.9 s), a
+ * pendulum that loses a little each swing, pivoting on its top edge. The post rises under it.
+ */
+
+.sign {
+  transform-origin: 50% 0;
+  opacity: 0;
+  transform: translate3d(0, -3rem, 0) rotate(-8deg);
+}
+
+.level[data-on] .sign {
+  animation: sign-drop 0.9s ease-out forwards;
+}
+
+@keyframes sign-drop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -3rem, 0) rotate(-8deg);
+  }
+  30% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(7deg);
+  }
+  50% {
+    transform: translate3d(0, 0, 0) rotate(-4deg);
+  }
+  70% {
+    transform: translate3d(0, 0, 0) rotate(2deg);
+  }
+  85% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+.post {
+  background: linear-gradient(90deg, var(--tp-bark-dark), var(--tp-bark) 50%, var(--tp-bark-dark));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sign,
+  .level[data-on] .sign {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

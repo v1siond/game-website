@@ -1,0 +1,110 @@
+/*
+ * The barrel run (cannons.tsx). The platforms rise in one after another when the list scrolls in
+ * (data-on, staggered by --i). The empty barrels turn a full turn every 2.4 s; his barrel turns to --aim
+ * (0.25 s) before it fires. The flight starts at the stage point --sx, --sy: the outer layer moves --dx
+ * at an even pace, the inner one climbs to --peak and falls to --dy, so together they draw the arc. The
+ * platform he lands on is remounted with data-landed and bounces. Transform and opacity only.
+ */
+
+.platform {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+}
+
+.run[data-on] .platform {
+  animation: platform-rise 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 90ms) forwards;
+}
+
+.run[data-on] .platform[data-landed] {
+  animation: platform-land 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes platform-rise {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes platform-land {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0.9rem, 0) scale(1.02, 0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.grass {
+  background: linear-gradient(180deg, var(--tp-fern), var(--tp-moss));
+}
+
+.cannon {
+  transform: rotate(var(--aim, 0deg));
+  transition: transform 0.25s ease-out;
+}
+
+.peek {
+  transform-origin: 50% 100%;
+}
+
+.idle {
+  animation: barrel-turn 2.4s linear infinite;
+}
+
+@keyframes barrel-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.flyX {
+  animation: fly-across 0.82s linear both;
+}
+
+@keyframes fly-across {
+  from {
+    transform: translate3d(calc(var(--sx) - 1.5rem), calc(var(--sy) - 2rem), 0);
+  }
+  to {
+    transform: translate3d(calc(var(--sx) + var(--dx) - 1.5rem), calc(var(--sy) - 2rem), 0);
+  }
+}
+
+.flyY {
+  animation: fly-arc 0.82s linear both;
+}
+
+@keyframes fly-arc {
+  0% {
+    transform: translate3d(0, 0, 0);
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
+  }
+  45% {
+    transform: translate3d(0, var(--peak), 0);
+    animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
+  }
+  100% {
+    transform: translate3d(0, var(--dy), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .platform,
+  .run[data-on] .platform,
+  .run[data-on] .platform[data-landed] {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+
+  .cannon {
+    transition: none;
+  }
+
+  .idle {
+    animation: none;
+  }
+}

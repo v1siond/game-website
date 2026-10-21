@@ -1,0 +1,175 @@
+/*
+ * The night contact (nightfall.tsx), off one data-on: he rolls in from the left as a ball (0 to 0.9 s),
+ * turning two full turns, then stands (the ball hides, the standing pose shows); the tree house window
+ * lights at 0.6 s; the sign drops on its vines from 1 s and swings to rest (1.4 s). Pointed at, the
+ * sign rocks. The four fireflies drift and blink on a loop. Transform and opacity only.
+ */
+
+.contact {
+  background: linear-gradient(180deg, transparent, rgb(7 12 32 / 0.6) 30%, var(--tp-night-deep));
+}
+
+.scene {
+  background: radial-gradient(60% 50% at 80% 20%, rgb(246 240 207 / 0.18), transparent 70%), linear-gradient(180deg, var(--tp-night-deep), var(--tp-night-sky));
+}
+
+.window {
+  opacity: 0.2;
+}
+
+.contact[data-on] .window {
+  opacity: 1;
+  transition: opacity 0.4s steps(3, end) 0.6s;
+}
+
+.firefly {
+  left: var(--left);
+  top: var(--top);
+  background: var(--tp-firefly);
+  box-shadow: 0 0 10px 3px rgb(233 255 143 / 0.6);
+  animation: firefly-drift 3.6s ease-in-out var(--delay) infinite;
+}
+
+@keyframes firefly-drift {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translate3d(0, 0, 0);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(14px, -10px, 0);
+  }
+  70% {
+    opacity: 0.5;
+    transform: translate3d(-8px, -18px, 0);
+  }
+}
+
+.roller {
+  opacity: 0;
+}
+
+.contact[data-on] .roller {
+  animation: roll-in 0.9s cubic-bezier(0.25, 0.8, 0.4, 1) forwards;
+}
+
+@keyframes roll-in {
+  from {
+    opacity: 1;
+    transform: translate3d(-260%, 0, 0) rotate(-720deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+.ball {
+  opacity: 1;
+}
+
+.standing {
+  opacity: 0;
+}
+
+.contact[data-on] .ball {
+  animation: hide-at-stop 0.9s steps(1, end) forwards;
+}
+
+.contact[data-on] .standing {
+  animation: show-at-stop 0.9s steps(1, end) forwards;
+}
+
+@keyframes hide-at-stop {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes show-at-stop {
+  to {
+    opacity: 1;
+  }
+}
+
+.hanger {
+  transform-origin: 50% 0;
+  opacity: 0;
+  transform: translate3d(0, -3rem, 0);
+}
+
+.contact[data-on] .hanger {
+  animation: sign-swing 1.4s ease-out 1s forwards;
+}
+
+@keyframes sign-swing {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -3rem, 0) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(5deg);
+  }
+  45% {
+    transform: rotate(-3.5deg);
+  }
+  65% {
+    transform: rotate(2deg);
+  }
+  85% {
+    transform: rotate(-0.8deg);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+}
+
+.sign {
+  transform-origin: 50% -2.5rem;
+}
+
+.sign:hover {
+  animation: sign-rock 1.2s ease-in-out;
+}
+
+@keyframes sign-rock {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(2.5deg);
+  }
+  60% {
+    transform: rotate(-1.8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .firefly,
+  .contact[data-on] .roller,
+  .contact[data-on] .ball,
+  .contact[data-on] .standing,
+  .contact[data-on] .hanger,
+  .sign:hover {
+    animation: none;
+  }
+
+  .roller,
+  .standing,
+  .hanger {
+    opacity: 1;
+    transform: none;
+  }
+
+  .ball {
+    opacity: 0;
+  }
+
+  .window {
+    opacity: 1;
+  }
+}
