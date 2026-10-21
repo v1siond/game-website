@@ -762,7 +762,7 @@ function paletteFromColors(c: { background: string; accent: string; secondary: s
 
 // Worlds that draw their own profession stages (Dark Fantasy's hand tuned set, the scroll scene worlds' own
 // scenes); the shared stage would double them, so it stays out of these.
-const WORLDS_WITH_OWN_STAGE = new Set(['dark-fantasy', 'neon-cyber', 'neon-portals', 'retro-atomic'])
+const WORLDS_WITH_OWN_STAGE = new Set(['dark-fantasy', 'neon-cyber', 'neon-portals', 'retro-atomic', 'art-deco'])
 
 /** Renders the profession boss-stage in any world, recoloured from its theme, except the worlds that
  *  draw their own. */
