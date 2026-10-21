@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobYears } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
@@ -72,7 +73,9 @@ export function LevelPortal({ entry, index }: { entry: Job; index: number }) {
         </div>
       </header>
       <div className="p-5">
-        <p className="text-base font-bold text-[color:var(--np-white)]">{entry.company}</p>
+        <p className="text-base font-bold text-[color:var(--np-white)]">
+          <SlashBreaks text={entry.company} />
+        </p>
         <p className="mt-2 inline-flex items-center gap-2 rounded-lg border-2 border-[color:var(--np-gold)] bg-[color:var(--np-void)] px-2 py-1">
           <span className="block h-6 w-6" aria-hidden="true">
             <Stopwatch className="h-full w-full" />

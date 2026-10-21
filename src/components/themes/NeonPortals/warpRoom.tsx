@@ -100,7 +100,7 @@ function LevelButton({ option, warp }: { option: ProfessionOption; warp: Warp })
   const { id, label, selected, optionProps } = option
 
   return (
-    <button type="button" {...optionProps} data-selected={selected || undefined} className={`group relative flex w-24 flex-col items-center focus:outline-none sm:w-40 ${room.button}`}>
+    <button type="button" {...optionProps} data-selected={selected || undefined} className={`group relative flex w-[5.25rem] flex-col items-center focus:outline-none min-[375px]:w-24 sm:w-40 ${room.button}`}>
       <span className={`pointer-events-none absolute bottom-[calc(100%+0.5rem)] left-1/2 z-10 flex w-40 flex-col items-center sm:w-48 ${room.hologram}`}>
         <span className={`relative block aspect-square w-28 overflow-hidden rounded-full border-[3px] border-[color:var(--np-void)] sm:w-36 ${room.orb}`} aria-hidden="true">
           <EraScene era={PROFESSION_ERA[id]} className="h-full w-full" />
@@ -120,7 +120,7 @@ function LevelButton({ option, warp }: { option: ProfessionOption; warp: Warp })
           </span>
         )}
       </span>
-      <span className={`relative -mt-6 block h-11 w-24 sm:w-32 ${room.pad}`} aria-hidden="true">
+      <span className={`relative -mt-6 block h-11 w-[5.25rem] min-[375px]:w-24 sm:w-32 ${room.pad}`} aria-hidden="true">
         <LevelPad label={PAD_NUMBER[id]} lit={selected} topClassName={room.padTop} className="h-full w-full" />
       </span>
       <span className={`mt-2 text-sm uppercase tracking-wide ${ui.chunk} ${selected ? PAD_TONE[id] : 'text-[color:var(--np-muted)]'}`} aria-hidden="true">

@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import { jobYears } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
@@ -32,7 +33,9 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
     <article className={`relative p-5 ${atomic.panel} ${atomic.cardOn}`} style={{ '--i': index } as CSSProperties}>
       <QuestState current={job.current} />
       <h3 className="mt-3 text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{job.title}</h3>
-      <p className="mt-1 text-base text-atomic-yellow">{job.company}</p>
+      <p className="mt-1 text-base text-atomic-yellow">
+        <SlashBreaks text={job.company} />
+      </p>
       <p className="mt-1 text-sm text-atomic-phosphor-dim">{fillLabel(years.range, { start, end })}</p>
 
       {job.description && <p className="mt-3 text-sm leading-relaxed text-atomic-ash">{job.description}</p>}

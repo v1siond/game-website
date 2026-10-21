@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { newTabName } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
@@ -69,8 +70,10 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
           <span className="text-3xl" aria-hidden="true">
             {company.icon}
           </span>
-          <div>
-            <h3 className={`text-base ${look.cardTitle}`}>{company.name}</h3>
+          <div className="min-w-0">
+            <h3 className={`text-base ${look.cardTitle}`}>
+              <SlashBreaks text={company.name} />
+            </h3>
             <p className="text-sm text-[color:var(--deco-mist)]">{company.tagline}</p>
           </div>
         </div>

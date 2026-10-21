@@ -53,7 +53,7 @@ export function QuickhackMenu({ active }: { active: Profession }) {
           {navigation.selectYourProfession}
         </p>
         <ProfessionSwitch
-          className="grid grid-cols-3 gap-2 md:grid-cols-1"
+          className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1"
           label={navigation.professionSelection}
           renderOption={({ id, label, selected, optionProps }) => (
             <button

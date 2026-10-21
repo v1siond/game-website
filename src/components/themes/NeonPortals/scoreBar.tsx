@@ -83,7 +83,7 @@ export function ScoreBar() {
           {score.masks}/3
         </Slot>
       </div>
-      <div className="flex flex-wrap justify-end gap-3">
+      <div className="mr-12 flex flex-wrap justify-end gap-3 sm:mr-28">
         <Slot
           shown={shown === 'crates'}
           icon={gem ? <Gem className={`h-full w-full ${ui.award}`} /> : <CrateArt kind="wood" className="h-full w-full" />}

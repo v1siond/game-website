@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { jobYears } from '@/components/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -63,11 +64,13 @@ function DiaryCard({ entry, index, playing, onToggle }: { entry: Job; index: num
       style={{ '--i': index, '--tape': `${lines * LINE_MS}ms` } as CSSProperties}
     >
       <span className={`pointer-events-none absolute inset-0 ${diary.glow}`} aria-hidden="true" />
-      <div className="relative flex items-start gap-4">
+      <div className="relative flex flex-col items-start gap-4 min-[375px]:flex-row">
         <Recorder />
         <div className="min-w-0">
           <h3 className={`text-lg leading-snug ${diary.title}`}>{entry.title}</h3>
-          <p className="mt-1 text-sm text-[color:var(--deco-cream)]">{entry.company}</p>
+          <p className="mt-1 text-sm text-[color:var(--deco-cream)]">
+            <SlashBreaks text={entry.company} />
+          </p>
           <p className="mt-1 text-sm text-[color:var(--deco-gold)]">{fillLabel(years.range, { start, end })}</p>
         </div>
       </div>

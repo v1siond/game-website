@@ -92,7 +92,7 @@ function ScreenTab({ label, selected, optionProps }: ProfessionOption) {
     <button
       type="button"
       {...optionProps}
-      className={`relative min-h-[44px] px-2 text-sm font-bold uppercase tracking-widest sm:px-4 sm:text-base ${atomic.screenTab} ${atomic.focusRing}`}
+      className={`relative min-h-[44px] px-2 text-sm font-bold uppercase tracking-wide sm:px-4 sm:text-base sm:tracking-widest ${atomic.screenTab} ${atomic.focusRing}`}
       data-on={selected || undefined}
     >
       {label}
@@ -245,7 +245,7 @@ export function WristComputer({ booted, instant }: WristComputerProps) {
         <div className="p-3 sm:p-5">
           <Screen>
             <div className={atomic.tubeWarm}>
-              <ProfessionSwitch className={`flex justify-center gap-1 sm:gap-4 ${atomic.tabRail}`} label={navigation.profession} renderOption={(option) => <ScreenTab {...option} />} />
+              <ProfessionSwitch className={`flex flex-wrap justify-center gap-x-1 sm:gap-x-4 ${atomic.tabRail}`} label={navigation.profession} renderOption={(option) => <ScreenTab {...option} />} />
               <SectionTabs profession={active} />
 
               <div key={active} className={`mt-5 grid items-center gap-6 md:grid-cols-[auto_1fr] ${atomic.powerOn}`}>

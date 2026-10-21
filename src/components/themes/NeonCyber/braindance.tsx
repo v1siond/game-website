@@ -5,6 +5,7 @@ import type { Job } from '@/lib/cv/content'
 import type { Labels } from '@/lib/cv/labels'
 import { fillLabel } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobYears } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -259,7 +260,9 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                     >
                       <header className="mb-2">
                         <h3 className="text-base text-[color:var(--neon-ice)]">{job.title}</h3>
-                        <p className="text-sm text-[color:var(--neon-hud)]">{job.company}</p>
+                        <p className="text-sm text-[color:var(--neon-hud)]">
+                          <SlashBreaks text={job.company} />
+                        </p>
                         <p className="text-sm text-[color:var(--neon-ash)]">{period}</p>
                       </header>
                       {job.description && <p className="mb-2 text-sm text-[color:var(--neon-ice)]">{job.description}</p>}

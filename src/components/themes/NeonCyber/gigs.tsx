@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type RefObjec
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -91,7 +92,7 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
       className={`${world.dialog} ${world.panel} m-auto w-[min(56rem,calc(100vw-2rem))] max-h-[calc(100vh-2rem)] overflow-y-auto bg-[color:var(--neon-glass)] p-4 text-[color:var(--neon-ice)] sm:p-6`}
     >
       <header className="mb-4 flex items-start justify-between gap-4">
-        <div>
+        <div className="min-w-0">
           <p className="text-sm uppercase tracking-[0.3em] text-[color:var(--neon-chrome-red)]">{cyber.breach}</p>
           <h2 id={headingId} className="text-lg uppercase tracking-[0.15em] text-[color:var(--neon-hud)]">
             {project.name}
@@ -250,7 +251,9 @@ function GigCard({ project, years, links }: ProjectSlot) {
       <Scannable kind="project" title={sections.projects} fact={project.role}>
         <article className="border border-[color-mix(in_srgb,var(--neon-hack)_30%,transparent)] bg-[color:var(--neon-glass)] p-4">
           <header className="mb-2 flex items-start justify-between gap-2">
-            <h3 className="text-base text-[color:var(--neon-ice)]">{project.name}</h3>
+            <h3 className="min-w-0 text-base text-[color:var(--neon-ice)]">
+              <SlashBreaks text={project.name} />
+            </h3>
             {years && <span className="shrink-0 text-sm text-[color:var(--neon-ash)]">{years}</span>}
           </header>
           <p className="text-sm text-[color:var(--neon-hud)]">{project.role}</p>

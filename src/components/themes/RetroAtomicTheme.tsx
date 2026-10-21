@@ -51,7 +51,7 @@ export default function RetroAtomicTheme() {
       <ShelterBackdrop />
       {!reducedMotion && <VaultEntrance onOpened={onOpened} />}
 
-      <header className="relative z-30 px-3 pb-8 pt-6 sm:px-6 sm:pt-10">
+      <header className="relative z-30 px-3 pb-8 pt-14 sm:px-6 sm:pt-10">
         <WristComputer booted={booted} instant={reducedMotion} />
       </header>
 

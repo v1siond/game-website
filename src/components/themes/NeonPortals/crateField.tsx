@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
@@ -173,7 +174,9 @@ function ClosedCrate({ slot, kind, state, onStrike }: { slot: ProjectSlot; kind:
         <CrateArt kind={kind} label={word} countdown={countdown} className="h-auto w-full" />
       </span>
       <span className="mx-auto mt-2 block w-[85%] max-w-[14rem] rounded-md border-2 border-[color:var(--np-void)] bg-[color:var(--np-plank-lit)] px-2 py-1 text-center">
-        <span className="block truncate text-base font-black uppercase text-[color:var(--np-void)]">{project.name}</span>
+        <span className="block text-base font-black uppercase text-[color:var(--np-void)]">
+          <SlashBreaks text={project.name} />
+        </span>
         {years && <span className="block text-sm font-bold text-[color:var(--np-void)]">{years}</span>}
       </span>
     </button>
@@ -194,8 +197,8 @@ function ProjectCard({ slot, focus }: { slot: ProjectSlot; focus: boolean }) {
       <div className="h-2 bg-[color:var(--np-orange)]" aria-hidden="true" />
       <div className="p-5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 id={`np-project-${project.id}`} className={`text-2xl leading-tight ${ui.display}`}>
-            {project.name}
+          <h3 id={`np-project-${project.id}`} className={`min-w-0 text-2xl leading-tight ${ui.display}`}>
+            <SlashBreaks text={project.name} />
           </h3>
           {years && <span className="text-sm font-bold text-[color:var(--np-gold)]">{years}</span>}
         </div>

@@ -65,7 +65,8 @@
   transform: translateY(5px);
 }
 
-/* The hologram: the period's orb always shows small; pointing or focus opens it full with its words. */
+/* The hologram: the period's orb always shows small; pointing or focus opens it full with its words. A tap
+   focuses the button (or leaves it hovered on touch browsers that keep the hover), so it opens on a phone too. */
 .hologram {
   transform: translate(-50%, 18%) scale(0.62);
   transform-origin: 50% 100%;
@@ -78,13 +79,35 @@
 }
 
 .button:hover .hologram,
-.button:focus-visible .hologram {
+.button:focus .hologram {
   transform: translate(-50%, 0) scale(1);
 }
 
 .button:hover .hologram > span:last-child,
-.button:focus-visible .hologram > span:last-child {
+.button:focus .hologram > span:last-child {
   opacity: 1;
+}
+
+/* Under 768px the hologram is wider than the row leaves beside the outer buttons, so the first one opens
+   from its left edge and the last from its right edge, inside the room instead of past it. */
+@media (max-width: 767px) {
+  .button:first-child .hologram {
+    left: 0;
+    transform: translate(0, 18%) scale(0.62);
+    transform-origin: 0 100%;
+  }
+
+  .button:last-child .hologram {
+    left: auto;
+    right: 0;
+    transform: translate(0, 18%) scale(0.62);
+    transform-origin: 100% 100%;
+  }
+
+  .button:first-child:is(:hover, :focus) .hologram,
+  .button:last-child:is(:hover, :focus) .hologram {
+    transform: translate(0, 0) scale(1);
+  }
 }
 
 .orb {

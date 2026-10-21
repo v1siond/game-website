@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
@@ -108,7 +109,9 @@ function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProp
     >
       <span className={atomic.brackets} aria-hidden="true" />
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{project.name}</h3>
+        <h3 className="min-w-0 text-lg font-bold uppercase tracking-wide text-atomic-phosphor">
+          <SlashBreaks text={project.name} />
+        </h3>
         {years && <span className="whitespace-nowrap text-sm text-atomic-yellow">{years}</span>}
       </div>
       <Part tag={hud.role}>
@@ -171,10 +174,10 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
         onClick={(event) => event.stopPropagation()}
         className={`relative max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-[1.2rem] p-6 sm:p-8 ${atomic.tube} ${atomic.powerOn}`}
       >
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
             <h3 id={titleId} className={`text-2xl font-bold uppercase tracking-wide text-atomic-phosphor ${atomic.glow}`}>
-              {project.name}
+              <SlashBreaks text={project.name} />
             </h3>
             <p className="mt-1 text-base text-atomic-yellow">{[project.role, years].filter(Boolean).join(' / ')}</p>
           </div>

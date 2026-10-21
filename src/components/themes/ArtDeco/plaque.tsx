@@ -43,9 +43,9 @@ export function Chamber({ title, depth, children }: { title: string; depth: numb
             <span key={step} className={`block border-2 border-b-0 ${plaque.step}`} style={{ '--s': step } as CSSProperties} />
           ))}
         </div>
-        <div className={`relative flex items-center gap-4 px-6 py-3 sm:px-10 ${plaque.board}`}>
+        <div className={`relative flex items-center gap-3 px-4 py-3 sm:gap-4 sm:px-10 ${plaque.board}`}>
           <DepthGauge />
-          <h2 id={id} className={`text-xl uppercase tracking-[0.3em] sm:text-2xl ${plaque.title}`}>
+          <h2 id={id} className={`text-lg uppercase tracking-[0.15em] min-[375px]:text-xl sm:text-2xl sm:tracking-[0.3em] ${plaque.title}`}>
             {title}
           </h2>
         </div>

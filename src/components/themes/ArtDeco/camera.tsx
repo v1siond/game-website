@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -102,7 +103,9 @@ function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
 
         <div className="mt-4 px-1">
           <div className="flex items-start justify-between gap-3">
-            <h3 className={`text-lg leading-snug ${camera.title}`}>{project.name}</h3>
+            <h3 className={`min-w-0 text-lg leading-snug ${camera.title}`}>
+              <SlashBreaks text={project.name} />
+            </h3>
             {years && <span className="whitespace-nowrap text-sm text-[color:var(--deco-sepia)]">{years}</span>}
           </div>
           <p className="mt-1 text-sm font-bold text-[color:var(--deco-blood)]">{project.role}</p>

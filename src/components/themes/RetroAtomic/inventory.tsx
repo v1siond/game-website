@@ -2,6 +2,7 @@
 
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { newTabName } from '@/components/cv/sectionText'
@@ -88,11 +89,13 @@ export function Holotapes({ companies }: { companies: CVData['companies'] }) {
             <div className="relative">
               <Cassette />
               <div className="absolute inset-x-[11%] top-[12%] flex h-[38%] flex-col justify-center px-2 text-atomic-poster-ink">
-                <p className="truncate text-base font-bold uppercase tracking-wide">{company.name}</p>
-                <p className="truncate text-sm">{company.tagline}</p>
+                <p className="text-base font-bold uppercase leading-tight tracking-wide">
+                  <SlashBreaks text={company.name} />
+                </p>
               </div>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-atomic-ash">{company.description}</p>
+            <p className="mt-3 text-sm font-bold text-atomic-yellow">{company.tagline}</p>
+            <p className="mt-1 text-sm leading-relaxed text-atomic-ash">{company.description}</p>
           </a>
         </li>
       ))}

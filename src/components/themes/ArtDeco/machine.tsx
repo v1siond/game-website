@@ -96,8 +96,11 @@ function ItemRow({ id, label, selected, optionProps }: ProfessionOption) {
       <svg viewBox="0 0 40 40" className="h-9 w-9 flex-shrink-0" aria-hidden="true" focusable="false">
         {GLYPHS[id](ink)}
       </svg>
-      <span className={`min-w-0 flex-1 text-base uppercase tracking-[0.12em] ${machine.rowTitle}`}>{label}</span>
-      <span className={`flex-shrink-0 px-2 py-1 text-sm ${machine.tag}`}>{professionFields[id]}</span>
+      {/* the field tag sits under the name until the row is wide enough (768px) to hold both on one line */}
+      <span className="flex min-w-0 flex-1 flex-col items-start gap-1 md:flex-row md:items-center md:gap-4">
+        <span className={`min-w-0 text-base uppercase tracking-[0.12em] md:flex-1 ${machine.rowTitle}`}>{label}</span>
+        <span className={`px-2 py-1 text-sm md:flex-shrink-0 ${machine.tag}`}>{professionFields[id]}</span>
+      </span>
       <svg viewBox="0 0 12 16" className={`h-4 w-3 flex-shrink-0 ${machine.pick}`} aria-hidden="true" focusable="false">
         <path d="M0 0 L12 8 L0 16 Z" fill={ink} />
       </svg>
