@@ -13,9 +13,8 @@ import { SlabButton } from './buttons'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
-// The projects as boons: a god's orb hangs over the list and the boons come out of it three at a time,
-// the way a god offers three, each card framed in its rarity's colour with the rarity's word on it and
-// the project's sigil. Pointing at or focusing a card flares its sigil; Choose sends the sigil up to the
+// The projects as boons: they rise out of the chest he rips open (chest.tsx) three at a time, each card
+// framed in its rarity's colour with the rarity's word on it and the project's sigil. Pointing at or focusing a card flares its sigil; Choose sends the sigil up to the
 // tray of chosen boons over the list, which counts them in words too. The rarity rule is in fates.ts.
 
 const RARITY_WORD: Record<Rarity, (labels: Labels) => string> = {
@@ -140,15 +139,6 @@ function Tray({ chosen, projects }: { chosen: readonly Project[]; projects: Proj
   )
 }
 
-function GodOrb() {
-  return (
-    <div className="relative mx-auto mb-6 h-20 w-20" aria-hidden="true">
-      <div className={`absolute inset-0 rounded-full bg-[radial-gradient(circle_at_40%_35%,var(--myth-gold-pale),var(--myth-gold)_35%,var(--myth-blood)_75%)] ${u.orb}`} />
-      <div className="absolute inset-0 rounded-full border-2 border-[var(--myth-ink)]" />
-    </div>
-  )
-}
-
 export function Boons({ projects }: { projects: Project[] }) {
   const { myth } = useLabels()
   const [chosenIds, setChosenIds] = useState<readonly string[]>([])
@@ -163,7 +153,6 @@ export function Boons({ projects }: { projects: Project[] }) {
     <>
       <Tray chosen={chosen} projects={projects} />
       <p className={`mb-6 ${u.hint}`}>{myth.boonHint}</p>
-      <GodOrb />
       <ProjectList
         projects={projects}
         className={MASONRY_LIST}

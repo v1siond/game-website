@@ -5,13 +5,14 @@ import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { Stage } from './stage'
 import { Trials } from './trials'
+import { ChainHaul } from './chains'
+import { ChestHeave } from './chest'
 import { Codex } from './codex'
 import { Boons } from './boons'
 import { Volcano } from './volcano'
 import { Keepsakes } from './keepsakes'
 import { Portraits } from './portraits'
 import { Prophecies } from './prophecies'
-import u from './underworld.module.css'
 
 // The picked profession's sections, each a stage in the descent: About in the great hall, the chambers
 // and the codex in the teal brick vaults, the volcano erupting over the boons and the keepsakes in the
@@ -24,9 +25,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
   return (
     <>
       <Stage title={titles.about} zone="hall">
-        <div className={`max-w-3xl p-6 ${u.panel} ${u.reveal}`}>
+        <ChainHaul>
           <p className="text-lg leading-relaxed">{professionalSummary.bio}</p>
-        </div>
+        </ChainHaul>
       </Stage>
 
       {sections.jobs.length > 0 && (
@@ -44,6 +45,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.projects.length > 0 && (
         <Stage title={titles.projects} zone="magma">
           <Volcano />
+          <ChestHeave />
           <Boons projects={sections.projects} />
         </Stage>
       )}

@@ -447,16 +447,28 @@
   opacity: 1;
 }
 
+/* The about's slab (chains.tsx): it slides in from the far side once he has hauled the chains in. */
+.hauled {
+  opacity: 0;
+  transform: translate3d(48px, 0, 0);
+  transition: opacity 0.6s ease 1.5s, transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) 1.4s;
+}
+
+[data-on] .hauled { opacity: 1; transform: none; }
+
+/* ---------------------------------------------------------------- the chest (chest.tsx) */
+
+/* The chest's light spreads up from its mouth; the lid turns about its own middle. */
+.chestGlow {
+  transform-origin: 178px 152px;
+  mix-blend-mode: screen;
+}
+
+.chestLid {
+  transform-origin: 178px 146px;
+}
+
 /* ---------------------------------------------------------------- the boons (boons.tsx) */
-
-.orb {
-  animation: orb-pulse 2.8s ease-in-out infinite;
-}
-
-@keyframes orb-pulse {
-  0%, 100% { transform: scale(1); opacity: 0.85; }
-  50% { transform: scale(1.08); opacity: 1; }
-}
 
 .boon[data-rarity='common'] { --rarity: var(--myth-common); }
 .boon[data-rarity='rare'] { --rarity: var(--myth-rare); }
@@ -466,9 +478,9 @@
 /* Each wave of three comes out of the orb above the list, one after the other. */
 .boon {
   opacity: 0;
-  transform: translate3d(0, -60px, 0) scale(0.8);
+  transform: translate3d(0, 60px, 0) scale(0.8);
   transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.2);
-  transition-delay: calc(var(--w) * 450ms + var(--k) * 120ms);
+  transition-delay: calc(1.2s + var(--w) * 450ms + var(--k) * 120ms);
 }
 
 [data-on] .boon { opacity: 1; transform: none; }
@@ -752,7 +764,8 @@
   .boon,
   .lavaFlow,
   .fulfilled,
-  .trayLand {
+  .trayLand,
+  .hauled {
     opacity: 1 !important;
   }
 
@@ -762,7 +775,8 @@
   .heroRest,
   .reveal,
   .boon,
-  .lavaFlow {
+  .lavaFlow,
+  .hauled {
     transform: none !important;
   }
 
