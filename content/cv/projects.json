@@ -1,0 +1,1571 @@
+{
+  "en": {
+    "projects": [
+      {
+        "id": "agency-rocket",
+        "slug": "agency-rocket",
+        "name": "Agency Rocket",
+        "role": "Built the Stripe billing engine for the suite",
+        "tagline": "Sales and illustration suite for insurance agents",
+        "description": "The Agency Rocket marketing suite (My New Retirement, Wealth United, etc.)",
+        "impact": "Testimonials cite 5x business and $50,000+ months",
+        "details": [
+          "Stripe billing: Stripe Elements, subscriptions, coupons and add ons",
+          "Illustrations created from an uploaded CSV, with PDF output",
+          "Team hierarchy views",
+          "SSO callback routes and annuity illustrations through the annuity parser"
+        ],
+        "techStack": [
+          "Vue",
+          "Quasar",
+          "GraphQL",
+          "Elixir",
+          "Phoenix"
+        ],
+        "status": "",
+        "startYear": 2018,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 1,
+        "links": {
+          "site": "https://www.agencyrocket.com",
+          "app": "https://app.agencyrocket.com",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "my-new-retirement",
+        "slug": "my-new-retirement",
+        "name": "My New Retirement",
+        "role": "Agency Rocket suite, billing",
+        "tagline": "Indexed life retirement planning for families",
+        "description": "One of the suite's three platforms",
+        "impact": "",
+        "details": [
+          "Landing pages with custom webinar content",
+          "Iframe views with a cross origin plug",
+          "French and a locale redirect"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2019,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 2,
+        "links": {
+          "site": "https://mynewretirement.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "debt-action-plan",
+        "slug": "debt-action-plan",
+        "name": "Debt Action Plan",
+        "role": "Agency Rocket suite",
+        "tagline": "Debt payoff program agents send to clients",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Made the initial setup",
+          "Add on setup parser logic",
+          "The Debt Action Plan PDF report, rendered with Puppeteer",
+          "Cloud Build and GitHub Actions deploys"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Ecto",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2021,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 3,
+        "links": {
+          "site": "https://debtactionplan.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "wealth-united",
+        "slug": "wealth-united",
+        "name": "Wealth United",
+        "role": "Agency Rocket suite, billing",
+        "tagline": "Invite only financial strategies platform",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Made the initial commit",
+          "National debt counter",
+          "Insurance product, carrier and app admin",
+          "Permissions and plugs QA flow"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2019,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 4,
+        "links": {
+          "site": "https://wealthunited.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "pmx-affiliate-marketplace",
+        "slug": "pmx-affiliate-marketplace",
+        "name": "PMX Affiliate Marketplace",
+        "role": "Engineered and launched the full stack, native Shopify integration",
+        "tagline": "Affiliate program for Shopify brands that traces every order to its affiliate",
+        "description": "Engineered, developed and launched the full-stack architecture of the affiliate marketplace, with a native integration into the Shopify ecosystem.",
+        "impact": "Top client grew affiliate ROAS from 2 to 3x to 5.5x",
+        "details": [
+          "Made the initial commits of the API and the client",
+          "Partnerships, referral links and the marketplace for brands and affiliates with OAuth",
+          "Shopify orders and channels",
+          "Commission rules, program policies, store subscriptions and plans"
+        ],
+        "techStack": [
+          "Rails",
+          "GraphQL",
+          "Next",
+          "React",
+          "TypeScript"
+        ],
+        "status": "",
+        "startYear": 2022,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 5,
+        "links": {
+          "site": "https://get-pmx.com",
+          "app": "https://pmx-app.com",
+          "store": "https://apps.shopify.com/pmx-affiliate-marketing",
+          "story": ""
+        }
+      },
+      {
+        "id": "insuradmin",
+        "slug": "insuradmin",
+        "name": "InsurAdmin",
+        "role": "CTO",
+        "tagline": "Agency management for insurance agencies and IMOs",
+        "description": "A platform managing complex carrier feeds and agency teams",
+        "impact": "Clients live in 2 to 4 weeks",
+        "details": [
+          "Made the initial commit and the setup with dashboard, htmx and onboarding",
+          "Carrier feed parser creating carrier, product, carrier appointment and apps linked to the agent",
+          "Commission files and party commissions",
+          "Team and agency dashboards, and agencies managing user subscriptions"
+        ],
+        "techStack": [
+          "Elixir",
+          "Phoenix",
+          "LiveView",
+          "htmx",
+          "PostgreSQL"
+        ],
+        "status": "",
+        "startYear": 2024,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 6,
+        "links": {
+          "site": "https://insuradmin.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "securebancard",
+        "slug": "securebancard",
+        "name": "SecureBancard",
+        "role": "The key developer: saved the launch",
+        "tagline": "Payments company for ISOs and ISVs (\"the alternative to big payment processors\"), Pioneer platform",
+        "description": "He learned and built what multi BIN needed, migrating thousands of lines and hundreds of queries and mutations from Node.js to Elixir by hand",
+        "impact": "Saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines",
+        "details": [
+          "API and web app dev setup docs, controller and route docs",
+          "Deployment process docs",
+          "Aggregation layer docs, including the Angular change that waits for the current bin before proxying calls"
+        ],
+        "techStack": [
+          "Angular",
+          "NgRx",
+          "Node",
+          "Phoenix",
+          "LiveView"
+        ],
+        "status": "",
+        "startYear": 2023,
+        "endYear": 2023,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 7,
+        "links": {
+          "site": "https://securebancard.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "pearson-channels",
+        "slug": "pearson-channels",
+        "name": "Pearson Channels",
+        "role": "Co-architect, key developer",
+        "tagline": "Pearson's video learning product, built nearly from the ground up",
+        "description": "He moved all of ClutchPrep's data into it, working, and built major features: exam preps, video lessons, shared widgets",
+        "impact": "",
+        "details": [],
+        "techStack": [],
+        "status": "",
+        "startYear": null,
+        "endYear": null,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 8,
+        "links": {
+          "site": "https://www.pearson.com/channels",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "clutchprep",
+        "slug": "clutchprep",
+        "name": "ClutchPrep",
+        "role": "Leader of the B2B system",
+        "tagline": "The B2B system that kept schools running through the pandemic",
+        "description": "Key in the work that closed the acquisition by Pearson",
+        "impact": "",
+        "details": [],
+        "techStack": [
+          "Ruby"
+        ],
+        "status": "completed",
+        "startYear": 2023,
+        "endYear": 2023,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 9,
+        "links": {
+          "site": "https://www.clutchprep.com",
+          "app": "",
+          "store": "",
+          "story": "https://refreshmiami.com/news/clutch-preps-journey-from-startup-to-exit-what-a-run-it-was/"
+        }
+      },
+      {
+        "id": "nebulith",
+        "slug": "nebulith",
+        "name": "Nebulith",
+        "role": "Creator, solo",
+        "tagline": "Game engine and map editor",
+        "description": "Generated worlds, iso and top views, tiles, units, quests",
+        "impact": "",
+        "details": [
+          "Template editor with a randomizer and isometric rendering",
+          "RPG engine: labelled multi cell assets, combat, quests, inventory",
+          "Attack animations and a collision paint tool",
+          "Railway deploy and CI on every push"
+        ],
+        "techStack": [
+          "Phoenix",
+          "LiveView",
+          "Ecto",
+          "Elixir",
+          "React"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 10,
+        "links": {
+          "site": "https://nebulith-production.up.railway.app",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "firestorm",
+        "slug": "firestorm",
+        "name": "Firestorm",
+        "role": "Rebuilt it alone in Ash",
+        "tagline": "The Elixir and Phoenix web forum",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Rebuilt Firestorm's forum domain in Ash 3",
+          "In forum moderation: pin, lock, hide, report",
+          "Feed, chat and mentions in every composer",
+          "Security fixes: the API token GraphQL field and the markdown fallback"
+        ],
+        "techStack": [
+          "Ash",
+          "AshPostgres",
+          "AshGraphql",
+          "Phoenix",
+          "LiveView"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 11,
+        "links": {
+          "site": "http://firestormforum.org",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "datepal",
+        "slug": "datepal",
+        "name": "Datepal",
+        "role": "Co PM and development lead",
+        "tagline": "",
+        "description": "Dating app where singles are invited by their coupled friends to events, rank each other and get matched into small groups to meet people from those circles.",
+        "impact": "",
+        "details": [
+          "Veriff identity and age verification",
+          "Ranking APIs with card stacks and a post huddle survey",
+          "SMS notifications on lifecycle events",
+          "Billing: prices, payments, Stripe checkout and webhooks"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Ash",
+          "Oban",
+          "LiveView",
+          "Flutter"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 12,
+        "links": {
+          "site": "https://datepals.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "bcharitable",
+        "slug": "bcharitable",
+        "name": "BCharitable",
+        "role": "Key developer",
+        "tagline": "Donor advised funds and crowdfunding",
+        "description": "Grants to over 1.4 million charities",
+        "impact": "",
+        "details": [
+          "Grant request select, receipt mailer and media gallery",
+          "Iframe support and investment strategy on the user",
+          "ACH and Stripe fixes, Stripe webhook data migration",
+          "Playwright suite replacing Jest, CI gated on rubocop and rspec"
+        ],
+        "techStack": [
+          "Rails",
+          "PostgreSQL",
+          "Sidekiq",
+          "Stripe",
+          "Tailwind"
+        ],
+        "status": "",
+        "startYear": 2021,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 13,
+        "links": {
+          "site": "https://bcharitable.org",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "truth-social",
+        "slug": "truth-social",
+        "name": "Truth Social",
+        "role": "Backend engineer, 2 to 3 months",
+        "tagline": "Helped set the initial backend architecture and features while the full team was hired",
+        "description": "Embedded as a backend engineer during the foundational architecture phases, collaborating closely with Mastodon core developers to scale and optimize the Ruby on Rails backend.",
+        "impact": "",
+        "details": [],
+        "techStack": [],
+        "status": "",
+        "startYear": 2021,
+        "endYear": 2021,
+        "current": false,
+        "featured": false,
+        "highlight": false,
+        "position": 14,
+        "links": {
+          "site": "https://truthsocial.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "grctechme",
+        "slug": "grctechme",
+        "name": "GRCTechMe",
+        "role": "CTO",
+        "tagline": "Governance, risk and compliance app",
+        "description": "He got it onto the Google Cloud Marketplace",
+        "impact": "Passing review on the first try with no fixes",
+        "details": [
+          "Google Cloud Marketplace: separate keys, redirect to the marketplace, signed push and procurement fixes",
+          "Demo side",
+          "i18n with react-i18next and a language switcher",
+          "Firestore data moved into Postgres"
+        ],
+        "techStack": [
+          "React",
+          "Vite",
+          "Tailwind",
+          "Firebase",
+          "Sequelize"
+        ],
+        "status": "",
+        "startYear": 2024,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 15,
+        "links": {
+          "site": "https://grctechme.com",
+          "app": "",
+          "store": "https://console.cloud.google.com/marketplace/product/grctechme-public/grctechme-25",
+          "story": ""
+        }
+      },
+      {
+        "id": "sillabo",
+        "slug": "sillabo",
+        "name": "Sillabo",
+        "role": "Creator",
+        "tagline": "Language learning with an AI tutor that speaks in your Spanish",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Claude adapter behind the tutor and the judge",
+          "Grading, exact at submit and judged",
+          "STT and TTS behind behaviours, with a narration render job",
+          "Billing with Stripe and RevenueCat"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir",
+          "Oban",
+          "Next",
+          "React"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 16,
+        "links": {
+          "site": "https://sillabo.up.railway.app",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      }
+    ]
+  },
+  "es": {
+    "projects": [
+      {
+        "id": "agency-rocket",
+        "slug": "agency-rocket",
+        "name": "Agency Rocket",
+        "role": "Construyó el motor de cobros con Stripe de la suite",
+        "tagline": "Suite de ventas e ilustraciones para agentes de seguros",
+        "description": "La suite de marketing Agency Rocket (My New Retirement, Wealth United, etc.)",
+        "impact": "Los testimonios citan 5x en negocio y meses de más de $50,000",
+        "details": [
+          "Cobros con Stripe: Stripe Elements, suscripciones, cupones y complementos",
+          "Ilustraciones creadas desde un CSV subido, con salida en PDF",
+          "Vistas de jerarquía de equipos",
+          "Rutas de callback SSO e ilustraciones de anualidades a través del parser de anualidades"
+        ],
+        "techStack": [
+          "Vue",
+          "Quasar",
+          "GraphQL",
+          "Elixir",
+          "Phoenix"
+        ],
+        "status": "",
+        "startYear": 2018,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 1,
+        "links": {
+          "site": "https://www.agencyrocket.com",
+          "app": "https://app.agencyrocket.com",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "my-new-retirement",
+        "slug": "my-new-retirement",
+        "name": "My New Retirement",
+        "role": "Suite Agency Rocket, cobros",
+        "tagline": "Planificación de retiro con seguros de vida indexados para familias",
+        "description": "Una de las tres plataformas de la suite",
+        "impact": "",
+        "details": [
+          "Páginas de aterrizaje con contenido de webinar a medida",
+          "Vistas en iframe con un plug de origen cruzado",
+          "Francés y una redirección por idioma"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2019,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 2,
+        "links": {
+          "site": "https://mynewretirement.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "debt-action-plan",
+        "slug": "debt-action-plan",
+        "name": "Debt Action Plan",
+        "role": "Suite Agency Rocket",
+        "tagline": "Programa de pago de deudas que los agentes envían a sus clientes",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Hizo la configuración inicial",
+          "Lógica del parser de configuración de complementos",
+          "El informe PDF de Debt Action Plan, generado con Puppeteer",
+          "Despliegues con Cloud Build y GitHub Actions"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Ecto",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2021,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 3,
+        "links": {
+          "site": "https://debtactionplan.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "wealth-united",
+        "slug": "wealth-united",
+        "name": "Wealth United",
+        "role": "Suite Agency Rocket, cobros",
+        "tagline": "Plataforma de estrategias financieras solo por invitación",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Hizo el commit inicial",
+          "Contador de la deuda nacional",
+          "Administración de productos de seguro, aseguradoras y apps",
+          "Flujo de QA de permisos y plugs"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2019,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 4,
+        "links": {
+          "site": "https://wealthunited.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "pmx-affiliate-marketplace",
+        "slug": "pmx-affiliate-marketplace",
+        "name": "PMX Affiliate Marketplace",
+        "role": "Diseñó y lanzó todo el full stack, integración nativa con Shopify",
+        "tagline": "Programa de afiliados para marcas de Shopify que asigna cada pedido a su afiliado",
+        "description": "Diseñó, desarrolló y lanzó la arquitectura full-stack del marketplace de afiliados, con una integración nativa en el ecosistema de Shopify.",
+        "impact": "El mayor cliente subió su ROAS de afiliados de 2 a 3x a 5.5x",
+        "details": [
+          "Hizo los commits iniciales de la API y del cliente",
+          "Alianzas, enlaces de referido y el marketplace para marcas y afiliados con OAuth",
+          "Pedidos y canales de Shopify",
+          "Reglas de comisión, políticas del programa, suscripciones y planes de tiendas"
+        ],
+        "techStack": [
+          "Rails",
+          "GraphQL",
+          "Next",
+          "React",
+          "TypeScript"
+        ],
+        "status": "",
+        "startYear": 2022,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 5,
+        "links": {
+          "site": "https://get-pmx.com",
+          "app": "https://pmx-app.com",
+          "store": "https://apps.shopify.com/pmx-affiliate-marketing",
+          "story": ""
+        }
+      },
+      {
+        "id": "insuradmin",
+        "slug": "insuradmin",
+        "name": "InsurAdmin",
+        "role": "CTO",
+        "tagline": "Gestión de agencias para agencias de seguros e IMOs",
+        "description": "Una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias",
+        "impact": "Clientes en marcha en 2 a 4 semanas",
+        "details": [
+          "Hizo el commit inicial y la configuración con dashboard, htmx y onboarding",
+          "Parser de feeds de aseguradoras que crea aseguradora, producto, nombramiento y apps vinculadas al agente",
+          "Archivos de comisiones y comisiones por parte",
+          "Dashboards de equipos y agencias, y agencias que gestionan las suscripciones de usuarios"
+        ],
+        "techStack": [
+          "Elixir",
+          "Phoenix",
+          "LiveView",
+          "htmx",
+          "PostgreSQL"
+        ],
+        "status": "",
+        "startYear": 2024,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 6,
+        "links": {
+          "site": "https://insuradmin.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "securebancard",
+        "slug": "securebancard",
+        "name": "SecureBancard",
+        "role": "El desarrollador clave: salvó el lanzamiento",
+        "tagline": "Empresa de pagos para ISOs e ISVs (\"la alternativa a los grandes procesadores de pago\"), plataforma Pioneer",
+        "description": "Aprendió y construyó lo que multi BIN necesitaba, migrando a mano miles de líneas y cientos de queries y mutations de Node.js a Elixir",
+        "impact": "Salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa",
+        "details": [
+          "Documentación de configuración de la API y la app web, y de controladores y rutas",
+          "Documentación del proceso de despliegue",
+          "Documentación de la capa de agregación, con el cambio en Angular que espera el bin actual antes de redirigir las llamadas"
+        ],
+        "techStack": [
+          "Angular",
+          "NgRx",
+          "Node",
+          "Phoenix",
+          "LiveView"
+        ],
+        "status": "",
+        "startYear": 2023,
+        "endYear": 2023,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 7,
+        "links": {
+          "site": "https://securebancard.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "pearson-channels",
+        "slug": "pearson-channels",
+        "name": "Pearson Channels",
+        "role": "Coarquitecto, desarrollador clave",
+        "tagline": "El producto de aprendizaje en video de Pearson, construido casi desde cero",
+        "description": "Migró todos los datos de ClutchPrep a Channels, funcionando, y construyó funcionalidades principales: preparación de exámenes, lecciones en video, widgets compartidos",
+        "impact": "",
+        "details": [],
+        "techStack": [],
+        "status": "",
+        "startYear": null,
+        "endYear": null,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 8,
+        "links": {
+          "site": "https://www.pearson.com/channels",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "clutchprep",
+        "slug": "clutchprep",
+        "name": "ClutchPrep",
+        "role": "Líder del sistema B2B",
+        "tagline": "El sistema B2B que mantuvo a las escuelas funcionando durante la pandemia",
+        "description": "Clave en el trabajo que cerró la adquisición por Pearson",
+        "impact": "",
+        "details": [],
+        "techStack": [
+          "Ruby"
+        ],
+        "status": "completed",
+        "startYear": 2023,
+        "endYear": 2023,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 9,
+        "links": {
+          "site": "https://www.clutchprep.com",
+          "app": "",
+          "store": "",
+          "story": "https://refreshmiami.com/news/clutch-preps-journey-from-startup-to-exit-what-a-run-it-was/"
+        }
+      },
+      {
+        "id": "nebulith",
+        "slug": "nebulith",
+        "name": "Nebulith",
+        "role": "Creador, en solitario",
+        "tagline": "Motor de juegos y editor de mapas",
+        "description": "Mundos generados, vistas isométrica y cenital, tiles, unidades, misiones",
+        "impact": "",
+        "details": [
+          "Editor de plantillas con aleatorizador y render isométrico",
+          "Motor RPG: assets multicelda etiquetados, combate, misiones, inventario",
+          "Animaciones de ataque y una herramienta para pintar colisiones",
+          "Despliegue en Railway y CI en cada push"
+        ],
+        "techStack": [
+          "Phoenix",
+          "LiveView",
+          "Ecto",
+          "Elixir",
+          "React"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 10,
+        "links": {
+          "site": "https://nebulith-production.up.railway.app",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "firestorm",
+        "slug": "firestorm",
+        "name": "Firestorm",
+        "role": "Lo reconstruyó él solo en Ash",
+        "tagline": "El foro web en Elixir y Phoenix",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Reconstruyó el dominio del foro de Firestorm en Ash 3",
+          "Moderación dentro del foro: fijar, bloquear, ocultar, reportar",
+          "Feed, chat y menciones en cada editor",
+          "Correcciones de seguridad: el campo GraphQL del token de API y el fallback de markdown"
+        ],
+        "techStack": [
+          "Ash",
+          "AshPostgres",
+          "AshGraphql",
+          "Phoenix",
+          "LiveView"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 11,
+        "links": {
+          "site": "http://firestormforum.org",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "datepal",
+        "slug": "datepal",
+        "name": "Datepal",
+        "role": "Co-PM y líder de desarrollo",
+        "tagline": "",
+        "description": "App de citas donde los solteros son invitados por sus amigos en pareja a eventos, se puntúan entre sí y forman pequeños grupos para conocer a gente de esos círculos.",
+        "impact": "",
+        "details": [
+          "Verificación de identidad y edad con Veriff",
+          "APIs de ranking con pilas de tarjetas y una encuesta posterior al huddle",
+          "Notificaciones SMS en eventos del ciclo de vida",
+          "Cobros: precios, pagos, Stripe checkout y webhooks"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Ash",
+          "Oban",
+          "LiveView",
+          "Flutter"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 12,
+        "links": {
+          "site": "https://datepals.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "bcharitable",
+        "slug": "bcharitable",
+        "name": "BCharitable",
+        "role": "Desarrollador clave",
+        "tagline": "Fondos asesorados por donantes y crowdfunding",
+        "description": "Donaciones a más de 1.4 millones de organizaciones benéficas",
+        "impact": "",
+        "details": [
+          "Selector de solicitudes de donación, correo de recibos y galería multimedia",
+          "Soporte de iframe y estrategia de inversión en el usuario",
+          "Correcciones de ACH y Stripe, migración de datos de webhooks de Stripe",
+          "Suite de Playwright en lugar de Jest, CI condicionado a rubocop y rspec"
+        ],
+        "techStack": [
+          "Rails",
+          "PostgreSQL",
+          "Sidekiq",
+          "Stripe",
+          "Tailwind"
+        ],
+        "status": "",
+        "startYear": 2021,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 13,
+        "links": {
+          "site": "https://bcharitable.org",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "truth-social",
+        "slug": "truth-social",
+        "name": "Truth Social",
+        "role": "Ingeniero backend, 2 a 3 meses",
+        "tagline": "Ayudó a definir la arquitectura y las funcionalidades iniciales del backend mientras se contrataba al equipo completo",
+        "description": "Integrado como ingeniero backend durante las fases de arquitectura fundacional, colaborando estrechamente con desarrolladores del núcleo de Mastodon para escalar y optimizar el backend en Ruby on Rails.",
+        "impact": "",
+        "details": [],
+        "techStack": [],
+        "status": "",
+        "startYear": 2021,
+        "endYear": 2021,
+        "current": false,
+        "featured": false,
+        "highlight": false,
+        "position": 14,
+        "links": {
+          "site": "https://truthsocial.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "grctechme",
+        "slug": "grctechme",
+        "name": "GRCTechMe",
+        "role": "CTO",
+        "tagline": "App de gobierno, riesgo y cumplimiento",
+        "description": "La llevó al Google Cloud Marketplace",
+        "impact": "Aprobó la revisión al primer intento, sin correcciones",
+        "details": [
+          "Google Cloud Marketplace: claves separadas, redirección al marketplace, push firmado y correcciones de procurement",
+          "Lado demo",
+          "i18n con react-i18next y un selector de idioma",
+          "Datos de Firestore movidos a Postgres"
+        ],
+        "techStack": [
+          "React",
+          "Vite",
+          "Tailwind",
+          "Firebase",
+          "Sequelize"
+        ],
+        "status": "",
+        "startYear": 2024,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 15,
+        "links": {
+          "site": "https://grctechme.com",
+          "app": "",
+          "store": "https://console.cloud.google.com/marketplace/product/grctechme-public/grctechme-25",
+          "story": ""
+        }
+      },
+      {
+        "id": "sillabo",
+        "slug": "sillabo",
+        "name": "Sillabo",
+        "role": "Creador",
+        "tagline": "Aprendizaje de idiomas con un tutor de IA que habla en tu español",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Adaptador de Claude detrás del tutor y del juez",
+          "Calificación, exacta al enviar y evaluada",
+          "STT y TTS detrás de behaviours, con un job de render de narración",
+          "Cobros con Stripe y RevenueCat"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir",
+          "Oban",
+          "Next",
+          "React"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 16,
+        "links": {
+          "site": "https://sillabo.up.railway.app",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      }
+    ]
+  },
+  "it": {
+    "projects": [
+      {
+        "id": "agency-rocket",
+        "slug": "agency-rocket",
+        "name": "Agency Rocket",
+        "role": "Ha costruito il motore di fatturazione Stripe della suite",
+        "tagline": "Suite di vendita e illustrazioni per agenti assicurativi",
+        "description": "La suite di marketing Agency Rocket (My New Retirement, Wealth United, ecc.)",
+        "impact": "Le testimonianze citano 5x di affari e mesi da oltre $50,000",
+        "details": [
+          "Fatturazione Stripe: Stripe Elements, abbonamenti, coupon e componenti aggiuntivi",
+          "Illustrazioni create da un CSV caricato, con output in PDF",
+          "Viste della gerarchia dei team",
+          "Route di callback SSO e illustrazioni di rendite tramite il parser delle rendite"
+        ],
+        "techStack": [
+          "Vue",
+          "Quasar",
+          "GraphQL",
+          "Elixir",
+          "Phoenix"
+        ],
+        "status": "",
+        "startYear": 2018,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 1,
+        "links": {
+          "site": "https://www.agencyrocket.com",
+          "app": "https://app.agencyrocket.com",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "my-new-retirement",
+        "slug": "my-new-retirement",
+        "name": "My New Retirement",
+        "role": "Suite Agency Rocket, fatturazione",
+        "tagline": "Pianificazione pensionistica con polizze vita indicizzate per le famiglie",
+        "description": "Una delle tre piattaforme della suite",
+        "impact": "",
+        "details": [
+          "Landing page con contenuti webinar su misura",
+          "Viste in iframe con un plug cross origin",
+          "Francese e un reindirizzamento per lingua"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2019,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 2,
+        "links": {
+          "site": "https://mynewretirement.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "debt-action-plan",
+        "slug": "debt-action-plan",
+        "name": "Debt Action Plan",
+        "role": "Suite Agency Rocket",
+        "tagline": "Programma di estinzione dei debiti che gli agenti inviano ai clienti",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Ha fatto la configurazione iniziale",
+          "Logica del parser di configurazione dei componenti aggiuntivi",
+          "Il report PDF di Debt Action Plan, generato con Puppeteer",
+          "Deploy con Cloud Build e GitHub Actions"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Ecto",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2021,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 3,
+        "links": {
+          "site": "https://debtactionplan.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "wealth-united",
+        "slug": "wealth-united",
+        "name": "Wealth United",
+        "role": "Suite Agency Rocket, fatturazione",
+        "tagline": "Piattaforma di strategie finanziarie solo su invito",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Ha fatto il commit iniziale",
+          "Contatore del debito nazionale",
+          "Amministrazione di prodotti assicurativi, compagnie e app",
+          "Flusso QA di permessi e plug"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir"
+        ],
+        "status": "",
+        "startYear": 2019,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 4,
+        "links": {
+          "site": "https://wealthunited.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "pmx-affiliate-marketplace",
+        "slug": "pmx-affiliate-marketplace",
+        "name": "PMX Affiliate Marketplace",
+        "role": "Ha progettato e lanciato l'intero full stack, integrazione nativa con Shopify",
+        "tagline": "Programma di affiliazione per brand Shopify che attribuisce ogni ordine al suo affiliato",
+        "description": "Ha progettato, sviluppato e lanciato l'architettura full-stack del marketplace di affiliazione, con un'integrazione nativa nell'ecosistema Shopify.",
+        "impact": "Il cliente principale ha portato il ROAS affiliati da 2 a 3x a 5.5x",
+        "details": [
+          "Ha fatto i commit iniziali dell'API e del client",
+          "Partnership, link di referral e il marketplace per brand e affiliati con OAuth",
+          "Ordini e canali Shopify",
+          "Regole di commissione, policy del programma, abbonamenti e piani dei negozi"
+        ],
+        "techStack": [
+          "Rails",
+          "GraphQL",
+          "Next",
+          "React",
+          "TypeScript"
+        ],
+        "status": "",
+        "startYear": 2022,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 5,
+        "links": {
+          "site": "https://get-pmx.com",
+          "app": "https://pmx-app.com",
+          "store": "https://apps.shopify.com/pmx-affiliate-marketing",
+          "story": ""
+        }
+      },
+      {
+        "id": "insuradmin",
+        "slug": "insuradmin",
+        "name": "InsurAdmin",
+        "role": "CTO",
+        "tagline": "Gestione di agenzie per agenzie assicurative e IMO",
+        "description": "Una piattaforma che gestisce feed complessi delle compagnie e team di agenzia",
+        "impact": "Clienti operativi in 2-4 settimane",
+        "details": [
+          "Ha fatto il commit iniziale e la configurazione con dashboard, htmx e onboarding",
+          "Parser dei feed delle compagnie che crea compagnia, prodotto, nomina e app collegate all'agente",
+          "File delle commissioni e commissioni per parte",
+          "Dashboard di team e agenzie, e agenzie che gestiscono gli abbonamenti degli utenti"
+        ],
+        "techStack": [
+          "Elixir",
+          "Phoenix",
+          "LiveView",
+          "htmx",
+          "PostgreSQL"
+        ],
+        "status": "",
+        "startYear": 2024,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 6,
+        "links": {
+          "site": "https://insuradmin.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "securebancard",
+        "slug": "securebancard",
+        "name": "SecureBancard",
+        "role": "Lo sviluppatore chiave: ha salvato il lancio",
+        "tagline": "Società di pagamenti per ISO e ISV (\"l'alternativa ai grandi processori di pagamento\"), piattaforma Pioneer",
+        "description": "Ha imparato e costruito ciò che serviva al multi BIN, migrando a mano migliaia di righe e centinaia di query e mutation da Node.js a Elixir",
+        "impact": "Ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide",
+        "details": [
+          "Documentazione di setup dell'API e della web app, e di controller e route",
+          "Documentazione del processo di deploy",
+          "Documentazione del livello di aggregazione, con la modifica Angular che attende il bin corrente prima di inoltrare le chiamate"
+        ],
+        "techStack": [
+          "Angular",
+          "NgRx",
+          "Node",
+          "Phoenix",
+          "LiveView"
+        ],
+        "status": "",
+        "startYear": 2023,
+        "endYear": 2023,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 7,
+        "links": {
+          "site": "https://securebancard.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "pearson-channels",
+        "slug": "pearson-channels",
+        "name": "Pearson Channels",
+        "role": "Co-architetto, sviluppatore chiave",
+        "tagline": "Il prodotto di apprendimento video di Pearson, costruito quasi da zero",
+        "description": "Ha migrato in Channels tutti i dati di ClutchPrep, funzionanti, e ha costruito funzionalità principali: preparazione agli esami, video lezioni, widget condivisi",
+        "impact": "",
+        "details": [],
+        "techStack": [],
+        "status": "",
+        "startYear": null,
+        "endYear": null,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 8,
+        "links": {
+          "site": "https://www.pearson.com/channels",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "clutchprep",
+        "slug": "clutchprep",
+        "name": "ClutchPrep",
+        "role": "Responsabile del sistema B2B",
+        "tagline": "Il sistema B2B che ha tenuto aperte le scuole durante la pandemia",
+        "description": "Chiave nel lavoro che ha chiuso l'acquisizione da parte di Pearson",
+        "impact": "",
+        "details": [],
+        "techStack": [
+          "Ruby"
+        ],
+        "status": "completed",
+        "startYear": 2023,
+        "endYear": 2023,
+        "current": false,
+        "featured": true,
+        "highlight": false,
+        "position": 9,
+        "links": {
+          "site": "https://www.clutchprep.com",
+          "app": "",
+          "store": "",
+          "story": "https://refreshmiami.com/news/clutch-preps-journey-from-startup-to-exit-what-a-run-it-was/"
+        }
+      },
+      {
+        "id": "nebulith",
+        "slug": "nebulith",
+        "name": "Nebulith",
+        "role": "Creatore, da solo",
+        "tagline": "Motore di gioco ed editor di mappe",
+        "description": "Mondi generati, viste isometrica e dall'alto, tile, unità, missioni",
+        "impact": "",
+        "details": [
+          "Editor di template con randomizzatore e rendering isometrico",
+          "Motore RPG: asset multicella etichettati, combattimento, missioni, inventario",
+          "Animazioni di attacco e uno strumento per dipingere le collisioni",
+          "Deploy su Railway e CI a ogni push"
+        ],
+        "techStack": [
+          "Phoenix",
+          "LiveView",
+          "Ecto",
+          "Elixir",
+          "React"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 10,
+        "links": {
+          "site": "https://nebulith-production.up.railway.app",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "firestorm",
+        "slug": "firestorm",
+        "name": "Firestorm",
+        "role": "L'ha ricostruito da solo in Ash",
+        "tagline": "Il forum web in Elixir e Phoenix",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Ha ricostruito il dominio del forum di Firestorm in Ash 3",
+          "Moderazione nel forum: fissare, bloccare, nascondere, segnalare",
+          "Feed, chat e menzioni in ogni editor",
+          "Correzioni di sicurezza: il campo GraphQL del token API e il fallback markdown"
+        ],
+        "techStack": [
+          "Ash",
+          "AshPostgres",
+          "AshGraphql",
+          "Phoenix",
+          "LiveView"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 11,
+        "links": {
+          "site": "http://firestormforum.org",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "datepal",
+        "slug": "datepal",
+        "name": "Datepal",
+        "role": "Co-PM e responsabile dello sviluppo",
+        "tagline": "",
+        "description": "App di incontri in cui i single vengono invitati dai loro amici in coppia a eventi, si valutano a vicenda e vengono abbinati in piccoli gruppi per conoscere persone di quelle cerchie.",
+        "impact": "",
+        "details": [
+          "Verifica dell'identità e dell'età con Veriff",
+          "API di ranking con pile di carte e un sondaggio dopo l'huddle",
+          "Notifiche SMS sugli eventi del ciclo di vita",
+          "Fatturazione: prezzi, pagamenti, Stripe checkout e webhook"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Ash",
+          "Oban",
+          "LiveView",
+          "Flutter"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 12,
+        "links": {
+          "site": "https://datepals.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "bcharitable",
+        "slug": "bcharitable",
+        "name": "BCharitable",
+        "role": "Sviluppatore chiave",
+        "tagline": "Fondi consigliati dai donatori e crowdfunding",
+        "description": "Donazioni a oltre 1.4 milioni di enti di beneficenza",
+        "impact": "",
+        "details": [
+          "Selettore delle richieste di donazione, mailer delle ricevute e galleria multimediale",
+          "Supporto iframe e strategia di investimento sull'utente",
+          "Correzioni ACH e Stripe, migrazione dei dati dei webhook Stripe",
+          "Suite Playwright al posto di Jest, CI vincolata a rubocop e rspec"
+        ],
+        "techStack": [
+          "Rails",
+          "PostgreSQL",
+          "Sidekiq",
+          "Stripe",
+          "Tailwind"
+        ],
+        "status": "",
+        "startYear": 2021,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 13,
+        "links": {
+          "site": "https://bcharitable.org",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "truth-social",
+        "slug": "truth-social",
+        "name": "Truth Social",
+        "role": "Ingegnere backend, 2-3 mesi",
+        "tagline": "Ha contribuito all'architettura e alle funzionalità iniziali del backend mentre si assumeva il team completo",
+        "description": "Inserito come ingegnere backend durante le fasi di architettura iniziale, collaborando a stretto contatto con gli sviluppatori del core di Mastodon per scalare e ottimizzare il backend in Ruby on Rails.",
+        "impact": "",
+        "details": [],
+        "techStack": [],
+        "status": "",
+        "startYear": 2021,
+        "endYear": 2021,
+        "current": false,
+        "featured": false,
+        "highlight": false,
+        "position": 14,
+        "links": {
+          "site": "https://truthsocial.com",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      },
+      {
+        "id": "grctechme",
+        "slug": "grctechme",
+        "name": "GRCTechMe",
+        "role": "CTO",
+        "tagline": "App di governance, rischio e conformità",
+        "description": "L'ha portata sul Google Cloud Marketplace",
+        "impact": "Ha superato la revisione al primo tentativo, senza correzioni",
+        "details": [
+          "Google Cloud Marketplace: chiavi separate, reindirizzamento al marketplace, push firmato e correzioni del procurement",
+          "Lato demo",
+          "i18n con react-i18next e un selettore di lingua",
+          "Dati di Firestore spostati in Postgres"
+        ],
+        "techStack": [
+          "React",
+          "Vite",
+          "Tailwind",
+          "Firebase",
+          "Sequelize"
+        ],
+        "status": "",
+        "startYear": 2024,
+        "endYear": null,
+        "current": true,
+        "featured": true,
+        "highlight": false,
+        "position": 15,
+        "links": {
+          "site": "https://grctechme.com",
+          "app": "",
+          "store": "https://console.cloud.google.com/marketplace/product/grctechme-public/grctechme-25",
+          "story": ""
+        }
+      },
+      {
+        "id": "sillabo",
+        "slug": "sillabo",
+        "name": "Sillabo",
+        "role": "Creatore",
+        "tagline": "Apprendimento delle lingue con un tutor IA che parla nel tuo spagnolo",
+        "description": "",
+        "impact": "",
+        "details": [
+          "Adattatore Claude dietro il tutor e il giudice",
+          "Valutazione, esatta all'invio e giudicata",
+          "STT e TTS dietro behaviour, con un job di rendering della narrazione",
+          "Fatturazione con Stripe e RevenueCat"
+        ],
+        "techStack": [
+          "Phoenix",
+          "Elixir",
+          "Oban",
+          "Next",
+          "React"
+        ],
+        "status": "",
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "featured": false,
+        "highlight": false,
+        "position": 16,
+        "links": {
+          "site": "https://sillabo.up.railway.app",
+          "app": "",
+          "store": "",
+          "story": ""
+        }
+      }
+    ]
+  }
+}

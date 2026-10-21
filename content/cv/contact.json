@@ -1,0 +1,23 @@
+{
+  "en": {
+    "contact": {
+      "email": "alexanderpulido81@gmail.com",
+      "linkedin": "https://www.linkedin.com/in/alexander-pulido-1aa24b134/",
+      "line": "Always interested in hearing new ideas and proposals"
+    }
+  },
+  "es": {
+    "contact": {
+      "email": "alexanderpulido81@gmail.com",
+      "linkedin": "https://www.linkedin.com/in/alexander-pulido-1aa24b134/",
+      "line": "Siempre interesado en escuchar nuevas ideas y propuestas"
+    }
+  },
+  "it": {
+    "contact": {
+      "email": "alexanderpulido81@gmail.com",
+      "linkedin": "https://www.linkedin.com/in/alexander-pulido-1aa24b134/",
+      "line": "Sempre interessato ad ascoltare nuove idee e proposte"
+    }
+  }
+}

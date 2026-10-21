@@ -1,0 +1,140 @@
+{
+  "en": {
+    "companies": [
+      {
+        "id": "dba",
+        "name": "DBA Consulting",
+        "tagline": "Enterprise Software Solutions",
+        "description": "Custom software development, system architecture, and technical consulting for businesses of all sizes.",
+        "url": "https://dbadbadba.com/",
+        "services": [
+          "Custom Software Development",
+          "System Architecture",
+          "Technical Consulting",
+          "Cloud Infrastructure"
+        ],
+        "icon": "🏢"
+      },
+      {
+        "id": "pmx",
+        "name": "PMX",
+        "tagline": "Affiliate Marketplace for E-commerce",
+        "description": "Full marketing affiliates platform with payment system and Shopify integration. Connect brands with affiliates seamlessly.",
+        "url": "https://getpmx.com",
+        "services": [
+          "Shopify Integration",
+          "Affiliate Management",
+          "Payment Processing",
+          "Analytics Dashboard"
+        ],
+        "icon": "🛒"
+      },
+      {
+        "id": "grctechme",
+        "name": "GRCTechMe",
+        "tagline": "Audit & Compliance Technology",
+        "description": "Digital audit platform for lawyers and agencies. Google Marketplace approved. Streamline compliance workflows.",
+        "url": "https://grctechme.com/",
+        "services": [
+          "Digital Audits",
+          "Compliance Management",
+          "Google Workspace Integration",
+          "Automated Reporting"
+        ],
+        "icon": "📋"
+      }
+    ]
+  },
+  "es": {
+    "companies": [
+      {
+        "id": "dba",
+        "name": "DBA Consulting",
+        "tagline": "Soluciones de software empresarial",
+        "description": "Desarrollo de software a medida, arquitectura de sistemas y consultoría técnica para empresas de todos los tamaños.",
+        "url": "https://dbadbadba.com/",
+        "services": [
+          "Desarrollo de software a medida",
+          "Arquitectura de sistemas",
+          "Consultoría técnica",
+          "Infraestructura en la nube"
+        ],
+        "icon": "🏢"
+      },
+      {
+        "id": "pmx",
+        "name": "PMX",
+        "tagline": "Marketplace de afiliados para e-commerce",
+        "description": "Plataforma completa de marketing de afiliados con sistema de pagos e integración con Shopify. Conecta marcas con afiliados sin fricciones.",
+        "url": "https://getpmx.com",
+        "services": [
+          "Integración con Shopify",
+          "Gestión de afiliados",
+          "Procesamiento de pagos",
+          "Panel de analítica"
+        ],
+        "icon": "🛒"
+      },
+      {
+        "id": "grctechme",
+        "name": "GRCTechMe",
+        "tagline": "Tecnología de auditoría y cumplimiento",
+        "description": "Plataforma de auditoría digital para abogados y agencias. Aprobada en Google Marketplace. Agiliza los flujos de cumplimiento.",
+        "url": "https://grctechme.com/",
+        "services": [
+          "Auditorías digitales",
+          "Gestión del cumplimiento",
+          "Integración con Google Workspace",
+          "Informes automatizados"
+        ],
+        "icon": "📋"
+      }
+    ]
+  },
+  "it": {
+    "companies": [
+      {
+        "id": "dba",
+        "name": "DBA Consulting",
+        "tagline": "Soluzioni software aziendali",
+        "description": "Sviluppo software su misura, architettura di sistemi e consulenza tecnica per aziende di ogni dimensione.",
+        "url": "https://dbadbadba.com/",
+        "services": [
+          "Sviluppo software su misura",
+          "Architettura di sistemi",
+          "Consulenza tecnica",
+          "Infrastruttura cloud"
+        ],
+        "icon": "🏢"
+      },
+      {
+        "id": "pmx",
+        "name": "PMX",
+        "tagline": "Marketplace di affiliazione per e-commerce",
+        "description": "Piattaforma completa di marketing di affiliazione con sistema di pagamento e integrazione Shopify. Collega i brand agli affiliati senza attriti.",
+        "url": "https://getpmx.com",
+        "services": [
+          "Integrazione Shopify",
+          "Gestione affiliati",
+          "Elaborazione pagamenti",
+          "Dashboard analitica"
+        ],
+        "icon": "🛒"
+      },
+      {
+        "id": "grctechme",
+        "name": "GRCTechMe",
+        "tagline": "Tecnologia per audit e conformità",
+        "description": "Piattaforma di audit digitale per avvocati e agenzie. Approvata su Google Marketplace. Semplifica i flussi di conformità.",
+        "url": "https://grctechme.com/",
+        "services": [
+          "Audit digitali",
+          "Gestione della conformità",
+          "Integrazione Google Workspace",
+          "Report automatizzati"
+        ],
+        "icon": "📋"
+      }
+    ]
+  }
+}

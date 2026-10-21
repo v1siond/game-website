@@ -1,0 +1,243 @@
+# Decap CMS for the CV content in content/cv. Each file holds en, es and it side by side
+# (i18n single_file). Text fields are translated per locale; ids, links, dates and numbers are
+# entered once in English and duplicated to the other locales. Decap only takes a boolean i18n on
+# list and object widgets, so lists of plain values (skills, stack, items) are kept per locale.
+backend:
+  name: github
+  repo: v1siond/game-website
+  branch: main
+  # base_url: https://<production host>   # GitHub OAuth route, set up in T3b
+  # auth_endpoint: api/decap-auth
+
+# `npx decap-server` (port 8081) lets the local admin write the files directly.
+local_backend: true
+
+media_folder: public/cv-media
+public_folder: /cv-media
+
+i18n:
+  structure: single_file
+  locales: [en, es, it]
+  default_locale: en
+
+x-text: &text { widget: string, i18n: true, required: false }
+x-prose: &prose { widget: text, i18n: true, required: false }
+x-fixed: &fixed { widget: string, i18n: duplicate, required: false }
+x-year: &whole { widget: number, value_type: int, i18n: duplicate, required: false }
+x-flag: &flag { widget: boolean, i18n: duplicate, required: false, default: false }
+
+collections:
+  - name: cv
+    label: CV
+    format: json
+    editor: { preview: false }
+    i18n: true
+    files:
+      - name: summary
+        label: Professional summary
+        file: content/cv/summary.json
+        i18n: true
+        fields:
+          - label: Professional summary
+            name: professionalSummary
+            widget: object
+            i18n: true
+            fields:
+              - { <<: *text, label: Headline, name: headline }
+              - { <<: *text, label: Tagline, name: tagline }
+              - { <<: *prose, label: Bio, name: bio }
+              - { label: Highlights, name: highlights, widget: list, i18n: true, field: { <<: *prose, label: Highlight, name: highlight } }
+
+      - name: contact
+        label: Contact
+        file: content/cv/contact.json
+        i18n: true
+        fields:
+          - label: Contact
+            name: contact
+            widget: object
+            i18n: true
+            fields:
+              - { <<: *fixed, label: Email, name: email }
+              - { <<: *fixed, label: LinkedIn, name: linkedin }
+              - { <<: *text, label: Line, name: line }
+
+      - name: experience
+        label: Work experience
+        file: content/cv/experience.json
+        i18n: true
+        fields:
+          - label: Jobs (newest first)
+            name: workExperience
+            widget: list
+            i18n: true
+            summary: '{{fields.title}}, {{fields.company}}'
+            fields:
+              - { <<: *fixed, label: Id, name: id }
+              - { <<: *text, label: Title, name: title }
+              - { <<: *fixed, label: Company, name: company }
+              - { <<: *text, label: Employment, name: employment }
+              - { <<: *text, label: Location, name: location }
+              - { <<: *fixed, label: Start date (YYYY-MM-DD), name: startDate }
+              - { <<: *fixed, label: End date (YYYY-MM-DD), name: endDate }
+              - { <<: *flag, label: Current, name: current }
+              - { <<: *flag, label: 'Highlight: a big win, shown even when older than 5 years', name: highlight }
+              - { <<: *prose, label: Description, name: description }
+              - { label: Highlights, name: highlights, widget: list, i18n: true, required: false, field: { <<: *prose, label: Highlight, name: highlight } }
+              - { label: Skills, name: skills, widget: list, i18n: true, required: false }
+
+      - name: projects
+        label: Projects
+        file: content/cv/projects.json
+        i18n: true
+        fields:
+          - label: Projects (by position)
+            name: projects
+            widget: list
+            i18n: true
+            summary: '{{fields.position}}. {{fields.name}}'
+            fields:
+              - { <<: *fixed, label: Id, name: id }
+              - { <<: *fixed, label: Slug, name: slug }
+              - { <<: *fixed, label: Name, name: name }
+              - { <<: *text, label: His role, name: role }
+              - { <<: *text, label: Tagline, name: tagline }
+              - { <<: *prose, label: Description, name: description }
+              - { <<: *prose, label: Impact, name: impact }
+              - { label: Details, name: details, widget: list, i18n: true, required: false, field: { <<: *prose, label: Detail, name: detail } }
+              - { label: Tech stack, name: techStack, widget: list, i18n: true, required: false }
+              - { <<: *fixed, label: Status, name: status }
+              - { <<: *whole, label: Start year, name: startYear }
+              - { <<: *whole, label: End year, name: endYear }
+              - { <<: *flag, label: Current, name: current }
+              - { <<: *flag, label: Featured, name: featured }
+              - { <<: *flag, label: 'Highlight: a big win, shown even when older than 5 years', name: highlight }
+              - { <<: *whole, label: Position, name: position }
+              - label: Links
+                name: links
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *fixed, label: Site, name: site }
+                  - { <<: *fixed, label: App, name: app }
+                  - { <<: *fixed, label: Store, name: store }
+                  - { <<: *fixed, label: Story, name: story }
+
+      - name: bands
+        label: Bands
+        file: content/cv/bands.json
+        i18n: true
+        fields:
+          - label: Musician
+            name: musician
+            widget: object
+            i18n: true
+            fields:
+              - { <<: *whole, label: Years playing, name: yearsPlaying }
+              - { <<: *whole, label: Playing since, name: since }
+              - { <<: *text, label: Local bands line, name: line }
+          - label: Bands
+            name: bands
+            widget: list
+            i18n: true
+            summary: '{{fields.name}}'
+            fields:
+              - { <<: *fixed, label: Id, name: id }
+              - { <<: *fixed, label: Slug, name: slug }
+              - { <<: *fixed, label: Name, name: name }
+              - { <<: *text, label: Role, name: role }
+              - { <<: *whole, label: Years, name: years }
+              - { <<: *whole, label: Start year, name: startYear }
+              - { <<: *whole, label: End year, name: endYear }
+              - { <<: *flag, label: Current, name: current }
+              - { <<: *fixed, label: Release, name: release }
+              - { <<: *fixed, label: Link, name: url }
+
+      - name: martial-arts
+        label: Martial arts
+        file: content/cv/martial-arts.json
+        i18n: true
+        fields:
+          - label: Martial arts
+            name: martialArts
+            widget: object
+            i18n: true
+            fields:
+              - label: Primary
+                name: primary
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *fixed, label: Discipline, name: discipline }
+                  - { <<: *text, label: Title, name: title }
+                  - { <<: *fixed, label: Dojo, name: dojo }
+                  - { <<: *text, label: Place, name: place }
+                  - { <<: *fixed, label: Founder, name: founder }
+                  - { <<: *text, label: Rank, name: rank }
+                  - { <<: *whole, label: Years training, name: yearsTraining }
+                  - { <<: *whole, label: Years teaching, name: yearsTeaching }
+                  - { <<: *flag, label: Current, name: current }
+                  - { label: Achievements, name: achievements, widget: list, i18n: true, required: false, field: { <<: *prose, label: Achievement, name: achievement } }
+                  - { <<: *text, label: Now, name: now }
+              - label: Training
+                name: training
+                widget: list
+                i18n: true
+                fields:
+                  - { <<: *fixed, label: Discipline, name: discipline }
+                  - { <<: *fixed, label: Academy, name: academy }
+                  - { <<: *fixed, label: Instructor, name: instructor }
+                  - { <<: *flag, label: Current, name: current }
+              - { <<: *prose, label: Background, name: background }
+
+      - name: companies
+        label: Companies
+        file: content/cv/companies.json
+        i18n: true
+        fields:
+          - label: Companies
+            name: companies
+            widget: list
+            i18n: true
+            summary: '{{fields.name}}'
+            fields:
+              - { <<: *fixed, label: Id, name: id }
+              - { <<: *fixed, label: Name, name: name }
+              - { <<: *text, label: Tagline, name: tagline }
+              - { <<: *prose, label: Description, name: description }
+              - { <<: *fixed, label: Link, name: url }
+              - { label: Services, name: services, widget: list, i18n: true, required: false }
+              - { <<: *fixed, label: Icon, name: icon }
+
+      - name: roles
+        label: Current roles
+        file: content/cv/roles.json
+        i18n: true
+        fields:
+          - label: Current roles
+            name: currentRoles
+            widget: list
+            i18n: true
+            summary: '{{fields.title}}, {{fields.company}}'
+            fields:
+              - { <<: *fixed, label: Id, name: id }
+              - { <<: *text, label: Title, name: title }
+              - { <<: *fixed, label: Company, name: company }
+              - { <<: *fixed, label: Type (employment or leadership), name: type }
+              - { <<: *flag, label: Current, name: current }
+              - { <<: *prose, label: Description, name: description }
+
+      - name: tech-stack
+        label: Tech stack
+        file: content/cv/tech-stack.json
+        i18n: true
+        fields:
+          - label: Categories
+            name: techStack
+            widget: list
+            i18n: true
+            summary: '{{fields.name}}'
+            fields:
+              - { <<: *text, label: Name, name: name }
+              - { <<: *fixed, label: Icon, name: icon }
+              - { label: Items, name: items, widget: list, i18n: true, required: false }

@@ -1,0 +1,86 @@
+{
+  "en": {
+    "currentRoles": [
+      {
+        "id": "dba",
+        "title": "Senior Staff Engineer",
+        "company": "DBA",
+        "type": "employment",
+        "current": true,
+        "description": "Enterprise software development for insurance and financial services."
+      },
+      {
+        "id": "pmx",
+        "title": "CTO",
+        "company": "PMX",
+        "type": "leadership",
+        "current": true,
+        "description": "Leading technical strategy for affiliate marketplace platform."
+      },
+      {
+        "id": "grctechme",
+        "title": "CTO",
+        "company": "GRCTechMe",
+        "type": "leadership",
+        "current": true,
+        "description": "Building audit and compliance technology for legal professionals."
+      }
+    ]
+  },
+  "es": {
+    "currentRoles": [
+      {
+        "id": "dba",
+        "title": "Ingeniero Senior Staff",
+        "company": "DBA",
+        "type": "employment",
+        "current": true,
+        "description": "Desarrollo de software empresarial para seguros y servicios financieros."
+      },
+      {
+        "id": "pmx",
+        "title": "CTO",
+        "company": "PMX",
+        "type": "leadership",
+        "current": true,
+        "description": "Lidera la estrategia técnica de la plataforma de marketplace de afiliados."
+      },
+      {
+        "id": "grctechme",
+        "title": "CTO",
+        "company": "GRCTechMe",
+        "type": "leadership",
+        "current": true,
+        "description": "Construye tecnología de auditoría y cumplimiento para profesionales del derecho."
+      }
+    ]
+  },
+  "it": {
+    "currentRoles": [
+      {
+        "id": "dba",
+        "title": "Ingegnere Senior Staff",
+        "company": "DBA",
+        "type": "employment",
+        "current": true,
+        "description": "Sviluppo software aziendale per assicurazioni e servizi finanziari."
+      },
+      {
+        "id": "pmx",
+        "title": "CTO",
+        "company": "PMX",
+        "type": "leadership",
+        "current": true,
+        "description": "Guida la strategia tecnica della piattaforma di marketplace di affiliazione."
+      },
+      {
+        "id": "grctechme",
+        "title": "CTO",
+        "company": "GRCTechMe",
+        "type": "leadership",
+        "current": true,
+        "description": "Costruisce tecnologia per audit e conformità per professionisti legali."
+      }
+    ]
+  }
+}

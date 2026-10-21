@@ -1,0 +1,173 @@
+{
+  "en": {
+    "musician": {
+      "yearsPlaying": 15,
+      "since": 2011,
+      "line": "Many local bands, performing at bars and private events, like Retrogroove, Arpegio and other party bands"
+    },
+    "bands": [
+      {
+        "id": "eon",
+        "slug": "eon",
+        "name": "Eon",
+        "role": "Drummer",
+        "years": 12,
+        "startYear": 2014,
+        "endYear": null,
+        "current": true,
+        "release": "",
+        "url": "https://eonband.net"
+      },
+      {
+        "id": "behated-reign",
+        "slug": "behated-reign",
+        "name": "Behated Reign",
+        "role": "Drummer",
+        "years": 2,
+        "startYear": null,
+        "endYear": null,
+        "current": false,
+        "release": "Encounters of Worst Kind",
+        "url": ""
+      },
+      {
+        "id": "en-carne-muerta",
+        "slug": "en-carne-muerta",
+        "name": "En Carne Muerta",
+        "role": "Main drummer",
+        "years": 2,
+        "startYear": 2016,
+        "endYear": 2018,
+        "current": false,
+        "release": "",
+        "url": ""
+      },
+      {
+        "id": "zero-nexus",
+        "slug": "zero-nexus",
+        "name": "Zero Nexus",
+        "role": "Drummer",
+        "years": null,
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "release": "",
+        "url": ""
+      }
+    ]
+  },
+  "es": {
+    "musician": {
+      "yearsPlaying": 15,
+      "since": 2011,
+      "line": "Muchas bandas locales, tocando en bares y eventos privados, como Retrogroove, Arpegio y otras bandas de fiesta"
+    },
+    "bands": [
+      {
+        "id": "eon",
+        "slug": "eon",
+        "name": "Eon",
+        "role": "Baterista",
+        "years": 12,
+        "startYear": 2014,
+        "endYear": null,
+        "current": true,
+        "release": "",
+        "url": "https://eonband.net"
+      },
+      {
+        "id": "behated-reign",
+        "slug": "behated-reign",
+        "name": "Behated Reign",
+        "role": "Baterista",
+        "years": 2,
+        "startYear": null,
+        "endYear": null,
+        "current": false,
+        "release": "Encounters of Worst Kind",
+        "url": ""
+      },
+      {
+        "id": "en-carne-muerta",
+        "slug": "en-carne-muerta",
+        "name": "En Carne Muerta",
+        "role": "Baterista principal",
+        "years": 2,
+        "startYear": 2016,
+        "endYear": 2018,
+        "current": false,
+        "release": "",
+        "url": ""
+      },
+      {
+        "id": "zero-nexus",
+        "slug": "zero-nexus",
+        "name": "Zero Nexus",
+        "role": "Baterista",
+        "years": null,
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "release": "",
+        "url": ""
+      }
+    ]
+  },
+  "it": {
+    "musician": {
+      "yearsPlaying": 15,
+      "since": 2011,
+      "line": "Molte band locali, suonando in bar ed eventi privati, come Retrogroove, Arpegio e altre band da festa"
+    },
+    "bands": [
+      {
+        "id": "eon",
+        "slug": "eon",
+        "name": "Eon",
+        "role": "Batterista",
+        "years": 12,
+        "startYear": 2014,
+        "endYear": null,
+        "current": true,
+        "release": "",
+        "url": "https://eonband.net"
+      },
+      {
+        "id": "behated-reign",
+        "slug": "behated-reign",
+        "name": "Behated Reign",
+        "role": "Batterista",
+        "years": 2,
+        "startYear": null,
+        "endYear": null,
+        "current": false,
+        "release": "Encounters of Worst Kind",
+        "url": ""
+      },
+      {
+        "id": "en-carne-muerta",
+        "slug": "en-carne-muerta",
+        "name": "En Carne Muerta",
+        "role": "Batterista principale",
+        "years": 2,
+        "startYear": 2016,
+        "endYear": 2018,
+        "current": false,
+        "release": "",
+        "url": ""
+      },
+      {
+        "id": "zero-nexus",
+        "slug": "zero-nexus",
+        "name": "Zero Nexus",
+        "role": "Batterista",
+        "years": null,
+        "startYear": 2026,
+        "endYear": null,
+        "current": true,
+        "release": "",
+        "url": ""
+      }
+    ]
+  }
+}

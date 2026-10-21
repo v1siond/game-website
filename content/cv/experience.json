@@ -1,0 +1,452 @@
+{
+  "en": {
+    "workExperience": [
+      {
+        "id": "dba-staff",
+        "highlight": false,
+        "endDate": "",
+        "current": true,
+        "employment": "Independent",
+        "description": "Long-term core engineer and architect trusted by high-profile enterprise companies and scaling startups to lead critical system overhauls, compliance-driven deployments, and zero-to-one product development.",
+        "highlights": [
+          "Truth Social (foundational stages): embedded as a backend engineer during the foundational architecture phases, collaborating closely with Mastodon core developers to scale and optimize the Ruby on Rails backend.",
+          "InsurAdmin and Agency Rocket (InsureTech automation): developed InsurAdmin from scratch, a platform managing complex carrier feeds and agency teams. Engineered core automation parsers (Annuity, IUL, Whole Life) and fully integrated the Stripe billing engine for the Agency Rocket marketing suite (My New Retirement, Wealth United, etc.).",
+          "PMX Affiliate Marketplace: engineered, developed and launched the full-stack architecture of the affiliate marketplace, with a native integration into the Shopify ecosystem.",
+          "SecureBancard (critical project rescue): saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines."
+        ],
+        "skills": [],
+        "title": "Senior Staff Software Engineer",
+        "company": "Daring Bit Assembly, Inc (DBA)",
+        "location": "United States, remote",
+        "startDate": "2023-12-01"
+      },
+      {
+        "id": "pearson",
+        "highlight": false,
+        "endDate": "2023-12-01",
+        "current": false,
+        "employment": "Full time",
+        "description": "Pearson Channels: co-architected Channels nearly from the ground up with the core team.",
+        "highlights": [
+          "Designed and executed the data migration strategy, linking legacy SQL data into Pearson's enterprise NoSQL infrastructure.",
+          "He moved all of ClutchPrep's data into it, working, and built major features: exam preps, video lessons, shared widgets"
+        ],
+        "skills": [
+          "AWS Lambda",
+          "AWS"
+        ],
+        "title": "Senior Full Stack Engineer",
+        "company": "Pearson",
+        "location": "United States, remote",
+        "startDate": "2022-04-01"
+      },
+      {
+        "id": "clutchprep",
+        "highlight": true,
+        "endDate": "2022-04-01",
+        "current": false,
+        "employment": "Full time",
+        "description": "Engineering leader for the Clutch Prep B2B product, driving the technical milestones that led to the acquisition by Pearson.",
+        "highlights": [
+          "Led the B2B system that kept schools running through the pandemic",
+          "Key in the work that closed the acquisition by Pearson"
+        ],
+        "skills": [
+          "AWS Lambda"
+        ],
+        "title": "Full Stack Engineer",
+        "company": "Clutch Prep",
+        "location": "Miami-Fort Lauderdale",
+        "startDate": "2019-08-01"
+      },
+      {
+        "id": "smoothterminal",
+        "highlight": true,
+        "endDate": "2019-09-01",
+        "current": false,
+        "employment": "Full time",
+        "description": "An online learning platform tailored for software developers and busy technical professionals. Both a developer of the platforms and an expert teacher, usually sharing frontend tricks and latest trends",
+        "highlights": [
+          "One of my most popular video series taught how to build pixel art characters with shadows and css when css was still very limited",
+          "Taught how to migrate the code from css to sass and stylus, taught ITCSS and how to work with javascript and handle WCAG AAA audits",
+          "How to work to get pixel perfect design implementations when it was hard and figma wasn't a thing"
+        ],
+        "skills": [],
+        "title": "Senior Full Stack Developer",
+        "company": "SmoothTerminal",
+        "location": "United States",
+        "startDate": "2017-07-01"
+      },
+      {
+        "id": "dba-frontend",
+        "highlight": true,
+        "endDate": "2019-09-01",
+        "current": false,
+        "employment": "Full time",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Senior Frontend Developer",
+        "company": "Daring Bit Assembly, Inc",
+        "location": "United States, remote",
+        "startDate": "2017-07-01"
+      },
+      {
+        "id": "solutionrus",
+        "highlight": false,
+        "endDate": "2017-02-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Fullstack Developer",
+        "company": "SolutionRus",
+        "location": "Florida",
+        "startDate": "2016-11-01"
+      },
+      {
+        "id": "altomi",
+        "highlight": false,
+        "endDate": "2015-08-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Head of technical service",
+        "company": "Altomi",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-12-01"
+      },
+      {
+        "id": "fundacite",
+        "highlight": false,
+        "endDate": "2015-08-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Instructor",
+        "company": "Fundacite Falcón",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-04-01"
+      },
+      {
+        "id": "decompra",
+        "highlight": false,
+        "endDate": "2014-09-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Junior programmer",
+        "company": "DeCompra Colombia",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-04-01"
+      }
+    ]
+  },
+  "es": {
+    "workExperience": [
+      {
+        "id": "dba-staff",
+        "highlight": false,
+        "endDate": "",
+        "current": true,
+        "employment": "Independiente",
+        "description": "Ingeniero y arquitecto central de largo plazo, de confianza para grandes empresas y startups en crecimiento, para liderar renovaciones de sistemas críticos, despliegues regidos por normativas y desarrollo de productos desde cero.",
+        "highlights": [
+          "Truth Social (etapas fundacionales): integrado como ingeniero backend durante las fases de arquitectura fundacional, colaborando estrechamente con desarrolladores del núcleo de Mastodon para escalar y optimizar el backend en Ruby on Rails.",
+          "InsurAdmin y Agency Rocket (automatización InsureTech): desarrolló InsurAdmin desde cero, una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias. Desarrolló los parsers de automatización centrales (Annuity, IUL, Whole Life) e integró por completo el motor de cobros con Stripe de la suite de marketing Agency Rocket (My New Retirement, Wealth United, etc.).",
+          "PMX Affiliate Marketplace: diseñó, desarrolló y lanzó la arquitectura full-stack del marketplace de afiliados, con una integración nativa en el ecosistema de Shopify.",
+          "SecureBancard (rescate de un proyecto crítico): salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa."
+        ],
+        "skills": [],
+        "title": "Ingeniero de Software Senior Staff",
+        "company": "Daring Bit Assembly, Inc (DBA)",
+        "location": "Estados Unidos, remoto",
+        "startDate": "2023-12-01"
+      },
+      {
+        "id": "pearson",
+        "highlight": false,
+        "endDate": "2023-12-01",
+        "current": false,
+        "employment": "Tiempo completo",
+        "description": "Pearson Channels: coarquitecto de Channels, construido casi desde cero con el equipo principal.",
+        "highlights": [
+          "Diseñó y ejecutó la estrategia de migración de datos, llevando los datos SQL heredados a la infraestructura NoSQL empresarial de Pearson.",
+          "Migró todos los datos de ClutchPrep a Channels, funcionando, y construyó funcionalidades principales: preparación de exámenes, lecciones en video, widgets compartidos"
+        ],
+        "skills": [
+          "AWS Lambda",
+          "AWS"
+        ],
+        "title": "Ingeniero Full Stack Senior",
+        "company": "Pearson",
+        "location": "Estados Unidos, remoto",
+        "startDate": "2022-04-01"
+      },
+      {
+        "id": "clutchprep",
+        "highlight": true,
+        "endDate": "2022-04-01",
+        "current": false,
+        "employment": "Tiempo completo",
+        "description": "Líder de ingeniería del producto B2B de Clutch Prep, impulsando los hitos técnicos que llevaron a la adquisición por Pearson.",
+        "highlights": [
+          "Lideró el sistema B2B que mantuvo a las escuelas funcionando durante la pandemia",
+          "Clave en el trabajo que cerró la adquisición por Pearson"
+        ],
+        "skills": [
+          "AWS Lambda"
+        ],
+        "title": "Ingeniero Full Stack",
+        "company": "Clutch Prep",
+        "location": "Miami-Fort Lauderdale",
+        "startDate": "2019-08-01"
+      },
+      {
+        "id": "smoothterminal",
+        "highlight": true,
+        "endDate": "2019-09-01",
+        "current": false,
+        "employment": "Tiempo completo",
+        "description": "Una plataforma de aprendizaje en línea pensada para desarrolladores de software y profesionales técnicos ocupados. Desarrollador de las plataformas y profesor experto a la vez, compartiendo trucos de frontend y las últimas tendencias",
+        "highlights": [
+          "Una de sus series de video más populares enseñó a crear personajes en pixel art con sombras y CSS cuando CSS aún era muy limitado",
+          "Enseñó a migrar el código de CSS a Sass y Stylus, enseñó ITCSS y a trabajar con JavaScript y llevar auditorías WCAG AAA",
+          "Cómo lograr implementaciones de diseño al píxel cuando era difícil y Figma no existía"
+        ],
+        "skills": [],
+        "title": "Desarrollador Full Stack Senior",
+        "company": "SmoothTerminal",
+        "location": "Estados Unidos",
+        "startDate": "2017-07-01"
+      },
+      {
+        "id": "dba-frontend",
+        "highlight": true,
+        "endDate": "2019-09-01",
+        "current": false,
+        "employment": "Tiempo completo",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Desarrollador Frontend Senior",
+        "company": "Daring Bit Assembly, Inc",
+        "location": "Estados Unidos, remoto",
+        "startDate": "2017-07-01"
+      },
+      {
+        "id": "solutionrus",
+        "highlight": false,
+        "endDate": "2017-02-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Desarrollador Fullstack",
+        "company": "SolutionRus",
+        "location": "Florida",
+        "startDate": "2016-11-01"
+      },
+      {
+        "id": "altomi",
+        "highlight": false,
+        "endDate": "2015-08-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Jefe de servicio técnico",
+        "company": "Altomi",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-12-01"
+      },
+      {
+        "id": "fundacite",
+        "highlight": false,
+        "endDate": "2015-08-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Instructor",
+        "company": "Fundacite Falcón",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-04-01"
+      },
+      {
+        "id": "decompra",
+        "highlight": false,
+        "endDate": "2014-09-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Programador auxiliar",
+        "company": "DeCompra Colombia",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-04-01"
+      }
+    ]
+  },
+  "it": {
+    "workExperience": [
+      {
+        "id": "dba-staff",
+        "highlight": false,
+        "endDate": "",
+        "current": true,
+        "employment": "Indipendente",
+        "description": "Ingegnere e architetto centrale di lungo corso, scelto da grandi aziende e startup in crescita per guidare il rinnovo di sistemi critici, rilasci vincolati alla conformità e lo sviluppo di prodotti da zero.",
+        "highlights": [
+          "Truth Social (fasi iniziali): inserito come ingegnere backend durante le fasi di architettura iniziale, collaborando a stretto contatto con gli sviluppatori del core di Mastodon per scalare e ottimizzare il backend in Ruby on Rails.",
+          "InsurAdmin e Agency Rocket (automazione InsureTech): ha sviluppato InsurAdmin da zero, una piattaforma che gestisce feed complessi delle compagnie e team di agenzia. Ha sviluppato i parser di automazione principali (Annuity, IUL, Whole Life) e integrato completamente il motore di fatturazione Stripe della suite di marketing Agency Rocket (My New Retirement, Wealth United, ecc.).",
+          "PMX Affiliate Marketplace: ha progettato, sviluppato e lanciato l'architettura full-stack del marketplace di affiliazione, con un'integrazione nativa nell'ecosistema Shopify.",
+          "SecureBancard (salvataggio di un progetto critico): ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide."
+        ],
+        "skills": [],
+        "title": "Ingegnere del Software Senior Staff",
+        "company": "Daring Bit Assembly, Inc (DBA)",
+        "location": "Stati Uniti, da remoto",
+        "startDate": "2023-12-01"
+      },
+      {
+        "id": "pearson",
+        "highlight": false,
+        "endDate": "2023-12-01",
+        "current": false,
+        "employment": "Tempo pieno",
+        "description": "Pearson Channels: co-architetto di Channels, costruito quasi da zero con il team principale.",
+        "highlights": [
+          "Ha progettato ed eseguito la strategia di migrazione dei dati, portando i dati SQL legacy nell'infrastruttura NoSQL aziendale di Pearson.",
+          "Ha migrato in Channels tutti i dati di ClutchPrep, funzionanti, e ha costruito funzionalità principali: preparazione agli esami, video lezioni, widget condivisi"
+        ],
+        "skills": [
+          "AWS Lambda",
+          "AWS"
+        ],
+        "title": "Ingegnere Full Stack Senior",
+        "company": "Pearson",
+        "location": "Stati Uniti, da remoto",
+        "startDate": "2022-04-01"
+      },
+      {
+        "id": "clutchprep",
+        "highlight": true,
+        "endDate": "2022-04-01",
+        "current": false,
+        "employment": "Tempo pieno",
+        "description": "Responsabile tecnico del prodotto B2B di Clutch Prep, alla guida delle tappe tecniche che hanno portato all'acquisizione da parte di Pearson.",
+        "highlights": [
+          "Ha guidato il sistema B2B che ha tenuto aperte le scuole durante la pandemia",
+          "Chiave nel lavoro che ha chiuso l'acquisizione da parte di Pearson"
+        ],
+        "skills": [
+          "AWS Lambda"
+        ],
+        "title": "Ingegnere Full Stack",
+        "company": "Clutch Prep",
+        "location": "Miami-Fort Lauderdale",
+        "startDate": "2019-08-01"
+      },
+      {
+        "id": "smoothterminal",
+        "highlight": true,
+        "endDate": "2019-09-01",
+        "current": false,
+        "employment": "Tempo pieno",
+        "description": "Una piattaforma di formazione online pensata per sviluppatori software e professionisti tecnici impegnati. Sviluppatore delle piattaforme e docente esperto allo stesso tempo, condividendo trucchi frontend e le ultime tendenze",
+        "highlights": [
+          "Una delle sue serie video più seguite insegnava a creare personaggi in pixel art con ombre e CSS quando il CSS era ancora molto limitato",
+          "Ha insegnato a migrare il codice da CSS a Sass e Stylus, ha insegnato ITCSS e a lavorare con JavaScript e gestire gli audit WCAG AAA",
+          "Come ottenere implementazioni di design al pixel quando era difficile e Figma non esisteva"
+        ],
+        "skills": [],
+        "title": "Sviluppatore Full Stack Senior",
+        "company": "SmoothTerminal",
+        "location": "Stati Uniti",
+        "startDate": "2017-07-01"
+      },
+      {
+        "id": "dba-frontend",
+        "highlight": true,
+        "endDate": "2019-09-01",
+        "current": false,
+        "employment": "Tempo pieno",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Sviluppatore Frontend Senior",
+        "company": "Daring Bit Assembly, Inc",
+        "location": "Stati Uniti, da remoto",
+        "startDate": "2017-07-01"
+      },
+      {
+        "id": "solutionrus",
+        "highlight": false,
+        "endDate": "2017-02-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Sviluppatore Fullstack",
+        "company": "SolutionRus",
+        "location": "Florida",
+        "startDate": "2016-11-01"
+      },
+      {
+        "id": "altomi",
+        "highlight": false,
+        "endDate": "2015-08-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Responsabile dell'assistenza tecnica",
+        "company": "Altomi",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-12-01"
+      },
+      {
+        "id": "fundacite",
+        "highlight": false,
+        "endDate": "2015-08-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Istruttore",
+        "company": "Fundacite Falcón",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-04-01"
+      },
+      {
+        "id": "decompra",
+        "highlight": false,
+        "endDate": "2014-09-01",
+        "current": false,
+        "employment": "",
+        "description": "",
+        "highlights": [],
+        "skills": [],
+        "title": "Programmatore junior",
+        "company": "DeCompra Colombia",
+        "location": "Falcón, Venezuela",
+        "startDate": "2014-04-01"
+      }
+    ]
+  }
+}

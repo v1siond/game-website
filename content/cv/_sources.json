@@ -1,0 +1,407 @@
+{
+  "agency-rocket": {
+    "years": "agencyrocket-app 2018-06-25 to 2026-10-20",
+    "details": [
+      {
+        "fact": "Stripe billing: Stripe Elements, subscriptions, coupons and add ons",
+        "shas": [
+          "b9642b12a",
+          "3d6196a15"
+        ]
+      },
+      {
+        "fact": "Illustrations created from an uploaded CSV, with PDF output",
+        "shas": [
+          "f49cae044",
+          "0012ea52c"
+        ]
+      },
+      {
+        "fact": "Team hierarchy views",
+        "shas": [
+          "20e7a716c"
+        ]
+      },
+      {
+        "fact": "SSO callback routes and annuity illustrations through the annuity parser",
+        "shas": [
+          "a3463a86e",
+          "5f88c6ebf"
+        ]
+      }
+    ]
+  },
+  "my-new-retirement": {
+    "years": "my-new-retirement 2019-01-24 to 2026-07-13",
+    "details": [
+      {
+        "fact": "Landing pages with custom webinar content",
+        "shas": [
+          "9eef63b"
+        ]
+      },
+      {
+        "fact": "Iframe views with a cross origin plug",
+        "shas": [
+          "9c0c733"
+        ]
+      },
+      {
+        "fact": "French and a locale redirect",
+        "shas": [
+          "825a40b"
+        ]
+      }
+    ]
+  },
+  "debt-action-plan": {
+    "years": "debt-action-plan 2021-06-02 to 2026-07-13",
+    "details": [
+      {
+        "fact": "Made the initial setup",
+        "shas": [
+          "8509a8e"
+        ]
+      },
+      {
+        "fact": "Add on setup parser logic",
+        "shas": [
+          "41baca2"
+        ]
+      },
+      {
+        "fact": "The Debt Action Plan PDF report, rendered with Puppeteer",
+        "shas": [
+          "4cef25390"
+        ]
+      },
+      {
+        "fact": "Cloud Build and GitHub Actions deploys",
+        "shas": [
+          "056cc83",
+          "714154b"
+        ]
+      }
+    ]
+  },
+  "wealth-united": {
+    "years": "wealth-united 2019-08-05 to 2026-03-03",
+    "details": [
+      {
+        "fact": "Made the initial commit",
+        "shas": [
+          "1d49390"
+        ]
+      },
+      {
+        "fact": "National debt counter",
+        "shas": [
+          "43afd10"
+        ]
+      },
+      {
+        "fact": "Insurance product, carrier and app admin",
+        "shas": [
+          "1eb228936"
+        ]
+      },
+      {
+        "fact": "Permissions and plugs QA flow",
+        "shas": [
+          "9313281"
+        ]
+      }
+    ]
+  },
+  "pmx-affiliate-marketplace": {
+    "years": "hot-tub-api and hot-tub-client 2022-02-04 to 2026-10-15",
+    "details": [
+      {
+        "fact": "Made the initial commits of the API and the client",
+        "shas": [
+          "3c6b3568",
+          "bb415b6e"
+        ]
+      },
+      {
+        "fact": "Partnerships, referral links and the marketplace for brands and affiliates with OAuth",
+        "shas": [
+          "1dea76ae",
+          "d3215230"
+        ]
+      },
+      {
+        "fact": "Shopify orders and channels",
+        "shas": [
+          "a9975c2a",
+          "6a6fbe64"
+        ]
+      },
+      {
+        "fact": "Commission rules, program policies, store subscriptions and plans",
+        "shas": [
+          "366d18f4",
+          "1e0eda9a"
+        ]
+      }
+    ]
+  },
+  "insuradmin": {
+    "years": "insuradmin 2024-02-27 to 2026-10-20",
+    "details": [
+      {
+        "fact": "Made the initial commit and the setup with dashboard, htmx and onboarding",
+        "shas": [
+          "20b1a685",
+          "da2523dd",
+          "aacc646a"
+        ]
+      },
+      {
+        "fact": "Carrier feed parser creating carrier, product, carrier appointment and apps linked to the agent",
+        "shas": [
+          "88d8cfb8"
+        ]
+      },
+      {
+        "fact": "Commission files and party commissions",
+        "shas": [
+          "a4ba138f",
+          "6c513aa5"
+        ]
+      },
+      {
+        "fact": "Team and agency dashboards, and agencies managing user subscriptions",
+        "shas": [
+          "418dbc3f",
+          "bf660dbb"
+        ]
+      }
+    ]
+  },
+  "securebancard": {
+    "years": "his words: 2023 (documentation repo 2023-12-13 to 2024-03-13)",
+    "details": [
+      {
+        "fact": "API and web app dev setup docs, controller and route docs",
+        "shas": [
+          "d1fbc24",
+          "3017fbd"
+        ]
+      },
+      {
+        "fact": "Deployment process docs",
+        "shas": [
+          "ad46e4f"
+        ]
+      },
+      {
+        "fact": "Aggregation layer docs, including the Angular change that waits for the current bin before proxying calls",
+        "shas": [
+          "95ae8b8"
+        ]
+      }
+    ]
+  },
+  "pearson-channels": {
+    "years": "no repo on disk",
+    "details": []
+  },
+  "clutchprep": {
+    "years": "newton, one commit 2023-04-28",
+    "details": []
+  },
+  "nebulith": {
+    "years": "nebulith 2026-05-24 to 2026-10-20",
+    "details": [
+      {
+        "fact": "Template editor with a randomizer and isometric rendering",
+        "shas": [
+          "4fe61c70"
+        ]
+      },
+      {
+        "fact": "RPG engine: labelled multi cell assets, combat, quests, inventory",
+        "shas": [
+          "b6f8cb8d"
+        ]
+      },
+      {
+        "fact": "Attack animations and a collision paint tool",
+        "shas": [
+          "4aa5febb"
+        ]
+      },
+      {
+        "fact": "Railway deploy and CI on every push",
+        "shas": [
+          "5d35a6af",
+          "8d47c1e5"
+        ]
+      }
+    ]
+  },
+  "firestorm": {
+    "years": "firestorm_ash 2026-07-23 to 2026-10-13",
+    "details": [
+      {
+        "fact": "Rebuilt Firestorm's forum domain in Ash 3",
+        "shas": [
+          "481b004"
+        ]
+      },
+      {
+        "fact": "In forum moderation: pin, lock, hide, report",
+        "shas": [
+          "51faab5"
+        ]
+      },
+      {
+        "fact": "Feed, chat and mentions in every composer",
+        "shas": [
+          "6ee36e2",
+          "fc80705"
+        ]
+      },
+      {
+        "fact": "Security fixes: the API token GraphQL field and the markdown fallback",
+        "shas": [
+          "51bb725",
+          "9244219"
+        ]
+      }
+    ]
+  },
+  "datepal": {
+    "years": "Datepal Backend 2026-04-27 to 2026-10-20, Flutter 2026-10-20",
+    "details": [
+      {
+        "fact": "Veriff identity and age verification",
+        "shas": [
+          "43d37a6",
+          "7350757"
+        ]
+      },
+      {
+        "fact": "Ranking APIs with card stacks and a post huddle survey",
+        "shas": [
+          "ccf7b05",
+          "fa2b21a"
+        ]
+      },
+      {
+        "fact": "SMS notifications on lifecycle events",
+        "shas": [
+          "94bd825"
+        ]
+      },
+      {
+        "fact": "Billing: prices, payments, Stripe checkout and webhooks",
+        "shas": [
+          "ea0b69f",
+          "2e8f588"
+        ]
+      }
+    ]
+  },
+  "bcharitable": {
+    "years": "charit 2021-03-09 to 2026-09-22",
+    "details": [
+      {
+        "fact": "Grant request select, receipt mailer and media gallery",
+        "shas": [
+          "f4256965",
+          "5eb175c8",
+          "9d7845d4"
+        ]
+      },
+      {
+        "fact": "Iframe support and investment strategy on the user",
+        "shas": [
+          "42eba292",
+          "30d416ae"
+        ]
+      },
+      {
+        "fact": "ACH and Stripe fixes, Stripe webhook data migration",
+        "shas": [
+          "a49f9b47",
+          "ce007820",
+          "7e8effb8"
+        ]
+      },
+      {
+        "fact": "Playwright suite replacing Jest, CI gated on rubocop and rspec",
+        "shas": [
+          "c7b2991f",
+          "ec8bd7e6"
+        ]
+      }
+    ]
+  },
+  "truth-social": {
+    "years": "his words: 2021, 2 to 3 months",
+    "details": []
+  },
+  "grctechme": {
+    "years": "auditechme 2024-09-30 to 2026-10-20",
+    "details": [
+      {
+        "fact": "Google Cloud Marketplace: separate keys, redirect to the marketplace, signed push and procurement fixes",
+        "shas": [
+          "1bd7ffdb",
+          "551037ec",
+          "29ed221c"
+        ]
+      },
+      {
+        "fact": "Demo side",
+        "shas": [
+          "f73013bb"
+        ]
+      },
+      {
+        "fact": "i18n with react-i18next and a language switcher",
+        "shas": [
+          "16b17ab4"
+        ]
+      },
+      {
+        "fact": "Firestore data moved into Postgres",
+        "shas": [
+          "94737875"
+        ]
+      }
+    ]
+  },
+  "sillabo": {
+    "years": "sillabo-api and sillabo-web 2026-10-05 to 2026-10-20",
+    "details": [
+      {
+        "fact": "Claude adapter behind the tutor and the judge",
+        "shas": [
+          "e36529d"
+        ]
+      },
+      {
+        "fact": "Grading, exact at submit and judged",
+        "shas": [
+          "66e8f4c"
+        ]
+      },
+      {
+        "fact": "STT and TTS behind behaviours, with a narration render job",
+        "shas": [
+          "f4e9f5f",
+          "ee162e2"
+        ]
+      },
+      {
+        "fact": "Billing with Stripe and RevenueCat",
+        "shas": [
+          "e195643"
+        ]
+      }
+    ]
+  }
+}

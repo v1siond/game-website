@@ -1,0 +1,44 @@
+{
+  "en": {
+    "professionalSummary": {
+      "headline": "Senior Staff Full-Stack & AI Systems Engineer with 10+ years of proven success",
+      "tagline": "Lead, sole or key developer on every project",
+      "bio": "Long-term core engineer and architect trusted by high-profile enterprise companies and scaling startups to lead critical system overhauls, compliance-driven deployments, and zero-to-one product development. Ingeniero en Sistemas, UNEFA, 2008 to 2014. Spanish and English native, Italian basic.",
+      "highlights": [
+        "SecureBancard (critical project rescue): saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines.",
+        "Engineering leader for the Clutch Prep B2B product, driving the technical milestones that led to the acquisition by Pearson.",
+        "InsurAdmin and Agency Rocket (InsureTech automation): developed InsurAdmin from scratch, a platform managing complex carrier feeds and agency teams. Engineered core automation parsers (Annuity, IUL, Whole Life) and fully integrated the Stripe billing engine for the Agency Rocket marketing suite (My New Retirement, Wealth United, etc.).",
+        "PMX Affiliate Marketplace: engineered, developed and launched the full-stack architecture of the affiliate marketplace, with a native integration into the Shopify ecosystem.",
+        "GRCTechMe, CTO: he got it onto the Google Cloud Marketplace, passing review on the first try with no fixes"
+      ]
+    }
+  },
+  "es": {
+    "professionalSummary": {
+      "headline": "Ingeniero Senior Staff Full-Stack y de Sistemas de IA con más de 10 años de éxito comprobado",
+      "tagline": "Líder, desarrollador único o clave en cada proyecto",
+      "bio": "Ingeniero y arquitecto central de largo plazo, de confianza para grandes empresas y startups en crecimiento, para liderar renovaciones de sistemas críticos, despliegues regidos por normativas y desarrollo de productos desde cero. Ingeniero en Sistemas, UNEFA, 2008 a 2014. Español e inglés nativos, italiano básico.",
+      "highlights": [
+        "SecureBancard (rescate de un proyecto crítico): salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa.",
+        "Líder de ingeniería del producto B2B de Clutch Prep, impulsando los hitos técnicos que llevaron a la adquisición por Pearson.",
+        "InsurAdmin y Agency Rocket (automatización InsureTech): desarrolló InsurAdmin desde cero, una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias. Desarrolló los parsers de automatización centrales (Annuity, IUL, Whole Life) e integró por completo el motor de cobros con Stripe de la suite de marketing Agency Rocket (My New Retirement, Wealth United, etc.).",
+        "PMX Affiliate Marketplace: diseñó, desarrolló y lanzó la arquitectura full-stack del marketplace de afiliados, con una integración nativa en el ecosistema de Shopify.",
+        "GRCTechMe, CTO: la llevó al Google Cloud Marketplace, aprobando la revisión al primer intento sin correcciones"
+      ]
+    }
+  },
+  "it": {
+    "professionalSummary": {
+      "headline": "Ingegnere Senior Staff Full-Stack e di Sistemi di IA con oltre 10 anni di successi comprovati",
+      "tagline": "Lead, sviluppatore unico o chiave in ogni progetto",
+      "bio": "Ingegnere e architetto centrale di lungo corso, scelto da grandi aziende e startup in crescita per guidare il rinnovo di sistemi critici, rilasci vincolati alla conformità e lo sviluppo di prodotti da zero. Ingegnere dei Sistemi, UNEFA, dal 2008 al 2014. Spagnolo e inglese madrelingua, italiano base.",
+      "highlights": [
+        "SecureBancard (salvataggio di un progetto critico): ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide.",
+        "Responsabile tecnico del prodotto B2B di Clutch Prep, alla guida delle tappe tecniche che hanno portato all'acquisizione da parte di Pearson.",
+        "InsurAdmin e Agency Rocket (automazione InsureTech): ha sviluppato InsurAdmin da zero, una piattaforma che gestisce feed complessi delle compagnie e team di agenzia. Ha sviluppato i parser di automazione principali (Annuity, IUL, Whole Life) e integrato completamente il motore di fatturazione Stripe della suite di marketing Agency Rocket (My New Retirement, Wealth United, ecc.).",
+        "PMX Affiliate Marketplace: ha progettato, sviluppato e lanciato l'architettura full-stack del marketplace di affiliazione, con un'integrazione nativa nell'ecosistema Shopify.",
+        "GRCTechMe, CTO: l'ha portata sul Google Cloud Marketplace, superando la revisione al primo tentativo senza correzioni"
+      ]
+    }
+  }
+}

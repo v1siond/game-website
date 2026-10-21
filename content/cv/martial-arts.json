@@ -1,0 +1,92 @@
+{
+  "en": {
+    "martialArts": {
+      "primary": {
+        "discipline": "Muay Thai",
+        "title": "Muay Thai Practitioner and Instructor",
+        "dojo": "Moving Zen",
+        "place": "Lima, Peru",
+        "founder": "Jimmy Pool",
+        "rank": "Namtal Khan, brown and white",
+        "yearsTraining": 4,
+        "yearsTeaching": 2,
+        "current": true,
+        "achievements": [
+          "National runner up",
+          "Competed in many tournaments, like top combat, national championship, achieving sub champion",
+          "Starting as assistant trainer, then getting my certification as teacher"
+        ],
+        "now": "Currently training for national championship"
+      },
+      "training": [
+        {
+          "discipline": "Jiu-jitsu",
+          "academy": "Monkey Jiujutsu Academy",
+          "instructor": "Mario Escurra",
+          "current": true
+        }
+      ],
+      "background": "I train martial arts since I was 19 years old, trained siscomada, choson mu sul, wrestling, jiujutsu, mma and muay thai."
+    }
+  },
+  "es": {
+    "martialArts": {
+      "primary": {
+        "discipline": "Muay Thai",
+        "title": "Practicante e instructor de Muay Thai",
+        "dojo": "Moving Zen",
+        "place": "Lima, Perú",
+        "founder": "Jimmy Pool",
+        "rank": "Namtal Khan, marrón y blanco",
+        "yearsTraining": 4,
+        "yearsTeaching": 2,
+        "current": true,
+        "achievements": [
+          "Subcampeón nacional",
+          "Compitió en muchos torneos, como Top Combat y el campeonato nacional, logrando el subcampeonato",
+          "Empezó como entrenador asistente y luego obtuvo su certificación como profesor"
+        ],
+        "now": "Entrenando actualmente para el campeonato nacional"
+      },
+      "training": [
+        {
+          "discipline": "Jiu-jitsu",
+          "academy": "Monkey Jiujutsu Academy",
+          "instructor": "Mario Escurra",
+          "current": true
+        }
+      ],
+      "background": "Entreno artes marciales desde los 19 años; he entrenado Siscomada, Choson Mu Sul, lucha, jiu-jitsu, MMA y Muay Thai."
+    }
+  },
+  "it": {
+    "martialArts": {
+      "primary": {
+        "discipline": "Muay Thai",
+        "title": "Praticante e istruttore di Muay Thai",
+        "dojo": "Moving Zen",
+        "place": "Lima, Perù",
+        "founder": "Jimmy Pool",
+        "rank": "Namtal Khan, marrone e bianco",
+        "yearsTraining": 4,
+        "yearsTeaching": 2,
+        "current": true,
+        "achievements": [
+          "Vicecampione nazionale",
+          "Ha gareggiato in molti tornei, come Top Combat e il campionato nazionale, ottenendo il titolo di vicecampione",
+          "Ha iniziato come allenatore assistente, poi ha ottenuto la certificazione da istruttore"
+        ],
+        "now": "Attualmente in allenamento per il campionato nazionale"
+      },
+      "training": [
+        {
+          "discipline": "Jiu-jitsu",
+          "academy": "Monkey Jiujutsu Academy",
+          "instructor": "Mario Escurra",
+          "current": true
+        }
+      ],
+      "background": "Mi alleno nelle arti marziali da quando avevo 19 anni; ho praticato Siscomada, Choson Mu Sul, lotta, jiu-jitsu, MMA e Muay Thai."
+    }
+  }
+}
