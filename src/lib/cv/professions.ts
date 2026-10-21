@@ -1,5 +1,5 @@
 // The three professions every world shows, in selector order. The ids are the ones the code and the
-// data already use; the labels are what a visitor reads.
+// data use; what a visitor reads for each is its label (labels.professions in content/cv/labels.json).
 
 export type Profession = 'engineer' | 'drummer' | 'fighter'
 
@@ -7,12 +7,6 @@ export type Profession = 'engineer' | 'drummer' | 'fighter'
 export const PROFESSION_ORDER: readonly Profession[] = ['drummer', 'engineer', 'fighter']
 
 export const DEFAULT_PROFESSION: Profession = 'engineer'
-
-export const PROFESSION_LABELS: Readonly<Record<Profession, string>> = {
-  drummer: 'Musician',
-  engineer: 'System Engineer',
-  fighter: 'Martial Artist',
-}
 
 export function isProfession(value: unknown): value is Profession {
   return typeof value === 'string' && (PROFESSION_ORDER as readonly string[]).includes(value)

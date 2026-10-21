@@ -1,57 +1,13 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import {
-  type Profession,
-  DEFAULT_PROFESSION,
-  PROFESSION_LABELS,
-  PROFESSION_ORDER,
-  professionOnLoad,
-} from '@/lib/cv/professions'
+import { type Profession, DEFAULT_PROFESSION, professionOnLoad } from '@/lib/cv/professions'
 
 export type { Profession }
-
-export interface ProfessionConfig {
-  id: Profession
-  title: string
-  tagline: string
-  icon: string
-  color: string
-  years: string
-}
-
-export const PROFESSION_CONFIGS: Record<Profession, ProfessionConfig> = {
-  engineer: {
-    id: 'engineer',
-    title: PROFESSION_LABELS.engineer,
-    tagline: 'Building systems that scale',
-    icon: '//--',
-    color: '#41c8e8',
-    years: '10+ years',
-  },
-  drummer: {
-    id: 'drummer',
-    title: PROFESSION_LABELS.drummer,
-    tagline: 'Rhythm is the architecture of music',
-    icon: '(O)',
-    color: '#9966cc',
-    years: '15 years',
-  },
-  fighter: {
-    id: 'fighter',
-    title: PROFESSION_LABELS.fighter,
-    tagline: 'Discipline through combat',
-    icon: '/|\\',
-    color: '#ff4444',
-    years: '4 years',
-  },
-}
 
 interface ProfessionContextType {
   active: Profession
   setActive: (p: Profession) => void
-  config: ProfessionConfig
-  allProfessions: ProfessionConfig[]
 }
 
 const ProfessionContext = createContext<ProfessionContextType | undefined>(undefined)
@@ -93,12 +49,7 @@ export function ProfessionProvider({ children }: { children: ReactNode }) {
     setActiveState(profession)
   }
 
-  const value: ProfessionContextType = {
-    active,
-    setActive,
-    config: PROFESSION_CONFIGS[active],
-    allProfessions: PROFESSION_ORDER.map((id) => PROFESSION_CONFIGS[id]),
-  }
+  const value: ProfessionContextType = { active, setActive }
 
   return (
     <ProfessionContext.Provider value={value}>

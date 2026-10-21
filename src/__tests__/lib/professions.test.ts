@@ -1,17 +1,17 @@
 import {
   PROFESSION_ORDER,
   DEFAULT_PROFESSION,
-  PROFESSION_LABELS,
   isProfession,
   professionOnLoad,
   professionFromSearch,
   stepProfession,
 } from '@/lib/cv/professions'
+import { testCV } from '../helpers/test-utils'
 
 describe('profession order and labels', () => {
   it('reads Musician, System Engineer, Martial Artist with the engineer in the centre', () => {
     expect(PROFESSION_ORDER).toEqual(['drummer', 'engineer', 'fighter'])
-    expect(PROFESSION_ORDER.map((id) => PROFESSION_LABELS[id])).toEqual([
+    expect(PROFESSION_ORDER.map((id) => testCV().labels.professions[id])).toEqual([
       'Musician',
       'System Engineer',
       'Martial Artist',
