@@ -6,7 +6,8 @@ import { DECO_COLORS } from './palette'
 // Him in the city under the sea (the shared HeroFigure), dressed the way the city dressed in 1959: the System Engineer
 // in shirt sleeves, a navy waistcoat with brass buttons and a maroon tie; the Musician in the white
 // dinner jacket and black bow tie of a ballroom band; the Martial Artist bare chested in gold Muay Thai
-// shorts, the red prajioud bands on his upper arms and red gloves with gold cuffs.
+// shorts, the red prajioud bands on his upper arms, a maroon headband with a gold edge tied at the side
+// and red gloves with gold cuffs.
 
 const EYE = '#0a1420'
 
@@ -18,6 +19,8 @@ interface Outfit {
   long: boolean
   feet: string
   hand: 'fist' | 'sticks' | 'gloves'
+  // Drawn in HeroFigure's over hair slot.
+  head: ReactNode
 }
 
 const SHIRT = DECO_COLORS.cream
@@ -26,6 +29,16 @@ const DINNER_JACKET = '#efe6d2'
 const TROUSERS = '#1c1c24'
 const SHOES = '#3a2414'
 const MAROON = DECO_COLORS.blood
+
+// The Muay Thai headband: a maroon band along the hairline with a gold edge, its knot and two tails at the side.
+const HEADBAND = (
+  <>
+    <path d="M21.6 12.5 Q32 7.6 42.4 12.5 L42.6 15.4 Q32 10.8 21.4 15.4 Z" fill={MAROON} />
+    <path d="M21.5 15.4 Q32 10.8 42.5 15.4" fill="none" stroke={DECO_COLORS.gold} strokeWidth={0.6} />
+    <circle cx={21.4} cy={14} r={1.6} fill={MAROON} />
+    <path d="M20.6 13.4 L15.4 16.2 L16.4 17.6 Z M20.8 14.8 L16.6 19.4 L18 20.2 Z" fill={MAROON} />
+  </>
+)
 
 const OUTFIT: Record<Profession, Outfit> = {
   engineer: {
@@ -44,6 +57,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     long: true,
     feet: SHOES,
     hand: 'fist',
+    head: null,
   },
   drummer: {
     torso: (
@@ -58,6 +72,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     long: true,
     feet: TROUSERS,
     hand: 'sticks',
+    head: null,
   },
   fighter: {
     torso: (
@@ -72,6 +87,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     long: false,
     feet: SKIN,
     hand: 'gloves',
+    head: HEADBAND,
   },
 }
 
@@ -101,6 +117,7 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
       torso={outfit.torso}
       arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={15} hand={HAND_DRAW[outfit.hand](x)} />}
       leg={(x) => <HeroLeg x={x} legs={outfit.legs} long={outfit.long} shorts={11} feet={outfit.feet} />}
+      overHair={outfit.head}
     />
   )
 }
