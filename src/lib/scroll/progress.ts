@@ -58,3 +58,19 @@ export function readThenWrite<Reading>(tasks: Iterable<FrameTask<Reading>>): voi
   const readings = Array.from(tasks, (task) => [task, task.read()] as const)
   readings.forEach(([task, reading]) => task.write(reading))
 }
+
+// A travel scene stretches one scene over a section's whole height. It starts as the section's top
+// crosses TRAVEL_START and ends a third of a screen (ARRIVE_EARLY) before the section leaves, so the
+// last entry is read with the scene finished; a short section still travels MIN_TRAVEL.
+const TRAVEL_START = 0.85
+const ARRIVE_EARLY = 0.35
+const MIN_TRAVEL = 0.3
+
+const roundLine = (value: number) => Math.round(value * 100) / 100
+
+/** Scene lines that stretch one scene over a section's whole height, in viewport fractions. */
+export function travelLines(sectionHeight: number, viewportHeight: number): SceneLines {
+  if (viewportHeight <= 0) return { start: TRAVEL_START, end: roundLine(TRAVEL_START - MIN_TRAVEL) }
+  const travel = Math.max(MIN_TRAVEL, sectionHeight / viewportHeight - ARRIVE_EARLY)
+  return { start: TRAVEL_START, end: roundLine(TRAVEL_START - travel) }
+}

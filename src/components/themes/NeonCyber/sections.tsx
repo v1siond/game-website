@@ -10,7 +10,9 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { CompanyCard, BandCard, CyberPanel, ExperienceCard, ProjectCard, TechCategory } from './cards'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
-import { LevelStrip, SceneItem, TravelScene } from './scenes'
+import { TravelScene } from '@/components/scroll/TravelScene'
+import { LevelStrip, SceneItem } from './scenes'
+import styles from './scenes.module.css'
 
 // The cyberware slot each profession's selector option shows.
 export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> = {
@@ -39,7 +41,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
       </FadeIn>
 
       {sections.jobs.length > 0 && (
-        <TravelScene>
+        <TravelScene className={styles.scene}>
           <LevelStrip profession="engineer" zone="record" />
           <CyberPanel title="Work Experience" accent="green">
             <ul className="space-y-4">
@@ -63,7 +65,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
         </CyberPanel>
       </FadeIn>
 
-      <TravelScene>
+      <TravelScene className={styles.scene}>
         <LevelStrip profession="engineer" zone="work" />
         <CyberPanel title="Projects" accent="magenta">
           <ProjectList
@@ -95,7 +97,7 @@ export function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }
   const { musician, bands } = sections
 
   return (
-    <TravelScene>
+    <TravelScene className={styles.scene}>
       <LevelStrip profession="drummer" zone="record" />
       <CyberPanel title="Bands" accent="violet">
         <p className="text-sm text-white/80 font-mono mb-4">
@@ -123,7 +125,7 @@ export function MartialArtistPanels({ sections }: { sections: SectionsOf<'fighte
   const { martialArts } = sections
 
   return (
-    <TravelScene>
+    <TravelScene className={styles.scene}>
       <LevelStrip profession="fighter" zone="record" />
       <CyberPanel title="Muay Thai" accent="red">
         <h3 className="text-base text-pink-400 font-mono mb-4">{martialArts.primary.title}</h3>

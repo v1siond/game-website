@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { SceneLines } from '@/lib/scroll/progress'
@@ -13,71 +13,11 @@ import styles from './scenes.module.css'
 // Neon Cyber's scroll scenes on the shared engine (useScrollScene): scroll position moves the scene,
 // once only, and reduced motion or a World Select preview shows the final frame at once.
 //
-// - TravelScene: a section whose level strip stays pinned while the section scrolls by; he crosses the
-//   level from the moment the section enters to just before it leaves.
+// - LevelStrip: the level pinned inside a shared TravelScene (src/components/scroll); he crosses it from
+//   the moment the section enters to just before it leaves.
 // - SceneItem: one entry (a job, a project, a band, an achievement) arriving as part of the level, a
 //   terminal that boots or a billboard that lights, on its own progress as it enters the screen.
 // - ContactScene: the profession's closing corner, then the contact panel powers on.
-
-const TRAVEL_START = 0.85
-// He reaches the end of the level a third of a screen before the section ends, so the last entry is
-// read with the level finished.
-const ARRIVE_EARLY = 0.35
-const MIN_TRAVEL = 0.3
-
-const roundLine = (value: number) => Math.round(value * 100) / 100
-
-/** Scene lines that stretch one scene over a section's whole height, in viewport fractions. */
-export function travelLines(sectionHeight: number, viewportHeight: number): SceneLines {
-  if (viewportHeight <= 0) return { start: TRAVEL_START, end: roundLine(TRAVEL_START - MIN_TRAVEL) }
-  const travel = Math.max(MIN_TRAVEL, sectionHeight / viewportHeight - ARRIVE_EARLY)
-  return { start: TRAVEL_START, end: roundLine(TRAVEL_START - travel) }
-}
-
-// Re-measures when the section's height or the viewport changes; the lines only change on a real
-// difference, so the scene is not re-armed on every resize event.
-function useTravelLines<T extends HTMLElement>(): [SceneLines, (element: T | null) => void] {
-  const [element, setElement] = useState<T | null>(null)
-  const [lines, setLines] = useState<SceneLines>(() => travelLines(0, 0))
-
-  useEffect(() => {
-    if (!element) return
-    const measure = () => {
-      const next = travelLines(element.offsetHeight, window.innerHeight)
-      setLines((previous) => (previous.start === next.start && previous.end === next.end ? previous : next))
-    }
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(element)
-    window.addEventListener('resize', measure, { passive: true })
-    return () => {
-      observer.disconnect()
-      window.removeEventListener('resize', measure)
-    }
-  }, [element])
-
-  return [lines, setElement]
-}
-
-// A wrapper, not a landmark: the panel inside it is the labelled section. `relative z-20` keeps the section above the world's fixed backdrop layers once a transform inside it
-// makes a stacking context.
-export function TravelScene({ children }: { children: ReactNode }) {
-  const [lines, measure] = useTravelLines<HTMLElement>()
-  const { ref, phase } = useScrollScene<HTMLElement>(lines)
-  const setElement = useCallback(
-    (element: HTMLElement | null) => {
-      ref(element)
-      measure(element)
-    },
-    [ref, measure],
-  )
-
-  return (
-    <div ref={setElement} data-scene-phase={phase} className={`relative z-20 mb-8 ${styles.scene}`}>
-      {children}
-    </div>
-  )
-}
 
 export function LevelStrip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
   const { Level, pose, travel, Companion } = PROFESSION_STAGES[profession]
