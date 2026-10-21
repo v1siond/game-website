@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
@@ -11,7 +11,6 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // Resident Evil actual game palette - from gameplay screenshots
 // RE1 Remake mansion, RE4 village, RE7 Baker house
@@ -54,148 +53,6 @@ const TEXTURES = {
   wornPaper: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E")`,
   // Blood stain texture
   bloodStain: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='15' fill='%236b1010' opacity='0.05'/%3E%3Ccircle cx='45' cy='20' r='8' fill='%233a0808' opacity='0.03'/%3E%3C/svg%3E")`,
-}
-
-// SVG Survivor silhouette with flashlight
-function SurvivorSprite({
-  direction = 'right',
-  size = 60,
-}: {
-  direction?: 'left' | 'right'
-  size?: number
-}) {
-  return (
-    <div className="relative" style={{ width: size, height: size * 1.4 }}>
-      <svg
-        viewBox="0 0 50 70"
-        className="w-full h-full"
-        style={{ transform: direction === 'left' ? 'scaleX(-1)' : 'none' }}
-      >
-        {/* Head */}
-        <ellipse cx="25" cy="10" rx="7" ry="8" fill={RE.shadow} />
-        {/* Body */}
-        <path d="M20,18 L18,45 L22,45 L25,25 L28,45 L32,45 L30,18 Z" fill={RE.shadow} />
-        {/* Arms - one forward holding gun/flashlight */}
-        <path d="M30,22 L45,28" stroke={RE.shadow} strokeWidth="4" strokeLinecap="round" />
-        <path d="M18,22 L12,35" stroke={RE.shadow} strokeWidth="4" strokeLinecap="round" />
-        {/* Legs running */}
-        <path d="M22,45 L18,65" stroke={RE.shadow} strokeWidth="5" strokeLinecap="round" />
-        <path d="M28,45 L35,60" stroke={RE.shadow} strokeWidth="5" strokeLinecap="round" />
-      </svg>
-      {/* Flashlight beam */}
-      <div
-        className="absolute top-1/4"
-        style={{
-          [direction === 'right' ? 'right' : 'left']: '-30px',
-          width: '50px',
-          height: '20px',
-          background: `linear-gradient(${direction === 'right' ? '90deg' : '270deg'}, rgba(255,220,150,0.5) 0%, transparent 100%)`,
-          filter: 'blur(8px)',
-          transform: `rotate(${direction === 'right' ? '5deg' : '-5deg'})`,
-        }}
-      />
-    </div>
-  )
-}
-
-// Zombie silhouette chasing
-function ZombieChaser({
-  direction = 'right',
-  size = 70,
-}: {
-  direction?: 'left' | 'right'
-  size?: number
-}) {
-  return (
-    <div className="relative" style={{ width: size, height: size * 1.3 }}>
-      <svg
-        viewBox="0 0 60 80"
-        className="w-full h-full"
-        style={{ transform: direction === 'left' ? 'scaleX(-1)' : 'none' }}
-      >
-        {/* Zombie shambling silhouette */}
-        <ellipse cx="30" cy="12" rx="10" ry="12" fill={RE.shadow} />
-        {/* Hunched body */}
-        <path d="M22,22 L18,55 L26,55 L28,35 L32,35 L34,55 L42,55 L38,22 Z" fill={RE.shadow} />
-        {/* Reaching arms - outstretched */}
-        <path d="M22,28 Q5,32 0,45" stroke={RE.shadow} strokeWidth="6" strokeLinecap="round" fill="none" />
-        <path d="M24,35 Q10,40 5,50" stroke={RE.shadow} strokeWidth="5" strokeLinecap="round" fill="none" />
-        {/* Shambling legs */}
-        <path d="M24,55 L20,75" stroke={RE.shadow} strokeWidth="6" strokeLinecap="round" />
-        <path d="M36,55 L42,72" stroke={RE.shadow} strokeWidth="6" strokeLinecap="round" />
-      </svg>
-    </div>
-  )
-}
-
-// Section that reveals with zombie chase animation
-function ZombieChaseSection({
-  children,
-  direction = 'left',
-  className = '',
-}: {
-  children: React.ReactNode
-  direction?: 'left' | 'right'
-  className?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [phase, setPhase] = useState<'hidden' | 'chasing' | 'revealed'>('hidden')
-
-  useEffect(() => {
-    if (hasEntered && phase === 'hidden') {
-      setPhase('chasing')
-      setTimeout(() => setPhase('revealed'), 1200)
-    }
-  }, [hasEntered, phase])
-
-  return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      {/* Chase animation layer */}
-      {phase === 'chasing' && (
-        <div
-          className="absolute inset-0 z-50 pointer-events-none"
-          style={{ overflow: 'hidden' }}
-        >
-          {/* Survivor running */}
-          <div
-            className="absolute top-1/2 left-0"
-            style={{
-              animation: direction === 'left'
-                ? 'survivor-run-left 1.2s ease-out forwards'
-                : 'survivor-run-right 1.2s ease-out forwards',
-              willChange: 'transform',
-            }}
-          >
-            <SurvivorSprite direction={direction === 'left' ? 'right' : 'left'} size={50} />
-          </div>
-          {/* Zombie chasing */}
-          <div
-            className="absolute top-1/2 left-0"
-            style={{
-              animation: direction === 'left'
-                ? 'zombie-chase-left 1.2s ease-out forwards'
-                : 'zombie-chase-right 1.2s ease-out forwards',
-              willChange: 'transform',
-            }}
-          >
-            <ZombieChaser direction={direction === 'left' ? 'right' : 'left'} size={55} />
-          </div>
-        </div>
-      )}
-
-      {/* Content */}
-      <div
-        style={{
-          opacity: phase === 'revealed' ? 1 : 0,
-          transform: phase === 'revealed' ? 'translateY(0)' : 'translateY(20px)',
-          transition: 'all 0.5s ease-out',
-        }}
-      >
-        {children}
-      </div>
-    </div>
-  )
 }
 
 // Dark overlay for content readability

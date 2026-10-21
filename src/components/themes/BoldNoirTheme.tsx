@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
@@ -13,60 +12,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-
-// Phantom Thief Alexander - stylish masked figure
-function PhantomThiefCharacter({
-  size = 60,
-  direction = 'right',
-  className = ''
-}: {
-  size?: number
-  direction?: 'left' | 'right'
-  className?: string
-}) {
-  const [frame, setFrame] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => setFrame(f => (f + 1) % 2), 140)
-    return () => clearInterval(interval)
-  }, [])
-
-  const sprite = direction === 'right'
-    ? (frame === 0 ? '/assets/sprites/run_right.png' : '/assets/sprites/run_right_1.png')
-    : (frame === 0 ? '/assets/sprites/run_left.png' : '/assets/sprites/run_left_1.png')
-
-  return (
-    <div className={`relative ${className}`} style={{ width: size, height: size * 1.2 }}>
-      <Image
-        src={sprite}
-        alt="Phantom Thief"
-        fill
-        className="object-contain"
-        style={{ filter: 'contrast(1.3) brightness(1.1)' }}
-      />
-      {/* Mask effect on face */}
-      <div
-        className="absolute top-[15%] left-1/2 -translate-x-1/2 w-[60%] h-[20%]"
-        style={{
-          background: 'linear-gradient(90deg, transparent, #ff0033, transparent)',
-          clipPath: 'polygon(20% 0%, 80% 0%, 100% 50%, 80% 100%, 20% 100%, 0% 50%)',
-          opacity: 0.8,
-        }}
-      />
-      {/* Stylish trail */}
-      <div
-        className="absolute top-0 left-0 w-full h-full"
-        style={{
-          background: direction === 'right'
-            ? 'linear-gradient(90deg, rgba(255,0,51,0.4), transparent 30%)'
-            : 'linear-gradient(270deg, rgba(255,0,51,0.4), transparent 30%)',
-        }}
-      />
-    </div>
-  )
-}
 
 // Profession-specific ornaments in Persona 5 bold style
 function StylishOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
@@ -117,59 +63,6 @@ function StylishOrnaments({ profession }: { profession: 'engineer' | 'drummer' |
           {item.text}
         </div>
       ))}
-    </div>
-  )
-}
-
-// ALL OUT ATTACK reveal section
-function AllOutAttackSection({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [phase, setPhase] = useState<'hidden' | 'attack' | 'revealed'>('hidden')
-
-  useEffect(() => {
-    if (hasEntered && phase === 'hidden') {
-      setPhase('attack')
-      setTimeout(() => setPhase('revealed'), 800)
-    }
-  }, [hasEntered, phase])
-
-  return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      {/* ALL OUT ATTACK animation */}
-      {phase === 'attack' && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90 animate-attack-flash">
-          <div className="relative">
-            <PhantomThiefCharacter size={80} className="absolute left-1/2 -translate-x-1/2 -top-20" />
-            <div
-              className="text-5xl font-black tracking-tighter text-center"
-              style={{
-                color: '#ff0033',
-                textShadow: '4px 4px 0 #000, -2px -2px 0 #fff',
-                transform: 'skewX(-10deg)',
-              }}
-            >
-              REVEAL!
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div
-        className="transition-all duration-500"
-        style={{
-          opacity: phase === 'revealed' ? 1 : 0,
-          transform: phase === 'revealed' ? 'skewX(0deg) translateX(0)' : 'skewX(-20deg) translateX(-30px)',
-        }}
-      >
-        {children}
-      </div>
     </div>
   )
 }

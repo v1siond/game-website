@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -13,7 +13,6 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
-import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // ============================================================================
@@ -148,70 +147,6 @@ function VintageOrnaments({ profession }: { profession: 'engineer' | 'drummer' |
           {item.icon}
         </div>
       ))}
-    </div>
-  )
-}
-
-// ============================================================================
-// COMPONENT: Splash Reveal Section (ink splat animation on scroll)
-// ============================================================================
-function SplashRevealSection({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  const ref = useRef<HTMLDivElement>(null)
-  const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
-  const [phase, setPhase] = useState<'hidden' | 'splashing' | 'revealed'>('hidden')
-  const reducedMotion = useReducedMotion()
-
-  useEffect(() => {
-    if (hasEntered && phase === 'hidden') {
-      if (reducedMotion) {
-        setPhase('revealed')
-      } else {
-        setPhase('splashing')
-        setTimeout(() => setPhase('revealed'), 500)
-      }
-    }
-  }, [hasEntered, phase, reducedMotion])
-
-  return (
-    <div ref={ref} className={`relative overflow-hidden ${className}`}>
-      {/* Ink splash animation */}
-      {phase === 'splashing' && !reducedMotion && (
-        <div className="absolute inset-0 z-50 pointer-events-none flex items-center justify-center" aria-hidden="true">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute rounded-full cuphead-ink-splash"
-              style={{
-                left: `${30 + i * 8}%`,
-                top: `${40 + (i % 3) * 10}%`,
-                width: 20 + i * 5,
-                height: 20 + i * 5,
-                background: CUPHEAD_COLORS.inkBlack,
-                animationDelay: `${i * 0.05}s`,
-              }}
-            />
-          ))}
-          <div className="absolute text-4xl cuphead-pop-in" style={{ color: CUPHEAD_COLORS.accentGold }}>
-            ✦
-          </div>
-        </div>
-      )}
-
-      <div
-        style={{
-          opacity: phase === 'revealed' ? 1 : 0,
-          transform: phase === 'revealed' ? 'scale(1)' : 'scale(0.9)',
-          transition: reducedMotion ? 'none' : 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-        }}
-      >
-        {children}
-      </div>
     </div>
   )
 }
