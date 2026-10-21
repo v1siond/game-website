@@ -23,7 +23,7 @@ import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, RELEASED } from '@/components/cv/sectionText'
 
 // Blended Dark Fantasy Metroidvania palette
-// Hollow Knight ethereal blues + Iconoclast brass/copper + Ori spirit gold + Salt & Sanctuary stone
+// Ethereal cavern blues + mechanical brass/copper + spirit gold + weathered stone
 const DF = {
   // Deep void backgrounds (HK + S&S)
   void: '#0f0a1a',
@@ -34,19 +34,19 @@ const DF = {
   ethereal: '#41c8e8',
   etherealDark: '#5ecfef',
 
-  // Spirit/soul gold (Ori)
+  // Spirit/soul gold
   spiritGold: '#e8c841',
   spiritGoldDark: '#d4af37',
 
-  // Mechanical brass/copper (Iconoclast)
+  // Mechanical brass/copper
   brass: '#b08d57',
   copper: '#8b6914',
 
-  // Organic green (Ori forests)
+  // Organic forest green
   forestGreen: '#4a8f4a',
   mossGreen: '#2d5a2d',
 
-  // Stone grey (Salt & Sanctuary)
+  // Stone grey
   stoneGrey: '#4a4a4a',
   stoneDark: '#333333',
 
@@ -130,7 +130,7 @@ const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DF.ethereal }: 
   )
 })
 
-// Mechanical gear (Iconoclast-inspired)
+// Mechanical gear
 const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: number }) {
   const teeth = 12
   return (
@@ -323,7 +323,7 @@ const GothicChandelier = memo(function GothicChandelier() {
   )
 })
 
-// Stone/crystal formations (Salt and Sanctuary inspired)
+// Stone/crystal formations
 const StoneFormations = memo(function StoneFormations() {
   return (
     <svg
@@ -385,7 +385,7 @@ const StoneFormations = memo(function StoneFormations() {
   )
 })
 
-// Gothic window with Ori-style light rays
+// Gothic window with soft light rays
 const GothicWindow = memo(function GothicWindow({ side }: { side: 'left' | 'right' }) {
   const xPos = side === 'left' ? '5%' : '95%'
   const transform = side === 'left' ? 'translateX(0)' : 'translateX(-100%)'
@@ -434,7 +434,7 @@ const GothicWindow = memo(function GothicWindow({ side }: { side: 'left' | 'righ
   )
 })
 
-// Hollow Knight boss-arena depth, a gothic STAGE: a distant back wall with small,
+// Boss-arena depth, a gothic STAGE: a distant back wall with small,
 // receded lancet windows, a FLOOR in front (cornice + perspective lines + soft stage
 // light) so there's a clear floor/wall read, framed by interior columns and hanging
 // soul-lamps, distant towers beyond, fog and drifting soul motes. Profession floor props
@@ -938,10 +938,10 @@ const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; sublabel: string;
 }
 
 /**
- * Hollow Knight-style Decorative Flourish
+ * Gothic decorative flourish
  * =======================================
  * Elegant curved vine-like pattern used at top/bottom of dialogue boxes.
- * Inspired by Hollow Knight's UI - organic, gothic curves with small embellishments.
+ * Organic, gothic curves with small embellishments.
  *
  * Pattern: CSS-only (SVG paths)
  * Why chosen: Static decorative element, no animation needed. SVG paths give us
@@ -1050,7 +1050,7 @@ const DialogueFlourish = memo(function DialogueFlourish({
 })
 
 /**
- * Hollow Knight-style Dialogue Box Frame (VoidFrame)
+ * Gothic dialogue box frame (VoidFrame)
  * ==================================================
  * Visual styling matching HK's in-game dialogue boxes:
  * - Dark semi-transparent background (deep blue/purple tones)
@@ -1330,7 +1330,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
 })
 
 
-// Art Section 1 - Spirit wisps with mechanical gears (blend of Ori + Iconoclast)
+// Art Section 1 - Spirit wisps with mechanical gears (spirit light and brass)
 const ArtSectionSpirits = memo(function ArtSectionSpirits() {
   return (
     <div className="relative z-20 py-16 px-6 overflow-hidden" aria-hidden="true" role="presentation">

@@ -193,7 +193,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
   )
 })
 
-// Drummer "concert stage", a Hollow Knight gothic chamber ensemble: drum kit, keyboard,
+// Drummer "concert stage", a gothic chamber ensemble: drum kit, keyboard,
 // trumpets, guitar, cello + violin, set BACK (smaller, high near the windows) in the side
 // negative spaces so they read as distant stage-dressing and never touch the content.
 // Solid dark shells, tarnished brass, ornate detail, gradient shading. Drummer only.

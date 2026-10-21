@@ -6,7 +6,7 @@ import { KnightCharacter } from './KnightCharacter'
 import { BattleBug } from './BattleReveal'
 
 /**
- * BUG CREATURE - HOLLOW KNIGHT BOSS STYLE
+ * BUG CREATURE - A CAVERN BOSS
  * =======================================
  *
  * Based on actual HK boss designs (reference image):

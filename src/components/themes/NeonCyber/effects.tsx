@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
-// Intense glitch text effect with RGB split - Cyberpunk 2077 style chromatic aberration
+// Intense glitch text effect with RGB split - neon city chromatic aberration
 export function GlitchText({
   text,
   className = '',

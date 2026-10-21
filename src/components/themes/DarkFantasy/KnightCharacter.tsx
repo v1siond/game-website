@@ -4,7 +4,7 @@ import { memo, ReactNode, useState, useEffect, useRef } from 'react'
 import { useInView, FixedCombatLayer } from './fixedCombat'
 
 /**
- * ALEXANDER AS HOLLOW KNIGHT CHARACTER
+ * ALEXANDER AS A MASKED CAVERN KNIGHT
  * =====================================
  * Based on reference image - 3/4 view facing RIGHT
  *

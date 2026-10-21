@@ -16,7 +16,7 @@ import { SECTION_VIEWS } from './ArtDeco/sections'
 import { ContactScene } from './ArtDeco/scenes'
 import look from './ArtDeco/world.module.css'
 
-// Art Deco, a city under the sea in the style of BioShock's Rapture: the page composition. Its palette,
+// Art Deco, a drowned 1920s city under the sea in brass, gold and lamplight: the page composition. Its palette,
 // backdrop, frames, cards, bottle switch, per profession sections, his costume and the scroll scenes
 // live in ./ArtDeco.
 //
