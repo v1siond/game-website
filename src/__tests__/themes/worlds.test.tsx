@@ -1,29 +1,26 @@
 import { themes } from '@/themes/themes'
 
-// Mock every world component so we exercise the registry wiring, not 17 heavy layouts.
-const mock = (name: string) =>
-  jest.mock(`@/components/themes/${name}`, () => ({
-    __esModule: true,
-    default: () => null,
-  }))
-
-mock('DarkFantasyTheme')
-mock('SurvivalHorrorTheme')
-mock('NeonPortalsTheme')
-mock('SoulMapTheme')
-mock('AdventurePathsTheme')
-mock('RubberHoseTheme')
-mock('RetroRPGTheme')
-mock('BoldNoirTheme')
-mock('FighterSelectTheme')
-mock('ArtDecoTheme')
-mock('RetroAtomicTheme')
-mock('NeonCyberTheme')
-mock('CellShadedTheme')
-mock('SilhouetteTheme')
-mock('MythicTheme')
-mock('TropicalPlatformerTheme')
-mock('MedievalFantasyTheme')
+// Every world component is mocked so the suite checks the registry wiring, not 17 heavy layouts, and a
+// world mid edit cannot break it. Each call is written out at the top level with a literal path and an
+// inline factory, because babel-jest hoists only those above the imports; a call inside a helper runs
+// after the imports and the real worlds load.
+jest.mock('@/components/themes/DarkFantasyTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/SurvivalHorrorTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/NeonPortalsTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/SoulMapTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/AdventurePathsTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/RubberHoseTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/RetroRPGTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/BoldNoirTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/FighterSelectTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/ArtDecoTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/RetroAtomicTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/NeonCyberTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/CellShadedTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/SilhouetteTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/MythicTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/TropicalPlatformerTheme', () => ({ __esModule: true, default: () => null }))
+jest.mock('@/components/themes/MedievalFantasyTheme', () => ({ __esModule: true, default: () => null }))
 
 import {
   WORLDS,
