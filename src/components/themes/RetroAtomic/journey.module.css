@@ -1,0 +1,175 @@
+/* The walk out of the shelter (journey.tsx), the dog (dog.tsx), the fetch and the level up (events.tsx).
+ * Transform and opacity only; every loop and move is still under reduced motion. */
+
+/* ---- the zones behind the page ---- */
+
+.zone {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.zone[data-shown] {
+  opacity: 1;
+}
+
+.neon {
+  animation: neon 3.2s steps(1, end) infinite;
+}
+
+@keyframes neon {
+  0%, 62%, 70%, 100% { opacity: 1; }
+  64%, 68% { opacity: 0.35; }
+}
+
+/* ---- he and the dog on the ground strip ---- */
+
+.walker {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 9rem;
+  height: 100%;
+  transform: translateX(3vw);
+  transition: transform 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.walker[data-zone='wasteland'] { transform: translateX(calc(50vw - 4.5rem)); }
+.walker[data-zone='town'] { transform: translateX(calc(100vw - 10rem)); }
+
+.follower {
+  transition: transform 0.4s ease 0.3s;
+}
+
+/* ---- the dog's joints ---- */
+
+.dog * { transform-box: view-box; }
+.dogBody { transform-origin: 55px 41px; }
+.dogHead { transform-origin: 90px 34px; }
+.dogTail { transform-origin: 22px 38px; }
+.dogHindFar { transform-origin: 34px 46px; }
+.dogFrontFar { transform-origin: 86px 46px; }
+.dogHindNear { transform-origin: 40px 46px; }
+.dogFrontNear { transform-origin: 90px 46px; }
+
+.dogTrot .dogFrontNear, .dogTrot .dogHindFar { animation: paw-a 0.42s ease-in-out infinite; }
+.dogTrot .dogFrontFar, .dogTrot .dogHindNear { animation: paw-b 0.42s ease-in-out infinite; }
+.dogTrot .dogBody, .dogTrot .dogHead { animation: lope 0.42s ease-in-out infinite; }
+.dogTrot .dogTail { animation: wag 0.42s ease-in-out infinite; }
+
+.dogRun .dogFrontNear, .dogRun .dogFrontFar { animation: paw-a 0.26s ease-in-out infinite; }
+.dogRun .dogHindNear, .dogRun .dogHindFar { animation: paw-b 0.26s ease-in-out infinite; }
+.dogRun .dogBody, .dogRun .dogHead { animation: lope 0.26s ease-in-out infinite; }
+.dogRun .dogTail { transform: rotate(-20deg); }
+
+/* Sitting (checked as a picture, research poses/dog-sit.png): the haunches drop, the hind legs fold
+ * flat under them, the front legs stay straight, the tail lies on the ground and the head looks up. */
+.dogSit .dogHindNear, .dogSit .dogHindFar { transform: translate(6px, 17px) rotate(-85deg); }
+.dogSit .dogBody { transform: rotate(-14deg) translateY(4px); }
+.dogSit .dogHead { transform: rotate(-12deg) translateY(-2px); }
+.dogSit .dogTail { transform: translateY(9px) rotate(-60deg); }
+
+@keyframes paw-a {
+  0%, 100% { transform: rotate(28deg); }
+  50% { transform: rotate(-28deg); }
+}
+
+@keyframes paw-b {
+  0%, 100% { transform: rotate(-28deg); }
+  50% { transform: rotate(28deg); }
+}
+
+@keyframes lope {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes wag {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-22deg); }
+}
+
+/* ---- about: the dog fetches the holotape (events.tsx) ---- */
+
+.fetchDog {
+  transform: translateX(-60vw);
+}
+
+.fetchTape {
+  opacity: 0;
+}
+
+.fetch[data-on] .fetchTape {
+  opacity: 1;
+}
+
+/* The run's leg loops play for the length of the run (5 x 0.26 s), then the dog stands. */
+.fetch[data-on] .fetchDog .dog * {
+  animation-iteration-count: 5;
+}
+
+.fetch[data-on] .fetchDog {
+  animation: fetch-run 1.3s cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.fetch[data-on] .fetchTape {
+  animation: tape-drop 0.5s ease-in 1.2s both;
+}
+
+.fetch .fetchPanel {
+  opacity: 0;
+  transform: scaleY(0.04);
+}
+
+.fetch[data-on] .fetchPanel {
+  animation: power-on 0.5s ease-out 1.6s both;
+}
+
+@keyframes fetch-run {
+  from { transform: translateX(-60vw); }
+  to { transform: translateX(0); }
+}
+
+@keyframes tape-drop {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  75% { transform: translate(10px, 26px) rotate(30deg); }
+  100% { transform: translate(12px, 22px) rotate(24deg); }
+}
+
+@keyframes power-on {
+  0% { opacity: 1; transform: scaleY(0.04); }
+  60% { opacity: 1; transform: scaleY(1.04); }
+  100% { opacity: 1; transform: scaleY(1); }
+}
+
+/* ---- experience: the level up card stamps down (events.tsx) ---- */
+
+.levelUp {
+  opacity: 0;
+  transform: scale(1.8) rotate(-8deg);
+}
+
+.stamp[data-on] .levelUp {
+  animation: stamp 0.55s cubic-bezier(0.3, 1.4, 0.5, 1) 0.2s both;
+}
+
+.sunburst {
+  animation: turn 24s linear infinite;
+}
+
+@keyframes stamp {
+  0% { opacity: 0; transform: scale(1.8) rotate(-8deg); }
+  100% { opacity: 1; transform: scale(1) rotate(-2deg); }
+}
+
+@keyframes turn {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zone, .walker, .follower { transition: none; }
+  .neon, .sunburst, .dog * { animation: none !important; }
+  .fetchDog, .fetch[data-on] .fetchDog { animation: none; transform: none; }
+  .fetchTape, .fetch[data-on] .fetchTape { animation: none; opacity: 1; transform: translate(12px, 22px) rotate(24deg); }
+  .fetch .fetchPanel, .fetch[data-on] .fetchPanel { animation: none; opacity: 1; transform: none; }
+  .levelUp, .stamp[data-on] .levelUp { animation: none; opacity: 1; transform: rotate(-2deg); }
+}

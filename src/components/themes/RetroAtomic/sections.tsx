@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { drumsSince } from '@/components/cv/sectionText'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useZoneStage } from '@/hooks/useZoneStage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { atomicId } from './anchors'
@@ -12,7 +12,10 @@ import { Holotapes, Inventory } from './inventory'
 import { TargetingSystem } from './targeting'
 import { Radio } from './radio'
 import { PerkChart } from './perks'
+import { Fetch, LevelUp } from './events'
+import type { Zone } from './journey'
 import atomic from './atomic.module.css'
+import j from './journey.module.css'
 
 // The picked profession's sections, each one a stage: useSectionTrigger adds data-on once it scrolls
 // into view and the CSS plays that section's own entrance off it (the quest cards power on like the
@@ -29,11 +32,11 @@ function SectionTitle({ title }: { title: string }) {
   )
 }
 
-function Stage({ title, children }: { title: string; children: ReactNode }) {
-  const { ref, triggered } = useSectionTrigger()
+function Stage({ title, zone, className = '', children }: { title: string; zone: Zone; className?: string; children: ReactNode }) {
+  const { ref, on } = useZoneStage(zone)
 
   return (
-    <section ref={ref} data-on={triggered || undefined} aria-labelledby={atomicId(title)} className={`mb-20 scroll-mt-24 ${atomic.stage}`}>
+    <section ref={ref} data-on={on || undefined} aria-labelledby={atomicId(title)} className={`mb-20 scroll-mt-24 ${atomic.stage} ${className}`}>
       <SectionTitle title={title} />
       {children}
     </section>
@@ -46,30 +49,33 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
   return (
     <>
-      <Stage title={titles.about}>
-        <div className={`max-w-3xl p-5 sm:p-6 ${atomic.panel}`}>
-          <p className="text-base leading-relaxed text-atomic-phosphor">{professionalSummary.bio}</p>
-        </div>
+      <Stage title={titles.about} zone="shelter" className={j.fetch}>
+        <Fetch>
+          <div className={`max-w-3xl p-5 sm:p-6 ${atomic.panel}`}>
+            <p className="text-base leading-relaxed text-atomic-phosphor">{professionalSummary.bio}</p>
+          </div>
+        </Fetch>
       </Stage>
 
       {sections.jobs.length > 0 && (
-        <Stage title={titles.workExperience}>
+        <Stage title={titles.workExperience} zone="wasteland" className={j.stamp}>
+          <LevelUp job={sections.jobs[0]} />
           <QuestLog jobs={sections.jobs} />
         </Stage>
       )}
 
-      <Stage title={titles.techStack}>
+      <Stage title={titles.techStack} zone="wasteland">
         <Inventory categories={sections.techStack} />
       </Stage>
 
       {sections.projects.length > 0 && (
-        <Stage title={titles.projects}>
+        <Stage title={titles.projects} zone="wasteland">
           <TargetingSystem projects={sections.projects} />
         </Stage>
       )}
 
       {sections.companies.length > 0 && (
-        <Stage title={titles.ventures}>
+        <Stage title={titles.ventures} zone="town">
           <Holotapes companies={sections.companies} />
         </Stage>
       )}
@@ -82,7 +88,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   const { musician, bands } = sections
 
   return (
-    <Stage title={labels.sections.bands}>
+    <Stage title={labels.sections.bands} zone="town">
       <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
       <Radio bands={bands} />
       <p className="mt-6 text-base italic text-atomic-phosphor-dim">{musician.line}</p>
@@ -94,7 +100,7 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
   const labels = useLabels()
 
   return (
-    <Stage title={labels.sections.muayThai}>
+    <Stage title={labels.sections.muayThai} zone="town">
       <PerkChart martialArts={sections.martialArts} />
     </Stage>
   )

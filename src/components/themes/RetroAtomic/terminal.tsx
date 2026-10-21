@@ -3,7 +3,7 @@
 import { useMemo, useReducer, useState } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useZoneStage } from '@/hooks/useZoneStage'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel } from '@/lib/cv/labels'
 import { ActionMenu } from './controls'
@@ -190,7 +190,7 @@ export function ContactTerminal() {
   const { sections } = useLabels()
   const { hero } = useWorldView()
   const { techStack } = useCVData()
-  const { ref, triggered } = useSectionTrigger()
+  const { ref, on } = useZoneStage('town')
   const tools = useMemo(() => techStack.flatMap((category) => category.items), [techStack])
   const [seed, setSeed] = useState(() => Math.floor(Math.random() * 2 ** 31))
   const board = useMemo(() => buildBoard(tools, seed), [tools, seed])
@@ -198,8 +198,8 @@ export function ContactTerminal() {
 
   return (
     <section ref={ref} aria-labelledby={atomicId(title)} className="relative z-20 overflow-hidden px-4 pb-48 pt-16 sm:px-6 lg:pb-56">
-      <Wasteland walking={triggered} />
-      <div className={`relative mx-auto max-w-6xl p-3 sm:p-5 ${atomic.device}`} data-on={triggered || undefined}>
+      <Wasteland walking={on} />
+      <div className={`relative mx-auto max-w-6xl p-3 sm:p-5 ${atomic.device}`} data-on={on || undefined}>
         <div className={`relative overflow-hidden rounded-[1.4rem] p-5 sm:p-8 ${atomic.tube}`}>
           <div className={`grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${atomic.sectionPower}`}>
             <div>
