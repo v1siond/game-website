@@ -6,6 +6,7 @@ import { CircuitPattern } from './effects'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
+import { jobYears } from '@/components/cv/sectionText'
 
 export type PanelAccent = 'yellow' | 'green' | 'cyan' | 'magenta' | 'violet' | 'red' | 'orange'
 
@@ -156,8 +157,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 // Work experience card - cyber dossier / personnel file style. Dates are date only strings (UTC
 // midnight), so the year is read in UTC: a January start shows its own year west of UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'ACTIVE'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'ACTIVE')
   const reducedMotion = useReducedMotion()
 
   return (

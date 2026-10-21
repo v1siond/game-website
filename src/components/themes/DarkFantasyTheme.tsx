@@ -19,6 +19,7 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
+import { jobYears } from '@/components/cv/sectionText'
 
 // Blended Dark Fantasy Metroidvania palette
 // Hollow Knight ethereal blues + Iconoclast brass/copper + Ori spirit gold + Salt & Sanctuary stone
@@ -1312,8 +1313,7 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
 // Work experience card. Dates are date only strings (UTC midnight), so the year is read in UTC: a
 // January start keeps its own year west of UTC.
 const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: Job; isLast?: boolean }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
 
   return (
     <article className="py-4">

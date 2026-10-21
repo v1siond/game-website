@@ -2,6 +2,7 @@ import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { RAPTURE_COLORS } from './palette'
+import { jobYears } from '@/components/cv/sectionText'
 
 // The brass card every list entry sits on: caustic shimmer, deco top line and hover gleam.
 export function BrassCard({
@@ -75,8 +76,7 @@ export const CARD_TITLE_STYLE: React.CSSProperties = {
 // so the year is read in UTC.
 // ============================================================================
 export function ExperienceCard({ entry, reducedMotion }: { entry: Job; reducedMotion: boolean }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
 
   return (
     <BrassCard reducedMotion={reducedMotion}>

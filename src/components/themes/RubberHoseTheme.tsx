@@ -15,6 +15,7 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { jobYears } from '@/components/cv/sectionText'
 
 // ============================================================================
 // CUPHEAD COLOR PALETTE - Authentic 1930s Fleischer/Disney style
@@ -823,8 +824,7 @@ function BandRecord({ band, years, linkProps }: BandSlot) {
 // so the year is read in UTC.
 // ============================================================================
 function ExperienceCard({ entry }: { entry: Job }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
 
   return (
     <article className="p-4 relative" style={POSTER_STYLE}>

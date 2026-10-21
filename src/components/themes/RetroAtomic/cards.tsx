@@ -20,6 +20,7 @@ import {
   wornPaperBg,
 } from './palette'
 import { RadiationSymbol } from './icons'
+import { jobYears } from '@/components/cv/sectionText'
 
 // The selector tab and the cards each section lists.
 
@@ -94,8 +95,7 @@ export function TechStackTerminal({ categories }: { categories: CVData['techStac
 
 // Dates are date only strings (UTC midnight), so the year is read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const startYear = entry.startDate.getUTCFullYear()
-  const endYear = entry.endDate ? entry.endDate.getUTCFullYear() : 'PRESENT'
+  const { start: startYear, end: endYear } = jobYears(entry, 'PRESENT')
   const isActive = !entry.endDate
 
   return (

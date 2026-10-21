@@ -1,4 +1,4 @@
-import type { Band, MartialArts, Project, ProjectLinks } from '@/lib/cv/content'
+import type { Band, Job, MartialArts, Project, ProjectLinks } from '@/lib/cv/content'
 
 // The words every world prints around the CV facts: link labels, year spans, the Muay Thai record
 // lines. One place, so the 17 worlds say the same thing and only draw it differently.
@@ -47,6 +47,17 @@ export function yearSpan({ startYear, endYear, current, years = null }: Span): s
 }
 
 export const bandSpan = (band: Band): string => yearSpan(band)
+
+export interface JobYears {
+  start: number
+  end: number | string
+}
+
+/** A job's start and end year; a running job ends in the world's own word for now ("Present", "NOW").
+ *  Dates are date only strings (UTC midnight), so the year is read in UTC. */
+export function jobYears(job: Pick<Job, 'startDate' | 'endDate'>, openLabel: string): JobYears {
+  return { start: job.startDate.getUTCFullYear(), end: job.endDate ? job.endDate.getUTCFullYear() : openLabel }
+}
 
 export interface RecordFact {
   label: string

@@ -14,6 +14,7 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { jobYears } from '@/components/cv/sectionText'
 
 // ============================================================================
 // CRASH BANDICOOT EXACT COLOR PALETTE
@@ -1348,8 +1349,7 @@ function TechCrates({ categories }: { categories: CVData['techStack'] }) {
 // EXPERIENCE CARD. Dates are date only strings (UTC midnight), so the year is read in UTC.
 // ============================================================================
 function ExperienceCard({ entry }: { entry: Job }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
 
   return (
     <article

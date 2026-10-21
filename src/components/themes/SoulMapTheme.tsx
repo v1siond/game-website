@@ -13,6 +13,7 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { jobYears } from '@/components/cv/sectionText'
 
 // Color palette - Dark Souls authentic
 const COLORS = {
@@ -1487,8 +1488,7 @@ function BandCard({ band, years, linkProps }: BandSlot) {
 // Work experience card - Dark Souls item description style. Dates are date only strings (UTC
 // midnight), so the year is read in UTC: a January start keeps its own year west of UTC.
 function ExperienceCard({ entry }: { entry: Job }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
 
   return (
     <article

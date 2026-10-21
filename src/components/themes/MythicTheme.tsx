@@ -15,6 +15,7 @@ import { ProfessionSectionsView, type ProfessionSectionViews } from '@/component
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { KratosChainPullReveal } from './Mythic/KratosSprite'
+import { jobYears } from '@/components/cv/sectionText'
 
 // =============================================================================
 // GOD OF WAR 3 COLOR PALETTE
@@ -1351,8 +1352,7 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
 // January start keeps its own year west of UTC.
 // =============================================================================
 const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: Job; isLast?: boolean }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
 
   return (
     <article className="py-4">

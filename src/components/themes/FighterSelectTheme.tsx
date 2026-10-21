@@ -13,6 +13,7 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { jobYears } from '@/components/cv/sectionText'
 
 // =============================================================================
 // EXACT COLOR PALETTE - STREET FIGHTER / MORTAL KOMBAT / TEKKEN INSPIRED
@@ -723,8 +724,7 @@ function BandCard({ band, years, linkProps }: BandSlot) {
 // EXPERIENCE CARD - FIGHT RECORD STYLE. Dates are date only strings (UTC midnight), so the year is read in UTC.
 // =============================================================================
 function ExperienceCard({ entry }: { entry: Job }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'NOW'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'NOW')
   const isActive = !entry.endDate
   const color = isActive ? COLORS.healthGreen : COLORS.specialBlue
 

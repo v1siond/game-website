@@ -13,6 +13,7 @@ import type { CVData, Job, Project } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { jobYears } from '@/components/cv/sectionText'
 
 // Borderlands color palette - desert wasteland + loot rarity
 const BORDERLANDS_COLORS = {
@@ -854,8 +855,7 @@ function TechStackCloud({ categories, reducedMotion = false }: { categories: CVD
 function ExperienceCard({ entry, index, reducedMotion = false }: { entry: Job; index: number; reducedMotion?: boolean }) {
   const borderColors = [BORDERLANDS_COLORS.legendary, BORDERLANDS_COLORS.rare, BORDERLANDS_COLORS.psychoRed]
   const color = borderColors[index % 3]
-  const startYear = entry.startDate.getUTCFullYear()
-  const endYear = entry.endDate ? entry.endDate.getUTCFullYear() : 'ACTIVE'
+  const { start: startYear, end: endYear } = jobYears(entry, 'ACTIVE')
 
   return (
     <article

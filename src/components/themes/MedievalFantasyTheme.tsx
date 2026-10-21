@@ -15,6 +15,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { jobYears } from '@/components/cv/sectionText'
 
 // =============================================================================
 // WARCRAFT 3 DUAL PALETTE - Reign of Chaos + Frozen Throne
@@ -4475,11 +4476,9 @@ const CARD_CHIP: React.CSSProperties = {
   textTransform: 'uppercase',
 }
 
-// Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps
-// its own year west of UTC.
-function jobYears(job: Job): string {
-  const end = job.endDate ? job.endDate.getUTCFullYear() : 'Present'
-  return `${job.startDate.getUTCFullYear()} - ${end}`
+function jobYearsLabel(job: Job): string {
+  const { start, end } = jobYears(job, 'Present')
+  return `${start} - ${end}`
 }
 
 function JobCard({ job }: { job: Job }) {
@@ -4490,7 +4489,7 @@ function JobCard({ job }: { job: Job }) {
           <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{job.title}</h3>
           <p style={{ color: WC3.goldMid, fontSize: '0.875rem' }}>{job.company}</p>
         </div>
-        <span style={{ color: WC3.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYears(job)}</span>
+        <span style={{ color: WC3.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYearsLabel(job)}</span>
       </div>
       {job.description && <p style={{ color: WC3.textMid, fontSize: '0.875rem' }}>{job.description}</p>}
       {job.highlights.length > 0 && (

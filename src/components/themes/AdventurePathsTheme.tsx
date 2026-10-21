@@ -13,6 +13,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { jobYears } from '@/components/cv/sectionText'
 
 // =============================================================================
 // SUPER MARIO BROS (NES) THEMED CV
@@ -1099,8 +1100,7 @@ function MusicCard({ band, years, linkProps }: BandSlot) {
 
 // Experience entry - Quest log style. Dates are date only strings (UTC midnight), so the year is read in UTC.
 function QuestEntry({ entry }: { entry: Job }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'NOW'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'NOW')
 
   return (
     <article

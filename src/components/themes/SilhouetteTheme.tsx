@@ -11,6 +11,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { jobYears } from '@/components/cv/sectionText'
 
 // =============================================================================
 // LIMBO - DARKER, PERFORMANCE-OPTIMIZED
@@ -613,8 +614,7 @@ function SectionHeader({ title }: { title: string }) {
 // Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps its
 // own year west of UTC.
 function ExperienceCard({ entry }: { entry: Job }) {
-  const startYear = entry.startDate.getUTCFullYear()
-  const endYear = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const { start: startYear, end: endYear } = jobYears(entry, 'Present')
 
   return (
     <article className="p-4" style={{

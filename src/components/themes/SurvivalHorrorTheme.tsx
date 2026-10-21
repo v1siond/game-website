@@ -12,6 +12,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { jobYears } from '@/components/cv/sectionText'
 
 // Resident Evil actual game palette - from gameplay screenshots
 // RE1 Remake mansion, RE4 village, RE7 Baker house
@@ -1011,8 +1012,7 @@ function BandCard({ band, years, linkProps }: BandSlot) {
 // Work experience card - worn document style. Dates are date only strings (UTC midnight), so the year
 // is read in UTC: a January start keeps its own year west of UTC.
 function ExperienceCard({ entry }: { entry: Job }) {
-  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
-  const startDisplay = entry.startDate.getUTCFullYear()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
 
   return (
     <div
