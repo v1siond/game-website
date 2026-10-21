@@ -1,3 +1,4 @@
+import { pixelRuns, type Run } from '@/lib/pixelRuns'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { TRAIL } from './palette'
@@ -115,30 +116,9 @@ export const EYES: ReadonlyArray<readonly [number, number]> = [
   [11, 6],
 ]
 
-export interface Run {
-  x: number
-  y: number
-  width: number
-  key: string
-}
-
-/**
- * The rows of a part as runs of one colour key, each row centred in the sprite's width and placed from
- * `top`. Transparent pixels ('.') make no run.
- */
-export function spriteRuns(rows: readonly string[], top: number): Run[] {
-  return rows.flatMap((row, index) => {
-    const left = (SPRITE.width - row.length) / 2
-    const runs: Run[] = []
-    let start = 0
-    for (let x = 1; x <= row.length; x += 1) {
-      if (row[x] === row[start]) continue
-      if (row[start] !== '.') runs.push({ x: left + start, y: top + index, width: x - start, key: row[start] })
-      start = x
-    }
-    return runs
-  })
-}
+/** The rows of a part as runs, each row centred in the sprite's width and placed from `top`. */
+export const spriteRuns = (rows: readonly string[], top: number): Run[] =>
+  rows.flatMap((row, index) => pixelRuns([row], top + index, (SPRITE.width - row.length) / 2))
 
 const OUTLINE = '#160e08'
 const CAP_RED = '#c8301f'
