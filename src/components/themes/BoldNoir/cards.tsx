@@ -7,6 +7,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { HitStar } from './backdrop'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 
 // The cards each section lists, each a crooked slab whose words sit level so they read. Every card sits
 // in two layers: the outer one plays the entrance once when its stage fires (rank flip, result slide),
@@ -43,17 +44,17 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
   const { cards } = useLabels()
 
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
-        <div key={category.id}>
+        <li key={category.id} className={MASONRY_ITEM}>
           <h3 className="flex items-center gap-2 text-2xl uppercase tracking-widest">
             <HitStar className="h-5 w-5" />
             {category.name}
           </h3>
           <Chips items={category.items} label={fillLabel(cards.categoryTechnologies, { name: category.name })} />
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 

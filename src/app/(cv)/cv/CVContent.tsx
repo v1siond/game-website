@@ -6,6 +6,7 @@ import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/components/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 
 // A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
 const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
@@ -152,14 +153,14 @@ export function CVContent() {
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
               {cvPage.technicalSkills}
             </h2>
-            <div className="text-sm space-y-2">
+            <ul className={`text-sm ${MASONRY_LIST}`}>
               {techStack.map((category) => (
-                <div key={category.id}>
+                <li key={category.id} className={MASONRY_ITEM}>
                   <span className="font-semibold">{category.name}:</span>{' '}
                   <span>{category.items.join(', ')}</span>
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </section>
         )}
 

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import type { TechCategory } from '@/lib/cv/content'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -28,7 +29,7 @@ function Branch({ category, index, lit, onLight }: { category: Category; index: 
   const depth = lit?.branch === category.id ? lit.depth : -1
 
   return (
-    <li className={`relative ${cel.branch}`} style={{ ['--i' as string]: index }} onPointerLeave={() => onLight(null)}>
+    <li className={`relative pb-4 ${MASONRY_ITEM} ${cel.branch}`} style={{ ['--i' as string]: index }} onPointerLeave={() => onLight(null)}>
       <div
         className={`relative z-10 mx-auto w-fit px-4 py-2 text-xl ${cel.display} ${cel.skill}`}
         onPointerEnter={() => onLight({ branch: category.id, depth: 0 })}
@@ -69,7 +70,7 @@ export function SkillTree({ categories }: { categories: Category[] }) {
         </div>
         <p className="mb-4 w-full min-w-0 text-base text-[var(--cel-paper)] sm:ml-28 sm:w-auto sm:flex-1">{hud.treeHint}</p>
       </div>
-      <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" aria-label={cards.techByCategory}>
+      <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
         {categories.map((category, index) => (
           <Branch key={category.id} category={category} index={index} lit={lit} onLight={setLit} />
         ))}

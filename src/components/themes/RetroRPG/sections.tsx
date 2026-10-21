@@ -84,7 +84,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </Block>
       )}
 
-      <Block label={titles.techStack} title={titles.techStack}>
+      <Block label={titles.techStack} title={titles.techStack} width={WIDE}>
         <OpenBox>
           <ItemBag categories={sections.techStack} />
         </OpenBox>

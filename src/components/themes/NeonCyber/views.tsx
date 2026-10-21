@@ -5,6 +5,7 @@ import type { SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { headingId, newTabName } from '@/components/cv/sectionText'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { Braindance } from './braindance'
@@ -45,9 +46,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <FadeInScene>
         <HudPanel title={titles.techStack}>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className={MASONRY_LIST}>
             {sections.techStack.map((category) => (
-              <section key={category.id} aria-labelledby={headingId('nc-tech', category.name)}>
+              <section key={category.id} aria-labelledby={headingId('nc-tech', category.name)} className={MASONRY_ITEM}>
                 <h3 id={headingId('nc-tech', category.name)} className="mb-2 text-sm uppercase tracking-wider text-[color:var(--neon-hud)]">
                   {category.name}
                 </h3>

@@ -24,6 +24,7 @@ import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 
 // Abstract spirit wisp - optimized: no SVG filter
@@ -1017,9 +1018,9 @@ const DF_FONT = '"Comic Sans MS", "Comic Sans", cursive'
 const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
   return (
-    <div className="space-y-6">
+    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
-        <div key={category.id}>
+        <li key={category.id} className={MASONRY_ITEM}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
             style={{ color: DARK_FANTASY.silver, fontFamily: DF_FONT }}
@@ -1043,9 +1044,9 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
               </li>
             ))}
           </ul>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 })
 

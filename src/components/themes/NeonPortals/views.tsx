@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { BandList } from '@/components/cv/BandList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/components/cv/masonry'
 import { drumsSince, headingId, newTabName } from '@/components/cv/sectionText'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -72,14 +72,14 @@ const HINT = 'mb-6 text-base text-[color:var(--np-muted)]'
 
 function TechStack({ categories }: { categories: CVData['techStack'] }) {
   return (
-    <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className={MASONRY_LIST}>
       {categories.map((category) => (
-        <li key={category.id} className={`${ui.panel} p-5`}>
+        <li key={category.id} className={`${MASONRY_ITEM} ${ui.panel} p-5`}>
           <h3 className={`mb-3 flex items-center gap-2 text-base uppercase tracking-wide text-[color:var(--np-teal)] ${ui.chunk}`}>
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
-          <ul className="grid grid-cols-2 gap-1.5">
+          <ul className={`${MASONRY_TILES} gap-1.5`}>
             {category.items.map((tech) => (
               <li key={tech} className="rounded-md border-2 border-[color:var(--np-plate)] bg-[color:var(--np-void)] px-2 py-1 text-sm text-[color:var(--np-white)]">
                 {tech}

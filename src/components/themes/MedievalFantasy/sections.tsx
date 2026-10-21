@@ -10,6 +10,7 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { drumsSince, newTabName } from '@/components/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { REALM } from './palette'
 import { InnerCard, RealmFrame } from './panels'
 import { BandCard, CARD_BODY, CARD_SUBTITLE, CARD_TITLE, JobCard, ProjectCard } from './cards'
@@ -105,9 +106,9 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
         <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <RealmFrame title={labels.sections.techStack} zone="roc">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+              <ul className={MASONRY_LIST} aria-label={labels.cards.techByCategory}>
                 {techStack.map((category) => (
-                  <div key={category.id}>
+                  <li key={category.id} className={MASONRY_ITEM}>
                     <h3 style={{ color: REALM.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${REALM.metalDark}`, paddingBottom: '0.25rem' }}>
                       {category.name}
                     </h3>
@@ -116,9 +117,9 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
                         <li key={tech} style={{ color: REALM.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{tech}</li>
                       ))}
                     </ul>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </RealmFrame>
           </section>
         </SectionWithOrnament>

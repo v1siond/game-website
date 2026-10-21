@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { newTabName } from '@/components/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import look from './world.module.css'
 
@@ -33,9 +34,9 @@ function BrassCard({ children }: { children: ReactNode }) {
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
   return (
-    <div className="space-y-5">
+    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
-        <div key={category.id}>
+        <li key={category.id} className={MASONRY_ITEM}>
           <h3 className={`mb-3 flex items-center gap-2 text-sm uppercase tracking-[0.2em] ${look.neon}`}>
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -47,9 +48,9 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
               </li>
             ))}
           </ul>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 

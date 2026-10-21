@@ -8,6 +8,7 @@ import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 
 // Rubber Hose's cards, sepia posters and title cards under one ink line: the tech bubbles, a job's title
 // card, a project's show poster, a venture's advertisement and a band's record label. A poster throws an
@@ -47,9 +48,9 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
   const { cards } = useLabels()
 
   return (
-    <div className="space-y-6">
+    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
-        <div key={category.id}>
+        <li key={category.id} className={MASONRY_ITEM}>
           <h3 className={`mb-3 flex items-center gap-2 text-sm uppercase tracking-widest ${world.red}`}>
             <span className="text-lg" aria-hidden="true">
               {category.icon}
@@ -63,9 +64,9 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
               </li>
             ))}
           </ul>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 

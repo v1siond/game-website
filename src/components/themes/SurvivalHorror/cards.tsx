@@ -1,5 +1,6 @@
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import look from './world.module.css'
 
@@ -16,9 +17,9 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
 
   return (
-    <div className="space-y-6">
+    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
-        <div key={category.id}>
+        <li key={category.id} className={MASONRY_ITEM}>
           <h3 className={`mb-3 text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>{category.name}</h3>
           <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
@@ -27,8 +28,8 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
               </li>
             ))}
           </ul>
-        </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
