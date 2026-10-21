@@ -5,24 +5,56 @@ import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { drumsSince } from '@/components/cv/sectionText'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { LevelScene } from '@/components/scroll/stage'
 import { BandCard, CompanyCard, ExperienceCard, ItemBag, ProjectCard } from './cards'
-import { SectionHeader, Window } from './panels'
+import { BulletBox } from './bulletBox'
+import { BODY, Box, Mark, SectionHeader } from './panels'
 import { PIXEL } from './palette'
-import { Lane, SceneItem } from './scenes'
-import { drumsSince } from '@/components/cv/sectionText'
+import { usePlay } from './play'
+import world from './world.module.css'
 
-// Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
-// Featured Work, Bands and the Muay Thai record are overworld levels he crosses, each entry arriving as
-// part of the level.
+// Each profession's sections, and only those, as the encounter's boxes. Light blocks (About, Tech stack,
+// Ventures, the band lines) are one box each; heavy blocks are the long lists in masonry columns
+// (MASONRY_LIST), each entry its own box with its own reveal (cards.tsx). The bullet box sits above
+// each profession's main list, playing that profession's soul mode (bulletBox.tsx).
+//
+// Every reveal has its own play scope (usePlay), so a block's heading, its box and each card in a list
+// open and type once, each when it shows, and never drive one another.
 
-function Block({ label, children }: { label: string; children: ReactNode }) {
+const WIDE = 'max-w-6xl'
+const NARROW = 'max-w-3xl'
+
+function Heading({ title }: { title: string }) {
+  const { ref, play } = usePlay(600)
+
   return (
-    <section className="px-4 py-8 sm:px-6" aria-label={label}>
-      <div className="mx-auto max-w-3xl">{children}</div>
+    <div ref={ref} data-play={play}>
+      <SectionHeader title={title} />
+    </div>
+  )
+}
+
+/** A single box that opens in steps, then shows what it holds, when it first shows. */
+function OpenBox({ children }: { children: ReactNode }) {
+  const { ref, play } = usePlay(1400)
+
+  return (
+    <div ref={ref} data-play={play}>
+      <Box className={world.opens}>{children}</Box>
+    </div>
+  )
+}
+
+function Block({ label, title, width = NARROW, children }: { label: string; title: string; width?: string; children: ReactNode }) {
+  return (
+    <section className="px-4 py-10 sm:px-6" aria-label={label}>
+      <div className={`mx-auto ${width}`}>
+        <Heading title={title} />
+        {children}
+      </div>
     </section>
   )
 }
@@ -32,68 +64,42 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
   return (
     <>
-      <FadeInScene>
-        <Block label="About">
-          <SectionHeader title="About" />
-          <Window>
-            <p className="text-sm leading-relaxed text-[color:var(--rpg-text)]">{professionalSummary.bio}</p>
-          </Window>
-        </Block>
-      </FadeInScene>
+      <Block label="About" title="About">
+        <OpenBox>
+          <p className={BODY}>{professionalSummary.bio}</p>
+        </OpenBox>
+      </Block>
 
       {sections.jobs.length > 0 && (
-        <LevelScene>
-          <Block label="Work experience">
-            <Lane profession="engineer" zone="record" />
-            <SectionHeader title="Work experience" />
-            <ul className="space-y-4">
-              {sections.jobs.map((entry) => (
-                <li key={entry.id}>
-                  <SceneItem kind="dialogue">
-                    <ExperienceCard entry={entry} />
-                  </SceneItem>
-                </li>
-              ))}
-            </ul>
-          </Block>
-        </LevelScene>
+        <Block label="Work experience" title="Work experience" width={WIDE}>
+          <BulletBox profession="engineer" />
+          <ul className={MASONRY_LIST}>
+            {sections.jobs.map((entry) => (
+              <li key={entry.id} className={MASONRY_ITEM}>
+                <ExperienceCard entry={entry} />
+              </li>
+            ))}
+          </ul>
+        </Block>
       )}
 
-      <FadeInScene>
-        <Block label="Tech stack">
-          <SectionHeader title="Tech stack" />
-          <Window>
-            <ItemBag categories={sections.techStack} />
-          </Window>
-        </Block>
-      </FadeInScene>
+      <Block label="Tech stack" title="Tech stack">
+        <OpenBox>
+          <ItemBag categories={sections.techStack} />
+        </OpenBox>
+      </Block>
 
-      <LevelScene>
-        <Block label="Projects">
-          <Lane profession="engineer" zone="work" />
-          <SectionHeader title="Featured work" />
-          <ProjectList
-            projects={sections.projects}
-            className="grid gap-4 md:grid-cols-2"
-            renderProject={(slot) => (
-              <SceneItem kind="menu">
-                <ProjectCard {...slot} />
-              </SceneItem>
-            )}
-          />
-        </Block>
-      </LevelScene>
+      <Block label="Projects" title="Featured work" width={WIDE}>
+        <ProjectList projects={sections.projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ProjectCard {...slot} />} />
+      </Block>
 
-      <FadeInScene>
-        <Block label="Ventures">
-          <SectionHeader title="Ventures" />
-          <div className="grid gap-4 md:grid-cols-3">
-            {sections.companies.map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))}
-          </div>
-        </Block>
-      </FadeInScene>
+      <Block label="Ventures" title="Ventures" width={WIDE}>
+        <div className="grid gap-6 md:grid-cols-3">
+          {sections.companies.map((company) => (
+            <CompanyCard key={company.id} company={company} />
+          ))}
+        </div>
+      </Block>
     </>
   )
 }
@@ -102,62 +108,47 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   const { musician, bands } = sections
 
   return (
-    <LevelScene>
-      <Block label="Bands">
-        <Lane profession="drummer" zone="record" />
-        <SectionHeader title="Bands" />
-        <p className="mb-4 text-sm text-[color:var(--rpg-text)]">
-          {drumsSince(musician)}
-        </p>
-        <BandList
-          bands={bands}
-          className="grid gap-4 md:grid-cols-3"
-          renderBand={(slot) => (
-            <SceneItem kind="menu">
-              <BandCard {...slot} />
-            </SceneItem>
-          )}
-        />
-        <p className="mt-4 text-sm text-[color:var(--rpg-muted)]">{musician.line}</p>
-      </Block>
-    </LevelScene>
+    <Block label="Bands" title="Bands" width={WIDE}>
+      <p className={`mb-6 text-center text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}>{drumsSince(musician)}</p>
+      <BulletBox profession="drummer" />
+      <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandCard {...slot} />} />
+      <p className={`mt-4 text-center ${BODY}`}>{musician.line}</p>
+    </Block>
   )
 }
+
+const STAT = 'border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-3'
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
-    <LevelScene>
-      <Block label="Muay Thai">
-        <Lane profession="fighter" zone="record" />
-        <SectionHeader title="Muay Thai" />
-        <Window>
-          <h3 className={`mb-4 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] ${PIXEL}`}>{martialArts.primary.title}</h3>
-          <MuayThaiRecord
-            martialArts={martialArts}
-            classNames={{
-              facts: 'mb-4 grid gap-3 sm:grid-cols-2',
-              fact: 'border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-3',
-              term: 'text-sm uppercase tracking-widest text-[color:var(--rpg-gold)]',
-              value: 'mt-2 text-sm leading-relaxed text-[color:var(--rpg-text)]',
-              achievements: 'space-y-3',
-              achievement: 'text-sm text-[color:var(--rpg-green)]',
-            }}
-            renderAchievement={(achievement) => (
-              <SceneItem kind="dialogue">
-                <p className="flex items-start gap-2 border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-2">
-                  <span className="text-[color:var(--rpg-gold)]" aria-hidden="true">
-                    ★
-                  </span>
-                  {achievement}
-                </p>
-              </SceneItem>
-            )}
-          />
-        </Window>
-      </Block>
-    </LevelScene>
+    <Block label="Muay Thai" title="Muay Thai">
+      <BulletBox profession="fighter" />
+      <OpenBox>
+        <h3 className={`mb-4 flex items-start gap-2 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] sm:text-base ${PIXEL}`}>
+          <Mark className="" />
+          {martialArts.primary.title}
+        </h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: `mb-6 grid gap-3 sm:grid-cols-2 ${world.after} [--show-delay:500ms]`,
+            fact: STAT,
+            term: `text-sm uppercase tracking-widest text-[color:var(--rpg-gold)] ${PIXEL}`,
+            value: `mt-2 ${BODY} text-[color:var(--rpg-text)]`,
+            achievements: `space-y-3 ${world.after} [--show-delay:900ms]`,
+            achievement: BODY,
+          }}
+          renderAchievement={(achievement) => (
+            <span className="flex items-start gap-2 text-[color:var(--rpg-green)]">
+              <Mark />
+              {achievement}
+            </span>
+          )}
+        />
+      </OpenBox>
+    </Block>
   )
 }
 

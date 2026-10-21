@@ -1,78 +1,71 @@
 import { paletteVars } from '../shared/paletteVars'
 
-// Retro RPG's palette: a 16 bit role playing game at night. The page is a deep night blue; every panel
-// is a dialogue window (a blue gradient inside a white pixel border with a grey inner line), its cursor
-// gold. Each profession's level has its own light: a daytime overworld meadow for the System Engineer,
-// a starry night camp around the fire for the Musician, an arena courtyard at dusk for the Martial
-// Artist.
+// Retro RPG's palette: a lo-fi pixel role playing game where every encounter happens on a black screen
+// inside a hard white box. White type, orange command buttons that turn yellow when the cursor sits on
+// them, a red heart for the visitor's soul, green and yellow for health, cyan and purple for the rare
+// coloured attacks. Each profession gets its own encounter light: cyan code rain for the System Engineer,
+// purple beat notes for the Musician, the orange strike sparks for the Martial Artist.
 //
 // This is the one source of the world's colours: SVG fills read the constants, class strings read the
-// same values as CSS variables (RPG_VARS, set once on the world's root).
+// same values as CSS variables (RPG_VARS, set once on the world's root). The keys void, night, gold,
+// text, muted, sky, green, border, windowLow and windowTop also feed the theme registry.
 //
-// Text pairs: text on window low 16.8:1 and on window top 9.3:1, muted on window low 11.9:1 and on
-// window top 6.6:1, gold 12.1:1, green 11.2:1 and sky 10.5:1 on window low (5.8:1 or more on window
-// top), void on gold 14.1:1.
+// Text pairs on void (#000): text 21:1, muted 13.3:1, gold 19.6:1, orange 9.6:1, green 15.2:1,
+// sky 13.4:1, purple 7.4:1, soul 5.3:1 (used at 14px bold or larger, or for shapes only), void on gold
+// 19.6:1 and void on orange 9.6:1.
 export const RPG = {
-  void: '#060a1f',
-  night: '#0b1236',
-  windowTop: '#2a3d9e',
-  windowLow: '#0d1650',
-  border: '#f4f4f4',
-  borderShade: '#8a93b8',
+  void: '#000000',
+  night: '#0b0b12',
+  windowLow: '#000000',
+  windowTop: '#101018',
+  border: '#ffffff',
+  borderShade: '#5a5a66',
   text: '#ffffff',
-  muted: '#d3d8ee',
-  gold: '#ffd75e',
-  green: '#8ee69a',
-  sky: '#9fd3f7',
-  // The daytime overworld: sky, far mountains, the trees, the grass and the dirt path.
-  dayTop: '#3d7fd6',
-  dayLow: '#a9dcf5',
-  mountain: '#6f84c2',
-  snow: '#e9f1ff',
-  tree: '#22602f',
-  grass: '#3f9a3a',
-  grassDark: '#2a6b2c',
-  path: '#c9a26b',
-  pathEdge: '#8d6a3e',
-  // The towns along the path and the castle at its end.
-  wall: '#efe2c0',
-  roof: '#c4473a',
-  stone: '#8b8f9e',
-  stoneDark: '#4c5064',
-  lamp: '#ffe9a0',
-  // The night camp: the sky, the stars, the hills, the tents and the fire.
-  nightTop: '#050822',
-  nightLow: '#1d2a6b',
-  star: '#fff6c8',
-  hill: '#121a45',
-  tent: '#7a5a3a',
-  fire: '#ff8a2a',
-  fireCore: '#ffd75e',
-  // The arena at dusk: the sky, the walls, the sand, the banners and the ropes.
-  duskTop: '#2b1a4a',
-  duskLow: '#e88a5a',
-  arenaWall: '#6a4a5e',
-  sand: '#d9b77a',
-  sandEdge: '#a8834c',
-  banner: '#c4473a',
-  rope: '#f4f4f4',
-  // His clothes and the props he carries.
-  tunic: '#3554c4',
-  vest: '#b0302c',
-  trousers: '#5a3d2a',
-  boot: '#3a2416',
-  belt: '#ffd75e',
-  shorts: '#c4302c',
-  glove: '#b0202a',
-  stick: '#e9d3a0',
-  eye: '#120c18',
-  pad: '#ffd75e',
-  holder: '#2a2440',
+  muted: '#d2d2d8',
+  gold: '#ffff3c',
+  orange: '#ff9a2e',
+  orangeDark: '#a8501a',
+  green: '#3cff6a',
+  sky: '#6fe3ff',
+  purple: '#c58cff',
+  soul: '#ff2020',
+  soulShine: '#ffb0b0',
+  hpBack: '#c41818',
+  pellet: '#ffffff',
+  // The encounter floor: the dark grid the boxes sit over, and the dim far layer of the starfield.
+  grid: '#1c1c2a',
+  far: '#3a3a52',
+  // The battle backdrop behind him: the dark green panel grid, its far rows dimmer, a low green haze.
+  panelNear: '#22b04a',
+  panelFar: '#0f5a26',
+  haze: '#0a2a14',
+  // The room he stands in before the encounter: violet brick, a lit floor of tiles, the light from above.
+  wall: '#3b2457',
+  wallLit: '#6a4294',
+  mortar: '#1e1030',
+  floor: '#7e5aa8',
+  floorDark: '#4c3270',
+  beam: '#fff6c8',
+  // The save star's light.
+  starCore: '#fffbe0',
+  starGlow: '#ffd23c',
+  // His clothes and the props he carries, in flat pixel colours.
+  tunic: '#3a6fd8',
+  stripe: '#9a5ad8',
+  vest: '#c43a3a',
+  trousers: '#3a2e52',
+  boot: '#5a3a24',
+  belt: '#ffff3c',
+  shorts: '#d83030',
+  glove: '#c41818',
+  stick: '#efe0b0',
+  eye: '#000000',
 } as const
 
-/** The palette as CSS variables (--rpg-void, --rpg-window-top and so on), set once on the world's root. */
+/** The palette as CSS variables (--rpg-void, --rpg-soul and so on), set once on the world's root. */
 export const RPG_VARS = paletteVars('rpg', RPG)
 
-// Pixel type, the menus of a 16 bit role playing game: the Silkscreen face the root shell loads
-// (RootShell.tsx sets --font-silkscreen), a monospace face until it arrives.
+// Pixel type: the Silkscreen face the root shell loads (RootShell.tsx sets --font-silkscreen), a
+// monospace face until it arrives. Body text stays in the monospace face, the way the game's dialogue does.
 export const PIXEL = "[font-family:var(--font-silkscreen),'Courier_New',monospace]"
+export const MONO = "[font-family:'Courier_New',ui-monospace,monospace]"

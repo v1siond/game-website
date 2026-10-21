@@ -236,7 +236,7 @@ export const themes: Theme[] = [
   {
     id: 'retro-rpg',
     name: 'Retro RPG',
-    description: '16 bit role playing game at night - dialogue windows and the overworld road',
+    description: 'Lo-fi pixel RPG encounter, white boxes on black, a red heart dodging the bullet box',
     colors: {
       background: RPG.void,
       backgroundGradient: `linear-gradient(to bottom, ${RPG.night}, ${RPG.void})`,

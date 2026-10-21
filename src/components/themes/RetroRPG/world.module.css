@@ -1,36 +1,400 @@
 /*
- * Retro RPG's page look, outside the scroll scenes: the night blue ground under faint CRT scanlines and
- * the dialogue window every panel, card and button sits in. Every colour reads the palette's CSS
- * variables (--rpg-*, set on the root from palette.ts). Nothing here animates.
+ * Retro RPG's look and motion: a lo-fi pixel role playing game's encounter screen. Black ground, hard
+ * white boxes, orange commands that turn yellow under the red heart. Every colour reads the palette's
+ * CSS variables (--rpg-*, set on the root from palette.ts).
+ *
+ * Motion is the game's: it runs on a locked frame clock, so every move is hard steps (steps()), never an
+ * eased slide. Transform and opacity only. A reveal plays when its element or a parent carries
+ * data-play="on" and rests on its final frame at data-play="done" or under reduced motion, which also
+ * drops every loop. The hero encounter adds data-phase (encounter.tsx) for its own beats.
  */
 
 .world {
-  background: linear-gradient(180deg, var(--rpg-void) 0%, var(--rpg-night) 50%, var(--rpg-void) 100%);
+  background-color: var(--rpg-void);
+  background-image:
+    linear-gradient(var(--rpg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rpg-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
   color: var(--rpg-text);
 }
 
-/* Faint scanlines over the whole screen, fixed under the content layers (they sit at z-20 and up). */
-.world::before {
+/* The box every encounter, dialogue and card sits in: a thick white pixel border on black. */
+.box {
+  background: var(--rpg-void);
+  border: 4px solid var(--rpg-border);
+}
+
+/* The monster area of the hero: framed by the box's white line on top and bottom only. */
+.stage {
+  border-block: 4px solid var(--rpg-border);
+}
+
+/* ---- the reveal steps ---- */
+
+/* A box opens like the encounter box: a thin line grows wide, then the box grows tall, in hard steps. */
+@keyframes boxOpen {
+  0% { transform: scale(0.04, 0.04); }
+  45% { transform: scale(1, 0.04); }
+  100% { transform: scale(1, 1); }
+}
+
+.opens {
+  transform-origin: 50% 50%;
+}
+
+[data-play='idle'] .opens,
+[data-play='idle'].opens {
+  transform: scale(0.04, 0.04);
+}
+
+[data-play='on'] .opens,
+[data-play='on'].opens {
+  animation: boxOpen 420ms steps(7, end) both;
+}
+
+/* The bullet box re-opens in its new shape when the profession, and so the attack, changes. */
+.resize {
+  transform-origin: 50% 50%;
+  animation: boxOpen 420ms steps(7, end) both;
+}
+
+/* A line types itself: a black block over it slides off to the right in one step per letter group
+   (--type-steps), after --type-delay. */
+.type {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.type::after {
   content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 10;
-  pointer-events: none;
-  opacity: 0.06;
-  background: repeating-linear-gradient(0deg, transparent 0 2px, var(--rpg-void) 2px 4px);
+  position: absolute;
+  inset: -2px;
+  background: var(--rpg-void);
+  transform: translateX(0);
 }
 
-/* The dialogue window: the blue gradient inside a white pixel border, a grey line just inside it. */
-.window {
-  background: linear-gradient(180deg, var(--rpg-window-top) 0%, var(--rpg-window-low) 100%);
-  border: 3px solid var(--rpg-border);
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 2px var(--rpg-border-shade);
+@keyframes typeOut {
+  to { transform: translateX(102%); }
 }
 
-/* The same frame around a scene, with no fill of its own: the level shows through it. */
-.frame {
-  border: 3px solid var(--rpg-border);
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 2px var(--rpg-border-shade);
+[data-play='on'] .type::after {
+  animation: typeOut var(--type-ms, 900ms) steps(var(--type-steps, 18), end) var(--type-delay, 0ms) both;
+}
+
+[data-play='done'] .type::after {
+  transform: translateX(102%);
+}
+
+/* Text or a row that appears all at once after the line before it is typed (--show-delay). */
+@keyframes popIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+[data-play='idle'] .after {
+  opacity: 0;
+}
+
+[data-play='on'] .after {
+  animation: popIn 1ms steps(1, end) var(--show-delay, 0ms) both;
+}
+
+/* ---- the hero encounter (data-phase) ---- */
+
+/* The room he stands in covers the encounter; at the cut its art goes and the black stays, at the open
+   the black goes too. */
+.room > * {
+  opacity: 1;
+}
+
+[data-phase='cut'] .room > * {
+  opacity: 0;
+}
+
+[data-phase='open'] .room,
+[data-phase='ready'] .room {
+  opacity: 0;
+}
+
+/* The exclamation mark pops over his head in three frames. */
+@keyframes alertPop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.alert {
+  transform-origin: 50% 100%;
+  transform: scale(0);
+}
+
+[data-phase='alert'] .alert,
+[data-phase='cut'] .alert {
+  animation: alertPop 240ms steps(3, end) both;
+}
+
+/* The heart blinks three times on the black screen, then drops toward the box and is gone. */
+@keyframes soulBlink {
+  0%, 33%, 66%, 100% { opacity: 1; }
+  16%, 50%, 83% { opacity: 0; }
+}
+
+@keyframes soulDrop {
+  0% { transform: translateY(0); opacity: 1; }
+  80% { transform: translateY(72px); opacity: 1; }
+  100% { transform: translateY(72px); opacity: 0; }
+}
+
+.encounterSoul {
+  opacity: 0;
+}
+
+[data-phase='cut'] .encounterSoul {
+  animation: soulBlink 540ms steps(1, end) both;
+}
+
+[data-phase='open'] .encounterSoul {
+  animation: soulDrop 300ms steps(6, end) both;
+}
+
+/* His sprite turns through a profession switch in four hard frames. */
+@keyframes spriteTurn {
+  0% { transform: scaleX(1); }
+  25% { transform: scaleX(0.4); }
+  50% { transform: scaleX(-1); }
+  75% { transform: scaleX(0.4); }
+  100% { transform: scaleX(1); }
+}
+
+.turns {
+  animation: spriteTurn 320ms steps(4, end) both;
+}
+
+/* The two frame idle of a pixel sprite: he bobs two pixels down and back, never a smooth breath. */
+@keyframes idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(2px); }
+}
+
+.idle {
+  animation: idle 1000ms steps(1, end) infinite;
+}
+
+/* The screen flashes white once: a profession switch, a save. */
+@keyframes flash {
+  0% { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+
+.flash {
+  opacity: 0;
+  animation: flash 260ms steps(3, end) both;
+}
+
+/* ---- the soul (the red heart cursor) ---- */
+
+/* The heart steps into a command's slot, or beside an option, an item or a card, and the slot's own
+   icon steps out, under the pointer, the keyboard or the pick. */
+.cursor {
+  opacity: 0;
+}
+
+.pick:hover .cursor,
+.pick:focus-visible .cursor,
+.pick:focus-within .cursor,
+.pick[aria-checked='true'] .cursor {
+  opacity: 1;
+}
+
+.pick:hover .icon,
+.pick:focus-visible .icon,
+.pick[aria-checked='true'] .icon {
+  opacity: 0;
+}
+
+/* ---- the attack on a project ---- */
+
+/* A project card is the target: the heart steps in beside its name and the meter rises under the pointer
+   or the keyboard, its line crossing in 1200ms (cards.tsx METER_MS). Its own class, so its link commands
+   keep their own heart. */
+.targetCursor,
+.meter {
+  opacity: 0;
+}
+
+.meter {
+  overflow: hidden;
+}
+
+.target:hover .targetCursor,
+.target:focus-within .targetCursor,
+.target:hover .meter,
+.target:focus-within .meter {
+  opacity: 1;
+}
+
+@keyframes sweep {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+.target:hover .meterLine,
+.target:focus-within .meterLine {
+  animation: sweep 1200ms steps(30, end) infinite;
+}
+
+/* The slash a strike plays (cards.tsx animates it): red, gold on a critical strike. */
+.slash {
+  transform-origin: 0% 50%;
+  transform: rotate(-12deg) scaleX(0);
+  opacity: 0;
+  background: var(--rpg-soul);
+}
+
+.slash[data-critical='true'] {
+  background: var(--rpg-gold);
+}
+
+/* ---- the bullet box ---- */
+
+/* Each pellet, the heart and the shield are placed by the box's frame loop through --x, --y and --r. */
+.placed {
+  transform: translate3d(var(--x, 0px), var(--y, 0px), 0) rotate(var(--r, 0deg));
+}
+
+@keyframes hitShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+/* A hit: the box shakes and the heart flickers while it cannot be hit again. */
+[data-hit='true'].hitBox {
+  animation: hitShake 240ms steps(4, end) both;
+}
+
+@keyframes hurt {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+[data-hit='true'] .hurt {
+  animation: hurt 160ms steps(1, end) 6;
+}
+
+/* At 0 HP the heart's halves part, a pixel at a time. */
+@keyframes splitLeft {
+  to { transform: translateX(-2px) rotate(-12deg); }
+}
+
+@keyframes splitRight {
+  to { transform: translateX(2px) rotate(12deg); }
+}
+
+.splitLeft,
+.splitRight {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.splitLeft {
+  animation: splitLeft 300ms steps(3, end) both;
+}
+
+.splitRight {
+  animation: splitRight 300ms steps(3, end) both;
+}
+
+/* The HP bar drains and refills in hard steps (--hp from 0 to 1, set by bulletBox.tsx). */
+.hpFill {
+  transform: scaleX(var(--hp, 1));
+  transition: transform 300ms steps(4, end);
+}
+
+/* ---- the save point ---- */
+
+/* The save star turns like a sprite and its glow flickers. Clicked, it spins fast once. */
+@keyframes starTurn {
+  0%, 100% { transform: scaleX(1); }
+  50% { transform: scaleX(0.2); }
+}
+
+.star {
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+  animation: starTurn 1200ms steps(6, end) infinite;
+}
+
+@keyframes glow {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.55; }
+}
+
+.glow {
+  animation: glow 1200ms steps(3, end) infinite;
+}
+
+@keyframes starSave {
+  from { transform: rotate(0deg) scale(1.3); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
+.saveSpin {
+  animation: starSave 480ms steps(8, end) both;
+}
+
+/* Saved, the closing box keeps a yellow border. */
+[data-saved='true'] .saveBox {
+  border-color: var(--rpg-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opens,
+  .resize,
+  .after,
+  .type::after,
+  .alert,
+  .encounterSoul,
+  .turns,
+  .idle,
+  .flash,
+  .meterLine,
+  .hitBox,
+  .hurt,
+  .splitLeft,
+  .splitRight,
+  .star,
+  .glow,
+  .saveSpin {
+    animation: none !important;
+  }
+
+  .hpFill {
+    transition: none;
+  }
+
+  [data-play] .opens {
+    transform: none;
+  }
+
+  [data-play] .after {
+    opacity: 1;
+  }
+
+  .type::after {
+    transform: translateX(102%);
+  }
+
+  .room,
+  .encounterSoul,
+  .flash {
+    opacity: 0;
+  }
+
+  .alert {
+    transform: none;
+  }
 }

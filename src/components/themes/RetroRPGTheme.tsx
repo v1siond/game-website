@@ -5,21 +5,35 @@ import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
-import { PIXEL, RPG_VARS } from './RetroRPG/palette'
-import { Window } from './RetroRPG/panels'
-import { PartyMember } from './RetroRPG/selector'
-import { CVLink, FOCUS, HeroActions, PlayLink } from './RetroRPG/actions'
+import { PROFESSION_LABELS } from '@/lib/cv/professions'
+import { MONO, PIXEL, RPG_VARS } from './RetroRPG/palette'
+import { ActionOptions, FOCUS } from './RetroRPG/actions'
+import { Box, Mark, SHOW_AFTER, Typed } from './RetroRPG/panels'
+import { CommandOption } from './RetroRPG/selector'
+import { Encounter } from './RetroRPG/encounter'
+import { SavePoint } from './RetroRPG/savePoint'
 import { SECTION_VIEWS } from './RetroRPG/sections'
-import { ContactScene } from './RetroRPG/scenes'
 import world from './RetroRPG/world.module.css'
 
-// Retro RPG: the page composition, a 16 bit role playing game at night where every block is a dialogue
-// window. Its palette, panels, cards, buttons, party menu, character, profession stages, scroll scenes
-// and per profession sections live in ./RetroRPG.
+// Retro RPG, a lo-fi pixel role playing game's encounter screen: the page composition. It reads top to
+// bottom like the game's battle screen: him in the monster area, the box with his name and lines, the
+// stats line, and the command row that switches the profession. Under it the profession's sections, each
+// a box (the bullet box above the main list), and the save point as the contact. The palette, buttons,
+// boxes, cards, the bullet box, the encounter and the save point live in ./RetroRPG.
 //
 // The root sets the palette as CSS variables (RPG_VARS), the only inline style, and clips sideways
-// overflow with overflow-x: clip, not hidden: hidden would make the root a scroll container and stop the
-// scenes' strips from sticking to the viewport.
+// overflow with overflow-x: clip, not hidden: hidden would make the root a scroll container.
+
+const LINE = `text-sm leading-relaxed sm:text-base ${MONO}`
+
+function Said({ children, className }: { children: string; className: string }) {
+  return (
+    <p className={`flex items-start gap-2 ${LINE} ${className}`}>
+      <Mark className="text-[color:var(--rpg-text)]" />
+      <span>{children}</span>
+    </p>
+  )
+}
 
 export default function RetroRPGTheme() {
   const { active } = useProfession()
@@ -34,47 +48,52 @@ export default function RetroRPGTheme() {
         Skip to main content
       </a>
 
-      {/* Header - the recruiter first screen, in the title window */}
-      <header className="relative z-30 p-4 sm:p-6">
-        <RecruiterHero
-          render={({ name, headline, tagline, line, actions }) => (
-            <Window className="mx-auto flex max-w-4xl flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0">
-                <h1 className={`break-words text-lg uppercase tracking-[0.15em] text-[color:var(--rpg-text)] sm:text-xl ${PIXEL}`}>{name}</h1>
-                <p className="mt-2 text-sm leading-relaxed text-[color:var(--rpg-gold)]">{headline}</p>
-                <p className="mt-2 text-sm italic leading-relaxed text-[color:var(--rpg-sky)]">{tagline}</p>
-                <p className="mt-2 text-sm leading-relaxed text-[color:var(--rpg-muted)]">{line}</p>
-              </div>
+      {/* The encounter: him, the box, the stats line and the command row */}
+      <header className="relative z-30 px-4 pb-6 pt-8 sm:px-6">
+        <Encounter profession={active}>
+          <RecruiterHero
+            render={({ name, headline, tagline, line, actions }) => (
+              <Box className={`mt-4 ${world.opens}`}>
+                <h1 className={`break-words text-lg uppercase tracking-[0.15em] text-[color:var(--rpg-text)] sm:text-2xl ${PIXEL}`}>
+                  <Typed pace="short" delay="open">
+                    {name}
+                  </Typed>
+                </h1>
+                <div className="mt-4 space-y-2">
+                  <Said className={`text-[color:var(--rpg-text)] ${SHOW_AFTER.second}`}>{headline}</Said>
+                  <Said className={`text-[color:var(--rpg-sky)] ${SHOW_AFTER.third}`}>{tagline}</Said>
+                  <Said className={`text-[color:var(--rpg-muted)] ${SHOW_AFTER.third}`}>{line}</Said>
+                </div>
+                <nav className={`mt-6 ${SHOW_AFTER.last}`} aria-label="Contact and CV">
+                  <ActionOptions actions={actions} />
+                </nav>
+              </Box>
+            )}
+          />
 
-              <nav className="flex flex-wrap items-center gap-3" aria-label="Contact and CV">
-                <HeroActions actions={actions} />
-                <CVLink />
-                <PlayLink />
-              </nav>
-            </Window>
-          )}
-        />
+          <div className={`mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-text)] ${PIXEL} ${SHOW_AFTER.last}`}>
+            <span>{view.hero.name}</span>
+            <span className="text-[color:var(--rpg-gold)]">{PROFESSION_LABELS[active]}</span>
+            <span className="h-4 w-24 bg-[color:var(--rpg-gold)]" aria-hidden="true" />
+          </div>
+
+          <ProfessionSwitch
+            className={`mt-4 grid grid-cols-1 gap-3 sm:flex sm:justify-between ${SHOW_AFTER.last}`}
+            label="Select profession view"
+            renderOption={(option) => <CommandOption option={option} />}
+          />
+        </Encounter>
       </header>
 
-      {/* The party menu: him once per profession, the switch */}
-      <section className="relative z-20 px-4 py-6" aria-label="Select profession view">
-        <ProfessionSwitch
-          className="flex justify-center gap-3 sm:gap-6"
-          label="Select profession view"
-          renderOption={(option) => <PartyMember key={option.id} option={option} />}
-        />
-      </section>
-
-      {/* The picked profession's levels, and only those */}
+      {/* The picked profession's sections, and only those */}
       <main id="main-content" className="relative z-20">
         <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
       </main>
 
-      {/* Contact - the closing window opens on his corner */}
-      <ContactScene profession={active} />
+      <SavePoint profession={active} />
 
       <footer className="relative z-20 py-10 text-center">
-        <p className="text-sm text-[color:var(--rpg-muted)]">
+        <p className={`text-sm text-[color:var(--rpg-muted)] ${MONO}`}>
           © {new Date().getFullYear()} {view.hero.name}
         </p>
       </footer>

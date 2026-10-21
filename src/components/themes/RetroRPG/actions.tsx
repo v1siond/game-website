@@ -1,79 +1,91 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react'
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { MONO, PIXEL } from './palette'
+import { PixelIcon, type IconId } from './icons'
+import { Soul } from './soul'
+import world from './world.module.css'
 
-// Retro RPG's buttons are menu commands: a white bordered box, the gold cursor stepping in beside the
-// one under the pointer or the keyboard. Email is the lit command (gold), the rest are plain.
+// Retro RPG's two kinds of button, both from the encounter screen:
+// - a command: the orange bordered button of the command row, with its pixel icon in the slot on the
+//   left; under the pointer, the keyboard or when picked it turns yellow and the red heart takes the slot;
+// - an option: a line inside a box, the way a submenu lists its choices in two columns, where the heart
+//   steps in beside the one under the pointer or the keyboard and the line turns yellow.
 
-export const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--rpg-gold)]'
+export const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--rpg-text)]'
 
-type CommandLook = 'lit' | 'plain'
+const LIT = 'hover:border-[color:var(--rpg-gold)] hover:text-[color:var(--rpg-gold)] focus-visible:border-[color:var(--rpg-gold)] focus-visible:text-[color:var(--rpg-gold)] aria-checked:border-[color:var(--rpg-gold)] aria-checked:text-[color:var(--rpg-gold)]'
 
-const LOOK: Record<CommandLook, string> = {
-  lit: 'bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)]',
-  plain: 'bg-[color:var(--rpg-window-low)] text-[color:var(--rpg-text)]',
-}
+export const COMMAND = `group inline-flex min-h-[44px] items-center gap-2 border-[3px] border-[color:var(--rpg-orange)] bg-[color:var(--rpg-void)] px-3 py-2 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-orange)] ${LIT} ${PIXEL} ${world.pick} ${FOCUS}`
 
-const CURSOR_LOOK: Record<CommandLook, string> = {
-  lit: 'text-[color:var(--rpg-void)]',
-  plain: 'text-[color:var(--rpg-gold)]',
-}
-
-const commandClass = (look: CommandLook) =>
-  `group inline-flex min-h-[44px] items-center justify-center gap-2 border-2 border-[color:var(--rpg-border)] px-3 py-2 text-sm uppercase tracking-wider ${LOOK[look]} ${FOCUS}`
-
-function Cursor({ look }: { look: CommandLook }) {
+/** The slot left of a command: its icon (or an empty square), swapped for the heart when lit. */
+export function Slot({ icon }: { icon?: IconId }) {
   return (
-    <span className={`opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100 ${CURSOR_LOOK[look]}`} aria-hidden="true">
-      ▶
+    <span className="relative h-4 w-4 shrink-0" aria-hidden="true">
+      {icon ? <PixelIcon id={icon} className={`absolute inset-0 h-4 w-4 ${world.icon}`} /> : <span className={`absolute inset-0.5 border-2 border-current ${world.icon}`} />}
+      <Soul className={`absolute inset-x-0 top-0.5 h-3.5 w-4 ${world.cursor}`} />
     </span>
   )
 }
 
 interface CommandProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  look?: CommandLook
   children: ReactNode
+  icon?: IconId
 }
 
-export function Command({ look = 'plain', children, ...linkProps }: CommandProps) {
+export function Command({ children, icon, ...linkProps }: CommandProps) {
   return (
-    <a {...linkProps} className={commandClass(look)}>
-      <Cursor look={look} />
+    <a {...linkProps} className={COMMAND}>
+      <Slot icon={icon} />
       {children}
     </a>
   )
 }
 
-const ACTION_LOOK: Record<HeroActionSlot['id'], CommandLook> = {
-  email: 'lit',
-  linkedin: 'plain',
-}
+const OPTION = `group flex min-h-[44px] items-center gap-3 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] focus-visible:text-[color:var(--rpg-gold)] sm:text-base ${MONO} ${world.pick} ${FOCUS}`
 
-export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+function OptionMark() {
   return (
-    <>
-      {actions.map((action) => (
-        <Command key={action.id} look={ACTION_LOOK[action.id]} {...action.linkProps}>
-          {action.label}
-        </Command>
-      ))}
-    </>
+    <span className="relative h-3.5 w-4 shrink-0" aria-hidden="true">
+      <span className={`absolute inset-0 text-center leading-none ${world.icon}`}>*</span>
+      <Soul className={`absolute inset-0 h-3.5 w-4 ${world.cursor}`} />
+    </span>
   )
 }
 
-function PageLink({ href, label }: { href: string; label: string }) {
+export function Option({ children, ...linkProps }: AnchorHTMLAttributes<HTMLAnchorElement> & { children: ReactNode }) {
   return (
-    <Link href={href} className={commandClass('plain')}>
-      <Cursor look="plain" />
+    <a {...linkProps} className={OPTION}>
+      <OptionMark />
+      {children}
+    </a>
+  )
+}
+
+function PageOption({ href, label }: { href: string; label: string }) {
+  return (
+    <Link href={href} className={OPTION}>
+      <OptionMark />
       {label}
     </Link>
   )
 }
 
-export function CVLink() {
-  return <PageLink href="/cv" label="CV" />
-}
-
-export function PlayLink() {
-  return <PageLink href="/personal-projects/game-engine" label="Game" />
+/** The hero's and the contact box's choices: email, LinkedIn, the full CV and the engine, two columns. */
+export function ActionOptions({ actions, className = '' }: { actions: HeroActionSlot[]; className?: string }) {
+  return (
+    <ul className={`grid grid-cols-1 gap-x-8 sm:grid-cols-2 ${className}`}>
+      {actions.map((action) => (
+        <li key={action.id}>
+          <Option {...action.linkProps}>{action.label}</Option>
+        </li>
+      ))}
+      <li>
+        <PageOption href="/cv" label="CV" />
+      </li>
+      <li>
+        <PageOption href="/personal-projects/game-engine" label="Game" />
+      </li>
+    </ul>
+  )
 }

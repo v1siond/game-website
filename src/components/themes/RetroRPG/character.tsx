@@ -5,7 +5,8 @@ import { Mongkhon } from '@/components/scroll/Mongkhon'
 import { HeroFist, HeroGlove, HeroStick } from '@/components/scroll/heroHands'
 import { RPG } from './palette'
 
-// Him in the role playing world (the shared HeroFigure), dressed as a 16 bit party member:
+// Him in the role playing world (the shared HeroFigure), the sprite in the encounter's monster area and
+// in the room before it, dressed per profession in flat pixel colours:
 // - System Engineer: a blue travelling tunic with a gold belt, brown trousers and boots.
 // - Musician: a red vest over bare arms, brown trousers, pale wooden sticks.
 // - Martial Artist: bare chested in red Muay Thai shorts with a gold waistband, the white mongkhon
