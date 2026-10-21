@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // =============================================================================
 // CHRONO TRIGGER EXACT COLOR PALETTE
@@ -574,76 +575,14 @@ function BattleFrame({
   )
 }
 
-// Menu Command Button (FIGHT/TECH/ITEM style)
-function MenuCommandButton({
-  label,
-  isSelected,
-  onClick,
-  color,
-}: {
-  label: string
-  isSelected: boolean
-  onClick: () => void
-  color: string
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className="relative px-6 py-3 text-xs tracking-[0.15em] font-bold transition-all flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2"
-      style={{
-        background: isSelected
-          ? `linear-gradient(180deg, ${color} 0%, ${color}AA 100%)`
-          : CT_COLORS.voidDark,
-        border: `3px solid ${color}`,
-        color: isSelected ? CT_COLORS.voidDark : color,
-        boxShadow: isSelected ? `0 0 20px ${color}80, inset 0 0 10px ${CT_COLORS.white}40` : 'none',
-        imageRendering: 'pixelated' as const,
-      }}
-      aria-pressed={isSelected}
-    >
-      {isSelected && (
-        <span style={{ fontSize: '8px' }}>▶</span>
-      )}
-      {label}
-    </button>
-  )
-}
-
 // =============================================================================
 // CONTENT CARDS
 // =============================================================================
 
-// Role Card
-function RoleCard({ role }: { role: (typeof CURRENT_ROLES)[0] }) {
-  return (
-    <div
-      className="flex items-start gap-3 p-4 transition-all hover:bg-white/5"
-      style={{
-        border: `2px solid ${CT_COLORS.gold}50`,
-        background: `linear-gradient(90deg, ${CT_COLORS.voidDark} 0%, transparent 100%)`,
-      }}
-      role="listitem"
-    >
-      <span style={{ color: CT_COLORS.gold, fontSize: '10px' }}>◈</span>
-      <div className="flex-1">
-        <p className="text-xs tracking-wide" style={{ color: CT_COLORS.white }}>
-          {role.title} @ <span style={{ color: CT_COLORS.marleBlue }}>{role.company}</span>
-        </p>
-        <p className="text-[10px] mt-2 leading-relaxed" style={{ color: CT_COLORS.silver }}>
-          {role.description}
-        </p>
-      </div>
-      {role.type === 'leadership' && (
-        <EraBadge era="future" year="CTO" />
-      )}
-    </div>
-  )
-}
-
-// Experience Card
-function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+// Experience Card. Dates are date only strings (UTC midnight), so the year is read in UTC.
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
     <article
@@ -652,19 +591,19 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
         border: `2px solid ${CT_COLORS.portalBlue}40`,
         background: `linear-gradient(180deg, ${CT_COLORS.voidMid}40 0%, ${CT_COLORS.voidDark} 100%)`,
       }}
-      aria-label={`${entry.title} at ${entry.organization}`}
+      aria-label={`${entry.title} at ${entry.company}, ${startDisplay} to ${endDisplay}`}
     >
-      <div className="flex justify-between items-start mb-3">
+      <div className="flex justify-between items-start gap-3 mb-3 flex-wrap">
         <div>
-          <h4 className="text-xs tracking-wide flex items-center gap-2" style={{ color: CT_COLORS.white }}>
-            <span style={{ color: CT_COLORS.medievalGreen }}>▸</span>
+          <h3 className="text-sm tracking-wide flex items-center gap-2" style={{ color: CT_COLORS.white }}>
+            <span style={{ color: CT_COLORS.medievalGreen }} aria-hidden="true">▸</span>
             {entry.title}
-          </h4>
+          </h3>
           <p className="text-sm mt-1" style={{ color: CT_COLORS.gold }}>
-            @ {entry.organization}
+            @ {entry.company}
           </p>
         </div>
-        <span className="text-[10px] tabular-nums tracking-wider px-2 py-1"
+        <span className="text-sm tabular-nums tracking-wider px-2 py-1"
           style={{
             color: CT_COLORS.futureChrome,
             background: CT_COLORS.voidDark,
@@ -673,110 +612,113 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-[10px] mb-3 leading-relaxed" style={{ color: CT_COLORS.silver }}>
-        {entry.description}
-      </p>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.description && (
+        <p className="text-sm mb-3 leading-relaxed" style={{ color: CT_COLORS.silver }}>
+          {entry.description}
+        </p>
+      )}
+      {entry.highlights.length > 0 && (
         <ul className="space-y-2" aria-label="Key achievements">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-[10px] flex items-start gap-2" style={{ color: CT_COLORS.atbGreen }}>
-              <span style={{ color: CT_COLORS.portalMagenta }}>◇</span>
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: CT_COLORS.atbGreen }}>
+              <span style={{ color: CT_COLORS.portalMagenta }} aria-hidden="true">◇</span>
               <span>{highlight}</span>
             </li>
           ))}
         </ul>
       )}
-      {entry.skills && entry.skills.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-3">
+      {entry.skills.length > 0 && (
+        <ul className="flex flex-wrap gap-1 mt-3" aria-label="Skills used">
           {entry.skills.slice(0, 5).map((skill) => (
-            <span
+            <li
               key={skill}
-              className="text-[8px] px-2 py-1"
+              className="text-sm px-2 py-1"
               style={{
                 color: CT_COLORS.portalBlueBright,
                 border: `1px solid ${CT_COLORS.portalBlue}40`,
               }}
             >
               {skill}
-            </span>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
     </article>
   )
 }
 
-// Project Card
-function ProjectCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
-  const linkHref = project.links?.demo || project.links?.site || '#'
-  const isExternal = linkHref.startsWith('http')
-
-  const content = (
+// Project Card: his role, the result line and the links that open the project, each a menu command
+function ProjectCard({ project, years, links }: ProjectSlot) {
+  return (
     <article
-      className="p-4 transition-all group"
+      className="h-full p-4"
       style={{
         border: `2px solid ${CT_COLORS.white}`,
         background: CT_COLORS.voidDark,
       }}
-      aria-label={`${project.name}: ${project.tagline}`}
     >
-      <div className="flex justify-between items-start mb-2">
-        <span className="text-xs flex items-center gap-2 tracking-wide group-hover:text-white"
-          style={{ color: CT_COLORS.white }}>
-          <span style={{ color: CT_COLORS.cronoOrange }}>◈</span>
+      <div className="flex justify-between items-start gap-2 mb-2">
+        <h3 className="text-sm flex items-center gap-2 tracking-wide" style={{ color: CT_COLORS.white }}>
+          <span style={{ color: CT_COLORS.cronoOrange }} aria-hidden="true">◈</span>
           {project.name}
-        </span>
-        {project.featured && (
-          <span className="text-[8px] px-2 py-1" style={{ background: CT_COLORS.gold, color: CT_COLORS.voidDark }}>
-            FEATURED
+        </h3>
+        {years && (
+          <span className="text-sm whitespace-nowrap" style={{ color: CT_COLORS.futureChrome }}>
+            {years}
           </span>
         )}
       </div>
-      <p className="text-[11px] mb-2" style={{ color: CT_COLORS.silver }}>
+      <p className="text-sm mb-2" style={{ color: CT_COLORS.gold }}>
+        {project.role}
+      </p>
+      <p className="text-sm mb-2" style={{ color: CT_COLORS.silver }}>
         {project.tagline}
       </p>
       {project.impact && (
-        <p className="text-[10px] flex items-start gap-2 mb-3" style={{ color: CT_COLORS.atbGreen }}>
-          <span style={{ color: CT_COLORS.gold }}>★</span>
+        <p className="text-sm flex items-start gap-2 mb-3" style={{ color: CT_COLORS.atbGreen }}>
+          <span style={{ color: CT_COLORS.gold }} aria-hidden="true">★</span>
           {project.impact}
         </p>
       )}
-      <div className="flex flex-wrap gap-1">
-        {project.techStack.slice(0, 4).map((tech) => (
-          <span
-            key={tech}
-            className="text-[8px] px-2 py-1"
-            style={{
-              border: `1px solid ${CT_COLORS.portalBlue}60`,
-              color: CT_COLORS.portalBlueBright,
-            }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
+      {project.techStack.length > 0 && (
+        <ul className="flex flex-wrap gap-1" aria-label="Technologies used">
+          {project.techStack.slice(0, 4).map((tech) => (
+            <li
+              key={tech}
+              className="text-sm px-2 py-1"
+              style={{
+                border: `1px solid ${CT_COLORS.portalBlue}60`,
+                color: CT_COLORS.portalBlueBright,
+              }}
+            >
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )}
+      {links.length > 0 ? (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-wide transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2"
+              style={{ border: `2px solid ${CT_COLORS.portalBlue}`, color: CT_COLORS.portalBlueBright }}
+            >
+              <span className="mr-2" aria-hidden="true">▶</span>
+              {label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm mt-3" style={{ color: CT_COLORS.silver }}>No public link</p>
+      )}
     </article>
-  )
-
-  const linkClass = "block hover:scale-[1.02] transition-transform focus:outline-none focus:ring-2 focus:ring-offset-2"
-
-  if (isExternal) {
-    return (
-      <a href={linkHref} target="_blank" rel="noopener noreferrer" className={linkClass}
-        style={{ '--tw-ring-color': CT_COLORS.portalBlue } as React.CSSProperties}>
-        {content}
-      </a>
-    )
-  }
-  return (
-    <Link href={linkHref} className={linkClass}>
-      {content}
-    </Link>
   )
 }
 
 // Company Card (Ventures)
-function CompanyCard({ company }: { company: (typeof COMPANIES)[0] }) {
+function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
@@ -788,27 +730,28 @@ function CompanyCard({ company }: { company: (typeof COMPANIES)[0] }) {
         background: `linear-gradient(180deg, ${CT_COLORS.voidMid} 0%, ${CT_COLORS.voidDark} 100%)`,
         '--tw-ring-color': CT_COLORS.futureChrome,
       } as React.CSSProperties}
-      aria-label={`${company.name}: ${company.tagline}`}
+      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
     >
       <div className="flex items-start gap-3 mb-2">
         <span className="text-xl" aria-hidden="true">{company.icon}</span>
         <div>
-          <h4 className="text-xs tracking-wide" style={{ color: CT_COLORS.white }}>
+          <h3 className="text-sm tracking-wide" style={{ color: CT_COLORS.white }}>
             {company.name}
-          </h4>
-          <p className="text-[11px] mt-1" style={{ color: CT_COLORS.gold }}>
+          </h3>
+          <p className="text-sm mt-1" style={{ color: CT_COLORS.gold }}>
             {company.tagline}
           </p>
         </div>
       </div>
-      <p className="text-[10px] mb-3" style={{ color: CT_COLORS.silver }}>
-        ◇ {company.description}
+      <p className="text-sm mb-3" style={{ color: CT_COLORS.silver }}>
+        <span aria-hidden="true">◇ </span>
+        {company.description}
       </p>
       <div className="flex flex-wrap gap-1">
         {company.services.slice(0, 2).map((service) => (
           <span
             key={service}
-            className="text-[8px] px-2 py-1"
+            className="text-sm px-2 py-1"
             style={{
               border: `1px solid ${CT_COLORS.futureChrome}50`,
               color: CT_COLORS.futureChrome,
@@ -823,96 +766,64 @@ function CompanyCard({ company }: { company: (typeof COMPANIES)[0] }) {
 }
 
 // Band Card
-function BandCard({ band }: { band: (typeof BANDS)[0] }) {
+function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <article
-      className="p-4 transition-all"
+      className="h-full p-4 transition-all"
       style={{
         border: `2px solid ${CT_COLORS.portalPurple}`,
         background: `linear-gradient(180deg, ${CT_COLORS.lavosPurple}20 0%, ${CT_COLORS.voidDark} 100%)`,
       }}
-      aria-label={`${band.name}: ${band.genre}`}
     >
-      <h4 className="text-xs tracking-wide flex items-center gap-2" style={{ color: CT_COLORS.white }}>
-        <span style={{ color: CT_COLORS.portalMagenta }}>♫</span>
+      <h3 className="text-sm tracking-wide flex items-center gap-2" style={{ color: CT_COLORS.white }}>
+        <span style={{ color: CT_COLORS.portalMagenta }} aria-hidden="true">♫</span>
         {band.name}
-      </h4>
-      <p className="text-[11px] mt-2" style={{ color: CT_COLORS.portalMagenta }}>
-        {band.genre} | {band.role}
+      </h3>
+      <p className="text-sm mt-2" style={{ color: CT_COLORS.portalMagenta }}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years && <span>{years}</span>}
       </p>
-      <p className="text-[10px] mt-2" style={{ color: CT_COLORS.silver }}>
-        {band.description}
-      </p>
-      {!band.url && (
-        <p className="text-[10px] mt-3 italic" style={{ color: CT_COLORS.gold }}>
-          ◇ Website coming soon...
+      {band.release && (
+        <p className="text-sm mt-2" style={{ color: CT_COLORS.silver }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>
   )
 
-  if (band.url) {
-    return (
-      <a href={band.url} target="_blank" rel="noopener noreferrer"
-        className="block hover:scale-[1.02] transition-transform focus:outline-none focus:ring-2"
-        style={{ '--tw-ring-color': CT_COLORS.portalPurple } as React.CSSProperties}>
-        {content}
-      </a>
-    )
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a {...linkProps}
+      className="block h-full hover:scale-[1.02] transition-transform focus:outline-none focus:ring-2"
+      style={{ '--tw-ring-color': CT_COLORS.portalPurple } as React.CSSProperties}>
+      {content}
+    </a>
+  )
 }
 
-// Tech Inventory (Engineer Skills)
-function TechInventory({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+// Tech Inventory (Engineer tech stack)
+function TechInventory({ categories }: { categories: CVData['techStack'] }) {
   return (
-    <div className="space-y-6" role="list" aria-label="Tech stack">
+    <div className="space-y-6">
       {categories.map((category) => (
-        <div key={category.name} role="listitem">
-          <p className="text-xs mb-3 flex items-center gap-2 tracking-widest" style={{ color: CT_COLORS.futureChrome }}>
-            <span>{category.icon}</span>
+        <div key={category.id}>
+          <h3 className="text-sm mb-3 flex items-center gap-2 tracking-widest" style={{ color: CT_COLORS.futureChrome }}>
+            <span aria-hidden="true">{category.icon}</span>
             {category.name.toUpperCase()}
-          </p>
-          <div className="flex flex-wrap gap-2">
+          </h3>
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
             {category.items.map((tech) => (
-              <span
+              <li
                 key={tech}
-                className="text-[10px] px-3 py-2 flex items-center gap-2 transition-colors hover:bg-white/10"
+                className="text-sm px-3 py-2 flex items-center gap-2 transition-colors hover:bg-white/10"
                 style={{
                   border: `1px solid ${CT_COLORS.portalBlue}60`,
                   color: CT_COLORS.white,
                 }}
               >
-                <span style={{ color: CT_COLORS.atbGreen, fontSize: '6px' }}>●</span>
+                <span style={{ color: CT_COLORS.atbGreen, fontSize: '6px' }} aria-hidden="true">●</span>
                 {tech}
-              </span>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// Skills Display (Drummer/Fighter)
-function SkillsDisplay({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
-  return (
-    <div className="grid md:grid-cols-3 gap-6" role="list" aria-label="Skills">
-      {categories.map((category) => (
-        <div key={category.name} role="listitem">
-          <p className="text-xs mb-3 flex items-center gap-2 tracking-widest" style={{ color: CT_COLORS.medievalGreen }}>
-            <span>{category.icon}</span>
-            {category.name.toUpperCase()}
-          </p>
-          <ul className="space-y-2">
-            {category.skills.map((skill) => (
-              <li
-                key={skill.name}
-                className="text-[10px] flex items-center gap-2"
-                style={{ color: CT_COLORS.white }}
-              >
-                <span style={{ color: CT_COLORS.portalMagenta, fontSize: '6px' }}>◆</span>
-                {skill.name}
               </li>
             ))}
           </ul>
@@ -922,38 +833,188 @@ function SkillsDisplay({ categories }: { categories: ReturnType<typeof getSkills
   )
 }
 
+// The command colour each profession's party menu option carries.
+const PROFESSION_COLORS: Record<Profession, string> = {
+  drummer: CT_COLORS.portalPurple,
+  engineer: CT_COLORS.portalBlue,
+  fighter: CT_COLORS.prehistoricOrange,
+}
+
+// Email is the lit primary command, LinkedIn the outlined one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
+  email: {
+    background: `linear-gradient(180deg, ${CT_COLORS.portalBlue}, ${CT_COLORS.portalPurple})`,
+    border: `3px solid ${CT_COLORS.white}`,
+    color: CT_COLORS.white,
+  },
+  linkedin: {
+    border: `3px solid ${CT_COLORS.portalBlue}`,
+    color: CT_COLORS.portalBlueBright,
+    background: CT_COLORS.voidDark,
+  },
+}
+
+const COMMAND_BUTTON =
+  'inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 text-sm tracking-widest transition-all hover:scale-105 focus:outline-none focus:ring-2'
+
+function HeroAction({ action }: { action: HeroActionSlot }) {
+  return (
+    <a {...action.linkProps} className={COMMAND_BUTTON} style={HERO_ACTION_LOOK[action.id]}>
+      <span aria-hidden="true">◈</span>
+      {action.label}
+    </a>
+  )
+}
+
+function CVLink() {
+  return (
+    <Link
+      href="/cv"
+      className={COMMAND_BUTTON}
+      style={{ border: `3px solid ${CT_COLORS.gold}`, color: CT_COLORS.gold, background: CT_COLORS.voidDark }}
+    >
+      <span aria-hidden="true">◈</span>
+      CV
+    </Link>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      <BattleFrame title="ABOUT" era="present">
+        <div className="p-4" style={{
+          border: `2px solid ${CT_COLORS.portalBlue}30`,
+          background: `linear-gradient(90deg, ${CT_COLORS.voidDark} 0%, transparent 100%)`,
+        }}>
+          <p className="text-sm leading-relaxed tracking-wide" style={{ color: CT_COLORS.white }}>
+            {professionalSummary.bio}
+          </p>
+        </div>
+      </BattleFrame>
+
+      {/* ART SECTION 1: Character Party */}
+      <CharacterParty />
+
+      {sections.jobs.length > 0 && (
+        <BattleFrame title="WORK EXPERIENCE" era="medieval">
+          <div className="space-y-4">
+            {sections.jobs.map((entry) => (
+              <ExperienceCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        </BattleFrame>
+      )}
+
+      {/* ART SECTION 2: Time Portal Gateway */}
+      <TimePortalGateway />
+
+      <BattleFrame title="TECH STACK" era="future">
+        <TechInventory categories={sections.techStack} />
+      </BattleFrame>
+
+      <BattleFrame title="PROJECTS" era="present">
+        <ProjectList
+          projects={sections.projects}
+          className="grid md:grid-cols-2 gap-4"
+          renderProject={(slot) => <ProjectCard {...slot} />}
+        />
+      </BattleFrame>
+
+      {/* ART SECTION 3: Lavos Dramatic */}
+      <LavosDramaticSection />
+
+      <BattleFrame title="VENTURES" era="future">
+        <div className="grid md:grid-cols-3 gap-4">
+          {sections.companies.map((company) => (
+            <CompanyCard key={company.id} company={company} />
+          ))}
+        </div>
+      </BattleFrame>
+    </>
+  )
+}
+
+function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <CharacterParty />
+      <BattleFrame title="BANDS" era="medieval">
+        <p className="text-sm mb-4" style={{ color: CT_COLORS.white }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList
+          bands={bands}
+          className="grid md:grid-cols-2 gap-4"
+          renderBand={(slot) => <BandCard {...slot} />}
+        />
+        <p className="text-sm mt-4" style={{ color: CT_COLORS.silver }}>
+          <span style={{ color: CT_COLORS.portalMagenta }} aria-hidden="true">◇ </span>
+          {musician.line}
+        </p>
+      </BattleFrame>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <CharacterParty />
+      <BattleFrame title="MUAY THAI" era="prehistoric">
+        <h3 className="text-sm tracking-wide mb-4" style={{ color: CT_COLORS.prehistoricOrangeLight }}>
+          {martialArts.primary.title}
+        </h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+            fact: 'p-3 border-2 border-white/20',
+            term: 'text-sm tracking-widest text-[#FFD700]',
+            value: 'text-sm text-white mt-2 leading-relaxed',
+            achievements: 'space-y-2',
+            achievement: 'text-sm text-[#00FF66] flex items-start gap-2',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span className="text-[#FFD700]" aria-hidden="true">★</span>
+              <span>{achievement}</span>
+            </>
+          )}
+        />
+      </BattleFrame>
+    </>
+  )
+}
+
+function ProfessionSections({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
+  return <EngineerSections sections={sections} />
+}
+
 // =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 export default function RetroRPGTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
+  const { active } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
   const reducedMotion = usePrefersReducedMotion()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = useMemo(() => getEngineerSkills(), [])
-  const otherSkills = useMemo(() => getSkillsByProfession(active), [active])
-  const projects = useMemo(
-    () => PROJECTS_DATA.filter((p) => p.professions.includes(active) || p.featured),
-    [active]
-  )
-  const experience = useMemo(
-    () => filterExperienceByProfession(EXPERIENCE_DATA, active),
-    [active]
-  )
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
   if (!mounted) return null
-
-  const professionOptions = [
-    { id: 'engineer' as const, label: 'ENGINEER', color: CT_COLORS.portalBlue },
-    { id: 'drummer' as const, label: 'MUSICIAN', color: CT_COLORS.portalPurple },
-    { id: 'fighter' as const, label: 'FIGHTER', color: CT_COLORS.prehistoricOrange },
-  ]
 
   return (
     <div
@@ -999,253 +1060,128 @@ export default function RetroRPGTheme() {
         <FrogPixelArt size={32} />
       </div>
 
-      {/* ========== HEADER ========== */}
-      <header className="relative z-30 p-6 border-b-4" style={{ borderColor: CT_COLORS.white }} role="banner">
-        <div className="max-w-5xl mx-auto flex justify-between items-start flex-wrap gap-4">
-          <div className="flex items-center gap-4">
-            <TimePortal size={48} animate={!reducedMotion} />
-            <div>
-              <h1 className="text-lg tracking-[0.2em]" style={{ color: CT_COLORS.white }}>
-                ALEXANDER PULIDO
-              </h1>
-              <p className="text-[11px] tracking-wide mt-1" style={{ color: CT_COLORS.gold }}>
-                {PROFESSIONAL_SUMMARY[active].headline}
-              </p>
-              <p className="text-[10px] mt-2 italic" style={{ color: CT_COLORS.portalBlueBright }}>
-                ◇ {PROFESSIONAL_SUMMARY[active].tagline}
-              </p>
-            </div>
-          </div>
+      {/* ========== HEADER: the recruiter first screen ========== */}
+      <header className="relative z-30 px-4 py-5 sm:p-6 border-b-4" style={{ borderColor: CT_COLORS.white }} role="banner">
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-5xl mx-auto flex justify-between items-start flex-wrap gap-4">
+              <div className="flex items-start gap-4">
+                <div className="hidden sm:block shrink-0">
+                  <TimePortal size={48} animate={!reducedMotion} />
+                </div>
+                <div>
+                  <h1 className="text-lg tracking-[0.2em] uppercase" style={{ color: CT_COLORS.white }}>
+                    {name}
+                  </h1>
+                  <p className="text-sm leading-relaxed mt-2" style={{ color: CT_COLORS.gold }}>
+                    {headline}
+                  </p>
+                  <p className="text-sm leading-relaxed mt-2 italic" style={{ color: CT_COLORS.portalBlueBright }}>
+                    <span aria-hidden="true">◇ </span>
+                    <span>{tagline}</span>
+                  </p>
+                  <p className="text-sm leading-relaxed mt-2" style={{ color: CT_COLORS.futureChromeLight }}>
+                    {line}
+                  </p>
+                </div>
+              </div>
 
-          <nav className="flex gap-3 items-center flex-wrap" aria-label="Main navigation">
-            <Link
-              href="/cv"
-              className="px-4 py-2 text-[10px] tracking-widest flex items-center gap-2 transition-all hover:scale-105 focus:outline-none focus:ring-2"
-              style={{
-                border: `3px solid ${CT_COLORS.gold}`,
-                color: CT_COLORS.gold,
-                background: CT_COLORS.voidDark,
-              }}
-              aria-label="View CV - Save point"
-            >
-              <span>◈</span>
-              SAVE
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="px-4 py-2 text-[10px] tracking-widest transition-all hover:scale-105 focus:outline-none focus:ring-2"
-              style={{
-                border: `3px solid ${CT_COLORS.portalBlue}`,
-                color: CT_COLORS.portalBlue,
-                background: CT_COLORS.voidDark,
-              }}
-              aria-label="Play game engine demo"
-            >
-              GAME
-            </Link>
-          </nav>
-        </div>
+              <nav className="flex gap-3 items-center flex-wrap" aria-label="Contact and CV">
+                {actions.map((action) => (
+                  <HeroAction key={action.id} action={action} />
+                ))}
+                <CVLink />
+                <Link
+                  href="/personal-projects/game-engine"
+                  className={COMMAND_BUTTON}
+                  style={{ border: `3px solid ${CT_COLORS.portalBlue}`, color: CT_COLORS.portalBlueBright, background: CT_COLORS.voidDark }}
+                  aria-label="Play game engine demo"
+                >
+                  GAME
+                </Link>
+              </nav>
+            </div>
+          )}
+        />
       </header>
 
       {/* Profession Selector (Party Menu) */}
-      <div className="relative z-20 px-6 py-6 border-b-2" style={{ borderColor: CT_COLORS.white + '30' }}>
+      <div className="relative z-20 px-4 sm:px-6 py-6 border-b-2" style={{ borderColor: CT_COLORS.white + '30' }}>
         <div className="max-w-5xl mx-auto">
-          <p className="text-xs mb-4 text-center tracking-widest" style={{ color: CT_COLORS.gold }}>
+          <p className="text-sm mb-4 text-center tracking-widest" style={{ color: CT_COLORS.gold }}>
             ◈ Select your path through time ◈
           </p>
-          <div
+          <ProfessionSwitch
             className="flex flex-wrap justify-center gap-4"
-            role="radiogroup"
-            aria-label="Profession selection"
-          >
-            {professionOptions.map((opt) => (
-              <MenuCommandButton
-                key={opt.id}
-                label={opt.label}
-                isSelected={active === opt.id}
-                onClick={() => setActive(opt.id)}
-                color={opt.color}
-              />
-            ))}
-          </div>
+            label="Profession selection"
+            renderOption={({ id, label, selected, optionProps }) => {
+              const color = PROFESSION_COLORS[id]
+              return (
+                <button
+                  type="button"
+                  {...optionProps}
+                  className="relative min-h-[44px] px-6 py-3 text-sm tracking-[0.15em] font-bold transition-all flex items-center gap-3 focus:outline-none focus:ring-2 focus:ring-offset-2"
+                  style={{
+                    background: selected
+                      ? `linear-gradient(180deg, ${color} 0%, ${color}AA 100%)`
+                      : CT_COLORS.voidDark,
+                    border: `3px solid ${color}`,
+                    color: CT_COLORS.white,
+                    boxShadow: selected ? `0 0 20px ${color}80, inset 0 0 10px ${CT_COLORS.white}40` : 'none',
+                  }}
+                >
+                  {selected && <span style={{ fontSize: '8px' }} aria-hidden="true">▶</span>}
+                  {label.toUpperCase()}
+                </button>
+              )
+            }}
+          />
         </div>
       </div>
 
-      {/* ========== MAIN CONTENT ========== */}
-      <main id="main-content" className="relative z-20 px-6 py-8" role="main">
-        <div className="max-w-5xl mx-auto">
-
-          {/* ABOUT Section */}
-          <BattleFrame title="ABOUT" era="present">
-            <div className="mb-4 p-4" style={{
-              border: `2px solid ${CT_COLORS.portalBlue}30`,
-              background: `linear-gradient(90deg, ${CT_COLORS.voidDark} 0%, transparent 100%)`,
-            }}>
-              <p className="text-[11px] leading-relaxed tracking-wide" style={{ color: CT_COLORS.white }}>
-                {aboutData.bio}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2" role="list" aria-label="Quick facts">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="text-[10px] px-3 py-2 flex items-center gap-2"
-                  style={{
-                    border: `1px solid ${CT_COLORS.portalPurple}50`,
-                    color: CT_COLORS.portalMagenta,
-                  }}
-                  role="listitem"
-                >
-                  <span style={{ color: CT_COLORS.gold, fontSize: '6px' }}>◆</span>
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </BattleFrame>
-
-          {/* ART SECTION 1: Character Party */}
-          <CharacterParty />
-
-          {/* EXPERIENCE Section */}
-          {experience.length > 0 && (
-            <BattleFrame title="WORK EXPERIENCE" era="medieval">
-              <div className="space-y-4">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </BattleFrame>
-          )}
-
-          {/* ART SECTION 2: Time Portal Gateway */}
-          <TimePortalGateway />
-
-          {/* SKILLS Section */}
-          <BattleFrame title={active === 'engineer' ? 'TECH STACK' : 'SKILLS'} era="future">
-            {active === 'engineer' ? (
-              <TechInventory categories={engineerTech} />
-            ) : (
-              <SkillsDisplay categories={otherSkills} />
-            )}
-          </BattleFrame>
-
-          {/* PROJECTS Section */}
-          <BattleFrame title="FEATURED WORK" era="present">
-            <div className="grid md:grid-cols-2 gap-4">
-              {projects.filter((p) => p.featured).map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
-            {projects.filter((p) => !p.featured).length > 0 && (
-              <details className="mt-6">
-                <summary
-                  className="text-[10px] cursor-pointer tracking-widest transition-colors hover:opacity-80 focus:outline-none focus:ring-2"
-                  style={{ color: CT_COLORS.gold }}
-                >
-                  ◇ View more projects...
-                </summary>
-                <div className="grid md:grid-cols-2 gap-4 mt-4">
-                  {projects.filter((p) => !p.featured).map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
-                </div>
-              </details>
-            )}
-          </BattleFrame>
-
-          {/* ART SECTION 3: Lavos Dramatic */}
-          <LavosDramaticSection />
-
-          {/* VENTURES Section (engineer only) */}
-          {active === 'engineer' && (
-            <BattleFrame title="VENTURES" era="future">
-              <div className="grid md:grid-cols-3 gap-4">
-                {COMPANIES.map((company) => (
-                  <CompanyCard key={company.id} company={company} />
-                ))}
-              </div>
-            </BattleFrame>
-          )}
-
-          {/* BANDS Section (drummer only) */}
-          {active === 'drummer' && (
-            <BattleFrame title="BANDS" era="medieval">
-              <div className="grid md:grid-cols-3 gap-4">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </BattleFrame>
-          )}
+      {/* ========== MAIN CONTENT: the picked profession's sections, and only those ========== */}
+      <main id="main-content" className="relative z-20 px-4 sm:px-6 py-8" role="main">
+        <div className="max-w-5xl mx-auto" role="region" aria-label={`${active} profession details`}>
+          <ProfessionSections sections={view.sections} />
 
           {/* POSTS Section */}
           <BattleFrame title="POSTS" era="end-of-time">
             <div className="text-center py-8">
-              <p className="text-[11px]" style={{ color: CT_COLORS.silver }}>
+              <p className="text-sm" style={{ color: CT_COLORS.silver }}>
                 Writings and thoughts coming soon...
               </p>
-              <p className="text-[10px] mt-3 italic" style={{ color: CT_COLORS.portalMagenta }}>
-                ◇ Check back for updates on development, music, and martial arts
-              </p>
-              <div className="flex justify-center mt-6 gap-4">
+              <div className="flex justify-center mt-6 gap-4 flex-wrap">
                 <EraBadge era="present" year="TECH" />
                 <EraBadge era="medieval" year="MUSIC" />
                 <EraBadge era="prehistoric" year="FIGHTING" />
               </div>
             </div>
           </BattleFrame>
-
-          {/* CURRENT ROLES Section */}
-          <BattleFrame title="EQUIPPED ROLES" era="present">
-            <div className="space-y-3" role="list">
-              {CURRENT_ROLES.map((role) => (
-                <RoleCard key={role.id} role={role} />
-              ))}
-            </div>
-          </BattleFrame>
-
         </div>
       </main>
 
       {/* ========== CONTACT CTA ========== */}
-      <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <h2 className="text-xl tracking-[0.2em] mb-3" style={{ color: CT_COLORS.gold }}>
-              READY TO WORK TOGETHER?
-            </h2>
-            <p className="text-[11px] tracking-wide" style={{ color: CT_COLORS.silver }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="px-6 py-3 text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all hover:scale-105 focus:outline-none focus:ring-2"
-              style={{
-                background: `linear-gradient(180deg, ${CT_COLORS.portalBlue}, ${CT_COLORS.portalPurple})`,
-                border: `3px solid ${CT_COLORS.white}`,
-                color: CT_COLORS.white,
-                boxShadow: `0 0 20px ${CT_COLORS.portalBlue}60`,
-              }}
-            >
-              <span>◈</span>
-              GET IN TOUCH
-            </a>
-            <Link
-              href="/cv"
-              className="px-6 py-3 text-[10px] tracking-widest flex items-center justify-center gap-2 transition-all hover:scale-105 focus:outline-none focus:ring-2"
-              style={{
-                border: `3px solid ${CT_COLORS.gold}`,
-                color: CT_COLORS.gold,
-                background: CT_COLORS.voidDark,
-              }}
-            >
-              <span>◈</span>
-              DOWNLOAD CV
-            </Link>
-          </div>
-        </div>
+      <section className="relative z-20 py-16 px-4 sm:px-6" aria-labelledby="rpg-contact-heading">
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <h2 id="rpg-contact-heading" className="text-xl tracking-[0.2em] mb-3" style={{ color: CT_COLORS.gold }}>
+                  CONTINUE?
+                </h2>
+                <p className="text-sm tracking-wide leading-relaxed" style={{ color: CT_COLORS.silver }}>
+                  {line}
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {actions.map((action) => (
+                  <HeroAction key={action.id} action={action} />
+                ))}
+                <CVLink />
+              </div>
+            </div>
+          )}
+        />
       </section>
 
       
