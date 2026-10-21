@@ -1,0 +1,83 @@
+import type { ReactNode } from 'react'
+import scene from './heroScene.module.css'
+
+// His figure in a scroll scene, drawn from his sprite (src/assets/sprites/stop_front.png): short dark
+// hair, the full dark beard, oval eyes. A world dresses him (the torso, the sleeves, the legs, what his
+// hands hold); the limbs are separate groups so the scene's pose class (stride, drum, strike, type,
+// guard in heroScene.module.css) swings them from the shoulder or hip with transforms only.
+
+export const HERO_SKIN = '#b5703f'
+const SKIN_SHADE = '#8a4f2b'
+const HAIR = '#241a24'
+
+interface ArmProps {
+  x: number
+  sleeve: string
+  // The bare forearm's length, down to where the hand sits.
+  forearm: number
+  hand: ReactNode
+}
+
+export function HeroArm({ x, sleeve, forearm, hand }: ArmProps) {
+  return (
+    <>
+      <rect x={x - 3.5} y={32} width={7} height={9} rx={2} fill={sleeve} />
+      <rect x={x - 2.5} y={39} width={5} height={forearm} rx={2} fill={HERO_SKIN} />
+      {hand}
+    </>
+  )
+}
+
+interface LegProps {
+  x: number
+  legs: string
+  // Long trousers reach the shoe; shorts stop above the knee and show the shin.
+  long: boolean
+  // How far the shorts reach down the thigh.
+  shorts: number
+  feet: string
+}
+
+export function HeroLeg({ x, legs, long, shorts, feet }: LegProps) {
+  return (
+    <>
+      {!long && <rect x={x - 3} y={64} width={6} height={22} rx={2} fill={HERO_SKIN} />}
+      <rect x={x - 4} y={57} width={8} height={long ? 30 : shorts} rx={1.5} fill={legs} />
+      <rect x={x - 4.5} y={86} width={10} height={5} rx={2} fill={feet} />
+    </>
+  )
+}
+
+interface HeroFigureProps {
+  className?: string
+  eye: string
+  // The world's tee and its trim, drawn under the neck and the head.
+  torso: ReactNode
+  // The shapes of one arm or leg hanging at x; HeroArm and HeroLeg draw them.
+  arm: (x: number) => ReactNode
+  leg: (x: number) => ReactNode
+}
+
+export function HeroFigure({ className = '', eye, torso, arm, leg }: HeroFigureProps) {
+  return (
+    <svg viewBox="0 0 64 96" className={className} aria-hidden="true" focusable="false">
+      <g className={`${scene.limb} ${scene.armBack}`}>{arm(23)}</g>
+      <g className={`${scene.limb} ${scene.legBack}`}>{leg(28)}</g>
+
+      {torso}
+      <rect x={29} y={26} width={6} height={5} fill={SKIN_SHADE} />
+
+      {/* head: ears, face, the short hair, the full beard, the oval eyes */}
+      <circle cx={21.5} cy={19} r={2.6} fill={HERO_SKIN} />
+      <circle cx={42.5} cy={19} r={2.6} fill={HERO_SKIN} />
+      <ellipse cx={32} cy={18} rx={10.5} ry={11} fill={HERO_SKIN} />
+      <path d="M21.5 15 Q21 6 32 5.5 Q43 6 42.5 15 Q38 10.5 32 10.5 Q26 10.5 21.5 15 Z" fill={HAIR} />
+      <path d="M21.5 18 Q22 31 32 31.5 Q42 31 42.5 18 Q40 24 36 23.5 Q32 25 28 23.5 Q24 24 21.5 18 Z" fill={HAIR} />
+      <ellipse cx={28} cy={17.5} rx={1.6} ry={2.4} fill={eye} />
+      <ellipse cx={36} cy={17.5} rx={1.6} ry={2.4} fill={eye} />
+
+      <g className={`${scene.limb} ${scene.legFront}`}>{leg(36)}</g>
+      <g className={`${scene.limb} ${scene.armFront}`}>{arm(41)}</g>
+    </svg>
+  )
+}

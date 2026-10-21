@@ -8,7 +8,8 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { BandCard, ChamberPanel, ExperienceCard, ProjectCard, TechCategoryList, VentureCard } from './cards'
-import { Lane, LevelScene, SceneItem } from './scenes'
+import { LevelScene } from '@/components/scroll/stage'
+import { Lane, SceneItem } from './scenes'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Experience, Projects, Bands
 // and the Muay Thai record are levels he crosses, each entry arriving as part of the level.

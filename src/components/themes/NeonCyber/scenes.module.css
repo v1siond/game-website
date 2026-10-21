@@ -1,37 +1,20 @@
 /*
- * Neon Cyber scroll scenes. Every moving value reads --scene-progress (0 to 1), which useScrollScene
- * writes on the scene's element once per frame; descendants inherit it, so scrolling never re-renders
- * React. Transform and opacity only. Progress 1 is the final pose, which is what reduced motion and
- * the World Select preview show at once.
- *
- * Limb cycles use sin() of progress, so a limb moves only while the page scrolls and stops when it
- * stops: 1turn of the argument is one full stride, strike or stick hit. A browser without sin() drops
- * the limb rules and shows the standing pose; every reveal still works.
- *
- * Every element that sets its own --scene-progress (a section or an item) carries .scene, so --p is
- * re-read there instead of inheriting the outer scene's value.
+ * Neon Cyber's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses and the props that answer progress). Transform and
+ * opacity only; progress 1 is the final pose, which is what reduced motion and the World Select preview
+ * show at once.
  */
 
-.scene {
-  --p: var(--scene-progress, 0);
+/* The world's tempo: seven running strides across the level, ten stick hits per arm, the sound waves
+   resting at 35% height between hits. */
+.tempo {
+  --strides: 7turn;
+  --swing: 34deg;
+  --stick-hits: 10turn;
+  --wave-rest: 0.35;
 }
 
-/* ---- the level strip: sticky while its section scrolls past, three layers deep ---- */
-
-.strip {
-  position: sticky;
-  top: 0.5rem;
-  z-index: 1;
-  height: 7rem;
-  overflow: hidden;
-  contain: strict;
-}
-
-@media (min-width: 640px) {
-  .strip {
-    height: 10rem;
-  }
-}
+/* ---- the level strip, three layers deep ---- */
 
 /* Far 0.15x, mid 0.35x of the travel, foreground fixed: the layers are wider than the strip so a
    shifted layer never shows its edge. */
@@ -52,13 +35,7 @@
   transform: translate3d(calc(var(--p) * -25%), 0, 0);
 }
 
-/* The track spans the strip; he stands at its left edge and travels its width minus his own. */
-.track {
-  position: absolute;
-  inset: auto 0 0 0;
-  height: 100%;
-}
-
+/* He stands at the track's left edge and runs its width minus his own. */
 .runner {
   transform: translate3d(calc(var(--p) * (100% - 5.5rem)), 0, 0);
 }
@@ -71,140 +48,29 @@
   transform: none;
 }
 
-.hero {
-  display: block;
-  width: 4rem;
-  height: 6rem;
-}
-
-@media (min-width: 640px) {
-  .hero {
-    width: 5rem;
-    height: 7.5rem;
-  }
-}
-
-/* Limbs hang from their shoulder or hip: the top centre of their own box is the pivot. */
-.limb {
-  transform-box: fill-box;
-  transform-origin: 50% 8%;
-}
-
-/* run: legs and arms swing against each other, seven strides across the level */
-.run .legFront,
-.run .armBack {
-  transform: rotate(calc(sin(var(--p) * 7turn) * 34deg));
-}
-
-.run .legBack,
-.run .armFront {
-  transform: rotate(calc(sin(var(--p) * 7turn) * -34deg));
-}
-
-/* drum: the sticks fall in turn, ten hits per arm over the scene; the last frame is the crash, front
-   stick up */
-.drum .armFront {
-  transform: rotate(calc(-70deg - sin(var(--p) * 10turn + 0.25turn) * 30deg));
-}
-
-.drum .armBack {
-  transform: rotate(calc(-70deg - sin(var(--p) * 10turn + 0.75turn) * 30deg));
-}
-
-/* strike: kick, knee and elbow take a third of each combo in turn (max(0, 2 sin - 1) is positive on a
-   third of the cycle); four combos over the scene, the last frame lands the roundhouse kick */
-.strike {
-  --kick: max(0, 2 * sin(var(--p) * 4turn + 0.25turn) - 1);
-  --knee: max(0, 2 * sin(var(--p) * 4turn + 0.5833turn) - 1);
-  --elbow: max(0, 2 * sin(var(--p) * 4turn + 0.9167turn) - 1);
-}
-
-.strike .legFront {
-  transform: rotate(calc(var(--kick) * -100deg + var(--knee) * -55deg));
-}
-
-.strike .armFront {
-  transform: rotate(calc(-35deg + var(--elbow) * -95deg));
-}
-
-.strike .armBack {
-  transform: rotate(-60deg);
-}
-
-.impact {
-  opacity: max(var(--kick), var(--knee), var(--elbow));
-}
-
-/* type: the hands tap over the keys, small and quick */
-.type .armFront {
-  transform: rotate(calc(-62deg + sin(var(--p) * 16turn) * 6deg));
-}
-
-.type .armBack {
-  transform: rotate(calc(-62deg + sin(var(--p) * 16turn + 0.5turn) * 6deg));
-}
-
-/* guard: gloves up, the closing pose of the ring */
-.guard .armFront {
-  transform: rotate(-120deg);
-}
-
-.guard .armBack {
-  transform: rotate(-105deg);
-}
-
-/* ---- props that answer progress ---- */
-
-/* A prop placed at --at (0 to 1 along the level) lights as he reaches it. */
-.lightAt {
-  opacity: clamp(0.15, (var(--p) - var(--at, 0)) * 8 + 0.15, 1);
-}
-
-/* Sound wave bars and stage beams follow the stick hits. */
-.wave {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  transform: scaleY(calc(0.35 + max(0, sin(var(--p) * 10turn + var(--phase, 0turn))) * 0.65));
-}
-
+/* Stage beams sweep with the song. */
 .beam {
   transform-box: fill-box;
   transform-origin: 50% 0%;
   transform: rotate(calc(sin(var(--p) * 1.5turn) * 18deg));
 }
 
-/* Contact: the panel powers on over the last part of the scene. */
-.powerOn {
-  opacity: clamp(0, var(--p) * 1.6 - 0.6, 1);
-  transform: translate3d(0, calc((1 - var(--p)) * 1.5rem), 0);
-}
-
 /* ---- per item reveals (their own scene each, so --p is the item's own progress) ---- */
 
-/* A terminal boots: the frame flickers on first, then the screen opens from a line like a CRT. */
-.bootFrame {
+/* The neon frame of a terminal or a billboard flickers on first. */
+.frameOn {
   opacity: clamp(0, var(--p) * 2, 1);
 }
 
+/* A terminal's screen then opens from a line like a CRT. */
 .bootScreen {
   opacity: clamp(0, var(--p) * 2 - 0.6, 1);
   transform: scaleY(calc(0.06 + clamp(0, var(--p) * 1.6 - 0.4, 1) * 0.94));
   transform-origin: 50% 50%;
 }
 
-/* A billboard lights: the neon frame first, then the copy slides up into it. */
-.billboardFrame {
-  opacity: clamp(0, var(--p) * 2, 1);
-}
-
+/* A billboard's copy slides up into its lit frame. */
 .billboardCopy {
   opacity: clamp(0, var(--p) * 2 - 0.8, 1);
   transform: translate3d(0, calc((1 - var(--p)) * 1rem), 0);
-}
-
-/* The hook already writes 1 under reduced motion; this holds the final pose before it runs. */
-@media (prefers-reduced-motion: reduce) {
-  .scene {
-    --p: 1;
-  }
 }

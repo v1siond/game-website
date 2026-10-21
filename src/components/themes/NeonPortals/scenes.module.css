@@ -1,41 +1,22 @@
 /*
- * Neon Portals scroll scenes. Every moving value reads --scene-progress (0 to 1), which useScrollScene
- * writes on the scene's element once per frame; descendants inherit it, so scrolling never re-renders
- * React. Transform and opacity only. Progress 1 is the final frame, which is what reduced motion and
- * the World Select preview show at once.
+ * Neon Portals' own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses and the props that answer progress). Transform and
+ * opacity only; progress 1 is the final frame, which is what reduced motion and the World Select preview
+ * show at once.
  *
  * The world's move is the dimension hop: a lane runs from an orange portal (in) to a blue one (out)
  * through two rifts, and each rift he crosses swaps the dimension behind him (a test chamber, then a
  * light grid, then a violet pocket). Three stacked layers crossfade on progress windows; nothing is
  * mounted or unmounted while scrolling.
- *
- * Limb cycles use sin() of progress, so a limb moves only while the page scrolls: 1turn of the argument
- * is one stride, strike or stick hit. A browser without sin() drops the limb rules and shows the
- * standing pose; every reveal still works.
- *
- * Every element that sets its own --scene-progress (a section or an item) carries .scene, so --p is
- * re-read there instead of inheriting the outer scene's value.
  */
 
-.scene {
-  --p: var(--scene-progress, 0);
-}
-
-/* ---- the lane: sticky while its section scrolls past ---- */
-
-.lane {
-  position: sticky;
-  top: 0.5rem;
-  z-index: 1;
-  height: 8rem;
-  overflow: hidden;
-  contain: strict;
-}
-
-@media (min-width: 640px) {
-  .lane {
-    height: 11rem;
-  }
+/* The world's tempo: eight walking strides along the lane, twelve stick hits per arm, the sound bars
+   resting at 30% height between hits. */
+.tempo {
+  --strides: 8turn;
+  --swing: 28deg;
+  --stick-hits: 12turn;
+  --wave-rest: 0.3;
 }
 
 /* The three dimensions. Each crossfade takes a twelfth of the scene around its rift (1/3 and 2/3). */
@@ -64,12 +45,7 @@
   transform: scaleX(clamp(0.12, 1 - max(var(--p) - var(--at), var(--at) - var(--p)) * 5, 1));
 }
 
-/* The track spans the lane; he starts in the orange portal and walks its width minus his own. */
-.track {
-  position: absolute;
-  inset: 0;
-}
-
+/* He starts in the orange portal and walks the track's width minus his own. */
 .walk {
   transform: translate3d(calc(var(--p) * (100% - 6rem)), 0, 0);
 }
@@ -79,94 +55,7 @@
   transform: translate3d(calc(min(var(--p) * 2, 1) * 42%), 0, 0);
 }
 
-.hero {
-  display: block;
-  width: 4rem;
-  height: 6rem;
-}
-
-@media (min-width: 640px) {
-  .hero {
-    width: 5rem;
-    height: 7.5rem;
-  }
-}
-
-/* Limbs hang from their shoulder or hip: the top centre of their own box is the pivot. */
-.limb {
-  transform-box: fill-box;
-  transform-origin: 50% 8%;
-}
-
-/* walk: legs and arms swing against each other, eight strides along the lane */
-.walking .legFront,
-.walking .armBack {
-  transform: rotate(calc(sin(var(--p) * 8turn) * 28deg));
-}
-
-.walking .legBack,
-.walking .armFront {
-  transform: rotate(calc(sin(var(--p) * 8turn) * -28deg));
-}
-
-/* drum: the sticks fall in turn, twelve hits per arm; the last frame is the crash, front stick up */
-.drum .armFront {
-  transform: rotate(calc(-70deg - sin(var(--p) * 12turn + 0.25turn) * 30deg));
-}
-
-.drum .armBack {
-  transform: rotate(calc(-70deg - sin(var(--p) * 12turn + 0.75turn) * 30deg));
-}
-
-/* strike: the roundhouse kick, the knee and the elbow take a third of each combo in turn
-   (max(0, 2 sin - 1) is positive on a third of the cycle); four combos, the last frame lands the kick */
-.strike {
-  --kick: max(0, 2 * sin(var(--p) * 4turn + 0.25turn) - 1);
-  --knee: max(0, 2 * sin(var(--p) * 4turn + 0.5833turn) - 1);
-  --elbow: max(0, 2 * sin(var(--p) * 4turn + 0.9167turn) - 1);
-}
-
-.strike .legFront {
-  transform: rotate(calc(var(--kick) * -100deg + var(--knee) * -55deg));
-}
-
-.strike .armFront {
-  transform: rotate(calc(-35deg + var(--elbow) * -95deg));
-}
-
-.strike .armBack {
-  transform: rotate(-60deg);
-}
-
-/* The pad that answers the strike flashes with it. */
-.impact {
-  opacity: max(var(--kick, 0), var(--knee, 0), var(--elbow, 0));
-}
-
-/* type: the hands tap the keys, small and quick */
-.type .armFront {
-  transform: rotate(calc(-62deg + sin(var(--p) * 16turn) * 6deg));
-}
-
-.type .armBack {
-  transform: rotate(calc(-62deg + sin(var(--p) * 16turn + 0.5turn) * 6deg));
-}
-
-/* guard: gloves up, the closing pose in the ring corner */
-.guard .armFront {
-  transform: rotate(-120deg);
-}
-
-.guard .armBack {
-  transform: rotate(-105deg);
-}
-
 /* ---- props that answer progress ---- */
-
-/* A prop at --at (0 to 1 along the lane) powers on as he reaches it. */
-.lightAt {
-  opacity: clamp(0.15, (var(--p) - var(--at, 0)) * 8 + 0.15, 1);
-}
 
 /* A build block drops into place as he passes under it. */
 .dropAt {
@@ -174,13 +63,7 @@
   transform: translate3d(0, calc(clamp(0, 1 - (var(--p) - var(--at, 0)) * 8, 1) * -2.5rem), 0);
 }
 
-/* Sound bars follow the stick hits; the cymbals wobble on the crash. */
-.wave {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  transform: scaleY(calc(0.3 + max(0, sin(var(--p) * 12turn + var(--phase, 0turn))) * 0.7));
-}
-
+/* The cymbals wobble on the crash. */
 .cymbal {
   transform-box: fill-box;
   transform-origin: 50% 50%;
@@ -192,11 +75,6 @@
 .exitPortal {
   opacity: clamp(0, var(--p) * 2.5, 1);
   transform: scale(calc(0.35 + min(var(--p) * 1.4, 1) * 0.65));
-}
-
-.arrive {
-  opacity: clamp(0, var(--p) * 1.6 - 0.6, 1);
-  transform: translate3d(0, calc((1 - var(--p)) * 1.5rem), 0);
 }
 
 /* ---- per item reveals (their own scene each, so --p is the item's own progress) ---- */
@@ -243,12 +121,7 @@
   }
 }
 
-/* The hook already writes 1 under reduced motion; this holds the final frame before it runs. */
 @media (prefers-reduced-motion: reduce) {
-  .scene {
-    --p: 1;
-  }
-
   .swirl {
     animation: none;
   }

@@ -9,9 +9,8 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { CompanyCard, BandCard, CyberPanel, ExperienceCard, ProjectCard, TechCategory } from './cards'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { TravelScene } from '@/components/scroll/TravelScene'
+import { LevelScene } from '@/components/scroll/stage'
 import { LevelStrip, SceneItem } from './scenes'
-import styles from './scenes.module.css'
 
 // The cyberware slot each profession's selector option shows.
 export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> = {
@@ -35,7 +34,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
       </FadeInScene>
 
       {sections.jobs.length > 0 && (
-        <TravelScene className={styles.scene}>
+        <LevelScene>
           <LevelStrip profession="engineer" zone="record" />
           <CyberPanel title="Work Experience" accent="green">
             <ul className="space-y-4">
@@ -48,7 +47,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
               ))}
             </ul>
           </CyberPanel>
-        </TravelScene>
+        </LevelScene>
       )}
 
       <FadeInScene>
@@ -59,7 +58,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
         </CyberPanel>
       </FadeInScene>
 
-      <TravelScene className={styles.scene}>
+      <LevelScene>
         <LevelStrip profession="engineer" zone="work" />
         <CyberPanel title="Projects" accent="magenta">
           <ProjectList
@@ -72,7 +71,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
             )}
           />
         </CyberPanel>
-      </TravelScene>
+      </LevelScene>
 
       <FadeInScene>
         <CyberPanel title="Ventures" accent="magenta" megacorpStyle>
@@ -91,7 +90,7 @@ export function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }
   const { musician, bands } = sections
 
   return (
-    <TravelScene className={styles.scene}>
+    <LevelScene>
       <LevelStrip profession="drummer" zone="record" />
       <CyberPanel title="Bands" accent="violet">
         <p className="text-sm text-white/80 font-mono mb-4">
@@ -111,7 +110,7 @@ export function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }
           {musician.line}
         </p>
       </CyberPanel>
-    </TravelScene>
+    </LevelScene>
   )
 }
 
@@ -119,7 +118,7 @@ export function MartialArtistPanels({ sections }: { sections: SectionsOf<'fighte
   const { martialArts } = sections
 
   return (
-    <TravelScene className={styles.scene}>
+    <LevelScene>
       <LevelStrip profession="fighter" zone="record" />
       <CyberPanel title="Muay Thai" accent="red">
         <h3 className="text-base text-pink-400 font-mono mb-4">{martialArts.primary.title}</h3>
@@ -143,7 +142,7 @@ export function MartialArtistPanels({ sections }: { sections: SectionsOf<'fighte
           )}
         />
       </CyberPanel>
-    </TravelScene>
+    </LevelScene>
   )
 }
 
