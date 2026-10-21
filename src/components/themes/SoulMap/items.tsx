@@ -13,16 +13,17 @@ import { CARD_BODY, CARD_META, CARD_TITLE, Hint, TAG } from './menu'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
-// The projects lie about like the game's items: a white glint on the stone until the visitor comes near,
-// then the glint flares and the item's card rises out of it. Pick up is the game's own verb: the item box
-// at the bottom of the screen names the project and what it gave (its impact, or its tagline), the souls
-// counter climbs, and the card keeps a "picked up" mark. An item is picked up once.
+// The projects lie about like the game's items: a white glint on the stone, each swelling on its own
+// phase, until the visitor comes near; then the glint flares and the item's card rises out of it. Pick up
+// is the game's own verb: the glint flares a last time and goes out, the item box at the bottom of the
+// screen names the project and what it gave (its impact, or its tagline), the souls counter climbs, and
+// the card keeps a "picked up" mark. An item is picked up once.
 
 const PICK_UP_SOULS = 400
 
 function Glint() {
   return (
-    <div className="relative mx-auto h-10 w-10" aria-hidden="true">
+    <div className={`${souls.glint} relative mx-auto h-10 w-10`} aria-hidden="true">
       <span className={`${souls.glintHalo} absolute inset-0 rounded-full bg-[color:var(--soul-fog)]`} />
       <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--soul-flame-core)]" />
       <span className={`${souls.glintRay} absolute left-[calc(50%-0.5px)] top-0 h-full w-px bg-[color:var(--soul-fog)]`} />
@@ -31,14 +32,13 @@ function Glint() {
   )
 }
 
-function PickUp({ project }: { project: Project }) {
+function PickUp({ project, picked, onPick }: { project: Project; picked: boolean; onPick: () => void }) {
   const run = useRun()
   const { souls: words } = useLabels()
-  const [picked, setPicked] = useState(false)
 
   const pickUp = () => {
     if (picked) return
-    setPicked(true)
+    onPick()
     run.found(project.name, project.impact || project.tagline)
     run.earn(PICK_UP_SOULS)
   }
@@ -58,9 +58,10 @@ function PickUp({ project }: { project: Project }) {
 
 function ItemCard({ project, years, links }: ProjectSlot) {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.25 })
+  const [picked, setPicked] = useState(false)
 
   return (
-    <article ref={ref} className={`${souls.item} ${triggered ? souls.itemOn : ''}`}>
+    <article ref={ref} className={`${souls.item} ${triggered ? souls.itemOn : ''} ${picked ? souls.itemPicked : ''}`}>
       <Glint />
       <div className={`${souls.itemCard} ${ashen.panel} -mt-3 p-5`}>
         <div className="flex items-baseline justify-between gap-2">
@@ -80,7 +81,7 @@ function ItemCard({ project, years, links }: ProjectSlot) {
           </ul>
         )}
         <div className="mt-4 flex flex-wrap gap-2">
-          <PickUp project={project} />
+          <PickUp project={project} picked={picked} onPick={() => setPicked(true)} />
           {links.map(({ kind, label, linkProps }) => (
             <a key={kind} {...linkProps} className={BUTTON}>
               {label}

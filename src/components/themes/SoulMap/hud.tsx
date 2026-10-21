@@ -15,7 +15,8 @@ import souls from './souls.module.css'
 // - the item box low in the middle, naming what was picked up and what it gave;
 // - the HUD in the corners, out of the content: health and stamina bars with their numbers and the
 //   flask with its charges bottom left (the flask is a button: drink to heal), the souls counter bottom
-//   right, which rolls up to its new total with the gain shown above it.
+//   right, which rolls up to its new total with the gain shown above it. A phone has no room for both
+//   corners side by side, so there the counter stacks over the gauges and the item box rises above both.
 // A World Select preview draws none of it: fixed layers would escape the preview card.
 
 const BANNER_TEXT: Record<BannerKind, string> = {
@@ -77,7 +78,7 @@ function ItemBoxPopup() {
   const { item } = useRun()
   const { souls: words } = useLabels()
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-36 z-50 flex justify-center px-4 sm:bottom-10" role="status" aria-live="polite">
+    <div className="pointer-events-none fixed inset-x-0 bottom-52 z-50 flex justify-center px-4 sm:bottom-10" role="status" aria-live="polite">
       {item && (
         <div key={item.key} className={`${souls.itemBox} ${CARVED} w-full max-w-md px-5 py-3`}>
           <p className="text-sm uppercase tracking-[0.3em] text-[color:var(--soul-text-soft)]">{words.found}</p>
@@ -153,7 +154,7 @@ function SoulsCounter() {
   }, [total])
 
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-40 flex flex-col items-end gap-1">
+    <div className="pointer-events-none fixed bottom-[8.5rem] left-4 z-40 flex flex-col items-start gap-1 sm:bottom-4 sm:left-auto sm:right-4 sm:items-end">
       {gain && (
         <span key={gain.key} className={`${souls.gain} text-sm tabular-nums text-[color:var(--soul-glow)]`}>
           {fillLabel(words.gained, { count: `+${gain.count}` })}

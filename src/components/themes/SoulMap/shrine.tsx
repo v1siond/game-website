@@ -28,17 +28,26 @@ import souls from './souls.module.css'
 
 type Phase = 'ash' | 'ember' | 'lit' | 'rise' | 'ready'
 
+// He rises once the banner has had its moment, and the scene is the visitor's when he is fully up (the
+// rise is 1.4 s in knight.module.css).
 const TIMELINE: Array<[Phase, number]> = [
   ['ember', 700],
-  ['lit', 1600],
-  ['rise', 3300],
-  ['ready', 4500],
+  ['lit', 1700],
+  ['rise', 3400],
+  ['ready', 4800],
 ]
 
 const FIRE: Record<Phase, FireState> = { ash: 'out', ember: 'ember', lit: 'lit', rise: 'lit', ready: 'lit' }
 
 const ROLL_COST = 20
 const REST_SOULS = 50
+
+// Each step lasts as long as its animation in knight.module.css, so it ends on the pose the next step
+// starts from: sit down, drink sitting, rise; the roll ends back on his feet in his place.
+const SIT_MS = 900
+const DRINK_MS = 2200
+const RISE_MS = 1400
+const ROLL_MS = 1200
 
 function useLighting(onLit: () => void): Phase {
   const preview = usePreview()
@@ -160,20 +169,22 @@ export function ShrineHero() {
   const phase = useLighting(() => run.announce('kindled', words.kindled))
   const script = usePoseScript('idle')
   const ready = phase === 'ready'
-  const pose = ready ? script.pose : phase === 'rise' ? 'rise' : 'sit'
+  // Before the lighting is done he is already sitting by the dead fire (no sitting down on the first
+  // draw), then rises with it.
+  const pose = ready ? script.pose : phase === 'rise' ? 'rise' : 'seated'
 
   const rest = () => {
     if (!ready) return
     script.play([
-      { pose: 'sit', ms: 900, effect: run.rest },
-      { pose: 'drink', ms: 1400, effect: () => run.earn(REST_SOULS) },
-      { pose: 'rise', ms: 1200 },
+      { pose: 'sit', ms: SIT_MS, effect: run.rest },
+      { pose: 'drink', ms: DRINK_MS, effect: () => run.earn(REST_SOULS) },
+      { pose: 'rise', ms: RISE_MS },
     ])
   }
 
   const roll = () => {
     if (!ready || script.busy() || !run.spend(ROLL_COST)) return
-    script.play([{ pose: 'roll', ms: 950 }])
+    script.play([{ pose: 'roll', ms: ROLL_MS }])
   }
 
   return (
@@ -208,7 +219,7 @@ export function ShrineHero() {
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
           <div className={`${souls.heroWords} ${ready ? souls.heroWordsOn : ''} relative z-10 mx-auto -mt-10 max-w-3xl px-4 text-center sm:-mt-16`}>
-            <h1 className={`${CARVED} text-[clamp(1.75rem,8vw,3.75rem)] uppercase tracking-[0.16em] text-[color:var(--soul-text)]`}>
+            <h1 className={`${CARVED} text-[clamp(1.75rem,6.6vw,3.25rem)] uppercase tracking-[0.16em] text-[color:var(--soul-text)]`}>
               <NameWords name={name} />
             </h1>
             <div className="mx-auto mt-3 flex max-w-md items-center gap-3" aria-hidden="true">

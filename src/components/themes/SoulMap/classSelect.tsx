@@ -92,6 +92,8 @@ function TrainingPost() {
   )
 }
 
+const RESPAWN_MS = 1400
+
 const PROP: Record<Profession, () => ReactNode> = {
   engineer: () => <Anvil />,
   drummer: () => <WarDrum />,
@@ -100,16 +102,16 @@ const PROP: Record<Profession, () => ReactNode> = {
 
 function ClassStage({ profession }: { profession: Profession }) {
   const script = usePoseScript('act')
-  const { hold, play } = script
+  const { replay } = script
   const previous = useRef(profession)
 
-  // A new class: he lies down under the black and gets up in its gear.
+  // A new class: out of the black he comes up off one knee in its gear, the way he comes back at a fire,
+  // then takes up its work.
   useEffect(() => {
     if (previous.current === profession) return
     previous.current = profession
-    hold('down')
-    play([{ pose: 'rise', ms: 1200 }])
-  }, [profession, hold, play])
+    replay([{ pose: 'respawn', ms: RESPAWN_MS }])
+  }, [profession, replay])
 
   return (
     <div className={`relative aspect-[4/3] overflow-hidden ${ashen.panel}`}>
@@ -129,7 +131,10 @@ function ClassStage({ profession }: { profession: Profession }) {
       </svg>
       <div className="absolute bottom-[14%] left-[26%] aspect-[60/96] h-[66%]">
         <Knight key={script.key} gear={profession} pose={script.pose} className="absolute inset-0 h-full w-full" />
-        {PROP[profession]()}
+        {/* the prop answers his strokes only while he works, and from his first stroke (keyed to the step) */}
+        <div key={`prop-${script.key}`} className={script.pose === 'act' ? souls.propLive : ''}>
+          {PROP[profession]()}
+        </div>
       </div>
       {script.key > 0 && (
         <div key={profession} className={`pointer-events-none absolute inset-0 bg-[color:var(--soul-ink)] ${souls.blackout}`} aria-hidden="true" />

@@ -1,12 +1,15 @@
 import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { CVData } from '@/lib/cv/content'
 import { CARVED } from './palette'
 import ashen from './ashen.module.css'
+import souls from './souls.module.css'
 
-// The game's menu pieces: the stone panel with its worn gold frame, the section title set like an area's
-// name (carved capitals between two thin rules), the item slots the tech stack fills, and the type sizes
-// every card of the world shares.
+// The game's menu pieces: the stone panel with its worn gold frame, the menu screen that fades open when
+// the visitor reaches it, the section title set like an area's name (carved capitals between two thin
+// rules), the item slots the tech stack fills, and the type sizes every card of the world shares.
 
 export const CARD_TITLE = `${CARVED} text-base uppercase tracking-[0.14em] text-[color:var(--soul-text)]`
 export const CARD_META = 'text-sm tracking-wide text-[color:var(--soul-text-soft)]'
@@ -15,6 +18,16 @@ export const TAG = `${ashen.slot} inline-block px-2 py-0.5 text-sm text-[color:v
 
 export function Panel({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <div className={`${ashen.panel} p-5 ${className}`}>{children}</div>
+}
+
+// A menu screen: the panel fades open in place once it is on screen (souls.module.css .menu).
+export function MenuPanel({ children }: { children: ReactNode }) {
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.15 })
+  return (
+    <div ref={ref} className={`${souls.menu} ${triggered ? souls.menuOn : ''}`}>
+      <Panel>{children}</Panel>
+    </div>
+  )
 }
 
 export function AreaTitle({ id, title, className = '' }: { id?: string; title: string; className?: string }) {
@@ -33,28 +46,31 @@ export function Hint({ children }: { children: ReactNode }) {
   return <p className="mb-6 mt-2 text-center text-sm italic text-[color:var(--soul-text-soft)]">{children}</p>
 }
 
-// The tech stack as an equipment screen: each category a row of item slots.
+// The tech stack as an equipment screen: each category a group of item slots, the groups packed in
+// masonry by their length, coming up one after another as the menu opens.
 export function TechSlots({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
   return (
-    <div className="grid gap-5 md:grid-cols-2" role="list" aria-label={cards.techByCategory}>
+    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
-        <div key={category.id} role="listitem">
-          <h3 className={`${CARVED} mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.22em] text-[color:var(--soul-glow)]`}>
-            <span className="grayscale" aria-hidden="true">
-              {category.icon}
-            </span>
-            {category.name}
-          </h3>
-          <ul className="flex flex-wrap gap-1.5" aria-label={category.name}>
-            {category.items.map((tech) => (
-              <li key={tech} className={TAG}>
-                {tech}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <li key={category.id} className={MASONRY_ITEM}>
+          <div className={souls.slotGroup}>
+            <h3 className={`${CARVED} mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.22em] text-[color:var(--soul-glow)]`}>
+              <span className="grayscale" aria-hidden="true">
+                {category.icon}
+              </span>
+              {category.name}
+            </h3>
+            <ul className="flex flex-wrap gap-1.5" aria-label={category.name}>
+              {category.items.map((tech) => (
+                <li key={tech} className={TAG}>
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }

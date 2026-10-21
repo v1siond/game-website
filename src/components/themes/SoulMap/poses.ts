@@ -21,6 +21,7 @@ export interface PoseScript {
   key: number
   busy: () => boolean
   play: (steps: PoseStep[], end?: KnightPose) => boolean
+  replay: (steps: PoseStep[], end?: KnightPose) => boolean
   hold: (pose: KnightPose) => void
 }
 
@@ -29,12 +30,13 @@ export function usePoseScript(rest: KnightPose): PoseScript {
   const timers = useRef<number[]>([])
   const running = useRef(false)
 
-  const clear = () => {
+  const stop = useCallback(() => {
     timers.current.forEach((timer) => window.clearTimeout(timer))
     timers.current = []
-  }
+    running.current = false
+  }, [])
 
-  useEffect(() => clear, [])
+  useEffect(() => stop, [stop])
 
   const show = useCallback((pose: KnightPose) => setShown((previous) => ({ pose, key: previous.key + 1 })), [])
 
@@ -66,14 +68,22 @@ export function usePoseScript(rest: KnightPose): PoseScript {
 
   const hold = useCallback(
     (pose: KnightPose) => {
-      clear()
-      running.current = false
+      stop()
       show(pose)
     },
-    [show],
+    [show, stop],
+  )
+
+  // A script that cuts off whatever he is doing (a new class picked mid move), with no held frame between.
+  const replay = useCallback(
+    (steps: PoseStep[], end?: KnightPose) => {
+      stop()
+      return play(steps, end)
+    },
+    [play, stop],
   )
 
   const busy = useCallback(() => running.current, [])
 
-  return { pose: shown.pose, key: shown.key, busy, play, hold }
+  return { pose: shown.pose, key: shown.key, busy, play, replay, hold }
 }

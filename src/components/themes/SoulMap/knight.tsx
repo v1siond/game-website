@@ -31,12 +31,15 @@ export type KnightPose =
   | 'guard'
   | 'swing'
   | 'sit'
+  | 'seated'
   | 'drink'
   | 'rise'
+  | 'respawn'
   | 'act'
   | 'strike'
   | 'hit'
   | 'down'
+  | 'getUp'
 
 export type KnightGear = 'knight' | Profession
 

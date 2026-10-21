@@ -20,6 +20,9 @@ import souls from './souls.module.css'
 // links themselves.
 
 const KINDLE_SOULS = 500
+// Two heavy strides to the fire (knight.module.css), the length of the slide that carries him there
+// (.atFire), then he lowers himself down beside it.
+const WALK_MS = 2400
 
 export function LastFire({ profession }: { profession: Profession }) {
   const run = useRun()
@@ -34,7 +37,7 @@ export function LastFire({ profession }: { profession: Profession }) {
     run.announce('kindled', words.kindled)
     run.earn(KINDLE_SOULS)
     run.rest()
-    script.play([{ pose: 'walk', ms: 900 }], 'sit')
+    script.play([{ pose: 'walk', ms: WALK_MS }], 'sit')
   }
 
   return (

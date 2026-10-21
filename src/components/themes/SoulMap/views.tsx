@@ -4,9 +4,8 @@ import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { drumsSince, headingId } from '@/components/cv/sectionText'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
-import { AreaTitle, Panel, TechSlots } from './menu'
+import { AreaTitle, MenuPanel, TechSlots } from './menu'
 import { LiftDescent } from './descent'
 import { ItemProjects } from './items'
 import { FloorMessages } from './messages'
@@ -17,7 +16,7 @@ import { FogArena } from './arena'
 // jobs are the lift ride down (./descent), his projects lie about as items to pick up (./items), his
 // ventures are messages on the floor (./messages); the Musician's bands are summon signs (./summons); the
 // Martial Artist's record is the bout behind the fog wall (./arena). About and the Tech Stack are the
-// game's plain menu panels between them.
+// game's plain menu screens between them, each fading open when reached (./menu).
 
 function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
   const id = headingId('soul', title)
@@ -37,13 +36,11 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
   return (
     <>
-      <FadeInScene>
-        <Block title={titles.about}>
-          <Panel>
-            <p className="text-base leading-relaxed text-[color:var(--soul-text)]">{professionalSummary.bio}</p>
-          </Panel>
-        </Block>
-      </FadeInScene>
+      <Block title={titles.about}>
+        <MenuPanel>
+          <p className="text-base leading-relaxed text-[color:var(--soul-text)]">{professionalSummary.bio}</p>
+        </MenuPanel>
+      </Block>
 
       {sections.jobs.length > 0 && (
         <Block title={titles.workExperience} wide>
@@ -51,13 +48,11 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </Block>
       )}
 
-      <FadeInScene>
-        <Block title={titles.techStack} wide>
-          <Panel>
-            <TechSlots categories={sections.techStack} />
-          </Panel>
-        </Block>
-      </FadeInScene>
+      <Block title={titles.techStack} wide>
+        <MenuPanel>
+          <TechSlots categories={sections.techStack} />
+        </MenuPanel>
+      </Block>
 
       <Block title={titles.featuredWork} wide>
         <ItemProjects projects={sections.projects} />

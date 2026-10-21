@@ -59,7 +59,7 @@ export default function SoulMapTheme() {
           <LastFire profession={active} />
         </div>
 
-        <footer className="relative z-20 pb-40 pt-6 text-center sm:pb-28">
+        <footer className="relative z-20 pb-52 pt-6 text-center sm:pb-28">
           <p className="text-sm text-[color:var(--soul-text-soft)]">
             © {new Date().getFullYear()} {view.hero.name}
           </p>

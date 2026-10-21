@@ -1,9 +1,12 @@
 /*
  * The bonfire world's scenes and HUD (hud.tsx, bonfire.tsx, shrine.tsx, classSelect.tsx, descent.tsx,
- * items.tsx, messages.tsx, summons.tsx, arena.tsx, lastFire.tsx). Heavy and slow with ease out, the way
- * the hard knight action game moves. Transforms and opacity only; every loop and every entrance runs only
- * with no motion preference, and the state it ends in is the plain rule, so reduced motion shows it still.
- * Colours are the --soul-* variables the world's root sets (palette.ts).
+ * items.tsx, messages.tsx, summons.tsx, arena.tsx, lastFire.tsx, views.tsx). Heavy and slow the way the
+ * hard knight action game moves: things settle with ease out, a flare is fast and its fade is long, the
+ * loops run on periods that never divide into each other, and each section enters its own way (a menu
+ * fades open, an area's name surfaces, a glint flares, a message is written, a phantom materialises, the
+ * fog parts). Transforms and opacity only; every loop and every entrance runs only with no motion
+ * preference, and the state it ends in is the plain rule, so reduced motion shows it still. Colours are
+ * the --soul-* variables the world's root sets (palette.ts).
  */
 
 /* ================================================================ HUD ================================== */
@@ -58,12 +61,14 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* The game's banner: the band fades up, the words come out of the dark and keep growing, very slowly,
+     the whole time they are up (run.tsx holds it 4.6 s). */
   .banner {
-    animation: banner-band 3.4s ease-out both;
+    animation: banner-band 4.6s ease-in-out both;
   }
 
   .bannerText {
-    animation: banner-words 3.4s cubic-bezier(0.2, 0.6, 0.2, 1) both;
+    animation: banner-words 4.6s linear both;
   }
 
   .itemBox {
@@ -86,16 +91,16 @@
 
 @keyframes banner-band {
   0% { opacity: 0; }
-  14% { opacity: 1; }
-  80% { opacity: 1; }
+  12% { opacity: 1; }
+  82% { opacity: 1; }
   100% { opacity: 0; }
 }
 
 @keyframes banner-words {
-  0% { opacity: 0; transform: scale(1.08); }
-  18% { opacity: 1; }
-  80% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1); }
+  0% { opacity: 0; transform: scale(0.96); }
+  20% { opacity: 1; transform: scale(0.982); }
+  82% { opacity: 1; transform: scale(1.036); }
+  100% { opacity: 0; transform: scale(1.05); }
 }
 
 @keyframes item-box {
@@ -174,73 +179,95 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .flames,
-  .fireGlow {
-    transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.9s ease-out;
+  /* Catching: the flame climbs past its height and sinks back onto the sword, the glow follows slower. */
+  .flames {
+    transition: transform 1.2s cubic-bezier(0.34, 1.36, 0.5, 1), opacity 0.8s ease-out;
   }
 
+  .fireGlow {
+    transition: transform 1.8s ease-out, opacity 1.8s ease-out;
+  }
+
+  /* Three tongues, each on its own uneven period, so the fire never repeats in step. */
   .fireLit .flameOuter {
-    animation: flicker-outer 1.7s ease-in-out infinite;
+    animation: flicker-outer 1.9s ease-in-out infinite;
   }
 
   .fireLit .flameMid {
-    animation: flicker-mid 1.1s ease-in-out infinite;
+    animation: flicker-mid 1.3s ease-in-out infinite;
   }
 
   .fireLit .flameCore {
-    animation: flicker-core 0.8s ease-in-out infinite;
+    animation: flicker-core 0.9s ease-in-out infinite;
   }
 
   .fireLit .fireGlow {
-    animation: glow-breathe 2.6s ease-in-out infinite;
+    animation: glow-breathe 4.1s ease-in-out infinite;
   }
 
+  /* Embers lift off the fire on curling paths, slowing and fading as they climb. */
   .fireLit .spark {
-    animation: spark-rise 2.4s ease-out infinite;
+    animation: spark-rise 3.7s ease-out infinite;
   }
 
   .fireLit .spark:nth-child(2) {
-    animation-delay: 0.8s;
-    animation-duration: 2.9s;
+    animation-name: spark-curl;
+    animation-delay: -1.9s;
+    animation-duration: 4.6s;
   }
 
   .fireLit .spark:nth-child(3) {
-    animation-delay: 1.6s;
-    animation-duration: 2.1s;
+    animation-delay: -3.1s;
+    animation-duration: 5.3s;
   }
 
   .fireOut .lastEmber,
   .fireEmber .lastEmber {
-    animation: ember-pulse 2.2s ease-in-out infinite;
+    animation: ember-pulse 2.9s ease-in-out infinite;
   }
 }
 
 @keyframes flicker-outer {
   0%, 100% { transform: scale(1, 1) skewX(0deg); }
-  30% { transform: scale(1.04, 0.95) skewX(-2deg); }
-  65% { transform: scale(0.97, 1.05) skewX(2deg); }
+  22% { transform: scale(1.03, 0.96) skewX(-2deg); }
+  41% { transform: scale(0.98, 1.06) skewX(1deg); }
+  58% { transform: scale(1.02, 0.97) skewX(-1deg); }
+  79% { transform: scale(0.97, 1.04) skewX(2deg); }
 }
 
 @keyframes flicker-mid {
   0%, 100% { transform: scale(1, 1); }
-  40% { transform: scale(0.95, 1.07); }
-  70% { transform: scale(1.03, 0.96); }
+  31% { transform: scale(0.95, 1.07); }
+  52% { transform: scale(1.02, 0.98); }
+  74% { transform: scale(0.98, 1.04); }
 }
 
 @keyframes flicker-core {
   0%, 100% { transform: scale(1, 1); opacity: 1; }
-  50% { transform: scale(1.06, 0.9); opacity: 0.85; }
+  38% { transform: scale(1.06, 0.9); opacity: 0.84; }
+  66% { transform: scale(0.97, 1.05); opacity: 0.95; }
 }
 
 @keyframes glow-breathe {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(0.96); }
+  45% { opacity: 0.78; transform: scale(0.96); }
+  70% { opacity: 0.9; transform: scale(0.99); }
 }
 
 @keyframes spark-rise {
   0% { opacity: 0; transform: translate(0, 0); }
-  15% { opacity: 1; }
-  100% { opacity: 0; transform: translate(6px, -44px); }
+  12% { opacity: 1; transform: translate(1px, -6px); }
+  45% { opacity: 0.85; transform: translate(5px, -22px); }
+  75% { opacity: 0.4; transform: translate(3px, -36px); }
+  100% { opacity: 0; transform: translate(7px, -46px); }
+}
+
+@keyframes spark-curl {
+  0% { opacity: 0; transform: translate(0, 0); }
+  12% { opacity: 1; transform: translate(-1px, -5px); }
+  40% { opacity: 0.8; transform: translate(-6px, -18px); }
+  70% { opacity: 0.45; transform: translate(-3px, -32px); }
+  100% { opacity: 0; transform: translate(-8px, -42px); }
 }
 
 @keyframes ember-pulse {
@@ -292,14 +319,28 @@
     animation: fog-drift 26s ease-in-out infinite alternate;
   }
 
+  /* After he stands, the words under the scene surface one line at a time, out of the dark. */
   .heroWords {
-    transform: translateY(12px);
-    transition: opacity 1.4s ease-out, transform 1.4s ease-out;
+    opacity: 1;
   }
 
-  .heroWordsOn {
+  .heroWords > * {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 1.6s ease-out, transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .heroWordsOn > * {
+    opacity: 1;
     transform: none;
   }
+
+  .heroWordsOn > :nth-child(2) { transition-delay: 0.3s; }
+  .heroWordsOn > :nth-child(3) { transition-delay: 0.45s; }
+  .heroWordsOn > :nth-child(4) { transition-delay: 0.65s; }
+  .heroWordsOn > :nth-child(5) { transition-delay: 0.8s; }
+  .heroWordsOn > :nth-child(6) { transition-delay: 1s; }
+  .heroWordsOn > :nth-child(7) { transition-delay: 1.3s; }
 }
 
 @keyframes fog-drift {
@@ -319,37 +360,46 @@
 
 @media (prefers-reduced-motion: no-preference) {
   /* A new pick cuts to black and back, the way the game fades between screens. */
+  /* The black lifts slowly off him as he comes up off his knee (the 1.4 s respawn). */
   .blackout {
-    animation: blackout 1s ease-in-out both;
-  }
-
-  /* Sparks fly from the anvil as the hammer lands (52% into his 1.6s hammer loop). */
-  .forgeSparks {
-    animation: forge-sparks 1.6s ease-out infinite;
-  }
-
-  .drumHead {
-    animation: drum-flash 0.4s ease-out infinite;
+    animation: blackout 1.3s ease-in-out both;
   }
 
   .post {
     transform-origin: 50% 100%;
-    animation: post-shake 4s ease-out infinite;
+  }
+
+  /* Each prop answers his strokes in time with his own loop (knight.module.css), from his first stroke:
+     the scene keys the prop to his step and marks it live only while he works. */
+
+  /* Sparks fly as the hammer lands, 52 % into its 2.4 s loop, after the 0.5 s lift into it. */
+  .propLive .forgeSparks {
+    animation: forge-sparks 2.4s linear 0.5s infinite;
+  }
+
+  /* The skin flashes on each mallet, 25 % and 75 % into the 1.2 s loop, after the 0.4 s lift. */
+  .propLive .drumHead {
+    animation: drum-flash 0.6s ease-out 0.7s infinite;
+  }
+
+  /* The post rocks on the roundhouse, the knee and the elbow (16, 49 and 74 % of the 4.8 s cycle). */
+  .propLive .post {
+    animation: post-shake 4.8s linear infinite;
   }
 }
 
 /* The blackout is drawn only after a change of class (classSelect.tsx), so the first draw has none. */
 @keyframes blackout {
   0% { opacity: 1; }
-  40% { opacity: 1; }
+  30% { opacity: 1; }
   100% { opacity: 0; }
 }
 
 @keyframes forge-sparks {
-  0%, 50% { opacity: 0; transform: translate(0, 0); }
-  53% { opacity: 1; }
-  75% { opacity: 0; transform: translate(4px, -10px); }
-  100% { opacity: 0; }
+  0%, 51% { opacity: 0; transform: translate(0, 0); animation-timing-function: ease-out; }
+  53% { opacity: 1; transform: translate(0.5px, -1px); animation-timing-function: ease-out; }
+  78% { opacity: 0; transform: translate(5px, -11px); }
+  100% { opacity: 0; transform: translate(5px, -11px); }
 }
 
 .drumHead {
@@ -357,14 +407,15 @@
 }
 
 @keyframes drum-flash {
-  0% { opacity: 0.35; }
+  0% { opacity: 0.4; }
   100% { opacity: 0; }
 }
 
 @keyframes post-shake {
-  /* the roundhouse lands at 16%, the knee at 48%, the elbow at 74% of his 4s cycle */
-  0%, 15%, 24%, 47%, 56%, 73%, 82%, 100% { transform: rotate(0deg); }
-  17%, 49%, 75% { transform: rotate(3deg); }
+  0%, 15.5%, 48.5%, 73.5%, 100% { transform: rotate(0deg); animation-timing-function: ease-out; }
+  16.5%, 49.5%, 74.5% { transform: rotate(3deg); animation-timing-function: ease-in-out; }
+  18.5%, 51.5%, 76.5% { transform: rotate(-1.2deg); animation-timing-function: ease-in-out; }
+  21%, 54%, 79% { transform: rotate(0deg); }
 }
 
 /* ============================================================ descent ================================== */
@@ -382,24 +433,36 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* The car rides with the scroll but carries its weight: it eases after the scroll instead of jumping
+     with every wheel step. */
+  .liftRide {
+    transition: transform 0.9s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
   .stop .areaName,
   .stop .stopCard {
     opacity: 0;
   }
 
+  /* An area's name surfaces slowly out of the dark, then the place itself comes up under it. */
   .stopOn .areaName {
-    animation: area-name 1.3s ease-out both;
+    animation: area-name 2.2s ease-in-out both;
   }
 
   .stopOn .stopCard {
-    animation: rise-in 0.9s ease-out 0.5s both;
+    animation: rise-in 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.8s both;
   }
+
+  /* Neighbours that arrive together arrive one after the other. */
+  li:nth-child(3n + 2) > .stopOn .areaName { animation-delay: 0.2s; }
+  li:nth-child(3n + 2) > .stopOn .stopCard { animation-delay: 1s; }
+  li:nth-child(3n + 3) > .stopOn .areaName { animation-delay: 0.4s; }
+  li:nth-child(3n + 3) > .stopOn .stopCard { animation-delay: 1.2s; }
 }
 
-/* An area's name: it swells in out of the dark and settles. */
 @keyframes area-name {
-  0% { opacity: 0; transform: scale(1.12); }
-  60% { opacity: 1; }
+  0% { opacity: 0; transform: scale(0.97); }
+  70% { opacity: 1; }
   100% { opacity: 1; transform: scale(1); }
 }
 
@@ -419,15 +482,26 @@
   opacity: 0.5;
 }
 
+/* Picked up: the glint is gone from the ground. */
+.itemPicked .glint {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  /* Lying on the ground: the glint pulses until the visitor comes near. */
+  /* Lying on the ground: the glint swells and sinks, the cross of light turning on a slower beat of its
+     own, and each item on its own phase, so a row of them never pulses together. */
   .item:not(.itemOn) .glintHalo {
-    animation: glint-pulse 1.8s ease-in-out infinite;
+    animation: glint-pulse 3.4s ease-in-out infinite;
   }
 
   .item:not(.itemOn) .glintRay {
-    animation: glint-ray 1.8s ease-in-out infinite;
+    animation: glint-ray 5.1s ease-in-out infinite;
   }
+
+  li:nth-child(3n + 2) > .item .glintHalo { animation-delay: -1.3s; }
+  li:nth-child(3n + 2) > .item .glintRay { animation-delay: -2.2s; }
+  li:nth-child(3n + 3) > .item .glintHalo { animation-delay: -2.4s; }
+  li:nth-child(3n + 3) > .item .glintRay { animation-delay: -3.9s; }
 
   .item:not(.itemOn) .itemCard {
     opacity: 0;
@@ -436,11 +510,21 @@
 
   /* Near: it flares once and the card rises out of it. */
   .itemOn .glintHalo {
-    animation: glint-flare 0.9s ease-out both;
+    animation: glint-flare 1.1s ease-out both;
   }
 
   .itemOn .itemCard {
-    animation: item-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.25s both;
+    animation: item-rise 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s both;
+  }
+
+  li:nth-child(3n + 2) > .itemOn .glintHalo { animation-delay: 0.2s; }
+  li:nth-child(3n + 2) > .itemOn .itemCard { animation-delay: 0.5s; }
+  li:nth-child(3n + 3) > .itemOn .glintHalo { animation-delay: 0.4s; }
+  li:nth-child(3n + 3) > .itemOn .itemCard { animation-delay: 0.7s; }
+
+  /* Picked up: one last flare, then the light goes out. */
+  .itemPicked .glint {
+    animation: glint-taken 1.2s ease-out both;
   }
 }
 
@@ -455,9 +539,15 @@
 }
 
 @keyframes glint-flare {
-  0% { opacity: 0.6; transform: scale(0.6); }
-  40% { opacity: 0.9; transform: scale(1.6); }
+  0% { opacity: 0.6; transform: scale(0.6); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  30% { opacity: 0.9; transform: scale(1.6); animation-timing-function: ease-in-out; }
   100% { opacity: 0.25; transform: scale(0.6); }
+}
+
+@keyframes glint-taken {
+  0% { opacity: 1; transform: scale(1); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  25% { opacity: 1; transform: scale(1.5); animation-timing-function: ease-in; }
+  100% { opacity: 0; transform: scale(0.4); }
 }
 
 @keyframes item-rise {
@@ -478,8 +568,21 @@
 
 /* The orange script, glowing a little off the stone. */
 .inscription {
+  position: relative;
+  isolation: isolate;
   text-shadow: 0 0 10px rgb(243 154 79 / 0.45);
   opacity: 0.88;
+}
+
+/* The light the script throws on the stone round it. */
+.inscription::before {
+  content: '';
+  position: absolute;
+  inset: -0.75rem -1rem;
+  z-index: -1;
+  background: radial-gradient(ellipse at 30% 50%, rgb(243 154 79 / 0.14), transparent 70%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .slab:hover .inscription,
@@ -492,6 +595,39 @@
   .inscription {
     transition: transform 0.5s ease-out, opacity 0.5s ease-out;
   }
+
+  /* A message on the floor is written in as the visitor reaches it, then its light breathes on the
+     stone, slowly, each slab on its own phase. The entrance fills backwards only, so pointing at the
+     slab still lifts the script once it is written. */
+  .message:not(.messageOn) .inscription {
+    opacity: 0;
+  }
+
+  .messageOn .inscription {
+    animation: inscribe 1.8s ease-out backwards;
+  }
+
+  .messageOn .inscription::before {
+    animation: script-glow 5.3s ease-in-out 1.8s infinite;
+  }
+
+  li:nth-child(even) > .messageOn .inscription {
+    animation-delay: 0.3s;
+  }
+
+  li:nth-child(even) > .messageOn .inscription::before {
+    animation-delay: -0.8s;
+  }
+}
+
+@keyframes inscribe {
+  0% { opacity: 0; }
+  35% { opacity: 0.5; }
+}
+
+@keyframes script-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
 /* ============================================================ summons ================================== */
@@ -505,27 +641,50 @@
   opacity: 1;
 }
 
+/* A phantom sent home is gone. */
+.phantomLeave {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  /* The sign flares when touched, then glows on slowly while its phantom is here. */
   .sigilLit {
-    animation: sigil-flare 1.1s ease-out both;
+    animation:
+      sigil-flare 1.1s ease-out both,
+      sigil-glow 4.6s ease-in-out 1.1s infinite;
   }
 
-  /* The phantom rises out of the sign in gold light. */
+  /* The phantom gathers out of the gold light as the flare peaks: it fades in drifting up off the sign. */
   .phantomRise {
-    animation: phantom-rise 1.4s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation: phantom-rise 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.35s both;
+  }
+
+  /* Sent home, it fades out the way a phantom leaves, lifting off the floor. */
+  .phantomLeave {
+    animation: phantom-leave 0.9s ease-in both;
   }
 }
 
 @keyframes sigil-flare {
-  0% { opacity: 0.55; transform: scale(1); }
-  35% { opacity: 1; transform: scale(1.12); }
+  0% { opacity: 0.55; transform: scale(1); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  30% { opacity: 1; transform: scale(1.12); animation-timing-function: ease-in-out; }
   100% { opacity: 1; transform: scale(1); }
 }
 
+@keyframes sigil-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
+
 @keyframes phantom-rise {
-  0% { opacity: 0; transform: translateY(28px) scaleY(0.4); }
-  60% { opacity: 0.9; }
+  0% { opacity: 0; transform: translateY(18px); }
+  45% { opacity: 0.6; }
   100% { opacity: 1; transform: none; }
+}
+
+@keyframes phantom-leave {
+  0% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: translateY(-10px); }
 }
 
 /* ============================================================== arena ================================== */
@@ -552,10 +711,24 @@
     animation-direction: alternate-reverse;
   }
 
+  /* Traverse: the wall thins and lets him through over the 2.4 s of his walk. */
+  .fogParting {
+    animation: fog-part 2.4s ease-in-out both;
+  }
+
+  .advance {
+    transition: transform 2.4s ease-in-out;
+  }
+
   /* The partner steps out of the fog as it parts. */
   .partnerIn {
-    animation: partner-in 1.2s ease-out both;
+    animation: partner-in 1.4s ease-out 1s both;
   }
+}
+
+@keyframes fog-part {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.15); }
 }
 
 @keyframes fog-swirl {
@@ -566,6 +739,15 @@
 @keyframes partner-in {
   0% { opacity: 0; transform: translateX(30px); }
   100% { opacity: 1; transform: none; }
+}
+
+/* Through the fog he has walked a step into the ring. */
+.advance {
+  transform: translateX(1.5rem);
+}
+
+.fogParting {
+  opacity: 0;
 }
 
 /* ========================================================== last fire ================================== */
@@ -580,7 +762,46 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* two heavy strides, 2.4 s, the same as his walk */
   .atFire {
-    transition: transform 0.9s ease-in-out;
+    transition: transform 2.4s ease-in-out;
   }
+}
+
+/* ============================================================== menus ================================== */
+
+/* About and the Tech Stack are the game's menu screens: the panel fades open on its own (no slide; a
+   menu in the game does not travel), then the stack's item groups come up one after another. */
+@media (prefers-reduced-motion: no-preference) {
+  .menu:not(.menuOn) {
+    opacity: 0;
+  }
+
+  .menuOn {
+    animation: menu-open 0.9s ease-out backwards;
+  }
+
+  .menu:not(.menuOn) .slotGroup {
+    opacity: 0;
+  }
+
+  .menuOn .slotGroup {
+    animation: slot-in 0.7s ease-out 0.4s backwards;
+  }
+
+  .menuOn li:nth-child(2) > .slotGroup { animation-delay: 0.52s; }
+  .menuOn li:nth-child(3) > .slotGroup { animation-delay: 0.64s; }
+  .menuOn li:nth-child(4) > .slotGroup { animation-delay: 0.76s; }
+  .menuOn li:nth-child(5) > .slotGroup { animation-delay: 0.88s; }
+  .menuOn li:nth-child(6) > .slotGroup { animation-delay: 1s; }
+  .menuOn li:nth-child(7) > .slotGroup { animation-delay: 1.12s; }
+  .menuOn li:nth-child(n + 8) > .slotGroup { animation-delay: 1.24s; }
+}
+
+@keyframes menu-open {
+  0% { opacity: 0; }
+}
+
+@keyframes slot-in {
+  0% { opacity: 0; transform: translateY(6px); }
 }

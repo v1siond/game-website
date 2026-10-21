@@ -31,7 +31,8 @@ export const MAX_FLASKS = 5
 const FLASK_HEAL = 45
 const STAMINA_REGEN = 6
 const REGEN_MS = 160
-const BANNER_MS = 3400
+// The banner's whole fade in, slow growth and fade out (souls.module.css .banner).
+const BANNER_MS = 4600
 const ITEM_MS = 2800
 
 interface RunState {

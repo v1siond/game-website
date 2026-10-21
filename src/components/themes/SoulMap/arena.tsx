@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { MartialArts } from '@/lib/cv/content'
@@ -14,17 +15,22 @@ import { CARVED, SOUL } from './palette'
 import souls from './souls.module.css'
 
 // The Muay Thai record is fought behind the game's fog wall. The visitor walks him through the fog
-// (Traverse) and the ring opens with a sparring partner in it, a red phantom, its name and long bar along
+// (Traverse: he takes two strides in as the wall thins, the way crossing the white light takes a
+// moment and commits him) and the ring opens with a sparring partner in it, a red phantom, its name and long bar along
 // the bottom the way the game shows a boss. Then it is a bout:
 // - Strike throws his roundhouse, if he has the stamina for it; it lands as his shin comes round.
 // - Guard raises his guard for a second.
-// - The partner winds up and swings on its own rhythm (only while the ring is on screen); a guard blocks
-//   it for stamina, an open guard takes the hit off his health (the HUD's bar, the flask heals it).
-// - At no health he is knocked down: the red banner, then he gets up and the partner's bar is full again.
-// - The partner's bar at nothing is the gold banner, a round won, and souls.
+// - The partner pulls its rear hand back, holds the tell a beat and throws the cross on its own rhythm
+//   (only while the ring is on screen); a guard blocks it for stamina, an open guard takes the hit off
+//   his health (the HUD's bar, the flask heals it). A hit jolts whoever is not mid move; a committed
+//   move is never cut off by a flinch.
+// - At no health he is knocked down: the red banner, then he gets up off his back and the partner's bar
+//   is full again.
+// - The partner's bar at nothing is the gold banner, a round won, and souls; another round and the
+//   partner gets up.
 // The record itself (his dojo, rank, years, achievements) stands beside the ring the whole time.
 
-type Bout = 'fog' | 'fight' | 'down' | 'won'
+type Bout = 'fog' | 'parting' | 'fight' | 'down' | 'won'
 
 const PARTNER_HP = 100
 const STRIKE_COST = 25
@@ -32,10 +38,16 @@ const GUARD_COST = 15
 const STRIKE_DAMAGE = [18, 14, 20, 16]
 const PARTNER_DAMAGE = 34
 const PARTNER_EVERY = 3400
-// The roundhouse lands 450 ms in, the partner's swing 680 ms in (knight.module.css).
-const STRIKE_LANDS = 450
-const SWING_LANDS = 680
+// Step lengths and the moments a blow lands, from the animations in knight.module.css: the roundhouse
+// lands at 50 % of its 1 s, the cross at 57 % of its 1.2 s.
+const STRIKE_MS = 1000
+const STRIKE_LANDS = 500
+const SWING_MS = 1200
+const SWING_LANDS = 684
 const GUARD_MS = 1000
+const HIT_MS = 500
+const GET_UP_MS = 1600
+const WALK_MS = 2400
 const DOWN_MS = 2600
 const WON_SOULS = 2000
 const NOTICE_MS = 1500
@@ -64,16 +76,16 @@ function Ring() {
   )
 }
 
-function FogWall({ onTraverse }: { onTraverse: () => void }) {
+function FogWall({ parting, onTraverse }: { parting: boolean; onTraverse: () => void }) {
   const { souls: words } = useLabels()
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/60 p-4 text-center">
+    <div className={`absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/60 p-4 text-center ${parting ? souls.fogParting : ''}`}>
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <span className={`${souls.fogLayer} absolute inset-0`} />
         <span className={`${souls.fogLayer} ${souls.fogLayerBack} absolute inset-0`} />
       </div>
       <p className="relative text-sm italic text-[color:var(--soul-text)]">{words.fogHint}</p>
-      <button type="button" onClick={onTraverse} className={`relative ${BUTTON_LIT}`}>
+      <button type="button" onClick={onTraverse} disabled={parting} className={`relative ${BUTTON_LIT}`}>
         {words.traverse}
       </button>
     </div>
@@ -143,14 +155,15 @@ function useBout() {
       rest()
       partnerLeft.current = PARTNER_HP
       setPartnerHp(PARTNER_HP)
-      playMe([{ pose: 'rise', ms: 1200 }])
+      playMe([{ pose: 'getUp', ms: GET_UP_MS }])
       setBout('fight')
     })
   }, [announce, holdMe, later, playMe, rest, words.knockedDown])
 
   const partnerSwing = useCallback(() => {
-    if (!playPartner([{ pose: 'swing', ms: 1100 }])) return
+    if (!playPartner([{ pose: 'swing', ms: SWING_MS }])) return
     later(SWING_LANDS, () => {
+      if (partnerLeft.current === 0) return
       if (guarding.current && spend(GUARD_COST)) return
       const left = hp.current - PARTNER_DAMAGE
       hurt(PARTNER_DAMAGE)
@@ -158,10 +171,9 @@ function useBout() {
         knockDown()
         return
       }
-      holdMe('hit')
-      later(500, () => holdMe('idle'))
+      playMe([{ pose: 'hit', ms: HIT_MS }])
     })
-  }, [holdMe, hurt, knockDown, later, playPartner, spend])
+  }, [hurt, knockDown, later, playMe, playPartner, spend])
 
   const strike = () => {
     if (bout !== 'fight' || me.busy()) return
@@ -169,7 +181,7 @@ function useBout() {
       say(words.winded)
       return
     }
-    playMe([{ pose: 'strike', ms: 900 }])
+    playMe([{ pose: 'strike', ms: STRIKE_MS }])
     later(STRIKE_LANDS, () => {
       const damage = STRIKE_DAMAGE[strikes.current % STRIKE_DAMAGE.length]
       strikes.current += 1
@@ -183,9 +195,7 @@ function useBout() {
         earn(WON_SOULS)
         return
       }
-      if (partner.busy()) return
-      holdPartner('hit')
-      later(500, () => holdPartner('idle'))
+      playPartner([{ pose: 'hit', ms: HIT_MS }])
     })
   }
 
@@ -201,11 +211,22 @@ function useBout() {
   const again = () => {
     partnerLeft.current = PARTNER_HP
     setPartnerHp(PARTNER_HP)
-    holdPartner('idle')
+    playPartner([{ pose: 'getUp', ms: GET_UP_MS }])
     setBout('fight')
   }
 
-  return { bout, partnerHp, notice, me, partner, partnerSwing, strike, guard, again, traverse: () => setBout('fight') }
+  // Through the fog: he walks in while it parts; with no motion the ring is simply open.
+  const traverse = () => {
+    if (prefersReducedMotion()) {
+      setBout('fight')
+      return
+    }
+    setBout('parting')
+    playMe([{ pose: 'walk', ms: WALK_MS }])
+    later(WALK_MS, () => setBout('fight'))
+  }
+
+  return { bout, partnerHp, notice, me, partner, partnerSwing, strike, guard, again, traverse }
 }
 
 function SparRing() {
@@ -221,12 +242,13 @@ function SparRing() {
   }, [bout, inView, partnerSwing])
 
   const fighting = bout === 'fight'
+  const inRing = bout !== 'fog' && bout !== 'parting'
 
   return (
     <div ref={ref}>
       <div className="relative aspect-[4/3] overflow-hidden border border-[color:var(--soul-ridge)] sm:aspect-[16/9]">
         <Ring />
-        <div className="absolute bottom-[18%] left-[18%] aspect-[60/96] h-[56%]">
+        <div className={`absolute bottom-[18%] left-[18%] aspect-[60/96] h-[56%] ${bout === 'fog' ? '' : souls.advance}`}>
           <Knight key={me.key} gear="fighter" pose={me.pose} className="h-full w-full" />
         </div>
         {bout !== 'fog' && (
@@ -234,14 +256,14 @@ function SparRing() {
             <Knight key={partner.key} gear="fighter" pose={partner.pose} spirit="invader" facingLeft className="h-full w-full" />
           </div>
         )}
-        {bout === 'fog' ? <FogWall onTraverse={traverse} /> : <BossBar hp={partnerHp} />}
+        {inRing ? <BossBar hp={partnerHp} /> : <FogWall parting={bout === 'parting'} onTraverse={traverse} />}
         {notice && (
           <p className="absolute inset-x-0 top-4 text-center text-sm uppercase tracking-[0.2em] text-[color:var(--soul-text)]" role="status">
             {notice}
           </p>
         )}
       </div>
-      {bout !== 'fog' && (
+      {inRing && (
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           {bout === 'won' ? (
             <button type="button" onClick={again} className={BUTTON_LIT}>

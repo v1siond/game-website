@@ -14,9 +14,10 @@ import souls from './souls.module.css'
 
 // Work experience is the ride down the game's lift shafts, the way its one interconnected world folds
 // back on itself: a stone shaft runs beside the jobs and the lift carries him down it as the visitor
-// scrolls (--scene-progress from the shared scroll engine moves the car, transform only, and once at the
-// bottom it stays there). Each job arrives the way a new area does: its company's name fades up in wide
-// capitals between two rules, then the card under it. The jobs sit in masonry, newest first.
+// scrolls (--scene-progress from the shared scroll engine moves the car, transform only, eased so the car
+// carries its weight; once at the bottom it stays there). Each job arrives the way a new area does: its
+// company's name surfaces slowly in wide capitals between two rules, then the card under it, neighbours
+// one after another. The jobs sit in masonry, newest first.
 
 // How far the visitor scrolls for the full ride: from the section's top at the bottom of the screen to a
 // screen and a half past the top of it.

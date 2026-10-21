@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData } from '@/lib/cv/content'
@@ -13,7 +14,8 @@ import { CARVED } from './palette'
 import souls from './souls.module.css'
 
 // The ventures are the game's messages left on the floor: each one a stone slab with its name written
-// in glowing orange script, the way players leave words for each other. Pointing at a slab (or focusing
+// in glowing orange script, the way players leave words for each other. The script is written into the
+// stone as the visitor reaches the slab, and its light breathes on the stone after. Pointing at a slab (or focusing
 // into it) lifts the script off the stone and brightens it, the moment the game shows a message; the
 // words under it are the venture's own. Appraise is the game's rating of a message: it marks the slab
 // appraised and gives the souls a good rating brings.
@@ -26,6 +28,7 @@ function Slab({ venture }: { venture: Venture }) {
   const run = useRun()
   const { souls: words, links } = useLabels()
   const [appraised, setAppraised] = useState(false)
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
   const appraise = () => {
     if (appraised) return
@@ -34,7 +37,7 @@ function Slab({ venture }: { venture: Venture }) {
   }
 
   return (
-    <article className={`${souls.slab} p-5`}>
+    <article ref={ref} className={`${souls.slab} ${souls.message} ${triggered ? souls.messageOn : ''} p-5`}>
       <div className={souls.inscription}>
         <h3 className={`${CARVED} text-lg tracking-[0.08em] text-[color:var(--soul-message)]`}>
           <span className="grayscale" aria-hidden="true">
