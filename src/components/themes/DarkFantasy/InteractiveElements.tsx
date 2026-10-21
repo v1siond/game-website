@@ -39,6 +39,21 @@ interface SpiritState {
   mood: 'idle' | 'curious' | 'excited' | 'sleepy'
 }
 
+// The companion, the trail and the parallax hide at 768px and below (too distracting on a phone).
+// Starts visible so the first client render matches the server one, then follows the window width.
+function useWiderThanMobile(): boolean {
+  const [isWide, setIsWide] = useState(true)
+
+  useEffect(() => {
+    const checkWidth = () => setIsWide(window.innerWidth > 768)
+    checkWidth()
+    window.addEventListener('resize', checkWidth)
+    return () => window.removeEventListener('resize', checkWidth)
+  }, [])
+
+  return isWide
+}
+
 export const SpiritCompanion = memo(function SpiritCompanion() {
   const [state, setState] = useState<SpiritState>({
     x: 100,
@@ -49,7 +64,7 @@ export const SpiritCompanion = memo(function SpiritCompanion() {
     rotation: 0,
     mood: 'idle',
   })
-  const [isVisible, setIsVisible] = useState(true)
+  const isVisible = useWiderThanMobile()
   const rafRef = useRef<number | null>(null)
   const mouseRef = useRef({ x: 0, y: 0 })
   const scrollRef = useRef(0)
@@ -151,16 +166,6 @@ export const SpiritCompanion = memo(function SpiritCompanion() {
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  // Hide on mobile (too distracting)
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsVisible(window.innerWidth > 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   if (!isVisible) return null
@@ -294,7 +299,7 @@ interface Particle {
 
 export const CursorTrail = memo(function CursorTrail() {
   const [particles, setParticles] = useState<Particle[]>([])
-  const [isVisible, setIsVisible] = useState(true)
+  const isVisible = useWiderThanMobile()
   const mouseRef = useRef({ x: 0, y: 0 })
   const lastEmitRef = useRef(0)
   const particleIdRef = useRef(0)
@@ -339,14 +344,6 @@ export const CursorTrail = memo(function CursorTrail() {
     return () => clearInterval(interval)
   }, [])
 
-  // Hide on mobile
-  useEffect(() => {
-    const checkMobile = () => setIsVisible(window.innerWidth > 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
   if (!isVisible) return null
 
   return (
@@ -377,7 +374,7 @@ export const CursorTrail = memo(function CursorTrail() {
 
 export const ParallaxLayers = memo(function ParallaxLayers() {
   const [offset, setOffset] = useState({ x: 0, y: 0 })
-  const [isVisible, setIsVisible] = useState(true)
+  const isVisible = useWiderThanMobile()
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -391,14 +388,6 @@ export const ParallaxLayers = memo(function ParallaxLayers() {
 
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
     return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
-
-  // Hide on mobile
-  useEffect(() => {
-    const checkMobile = () => setIsVisible(window.innerWidth > 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   if (!isVisible) return null
