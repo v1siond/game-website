@@ -1,0 +1,239 @@
+/*
+ * The stage behind the page (stage.tsx): where he stands, how he and the pursuer cross a room, the props
+ * that move once, the corridor glass, and the black cut between rooms. Everything is placed from the
+ * anchor, a box his size at the bottom left of the screen: a place is translateX(place * 100%) of a box
+ * as wide as him, so a prop, his hand and the pursuer meet at every screen size. Transforms and opacity
+ * only; under reduced motion every move, swing and cut is off and the figures show their last frame.
+ */
+
+.anchor {
+  position: absolute;
+  bottom: 3vh;
+  left: 4%;
+  height: 34vh;
+  aspect-ratio: 48 / 112;
+}
+
+@media (min-width: 640px) {
+  .anchor {
+    height: clamp(220px, 52vh, 520px);
+  }
+}
+
+/* A figure: as wide as him, carried to its place over the beat's move, at the genre's even walking pace. */
+.actor {
+  position: absolute;
+  inset: 0;
+}
+
+.walker {
+  transform: translateX(calc(var(--x) * 100%));
+  transition:
+    transform var(--move) linear,
+    opacity 200ms linear;
+}
+
+.gone {
+  opacity: 0;
+}
+
+/* The pursuer, half again his height, from the same floor. */
+.foe {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 152%;
+  height: 130%;
+}
+
+/* Far behind the corridor glass: smaller, higher up the wall's foot, and in the dark. */
+.far {
+  transform: translateY(-26%) scale(0.55);
+  transform-origin: 0 100%;
+  filter: brightness(0.45);
+}
+
+/* The night outside the corridor's long window, and the glass over it with its mullions. */
+.night,
+.glass {
+  position: absolute;
+  bottom: 26%;
+  left: -100vw;
+  width: 300vw;
+  height: 86%;
+}
+
+.night {
+  background: linear-gradient(180deg, var(--sh-void), color-mix(in srgb, var(--sh-moon) 22%, var(--sh-void)));
+}
+
+.glass {
+  background:
+    repeating-linear-gradient(90deg, var(--sh-wood) 0 6px, transparent 6px 120px),
+    linear-gradient(0deg, var(--sh-wood) 0 6px, transparent 6px calc(100% - 6px), var(--sh-wood) calc(100% - 6px)),
+    linear-gradient(160deg, color-mix(in srgb, var(--sh-moon) 18%, transparent), transparent 40%);
+}
+
+/* A prop on his floor, its place and size in his body widths and heights. */
+.prop {
+  position: absolute;
+  bottom: 0;
+  left: calc(var(--at) * 100%);
+  width: calc(var(--w) * 100%);
+  height: calc(var(--h) * 100%);
+  overflow: visible;
+}
+
+.lid,
+.leaf,
+.flapLeft,
+.flapRight {
+  transform-box: fill-box;
+  transition: transform 520ms cubic-bezier(0.45, 0, 0.3, 1);
+}
+
+.lid {
+  transform-origin: 100% 100%;
+}
+
+.lid.on {
+  transform: rotate(-70deg) translateY(-6%);
+}
+
+.leaf,
+.flapLeft {
+  transform-origin: 0 50%;
+}
+
+.flapRight {
+  transform-origin: 100% 50%;
+}
+
+.leaf.on {
+  transform: scaleX(0.14);
+}
+
+.flapLeft.on,
+.flapRight.on {
+  transform: scaleX(0.3);
+}
+
+.glow {
+  opacity: 0;
+  transition: opacity 120ms steps(1, end);
+}
+
+.glow.on {
+  opacity: 1;
+}
+
+.magazine {
+  position: absolute;
+  bottom: 0;
+  left: 52%;
+  width: 22%;
+  opacity: 0;
+  transform: translateY(-260%);
+  transition:
+    transform 280ms cubic-bezier(0.5, 0, 1, 1),
+    opacity 80ms linear;
+}
+
+.magazine.on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* The door under the pursuer's blows. */
+.shake {
+  animation: shake 300ms ease-out;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3%);
+  }
+  50% {
+    transform: translateX(2%);
+  }
+  75% {
+    transform: translateX(-1%);
+  }
+}
+
+/* Once: the chandelier settles as he walks in, the armoury lamp swings at the blow. */
+.settle,
+.swing {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+
+.settle {
+  animation: swing 2.4s ease-out 2.2s both;
+}
+
+.swing {
+  animation: swing 2.4s ease-out both;
+}
+
+@keyframes swing {
+  0% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(7deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+  65% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* The hard cut between fixed cameras: a moment of black. */
+.cut {
+  position: absolute;
+  inset: 0;
+  background: var(--sh-void);
+  opacity: 0;
+  animation: cut 320ms steps(1, end);
+}
+
+@keyframes cut {
+  0% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walker,
+  .lid,
+  .leaf,
+  .flapLeft,
+  .flapRight,
+  .glow,
+  .magazine {
+    transition: none;
+  }
+
+  .shake,
+  .settle,
+  .swing,
+  .cut {
+    animation: none;
+  }
+}

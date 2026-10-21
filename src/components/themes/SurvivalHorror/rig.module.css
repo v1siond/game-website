@@ -1,0 +1,52 @@
+/*
+ * The rig's motion (rig.tsx): each bone turns round its own pivot, given in the figure's viewBox units
+ * (transform-box: view-box), and eases to the next pose over the beat's tempo (--tempo, set by the stage
+ * on the figure). The breath is the one thing that repeats, and only at rest: a slow rise of the chest.
+ * Transforms only; reduced motion holds every pose still.
+ */
+
+.joint {
+  transform-box: view-box;
+  transform-origin: var(--ox) var(--oy);
+  transform: rotate(var(--a));
+  transition: transform var(--tempo, 320ms) cubic-bezier(0.45, 0, 0.3, 1);
+}
+
+.drop {
+  transform: translateY(var(--dy));
+  transition: transform var(--tempo, 320ms) cubic-bezier(0.45, 0, 0.3, 1);
+}
+
+.breath {
+  transform-box: view-box;
+  transform-origin: var(--ox) var(--oy);
+  animation: breath 4.8s ease-in-out infinite;
+}
+
+/* The hall's aim: both arms follow the visitor's pointer up and down (--my from the world root). */
+.follow {
+  transform-box: view-box;
+  transform-origin: 25px 30.5px;
+  transform: rotate(calc(var(--my, 0) * 10deg));
+}
+
+@keyframes breath {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.012, 1.018);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .joint,
+  .drop {
+    transition: none;
+  }
+
+  .breath {
+    animation: none;
+  }
+}

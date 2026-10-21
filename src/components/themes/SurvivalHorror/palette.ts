@@ -54,10 +54,14 @@ export const SH = {
   herbGreen: '#3f9a46',
   herbRed: '#c23a32',
   pot: '#6a4630',
-  // The stalker: the long coat, its belts, the pale grey head.
+  // The pursuer: the long coat closed with straps, its buckles, the pale grey stitched head, the bared
+  // teeth and raw gums, the olive launcher on his back.
   coat: '#16171a',
   coatLit: '#2b2d32',
   stalkerSkin: '#8c857b',
+  gums: '#7a2a2a',
+  launcher: '#4f5f2c',
+  launcherLit: '#6d7d3e',
   // The case lining and the trader's eyes.
   felt: '#24402e',
   feltLine: '#335a40',

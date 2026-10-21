@@ -5,7 +5,6 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
-import { ProfessionRoom } from './rooms'
 import { ConditionMonitor } from './ecg'
 import { useDoor } from './door'
 import { SH } from './palette'
@@ -13,14 +12,14 @@ import { CORNER_MARKS } from './panels'
 import horror from './horror.module.css'
 import look from './world.module.css'
 
-// The profession switch as the genre's inventory screen beside the item box: on the left the room he is in
-// (./rooms), on the right his condition, the equipped item turning in the examine view, and three slots, one
-// item per profession (his laptop, his sticks, his hand wraps). Taking another item goes through the door
-// (./door) to its room. The arrow keys change the profession straight away (ProfessionSwitch), so a change
+// The profession switch as the genre's inventory screen beside the item box: his condition, the equipped
+// item turning once in the examine view when it changes, and three slots, one item per profession (his
+// laptop, his sticks, his hand wraps). Behind the page he kneels at the chest and takes the item out
+// (./stage). Taking another item goes through the door (./door). The arrow keys change the profession straight away (ProfessionSwitch), so a change
 // that did not come from a click still gets the door. ProfessionSwitch owns the order, the pick and the
 // keyboard; this draws the screen.
 //
-// Animated: the room's own parts, the equipped item's turn.
+// Animated: the equipped item's turn, once per change.
 
 const ITEM: Record<Profession, ReactNode> = {
   engineer: (
@@ -107,16 +106,12 @@ export function ItemBox() {
 
   return (
     <section className="mx-auto max-w-6xl px-4 sm:px-6" aria-label={navigation.professionSelection}>
-      <div className={`grid gap-4 p-4 sm:p-6 lg:grid-cols-[3fr_2fr] ${look.panel}`}>
-        <div className={`relative h-[34vh] min-h-[220px] max-h-[380px] overflow-hidden border-2 border-[color:var(--sh-sepia)] ${horror.cameraFrame}`}>
-          <ProfessionRoom profession={active} />
-        </div>
-
+      <div className={`mx-auto max-w-3xl p-4 sm:p-6 ${look.panel}`}>
         <div className="flex flex-col gap-4">
           <ConditionMonitor condition="fine" />
           <div className="flex items-center gap-4 border border-[color:var(--sh-sepia)] bg-[color:var(--sh-shadow)] p-3">
             <div className={horror.examineStage} aria-hidden="true">
-              <ItemIcon profession={active} className={`h-16 w-16 ${horror.examineTurn}`} />
+              <ItemIcon key={active} profession={active} className={`h-16 w-16 ${horror.examineTurn}`} />
             </div>
             <div className="min-w-0">
               <p className={`text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>{hud.equipped}</p>

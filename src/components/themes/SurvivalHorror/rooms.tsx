@@ -1,144 +1,346 @@
 import type { ReactNode } from 'react'
-import type { Profession } from '@/lib/cv/professions'
-import { Survivor, type SurvivorPose } from './survivor'
+import type { Flags, Zone } from './scripts'
 import { SH } from './palette'
-import horror from './horror.module.css'
+import stage from './stage.module.css'
 
-// His three professions as rooms of the house, each one fixed camera frame (600 by 260) with its own lamp,
-// and him at work in it; what he works at stands in front of him, the way a pre-rendered room puts its props
-// over the character:
-// - System Engineer: the security room, a wall of monitors and the console he types at.
-// - Musician: the music room, his kit in front of him under one hanging lamp.
-// - Martial Artist: the basement gym, the heavy bag on its chain that swings with every kick.
-// Animated per room: him, one screen's flicker or the cymbal or the bag, the bulb's sway.
+// The rooms of the house behind the page, one fixed camera frame each (600 by 300, the floor from y 220),
+// the way the genre's pre-rendered rooms hold still while the figures move through them. The stage
+// (./stage) shows the room of the part of the page in view and cuts to the next with a black frame. A
+// phone sees only the middle of a room, so what matters stands near x 300. What a figure handles (the
+// chest, the lamp, the doors, the trader, the desk) is not here but in ./props, placed by his body width.
+//
+// Each room keeps still; the lamps glow without flicker. The few that move do it once: the hall's
+// chandelier settles when he walks in, the armoury lamp swings at the blow.
 
-interface RoomArt {
-  back: ReactNode
-  front: ReactNode
-  at: { x: number; y: number }
+type Room = Zone | 'safe'
+
+const FLOOR_ROWS = 7
+const FLOOR_COLS = 12
+const rowY = (row: number) => 220 + 80 * (row / FLOOR_ROWS) ** 1.4
+const colX = (col: number, y: number) => 300 + (col - FLOOR_COLS / 2) * (680 / FLOOR_COLS) * (0.62 + 0.38 * ((y - 220) / 80))
+
+// The checker floor in perspective, only its dark tiles drawn over the floor colour.
+const CHECKER = Array.from({ length: FLOOR_ROWS * FLOOR_COLS }, (_, index) => {
+  const row = Math.floor(index / FLOOR_COLS)
+  const col = index % FLOOR_COLS
+  const top = rowY(row)
+  const bottom = rowY(row + 1)
+  return { key: index, dark: (row + col) % 2 === 0, d: `M${colX(col, top)} ${top} L${colX(col + 1, top)} ${top} L${colX(col + 1, bottom)} ${bottom} L${colX(col, bottom)} ${bottom} Z` }
+}).filter((tile) => tile.dark)
+
+const BOARDS = Array.from({ length: 9 }, (_, index) => 224 + index * 9 + index * index * 0.6)
+const PANELS = [20, 120, 220, 320, 420, 520]
+const POSTS = Array.from({ length: 23 }, (_, index) => 70 + index * 20)
+const STEPS = Array.from({ length: 9 }, (_, index) => index)
+const BOOKS = Array.from({ length: 14 }, (_, index) => index)
+
+function Wall({ tone = SH.paper, children }: { tone?: string; children?: ReactNode }) {
+  return (
+    <>
+      <rect width={600} height={220} fill={tone} />
+      <rect width={600} height={220} fill="url(#sh-room-dark)" />
+      {children}
+    </>
+  )
 }
 
-const MONITORS = [0, 1, 2, 3, 4, 5].map((index) => ({ x: 340 + (index % 3) * 76, y: 40 + Math.floor(index / 3) * 62 }))
+/** The wainscot along the foot of the wall, its panels. */
+function Wainscot() {
+  return (
+    <>
+      <rect y={168} width={600} height={52} fill={SH.wood} opacity={0.55} />
+      <rect y={164} width={600} height={5} fill={SH.sepia} />
+      {PANELS.map((x) => (
+        <rect key={x} x={x} y={176} width={84} height={36} fill="none" stroke={SH.sepia} strokeWidth={2} />
+      ))}
+    </>
+  )
+}
 
-function Monitor({ x, y, flicker }: { x: number; y: number; flicker: boolean }) {
+function Boards() {
+  return (
+    <>
+      <rect y={220} width={600} height={80} fill={SH.sepia} />
+      {BOARDS.map((y) => (
+        <path key={y} d={`M0 ${y} H600`} stroke={SH.shadow} strokeWidth={1.4} opacity={0.6} />
+      ))}
+    </>
+  )
+}
+
+function Checker() {
+  return (
+    <>
+      <rect y={220} width={600} height={80} fill={SH.shadow} />
+      {CHECKER.map((tile) => (
+        <path key={tile.key} d={tile.d} fill={SH.sepia} opacity={0.6} />
+      ))}
+    </>
+  )
+}
+
+/** A pool of lamp light on wall and floor. */
+function Glow({ x, y, r }: { x: number; y: number; r: number }) {
+  return <ellipse cx={x} cy={y} rx={r} ry={r * 0.7} fill="url(#sh-room-glow)" />
+}
+
+function TallWindow({ x }: { x: number }) {
   return (
     <g>
-      <rect x={x} y={y} width={68} height={54} rx={4} fill={SH.gunmetal} />
-      <rect x={x + 6} y={y + 6} width={56} height={40} rx={6} fill={SH.monitor} />
-      <rect x={x + 6} y={y + 6} width={56} height={40} rx={6} fill={SH.fine} opacity={0.16} className={flicker ? horror.screenFlicker : ''} />
-      <path d={`M${x + 12} ${y + 18} H${x + 40} M${x + 12} ${y + 26} H${x + 50} M${x + 12} ${y + 34} H${x + 30}`} stroke={SH.fine} strokeWidth={1.4} opacity={0.6} />
+      <path d={`M${x} 160 V64 Q${x + 22} 40 ${x + 44} 64 V160 Z`} fill={SH.moon} opacity={0.16} />
+      <path d={`M${x} 160 V64 Q${x + 22} 40 ${x + 44} 64 V160 Z M${x + 22} 50 V160 M${x} 108 H${x + 44}`} fill="none" stroke={SH.sepia} strokeWidth={3} />
+      <path d={`M${x + 4} 160 L${x - 26} 220 H${x + 20} L${x + 40} 160 Z`} fill={SH.moon} opacity={0.05} />
     </g>
   )
 }
 
-const ROOMS: Record<Profession, RoomArt> = {
-  engineer: {
-    back: (
-      <>
-        <rect width={600} height={210} fill={SH.shadow} />
-        <rect x={326} y={28} width={244} height={142} fill={SH.void} />
-        {MONITORS.map((monitor, index) => (
-          <Monitor key={index} x={monitor.x} y={monitor.y} flicker={index === 4} />
-        ))}
-        <path d="M40 30 H300 M40 50 H300" stroke={SH.sepia} strokeWidth={4} opacity={0.6} />
-        <path d="M60 30 V0 M120 30 V0" stroke={SH.ash} strokeWidth={1.4} />
-        <rect y={210} width={600} height={50} fill={SH.panel} />
-        <path d="M0 214 H600" stroke={SH.sepia} strokeWidth={2} />
-      </>
-    ),
-    front: (
-      <>
-        {/* the console desk in front of him, its keyboard lit by the screens */}
-        <path d="M150 168 H420 L430 232 H140 Z" fill={SH.wood} />
-        <rect x={150} y={164} width={270} height={8} fill={SH.sepia} />
-        <rect x={250} y={156} width={64} height={10} rx={1} fill={SH.gunmetal} />
-        <rect x={252} y={158} width={60} height={6} fill={SH.fine} opacity={0.25} />
-        <path d="M140 232 H430" stroke={SH.void} strokeWidth={3} />
-        <path d="M420 200 Q470 230 520 214 Q560 204 600 226" stroke={SH.void} strokeWidth={3} fill="none" />
-      </>
-    ),
-    at: { x: 200, y: 214 },
-  },
-  drummer: {
-    back: (
-      <>
-        <rect width={600} height={210} fill={SH.panel} />
-        <path d="M0 0 Q40 110 20 210 H0 Z M600 0 Q560 110 580 210 H600 Z" fill={SH.leather} />
-        <path d="M20 0 Q50 100 34 210 M580 0 Q550 100 566 210" stroke={SH.void} strokeWidth={2} opacity={0.5} fill="none" />
-        {/* an upright piano against the back wall */}
-        <rect x={420} y={110} width={130} height={100} fill={SH.void} />
-        <rect x={426} y={150} width={118} height={8} fill={SH.ivory} opacity={0.7} />
-        <rect y={210} width={600} height={50} fill={SH.paper} />
-        <g className={horror.bulb}>
-          <line x1={290} y1={0} x2={290} y2={46} stroke={SH.ash} strokeWidth={1.2} />
-          <path d="M276 56 Q290 40 304 56 Z" fill={SH.brass} />
-          <circle cx={290} cy={58} r={4} fill={SH.flame} />
-          <circle cx={290} cy={58} r={30} fill={SH.flame} opacity={0.08} />
-        </g>
-      </>
-    ),
-    front: (
-      <>
-        {/* the kit: bass drum, two toms, the snare, the floor tom, the hi-hat and a crash */}
-        <line x1={190} y1={232} x2={210} y2={120} stroke={SH.steel} strokeWidth={2} />
-        <g className={horror.cymbal}>
-          <ellipse cx={210} cy={120} rx={30} ry={5} fill={SH.brass} />
-        </g>
-        <line x1={420} y1={232} x2={414} y2={150} stroke={SH.steel} strokeWidth={2} />
-        <ellipse cx={414} cy={150} rx={22} ry={4} fill={SH.brass} />
-        <ellipse cx={414} cy={155} rx={22} ry={4} fill={SH.brass} opacity={0.8} />
-        <circle cx={300} cy={194} r={40} fill={SH.leather} />
-        <circle cx={300} cy={194} r={33} fill={SH.cream} />
-        <circle cx={300} cy={194} r={33} fill="none" stroke={SH.brass} strokeWidth={3} />
-        <ellipse cx={264} cy={148} rx={20} ry={13} fill={SH.leather} />
-        <ellipse cx={264} cy={142} rx={20} ry={6} fill={SH.cream} />
-        <ellipse cx={334} cy={148} rx={20} ry={13} fill={SH.leather} />
-        <ellipse cx={334} cy={142} rx={20} ry={6} fill={SH.cream} />
-        <rect x={360} y={174} width={46} height={56} fill={SH.leather} />
-        <ellipse cx={383} cy={174} rx={23} ry={6} fill={SH.cream} />
-        <ellipse cx={224} cy={180} rx={24} ry={8} fill={SH.steel} />
-        <ellipse cx={224} cy={176} rx={24} ry={6} fill={SH.cream} />
-        <path d="M206 186 L198 232 M242 186 L250 232" stroke={SH.steel} strokeWidth={2} />
-      </>
-    ),
-    at: { x: 278, y: 222 },
-  },
-  fighter: {
-    back: (
-      <>
-        <rect width={600} height={210} fill={SH.void} />
-        <path d="M0 40 H600 M0 54 H600" stroke={SH.rust} strokeWidth={6} opacity={0.6} />
-        <path d="M80 54 V210 M520 54 V210" stroke={SH.rust} strokeWidth={5} opacity={0.5} />
-        <rect y={210} width={600} height={50} fill={SH.olive} opacity={0.6} />
-        <rect x={120} y={210} width={360} height={30} fill={SH.leather} opacity={0.5} />
-        <g className={horror.bulb}>
-          <line x1={200} y1={0} x2={200} y2={70} stroke={SH.ash} strokeWidth={1.2} />
-          <circle cx={200} cy={76} r={5} fill={SH.flame} />
-          <circle cx={200} cy={76} r={40} fill={SH.flame} opacity={0.1} />
-        </g>
-      </>
-    ),
-    front: (
-      <g className={horror.heavyBag}>
-        <line x1={356} y1={0} x2={356} y2={70} stroke={SH.steel} strokeWidth={2} strokeDasharray="4 2" />
-        <rect x={334} y={70} width={44} height={120} rx={14} fill={SH.leather} />
-        <rect x={334} y={88} width={44} height={6} fill={SH.void} opacity={0.4} />
-        <rect x={334} y={164} width={44} height={6} fill={SH.void} opacity={0.4} />
-        <rect x={340} y={76} width={8} height={104} rx={4} fill={SH.rust} opacity={0.6} />
-      </g>
-    ),
-    at: { x: 250, y: 226 },
-  },
+function Bulb({ x }: { x: number }) {
+  return (
+    <g>
+      <line x1={x} y1={0} x2={x} y2={46} stroke={SH.ash} strokeWidth={1.2} />
+      <path d={`M${x - 10} 52 Q${x} 40 ${x + 10} 52 Z`} fill={SH.gunmetal} />
+      <circle cx={x} cy={53} r={3.5} fill={SH.flame} />
+    </g>
+  )
 }
 
-export function ProfessionRoom({ profession, pose = 'act' }: { profession: Profession; pose?: SurvivorPose }) {
-  const room = ROOMS[profession]
+const HALL = (
+  <>
+    <Wall>
+      <TallWindow x={40} />
+      <TallWindow x={516} />
+      <rect x={262} y={150} width={76} height={70} fill={SH.void} />
+      <rect x={266} y={154} width={33} height={66} fill={SH.wood} />
+      <rect x={301} y={154} width={33} height={66} fill={SH.wood} />
+      <circle cx={296} cy={188} r={1.8} fill={SH.brass} />
+      <circle cx={304} cy={188} r={1.8} fill={SH.brass} />
+      <rect x={60} y={124} width={480} height={10} fill={SH.wood} />
+      <rect x={60} y={106} width={480} height={4} fill={SH.wood} />
+      {POSTS.map((x) => (
+        <rect key={x} x={x} y={110} width={3} height={14} fill={SH.sepia} />
+      ))}
+      {STEPS.map((step) => (
+        <g key={step}>
+          <rect x={60 + step * 10} y={134 + step * 9.6} width={70} height={9.6} fill={step % 2 ? SH.sepia : SH.wood} />
+          <rect x={470 - step * 10} y={134 + step * 9.6} width={70} height={9.6} fill={step % 2 ? SH.sepia : SH.wood} />
+        </g>
+      ))}
+    </Wall>
+    <Checker />
+    <path d="M262 220 L338 220 L392 300 L208 300 Z" fill={SH.leather} opacity={0.7} />
+    <Glow x={300} y={262} r={170} />
+    <g className={stage.settle}>
+      <line x1={300} y1={0} x2={300} y2={50} stroke={SH.ash} strokeWidth={1.4} />
+      <path d="M270 58 Q300 76 330 58 L326 54 Q300 66 274 54 Z" fill={SH.brass} />
+      {[274, 286, 300, 314, 326].map((x) => (
+        <g key={x}>
+          <rect x={x - 1.2} y={46} width={2.4} height={9} fill={SH.cream} />
+          <ellipse cx={x} cy={43} rx={1.6} ry={3} fill={SH.flame} />
+        </g>
+      ))}
+    </g>
+  </>
+)
+
+const SHELF_BOXES = [
+  [180, 92, 30, 22],
+  [216, 98, 22, 16],
+  [330, 90, 34, 24],
+  [372, 96, 20, 18],
+  [190, 142, 40, 26],
+  [350, 146, 28, 22],
+  [400, 140, 26, 28],
+] as const
+
+const STORE = (
+  <>
+    <Wall tone={SH.panel}>
+      {[114, 164].map((y) => (
+        <rect key={y} x={160} y={y} width={280} height={6} fill={SH.wood} />
+      ))}
+      {SHELF_BOXES.map(([x, y, w, h]) => (
+        <rect key={`${x}-${y}`} x={x} y={y + 22 - h} width={w} height={h} fill={SH.sepia} stroke={SH.shadow} strokeWidth={1} />
+      ))}
+      <path d="M160 70 V220 M440 70 V220" stroke={SH.wood} strokeWidth={5} />
+    </Wall>
+    <Boards />
+    <Glow x={300} y={150} r={150} />
+    <Bulb x={300} />
+  </>
+)
+
+const ABOUT = (
+  <>
+    <Wall>
+      <rect x={340} y={40} width={150} height={180} fill={SH.wood} />
+      {[64, 112, 160].map((y) => (
+        <g key={y}>
+          <rect x={346} y={y} width={138} height={4} fill={SH.sepia} />
+          {BOOKS.map((book) => (
+            <rect key={book} x={350 + book * 9.4} y={y - 22 + (book % 3) * 2} width={7} height={22 - (book % 3) * 2} fill={book % 4 === 0 ? SH.leather : book % 3 === 0 ? SH.olive : SH.rust} />
+          ))}
+        </g>
+      ))}
+      <TallWindow x={150} />
+      <Wainscot />
+    </Wall>
+    <Boards />
+    <path d="M180 236 H420 L440 286 H160 Z" fill={SH.leather} opacity={0.55} />
+  </>
+)
+
+// The long corridor of the ground floor: its window is the stage's glass band, the night beyond it.
+const CORRIDOR = (
+  <>
+    <Wall tone={SH.panel}>
+      <rect x={0} y={60} width={600} height={6} fill={SH.wood} />
+      <Wainscot />
+    </Wall>
+    <Boards />
+    <path d="M0 300 L250 220 H350 L600 300 Z" fill={SH.leather} opacity={0.3} />
+  </>
+)
+
+const PEGS = Array.from({ length: 6 }, (_, index) => 190 + index * 44)
+
+const TECH = (
+  <>
+    <Wall tone={SH.panel}>
+      <rect x={170} y={60} width={260} height={110} fill={SH.olive} opacity={0.6} />
+      {PEGS.map((x) => (
+        <g key={x}>
+          <path d={`M${x} 92 h22 v6 h-12 l-2 12 h-6 l2 -12 h-4 Z`} fill={SH.void} opacity={0.75} />
+          <rect x={x - 2} y={128} width={30} height={8} fill={SH.void} opacity={0.75} />
+        </g>
+      ))}
+      <rect x={110} y={182} width={380} height={10} fill={SH.wood} />
+      <path d="M120 192 V220 M480 192 V220" stroke={SH.wood} strokeWidth={6} />
+    </Wall>
+    <rect y={220} width={600} height={80} fill={SH.shadow} />
+    <Glow x={300} y={160} r={160} />
+  </>
+)
+
+const PROJECTS = (
+  <>
+    <Wall>
+      <TallWindow x={110} />
+      <Wainscot />
+    </Wall>
+    <Checker />
+    <Glow x={240} y={240} r={130} />
+  </>
+)
+
+const VENTURES = (
+  <>
+    <Wall tone={SH.shadow}>
+      <path d="M140 220 V90 Q300 20 460 90 V220" fill={SH.void} opacity={0.7} />
+      <path d="M140 220 V90 Q300 20 460 90 V220" fill="none" stroke={SH.sepia} strokeWidth={6} />
+    </Wall>
+    <rect y={220} width={600} height={80} fill={SH.shadow} />
+    <ellipse cx={380} cy={250} rx={160} ry={50} fill="url(#sh-room-blue)" />
+  </>
+)
+
+const SUIT_STRIP = [200, 260, 340, 400]
+
+const BANDS = (
+  <>
+    <Wall tone={SH.panel}>
+      <rect x={0} y={60} width={600} height={6} fill={SH.wood} />
+      {SUIT_STRIP.map((x) => (
+        <rect key={x} x={x} y={30} width={16} height={16} transform={`rotate(45 ${x + 8} 38)`} fill={SH.brass} opacity={0.3} />
+      ))}
+      <Wainscot />
+    </Wall>
+    <Checker />
+  </>
+)
+
+const GYM = (
+  <>
+    <Wall tone={SH.void}>
+      <path d="M0 34 H600 M0 48 H600" stroke={SH.rust} strokeWidth={6} opacity={0.5} />
+      <rect x={430} y={60} width={90} height={160} fill={SH.olive} opacity={0.25} />
+    </Wall>
+    <rect y={220} width={600} height={80} fill={SH.olive} opacity={0.6} />
+    <rect y={220} width={600} height={80} fill="url(#sh-room-dark)" opacity={0.5} />
+    <Glow x={300} y={200} r={150} />
+    <Bulb x={300} />
+  </>
+)
+
+// Outside the safe room: the last corridor, the safe door at his end of it.
+const CONTACT = (
+  <>
+    <Wall tone={SH.panel}>
+      {[60, 180, 420, 520].map((x) => (
+        <rect key={x} x={x} y={70} width={50} height={70} fill="none" stroke={SH.sepia} strokeWidth={2} />
+      ))}
+      <Wainscot />
+    </Wall>
+    <Boards />
+    <Glow x={260} y={220} r={110} />
+    <Bulb x={260} />
+  </>
+)
+
+// Inside: the safe room's warm lamp, the item box against the wall.
+const SAFE = (
+  <>
+    <Wall tone={SH.paper}>
+      <rect x={380} y={150} width={120} height={70} fill={SH.wood} />
+      <path d="M380 150 Q440 124 500 150 Z" fill={SH.rust} />
+      <rect x={434} y={160} width={12} height={14} fill={SH.brass} />
+      <Wainscot />
+    </Wall>
+    <Boards />
+    <Glow x={300} y={200} r={200} />
+  </>
+)
+
+const ROOMS: Record<Room, ReactNode> = {
+  hall: HALL,
+  store: STORE,
+  about: ABOUT,
+  experience: CORRIDOR,
+  tech: TECH,
+  projects: PROJECTS,
+  ventures: VENTURES,
+  bands: BANDS,
+  gym: GYM,
+  contact: CONTACT,
+  safe: SAFE,
+}
+
+/** The room in view: the safe room once he is inside it. */
+export function RoomArt({ zone, flags }: { zone: Zone; flags: Flags }) {
+  const room: Room = zone === 'contact' && flags.inside ? 'safe' : zone
 
   return (
-    <svg viewBox="0 0 600 260" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-      {room.back}
-      <Survivor profession={profession} pose={pose} place={{ x: room.at.x, y: room.at.y, height: 128 }} />
-      {room.front}
+    <svg viewBox="0 0 600 300" preserveAspectRatio="xMidYMax slice" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="sh-room-dark" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={SH.void} stopOpacity={0.9} />
+          <stop offset="70%" stopColor={SH.void} stopOpacity={0.2} />
+          <stop offset="100%" stopColor={SH.void} stopOpacity={0.4} />
+        </linearGradient>
+        <radialGradient id="sh-room-glow" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stopColor={SH.flame} stopOpacity={0.3} />
+          <stop offset="100%" stopColor={SH.flame} stopOpacity={0} />
+        </radialGradient>
+        <radialGradient id="sh-room-blue" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stopColor={SH.moon} stopOpacity={0.3} />
+          <stop offset="100%" stopColor={SH.moon} stopOpacity={0} />
+        </radialGradient>
+      </defs>
+      {ROOMS[room]}
+      {room === 'tech' && (
+        <g className={flags.swing ? stage.swing : ''}>
+          <Bulb x={300} />
+        </g>
+      )}
     </svg>
   )
 }
