@@ -1,6 +1,17 @@
 import type { Profession } from '@/lib/cv/professions'
 import { at, type LevelZone, type StageLook } from '@/components/scroll/stage'
-import { DeskCorner, DrumKit, KitCorner, PadHolder, SoundWaves, StrikeFlash, Terminal, type DrumKitColors } from '@/components/scroll/stageProps'
+import {
+  DeskCorner,
+  DrumKit,
+  KitCorner,
+  PadHolder,
+  RingCorner,
+  SoundWaves,
+  StrikeFlash,
+  Terminal,
+  ringPost,
+  type DrumKitColors,
+} from '@/components/scroll/stageProps'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import styles from './scenes.module.css'
@@ -188,24 +199,20 @@ function KitCornerScene() {
   return <KitCorner hero={<HeroCharacter profession="drummer" className={scene.hero} />} kit={KIT} waves={WAVES} />
 }
 
-function RingCorner() {
+function RingCornerScene() {
   return (
-    <div className={`absolute inset-0 ${scene.guard}`}>
-      <svg viewBox="0 0 160 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-        <rect x={146} y={20} width={8} height={80} fill="#3a2456" />
-        <line x1={0} y1={34} x2={150} y2={34} stroke={HOT_PINK} strokeWidth={1.5} />
-        <line x1={0} y1={52} x2={150} y2={52} stroke="#e0f0ff" strokeWidth={1.5} />
-        <line x1={0} y1={70} x2={150} y2={70} stroke={CYAN} strokeWidth={1.5} />
-      </svg>
-      <div className="absolute bottom-1 left-1/2 -translate-x-1/2">
-        <HeroCharacter profession="fighter" className={scene.hero} />
-      </div>
-    </div>
+    <RingCorner
+      hero={<HeroCharacter profession="fighter" className={scene.hero} />}
+      side="right"
+      post={ringPost('right', '#3a2456')}
+      ropes={[HOT_PINK, '#e0f0ff', CYAN]}
+      heroPlace="left-1/2 -translate-x-1/2"
+    />
   )
 }
 
 export const PROFESSION_STAGES: Record<Profession, StageLook> = {
-  engineer: { Level: Rooftop, pose: scene.stride, travel: styles.runner, Companion: null, Corner: DeskCornerScene },
+  engineer: { Level: Rooftop, pose: scene.stride, travel: scene.walk, Companion: null, Corner: DeskCornerScene },
   drummer: { Level: Stage, pose: scene.drum, travel: styles.planted, Companion: KitInFront, Corner: KitCornerScene },
-  fighter: { Level: Ring, pose: scene.strike, travel: styles.advance, Companion: Strike, Corner: RingCorner },
+  fighter: { Level: Ring, pose: scene.strike, travel: scene.advance, Companion: Strike, Corner: RingCornerScene },
 }

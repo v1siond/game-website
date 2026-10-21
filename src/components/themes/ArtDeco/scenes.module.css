@@ -10,24 +10,17 @@
  */
 
 /* The world's tempo: six unhurried strides along the tunnel, eight stick hits per arm, the sound bars
-   resting at 30% height between hits. */
+   resting at 30% height between hits; in the ring he reaches the pads by two thirds of the scene. */
 .tempo {
   --strides: 6turn;
   --swing: 26deg;
   --stick-hits: 8turn;
   --wave-rest: 0.3;
+  --advance-until: 0.6667;
 }
 
 /* He walks the tunnel's width minus his own. */
-.walk {
-  transform: translate3d(calc(var(--p) * (100% - 5.5rem)), 0, 0);
-}
-
 /* The fighter crosses the canvas to the pads in the first two thirds, then holds his ground. */
-.advance {
-  transform: translate3d(calc(min(var(--p) * 1.5, 1) * 40%), 0, 0);
-}
-
 /* A school of fish swims the other way outside the glass, bobbing as it goes. */
 .school {
   transform: translate3d(calc((1 - var(--p)) * 55%), calc(sin(var(--p) * 3turn) * 0.25rem), 0);

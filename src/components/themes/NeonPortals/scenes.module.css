@@ -11,12 +11,16 @@
  */
 
 /* The world's tempo: eight walking strides along the lane, twelve stick hits per arm, the sound bars
-   resting at 30% height between hits. */
+   resting at 30% height between hits; he walks to 6rem short of the far edge, and in the ring reaches
+   the pads, 42% across, by half the scene. */
 .tempo {
   --strides: 8turn;
   --swing: 28deg;
   --stick-hits: 12turn;
   --wave-rest: 0.3;
+  --walk-inset: 6rem;
+  --advance-to: 42%;
+  --advance-until: 0.5;
 }
 
 /* The three dimensions. Each crossfade takes a twelfth of the scene around its rift (1/3 and 2/3). */
@@ -46,15 +50,7 @@
 }
 
 /* He starts in the orange portal and walks the track's width minus his own. */
-.walk {
-  transform: translate3d(calc(var(--p) * (100% - 6rem)), 0, 0);
-}
-
 /* The fighter steps from the corner to the pads in the first half, then holds his ground. */
-.advance {
-  transform: translate3d(calc(min(var(--p) * 2, 1) * 42%), 0, 0);
-}
-
 /* ---- props that answer progress ---- */
 
 /* A build block drops into place as he passes under it. */

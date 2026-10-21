@@ -1,7 +1,17 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { at, type LevelZone, type StageLook } from '@/components/scroll/stage'
-import { DeskCorner, DrumKit, KitCorner, PadHolder, SoundWaves, StrikeFlash, Terminal, type DrumKitColors } from '@/components/scroll/stageProps'
+import {
+  DeskCorner,
+  DrumKit,
+  KitCorner,
+  PadHolder,
+  RingCorner,
+  SoundWaves,
+  StrikeFlash,
+  Terminal,
+  type DrumKitColors,
+} from '@/components/scroll/stageProps'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { DECO_COLORS as C } from './palette'
@@ -264,11 +274,14 @@ function Chandelier({ position, x }: { position: number; x: number }) {
   )
 }
 
+const ROPE_COLORS: [string, string, string] = [C.gold, C.ivory, C.tealLight]
+const ROPE_HEIGHTS: [number, number, number] = [40, 56, 72]
+
 const ropes = (from: number, to: number) => (
   <>
-    <line x1={from} y1={40} x2={to} y2={40} stroke={C.gold} strokeWidth={1.5} />
-    <line x1={from} y1={56} x2={to} y2={56} stroke={C.ivory} strokeWidth={1.5} />
-    <line x1={from} y1={72} x2={to} y2={72} stroke={C.tealLight} strokeWidth={1.5} />
+    {ROPE_COLORS.map((color, i) => (
+      <line key={ROPE_HEIGHTS[i]} x1={from} y1={ROPE_HEIGHTS[i]} x2={to} y2={ROPE_HEIGHTS[i]} stroke={color} strokeWidth={1.5} />
+    ))}
   </>
 )
 
@@ -323,24 +336,23 @@ function KitCornerScene() {
   return <KitCorner hero={<HeroCharacter profession="drummer" className={scene.hero} />} kit={KIT} waves={WAVES} />
 }
 
-function RingCorner() {
+function RingCornerScene() {
   return (
-    <div className={`absolute inset-0 ${scene.guard}`}>
-      <svg viewBox="0 0 160 100" preserveAspectRatio="none" className={SVG_LAYER} aria-hidden="true" focusable="false">
-        {post(150)}
-        {ropes(0, 150)}
-        <rect x={0} y={92} width={160} height={8} fill={C.tealDark} />
-      </svg>
-      <div className="absolute bottom-1 left-1/3">
-        <HeroCharacter profession="fighter" className={scene.hero} />
-      </div>
-    </div>
+    <RingCorner
+      hero={<HeroCharacter profession="fighter" className={scene.hero} />}
+      side="right"
+      post={post(150)}
+      ropes={ROPE_COLORS}
+      ropeHeights={ROPE_HEIGHTS}
+    >
+      <rect x={0} y={92} width={160} height={8} fill={C.tealDark} />
+    </RingCorner>
   )
 }
 
 export const PROFESSION_STAGES: Record<Profession, StageLook> = {
-  engineer: { Level: EngineerLevel, pose: scene.stride, travel: styles.walk, Companion: null, Corner: DeskCornerScene },
+  engineer: { Level: EngineerLevel, pose: scene.stride, travel: scene.walk, Companion: null, Corner: DeskCornerScene },
   // He plays in front of the fan, a fifth of the way in.
   drummer: { Level: BallroomStage, pose: scene.drum, travel: 'translate-x-[20%]', Companion: KitInFront, Corner: KitCornerScene },
-  fighter: { Level: BallroomRing, pose: scene.strike, travel: styles.advance, Companion: Strike, Corner: RingCorner },
+  fighter: { Level: BallroomRing, pose: scene.strike, travel: scene.advance, Companion: Strike, Corner: RingCornerScene },
 }

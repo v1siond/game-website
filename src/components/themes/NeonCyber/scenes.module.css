@@ -6,12 +6,13 @@
  */
 
 /* The world's tempo: seven running strides across the level, ten stick hits per arm, the sound waves
-   resting at 35% height between hits. */
+   resting at 35% height between hits; in the ring he steps forward 38% across the whole scene. */
 .tempo {
   --strides: 7turn;
   --swing: 34deg;
   --stick-hits: 10turn;
   --wave-rest: 0.35;
+  --advance-to: 38%;
 }
 
 /* ---- the level strip, three layers deep ---- */
@@ -36,14 +37,6 @@
 }
 
 /* He stands at the track's left edge and runs its width minus his own. */
-.runner {
-  transform: translate3d(calc(var(--p) * (100% - 5.5rem)), 0, 0);
-}
-
-.advance {
-  transform: translate3d(calc(var(--p) * 38%), 0, 0);
-}
-
 .planted {
   transform: none;
 }

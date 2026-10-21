@@ -10,27 +10,19 @@
  */
 
 /* The world's tempo: five strides a room (fifteen along the level), twelve stick hits per arm, the
-   sound bars resting at a quarter height between hits. */
+   sound bars resting at a quarter height between hits; in the ring he reaches the pads by 45% of the
+   scene. */
 .tempo {
   --strides: 15turn;
   --swing: 26deg;
   --stick-hits: 12turn;
   --wave-rest: 0.25;
-}
-
-/* System Engineer crosses all three rooms: the track's width minus his own and the margins. */
-.walk {
-  transform: translate3d(calc(var(--p) * (100% - 5.5rem)), 0, 0);
+  --advance-until: 0.45;
 }
 
 /* Musician plays from the middle of the lounge stage. */
 .onStage {
   transform: translate3d(34%, 0, 0);
-}
-
-/* Martial Artist crosses the ring to the pads by 45% of the scene, then holds his ground. */
-.advance {
-  transform: translate3d(calc(min(var(--p) / 0.45, 1) * 40%), 0, 0);
 }
 
 /* ---- the shelter ---- */

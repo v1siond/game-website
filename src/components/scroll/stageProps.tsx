@@ -5,7 +5,7 @@ import scene from './heroScene.module.css'
 // The profession props more than one world stands on its stages, drawn in the world's own colours:
 // the terminal that lights as he passes (System Engineer), his drum kit and the sound waves that follow
 // the sticks (Musician), the pad holder and the strike flash (Martial Artist), and the closing corners
-// at his desk and behind his kit.
+// at his desk, behind his kit and in the ring.
 
 // A terminal on the level: its screen lights as he passes it.
 export function Terminal({ position, body, screen, stand }: { position: number; body: string; screen: string; stand: string }) {
@@ -144,6 +144,53 @@ export function KitCorner({ hero, kit, waves }: { hero: ReactNode; kit: DrumKitC
       <div className="absolute bottom-1 left-6">{hero}</div>
       <DrumKit className="absolute bottom-1 left-12 h-20 w-28" colors={kit} />
       <SoundWaves className="absolute bottom-3 right-3 h-14 w-16" colors={waves} />
+    </div>
+  )
+}
+
+export type RingSide = 'left' | 'right'
+
+// The corner post's place and the span of the ropes from it, in the corner's 160 by 100 box.
+const RING_SIDE: Record<RingSide, { postX: number; ropes: [number, number] }> = {
+  left: { postX: 4, ropes: [10, 160] },
+  right: { postX: 146, ropes: [0, 150] },
+}
+
+const ROPE_HEIGHTS: [number, number, number] = [34, 52, 70]
+
+// A plain corner post, for a world that does not draw its own.
+export const ringPost = (side: RingSide, color: string) => (
+  <rect x={RING_SIDE[side].postX} y={20} width={8} height={80} fill={color} />
+)
+
+interface RingCornerProps {
+  hero: ReactNode
+  side: RingSide
+  // The corner post as the world draws it (ringPost draws a plain one).
+  post: ReactNode
+  // The three ropes' colours top to bottom, and their heights in the 100 unit box.
+  ropes: [string, string, string]
+  ropeHeights?: [number, number, number]
+  // Where he stands, as position classes.
+  heroPlace?: string
+  // What else the world draws in the corner (a floor, a mat).
+  children?: ReactNode
+}
+
+// The Martial Artist's closing corner: the post, the ropes from it and him gloves up in guard.
+export function RingCorner({ hero, side, post, ropes, ropeHeights = ROPE_HEIGHTS, heroPlace = 'left-1/3', children = null }: RingCornerProps) {
+  const [from, to] = RING_SIDE[side].ropes
+
+  return (
+    <div className={`absolute inset-0 ${scene.guard}`}>
+      <svg viewBox="0 0 160 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
+        {post}
+        {ropes.map((color, i) => (
+          <line key={ropeHeights[i]} x1={from} y1={ropeHeights[i]} x2={to} y2={ropeHeights[i]} stroke={color} strokeWidth={1.5} />
+        ))}
+        {children}
+      </svg>
+      <div className={`absolute bottom-1 ${heroPlace}`}>{hero}</div>
     </div>
   )
 }

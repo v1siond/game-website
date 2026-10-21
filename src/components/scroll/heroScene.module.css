@@ -11,7 +11,8 @@
  *
  * A world sets its own tempo on an ancestor of the figure and the props (its strip and its contact
  * corner): --strides and --swing for the stride, --stick-hits for the drum sticks and the sound waves
- * that follow them, --wave-rest for the waves' resting height.
+ * that follow them, --wave-rest for the waves' resting height, --walk-inset, --advance-to and
+ * --advance-until for his travel.
  *
  * Every element that sets its own --scene-progress (a section or an item) carries .scene, so --p is
  * re-read there instead of inheriting the outer scene's value.
@@ -47,6 +48,17 @@
     width: 5rem;
     height: 7.5rem;
   }
+}
+
+/* His travel along the track, the world's numbers set in its tempo class:
+   walk crosses the whole level, stopping --walk-inset short of the far edge (his width and the margins);
+   advance steps him --advance-to along it by --advance-until of the scene, then he holds his ground. */
+.walk {
+  transform: translate3d(calc(var(--p) * (100% - var(--walk-inset, 5.5rem))), 0, 0);
+}
+
+.advance {
+  transform: translate3d(calc(min(var(--p) / var(--advance-until, 1), 1) * var(--advance-to, 40%)), 0, 0);
 }
 
 /* Limbs hang from their shoulder or hip: the top centre of their own box is the pivot. */
