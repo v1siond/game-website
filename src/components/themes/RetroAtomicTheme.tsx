@@ -1239,10 +1239,10 @@ export default function RetroAtomicTheme() {
                 </div>
               </div>
               <p className="text-sm max-w-xl" style={{ color: TERMINAL_TEXT }}>
-                {PROFESSIONAL_SUMMARY.headline}
+                {PROFESSIONAL_SUMMARY[active].headline}
               </p>
               <p className="text-xs mt-1 italic" style={{ color: TERMINAL_AMBER }}>
-                &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
+                &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
               </p>
             </div>
 

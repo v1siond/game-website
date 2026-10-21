@@ -1561,13 +1561,13 @@ export default function CellShadedTheme() {
               className="text-base tracking-wide mt-2 font-bold"
               style={{ color: BORDERLANDS_COLORS.ink }}
             >
-              {PROFESSIONAL_SUMMARY.headline}
+              {PROFESSIONAL_SUMMARY[active].headline}
             </p>
             <p
               className="text-sm tracking-wider mt-1 italic"
               style={{ color: BORDERLANDS_COLORS.legendary, textShadow: `1px 1px 0 ${BORDERLANDS_COLORS.ink}` }}
             >
-              &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
+              &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
             </p>
           </div>
 

@@ -1254,7 +1254,7 @@ export default function NeonCyberTheme() {
                       <GlitchText text="PULIDO" className="text-cyan-400" intensity="high" />
                     </h1>
                     <p className="mt-3 text-sm text-white/90">
-                      {PROFESSIONAL_SUMMARY.headline}
+                      {PROFESSIONAL_SUMMARY[active].headline}
                     </p>
                     <div className="flex items-center gap-3 mt-2">
                       <span
@@ -1263,7 +1263,7 @@ export default function NeonCyberTheme() {
                         aria-label="Online status indicator"
                       />
                       <span className="text-xs text-pink-500 tracking-wider italic">
-                        &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
+                        &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
                       </span>
                     </div>
                   </div>

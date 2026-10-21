@@ -1343,10 +1343,10 @@ export default function SurvivalHorrorTheme() {
               Alexander Pulido
             </h1>
             <p className="text-sm tracking-wider mt-2" style={{ color: RE.fog }}>
-              {PROFESSIONAL_SUMMARY.headline}
+              {PROFESSIONAL_SUMMARY[active].headline}
             </p>
             <p className="text-xs tracking-wider mt-1 italic" style={{ color: RE.warmGlow }}>
-              <TypewriterText text={PROFESSIONAL_SUMMARY.tagline} speed={80} />
+              <TypewriterText text={PROFESSIONAL_SUMMARY[active].tagline} speed={80} />
             </p>
           </div>
 

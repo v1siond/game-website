@@ -1963,10 +1963,10 @@ export default function SoulMapTheme() {
                 ALEXANDER PULIDO
               </h1>
               <p className="text-sm mt-1 tracking-wider" style={{ color: '#888060' }}>
-                {PROFESSIONAL_SUMMARY.headline}
+                {PROFESSIONAL_SUMMARY[active].headline}
               </p>
               <p className="text-xs mt-1 italic tracking-wide" style={{ color: COLORS.bonfire }}>
-                {PROFESSIONAL_SUMMARY.tagline}
+                {PROFESSIONAL_SUMMARY[active].tagline}
               </p>
             </div>
           </div>

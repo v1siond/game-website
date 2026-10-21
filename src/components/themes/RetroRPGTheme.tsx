@@ -1009,10 +1009,10 @@ export default function RetroRPGTheme() {
                 ALEXANDER PULIDO
               </h1>
               <p className="text-[11px] tracking-wide mt-1" style={{ color: CT_COLORS.gold }}>
-                {PROFESSIONAL_SUMMARY.headline}
+                {PROFESSIONAL_SUMMARY[active].headline}
               </p>
               <p className="text-[10px] mt-2 italic" style={{ color: CT_COLORS.portalBlueBright }}>
-                ◇ {PROFESSIONAL_SUMMARY.tagline}
+                ◇ {PROFESSIONAL_SUMMARY[active].tagline}
               </p>
             </div>
           </div>

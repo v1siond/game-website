@@ -1468,13 +1468,13 @@ export default function RubberHoseTheme() {
             <div>
               <CartoonTitle
                 text="ALEXANDER PULIDO"
-                subtitle={PROFESSIONAL_SUMMARY.headline}
+                subtitle={PROFESSIONAL_SUMMARY[active].headline}
               />
               <p
                 className="text-xs tracking-widest mt-2 italic"
                 style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}
               >
-                &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
+                &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
               </p>
             </div>
 

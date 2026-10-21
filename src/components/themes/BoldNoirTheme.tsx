@@ -1436,13 +1436,13 @@ export default function BoldNoirTheme() {
               className="text-sm md:text-base tracking-wider mt-2 font-medium"
               style={{ color: '#ccc' }}
             >
-              {PROFESSIONAL_SUMMARY.headline}
+              {PROFESSIONAL_SUMMARY[active].headline}
             </p>
             <p
               className="text-xs md:text-sm tracking-wider mt-1 italic"
               style={{ color: '#ff0033' }}
             >
-              {PROFESSIONAL_SUMMARY.tagline}
+              {PROFESSIONAL_SUMMARY[active].tagline}
             </p>
           </div>
 

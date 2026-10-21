@@ -812,10 +812,10 @@ export default function SilhouetteTheme() {
               ALEXANDER PULIDO
             </h1>
             <p className="text-xs tracking-[0.2em] mt-2" style={{ color: LIMBO.fogWhite1 }}>
-              {PROFESSIONAL_SUMMARY.headline}
+              {PROFESSIONAL_SUMMARY[active].headline}
             </p>
             <p className="text-xs tracking-wider mt-1 italic" style={{ color: LIMBO.lightGrey1 }}>
-              {PROFESSIONAL_SUMMARY.tagline}
+              {PROFESSIONAL_SUMMARY[active].tagline}
             </p>
           </div>
 

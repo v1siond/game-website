@@ -1817,10 +1817,10 @@ export default function ArtDecoTheme() {
                   <NeonSign text="ALEXANDER PULIDO" reducedMotion={reducedMotion} />
                 </h1>
                 <p className="text-base tracking-wider mt-2" style={{ color: RAPTURE_COLORS.parchment }}>
-                  {PROFESSIONAL_SUMMARY.headline}
+                  {PROFESSIONAL_SUMMARY[active].headline}
                 </p>
                 <p className="text-sm tracking-wider mt-1 italic" style={{ color: RAPTURE_COLORS.gold }}>
-                  {PROFESSIONAL_SUMMARY.tagline}
+                  {PROFESSIONAL_SUMMARY[active].tagline}
                 </p>
               </div>
             </div>

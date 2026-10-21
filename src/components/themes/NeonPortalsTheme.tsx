@@ -1356,10 +1356,10 @@ export default function NeonPortalsTheme() {
                 ALEXANDER PULIDO
               </h1>
               <p className="text-xs mt-0.5" style={{ color: PORTAL.BLUE }}>
-                {PROFESSIONAL_SUMMARY.headline}
+                {PROFESSIONAL_SUMMARY[active].headline}
               </p>
               <p className="text-[10px] mt-0.5 italic" style={{ color: PORTAL.ORANGE }}>
-                {PROFESSIONAL_SUMMARY.tagline}
+                {PROFESSIONAL_SUMMARY[active].tagline}
               </p>
             </div>
           </div>
@@ -1586,7 +1586,7 @@ export default function NeonPortalsTheme() {
               className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
               style={{
                 background: PORTAL.ORANGE,
-                color: PORTAL.PANEL_BG,
+                color: PORTAL.CHAMBER_BG,
               }}
             >
               Initiate Contact

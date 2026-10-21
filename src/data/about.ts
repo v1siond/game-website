@@ -18,8 +18,8 @@ export const PROFESSIONAL_SUMMARY: Record<Profession, { headline: string; taglin
     tagline: 'From brutal death metal to smooth salsa, I lock in the pocket.',
   },
   fighter: {
-    headline: 'Martial Artist • BJJ Instructor • 6 Years Training',
-    tagline: 'Muay Thai. MMA. Jiu-Jitsu. The mat teaches what words cannot.',
+    headline: 'Muay Thai Practitioner and Instructor',
+    tagline: '4 years of Muay Thai, 2 of them teaching, national runner up.',
   },
 }
 

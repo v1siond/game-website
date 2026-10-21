@@ -1701,13 +1701,13 @@ export default function FighterSelectTheme() {
                       fontFamily: 'system-ui, sans-serif',
                     }}
                   >
-                    {PROFESSIONAL_SUMMARY.headline}
+                    {PROFESSIONAL_SUMMARY[active].headline}
                   </p>
                   <p
                     className="text-sm md:text-base mt-2 italic tracking-wider"
                     style={{ color: COLORS.specialBlue }}
                   >
-                    &quot;{PROFESSIONAL_SUMMARY.tagline}&quot;
+                    &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
                   </p>
 
                   {/* Combo counter - years of experience */}
@@ -2006,7 +2006,7 @@ export default function FighterSelectTheme() {
               >
                 CHALLENGER APPROACHING?
               </h2>
-              <p className="text-sm" style={{ color: COLORS.chromeLight }}>
+              <p className="text-sm" style={{ color: COLORS.chrome }}>
                 10+ years delivering production systems. Let&apos;s build something.
               </p>
             </div>
@@ -2016,7 +2016,7 @@ export default function FighterSelectTheme() {
                 className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.2em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
                 style={{
                   fontFamily: '"Impact", "Arial Black", sans-serif',
-                  background: `linear-gradient(180deg, ${COLORS.gold}, ${COLORS.goldDark})`,
+                  background: `linear-gradient(180deg, ${COLORS.gold}, ${COLORS.orange})`,
                   color: COLORS.arcadeBlack,
                   border: `2px solid ${COLORS.gold}`,
                   boxShadow: `0 0 15px ${COLORS.gold}40`,

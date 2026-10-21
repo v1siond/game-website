@@ -1240,10 +1240,10 @@ export default function AdventurePathsTheme() {
                   textShadow: '1px 1px 0 #FFF',
                 }}
               >
-                {PROFESSIONAL_SUMMARY.headline}
+                {PROFESSIONAL_SUMMARY[active].headline}
               </p>
               <p className="text-[10px] tracking-wide mt-1 italic" style={{ color: MARIO_COLORS.groundDark }}>
-                {PROFESSIONAL_SUMMARY.tagline}
+                {PROFESSIONAL_SUMMARY[active].tagline}
               </p>
             </div>
           </div>

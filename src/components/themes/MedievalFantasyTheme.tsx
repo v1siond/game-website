@@ -1949,7 +1949,7 @@ const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
           {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
           {golemPhase === 'final' && (
             <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: 'golemFadeIn 1s ease-out forwards' }}>
-              <InfernalGolemSVG id={999} isIdle={true} />
+              <InfernalGolemSVG id="final" isIdle={true} />
             </div>
           )}
         </div>
@@ -4445,8 +4445,8 @@ export default function MedievalFantasyTheme() {
                   }}>
                     Alexander Pulido
                   </h1>
-                  <p style={{ color: WC3.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{PROFESSIONAL_SUMMARY.headline}</p>
-                  <p style={{ color: WC3.textMid, fontSize: '0.875rem', fontStyle: 'italic' }}>{PROFESSIONAL_SUMMARY.tagline}</p>
+                  <p style={{ color: WC3.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{PROFESSIONAL_SUMMARY[active].headline}</p>
+                  <p style={{ color: WC3.textMid, fontSize: '0.875rem', fontStyle: 'italic' }}>{PROFESSIONAL_SUMMARY[active].tagline}</p>
                 </div>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                   <WC3Button href="/cv" zone="roc">CV</WC3Button>
@@ -4804,7 +4804,7 @@ export default function MedievalFantasyTheme() {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
                   {(active === 'engineer' ? getFeaturedProjects(projects) : projects).slice(0, 6).map((project) => (
                     <InnerCard key={project.id} zone="ft">
-                      <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.25rem' }}>{project.title}</h3>
+                      <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.25rem' }}>{project.name}</h3>
                       <p style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.25rem' }}>{project.description}</p>
                       {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '1.125rem', fontWeight: 500 }}>{project.impact}</p>}
                     </InnerCard>
@@ -4834,7 +4834,7 @@ export default function MedievalFantasyTheme() {
                     {COMPANIES.map((company) => (
                       <InnerCard key={company.id} zone="ft">
                         <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600 }}>{company.name}</h3>
-                        <p style={{ color: WC3.goldMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{company.role}</p>
+                        <p style={{ color: WC3.goldMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{company.tagline}</p>
                         <p style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.25rem' }}>{company.description}</p>
                         {company.url && <a href={company.url} target="_blank" rel="noopener noreferrer" style={{ color: WC3.ft.iceMid, fontSize: '0.875rem', textDecoration: 'none' }}>{company.url}</a>}
                       </InnerCard>

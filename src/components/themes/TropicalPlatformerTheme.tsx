@@ -1933,7 +1933,7 @@ export default function TropicalPlatformerTheme() {
                   fontFamily: 'Impact, Arial Black, sans-serif',
                 }}
               >
-                {PROFESSIONAL_SUMMARY.headline}
+                {PROFESSIONAL_SUMMARY[active].headline}
               </p>
 
               <p
@@ -1943,7 +1943,7 @@ export default function TropicalPlatformerTheme() {
                   textShadow: '2px 2px 0 rgba(0,0,0,0.6)'
                 }}
               >
-                {PROFESSIONAL_SUMMARY.tagline}
+                {PROFESSIONAL_SUMMARY[active].tagline}
               </p>
             </div>
 
