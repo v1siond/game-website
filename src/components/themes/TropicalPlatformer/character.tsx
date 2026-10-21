@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_SKIN as SKIN, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { HERO_SKIN as SKIN, HERO_TORSO, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { Mongkhon } from '@/components/scroll/Mongkhon'
+import { HeroFist, HeroGlove, HeroStick } from '@/components/scroll/heroHands'
 import { COLORS } from './palette'
 
 // Him on the island (the shared HeroFigure), dressed for the tropics per profession: a lagoon blue
@@ -25,24 +27,22 @@ interface Outfit {
 }
 
 // The hand sits at the end of the 14 unit forearm (y 53 to 57).
-const HAND_DRAW: Record<Outfit['hand'], (x: number) => ReactNode> = {
-  bare: (x) => <circle cx={x} cy={55} r={3} fill={SKIN} />,
-  sticks: (x) => (
+const HAND_DRAW: Record<Outfit['hand'], (x: number, y: number) => ReactNode> = {
+  bare: (x, y) => <HeroFist x={x} y={y} />,
+  sticks: (x, y) => (
     <>
-      <line x1={x} y1={53} x2={x} y2={73} stroke={COLORS.sandLight} strokeWidth={2} strokeLinecap="round" />
-      <circle cx={x} cy={55} r={3} fill={SKIN} />
+      <HeroStick x={x} y={y} color={COLORS.sandLight} />
+      <HeroFist x={x} y={y} />
     </>
   ),
-  gloves: (x) => <circle cx={x} cy={55} r={4.8} fill={COLORS.hazard} stroke={COLORS.parchment} strokeWidth={0.8} />,
+  gloves: (x, y) => <HeroGlove x={x} y={y} fill={COLORS.hazard} stroke={COLORS.parchment} strokeWidth={0.8} />,
 }
-
-const TORSO = 'M22 32 Q32 29 42 32 L41 59 L23 59 Z'
 
 const OUTFIT: Record<Profession, Outfit> = {
   engineer: {
     torso: (
       <>
-        <path d={TORSO} fill={COLORS.lagoonDeep} />
+        <path d={HERO_TORSO} fill={COLORS.lagoonDeep} />
         <rect x={31} y={31} width={2} height={28} fill={COLORS.sun} />
         <circle cx={27} cy={40} r={1.6} fill={COLORS.fruitShine} />
         <circle cx={37} cy={47} r={1.6} fill={COLORS.fruitShine} />
@@ -59,7 +59,7 @@ const OUTFIT: Record<Profession, Outfit> = {
   drummer: {
     torso: (
       <>
-        <path d={TORSO} fill={SKIN} />
+        <path d={HERO_TORSO} fill={SKIN} />
         <path d="M25 33 H39 L41 59 H23 Z" fill={TANK} />
       </>
     ),
@@ -73,7 +73,7 @@ const OUTFIT: Record<Profession, Outfit> = {
   fighter: {
     torso: (
       <>
-        <path d={TORSO} fill={SKIN} />
+        <path d={HERO_TORSO} fill={SKIN} />
         <rect x={23} y={56} width={18} height={3} fill={COLORS.seaDeep} />
       </>
     ),
@@ -82,7 +82,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     shorts: 12,
     feet: SKIN,
     hand: 'gloves',
-    overHair: <path d="M21.6 12.5 Q32 8.5 42.4 12.5 L42.4 15.2 Q32 11.2 21.6 15.2 Z" fill={COLORS.seaDeep} />,
+    overHair: <Mongkhon cord={COLORS.seaDeep} />,
   },
 }
 
@@ -95,7 +95,7 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
       eye={EYE}
       overHair={outfit.overHair}
       torso={outfit.torso}
-      arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={14} hand={HAND_DRAW[outfit.hand](x)} />}
+      arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={14} hand={(y) => HAND_DRAW[outfit.hand](x, y)} />}
       leg={(x) => <HeroLeg x={x} legs={outfit.legs} long={false} shorts={outfit.shorts} feet={outfit.feet} />}
     />
   )

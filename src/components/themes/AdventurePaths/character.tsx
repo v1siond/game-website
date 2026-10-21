@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_SKIN as SKIN, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { HERO_SKIN as SKIN, HERO_TORSO, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { Mongkhon } from '@/components/scroll/Mongkhon'
+import { HeroFist, HeroGlove, HeroStick } from '@/components/scroll/heroHands'
 import { TRAIL } from './palette'
 
 // Him in Adventure Paths (the shared HeroFigure), dressed for the trail per profession: a khaki field
@@ -25,24 +27,22 @@ interface Outfit {
   head: ReactNode
 }
 
-const SHIRT = 'M22 32 Q32 29 42 32 L41 59 L23 59 Z'
-
 // The hand sits at the end of the 14 unit forearm (y 53 to 57).
-const HAND_DRAW: Record<Outfit['hand'], (x: number) => ReactNode> = {
-  tracker: (x) => (
+const HAND_DRAW: Record<Outfit['hand'], (x: number, y: number) => ReactNode> = {
+  tracker: (x, y) => (
     <>
-      <rect x={x - 3} y={47} width={6} height={4} rx={1} fill={TRAIL.BARK} />
-      <rect x={x - 2} y={48} width={4} height={2} fill={TRAIL.RUNE} />
-      <circle cx={x} cy={55} r={3} fill={SKIN} />
+      <rect x={x - 3} y={y - 8} width={6} height={4} rx={1} fill={TRAIL.BARK} />
+      <rect x={x - 2} y={y - 7} width={4} height={2} fill={TRAIL.RUNE} />
+      <HeroFist x={x} y={y} />
     </>
   ),
-  sticks: (x) => (
+  sticks: (x, y) => (
     <>
-      <line x1={x} y1={53} x2={x} y2={73} stroke={TRAIL.LANTERN} strokeWidth={2} strokeLinecap="round" />
-      <circle cx={x} cy={55} r={3} fill={SKIN} />
+      <HeroStick x={x} y={y} color={TRAIL.LANTERN} />
+      <HeroFist x={x} y={y} />
     </>
   ),
-  gloves: (x) => <circle cx={x} cy={55} r={4.8} fill={TRAIL.ROUTE} stroke={TRAIL.PARCHMENT} strokeWidth={0.8} />,
+  gloves: (x, y) => <HeroGlove x={x} y={y} fill={TRAIL.ROUTE} stroke={TRAIL.PARCHMENT} strokeWidth={0.8} />,
 }
 
 // The field hat: a wide brim over the hairline, the crown and a route red band.
@@ -55,19 +55,13 @@ const FIELD_HAT = (
 )
 
 // The mongkhon: a parchment white ring around the crown, its tail standing up behind.
-const MONGKHON = (
-  <>
-    <path d="M41 8 Q47 5 48 0" stroke={TRAIL.PARCHMENT} strokeWidth={2} fill="none" strokeLinecap="round" />
-    <ellipse cx={32} cy={8.5} rx={10.5} ry={2.6} fill="none" stroke={TRAIL.PARCHMENT} strokeWidth={2.2} />
-    <ellipse cx={32} cy={8.5} rx={10.5} ry={2.6} fill="none" stroke={TRAIL.ROUTE} strokeWidth={0.7} strokeDasharray="2 2" />
-  </>
-)
+const MONGKHON = <Mongkhon cord={TRAIL.PARCHMENT} binding={TRAIL.ROUTE} />
 
 const OUTFIT: Record<Profession, Outfit> = {
   engineer: {
     torso: (
       <>
-        <path d={SHIRT} fill={KHAKI} />
+        <path d={HERO_TORSO} fill={KHAKI} />
         <path d="M24 33 L40 57" stroke={TRAIL.ROUTE} strokeWidth={2.5} />
         <rect x={27} y={36} width={4} height={4} fill={OLIVE} />
       </>
@@ -82,7 +76,7 @@ const OUTFIT: Record<Profession, Outfit> = {
   drummer: {
     torso: (
       <>
-        <path d={SHIRT} fill={TRAIL.ROUTE} />
+        <path d={HERO_TORSO} fill={TRAIL.ROUTE} />
         <path d="M23 40 H41 M23 48 H41 M28 31 V59 M36 31 V59" stroke={FLANNEL_LINE} strokeWidth={1.4} />
       </>
     ),
@@ -96,7 +90,7 @@ const OUTFIT: Record<Profession, Outfit> = {
   fighter: {
     torso: (
       <>
-        <path d={SHIRT} fill={SKIN} />
+        <path d={HERO_TORSO} fill={SKIN} />
         <rect x={23} y={56} width={18} height={3} fill={TRAIL.GOLD} />
       </>
     ),
@@ -117,7 +111,7 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
       className={className}
       eye={EYE}
       torso={outfit.torso}
-      arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={14} hand={HAND_DRAW[outfit.hand](x)} />}
+      arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={14} hand={(y) => HAND_DRAW[outfit.hand](x, y)} />}
       leg={(x) => <HeroLeg x={x} legs={outfit.legs} long={outfit.long} shorts={12} feet={outfit.feet} />}
       overHair={outfit.head}
     />

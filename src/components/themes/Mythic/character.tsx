@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_SKIN as SKIN, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { HERO_SKIN as SKIN, HERO_TORSO, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { Mongkhon } from '@/components/scroll/Mongkhon'
+import { HeroFist, HeroGlove, HeroStick } from '@/components/scroll/heroHands'
 import { MYTH } from './palette'
 
 // Him in Mythic (the shared HeroFigure), dressed for an Aegean noon: the System Engineer in a white
@@ -25,15 +27,15 @@ interface Outfit {
 }
 
 // The hand sits at the end of the 15 unit forearm (y 54 to 58).
-const HAND_DRAW: Record<Outfit['hand'], (x: number) => ReactNode> = {
-  fist: (x) => <circle cx={x} cy={56} r={3} fill={SKIN} />,
-  sticks: (x) => (
+const HAND_DRAW: Record<Outfit['hand'], (x: number, y: number) => ReactNode> = {
+  fist: (x, y) => <HeroFist x={x} y={y} />,
+  sticks: (x, y) => (
     <>
-      <line x1={x} y1={54} x2={x} y2={74} stroke={MYTH.sand} strokeWidth={2.2} strokeLinecap="round" />
-      <circle cx={x} cy={56} r={3} fill={SKIN} />
+      <HeroStick x={x} y={y} color={MYTH.sand} width={2.2} />
+      <HeroFist x={x} y={y} />
     </>
   ),
-  gloves: (x) => <circle cx={x} cy={56} r={4.8} fill={MYTH.terracottaDeep} />,
+  gloves: (x, y) => <HeroGlove x={x} y={y} fill={MYTH.terracottaDeep} />,
 }
 
 // The laurel wreath: the olive branch round his head and its leaves, paired along it.
@@ -58,12 +60,7 @@ const LAUREL = (
 const DIADEM = <path d="M21.4 13 Q32 7.6 42.6 13" fill="none" stroke={MYTH.gold} strokeWidth={2} strokeLinecap="round" />
 
 // The mongkol: the corded ring round his head and its tail standing out behind.
-const MONGKOL = (
-  <>
-    <path d="M21.4 13 Q32 7.4 42.6 13" fill="none" stroke={MYTH.marble} strokeWidth={2.4} strokeLinecap="round" />
-    <path d="M41.6 11.8 Q47 6 49 1.5" fill="none" stroke={MYTH.marble} strokeWidth={1.8} strokeLinecap="round" />
-  </>
-)
+const MONGKOL = <Mongkhon cord={MYTH.marble} />
 
 // The chiton falls from the shoulders to above the knee; the skirt below the hips is the legs' colour.
 const CHITON = 'M21 32 Q32 28.5 43 32 L44 62 L20 62 Z'
@@ -102,7 +99,7 @@ const OUTFIT: Record<Profession, Outfit> = {
   fighter: {
     torso: (
       <>
-        <path d="M22 32 Q32 29 42 32 L41 59 L23 59 Z" fill={SKIN} />
+        <path d={HERO_TORSO} fill={SKIN} />
         <path d="M26 40 Q32 43 38 40 M32 44 V54" fill="none" stroke={MYTH.inkSoft} strokeWidth={0.8} />
         <rect x={23} y={55} width={18} height={4} fill={MYTH.gold} />
       </>
@@ -123,7 +120,7 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
       className={className}
       eye={EYE}
       torso={outfit.torso}
-      arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={15} hand={HAND_DRAW[outfit.hand](x)} />}
+      arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={15} hand={(y) => HAND_DRAW[outfit.hand](x, y)} />}
       leg={(x) => <HeroLeg x={x} legs={outfit.legs} long={false} shorts={11} feet={outfit.feet} />}
       overHair={outfit.head}
     />

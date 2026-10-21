@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { PORTAL } from './palette'
-import { HERO_SKIN as SKIN, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { HERO_SKIN as SKIN, HERO_TORSO, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { HeroFist, HeroGlove, HeroStick } from '@/components/scroll/heroHands'
 
 // Him in Neon Portals (the shared HeroFigure), dressed as a dimension hopper per profession: a charcoal
 // tee split by an orange and a blue seam (the two portal colours) and a rift band on the front wrist.
@@ -24,20 +25,20 @@ const OUTFIT: Record<Profession, Outfit> = {
   fighter: { legs: PORTAL.BLUE, long: false, feet: SKIN, hand: 'gloves' },
 }
 
-const HAND_DRAW: Record<Outfit['hand'], (x: number) => ReactNode> = {
-  band: (x) => (
+const HAND_DRAW: Record<Outfit['hand'], (x: number, y: number) => ReactNode> = {
+  band: (x, y) => (
     <>
-      <rect x={x - 3} y={49} width={6} height={3} fill={PORTAL.VIOLET} />
-      <circle cx={x} cy={55} r={3} fill={SKIN} />
+      <rect x={x - 3} y={y - 6} width={6} height={3} fill={PORTAL.VIOLET} />
+      <HeroFist x={x} y={y} />
     </>
   ),
-  sticks: (x) => (
+  sticks: (x, y) => (
     <>
-      <line x1={x} y1={53} x2={x} y2={74} stroke="#f5d28a" strokeWidth={2} strokeLinecap="round" />
-      <circle cx={x} cy={55} r={3} fill={SKIN} />
+      <HeroStick x={x} y={y} color="#f5d28a" />
+      <HeroFist x={x} y={y} />
     </>
   ),
-  gloves: (x) => <circle cx={x} cy={55} r={4.6} fill={PORTAL.ORANGE} stroke="#7a4300" strokeWidth={0.8} />,
+  gloves: (x, y) => <HeroGlove x={x} y={y} fill={PORTAL.ORANGE} r={4.6} stroke="#7a4300" strokeWidth={0.8} />,
 }
 
 export function HeroCharacter({ profession, className = '' }: { profession: Profession; className?: string }) {
@@ -50,12 +51,12 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
       torso={
         <>
           {/* the charcoal tee, split by the orange and blue seams */}
-          <path d="M22 32 Q32 29 42 32 L41 59 L23 59 Z" fill={TEE} />
+          <path d={HERO_TORSO} fill={TEE} />
           <line x1={30.5} y1={33} x2={30.5} y2={58} stroke={PORTAL.ORANGE} strokeWidth={1.2} />
           <line x1={33.5} y1={33} x2={33.5} y2={58} stroke={PORTAL.BLUE} strokeWidth={1.2} />
         </>
       }
-      arm={(x) => <HeroArm x={x} sleeve={TEE} forearm={14} hand={HAND_DRAW[outfit.hand](x)} />}
+      arm={(x) => <HeroArm x={x} sleeve={TEE} forearm={14} hand={(y) => HAND_DRAW[outfit.hand](x, y)} />}
       leg={(x) => <HeroLeg x={x} legs={outfit.legs} long={outfit.long} shorts={12} feet={outfit.feet} />}
     />
   )
