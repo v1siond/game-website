@@ -516,6 +516,9 @@ export const BattleReveal = memo(function BattleReveal({
  * - Thick segmented legs
  * - Orange infection growths
  */
+/** How strongly the bone silhouette covers the bug on a hit: enough to read as the bug bleaching white. */
+const HIT_FLASH_OPACITY = 0.75
+
 export const BattleBug = memo(function BattleBug({
   size = 120,
   legPhase = 0,
@@ -543,17 +546,31 @@ export const BattleBug = memo(function BattleBug({
 
   const antennaWiggle = Math.sin(antennaPhase * Math.PI * 2) * 6
 
+  const legs = [
+    `M28,45 Q18,${50 + getLegY(0)} 10,${58 + getLegY(0)} Q6,${62 + getLegY(0)} 4,${68 + getLegY(0)}`,
+    `M25,52 Q15,${56 + getLegY(1)} 8,${64 + getLegY(1)} Q4,${68 + getLegY(1)} 2,${74 + getLegY(1)}`,
+    `M26,58 Q18,${62 + getLegY(2)} 12,${70 + getLegY(2)} Q8,${74 + getLegY(2)} 6,${80 + getLegY(2)}`,
+    `M30,62 Q24,${66 + getLegY(3)} 18,${74 + getLegY(3)}`,
+    `M72,45 Q82,${50 + getLegY(4)} 90,${58 + getLegY(4)} Q94,${62 + getLegY(4)} 96,${68 + getLegY(4)}`,
+    `M75,52 Q85,${56 + getLegY(5)} 92,${64 + getLegY(5)} Q96,${68 + getLegY(5)} 98,${74 + getLegY(5)}`,
+    `M74,58 Q82,${62 + getLegY(6)} 88,${70 + getLegY(6)} Q92,${74 + getLegY(6)} 94,${80 + getLegY(6)}`,
+    `M70,62 Q76,${66 + getLegY(7)} 82,${74 + getLegY(7)}`,
+  ]
+  const mandibles = [
+    `M36,32 Q${28 + antennaWiggle * 0.3},38 ${24 + antennaWiggle * 0.5},45`,
+    `M64,32 Q${72 - antennaWiggle * 0.3},38 ${76 - antennaWiggle * 0.5},45`,
+  ]
+  const horns = [
+    `M38,14 Q${30 + antennaWiggle},6 ${26 + antennaWiggle},0`,
+    `M62,14 Q${70 - antennaWiggle},6 ${74 - antennaWiggle},0`,
+  ]
+
   return (
     <svg
       width={size}
       height={size * 0.85}
       viewBox="0 0 100 85"
-      style={{
-        filter: isHit
-          ? 'brightness(2) saturate(0)'
-          : `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 6px ${infected}80)`,
-        transition: 'filter 100ms'
-      }}
+      style={{ filter: `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 6px ${infected}80)` }}
     >
       <defs>
         <filter id="battleGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -576,14 +593,7 @@ export const BattleBug = memo(function BattleBug({
 
       {/* LEGS - thick, segmented, 4 per side */}
       <g stroke={shellDark} strokeWidth="4" strokeLinecap="round" fill="none">
-        <path d={`M28,45 Q18,${50 + getLegY(0)} 10,${58 + getLegY(0)} Q6,${62 + getLegY(0)} 4,${68 + getLegY(0)}`} />
-        <path d={`M25,52 Q15,${56 + getLegY(1)} 8,${64 + getLegY(1)} Q4,${68 + getLegY(1)} 2,${74 + getLegY(1)}`} />
-        <path d={`M26,58 Q18,${62 + getLegY(2)} 12,${70 + getLegY(2)} Q8,${74 + getLegY(2)} 6,${80 + getLegY(2)}`} />
-        <path d={`M30,62 Q24,${66 + getLegY(3)} 18,${74 + getLegY(3)}`} />
-        <path d={`M72,45 Q82,${50 + getLegY(4)} 90,${58 + getLegY(4)} Q94,${62 + getLegY(4)} 96,${68 + getLegY(4)}`} />
-        <path d={`M75,52 Q85,${56 + getLegY(5)} 92,${64 + getLegY(5)} Q96,${68 + getLegY(5)} 98,${74 + getLegY(5)}`} />
-        <path d={`M74,58 Q82,${62 + getLegY(6)} 88,${70 + getLegY(6)} Q92,${74 + getLegY(6)} 94,${80 + getLegY(6)}`} />
-        <path d={`M70,62 Q76,${66 + getLegY(7)} 82,${74 + getLegY(7)}`} />
+        {legs.map((d, i) => <path key={i} d={d} />)}
       </g>
       {/* Leg joints */}
       <g fill={shellMid}>
@@ -606,14 +616,12 @@ export const BattleBug = memo(function BattleBug({
       <path d="M35,22 Q50,16 65,22" fill="none" stroke={maskLight} strokeWidth="2" opacity="0.5" />
 
       {/* MANDIBLES */}
-      <path d={`M36,32 Q${28 + antennaWiggle * 0.3},38 ${24 + antennaWiggle * 0.5},45`} fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" />
-      <path d={`M64,32 Q${72 - antennaWiggle * 0.3},38 ${76 - antennaWiggle * 0.5},45`} fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" />
+      {mandibles.map((d, i) => <path key={i} d={d} fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" />)}
       <circle cx={24 + antennaWiggle * 0.5} cy="45" r="3" fill={shellDark} />
       <circle cx={76 - antennaWiggle * 0.5} cy="45" r="3" fill={shellDark} />
 
       {/* HORNS */}
-      <path d={`M38,14 Q${30 + antennaWiggle},6 ${26 + antennaWiggle},0`} fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" />
-      <path d={`M62,14 Q${70 - antennaWiggle},6 ${74 - antennaWiggle},0`} fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" />
+      {horns.map((d, i) => <path key={i} d={d} fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" />)}
 
       {/* EYES - void black with orange glow */}
       <g filter="url(#battleGlow)">
@@ -636,6 +644,28 @@ export const BattleBug = memo(function BattleBug({
       </g>
 
       <ellipse cx="48" cy="47" rx="3" ry="2" fill={infectedBright} opacity="0.35" />
+
+      {/* HIT FLASH - the bug's silhouette in bone, drawn over it; only its opacity changes on a hit */}
+      <g
+        fill={DARK_FANTASY.bone}
+        stroke={DARK_FANTASY.bone}
+        strokeLinecap="round"
+        style={{ opacity: isHit ? HIT_FLASH_OPACITY : 0, transition: 'opacity 100ms' }}
+        aria-hidden="true"
+      >
+        <g fill="none" strokeWidth="4">
+          {legs.map((d, i) => <path key={i} d={d} />)}
+        </g>
+        <ellipse cx="50" cy="55" rx="28" ry="20" strokeWidth="1.5" />
+        <ellipse cx="50" cy="40" rx="22" ry="14" strokeWidth="1" />
+        <ellipse cx="50" cy="26" rx="18" ry="15" strokeWidth="1" />
+        <g fill="none" strokeWidth="5">
+          {mandibles.map((d, i) => <path key={i} d={d} />)}
+        </g>
+        <g fill="none" strokeWidth="3">
+          {horns.map((d, i) => <path key={i} d={d} />)}
+        </g>
+      </g>
     </svg>
   )
 })

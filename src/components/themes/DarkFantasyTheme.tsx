@@ -705,7 +705,7 @@ const WaystationNode = memo(function WaystationNode({
       )}
       {/* Active glow - rectangular to match VoidFrame */}
       <div
-        className={`absolute inset-0 transition-all duration-500 ${
+        className={`absolute inset-0 transition-[transform,opacity] duration-500 ${
           isActive ? 'opacity-50 scale-110' : 'opacity-0 scale-100 group-hover:opacity-30 group-hover:scale-105'
         }`}
         style={{
@@ -715,14 +715,19 @@ const WaystationNode = memo(function WaystationNode({
       />
       {/* Main container - VoidFrame style with decorative elements */}
       <div
-        className={`df-card bg-df-panel relative w-24 h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-all duration-300 ${
-          isActive ? 'df-card--active scale-110' : 'group-hover:scale-105'
+        className={`df-card bg-df-panel relative z-0 w-24 h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
+          isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
-        style={{
-          ['--df-accent' as string]: isActive ? color : undefined,
-          animation: isReceivingEnergy ? 'nodeArrival 400ms ease-out' : undefined,
-        }}
+        style={{ animation: isReceivingEnergy ? 'nodeArrival 400ms ease-out' : undefined }}
       >
+        {/* Active border and glow: the active card drawn under the content, fading in by opacity */}
+        <div
+          className={`df-card df-card--active absolute -inset-px -z-10 pointer-events-none transition-opacity duration-300 ${
+            isActive ? 'opacity-100' : 'opacity-0'
+          }`}
+          style={{ ['--df-accent' as string]: color }}
+          aria-hidden="true"
+        />
         {/* Top flourish - mini version */}
         <svg
           className="absolute -top-2 left-1/2 -translate-x-1/2"
@@ -1088,7 +1093,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
             <a
               key={kind}
               {...linkProps}
-              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
+              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
             >
               {label}
             </a>
@@ -1483,7 +1488,7 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
 
 // Profession sections. Each animated section gets its own useSectionTrigger, from its real position.
 const DF_BUTTON =
-  'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
+  'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-transform hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
 
 // Email is the brass action, LinkedIn the outlined one.
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
@@ -1797,13 +1802,13 @@ export default function DarkFantasyTheme() {
           <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
             >
               {actionLabels.cv}
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
             >
               <span className="hidden sm:inline">{actionLabels.engine}</span>
               <span className="sm:hidden">{actionLabels.engineShort}</span>
