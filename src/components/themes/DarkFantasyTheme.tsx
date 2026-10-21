@@ -310,55 +310,6 @@ const StoneFormations = memo(function StoneFormations() {
   )
 })
 
-// Gothic window with soft light rays
-const GothicWindow = memo(function GothicWindow({ side }: { side: 'left' | 'right' }) {
-  const xPos = side === 'left' ? '5%' : '95%'
-  const transform = side === 'left' ? 'translateX(0)' : 'translateX(-100%)'
-
-  return (
-    <div
-      className="absolute top-[10%] h-[60%] w-24 opacity-40"
-      style={{ left: xPos, transform }}
-      aria-hidden="true"
-    >
-      <svg viewBox="0 0 80 200" className="w-full h-full" preserveAspectRatio="none" role="presentation">
-        {/* Gothic arch frame - weathered stone */}
-        <path
-          d="M10,200 L10,60 Q10,10 40,10 Q70,10 70,60 L70,200"
-          fill="none"
-          stroke={DARK_FANTASY.stoneGrey}
-          strokeWidth="4"
-        />
-        {/* Inner glow */}
-        <path
-          d="M15,195 L15,62 Q15,18 40,18 Q65,18 65,62 L65,195"
-          fill={DARK_FANTASY.spiritGold}
-          opacity="0.08"
-        />
-        {/* Gothic tracery */}
-        <path
-          d="M40,18 L40,80 M25,50 Q40,40 55,50 M20,80 Q40,65 60,80"
-          fill="none"
-          stroke={DARK_FANTASY.stoneGrey}
-          strokeWidth="1.5"
-          opacity="0.6"
-        />
-        {/* Crystal/stained glass points */}
-        <circle cx="40" cy="35" r="4" fill={DARK_FANTASY.ethereal} opacity="0.5" />
-        <circle cx="30" cy="55" r="3" fill={DARK_FANTASY.spiritGold} opacity="0.4" />
-        <circle cx="50" cy="55" r="3" fill={DARK_FANTASY.spiritGold} opacity="0.4" />
-      </svg>
-      {/* Light rays emanating - no blur filter for performance */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(ellipse at ${side === 'left' ? '80%' : '20%'} 30%, ${DARK_FANTASY.spiritGold}15, ${DARK_FANTASY.spiritGold}08 40%, transparent 70%)`,
-        }}
-      />
-    </div>
-  )
-})
-
 // Boss-arena depth, a gothic STAGE: a distant back wall with small,
 // receded lancet windows, a FLOOR in front (cornice + perspective lines + soft stage
 // light) so there's a clear floor/wall read, framed by interior columns and hanging
