@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HeroCharacter } from './character'
+import { MERC_ACTION, MercSprite } from './merc'
 import { NEON } from './palette'
 import world from './world.module.css'
 
@@ -29,16 +29,11 @@ function Layer({ depth, children }: { depth: 'far' | 'mid' | 'near'; children: R
   )
 }
 
-// Where he stands in the rig and how he moves there, in percent of the rig box.
-interface Stance {
-  place: string
-  pose: string
-}
-
-const STANCE: Record<Profession, Stance> = {
-  engineer: { place: 'left-[13%] bottom-[3%] w-[18%]', pose: world.typing },
-  drummer: { place: 'left-[41%] bottom-[10%] w-[18%]', pose: world.drumming },
-  fighter: { place: 'left-[30%] bottom-[4%] w-[18%]', pose: world.fighting },
+// Where he stands in the rig, in percent of the rig box; his loop there is the merc's profession action.
+const PLACE: Record<Profession, string> = {
+  engineer: 'left-[13%] bottom-[3%] w-[18%]',
+  drummer: 'left-[41%] bottom-[10%] w-[18%]',
+  fighter: 'left-[30%] bottom-[4%] w-[18%]',
 }
 
 // ---- System Engineer: the den ----
@@ -185,14 +180,14 @@ const RIG: Record<Profession, (props: { figure: ReactNode }) => ReactNode> = {
 
 export function Rig({ profession }: { profession: Profession }) {
   const Place = RIG[profession]
-  const { place, pose } = STANCE[profession]
+  const place = PLACE[profession]
 
   return (
     <div className="relative aspect-[2/1] overflow-hidden border border-[color-mix(in_srgb,var(--neon-chrome-red)_60%,transparent)] bg-[color:var(--neon-ink)]" aria-hidden="true">
       <Place
         figure={
           <div className={`absolute ${place} ${world.depth} ${world.mid}`}>
-            <HeroCharacter profession={profession} className={`h-auto w-full ${world.figure} ${pose}`} />
+            <MercSprite profession={profession} motion={MERC_ACTION[profession]} className="h-auto w-full" />
           </div>
         }
       />

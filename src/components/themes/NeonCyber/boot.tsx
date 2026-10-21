@@ -5,7 +5,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { CVLink, HeroAction } from './actions'
-import { HeroCharacter } from './character'
+import { MercSprite } from './merc'
 import { ScanToggle } from './scanner'
 import world from './world.module.css'
 
@@ -110,7 +110,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
               {/* his portrait in the optics frame, built from one line */}
               <div className="relative mx-auto w-32 border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40" aria-hidden="true">
                 <div className={world.build}>
-                  <HeroCharacter profession={profession} className="h-auto w-full" />
+                  <MercSprite profession={profession} motion="idle" className="h-auto w-full" />
                 </div>
                 <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" />
               </div>
