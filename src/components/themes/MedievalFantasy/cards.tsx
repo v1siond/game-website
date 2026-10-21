@@ -2,7 +2,8 @@ import type { CSSProperties } from 'react'
 import type { Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobYears, RELEASED } from '@/components/cv/sectionText'
+import { jobYears } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { REALM } from './palette'
 import { InnerCard } from './panels'
 import { RealmButton } from './actions'
@@ -20,12 +21,13 @@ export const CARD_CHIP: CSSProperties = {
   textTransform: 'uppercase',
 }
 
-function jobYearsLabel(job: Job): string {
-  const { start, end } = jobYears(job, 'Present')
+function jobYearsLabel(job: Job, present: string): string {
+  const { start, end } = jobYears(job, present)
   return `${start} - ${end}`
 }
 
 export function JobCard({ job }: { job: Job }) {
+  const { years } = useLabels()
   return (
     <InnerCard highlight={job.endDate === null} zone="roc">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '0.375rem' }}>
@@ -33,7 +35,7 @@ export function JobCard({ job }: { job: Job }) {
           <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{job.title}</h3>
           <p style={{ color: REALM.goldMid, fontSize: '0.875rem' }}>{job.company}</p>
         </div>
-        <span style={{ color: REALM.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYearsLabel(job)}</span>
+        <span style={{ color: REALM.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYearsLabel(job, years.present)}</span>
       </div>
       {job.description && <p style={{ color: REALM.textMid, fontSize: '0.875rem' }}>{job.description}</p>}
       {job.highlights.length > 0 && (
@@ -79,6 +81,7 @@ export function ProjectCard({ slot: { project, years, links } }: { slot: Project
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   return (
     <InnerCard zone="ft">
       <h3 style={CARD_TITLE}>
@@ -93,7 +96,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p style={CARD_BODY}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </InnerCard>

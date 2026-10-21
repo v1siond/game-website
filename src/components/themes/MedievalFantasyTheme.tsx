@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
@@ -20,6 +20,7 @@ import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy
 
 export default function MedievalFantasyTheme() {
   const view = useWorldView()
+  const { navigation, actions: actionLabels, sections } = useLabels()
   const active = view.profession
   const [mounted, setMounted] = useState(false)
   const [viewportHeight, setViewportHeight] = useState(800)
@@ -49,7 +50,7 @@ export default function MedievalFantasyTheme() {
   if (!mounted) {
     return (
       <div style={{ minHeight: '100vh', background: REALM.bgVoid, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: REALM.textDim, fontFamily: '"Cinzel", Georgia, serif', letterSpacing: '0.2em' }}>LOADING...</p>
+        <p style={{ color: REALM.textDim, fontFamily: '"Cinzel", Georgia, serif', letterSpacing: '0.2em' }}>{navigation.loading.toUpperCase()}</p>
       </div>
     )
   }
@@ -89,8 +90,8 @@ export default function MedievalFantasyTheme() {
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <HeroActions actions={actions} zone="roc" />
-                      <RealmButton href="/cv" zone="roc">CV</RealmButton>
-                      <RealmButton href="/personal-projects/game-engine" zone="roc">Nebulith</RealmButton>
+                      <RealmButton href="/cv" zone="roc">{actionLabels.cv}</RealmButton>
+                      <RealmButton href="/personal-projects/game-engine" zone="roc">{actionLabels.engine}</RealmButton>
                       <LanguageSwitcher render={(state) => <RealmLanguageMenu {...state} />} />
                     </div>
                   </div>
@@ -103,7 +104,7 @@ export default function MedievalFantasyTheme() {
 
         {/* Profession Selector - REALM Style Command Card */}
         <ScrollScene>
-          <section aria-label="Select profession" style={{
+          <section aria-label={navigation.professionSelection} style={{
             marginBottom: sectionSpacing,
             position: 'relative',
             height: isLargeScreen ? '12rem' : '9rem',
@@ -156,7 +157,7 @@ export default function MedievalFantasyTheme() {
 
             {/* Profession nodes */}
             <ProfessionSwitch
-              label="Profession selector"
+              label={navigation.professionSelection}
               className={`relative flex justify-between items-stretch w-full px-4 h-full py-2 ${isLargeScreen ? 'max-w-[700px]' : 'max-w-[500px]'}`}
               renderOption={(option) => <ProfessionNode option={option} isLargeScreen={isLargeScreen} />}
             />
@@ -174,7 +175,7 @@ export default function MedievalFantasyTheme() {
 
         {/* Contact - no card, floating text like Dark Fantasy */}
         <ScrollScene>
-          <section aria-label="Contact" style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
+          <section aria-label={sections.contact} style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
             <RecruiterHero
               render={({ line, actions }) => (
                 <>
@@ -186,12 +187,12 @@ export default function MedievalFantasyTheme() {
                     marginBottom: '0.75rem',
                     textShadow: `0 0 20px ${REALM.frostIceMid}40`,
                   }}>
-                    Get In Touch
+                    {actionLabels.getInTouch}
                   </h2>
                   <p style={{ color: REALM.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <HeroActions actions={actions} zone="ft" />
-                    <RealmButton href="/cv" zone="ft">Download CV</RealmButton>
+                    <RealmButton href="/cv" zone="ft">{actionLabels.downloadCv}</RealmButton>
                   </div>
                 </>
               )}

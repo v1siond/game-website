@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, memo, ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useInView, FixedCombatLayer } from './fixedCombat'
 import { DARK_FANTASY } from './palette'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 /**
  * BATTLE REVEAL ANIMATION
@@ -59,6 +60,7 @@ export const BattleReveal = memo(function BattleReveal({
   children,
   triggered
 }: BattleRevealProps) {
+  const { navigation } = useLabels()
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [showSlash, setShowSlash] = useState(false)
   const [showImpact, setShowImpact] = useState(false)
@@ -367,7 +369,7 @@ export const BattleReveal = memo(function BattleReveal({
         ref={stageRef}
         className={`relative w-full min-h-[300px] flex items-center justify-center ${screenShake ? 'animate-screenShake' : ''}`}
         aria-live="polite"
-        aria-label={isAnimating ? "Battle animation in progress" : "Content revealed"}
+        aria-label={isAnimating ? navigation.battleInProgress : navigation.contentRevealed}
       >
         {/* Knight + bug pinned to the viewport corners (left-15% / right-18%, bottom-15-20%);
             only the content below scrolls past them. Fades out as the section leaves view. */}

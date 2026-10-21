@@ -7,7 +7,8 @@ import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { drumsSince } from '@/components/cv/sectionText'
+import { drumsSince, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { REALM } from './palette'
 import { InnerCard, RealmFrame } from './panels'
@@ -49,6 +50,7 @@ export function ArtDivider({ layout, children }: { layout: SectionLayout; childr
 }
 
 function EngineerSections({ sections, layout, isLargeScreen }: { sections: SectionsOf<'engineer'>; layout: SectionLayout; isLargeScreen: boolean }) {
+  const labels = useLabels()
   const { professionalSummary } = useCVData()
   const { jobs, techStack, projects, companies } = sections
 
@@ -57,7 +59,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
       {/* About - More breathing room */}
       <ScrollScene>
         <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
-          <RealmFrame title="About" zone="roc">
+          <RealmFrame title={labels.sections.about} zone="roc">
             <p style={{
               color: REALM.textBright,
               lineHeight: 1.8,
@@ -81,7 +83,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
             rightOrnament={<RoCOrnament side="right" type="weapons" />}
           >
             <section style={{ marginBottom: layout.sectionSpacing }}>
-              <RealmFrame title="Work Experience" zone="roc">
+              <RealmFrame title={labels.sections.workExperience} zone="roc">
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {jobs.map((job) => (
                     <JobCard key={job.id} job={job} />
@@ -102,7 +104,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
       <ScrollScene>
         <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title="Tech Stack" zone="roc">
+            <RealmFrame title={labels.sections.techStack} zone="roc">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                 {techStack.map((category) => (
                   <div key={category.id}>
@@ -136,7 +138,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
           rightOrnament={<FTOrnament side="right" type="rune" />}
         >
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title="Projects" zone="ft">
+            <RealmFrame title={labels.sections.projects} zone="ft">
               <ProjectList
                 projects={projects}
                 className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3"
@@ -156,7 +158,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
       <ScrollScene>
         <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title="Ventures" zone="ft">
+            <RealmFrame title={labels.sections.ventures} zone="ft">
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
                 {companies.map((company) => (
                   <InnerCard key={company.id} zone="ft">
@@ -167,7 +169,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
                       href={company.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={`${company.name} (opens in a new tab)`}
+                      aria-label={newTabName(labels.links, company.name)}
                       style={{ color: REALM.frostIceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem' }}
                     >
                       {company.url}
@@ -184,6 +186,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
 }
 
 function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'>; layout: SectionLayout }) {
+  const labels = useLabels()
   const { musician, bands } = sections
 
   return (
@@ -195,9 +198,9 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
       <ScrollScene>
         <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title="Bands" zone="ft">
+            <RealmFrame title={labels.sections.bands} zone="ft">
               <p style={{ color: REALM.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
-                {drumsSince(musician)}
+                {drumsSince(musician, labels.years)}
               </p>
               <BandList
                 bands={bands}
@@ -214,6 +217,7 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
 }
 
 function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fighter'>; layout: SectionLayout }) {
+  const labels = useLabels()
   const { martialArts } = sections
 
   return (
@@ -225,7 +229,7 @@ function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fig
       <ScrollScene>
         <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
-            <RealmFrame title="Muay Thai" zone="roc">
+            <RealmFrame title={labels.sections.muayThai} zone="roc">
               <h3 style={{ ...CARD_TITLE, marginBottom: '1rem' }}>{martialArts.primary.title}</h3>
               <MuayThaiRecord
                 martialArts={martialArts}

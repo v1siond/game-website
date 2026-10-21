@@ -1,6 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 /**
  * WCAG AA Accessibility Styles for Game Website Themes
@@ -179,6 +180,7 @@ export const THEME_FOCUS_COLORS: Record<string, string> = {
 
 // Skip link component - ensures keyboard users can bypass navigation
 export function SkipLink({ href = '#main-content' }: { href?: string }) {
+  const { navigation } = useLabels()
   return (
     <a
       href={href}
@@ -219,28 +221,8 @@ export function SkipLink({ href = '#main-content' }: { href?: string }) {
         el.style.overflow = 'hidden'
       }}
     >
-      Skip to main content
+      {navigation.skipToContent}
     </a>
-  )
-}
-
-// Skip links container for multiple targets
-export function SkipLinks({ links }: { links: Array<{ href: string; label: string }> }) {
-  return (
-    <nav aria-label="Skip links" className="sr-only focus-within:not-sr-only">
-      <ul className="flex gap-2 p-2 fixed top-0 left-0 z-[9999] bg-black">
-        {links.map((link) => (
-          <li key={link.href}>
-            <a
-              href={link.href}
-              className="text-white px-4 py-2 bg-gray-800 rounded focus:outline-2 focus:outline-white focus:outline-offset-2"
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
   )
 }
 

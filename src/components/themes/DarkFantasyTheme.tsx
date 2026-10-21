@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
@@ -21,7 +21,8 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
-import { drumsSince, headingId, jobYears, RELEASED } from '@/components/cv/sectionText'
+import { drumsSince, headingId, jobYears, newTabName } from '@/components/cv/sectionText'
+import { fillLabel } from '@/lib/cv/labels'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 
 // Abstract spirit wisp - optimized: no SVG filter
@@ -1008,6 +1009,7 @@ const DF_FONT = '"Comic Sans MS", "Comic Sans", cursive'
 
 // Tech stack display
 const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
     <div className="space-y-6">
       {categories.map((category) => (
@@ -1019,7 +1021,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li
                 key={tech}
@@ -1043,6 +1045,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
 
 // Project card - his role, the years, the result and the links
 const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
+  const { cards } = useLabels()
   return (
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
@@ -1054,7 +1057,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
     >
       {project.featured && (
         <span className="text-sm tracking-[0.15em] uppercase" style={{ color: DARK_FANTASY.spiritGold }}>
-          <span aria-hidden="true">* </span>Featured
+          <span aria-hidden="true">* </span>{cards.featured}
         </span>
       )}
       <h3 className="text-lg mt-1 transition-colors" style={{ color: DARK_FANTASY.bone }}>
@@ -1069,10 +1072,10 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
-          <span className="sr-only">Impact: </span>{project.impact}
+          <span className="sr-only">{cards.impact}: </span>{project.impact}
         </p>
       )}
-      <div className="flex flex-wrap gap-1 mt-3" aria-label="Technologies used">
+      <div className="flex flex-wrap gap-1 mt-3" aria-label={cards.technologiesUsed}>
         {project.techStack.map((tech) => (
           <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${DARK_FANTASY.ethereal}12`, color: DARK_FANTASY.silver }}>
             {tech}
@@ -1098,6 +1101,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
 
 // Company card
 const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
   return (
     <a
       href={company.url}
@@ -1109,7 +1113,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
         border: `1px solid ${DARK_FANTASY.stoneDark}`,
         borderRadius: '4px',
       }}
-      aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}, ${company.tagline}`)}
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl" aria-hidden="true">{company.icon}</span>
@@ -1127,6 +1131,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
 
 // Band card
 const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const content = (
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
@@ -1146,7 +1151,7 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silver }}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>
@@ -1166,7 +1171,8 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
 // Work experience card. Dates are date only strings (UTC midnight), so the year is read in UTC: a
 // January start keeps its own year west of UTC.
 const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: Job; isLast?: boolean }) {
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
+  const { years, cards } = useLabels()
+  const { start: startDisplay, end: endDisplay } = jobYears(entry, years.present)
 
   return (
     <article className="py-4">
@@ -1184,7 +1190,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
       </div>
       {entry.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silver }}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1" aria-label="Key achievements">
+        <ul className="space-y-1" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DARK_FANTASY.bone }}>
               <span style={{ color: DARK_FANTASY.spiritGold }} aria-hidden="true">*</span>
@@ -1528,12 +1534,13 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
 
 function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const labels = useLabels()
   const projectsTrigger = useSectionTrigger()
   const { jobs, techStack, projects, companies } = sections
 
   return (
     <>
-      <FramedSection title="About">
+      <FramedSection title={labels.sections.about}>
         <p className="leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{professionalSummary.bio}</p>
       </FramedSection>
 
@@ -1544,7 +1551,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
 
       {/* Work Experience - Knight Slash Reveal (content slides from right) */}
       {jobs.length > 0 && (
-        <SlashRevealSection title="Work Experience">
+        <SlashRevealSection title={labels.sections.workExperience}>
           <div>
             {jobs.map((entry, index) => (
               <ExperienceCard key={entry.id} entry={entry} isLast={index === jobs.length - 1} />
@@ -1558,7 +1565,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
         <ArtSectionLanterns />
       </ScrollScene>
 
-      <FramedSection title="Tech Stack">
+      <FramedSection title={labels.sections.techStack}>
         <TechCloud categories={techStack} />
       </FramedSection>
 
@@ -1567,7 +1574,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
         <BugPullReveal triggered={projectsTrigger.triggered}>
           <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
             <div className="max-w-4xl mx-auto">
-              <VoidFrame title="Projects">
+              <VoidFrame title={labels.sections.projects}>
                 <ProjectList
                   projects={projects}
                   className="grid md:grid-cols-2 gap-3 md:gap-4"
@@ -1584,7 +1591,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
         <ArtSectionCrystals />
       </ScrollScene>
 
-      <FramedSection title="Ventures">
+      <FramedSection title={labels.sections.ventures}>
         <div className="grid md:grid-cols-3 gap-3 md:gap-4">
           {companies.map((company) => (
             <CompanyCard key={company.id} company={company} />
@@ -1597,6 +1604,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
 
 function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const labels = useLabels()
 
   return (
     <>
@@ -1604,9 +1612,9 @@ function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
         <ArtSectionSpirits />
       </ScrollScene>
 
-      <SlashRevealSection title="Bands">
+      <SlashRevealSection title={labels.sections.bands}>
         <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
-          {drumsSince(musician)}
+          {drumsSince(musician, labels.years)}
         </p>
         <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
         <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
@@ -1621,6 +1629,7 @@ function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
 
 function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const labels = useLabels()
 
   return (
     <>
@@ -1628,7 +1637,7 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
         <ArtSectionSpirits />
       </ScrollScene>
 
-      <SlashRevealSection title="Muay Thai">
+      <SlashRevealSection title={labels.sections.muayThai}>
         <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
         <MuayThaiRecord
           martialArts={martialArts}
@@ -1664,6 +1673,7 @@ const SECTION_VIEWS: ProfessionSectionViews = {
 
 export default function DarkFantasyTheme() {
   const view = useWorldView()
+  const { navigation, actions: actionLabels, sections } = useLabels()
   const active = view.profession
   const [mounted, setMounted] = useState(false)
 
@@ -1703,10 +1713,10 @@ export default function DarkFantasyTheme() {
         style={DARK_FANTASY_VARS}
         className="min-h-screen flex items-center justify-center bg-[color:var(--df-void)]"
         role="status"
-        aria-label="Loading theme"
+        aria-label={navigation.loadingTheme}
       >
         <div className="animate-pulse text-center" style={{ color: DARK_FANTASY.bone }}>
-          Loading...
+          {navigation.loading}
         </div>
       </div>
     )
@@ -1764,7 +1774,7 @@ export default function DarkFantasyTheme() {
         style={{
           background: `linear-gradient(180deg, ${DARK_FANTASY.void}f5 0%, ${DARK_FANTASY.void}e0 70%, transparent 100%)`,
         }}
-        aria-label="Primary navigation"
+        aria-label={navigation.primaryNavigation}
       >
         <div className="max-w-6xl mx-auto flex justify-between items-center gap-2 md:gap-4">
           {/* Name - compact on mobile */}
@@ -1789,14 +1799,14 @@ export default function DarkFantasyTheme() {
               href="/cv"
               className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
             >
-              CV
+              {actionLabels.cv}
             </Link>
             <Link
               href="/personal-projects/game-engine"
               className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
             >
-              <span className="hidden sm:inline">Nebulith</span>
-              <span className="sm:hidden">Game</span>
+              <span className="hidden sm:inline">{actionLabels.engine}</span>
+              <span className="sm:hidden">{actionLabels.engineShort}</span>
             </Link>
           </div>
         </div>
@@ -1837,7 +1847,7 @@ export default function DarkFantasyTheme() {
       {/* Profession Selector - Waystation style */}
       <ScrollScene>
         <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
-          <h2 id="profession-heading" className="sr-only">Select Your Profession</h2>
+          <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
           <div className="max-w-6xl mx-auto px-4 md:px-6">
             <div
               className="relative h-40 md:h-56 overflow-hidden"
@@ -1871,7 +1881,7 @@ export default function DarkFantasyTheme() {
 
               <ProfessionSwitch
                 className="absolute inset-0"
-                label="Profession selector"
+                label={navigation.professionSelection}
                 renderOption={(option) => (
                   <WaystationNode option={option} isReceivingEnergy={isEnergyFlowing && option.selected} />
                 )}
@@ -1888,20 +1898,20 @@ export default function DarkFantasyTheme() {
       {/* Contact CTA - Battle Reveal (knight kills bug, content drops from top) */}
       <div ref={contactTrigger.ref}>
         <BattleReveal triggered={contactTrigger.triggered}>
-        <section className="relative z-20 py-16 px-6" aria-label="Contact">
+        <section className="relative z-20 py-16 px-6" aria-label={sections.contact}>
           <RecruiterHero
             render={({ line, actions }) => (
               <div className="max-w-2xl mx-auto text-center">
                 <div className="mb-8">
                   <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brass, fontFamily: DF_FONT }}>
-                    Get In Touch
+                    {actionLabels.getInTouch}
                   </h2>
                   <p className="text-sm" style={{ color: DARK_FANTASY.silver }}>{line}</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <HeroActions actions={actions} />
                   <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass)]`}>
-                    Download CV
+                    {actionLabels.downloadCv}
                   </Link>
                 </div>
               </div>
@@ -1925,7 +1935,7 @@ export default function DarkFantasyTheme() {
         <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silver }}>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
-            <span className="sr-only">Copyright </span>© {new Date().getFullYear()} {view.hero.name}
+            <span className="sr-only">{navigation.copyright} </span>© {new Date().getFullYear()} {view.hero.name}
           </span>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
         </div>
