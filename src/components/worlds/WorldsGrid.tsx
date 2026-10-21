@@ -42,7 +42,7 @@ function FilterChip({
 }
 
 /**
- * The functional Worlds grid: category filter chips + a responsive grid of every OTHER
+ * The functional Worlds grid: category filter chips + a responsive grid of every
  * world as a live-preview card. Chrome (chips, card frames) is styled from the CURRENT
  * theme via `useTheme()`, so it inherits whatever world hosts it. Themes wrap this in
  * their own <section> + heading to provide the signature framing. See WorldCard.
@@ -51,14 +51,11 @@ export default function WorldsGrid() {
   const { theme } = useTheme()
   const [filter, setFilter] = useState<Filter>('All')
 
-  // Show every world, with the current one first and flagged as selected.
-  const current = WORLDS.find((w) => w.id === theme.id)
-  const rest = WORLDS.filter((w) => w.id !== theme.id)
-  const ordered = current ? [current, ...rest] : rest
-  const visibleWorlds = filter === 'All' ? ordered : ordered.filter((w) => w.category === filter)
+  // One fixed order (the registry's); the current world is flagged in place, never moved.
+  const visibleWorlds = filter === 'All' ? WORLDS : WORLDS.filter((w) => w.category === filter)
   const categoriesWithCounts = WORLD_CATEGORIES.map((cat) => ({
     ...cat,
-    count: ordered.filter((w) => w.category === cat.name).length,
+    count: WORLDS.filter((w) => w.category === cat.name).length,
   })).filter((c) => c.count > 0)
 
   return (
@@ -72,7 +69,7 @@ export default function WorldsGrid() {
           active={filter === 'All'}
           onClick={() => setFilter('All')}
           label="All"
-          count={ordered.length}
+          count={WORLDS.length}
           theme={theme}
         />
         {categoriesWithCounts.map((cat) => (
