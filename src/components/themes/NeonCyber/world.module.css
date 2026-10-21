@@ -250,6 +250,17 @@
   }
 }
 
+/* Once the frame is built he walks in from its left edge, two strides of the street walk. */
+.walkIn {
+  animation: walk-in 1.6s linear 2.6s both;
+}
+
+@keyframes walk-in {
+  from {
+    transform: translateX(-110%);
+  }
+}
+
 .fadeLate {
   animation: fadeIn 0.4s ease-out 2.3s both;
 }
@@ -691,8 +702,23 @@
 
 /* ---- Muay Thai: gold job toasts stacking in from the right ---- */
 
+/* Pointing at a toast lights its gold edge: an overlay frame that fades in, the border never repaints. */
 .toast {
-  transition: border-color 0.2s;
+  position: relative;
+}
+
+.toast::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--neon-gold);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.toast:hover::after {
+  opacity: 1;
 }
 
 .toasting .toast {

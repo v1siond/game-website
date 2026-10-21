@@ -12,7 +12,8 @@ import world from './world.module.css'
 
 // Contact as an incoming call on the optics: when the section comes into view the call rings (two
 // rings pulse out three times), then his portrait resolves line by line from the right, the way a call
-// feed builds. Email and LinkedIn are the two ways to answer; pointing at one kicks it out a step.
+// feed builds and he takes the scan pose, hand at the temple and the optic reticle locking on the
+// caller. Email and LinkedIn are the two ways to answer; pointing at one kicks it out a step.
 
 const PORTRAIT_LINES = [0, 1, 2, 3, 4, 5, 6, 7]
 
@@ -45,7 +46,7 @@ export function HoloCall({ profession }: { profession: Profession }) {
                   />
                 ))}
                 <div className="relative h-32 w-32 overflow-hidden rounded-full border-2 border-[color:var(--neon-data)] bg-[color:var(--neon-ink)]">
-                  <MercSprite profession={profession} motion="idle" className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
+                  <MercSprite profession={profession} motion={triggered ? 'scan' : 'idle'} className="absolute left-1/2 top-2 h-auto w-28 -translate-x-1/2" />
                   <div className="absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.14)_2px_3px)]" />
                   <div className="absolute inset-0 flex flex-col">
                     {PORTRAIT_LINES.map((i) => (

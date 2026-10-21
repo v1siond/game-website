@@ -38,7 +38,7 @@ export function FightRecord({ martialArts }: { martialArts: MartialArts }) {
               }}
               renderAchievement={(achievement) => (
                 <span
-                  className={`${world.toast} ${world.cut} flex items-start gap-3 border border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)] bg-[color:var(--neon-glass)] p-3 hover:border-[color:var(--neon-gold)]`}
+                  className={`${world.toast} ${world.cut} flex items-start gap-3 border border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)] bg-[color:var(--neon-glass)] p-3`}
                   style={{ '--i': achievements.indexOf(achievement) } as CSSProperties}
                 >
                   <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center bg-[color:var(--neon-gold)] text-sm text-[color:var(--neon-ink)]" aria-hidden="true">

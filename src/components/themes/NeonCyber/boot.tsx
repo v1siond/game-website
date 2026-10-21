@@ -1,19 +1,22 @@
 'use client'
 
-import type { CSSProperties } from 'react'
+import { useState, type AnimationEvent, type CSSProperties } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { CVLink, HeroAction } from './actions'
-import { MercSprite } from './merc'
+import { MercSprite, type MercMotion } from './merc'
 import { ScanToggle } from './scanner'
 import world from './world.module.css'
 
 // The recruiter first screen as the optics booting, once, about 2.4 s: a scanline sweeps the panel,
 // the four brackets snap in, his name lands with its red and cyan ghosts splitting off and settling,
 // the headline and the tagline type in, the HUD rail slides in under them, and his portrait builds from
-// a single line. After the boot the panel leans toward the pointer (--mx, --my), the HUD sitting in his
-// eyes. Every word is real text from the start; the shutters and the ghosts are drawn over it.
+// a single line. Once the frame is built he walks into it from the left on the street stride and
+// settles into the idle breath. After the boot the panel leans toward the pointer (--mx, --my), the HUD
+// sitting in his eyes. Every word is real text from the start; the shutters and the ghosts are drawn
+// over it.
 
 // How a typed line runs: its length sets the steps, its start follows the line before it.
 function Typed({ text, at, className = '' }: { text: string; at: number; className?: string }) {
@@ -42,6 +45,43 @@ const GHOSTS = [
   { color: 'text-[color:var(--neon-chrome-red)]', slice: '[clip-path:inset(0_0_55%_0)]', x: '-14px' },
   { color: 'text-[color:var(--neon-data)]', slice: '[clip-path:inset(45%_0_0_0)]', x: '12px' },
 ]
+
+type Strike = Extract<MercMotion, 'blades' | 'jump'>
+
+/**
+ * Him in the optics frame, played like the game's merc: the walk in, then the idle. Pointing at him pops
+ * the mantis blades for one slash, pressing him fires the double jump on the cyberlegs; each strike
+ * plays one cycle and he drops back to the idle (the first animation iteration under him ends it).
+ * Under reduced motion he stands still and takes no strikes.
+ */
+function HeroMerc({ profession }: { profession: Profession }) {
+  const reducedMotion = useReducedMotion()
+  const [arrived, setArrived] = useState(false)
+  const [strike, setStrike] = useState<Strike | null>(null)
+  const rest: MercMotion = arrived ? 'idle' : 'walk'
+  const motion: MercMotion = reducedMotion ? 'still' : (strike ?? rest)
+
+  const arrive = (event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return
+    setArrived(true)
+  }
+  const play = (move: Strike) => () => {
+    if (!arrived || reducedMotion) return
+    setStrike(move)
+  }
+
+  return (
+    <div
+      className={`cursor-crosshair ${world.walkIn}`}
+      onAnimationEnd={arrive}
+      onAnimationIteration={() => setStrike(null)}
+      onPointerEnter={play('blades')}
+      onPointerDown={play('jump')}
+    >
+      <MercSprite profession={profession} motion={motion} className="h-auto w-full" />
+    </div>
+  )
+}
 
 interface BootHeroProps {
   profession: Profession
@@ -107,10 +147,10 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                 </div>
               </div>
 
-              {/* his portrait in the optics frame, built from one line */}
-              <div className="relative mx-auto w-32 border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40" aria-hidden="true">
+              {/* his portrait in the optics frame, built from one line, then he walks in */}
+              <div className="relative mx-auto w-32 overflow-hidden border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40" aria-hidden="true">
                 <div className={world.build}>
-                  <MercSprite profession={profession} motion="idle" className="h-auto w-full" />
+                  <HeroMerc profession={profession} />
                 </div>
                 <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" />
               </div>
