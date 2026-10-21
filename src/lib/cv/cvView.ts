@@ -44,7 +44,7 @@ export interface CVView {
 // 2021 or later. Older entries stay on /cv, and a highlight is shown whatever its age.
 export const RECENT_WORK_YEARS = 5
 
-const recentSince = (now: Date): number => now.getFullYear() - RECENT_WORK_YEARS
+const recentSince = (now: Date): number => now.getUTCFullYear() - RECENT_WORK_YEARS
 
 // Whether an entry belongs in the view: everything on /cv; in a world, current, recent or a highlight.
 type Keep = (entry: { current: boolean; highlight: boolean }, endYear: number | null) => boolean
