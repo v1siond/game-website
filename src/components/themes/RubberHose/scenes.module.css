@@ -388,24 +388,6 @@
   }
 }
 
-/* ---- him ---- */
-
-/* His bounce on the beat: a squash on landing, a stretch at the top, the whole figure from his feet. */
-.heroBob {
-  transform-origin: 50% 100%;
-  animation: heroBob 0.7s var(--hose-bounce) infinite;
-}
-
-@keyframes heroBob {
-  0%,
-  100% {
-    transform: scale(1.06, 0.95);
-  }
-  50% {
-    transform: translate3d(0, -6%, 0) scale(0.96, 1.04);
-  }
-}
-
 .pupils {
   transition: transform 0.2s ease-out;
   transform: translate3d(calc(var(--mx, 0) * 3px), calc(var(--my, 0) * 3px), 0);
@@ -456,7 +438,6 @@
   .slapHand,
   .pinkFlash,
   .superSpin > *,
-  .heroBob,
   .sunRays,
   .bellBox:hover .bell {
     animation: none;

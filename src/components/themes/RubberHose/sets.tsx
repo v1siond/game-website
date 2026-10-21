@@ -51,9 +51,7 @@ function Him({ profession, pose, x, ground, height }: { profession: Profession; 
 
   return (
     <g transform={`translate(${x - 300 * scale} ${ground - height}) scale(${scale})`}>
-      <g className={styles.himBob}>
-        <HeroCharacter profession={profession} pose={pose} />
-      </g>
+      <HeroCharacter profession={profession} pose={pose} />
     </g>
   )
 }

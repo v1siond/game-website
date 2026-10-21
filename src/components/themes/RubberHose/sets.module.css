@@ -89,14 +89,6 @@
   }
 }
 
-/* ---- him ---- */
-
-.himBob {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: beat 1s steps(12, end) infinite alternate;
-}
-
 @keyframes beat {
   from {
     transform: scale(1.04, 0.96);
@@ -344,7 +336,6 @@
   }
 
   .prop:hover,
-  .himBob,
   .cloudDrift,
   .houseBob,
   .propBob,

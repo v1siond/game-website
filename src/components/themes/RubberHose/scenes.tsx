@@ -119,9 +119,7 @@ export function RunBar({ profession, stops }: { profession: Profession; stops: n
           </svg>
         ))}
         <div className={`absolute bottom-3 left-0 h-12 w-10 ${styles.runner}`}>
-          <div className={`h-full w-full ${styles.heroBob}`}>
-            <HeroCharacter profession={profession} pose="run" className="h-full w-full" />
-          </div>
+          <HeroCharacter profession={profession} pose="run" className="h-full w-full" />
         </div>
       </div>
     </div>
@@ -164,7 +162,7 @@ export function SunWatcher({ profession }: { profession: Profession }) {
       <div className="absolute right-[12%] top-2">
         <Sun />
       </div>
-      <div className={`absolute bottom-2 left-[18%] h-28 w-20 ${styles.heroBob}`}>
+      <div className="absolute bottom-2 left-[18%] h-28 w-20">
         <HeroCharacter profession={profession} pose="cheer" className="h-full w-full" />
       </div>
       <IrisRing className={`${styles.iris} ${styles.irisClose}`} />
