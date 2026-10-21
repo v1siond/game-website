@@ -113,28 +113,35 @@ export function Crystal({ className }: ArtProps) {
   )
 }
 
-/** The time relic: a stepped stone on a ringed base, in sapphire, gold or platinum. */
+/** The time relic: an ankh holding a red hex gem in its loop, on a round base, in sapphire, gold or platinum. */
 export function Relic({ className, tone = 'gold' }: ArtProps & { tone?: RelicTone }) {
   const fill = `url(#npw-relic-${tone})`
   return (
     <svg viewBox="0 0 44 48" className={className} aria-hidden="true" focusable="false">
-      <ellipse cx="22" cy="42" rx="18" ry="5" fill={fill} stroke={PORTAL.VOID} strokeWidth="1.4" />
-      <path d="M8 40 L12 30 H32 L36 40 Z" fill={fill} stroke={PORTAL.VOID} strokeWidth="1.4" strokeLinejoin="round" />
-      <path d="M13 30 L16 19 H28 L31 30 Z" fill={fill} stroke={PORTAL.VOID} strokeWidth="1.4" strokeLinejoin="round" />
-      <path d="M17 19 L22 3 L27 19 Z" fill={fill} stroke={PORTAL.VOID} strokeWidth="1.4" strokeLinejoin="round" />
-      <path d="M19 17 L22 7 L23 17 Z M14 28 L16 21 H19 L18 28 Z" fill={PORTAL.WHITE} opacity="0.6" />
-      <circle cx="22" cy="35" r="2.4" fill={PORTAL.VOID} opacity="0.35" />
+      <ellipse cx="22" cy="43" rx="16" ry="4.5" fill={fill} stroke={PORTAL.VOID} strokeWidth="1.4" />
+      <path d="M17.6 25 L15.4 41 H28.6 L26.4 25 Z" fill={fill} stroke={PORTAL.VOID} strokeWidth="1.4" strokeLinejoin="round" />
+      <rect x="5" y="20" width="34" height="6.4" rx="2.4" fill={fill} stroke={PORTAL.VOID} strokeWidth="1.4" />
+      <path
+        d="M12 12 A10 12 0 1 1 32 12 A10 12 0 1 1 12 12 Z M16.4 12 A5.6 7.6 0 1 0 27.6 12 A5.6 7.6 0 1 0 16.4 12 Z"
+        fill={fill}
+        fillRule="evenodd"
+        stroke={PORTAL.VOID}
+        strokeWidth="1.4"
+      />
+      <path d="M22 6.6 L26.6 9.3 V14.7 L22 17.4 L17.4 14.7 V9.3 Z" fill={PORTAL.FRUIT_RED} stroke={PORTAL.FRUIT_DEEP} strokeWidth="1" strokeLinejoin="round" />
+      <path d="M22 6.6 L26.6 9.3 L22 12 L17.4 9.3 Z" fill={PORTAL.WHITE} opacity="0.35" />
+      <path d="M14 7 Q16 2.4 21 1.6 M8 22 H16" stroke={PORTAL.WHITE} strokeWidth="1.2" strokeLinecap="round" opacity="0.6" fill="none" />
     </svg>
   )
 }
 
-/** The time trial stopwatch: a round yellow face, the crown and the two hands. */
+/** The time trial stopwatch: a yellow octagon round a light face, the crown and the two hands. */
 export function Stopwatch({ className, hand = '' }: ArtProps & { hand?: string }) {
   return (
     <svg viewBox="0 0 40 46" className={className} aria-hidden="true" focusable="false">
       <rect x="16" y="1" width="8" height="5" rx="1.5" fill={PORTAL.BRASS} stroke={PORTAL.VOID} strokeWidth="1.2" />
       <path d="M30 8 L34 4" stroke={PORTAL.VOID} strokeWidth="3" strokeLinecap="round" />
-      <circle cx="20" cy="26" r="18" fill={PORTAL.BRASS} stroke={PORTAL.VOID} strokeWidth="1.6" />
+      <path d="M26.9 9.4 L36.6 19.1 V32.9 L26.9 42.6 H13.1 L3.4 32.9 V19.1 L13.1 9.4 Z" fill={PORTAL.CLOCK} stroke={PORTAL.VOID} strokeWidth="1.6" strokeLinejoin="round" />
       <circle cx="20" cy="26" r="14.5" fill="url(#npw-clock)" />
       {[0, 90, 180, 270].map((turn) => (
         <rect key={turn} x="19" y="12.5" width="2" height="3.5" fill={PORTAL.VOID} transform={`rotate(${turn} 20 26)`} />

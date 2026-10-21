@@ -178,8 +178,14 @@
   font-family: 'Arial Black', system-ui, sans-serif;
   font-size: 1.5rem;
   line-height: 1;
-  color: var(--np-white);
-  text-shadow: 0 3px 0 var(--np-void);
+  color: var(--np-hud-top);
+  background: linear-gradient(180deg, var(--np-hud-top) 20%, var(--np-hud-low) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1.5px var(--np-void);
+  paint-order: stroke fill;
+  filter: drop-shadow(0 3px 0 var(--np-void));
 }
 
 .counterSpin {

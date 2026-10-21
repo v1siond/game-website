@@ -95,6 +95,12 @@ export const PORTAL = {
   MASK_DARK: '#5e1402',
   MASK_LIP: '#e8a23a',
 
+  // the hub's level pads, the time trial clock and the score digits' ramp (read from the remaster's pixels)
+  PAD: '#0155f1',
+  CLOCK: '#fffe0a',
+  HUD_TOP: '#f06a10',
+  HUD_LOW: '#a8b004',
+
   GRID: '#2b2a6b',
 } as const
 

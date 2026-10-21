@@ -54,6 +54,9 @@ const PAD_TONE: Record<Profession, string> = {
   fighter: 'text-[color:var(--np-green)]',
 }
 
+// The pad's number, in the switch's order, painted on the pad as the hub's level pads carry theirs.
+const PAD_NUMBER: Record<Profession, number> = { engineer: 1, drummer: 2, fighter: 3 }
+
 /** The entry phase: 'slam' the moment the profession changes, then on through the timeline to 'off'. */
 function useEntry(profession: Profession) {
   const reduced = useReducedMotion()
@@ -117,8 +120,11 @@ function LevelButton({ option, warp }: { option: ProfessionOption; warp: Warp })
         <svg viewBox="0 0 120 40" className="h-full w-full" focusable="false">
           <ellipse cx="60" cy="26" rx="58" ry="13" fill={PORTAL.BRASS_DARK} />
           <g className={room.padTop}>
-            <ellipse cx="60" cy="20" rx="54" ry="12" fill={selected ? PORTAL.GOLD : PORTAL.PLATE_LIT} stroke={PORTAL.VOID} strokeWidth="2" />
+            <ellipse cx="60" cy="20" rx="54" ry="12" fill={PORTAL.PAD} stroke={selected ? PORTAL.GOLD : PORTAL.VOID} strokeWidth={selected ? 3 : 2} />
             <ellipse cx="60" cy="18" rx="36" ry="7" fill="none" stroke={PORTAL.WHITE} strokeWidth="1.5" opacity="0.5" />
+            <text x="60" y="25" textAnchor="middle" fontFamily="'Arial Black', system-ui, sans-serif" fontSize="15" fontStyle="italic" fontWeight="900" fill={PORTAL.WHITE}>
+              {PAD_NUMBER[id]}
+            </text>
           </g>
         </svg>
       </span>

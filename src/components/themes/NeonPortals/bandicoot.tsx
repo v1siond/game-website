@@ -310,10 +310,10 @@ function Head({ profession }: { profession: Profession }) {
       <ellipse cx="38.6" cy="29.6" rx="1.4" ry="0.8" fill={PORTAL.WHITE} opacity="0.7" />
 
       <g className={sprite.grin}>
-        <path d="M28.6 37.6 Q40 47.6 51.4 37.6 Q49.6 45.4 40 46.8 Q30.4 45.4 28.6 37.6 Z" fill={PORTAL.MOUTH} stroke={INK} strokeWidth="0.8" strokeLinejoin="round" />
-        <path d="M30 38.8 Q40 45.6 50 38.8 L49 41.4 Q40 46.6 31 41.4 Z" fill={PORTAL.TOOTH} />
-        <path d="M35 42.6 V44.6 M40 43.6 V45.6 M45 42.6 V44.6" stroke={PORTAL.MUTED} strokeWidth="0.5" />
-        <ellipse cx="40" cy="45.2" rx="3.2" ry="1.2" fill={PORTAL.FRUIT_RED} />
+        <path d="M24.4 36.2 Q40 50 55.6 36.2 Q53.6 47.4 40 49 Q26.4 47.4 24.4 36.2 Z" fill={PORTAL.MOUTH} stroke={INK} strokeWidth="0.9" strokeLinejoin="round" />
+        <path d="M26 37.4 Q40 48 54 37.4 L53 41.4 Q40 49.4 27 41.4 Z" fill={PORTAL.TOOTH} />
+        <path d="M30.6 40.2 V43.6 M35.2 42 V45.6 M40 42.8 V46.4 M44.8 42 V45.6 M49.4 40.2 V43.6" stroke={PORTAL.MUTED} strokeWidth="0.6" />
+        <ellipse cx="40" cy="47.4" rx="3.6" ry="1.2" fill={PORTAL.FRUIT_RED} />
       </g>
 
       {OUTFIT[profession].headwear}
