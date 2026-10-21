@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelArt, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage, LevelArt } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { PROFESSION_SKY, PROFESSION_STAGES, Sky } from './stages'
@@ -24,20 +24,12 @@ import styles from './scenes.module.css'
 
 const STRIP_FRAME = 'h-32 border-y-2 border-[color:var(--sh-black)] bg-[color:var(--sh-black)] sm:h-44'
 
-export function Lane({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} ${STRIP_FRAME}`}
-      hero={
-        <div className="absolute bottom-3 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Lane = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} ${STRIP_FRAME}`,
+  heroAt: 'bottom-3 left-2',
+})
 
 export type SceneItemKind = 'fog' | 'light'
 
@@ -54,20 +46,10 @@ function RimLight() {
   return <div className={`pointer-events-none absolute inset-x-0 -top-0.5 z-10 h-0.5 bg-[color:var(--sh-rim)] ${styles.rimSweep}`} aria-hidden="true" />
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; arrival: string }> = {
-  fog: { Frame: FogVeil, arrival: styles.emerge },
-  light: { Frame: RimLight, arrival: styles.rise },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, arrival } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={arrival}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  fog: { frame: <FogVeil />, arrival: styles.emerge },
+  light: { frame: <RimLight />, arrival: styles.rise },
+})
 
 // The two black rocks framing his corner; each slides out to its side as the scene plays.
 function PartingRocks() {

@@ -1,10 +1,10 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { RainStreaks } from './backdrop'
@@ -26,20 +26,12 @@ import styles from './scenes.module.css'
 // - ContactScene: the profession's closing corner behind a window whose blinds tilt open and let the
 //   light in, then the contact panel arrives.
 
-export function Strip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-28 border-[3px] border-[color:var(--noir-paper)] bg-[color:var(--noir-coal)] sm:h-40`}
-      hero={
-        <div className="absolute bottom-1 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Strip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-28 border-[3px] border-[color:var(--noir-paper)] bg-[color:var(--noir-coal)] sm:h-40`,
+  heroAt: 'bottom-1 left-2',
+})
 
 export type SceneItemKind = 'panel' | 'photo'
 
@@ -51,20 +43,10 @@ function PhotoFrame() {
   return <div className={`pointer-events-none absolute -inset-2 bg-[color:var(--noir-paper)] ${styles.flash}`} aria-hidden="true" />
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
-  panel: { Frame: PanelFrame, body: styles.panelIn },
-  photo: { Frame: PhotoFrame, body: styles.photoIn },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, body } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={body}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  panel: { frame: <PanelFrame />, arrival: styles.panelIn },
+  photo: { frame: <PhotoFrame />, arrival: styles.photoIn },
+})
 
 // The window's slats in the corner's 160 by 100 box, the light between them tilting open.
 const SLATS = [8, 22, 36, 50, 64, 78]

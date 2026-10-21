@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { CORNER_SKY, PROFESSION_STAGES } from './stages'
@@ -24,20 +24,12 @@ import styles from './scenes.module.css'
 
 const STRIP_FRAME = `h-32 overflow-hidden sm:h-44 ${world.frame}`
 
-export function Lane({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} ${STRIP_FRAME}`}
-      hero={
-        <div className="absolute bottom-3 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Lane = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} ${STRIP_FRAME}`,
+  heroAt: 'bottom-3 left-2',
+})
 
 export type SceneItemKind = 'dialogue' | 'menu'
 
@@ -49,20 +41,10 @@ function DialogueCursor() {
   )
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { frame: ReactNode; arrival: string }> = {
+export const SceneItem = arrivalItem<SceneItemKind>({
   dialogue: { frame: <DialogueCursor />, arrival: styles.unfold },
   menu: { frame: null, arrival: styles.snapIn },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { frame, arrival } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={frame} arrival={arrival}>
-      {children}
-    </SceneEntry>
-  )
-}
+})
 
 export function ContactScene({ profession }: { profession: Profession }) {
   const { Corner } = PROFESSION_STAGES[profession]

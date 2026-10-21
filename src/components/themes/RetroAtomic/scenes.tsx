@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { PROFESSION_STAGES } from './stages'
@@ -20,20 +20,12 @@ import styles from './scenes.module.css'
 //   job or record line feeds out of a terminal slot, a project or band powers on like a tube screen.
 // - ContactScene: the round hatch turns and rolls aside to the profession's corner, then the panel.
 
-export function Lane({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-32 border-y-2 border-atomic-steel-edge bg-atomic-bunker sm:h-44`}
-      hero={
-        <div className="absolute bottom-3 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Lane = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-32 border-y-2 border-atomic-steel-edge bg-atomic-bunker sm:h-44`,
+  heroAt: 'bottom-3 left-2',
+})
 
 export type SceneItemKind = 'file' | 'screen'
 
@@ -50,20 +42,10 @@ function Phosphor() {
   )
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; arrival: string }> = {
-  file: { Frame: TerminalSlot, arrival: styles.fileOut },
-  screen: { Frame: Phosphor, arrival: styles.screenIn },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, arrival } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={arrival}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  file: { frame: <TerminalSlot />, arrival: styles.fileOut },
+  screen: { frame: <Phosphor />, arrival: styles.screenIn },
+})
 
 // The round shelter hatch over his corner: the cog wheel turns, then the whole door rolls aside.
 const COG_TEETH = Array.from({ length: 10 }, (_, i) => i * 36)

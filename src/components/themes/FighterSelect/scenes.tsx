@@ -1,10 +1,10 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { CabinetPanel } from './frames'
@@ -24,20 +24,12 @@ import styles from './scenes.module.css'
 // - ContactScene: the final round, the two health bars sweep in from the corners over his closing
 //   corner, then the contact panel arrives.
 
-export function Strip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-28 border-4 border-[color:var(--fs-gold)] bg-[color:var(--fs-night)] sm:h-40`}
-      hero={
-        <div className="absolute bottom-1 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Strip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-28 border-4 border-[color:var(--fs-gold)] bg-[color:var(--fs-night)] sm:h-40`,
+  heroAt: 'bottom-1 left-2',
+})
 
 export type SceneItemKind = 'challenger' | 'portrait'
 
@@ -58,20 +50,10 @@ function CursorFrame() {
   )
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
-  challenger: { Frame: SlashFrame, body: styles.challenger },
-  portrait: { Frame: CursorFrame, body: styles.portrait },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, body } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={body}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  challenger: { frame: <SlashFrame />, arrival: styles.challenger },
+  portrait: { frame: <CursorFrame />, arrival: styles.portrait },
+})
 
 // The two health bars of the final round, sweeping in from the corners above his corner.
 function FinalRoundHud() {

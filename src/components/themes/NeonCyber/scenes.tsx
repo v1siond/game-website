@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip as SharedLevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { PROFESSION_STAGES } from './professions'
@@ -18,46 +18,27 @@ import styles from './scenes.module.css'
 // - SceneItem: one entry arriving as part of the level, a terminal that boots or a billboard that lights.
 // - ContactScene: the profession's closing corner, then the contact panel powers on.
 
-export function LevelStrip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <SharedLevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-28 border-y border-pink-500/60 bg-[color:var(--neon-void)] sm:h-40`}
-      hero={
-        <div className="absolute bottom-1 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const LevelStrip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-28 border-y border-pink-500/60 bg-[color:var(--neon-void)] sm:h-40`,
+  heroAt: 'bottom-1 left-2',
+})
 
 export type SceneItemKind = 'terminal' | 'billboard'
 
-const ITEM_LOOK: Record<SceneItemKind, { frame: string; body: string }> = {
-  terminal: {
-    frame: 'border border-cyan-400',
-    body: styles.bootScreen,
-  },
+// The frame lights up around the entry in its kind's colour.
+function FrameOn({ className }: { className: string }) {
+  return <div className={`pointer-events-none absolute -inset-1 ${styles.frameOn} ${className}`} aria-hidden="true" />
+}
+
+export const SceneItem = arrivalItem<SceneItemKind>({
+  terminal: { frame: <FrameOn className="border border-cyan-400" />, arrival: styles.bootScreen },
   billboard: {
-    frame: 'border-2 border-pink-500 shadow-[0_0_14px_color-mix(in_srgb,var(--neon-magenta)_50%,transparent)]',
-    body: styles.billboardCopy,
+    frame: <FrameOn className="border-2 border-pink-500 shadow-[0_0_14px_color-mix(in_srgb,var(--neon-magenta)_50%,transparent)]" />,
+    arrival: styles.billboardCopy,
   },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const look = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry
-      frame={<div className={`pointer-events-none absolute -inset-1 ${styles.frameOn} ${look.frame}`} aria-hidden="true" />}
-      arrival={look.body}
-    >
-      {children}
-    </SceneEntry>
-  )
-}
+})
 
 export function ContactScene({ profession }: { profession: Profession }) {
   const { Corner } = PROFESSION_STAGES[profession]

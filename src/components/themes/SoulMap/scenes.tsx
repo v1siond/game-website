@@ -1,10 +1,10 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, atClass, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage, atClass } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { RestPoint } from './art'
@@ -24,20 +24,12 @@ import styles from './scenes.module.css'
 // - ContactScene: the last rest point. The three rooms of the map above it light one by one, its lantern
 //   comes on behind the profession's corner, then the contact panel arrives.
 
-export function Strip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-28 sm:h-40 ${world.room}`}
-      hero={
-        <div className="absolute bottom-1 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Strip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-28 sm:h-40 ${world.room}`,
+  heroAt: 'bottom-1 left-2',
+})
 
 export type SceneItemKind = 'room' | 'find'
 
@@ -54,20 +46,10 @@ function FindFrame() {
   )
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
-  room: { Frame: RoomFrame, body: styles.enterRoom },
-  find: { Frame: FindFrame, body: styles.alongPath },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, body } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={body}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  room: { frame: <RoomFrame />, arrival: styles.enterRoom },
+  find: { frame: <FindFrame />, arrival: styles.alongPath },
+})
 
 const CONTACT_HEADING = headingId('soul', 'Contact')
 

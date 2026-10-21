@@ -1,10 +1,10 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { IrisRing } from './art'
@@ -23,20 +23,12 @@ import styles from './scenes.module.css'
 //   its paste board like a show poster.
 // - ContactScene: the profession's closing corner closing on an iris out, then the contact panel arrives.
 
-export function Strip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} ${styles.frame} h-28 sm:h-40`}
-      hero={
-        <div className={`absolute bottom-1 left-2 ${styles.bob}`}>
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Strip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} ${styles.frame} h-28 sm:h-40`,
+  heroAt: `bottom-1 left-2 ${styles.bob}`,
+})
 
 export type SceneItemKind = 'bounce' | 'unroll'
 
@@ -48,20 +40,10 @@ function PasteBoard() {
   return <div className={`pointer-events-none absolute inset-x-2 -top-2 z-10 h-3 rounded-full bg-[var(--hose-ink)] ${styles.roller}`} aria-hidden="true" />
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
-  bounce: { Frame: LandShadow, body: styles.bounceIn },
-  unroll: { Frame: PasteBoard, body: styles.unroll },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, body } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={body}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  bounce: { frame: <LandShadow />, arrival: styles.bounceIn },
+  unroll: { frame: <PasteBoard />, arrival: styles.unroll },
+})
 
 const CONTACT_HEADING = headingId('hose', 'Contact')
 

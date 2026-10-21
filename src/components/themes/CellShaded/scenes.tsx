@@ -1,10 +1,10 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { ImpactBurst, SpeedLines } from './backdrop'
@@ -24,20 +24,12 @@ import styles from './scenes.module.css'
 // - ContactScene: the profession's closing corner, an impact burst blowing open behind him, then the
 //   contact panel arrives.
 
-export function Strip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-28 border-[5px] border-[#141414] bg-[#3fc4e8] sm:h-40 ${world.drop}`}
-      hero={
-        <div className="absolute bottom-1 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Strip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-28 border-[5px] border-[#141414] bg-[#3fc4e8] sm:h-40 ${world.drop}`,
+  heroAt: 'bottom-1 left-2',
+})
 
 export type SceneItemKind = 'slam' | 'swipe'
 
@@ -49,20 +41,10 @@ function SwipeFrame() {
   return <SpeedLines className={`pointer-events-none absolute -left-6 top-1/4 h-1/2 w-12 ${styles.swipeLines}`} color={CEL.ink} />
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
-  slam: { Frame: SlamFrame, body: styles.slam },
-  swipe: { Frame: SwipeFrame, body: styles.swipe },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, body } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={body}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  slam: { frame: <SlamFrame />, arrival: styles.slam },
+  swipe: { frame: <SwipeFrame />, arrival: styles.swipe },
+})
 
 const CONTACT_HEADING = headingId('cel', 'Contact')
 

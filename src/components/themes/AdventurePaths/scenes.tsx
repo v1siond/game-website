@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { PROFESSION_STAGES } from './stages'
@@ -22,20 +22,12 @@ import styles from './scenes.module.css'
 // - ContactScene: the temple door's compass turns and the door sinks into the floor, showing the
 //   profession's corner, then the panel.
 
-export function Lane({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-36 rounded-sm border-2 border-[color:var(--ap-edge)] bg-[color:var(--ap-night)] sm:h-48`}
-      hero={
-        <div className="absolute bottom-3 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Lane = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-36 rounded-sm border-2 border-[color:var(--ap-edge)] bg-[color:var(--ap-night)] sm:h-48`,
+  heroAt: 'bottom-3 left-2',
+})
 
 export type SceneItemKind = 'stop' | 'find'
 
@@ -57,20 +49,10 @@ function Glint() {
   )
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; arrival: string }> = {
-  stop: { Frame: RouteStop, arrival: styles.walkIn },
-  find: { Frame: Glint, arrival: styles.unearth },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, arrival } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={arrival}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  stop: { frame: <RouteStop />, arrival: styles.walkIn },
+  find: { frame: <Glint />, arrival: styles.unearth },
+})
 
 // The temple door over his corner: a carved stone slab whose compass turns, then the slab sinks.
 function TempleDoor() {

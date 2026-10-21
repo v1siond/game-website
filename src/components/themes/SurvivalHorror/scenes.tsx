@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { PROFESSION_STAGES } from './stages'
@@ -24,20 +24,12 @@ import styles from './scenes.module.css'
 // - ContactScene: the save room at the end of the page; its door swings open on the profession's
 //   corner under the lamp, then the contact panel arrives.
 
-export function Strip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-28 border-4 border-[color:var(--sh-wood)] bg-[color:var(--sh-void)] sm:h-40`}
-      hero={
-        <div className="absolute bottom-1 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Strip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-28 border-4 border-[color:var(--sh-wood)] bg-[color:var(--sh-void)] sm:h-40`,
+  heroAt: 'bottom-1 left-2',
+})
 
 export type SceneItemKind = 'document' | 'item'
 
@@ -59,20 +51,10 @@ function ItemBoxFrame() {
   )
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
-  document: { Frame: SweepFrame, body: styles.document },
-  item: { Frame: ItemBoxFrame, body: styles.item },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, body } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={body}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  document: { frame: <SweepFrame />, arrival: styles.document },
+  item: { frame: <ItemBoxFrame />, arrival: styles.item },
+})
 
 const CONTACT_HEADING = sectionHeadingId('Contact')
 

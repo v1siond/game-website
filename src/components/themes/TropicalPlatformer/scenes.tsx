@@ -1,9 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { PROFESSION_STAGES } from './stages'
@@ -22,20 +22,12 @@ import world from './world.module.css'
 //   job or record line bursts out of a crate, a project or band swings in on a vine.
 // - ContactScene: the sun comes up and the palm fronds part to the profession's corner, then the panel.
 
-export function Lane({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-32 rounded-lg border-4 border-[var(--tp-wood-dark)] sm:h-44`}
-      hero={
-        <div className="absolute bottom-3 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Lane = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-32 rounded-lg border-4 border-[var(--tp-wood-dark)] sm:h-44`,
+  heroAt: 'bottom-3 left-2',
+})
 
 export type SceneItemKind = 'crate' | 'vine'
 
@@ -54,20 +46,10 @@ function Vine() {
   return <div className={`pointer-events-none absolute -top-6 left-1/2 h-6 w-1.5 rounded bg-[var(--tp-leaf-light)] ${styles.vine}`} aria-hidden="true" />
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; arrival: string }> = {
-  crate: { Frame: CrateHalves, arrival: styles.popUp },
-  vine: { Frame: Vine, arrival: styles.swingIn },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, arrival } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={arrival}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  crate: { frame: <CrateHalves />, arrival: styles.popUp },
+  vine: { frame: <Vine />, arrival: styles.swingIn },
+})
 
 // A broad palm frond hanging over his corner from the stalk at its top corner; `flip` mirrors it to the
 // right side.

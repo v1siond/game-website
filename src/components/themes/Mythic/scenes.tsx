@@ -1,10 +1,10 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { ContactStage, LevelStrip, SceneEntry, type LevelZone } from '@/components/scroll/stage'
+import { ContactStage } from '@/components/scroll/stage'
+import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import { GreekKey } from './art'
@@ -28,20 +28,12 @@ import styles from './scenes.module.css'
 
 const FRAME = 'border-[3px] border-[color:var(--myth-marble)] bg-[var(--myth-sky)]'
 
-export function Strip({ profession, zone }: { profession: Profession; zone: LevelZone }) {
-  return (
-    <LevelStrip
-      stage={PROFESSION_STAGES[profession]}
-      zone={zone}
-      className={`${styles.tempo} h-28 sm:h-40 ${FRAME}`}
-      hero={
-        <div className="absolute bottom-1 left-2">
-          <HeroCharacter profession={profession} className={scene.hero} />
-        </div>
-      }
-    />
-  )
-}
+export const Strip = worldLane({
+  stages: PROFESSION_STAGES,
+  Hero: HeroCharacter,
+  className: `${styles.tempo} h-28 sm:h-40 ${FRAME}`,
+  heroAt: 'bottom-1 left-2',
+})
 
 export type SceneItemKind = 'stele' | 'frieze'
 
@@ -57,20 +49,10 @@ function FriezeFrame() {
   return <div className={`pointer-events-none absolute -inset-2 bg-[var(--myth-terracotta)] ${styles.clayBand}`} aria-hidden="true" />
 }
 
-const ITEM_LOOK: Record<SceneItemKind, { Frame: () => ReactNode; body: string }> = {
-  stele: { Frame: SteleFrame, body: styles.steleIn },
-  frieze: { Frame: FriezeFrame, body: styles.friezeIn },
-}
-
-export function SceneItem({ kind, children }: { kind: SceneItemKind; children: ReactNode }) {
-  const { Frame, body } = ITEM_LOOK[kind]
-
-  return (
-    <SceneEntry frame={<Frame />} arrival={body}>
-      {children}
-    </SceneEntry>
-  )
-}
+export const SceneItem = arrivalItem<SceneItemKind>({
+  stele: { frame: <SteleFrame />, arrival: styles.steleIn },
+  frieze: { frame: <FriezeFrame />, arrival: styles.friezeIn },
+})
 
 // The temple front over the corner: the pediment, and the two bronze door leaves that swing open.
 function TempleDoors() {
