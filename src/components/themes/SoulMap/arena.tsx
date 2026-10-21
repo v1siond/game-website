@@ -97,7 +97,7 @@ function BossBar({ hp }: { hp: number }) {
   const level = { '--fill': hp / PARTNER_HP } as CSSProperties
   return (
     <div className="absolute inset-x-4 bottom-3 sm:inset-x-10">
-      <div className="flex items-baseline justify-between">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-2">
         <p className={`${CARVED} text-sm uppercase tracking-[0.2em] text-[color:var(--soul-text)]`}>{words.partner}</p>
         <p className="text-sm tabular-nums text-[color:var(--soul-text)]">
           {hp}/{PARTNER_HP}

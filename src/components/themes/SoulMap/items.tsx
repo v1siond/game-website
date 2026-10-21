@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
@@ -64,8 +65,10 @@ function ItemCard({ project, years, links }: ProjectSlot) {
     <article ref={ref} className={`${souls.item} ${triggered ? souls.itemOn : ''} ${picked ? souls.itemPicked : ''}`}>
       <Glint />
       <div className={`${souls.itemCard} ${ashen.panel} -mt-3 p-5`}>
-        <div className="flex items-baseline justify-between gap-2">
-          <h3 className={CARD_TITLE}>{project.name}</h3>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h3 className={`min-w-0 ${CARD_TITLE}`}>
+            <SlashBreaks text={project.name} />
+          </h3>
           {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
         </div>
         <p className="mt-1 text-sm text-[color:var(--soul-glow)]">{project.role}</p>

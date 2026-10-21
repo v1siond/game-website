@@ -3,6 +3,7 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { jobYears } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Job } from '@/lib/cv/content'
@@ -52,7 +53,9 @@ function JobStop({ job }: { job: Job }) {
     <article ref={ref} className={`${souls.stop} ${triggered ? souls.stopOn : ''}`}>
       <div className={`${souls.areaName} mb-3 flex items-center gap-3`}>
         <span className="h-px flex-1 bg-[color:var(--soul-glow-deep)]" aria-hidden="true" />
-        <p className={`${CARVED} text-center text-base uppercase tracking-[0.28em] text-[color:var(--soul-text)]`}>{job.company}</p>
+        <p className={`${CARVED} min-w-0 text-center text-base uppercase tracking-[0.28em] text-[color:var(--soul-text)]`}>
+          <SlashBreaks text={job.company} />
+        </p>
         <span className="h-px flex-1 bg-[color:var(--soul-glow-deep)]" aria-hidden="true" />
       </div>
       <div className={`${souls.stopCard} ${ashen.panel} p-5`}>

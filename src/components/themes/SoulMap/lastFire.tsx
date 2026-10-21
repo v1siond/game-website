@@ -73,7 +73,7 @@ export function LastFire({ profession }: { profession: Profession }) {
                   <li key={action.id} className={`${souls.slab} p-4`}>
                     <a
                       {...action.linkProps}
-                      className={`${souls.inscription} ${CARVED} block min-h-[44px] break-words text-lg text-[color:var(--soul-message)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--soul-glow)]`}
+                      className={`${souls.inscription} ${CARVED} block min-h-[44px] text-lg [overflow-wrap:anywhere] text-[color:var(--soul-message)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--soul-glow)]`}
                     >
                       <span className="block text-sm uppercase tracking-[0.24em] text-[color:var(--soul-text-soft)]">{action.label}</span>
                       {action.value}

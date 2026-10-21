@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { newTabName } from '@/components/cv/sectionText'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData } from '@/lib/cv/content'
 import { useRun } from './run'
@@ -43,7 +44,7 @@ function Slab({ venture }: { venture: Venture }) {
           <span className="grayscale" aria-hidden="true">
             {venture.icon}{' '}
           </span>
-          {venture.name}
+          <SlashBreaks text={venture.name} />
         </h3>
         <p className="mt-1 text-sm italic text-[color:var(--soul-message)]">{venture.tagline}</p>
       </div>

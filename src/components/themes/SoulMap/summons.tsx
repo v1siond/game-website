@@ -63,7 +63,7 @@ function SummonCard({ slot: { band, years, linkProps }, phantom, onSummon }: Sum
         )}
       </div>
       <div className="p-5">
-        <div className="flex items-baseline justify-between gap-2">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className={CARD_TITLE}>{band.name}</h3>
           {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
         </div>

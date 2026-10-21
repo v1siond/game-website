@@ -208,7 +208,7 @@ export function ShrineHero() {
             disabled={!ready}
             aria-label={words.roll}
             title={words.roll}
-            className={`absolute bottom-[9%] left-[33%] h-[27%] w-[9%] ${souls.target}`}
+            className={`absolute bottom-[9%] left-[33%] h-[27%] w-[9%] min-w-11 ${souls.target}`}
           >
             <Knight key={ready ? `step-${script.key}` : pose} gear="knight" pose={pose} className="h-full w-full" />
           </button>
