@@ -1,10 +1,81 @@
 'use client'
 
-import { memo, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
 import { REALM } from './palette'
 import { InfernalGolemSVG } from './character'
 
 // The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
+
+// The golem's rocks fly from the crater to their place. Each one lands lit (the brightness it starts at) and
+// cools to its stone colour; the light is a pre-drawn white copy of its outline whose opacity fades out, so
+// only opacity and transform animate.
+interface RockPart {
+  keyframes: string
+  timing: string
+  brightness: number
+  startHidden: boolean
+  outlineFill: string
+  outline: (fill: string) => ReactElement
+  detail?: ReactNode
+}
+
+const ROCK_PARTS: RockPart[] = [
+  {
+    keyframes: 'assembleHead', timing: '1.8s ease-out', brightness: 1.5, startHidden: false, outlineFill: REALM.stone22,
+    outline: (fill) => <ellipse cx="80" cy="25" rx="22" ry="18" fill={fill} />,
+    detail: (
+      <>
+        <ellipse cx="80" cy="24" rx="18" ry="14" fill={REALM.stone28} />
+        <ellipse cx="70" cy="24" rx="4" ry="3" fill={REALM.chaosFelMid} />
+        <ellipse cx="90" cy="24" rx="4" ry="3" fill={REALM.chaosFelMid} />
+      </>
+    ),
+  },
+  {
+    keyframes: 'assembleLeftShoulder', timing: '1.5s ease-out 0.2s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
+    outline: (fill) => <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill={fill} />,
+    detail: <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill={REALM.stone28} />,
+  },
+  {
+    keyframes: 'assembleRightShoulder', timing: '1.6s ease-out 0.15s', brightness: 1.4, startHidden: true, outlineFill: REALM.stone22,
+    outline: (fill) => <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill={fill} />,
+    detail: <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill={REALM.stone28} />,
+  },
+  {
+    keyframes: 'assembleTorso', timing: '1.4s ease-out 0.3s', brightness: 1.6, startHidden: true, outlineFill: REALM.stone15b,
+    outline: (fill) => <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill={fill} />,
+    detail: (
+      <>
+        <polygon points="60,58 58,88 62,110 98,110 102,88 100,58" fill={REALM.stone22} />
+        <path d="M80,65 L75,85 L82,105" stroke={REALM.chaosFelMid} strokeWidth="2" fill="none" />
+      </>
+    ),
+  },
+  {
+    keyframes: 'assembleLeftArm', timing: '1.7s ease-out 0.4s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
+    outline: (fill) => <polygon points="15,72 8,100 18,115 30,108 28,78" fill={fill} />,
+  },
+  {
+    keyframes: 'assembleRightArm', timing: '1.65s ease-out 0.35s', brightness: 1.3, startHidden: true, outlineFill: REALM.stone22,
+    outline: (fill) => <polygon points="145,72 152,100 142,115 130,108 132,78" fill={fill} />,
+  },
+  {
+    keyframes: 'assembleLeftLeg', timing: '1.3s ease-out 0.5s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
+    outline: (fill) => <polygon points="50,120 42,160 55,185 68,175 62,125" fill={fill} />,
+  },
+  {
+    keyframes: 'assembleRightLeg', timing: '1.35s ease-out 0.45s', brightness: 1.2, startHidden: true, outlineFill: REALM.stone22,
+    outline: (fill) => <polygon points="110,120 118,160 105,185 92,175 98,125" fill={fill} />,
+  },
+]
+
+// The stones sit near 22% luminance (c). A white layer at alpha a lifts c to c + a(1 - c), which equals the
+// c * brightness the parts used to start at when a = c(brightness - 1) / (1 - c).
+const STONE_LUMINANCE = 0.22
+
+function flashOverlayAlpha(brightness: number): number {
+  return (STONE_LUMINANCE * (brightness - 1)) / (1 - STONE_LUMINANCE)
+}
 
 export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
   const lightningActive = false
@@ -1030,23 +1101,23 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             >
               {/* Meteor core - scales up during animation */}
               <div style={{
-                width: '10px',
-                height: '10px',
+                width: '40px',
+                height: '40px',
                 borderRadius: '50%',
                 background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosFelMid} 85%, var(--realm-stone8c) 100%)`,
-                boxShadow: `0 0 15px ${REALM.chaosFelBright}, 0 0 30px ${REALM.chaosFireMid}`,
+                boxShadow: `0 0 35px ${REALM.chaosFelBright}, 0 0 70px ${REALM.chaosFireMid}`,
+                transformOrigin: '0 0',
                 animation: 'meteorGrow 1.5s ease-in forwards',
               }} />
               {/* Meteor trail - diagonal, grows with meteor */}
               <div style={{
                 position: 'absolute',
-                top: '-40px',
-                left: '50%',
-                width: '4px',
-                height: '50px',
+                top: '-160px',
+                left: '0px',
+                width: '14px',
+                height: '120px',
                 background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}40 30%, ${REALM.chaosFelMid}70 60%, ${REALM.chaosFelBright}95 85%, ${REALM.chaosFireCore} 100%)`,
-                filter: 'blur(3px)',
-                transform: 'translateX(-50%) rotate(-25deg)',
+                filter: 'blur(5px)',
                 transformOrigin: 'bottom center',
                 animation: 'meteorTrailGrow 1.5s ease-in forwards',
               }} />
@@ -1133,45 +1204,15 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                   transition: 'opacity 0.5s ease',
                 }}
               >
-                {/* HEAD rock */}
-                <g style={{ animation: 'assembleHead 1.8s ease-out forwards' }}>
-                  <ellipse cx="80" cy="25" rx="22" ry="18" fill={REALM.stone22} />
-                  <ellipse cx="80" cy="24" rx="18" ry="14" fill={REALM.stone28} />
-                  <ellipse cx="70" cy="24" rx="4" ry="3" fill={REALM.chaosFelMid} />
-                  <ellipse cx="90" cy="24" rx="4" ry="3" fill={REALM.chaosFelMid} />
-                </g>
-                {/* LEFT SHOULDER */}
-                <g style={{ animation: 'assembleLeftShoulder 1.5s ease-out 0.2s forwards', opacity: 0 }}>
-                  <polygon points="20,50 15,65 30,72 45,68 42,52 30,45" fill={REALM.stone22} />
-                  <polygon points="25,52 22,62 32,66 40,63 38,55 30,50" fill={REALM.stone28} />
-                </g>
-                {/* RIGHT SHOULDER */}
-                <g style={{ animation: 'assembleRightShoulder 1.6s ease-out 0.15s forwards', opacity: 0 }}>
-                  <polygon points="140,50 145,65 130,72 115,68 118,52 130,45" fill={REALM.stone22} />
-                  <polygon points="135,52 138,62 128,66 120,63 122,55 130,50" fill={REALM.stone28} />
-                </g>
-                {/* TORSO */}
-                <g style={{ animation: 'assembleTorso 1.4s ease-out 0.3s forwards', opacity: 0 }}>
-                  <polygon points="55,55 50,90 55,115 105,115 110,90 105,55" fill={REALM.stone15b} />
-                  <polygon points="60,58 58,88 62,110 98,110 102,88 100,58" fill={REALM.stone22} />
-                  <path d="M80,65 L75,85 L82,105" stroke={REALM.chaosFelMid} strokeWidth="2" fill="none" />
-                </g>
-                {/* LEFT ARM */}
-                <g style={{ animation: 'assembleLeftArm 1.7s ease-out 0.4s forwards', opacity: 0 }}>
-                  <polygon points="15,72 8,100 18,115 30,108 28,78" fill={REALM.stone22} />
-                </g>
-                {/* RIGHT ARM */}
-                <g style={{ animation: 'assembleRightArm 1.65s ease-out 0.35s forwards', opacity: 0 }}>
-                  <polygon points="145,72 152,100 142,115 130,108 132,78" fill={REALM.stone22} />
-                </g>
-                {/* LEFT LEG */}
-                <g style={{ animation: 'assembleLeftLeg 1.3s ease-out 0.5s forwards', opacity: 0 }}>
-                  <polygon points="50,120 42,160 55,185 68,175 62,125" fill={REALM.stone22} />
-                </g>
-                {/* RIGHT LEG */}
-                <g style={{ animation: 'assembleRightLeg 1.35s ease-out 0.45s forwards', opacity: 0 }}>
-                  <polygon points="110,120 118,160 105,185 92,175 98,125" fill={REALM.stone22} />
-                </g>
+                {ROCK_PARTS.map((part) => (
+                  <g key={part.keyframes} style={{ animation: `${part.keyframes} ${part.timing} forwards`, opacity: part.startHidden ? 0 : undefined }}>
+                    {part.outline(part.outlineFill)}
+                    {part.detail}
+                    <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `rockFlash ${part.timing} both` } as CSSProperties}>
+                      {part.outline(REALM.ash100)}
+                    </g>
+                  </g>
+                ))}
               </svg>
             </>
           )}
@@ -1505,29 +1546,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             opacity: 0.9;
           }
         }
-        /* Explosion flash on impact */
-        @keyframes explosionFlash {
-          0% {
-            transform: scale(0.2);
-            opacity: 1;
-            filter: brightness(2.5);
-          }
-          20% {
-            transform: scale(1.3);
-            opacity: 1;
-            filter: brightness(2);
-          }
-          50% {
-            transform: scale(1.6);
-            opacity: 0.7;
-            filter: brightness(1.3);
-          }
-          100% {
-            transform: scale(2);
-            opacity: 0;
-            filter: brightness(0.3);
-          }
-        }
         /* Shockwave ring expanding */
         @keyframes shockwaveExpand {
           0% {
@@ -1602,16 +1620,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(-60px, 150px) rotate(-30deg) scale(0.6);
             opacity: 0.3;
-            filter: brightness(1.5);
           }
-          20% {
-            opacity: 1;
-            filter: brightness(1.3);
-          }
+          20% { opacity: 1; }
           100% {
             transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* LEFT SHOULDER - starts bottom left of crater */
@@ -1619,13 +1632,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(-40px, 130px) rotate(20deg) scale(0.5);
             opacity: 0;
-            filter: brightness(1.4);
           }
           15% { opacity: 1; }
           100% {
             transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* RIGHT SHOULDER - starts bottom right of crater */
@@ -1633,13 +1644,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(40px, 130px) rotate(-25deg) scale(0.5);
             opacity: 0;
-            filter: brightness(1.4);
           }
           15% { opacity: 1; }
           100% {
             transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* TORSO - starts at crater center, rises up */
@@ -1647,13 +1656,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(0, 100px) scale(0.4);
             opacity: 0;
-            filter: brightness(1.6);
           }
           20% { opacity: 1; }
           100% {
             transform: translate(0, 0) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* LEFT ARM - starts far left */
@@ -1661,13 +1668,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(-50px, 60px) rotate(45deg) scale(0.4);
             opacity: 0;
-            filter: brightness(1.3);
           }
           20% { opacity: 1; }
           100% {
             transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* RIGHT ARM - starts far right */
@@ -1675,13 +1680,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(50px, 60px) rotate(-45deg) scale(0.4);
             opacity: 0;
-            filter: brightness(1.3);
           }
           20% { opacity: 1; }
           100% {
             transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* LEFT LEG - starts left of crater */
@@ -1689,13 +1692,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(-30px, 70px) rotate(15deg) scale(0.5);
             opacity: 0;
-            filter: brightness(1.2);
           }
           25% { opacity: 1; }
           100% {
             transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* RIGHT LEG - starts right of crater */
@@ -1703,13 +1704,11 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           0% {
             transform: translate(30px, 70px) rotate(-15deg) scale(0.5);
             opacity: 0;
-            filter: brightness(1.2);
           }
           25% { opacity: 1; }
           100% {
             transform: translate(0, 0) rotate(0deg) scale(1);
             opacity: 1;
-            filter: brightness(1);
           }
         }
         /* Glow during assembly */
@@ -1718,16 +1717,15 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           50% { opacity: 0.6; transform: translateY(30px); }
           100% { opacity: 0; transform: translateY(-20px); }
         }
-        /* Rock parts glow during assembly */
-        @keyframes rockGlowPulse {
-          0% { opacity: 0.2; filter: brightness(2); }
-          50% { opacity: 0.8; filter: brightness(1.5); }
-          100% { opacity: 1; filter: brightness(1); }
+        /* The lit layer over each assembling rock fades as the rock cools */
+        @keyframes rockFlash {
+          from { opacity: var(--rock-flash); }
+          to { opacity: 0; }
         }
         /* Detailed golem fades in on top of assembled rocks */
         @keyframes golemFadeIn {
-          0% { opacity: 0; filter: brightness(1.3); }
-          100% { opacity: 1; filter: brightness(1); }
+          0% { opacity: 0; }
+          100% { opacity: 1; }
         }
         /* Meteor falls diagonally from sky for golem spawn */
         @keyframes golemMeteorFall {
@@ -1743,41 +1741,19 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             opacity: 1;
           }
         }
-        /* Meteor grows as it approaches (perspective effect) */
+        /* Meteor grows as it approaches (perspective effect): the 40px core and its glow scale from the top left
+           corner, 8px, then 20px, then 40px across */
         @keyframes meteorGrow {
-          0% {
-            width: 8px;
-            height: 8px;
-            box-shadow: 0 0 8px ${REALM.chaosFelBright}, 0 0 15px ${REALM.chaosFireMid};
-          }
-          50% {
-            width: 20px;
-            height: 20px;
-            box-shadow: 0 0 20px ${REALM.chaosFelBright}, 0 0 40px ${REALM.chaosFireMid};
-          }
-          100% {
-            width: 40px;
-            height: 40px;
-            box-shadow: 0 0 35px ${REALM.chaosFelBright}, 0 0 70px ${REALM.chaosFireMid};
-          }
+          0% { transform: scale(0.2); }
+          50% { transform: scale(0.5); }
+          100% { transform: scale(1); }
         }
-        /* Trail grows with meteor */
+        /* Trail grows with meteor: the 14 by 120 trail scales about its bottom centre from 3 by 30, through 8 by
+           70, and its bottom follows the core's centre (half the core's width across, its height down from -40px) */
         @keyframes meteorTrailGrow {
-          0% {
-            width: 3px;
-            height: 30px;
-            filter: blur(2px);
-          }
-          50% {
-            width: 8px;
-            height: 70px;
-            filter: blur(3px);
-          }
-          100% {
-            width: 14px;
-            height: 120px;
-            filter: blur(5px);
-          }
+          0% { transform: translate(-3px, 30px) rotate(-25deg) scale(0.2143, 0.25); }
+          50% { transform: translate(3px, 70px) rotate(-25deg) scale(0.5714, 0.5833); }
+          100% { transform: translate(13px, 120px) rotate(-25deg) scale(1, 1); }
         }
         /* Explosion flash on meteor impact */
         @keyframes explosionFlash {
@@ -2002,18 +1978,14 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         }
         /* Eye glow intensity variation */
         @keyframes eyeGlow {
-          0%, 100% {
-            opacity: 0.9;
-            filter: brightness(1);
-          }
-          25% {
-            opacity: 1;
-            filter: brightness(1.3);
-          }
-          75% {
-            opacity: 0.7;
-            filter: brightness(0.8);
-          }
+          0%, 100% { opacity: 0.9; }
+          25% { opacity: 1; }
+          75% { opacity: 0.7; }
+        }
+        /* The brighter fel layer over each eye flares with the glow */
+        @keyframes eyeFlare {
+          0%, 75%, 100% { opacity: 0; }
+          25% { opacity: 0.7; }
         }
         /* Wind gusts blowing across battlefield */
         @keyframes rainWindGust {

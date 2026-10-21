@@ -45,23 +45,32 @@ export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOp
         background: selected
           ? `linear-gradient(135deg, ${REALM.metalLight} 0%, ${REALM.metalMid} 50%, ${REALM.metalDark} 100%)`
           : `linear-gradient(135deg, ${REALM.metalDark} 0%, ${REALM.bgDeep} 100%)`,
-        border: `3px solid ${selected ? REALM.chaosFelMid : REALM.metalMid}`,
-        boxShadow: selected
-          ? `0 0 20px ${`${REALM.moss27}80`}, inset 0 1px 2px rgba(255,255,255,0.1)`
-          : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
+        border: `3px solid ${REALM.metalMid}`,
+        boxShadow: selected ? 'inset 0 1px 2px rgba(255,255,255,0.1)' : 'inset 0 -2px 4px rgba(0,0,0,0.5)',
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         gap: '0.25rem',
-        transition: 'all 0.3s ease',
         position: 'relative',
         alignSelf: isCentre ? 'flex-start' : 'flex-end',
         marginTop: isCentre ? (isLargeScreen ? '0.5rem' : '0.25rem') : undefined,
         padding: '0.25rem',
       }}
     >
+      {/* The selected rim and its fel glow are drawn once over the border and fade in, so selecting a node
+          animates opacity only */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-[3px]"
+        style={{
+          border: `3px solid ${REALM.chaosFelMid}`,
+          boxShadow: `0 0 20px ${REALM.moss27}80`,
+          opacity: selected ? 1 : 0,
+          transition: 'opacity 0.3s ease',
+        }}
+      />
       {PROFESSION_NODE_ICONS[id](tint)}
       <span
         aria-hidden="true"

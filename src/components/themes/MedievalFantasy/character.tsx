@@ -308,6 +308,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
         {/* Fire glow from deep inside */}
         <ellipse cx="69" cy="36" rx="4" ry="3" fill={REALM.chaosFelDark} opacity="0.8" />
         <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
+        {isIdle && <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelBright} opacity="0" style={{ animation: 'eyeFlare 2s ease-in-out infinite' }} />}
         <ellipse cx="69" cy="34" rx="1.5" ry="1" fill={REALM.chaosFelBright} opacity="0.7" filter={`url(#${glowId})`} />
 
         {/* RIGHT EYE SOCKET - Dark hole with fire from within */}
@@ -319,6 +320,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
         />
         <ellipse cx="91" cy="36" rx="4" ry="3" fill={REALM.chaosFelDark} opacity="0.8" />
         <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
+        {isIdle && <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelBright} opacity="0" style={{ animation: 'eyeFlare 2s ease-in-out infinite' }} />}
         <ellipse cx="91" cy="34" rx="1.5" ry="1" fill={REALM.chaosFelBright} opacity="0.7" filter={`url(#${glowId})`} />
 
         {/* NASAL CAVITY - Dark triangular hole */}

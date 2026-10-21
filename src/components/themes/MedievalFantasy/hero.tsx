@@ -1,10 +1,11 @@
+import type { CSSProperties } from 'react'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { REALM } from './palette'
 
 // Him as the death knight king of the frost zone: the spiked pauldrons, the skull chest plate, the fur trimmed
 // cape and the runeblade held point down. His skin, hair, beard and eyes come from HERO_IDENTITY; the armour,
-// the blade and the frost come from the world's palette. The cape sways on capeWave, declared by the frost
-// zone because the horse's mane and tail use it too.
+// the blade and the frost come from the world's palette. The cape sways on capeWave and the frost breath on
+// mf-drift, both declared by the frost zone because the horse's mane, tail and smoke use them too.
 
 export function FrostHero() {
   return (
@@ -265,9 +266,8 @@ export function FrostHero() {
         <path d="M116,72 Q110,88 102,102" stroke={REALM.stone10} strokeWidth="1.5" fill="none" opacity="0.25" />
 
         {/* Frost breath */}
-        <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} opacity="0.15" filter="url(#frostGlow)">
+        <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} opacity="0.15" filter="url(#frostGlow)" className="mf-drift" style={{ '--drift-dur': '3s', '--drift-sx': 1.6667 } as CSSProperties}>
           <animate attributeName="opacity" values="0.1;0.22;0.1" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="rx" values="12;20;12" dur="3s" repeatCount="indefinite" />
         </ellipse>
 
         {/* Ground frost */}

@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useMemo } from 'react'
+import { memo, useMemo, type CSSProperties } from 'react'
 import { FrostHero } from './hero'
 import { REALM } from './palette'
 
@@ -389,10 +389,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="160,250 150,252 148,260 158,262" fill={REALM.stone7} />
           {/* Blue smoke from back left hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} opacity="0.25">
-              <animate attributeName="ry" values="8;15;8" dur="2s" repeatCount="indefinite" />
+            <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} opacity="0.25" className="mf-drift" style={{ '--drift-dur': '2s', '--drift-y': '-10px', '--drift-sy': 1.875 } as CSSProperties}>
               <animate attributeName="opacity" values="0.25;0.1;0.25" dur="2s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="255;245;255" dur="2s" repeatCount="indefinite" />
             </ellipse>
           </g>
         </g>
@@ -401,10 +399,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="184,245 174,248 172,256 182,258" fill={REALM.stone7} />
           {/* Blue smoke from back right hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} opacity="0.2">
-              <animate attributeName="ry" values="7;14;7" dur="2.3s" repeatCount="indefinite" />
+            <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} opacity="0.2" className="mf-drift" style={{ '--drift-dur': '2.3s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
               <animate attributeName="opacity" values="0.2;0.08;0.2" dur="2.3s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="250;238;250" dur="2.3s" repeatCount="indefinite" />
             </ellipse>
           </g>
         </g>
@@ -415,10 +411,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="34,255 44,257 46,265 36,267" fill={REALM.stone7} />
           {/* Blue smoke from front left hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} opacity="0.3">
-              <animate attributeName="ry" values="9;18;9" dur="1.8s" repeatCount="indefinite" />
+            <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} opacity="0.3" className="mf-drift" style={{ '--drift-dur': '1.8s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
               <animate attributeName="opacity" values="0.3;0.1;0.3" dur="1.8s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="260;248;260" dur="1.8s" repeatCount="indefinite" />
             </ellipse>
           </g>
         </g>
@@ -427,10 +421,8 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="55,250 65,252 67,260 57,262" fill={REALM.stone7} />
           {/* Blue smoke from front right hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} opacity="0.22">
-              <animate attributeName="ry" values="8;16;8" dur="2.1s" repeatCount="indefinite" />
+            <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} opacity="0.22" className="mf-drift" style={{ '--drift-dur': '2.1s', '--drift-y': '-13px', '--drift-sy': 2 } as CSSProperties}>
               <animate attributeName="opacity" values="0.22;0.08;0.22" dur="2.1s" repeatCount="indefinite" />
-              <animate attributeName="cy" values="255;242;255" dur="2.1s" repeatCount="indefinite" />
             </ellipse>
           </g>
         </g>
@@ -467,12 +459,10 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
 
           {/* BLUE SMOKE from eyes */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} opacity="0.35">
-              <animate attributeName="cx" values="8;18;8" dur="2s" repeatCount="indefinite" />
+            <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} opacity="0.35" className="mf-drift" style={{ '--drift-dur': '2s', '--drift-x': '10px' } as CSSProperties}>
               <animate attributeName="opacity" values="0.35;0.1;0.35" dur="2s" repeatCount="indefinite" />
             </ellipse>
-            <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} opacity="0.2">
-              <animate attributeName="cx" values="15;28;15" dur="2.5s" repeatCount="indefinite" />
+            <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} opacity="0.2" className="mf-drift" style={{ '--drift-dur': '2.5s', '--drift-x': '13px' } as CSSProperties}>
               <animate attributeName="opacity" values="0.2;0.05;0.2" dur="2.5s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -480,8 +470,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           {/* BLUE SMOKE from nostrils */}
           <ellipse cx="-28" cy="-45" rx="3" ry="4" fill={REALM.stone4a} />
           <g filter="url(#smokeBlur)">
-            <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} opacity="0.3">
-              <animate attributeName="cy" values="-52;-65;-52" dur="3s" repeatCount="indefinite" />
+            <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} opacity="0.3" className="mf-drift" style={{ '--drift-dur': '3s', '--drift-y': '-13px' } as CSSProperties}>
               <animate attributeName="opacity" values="0.3;0.08;0.3" dur="3s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -513,6 +502,17 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         @keyframes capeWave {
           0%, 100% { transform: rotate(0deg); }
           50% { transform: rotate(1.5deg); }
+        }
+        /* Smoke and breath that swell and drift: each wisp moves by --drift-x and --drift-y and stretches by
+           --drift-sx and --drift-sy about its own centre, then returns, linear like the opacity beside it */
+        .mf-drift {
+          transform-box: fill-box;
+          transform-origin: center;
+          animation: mfDrift var(--drift-dur) linear infinite;
+        }
+        @keyframes mfDrift {
+          0%, 100% { transform: translate(0, 0) scale(1, 1); }
+          50% { transform: translate(var(--drift-x, 0px), var(--drift-y, 0px)) scale(var(--drift-sx, 1), var(--drift-sy, 1)); }
         }
       `}</style>
 
