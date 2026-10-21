@@ -11,7 +11,7 @@ import { createContext, useContext } from 'react'
  * Select screen, we wrap it so this reads `true`. Shared hooks/components react to it:
  *  - useSectionTrigger / useMultiSectionTrigger -> report "always triggered" so
  *    scroll-gated heroes show immediately instead of staying blank inside a clipped card
- *  - ThemeSwitcher -> renders null (we don't want 17 nested switchers)
+ *  - useScrollScene -> starts every scene done, for the same reason
  *
  * Default is `false` and `usePreview()` does NOT throw outside a provider, so any
  * component (or test) can call it safely whether or not it's inside a preview.

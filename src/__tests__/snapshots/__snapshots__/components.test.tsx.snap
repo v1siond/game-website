@@ -81,39 +81,6 @@ exports[`Component Snapshots LanguageSwitcher matches default snapshot 1`] = `
 </div>
 `;
 
-exports[`Component Snapshots ThemeSwitcher matches closed state snapshot 1`] = `
-<div>
-  <div
-    class="relative z-[9999]"
-  >
-    <button
-      aria-expanded="false"
-      aria-haspopup="listbox"
-      aria-label="Select theme"
-      class="text-sm px-3 py-2 transition-colors cursor-pointer min-h-[44px] flex items-center gap-2"
-      style="border: 1px solid #4020a0; color: rgb(128, 128, 160);"
-    >
-      <span
-        aria-hidden="true"
-        class="w-2 h-2 rounded-full flex-shrink-0"
-        style="background-color: rgb(255, 0, 255);"
-      />
-      <span
-        aria-hidden="true"
-      >
-        THEMES
-      </span>
-      <span
-        class="sr-only"
-      >
-        Current theme: 
-        Neon Cyber
-      </span>
-    </button>
-  </div>
-</div>
-`;
-
 exports[`Profession Data Snapshots profession configs structure matches snapshot 1`] = `
 {
   "configKeys": [

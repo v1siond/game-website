@@ -1607,10 +1607,6 @@ export default function NeonPortalsTheme() {
       </section>
 
       {/* ================================================================== */}
-      {/* ENTER ANOTHER WORLD */}
-      
-
-      {/* ================================================================== */}
       {/* FOOTER */}
       {/* ================================================================== */}
       <footer className="relative z-20 py-8 text-center mt-6" role="contentinfo">

@@ -1472,10 +1472,6 @@ export default function RetroAtomicTheme() {
       </section>
 
       {/* ================================================================ */}
-      {/* ENTER ANOTHER WORLD */}
-      
-
-      {/* ================================================================ */}
       {/* FOOTER */}
       {/* ================================================================ */}
       <footer className="relative z-20 py-12 text-center" role="contentinfo">

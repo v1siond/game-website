@@ -1,5 +1,4 @@
 import { render } from '@testing-library/react'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ThemeProvider } from '@/themes/ThemeContext'
@@ -13,14 +12,6 @@ const AllProviders = ({ children }: { children: React.ReactNode }) => (
 )
 
 describe('Component Snapshots', () => {
-  describe('ThemeSwitcher', () => {
-    it('matches closed state snapshot', () => {
-      const { container } = render(<ThemeSwitcher />, { wrapper: AllProviders })
-
-      expect(container).toMatchSnapshot()
-    })
-  })
-
   describe('DownloadPdfButton', () => {
     beforeEach(() => {
       // Create mock element for PDF content

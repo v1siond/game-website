@@ -1,7 +1,6 @@
-import { screen, within } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { render } from '@testing-library/react'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ThemeProvider } from '@/themes/ThemeContext'
@@ -15,81 +14,6 @@ const ThemeWrapper = ({ children }: { children: React.ReactNode }) => (
 )
 
 describe('Accessibility Tests', () => {
-  describe('ThemeSwitcher Accessibility', () => {
-    it('has accessible button with clear text', () => {
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      const button = screen.getByRole('button', { name: /themes/i })
-      expect(button).toBeInTheDocument()
-    })
-
-    it('can be activated with keyboard Enter', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      const button = screen.getByRole('button', { name: /themes/i })
-      button.focus()
-
-      await user.keyboard('{Enter}')
-
-      expect(screen.getByText('[ SELECT THEME ]')).toBeInTheDocument()
-    })
-
-    it('can be activated with keyboard Space', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      const button = screen.getByRole('button', { name: /themes/i })
-      button.focus()
-
-      await user.keyboard(' ')
-
-      expect(screen.getByText('[ SELECT THEME ]')).toBeInTheDocument()
-    })
-
-    it('can close dropdown with Escape key', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      // Open
-      await user.click(screen.getByRole('button', { name: /themes/i }))
-      expect(screen.getByText('[ SELECT THEME ]')).toBeInTheDocument()
-
-      // Close with Escape
-      await user.keyboard('{Escape}')
-
-      expect(screen.queryByText('[ SELECT THEME ]')).not.toBeInTheDocument()
-    })
-
-    it('theme options are buttons with accessible names', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      await user.click(screen.getByRole('button', { name: /themes/i }))
-
-      // Each theme should be a button
-      const themeButtons = screen.getAllByRole('button').filter(
-        (btn) => btn.textContent && btn.textContent !== 'THEMES'
-      )
-
-      expect(themeButtons.length).toBeGreaterThan(0)
-      themeButtons.forEach((btn) => {
-        expect(btn.textContent).toBeTruthy()
-      })
-    })
-
-    it('indicates selected theme visually', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      await user.click(screen.getByRole('button', { name: /themes/i }))
-
-      // Selected theme should have checkmark
-      const darkFantasyButton = screen.getByRole('button', { name: /Dark Fantasy/i })
-      expect(darkFantasyButton.textContent).toContain('Dark Fantasy')
-    })
-  })
-
   describe('DownloadPdfButton Accessibility', () => {
     beforeEach(() => {
       const mockElement = document.createElement('div')
@@ -205,54 +129,6 @@ describe('Accessibility Tests', () => {
     })
   })
 
-  describe('Focus Management', () => {
-    it('ThemeSwitcher maintains focus within dropdown when open', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      await user.click(screen.getByRole('button', { name: /themes/i }))
-
-      // First theme should be focusable
-      const firstTheme = screen.getByRole('button', { name: /Dark Fantasy/i })
-      expect(firstTheme).toBeInTheDocument()
-    })
-
-    it('focus returns to trigger after closing', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      const triggerButton = screen.getByRole('button', { name: /themes/i })
-
-      // Open
-      await user.click(triggerButton)
-
-      // Close with Escape
-      await user.keyboard('{Escape}')
-
-      // Focus should be manageable (component handles this via DOM events)
-      expect(screen.queryByText('[ SELECT THEME ]')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('Color Contrast (visual indicators)', () => {
-    it('ThemeSwitcher shows colored theme indicators', async () => {
-      const user = userEvent.setup()
-      render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-      await user.click(screen.getByRole('button', { name: /themes/i }))
-
-      // Each theme button should have a color indicator span
-      const themeButtons = screen.getAllByRole('button').filter(
-        (btn) => btn.textContent && btn.textContent !== 'THEMES'
-      )
-
-      themeButtons.forEach((btn) => {
-        const colorIndicator = btn.querySelector('span.rounded-full')
-        expect(colorIndicator).toBeInTheDocument()
-      })
-    })
-  })
-
   describe('Semantic HTML', () => {
     it('LanguageSwitcher uses proper form controls', () => {
       render(<LanguageSwitcher />)
@@ -271,7 +147,6 @@ describe('Accessibility Tests', () => {
     it('buttons have button role', () => {
       render(
         <div>
-          <ThemeSwitcher />
           <DownloadPdfButton label="Download" />
         </div>,
         { wrapper: ThemeWrapper }
@@ -299,18 +174,5 @@ describe('Accessibility Tests', () => {
       const container = screen.getByText('Language:').parentElement
       expect(container).toHaveClass('print:hidden')
     })
-  })
-})
-
-describe('Reduced Motion Support', () => {
-  // Note: Testing prefers-reduced-motion would require mocking matchMedia
-  // The actual CSS handles this with media queries
-
-  it('components have CSS classes that can be disabled with reduced motion', () => {
-    render(<ThemeSwitcher />, { wrapper: ThemeWrapper })
-
-    const button = screen.getByRole('button', { name: /themes/i })
-    // Transition classes should be present (CSS will handle disabling them)
-    expect(button).toHaveClass('transition-colors')
   })
 })
