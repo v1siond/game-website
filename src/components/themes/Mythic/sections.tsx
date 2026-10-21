@@ -1,156 +1,153 @@
+'use client'
+
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { KratosChainPullReveal } from './KratosSprite'
-import { GOW } from './palette'
-import { ArtSectionOlympus, ArtSectionPillars, ArtSectionWeapons } from './art'
-import { FadeInSection, FramedSection, SpartanFrame } from './panels'
-import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechCloud } from './cards'
+import { SectionBreak } from './art'
+import { Inscription, MarblePanel, SectionTitle } from './panels'
+import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechStackBoard } from './cards'
+import { SceneItem, Strip } from './scenes'
+import world from './world.module.css'
 
-// The picked profession's sections.
+// The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
+// Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
+// A line of text outside a marble slab sits on a black plaque, so it reads on the sky and on the sea.
 
-function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+const LEAD = `inline-block px-3 py-1 text-base ${world.plaque}`
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
-  const experienceTrigger = useSectionTrigger()
-  const projectsTrigger = useSectionTrigger()
-  const { jobs, techStack, projects, companies } = sections
 
   return (
     <>
-      <FramedSection title="About">
-        <p className="leading-relaxed" style={{ color: GOW.bone }}>{professionalSummary.bio}</p>
-      </FramedSection>
+      <FadeInScene>
+        <Inscription label="About">
+          <p className="text-base leading-relaxed text-[color:var(--myth-ink)]">{professionalSummary.bio}</p>
+        </Inscription>
+      </FadeInScene>
 
-      {/* Art Section 1 - Weapons */}
-      <FadeInSection delay={150}>
-        <ArtSectionWeapons />
-      </FadeInSection>
+      <SectionBreak kind="key" />
 
-      {/* Work Experience - Kratos runs in, then pulls content with Blades of Chaos */}
-      {jobs.length > 0 && (
-        <section ref={experienceTrigger.ref} className="relative z-20 py-8 px-6 overflow-visible">
-          <KratosChainPullReveal triggered={experienceTrigger.triggered} className="max-w-4xl mx-auto">
-            <SpartanFrame title="Work Experience">
-              <div>
-                {jobs.map((entry, index) => (
-                  <ExperienceCard key={entry.id} entry={entry} isLast={index === jobs.length - 1} />
-                ))}
-              </div>
-            </SpartanFrame>
-          </KratosChainPullReveal>
-        </section>
+      {sections.jobs.length > 0 && (
+        <LevelScene>
+          <Strip profession="engineer" zone="record" />
+          <MarblePanel title="Work Experience">
+            <ul className="space-y-8">
+              {sections.jobs.map((entry) => (
+                <li key={entry.id}>
+                  <SceneItem kind="stele">
+                    <ExperienceCard entry={entry} />
+                  </SceneItem>
+                </li>
+              ))}
+            </ul>
+          </MarblePanel>
+        </LevelScene>
       )}
 
-      {/* Art Section 2 - Greek Pillars */}
-      <FadeInSection>
-        <ArtSectionPillars />
-      </FadeInSection>
+      <SectionBreak kind="wave" />
 
-      <FramedSection title="Tech Stack">
-        <TechCloud categories={techStack} />
-      </FramedSection>
+      <FadeInScene>
+        <MarblePanel title="Tech Stack">
+          <TechStackBoard categories={sections.techStack} />
+        </MarblePanel>
+      </FadeInScene>
 
-      {/* Projects */}
-      <section
-        ref={projectsTrigger.ref}
-        className={`relative z-20 py-6 md:py-8 px-4 md:px-6 transition-[opacity,transform] duration-[600ms] ease-out ${
-          projectsTrigger.triggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]'
-        }`}
-      >
-        <div className="max-w-4xl mx-auto">
-          <SpartanFrame title="Projects">
-            <ProjectList
-              projects={projects}
-              className="grid md:grid-cols-2 gap-3 md:gap-4"
-              renderProject={(slot) => <ProjectCard slot={slot} />}
-            />
-          </SpartanFrame>
-        </div>
-      </section>
+      <SectionBreak kind="key" />
 
-      {/* Art Section 3 - Mount Olympus */}
-      <FadeInSection>
-        <ArtSectionOlympus />
-      </FadeInSection>
+      <LevelScene>
+        <Strip profession="engineer" zone="work" />
+        <SectionTitle>Featured Work</SectionTitle>
+        <ProjectList
+          projects={sections.projects}
+          className="grid gap-8 md:grid-cols-2"
+          renderProject={(slot) => (
+            <SceneItem kind="frieze">
+              <ProjectCard {...slot} />
+            </SceneItem>
+          )}
+        />
+      </LevelScene>
 
-      <FramedSection title="Ventures">
-        <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-          {companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
+      <SectionBreak kind="wave" />
+
+      <FadeInScene>
+        <SectionTitle>Ventures</SectionTitle>
+        <ul className="grid gap-6 md:grid-cols-3">
+          {sections.companies.map((company) => (
+            <li key={company.id}>
+              <CompanyCard company={company} />
+            </li>
           ))}
-        </div>
-      </FramedSection>
+        </ul>
+      </FadeInScene>
     </>
   )
 }
 
-function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
     <>
-      <FadeInSection delay={150}>
-        <ArtSectionWeapons />
-      </FadeInSection>
-
-      <FramedSection title="Bands">
-        <p className="text-sm mb-4 text-center" style={{ color: GOW.bone }}>
+      <SectionBreak kind="key" />
+      <LevelScene>
+        <Strip profession="drummer" zone="record" />
+        <SectionTitle>Bands</SectionTitle>
+        <p className={`mb-6 ${LEAD}`}>
           Drums since {musician.since}, {musician.yearsPlaying} years
         </p>
-        <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
-        <p className="text-sm mt-4 italic text-center" style={{ color: GOW.goldBright }}>{musician.line}</p>
-      </FramedSection>
-
-      <FadeInSection>
-        <ArtSectionOlympus />
-      </FadeInSection>
+        <BandList
+          bands={bands}
+          className="grid gap-6 md:grid-cols-3"
+          renderBand={(slot) => (
+            <SceneItem kind="frieze">
+              <BandCard {...slot} />
+            </SceneItem>
+          )}
+        />
+        <p className={`mt-6 italic ${LEAD}`}>{musician.line}</p>
+      </LevelScene>
     </>
   )
 }
 
-function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
-  const recordTrigger = useSectionTrigger()
 
   return (
     <>
-      <FadeInSection>
-        <ArtSectionPillars />
-      </FadeInSection>
-
-      {/* Muay Thai record - Kratos pulls it in with the Blades of Chaos */}
-      <section ref={recordTrigger.ref} className="relative z-20 py-8 px-6 overflow-visible">
-        <KratosChainPullReveal triggered={recordTrigger.triggered} className="max-w-4xl mx-auto">
-          <SpartanFrame title="Muay Thai">
-            <h3 className="text-lg font-medium mb-4" style={{ color: GOW.bone }}>{martialArts.primary.title}</h3>
-            <MuayThaiRecord
-              martialArts={martialArts}
-              classNames={{
-                facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-                fact: 'p-3 bg-black/60 border border-[#2a2420] rounded',
-                term: 'text-sm tracking-[0.15em] uppercase text-[#c9a227]',
-                value: 'text-sm mt-1 text-[#e8e0d0]',
-                achievements: 'space-y-1',
-                achievement: 'text-sm flex items-start gap-2 text-[#e8e0d0]',
-              }}
-              renderAchievement={(achievement) => (
-                <>
-                  <span className="text-[#8b1a1a]" aria-hidden="true">◆</span>
-                  {achievement}
-                </>
-              )}
-            />
-          </SpartanFrame>
-        </KratosChainPullReveal>
-      </section>
-
-      <FadeInSection>
-        <ArtSectionOlympus />
-      </FadeInSection>
+      <SectionBreak kind="wave" />
+      <LevelScene>
+        <Strip profession="fighter" zone="record" />
+        <MarblePanel title="Muay Thai">
+          <h3 className={`mb-4 text-xl ${world.carved}`}>{martialArts.primary.title}</h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'mb-5 grid gap-3 sm:grid-cols-2',
+              fact: `px-4 py-3 ${world.block}`,
+              term: `text-sm text-[color:var(--myth-aegean)] ${world.carved}`,
+              value: 'mt-1 text-sm text-[color:var(--myth-ink)]',
+              achievements: 'space-y-3',
+              achievement: 'text-sm text-[color:var(--myth-ink)]',
+            }}
+            renderAchievement={(achievement) => (
+              <SceneItem kind="stele">
+                <p className={`flex items-start gap-2 p-3 ${world.block}`}>
+                  <span className="mt-1.5 block h-2 w-2 flex-shrink-0 rotate-45 bg-[var(--myth-terracotta)]" aria-hidden="true" />
+                  <span>{achievement}</span>
+                </p>
+              </SceneItem>
+            )}
+          />
+        </MarblePanel>
+      </LevelScene>
     </>
   )
 }

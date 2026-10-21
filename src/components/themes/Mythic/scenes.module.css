@@ -1,0 +1,100 @@
+/*
+ * Mythic's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses, his walk and advance, the props that answer progress
+ * and reduced motion). Transform and opacity only; progress 1 is the final frame, which reduced motion
+ * and the World Select preview show at once.
+ *
+ * The world's move is the myth told on stone and clay: measured and fluid, the colonnade sliding past
+ * at a steady walk, what he reaches rising from the marble or lighting gold, fire answering the sticks
+ * and the strikes, and what arrives is set upright like a carved stele or painted on like a vase frieze.
+ */
+
+/* The world's tempo: twelve even strides along the colonnade with a measured swing, twelve stick hits
+   per arm in the theatre, the sound bars resting at a fifth of their height; in the palaestra he reaches
+   the pads by half the scene and works them for the rest. */
+.tempo {
+  --strides: 12turn;
+  --swing: 20deg;
+  --stick-hits: 12turn;
+  --wave-rest: 0.2;
+  --walk-inset: 5.5rem;
+  --advance-to: 40%;
+  --advance-until: 0.5;
+}
+
+/* The Musician plays a third of the way across the theatre's stage, between its two columns. */
+.onStage {
+  transform: translate3d(30%, 0, 0);
+}
+
+/* ---- the colonnade ---- */
+
+/* The columns slide back as he walks; the layer is 120% of the strip, so no edge comes into view. */
+.drift {
+  transform: translate3d(calc(var(--p) * -15%), 0, 0);
+}
+
+/* A stele at --at rises out of the floor as he reaches it and stands. */
+.riseAt {
+  opacity: clamp(0.3, (var(--p) - var(--at, 0)) * 10 + 0.6, 1);
+  transform: translate3d(0, calc(clamp(0, 1 - (var(--p) - var(--at, 0) + 0.06) * 8, 1) * 55%), 0);
+}
+
+/* ---- fire ---- */
+
+/* The theatre's braziers flare with the stick hits, each on its own --phase. */
+.flare {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scaleY(calc(0.7 + max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 0.45));
+}
+
+/* The palaestra's brazier flares on every kick, knee and elbow (the strip carries the three). */
+.strikeFlare {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transform: scale(calc(0.75 + max(var(--kick, 0), var(--knee, 0), var(--elbow, 0)) * 0.5));
+}
+
+/* ---- per item reveals (their own scene each, so --p is the item's own progress) ---- */
+
+/* A job or a record line is set up like a carved stele: the Greek key above it is cut across from the
+   left, then the block rises into place from below. */
+.keyLine {
+  transform-origin: 0% 50%;
+  transform: scaleX(clamp(0, var(--p) * 2.5, 1));
+}
+
+.steleIn {
+  opacity: clamp(0, var(--p) * 2.5 - 0.5, 1);
+  transform: translate3d(0, calc((1 - clamp(0, var(--p) * 1.6, 1)) * 2rem), 0);
+}
+
+/* A project or a band is painted on like a vase frieze: a band of clay sweeps in from the right and
+   fades as the card turns in after it, the way a pot turns on the wheel. */
+.clayBand {
+  transform-origin: 100% 50%;
+  opacity: clamp(0, min(var(--p) * 5, 1.5 - var(--p) * 2), 0.85);
+  transform: scaleX(clamp(0, var(--p) * 3, 1));
+}
+
+.friezeIn {
+  opacity: clamp(0, var(--p) * 2.5 - 0.4, 1);
+  transform: translate3d(calc((1 - clamp(0, var(--p) * 1.5, 1)) * 2.5rem), 0, 0)
+    scale(calc(0.95 + clamp(0, var(--p) * 1.5, 1) * 0.05));
+}
+
+/* ---- contact: the temple's bronze doors swing open on his corner, then the panel arrives ---- */
+
+.doorLeft,
+.doorRight {
+  transform: scaleX(calc(1 - clamp(0, var(--p) * 1.6, 1)));
+}
+
+.doorLeft {
+  transform-origin: 0% 50%;
+}
+
+.doorRight {
+  transform-origin: 100% 50%;
+}
