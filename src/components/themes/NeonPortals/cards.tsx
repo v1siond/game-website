@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
+import { jobYears } from '@/components/cv/sectionText'
 
 // Neon Portals' panels and cards. Static classes only (no blur, no animated glow), so a card costs
 // nothing while the page scrolls; the scenes in scenes.tsx move them. Colours are the palette.ts values.
@@ -74,12 +75,9 @@ export function TechCategoryList({ categories }: { categories: CVData['techStack
   )
 }
 
-// Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps its
-// own year west of UTC.
-const yearOf = (date: Date | null | undefined) => (date ? String(date.getUTCFullYear()) : 'Present')
-
 export function ExperienceCard({ entry, index }: { entry: Job; index: number }) {
   const look = SIDE_LOOK[sideOf(index)]
+  const { start, end } = jobYears(entry, 'Present')
 
   return (
     <article className={`border bg-[#12111c] p-4 ${look.border}`} aria-labelledby={`portal-exp-${entry.id}`}>
@@ -91,7 +89,7 @@ export function ExperienceCard({ entry, index }: { entry: Job; index: number }) 
           <p className={`mt-0.5 text-sm ${look.text}`}>{entry.company}</p>
         </div>
         <span className={`px-1.5 py-0.5 text-sm tracking-wider ${look.chip}`}>
-          {yearOf(entry.startDate)} - {yearOf(entry.endDate)}
+          {start} - {end}
         </span>
       </div>
       {entry.description && <p className="mb-2 text-sm text-[#a9a6b8]">{entry.description}</p>}

@@ -1,35 +1,28 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { ScrollScene } from '@/components/scroll/ScrollScene'
-import type { Profession } from '@/lib/cv/professions'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { BandCard, ChamberPanel, ExperienceCard, ProjectCard, TechCategoryList, VentureCard } from './cards'
 import { Lane, LevelScene, SceneItem } from './scenes'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Experience, Projects, Bands
 // and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
-function FadeIn({ children }: { children: ReactNode }) {
-  return <ScrollScene className="mb-8">{children}</ScrollScene>
-}
-
 function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      <FadeIn>
+      <FadeInScene>
         <ChamberPanel title="About">
           <p className="text-sm leading-relaxed text-[#edebe4]">{professionalSummary.bio}</p>
         </ChamberPanel>
-      </FadeIn>
+      </FadeInScene>
 
       {sections.jobs.length > 0 && (
         <LevelScene>
@@ -48,11 +41,11 @@ function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
         </LevelScene>
       )}
 
-      <FadeIn>
+      <FadeInScene>
         <ChamberPanel title="Tech Stack">
           <TechCategoryList categories={sections.techStack} />
         </ChamberPanel>
-      </FadeIn>
+      </FadeInScene>
 
       <LevelScene>
         <Lane profession="engineer" zone="work" />
@@ -69,7 +62,7 @@ function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
         </ChamberPanel>
       </LevelScene>
 
-      <FadeIn>
+      <FadeInScene>
         <ChamberPanel title="Ventures">
           <ul className="grid gap-4 md:grid-cols-3">
             {sections.companies.map((company) => (
@@ -79,7 +72,7 @@ function EngineerChambers({ sections }: { sections: SectionsOf<'engineer'> }) {
             ))}
           </ul>
         </ChamberPanel>
-      </FadeIn>
+      </FadeInScene>
     </>
   )
 }
@@ -143,8 +136,8 @@ function MartialArtistChambers({ sections }: { sections: SectionsOf<'fighter'> }
   )
 }
 
-export function ProfessionChambers({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianChambers sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistChambers sections={sections} />
-  return <EngineerChambers sections={sections} />
+export const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerChambers,
+  drummer: MusicianChambers,
+  fighter: MartialArtistChambers,
 }

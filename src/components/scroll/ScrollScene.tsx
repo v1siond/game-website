@@ -30,3 +30,8 @@ export function ScrollScene({ children, className = '', reveal = true, ...option
     </div>
   )
 }
+
+/** The plain fade in block worlds set between their scroll levels (About, Tech Stack, Ventures). */
+export function FadeInScene({ children }: { children: ReactNode }) {
+  return <ScrollScene className="mb-8">{children}</ScrollScene>
+}

@@ -8,7 +8,8 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { DimensionBackdrop, PortalPair } from './NeonPortals/backdrop'
 import { PortalSelector } from './NeonPortals/selector'
 import { CVLink, DemoLink, HeroActions } from './NeonPortals/actions'
-import { ProfessionChambers } from './NeonPortals/sections'
+import { SECTION_VIEWS } from './NeonPortals/sections'
+import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ContactScene } from './NeonPortals/scenes'
 
 // Neon Portals: the page composition. Its backdrop, character, cards, profession portals, stages and
@@ -76,7 +77,7 @@ export default function NeonPortalsTheme() {
       {/* The picked profession's sections and stages, and only those */}
       <main id="main-content" className="relative z-20 px-4 sm:px-6">
         <div className="mx-auto max-w-4xl">
-          <ProfessionChambers sections={view.sections} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </div>
       </main>
 

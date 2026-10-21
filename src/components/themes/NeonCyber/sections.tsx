@@ -1,6 +1,5 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -9,7 +8,7 @@ import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { CompanyCard, BandCard, CyberPanel, ExperienceCard, ProjectCard, TechCategory } from './cards'
-import { ScrollScene } from '@/components/scroll/ScrollScene'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { TravelScene } from '@/components/scroll/TravelScene'
 import { LevelStrip, SceneItem } from './scenes'
 import styles from './scenes.module.css'
@@ -24,21 +23,16 @@ export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> =
 // The selector's state line reads the profession the way the terminal would type it.
 export const terminalName = (profession: Profession): string => PROFESSION_LABELS[profession].toUpperCase().replace(/\s+/g, '_')
 
-// About, Tech Stack and Ventures fade in; the work sections are levels he crosses.
-function FadeIn({ children }: { children: ReactNode }) {
-  return <ScrollScene className="mb-8">{children}</ScrollScene>
-}
-
 export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary, companies } = useCVData()
 
   return (
     <>
-      <FadeIn>
+      <FadeInScene>
         <CyberPanel title="About" accent="yellow">
           <p className="text-sm text-white/80 leading-relaxed font-mono">{professionalSummary.bio}</p>
         </CyberPanel>
-      </FadeIn>
+      </FadeInScene>
 
       {sections.jobs.length > 0 && (
         <TravelScene className={styles.scene}>
@@ -57,13 +51,13 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
         </TravelScene>
       )}
 
-      <FadeIn>
+      <FadeInScene>
         <CyberPanel title="Tech Stack" accent="cyan" megacorpStyle>
           {sections.techStack.map((category) => (
             <TechCategory key={category.id} category={category} />
           ))}
         </CyberPanel>
-      </FadeIn>
+      </FadeInScene>
 
       <TravelScene className={styles.scene}>
         <LevelStrip profession="engineer" zone="work" />
@@ -80,7 +74,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
         </CyberPanel>
       </TravelScene>
 
-      <FadeIn>
+      <FadeInScene>
         <CyberPanel title="Ventures" accent="magenta" megacorpStyle>
           <div className="grid md:grid-cols-3 gap-4">
             {companies.map((company) => (
@@ -88,7 +82,7 @@ export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> 
             ))}
           </div>
         </CyberPanel>
-      </FadeIn>
+      </FadeInScene>
     </>
   )
 }
