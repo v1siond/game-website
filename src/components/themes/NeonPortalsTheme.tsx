@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Luckiest_Guy } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -8,8 +8,10 @@ import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
+import { ZoneStageProvider } from '@/hooks/useZoneStage'
 import { Arrival } from './NeonPortals/arrival'
 import { BandicootDefs } from './NeonPortals/bandicoot'
+import { EraArea, EraBackdrop, type Zone } from './NeonPortals/eraBackdrop'
 import { LevelEnd } from './NeonPortals/levelEnd'
 import { PORTAL_VARS } from './NeonPortals/palette'
 import { PickupDefs } from './NeonPortals/pickups'
@@ -23,13 +25,16 @@ import ui from './NeonPortals/warped.module.css'
 // digits. The root carries its --np-face variable and warped.module.css reads it.
 const warpFace = Luckiest_Guy({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--np-face' })
 
-// Neon Portals: the page as one visit to the time machine of the 1998 time travel platformer (Warped,
-// named in code only), with him as its orange hero. He beams in on the warp pad and spins open the
-// crates beside him (arrival), the warp room's three level buttons change the profession with a slam
-// and the warp tunnel (warpRoom), the picked profession's sections are levels played the game's way
-// (views: crystals, crates, time trials, a boss), and the contact is the level end that tallies the
-// visit. WarpScore keeps the score that the score bar and the floating mask show. Every piece lives in
-// ./NeonPortals.
+// Neon Portals: the page as one trip through the time machine of the 1998 time travel platformer
+// (Warped, named in code only), with him as its orange hero. The page travels through the game's eras
+// as it scrolls: the fixed backdrop (eraBackdrop) paints the era of the part in view and warps to the
+// next one, the way the game sends you from the hub through each period. He beams in at the hub and
+// spins open the crates beside him (arrival), the warp room's three level buttons change the profession
+// with a slam and the warp tunnel (warpRoom), each of the picked profession's sections is a level in its
+// own era with his own moment there (views, eraScenes: the bridge slide, the tomb run, the scuba swim,
+// the T rex ride, the motorbike, the jet ski, the boss), and the contact back at the hub is the level
+// end that tallies the visit. WarpScore keeps the score that the score bar and the floating mask show.
+// Every piece lives in ./NeonPortals.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
 // scroll container and break the fixed layers inside it.
@@ -41,6 +46,8 @@ export default function NeonPortalsTheme() {
   const reducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
   const rootRef = usePointerVars(mounted && !reducedMotion)
+  const [zone, setZone] = useState<Zone>('hub')
+  const onZone = useCallback((next: Zone) => setZone(next), [])
 
   useEffect(() => {
     setMounted(true)
@@ -50,7 +57,7 @@ export default function NeonPortalsTheme() {
 
   return (
     <WarpScore>
-      <div ref={rootRef} style={PORTAL_VARS} className={`relative min-h-screen overflow-x-clip ${ui.root} ${warpFace.variable}`}>
+      <div ref={rootRef} style={PORTAL_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${ui.root} ${warpFace.variable}`}>
         <PickupDefs />
         <BandicootDefs />
         <a
@@ -60,27 +67,35 @@ export default function NeonPortalsTheme() {
           {navigation.skipToContent}
         </a>
 
-        <div className={`pointer-events-none fixed inset-0 ${ui.night}`} aria-hidden="true" />
+        <EraBackdrop zone={zone} reduced={reducedMotion} />
         <ScoreBar />
 
-        <header className="relative z-20">
-          <Arrival profession={active} />
-        </header>
+        <ZoneStageProvider value={{ reduced: reducedMotion, onZone }}>
+          <header className="relative z-20">
+            <EraArea zone="hub">
+              <Arrival profession={active} />
+            </EraArea>
+          </header>
 
-        <section className="relative z-20 mt-16 px-4 sm:px-6" aria-label={navigation.professionSelection}>
-          <WarpRoom profession={active} />
-        </section>
+          <section className="relative z-20 mt-16 px-4 sm:px-6" aria-label={navigation.professionSelection}>
+            <EraArea zone="room">
+              <WarpRoom profession={active} />
+            </EraArea>
+          </section>
 
-        <main id="main-content" className="relative z-20 px-4 pt-16 sm:px-6">
-          <div className="mx-auto max-w-5xl">
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          </div>
-        </main>
+          <main id="main-content" className="relative z-20 px-4 pt-16 sm:px-6">
+            <div className="mx-auto max-w-5xl">
+              <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+            </div>
+          </main>
 
-        <LevelEnd profession={active} />
+          <EraArea zone="hub">
+            <LevelEnd profession={active} />
+          </EraArea>
+        </ZoneStageProvider>
 
         <footer className="relative z-20 py-8 text-center">
-          <p className="text-sm tracking-[0.2em] text-[color:var(--np-muted)]">
+          <p className={`inline-block text-sm tracking-[0.2em] text-[color:var(--np-white)] ${ui.plate}`}>
             &copy; {new Date().getFullYear()} <NameWords name={view.hero.name} />
           </p>
         </footer>

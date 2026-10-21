@@ -180,6 +180,15 @@
     0 6px 0 var(--np-void);
 }
 
+/* A dark plate behind a heading or a line set straight on the era painting, so the lettering keeps
+ * 4.5:1 over the brightest era (the medieval wheat, the great wall's sky). */
+.plate {
+  padding: 0.3rem 0.9rem;
+  border-radius: 1rem;
+  background: rgb(7 3 31 / 0.82);
+  box-shadow: 0 4px 0 var(--np-void);
+}
+
 /* The pickup beside a section heading. */
 .sectionIcon {
   display: block;

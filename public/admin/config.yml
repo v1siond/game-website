@@ -588,6 +588,7 @@ collections:
                   - { <<: *text, label: "Relic score", name: relicScore, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Spin kick", name: kick }
                   - { <<: *text, label: "Boss hint", name: bossHint }
+                  - { <<: *text, label: "Life hint", name: lifeHint }
                   - { <<: *text, label: "Boss health", name: bossHealth, hint: 'Keep {left} {total}' }
                   - { <<: *text, label: "Power score", name: powerScore, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Double jump", name: doubleJump }

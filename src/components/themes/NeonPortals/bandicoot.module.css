@@ -1,612 +1,81 @@
 /*
- * His bandicoot's poses (bandicoot.tsx). Every part turns round its own joint, in the sprite's viewBox
- * units (transform-box: view-box): the shoulders at (31.5, 50.5) and (48.5, 50.5), the hips at y 71,
- * the neck at (40, 48), the feet on y 110. He faces the camera, so the run is the game's run toward
- * the screen: knees pumping up, arms swinging wide, a bounce on every step. Transforms and opacity only.
- *
- * - idle: the little shimmy he does when left alone (hips side to side, arms loose), a blink, a breath.
- * - run: knees up in turn, arms pumping, the whole figure bobbing.
- * - spin: the tornado spin, the figure spinning on its vertical axis inside a white and orange swirl.
- * - jump: the double jump, a hop, then a second hop with a front flip at the top.
- * - slam: the body slam, up, a stall, then straight down with a squash on the floor.
- * - dance: the level end dance, side steps with the arms thrown up in turn.
- * - act: one action per profession, typing on the laptop, drumming on two crates, the roundhouse.
- * - warp: he shrinks and spins away into the warp light, then comes back the other way.
+ * His bandicoot (bandicoot.tsx). The poses play from rig.ts on the data-joint groups with the Web
+ * Animations API; each transform carries its own pivot, so every joint turns from the viewBox origin
+ * (transform-box: view-box, transform-origin 0 0). What lives here is only what is not a pose: the blink,
+ * the glance toward the pointer and the tornado's swirl. Transforms and opacity only; a still figure
+ * (reduced motion, a still frame) plays none of it.
  */
 
 .sprite {
   overflow: visible;
 }
 
-.sprite g {
+.sprite [data-joint] {
   transform-box: view-box;
+  transform-origin: 0 0;
 }
 
-.whole {
-  transform-origin: 40px 110px;
-}
-
-.shadow {
-  transform-box: view-box;
-  transform-origin: 40px 110px;
-}
-
-.armLeft {
-  transform-origin: 31.5px 50.5px;
-}
-
-.armRight {
-  transform-origin: 48.5px 50.5px;
-}
-
-.legLeft {
-  transform-origin: 34px 71px;
-}
-
-.legRight {
-  transform-origin: 46px 71px;
-}
-
-.body {
-  transform-origin: 40px 69px;
-}
-
-.head {
-  transform-origin: 40px 48px;
-}
-
-.eyes {
-  transform-origin: 40px 23px;
-}
-
-.grin {
-  transform-origin: 40px 40px;
-}
-
-/* His head turns a little and his eyes glance toward the visitor's pointer. */
+/* His eyes glance toward the visitor's pointer. */
 .look {
   transform: translate(calc(var(--mx, 0) * 1.4px), calc(var(--my, 0) * 1px));
   transition: transform 0.4s ease-out;
 }
 
-.prop {
-  opacity: 0;
-}
-
-.tornado {
-  opacity: 0;
+.eyes {
   transform-box: view-box;
-  transform-origin: 40px 60px;
-}
-
-/* ---- idle: the shimmy ---- */
-
-.idle .whole {
-  animation: shimmy 1.6s ease-in-out infinite;
-}
-
-.idle .armLeft {
-  animation: loose-left 1.6s ease-in-out infinite;
-}
-
-.idle .armRight {
-  animation: loose-right 1.6s ease-in-out infinite;
-}
-
-.idle .body {
-  animation: breathe 3.2s ease-in-out infinite;
-}
-
-.idle .eyes,
-.run .eyes,
-.dance .eyes {
+  transform-origin: 46px 20px;
   animation: blink 4.6s steps(1) infinite;
-}
-
-@keyframes shimmy {
-  0%,
-  100% {
-    transform: translateX(0) rotate(0);
-  }
-  25% {
-    transform: translateX(-1.6px) rotate(-3deg);
-  }
-  75% {
-    transform: translateX(1.6px) rotate(3deg);
-  }
-}
-
-@keyframes loose-left {
-  0%,
-  100% {
-    transform: rotate(0);
-  }
-  25% {
-    transform: rotate(12deg);
-  }
-  75% {
-    transform: rotate(-6deg);
-  }
-}
-
-@keyframes loose-right {
-  0%,
-  100% {
-    transform: rotate(0);
-  }
-  25% {
-    transform: rotate(6deg);
-  }
-  75% {
-    transform: rotate(-12deg);
-  }
-}
-
-@keyframes breathe {
-  0%,
-  100% {
-    transform: scaleY(1);
-  }
-  50% {
-    transform: scaleY(1.03);
-  }
 }
 
 @keyframes blink {
   0%,
-  95% {
+  94%,
+  100% {
     transform: scaleY(1);
   }
-  96%,
-  99% {
+  95% {
     transform: scaleY(0.1);
   }
 }
 
-/* ---- run: toward the camera ---- */
-
-.run .whole {
-  animation: bob 0.36s ease-in-out infinite;
-}
-
-.run .legLeft {
-  animation: knee-left 0.72s ease-in-out infinite;
-}
-
-.run .legRight {
-  animation: knee-left 0.72s ease-in-out -0.36s infinite;
-}
-
-.run .armLeft {
-  animation: pump-left 0.72s ease-in-out infinite;
-}
-
-.run .armRight {
-  animation: pump-right 0.72s ease-in-out infinite;
-}
-
-@keyframes bob {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-4px);
-  }
-}
-
-@keyframes knee-left {
-  0%,
-  100% {
-    transform: scaleY(1) translateY(0);
-  }
-  50% {
-    transform: scaleY(0.74) translateY(-6px);
-  }
-}
-
-@keyframes pump-left {
-  0%,
-  100% {
-    transform: rotate(-30deg);
-  }
-  50% {
-    transform: rotate(40deg);
-  }
-}
-
-@keyframes pump-right {
-  0%,
-  100% {
-    transform: rotate(40deg);
-  }
-  50% {
-    transform: rotate(-30deg);
-  }
-}
-
-/* ---- spin: the tornado ---- */
-
-.spin .whole {
-  animation: tornado 0.5s linear 2;
-}
-
-.spin .armLeft {
-  transform: rotate(70deg);
-}
-
-.spin .armRight {
-  transform: rotate(-70deg);
-}
-
-.spin .tornado {
-  animation: swirl 1s ease-out;
-}
-
-@keyframes tornado {
-  0% {
-    transform: scaleX(1);
-  }
-  25% {
-    transform: scaleX(0.15);
-  }
-  50% {
-    transform: scaleX(-1);
-  }
-  75% {
-    transform: scaleX(0.15);
-  }
-  100% {
-    transform: scaleX(1);
-  }
+/* The tornado spin's swirl: rings of white and pink sweeping round him. */
+.tornado {
+  transform-box: view-box;
+  transform-origin: 40px 60px;
+  animation: swirl 0.3s linear infinite;
 }
 
 @keyframes swirl {
   0% {
-    opacity: 0;
-    transform: scaleX(0.6);
-  }
-  20%,
-  80% {
-    opacity: 1;
-    transform: scaleX(1.1);
-  }
-  100% {
-    opacity: 0;
-    transform: scaleX(1.3);
-  }
-}
-
-/* ---- jump: the double jump with a flip ---- */
-
-.jump .whole {
-  animation: double-jump 0.9s cubic-bezier(0.3, 0.7, 0.4, 1);
-}
-
-.jump .legLeft,
-.jump .legRight {
-  animation: tuck 0.9s ease-in-out;
-}
-
-.jump .armLeft {
-  transform: rotate(-60deg);
-}
-
-.jump .armRight {
-  transform: rotate(60deg);
-}
-
-@keyframes double-jump {
-  0% {
-    transform: translateY(0) scale(1.06, 0.9);
-  }
-  25% {
-    transform: translateY(-26px) rotate(0);
-  }
-  38% {
-    transform: translateY(-20px) rotate(0);
-  }
-  65% {
-    transform: translateY(-46px) rotate(-360deg);
-  }
-  92% {
-    transform: translateY(0) rotate(-360deg) scale(1.08, 0.9);
-  }
-  100% {
-    transform: translateY(0) rotate(-360deg);
-  }
-}
-
-@keyframes tuck {
-  0%,
-  100% {
-    transform: scaleY(1);
+    transform: scaleX(1);
+    opacity: 0.9;
   }
   50% {
-    transform: scaleY(0.7);
+    transform: scaleX(-1);
+    opacity: 0.6;
   }
-}
-
-/* ---- slam: up, a stall, straight down ---- */
-
-.slam .whole {
-  animation: body-slam 0.8s cubic-bezier(0.5, 0, 0.75, 0);
-}
-
-.slam .armLeft {
-  animation: slam-arm-left 0.8s ease-in;
-}
-
-.slam .armRight {
-  animation: slam-arm-right 0.8s ease-in;
-}
-
-.slam .shadow {
-  animation: slam-shadow 0.8s ease-in;
-}
-
-@keyframes body-slam {
-  0% {
-    transform: translateY(0);
-  }
-  30% {
-    transform: translateY(-34px) rotate(-10deg);
-  }
-  55% {
-    transform: translateY(-36px) rotate(0) scale(1.05);
-  }
-  80% {
-    transform: translateY(0) scale(1.2, 0.72);
-  }
-  100% {
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes slam-arm-left {
-  0%,
-  55% {
-    transform: rotate(80deg);
-  }
-  80%,
-  100% {
-    transform: rotate(0);
-  }
-}
-
-@keyframes slam-arm-right {
-  0%,
-  55% {
-    transform: rotate(-80deg);
-  }
-  80%,
-  100% {
-    transform: rotate(0);
-  }
-}
-
-@keyframes slam-shadow {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  55% {
-    transform: scale(0.5);
-    opacity: 0.2;
-  }
-  80% {
-    transform: scale(1.5);
-  }
-}
-
-/* ---- dance: the level end ---- */
-
-.dance .whole {
-  animation: side-step 1.2s ease-in-out infinite;
-}
-
-.dance .armLeft {
-  animation: arm-up-left 1.2s ease-in-out infinite;
-}
-
-.dance .armRight {
-  animation: arm-up-right 1.2s ease-in-out infinite;
-}
-
-.dance .legLeft {
-  animation: knee-left 0.6s ease-in-out infinite;
-}
-
-.dance .legRight {
-  animation: knee-left 0.6s ease-in-out -0.3s infinite;
-}
-
-.dance .head {
-  animation: head-bob 0.6s ease-in-out infinite;
-}
-
-@keyframes side-step {
-  0%,
-  100% {
-    transform: translateX(-5px) rotate(-5deg);
-  }
-  50% {
-    transform: translateX(5px) rotate(5deg);
-  }
-}
-
-@keyframes arm-up-left {
-  0%,
-  100% {
-    transform: rotate(150deg);
-  }
-  50% {
-    transform: rotate(20deg);
-  }
-}
-
-@keyframes arm-up-right {
-  0%,
-  100% {
-    transform: rotate(-20deg);
-  }
-  50% {
-    transform: rotate(-150deg);
-  }
-}
-
-@keyframes head-bob {
-  0%,
-  100% {
-    transform: rotate(-6deg);
-  }
-  50% {
-    transform: rotate(6deg);
-  }
-}
-
-/* ---- act: one per profession ---- */
-
-.act .prop {
-  opacity: 1;
-}
-
-.act.engineer .armLeft {
-  animation: type-left 0.24s ease-in-out infinite;
-}
-
-.act.engineer .armRight {
-  transform: rotate(-30deg) translateX(-6px);
-}
-
-.act.engineer .head {
-  transform: rotate(-8deg) translateY(1px);
-}
-
-@keyframes type-left {
-  0%,
-  100% {
-    transform: rotate(-14deg) translateY(-2px);
-  }
-  50% {
-    transform: rotate(-18deg) translateY(0);
-  }
-}
-
-.act.drummer .armLeft {
-  animation: beat-left 0.4s ease-in-out infinite;
-}
-
-.act.drummer .armRight {
-  animation: beat-left 0.4s ease-in-out -0.2s infinite;
-}
-
-.act.drummer .head {
-  animation: head-bob 0.4s ease-in-out infinite;
-}
-
-@keyframes beat-left {
-  0%,
-  100% {
-    transform: rotate(-8deg);
-  }
-  50% {
-    transform: rotate(26deg);
-  }
-}
-
-.act.fighter .whole {
-  animation: roundhouse 0.9s cubic-bezier(0.3, 0.7, 0.4, 1) infinite;
-}
-
-.act.fighter .legRight {
-  animation: kick-leg 0.9s ease-out infinite;
-}
-
-.act.fighter .armLeft {
-  transform: rotate(-120deg);
-}
-
-.act.fighter .armRight {
-  transform: rotate(-40deg);
-}
-
-@keyframes roundhouse {
-  0%,
   100% {
     transform: scaleX(1);
-  }
-  30% {
-    transform: scaleX(-1);
-  }
-  55% {
-    transform: scaleX(1) rotate(-6deg);
+    opacity: 0.9;
   }
 }
 
-@keyframes kick-leg {
-  0%,
-  25%,
-  100% {
-    transform: rotate(0);
-  }
-  45%,
-  65% {
-    transform: rotate(-95deg);
-  }
+.still .eyes,
+.still .tornado {
+  animation: none;
 }
 
-/* ---- warp: out into the light and back ---- */
-
-.warp .whole {
-  animation: warp-away 1.2s ease-in-out;
-}
-
-.warp .shadow {
-  animation: warp-shadow 1.2s ease-in-out;
-}
-
-@keyframes warp-away {
-  0% {
-    transform: scale(1) rotate(0);
-    opacity: 1;
-  }
-  45% {
-    transform: translateY(-30px) scale(0.1, 1.4) rotate(0);
-    opacity: 0;
-  }
-  55% {
-    transform: translateY(-30px) scale(0.1, 1.4);
-    opacity: 0;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-@keyframes warp-shadow {
-  0%,
-  100% {
-    opacity: 0.35;
-  }
-  50% {
-    opacity: 0;
-  }
+.still .look {
+  transition: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sprite *,
-  .sprite .eyes {
-    animation: none !important;
+  .eyes,
+  .tornado {
+    animation: none;
   }
 
   .look {
-    transform: none;
     transition: none;
-  }
-
-  .tornado {
-    opacity: 0;
   }
 }

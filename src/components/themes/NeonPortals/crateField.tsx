@@ -15,6 +15,7 @@ import { Bandicoot, type BandicootPose } from './bandicoot'
 import { Blast, Planks, PopUp, type BurstTone } from './burst'
 import { CrateArt, type CrateKind } from './crateArt'
 import { Fruit, Gem, MaskFace } from './pickups'
+import { Ride } from './vehicles'
 import { allCratesOpen, useScore } from './score'
 import crates from './crateField.module.css'
 import ui from './warped.module.css'
@@ -35,8 +36,9 @@ import ui from './warped.module.css'
 // Spin opens every crate but the steel ones (a TNT caught in a spin blows at once), and Body slam
 // opens the steel ones. The box counter in the strip and the score bar count them against the total;
 // when the last one opens the counter turns into the gem and he dances. When the field scrolls in he
-// runs into the strip from its left while the crates rise, and every crate the visitor breaks by hand
-// makes him jump, the way he hops onto a crate to bust it.
+// rides the baby T rex into the strip from its left while the crates rise (the prehistoric era's ride),
+// hops off and the T rex runs on out of the strip; every crate the visitor breaks by hand makes him
+// jump, the way he hops onto a crate to bust it.
 // A crate opened by the visitor's own click hands focus to the card it held. Reduced motion and a
 // World Select preview open every crate at once, with the score to match.
 
@@ -280,9 +282,10 @@ function ProjectCrate({ slot, index, spin, slam, onHit }: ProjectCrateProps) {
 }
 
 const MOVE_MS = 1000
+const HOP_OFF_MS = 950
 
-/** The run in while the field rises; then the idle, or the dance once all are open. */
-const RUN_IN: readonly BandicootPose[] = ['run']
+/** He rides the baby T rex in while the field rises and hops off; then the idle, or the dance once all are open. */
+const RIDE_IN: readonly BandicootPose[] = ['ride', 'jump']
 
 interface MoveStripProps {
   onSpin: () => void
@@ -298,13 +301,26 @@ function MoveStrip({ onSpin, onSlam, figure, gem }: MoveStripProps) {
   const { ref, triggered } = useSectionTrigger()
   const { crates: opened } = score.counts
   const total = score.totals.crates
+  const hopping = !figure.arrived && figure.pose === 'jump'
+  const { advance } = figure
+
+  useEffect(() => {
+    if (!hopping) return
+    const timer = window.setTimeout(advance, HOP_OFF_MS)
+    return () => window.clearTimeout(timer)
+  }, [hopping, advance])
 
   return (
     <div ref={ref} className={`mb-8 flex flex-wrap items-center gap-4 overflow-hidden p-4 ${ui.panel}`}>
       <span className={`relative block h-24 w-16 shrink-0 ${triggered ? crates.runIn : crates.offStage}`} onAnimationEnd={figure.onOwnAnimationEnd} aria-hidden="true">
         {figure.move === 'slam' && <Blast tone="slam" />}
-        {/* a move mounts him afresh so a repeat replays; its end remounts him on the rest pose */}
-        <Bandicoot key={figure.move ? figure.take : 0} profession="engineer" pose={figure.pose} className="h-full w-full" />
+        {figure.pose === 'ride' ? (
+          <Ride vehicle="rex" profession="engineer" className="absolute inset-y-0 -left-1/2" />
+        ) : (
+          // a move mounts him afresh so a repeat replays; its end remounts him on the rest pose
+          <Bandicoot key={figure.move ? figure.take : 0} profession="engineer" pose={triggered ? figure.pose : 'idle'} className="h-full w-full" />
+        )}
+        {hopping && <Ride vehicle="rex" profession="engineer" rider={false} className={`absolute inset-y-0 -left-1/2 ${crates.rexOff}`} />}
       </span>
       <div className="flex flex-wrap gap-3">
         <button type="button" onClick={onSpin} className={`${ui.button} ${ui.lit}`}>
@@ -335,7 +351,7 @@ export function CrateField({ projects }: { projects: SectionsOf<'engineer'>['pro
   const [spin, setSpin] = useState(0)
   const [slam, setSlam] = useState(0)
   const gem = allCratesOpen(useScore().score)
-  const figure = usePoseSequence<BandicootPose>({ entrance: RUN_IN, rest: gem ? 'dance' : 'idle', moveMs: MOVE_MS, policy: 'always' })
+  const figure = usePoseSequence<BandicootPose>({ entrance: RIDE_IN, rest: gem ? 'dance' : 'idle', still: 'idle', moveMs: MOVE_MS, policy: 'always' })
   const { play } = figure
 
   return (

@@ -1,0 +1,165 @@
+/*
+ * His moment in each era (eraScenes.tsx). The bridge slide and the banner unrolling (medieval), the
+ * tomb floor he runs along with the scroll (Egypt, --scene-progress from useScrollScene), the one pass
+ * across a lane (the swim, the motorbike, the jet ski), and the dark plate behind a hint so it reads on
+ * every era's painting. Transforms and opacity only; reduced motion shows each of them in place.
+ */
+
+/* Medieval: the stone bridge under him, the slide in from the left, the bio unrolling from its rod. */
+.bridge {
+  padding-bottom: 0.5rem;
+  border-bottom: 10px solid #9a96a4;
+  border-radius: 0 0 6px 6px;
+}
+
+.offStage {
+  opacity: 0;
+  transform: translate3d(-160%, 0, 0);
+}
+
+.slideIn {
+  animation: slide-in 0.9s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 1;
+    transform: translate3d(-160%, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.banner {
+  transform-origin: top;
+  transition: transform 700ms cubic-bezier(0.34, 1.56, 0.64, 1) 300ms;
+}
+
+[data-on] .banner {
+  transform: none;
+}
+
+section:not([data-on]) .banner {
+  transform: scaleY(0.04);
+}
+
+/* Egypt: the sandstone floor, the runner carried across it by the scroll. */
+.tomb {
+  border-bottom: 8px solid #a8783a;
+  background: linear-gradient(180deg, transparent 70%, rgb(216 168 90 / 0.5));
+}
+
+.runner {
+  transform: translate3d(calc(var(--scene-progress, 1) * 100%), 0, 0);
+}
+
+/* A lane he crosses once: waiting off its left edge, then across and out the right. */
+.lane {
+  container-type: inline-size;
+}
+
+.waiting {
+  opacity: 0;
+  transform: translate3d(-100%, 0, 0);
+}
+
+.cross {
+  animation: cross 3.2s linear both;
+}
+
+@keyframes cross {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(100cqw, 0, 0);
+  }
+}
+
+/* Underwater: the tech panels rise from below like bubbles, each with a wobble as it settles. */
+[data-on] .bubble {
+  animation: bubble 1.1s ease-out both;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+@keyframes bubble {
+  0% {
+    transform: translateY(60px) scale(0.9, 1.08);
+  }
+  60% {
+    transform: translateY(-6px) scale(1.04, 0.96);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Future: each venture card lights in turn as the motorbike passes under it. */
+.lightUp {
+  position: relative;
+}
+
+.lightUp::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 3px solid var(--np-teal);
+  border-radius: 1.6rem;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-on] .lightUp::after {
+  animation: light-up 1.2s ease-out both;
+  animation-delay: calc(0.6s + var(--i, 0) * 0.8s);
+}
+
+@keyframes light-up {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+/* A hint line on a dark plate: white text on the void at 85% stays over 4.5:1 on any era. */
+.hint {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.75rem;
+  background: rgb(7 3 31 / 0.85);
+  color: var(--np-white);
+  font-size: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .offStage {
+    opacity: 1;
+    transform: none;
+  }
+
+  .slideIn,
+  .cross,
+  [data-on] .bubble {
+    animation: none;
+  }
+
+  [data-on] .lightUp::after {
+    animation: none;
+    opacity: 0.35;
+  }
+
+  .banner {
+    transition: none;
+  }
+
+  section:not([data-on]) .banner {
+    transform: none;
+  }
+}

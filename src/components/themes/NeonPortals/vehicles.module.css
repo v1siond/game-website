@@ -1,0 +1,80 @@
+/*
+ * The eras' rides (vehicles.tsx): the T rex's legs striding in turn, the motorbike's wheels turning and
+ * its neon trail, the jet ski's spray. Transforms and opacity only; a still ride plays none of it.
+ */
+
+.ride [class] {
+  transform-box: fill-box;
+}
+
+.legFront,
+.legBack {
+  transform-origin: top center;
+  animation: stride 0.46s ease-in-out infinite alternate;
+}
+
+.legBack {
+  animation-direction: alternate-reverse;
+}
+
+.wheel {
+  transform-origin: center;
+  animation: turn 0.4s linear infinite;
+}
+
+.trail {
+  transform-origin: right center;
+  animation: trail 0.3s ease-in-out infinite alternate;
+}
+
+.spray {
+  transform-origin: right center;
+  animation: spray 0.35s ease-out infinite;
+}
+
+@keyframes stride {
+  from {
+    transform: rotate(-24deg);
+  }
+  to {
+    transform: rotate(24deg);
+  }
+}
+
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes trail {
+  from {
+    transform: scaleX(0.5);
+    opacity: 0.5;
+  }
+  to {
+    transform: scaleX(1.2);
+    opacity: 1;
+  }
+}
+
+@keyframes spray {
+  from {
+    transform: translateX(0) scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-10px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.still [class] {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ride [class] {
+    animation: none;
+  }
+}

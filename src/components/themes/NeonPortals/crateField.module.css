@@ -102,6 +102,18 @@
   animation: runIn 1.4s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
+/* The T rex he rode in on runs on out of the strip once he hops off. */
+.rexOff {
+  animation: rexOff 0.9s ease-in both;
+}
+
+@keyframes rexOff {
+  to {
+    opacity: 0;
+    transform: translate3d(400%, 0, 0);
+  }
+}
+
 @keyframes runIn {
   from {
     opacity: 1;
@@ -119,7 +131,8 @@
     transform: none;
   }
 
-  .runIn {
+  .runIn,
+  .rexOff {
     animation: none;
   }
 

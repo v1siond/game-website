@@ -10,16 +10,18 @@ import type { SectionsOf } from '@/lib/cv/cvView'
 import { Bandicoot, type BandicootPose } from './bandicoot'
 import { Blast } from './burst'
 import { PORTAL } from './palette'
-import { Gem, type GemTone } from './pickups'
+import { Gem, MaskFace, type GemTone } from './pickups'
 import { useScore } from './score'
 import boss from './bossRound.module.css'
 import ui from './warped.module.css'
 
-// Muay Thai as a boss round (the time travel platformer's boss fights, Warped, named in code only): him
-// in his fight gear on one side, a carved totem boss with a health bar on the other, one bar segment
-// per title. Spin kick plays his spinning roundhouse, the totem flashes and shakes, a segment drops, and
-// the next title's power unlocks the way a boss in the game hands over a new move: body slam, double
-// jump, tornado spin, in that order. When the last segment goes the totem crumbles and leaves a mask.
+// Muay Thai as a boss round (the time travel platformer's boss fights, Warped, named in code only), on
+// the great wall era: him in his fight gear and guard on one side, the game's time foe (the clock in his
+// chest, the gold horned headpiece, the green lens, the tuning fork staff) with a health bar on the
+// other, one bar segment per title. Spin kick plays his roundhouse, the foe staggers back, a segment
+// drops, and the next title's power unlocks the way a boss in the game hands over a new move: body slam,
+// double jump, tornado spin, in that order. When the last segment goes the foe warps out (squeezed thin
+// and gone, the way he leaves at the end of each boss) and a mask drops where he stood.
 // The titles are always readable in the list below the arena; each one carries its power, shown locked
 // until its kick lands (text and gem together, so the state never rests on colour). Reduced motion
 // lands each kick with no movement, a preview shows the boss beaten.
@@ -32,7 +34,7 @@ const KICK_MS = 900
 const fighterPose = (kicking: boolean, beaten: boolean): BandicootPose => {
   if (kicking) return 'act'
   if (beaten) return 'dance'
-  return 'idle'
+  return 'guard'
 }
 
 function useBoss(achievements: readonly string[]) {
@@ -66,25 +68,34 @@ function useBoss(achievements: readonly string[]) {
   return { kicking, landed: preview ? achievements.length : landed, beaten, kick }
 }
 
-function Totem({ hit, beaten }: { hit: boolean; beaten: boolean }) {
+/** The time foe: a lanky villain with a clock set in his chest, a gold horned headpiece, a green lens over
+ * one eye and a tuning fork staff. A kick makes him stagger; beaten, he warps out and leaves a mask. */
+function TimeFoe({ hit, beaten }: { hit: boolean; beaten: boolean }) {
   return (
-    <svg viewBox="0 0 80 120" className={`h-full w-full ${boss.totem}`} data-hit={hit || undefined} data-beaten={beaten || undefined} aria-hidden="true" focusable="false">
-      {[0, 1, 2].map((tier) => {
-        const y = 8 + tier * 36
-        return (
-          <g key={tier} className={boss.tier} style={{ '--i': tier } as CSSProperties}>
-            <rect x="10" y={y} width="60" height="34" rx="6" fill={tier === 1 ? PORTAL.MASK_LIT : PORTAL.MASK_WOOD} stroke={PORTAL.VOID} strokeWidth="2" />
-            <ellipse cx="28" cy={y + 13} rx="6" ry="5" fill={PORTAL.WHITE} stroke={PORTAL.VOID} strokeWidth="1.4" />
-            <ellipse cx="52" cy={y + 13} rx="6" ry="5" fill={PORTAL.WHITE} stroke={PORTAL.VOID} strokeWidth="1.4" />
-            <circle cx="28" cy={y + 14} r="2.4" fill={tier === 0 ? PORTAL.FRUIT_RED : PORTAL.VOID} />
-            <circle cx="52" cy={y + 14} r="2.4" fill={tier === 0 ? PORTAL.FRUIT_RED : PORTAL.VOID} />
-            <path d={`M22 ${y + 24} Q40 ${y + 32} 58 ${y + 24} L56 ${y + 28} Q40 ${y + 34} 24 ${y + 28} Z`} fill={PORTAL.MASK_DARK} />
-            <path d={`M26 ${y + 25} H54`} stroke={PORTAL.TOOTH} strokeWidth="2" strokeDasharray="3 2" />
-          </g>
-        )
-      })}
-      <path d="M4 8 L14 -2 M76 8 L66 -2 M40 6 V-4" stroke={PORTAL.GREEN} strokeWidth="4" strokeLinecap="round" />
-    </svg>
+    <span className={`relative block h-full w-full ${boss.foe}`} data-hit={hit || undefined} data-beaten={beaten || undefined}>
+      <svg viewBox="0 0 80 120" className={`h-full w-full ${boss.body}`} aria-hidden="true" focusable="false">
+        <path d="M66 112 V20" stroke={PORTAL.METAL_DARK} strokeWidth="3" />
+        <path d="M60 22 V6 M72 22 V6 M60 22 Q66 30 72 22" fill="none" stroke={PORTAL.METAL} strokeWidth="3" strokeLinecap="round" />
+        <path d="M32 116 L30 84 M46 116 L48 84" stroke={PORTAL.CRYSTAL_DEEP} strokeWidth="7" strokeLinecap="round" />
+        <path d="M26 118 h10 M44 118 h10" stroke={PORTAL.VOID} strokeWidth="5" strokeLinecap="round" />
+        <path d="M22 44 Q40 36 58 44 L54 88 H26 Z" fill={PORTAL.CRYSTAL_DEEP} stroke={PORTAL.VOID} strokeWidth="2" />
+        <path d="M26 44 L40 90 L54 44" fill="none" stroke={PORTAL.GOLD} strokeWidth="2" />
+        <circle cx="40" cy="60" r="10" fill={PORTAL.WHITE} stroke={PORTAL.GOLD} strokeWidth="3" />
+        <path d="M40 60 V53 M40 60 L45 63" stroke={PORTAL.VOID} strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M24 48 Q14 60 18 72 L62 60" fill="none" stroke={PORTAL.CRYSTAL_DEEP} strokeWidth="6" strokeLinecap="round" />
+        <path d="M56 48 Q64 56 64 66" fill="none" stroke={PORTAL.CRYSTAL_DEEP} strokeWidth="6" strokeLinecap="round" />
+        <ellipse cx="40" cy="30" rx="11" ry="13" fill="#7fae9a" stroke={PORTAL.VOID} strokeWidth="2" />
+        <path d="M28 22 Q40 10 52 22 L56 8 L48 16 Q40 6 32 16 L24 8 Z" fill={PORTAL.GOLD} stroke={PORTAL.VOID} strokeWidth="1.6" />
+        <circle cx="45" cy="29" r="5" fill={PORTAL.GREEN} stroke={PORTAL.METAL_DARK} strokeWidth="2" />
+        <circle cx="35" cy="29" r="2" fill={PORTAL.VOID} />
+        <path d="M34 38 Q40 42 46 38" fill="none" stroke={PORTAL.VOID} strokeWidth="1.6" />
+      </svg>
+      {beaten && (
+        <span className={`absolute bottom-0 left-1/4 block h-1/3 w-1/2 ${boss.leftMask}`}>
+          <MaskFace className="h-full w-full" />
+        </span>
+      )}
+    </span>
   )
 }
 
@@ -145,7 +156,7 @@ export function BossRound({ martialArts }: { martialArts: SectionsOf<'fighter'>[
           </span>
           <span className="relative block h-full w-[22%] max-w-[9rem]">
             {kicking && <Blast tone="tnt" />}
-            <Totem hit={kicking} beaten={beaten} />
+            <TimeFoe hit={kicking} beaten={beaten} />
           </span>
         </div>
         <p className="mt-3 text-base text-[color:var(--np-muted)]">{warp.bossHint}</p>

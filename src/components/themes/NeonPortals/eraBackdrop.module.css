@@ -1,0 +1,287 @@
+/*
+ * The era backdrop (eraBackdrop.tsx). Every era painting sits in the fixed layer, hidden; the one in
+ * view (data-shown) fades in over 0.7s. Its living details loop only while it is shown, at most three
+ * per era, transform and opacity only. Each zone change remounts the warp: four rings rush out from
+ * the middle of the screen and a white flash fades, like the time twister's tunnel between levels.
+ * The shade darkens every era the same amount so the panels and the lettering keep their contrast.
+ * Reduced motion: the eras still change (a plain cut), nothing loops and the warp is not drawn.
+ */
+
+.backdrop {
+  z-index: 0;
+  background: var(--np-void);
+}
+
+.era {
+  opacity: 0;
+  transition: opacity 0.7s ease-out;
+}
+
+.era[data-shown] {
+  opacity: 1;
+}
+
+.shade {
+  background: linear-gradient(180deg, rgb(7 3 31 / 0.5), rgb(7 3 31 / 0.35) 40%, rgb(7 3 31 / 0.55));
+}
+
+.era [class] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The living details, played only by the era in view. */
+.era[data-shown] .sand {
+  transform-origin: top;
+  animation: sand 1.6s ease-in-out infinite;
+}
+
+.era[data-shown] .spark {
+  animation: spark 1.3s steps(2) infinite;
+}
+
+.era[data-shown] .banner,
+.era[data-shown] .pennant {
+  transform-origin: left center;
+  animation: wave 2.4s ease-in-out infinite;
+}
+
+.era[data-shown] .cloud {
+  animation: drift 40s linear infinite alternate;
+}
+
+.era[data-shown] .flame {
+  transform-origin: bottom;
+  animation: flicker 0.5s ease-in-out infinite alternate;
+}
+
+.era[data-shown] .shark {
+  animation: cruise 26s linear infinite;
+}
+
+.era[data-shown] .weed {
+  transform-origin: bottom;
+  animation: sway 3.4s ease-in-out infinite alternate;
+}
+
+.era[data-shown] .bubbles {
+  animation: rise 4s linear infinite;
+}
+
+.era[data-shown] .glow {
+  animation: glow 2.2s ease-in-out infinite alternate;
+}
+
+.era[data-shown] .smoke {
+  transform-origin: bottom;
+  animation: smoke 5s ease-out infinite;
+}
+
+.era[data-shown] .car {
+  animation: fly 9s linear infinite;
+}
+
+.era[data-shown] .window {
+  animation: glow 1.8s steps(2) infinite;
+}
+
+.era[data-shown] .carpet {
+  animation: carpet 14s ease-in-out infinite alternate;
+}
+
+.era[data-shown] .lamp {
+  animation: glow 2.6s ease-in-out infinite alternate;
+}
+
+@keyframes sand {
+  from {
+    transform: scaleY(0.4);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes spark {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.1;
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  50% {
+    transform: skewY(6deg) scaleX(0.9);
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-60px);
+  }
+  to {
+    transform: translateX(60px);
+  }
+}
+
+@keyframes flicker {
+  from {
+    transform: scale(0.9, 0.85);
+  }
+  to {
+    transform: scale(1.05, 1.1);
+  }
+}
+
+@keyframes cruise {
+  from {
+    transform: translateX(400px);
+  }
+  to {
+    transform: translateX(-1500px);
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-420px);
+    opacity: 0;
+  }
+}
+
+@keyframes glow {
+  from {
+    opacity: 0.65;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes smoke {
+  from {
+    transform: translateY(0) scale(0.8);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateY(-120px) scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes fly {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(2000px);
+  }
+}
+
+@keyframes carpet {
+  from {
+    transform: translate(0, 0) rotate(-3deg);
+  }
+  to {
+    transform: translate(900px, -60px) rotate(3deg);
+  }
+}
+
+/* The warp between two eras. */
+.warp {
+  display: grid;
+  place-items: center;
+}
+
+.ring,
+.flash {
+  grid-area: 1 / 1;
+}
+
+.ring {
+  width: 40vmax;
+  height: 40vmax;
+  border-radius: 50%;
+  border: 6px solid var(--np-teal);
+  opacity: 0;
+  animation: ring 0.7s ease-out both;
+}
+
+.ring[data-ring='1'] {
+  border-color: var(--np-violet);
+  animation-delay: 0.08s;
+}
+
+.ring[data-ring='2'] {
+  border-color: var(--np-brass);
+  animation-delay: 0.16s;
+}
+
+.ring[data-ring='3'] {
+  border-color: var(--np-white);
+  animation-delay: 0.24s;
+}
+
+.flash {
+  width: 100%;
+  height: 100%;
+  background: var(--np-white);
+  opacity: 0;
+  animation: flash 0.6s ease-out both;
+}
+
+@keyframes ring {
+  from {
+    transform: scale(0.05);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .era {
+    transition: none;
+  }
+
+  .era[data-shown] [class] {
+    animation: none;
+  }
+
+  .warp {
+    display: none;
+  }
+}
