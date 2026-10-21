@@ -58,6 +58,18 @@ export const COLORS = {
   // the sandy jungle path
   dirt: '#c99a5a',
   dirtDark: '#8a5a2c',
+  // the old timer in his rocking chair (about): grey brown fur, a long white beard
+  elderFur: '#7b6555',
+  elderSkin: '#d9a77c',
+  elderBeard: '#f2efe8',
+  // the walking crocodile foes (Muay Thai): green hide, a tan belly
+  croc: '#3f8a3a',
+  crocDark: '#1f4f24',
+  crocBelly: '#d9b77a',
+  // the rhino he rides through the ventures: grey hide, an ivory horn
+  rhino: '#8a8f99',
+  rhinoDark: '#4d5159',
+  horn: '#efe6d2',
 } as const
 
 export type ColorName = keyof typeof COLORS

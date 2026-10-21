@@ -1,6 +1,6 @@
-// The hidden letters of the projects: the first four letters of his first name, spread over the project
-// cards the way the source spreads its four letters over a level (the first on the first card, the last
-// on the last, the others evenly between). Fewer cards than letters: the letters go round the cards.
+// The hidden letters of the jobs: the first four letters of his first name, spread over the job
+// platforms the way the source spreads its four letters over a level (the first on the first card, the
+// last on the last, the others evenly between). Fewer cards than letters: the letters go round the cards.
 
 export const LETTER_COUNT = 4
 

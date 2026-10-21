@@ -1,0 +1,157 @@
+/*
+ * The old timer's yard (elder.tsx), off one data-on: the cannon recoils, he flies across rolled into a
+ * ball (0 to 0.8 s, a full width layer sliding 32% of the yard over an eased arc), the ball hides and he stands at 0.8 s,
+ * and the about board unfolds down from its top edge from 0.9 s. The old timer rocks all the while
+ * (2.4 s), his rocker as the pivot. Transform and opacity only.
+ */
+
+.cannon {
+  transform: rotate(-35deg);
+  transform-origin: 50% 70%;
+}
+
+.yard[data-on] .cannon {
+  animation: cannon-kick 0.35s ease-out;
+}
+
+@keyframes cannon-kick {
+  0%,
+  100% {
+    transform: rotate(-35deg);
+  }
+  30% {
+    transform: rotate(-35deg) translate3d(-8px, 6px, 0) scale(1.1, 0.9);
+  }
+}
+
+.flyX,
+.standing {
+  opacity: 0;
+}
+
+.yard[data-on] .flyX {
+  animation: fly-x 0.8s linear both;
+}
+
+.yard[data-on] .flyY {
+  animation: fly-y 0.8s cubic-bezier(0.2, 0.6, 0.6, 1) both;
+}
+
+.yard[data-on] .standing {
+  animation: stand-up 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s both;
+}
+
+@keyframes fly-x {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  99% {
+    opacity: 1;
+    transform: translate3d(32%, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(32%, 0, 0);
+  }
+}
+
+@keyframes fly-y {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  45% {
+    transform: translate3d(0, -6rem, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes stand-up {
+  from {
+    opacity: 1;
+    transform: scale(1.2, 0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+}
+
+.rock {
+  transform-box: view-box;
+  transform-origin: 52px 104px;
+  animation: chair-rock 2.4s ease-in-out infinite;
+}
+
+@keyframes chair-rock {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+.bubble {
+  background: var(--tp-parchment);
+  border: 3px solid var(--tp-bark-dark);
+}
+
+.bubble::after {
+  content: '';
+  position: absolute;
+  right: 3rem;
+  top: -0.7rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  background: var(--tp-parchment);
+  border-left: 3px solid var(--tp-bark-dark);
+  border-top: 3px solid var(--tp-bark-dark);
+  transform: rotate(45deg);
+}
+
+.unfold {
+  transform-origin: 50% 0;
+  opacity: 0;
+  transform: scale(1, 0.05);
+}
+
+.yard[data-on] .unfold {
+  animation: board-unfold 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) 0.9s forwards;
+}
+
+@keyframes board-unfold {
+  0% {
+    opacity: 1;
+    transform: scale(1, 0.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .yard[data-on] .cannon,
+  .rock {
+    animation: none;
+  }
+
+  .flyX,
+  .yard[data-on] .flyX {
+    animation: none;
+    opacity: 0;
+  }
+
+  .standing,
+  .yard[data-on] .standing,
+  .unfold,
+  .yard[data-on] .unfold {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

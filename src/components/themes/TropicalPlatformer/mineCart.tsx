@@ -1,24 +1,22 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { BandList, type BandSlot } from '@/components/cv/BandList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
-import { drumsSince } from '@/components/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
-import type { Band, Musician } from '@/lib/cv/content'
+import type { Profession } from '@/lib/cv/professions'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import { CaveCeiling } from './scenery'
 import look from './jungle.module.css'
 import cart from './mineCart.module.css'
 
-// The bands as a mine cart ride: a rail strip with one station per band, broken between stations as the
-// source's cart levels are, and him in the cart. Each band's card has a ride button; the cart rolls to
-// that band's station, hopping every broken gap on the way, its wheels turning while it rides, and the
-// band's card lights up as the stop. When the section scrolls in the cart rolls in to the first band.
+// A mine cart line over a list: a rail strip with one station per stop, broken between stations as the
+// source's cart levels are, and him in the cart. Each stop's card carries a RideButton; the cart rolls
+// to that stop's station, hopping every broken gap on the way, its wheels turning while it rides, and
+// the card lights up as the stop. When the section scrolls in the cart rolls in to the first stop. The
+// projects ride it (projects.tsx).
 //
 // Pattern: the stop is a CSS variable (--stop, in station widths); the hop count (--hops) is the number
 // of gaps crossed and sets the hop's iteration count, remounted per ride; one timer ends the ride.
@@ -53,50 +51,36 @@ function Rails({ stations }: { stations: number }) {
   )
 }
 
-interface StationCardProps {
-  slot: BandSlot
-  here: boolean
-  onRide: () => void
-}
-
-function StationCard({ slot, here, onRide }: StationCardProps) {
-  const { jungle, links } = useLabels()
-  const { band, years, linkProps } = slot
-
+/** The ride button on a stop's card: pressed while the cart stands there. */
+export function RideButton({ name, here, onRide }: { name: string; here: boolean; onRide: () => void }) {
+  const { jungle } = useLabels()
   return (
-    <article data-here={here || undefined} className={`rounded-3xl p-5 ${look.board} ${cart.station}`}>
-      <h3 className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>
-        {linkProps ? (
-          <a {...linkProps} className={`underline decoration-2 underline-offset-4 ${look.focus}`}>
-            {band.name}
-          </a>
-        ) : (
-          band.name
-        )}
-      </h3>
-      {band.role && <p className="mt-1 text-base text-[color:var(--tp-parchment)]">{band.role}</p>}
-      {years && <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{years}</p>}
-      {band.release && (
-        <p className="mt-2 text-sm text-[color:var(--tp-parchment)]">
-          <span className="font-bold text-[color:var(--tp-sun-gold)]">{links.released}: </span>
-          {band.release}
-        </p>
-      )}
-      <button
-        type="button"
-        onClick={onRide}
-        aria-pressed={here}
-        aria-label={fillLabel(jungle.rideTo, { band: band.name })}
-        className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
-      >
-        {here ? jungle.cartHere : jungle.ride}
-      </button>
-    </article>
+    <button
+      type="button"
+      onClick={onRide}
+      aria-pressed={here}
+      aria-label={fillLabel(jungle.rideTo, { stop: name })}
+      className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
+    >
+      {here ? jungle.cartHere : jungle.ride}
+    </button>
   )
 }
 
-/** The bands as stations on a mine cart line; the visitor rides the cart from band to band. */
-export function CartRide({ bands, musician }: { bands: Band[]; musician: Musician }) {
+/** The cart's stop and the ride to another one, handed to the list under the rails. */
+export interface CartStop {
+  stop: number
+  rideTo: (index: number) => void
+}
+
+interface CartLineProps {
+  stops: string[]
+  profession: Profession
+  children: (cart: CartStop) => ReactNode
+}
+
+/** A mine cart line with one station per stop; the visitor rides the cart from stop to stop. */
+export function CartLine({ stops, profession, children }: CartLineProps) {
   const labels = useLabels()
   const { ref, triggered } = useSectionTrigger()
   const [stop, setStop] = useState(0)
@@ -109,7 +93,7 @@ export function CartRide({ bands, musician }: { bands: Band[]; musician: Musicia
 
   const rideTo = (index: number) => {
     if (index === stop) return
-    setStatus(fillLabel(labels.jungle.cartAt, { band: bands[index].name }))
+    setStatus(fillLabel(labels.jungle.cartAt, { stop: stops[index] }))
     setStop(index)
     if (prefersReducedMotion()) return
     setRide((current) => ({ count: current.count + 1, hops: Math.abs(index - stop) }))
@@ -118,32 +102,22 @@ export function CartRide({ bands, musician }: { bands: Band[]; musician: Musicia
     timer.current = window.setTimeout(() => setRiding(false), RIDE_MS)
   }
 
-  if (bands.length === 0) return null
+  if (stops.length === 0) return null
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={cart.line}>
-      <p className={`mx-auto mb-8 w-fit rounded-xl px-5 py-2 text-center text-base text-[color:var(--tp-parchment)] ${look.board}`}>{drumsSince(musician, labels.years)}</p>
-
-      <div className={`relative mb-10 h-32 overflow-hidden rounded-3xl sm:h-36 ${cart.tunnel}`} style={{ '--n': bands.length } as CSSProperties} aria-hidden="true">
+      <div className={`relative mb-10 h-32 overflow-hidden rounded-3xl sm:h-36 ${cart.tunnel}`} style={{ '--n': stops.length } as CSSProperties} aria-hidden="true">
         <CaveCeiling />
-        <Rails stations={bands.length} />
+        <Rails stations={stops.length} />
         <div className={`absolute bottom-2 left-0 ${cart.track}`} style={{ '--stop': stop } as CSSProperties} data-riding={riding || undefined}>
           <div key={ride.count} className={`relative mx-auto w-full max-w-[6rem] ${cart.hop}`} style={{ '--hops': Math.max(ride.hops, 1) } as CSSProperties}>
-            <HeroCharacter profession="drummer" pose={riding ? 'run' : 'idle'} className="absolute bottom-[45%] left-[12%] w-[76%]" />
+            <HeroCharacter profession={profession} pose={riding ? 'run' : 'idle'} className="absolute bottom-[45%] left-[12%] w-[76%]" />
             <Cart />
           </div>
         </div>
       </div>
 
-      <BandList
-        bands={bands}
-        className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => {
-          const index = bands.indexOf(slot.band)
-          return <StationCard slot={slot} here={index === stop} onRide={() => rideTo(index)} />
-        }}
-      />
+      {children({ stop, rideTo })}
 
       <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
         {status}
@@ -151,3 +125,6 @@ export function CartRide({ bands, musician }: { bands: Band[]; musician: Musicia
     </div>
   )
 }
+
+/** The class a stop's card wears: lifted and gold edged while the cart stands at it (data-here). */
+export const STATION = cart.station

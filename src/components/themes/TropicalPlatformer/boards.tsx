@@ -1,5 +1,6 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
@@ -11,15 +12,17 @@ import look from './jungle.module.css'
 
 // The two short sections, read on boards with a simple fade (the section's own level sign does the
 // arrival): the tech stack as a masonry of boards, one per category with its wooden tags, so categories
-// of different lengths pack without gaps; the ventures as plank cards that open the venture's site.
+// of different lengths pack without gaps (each board carries its place as --i, for the ground slap's
+// jolt in slap.tsx); the ventures as plank cards that open
+// the venture's site (also placed by --i, for the rhino's charge in rhino.tsx).
 
 export function TechBoard({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
 
   return (
     <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
-      {categories.map((category) => (
-        <li key={category.id} className={MASONRY_ITEM}>
+      {categories.map((category, index) => (
+        <li key={category.id} className={MASONRY_ITEM} style={{ '--i': index } as CSSProperties}>
           <Board>
             <h3 className={`mb-3 flex items-center gap-2 text-base uppercase text-[color:var(--tp-sun-gold)] ${look.display}`}>
               <span aria-hidden="true">{category.icon}</span>
@@ -44,8 +47,8 @@ export function VentureBoard({ companies }: { companies: CVData['companies'] }) 
 
   return (
     <ul className="grid gap-5 md:grid-cols-3">
-      {companies.map((company) => (
-        <li key={company.id}>
+      {companies.map((company, index) => (
+        <li key={company.id} style={{ '--i': index } as CSSProperties}>
           <a
             href={company.url}
             target="_blank"

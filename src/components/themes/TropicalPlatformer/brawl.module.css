@@ -1,0 +1,111 @@
+/*
+ * The jungle bout (brawl.tsx), one block per data-phase. walk (1 s): the foe swaggers in from off the
+ * right, bobbing, its legs striding; hit (0.7 s): it takes the strike, a spark flashes where it landed,
+ * and it is knocked up and out of the clearing spinning. Transform and opacity only.
+ */
+
+.clearing {
+  background: linear-gradient(180deg, #1d5a2a 0%, #0f3519 100%);
+  border: 3px solid var(--tp-bark-dark);
+}
+
+.ground {
+  background: linear-gradient(180deg, var(--tp-dirt) 0%, var(--tp-dirt-dark) 100%);
+}
+
+.foe {
+  transform-origin: 50% 80%;
+}
+
+.clearing[data-phase='walk'] .foe {
+  animation: foe-walk-in 1s linear both;
+}
+
+@keyframes foe-walk-in {
+  from {
+    transform: translate3d(140%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.clearing[data-phase='walk'] .walker {
+  animation: foe-bob 0.25s ease-in-out infinite alternate;
+}
+
+@keyframes foe-bob {
+  from {
+    transform: translate3d(0, 0, 0) rotate(-3deg);
+  }
+  to {
+    transform: translate3d(0, -4px, 0) rotate(3deg);
+  }
+}
+
+.stride,
+.strideBack {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.clearing[data-phase='walk'] .stride {
+  animation: foe-stride 0.25s ease-in-out infinite alternate;
+}
+
+.clearing[data-phase='walk'] .strideBack {
+  animation: foe-stride 0.25s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes foe-stride {
+  from {
+    transform: rotate(-20deg);
+  }
+  to {
+    transform: rotate(20deg);
+  }
+}
+
+.clearing[data-phase='hit'] .foe {
+  animation: foe-knocked 0.7s cubic-bezier(0.3, 0, 0.6, 1) both;
+}
+
+@keyframes foe-knocked {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  15% {
+    transform: translate3d(0.4rem, 0, 0) scale(0.92, 1.06);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(160%, -140%, 0) rotate(300deg);
+  }
+}
+
+.spark {
+  background: radial-gradient(closest-side, var(--tp-burst), var(--tp-sun-gold) 45%, transparent);
+  animation: spark-flash 0.35s ease-out both;
+}
+
+@keyframes spark-flash {
+  from {
+    opacity: 1;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clearing[data-phase] .foe,
+  .clearing[data-phase] .walker,
+  .clearing[data-phase] .stride,
+  .clearing[data-phase] .strideBack,
+  .spark {
+    animation: none;
+  }
+}

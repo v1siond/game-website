@@ -18,6 +18,9 @@ import sprite from './character.module.css'
 // - run: the knuckle run, the body bouncing while the arms plant and swing;
 // - roll: tucked into a spinning ball, the roll attack;
 // - throw: a barrel hoisted overhead and thrown, once, then back to rest;
+// - slap: the ground slap, both hands raised and slammed flat on the ground in turn, the body squashing
+//   on each slam (the section around him shakes, slap.tsx);
+// - swing: hanging from a vine by one hand overhead, the other arm and the legs loose (vines.tsx);
 // - act: his profession, done the way this hero would: typing on a field laptop with his knuckles
 //   (engineer), slapping a pair of bongos (drummer), a guard and jabs in gloves, shorts and his mongkhon
 //   (fighter, who wears no tie).
@@ -25,7 +28,7 @@ import sprite from './character.module.css'
 // `silhouette` draws him the way the sunset level draws its characters: fur and skin one dark shape, the
 // rim light kept, only what he wears in colour.
 
-export type HeroPose = 'idle' | 'run' | 'roll' | 'throw' | 'act'
+export type HeroPose = 'idle' | 'run' | 'roll' | 'throw' | 'slap' | 'swing' | 'act'
 
 // A hex colour moved toward another by t (0 to 1), for the light and the shade of a volume.
 const mix = (from: string, to: string, t: number): string => {

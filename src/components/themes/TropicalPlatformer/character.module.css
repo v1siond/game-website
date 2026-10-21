@@ -127,6 +127,39 @@
     animation: throw-barrel 1.3s ease-in var(--pose-delay, 0s) both;
   }
 
+  /* ---- slap: hands up, slammed flat on the ground, left then right ---- */
+
+  .figure[data-pose='slap'] .body {
+    animation: slap-body 0.9s ease-in infinite;
+  }
+
+  .figure[data-pose='slap'] .armBack {
+    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) infinite;
+  }
+
+  .figure[data-pose='slap'] .foreBack {
+    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) infinite;
+  }
+
+  .figure[data-pose='slap'] .armFront {
+    animation: slap-upper 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s infinite;
+  }
+
+  .figure[data-pose='slap'] .foreFront {
+    animation: slap-fore 0.9s cubic-bezier(0.5, 0, 0.9, 0.6) -0.45s infinite;
+  }
+
+  /* ---- swing: the back hand holds the vine overhead, the rest hangs and trails ---- */
+
+  .figure[data-pose='swing'] .armFront {
+    animation: swing-loose 1.6s ease-in-out infinite alternate;
+  }
+
+  .figure[data-pose='swing'] .legBack,
+  .figure[data-pose='swing'] .legFront {
+    animation: swing-dangle 1.6s ease-in-out infinite alternate;
+  }
+
   /* ---- act: typing with the knuckles ---- */
 
   .figure[data-pose='act'][data-profession='engineer'] .armBack,
@@ -371,6 +404,76 @@
   }
   28% {
     transform: rotate(0deg);
+  }
+}
+
+/* The hanging grip holds even when nothing moves: the back arm straight up to the vine. */
+.figure[data-pose='swing'] .armBack {
+  transform: rotate(168deg);
+}
+
+.figure[data-pose='swing'] .armFront {
+  transform: rotate(28deg);
+}
+
+@keyframes slap-body {
+  0%,
+  100% {
+    transform: translate(0, 3px) scale(1.08, 0.9);
+  }
+  25%,
+  75% {
+    transform: translate(0, -2px) scale(0.98, 1.04);
+  }
+  50% {
+    transform: translate(0, 3px) scale(1.08, 0.9);
+  }
+}
+
+/* Up over the head (outward and up), then down hard to the hip with the forearm reaching out flat. */
+@keyframes slap-upper {
+  0%,
+  10% {
+    transform: rotate(20deg);
+  }
+  40% {
+    transform: rotate(150deg);
+  }
+  55%,
+  100% {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes slap-fore {
+  0%,
+  10% {
+    transform: rotate(-10deg);
+  }
+  40% {
+    transform: rotate(-30deg);
+  }
+  55%,
+  100% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes swing-loose {
+  from {
+    transform: rotate(18deg);
+  }
+  to {
+    transform: rotate(40deg);
+  }
+}
+
+@keyframes swing-dangle {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(10deg);
   }
 }
 

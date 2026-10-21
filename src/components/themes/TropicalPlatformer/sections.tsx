@@ -5,18 +5,24 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { TechBoard, VentureBoard } from './boards'
+import { BrawlRecord } from './brawl'
 import { CannonRun } from './cannons'
+import { VineCrossing } from './crossing'
+import { ElderYard } from './elder'
 import { Board, Level } from './levelSign'
-import { CartRide } from './mineCart'
-import { TargetRecord } from './target'
-import { VineGrove } from './vines'
+import { CartProjects } from './projects'
+import { RhinoCharge } from './rhino'
+import { GroundSlap } from './slap'
+import { VineBands } from './vines'
 import look from './jungle.module.css'
 
-// The picked profession's sections, each a level opened by its plank sign and standing in its own scene:
-// the day jungle, the treetop village for the barrel cannons, the dusk vines for the projects, the cave
-// of the hoard for the mine cart. The short ones (about, the tech stack, ventures) fade in on boards; the long ones are the jungle's own machines: the barrel
-// cannons for the jobs, the hanging vines and the hidden letters for the projects, the mine cart for the
-// bands and the end target for the Muay Thai record.
+// The picked profession's sections, each a level opened by its plank sign and standing in its own scene,
+// and each one a different thing he does with its content: about in the old timer's yard (a barrel
+// cannon fires him in, the board unfolds, the old timer grumbles), the jobs as barrel cannons he blasts
+// between collecting the letters of his name, the tech stack shaken by his ground slap, a vine crossing
+// into the cave, the projects as stations of a mine cart ride, the ventures rammed by the rhino, the
+// bands as hanging planks he swings between, and the Muay Thai record as a bout with the walking
+// crocodiles. The posts level closes every profession on a plain board.
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -25,11 +31,11 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
   return (
     <div className="space-y-24">
       <Level title={titles.about} scene="jungle">
-        <FadeInScene>
+        <ElderYard>
           <Board>
             <p className="mx-auto max-w-3xl text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{professionalSummary.bio}</p>
           </Board>
-        </FadeInScene>
+        </ElderYard>
       </Level>
 
       {sections.jobs.length > 0 && (
@@ -39,22 +45,25 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       )}
 
       <Level title={titles.techStack} scene="jungle">
-        <FadeInScene>
+        <GroundSlap>
           <TechBoard categories={sections.techStack} />
-        </FadeInScene>
+        </GroundSlap>
       </Level>
 
       {sections.projects.length > 0 && (
-        <Level title={titles.projects} scene="vines">
-          <VineGrove projects={sections.projects} />
-        </Level>
+        <>
+          <VineCrossing />
+          <Level title={titles.projects} scene="cave">
+            <CartProjects projects={sections.projects} />
+          </Level>
+        </>
       )}
 
       {sections.companies.length > 0 && (
         <Level title={titles.ventures} scene="jungle">
-          <FadeInScene>
+          <RhinoCharge>
             <VentureBoard companies={sections.companies} />
-          </FadeInScene>
+          </RhinoCharge>
         </Level>
       )}
     </div>
@@ -65,8 +74,8 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   const { sections: titles } = useLabels()
 
   return (
-    <Level title={titles.bands} scene="cave">
-      <CartRide bands={sections.bands} musician={sections.musician} />
+    <Level title={titles.bands} scene="vines">
+      <VineBands bands={sections.bands} musician={sections.musician} />
     </Level>
   )
 }
@@ -78,7 +87,7 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
   return (
     <Level title={titles.muayThai} scene="jungle">
       <h3 className={`mb-8 text-center text-xl text-[color:var(--tp-sun-gold)] ${look.display} ${look.caption}`}>{martialArts.primary.title}</h3>
-      <TargetRecord martialArts={martialArts} />
+      <BrawlRecord martialArts={martialArts} />
     </Level>
   )
 }

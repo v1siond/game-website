@@ -17,6 +17,7 @@ import { HudProvider } from './TropicalPlatformer/hud'
 import { SunsetHero } from './TropicalPlatformer/sunset'
 import { PartnerBarrel } from './TropicalPlatformer/partnerBarrel'
 import { PostsLevel, SECTION_VIEWS } from './TropicalPlatformer/sections'
+import { VineCrossing } from './TropicalPlatformer/crossing'
 import { TreehouseContact } from './TropicalPlatformer/nightfall'
 import look from './TropicalPlatformer/jungle.module.css'
 
@@ -25,7 +26,7 @@ const jungleFace = Lilita_One({ weight: '400', subsets: ['latin'], display: 'swa
 
 // Tropical Platformer, a jungle barrel platformer from sunset to night: the page composition. He is shot
 // out of his tree house in the sunset (the hero), picks a profession at the partner barrel, crosses the
-// picked profession's levels (./TropicalPlatformer/sections) and ends the run at night by the tree house
+// picked profession's levels (./TropicalPlatformer/sections), swinging in on the vines, and ends the run at night by the tree house
 // (contact). The root carries the palette as --tp-* variables, the pointer as --mx and --my for the
 // sunset's planes, the shared gradients every barrel is drawn with and the scenery's shapes every scene
 // is built from. Each part stands in its own scene (the sunset, the dusk, each level's, the night) and
@@ -67,6 +68,7 @@ export default function TropicalPlatformerTheme() {
 
       <main className="relative z-20 px-4 py-16 sm:px-8 md:px-20">
         <div className="mx-auto max-w-6xl space-y-24" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <VineCrossing />
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           <PostsLevel />
         </div>

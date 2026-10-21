@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { jobYears } from '@/components/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -11,6 +11,8 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { BarrelArt } from './barrel'
 import { HeroCharacter } from './character'
+import { ExtraLifeBalloon, HiddenCoin, LetterTracker } from './letterCoin'
+import { letterCards, nameLetters } from './letters'
 import look from './jungle.module.css'
 import run from './cannons.module.css'
 
@@ -19,7 +21,10 @@ import run from './cannons.module.css'
 // its mouth, and only that barrel is a button. Blast turns it to aim at the next job's barrel, fires
 // with a recoil, and he flies there rolled into a ball in an arc; the platform he lands on bounces and
 // its barrel takes him. The status line says where he landed and focus moves to his new barrel, so a
-// keyboard visitor can keep blasting through the jobs.
+// keyboard visitor can keep blasting through the jobs. The source hides four letters along every level;
+// here the first four letters of his first name spin over the jobs (first, last and evenly between) and
+// each is collected when he lands on its job (the first when the run opens), flying up into the tracker
+// over the run; all four float up the extra life balloon.
 //
 // Pattern: measured flight. A click reads the two barrels' boxes, sets the aim angle (--aim) and the
 // flight offsets (--dx, --dy, --peak) as CSS variables, and two timers end the aim and the flight; the
@@ -48,8 +53,15 @@ const centre = (element: HTMLElement) => {
   return { x: box.left + box.width / 2, y: box.top + box.height / 2 }
 }
 
+interface Coin {
+  index: number
+  letter: string
+  found: boolean
+}
+
 interface PlatformProps {
   entry: Job
+  coins: Coin[]
   index: number
   occupied: boolean
   landed: number
@@ -59,7 +71,7 @@ interface PlatformProps {
   barrelRef: (element: HTMLElement | null) => void
 }
 
-function Platform({ entry, index, occupied, landed, aim, nextName, onBlast, barrelRef }: PlatformProps) {
+function Platform({ entry, coins, index, occupied, landed, aim, nextName, onBlast, barrelRef }: PlatformProps) {
   const { years, cards, jungle } = useLabels()
   const { start, end } = jobYears(entry, years.present)
   const cannon = (
@@ -72,6 +84,13 @@ function Platform({ entry, index, occupied, landed, aim, nextName, onBlast, barr
   return (
     <article key={landed} data-landed={landed > 0 || undefined} className={`relative rounded-3xl p-5 pt-6 ${look.board} ${run.platform}`} style={{ '--i': index } as CSSProperties}>
       <span className={`absolute inset-x-0 top-0 h-3 rounded-t-3xl ${run.grass}`} aria-hidden="true" />
+      {coins.length > 0 && (
+        <div className="absolute -top-5 left-4 flex gap-2">
+          {coins.map((coin) => (
+            <HiddenCoin key={coin.index} letter={coin.letter} found={coin.found} />
+          ))}
+        </div>
+      )}
       <div className="absolute -top-6 right-4 w-14">
         {occupied ? (
           <button ref={barrelRef} type="button" onClick={onBlast} aria-label={fillLabel(jungle.blastTo, { job: nextName })} className={`block w-full rounded-full ${look.focus}`}>
@@ -84,7 +103,7 @@ function Platform({ entry, index, occupied, landed, aim, nextName, onBlast, barr
         )}
       </div>
 
-      <div className="pr-16">
+      <div className={`pr-16 ${coins.length > 0 ? 'pt-6' : ''}`}>
         <h3 className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>{entry.title}</h3>
         <p className="mt-1 text-base text-[color:var(--tp-parchment)]">
           <SlashBreaks text={entry.company} />
@@ -123,7 +142,11 @@ function Platform({ entry, index, occupied, landed, aim, nextName, onBlast, barr
 /** The jobs as a masonry run of platforms and barrel cannons; he blasts from one job to the next. */
 export function CannonRun({ jobs }: { jobs: Job[] }) {
   const labels = useLabels()
+  const { hero } = useWorldView()
   const { ref, triggered } = useSectionTrigger()
+  const letters = nameLetters(hero.name)
+  const holders = letterCards(letters.length, jobs.length)
+  const [visited, setVisited] = useState<ReadonlySet<number>>(() => new Set())
   const [at, setAt] = useState(0)
   const [aim, setAim] = useState<number | null>(null)
   const [flight, setFlight] = useState<Flight | null>(null)
@@ -136,6 +159,11 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
+  // He starts in the first job's barrel, so its letter is found as the run opens.
+  useEffect(() => {
+    if (triggered) setVisited((current) => (current.has(0) ? current : new Set(current).add(0)))
+  }, [triggered])
+
   useEffect(() => {
     if (!focusAfterLanding.current) return
     focusAfterLanding.current = false
@@ -144,6 +172,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   const land = (to: number) => {
     setAt(to)
+    setVisited((current) => new Set(current).add(to))
     setAim(null)
     setFlight(null)
     setLandings((count) => ({ ...count, [to]: (count[to] ?? 0) + 1 }))
@@ -180,9 +209,21 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   if (jobs.length === 0) return null
   const nextName = jobName(jobs[(at + 1) % jobs.length], labels)
+  const found = new Set(holders.flatMap((holder, index) => (visited.has(holder) ? [index] : [])))
+  const complete = letters.length > 0 && found.size === letters.length
+  const coinsOn = (job: number): Coin[] =>
+    holders.flatMap((holder, index) => (holder === job ? [{ index, letter: letters[index], found: found.has(index) }] : []))
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={run.run}>
+      <div className={`relative mx-auto mb-6 max-w-md rounded-3xl px-5 py-4 text-center ${look.board}`}>
+        <p className="mb-3 text-base text-[color:var(--tp-parchment)]">{labels.jungle.lettersHint}</p>
+        <LetterTracker letters={letters} found={found} />
+        <p className="mt-3 text-base text-[color:var(--tp-sun-gold)]">
+          {complete ? labels.jungle.extraLife : fillLabel(labels.jungle.lettersFound, { count: found.size, total: letters.length })}
+        </p>
+        {complete && <ExtraLifeBalloon />}
+      </div>
       <p className={`mb-8 text-center text-base text-[color:var(--tp-parchment)] ${look.caption}`}>{labels.jungle.cannonHint}</p>
       <div ref={stage} className="relative">
         <ul className={MASONRY_LIST}>
@@ -190,6 +231,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
             <li key={entry.id} className={`${MASONRY_ITEM} pt-6`}>
               <Platform
                 entry={entry}
+                coins={coinsOn(index)}
                 index={index}
                 occupied={index === at && !flight}
                 landed={landings[index] ?? 0}

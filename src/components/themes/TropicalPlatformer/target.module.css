@@ -1,126 +1,71 @@
 /*
- * The end target (target.tsx), one block per phase of data-phase. fall (0.6 s): the high barrel recoils
- * and he flies from it onto the pad, rolled into a ball; climb (0.8 s): he lands with a squash and the
- * marker climbs the pole; roll (1.2 s): the prize window runs once through every achievement and stops
- * on the next one (--prize of --count, each line 4rem tall). Transform and opacity only.
+ * The end target (target.tsx), off the night scene's data-on. At 0.9 s he lands from the roll and the
+ * pad squashes (0.3 s); from 1 s the barrel shoots up the pole (0.7 s) and at the top a starburst flares
+ * and fades (1.7 s). The barrel stays up, the level won. Transform and opacity only.
  */
-
-.rig {
-  --line: 4rem;
-}
 
 .pole {
   background: linear-gradient(90deg, var(--tp-bark-dark), var(--tp-plank) 45%, var(--tp-bark-dark));
 }
 
-.marker {
-  transform: translate3d(0, 0, 0);
-  transition: transform 0.5s ease-in;
-}
-
-.rig[data-phase='climb'] .marker,
-.rig[data-phase='roll'] .marker {
-  transform: translate3d(0, -13rem, 0);
-  transition: transform 0.8s cubic-bezier(0.34, 1.2, 0.64, 1);
-}
-
-.reel {
-  transform: translate3d(0, calc(var(--prize) * var(--line) * -1), 0);
-}
-
-.rig[data-phase='roll'] .reel {
-  animation: prize-roll 1.2s cubic-bezier(0.2, 0.6, 0.3, 1) both;
-}
-
-@keyframes prize-roll {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(0, calc((var(--count) + var(--prize)) * var(--line) * -1), 0);
-  }
-}
-
-.prize {
-  height: var(--line);
-}
-
-.cannon {
-  transform: rotate(120deg);
-}
-
-.rig[data-phase='fall'] .cannon {
-  animation: high-recoil 0.3s ease-out;
-}
-
-@keyframes high-recoil {
-  0% {
-    transform: rotate(120deg) translate3d(0, 18%, 0) scale(1.1, 0.88);
-  }
-  100% {
-    transform: rotate(120deg);
-  }
-}
-
-.rig[data-phase='fall'] .jumperX {
-  animation: jump-across 0.6s linear both;
-}
-
-@keyframes jump-across {
-  from {
-    transform: translate3d(-170px, 0, 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-.rig[data-phase='fall'] .jumperY {
-  animation: jump-drop 0.6s linear both;
-}
-
-@keyframes jump-drop {
-  0% {
-    transform: translate3d(0, -150px, 0);
-    animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
-  }
-  30% {
-    transform: translate3d(0, -190px, 0);
-    animation-timing-function: cubic-bezier(0.6, 0, 0.9, 0.5);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-.jumperY {
+.pad {
   transform-origin: 50% 100%;
 }
 
-.rig[data-phase='climb'] .jumperY {
-  animation: pad-squash 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+[data-on] .pad {
+  animation: pad-squash 0.3s ease-out 0.9s;
 }
 
 @keyframes pad-squash {
+  50% {
+    transform: scale(1.12, 0.6);
+  }
+}
+
+[data-on] .marker {
+  animation: barrel-climb 0.7s cubic-bezier(0.2, 0.9, 0.3, 1.15) 1s both;
+}
+
+@keyframes barrel-climb {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -10rem, 0);
+  }
+}
+
+.star {
+  opacity: 0;
+  background: radial-gradient(closest-side, var(--tp-burst), var(--tp-sun-gold) 40%, transparent);
+}
+
+[data-on] .star {
+  animation: bell-flare 0.8s ease-out 1.7s both;
+}
+
+@keyframes bell-flare {
   0% {
-    transform: scale(1.25, 0.75);
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  30% {
+    opacity: 1;
   }
   100% {
-    transform: scale(1);
+    opacity: 0;
+    transform: scale(1.5) rotate(45deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marker,
-  .rig[data-phase='climb'] .marker,
-  .rig[data-phase='roll'] .marker {
-    transition: none;
+  [data-on] .pad,
+  [data-on] .star {
+    animation: none;
   }
 
-  .rig[data-phase] .reel,
-  .rig[data-phase] .cannon,
-  .rig[data-phase] .jumperX,
-  .rig[data-phase] .jumperY {
+  [data-on] .marker {
     animation: none;
+    transform: translate3d(0, -10rem, 0);
   }
 }

@@ -1,26 +1,26 @@
 'use client'
 
-import { useRef, useState, type CSSProperties } from 'react'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useState, type CSSProperties } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
-import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
-import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { drumsSince } from '@/components/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
-import type { Project } from '@/lib/cv/content'
+import type { Band, Musician } from '@/lib/cv/content'
+import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
-import { letterCards, nameLetters } from './letters'
 import look from './jungle.module.css'
 import grove from './vines.module.css'
 
-// Projects as a grove of hanging planks: each project hangs from two leafy vines and sways when pointed
-// at or focused. The source hides four letters in every level; here they are the first four letters of
-// his first name, spinning on four of the cards (first, last and evenly between). A click collects one:
-// it flies up and its slot in the tracker under the title fills in. With all four found, a red balloon
-// floats up and the status line says so (the source's extra life).
+// The bands as a grove of hanging planks in the cave of the hoard: each band hangs from two leafy vines
+// and sways when pointed at or focused. He hangs by one hand from the vine of the band he is at, legs
+// loose, swaying on it the way the source's ropes swing. Swing here sends him over: he lets go of the
+// old vine and swings in on the new one, overshooting and settling like a pendulum; the band he hangs
+// from lifts as the one being played.
 //
-// Pattern: React state for the found letters, CSS for the motion. A collected letter's button is gone, so
-// focus moves to the tracker, which the status line also reads out.
+// Pattern: React state for the band he is on and a count that remounts the swing in; the pendulum is CSS
+// round the hand on the vine.
 
 function Vines() {
   return (
@@ -35,166 +35,90 @@ function Vines() {
   )
 }
 
-// A letter as the gold coin it spins on.
-function LetterCoin({ letter }: { letter: string }) {
-  return (
-    <svg viewBox="0 0 40 40" className="h-full w-full" aria-hidden="true" focusable="false">
-      <circle cx="20" cy="20" r="18" fill={C.letter} stroke={C.barkDark} strokeWidth="3" />
-      <circle cx="20" cy="20" r="13" fill="none" stroke={C.sunCore} strokeWidth="1.5" opacity="0.8" />
-      <text x="20" y="27" textAnchor="middle" fontSize="20" fontWeight="900" fill={C.barkDark} fontFamily="Arial Black, sans-serif">
-        {letter}
-      </text>
-    </svg>
-  )
-}
-
-interface HiddenLetter {
-  index: number
-  letter: string
-}
-
 interface CardProps {
-  slot: ProjectSlot
+  slot: BandSlot
   index: number
-  letters: HiddenLetter[]
-  found: ReadonlySet<number>
-  onCollect: (index: number) => void
+  here: boolean
+  swings: number
+  onSwing: () => void
 }
 
-// The coins hang over the card's top right corner. Where the card is narrow (a phone, the two up tablet
-// columns) the name starts below them; from lg up the card is wide enough to run beside them.
-const CLEAR_COINS = 'pt-6 lg:pr-24 lg:pt-0'
-
-function HangingCard({ slot, index, letters, found, onCollect }: CardProps) {
-  const labels = useLabels()
-  const { project, years, links } = slot
+function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
+  const { jungle, links } = useLabels()
+  const { band, years, linkProps } = slot
 
   return (
     <div className={`relative pt-10 ${grove.hang}`} style={{ '--i': index } as CSSProperties}>
-      <article className={`relative rounded-3xl p-5 ${look.board} ${grove.card}`}>
+      <article data-here={here || undefined} className={`relative rounded-3xl p-5 ${look.board} ${grove.card}`}>
         <Vines />
-        {letters.length > 0 && (
-          <div className="absolute -top-5 right-4 flex gap-2">
-            {letters.map(({ index: letterIndex, letter }) =>
-              found.has(letterIndex) ? (
-                <span key={letterIndex} className={`block h-11 w-11 ${grove.flown}`} aria-hidden="true">
-                  <LetterCoin letter={letter} />
-                </span>
-              ) : (
-                <button
-                  key={letterIndex}
-                  type="button"
-                  onClick={() => onCollect(letterIndex)}
-                  aria-label={fillLabel(labels.jungle.collectLetter, { letter })}
-                  className={`block h-11 w-11 rounded-full ${look.focus} ${grove.coin}`}
-                >
-                  <LetterCoin letter={letter} />
-                </button>
-              ),
-            )}
+        {here && (
+          <div key={swings} className={`pointer-events-none absolute -top-12 right-[12%] z-10 w-16 ${grove.swinger}`} aria-hidden="true">
+            <HeroCharacter profession="drummer" pose="swing" className="block h-auto w-full" />
           </div>
         )}
-
-        <h3 className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display} ${letters.length > 0 ? CLEAR_COINS : ''}`}>
-          <SlashBreaks text={project.name} />
+        <h3 className={`pr-20 text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>
+          {linkProps ? (
+            <a {...linkProps} className={`underline decoration-2 underline-offset-4 ${look.focus}`}>
+              {band.name}
+            </a>
+          ) : (
+            band.name
+          )}
         </h3>
-        {project.role && <p className="mt-1 text-sm font-bold text-[color:var(--tp-plank-light)]">{project.role}</p>}
+        {band.role && <p className="mt-1 pr-20 text-base text-[color:var(--tp-parchment)]">{band.role}</p>}
         {years && <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{years}</p>}
-        {project.tagline && <p className="mt-3 text-base leading-relaxed text-[color:var(--tp-parchment)]">{project.tagline}</p>}
-        {project.impact && (
-          <p className="mt-3 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
-            <span className="font-bold text-[color:var(--tp-sun-gold)]">{labels.cards.impact}: </span>
-            {project.impact}
+        {band.release && (
+          <p className="mt-2 text-sm text-[color:var(--tp-parchment)]">
+            <span className="font-bold text-[color:var(--tp-sun-gold)]">{links.released}: </span>
+            {band.release}
           </p>
         )}
-        {project.techStack.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-2" aria-label={labels.cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <li key={tech} className={`rounded-lg px-2 py-1 text-sm ${look.tag}`}>
-                {tech}
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className="mt-4 flex flex-wrap gap-3">
-          {links.length > 0 ? (
-            links.map(({ kind, label, linkProps }) => (
-              <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}>
-                {label}
-              </a>
-            ))
-          ) : (
-            <p className="text-sm italic text-[color:var(--tp-plank-light)]">{labels.links.noPublicLink}</p>
-          )}
-        </div>
+        <button
+          type="button"
+          onClick={onSwing}
+          aria-pressed={here}
+          aria-label={fillLabel(jungle.swingTo, { band: band.name })}
+          className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
+        >
+          {here ? jungle.swingHere : jungle.swing}
+        </button>
       </article>
     </div>
   )
 }
 
-function Tracker({ letters, found }: { letters: string[]; found: ReadonlySet<number> }) {
-  return (
-    <ol className="flex justify-center gap-3" aria-hidden="true">
-      {letters.map((letter, index) => (
-        <li key={index} data-found={found.has(index) || undefined} className={`flex h-12 w-12 items-center justify-center rounded-full ${grove.slot}`}>
-          {found.has(index) && (
-            <span className={`block h-full w-full ${grove.landed}`}>
-              <LetterCoin letter={letter} />
-            </span>
-          )}
-        </li>
-      ))}
-    </ol>
-  )
-}
-
-/** The projects hanging from vines, with his name's letters hidden on four of them. */
-export function VineGrove({ projects }: { projects: Project[] }) {
+/** The bands hanging from vines; he swings from band to band. */
+export function VineBands({ bands, musician }: { bands: Band[]; musician: Musician }) {
   const labels = useLabels()
-  const { hero } = useWorldView()
   const { ref, triggered } = useSectionTrigger()
-  const letters = nameLetters(hero.name)
-  const holders = letterCards(letters.length, projects.length)
-  const [found, setFound] = useState<ReadonlySet<number>>(() => new Set())
-  const tracker = useRef<HTMLDivElement>(null)
-  const complete = letters.length > 0 && found.size === letters.length
+  const [at, setAt] = useState(0)
+  const [swings, setSwings] = useState(0)
+  const [status, setStatus] = useState('')
 
-  const collect = (index: number) => {
-    setFound((current) => new Set(current).add(index))
-    tracker.current?.focus()
+  const swingTo = (index: number) => {
+    if (index === at) return
+    setAt(index)
+    setSwings((count) => count + 1)
+    setStatus(fillLabel(labels.jungle.swingAt, { band: bands[index].name }))
   }
 
-  const lettersOn = (card: number): HiddenLetter[] =>
-    holders.flatMap((holder, index) => (holder === card ? [{ index, letter: letters[index] }] : []))
-
-  const count = fillLabel(labels.jungle.lettersFound, { count: found.size, total: letters.length })
+  if (bands.length === 0) return null
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={grove.grove}>
-      <div ref={tracker} tabIndex={-1} className={`relative mx-auto mb-10 max-w-md rounded-3xl px-5 py-4 text-center ${look.board} ${look.focus}`}>
-        <p className="mb-3 text-base text-[color:var(--tp-parchment)]">{labels.jungle.lettersHint}</p>
-        <Tracker letters={letters} found={found} />
-        <p role="status" className="mt-3 text-base text-[color:var(--tp-sun-gold)]">
-          {complete ? labels.jungle.extraLife : count}
-        </p>
-        {complete && (
-          <svg viewBox="0 0 40 60" className={`pointer-events-none absolute -top-4 right-6 h-16 w-10 ${grove.balloon}`} aria-hidden="true" focusable="false">
-            <path d="M20 2 C31 2 37 11 37 20 C37 31 28 39 20 40 C12 39 3 31 3 20 C3 11 9 2 20 2 Z" fill={C.target} />
-            <ellipse cx="13" cy="13" rx="4" ry="6" fill={C.burst} opacity="0.5" />
-            <path d="M17 40 L23 40 L20 44 Z M20 44 Q16 50 20 54 T20 60" fill="none" stroke={C.parchment} strokeWidth="1.5" />
-          </svg>
-        )}
-      </div>
-
-      <ProjectList
-        projects={projects}
+      <p className={`mx-auto mb-10 w-fit rounded-xl px-5 py-2 text-center text-base text-[color:var(--tp-parchment)] ${look.board}`}>{drumsSince(musician, labels.years)}</p>
+      <BandList
+        bands={bands}
         className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => {
-          const card = projects.indexOf(slot.project)
-          return <HangingCard slot={slot} index={card} letters={lettersOn(card)} found={found} onCollect={collect} />
+        itemClassName={`${MASONRY_ITEM} pt-6`}
+        renderBand={(slot) => {
+          const index = bands.indexOf(slot.band)
+          return <HangingBand slot={slot} index={index} here={index === at} swings={swings} onSwing={() => swingTo(index)} />
         }}
       />
+      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
+        {status}
+      </p>
     </div>
   )
 }

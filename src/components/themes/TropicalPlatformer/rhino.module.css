@@ -1,0 +1,91 @@
+/*
+ * The rhino's charge (rhino.tsx), off data-charging (remounted per charge): a full width layer carries
+ * the rhino from off the left edge to the right end of the trail, where it pulls up (1.6 s), the rhino bobbing at a gallop with its legs
+ * trotting; each venture card is knocked sideways and rocks back as the charge passes it (--i). Before
+ * the first charge the rhino waits off screen. Transform and opacity only.
+ */
+
+.runner {
+  transform: translate3d(-40%, 0, 0);
+}
+
+.trail[data-charging] .runner {
+  animation: charge-across 1.6s cubic-bezier(0.5, 0, 0.7, 1) both;
+}
+
+@keyframes charge-across {
+  from {
+    transform: translate3d(-40%, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(100% - 9rem), 0, 0);
+  }
+}
+
+.trail[data-charging] .gallop {
+  animation: gallop-bob 0.2s ease-in-out 8 alternate;
+}
+
+@keyframes gallop-bob {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(0, -6px, 0) rotate(-3deg);
+  }
+}
+
+.legA,
+.legB {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.trail[data-charging] .legA {
+  animation: trot 0.2s ease-in-out 8 alternate;
+}
+
+.trail[data-charging] .legB {
+  animation: trot 0.2s ease-in-out -0.2s 8 alternate-reverse;
+}
+
+@keyframes trot {
+  from {
+    transform: rotate(-22deg);
+  }
+  to {
+    transform: rotate(22deg);
+  }
+}
+
+.trail[data-charging] .cards li {
+  animation: rammed 0.7s cubic-bezier(0.3, 0, 0.3, 1) calc(0.45s + var(--i, 0) * 0.3s) both;
+}
+
+@keyframes rammed {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  20% {
+    transform: translate3d(1.2rem, -0.4rem, 0) rotate(4deg);
+  }
+  55% {
+    transform: translate3d(-0.3rem, 0, 0) rotate(-1.5deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .runner,
+  .trail[data-charging] .runner {
+    animation: none;
+    transform: translate3d(calc(100% - 9rem), 0, 0);
+  }
+
+  .trail[data-charging] .gallop,
+  .trail[data-charging] .legA,
+  .trail[data-charging] .legB,
+  .trail[data-charging] .cards li {
+    animation: none;
+  }
+}

@@ -1,6 +1,6 @@
 'use client'
 
-import { type CSSProperties } from 'react'
+import { useState, type CSSProperties } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/components/cv/sectionText'
@@ -10,15 +10,18 @@ import { JungleAction, JungleCVLink } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import { Backdrop, NightFront, NightSky, ToneScope } from './scenery'
+import { EndTarget } from './target'
 import look from './jungle.module.css'
 import night from './nightfall.module.css'
 
 // Contact at the end of the level, where the source's levels end: night, in the teal the source tints
 // its night jungle with, the same jungle round the section. The moon is up over his tree house, the
-// window lights, fireflies drift; he rolls in along the ground as a spinning ball and pops up
-// by the ladder, chest pounding, and the contact sign drops on two vines and swings to rest. Pointing at
-// the sign rocks it. Pattern: CSS off one trigger (data-on), the roll 0 to 0.9 s, the window at 0.6 s,
-// the sign from 1 s.
+// window lights, fireflies drift; he rolls in along the ground as a spinning ball onto the source's end
+// of level target and pops up on its pad, chest pounding, while the barrel shoots up the pole and rings
+// the bell (target.tsx); the contact sign drops on two vines and swings to rest. Pointing at the sign
+// rocks it; Jump again replays the finish. Pattern: CSS off one trigger (data-on), the roll 0 to 0.9 s,
+// the window at 0.6 s, the target from 0.9 s, the sign from 1 s; a replay count remounts the scene's
+// actors.
 
 // The four fireflies: where each drifts from and its delay.
 const FIREFLIES = [
@@ -58,7 +61,8 @@ function NightHouse() {
 }
 
 export function TreehouseContact() {
-  const { sections, navigation } = useLabels()
+  const { sections, navigation, jungle } = useLabels()
+  const [finishes, setFinishes] = useState(0)
   const { active } = useProfession()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
   const id = headingId('jungle', sections.contact)
@@ -79,10 +83,20 @@ export function TreehouseContact() {
               aria-hidden="true"
             />
           ))}
-          <div className={`absolute bottom-3 left-[50%] h-28 w-20 ${night.roller}`} aria-hidden="true">
-            <HeroCharacter profession={active} pose="roll" className={`absolute inset-0 h-full w-full ${night.ball}`} />
-            <HeroCharacter profession={active} pose="idle" className={`absolute inset-0 h-full w-full ${night.standing}`} />
+          <div key={finishes} className="absolute inset-0">
+            <EndTarget />
+            <div className={`absolute bottom-3 left-[50%] h-28 w-20 ${night.roller}`} aria-hidden="true">
+              <HeroCharacter profession={active} pose="roll" className={`absolute inset-0 h-full w-full ${night.ball}`} />
+              <HeroCharacter profession={active} pose="idle" className={`absolute inset-0 h-full w-full ${night.standing}`} />
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={() => setFinishes((count) => count + 1)}
+            className={`absolute left-3 top-3 min-h-[44px] rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}
+          >
+            {jungle.jumpAgain}
+          </button>
         </div>
 
         <RecruiterHero

@@ -413,18 +413,28 @@ collections:
                   - { <<: *text, label: "Landed at", name: landedAt, hint: 'Keep {job}' }
                   - { <<: *text, label: "Letters hint", name: lettersHint }
                   - { <<: *text, label: "Letters found", name: lettersFound, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Collect letter", name: collectLetter, hint: 'Keep {letter}' }
                   - { <<: *text, label: "Extra life", name: extraLife }
                   - { <<: *text, label: "Ride", name: ride }
                   - { <<: *text, label: "Cart here", name: cartHere }
-                  - { <<: *text, label: "Ride to", name: rideTo, hint: 'Keep {band}' }
-                  - { <<: *text, label: "Cart at", name: cartAt, hint: 'Keep {band}' }
-                  - { <<: *text, label: "Jump", name: jump }
+                  - { <<: *text, label: "Ride to", name: rideTo, hint: 'Keep {stop}' }
+                  - { <<: *text, label: "Cart at", name: cartAt, hint: 'Keep {stop}' }
                   - { <<: *text, label: "Jump again", name: jumpAgain }
-                  - { <<: *text, label: "Jump hint", name: jumpHint }
-                  - { <<: *text, label: "Prize won", name: prizeWon, hint: 'Keep {achievement}' }
-                  - { <<: *text, label: "All prizes", name: allPrizes }
                   - { <<: *text, label: "Won", name: won }
+                  - { <<: *text, label: "Old timer line 1", name: elderSays1 }
+                  - { <<: *text, label: "Old timer line 2", name: elderSays2 }
+                  - { <<: *text, label: "Old timer line 3", name: elderSays3 }
+                  - { <<: *text, label: "Ask the old timer", name: elderAsk }
+                  - { <<: *text, label: "Slap again", name: slapAgain }
+                  - { <<: *text, label: "Charge again", name: charge }
+                  - { <<: *text, label: "Swing", name: swing }
+                  - { <<: *text, label: "Swing here", name: swingHere }
+                  - { <<: *text, label: "Swing to", name: swingTo, hint: 'Keep {band}' }
+                  - { <<: *text, label: "Swung to", name: swingAt, hint: 'Keep {band}' }
+                  - { <<: *text, label: "Fight", name: fight }
+                  - { <<: *text, label: "Fight again", name: fightAgain }
+                  - { <<: *text, label: "Fight hint", name: fightHint }
+                  - { <<: *text, label: "Beaten", name: beaten, hint: 'Keep {achievement}' }
+                  - { <<: *text, label: "All beaten", name: allBeaten }
               - label: Neon cyber world (neon cyber)
                 name: cyber
                 widget: object
