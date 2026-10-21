@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { NameWords } from '@/components/cv/NameWords'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
@@ -118,7 +119,12 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
           render={({ name, headline, tagline, line, actions }) => (
             <div className="min-w-0">
               <h1 className={u.namePlate}>
-                <span className={`${u.plate} ${u.display} break-words text-3xl leading-tight sm:text-5xl lg:text-6xl`}>{name}</span>
+                {/* one inner span, so the plate's flex row holds one item that wraps only between the words */}
+                <span className={`${u.plate} ${u.display} text-[clamp(1.75rem,0.5rem+4.5vw,3.75rem)] leading-tight`}>
+                  <span>
+                    <NameWords name={name} />
+                  </span>
+                </span>
               </h1>
               <p className={`mt-5 inline-block px-5 py-2 text-lg sm:text-xl ${u.parchment} ${u.scroll}`}>{headline}</p>
               <div className={u.heroRest}>

@@ -40,10 +40,10 @@ export function Laurel({ flip = false }: { flip?: boolean }) {
 
 export function SectionTitle({ title }: { title: string }) {
   return (
-    <h2 id={mythHeadingId(title)} className="mb-8 text-2xl sm:text-3xl">
+    <h2 id={mythHeadingId(title)} className="mb-8 text-[clamp(1.25rem,0.85rem+1.8vw,1.875rem)]">
       <span className={`${u.plate} ${u.display}`}>
         <Laurel />
-        <span>{title}</span>
+        <span className="min-w-0">{title}</span>
         <Laurel flip />
       </span>
     </h2>
