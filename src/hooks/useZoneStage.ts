@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import { useSectionTrigger } from './useSectionTrigger'
 
 // A world page that fades its fixed backdrop to the part of the page in view. The page keeps the zone in
@@ -25,11 +25,14 @@ export const useZoneStageContext = () => useContext(ZoneStage)
 /** Whether a stage has come into view, its zone handed to the page while it is in view. */
 export function useZoneStage<Zone extends string>(zone: Zone) {
   const { reduced, onZone } = useZoneStageContext()
-  const { ref, triggered, inView } = useSectionTrigger()
+  // Observed for the whole visit, so scrolling back up hands this zone up again; the stage itself stays on.
+  const { ref, triggered, inView } = useSectionTrigger({ triggerOnce: false })
+  const [seen, setSeen] = useState(false)
+  if (inView && !seen) setSeen(true)
 
   useEffect(() => {
     if (inView) onZone(zone)
   }, [inView, zone, onZone])
 
-  return { ref, on: triggered || reduced, reduced }
+  return { ref, on: seen || triggered || reduced, reduced }
 }
