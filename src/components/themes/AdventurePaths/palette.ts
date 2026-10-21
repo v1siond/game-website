@@ -1,0 +1,33 @@
+// Adventure Paths' palette.
+
+// === MARIO COLORS ===
+export const MARIO_COLORS = {
+  skyBlue: '#5C94FC',
+  skyLight: '#92CCFF',
+  groundBrown: '#D87B17',
+  groundDark: '#8B4513',
+  groundDarkest: '#5C3317',
+  brickRed: '#AD6B2F',
+  brickDark: '#7B3B0A',
+  pipeGreen: '#5C9E31',
+  pipeMid: '#3E6B1F',
+  pipeDark: '#1E4B0F',
+  questionYellow: '#FFD700',
+  questionOrange: '#F5A623',
+  questionDark: '#E5941B',
+  marioRed: '#E52521',
+  marioDarkRed: '#C41E3A',
+  luigiGreen: '#43B047',
+  coinGold: '#FFD700',
+  coinOrange: '#FFC107',
+  cloudWhite: '#FFFFFF',
+  cloudGrey: '#E8E8E8',
+  bushGreen: '#228B22',
+  bushLight: '#32CD32',
+  flagGrey: '#808080',
+  flagLight: '#A0A0A0',
+  undergroundBlue: '#000080',
+  undergroundBlack: '#0A0A20',
+  castleGrey: '#707070',
+  castleDark: '#404040',
+}
