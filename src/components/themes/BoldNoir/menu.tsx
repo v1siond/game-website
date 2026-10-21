@@ -5,7 +5,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { HeroCharacter } from './character'
+import { DETECTIVE_HOST, Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
 
@@ -23,14 +23,14 @@ function MenuSlab({ id, label, selected, optionProps }: ProfessionOption) {
     <button
       type="button"
       {...optionProps}
-      className={`group relative flex min-h-[44px] w-full flex-col items-center bg-transparent px-2 pb-3 pt-2 text-[color:var(--noir-paper)] sm:w-44 ${world.menuItem}`}
+      className={`group relative flex min-h-[44px] w-full flex-col items-center bg-transparent px-2 pb-3 pt-2 text-[color:var(--noir-paper)] sm:w-44 ${world.menuItem} ${DETECTIVE_HOST.badge}`}
     >
       <svg viewBox="0 0 200 100" preserveAspectRatio="none" className={`absolute -inset-x-3 -inset-y-2 h-[calc(100%+1rem)] w-[calc(100%+1.5rem)] ${world.jag}`} aria-hidden="true" focusable="false">
         <path d={JAG} fill={NOIR.red} />
       </svg>
       <span className={`relative flex w-full flex-col items-center ${world.slab} px-2 pb-2 pt-3`}>
         <span className={`block ${world.unskew}`}>
-          <HeroCharacter profession={id} className={`h-24 w-16 sm:h-32 sm:w-20 ${world.redShadow}`} />
+          <Detective profession={id} className={`h-24 w-16 sm:h-32 sm:w-20 ${world.redShadow}`} />
         </span>
         <span className={`mt-1 block text-center text-lg uppercase leading-tight tracking-wider sm:text-2xl ${world.unskew} ${selected ? 'text-[color:var(--noir-paper)]' : 'text-[color:var(--noir-fog)]'}`}>
           {label}
@@ -44,7 +44,7 @@ function MenuSlab({ id, label, selected, optionProps }: ProfessionOption) {
 function EyeStrip({ profession }: { profession: Profession }) {
   return (
     <div className="relative h-24 w-full overflow-hidden bg-[color:var(--noir-paper)] sm:h-32">
-      <HeroCharacter profession={profession} className="absolute left-1/2 top-1/2 h-[64rem] w-[42.6rem] -translate-x-1/2 -translate-y-[18.2%]" />
+      <Detective profession={profession} motion="still" className="absolute left-1/2 top-1/2 h-[64rem] w-[42.6rem] -translate-x-1/2 -translate-y-[18.2%]" />
     </div>
   )
 }

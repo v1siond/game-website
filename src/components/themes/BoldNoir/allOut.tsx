@@ -5,7 +5,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { GlassStar, HitStar } from './backdrop'
-import { HeroCharacter } from './character'
+import { Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -84,7 +84,7 @@ function Rush() {
         <div className="absolute inset-x-0 bottom-[12%] flex items-end justify-center gap-[6vw]">
           {PROFESSION_ORDER.map((profession, i) => (
             <div key={profession} className={i === 0 ? world.hop : world.leap} style={{ '--i': i } as CSSProperties}>
-              <HeroCharacter profession={profession} className={`h-[38vh] w-[25vh] ${world.silhouette}`} />
+              <Detective profession={profession} motion="still" className={`h-[38vh] w-[25vh] ${world.silhouette}`} />
             </div>
           ))}
         </div>
@@ -129,7 +129,7 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
           <GlassStar className={`h-full w-full ${world.drift}`} />
         </div>
         <div className={`absolute bottom-0 left-[4%] hidden md:block ${world.finishDrop}`}>
-          <HeroCharacter profession="engineer" className={`h-[70vh] w-[46vh] ${world.silhouette}`} />
+          <Detective profession="engineer" motion="still" className={`h-[70vh] w-[46vh] ${world.silhouette}`} />
         </div>
       </div>
 

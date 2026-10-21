@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HitStar, StarBurst } from './backdrop'
-import { HeroCharacter } from './character'
+import { DETECTIVE_HOST, Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
 
@@ -57,7 +57,7 @@ function Office() {
         ))}
         <rect x={364} y={92} width={6} height={10} fill={NOIR.paper} className={world.blink} />
         <foreignObject x={150} y={70} width={70} height={105}>
-          <HeroCharacter profession="engineer" className={`h-full w-full ${world.redShadow}`} />
+          <Detective profession="engineer" motion="act" className={`h-full w-full ${world.redShadow}`} />
         </foreignObject>
       </Layer>
     </>
@@ -81,7 +81,7 @@ function Club() {
         <polygon points="0,168 600,160 600,200 0,200" fill={NOIR.coal} />
         <polygon points="0,160 600,152 600,160 0,168" fill={NOIR.red} />
         <foreignObject x={262} y={56} width={76} height={114}>
-          <HeroCharacter profession="drummer" className={`h-full w-full ${world.redShadow}`} />
+          <Detective profession="drummer" motion="act" className={`h-full w-full ${world.redShadow}`} />
         </foreignObject>
         <ellipse cx={300} cy={146} rx={34} ry={22} fill={NOIR.ink} stroke={NOIR.paper} strokeWidth={3} />
         <circle cx={300} cy={146} r={8} fill={NOIR.red} />
@@ -120,7 +120,7 @@ function Gym() {
           </foreignObject>
         </g>
         <foreignObject x={250} y={58} width={76} height={114}>
-          <HeroCharacter profession="fighter" className={`h-full w-full ${world.redShadow}`} />
+          <Detective profession="fighter" motion="act" className={`h-full w-full ${world.redShadow}`} />
         </foreignObject>
       </Layer>
     </>
@@ -137,7 +137,7 @@ export function ProfessionSet({ profession }: { profession: Profession }) {
   const Scene = SET[profession]
 
   return (
-    <div className={`relative mx-auto h-48 max-w-5xl overflow-hidden sm:h-64 ${world.setFrame} ${world.setIn}`} aria-hidden="true">
+    <div className={`relative mx-auto h-48 max-w-5xl overflow-hidden sm:h-64 ${world.setFrame} ${world.setIn} ${DETECTIVE_HOST.lean}`} aria-hidden="true">
       <Scene />
     </div>
   )
