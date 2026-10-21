@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type AnchorHTMLAttributes, type CSSProperties, type ReactNode } from 'react'
 import Link from 'next/link'
-import { locales, localeNames, type Locale } from '@/i18n/config'
+import { locales, type Locale } from '@/i18n/config'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import type { LocaleSwitchState } from '@/components/cv/LanguageSwitcher'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { REALM } from './palette'
@@ -58,6 +59,7 @@ export function RealmButton({
 }
 
 export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
+  const { languages } = useLabels()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -148,7 +150,7 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
                 }
               }}
             >
-              <span>{localeNames[locale]}</span>
+              <span>{languages[locale]}</span>
               {currentLocale === locale && <span style={{ color: REALM.chaosFelBright }}>✓</span>}
             </button>
           ))}
