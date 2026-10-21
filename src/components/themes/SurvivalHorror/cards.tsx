@@ -1,94 +1,125 @@
+import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobYears } from '@/components/cv/sectionText'
-import { RE } from './palette'
+import { CARD_BUTTON } from './actions'
+import look from './world.module.css'
 
-// Project file - worn paper file style. The name, his role, the years and the links are always on the
-// file; opening it reads the description and the result line.
-export function ProjectFile({ slot: { project, years, links }, isOpen, onToggle }: { slot: ProjectSlot; isOpen: boolean; onToggle: () => void }) {
-  const bodyId = `file-${project.id}`
+// The cards each section lists, as the papers and items found in the house: a job is a typed document,
+// a project a case file that opens to read its description and result, a band or a venture a filed card.
+
+const TITLE = 'text-base text-[color:var(--sh-ivory)]'
+const SUB = 'text-sm text-[color:var(--sh-brass)]'
+const BODY = 'text-sm leading-relaxed text-[color:var(--sh-fog)]'
+const STAMP = `whitespace-nowrap border border-[color:var(--sh-rust)] px-2 py-1 text-sm text-[color:var(--sh-flame)] ${look.typed}`
+
+export function Mark() {
+  return <span className="mt-2 h-1.5 w-1.5 shrink-0 bg-[color:var(--sh-brass)]" aria-hidden="true" />
+}
+
+function MarkedLine({ children }: { children: ReactNode }) {
+  return (
+    <li className="flex items-start gap-2 text-sm text-[color:var(--sh-cream)]">
+      <Mark />
+      <span>{children}</span>
+    </li>
+  )
+}
+
+export function ExperienceCard({ entry }: { entry: Job }) {
+  const { start, end } = jobYears(entry, 'Present')
 
   return (
-    <article style={{ background: RE.sepia, border: `1px solid ${RE.midBrown}` }}>
-      <div className="px-4 py-3" style={{ borderBottom: isOpen ? `1px solid ${RE.midBrown}` : 'none' }}>
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-sm flex items-center gap-2" style={{ color: RE.cream }}>
-            <span style={{ color: RE.warmGlow }} aria-hidden="true">[FILE]</span>
-            {project.name}
-          </h3>
-          {years && <span className="text-sm whitespace-nowrap" style={{ color: RE.candlelight }}>{years}</span>}
+    <article className={`p-4 ${look.file}`}>
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className={TITLE}>{entry.title}</h3>
+          <p className={SUB}>{entry.company}</p>
         </div>
-        <p className="text-sm mt-1" style={{ color: RE.warmGlow }}>{project.role}</p>
-        <p className="text-sm mt-1" style={{ color: RE.fog }}>{project.tagline}</p>
-        <div className="flex flex-wrap items-center gap-2 mt-2">
+        <span className={STAMP}>
+          {start} - {end}
+        </span>
+      </div>
+      {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
+      {entry.highlights.length > 0 && (
+        <ul className="space-y-1" aria-label="Key accomplishments">
+          {entry.highlights.map((highlight) => (
+            <MarkedLine key={highlight}>{highlight}</MarkedLine>
+          ))}
+        </ul>
+      )}
+    </article>
+  )
+}
+
+const LINK_PLATE = `${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame)] hover:border-[color:var(--sh-flame)]`
+const TOGGLE_PLATE = `${CARD_BUTTON} border-transparent text-[color:var(--sh-cream)] hover:border-[color:var(--sh-wood)]`
+
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg viewBox="0 0 10 10" className={`h-2.5 w-2.5 motion-safe:transition-transform ${open ? 'rotate-90' : ''}`} aria-hidden="true" focusable="false">
+      <path d="M2 1 L8 5 L2 9 Z" fill="currentColor" />
+    </svg>
+  )
+}
+
+// The name, his role, the years and the links are always on the file; opening it reads the
+// description and the result line.
+export function ProjectFile({ slot: { project, years, links }, isOpen, onToggle }: { slot: ProjectSlot; isOpen: boolean; onToggle: () => void }) {
+  const bodyId = `survival-horror-file-${project.id}`
+
+  return (
+    <article className={look.file}>
+      <div className="px-4 py-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h3 className={`min-w-0 ${TITLE}`}>{project.name}</h3>
+          {years && <span className={STAMP}>{years}</span>}
+        </div>
+        <p className={`mt-1 ${SUB}`}>{project.role}</p>
+        <p className={`mt-1 ${BODY}`}>{project.tagline}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           {links.map(({ kind, label, linkProps }) => (
-            <a
-              key={kind}
-              {...linkProps}
-              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-wider transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860] border border-[#c49050] text-[#e8a860] bg-[#6b4030]/40"
-            >
-              [{label.toUpperCase()}]
+            <a key={kind} {...linkProps} className={LINK_PLATE}>
+              {label}
             </a>
           ))}
-          {links.length === 0 && <span className="text-sm italic" style={{ color: RE.fog }}>No public link</span>}
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-expanded={isOpen}
-            aria-controls={bodyId}
-            className="inline-flex items-center gap-2 min-h-[44px] px-3 text-sm tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860] text-[#d8c8a8]"
-          >
-            <span aria-hidden="true" style={{ color: RE.candlelight }}>{isOpen ? '▼' : '▶'}</span>
+          {links.length === 0 && <span className={`italic ${BODY}`}>No public link</span>}
+          <button type="button" onClick={onToggle} aria-expanded={isOpen} aria-controls={bodyId} className={TOGGLE_PLATE}>
+            <Chevron open={isOpen} />
             {isOpen ? 'Close file' : 'Read file'}
           </button>
         </div>
       </div>
       {isOpen && (
-        <div id={bodyId} className="px-4 py-3" style={{ background: `${RE.darkSepia}cc` }}>
-          <p className="text-sm leading-relaxed" style={{ color: RE.fog }}>
-            {project.description}
-          </p>
-          {project.impact && (
-            <p className="text-sm mt-2 italic" style={{ color: RE.cream }}>▸ {project.impact}</p>
-          )}
+        <div id={bodyId} className="border-t border-[color:var(--sh-wood)] bg-[color:var(--sh-shadow)] px-4 py-3">
+          <p className={BODY}>{project.description}</p>
+          {project.impact && <p className="mt-2 text-sm italic text-[color:var(--sh-cream)]">{project.impact}</p>}
         </div>
       )}
     </article>
   )
 }
 
-// Tech stack display - sepia inventory style
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6">
       {categories.map((category) => (
         <div key={category.id}>
-          <h3
-            className="text-sm tracking-wider mb-3 flex items-center gap-2 uppercase"
-            style={{ color: RE.warmGlow }}
-          >
-            <span className="text-sm" aria-hidden="true">[{category.icon}]</span>
-            {category.name}
-          </h3>
-          <div className="flex flex-wrap gap-2">
+          <h3 className={`mb-3 text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>{category.name}</h3>
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
             {category.items.map((tech) => (
-              <span
-                key={tech}
-                className="px-2 py-1 text-sm tracking-wider transition-all hover:scale-105 cursor-default"
-                style={{ background: `${RE.midBrown}50`, border: `1px solid ${RE.midBrown}`, color: RE.cream }}
-              >
+              <li key={tech} className="border border-[color:var(--sh-wood)] bg-[color:var(--sh-shadow)] px-2 py-1 text-sm text-[color:var(--sh-cream)]">
                 {tech}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       ))}
     </div>
   )
 }
 
-// Company card - worn paper style
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
@@ -96,40 +127,26 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${company.name} (opens in a new tab)`}
-      className="block p-4 transition-all hover:scale-[1.02] group"
-      style={{ background: `linear-gradient(135deg, ${RE.sepia}, ${RE.darkSepia})`, border: `1px solid ${RE.midBrown}` }}
+      className={`block h-full p-4 hover:border-[color:var(--sh-brass)] ${look.file} ${look.focus}`}
     >
-      <div className="flex items-center gap-3 mb-2">
-        <span className="text-xl" aria-hidden="true">{company.icon}</span>
-        <div>
-          <h3 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
-            {company.name}
-          </h3>
-          <p className="text-sm" style={{ color: RE.warmGlow }}>{company.tagline}</p>
-        </div>
-      </div>
-      <p className="text-sm" style={{ color: RE.fog }}>{company.description}</p>
+      <h3 className={TITLE}>{company.name}</h3>
+      <p className={`mb-2 ${SUB}`}>{company.tagline}</p>
+      <p className={BODY}>{company.description}</p>
     </a>
   )
 }
 
-// Band card - worn paper style
 export function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
-    <div
-      className="h-full p-4 transition-all hover:scale-[1.02] group"
-      style={{ background: `linear-gradient(135deg, ${RE.sepia}, ${RE.darkSepia})`, border: `1px solid ${RE.midBrown}` }}
-    >
-      <h3 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
-        {band.name}
-      </h3>
-      <p className="text-sm mt-1" style={{ color: RE.warmGlow }}>
+    <div className={`h-full p-4 ${look.file}`}>
+      <h3 className={TITLE}>{band.name}</h3>
+      <p className={`mt-1 ${SUB}`}>
         {band.role}
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
       {band.release && (
-        <p className="text-sm mt-2" style={{ color: RE.fog }}>
+        <p className={`mt-2 ${BODY}`}>
           Released <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
@@ -138,45 +155,8 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 
   if (!linkProps) return content
   return (
-    <a {...linkProps} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860]">
+    <a {...linkProps} className={`block h-full ${look.focus}`}>
       {content}
     </a>
-  )
-}
-
-// Work experience card - worn document style. Dates are date only strings (UTC midnight), so the year
-// is read in UTC: a January start keeps its own year west of UTC.
-export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
-
-  return (
-    <div
-      className="p-4"
-      style={{ background: `linear-gradient(135deg, ${RE.sepia}, ${RE.darkSepia})`, border: `1px solid ${RE.midBrown}` }}
-    >
-      <div className="flex justify-between items-start gap-3 mb-2">
-        <div>
-          <h3 className="text-sm" style={{ color: RE.cream }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: RE.warmGlow }}>{entry.company}</p>
-        </div>
-        <span
-          className="text-sm px-2 py-1 whitespace-nowrap"
-          style={{ color: RE.candlelight, background: `${RE.rust}30`, border: `1px solid ${RE.rust}50` }}
-        >
-          {startDisplay} - {endDisplay}
-        </span>
-      </div>
-      {entry.description && <p className="text-sm mb-2" style={{ color: RE.fog }}>{entry.description}</p>}
-      {entry.highlights.length > 0 && (
-        <ul className="space-y-1">
-          {entry.highlights.map((highlight) => (
-            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: RE.cream }}>
-              <span style={{ color: RE.warmGlow }} aria-hidden="true">▸</span>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
   )
 }

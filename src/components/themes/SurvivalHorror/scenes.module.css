@@ -1,0 +1,86 @@
+/*
+ * Survival Horror's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses, the travel and the props that answer progress).
+ * Transform and opacity only; progress 1 is the final frame, which is what reduced motion and the World
+ * Select preview show at once.
+ *
+ * The world's move is a careful walk through dark rooms: lamps come on as he reaches them, his torch
+ * beam stutters, each job is a document his light finds and each project, band or record line is an
+ * item laid into the item box. Slow and weighted, easing in; nothing jumps at him.
+ */
+
+/* The world's tempo: six cautious strides with a short swing, eight stick hits per arm, the sound bars
+   resting low at 15%; in the ring he reaches the pads by 60% of the scene and works them there. */
+.tempo {
+  --strides: 6turn;
+  --swing: 22deg;
+  --stick-hits: 8turn;
+  --wave-rest: 0.15;
+  --advance-until: 0.6;
+}
+
+/* The fog over the floor of every strip, still. */
+.floorFog {
+  background: linear-gradient(0deg, color-mix(in srgb, var(--sh-fog) 22%, transparent), transparent);
+}
+
+/* His torch beam: a cone from the chest pocket, stuttering as he walks (a quick sin of progress held
+   above 55%), and steady once he stops. */
+.beam {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--sh-flame) 40%, transparent), transparent);
+  clip-path: polygon(0 44%, 100% 0, 100% 100%, 0 56%);
+  opacity: calc(0.85 + max(0, sin(var(--p) * 23turn) - 0.6) * -0.75);
+}
+
+/* A hanging bulb's cone and a theatre footlight both come up as he reaches them, held soft. */
+.glowAt {
+  opacity: clamp(0, (var(--p) - var(--at, 0)) * 5, 0.45);
+}
+
+/* ---- per item arrivals (their own scene each, so --p is the item's own progress) ---- */
+
+/* A document: his light sweeps across it from the left, then the paper settles out of the dark,
+   tipped a little until it lies flat. */
+.sweep {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sh-flame) 22%, transparent), transparent);
+  opacity: clamp(0, 1 - var(--p) * 1.25, 0.9);
+  transform: translate3d(calc((clamp(0, var(--p) * 1.4, 1) * 2 - 1) * 60%), 0, 0);
+}
+
+.document {
+  opacity: clamp(0, var(--p) * 1.8 - 0.3, 1);
+  transform: translate3d(0, calc((1 - clamp(0, var(--p) * 1.3, 1)) * 0.75rem), 0)
+    rotate(calc((1 - clamp(0, var(--p) * 1.3, 1)) * -1.5deg));
+}
+
+/* An item: the box's four corner marks close in on the slot, then the item rises into it. */
+.corners {
+  opacity: clamp(0, var(--p) * 2, 1);
+  transform: scale(calc(1 + (1 - clamp(0, var(--p) * 1.5, 1)) * 0.06));
+}
+
+.item {
+  opacity: clamp(0, var(--p) * 2 - 0.5, 1);
+  transform: translate3d(0, calc((1 - clamp(0, var(--p) * 1.4, 1)) * 1rem), 0);
+}
+
+/* ---- doors: the break between rooms and the save room at the end ---- */
+
+.leafLeft,
+.leafRight {
+  transform: scaleX(calc(1 - clamp(0, var(--p) * 1.25, 1) * 0.85));
+}
+
+.leafLeft {
+  transform-origin: 0% 50%;
+}
+
+.leafRight {
+  transform-origin: 100% 50%;
+}
+
+/* The lit room behind the door, warming as the leaves open. */
+.roomBeyond {
+  background: radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--sh-flame) 45%, transparent), var(--sh-shadow) 75%);
+  opacity: clamp(0, var(--p) * 1.4, 1);
+}

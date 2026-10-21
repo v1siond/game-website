@@ -1,0 +1,146 @@
+/*
+ * Survival Horror's page look: a panelled house at night. The page darkens toward its edges like a fixed
+ * camera room, a damask wallpaper sits faint behind everything, fog lies low, one warm lamp glow hangs
+ * over the top of the page and flickers, and a fine film grain moves over it all. Every colour reads the
+ * --sh-* variables set from palette.ts. The loops animate transform and opacity only and stop under
+ * reduced motion; the scroll scenes live in scenes.module.css.
+ */
+
+.root {
+  background: linear-gradient(
+    180deg,
+    var(--sh-void) 0%,
+    var(--sh-shadow) 20%,
+    var(--sh-paper) 50%,
+    var(--sh-shadow) 80%,
+    var(--sh-void) 100%
+  );
+  color: var(--sh-cream);
+  font-family: 'Times New Roman', Georgia, serif;
+}
+
+/* The typed face of files and labels, a typewriter's monospace. */
+.typed {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 0.08em;
+}
+
+/* ---- the room: fixed layers behind the content ---- */
+
+.wallpaper {
+  background-image: radial-gradient(circle at 50% 50%, var(--sh-wood) 0 1.5px, transparent 2px),
+    radial-gradient(ellipse 9px 14px at 50% 50%, transparent 8px, var(--sh-wood) 9px, transparent 10px);
+  background-size: 60px 60px;
+  opacity: 0.08;
+}
+
+.lamp {
+  background: radial-gradient(ellipse 60% 40% at 50% 0%, color-mix(in srgb, var(--sh-flame) 16%, transparent), transparent 70%);
+  animation: lamp-flicker 7s steps(1, end) infinite;
+}
+
+/* The lamp dips twice in quick succession, then holds, the way a failing bulb does. */
+@keyframes lamp-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 0.55;
+  }
+  64% {
+    opacity: 1;
+  }
+  67% {
+    opacity: 0.4;
+  }
+  70% {
+    opacity: 1;
+  }
+}
+
+.fogLow {
+  background: linear-gradient(0deg, color-mix(in srgb, var(--sh-ash) 30%, transparent), transparent);
+}
+
+.fogDrift {
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sh-fog) 12%, transparent), transparent);
+  animation: fog-drift 40s linear infinite;
+}
+
+@keyframes fog-drift {
+  from {
+    transform: translate3d(-60%, 0, 0);
+  }
+  to {
+    transform: translate3d(60%, 0, 0);
+  }
+}
+
+.vignette {
+  background: radial-gradient(ellipse at 50% 35%, transparent 25%, color-mix(in srgb, var(--sh-void) 85%, transparent) 100%);
+}
+
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  animation: grain 0.6s steps(6) infinite;
+}
+
+@keyframes grain {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(-1%, -1%, 0);
+  }
+  40% {
+    transform: translate3d(1%, 1%, 0);
+  }
+  60% {
+    transform: translate3d(-1%, 1%, 0);
+  }
+  80% {
+    transform: translate3d(1%, -1%, 0);
+  }
+}
+
+/* ---- surfaces: the paper panels, the found documents, the item box ---- */
+
+.panel {
+  background-color: var(--sh-paper);
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--sh-sepia) 50%, transparent), transparent 40%);
+  border: 2px solid var(--sh-wood);
+  box-shadow: inset 0 0 40px color-mix(in srgb, var(--sh-void) 55%, transparent);
+}
+
+.file {
+  background: linear-gradient(135deg, var(--sh-sepia), var(--sh-panel));
+  border: 1px solid var(--sh-wood);
+}
+
+.slot {
+  background: linear-gradient(135deg, var(--sh-sepia), var(--sh-shadow));
+  box-shadow: inset 0 0 24px color-mix(in srgb, var(--sh-void) 70%, transparent);
+}
+
+.emptySlot {
+  border: 1px dashed color-mix(in srgb, var(--sh-wood) 50%, transparent);
+  background: color-mix(in srgb, var(--sh-shadow) 40%, transparent);
+}
+
+/* One focus ring for every control in the world: the lamp flame. */
+.focus:focus-visible {
+  outline: 2px solid var(--sh-flame);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lamp,
+  .fogDrift,
+  .grain {
+    animation: none;
+  }
+}
