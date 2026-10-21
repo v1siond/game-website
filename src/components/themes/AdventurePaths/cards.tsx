@@ -2,7 +2,9 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, RELEASED } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { JOURNAL_SERIF } from './palette'
 
 // Adventure Paths' entries: a job is a dated page of the field journal with the route line down its left
@@ -32,7 +34,8 @@ function Chips({ items, label }: { items: string[]; label: string }) {
 }
 
 export function JourneyEntry({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className="rounded-sm border-l-4 border-[color:var(--ap-route)] bg-[color:var(--ap-page)] p-4 text-[color:var(--ap-ink)]">
@@ -42,12 +45,12 @@ export function JourneyEntry({ entry }: { entry: Job }) {
           <p className="text-sm font-semibold text-[color:var(--ap-route)]">{entry.company}</p>
         </div>
         <span className="rounded-sm bg-[color:var(--ap-ink)] px-2 py-1 text-sm text-[color:var(--ap-parchment)]">
-          {start} to {end}
+          {fillLabel(years.range, { start, end })}
         </span>
       </div>
       {entry.description && <p className="text-sm text-[color:var(--ap-ink-soft)]">{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="mt-2 space-y-1" aria-label="Key achievements">
+        <ul className="mt-2 space-y-1" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className="flex items-start gap-2 text-sm">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45 bg-[color:var(--ap-route)]" aria-hidden="true" />
@@ -61,6 +64,7 @@ export function JourneyEntry({ entry }: { entry: Job }) {
 }
 
 export function ProjectFind({ project, years, links }: ProjectSlot) {
+  const { cards } = useLabels()
   return (
     <article className={FIND}>
       <div className="mb-1 flex items-start justify-between gap-2">
@@ -70,7 +74,7 @@ export function ProjectFind({ project, years, links }: ProjectSlot) {
       <p className="text-sm font-semibold text-[color:var(--ap-route)]">{project.role}</p>
       <p className="mt-1 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
       {project.impact && <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">{project.impact}</p>}
-      <Chips items={project.techStack.slice(0, 4)} label="Technologies used" />
+      <Chips items={project.techStack.slice(0, 4)} label={cards.technologiesUsed} />
       {links.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {links.map(({ kind, label, linkProps }) => (
@@ -85,6 +89,7 @@ export function ProjectFind({ project, years, links }: ProjectSlot) {
 }
 
 export function BandFind({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const card: ReactNode = (
     <article className={FIND}>
       <h3 className={`text-base font-bold ${JOURNAL_SERIF}`}>{band.name}</h3>
@@ -94,7 +99,7 @@ export function BandFind({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="mt-2 text-sm">
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>
@@ -110,12 +115,13 @@ export function BandFind({ band, years, linkProps }: BandSlot) {
 }
 
 export function CampCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
       className={`block h-full transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${FOCUS}`}
     >
       <article className={FIND}>
@@ -128,12 +134,13 @@ export function CampCard({ company }: { company: CVData['companies'][number] }) 
 }
 
 export function ExplorerPack({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
     <div className="grid gap-5 sm:grid-cols-2">
       {categories.map((category) => (
         <div key={category.id}>
           <h3 className={`text-base font-bold ${JOURNAL_SERIF}`}>{category.name}</h3>
-          <Chips items={category.items} label={`${category.name} technologies`} />
+          <Chips items={category.items} label={fillLabel(cards.categoryTechnologies, { name: category.name })} />
         </div>
       ))}
     </div>

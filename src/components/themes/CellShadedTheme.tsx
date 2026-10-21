@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { CEL } from './CellShaded/palette'
@@ -24,6 +25,7 @@ import world from './CellShaded/world.module.css'
 export default function CellShadedTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation, professions } = useLabels()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function CellShadedTheme() {
                 </div>
               </div>
 
-              <nav className="flex flex-wrap items-center gap-3" aria-label="Contact and CV">
+              <nav className="flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
                 {actions.map((action) => (
                   <HeroAction key={action.id} action={action} />
                 ))}
@@ -68,16 +70,16 @@ export default function CellShadedTheme() {
       </header>
 
       {/* the profession switch, a character select with him in each costume */}
-      <section className="relative z-20 px-4 py-6" aria-label="Profession selection">
+      <section className="relative z-20 px-4 py-6" aria-label={navigation.professionSelection}>
         <ProfessionSwitch
           className="mx-auto grid max-w-xl grid-cols-3 gap-3 sm:flex sm:max-w-none sm:justify-center sm:gap-8"
-          label="Profession"
+          label={navigation.profession}
           renderOption={(option) => <ProfessionCard {...option} />}
         />
       </section>
 
       <main className="relative z-20 px-4 py-8 sm:px-6">
-        <div className="mx-auto max-w-5xl" role="region" aria-label={`${active} profession details`}>
+        <div className="mx-auto max-w-5xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </div>
       </main>

@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { JOURNAL_SERIF, TRAIL_VARS } from './AdventurePaths/palette'
@@ -25,6 +26,7 @@ import { ContactScene } from './AdventurePaths/scenes'
 export default function AdventurePathsTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation, professions } = useLabels()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -55,7 +57,7 @@ export default function AdventurePathsTheme() {
                 </div>
               </div>
 
-              <nav className="flex flex-wrap items-center gap-3" aria-label="Contact and CV">
+              <nav className="flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
                 {actions.map((action) => (
                   <HeroAction key={action.id} action={action} />
                 ))}
@@ -68,16 +70,16 @@ export default function AdventurePathsTheme() {
       </header>
 
       {/* The trail fork: one sign per profession, System Engineer in the centre */}
-      <section className="relative z-20 px-4 py-6 sm:py-8" aria-label="Profession selection">
+      <section className="relative z-20 px-4 py-6 sm:py-8" aria-label={navigation.professionSelection}>
         <ProfessionSwitch
           className="mx-auto grid max-w-xl grid-cols-3 gap-2 sm:gap-6"
-          label="Profession"
+          label={navigation.profession}
           renderOption={(option) => <TrailSign {...option} />}
         />
       </section>
 
       {/* The picked profession's levels, and only those */}
-      <div role="region" aria-label={`${active} profession details`}>
+      <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
         <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
       </div>
 

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import world from './world.module.css'
 
 // Silhouette's buttons, on the offset block (world.module.css): email is lit fog white, LinkedIn, the CV
@@ -28,17 +29,19 @@ export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${BUTTON} ${OUTLINED}`}>
-      resume
+      {actions.resume.toLowerCase()}
     </Link>
   )
 }
 
 export function PlayLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/personal-projects/game-engine" className={`${BUTTON} ${LIT}`}>
-      enter
+      {actions.enter.toLowerCase()}
     </Link>
   )
 }

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { Crate, Gem } from './icons'
 import world from './world.module.css'
 
@@ -27,19 +28,21 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/cv" className={CRATE_BUTTON}>
       <Crate size={20} />
-      CV
+      {actions.cv}
     </Link>
   )
 }
 
 export function NebulithLink() {
+  const { actions } = useLabels()
   return (
-    <Link href="/personal-projects/game-engine" className={GEM_BUTTON} aria-label="View Nebulith game engine project">
+    <Link href="/personal-projects/game-engine" className={GEM_BUTTON} aria-label={actions.viewEngine}>
       <Gem size={22} color="blue" />
-      NEBULITH
+      {actions.engine.toUpperCase()}
     </Link>
   )
 }

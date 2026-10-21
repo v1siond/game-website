@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { ContactStage, LevelArt } from '@/components/scroll/stage'
 import { arrivalItem, worldLane } from '@/components/scroll/arrivals'
@@ -67,6 +68,7 @@ function PartingRocks() {
 
 export function ContactScene({ profession }: { profession: Profession }) {
   const { Corner } = PROFESSION_STAGES[profession]
+  const { sections } = useLabels()
   const light = PROFESSION_SKY[profession]
 
   return (
@@ -89,7 +91,7 @@ export function ContactScene({ profession }: { profession: Profession }) {
               id="silhouette-contact-heading"
               className={`mb-3 text-xl font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] ${TYPEWRITER}`}
             >
-              Contact
+              {sections.contact}
             </h2>
             <p className="mb-6 text-sm text-[color:var(--sh-muted)]">{line}</p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row sm:flex-wrap sm:justify-start">

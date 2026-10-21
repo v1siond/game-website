@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -25,12 +25,13 @@ function Leg({ children }: { children: ReactNode }) {
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <FadeInScene>
         <Leg>
-          <TrailPanel title="About" tone="journal">
+          <TrailPanel title={titles.about} tone="journal">
             <p className="text-base leading-relaxed">{professionalSummary.bio}</p>
           </TrailPanel>
         </Leg>
@@ -40,7 +41,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <LevelScene>
           <Leg>
             <Lane profession="engineer" zone="record" />
-            <TrailPanel title="Work Experience" tone="journal">
+            <TrailPanel title={titles.workExperience} tone="journal">
               <ul className="space-y-4 pl-5">
                 {sections.jobs.map((entry) => (
                   <li key={entry.id}>
@@ -57,7 +58,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <FadeInScene>
         <Leg>
-          <TrailPanel title="Tech Stack" tone="journal">
+          <TrailPanel title={titles.techStack} tone="journal">
             <ExplorerPack categories={sections.techStack} />
           </TrailPanel>
         </Leg>
@@ -66,7 +67,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <LevelScene>
         <Leg>
           <Lane profession="engineer" zone="work" />
-          <TrailPanel title="Projects" tone="canopy">
+          <TrailPanel title={titles.projects} tone="canopy">
             <ProjectList
               projects={sections.projects}
               className="grid gap-4 md:grid-cols-2"
@@ -82,7 +83,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <FadeInScene>
         <Leg>
-          <TrailPanel title="Ventures" tone="canopy">
+          <TrailPanel title={titles.ventures} tone="canopy">
             <div className="grid gap-4 md:grid-cols-3">
               {sections.companies.map((company) => (
                 <CampCard key={company.id} company={company} />
@@ -97,14 +98,15 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const { sections: titles, years } = useLabels()
 
   return (
     <LevelScene>
       <Leg>
         <Lane profession="drummer" zone="record" />
-        <TrailPanel title="Bands" tone="canopy">
+        <TrailPanel title={titles.bands} tone="canopy">
           <p className="mb-4 text-base">
-            {drumsSince(musician)}
+            {drumsSince(musician, years)}
           </p>
           <BandList
             bands={bands}
@@ -124,12 +126,13 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const { sections: titles } = useLabels()
 
   return (
     <LevelScene>
       <Leg>
         <Lane profession="fighter" zone="record" />
-        <TrailPanel title="Muay Thai" tone="canopy">
+        <TrailPanel title={titles.muayThai} tone="canopy">
           <h3 className={`mb-4 text-lg font-bold text-[color:var(--ap-gold)] ${JOURNAL_SERIF}`}>{martialArts.primary.title}</h3>
           <MuayThaiRecord
             martialArts={martialArts}

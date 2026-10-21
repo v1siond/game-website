@@ -3,7 +3,7 @@
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
@@ -25,13 +25,14 @@ const COLUMN = 'mx-auto max-w-4xl'
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <FadeInScene>
         <div className={SECTION_WRAP}>
           <div className={COLUMN}>
-            <CratePanel title="About" titleIcon={<TikiMask size={30} />} variant="lagoon">
+            <CratePanel title={titles.about} titleIcon={<TikiMask size={30} />} variant="lagoon">
               <p className="text-base leading-relaxed text-white">{professionalSummary.bio}</p>
             </CratePanel>
           </div>
@@ -45,7 +46,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <div className={SECTION_WRAP}>
             <div className={COLUMN}>
               <Lane profession="engineer" zone="record" />
-              <CratePanel title="Work Experience" titleIcon={<Crate size={28} variant="flag" />} variant="temple">
+              <CratePanel title={titles.workExperience} titleIcon={<Crate size={28} variant="flag" />} variant="temple">
                 <ul className="space-y-4">
                   {sections.jobs.map((entry) => (
                     <li key={entry.id}>
@@ -66,7 +67,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <FadeInScene>
         <div className={SECTION_WRAP}>
           <div className={COLUMN}>
-            <CratePanel title="Tech Stack" titleIcon={<Crate size={28} />} variant="wood">
+            <CratePanel title={titles.techStack} titleIcon={<Crate size={28} />} variant="wood">
               <TechCrates categories={sections.techStack} />
             </CratePanel>
           </div>
@@ -77,7 +78,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <div className={SECTION_WRAP}>
           <div className={COLUMN}>
             <Lane profession="engineer" zone="work" />
-            <CratePanel title="Projects" titleIcon={<Crate size={32} variant="hazard" />} variant="hazard">
+            <CratePanel title={titles.projects} titleIcon={<Crate size={32} variant="hazard" />} variant="hazard">
               <ProjectList
                 projects={sections.projects}
                 className="grid gap-x-4 gap-y-10 pt-6 md:grid-cols-2"
@@ -98,7 +99,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <FadeInScene>
           <div className={SECTION_WRAP}>
             <div className={COLUMN}>
-              <CratePanel title="Ventures" titleIcon={<Crystal size={28} />} variant="lagoon">
+              <CratePanel title={titles.ventures} titleIcon={<Crystal size={28} />} variant="lagoon">
                 <div className="grid gap-4 md:grid-cols-3">
                   {sections.companies.map((company) => (
                     <VentureCard key={company.id} company={company} />
@@ -115,6 +116,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const { sections: titles, years } = useLabels()
 
   return (
     <>
@@ -123,9 +125,9 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <div className={SECTION_WRAP}>
           <div className={COLUMN}>
             <Lane profession="drummer" zone="record" />
-            <CratePanel title="Bands" titleIcon={<Gem size={26} color="purple" />} variant="leaf">
+            <CratePanel title={titles.bands} titleIcon={<Gem size={26} color="purple" />} variant="leaf">
               <p className="mb-6 text-base text-white">
-                {drumsSince(musician)}
+                {drumsSince(musician, years)}
               </p>
               <BandList
                 bands={bands}
@@ -148,6 +150,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const { sections: titles } = useLabels()
 
   return (
     <>
@@ -156,7 +159,7 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
         <div className={SECTION_WRAP}>
           <div className={COLUMN}>
             <Lane profession="fighter" zone="record" />
-            <CratePanel title="Muay Thai" titleIcon={<Crate size={32} variant="hazard" />} variant="hazard">
+            <CratePanel title={titles.muayThai} titleIcon={<Crate size={32} variant="hazard" />} variant="hazard">
               <h3 className={`mb-6 text-xl font-black text-white ${world.display} ${world.outlined}`}>{martialArts.primary.title}</h3>
               <MuayThaiRecord
                 martialArts={martialArts}

@@ -2,7 +2,8 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, RELEASED } from '@/components/cv/sectionText'
+import { jobYears } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
@@ -40,8 +41,9 @@ export function SectionHeader({ title }: { title: string }) {
 }
 
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
-    <div className="space-y-4" role="list" aria-label="Technical skills by category">
+    <div className="space-y-4" role="list" aria-label={cards.techByCategory}>
       {categories.map((category) => (
         <div key={category.id} role="listitem">
           <h3 className="mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.25em] text-[color:var(--sh-dim)]">
@@ -69,7 +71,8 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
 // Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps its
 // own year west of UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className={`border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
@@ -172,6 +175,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const content = (
     <Card>
       <h3 className={`${CARD_TITLE} group-hover:underline`}>{band.name}</h3>
@@ -182,7 +186,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-1.5 ${CARD_BODY}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </Card>

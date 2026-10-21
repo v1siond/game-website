@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // Adventure Paths' buttons: email is the route red, LinkedIn the forest green, the CV and the engine are
 // parchment trail signs.
@@ -23,17 +24,19 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${BUTTON} ${SIGN}`}>
-      CV
+      {actions.cv}
     </Link>
   )
 }
 
 export function PlayLink() {
+  const { actions } = useLabels()
   return (
     <Link href="/personal-projects/game-engine" className={`${BUTTON} ${SIGN}`}>
-      Play
+      {actions.play}
     </Link>
   )
 }

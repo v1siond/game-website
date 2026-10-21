@@ -1,6 +1,6 @@
 'use client'
 
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -22,11 +22,12 @@ const LEAD = `text-center text-base font-bold ${world.copy}`
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <FadeInScene>
-        <SpeechBubble label="About">
+        <SpeechBubble label={titles.about}>
           <p className={`text-base leading-relaxed ${world.copy}`}>{professionalSummary.bio}</p>
         </SpeechBubble>
       </FadeInScene>
@@ -36,7 +37,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.jobs.length > 0 && (
         <LevelScene>
           <Strip profession="engineer" zone="record" />
-          <ComicPanel title="Work Experience" accent="orange">
+          <ComicPanel title={titles.workExperience} accent="orange">
             <ul className="space-y-8">
               {sections.jobs.map((entry, index) => (
                 <li key={entry.id}>
@@ -53,7 +54,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <SectionBreak kind="streaks" />
 
       <FadeInScene>
-        <ComicPanel title="Tech Stack" accent="sky">
+        <ComicPanel title={titles.techStack} accent="sky">
           <TechStackCloud categories={sections.techStack} />
         </ComicPanel>
       </FadeInScene>
@@ -62,7 +63,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <LevelScene>
         <Strip profession="engineer" zone="work" />
-        <SectionBanner accent="sun">Featured Work</SectionBanner>
+        <SectionBanner accent="sun">{titles.featuredWork}</SectionBanner>
         <ProjectList
           projects={sections.projects}
           className="grid gap-8 md:grid-cols-2"
@@ -77,7 +78,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <SectionBreak kind="streaks" />
 
       <FadeInScene>
-        <SectionBanner accent="magenta">Ventures</SectionBanner>
+        <SectionBanner accent="magenta">{titles.ventures}</SectionBanner>
         <ul className="grid gap-6 md:grid-cols-3">
           {sections.companies.map((company) => (
             <li key={company.id}>
@@ -92,15 +93,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const { sections: titles, years } = useLabels()
 
   return (
     <>
       <SectionBreak kind="burst" />
       <LevelScene>
         <Strip profession="drummer" zone="record" />
-        <SectionBanner accent="magenta">Bands</SectionBanner>
+        <SectionBanner accent="magenta">{titles.bands}</SectionBanner>
         <p className={`mb-6 ${LEAD}`}>
-          {drumsSince(musician)}
+          {drumsSince(musician, years)}
         </p>
         <BandList
           bands={bands}
@@ -119,13 +121,14 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <SectionBreak kind="burst" />
       <LevelScene>
         <Strip profession="fighter" zone="record" />
-        <ComicPanel title="Muay Thai" accent="orange">
+        <ComicPanel title={titles.muayThai} accent="orange">
           <h3 className="mb-4 text-xl tracking-wide">{martialArts.primary.title}</h3>
           <MuayThaiRecord
             martialArts={martialArts}

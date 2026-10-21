@@ -2,7 +2,7 @@
 
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { SHADE_VARS, TYPEWRITER } from './Silhouette/palette'
@@ -24,6 +24,7 @@ import world from './Silhouette/world.module.css'
 export default function SilhouetteTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation } = useLabels()
 
   return (
     <div className={`relative min-h-screen overflow-x-clip ${TYPEWRITER} ${world.world}`} style={SHADE_VARS}>
@@ -43,7 +44,7 @@ export default function SilhouetteTheme() {
                 <p className="mt-2 text-sm tracking-wider text-[color:var(--sh-text)]">{line}</p>
               </div>
 
-              <nav className="flex flex-wrap items-center gap-3" aria-label="Contact and CV">
+              <nav className="flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
                 <HeroActions actions={actions} />
                 <CVLink />
                 <PlayLink />
@@ -54,10 +55,10 @@ export default function SilhouetteTheme() {
       </header>
 
       {/* Him three times in the dark, one per profession: the switch */}
-      <section className="relative z-20 py-8" aria-label="Select profession view">
+      <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
         <ProfessionSwitch
           className="flex justify-center gap-6 sm:gap-14"
-          label="Select profession view"
+          label={navigation.profession}
           renderOption={(option) => <ProfessionFigure key={option.id} option={option} />}
         />
       </section>

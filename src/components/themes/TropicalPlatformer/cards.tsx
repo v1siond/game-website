@@ -3,7 +3,9 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { Crate, Gem, Mango, type GemColor } from './icons'
 import world from './world.module.css'
 
@@ -16,6 +18,7 @@ const TAG_LIST = 'mt-3 flex flex-wrap gap-1.5'
 const TAG = 'rounded border border-[var(--tp-leaf-light)] bg-[var(--tp-canopy)] px-2 py-1 text-sm text-[var(--tp-lime)]'
 
 export function TechCrates({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
     <div className="space-y-6">
       {categories.map((category) => (
@@ -24,7 +27,7 @@ export function TechCrates({ categories }: { categories: CVData['techStack'] }) 
             <Mango size={18} />
             {category.name}
           </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li
                 key={tech}
@@ -41,7 +44,8 @@ export function TechCrates({ categories }: { categories: CVData['techStack'] }) 
 }
 
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className={`${CARD} border-[var(--tp-sun)]`}>
@@ -56,7 +60,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       </div>
       {entry.description && <p className="mb-3 text-sm text-[var(--tp-parchment)]">{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="space-y-2" aria-label="Key achievements">
+        <ul className="space-y-2" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className="flex items-start gap-2 text-sm text-white">
               <Mango size={14} className="mt-0.5 flex-shrink-0" />
@@ -66,7 +70,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         </ul>
       )}
       {entry.skills.length > 0 && (
-        <ul className={TAG_LIST} aria-label="Skills used">
+        <ul className={TAG_LIST} aria-label={cards.skillsUsed}>
           {entry.skills.map((skill) => (
             <li key={skill} className={TAG}>
               {skill}
@@ -81,6 +85,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 const LINK_BUTTON = `inline-flex min-h-[44px] items-center rounded-md border-[3px] border-[var(--tp-sun)] px-4 text-sm font-black tracking-widest text-white transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[var(--tp-sun)] ${world.buttonFruit} ${world.display} ${world.outlined}`
 
 export function ProjectCard({ project, years, links }: ProjectSlot) {
+  const labels = useLabels()
   return (
     <article className={`${CARD} h-full ${project.highlight ? 'border-[var(--tp-gem-blue)]' : 'border-[var(--tp-wood-light)]'}`}>
       <div className="flex items-start justify-between gap-2">
@@ -99,7 +104,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         </p>
       )}
       {project.techStack.length > 0 && (
-        <ul className={TAG_LIST} aria-label="Technologies used">
+        <ul className={TAG_LIST} aria-label={labels.cards.technologiesUsed}>
           {project.techStack.map((tech) => (
             <li key={tech} className={TAG}>
               {tech}
@@ -116,20 +121,21 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm italic text-[var(--tp-parchment)]">{NO_PUBLIC_LINK}</p>
+        <p className="mt-4 text-sm italic text-[var(--tp-parchment)]">{labels.links.noPublicLink}</p>
       )}
     </article>
   )
 }
 
 export function VentureCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
       className={`${CARD} block h-full border-[var(--tp-wood-light)] transition-transform hover:scale-[1.02] focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[var(--tp-sun)]`}
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
     >
       <div className="mb-2 flex items-center gap-3">
         <Crate size={36} variant="flag" />
@@ -144,6 +150,7 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const content = (
     <article className={`h-full rounded-lg border-2 border-[var(--tp-gem-purple)] p-4 ${world.bandCard}`}>
       <h3 className="text-base font-bold text-white">{band.name}</h3>
@@ -154,7 +161,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="mt-2 text-sm text-[var(--tp-parchment)]">
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>
