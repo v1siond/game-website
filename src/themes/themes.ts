@@ -86,7 +86,7 @@ export const themes: Theme[] = [
   {
     id: 'survival-horror',
     name: 'Survival Horror',
-    description: 'An old house at night - one lamp at a time, fog and the save room',
+    description: 'An old house at night under fixed cameras: doors that creak open, an item box, rooms to search and a safe room with a typewriter',
     colors: {
       background: SH.void,
       backgroundGradient: `linear-gradient(to bottom, ${SH.shadow}, ${SH.void})`,
@@ -116,7 +116,7 @@ export const themes: Theme[] = [
   {
     id: 'neon-portals',
     name: 'Neon Portals',
-    description: 'Glowing portals - orange in, blue out, violet rifts between',
+    description: 'A warp room with level buttons: crates to spin open, crystals, time trials and a boss, the whole visit tallied at the end',
     colors: {
       background: PORTAL.VOID,
       backgroundGradient: `linear-gradient(to bottom, ${PORTAL.CHAMBER}, ${PORTAL.VOID})`,
@@ -146,7 +146,7 @@ export const themes: Theme[] = [
   {
     id: 'soul-map',
     name: 'Soul Map',
-    description: 'Deep blue caverns - rooms that reveal as you explore, glowing paths',
+    description: 'Grey ash and one warm fire: a ruined shrine at dusk, a lift down through the jobs, summon signs and a bout behind a fog wall',
     colors: {
       background: SOUL.abyss,
       backgroundGradient: `linear-gradient(to bottom, ${SOUL.deep}, ${SOUL.abyss})`,
@@ -176,7 +176,7 @@ export const themes: Theme[] = [
   {
     id: 'adventure-paths',
     name: 'Adventure Paths',
-    description: "An explorer's map at dusk - trails, ruins and a red route",
+    description: 'An overworld map: a hub that picks the profession, regions with their own trails and a goal gate at the end',
     colors: {
       background: TRAIL.NIGHT,
       backgroundGradient: `linear-gradient(to bottom, ${TRAIL.CANOPY}, ${TRAIL.NIGHT})`,
@@ -356,7 +356,7 @@ export const themes: Theme[] = [
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',
-    description: 'Atomic age shelter - phosphor terminals and steel bunker rooms',
+    description: 'An atomic age shelter on a green wrist terminal: the cog door, the radio, a perk chart and a password game outside',
     colors: {
       background: ATOMIC_COLORS.ink,
       backgroundGradient: `linear-gradient(to bottom, ${ATOMIC_COLORS.bunker}, ${ATOMIC_COLORS.ink})`,
@@ -416,7 +416,7 @@ export const themes: Theme[] = [
   {
     id: 'cell-shaded',
     name: 'Cell Shaded',
-    description: 'Toon shaded comic - flat colour bands, bold ink lines, impact bursts',
+    description: 'One day in an inked comic desert: a freeze frame intro at noon, a bounty board and skill tree, loot at dusk, a respawn station at night',
     colors: {
       background: CEL.paper,
       backgroundGradient: `linear-gradient(to bottom, ${CEL.paper}, ${CEL.paperShade})`,
@@ -446,7 +446,7 @@ export const themes: Theme[] = [
   {
     id: 'silhouette',
     name: 'Silhouette',
-    description: 'Black shapes on a lit sky - fog, dawn, ember and crimson light',
+    description: "A black forest in the fog: levers, ropes, a spider's webbing, a gravity room and a cut to black between scenes",
     colors: {
       background: SHADE.void,
       backgroundGradient: `linear-gradient(to bottom, ${SHADE.panel}, ${SHADE.void})`,
@@ -476,7 +476,7 @@ export const themes: Theme[] = [
   {
     id: 'mythic',
     name: 'Mythic',
-    description: 'Sunlit Aegean noon - marble temples, terracotta pottery and laurel gold',
+    description: 'An escape up from the underworld in ink over colour: the blood pool hall, chambers to clear, boons over the magma and a gate onto the dawn',
     colors: {
       background: MYTH.sky,
       backgroundGradient: `linear-gradient(to bottom, ${MYTH.sky}, ${MYTH.hallLow})`,
@@ -506,7 +506,7 @@ export const themes: Theme[] = [
   {
     id: 'tropical-platformer',
     name: 'Tropical Platformer',
-    description: 'Island platformer - jungle greens, lagoon blues, ripe fruit and crates',
+    description: 'A jungle run from sunset to night: shot out of barrels across the canopy levels and back to the tree house',
     colors: {
       background: COLORS.canopy,
       backgroundGradient: `linear-gradient(to bottom, ${COLORS.leafDark}, ${COLORS.canopy})`,
