@@ -44,3 +44,17 @@ export function advanceScene(state: SceneState, rawProgress: number): SceneState
   if (progress >= 1) return SCENE_DONE
   return { phase: 'playing', progress }
 }
+
+// One frame's work for many scenes: a layout read, then a style write that uses it.
+export interface FrameTask<Reading> {
+  read: () => Reading
+  write: (reading: Reading) => void
+}
+
+// Every read runs before any write, so a frame forces layout once instead of once per scene (a write
+// between two reads invalidates the layout the next read needs). The tasks are copied first, so a
+// write that releases a scene from a live Set neither skips nor repeats another scene this frame.
+export function readThenWrite<Reading>(tasks: Iterable<FrameTask<Reading>>): void {
+  const readings = Array.from(tasks, (task) => [task, task.read()] as const)
+  readings.forEach(([task, reading]) => task.write(reading))
+}

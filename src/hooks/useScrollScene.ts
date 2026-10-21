@@ -3,21 +3,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePreview } from '@/themes/PreviewContext'
 import {
+  type FrameTask,
   type ScenePhase,
   type SceneLines,
   type SceneState,
   SCENE_DONE,
   SCENE_IDLE,
   advanceScene,
+  readThenWrite,
   sectionProgress,
 } from '@/lib/scroll/progress'
 
 /**
  * One scroll engine for every world's scenes.
  *
- * An IntersectionObserver arms the section when it nears the viewport; only while it is armed does a
- * passive scroll listener schedule one requestAnimationFrame per frame, which measures the section and
- * writes its progress (0 to 1) to the `--scene-progress` CSS variable on the element. React re-renders
+ * An IntersectionObserver arms the section when it nears the viewport. Every armed scene on the page
+ * shares one scheduler: one passive scroll and resize listener and at most one requestAnimationFrame per
+ * frame, which first measures every armed section and then writes each progress (0 to 1) to the
+ * `--scene-progress` CSS variable on its element, so the frame forces layout once. React re-renders
  * only on phase changes (idle, playing, done), never per frame. Once done the scene stays done
  * (`hasAnimated`), and every listener is released. Reduced motion and World Select previews start done.
  */
@@ -34,6 +37,38 @@ export interface ScrollSceneReturn<T extends HTMLElement> {
 }
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
+
+type ArmedScene = FrameTask<number>
+
+const armedScenes = new Set<ArmedScene>()
+let pendingFrame = 0
+
+function flushScenes() {
+  pendingFrame = 0
+  readThenWrite(armedScenes)
+}
+
+function scheduleFrame() {
+  if (!pendingFrame) pendingFrame = requestAnimationFrame(flushScenes)
+}
+
+function armScene(scene: ArmedScene) {
+  if (armedScenes.has(scene)) return
+  if (armedScenes.size === 0) {
+    window.addEventListener('scroll', scheduleFrame, { passive: true })
+    window.addEventListener('resize', scheduleFrame, { passive: true })
+  }
+  armedScenes.add(scene)
+  scheduleFrame()
+}
+
+function disarmScene(scene: ArmedScene) {
+  if (!armedScenes.delete(scene) || armedScenes.size > 0) return
+  window.removeEventListener('scroll', scheduleFrame)
+  window.removeEventListener('resize', scheduleFrame)
+  if (pendingFrame) cancelAnimationFrame(pendingFrame)
+  pendingFrame = 0
+}
 
 function writeProgress(element: HTMLElement, state: SceneState) {
   element.style.setProperty(SCENE_PROGRESS_VAR, String(state.progress))
@@ -68,50 +103,33 @@ export function useScrollScene<T extends HTMLElement = HTMLDivElement>({
     }
 
     let state = SCENE_IDLE
-    let frame = 0
 
-    const measure = () => {
-      frame = 0
-      const raw = sectionProgress(element.getBoundingClientRect().top, window.innerHeight, { start, end })
-      const next = advanceScene(state, raw)
-      if (next.phase !== state.phase) setPhase(next.phase)
-      state = next
-      writeProgress(element, state)
-      if (state.phase === 'done') release()
-    }
-
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(measure)
-    }
-
-    const arm = () => {
-      window.addEventListener('scroll', schedule, { passive: true })
-      window.addEventListener('resize', schedule, { passive: true })
-      schedule()
-    }
-
-    const disarm = () => {
-      window.removeEventListener('scroll', schedule)
-      window.removeEventListener('resize', schedule)
-      if (frame) cancelAnimationFrame(frame)
-      frame = 0
+    const scene: ArmedScene = {
+      read: () => element.getBoundingClientRect().top,
+      write: (top) => {
+        const next = advanceScene(state, sectionProgress(top, window.innerHeight, { start, end }))
+        if (next.phase !== state.phase) setPhase(next.phase)
+        state = next
+        writeProgress(element, state)
+        if (state.phase === 'done') release()
+      },
     }
 
     const observer = new IntersectionObserver(
-      ([entry]) => (entry?.isIntersecting ? arm() : disarm()),
+      ([entry]) => (entry?.isIntersecting ? armScene(scene) : disarmScene(scene)),
       { rootMargin },
     )
 
     function release() {
       hasAnimated.current = true
-      disarm()
+      disarmScene(scene)
       observer.disconnect()
     }
 
     writeProgress(element, state)
     observer.observe(element)
     return () => {
-      disarm()
+      disarmScene(scene)
       observer.disconnect()
     }
   }, [element, isPreview, start, end, rootMargin])

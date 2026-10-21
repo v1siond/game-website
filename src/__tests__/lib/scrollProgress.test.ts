@@ -1,4 +1,4 @@
-import { clamp01, sectionProgress, advanceScene, SCENE_IDLE, SCENE_DONE } from '@/lib/scroll/progress'
+import { clamp01, sectionProgress, advanceScene, readThenWrite, SCENE_IDLE, SCENE_DONE } from '@/lib/scroll/progress'
 
 describe('clamp01', () => {
   it.each([
@@ -61,5 +61,43 @@ describe('advanceScene', () => {
     const done = advanceScene({ phase: 'playing', progress: 0.9 }, 1.2)
     expect(done).toEqual(SCENE_DONE)
     expect(advanceScene(done, 0)).toEqual(SCENE_DONE)
+  })
+})
+
+describe('readThenWrite', () => {
+  const recorder = () => {
+    const log: string[] = []
+    const scene = (name: string, onWrite?: () => void) => ({
+      read: () => {
+        log.push(`read ${name}`)
+        return name.length
+      },
+      write: (reading: number) => {
+        log.push(`write ${name} ${reading}`)
+        onWrite?.()
+      },
+    })
+    return { log, scene }
+  }
+
+  it('reads every scene before it writes any, so one frame forces one layout', () => {
+    const { log, scene } = recorder()
+    readThenWrite([scene('a'), scene('bb'), scene('ccc')])
+    expect(log).toEqual(['read a', 'read bb', 'read ccc', 'write a 1', 'write bb 2', 'write ccc 3'])
+  })
+
+  it('hands each scene its own reading even when a write releases a scene from the set', () => {
+    const { log, scene } = recorder()
+    const armed = new Set<ReturnType<typeof scene>>()
+    const first = scene('a', () => armed.delete(second))
+    const second = scene('bb')
+    armed.add(first).add(second)
+    readThenWrite(armed)
+    expect(log).toEqual(['read a', 'read bb', 'write a 1', 'write bb 2'])
+    expect([...armed]).toEqual([first])
+  })
+
+  it('does nothing for no scenes', () => {
+    expect(() => readThenWrite([])).not.toThrow()
   })
 })
