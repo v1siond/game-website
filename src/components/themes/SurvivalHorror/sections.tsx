@@ -14,6 +14,7 @@ import { BandCard, CompanyCard, ExperienceCard, Mark, ProjectFile, TechCloud } f
 import { PaperPanel } from './panels'
 import { SceneItem, Strip } from './scenes'
 import look from './world.module.css'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Projects,
 // Bands and the Muay Thai record are rooms he crosses, each entry arriving as part of the room. The
@@ -113,7 +114,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <Strip profession="drummer" zone="record" />
         <PaperPanel title="Bands">
           <p className={`mb-4 ${LEAD}`}>
-            Drums since {musician.since}, {musician.yearsPlaying} years
+            {drumsSince(musician)}
           </p>
           <BandList
             bands={bands}

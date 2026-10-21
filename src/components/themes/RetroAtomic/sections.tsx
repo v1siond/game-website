@@ -12,6 +12,7 @@ import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechStackTerminal }
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { LevelScene } from '@/components/scroll/stage'
 import { Lane, SceneItem } from './scenes'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
 // Projects, Bands and the Muay Thai record are shelter levels he crosses, each entry arriving as part of
@@ -121,7 +122,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
             <Lane profession="drummer" zone="record" />
             <RustedPanel title="Bands">
               <p className="mb-4 font-mono text-base text-atomic-phosphor">
-                Drums since {musician.since}, {musician.yearsPlaying} years
+                {drumsSince(musician)}
               </p>
               <BandList
                 bands={bands}

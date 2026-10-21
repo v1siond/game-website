@@ -6,7 +6,7 @@ import { CircuitPattern } from './effects'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, headingId } from '@/components/cv/sectionText'
+import { headingId, jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 
 export type PanelAccent = 'yellow' | 'green' | 'cyan' | 'magenta' | 'violet' | 'red' | 'orange'
 
@@ -139,7 +139,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="text-sm text-white/80 mt-2">
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
       {linkProps && <div className="text-sm text-cyan-400 mt-2" aria-hidden="true">[STREAM_LINK]</div>}
@@ -251,7 +251,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-white/70 mt-3 font-mono">No public link</p>
+        <p className="text-sm text-white/70 mt-3 font-mono">{NO_PUBLIC_LINK}</p>
       )}
     </article>
   )

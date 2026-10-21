@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, headingId } from '@/components/cv/sectionText'
+import { headingId, jobYears, RELEASED } from '@/components/cv/sectionText'
 
 // Neon Portals' panels and cards. Static classes only (no blur, no animated glow), so a card costs
 // nothing while the page scrolls; the scenes in scenes.tsx move them. Colours are the palette.ts values.
@@ -193,7 +193,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="mt-1.5 text-sm text-[#a9a6b8]">
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

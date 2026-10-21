@@ -13,6 +13,7 @@ import { TrailPanel } from './panels'
 import { BandFind, CampCard, ExplorerPack, JourneyEntry, ProjectFind } from './cards'
 import { JOURNAL_SERIF } from './palette'
 import { Lane, SceneItem } from './scenes'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
 // Projects, Bands and the Muay Thai record are trail levels he travels, each entry arriving as part of
@@ -103,7 +104,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <Lane profession="drummer" zone="record" />
         <TrailPanel title="Bands" tone="canopy">
           <p className="mb-4 text-base">
-            Drums since {musician.since}, {musician.yearsPlaying} years
+            {drumsSince(musician)}
           </p>
           <BandList
             bands={bands}

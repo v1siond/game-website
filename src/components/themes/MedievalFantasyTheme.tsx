@@ -15,7 +15,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { Job } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { jobYears } from '@/components/cv/sectionText'
+import { drumsSince, jobYears, RELEASED } from '@/components/cv/sectionText'
 
 // =============================================================================
 // WARCRAFT 3 DUAL PALETTE - Reign of Chaos + Frozen Throne
@@ -4549,7 +4549,7 @@ function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p style={CARD_BODY}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </InnerCard>
@@ -4705,7 +4705,7 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <WC3Frame title="Bands" zone="ft">
               <p style={{ color: WC3.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
-                Drums since {musician.since}, {musician.yearsPlaying} years
+                {drumsSince(musician)}
               </p>
               <BandList
                 bands={bands}

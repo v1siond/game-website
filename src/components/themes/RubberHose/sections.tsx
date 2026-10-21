@@ -12,6 +12,7 @@ import { ArtBreak, CurlBanner } from './art'
 import { BandRecord, CompanyPoster, ExperienceCard, TechBubbleCloud, VintagePoster } from './cards'
 import { SceneItem, Strip } from './scenes'
 import world from './world.module.css'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
 // Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
@@ -107,7 +108,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <section aria-labelledby="hose-bands">
           <CurlBanner id="hose-bands">Bands</CurlBanner>
           <p className={`mb-6 ${LEAD}`}>
-            Drums since {musician.since}, {musician.yearsPlaying} years
+            {drumsSince(musician)}
           </p>
           <BandList
             bands={bands}

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, RELEASED } from '@/components/cv/sectionText'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
@@ -182,7 +182,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-1.5 ${CARD_BODY}`}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </Card>

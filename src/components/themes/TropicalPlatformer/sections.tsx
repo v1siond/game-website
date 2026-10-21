@@ -14,6 +14,7 @@ import { CrateStackArt, JungleSceneArt, WarpPortalArt } from './art'
 import { BandCard, ExperienceCard, ProjectCard, TechCrates, VentureCard } from './cards'
 import { Lane, SceneItem } from './scenes'
 import world from './world.module.css'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
 // Projects, Bands and the Muay Thai record are island runs he crosses, each entry arriving as part of
@@ -124,7 +125,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
             <Lane profession="drummer" zone="record" />
             <CratePanel title="Bands" titleIcon={<Gem size={26} color="purple" />} variant="leaf">
               <p className="mb-6 text-base text-white">
-                Drums since {musician.since}, {musician.yearsPlaying} years
+                {drumsSince(musician)}
               </p>
               <BandList
                 bands={bands}

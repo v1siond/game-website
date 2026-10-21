@@ -1,7 +1,7 @@
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, RELEASED } from '@/components/cv/sectionText'
 import { RoomGlyph } from './art'
 import { SOUL } from './palette'
 import world from './world.module.css'
@@ -129,7 +129,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${BODY}`}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

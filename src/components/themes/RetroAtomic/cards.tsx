@@ -2,7 +2,7 @@ import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { TERMINAL_AMBER } from './palette'
 import { RadiationSymbol } from './icons'
 import world from './world.module.css'
@@ -149,7 +149,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-atomic-ash">No public link</p>
+        <p className="mt-4 text-sm text-atomic-ash">{NO_PUBLIC_LINK}</p>
       )}
     </article>
   )
@@ -190,7 +190,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="mt-2 text-sm text-atomic-ash">
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

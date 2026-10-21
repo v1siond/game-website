@@ -1,4 +1,4 @@
-import type { Band, Job, MartialArts, Project, ProjectLinks } from '@/lib/cv/content'
+import type { Band, Job, MartialArts, Musician, Project, ProjectLinks } from '@/lib/cv/content'
 
 // The words every world prints around the CV facts: link labels, year spans, the Muay Thai record
 // lines. One place, so the 17 worlds say the same thing and only draw it differently.
@@ -47,6 +47,16 @@ export function yearSpan({ startYear, endYear, current, years = null }: Span): s
 }
 
 export const bandSpan = (band: Band): string => yearSpan(band)
+
+/** The line over the bands: "Drums since 2005, 19 years". */
+export const drumsSince = ({ since, yearsPlaying }: Pick<Musician, 'since' | 'yearsPlaying'>): string =>
+  `Drums since ${since}, ${yearsPlaying} years`
+
+/** The word before a band's release title, which the world sets in its own <cite>. */
+export const RELEASED = 'Released'
+
+/** What a project card says when it has no link to show. */
+export const NO_PUBLIC_LINK = 'No public link'
 
 export interface JobYears {
   start: number

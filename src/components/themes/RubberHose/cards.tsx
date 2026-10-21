@@ -1,7 +1,7 @@
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
@@ -123,7 +123,7 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className={`mt-4 italic ${BODY}`}>No public link</p>
+        <p className={`mt-4 italic ${BODY}`}>{NO_PUBLIC_LINK}</p>
       )}
     </article>
   )
@@ -173,7 +173,7 @@ export function BandRecord({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${BODY}`}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

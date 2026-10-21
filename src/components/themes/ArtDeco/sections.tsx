@@ -11,6 +11,7 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { ArtDecoChevron, ArtDecoFan, ArtDecoSunburst, GoldFrame } from './frames'
 import { BandCard, CARD_TITLE, CompanyCard, ExperienceCard, ProjectCard, TechCloud } from './cards'
 import { SceneItem, Strip } from './scenes'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Projects,
 // Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
@@ -99,7 +100,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <Strip profession="drummer" zone="record" />
         <GoldFrame title="Bands">
           <p className={`mb-5 ${LEAD}`}>
-            Drums since {musician.since}, {musician.yearsPlaying} years
+            {drumsSince(musician)}
           </p>
           <BandList
             bands={bands}

@@ -11,6 +11,7 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { LevelScene } from '@/components/scroll/stage'
 import { BandCard, CompanyCard, ExperienceCard, Panel, ProjectCard, SectionHeader, TechCloud } from './cards'
 import { Lane, SceneItem } from './scenes'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
 // Featured Work, Bands and the Muay Thai record are silhouette levels he walks, each entry arriving as
@@ -104,7 +105,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <Lane profession="drummer" zone="record" />
         <SectionHeader title="bands" />
         <p className="mb-4 text-center text-sm text-[color:var(--sh-muted)]">
-          Drums since {musician.since}, {musician.yearsPlaying} years
+          {drumsSince(musician)}
         </p>
         <BandList
           bands={bands}

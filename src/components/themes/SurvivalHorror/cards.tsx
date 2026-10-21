@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { CARD_BUTTON } from './actions'
 import look from './world.module.css'
 
@@ -84,7 +84,7 @@ export function ProjectFile({ slot: { project, years, links }, isOpen, onToggle 
               {label}
             </a>
           ))}
-          {links.length === 0 && <span className={`italic ${BODY}`}>No public link</span>}
+          {links.length === 0 && <span className={`italic ${BODY}`}>{NO_PUBLIC_LINK}</span>}
           <button type="button" onClick={onToggle} aria-expanded={isOpen} aria-controls={bodyId} className={TOGGLE_PLATE}>
             <Chevron open={isOpen} />
             {isOpen ? 'Close file' : 'Read file'}
@@ -147,7 +147,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${BODY}`}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </div>

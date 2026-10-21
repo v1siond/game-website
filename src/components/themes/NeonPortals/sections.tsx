@@ -10,6 +10,7 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { BandCard, ChamberPanel, ExperienceCard, ProjectCard, TechCategoryList, VentureCard } from './cards'
 import { LevelScene } from '@/components/scroll/stage'
 import { Lane, SceneItem } from './scenes'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Experience, Projects, Bands
 // and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
@@ -86,7 +87,7 @@ function MusicianChambers({ sections }: { sections: SectionsOf<'drummer'> }) {
       <Lane profession="drummer" zone="record" />
       <ChamberPanel title="Bands">
         <p className="mb-4 text-sm text-[#edebe4]">
-          Drums since {musician.since}, {musician.yearsPlaying} years
+          {drumsSince(musician)}
         </p>
         <BandList
           bands={bands}

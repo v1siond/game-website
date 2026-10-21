@@ -13,6 +13,7 @@ import { MapPanel, OpenSection } from './panels'
 import { BandCard, CompanyCard, ExperienceCard, Marker, ProjectCard, TechStack } from './cards'
 import { SceneItem, Strip } from './scenes'
 import world from './world.module.css'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
 // Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
@@ -101,7 +102,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <Strip profession="drummer" zone="record" />
         <OpenSection title="Bands">
           <p className={`mb-6 ${LEAD}`}>
-            Drums since {musician.since}, {musician.yearsPlaying} years
+            {drumsSince(musician)}
           </p>
           <BandList
             bands={bands}

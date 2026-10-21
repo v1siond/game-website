@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, RELEASED } from '@/components/cv/sectionText'
 import { JOURNAL_SERIF } from './palette'
 
 // Adventure Paths' entries: a job is a dated page of the field journal with the route line down its left
@@ -94,7 +94,7 @@ export function BandFind({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="mt-2 text-sm">
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

@@ -20,7 +20,7 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
-import { jobYears, headingId } from '@/components/cv/sectionText'
+import { drumsSince, headingId, jobYears, RELEASED } from '@/components/cv/sectionText'
 
 // Blended Dark Fantasy Metroidvania palette
 // Hollow Knight ethereal blues + Iconoclast brass/copper + Ori spirit gold + Salt & Sanctuary stone
@@ -1270,7 +1270,7 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className="text-sm mt-2" style={{ color: DF.silver }}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>
@@ -1731,7 +1731,7 @@ function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
 
       <SlashRevealSection title="Bands">
         <p className="text-sm mb-4 text-center" style={{ color: DF.bone }}>
-          Drums since {musician.since}, {musician.yearsPlaying} years
+          {drumsSince(musician)}
         </p>
         <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
         <p className="text-sm mt-4 italic text-center" style={{ color: DF.lavender }}>{musician.line}</p>

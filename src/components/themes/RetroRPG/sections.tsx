@@ -13,6 +13,7 @@ import { BandCard, CompanyCard, ExperienceCard, ItemBag, ProjectCard } from './c
 import { SectionHeader, Window } from './panels'
 import { PIXEL } from './palette'
 import { Lane, SceneItem } from './scenes'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
 // Featured Work, Bands and the Muay Thai record are overworld levels he crosses, each entry arriving as
@@ -106,7 +107,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <Lane profession="drummer" zone="record" />
         <SectionHeader title="Bands" />
         <p className="mb-4 text-sm text-[color:var(--rpg-text)]">
-          Drums since {musician.since}, {musician.yearsPlaying} years
+          {drumsSince(musician)}
         </p>
         <BandList
           bands={bands}

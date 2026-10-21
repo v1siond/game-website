@@ -11,6 +11,7 @@ import { CompanyCard, BandCard, CyberPanel, ExperienceCard, ProjectCard, TechCat
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { LevelScene } from '@/components/scroll/stage'
 import { LevelStrip, SceneItem } from './scenes'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // The cyberware slot each profession's selector option shows.
 export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> = {
@@ -94,7 +95,7 @@ export function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }
       <LevelStrip profession="drummer" zone="record" />
       <CyberPanel title="Bands" accent="violet">
         <p className="text-sm text-white/80 font-mono mb-4">
-          Drums since {musician.since}, {musician.yearsPlaying} years
+          {drumsSince(musician)}
         </p>
         <BandList
           bands={bands}

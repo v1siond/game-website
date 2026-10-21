@@ -2,7 +2,7 @@ import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { HeroCharacter } from './character'
 import { ImpactBurst } from './backdrop'
 import { ACCENT_FILL, type Accent } from './panels'
@@ -118,7 +118,7 @@ export function ProjectCard({ project, years, links, index }: ProjectSlot & { in
           ))}
         </div>
       ) : (
-        <p className={`mt-3 italic ${BODY}`}>No public link</p>
+        <p className={`mt-3 italic ${BODY}`}>{NO_PUBLIC_LINK}</p>
       )}
     </article>
   )
@@ -166,7 +166,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 text-sm text-[#eadcb8] ${world.copy}`}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

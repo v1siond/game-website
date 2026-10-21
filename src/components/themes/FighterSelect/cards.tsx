@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
 import { HitSpark } from './badges'
 import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
@@ -101,7 +101,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className={`mt-4 ${BODY}`}>No public link</p>
+        <p className={`mt-4 ${BODY}`}>{NO_PUBLIC_LINK}</p>
       )}
     </FightCard>
   )
@@ -118,7 +118,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-3 ${BODY}`}>
-          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </FightCard>

@@ -14,6 +14,7 @@ import { BandCard, ExperienceCard, MoveList, ProjectCard, VentureCard } from './
 import { ClashSeparator, LightningLine, RoundWins } from './separators'
 import { SceneItem, Strip } from './scenes'
 import look from './world.module.css'
+import { drumsSince } from '@/components/cv/sectionText'
 
 // The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Projects,
 // Bands and the Muay Thai record are stages he crosses, each entry arriving as part of the match.
@@ -100,7 +101,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <Strip profession="drummer" zone="record" />
         <ArcadePanel accent="p2" title="Bands" id="bands-heading">
           <p className={`mb-6 ${LEAD}`}>
-            Drums since {musician.since}, {musician.yearsPlaying} years
+            {drumsSince(musician)}
           </p>
           <BandList
             bands={bands}
