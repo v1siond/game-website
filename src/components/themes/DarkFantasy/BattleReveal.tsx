@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef, memo, ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
-import { useInView, FixedCombatLayer } from './fixedCombat'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { FixedCombatLayer, COMBAT_IN_VIEW, moveAndFade } from './fixedCombat'
+import bugMotion from './bug.module.css'
 import { DARK_FANTASY } from './palette'
 import { useLabels } from '@/components/cv/CVDataProvider'
 
@@ -80,7 +82,7 @@ export const BattleReveal = memo(function BattleReveal({
   // continuous in-view so the fixed knight/bug fade out once we scroll past the section.
   // Aggressive top margin (-48%) hides them EARLY as you scroll down toward the worlds
   // section, so the battle never mixes into it; -12% bottom shows them a touch sooner on entry.
-  const { ref: stageRef, inView } = useInView('-48% 0px -12% 0px')
+  const { ref: stageRef, inView } = useSectionTrigger({ ...COMBAT_IN_VIEW, rootMargin: '-48% 0px -12% 0px' })
 
   // Continuous animation loop for leg/antenna movement
   useEffect(() => {
@@ -252,7 +254,7 @@ export const BattleReveal = memo(function BattleReveal({
           ...baseStyle,
           transform: 'translateX(0) translateY(0) rotateZ(0deg)',
           opacity: 1,
-          transition: 'all 500ms ease-out',
+          transition: moveAndFade('500ms ease-out'),
           animation: 'bugWander 600ms ease-in-out infinite'
         }
       case 'knight-dash':
@@ -408,9 +410,6 @@ export const BattleReveal = memo(function BattleReveal({
         {showBug && !isBugDead && (
           <div
             className="absolute right-[18%] bottom-[10%] z-5 pointer-events-none"
-            style={{
-              transition: 'all 300ms ease-out',
-            }}
           >
             <div
               className="rounded-full"
@@ -628,15 +627,9 @@ export const BattleBug = memo(function BattleBug({
 
       {/* INFECTION GROWTHS */}
       <g filter="url(#battleGlow)">
-        <ellipse cx="50" cy="50" rx="10" ry="8" fill={infected} opacity="0.85">
-          <animate attributeName="rx" values="10;11;10" dur="2s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="35" cy="56" rx="7" ry="5" fill={infected} opacity="0.75">
-          <animate attributeName="ry" values="5;6;5" dur="1.8s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="65" cy="56" rx="7" ry="5" fill={infected} opacity="0.75">
-          <animate attributeName="ry" values="5;6;5" dur="2.2s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse className={`${bugMotion.shape} ${bugMotion.swellWide}`} cx="50" cy="50" rx="10" ry="8" fill={infected} opacity="0.85" />
+        <ellipse className={`${bugMotion.shape} ${bugMotion.swellTall}`} cx="35" cy="56" rx="7" ry="5" fill={infected} opacity="0.75" />
+        <ellipse className={`${bugMotion.shape} ${bugMotion.swellTallSlow}`} cx="65" cy="56" rx="7" ry="5" fill={infected} opacity="0.75" />
         <circle cx="42" cy="60" r="4" fill={infected} opacity="0.5" />
         <circle cx="58" cy="62" r="3" fill={infected} opacity="0.45" />
         <circle cx="50" cy="38" r="5" fill={infected} opacity="0.6" />
@@ -726,39 +719,18 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 120 }: { size?: n
       <g>
         <ellipse cx="50" cy="72" rx="12" ry="4" fill={infected} opacity="0.5" />
         {/* Drip 1 */}
-        <ellipse cx="46" cy="65" rx="2" ry="3" fill={infected} opacity="0.6">
-          <animate attributeName="cy" values="60;68;60" dur="2s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.6;0.3;0.6" dur="2s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse className={`${bugMotion.shape} ${bugMotion.drip} ${bugMotion.dripA}`} cx="46" cy="60" rx="2" ry="3" fill={infected} opacity="0.6" />
         {/* Drip 2 */}
-        <ellipse cx="54" cy="62" rx="1.5" ry="2.5" fill={infected} opacity="0.5">
-          <animate attributeName="cy" values="58;66;58" dur="2.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.5;0.2;0.5" dur="2.5s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse className={`${bugMotion.shape} ${bugMotion.drip} ${bugMotion.dripB}`} cx="54" cy="58" rx="1.5" ry="2.5" fill={infected} opacity="0.5" />
         {/* Drip 3 */}
-        <ellipse cx="50" cy="64" rx="2.5" ry="4" fill={infected} opacity="0.55">
-          <animate attributeName="cy" values="62;70;62" dur="1.8s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.55;0.25;0.55" dur="1.8s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse className={`${bugMotion.shape} ${bugMotion.drip} ${bugMotion.dripC}`} cx="50" cy="62" rx="2.5" ry="4" fill={infected} opacity="0.55" />
       </g>
 
       {/* SMOKE/STEAM - rising from body */}
       <g opacity="0.4">
-        <ellipse cx="45" cy="35" rx="3" ry="2" fill={DARK_FANTASY.dust}>
-          <animate attributeName="cy" values="40;25;40" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite" />
-          <animate attributeName="rx" values="3;6;3" dur="3s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="55" cy="38" rx="2.5" ry="1.5" fill={DARK_FANTASY.dustDark}>
-          <animate attributeName="cy" values="42;28;42" dur="3.5s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.35;0;0.35" dur="3.5s" repeatCount="indefinite" />
-          <animate attributeName="rx" values="2.5;5;2.5" dur="3.5s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="50" cy="32" rx="2" ry="1.5" fill={DARK_FANTASY.dustLight}>
-          <animate attributeName="cy" values="36;22;36" dur="4s" repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" />
-          <animate attributeName="rx" values="2;4;2" dur="4s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse className={`${bugMotion.shape} ${bugMotion.smoke} ${bugMotion.smokeA}`} cx="45" cy="40" rx="3" ry="2" fill={DARK_FANTASY.dust} opacity="0.4" />
+        <ellipse className={`${bugMotion.shape} ${bugMotion.smoke} ${bugMotion.smokeB}`} cx="55" cy="42" rx="2.5" ry="1.5" fill={DARK_FANTASY.dustDark} opacity="0.35" />
+        <ellipse className={`${bugMotion.shape} ${bugMotion.smoke} ${bugMotion.smokeC}`} cx="50" cy="36" rx="2" ry="1.5" fill={DARK_FANTASY.dustLight} opacity="0.3" />
       </g>
     </svg>
   )
@@ -892,7 +864,7 @@ const DeathParticles = memo(function DeathParticles() {
   })
 
   // Rising soul particles
-  const soulParticles = Array.from({ length: 15 }, (_, i) => ({
+  const soulParticles = Array.from({ length: 15 }, () => ({
     x: Math.random() * 100 - 50,
     delay: 100 + Math.random() * 150,
     duration: 400 + Math.random() * 200,
@@ -900,7 +872,7 @@ const DeathParticles = memo(function DeathParticles() {
   }))
 
   // Spark/debris particles
-  const sparkParticles = Array.from({ length: 12 }, (_, i) => {
+  const sparkParticles = Array.from({ length: 12 }, () => {
     const angle = Math.random() * Math.PI * 2
     const distance = 30 + Math.random() * 40
     return {
@@ -1002,7 +974,7 @@ const BloodSplatter = memo(function BloodSplatter() {
   })
 
   // Smaller spray particles
-  const spray = Array.from({ length: 12 }, (_, i) => {
+  const spray = Array.from({ length: 12 }, () => {
     const angle = (Math.random() - 0.5) * Math.PI
     const distance = 20 + Math.random() * 30
     return {

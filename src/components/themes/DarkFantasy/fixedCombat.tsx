@@ -1,29 +1,25 @@
 'use client'
 
-import { ReactNode, useEffect, useRef, useState } from 'react'
+import { ReactNode } from 'react'
+import type { SectionTriggerOptions } from '@/hooks/useSectionTrigger'
 
 /**
- * useInView, continuous "is this element currently in the viewport?" signal.
- *
- * Unlike `useSectionTrigger` (one-shot `triggered` that latches true), this toggles
- * back to false when the element scrolls out of view. We use it to fade the fixed
- * combat layer out as the user scrolls past a section ("the bug disappears as we go
- * down") rather than leaving the knight/bug pinned to the corner forever.
+ * Continuous in-view signal for the combat stages, read through the shared useSectionTrigger.
+ * triggerOnce false toggles `inView` back off when the stage scrolls out, so the fixed combat
+ * layer fades away as the user scrolls past a section instead of staying pinned to the corner.
  */
-export function useInView(rootMargin = '-30% 0px -30% 0px') {
-  const ref = useRef<HTMLDivElement>(null)
-  const [inView, setInView] = useState(false)
-  useEffect(() => {
-    const el = ref.current
-    if (!el || typeof IntersectionObserver === 'undefined') return
-    const io = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0, rootMargin }
-    )
-    io.observe(el)
-    return () => io.disconnect()
-  }, [rootMargin])
-  return { ref, inView }
+export const COMBAT_IN_VIEW: SectionTriggerOptions = {
+  threshold: 0,
+  rootMargin: '-30% 0px -30% 0px',
+  triggerOnce: false,
+}
+
+/**
+ * The transition for a pose change that moves and fades: transform and opacity only, so the
+ * browser composites it instead of recalculating every animatable property.
+ */
+export function moveAndFade(timing: string): string {
+  return `transform ${timing}, opacity ${timing}`
 }
 
 /**

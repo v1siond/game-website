@@ -1,7 +1,8 @@
 'use client'
 
 import { memo, ReactNode, useState, useEffect, useRef } from 'react'
-import { useInView, FixedCombatLayer } from './fixedCombat'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { FixedCombatLayer, COMBAT_IN_VIEW, moveAndFade } from './fixedCombat'
 import { DARK_FANTASY } from './palette'
 
 /**
@@ -281,7 +282,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const [showSlash, setShowSlash] = useState(false)
   const hasAnimated = useRef(false)
   // continuous in-view so the fixed knight fades out once we scroll past the section
-  const { ref: stageRef, inView } = useInView()
+  const { ref: stageRef, inView } = useSectionTrigger(COMBAT_IN_VIEW)
 
   useEffect(() => {
     if (!triggered || hasAnimated.current) {
@@ -331,19 +332,19 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       case 'idle':
         return { transform: 'translateX(120px)', opacity: 0 }
       case 'knight-enter':
-        return { transform: 'translateX(0)', opacity: 1, transition: 'all 200ms ease-out' }
+        return { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('200ms ease-out') }
       case 'knight-raise':
-        return { transform: 'translateX(-10px)', opacity: 1, transition: 'all 150ms ease-out' }
+        return { transform: 'translateX(-10px)', opacity: 1, transition: moveAndFade('150ms ease-out') }
       case 'slash':
-        return { transform: 'translateX(-25px)', opacity: 1, transition: 'all 100ms ease-out' }
+        return { transform: 'translateX(-25px)', opacity: 1, transition: moveAndFade('100ms ease-out') }
       case 'content-reveal':
-        return { transform: 'translateX(-70px)', opacity: 0.75, transition: 'all 250ms ease-out' }
+        return { transform: 'translateX(-70px)', opacity: 0.75, transition: moveAndFade('250ms ease-out') }
       case 'complete':
         // Knight rests closer to content (more to the left)
         return {
           transform: 'translateX(-90px)',
           opacity: 0.7,
-          transition: 'all 300ms ease-out',
+          transition: moveAndFade('300ms ease-out'),
         }
       default:
         return { transform: 'translateX(120px)', opacity: 0 }
@@ -359,7 +360,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       case 'slash':
         return { transform: 'translateX(100%)', opacity: 0 }
       case 'content-reveal':
-        return { transform: 'translateX(0)', opacity: 1, transition: 'all 250ms cubic-bezier(0.34, 1.56, 0.64, 1)' }
+        return { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)') }
       case 'complete':
         return { transform: 'translateX(0)', opacity: 1 }
       default:

@@ -1,242 +1,10 @@
 'use client'
 
 import { useState, useEffect, memo, ReactNode, useRef } from 'react'
-import { useInView, FixedCombatLayer } from './fixedCombat'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { FixedCombatLayer, COMBAT_IN_VIEW, moveAndFade } from './fixedCombat'
 import { KnightCharacter } from './KnightCharacter'
 import { BattleBug } from './BattleReveal'
-import { DARK_FANTASY } from './palette'
-
-/**
- * BUG CREATURE - A CAVERN BOSS
- * =======================================
- *
- * Based on actual HK boss designs (reference image):
- * - Chunky armored body with segmented shell
- * - Multiple void-black eyes (some glowing orange)
- * - Curved mandibles/horns
- * - Thick segmented legs
- * - Purple-grey color palette with orange infection
- * - Mask-like face structure
- *
- * Key bosses referenced:
- * - False Knight (bulky, armored)
- * - Broken Vessel (infected, orange glows)
- * - Husk Guard (segmented body)
- * - Gruz Mother (rounded, multiple legs)
- */
-
-interface BugCreatureProps {
-  size?: number
-  className?: string
-  style?: React.CSSProperties
-  legPhase?: number
-  antennaPhase?: number
-  isDead?: boolean
-  isHit?: boolean
-}
-
-export const BugCreature = memo(function BugCreature({
-  size = 80,
-  className = '',
-  style = {},
-  legPhase = 0,
-  antennaPhase = 0,
-  isDead = false,
-  isHit = false,
-}: BugCreatureProps) {
-  // Leg animation - alternating gait
-  const getLegY = (index: number) => {
-    if (isDead) return 5
-    const offset = index % 2 === 0 ? 0 : 0.5
-    return Math.sin((legPhase + offset) * Math.PI * 2) * 4
-  }
-
-  const antennaWiggle = isDead ? 0 : Math.sin(antennaPhase * Math.PI * 2) * 6
-
-  return (
-    <svg
-      width={size}
-      height={size * 0.85}
-      viewBox="0 0 100 85"
-      className={className}
-      style={{
-        ...style,
-        filter: isHit
-          ? 'brightness(2) saturate(0)'
-          : `drop-shadow(0 0 8px ${DARK_FANTASY.infectedGlow}50)`,
-        transform: isDead ? 'rotate(180deg)' : undefined,
-        opacity: isDead ? 0.6 : 1,
-      }}
-    >
-      <defs>
-        <radialGradient id="bugShellGrad" cx="50%" cy="30%" r="70%">
-          <stop offset="0%" stopColor={DARK_FANTASY.shell} />
-          <stop offset="70%" stopColor={DARK_FANTASY.shellMid} />
-          <stop offset="100%" stopColor={DARK_FANTASY.shellDark} />
-        </radialGradient>
-        <radialGradient id="bugMaskGrad" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor={DARK_FANTASY.bugMaskLight} />
-          <stop offset="100%" stopColor={DARK_FANTASY.bugMask} />
-        </radialGradient>
-        <filter id="infectionGlow2" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      </defs>
-
-      {/* LEGS - thick, segmented, 4 per side */}
-      <g stroke={DARK_FANTASY.shellDark} strokeWidth="4" strokeLinecap="round" fill="none">
-        {/* Left legs - curved downward with joints */}
-        <path d={`M28,45 Q18,${50 + getLegY(0)} 10,${58 + getLegY(0)} Q6,${62 + getLegY(0)} 4,${68 + getLegY(0)}`} />
-        <path d={`M25,52 Q15,${56 + getLegY(1)} 8,${64 + getLegY(1)} Q4,${68 + getLegY(1)} 2,${74 + getLegY(1)}`} />
-        <path d={`M26,58 Q18,${62 + getLegY(2)} 12,${70 + getLegY(2)} Q8,${74 + getLegY(2)} 6,${80 + getLegY(2)}`} />
-        <path d={`M30,62 Q24,${66 + getLegY(3)} 18,${74 + getLegY(3)}`} />
-        {/* Right legs */}
-        <path d={`M72,45 Q82,${50 + getLegY(4)} 90,${58 + getLegY(4)} Q94,${62 + getLegY(4)} 96,${68 + getLegY(4)}`} />
-        <path d={`M75,52 Q85,${56 + getLegY(5)} 92,${64 + getLegY(5)} Q96,${68 + getLegY(5)} 98,${74 + getLegY(5)}`} />
-        <path d={`M74,58 Q82,${62 + getLegY(6)} 88,${70 + getLegY(6)} Q92,${74 + getLegY(6)} 94,${80 + getLegY(6)}`} />
-        <path d={`M70,62 Q76,${66 + getLegY(7)} 82,${74 + getLegY(7)}`} />
-      </g>
-      {/* Leg segments (joints) */}
-      <g fill={DARK_FANTASY.shellMid}>
-        <circle cx="18" cy={50 + getLegY(0)} r="3" />
-        <circle cx="15" cy={56 + getLegY(1)} r="3" />
-        <circle cx="82" cy={50 + getLegY(4)} r="3" />
-        <circle cx="85" cy={56 + getLegY(5)} r="3" />
-      </g>
-
-      {/* BODY - chunky segmented shell */}
-      {/* Back segment (largest) */}
-      <ellipse
-        cx="50"
-        cy="55"
-        rx="28"
-        ry="20"
-        fill="url(#bugShellGrad)"
-        stroke={DARK_FANTASY.void}
-        strokeWidth="1.5"
-      />
-      {/* Shell ridge lines */}
-      <path
-        d="M30,50 Q50,45 70,50"
-        fill="none"
-        stroke={DARK_FANTASY.shellDark}
-        strokeWidth="2"
-        opacity="0.6"
-      />
-      <path
-        d="M32,58 Q50,54 68,58"
-        fill="none"
-        stroke={DARK_FANTASY.shellDark}
-        strokeWidth="1.5"
-        opacity="0.4"
-      />
-
-      {/* Middle segment */}
-      <ellipse
-        cx="50"
-        cy="40"
-        rx="22"
-        ry="14"
-        fill={DARK_FANTASY.shellMid}
-        stroke={DARK_FANTASY.void}
-        strokeWidth="1"
-      />
-
-      {/* HEAD/MASK - HK style face */}
-      <ellipse
-        cx="50"
-        cy="26"
-        rx="18"
-        ry="15"
-        fill="url(#bugMaskGrad)"
-        stroke={DARK_FANTASY.void}
-        strokeWidth="1"
-      />
-      {/* Mask ridge */}
-      <path
-        d="M35,22 Q50,16 65,22"
-        fill="none"
-        stroke={DARK_FANTASY.bugMaskLight}
-        strokeWidth="2"
-        opacity="0.5"
-      />
-
-      {/* MANDIBLES - curved, threatening */}
-      <path
-        d={`M36,32 Q${28 + antennaWiggle * 0.3},38 ${24 + antennaWiggle * 0.5},45`}
-        fill="none"
-        stroke={DARK_FANTASY.shell}
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      <path
-        d={`M64,32 Q${72 - antennaWiggle * 0.3},38 ${76 - antennaWiggle * 0.5},45`}
-        fill="none"
-        stroke={DARK_FANTASY.shell}
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      {/* Mandible tips */}
-      <circle cx={24 + antennaWiggle * 0.5} cy="45" r="3" fill={DARK_FANTASY.shellDark} />
-      <circle cx={76 - antennaWiggle * 0.5} cy="45" r="3" fill={DARK_FANTASY.shellDark} />
-
-      {/* HORNS/ANTENNAE - curved upward */}
-      <path
-        d={`M38,14 Q${30 + antennaWiggle},6 ${26 + antennaWiggle},0`}
-        fill="none"
-        stroke={DARK_FANTASY.shell}
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-      <path
-        d={`M62,14 Q${70 - antennaWiggle},6 ${74 - antennaWiggle},0`}
-        fill="none"
-        stroke={DARK_FANTASY.shell}
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-
-      {/* EYES - void black with orange glow (HK style) */}
-      <g filter="url(#infectionGlow2)">
-        {/* Main eyes - large, void black */}
-        <ellipse cx="40" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
-        <ellipse cx="60" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
-        {/* Inner orange glow */}
-        <ellipse cx="40" cy="24" rx="4" ry="5" fill={DARK_FANTASY.infected} opacity="0.7" />
-        <ellipse cx="60" cy="24" rx="4" ry="5" fill={DARK_FANTASY.infected} opacity="0.7" />
-        {/* Eye highlights */}
-        <ellipse cx="38" cy="22" rx="2" ry="2.5" fill={DARK_FANTASY.infectedBright} opacity="0.8" />
-        <ellipse cx="58" cy="22" rx="2" ry="2.5" fill={DARK_FANTASY.infectedBright} opacity="0.8" />
-      </g>
-
-      {/* INFECTION GROWTHS - bulbous orange blobs */}
-      <g filter="url(#infectionGlow2)">
-        {/* Main back infection */}
-        <ellipse cx="50" cy="50" rx="10" ry="8" fill={DARK_FANTASY.infected} opacity="0.85">
-          {!isDead && <animate attributeName="rx" values="10;11;10" dur="2s" repeatCount="indefinite" />}
-        </ellipse>
-        {/* Side infections */}
-        <ellipse cx="35" cy="56" rx="7" ry="5" fill={DARK_FANTASY.infected} opacity="0.75">
-          {!isDead && <animate attributeName="ry" values="5;6;5" dur="1.8s" repeatCount="indefinite" />}
-        </ellipse>
-        <ellipse cx="65" cy="56" rx="7" ry="5" fill={DARK_FANTASY.infected} opacity="0.75">
-          {!isDead && <animate attributeName="ry" values="5;6;5" dur="2.2s" repeatCount="indefinite" />}
-        </ellipse>
-        {/* Small accent blobs */}
-        <circle cx="42" cy="60" r="4" fill={DARK_FANTASY.infected} opacity="0.5" />
-        <circle cx="58" cy="62" r="3" fill={DARK_FANTASY.infected} opacity="0.45" />
-        <circle cx="50" cy="38" r="5" fill={DARK_FANTASY.infected} opacity="0.6" />
-      </g>
-
-      {/* Blob highlights */}
-      <ellipse cx="48" cy="47" rx="3" ry="2" fill={DARK_FANTASY.infectedBright} opacity="0.35" />
-    </svg>
-  )
-})
 
 // ============================================
 // BUG ATTACK REVEAL ANIMATION
@@ -266,6 +34,51 @@ const ATTACK_TIMING = {
   'complete': 1900,
 }
 
+/** Alex's pose: `track` is his x across the layer, `self` his offset from it, by his own width. */
+interface AlexPose {
+  track: string
+  self: string
+  opacity: number
+  timing?: string
+}
+
+const ALEX_POSES: Record<AnimationPhase, AlexPose> = {
+  'idle': { track: '45%', self: '-50%', opacity: 0 },
+  'alex-enters': { track: '45%', self: '-50%', opacity: 1, timing: '400ms ease-out' },
+  'bug-appears': { track: '45%', self: '-50%', opacity: 1 },
+  'bug-hits': { track: '40%', self: '-50%', opacity: 1, timing: '150ms ease-out' },
+  'alex-blocks': { track: '8%', self: '0', opacity: 1, timing: '250ms cubic-bezier(0.34, 1.56, 0.64, 1)' },
+  'attack-stance': { track: '15%', self: '0', opacity: 1, timing: '200ms ease-out' },
+  'complete': { track: '15%', self: '0', opacity: 1, timing: '200ms ease-out' },
+}
+
+/** The bug's pose: `track` is its x from the layer's right edge (negative is inward). */
+interface BugPose {
+  track: string
+  transform: string
+  opacity: number
+  timing?: string
+  float?: boolean
+}
+
+const BUG_POSES: Record<AnimationPhase, BugPose> = {
+  'idle': { track: '180px', transform: 'translateY(0)', opacity: 0 },
+  'alex-enters': { track: '180px', transform: 'translateY(0)', opacity: 0 },
+  'bug-appears': { track: '-2%', transform: 'translateY(0)', opacity: 1, timing: '350ms ease-out' },
+  'bug-hits': {
+    track: '-5%',
+    transform: 'translateX(-20px) translateY(-8px) rotate(-8deg)',
+    opacity: 1,
+    timing: '150ms ease-out',
+  },
+  'alex-blocks': { track: '-3%', transform: 'translateY(0) rotate(0deg)', opacity: 1, timing: '200ms ease-out' },
+  'attack-stance': { track: '-16%', transform: 'translateY(-70px)', opacity: 1, timing: '400ms ease-out', float: true },
+  'complete': { track: '-16%', transform: 'translateY(-70px)', opacity: 1, timing: '400ms ease-out', float: true },
+}
+
+const BUG_FLOAT = 'bugFloat 1.5s ease-in-out infinite'
+const SHADOW_TIMING = '400ms ease-out'
+
 export const BugPullReveal = memo(function BugPullReveal({
   children,
   triggered,
@@ -275,7 +88,7 @@ export const BugPullReveal = memo(function BugPullReveal({
   const [legPhase, setLegPhase] = useState(0)
   const hasAnimated = useRef(false)
   // continuous in-view so the fixed Alex/bug fade out once we scroll past the section
-  const { ref: stageRef, inView } = useInView()
+  const { ref: stageRef, inView } = useSectionTrigger(COMBAT_IN_VIEW)
 
   useEffect(() => {
     if (phase === 'idle' || phase === 'complete') return
@@ -318,88 +131,29 @@ export const BugPullReveal = memo(function BugPullReveal({
     return () => timers.forEach(t => clearTimeout(t))
   }, [triggered])
 
-  const getAlexStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        return { left: '45%', transform: 'translateX(-50%)', opacity: 0 }
-      case 'alex-enters':
-        return {
-          left: '45%',
-          transform: 'translateX(-50%)',
-          opacity: 1,
-          transition: 'all 400ms ease-out'
-        }
-      case 'bug-appears':
-        return {
-          left: '45%',
-          transform: 'translateX(-50%)',
-          opacity: 1
-        }
-      case 'bug-hits':
-        return {
-          left: '40%',
-          transform: 'translateX(-50%)',
-          opacity: 1,
-          transition: 'all 150ms ease-out'
-        }
-      case 'alex-blocks':
-        return {
-          left: '8%',
-          transform: 'translateX(0)',
-          opacity: 1,
-          transition: 'all 250ms cubic-bezier(0.34, 1.56, 0.64, 1)'
-        }
-      case 'attack-stance':
-      case 'complete':
-        return {
-          left: '15%',
-          transform: 'translateX(0)',
-          opacity: 1,
-          transition: 'all 200ms ease-out'
-        }
-      default:
-        return { left: '45%', transform: 'translateX(-50%)', opacity: 0 }
-    }
+  // Each figure rides a full-width track inside the fixed layer. The track's translateX in percent
+  // resolves against the layer's width, so it places the figure as left or right would, on the compositor.
+  const alex = ALEX_POSES[phase]
+  const bug = BUG_POSES[phase]
+  const isFloating = bug.float === true
+  const alexTrackStyle: React.CSSProperties = {
+    transform: `translateX(${alex.track})`,
+    transition: alex.timing && `transform ${alex.timing}`,
   }
-
-  const getBugStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-      case 'alex-enters':
-        return { right: '-180px', opacity: 0, transform: 'translateY(0)' }
-      case 'bug-appears':
-        return {
-          right: '2%',
-          opacity: 1,
-          transform: 'translateY(0)',
-          transition: 'all 350ms ease-out'
-        }
-      case 'bug-hits':
-        return {
-          right: '5%',
-          opacity: 1,
-          transform: 'translateX(-20px) translateY(-8px) rotate(-8deg)',
-          transition: 'all 150ms ease-out'
-        }
-      case 'alex-blocks':
-        return {
-          right: '3%',
-          opacity: 1,
-          transform: 'translateY(0) rotate(0deg)',
-          transition: 'all 200ms ease-out'
-        }
-      case 'attack-stance':
-      case 'complete':
-        return {
-          right: '16%',
-          opacity: 1,
-          transform: 'translateY(-70px)',
-          transition: 'all 400ms ease-out',
-          animation: 'bugFloat 1.5s ease-in-out infinite'
-        }
-      default:
-        return { right: '-180px', opacity: 0 }
-    }
+  const alexStyle: React.CSSProperties = {
+    transform: `translateX(${alex.self})`,
+    opacity: alex.opacity,
+    transition: alex.timing && moveAndFade(alex.timing),
+  }
+  const bugTrackStyle: React.CSSProperties = {
+    transform: `translateX(${bug.track})`,
+    transition: bug.timing && `transform ${bug.timing}`,
+  }
+  const bugStyle: React.CSSProperties = {
+    transform: bug.transform,
+    opacity: bug.opacity,
+    transition: bug.timing && moveAndFade(bug.timing),
+    animation: isFloating ? BUG_FLOAT : undefined,
   }
 
   const getContentStyle = (): React.CSSProperties => {
@@ -411,13 +165,13 @@ export const BugPullReveal = memo(function BugPullReveal({
         return {
           transform: 'translateX(55%)',
           opacity: 0.7,
-          transition: 'all 350ms ease-out'
+          transition: moveAndFade('350ms ease-out')
         }
       case 'bug-hits':
         return {
           transform: 'translateX(15%)',
           opacity: 0.95,
-          transition: 'all 300ms ease-out'
+          transition: moveAndFade('300ms ease-out')
         }
       case 'alex-blocks':
       case 'attack-stance':
@@ -425,7 +179,7 @@ export const BugPullReveal = memo(function BugPullReveal({
         return {
           transform: 'translateX(0)',
           opacity: 1,
-          transition: 'all 250ms cubic-bezier(0.34, 1.56, 0.64, 1)'
+          transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)')
         }
       default:
         return { transform: 'translateX(0)', opacity: 1 }
@@ -434,7 +188,6 @@ export const BugPullReveal = memo(function BugPullReveal({
 
   const showBug = phase !== 'idle' && phase !== 'alex-enters'
   const showAlex = phase !== 'idle'
-  const isFloating = phase === 'attack-stance' || phase === 'complete'
 
   return (
     <div ref={stageRef} className={`relative w-full ${className}`} style={{ minHeight: '280px' }}>
@@ -442,41 +195,46 @@ export const BugPullReveal = memo(function BugPullReveal({
       {(showAlex || showBug) && (
         <FixedCombatLayer inView={inView}>
           {showAlex && (
-            <div
-              className="absolute bottom-[15%] z-10 pointer-events-none"
-              style={{ ...getAlexStyle(), position: 'absolute' }}
-            >
-              <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
+            <div className="absolute inset-x-0 bottom-[15%] z-10 pointer-events-none" style={alexTrackStyle}>
+              <div className="absolute left-0 bottom-0" style={alexStyle}>
+                <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
+              </div>
             </div>
           )}
 
           {showBug && (
             <>
               <div
-                className="absolute bottom-[15%] z-5 pointer-events-none"
-                style={{
-                  ...getBugStyle(),
-                  position: 'absolute',
-                  transform: isFloating ? 'translateY(60px)' : 'translateY(40px)',
-                  transition: 'all 400ms ease-out',
-                }}
+                className="absolute inset-x-0 bottom-[15%] pointer-events-none"
+                style={{ transform: `translateX(${bug.track})`, transition: `transform ${SHADOW_TIMING}` }}
               >
                 <div
-                  className="rounded-full"
+                  className="absolute right-0 bottom-0"
                   style={{
-                    width: isFloating ? 100 : 80,
-                    height: isFloating ? 20 : 16,
-                    background: 'radial-gradient(ellipse, rgba(15,10,26,0.6) 0%, transparent 70%)',
-                    transform: 'translateX(20px)',
-                    transition: 'all 400ms ease-out',
+                    transform: isFloating ? 'translateY(60px)' : 'translateY(40px)',
+                    opacity: bug.opacity,
+                    transition: moveAndFade(SHADOW_TIMING),
+                    animation: isFloating ? BUG_FLOAT : undefined,
                   }}
-                />
+                >
+                  {/* drawn at the floating size and scaled from its bottom right corner, so it grows
+                      up and to the left like a box anchored to the right and bottom */}
+                  <div
+                    className="rounded-full origin-bottom-right"
+                    style={{
+                      width: 100,
+                      height: 20,
+                      background: 'radial-gradient(ellipse, rgba(15,10,26,0.6) 0%, transparent 70%)',
+                      transform: isFloating ? 'translateX(20px)' : 'translateX(20px) scale(0.8)',
+                      transition: `transform ${SHADOW_TIMING}`,
+                    }}
+                  />
+                </div>
               </div>
-              <div
-                className="absolute bottom-[15%] -translate-y-1/2 z-30 pointer-events-none"
-                style={{ ...getBugStyle(), position: 'absolute' }}
-              >
-                <BattleBug size={140} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
+              <div className="absolute inset-x-0 bottom-[15%] z-30 pointer-events-none" style={bugTrackStyle}>
+                <div className="absolute right-0 bottom-0" style={bugStyle}>
+                  <BattleBug size={140} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
+                </div>
               </div>
             </>
           )}
@@ -496,10 +254,3 @@ export const BugPullReveal = memo(function BugPullReveal({
     </div>
   )
 })
-
-export const bugCreatureKeyframes = `
-  @keyframes infectionPulse {
-    0%, 100% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); }
-  }
-`

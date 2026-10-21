@@ -1,0 +1,47 @@
+/* The bug's living and dead loops, as transform and opacity on its SVG shapes. Each shape scales and
+   moves about its own centre (fill-box), so a scaleX of 1.1 on an ellipse reads as its rx growing by
+   10 percent and translateY moves its centre. Linear timing gives each three value loop an even pace.
+   Keyframe names stay on animation-name so the CSS module scopes them. */
+
+.shape {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-duration: var(--dur);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+/* infection growths breathing on the living bug */
+.swellWide { animation-name: swellWide; --dur: 2s; }
+.swellTall { animation-name: swellTall; --dur: 1.8s; }
+.swellTallSlow { animation-name: swellTall; --dur: 2.2s; }
+
+@keyframes swellWide {
+  50% { transform: scaleX(1.1); }
+}
+
+@keyframes swellTall {
+  50% { transform: scaleY(1.2); }
+}
+
+/* blood dripping from the corpse: falls 8 units and thins, then returns */
+.drip { animation-name: drip; }
+.dripA { --dur: 2s; --from: 0.6; --to: 0.3; }
+.dripB { --dur: 2.5s; --from: 0.5; --to: 0.2; }
+.dripC { --dur: 1.8s; --from: 0.55; --to: 0.25; }
+
+@keyframes drip {
+  0%, 100% { transform: translateY(0); opacity: var(--from); }
+  50% { transform: translateY(8px); opacity: var(--to); }
+}
+
+/* smoke rising from the corpse: climbs, doubles in width and fades out, then returns */
+.smoke { animation-name: smoke; }
+.smokeA { --dur: 3s; --rise: -15px; --from: 0.4; }
+.smokeB { --dur: 3.5s; --rise: -14px; --from: 0.35; }
+.smokeC { --dur: 4s; --rise: -14px; --from: 0.3; }
+
+@keyframes smoke {
+  0%, 100% { transform: translateY(0) scaleX(1); opacity: var(--from); }
+  50% { transform: translateY(var(--rise)) scaleX(2); opacity: 0; }
+}
