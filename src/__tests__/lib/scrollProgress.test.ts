@@ -1,4 +1,4 @@
-import { clamp01, sectionProgress, advanceScene, readThenWrite, travelLines, SCENE_IDLE, SCENE_DONE } from '@/lib/scroll/progress'
+import { clamp01, sectionProgress, advanceScene, readThenWrite, SCENE_IDLE, SCENE_DONE } from '@/lib/scroll/progress'
 
 describe('clamp01', () => {
   it.each([
@@ -99,19 +99,5 @@ describe('readThenWrite', () => {
 
   it('does nothing for no scenes', () => {
     expect(() => readThenWrite([])).not.toThrow()
-  })
-})
-
-describe('travelLines', () => {
-  it('stretches the scene over the section, ending a third of a screen early', () => {
-    expect(travelLines(2000, 1000)).toEqual({ start: 0.85, end: -0.8 })
-  })
-
-  it('keeps a minimum travel for a short section', () => {
-    expect(travelLines(300, 1000)).toEqual({ start: 0.85, end: 0.55 })
-  })
-
-  it('falls back to the minimum travel before the viewport is measured', () => {
-    expect(travelLines(0, 0)).toEqual({ start: 0.85, end: 0.55 })
   })
 })
