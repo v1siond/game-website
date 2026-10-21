@@ -4,6 +4,7 @@ import { useState, useEffect, memo, ReactNode, useRef } from 'react'
 import { useInView, FixedCombatLayer } from './fixedCombat'
 import { KnightCharacter } from './KnightCharacter'
 import { BattleBug } from './BattleReveal'
+import { DARK_FANTASY } from './palette'
 
 /**
  * BUG CREATURE - A CAVERN BOSS
@@ -23,19 +24,6 @@ import { BattleBug } from './BattleReveal'
  * - Husk Guard (segmented body)
  * - Gruz Mother (rounded, multiple legs)
  */
-
-const DF = {
-  void: '#0f0a1a',
-  shell: '#3a3055',
-  shellMid: '#2a2040',
-  shellDark: '#1a1525',
-  mask: '#4a4565',
-  maskLight: '#5a5575',
-  infected: '#ff6b35',
-  infectedBright: '#ff9955',
-  infectedDark: '#cc4420',
-  infectedGlow: '#ff8833',
-}
 
 interface BugCreatureProps {
   size?: number
@@ -75,20 +63,20 @@ export const BugCreature = memo(function BugCreature({
         ...style,
         filter: isHit
           ? 'brightness(2) saturate(0)'
-          : `drop-shadow(0 0 8px ${DF.infectedGlow}50)`,
+          : `drop-shadow(0 0 8px ${DARK_FANTASY.infectedGlow}50)`,
         transform: isDead ? 'rotate(180deg)' : undefined,
         opacity: isDead ? 0.6 : 1,
       }}
     >
       <defs>
         <radialGradient id="bugShellGrad" cx="50%" cy="30%" r="70%">
-          <stop offset="0%" stopColor={DF.shell} />
-          <stop offset="70%" stopColor={DF.shellMid} />
-          <stop offset="100%" stopColor={DF.shellDark} />
+          <stop offset="0%" stopColor={DARK_FANTASY.shell} />
+          <stop offset="70%" stopColor={DARK_FANTASY.shellMid} />
+          <stop offset="100%" stopColor={DARK_FANTASY.shellDark} />
         </radialGradient>
         <radialGradient id="bugMaskGrad" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor={DF.maskLight} />
-          <stop offset="100%" stopColor={DF.mask} />
+          <stop offset="0%" stopColor={DARK_FANTASY.bugMaskLight} />
+          <stop offset="100%" stopColor={DARK_FANTASY.bugMask} />
         </radialGradient>
         <filter id="infectionGlow2" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2" result="blur" />
@@ -100,7 +88,7 @@ export const BugCreature = memo(function BugCreature({
       </defs>
 
       {/* LEGS - thick, segmented, 4 per side */}
-      <g stroke={DF.shellDark} strokeWidth="4" strokeLinecap="round" fill="none">
+      <g stroke={DARK_FANTASY.shellDark} strokeWidth="4" strokeLinecap="round" fill="none">
         {/* Left legs - curved downward with joints */}
         <path d={`M28,45 Q18,${50 + getLegY(0)} 10,${58 + getLegY(0)} Q6,${62 + getLegY(0)} 4,${68 + getLegY(0)}`} />
         <path d={`M25,52 Q15,${56 + getLegY(1)} 8,${64 + getLegY(1)} Q4,${68 + getLegY(1)} 2,${74 + getLegY(1)}`} />
@@ -113,7 +101,7 @@ export const BugCreature = memo(function BugCreature({
         <path d={`M70,62 Q76,${66 + getLegY(7)} 82,${74 + getLegY(7)}`} />
       </g>
       {/* Leg segments (joints) */}
-      <g fill={DF.shellMid}>
+      <g fill={DARK_FANTASY.shellMid}>
         <circle cx="18" cy={50 + getLegY(0)} r="3" />
         <circle cx="15" cy={56 + getLegY(1)} r="3" />
         <circle cx="82" cy={50 + getLegY(4)} r="3" />
@@ -128,21 +116,21 @@ export const BugCreature = memo(function BugCreature({
         rx="28"
         ry="20"
         fill="url(#bugShellGrad)"
-        stroke={DF.void}
+        stroke={DARK_FANTASY.void}
         strokeWidth="1.5"
       />
       {/* Shell ridge lines */}
       <path
         d="M30,50 Q50,45 70,50"
         fill="none"
-        stroke={DF.shellDark}
+        stroke={DARK_FANTASY.shellDark}
         strokeWidth="2"
         opacity="0.6"
       />
       <path
         d="M32,58 Q50,54 68,58"
         fill="none"
-        stroke={DF.shellDark}
+        stroke={DARK_FANTASY.shellDark}
         strokeWidth="1.5"
         opacity="0.4"
       />
@@ -153,8 +141,8 @@ export const BugCreature = memo(function BugCreature({
         cy="40"
         rx="22"
         ry="14"
-        fill={DF.shellMid}
-        stroke={DF.void}
+        fill={DARK_FANTASY.shellMid}
+        stroke={DARK_FANTASY.void}
         strokeWidth="1"
       />
 
@@ -165,14 +153,14 @@ export const BugCreature = memo(function BugCreature({
         rx="18"
         ry="15"
         fill="url(#bugMaskGrad)"
-        stroke={DF.void}
+        stroke={DARK_FANTASY.void}
         strokeWidth="1"
       />
       {/* Mask ridge */}
       <path
         d="M35,22 Q50,16 65,22"
         fill="none"
-        stroke={DF.maskLight}
+        stroke={DARK_FANTASY.bugMaskLight}
         strokeWidth="2"
         opacity="0.5"
       />
@@ -181,33 +169,33 @@ export const BugCreature = memo(function BugCreature({
       <path
         d={`M36,32 Q${28 + antennaWiggle * 0.3},38 ${24 + antennaWiggle * 0.5},45`}
         fill="none"
-        stroke={DF.shell}
+        stroke={DARK_FANTASY.shell}
         strokeWidth="5"
         strokeLinecap="round"
       />
       <path
         d={`M64,32 Q${72 - antennaWiggle * 0.3},38 ${76 - antennaWiggle * 0.5},45`}
         fill="none"
-        stroke={DF.shell}
+        stroke={DARK_FANTASY.shell}
         strokeWidth="5"
         strokeLinecap="round"
       />
       {/* Mandible tips */}
-      <circle cx={24 + antennaWiggle * 0.5} cy="45" r="3" fill={DF.shellDark} />
-      <circle cx={76 - antennaWiggle * 0.5} cy="45" r="3" fill={DF.shellDark} />
+      <circle cx={24 + antennaWiggle * 0.5} cy="45" r="3" fill={DARK_FANTASY.shellDark} />
+      <circle cx={76 - antennaWiggle * 0.5} cy="45" r="3" fill={DARK_FANTASY.shellDark} />
 
       {/* HORNS/ANTENNAE - curved upward */}
       <path
         d={`M38,14 Q${30 + antennaWiggle},6 ${26 + antennaWiggle},0`}
         fill="none"
-        stroke={DF.shell}
+        stroke={DARK_FANTASY.shell}
         strokeWidth="3"
         strokeLinecap="round"
       />
       <path
         d={`M62,14 Q${70 - antennaWiggle},6 ${74 - antennaWiggle},0`}
         fill="none"
-        stroke={DF.shell}
+        stroke={DARK_FANTASY.shell}
         strokeWidth="3"
         strokeLinecap="round"
       />
@@ -215,37 +203,37 @@ export const BugCreature = memo(function BugCreature({
       {/* EYES - void black with orange glow (HK style) */}
       <g filter="url(#infectionGlow2)">
         {/* Main eyes - large, void black */}
-        <ellipse cx="40" cy="24" rx="6" ry="8" fill={DF.void} />
-        <ellipse cx="60" cy="24" rx="6" ry="8" fill={DF.void} />
+        <ellipse cx="40" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
+        <ellipse cx="60" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
         {/* Inner orange glow */}
-        <ellipse cx="40" cy="24" rx="4" ry="5" fill={DF.infected} opacity="0.7" />
-        <ellipse cx="60" cy="24" rx="4" ry="5" fill={DF.infected} opacity="0.7" />
+        <ellipse cx="40" cy="24" rx="4" ry="5" fill={DARK_FANTASY.infected} opacity="0.7" />
+        <ellipse cx="60" cy="24" rx="4" ry="5" fill={DARK_FANTASY.infected} opacity="0.7" />
         {/* Eye highlights */}
-        <ellipse cx="38" cy="22" rx="2" ry="2.5" fill={DF.infectedBright} opacity="0.8" />
-        <ellipse cx="58" cy="22" rx="2" ry="2.5" fill={DF.infectedBright} opacity="0.8" />
+        <ellipse cx="38" cy="22" rx="2" ry="2.5" fill={DARK_FANTASY.infectedBright} opacity="0.8" />
+        <ellipse cx="58" cy="22" rx="2" ry="2.5" fill={DARK_FANTASY.infectedBright} opacity="0.8" />
       </g>
 
       {/* INFECTION GROWTHS - bulbous orange blobs */}
       <g filter="url(#infectionGlow2)">
         {/* Main back infection */}
-        <ellipse cx="50" cy="50" rx="10" ry="8" fill={DF.infected} opacity="0.85">
+        <ellipse cx="50" cy="50" rx="10" ry="8" fill={DARK_FANTASY.infected} opacity="0.85">
           {!isDead && <animate attributeName="rx" values="10;11;10" dur="2s" repeatCount="indefinite" />}
         </ellipse>
         {/* Side infections */}
-        <ellipse cx="35" cy="56" rx="7" ry="5" fill={DF.infected} opacity="0.75">
+        <ellipse cx="35" cy="56" rx="7" ry="5" fill={DARK_FANTASY.infected} opacity="0.75">
           {!isDead && <animate attributeName="ry" values="5;6;5" dur="1.8s" repeatCount="indefinite" />}
         </ellipse>
-        <ellipse cx="65" cy="56" rx="7" ry="5" fill={DF.infected} opacity="0.75">
+        <ellipse cx="65" cy="56" rx="7" ry="5" fill={DARK_FANTASY.infected} opacity="0.75">
           {!isDead && <animate attributeName="ry" values="5;6;5" dur="2.2s" repeatCount="indefinite" />}
         </ellipse>
         {/* Small accent blobs */}
-        <circle cx="42" cy="60" r="4" fill={DF.infected} opacity="0.5" />
-        <circle cx="58" cy="62" r="3" fill={DF.infected} opacity="0.45" />
-        <circle cx="50" cy="38" r="5" fill={DF.infected} opacity="0.6" />
+        <circle cx="42" cy="60" r="4" fill={DARK_FANTASY.infected} opacity="0.5" />
+        <circle cx="58" cy="62" r="3" fill={DARK_FANTASY.infected} opacity="0.45" />
+        <circle cx="50" cy="38" r="5" fill={DARK_FANTASY.infected} opacity="0.6" />
       </g>
 
       {/* Blob highlights */}
-      <ellipse cx="48" cy="47" rx="3" ry="2" fill={DF.infectedBright} opacity="0.35" />
+      <ellipse cx="48" cy="47" rx="3" ry="2" fill={DARK_FANTASY.infectedBright} opacity="0.35" />
     </svg>
   )
 })

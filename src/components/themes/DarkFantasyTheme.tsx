@@ -21,40 +21,7 @@ import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, RELEASED } from '@/components/cv/sectionText'
-
-// Blended Dark Fantasy Metroidvania palette
-// Ethereal cavern blues + mechanical brass/copper + spirit gold + weathered stone
-const DF = {
-  // Deep void backgrounds (HK + S&S)
-  void: '#0f0a1a',
-  voidDeep: '#1a1025',
-  voidPurple: '#150f25',
-
-  // Ethereal cyan/teal (HK soul)
-  ethereal: '#41c8e8',
-  etherealDark: '#5ecfef',
-
-  // Spirit/soul gold
-  spiritGold: '#e8c841',
-  spiritGoldDark: '#d4af37',
-
-  // Mechanical brass/copper
-  brass: '#b08d57',
-  copper: '#8b6914',
-
-  // Organic forest green
-  forestGreen: '#4a8f4a',
-  mossGreen: '#2d5a2d',
-
-  // Stone grey
-  stoneGrey: '#4a4a4a',
-  stoneDark: '#333333',
-
-  // UI elements
-  bone: '#e8e4dc',
-  silver: '#a0a0a0',
-  lavender: '#b7a9d9',
-}
+import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 
 /**
  * SECTION TRIGGER WRAPPER
@@ -100,7 +67,7 @@ const FadeInSection = memo(function FadeInSection({
 })
 
 // Abstract spirit wisp - optimized: no SVG filter
-const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DF.ethereal }: { size?: number; color?: string }) {
+const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.ethereal }: { size?: number; color?: string }) {
   const gradId = `wispGlow-${color?.replace('#', '')}`
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true" role="presentation">
@@ -137,8 +104,8 @@ const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: numb
     <svg width={size} height={size} viewBox="0 0 50 50" aria-hidden="true" role="presentation">
       <defs>
         <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={DF.brass} />
-          <stop offset="100%" stopColor={DF.copper} />
+          <stop offset="0%" stopColor={DARK_FANTASY.brass} />
+          <stop offset="100%" stopColor={DARK_FANTASY.copper} />
         </linearGradient>
       </defs>
       {/* Gear teeth */}
@@ -167,9 +134,9 @@ const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: numb
       {/* Inner ring */}
       <circle cx="25" cy="25" r="16" fill="none" stroke="url(#brassGrad)" strokeWidth="3" />
       {/* Center hole */}
-      <circle cx="25" cy="25" r="6" fill={DF.voidDeep} stroke={DF.brass} strokeWidth="1" />
+      <circle cx="25" cy="25" r="6" fill={DARK_FANTASY.voidDeep} stroke={DARK_FANTASY.brass} strokeWidth="1" />
       {/* Decorative spokes */}
-      <path d="M25,10 L25,19 M25,31 L25,40 M10,25 L19,25 M31,25 L40,25" stroke={DF.copper} strokeWidth="2" opacity="0.5" />
+      <path d="M25,10 L25,19 M25,31 L25,40 M10,25 L19,25 M31,25 L40,25" stroke={DARK_FANTASY.copper} strokeWidth="2" opacity="0.5" />
     </svg>
   )
 })
@@ -182,18 +149,18 @@ const FloatingLantern = memo(function FloatingLantern({ size = 30 }: { size?: nu
       <path
         d="M10,12 L10,32 Q10,38 15,38 Q20,38 20,32 L20,12"
         fill="none"
-        stroke={DF.copper}
+        stroke={DARK_FANTASY.copper}
         strokeWidth="1.5"
       />
       {/* Top cap */}
-      <path d="M8,12 L22,12 L20,8 Q15,6 10,8 Z" fill={DF.brass} />
+      <path d="M8,12 L22,12 L20,8 Q15,6 10,8 Z" fill={DARK_FANTASY.brass} />
       {/* Hook */}
-      <path d="M15,8 L15,2 Q15,0 17,0 Q19,0 19,2" fill="none" stroke={DF.copper} strokeWidth="1" />
+      <path d="M15,8 L15,2 Q15,0 17,0 Q19,0 19,2" fill="none" stroke={DARK_FANTASY.copper} strokeWidth="1" />
       {/* Glass panels */}
-      <rect x="11" y="14" width="8" height="16" fill={DF.spiritGold} opacity="0.3" />
+      <rect x="11" y="14" width="8" height="16" fill={DARK_FANTASY.spiritGold} opacity="0.3" />
       {/* Inner flame glow */}
-      <ellipse cx="15" cy="22" rx="3" ry="5" fill={DF.spiritGold} opacity="0.8" />
-      <ellipse cx="15" cy="22" rx="5" ry="8" fill={DF.spiritGold} opacity="0.3" />
+      <ellipse cx="15" cy="22" rx="3" ry="5" fill={DARK_FANTASY.spiritGold} opacity="0.8" />
+      <ellipse cx="15" cy="22" rx="5" ry="8" fill={DARK_FANTASY.spiritGold} opacity="0.3" />
     </svg>
   )
 })
@@ -227,7 +194,7 @@ const EtherealRain = memo(function EtherealRain() {
             left: `${d.x}%`,
             top: '-30px',
             height: d.height,
-            background: `linear-gradient(180deg, transparent, ${DF.ethereal}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
+            background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.ethereal}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
             animation: `etherealRain ${d.speed}s linear infinite`,
             animationDelay: `${d.delay}s`,
           }}
@@ -248,7 +215,7 @@ const SpiritParticles = memo(function SpiritParticles() {
       opacity: Math.random() * 0.4 + 0.2,
       speed: Math.random() * 30 + 20,
       delay: Math.random() * -25,
-      color: i % 3 === 0 ? DF.spiritGold : i % 3 === 1 ? DF.ethereal : DF.forestGreen,
+      color: i % 3 === 0 ? DARK_FANTASY.spiritGold : i % 3 === 1 ? DARK_FANTASY.ethereal : DARK_FANTASY.forestGreen,
     })),
     []
   )
@@ -289,22 +256,22 @@ const GothicChandelier = memo(function GothicChandelier() {
       role="presentation"
     >
       {/* Central chain with gear link */}
-      <path d="M250,0 L250,10" stroke={DF.brass} strokeWidth="2" />
-      <circle cx="250" cy="14" r="4" fill="none" stroke={DF.copper} strokeWidth="1" />
-      <circle cx="250" cy="14" r="2" fill={DF.brass} />
+      <path d="M250,0 L250,10" stroke={DARK_FANTASY.brass} strokeWidth="2" />
+      <circle cx="250" cy="14" r="4" fill="none" stroke={DARK_FANTASY.copper} strokeWidth="1" />
+      <circle cx="250" cy="14" r="2" fill={DARK_FANTASY.brass} />
 
       {/* Simple ornate arms */}
       <path
         d="M250,18 Q200,22 150,20 Q100,24 50,22"
         fill="none"
-        stroke={DF.brass}
+        stroke={DARK_FANTASY.brass}
         strokeWidth="1"
         opacity="0.6"
       />
       <path
         d="M250,18 Q300,22 350,20 Q400,24 450,22"
         fill="none"
-        stroke={DF.brass}
+        stroke={DARK_FANTASY.brass}
         strokeWidth="1"
         opacity="0.6"
       />
@@ -312,13 +279,13 @@ const GothicChandelier = memo(function GothicChandelier() {
       {/* Subtle glow points along the arms */}
       {[100, 175, 250, 325, 400].map((x, i) => (
         <g key={i}>
-          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="3" fill={DF.spiritGold} opacity="0.3" />
-          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="6" fill={DF.spiritGold} opacity="0.1" />
+          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="3" fill={DARK_FANTASY.spiritGold} opacity="0.3" />
+          <circle cx={x} cy={22 + Math.abs(x - 250) * 0.01} r="6" fill={DARK_FANTASY.spiritGold} opacity="0.1" />
         </g>
       ))}
 
       {/* Central larger glow */}
-      <ellipse cx="250" cy="30" rx="20" ry="12" fill={DF.spiritGold} opacity="0.15" />
+      <ellipse cx="250" cy="30" rx="20" ry="12" fill={DARK_FANTASY.spiritGold} opacity="0.15" />
     </svg>
   )
 })
@@ -336,7 +303,7 @@ const StoneFormations = memo(function StoneFormations() {
       {/* Base weathered stone */}
       <path
         d="M0,85 Q200,82 400,88 Q600,80 800,86 Q900,83 1000,85 L1000,100 L0,100 Z"
-        fill={DF.stoneDark}
+        fill={DARK_FANTASY.stoneDark}
       />
 
       {/* Crystal/stone spikes - irregular, weathered */}
@@ -354,13 +321,13 @@ const StoneFormations = memo(function StoneFormations() {
                  L${x + lean},${85 - height}
                  L${x + lean + width * 0.3},${85 - height * 0.7}
                  L${x},85`}
-              fill={isCrystal ? DF.ethereal : DF.stoneGrey}
+              fill={isCrystal ? DARK_FANTASY.ethereal : DARK_FANTASY.stoneGrey}
               opacity={isCrystal ? 0.4 : 0.8}
             />
             {isCrystal && (
               <path
                 d={`M${x + lean},${85 - height} L${x + lean},${85 - height + 10}`}
-                stroke={DF.ethereal}
+                stroke={DARK_FANTASY.ethereal}
                 strokeWidth="2"
                 opacity="0.6"
               />
@@ -377,7 +344,7 @@ const StoneFormations = memo(function StoneFormations() {
           cy={90}
           rx={30 + Math.random() * 20}
           ry={8}
-          fill={DF.mossGreen}
+          fill={DARK_FANTASY.mossGreen}
           opacity="0.3"
         />
       ))}
@@ -401,33 +368,33 @@ const GothicWindow = memo(function GothicWindow({ side }: { side: 'left' | 'righ
         <path
           d="M10,200 L10,60 Q10,10 40,10 Q70,10 70,60 L70,200"
           fill="none"
-          stroke={DF.stoneGrey}
+          stroke={DARK_FANTASY.stoneGrey}
           strokeWidth="4"
         />
         {/* Inner glow */}
         <path
           d="M15,195 L15,62 Q15,18 40,18 Q65,18 65,62 L65,195"
-          fill={DF.spiritGold}
+          fill={DARK_FANTASY.spiritGold}
           opacity="0.08"
         />
         {/* Gothic tracery */}
         <path
           d="M40,18 L40,80 M25,50 Q40,40 55,50 M20,80 Q40,65 60,80"
           fill="none"
-          stroke={DF.stoneGrey}
+          stroke={DARK_FANTASY.stoneGrey}
           strokeWidth="1.5"
           opacity="0.6"
         />
         {/* Crystal/stained glass points */}
-        <circle cx="40" cy="35" r="4" fill={DF.ethereal} opacity="0.5" />
-        <circle cx="30" cy="55" r="3" fill={DF.spiritGold} opacity="0.4" />
-        <circle cx="50" cy="55" r="3" fill={DF.spiritGold} opacity="0.4" />
+        <circle cx="40" cy="35" r="4" fill={DARK_FANTASY.ethereal} opacity="0.5" />
+        <circle cx="30" cy="55" r="3" fill={DARK_FANTASY.spiritGold} opacity="0.4" />
+        <circle cx="50" cy="55" r="3" fill={DARK_FANTASY.spiritGold} opacity="0.4" />
       </svg>
       {/* Light rays emanating - no blur filter for performance */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse at ${side === 'left' ? '80%' : '20%'} 30%, ${DF.spiritGold}15, ${DF.spiritGold}08 40%, transparent 70%)`,
+          background: `radial-gradient(ellipse at ${side === 'left' ? '80%' : '20%'} 30%, ${DARK_FANTASY.spiritGold}15, ${DARK_FANTASY.spiritGold}08 40%, transparent 70%)`,
         }}
       />
     </div>
@@ -463,9 +430,9 @@ const HollowDepths = memo(function HollowDepths() {
     const d = `M${l},${baseY} L${l},${springY} Q${l},${apexY} ${x},${apexY} Q${r},${apexY} ${r},${springY} L${r},${baseY} Z`
     return (
       <g key={k}>
-        <path d={d} fill={DF.ethereal} opacity={op * 0.45} />
-        <path d={d} fill="none" stroke={DF.stoneGrey} strokeWidth="2.5" opacity={op * 1.8} />
-        <line x1={x} y1={baseY} x2={x} y2={apexY} stroke={DF.stoneGrey} strokeWidth="1.5" opacity={op * 1.4} />
+        <path d={d} fill={DARK_FANTASY.ethereal} opacity={op * 0.45} />
+        <path d={d} fill="none" stroke={DARK_FANTASY.stoneGrey} strokeWidth="2.5" opacity={op * 1.8} />
+        <line x1={x} y1={baseY} x2={x} y2={apexY} stroke={DARK_FANTASY.stoneGrey} strokeWidth="1.5" opacity={op * 1.4} />
       </g>
     )
   }
@@ -474,7 +441,7 @@ const HollowDepths = memo(function HollowDepths() {
     const hw = w / 2,
       roofH = w * 1.9
     return (
-      <g key={k} fill={DF.voidDeep} opacity={op}>
+      <g key={k} fill={DARK_FANTASY.voidDeep} opacity={op}>
         <rect x={x - hw} y={topY} width={w} height={baseY - topY} />
         <polygon points={`${x - hw},${topY} ${x},${topY - roofH} ${x + hw},${topY}`} />
       </g>
@@ -483,20 +450,20 @@ const HollowDepths = memo(function HollowDepths() {
 
   const lamp = (x: number, y: number, k: string) => (
     <g key={k}>
-      <line x1={x} y1={y - 80} x2={x} y2={y + 70} stroke={DF.stoneGrey} strokeWidth="3" opacity="0.4" />
-      <path d={`M${x - 14},${y} Q${x},${y - 20} ${x + 14},${y} Q${x},${y + 7} ${x - 14},${y} Z`} fill={DF.voidDeep} stroke={DF.stoneGrey} strokeWidth="2" opacity="0.6" />
-      <circle cx={x} cy={y} r="24" fill={DF.ethereal} opacity="0.07" />
-      <circle cx={x} cy={y} r="7" fill={DF.etherealDark} opacity="0.5" />
+      <line x1={x} y1={y - 80} x2={x} y2={y + 70} stroke={DARK_FANTASY.stoneGrey} strokeWidth="3" opacity="0.4" />
+      <path d={`M${x - 14},${y} Q${x},${y - 20} ${x + 14},${y} Q${x},${y + 7} ${x - 14},${y} Z`} fill={DARK_FANTASY.voidDeep} stroke={DARK_FANTASY.stoneGrey} strokeWidth="2" opacity="0.6" />
+      <circle cx={x} cy={y} r="24" fill={DARK_FANTASY.ethereal} opacity="0.07" />
+      <circle cx={x} cy={y} r="7" fill={DARK_FANTASY.etherealDark} opacity="0.5" />
     </g>
   )
 
   const column = (x: number, k: string) => (
     <g key={k}>
-      <rect x={x - 52} y={0} width="104" height="1080" fill={DF.void} opacity="0.82" />
-      <rect x={x - 66} y={112} width="132" height="36" rx="6" fill={DF.void} opacity="0.85" />
-      <rect x={x - 66} y={540} width="132" height="26" rx="4" fill={DF.void} opacity="0.85" />
+      <rect x={x - 52} y={0} width="104" height="1080" fill={DARK_FANTASY.void} opacity="0.82" />
+      <rect x={x - 66} y={112} width="132" height="36" rx="6" fill={DARK_FANTASY.void} opacity="0.85" />
+      <rect x={x - 66} y={540} width="132" height="26" rx="4" fill={DARK_FANTASY.void} opacity="0.85" />
       {[250, 400].map((y, j) => (
-        <path key={j} d={`M${x - 52},${y} Q${x},${y + 18} ${x + 52},${y}`} fill="none" stroke={DF.stoneDark} strokeWidth="3" opacity="0.8" />
+        <path key={j} d={`M${x - 52},${y} Q${x},${y + 18} ${x + 52},${y}`} fill="none" stroke={DARK_FANTASY.stoneDark} strokeWidth="3" opacity="0.8" />
       ))}
     </g>
   )
@@ -506,9 +473,9 @@ const HollowDepths = memo(function HollowDepths() {
   return (
     <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true" role="presentation">
       {/* upper nave light, soft floor "stage" light, and a dark vignette */}
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 60% 40% at 50% 22%, ${DF.ethereal}0e, transparent 60%)` }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 55% 32% at 50% 84%, ${DF.ethereal}0c, transparent 62%)` }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, ${DF.void} 100%)` }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 60% 40% at 50% 22%, ${DARK_FANTASY.ethereal}0e, transparent 60%)` }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 55% 32% at 50% 84%, ${DARK_FANTASY.ethereal}0c, transparent 62%)` }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 120% 90% at 50% 50%, transparent 55%, ${DARK_FANTASY.void} 100%)` }} />
 
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
         {/* distant towers beyond the wall (faint, high) */}
@@ -517,25 +484,25 @@ const HollowDepths = memo(function HollowDepths() {
         {tower(1560, 200, 34, -50, 't3', 0.28)}
 
         {/* BACK WALL */}
-        <rect x="0" y="0" width="1920" height={HORIZON} fill={DF.void} opacity="0.55" />
+        <rect x="0" y="0" width="1920" height={HORIZON} fill={DARK_FANTASY.void} opacity="0.55" />
         {Array.from({ length: 13 }, (_, i) => (
-          <rect key={`pil${i}`} x={70 + i * 145} y={0} width="14" height={HORIZON} fill={DF.voidDeep} opacity="0.4" />
+          <rect key={`pil${i}`} x={70 + i * 145} y={0} width="14" height={HORIZON} fill={DARK_FANTASY.voidDeep} opacity="0.4" />
         ))}
         {/* small, distant lancet windows, high on the wall */}
         {Array.from({ length: 12 }, (_, i) => lancet(150 + i * 145, 430, 96, 250, `w${i}`, 0.1))}
 
         {/* CORNICE, wall/floor boundary (contrast) */}
-        <rect x="0" y={HORIZON - 5} width="1920" height="9" fill={DF.stoneGrey} opacity="0.2" />
-        <rect x="0" y={HORIZON + 4} width="1920" height="22" fill={DF.void} opacity="0.4" />
+        <rect x="0" y={HORIZON - 5} width="1920" height="9" fill={DARK_FANTASY.stoneGrey} opacity="0.2" />
+        <rect x="0" y={HORIZON + 4} width="1920" height="22" fill={DARK_FANTASY.void} opacity="0.4" />
 
                 {/* FLOOR, flat 2D side-view plane + foreground balustrade ledge (no perspective) */}
-        <rect x="0" y={HORIZON} width="1920" height={1080 - HORIZON} fill={DF.voidDeep} opacity="0.3" />
-        <rect x="0" y="1004" width="1920" height="14" fill={DF.void} opacity="0.92" />
-        <rect x="0" y="1056" width="1920" height="24" fill={DF.void} opacity="0.96" />
+        <rect x="0" y={HORIZON} width="1920" height={1080 - HORIZON} fill={DARK_FANTASY.voidDeep} opacity="0.3" />
+        <rect x="0" y="1004" width="1920" height="14" fill={DARK_FANTASY.void} opacity="0.92" />
+        <rect x="0" y="1056" width="1920" height="24" fill={DARK_FANTASY.void} opacity="0.96" />
         {Array.from({ length: 28 }, (_, i) => {
           const bx = 34 + i * 69
           return (
-            <g key={`bal${i}`} fill={DF.void} opacity="0.9">
+            <g key={`bal${i}`} fill={DARK_FANTASY.void} opacity="0.9">
               <rect x={bx - 7} y="1018" width="14" height="40" rx="3" />
               <ellipse cx={bx} cy="1018" rx="13" ry="7" />
               <ellipse cx={bx} cy="1056" rx="13" ry="7" />
@@ -563,7 +530,7 @@ const HollowDepths = memo(function HollowDepths() {
             top: `${m.top}%`,
             width: m.size,
             height: m.size,
-            background: `radial-gradient(circle, ${m.gold ? DF.spiritGold : DF.etherealDark}, transparent 70%)`,
+            background: `radial-gradient(circle, ${m.gold ? DARK_FANTASY.spiritGold : DARK_FANTASY.etherealDark}, transparent 70%)`,
             animationDuration: `${m.dur}s`,
             animationDelay: `${m.delay}s`,
           }}
@@ -583,7 +550,7 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
       <div
         className="absolute top-[15%] left-1/2 w-[800px] h-[500px]"
         style={{
-          background: `radial-gradient(ellipse at center top, ${DF.spiritGold}10 0%, ${DF.spiritGold}05 20%, ${DF.ethereal}04 50%, transparent 80%)`,
+          background: `radial-gradient(ellipse at center top, ${DARK_FANTASY.spiritGold}10 0%, ${DARK_FANTASY.spiritGold}05 20%, ${DARK_FANTASY.ethereal}04 50%, transparent 80%)`,
           transform: 'translateX(-50%) translateZ(0)',
         }}
       />
@@ -591,7 +558,7 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
       <div
         className="absolute bottom-0 left-0 right-0 h-48"
         style={{
-          background: `linear-gradient(180deg, transparent, ${DF.voidPurple}50, ${DF.void}80)`,
+          background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}50, ${DARK_FANTASY.void}80)`,
         }}
       />
     </div>
@@ -769,7 +736,7 @@ const EnergyFlowAnimation = memo(function EnergyFlowAnimation({
     { delay: 120, size: 0.75 },
   ]
 
-  const energyColor = '#50e0ff' // Ethereal HK blue
+  const energyColor = DARK_FANTASY.soulBlue
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
@@ -812,7 +779,7 @@ const WaystationNode = memo(function WaystationNode({
         left: `${position.x}%`,
         top: `${position.y}%`,
         ['--tw-ring-color' as string]: color,
-        ['--tw-ring-offset-color' as string]: DF.void,
+        ['--tw-ring-offset-color' as string]: DARK_FANTASY.void,
       }}
     >
       {/* Energy arrival burst - shows when this node receives energy */}
@@ -820,7 +787,7 @@ const WaystationNode = memo(function WaystationNode({
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: `radial-gradient(ellipse, #50e0ff60 0%, #50e0ff30 40%, transparent 70%)`,
+            background: `radial-gradient(ellipse, color-mix(in srgb, ${DARK_FANTASY.soulBlue} 38%, transparent) 0%, color-mix(in srgb, ${DARK_FANTASY.soulBlue} 19%, transparent) 40%, transparent 70%)`,
             animation: 'energyArrival 400ms ease-out forwards',
           }}
           aria-hidden="true"
@@ -856,33 +823,33 @@ const WaystationNode = memo(function WaystationNode({
         >
           <path
             d="M25,4 L27,2 L25,0 L23,2 Z"
-            fill={isActive ? color : DF.bone}
+            fill={isActive ? color : DARK_FANTASY.bone}
             opacity={isActive ? 0.8 : 0.4}
           />
           <path
             d="M23,4 Q15,3 5,5"
             fill="none"
-            stroke={isActive ? color : DF.bone}
+            stroke={isActive ? color : DARK_FANTASY.bone}
             strokeWidth="0.5"
             opacity={isActive ? 0.6 : 0.3}
           />
           <path
             d="M27,4 Q35,3 45,5"
             fill="none"
-            stroke={isActive ? color : DF.bone}
+            stroke={isActive ? color : DARK_FANTASY.bone}
             strokeWidth="0.5"
             opacity={isActive ? 0.6 : 0.3}
           />
         </svg>
 
         {/* Abstract icon */}
-        <div className="mb-0.5 md:mb-1 scale-75 md:scale-100" style={{ color: isActive ? color : DF.silver }}>
+        <div className="mb-0.5 md:mb-1 scale-75 md:scale-100" style={{ color: isActive ? color : DARK_FANTASY.silver }}>
           {icon}
         </div>
         <span
           className="text-sm tracking-[0.05em] md:tracking-[0.1em] uppercase font-medium text-center leading-tight"
           style={{
-            color: isActive ? color : DF.silver,
+            color: isActive ? color : DARK_FANTASY.silver,
             fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
@@ -891,7 +858,7 @@ const WaystationNode = memo(function WaystationNode({
         <span
           className="text-sm tracking-wider opacity-70 text-center leading-tight hidden md:block"
           style={{
-            color: isActive ? color : DF.silver,
+            color: isActive ? color : DARK_FANTASY.silver,
             fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
@@ -908,20 +875,20 @@ const WaystationNode = memo(function WaystationNode({
         >
           <path
             d="M20,2 L22,4 L20,6 L18,4 Z"
-            fill={isActive ? color : DF.bone}
+            fill={isActive ? color : DARK_FANTASY.bone}
             opacity={isActive ? 0.6 : 0.3}
           />
           <path
             d="M18,4 Q10,4 2,3"
             fill="none"
-            stroke={isActive ? color : DF.bone}
+            stroke={isActive ? color : DARK_FANTASY.bone}
             strokeWidth="0.5"
             opacity={isActive ? 0.4 : 0.2}
           />
           <path
             d="M22,4 Q30,4 38,3"
             fill="none"
-            stroke={isActive ? color : DF.bone}
+            stroke={isActive ? color : DARK_FANTASY.bone}
             strokeWidth="0.5"
             opacity={isActive ? 0.4 : 0.2}
           />
@@ -932,9 +899,9 @@ const WaystationNode = memo(function WaystationNode({
 })
 
 const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; sublabel: string; color: string }> = {
-  drummer: { icon: <WaveIcon />, sublabel: 'Drums', color: DF.lavender },
-  engineer: { icon: <GearIcon />, sublabel: 'Software', color: DF.ethereal },
-  fighter: { icon: <DiamondIcon />, sublabel: 'Muay Thai', color: DF.spiritGold },
+  drummer: { icon: <WaveIcon />, sublabel: 'Drums', color: DARK_FANTASY.lavender },
+  engineer: { icon: <GearIcon />, sublabel: 'Software', color: DARK_FANTASY.ethereal },
+  fighter: { icon: <DiamondIcon />, sublabel: 'Muay Thai', color: DARK_FANTASY.spiritGold },
 }
 
 /**
@@ -974,12 +941,12 @@ const DialogueFlourish = memo(function DialogueFlourish({
         {/* Central diamond ornament */}
         <path
           d="M100,4 L104,10 L100,16 L96,10 Z"
-          fill={DF.bone}
+          fill={DARK_FANTASY.bone}
           opacity="0.7"
         />
         <path
           d="M100,6 L102,10 L100,14 L98,10 Z"
-          fill={DF.ethereal}
+          fill={DARK_FANTASY.ethereal}
           opacity="0.4"
         />
 
@@ -987,7 +954,7 @@ const DialogueFlourish = memo(function DialogueFlourish({
         <path
           d="M96,10 Q80,8 65,12 Q50,16 35,10 Q25,6 15,10"
           fill="none"
-          stroke={DF.bone}
+          stroke={DARK_FANTASY.bone}
           strokeWidth="1.2"
           opacity="0.5"
           strokeLinecap="round"
@@ -996,7 +963,7 @@ const DialogueFlourish = memo(function DialogueFlourish({
         <path
           d="M90,10 Q75,6 60,10 Q48,14 38,8"
           fill="none"
-          stroke={DF.bone}
+          stroke={DARK_FANTASY.bone}
           strokeWidth="0.8"
           opacity="0.3"
           strokeLinecap="round"
@@ -1005,7 +972,7 @@ const DialogueFlourish = memo(function DialogueFlourish({
         <path
           d="M35,10 Q32,6 28,8 Q26,10 28,12"
           fill="none"
-          stroke={DF.bone}
+          stroke={DARK_FANTASY.bone}
           strokeWidth="0.8"
           opacity="0.4"
           strokeLinecap="round"
@@ -1015,7 +982,7 @@ const DialogueFlourish = memo(function DialogueFlourish({
         <path
           d="M104,10 Q120,8 135,12 Q150,16 165,10 Q175,6 185,10"
           fill="none"
-          stroke={DF.bone}
+          stroke={DARK_FANTASY.bone}
           strokeWidth="1.2"
           opacity="0.5"
           strokeLinecap="round"
@@ -1024,7 +991,7 @@ const DialogueFlourish = memo(function DialogueFlourish({
         <path
           d="M110,10 Q125,6 140,10 Q152,14 162,8"
           fill="none"
-          stroke={DF.bone}
+          stroke={DARK_FANTASY.bone}
           strokeWidth="0.8"
           opacity="0.3"
           strokeLinecap="round"
@@ -1033,17 +1000,17 @@ const DialogueFlourish = memo(function DialogueFlourish({
         <path
           d="M165,10 Q168,6 172,8 Q174,10 172,12"
           fill="none"
-          stroke={DF.bone}
+          stroke={DARK_FANTASY.bone}
           strokeWidth="0.8"
           opacity="0.4"
           strokeLinecap="round"
         />
 
         {/* Small dot accents along the vines */}
-        <circle cx="50" cy="14" r="1.5" fill={DF.bone} opacity="0.3" />
-        <circle cx="70" cy="10" r="1" fill={DF.bone} opacity="0.4" />
-        <circle cx="150" cy="14" r="1.5" fill={DF.bone} opacity="0.3" />
-        <circle cx="130" cy="10" r="1" fill={DF.bone} opacity="0.4" />
+        <circle cx="50" cy="14" r="1.5" fill={DARK_FANTASY.bone} opacity="0.3" />
+        <circle cx="70" cy="10" r="1" fill={DARK_FANTASY.bone} opacity="0.4" />
+        <circle cx="150" cy="14" r="1.5" fill={DARK_FANTASY.bone} opacity="0.3" />
+        <circle cx="130" cy="10" r="1" fill={DARK_FANTASY.bone} opacity="0.4" />
       </g>
     </svg>
   )
@@ -1095,7 +1062,7 @@ const VoidFrame = memo(function VoidFrame({
             id={sectionHeadingId}
             className="text-sm tracking-[0.3em] uppercase inline-block"
             style={{
-              color: DF.bone,
+              color: DARK_FANTASY.bone,
               fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
               fontWeight: 400,
               letterSpacing: '0.25em',
@@ -1111,7 +1078,7 @@ const VoidFrame = memo(function VoidFrame({
             style={{
               width: '40px',
               height: '1px',
-              background: `linear-gradient(90deg, transparent, ${DF.bone}40, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.bone}40, transparent)`,
             }}
           />
         </div>
@@ -1138,7 +1105,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
         <div key={category.id}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DF.silver, fontFamily: DF_FONT }}
+            style={{ color: DARK_FANTASY.silver, fontFamily: DF_FONT }}
           >
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -1149,9 +1116,9 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
                 key={tech}
                 className="px-3 py-1 text-sm transition-transform hover:scale-105 cursor-default"
                 style={{
-                  background: `${DF.ethereal}12`,
-                  border: `1px solid ${DF.ethereal}30`,
-                  color: DF.bone,
+                  background: `${DARK_FANTASY.ethereal}12`,
+                  border: `1px solid ${DARK_FANTASY.ethereal}30`,
+                  color: DARK_FANTASY.bone,
                   borderRadius: '3px',
                 }}
               >
@@ -1171,34 +1138,34 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple})`,
-        border: `1px solid ${project.featured ? DF.spiritGold : DF.stoneDark}`,
+        background: `linear-gradient(135deg, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidPurple})`,
+        border: `1px solid ${project.featured ? DARK_FANTASY.spiritGold : DARK_FANTASY.stoneDark}`,
         borderRadius: '4px',
       }}
     >
       {project.featured && (
-        <span className="text-sm tracking-[0.15em] uppercase" style={{ color: DF.spiritGold }}>
+        <span className="text-sm tracking-[0.15em] uppercase" style={{ color: DARK_FANTASY.spiritGold }}>
           <span aria-hidden="true">* </span>Featured
         </span>
       )}
-      <h3 className="text-lg mt-1 transition-colors" style={{ color: DF.bone }}>
+      <h3 className="text-lg mt-1 transition-colors" style={{ color: DARK_FANTASY.bone }}>
         {project.name}
       </h3>
-      <p className="text-sm mt-1" style={{ color: DF.ethereal }}>
+      <p className="text-sm mt-1" style={{ color: DARK_FANTASY.ethereal }}>
         {project.role}
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
-      <p className="text-sm mt-2" style={{ color: DF.silver }}>{project.tagline}</p>
+      <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silver }}>{project.tagline}</p>
       {project.impact && (
-        <p className="text-sm mt-2 italic" style={{ color: DF.bone }}>
+        <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
           <span className="sr-only">Impact: </span>{project.impact}
         </p>
       )}
       <div className="flex flex-wrap gap-1 mt-3" aria-label="Technologies used">
         {project.techStack.map((tech) => (
-          <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${DF.ethereal}12`, color: DF.silver }}>
+          <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${DARK_FANTASY.ethereal}12`, color: DARK_FANTASY.silver }}>
             {tech}
           </span>
         ))}
@@ -1209,7 +1176,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
             <a
               key={kind}
               {...linkProps}
-              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] border border-[#41c8e8] text-[#41c8e8] bg-[#41c8e8]/10"
+              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
             >
               {label}
             </a>
@@ -1227,10 +1194,10 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0a1a]"
+      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]"
       style={{
-        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidPurple})`,
-        border: `1px solid ${DF.stoneDark}`,
+        background: `linear-gradient(135deg, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidPurple})`,
+        border: `1px solid ${DARK_FANTASY.stoneDark}`,
         borderRadius: '4px',
       }}
       aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
@@ -1238,13 +1205,13 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl" aria-hidden="true">{company.icon}</span>
         <div>
-          <h3 className="text-lg transition-colors" style={{ color: DF.bone }}>
+          <h3 className="text-lg transition-colors" style={{ color: DARK_FANTASY.bone }}>
             {company.name}
           </h3>
-          <p className="text-sm" style={{ color: DF.spiritGold }}>{company.tagline}</p>
+          <p className="text-sm" style={{ color: DARK_FANTASY.spiritGold }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-sm" style={{ color: DF.silver }}>{company.description}</p>
+      <p className="text-sm" style={{ color: DARK_FANTASY.silver }}>{company.description}</p>
     </a>
   )
 })
@@ -1255,21 +1222,21 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${DF.void}, ${DF.voidDeep})`,
-        border: `1px solid ${DF.lavender}60`,
+        background: `linear-gradient(135deg, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidDeep})`,
+        border: `1px solid ${DARK_FANTASY.lavender}60`,
         borderRadius: '4px',
       }}
     >
-      <h3 className="text-lg transition-colors" style={{ color: DF.bone }}>
+      <h3 className="text-lg transition-colors" style={{ color: DARK_FANTASY.bone }}>
         {band.name}
       </h3>
-      <p className="text-sm mt-1" style={{ color: DF.lavender }}>
+      <p className="text-sm mt-1" style={{ color: DARK_FANTASY.lavender }}>
         {band.role}
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
       {band.release && (
-        <p className="text-sm mt-2" style={{ color: DF.silver }}>
+        <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silver }}>
           {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
@@ -1280,7 +1247,7 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
   return (
     <a
       {...linkProps}
-      className="block h-full min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#b7a9d9] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0a1a]"
+      className="block h-full min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-lavender)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]"
     >
       {content}
     </a>
@@ -1296,22 +1263,22 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
     <article className="py-4">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
-          <h3 className="text-lg font-medium" style={{ color: DF.bone }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: DF.ethereal }}>{entry.company}</p>
+          <h3 className="text-lg font-medium" style={{ color: DARK_FANTASY.bone }}>{entry.title}</h3>
+          <p className="text-sm" style={{ color: DARK_FANTASY.ethereal }}>{entry.company}</p>
         </div>
         <span
           className="text-sm"
-          style={{ color: DF.spiritGold }}
+          style={{ color: DARK_FANTASY.spiritGold }}
         >
           <time>{startDisplay}</time> - <time>{endDisplay}</time>
         </span>
       </div>
-      {entry.description && <p className="text-sm mb-2" style={{ color: DF.silver }}>{entry.description}</p>}
+      {entry.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silver }}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
         <ul className="space-y-1" aria-label="Key achievements">
           {entry.highlights.map((highlight) => (
-            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DF.bone }}>
-              <span style={{ color: DF.spiritGold }} aria-hidden="true">*</span>
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DARK_FANTASY.bone }}>
+              <span style={{ color: DARK_FANTASY.spiritGold }} aria-hidden="true">*</span>
               {highlight}
             </li>
           ))}
@@ -1321,14 +1288,13 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
         <div
           className="mt-4"
           style={{
-            borderBottom: `1px solid ${DF.stoneDark}40`,
+            borderBottom: `1px solid ${DARK_FANTASY.stoneDark}40`,
           }}
         />
       )}
     </article>
   )
 })
-
 
 // Art Section 1 - Spirit wisps with mechanical gears (spirit light and brass)
 const ArtSectionSpirits = memo(function ArtSectionSpirits() {
@@ -1341,14 +1307,14 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
           <path
             d="M400,100 Q320,85 240,95 Q160,105 80,90"
             fill="none"
-            stroke={DF.forestGreen}
+            stroke={DARK_FANTASY.forestGreen}
             strokeWidth="2"
             opacity="0.3"
           />
           <path
             d="M400,100 Q480,85 560,95 Q640,105 720,90"
             fill="none"
-            stroke={DF.forestGreen}
+            stroke={DARK_FANTASY.forestGreen}
             strokeWidth="2"
             opacity="0.3"
           />
@@ -1356,7 +1322,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
           <path
             d="M400,100 Q350,110 280,105 Q200,100 120,115"
             fill="none"
-            stroke={DF.brass}
+            stroke={DARK_FANTASY.brass}
             strokeWidth="1.5"
             opacity="0.25"
             strokeDasharray="8 4"
@@ -1364,7 +1330,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
           <path
             d="M400,100 Q450,110 520,105 Q600,100 680,115"
             fill="none"
-            stroke={DF.brass}
+            stroke={DARK_FANTASY.brass}
             strokeWidth="1.5"
             opacity="0.25"
             strokeDasharray="8 4"
@@ -1376,14 +1342,14 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
                 cx={x}
                 cy={95 + Math.sin(i * 1.2) * 10}
                 r={4 + (i % 2) * 2}
-                fill={i % 2 === 0 ? DF.spiritGold : DF.ethereal}
+                fill={i % 2 === 0 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal}
                 opacity={0.4}
               />
               <circle
                 cx={x}
                 cy={95 + Math.sin(i * 1.2) * 10}
                 r={8 + (i % 2) * 3}
-                fill={i % 2 === 0 ? DF.spiritGold : DF.ethereal}
+                fill={i % 2 === 0 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal}
                 opacity={0.1}
               />
             </g>
@@ -1395,7 +1361,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
           <div className="opacity-60">
             <MechanicalGear size={40} />
           </div>
-          <SpiritWisp size={60} color={DF.spiritGold} />
+          <SpiritWisp size={60} color={DARK_FANTASY.spiritGold} />
           <div className="opacity-60">
             <MechanicalGear size={40} />
           </div>
@@ -1403,10 +1369,10 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
 
         {/* Floating particles - no box-shadow */}
         {[
-          { x: '20%', y: '30%', color: DF.spiritGold },
-          { x: '80%', y: '40%', color: DF.ethereal },
-          { x: '15%', y: '70%', color: DF.forestGreen },
-          { x: '85%', y: '60%', color: DF.spiritGold },
+          { x: '20%', y: '30%', color: DARK_FANTASY.spiritGold },
+          { x: '80%', y: '40%', color: DARK_FANTASY.ethereal },
+          { x: '15%', y: '70%', color: DARK_FANTASY.forestGreen },
+          { x: '85%', y: '60%', color: DARK_FANTASY.spiritGold },
         ].map((p, i) => (
           <div
             key={i}
@@ -1424,12 +1390,12 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
 
       {/* Divider */}
       <div className="max-w-2xl mx-auto flex items-center gap-4 mt-4">
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DF.brass}, transparent)` }} />
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.brass}, transparent)` }} />
         <svg width="20" height="20" viewBox="0 0 20 20">
-          <path d="M10,2 L18,10 L10,18 L2,10 Z" fill="none" stroke={DF.spiritGold} strokeWidth="1" opacity="0.6" />
-          <circle cx="10" cy="10" r="2" fill={DF.spiritGold} opacity="0.4" />
+          <path d="M10,2 L18,10 L10,18 L2,10 Z" fill="none" stroke={DARK_FANTASY.spiritGold} strokeWidth="1" opacity="0.6" />
+          <circle cx="10" cy="10" r="2" fill={DARK_FANTASY.spiritGold} opacity="0.4" />
         </svg>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DF.brass}, transparent)` }} />
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.brass}, transparent)` }} />
       </div>
     </div>
   )
@@ -1471,7 +1437,7 @@ const ArtSectionLanterns = memo(function ArtSectionLanterns() {
         <div
           className="absolute inset-0"
           style={{
-            background: `radial-gradient(ellipse at 50% 50%, ${DF.spiritGold}15 0%, transparent 60%)`,
+            background: `radial-gradient(ellipse at 50% 50%, ${DARK_FANTASY.spiritGold}15 0%, transparent 60%)`,
           }}
         />
       </div>
@@ -1491,58 +1457,58 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
             {/* Main crystal */}
             <path
               d="M0,-50 L12,-20 L8,40 L-8,40 L-12,-20 Z"
-              fill={DF.ethereal}
+              fill={DARK_FANTASY.ethereal}
               opacity="0.6"
             />
             <path
               d="M0,-50 L12,-20 L0,0 L-12,-20 Z"
-              fill={DF.ethereal}
+              fill={DARK_FANTASY.ethereal}
               opacity="0.8"
             />
             {/* Side crystals */}
             <path
               d="M-30,-30 L-22,-10 L-26,25 L-34,25 L-38,-10 Z"
-              fill={DF.spiritGold}
+              fill={DARK_FANTASY.spiritGold}
               opacity="0.5"
               transform="rotate(-15)"
             />
             <path
               d="M30,-30 L38,-10 L34,25 L26,25 L22,-10 Z"
-              fill={DF.spiritGold}
+              fill={DARK_FANTASY.spiritGold}
               opacity="0.5"
               transform="rotate(15)"
             />
             {/* Small accent crystals */}
-            <path d="M-50,-10 L-45,5 L-55,5 Z" fill={DF.forestGreen} opacity="0.4" transform="rotate(-25)" />
-            <path d="M50,-10 L55,5 L45,5 Z" fill={DF.forestGreen} opacity="0.4" transform="rotate(25)" />
+            <path d="M-50,-10 L-45,5 L-55,5 Z" fill={DARK_FANTASY.forestGreen} opacity="0.4" transform="rotate(-25)" />
+            <path d="M50,-10 L55,5 L45,5 Z" fill={DARK_FANTASY.forestGreen} opacity="0.4" transform="rotate(25)" />
           </g>
 
           {/* Energy tendrils spreading from crystals */}
           <path
             d="M500,30 Q400,25 300,40 Q200,55 100,45"
             fill="none"
-            stroke={DF.ethereal}
+            stroke={DARK_FANTASY.ethereal}
             strokeWidth="2"
             opacity="0.2"
           />
           <path
             d="M500,30 Q600,25 700,40 Q800,55 900,45"
             fill="none"
-            stroke={DF.ethereal}
+            stroke={DARK_FANTASY.ethereal}
             strokeWidth="2"
             opacity="0.2"
           />
           <path
             d="M500,50 Q420,60 340,55 Q260,50 180,65"
             fill="none"
-            stroke={DF.spiritGold}
+            stroke={DARK_FANTASY.spiritGold}
             strokeWidth="1.5"
             opacity="0.15"
           />
           <path
             d="M500,50 Q580,60 660,55 Q740,50 820,65"
             fill="none"
-            stroke={DF.spiritGold}
+            stroke={DARK_FANTASY.spiritGold}
             strokeWidth="1.5"
             opacity="0.15"
           />
@@ -1554,14 +1520,14 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
                 cx={x}
                 cy={45 + Math.sin(i * 1.5) * 12}
                 r={5}
-                fill={i % 2 === 0 ? DF.ethereal : DF.spiritGold}
+                fill={i % 2 === 0 ? DARK_FANTASY.ethereal : DARK_FANTASY.spiritGold}
                 opacity={0.3}
               />
               <circle
                 cx={x}
                 cy={45 + Math.sin(i * 1.5) * 12}
                 r={10}
-                fill={i % 2 === 0 ? DF.ethereal : DF.spiritGold}
+                fill={i % 2 === 0 ? DARK_FANTASY.ethereal : DARK_FANTASY.spiritGold}
                 opacity={0.1}
               />
             </g>
@@ -1572,16 +1538,16 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
         <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-40"
           style={{
-            background: `radial-gradient(ellipse, ${DF.ethereal}15 0%, ${DF.ethereal}08 30%, ${DF.spiritGold}05 60%, transparent 80%)`,
+            background: `radial-gradient(ellipse, ${DARK_FANTASY.ethereal}15 0%, ${DARK_FANTASY.ethereal}08 30%, ${DARK_FANTASY.spiritGold}05 60%, transparent 80%)`,
           }}
         />
       </div>
 
       {/* Bottom divider */}
       <div className="max-w-3xl mx-auto flex items-center gap-6 mt-4">
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DF.ethereal}40, transparent)` }} />
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.ethereal}40, transparent)` }} />
         <div className="flex gap-3">
-          {[DF.ethereal, DF.spiritGold, DF.ethereal].map((color, i) => (
+          {[DARK_FANTASY.ethereal, DARK_FANTASY.spiritGold, DARK_FANTASY.ethereal].map((color, i) => (
             <div
               key={i}
               className="w-2 h-2"
@@ -1594,7 +1560,7 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
             />
           ))}
         </div>
-        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DF.ethereal}40, transparent)` }} />
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, transparent, ${DARK_FANTASY.ethereal}40, transparent)` }} />
       </div>
     </div>
   )
@@ -1602,12 +1568,12 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
 
 // Profession sections. Each animated section gets its own useSectionTrigger, from its real position.
 const DF_BUTTON =
-  'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f0a1a]'
+  'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
 
 // Email is the brass action, LinkedIn the outlined one.
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-[#b08d57] text-[#0f0a1a]',
-  linkedin: 'bg-transparent border-2 border-[#b08d57] text-[#b08d57]',
+  email: 'bg-[color:var(--df-brass)] text-[color:var(--df-void)]',
+  linkedin: 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass)]',
 }
 
 function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
@@ -1659,7 +1625,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   return (
     <>
       <FramedSection title="About" delay={100}>
-        <p className="leading-relaxed" style={{ color: DF.bone }}>{professionalSummary.bio}</p>
+        <p className="leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{professionalSummary.bio}</p>
       </FramedSection>
 
       {/* Art Section 1 - Spirits and Gears */}
@@ -1730,11 +1696,11 @@ function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
       </FadeInSection>
 
       <SlashRevealSection title="Bands">
-        <p className="text-sm mb-4 text-center" style={{ color: DF.bone }}>
+        <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
           {drumsSince(musician)}
         </p>
         <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
-        <p className="text-sm mt-4 italic text-center" style={{ color: DF.lavender }}>{musician.line}</p>
+        <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
       </SlashRevealSection>
 
       <FadeInSection>
@@ -1754,20 +1720,20 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
       </FadeInSection>
 
       <SlashRevealSection title="Muay Thai">
-        <h3 className="text-lg font-medium mb-4" style={{ color: DF.bone }}>{martialArts.primary.title}</h3>
+        <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
         <MuayThaiRecord
           martialArts={martialArts}
           classNames={{
             facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-            fact: 'p-3 rounded bg-gradient-to-br from-[#0f0a1a] to-[#150f25] border border-[#333333]',
-            term: 'text-sm tracking-[0.15em] uppercase text-[#e8c841]',
-            value: 'text-sm mt-1 text-[#e8e4dc]',
+            fact: 'p-3 rounded bg-gradient-to-br from-[color:var(--df-void)] to-[color:var(--df-void-purple)] border border-[color:var(--df-stone-dark)]',
+            term: 'text-sm tracking-[0.15em] uppercase text-[color:var(--df-spirit-gold)]',
+            value: 'text-sm mt-1 text-[color:var(--df-bone)]',
             achievements: 'space-y-1',
-            achievement: 'text-sm flex items-start gap-2 text-[#e8e4dc]',
+            achievement: 'text-sm flex items-start gap-2 text-[color:var(--df-bone)]',
           }}
           renderAchievement={(achievement) => (
             <>
-              <span className="text-[#e8c841]" aria-hidden="true">*</span>
+              <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
               {achievement}
             </>
           )}
@@ -1786,7 +1752,6 @@ const SECTION_VIEWS: ProfessionSectionViews = {
   drummer: MusicianSections,
   fighter: MartialArtistSections,
 }
-
 
 export default function DarkFantasyTheme() {
   const view = useWorldView()
@@ -1826,12 +1791,12 @@ export default function DarkFantasyTheme() {
   if (!mounted) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ background: DF.void }}
+        style={DARK_FANTASY_VARS}
+        className="min-h-screen flex items-center justify-center bg-[color:var(--df-void)]"
         role="status"
         aria-label="Loading theme"
       >
-        <div className="animate-pulse text-center" style={{ color: DF.bone }}>
+        <div className="animate-pulse text-center" style={{ color: DARK_FANTASY.bone }}>
           Loading...
         </div>
       </div>
@@ -1840,11 +1805,8 @@ export default function DarkFantasyTheme() {
 
   return (
     <div
-      className="min-h-screen relative overflow-hidden"
-      style={{
-        background: `linear-gradient(180deg, ${DF.void}, ${DF.voidDeep}, ${DF.voidPurple})`,
-        fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
-      }}
+      style={DARK_FANTASY_VARS}
+      className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[color:var(--df-void)] via-[color:var(--df-void-deep)] to-[color:var(--df-void-purple)] font-['Comic_Sans_MS','Comic_Sans',cursive]"
     >
       {/* Skip Link for accessibility */}
       <SkipLink href="#main-content" />
@@ -1854,10 +1816,10 @@ export default function DarkFantasyTheme() {
         className="fixed inset-0 z-0"
         style={{
           background: `
-            radial-gradient(ellipse at 50% 10%, ${DF.ethereal}15 0%, transparent 50%),
-            radial-gradient(ellipse at 20% 60%, ${DF.voidPurple}40 0%, transparent 40%),
-            radial-gradient(ellipse at 80% 40%, ${DF.spiritGold}08 0%, transparent 35%),
-            linear-gradient(180deg, ${DF.void} 0%, ${DF.voidDeep} 40%, ${DF.voidPurple} 100%)
+            radial-gradient(ellipse at 50% 10%, ${DARK_FANTASY.ethereal}15 0%, transparent 50%),
+            radial-gradient(ellipse at 20% 60%, ${DARK_FANTASY.voidPurple}40 0%, transparent 40%),
+            radial-gradient(ellipse at 80% 40%, ${DARK_FANTASY.spiritGold}08 0%, transparent 35%),
+            linear-gradient(180deg, ${DARK_FANTASY.void} 0%, ${DARK_FANTASY.voidDeep} 40%, ${DARK_FANTASY.voidPurple} 100%)
           `,
         }}
       />
@@ -1865,7 +1827,7 @@ export default function DarkFantasyTheme() {
       <EtherealRain />
       <DarkFantasyAtmosphere />
       <SpiritParticles />
-      <ProfessionStage profession={active} p={DF} />
+      <ProfessionStage profession={active} p={DARK_FANTASY} />
 
       {/* Interactive Elements - desktop only */}
       <ParallaxLayers />
@@ -1877,7 +1839,7 @@ export default function DarkFantasyTheme() {
         style={{
           background: `
             radial-gradient(ellipse at 50% 50%, transparent 0%, transparent 30%, rgba(15,10,26,0.4) 60%, rgba(15,10,26,0.8) 100%),
-            linear-gradient(180deg, transparent 60%, ${DF.void}90 100%)
+            linear-gradient(180deg, transparent 60%, ${DARK_FANTASY.void}90 100%)
           `,
         }}
       />
@@ -1891,7 +1853,7 @@ export default function DarkFantasyTheme() {
       <nav
         className="fixed top-0 left-0 right-0 z-[50] px-4 py-3 md:px-6 md:py-4"
         style={{
-          background: `linear-gradient(180deg, ${DF.void}f5 0%, ${DF.void}e0 70%, transparent 100%)`,
+          background: `linear-gradient(180deg, ${DARK_FANTASY.void}f5 0%, ${DARK_FANTASY.void}e0 70%, transparent 100%)`,
         }}
         aria-label="Primary navigation"
       >
@@ -1899,13 +1861,13 @@ export default function DarkFantasyTheme() {
           {/* Name - compact on mobile */}
           <Link href="/" className="flex items-center gap-2 md:gap-3 group">
             <div aria-hidden="true" className="hidden sm:block">
-              <SpiritWisp size={32} color={DF.spiritGold} />
+              <SpiritWisp size={32} color={DARK_FANTASY.spiritGold} />
             </div>
             <span
               className="text-sm md:text-lg tracking-[0.15em] md:tracking-[0.2em] font-normal uppercase whitespace-nowrap"
               style={{
-                color: DF.bone,
-                textShadow: `0 0 20px ${DF.ethereal}30`,
+                color: DARK_FANTASY.bone,
+                textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30`,
               }}
             >
               {view.hero.name}
@@ -1916,13 +1878,13 @@ export default function DarkFantasyTheme() {
           <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] border border-[#333333] text-[#a0a0a0] bg-[#0f0a1a]/80"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
             >
               CV
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c841] border border-[#41c8e8] text-[#41c8e8] bg-[#41c8e8]/10"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.1em] uppercase transition-all hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
             >
               <span className="hidden sm:inline">Nebulith</span>
               <span className="sm:hidden">Game</span>
@@ -1938,20 +1900,20 @@ export default function DarkFantasyTheme() {
             <div className="max-w-4xl mx-auto text-center">
               <h1
                 className="text-2xl md:text-4xl tracking-[0.15em] uppercase mb-3"
-                style={{ color: DF.bone, textShadow: `0 0 20px ${DF.ethereal}30` }}
+                style={{ color: DARK_FANTASY.bone, textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30` }}
               >
                 {name}
               </h1>
-              <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DF.silver }}>
+              <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silver }}>
                 {headline}
               </p>
               <p
                 className="text-sm tracking-wider italic"
-                style={{ color: DF.spiritGold, textShadow: `0 0 10px ${DF.spiritGold}40` }}
+                style={{ color: DARK_FANTASY.spiritGold, textShadow: `0 0 10px ${DARK_FANTASY.spiritGold}40` }}
               >
                 {tagline}
               </p>
-              <p className="text-sm mt-2" style={{ color: DF.bone }}>{line}</p>
+              <p className="text-sm mt-2" style={{ color: DARK_FANTASY.bone }}>{line}</p>
               <div className="flex flex-wrap gap-3 justify-center mt-4">
                 <HeroActions actions={actions} />
               </div>
@@ -1971,7 +1933,7 @@ export default function DarkFantasyTheme() {
             <div
               className="relative h-40 md:h-56 overflow-hidden"
               style={{
-                background: `linear-gradient(180deg, transparent, ${DF.voidPurple}30)`,
+                background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
                 borderRadius: '4px',
               }}
             >
@@ -1979,16 +1941,16 @@ export default function DarkFantasyTheme() {
               <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
                   <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor={DF.brass} stopOpacity="0" />
-                    <stop offset="50%" stopColor={DF.brass} stopOpacity="0.4" />
-                    <stop offset="100%" stopColor={DF.brass} stopOpacity="0" />
+                    <stop offset="0%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
+                    <stop offset="50%" stopColor={DARK_FANTASY.brass} stopOpacity="0.4" />
+                    <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
                   </linearGradient>
                 </defs>
                 <line x1="25%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
                 <line x1="50%" y1="30%" x2="75%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
                 {/* Gear decorations at intersections */}
-                <circle cx="37.5%" cy="42.5%" r="3" fill={DF.copper} opacity="0.3" />
-                <circle cx="62.5%" cy="42.5%" r="3" fill={DF.copper} opacity="0.3" />
+                <circle cx="37.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+                <circle cx="62.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
               </svg>
 
               {/* Energy flow animation between nodes */}
@@ -2022,14 +1984,14 @@ export default function DarkFantasyTheme() {
             render={({ line, actions }) => (
               <div className="max-w-2xl mx-auto text-center">
                 <div className="mb-8">
-                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DF.brass, fontFamily: DF_FONT }}>
+                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brass, fontFamily: DF_FONT }}>
                     Get In Touch
                   </h2>
-                  <p className="text-sm" style={{ color: DF.silver }}>{line}</p>
+                  <p className="text-sm" style={{ color: DARK_FANTASY.silver }}>{line}</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <HeroActions actions={actions} />
-                  <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[#b08d57] text-[#b08d57]`}>
+                  <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass)]`}>
                     Download CV
                   </Link>
                 </div>
@@ -2044,19 +2006,19 @@ export default function DarkFantasyTheme() {
       <div
         className="fixed bottom-0 left-0 right-0 h-48 pointer-events-none z-[7]"
         style={{
-          background: `linear-gradient(180deg, transparent 0%, ${DF.void}40 30%, ${DF.void}90 70%, ${DF.void} 100%)`,
+          background: `linear-gradient(180deg, transparent 0%, ${DARK_FANTASY.void}40 30%, ${DARK_FANTASY.void}90 70%, ${DARK_FANTASY.void} 100%)`,
         }}
         aria-hidden="true"
       />
 
       {/* Footer */}
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
-        <div className="inline-flex items-center gap-4" style={{ color: DF.silver }}>
-          <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
+        <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silver }}>
+          <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
             <span className="sr-only">Copyright </span>© {new Date().getFullYear()} {view.hero.name}
           </span>
-          <div className="w-12 h-px" style={{ background: DF.brass }} aria-hidden="true" />
+          <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
         </div>
       </footer>
 

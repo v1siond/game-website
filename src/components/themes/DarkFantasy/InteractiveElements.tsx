@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback, memo } from 'react'
+import { DARK_FANTASY } from './palette'
 
 /**
  * DARK FANTASY INTERACTIVE ELEMENTS
@@ -13,15 +14,6 @@ import { useState, useEffect, useRef, useCallback, memo } from 'react'
  *
  * All animations use only transform and opacity for 60fps performance.
  */
-
-// Color palette (matching DarkFantasyTheme)
-const DF = {
-  void: '#0f0a1a',
-  ethereal: '#41c8e8',
-  spiritGold: '#e8c841',
-  brass: '#b08d57',
-  lavender: '#b7a9d9',
-}
 
 // ============================================
 // SPIRIT COMPANION
@@ -195,14 +187,14 @@ export const SpiritCompanion = memo(function SpiritCompanion() {
         {/* Outer glow */}
         <defs>
           <radialGradient id="spiritGlow" cx="50%" cy="40%" r="50%">
-            <stop offset="0%" stopColor={DF.spiritGold} stopOpacity="0.6" />
-            <stop offset="50%" stopColor={DF.spiritGold} stopOpacity="0.2" />
-            <stop offset="100%" stopColor={DF.spiritGold} stopOpacity="0" />
+            <stop offset="0%" stopColor={DARK_FANTASY.spiritGold} stopOpacity="0.6" />
+            <stop offset="50%" stopColor={DARK_FANTASY.spiritGold} stopOpacity="0.2" />
+            <stop offset="100%" stopColor={DARK_FANTASY.spiritGold} stopOpacity="0" />
           </radialGradient>
           <radialGradient id="spiritCore" cx="50%" cy="40%" r="50%">
-            <stop offset="0%" stopColor="#fff" stopOpacity="0.9" />
-            <stop offset="30%" stopColor={DF.spiritGold} stopOpacity="0.8" />
-            <stop offset="100%" stopColor={DF.spiritGold} stopOpacity="0.4" />
+            <stop offset="0%" stopColor={DARK_FANTASY.white} stopOpacity="0.9" />
+            <stop offset="30%" stopColor={DARK_FANTASY.spiritGold} stopOpacity="0.8" />
+            <stop offset="100%" stopColor={DARK_FANTASY.spiritGold} stopOpacity="0.4" />
           </radialGradient>
         </defs>
 
@@ -216,7 +208,7 @@ export const SpiritCompanion = memo(function SpiritCompanion() {
         />
 
         {/* Inner highlight */}
-        <ellipse cx="30" cy="25" rx="10" ry="8" fill="#fff" opacity="0.4" />
+        <ellipse cx="30" cy="25" rx="10" ry="8" fill={DARK_FANTASY.white} opacity="0.4" />
 
         {/* Eyes */}
         <g style={{ transform: `translateY(${getEyeStyle().translateY || 0}px)` }}>
@@ -225,36 +217,36 @@ export const SpiritCompanion = memo(function SpiritCompanion() {
             cy="28"
             rx="3"
             ry={4 * (getEyeStyle().scaleY || 1)}
-            fill={DF.void}
+            fill={DARK_FANTASY.void}
           />
           <ellipse
             cx="37"
             cy="28"
             rx="3"
             ry={4 * (getEyeStyle().scaleY || 1)}
-            fill={DF.void}
+            fill={DARK_FANTASY.void}
           />
           {/* Eye highlights */}
-          <circle cx="24" cy="27" r="1" fill="#fff" opacity="0.8" />
-          <circle cx="38" cy="27" r="1" fill="#fff" opacity="0.8" />
+          <circle cx="24" cy="27" r="1" fill={DARK_FANTASY.white} opacity="0.8" />
+          <circle cx="38" cy="27" r="1" fill={DARK_FANTASY.white} opacity="0.8" />
         </g>
 
         {/* Mouth based on mood */}
         {state.mood === 'excited' && (
-          <path d="M26,36 Q30,40 34,36" fill="none" stroke={DF.void} strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M26,36 Q30,40 34,36" fill="none" stroke={DARK_FANTASY.void} strokeWidth="1.5" strokeLinecap="round" />
         )}
         {state.mood === 'curious' && (
-          <ellipse cx="30" cy="37" rx="2" ry="2" fill={DF.void} />
+          <ellipse cx="30" cy="37" rx="2" ry="2" fill={DARK_FANTASY.void} />
         )}
         {state.mood === 'sleepy' && (
-          <path d="M27,36 L33,36" fill="none" stroke={DF.void} strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M27,36 L33,36" fill="none" stroke={DARK_FANTASY.void} strokeWidth="1.5" strokeLinecap="round" />
         )}
 
         {/* Trailing wisps */}
         <path
           d="M25,55 Q20,62 18,68 M30,58 Q30,65 28,70 M35,55 Q40,62 42,68"
           fill="none"
-          stroke={DF.spiritGold}
+          stroke={DARK_FANTASY.spiritGold}
           strokeWidth="2"
           strokeLinecap="round"
           opacity="0.5"
@@ -270,11 +262,11 @@ export const SpiritCompanion = memo(function SpiritCompanion() {
           key={i}
           className="absolute w-1 h-1 rounded-full"
           style={{
-            background: i % 2 === 0 ? DF.spiritGold : DF.ethereal,
+            background: i % 2 === 0 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal,
             left: 20 + Math.sin(idleTimeRef.current * 2 + i * 2) * 25,
             top: 15 + Math.cos(idleTimeRef.current * 1.5 + i * 2.5) * 20,
             opacity: 0.6 + Math.sin(idleTimeRef.current * 3 + i) * 0.3,
-            boxShadow: `0 0 4px ${i % 2 === 0 ? DF.spiritGold : DF.ethereal}`,
+            boxShadow: `0 0 4px ${i % 2 === 0 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal}`,
           }}
         />
       ))}
@@ -319,7 +311,7 @@ export const CursorTrail = memo(function CursorTrail() {
           y: e.clientY + (Math.random() - 0.5) * 10,
           size: 3 + Math.random() * 4,
           opacity: 0.6 + Math.random() * 0.3,
-          color: Math.random() > 0.5 ? DF.spiritGold : DF.ethereal,
+          color: Math.random() > 0.5 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal,
           life: 1,
         }
 
@@ -404,10 +396,10 @@ export const ParallaxLayers = memo(function ParallaxLayers() {
       >
         {/* Distant ethereal orbs */}
         {[
-          { x: '10%', y: '20%', size: 100, color: DF.ethereal, opacity: 0.05 },
-          { x: '80%', y: '30%', size: 150, color: DF.spiritGold, opacity: 0.04 },
-          { x: '20%', y: '70%', size: 120, color: DF.lavender, opacity: 0.04 },
-          { x: '70%', y: '80%', size: 80, color: DF.ethereal, opacity: 0.05 },
+          { x: '10%', y: '20%', size: 100, color: DARK_FANTASY.ethereal, opacity: 0.05 },
+          { x: '80%', y: '30%', size: 150, color: DARK_FANTASY.spiritGold, opacity: 0.04 },
+          { x: '20%', y: '70%', size: 120, color: DARK_FANTASY.lavender, opacity: 0.04 },
+          { x: '70%', y: '80%', size: 80, color: DARK_FANTASY.ethereal, opacity: 0.05 },
         ].map((orb, i) => (
           <div
             key={i}
@@ -449,7 +441,7 @@ export const ParallaxLayers = memo(function ParallaxLayers() {
               top: mote.y,
               width: mote.size,
               height: mote.size,
-              background: i % 2 === 0 ? DF.spiritGold : DF.ethereal,
+              background: i % 2 === 0 ? DARK_FANTASY.spiritGold : DARK_FANTASY.ethereal,
               opacity: 0.3,
             }}
           />
@@ -466,9 +458,9 @@ export const ParallaxLayers = memo(function ParallaxLayers() {
       >
         {/* Close floating particles */}
         {[
-          { x: '5%', y: '40%', size: 2, color: DF.spiritGold },
-          { x: '95%', y: '20%', size: 3, color: DF.ethereal },
-          { x: '50%', y: '90%', size: 2, color: DF.lavender },
+          { x: '5%', y: '40%', size: 2, color: DARK_FANTASY.spiritGold },
+          { x: '95%', y: '20%', size: 3, color: DARK_FANTASY.ethereal },
+          { x: '50%', y: '90%', size: 2, color: DARK_FANTASY.lavender },
         ].map((p, i) => (
           <div
             key={i}

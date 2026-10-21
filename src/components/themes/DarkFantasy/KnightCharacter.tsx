@@ -2,6 +2,7 @@
 
 import { memo, ReactNode, useState, useEffect, useRef } from 'react'
 import { useInView, FixedCombatLayer } from './fixedCombat'
+import { DARK_FANTASY } from './palette'
 
 /**
  * ALEXANDER AS A MASKED CAVERN KNIGHT
@@ -18,19 +19,6 @@ import { useInView, FixedCombatLayer } from './fixedCombat'
  * ALEXANDER ADAPTATION:
  * - Beard extends from bottom of mask
  */
-
-const DF = {
-  void: '#000000',
-  mask: '#ffffff',
-  maskShade: '#e8e8e8',
-  cloak: '#3d4a5c',
-  cloakDark: '#2a3545',
-  ethereal: '#50e0ff',
-  nail: '#c8c8c8',
-  nailShade: '#a0a0a0',
-  beard: '#4a3c2e',
-  beardDark: '#3a2c1e',
-}
 
 interface KnightCharacterProps {
   scale?: number
@@ -86,12 +74,12 @@ export const KnightCharacter = memo(function KnightCharacter({
       style={{
         overflow: 'visible',
         transform: isLeft ? 'scaleX(-1)' : 'none',
-        filter: `drop-shadow(0 4px 3px rgba(0,0,0,0.45)) drop-shadow(0 0 5px ${DF.ethereal}22)`,
+        filter: `drop-shadow(0 4px 3px rgba(0,0,0,0.45)) drop-shadow(0 0 5px ${DARK_FANTASY.soulBlue}22)`,
       }}
     >
       {/* Ground contact shadow, two soft stacked ellipses (replaces the old glow-only shadow) */}
-      <ellipse cx="30" cy="79" rx="21" ry="4.5" fill={DF.void} opacity="0.22" />
-      <ellipse cx="30" cy="79" rx="14" ry="3" fill={DF.void} opacity="0.4" />
+      <ellipse cx="30" cy="79" rx="21" ry="4.5" fill={DARK_FANTASY.black} opacity="0.22" />
+      <ellipse cx="30" cy="79" rx="14" ry="3" fill={DARK_FANTASY.black} opacity="0.4" />
       {/* === KNIGHT - 3/4 VIEW FACING RIGHT === */}
       {/* Based on reference image proportions */}
 
@@ -110,28 +98,28 @@ export const KnightCharacter = memo(function KnightCharacter({
              L46,70
              C48,60 46,52 42,48
              Z"
-          fill={DF.cloak}
-          stroke={DF.void}
+          fill={DARK_FANTASY.cloak}
+          stroke={DARK_FANTASY.black}
           strokeWidth="1.5"
         />
         {/* Cloak detail - center fold */}
         <path
           d="M30,50 L30,72"
-          stroke={DF.cloakDark}
+          stroke={DARK_FANTASY.cloakDark}
           strokeWidth="2"
           opacity="0.5"
         />
         {/* Cloak side folds */}
         <path
           d="M22,52 C20,58 20,66 22,72"
-          stroke={DF.cloakDark}
+          stroke={DARK_FANTASY.cloakDark}
           strokeWidth="1"
           fill="none"
           opacity="0.3"
         />
         <path
           d="M38,52 C40,58 40,66 38,72"
-          stroke={DF.cloakDark}
+          stroke={DARK_FANTASY.cloakDark}
           strokeWidth="1"
           fill="none"
           opacity="0.3"
@@ -144,8 +132,8 @@ export const KnightCharacter = memo(function KnightCharacter({
         cy="28"
         rx="20"
         ry="22"
-        fill={DF.mask}
-        stroke={DF.void}
+        fill={DARK_FANTASY.white}
+        stroke={DARK_FANTASY.black}
         strokeWidth="1.5"
       />
 
@@ -156,8 +144,8 @@ export const KnightCharacter = memo(function KnightCharacter({
            C14,-4 16,2 18,10
            C16,12 14,14 14,14
            Z"
-        fill={DF.mask}
-        stroke={DF.void}
+        fill={DARK_FANTASY.white}
+        stroke={DARK_FANTASY.black}
         strokeWidth="1"
       />
 
@@ -168,8 +156,8 @@ export const KnightCharacter = memo(function KnightCharacter({
            C46,-4 44,2 42,10
            C44,12 46,14 46,14
            Z"
-        fill={DF.mask}
-        stroke={DF.void}
+        fill={DARK_FANTASY.white}
+        stroke={DARK_FANTASY.black}
         strokeWidth="1"
       />
 
@@ -179,7 +167,7 @@ export const KnightCharacter = memo(function KnightCharacter({
         cy="28"
         rx="6"
         ry="9"
-        fill={DF.void}
+        fill={DARK_FANTASY.black}
       />
 
       {/* RIGHT EYE - large void oval */}
@@ -188,7 +176,7 @@ export const KnightCharacter = memo(function KnightCharacter({
         cy="28"
         rx="6"
         ry="9"
-        fill={DF.void}
+        fill={DARK_FANTASY.black}
       />
 
       {/* BEARD - Alexander's signature */}
@@ -201,28 +189,28 @@ export const KnightCharacter = memo(function KnightCharacter({
            C36,44 34,46 30,46
            C26,46 24,44 20,42
            Z"
-        fill={DF.beard}
-        stroke={DF.beardDark}
+        fill={DARK_FANTASY.beard}
+        stroke={DARK_FANTASY.beardDark}
         strokeWidth="0.5"
       />
       {/* Beard texture lines */}
       <path
         d="M24,48 C24,52 26,56 28,58"
-        stroke={DF.beardDark}
+        stroke={DARK_FANTASY.beardDark}
         strokeWidth="0.5"
         fill="none"
         opacity="0.5"
       />
       <path
         d="M36,48 C36,52 34,56 32,58"
-        stroke={DF.beardDark}
+        stroke={DARK_FANTASY.beardDark}
         strokeWidth="0.5"
         fill="none"
         opacity="0.5"
       />
       <path
         d="M30,46 L30,60"
-        stroke={DF.beardDark}
+        stroke={DARK_FANTASY.beardDark}
         strokeWidth="0.5"
         opacity="0.4"
       />
@@ -236,27 +224,27 @@ export const KnightCharacter = memo(function KnightCharacter({
         }}
       >
         {/* Handle */}
-        <rect x="49" y="53" width="6" height="10" rx="1" fill={DF.cloakDark} stroke={DF.void} strokeWidth="0.5" />
+        <rect x="49" y="53" width="6" height="10" rx="1" fill={DARK_FANTASY.cloakDark} stroke={DARK_FANTASY.black} strokeWidth="0.5" />
         {/* Blade */}
         <path
           d="M52,53 L48,35 L52,15 L56,35 L52,53"
-          fill={DF.nail}
-          stroke={DF.nailShade}
+          fill={DARK_FANTASY.nail}
+          stroke={DARK_FANTASY.silver}
           strokeWidth="0.5"
         />
         {/* Highlight */}
-        <line x1="52" y1="50" x2="52" y2="18" stroke="#ffffff" strokeWidth="0.5" opacity="0.5" />
+        <line x1="52" y1="50" x2="52" y2="18" stroke={DARK_FANTASY.white} strokeWidth="0.5" opacity="0.5" />
         {attacking && attackPhase > 0.2 && attackPhase < 0.6 && (
           <path
             d="M52,53 L48,35 L52,15 L56,35 L52,53"
-            fill={DF.ethereal}
+            fill={DARK_FANTASY.soulBlue}
             opacity="0.5"
           />
         )}
       </g>
 
       {/* Ground shadow */}
-      <ellipse cx="30" cy="76" rx="14" ry="2" fill={DF.void} opacity="0.3" />
+      <ellipse cx="30" cy="76" rx="14" ry="2" fill={DARK_FANTASY.black} opacity="0.3" />
     </svg>
     </span>
   )
@@ -388,7 +376,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
         <div
           className="absolute inset-0 z-10 pointer-events-none"
           style={{
-            background: `linear-gradient(90deg, transparent 20%, ${DF.ethereal}40 50%, transparent 80%)`,
+            background: `linear-gradient(90deg, transparent 20%, ${DARK_FANTASY.soulBlue}40 50%, transparent 80%)`,
             animation: 'slashFlash 100ms ease-out'
           }}
         />

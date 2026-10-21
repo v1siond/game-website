@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, memo, ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useInView, FixedCombatLayer } from './fixedCombat'
+import { DARK_FANTASY } from './palette'
 
 /**
  * BATTLE REVEAL ANIMATION
@@ -22,16 +23,6 @@ import { useInView, FixedCombatLayer } from './fixedCombat'
  *
  * Uses only transform and opacity for GPU-accelerated performance.
  */
-
-// Color palette (matching DarkFantasyTheme)
-const DF = {
-  void: '#0f0a1a',
-  ethereal: '#41c8e8',
-  spiritGold: '#e8c841',
-  brass: '#b08d57',
-  lavender: '#b7a9d9',
-  bone: '#e8e4dc',
-}
 
 // Animation phases
 type AnimationPhase =
@@ -502,7 +493,7 @@ export const BattleReveal = memo(function BattleReveal({
             <div
               className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-[80%] h-2 rounded-full"
               style={{
-                background: `radial-gradient(ellipse, ${DF.void}80 0%, transparent 70%)`,
+                background: `radial-gradient(ellipse, ${DARK_FANTASY.void}80 0%, transparent 70%)`,
                 animation: 'shadowGrow 400ms ease-out forwards'
               }}
             />
@@ -535,14 +526,14 @@ export const BattleBug = memo(function BattleBug({
   antennaPhase?: number
   isHit?: boolean
 }) {
-  const shell = '#3a3055'
-  const shellMid = '#2a2040'
-  const shellDark = '#1a1525'
-  const mask = '#4a4565'
-  const maskLight = '#5a5575'
-  const infected = '#ff6b35'
-  const infectedBright = '#ff9955'
-  const infectedGlow = '#ff8833'
+  const shell = DARK_FANTASY.shell
+  const shellMid = DARK_FANTASY.shellMid
+  const shellDark = DARK_FANTASY.shellDark
+  const mask = DARK_FANTASY.bugMask
+  const maskLight = DARK_FANTASY.bugMaskLight
+  const infected = DARK_FANTASY.infected
+  const infectedBright = DARK_FANTASY.infectedBright
+  const infectedGlow = DARK_FANTASY.infectedGlow
 
   const getLegY = (index: number) => {
     const offset = index % 2 === 0 ? 0 : 0.5
@@ -602,15 +593,15 @@ export const BattleBug = memo(function BattleBug({
       </g>
 
       {/* BODY - chunky segmented shell */}
-      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#battleShellGrad)" stroke={DF.void} strokeWidth="1.5" />
+      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#battleShellGrad)" stroke={DARK_FANTASY.void} strokeWidth="1.5" />
       <path d="M30,50 Q50,45 70,50" fill="none" stroke={shellDark} strokeWidth="2" opacity="0.6" />
       <path d="M32,58 Q50,54 68,58" fill="none" stroke={shellDark} strokeWidth="1.5" opacity="0.4" />
 
       {/* Middle segment */}
-      <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DF.void} strokeWidth="1" />
+      <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DARK_FANTASY.void} strokeWidth="1" />
 
       {/* HEAD/MASK */}
-      <ellipse cx="50" cy="26" rx="18" ry="15" fill="url(#battleMaskGrad)" stroke={DF.void} strokeWidth="1" />
+      <ellipse cx="50" cy="26" rx="18" ry="15" fill="url(#battleMaskGrad)" stroke={DARK_FANTASY.void} strokeWidth="1" />
       <path d="M35,22 Q50,16 65,22" fill="none" stroke={maskLight} strokeWidth="2" opacity="0.5" />
 
       {/* MANDIBLES */}
@@ -625,8 +616,8 @@ export const BattleBug = memo(function BattleBug({
 
       {/* EYES - void black with orange glow */}
       <g filter="url(#battleGlow)">
-        <ellipse cx="40" cy="24" rx="6" ry="8" fill={DF.void} />
-        <ellipse cx="60" cy="24" rx="6" ry="8" fill={DF.void} />
+        <ellipse cx="40" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
+        <ellipse cx="60" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
         <ellipse cx="40" cy="24" rx="4" ry="5" fill={infected} opacity="0.7" />
         <ellipse cx="60" cy="24" rx="4" ry="5" fill={infected} opacity="0.7" />
         <ellipse cx="38" cy="22" rx="2" ry="2.5" fill={infectedBright} opacity="0.8" />
@@ -665,12 +656,12 @@ export const BattleBug = memo(function BattleBug({
  * - Exhaling smoke
  */
 const DeadBugCreature = memo(function DeadBugCreature({ size = 120 }: { size?: number }) {
-  const shell = '#3a3055'
-  const shellMid = '#2a2040'
-  const shellDark = '#1a1525'
-  const mask = '#4a4565'
-  const infected = '#ff6b35'
-  const infectedDim = '#cc4420'
+  const shell = DARK_FANTASY.shell
+  const shellMid = DARK_FANTASY.shellMid
+  const shellDark = DARK_FANTASY.shellDark
+  const mask = DARK_FANTASY.bugMask
+  const infected = DARK_FANTASY.infected
+  const infectedDim = DARK_FANTASY.infectedDark
 
   return (
     <svg
@@ -704,11 +695,11 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 120 }: { size?: n
       </g>
 
       {/* BODY - dimmed */}
-      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#deadShellGrad)" stroke={DF.void} strokeWidth="1.5" opacity="0.8" />
-      <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DF.void} strokeWidth="1" opacity="0.8" />
+      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#deadShellGrad)" stroke={DARK_FANTASY.void} strokeWidth="1.5" opacity="0.8" />
+      <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DARK_FANTASY.void} strokeWidth="1" opacity="0.8" />
 
       {/* HEAD/MASK */}
-      <ellipse cx="50" cy="26" rx="18" ry="15" fill={mask} stroke={DF.void} strokeWidth="1" opacity="0.8" />
+      <ellipse cx="50" cy="26" rx="18" ry="15" fill={mask} stroke={DARK_FANTASY.void} strokeWidth="1" opacity="0.8" />
 
       {/* MANDIBLES - drooped */}
       <path d="M36,32 Q30,42 28,52" fill="none" stroke={shell} strokeWidth="5" strokeLinecap="round" opacity="0.6" />
@@ -719,8 +710,8 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 120 }: { size?: n
       <path d="M62,14 Q70,20 76,28" fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" opacity="0.5" />
 
       {/* CLOSED EYES - dimmed */}
-      <ellipse cx="40" cy="24" rx="5" ry="4" fill={DF.void} opacity="0.8" />
-      <ellipse cx="60" cy="24" rx="5" ry="4" fill={DF.void} opacity="0.8" />
+      <ellipse cx="40" cy="24" rx="5" ry="4" fill={DARK_FANTASY.void} opacity="0.8" />
+      <ellipse cx="60" cy="24" rx="5" ry="4" fill={DARK_FANTASY.void} opacity="0.8" />
       <ellipse cx="40" cy="24" rx="3" ry="2" fill={infectedDim} opacity="0.4" />
       <ellipse cx="60" cy="24" rx="3" ry="2" fill={infectedDim} opacity="0.4" />
 
@@ -751,17 +742,17 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 120 }: { size?: n
 
       {/* SMOKE/STEAM - rising from body */}
       <g opacity="0.4">
-        <ellipse cx="45" cy="35" rx="3" ry="2" fill="#aaa">
+        <ellipse cx="45" cy="35" rx="3" ry="2" fill={DARK_FANTASY.dust}>
           <animate attributeName="cy" values="40;25;40" dur="3s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.4;0;0.4" dur="3s" repeatCount="indefinite" />
           <animate attributeName="rx" values="3;6;3" dur="3s" repeatCount="indefinite" />
         </ellipse>
-        <ellipse cx="55" cy="38" rx="2.5" ry="1.5" fill="#999">
+        <ellipse cx="55" cy="38" rx="2.5" ry="1.5" fill={DARK_FANTASY.dustDark}>
           <animate attributeName="cy" values="42;28;42" dur="3.5s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.35;0;0.35" dur="3.5s" repeatCount="indefinite" />
           <animate attributeName="rx" values="2.5;5;2.5" dur="3.5s" repeatCount="indefinite" />
         </ellipse>
-        <ellipse cx="50" cy="32" rx="2" ry="1.5" fill="#bbb">
+        <ellipse cx="50" cy="32" rx="2" ry="1.5" fill={DARK_FANTASY.dustLight}>
           <animate attributeName="cy" values="36;22;36" dur="4s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="0.3;0;0.3" dur="4s" repeatCount="indefinite" />
           <animate attributeName="rx" values="2;4;2" dur="4s" repeatCount="indefinite" />
@@ -780,14 +771,14 @@ const SlashEffect = memo(function SlashEffect() {
       viewBox="0 0 150 100"
       aria-hidden="true"
       style={{
-        filter: `drop-shadow(0 0 10px ${DF.ethereal}) drop-shadow(0 0 20px ${DF.bone})`
+        filter: `drop-shadow(0 0 10px ${DARK_FANTASY.ethereal}) drop-shadow(0 0 20px ${DARK_FANTASY.bone})`
       }}
     >
       <defs>
         <linearGradient id="slashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor={DF.bone} stopOpacity="1" />
-          <stop offset="50%" stopColor={DF.ethereal} stopOpacity="0.8" />
-          <stop offset="100%" stopColor={DF.ethereal} stopOpacity="0" />
+          <stop offset="0%" stopColor={DARK_FANTASY.bone} stopOpacity="1" />
+          <stop offset="50%" stopColor={DARK_FANTASY.ethereal} stopOpacity="0.8" />
+          <stop offset="100%" stopColor={DARK_FANTASY.ethereal} stopOpacity="0" />
         </linearGradient>
       </defs>
       {/* Main slash arc */}
@@ -807,7 +798,7 @@ const SlashEffect = memo(function SlashEffect() {
       <path
         d="M10,85 Q50,30 105,15"
         fill="none"
-        stroke={DF.bone}
+        stroke={DARK_FANTASY.bone}
         strokeWidth="3"
         strokeLinecap="round"
         opacity="0.5"
@@ -842,14 +833,14 @@ const ImpactBurst = memo(function ImpactBurst() {
         cx="40"
         cy="40"
         r="15"
-        fill={DF.bone}
+        fill={DARK_FANTASY.bone}
         style={{ animation: 'flashPulse 150ms ease-out forwards' }}
       />
       <circle
         cx="40"
         cy="40"
         r="8"
-        fill={DF.ethereal}
+        fill={DARK_FANTASY.ethereal}
         style={{ animation: 'flashPulse 100ms ease-out forwards' }}
       />
 
@@ -866,7 +857,7 @@ const ImpactBurst = memo(function ImpactBurst() {
             y1="40"
             x2={endX}
             y2={endY}
-            stroke={i % 2 === 0 ? DF.bone : DF.ethereal}
+            stroke={i % 2 === 0 ? DARK_FANTASY.bone : DARK_FANTASY.ethereal}
             strokeWidth="2"
             strokeLinecap="round"
             style={{
@@ -882,7 +873,7 @@ const ImpactBurst = memo(function ImpactBurst() {
 
 // EXPLOSIVE Death particles - more dramatic, more particles, bigger explosion
 const DeathParticles = memo(function DeathParticles() {
-  const orangeColors = ['#ff7b00', '#ff9500', '#ffaa00', '#cc5500', '#ff6b35', '#ff4400']
+  const orangeColors = [DARK_FANTASY.flameOrange, DARK_FANTASY.flameAmber, DARK_FANTASY.flameYellow, DARK_FANTASY.flameDeep, DARK_FANTASY.infected, DARK_FANTASY.flameRed]
 
   // Core explosion particles - burst outward
   const burstParticles = Array.from({ length: 20 }, (_, i) => {
@@ -926,7 +917,7 @@ const DeathParticles = memo(function DeathParticles() {
         style={{
           width: 60,
           height: 60,
-          background: 'radial-gradient(circle, #fff 0%, #ff9500 40%, #ff6b35 70%, transparent 100%)',
+          background: `radial-gradient(circle, ${DARK_FANTASY.white} 0%, ${DARK_FANTASY.flameAmber} 40%, ${DARK_FANTASY.infected} 70%, transparent 100%)`,
           animation: 'explosionFlash 200ms ease-out forwards',
         }}
       />
@@ -975,8 +966,8 @@ const DeathParticles = memo(function DeathParticles() {
           style={{
             width: p.size,
             height: p.size * 3,
-            backgroundColor: '#fff',
-            boxShadow: '0 0 4px #ff9500',
+            backgroundColor: DARK_FANTASY.white,
+            boxShadow: `0 0 4px ${DARK_FANTASY.flameAmber}`,
             opacity: 0,
             animation: `sparkFly 250ms ease-out ${p.delay}ms forwards`,
             ['--end-x' as string]: `${p.endX}px`,
@@ -991,7 +982,7 @@ const DeathParticles = memo(function DeathParticles() {
 
 // Blood Splatter - orange infection blood spraying on hit
 const BloodSplatter = memo(function BloodSplatter() {
-  const bloodColors = ['#ff6b35', '#ff4400', '#cc3300', '#ff7b00']
+  const bloodColors = [DARK_FANTASY.infected, DARK_FANTASY.flameRed, DARK_FANTASY.bloodDark, DARK_FANTASY.flameOrange]
 
   // Main blood drops
   const drops = Array.from({ length: 16 }, (_, i) => {
@@ -1063,7 +1054,7 @@ const BloodSplatter = memo(function BloodSplatter() {
 // Blood Pool - orange/green infection blood that stays on the "floor"
 const BloodPool = memo(function BloodPool() {
   // SATURATED infected blood - bright greens and oranges
-  const poolColors = ['#ff5500', '#00ff44', '#ff7700', '#33ff66', '#ee4400', '#22ee55']
+  const poolColors = [DARK_FANTASY.poolOrange, DARK_FANTASY.poolGreen, DARK_FANTASY.poolAmber, DARK_FANTASY.poolGreenLight, DARK_FANTASY.poolRed, DARK_FANTASY.poolGreenMid]
 
   // Main pool blobs - spread LEFT from right edge
   const pools = Array.from({ length: 8 }, (_, i) => ({
