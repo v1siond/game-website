@@ -724,7 +724,7 @@ export const ProfessionStage = memo(function ProfessionStage({ profession, p }: 
   const Ornaments = ORNAMENTS_FOR[profession]
   return (
     <div className="fixed inset-0 pointer-events-none z-[0] overflow-hidden" aria-hidden="true">
-      {/* z-[0]: sits BELOW the z-[1] HollowDepths columns so instruments read as set
+      {/* z-[0]: sits BELOW the z-[1] VoidDepths columns so instruments read as set
           BEHIND the architecture (was z-[2], which painted them in front of the columns). */}
       <Ornaments p={p} />
     </div>

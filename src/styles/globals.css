@@ -424,7 +424,7 @@ textarea:focus-visible {
   .ornament-layer { display: none !important; }
 }
 
-/* Hollow Knight soul motes — soft drifting lumafly-like specks (GPU transform/opacity). */
+/* Soul motes: soft drifting specks (GPU transform/opacity). */
 .hk-mote {
   position: absolute;
   border-radius: 9999px;

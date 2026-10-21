@@ -3,9 +3,9 @@
 import { memo, useMemo } from 'react'
 import { REALM } from './palette'
 
-// The Frozen Throne backdrop: snow layers, frost wind and the ice field.
+// The frost zone backdrop: snow layers, frost wind and the ice field.
 
-export const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
+export const FrostAtmosphere = memo(function FrostAtmosphere() {
   // Snow layers - reduced counts for performance
   const snowLayers = useMemo(() => ({
     // Far layer - small, slow
@@ -99,7 +99,7 @@ export const FrozenThroneAtmosphere = memo(function FrozenThroneAtmosphere() {
         <ellipse cx="500" cy="120" rx="180" ry="100" fill={REALM.frostIceBright} filter="url(#iceGlow)" opacity="0.2" />
         <ellipse cx="500" cy="100" rx="80" ry="50" fill={REALM.frostIceBright} filter="url(#iceGlow)" opacity="0.35" />
 
-        {/* The Frozen Throne structure - NO BLUR, higher opacity */}
+        {/* The frozen spire - NO BLUR, higher opacity */}
         <g transform="translate(500, 80)" opacity="0.75">
           {/* Throne base - massive ice platform with ice-blue tint */}
           <polygon points="-200,320 -170,220 -130,250 -80,160 -40,190 0,100 40,190 80,160 130,250 170,220 200,320" fill={REALM.night21} />

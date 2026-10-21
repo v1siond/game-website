@@ -1,6 +1,6 @@
 import { REALM } from './palette'
 
-// The infernal golem, the rock creature with fel fire joints that lands in the Reign of Chaos zone.
+// The infernal golem, the rock creature with fel fire joints that lands in the chaos zone.
 
 interface InfernalGolemProps {
   id: string

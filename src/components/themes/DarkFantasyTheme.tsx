@@ -315,7 +315,7 @@ const StoneFormations = memo(function StoneFormations() {
 // light) so there's a clear floor/wall read, framed by interior columns and hanging
 // soul-lamps, distant towers beyond, fog and drifting soul motes. Profession floor props
 // layer on top. Static SVG + CSS motes only (no scroll work).
-const HollowDepths = memo(function HollowDepths() {
+const VoidDepths = memo(function VoidDepths() {
   const motes = useMemo(
     () =>
       Array.from({ length: 18 }, (_, i) => ({
@@ -1732,7 +1732,7 @@ export default function DarkFantasyTheme() {
           `,
         }}
       />
-      <HollowDepths />
+      <VoidDepths />
       <EtherealRain />
       <DarkFantasyAtmosphere />
       <SpiritParticles />

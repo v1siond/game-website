@@ -4,9 +4,9 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { REALM } from './palette'
 import { InfernalGolemSVG } from './character'
 
-// The Reign of Chaos backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
+// The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
 
-export const ReignOfChaosAtmosphere = memo(function ReignOfChaosAtmosphere() {
+export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
   const lightningActive = false
   const lightningX = 50
   const cloudGlow = 0

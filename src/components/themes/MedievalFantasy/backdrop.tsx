@@ -2,10 +2,10 @@
 
 import { memo, useEffect, useState } from 'react'
 import { REALM } from './palette'
-import { ReignOfChaosAtmosphere } from './reignOfChaos'
-import { FrozenThroneAtmosphere } from './frozenThrone'
+import { ChaosAtmosphere } from './chaosZone'
+import { FrostAtmosphere } from './frostZone'
 
-// The fixed backdrop behind the page: the Reign of Chaos zone fades into the Frozen Throne as the page scrolls.
+// The fixed backdrop behind the page: the chaos zone fades into the frost zone as the page scrolls.
 
 export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -39,12 +39,12 @@ export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
 
       {/* REIGN OF CHAOS atmosphere */}
       <div style={{ position: 'absolute', inset: 0, opacity: rocOpacity, transition: 'opacity 0.5s ease' }}>
-        <ReignOfChaosAtmosphere />
+        <ChaosAtmosphere />
       </div>
 
       {/* FROZEN THRONE atmosphere */}
       <div style={{ position: 'absolute', inset: 0, opacity: ftOpacity, transition: 'opacity 0.5s ease' }}>
-        <FrozenThroneAtmosphere />
+        <FrostAtmosphere />
       </div>
 
       {/* Vignette (always visible) */}
