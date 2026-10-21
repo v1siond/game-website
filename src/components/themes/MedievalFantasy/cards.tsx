@@ -1,0 +1,101 @@
+import type { CSSProperties } from 'react'
+import type { Job } from '@/lib/cv/content'
+import type { ProjectSlot } from '@/components/cv/ProjectList'
+import type { BandSlot } from '@/components/cv/BandList'
+import { jobYears, RELEASED } from '@/components/cv/sectionText'
+import { WC3 } from './palette'
+import { InnerCard } from './panels'
+import { WC3Button } from './actions'
+
+// One card per job, project and band, read from the shared section slots.
+
+export const CARD_TITLE: CSSProperties = { color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.125rem' }
+export const CARD_SUBTITLE: CSSProperties = { color: WC3.goldMid, fontSize: '0.875rem', marginBottom: '0.25rem' }
+export const CARD_BODY: CSSProperties = { color: WC3.textMid, fontSize: '1rem', marginBottom: '0.25rem' }
+export const CARD_CHIP: CSSProperties = {
+  background: WC3.roc.felDark + '40',
+  color: WC3.roc.felBright,
+  fontSize: '0.875rem',
+  padding: '0.125rem 0.25rem',
+  textTransform: 'uppercase',
+}
+
+function jobYearsLabel(job: Job): string {
+  const { start, end } = jobYears(job, 'Present')
+  return `${start} - ${end}`
+}
+
+export function JobCard({ job }: { job: Job }) {
+  return (
+    <InnerCard highlight={job.endDate === null} zone="roc">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '0.375rem' }}>
+        <div>
+          <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{job.title}</h3>
+          <p style={{ color: WC3.goldMid, fontSize: '0.875rem' }}>{job.company}</p>
+        </div>
+        <span style={{ color: WC3.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYearsLabel(job)}</span>
+      </div>
+      {job.description && <p style={{ color: WC3.textMid, fontSize: '0.875rem' }}>{job.description}</p>}
+      {job.highlights.length > 0 && (
+        <ul style={{ listStyle: 'none', padding: 0, margin: '0.375rem 0 0 0' }}>
+          {job.highlights.map((highlight) => (
+            <li key={highlight} style={{ color: WC3.textMid, fontSize: '0.875rem', paddingLeft: '0.75rem', position: 'relative', marginBottom: '0.125rem' }}>
+              <span style={{ position: 'absolute', left: 0, color: WC3.goldDark }} aria-hidden="true">›</span>{highlight}
+            </li>
+          ))}
+        </ul>
+      )}
+      {job.skills.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.5rem' }}>
+          {job.skills.map((skill) => (
+            <span key={skill} style={CARD_CHIP}>{skill}</span>
+          ))}
+        </div>
+      )}
+    </InnerCard>
+  )
+}
+
+export function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
+  return (
+    <InnerCard zone="ft">
+      <h3 style={CARD_TITLE}>{project.name}</h3>
+      <p style={CARD_SUBTITLE}>
+        {project.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      <p style={CARD_BODY}>{project.tagline}</p>
+      {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '1rem', fontWeight: 500 }}>{project.impact}</p>}
+      {links.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
+          {links.map(({ kind, label, linkProps }) => (
+            <WC3Button key={kind} linkProps={linkProps} zone="ft">{label}</WC3Button>
+          ))}
+        </div>
+      )}
+    </InnerCard>
+  )
+}
+
+export function BandCard({ band, years, linkProps }: BandSlot) {
+  return (
+    <InnerCard zone="ft">
+      <h3 style={CARD_TITLE}>
+        {linkProps ? (
+          <a {...linkProps} style={{ color: WC3.textBright, textDecoration: 'underline', textUnderlineOffset: '3px' }}>{band.name}</a>
+        ) : band.name}
+      </h3>
+      <p style={CARD_SUBTITLE}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      {band.release && (
+        <p style={CARD_BODY}>
+          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
+    </InnerCard>
+  )
+}
