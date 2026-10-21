@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
-import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobYears } from '@/components/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -8,10 +7,10 @@ import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
 // Silhouette's panels and cards: near black slabs with a hard black offset shadow, the way a silhouette
-// game frames its few words, and the entries that sit in them (a job, a project, a venture, a band).
+// game frames its few words, the section header, the tech stack, and the job and project cards the
+// ropes (./ropes) and the spider's webbing (./spider) hold.
 
 const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--sh-glow)]'
-const CARD_LINK = `group block transition-transform hover:translate-x-0.5 hover:translate-y-0.5 motion-reduce:transition-none ${LINK_FOCUS}`
 const CARD_TITLE = 'text-sm font-bold uppercase tracking-wider text-[color:var(--sh-text)]'
 const CARD_META = 'text-sm tracking-wider text-[color:var(--sh-dim)]'
 const CARD_BODY = 'text-sm leading-relaxed text-[color:var(--sh-muted)]'
@@ -30,11 +29,11 @@ function Card({ children }: { children: ReactNode }) {
   return <div className={`relative h-full border-2 border-[color:var(--sh-black)] p-4 ${world.card}`}>{children}</div>
 }
 
-export function SectionHeader({ title }: { title: string }) {
+export function SectionHeader({ id, title }: { id: string; title: string }) {
   return (
     <div className="mb-4 flex items-center gap-3">
       <div className="h-px flex-1 bg-[color:var(--sh-fog)]" aria-hidden="true" />
-      <h2 className={`text-sm uppercase tracking-[0.4em] text-[color:var(--sh-muted)] ${TYPEWRITER}`}>{title}</h2>
+      <h2 id={id} className={`text-sm uppercase tracking-[0.4em] text-[color:var(--sh-muted)] ${TYPEWRITER}`}>{title}</h2>
       <div className="h-px flex-1 bg-[color:var(--sh-fog)]" aria-hidden="true" />
     </div>
   )
@@ -147,55 +146,5 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         </div>
       )}
     </Card>
-  )
-}
-
-export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  const content = (
-    <Card>
-      <div className="mb-1 flex items-start gap-2">
-        <span className="grayscale" aria-hidden="true">
-          {company.icon}
-        </span>
-        <div>
-          <h3 className={`${CARD_TITLE} group-hover:underline`}>{company.name}</h3>
-          <p className={CARD_META}>{company.tagline}</p>
-        </div>
-      </div>
-      <p className={CARD_BODY}>{company.description}</p>
-    </Card>
-  )
-
-  if (!company.url) return content
-  return (
-    <a href={company.url} target="_blank" rel="noopener noreferrer" className={CARD_LINK}>
-      {content}
-    </a>
-  )
-}
-
-export function BandCard({ band, years, linkProps }: BandSlot) {
-  const { links } = useLabels()
-  const content = (
-    <Card>
-      <h3 className={`${CARD_TITLE} group-hover:underline`}>{band.name}</h3>
-      <p className={`mt-0.5 ${CARD_META}`}>
-        {band.role}
-        {years && <span aria-hidden="true"> | </span>}
-        {years}
-      </p>
-      {band.release && (
-        <p className={`mt-1.5 ${CARD_BODY}`}>
-          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
-        </p>
-      )}
-    </Card>
-  )
-
-  if (!linkProps) return content
-  return (
-    <a {...linkProps} className={CARD_LINK}>
-      {content}
-    </a>
   )
 }

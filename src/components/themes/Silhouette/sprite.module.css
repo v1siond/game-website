@@ -1,0 +1,426 @@
+/*
+ * His sprite's poses (character.tsx). Every part turns round its own joint, given in the sprite's
+ * viewBox units (transform-box: view-box): the shoulders at y 24.5, the hips at y 39.5, the neck at
+ * y 20.5 and the feet at y 63. He faces right, so a negative turn swings a limb forward. Transforms only.
+ *
+ * - idle: the chest rises and falls, the two lit eyes blink.
+ * - run: a heavy run, legs and arms in opposition, a forward lean and a bob that lands on each step.
+ * - push: leaning into the load, arms out straight, short slow steps (a crate, a lever, a door).
+ * - fall: the knees go, he pitches forward onto the ground; lie holds him there; rise gets him up in
+ *   three beats, onto his hands, up to one knee, standing with a small settle.
+ * - act: one action per profession, typing, drumming, the roundhouse kick from a high guard.
+ */
+
+.sprite {
+  overflow: visible;
+}
+
+.sprite g {
+  transform-box: view-box;
+}
+
+.whole {
+  transform-origin: 20px 63px;
+}
+
+.armBack {
+  transform-origin: 16.4px 24.5px;
+}
+
+.armFront {
+  transform-origin: 23.4px 24.5px;
+}
+
+.legBack {
+  transform-origin: 18.2px 39.5px;
+}
+
+.legFront {
+  transform-origin: 21.8px 39.5px;
+}
+
+.body {
+  transform-origin: 20px 40px;
+}
+
+.head {
+  transform-origin: 20px 20.5px;
+}
+
+.eye {
+  transform-origin: 23px 11.4px;
+}
+
+/* His eyes glance toward the visitor's pointer. */
+.look {
+  transform: translate(calc(var(--mx, 0) * 0.8px), calc(var(--my, 0) * 0.6px));
+  transition: transform 0.4s ease-out;
+}
+
+/* ---- idle ---- */
+
+.idle .body {
+  animation: breathe 3.6s ease-in-out infinite;
+}
+
+.sprite .eye {
+  animation: blink 5.2s steps(1, end) infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(1.025);
+  }
+}
+
+@keyframes blink {
+  0%,
+  95% {
+    transform: scaleY(1);
+  }
+  96%,
+  98% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* ---- run ---- */
+
+.run .whole {
+  animation: run-bob 0.62s linear infinite;
+}
+
+.run .body {
+  transform: rotate(8deg);
+}
+
+.run .legFront,
+.run .armBack {
+  animation: run-swing 0.62s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.run .legBack,
+.run .armFront {
+  animation: run-swing 0.62s cubic-bezier(0.45, 0, 0.55, 1) infinite reverse;
+}
+
+@keyframes run-swing {
+  0%,
+  100% {
+    transform: rotate(-36deg);
+  }
+  50% {
+    transform: rotate(32deg);
+  }
+}
+
+@keyframes run-bob {
+  0%,
+  50%,
+  100% {
+    transform: translateY(0.9px);
+  }
+  25%,
+  75% {
+    transform: translateY(-1.5px);
+  }
+}
+
+/* ---- push ---- */
+
+.push .body {
+  transform: rotate(18deg);
+}
+
+.push .armFront,
+.push .armBack {
+  animation: push-shove 1.4s ease-in-out infinite;
+}
+
+.push .legBack {
+  animation: push-step-back 1.4s ease-in-out infinite;
+}
+
+.push .legFront {
+  animation: push-step-front 1.4s ease-in-out infinite;
+}
+
+@keyframes push-shove {
+  0%,
+  100% {
+    transform: rotate(-78deg);
+  }
+  50% {
+    transform: rotate(-70deg);
+  }
+}
+
+@keyframes push-step-back {
+  0%,
+  100% {
+    transform: rotate(28deg);
+  }
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes push-step-front {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+/* ---- fall, lie, rise ---- */
+
+.fall .whole {
+  animation: fall 0.7s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+.fall .armFront,
+.fall .armBack {
+  animation: flail 0.7s ease-out forwards;
+}
+
+.lie .whole {
+  transform: rotate(90deg);
+}
+
+.lie .armFront,
+.lie .armBack {
+  transform: rotate(-30deg);
+}
+
+.rise .whole {
+  animation: rise 1.3s ease-out forwards;
+}
+
+.rise .armFront,
+.rise .armBack {
+  animation: rise-arms 1.3s ease-out forwards;
+}
+
+.rise .legFront {
+  animation: rise-knee 1.3s ease-out forwards;
+}
+
+@keyframes fall {
+  0% {
+    transform: rotate(0deg);
+  }
+  35% {
+    transform: rotate(14deg) translateY(1.5px);
+  }
+  100% {
+    transform: rotate(90deg);
+  }
+}
+
+@keyframes flail {
+  0% {
+    transform: rotate(0deg);
+  }
+  45% {
+    transform: rotate(-130deg);
+  }
+  100% {
+    transform: rotate(-30deg);
+  }
+}
+
+@keyframes rise {
+  0%,
+  20% {
+    transform: rotate(90deg);
+  }
+  45% {
+    transform: rotate(60deg);
+  }
+  72% {
+    transform: rotate(16deg);
+  }
+  86% {
+    transform: rotate(-4deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes rise-arms {
+  0% {
+    transform: rotate(-30deg);
+  }
+  30% {
+    transform: rotate(-95deg);
+  }
+  60% {
+    transform: rotate(-40deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes rise-knee {
+  0%,
+  45% {
+    transform: rotate(0deg);
+  }
+  65% {
+    transform: rotate(-70deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+/* ---- act: the System Engineer types ---- */
+
+.act.engineer .body {
+  transform: rotate(6deg);
+}
+
+.act.engineer .armFront {
+  animation: type-a 0.34s ease-in-out infinite alternate;
+}
+
+.act.engineer .armBack {
+  animation: type-b 0.34s ease-in-out infinite alternate;
+}
+
+@keyframes type-a {
+  from {
+    transform: rotate(-64deg);
+  }
+  to {
+    transform: rotate(-56deg);
+  }
+}
+
+@keyframes type-b {
+  from {
+    transform: rotate(-56deg);
+  }
+  to {
+    transform: rotate(-64deg);
+  }
+}
+
+/* ---- act: the Musician drums ---- */
+
+.act.drummer .armFront {
+  animation: drum-hit 0.5s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+
+.act.drummer .armBack {
+  animation: drum-hit 0.5s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+  animation-delay: -0.25s;
+}
+
+.act.drummer .head {
+  animation: drum-nod 0.5s ease-in-out infinite;
+}
+
+@keyframes drum-hit {
+  0%,
+  100% {
+    transform: rotate(-72deg);
+  }
+  45% {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes drum-nod {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+/* ---- act: the Martial Artist, a high guard and the roundhouse kick ---- */
+
+.act.fighter .armFront {
+  transform: rotate(-150deg);
+}
+
+.act.fighter .armBack {
+  animation: kick-guard 1.8s ease-in-out infinite;
+}
+
+.act.fighter .legFront {
+  animation: kick 1.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+
+.act.fighter .body {
+  animation: kick-lean 1.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+
+@keyframes kick {
+  0%,
+  35%,
+  85%,
+  100% {
+    transform: rotate(0deg);
+  }
+  52% {
+    transform: rotate(-104deg);
+  }
+  62% {
+    transform: rotate(-96deg);
+  }
+}
+
+@keyframes kick-lean {
+  0%,
+  35%,
+  85%,
+  100% {
+    transform: rotate(0deg);
+  }
+  52%,
+  62% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes kick-guard {
+  0%,
+  35%,
+  85%,
+  100% {
+    transform: rotate(-140deg);
+  }
+  52%,
+  62% {
+    transform: rotate(-30deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite *,
+  .sprite .eye {
+    animation: none !important;
+  }
+
+  .fall .whole {
+    transform: rotate(90deg);
+  }
+
+  .look {
+    transform: none;
+    transition: none;
+  }
+}

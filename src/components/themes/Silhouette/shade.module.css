@@ -1,0 +1,533 @@
+/*
+ * Silhouette's scenes and mechanics: the death cut, the four plane lean, the props that move in each
+ * place, the wake iris, the lever, the hanging jobs, the spider and its veils, the rooftop signs, the
+ * gravity switch and the trap in the clearing. Transform and opacity only; every loop stops under
+ * reduced motion, and every reveal shows its last frame. The pointer arrives as --mx and --my (-1 to 1,
+ * usePointerVars on the world root), a reveal's order as --i, set on the element.
+ */
+
+/* ---- the death cut (cut.tsx) ---- */
+
+.cutFade {
+  transition: opacity 620ms ease-in;
+}
+
+/* ---- the four planes lean against the pointer (depth.tsx), the near one most ---- */
+
+.leanFar,
+.leanMid,
+.leanPlane,
+.leanNear {
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+.leanFar {
+  transform: translate3d(calc(var(--mx, 0) * -4px), calc(var(--my, 0) * -2px), 0);
+}
+
+.leanMid {
+  transform: translate3d(calc(var(--mx, 0) * -10px), calc(var(--my, 0) * -4px), 0);
+}
+
+.leanPlane {
+  transform: translate3d(calc(var(--mx, 0) * -16px), calc(var(--my, 0) * -5px), 0);
+}
+
+.leanNear {
+  transform: translate3d(calc(var(--mx, 0) * -30px), calc(var(--my, 0) * -9px), 0);
+}
+
+/* ---- the props of each place (places.tsx, wake.tsx) ---- */
+
+.spin,
+.spinBack,
+.lampSwing,
+.ropeSway,
+.bagSwing,
+.sway,
+.cymbal,
+.piston {
+  transform-box: fill-box;
+}
+
+.spin {
+  transform-origin: center;
+  animation: spin 18s linear infinite;
+}
+
+.spinBack {
+  transform-origin: center;
+  animation: spin 9s linear infinite reverse;
+}
+
+.piston {
+  transform-origin: center bottom;
+  animation: piston 2.4s ease-in-out infinite;
+}
+
+.lampSwing,
+.ropeSway,
+.bagSwing {
+  transform-origin: center top;
+}
+
+.lampSwing {
+  animation: swing-small 4.2s ease-in-out infinite;
+}
+
+.ropeSway {
+  animation: swing-small 6s ease-in-out infinite;
+}
+
+.bagSwing {
+  animation: bag-swing 1.8s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+
+.lampFlicker {
+  animation: flicker 5s steps(1, end) infinite;
+}
+
+.screenGlow {
+  animation: screen-glow 2.6s ease-in-out infinite;
+}
+
+.cymbal {
+  transform-origin: center;
+  animation: cymbal 0.5s ease-out infinite;
+}
+
+.birds {
+  animation: birds 22s linear infinite;
+}
+
+.sway {
+  transform-origin: center bottom;
+  animation: swing-small 3.4s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes piston {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes swing-small {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+/* The bag takes his kick at the kick's peak (52% of the same 1.8s) and swings away. */
+@keyframes bag-swing {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+  60% {
+    transform: rotate(-16deg);
+  }
+  72% {
+    transform: rotate(8deg);
+  }
+  84% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  41% {
+    opacity: 0.3;
+  }
+  43% {
+    opacity: 1;
+  }
+  47% {
+    opacity: 0.5;
+  }
+  49% {
+    opacity: 1;
+  }
+}
+
+@keyframes screen-glow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes cymbal {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes birds {
+  from {
+    transform: translateX(-160px);
+  }
+  to {
+    transform: translateX(640px);
+  }
+}
+
+/* ---- the wake (wake.tsx): an iris of light opens on the black ---- */
+
+.irisBlack {
+  transition: opacity 1.4s ease-out;
+}
+
+.iris {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 200vmax var(--sh-black);
+  transform: scale(0);
+  transition: transform 1.3s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.irisOpen {
+  transform: scale(60);
+}
+
+.titleIn {
+  transition:
+    opacity 0.9s ease-out,
+    transform 0.9s ease-out;
+}
+
+/* ---- the lever switch (levers.tsx) ---- */
+
+.leverHandle {
+  transform-box: view-box;
+  transform-origin: 24px 46px;
+  transform: rotate(-38deg);
+  transition: transform 300ms cubic-bezier(0.5, 0, 0.6, 1.4);
+}
+
+.leverPulled {
+  transform: rotate(38deg);
+}
+
+/* ---- the hanging jobs (ropes.tsx): each drops on its rope once, then swings when touched ---- */
+
+.drop {
+  opacity: 0;
+  transform: translateY(-3rem);
+}
+
+.dropped {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.4s ease-out calc(var(--i, 0) * 110ms),
+    transform 0.7s cubic-bezier(0.3, 1.5, 0.5, 1) calc(var(--i, 0) * 110ms);
+}
+
+.hang {
+  transform-origin: 50% -1.5rem;
+}
+
+.swingLeft {
+  animation: rope-swing-left 1.6s ease-out;
+}
+
+.swingRight {
+  animation: rope-swing-right 1.6s ease-out;
+}
+
+@keyframes rope-swing-left {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-3deg);
+  }
+  45% {
+    transform: rotate(2deg);
+  }
+  70% {
+    transform: rotate(-1deg);
+  }
+}
+
+@keyframes rope-swing-right {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(3deg);
+  }
+  45% {
+    transform: rotate(-2deg);
+  }
+  70% {
+    transform: rotate(1deg);
+  }
+}
+
+/* ---- the spider (spider.tsx): legs reach in from the edge and pull the veils off ---- */
+
+.spider {
+  transform: translate3d(40%, -60%, 0);
+  transition: transform 0.7s cubic-bezier(0.6, 0, 0.3, 1);
+}
+
+.spiderIn {
+  transform: translate3d(0, 0, 0);
+}
+
+.spiderGone {
+  transform: translate3d(50%, -90%, 0);
+  transition-duration: 0.9s;
+}
+
+.leg {
+  transform-box: view-box;
+  transform-origin: 150px 30px;
+  transform: rotate(-24deg);
+  transition: transform 0.5s cubic-bezier(0.5, 0, 0.3, 1.3) calc(var(--i, 0) * 70ms);
+}
+
+.legReach {
+  transform: rotate(0deg);
+}
+
+.legPull {
+  transform: rotate(-14deg);
+}
+
+.veil {
+  transition:
+    transform 0.6s cubic-bezier(0.6, 0, 0.4, 1) calc(var(--i, 0) * 90ms),
+    opacity 0.6s ease-in calc(var(--i, 0) * 90ms);
+}
+
+.veilOff {
+  opacity: 0;
+  transform: translate3d(12%, -105%, 0) rotate(-4deg);
+}
+
+/* The lantern: a warm pool of light that follows the pointer over the dark of the section. */
+.lantern {
+  transform: translate3d(calc(var(--mx, 0) * 45vw), calc(var(--my, 0) * 45vh), 0);
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* ---- the rooftop signs (signs.tsx): they flicker on once, and short out when touched ---- */
+
+.signOff {
+  opacity: 0;
+}
+
+.signOn {
+  animation: sign-on 0.9s steps(1, end) calc(var(--i, 0) * 180ms) both;
+}
+
+.sign:hover .glow,
+.sign:focus-visible .glow {
+  animation: short-out 0.7s steps(1, end);
+}
+
+@keyframes sign-on {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  30% {
+    opacity: 0.1;
+  }
+  45% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.35;
+  }
+  70%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes short-out {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  15% {
+    opacity: 0.2;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  45% {
+    opacity: 0;
+  }
+  65% {
+    opacity: 0.6;
+  }
+}
+
+/* ---- the gravity switch (gravity.tsx) ---- */
+
+.gravity {
+  transform-box: view-box;
+  transform-origin: 300px 140px;
+  transition: transform 0.6s cubic-bezier(0.55, 0, 1, 0.45);
+}
+
+.gravityFlipped {
+  transform: translateY(-120px) scaleY(-1);
+}
+
+.fallDown {
+  animation: fall-down 0.5s cubic-bezier(0.55, 0, 1, 0.45) calc(var(--i, 0) * 80ms) both;
+}
+
+.fallUp {
+  animation: fall-up 0.5s cubic-bezier(0.55, 0, 1, 0.45) calc(var(--i, 0) * 80ms) both;
+}
+
+@keyframes fall-down {
+  from {
+    opacity: 0;
+    transform: translateY(-2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fall-up {
+  from {
+    opacity: 0;
+    transform: translateY(2rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- the clearing (clearing.tsx): the fog lifts with scroll, the trap springs ---- */
+
+.fogLift {
+  opacity: calc(1 - var(--scene-progress, 0) * 0.85);
+  transform: translateY(calc(var(--scene-progress, 0) * -40%));
+}
+
+.runner {
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.9, 0.6);
+}
+
+.runnerAtTrap {
+  transform: translateX(150px);
+}
+
+.jawBack,
+.jawFront {
+  transform-box: view-box;
+  transform-origin: 450px 176px;
+  transition: transform 120ms cubic-bezier(0.7, 0, 1, 0.5);
+}
+
+.jawBack {
+  transform: rotate(-70deg);
+}
+
+.jawFront {
+  transform: rotate(70deg);
+}
+
+.jawShut {
+  transform: rotate(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin,
+  .spinBack,
+  .piston,
+  .lampSwing,
+  .ropeSway,
+  .bagSwing,
+  .lampFlicker,
+  .screenGlow,
+  .cymbal,
+  .birds,
+  .sway,
+  .swingLeft,
+  .swingRight,
+  .signOn,
+  .sign:hover .glow,
+  .sign:focus-visible .glow,
+  .fallDown,
+  .fallUp {
+    animation: none;
+  }
+
+  .leanFar,
+  .leanMid,
+  .leanPlane,
+  .leanNear,
+  .lantern {
+    transform: none;
+    transition: none;
+  }
+
+  .drop,
+  .signOff {
+    opacity: 1;
+    transform: none;
+  }
+
+  .cutFade,
+  .irisBlack,
+  .iris,
+  .titleIn,
+  .leverHandle,
+  .dropped,
+  .spider,
+  .leg,
+  .veil,
+  .gravity,
+  .runner,
+  .jawBack,
+  .jawFront {
+    transition: none;
+  }
+}
