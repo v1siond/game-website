@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, type ReactNode } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
-import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // Resident Evil actual game palette - from gameplay screenshots
@@ -951,60 +951,58 @@ function MansionDoorFrame() {
   )
 }
 
-// Inventory slot component - sepia item box style
-function InventorySlot({
-  icon,
-  label,
-  sublabel,
-  isSelected,
-  onClick,
-  rarity = 'common',
-}: {
-  icon: string
-  label: string
-  sublabel: string
-  isSelected: boolean
-  onClick: () => void
-  rarity?: 'common' | 'rare' | 'legendary'
-}) {
-  const rarityColor = {
-    common: RE.midBrown,
-    rare: RE.warmGlow,
-    legendary: RE.candlelight,
-  }
+// Inventory slot component - sepia item box style. ProfessionSwitch owns the order (Musician, System
+// Engineer, Martial Artist), the pick and the keyboard; the slot only draws itself.
+type Rarity = 'common' | 'rare' | 'legendary'
+
+const INVENTORY_ITEMS: Record<Profession, { icon: string; sublabel: string; rarity: Rarity }> = {
+  drummer: { icon: '*', sublabel: 'SCORE', rarity: 'rare' },
+  engineer: { icon: '>', sublabel: 'JOURNAL', rarity: 'legendary' },
+  fighter: { icon: '+', sublabel: 'MANUAL', rarity: 'rare' },
+}
+
+const RARITY_COLOR: Record<Rarity, string> = {
+  common: RE.midBrown,
+  rare: RE.warmGlow,
+  legendary: RE.candlelight,
+}
+
+function InventorySlot({ option }: { option: ProfessionOption }) {
+  const { id, label, selected: isSelected, optionProps } = option
+  const { icon, sublabel, rarity } = INVENTORY_ITEMS[id]
+  const rarityColor = RARITY_COLOR[rarity]
 
   return (
     <button
-      onClick={onClick}
-      aria-label={`Select ${label} profession ${isSelected ? '(currently selected)' : ''}`}
-      aria-pressed={isSelected}
-      className="relative aspect-square transition-all duration-200 group"
+      type="button"
+      {...optionProps}
+      className="relative aspect-square transition-all duration-200 group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860]"
       style={{
         background: `linear-gradient(135deg, ${RE.sepia}, ${RE.darkSepia})`,
-        border: `2px solid ${isSelected ? RE.candlelight : rarityColor[rarity]}`,
+        border: `2px solid ${isSelected ? RE.candlelight : rarityColor}`,
         boxShadow: isSelected ? `0 0 20px ${RE.warmGlow}40, inset 0 0 30px ${RE.void}80` : `inset 0 0 30px ${RE.void}60`,
       }}
     >
       {/* Corner notches - item box style */}
-      <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2" style={{ borderColor: rarityColor[rarity] }} />
-      <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2" style={{ borderColor: rarityColor[rarity] }} />
-      <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2" style={{ borderColor: rarityColor[rarity] }} />
-      <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2" style={{ borderColor: rarityColor[rarity] }} />
+      <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2" style={{ borderColor: rarityColor }} aria-hidden="true" />
+      <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2" style={{ borderColor: rarityColor }} aria-hidden="true" />
+      <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2" style={{ borderColor: rarityColor }} aria-hidden="true" />
+      <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2" style={{ borderColor: rarityColor }} aria-hidden="true" />
 
       {/* Content */}
-      <div className="absolute inset-2 flex flex-col items-center justify-center">
+      <div className="absolute inset-2 flex flex-col items-center justify-center" aria-hidden="true">
         <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">{icon}</span>
-        <span className="text-sm tracking-wider text-center uppercase" style={{ color: RE.cream }}>
+        <span className="text-sm tracking-wider text-center uppercase leading-tight" style={{ color: RE.cream }}>
           {label}
         </span>
-        <span className="text-sm mt-1" style={{ color: RE.warmGlow }}>
+        <span className="text-sm mt-1 hidden sm:block" style={{ color: RE.warmGlow }}>
           {sublabel}
         </span>
       </div>
 
       {/* Selected indicator */}
       {isSelected && (
-        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2" aria-hidden="true">
           <span style={{ color: RE.candlelight }}>▼</span>
         </div>
       )}
@@ -1012,51 +1010,71 @@ function InventorySlot({
   )
 }
 
-// Document/File component - worn paper file style
-function DocumentItem({ title, content, isOpen, onToggle }: {
-  title: string
-  content: string
-  isOpen: boolean
-  onToggle: () => void
-}) {
+// Project file - worn paper file style. The name, his role, the years and the links are always on the
+// file; opening it reads the description and the result line.
+function ProjectFile({ slot: { project, years, links }, isOpen, onToggle }: { slot: ProjectSlot; isOpen: boolean; onToggle: () => void }) {
+  const bodyId = `file-${project.id}`
+
   return (
-    <div
-      className="transition-all cursor-pointer"
-      style={{ background: RE.sepia, border: `1px solid ${RE.midBrown}` }}
-      onClick={onToggle}
-    >
-      <div
-        className="px-4 py-3 flex items-center justify-between"
-        style={{ borderBottom: isOpen ? `1px solid ${RE.midBrown}` : 'none' }}
-      >
-        <span className="text-sm flex items-center gap-2" style={{ color: RE.cream }}>
-          <span style={{ color: RE.warmGlow }}>[FILE]</span>
-          {title}
-        </span>
-        <span style={{ color: RE.candlelight }}>{isOpen ? '▼' : '▶'}</span>
+    <article style={{ background: RE.sepia, border: `1px solid ${RE.midBrown}` }}>
+      <div className="px-4 py-3" style={{ borderBottom: isOpen ? `1px solid ${RE.midBrown}` : 'none' }}>
+        <div className="flex items-start justify-between gap-3">
+          <h3 className="text-sm flex items-center gap-2" style={{ color: RE.cream }}>
+            <span style={{ color: RE.warmGlow }} aria-hidden="true">[FILE]</span>
+            {project.name}
+          </h3>
+          {years && <span className="text-sm whitespace-nowrap" style={{ color: RE.candlelight }}>{years}</span>}
+        </div>
+        <p className="text-sm mt-1" style={{ color: RE.warmGlow }}>{project.role}</p>
+        <p className="text-sm mt-1" style={{ color: RE.fog }}>{project.tagline}</p>
+        <div className="flex flex-wrap items-center gap-2 mt-2">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-wider transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860] border border-[#c49050] text-[#e8a860] bg-[#6b4030]/40"
+            >
+              [{label.toUpperCase()}]
+            </a>
+          ))}
+          {links.length === 0 && <span className="text-sm italic" style={{ color: RE.fog }}>No public link</span>}
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-expanded={isOpen}
+            aria-controls={bodyId}
+            className="inline-flex items-center gap-2 min-h-[44px] px-3 text-sm tracking-wider focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860] text-[#d8c8a8]"
+          >
+            <span aria-hidden="true" style={{ color: RE.candlelight }}>{isOpen ? '▼' : '▶'}</span>
+            {isOpen ? 'Close file' : 'Read file'}
+          </button>
+        </div>
       </div>
       {isOpen && (
-        <div className="px-4 py-3" style={{ background: `${RE.darkSepia}cc` }}>
-          <p className="text-xs leading-relaxed" style={{ color: RE.fog }}>
-            {content}
+        <div id={bodyId} className="px-4 py-3" style={{ background: `${RE.darkSepia}cc` }}>
+          <p className="text-sm leading-relaxed" style={{ color: RE.fog }}>
+            {project.description}
           </p>
+          {project.impact && (
+            <p className="text-sm mt-2 italic" style={{ color: RE.cream }}>▸ {project.impact}</p>
+          )}
         </div>
       )}
-    </div>
+    </article>
   )
 }
 
 // Tech stack display - sepia inventory style
-function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6">
       {categories.map((category) => (
-        <div key={category.name}>
+        <div key={category.id}>
           <h3
-            className="text-xs tracking-wider mb-3 flex items-center gap-2 uppercase"
+            className="text-sm tracking-wider mb-3 flex items-center gap-2 uppercase"
             style={{ color: RE.warmGlow }}
           >
-            <span className="text-sm">[{category.icon}]</span>
+            <span className="text-sm" aria-hidden="true">[{category.icon}]</span>
             {category.name}
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -1076,119 +1094,91 @@ function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSk
   )
 }
 
-// Skills list for drummer/fighter modes - sepia bar style
-function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
-  return (
-    <div className="space-y-4">
-      {categories.map((category) => (
-        <div key={category.name}>
-          <h3
-            className="text-xs tracking-wider mb-2 uppercase"
-            style={{ color: RE.warmGlow }}
-          >
-            [{category.icon}] {category.name}
-          </h3>
-          <div className="space-y-2">
-            {category.skills.map((skill) => (
-              <div key={skill.name} className="flex items-center gap-3">
-                <span className="text-xs w-32" style={{ color: RE.cream }}>
-                  {skill.name}
-                </span>
-                <div className="flex-1 h-2" style={{ background: RE.darkSepia }}>
-                  <div
-                    className="h-full transition-all"
-                    style={{
-                      width: `${(skill.proficiency / 5) * 100}%`,
-                      background: `linear-gradient(90deg, ${RE.rust}, ${RE.warmGlow})`,
-                    }}
-                  />
-                </div>
-                <span className="text-sm w-8" style={{ color: RE.candlelight }}>
-                  {skill.proficiency}/5
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 // Company card - worn paper style
-function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
+function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={`${company.name} (opens in a new tab)`}
       className="block p-4 transition-all hover:scale-[1.02] group"
       style={{ background: `linear-gradient(135deg, ${RE.sepia}, ${RE.darkSepia})`, border: `1px solid ${RE.midBrown}` }}
     >
       <div className="flex items-center gap-3 mb-2">
-        <span className="text-xl">{company.icon}</span>
+        <span className="text-xl" aria-hidden="true">{company.icon}</span>
         <div>
-          <h4 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
+          <h3 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
             {company.name}
-          </h4>
+          </h3>
           <p className="text-sm" style={{ color: RE.warmGlow }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-xs" style={{ color: RE.fog }}>{company.description}</p>
+      <p className="text-sm" style={{ color: RE.fog }}>{company.description}</p>
     </a>
   )
 }
 
 // Band card - worn paper style
-function BandCard({ band }: { band: typeof BANDS[0] }) {
+function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <div
-      className="p-4 transition-all hover:scale-[1.02] group"
+      className="h-full p-4 transition-all hover:scale-[1.02] group"
       style={{ background: `linear-gradient(135deg, ${RE.sepia}, ${RE.darkSepia})`, border: `1px solid ${RE.midBrown}` }}
     >
-      <h4 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
+      <h3 className="text-sm group-hover:brightness-125 transition-all" style={{ color: RE.cream }}>
         {band.name}
-      </h4>
-      <p className="text-sm mt-1" style={{ color: RE.warmGlow }}>{band.genre} | {band.role}</p>
-      <p className="text-xs mt-2" style={{ color: RE.fog }}>{band.description}</p>
-      {!band.url && <p className="text-sm mt-2 italic" style={{ color: RE.mistDark }}>-- COMING SOON --</p>}
+      </h3>
+      <p className="text-sm mt-1" style={{ color: RE.warmGlow }}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      {band.release && (
+        <p className="text-sm mt-2" style={{ color: RE.fog }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
     </div>
   )
 
-  if (band.url) {
-    return <a href={band.url} target="_blank" rel="noopener noreferrer" className="block">{content}</a>
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a {...linkProps} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860]">
+      {content}
+    </a>
+  )
 }
 
-// Work experience card - worn document style
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+// Work experience card - worn document style. Dates are date only strings (UTC midnight), so the year
+// is read in UTC: a January start keeps its own year west of UTC.
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
     <div
       className="p-4"
       style={{ background: `linear-gradient(135deg, ${RE.sepia}, ${RE.darkSepia})`, border: `1px solid ${RE.midBrown}` }}
     >
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start gap-3 mb-2">
         <div>
-          <h4 className="text-sm" style={{ color: RE.cream }}>{entry.title}</h4>
-          <p className="text-xs" style={{ color: RE.warmGlow }}>{entry.organization}</p>
+          <h3 className="text-sm" style={{ color: RE.cream }}>{entry.title}</h3>
+          <p className="text-sm" style={{ color: RE.warmGlow }}>{entry.company}</p>
         </div>
         <span
-          className="text-sm px-2 py-1"
+          className="text-sm px-2 py-1 whitespace-nowrap"
           style={{ color: RE.candlelight, background: `${RE.rust}30`, border: `1px solid ${RE.rust}50` }}
         >
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-xs mb-2" style={{ color: RE.fog }}>{entry.description}</p>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.description && <p className="text-sm mb-2" style={{ color: RE.fog }}>{entry.description}</p>}
+      {entry.highlights.length > 0 && (
         <ul className="space-y-1">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-xs flex items-start gap-2" style={{ color: RE.cream }}>
-              <span style={{ color: RE.warmGlow }}>▸</span>
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: RE.cream }}>
+              <span style={{ color: RE.warmGlow }} aria-hidden="true">▸</span>
               {highlight}
             </li>
           ))}
@@ -1198,17 +1188,226 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
   )
 }
 
-export default function SurvivalHorrorTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
-  const [mounted, setMounted] = useState(false)
-  const [openDocs, setOpenDocs] = useState<Set<string>>(new Set())
+// The paper panel every section sits on; `texture` picks its stains.
+function PaperPanel({ label, texture, children }: { label: string; texture: string; children: ReactNode }) {
+  return (
+    <section
+      aria-label={label}
+      className="p-6 mb-8 relative overflow-hidden"
+      style={{ background: `${RE.sepia}f0`, border: `2px solid ${RE.midBrown}`, backgroundImage: texture }}
+    >
+      {children}
+    </section>
+  )
+}
 
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
+const PANEL_HEADING = 'text-sm tracking-[0.3em] mb-4 uppercase text-[#c49050]'
+
+const SH_BUTTON =
+  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider transition-all hover:brightness-125 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8a860]'
+
+// Email is the lit rust action, LinkedIn the plain file one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-[#6b4030]/80 border-2 border-[#c49050] text-[#d8c8a8]',
+  linkedin: 'bg-[#2a2018] border-2 border-[#5c4a38] text-[#d8c8a8]',
+}
+
+function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+  return (
+    <>
+      {actions.map((action) => (
+        <a key={action.id} {...action.linkProps} className={`${SH_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+          [{action.label.toUpperCase()}]
+        </a>
+      ))}
+    </>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerFiles({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+  const [openFiles, setOpenFiles] = useState<ReadonlySet<string>>(new Set())
+
+  const toggleFile = (id: string) =>
+    setOpenFiles((open) => {
+      const next = new Set(open)
+      if (!next.delete(id)) next.add(id)
+      return next
+    })
+
+  return (
+    <>
+      {/* 2. About Section - worn paper style with horror textures */}
+      <PaperPanel label="About" texture={TEXTURES.wornPaper}>
+        {/* Subtle blood corner stain */}
+        <div
+          className="absolute top-0 right-0 w-24 h-24 opacity-30 pointer-events-none"
+          style={{ backgroundImage: TEXTURES.bloodStain }}
+          aria-hidden="true"
+        />
+        <h2 className={PANEL_HEADING}>About</h2>
+        <p className="text-sm leading-relaxed" style={{ color: RE.cream }}>
+          {professionalSummary.bio}
+        </p>
+      </PaperPanel>
+
+      {/* 3. ART SECTION - Zombie silhouettes with typewriter */}
+      <ArtSectionZombies />
+
+      {/* 4. Work Experience Section - scratched file folder */}
+      {sections.jobs.length > 0 && (
+        <PaperPanel label="Work Experience" texture={`${TEXTURES.scratches}, ${TEXTURES.wornPaper}`}>
+          {/* Folder tab */}
+          <div
+            className="absolute -top-2 left-6 px-4 py-1 text-sm tracking-wider uppercase"
+            style={{ background: RE.midBrown, color: RE.cream, borderRadius: '4px 4px 0 0' }}
+            aria-hidden="true"
+          >
+            Personnel File
+          </div>
+          <h2 className={`${PANEL_HEADING} mt-2`}>Work Experience</h2>
+          <div className="space-y-4">
+            {sections.jobs.map((entry) => (
+              <ExperienceCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        </PaperPanel>
+      )}
+
+      {/* 5. ART SECTION - Blood splatter with typewriter */}
+      <ArtSectionTypewriter />
+
+      {/* 6. Tech Stack - inventory manifest with blood stains */}
+      <PaperPanel label="Tech Stack" texture={`${TEXTURES.bloodStain}, ${TEXTURES.wornPaper}`}>
+        {/* Claw marks across corner */}
+        <div
+          className="absolute bottom-0 left-0 w-32 h-32 opacity-20 pointer-events-none"
+          style={{ backgroundImage: TEXTURES.scratches, backgroundSize: '100% 100%' }}
+          aria-hidden="true"
+        />
+        <h2 className={`${PANEL_HEADING} flex items-center gap-2`}>
+          Tech Stack
+          <span className="text-sm" style={{ color: RE.candlelight }}>
+            [{sections.techStack.flatMap((category) => category.items).length} ITEMS]
+          </span>
+        </h2>
+        <TechCloud categories={sections.techStack} />
+      </PaperPanel>
+
+      {/* 7. Projects - blood-stained research notes */}
+      <PaperPanel label="Projects" texture={`${TEXTURES.scratches}, ${TEXTURES.wornPaper}`}>
+        {/* Blood fingerprint smear */}
+        <div
+          className="absolute top-4 right-4 w-16 h-20 opacity-25 pointer-events-none"
+          style={{ backgroundImage: TEXTURES.bloodStain, backgroundSize: '100% 100%' }}
+          aria-hidden="true"
+        />
+        <h2 className={`${PANEL_HEADING} flex items-center gap-2`}>
+          <span style={{ color: RE.rust }} aria-hidden="true">[CLASSIFIED]</span> Featured Work
+        </h2>
+        <ProjectList
+          projects={sections.projects}
+          className="space-y-2"
+          renderProject={(slot) => (
+            <ProjectFile slot={slot} isOpen={openFiles.has(slot.project.id)} onToggle={() => toggleFile(slot.project.id)} />
+          )}
+        />
+      </PaperPanel>
+
+      {/* 8. ART SECTION - Herb garden scene */}
+      <ArtSectionHerbs />
+
+      {/* 9. Ventures */}
+      <PaperPanel label="Ventures" texture={TEXTURES.wornPaper}>
+        {/* Stamp mark */}
+        <div
+          className="absolute top-3 right-3 text-sm px-2 py-1 rotate-[-8deg] opacity-60"
+          style={{ border: `2px solid ${RE.rust}`, color: RE.rust }}
+          aria-hidden="true"
+        >
+          APPROVED
+        </div>
+        <h2 className={PANEL_HEADING}>Ventures</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          {sections.companies.map((company) => (
+            <CompanyCard key={company.id} company={company} />
+          ))}
+        </div>
+      </PaperPanel>
+    </>
+  )
+}
+
+function MusicianFiles({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <ArtSectionZombies />
+
+      <PaperPanel label="Bands" texture={`${TEXTURES.bloodStain}, ${TEXTURES.wornPaper}`}>
+        {/* Musical note decoration */}
+        <div className="absolute top-2 right-4 text-2xl opacity-20 pointer-events-none" style={{ color: RE.midBrown }} aria-hidden="true">
+          ♪ ♫ ♩
+        </div>
+        <h2 className={PANEL_HEADING}>Bands</h2>
+        <p className="text-sm mb-4" style={{ color: RE.cream }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandCard {...slot} />} />
+        <p className="text-sm mt-4 italic" style={{ color: RE.cream }}>▸ {musician.line}</p>
+      </PaperPanel>
+
+      <ArtSectionHerbs />
+    </>
+  )
+}
+
+function MartialArtistFiles({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <ArtSectionTypewriter />
+
+      <PaperPanel label="Muay Thai" texture={`${TEXTURES.scratches}, ${TEXTURES.wornPaper}`}>
+        <h2 className={PANEL_HEADING}>Muay Thai</h2>
+        <h3 className="text-base tracking-wider mb-4" style={{ color: RE.candlelight }}>{martialArts.primary.title}</h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+            fact: 'p-3 bg-[#2a2018] border border-[#5c4a38]',
+            term: 'text-sm tracking-wider uppercase text-[#c49050]',
+            value: 'text-sm mt-1 text-[#d8c8a8]',
+            achievements: 'space-y-1',
+            achievement: 'text-sm flex items-start gap-2 text-[#d8c8a8]',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span className="text-[#c49050]" aria-hidden="true">▸</span>
+              {achievement}
+            </>
+          )}
+        />
+      </PaperPanel>
+
+      <ArtSectionHerbs />
+    </>
+  )
+}
+
+function ProfessionFiles({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianFiles sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistFiles sections={sections} />
+  return <EngineerFiles sections={sections} />
+}
+
+export default function SurvivalHorrorTheme() {
+  const view = useWorldView()
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -1216,27 +1415,9 @@ export default function SurvivalHorrorTheme() {
 
   if (!mounted) return null
 
-  const inventoryItems = [
-    { id: 'engineer', icon: '>', label: 'ENGINEER', sublabel: 'JOURNAL', rarity: 'legendary' as const },
-    { id: 'drummer', icon: '*', label: 'MUSICIAN', sublabel: 'SCORE', rarity: 'rare' as const },
-    { id: 'fighter', icon: '+', label: 'FIGHTER', sublabel: 'MANUAL', rarity: 'rare' as const },
-  ]
-
-  const toggleDoc = (id: string) => {
-    const newOpen = new Set(openDocs)
-    if (newOpen.has(id)) {
-      newOpen.delete(id)
-    } else {
-      newOpen.add(id)
-    }
-    setOpenDocs(newOpen)
-  }
-
   return (
     <div
       className="min-h-screen relative overflow-hidden"
-      role="main"
-      aria-label="Survival Horror themed portfolio - Resident Evil inspired"
       style={{
         background: `linear-gradient(180deg, ${RE.void} 0%, ${RE.darkSepia} 20%, ${RE.sepia} 50%, ${RE.darkSepia} 80%, ${RE.void} 100%)`,
         fontFamily: '"Times New Roman", "Georgia", serif',
@@ -1332,67 +1513,50 @@ export default function SurvivalHorrorTheme() {
         <InkRibbon />
       </div>
 
-      {/* Header - sepia mansion style */}
+      {/* Header - sepia mansion style, the recruiter first screen */}
       <header className="relative z-30 p-6 pt-10">
-        <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div>
-            <h1
-              className="text-2xl tracking-[0.15em] uppercase"
-              style={{ color: RE.cream, textShadow: `2px 2px 4px ${RE.void}` }}
-            >
-              Alexander Pulido
-            </h1>
-            <p className="text-sm tracking-wider mt-2" style={{ color: RE.fog }}>
-              {PROFESSIONAL_SUMMARY[active].headline}
-            </p>
-            <p className="text-xs tracking-wider mt-1 italic" style={{ color: RE.warmGlow }}>
-              <TypewriterText text={PROFESSIONAL_SUMMARY[active].tagline} speed={80} />
-            </p>
-          </div>
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-start gap-4">
+              <div className="min-w-0">
+                <h1
+                  className="text-2xl tracking-[0.15em] uppercase"
+                  style={{ color: RE.cream, textShadow: `2px 2px 4px ${RE.void}` }}
+                >
+                  {name}
+                </h1>
+                <p className="text-sm tracking-wider mt-2" style={{ color: RE.fog }}>
+                  {headline}
+                </p>
+                <p className="text-sm tracking-wider mt-1 italic" style={{ color: RE.warmGlow }}>
+                  <TypewriterText text={tagline} speed={80} />
+                </p>
+                <p className="text-sm mt-1" style={{ color: RE.cream }}>{line}</p>
+              </div>
 
-          <div className="flex gap-3 items-center">
-            <Link
-              href="/cv"
-              className="px-3 py-2 text-xs tracking-wider transition-all hover:brightness-125"
-              style={{ background: RE.darkSepia, border: `1px solid ${RE.midBrown}`, color: RE.cream }}
-            >
-              [FILE]
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="px-3 py-2 text-xs tracking-wider transition-all hover:brightness-125"
-              style={{ background: `${RE.rust}40`, border: `1px solid ${RE.rust}`, color: RE.warmGlow }}
-            >
-              [NEBULITH]
-            </Link>
-          </div>
-        </div>
-      </header>
-
-      {/* Current Roles Section */}
-      <section className="relative z-20 py-4 px-6" aria-labelledby="current-status-heading">
-        <div className="max-w-6xl mx-auto">
-          <div className="p-4" style={{ background: `${RE.darkSepia}cc`, border: `1px solid ${RE.midBrown}` }}>
-            <h2 id="current-status-heading" className="text-sm tracking-[0.3em] mb-3 uppercase" style={{ color: RE.warmGlow }}>
-              Current Status
-            </h2>
-            <div className="flex flex-wrap justify-center gap-6">
-              {CURRENT_ROLES.map((role) => (
-                <div key={role.id} className="text-center">
-                  <p className="text-xs tracking-wider" style={{ color: RE.candlelight }}>{role.title}</p>
-                  <p className="text-sm" style={{ color: RE.cream }}>{role.company}</p>
-                </div>
-              ))}
+              <nav className="flex flex-wrap gap-3 items-center" aria-label="Contact and CV">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${SH_BUTTON} bg-[#2a2018] border border-[#5c4a38] text-[#d8c8a8]`}>
+                  [FILE]
+                </Link>
+                <Link
+                  href="/personal-projects/game-engine"
+                  className={`${SH_BUTTON} bg-[#6b4030]/40 border border-[#6b4030] text-[#c49050]`}
+                >
+                  [NEBULITH]
+                </Link>
+              </nav>
             </div>
-          </div>
-        </div>
-      </section>
+          )}
+        />
+      </header>
 
       {/* Main inventory area */}
       <main className="relative z-20 px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* 1. Inventory grid - item box style (part of header/navigation) */}
-          <div
+          {/* 1. Inventory grid - item box style, the profession switch */}
+          <section
+            aria-label="Select profession"
             className="p-6 mb-8"
             style={{
               background: `linear-gradient(180deg, ${RE.sepia}f0, ${RE.darkSepia}e0)`,
@@ -1401,27 +1565,21 @@ export default function SurvivalHorrorTheme() {
             }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xs tracking-[0.3em] uppercase" style={{ color: RE.warmGlow }}>
+              <h2 className="text-sm tracking-[0.3em] uppercase" style={{ color: RE.warmGlow }}>
                 Inventory
               </h2>
-              <span className="text-xs" style={{ color: RE.rust }}>
-                {inventoryItems.length}/8 SLOTS
+              <span className="text-sm" style={{ color: RE.candlelight }} aria-hidden="true">
+                3/8 SLOTS
               </span>
             </div>
 
-            <div className="grid grid-cols-4 gap-3">
-              {inventoryItems.map((item) => (
-                <InventorySlot
-                  key={item.id}
-                  icon={item.icon}
-                  label={item.label}
-                  sublabel={item.sublabel}
-                  isSelected={active === item.id}
-                  onClick={() => setActive(item.id as 'engineer' | 'drummer' | 'fighter')}
-                  rarity={item.rarity}
-                />
-              ))}
-              {/* Empty slots */}
+            <ProfessionSwitch
+              className="grid grid-cols-3 gap-3"
+              label="Profession selector"
+              renderOption={(option) => <InventorySlot option={option} />}
+            />
+            {/* Empty slots */}
+            <div className="grid grid-cols-5 gap-3 mt-3" aria-hidden="true">
               {Array.from({ length: 5 }).map((_, i) => (
                 <div
                   key={`empty-${i}`}
@@ -1433,258 +1591,33 @@ export default function SurvivalHorrorTheme() {
                 />
               ))}
             </div>
-          </div>
+          </section>
 
-          {/* 2. About Section - worn paper style with horror textures */}
-          <div
-            className="p-6 mb-8 relative overflow-hidden"
-            style={{
-              background: `${RE.sepia}f0`,
-              border: `2px solid ${RE.midBrown}`,
-              backgroundImage: TEXTURES.wornPaper,
-            }}
-          >
-            {/* Subtle blood corner stain */}
-            <div
-              className="absolute top-0 right-0 w-24 h-24 opacity-30 pointer-events-none"
-              style={{ backgroundImage: TEXTURES.bloodStain }}
-            />
-            <h2 className="text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: RE.warmGlow }}>
-              About
-            </h2>
-            <p className="text-xs leading-relaxed mb-4" style={{ color: RE.cream }}>
-              {aboutData.bio}
-            </p>
-            <div className="flex gap-2 flex-wrap">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="text-sm px-2 py-1"
-                  style={{ background: RE.darkSepia, border: `1px solid ${RE.midBrown}`, color: RE.fog }}
-                >
-                  ▸ {fact}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 3. ART SECTION - Zombie silhouettes with typewriter */}
-          <ArtSectionZombies />
-
-          {/* 4. Work Experience Section - scratched file folder */}
-          {experience.length > 0 && (
-            <div
-              className="p-6 mb-8 relative overflow-hidden"
-              style={{
-                background: `${RE.sepia}f0`,
-                border: `2px solid ${RE.midBrown}`,
-                backgroundImage: `${TEXTURES.scratches}, ${TEXTURES.wornPaper}`,
-              }}
-            >
-              {/* Folder tab */}
-              <div
-                className="absolute -top-2 left-6 px-4 py-1 text-sm tracking-wider uppercase"
-                style={{ background: RE.midBrown, color: RE.cream, borderRadius: '4px 4px 0 0' }}
-              >
-                Personnel File
-              </div>
-              <h2 className="text-xs tracking-[0.3em] mb-4 mt-2 uppercase" style={{ color: RE.warmGlow }}>
-                Work Experience
-              </h2>
-              <div className="space-y-4">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 5. ART SECTION - Blood splatter with typewriter */}
-          <ArtSectionTypewriter />
-
-          {/* 6. Tech Stack / Skills Section - inventory manifest with blood stains */}
-          <div
-            className="p-6 mb-8 relative overflow-hidden"
-            style={{
-              background: `${RE.sepia}f0`,
-              border: `2px solid ${RE.midBrown}`,
-              backgroundImage: `${TEXTURES.bloodStain}, ${TEXTURES.wornPaper}`,
-            }}
-          >
-            {/* Claw marks across corner */}
-            <div
-              className="absolute bottom-0 left-0 w-32 h-32 opacity-20 pointer-events-none"
-              style={{ backgroundImage: TEXTURES.scratches, backgroundSize: '100% 100%' }}
-            />
-            <h2 className="text-xs tracking-[0.3em] mb-4 flex items-center gap-2 uppercase" style={{ color: RE.warmGlow }}>
-              {active === 'engineer' ? 'Tech Stack' : 'Skills'}
-              <span className="text-sm" style={{ color: RE.candlelight }}>
-                {active === 'engineer' ? `[${engineerTech.flatMap(c => c.items).length} ITEMS]` : ''}
-              </span>
-            </h2>
-            {active === 'engineer' ? (
-              <TechCloud categories={engineerTech} />
-            ) : (
-              <SkillsList categories={otherSkills} />
-            )}
-          </div>
-
-          {/* 7. Featured Work (Projects) - blood-stained research notes */}
-          <div
-            className="p-6 mb-8 relative overflow-hidden"
-            style={{
-              background: `${RE.sepia}f0`,
-              border: `2px solid ${RE.midBrown}`,
-              backgroundImage: `${TEXTURES.scratches}, ${TEXTURES.wornPaper}`,
-            }}
-          >
-            {/* Blood fingerprint smear */}
-            <div
-              className="absolute top-4 right-4 w-16 h-20 opacity-25 pointer-events-none"
-              style={{ backgroundImage: TEXTURES.bloodStain, backgroundSize: '100% 100%' }}
-            />
-            <h2 className="text-xs tracking-[0.3em] mb-4 uppercase flex items-center gap-2" style={{ color: RE.warmGlow }}>
-              <span style={{ color: RE.rust }}>[CLASSIFIED]</span> Featured Work
-            </h2>
-            <div className="space-y-2">
-              {projects.slice(0, 4).map((project) => (
-                <DocumentItem
-                  key={project.id}
-                  title={project.name}
-                  content={project.description}
-                  isOpen={openDocs.has(project.id)}
-                  onToggle={() => toggleDoc(project.id)}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* 8. ART SECTION - Herb garden scene */}
-          <ArtSectionHerbs />
-
-          {/* 9. Ventures Section - Companies (Engineer mode) or Bands (Drummer mode) */}
-          {active === 'engineer' && (
-            <div
-              className="p-6 mb-8 relative overflow-hidden"
-              style={{
-                background: `${RE.sepia}f0`,
-                border: `2px solid ${RE.midBrown}`,
-                backgroundImage: TEXTURES.wornPaper,
-              }}
-            >
-              {/* Stamp mark */}
-              <div
-                className="absolute top-3 right-3 text-sm px-2 py-1 rotate-[-8deg] opacity-60"
-                style={{ border: `2px solid ${RE.rust}`, color: RE.rust }}
-              >
-                APPROVED
-              </div>
-              <h2 className="text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: RE.warmGlow }}>
-                Ventures
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4">
-                {COMPANIES.map((company) => (
-                  <CompanyCard key={company.id} company={company} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {active === 'drummer' && (
-            <div
-              className="p-6 mb-8 relative overflow-hidden"
-              style={{
-                background: `${RE.sepia}f0`,
-                border: `2px solid ${RE.midBrown}`,
-                backgroundImage: `${TEXTURES.bloodStain}, ${TEXTURES.wornPaper}`,
-              }}
-            >
-              {/* Musical note decoration */}
-              <div
-                className="absolute top-2 right-4 text-2xl opacity-20 pointer-events-none"
-                style={{ color: RE.midBrown }}
-              >
-                ♪ ♫ ♩
-              </div>
-              <h2 className="text-xs tracking-[0.3em] mb-4 uppercase" style={{ color: RE.warmGlow }}>
-                Bands
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* 10. Posts Section - placeholder for future blog posts */}
-          <div
-            className="p-6 mb-8 relative overflow-hidden"
-            style={{
-              background: `${RE.sepia}f0`,
-              border: `2px solid ${RE.midBrown}`,
-              backgroundImage: TEXTURES.wornPaper,
-            }}
-          >
-            {/* Worn edge effect */}
-            <div
-              className="absolute top-0 left-0 w-full h-2 opacity-30"
-              style={{ background: `linear-gradient(90deg, ${RE.midBrown}, transparent, ${RE.midBrown})` }}
-            />
-            <h2 className="text-xs tracking-[0.3em] mb-4 uppercase flex items-center gap-2" style={{ color: RE.warmGlow }}>
-              <span style={{ color: RE.fog }}>[LOGS]</span> Posts
-            </h2>
-            <div className="text-center py-8">
-              <p className="text-sm italic" style={{ color: RE.mistDark }}>
-                -- TRANSMISSIONS INCOMING --
-              </p>
-              <p className="text-xs mt-2" style={{ color: RE.fog }}>
-                Signal interference detected. Stand by for incoming reports...
-              </p>
-            </div>
-          </div>
+          <ProfessionFiles sections={view.sections} />
         </div>
       </main>
 
       {/* Contact CTA */}
       <section className="relative z-20 py-12 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <h2 className="text-sm tracking-[0.3em] mb-3 uppercase" style={{ color: RE.warmGlow }}>
-              Ready to Work Together?
-            </h2>
-            <p className="text-xs" style={{ color: RE.fog }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="px-6 py-3 text-sm tracking-wider transition-all hover:brightness-125"
-              style={{
-                background: `${RE.rust}80`,
-                border: `2px solid ${RE.warmGlow}`,
-                color: RE.cream,
-              }}
-            >
-              [CONTACT] Get In Touch
-            </a>
-            <Link
-              href="/cv"
-              className="px-6 py-3 text-sm tracking-wider transition-all hover:brightness-125"
-              style={{
-                background: RE.darkSepia,
-                border: `2px solid ${RE.midBrown}`,
-                color: RE.cream,
-              }}
-            >
-              [FILE] Download CV
-            </Link>
-          </div>
-        </div>
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <h2 className="text-sm tracking-[0.3em] mb-3 uppercase" style={{ color: RE.warmGlow }}>
+                  Get In Touch
+                </h2>
+                <p className="text-sm" style={{ color: RE.fog }}>{line}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${SH_BUTTON} bg-[#2a2018] border-2 border-[#5c4a38] text-[#d8c8a8]`}>
+                  [FILE] Download CV
+                </Link>
+              </div>
+            </div>
+          )}
+        />
       </section>
-
-      
 
       {/* Footer - save room style */}
       <footer className="relative z-20 py-12 text-center">
