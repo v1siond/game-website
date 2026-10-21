@@ -1,0 +1,119 @@
+/*
+ * Cell Shaded's page look, outside the scroll scenes (scenes.module.css): the paper page under flat sky
+ * bands and a halftone screen, the comic panel and speech bubble surfaces with their hard ink drop, the
+ * inked lettering, and the ink outline every drawn shape carries. Everything here is static: shadows
+ * and strokes are fixed, never animated.
+ */
+
+.root {
+  --cel-ink: #141414;
+  --cel-paper: #fbf3df;
+  --cel-paper-shade: #eadcb8;
+  --cel-sky: #3fc4e8;
+  --cel-sun: #ffd23f;
+  --cel-orange: #ff7a1a;
+  --cel-magenta: #e8318a;
+
+  background: linear-gradient(
+    180deg,
+    var(--cel-sky) 0 7rem,
+    var(--cel-sun) 7rem 9rem,
+    var(--cel-orange) 9rem 10rem,
+    var(--cel-paper) 10rem
+  );
+  color: var(--cel-ink);
+  font-family: 'Bangers', 'Impact', 'Arial Black', sans-serif;
+}
+
+/* Body copy stays a plain sans for reading; the lettering above it is the comic face. */
+.copy {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* The halftone screen over the page, darkest at the bottom like a printed panel's shadow side. */
+.halftone {
+  background-image: radial-gradient(circle, var(--cel-ink) 1px, transparent 1.4px);
+  background-size: 7px 7px;
+  mask-image: linear-gradient(180deg, transparent 20%, rgb(0 0 0 / 0.5) 100%);
+  opacity: 0.12;
+}
+
+/* ---- surfaces ---- */
+
+.panel {
+  background: var(--cel-paper);
+  border: 5px solid var(--cel-ink);
+  box-shadow: 7px 7px 0 var(--cel-ink);
+}
+
+/* A card: thinner ink and a shorter drop than its panel. */
+.card {
+  background: #fff;
+  border: 4px solid var(--cel-ink);
+  box-shadow: 4px 4px 0 var(--cel-ink);
+}
+
+.darkCard {
+  background: #2b2b33;
+  border: 4px solid var(--cel-ink);
+  box-shadow: 4px 4px 0 var(--cel-ink);
+}
+
+.bubble {
+  background: #fff;
+  border: 5px solid var(--cel-ink);
+  border-radius: 1.5rem;
+  box-shadow: 6px 6px 0 var(--cel-ink);
+}
+
+/* The bubble's tail: an ink triangle with a white one inside it. */
+.bubbleTail {
+  border-left: 18px solid transparent;
+  border-right: 18px solid transparent;
+  border-top: 24px solid var(--cel-ink);
+}
+
+.bubbleTail::after {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: -27px;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 16px solid #fff;
+}
+
+/* A short hard drop under a banner, a chip or a button. */
+.drop {
+  box-shadow: 3px 3px 0 var(--cel-ink);
+}
+
+/* ---- lettering ---- */
+
+/* The big inked title: ink letters with two hard drops, sun yellow then orange. */
+.title {
+  text-shadow:
+    3px 3px 0 var(--cel-sun),
+    6px 6px 0 var(--cel-orange);
+}
+
+.lettering {
+  text-shadow: 2px 2px 0 var(--cel-sun);
+}
+
+/* ---- art ---- */
+
+/* The ink outline round every shape of a drawing, one weight however the drawing is scaled. */
+.inked :is(path, rect, circle, ellipse, polygon) {
+  stroke: var(--cel-ink);
+  stroke-width: 1.4px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+.focusRing :focus-visible {
+  outline: 4px solid var(--cel-ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px var(--cel-sun);
+}

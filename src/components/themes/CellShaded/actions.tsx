@@ -1,26 +1,44 @@
+import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import world from './world.module.css'
 
-export const COMIC_BUTTON =
-  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider font-black border-[5px] border-[#1a1a1a] shadow-[4px_4px_0_#1a1a1a] focus:outline-none focus:ring-4 focus:ring-yellow-400'
+// The world's actions, in the hero and again in the contact section: email, LinkedIn, the CV, and the
+// link out to Nebulith.
 
-// Email is the loud orange action, LinkedIn the white one.
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-gradient-to-br from-[#ff9500] to-[#d4763d] text-white [text-shadow:2px_2px_0_#1a1a1a]',
-  linkedin: 'bg-white text-[#1a1a1a]',
+const COMIC_BUTTON = `inline-flex min-h-[44px] items-center justify-center border-4 border-[#141414] px-4 py-2 text-base uppercase tracking-wider transition-transform hover:-rotate-2 hover:scale-105 motion-reduce:transition-none motion-reduce:hover:transform-none ${world.drop}`
+
+// Email is the loud orange action, LinkedIn and the CV the white ones, Nebulith the sun yellow one.
+const LOOK = {
+  loud: 'bg-[#ff7a1a] text-[#141414]',
+  plain: 'bg-white text-[#141414]',
+  sun: 'bg-[#ffd23f] text-[#141414]',
 }
 
-export function HeroActions({ actions, reducedMotion }: { actions: HeroActionSlot[]; reducedMotion: boolean }) {
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: LOOK.loud,
+  linkedin: LOOK.plain,
+}
+
+export function HeroAction({ action }: { action: HeroActionSlot }) {
   return (
-    <>
-      {actions.map((action) => (
-        <a
-          key={action.id}
-          {...action.linkProps}
-          className={`${COMIC_BUTTON} ${HERO_ACTION_LOOK[action.id]} ${reducedMotion ? '' : 'transition-all hover:scale-105 hover:-rotate-2'}`}
-        >
-          {action.label.toUpperCase()}
-        </a>
-      ))}
-    </>
+    <a {...action.linkProps} className={`${COMIC_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+      {action.label}
+    </a>
+  )
+}
+
+export function CVLink() {
+  return (
+    <Link href="/cv" className={`${COMIC_BUTTON} ${LOOK.plain}`}>
+      CV
+    </Link>
+  )
+}
+
+export function EngineLink() {
+  return (
+    <Link href="/personal-projects/game-engine" className={`${COMIC_BUTTON} ${LOOK.sun}`}>
+      Nebulith
+    </Link>
   )
 }
