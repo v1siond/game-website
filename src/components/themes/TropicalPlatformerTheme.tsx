@@ -1,15 +1,17 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // ============================================================================
 // CRASH BANDICOOT EXACT COLOR PALETTE
@@ -85,41 +87,6 @@ const COLORS = {
   warpPink: '#FF69B4',
 }
 
-// ============================================================================
-// SKILL ACHIEVEMENTS - No proficiency bars, show real impact
-// ============================================================================
-const SKILL_ACHIEVEMENTS: Record<string, Record<string, string[]>> = {
-  drummer: {
-    'Rock/Metal': ['Toured 30+ cities nationally', 'Studio albums with 3 metal bands'],
-    'Progressive': ['Complex time signatures (7/8, 11/8)', 'Dream Theater-inspired fills'],
-    'Latin/Salsa': ['Traditional Cuban rhythms mastery', 'Latin jazz ensemble work'],
-    'Jazz Fusion': ['Improvisation across 4 octave range', 'Session work with fusion artists'],
-    'Funk/Soul': ['Pocket grooves, ghost notes specialist', 'James Brown tribute performances'],
-    'Double Bass': ['200+ BPM sustained patterns', 'Heel-toe technique mastery'],
-    'Polyrhythms': ['4 over 3, 5 over 4 independence', 'West African rhythm integration'],
-    'Odd Time Signatures': ['Tool/Meshuggah-style grooves', 'Seamless time transitions'],
-    'Ghost Notes': ['Dynamic control, felt not heard', 'Signature snare patterns'],
-    'Linear Drumming': ['Hands-feet independence', 'Modern gospel chops'],
-    'Studio Recording': ['Multi-track session experience', 'Pro Tools, Logic certified'],
-    'Live Touring': ['Festival stages, club circuits', 'In-ear monitoring expertise'],
-    'Session Work': ['Quick learning, chart reading', 'Diverse genre adaptability'],
-    'Music Production': ['Drum programming, mixing', 'Home studio production'],
-  },
-  fighter: {
-    'Muay Thai (3 years)': ['Traditional clinch techniques', 'Elbow/knee combinations'],
-    'Brazilian Jiu-Jitsu (2 years)': ['Blue belt competitor', 'Triangle choke specialist'],
-    'MMA (1 year)': ['Integrated striking/grappling', 'Cage control fundamentals'],
-    'Wrestling': ['Double/single leg takedowns', 'Mat return techniques'],
-    'Striking': ['Boxing combos, head movement', 'Distance management'],
-    'Clinch Work': ['Thai plum control', 'Dirty boxing integration'],
-    'Ground Game': ['Guard passing, sweeps', 'Position before submission'],
-    'Submissions': ['Triangle, armbar, RNC', '15+ competition submissions'],
-    'Fundamentals Instruction': ['20+ students to competition', '3 classes weekly'],
-    'Competition Prep': ['Fight camp programming', 'Weight cut protocols'],
-    'Self Defense': ['Real-world scenario training', 'De-escalation techniques'],
-    'Private Coaching': ['Personalized curricula', 'Video analysis sessions'],
-  },
-}
 
 // ============================================================================
 // REDUCED MOTION HOOK
@@ -1353,24 +1320,25 @@ function CratePanel({
   )
 }
 
+
 // ============================================================================
-// TECH CRATES - Engineer skills as crate chips
+// TECH CRATES - Engineer tech stack as crate chips
 // ============================================================================
-function TechCrates({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+function TechCrates({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6">
       {categories.map((category) => (
-        <div key={category.name}>
+        <div key={category.id}>
           <h3
             className="text-sm tracking-widest mb-3 font-black uppercase flex items-center gap-2"
-            style={{ color: COLORS.wumpaOrange, fontFamily: 'Impact, Arial Black, sans-serif' }}
+            style={{ color: COLORS.maskYellow, fontFamily: 'Impact, Arial Black, sans-serif' }}
           >
             <WumpaFruit size={18} />
             {category.name}
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
             {category.items.map((tech) => (
-              <span
+              <li
                 key={tech}
                 className="px-3 py-2 text-sm font-bold transition-transform hover:scale-105 cursor-default"
                 style={{
@@ -1383,66 +1351,8 @@ function TechCrates({ categories }: { categories: ReturnType<typeof getEngineerS
                 }}
               >
                 {tech}
-              </span>
+              </li>
             ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ============================================================================
-// SKILLS LIST - Drummer/Fighter with achievements
-// ============================================================================
-function SkillsList({
-  categories,
-  profession
-}: {
-  categories: ReturnType<typeof getSkillsByProfession>
-  profession: 'drummer' | 'fighter'
-}) {
-  const achievements = SKILL_ACHIEVEMENTS[profession] || {}
-
-  return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {categories.map((category) => (
-        <div key={category.name}>
-          <h3
-            className="text-sm tracking-widest mb-3 font-black uppercase flex items-center gap-2"
-            style={{ color: COLORS.gemBlue, fontFamily: 'Impact, Arial Black, sans-serif' }}
-          >
-            <GemIcon size={16} color="blue" />
-            {category.name}
-          </h3>
-          <ul className="space-y-3">
-            {category.skills.map((skill) => {
-              const skillAchievements = achievements[skill.name] || []
-              return (
-                <li
-                  key={skill.name}
-                  className="p-3 rounded"
-                  style={{
-                    background: `linear-gradient(135deg, ${COLORS.beachBrown}50, transparent)`,
-                    border: `1px solid ${COLORS.maskYellow}30`,
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <WumpaFruit size={16} />
-                    <span className="text-sm font-bold" style={{ color: '#fff' }}>{skill.name}</span>
-                  </div>
-                  {skillAchievements.length > 0 && (
-                    <ul className="ml-6 space-y-0.5">
-                      {skillAchievements.map((achievement, i) => (
-                        <li key={i} className="text-xs" style={{ color: COLORS.beachSand }}>
-                          {achievement}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              )
-            })}
           </ul>
         </div>
       ))}
@@ -1451,43 +1361,54 @@ function SkillsList({
 }
 
 // ============================================================================
-// EXPERIENCE CARD
+// EXPERIENCE CARD. Dates are date only strings (UTC midnight), so the year is read in UTC.
 // ============================================================================
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
     <article
       className="p-4 rounded-lg transition-transform hover:scale-[1.01]"
       style={{
-        background: `linear-gradient(135deg, ${COLORS.beachBrown}80, ${COLORS.crateWood}60)`,
-        border: `2px solid ${COLORS.maskYellow}50`,
+        background: `linear-gradient(135deg, ${COLORS.crateWood}e6, ${COLORS.jungleDark}cc)`,
+        border: `2px solid ${COLORS.maskYellow}80`,
       }}
     >
       <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3">
         <div>
-          <h4 className="text-lg font-bold" style={{ color: '#fff' }}>{entry.title}</h4>
-          <p className="text-sm font-semibold" style={{ color: COLORS.wumpaOrange }}>{entry.organization}</p>
+          <h3 className="text-lg font-bold" style={{ color: '#fff' }}>{entry.title}</h3>
+          <p className="text-sm font-semibold" style={{ color: COLORS.maskYellow }}>{entry.company}</p>
         </div>
         <span
-          className="text-xs px-3 py-1 rounded font-bold"
-          style={{
-            background: COLORS.oceanRoyal,
-            color: COLORS.oceanSky,
-            whiteSpace: 'nowrap',
-          }}
+          className="text-sm px-3 py-1 rounded font-bold"
+          style={{ background: '#0a1f5c', color: COLORS.oceanSky, whiteSpace: 'nowrap' }}
         >
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-sm mb-3" style={{ color: COLORS.beachTan }}>{entry.description}</p>
-      {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-2">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-sm flex items-start gap-2" style={{ color: '#fff' }}>
+      {entry.description && (
+        <p className="text-sm mb-3" style={{ color: COLORS.beachTan }}>{entry.description}</p>
+      )}
+      {entry.highlights.length > 0 && (
+        <ul className="space-y-2" aria-label="Key achievements">
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: '#fff' }}>
               <WumpaFruit size={14} className="flex-shrink-0 mt-0.5" />
               <span>{highlight}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {entry.skills.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5 mt-3" aria-label="Skills used">
+          {entry.skills.map((skill) => (
+            <li
+              key={skill}
+              className="text-sm px-2 py-1 rounded"
+              style={{ background: COLORS.jungleDark, color: COLORS.nitroBright, border: `1px solid ${COLORS.jungleLime}80` }}
+            >
+              {skill}
             </li>
           ))}
         </ul>
@@ -1497,57 +1418,73 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
 }
 
 // ============================================================================
-// PROJECT CARD
+// PROJECT CARD - his role, the years, the impact and the links
 // ============================================================================
-function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+function ProjectCard({ project, years, links }: ProjectSlot) {
   return (
     <article
-      className="p-4 rounded-lg transition-all hover:scale-[1.02] group"
+      className="h-full p-4 rounded-lg transition-all hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${COLORS.beachBrown}90, ${COLORS.crateWood}70)`,
-        border: `3px solid ${project.featured ? COLORS.gemBlue : COLORS.crateWood}`,
-        boxShadow: project.featured ? `0 0 25px ${COLORS.gemBlue}40` : 'none',
+        background: `linear-gradient(135deg, ${COLORS.crateWood}f0, ${COLORS.jungleDark}d9)`,
+        border: `3px solid ${project.highlight ? COLORS.gemBlue : COLORS.cratePeru}`,
+        boxShadow: project.highlight ? `0 0 25px ${COLORS.gemBlue}40` : 'none',
       }}
     >
-      {project.featured && (
-        <div className="flex items-center gap-2 mb-2">
-          <GemIcon size={16} color="blue" />
-          <span
-            className="text-xs tracking-widest font-black uppercase"
-            style={{ color: COLORS.gemBlue, fontFamily: 'Impact, sans-serif' }}
-          >
-            Featured
+      <div className="flex justify-between items-start gap-2">
+        <h3 className="text-lg font-bold flex items-center gap-2" style={{ color: '#fff' }}>
+          {project.highlight && <GemIcon size={16} color="blue" />}
+          {project.name}
+        </h3>
+        {years && (
+          <span className="text-sm font-bold whitespace-nowrap" style={{ color: COLORS.oceanSky }}>
+            {years}
           </span>
-        </div>
-      )}
-      <h4
-        className="text-lg font-bold group-hover:text-orange-400 transition-colors"
-        style={{ color: '#fff' }}
-      >
-        {project.name}
-      </h4>
+        )}
+      </div>
+      <p className="text-sm font-semibold mt-1" style={{ color: COLORS.maskYellow }}>{project.role}</p>
       <p className="text-sm mt-2" style={{ color: COLORS.beachTan }}>{project.tagline}</p>
       {project.impact && (
-        <p className="text-sm mt-2 font-bold flex items-center gap-2" style={{ color: COLORS.wumpaOrange }}>
-          <WumpaFruit size={16} />
+        <p className="text-sm mt-2 font-bold flex items-start gap-2" style={{ color: '#fff' }}>
+          <WumpaFruit size={16} className="flex-shrink-0 mt-0.5" />
           {project.impact}
         </p>
       )}
-      <div className="flex flex-wrap gap-1.5 mt-3">
-        {project.techStack.slice(0, 5).map((tech) => (
-          <span
-            key={tech}
-            className="text-xs px-2 py-1 rounded"
-            style={{
-              background: `${COLORS.jungleGreen}90`,
-              color: COLORS.jungleLime,
-              border: `1px solid ${COLORS.jungleLime}50`,
-            }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
+      {project.techStack.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5 mt-3" aria-label="Technologies used">
+          {project.techStack.map((tech) => (
+            <li
+              key={tech}
+              className="text-sm px-2 py-1 rounded"
+              style={{ background: COLORS.jungleDark, color: COLORS.nitroBright, border: `1px solid ${COLORS.jungleLime}80` }}
+            >
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )}
+      {links.length > 0 ? (
+        <div className="flex flex-wrap gap-3 mt-4">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-4 text-sm font-black tracking-widest transition-all hover:scale-105"
+              style={{
+                background: `linear-gradient(180deg, ${COLORS.crashOrangeDark}, #a33f00)`,
+                border: `3px solid ${COLORS.maskYellow}`,
+                color: '#fff',
+                textShadow: '1px 1px 0 rgba(0,0,0,0.6)',
+                fontFamily: 'Impact, sans-serif',
+                borderRadius: '6px',
+              }}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm mt-4 italic" style={{ color: COLORS.beachTan }}>No public link</p>
+      )}
     </article>
   )
 }
@@ -1555,26 +1492,26 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
 // ============================================================================
 // VENTURE CARD
 // ============================================================================
-function VentureCard({ company }: { company: typeof COMPANIES[0] }) {
+function VentureCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 rounded-lg transition-all hover:scale-[1.02] group"
+      className="block h-full p-4 rounded-lg transition-all hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${COLORS.beachBrown}70, ${COLORS.crateWood}50)`,
+        background: `linear-gradient(135deg, ${COLORS.crateWood}f0, ${COLORS.jungleDark}d9)`,
         border: `2px solid ${COLORS.cratePeru}`,
       }}
-      aria-label={`Visit ${company.name} - ${company.tagline}`}
+      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
     >
       <div className="flex items-center gap-3 mb-2">
         <WoodenCrate size={36} variant="checkpoint" />
         <div>
-          <h4 className="text-base font-bold group-hover:text-orange-400 transition-colors" style={{ color: '#fff' }}>
+          <h3 className="text-base font-bold" style={{ color: '#fff' }}>
             {company.name}
-          </h4>
-          <p className="text-xs font-semibold" style={{ color: COLORS.wumpaOrange }}>{company.tagline}</p>
+          </h3>
+          <p className="text-sm font-semibold" style={{ color: COLORS.maskYellow }}>{company.tagline}</p>
         </div>
       </div>
       <p className="text-sm" style={{ color: COLORS.beachTan }}>{company.description}</p>
@@ -1583,120 +1520,299 @@ function VentureCard({ company }: { company: typeof COMPANIES[0] }) {
 }
 
 // ============================================================================
-// BAND CARD
+// BAND CARD - his role, the years and the release
 // ============================================================================
-function BandCard({ band }: { band: typeof BANDS[0] }) {
+function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <article
-      className="p-4 rounded-lg transition-all hover:scale-[1.02] group"
+      className="h-full p-4 rounded-lg transition-all hover:scale-[1.02] group"
       style={{
-        background: `linear-gradient(135deg, ${COLORS.beachBrown}70, ${COLORS.crateWood}50)`,
-        border: `2px solid ${COLORS.cortexPurple}60`,
+        background: `linear-gradient(135deg, ${COLORS.cortexPurple}, ${COLORS.crateWood}e6)`,
+        border: `2px solid ${COLORS.gemPurple}`,
       }}
     >
-      <h4 className="text-base font-bold group-hover:text-orange-400 transition-colors" style={{ color: '#fff' }}>
+      <h3 className="text-base font-bold" style={{ color: '#fff' }}>
         {band.name}
-      </h4>
-      <p className="text-xs mt-1 font-semibold" style={{ color: COLORS.cortexOrchid }}>
-        {band.genre} | {band.role}
+      </h3>
+      <p className="text-sm mt-1 font-semibold" style={{ color: COLORS.maskYellow }}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years && <span>{years}</span>}
       </p>
-      <p className="text-sm mt-2" style={{ color: COLORS.beachTan }}>{band.description}</p>
+      {band.release && (
+        <p className="text-sm mt-2" style={{ color: COLORS.beachTan }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
     </article>
   )
 
-  if (band.url) {
-    return (
-      <a
-        href={band.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block"
-        aria-label={`Visit ${band.name} website`}
-      >
-        {content}
-      </a>
-    )
-  }
-  return content
+  return linkProps ? (
+    <a {...linkProps} className="block h-full">
+      {content}
+    </a>
+  ) : (
+    content
+  )
 }
 
 // ============================================================================
-// WARP ZONE PROFESSION SELECTOR
+// WARP ZONE - one profession portal of the shared switch
 // ============================================================================
-function WarpZoneSelector({
-  active,
-  onSelect,
-  reducedMotion = false,
-}: {
-  active: 'engineer' | 'drummer' | 'fighter'
-  onSelect: (p: 'engineer' | 'drummer' | 'fighter') => void
-  reducedMotion?: boolean
-}) {
-  const zones = [
-    { id: 'engineer' as const, label: 'Engineer', color: COLORS.gemBlue, gem: 'blue' as const },
-    { id: 'drummer' as const, label: 'Musician', color: COLORS.gemPurple, gem: 'purple' as const },
-    { id: 'fighter' as const, label: 'Fighter', color: COLORS.gemRed, gem: 'red' as const },
-  ]
+const WARP_ZONES: Record<Profession, { color: string; gem: 'blue' | 'purple' | 'red' }> = {
+  engineer: { color: COLORS.gemBlue, gem: 'blue' },
+  drummer: { color: COLORS.gemPurple, gem: 'purple' },
+  fighter: { color: COLORS.gemRed, gem: 'red' },
+}
+
+function WarpZone({ id, label, selected, optionProps, reducedMotion }: ProfessionOption & { reducedMotion: boolean }) {
+  const zone = WARP_ZONES[id]
 
   return (
-    <div className="flex justify-center gap-8 py-10" role="tablist" aria-label="Profession selector">
-      {zones.map((zone) => {
-        const isActive = active === zone.id
-        return (
-          <button
-            key={zone.id}
-            onClick={() => onSelect(zone.id)}
-            role="tab"
-            aria-selected={isActive}
-            aria-controls={`${zone.id}-content`}
-            className="relative group focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 rounded-xl"
-            style={{ ['--ring-color' as string]: zone.color }}
-          >
-            {/* Glow effect */}
-            <div
-              className={`absolute inset-0 rounded-xl blur-2xl transition-all duration-300 ${
-                isActive ? 'opacity-70 scale-150' : 'opacity-0 group-hover:opacity-40'
-              }`}
-              style={{ background: zone.color }}
-              aria-hidden="true"
-            />
+    <button
+      type="button"
+      {...optionProps}
+      className="relative group focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 rounded-xl"
+    >
+      {/* Glow effect */}
+      <div
+        className={`absolute inset-0 rounded-xl blur-2xl transition-all duration-300 ${
+          selected ? 'opacity-70 scale-150' : 'opacity-0 group-hover:opacity-40'
+        }`}
+        style={{ background: zone.color }}
+        aria-hidden="true"
+      />
 
-            {/* Warp portal button */}
-            <div
-              className={`relative w-28 h-28 rounded-xl flex flex-col items-center justify-center transition-all duration-300 ${
-                isActive ? 'scale-110' : 'group-hover:scale-105'
-              }`}
-              style={{
-                background: `linear-gradient(135deg, ${zone.color}40, ${COLORS.beachBrown}90)`,
-                border: `4px solid ${isActive ? zone.color : COLORS.crateWood}`,
-                boxShadow: isActive
-                  ? `0 0 40px ${zone.color}70, inset 0 0 25px ${zone.color}40`
-                  : '0 6px 16px rgba(0,0,0,0.5)',
-              }}
-            >
-              <GemIcon size={40} color={zone.gem} />
-              <span
-                className="text-xs tracking-widest uppercase mt-2 font-black"
-                style={{
-                  color: isActive ? zone.color : COLORS.beachSand,
-                  fontFamily: 'Impact, Arial Black, sans-serif',
-                }}
-              >
-                {zone.label}
-              </span>
-            </div>
+      {/* Warp portal button */}
+      <div
+        className={`relative w-24 h-28 sm:w-32 sm:h-32 rounded-xl flex flex-col items-center justify-center px-1 transition-all duration-300 ${
+          selected ? 'scale-110' : 'group-hover:scale-105'
+        }`}
+        style={{
+          background: `linear-gradient(135deg, ${zone.color}40, ${COLORS.crateWood})`,
+          border: `4px solid ${selected ? zone.color : COLORS.cratePeru}`,
+          boxShadow: selected
+            ? `0 0 40px ${zone.color}70, inset 0 0 25px ${zone.color}40`
+            : '0 6px 16px rgba(0,0,0,0.5)',
+        }}
+      >
+        <GemIcon size={40} color={zone.gem} />
+        <span
+          className="text-sm tracking-wide uppercase mt-2 font-black text-center leading-tight"
+          style={{
+            color: selected ? '#fff' : COLORS.beachSand,
+            fontFamily: 'Impact, Arial Black, sans-serif',
+            textShadow: '1px 1px 0 #000',
+          }}
+        >
+          {label}
+        </span>
+      </div>
 
-            {/* Aku Aku appearing when active */}
-            {isActive && !reducedMotion && (
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 animate-aku-bounce">
-                <AkuAkuMask size={35} animated={false} />
-              </div>
-            )}
-          </button>
-        )
-      })}
-    </div>
+      {/* Aku Aku appearing when picked */}
+      {selected && !reducedMotion && (
+        <div className="absolute -top-10 left-1/2 -translate-x-1/2 animate-aku-bounce" aria-hidden="true">
+          <AkuAkuMask size={35} animated={false} />
+        </div>
+      )}
+    </button>
   )
+}
+
+// ============================================================================
+// HERO ACTIONS - crate buttons for Email, LinkedIn and the CV
+// ============================================================================
+const CRATE_BUTTON =
+  'inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-3 font-black tracking-widest transition-all hover:scale-105'
+
+// Email is the orange primary action, LinkedIn and the CV the wooden crates.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
+  email: {
+    background: `linear-gradient(180deg, ${COLORS.crashOrangeDark}, #a33f00)`,
+    border: `4px solid ${COLORS.maskYellow}`,
+    color: '#fff',
+    boxShadow: '0 5px 0 #663000, inset 0 2px 0 rgba(255,255,255,0.2)',
+    textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
+    fontFamily: 'Impact, sans-serif',
+    borderRadius: '6px',
+  },
+  linkedin: {
+    background: `linear-gradient(180deg, ${COLORS.crateWood}, #5c2d0c)`,
+    border: `4px solid ${COLORS.cratePeru}`,
+    color: '#fff',
+    boxShadow: '0 5px 0 #3a2010, inset 0 2px 0 rgba(255,255,255,0.2)',
+    textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
+    fontFamily: 'Impact, sans-serif',
+    borderRadius: '6px',
+  },
+}
+
+function HeroAction({ action }: { action: HeroActionSlot }) {
+  return (
+    <a {...action.linkProps} className={CRATE_BUTTON} style={HERO_ACTION_LOOK[action.id]}>
+      {action.id === 'email' ? <GemIcon size={20} color="yellow" /> : <WoodenCrate size={20} />}
+      {action.label}
+    </a>
+  )
+}
+
+function CVLink() {
+  return (
+    <Link href="/cv" className={CRATE_BUTTON} style={HERO_ACTION_LOOK.linkedin}>
+      <WoodenCrate size={20} />
+      CV
+    </Link>
+  )
+}
+
+// ============================================================================
+// PROFESSION SECTIONS - what each profession shows, from the content files
+// ============================================================================
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections, reducedMotion }: { sections: SectionsOf<'engineer'>; reducedMotion: boolean }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      <div className="relative z-20 py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <CratePanel title="About" titleIcon={<AkuAkuMask size={35} animated={!reducedMotion} />} variant="checkpoint">
+            <p className="text-base leading-relaxed" style={{ color: '#fff' }}>
+              {professionalSummary.bio}
+            </p>
+          </CratePanel>
+        </div>
+      </div>
+
+      {/* ART SECTION 1: JUNGLE SCENE (After About) */}
+      <JungleSceneArt reducedMotion={reducedMotion} />
+
+      {sections.jobs.length > 0 && (
+        <div className="relative z-20 py-8 px-6">
+          <div className="max-w-4xl mx-auto">
+            <CratePanel title="Work Experience" titleIcon={<WoodenCrate size={28} variant="checkpoint" />} variant="temple">
+              <div className="space-y-4">
+                {sections.jobs.map((entry) => (
+                  <ExperienceCard key={entry.id} entry={entry} />
+                ))}
+              </div>
+            </CratePanel>
+          </div>
+        </div>
+      )}
+
+      {/* ART SECTION 2: CRATE STACK (After Experience) */}
+      <CrateStackArt reducedMotion={reducedMotion} />
+
+      <div className="relative z-20 py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <CratePanel title="Tech Stack" titleIcon={<WoodenCrate size={28} />} variant="wood">
+            <TechCrates categories={sections.techStack} />
+          </CratePanel>
+        </div>
+      </div>
+
+      <div className="relative z-20 py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <CratePanel title="Projects" titleIcon={<TNTCrate size={32} />} variant="tnt">
+            <ProjectList
+              projects={sections.projects}
+              className="grid md:grid-cols-2 gap-4"
+              renderProject={(slot) => <ProjectCard {...slot} />}
+            />
+          </CratePanel>
+        </div>
+      </div>
+
+      {/* ART SECTION 3: WARP PORTAL (After Projects) */}
+      <WarpPortalArt reducedMotion={reducedMotion} />
+
+      {sections.companies.length > 0 && (
+        <div className="relative z-20 py-8 px-6">
+          <div className="max-w-4xl mx-auto">
+            <CratePanel title="Ventures" titleIcon={<Crystal size={28} />} variant="checkpoint">
+              <div className="grid md:grid-cols-3 gap-4">
+                {sections.companies.map((company) => (
+                  <VentureCard key={company.id} company={company} />
+                ))}
+              </div>
+            </CratePanel>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+function MusicianSections({ sections, reducedMotion }: { sections: SectionsOf<'drummer'>; reducedMotion: boolean }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <JungleSceneArt reducedMotion={reducedMotion} />
+      <div className="relative z-20 py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <CratePanel title="Bands" titleIcon={<GemIcon size={26} color="purple" />} variant="nitro">
+            <p className="text-base mb-6" style={{ color: '#fff' }}>
+              Drums since {musician.since}, {musician.yearsPlaying} years
+            </p>
+            <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandCard {...slot} />} />
+            <p className="text-sm mt-6 italic" style={{ color: COLORS.nitroBright }}>
+              {musician.line}
+            </p>
+          </CratePanel>
+        </div>
+      </div>
+      <CrateStackArt reducedMotion={reducedMotion} />
+    </>
+  )
+}
+
+function MartialArtistSections({ sections, reducedMotion }: { sections: SectionsOf<'fighter'>; reducedMotion: boolean }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <CrateStackArt reducedMotion={reducedMotion} />
+      <div className="relative z-20 py-8 px-6">
+        <div className="max-w-4xl mx-auto">
+          <CratePanel title="Muay Thai" titleIcon={<TNTCrate size={32} />} variant="tnt">
+            <h3
+              className="text-xl font-black mb-6"
+              style={{ color: '#fff', fontFamily: 'Impact, Arial Black, sans-serif', textShadow: '2px 2px 0 #000' }}
+            >
+              {martialArts.primary.title}
+            </h3>
+            <MuayThaiRecord
+              martialArts={martialArts}
+              classNames={{
+                facts: 'grid sm:grid-cols-2 gap-4 mb-6',
+                fact: 'p-3 rounded-lg border-2 border-[#FFD700] bg-[#5c1a00]',
+                term: 'text-sm tracking-widest uppercase font-black text-[#FFD700]',
+                value: 'text-sm mt-1 text-white',
+                achievements: 'space-y-2',
+                achievement: 'text-sm flex items-start gap-2 text-white',
+              }}
+              renderAchievement={(achievement) => (
+                <>
+                  <WumpaFruit size={14} className="flex-shrink-0 mt-0.5" />
+                  <span>{achievement}</span>
+                </>
+              )}
+            />
+          </CratePanel>
+        </div>
+      </div>
+      <WarpPortalArt reducedMotion={reducedMotion} />
+    </>
+  )
+}
+
+function ProfessionDetails({ sections, reducedMotion }: { sections: ProfessionSections; reducedMotion: boolean }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} reducedMotion={reducedMotion} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} reducedMotion={reducedMotion} />
+  return <EngineerSections sections={sections} reducedMotion={reducedMotion} />
 }
 
 // ============================================================================
@@ -1728,15 +1844,10 @@ function LifeCounter({ lives = 99, className = '' }: { lives?: number; className
 // MAIN THEME COMPONENT
 // ============================================================================
 export default function TropicalPlatformerTheme() {
-  const { active, setActive } = useProfession()
+  const { active } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
   const reducedMotion = useReducedMotion()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
@@ -1899,326 +2010,126 @@ export default function TropicalPlatformerTheme() {
       <OceanWaves />
 
       {/* ================================================================ */}
-      {/* HEADER */}
+      {/* HEADER - the recruiter first screen */}
       {/* ================================================================ */}
       <header className="relative z-30 pt-8 pb-4 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
-            <div>
-              <LifeCounter lives={99} className="mb-3" />
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-6xl mx-auto">
+              <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+                <div>
+                  <LifeCounter lives={99} className="mb-3" />
 
-              <h1
-                className="text-4xl md:text-6xl font-black tracking-wider"
-                style={{
-                  color: COLORS.crashOrange,
-                  fontFamily: 'Impact, Arial Black, sans-serif',
-                  textShadow: `
-                    4px 4px 0 ${COLORS.jungleDark},
-                    -2px -2px 0 #000,
-                    2px -2px 0 #000,
-                    -2px 2px 0 #000,
-                    0 0 40px ${COLORS.crashOrange}70
-                  `,
-                  letterSpacing: '0.05em',
-                }}
-              >
-                ALEXANDER PULIDO
-              </h1>
+                  <h1
+                    className="text-4xl md:text-6xl font-black tracking-wider uppercase"
+                    style={{
+                      color: COLORS.crashOrange,
+                      fontFamily: 'Impact, Arial Black, sans-serif',
+                      textShadow: `
+                        4px 4px 0 ${COLORS.jungleDark},
+                        -2px -2px 0 #000,
+                        2px -2px 0 #000,
+                        -2px 2px 0 #000,
+                        0 0 40px ${COLORS.crashOrange}70
+                      `,
+                      letterSpacing: '0.05em',
+                    }}
+                  >
+                    {name}
+                  </h1>
 
-              <p
-                className="text-xl md:text-2xl font-bold mt-3"
-                style={{
-                  color: '#fff',
-                  textShadow: '3px 3px 0 rgba(0,0,0,0.8)',
-                  fontFamily: 'Impact, Arial Black, sans-serif',
-                }}
-              >
-                {PROFESSIONAL_SUMMARY[active].headline}
-              </p>
+                  <p
+                    className="text-xl md:text-2xl font-bold mt-3"
+                    style={{
+                      color: '#fff',
+                      textShadow: '3px 3px 0 rgba(0,0,0,0.8)',
+                      fontFamily: 'Impact, Arial Black, sans-serif',
+                    }}
+                  >
+                    {headline}
+                  </p>
 
-              <p
-                className="text-base md:text-lg mt-2 italic"
-                style={{
-                  color: COLORS.tropicalCyan,
-                  textShadow: '2px 2px 0 rgba(0,0,0,0.6)'
-                }}
-              >
-                {PROFESSIONAL_SUMMARY[active].tagline}
-              </p>
+                  <p
+                    className="text-base md:text-lg mt-2 italic"
+                    style={{ color: COLORS.tropicalCyan, textShadow: '2px 2px 0 rgba(0,0,0,0.6)' }}
+                  >
+                    {tagline}
+                  </p>
+
+                  <p className="text-base mt-2" style={{ color: '#fff', textShadow: '2px 2px 0 rgba(0,0,0,0.8)' }}>
+                    {line}
+                  </p>
+                </div>
+
+                <nav className="flex gap-3 items-center flex-wrap" aria-label="Contact and CV">
+                  {actions.map((action) => (
+                    <HeroAction key={action.id} action={action} />
+                  ))}
+                  <CVLink />
+
+                  {/* Nebulith Button - Crystal style */}
+                  <Link
+                    href="/personal-projects/game-engine"
+                    className={CRATE_BUTTON}
+                    style={{
+                      background: `linear-gradient(180deg, #0a1f5c, ${COLORS.crateWood})`,
+                      border: `4px solid ${COLORS.gemBlue}`,
+                      color: COLORS.gemBlue,
+                      boxShadow: '0 5px 0 #001a33, inset 0 2px 0 rgba(255,255,255,0.15)',
+                      fontFamily: 'Impact, sans-serif',
+                      borderRadius: '6px',
+                    }}
+                    aria-label="View Nebulith game engine project"
+                  >
+                    <GemIcon size={22} color="blue" />
+                    NEBULITH
+                  </Link>
+                </nav>
+              </div>
             </div>
-
-            <div className="flex gap-3 items-center flex-wrap">
-              {/* CV Button - Crate style */}
-              <Link
-                href="/cv"
-                className="px-5 py-3 font-black tracking-widest transition-all hover:scale-105 flex items-center gap-2"
-                style={{
-                  background: `linear-gradient(180deg, ${COLORS.crateWood}, ${COLORS.beachBrown})`,
-                  border: `4px solid ${COLORS.wumpaOrange}`,
-                  color: '#fff',
-                  boxShadow: '0 5px 0 #3a2010, inset 0 2px 0 rgba(255,255,255,0.2)',
-                  textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
-                  fontFamily: 'Impact, sans-serif',
-                  borderRadius: '6px',
-                }}
-                aria-label="View CV"
-              >
-                <WoodenCrate size={24} />
-                CV
-              </Link>
-
-              {/* Nebulith Button - Crystal style */}
-              <Link
-                href="/personal-projects/game-engine"
-                className="px-5 py-3 font-black tracking-widest transition-all hover:scale-105 flex items-center gap-2"
-                style={{
-                  background: `linear-gradient(180deg, ${COLORS.oceanRoyal}, ${COLORS.beachBrown})`,
-                  border: `4px solid ${COLORS.gemBlue}`,
-                  color: COLORS.gemBlue,
-                  boxShadow: '0 5px 0 #001a33, inset 0 2px 0 rgba(255,255,255,0.15)',
-                  fontFamily: 'Impact, sans-serif',
-                  borderRadius: '6px',
-                }}
-                aria-label="View Nebulith game engine project"
-              >
-                <GemIcon size={22} color="blue" />
-                NEBULITH
-              </Link>
-
-            </div>
-          </div>
-        </div>
+          )}
+        />
       </header>
 
-      {/* Current Roles */}
-      <section className="relative z-20 py-6 px-6" aria-labelledby="current-roles-heading">
-        <h2 id="current-roles-heading" className="sr-only">Current Roles</h2>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-6">
-            {CURRENT_ROLES.map((role) => (
-              <div
-                key={role.id}
-                className="text-center p-4 rounded-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${COLORS.beachBrown}60, transparent)`,
-                  border: `2px solid ${COLORS.maskYellow}40`,
-                }}
-              >
-                <p className="text-sm font-bold" style={{ color: COLORS.wumpaOrange }}>{role.title}</p>
-                <p className="text-lg font-black" style={{ color: '#fff', fontFamily: 'Impact, sans-serif' }}>{role.company}</p>
-              </div>
-            ))}
-          </div>
+      {/* Warp Zone Profession Selector, System Engineer in the centre */}
+      <section className="relative z-20 py-4" aria-label="Profession selection">
+        <ProfessionSwitch
+          className="flex justify-center gap-4 sm:gap-8 py-10"
+          label="Profession"
+          renderOption={(option) => <WarpZone {...option} reducedMotion={reducedMotion} />}
+        />
+      </section>
+
+      <main className="relative z-20">
+        <div role="region" aria-label={`${active} profession details`}>
+          <ProfessionDetails sections={view.sections} reducedMotion={reducedMotion} />
         </div>
-      </section>
-
-      {/* Warp Zone Profession Selector */}
-      <section className="relative z-20 py-4" aria-label="Select profession">
-        <WarpZoneSelector active={active} onSelect={setActive} reducedMotion={reducedMotion} />
-      </section>
-
-      {/* ================================================================ */}
-      {/* ABOUT SECTION */}
-      {/* ================================================================ */}
-      <section className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel
-            title="About"
-            titleIcon={<AkuAkuMask size={35} animated={!reducedMotion} />}
-            variant="checkpoint"
-          >
-            <p className="text-base leading-relaxed mb-4" style={{ color: '#fff' }}>
-              {aboutData.bio}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  className="px-4 py-2 text-sm font-bold flex items-center gap-2"
-                  style={{
-                    background: `${COLORS.wumpaOrange}25`,
-                    border: `2px solid ${COLORS.wumpaOrange}`,
-                    color: COLORS.wumpaOrange,
-                    borderRadius: '6px',
-                  }}
-                >
-                  <WumpaFruit size={16} />
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </CratePanel>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* ART SECTION 1: JUNGLE SCENE (After About) */}
-      {/* ================================================================ */}
-      <JungleSceneArt reducedMotion={reducedMotion} />
-
-      {/* ================================================================ */}
-      {/* EXPERIENCE SECTION */}
-      {/* ================================================================ */}
-      {experience.length > 0 && (
-        <section className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <CratePanel
-              title="Work Experience"
-              titleIcon={<WoodenCrate size={28} variant="checkpoint" />}
-              variant="temple"
-            >
-              <div className="space-y-4">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </CratePanel>
-          </div>
-        </section>
-      )}
-
-      {/* ================================================================ */}
-      {/* ART SECTION 2: CRATE STACK (After Experience) */}
-      {/* ================================================================ */}
-      <CrateStackArt reducedMotion={reducedMotion} />
-
-      {/* ================================================================ */}
-      {/* SKILLS SECTION */}
-      {/* ================================================================ */}
-      <section className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel
-            title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
-            titleIcon={active === 'engineer' ? <WoodenCrate size={28} /> : <GemIcon size={26} color="purple" />}
-            variant="wood"
-          >
-            {active === 'engineer' ? (
-              <TechCrates categories={engineerTech} />
-            ) : (
-              <SkillsList categories={otherSkills} profession={active as 'drummer' | 'fighter'} />
-            )}
-          </CratePanel>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* PROJECTS SECTION */}
-      {/* ================================================================ */}
-      <section className="relative z-20 py-8 px-6">
-        <div className="max-w-4xl mx-auto">
-          <CratePanel
-            title="Featured Work"
-            titleIcon={<TNTCrate size={32} />}
-            variant="tnt"
-          >
-            <div className="grid md:grid-cols-2 gap-4">
-              {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
-          </CratePanel>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* ART SECTION 3: WARP PORTAL (After Projects) */}
-      {/* ================================================================ */}
-      <WarpPortalArt reducedMotion={reducedMotion} />
-
-      {/* ================================================================ */}
-      {/* VENTURES SECTION (Engineer) */}
-      {/* ================================================================ */}
-      {active === 'engineer' && (
-        <section className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <CratePanel
-              title="Ventures"
-              titleIcon={<Crystal size={28} />}
-              variant="checkpoint"
-            >
-              <div className="grid md:grid-cols-3 gap-4">
-                {COMPANIES.map((company) => (
-                  <VentureCard key={company.id} company={company} />
-                ))}
-              </div>
-            </CratePanel>
-          </div>
-        </section>
-      )}
-
-      {/* ================================================================ */}
-      {/* BANDS SECTION (Drummer) */}
-      {/* ================================================================ */}
-      {active === 'drummer' && (
-        <section className="relative z-20 py-8 px-6">
-          <div className="max-w-4xl mx-auto">
-            <CratePanel
-              title="Bands"
-              titleIcon={<GemIcon size={26} color="purple" />}
-              variant="nitro"
-            >
-              <div className="grid md:grid-cols-3 gap-4">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </CratePanel>
-          </div>
-        </section>
-      )}
+      </main>
 
       {/* ================================================================ */}
       {/* CONTACT CTA */}
       {/* ================================================================ */}
-      <section className="relative z-20 py-12 px-6" aria-label="Contact">
+      <div className="relative z-20 py-12 px-6">
         <div className="max-w-4xl mx-auto">
-          <CratePanel
-            title="Ready to Work Together?"
-            titleIcon={<WumpaFruit size={28} />}
-            variant="checkpoint"
-          >
-            <div className="text-center">
-              <p className="text-lg mb-6" style={{ color: '#fff' }}>
-                10+ years delivering production systems. Let&apos;s build something.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="mailto:alexanderpulido81@gmail.com"
-                  className="px-6 py-3 font-black tracking-widest transition-all hover:scale-105 flex items-center justify-center gap-2"
-                  style={{
-                    background: `linear-gradient(180deg, ${COLORS.crashOrange}, ${COLORS.crashOrangeDark})`,
-                    border: `4px solid ${COLORS.maskYellow}`,
-                    color: '#fff',
-                    boxShadow: '0 5px 0 #994400, inset 0 2px 0 rgba(255,255,255,0.2)',
-                    textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
-                    fontFamily: 'Impact, sans-serif',
-                    borderRadius: '6px',
-                  }}
-                >
-                  <GemIcon size={20} color="yellow" />
-                  GET IN TOUCH
-                </a>
-                <Link
-                  href="/cv"
-                  className="px-6 py-3 font-black tracking-widest transition-all hover:scale-105 flex items-center justify-center gap-2"
-                  style={{
-                    background: `linear-gradient(180deg, ${COLORS.crateWood}, ${COLORS.beachBrown})`,
-                    border: `4px solid ${COLORS.cratePeru}`,
-                    color: '#fff',
-                    boxShadow: '0 5px 0 #3a2010, inset 0 2px 0 rgba(255,255,255,0.2)',
-                    textShadow: '2px 2px 0 rgba(0,0,0,0.6)',
-                    fontFamily: 'Impact, sans-serif',
-                    borderRadius: '6px',
-                  }}
-                >
-                  <WoodenCrate size={20} />
-                  DOWNLOAD CV
-                </Link>
-              </div>
-            </div>
+          <CratePanel title="Ready to Work Together?" titleIcon={<WumpaFruit size={28} />} variant="checkpoint">
+            <RecruiterHero
+              render={({ line, actions }) => (
+                <div className="text-center">
+                  <p className="text-lg mb-6" style={{ color: '#fff' }}>
+                    {line}
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    {actions.map((action) => (
+                      <HeroAction key={action.id} action={action} />
+                    ))}
+                    <CVLink />
+                  </div>
+                </div>
+              )}
+            />
           </CratePanel>
         </div>
-      </section>
+      </div>
 
       {/* ================================================================ */}
       {/* FOOTER */}
