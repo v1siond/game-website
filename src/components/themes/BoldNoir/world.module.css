@@ -1,131 +1,907 @@
 /*
- * Bold Noir's page look, outside the scroll scenes (scenes.module.css): the rain soaked night behind
- * the page with venetian blind light falling across it, the graphic novel panel and its typewriter
- * caption box, the cards, the lettering, and the focus ring. Black, white and the greys between, with
- * one red accent. Shadows and gradients are static; the only ambient loop is the rain, on transform,
- * and it stops under reduced motion.
+ * Bold Noir's whole look and motion: flat black slabs and paper on crooked boxes (no two edges parallel),
+ * one loud red, ransom note lettering, star bursts, halftone dots and glass shards. Fills are flat, depth
+ * comes from stacked flat layers and hard offset shadows, never a gradient. Every move is snappy with an
+ * overshoot (--snap) and lands hard; nothing floats. Animations move transform and opacity only; the
+ * static filters (offset silhouettes, hard shadows) never animate. A reveal plays once: the component
+ * adds data-on when it fires and never removes it. Under reduced motion every reveal shows its final
+ * frame, the finisher goes straight to its card and the loops stop.
  */
 
-/* The colours come from palette.ts as --noir-* (NOIR_VARS on the root). */
 .root {
+  --snap: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cut: cubic-bezier(0.7, 0, 0.2, 1);
+  --crook: polygon(0 2%, 100% 0, 98.5% 100%, 1.2% 97%);
+
   background: var(--noir-ink);
   color: var(--noir-paper);
   font-family: 'Bebas Neue', 'Impact', 'Arial Narrow', sans-serif;
 }
 
-/* Body copy stays a plain sans for reading; captions are typed, titles are the condensed poster face. */
 .copy {
   font-family: ui-sans-serif, system-ui, sans-serif;
-}
-
-.typed {
-  font-family: 'Courier New', Courier, ui-monospace, monospace;
-}
-
-/* ---- the night behind the page ---- */
-
-/* Venetian blind light: hard slanted bands of window light across the dark, fading towards the floor. */
-.blinds {
-  background: repeating-linear-gradient(
-    -24deg,
-    rgb(242 239 230 / 0.07) 0 2.25rem,
-    transparent 2.25rem 3.5rem
-  );
-  mask-image: linear-gradient(200deg, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 85%);
-}
-
-/* The corner the light comes from stays darkest; the page edges fall into shadow. */
-.vignette {
-  background: radial-gradient(ellipse at 70% 20%, transparent 30%, rgb(10 10 10 / 0.75) 100%);
-}
-
-/* Rain: two layers of short slanted streaks, each one tile (--fall) taller than the screen, falling one
-   tile per loop on transform only, so the loop never shows a seam. */
-.rain,
-.rainFar {
-  position: fixed;
-  inset: 0 0 auto;
-  height: calc(100% + var(--fall));
-  animation: rain var(--loop) linear infinite;
-}
-
-.rain {
-  --fall: 140px;
-  --loop: 0.9s;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='140'%3E%3Cpath d='M12 0 l-3 24 M72 42 l-3 24 M42 92 l-3 24 M104 112 l-3 24' stroke='%23f2efe6' stroke-opacity='0.22' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  background-size: 120px 140px;
-}
-
-.rainFar {
-  --fall: 90px;
-  --loop: 1.6s;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='90'%3E%3Cpath d='M16 8 l-2 14 M58 52 l-2 14' stroke='%23f2efe6' stroke-opacity='0.12' stroke-width='1' fill='none'/%3E%3C/svg%3E");
-  background-size: 80px 90px;
-}
-
-@keyframes rain {
-  from {
-    transform: translate3d(0, calc(var(--fall) * -1), 0);
-  }
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rain,
-  .rainFar {
-    animation: none;
-  }
-}
-
-/* ---- surfaces ---- */
-
-/* A graphic novel panel: the white gutter line round a black frame and a hard drop into the dark. */
-.panel {
-  background: var(--noir-coal);
-  border: 3px solid var(--noir-paper);
-  box-shadow: 8px 8px 0 #000;
-}
-
-/* The caption box on a panel's edge: typed black on old paper, like a narrated line. */
-.caption {
-  background: var(--noir-paper);
-  color: var(--noir-ink);
-  box-shadow: 4px 4px 0 var(--noir-red);
-}
-
-.card {
-  background: var(--noir-ink);
-  border: 2px solid var(--noir-ash);
-  border-left: 5px solid var(--noir-red);
-}
-
-/* A photograph on the case file: a paper border round the dark print. */
-.photo {
-  background: var(--noir-ink);
-  border: 6px solid var(--noir-paper);
-  box-shadow: 6px 6px 0 #000;
-}
-
-/* The lineup wall behind him on the profession switch: the height lines of a police lineup. */
-.lineup {
-  background: repeating-linear-gradient(180deg, transparent 0 0.9rem, rgb(242 239 230 / 0.22) 0.9rem 1rem), var(--noir-coal);
-}
-
-/* ---- lettering ---- */
-
-/* The big title: paper letters cut with a hard red drop and a black one under it. */
-.title {
-  text-shadow:
-    3px 3px 0 var(--noir-red),
-    6px 6px 0 #000;
 }
 
 .focusRing :focus-visible {
   outline: 3px solid var(--noir-red);
   outline-offset: 3px;
   box-shadow: 0 0 0 6px var(--noir-paper);
+}
+
+/* ---- the night behind the page ---- */
+
+/* Halftone dots, densest in the top corner the red slab cuts from. */
+.halftone {
+  background-image: radial-gradient(rgb(247 245 239 / 0.09) 1.5px, transparent 1.6px);
+  background-size: 14px 14px;
+  mask-image: linear-gradient(160deg, #000 0%, rgb(0 0 0 / 0.4) 40%, transparent 75%);
+}
+
+/* The pointer layers: --mx and --my (-1 to 1) are written on the root by the theme, one rAF a frame. */
+.follow {
+  transform: translate3d(calc(var(--mx, 0) * 18px), calc(var(--my, 0) * 12px), 0);
+}
+
+.followSoft {
+  transform: translate3d(calc(var(--mx, 0) * -8px), calc(var(--my, 0) * -6px), 0) rotate(calc(var(--mx, 0) * 2deg));
+}
+
+.lean {
+  transform: perspective(1200px) rotateY(calc(var(--mx, 0) * 7deg)) rotateX(calc(var(--my, 0) * -5deg));
+}
+
+.spin {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: spin 90s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- surfaces: crooked boxes built from flat layers ---- */
+
+/*
+ * A crooked black slab: the paper edge (::before) and the coal fill (::after) are clipped to the same
+ * crooked polygon (--crook, set per card), the hard red drop is a static drop-shadow that follows the
+ * clipped shape. The content inside stays level so it reads.
+ */
+.slab {
+  position: relative;
+  isolation: isolate;
+  filter: drop-shadow(8px 8px 0 var(--noir-red));
+}
+
+.slab::before,
+.slab::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  clip-path: var(--crook);
+}
+
+.slab::before {
+  inset: 0;
+  background: var(--noir-paper);
+}
+
+.slab::after {
+  inset: 3px;
+  background: var(--noir-coal);
+}
+
+/* A crooked paper speech box with a tail, a hard ink shadow and a red one behind it. */
+.speech {
+  position: relative;
+  isolation: isolate;
+  color: var(--noir-ink);
+  filter: drop-shadow(10px 10px 0 var(--noir-ink)) drop-shadow(4px 4px 0 var(--noir-red));
+}
+
+.speech::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--noir-paper);
+  clip-path: polygon(0 4%, 100% 0, 97% 92%, 18% 95%, 8% 100%, 10% 94%, 2% 96%);
+}
+
+/* A section title: paper words on a crooked red panel with a hard ink drop. */
+.heading {
+  position: relative;
+  isolation: isolate;
+  color: var(--noir-paper);
+  filter: drop-shadow(5px 5px 0 var(--noir-ink));
+}
+
+.heading::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--noir-red);
+  clip-path: polygon(0 10%, 100% 0, 96% 100%, 3% 88%);
+}
+
+.chip {
+  background: var(--noir-paper);
+  color: var(--noir-ink);
+}
+
+/* ---- ransom note lettering ---- */
+
+.letter {
+  display: inline-block;
+  transform: translate3d(0, var(--y, 0), 0) rotate(var(--r, 0deg));
+}
+
+.letterInk {
+  background: var(--noir-ink);
+  color: var(--noir-paper);
+  outline: 2px solid var(--noir-paper);
+}
+
+.letterPaper {
+  background: var(--noir-paper);
+  color: var(--noir-ink);
+}
+
+.letterRed {
+  background: var(--noir-red);
+  color: var(--noir-paper);
+}
+
+/* A bare letter, no box, paper on the dark: the cut that keeps the word uneven. */
+.letterBare {
+  color: var(--noir-paper);
+}
+
+/* ---- the hero: the calling card thrown at the screen, then the name drops in letter by letter ---- */
+
+.hero:not([data-on]) .card,
+.hero:not([data-on]) .letter,
+.hero:not([data-on]) .after {
+  opacity: 0;
+}
+
+.hero[data-on] .card {
+  animation: throw 560ms var(--snap) both;
+}
+
+.hero[data-on] .letter {
+  animation: letterDrop 300ms var(--snap) both;
+  animation-delay: calc(420ms + var(--i, 0) * 45ms);
+}
+
+.hero[data-on] .after {
+  animation: slashIn 320ms var(--cut) both;
+  animation-delay: calc(500ms + var(--n, 10) * 45ms);
+}
+
+@keyframes throw {
+  from {
+    opacity: 0;
+    transform: translate3d(-70vw, -30vh, 0) rotate(-560deg) scale(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(-3deg) scale(1);
+  }
+}
+
+@keyframes letterDrop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -1.2em, 0) rotate(calc(var(--r, 0deg) - 45deg)) scale(2);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, var(--y, 0), 0) rotate(var(--r, 0deg)) scale(1);
+  }
+}
+
+@keyframes slashIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-3rem, 0, 0) skewX(-30deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+.card {
+  transform: rotate(-3deg);
+}
+
+/* ---- the profession menu: crooked slabs, the pick swells and tilts, the red jag jitters behind it ---- */
+
+.menuItem {
+  transform: skewX(-10deg);
+  transition: transform 160ms var(--snap);
+}
+
+.menuItem:hover {
+  transform: skewX(-10deg) translate3d(6px, -4px, 0);
+}
+
+.menuItem[aria-checked='true'] {
+  transform: skewX(-10deg) translate3d(8px, -8px, 0) rotate(-3deg) scale(1.08);
+}
+
+.unskew {
+  transform: skewX(10deg);
+}
+
+.jag {
+  transform: scale(0, 0.6);
+  transition: transform 180ms var(--snap);
+}
+
+.menuItem:hover .jag {
+  transform: scale(0.85, 0.85);
+}
+
+.menuItem[aria-checked='true'] .jag {
+  transform: scale(1, 1);
+  animation: jagJitter 720ms steps(1) infinite;
+}
+
+/* The highlighter keeps changing shape: three hard poses, no tween between them. */
+@keyframes jagJitter {
+  0% {
+    transform: scale(1, 1) skewX(0);
+  }
+  33% {
+    transform: scale(1.06, 0.94) skewX(-6deg) rotate(1.5deg);
+  }
+  66% {
+    transform: scale(0.96, 1.05) skewX(5deg) rotate(-2deg);
+  }
+}
+
+/* Him with the flat red silhouette offset behind (static, never animated). */
+.redShadow {
+  filter: drop-shadow(5px 3px 0 var(--noir-red));
+}
+
+/* Solid black: him in the finisher, the lights dropped. */
+.silhouette {
+  filter: brightness(0);
+}
+
+/* The cut-in on a profession pick: the red band and his eyes strip sweep across and out. */
+.cutBand {
+  animation: cutAcross 680ms var(--cut) both;
+}
+
+.cutStrip {
+  animation: cutAcross 680ms var(--cut) 60ms both;
+}
+
+@keyframes cutAcross {
+  0% {
+    transform: translate3d(-115%, 0, 0) skewY(-8deg);
+  }
+  32%,
+  68% {
+    transform: translate3d(0, 0, 0) skewY(-8deg);
+  }
+  100% {
+    transform: translate3d(115%, 0, 0) skewY(-8deg);
+  }
+}
+
+/* ---- the profession sets: a crooked frame, slammed in on every pick ---- */
+
+.setFrame {
+  clip-path: polygon(0 4%, 100% 0, 99% 100%, 1% 95%);
+}
+
+.setIn {
+  animation: setSlam 340ms var(--snap) both;
+}
+
+@keyframes setSlam {
+  from {
+    opacity: 0;
+    transform: scale(1.12) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* The office: the code lines type in one after another and start over, the cursor blinks. */
+.typeLine {
+  transform-box: fill-box;
+  transform-origin: 0% 50%;
+  animation: typeLine 2.4s steps(6) infinite;
+  animation-delay: calc(var(--i, 0) * 0.5s);
+}
+
+@keyframes typeLine {
+  0% {
+    transform: scaleX(0);
+  }
+  40%,
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* The club: the spotlight sweeps the stage, the crash cymbal shakes on the hit. */
+.sweep {
+  transform-box: view-box;
+  transform-origin: 300px -10px;
+  animation: sweep 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes sweep {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+.crash {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: crash 0.9s var(--snap) infinite;
+}
+
+@keyframes crash {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  10% {
+    transform: rotate(-12deg);
+  }
+  30% {
+    transform: rotate(6deg);
+  }
+}
+
+/* The gym: the heavy bag swings on its chain, a hit star bursts on it at the top of each swing. */
+.swing {
+  transform-box: view-box;
+  transform-origin: 370px 0;
+  animation: swing 1.6s ease-in-out infinite;
+}
+
+@keyframes swing {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  12% {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+.bagHit {
+  animation: bagHit 1.6s var(--snap) infinite;
+}
+
+@keyframes bagHit {
+  0%,
+  30%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  8% {
+    opacity: 1;
+    transform: scale(1.1) rotate(20deg);
+  }
+}
+
+/* ---- the lists: each item waits hidden until its stage fires, then plays its own entrance ---- */
+
+.stage:not([data-on]) .rank,
+.stage:not([data-on]) .result,
+.stage:not([data-on]) .hit,
+.stage:not([data-on]) .stamp,
+.stage:not([data-on]) .burst,
+.stage:not([data-on]) .trail,
+.stage:not([data-on]) .speech {
+  opacity: 0;
+}
+
+/* About: the speech box lands with a short wobble of chaotic energy, then rests level. */
+.stage[data-on] .speech {
+  animation: speechIn 520ms steps(5) both;
+}
+
+@keyframes speechIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) rotate(-6deg);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.05) rotate(3deg);
+  }
+  40% {
+    transform: scale(0.98) rotate(-2deg);
+  }
+  60% {
+    transform: scale(1.02) rotate(1.5deg);
+  }
+  80% {
+    transform: scale(1) rotate(-0.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+/* Experience: the rank card snaps flat from a tilt, then its years slam in like the day change. */
+.stage[data-on] .rank {
+  animation: rankFlip 460ms var(--snap) both;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+.stage[data-on] .stamp {
+  animation: stamp 260ms var(--snap) both;
+  animation-delay: calc(300ms + var(--i, 0) * 110ms);
+}
+
+@keyframes rankFlip {
+  from {
+    opacity: 0;
+    transform: perspective(900px) rotateY(-85deg) rotate(-8deg);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(900px) rotateY(0) rotate(0);
+  }
+}
+
+@keyframes stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.6) rotate(-24deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(-6deg);
+  }
+}
+
+.stampRest {
+  transform: rotate(-6deg);
+}
+
+.lift {
+  transition: transform 160ms var(--snap);
+}
+
+.lift:hover {
+  transform: translate3d(0, -6px, 0) rotate(var(--tilt, 0deg));
+}
+
+/* Projects and bands: the result panel slides in from the side and overshoots. */
+.stage[data-on] .result {
+  animation: resultSlide 420ms var(--snap) both;
+  animation-delay: calc(200ms + var(--i, 0) * 90ms);
+}
+
+@keyframes resultSlide {
+  from {
+    opacity: 0;
+    transform: translate3d(-40%, 0, 0) skewX(-14deg);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+/* Bands: the uneven red line of the victory screen draws across first, the panels land on it. */
+.stage[data-on] .trail {
+  animation: trailDraw 380ms var(--cut) both;
+}
+
+.trail {
+  transform-origin: 0% 50%;
+}
+
+@keyframes trailDraw {
+  from {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+.kick {
+  transition: transform 150ms var(--snap);
+}
+
+.kick:hover,
+.kick:focus-visible {
+  transform: translate3d(6px, -6px, 0) rotate(-1.5deg);
+}
+
+/* Muay Thai: each achievement slams in with a hit star behind it; hover hits it again. */
+.stage[data-on] .hit {
+  animation: slam 300ms var(--snap) both;
+  animation-delay: calc(var(--i, 0) * 160ms);
+}
+
+.stage[data-on] .burst {
+  animation: burstHit 360ms var(--snap) both;
+  animation-delay: calc(var(--i, 0) * 160ms);
+}
+
+@keyframes slam {
+  from {
+    opacity: 0;
+    transform: scale(1.7) rotate(4deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes burstHit {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-60deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+.burstHover {
+  transition: transform 200ms var(--snap);
+}
+
+.hitRow:hover .burstHover {
+  transform: scale(1.35) rotate(30deg);
+}
+
+/* ---- the finisher on a project open (the phases run on CSS delays from the dialog's open) ---- */
+
+.allOut {
+  max-width: none;
+  max-height: none;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--noir-paper);
+  overflow: hidden;
+}
+
+.allOut::backdrop {
+  background: rgb(10 10 10 / 0.88);
+}
+
+/* 1. A dust cloud wipes the screen and hides the change of scene. */
+.dust {
+  animation: dustWipe 560ms var(--cut) both;
+}
+
+@keyframes dustWipe {
+  from {
+    transform: translate3d(-110%, 0, 0);
+  }
+  to {
+    transform: translate3d(110%, 0, 0);
+  }
+}
+
+/* 2. The flat red field under it, then the cracks across it. */
+.field {
+  animation: appear 1ms linear 220ms both;
+}
+
+.crack {
+  transform-origin: 50% 50%;
+  animation: crackIn 180ms var(--cut) 420ms both;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes crackIn {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* 3. Three of him, lights dropped to silhouettes, leap out of frame on a staggered rhythm. */
+.leap {
+  animation: leap 520ms var(--cut) both;
+  animation-delay: calc(520ms + var(--i, 0) * 110ms);
+}
+
+.hop {
+  animation: hopThenLeap 640ms var(--cut) 480ms both;
+}
+
+@keyframes leap {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(0, 8%, 0) scale(1.04, 0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(30vw, -120vh, 0) rotate(18deg);
+  }
+}
+
+@keyframes hopThenLeap {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(0, -12%, 0);
+  }
+  35% {
+    transform: translate3d(0, 0, 0) scale(1.04, 0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(-30vw, -120vh, 0) rotate(-18deg);
+  }
+}
+
+/* 4. The field shatters, the shards fly past the camera. */
+.shard {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: shardFly 520ms cubic-bezier(0.5, 0, 0.9, 0.6) both;
+  animation-delay: calc(1080ms + var(--i, 0) * 30ms);
+}
+
+@keyframes shardFly {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--dx, 0), var(--dy, 0), 0) scale(3.2) rotate(var(--spin, 40deg));
+  }
+}
+
+.shake {
+  animation: shake 240ms steps(4) 1060ms both;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(-10px, 6px, 0);
+  }
+  50% {
+    transform: translate3d(8px, -8px, 0);
+  }
+  75% {
+    transform: translate3d(-6px, -4px, 0);
+  }
+}
+
+/* 5. Streaks cross the screen, impact stars pop. */
+.streak {
+  animation: streak 260ms var(--cut) both;
+  animation-delay: calc(1320ms + var(--i, 0) * 70ms);
+}
+
+@keyframes streak {
+  from {
+    opacity: 1;
+    transform: translate3d(-120vw, 0, 0) rotate(var(--a, -18deg));
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(120vw, 0, 0) rotate(var(--a, -18deg));
+  }
+}
+
+.impact {
+  animation: impact 220ms var(--snap) both;
+  animation-delay: calc(1380ms + var(--i, 0) * 120ms);
+}
+
+@keyframes impact {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(-40deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) rotate(20deg);
+  }
+}
+
+/* 6. One bright flash clears the board. */
+.flash {
+  animation: flash 260ms ease-out 1700ms both;
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+
+/* 7. The finish: he drops onto the red and black field, a snappy zoom brings the card in with a shake,
+   the burst with its glass drifts slowly behind. */
+.finishDrop {
+  animation: finishDrop 300ms var(--snap) both;
+}
+
+.finish {
+  animation: finishIn 380ms var(--snap) 120ms both;
+}
+
+.drift {
+  animation: drift 24s linear infinite;
+}
+
+@keyframes finishDrop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -60vh, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes finishIn {
+  0% {
+    opacity: 0;
+    transform: scale(2.4) rotate(8deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.96) rotate(-2.5deg);
+  }
+  75% {
+    transform: translate3d(-6px, 4px, 0) scale(1) rotate(-1.5deg);
+  }
+  90% {
+    transform: translate3d(4px, -3px, 0) rotate(-1.5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(-1.5deg);
+  }
+}
+
+@keyframes drift {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- contact: the second calling card, thrown in from the other side ---- */
+
+.stage:not([data-on]) .delivered {
+  opacity: 0;
+}
+
+.stage[data-on] .delivered {
+  animation: deliver 600ms var(--snap) both;
+}
+
+@keyframes deliver {
+  from {
+    opacity: 0;
+    transform: translate3d(70vw, -20vh, 0) rotate(600deg) scale(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(2deg) scale(1);
+  }
+}
+
+.delivered {
+  transform: rotate(2deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin,
+  .drift,
+  .hero .card,
+  .hero .letter,
+  .hero .after,
+  .stage .rank,
+  .stage .stamp,
+  .stage .result,
+  .stage .trail,
+  .stage .hit,
+  .stage .burst,
+  .stage .speech,
+  .stage .delivered,
+  .finish,
+  .finishDrop,
+  .setIn,
+  .typeLine,
+  .blink,
+  .sweep,
+  .crash,
+  .swing,
+  .bagHit,
+  .menuItem[aria-checked='true'] .jag {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .follow,
+  .followSoft,
+  .lean {
+    transform: none;
+  }
+
+  .menuItem,
+  .jag,
+  .lift,
+  .kick,
+  .burstHover {
+    transition: none;
+  }
 }

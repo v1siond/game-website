@@ -266,7 +266,7 @@ export const themes: Theme[] = [
   {
     id: 'bold-noir',
     name: 'Bold Noir',
-    description: 'Graphic novel night - black, white and one red accent, rain',
+    description: 'Gentleman thief night in black, white and one loud red: a calling card in ransom letters, crooked black and red menu slabs with a cut-in, every project opened by a finisher rush',
     colors: {
       background: NOIR.ink,
       backgroundGradient: `linear-gradient(135deg, ${NOIR.coal}, ${NOIR.ink})`,
