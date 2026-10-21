@@ -61,10 +61,11 @@ const engineerOf = (view: ReturnType<typeof viewFor>) => {
 const ids = (entries: Array<{ id: string }>) => entries.map((entry) => entry.id)
 
 describe('viewFor: the recruiter hero', () => {
-  it('takes headline, tagline, the contact line and both actions from the content', () => {
+  it('takes name, headline, tagline, the contact line and both actions from the content', () => {
     const cv = realCV()
     const { hero } = viewFor(cv, 'engineer', 'world', NOW)
 
+    expect(hero.name).toBe('Alexander Pulido')
     expect(hero.headline).toBe(cv.professionalSummary.headline)
     expect(hero.tagline).toBe(cv.professionalSummary.tagline)
     expect(hero.line).toBe(cv.contact.line)

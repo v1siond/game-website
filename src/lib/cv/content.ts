@@ -122,7 +122,7 @@ export interface Role {
 
 /** What each content file holds inside one locale block. */
 export interface CVContentSections {
-  summary: { professionalSummary: ProfessionalSummary }
+  summary: { fullName: string; professionalSummary: ProfessionalSummary }
   contact: { contact: Contact }
   experience: { workExperience: JobEntry[] }
   projects: { projects: Project[] }

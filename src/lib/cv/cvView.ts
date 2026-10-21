@@ -13,6 +13,7 @@ export interface HeroAction {
 }
 
 export interface RecruiterHero {
+  name: string
   headline: string
   tagline: string
   line: string
@@ -96,7 +97,8 @@ const SECTIONS_FOR: Record<Profession, (cv: CVData, keep: Keep) => ProfessionSec
   fighter: (cv) => ({ profession: 'fighter', martialArts: cv.martialArts }),
 }
 
-const heroFor = ({ professionalSummary, contact }: CVData): RecruiterHero => ({
+const heroFor = ({ fullName, professionalSummary, contact }: CVData): RecruiterHero => ({
+  name: fullName,
   headline: professionalSummary.headline,
   tagline: professionalSummary.tagline,
   line: contact.line,
