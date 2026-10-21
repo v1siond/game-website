@@ -1,0 +1,196 @@
+/*
+ * The research board (camera.tsx). Arrival: each print swings in on its pin to its own small tilt,
+ * staggered by --i, off the board's data-on. Hover or focus: the gold brackets close in and lock on.
+ * The viewfinder is fixed to the viewport and follows the pointer through --mx and --my (-1 to 1 from
+ * the viewport centre), shown only while a fine pointer is over the board. A snap: the white flash, the
+ * veil over the plate clears, the stamp lands. Transform and opacity only.
+ */
+
+.board {
+  --ease-swing: cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.print {
+  --tilt: calc((var(--i) - 1) * 0.6deg);
+  opacity: 0;
+  transform-origin: 50% 0;
+  transform: rotate(calc(var(--tilt) * 8));
+}
+
+.board[data-on] .print {
+  opacity: 1;
+  transform: rotate(var(--tilt));
+  transition:
+    opacity 0.5s ease-out calc(var(--i) * 110ms),
+    transform 0.9s var(--ease-swing) calc(var(--i) * 110ms);
+}
+
+.paper {
+  background: linear-gradient(180deg, #f6ecd6, #e6d6b4);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.45);
+}
+
+.pin {
+  background: radial-gradient(circle at 35% 35%, var(--deco-gold-bright), var(--deco-brass-dark));
+  box-shadow: 0 2px 3px rgb(0 0 0 / 0.5);
+}
+
+.title {
+  font-family: var(--deco-display);
+  color: var(--deco-abyss);
+  letter-spacing: 0.04em;
+}
+
+.impact {
+  border-left: 3px solid var(--deco-blood);
+  background: rgb(139 0 0 / 0.08);
+  color: var(--deco-sepia);
+}
+
+.tech {
+  border: 1px solid var(--deco-sepia);
+  color: var(--deco-sepia);
+}
+
+.link,
+.snap {
+  border: 2px solid var(--deco-abyss);
+  color: var(--deco-abyss);
+  transition: transform 0.2s ease-out;
+}
+
+.snap {
+  background: var(--deco-abyss);
+  color: var(--deco-cream);
+}
+
+.link:hover,
+.snap:hover {
+  transform: translate3d(0, -2px, 0);
+}
+
+.link:focus-visible,
+.snap:focus-visible {
+  outline: 2px solid var(--deco-blood);
+  outline-offset: 2px;
+}
+
+/* The plate's half developed state, and its full development after a snap. */
+.veil {
+  background: linear-gradient(180deg, rgb(58 42 20 / 0.85), rgb(20 12 4 / 0.9));
+  mix-blend-mode: multiply;
+  opacity: 0.9;
+}
+
+.board[data-on] .veil {
+  opacity: 0.55;
+  transition: opacity 1.4s ease-out calc(0.4s + var(--i) * 110ms);
+}
+
+.print[data-developed] .veil {
+  opacity: 0;
+  transition: opacity 0.9s ease-out 0.2s;
+}
+
+.flash {
+  opacity: 0;
+  animation: flash 0.35s ease-out;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.stamp {
+  border: 2px solid var(--deco-blood);
+  color: var(--deco-blood);
+  background: rgb(246 236 214 / 0.9);
+  font-family: var(--deco-display);
+  animation: stamp 0.35s cubic-bezier(0.3, 0, 0.2, 1) 0.25s both;
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(1.8) rotate(-14deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-8deg);
+  }
+}
+
+/* The brackets wait wide and faint, and close in on the print the viewfinder is on. */
+.bracket {
+  opacity: 0;
+  transform: scale(1.25);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.25s ease-out;
+}
+
+.print:hover .bracket,
+.print:focus-within .bracket {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.finder {
+  opacity: 0;
+  transform: translate3d(calc(var(--mx, 0) * 50vw - 50%), calc(var(--my, 0) * 50vh - 50%), 0);
+  transition: opacity 0.2s ease-out;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .board:hover .finder {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .print,
+  .board[data-on] .print {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .board[data-on] .veil,
+  .print[data-developed] .veil {
+    transition: none;
+  }
+
+  .flash,
+  .stamp {
+    animation: none;
+  }
+
+  .flash {
+    opacity: 0;
+  }
+
+  .stamp {
+    transform: rotate(-8deg);
+  }
+
+  .finder,
+  .board:hover .finder {
+    opacity: 0;
+  }
+
+  .bracket,
+  .link,
+  .snap {
+    transition: none;
+  }
+
+  .link:hover,
+  .snap:hover {
+    transform: none;
+  }
+}

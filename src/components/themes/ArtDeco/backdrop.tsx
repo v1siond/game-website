@@ -2,25 +2,15 @@ import type { CSSProperties } from 'react'
 import { DECO_COLORS as C } from './palette'
 import look from './world.module.css'
 
-// The fixed backdrop of the city under the sea behind every section: the shared SVG gradients and
-// patterns, the deco pattern, the light rays through the dome, the caustic light, a few rising bubbles
-// and the lighthouse on the surface. Ambient loops stop under reduced motion (world.module.css).
+// The fixed backdrop of the city under the sea behind every section: the SVG patterns, the deco
+// pattern, the light rays through the dome, the caustic light and a few rising bubbles.
+// Ambient loops stop under reduced motion (world.module.css).
 
 export function DecoSVGDefs() {
   return (
     <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
       <defs>
-        <linearGradient id="brass-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={C.goldBright} />
-          <stop offset="50%" stopColor={C.gold} />
-          <stop offset="100%" stopColor={C.brassDark} />
-        </linearGradient>
 
-        <radialGradient id="porthole-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor={C.goldBright} stopOpacity="0.8" />
-          <stop offset="60%" stopColor={C.gold} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={C.gold} stopOpacity="0" />
-        </radialGradient>
 
         <pattern id="deco-diamonds" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
           <path d="M40 0 L80 40 L40 80 L0 40 Z" fill="none" stroke={C.gold} strokeWidth="0.5" opacity="0.1" />
@@ -111,27 +101,6 @@ export function UnderwaterBubbles() {
           style={{ '--x': x, '--size': size, '--rise': rise, '--delay': delay, '--drift': drift, '--rest': rest } as CSSProperties}
         />
       ))}
-    </div>
-  )
-}
-
-// The lighthouse on the surface, its beam turning.
-export function LighthouseBeacon() {
-  return (
-    <div className="pointer-events-none fixed left-1/2 top-8 z-[4] -translate-x-1/2 opacity-[0.15]" aria-hidden="true">
-      <svg width="60" height="100" viewBox="0 0 60 100" focusable="false">
-        <path d="M20 100 L15 50 L45 50 L40 100" fill={C.gold} opacity="0.5" />
-        <path d="M17 70 L43 70 M16 85 L44 85" stroke={C.bronzeDark} strokeWidth="2" opacity="0.3" />
-        <rect x="12" y="35" width="36" height="15" fill={C.gold} opacity="0.6" />
-        <path d="M10 35 L30 20 L50 35" fill={C.gold} opacity="0.5" />
-        <circle cx="30" cy="42" r="8" fill={C.goldBright} />
-        <g className={look.beam}>
-          <line x1="30" y1="34" x2="30" y2="15" stroke={C.goldBright} strokeWidth="2" opacity="0.5" />
-          <line x1="38" y1="35" x2="55" y2="25" stroke={C.goldBright} strokeWidth="1.5" opacity="0.4" />
-          <line x1="22" y1="35" x2="5" y2="25" stroke={C.goldBright} strokeWidth="1.5" opacity="0.4" />
-        </g>
-        <circle cx="30" cy="42" r="15" fill="url(#porthole-glow)" opacity="0.5" />
-      </svg>
     </div>
   )
 }

@@ -1,0 +1,213 @@
+/*
+ * The vending machine (machine.tsx). Each pick remounts the glass, the bulbs and the bottle under a new
+ * key, so these keyframes play once per pick: the blind drops over the glass (0 to 280 ms), holds while
+ * the costume changes, lifts (to 900 ms); the prop and his figure rise into the case under it; the
+ * bottle drops into the tray and settles; the two bulb layers alternate in a chase for 1.6 s. Nothing
+ * plays before the machine is in view (data-on). Transform and opacity only.
+ */
+
+.machine {
+  --ease-vend: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.cabinet {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 22px, rgb(212 175 55 / 0.05) 22px 24px),
+    linear-gradient(180deg, #2a1a10, #170d08 70%, #0f0905);
+  box-shadow: inset 0 0 60px rgb(0 0 0 / 0.6);
+}
+
+.marquee {
+  font-family: var(--deco-display);
+  color: var(--deco-gold-bright);
+  text-shadow: 0 0 6px rgb(240 200 80 / 0.7);
+}
+
+/* Bulbs round the marquee: two layers of dots offset by one bulb, so alternating them chases. */
+.bulbs {
+  background-image: radial-gradient(circle, var(--deco-gold-bright) 0 2.5px, transparent 3px);
+  background-size: 16px 100%;
+  background-repeat: repeat-x;
+  -webkit-mask: linear-gradient(#000 0 6px, transparent 6px calc(100% - 6px), #000 calc(100% - 6px));
+  mask: linear-gradient(#000 0 6px, transparent 6px calc(100% - 6px), #000 calc(100% - 6px));
+}
+
+.bulbsOdd {
+  opacity: 0.9;
+}
+
+.bulbsEven {
+  background-position: 8px 0;
+  opacity: 0.25;
+}
+
+.machine[data-on] .bulbsOdd {
+  animation: chase 0.2s steps(1, end) 8 alternate;
+}
+
+.machine[data-on] .bulbsEven {
+  animation: chase 0.2s steps(1, end) 8 alternate-reverse;
+}
+
+@keyframes chase {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
+
+/* ---- the glass case ---- */
+
+.glass {
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 30%, rgb(65 200 232 / 0.18), transparent 70%),
+    linear-gradient(180deg, #0f3550, #07182a);
+}
+
+.shine {
+  background: linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 0.1) 38%, transparent 46%);
+}
+
+.blind {
+  background: repeating-linear-gradient(180deg, #6b5818 0 10px, #3a2c08 10px 12px);
+  transform: translate3d(0, -101%, 0);
+}
+
+.machine[data-on] .blind {
+  animation: blind 0.9s var(--ease-vend);
+}
+
+@keyframes blind {
+  0% {
+    transform: translate3d(0, -101%, 0);
+  }
+  30%,
+  55% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, -101%, 0);
+  }
+}
+
+.figure,
+.prop {
+  opacity: 0;
+}
+
+.machine[data-on] .figure {
+  animation: rise 0.6s var(--ease-vend) 0.3s both;
+}
+
+.machine[data-on] .prop {
+  animation: rise 0.6s var(--ease-vend) 0.25s both;
+}
+
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ---- the rows and the tray ---- */
+
+.row {
+  border: 2px solid rgb(212 175 55 / 0.45);
+  background: rgb(5 16 26 / 0.85);
+  color: var(--deco-cream);
+  transition: transform 0.2s ease-out;
+}
+
+.row:hover {
+  border-color: var(--deco-gold-bright);
+  transform: translate3d(0.25rem, 0, 0);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--deco-gold-bright);
+  outline-offset: 3px;
+}
+
+.row[aria-checked='true'] {
+  border-color: var(--deco-gold-bright);
+  background: linear-gradient(180deg, var(--deco-gold-bright), var(--deco-gold));
+  color: var(--deco-abyss);
+}
+
+.rowTitle {
+  font-family: var(--deco-display);
+}
+
+.tag {
+  border: 1px solid currentColor;
+}
+
+.pick {
+  opacity: 0;
+}
+
+.row[aria-checked='true'] .pick {
+  opacity: 1;
+}
+
+.tray {
+  background: linear-gradient(180deg, #05101a, #0f0905);
+}
+
+.bottle {
+  opacity: 0;
+}
+
+.machine[data-on] .bottle {
+  animation: drop 0.7s cubic-bezier(0.3, 0, 0.2, 1) 0.45s both;
+}
+
+@keyframes drop {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -4rem, 0);
+  }
+  20% {
+    opacity: 1;
+  }
+  70% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  85% {
+    transform: translate3d(0, -0.4rem, 0) rotate(-6deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .machine[data-on] .bulbsOdd,
+  .machine[data-on] .bulbsEven,
+  .machine[data-on] .blind,
+  .machine[data-on] .figure,
+  .machine[data-on] .prop,
+  .machine[data-on] .bottle {
+    animation: none;
+  }
+
+  .figure,
+  .prop,
+  .bottle {
+    opacity: 1;
+  }
+
+  .row,
+  .row:hover {
+    transition: none;
+    transform: none;
+  }
+}

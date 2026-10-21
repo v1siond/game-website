@@ -386,6 +386,20 @@ collections:
                   - { <<: *text, label: "Training", name: training, hint: 'Keep {discipline} {academy} {instructor}' }
                   - { <<: *text, label: "Training now", name: trainingNow, hint: 'Keep {discipline} {academy} {instructor}' }
                   - { <<: *text, label: "Practice", name: practice, hint: 'Keep {training} {teaching}' }
+              - label: City under the sea world (art deco)
+                name: deco
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Stop", name: stop }
+                  - { <<: *text, label: "Play diary", name: playDiary, hint: 'Keep {job}' }
+                  - { <<: *text, label: "Stop diary", name: stopDiary, hint: 'Keep {job}' }
+                  - { <<: *text, label: "Snap", name: snap }
+                  - { <<: *text, label: "Snap of", name: snapOf, hint: 'Keep {project}' }
+                  - { <<: *text, label: "Developed", name: developed }
+                  - { <<: *text, label: "Turn pipe", name: turnPipe, hint: 'Keep {achievement}' }
+                  - { <<: *text, label: "Flow waiting", name: flowWaiting }
+                  - { <<: *text, label: "Flow done", name: flowDone }
               - label: The /cv page
                 name: cvPage
                 widget: object

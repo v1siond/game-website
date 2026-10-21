@@ -105,6 +105,17 @@
         "trainingNow": "{discipline} at {academy}, under {instructor}, now",
         "practice": "{training} training, {teaching} teaching"
       },
+      "deco": {
+        "stop": "Stop",
+        "playDiary": "Play the diary of {job}",
+        "stopDiary": "Stop the diary of {job}",
+        "snap": "Snap",
+        "snapOf": "Photograph {project}",
+        "developed": "Developed",
+        "turnPipe": "Turn the pipe to {achievement}",
+        "flowWaiting": "The flow stopped at a turned pipe",
+        "flowDone": "Circuit complete"
+      },
       "cvPage": {
         "backToSite": "Back to the site",
         "downloadPdf": "Download PDF",
@@ -248,6 +259,17 @@
         "trainingNow": "{discipline} en {academy}, con {instructor}, actualmente",
         "practice": "{training} entrenando, {teaching} enseñando"
       },
+      "deco": {
+        "stop": "Detener",
+        "playDiary": "Reproducir el diario de {job}",
+        "stopDiary": "Detener el diario de {job}",
+        "snap": "Foto",
+        "snapOf": "Fotografiar {project}",
+        "developed": "Revelada",
+        "turnPipe": "Girar la tubería hacia {achievement}",
+        "flowWaiting": "El flujo se detuvo en una tubería girada",
+        "flowDone": "Circuito completo"
+      },
       "cvPage": {
         "backToSite": "Volver al sitio",
         "downloadPdf": "Descargar PDF",
@@ -390,6 +412,17 @@
         "training": "{discipline} presso {academy}, con {instructor}",
         "trainingNow": "{discipline} presso {academy}, con {instructor}, attualmente",
         "practice": "{training} di allenamento, {teaching} di insegnamento"
+      },
+      "deco": {
+        "stop": "Ferma",
+        "playDiary": "Riproduci il diario di {job}",
+        "stopDiary": "Ferma il diario di {job}",
+        "snap": "Scatta",
+        "snapOf": "Fotografa {project}",
+        "developed": "Sviluppata",
+        "turnPipe": "Gira il tubo verso {achievement}",
+        "flowWaiting": "Il flusso si è fermato su un tubo girato",
+        "flowDone": "Circuito completo"
       },
       "cvPage": {
         "backToSite": "Torna al sito",

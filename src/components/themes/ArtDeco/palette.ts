@@ -1,17 +1,20 @@
-// The palette of the city under the sea, for the world's SVG art: deep sea blues, teal water, brass and
-// gold, the neon of its failing signs, and the maroon of its ballroom curtains. Class names carry the
-// same hex values through Tailwind.
+import { paletteVars } from '../shared/paletteVars'
+
+// The palette of the city under the sea: surface teal sinking to the abyss, brass and gold, the
+// maroon of its theatre boards, the cream of its posters and one red for a spark. The world's one
+// colour source: the registry reads it, the root sets it as --deco-* variables and every class reads
+// those. Gold and cream on abyss measure over 9:1; mist on deep sea 9:1.
 
 export const DECO_COLORS = {
-  // Deep sea blues
-  deepSea: '#0A2540',
-  deepSeaDark: '#102030',
-  abyss: '#05101a',
-
-  // Teal water
+  // The water, from the surface to the floor
+  surface: '#1c5a6e',
   tealDark: '#006666',
   tealLight: '#00AAAA',
   waterGlow: '#41c8e8',
+  seaMid: '#0d3050',
+  deepSea: '#0A2540',
+  deepSeaDark: '#102030',
+  abyss: '#05101a',
 
   // Brass and gold
   brassDark: '#8B7320',
@@ -23,14 +26,20 @@ export const DECO_COLORS = {
   bronzeDark: '#8B4513',
   bronze: '#CD7F32',
 
-  // Neon signs
+  // Neon and the spark of an overload
   neonPink: '#FF0066',
+  spark: '#ff5a3c',
 
-  // Maroon
+  // Maroon theatre boards
   bloodDark: '#660000',
   blood: '#8B0000',
 
-  // Ivory accents
+  // Poster paper and text
   ivory: '#FFFFF0',
   cream: '#FAF0E6',
+  mist: '#d0c8b8',
+  sepia: '#3a2a14',
 } as const
+
+/** The palette as CSS variables (--deco-gold, --deco-deep-sea and so on), set once on the world's root. */
+export const DECO_VARS = paletteVars('deco', DECO_COLORS)

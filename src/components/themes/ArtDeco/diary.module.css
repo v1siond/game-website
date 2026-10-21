@@ -1,0 +1,148 @@
+/*
+ * The audio diaries (diary.tsx). Arrival: each card rises from the dark, staggered by --i, and its gold
+ * glow swells once and settles, off the shelf's data-on. Playing (data-playing on the card): the reels
+ * turn, the counter runs across in --tape, the lit lines turn gold. Transform and opacity only.
+ */
+
+.card {
+  border: 2px solid rgb(212 175 55 / 0.5);
+  background:
+    linear-gradient(180deg, rgb(42 29 12 / 0.55), transparent 40%),
+    linear-gradient(180deg, #0d2a42, #071624);
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+}
+
+.shelf[data-on] .card {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 0.6s ease-out calc(var(--i) * 120ms),
+    transform 0.7s cubic-bezier(0.45, 0, 0.25, 1) calc(var(--i) * 120ms);
+}
+
+.glow {
+  box-shadow: inset 0 0 40px rgb(240 200 80 / 0.35), 0 0 24px rgb(240 200 80 / 0.3);
+  opacity: 0;
+}
+
+.shelf[data-on] .glow {
+  animation: glow 1.6s ease-in-out calc(0.3s + var(--i) * 120ms) both;
+}
+
+.card[data-playing] .glow {
+  animation: none;
+  opacity: 0.6;
+}
+
+@keyframes glow {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.15;
+  }
+}
+
+.title {
+  font-family: var(--deco-display);
+  color: var(--deco-gold-bright);
+}
+
+.reel {
+  transform-box: view-box;
+  transform-origin: var(--cx) 28px;
+}
+
+.card[data-playing] .reel {
+  animation: reel 1.4s linear infinite;
+}
+
+@keyframes reel {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.counter {
+  transform: scaleX(0);
+}
+
+.card[data-playing] .counter {
+  transform: scaleX(1);
+  transition: transform var(--tape) linear;
+}
+
+.line {
+  color: var(--deco-cream);
+  transition: color 0.3s;
+}
+
+.line svg {
+  color: var(--deco-brass-mid);
+}
+
+.line[data-lit] {
+  color: var(--deco-gold-bright);
+}
+
+.line[data-lit] svg {
+  color: var(--deco-gold-bright);
+}
+
+.skill {
+  border: 1px solid rgb(212 175 55 / 0.45);
+  color: var(--deco-gold);
+}
+
+.play {
+  border: 2px solid var(--deco-gold);
+  color: var(--deco-gold-bright);
+  background: rgb(5 16 26 / 0.8);
+  transition: transform 0.2s ease-out;
+}
+
+.play:hover {
+  transform: translate3d(0, -2px, 0);
+}
+
+.play[aria-pressed='true'] {
+  background: var(--deco-gold);
+  color: var(--deco-abyss);
+}
+
+.play:focus-visible {
+  outline: 2px solid var(--deco-gold-bright);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .shelf[data-on] .card {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .shelf[data-on] .glow {
+    animation: none;
+    opacity: 0.15;
+  }
+
+  .card[data-playing] .reel {
+    animation: none;
+  }
+
+  .card[data-playing] .counter {
+    transition: none;
+  }
+
+  .play,
+  .play:hover {
+    transition: none;
+    transform: none;
+  }
+}

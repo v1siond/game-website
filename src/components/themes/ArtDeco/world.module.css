@@ -1,21 +1,19 @@
 /*
- * Art Deco's page look: the deep sea gradient, the gold neon type, the brass frames and cards, the
- * tonic bottles of the profession switch, and the few ambient loops of the backdrop (rising bubbles, the
- * caustic light, the lighthouse beam, a sign's rare flicker). Ambient loops animate transform and
- * opacity only and stop under reduced motion; the scroll scenes live in scenes.module.css.
+ * Art Deco's page look: the deep sea gradient and the type on the root (the colours come from the
+ * palette as --deco-* variables set on the same root), the gold neon type, the brass cards,
+ * and the few ambient loops of the backdrop (rising bubbles, the caustic light, a sign's rare flicker).
+ * Ambient loops animate transform and opacity only and stop under reduced motion; each machine of the
+ * page has its own module next to it.
  */
 
 .root {
-  --deco-gold: #d4af37;
-  --deco-gold-bright: #f0c850;
-  --deco-brass-dark: #8b7320;
-  --deco-sea: #0a2540;
-  --deco-sea-mid: #0d3050;
-  --deco-abyss: #05101a;
-  --deco-water: #41c8e8;
+  /* The type: the geometric sans of the city's signs and a book serif for reading, both from the system. */
+  --deco-display: 'Century Gothic', 'Futura', 'Avenir Next', 'Trebuchet MS', sans-serif;
+  --deco-body: Georgia, 'Times New Roman', serif;
 
-  background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-sea), var(--deco-abyss));
-  font-family: 'Playfair Display', Georgia, serif;
+  background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-deep-sea), var(--deco-abyss));
+  color: var(--deco-cream);
+  font-family: var(--deco-body);
 }
 
 .vignette {
@@ -33,52 +31,11 @@
     0 0 30px rgb(212 175 55 / 0.5);
 }
 
+/* ---- cards ---- */
+
 .cardTitle {
+  font-family: var(--deco-display);
   color: var(--deco-gold);
-  text-shadow: 0 0 15px rgb(212 175 55 / 0.19);
-}
-
-/* A failing sign: it dips twice every few seconds, on opacity only, each sign on its own --delay. */
-.flicker {
-  animation: flicker 7s steps(1, end) infinite;
-  animation-delay: var(--delay, 0s);
-}
-
-@keyframes flicker {
-  0%,
-  90% {
-    opacity: 1;
-  }
-  91% {
-    opacity: 0.45;
-  }
-  93% {
-    opacity: 1;
-  }
-  94% {
-    opacity: 0.45;
-  }
-  95%,
-  100% {
-    opacity: 1;
-  }
-}
-
-/* ---- frames and cards ---- */
-
-.frame {
-  background:
-    linear-gradient(180deg, rgb(13 48 80 / 0.97), rgb(5 16 26 / 0.99)),
-    repeating-linear-gradient(45deg, transparent, transparent 15px, rgb(212 175 55 / 0.02) 15px, rgb(212 175 55 / 0.02) 30px);
-  box-shadow:
-    inset 0 0 80px rgb(5 16 26 / 0.8),
-    0 0 30px rgb(212 175 55 / 0.12);
-}
-
-.frameLight {
-  background:
-    radial-gradient(ellipse 60% 40% at 15% 25%, rgb(65 200 232 / 0.03) 0%, transparent 50%),
-    radial-gradient(ellipse 50% 60% at 85% 75%, rgb(212 175 55 / 0.025) 0%, transparent 50%);
 }
 
 .card {
@@ -95,18 +52,6 @@
 .cardGleam {
   background: linear-gradient(180deg, rgb(212 175 55 / 0.05) 0%, transparent 50%);
   box-shadow: inset 0 0 50px rgb(212 175 55 / 0.19);
-}
-
-/* ---- the tonic bottles of the profession switch ---- */
-
-.bottle {
-  border-radius: 8px 8px 20px 20px;
-  clip-path: polygon(10% 0, 90% 0, 100% 15%, 100% 100%, 0 100%, 0 15%);
-  background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-sea));
-}
-
-.bottleFull {
-  background: linear-gradient(180deg, var(--deco-gold-bright), var(--deco-gold), var(--deco-brass-dark));
 }
 
 /* ---- the backdrop ---- */
@@ -187,24 +132,10 @@
   }
 }
 
-.beam {
-  transform-box: view-box;
-  transform-origin: 30px 42px;
-  animation: beam-turn 10s linear infinite;
-}
-
-@keyframes beam-turn {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 /* Under reduced motion the loops stop; a bubble rests where its --rest puts it. */
 @media (prefers-reduced-motion: reduce) {
-  .flicker,
   .causticsNear,
-  .causticsFar,
-  .beam {
+  .causticsFar {
     animation: none;
   }
 

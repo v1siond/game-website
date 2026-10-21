@@ -1,0 +1,105 @@
+/*
+ * The bulkhead hatch (hatch.tsx). On data-on: the wheel spins two turns (0 to 1.1 s), the door swings
+ * open on its left hinge (0.9 to 2 s), the plate slides out (from 1.6 s). Hover eases the door wider and
+ * turns the wheel a little more. Transform and opacity only; the room glow is a static gradient.
+ */
+
+.bay {
+  --ease-door: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.frame {
+  border-radius: 9999px;
+  border: 8px solid var(--deco-brass-dark);
+  box-shadow:
+    0 0 0 3px var(--deco-gold),
+    0 0 40px rgb(0 0 0 / 0.6);
+  perspective: 700px;
+}
+
+.room {
+  background: radial-gradient(circle at 50% 45%, var(--deco-gold-bright), var(--deco-brass-mid) 45%, var(--deco-sepia) 80%);
+}
+
+.hinge {
+  transform-origin: 0 50%;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+}
+
+.bay[data-on] .hinge {
+  transform: rotateY(-72deg);
+  transition: transform 1.1s var(--ease-door) 0.9s;
+}
+
+.bay[data-on] .frame:hover .hinge {
+  transform: rotateY(-84deg);
+  transition: transform 0.5s var(--ease-door);
+}
+
+.door {
+  transform: translateZ(1px);
+}
+
+.wheel {
+  transform-box: view-box;
+  transform-origin: 100px 100px;
+}
+
+.bay[data-on] .wheel {
+  transform: rotate(720deg);
+  transition: transform 1.1s var(--ease-door);
+}
+
+.bay[data-on] .frame:hover .wheel {
+  transform: rotate(780deg);
+  transition: transform 0.5s var(--ease-door);
+}
+
+.plate {
+  border: 3px solid var(--deco-gold);
+  background:
+    linear-gradient(135deg, rgb(240 200 80 / 0.06), transparent 40%),
+    linear-gradient(180deg, var(--deco-deep-sea), var(--deco-abyss));
+  opacity: 0;
+  transform: translate3d(-2rem, 0, 0);
+}
+
+.bay[data-on] .plate {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 0.6s ease-out 1.6s,
+    transform 0.7s var(--ease-door) 1.6s;
+}
+
+.neon {
+  font-family: var(--deco-display);
+  color: var(--deco-gold-bright);
+  text-shadow:
+    0 0 4px var(--deco-gold),
+    0 0 16px rgb(212 175 55 / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hinge,
+  .bay[data-on] .hinge,
+  .bay[data-on] .frame:hover .hinge {
+    transform: rotateY(-72deg);
+    transition: none;
+  }
+
+  .wheel,
+  .bay[data-on] .wheel,
+  .bay[data-on] .frame:hover .wheel {
+    transform: none;
+    transition: none;
+  }
+
+  .plate,
+  .bay[data-on] .plate {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

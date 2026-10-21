@@ -1,0 +1,66 @@
+/*
+ * The chamber plaque (plaque.tsx): three stepped tiers rise over the board from the widest up, then the
+ * depth gauge's needle swings to its chamber's --depth (24 degrees a chamber). Transform and opacity only.
+ */
+
+.step {
+  --w: calc(var(--s) * 2.5rem);
+  width: var(--w);
+  height: 0.6rem;
+  border-color: var(--deco-gold);
+  background: var(--deco-sepia);
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+}
+
+section[data-on] .step {
+  transform: scaleY(1);
+  transition: transform 0.4s cubic-bezier(0.45, 0, 0.25, 1) calc((4 - var(--s)) * 120ms);
+}
+
+.board {
+  border: 2px solid var(--deco-gold);
+  background: linear-gradient(180deg, #1a140a, var(--deco-abyss));
+  box-shadow: 0 0 24px rgb(212 175 55 / 0.15);
+}
+
+.title {
+  font-family: var(--deco-display);
+  color: var(--deco-gold-bright);
+  text-shadow:
+    0 0 4px var(--deco-gold),
+    0 0 14px rgb(212 175 55 / 0.45);
+}
+
+.needle {
+  transform-box: view-box;
+  transform-origin: 24px 24px;
+  transform: rotate(-120deg);
+}
+
+section[data-on] .needle {
+  transform: rotate(calc(-120deg + min(var(--depth), 10) * 24deg));
+  transition: transform 1.2s cubic-bezier(0.34, 1.3, 0.64, 1) 0.4s;
+}
+
+.panel {
+  border: 2px solid rgb(212 175 55 / 0.6);
+  background:
+    repeating-linear-gradient(45deg, transparent 0 14px, rgb(212 175 55 / 0.03) 14px 28px),
+    linear-gradient(180deg, rgb(13 48 80 / 0.95), rgb(5 16 26 / 0.98));
+  box-shadow: inset 0 0 0 4px var(--deco-abyss), inset 0 0 0 5px rgb(212 175 55 / 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step,
+  section[data-on] .step {
+    transform: none;
+    transition: none;
+  }
+
+  .needle,
+  section[data-on] .needle {
+    transform: rotate(calc(-120deg + min(var(--depth), 10) * 24deg));
+    transition: none;
+  }
+}

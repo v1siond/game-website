@@ -2,56 +2,37 @@
 
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
-import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { DECO_COLORS as C } from './ArtDeco/palette'
-import { DecoPatternBackground, LighthouseBeacon, DecoSVGDefs, UnderwaterBubbles, UnderwaterRays, WaterCaustics } from './ArtDeco/backdrop'
-import { GoldFrame, NeonSign } from './ArtDeco/frames'
-import { TonicBottle } from './ArtDeco/bottles'
-import { CVLink, HeroAction, PortfolioLink } from './ArtDeco/actions'
-import { SECTION_VIEWS } from './ArtDeco/sections'
-import { ContactScene } from './ArtDeco/scenes'
+import { usePointerVars } from '@/hooks/usePointerVars'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { DECO_COLORS as C, DECO_VARS } from './ArtDeco/palette'
+import { DecoPatternBackground, DecoSVGDefs, UnderwaterBubbles, UnderwaterRays, WaterCaustics } from './ArtDeco/backdrop'
+import { BathysphereHero } from './ArtDeco/descent'
+import { VendingMachine } from './ArtDeco/machine'
+import { BrassPanel, Chamber } from './ArtDeco/plaque'
+import { POSTS_DEPTH, SECTION_VIEWS } from './ArtDeco/sections'
+import { ContactHatch } from './ArtDeco/hatch'
 import look from './ArtDeco/world.module.css'
 
-// Art Deco, a drowned 1920s city under the sea in brass, gold and lamplight: the page composition. Its palette,
-// backdrop, frames, cards, bottle switch, per profession sections, his costume and the scroll scenes
-// live in ./ArtDeco.
+// Art Deco, the 1920s city at the bottom of the sea in brass, gold and lamplight: the page composition.
+// The visitor arrives in the bathysphere as it sinks past the lighthouse to the city (the hero), picks a
+// profession at the city's vending machine, then goes down through the chambers of the picked profession
+// (./ArtDeco/sections) and leaves through the bulkhead hatch (contact). The root carries the palette as
+// --deco-* variables and the pointer as --mx and --my for the porthole parallax and the camera viewfinder.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
-// scroll container and stop the scenes' level strips from sticking to the viewport.
-
-const SUNBURST_RAYS = Array.from({ length: 12 }, (_, i) => i * 30)
-
-// The header's gold sunburst medallion.
-function SunburstMedallion() {
-  return (
-    <svg viewBox="0 0 80 80" className="pointer-events-none hidden h-20 w-20 flex-shrink-0 sm:block" aria-hidden="true" focusable="false">
-      {SUNBURST_RAYS.map((angle, i) => (
-        <line
-          key={angle}
-          x1={40}
-          y1={40}
-          x2={40 + Math.sin((angle * Math.PI) / 180) * 40}
-          y2={40 - Math.cos((angle * Math.PI) / 180) * 40}
-          stroke={C.gold}
-          strokeWidth={1.5}
-          opacity={i % 2 ? 0.3 : 0.5}
-        />
-      ))}
-      <circle cx={40} cy={40} r={20} fill="url(#porthole-glow)" stroke={C.gold} strokeWidth={2} />
-    </svg>
-  )
-}
+// scroll container and break the fixed viewfinder's place.
 
 export default function ArtDecoTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const { navigation, professions, sections, cards } = useLabels()
   const [mounted, setMounted] = useState(false)
+  const reducedMotion = useReducedMotion()
+  const pointer = usePointerVars(mounted && !reducedMotion)
 
   useEffect(() => {
     setMounted(true)
@@ -60,70 +41,40 @@ export default function ArtDecoTheme() {
   if (!mounted) return null
 
   return (
-    <div className={`relative min-h-screen overflow-x-clip ${look.root}`}>
+    <div ref={pointer} style={DECO_VARS} className={`relative min-h-screen overflow-x-clip ${look.root}`}>
       <DecoSVGDefs />
 
       <DecoPatternBackground />
       <UnderwaterRays />
       <WaterCaustics />
       <UnderwaterBubbles />
-      <LighthouseBeacon />
       <div className={`pointer-events-none fixed inset-0 z-[7] ${look.vignette}`} aria-hidden="true" />
 
-      {/* Header - the recruiter first screen */}
-      <header className="relative z-30 px-4 py-6 sm:p-6 sm:pb-10 sm:pt-20">
-        <RecruiterHero
-          render={({ name, headline, tagline, line, actions }) => (
-            <div className="mx-auto flex max-w-6xl flex-wrap items-start justify-between gap-6">
-              <div className="flex items-center gap-5">
-                <SunburstMedallion />
-                <div className="min-w-0">
-                  <h1 className="break-words text-2xl uppercase tracking-[0.2em] sm:text-4xl">
-                    <NeonSign text={name} flicker />
-                  </h1>
-                  <p className="mt-2 text-base tracking-wider text-[#e8e0d0]">{headline}</p>
-                  <p className="mt-1 text-sm italic tracking-wider text-[#D4AF37]">{tagline}</p>
-                  <p className="mt-1 text-sm tracking-wider text-[#d0c8b8]">{line}</p>
-                </div>
-              </div>
-
-              <nav className="flex flex-wrap items-center gap-3 sm:gap-4" aria-label={navigation.contactAndCv}>
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
-                <PortfolioLink />
-              </nav>
-            </div>
-          )}
-        />
+      <header className="relative z-30 px-4 pb-6 pt-10 sm:px-6 sm:pt-16">
+        <BathysphereHero />
       </header>
 
-      {/* The profession switch: a row of tonic bottles, System Engineer in the centre */}
       <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
-        <ProfessionSwitch
-          className="grid grid-cols-3 gap-3 sm:flex sm:justify-center sm:gap-8"
-          label={navigation.profession}
-          renderOption={(option) => <TonicBottle {...option} />}
-        />
+        <VendingMachine />
       </section>
 
-      {/* The picked profession's sections and stages, and only those */}
-      <main className="relative z-20 px-4 py-10 sm:px-8">
-        <div className="mx-auto max-w-5xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+      <main className="relative z-20 px-4 py-16 sm:px-8">
+        <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
-          <div className="pt-8">
+          <div className="pt-20">
             <FadeInScene>
-              <GoldFrame title={sections.posts}>
-                <p className="py-8 text-center text-base italic text-[#d0c8b8]">{cards.noPosts}</p>
-              </GoldFrame>
+              <Chamber title={sections.posts} depth={POSTS_DEPTH[active]}>
+                <BrassPanel>
+                  <p className="py-6 text-center text-base italic text-[color:var(--deco-mist)]">{cards.noPosts}</p>
+                </BrassPanel>
+              </Chamber>
             </FadeInScene>
           </div>
         </div>
       </main>
 
-      <ContactScene profession={active} />
+      <ContactHatch />
 
       <footer className="relative z-20 flex justify-center py-12" aria-hidden="true">
         <svg width="50" height="80" viewBox="0 0 50 80" opacity="0.25" focusable="false">
