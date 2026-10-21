@@ -2,32 +2,35 @@
 
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
-import { JOURNAL_SERIF, TRAIL_VARS } from './AdventurePaths/palette'
-import { NightBackdrop } from './AdventurePaths/backdrop'
-import { CompassRose } from './AdventurePaths/icons'
-import { TrailSign } from './AdventurePaths/selector'
-import { CVLink, HeroAction, PlayLink } from './AdventurePaths/actions'
+import { usePointerVars } from '@/hooks/usePointerVars'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { fillLabel } from '@/lib/cv/labels'
+import { TRAIL_VARS } from './AdventurePaths/palette'
+import { MapDefs } from './AdventurePaths/art'
+import { ExpeditionHero } from './AdventurePaths/hero'
 import { SECTION_VIEWS } from './AdventurePaths/sections'
-import { ContactScene } from './AdventurePaths/scenes'
+import { GoalGate } from './AdventurePaths/goal'
+import map from './AdventurePaths/map.module.css'
 
-// Adventure Paths: the page composition, an expedition on foot through ruins, clearings and temples. Its
-// palette, backdrop, marks, trail signs, panels, cards, character, profession stages, scroll scenes and
-// per profession sections live in ./AdventurePaths.
+// Adventure Paths: his CV as an explorer's overworld map. The hub map he arrives on picks the profession
+// (hero.tsx); each profession's sections are regions of the map with their own mechanics (sections.tsx);
+// contact is the goal gate at the end of the trail (goal.tsx). Every map shares the gradients in MapDefs.
 //
-// The root sets the palette as CSS variables (TRAIL_VARS), the only inline style, and clips sideways
-// overflow with overflow-x: clip, not hidden: hidden would make the root a scroll container and stop the
-// scenes' strips from sticking to the viewport.
+// The root sets the palette as CSS variables (TRAIL_VARS) and the pointer as --mx and --my, the only
+// inline styles, and clips sideways overflow with overflow-x: clip, not hidden, so it never becomes a
+// scroll container.
 
 export default function AdventurePathsTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { fullName } = useCVData()
   const { navigation, professions } = useLabels()
+  const reducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
+  const pointerRef = usePointerVars(mounted && !reducedMotion)
 
   useEffect(() => {
     setMounted(true)
@@ -37,56 +40,30 @@ export default function AdventurePathsTheme() {
 
   return (
     <div
-      className="relative min-h-screen overflow-x-clip bg-[color:var(--ap-night)] font-['Segoe_UI',system-ui,sans-serif] text-[color:var(--ap-parchment)]"
+      ref={pointerRef}
+      className={`relative min-h-screen overflow-x-clip bg-[color:var(--ap-night)] font-['Segoe_UI',system-ui,sans-serif] text-[color:var(--ap-parchment)] ${map.root}`}
       style={TRAIL_VARS}
     >
-      <NightBackdrop />
+      <MapDefs />
+      <a
+        href="#trail-main"
+        className="sr-only z-50 rounded-sm bg-[color:var(--ap-gold)] px-4 py-2 font-bold text-[color:var(--ap-ink)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4"
+      >
+        {navigation.skipToContent}
+      </a>
 
-      {/* Header - the recruiter first screen */}
-      <header className="relative z-30 px-4 py-5 sm:p-6">
-        <RecruiterHero
-          render={({ name, headline, tagline, line, actions }) => (
-            <div className="mx-auto flex max-w-5xl flex-col items-start justify-between gap-4 md:flex-row">
-              <div className="flex min-w-0 items-start gap-4">
-                <CompassRose className="hidden h-14 w-14 shrink-0 sm:block" />
-                <div className="min-w-0">
-                  <h1 className={`break-words text-2xl font-bold tracking-wide sm:text-3xl ${JOURNAL_SERIF}`}>{name}</h1>
-                  <p className="mt-2 text-base font-semibold text-[color:var(--ap-gold)]">{headline}</p>
-                  <p className="mt-1 text-sm italic text-[color:var(--ap-edge)]">{tagline}</p>
-                  <p className="mt-1 text-sm">{line}</p>
-                </div>
-              </div>
-
-              <nav className="flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
-                <PlayLink />
-              </nav>
-            </div>
-          )}
-        />
+      <header className="relative z-20">
+        <ExpeditionHero name={fullName} />
       </header>
 
-      {/* The trail fork: one sign per profession, System Engineer in the centre */}
-      <section className="relative z-20 px-4 py-6 sm:py-8" aria-label={navigation.professionSelection}>
-        <ProfessionSwitch
-          className="mx-auto grid max-w-xl grid-cols-3 gap-2 sm:gap-6"
-          label={navigation.profession}
-          renderOption={(option) => <TrailSign {...option} />}
-        />
-      </section>
+      <main id="trail-main" className="relative z-10">
+        <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+        </div>
+        <GoalGate profession={active} />
+      </main>
 
-      {/* The picked profession's levels, and only those */}
-      <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
-        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-      </div>
-
-      {/* Contact - the temple door sinks to his corner */}
-      <ContactScene profession={active} />
-
-      <footer className="relative z-20 py-10 text-center">
+      <footer className="relative z-10 py-10 text-center">
         <RecruiterHero
           render={({ name }) => (
             <p className="text-sm text-[color:var(--ap-edge)]">

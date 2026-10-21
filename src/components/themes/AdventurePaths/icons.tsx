@@ -1,7 +1,6 @@
 import { TRAIL } from './palette'
 
-// Adventure Paths' small marks: the compass rose of the explorer's map and the waypoint flag that marks
-// a stop on the route.
+// The compass rose of the explorer's map.
 
 export function CompassRose({ className = '' }: { className?: string }) {
   return (
@@ -12,17 +11,6 @@ export function CompassRose({ className = '' }: { className?: string }) {
       <path d="M20 4 L23 20 L17 20 Z" fill={TRAIL.ROUTE} />
       <path d="M4 20 L20 17 L36 20 L20 23 Z" fill={TRAIL.INK_SOFT} />
       <circle cx={20} cy={20} r={2} fill={TRAIL.GOLD} />
-    </svg>
-  )
-}
-
-// `pennantClassName` lets a scene raise the pennant up its pole.
-export function WaypointFlag({ className = '', pennantClassName = '' }: { className?: string; pennantClassName?: string }) {
-  return (
-    <svg viewBox="0 0 20 28" className={className} aria-hidden="true" focusable="false">
-      <rect x={4} y={2} width={2} height={24} fill={TRAIL.BARK} />
-      <path d="M6 3 L18 7 L6 11 Z" fill={TRAIL.ROUTE} className={pennantClassName} />
-      <ellipse cx={5} cy={26} rx={5} ry={2} fill={TRAIL.STONE_DARK} />
     </svg>
   )
 }

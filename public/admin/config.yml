@@ -430,6 +430,31 @@ collections:
                   - { <<: *text, label: "Try again", name: retry }
                   - { <<: *text, label: "Data tab", name: dataTab }
                   - { <<: *text, label: "Incoming call", name: incomingCall }
+              - label: Explorer's map world (adventure paths)
+                name: trail
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Map name", name: mapOf, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Walk hint", name: walkHint }
+                  - { <<: *text, label: "Standing at", name: standingAt, hint: 'Keep {place}' }
+                  - { <<: *text, label: "Stop", name: stopOf, hint: 'Keep {n} {place}' }
+                  - { <<: *text, label: "Walk to", name: walkTo, hint: 'Keep {place}' }
+                  - { <<: *text, label: "Cleared", name: cleared }
+                  - { <<: *text, label: "Exits", name: exits }
+                  - { <<: *text, label: "Secret exit", name: secretExit }
+                  - { <<: *text, label: "Press the switch", name: pressSwitch, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Switch hint", name: switchHint }
+                  - { <<: *text, label: "Star road", name: starRoad }
+                  - { <<: *text, label: "Star of", name: starOf, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Fortress cleared", name: fortressCleared }
+                  - { <<: *text, label: "Goal", name: goal }
+                  - { <<: *text, label: "Trail cleared", name: trailCleared }
+                  - { <<: *text, label: "Reserve box", name: reserveBox }
+                  - { <<: *text, label: "Job hint", name: jobHint }
+                  - { <<: *text, label: "Band hint", name: bandHint }
+                  - { <<: *text, label: "Fortress hint", name: fortressHint }
+                  - { <<: *text, label: "Break the tape", name: breakTape }
               - label: The /cv page
                 name: cvPage
                 widget: object

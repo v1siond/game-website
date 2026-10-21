@@ -1,161 +1,108 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { ProjectList } from '@/components/cv/ProjectList'
-import { BandList } from '@/components/cv/BandList'
-import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { newTabName } from '@/components/cv/sectionText'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { LevelScene } from '@/components/scroll/stage'
-import { TrailPanel } from './panels'
-import { BandFind, CampCard, ExplorerPack, JourneyEntry, ProjectFind } from './cards'
+import { fillLabel } from '@/lib/cv/labels'
+import { FortressTrail } from './fortresses'
+import { JourneyRegion } from './journey'
+import { PAPER_CARD, Region } from './region'
+import { StarRoad } from './starRoad'
+import { SwitchPalaces } from './switches'
 import { JOURNAL_SERIF } from './palette'
-import { Lane, SceneItem } from './scenes'
-import { drumsSince } from '@/components/cv/sectionText'
 
-// Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
-// Projects, Bands and the Muay Thai record are trail levels he travels, each entry arriving as part of
-// the level.
+// Each profession's regions of the map, and only those. About, Tech Stack and Ventures are journal pages
+// that fade in; Experience is the region he walks, Projects the switch palaces, Bands the star road and
+// the Muay Thai record the fortresses (their own files).
 
-function Leg({ children }: { children: ReactNode }) {
-  return <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">{children}</div>
+function AboutPage() {
+  const { professionalSummary } = useCVData()
+  const { sections } = useLabels()
+  return (
+    <FadeInScene>
+      <Region title={sections.about}>
+        <p className={`max-w-3xl text-lg leading-relaxed text-[color:var(--ap-parchment)] ${JOURNAL_SERIF}`}>{professionalSummary.bio}</p>
+      </Region>
+    </FadeInScene>
+  )
 }
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const { sections: titles } = useLabels()
-
+/** The tech stack as the explorer's pack: one pouch per category, its tools as stamped blocks. */
+function PackPage({ categories }: { categories: SectionsOf<'engineer'>['techStack'] }) {
+  const { sections, cards } = useLabels()
   return (
-    <>
-      <FadeInScene>
-        <Leg>
-          <TrailPanel title={titles.about} tone="journal">
-            <p className="text-base leading-relaxed">{professionalSummary.bio}</p>
-          </TrailPanel>
-        </Leg>
-      </FadeInScene>
-
-      {sections.jobs.length > 0 && (
-        <LevelScene>
-          <Leg>
-            <Lane profession="engineer" zone="record" />
-            <TrailPanel title={titles.workExperience} tone="journal">
-              <ul className="space-y-4 pl-5">
-                {sections.jobs.map((entry) => (
-                  <li key={entry.id}>
-                    <SceneItem kind="stop">
-                      <JourneyEntry entry={entry} />
-                    </SceneItem>
+    <FadeInScene>
+      <Region title={sections.techStack}>
+        <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
+          {categories.map((category) => (
+            <li key={category.id} className={`${MASONRY_ITEM} ${PAPER_CARD}`}>
+              <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{category.name}</h3>
+              <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
+                {category.items.map((item) => (
+                  <li key={item} className="rounded-sm border-2 border-[color:var(--ap-ink)] bg-[color:var(--ap-parchment)] px-2 py-0.5 text-sm font-semibold">
+                    {item}
                   </li>
                 ))}
               </ul>
-            </TrailPanel>
-          </Leg>
-        </LevelScene>
-      )}
+            </li>
+          ))}
+        </ul>
+      </Region>
+    </FadeInScene>
+  )
+}
 
-      <FadeInScene>
-        <Leg>
-          <TrailPanel title={titles.techStack} tone="journal">
-            <ExplorerPack categories={sections.techStack} />
-          </TrailPanel>
-        </Leg>
-      </FadeInScene>
+/** The ventures as camps marked on the map, each a flag and its card. */
+function CampsPage({ companies }: { companies: SectionsOf<'engineer'>['companies'] }) {
+  const { sections, links } = useLabels()
+  return (
+    <FadeInScene>
+      <Region title={sections.ventures}>
+        <ul className="grid gap-6 md:grid-cols-3">
+          {companies.map((company) => (
+            <li key={company.id}>
+              <a
+                href={company.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+                className="block h-full transition-transform hover:-translate-y-1 motion-reduce:transition-none"
+              >
+                <article className={`${PAPER_CARD} h-full border-t-8 border-t-[color:var(--ap-route)]`}>
+                  <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{company.name}</h3>
+                  <p className="text-sm font-semibold text-[color:var(--ap-route)]">{company.tagline}</p>
+                  <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{company.description}</p>
+                </article>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Region>
+    </FadeInScene>
+  )
+}
 
-      <LevelScene>
-        <Leg>
-          <Lane profession="engineer" zone="work" />
-          <TrailPanel title={titles.projects} tone="canopy">
-            <ProjectList
-              projects={sections.projects}
-              className="grid gap-4 md:grid-cols-2"
-              renderProject={(slot) => (
-                <SceneItem kind="find">
-                  <ProjectFind {...slot} />
-                </SceneItem>
-              )}
-            />
-          </TrailPanel>
-        </Leg>
-      </LevelScene>
-
-      <FadeInScene>
-        <Leg>
-          <TrailPanel title={titles.ventures} tone="canopy">
-            <div className="grid gap-4 md:grid-cols-3">
-              {sections.companies.map((company) => (
-                <CampCard key={company.id} company={company} />
-              ))}
-            </div>
-          </TrailPanel>
-        </Leg>
-      </FadeInScene>
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+  return (
+    <>
+      <AboutPage />
+      {sections.jobs.length > 0 && <JourneyRegion jobs={sections.jobs} profession="engineer" />}
+      <PackPage categories={sections.techStack} />
+      <SwitchPalaces projects={sections.projects} />
+      <CampsPage companies={sections.companies} />
     </>
   )
 }
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { musician, bands } = sections
-  const { sections: titles, years } = useLabels()
-
-  return (
-    <LevelScene>
-      <Leg>
-        <Lane profession="drummer" zone="record" />
-        <TrailPanel title={titles.bands} tone="canopy">
-          <p className="mb-4 text-base">
-            {drumsSince(musician, years)}
-          </p>
-          <BandList
-            bands={bands}
-            className="grid gap-4 md:grid-cols-3"
-            renderBand={(slot) => (
-              <SceneItem kind="find">
-                <BandFind {...slot} />
-              </SceneItem>
-            )}
-          />
-          <p className="mt-4 text-sm italic text-[color:var(--ap-gold)]">{musician.line}</p>
-        </TrailPanel>
-      </Leg>
-    </LevelScene>
-  )
+  return <StarRoad bands={sections.bands} musician={sections.musician} />
 }
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { martialArts } = sections
-  const { sections: titles } = useLabels()
-
-  return (
-    <LevelScene>
-      <Leg>
-        <Lane profession="fighter" zone="record" />
-        <TrailPanel title={titles.muayThai} tone="canopy">
-          <h3 className={`mb-4 text-lg font-bold text-[color:var(--ap-gold)] ${JOURNAL_SERIF}`}>{martialArts.primary.title}</h3>
-          <MuayThaiRecord
-            martialArts={martialArts}
-            classNames={{
-              facts: 'mb-5 grid gap-3 md:grid-cols-2',
-              fact: 'rounded-sm border border-[color:var(--ap-moss)] bg-[color:var(--ap-night)] p-3',
-              term: 'text-sm font-bold uppercase tracking-wider text-[color:var(--ap-gold)]',
-              value: 'mt-1 text-sm text-[color:var(--ap-parchment)]',
-              achievements: 'space-y-3 pl-5',
-              achievement: 'text-sm',
-            }}
-            renderAchievement={(achievement) => (
-              <SceneItem kind="stop">
-                <p className="rounded-sm border-l-4 border-[color:var(--ap-route)] bg-[color:var(--ap-page)] p-3 text-[color:var(--ap-ink)]">
-                  {achievement}
-                </p>
-              </SceneItem>
-            )}
-          />
-        </TrailPanel>
-      </Leg>
-    </LevelScene>
-  )
+  return <FortressTrail martialArts={sections.martialArts} />
 }
 
 export const SECTION_VIEWS: ProfessionSectionViews = {

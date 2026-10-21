@@ -30,6 +30,21 @@ export const TRAIL = {
   RUNE: '#59d8c6',
   WOOD: '#7a4e2a',
   BARK: '#3e2a1a',
+  // The map's watercolour washes over the parchment: the sea, the sand of the shore, the meadow on the
+  // plateau tops and the brown cliff faces under them, each with its shade.
+  SEA: '#86aebb',
+  SEA_DEEP: '#4f7f93',
+  SAND: '#ead39a',
+  MEADOW: '#a9bf6e',
+  MEADOW_DARK: '#6f8f45',
+  CLIFF: '#a8743f',
+  CLIFF_DARK: '#6e4523',
+  // The map's fall, once every landmark has been visited: the meadow turns orange brown and the sea teal.
+  FALL: '#d0913f',
+  FALL_DARK: '#8a4e22',
+  TEAL: '#3f9a92',
+  // The blue of the overalls and the blue switch; white on it 6.4:1.
+  BLUE: '#2f5fae',
 } as const
 
 /** The palette as CSS variables, set once on the world's root. */

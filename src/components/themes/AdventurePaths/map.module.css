@@ -1,0 +1,737 @@
+/*
+ * Adventure Paths' look and motion: an explorer's hand inked map read like an overworld. Transform and
+ * opacity only, never an animated shadow, blur or layout property. The resting frame of every reveal is
+ * the plain style, so reduced motion (the block at the end) and a World Select preview show the finished
+ * map with nothing playing. Colours are the --ap-* variables palette.ts sets on the root; --mx and --my
+ * (-1 to 1) are the pointer from usePointerVars; --scene-progress (0 to 1) is a ScrollScene's progress.
+ *
+ * The feel is the overworld map's: things on the map step in two frames (steps(2)) like map sprites,
+ * the dotted trail appears one dot at a time, a tile that is cleared flips its colour in one frame, and
+ * the only smooth motions are the camera (the unroll, the zoom into a landmark) and his walk.
+ */
+
+.root {
+  --pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --glide: cubic-bezier(0.22, 1, 0.36, 1);
+  --mx: 0;
+  --my: 0;
+}
+
+.root :focus-visible {
+  outline: 3px solid var(--ap-gold);
+  outline-offset: 3px;
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * The hub map: unrolled on arrival, inked, the trail dotted in, then he walks to his landmark.
+ * Phases are data attributes on a scene's root, each 'false' until reached (see hero.tsx, journey.tsx).
+ * ------------------------------------------------------------------------------------------------- */
+
+/* The map held in two hands: it leans a few degrees toward the pointer. */
+.mapTilt {
+  transform: perspective(1400px) rotateX(calc(var(--my) * -2.5deg)) rotateY(calc(var(--mx) * 3.5deg));
+  transition: transform 240ms ease-out;
+}
+
+/* The rolled part of the map slides off to the right with the wooden roller at its edge. */
+.cover {
+  transform: translate3d(101%, 0, 0);
+  transition: transform 1100ms var(--glide);
+}
+
+[data-unrolled='false'] .cover {
+  transform: none;
+  transition: none;
+}
+
+/* The ink: coast, landmarks and the woods rise into place once the paper is flat, each on its --i. */
+.inked {
+  transition:
+    opacity 380ms ease-out calc(var(--i, 0) * 90ms),
+    transform 380ms var(--pop) calc(var(--i, 0) * 90ms);
+}
+
+[data-inked='false'] .inked {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+  transition: none;
+}
+
+/* The trail appears one dot at a time in trail order (--at along the trail, --leg for its stretch), each
+ * dot fading in on its own, as a new path appears tile by tile on the overworld map. */
+.dot {
+  transition: opacity 260ms ease-out calc((var(--leg, 0) + var(--at, 0)) * var(--trail-ms, 560ms));
+}
+
+[data-trailed='false'] .dot {
+  opacity: 0;
+  transition: none;
+}
+
+/* A tile keeps its colour for good; it only fades in with the trail that reaches it. */
+.tile {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.tileLit {
+  transition: opacity 260ms ease-out;
+}
+
+[data-trailed='false'] .tileLit {
+  opacity: 0;
+  transition: none;
+}
+
+/* The name plaque swings down on its two ropes and settles. */
+.plaque {
+  transform-origin: 50% -40px;
+  transition:
+    transform 760ms var(--pop),
+    opacity 200ms ease-out;
+}
+
+[data-inked='false'] .plaque {
+  opacity: 0;
+  transform: translate3d(0, -40px, 0) rotate(-6deg);
+  transition: none;
+}
+
+.plaqueSettle {
+  transform-origin: 50% -40px;
+  animation: plaque-sway 1400ms ease-out 760ms 1 both;
+}
+
+[data-inked='false'] .plaqueSettle {
+  animation: none;
+}
+
+@keyframes plaque-sway {
+  0% {
+    transform: rotate(0);
+  }
+  30% {
+    transform: rotate(2.2deg);
+  }
+  60% {
+    transform: rotate(-1.2deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+/* The hills on the map breathe in two frames, out of step with each other (--i). */
+.hill {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hill-breathe 1.6s steps(2, jump-none) infinite;
+  animation-delay: calc(var(--i, 0) * -0.4s);
+}
+
+@keyframes hill-breathe {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.03, 0.95);
+  }
+}
+
+/* The ship at anchor rocks, the torch flames flicker, the clouds drift and part toward the pointer. */
+.ship {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: ship-rock 3.2s ease-in-out infinite;
+}
+
+@keyframes ship-rock {
+  0%,
+  100% {
+    transform: rotate(-3deg) translate3d(0, 0, 0);
+  }
+  50% {
+    transform: rotate(3deg) translate3d(0, 2px, 0);
+  }
+}
+
+.flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flame-flick 0.5s steps(2, jump-none) infinite;
+  animation-delay: calc(var(--i, 0) * -0.25s);
+}
+
+@keyframes flame-flick {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(0.85, 1.18);
+  }
+}
+
+.cloud {
+  transform: translate3d(calc(var(--mx) * var(--depth, 14px)), calc(var(--my) * 6px), 0);
+  transition: transform 400ms ease-out;
+}
+
+.cloudDrift {
+  animation: cloud-drift 26s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i, 0) * -9s);
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translate3d(-24px, 0, 0);
+  }
+  to {
+    transform: translate3d(24px, 0, 0);
+  }
+}
+
+/* ---- entering a landmark: the map breaks into coarse blocks and fades out, then back (about 30 frames
+ * each way, the overworld's mosaic and fade into a level) ---- */
+
+.camera {
+  transform-origin: var(--ox, 50%) var(--oy, 50%);
+}
+
+.camera[data-entering='true'] {
+  animation: camera-enter 1000ms ease-in-out 1 both;
+}
+
+@keyframes camera-enter {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+.mosaic {
+  opacity: 0;
+  background-color: transparent;
+  background-image: repeating-conic-gradient(var(--ap-ink) 0 25%, var(--ap-night) 0 50%);
+  background-size: 28px 28px;
+}
+
+.camera[data-entering='true'] + .mosaic {
+  animation: mosaic-in 1000ms steps(4, jump-none) 1 both;
+}
+
+@keyframes mosaic-in {
+  0% {
+    opacity: 0;
+  }
+  45%,
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- the fall: once every landmark is visited the map's meadow turns orange brown and the sea teal,
+ * for good (the overworld's permanent palette change) ---- */
+
+.fall {
+  opacity: 0;
+  transition: opacity 1600ms ease-in-out;
+}
+
+[data-season='fall'] .fall {
+  opacity: 1;
+}
+
+/* ---- his marker: placed by the walker's transform; he drops onto the start tile, steps while walking ---- */
+
+.marker {
+  will-change: transform;
+}
+
+.markerDrop {
+  transition:
+    transform 420ms var(--pop),
+    opacity 120ms linear;
+}
+
+[data-landed='false'] .markerDrop {
+  opacity: 0;
+  transform: translate3d(0, -70px, 0);
+  transition: none;
+}
+
+.figure {
+  transform-origin: 50% 100%;
+}
+
+.marker[data-facing='left'] .figure {
+  transform: scaleX(-1);
+}
+
+/* ---- his sprite (walker.tsx): every frame is drawn, one shows. The step frames swap in one frame while
+ * the trail walker marks him walking; his profession's action plays while data-acting is set; both arms
+ * go up under data-cheer. A breath and a blink run at rest, a one pixel bob while he walks, and a short
+ * hop when he stops on a tile. ---- */
+
+.frame {
+  opacity: 0;
+}
+
+.frame[data-f='legs-stand'],
+.frame[data-f='torso-idle'] {
+  opacity: 1;
+}
+
+[data-walking='true'] .frame[data-f='legs-stand'],
+[data-walking='true'] .frame[data-f='torso-idle'],
+[data-acting='true'] .frame[data-f='torso-idle'],
+[data-cheer='true'] .frame[data-f='torso-idle'] {
+  opacity: 0;
+}
+
+[data-walking='true'] .frame[data-f$='-walkA'] {
+  animation: frame-first 280ms steps(1, end) infinite;
+}
+
+[data-walking='true'] .frame[data-f$='-walkB'] {
+  animation: frame-second 280ms steps(1, end) infinite;
+}
+
+[data-acting='true']:not([data-walking='true']) .frame[data-f='torso-actA'] {
+  animation: frame-first 440ms steps(1, end) infinite;
+}
+
+[data-acting='true']:not([data-walking='true']) .frame[data-f='torso-actB'] {
+  animation: frame-second 440ms steps(1, end) infinite;
+}
+
+[data-acting='true'][data-walking='true'] .frame[data-f='torso-actA'],
+[data-acting='true'][data-walking='true'] .frame[data-f='torso-actB'] {
+  opacity: 0;
+}
+
+[data-cheer='true'] .frame[data-f='torso-cheer'] {
+  opacity: 1;
+}
+
+@keyframes frame-first {
+  0% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes frame-second {
+  0% {
+    opacity: 0;
+  }
+  50%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.breath {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: sprite-breath 1.8s steps(2, jump-none) infinite;
+}
+
+[data-walking='true'] .breath {
+  animation: sprite-bob 280ms steps(2, jump-none) infinite;
+}
+
+@keyframes sprite-breath {
+  from {
+    transform: scale(1, 1);
+  }
+  to {
+    transform: scale(1.02, 0.97);
+  }
+}
+
+@keyframes sprite-bob {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.blink {
+  opacity: 0;
+  animation: sprite-blink 4.2s steps(1, end) infinite;
+}
+
+@keyframes sprite-blink {
+  0%,
+  94% {
+    opacity: 0;
+  }
+  95%,
+  97% {
+    opacity: 1;
+  }
+  98%,
+  100% {
+    opacity: 0;
+  }
+}
+
+[data-walking='false'] .hop {
+  animation: sprite-hop 360ms steps(4, jump-none) 1;
+}
+
+@keyframes sprite-hop {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+/* ---- a landmark you can pick: it lifts and its tile rings while pointed at or focused ---- */
+
+.landmark {
+  transform: translate3d(-50%, -50%, 0);
+  transition: transform 160ms var(--pop);
+}
+
+.landmark:hover,
+.landmark:focus-visible {
+  transform: translate3d(-50%, calc(-50% - 4px), 0);
+}
+
+.ring {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 120ms linear,
+    transform 240ms var(--pop);
+}
+
+.landmark:hover .ring,
+.landmark:focus-visible .ring,
+.landmark[aria-checked='true'] .ring {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* The level name box under the map changes in one frame, like the map's own. */
+.nameBox {
+  animation: name-box 1ms steps(1) 1 both;
+}
+
+@keyframes name-box {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---- the switch palaces (switches.tsx): the switch squashes flat in two frames, the outlined blocks
+ * fill solid one after another, the message box opens from its centre ---- */
+
+.switchCap {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 160ms steps(2, jump-none);
+}
+
+.switch:hover .switchCap {
+  transform: translate3d(0, -2px, 0);
+}
+
+.switch[aria-pressed='true'] .switchCap {
+  transform: scale(1.08, 0.45);
+}
+
+.block {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 120ms steps(2, jump-none) calc(var(--i, 0) * 70ms),
+    transform 220ms var(--pop) calc(var(--i, 0) * 70ms);
+}
+
+.block[data-solid='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+.messageBox {
+  transform-origin: 50% 50%;
+  animation: message-open 430ms steps(6, jump-none) 1 both;
+}
+
+@keyframes message-open {
+  from {
+    opacity: 0;
+    transform: scale(0.1, 0.1);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---- the star road (starRoad.tsx): the sky's specks twinkle in two frames, the warp stars turn
+ * slowly, and he spins up out of sight and drops onto the next star ---- */
+
+.twinkle {
+  animation: twinkle 1.2s steps(2, jump-none) infinite;
+  animation-delay: calc(var(--i, 0) * -0.35s);
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.25;
+  }
+}
+
+.warpStar {
+  animation: warp-star 6s linear infinite;
+}
+
+@keyframes warp-star {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.warp {
+  transform-origin: 50% 70%;
+  transition:
+    transform 380ms var(--glide),
+    opacity 380ms ease-in;
+}
+
+.warp[data-out='true'] {
+  opacity: 0;
+  transform: translate3d(0, -90px, 0) rotate(720deg) scale(0.4);
+}
+
+/* ---- the fortresses (fortresses.tsx): each is pressed down into the ground in steps and its ruin
+ * rises in its place; pointing at its achievement shakes it ---- */
+
+.fort,
+.ruin {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.fort {
+  transition:
+    transform 560ms steps(5, jump-none),
+    opacity 120ms linear 560ms;
+}
+
+.fort[data-crushed='true'] {
+  opacity: 0;
+  transform: scale(1.1, 0.1);
+}
+
+.ruin {
+  opacity: 0;
+  transform: scale(1, 0.4);
+  transition:
+    opacity 80ms linear 480ms,
+    transform 240ms var(--pop) 480ms;
+}
+
+.ruin[data-crushed='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+.shake[data-shaking='true'] {
+  animation: fort-shake 240ms steps(2, jump-none) infinite;
+}
+
+@keyframes fort-shake {
+  from {
+    transform: translate3d(-2px, 0, 0);
+  }
+  to {
+    transform: translate3d(2px, 0, 0);
+  }
+}
+
+/* ---- the goal (goal.tsx): the tape slides up and down between the posts at a steady pace; broken, it
+ * holds where it was hit and its halves fall away, the stars burst out, the letter drops from the
+ * reserve box and he walks through the gate with a fist up ---- */
+
+.tape {
+  animation: tape-run var(--period, 2400ms) linear infinite;
+}
+
+@keyframes tape-run {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 100%, 0);
+  }
+}
+
+[data-broken='true'] .tape {
+  animation: none;
+  transform: translate3d(0, var(--held, 0%), 0);
+}
+
+.tapeLeft,
+.tapeRight {
+  transition:
+    transform 600ms ease-in,
+    opacity 600ms ease-in;
+}
+
+.tapeLeft {
+  transform-origin: 0 50%;
+}
+
+.tapeRight {
+  transform-origin: 100% 50%;
+}
+
+[data-broken='true'] .tapeLeft {
+  opacity: 0;
+  transform: translate3d(-10px, 60px, 0) rotate(60deg);
+}
+
+[data-broken='true'] .tapeRight {
+  opacity: 0;
+  transform: translate3d(10px, 60px, 0) rotate(-60deg);
+}
+
+.burst {
+  opacity: 0;
+}
+
+.burst[data-on='true'] {
+  animation: star-burst 900ms var(--glide) calc(var(--i, 0) * 60ms) 1 both;
+}
+
+@keyframes star-burst {
+  0% {
+    opacity: 1;
+    transform: translate(280px, 110px) scale(0.4);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(280px + var(--dx, 0px)), 30px) scale(1.4);
+  }
+}
+
+.letter {
+  opacity: 0;
+}
+
+[data-broken='true'] .letter {
+  animation: letter-drop 700ms steps(7, jump-none) 500ms 1 both;
+}
+
+@keyframes letter-drop {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 150px, 0);
+  }
+}
+
+.goalWalker {
+  transition: transform 1400ms linear 900ms;
+}
+
+[data-broken='true'] .goalWalker {
+  transform: translate3d(calc(-50% + 140%), 0, 0);
+}
+
+/* ---------------------------------------------------------------------------------------------------
+ * Reduced motion: every reveal shows its resting frame, every loop stands still.
+ * ------------------------------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .mapTilt,
+  .cloud {
+    transform: none;
+    transition: none;
+  }
+
+  .hill,
+  .ship,
+  .flame,
+  .cloudDrift,
+  .plaqueSettle,
+  .nameBox,
+  .camera[data-entering='true'],
+  .camera[data-entering='true'] + .mosaic,
+  .breath,
+  .blink,
+  .hop,
+  .frame {
+    animation: none !important;
+  }
+
+  [data-acting='true'] .frame[data-f='torso-actA'] {
+    opacity: 1;
+  }
+
+  [data-broken='true'] .letter {
+    animation: none;
+    opacity: 1;
+    transform: translate3d(0, 150px, 0);
+  }
+
+  .messageBox,
+  .tape,
+  .burst[data-on='true'],
+  .shake[data-shaking='true'],
+  .twinkle,
+  .warpStar {
+    animation: none;
+  }
+
+  .switchCap,
+  .block,
+  .warp,
+  .fort,
+  .ruin,
+  .tapeLeft,
+  .tapeRight,
+  .goalWalker,
+  .cover,
+  .inked,
+  .dot,
+  .tileLit,
+  .fall,
+  .plaque,
+  .markerDrop,
+  .landmark,
+  .ring {
+    transition: none;
+  }
+}
