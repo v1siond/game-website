@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { at, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import { DeskCorner, DrumKit, KitCorner, StrikeFlash, Terminal, type DrumKitColors } from '@/components/scroll/stageProps'
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
@@ -38,7 +38,7 @@ import styles from './scenes.module.css'
 //
 // Animated elements per strip, at most 18: three lamps or spotlights, two hatches or the curtain halves,
 // his travel and four swinging limbs, and the props that answer (three terminals or six reels; the
-// needle, three valves and two cymbals; the strike flash).
+// needle, three valves and two cymbals; the strike flash and the robot's two pads).
 
 // A prop standing on the floor at --at along the level.
 const PROP_SLOT = 'absolute bottom-3 left-[calc(var(--at)*100%_-_1rem)]'
@@ -72,8 +72,7 @@ function RoomLamps({ glow }: { glow: string }) {
           key={place}
           viewBox="0 0 40 100"
           preserveAspectRatio="none"
-          className={`absolute top-0 h-[88%] w-16 -translate-x-1/2 sm:w-24 ${place}`}
-          style={at(enters)}
+          className={`absolute top-0 h-[88%] w-16 -translate-x-1/2 sm:w-24 ${place} ${atClass(enters)}`}
           aria-hidden="true"
           focusable="false"
         >
@@ -95,8 +94,7 @@ function Bulkheads() {
       {[1 / 3, 2 / 3].map((position) => (
         <div
           key={position}
-          className="absolute inset-y-0 left-[calc(var(--at)*100%_-_0.6rem)] w-5 sm:w-6"
-          style={at(position)}
+          className={`absolute inset-y-0 left-[calc(var(--at)*100%_-_0.6rem)] w-5 sm:w-6 ${atClass(position)}`}
           aria-hidden="true"
         >
           <div className="absolute inset-y-0 -left-1 w-1.5 bg-[#5a5e50]" />
@@ -137,7 +135,7 @@ function LabWall() {
 // A tape reel mainframe, the machine a project runs on: its two reels turn while the level advances.
 function Mainframe({ position }: { position: number }) {
   return (
-    <svg viewBox="0 0 36 52" className={`${PROP_SLOT} h-14 w-10 sm:h-20 sm:w-14`} style={at(position)} aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 36 52" className={`${PROP_SLOT} h-14 w-10 sm:h-20 sm:w-14 ${atClass(position)}`} aria-hidden="true" focusable="false">
       <rect x={1} y={1} width={34} height={50} rx={2} fill={CASING} />
       <rect x={4} y={4} width={28} height={22} fill={PIPBOY_SCREEN_BG} />
       {[11, 25].map((cx) => (
@@ -246,8 +244,7 @@ function MusicianLevel() {
           key={place}
           viewBox="0 0 40 100"
           preserveAspectRatio="none"
-          className={`absolute top-0 h-full w-20 -translate-x-1/2 sm:w-28 ${place}`}
-          style={at(on)}
+          className={`absolute top-0 h-full w-20 -translate-x-1/2 sm:w-28 ${place} ${atClass(on)}`}
           aria-hidden="true"
           focusable="false"
         >
@@ -293,7 +290,8 @@ function GymWall() {
 }
 
 // The tin robot holding the pads, facing him where his advance ends (40% of the level plus his width):
-// a box head with a bulb antenna and lamp eyes, a barrel body on treads, a red pad in each claw.
+// a box head with a bulb antenna and lamp eyes, a barrel body on treads, a red pad in each claw. The
+// pads give with his strikes (the shared padHigh and padLow read the strip's --kick, --knee, --elbow).
 function PadRobot() {
   return (
     <svg
@@ -312,8 +310,8 @@ function PadRobot() {
       <rect x={8} y={68} width={28} height={22} rx={6} fill={STEEL_LIGHT} />
       <circle cx={14} cy={84} r={3} fill={STEEL_EDGE} />
       <circle cx={30} cy={84} r={3} fill={STEEL_EDGE} />
-      <rect x={0} y={32} width={8} height={14} rx={3} fill={NUKA_RED} />
-      <rect x={0} y={52} width={8} height={16} rx={3} fill={NUKA_RED} />
+      <rect x={0} y={32} width={8} height={14} rx={3} fill={NUKA_RED} className={scene.padHigh} />
+      <rect x={0} y={52} width={8} height={16} rx={3} fill={NUKA_RED} className={scene.padLow} />
     </svg>
   )
 }

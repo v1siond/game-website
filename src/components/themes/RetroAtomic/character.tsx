@@ -5,7 +5,8 @@ import { NUKA_RED, PIPBOY_GREEN, VAULT_BLUE, VAULT_YELLOW } from './palette'
 
 // Him in Retro Atomic (the shared HeroFigure), dressed the atomic age way per profession: a blue utility
 // jumpsuit with a yellow stripe and a wrist computer at the terminals, a white tee and dark jeans behind
-// the kit, and bare chested in red Muay Thai shorts with a yellow waistband and red gloves in the ring.
+// the kit, and bare chested in red Muay Thai shorts with a yellow waistband, a yellow headband tied at
+// the side and red gloves in the ring.
 
 const EYE = '#0a0a08'
 const BOOT = '#3a2a1e'
@@ -19,6 +20,8 @@ interface Outfit {
   long: boolean
   feet: string
   hand: 'computer' | 'sticks' | 'gloves'
+  // Drawn in HeroFigure's over hair slot.
+  head: ReactNode
 }
 
 // The hand sits at the end of the 14 unit forearm (y 53 to 57).
@@ -38,6 +41,15 @@ const HAND_DRAW: Record<Outfit['hand'], (x: number) => ReactNode> = {
   gloves: (x) => <circle cx={x} cy={55} r={4.8} fill={NUKA_RED} stroke="#ffd7c2" strokeWidth={0.8} />,
 }
 
+// The Muay Thai headband: a band across the forehead along the hairline, its knot and two tails at the side.
+const HEADBAND = (
+  <>
+    <path d="M21.6 12.5 Q32 7.6 42.4 12.5 L42.6 15.4 Q32 10.8 21.4 15.4 Z" fill={VAULT_YELLOW} />
+    <circle cx={21.4} cy={14} r={1.6} fill={VAULT_YELLOW} />
+    <path d="M20.6 13.4 L15.4 16.2 L16.4 17.6 Z M20.8 14.8 L16.6 19.4 L18 20.2 Z" fill={VAULT_YELLOW} />
+  </>
+)
+
 const OUTFIT: Record<Profession, Outfit> = {
   engineer: {
     torso: (
@@ -51,6 +63,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     long: true,
     feet: BOOT,
     hand: 'computer',
+    head: null,
   },
   drummer: {
     torso: <path d="M22 32 Q32 29 42 32 L41 59 L23 59 Z" fill={TEE} />,
@@ -59,6 +72,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     long: true,
     feet: BOOT,
     hand: 'sticks',
+    head: null,
   },
   fighter: {
     torso: (
@@ -72,6 +86,7 @@ const OUTFIT: Record<Profession, Outfit> = {
     long: false,
     feet: SKIN,
     hand: 'gloves',
+    head: HEADBAND,
   },
 }
 
@@ -85,6 +100,7 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
       torso={outfit.torso}
       arm={(x) => <HeroArm x={x} sleeve={outfit.sleeve} forearm={14} hand={HAND_DRAW[outfit.hand](x)} />}
       leg={(x) => <HeroLeg x={x} legs={outfit.legs} long={outfit.long} shorts={12} feet={outfit.feet} />}
+      overHair={outfit.head}
     />
   )
 }
