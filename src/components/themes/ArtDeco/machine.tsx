@@ -6,7 +6,7 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
-import { HeroCharacter } from './character'
+import { GlassSurvivor } from './survivor'
 import { DECO_COLORS as C } from './palette'
 import machine from './machine.module.css'
 
@@ -129,7 +129,7 @@ export function VendingMachine() {
                 {PROPS[active]}
               </svg>
               <div className={`absolute bottom-6 left-[18%] h-44 w-28 sm:h-52 sm:w-32 ${machine.figure}`}>
-                <HeroCharacter profession={active} className="h-full w-full" />
+                <GlassSurvivor profession={active} className="h-full w-full" />
               </div>
               <div className={`pointer-events-none absolute inset-0 ${machine.blind}`} aria-hidden="true" />
             </Fragment>

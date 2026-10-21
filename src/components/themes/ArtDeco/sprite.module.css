@@ -1,0 +1,262 @@
+/*
+ * His figure's motion (sprite.tsx): transform and opacity only. Every part turns round its own joint in
+ * the viewBox's units (transform-box: view-box), so a forearm turns at the elbow wherever the shoulder
+ * took it. The kit classes set a profession's resting pose; a motion class plays a cycle over it. A one
+ * shot motion also runs `clock` on the root group, whose end the component reports. Glows, the bolt, the
+ * arc and the chamber rest at opacity 0 and show only inside a motion.
+ */
+
+.sprite * {
+  transform-box: view-box;
+}
+
+.body { transform-origin: 62px 172px; }
+.chest { transform-origin: 62px 90px; }
+.head { transform-origin: 62px 44px; }
+.eyes { transform-origin: 70px 28px; }
+.armBack { transform-origin: 49px 53px; }
+.foreBack { transform-origin: 49.5px 76px; }
+.armFront { transform-origin: 73px 53px; }
+.foreFront { transform-origin: 73.5px 76px; }
+.thighBack { transform-origin: 54px 96px; }
+.shinBack { transform-origin: 55px 132px; }
+.thighFront { transform-origin: 70px 96px; }
+.shinFront { transform-origin: 69px 132px; }
+.bolt { transform-origin: 80px 72px; }
+.chamber { transform-origin: 62px 172px; }
+
+.sparks,
+.bolt,
+.chamber,
+.hitSpark,
+.arc {
+  opacity: 0;
+}
+
+.palmGlow,
+.veins {
+  opacity: 0.35;
+}
+
+/* ---------------------------------------------------------------- resting poses per kit */
+
+/* both sticks raised over the snare */
+.kitSticks .armFront { transform: rotate(-20deg); }
+.kitSticks .foreFront { transform: rotate(-70deg); }
+.kitSticks .armBack { transform: rotate(-25deg); }
+.kitSticks .foreBack { transform: rotate(-75deg); }
+
+/* the Muay Thai guard: wrapped fists by the chin, weight on the back leg */
+.kitGuard .armFront { transform: rotate(-35deg); }
+.kitGuard .foreFront { transform: rotate(-135deg); }
+.kitGuard .armBack { transform: rotate(-25deg); }
+.kitGuard .foreBack { transform: rotate(-145deg); }
+.kitGuard .thighFront { transform: rotate(-6deg); }
+
+/* ---------------------------------------------------------------- idle: breath, blink, the wrench tap, the plasmid crawl */
+
+.idle .chest { animation: breathe 3.6s ease-in-out infinite; }
+.idle .eyes { animation: blink 4.6s step-end infinite; }
+.idle.kitWrench .foreBack { animation: tap 2.4s cubic-bezier(0.5, 0, 0.9, 0.4) infinite; }
+.idle .sparks { animation: crawl 1.9s steps(1) infinite; }
+.idle .veins { animation: pulse 2.8s ease-in-out infinite; }
+
+@keyframes breathe {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-0.8px) scaleY(1.015); }
+}
+
+@keyframes blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+
+/* the wrench lifts slowly and drops onto the thigh, twice, then rests */
+@keyframes tap {
+  0%, 12%, 30%, 48%, 100% { transform: rotate(0deg); }
+  8%, 26% { transform: rotate(-16deg); }
+}
+
+@keyframes crawl {
+  0%, 40%, 70%, 100% { opacity: 0; }
+  20%, 55% { opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- walk: a wary first person stride */
+
+.walk .body { animation: bob 0.8s ease-in-out infinite; }
+.walk .thighBack, .walk .armFront { animation: stride-a 0.8s ease-in-out infinite; }
+.walk .thighFront, .walk .armBack { animation: stride-b 0.8s ease-in-out infinite; }
+.walk .shinBack { animation: knee 0.8s ease-in-out infinite; }
+.walk .shinFront { animation: knee 0.8s ease-in-out -0.4s infinite; }
+
+@keyframes bob {
+  0%, 50%, 100% { transform: translateY(0); }
+  25%, 75% { transform: translateY(-2px); }
+}
+
+@keyframes stride-a {
+  0%, 100% { transform: rotate(16deg); }
+  50% { transform: rotate(-16deg); }
+}
+
+@keyframes stride-b {
+  0%, 100% { transform: rotate(-16deg); }
+  50% { transform: rotate(16deg); }
+}
+
+@keyframes knee {
+  0%, 50%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(14deg); }
+}
+
+/* ---------------------------------------------------------------- one shots: each runs the clock */
+
+.swing { animation: clock 0.9s linear both; }
+.zap { animation: clock 1.3s linear both; }
+.drum { animation: clock 1.6s linear both; }
+.strike { animation: clock 1.8s linear both; }
+.revive { animation: clock 1.8s linear both; }
+
+@keyframes clock {
+  from { opacity: 1; }
+  to { opacity: 1; }
+}
+
+/* the wrench swing: wound up behind the head, brought down hard in front, the arc in the hit frames */
+.swing .armBack { animation: swing-arm 0.9s cubic-bezier(0.6, 0, 0.2, 1) both; }
+.swing .foreBack { animation: swing-fore 0.9s cubic-bezier(0.6, 0, 0.2, 1) both; }
+.swing .chest { animation: swing-lean 0.9s ease-in-out both; }
+.swing .arc { animation: flash 0.9s linear both; }
+
+@keyframes swing-arm {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(160deg); }
+  55% { transform: rotate(-80deg); }
+  75% { transform: rotate(-60deg); }
+}
+
+@keyframes swing-fore {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(30deg); }
+  55%, 75% { transform: rotate(-10deg); }
+}
+
+@keyframes swing-lean {
+  0%, 100% { transform: rotate(0deg); }
+  35% { transform: rotate(-6deg); }
+  55% { transform: rotate(7deg); }
+}
+
+@keyframes flash {
+  0%, 44%, 70%, 100% { opacity: 0; }
+  52% { opacity: 0.8; }
+}
+
+/* the plasmid zap: the hand thrown forward, the veins flare, the bolt forks out twice */
+.zap .armFront { animation: aim-arm 1.3s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.zap .foreFront { animation: aim-fore 1.3s cubic-bezier(0.3, 0, 0.2, 1) both; }
+.zap .veins, .zap .palmGlow { animation: flare 1.3s linear both; }
+.zap .sparks { animation: flare 1.3s steps(2) both; }
+.zap .bolt { animation: bolt 1.3s steps(1) both; }
+
+@keyframes aim-arm {
+  0%, 100% { transform: rotate(0deg); }
+  25%, 80% { transform: rotate(-75deg); }
+}
+
+@keyframes aim-fore {
+  0%, 100% { transform: rotate(0deg); }
+  25%, 80% { transform: rotate(-12deg); }
+}
+
+@keyframes flare {
+  0%, 100% { opacity: 0.35; }
+  20%, 80% { opacity: 1; }
+}
+
+@keyframes bolt {
+  0%, 30%, 45%, 52%, 72%, 100% { opacity: 0; transform: scaleX(1); }
+  32%, 54% { opacity: 1; transform: scaleX(1); }
+  40%, 62% { opacity: 1; transform: scaleX(0.92) translateY(1px); }
+}
+
+/* the drum roll: the sticks alternate, the plasmid stick spits a spark on each hit */
+.drum .foreBack { animation: hit 0.32s ease-in 5 both; }
+.drum .foreFront { animation: hit 0.32s ease-in -0.16s 5 both; }
+.drum .hitSpark { animation: spit 0.32s steps(1) 5 both; }
+.drum .veins { animation: flare 1.6s linear both; }
+.drum .chest { animation: nod 0.64s ease-in-out 2 both; }
+
+@keyframes hit {
+  0%, 100% { transform: rotate(-75deg); }
+  50% { transform: rotate(-40deg); }
+}
+
+@keyframes spit {
+  0%, 40%, 100% { opacity: 0; }
+  50% { opacity: 1; }
+}
+
+@keyframes nod {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(3deg); }
+}
+
+/* the knee then the round kick, guard held */
+.strike .thighFront { animation: knee-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.strike .shinFront { animation: shin-kick 1.8s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.strike .body { animation: lean 1.8s ease-in-out both; }
+.strike .veins { animation: flare 1.8s linear both; }
+
+@keyframes knee-kick {
+  0%, 100% { transform: rotate(-6deg); }
+  18%, 30% { transform: rotate(-85deg); }
+  42% { transform: rotate(-6deg); }
+  62%, 74% { transform: rotate(-80deg); }
+}
+
+@keyframes shin-kick {
+  0%, 42%, 100% { transform: rotate(0deg); }
+  18%, 30% { transform: rotate(95deg); }
+  56% { transform: rotate(80deg); }
+  62%, 74% { transform: rotate(0deg); }
+}
+
+@keyframes lean {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 70% { transform: rotate(-6deg); }
+}
+
+/* the revival chamber: the light column stands, he knits together from the feet up, flickering in */
+.revive .chamber { animation: chamber 1.8s ease-in-out both; }
+.revive .body { animation: knit 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+
+@keyframes chamber {
+  0% { opacity: 0; transform: scaleY(0.2); }
+  20%, 70% { opacity: 1; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1); }
+}
+
+@keyframes knit {
+  0%, 15% { opacity: 0; transform: scaleY(0.05); }
+  35% { opacity: 0.6; transform: scaleY(0.7); }
+  40% { opacity: 0.2; }
+  48% { opacity: 0.9; transform: scaleY(1.04); }
+  54% { opacity: 0.4; }
+  62%, 100% { opacity: 1; transform: scaleY(1); }
+}
+
+/* ---------------------------------------------------------------- the glass: he walks in from the left edge */
+
+.walkIn { animation: walk-in 1.6s linear both; }
+
+@keyframes walk-in {
+  from { transform: translateX(-70%); }
+  to { transform: translateX(0); }
+}

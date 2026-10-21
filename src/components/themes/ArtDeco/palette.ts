@@ -34,6 +34,19 @@ export const DECO_COLORS = {
   bloodDark: '#660000',
   blood: '#8B0000',
 
+  // His painted costume: the charcoal cable knit sweater, the slacks, the pipe wrench and the blue
+  // crackle of the electric plasmid in his veins
+  knit: '#4a463e',
+  knitShade: '#26241f',
+  knitLight: '#6d675a',
+  slacks: '#2e2b27',
+  shoe: '#3a2414',
+  steel: '#9aa0a4',
+  steelShade: '#4f5458',
+  rust: '#8a4320',
+  bolt: '#7fe0ff',
+  boltCore: '#effcff',
+
   // Poster paper and text
   ivory: '#FFFFF0',
   cream: '#FAF0E6',
