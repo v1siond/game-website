@@ -8,6 +8,14 @@
     <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
   </head>
   <body>
+    <!-- Decap starts by hand so the sign in goes to the origin the admin is served from (the site's own
+         OAuth route in src/app/api/decap-auth); the rest of the config still comes from config.yml. -->
+    <script>
+      window.CMS_MANUAL_INIT = true
+    </script>
     <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
+    <script>
+      CMS.init({ config: { backend: { base_url: location.origin, auth_endpoint: 'api/decap-auth' } } })
+    </script>
   </body>
 </html>
