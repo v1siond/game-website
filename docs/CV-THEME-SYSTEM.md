@@ -25,6 +25,12 @@ Artistic.
   martial-arts, tech-stack, companies, roles), each holding `en`, `es` and `it`. He edits them at `/admin`.
 - One loader, `getAllCVData(locale)` in `src/lib/cv-data.ts`, reads the files on each render, so an edit
   shows without a code change. A key missing in a locale keeps the English value.
+- Interface text (section titles, buttons, accessible names, "Released", "Since {year}") lives in
+  `content/cv/labels.json` ("Site text" at `/admin`), never in a component. The same loader reads it, and a
+  component reads it with `useLabels()` from `CVDataProvider`: `const { sections } = useLabels()`, then
+  `title={sections.about}`. A `{slot}` is filled with `fillLabel` from `src/lib/cv/labels.ts`. A key missing
+  in es or it keeps the English text. There is no next-intl and no `messages/` folder; the locale comes from
+  the cookie or Accept-Language (`src/i18n/requestLocale.ts`).
 - No other source exists: no hand written data folder and no API. nebulith is not this site's backend.
 - `node scripts/check-cv-text.mjs` fails when an English string no longer matches the job history it was
   copied from, or a project fact has no commit behind it.
@@ -101,7 +107,8 @@ its folder `src/components/themes/MedievalFantasy/` has no `stages.tsx` or `scen
 - Animate transform and opacity only. No animated shadow or blur.
 - Honour reduced motion through `useReducedMotion` (or the shared CSS), never a local media query check.
 - Titles stay professional (System Engineer, Musician, Martial Artist). Content comes only from the Decap
-  files through `useWorldView`.
+  files through `useWorldView`, and every label through `useLabels`. A world may change a label's casing
+  (uppercase, lowercase) but never writes its own copy of the text.
 
 ## How to add a new world
 
