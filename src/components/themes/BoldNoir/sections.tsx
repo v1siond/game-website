@@ -4,144 +4,154 @@ import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { ArtSection } from './art'
-import { SectionHeading, SkewedPanel } from './panels'
-import { CompanyCard, BandCard, ExperienceCard, ProjectCard, TechStackDisplay } from './cards'
+import { SectionBreak } from './backdrop'
+import { Narration, NoirPanel, SectionTitle } from './panels'
+import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechStackBoard } from './cards'
+import { SceneItem, Strip } from './scenes'
+import world from './world.module.css'
 
-export function EngineerSections({ sections, prefersReducedMotion }: { sections: SectionsOf<'engineer'>; prefersReducedMotion: boolean }) {
+// The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
+// Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
+
+const LEAD = `text-base text-[#d6d3cb] ${world.copy}`
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      <section aria-label="About">
-        <SkewedPanel color="#ff0033" direction="right" delay={200}>
-          <h2 className="text-xl font-black mb-3" style={{ color: '#ff0033' }}>
-            ABOUT
-          </h2>
-          <p className="text-base leading-relaxed" style={{ color: '#ccc' }}>
-            {professionalSummary.bio}
-          </p>
-        </SkewedPanel>
-      </section>
+      <FadeInScene>
+        <Narration label="About">
+          <p className={`text-base leading-relaxed ${world.typed}`}>{professionalSummary.bio}</p>
+        </Narration>
+      </FadeInScene>
 
-      {/* ART SECTION 1: Phantom masks + action lines */}
-      {!prefersReducedMotion && <ArtSection variant={1} />}
+      <SectionBreak kind="lamp" />
 
       {sections.jobs.length > 0 && (
-        <section className="mt-8" aria-label="Work experience">
-          <SkewedPanel color="#ff0033" direction="left" delay={300}>
-            <h2 className="text-xl font-black mb-4" style={{ color: '#ff0033' }}>
-              WORK EXPERIENCE
-            </h2>
-            <div className="space-y-4">
+        <LevelScene>
+          <Strip profession="engineer" zone="record" />
+          <NoirPanel title="Work Experience">
+            <ul className="space-y-8">
               {sections.jobs.map((entry) => (
-                <ExperienceCard key={entry.id} entry={entry} />
+                <li key={entry.id}>
+                  <SceneItem kind="panel">
+                    <ExperienceCard entry={entry} />
+                  </SceneItem>
+                </li>
               ))}
-            </div>
-          </SkewedPanel>
-        </section>
+            </ul>
+          </NoirPanel>
+        </LevelScene>
       )}
 
-      {/* ART SECTION 2: Paint splatters + card suits */}
-      {!prefersReducedMotion && <ArtSection variant={2} />}
+      <SectionBreak kind="blinds" />
 
-      <section className="mt-8" aria-label="Tech stack">
-        <SkewedPanel color="#ff0033" direction="left" delay={400}>
-          <h2 className="text-xl font-black mb-4" style={{ color: '#ff0033' }}>
-            TECH STACK
-          </h2>
-          <TechStackDisplay categories={sections.techStack} />
-        </SkewedPanel>
-      </section>
+      <FadeInScene>
+        <NoirPanel title="Tech Stack">
+          <TechStackBoard categories={sections.techStack} />
+        </NoirPanel>
+      </FadeInScene>
 
-      <section className="mt-8" aria-label="Projects">
-        <SectionHeading prefersReducedMotion={prefersReducedMotion}>PROJECTS</SectionHeading>
+      <SectionBreak kind="lamp" />
+
+      <LevelScene>
+        <Strip profession="engineer" zone="work" />
+        <SectionTitle>Featured Work</SectionTitle>
         <ProjectList
           projects={sections.projects}
-          className="grid md:grid-cols-2 gap-4"
-          renderProject={(slot) => <ProjectCard {...slot} index={sections.projects.indexOf(slot.project)} />}
+          className="grid gap-8 md:grid-cols-2"
+          renderProject={(slot) => (
+            <SceneItem kind="photo">
+              <ProjectCard {...slot} />
+            </SceneItem>
+          )}
         />
-      </section>
+      </LevelScene>
 
-      {/* ART SECTION 3: Speed lines + chain break */}
-      {!prefersReducedMotion && <ArtSection variant={3} />}
+      <SectionBreak kind="blinds" />
 
-      <section className="mt-8" aria-label="Ventures">
-        <SectionHeading prefersReducedMotion={prefersReducedMotion}>VENTURES</SectionHeading>
-        <div className="grid md:grid-cols-3 gap-4">
+      <FadeInScene>
+        <SectionTitle>Ventures</SectionTitle>
+        <ul className="grid gap-6 md:grid-cols-3">
           {sections.companies.map((company) => (
-            <CompanyCard key={company.id} company={company} />
+            <li key={company.id}>
+              <CompanyCard company={company} />
+            </li>
           ))}
-        </div>
-      </section>
+        </ul>
+      </FadeInScene>
     </>
   )
 }
 
-export function MusicianSections({ sections, prefersReducedMotion }: { sections: SectionsOf<'drummer'>; prefersReducedMotion: boolean }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
     <>
-      {!prefersReducedMotion && <ArtSection variant={2} />}
-      <section className="mt-8" aria-label="Bands">
-        <SectionHeading prefersReducedMotion={prefersReducedMotion}>BANDS</SectionHeading>
-        <p className="text-base mb-4" style={{ color: '#ccc' }}>
+      <SectionBreak kind="lamp" />
+      <LevelScene>
+        <Strip profession="drummer" zone="record" />
+        <SectionTitle>Bands</SectionTitle>
+        <p className={`mb-6 ${LEAD}`}>
           Drums since {musician.since}, {musician.yearsPlaying} years
         </p>
         <BandList
           bands={bands}
-          className="grid md:grid-cols-3 gap-4"
-          renderBand={(slot) => <BandCard {...slot} />}
+          className="grid gap-6 md:grid-cols-3"
+          renderBand={(slot) => (
+            <SceneItem kind="photo">
+              <BandCard {...slot} />
+            </SceneItem>
+          )}
         />
-        <p className="text-sm mt-4 italic" style={{ color: '#ff6666' }}>
-          {musician.line}
-        </p>
-      </section>
+        <p className={`mt-6 italic ${LEAD}`}>{musician.line}</p>
+      </LevelScene>
     </>
   )
 }
 
-export function MartialArtistSections({ sections, prefersReducedMotion }: { sections: SectionsOf<'fighter'>; prefersReducedMotion: boolean }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
     <>
-      {!prefersReducedMotion && <ArtSection variant={3} />}
-      <section className="mt-8" aria-label="Muay Thai">
-        <SkewedPanel color="#ff0033" direction="right" delay={200}>
-          <h2 className="text-xl font-black mb-2" style={{ color: '#ff0033' }}>
-            MUAY THAI
-          </h2>
-          <h3 className="text-lg font-bold mb-4" style={{ color: '#fff' }}>
-            {martialArts.primary.title}
-          </h3>
+      <SectionBreak kind="blinds" />
+      <LevelScene>
+        <Strip profession="fighter" zone="record" />
+        <NoirPanel title="Muay Thai">
+          <h3 className="mb-4 text-2xl tracking-wide">{martialArts.primary.title}</h3>
           <MuayThaiRecord
             martialArts={martialArts}
             classNames={{
-              facts: 'grid sm:grid-cols-2 gap-3 mb-5',
-              fact: 'px-4 py-3 border-l-4 border-[#ff0033] bg-[#ff0033]/10',
-              term: 'text-sm tracking-widest uppercase font-bold text-[#ff6666]',
-              value: 'text-sm mt-1 text-white',
-              achievements: 'space-y-2',
-              achievement: 'text-sm flex items-start gap-2 text-[#e0e0e0]',
+              facts: `mb-5 grid gap-3 sm:grid-cols-2 ${world.copy}`,
+              fact: 'border-l-4 border-[#ff0033] bg-[#0a0a0a] px-4 py-3',
+              term: `text-sm font-bold uppercase tracking-widest text-[#a3a3a3] ${world.typed}`,
+              value: 'mt-1 text-sm text-[#f2efe6]',
+              achievements: `space-y-3 ${world.copy}`,
+              achievement: 'text-sm text-[#f2efe6]',
             }}
             renderAchievement={(achievement) => (
-              <>
-                <span className="text-[#ff6666]" aria-hidden="true">▸</span>
-                <span>{achievement}</span>
-              </>
+              <SceneItem kind="panel">
+                <p className={`flex items-start gap-2 p-3 ${world.card}`}>
+                  <span className="mt-1.5 block h-2 w-2 flex-shrink-0 bg-[#ff0033]" aria-hidden="true" />
+                  <span>{achievement}</span>
+                </p>
+              </SceneItem>
             )}
           />
-        </SkewedPanel>
-      </section>
+        </NoirPanel>
+      </LevelScene>
     </>
   )
 }
 
-export const SECTION_VIEWS: ProfessionSectionViews<{ prefersReducedMotion: boolean }> = {
+export const SECTION_VIEWS: ProfessionSectionViews = {
   engineer: EngineerSections,
   drummer: MusicianSections,
   fighter: MartialArtistSections,

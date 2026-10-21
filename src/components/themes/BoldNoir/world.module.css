@@ -1,0 +1,138 @@
+/*
+ * Bold Noir's page look, outside the scroll scenes (scenes.module.css): the rain soaked night behind
+ * the page with venetian blind light falling across it, the graphic novel panel and its typewriter
+ * caption box, the cards, the lettering, and the focus ring. Black, white and the greys between, with
+ * one red accent. Shadows and gradients are static; the only ambient loop is the rain, on transform,
+ * and it stops under reduced motion.
+ */
+
+.root {
+  --noir-ink: #0a0a0a;
+  --noir-coal: #161616;
+  --noir-smoke: #2a2a2a;
+  --noir-ash: #5c5c5c;
+  --noir-fog: #a3a3a3;
+  --noir-paper: #f2efe6;
+  --noir-red: #ff0033;
+
+  background: var(--noir-ink);
+  color: var(--noir-paper);
+  font-family: 'Bebas Neue', 'Impact', 'Arial Narrow', sans-serif;
+}
+
+/* Body copy stays a plain sans for reading; captions are typed, titles are the condensed poster face. */
+.copy {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+.typed {
+  font-family: 'Courier New', Courier, ui-monospace, monospace;
+}
+
+/* ---- the night behind the page ---- */
+
+/* Venetian blind light: hard slanted bands of window light across the dark, fading towards the floor. */
+.blinds {
+  background: repeating-linear-gradient(
+    -24deg,
+    rgb(242 239 230 / 0.07) 0 2.25rem,
+    transparent 2.25rem 3.5rem
+  );
+  mask-image: linear-gradient(200deg, #000 0%, rgb(0 0 0 / 0.6) 45%, transparent 85%);
+}
+
+/* The corner the light comes from stays darkest; the page edges fall into shadow. */
+.vignette {
+  background: radial-gradient(ellipse at 70% 20%, transparent 30%, rgb(10 10 10 / 0.75) 100%);
+}
+
+/* Rain: two layers of short slanted streaks, each one tile (--fall) taller than the screen, falling one
+   tile per loop on transform only, so the loop never shows a seam. */
+.rain,
+.rainFar {
+  position: fixed;
+  inset: 0 0 auto;
+  height: calc(100% + var(--fall));
+  animation: rain var(--loop) linear infinite;
+}
+
+.rain {
+  --fall: 140px;
+  --loop: 0.9s;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='140'%3E%3Cpath d='M12 0 l-3 24 M72 42 l-3 24 M42 92 l-3 24 M104 112 l-3 24' stroke='%23f2efe6' stroke-opacity='0.22' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-size: 120px 140px;
+}
+
+.rainFar {
+  --fall: 90px;
+  --loop: 1.6s;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='90'%3E%3Cpath d='M16 8 l-2 14 M58 52 l-2 14' stroke='%23f2efe6' stroke-opacity='0.12' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+  background-size: 80px 90px;
+}
+
+@keyframes rain {
+  from {
+    transform: translate3d(0, calc(var(--fall) * -1), 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rain,
+  .rainFar {
+    animation: none;
+  }
+}
+
+/* ---- surfaces ---- */
+
+/* A graphic novel panel: the white gutter line round a black frame and a hard drop into the dark. */
+.panel {
+  background: var(--noir-coal);
+  border: 3px solid var(--noir-paper);
+  box-shadow: 8px 8px 0 #000;
+}
+
+/* The caption box on a panel's edge: typed black on old paper, like a narrated line. */
+.caption {
+  background: var(--noir-paper);
+  color: var(--noir-ink);
+  box-shadow: 4px 4px 0 var(--noir-red);
+}
+
+.card {
+  background: var(--noir-ink);
+  border: 2px solid var(--noir-ash);
+  border-left: 5px solid var(--noir-red);
+}
+
+/* A photograph on the case file: a paper border round the dark print. */
+.photo {
+  background: var(--noir-ink);
+  border: 6px solid var(--noir-paper);
+  box-shadow: 6px 6px 0 #000;
+}
+
+/* The lineup wall behind him on the profession switch: the height lines of a police lineup. */
+.lineup {
+  background: repeating-linear-gradient(180deg, transparent 0 0.9rem, rgb(242 239 230 / 0.22) 0.9rem 1rem), var(--noir-coal);
+}
+
+/* ---- lettering ---- */
+
+/* The big title: paper letters cut with a hard red drop and a black one under it. */
+.title {
+  text-shadow:
+    3px 3px 0 var(--noir-red),
+    6px 6px 0 #000;
+}
+
+.focusRing :focus-visible {
+  outline: 3px solid var(--noir-red);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--noir-paper);
+}

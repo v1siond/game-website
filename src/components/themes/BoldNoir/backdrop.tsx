@@ -1,271 +1,111 @@
-import { useEffect, useState } from 'react'
+import type { ReactNode } from 'react'
+import { NOIR } from './palette'
+import world from './world.module.css'
 
-// Bold Noir's fixed background layers and ornaments.
+// Bold Noir's static art: the city skyline, the rain streaks the levels pour, the page's night behind
+// everything (blind light, rain, the skyline at the foot of the screen) and the breaks between
+// sections. Only the page rain loops (world.module.css); the scroll scenes own every other motion.
 
-// Profession-specific ornaments in Persona 5 bold style
-export function StylishOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
-  const ornamentsByProfession = {
-    engineer: [
-      { text: 'CODE', x: 3, y: 15, rotation: -15, size: 32 },
-      { text: '{ }', x: 90, y: 20, rotation: 12, size: 40 },
-      { text: '<>', x: 5, y: 75, rotation: 8, size: 36 },
-      { text: '//', x: 88, y: 80, rotation: -10, size: 34 },
-      { text: '01', x: 8, y: 45, rotation: -5, size: 28 },
-    ],
-    drummer: [
-      { text: '♪', x: 5, y: 18, rotation: -12, size: 44 },
-      { text: '🥁', x: 92, y: 25, rotation: 15, size: 38 },
-      { text: '🎹', x: 4, y: 70, rotation: 8, size: 36 },
-      { text: '♫', x: 90, y: 75, rotation: -8, size: 40 },
-      { text: 'BEAT', x: 6, y: 45, rotation: -5, size: 26 },
-    ],
-    fighter: [
-      { text: '拳', x: 5, y: 20, rotation: -10, size: 40 },
-      { text: '👊', x: 90, y: 25, rotation: 12, size: 38 },
-      { text: '⚔️', x: 4, y: 72, rotation: 8, size: 36 },
-      { text: 'KO', x: 88, y: 78, rotation: -15, size: 32 },
-      { text: '💥', x: 8, y: 48, rotation: 5, size: 34 },
-    ],
-  }
+// The towers of the skyline in its 690 by 100 box, each with the few windows still lit this late.
+const TOWERS = [
+  { x: 0, width: 48, height: 52, lit: [0.3] },
+  { x: 54, width: 34, height: 78, lit: [0.6] },
+  { x: 94, width: 62, height: 40, lit: [] },
+  { x: 162, width: 38, height: 88, lit: [0.25, 0.7] },
+  { x: 206, width: 54, height: 58, lit: [0.5] },
+  { x: 266, width: 30, height: 70, lit: [] },
+  { x: 302, width: 66, height: 46, lit: [0.2] },
+  { x: 374, width: 40, height: 82, lit: [0.65] },
+  { x: 420, width: 56, height: 54, lit: [] },
+  { x: 482, width: 36, height: 74, lit: [0.4] },
+  { x: 524, width: 60, height: 44, lit: [0.75] },
+  { x: 590, width: 42, height: 66, lit: [0.3] },
+  { x: 638, width: 52, height: 50, lit: [] },
+]
 
-  const items = ornamentsByProfession[profession]
-
+export function Skyline({ className, fill = NOIR.ink }: { className: string; fill?: string }) {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[3] overflow-hidden">
-      {items.map((item, i) => (
-        <div
-          key={i}
-          className="absolute font-black tracking-tighter animate-stylish-float"
-          style={{
-            left: `${item.x}%`,
-            top: `${item.y}%`,
-            fontSize: item.size,
-            transform: `rotate(${item.rotation}deg)`,
-            color: '#ff0033',
-            textShadow: '3px 3px 0 #000, -1px -1px 0 #000',
-            opacity: 0.25,
-            animation: `stylishFloat ${8 + i * 2}s ease-in-out infinite`,
-            animationDelay: `${-i * 1.5}s`,
-          }}
-        >
-          {item.text}
-        </div>
+    <svg viewBox="0 0 690 100" preserveAspectRatio="none" className={className} aria-hidden="true" focusable="false">
+      {TOWERS.map(({ x, width, height, lit }) => (
+        <g key={x}>
+          <rect x={x} y={100 - height} width={width} height={height} fill={fill} />
+          {lit.map((place) => (
+            <rect key={place} x={x + width * place} y={100 - height + 10} width={5} height={4} fill={NOIR.paper} />
+          ))}
+        </g>
       ))}
-    </div>
-  )
-}
-
-// Phantom thief mask SVG - floating decoration
-export function PhantomMask({ style }: { style: React.CSSProperties }) {
-  return (
-    <svg
-      viewBox="0 0 100 50"
-      className="absolute pointer-events-none opacity-20"
-      style={{ width: '120px', ...style }}
-    >
-      <path
-        d="M10,25 Q15,10 30,15 L50,10 L70,15 Q85,10 90,25 Q85,35 70,30 L50,35 L30,30 Q15,35 10,25 Z"
-        fill="none"
-        stroke="#ff0033"
-        strokeWidth="2"
-      />
-      <ellipse cx="30" cy="22" rx="12" ry="8" fill="#ff0033" opacity="0.3" />
-      <ellipse cx="70" cy="22" rx="12" ry="8" fill="#ff0033" opacity="0.3" />
     </svg>
   )
 }
 
-// Floating phantom masks
-export function FloatingMasks() {
-  const [masks, setMasks] = useState<Array<{
-    id: number
-    x: number
-    y: number
-    rotation: number
-    scale: number
-    delay: number
-  }>>([])
+// Short slanted streaks of rain over a 600 by 100 box; a level stretches it wider and pours it.
+const STREAKS = Array.from({ length: 36 }, (_, i) => ({ x: (i * 97) % 600, y: (i * 37) % 100 }))
 
-  useEffect(() => {
-    const newMasks = Array.from({ length: 8 }, (_, i) => ({
-      id: i,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      rotation: Math.random() * 40 - 20,
-      scale: 0.5 + Math.random() * 0.5,
-      delay: Math.random() * 5,
-    }))
-    setMasks(newMasks)
-  }, [])
-
+export function RainStreaks({ className }: { className: string }) {
   return (
-    <div className="fixed inset-0 pointer-events-none z-[2] overflow-hidden">
-      {masks.map((m) => (
-        <PhantomMask
-          key={m.id}
-          style={{
-            left: `${m.x}%`,
-            top: `${m.y}%`,
-            transform: `rotate(${m.rotation}deg) scale(${m.scale})`,
-            animation: `float-mask 10s ease-in-out infinite`,
-            animationDelay: `${m.delay}s`,
-          }}
-        />
+    <svg viewBox="0 0 600 100" preserveAspectRatio="none" className={className} aria-hidden="true" focusable="false">
+      {STREAKS.map(({ x, y }) => (
+        <line key={`${x}-${y}`} x1={x} y1={y} x2={x - 4} y2={y + 14} stroke={NOIR.paper} strokeOpacity={0.35} strokeWidth={1} />
       ))}
-    </div>
-  )
-}
-
-// Card suit symbols scattered background
-export function CardSuits() {
-  const suits = ['♠', '♥', '♦', '♣']
-  const [scattered, setScattered] = useState<Array<{
-    id: number
-    suit: string
-    x: number
-    y: number
-    rotation: number
-    opacity: number
-  }>>([])
-
-  useEffect(() => {
-    const newScattered = Array.from({ length: 20 }, (_, i) => ({
-      id: i,
-      suit: suits[i % 4],
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      rotation: Math.random() * 360,
-      opacity: 0.05 + Math.random() * 0.1,
-    }))
-    setScattered(newScattered)
-  }, [])
-
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
-      {scattered.map((s) => (
-        <span
-          key={s.id}
-          className="absolute text-4xl select-none"
-          style={{
-            left: `${s.x}%`,
-            top: `${s.y}%`,
-            transform: `rotate(${s.rotation}deg)`,
-            opacity: s.opacity,
-            color: s.suit === '♥' || s.suit === '♦' ? '#ff0033' : '#333',
-          }}
-        >
-          {s.suit}
-        </span>
-      ))}
-    </div>
-  )
-}
-
-// Chain link decoration
-export function ChainLink({ broken = false }: { broken?: boolean }) {
-  return (
-    <svg viewBox="0 0 40 20" className="w-10 h-5">
-      <ellipse
-        cx="10"
-        cy="10"
-        rx="8"
-        ry="6"
-        fill="none"
-        stroke={broken ? '#ff0033' : '#333'}
-        strokeWidth="2"
-        className={broken ? 'animate-pulse' : ''}
-      />
-      {!broken && (
-        <ellipse
-          cx="30"
-          cy="10"
-          rx="8"
-          ry="6"
-          fill="none"
-          stroke="#333"
-          strokeWidth="2"
-        />
-      )}
-      {broken && (
-        <>
-          <line x1="18" y1="5" x2="25" y2="3" stroke="#ff0033" strokeWidth="2" />
-          <line x1="18" y1="15" x2="25" y2="17" stroke="#ff0033" strokeWidth="2" />
-        </>
-      )}
     </svg>
   )
 }
 
-// Breaking chains animation
-export function BreakingChains() {
+// The night behind the page: the blind light falling across it, two layers of rain, the skyline at
+// the foot of the screen and the shadowed edges.
+export function NoirBackdrop() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 pointer-events-none z-[3] overflow-hidden flex justify-center gap-2 opacity-30">
-      {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="flex items-center" style={{ animationDelay: `${i * 0.1}s` }}>
-          <ChainLink broken={i === 3 || i === 4} />
-        </div>
-      ))}
+    <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
+      <div className={`absolute inset-0 ${world.blinds}`} />
+      <div className={world.rainFar} />
+      <Skyline className="absolute inset-x-0 bottom-0 h-40 w-full opacity-80" fill={NOIR.coal} />
+      <div className={world.rain} />
+      <div className={`absolute inset-0 ${world.vignette}`} />
     </div>
   )
 }
 
-// Red paint stroke background
-export function PaintStroke({ position }: { position: 'top' | 'bottom' | 'left' | 'right' }) {
-  const positions = {
-    top: 'top-0 left-0 right-0 h-32',
-    bottom: 'bottom-0 left-0 right-0 h-32',
-    left: 'left-0 top-0 bottom-0 w-32',
-    right: 'right-0 top-0 bottom-0 w-32',
-  }
+export type BreakKind = 'blinds' | 'lamp'
 
-  const gradients = {
-    top: 'linear-gradient(180deg, rgba(255,0,51,0.15), transparent)',
-    bottom: 'linear-gradient(0deg, rgba(255,0,51,0.15), transparent)',
-    left: 'linear-gradient(90deg, rgba(255,0,51,0.15), transparent)',
-    right: 'linear-gradient(270deg, rgba(255,0,51,0.15), transparent)',
-  }
-
+// The slats of a venetian blind with a red slash cut across them.
+function BlindsBreak() {
   return (
-    <div
-      className={`fixed pointer-events-none z-[4] ${positions[position]}`}
-      style={{
-        background: gradients[position],
-        maskImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\'/%3E%3C/svg%3E")',
-      }}
-    />
-  )
-}
-
-// Halftone overlay for comic book effect
-export function HalftoneOverlay() {
-  return (
-    <div
-      className="fixed inset-0 pointer-events-none z-[5] opacity-[0.03]"
-      style={{
-        backgroundImage: `radial-gradient(circle, #ff0033 1px, transparent 1px)`,
-        backgroundSize: '8px 8px',
-      }}
-    />
-  )
-}
-
-// Animated diagonal lines background
-export function DiagonalLines() {
-  return (
-    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden opacity-10">
-      {Array.from({ length: 20 }).map((_, i) => (
-        <div
-          key={i}
-          className="absolute w-1 bg-red-600 animate-slide-diagonal"
-          style={{
-            height: '200%',
-            left: `${i * 5}%`,
-            top: '-50%',
-            transform: 'rotate(45deg)',
-            animationDelay: `${i * 0.1}s`,
-          }}
-        />
+    <svg viewBox="0 0 600 60" preserveAspectRatio="none" className="h-14 w-full" aria-hidden="true" focusable="false">
+      {[6, 18, 30, 42].map((y) => (
+        <rect key={y} x={0} y={y} width={600} height={7} fill={NOIR.smoke} />
       ))}
+      <polygon points="250,58 262,58 352,2 340,2" fill={NOIR.red} />
+    </svg>
+  )
+}
+
+// A street lamp at the kerb, its cone of light falling through the rain onto a wet pavement.
+function LampBreak() {
+  return (
+    <svg viewBox="0 0 600 90" preserveAspectRatio="xMidYMid meet" className="h-20 w-full" aria-hidden="true" focusable="false">
+      <polygon points="292,22 308,22 360,84 240,84" fill={NOIR.paper} fillOpacity={0.12} />
+      <rect x={298} y={6} width={4} height={80} fill={NOIR.ash} />
+      <path d="M288 22 Q300 8 312 22 Z" fill={NOIR.fog} />
+      <rect x={60} y={84} width={480} height={3} fill={NOIR.smoke} />
+      <ellipse cx={300} cy={86} rx={70} ry={2} fill={NOIR.paper} fillOpacity={0.18} />
+      {[250, 276, 322, 348].map((x) => (
+        <line key={x} x1={x} y1={34} x2={x - 3} y2={52} stroke={NOIR.paper} strokeOpacity={0.4} />
+      ))}
+    </svg>
+  )
+}
+
+const BREAKS: Record<BreakKind, () => ReactNode> = {
+  blinds: BlindsBreak,
+  lamp: LampBreak,
+}
+
+export function SectionBreak({ kind }: { kind: BreakKind }) {
+  const Break = BREAKS[kind]
+
+  return (
+    <div className="relative z-20 my-10" aria-hidden="true">
+      <Break />
     </div>
   )
 }

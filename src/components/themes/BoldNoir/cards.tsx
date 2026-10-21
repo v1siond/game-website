@@ -1,150 +1,52 @@
-'use client'
-
-import { useEffect, useState } from 'react'
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobYears } from '@/components/cv/sectionText'
-import { AllOutAttackSplash } from './panels'
+import { HeroCharacter } from './character'
+import world from './world.module.css'
 
-// Tarot card art per profession: the glyph and the arcana under the label.
-export const TAROT: Record<Profession, { icon: string; arcana: string }> = {
-  drummer: { icon: '🥁', arcana: 'V - THE HIEROPHANT' },
-  engineer: { icon: '💻', arcana: 'XII - THE HANGED MAN' },
-  fighter: { icon: '🥊', arcana: 'XI - STRENGTH' },
+// The profession switch card and the cards each section lists: black prints, paper borders and typed
+// captions, with the red accent on what the eye must land on.
+
+const SELECT_LOOK = {
+  on: 'border-[#ff0033] -translate-y-1',
+  off: 'border-[#5c5c5c] hover:border-[#f2efe6]',
 }
 
-// Persona-style character portrait with Tarot card motif, one option of the shared profession switch
-export function CharacterCard({
-  id,
-  label,
-  selected,
-  optionProps,
-  prefersReducedMotion = false,
-}: ProfessionOption & { prefersReducedMotion?: boolean }) {
-  const { icon, arcana } = TAROT[id]
-  const numeral = arcana.split(' - ')[0]
-
+// One card of the shared profession switch, a lineup: him in that profession's costume against the
+// height lines, his placard under him; the picked one steps forward with the red border.
+export function ProfessionCard({ id, label, selected, optionProps }: ProfessionOption) {
   return (
     <button
       type="button"
       {...optionProps}
-      className={`relative group transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-black ${
-        selected ? 'scale-105 z-10' : 'opacity-70 hover:opacity-100'
-      }`}
-      style={{
-        transform: prefersReducedMotion
-          ? selected ? 'scale(1.05)' : 'none'
-          : `skewX(-5deg) ${selected ? 'scale(1.05)' : ''}`,
-      }}
+      className={`relative w-full border-4 px-2 pb-3 pt-3 transition-transform motion-reduce:transition-none sm:w-44 ${world.lineup} ${SELECT_LOOK[selected ? 'on' : 'off']}`}
     >
-      {/* Card background with Tarot styling */}
-      <div
-        className="px-4 py-5 sm:p-6 relative overflow-hidden"
-        style={{
-          background: selected
-            ? 'linear-gradient(135deg, #ff0033, #990022)'
-            : 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-          border: `3px solid ${selected ? '#ff0033' : '#333'}`,
-        }}
-      >
-        {/* Diagonal stripes - Persona 5 pattern */}
-        <div
-          className="absolute inset-0 opacity-20"
-          style={{
-            background: 'repeating-linear-gradient(45deg, transparent, transparent 10px, #000 10px, #000 20px)',
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Corner Tarot decorations */}
-        <div
-          className="absolute top-1 left-1 text-[8px] font-bold"
-          style={{ color: selected ? '#000' : '#ff6666' }}
-          aria-hidden="true"
-        >
-          {numeral}
-        </div>
-        <div
-          className="absolute bottom-1 right-1 text-[8px] font-bold rotate-180"
-          style={{ color: selected ? '#000' : '#ff6666' }}
-          aria-hidden="true"
-        >
-          {numeral}
-        </div>
-
-        {/* Content - counter-skew */}
-        <div
-          className="relative z-10"
-          style={{ transform: prefersReducedMotion ? 'none' : 'skewX(5deg)' }}
-        >
-          <span className="text-4xl sm:text-5xl block mb-3" aria-hidden="true">{icon}</span>
-          <span
-            className="text-base sm:text-lg font-black tracking-wider block uppercase"
-            style={{ color: selected ? '#000' : '#fff' }}
-          >
-            {label}
-          </span>
-          <span
-            className="text-sm tracking-widest block mt-1"
-            style={{ color: selected ? '#1a0000' : '#ff6666' }}
-            aria-hidden="true"
-          >
-            {arcana}
-          </span>
-        </div>
-
-        {/* Selection indicator */}
-        {selected && !prefersReducedMotion && (
-          <div className="absolute -right-2 top-1/2 -translate-y-1/2" aria-hidden="true">
-            <span className="text-2xl animate-pulse">◀</span>
-          </div>
-        )}
-      </div>
+      <HeroCharacter profession={id} className="relative mx-auto block h-24 w-16 sm:h-32 sm:w-20" />
+      <span className={`relative mt-2 block px-1 py-1 text-sm font-bold uppercase leading-tight tracking-wider sm:text-base ${world.typed} ${world.caption}`}>
+        {label}
+      </span>
     </button>
   )
 }
 
-// Tech stack display for engineer (ALL OUT ATTACK style)
-export function TechStackDisplay({ categories }: { categories: CVData['techStack'] }) {
+const BODY = `text-sm text-[#d6d3cb] ${world.copy}`
+const CHIP = `border border-[#5c5c5c] px-2 py-0.5 text-sm text-[#f2efe6] ${world.copy}`
+
+export function TechStackBoard({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6">
-      {categories.map((category, catIndex) => (
-        <div key={category.id} className="relative">
-          {/* Category header */}
-          <div
-            className="flex items-center gap-3 mb-3"
-            style={{ transform: 'skewX(-3deg)' }}
-          >
-            <span className="text-xl" aria-hidden="true">{category.icon}</span>
-            <h3
-              className="text-sm font-black tracking-wider"
-              style={{ color: '#ff0033' }}
-            >
-              {category.name.toUpperCase()}
-            </h3>
-            <div className="flex-1 h-px" style={{ background: 'linear-gradient(90deg, #ff0033, transparent)' }} aria-hidden="true" />
-          </div>
-
-          {/* Tech items */}
+      {categories.map((category) => (
+        <div key={category.id}>
+          <h3 className="mb-2 flex items-center gap-3 text-xl uppercase tracking-widest">
+            <span className="block h-3 w-3 bg-[#ff0033]" aria-hidden="true" />
+            {category.name}
+          </h3>
           <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
-            {category.items.map((tech, techIndex) => (
-              <li
-                key={tech}
-                className="px-3 py-1 text-sm transition-all hover:scale-105 cursor-default"
-                style={{
-                  background: `rgba(255,0,51,${0.05 + (techIndex % 3) * 0.05})`,
-                  border: '1px solid #ff003340',
-                  color: '#fff',
-                  transform: 'skewX(-3deg)',
-                  animationDelay: `${catIndex * 100 + techIndex * 50}ms`,
-                }}
-              >
-                <span style={{ display: 'inline-block', transform: 'skewX(3deg)' }}>
-                  {tech}
-                </span>
+            {category.items.map((tech) => (
+              <li key={tech} className={CHIP}>
+                {tech}
               </li>
             ))}
           </ul>
@@ -154,265 +56,126 @@ export function TechStackDisplay({ categories }: { categories: CVData['techStack
   )
 }
 
-// Company card with Persona flair
-export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  return (
-    <AllOutAttackSplash featured>
-      <a
-        href={company.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
-        className="block relative overflow-hidden group h-full"
-        style={{
-          background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-          border: '2px solid #330011',
-          transform: 'skewX(-2deg)',
-        }}
-      >
-        {/* Hover effect line */}
-        <div
-          className="absolute top-0 left-0 w-full h-1 transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100"
-          style={{ background: '#ff0033' }}
-          aria-hidden="true"
-        />
-
-        <div className="p-4" style={{ transform: 'skewX(2deg)' }}>
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-3xl" aria-hidden="true">{company.icon}</span>
-            <div>
-              <h3 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
-                {company.name}
-              </h3>
-              <p className="text-sm" style={{ color: '#ff6666' }}>{company.tagline}</p>
-            </div>
-          </div>
-          <p className="text-sm" style={{ color: '#b8b8b8' }}>{company.description}</p>
-        </div>
-      </a>
-    </AllOutAttackSplash>
-  )
-}
-
-// Band card with musical flair: his role, the years and the release
-export function BandCard({ band, years, linkProps }: BandSlot) {
-  const content = (
-    <div
-      className="p-4 relative overflow-hidden group h-full"
-      style={{
-        background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-        border: '2px solid #330011',
-        transform: 'skewX(-2deg)',
-      }}
-    >
-      {/* Musical note decoration */}
-      <div
-        className="absolute top-2 right-2 text-2xl opacity-20 group-hover:opacity-40 transition-opacity"
-        style={{ color: '#ff0033' }}
-        aria-hidden="true"
-      >
-        ♪
-      </div>
-
-      <div style={{ transform: 'skewX(2deg)' }}>
-        <h3 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
-          {band.name}
-        </h3>
-        <p className="text-sm mt-1" style={{ color: '#ff6666' }}>
-          {band.role}
-          {years && <span aria-hidden="true"> | </span>}
-          {years && <span>{years}</span>}
-        </p>
-        {band.release && (
-          <p className="text-sm mt-2" style={{ color: '#b8b8b8' }}>
-            Released <cite>&ldquo;{band.release}&rdquo;</cite>
-          </p>
-        )}
-      </div>
-    </div>
-  )
-
-  if (!linkProps) return content
-  return (
-    <a {...linkProps} className="block h-full">
-      {content}
-    </a>
-  )
-}
-
-// Work experience card with Persona 5 styling. Dates are date only strings (UTC midnight), so the year is read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'Present')
+  const { start, end } = jobYears(entry, 'Present')
 
   return (
-    <article
-      className="relative overflow-hidden group"
-      style={{
-        background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-        border: '2px solid #330011',
-        transform: 'skewX(-2deg)',
-      }}
-    >
-      {/* Red accent line */}
-      <div
-        className="absolute top-0 left-0 w-1 h-full transition-all duration-300 group-hover:w-2"
-        style={{ background: '#ff0033' }}
-        aria-hidden="true"
-      />
-
-      <div className="p-4 pl-5" style={{ transform: 'skewX(2deg)' }}>
-        <div className="flex justify-between items-start gap-3 mb-2 flex-wrap">
-          <div>
-            <h3 className="text-base font-bold group-hover:text-red-500 transition-colors" style={{ color: '#fff' }}>
-              {entry.title}
-            </h3>
-            <p className="text-sm mt-0.5" style={{ color: '#ff6666' }}>
-              {entry.company}
-            </p>
-          </div>
-          <span
-            className="text-sm px-2 py-1"
-            style={{
-              background: '#ff003330',
-              border: '1px solid #ff003350',
-              color: '#fff',
-            }}
-          >
-            {startDisplay} - {endDisplay}
-          </span>
+    <article className={`p-4 ${world.card}`}>
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="text-2xl tracking-wide">{entry.title}</h3>
+          <p className={`font-bold ${BODY}`}>{entry.company}</p>
         </div>
-
-        {entry.description && (
-          <p className="text-sm mb-3" style={{ color: '#b8b8b8' }}>
-            {entry.description}
-          </p>
-        )}
-
-        {entry.highlights.length > 0 && (
-          <ul className="space-y-1.5" aria-label="Key achievements">
-            {entry.highlights.map((highlight) => (
-              <li
-                key={highlight}
-                className="text-sm flex items-start gap-2"
-                style={{ color: '#e0e0e0' }}
-              >
-                <span style={{ color: '#ff6666' }} aria-hidden="true">▸</span>
-                {highlight}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {entry.skills.length > 0 && (
-          <ul className="flex flex-wrap gap-1 mt-3" aria-label="Skills used">
-            {entry.skills.slice(0, 4).map((skill) => (
-              <li
-                key={skill}
-                className="text-sm px-2 py-0.5"
-                style={{ background: '#ff003330', color: '#fff' }}
-              >
-                {skill}
-              </li>
-            ))}
-          </ul>
-        )}
+        <p className={`whitespace-nowrap bg-[#ff0033] px-2 py-0.5 text-sm font-bold text-[#0a0a0a] ${world.typed}`}>
+          {start} - {end}
+        </p>
       </div>
+      {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
+      {entry.highlights.length > 0 && (
+        <ul className="mt-3 space-y-1.5" aria-label="Key achievements">
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
+              <span className="mt-1.5 block h-2 w-2 flex-shrink-0 bg-[#ff0033]" aria-hidden="true" />
+              {highlight}
+            </li>
+          ))}
+        </ul>
+      )}
+      {entry.skills.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-1" aria-label="Skills used">
+          {entry.skills.slice(0, 4).map((skill) => (
+            <li key={skill} className={CHIP}>
+              {skill}
+            </li>
+          ))}
+        </ul>
+      )}
     </article>
   )
 }
 
-// Project card with reveal effect: his role, the result line and the links
-export function ProjectCard({ project, years, links, index }: ProjectSlot & { index: number }) {
-  const [revealed, setRevealed] = useState(false)
+const LINK_BUTTON = `inline-flex min-h-[44px] items-center border-2 border-[#f2efe6] px-3 text-base uppercase tracking-wider text-[#f2efe6] transition-colors hover:bg-[#f2efe6] hover:text-[#0a0a0a] motion-reduce:transition-none`
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setRevealed(true), 500 + index * 150)
-    return () => clearTimeout(timeout)
-  }, [index])
+export function ProjectCard({ project, years, links }: ProjectSlot) {
+  const titleId = `noir-project-${project.id}`
 
   return (
-    <AllOutAttackSplash featured={project.highlight}>
-      <div
-        className={`relative h-full transition-all duration-500 ${
-          revealed ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
-        style={{
-          transform: `skewX(-2deg)`,
-        }}
-      >
-        <article
-          className="p-4 relative overflow-hidden group h-full"
-          style={{
-            background: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-            border: `2px solid ${project.highlight ? '#ff0033' : '#330011'}`,
-          }}
-        >
-          {/* Red reveal line */}
-          <div
-            className="absolute top-0 left-0 w-full h-1 transition-transform duration-300 group-hover:scale-x-100"
-            style={{
-              background: '#ff0033',
-              transform: 'scaleX(0)',
-              transformOrigin: 'left',
-            }}
-            aria-hidden="true"
-          />
-
-          <div style={{ transform: 'skewX(2deg)' }}>
-            <div className="flex justify-between items-start gap-2 mb-2">
-              <h3 className="text-base font-bold" style={{ color: '#ff0033' }}>
-                {project.name}
-              </h3>
-              {years && (
-                <span className="text-sm px-2 py-1 font-bold whitespace-nowrap" style={{ background: '#ff0033', color: '#000' }}>
-                  {years}
-                </span>
-              )}
-            </div>
-            <p className="text-sm font-bold" style={{ color: '#fff' }}>
-              {project.role}
-            </p>
-            <p className="text-sm mt-1" style={{ color: '#b8b8b8' }}>
-              {project.tagline}
-            </p>
-            {project.impact && (
-              <p className="text-sm mt-2 italic" style={{ color: '#ff6666' }}>
-                <span aria-hidden="true">→ </span>
-                {project.impact}
-              </p>
-            )}
-            {project.techStack.length > 0 && (
-              <ul className="flex gap-2 mt-2 flex-wrap" aria-label="Technologies used">
-                {project.techStack.slice(0, 4).map((tech) => (
-                  <li
-                    key={tech}
-                    className="text-sm px-2 py-0.5"
-                    style={{ background: '#ff003330', color: '#fff' }}
-                  >
-                    {tech}
-                  </li>
-                ))}
-              </ul>
-            )}
-            {links.length > 0 ? (
-              <div className="flex flex-wrap gap-3 mt-4">
-                {links.map(({ kind, label, linkProps }) => (
-                  <a
-                    key={kind}
-                    {...linkProps}
-                    className="inline-flex items-center min-h-[44px] px-4 text-sm font-bold tracking-wider transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500"
-                    style={{ border: '3px solid #ff0033', color: '#ff0033' }}
-                  >
-                    {label.toUpperCase()}
-                  </a>
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm mt-4" style={{ color: '#999' }}>No public link</p>
-            )}
-          </div>
-        </article>
+    <article className={`h-full p-4 ${world.photo}`} aria-labelledby={titleId}>
+      <div className="mb-2 flex items-baseline justify-between gap-2">
+        <h3 id={titleId} className="text-2xl tracking-wide">
+          {project.name}
+        </h3>
+        {years && <span className={`whitespace-nowrap text-sm font-bold text-[#a3a3a3] ${world.typed}`}>{years}</span>}
       </div>
-    </AllOutAttackSplash>
+      <p className={`mb-1 font-bold ${BODY}`}>{project.role}</p>
+      <p className={`mb-3 ${BODY}`}>{project.tagline}</p>
+      {project.impact && <p className={`mb-3 px-3 py-2 text-sm font-bold ${world.typed} ${world.caption}`}>{project.impact}</p>}
+      <ul className="flex flex-wrap gap-1" aria-label={`${project.name} technologies`}>
+        {project.techStack.slice(0, 4).map((tech) => (
+          <li key={tech} className={CHIP}>
+            {tech}
+          </li>
+        ))}
+      </ul>
+      {links.length > 0 ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {links.map(({ kind, label, linkProps }) => (
+            <a key={kind} {...linkProps} className={LINK_BUTTON}>
+              {label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className={`mt-4 italic ${BODY}`}>No public link</p>
+      )}
+    </article>
+  )
+}
+
+export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  return (
+    <a
+      href={company.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      className={`block h-full p-4 transition-colors hover:border-[#f2efe6] motion-reduce:transition-none ${world.card}`}
+    >
+      <div className="mb-2 flex items-center gap-3">
+        <span className="text-3xl" aria-hidden="true">
+          {company.icon}
+        </span>
+        <div>
+          <h3 className="text-xl tracking-wide">{company.name}</h3>
+          <p className={`font-bold ${BODY}`}>{company.tagline}</p>
+        </div>
+      </div>
+      <p className={BODY}>{company.description}</p>
+    </a>
+  )
+}
+
+export function BandCard({ band, years, linkProps }: BandSlot) {
+  const card = (
+    <article className={`h-full p-4 ${world.photo}`}>
+      <h3 className="text-2xl tracking-wide">{band.name}</h3>
+      <p className={`mt-1 font-bold ${BODY}`}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      {band.release && (
+        <p className={`mt-2 ${BODY}`}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
+    </article>
+  )
+
+  if (!linkProps) return card
+  return (
+    <a {...linkProps} className="block h-full">
+      {card}
+    </a>
   )
 }
