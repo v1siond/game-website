@@ -40,12 +40,13 @@ const KO_BURST = Array.from({ length: KO_RAYS * 2 }, (_, i) => {
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const titles = useLabels().sections
 
   return (
     <>
       <FadeInScene>
         <section aria-labelledby="hose-about">
-          <CurlBanner id="hose-about">About</CurlBanner>
+          <CurlBanner id="hose-about">{titles.about}</CurlBanner>
           <p className={`mx-auto max-w-2xl leading-relaxed ${LEAD}`}>{professionalSummary.bio}</p>
         </section>
       </FadeInScene>
@@ -55,7 +56,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.jobs.length > 0 && (
         <ScrollScene reveal={false} start={RUN_START} end={RUN_END}>
           <section aria-labelledby="hose-work-experience" className="mb-8">
-            <CurlBanner id="hose-work-experience">Work Experience</CurlBanner>
+            <CurlBanner id="hose-work-experience">{titles.workExperience}</CurlBanner>
             <div className="sticky top-3 z-30 mb-2">
               <RunBar profession="engineer" stops={sections.jobs.length} />
             </div>
@@ -80,7 +81,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <FadeInScene>
         <section aria-labelledby="hose-tech-stack">
-          <CurlBanner id="hose-tech-stack">Tech Stack</CurlBanner>
+          <CurlBanner id="hose-tech-stack">{titles.techStack}</CurlBanner>
           <div className={`mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
             <TechBubbleCloud categories={sections.techStack} />
           </div>
@@ -88,7 +89,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       </FadeInScene>
 
       <section aria-labelledby="hose-featured-work" className="mb-8">
-        <CurlBanner id="hose-featured-work">Featured Work</CurlBanner>
+        <CurlBanner id="hose-featured-work">{titles.featuredWork}</CurlBanner>
         <ParryBoard projects={sections.projects} />
       </section>
 
@@ -96,7 +97,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <FadeInScene>
         <section aria-labelledby="hose-ventures">
-          <CurlBanner id="hose-ventures">Ventures</CurlBanner>
+          <CurlBanner id="hose-ventures">{titles.ventures}</CurlBanner>
           <ul className="grid gap-4 md:grid-cols-3">
             {sections.companies.map((company) => (
               <li key={company.id}>
@@ -118,7 +119,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
     <>
       <ArtBreak kind="singAlong" />
       <section aria-labelledby="hose-bands" className="mb-8">
-          <CurlBanner id="hose-bands">Bands</CurlBanner>
+          <CurlBanner id="hose-bands">{labels.sections.bands}</CurlBanner>
           <p className={`mb-6 ${LEAD}`}>
             {drumsSince(musician, labels.years)}
           </p>
@@ -131,12 +132,13 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const titles = useLabels().sections
 
   return (
     <>
       <ArtBreak kind="bouncingBalls" />
       <section aria-labelledby="hose-muay-thai" className="mb-8">
-        <CurlBanner id="hose-muay-thai">Muay Thai</CurlBanner>
+        <CurlBanner id="hose-muay-thai">{titles.muayThai}</CurlBanner>
         <Reveal className={`relative mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
           {({ played }) => (
             <>

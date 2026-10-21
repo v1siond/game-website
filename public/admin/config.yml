@@ -328,6 +328,8 @@ collections:
                   - { <<: *text, label: "Read file", name: readFile }
                   - { <<: *text, label: "Close file", name: closeFile }
                   - { <<: *text, label: "Stream link", name: streamLink }
+                  - { <<: *text, label: "Close", name: close, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Spin the star", name: spinStar }
               - label: Link words
                 name: links
                 widget: object
@@ -357,6 +359,7 @@ collections:
                   - { <<: *text, label: "No posts", name: noPosts }
                   - { <<: *text, label: "Job span", name: jobSpan, hint: 'Keep {title} {company} {start} {end}' }
                   - { <<: *text, label: "Cyberware", name: cyberware, hint: 'Keep {type}' }
+                  - { <<: *text, label: "Details", name: details }
               - label: Years
                 name: years
                 widget: object
@@ -400,6 +403,15 @@ collections:
                   - { <<: *text, label: "Professional experience", name: professionalExperience }
                   - { <<: *text, label: "Education", name: education }
                   - { <<: *prose, label: "Education text", name: educationText }
+              - label: Game HUD words
+                name: hud
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Player one", name: playerOne }
+                  - { <<: *text, label: "Hits", name: hits }
+                  - { <<: *text, label: "HP", name: hp }
+                  - { <<: *text, label: "Parry meter", name: parryMeter, hint: 'Keep {parried} {total}' }
               - label: Language names (each in its own language)
                 name: languages
                 widget: object

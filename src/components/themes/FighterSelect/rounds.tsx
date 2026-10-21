@@ -3,6 +3,7 @@
 import type { PointerEvent, ReactNode } from 'react'
 import type { BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/components/cv/sectionText'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import type { Job, MartialArts } from '@/lib/cv/content'
@@ -24,10 +25,9 @@ import fight from './fight.module.css'
 // - BandStage, a band: the concert stage over the card, the card leaning with the pointer and the
 //   stage's three depth layers sliding against it (CSS variables written on pointer move, no render).
 
-const NOW = 'Now'
-
 export function RoundEntry({ entry, round }: { entry: Job; round: number }) {
-  const { start, end } = jobYears(entry, NOW)
+  const { years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <Cue>

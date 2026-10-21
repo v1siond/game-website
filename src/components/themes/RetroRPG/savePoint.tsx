@@ -49,7 +49,7 @@ export function SavePoint({ profession }: { profession: Profession }) {
             type="button"
             onClick={() => setSaves((n) => n + 1)}
             className="relative h-14 w-14 p-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--rpg-text)]"
-            aria-label="Spin the star"
+            aria-label={labels.actions.spinStar}
           >
             <span key={saves} className={`block h-full w-full ${saved ? world.saveSpin : ''}`}>
               <SaveStar />
@@ -63,7 +63,7 @@ export function SavePoint({ profession }: { profession: Profession }) {
               {saved && <div key={saves} className={`pointer-events-none absolute inset-0 bg-[color:var(--rpg-text)] ${world.flash}`} aria-hidden="true" />}
               <h2 id={CONTACT_HEADING} className={`mb-4 text-base uppercase tracking-[0.2em] text-[color:var(--rpg-text)] sm:text-lg ${PIXEL}`}>
                 <Typed pace="short" delay="open">
-                  Contact
+                  {labels.sections.contact}
                 </Typed>
               </h2>
               <p className={`mb-4 flex flex-wrap justify-between gap-2 text-sm uppercase tracking-[0.12em] ${PIXEL} ${saved ? 'text-[color:var(--rpg-gold)]' : 'text-[color:var(--rpg-text)]'}`}>

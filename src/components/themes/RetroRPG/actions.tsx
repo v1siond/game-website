@@ -1,6 +1,7 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react'
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { MONO, PIXEL } from './palette'
 import { PixelIcon, type IconId } from './icons'
 import { Soul } from './soul'
@@ -73,6 +74,8 @@ function PageOption({ href, label }: { href: string; label: string }) {
 
 /** The hero's and the contact box's choices: email, LinkedIn, the full CV and the engine, two columns. */
 export function ActionOptions({ actions, className = '' }: { actions: HeroActionSlot[]; className?: string }) {
+  const labels = useLabels().actions
+
   return (
     <ul className={`grid grid-cols-1 gap-x-8 sm:grid-cols-2 ${className}`}>
       {actions.map((action) => (
@@ -81,10 +84,10 @@ export function ActionOptions({ actions, className = '' }: { actions: HeroAction
         </li>
       ))}
       <li>
-        <PageOption href="/cv" label="CV" />
+        <PageOption href="/cv" label={labels.cv} />
       </li>
       <li>
-        <PageOption href="/personal-projects/game-engine" label="Game" />
+        <PageOption href="/personal-projects/game-engine" label={labels.engineShort} />
       </li>
     </ul>
   )

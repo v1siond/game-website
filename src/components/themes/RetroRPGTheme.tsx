@@ -45,7 +45,7 @@ export default function RetroRPGTheme() {
         href="#main-content"
         className={`sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 ${FOCUS}`}
       >
-        Skip to main content
+        {labels.navigation.skipToContent}
       </a>
 
       {/* The encounter: him, the box, the stats line and the command row */}
@@ -64,7 +64,7 @@ export default function RetroRPGTheme() {
                   <Said className={`text-[color:var(--rpg-sky)] ${SHOW_AFTER.third}`}>{tagline}</Said>
                   <Said className={`text-[color:var(--rpg-muted)] ${SHOW_AFTER.third}`}>{line}</Said>
                 </div>
-                <nav className={`mt-6 ${SHOW_AFTER.last}`} aria-label="Contact and CV">
+                <nav className={`mt-6 ${SHOW_AFTER.last}`} aria-label={labels.navigation.contactAndCv}>
                   <ActionOptions actions={actions} />
                 </nav>
               </Box>
@@ -79,7 +79,7 @@ export default function RetroRPGTheme() {
 
           <ProfessionSwitch
             className={`mt-4 grid grid-cols-1 gap-3 sm:flex sm:justify-between ${SHOW_AFTER.last}`}
-            label="Select profession view"
+            label={labels.navigation.professionSelection}
             renderOption={(option) => <CommandOption option={option} />}
           />
         </Encounter>

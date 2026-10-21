@@ -61,17 +61,18 @@ function Block({ label, title, width = NARROW, children }: { label: string; titl
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const titles = useLabels().sections
 
   return (
     <>
-      <Block label="About" title="About">
+      <Block label={titles.about} title={titles.about}>
         <OpenBox>
           <p className={BODY}>{professionalSummary.bio}</p>
         </OpenBox>
       </Block>
 
       {sections.jobs.length > 0 && (
-        <Block label="Work experience" title="Work experience" width={WIDE}>
+        <Block label={titles.workExperience} title={titles.workExperience} width={WIDE}>
           <BulletBox profession="engineer" />
           <ul className={MASONRY_LIST}>
             {sections.jobs.map((entry) => (
@@ -83,17 +84,17 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </Block>
       )}
 
-      <Block label="Tech stack" title="Tech stack">
+      <Block label={titles.techStack} title={titles.techStack}>
         <OpenBox>
           <ItemBag categories={sections.techStack} />
         </OpenBox>
       </Block>
 
-      <Block label="Projects" title="Featured work" width={WIDE}>
+      <Block label={titles.projects} title={titles.featuredWork} width={WIDE}>
         <ProjectList projects={sections.projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ProjectCard {...slot} />} />
       </Block>
 
-      <Block label="Ventures" title="Ventures" width={WIDE}>
+      <Block label={titles.ventures} title={titles.ventures} width={WIDE}>
         <div className="grid gap-6 md:grid-cols-3">
           {sections.companies.map((company) => (
             <CompanyCard key={company.id} company={company} />
@@ -109,7 +110,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   const { musician, bands } = sections
 
   return (
-    <Block label="Bands" title="Bands" width={WIDE}>
+    <Block label={labels.sections.bands} title={labels.sections.bands} width={WIDE}>
       <p className={`mb-6 text-center text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}>{drumsSince(musician, labels.years)}</p>
       <BulletBox profession="drummer" />
       <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandCard {...slot} />} />
@@ -122,9 +123,10 @@ const STAT = 'border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rp
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const titles = useLabels().sections
 
   return (
-    <Block label="Muay Thai" title="Muay Thai">
+    <Block label={titles.muayThai} title={titles.muayThai}>
       <BulletBox profession="fighter" />
       <OpenBox>
         <h3 className={`mb-4 flex items-start gap-2 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] sm:text-base ${PIXEL}`}>

@@ -3,6 +3,7 @@
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { fillLabel } from '@/lib/cv/labels'
 import { FS_VARS } from './FighterSelect/palette'
 import { ArcadePanel } from './FighterSelect/frames'
 import { HeroSplash } from './FighterSelect/versus'
@@ -43,7 +44,7 @@ export default function FighterSelectTheme() {
             <SelectScreen active={active} title={labels.professions[active]} />
           </ArcadePanel>
 
-          <div role="region" aria-label={`${active} profession details`}>
+          <div role="region" aria-label={fillLabel(labels.navigation.professionDetails, { profession: labels.professions[active] })}>
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           </div>
         </main>

@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import { HeroCharacter } from './character'
@@ -54,6 +55,8 @@ function ChallengeClock() {
 }
 
 export function ChallengerScene({ profession }: { profession: Profession }) {
+  const { sections } = useLabels()
+
   return (
     <section aria-labelledby={CONTACT_HEADING} className="relative z-20 mx-auto mb-10 max-w-6xl px-4 sm:px-6">
       <Cue>
@@ -80,7 +83,7 @@ export function ChallengerScene({ profession }: { profession: Profession }) {
 
               <div className="mt-6 text-center sm:text-left">
                 <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase sm:text-3xl ${look.display} ${look.roundCall} ${fight.enter} ${fight.slam}`}>
-                  Contact
+                  {sections.contact}
                 </h2>
                 <p className={`mb-6 text-base ${fight.enter} ${fight.rise}`}>{line}</p>
                 <div className={`flex flex-col justify-center gap-4 sm:flex-row sm:flex-wrap sm:justify-start ${fight.enter} ${fight.rise} [--delay:860ms]`}>

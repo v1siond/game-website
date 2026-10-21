@@ -45,7 +45,7 @@
   vector-effect: non-scaling-stroke;
 }
 
-/* ---- parallax: each layer slides against the pointer by its depth (--look-x, --look-y, -1 to 1) ---- */
+/* ---- parallax: each layer slides against the pointer by its depth (--mx, --my, -1 to 1, from the theme root) ---- */
 
 .far,
 .mid,
@@ -54,15 +54,15 @@
 }
 
 .far {
-  transform: translate3d(calc(var(--look-x, 0) * -6px), calc(var(--look-y, 0) * -2px), 0);
+  transform: translate3d(calc(var(--mx, 0) * -6px), calc(var(--my, 0) * -2px), 0);
 }
 
 .mid {
-  transform: translate3d(calc(var(--look-x, 0) * -14px), calc(var(--look-y, 0) * -4px), 0);
+  transform: translate3d(calc(var(--mx, 0) * -14px), calc(var(--my, 0) * -4px), 0);
 }
 
 .near {
-  transform: translate3d(calc(var(--look-x, 0) * -26px), calc(var(--look-y, 0) * -6px), 0);
+  transform: translate3d(calc(var(--mx, 0) * -26px), calc(var(--my, 0) * -6px), 0);
 }
 
 /* A prop takes the pointer even though its layer lets it through, and squashes when it lands. */

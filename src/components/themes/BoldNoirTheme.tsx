@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -29,6 +30,7 @@ import world from './BoldNoir/world.module.css'
 export default function BoldNoirTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
   const rootRef = usePointerVars(mounted && !reducedMotion)
@@ -47,7 +49,7 @@ export default function BoldNoirTheme() {
         <CallingCardHero />
       </header>
 
-      <section className="relative z-20 px-4 py-8" aria-label="Profession selection">
+      <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
         <ProfessionMenu active={active} />
         <div className="mt-10">
           <ProfessionSet key={active} profession={active} />
@@ -55,7 +57,7 @@ export default function BoldNoirTheme() {
       </section>
 
       <main className="relative z-20 px-4 py-10 sm:px-6">
-        <div className="mx-auto max-w-6xl" role="region" aria-label={`${active} profession details`}>
+        <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </div>
       </main>

@@ -40,6 +40,8 @@
         "active": "Active"
       },
       "actions": {
+        "close": "Close {name}",
+        "spinStar": "Spin the star",
         "getInTouch": "Get In Touch",
         "downloadCv": "Download CV",
         "cv": "CV",
@@ -70,6 +72,7 @@
         "linkOf": "{link} of {project}"
       },
       "cards": {
+        "details": "Details",
         "keyAchievements": "Key achievements",
         "technologiesUsed": "Technologies used",
         "skillsUsed": "Skills used",
@@ -115,6 +118,12 @@
         "professionalExperience": "Professional Experience",
         "education": "Education & Continuous Learning",
         "educationText": "Self-taught engineer with 10+ years of practical experience building production systems. Continuous learner through hands-on project work, technical documentation, and staying current with industry developments."
+      },
+      "hud": {
+        "playerOne": "1P",
+        "hits": "hits",
+        "hp": "HP",
+        "parryMeter": "{parried} of {total} parried"
       },
       "languages": {
         "en": "English",
@@ -164,6 +173,8 @@
         "active": "Activo"
       },
       "actions": {
+        "close": "Cerrar {name}",
+        "spinStar": "Girar la estrella",
         "getInTouch": "Contáctame",
         "downloadCv": "Descargar CV",
         "cv": "CV",
@@ -194,6 +205,7 @@
         "linkOf": "{link} de {project}"
       },
       "cards": {
+        "details": "Detalles",
         "keyAchievements": "Logros clave",
         "technologiesUsed": "Tecnologías usadas",
         "skillsUsed": "Habilidades usadas",
@@ -239,6 +251,12 @@
         "professionalExperience": "Experiencia Profesional",
         "education": "Educación y Aprendizaje Continuo",
         "educationText": "Ingeniero autodidacta con más de 10 años de experiencia práctica construyendo sistemas de producción. Aprendiz continuo a través de trabajo en proyectos, documentación técnica y manteniéndose actualizado con los desarrollos de la industria."
+      },
+      "hud": {
+        "playerOne": "1J",
+        "hits": "golpes",
+        "hp": "PV",
+        "parryMeter": "{parried} de {total} desviados"
       },
       "languages": {
         "en": "English",
@@ -288,6 +306,8 @@
         "active": "Attivo"
       },
       "actions": {
+        "close": "Chiudi {name}",
+        "spinStar": "Fai girare la stella",
         "getInTouch": "Contattami",
         "downloadCv": "Scarica il CV",
         "cv": "CV",
@@ -318,6 +338,7 @@
         "linkOf": "{link} di {project}"
       },
       "cards": {
+        "details": "Dettagli",
         "keyAchievements": "Risultati chiave",
         "technologiesUsed": "Tecnologie usate",
         "skillsUsed": "Competenze usate",
@@ -363,6 +384,12 @@
         "professionalExperience": "Esperienza Professionale",
         "education": "Formazione e Apprendimento Continuo",
         "educationText": "Ingegnere autodidatta con oltre 10 anni di esperienza pratica nella costruzione di sistemi in produzione. Apprendista continuo attraverso lavoro su progetti, documentazione tecnica e aggiornamento costante sugli sviluppi del settore."
+      },
+      "hud": {
+        "playerOne": "1G",
+        "hits": "colpi",
+        "hp": "PV",
+        "parryMeter": "{parried} di {total} parati"
       },
       "languages": {
         "en": "English",

@@ -5,7 +5,8 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { fillLabel } from '@/lib/cv/labels'
 import { MONO, PIXEL } from './palette'
 import { Command, FOCUS } from './actions'
 import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
@@ -56,7 +57,8 @@ const lineDelay = (index: number) => ({ '--show-delay': `${LINE_START_MS + index
 
 // Dates are date only strings (UTC midnight), so the year is read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
   const { ref, play } = usePlay(LINE_START_MS + entry.highlights.length * LINE_GAP_MS + 600)
 
   return (
@@ -74,7 +76,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       </div>
       {entry.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="space-y-2" aria-label="Key achievements">
+        <ul className="space-y-2" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight, index) => (
             <Said key={highlight} className={world.after} style={lineDelay(index)}>
               {highlight}
@@ -83,7 +85,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         </ul>
       )}
       <div className={SHOW_AFTER.last}>
-        <Tags items={entry.skills.slice(0, 5)} label="Skills used" />
+        <Tags items={entry.skills.slice(0, 5)} label={cards.skillsUsed} />
       </div>
     </article>
   )
@@ -145,7 +147,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
             {project.impact}
           </p>
         )}
-        <Tags items={project.techStack.slice(0, 4)} label="Technologies used" />
+        <Tags items={project.techStack.slice(0, 4)} label={labels.cards.technologiesUsed} />
         {links.length > 0 ? (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map(({ kind, label, linkProps }) => (
@@ -170,13 +172,15 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 }
 
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
+
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
       className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${world.box} ${world.pick} ${FOCUS}`}
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
     >
       <div className="mb-2 flex items-start gap-3">
         <span className="text-xl" aria-hidden="true">
@@ -230,6 +234,8 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 
 // The tech stack as the item menu: one pocket per category, each item a line the heart can sit on.
 export function ItemBag({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
+
   return (
     <div className="grid gap-6 sm:grid-cols-2">
       {categories.map((category) => (
@@ -238,7 +244,7 @@ export function ItemBag({ categories }: { categories: CVData['techStack'] }) {
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
-          <ul className="grid grid-cols-2 gap-x-4 gap-y-1" aria-label={`${category.name} technologies`}>
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-1" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li key={tech} className={`flex items-center gap-2 text-sm text-[color:var(--rpg-text)] hover:text-[color:var(--rpg-gold)] ${MONO} ${world.pick}`}>
                 <Soul className={`h-3 w-3.5 shrink-0 ${world.cursor}`} />

@@ -2,6 +2,7 @@
 
 import type { CSSProperties } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { RansomWord, StarBurst } from './backdrop'
 import { CVLink, EngineLink, HeroAction } from './actions'
@@ -18,6 +19,7 @@ import world from './world.module.css'
 
 export function CallingCardHero() {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.1, rootMargin: '0px' })
+  const { navigation } = useLabels()
 
   return (
     <RecruiterHero
@@ -45,7 +47,7 @@ export function CallingCardHero() {
           <div className={world.after}>
             <p className={`text-lg italic text-[color:var(--noir-paper)] ${world.copy}`}>{tagline}</p>
             <p className={`mt-2 text-base text-[color:var(--noir-paper-dim)] ${world.copy}`}>{line}</p>
-            <nav className="mt-6 flex flex-wrap items-center gap-3" aria-label="Contact and CV">
+            <nav className="mt-6 flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
               {actions.map((action) => (
                 <HeroAction key={action.id} action={action} />
               ))}

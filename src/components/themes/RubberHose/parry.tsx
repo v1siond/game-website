@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { ProjectList } from '@/components/cv/ProjectList'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { VintagePoster } from './cards'
 import { HOSE } from './palette'
@@ -62,10 +64,11 @@ export function ParryBoard({ projects }: { projects: Project[] }) {
   const [parried, setParried] = useState<ReadonlySet<string>>(new Set())
   const parry = (id: string) => setParried((current) => new Set(current).add(id))
   const meterFull = projects.length > 0 && parried.size === projects.length
+  const { hud } = useLabels()
 
   return (
     <div className={styles.scene}>
-      <div className={`mb-6 flex justify-center gap-2 ${meterFull ? styles.superSpin : ''}`} role="img" aria-label={`${parried.size} / ${projects.length}`}>
+      <div className={`mb-6 flex justify-center gap-2 ${meterFull ? styles.superSpin : ''}`} role="img" aria-label={fillLabel(hud.parryMeter, { parried: parried.size, total: projects.length })}>
         {projects.map((project) => (
           <SuperCard key={project.id} full={parried.has(project.id)} />
         ))}

@@ -2,7 +2,8 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { fillLabel } from '@/lib/cv/labels'
 import { HitStar } from './backdrop'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -39,6 +40,8 @@ function Chips({ items, label }: { items: string[]; label: string }) {
 }
 
 export function TechStackBoard({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {categories.map((category) => (
@@ -47,7 +50,7 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
             <HitStar className="h-5 w-5" />
             {category.name}
           </h3>
-          <Chips items={category.items} label={`${category.name} technologies`} />
+          <Chips items={category.items} label={fillLabel(cards.categoryTechnologies, { name: category.name })} />
         </div>
       ))}
     </div>
@@ -56,7 +59,8 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
 
 // A job as a rank card: the years stamped on its corner in big tilted calendar digits.
 export function RankCard({ entry, index }: { entry: Job; index: number }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <div className={world.rank} style={orderVars(index)}>
@@ -70,7 +74,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
         <p className={`mt-1 font-bold uppercase tracking-wider text-[color:var(--noir-paper)] ${world.copy} text-sm`}>{entry.company}</p>
         {entry.description && <p className={`mt-3 ${BODY}`}>{entry.description}</p>}
         {entry.highlights.length > 0 && (
-          <ul className="mt-3 space-y-1.5" aria-label="Key achievements">
+          <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
             {entry.highlights.map((highlight) => (
               <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
                 <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />
@@ -79,7 +83,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
             ))}
           </ul>
         )}
-        {entry.skills.length > 0 && <Chips items={entry.skills.slice(0, 5)} label="Skills used" />}
+        {entry.skills.length > 0 && <Chips items={entry.skills.slice(0, 5)} label={cards.skillsUsed} />}
       </article>
     </div>
   )
@@ -112,12 +116,14 @@ export function CaseCard({ slot, index, onOpen }: { slot: ProjectSlot; index: nu
 }
 
 export function CompanyTag({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
+
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
       className={`block h-full p-5 ${world.slab} ${world.kick}`}
     >
       <span className="flex items-center gap-3">

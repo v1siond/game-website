@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { usePointerVars } from '@/hooks/usePointerVars'
+import { fillLabel } from '@/lib/cv/labels'
 import { HOSE_VARS } from './RubberHose/palette'
 import { FilmFrame, FilmGrain, RisingNotes } from './RubberHose/backdrop'
 import { CartoonTitle } from './RubberHose/art'
@@ -25,7 +28,8 @@ import world from './RubberHose/world.module.css'
 // on a new iris (./RubberHose/sets), the contact frame closes on the iris out round him waving under the
 // pie eyed sun (./RubberHose/scenes).
 //
-// The root carries the palette as --hose-* variables (the one inline style, variables only) and clips
+// The root carries the palette as --hose-* variables (the one inline style, variables only), the pointer
+// as --mx and --my (usePointerVars, read by the sets' parallax and the sun's pupils), and clips
 // sideways overflow with overflow-x: clip, not hidden: hidden would make the root a scroll container and
 // stop sticky children from sticking to the viewport.
 
@@ -34,7 +38,10 @@ const CONTACT_HEADING = headingId('hose', 'Contact')
 export default function RubberHoseTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation, professions, sections } = useLabels()
+  const reducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
+  const rootRef = usePointerVars(mounted && !reducedMotion)
 
   useEffect(() => {
     setMounted(true)
@@ -43,9 +50,9 @@ export default function RubberHoseTheme() {
   if (!mounted) return null
 
   return (
-    <div className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={HOSE_VARS}>
+    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={HOSE_VARS}>
       <a href="#main-content" className={`sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 ${world.chip}`}>
-        Skip to main content
+        {navigation.skipToContent}
       </a>
 
       <FilmFrame />
@@ -68,7 +75,7 @@ export default function RubberHoseTheme() {
                       <p className={`mt-2 text-sm ${world.ink} ${staggerAt(2)} ${look.word}`}>{line}</p>
                     </div>
 
-                    <nav className={`flex flex-wrap items-center justify-center gap-3 ${staggerAt(3)} ${look.word}`} aria-label="Contact and CV">
+                    <nav className={`flex flex-wrap items-center justify-center gap-3 ${staggerAt(3)} ${look.word}`} aria-label={navigation.contactAndCv}>
                       {actions.map((action) => (
                         <HeroAction key={action.id} action={action} />
                       ))}
@@ -83,16 +90,16 @@ export default function RubberHoseTheme() {
         </header>
 
         {/* the profession switch, a row of cast badges with him in each costume */}
-        <section className="relative z-20 py-8" aria-label="Profession selection">
+        <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
           <ProfessionSwitch
             className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
-            label="Profession"
+            label={navigation.profession}
             renderOption={(option) => <CartoonCharacter {...option} />}
           />
         </section>
 
         <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">
-          <div className="mx-auto max-w-6xl" role="region" aria-label={`${active} profession details`}>
+          <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
             <IrisWipe key={active}>
               <ProfessionSet profession={active} />
               <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
@@ -106,7 +113,7 @@ export default function RubberHoseTheme() {
             render={({ line, actions }) => (
               <div className={`relative mt-6 p-6 text-center sm:text-left ${world.titleCard}`}>
                 <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase ${world.lettering} ${world.dropText}`}>
-                  Contact
+                  {sections.contact}
                 </h2>
                 <p className={`mb-6 text-base ${world.ink}`}>{line}</p>
                 <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">

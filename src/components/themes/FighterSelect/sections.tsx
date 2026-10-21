@@ -23,12 +23,13 @@ const LEAD = 'text-base leading-relaxed'
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const titles = useLabels().sections
   const { jobs } = sections
 
   return (
     <>
       <FadeInScene>
-        <ArcadePanel accent="cyan" title="About" id="about-heading">
+        <ArcadePanel accent="cyan" title={titles.about} id="about-heading">
           <p className={LEAD}>{professionalSummary.bio}</p>
         </ArcadePanel>
       </FadeInScene>
@@ -36,7 +37,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <ClashSeparator />
 
       {jobs.length > 0 && (
-        <ArcadePanel accent="p1" title="Work Experience" id="experience-heading">
+        <ArcadePanel accent="p1" title={titles.workExperience} id="experience-heading">
           <ul className={MASONRY_LIST}>
             {jobs.map((entry, index) => (
               <li key={entry.id} className={MASONRY_ITEM}>
@@ -50,12 +51,12 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <LightningLine />
 
       <FadeInScene>
-        <ArcadePanel accent="cyan" title="Tech Stack" id="tech-stack-heading">
+        <ArcadePanel accent="cyan" title={titles.techStack} id="tech-stack-heading">
           <MoveList categories={sections.techStack} />
         </ArcadePanel>
       </FadeInScene>
 
-      <ArcadePanel accent="gold" title="Projects" id="projects-heading">
+      <ArcadePanel accent="gold" title={titles.projects} id="projects-heading">
         <ComboZone>
           <ProjectList
             projects={sections.projects}
@@ -75,7 +76,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <RoundWins />
 
       <FadeInScene>
-        <ArcadePanel accent="cyan" title="Ventures" id="ventures-heading">
+        <ArcadePanel accent="cyan" title={titles.ventures} id="ventures-heading">
           <ul className="grid gap-6 md:grid-cols-3">
             {sections.companies.map((company) => (
               <li key={company.id}>
@@ -96,7 +97,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   return (
     <>
       <LightningLine />
-      <ArcadePanel accent="p2" title="Bands" id="bands-heading">
+      <ArcadePanel accent="p2" title={labels.sections.bands} id="bands-heading">
         <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
         <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <BandStage {...slot} />} />
         <p className="mt-6 text-sm italic text-[color:var(--fs-gold)]">{musician.line}</p>
@@ -106,10 +107,12 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 }
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const titles = useLabels().sections
+
   return (
     <>
       <RoundWins />
-      <ArcadePanel accent="p2" title="Muay Thai" id="muay-thai-heading">
+      <ArcadePanel accent="p2" title={titles.muayThai} id="muay-thai-heading">
         <ResultRecord martialArts={sections.martialArts} />
       </ArcadePanel>
     </>

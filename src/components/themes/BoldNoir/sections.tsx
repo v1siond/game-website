@@ -45,8 +45,10 @@ function Stage({ title, children, className = '' }: { title: string; children: R
 }
 
 function About({ bio }: { bio: string }) {
+  const { sections } = useLabels()
+
   return (
-    <Stage title="About">
+    <Stage title={sections.about}>
       <div className={`max-w-3xl px-6 pb-10 pt-6 sm:px-8 ${world.speech}`}>
         <p className={`text-base leading-relaxed ${world.copy}`}>{bio}</p>
       </div>
@@ -56,9 +58,10 @@ function About({ bio }: { bio: string }) {
 
 function Projects({ projects }: { projects: SectionsOf<'engineer'>['projects'] }) {
   const [opened, setOpened] = useState<{ slot: ProjectSlot; trigger: HTMLElement } | null>(null)
+  const { sections } = useLabels()
 
   return (
-    <Stage title="Featured Work">
+    <Stage title={sections.featuredWork}>
       <ProjectList
         projects={projects}
         className={MASONRY_LIST}
@@ -72,13 +75,14 @@ function Projects({ projects }: { projects: SectionsOf<'engineer'>['projects'] }
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const titles = useLabels().sections
 
   return (
     <>
       <About bio={professionalSummary.bio} />
 
       {sections.jobs.length > 0 && (
-        <Stage title="Work Experience">
+        <Stage title={titles.workExperience}>
           <ul className={MASONRY_LIST}>
             {sections.jobs.map((entry, index) => (
               <li key={entry.id} className={MASONRY_ITEM}>
@@ -90,8 +94,8 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       )}
 
       <FadeInScene>
-        <section aria-labelledby={headingId('noir', 'Tech Stack')} className="mb-16">
-          <SectionTitle title="Tech Stack" />
+        <section aria-labelledby={headingId('noir', titles.techStack)} className="mb-16">
+          <SectionTitle title={titles.techStack} />
           <TechStackBoard categories={sections.techStack} />
         </section>
       </FadeInScene>
@@ -99,8 +103,8 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <Projects projects={sections.projects} />
 
       <FadeInScene>
-        <section aria-labelledby={headingId('noir', 'Ventures')} className="mb-16">
-          <SectionTitle title="Ventures" />
+        <section aria-labelledby={headingId('noir', titles.ventures)} className="mb-16">
+          <SectionTitle title={titles.ventures} />
           <ul className="grid gap-8 md:grid-cols-3">
             {sections.companies.map((company) => (
               <li key={company.id}>
@@ -122,7 +126,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   const { musician, bands } = sections
 
   return (
-    <Stage title="Bands">
+    <Stage title={labels.sections.bands}>
       <p className={`mb-6 ${LEAD}`}>{drumsSince(musician, labels.years)}</p>
       <div className="relative">
         <svg viewBox="0 0 600 40" preserveAspectRatio="none" className={`pointer-events-none absolute inset-x-0 top-10 h-16 w-full ${world.trail}`} aria-hidden="true" focusable="false">
@@ -138,9 +142,10 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
   const { achievements } = martialArts.primary
+  const labels = useLabels()
 
   return (
-    <Stage title="Muay Thai">
+    <Stage title={labels.sections.muayThai}>
       <h3 className="mb-5 text-3xl tracking-wide">{martialArts.primary.title}</h3>
       <MuayThaiRecord
         martialArts={martialArts}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties, type ReactNode, type PointerEvent } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { usePreview } from '@/themes/PreviewContext'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -21,8 +21,8 @@ import styles from './scenes.module.css'
 // - RunBar: the run bar of a lost round, his little figure running along a line past a flag per stop.
 //   Scroll driven: it reads the --scene-progress the shared ScrollScene writes round the section, so a
 //   frame never renders React, and each flag goes up as he passes it (scenes.module.css .flag).
-// - SunWatcher: the pie eyed sun over the contact card, its pupils following the pointer through two CSS
-//   variables written on pointer move (no React render per move).
+// - SunWatcher: the pie eyed sun over the contact card, its pupils following the pointer through the
+//   --mx and --my the theme root carries (the shared usePointerVars, no React render per move).
 
 type IntroPhase = 'wait' | 'drop' | 'pop'
 
@@ -146,20 +146,10 @@ function Sun() {
   )
 }
 
-const clampUnit = (value: number) => Math.max(-1, Math.min(1, value))
-
-// Writes where the pointer is over a box as --look-x and --look-y (each -1 to 1) on that box, for the
-// sun's pupils and the sets' parallax layers to read in CSS, so a pointer move never renders React.
-export function trackPointer(event: PointerEvent<HTMLElement>) {
-  const box = event.currentTarget.getBoundingClientRect()
-  event.currentTarget.style.setProperty('--look-x', String(clampUnit(((event.clientX - box.left) / box.width) * 2 - 1)))
-  event.currentTarget.style.setProperty('--look-y', String(clampUnit(((event.clientY - box.top) / box.height) * 2 - 1)))
-}
-
 // The contact frame: the iris closes round him waving under the sun, whose eyes follow the pointer.
 export function SunWatcher({ profession }: { profession: Profession }) {
   return (
-    <div onPointerMove={trackPointer} className={`relative h-48 overflow-hidden ${world.titleCard} ${styles.scene}`} aria-hidden="true">
+    <div className={`relative h-48 overflow-hidden ${world.titleCard} ${styles.scene}`} aria-hidden="true">
       <svg viewBox="0 0 400 120" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" focusable="false">
         <defs>
           <linearGradient id="hose-contact-sky" x1="0" y1="0" x2="0" y2="1">

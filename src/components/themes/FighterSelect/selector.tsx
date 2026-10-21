@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
 import { HeroCharacter } from './character'
 import { StageBackdrop } from './stages'
@@ -47,6 +48,7 @@ function Slot({ id, label, selected, optionProps, aimed, onAim }: SlotProps) {
 
 export function SelectScreen({ active, title }: { active: Profession; title: string }) {
   const [aim, setAim] = useState<Profession | null>(null)
+  const { hud, navigation } = useLabels()
   const aimed = aim ?? active
   const slot = PROFESSION_ORDER.indexOf(aimed)
 
@@ -55,13 +57,13 @@ export function SelectScreen({ active, title }: { active: Profession; title: str
       <div className="relative" onPointerLeave={() => setAim(null)}>
         <ProfessionSwitch
           className="grid grid-cols-3"
-          label="Profession"
+          label={navigation.profession}
           renderOption={(option) => <Slot {...option} aimed={option.id === aimed} onAim={setAim} />}
         />
         <div className={`pointer-events-none absolute inset-y-0 left-0 w-1/3 ${fight.cursor} ${SLOT_VAR[slot]}`} aria-hidden="true">
           <div className="absolute inset-x-0 bottom-9 top-1 border-4 border-[color:var(--fs-p1-light)] sm:inset-x-1" />
           <span className={`absolute -top-3 left-1/2 flex -translate-x-1/2 flex-col items-center ${look.display}`}>
-            <span className="bg-[color:var(--fs-p1-light)] px-2 text-sm leading-5 text-[color:var(--fs-ink)]">1P</span>
+            <span className="bg-[color:var(--fs-p1-light)] px-2 text-sm leading-5 text-[color:var(--fs-ink)]">{hud.playerOne}</span>
             <svg viewBox="0 0 20 10" className="h-2 w-5" focusable="false">
               <path d="M0 0 H20 L10 10 Z" fill={FS.p1Light} />
             </svg>

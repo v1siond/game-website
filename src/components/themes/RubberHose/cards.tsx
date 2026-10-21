@@ -1,7 +1,8 @@
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { fillLabel } from '@/lib/cv/labels'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
@@ -43,6 +44,8 @@ function Chips({ items, label }: { items: string[]; label: string }) {
 }
 
 export function TechBubbleCloud({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
+
   return (
     <div className="space-y-6">
       {categories.map((category) => (
@@ -53,7 +56,7 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
             </span>
             {category.name}
           </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li key={tech} className={`px-3 py-1 ${CHIP} transition-transform hover:scale-110 motion-reduce:transition-none`}>
                 {tech}
@@ -68,7 +71,8 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
 
 // A job on a title card, the dates on an ink tab above it. Dates are date only strings, read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className={`relative p-5 pt-7 ${world.titleCard}`}>
@@ -79,7 +83,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       <p className={`mb-2 text-sm ${world.red}`}>{entry.company}</p>
       {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1" aria-label="Key achievements">
+        <ul className="space-y-1" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
               <span className={world.red} aria-hidden="true">
@@ -90,7 +94,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           ))}
         </ul>
       )}
-      <Chips items={entry.skills} label="Skills used" />
+      <Chips items={entry.skills} label={cards.skillsUsed} />
     </article>
   )
 }
@@ -116,7 +120,7 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
           {project.impact}
         </p>
       )}
-      <Chips items={project.techStack} label="Technologies used" />
+      <Chips items={project.techStack} label={labels.cards.technologiesUsed} />
       {links.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-3">
           {links.map(({ kind, label, linkProps }) => (
@@ -134,13 +138,15 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
 
 // A venture as a vintage advertisement, the whole poster its link.
 export function CompanyPoster({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
+
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
       className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
     >
       <CornerTicks />
       <InkBlot />

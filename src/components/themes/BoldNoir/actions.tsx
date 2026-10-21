@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 
 // The world's actions, in the hero and again in the contact section: email, LinkedIn, the CV, and the
 // link out to Nebulith.
@@ -28,17 +29,21 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
+
   return (
     <Link href="/cv" className={`${NOIR_BUTTON} ${LOOK.outline}`}>
-      CV
+      {actions.cv}
     </Link>
   )
 }
 
 export function EngineLink() {
+  const { actions } = useLabels()
+
   return (
     <Link href="/personal-projects/game-engine" className={`${NOIR_BUTTON} ${LOOK.paper}`}>
-      Nebulith
+      {actions.engine}
     </Link>
   )
 }

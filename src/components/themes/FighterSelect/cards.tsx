@@ -7,6 +7,8 @@ import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { newTabName } from '@/components/cv/sectionText'
+import { fillLabel } from '@/lib/cv/labels'
 
 // The fight cards every list entry sits on: cabinet metal with the cut corner of a move list panel,
 // the accent border, highlights marked with a hit spark. A running job glows health green, a highlighted
@@ -42,6 +44,7 @@ function Tags({ items, label }: { items: string[]; label: string }) {
 // The job's years stand on the round's life bars above the card (./rounds), not on the card.
 export function ExperienceCard({ entry }: { entry: Job }) {
   const running = !entry.endDate
+  const { cards } = useLabels()
 
   return (
     <FightCard accent={running ? 'health' : 'cyan'}>
@@ -53,7 +56,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       {entry.description && <p className={`mb-4 ${BODY}`}>{entry.description}</p>}
 
       {entry.highlights.length > 0 && (
-        <ul className="mb-4 space-y-2" aria-label="Key achievements">
+        <ul className="mb-4 space-y-2" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className="flex items-start gap-3 text-sm text-white">
               <HitSpark />
@@ -63,7 +66,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         </ul>
       )}
 
-      <Tags items={entry.skills} label="Skills used" />
+      <Tags items={entry.skills} label={cards.skillsUsed} />
     </FightCard>
   )
 }
@@ -86,7 +89,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         </p>
       )}
 
-      <Tags items={project.techStack} label="Technologies used" />
+      <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
 
       {links.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-3">
@@ -130,12 +133,14 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 }
 
 export function VentureCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
+
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
       className={`block h-full motion-safe:transition-transform motion-safe:hover:scale-[1.02] ${FOCUS}`}
     >
       <FightCard accent="cyan">
@@ -156,6 +161,8 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
 
 // The tech stack as a move list: each category a heading, its technologies a grid of command slots.
 export function MoveList({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
+
   return (
     <div className="space-y-8">
       {categories.map((category) => (
@@ -164,7 +171,7 @@ export function MoveList({ categories }: { categories: CVData['techStack'] }) {
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
-          <ul className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6" aria-label={`${category.name} technologies`}>
+          <ul className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li key={tech} className="border border-[color:var(--fs-steel)] bg-[color:var(--fs-panel)] px-3 py-2 text-sm">
                 {tech}

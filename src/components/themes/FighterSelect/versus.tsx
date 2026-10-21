@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { HeroCharacter } from './character'
 import { StageBackdrop } from './stages'
@@ -19,6 +20,8 @@ import fight from './fight.module.css'
 const RISE_DELAYS = ['[--delay:760ms]', '[--delay:860ms]', '[--delay:960ms]', '[--delay:1060ms]']
 
 export function HeroSplash({ profession }: { profession: Profession }) {
+  const { navigation } = useLabels()
+
   return (
     <Cue>
       <RecruiterHero
@@ -43,7 +46,7 @@ export function HeroSplash({ profession }: { profession: Profession }) {
               <p className={`mt-4 max-w-2xl text-base md:text-lg ${fight.enter} ${fight.rise} ${RISE_DELAYS[0]}`}>{headline}</p>
               <p className={`mt-2 text-base italic text-[color:var(--fs-cyan)] ${fight.enter} ${fight.rise} ${RISE_DELAYS[1]}`}>{tagline}</p>
               <p className={`mt-2 text-sm ${fight.enter} ${fight.rise} ${RISE_DELAYS[2]}`}>{line}</p>
-              <nav className={`mt-6 flex flex-wrap items-center gap-3 ${fight.enter} ${fight.rise} ${RISE_DELAYS[3]}`} aria-label="Contact and CV">
+              <nav className={`mt-6 flex flex-wrap items-center gap-3 ${fight.enter} ${fight.rise} ${RISE_DELAYS[3]}`} aria-label={navigation.contactAndCv}>
                 {actions.map((action) => (
                   <HeroAction key={action.id} action={action} />
                 ))}

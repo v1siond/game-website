@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { ImpactBurst } from './badges'
 import look from './world.module.css'
 import fight from './fight.module.css'
@@ -17,10 +18,12 @@ const MAX_HITS = 99
 const ComboContext = createContext<() => void>(() => {})
 
 function ComboCounter({ hits }: { hits: number }) {
+  const { hud } = useLabels()
+
   return (
     <span key={hits} className={`ml-2 mt-2 inline-flex items-baseline gap-1 bg-[color:var(--fs-ink)] px-3 py-1 ${look.display} ${fight.comboPop}`}>
       <span className={`text-4xl ${look.roundCall}`}>{hits}</span>
-      <span className="text-sm uppercase text-[color:var(--fs-chrome)]">hits</span>
+      <span className="text-sm uppercase text-[color:var(--fs-chrome)]">{hud.hits}</span>
     </span>
   )
 }

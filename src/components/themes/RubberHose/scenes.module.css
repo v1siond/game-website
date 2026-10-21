@@ -514,10 +514,10 @@
 
 /* ---- the pie eyed sun (Contact) ---- */
 
-/* The pupils follow the pointer through --look-x and --look-y (each -1 to 1), written by the scene. */
+/* The pupils follow the pointer through --mx and --my (each -1 to 1), written on the theme root by usePointerVars. */
 .pupils {
   transition: transform 0.2s ease-out;
-  transform: translate3d(calc(var(--look-x, 0) * 3px), calc(var(--look-y, 0) * 3px), 0);
+  transform: translate3d(calc(var(--mx, 0) * 3px), calc(var(--my, 0) * 3px), 0);
 }
 
 .sunRays {

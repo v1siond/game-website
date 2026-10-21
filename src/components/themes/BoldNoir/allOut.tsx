@@ -9,6 +9,7 @@ import { HeroCharacter } from './character'
 import { NOIR } from './palette'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 
 // The finisher a project open plays, then the project's finish card. The phases follow the game's
 // sequence, compressed from its 8 s to 1.9 s so a reader is not kept waiting:
@@ -137,7 +138,7 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
           type="button"
           autoFocus
           onClick={onClose}
-          aria-label={`Close ${project.name}`}
+          aria-label={fillLabel(labels.actions.close, { name: project.name })}
           className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center bg-[color:var(--noir-red)] text-2xl text-[color:var(--noir-paper)] transition-transform hover:rotate-12 hover:scale-110 motion-reduce:transition-none"
         >
           <span aria-hidden="true">X</span>
@@ -155,7 +156,7 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
           <p className={`mt-4 inline-block px-3 py-1 text-base font-bold ${world.heading} ${world.copy}`}>{project.impact}</p>
         )}
         {project.details.length > 0 && (
-          <ul className="mt-4 space-y-1.5" aria-label="Details">
+          <ul className="mt-4 space-y-1.5" aria-label={labels.cards.details}>
             {project.details.map((detail) => (
               <li key={detail} className={`flex items-start gap-2 text-sm text-[color:var(--noir-paper-dim)] ${world.copy}`}>
                 <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />
@@ -165,7 +166,7 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
           </ul>
         )}
         {project.techStack.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Tech stack">
+          <ul className="mt-4 flex flex-wrap gap-1.5" aria-label={labels.sections.techStack}>
             {project.techStack.map((tech) => (
               <li key={tech} className={`px-2 py-0.5 text-sm font-bold ${world.chip} ${world.copy}`}>
                 {tech}

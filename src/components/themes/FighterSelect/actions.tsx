@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import look from './world.module.css'
 
 // The world's buttons, cut like the command buttons of a select screen: email is the gold primary
@@ -24,17 +25,21 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
+
   return (
     <Link href="/cv" className={BLUE_OUTLINE}>
-      CV
+      {actions.cv}
     </Link>
   )
 }
 
 export function PortfolioLink() {
+  const { actions } = useLabels()
+
   return (
     <Link href="/personal-projects/game-engine" className={BLUE_OUTLINE}>
-      Portfolio
+      {actions.portfolio}
     </Link>
   )
 }

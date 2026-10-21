@@ -5,13 +5,12 @@ import type { Profession } from '@/lib/cv/professions'
 import { PieEyes } from './art'
 import { HeroCharacter, type HeroPose } from './character'
 import { HOSE } from './palette'
-import { trackPointer } from './scenes'
 import styles from './sets.module.css'
 
 // Rubber Hose's three profession sets, the backdrop the iris opens on above the picked profession's
 // sections. Each is built like a 1930s cartoon set: a watercolour sky, then a far, a mid and a near layer
-// of inked cut outs that slide against each other as the pointer moves over the set (depth through
-// parallax, the way a cartoon camera shot cels in front of a built set). Two ink weights: a thick line
+// of inked cut outs that slide against each other as the pointer moves (--mx and --my from the theme
+// root, the shared usePointerVars; depth through parallax, the way a cartoon camera shot cels in front of a built set). Two ink weights: a thick line
 // round every silhouette, a thin one for the detail inside. The props wear pie eyes and bob on the beat,
 // most loops stepped to 24 frames a second like hand drawn cels (sets.module.css). Him in the middle,
 // working: typing at the terminal, playing the kit, jabbing the heavy bag.
@@ -448,7 +447,7 @@ export function ProfessionSet({ profession }: { profession: Profession }) {
   const Set = SETS[profession]
 
   return (
-    <div onPointerMove={trackPointer} className={`relative mb-10 h-44 overflow-hidden sm:h-64 lg:h-72 ${styles.frame}`} aria-hidden="true">
+    <div className={`relative mb-10 h-44 overflow-hidden sm:h-64 lg:h-72 ${styles.frame}`} aria-hidden="true">
       <Set />
     </div>
   )

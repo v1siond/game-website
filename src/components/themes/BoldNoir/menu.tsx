@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { HeroCharacter } from './character'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -80,11 +81,13 @@ function CutIn({ profession }: { profession: Profession }) {
 }
 
 export function ProfessionMenu({ active }: { active: Profession }) {
+  const { navigation } = useLabels()
+
   return (
     <>
       <ProfessionSwitch
         className="mx-auto grid max-w-xl grid-cols-3 gap-4 sm:flex sm:max-w-none sm:justify-center sm:gap-10"
-        label="Profession"
+        label={navigation.profession}
         renderOption={(option) => <MenuSlab {...option} />}
       />
       <CutIn profession={active} />

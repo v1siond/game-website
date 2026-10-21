@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { PIXEL, RPG } from './palette'
 import { Soul, SoulHalves } from './soul'
 import world from './world.module.css'
@@ -143,6 +144,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
   const [hurt, setHurt] = useState(false)
   const broken = hp === 0
   const mode = MODES[profession]
+  const { hud } = useLabels()
 
   useEffect(() => {
     const el = box.current
@@ -253,7 +255,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
       </div>
 
       <div className={`mx-auto mt-3 flex w-full items-center justify-center gap-3 text-sm text-[color:var(--rpg-text)] ${PIXEL}`}>
-        <span>HP</span>
+        <span>{hud.hp}</span>
         <span className="relative h-4 w-24 bg-[color:var(--rpg-hp-back)]">
           <span className={`absolute inset-0 origin-left bg-[color:var(--rpg-gold)] ${world.hpFill}`} style={{ '--hp': hp / MAX_HP } as React.CSSProperties} />
         </span>

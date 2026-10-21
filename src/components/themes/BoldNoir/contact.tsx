@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/components/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HitStar, RansomWord } from './backdrop'
@@ -15,6 +16,7 @@ const CONTACT_HEADING = headingId('noir', 'Contact')
 
 export function DeliveredCard() {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
+  const { sections } = useLabels()
 
   return (
     <section
@@ -28,7 +30,7 @@ export function DeliveredCard() {
           <div className={`relative px-6 pb-10 pt-12 sm:px-10 ${world.slab} ${world.delivered}`}>
             <HitStar className="absolute -left-6 -top-8 h-16 w-16" />
             <h2 id={CONTACT_HEADING} className="mb-4 text-4xl uppercase sm:text-5xl">
-              <RansomWord text="Contact" />
+              <RansomWord text={sections.contact} />
             </h2>
             <p className={`mb-8 text-base text-[color:var(--noir-paper)] ${world.copy}`}>{line}</p>
             <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
