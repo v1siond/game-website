@@ -5,7 +5,7 @@ import { HeroFist, HeroGlove, HeroStick } from '@/components/scroll/heroHands'
 import { NEON } from './palette'
 
 // Him in Neon Cyber (the shared HeroFigure): the dark tee, dressed per profession, the trim lit in the
-// world's magenta and cyan.
+// HUD's colours, and one piece of chrome, the optic at his right temple that the scanner reads through.
 
 const EYE = NEON.void
 const SHOE = NEON.shoe
@@ -21,9 +21,9 @@ interface Outfit {
 }
 
 const OUTFIT: Record<Profession, Outfit> = {
-  engineer: { shirt: NEON.jacket, trim: NEON.cyan, legs: NEON.jeans, long: true, feet: SHOE, hand: 'fist' },
-  drummer: { shirt: NEON.jacket, trim: NEON.magenta, legs: NEON.shorts, long: false, feet: SHOE, hand: 'sticks' },
-  fighter: { shirt: NEON.jacket, trim: NEON.hotPink, legs: NEON.hotPink, long: false, feet: SKIN, hand: 'gloves' },
+  engineer: { shirt: NEON.jacket, trim: NEON.data, legs: NEON.jeans, long: true, feet: SHOE, hand: 'fist' },
+  drummer: { shirt: NEON.jacket, trim: NEON.hud, legs: NEON.shorts, long: false, feet: SHOE, hand: 'sticks' },
+  fighter: { shirt: NEON.jacket, trim: NEON.chromeRed, legs: NEON.hotPink, long: false, feet: SKIN, hand: 'gloves' },
 }
 
 const HAND_DRAW: Record<Outfit['hand'], (x: number, y: number) => ReactNode> = {
@@ -44,6 +44,12 @@ export function HeroCharacter({ profession, className = '' }: { profession: Prof
     <HeroFigure
       className={className}
       eye={EYE}
+      overHair={
+        <>
+          <rect x={40.5} y={14.5} width={4} height={6} rx={1} fill={NEON.steel} />
+          <rect x={41.5} y={16} width={2} height={3} fill={NEON.hud} />
+        </>
+      }
       torso={
         <>
           {/* the dark tee with the profession's neon trim at the collar and hem */}

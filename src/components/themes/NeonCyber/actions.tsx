@@ -1,24 +1,22 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { terminalName } from './cards'
+import world from './world.module.css'
 
-// The world's three actions, in the hero and again in the contact scene: email, LinkedIn, the CV.
+// The world's three actions, in the hero and again on the incoming call: email, LinkedIn, the CV.
+// Email is the lit primary action in HUD yellow, LinkedIn the data cyan outline, the CV the ice one.
 
-// Email is the lit primary action, LinkedIn the outlined one.
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-pink-500 text-black hover:bg-pink-400',
-  linkedin: 'border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black',
+const ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-[color:var(--neon-hud)] text-[color:var(--neon-ink)] hover:bg-[color:var(--neon-ice)]',
+  linkedin: 'border border-[color:var(--neon-data)] text-[color:var(--neon-data)] hover:bg-[color-mix(in_srgb,var(--neon-data)_14%,transparent)]',
 }
 
-// The slanted cut would clip the focus ring, so a focused button drops it and shows the ring whole.
-const HUD_BUTTON =
-  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--neon-void)] [clip-path:polygon(8px_0,100%_0,calc(100%-8px)_100%,0_100%)] focus-visible:[clip-path:none]'
+const HUD_BUTTON = `${world.cut} inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-sm uppercase tracking-[0.2em] transition-colors`
 
-export function HeroAction({ action }: { action: HeroActionSlot }) {
+export function HeroAction({ action, className = '' }: { action: HeroActionSlot; className?: string }) {
   return (
-    <a {...action.linkProps} className={`${HUD_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
-      [{action.label.toUpperCase()}]
+    <a {...action.linkProps} className={`${HUD_BUTTON} ${ACTION_LOOK[action.id]} ${className}`}>
+      {action.label}
     </a>
   )
 }
@@ -26,8 +24,8 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 export function CVLink() {
   const { actions } = useLabels()
   return (
-    <Link href="/cv" className={`${HUD_BUTTON} border border-white/60 text-white hover:bg-white hover:text-black`}>
-      [{terminalName(actions.getCv)}]
+    <Link href="/cv" className={`${HUD_BUTTON} border border-[color:var(--neon-ice)] text-[color:var(--neon-ice)] hover:bg-[color-mix(in_srgb,var(--neon-ice)_12%,transparent)]`}>
+      {actions.getCv}
     </Link>
   )
 }

@@ -29,6 +29,22 @@ export const NEON = {
   violetText: '#b388e6',
   lilac: '#c4a3e6',
 
+  // The optics HUD: the loud yellow that carries data, red line work for the chrome only (red words on
+  // the dark ground fail contrast), the scanner's colour key (gold for work, green for what can be
+  // breached, blue for what can be used, red for the fight record) and the thermal layer's cold and heat.
+  hud: '#f3e600',
+  hudDim: '#8f8700',
+  chromeRed: '#ff3b4e',
+  data: '#5ef2ff',
+  gold: '#ffc23d',
+  hack: '#3dff9a',
+  use: '#4da3ff',
+  cold: '#2d4bff',
+  heat: '#ff5a1f',
+  ink: '#07060c',
+  ash: '#c9c4da',
+  glass: '#120d1e',
+
   // The city: street, alley walls, towers, steel, panels and chrome
   street: '#1a0a2a',
   alley: '#1d1030',
