@@ -9,7 +9,7 @@ import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { drumsSince } from '@/components/cv/sectionText'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
-import { WC3 } from './palette'
+import { REALM } from './palette'
 import { InnerCard, WC3Frame } from './panels'
 import { BandCard, CARD_BODY, CARD_SUBTITLE, CARD_TITLE, JobCard, ProjectCard } from './cards'
 import { FTArtDivider, FTOrnament, RoCArtDivider, RoCOrnament } from './ornaments'
@@ -59,7 +59,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
         <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
           <WC3Frame title="About" zone="roc">
             <p style={{
-              color: WC3.textBright,
+              color: REALM.textBright,
               lineHeight: 1.8,
               fontSize: isLargeScreen ? '1.125rem' : '1rem',
               padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
@@ -106,12 +106,12 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
                 {techStack.map((category) => (
                   <div key={category.id}>
-                    <h3 style={{ color: WC3.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
+                    <h3 style={{ color: REALM.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${REALM.metalDark}`, paddingBottom: '0.25rem' }}>
                       {category.name}
                     </h3>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                       {category.items.map((tech) => (
-                        <li key={tech} style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{tech}</li>
+                        <li key={tech} style={{ color: REALM.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{tech}</li>
                       ))}
                     </ul>
                   </div>
@@ -168,7 +168,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`${company.name} (opens in a new tab)`}
-                      style={{ color: WC3.ft.iceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem' }}
+                      style={{ color: REALM.frostIceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem' }}
                     >
                       {company.url}
                     </a>
@@ -196,7 +196,7 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
         <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <WC3Frame title="Bands" zone="ft">
-              <p style={{ color: WC3.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
+              <p style={{ color: REALM.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
                 {drumsSince(musician)}
               </p>
               <BandList
@@ -204,7 +204,7 @@ function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'
                 className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3"
                 renderBand={(slot) => <BandCard {...slot} />}
               />
-              <p style={{ color: WC3.ft.iceMid, fontSize: '1rem', fontStyle: 'italic', marginTop: '1rem' }}>{musician.line}</p>
+              <p style={{ color: REALM.frostIceMid, fontSize: '1rem', fontStyle: 'italic', marginTop: '1rem' }}>{musician.line}</p>
             </WC3Frame>
           </section>
         </SectionWithOrnament>
@@ -231,15 +231,15 @@ function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fig
                 martialArts={martialArts}
                 classNames={{
                   facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-                  fact: 'p-3 bg-gradient-to-b from-[#0a0c0e] to-[#060608] border border-[#2a2428]',
-                  term: 'text-sm uppercase tracking-[0.08em] font-semibold text-[#b8860b]',
-                  value: 'text-base mt-1 text-[#e8dcc8]',
+                  fact: 'p-3 bg-gradient-to-b from-[color:var(--realm-bg-deep)] to-[color:var(--realm-bg-void)] border border-[color:var(--realm-metal-dark)]',
+                  term: 'text-sm uppercase tracking-[0.08em] font-semibold text-[color:var(--realm-gold-mid)]',
+                  value: 'text-base mt-1 text-[color:var(--realm-text-bright)]',
                   achievements: 'space-y-1',
-                  achievement: 'text-base flex items-start gap-2 text-[#b09878]',
+                  achievement: 'text-base flex items-start gap-2 text-[color:var(--realm-text-mid)]',
                 }}
                 renderAchievement={(achievement) => (
                   <>
-                    <span className="text-[#8b6914]" aria-hidden="true">›</span>
+                    <span className="text-[color:var(--realm-gold-dark)]" aria-hidden="true">›</span>
                     {achievement}
                   </>
                 )}

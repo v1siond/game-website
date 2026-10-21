@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { locales, localeNames, type Locale } from '@/i18n/config'
 import type { LocaleSwitchState } from '@/components/cv/LanguageSwitcher'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { WC3 } from './palette'
+import { REALM } from './palette'
 
 // The world's buttons: the bevelled metal button, the language dropdown drawn for the shared
 // LanguageSwitcher, and the hero's contact actions as buttons.
@@ -27,20 +27,20 @@ export function WC3Button({
   variant?: 'default' | 'primary'
   zone?: 'roc' | 'ft'
 }) {
-  const accentColor = zone === 'ft' ? WC3.ft.iceMid : WC3.roc.felMid
-  const accentBright = zone === 'ft' ? WC3.ft.iceBright : WC3.roc.felBright
+  const accentColor = zone === 'ft' ? REALM.frostIceMid : REALM.chaosFelMid
+  const accentBright = zone === 'ft' ? REALM.frostIceBright : REALM.chaosFelBright
 
   const style: CSSProperties = {
     background: variant === 'primary'
-      ? `linear-gradient(180deg, ${WC3.goldMid} 0%, ${WC3.goldDark} 50%, ${WC3.goldDeep} 100%)`
+      ? `linear-gradient(180deg, ${REALM.goldMid} 0%, ${REALM.goldDark} 50%, ${REALM.goldDeep} 100%)`
       : active
-        ? `linear-gradient(180deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 100%)`
-        : `linear-gradient(180deg, ${WC3.metalMid} 0%, ${WC3.metalDark} 100%)`,
-    border: `2px solid ${active ? accentColor : variant === 'primary' ? WC3.goldBright : WC3.metalDark}`,
+        ? `linear-gradient(180deg, ${REALM.metalLight} 0%, ${REALM.metalMid} 100%)`
+        : `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
+    border: `2px solid ${active ? accentColor : variant === 'primary' ? REALM.goldBright : REALM.metalDark}`,
     boxShadow: active
-      ? `0 0 10px ${accentColor}, inset 1px 1px 0 ${WC3.metalHighlight}`
-      : `inset 1px 1px 2px ${WC3.metalLight}, inset -1px -1px 2px ${WC3.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-    color: variant === 'primary' ? WC3.bgVoid : active ? accentBright : WC3.textBright,
+      ? `0 0 10px ${accentColor}, inset 1px 1px 0 ${REALM.metalHighlight}`
+      : `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
+    color: variant === 'primary' ? REALM.bgVoid : active ? accentBright : REALM.textBright,
     fontFamily: '"Cinzel", Georgia, serif',
     fontSize: '1.125rem',
     fontWeight: 600,
@@ -82,10 +82,10 @@ export function WC3LanguageMenu({ currentLocale, isPending, changeLocale }: Loca
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
         style={{
-          background: `linear-gradient(180deg, ${WC3.metalMid} 0%, ${WC3.metalDark} 100%)`,
-          border: `2px solid ${WC3.metalDark}`,
-          boxShadow: `inset 1px 1px 2px ${WC3.metalLight}, inset -1px -1px 2px ${WC3.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-          color: WC3.textBright,
+          background: `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
+          border: `2px solid ${REALM.metalDark}`,
+          boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
+          color: REALM.textBright,
           fontFamily: '"Cinzel", Georgia, serif',
           fontSize: '0.875rem',
           fontWeight: 600,
@@ -110,9 +110,9 @@ export function WC3LanguageMenu({ currentLocale, isPending, changeLocale }: Loca
           top: '100%',
           right: 0,
           marginTop: '4px',
-          background: `linear-gradient(180deg, ${WC3.bgDeep} 0%, ${WC3.bgVoid} 100%)`,
-          border: `2px solid ${WC3.metalDark}`,
-          boxShadow: `0 4px 12px rgba(0,0,0,0.6), inset 0 1px 0 ${WC3.metalLight}`,
+          background: `linear-gradient(180deg, ${REALM.bgDeep} 0%, ${REALM.bgVoid} 100%)`,
+          border: `2px solid ${REALM.metalDark}`,
+          boxShadow: `0 4px 12px rgba(0,0,0,0.6), inset 0 1px 0 ${REALM.metalLight}`,
           minWidth: '120px',
           zIndex: 1000,
         }}>
@@ -123,10 +123,10 @@ export function WC3LanguageMenu({ currentLocale, isPending, changeLocale }: Loca
               style={{
                 width: '100%',
                 padding: '0.5rem 0.75rem',
-                background: currentLocale === locale ? `${WC3.roc.felDark}40` : 'transparent',
+                background: currentLocale === locale ? `${REALM.chaosFelDark}40` : 'transparent',
                 border: 'none',
-                borderBottom: locale !== locales[locales.length - 1] ? `1px solid ${WC3.metalDark}50` : 'none',
-                color: currentLocale === locale ? WC3.roc.felBright : WC3.textMid,
+                borderBottom: locale !== locales[locales.length - 1] ? `1px solid ${REALM.metalDark}50` : 'none',
+                color: currentLocale === locale ? REALM.chaosFelBright : REALM.textMid,
                 fontFamily: '"Cinzel", Georgia, serif',
                 fontSize: '0.875rem',
                 textAlign: 'left',
@@ -137,19 +137,19 @@ export function WC3LanguageMenu({ currentLocale, isPending, changeLocale }: Loca
               }}
               onMouseEnter={(e) => {
                 if (currentLocale !== locale) {
-                  e.currentTarget.style.background = `${WC3.metalMid}30`
-                  e.currentTarget.style.color = WC3.textBright
+                  e.currentTarget.style.background = `${REALM.metalMid}30`
+                  e.currentTarget.style.color = REALM.textBright
                 }
               }}
               onMouseLeave={(e) => {
                 if (currentLocale !== locale) {
                   e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.color = WC3.textMid
+                  e.currentTarget.style.color = REALM.textMid
                 }
               }}
             >
               <span>{localeNames[locale]}</span>
-              {currentLocale === locale && <span style={{ color: WC3.roc.felBright }}>✓</span>}
+              {currentLocale === locale && <span style={{ color: REALM.chaosFelBright }}>✓</span>}
             </button>
           ))}
         </div>

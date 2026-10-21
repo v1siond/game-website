@@ -7,7 +7,7 @@ import { useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
-import { WC3 } from './MedievalFantasy/palette'
+import { REALM, REALM_VARS } from './MedievalFantasy/palette'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
 import { WC3Frame } from './MedievalFantasy/panels'
 import { HeroActions, WC3Button, WC3LanguageMenu } from './MedievalFantasy/actions'
@@ -48,14 +48,14 @@ export default function MedievalFantasyTheme() {
 
   if (!mounted) {
     return (
-      <div style={{ minHeight: '100vh', background: WC3.bgVoid, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: WC3.textDim, fontFamily: '"Cinzel", Georgia, serif', letterSpacing: '0.2em' }}>LOADING...</p>
+      <div style={{ minHeight: '100vh', background: REALM.bgVoid, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: REALM.textDim, fontFamily: '"Cinzel", Georgia, serif', letterSpacing: '0.2em' }}>LOADING...</p>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: WC3.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: WC3.textBright }}>
+    <div style={{ ...REALM_VARS, minHeight: '100vh', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
       <DualZoneAtmosphere />
 
       {/* ============ MAIN CONTENT - Starts at top like Dark Fantasy ============ */}
@@ -73,19 +73,19 @@ export default function MedievalFantasyTheme() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
                     <div style={{ minWidth: 0 }}>
                       <h1 style={{
-                        color: WC3.goldBright,
+                        color: REALM.goldBright,
                         fontSize: '1.5rem',
                         fontWeight: 700,
                         textTransform: 'uppercase',
                         letterSpacing: '0.12em',
-                        textShadow: `2px 2px 4px ${WC3.bgVoid}`,
+                        textShadow: `2px 2px 4px ${REALM.bgVoid}`,
                         marginBottom: '0.375rem'
                       }}>
                         {name}
                       </h1>
-                      <p style={{ color: WC3.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{headline}</p>
-                      <p style={{ color: WC3.textMid, fontSize: '0.875rem', fontStyle: 'italic', marginBottom: '0.25rem' }}>{tagline}</p>
-                      <p style={{ color: WC3.textBright, fontSize: '0.875rem' }}>{line}</p>
+                      <p style={{ color: REALM.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{headline}</p>
+                      <p style={{ color: REALM.textMid, fontSize: '0.875rem', fontStyle: 'italic', marginBottom: '0.25rem' }}>{tagline}</p>
+                      <p style={{ color: REALM.textBright, fontSize: '0.875rem' }}>{line}</p>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <HeroActions actions={actions} zone="roc" />
@@ -101,7 +101,7 @@ export default function MedievalFantasyTheme() {
         </ScrollScene>
         </div>
 
-        {/* Profession Selector - WC3 Style Command Card */}
+        {/* Profession Selector - REALM Style Command Card */}
         <ScrollScene>
           <section aria-label="Select profession" style={{
             marginBottom: sectionSpacing,
@@ -115,7 +115,7 @@ export default function MedievalFantasyTheme() {
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: `radial-gradient(ellipse 80% 100% at 50% 100%, ${WC3.roc.felDark}15 0%, transparent 70%)`,
+              background: `radial-gradient(ellipse 80% 100% at 50% 100%, ${REALM.chaosFelDark}15 0%, transparent 70%)`,
               pointerEvents: 'none',
             }} />
 
@@ -123,9 +123,9 @@ export default function MedievalFantasyTheme() {
             <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }} preserveAspectRatio="none" aria-hidden="true">
               <defs>
                 <linearGradient id="felPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor={WC3.roc.felDark} stopOpacity="0.3" />
-                  <stop offset="50%" stopColor={WC3.roc.felMid} stopOpacity="0.5" />
-                  <stop offset="100%" stopColor={WC3.roc.felDark} stopOpacity="0.3" />
+                  <stop offset="0%" stopColor={REALM.chaosFelDark} stopOpacity="0.3" />
+                  <stop offset="50%" stopColor={REALM.chaosFelMid} stopOpacity="0.5" />
+                  <stop offset="100%" stopColor={REALM.chaosFelDark} stopOpacity="0.3" />
                 </linearGradient>
               </defs>
               {/* Left to center path */}
@@ -136,7 +136,7 @@ export default function MedievalFantasyTheme() {
                 fill="none"
                 strokeDasharray={active === 'drummer' ? "none" : "4 4"}
                 style={{
-                  filter: active === 'drummer' ? `drop-shadow(0 0 4px ${WC3.roc.felMid})` : 'none',
+                  filter: active === 'drummer' ? `drop-shadow(0 0 4px ${REALM.chaosFelMid})` : 'none',
                   transition: 'all 0.3s ease'
                 }}
               />
@@ -148,7 +148,7 @@ export default function MedievalFantasyTheme() {
                 fill="none"
                 strokeDasharray={active === 'fighter' ? "none" : "4 4"}
                 style={{
-                  filter: active === 'fighter' ? `drop-shadow(0 0 4px ${WC3.roc.felMid})` : 'none',
+                  filter: active === 'fighter' ? `drop-shadow(0 0 4px ${REALM.chaosFelMid})` : 'none',
                   transition: 'all 0.3s ease'
                 }}
               />
@@ -179,16 +179,16 @@ export default function MedievalFantasyTheme() {
               render={({ line, actions }) => (
                 <>
                   <h2 style={{
-                    color: WC3.ft.iceBright,
+                    color: REALM.frostIceBright,
                     fontSize: '1.125rem',
                     letterSpacing: '0.15em',
                     textTransform: 'uppercase',
                     marginBottom: '0.75rem',
-                    textShadow: `0 0 20px ${WC3.ft.iceMid}40`,
+                    textShadow: `0 0 20px ${REALM.frostIceMid}40`,
                   }}>
                     Get In Touch
                   </h2>
-                  <p style={{ color: WC3.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
+                  <p style={{ color: REALM.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <HeroActions actions={actions} zone="ft" />
                     <WC3Button href="/cv" zone="ft">Download CV</WC3Button>
@@ -201,7 +201,7 @@ export default function MedievalFantasyTheme() {
 
         {/* Footer */}
         <footer style={{ textAlign: 'center', paddingTop: '0.75rem' }}>
-          <p style={{ color: WC3.textDim, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+          <p style={{ color: REALM.textDim, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
             © {new Date().getFullYear()} {view.hero.name}
           </p>
         </footer>

@@ -1,7 +1,7 @@
 'use client'
 
 import { memo, useEffect, useState } from 'react'
-import { WC3 } from './palette'
+import { REALM } from './palette'
 import { ReignOfChaosAtmosphere } from './reignOfChaos'
 import { FrozenThroneAtmosphere } from './frozenThrone'
 
@@ -35,7 +35,7 @@ export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
   return (
     <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, overflow: 'hidden' }}>
       {/* Base dark */}
-      <div style={{ position: 'absolute', inset: 0, background: WC3.bgVoid }} />
+      <div style={{ position: 'absolute', inset: 0, background: REALM.bgVoid }} />
 
       {/* REIGN OF CHAOS atmosphere */}
       <div style={{ position: 'absolute', inset: 0, opacity: rocOpacity, transition: 'opacity 0.5s ease' }}>

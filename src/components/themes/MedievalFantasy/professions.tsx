@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { Profession } from '@/lib/cv/professions'
-import { WC3 } from './palette'
+import { REALM } from './palette'
 
 // =============================================================================
-// PROFESSION NODE - WC3 command card button, drawn for the shared ProfessionSwitch. The switch lays
+// PROFESSION NODE - REALM command card button, drawn for the shared ProfessionSwitch. The switch lays
 // the nodes out Musician, System Engineer, Martial Artist, so the engineer node is the raised centre.
 // =============================================================================
 
@@ -32,22 +32,22 @@ export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOp
   const { id, label, selected, optionProps } = option
   const isCentre = id === 'engineer'
   const size = isCentre ? (isLargeScreen ? '8rem' : '6rem') : (isLargeScreen ? '7rem' : '5.5rem')
-  const tint = selected ? WC3.roc.felBright : WC3.textMid
+  const tint = selected ? REALM.chaosFelBright : REALM.textMid
 
   return (
     <button
       type="button"
       {...optionProps}
-      className="focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a017] focus-visible:ring-offset-2 focus-visible:ring-offset-[#060608]"
+      className="focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--realm-gold-bright)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--realm-bg-void)]"
       style={{
         width: size,
         height: size,
         background: selected
-          ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
-          : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
-        border: `3px solid ${selected ? WC3.roc.felMid : WC3.metalMid}`,
+          ? `linear-gradient(135deg, ${REALM.metalLight} 0%, ${REALM.metalMid} 50%, ${REALM.metalDark} 100%)`
+          : `linear-gradient(135deg, ${REALM.metalDark} 0%, ${REALM.bgDeep} 100%)`,
+        border: `3px solid ${selected ? REALM.chaosFelMid : REALM.metalMid}`,
         boxShadow: selected
-          ? `0 0 20px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
+          ? `0 0 20px ${`${REALM.moss27}80`}, inset 0 1px 2px rgba(255,255,255,0.1)`
           : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
         cursor: 'pointer',
         display: 'flex',
