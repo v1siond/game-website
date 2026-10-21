@@ -591,7 +591,7 @@ function CyberArtSection({ variant = 'neon' }: { variant?: 'neon' | 'circuit' | 
                 NIGHT_CITY
               </div>
               <div className="text-center text-xs text-cyan-400/70 mt-1 tracking-[0.3em] font-mono">
-                // SECTOR_WATSON //
+                {'// SECTOR_WATSON //'}
               </div>
             </div>
 
@@ -1535,7 +1535,7 @@ export default function NeonCyberTheme() {
               <div className="text-center py-8">
                 <div className="text-6xl mb-4 text-white/20 font-mono">&#123; &#125;</div>
                 <p className="text-sm text-white/50 font-mono tracking-wider">
-                  // DATA_FEED_PENDING
+                  {'// DATA_FEED_PENDING'}
                 </p>
                 <p className="text-xs text-cyan-400/50 mt-2 font-mono">
                   Neural link required for content sync

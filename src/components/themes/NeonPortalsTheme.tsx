@@ -707,7 +707,7 @@ function ArtSectionTestChamber() {
           className="text-center mt-6 text-xs tracking-wider italic"
           style={{ color: PORTAL.PANEL_SCUFFED }}
         >
-          "We do what we must because we can"
+          &ldquo;We do what we must because we can&rdquo;
         </div>
       </div>
 

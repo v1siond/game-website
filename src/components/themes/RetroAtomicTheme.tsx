@@ -1117,7 +1117,7 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
         {band.name}
       </h4>
       <p className="text-xs mt-1" style={{ color: VAULT_YELLOW }}>
-        {band.genre} // {band.role}
+        {band.genre} {'//'} {band.role}
       </p>
       <p className="text-xs mt-2" style={{ color: FADED_TEXT }}>{band.description}</p>
       {band.active && (

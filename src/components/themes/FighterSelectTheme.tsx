@@ -1120,7 +1120,7 @@ function BandCard({ band }: { band: (typeof BANDS)[0] }) {
       </div>
 
       <p className="text-sm mt-2 relative" style={{ color: bandColor }}>
-        {band.genre} // {band.role}
+        {band.genre} {'//'} {band.role}
       </p>
 
       <p className="text-sm mt-3 leading-relaxed relative" style={{ color: COLORS.chrome }}>
