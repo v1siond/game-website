@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useState, useEffect } from 'react'
+import { memo } from 'react'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
 
@@ -12,8 +12,7 @@ export interface OrnamentPalette {
   stoneGrey: string; bone: string
 }
 
-const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY, p }: { scrollY: number; p: OrnamentPalette }) {
-  void scrollY
+const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPalette }) {
   const SHELL = p.voidDeep
   const SHELL_D = p.void
   const RIM = p.brass
@@ -198,8 +197,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ scrollY, p }: { scro
 // trumpets, guitar, cello + violin, set BACK (smaller, high near the windows) in the side
 // negative spaces so they read as distant stage-dressing and never touch the content.
 // Solid dark shells, tarnished brass, ornate detail, gradient shading. Drummer only.
-const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY, p }: { scrollY: number; p: OrnamentPalette }) {
-  void scrollY
+const MusicianOrnaments = memo(function MusicianOrnaments({ p }: { p: OrnamentPalette }) {
   const SHELL = p.voidDeep
   const SHELL_D = p.void
   const RIM = p.brass
@@ -463,8 +461,7 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ scrollY, p }: { scro
 // corner posts + ropes, corner stool) set BACK in the side negative spaces, behind the
 // columns. Same treatment as the music stage: solid dark leather, tarnished brass, idle
 // swing. Fighter only.
-const FighterOrnaments = memo(function FighterOrnaments({ scrollY, p }: { scrollY: number; p: OrnamentPalette }) {
-  void scrollY
+const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPalette }) {
   const SHELL = p.voidDeep
   const SHELL_D = p.void
   const RIM = p.brass
@@ -713,38 +710,28 @@ const FighterOrnaments = memo(function FighterOrnaments({ scrollY, p }: { scroll
   )
 })
 
-// Container component that selects ornaments based on profession
-const ProfessionStage = memo(function ProfessionStage({ profession, p }: { profession: 'engineer' | 'drummer' | 'fighter'; p: OrnamentPalette }) {
-  const [scrollY, setScrollY] = useState(0)
+type StageProfession = 'engineer' | 'drummer' | 'fighter'
 
-  useEffect(() => {
-    let ticking = false
-    const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          setScrollY(window.scrollY)
-          ticking = false
-        })
-        ticking = true
-      }
-    }
+const ORNAMENTS_FOR: Record<StageProfession, typeof EngineerOrnaments> = {
+  engineer: EngineerOrnaments,
+  drummer: MusicianOrnaments,
+  fighter: FighterOrnaments,
+}
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
+/** The profession boss-stage, drawn in the palette it is given: Dark Fantasy passes its own, every
+ *  other world gets one derived from its theme colours by GlobalProfessionStage. */
+export const ProfessionStage = memo(function ProfessionStage({ profession, p }: { profession: StageProfession; p: OrnamentPalette }) {
+  const Ornaments = ORNAMENTS_FOR[profession]
   return (
     <div className="fixed inset-0 pointer-events-none z-[0] overflow-hidden" aria-hidden="true">
       {/* z-[0]: sits BELOW the z-[1] HollowDepths columns so instruments read as set
           BEHIND the architecture (was z-[2], which painted them in front of the columns). */}
-      {profession === 'engineer' && <EngineerOrnaments scrollY={scrollY} p={p} />}
-      {profession === 'drummer' && <MusicianOrnaments scrollY={scrollY} p={p} />}
-      {profession === 'fighter' && <FighterOrnaments scrollY={scrollY} p={p} />}
+      <Ornaments p={p} />
     </div>
   )
 })
 
-// ---- theme-derived palette + global render (every world EXCEPT dark-fantasy, which keeps its own) ----
+// ---- theme-derived palette + global render (Dark Fantasy renders ProfessionStage with its own palette) ----
 function clampHex(n: number) { return Math.max(0, Math.min(255, Math.round(n))) }
 function parseHex(h: string) {
   let s = h.replace('#', '')
