@@ -40,6 +40,8 @@ export type KnightPose =
   | 'hit'
   | 'down'
   | 'getUp'
+  | 'praise'
+  | 'write'
 
 export type KnightGear = 'knight' | Profession
 
@@ -121,10 +123,59 @@ const INVADER_INK: Ink = {
   blade: SOUL.invaderLight,
 }
 
-// A spirit draws him in light instead of steel: a summoned one in gold, an invading one in red.
-export type KnightSpirit = 'summon' | 'invader'
+// The ghost a bloodstain replays: his last moments in the dark red of the stain, see through.
+const BLOOD_INK: Ink = {
+  steelLight: SOUL.bloodBright,
+  steel: SOUL.blood,
+  steelDark: SOUL.invaderDeep,
+  mail: SOUL.blood,
+  leather: SOUL.invaderDeep,
+  leatherDark: SOUL.invaderDeep,
+  surcoat: SOUL.blood,
+  surcoatDark: SOUL.invaderDeep,
+  emblem: SOUL.bloodBright,
+  skin: SOUL.bloodBright,
+  skinShade: SOUL.blood,
+  hair: SOUL.invaderDeep,
+  beard: SOUL.invaderDeep,
+  eyes: SOUL.invaderDeep,
+  wraps: SOUL.bloodBright,
+  blade: SOUL.bloodBright,
+}
 
-const SPIRIT_INK: Record<KnightSpirit, Ink> = { summon: PHANTOM_INK, invader: INVADER_INK }
+// The spirit that writes a message on the floor: white blue, the way another world's player shows.
+const SCRIBE_INK: Ink = {
+  steelLight: SOUL.fog,
+  steel: SOUL.spirit,
+  steelDark: SOUL.spiritDeep,
+  mail: SOUL.spiritDeep,
+  leather: SOUL.spiritDeep,
+  leatherDark: SOUL.spiritDeep,
+  surcoat: SOUL.spirit,
+  surcoatDark: SOUL.spiritDeep,
+  emblem: SOUL.fog,
+  skin: SOUL.spirit,
+  skinShade: SOUL.spiritDeep,
+  hair: SOUL.spiritDeep,
+  beard: SOUL.spiritDeep,
+  eyes: SOUL.spiritDeep,
+  wraps: SOUL.spirit,
+  blade: SOUL.fog,
+}
+
+// A spirit draws him in light instead of steel: a summoned one in gold, an invading one in red, a
+// bloodstain's ghost in dark red, a message's writer in white blue.
+export type KnightSpirit = 'summon' | 'invader' | 'blood' | 'scribe'
+
+const SPIRIT_INK: Record<KnightSpirit, Ink> = { summon: PHANTOM_INK, invader: INVADER_INK, blood: BLOOD_INK, scribe: SCRIBE_INK }
+
+// How see through each spirit is (knight.module.css).
+const SPIRIT_CLASS: Record<KnightSpirit, string> = {
+  summon: knight.phantom,
+  invader: knight.phantom,
+  blood: knight.ghost,
+  scribe: knight.ghost,
+}
 
 interface Paint {
   ink: Ink
@@ -377,7 +428,7 @@ export function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false,
     <svg
       {...placement(place)}
       viewBox="0 0 60 96"
-      className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spirit ? knight.phantom : ''} ${facingLeft ? knight.facingLeft : ''} ${className}`}
+      className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spirit ? SPIRIT_CLASS[spirit] : ''} ${facingLeft ? knight.facingLeft : ''} ${className}`}
       aria-hidden="true"
       focusable="false"
     >

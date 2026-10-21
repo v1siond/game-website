@@ -3,11 +3,13 @@
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { newTabName } from '@/components/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData } from '@/lib/cv/content'
+import { Knight } from './knight'
 import { useRun } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
 import { CARD_BODY, Hint, TAG } from './menu'
@@ -20,10 +22,26 @@ import souls from './souls.module.css'
 // into it) lifts the script off the stone and brightens it, the moment the game shows a message; the
 // words under it are the venture's own. Appraise is the game's rating of a message: it marks the slab
 // appraised and gives the souls a good rating brings.
+//
+// Who left it shows too: as the slab is reached, a white blue spirit of him fades in kneeling at the
+// stone and writes, the soapstone hand working in short strokes while the script burns in beside him,
+// then fades away the way another world's player does, leaving only the words. It goes once per slab and
+// is taken off the page when gone; under reduced motion only the message shows.
 
 type Venture = CVData['companies'][number]
 
 const APPRAISE_SOULS = 100
+
+function Scribe({ writing }: { writing: boolean }) {
+  const reduced = useReducedMotion()
+  const [gone, setGone] = useState(false)
+  if (!writing || reduced || gone) return null
+  return (
+    <div className={`pointer-events-none absolute -top-[4.75rem] right-3 h-20 w-[3.125rem] ${souls.scribe}`} onAnimationEnd={(event) => event.target === event.currentTarget && setGone(true)} aria-hidden="true">
+      <Knight gear="drummer" pose="write" spirit="scribe" facingLeft className="h-full w-full" />
+    </div>
+  )
+}
 
 function Slab({ venture }: { venture: Venture }) {
   const run = useRun()
@@ -38,7 +56,8 @@ function Slab({ venture }: { venture: Venture }) {
   }
 
   return (
-    <article ref={ref} className={`${souls.slab} ${souls.message} ${triggered ? souls.messageOn : ''} p-5`}>
+    <article ref={ref} className={`relative ${souls.slab} ${souls.message} ${triggered ? souls.messageOn : ''} mt-[4.75rem] p-5`}>
+      <Scribe writing={triggered} />
       <div className={souls.inscription}>
         <h3 className={`${CARVED} text-lg tracking-[0.08em] text-[color:var(--soul-message)]`}>
           <span className="grayscale" aria-hidden="true">

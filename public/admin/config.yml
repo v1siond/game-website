@@ -627,10 +627,10 @@ collections:
                   - { <<: *text, label: "Appraise", name: appraise }
                   - { <<: *text, label: "Appraise a message", name: appraiseOf }
                   - { <<: *text, label: "Appraised", name: appraised }
-                  - { <<: *text, label: "Summon", name: summon }
-                  - { <<: *text, label: "Summon a band", name: summonOf }
-                  - { <<: *text, label: "Band summoned banner", name: summoned }
-                  - { <<: *text, label: "Summon hint", name: summonHint }
+                  - { <<: *text, label: "Encore", name: encore }
+                  - { <<: *text, label: "Encore for a band", name: encoreOf }
+                  - { <<: *text, label: "Encore banner", name: encored }
+                  - { <<: *text, label: "Stage hint", name: stageHint }
                   - { <<: *text, label: "Fog hint", name: fogHint }
                   - { <<: *text, label: "Traverse the fog", name: traverse }
                   - { <<: *text, label: "Sparring partner", name: partner }
@@ -672,10 +672,10 @@ collections:
                   - { <<: *text, label: "Appraise", name: appraise }
                   - { <<: *text, label: "Appraise a message", name: appraiseOf }
                   - { <<: *text, label: "Appraised", name: appraised }
-                  - { <<: *text, label: "Summon", name: summon }
-                  - { <<: *text, label: "Summon a band", name: summonOf }
-                  - { <<: *text, label: "Band summoned banner", name: summoned }
-                  - { <<: *text, label: "Summon hint", name: summonHint }
+                  - { <<: *text, label: "Encore", name: encore }
+                  - { <<: *text, label: "Encore for a band", name: encoreOf }
+                  - { <<: *text, label: "Encore banner", name: encored }
+                  - { <<: *text, label: "Stage hint", name: stageHint }
                   - { <<: *text, label: "Fog hint", name: fogHint }
                   - { <<: *text, label: "Traverse the fog", name: traverse }
                   - { <<: *text, label: "Sparring partner", name: partner }

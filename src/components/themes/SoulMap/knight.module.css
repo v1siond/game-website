@@ -206,6 +206,75 @@
   transform: rotate(-12deg);
 }
 
+/* A bloodstain's ghost and a message's writer: further see through than a summoned phantom. */
+.ghost {
+  opacity: 0.62;
+}
+
+/* Praising the light: both arms thrown straight up in a V (the far one straight up, the near one forward),
+   a lean back, the face up to it. */
+.praise .armFar {
+  transform: rotate(-172deg);
+}
+
+.praise .armNear {
+  transform: rotate(-138deg);
+}
+
+.praise .body {
+  transform: rotate(-5deg);
+}
+
+.praise .head {
+  transform: rotate(-10deg);
+}
+
+/* Writing a message: down on the far knee, the near foot planted (the kneel he respawns from), the near
+   hand forward at the floor with the soapstone, the far hand on the near knee. */
+.write .whole {
+  transform: translateY(12px);
+}
+
+.write .legNear {
+  transform: rotate(-80deg);
+}
+
+.write .shinNear {
+  transform: rotate(90deg);
+}
+
+.write .legFar {
+  transform: rotate(-10deg);
+}
+
+.write .shinFar {
+  transform: rotate(100deg);
+}
+
+.write .body {
+  transform: rotate(14deg);
+}
+
+.write .head {
+  transform: rotate(20deg);
+}
+
+.write .armNear {
+  transform: rotate(-6deg);
+}
+
+.write .foreNear {
+  transform: rotate(-24deg);
+}
+
+.write .armFar {
+  transform: rotate(-30deg);
+}
+
+.write .foreFar {
+  transform: rotate(-40deg);
+}
+
 /* Knocked down: flat on his back. */
 .down .whole {
   transform: rotate(-86deg) translate(-6px, 4px);
@@ -1255,6 +1324,85 @@
   100% {
     transform: rotate(0deg);
   }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* ---- praise: the arms go up fast, hold in the light, and come down to his sides on the last beat ---- */
+  .praise .armFar {
+    animation: praise-arm-far 1.8s both;
+  }
+
+  .praise .armNear {
+    animation: praise-arm-near 1.8s both;
+  }
+
+  .praise .foreFar,
+  .praise .foreNear {
+    animation: praise-fore 1.8s ease-in-out both;
+  }
+
+  .praise .body {
+    animation: praise-body 1.8s ease-in-out both;
+  }
+
+  .praise .head {
+    animation: praise-head 1.8s ease-in-out both;
+  }
+
+  /* ---- write: the soapstone hand works across the floor in short strokes, the head following it ---- */
+  .write .armNear {
+    animation: write-arm 1.3s ease-in-out infinite alternate;
+  }
+
+  .write .foreNear {
+    animation: write-fore 0.45s ease-in-out infinite alternate;
+  }
+
+  .write .head {
+    animation: write-head 1.3s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes praise-arm-far {
+  0% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1); }
+  28%, 78% { transform: rotate(-172deg); animation-timing-function: ease-in-out; }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes praise-arm-near {
+  0% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1); }
+  28%, 78% { transform: rotate(-138deg); animation-timing-function: ease-in-out; }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes praise-fore {
+  0%, 28%, 78%, 100% { transform: rotate(0deg); }
+  12%, 90% { transform: rotate(-40deg); }
+}
+
+@keyframes praise-body {
+  0%, 100% { transform: rotate(0deg); }
+  30%, 75% { transform: rotate(-5deg); }
+}
+
+@keyframes praise-head {
+  0%, 100% { transform: rotate(0deg); }
+  30%, 75% { transform: rotate(-10deg); }
+}
+
+@keyframes write-arm {
+  0% { transform: rotate(-2deg); }
+  100% { transform: rotate(-12deg); }
+}
+
+@keyframes write-fore {
+  0% { transform: rotate(-10deg); }
+  100% { transform: rotate(-36deg); }
+}
+
+@keyframes write-head {
+  0% { transform: rotate(18deg); }
+  100% { transform: rotate(23deg); }
 }
 
 /* ---- respawn (from one knee) ---- */

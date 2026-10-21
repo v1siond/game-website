@@ -4,10 +4,13 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { jobYears } from '@/components/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { useEffect, useState } from 'react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Job } from '@/lib/cv/content'
 import { Knight } from './knight'
+import { usePoseScript, type PoseStep } from './poses'
 import { CARD_BODY, CARD_META, CARD_TITLE, TAG } from './menu'
 import { CARVED, SOUL } from './palette'
 import ashen from './ashen.module.css'
@@ -19,6 +22,12 @@ import souls from './souls.module.css'
 // carries its weight; once at the bottom it stays there). Each job arrives the way a new area does: its
 // company's name surfaces slowly in wide capitals between two rules, then the card under it, neighbours
 // one after another. The jobs sit in masonry, newest first.
+//
+// Each job lies under a bloodstain, the way the game marks where a player fell: as the job is reached,
+// the stain replays his last moments there as a red, see through ghost in the smith's gear, and each job
+// replays a different end (walking into the blow, a roll cut short, a guard broken, struck down at the
+// anvil), the hit, the fall, then the ghost sinks back into the stain and the card
+// rises. Under reduced motion only the stain shows.
 
 // How far the visitor scrolls for the full ride: from the section's top at the bottom of the screen to a
 // screen and a half past the top of it.
@@ -44,13 +53,55 @@ function LiftShaft() {
   )
 }
 
-function JobStop({ job }: { job: Job }) {
+// The last moments a stain replays, one per job in turn: the move he was making, then the blow and the fall.
+const LAST_MOVES: PoseStep[] = [
+  { pose: 'walk', ms: 1200 },
+  { pose: 'roll', ms: 900 },
+  { pose: 'guard', ms: 1000 },
+  { pose: 'act', ms: 1600 },
+]
+// The ghost lies on as it sinks (.ghostGone fades it after the 0.9 s fall), so the held end pose that
+// follows never shows the fall again.
+const fall = (sink: () => void): PoseStep[] => [
+  { pose: 'hit', ms: 500 },
+  { pose: 'down', ms: 2600, effect: sink },
+]
+
+function Bloodstain({ replay, order }: { replay: boolean; order: number }) {
+  const reduced = useReducedMotion()
+  const script = usePoseScript('idle')
+  const { play } = script
+  const [gone, setGone] = useState(false)
+
+  useEffect(() => {
+    if (!replay || reduced) return
+    play([LAST_MOVES[order % LAST_MOVES.length], ...fall(() => setGone(true))], 'down')
+  }, [replay, reduced, order, play])
+
+  return (
+    <div className="relative mx-auto h-24 w-40" aria-hidden="true">
+      <svg viewBox="0 0 160 16" className={`absolute bottom-0 left-0 h-4 w-40 ${souls.stain} ${replay ? souls.stainOn : ''}`} focusable="false">
+        <ellipse cx={80} cy={9} rx={34} ry={5} fill={SOUL.blood} />
+        <ellipse cx={70} cy={8} rx={18} ry={3} fill={SOUL.bloodBright} opacity={0.6} />
+        <ellipse cx={112} cy={11} rx={6} ry={2} fill={SOUL.blood} />
+      </svg>
+      {replay && !reduced && (
+        <div className={`absolute bottom-1 left-[3.6rem] h-20 w-[3.125rem] ${souls.ghost} ${gone ? souls.ghostGone : ''}`}>
+          <Knight key={script.key} gear="engineer" pose={script.pose} spirit="blood" className="h-full w-full" />
+        </div>
+      )}
+    </div>
+  )
+}
+
+function JobStop({ job, order }: { job: Job; order: number }) {
   const { years } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
   const { start, end } = jobYears(job, years.present)
 
   return (
     <article ref={ref} className={`${souls.stop} ${triggered ? souls.stopOn : ''}`}>
+      <Bloodstain replay={triggered} order={order} />
       <div className={`${souls.areaName} mb-3 flex items-center gap-3`}>
         <span className="h-px flex-1 bg-[color:var(--soul-glow-deep)]" aria-hidden="true" />
         <p className={`${CARVED} min-w-0 text-center text-base uppercase tracking-[0.28em] text-[color:var(--soul-text)]`}>
@@ -100,9 +151,9 @@ export function LiftDescent({ jobs }: { jobs: Job[] }) {
       <div>
         <p className="mb-6 hidden text-sm italic text-[color:var(--soul-text-soft)] lg:block">{words.liftHint}</p>
         <ul className={MASONRY_LIST}>
-          {jobs.map((job) => (
+          {jobs.map((job, order) => (
             <li key={job.id} className={MASONRY_ITEM}>
-              <JobStop job={job} />
+              <JobStop job={job} order={order} />
             </li>
           ))}
         </ul>

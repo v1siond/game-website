@@ -52,6 +52,10 @@ export const SOUL = {
   invader: '#c8452f',
   invaderDeep: '#5e1810',
 
+  // The white blue of a spirit that left a message on the floor
+  spirit: '#d6e4f2',
+  spiritDeep: '#6f88a6',
+
   // HUD colours: health, its bright banner red, stamina, the flask
   blood: '#9e2a22',
   bloodBright: '#d8432f',

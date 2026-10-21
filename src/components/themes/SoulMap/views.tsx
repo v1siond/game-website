@@ -6,17 +6,19 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { drumsSince, headingId } from '@/components/cv/sectionText'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { AreaTitle, MenuPanel, TechSlots } from './menu'
+import { FogGate } from './gate'
 import { LiftDescent } from './descent'
 import { ItemProjects } from './items'
 import { FloorMessages } from './messages'
-import { SummonSigns } from './summons'
+import { SunStages } from './stage'
 import { FogArena } from './arena'
 
-// Each profession's sections, each with its own mechanic of the bonfire world: the System Engineer's
-// jobs are the lift ride down (./descent), his projects lie about as items to pick up (./items), his
-// ventures are messages on the floor (./messages); the Musician's bands are summon signs (./summons); the
-// Martial Artist's record is the bout behind the fog wall (./arena). About and the Tech Stack are the
-// game's plain menu screens between them, each fading open when reached (./menu).
+// Each profession's sections, each with its own event of the bonfire world: the System Engineer walks
+// out of a fog gate into About (./gate), his jobs are the lift ride down past bloodstains that replay his
+// ghost (./descent), his projects are summon signs his phantom rises out of (./items), his ventures are
+// messages a spirit of him kneels and writes (./messages); the Musician's bands play in a shaft of sun
+// (./stage); the Martial Artist's record is the bout behind the fog wall, its boss dropping in (./arena).
+// The Tech Stack stays the game's plain menu screen, fading open when reached (./menu).
 
 function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
   const id = headingId('soul', title)
@@ -37,9 +39,11 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
   return (
     <>
       <Block title={titles.about}>
-        <MenuPanel>
-          <p className="text-base leading-relaxed text-[color:var(--soul-text)]">{professionalSummary.bio}</p>
-        </MenuPanel>
+        <FogGate>
+          <MenuPanel>
+            <p className="text-base leading-relaxed text-[color:var(--soul-text)]">{professionalSummary.bio}</p>
+          </MenuPanel>
+        </FogGate>
       </Block>
 
       {sections.jobs.length > 0 && (
@@ -74,7 +78,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   return (
     <Block title={titles.bands} wide>
       <p className="text-center text-base text-[color:var(--soul-glow)]">{drumsSince(musician, years)}</p>
-      <SummonSigns bands={bands} />
+      <SunStages bands={bands} />
       <p className="mt-6 text-center text-sm italic text-[color:var(--soul-text-soft)]">{musician.line}</p>
     </Block>
   )

@@ -16,8 +16,9 @@ import souls from './souls.module.css'
 
 // The Muay Thai record is fought behind the game's fog wall. The visitor walks him through the fog
 // (Traverse: he takes two strides in as the wall thins, the way crossing the white light takes a
-// moment and commits him) and the ring opens with a sparring partner in it, a red phantom, its name and long bar along
-// the bottom the way the game shows a boss. Then it is a bout:
+// moment and commits him) and a sparring partner, a red phantom, drops into the ring from above the way
+// a boss falls on the player, lands in a crouch in a ring of dust and rises, and its name and long bar
+// slide in along the bottom the way the game shows a boss. Then it is a bout:
 // - Strike throws his roundhouse, if he has the stamina for it; it lands as his shin comes round.
 // - Guard raises his guard for a second.
 // - The partner pulls its rear hand back, holds the tell a beat and throws the cross on its own rhythm
@@ -96,7 +97,7 @@ function BossBar({ hp }: { hp: number }) {
   const { souls: words } = useLabels()
   const level = { '--fill': hp / PARTNER_HP } as CSSProperties
   return (
-    <div className="absolute inset-x-4 bottom-3 sm:inset-x-10">
+    <div className={`absolute inset-x-4 bottom-3 sm:inset-x-10 ${souls.bossIn}`}>
       <div className="flex flex-wrap items-baseline justify-between gap-x-2">
         <p className={`${CARVED} text-sm uppercase tracking-[0.2em] text-[color:var(--soul-text)]`}>{words.partner}</p>
         <p className="text-sm tabular-nums text-[color:var(--soul-text)]">
@@ -252,9 +253,12 @@ function SparRing() {
           <Knight key={me.key} gear="fighter" pose={me.pose} className="h-full w-full" />
         </div>
         {bout !== 'fog' && (
-          <div className={`absolute bottom-[18%] right-[18%] aspect-[60/96] h-[60%] ${souls.partnerIn}`}>
-            <Knight key={partner.key} gear="fighter" pose={partner.pose} spirit="invader" facingLeft className="h-full w-full" />
-          </div>
+          <>
+            <span className={`absolute bottom-[14%] right-[10%] h-[14%] w-[30%] ${souls.dropDust}`} aria-hidden="true" />
+            <div className={`absolute bottom-[18%] right-[18%] aspect-[60/96] h-[60%] ${souls.partnerIn}`}>
+              <Knight key={partner.key} gear="fighter" pose={partner.pose} spirit="invader" facingLeft className="h-full w-full" />
+            </div>
+          </>
         )}
         {inRing ? <BossBar hp={partnerHp} /> : <FogWall parting={bout === 'parting'} onTraverse={traverse} />}
         {notice && (
