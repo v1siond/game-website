@@ -90,3 +90,61 @@ export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOp
     </button>
   )
 }
+
+// =============================================================================
+// FEL PATHS - the trails from the engineer node out to the musician and the martial artist. They are drawn
+// in a 0 to 100 box stretched over the row of nodes, so each curve runs from the centre of a side node (low,
+// near the row's edge) up to the raised centre node at any width; the stroke keeps its pixel width. The trail
+// of the chosen profession is lit: its solid line and a pre-drawn blurred glow fade in over the dashed line,
+// and the glow pulses on opacity.
+// =============================================================================
+
+type FelPathProfession = Extract<Profession, 'drummer' | 'fighter'>
+
+const FEL_PATHS: Record<FelPathProfession, { large: string; small: string }> = {
+  drummer: { large: 'M 10 67 Q 30 40 50 42', small: 'M 12 64 Q 31 40 50 42' },
+  fighter: { large: 'M 50 42 Q 70 40 90 67', small: 'M 50 42 Q 69 40 88 64' },
+}
+
+const FEL_PATH_IDS = Object.keys(FEL_PATHS) as FelPathProfession[]
+
+export function FelPaths({ active, isLargeScreen }: { active: Profession; isLargeScreen: boolean }) {
+  return (
+    <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="felPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor={REALM.chaosFelDark} stopOpacity="0.3" />
+          <stop offset="50%" stopColor={REALM.chaosFelMid} stopOpacity="0.5" />
+          <stop offset="100%" stopColor={REALM.chaosFelDark} stopOpacity="0.3" />
+        </linearGradient>
+      </defs>
+      {FEL_PATH_IDS.map((id) => {
+        const d = isLargeScreen ? FEL_PATHS[id].large : FEL_PATHS[id].small
+        const lit = active === id
+        return (
+          <g key={id} fill="none">
+            <path
+              d={d}
+              stroke="url(#felPathGradient)"
+              strokeWidth="2"
+              strokeDasharray="4 4"
+              vectorEffect="non-scaling-stroke"
+              className={`transition-opacity duration-300 ${lit ? 'opacity-0' : 'opacity-100'}`}
+            />
+            <g className={`transition-opacity duration-300 ${lit ? 'opacity-100' : 'opacity-0'}`}>
+              <path
+                d={d}
+                stroke={REALM.chaosFelMid}
+                strokeWidth="8"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                className={`blur-[3px] ${lit ? 'motion-safe:animate-pulse' : ''}`}
+              />
+              <path d={d} stroke="url(#felPathGradient)" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+            </g>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}

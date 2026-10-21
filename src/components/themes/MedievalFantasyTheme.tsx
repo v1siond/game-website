@@ -12,7 +12,7 @@ import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
 import { RealmFrame } from './MedievalFantasy/panels'
 import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/actions'
 import { FTArtDivider } from './MedievalFantasy/ornaments'
-import { ProfessionNode } from './MedievalFantasy/professions'
+import { FelPaths, ProfessionNode } from './MedievalFantasy/professions'
 import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy/sections'
 
 // Medieval Fantasy: the page composition. Its palette, backdrop, frames, buttons, cards, ornaments and
@@ -120,47 +120,15 @@ export default function MedievalFantasyTheme() {
               pointerEvents: 'none',
             }} />
 
-            {/* Connecting paths SVG */}
-            <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }} preserveAspectRatio="none" aria-hidden="true">
-              <defs>
-                <linearGradient id="felPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor={REALM.chaosFelDark} stopOpacity="0.3" />
-                  <stop offset="50%" stopColor={REALM.chaosFelMid} stopOpacity="0.5" />
-                  <stop offset="100%" stopColor={REALM.chaosFelDark} stopOpacity="0.3" />
-                </linearGradient>
-              </defs>
-              {/* Left to center path */}
-              <path
-                d={isLargeScreen ? "M 20% 70% Q 35% 40%, 50% 50%" : "M 15% 75% Q 32% 45%, 50% 55%"}
-                stroke="url(#felPathGradient)"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray={active === 'drummer' ? "none" : "4 4"}
-                style={{
-                  filter: active === 'drummer' ? `drop-shadow(0 0 4px ${REALM.chaosFelMid})` : 'none',
-                  transition: 'all 0.3s ease'
-                }}
+            {/* Profession nodes over the fel paths that join them */}
+            <div className={`relative w-full h-full ${isLargeScreen ? 'max-w-[700px]' : 'max-w-[500px]'}`}>
+              <FelPaths active={active} isLargeScreen={isLargeScreen} />
+              <ProfessionSwitch
+                label={navigation.professionSelection}
+                className="relative flex justify-between items-stretch w-full px-4 h-full py-2"
+                renderOption={(option) => <ProfessionNode option={option} isLargeScreen={isLargeScreen} />}
               />
-              {/* Center to right path */}
-              <path
-                d={isLargeScreen ? "M 50% 50% Q 65% 40%, 80% 70%" : "M 50% 55% Q 68% 45%, 85% 75%"}
-                stroke="url(#felPathGradient)"
-                strokeWidth="2"
-                fill="none"
-                strokeDasharray={active === 'fighter' ? "none" : "4 4"}
-                style={{
-                  filter: active === 'fighter' ? `drop-shadow(0 0 4px ${REALM.chaosFelMid})` : 'none',
-                  transition: 'all 0.3s ease'
-                }}
-              />
-            </svg>
-
-            {/* Profession nodes */}
-            <ProfessionSwitch
-              label={navigation.professionSelection}
-              className={`relative flex justify-between items-stretch w-full px-4 h-full py-2 ${isLargeScreen ? 'max-w-[700px]' : 'max-w-[500px]'}`}
-              renderOption={(option) => <ProfessionNode option={option} isLargeScreen={isLargeScreen} />}
-            />
+            </div>
           </section>
         </ScrollScene>
 
