@@ -76,7 +76,10 @@
 }
 
 /* strike: the roundhouse kick, the knee and the elbow take a third of each combo in turn
-   (max(0, 2 sin - 1) is positive on a third of the cycle); four combos, the last frame lands the kick */
+   (max(0, 2 sin - 1) is positive on a third of the cycle); four combos, the last frame lands the kick.
+   The strip carries the three values too, so the props on the level (the pads, the flash) answer the
+   same strikes his limbs throw; .strike keeps them for a striking figure outside a strip. */
+.strip,
 .strike {
   --kick: max(0, 2 * sin(var(--p) * 4turn + 0.25turn) - 1);
   --knee: max(0, 2 * sin(var(--p) * 4turn + 0.5833turn) - 1);
@@ -100,6 +103,23 @@
   opacity: max(var(--kick, 0), var(--knee, 0), var(--elbow, 0));
 }
 
+/* The pads give with the strikes: the high pad takes the elbow, the low pad the kick and the knee; each
+   is pushed back and tipped away from him (he strikes from the left). */
+.padHigh,
+.padLow {
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+}
+
+.padHigh {
+  transform: translate3d(calc(var(--elbow, 0) * 4px), 0, 0) rotate(calc(var(--elbow, 0) * 12deg));
+}
+
+.padLow {
+  transform: translate3d(calc(max(var(--kick, 0), var(--knee, 0)) * 4px), 0, 0)
+    rotate(calc(max(var(--kick, 0), var(--knee, 0)) * 12deg));
+}
+
 /* type: the hands tap the keys, small and quick */
 .type .armFront {
   transform: rotate(calc(-62deg + sin(var(--p) * 16turn) * 6deg));
@@ -119,6 +139,11 @@
 }
 
 /* ---- props that answer progress ---- */
+
+/* A prop's place from atClass (stage.tsx): its tenths and hundredths classes add up to --at. */
+.at {
+  --at: calc(var(--at-tenths, 0) + var(--at-hundredths, 0));
+}
 
 /* A prop at --at (0 to 1 along the level) lights as he reaches it. */
 .lightAt {

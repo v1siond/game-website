@@ -28,7 +28,42 @@ export interface StageLook {
 }
 
 // A prop's place along the level (0 to 1) as --at: it sets the prop's left edge and when it answers.
+// atClass is the class route, no style object: the place is rounded to hundredths and split into a
+// tenths class and a hundredths class (literal Tailwind arbitrary properties, so the build sees all 21),
+// and heroScene's .at rule adds the two into --at. at() is the inline route the older props still take.
 export const at = (position: number) => ({ '--at': position }) as CSSProperties
+
+const AT_TENTHS = [
+  '[--at-tenths:0]',
+  '[--at-tenths:0.1]',
+  '[--at-tenths:0.2]',
+  '[--at-tenths:0.3]',
+  '[--at-tenths:0.4]',
+  '[--at-tenths:0.5]',
+  '[--at-tenths:0.6]',
+  '[--at-tenths:0.7]',
+  '[--at-tenths:0.8]',
+  '[--at-tenths:0.9]',
+  '[--at-tenths:1]',
+]
+
+const AT_HUNDREDTHS = [
+  '[--at-hundredths:0]',
+  '[--at-hundredths:0.01]',
+  '[--at-hundredths:0.02]',
+  '[--at-hundredths:0.03]',
+  '[--at-hundredths:0.04]',
+  '[--at-hundredths:0.05]',
+  '[--at-hundredths:0.06]',
+  '[--at-hundredths:0.07]',
+  '[--at-hundredths:0.08]',
+  '[--at-hundredths:0.09]',
+]
+
+export function atClass(position: number): string {
+  const hundredths = Math.round(Math.min(Math.max(position, 0), 1) * 100)
+  return `${scene.at} ${AT_TENTHS[Math.floor(hundredths / 10)]} ${AT_HUNDREDTHS[hundredths % 10]}`
+}
 
 export function LevelScene({ children }: { children: ReactNode }) {
   return <TravelScene className={scene.scene}>{children}</TravelScene>

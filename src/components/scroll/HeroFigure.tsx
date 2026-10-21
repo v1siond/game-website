@@ -2,8 +2,8 @@ import type { ReactNode } from 'react'
 import scene from './heroScene.module.css'
 
 // His figure in a scroll scene, drawn from his sprite (src/assets/sprites/stop_front.png): short dark
-// hair, the full dark beard, oval eyes. A world dresses him (the torso, the sleeves, the legs, what his
-// hands hold); the limbs are separate groups so the scene's pose class (stride, drum, strike, type,
+// hair, the full dark beard, oval eyes. A world dresses him (the torso, the sleeves, the legs, what he
+// wears on his head, what his hands hold); the limbs are separate groups so the scene's pose class (stride, drum, strike, type,
 // guard in heroScene.module.css) swings them from the shoulder or hip with transforms only.
 
 export const HERO_SKIN = '#b5703f'
@@ -56,9 +56,11 @@ interface HeroFigureProps {
   // The shapes of one arm or leg hanging at x; HeroArm and HeroLeg draw them.
   arm: (x: number) => ReactNode
   leg: (x: number) => ReactNode
+  // What he wears on his head (a headband, a cap), drawn over the hair and the face.
+  overHair?: ReactNode
 }
 
-export function HeroFigure({ className = '', eye, torso, arm, leg }: HeroFigureProps) {
+export function HeroFigure({ className = '', eye, torso, arm, leg, overHair = null }: HeroFigureProps) {
   return (
     <svg viewBox="0 0 64 96" className={className} aria-hidden="true" focusable="false">
       <g className={`${scene.limb} ${scene.armBack}`}>{arm(23)}</g>
@@ -75,6 +77,7 @@ export function HeroFigure({ className = '', eye, torso, arm, leg }: HeroFigureP
       <path d="M21.5 18 Q22 31 32 31.5 Q42 31 42.5 18 Q40 24 36 23.5 Q32 25 28 23.5 Q24 24 21.5 18 Z" fill={HAIR} />
       <ellipse cx={28} cy={17.5} rx={1.6} ry={2.4} fill={eye} />
       <ellipse cx={36} cy={17.5} rx={1.6} ry={2.4} fill={eye} />
+      {overHair}
 
       <g className={`${scene.limb} ${scene.legFront}`}>{leg(36)}</g>
       <g className={`${scene.limb} ${scene.armFront}`}>{arm(41)}</g>
