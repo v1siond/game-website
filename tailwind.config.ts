@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { ATOMIC_COLORS } from "./src/components/themes/RetroAtomic/palette";
 
 const config: Config = {
   content: [
@@ -30,6 +31,8 @@ const config: Config = {
           silver: "#a0a0a0",
           lavender: "#b7a9d9",
         },
+        // Retro Atomic, fed from its palette: bg-atomic-ink, text-atomic-phosphor, border-atomic-yellow/30.
+        atomic: ATOMIC_COLORS,
       },
     },
   },

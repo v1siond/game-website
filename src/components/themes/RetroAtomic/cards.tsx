@@ -10,8 +10,8 @@ import world from './world.module.css'
 // The selector tab and the cards each section lists.
 
 const TAB_LOOK = {
-  on: { frame: `border-[#14FF00] ${world.tabLit}`, lamp: 'bg-[#FFD700]', label: `text-[#14FF00] ${world.glowGreenSoft}` },
-  off: { frame: 'border-[#10CC00] bg-transparent', lamp: 'bg-[#3d4136]', label: 'text-[#10CC00]' },
+  on: { frame: `border-atomic-phosphor ${world.tabLit}`, lamp: 'bg-atomic-yellow', label: `text-atomic-phosphor ${world.glowGreenSoft}` },
+  off: { frame: 'border-atomic-phosphor-dim bg-transparent', lamp: 'bg-atomic-steel-light', label: 'text-atomic-phosphor-dim' },
 }
 
 // One tab of the shared profession switch: a panel lamp that lights over the chosen profession.
@@ -33,15 +33,15 @@ export function ProfessionTab({ label, selected, optionProps }: ProfessionOption
   )
 }
 
-const CHIP = 'border border-[#14FF00]/25 bg-[#14FF00]/10 px-2 py-0.5 text-sm text-[#10CC00]'
+const CHIP = 'border border-atomic-phosphor/25 bg-atomic-phosphor/10 px-2 py-0.5 text-sm text-atomic-phosphor-dim'
 
 export function TechStackTerminal({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6 font-mono">
       {categories.map((cat, idx) => (
         <div key={cat.id}>
-          <h3 className="mb-3 flex items-center gap-2 text-sm tracking-wider text-[#14FF00]">
-            <span className="text-[#FFD700]" aria-hidden="true">
+          <h3 className="mb-3 flex items-center gap-2 text-sm tracking-wider text-atomic-phosphor">
+            <span className="text-atomic-yellow" aria-hidden="true">
               [{String(idx + 1).padStart(2, '0')}]
             </span>
             <span aria-hidden="true">{cat.icon}</span>
@@ -49,7 +49,7 @@ export function TechStackTerminal({ categories }: { categories: CVData['techStac
           </h3>
           <ul className="flex flex-wrap gap-2" aria-label={`${cat.name} technologies`}>
             {cat.items.map((tech) => (
-              <li key={tech} className="border border-[#14FF00] bg-[#0a0a08] px-3 py-1 text-sm font-bold text-[#14FF00]">
+              <li key={tech} className="border border-atomic-phosphor bg-atomic-ink px-3 py-1 text-sm font-bold text-atomic-phosphor">
                 {tech}
               </li>
             ))}
@@ -62,26 +62,26 @@ export function TechStackTerminal({ categories }: { categories: CVData['techStac
 
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { start: startYear, end: endYear } = jobYears(entry, 'PRESENT')
-  const frame = entry.endDate ? 'border-[#A3A38C]/25' : 'border-[#14FF00]/25'
+  const frame = entry.endDate ? 'border-atomic-ash/25' : 'border-atomic-phosphor/25'
 
   return (
     <article className={`relative border p-4 font-mono ${world.wornCard} ${frame}`}>
       <div className="mb-2">
-        <h3 className="text-base font-bold uppercase tracking-wide text-[#14FF00]">{entry.title}</h3>
-        <p className="mt-1 text-sm text-[#FFD700]">{entry.company}</p>
+        <h3 className="text-base font-bold uppercase tracking-wide text-atomic-phosphor">{entry.title}</h3>
+        <p className="mt-1 text-sm text-atomic-yellow">{entry.company}</p>
       </div>
 
-      <div className="mb-3 inline-block border border-[#0066CC] bg-[#0066CC]/20 px-2 py-1 text-sm text-[#FFD700]">
+      <div className="mb-3 inline-block border border-atomic-blue bg-atomic-blue/20 px-2 py-1 text-sm text-atomic-yellow">
         {startYear} - {endYear}
       </div>
 
-      {entry.description && <p className="mb-3 text-sm text-[#A3A38C]">{entry.description}</p>}
+      {entry.description && <p className="mb-3 text-sm text-atomic-ash">{entry.description}</p>}
 
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1 border-t border-[#14FF00]/20 pt-2" aria-label="Key achievements">
+        <ul className="space-y-1 border-t border-atomic-phosphor/20 pt-2" aria-label="Key achievements">
           {entry.highlights.map((h) => (
-            <li key={h} className="flex items-start gap-2 text-sm text-[#14FF00]">
-              <span className="text-[#FF9900]" aria-hidden="true">
+            <li key={h} className="flex items-start gap-2 text-sm text-atomic-phosphor">
+              <span className="text-atomic-amber" aria-hidden="true">
                 +
               </span>
               {h}
@@ -104,12 +104,12 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 }
 
 const LINK_BUTTON =
-  'inline-flex min-h-[44px] items-center border-2 border-[#14FF00] bg-[#0a0a08] px-4 text-sm font-bold uppercase tracking-wider text-[#14FF00] transition-all hover:scale-105 focus:outline-none focus-visible:ring-2'
+  'inline-flex min-h-[44px] items-center border-2 border-atomic-phosphor bg-atomic-ink px-4 text-sm font-bold uppercase tracking-wider text-atomic-phosphor transition-all hover:scale-105 focus:outline-none focus-visible:ring-2'
 
 // A highlight project sits on rusted steel in yellow, the others on the phosphor screen in green.
 const PROJECT_LOOK = {
-  highlight: `${world.rust} ${world.highlightCard} border-[#FFD700]/30`,
-  plain: `${world.phosphorScreen} border-[#14FF00]/30`,
+  highlight: `${world.rust} ${world.highlightCard} border-atomic-yellow/30`,
+  plain: `${world.phosphorScreen} border-atomic-phosphor/30`,
 }
 
 // His role, the result line and the links.
@@ -117,14 +117,14 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
   return (
     <article className={`relative h-full border-2 p-4 font-mono ${PROJECT_LOOK[project.highlight ? 'highlight' : 'plain']}`}>
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-base font-bold uppercase tracking-wide text-[#14FF00]">{project.name}</h3>
-        {years && <span className="whitespace-nowrap text-sm text-[#FFD700]">{years}</span>}
+        <h3 className="text-base font-bold uppercase tracking-wide text-atomic-phosphor">{project.name}</h3>
+        {years && <span className="whitespace-nowrap text-sm text-atomic-yellow">{years}</span>}
       </div>
-      <p className="mt-1 text-sm font-bold text-[#FFD700]">{project.role}</p>
-      <p className="mt-1 text-sm text-[#A3A38C]">{project.tagline}</p>
+      <p className="mt-1 text-sm font-bold text-atomic-yellow">{project.role}</p>
+      <p className="mt-1 text-sm text-atomic-ash">{project.tagline}</p>
 
       {project.impact && (
-        <p className="mt-3 flex items-start gap-2 border border-[#FF9900]/25 bg-[#FF9900]/5 p-2 text-sm text-[#FF9900]">
+        <p className="mt-3 flex items-start gap-2 border border-atomic-amber/25 bg-atomic-amber/5 p-2 text-sm text-atomic-amber">
           <RadiationSymbol size={12} color={TERMINAL_AMBER} />
           {project.impact}
         </p>
@@ -149,7 +149,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-[#A3A38C]">No public link</p>
+        <p className="mt-4 text-sm text-atomic-ash">No public link</p>
       )}
     </article>
   )
@@ -162,18 +162,18 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
-      className={`block h-full border border-[#0066CC] p-4 font-mono transition-all hover:scale-[1.02] focus:outline-none focus-visible:ring-2 ${world.phosphorScreen}`}
+      className={`block h-full border border-atomic-blue p-4 font-mono transition-all hover:scale-[1.02] focus:outline-none focus-visible:ring-2 ${world.phosphorScreen}`}
     >
       <div className="mb-2 flex items-center gap-3">
         <span className="text-2xl" aria-hidden="true">
           {company.icon}
         </span>
         <div>
-          <h3 className="text-base font-bold uppercase tracking-wide text-[#14FF00]">{company.name}</h3>
-          <p className="text-sm text-[#FFD700]">{company.tagline}</p>
+          <h3 className="text-base font-bold uppercase tracking-wide text-atomic-phosphor">{company.name}</h3>
+          <p className="text-sm text-atomic-yellow">{company.tagline}</p>
         </div>
       </div>
-      <p className="text-sm text-[#A3A38C]">{company.description}</p>
+      <p className="text-sm text-atomic-ash">{company.description}</p>
     </a>
   )
 }
@@ -181,15 +181,15 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 // His role, the years and the release.
 export function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
-    <article className={`h-full border border-[#CC0000]/30 p-4 font-mono ${world.rust}`}>
-      <h3 className="text-base font-bold uppercase tracking-wide text-[#FF4D4D]">{band.name}</h3>
-      <p className="mt-1 text-sm text-[#FFD700]">
+    <article className={`h-full border border-atomic-red/30 p-4 font-mono ${world.rust}`}>
+      <h3 className="text-base font-bold uppercase tracking-wide text-atomic-red-light">{band.name}</h3>
+      <p className="mt-1 text-sm text-atomic-yellow">
         {band.role}
         {years && <span aria-hidden="true"> {'//'} </span>}
         {years && <span>{years}</span>}
       </p>
       {band.release && (
-        <p className="mt-2 text-sm text-[#A3A38C]">
+        <p className="mt-2 text-sm text-atomic-ash">
           Released <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}

@@ -63,13 +63,13 @@ export default function RetroAtomicTheme() {
             <div className="mx-auto max-w-6xl">
               <div className="mb-4 flex flex-col items-start justify-between gap-4 md:flex-row">
                 <div>
-                  <div className="mb-3 flex items-center gap-4 border-b-2 border-[#FFD700] pb-3">
+                  <div className="mb-3 flex items-center gap-4 border-b-2 border-atomic-yellow pb-3">
                     <RadiationSymbol size={36} color={ATOMIC_YELLOW} />
-                    <h1 className={`text-xl font-bold uppercase tracking-wider text-[#14FF00] md:text-3xl ${world.glowGreen}`}>{name}</h1>
+                    <h1 className={`text-xl font-bold uppercase tracking-wider text-atomic-phosphor md:text-3xl ${world.glowGreen}`}>{name}</h1>
                   </div>
-                  <p className="max-w-xl text-base text-[#14FF00]">{headline}</p>
-                  <p className="mt-1 text-sm italic text-[#FF9900]">{tagline}</p>
-                  <p className="mt-1 text-sm text-[#14FF00]">{line}</p>
+                  <p className="max-w-xl text-base text-atomic-phosphor">{headline}</p>
+                  <p className="mt-1 text-sm italic text-atomic-amber">{tagline}</p>
+                  <p className="mt-1 text-sm text-atomic-phosphor">{line}</p>
                 </div>
 
                 <div className="flex flex-col items-start gap-3 md:items-end">
@@ -110,7 +110,7 @@ export default function RetroAtomicTheme() {
         <div className="mb-4 flex justify-center gap-4">
           <AtomSymbol size={40} color={PHOSPHOR_GREEN_DIM} />
         </div>
-        <p className="font-mono text-sm text-[#A3A38C]">
+        <p className="font-mono text-sm text-atomic-ash">
           © {new Date().getFullYear()} {view.hero.name}
         </p>
       </footer>

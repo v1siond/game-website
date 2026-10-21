@@ -85,8 +85,8 @@ function Bulkheads() {
           className={`absolute inset-y-0 left-[calc(var(--at)*100%_-_0.6rem)] w-5 sm:w-6 ${atClass(position)}`}
           aria-hidden="true"
         >
-          <div className="absolute inset-y-0 -left-1 w-1.5 bg-[#5a5e50]" />
-          <div className="absolute inset-y-0 -right-1 w-1.5 bg-[#5a5e50]" />
+          <div className="absolute inset-y-0 -left-1 w-1.5 bg-atomic-steel-edge" />
+          <div className="absolute inset-y-0 -right-1 w-1.5 bg-atomic-steel-edge" />
           <svg
             viewBox="0 0 20 100"
             preserveAspectRatio="none"
@@ -155,7 +155,7 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
       <LabWall />
       <RoomLamps glow={PHOSPHOR_GREEN} />
       <Bulkheads />
-      <LevelGround className="border-[#5a5e50] bg-[#23261f]" />
+      <LevelGround className="border-atomic-steel-edge bg-atomic-steel" />
       {ENGINEER_PROPS[zone]}
     </>
   )
@@ -211,8 +211,8 @@ function ValveAmp() {
 function StageCurtain() {
   return (
     <div className="absolute inset-0 z-10 flex" aria-hidden="true">
-      <div className={`h-full w-1/2 border-r-4 border-[#3d0a15] bg-[#5a1020] ${styles.curtainLeft}`} />
-      <div className={`h-full w-1/2 border-l-4 border-[#3d0a15] bg-[#5a1020] ${styles.curtainRight}`} />
+      <div className={`h-full w-1/2 border-r-4 border-atomic-velvet-fold bg-atomic-velvet ${styles.curtainLeft}`} />
+      <div className={`h-full w-1/2 border-l-4 border-atomic-velvet-fold bg-atomic-velvet ${styles.curtainRight}`} />
     </div>
   )
 }
@@ -241,7 +241,7 @@ function MusicianLevel() {
           </g>
         </svg>
       ))}
-      <LevelGround className="border-[#5a5e50] bg-[#4a3728]" />
+      <LevelGround className="border-atomic-steel-edge bg-atomic-dust-dark" />
       <ValveAmp />
       <StageCurtain />
     </>
@@ -309,7 +309,7 @@ function FighterLevel() {
     <>
       <GymWall />
       <RoomLamps glow={LAMP_GLOW} />
-      <LevelGround className="border-[#5a5e50] bg-[#3d4136]" />
+      <LevelGround className="border-atomic-steel-edge bg-atomic-steel-light" />
       <PadRobot />
     </>
   )

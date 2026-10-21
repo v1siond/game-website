@@ -10,9 +10,9 @@ export const TERMINAL_BUTTON =
 // Email is the solid phosphor green primary action, LinkedIn and the CV the outlined yellow ones; the
 // outlined green one is the link out to Nebulith.
 export const BUTTON_LOOK = {
-  solid: `border-[#14FF00] bg-[#14FF00] text-[#0a0a08] ${world.buttonLit}`,
-  yellow: 'border-[#FFD700] bg-[#0a0a08] text-[#FFD700]',
-  green: 'border-[#14FF00] bg-[#0a0a08] text-[#14FF00]',
+  solid: `border-atomic-phosphor bg-atomic-phosphor text-atomic-ink ${world.buttonLit}`,
+  yellow: 'border-atomic-yellow bg-atomic-ink text-atomic-yellow',
+  green: 'border-atomic-phosphor bg-atomic-ink text-atomic-phosphor',
 }
 
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {

@@ -25,7 +25,7 @@ export function Lane({ profession, zone }: { profession: Profession; zone: Level
     <LevelStrip
       stage={PROFESSION_STAGES[profession]}
       zone={zone}
-      className={`${styles.tempo} h-32 border-y-2 border-[#5a5e50] bg-[#1a1a16] sm:h-44`}
+      className={`${styles.tempo} h-32 border-y-2 border-atomic-steel-edge bg-atomic-bunker sm:h-44`}
       hero={
         <div className="absolute bottom-3 left-2">
           <HeroCharacter profession={profession} className={scene.hero} />
@@ -38,13 +38,13 @@ export function Lane({ profession, zone }: { profession: Profession; zone: Level
 export type SceneItemKind = 'file' | 'screen'
 
 function TerminalSlot() {
-  return <div className={`pointer-events-none absolute -left-2 inset-y-0 w-1 bg-[#14FF00] ${styles.slot}`} aria-hidden="true" />
+  return <div className={`pointer-events-none absolute -left-2 inset-y-0 w-1 bg-atomic-phosphor ${styles.slot}`} aria-hidden="true" />
 }
 
 function Phosphor() {
   return (
     <div
-      className={`pointer-events-none absolute inset-0 z-10 border-2 border-[#14FF00] bg-[#14FF00]/20 ${styles.phosphor}`}
+      className={`pointer-events-none absolute inset-0 z-10 border-2 border-atomic-phosphor bg-atomic-phosphor/20 ${styles.phosphor}`}
       aria-hidden="true"
     />
   )
@@ -70,7 +70,7 @@ const COG_TEETH = Array.from({ length: 10 }, (_, i) => i * 36)
 
 function RoundHatch() {
   return (
-    <div className={`absolute inset-0 bg-[#23261f] ${styles.hatchDoor}`}>
+    <div className={`absolute inset-0 bg-atomic-steel ${styles.hatchDoor}`}>
       <svg viewBox="0 0 100 100" className="absolute left-1/2 top-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2" focusable="false">
         <g className={styles.cog}>
           {COG_TEETH.map((angle) => (
@@ -93,8 +93,8 @@ export function ContactScene({ profession }: { profession: Profession }) {
     <ContactStage
       headingId="atomic-contact-heading"
       corner={
-        <div className={`relative h-44 overflow-hidden border-2 border-[#5a5e50] bg-[#1a1a16] ${styles.tempo}`} aria-hidden="true">
-          <div className="absolute inset-x-0 bottom-0 h-2 bg-[#3d4136]" />
+        <div className={`relative h-44 overflow-hidden border-2 border-atomic-steel-edge bg-atomic-bunker ${styles.tempo}`} aria-hidden="true">
+          <div className="absolute inset-x-0 bottom-0 h-2 bg-atomic-steel-light" />
           <Corner />
           <RoundHatch />
         </div>
@@ -103,10 +103,10 @@ export function ContactScene({ profession }: { profession: Profession }) {
       <RecruiterHero
         render={({ line, actions }) => (
           <div className={`text-center font-mono sm:text-left ${scene.arrive}`}>
-            <h2 id="atomic-contact-heading" className="mb-2 text-lg font-bold uppercase tracking-widest text-[#FFD700]">
+            <h2 id="atomic-contact-heading" className="mb-2 text-lg font-bold uppercase tracking-widest text-atomic-yellow">
               Contact
             </h2>
-            <p className="mb-6 text-sm text-[#14FF00]">{line}</p>
+            <p className="mb-6 text-sm text-atomic-phosphor">{line}</p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row sm:flex-wrap sm:justify-start">
               {actions.map((action) => (
                 <HeroAction key={action.id} action={action} />
