@@ -36,6 +36,16 @@ export const TERMINAL_BG = '#0a0a08'
 export const PANEL_BG = '#0d0d0a'
 export const VAULT_BG = '#1a1a16'
 
+// BUNKER: the steel, lamps and fittings the scroll scenes are built from
+export const STEEL = '#23261f'
+export const STEEL_LIGHT = '#3d4136'
+export const STEEL_EDGE = '#5a5e50'
+export const CHROME = '#c9cbb8'
+export const CASING = '#8f8a6a'
+export const LAMP_GLOW = '#ffe9a8'
+export const VELVET = '#5a1020'
+export const VELVET_FOLD = '#3d0a15'
+
 // TEXT
 export const TERMINAL_TEXT = PIPBOY_GREEN
 export const FADED_TEXT = '#A3A38C'

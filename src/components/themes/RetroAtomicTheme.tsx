@@ -23,9 +23,13 @@ import { CVLink, HeroAction, TERMINAL_BUTTON } from './RetroAtomic/actions'
 import { SECTION_VIEWS } from './RetroAtomic/sections'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { ContactScene } from './RetroAtomic/scenes'
 
-// Retro Atomic: the page composition. Its palette, icons, panels, art separators, cards and per
-// profession sections live in ./RetroAtomic.
+// Retro Atomic: the page composition. Its palette, icons, panels, art separators, cards, character,
+// profession stages, scroll scenes and per profession sections live in ./RetroAtomic.
+//
+// The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
+// scroll container and stop the scenes' strips from sticking to the viewport.
 
 export default function RetroAtomicTheme() {
   const { active } = useProfession()
@@ -41,7 +45,7 @@ export default function RetroAtomicTheme() {
 
   return (
     <div
-      className="min-h-screen relative"
+      className="relative min-h-screen overflow-x-clip"
       style={{
         background: TERMINAL_BG,
         fontFamily: 'monospace',
@@ -151,31 +155,8 @@ export default function RetroAtomicTheme() {
         <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
       </div>
 
-      {/* ================================================================ */}
-      {/* CONTACT CTA */}
-      {/* ================================================================ */}
-      <section className="relative z-20 py-12 px-4 md:px-6" aria-label="Contact">
-        <RecruiterHero
-          render={({ line, actions }) => (
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="mb-6">
-                <h2 className="text-lg font-bold tracking-widest uppercase font-mono mb-2" style={{ color: VAULT_YELLOW }}>
-                  [ INITIATE CONTACT PROTOCOL ]
-                </h2>
-                <p className="text-sm font-mono" style={{ color: TERMINAL_TEXT }}>
-                  {line}
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
-              </div>
-            </div>
-          )}
-        />
-      </section>
+      {/* CONTACT - the round shelter hatch rolls aside to his corner */}
+      <ContactScene profession={active} />
 
       {/* ================================================================ */}
       {/* FOOTER */}
