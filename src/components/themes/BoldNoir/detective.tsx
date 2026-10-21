@@ -4,9 +4,10 @@ import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { NOIR } from './palette'
 import s from './detective.module.css'
 
-// Him as this world's own figure, a parody of the 1947 city detective of the noir crime game (the fedora
-// with its band, the double breasted suit, the tie, the badge held up, the notebook that chimes on a
-// clue), cut the way the heist world cuts everything: flat ink, paper and one red, no gradient, depth
+// Him as this world's own figure, a parody of the 1947 city detective of the noir crime game (the pale
+// pinched fedora with its wide dark band, the grey three piece suit with the single breasted jacket worn
+// open over the waistcoat, the red tie, the pistol at his hip, the badge held up, the notebook that chimes
+// on a clue), cut the way the heist world cuts everything: flat ink, paper and one red, no gradient, depth
 // from hard shadow shapes and halftone dots, a sharp silhouette. The fedora's brim throws a hard shadow
 // over his brow; under it his own face: brown skin, short dark hair at the temples, the full dark beard,
 // dark oval eyes (HERO_IDENTITY).
@@ -33,28 +34,39 @@ const SKIN = HERO_IDENTITY.skin
 const SHADE = HERO_IDENTITY.skinShade
 const BEARD = HERO_IDENTITY.beard
 
+interface Trousers {
+  fill: string
+  crease: string
+}
+
 interface Kit {
   // the torso, drawn over the legs and under the arms
   torso: (dots: string) => ReactNode
+  // the upper sleeve, then the forearm (bare skin where the sleeves are rolled or off)
   sleeve: string
+  forearm: string
   // what sits in the hands while he acts, and what he wears on his head
   backProp: ReactNode
   frontProp: ReactNode
   head: ReactNode
-  trousers: string
+  trousers: Trousers
   hand: 'bare' | 'glove'
   band: boolean
 }
 
 // ---- head ----
 
+// The pale fedora: a tapered crown pinched at the front with the centre dent, the wide dark band, the
+// brim snapped down with its dark underside; the crown's shadow side cut hard like the face's.
 const FEDORA = (
   <g className={s.hat}>
-    <path d="M22 11 L23.5 3 Q32 -0.5 40.5 3 L42 11 Z" fill={NOIR.ink} />
-    <path d="M28 3.4 L32 5.8 L36 3.4" fill="none" stroke={NOIR.ash} strokeWidth={0.9} />
-    <path d="M22.6 7.8 L41.4 7.8 L42 11 L22 11 Z" fill={NOIR.red} />
-    <path d="M12.5 13.4 Q32 7.6 51.5 13.4 L49.5 14.8 Q32 10.6 14.5 14.8 Z" fill={NOIR.ink} />
-    <path d="M44 10.4 Q48 11.3 50 12.6" fill="none" stroke={NOIR.ash} strokeWidth={0.6} />
+    <path d="M22.6 11 L24.4 3.6 Q28 1.4 32 2.6 Q36 1.4 39.6 3.6 L41.4 11 Z" fill={NOIR.fog} />
+    <path d="M22.6 11 L24.4 3.6 Q26 2.4 27.6 2.2 L27.2 11 Z" fill={NOIR.ash} />
+    <path d="M32 2.8 L32 6.6 M27.8 2.6 L29.4 7 M36.2 2.6 L34.6 7" fill="none" stroke={NOIR.ash} strokeWidth={0.8} />
+    <path d="M23.4 7.2 L40.6 7.2 L41.4 11 L22.6 11 Z" fill={NOIR.ink} />
+    <path d="M12.5 13.4 Q32 7.6 51.5 13.4 L49.5 14.8 Q32 10.6 14.5 14.8 Z" fill={NOIR.fog} />
+    <path d="M12.5 13.4 Q14 14.4 14.5 14.8 Q32 10.6 49.5 14.8 L48.4 15.6 Q32 11.8 15.6 15.6 Z" fill={NOIR.ink} />
+    <path d="M44 10.6 Q48 11.4 50.4 12.8" fill="none" stroke={NOIR.paper} strokeWidth={0.6} />
   </g>
 )
 
@@ -97,20 +109,26 @@ function Head({ head, dots, hatShade }: { head: ReactNode; dots: string; hatShad
 
 // ---- torsos ----
 
-const COAT = (dots: string) => (
+// The three piece: the grey single breasted jacket hangs open over the matching waistcoat, the white
+// shirt and the red tie in the collar's V, long notched lapels rolling to the waist, the pistol's grip
+// in its holster at the hip where the jacket swings open.
+const SUIT = (dots: string) => (
   <>
-    <path d="M18 34 Q32 29 46 34 L47 65 L17 65 Z" fill={NOIR.smoke} />
-    <path d="M18 34 Q24 31.5 28 31 L26.5 65 L17 65 Z" fill={NOIR.ink} />
+    <path d="M18 34 Q32 29 46 34 L47 65 L17 65 Z" fill={NOIR.ash} />
+    <path d="M18 34 Q24 31.5 28 31 L26.5 65 L17 65 Z" fill={NOIR.smoke} />
     <path d="M18 34 Q24 31.5 28 31 L26.5 65 L17 65 Z" fill={dots} />
+    <path d="M28 31 L36 31 L38.6 50 L40.4 65 L23.6 65 L25.4 50 Z" fill={NOIR.coal} />
     <path d="M28 31 L32 42 L36 31 Z" fill={NOIR.paper} />
-    <path d="M31 33 L33 33 L33.8 44 L32 46.6 L30.2 44 Z" fill={NOIR.red} />
-    <path d="M28 31 L32 42 L27 38.5 L25.4 33 Z M36 31 L32 42 L37 38.5 L38.6 33 Z" fill={NOIR.ink} stroke={NOIR.fog} strokeWidth={0.5} />
-    <path d="M32 42 L34.4 65" stroke={NOIR.ink} strokeWidth={0.9} />
-    <circle cx={28.6} cy={47} r={0.9} fill={NOIR.paper} />
-    <circle cx={36} cy={47} r={0.9} fill={NOIR.paper} />
-    <circle cx={28.6} cy={53} r={0.9} fill={NOIR.paper} />
-    <circle cx={36} cy={53} r={0.9} fill={NOIR.paper} />
-    <path d="M38.4 37 L42.4 36.4 L41.4 39.2 Z" fill={NOIR.paper} />
+    <path d="M31 33 L33 33 L33.6 41 L32 42.6 L30.4 41 Z" fill={NOIR.red} />
+    <path d="M27.4 42 L32 46.2 L36.6 42 L37.4 58 L32 61 L26.6 58 Z" fill={NOIR.smoke} />
+    <circle cx={32} cy={48.6} r={0.7} fill={NOIR.fog} />
+    <circle cx={32} cy={52.4} r={0.7} fill={NOIR.fog} />
+    <circle cx={32} cy={56.2} r={0.7} fill={NOIR.fog} />
+    <path d="M28 31 L25.4 33 L24.6 37.6 L27.6 39 L25.8 50 L27.4 42 Z M36 31 L38.6 33 L39.4 37.6 L36.4 39 L38.2 50 L36.6 42 Z" fill={NOIR.ash} stroke={NOIR.ink} strokeWidth={0.5} />
+    <path d="M25.8 50 Q25 58 23.6 65 M38.2 50 Q39 58 40.4 65" fill="none" stroke={NOIR.ink} strokeWidth={0.6} />
+    <path d="M39.4 39.4 L43.4 39" stroke={NOIR.ink} strokeWidth={0.6} />
+    <path d="M38.8 57 L42.6 57 L42.2 64 L39.2 64 Z" fill={NOIR.ink} />
+    <path d="M39.4 54.6 L42.2 54.2 L42.6 57.4 L39.6 57.6 Z" fill={NOIR.smoke} stroke={NOIR.ink} strokeWidth={0.4} />
   </>
 )
 
@@ -157,9 +175,9 @@ const SNARE = (
 )
 
 const KITS: Record<Profession, Kit> = {
-  engineer: { torso: COAT, sleeve: NOIR.smoke, backProp: NOTEBOOK, frontProp: PENCIL, head: FEDORA, trousers: NOIR.coal, hand: 'bare', band: false },
-  drummer: { torso: WAISTCOAT, sleeve: NOIR.paper, backProp: stick(16, 22), frontProp: stick(48, 42), head: FEDORA, trousers: NOIR.ink, hand: 'bare', band: false },
-  fighter: { torso: VEST, sleeve: SKIN, backProp: null, frontProp: null, head: MONGKHON, trousers: NOIR.ink, hand: 'glove', band: true },
+  engineer: { torso: SUIT, sleeve: NOIR.ash, forearm: NOIR.ash, backProp: NOTEBOOK, frontProp: PENCIL, head: FEDORA, trousers: { fill: NOIR.ash, crease: NOIR.smoke }, hand: 'bare', band: false },
+  drummer: { torso: WAISTCOAT, sleeve: NOIR.paper, forearm: SKIN, backProp: stick(16, 22), frontProp: stick(48, 42), head: FEDORA, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'bare', band: false },
+  fighter: { torso: VEST, sleeve: SKIN, forearm: SKIN, backProp: null, frontProp: null, head: MONGKHON, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'glove', band: true },
 }
 
 // ---- limbs ----
@@ -187,7 +205,7 @@ function Arm({ side, kit, dots, extra }: ArmProps) {
       {side === 'back' && <path d={arm.upper} fill={dots} />}
       {kit.band && <path d={side === 'front' ? 'M42.4 39 L47.6 39.4 L48 41.6 L42.8 41.4 Z' : 'M21.6 39 L16.4 39.4 L16 41.6 L21.2 41.4 Z'} fill={NOIR.paper} />}
       <g className={side === 'front' ? s.frontFore : s.backFore}>
-        <path d={arm.fore} fill={kit.sleeve === NOIR.smoke ? NOIR.smoke : SKIN} stroke={NOIR.ink} strokeWidth={0.6} />
+        <path d={arm.fore} fill={kit.forearm} stroke={NOIR.ink} strokeWidth={0.6} />
         {side === 'front' ? kit.frontProp : kit.backProp}
         <circle cx={hx} cy={hy} r={glove ? 3.6 : 2.6} fill={glove ? NOIR.red : SKIN} stroke={NOIR.ink} strokeWidth={0.6} />
         {extra}
@@ -196,25 +214,27 @@ function Arm({ side, kit, dots, extra }: ArmProps) {
   )
 }
 
-// The badge, held up in the front hand on a hover: a paper shield with an ink star, its flash behind.
+// The badge, held up in the front hand on a hover: the city police shield under its spread wing crest,
+// an ink star at its heart, its flash behind.
 const BADGE = (
   <g className={s.badge} transform="rotate(80 48 60)">
     <path className={s.flash} d="M48 48 L50 55 L57 52 L52.4 58 L59 62 L51.6 62.4 L53 70 L48 64.6 L43 70 L44.4 62.4 L37 62 L43.6 58 L39 52 L46 55 Z" fill={NOIR.paper} />
-    <path d="M44.6 56 L51.4 56 L51 61.6 L48 64.2 L45 61.6 Z" fill={NOIR.fog} stroke={NOIR.ink} strokeWidth={0.6} />
+    <path d="M43.6 55.4 Q46 53.8 48 55 Q50 53.8 52.4 55.4 L50.6 56.2 L45.4 56.2 Z" fill={NOIR.fog} stroke={NOIR.ink} strokeWidth={0.5} />
     <path d="M48 57.2 L48.8 59 L50.6 59 L49.2 60.2 L49.7 62 L48 60.9 L46.3 62 L46.8 60.2 L45.4 59 L47.2 59 Z" fill={NOIR.ink} />
   </g>
 )
 
-function Legs({ trousers }: { trousers: string }) {
+function Legs({ trousers }: { trousers: Trousers }) {
   return (
     <>
       <g className={s.backLeg}>
-        <path d="M22 62 L31 62 L30 89 L23 89 Z" fill={trousers} />
+        <path d="M22 62 L31 62 L30 89 L23 89 Z" fill={trousers.fill} />
+        <path d="M23 86.6 L30.1 86.6" stroke={trousers.crease} strokeWidth={0.5} />
         <path d="M21 88 L31 88 L32 92 L19.5 92 Q19.5 89 21 88 Z" fill={NOIR.ink} />
       </g>
       <g className={s.frontLeg}>
-        <path d="M33 62 L42 62 L41 89 L34 89 Z" fill={trousers} />
-        <path d="M37.5 64 L37.5 88" stroke={NOIR.ash} strokeWidth={0.5} />
+        <path d="M33 62 L42 62 L41 89 L34 89 Z" fill={trousers.fill} />
+        <path d="M37.5 64 L37.5 88 M33.9 86.6 L41.1 86.6" stroke={trousers.crease} strokeWidth={0.5} />
         <path d="M33 88 L43 88 Q45 89 45 92 L32.5 92 Z" fill={NOIR.ink} />
         <path d="M38 89.4 L43 89.6" stroke={NOIR.fog} strokeWidth={0.5} />
       </g>
