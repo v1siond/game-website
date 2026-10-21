@@ -24,6 +24,14 @@ export function professionFromSearch(search: string): Profession | null {
   return isProfession(value) ? value : null
 }
 
+// What a page load opens on: `?profession=` first, then the pick made earlier in this visit (the CV is its
+// own root layout, so going there and back reloads the page). Null means the default.
+export function professionOnLoad(search: string, visitPick: string | null): Profession | null {
+  const forced = professionFromSearch(search)
+  if (forced) return forced
+  return isProfession(visitPick) ? visitPick : null
+}
+
 // The neighbour one slot left (-1) or right (1), wrapping at both ends, for arrow key moves.
 export function stepProfession(current: Profession, step: -1 | 1): Profession {
   const count = PROFESSION_ORDER.length

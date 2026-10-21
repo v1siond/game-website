@@ -4,8 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useTransition, useEffect, useState, type ReactNode } from 'react'
 import { locales, localeNames, type Locale } from '@/i18n/config'
 
-// The one language switcher. It owns reading and writing the locale (cookie for the server, localStorage
-// as a fallback) and the refresh; a world that wants its own look passes `render` and draws the state.
+// The one language switcher. It owns reading and writing the locale cookie and the refresh; a world that
+// wants its own look passes `render` and draws the state. The cookie is the only store: it is what the
+// server renders from, so the picker can never name a language the page is not in.
 
 export interface LocaleSwitchState {
   currentLocale: Locale
@@ -28,9 +29,7 @@ function storedLocale(): Locale | null {
     .split('; ')
     .find((row) => row.startsWith('locale='))
     ?.split('=')[1]
-  if (isLocale(fromCookie)) return fromCookie
-  const fromStorage = localStorage.getItem('locale')
-  return isLocale(fromStorage) ? fromStorage : null
+  return isLocale(fromCookie) ? fromCookie : null
 }
 
 function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
@@ -69,7 +68,6 @@ export function LanguageSwitcher({ render = renderSelect }: LanguageSwitcherProp
   }, [])
 
   const changeLocale = (newLocale: Locale) => {
-    localStorage.setItem('locale', newLocale)
     document.cookie = `locale=${newLocale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}`
     setCurrentLocale(newLocale)
     startTransition(() => {

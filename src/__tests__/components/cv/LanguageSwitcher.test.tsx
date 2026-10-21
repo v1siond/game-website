@@ -76,14 +76,14 @@ describe('LanguageSwitcher', () => {
       expect(select).toHaveValue('it')
     })
 
-    it('saves selection to localStorage', async () => {
+    it('keeps the locale in the cookie only, never in localStorage', async () => {
       const user = userEvent.setup()
       render(<LanguageSwitcher />)
 
-      const select = screen.getByRole('combobox')
-      await user.selectOptions(select, 'es')
+      await user.selectOptions(screen.getByRole('combobox'), 'es')
 
-      expect(localStorage.setItem).toHaveBeenCalledWith('locale', 'es')
+      expect(document.cookie).toContain('locale=es')
+      expect(localStorage.setItem).not.toHaveBeenCalled()
     })
 
     it('sets cookie when language changes', async () => {
@@ -152,14 +152,12 @@ describe('LanguageSwitcher', () => {
       })
     })
 
-    it('reads initial locale from localStorage if no cookie', () => {
+    it('ignores localStorage when there is no cookie, as the server does', () => {
       ;(localStorage.getItem as jest.Mock).mockReturnValue('it')
 
       render(<LanguageSwitcher />)
 
-      waitFor(() => {
-        expect(screen.getByRole('combobox')).toHaveValue('it')
-      })
+      expect(screen.getByRole('combobox')).toHaveValue('en')
     })
 
     it('prefers cookie over localStorage', () => {

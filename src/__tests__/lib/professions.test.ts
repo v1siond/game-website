@@ -3,6 +3,7 @@ import {
   DEFAULT_PROFESSION,
   PROFESSION_LABELS,
   isProfession,
+  professionOnLoad,
   professionFromSearch,
   stepProfession,
 } from '@/lib/cv/professions'
@@ -54,5 +55,21 @@ describe('stepProfession', () => {
   it('wraps at both ends', () => {
     expect(stepProfession('drummer', -1)).toBe('fighter')
     expect(stepProfession('fighter', 1)).toBe('drummer')
+  })
+})
+
+describe('professionOnLoad', () => {
+  it('opens on the pick made earlier in this visit, so leaving for the CV and coming back keeps it', () => {
+    expect(professionOnLoad('', 'drummer')).toBe('drummer')
+  })
+
+  it('lets ?profession= win over the pick made in this visit', () => {
+    expect(professionOnLoad('?profession=fighter', 'drummer')).toBe('fighter')
+  })
+
+  it('has nothing to open on for a new visit, or for a stored value that is not a profession', () => {
+    expect(professionOnLoad('', null)).toBeNull()
+    expect(professionOnLoad('', 'wizard')).toBeNull()
+    expect(professionOnLoad('?profession=wizard', '')).toBeNull()
   })
 })

@@ -12,6 +12,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 describe('Profession Flow Integration', () => {
   beforeEach(() => {
     localStorage.clear()
+    sessionStorage.clear()
     jest.clearAllMocks()
   })
 

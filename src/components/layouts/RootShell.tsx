@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import "../../styles/globals.css";
-import { getLocale } from "next-intl/server";
 import ClientProviders from "../providers/ClientProviders";
 
 const silkScreen = localFont({
@@ -74,17 +73,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
-  children,
-}: Readonly<{
+interface RootShellProps {
+  lang: string;
   children: React.ReactNode;
-}>) {
-  // The locale next-intl resolved for this request (cookie, then Accept-Language), so screen readers
-  // and the browser read the translated /cv in the right language.
-  const locale = await getLocale();
+}
 
+/**
+ * The document every root layout renders: fonts, head and the world providers. The site and the CV are
+ * separate root layouts (route groups) only so each can set its own `lang`; everything else is this.
+ */
+export default function RootShell({ lang, children }: Readonly<RootShellProps>) {
   return (
-    <html lang={locale}>
+    <html lang={lang}>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

@@ -10,8 +10,8 @@ import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, type Theme, getThemeById } from '@
  * `_app`/`_document` and the game-engine routes, `src/app` had no `not-found`/`error`, so every miss
  * fell through to Next's own grey stock page in production and to the dev overlay in development.
  *
- * ONE component, six entry points (`app/not-found`, `app/error`, `app/global-error`, `pages/404`,
- * `pages/500`, `pages/_error`), so a 404 in the App Router and a 404 in the Pages Router are the same
+ * ONE component, six entry points (`app/(site)/not-found`, each route group's `error`, `app/global-error`,
+ * `pages/404`, `pages/500`, `pages/_error`), so a 404 in the App Router and a 404 in the Pages Router are the same
  * screen rather than two that drift.
  *
  * ## Why it reads the world itself instead of `useTheme()`

@@ -1,8 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
 
 // The e2e server runs on its own port and its own dist dir, so it never shares `.next` with the
-// :3000 dev server (a second next process writing the same dist dir breaks the first one).
-const PORT = 4100
+// :3000 dev server (a second next process writing the same dist dir breaks the first one). E2E_PORT
+// moves it when a parallel lane already holds 4100.
+const PORT = Number(process.env.E2E_PORT ?? 4100)
 const baseURL = `http://localhost:${PORT}`
 
 export default defineConfig({

@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import { render } from '@testing-library/react'
-import { CVContent } from '@/app/cv/CVContent'
+import { CVContent } from '@/app/(cv)/cv/CVContent'
 import type { Locale } from '@/i18n/config'
 
 // Sample test data that mirrors the real data structure

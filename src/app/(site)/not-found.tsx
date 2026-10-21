@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-/** App Router 404. Renders inside the root layout, so the world's providers are still around it. */
+/** App Router 404 for every unknown URL (see `[...missing]`). Renders inside the site layout, so the world's providers are still around it. */
 export default function NotFound() {
   return <NotFoundScreen />
 }

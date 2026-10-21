@@ -1,5 +1,5 @@
 import { screen, waitFor } from '@testing-library/react'
-import Home from '@/app/page'
+import Home from '@/app/(site)/page'
 import { render } from '../test-utils'
 
 // Mock the heavy themed layouts: we only care that the right *world* renders.
