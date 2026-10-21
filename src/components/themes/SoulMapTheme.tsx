@@ -2,14 +2,15 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // Color palette - Dark Souls authentic
 const COLORS = {
@@ -1243,32 +1244,6 @@ function Darksign({ size = 40 }: { size?: number }) {
     </div>
   )
 }
-
-// YOU DIED text effect - enhanced with authentic styling
-function YouDied({ show }: { show: boolean }) {
-  if (!show) return null
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none animate-you-died"
-      role="alert"
-      aria-live="assertive"
-    >
-      <div
-        className="text-6xl md:text-8xl font-serif tracking-[0.6em] uppercase"
-        style={{
-          color: COLORS.blood,
-          textShadow: `0 0 60px #ff0000, 0 0 120px ${COLORS.blood}`,
-          fontFamily: '"Cinzel", "Trajan Pro", serif',
-          filter: 'blur(0.3px)',
-        }}
-      >
-        YOU DIED
-      </div>
-    </div>
-  )
-}
-
 // Sword stuck in ground - rest point marker
 function SwordMarker() {
   return (
@@ -1350,46 +1325,42 @@ function MapFog() {
 }
 
 // Zone/Room node on the map - Dark Souls bonfire style
-function ZoneNode({
-  profession,
-  isActive,
-  isExplored,
-  onClick,
-  connections,
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  isActive: boolean
-  isExplored: boolean
-  onClick: () => void
-  connections: Array<{ direction: 'up' | 'down' | 'left' | 'right' }>
-}) {
-  const zones = {
-    engineer: { name: 'SYSTEM ENGINEER', icon: null, color: COLORS.bonfire, description: 'Senior Staff • CTO' },
-    drummer: { name: 'MUSICIAN', icon: null, color: '#9966ff', description: 'Professional Drummer' },
-    fighter: { name: 'MARTIAL ARTIST', icon: null, color: '#ff4444', description: 'BJJ Instructor' },
-  }
-  const zone = zones[profession]
+type Direction = 'up' | 'down' | 'left' | 'right'
+
+// Each zone keeps its own colour, a short plain sublabel and the stone paths to its neighbours. The
+// switch lays the zones out Musician, System Engineer, Martial Artist, so the engineer zone is the hub.
+const ZONES: Record<Profession, { color: string; description: string; connections: Direction[] }> = {
+  drummer: { color: '#9966ff', description: 'Drums', connections: ['right'] },
+  engineer: { color: COLORS.bonfire, description: 'Software', connections: ['left', 'right'] },
+  fighter: { color: '#ff4444', description: 'Muay Thai', connections: ['left'] },
+}
+
+const CONNECTION_PLACEMENT: Record<Direction, string> = {
+  up: '-top-[30px] left-1/2 w-[3px] h-[30px] -translate-x-1/2',
+  down: '-bottom-[30px] left-1/2 w-[3px] h-[30px] -translate-x-1/2',
+  left: '-left-[30px] top-1/2 w-[30px] h-[3px] -translate-y-1/2',
+  right: '-right-[30px] top-1/2 w-[30px] h-[3px] -translate-y-1/2',
+}
+
+function ZoneNode({ option, isExplored }: { option: ProfessionOption; isExplored: boolean }) {
+  const { id, label, selected: isActive, optionProps } = option
+  const zone = ZONES[id]
 
   return (
     <button
-      onClick={onClick}
-      className={`relative transition-all duration-500 ${
-        isActive ? 'scale-110 z-20' : 'hover:scale-105 opacity-70 hover:opacity-100'
+      type="button"
+      {...optionProps}
+      className={`relative transition-all duration-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6a00] ${
+        isActive ? 'scale-110 z-20' : 'hover:scale-105 opacity-80 hover:opacity-100'
       }`}
-      aria-label={`${zone.name} - ${zone.description}. ${isActive ? 'Currently active.' : ''} ${isExplored ? 'Explored.' : 'Unexplored.'}`}
-      aria-pressed={isActive}
     >
       {/* Connection lines - ancient stone paths */}
-      {connections.map((conn, i) => (
+      {zone.connections.map((direction) => (
         <div
-          key={i}
-          className="absolute"
+          key={direction}
+          className={`absolute ${CONNECTION_PLACEMENT[direction]}`}
           style={{
-            ...(conn.direction === 'up' && { top: '-30px', left: '50%', width: '3px', height: '30px', transform: 'translateX(-50%)' }),
-            ...(conn.direction === 'down' && { bottom: '-30px', left: '50%', width: '3px', height: '30px', transform: 'translateX(-50%)' }),
-            ...(conn.direction === 'left' && { left: '-30px', top: '50%', width: '30px', height: '3px', transform: 'translateY(-50%)' }),
-            ...(conn.direction === 'right' && { right: '-30px', top: '50%', width: '30px', height: '3px', transform: 'translateY(-50%)' }),
-            background: `linear-gradient(${conn.direction === 'left' || conn.direction === 'right' ? '90deg' : '180deg'}, transparent, ${COLORS.ash}80, transparent)`,
+            background: `linear-gradient(${direction === 'left' || direction === 'right' ? '90deg' : '180deg'}, transparent, ${COLORS.ash}80, transparent)`,
           }}
           aria-hidden="true"
         />
@@ -1397,7 +1368,7 @@ function ZoneNode({
 
       {/* Zone container - gothic stone frame */}
       <div
-        className="w-32 h-24 flex flex-col items-center justify-center relative"
+        className="w-36 h-24 flex flex-col items-center justify-center relative"
         style={{
           background: isActive
             ? `radial-gradient(ellipse at 50% 80%, ${zone.color}30, ${COLORS.stone} 70%)`
@@ -1409,31 +1380,29 @@ function ZoneNode({
             ? `0 0 40px ${zone.color}30, inset 0 0 30px ${zone.color}15`
             : 'inset 0 0 20px rgba(0,0,0,0.5)',
         }}
+        aria-hidden="true"
       >
         {/* Mini bonfire when active */}
         {isActive && (
-          <div className="absolute -top-8" aria-hidden="true">
+          <div className="absolute -top-8">
             <Bonfire size="small" />
           </div>
         )}
 
         {/* Zone icon - sword marker when not active */}
         {!isActive && isExplored && (
-          <div className="absolute -top-10 scale-50" aria-hidden="true">
+          <div className="absolute -top-10 scale-50">
             <SwordMarker />
           </div>
         )}
 
         <span
-          className="text-[9px] tracking-[0.3em] font-bold mt-2"
-          style={{ color: isActive ? zone.color : '#555045' }}
+          className="text-sm tracking-[0.15em] font-bold mt-2 uppercase text-center leading-tight"
+          style={{ color: isActive ? zone.color : '#8a8070' }}
         >
-          {zone.name}
+          {label}
         </span>
-        <span
-          className="text-sm tracking-wider mt-1"
-          style={{ color: isActive ? '#aaa' : '#444' }}
-        >
+        <span className="text-sm tracking-wider mt-1" style={{ color: isActive ? '#bbb' : '#777' }}>
           {zone.description}
         </span>
       </div>
@@ -1450,52 +1419,19 @@ function ZoneNode({
   )
 }
 
-// Impact statement for skills - NO 1-5 bars, shows achievements
-function SkillImpact({ name, impact, icon }: { name: string; impact: string; icon?: string }) {
-  return (
-    <div
-      className="flex items-start gap-3 py-3 border-b"
-      style={{ borderColor: '#1a1518' }}
-    >
-      <div
-        className="w-8 h-8 flex items-center justify-center flex-shrink-0 mt-0.5"
-        style={{
-          background: `${COLORS.bonfire}15`,
-          border: `1px solid ${COLORS.bonfire}40`,
-        }}
-      >
-        {icon ? (
-          <span className="text-sm">{icon}</span>
-        ) : (
-          <Darksign size={14} />
-        )}
-      </div>
-      <div className="flex-1">
-        <span className="text-xs font-bold tracking-wide block" style={{ color: COLORS.ember }}>
-          {name}
-        </span>
-        <span className="text-[11px] leading-relaxed block mt-1" style={{ color: '#a09080' }}>
-          {impact}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-// Save room style project card - Bonfire checkpoint with impact
-function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+// Save room style project card - bonfire checkpoint with his role, the years, the result and the links
+function SaveRoomCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
   return (
     <article
-      className="p-4 group cursor-pointer transition-all relative overflow-hidden"
+      className="h-full p-4 group transition-all relative overflow-hidden"
       style={{
         background: `linear-gradient(180deg, #12100f, #0a0908)`,
         border: `1px solid ${COLORS.ash}`,
       }}
-      aria-labelledby={`project-${project.id}`}
     >
       {/* Ember glow on hover */}
       <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
         style={{
           background: `radial-gradient(ellipse at 50% 100%, ${COLORS.bonfire}10, transparent 70%)`,
         }}
@@ -1503,9 +1439,9 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
       />
 
       {/* Save point indicator - small ember */}
-      <div className="flex items-center gap-2 mb-2 relative">
+      <div className="flex items-center gap-2 mb-1 relative">
         <div
-          className="w-3 h-3 rounded-full"
+          className="w-3 h-3 rounded-full flex-shrink-0"
           style={{
             background: project.featured
               ? `radial-gradient(circle, ${COLORS.gold}, ${COLORS.bonfire})`
@@ -1514,36 +1450,43 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
           }}
           aria-hidden="true"
         />
-        <h3
-          id={`project-${project.id}`}
-          className="text-sm tracking-wide"
-          style={{ color: project.featured ? '#ffaa66' : '#8a8070' }}
-        >
+        <h3 className="text-sm tracking-wide" style={{ color: project.featured ? '#ffaa66' : '#c0b0a0' }}>
           {project.name}
         </h3>
       </div>
-      <p className="text-sm mb-2 leading-relaxed" style={{ color: '#666050' }}>
+      <p className="text-sm mb-2 relative" style={{ color: COLORS.ember }}>
+        {project.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      <p className="text-sm mb-2 leading-relaxed relative" style={{ color: '#a09080' }}>
         {project.tagline}
       </p>
-      {/* Impact statement instead of just description */}
       {project.impact && (
-        <p className="text-[11px] mb-3 leading-relaxed" style={{ color: '#a09080' }}>
+        <p className="text-sm mb-3 leading-relaxed relative" style={{ color: '#b0a090' }}>
           {project.impact}
         </p>
       )}
-      <div className="flex gap-1 flex-wrap">
-        {project.techStack.slice(0, 3).map((tech) => (
+      <div className="flex gap-1 flex-wrap mb-3 relative">
+        {project.techStack.map((tech) => (
           <span
             key={tech}
             className="text-sm px-2 py-0.5 tracking-wide"
-            style={{
-              background: '#1a1815',
-              color: '#887860',
-              border: `1px solid ${COLORS.ash}`,
-            }}
+            style={{ background: '#1a1815', color: '#a09080', border: `1px solid ${COLORS.ash}` }}
           >
             {tech}
           </span>
+        ))}
+      </div>
+      <div className="flex flex-wrap gap-2 relative">
+        {links.map(({ kind, label, linkProps }) => (
+          <a
+            key={kind}
+            {...linkProps}
+            className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.15em] uppercase transition-all hover:bg-[#1a1815] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6a00] border border-[#ff6a00]/40 text-[#ff8c42] bg-[#252321]"
+          >
+            {label}
+          </a>
         ))}
       </div>
     </article>
@@ -1551,7 +1494,7 @@ function SaveRoomCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
 }
 
 // Company card - Dark Souls merchant style
-function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
+function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
@@ -1562,7 +1505,7 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
         background: `linear-gradient(180deg, #12100f, #0a0908)`,
         border: `1px solid ${COLORS.ash}`,
       }}
-      aria-label={`${company.name} - ${company.tagline}. ${company.description}`}
+      aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
     >
       {/* Hover glow */}
       <div
@@ -1576,13 +1519,13 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
       <div className="flex items-center gap-3 mb-2 relative">
         <span className="text-2xl" aria-hidden="true">{company.icon}</span>
         <div>
-          <h4 className="text-sm tracking-wide group-hover:text-orange-300 transition-colors" style={{ color: '#c0a080' }}>
+          <h3 className="text-sm tracking-wide group-hover:text-orange-300 transition-colors" style={{ color: '#c0a080' }}>
             {company.name}
-          </h4>
+          </h3>
           <p className="text-sm" style={{ color: COLORS.bonfire }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-xs leading-relaxed" style={{ color: '#666050' }}>{company.description}</p>
+      <p className="text-sm leading-relaxed relative" style={{ color: '#a09080' }}>{company.description}</p>
 
       {/* External link indicator */}
       <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity" aria-hidden="true">
@@ -1593,15 +1536,14 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
 }
 
 // Band card - Dark Souls covenant style
-function BandCard({ band }: { band: typeof BANDS[0] }) {
+function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <article
-      className="p-4 group transition-all relative overflow-hidden"
+      className="h-full p-4 group transition-all relative overflow-hidden"
       style={{
         background: `linear-gradient(180deg, #12100f, #0a0908)`,
         border: `1px solid ${COLORS.ash}`,
       }}
-      aria-label={`${band.name} - ${band.genre}, ${band.role}. ${band.description}`}
     >
       {/* Hover glow - purple for music */}
       <div
@@ -1612,27 +1554,35 @@ function BandCard({ band }: { band: typeof BANDS[0] }) {
         aria-hidden="true"
       />
 
-      <h4 className="text-sm tracking-wide group-hover:text-purple-300 transition-colors" style={{ color: '#b090d0' }}>
+      <h3 className="text-sm tracking-wide group-hover:text-purple-300 transition-colors relative" style={{ color: '#c0a0e0' }}>
         {band.name}
-      </h4>
-      <p className="text-sm mt-1" style={{ color: '#9966ff' }}>{band.genre} - {band.role}</p>
-      <p className="text-xs mt-2 leading-relaxed" style={{ color: '#666050' }}>{band.description}</p>
-      {!band.url && (
-        <p className="text-sm mt-2 italic" style={{ color: '#444' }}>Covenant forming...</p>
+      </h3>
+      <p className="text-sm mt-1 relative" style={{ color: '#b090ff' }}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      {band.release && (
+        <p className="text-sm mt-2 leading-relaxed relative" style={{ color: '#a09080' }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
       )}
     </article>
   )
 
-  if (band.url) {
-    return <a href={band.url} target="_blank" rel="noopener noreferrer" className="block">{content}</a>
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a {...linkProps} className="block h-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#9966ff]">
+      {content}
+    </a>
+  )
 }
 
-// Work experience card - Dark Souls item description style
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+// Work experience card - Dark Souls item description style. Dates are date only strings (UTC
+// midnight), so the year is read in UTC: a January start keeps its own year west of UTC.
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
     <article
@@ -1641,7 +1591,6 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
         background: `linear-gradient(180deg, #12100f, #0a0908)`,
         border: `1px solid ${COLORS.ash}`,
       }}
-      aria-label={`${entry.title} at ${entry.organization}, ${startDisplay} to ${endDisplay}`}
     >
       {/* Ember accent on left */}
       <div
@@ -1653,20 +1602,22 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
         aria-hidden="true"
       />
 
-      <div className="flex justify-between items-start mb-2 pl-3">
+      <div className="flex justify-between items-start gap-3 mb-2 pl-3">
         <div>
-          <h4 className="text-sm tracking-wide" style={{ color: '#c0a080' }}>{entry.title}</h4>
-          <p className="text-xs" style={{ color: COLORS.bonfire }}>{entry.organization}</p>
+          <h3 className="text-sm tracking-wide" style={{ color: '#c0a080' }}>{entry.title}</h3>
+          <p className="text-sm" style={{ color: COLORS.bonfire }}>{entry.company}</p>
         </div>
-        <span className="text-sm tracking-wide" style={{ color: '#666050' }}>
+        <span className="text-sm tracking-wide whitespace-nowrap" style={{ color: '#a09080' }}>
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-xs mb-2 pl-3 leading-relaxed" style={{ color: '#807060' }}>{entry.description}</p>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.description && (
+        <p className="text-sm mb-2 pl-3 leading-relaxed" style={{ color: '#a09080' }}>{entry.description}</p>
+      )}
+      {entry.highlights.length > 0 && (
         <ul className="pl-3 space-y-1" aria-label="Achievements">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#a09080' }}>
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: '#b0a090' }}>
               <span style={{ color: `${COLORS.bonfire}80` }} aria-hidden="true">◆</span>
               {highlight}
             </li>
@@ -1677,46 +1628,24 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
   )
 }
 
-// Tech stack for engineer - Dark Souls attribute style with impacts
-function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
-  // Impact statements for tech categories
-  const categoryImpacts: Record<string, string> = {
-    'Languages': 'Primary: Elixir & TypeScript. Built enterprise systems processing millions of transactions.',
-    'Backend Frameworks': 'Phoenix/Ash specialist. Architected multi-tenant SaaS platforms from scratch.',
-    'Frontend Frameworks': 'Full-stack delivery from React SPAs to LiveView real-time dashboards.',
-    'Databases': 'PostgreSQL performance tuning, complex migrations, data modeling at scale.',
-    'Cloud & DevOps': 'Kubernetes clusters, GitOps pipelines, infrastructure as code.',
-    'Integrations & APIs': 'Shopify, Stripe, Google Workspace - built production integrations used by thousands.',
-    'AI & Automation': 'Claude/GPT integrations, prompt engineering for production AI features.',
-  }
-
+// Tech stack for engineer - Dark Souls attribute style
+function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
-    <div className="space-y-6" role="list" aria-label="Technology categories">
+    <div className="space-y-6">
       {categories.map((category) => (
-        <div key={category.name} role="listitem">
+        <div key={category.id}>
           <div className="flex items-center gap-2 mb-2">
             <Darksign size={12} />
-            <h3 className="text-xs tracking-[0.2em]" style={{ color: '#886640' }}>
-              {category.name.toUpperCase()}
+            <h3 className="text-sm tracking-[0.2em] uppercase" style={{ color: '#b08850' }}>
+              {category.name}
             </h3>
           </div>
-          {/* Impact statement */}
-          {categoryImpacts[category.name] && (
-            <p className="text-[11px] mb-3 leading-relaxed" style={{ color: '#a09080' }}>
-              {categoryImpacts[category.name]}
-            </p>
-          )}
-          <div className="flex flex-wrap gap-2" role="list" aria-label={`${category.name} technologies`}>
+          <div className="flex flex-wrap gap-2">
             {category.items.map((tech) => (
               <span
                 key={tech}
-                role="listitem"
-                className="px-3 py-1 text-xs transition-all hover:scale-105 cursor-default"
-                style={{
-                  background: '#12100f',
-                  border: `1px solid ${COLORS.ash}`,
-                  color: '#a09080',
-                }}
+                className="px-3 py-1 text-sm transition-all hover:scale-105 cursor-default"
+                style={{ background: '#12100f', border: `1px solid ${COLORS.ash}`, color: '#a09080' }}
               >
                 {tech}
               </span>
@@ -1728,100 +1657,34 @@ function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSk
   )
 }
 
-// Skills display for drummer/fighter - with achievements, NO bars
-function SkillsDisplay({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
-  // Impact statements for skills
-  const skillImpacts: Record<string, string> = {
-    // Drummer
-    'Rock/Metal': 'Active in 3 metal/rock bands, studio recording experience',
-    'Progressive': 'Complex time signatures, dynamic arrangements with Eon',
-    'Latin/Salsa': 'Trained in authentic Latin rhythms and clave patterns',
-    'Jazz Fusion': 'Polyrhythmic independence, improvisational chops',
-    'Funk/Soul': 'Retrogroove founding member, deep pocket grooves',
-    'Double Bass': 'Clean, controlled double bass at 180+ BPM',
-    'Polyrhythms': '4 over 3, 5 over 4, layered independence',
-    'Odd Time Signatures': '7/8, 11/8, metric modulation proficiency',
-    'Ghost Notes': 'Dynamic control and subtle ghost note phrasing',
-    'Linear Drumming': 'No simultaneous hits, flowing single-surface patterns',
-    'Studio Recording': '15+ years, multiple album recordings',
-    'Live Touring': '7 years professional live performance',
-    'Session Work': 'Hired for studio sessions across genres',
-    'Music Production': 'Logic Pro, home studio setup',
-    // Fighter
-    'Muay Thai (3 years)': 'Clinch work, elbow/knee techniques, fight cardio',
-    'Brazilian Jiu-Jitsu (2 years)': 'Guard game, submissions, positional control',
-    'MMA (1 year)': 'Integrating striking with grappling transitions',
-    'Wrestling': 'Takedown defense, scrambles',
-    'Striking': 'Boxing fundamentals, Thai kicks, combinations',
-    'Clinch Work': 'Thai clinch control, dirty boxing',
-    'Ground Game': 'Top pressure, guard passing',
-    'Submissions': 'Triangle, armbar, RNC, guillotine',
-    'Fundamentals Instruction': 'Teaching beginners proper technique',
-    'Competition Prep': 'Preparing fighters for amateur bouts',
-    'Self Defense': 'Practical self-defense applications',
-    'Private Coaching': 'One-on-one skill development',
-  }
+// Mini-map component - Dark Souls style. The middle row is the zone row: Musician, System Engineer,
+// Martial Artist, the order the switch lays them out.
+const MINI_MAP_CELL: Record<Profession, number> = { drummer: 3, engineer: 4, fighter: 5 }
+const MINI_MAP_AREAS = ['', '', '', 'Musician', 'System Engineer', 'Martial Artist', '', '', '']
+
+function MiniMap({ active }: { active: Profession }) {
+  const currentCell = MINI_MAP_CELL[active]
 
   return (
-    <div className="space-y-6" role="list" aria-label="Skill categories">
-      {categories.map((category) => (
-        <div key={category.name} role="listitem">
-          <div className="flex items-center gap-2 mb-3">
-            {category.icon && <span className="text-lg" aria-hidden="true">{category.icon}</span>}
-            <h3 className="text-sm tracking-[0.2em]" style={{ color: '#886640' }}>
-              {category.name.toUpperCase()}
-            </h3>
-          </div>
-          <div className="space-y-0" role="list" aria-label={`${category.name} skills`}>
-            {category.skills.map((skill) => (
-              <SkillImpact
-                key={skill.name}
-                name={skill.name}
-                impact={skillImpacts[skill.name] || 'Developed through years of dedicated practice'}
-                icon={category.icon}
-              />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// Mini-map component - Dark Souls style
-function MiniMap({ active }: { active: string }) {
-  const positions = {
-    engineer: { x: 1, y: 1 },
-    drummer: { x: 2, y: 0 },
-    fighter: { x: 0, y: 2 },
-  }
-  const pos = positions[active as keyof typeof positions]
-
-  return (
-    <nav
+    <div
       className="fixed bottom-6 right-6 p-3 z-30"
       style={{
         background: `linear-gradient(180deg, ${COLORS.stone}ee, #05050899)`,
         border: `2px solid ${COLORS.ash}`,
         boxShadow: '0 0 20px rgba(0,0,0,0.8)',
       }}
-      aria-label="Navigation map"
+      aria-hidden="true"
     >
-      <div className="text-sm tracking-widest mb-2 text-center" style={{ color: '#666050' }}>
+      <div className="text-sm tracking-widest mb-2 text-center" style={{ color: '#888070' }}>
         LORDRAN
       </div>
-      <div className="grid grid-cols-3 gap-1" role="grid" aria-label="Area grid">
-        {Array.from({ length: 9 }).map((_, i) => {
-          const x = i % 3
-          const y = Math.floor(i / 3)
-          const isCurrent = pos.x === x && pos.y === y
-          const areaNames = ['', 'Drums', '', 'Fighter', 'Hub', 'Engineer', '', '', '']
+      <div className="grid grid-cols-3 gap-1">
+        {MINI_MAP_AREAS.map((area, cell) => {
+          const isCurrent = cell === currentCell
           return (
             <div
-              key={i}
-              role="gridcell"
-              aria-label={areaNames[i] || 'Empty area'}
-              aria-current={isCurrent ? 'location' : undefined}
+              key={cell}
+              title={area || undefined}
               className="w-4 h-4 relative"
               style={{
                 background: isCurrent
@@ -1832,7 +1695,7 @@ function MiniMap({ active }: { active: string }) {
               }}
             >
               {isCurrent && (
-                <div className="absolute inset-0 flex items-center justify-center" aria-hidden="true">
+                <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
                 </div>
               )}
@@ -1840,45 +1703,182 @@ function MiniMap({ active }: { active: string }) {
           )
         })}
       </div>
-    </nav>
-  )
-}
-
-// Current roles - Dark Souls covenant ranks
-function RolesDisplay() {
-  return (
-    <div className="flex flex-wrap justify-center gap-6" role="list" aria-label="Current positions">
-      {CURRENT_ROLES.map((role) => (
-        <div
-          key={role.id}
-          role="listitem"
-          className="text-center px-4 py-2 relative"
-          style={{
-            background: `linear-gradient(180deg, transparent, ${COLORS.bonfire}08)`,
-            borderBottom: `1px solid ${COLORS.bonfire}40`,
-          }}
-        >
-          <p className="text-xs tracking-[0.2em]" style={{ color: COLORS.bonfire }}>{role.title}</p>
-          <p className="text-sm mt-1" style={{ color: '#c0b0a0' }}>{role.company}</p>
-        </div>
-      ))}
     </div>
   )
 }
 
-export default function SoulMapTheme() {
-  const { active, setActive } = useProfession()
-  const [mounted, setMounted] = useState(false)
-  const [explored, setExplored] = useState<Set<string>>(new Set(['engineer']))
-  const [souls, setSouls] = useState(125890)
-  const [showDeath, setShowDeath] = useState(false)
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+const SM_BUTTON =
+  'inline-flex items-center justify-center gap-2 min-h-[44px] px-5 py-2 text-sm tracking-[0.2em] uppercase transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[#ff8c42]'
 
-  const aboutData = ABOUT_DATA[active]
-  const skills = getSkillsByProfession(active)
-  const engineerTech = getEngineerSkills()
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
+// Email is the lit bonfire action, LinkedIn the stone one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-gradient-to-b from-[#ff6a00] to-[#cc6600] text-[#0a0808] border-2 border-[#ff8c42] hover:scale-105',
+  linkedin: 'bg-[#252321] border border-[#ff6a00]/40 text-[#ff8c42] hover:bg-[#1a1815]',
+}
+
+function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+  return (
+    <>
+      {actions.map((action) => (
+        <a key={action.id} {...action.linkProps} className={`${SM_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+          {action.id === 'email' && <Darksign size={14} />}
+          {action.label}
+        </a>
+      ))}
+    </>
+  )
+}
+
+function SectionHeading({ id, color = COLORS.bonfire, children }: { id: string; color?: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <SwordMarker />
+      <h2 id={id} className="text-sm tracking-[0.3em] uppercase" style={{ color }}>
+        {children}
+      </h2>
+    </div>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerZone({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      {/* Bio panel - item description style */}
+      <StoneSectionCard className="mb-8" ariaLabelledby="about-heading">
+        <SectionHeading id="about-heading">About</SectionHeading>
+        <p className="text-sm leading-relaxed" style={{ color: '#b0a090' }}>
+          {professionalSummary.bio}
+        </p>
+      </StoneSectionCard>
+
+      {/* ART SECTION: Bonfire - after About, before Experience */}
+      <BonfireArtSection />
+
+      {sections.jobs.length > 0 && (
+        <StoneSectionCard className="mb-8" ariaLabelledby="experience-heading">
+          <SectionHeading id="experience-heading">Work Experience</SectionHeading>
+          <div className="space-y-3">
+            {sections.jobs.map((entry) => (
+              <ExperienceCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        </StoneSectionCard>
+      )}
+
+      {/* ART SECTION: Fog Gate - after Experience, before the stack */}
+      <FogGateArtSection />
+
+      <StoneSectionCard className="mb-8" ariaLabelledby="skills-heading">
+        <h2 id="skills-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2 uppercase" style={{ color: COLORS.bonfire }}>
+          <Darksign size={16} />
+          Tech Stack
+        </h2>
+        <TechCloud categories={sections.techStack} />
+      </StoneSectionCard>
+
+      {/* Save rooms / Projects */}
+      <section aria-labelledby="projects-heading" className="mb-8">
+        <h2 id="projects-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2 uppercase" style={{ color: '#88cc55' }}>
+          <span className="w-3 h-3 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: '0 0 10px #88cc55' }} aria-hidden="true" />
+          Projects
+        </h2>
+        <ProjectList
+          projects={sections.projects}
+          className="grid md:grid-cols-2 gap-3"
+          renderProject={(slot) => <SaveRoomCard slot={slot} />}
+        />
+      </section>
+
+      {/* ART SECTION: Praise the Sun - after Projects, before Ventures */}
+      <PraiseTheSunArtSection />
+
+      <section className="mt-8" aria-labelledby="companies-heading">
+        <FogGate />
+        <h2 id="companies-heading" className="text-sm tracking-[0.3em] mb-4 text-center uppercase" style={{ color: COLORS.bonfire }}>
+          Ventures
+        </h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          {sections.companies.map((company) => (
+            <CompanyCard key={company.id} company={company} />
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+function MusicianZone({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <BonfireArtSection />
+
+      <StoneSectionCard className="mb-8" ariaLabelledby="bands-heading" glowColor="#9966ff">
+        <SectionHeading id="bands-heading" color="#b090ff">Bands</SectionHeading>
+        <p className="text-sm mb-4" style={{ color: '#b0a090' }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandCard {...slot} />} />
+        <p className="text-sm mt-4 italic" style={{ color: '#c0b0a0' }}>{musician.line}</p>
+      </StoneSectionCard>
+
+      <PraiseTheSunArtSection />
+    </>
+  )
+}
+
+function MartialArtistZone({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <FogGateArtSection />
+
+      <StoneSectionCard className="mb-8" ariaLabelledby="muay-thai-heading" glowColor="#ff4444">
+        <SectionHeading id="muay-thai-heading" color="#ff7070">Muay Thai</SectionHeading>
+        <h3 className="text-base tracking-wider mb-4" style={{ color: '#c0a080' }}>{martialArts.primary.title}</h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+            fact: 'p-3 bg-[#12100f] border border-[#3a3633]',
+            term: 'text-sm tracking-[0.2em] uppercase text-[#ff8c42]',
+            value: 'text-sm mt-1 text-[#c0b0a0]',
+            achievements: 'space-y-1',
+            achievement: 'text-sm flex items-start gap-2 text-[#b0a090]',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span className="text-[#ff6a00]/80" aria-hidden="true">◆</span>
+              {achievement}
+            </>
+          )}
+        />
+      </StoneSectionCard>
+
+      <PraiseTheSunArtSection />
+    </>
+  )
+}
+
+function ProfessionZone({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianZone sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistZone sections={sections} />
+  return <EngineerZone sections={sections} />
+}
+
+export default function SoulMapTheme() {
+  const view = useWorldView()
+  const active = view.profession
+  const [mounted, setMounted] = useState(false)
+  const [explored, setExplored] = useState<ReadonlySet<Profession>>(new Set([active]))
+  const [souls, setSouls] = useState(125890)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -1898,10 +1898,10 @@ export default function SoulMapTheme() {
     return () => clearInterval(interval)
   }, [prefersReducedMotion])
 
-  const handleZoneClick = (prof: 'engineer' | 'drummer' | 'fighter') => {
-    setActive(prof)
-    setExplored(prev => new Set([...prev, prof]))
-  }
+  // A zone counts as explored once its profession has been picked.
+  useEffect(() => {
+    setExplored((seen) => (seen.has(active) ? seen : new Set([...seen, active])))
+  }, [active])
 
   if (!mounted) return null
 
@@ -1934,9 +1934,6 @@ export default function SoulMapTheme() {
       {/* Souls counter */}
       <SoulsCounter count={souls} />
 
-      {/* YOU DIED overlay */}
-      <YouDied show={showDeath} />
-
       {/* Scattered bloodstains */}
       <Bloodstain className="fixed top-32 left-[10%] z-[1]" />
       <Bloodstain className="fixed top-[60%] right-[15%] z-[1] rotate-45" />
@@ -1947,102 +1944,64 @@ export default function SoulMapTheme() {
       <HollowKnight variant="kneeling" className="fixed bottom-[30%] right-[8%] z-[1]" />
       <HollowKnight variant="combat" className="fixed top-[45%] right-[3%] z-[1]" />
 
-      {/* Header with Darksign */}
+      {/* Header with Darksign, the recruiter first screen */}
       <header className="relative z-30 p-6" role="banner">
-        <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div className="flex items-center gap-4">
-            <Darksign size={50} />
-            <div>
-              <h1
-                className="text-3xl tracking-[0.4em]"
-                style={{
-                  color: '#c0a060',
-                  textShadow: `0 0 30px ${COLORS.bonfire}30`,
-                }}
-              >
-                ALEXANDER PULIDO
-              </h1>
-              <p className="text-sm mt-1 tracking-wider" style={{ color: '#888060' }}>
-                {PROFESSIONAL_SUMMARY[active].headline}
-              </p>
-              <p className="text-xs mt-1 italic tracking-wide" style={{ color: COLORS.bonfire }}>
-                {PROFESSIONAL_SUMMARY[active].tagline}
-              </p>
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-start gap-4">
+              <div className="flex items-center gap-4 min-w-0">
+                <Darksign size={50} />
+                <div className="min-w-0">
+                  <h1
+                    className="text-2xl sm:text-3xl tracking-[0.3em] uppercase"
+                    style={{ color: '#c0a060', textShadow: `0 0 30px ${COLORS.bonfire}30` }}
+                  >
+                    {name}
+                  </h1>
+                  <p className="text-sm mt-1 tracking-wider" style={{ color: '#b0a080' }}>
+                    {headline}
+                  </p>
+                  <p className="text-sm mt-1 italic tracking-wide" style={{ color: COLORS.ember }}>
+                    {tagline}
+                  </p>
+                  <p className="text-sm mt-1" style={{ color: '#c0b0a0' }}>{line}</p>
+                </div>
+              </div>
+
+              <nav className="flex flex-wrap gap-3 items-center" aria-label="Contact and CV">
+                <EstusFlask charges={5} maxCharges={5} />
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${SM_BUTTON} bg-[#252321] border border-[#ff6a00]/40 text-[#ff8c42] hover:bg-[#1a1815]`}>
+                  Resume
+                </Link>
+                <Link
+                  href="/personal-projects/game-engine"
+                  className={`${SM_BUTTON} bg-gradient-to-b from-[#ff6a00] to-[#cc6600] text-[#0a0808]`}
+                >
+                  Explore
+                </Link>
+              </nav>
             </div>
-          </div>
-
-          <div className="flex gap-3 items-center">
-            <EstusFlask charges={5} maxCharges={5} />
-            <Link
-              href="/cv"
-              className="px-4 py-2 text-xs tracking-[0.2em] transition-all hover:bg-[#1a1815]"
-              style={{
-                background: COLORS.stone,
-                border: `1px solid ${COLORS.bonfire}40`,
-                color: COLORS.bonfire,
-              }}
-              aria-label="View CV - Rest at bonfire"
-            >
-              REST
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="px-4 py-2 text-xs tracking-[0.2em] transition-all"
-              style={{
-                background: `linear-gradient(180deg, ${COLORS.bonfire}, #cc6600)`,
-                color: '#0a0808',
-              }}
-              aria-label="Explore game engine project"
-            >
-              EXPLORE
-            </Link>
-          </div>
-        </div>
+          )}
+        />
       </header>
-
-      {/* Current Roles / Covenants */}
-      <section className="relative z-20 py-6 px-6" aria-label="Current positions">
-        <div className="max-w-6xl mx-auto">
-          <RolesDisplay />
-        </div>
-      </section>
 
       {/* Fog Gate divider */}
       <FogGate />
 
       {/* Map navigation with bonfire */}
-      <section className="relative z-20 py-8" aria-label="Profession selection">
-        <div className="flex justify-center items-center gap-8">
-          <ZoneNode
-            profession="drummer"
-            isActive={active === 'drummer'}
-            isExplored={explored.has('drummer')}
-            onClick={() => handleZoneClick('drummer')}
-            connections={[{ direction: 'down' }]}
-          />
+      <section className="relative z-20 py-8" aria-label="Select profession">
+        <div className="flex justify-center mb-12">
+          <Bonfire size="normal" label="Central bonfire, hub area" />
         </div>
-        <div className="flex justify-center items-center gap-12 mt-12">
-          <ZoneNode
-            profession="fighter"
-            isActive={active === 'fighter'}
-            isExplored={explored.has('fighter')}
-            onClick={() => handleZoneClick('fighter')}
-            connections={[{ direction: 'right' }]}
-          />
-          <div className="w-24 flex justify-center">
-            <Bonfire size="normal" label="Central bonfire - hub area" />
-          </div>
-          <ZoneNode
-            profession="engineer"
-            isActive={active === 'engineer'}
-            isExplored={explored.has('engineer')}
-            onClick={() => handleZoneClick('engineer')}
-            connections={[{ direction: 'left' }, { direction: 'up' }]}
-          />
-        </div>
+        <ProfessionSwitch
+          className="flex flex-wrap justify-center items-center gap-12 px-4"
+          label="Profession selector"
+          renderOption={(option) => <ZoneNode option={option} isExplored={explored.has(option.id)} />}
+        />
 
         {/* Praise the Sun decoration */}
-        <div className="flex justify-center mt-8">
+        <div className="flex justify-center mt-12">
           <PraiseTheSun size={60} />
         </div>
       </section>
@@ -2051,124 +2010,9 @@ export default function SoulMapTheme() {
       <FogGate />
 
       {/* Zone info */}
-      <main id="main-content" className="relative z-20 px-6 py-8" role="main">
+      <main id="main-content" className="relative z-20 px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          {/* Bio panel - item description style */}
-          <StoneSectionCard className="mb-8" ariaLabelledby="about-heading">
-            <div className="flex items-center gap-2 mb-4">
-              <SwordMarker />
-              <h2 id="about-heading" className="text-sm tracking-[0.3em]" style={{ color: COLORS.bonfire }}>
-                ABOUT
-              </h2>
-            </div>
-            <p className="text-sm leading-relaxed" style={{ color: '#a09080' }}>
-              {aboutData.bio}
-            </p>
-            <div className="flex gap-2 mt-4 flex-wrap" role="list" aria-label="Quick facts">
-              {aboutData.quickFacts.map((fact, i) => (
-                <span
-                  key={i}
-                  role="listitem"
-                  className="text-sm px-3 py-1 tracking-wide"
-                  style={{
-                    background: '#1a1815',
-                    color: '#887860',
-                    border: `1px solid ${COLORS.ash}`,
-                  }}
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </StoneSectionCard>
-
-          {/* ART SECTION: Bonfire - after About, before Experience */}
-          <BonfireArtSection />
-
-          {/* Work Experience Section */}
-          {experience.length > 0 && (
-            <StoneSectionCard className="mb-8" ariaLabelledby="experience-heading">
-              <div className="flex items-center gap-2 mb-4">
-                <SwordMarker />
-                <h2 id="experience-heading" className="text-sm tracking-[0.3em]" style={{ color: COLORS.bonfire }}>
-                  WORK EXPERIENCE
-                </h2>
-              </div>
-              <div className="space-y-3" role="list">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </StoneSectionCard>
-          )}
-
-          {/* ART SECTION: Fog Gate - after Experience, before Skills */}
-          <FogGateArtSection />
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Abilities / Tech Stack */}
-            <StoneSectionCard
-              ariaLabelledby="skills-heading"
-              glowColor={active === 'drummer' ? '#9966ff' : active === 'fighter' ? '#ff4444' : COLORS.bonfire}
-            >
-              <h2 id="skills-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: COLORS.bonfire }}>
-                <Darksign size={16} />
-                {active === 'engineer' ? 'TECH STACK' : 'SKILLS'}
-              </h2>
-
-              {active === 'engineer' ? (
-                <TechCloud categories={engineerTech} />
-              ) : (
-                <SkillsDisplay categories={skills} />
-              )}
-            </StoneSectionCard>
-
-            {/* Save rooms / Projects */}
-            <section aria-labelledby="projects-heading">
-              <h2 id="projects-heading" className="text-sm tracking-[0.3em] mb-4 flex items-center gap-2" style={{ color: '#88cc55' }}>
-                <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" style={{ boxShadow: '0 0 10px #88cc55' }} aria-hidden="true" />
-                FEATURED WORK
-              </h2>
-              <div className="space-y-2" role="list">
-                {projects.slice(0, 4).map((project) => (
-                  <SaveRoomCard key={project.id} project={project} />
-                ))}
-              </div>
-            </section>
-          </div>
-
-          {/* ART SECTION: Praise the Sun - after Projects, before Ventures */}
-          <PraiseTheSunArtSection />
-
-          {/* Companies (Engineer) */}
-          {active === 'engineer' && (
-            <section className="mt-8" aria-labelledby="companies-heading">
-              <FogGate />
-              <h2 id="companies-heading" className="text-sm tracking-[0.3em] mb-4 text-center" style={{ color: COLORS.bonfire }}>
-                VENTURES
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4" role="list">
-                {COMPANIES.map((company) => (
-                  <CompanyCard key={company.id} company={company} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Bands (Drummer) */}
-          {active === 'drummer' && (
-            <section className="mt-8" aria-labelledby="bands-heading">
-              <FogGate />
-              <h2 id="bands-heading" className="text-sm tracking-[0.3em] mb-4 text-center" style={{ color: '#9966ff' }}>
-                BANDS
-              </h2>
-              <div className="grid md:grid-cols-3 gap-4" role="list">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </section>
-          )}
+          <ProfessionZone sections={view.sections} />
         </div>
       </main>
 
@@ -2177,45 +2021,25 @@ export default function SoulMapTheme() {
 
       {/* Contact CTA */}
       <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <h2 className="text-sm tracking-[0.4em] mb-3" style={{ color: COLORS.bonfire }}>
-              READY TO WORK TOGETHER?
-            </h2>
-            <p className="text-xs tracking-wide" style={{ color: '#a09080' }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="px-6 py-3 text-xs tracking-[0.2em] flex items-center justify-center gap-2 transition-all hover:scale-105"
-              style={{
-                background: `linear-gradient(180deg, ${COLORS.bonfire}, #cc6600)`,
-                color: '#0a0808',
-                border: `2px solid ${COLORS.ember}`,
-                boxShadow: `0 0 20px ${COLORS.bonfire}40`,
-              }}
-            >
-              <Darksign size={14} />
-              GET IN TOUCH
-            </a>
-            <Link
-              href="/cv"
-              className="px-6 py-3 text-xs tracking-[0.2em] flex items-center justify-center gap-2 transition-all hover:bg-[#1a1815]"
-              style={{
-                background: COLORS.stone,
-                border: `1px solid ${COLORS.bonfire}40`,
-                color: COLORS.bonfire,
-              }}
-            >
-              DOWNLOAD CV
-            </Link>
-          </div>
-        </div>
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <h2 className="text-sm tracking-[0.4em] mb-3 uppercase" style={{ color: COLORS.bonfire }}>
+                  Get In Touch
+                </h2>
+                <p className="text-sm tracking-wide" style={{ color: '#b0a090' }}>{line}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${SM_BUTTON} bg-[#252321] border border-[#ff6a00]/40 text-[#ff8c42] hover:bg-[#1a1815]`}>
+                  Download CV
+                </Link>
+              </div>
+            </div>
+          )}
+        />
       </section>
-
-      
 
       {/* Footer */}
       <footer className="relative z-20 py-12 text-center" role="contentinfo">
@@ -2224,7 +2048,7 @@ export default function SoulMapTheme() {
           <Bonfire size="small" label="Footer bonfire" />
           <div className="w-12 h-px" style={{ background: `linear-gradient(90deg, ${COLORS.ash}, transparent)` }} aria-hidden="true" />
         </div>
-        <p className="text-sm tracking-[0.4em] mt-4" style={{ color: '#444030' }}>
+        <p className="text-sm tracking-[0.4em] mt-4" style={{ color: '#888070' }}>
           EXPLORATION: {Math.round((explored.size / 3) * 100)}% • MMXXVI
         </p>
       </footer>
