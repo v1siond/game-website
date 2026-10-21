@@ -6,6 +6,7 @@ import { DARK_FANTASY } from '@/components/themes/DarkFantasy/palette'
 import { NOIR } from '@/components/themes/BoldNoir/palette'
 import { CEL } from '@/components/themes/CellShaded/palette'
 import { FS } from '@/components/themes/FighterSelect/palette'
+import { REALM } from '@/components/themes/MedievalFantasy/palette'
 import { MYTH } from '@/components/themes/Mythic/palette'
 import { NEON } from '@/components/themes/NeonCyber/palette'
 import { PORTAL } from '@/components/themes/NeonPortals/palette'
@@ -537,17 +538,17 @@ export const themes: Theme[] = [
     name: 'Medieval Fantasy',
     description: 'RTS fantasy - gold accents, stone frames, parchment',
     colors: {
-      background: '#0a0805',
-      backgroundGradient: 'linear-gradient(to bottom, #151210, #0a0805)',
-      accent: '#ffd100',
-      text: '#e8dcc4',
-      textMuted: '#a09080',
-      secondary: '#0066cc',
-      highlight: '#ffdd44',
-      border: '#6b5a4a',
-      borderHover: '#ffd100',
-      surface: '#1a1510',
-      surfaceHover: '#252015',
+      background: REALM.bgDeep,
+      backgroundGradient: `linear-gradient(to bottom, ${REALM.bgDeep}, ${REALM.bgVoid})`,
+      accent: REALM.goldBright,
+      text: REALM.textBright,
+      textMuted: REALM.textMid,
+      secondary: REALM.allianceBlue,
+      highlight: REALM.goldBright,
+      border: REALM.metalLight,
+      borderHover: REALM.goldBright,
+      surface: REALM.metalDark,
+      surfaceHover: REALM.metalMid,
     },
     font: 'serif',
     effects: {
