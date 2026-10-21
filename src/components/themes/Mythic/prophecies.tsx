@@ -1,19 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Labels } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
 import { SpartanSprite, type SpriteMotion } from './sprite'
+import { FOE } from './foes'
+import { MOVES } from './rig'
+import { useTrack } from './track'
+import { MYTH } from './palette'
 import { nextStrike, type Strike } from './fates'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { SlabButton } from './buttons'
 import u from './underworld.module.css'
 
-// Muay Thai in the arena of the green fields: he stands in his shorts, wraps and mongkhon, and Strike
-// throws his next move (knee, elbow, kick, then the rage roar, and round again), the move's name called
-// over the arena as it lands. Beside him the record is the stone tablet of facts and his achievements are
+// Muay Thai in the arena of the green fields: he stands in his shorts, wraps and mongkhon facing the
+// one eyed giant with the bronze shield, and Strike throws his next move (knee, elbow, kick, then the
+// rage roar, and round again), the move's name called over the arena as it lands. Each strike staggers
+// the giant back behind his shield as it lands; the roar makes his eye flare and him cower. Beside him the record is the stone tablet of facts and his achievements are
 // the prophecies on the list, each stamped fulfilled in turn when the stage first shows.
 
 const STRIKE_NAME: Record<Strike, (labels: Labels['myth']) => string> = {
@@ -21,6 +26,61 @@ const STRIKE_NAME: Record<Strike, (labels: Labels['myth']) => string> = {
   elbow: (myth) => myth.strikeElbow,
   kick: (myth) => myth.strikeKick,
   roar: (myth) => myth.strikeRoar,
+}
+
+const SCENE = { width: 252, height: 200 }
+const HIM = { x: 0, y: 8, height: 188 }
+const GIANT = { x: 100, y: 36, scale: 2 }
+
+// The giant's answer to each strike, over the strike's own length: the blow lands about halfway.
+const stagger = (lean: number, push: number): Keyframe[] => [
+  { offset: 0, transform: 'none' },
+  { offset: 0.42, transform: 'none' },
+  { offset: 0.55, transform: `translate(${push}px, -2px) rotate(${lean}deg)` },
+  { offset: 0.8, transform: `translate(${push / 3}px, 0) rotate(${lean / 3}deg)` },
+  { offset: 1, transform: 'none' },
+]
+
+const GIANT_TRACK: Record<Strike, Keyframe[]> = {
+  knee: stagger(8, 12),
+  elbow: stagger(5, 9),
+  kick: stagger(10, 16),
+  roar: [
+    { offset: 0, transform: 'none' },
+    { offset: 0.3, transform: 'translate(10px, 4px) scale(0.96)' },
+    { offset: 0.8, transform: 'translate(10px, 4px) scale(0.96)' },
+    { offset: 1, transform: 'none' },
+  ],
+}
+
+const EYE_TRACK: Record<Strike, Keyframe[]> = {
+  knee: [{ opacity: 0 }, { opacity: 0 }],
+  elbow: [{ opacity: 0 }, { opacity: 0 }],
+  kick: [{ opacity: 0 }, { opacity: 0 }],
+  roar: [
+    { offset: 0, opacity: 0 },
+    { offset: 0.3, opacity: 1 },
+    { offset: 0.8, opacity: 1 },
+    { offset: 1, opacity: 0 },
+  ],
+}
+
+const Giant = FOE.cyclops
+
+function Ring({ strike, take }: { strike: Strike; take: number }) {
+  const giantRef = useRef<SVGGElement>(null)
+  const eyeRef = useRef<SVGCircleElement>(null)
+  useTrack(giantRef, GIANT_TRACK[strike], MOVES[strike].ms, take)
+  useTrack(eyeRef, EYE_TRACK[strike], MOVES[strike].ms, take)
+
+  return (
+    <g ref={giantRef} className={`${u.sceneProp} ${u.giant}`}>
+      <g transform={`translate(${GIANT.x} ${GIANT.y}) scale(${GIANT.scale})`}>
+        <Giant />
+        <circle ref={eyeRef} cx={30} cy={13} r={6} fill={MYTH.giantEye} opacity={0} className={u.sceneProp} />
+      </g>
+    </g>
+  )
 }
 
 function Arena() {
@@ -43,9 +103,11 @@ function Arena() {
           </span>
         )}
       </p>
-      <div className="h-64 w-52" aria-hidden="true">
-        <SpartanSprite key={take} profession="fighter" motion={pose} onDone={settle} className="h-full w-full" />
-      </div>
+      <svg viewBox={`0 0 ${SCENE.width} ${SCENE.height}`} className="h-64 w-full max-w-[19rem]" aria-hidden="true">
+        <path d={`M0 ${SCENE.height - 6} L${SCENE.width} ${SCENE.height - 6}`} stroke={MYTH.goldDeep} strokeWidth={3} />
+        <Ring strike={last ?? 'knee'} take={last ? take : 0} />
+        <SpartanSprite key={take} profession="fighter" motion={pose} place={HIM} onDone={settle} />
+      </svg>
       <SlabButton tone="blood" className="mt-4" onClick={strike}>
         {myth.strike}
       </SlabButton>

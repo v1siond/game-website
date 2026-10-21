@@ -477,6 +477,13 @@
   transform-origin: 50% 50%;
 }
 
+/* ---------------------------------------------------------------- the giant (prophecies.tsx) */
+
+/* He rocks back on his heels: the turn is about his feet. */
+.giant {
+  transform-origin: 174px 192px;
+}
+
 /* ---------------------------------------------------------------- the boons (boons.tsx) */
 
 .boon[data-rarity='common'] { --rarity: var(--myth-common); }
