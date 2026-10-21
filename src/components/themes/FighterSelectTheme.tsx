@@ -1,16 +1,17 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // =============================================================================
 // EXACT COLOR PALETTE - STREET FIGHTER / MORTAL KOMBAT / TEKKEN INSPIRED
@@ -435,260 +436,6 @@ function ArcadeText({
   )
 }
 
-// =============================================================================
-// HEALTH BAR - SEGMENTED WITH GLOW
-// =============================================================================
-function HealthBar({
-  label,
-  value,
-  maxValue = 100,
-  color,
-  reverse = false,
-}: {
-  label: string
-  value: number
-  maxValue?: number
-  color: string
-  reverse?: boolean
-}) {
-  const percentage = Math.min((value / maxValue) * 100, 100)
-  const id = `health-bar-${label.toLowerCase().replace(/\s/g, '-')}`
-
-  // Determine color based on percentage
-  const fillColor = percentage > 60 ? color : percentage > 30 ? COLORS.electricYellow : COLORS.p2Red
-
-  return (
-    <div
-      className={`flex items-center gap-4 ${reverse ? 'flex-row-reverse' : ''}`}
-      role="meter"
-      aria-labelledby={id}
-      aria-valuenow={value}
-      aria-valuemin={0}
-      aria-valuemax={maxValue}
-    >
-      <span
-        id={id}
-        className="text-sm font-black tracking-wider w-28 uppercase"
-        style={{
-          fontFamily: '"Impact", "Arial Black", sans-serif',
-          color,
-          textAlign: reverse ? 'right' : 'left',
-          textShadow: `0 0 8px ${color}80`,
-        }}
-      >
-        {label}
-      </span>
-
-      <div
-        className="flex-1 h-8 relative"
-        style={{
-          background: `linear-gradient(180deg, ${COLORS.arcadeBlack}, ${COLORS.arcadeGray}, ${COLORS.arcadeBlack})`,
-          border: `3px solid ${color}80`,
-          borderRadius: '2px',
-          boxShadow: `inset 0 3px 10px rgba(0,0,0,0.9), 0 0 8px ${color}40`,
-        }}
-      >
-        {/* Health fill - immediate, no animation */}
-        <div
-          className="absolute top-0 bottom-0"
-          style={{
-            left: reverse ? 'auto' : 0,
-            right: reverse ? 0 : 'auto',
-            width: `${percentage}%`,
-            background: `linear-gradient(180deg, ${fillColor}, ${fillColor}cc, ${fillColor}88)`,
-            boxShadow: `0 0 20px ${fillColor}99, inset 0 2px 0 rgba(255,255,255,0.5)`,
-          }}
-        />
-
-        {/* Segment dividers - 10 segments */}
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div
-            key={i}
-            className="absolute top-0 bottom-0 w-0.5"
-            aria-hidden="true"
-            style={{
-              left: `${(i + 1) * 10}%`,
-              background: 'rgba(0,0,0,0.6)',
-            }}
-          />
-        ))}
-
-        {/* Top shine highlight */}
-        <div
-          className="absolute inset-x-0 top-0 h-1/3 opacity-40"
-          aria-hidden="true"
-          style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.5), transparent)' }}
-        />
-      </div>
-
-      <span
-        className="text-sm font-black w-14 tabular-nums"
-        style={{
-          fontFamily: '"Impact", "Arial Black", sans-serif',
-          color: fillColor,
-          textShadow: `0 0 8px ${fillColor}`,
-        }}
-      >
-        {value}%
-      </span>
-    </div>
-  )
-}
-
-// =============================================================================
-// COMBO COUNTER - HIT NUMBERS
-// =============================================================================
-function ComboCounter({ hits, label }: { hits: number; label: string }) {
-  return (
-    <div
-      className="inline-flex items-center gap-3 px-4 py-2"
-      role="status"
-      aria-label={`${hits} ${label}`}
-      style={{
-        background: `linear-gradient(180deg, rgba(0,0,0,0.9), rgba(0,0,0,0.7))`,
-        border: `3px solid ${COLORS.neonPink}`,
-        borderRadius: '4px',
-        boxShadow: `0 0 15px ${COLORS.neonPink}60, inset 0 0 20px rgba(0,0,0,0.5)`,
-      }}
-    >
-      <span
-        className="text-4xl font-black tabular-nums"
-        style={{
-          fontFamily: '"Impact", "Arial Black", sans-serif',
-          color: COLORS.gold,
-          textShadow: `0 0 10px ${COLORS.gold}, 0 0 20px ${COLORS.orange}`,
-        }}
-      >
-        {hits}
-      </span>
-      <div className="flex flex-col">
-        <span
-          className="text-xs tracking-[0.3em] uppercase"
-          style={{ color: COLORS.neonPink }}
-        >
-          {label}
-        </span>
-        <ArcadeText text="HITS!" type="combo" size="sm" />
-      </div>
-    </div>
-  )
-}
-
-// =============================================================================
-// SPECIAL MOVE INPUT DISPLAY - ARCADE JOYSTICK NOTATION
-// =============================================================================
-function SpecialMoveInput({ name, input }: { name: string; input: string }) {
-  // Parse input notation
-  const renderInput = (notation: string) => {
-    const parts = notation.split(/([↓↑←→]|[PKL])/g).filter(Boolean)
-
-    return parts.map((char, i) => {
-      const isDirection = ['↓', '↑', '←', '→'].includes(char)
-      const isButton = ['P', 'K', 'L'].includes(char)
-
-      if (isDirection) {
-        return (
-          <span
-            key={i}
-            className="inline-flex items-center justify-center w-7 h-7 text-sm font-bold"
-            style={{
-              background: `radial-gradient(circle at 40% 35%, ${COLORS.arcadeGray}, ${COLORS.arcadeBlack})`,
-              border: `2px solid ${COLORS.chromeDark}`,
-              borderRadius: '50%',
-              boxShadow: 'inset 0 2px 3px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.5)',
-              color: COLORS.electricYellow,
-            }}
-          >
-            {char}
-          </span>
-        )
-      }
-
-      if (isButton) {
-        const buttonColor = char === 'P' ? COLORS.p1Blue : char === 'K' ? COLORS.p2Red : COLORS.healthGreen
-        return (
-          <span
-            key={i}
-            className="inline-flex items-center justify-center w-7 h-7 text-sm font-black"
-            style={{
-              background: `radial-gradient(circle at 40% 35%, ${buttonColor}, ${buttonColor}cc)`,
-              border: `2px solid ${COLORS.arcadeGray}`,
-              borderRadius: '50%',
-              boxShadow: `inset 0 2px 3px rgba(255,255,255,0.4), 0 0 8px ${buttonColor}60`,
-              color: '#FFF',
-              textShadow: '0 1px 2px rgba(0,0,0,0.5)',
-            }}
-          >
-            {char}
-          </span>
-        )
-      }
-
-      return (
-        <span key={i} className="text-xs" style={{ color: COLORS.chrome }}>
-          {char}
-        </span>
-      )
-    })
-  }
-
-  return (
-    <div
-      className="flex items-center justify-between px-4 py-3 group"
-      style={{
-        background: `linear-gradient(90deg, ${COLORS.arcadeGray}cc, ${COLORS.arcadeGray}60)`,
-        borderLeft: `4px solid ${COLORS.specialBlue}`,
-        borderBottom: `1px solid ${COLORS.arcadeGray}`,
-      }}
-    >
-      <span
-        className="text-sm font-medium"
-        style={{ color: COLORS.chrome }}
-      >
-        {name}
-      </span>
-      <div className="flex gap-1 items-center">{renderInput(input)}</div>
-    </div>
-  )
-}
-
-// =============================================================================
-// ROUND INDICATORS - WIN DOTS
-// =============================================================================
-function RoundIndicators({
-  wins,
-  maxWins = 2,
-  side,
-}: {
-  wins: number
-  maxWins?: number
-  side: 'left' | 'right'
-}) {
-  return (
-    <div
-      className={`flex gap-2 ${side === 'right' ? 'justify-end' : ''}`}
-      role="status"
-      aria-label={`${wins} rounds won`}
-    >
-      {Array.from({ length: maxWins }).map((_, i) => (
-        <div
-          key={i}
-          className="w-5 h-5 rounded-full"
-          aria-hidden="true"
-          style={{
-            background: i < wins
-              ? `radial-gradient(circle at 40% 35%, ${COLORS.gold}, ${COLORS.orange})`
-              : COLORS.arcadeGray,
-            boxShadow: i < wins
-              ? `0 0 12px ${COLORS.gold}, 0 0 24px ${COLORS.orange}60`
-              : 'inset 0 2px 4px rgba(0,0,0,0.5)',
-            border: `2px solid ${COLORS.chromeDark}`,
-          }}
-        />
-      ))}
-    </div>
-  )
-}
 
 // =============================================================================
 // PLAYER INDICATOR (P1/P2 TAG)
@@ -724,48 +471,41 @@ function PlayerIndicator({ player, side }: { player: 1 | 2; side: 'left' | 'righ
 
 // =============================================================================
 // CHARACTER PORTRAIT - NEON FRAME, DRAMATIC SELECTION
+// One option of the shared profession switch. The picked fighter is player one.
 // =============================================================================
-function CharacterPortrait({
-  icon,
-  name,
-  subtitle,
-  achievements,
-  winRecord,
-  isSelected,
-  onClick,
-  side,
-  playerNum,
-}: {
-  icon: string
-  name: string
-  subtitle: string
-  achievements: string[]
-  winRecord: { wins: number; losses: number }
-  isSelected: boolean
-  onClick: () => void
-  side: 'left' | 'right'
-  playerNum: 1 | 2
-}) {
-  const playerColor = playerNum === 1 ? COLORS.p1Blue : COLORS.p2Red
+const FIGHTER_ICONS: Record<Profession, string> = {
+  drummer: '🥁',
+  engineer: '💻',
+  fighter: '🥊',
+}
+
+// The outer portraits lean towards the centre slot, like the two sides of a versus screen.
+const FIGHTER_SIDES: Record<Profession, 'left' | 'right'> = {
+  drummer: 'left',
+  engineer: 'left',
+  fighter: 'right',
+}
+
+function CharacterPortrait({ id, label, selected, optionProps }: ProfessionOption) {
+  const playerColor = selected ? COLORS.p1Blue : COLORS.p2Red
+  const side = FIGHTER_SIDES[id]
+  const clipPath =
+    side === 'left' ? 'polygon(0 0, 100% 0, 92% 100%, 0 100%)' : 'polygon(8% 0, 100% 0, 100% 100%, 0 100%)'
 
   return (
     <button
-      onClick={onClick}
-      aria-pressed={isSelected}
-      aria-label={`Select ${name} - ${subtitle}. ${achievements.join('. ')}. Win record: ${winRecord.wins} wins, ${winRecord.losses} losses.`}
-      className={`relative p-6 focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 transition-all duration-150 ${
-        isSelected ? 'scale-105 z-10' : 'opacity-60 hover:opacity-100'
+      type="button"
+      {...optionProps}
+      className={`relative px-3 pt-6 pb-4 sm:p-6 w-full sm:w-auto sm:min-w-[200px] focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 transition-all duration-150 ${
+        selected ? 'scale-105 z-10' : 'opacity-70 hover:opacity-100'
       }`}
       style={{
-        background: isSelected
+        background: selected
           ? `linear-gradient(${side === 'left' ? '135deg' : '-135deg'}, ${playerColor}60, ${COLORS.arcadeBlack}80)`
           : metallicTexture,
-        border: `4px solid ${isSelected ? playerColor : COLORS.chromeDark}`,
-        clipPath:
-          side === 'left'
-            ? 'polygon(0 0, 100% 0, 92% 100%, 0 100%)'
-            : 'polygon(8% 0, 100% 0, 100% 100%, 0 100%)',
-        boxShadow: isSelected
+        border: `4px solid ${selected ? playerColor : COLORS.chromeDark}`,
+        clipPath,
+        boxShadow: selected
           ? `
             0 0 40px ${playerColor}99,
             0 0 80px ${playerColor}40,
@@ -776,23 +516,23 @@ function CharacterPortrait({
             inset 0 -2px 4px rgba(0,0,0,0.5),
             0 4px 12px rgba(0,0,0,0.4)
           `,
-        minWidth: '200px',
       }}
     >
       {/* Player indicator when selected */}
-      {isSelected && <PlayerIndicator player={playerNum} side={side} />}
+      {selected && (
+        <span aria-hidden="true">
+          <PlayerIndicator player={1} side={side} />
+        </span>
+      )}
 
       {/* Animated neon border when selected */}
-      {isSelected && (
+      {selected && (
         <div
           className="absolute inset-0 pointer-events-none"
           aria-hidden="true"
           style={{
             border: `2px solid ${playerColor}`,
-            clipPath:
-              side === 'left'
-                ? 'polygon(0 0, 100% 0, 92% 100%, 0 100%)'
-                : 'polygon(8% 0, 100% 0, 100% 100%, 0 100%)',
+            clipPath,
             boxShadow: `inset 0 0 20px ${playerColor}80`,
           }}
         />
@@ -800,83 +540,39 @@ function CharacterPortrait({
 
       {/* Character icon with glow */}
       <div
-        className="text-8xl mb-4"
+        className="text-5xl sm:text-8xl mb-4"
+        aria-hidden="true"
         style={{
-          filter: isSelected ? `drop-shadow(0 0 30px ${playerColor})` : 'none',
+          filter: selected ? `drop-shadow(0 0 30px ${playerColor})` : 'none',
         }}
       >
-        {icon}
+        {FIGHTER_ICONS[id]}
       </div>
 
       {/* Name plate - hexagonal arcade style */}
       <div
-        className="py-2 -mx-6 px-6"
+        className="py-2 -mx-3 px-3 sm:-mx-6 sm:px-6"
         style={{
-          background: isSelected
+          background: selected
             ? `linear-gradient(90deg, ${playerColor}, ${playerColor}dd)`
             : `linear-gradient(90deg, ${COLORS.chromeDark}80, ${COLORS.chrome}99)`,
           clipPath: 'polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0 50%)',
         }}
       >
         <div
-          className="text-sm font-black tracking-[0.2em] uppercase"
+          className="text-sm font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase"
           style={{
             fontFamily: '"Impact", "Arial Black", sans-serif',
-            color: isSelected ? '#000' : '#FFF',
-            textShadow: isSelected ? 'none' : '0 2px 4px rgba(0,0,0,0.5)',
+            color: selected ? '#000' : '#FFF',
+            textShadow: selected ? 'none' : '0 2px 4px rgba(0,0,0,0.5)',
           }}
         >
-          {name}
+          {label}
         </div>
-        <div
-          className="text-sm opacity-90"
-          style={{ color: isSelected ? COLORS.arcadeGray : COLORS.chrome }}
-        >
-          {subtitle}
-        </div>
-      </div>
-
-      {/* Win/Loss record with K.O. styling */}
-      <div
-        className="mt-4 py-2 flex items-center justify-center gap-4"
-        style={{
-          background: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.6), transparent)',
-        }}
-      >
-        <span
-          className="text-sm font-black tracking-wider"
-          style={{ color: COLORS.healthGreen, textShadow: `0 0 8px ${COLORS.healthGreen}` }}
-        >
-          W:{winRecord.wins}
-        </span>
-        <ArcadeText text="K.O." type="ko" size="sm" />
-        <span
-          className="text-sm font-black tracking-wider"
-          style={{ color: COLORS.p2Red, textShadow: `0 0 8px ${COLORS.p2Red}` }}
-        >
-          L:{winRecord.losses}
-        </span>
-      </div>
-
-      {/* Achievements - impact statements */}
-      <div className="mt-4 space-y-1.5">
-        {achievements.slice(0, 3).map((achievement, i) => (
-          <div
-            key={i}
-            className="text-sm px-3 py-1.5 text-left"
-            style={{
-              background: `${playerColor}20`,
-              borderLeft: `3px solid ${playerColor}`,
-              color: COLORS.chrome,
-            }}
-          >
-            {achievement}
-          </div>
-        ))}
       </div>
 
       {/* Selection arrow when selected */}
-      {isSelected && (
+      {selected && (
         <div
           className="absolute -top-4 left-1/2 -translate-x-1/2 text-3xl"
           aria-hidden="true"
@@ -888,15 +584,9 @@ function CharacterPortrait({
           ▼
         </div>
       )}
-
-      {/* Round win indicators */}
-      <div className="mt-4">
-        <RoundIndicators wins={Math.min(winRecord.wins, 2)} maxWins={2} side={side} />
-      </div>
     </button>
   )
 }
-
 // =============================================================================
 // FIGHT! ANNOUNCEMENT BANNER
 // =============================================================================
@@ -932,80 +622,19 @@ function FightBanner({ text, ready = false }: { text: string; ready?: boolean })
 }
 
 // =============================================================================
-// ROLE RANK DISPLAY - CHAMPIONSHIP BELT STYLE
-// =============================================================================
-function RoleRank({ role }: { role: (typeof CURRENT_ROLES)[0] }) {
-  const isLeadership = role.type === 'leadership'
-  const color = isLeadership ? COLORS.gold : COLORS.specialBlue
-
-  return (
-    <div
-      className="relative px-6 py-4 text-center"
-      role="listitem"
-      style={{
-        background: isLeadership
-          ? `linear-gradient(180deg, ${COLORS.gold}50, ${COLORS.gold}20, transparent)`
-          : metallicTexture,
-        border: `3px solid ${color}`,
-        clipPath: 'polygon(15% 0, 85% 0, 100% 50%, 85% 100%, 15% 100%, 0 50%)',
-        boxShadow: `
-          0 0 20px ${color}50,
-          inset 0 2px 4px rgba(255,255,255,0.1),
-          0 4px 12px rgba(0,0,0,0.4)
-        `,
-      }}
-    >
-      {/* Championship star for leadership */}
-      {isLeadership && (
-        <div
-          className="absolute -top-3 left-1/2 -translate-x-1/2 text-xl"
-          aria-hidden="true"
-          style={{
-            color: COLORS.gold,
-            textShadow: `0 0 10px ${COLORS.gold}, 0 0 20px ${COLORS.orange}`,
-          }}
-        >
-          ★
-        </div>
-      )}
-
-      <div
-        className="text-sm tracking-[0.25em] uppercase font-black"
-        style={{
-          fontFamily: '"Impact", "Arial Black", sans-serif',
-          color,
-          textShadow: `0 0 8px ${color}60`,
-        }}
-      >
-        {role.title}
-      </div>
-      <div
-        className="text-sm font-bold mt-1"
-        style={{
-          color: '#FFF',
-          textShadow: '0 2px 4px rgba(0,0,0,0.6)',
-        }}
-      >
-        {role.company}
-      </div>
-    </div>
-  )
-}
-
-// =============================================================================
 // TEAM CARD (VENTURES/COMPANIES)
 // =============================================================================
-function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
+function TeamCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`Visit ${company.name} - ${company.tagline}`}
-      className="block focus:outline-none focus-visible:ring-4 transition-transform hover:scale-[1.02]"
+      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      className="block h-full focus:outline-none focus-visible:ring-4 transition-transform hover:scale-[1.02]"
     >
       <div
-        className="relative p-5"
+        className="relative p-5 h-full"
         style={{
           background: metallicTexture,
           border: `3px solid ${COLORS.specialBlue}`,
@@ -1023,7 +652,7 @@ function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
         <div className="flex items-center gap-4 relative">
           <span className="text-4xl" aria-hidden="true">{company.icon}</span>
           <div>
-            <h4
+            <h3
               className="text-base font-black tracking-wide uppercase"
               style={{
                 fontFamily: '"Impact", "Arial Black", sans-serif',
@@ -1032,53 +661,30 @@ function TeamCard({ company }: { company: (typeof COMPANIES)[0] }) {
               }}
             >
               {company.name}
-            </h4>
-            <p
-              className="text-sm tracking-wider"
-              style={{ color: COLORS.specialBlue }}
-            >
+            </h3>
+            <p className="text-sm tracking-wider" style={{ color: COLORS.specialBlue }}>
               {company.tagline}
             </p>
           </div>
         </div>
 
-        <p
-          className="text-sm mt-4 leading-relaxed relative"
-          style={{ color: COLORS.chrome }}
-        >
+        <p className="text-sm mt-4 leading-relaxed relative" style={{ color: COLORS.chrome }}>
           {company.description}
         </p>
-
-        <div className="flex flex-wrap gap-2 mt-4 relative">
-          {company.services.slice(0, 3).map((service) => (
-            <span
-              key={service}
-              className="text-sm px-3 py-1"
-              style={{
-                background: `${COLORS.specialBlue}25`,
-                border: `1px solid ${COLORS.specialBlue}50`,
-                borderRadius: '2px',
-                color: COLORS.specialBlue,
-              }}
-            >
-              {service}
-            </span>
-          ))}
-        </div>
       </div>
     </a>
   )
 }
 
 // =============================================================================
-// BAND CARD
+// BAND CARD - his role, the years and the release
 // =============================================================================
-function BandCard({ band }: { band: (typeof BANDS)[0] }) {
+function BandCard({ band, years, linkProps }: BandSlot) {
   const bandColor = COLORS.neonPink
 
   const content = (
-    <div
-      className="relative p-5"
+    <article
+      className="relative p-5 h-full"
       style={{
         background: metallicTexture,
         border: `3px solid ${bandColor}`,
@@ -1093,71 +699,48 @@ function BandCard({ band }: { band: (typeof BANDS)[0] }) {
         style={{ background: crtScanlines }}
       />
 
-      <div className="flex justify-between items-start relative">
-        <h4
-          className="text-base font-black tracking-wide uppercase"
-          style={{
-            fontFamily: '"Impact", "Arial Black", sans-serif',
-            color: '#FFF',
-            textShadow: `0 0 10px ${bandColor}60`,
-          }}
-        >
-          {band.name}
-        </h4>
-        {band.active && (
-          <span
-            className="text-sm px-3 py-1 font-black tracking-wider"
-            style={{
-              background: COLORS.healthGreen,
-              color: '#000',
-              borderRadius: '2px',
-              boxShadow: `0 0 10px ${COLORS.healthGreen}`,
-            }}
-          >
-            LIVE
-          </span>
-        )}
-      </div>
+      <h3
+        className="text-base font-black tracking-wide uppercase relative"
+        style={{
+          fontFamily: '"Impact", "Arial Black", sans-serif',
+          color: '#FFF',
+          textShadow: `0 0 10px ${bandColor}60`,
+        }}
+      >
+        {band.name}
+      </h3>
 
       <p className="text-sm mt-2 relative" style={{ color: bandColor }}>
-        {band.genre} {'//'} {band.role}
+        {band.role}
+        {years && <span aria-hidden="true"> {'//'} </span>}
+        {years && <span>{years}</span>}
       </p>
 
-      <p className="text-sm mt-3 leading-relaxed relative" style={{ color: COLORS.chrome }}>
-        {band.description}
-      </p>
-
-      {!band.url && (
-        <p className="text-sm mt-3 italic relative" style={{ color: COLORS.chromeDark }}>
-          Website coming soon...
+      {band.release && (
+        <p className="text-sm mt-3 leading-relaxed relative" style={{ color: COLORS.chrome }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
-    </div>
+    </article>
   )
 
-  if (band.url) {
-    return (
-      <a
-        href={band.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label={`Visit ${band.name} website`}
-        className="block focus:outline-none focus-visible:ring-4 transition-transform hover:scale-[1.02]"
-      >
-        {content}
-      </a>
-    )
-  }
-
-  return <div role="article">{content}</div>
+  if (!linkProps) return content
+  return (
+    <a
+      {...linkProps}
+      className="block h-full focus:outline-none focus-visible:ring-4 transition-transform hover:scale-[1.02]"
+    >
+      {content}
+    </a>
+  )
 }
 
 // =============================================================================
-// EXPERIENCE CARD - FIGHT RECORD STYLE
+// EXPERIENCE CARD - FIGHT RECORD STYLE. Dates are date only strings (UTC midnight), so the year is read in UTC.
 // =============================================================================
-function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'NOW'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'NOW'
+  const startDisplay = entry.startDate.getUTCFullYear()
   const isActive = !entry.endDate
   const color = isActive ? COLORS.healthGreen : COLORS.specialBlue
 
@@ -1180,9 +763,9 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
         />
 
         {/* Header */}
-        <div className="flex justify-between items-start mb-4 relative">
+        <div className="flex justify-between items-start gap-3 mb-4 relative flex-wrap">
           <div>
-            <h4
+            <h3
               className="text-base font-black uppercase"
               style={{
                 fontFamily: '"Impact", "Arial Black", sans-serif',
@@ -1190,9 +773,9 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
               }}
             >
               {entry.title}
-            </h4>
+            </h3>
             <p className="text-sm tracking-wider" style={{ color }}>
-              {entry.organization}
+              {entry.company}
             </p>
           </div>
           <span
@@ -1209,20 +792,20 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
         </div>
 
         {/* Description */}
-        <p className="text-sm mb-4 leading-relaxed relative" style={{ color: COLORS.chrome }}>
-          {entry.description}
-        </p>
+        {entry.description && (
+          <p className="text-sm mb-4 leading-relaxed relative" style={{ color: COLORS.chrome }}>
+            {entry.description}
+          </p>
+        )}
 
-        {/* Highlights with K.O. markers */}
-        {entry.highlights && entry.highlights.length > 0 && (
-          <ul className="space-y-2 mb-4 relative" role="list">
-            {entry.highlights.map((highlight, i) => (
-              <li
-                key={i}
-                className="text-sm flex items-start gap-3"
-                style={{ color: '#FFF' }}
-              >
-                <ArcadeText text="HIT" type="combo" size="sm" />
+        {/* Highlights with HIT markers */}
+        {entry.highlights.length > 0 && (
+          <ul className="space-y-2 mb-4 relative" aria-label="Key achievements">
+            {entry.highlights.map((highlight) => (
+              <li key={highlight} className="text-sm flex items-start gap-3" style={{ color: '#FFF' }}>
+                <span aria-hidden="true">
+                  <ArcadeText text="HIT" type="combo" size="sm" />
+                </span>
                 <span>{highlight}</span>
               </li>
             ))}
@@ -1230,22 +813,24 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
         )}
 
         {/* Skills/tech tags */}
-        <div className="flex flex-wrap gap-2 relative">
-          {entry.skills.slice(0, 5).map((skill) => (
-            <span
-              key={skill}
-              className="text-sm px-3 py-1"
-              style={{
-                background: `${color}25`,
-                border: `1px solid ${color}40`,
-                borderRadius: '2px',
-                color,
-              }}
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
+        {entry.skills.length > 0 && (
+          <ul className="flex flex-wrap gap-2 relative" aria-label="Skills used">
+            {entry.skills.slice(0, 5).map((skill) => (
+              <li
+                key={skill}
+                className="text-sm px-3 py-1"
+                style={{
+                  background: `${color}25`,
+                  border: `1px solid ${color}40`,
+                  borderRadius: '2px',
+                  color,
+                }}
+              >
+                {skill}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       {/* Corner cut decoration */}
@@ -1262,20 +847,20 @@ function ExperienceCard({ entry }: { entry: (typeof EXPERIENCE_DATA)[0] }) {
 }
 
 // =============================================================================
-// PROJECT CARD - CHAMPIONSHIP VICTORY STYLE
+// PROJECT CARD - CHAMPIONSHIP VICTORY STYLE: his role, the result line and the links
 // =============================================================================
-function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
-  const isFeatured = project.featured
-  const color = isFeatured ? COLORS.gold : COLORS.specialBlue
+function FightCard({ project, years, links }: ProjectSlot) {
+  const isHighlight = project.highlight
+  const color = isHighlight ? COLORS.gold : COLORS.specialBlue
 
   return (
     <article
-      className="relative"
+      className="relative h-full"
       style={{
         background: metallicTexture,
         border: `3px solid ${color}`,
         clipPath: 'polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%)',
-        boxShadow: isFeatured
+        boxShadow: isHighlight
           ? `0 0 30px ${COLORS.gold}60, inset 0 0 25px ${COLORS.gold}15`
           : `0 0 15px ${color}30, inset 0 0 20px rgba(0,0,0,0.5)`,
       }}
@@ -1289,31 +874,27 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
         />
 
         {/* Header */}
-        <div className="flex justify-between items-start mb-3 relative">
-          <h4
+        <div className="flex justify-between items-start gap-2 mb-2 relative">
+          <h3
             className="text-base font-black tracking-wide uppercase"
             style={{
               fontFamily: '"Impact", "Arial Black", sans-serif',
-              color: isFeatured ? COLORS.gold : '#FFF',
-              textShadow: isFeatured ? `0 0 12px ${COLORS.gold}` : 'none',
+              color: isHighlight ? COLORS.gold : '#FFF',
+              textShadow: isHighlight ? `0 0 12px ${COLORS.gold}` : 'none',
             }}
           >
             {project.name}
-          </h4>
-          {isFeatured && (
-            <span
-              className="px-3 py-1.5 font-black tracking-[0.2em]"
-              style={{
-                background: `linear-gradient(90deg, ${COLORS.gold}, ${COLORS.orange})`,
-                color: '#000',
-                borderRadius: '2px',
-                boxShadow: `0 0 15px ${COLORS.gold}80`,
-              }}
-            >
-              <ArcadeText text="CHAMP" type="ko" size="sm" />
+          </h3>
+          {years && (
+            <span className="text-sm font-black tracking-wider whitespace-nowrap" style={{ color }}>
+              {years}
             </span>
           )}
         </div>
+
+        <p className="text-sm font-bold mb-2 relative" style={{ color: '#FFF' }}>
+          {project.role}
+        </p>
 
         {/* Tagline */}
         <p className="text-sm mb-3 relative" style={{ color: COLORS.chrome }}>
@@ -1329,65 +910,54 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
               borderLeft: `4px solid ${color}`,
             }}
           >
-            <ArcadeText text="K.O.:" type="ko" size="sm" />
+            <span aria-hidden="true">
+              <ArcadeText text="K.O." type="ko" size="sm" />
+            </span>
             <span style={{ color }}>{project.impact}</span>
           </div>
         )}
 
         {/* Tech stack */}
-        <div className="flex flex-wrap gap-2 relative">
-          {project.techStack.slice(0, 5).map((tech) => (
-            <span
-              key={tech}
-              className="text-sm px-3 py-1"
-              style={{
-                background: `${color}20`,
-                border: `1px solid ${color}35`,
-                borderRadius: '2px',
-                color,
-              }}
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
+        {project.techStack.length > 0 && (
+          <ul className="flex flex-wrap gap-2 relative" aria-label="Technologies used">
+            {project.techStack.slice(0, 5).map((tech) => (
+              <li
+                key={tech}
+                className="text-sm px-3 py-1"
+                style={{
+                  background: `${color}20`,
+                  border: `1px solid ${color}35`,
+                  borderRadius: '2px',
+                  color,
+                }}
+              >
+                {tech}
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* Links */}
-        {project.links && (
-          <div className="flex gap-3 mt-4 relative">
-            {project.links.site && (
+        {links.length > 0 ? (
+          <div className="flex flex-wrap gap-3 mt-4 relative">
+            {links.map(({ kind, label, linkProps }) => (
               <a
-                href={project.links.site}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm px-4 py-2 font-black tracking-wider focus:outline-none focus-visible:ring-2 transition-transform hover:scale-105"
+                key={kind}
+                {...linkProps}
+                className="inline-flex items-center min-h-[44px] text-sm px-4 font-black tracking-wider uppercase focus:outline-none focus-visible:ring-2 transition-transform hover:scale-105"
                 style={{
                   background: color,
                   color: '#000',
                   borderRadius: '2px',
                   boxShadow: `0 0 12px ${color}80`,
                 }}
-                aria-label={`Visit ${project.name} website`}
               >
-                VIEW
+                {label}
               </a>
-            )}
-            {project.links.demo && (
-              <Link
-                href={project.links.demo}
-                className="text-sm px-4 py-2 font-black tracking-wider focus:outline-none focus-visible:ring-2 transition-transform hover:scale-105"
-                style={{
-                  background: COLORS.healthGreen,
-                  color: '#000',
-                  borderRadius: '2px',
-                  boxShadow: `0 0 12px ${COLORS.healthGreen}80`,
-                }}
-                aria-label={`Play ${project.name} demo`}
-              >
-                PLAY
-              </Link>
-            )}
+            ))}
           </div>
+        ) : (
+          <p className="text-sm mt-4 relative" style={{ color: COLORS.chrome }}>No public link</p>
         )}
       </div>
 
@@ -1403,47 +973,6 @@ function FightCard({ project }: { project: (typeof PROJECTS_DATA)[0] }) {
     </article>
   )
 }
-
-// =============================================================================
-// SKILL SECTION (NO BARS - ACHIEVEMENTS ONLY)
-// =============================================================================
-function SkillSection({
-  category,
-}: {
-  category: { name: string; icon?: string; skills: { name: string; proficiency: number }[] }
-}) {
-  return (
-    <div className="space-y-3">
-      <h4
-        className="text-sm font-black tracking-[0.2em] uppercase flex items-center gap-3"
-        style={{
-          fontFamily: '"Impact", "Arial Black", sans-serif',
-          color: '#FFF',
-          textShadow: `0 0 8px ${COLORS.specialBlue}60`,
-        }}
-      >
-        <span aria-hidden="true">{category.icon}</span>
-        {category.name}
-      </h4>
-      <div className="space-y-2">
-        {category.skills.map((skill) => (
-          <div
-            key={skill.name}
-            className="px-3 py-2 text-sm"
-            style={{
-              background: `${COLORS.specialBlue}15`,
-              borderLeft: `3px solid ${COLORS.specialBlue}`,
-              color: COLORS.chrome,
-            }}
-          >
-            {skill.name}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // =============================================================================
 // ART SEPARATOR - ARCADE DECORATIVE ELEMENT
 // =============================================================================
@@ -1594,52 +1123,207 @@ function InsertCoinFooter() {
 }
 
 // =============================================================================
+// RECRUITER ACTIONS - arcade buttons
+// =============================================================================
+const ARCADE_BUTTON =
+  'inline-flex items-center justify-center min-h-[44px] px-6 py-3 text-sm tracking-[0.2em] font-black uppercase transition-all hover:scale-105 focus:outline-none focus-visible:ring-4'
+
+// Email is the gold primary action, LinkedIn and the CV the outlined ones.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
+  email: {
+    fontFamily: '"Impact", "Arial Black", sans-serif',
+    background: `linear-gradient(180deg, ${COLORS.gold}, ${COLORS.orange})`,
+    color: COLORS.arcadeBlack,
+    border: `2px solid ${COLORS.gold}`,
+    boxShadow: `0 0 15px ${COLORS.gold}40`,
+  },
+  linkedin: {
+    fontFamily: '"Impact", "Arial Black", sans-serif',
+    background: 'transparent',
+    border: `2px solid ${COLORS.specialBlue}`,
+    color: COLORS.specialBlue,
+    boxShadow: `0 0 10px ${COLORS.specialBlue}30`,
+  },
+}
+
+function HeroAction({ action }: { action: HeroActionSlot }) {
+  return (
+    <a {...action.linkProps} className={ARCADE_BUTTON} style={HERO_ACTION_LOOK[action.id]}>
+      {action.label}
+    </a>
+  )
+}
+
+function CVLink() {
+  return (
+    <Link href="/cv" className={ARCADE_BUTTON} style={HERO_ACTION_LOOK.linkedin}>
+      CV
+    </Link>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      <ArcadeSectionCard color={COLORS.specialBlue} title="About" titleIcon="►" id="about-heading">
+        <p className="text-base leading-relaxed" style={{ color: COLORS.chrome, fontFamily: 'system-ui, sans-serif' }}>
+          {professionalSummary.bio}
+        </p>
+      </ArcadeSectionCard>
+
+      {/* ART SECTION 1: VS Badge separator (after About) */}
+      <ArtSeparator type="versus" />
+
+      {sections.jobs.length > 0 && (
+        <ArcadeSectionCard color={COLORS.p1Blue} title="Work Experience" titleIcon="▶▶" id="experience-heading">
+          <div className="grid md:grid-cols-2 gap-6">
+            {sections.jobs.map((entry) => (
+              <ExperienceCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        </ArcadeSectionCard>
+      )}
+
+      {/* ART SECTION 2: Lightning separator (after Experience) */}
+      <ArtSeparator type="lightning" />
+
+      <ArcadeSectionCard color={COLORS.specialBlue} title="Tech Stack" titleIcon="▶▶▶" id="tech-stack-heading">
+        <div className="space-y-8">
+          {sections.techStack.map((category) => (
+            <div key={category.id}>
+              <h3
+                className="text-base mb-4 flex items-center gap-3 tracking-[0.2em] uppercase"
+                style={{
+                  fontFamily: '"Impact", "Arial Black", sans-serif',
+                  color: '#FFF',
+                  textShadow: `0 0 8px ${COLORS.specialBlue}60`,
+                }}
+              >
+                <span aria-hidden="true">{category.icon}</span>
+                {category.name}
+              </h3>
+              <ul
+                className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2"
+                aria-label={`${category.name} technologies`}
+              >
+                {category.items.map((tech) => (
+                  <li
+                    key={tech}
+                    className="px-3 py-2 text-sm"
+                    style={{
+                      background: `${COLORS.arcadeGray}cc`,
+                      border: `1px solid ${COLORS.chromeDarker}`,
+                      borderRadius: '2px',
+                      color: COLORS.chrome,
+                    }}
+                  >
+                    {tech}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </ArcadeSectionCard>
+
+      <ArcadeSectionCard color={COLORS.gold} title="Projects" titleIcon="★" id="projects-heading">
+        <ProjectList
+          projects={sections.projects}
+          className="grid md:grid-cols-2 gap-6"
+          renderProject={(slot) => <FightCard {...slot} />}
+        />
+      </ArcadeSectionCard>
+
+      {/* ART SECTION 3: Flames separator (after Projects) */}
+      <ArtSeparator type="flames" />
+
+      <ArcadeSectionCard color={COLORS.specialBlue} title="Ventures" titleIcon="▶▶▶▶" id="ventures-heading">
+        <div className="grid md:grid-cols-3 gap-6">
+          {sections.companies.map((company) => (
+            <TeamCard key={company.id} company={company} />
+          ))}
+        </div>
+      </ArcadeSectionCard>
+    </>
+  )
+}
+
+function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <ArtSeparator type="lightning" />
+      <ArcadeSectionCard color={COLORS.neonPink} title="Bands" titleIcon="♪♪♪" id="bands-heading">
+        <p className="text-base mb-6" style={{ color: COLORS.chrome, fontFamily: 'system-ui, sans-serif' }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList bands={bands} className="grid md:grid-cols-3 gap-6" renderBand={(slot) => <BandCard {...slot} />} />
+        <p className="text-sm mt-6 italic" style={{ color: COLORS.neonPinkLight }}>
+          {musician.line}
+        </p>
+      </ArcadeSectionCard>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <ArtSeparator type="flames" />
+      <ArcadeSectionCard color={COLORS.orange} title="Muay Thai" titleIcon="▶▶▶" id="muay-thai-heading">
+        <h3
+          className="text-xl mb-6 tracking-[0.15em] uppercase"
+          style={{
+            fontFamily: '"Impact", "Arial Black", sans-serif',
+            color: COLORS.gold,
+            textShadow: `0 0 12px ${COLORS.gold}60`,
+          }}
+        >
+          {martialArts.primary.title}
+        </h3>
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'grid sm:grid-cols-2 gap-4 mb-6',
+            fact: 'px-4 py-3 border-l-4 border-[#FF6600] bg-[#FF6600]/10',
+            term: 'text-sm tracking-[0.2em] uppercase font-black text-[#FFD700]',
+            value: 'text-sm mt-1 text-white',
+            achievements: 'space-y-2',
+            achievement: 'text-sm flex items-start gap-3 text-white',
+          }}
+          renderAchievement={(achievement) => (
+            <>
+              <span aria-hidden="true">
+                <ArcadeText text="HIT" type="combo" size="sm" />
+              </span>
+              <span>{achievement}</span>
+            </>
+          )}
+        />
+      </ArcadeSectionCard>
+    </>
+  )
+}
+
+function ProfessionDetails({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
+  return <EngineerSections sections={sections} />
+}
+
+// =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 export default function FighterSelectTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter((p) => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
-
-  const characters = [
-    {
-      id: 'engineer',
-      icon: '💻',
-      name: 'SYSTEM ENGINEER',
-      subtitle: 'Senior Staff • CTO',
-      achievements: ['10+ years experience', 'CTO x 2', 'Enterprise scale', '50k+ users migrated'],
-      winRecord: { wins: 999, losses: 0 },
-    },
-    {
-      id: 'drummer',
-      icon: '🥁',
-      name: 'MUSICIAN',
-      subtitle: 'Professional Drummer',
-      achievements: ['15 years playing', '7 years professional', '3 active bands', '30+ city tour'],
-      winRecord: { wins: 15, losses: 0 },
-    },
-    {
-      id: 'fighter',
-      icon: '🥋',
-      name: 'MARTIAL ARTIST',
-      subtitle: 'BJJ Instructor',
-      achievements: ['6 years training', 'BJJ Instructor', '20+ students', '3 disciplines'],
-      winRecord: { wins: 6, losses: 0 },
-    },
-  ]
-
-  // Special move inputs for engineer character
-  const specialMoves = [
-    { name: 'Deploy to Prod', input: '↓→P' },
-    { name: 'Debug Master', input: '←↓→K' },
-    { name: 'Code Review', input: '↓↓P' },
-    { name: 'Ship Feature', input: '→→P' },
-  ]
+  const { active, config } = useProfession()
+  const view = useWorldView()
 
   return (
     <div
@@ -1668,377 +1352,134 @@ export default function FighterSelectTheme() {
 
       <div className="relative z-10">
         {/* ================================================================= */}
-        {/* HEADER */}
+        {/* HEADER - the recruiter first screen */}
         {/* ================================================================= */}
-        <header className="relative py-8 px-6">
+        <header className="relative py-6 px-4 sm:py-8 sm:px-6">
           <div className="max-w-6xl mx-auto">
             <ArcadeSectionCard color={COLORS.p1Blue}>
-              <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
-                <div>
-                  {/* Main title - dramatic arcade styling */}
-                  <h1
-                    className="text-3xl md:text-5xl tracking-[0.15em] uppercase leading-tight"
-                    style={{
-                      color: COLORS.electricYellow,
-                      textShadow: `
-                        0 0 10px ${COLORS.electricYellow},
-                        0 0 20px ${COLORS.orange},
-                        0 0 40px ${COLORS.p2Red}60,
-                        4px 4px 0 ${COLORS.arcadeBlack},
-                        -2px -2px 0 ${COLORS.arcadeBlack}
-                      `,
-                      WebkitTextStroke: `2px ${COLORS.arcadeBlack}`,
-                    }}
-                  >
-                    SELECT YOUR FIGHTER
-                  </h1>
+              <RecruiterHero
+                render={({ name, headline, tagline, line, actions }) => (
+                  <div className="flex flex-col lg:flex-row justify-between items-start gap-6">
+                    <div>
+                      {/* Main title - dramatic arcade styling */}
+                      <h1
+                        className="text-3xl md:text-5xl tracking-[0.15em] uppercase leading-tight"
+                        style={{
+                          color: COLORS.electricYellow,
+                          textShadow: `
+                            0 0 10px ${COLORS.electricYellow},
+                            0 0 20px ${COLORS.orange},
+                            0 0 40px ${COLORS.p2Red}60,
+                            4px 4px 0 ${COLORS.arcadeBlack},
+                            -2px -2px 0 ${COLORS.arcadeBlack}
+                          `,
+                          WebkitTextStroke: `2px ${COLORS.arcadeBlack}`,
+                        }}
+                      >
+                        {name}
+                      </h1>
 
-                  {/* Professional summary */}
-                  <p
-                    className="text-base md:text-lg mt-4 tracking-wide max-w-2xl"
-                    style={{
-                      color: COLORS.chrome,
-                      fontFamily: 'system-ui, sans-serif',
-                    }}
-                  >
-                    {PROFESSIONAL_SUMMARY[active].headline}
-                  </p>
-                  <p
-                    className="text-sm md:text-base mt-2 italic tracking-wider"
-                    style={{ color: COLORS.specialBlue }}
-                  >
-                    &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
-                  </p>
+                      <p
+                        className="text-base md:text-lg mt-4 tracking-wide max-w-2xl"
+                        style={{ color: COLORS.chrome, fontFamily: 'system-ui, sans-serif' }}
+                      >
+                        {headline}
+                      </p>
+                      <p className="text-sm md:text-base mt-2 italic tracking-wider" style={{ color: COLORS.specialBlue }}>
+                        {tagline}
+                      </p>
+                      <p className="text-sm mt-2 tracking-wide" style={{ color: COLORS.chrome, fontFamily: 'system-ui, sans-serif' }}>
+                        {line}
+                      </p>
+                    </div>
 
-                  {/* Combo counter - years of experience */}
-                  <div className="mt-6">
-                    <ComboCounter hits={10} label="YEARS EXP" />
+                    <nav className="flex gap-3 sm:gap-4 items-center flex-wrap shrink-0" aria-label="Contact and CV">
+                      {actions.map((action) => (
+                        <HeroAction key={action.id} action={action} />
+                      ))}
+                      <CVLink />
+                      <Link
+                        href="/personal-projects/game-engine"
+                        className={ARCADE_BUTTON}
+                        style={{
+                          background: `linear-gradient(90deg, ${COLORS.healthGreen}, ${COLORS.healthGreenDark})`,
+                          color: '#000',
+                          borderRadius: '4px',
+                          clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0 100%)',
+                          boxShadow: `0 0 20px ${COLORS.healthGreen}60`,
+                        }}
+                        aria-label="Play the game engine demo"
+                      >
+                        PLAY
+                      </Link>
+                    </nav>
                   </div>
-                </div>
-
-                <nav className="flex gap-4 items-center shrink-0" aria-label="Main navigation">
-                  <Link
-                    href="/cv"
-                    className="px-6 py-3 text-sm tracking-[0.2em] font-black uppercase focus:outline-none focus-visible:ring-4 transition-transform hover:scale-105"
-                    style={{
-                      background: metallicTexture,
-                      border: `3px solid ${COLORS.chromeDark}`,
-                      borderRadius: '4px',
-                      color: COLORS.chrome,
-                      clipPath: 'polygon(10% 0, 100% 0, 100% 100%, 0 100%)',
-                      boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 8px rgba(0,0,0,0.4)',
-                    }}
-                  >
-                    CV
-                  </Link>
-                  <Link
-                    href="/personal-projects/game-engine"
-                    className="px-6 py-3 text-sm tracking-[0.2em] font-black uppercase focus:outline-none focus-visible:ring-4 transition-transform hover:scale-105"
-                    style={{
-                      background: `linear-gradient(90deg, ${COLORS.healthGreen}, ${COLORS.healthGreenDark})`,
-                      color: '#000',
-                      borderRadius: '4px',
-                      clipPath: 'polygon(0 0, 100% 0, 90% 100%, 0 100%)',
-                      boxShadow: `0 0 20px ${COLORS.healthGreen}60`,
-                    }}
-                  >
-                    PLAY
-                  </Link>
-                </nav>
-              </div>
+                )}
+              />
             </ArcadeSectionCard>
           </div>
         </header>
 
-        <main className="max-w-6xl mx-auto px-6">
+        <main className="max-w-6xl mx-auto px-4 sm:px-6">
           {/* ================================================================= */}
-          {/* ABOUT SECTION (with Character Select integrated) */}
+          {/* CHARACTER SELECT - the shared profession switch, System Engineer in the centre and picked */}
           {/* ================================================================= */}
-          <ArcadeSectionCard
-            color={COLORS.specialBlue}
-            title="About"
-            titleIcon="►"
-            id="about-heading"
-          >
-            {/* Current roles - championship belts */}
-            <div className="flex flex-wrap justify-center gap-4 mb-8" role="list" aria-label="Current roles">
-              {CURRENT_ROLES.map((role) => (
-                <RoleRank key={role.id} role={role} />
-              ))}
-            </div>
-
-            {/* Character portraits - profession switching */}
-            <div
-              className="flex items-center justify-center gap-4 lg:gap-8 mb-8 flex-wrap"
-              role="group"
-              aria-label="Select a character"
-            >
-              {characters.map((char, index) => (
-                <div key={char.id} className="flex items-center">
-                  <CharacterPortrait
-                    icon={char.icon}
-                    name={char.name}
-                    subtitle={char.subtitle}
-                    achievements={char.achievements}
-                    winRecord={char.winRecord}
-                    isSelected={active === char.id}
-                    onClick={() => setActive(char.id as 'engineer' | 'drummer' | 'fighter')}
-                    side={index === 0 ? 'left' : index === 2 ? 'right' : 'left'}
-                    playerNum={index === 0 ? 1 : 2}
-                  />
-                  {index < characters.length - 1 && (
-                    <div className="mx-2 lg:mx-6 hidden md:block">
+          <ArcadeSectionCard color={COLORS.specialBlue} title="Select your fighter" titleIcon="►" id="select-heading">
+            <ProfessionSwitch
+              className="grid grid-cols-3 gap-2 pt-8 mb-8 md:flex md:items-center md:justify-center md:gap-0"
+              label="Profession"
+              renderOption={(option) => (
+                <>
+                  {option.id !== 'drummer' && (
+                    <div className="mx-2 lg:mx-6 hidden md:block" aria-hidden="true">
                       <VSBadge />
                     </div>
                   )}
-                </div>
-              ))}
-            </div>
-
-            {/* Health bars */}
-            <div className="max-w-3xl mx-auto mb-8 space-y-4">
-              <HealthBar
-                label="Experience"
-                value={active === 'engineer' ? 95 : active === 'drummer' ? 80 : 60}
-                color={COLORS.p1Blue}
-              />
-              <HealthBar
-                label="Mastery"
-                value={active === 'engineer' ? 90 : active === 'drummer' ? 85 : 70}
-                color={COLORS.gold}
-              />
-              <HealthBar
-                label="Power"
-                value={active === 'engineer' ? 85 : active === 'drummer' ? 90 : 95}
-                color={COLORS.p2Red}
-              />
-            </div>
+                  <CharacterPortrait {...option} />
+                </>
+              )}
+            />
 
             {/* Ready banner */}
             <FightBanner text={`${config.title.toUpperCase()} - READY!`} ready />
-
-            {/* Bio and quick facts */}
-            <div className="mt-8 pt-8" style={{ borderTop: `2px solid ${COLORS.specialBlue}40` }}>
-              <p
-                className="text-base leading-relaxed mb-6"
-                style={{ color: COLORS.chrome, fontFamily: 'system-ui, sans-serif' }}
-              >
-                {aboutData.bio}
-              </p>
-              <div className="flex flex-wrap gap-3" role="list" aria-label="Quick facts">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span
-                    key={i}
-                    className="px-5 py-2 text-sm font-black tracking-wider uppercase"
-                    style={{
-                      background: `linear-gradient(90deg, ${COLORS.specialBlue}, ${COLORS.specialBlueDark})`,
-                      color: '#000',
-                      clipPath: 'polygon(8% 0, 100% 0, 92% 100%, 0 100%)',
-                      boxShadow: `0 0 12px ${COLORS.specialBlue}60`,
-                    }}
-                  >
-                    {fact}
-                  </span>
-                ))}
-              </div>
-            </div>
           </ArcadeSectionCard>
 
-          {/* ================================================================= */}
-          {/* ART SECTION 1: VS Badge separator (after About) */}
-          {/* ================================================================= */}
-          <ArtSeparator type="versus" />
-
-          {/* ================================================================= */}
-          {/* EXPERIENCE / FIGHT RECORD */}
-          {/* ================================================================= */}
-          {experience.length > 0 && (
-            <ArcadeSectionCard
-              color={COLORS.p1Blue}
-              title="Work Experience"
-              titleIcon="▶▶"
-              id="experience-heading"
-            >
-              <div className="grid md:grid-cols-2 gap-6">
-                {experience.map((entry) => (
-                  <ExperienceCard key={entry.id} entry={entry} />
-                ))}
-              </div>
-            </ArcadeSectionCard>
-          )}
-
-          {/* ================================================================= */}
-          {/* ART SECTION 2: Lightning separator (after Experience) */}
-          {/* ================================================================= */}
-          <ArtSeparator type="lightning" />
-
-          {/* ================================================================= */}
-          {/* SKILLS / SPECIAL MOVES */}
-          {/* ================================================================= */}
-          <ArcadeSectionCard
-            color={active === 'engineer' ? COLORS.specialBlue : active === 'drummer' ? COLORS.neonPink : COLORS.orange}
-            title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
-            titleIcon="▶▶▶"
-            id="skills-heading"
-          >
-            {active === 'engineer' ? (
-              <div className="space-y-8">
-                {/* Special move inputs */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
-                  {specialMoves.map((move) => (
-                    <SpecialMoveInput key={move.name} name={move.name} input={move.input} />
-                  ))}
-                </div>
-
-                {/* Tech categories */}
-                {engineerTech.slice(0, 6).map((category) => (
-                  <div key={category.name}>
-                    <h3
-                      className="text-base mb-4 flex items-center gap-3 tracking-[0.2em] uppercase"
-                      style={{
-                        fontFamily: '"Impact", "Arial Black", sans-serif',
-                        color: '#FFF',
-                        textShadow: `0 0 8px ${COLORS.specialBlue}60`,
-                      }}
-                    >
-                      <span aria-hidden="true">{category.icon}</span>
-                      {category.name}
-                    </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                      {category.items.map((tech) => (
-                        <div
-                          key={tech}
-                          className="px-3 py-2 text-sm"
-                          style={{
-                            background: `${COLORS.arcadeGray}cc`,
-                            border: `1px solid ${COLORS.chromeDarker}`,
-                            borderRadius: '2px',
-                            color: COLORS.chrome,
-                          }}
-                        >
-                          {tech}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-3 gap-8">
-                {otherSkills.map((category) => (
-                  <SkillSection key={category.name} category={category} />
-                ))}
-              </div>
-            )}
-          </ArcadeSectionCard>
-
-          {/* ================================================================= */}
-          {/* PROJECTS / CHAMPIONSHIP VICTORIES */}
-          {/* ================================================================= */}
-          <ArcadeSectionCard
-            color={COLORS.gold}
-            title="Featured Work"
-            titleIcon="★"
-            id="projects-heading"
-          >
-            <div className="grid md:grid-cols-2 gap-6">
-              {projects.slice(0, 6).map((project) => (
-                <FightCard key={project.id} project={project} />
-              ))}
-            </div>
-          </ArcadeSectionCard>
-
-          {/* ================================================================= */}
-          {/* ART SECTION 3: Flames separator (after Projects) */}
-          {/* ================================================================= */}
-          <ArtSeparator type="flames" />
-
-          {/* ================================================================= */}
-          {/* VENTURES / TEAM AFFILIATIONS */}
-          {/* ================================================================= */}
-          {active === 'engineer' && (
-            <ArcadeSectionCard
-              color={COLORS.specialBlue}
-              title="Ventures"
-              titleIcon="▶▶▶▶"
-              id="ventures-heading"
-            >
-              <div className="grid md:grid-cols-3 gap-6">
-                {COMPANIES.map((company) => (
-                  <TeamCard key={company.id} company={company} />
-                ))}
-              </div>
-            </ArcadeSectionCard>
-          )}
-
-          {/* ================================================================= */}
-          {/* BANDS / STAGE CREWS */}
-          {/* ================================================================= */}
-          {active === 'drummer' && (
-            <ArcadeSectionCard
-              color={COLORS.neonPink}
-              title="Bands"
-              titleIcon="♪♪♪"
-              id="bands-heading"
-            >
-              <div className="grid md:grid-cols-3 gap-6">
-                {BANDS.map((band) => (
-                  <BandCard key={band.id} band={band} />
-                ))}
-              </div>
-            </ArcadeSectionCard>
-          )}
+          <div role="region" aria-label={`${active} profession details`}>
+            <ProfessionDetails sections={view.sections} />
+          </div>
         </main>
 
         {/* ================================================================= */}
         {/* CONTACT CTA */}
         {/* ================================================================= */}
-        <section className="relative z-20 py-12 px-6" aria-label="Contact">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="mb-6">
-              <h2
-                className="text-xl tracking-[0.3em] uppercase mb-2"
-                style={{
-                  fontFamily: '"Impact", "Arial Black", sans-serif',
-                  color: COLORS.gold,
-                  textShadow: `0 0 20px ${COLORS.gold}40`,
-                }}
-              >
-                CHALLENGER APPROACHING?
-              </h2>
-              <p className="text-sm" style={{ color: COLORS.chrome }}>
-                10+ years delivering production systems. Let&apos;s build something.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:alexanderpulido81@gmail.com"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.2em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
-                style={{
-                  fontFamily: '"Impact", "Arial Black", sans-serif',
-                  background: `linear-gradient(180deg, ${COLORS.gold}, ${COLORS.orange})`,
-                  color: COLORS.arcadeBlack,
-                  border: `2px solid ${COLORS.gold}`,
-                  boxShadow: `0 0 15px ${COLORS.gold}40`,
-                }}
-              >
-                GET IN TOUCH
-              </a>
-              <Link
-                href="/cv"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.2em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2"
-                style={{
-                  fontFamily: '"Impact", "Arial Black", sans-serif',
-                  background: 'transparent',
-                  border: `2px solid ${COLORS.specialBlue}`,
-                  color: COLORS.specialBlue,
-                  boxShadow: `0 0 10px ${COLORS.specialBlue}30`,
-                }}
-              >
-                DOWNLOAD CV
-              </Link>
-            </div>
-          </div>
+        <section className="relative z-20 py-12 px-4 sm:px-6" aria-label="Contact">
+          <RecruiterHero
+            render={({ line, actions }) => (
+              <div className="max-w-2xl mx-auto text-center">
+                <div className="mb-6">
+                  <h2
+                    className="text-xl tracking-[0.3em] uppercase mb-2"
+                    style={{
+                      fontFamily: '"Impact", "Arial Black", sans-serif',
+                      color: COLORS.gold,
+                      textShadow: `0 0 20px ${COLORS.gold}40`,
+                    }}
+                  >
+                    CHALLENGER APPROACHING?
+                  </h2>
+                  <p className="text-sm" style={{ color: COLORS.chrome }}>
+                    {line}
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {actions.map((action) => (
+                    <HeroAction key={action.id} action={action} />
+                  ))}
+                  <CVLink />
+                </div>
+              </div>
+            )}
+          />
         </section>
 
         {/* ================================================================= */}
