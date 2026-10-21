@@ -2,15 +2,15 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getEngineerSkills } from '@/data/skills'
-import { getAchievementsByProfession, WORK_EXPERIENCE, type AchievementCategory } from '@/data/achievements'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // =============================================================================
 // LIMBO - DARKER, PERFORMANCE-OPTIMIZED
@@ -495,31 +495,20 @@ function LimboItemCard({ children, href, className = '' }: {
 // CV CONTENT COMPONENTS - All content immediately visible
 // =============================================================================
 
-function SilhouetteFigure({
-  profession,
-  isActive,
-  onClick,
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  isActive: boolean
-  onClick: () => void
-}) {
-  const labels = {
-    engineer: 'the architect',
-    drummer: 'the artist',
-    fighter: 'the warrior',
-  }
+// The three figures are the profession switch's options: ProfessionSwitch owns the order (Musician,
+// System Engineer, Martial Artist), the pick and the keyboard; each figure only draws itself.
+function SilhouetteFigure({ option }: { option: ProfessionOption }) {
+  const { id: profession, label, selected: isActive, optionProps } = option
 
   return (
     <button
-      onClick={onClick}
-      aria-label={`Select ${profession} profession`}
-      aria-pressed={isActive}
+      type="button"
+      {...optionProps}
       className={`relative transition-all duration-300 group focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white ${
         isActive ? 'scale-110' : 'opacity-30 hover:opacity-50'
       }`}
     >
-      <div className="relative w-16 h-24">
+      <div className="relative w-16 h-24 mx-auto">
         <svg viewBox="0 0 60 80" className="w-full h-full" aria-hidden="true">
           {profession === 'engineer' && (
             <>
@@ -570,8 +559,11 @@ function SilhouetteFigure({
         />
       )}
 
-      <span className="block mt-1.5 text-xs tracking-[0.25em] uppercase" style={{ color: isActive ? LIMBO.fogWhite1 : LIMBO.midGrey2 }}>
-        {labels[profession]}
+      <span
+        className={`block mt-1.5 text-sm tracking-[0.2em] lowercase ${isActive ? 'text-[#CCCCCC]' : 'text-[#888888]'}`}
+        aria-hidden="true"
+      >
+        {label}
       </span>
     </button>
   )
@@ -588,62 +580,20 @@ function TechTag({ name }: { name: string }) {
   )
 }
 
-function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-4" role="list" aria-label="Technical skills by category">
       {categories.map((category) => (
-        <div key={category.name} role="listitem">
-          <h4 className="text-xs tracking-[0.25em] uppercase mb-2 flex items-center gap-2" style={{ color: LIMBO.lightGrey1 }}>
-            <span className="text-sm grayscale">{category.icon}</span>
+        <div key={category.id} role="listitem">
+          <h3 className="text-xs tracking-[0.25em] uppercase mb-2 flex items-center gap-2" style={{ color: LIMBO.lightGrey1 }}>
+            <span className="text-sm grayscale" aria-hidden="true">{category.icon}</span>
             {category.name}
-          </h4>
+          </h3>
           <div className="flex flex-wrap gap-1.5">
             {category.items.map((tech) => (
               <TechTag key={tech} name={tech} />
             ))}
           </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function AchievementsList({ categories }: { categories: AchievementCategory[] }) {
-  return (
-    <div className="grid md:grid-cols-3 gap-5" role="list" aria-label="Achievements by category">
-      {categories.map((category) => (
-        <div key={category.name} role="listitem">
-          <h4 className="text-xs tracking-[0.25em] uppercase mb-3 flex items-center gap-2" style={{ color: LIMBO.lightGrey1 }}>
-            <span className="text-sm grayscale">{category.icon}</span>
-            {category.name}
-          </h4>
-          <ul className="space-y-2">
-            {category.achievements.map((achievement) => (
-              <li key={achievement.title} style={{ color: LIMBO.lightGrey2 }}>
-                <div className="flex items-baseline gap-2">
-                  <span style={{ color: LIMBO.midGrey2 }} aria-hidden="true">-</span>
-                  {achievement.link ? (
-                    <a
-                      href={achievement.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-white focus-visible:outline focus-visible:outline-1 focus-visible:outline-white"
-                    >
-                      {achievement.title}
-                    </a>
-                  ) : (
-                    <span>{achievement.title}</span>
-                  )}
-                  {achievement.metric && (
-                    <span className="text-xs" style={{ color: LIMBO.midGrey2 }}>{achievement.metric}</span>
-                  )}
-                </div>
-                {achievement.description && (
-                  <p className="text-xs ml-3 mt-0.5" style={{ color: LIMBO.midGrey2 }}>{achievement.description}</p>
-                )}
-              </li>
-            ))}
-          </ul>
         </div>
       ))}
     </div>
@@ -660,9 +610,11 @@ function SectionHeader({ title }: { title: string }) {
   )
 }
 
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const startYear = new Date(entry.startDate).getFullYear()
-  const endYear = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
+// Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps its
+// own year west of UTC.
+function ExperienceCard({ entry }: { entry: Job }) {
+  const startYear = entry.startDate.getUTCFullYear()
+  const endYear = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
 
   return (
     <article className="p-4" style={{
@@ -670,35 +622,47 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
       borderLeft: `3px solid ${LIMBO.black}`,
       boxShadow: `4px 4px 0 ${LIMBO.black}`,
     }}>
-      <div className="flex justify-between items-start mb-1">
+      <div className="flex justify-between items-start gap-3 mb-1">
         <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: LIMBO.fogWhite1 }}>{entry.title}</h4>
-          <p className="text-xs tracking-wider mt-0.5" style={{ color: LIMBO.lightGrey1 }}>{entry.organization}</p>
+          <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: LIMBO.fogWhite1 }}>{entry.title}</h3>
+          <p className="text-xs tracking-wider mt-0.5" style={{ color: LIMBO.lightGrey1 }}>{entry.company}</p>
         </div>
-        <span className="text-xs tracking-wider uppercase" style={{ color: LIMBO.midGrey2 }}>{startYear} - {endYear}</span>
+        <span className="text-xs tracking-wider uppercase whitespace-nowrap" style={{ color: LIMBO.lightGrey1 }}>{startYear} - {endYear}</span>
       </div>
-      <p className="text-sm leading-relaxed mt-2" style={{ color: LIMBO.lightGrey2 }}>{entry.description}</p>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.description && (
+        <p className="text-sm leading-relaxed mt-2" style={{ color: LIMBO.lightGrey2 }}>{entry.description}</p>
+      )}
+      {entry.highlights.length > 0 && (
         <ul className="mt-2 space-y-0.5">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-xs flex items-start gap-1.5" style={{ color: LIMBO.lightGrey2 }}>
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-xs flex items-start gap-1.5" style={{ color: LIMBO.lightGrey2 }}>
               <span style={{ color: LIMBO.midGrey2 }} aria-hidden="true">-</span>
               {highlight}
             </li>
           ))}
         </ul>
       )}
+      {entry.skills.length > 0 && (
+        <div className="flex gap-1.5 flex-wrap mt-2">
+          {entry.skills.slice(0, 5).map((skill) => (
+            <span key={skill} className="text-xs px-1 py-0.5 uppercase" style={{ border: `1px solid ${LIMBO.midGrey1}`, color: LIMBO.lightGrey1 }}>
+              {skill}
+            </span>
+          ))}
+        </div>
+      )}
     </article>
   )
 }
 
-function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+function ProjectCard({ project, years, links }: ProjectSlot) {
   return (
     <LimboItemCard>
-      {project.featured && (
-        <span className="text-xs tracking-[0.15em] uppercase" style={{ color: LIMBO.midGrey2 }}>[ featured ]</span>
-      )}
-      <h4 className="text-xs font-bold mt-0.5 uppercase tracking-wider" style={{ color: LIMBO.fogWhite1 }}>{project.name}</h4>
+      <div className="flex justify-between items-start gap-2">
+        <h3 className="text-xs font-bold uppercase tracking-wider" style={{ color: LIMBO.fogWhite1 }}>{project.name}</h3>
+        {years && <span className="text-xs tracking-wider whitespace-nowrap text-[#888888]">{years}</span>}
+      </div>
+      <p className="text-xs mt-0.5 text-[#CCCCCC]">{project.role}</p>
       <p className="text-xs mt-0.5" style={{ color: LIMBO.lightGrey1 }}>{project.tagline}</p>
       {project.impact && (
         <p className="text-xs mt-1.5 italic" style={{ color: LIMBO.lightGrey2 }}>{'-> '}{project.impact}</p>
@@ -710,17 +674,32 @@ function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
           </span>
         ))}
       </div>
+      {links.length > 0 ? (
+        <div className="flex gap-2 flex-wrap mt-3">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-3 text-xs tracking-[0.2em] uppercase border-2 border-[#CCCCCC] text-[#CCCCCC] transition-colors hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-xs mt-3 uppercase tracking-wider text-[#888888]">[ no public link ]</p>
+      )}
     </LimboItemCard>
   )
 }
 
-function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
+function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
-    <LimboItemCard href={company.url}>
+    <LimboItemCard href={company.url || undefined}>
       <div className="flex items-start gap-2 mb-1">
-        <span className="text-base grayscale contrast-200">{company.icon}</span>
+        <span className="text-base grayscale contrast-200" aria-hidden="true">{company.icon}</span>
         <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider group-hover:underline" style={{ color: LIMBO.fogWhite1 }}>{company.name}</h4>
+          <h3 className="text-xs font-bold uppercase tracking-wider group-hover:underline" style={{ color: LIMBO.fogWhite1 }}>{company.name}</h3>
           <p className="text-xs tracking-wider" style={{ color: LIMBO.lightGrey1 }}>{company.tagline}</p>
         </div>
       </div>
@@ -729,67 +708,212 @@ function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
   )
 }
 
-function BandCard({ band }: { band: typeof BANDS[0] }) {
-  return (
-    <LimboItemCard href={band.url || undefined}>
-      <h4 className="text-xs font-bold uppercase tracking-wider group-hover:underline" style={{ color: LIMBO.fogWhite1 }}>{band.name}</h4>
-      <p className="text-xs tracking-wider mt-0.5" style={{ color: LIMBO.lightGrey1 }}>{band.genre} | {band.role}</p>
-      <p className="text-sm leading-relaxed mt-1.5" style={{ color: LIMBO.lightGrey2 }}>{band.description}</p>
-      {!band.url && (
-        <p className="text-xs mt-1.5 uppercase tracking-wider" style={{ color: LIMBO.midGrey1 }}>[ website coming ]</p>
+function BandCard({ band, years, linkProps }: BandSlot) {
+  const content = (
+    <LimboItemCard>
+      <h3 className="text-xs font-bold uppercase tracking-wider group-hover:underline" style={{ color: LIMBO.fogWhite1 }}>{band.name}</h3>
+      <p className="text-xs tracking-wider mt-0.5" style={{ color: LIMBO.lightGrey1 }}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      {band.release && (
+        <p className="text-sm leading-relaxed mt-1.5" style={{ color: LIMBO.lightGrey2 }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
       )}
     </LimboItemCard>
   )
+
+  if (!linkProps) return content
+  return (
+    <a
+      {...linkProps}
+      className="block transition-transform hover:translate-x-0.5 hover:translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white group"
+    >
+      {content}
+    </a>
+  )
 }
 
-function WorkCard({ work }: { work: typeof WORK_EXPERIENCE[0] }) {
+// The limbo button look, shared by the hero actions, the CV link and the closing call to action.
+const LIMBO_BUTTON =
+  'limbo-btn inline-flex items-center justify-center min-h-[44px] px-3 py-1.5 text-xs tracking-[0.2em] uppercase transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white'
+
+// Email is the lit primary action, LinkedIn the outlined one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-[#CCCCCC] text-black hover:opacity-90',
+  linkedin: 'border-2 border-[#CCCCCC] text-[#CCCCCC] hover:bg-white hover:text-black',
+}
+
+function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   return (
-    <article className="p-4" style={{
-      background: `${LIMBO.darkGrey2}`,
-      borderLeft: `3px solid ${LIMBO.black}`,
-      boxShadow: `4px 4px 0 ${LIMBO.black}`,
-    }}>
-      <div className="flex justify-between items-start mb-1">
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider" style={{ color: LIMBO.fogWhite1 }}>{work.title}</h4>
-          <p className="text-xs tracking-wider mt-0.5" style={{ color: LIMBO.lightGrey1 }}>{work.company}</p>
-        </div>
-        <span className="text-xs tracking-wider uppercase" style={{ color: work.current ? LIMBO.lightGrey1 : LIMBO.midGrey2 }}>{work.period}</span>
-      </div>
-      <ul className="mt-2 space-y-1">
-        {work.highlights.map((highlight, i) => (
-          <li key={i} className="text-xs flex items-start gap-1.5" style={{ color: LIMBO.lightGrey2 }}>
-            <span style={{ color: LIMBO.midGrey2 }} aria-hidden="true">-</span>
-            {highlight}
-          </li>
-        ))}
-      </ul>
-      {work.technologies && (
-        <div className="flex gap-1.5 flex-wrap mt-2">
-          {work.technologies.map((tech) => (
-            <span key={tech} className="text-xs px-1 py-0.5 uppercase" style={{ border: `1px solid ${LIMBO.midGrey1}`, color: LIMBO.lightGrey1 }}>
-              {tech}
-            </span>
-          ))}
-        </div>
-      )}
-    </article>
+    <>
+      {actions.map((action) => (
+        <a key={action.id} {...action.linkProps} className={`${LIMBO_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+          {action.label}
+        </a>
+      ))}
+    </>
   )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      {/* ========== ABOUT ========== */}
+      <section className="px-6 py-8" aria-label="About">
+        <div className="max-w-2xl mx-auto">
+          <SectionHeader title="about" />
+          <LimboCard>
+            <p className="text-sm leading-relaxed" style={{ color: LIMBO.lightGrey2 }}>{professionalSummary.bio}</p>
+          </LimboCard>
+        </div>
+      </section>
+
+      {/* ========== ART: GIANT SPIDER ========== */}
+      <GiantSpiderArt />
+
+      {/* ========== EXPERIENCE ========== */}
+      {sections.jobs.length > 0 && (
+        <section className="px-6 py-8" aria-label="Work experience">
+          <div className="max-w-2xl mx-auto">
+            <SectionHeader title="work experience" />
+            <div className="space-y-3">
+              {sections.jobs.map((entry) => (
+                <ExperienceCard key={entry.id} entry={entry} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ========== ART: INDUSTRIAL GEARS ========== */}
+      <IndustrialGearsArt />
+
+      {/* ========== TECH STACK ========== */}
+      <section className="px-6 py-8" aria-label="Tech stack">
+        <div className="max-w-2xl mx-auto">
+          <SectionHeader title="tech stack" />
+          <LimboCard>
+            <TechCloud categories={sections.techStack} />
+          </LimboCard>
+        </div>
+      </section>
+
+      {/* ========== PROJECTS ========== */}
+      <section className="px-6 py-8" aria-label="Projects">
+        <div className="max-w-2xl mx-auto">
+          <SectionHeader title="featured work" />
+          <ProjectList
+            projects={sections.projects}
+            className="grid md:grid-cols-2 gap-4"
+            renderProject={(slot) => <ProjectCard {...slot} />}
+          />
+        </div>
+      </section>
+
+      {/* ========== ART: FOREST ========== */}
+      <ForestArt />
+
+      {/* ========== VENTURES ========== */}
+      <section className="px-6 py-8" aria-label="Ventures">
+        <div className="max-w-2xl mx-auto">
+          <SectionHeader title="ventures" />
+          <div className="grid md:grid-cols-3 gap-3">
+            {sections.companies.map((company) => (
+              <CompanyCard key={company.id} company={company} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <GiantSpiderArt />
+
+      <section className="px-6 py-8" aria-label="Bands">
+        <div className="max-w-2xl mx-auto">
+          <SectionHeader title="bands" />
+          <p className="text-sm mb-4 text-center" style={{ color: LIMBO.lightGrey2 }}>
+            Drums since {musician.since}, {musician.yearsPlaying} years
+          </p>
+          <BandList
+            bands={bands}
+            className="grid md:grid-cols-3 gap-3"
+            renderBand={(slot) => <BandCard {...slot} />}
+          />
+          <p className="text-sm mt-4 italic text-center" style={{ color: LIMBO.lightGrey2 }}>{musician.line}</p>
+        </div>
+      </section>
+
+      <ForestArt />
+    </>
+  )
+}
+
+function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <IndustrialGearsArt />
+
+      <section className="px-6 py-8" aria-label="Muay Thai">
+        <div className="max-w-2xl mx-auto">
+          <SectionHeader title="muay thai" />
+          <LimboCard>
+            <h3 className="text-sm tracking-[0.2em] uppercase mb-4 text-[#DDDDDD]">{martialArts.primary.title}</h3>
+            <MuayThaiRecord
+              martialArts={martialArts}
+              classNames={{
+                facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+                fact: 'p-3 border-l-2 border-black bg-[#121212]',
+                term: 'text-xs tracking-[0.25em] uppercase text-[#888888]',
+                value: 'text-sm mt-1 text-[#CCCCCC]',
+                achievements: 'space-y-1',
+                achievement: 'text-sm flex items-start gap-1.5 text-[#AAAAAA]',
+              }}
+              renderAchievement={(achievement) => (
+                <>
+                  <span className="text-[#888888]" aria-hidden="true">-</span>
+                  {achievement}
+                </>
+              )}
+            />
+          </LimboCard>
+        </div>
+      </section>
+
+      <ForestArt />
+    </>
+  )
+}
+
+function ProfessionSectionsFor({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
+  return <EngineerSections sections={sections} />
 }
 
 // =============================================================================
 // MAIN THEME COMPONENT
-// Layout: Header -> About -> ART (spider) -> Experience -> ART (gears) -> Skills -> Projects -> ART (forest) -> Ventures -> Posts
+// Layout: Header -> Profession figures -> the profession's sections with the limbo art between them
+// -> Posts -> Contact
 // =============================================================================
 
 export default function SilhouetteTheme() {
-  const { active, setActive, config } = useProfession()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerSkills = getEngineerSkills()
-  const achievements = getAchievementsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
+  const view = useWorldView()
 
   return (
     <div
@@ -804,171 +928,46 @@ export default function SilhouetteTheme() {
       {/* Limbo atmospheric effects */}
       <LimboAtmosphere />
 
-      {/* ========== HEADER ========== */}
+      {/* ========== HEADER - the recruiter first screen ========== */}
       <header className="relative z-30 p-6" role="banner">
-        <div className="max-w-3xl mx-auto flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl tracking-[0.5em] font-normal" style={{ color: LIMBO.fogWhite2 }}>
-              ALEXANDER PULIDO
-            </h1>
-            <p className="text-xs tracking-[0.2em] mt-2" style={{ color: LIMBO.fogWhite1 }}>
-              {PROFESSIONAL_SUMMARY[active].headline}
-            </p>
-            <p className="text-xs tracking-wider mt-1 italic" style={{ color: LIMBO.lightGrey1 }}>
-              {PROFESSIONAL_SUMMARY[active].tagline}
-            </p>
-          </div>
-
-          <nav className="flex gap-3 items-center" aria-label="Main navigation">
-            <Link
-              href="/cv"
-              className="limbo-btn px-3 py-1.5 text-xs tracking-[0.2em] uppercase transition-colors hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ background: 'transparent', border: `2px solid ${LIMBO.fogWhite1}`, color: LIMBO.fogWhite1 }}
-            >
-              resume
-            </Link>
-            <Link
-              href="/personal-projects/game-engine"
-              className="limbo-btn px-3 py-1.5 text-xs tracking-[0.2em] uppercase transition-colors hover:opacity-80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ background: LIMBO.fogWhite1, color: LIMBO.black }}
-            >
-              enter
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Current Roles */}
-      <section className="relative z-20 py-4 px-6" aria-label="Current professional roles">
-        <div className="max-w-3xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-6">
-            {CURRENT_ROLES.map((role) => (
-              <div key={role.id} className="text-center">
-                <p className="text-xs tracking-[0.3em] uppercase" style={{ color: LIMBO.fogWhite1 }}>{role.title}</p>
-                <p className="text-xs mt-0.5" style={{ color: LIMBO.lightGrey1 }}>{role.company}</p>
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-3xl mx-auto flex flex-wrap justify-between items-start gap-4">
+              <div className="min-w-0">
+                <h1 className="text-xl sm:text-2xl tracking-[0.3em] sm:tracking-[0.5em] font-normal uppercase" style={{ color: LIMBO.fogWhite2 }}>
+                  {name}
+                </h1>
+                <p className="text-sm tracking-[0.2em] mt-2" style={{ color: LIMBO.fogWhite1 }}>{headline}</p>
+                <p className="text-sm tracking-wider mt-1 italic text-[#AAAAAA]">{tagline}</p>
+                <p className="text-sm tracking-wider mt-2 text-[#CCCCCC]">{line}</p>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+
+              <nav className="flex flex-wrap gap-3 items-center" aria-label="Contact and CV">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${LIMBO_BUTTON} border-2 border-[#CCCCCC] text-[#CCCCCC] hover:bg-white hover:text-black`}>
+                  resume
+                </Link>
+                <Link href="/personal-projects/game-engine" className={`${LIMBO_BUTTON} bg-[#CCCCCC] text-black hover:opacity-80`}>
+                  enter
+                </Link>
+              </nav>
+            </div>
+          )}
+        />
+      </header>
 
       {/* Profession Selection */}
       <section className="relative z-20 py-8" aria-label="Select profession view">
-        <div className="flex justify-center gap-14">
-          {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-            <SilhouetteFigure key={prof} profession={prof} isActive={active === prof} onClick={() => setActive(prof)} />
-          ))}
-        </div>
-        <p className="text-center mt-3 text-xs tracking-[0.3em] uppercase" style={{ color: LIMBO.lightGrey1 }}>
-          {config.title.toLowerCase()}
-        </p>
+        <ProfessionSwitch
+          className="flex justify-center gap-8 sm:gap-14"
+          label="Select profession view"
+          renderOption={(option) => <SilhouetteFigure key={option.id} option={option} />}
+        />
       </section>
 
-      {/* ========== MAIN CONTENT - NEW LAYOUT ORDER ========== */}
+      {/* ========== MAIN CONTENT ========== */}
       <main className="relative z-20" role="main">
-
-        {/* ========== ABOUT ========== */}
-        <section className="px-6 py-8" aria-label="About">
-          <div className="max-w-2xl mx-auto">
-            <SectionHeader title="about" />
-            <LimboCard ariaLabel="Biography">
-              <p className="text-sm leading-relaxed" style={{ color: LIMBO.lightGrey2 }}>{aboutData.bio}</p>
-              <div className="flex flex-wrap gap-3 mt-4">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span key={i} className="text-xs tracking-wider uppercase" style={{ color: LIMBO.lightGrey1 }}>- {fact}</span>
-                ))}
-              </div>
-            </LimboCard>
-          </div>
-        </section>
-
-        {/* ========== ART: GIANT SPIDER ========== */}
-        <GiantSpiderArt />
-
-        {/* ========== EXPERIENCE ========== */}
-        <section className="px-6 py-8" aria-label="Work experience">
-          <div className="max-w-2xl mx-auto space-y-6">
-            {/* Work Experience */}
-            <div>
-              <SectionHeader title="work experience" />
-              <div className="space-y-3">
-                {WORK_EXPERIENCE.map((work) => (
-                  <WorkCard key={work.company} work={work} />
-                ))}
-              </div>
-            </div>
-
-            {/* Professional Timeline */}
-            {experience.length > 0 && (
-              <div>
-                <SectionHeader title="timeline" />
-                <div className="space-y-3">
-                  {experience.map((entry) => (
-                    <ExperienceCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* ========== ART: INDUSTRIAL GEARS ========== */}
-        <IndustrialGearsArt />
-
-        {/* ========== SKILLS ========== */}
-        <section className="px-6 py-8" aria-label={active === 'engineer' ? 'Technical skills' : 'Skills and achievements'}>
-          <div className="max-w-2xl mx-auto">
-            <SectionHeader title={active === 'engineer' ? 'tech stack' : 'skills'} />
-            <LimboCard>
-              {active === 'engineer' ? (
-                <TechCloud categories={engineerSkills} />
-              ) : (
-                <AchievementsList categories={achievements} />
-              )}
-            </LimboCard>
-          </div>
-        </section>
-
-        {/* ========== PROJECTS ========== */}
-        <section className="px-6 py-8" aria-label="Featured projects">
-          <div className="max-w-2xl mx-auto">
-            <SectionHeader title="featured work" />
-            <div className="grid md:grid-cols-2 gap-4">
-              {projects.slice(0, 6).map((project) => (
-                <ProjectCard key={project.id} project={project} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ========== ART: FOREST ========== */}
-        <ForestArt />
-
-        {/* ========== VENTURES (Companies/Bands) ========== */}
-        <section className="px-6 py-8" aria-label="Ventures">
-          <div className="max-w-2xl mx-auto">
-            {active === 'engineer' && (
-              <>
-                <SectionHeader title="ventures" />
-                <div className="grid md:grid-cols-3 gap-3">
-                  {COMPANIES.map((company) => (
-                    <CompanyCard key={company.id} company={company} />
-                  ))}
-                </div>
-              </>
-            )}
-            {active === 'drummer' && (
-              <>
-                <SectionHeader title="bands" />
-                <div className="grid md:grid-cols-3 gap-3">
-                  {BANDS.map((band) => (
-                    <BandCard key={band.id} band={band} />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        </section>
+        <ProfessionSectionsFor sections={view.sections} />
 
         {/* ========== POSTS ========== */}
         <section className="px-6 py-8" aria-label="Posts">
@@ -991,35 +990,25 @@ export default function SilhouetteTheme() {
 
       {/* ========== CONTACT CTA ========== */}
       <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <h2 className="text-xl tracking-[0.3em] font-normal mb-3" style={{ color: LIMBO.fogWhite2 }}>
-              READY TO WORK TOGETHER?
-            </h2>
-            <p className="text-sm" style={{ color: LIMBO.lightGrey2 }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="limbo-btn px-6 py-3 text-sm tracking-[0.2em] uppercase transition-colors hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ background: LIMBO.fogWhite1, color: LIMBO.black }}
-            >
-              Get In Touch
-            </a>
-            <Link
-              href="/cv"
-              className="limbo-btn px-6 py-3 text-sm tracking-[0.2em] uppercase transition-colors hover:bg-white hover:text-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              style={{ background: 'transparent', border: `2px solid ${LIMBO.fogWhite1}`, color: LIMBO.fogWhite1 }}
-            >
-              Download CV
-            </Link>
-          </div>
-        </div>
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <h2 className="text-xl tracking-[0.3em] font-normal mb-3" style={{ color: LIMBO.fogWhite2 }}>
+                  READY TO WORK TOGETHER?
+                </h2>
+                <p className="text-sm" style={{ color: LIMBO.lightGrey2 }}>{line}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${LIMBO_BUTTON} border-2 border-[#CCCCCC] text-[#CCCCCC] hover:bg-white hover:text-black`}>
+                  Get the CV
+                </Link>
+              </div>
+            </div>
+          )}
+        />
       </section>
-
-      
 
       {/* ========== FOOTER ========== */}
       <footer className="relative z-20 py-10 text-center" role="contentinfo">
@@ -1029,7 +1018,7 @@ export default function SilhouetteTheme() {
           <div className="w-6 h-px" style={{ background: `${LIMBO.midGrey1}` }} />
         </div>
         <p className="text-xs" style={{ color: LIMBO.midGrey2 }}>
-          © {new Date().getFullYear()} Alexander Pulido
+          © {new Date().getFullYear()} {view.hero.name}
         </p>
       </footer>
 
