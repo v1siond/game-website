@@ -490,6 +490,29 @@ collections:
                   - { <<: *text, label: "Level number", name: level, hint: 'Keep {number}' }
                   - { <<: *text, label: "Time", name: time }
                   - { <<: *text, label: "Portal hint", name: hubHint }
+                  - { <<: *text, label: "XP", name: xp }
+                  - { <<: *text, label: "XP bar", name: xpBar, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Level up", name: levelUp }
+                  - { <<: *text, label: "Rarity common", name: rarityCommon }
+                  - { <<: *text, label: "Rarity uncommon", name: rarityUncommon }
+                  - { <<: *text, label: "Rarity rare", name: rarityRare }
+                  - { <<: *text, label: "Rarity epic", name: rarityEpic }
+                  - { <<: *text, label: "Rarity legendary", name: rarityLegendary }
+                  - { <<: *text, label: "Equip", name: equip }
+                  - { <<: *text, label: "Equipped", name: equipped }
+                  - { <<: *text, label: "Equip item", name: equipItem, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Links stat", name: statLinks }
+                  - { <<: *text, label: "Compare more", name: compareUp, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Compare fewer", name: compareDown, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Compare same", name: compareSame }
+                  - { <<: *text, label: "Loot hint", name: lootHint }
+                  - { <<: *text, label: "Quick change hint", name: changeHint }
+                  - { <<: *text, label: "Skill tree hint", name: treeHint }
+                  - { <<: *text, label: "Band intro hint", name: introHint }
+                  - { <<: *text, label: "Strike", name: strike }
+                  - { <<: *text, label: "Critical", name: critical }
+                  - { <<: *text, label: "Hit log", name: hitLog, hint: 'Keep {count} {total}' }
+                  - { <<: *text, label: "Respawn", name: respawn }
                   - { <<: *text, label: "Wrist terminal", name: wristTerminal }
                   - { <<: *text, label: "Dial hint", name: dialHint }
                   - { <<: *text, label: "Section tabs", name: sectionTabs }

@@ -1,157 +1,80 @@
 'use client'
 
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { ProjectList } from '@/components/cv/ProjectList'
-import { BandList } from '@/components/cv/BandList'
-import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { LevelScene } from '@/components/scroll/stage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { SectionBreak } from './backdrop'
-import { ComicPanel, SectionBanner, SpeechBubble } from './panels'
-import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechStackCloud } from './cards'
-import { SceneItem, Strip } from './scenes'
-import world from './world.module.css'
-import { drumsSince } from '@/components/cv/sectionText'
+import { Stage, useStage, SectionTitle, celHeadingId } from './stage'
+import { BountyBoard } from './bountyBoard'
+import { SkillTree } from './skillTree'
+import { LootDrops } from './lootDrops'
+import { MakersPlates } from './badges'
+import { BossCards } from './bossCards'
+import { HeavyBag } from './heavyBag'
+import cel from './cel.module.css'
 
-// The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
-// Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
-
-const LEAD = `text-center text-base font-bold ${world.copy}`
+// The picked profession's sections, each one a stage in the wasteland's day: About at noon, the bounty
+// board and the skill tree in the town's afternoon, the loot field, the makers' plates, the boss cards
+// and the heavy bag at dusk. The respawn station closes the page at night (respawn.tsx).
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
-  const { sections: titles } = useLabels()
+  const titles = useLabels().sections
 
   return (
     <>
-      <FadeInScene>
-        <SpeechBubble label={titles.about}>
-          <p className={`text-base leading-relaxed ${world.copy}`}>{professionalSummary.bio}</p>
-        </SpeechBubble>
-      </FadeInScene>
-
-      <SectionBreak kind="burst" />
+      <Stage title={titles.about} zone="noon">
+        <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
+          <p className="text-base leading-relaxed">{professionalSummary.bio}</p>
+        </div>
+      </Stage>
 
       {sections.jobs.length > 0 && (
-        <LevelScene>
-          <Strip profession="engineer" zone="record" />
-          <ComicPanel title={titles.workExperience} accent="orange">
-            <ul className="space-y-8">
-              {sections.jobs.map((entry, index) => (
-                <li key={entry.id}>
-                  <SceneItem kind="slam">
-                    <ExperienceCard entry={entry} index={index} />
-                  </SceneItem>
-                </li>
-              ))}
-            </ul>
-          </ComicPanel>
-        </LevelScene>
+        <Stage title={titles.workExperience} zone="town">
+          <BountyBoard jobs={sections.jobs} />
+        </Stage>
       )}
 
-      <SectionBreak kind="streaks" />
+      {sections.techStack.length > 0 && (
+        <Stage title={titles.techStack} zone="town">
+          <SkillTree categories={sections.techStack} />
+        </Stage>
+      )}
 
-      <FadeInScene>
-        <ComicPanel title={titles.techStack} accent="sky">
-          <TechStackCloud categories={sections.techStack} />
-        </ComicPanel>
-      </FadeInScene>
+      {sections.projects.length > 0 && (
+        <Stage title={titles.projects} zone="dusk">
+          <LootDrops projects={sections.projects} />
+        </Stage>
+      )}
 
-      <SectionBreak kind="burst" />
-
-      <LevelScene>
-        <Strip profession="engineer" zone="work" />
-        <SectionBanner accent="sun">{titles.featuredWork}</SectionBanner>
-        <ProjectList
-          projects={sections.projects}
-          className="grid gap-8 md:grid-cols-2"
-          renderProject={(slot) => (
-            <SceneItem kind="swipe">
-              <ProjectCard {...slot} index={sections.projects.indexOf(slot.project)} />
-            </SceneItem>
-          )}
-        />
-      </LevelScene>
-
-      <SectionBreak kind="streaks" />
-
-      <FadeInScene>
-        <SectionBanner accent="magenta">{titles.ventures}</SectionBanner>
-        <ul className="grid gap-6 md:grid-cols-3">
-          {sections.companies.map((company) => (
-            <li key={company.id}>
-              <CompanyCard company={company} />
-            </li>
-          ))}
-        </ul>
-      </FadeInScene>
+      {sections.companies.length > 0 && (
+        <Stage title={titles.ventures} zone="dusk">
+          <MakersPlates companies={sections.companies} />
+        </Stage>
+      )}
     </>
   )
 }
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { musician, bands } = sections
-  const { sections: titles, years } = useLabels()
+  const titles = useLabels().sections
 
   return (
-    <>
-      <SectionBreak kind="burst" />
-      <LevelScene>
-        <Strip profession="drummer" zone="record" />
-        <SectionBanner accent="magenta">{titles.bands}</SectionBanner>
-        <p className={`mb-6 ${LEAD}`}>
-          {drumsSince(musician, years)}
-        </p>
-        <BandList
-          bands={bands}
-          className="grid gap-6 md:grid-cols-3"
-          renderBand={(slot) => (
-            <SceneItem kind="swipe">
-              <BandCard {...slot} />
-            </SceneItem>
-          )}
-        />
-        <p className={`mt-6 ${LEAD}`}>{musician.line}</p>
-      </LevelScene>
-    </>
+    <Stage title={titles.bands} zone="dusk">
+      <BossCards musician={sections.musician} bands={sections.bands} />
+    </Stage>
   )
 }
 
+// The heavy bag needs the stage's flag to throw its first hits, so this stage is written out here.
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { martialArts } = sections
-  const { sections: titles } = useLabels()
+  const title = useLabels().sections.muayThai
+  const { ref, on } = useStage('dusk')
 
   return (
-    <>
-      <SectionBreak kind="burst" />
-      <LevelScene>
-        <Strip profession="fighter" zone="record" />
-        <ComicPanel title={titles.muayThai} accent="orange">
-          <h3 className="mb-4 text-xl tracking-wide">{martialArts.primary.title}</h3>
-          <MuayThaiRecord
-            martialArts={martialArts}
-            classNames={{
-              facts: `grid sm:grid-cols-2 gap-3 mb-5 ${world.copy}`,
-              fact: `p-3 bg-white border-[3px] border-[#141414] ${world.drop}`,
-              term: 'text-sm font-black tracking-wider uppercase text-[#141414]',
-              value: 'text-sm mt-1 text-[#141414]',
-              achievements: `space-y-3 ${world.copy}`,
-              achievement: 'text-sm font-bold text-[#141414]',
-            }}
-            renderAchievement={(achievement) => (
-              <SceneItem kind="slam">
-                <p className={`flex items-start gap-2 p-3 ${world.card}`}>
-                  <span className="mt-1.5 block h-2 w-2 flex-shrink-0 rotate-45 bg-[#e2362c]" aria-hidden="true" />
-                  <span>{achievement}</span>
-                </p>
-              </SceneItem>
-            )}
-          />
-        </ComicPanel>
-      </LevelScene>
-    </>
+    <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`mb-24 scroll-mt-8 ${cel.stage}`}>
+      <SectionTitle title={title} />
+      <HeavyBag martialArts={sections.martialArts} on={on} />
+    </section>
   )
 }
 

@@ -1,0 +1,1078 @@
+/*
+ * Cell Shaded, the inked wasteland: every look and every motion of the world. Colours are the palette's
+ * --cel-* variables, set once on the root (paletteVars). Motion is transform and opacity only; shadows,
+ * strokes and clip paths are fixed, never animated. Each block names the component that uses it.
+ * Under prefers-reduced-motion every animation and transition is off and every reveal is in its final
+ * state (the components pass their end state from the start).
+ */
+
+/* ---------------------------------------------------------------- page */
+
+.root {
+  background: var(--cel-noon-low);
+  color: var(--cel-ink);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* The display lettering: a heavy condensed face, upper case, the ink line round each letter. */
+.display {
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  -webkit-text-stroke: 1.5px var(--cel-ink);
+  paint-order: stroke fill;
+}
+
+/* The section title: sun letters on an ink slab cut on a slant, the slab's drop in orange. */
+.titleSlab {
+  display: inline-block;
+  padding: 0.35rem 1.25rem 0.25rem;
+  background: var(--cel-ink);
+  color: var(--cel-sun);
+  transform: skewX(-8deg);
+  box-shadow: 6px 6px 0 var(--cel-orange);
+}
+
+.titleSlab > * {
+  display: inline-block;
+  transform: skewX(8deg);
+}
+
+.hint {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--cel-ink);
+  color: var(--cel-paper);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+/* A printed surface: paper, a thick ink border and a hard ink drop. */
+.paper {
+  background: var(--cel-paper);
+  border: 4px solid var(--cel-ink);
+  box-shadow: 6px 6px 0 var(--cel-ink);
+}
+
+.darkPaper {
+  background: var(--cel-ink-soft);
+  color: var(--cel-paper);
+  border: 4px solid var(--cel-ink);
+  box-shadow: 6px 6px 0 var(--cel-ink);
+}
+
+/* Drawings with plain shapes get one ink line round every shape; data-bare shapes keep none. */
+.inked :is(path, rect, circle, ellipse, polygon):not([data-bare]) {
+  stroke: var(--cel-ink);
+  stroke-width: 2px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+.root :focus-visible {
+  outline: 4px solid var(--cel-ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px var(--cel-sun);
+}
+
+/* ---------------------------------------------------------------- buttons (buttons.tsx) */
+
+.inkButton {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 4px solid var(--cel-ink);
+  box-shadow: 4px 4px 0 var(--cel-ink);
+  color: var(--cel-ink);
+  font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', 'Arial Black', sans-serif;
+  font-size: 1.125rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.inkButton:hover {
+  transform: translate(-2px, -2px) rotate(-1.5deg);
+}
+
+.inkButton:active {
+  transform: translate(3px, 3px);
+}
+
+.btnSun { background: var(--cel-sun); }
+.btnOrange { background: var(--cel-orange); }
+.btnPaper { background: var(--cel-paper); }
+.btnHolo { background: var(--cel-holo); }
+
+/* ---------------------------------------------------------------- the sky and the desert (wasteland.tsx) */
+
+/* Four fixed skies in hard flat bands; the root's data-zone shows one, the others fade out. */
+.sky {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+}
+
+.skyNoon {
+  background: linear-gradient(180deg, var(--cel-noon-high) 0 38%, #5cc4c9 38% 62%, var(--cel-noon-low) 62%);
+}
+
+.skyTown {
+  background: linear-gradient(180deg, #3b8fb0 0 34%, var(--cel-sand) 34% 58%, var(--cel-orange) 58%);
+}
+
+.skyDusk {
+  background: linear-gradient(180deg, var(--cel-dusk-high) 0 36%, var(--cel-magenta) 36% 56%, var(--cel-dusk-low) 56%);
+}
+
+.skyNight {
+  background: linear-gradient(180deg, var(--cel-night-high) 0 46%, var(--cel-night) 46% 70%, var(--cel-night-low) 70%);
+}
+
+.root[data-zone='noon'] .skyNoon,
+.root[data-zone='town'] .skyTown,
+.root[data-zone='dusk'] .skyDusk,
+.root[data-zone='night'] .skyNight {
+  opacity: 1;
+}
+
+/* The sun sets as the page goes to dusk and night; the stars come out at night. */
+.sun {
+  transition: transform 1200ms ease-in-out, opacity 1200ms ease-in-out;
+}
+
+.root[data-zone='dusk'] .sun {
+  transform: translate3d(0, 38vh, 0);
+}
+
+.root[data-zone='night'] .sun {
+  transform: translate3d(0, 60vh, 0);
+  opacity: 0;
+}
+
+.stars {
+  opacity: 0;
+  transition: opacity 1200ms ease-in-out;
+}
+
+.root[data-zone='night'] .stars {
+  opacity: 1;
+}
+
+/* The mesas follow the pointer, far ones less: --mx from usePointerVars. */
+.ridgeFar,
+.ridgeNear {
+  transition: transform 400ms ease-out;
+}
+
+.ridgeFar {
+  transform: translate3d(calc(var(--mx, 0) * -10px), 0, 0);
+}
+
+.ridgeNear {
+  transform: translate3d(calc(var(--mx, 0) * -26px), 0, 0);
+}
+
+/* The desert darkens with the light. */
+.duskShade {
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+}
+
+.root[data-zone='dusk'] .duskShade {
+  opacity: 0.35;
+}
+
+.root[data-zone='night'] .duskShade {
+  opacity: 0.65;
+}
+
+/* ---------------------------------------------------------------- the sprite (sprite.tsx) */
+
+.sprite {
+  --sprite-run: 440ms;
+}
+
+/* Limbs swing from the top of their own box: the shoulder or the hip. */
+.limb {
+  transform-box: fill-box;
+  transform-origin: 50% 3%;
+}
+
+.sprBody {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.sprEyes {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.sprHolo {
+  opacity: 0;
+}
+
+.sprStickF,
+.sprStickB {
+  transform-box: fill-box;
+}
+
+/* The turret stays packed until the engineer's action deploys it. */
+.sprTurret,
+.sprFlash {
+  opacity: 0;
+}
+
+.sprTurret {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+.sprFlash {
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+}
+
+/* idle: the chest breathes, the eyes blink every few seconds */
+.motionIdle .sprBody {
+  animation: celBreathe 2600ms ease-in-out infinite;
+}
+
+.motionIdle .sprEyes,
+.motionAction .sprEyes {
+  animation: celBlink 4200ms linear infinite;
+}
+
+/* run: legs and arms swing against each other, the body bobs on each step */
+.motionRun .sprLegF,
+.motionRun .sprArmB {
+  animation: celSwing var(--sprite-run) ease-in-out infinite alternate;
+}
+
+.motionRun .sprLegB,
+.motionRun .sprArmF {
+  animation: celSwing var(--sprite-run) ease-in-out infinite alternate-reverse;
+}
+
+.motionRun .sprBody {
+  animation: celBob calc(var(--sprite-run) / 2) ease-in-out infinite alternate;
+}
+
+/* leap: the freeze frame pose, front fist thrown up, legs split mid air */
+.motionLeap .sprArmF { transform: rotate(-155deg); }
+.motionLeap .sprArmB { transform: rotate(55deg); }
+.motionLeap .sprLegF { transform: rotate(-48deg); }
+.motionLeap .sprLegB { transform: rotate(28deg); }
+
+/* action, per profession: deploys the turret and works it from the wrist computer, hits the drums,
+   throws the kick */
+.actsTurret.motionAction .sprArmF {
+  animation: celType 520ms ease-in-out infinite alternate;
+}
+
+.actsTurret.motionAction .sprArmB {
+  transform: rotate(-30deg);
+}
+
+.actsTurret.motionAction .sprHolo {
+  animation: celHolo 1400ms steps(2, jump-none) infinite;
+}
+
+/* the turret drops from above, lands with a squash, then fires: the flash is on for one frame in three */
+.actsTurret.motionAction .sprTurret {
+  animation: celDeploy 520ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.actsTurret.motionAction .sprFlash {
+  animation: celMuzzle 270ms steps(1, end) 600ms infinite;
+}
+
+.actsDrum.motionAction .sprArmF {
+  animation: celStick 300ms cubic-bezier(0.5, 0, 0.75, 0) infinite alternate;
+}
+
+.actsDrum.motionAction .sprArmB {
+  animation: celStick 300ms cubic-bezier(0.5, 0, 0.75, 0) infinite alternate-reverse;
+}
+
+.actsStrike.motionAction .sprLegF,
+.motionKick .sprLegF {
+  animation: celKick 460ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.actsStrike.motionAction .sprArmF,
+.actsStrike.motionAction .sprArmB,
+.motionKick .sprArmF,
+.motionKick .sprArmB,
+.motionKnee .sprArmF,
+.motionKnee .sprArmB {
+  transform: rotate(-28deg);
+}
+
+.motionKnee .sprLegF {
+  animation: celKnee 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.motionElbow .sprArmF {
+  animation: celElbow 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.motionElbow .sprArmB {
+  transform: rotate(-28deg);
+}
+
+@keyframes celBreathe {
+  50% { transform: scaleY(1.018); }
+}
+
+@keyframes celBlink {
+  0%, 94%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+
+@keyframes celSwing {
+  from { transform: rotate(-32deg); }
+  to { transform: rotate(32deg); }
+}
+
+@keyframes celBob {
+  to { transform: translateY(-3px); }
+}
+
+@keyframes celType {
+  from { transform: rotate(-62deg); }
+  to { transform: rotate(-78deg); }
+}
+
+@keyframes celDeploy {
+  0% { opacity: 0; transform: translate3d(0, -60px, 0); }
+  55% { opacity: 1; transform: translate3d(0, 4px, 0) scale(1.06, 0.92); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes celMuzzle {
+  0% { opacity: 1; transform: scale(1); }
+  33% { opacity: 0; transform: scale(0.6); }
+}
+
+@keyframes celHolo {
+  0% { opacity: 0.85; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes celStick {
+  from { transform: rotate(-115deg); }
+  to { transform: rotate(-55deg); }
+}
+
+@keyframes celKick {
+  0% { transform: rotate(0); }
+  35%, 60% { transform: rotate(-105deg); }
+  100% { transform: rotate(0); }
+}
+
+@keyframes celKnee {
+  0% { transform: rotate(0); }
+  35%, 60% { transform: rotate(-62deg); }
+  100% { transform: rotate(0); }
+}
+
+@keyframes celElbow {
+  0% { transform: rotate(-28deg); }
+  35%, 60% { transform: rotate(-140deg); }
+  100% { transform: rotate(-28deg); }
+}
+
+/* ---------------------------------------------------------------- the freeze frame entrance (freezeIntro.tsx) */
+
+/* The header carries one data attribute per phase reached (run, leap, freeze, name, title, release,
+   done); each rule below starts at its phase and the later phase that ends it wins. */
+
+.runner {
+  transform: translate3d(-120vw, 0, 0);
+}
+
+.intro[data-run] .runner {
+  animation: celRunIn 560ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.leap {
+  transform-origin: 50% 100%;
+}
+
+.intro[data-leap] .leap {
+  animation: celLeapUp 380ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.intro[data-release] .leap {
+  animation: celLand 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.dust {
+  opacity: 0;
+}
+
+.intro[data-run] .dust {
+  animation: celDust 640ms ease-out both;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+/* the freeze: the two tone wash, the rays, the letterbox cut on a slant, a one frame white flash */
+.wash,
+.rays,
+.flash {
+  opacity: 0;
+}
+
+.intro[data-freeze] .wash {
+  opacity: 0.62;
+}
+
+.intro[data-freeze] .rays {
+  animation: celRays 420ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.intro[data-freeze] .flash {
+  animation: celFlash 220ms ease-out both;
+}
+
+.barTop {
+  transform: translate3d(0, -110%, 0) skewY(-3deg);
+}
+
+.barBottom {
+  transform: translate3d(0, 110%, 0) skewY(-3deg);
+}
+
+.intro[data-freeze] :is(.barTop, .barBottom) {
+  transform: translate3d(0, 0, 0) skewY(-3deg);
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.intro[data-release] .wash,
+.intro[data-release] .rays {
+  animation: celFadeOut 360ms ease-in both;
+}
+
+.intro[data-release] .barTop {
+  transform: translate3d(0, -110%, 0) skewY(-3deg);
+}
+
+.intro[data-release] .barBottom {
+  transform: translate3d(0, 110%, 0) skewY(-3deg);
+}
+
+/* the name slams in, the stage shakes with it */
+.nameCard,
+.subtitle,
+.tagline,
+.introActions {
+  opacity: 0;
+}
+
+.intro[data-name] .nameCard {
+  animation: celSlam 460ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.intro[data-name] .shake {
+  animation: celShake 320ms linear both;
+}
+
+.intro[data-title] .subtitle {
+  animation: celSlideIn 340ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.intro[data-title] .tagline {
+  animation: celSlideIn 340ms cubic-bezier(0.2, 0.8, 0.3, 1) 140ms both;
+}
+
+.intro[data-release] .introActions {
+  animation: celRise 360ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* the name card: sun letters, a thick ink line, two hard drops, tilted the way the cards sit */
+.nameLetters {
+  color: var(--cel-sun);
+  -webkit-text-stroke: 3px var(--cel-ink);
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 var(--cel-ink), 8px 8px 0 var(--cel-orange);
+  transform: rotate(-4deg);
+}
+
+.subtitleCard {
+  background: var(--cel-paper);
+  border: 4px solid var(--cel-ink);
+  box-shadow: 5px 5px 0 var(--cel-ink);
+  transform: rotate(-2deg);
+}
+
+/* the end state, held once the entrance is over, skipped or never played (reduced motion) */
+.intro[data-done] :is(.nameCard, .subtitle, .tagline, .introActions) {
+  opacity: 1;
+  animation: none;
+}
+
+.intro[data-done] .runner {
+  transform: none;
+  animation: none;
+}
+
+.intro[data-done] :is(.wash, .rays, .flash, .dust) {
+  opacity: 0;
+  animation: none;
+}
+
+.intro[data-done] .leap {
+  animation: none;
+}
+
+@keyframes celFadeOut {
+  to { opacity: 0; }
+}
+
+@keyframes celRunIn {
+  from { transform: translate3d(-70vw, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes celLeapUp {
+  from { transform: translate3d(0, 0, 0) rotate(0); }
+  to { transform: translate3d(0, -14%, 0) rotate(-7deg); }
+}
+
+@keyframes celLand {
+  0% { transform: translate3d(0, -14%, 0) rotate(-7deg); }
+  60% { transform: translate3d(0, 0, 0) scale(1.06, 0.92); }
+  100% { transform: none; }
+}
+
+@keyframes celDust {
+  0% { opacity: 0; transform: scale(0.3); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(-40px, -16px, 0) scale(1.4); }
+}
+
+@keyframes celRays {
+  from { opacity: 0; transform: scale(0.5) rotate(-8deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes celFlash {
+  0% { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+@keyframes celSlam {
+  0% { opacity: 0; transform: scale(2.6) rotate(-14deg); }
+  60% { opacity: 1; transform: scale(0.94) rotate(-3deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes celShake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-8px, 4px, 0); }
+  40% { transform: translate3d(7px, -5px, 0); }
+  60% { transform: translate3d(-5px, 3px, 0); }
+  80% { transform: translate3d(3px, -2px, 0); }
+}
+
+@keyframes celSlideIn {
+  from { opacity: 0; transform: translate3d(48px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes celRise {
+  from { opacity: 0; transform: translate3d(0, 24px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* ---------------------------------------------------------------- a section's stage (zones.tsx) */
+
+/* The title slab slides in when the section first comes into view (data-on, useSectionTrigger). */
+.stage .titleSlab {
+  opacity: 0;
+}
+
+.stage[data-on] .titleSlab {
+  animation: celSlab 380ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes celSlab {
+  from { opacity: 0; transform: translate3d(-60px, 0, 0) skewX(-8deg); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) skewX(-8deg); }
+}
+
+/* ---------------------------------------------------------------- the digistruct build (digistruct.tsx) */
+
+/* Eight horizontal slices of him, each cut by a fixed clip; on a build they fly in from alternate
+   sides, bottom slice first, while the scan line climbs. */
+.slice {
+  clip-path: inset(calc(var(--i) * 12.5%) 0 calc((7 - var(--i)) * 12.5%) 0);
+}
+
+.digi[data-play] .slice {
+  animation: celSlice 380ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation-delay: calc((7 - var(--i)) * 70ms);
+}
+
+.slice:nth-child(odd) {
+  --side: -1;
+}
+
+.slice:nth-child(even) {
+  --side: 1;
+}
+
+.scan {
+  opacity: 0;
+}
+
+.digi[data-play] .scan {
+  animation: celScan 900ms linear both;
+}
+
+@keyframes celSlice {
+  from { opacity: 0; transform: translate3d(calc(var(--side) * 26px), 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes celScan {
+  0% { opacity: 1; transform: translate3d(0, 0, 0); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translate3d(0, -100cqh, 0); }
+}
+
+.digiBox {
+  container-type: size;
+}
+
+/* ---------------------------------------------------------------- the quick change station (quickChange.tsx) */
+
+.outfit {
+  transition: transform 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.outfit:hover {
+  transform: translate3d(0, -4px, 0) rotate(-1.5deg);
+}
+
+.outfit[aria-checked='true'] {
+  transform: rotate(-2deg) scale(1.04);
+}
+
+.padGlow {
+  animation: celPulse 1800ms ease-in-out infinite alternate;
+}
+
+@keyframes celPulse {
+  from { opacity: 0.45; }
+  to { opacity: 1; }
+}
+
+/* ---------------------------------------------------------------- the bounty board (bountyBoard.tsx) */
+
+.board {
+  background:
+    repeating-linear-gradient(180deg, transparent 0 52px, var(--cel-ink) 52px 55px),
+    repeating-linear-gradient(90deg, var(--cel-plank) 0 140px, #9a6836 140px 280px);
+  border: 6px solid var(--cel-ink);
+  box-shadow: 8px 8px 0 var(--cel-ink);
+}
+
+.notice {
+  background: var(--cel-notice);
+  border: 3px solid var(--cel-ink);
+  box-shadow: 4px 4px 0 var(--cel-plank-shade);
+  transform: rotate(var(--tilt));
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.notice:hover {
+  transform: translate3d(0, -5px, 0) rotate(0);
+}
+
+.noticeSlot {
+  opacity: 0;
+}
+
+.noticeSlot[data-on] {
+  animation: celSlap 360ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+
+.stamp {
+  color: var(--cel-flavour);
+  border: 3px solid var(--cel-flavour);
+  transform: rotate(-8deg);
+}
+
+.xpBar {
+  background: var(--cel-ink);
+  color: var(--cel-paper);
+  border: 3px solid var(--cel-ink);
+  box-shadow: 4px 4px 0 var(--cel-orange);
+}
+
+.xpCell {
+  background: var(--cel-ink-soft);
+  border: 2px solid var(--cel-paper);
+}
+
+.xpFill {
+  background: var(--cel-sun);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.xpFill[data-on] {
+  transform: scaleX(1);
+}
+
+.levelUp {
+  animation: celLevelUp 1500ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
+}
+
+@keyframes celSlap {
+  0% { opacity: 0; transform: scale(1.3) rotate(8deg); }
+  70% { opacity: 1; transform: scale(0.97) rotate(-1deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes celLevelUp {
+  0% { opacity: 0; transform: scale(0.3) rotate(-12deg); }
+  20% { opacity: 1; transform: scale(1.15) rotate(-4deg); }
+  75% { opacity: 1; transform: scale(1) rotate(-4deg); }
+  100% { opacity: 0; transform: translate3d(0, -24px, 0) scale(1) rotate(-4deg); }
+}
+
+/* ---------------------------------------------------------------- the skill tree (skillTree.tsx) */
+
+.branch {
+  opacity: 0;
+}
+
+.stage[data-on] .branch {
+  animation: celUnlock 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--i) * 110ms);
+}
+
+.skill {
+  background: var(--cel-paper);
+  color: var(--cel-ink);
+  border: 3px solid var(--cel-ink);
+  box-shadow: 3px 3px 0 var(--cel-ink);
+}
+
+/* The lit fill and the lit spine sit over the plain ones; a branch lights from the top down. */
+.skillLit {
+  background: var(--cel-sun);
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+  transition-delay: calc(var(--t) * 45ms);
+}
+
+.skillLit[data-on] {
+  opacity: 1;
+}
+
+.spineLit {
+  background: var(--cel-sun);
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  transition: transform 220ms ease-out;
+  transition-delay: calc(var(--t) * 45ms);
+}
+
+.spineLit[data-on] {
+  transform: scaleY(1);
+}
+
+@keyframes celUnlock {
+  0% { opacity: 0; transform: translate3d(0, 30px, 0) scale(0.9); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---------------------------------------------------------------- the loot drops (lootDrops.tsx) */
+
+.loot[data-rarity='common'] { --rarity: var(--cel-common); --rarity-text: var(--cel-ink); }
+.loot[data-rarity='uncommon'] { --rarity: var(--cel-uncommon); --rarity-text: var(--cel-ink); }
+.loot[data-rarity='rare'] { --rarity: var(--cel-rare); --rarity-text: var(--cel-ink); }
+.loot[data-rarity='epic'] { --rarity: var(--cel-epic); --rarity-text: var(--cel-white); }
+.loot[data-rarity='legendary'] { --rarity: var(--cel-legendary); --rarity-text: var(--cel-ink); }
+
+.loot {
+  opacity: 0;
+}
+
+.stage[data-on] .loot {
+  animation: celDrop 620ms cubic-bezier(0.3, 0.9, 0.4, 1) both;
+  animation-delay: calc(var(--i) * 110ms);
+}
+
+/* The beam: a column of the rarity's light standing up from the drop. */
+.beam,
+.beamGlow {
+  background: linear-gradient(0deg, var(--rarity) 0%, transparent 100%);
+  transform-origin: 50% 100%;
+}
+
+.beam {
+  transform: scaleY(0);
+}
+
+.stage[data-on] .beam {
+  animation: celBeam 900ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  animation-delay: calc(var(--i) * 110ms + 280ms);
+}
+
+.beamGlow {
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+.loot:hover .beamGlow,
+.loot:focus-within .beamGlow {
+  opacity: 0.85;
+}
+
+.lootCard {
+  background: var(--cel-paper);
+  border: 4px solid var(--cel-ink);
+  box-shadow: 6px 6px 0 var(--cel-ink);
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.loot:hover .lootCard,
+.loot:focus-within .lootCard {
+  transform: translate3d(0, -6px, 0);
+}
+
+.rarityBand {
+  background: var(--rarity);
+  color: var(--rarity-text);
+  border-bottom: 4px solid var(--cel-ink);
+}
+
+/* The compare marks show while the card is pointed at or focused, the card's equipped one never. */
+.compare {
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+
+.loot:hover .compare,
+.loot:focus-within .compare {
+  opacity: 1;
+}
+
+.up { color: #1d7a12; }
+.down { color: var(--cel-flavour); }
+
+.flavour {
+  color: var(--cel-flavour);
+}
+
+@keyframes celDrop {
+  0% { opacity: 0; transform: translate3d(0, -90px, 0) rotate(-5deg); }
+  55% { opacity: 1; transform: translate3d(0, 8px, 0) rotate(2deg); }
+  78% { transform: translate3d(0, -4px, 0) rotate(-0.5deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes celBeam {
+  0% { transform: scaleY(0); opacity: 0; }
+  45% { transform: scaleY(1.12); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0.55; }
+}
+
+/* ---------------------------------------------------------------- the makers' plates (badges.tsx) */
+
+.plate {
+  opacity: 0;
+}
+
+.stage[data-on] .plate {
+  animation: celStampIn 380ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+.press {
+  transition: transform 140ms ease-out;
+}
+
+.plate:hover .press,
+.plate:focus-visible .press {
+  transform: translate3d(0, 3px, 0) scale(0.97);
+}
+
+.splat {
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 160ms ease-out, transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.plate:hover .splat,
+.plate:focus-visible .splat {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@keyframes celStampIn {
+  0% { opacity: 0; transform: scale(1.5) rotate(-6deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+/* ---------------------------------------------------------------- the boss cards (bossCards.tsx) */
+
+.boss {
+  opacity: 0;
+}
+
+.stage[data-on] .boss {
+  animation: celSlap 380ms cubic-bezier(0.2, 1.3, 0.4, 1) both;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+.bossWash,
+.bossRays {
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.boss:hover :is(.bossWash, .bossRays),
+.boss:focus-within :is(.bossWash, .bossRays) {
+  opacity: 1;
+}
+
+.boss:hover .bossName,
+.boss:focus-within .bossName {
+  animation: celSlam 440ms cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.boss:hover .bossSub,
+.boss:focus-within .bossSub {
+  animation: celSlideIn 320ms cubic-bezier(0.2, 0.8, 0.3, 1) 120ms both;
+}
+
+.bossLetters {
+  color: var(--cel-sun);
+  -webkit-text-stroke: 2px var(--cel-ink);
+  paint-order: stroke fill;
+  text-shadow: 3px 3px 0 var(--cel-ink);
+}
+
+/* the drum hits on the band header: a burst at each stick tip in turn */
+.kitHit {
+  opacity: 0;
+}
+
+.stage[data-on] .kitHit {
+  animation: celHit 600ms steps(1, end) infinite;
+  animation-delay: calc(var(--i) * 300ms);
+}
+
+@keyframes celHit {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ---------------------------------------------------------------- the heavy bag (heavyBag.tsx) */
+
+.bag {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.bagSwing {
+  animation: celBagSwing 700ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.impact {
+  animation: celImpact 360ms ease-out both;
+}
+
+.pop {
+  animation: celPop 1300ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.crit {
+  color: var(--cel-crit);
+  -webkit-text-stroke: 2px var(--cel-ink);
+  paint-order: stroke fill;
+  text-shadow: 3px 3px 0 var(--cel-ink);
+}
+
+.hitMark {
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 160ms ease-out, transform 240ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hitMark[data-on] {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes celBagSwing {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(-12deg); }
+  55% { transform: rotate(7deg); }
+  80% { transform: rotate(-3deg); }
+  100% { transform: rotate(0); }
+}
+
+@keyframes celImpact {
+  0% { opacity: 1; transform: scale(0.3); }
+  100% { opacity: 0; transform: scale(1.3); }
+}
+
+@keyframes celPop {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.5); }
+  15% { opacity: 1; transform: translate3d(0, -12px, 0) scale(1.15); }
+  70% { opacity: 1; transform: translate3d(0, -70px, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(0, -100px, 0) scale(1); }
+}
+
+/* ---------------------------------------------------------------- the respawn station (respawn.tsx) */
+
+.ring {
+  animation: celPulse 1400ms ease-in-out infinite alternate;
+}
+
+.ringLate {
+  animation: celPulse 1400ms ease-in-out 700ms infinite alternate;
+}
+
+/* ---------------------------------------------------------------- reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .root *,
+  .root *::before,
+  .root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .motionAction .sprHolo,
+  .motionAction .sprTurret {
+    opacity: 1;
+  }
+
+  /* every entrance in its end state */
+  .stage[data-on] :is(.titleSlab, .branch, .loot, .plate, .boss),
+  .noticeSlot[data-on] {
+    opacity: 1;
+  }
+
+  .stage[data-on] .beam {
+    transform: none;
+    opacity: 0.55;
+  }
+}
