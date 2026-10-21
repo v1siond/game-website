@@ -787,6 +787,31 @@
   opacity: 0.9;
 }
 
+/* Him walking out of the door to the post: the strip spans the scene and starts pushed left with him
+   in the doorway, then slides to rest, five strides of the poster walk. */
+.atDoor {
+  opacity: 0;
+  transform: translate3d(-70%, 0, 0);
+}
+
+.walkOut {
+  animation: walkOut 3.5s linear both;
+}
+
+@keyframes walkOut {
+  0% {
+    opacity: 0;
+    transform: translate3d(-70%, 0, 0);
+  }
+  8% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .sectionPower {
   opacity: 0;
 }
@@ -855,8 +880,17 @@
   .backFar,
   .backNear,
   .farLayer,
-  .nearLayer {
+  .nearLayer,
+  .atDoor {
     transform: none;
+  }
+
+  .atDoor {
+    opacity: 1;
+  }
+
+  .walkOut {
+    animation: none;
   }
 
   .doorWall,

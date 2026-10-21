@@ -1,11 +1,13 @@
 'use client'
 
-import { useMemo, useReducer, useState } from 'react'
+import { useMemo, useReducer, useState, type AnimationEvent } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel } from '@/lib/cv/labels'
 import { ActionMenu } from './controls'
-import { DwellerSprite } from './dweller'
+import { DwellerSprite, type DwellerMotion } from './dweller'
 import { DoorArt } from './vaultDoor'
 import { atomicId } from './anchors'
 import { buildBoard, hackReducer, initialHack, MAX_ATTEMPTS, type HackAction, type HackBoard, type HackCell, type HackLogEntry, type HackState } from './hacking'
@@ -14,13 +16,41 @@ import atomic from './atomic.module.css'
 
 // Contact, outside: the page leaves the shelter. Behind, the wasteland at dusk (dust sky, the far ruined
 // skyline and the near one sliding apart with the pointer through --mx, the door standing rolled aside
-// in the rock), him outside in the poster tone, thumb up. In front, a public terminal on its post: the
+// in the rock). When the section scrolls in he walks out of the door on the jaunty poster walk, in
+// the poster tone and the picked profession's kit, and stops at the post to idle (the bounce and the
+// blink). In front, a public terminal on its post: the
 // contact menu on the left, always open, and on the right the password game (hacking.ts holds the
 // rules): his tools hidden in a memory dump, the attempts as blocks, every guess answered in the log.
 // A granted password powers on the reward line and he raises his thumb; a locked terminal offers a
 // reboot, which deals a fresh dump (a new seed remounts the game). The terminal powers on once when the section scrolls in.
 
-function Wasteland() {
+/**
+ * Him leaving the shelter: the strip he walks along spans the scene, so it starts pushed left with him
+ * at the door and slides to rest with him at the post; its own animation ending turns the walk into
+ * the idle. Under reduced motion he stands at the post, still.
+ */
+function WalkOut({ walking }: { walking: boolean }) {
+  const { active } = useProfession()
+  const reducedMotion = useReducedMotion()
+  const [arrived, setArrived] = useState(false)
+  const pace: DwellerMotion = arrived ? 'idle' : 'walk'
+  const motion: DwellerMotion = reducedMotion ? 'still' : pace
+
+  const arrive = (event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return
+    setArrived(true)
+  }
+
+  return (
+    <div className={`absolute inset-x-0 bottom-[6%] hidden lg:block ${walking ? atomic.walkOut : atomic.atDoor}`} onAnimationEnd={arrive}>
+      <div className="ml-auto mr-[4%] h-40 w-28">
+        <DwellerSprite profession={active} motion={motion} className="h-full w-full" />
+      </div>
+    </div>
+  )
+}
+
+function Wasteland({ walking }: { walking: boolean }) {
   return (
     <div className={`pointer-events-none absolute inset-0 overflow-hidden ${atomic.dusk}`} aria-hidden="true">
       <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className={`absolute inset-x-[-4%] bottom-[18%] h-[45%] w-[108%] ${atomic.farLayer}`} focusable="false">
@@ -34,9 +64,7 @@ function Wasteland() {
       <div className="absolute bottom-[8%] left-[2%] hidden w-[18%] max-w-[220px] lg:block">
         <DoorArt className={`h-auto w-full ${atomic.doorAside}`} />
       </div>
-      <div className="absolute bottom-[6%] right-[4%] hidden h-40 w-28 lg:block">
-        <DwellerSprite profession="engineer" motion="type" className="h-full w-full" />
-      </div>
+      <WalkOut walking={walking} />
       <span className="absolute inset-x-0 bottom-0 h-2 bg-atomic-ink" />
     </div>
   )
@@ -176,7 +204,7 @@ export function ContactTerminal() {
 
   return (
     <section ref={ref} aria-labelledby={atomicId(title)} className="relative z-20 overflow-hidden px-4 pb-48 pt-16 sm:px-6 lg:pb-56">
-      <Wasteland />
+      <Wasteland walking={triggered} />
       <div className={`relative mx-auto max-w-6xl p-3 sm:p-5 ${atomic.device}`} data-on={triggered || undefined}>
         <div className={`relative overflow-hidden rounded-[1.4rem] p-5 sm:p-8 ${atomic.tube}`}>
           <div className={`grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${atomic.sectionPower}`}>

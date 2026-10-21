@@ -8,7 +8,7 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
 import type { CVData } from '@/lib/cv/content'
-import { DwellerSprite } from './dweller'
+import { DWELLER_ACTION, DwellerSprite } from './dweller'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
 import { BRASS, CHROME, OLIVE, OLIVE_DARK, OLIVE_LIGHT, RUBBER, STEEL_LIGHT } from './palette'
@@ -25,8 +25,8 @@ import atomic from './atomic.module.css'
 // - Profession switch: the top tabs are the shared ProfessionSwitch (radio group, arrows); the dial on
 //   the right turns to the picked tab with a mechanical overshoot, and clicking the dial steps to the
 //   next one. A switch collapses the screen to a line and reopens it on the new profession (the screen's
-//   content is keyed by profession, so the CSS power on plays per switch), and his status figure raises
-//   its thumb.
+//   content is keyed by profession, so the CSS power on plays per switch), and his status figure plays
+//   that profession's action: typing on the wrist terminal, the drum roll, or the knee and side kick.
 // - The second row of tabs jumps to the picked profession's sections.
 // - The bottom bar holds the profession's field and how long he has been at it, from the CV.
 
@@ -117,13 +117,13 @@ function SectionTabs({ profession }: { profession: Profession }) {
   )
 }
 
-/** His figure on the tube, in the green line tone, raising his thumb as the screen comes on. */
+/** His figure on the tube, in the green line tone, at the picked profession's work as the screen comes on. */
 function StatusFigure({ profession }: { profession: Profession }) {
   return (
     <div className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
       <span className={atomic.statusBrackets} aria-hidden="true" />
       <div className={`absolute inset-3 ${atomic.statusFigure}`}>
-        <DwellerSprite key={profession} profession={profession} tone="phosphor" motion="thumbsUp" className="h-full w-full" />
+        <DwellerSprite key={profession} profession={profession} tone="phosphor" motion={DWELLER_ACTION[profession]} className="h-full w-full" />
       </div>
     </div>
   )
