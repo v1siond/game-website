@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { usePointerVars } from '@/hooks/usePointerVars'
 import { NoirBackdrop } from './BoldNoir/backdrop'
 import { CallingCardHero } from './BoldNoir/hero'
 import { ProfessionMenu } from './BoldNoir/menu'
@@ -24,42 +25,6 @@ import world from './BoldNoir/world.module.css'
 // The root carries the palette as --noir-* variables and the pointer as --mx and --my (-1 to 1), the
 // only inline styles, variables only. It clips sideways overflow with overflow-x: clip, not hidden:
 // hidden would make the root a scroll container.
-
-/**
- * Writes the pointer's place on the element as --mx and --my, -1 to 1 from the viewport centre: one
- * passive listener, at most one write a frame. Off until the element is drawn and under reduced
- * motion, where the layers stay still.
- */
-function usePointerVars(enabled: boolean) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const element = ref.current
-    if (!element || !enabled) return
-    let frame = 0
-    let x = 0
-    let y = 0
-
-    const write = () => {
-      frame = 0
-      element.style.setProperty('--mx', x.toFixed(3))
-      element.style.setProperty('--my', y.toFixed(3))
-    }
-    const onMove = (event: PointerEvent) => {
-      x = (event.clientX / window.innerWidth) * 2 - 1
-      y = (event.clientY / window.innerHeight) * 2 - 1
-      if (!frame) frame = window.requestAnimationFrame(write)
-    }
-
-    window.addEventListener('pointermove', onMove, { passive: true })
-    return () => {
-      window.removeEventListener('pointermove', onMove)
-      window.cancelAnimationFrame(frame)
-    }
-  }, [enabled])
-
-  return ref
-}
 
 export default function BoldNoirTheme() {
   const { active } = useProfession()
