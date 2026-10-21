@@ -31,6 +31,9 @@ export type ProfessionSections =
   | { profession: 'drummer'; musician: Musician; bands: Band[] }
   | { profession: 'fighter'; martialArts: MartialArts }
 
+/** One profession's slice of ProfessionSections, for a world's per profession section component. */
+export type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
 export interface CVView {
   profession: Profession
   hero: RecruiterHero

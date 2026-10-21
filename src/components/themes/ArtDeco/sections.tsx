@@ -4,13 +4,11 @@ import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import type { Profession } from '@/lib/cv/professions'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { RAPTURE_COLORS } from './palette'
 import { ArtDecoChevron, ArtDecoFan, ArtDecoSunburst, GoldFrame } from './frames'
 import { BandCard, CARD_TITLE_STYLE, CompanyCard, ExperienceCard, ProjectCard, TechCloud } from './cards'
-
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
 
 export function EngineerSections({ sections, reducedMotion }: { sections: SectionsOf<'engineer'>; reducedMotion: boolean }) {
   const { professionalSummary } = useCVData()
@@ -117,9 +115,8 @@ export function MartialArtistSections({ sections, reducedMotion }: { sections: S
   )
 }
 
-export function ProfessionDetails(props: { sections: ProfessionSections; reducedMotion: boolean }) {
-  const { sections, reducedMotion } = props
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} reducedMotion={reducedMotion} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} reducedMotion={reducedMotion} />
-  return <EngineerSections sections={sections} reducedMotion={reducedMotion} />
+export const SECTION_VIEWS: ProfessionSectionViews<{ reducedMotion: boolean }> = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }

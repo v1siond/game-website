@@ -12,7 +12,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // ============================================================================
@@ -1240,8 +1241,6 @@ function SectionBanner({ children }: { children: React.ReactNode }) {
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
@@ -1368,10 +1367,10 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
   )
 }
 
-function ProfessionDetails({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
-  return <EngineerSections sections={sections} />
+const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }
 
 // ============================================================================
@@ -1491,7 +1490,7 @@ export default function RubberHoseTheme() {
         {/* Main content */}
         <main id="main-content" className="relative z-20 px-2 md:px-8 py-8">
           <div className="max-w-4xl mx-auto" role="region" aria-label={`${active} profession details`}>
-            <ProfessionDetails sections={view.sections} />
+            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           </div>
         </main>
 

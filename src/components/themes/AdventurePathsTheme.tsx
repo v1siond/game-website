@@ -11,7 +11,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 
 // =============================================================================
 // SUPER MARIO BROS (NES) THEMED CV
@@ -1212,8 +1213,6 @@ function CVLink() {
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
@@ -1357,10 +1356,10 @@ function MartialArtistLevel({ sections }: { sections: SectionsOf<'fighter'> }) {
   )
 }
 
-function ProfessionLevels({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianLevel sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistLevel sections={sections} />
-  return <EngineerLevels sections={sections} />
+const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerLevels,
+  drummer: MusicianLevel,
+  fighter: MartialArtistLevel,
 }
 
 // =============================================================================
@@ -1491,7 +1490,7 @@ export default function AdventurePathsTheme() {
 
       {/* The picked profession's levels, and only those */}
       <div role="region" aria-label={`${active} profession details`}>
-        <ProfessionLevels sections={view.sections} />
+        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
       </div>
 
       <div className="relative z-20 px-4 sm:px-6 py-8">

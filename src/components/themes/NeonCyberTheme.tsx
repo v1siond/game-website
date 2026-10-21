@@ -11,7 +11,8 @@ import { ChromaticBorder, CyberwareIcon, GlitchText, ScannerCorners, TerminalLin
 import { DataStream, NightCitySkyline, RainOverlay } from './NeonCyber/backdrop'
 import { CyberPanel } from './NeonCyber/cards'
 import { CVLink, HeroAction } from './NeonCyber/actions'
-import { PROFESSION_CYBERWARE, ProfessionPanels, terminalName } from './NeonCyber/sections'
+import { PROFESSION_CYBERWARE, SECTION_VIEWS, terminalName } from './NeonCyber/sections'
+import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ContactScene } from './NeonCyber/scenes'
 
 // Neon Cyber, the default world: the page composition. Its effects, backdrop, cards, per profession
@@ -164,7 +165,7 @@ export default function NeonCyberTheme() {
 
           {/* The picked profession's sections and stages, and only those */}
           <div role="region" aria-label={`${active} profession details`}>
-            <ProfessionPanels sections={view.sections} />
+            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           </div>
 
           <ScrollScene className="mb-8">

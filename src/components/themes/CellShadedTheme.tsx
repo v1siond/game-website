@@ -10,7 +10,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job, Project } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Borderlands color palette - desert wasteland + loot rarity
@@ -1258,8 +1259,6 @@ function HeroActions({ actions, reducedMotion }: { actions: HeroActionSlot[]; re
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerPanels({ sections, reducedMotion }: { sections: SectionsOf<'engineer'>; reducedMotion: boolean }) {
   const { professionalSummary } = useCVData()
 
@@ -1410,10 +1409,10 @@ function MartialArtistPanels({ sections, reducedMotion }: { sections: SectionsOf
   )
 }
 
-function ProfessionPanels({ sections, reducedMotion }: { sections: ProfessionSections; reducedMotion: boolean }) {
-  if (sections.profession === 'drummer') return <MusicianPanels sections={sections} reducedMotion={reducedMotion} />
-  if (sections.profession === 'fighter') return <MartialArtistPanels sections={sections} reducedMotion={reducedMotion} />
-  return <EngineerPanels sections={sections} reducedMotion={reducedMotion} />
+const SECTION_VIEWS: ProfessionSectionViews<{ reducedMotion: boolean }> = {
+  engineer: EngineerPanels,
+  drummer: MusicianPanels,
+  fighter: MartialArtistPanels,
 }
 
 export default function CellShadedTheme() {
@@ -1547,7 +1546,7 @@ export default function CellShadedTheme() {
       {/* Main content */}
       <main className="relative z-20 px-6 py-8">
         <div className="max-w-5xl mx-auto">
-          <ProfessionPanels sections={view.sections} reducedMotion={reducedMotion} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} reducedMotion={reducedMotion} />
         </div>
       </main>
 

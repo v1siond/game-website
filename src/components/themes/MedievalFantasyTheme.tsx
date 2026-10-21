@@ -13,7 +13,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 
 // =============================================================================
 // WARCRAFT 3 DUAL PALETTE - Reign of Chaos + Frozen Throne
@@ -4556,8 +4557,6 @@ function BandCard({ band, years, linkProps }: BandSlot) {
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerSections({ sections, layout, isLargeScreen }: { sections: SectionsOf<'engineer'>; layout: SectionLayout; isLargeScreen: boolean }) {
   const { professionalSummary } = useCVData()
   const { jobs, techStack, projects, companies } = sections
@@ -4762,10 +4761,10 @@ function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fig
   )
 }
 
-function ProfessionSectionsView({ sections, layout, isLargeScreen }: { sections: ProfessionSections; layout: SectionLayout; isLargeScreen: boolean }) {
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} layout={layout} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} layout={layout} />
-  return <EngineerSections sections={sections} layout={layout} isLargeScreen={isLargeScreen} />
+const SECTION_VIEWS: ProfessionSectionViews<{ layout: SectionLayout; isLargeScreen: boolean }> = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }
 
 function HeroActions({ actions, zone }: { actions: HeroActionSlot[]; zone: 'roc' | 'ft' }) {
@@ -4930,7 +4929,7 @@ export default function MedievalFantasyTheme() {
         </FadeInSection>
 
         <main>
-          <ProfessionSectionsView sections={view.sections} layout={layout} isLargeScreen={isLargeScreen} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} layout={layout} isLargeScreen={isLargeScreen} />
         </main>
 
         {/* === FT Art Divider: Ice Throne === */}

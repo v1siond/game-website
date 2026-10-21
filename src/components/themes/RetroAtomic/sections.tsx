@@ -4,16 +4,14 @@ import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useCVData } from '@/components/cv/CVDataProvider'
-import type { Profession } from '@/lib/cv/professions'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { TERMINAL_AMBER, TERMINAL_TEXT, VAULT_YELLOW } from './palette'
 import { PipBoyFrame, RustedPanel, VaultTecPanel, WornDocumentPanel } from './panels'
 import { NukaColaArt, VaultTecArt, WastelandArt } from './art'
 import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechStackTerminal } from './cards'
 
 // Each profession's sections, and only those.
-
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
 
 export const SECTION_WRAP = 'relative z-20 py-6 px-4 md:px-6'
 
@@ -149,8 +147,8 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
   )
 }
 
-export function ProfessionDetails({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
-  return <EngineerSections sections={sections} />
+export const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }

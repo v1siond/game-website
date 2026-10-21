@@ -8,9 +8,9 @@ import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHer
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 
 // =============================================================================
 // LIMBO - DARKER, PERFORMANCE-OPTIMIZED
@@ -758,8 +758,6 @@ function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
@@ -900,10 +898,10 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
   )
 }
 
-function ProfessionSectionsFor({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
-  return <EngineerSections sections={sections} />
+const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }
 
 // =============================================================================
@@ -967,7 +965,7 @@ export default function SilhouetteTheme() {
 
       {/* ========== MAIN CONTENT ========== */}
       <main className="relative z-20" role="main">
-        <ProfessionSectionsFor sections={view.sections} />
+        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
         {/* ========== POSTS ========== */}
         <section className="px-6 py-8" aria-label="Posts">

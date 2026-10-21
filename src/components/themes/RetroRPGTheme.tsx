@@ -11,7 +11,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // =============================================================================
@@ -859,8 +860,6 @@ function CVLink() {
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
@@ -975,10 +974,10 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
   )
 }
 
-function ProfessionSections({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
-  return <EngineerSections sections={sections} />
+const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }
 
 // =============================================================================
@@ -1122,7 +1121,7 @@ export default function RetroRPGTheme() {
       {/* ========== MAIN CONTENT: the picked profession's sections, and only those ========== */}
       <main id="main-content" className="relative z-20 px-4 sm:px-6 py-8" role="main">
         <div className="max-w-5xl mx-auto" role="region" aria-label={`${active} profession details`}>
-          <ProfessionSections sections={view.sections} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
           {/* POSTS Section */}
           <BattleFrame title="POSTS" era="end-of-time">

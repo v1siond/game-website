@@ -10,7 +10,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Color palette - Dark Souls authentic
@@ -1645,8 +1646,6 @@ function SectionHeading({ id, color = COLORS.bonfire, children }: { id: string; 
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerZone({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
@@ -1771,10 +1770,10 @@ function MartialArtistZone({ sections }: { sections: SectionsOf<'fighter'> }) {
   )
 }
 
-function ProfessionZone({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianZone sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistZone sections={sections} />
-  return <EngineerZone sections={sections} />
+const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerZone,
+  drummer: MusicianZone,
+  fighter: MartialArtistZone,
 }
 
 export default function SoulMapTheme() {
@@ -1912,7 +1911,7 @@ export default function SoulMapTheme() {
       {/* Zone info */}
       <main id="main-content" className="relative z-20 px-6 py-8">
         <div className="max-w-4xl mx-auto">
-          <ProfessionZone sections={view.sections} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </div>
       </main>
 

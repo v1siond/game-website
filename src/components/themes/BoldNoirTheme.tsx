@@ -11,7 +11,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Profession-specific ornaments in Persona 5 bold style
@@ -1163,8 +1164,6 @@ function SectionHeading({ children, prefersReducedMotion }: { children: React.Re
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerSections({ sections, prefersReducedMotion }: { sections: SectionsOf<'engineer'>; prefersReducedMotion: boolean }) {
   const { professionalSummary } = useCVData()
 
@@ -1296,11 +1295,10 @@ function MartialArtistSections({ sections, prefersReducedMotion }: { sections: S
   )
 }
 
-function ProfessionDetails(props: { sections: ProfessionSections; prefersReducedMotion: boolean }) {
-  const { sections, prefersReducedMotion } = props
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} prefersReducedMotion={prefersReducedMotion} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} prefersReducedMotion={prefersReducedMotion} />
-  return <EngineerSections sections={sections} prefersReducedMotion={prefersReducedMotion} />
+const SECTION_VIEWS: ProfessionSectionViews<{ prefersReducedMotion: boolean }> = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }
 
 export default function BoldNoirTheme() {
@@ -1422,7 +1420,7 @@ export default function BoldNoirTheme() {
           </section>
 
           <div role="region" aria-label={`${active} profession details`}>
-            <ProfessionDetails sections={view.sections} prefersReducedMotion={prefersReducedMotion} />
+            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} prefersReducedMotion={prefersReducedMotion} />
           </div>
         </div>
       </main>

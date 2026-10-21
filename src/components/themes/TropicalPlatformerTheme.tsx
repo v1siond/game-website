@@ -11,7 +11,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // ============================================================================
@@ -1651,7 +1652,6 @@ function CVLink() {
 // ============================================================================
 // PROFESSION SECTIONS - what each profession shows, from the content files
 // ============================================================================
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
 
 function EngineerSections({ sections, reducedMotion }: { sections: SectionsOf<'engineer'>; reducedMotion: boolean }) {
   const { professionalSummary } = useCVData()
@@ -1792,10 +1792,10 @@ function MartialArtistSections({ sections, reducedMotion }: { sections: Sections
   )
 }
 
-function ProfessionDetails({ sections, reducedMotion }: { sections: ProfessionSections; reducedMotion: boolean }) {
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} reducedMotion={reducedMotion} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} reducedMotion={reducedMotion} />
-  return <EngineerSections sections={sections} reducedMotion={reducedMotion} />
+const SECTION_VIEWS: ProfessionSectionViews<{ reducedMotion: boolean }> = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }
 
 // ============================================================================
@@ -2085,7 +2085,7 @@ export default function TropicalPlatformerTheme() {
 
       <main className="relative z-20">
         <div role="region" aria-label={`${active} profession details`}>
-          <ProfessionDetails sections={view.sections} reducedMotion={reducedMotion} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} reducedMotion={reducedMotion} />
         </div>
       </main>
 

@@ -5,7 +5,8 @@ import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { PROFESSION_LABELS, type Profession } from '@/lib/cv/professions'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { CompanyCard, BandCard, CyberPanel, ExperienceCard, ProjectCard, TechCategory } from './cards'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
@@ -20,8 +21,6 @@ export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> =
 
 // The selector's state line reads the profession the way the terminal would type it.
 export const terminalName = (profession: Profession): string => PROFESSION_LABELS[profession].toUpperCase().replace(/\s+/g, '_')
-
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
 
 // About, Tech Stack and Ventures fade in; the work sections are levels he crosses.
 function FadeIn({ children }: { children: ReactNode }) {
@@ -152,8 +151,8 @@ export function MartialArtistPanels({ sections }: { sections: SectionsOf<'fighte
   )
 }
 
-export function ProfessionPanels({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianPanels sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistPanels sections={sections} />
-  return <EngineerPanels sections={sections} />
+export const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerPanels,
+  drummer: MusicianPanels,
+  fighter: MartialArtistPanels,
 }

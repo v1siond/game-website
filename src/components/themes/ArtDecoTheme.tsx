@@ -22,7 +22,8 @@ import {
 import { GoldFrame, NeonSign } from './ArtDeco/frames'
 import { PlasmidButton } from './ArtDeco/plasmids'
 import { CVLink, DECO_BUTTON, HERO_ACTION_LOOK, HeroAction } from './ArtDeco/actions'
-import { ProfessionDetails } from './ArtDeco/sections'
+import { SECTION_VIEWS } from './ArtDeco/sections'
+import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 
 // Art Deco, BioShock's Rapture: the page composition. Its palette, backdrop, frames, cards, plasmid
 // switch and per profession sections live in ./ArtDeco.
@@ -156,7 +157,7 @@ export default function ArtDecoTheme() {
       {/* ================================================================== */}
       <main className="relative z-20 px-4 sm:px-8 py-10">
         <div className="max-w-5xl mx-auto space-y-0" role="region" aria-label={`${active} profession details`}>
-          <ProfessionDetails sections={view.sections} reducedMotion={reducedMotion} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} reducedMotion={reducedMotion} />
 
           <div className="pt-8">
             <GoldFrame title="POSTS" reducedMotion={reducedMotion}>

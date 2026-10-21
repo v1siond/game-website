@@ -10,7 +10,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { KratosChainPullReveal } from './Mythic/KratosSprite'
@@ -1668,8 +1669,6 @@ function FramedSection({ title, children }: { title: string; children: React.Rea
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
   const experienceTrigger = useSectionTrigger(SECTION_TRIGGER)
@@ -1812,10 +1811,10 @@ function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }
   )
 }
 
-function ProfessionSectionsView({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
-  return <EngineerSections sections={sections} />
+const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }
 
 // =============================================================================
@@ -2022,7 +2021,7 @@ export default function MythicTheme() {
           </section>
         </FadeInSection>
 
-        <ProfessionSectionsView sections={view.sections} />
+        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
       </main>
 

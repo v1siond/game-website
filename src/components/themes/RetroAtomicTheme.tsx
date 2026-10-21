@@ -20,7 +20,8 @@ import {
 import { AtomSymbol, BottleCap, RadiationSymbol } from './RetroAtomic/icons'
 import { PipBoyTab } from './RetroAtomic/cards'
 import { CVLink, HeroAction, TERMINAL_BUTTON } from './RetroAtomic/actions'
-import { ProfessionDetails } from './RetroAtomic/sections'
+import { SECTION_VIEWS } from './RetroAtomic/sections'
+import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Retro Atomic: the page composition. Its palette, icons, panels, art separators, cards and per
@@ -147,7 +148,7 @@ export default function RetroAtomicTheme() {
       </section>
 
       <div role="region" aria-label={`${active} profession details`}>
-        <ProfessionDetails sections={view.sections} />
+        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
       </div>
 
       {/* ================================================================ */}

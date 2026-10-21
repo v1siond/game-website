@@ -10,7 +10,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
-import type { ProfessionSections } from '@/lib/cv/cvView'
+import type { SectionsOf } from '@/lib/cv/cvView'
+import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 
 // Resident Evil actual game palette - from gameplay screenshots
 // RE1 Remake mansion, RE4 village, RE7 Baker house
@@ -1081,8 +1082,6 @@ function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   )
 }
 
-type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
-
 function EngineerFiles({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
   const [openFiles, setOpenFiles] = useState<ReadonlySet<string>>(new Set())
@@ -1256,10 +1255,10 @@ function MartialArtistFiles({ sections }: { sections: SectionsOf<'fighter'> }) {
   )
 }
 
-function ProfessionFiles({ sections }: { sections: ProfessionSections }) {
-  if (sections.profession === 'drummer') return <MusicianFiles sections={sections} />
-  if (sections.profession === 'fighter') return <MartialArtistFiles sections={sections} />
-  return <EngineerFiles sections={sections} />
+const SECTION_VIEWS: ProfessionSectionViews = {
+  engineer: EngineerFiles,
+  drummer: MusicianFiles,
+  fighter: MartialArtistFiles,
 }
 
 export default function SurvivalHorrorTheme() {
@@ -1450,7 +1449,7 @@ export default function SurvivalHorrorTheme() {
             </div>
           </section>
 
-          <ProfessionFiles sections={view.sections} />
+          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </div>
       </main>
 
