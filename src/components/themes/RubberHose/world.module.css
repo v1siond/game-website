@@ -1,0 +1,406 @@
+/*
+ * Rubber Hose's page look, outside the scroll scenes (scenes.module.css): the sepia paper page, the film
+ * stock round the frame with its grain, vignette and flicker, the poster and title card surfaces with
+ * their hard ink drop, the lettering, the ink line every drawing carries, and the ambient loops of a
+ * 1930s cartoon (the sprockets running, notes rising, the title bouncing on the beat). Every colour is a
+ * --hose-* variable that palette.ts puts on the root. Shadows and strokes are fixed, never animated;
+ * the loops move transform and opacity only and stop under reduced motion.
+ */
+
+.root {
+  background: linear-gradient(180deg, var(--hose-paper), var(--hose-paper-sepia));
+  color: var(--hose-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+/* The poster lettering: a heavy display serif. */
+.lettering {
+  font-family: 'Abril Fatface', Georgia, serif;
+  letter-spacing: 0.05em;
+}
+
+/* ---- text tones on the paper ---- */
+
+.ink {
+  color: var(--hose-ink);
+}
+
+.red {
+  color: var(--hose-red-dark);
+}
+
+.muted {
+  color: var(--hose-shadow-dark);
+}
+
+/* ---- the film frame ---- */
+
+/* A strip of film stock down the page edge, its sprocket holes running past. The holes are one
+   repeating gradient on an element taller than the screen, so the loop is a single translate. */
+.filmStrip {
+  background: var(--hose-film);
+}
+
+.sprockets {
+  position: absolute;
+  inset: -2rem 0;
+  background-image: linear-gradient(180deg, transparent 0 0.5rem, var(--hose-film-hole) 0.5rem 1.5rem, transparent 1.5rem 2rem);
+  background-size: 50% 2rem;
+  background-repeat: repeat-y;
+  background-position: center top;
+  animation: sprocketRun 1.6s linear infinite;
+}
+
+.sprocketsReverse {
+  animation-direction: reverse;
+}
+
+@keyframes sprocketRun {
+  to {
+    transform: translate3d(0, 2rem, 0);
+  }
+}
+
+/* The double ink rule framing the page like a cartoon's title frame. */
+.frameRule {
+  border: 8px double var(--hose-ink);
+}
+
+/* The film grain: a noise tile larger than the screen jumping in steps, like grain changing per frame. */
+.grain {
+  position: absolute;
+  inset: -10%;
+  opacity: 0.15;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  animation: grainJump 0.5s steps(5) infinite;
+}
+
+@keyframes grainJump {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(-3%, 2%, 0);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0);
+  }
+  75% {
+    transform: translate3d(-2%, -2%, 0);
+  }
+  100% {
+    transform: translate3d(3%, 3%, 0);
+  }
+}
+
+/* The sepia vignette darkening the edges, and the projector's flicker over it. */
+.vignette {
+  background: radial-gradient(
+    circle at 50% 50%,
+    transparent 25%,
+    color-mix(in srgb, var(--hose-ink) 45%, transparent) 85%,
+    color-mix(in srgb, var(--hose-ink) 70%, transparent) 100%
+  );
+}
+
+.flicker {
+  background: var(--hose-ink);
+  opacity: 0;
+  animation: flicker 2.4s linear infinite;
+}
+
+@keyframes flicker {
+  0%,
+  7%,
+  10%,
+  49%,
+  52%,
+  100% {
+    opacity: 0;
+  }
+  8% {
+    opacity: 0.08;
+  }
+  50% {
+    opacity: 0.05;
+  }
+}
+
+/* A note drifting up the page on its own --delay, swaying as it climbs. */
+.noteRise {
+  opacity: 0;
+  animation: noteRise 14s linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes noteRise {
+  0% {
+    transform: translate3d(0, 0, 0) rotate(-10deg);
+    opacity: 0;
+  }
+  10%,
+  85% {
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate3d(1.5rem, -55vh, 0) rotate(10deg);
+  }
+  100% {
+    transform: translate3d(0, -110vh, 0) rotate(-10deg);
+    opacity: 0;
+  }
+}
+
+/* ---- surfaces ---- */
+
+.poster {
+  background: var(--hose-paper-dark);
+  border: 4px solid var(--hose-ink);
+  box-shadow: 4px 4px 0 var(--hose-shadow);
+}
+
+.posterWide {
+  box-shadow: 6px 6px 0 var(--hose-shadow);
+}
+
+/* A title card, the ornate frame a 1930s short puts its words in: paper with an inner rule. */
+.titleCard {
+  background: var(--hose-paper);
+  border: 4px solid var(--hose-ink);
+  box-shadow: 5px 5px 0 var(--hose-shadow-dark);
+  outline: 2px solid var(--hose-ink);
+  outline-offset: -10px;
+}
+
+.banner {
+  background: var(--hose-red-dark);
+  border: 4px solid var(--hose-ink);
+  color: var(--hose-paper);
+  box-shadow: 4px 4px 0 var(--hose-red-deep);
+}
+
+.chip {
+  background: var(--hose-ink);
+  color: var(--hose-paper);
+}
+
+.fact {
+  background: var(--hose-paper);
+  border: 4px solid var(--hose-ink);
+}
+
+.impact {
+  background: color-mix(in srgb, var(--hose-gold) 19%, transparent);
+  border: 1px solid color-mix(in srgb, var(--hose-gold) 31%, transparent);
+}
+
+/* The corner ticks of a poster's frame. */
+.tick {
+  border-color: var(--hose-red-dark);
+}
+
+/* ---- buttons ---- */
+
+.button {
+  border: 3px solid var(--hose-ink);
+  color: var(--hose-paper);
+}
+
+.buttonRed {
+  background: var(--hose-red-dark);
+  box-shadow: 3px 3px 0 var(--hose-red-deep);
+}
+
+.buttonInk {
+  background: var(--hose-ink);
+  box-shadow: 3px 3px 0 var(--hose-film);
+}
+
+/* ---- the profession select badges ---- */
+
+.badge {
+  background: var(--hose-paper);
+  border: 6px solid var(--hose-ink);
+  box-shadow: 0 4px 0 var(--hose-shadow);
+}
+
+.badgeOn {
+  background: var(--hose-red-dark);
+  box-shadow: 0 8px 0 var(--hose-red-deep);
+}
+
+.badgeRing {
+  border: 2px dashed color-mix(in srgb, var(--hose-ink) 25%, transparent);
+}
+
+.badgeName {
+  background: var(--hose-ink);
+  color: var(--hose-paper);
+}
+
+/* The picked badge bounces on the beat, squashing as it lands. */
+.beatBounce {
+  transform-origin: 50% 100%;
+  animation: beatBounce 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+@keyframes beatBounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.06, 0.94);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0) scale(0.97, 1.03);
+  }
+}
+
+/* ---- lettering ---- */
+
+/* The big title: ink letters with two hard brown drops, each letter tilted the other way to its
+   neighbour like hand lettering; the whole name bounces on the beat. */
+.title {
+  text-shadow:
+    4px 4px 0 var(--hose-shadow),
+    6px 6px 0 var(--hose-shadow-dark);
+}
+
+.title > * > :nth-child(odd) {
+  transform: rotate(-2deg);
+}
+
+.title > * > :nth-child(even) {
+  transform: rotate(2deg) translateY(-2px);
+}
+
+.titleBounce {
+  transform-origin: 50% 100%;
+  animation: beatBounce 1.2s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+}
+
+.dropText {
+  text-shadow: 2px 2px 0 var(--hose-shadow);
+}
+
+/* ---- art ---- */
+
+/* The ink line round every shape of a drawing, one weight however the drawing is scaled. */
+.inked :is(path, rect, circle, ellipse, polygon) {
+  stroke: var(--hose-ink);
+  stroke-width: 1.4px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+
+/* The ink blot a poster throws when the pointer lands on it, grown from its corner. */
+.blot {
+  transform: scale(0);
+  transform-origin: 100% 0;
+  transition: transform 0.25s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+:global(.group):hover .blot {
+  transform: scale(1);
+}
+
+/* An art break's sprocket row running sideways. */
+.sprocketRow {
+  background-image: linear-gradient(90deg, transparent 0 0.5rem, var(--hose-paper) 0.5rem 1.5rem, transparent 1.5rem 2rem);
+  background-size: 2rem 1rem;
+  background-repeat: repeat-x;
+  background-position: left center;
+  animation: sprocketSide 1.2s linear infinite;
+}
+
+.sprocketRowReverse {
+  animation-direction: reverse;
+}
+
+@keyframes sprocketSide {
+  to {
+    transform: translate3d(-2rem, 0, 0);
+  }
+}
+
+/* The countdown leader's sweep going round. */
+.leaderSweep {
+  transform-box: fill-box;
+  transform-origin: 0 100%;
+  animation: leaderSweep 2s steps(8) infinite;
+}
+
+@keyframes leaderSweep {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The lane the sing along ball crosses, measured so the hop can cross its whole width. */
+.hopLane {
+  container-type: inline-size;
+}
+
+/* The sing along ball hopping from note to note across the line, squashing on each landing. */
+.hop {
+  animation: hop 4s linear infinite;
+}
+
+.hop > * {
+  transform-origin: 50% 100%;
+  animation: hopBounce 0.8s ease-in-out infinite;
+}
+
+@keyframes hop {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(100cqw - 1rem), 0, 0);
+  }
+}
+
+@keyframes hopBounce {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.2, 0.8);
+  }
+  50% {
+    transform: translate3d(0, -2.5rem, 0) scale(0.9, 1.1);
+  }
+}
+
+/* A pie eyed ball bouncing in place on its own --delay. */
+.ballBounce {
+  transform-origin: 50% 100%;
+  animation: hopBounce 1s ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+.focusRing :focus-visible {
+  outline: 4px solid var(--hose-ink);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 7px var(--hose-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprockets,
+  .grain,
+  .flicker,
+  .beatBounce,
+  .titleBounce,
+  .sprocketRow,
+  .leaderSweep,
+  .hop,
+  .hop > *,
+  .ballBounce {
+    animation: none;
+  }
+
+  .noteRise {
+    display: none;
+  }
+
+  .blot {
+    transition: none;
+  }
+}

@@ -1,0 +1,149 @@
+/*
+ * Rubber Hose's own scroll scene rules, on top of the shared ones (src/components/scroll/heroScene.module.css,
+ * which owns --p, the strip, his figure, the poses, his walk and advance, the strikes, the props that
+ * answer progress and reduced motion). Transform and opacity only; progress 1 is the final frame, which
+ * reduced motion and the World Select preview show at once.
+ *
+ * The world's move is the 1930s rubber hose cartoon: everything bobs on one beat, he bounces on every
+ * footfall, things land with a squash and a stretch, and a scene opens and closes on the iris of an old
+ * film. One beat (--beats) drives the bobbing of the level, his bounce follows his own strides.
+ */
+
+/* The world's tempo: six bouncy strides across the street with a wide swing, ten stick hits per arm,
+   the sound bars resting at a quarter of their height, the level bobbing on twelve beats; in the ring
+   he reaches the pads by 40% of the scene and works them for the rest. */
+.tempo {
+  --strides: 6turn;
+  --swing: 38deg;
+  --stick-hits: 10turn;
+  --wave-rest: 0.25;
+  --walk-inset: 5.5rem;
+  --advance-to: 38%;
+  --advance-until: 0.4;
+  --beats: 12turn;
+  --bob: -5px;
+}
+
+/* The strip's frame: a thick ink line with rounded corners like an old cartoon's frame. */
+.frame {
+  border: 5px solid var(--hose-ink);
+  border-radius: 1rem;
+  background: var(--hose-paper);
+}
+
+/* He bounces on every footfall: sin squared peaks twice per stride. */
+.bob {
+  transform: translate3d(0, calc(sin(var(--p) * var(--strides)) * sin(var(--p) * var(--strides)) * var(--bob)), 0);
+}
+
+/* ---- the iris ---- */
+
+/* The iris is a square as wide as its strip or corner, centred on it, holding a ring of ink with a round
+   hole; scaling the square opens or closes the hole, composited. */
+.iris {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  aspect-ratio: 1;
+  transform-origin: 50% 50%;
+}
+
+/* A level opens on an iris in: the hole grows from a twentieth of the strip's width to past its corners
+   over the first 15% of the scene, then the ring fades away. */
+.irisIn {
+  opacity: clamp(0, (0.2 - var(--p)) * 20, 1);
+  transform: translate3d(0, -50%, 0) scale(calc(0.5 + clamp(0, var(--p) / 0.15, 1) * 5.5));
+}
+
+/* The contact corner closes on an iris out, the ending of an old short: the hole shrinks from past the
+   corners to a round frame three fifths of the corner's width across, and holds there. */
+.irisOut {
+  transform: translate3d(0, -50%, 0) scale(calc(6 - clamp(0, var(--p) * 1.5 - 0.1, 1) * 3));
+}
+
+/* ---- the cartoon street ---- */
+
+/* The street's houses squash and stretch from the ground on the beat, the two rows half a beat apart. */
+.bobRow {
+  transform-origin: 50% 100%;
+  transform: scale(
+    calc(1 - sin(var(--p) * var(--beats) + var(--phase, 0turn)) * 0.03),
+    calc(1 + sin(var(--p) * var(--beats) + var(--phase, 0turn)) * 0.06)
+  );
+}
+
+/* A show poster column at --at springs up from its foot as he reaches it, overshooting, then settles. */
+.springAt {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: clamp(0.25, (var(--p) - var(--at, 0)) * 10 + 0.6, 1);
+  transform: scaleY(
+    calc(clamp(0.3, (var(--p) - var(--at, 0)) * 8 + 0.7, 1) + sin(clamp(0, (var(--p) - var(--at, 0)) * 6, 1) * 0.5turn) * 0.15)
+  );
+}
+
+/* ---- the vaudeville stage ---- */
+
+/* The gramophone's horn pumps on each stick hit, squashing toward its bell. */
+.pump {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  transform: scale(
+    calc(1 + max(0, sin(var(--p) * var(--stick-hits) + 0.25turn)) * 0.14),
+    calc(1 - max(0, sin(var(--p) * var(--stick-hits) + 0.25turn)) * 0.08)
+  );
+}
+
+/* The cymbals jump and tip on the hits, the second half a turn later (DrumKit sets its --phase). */
+.cymbal {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: translate3d(0, calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * -2px), 0)
+    rotate(calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * -16deg));
+}
+
+/* ---- the prize ring ---- */
+
+/* The crowd behind the ropes bobs on the beat. */
+.crowd {
+  transform: translate3d(0, calc(sin(var(--p) * var(--beats)) * sin(var(--p) * var(--beats)) * -4px), 0);
+}
+
+/* The ring bell on the corner post swings on every kick, knee and elbow (the strip carries the three). */
+.bell {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  transform: rotate(calc(var(--kick, 0) * 18deg - var(--elbow, 0) * 18deg + var(--knee, 0) * 10deg));
+}
+
+/* ---- per item arrivals (their own scene each, so --p is the item's own progress) ---- */
+
+/* A job or a record line drops in as a title card and bounces to a stop: three bounces, each lower
+   (cos squared touches zero three times as the drop shrinks), squashing at each landing. */
+.bounceIn {
+  --land: clamp(0, var(--p) * 1.5, 1);
+  transform-origin: 50% 100%;
+  opacity: clamp(0, var(--p) * 4, 1);
+  transform: translate3d(0, calc((1 - var(--land)) * cos(var(--land) * 1.5turn) * cos(var(--land) * 1.5turn) * -3rem), 0)
+    scaleY(calc(1 - (1 - var(--land)) * sin(var(--land) * 1.5turn) * sin(var(--land) * 1.5turn) * 0.08));
+}
+
+/* The card's shadow on the floor tightens as it lands. */
+.landShadow {
+  opacity: clamp(0, var(--p) * 3, 0.25);
+  transform: scaleX(calc(0.5 + clamp(0, var(--p) * 1.5, 1) * 0.5));
+}
+
+/* A project or a band unrolls from its top like a show poster pasted up, wobbling as it hangs. */
+.unroll {
+  --hang: clamp(0, var(--p) * 1.6, 1);
+  transform-origin: 50% 0%;
+  opacity: clamp(0, var(--p) * 3, 1);
+  transform: scaleY(calc(0.15 + var(--hang) * 0.85)) rotate(calc((1 - var(--hang)) * sin(var(--hang) * 2turn) * 4deg));
+}
+
+/* The paste board the poster hangs from. */
+.roller {
+  opacity: clamp(0, var(--p) * 5, 1);
+}

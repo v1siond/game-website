@@ -4,144 +4,163 @@ import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { CUPHEAD_COLORS } from './palette'
-import { ArtSection, DecorativeBanner } from './art'
-import { BandRecord, CompanyPoster, ExperienceCard, POSTER_STYLE, TechBubbleCloud, VintagePoster } from './cards'
+import { ArtBreak, CurlBanner } from './art'
+import { BandRecord, CompanyPoster, ExperienceCard, TechBubbleCloud, VintagePoster } from './cards'
+import { SceneItem, Strip } from './scenes'
+import world from './world.module.css'
 
-function SectionBanner({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-center mb-6">
-      <DecorativeBanner>
-        <span className="text-lg tracking-wider">{children}</span>
-      </DecorativeBanner>
-    </div>
-  )
-}
+// The picked profession's sections. About, Tech Stack and Ventures fade in; Work Experience, Featured
+// Work, Bands and the Muay Thai record are levels he crosses, each entry arriving as part of the level.
+// The art breaks between them are a film leader, a sing along line and pie eyed balls.
 
-function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+const LEAD = `text-center text-base ${world.ink}`
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      <section className="text-center mb-8" aria-label="About">
-        <DecorativeBanner>
-          <span className="text-lg tracking-wider">ABOUT</span>
-        </DecorativeBanner>
-        <p
-          className="mt-8 text-base leading-relaxed max-w-2xl mx-auto"
-          style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}
-        >
-          {professionalSummary.bio}
-        </p>
-      </section>
+      <FadeInScene>
+        <section aria-labelledby="hose-about">
+          <CurlBanner id="hose-about">About</CurlBanner>
+          <p className={`mx-auto max-w-2xl leading-relaxed ${LEAD}`}>{professionalSummary.bio}</p>
+        </section>
+      </FadeInScene>
 
-      {/* ========== ART SECTION 1: Film Reel Break ========== */}
-      <ArtSection variant="filmReel" />
+      <ArtBreak kind="filmLeader" />
 
       {sections.jobs.length > 0 && (
-        <section className="mb-8" aria-label="Work experience">
-          <SectionBanner>WORK EXPERIENCE</SectionBanner>
-          <div className="space-y-4 max-w-3xl mx-auto">
-            {sections.jobs.map((entry) => (
-              <ExperienceCard key={entry.id} entry={entry} />
-            ))}
-          </div>
-        </section>
+        <LevelScene>
+          <Strip profession="engineer" zone="record" />
+          <section aria-labelledby="hose-work-experience">
+            <CurlBanner id="hose-work-experience">Work Experience</CurlBanner>
+            <ul className="mx-auto max-w-3xl space-y-8">
+              {sections.jobs.map((entry) => (
+                <li key={entry.id}>
+                  <SceneItem kind="bounce">
+                    <ExperienceCard entry={entry} />
+                  </SceneItem>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </LevelScene>
       )}
 
-      {/* ========== ART SECTION 2: Music Notes Break ========== */}
-      <ArtSection variant="musicNotes" />
+      <ArtBreak kind="singAlong" />
 
-      <section className="mb-8" aria-label="Tech stack">
-        <SectionBanner>TECH STACK</SectionBanner>
-        <div
-          className="p-6 max-w-3xl mx-auto"
-          style={{ ...POSTER_STYLE, boxShadow: `6px 6px 0 ${CUPHEAD_COLORS.shadowBrown}` }}
-        >
-          <TechBubbleCloud categories={sections.techStack} />
-        </div>
-      </section>
+      <FadeInScene>
+        <section aria-labelledby="hose-tech-stack">
+          <CurlBanner id="hose-tech-stack">Tech Stack</CurlBanner>
+          <div className={`mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
+            <TechBubbleCloud categories={sections.techStack} />
+          </div>
+        </section>
+      </FadeInScene>
 
-      <section className="mb-8" aria-label="Projects">
-        <SectionBanner>PROJECTS</SectionBanner>
-        <ProjectList
-          projects={sections.projects}
-          className="grid md:grid-cols-2 gap-4"
-          renderProject={(slot) => <VintagePoster {...slot} />}
-        />
-      </section>
+      <LevelScene>
+        <Strip profession="engineer" zone="work" />
+        <section aria-labelledby="hose-featured-work">
+          <CurlBanner id="hose-featured-work">Featured Work</CurlBanner>
+          <ProjectList
+            projects={sections.projects}
+            className="grid gap-8 md:grid-cols-2"
+            renderProject={(slot) => (
+              <SceneItem kind="unroll">
+                <VintagePoster {...slot} />
+              </SceneItem>
+            )}
+          />
+        </section>
+      </LevelScene>
 
-      {/* ========== ART SECTION 3: Bouncing Balls Break ========== */}
-      <ArtSection variant="bouncingBalls" />
+      <ArtBreak kind="bouncingBalls" />
 
-      <section className="mb-8" aria-label="Ventures">
-        <SectionBanner>VENTURES</SectionBanner>
-        <div className="grid md:grid-cols-3 gap-4">
-          {sections.companies.map((company) => (
-            <CompanyPoster key={company.id} company={company} />
-          ))}
-        </div>
-      </section>
+      <FadeInScene>
+        <section aria-labelledby="hose-ventures">
+          <CurlBanner id="hose-ventures">Ventures</CurlBanner>
+          <ul className="grid gap-4 md:grid-cols-3">
+            {sections.companies.map((company) => (
+              <li key={company.id}>
+                <CompanyPoster company={company} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      </FadeInScene>
     </>
   )
 }
 
-function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
     <>
-      <ArtSection variant="musicNotes" />
-      <section className="mb-8" aria-label="Bands">
-        <SectionBanner>BANDS</SectionBanner>
-        <p className="text-base text-center mb-6" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
-          Drums since {musician.since}, {musician.yearsPlaying} years
-        </p>
-        <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandRecord {...slot} />} />
-        <p className="text-sm text-center mt-6 italic" style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}>
-          {musician.line}
-        </p>
-      </section>
+      <ArtBreak kind="singAlong" />
+      <LevelScene>
+        <Strip profession="drummer" zone="record" />
+        <section aria-labelledby="hose-bands">
+          <CurlBanner id="hose-bands">Bands</CurlBanner>
+          <p className={`mb-6 ${LEAD}`}>
+            Drums since {musician.since}, {musician.yearsPlaying} years
+          </p>
+          <BandList
+            bands={bands}
+            className="grid gap-8 md:grid-cols-3"
+            renderBand={(slot) => (
+              <SceneItem kind="unroll">
+                <BandRecord {...slot} />
+              </SceneItem>
+            )}
+          />
+          <p className={`mt-6 italic ${LEAD} ${world.red}`}>{musician.line}</p>
+        </section>
+      </LevelScene>
     </>
   )
 }
 
-function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
     <>
-      <ArtSection variant="bouncingBalls" />
-      <section className="mb-8" aria-label="Muay Thai">
-        <SectionBanner>MUAY THAI</SectionBanner>
-        <div className="p-6 max-w-3xl mx-auto" style={{ ...POSTER_STYLE, boxShadow: `6px 6px 0 ${CUPHEAD_COLORS.shadowBrown}` }}>
-          <h3
-            className="text-xl text-center mb-6"
-            style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: '"Abril Fatface", serif' }}
-          >
-            {martialArts.primary.title}
-          </h3>
-          <MuayThaiRecord
-            martialArts={martialArts}
-            classNames={{
-              facts: 'grid sm:grid-cols-2 gap-4 mb-6',
-              fact: 'p-3 border-4 border-[#2a2015] bg-[#f7ead0]',
-              term: 'text-sm tracking-widest uppercase text-[#8b0000] font-serif',
-              value: 'text-sm mt-1 text-[#2a2015] font-serif',
-              achievements: 'space-y-2',
-              achievement: 'text-sm flex items-start gap-2 text-[#2a2015] font-serif',
-            }}
-            renderAchievement={(achievement) => (
-              <>
-                <span className="text-[#8b0000]" aria-hidden="true">★</span>
-                <span>{achievement}</span>
-              </>
-            )}
-          />
-        </div>
-      </section>
+      <ArtBreak kind="bouncingBalls" />
+      <LevelScene>
+        <Strip profession="fighter" zone="record" />
+        <section aria-labelledby="hose-muay-thai">
+          <CurlBanner id="hose-muay-thai">Muay Thai</CurlBanner>
+          <div className={`mx-auto max-w-3xl p-6 ${world.poster} ${world.posterWide}`}>
+            <h3 className={`mb-6 text-center text-xl ${world.red} ${world.lettering}`}>{martialArts.primary.title}</h3>
+            <MuayThaiRecord
+              martialArts={martialArts}
+              classNames={{
+                facts: 'grid sm:grid-cols-2 gap-4 mb-6',
+                fact: `p-3 ${world.fact}`,
+                term: `text-sm tracking-widest uppercase ${world.red}`,
+                value: `text-sm mt-1 ${world.ink}`,
+                achievements: 'space-y-4',
+                achievement: `text-sm ${world.ink}`,
+              }}
+              renderAchievement={(achievement) => (
+                <SceneItem kind="bounce">
+                  <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
+                    <span className={world.red} aria-hidden="true">
+                      ★
+                    </span>
+                    <span>{achievement}</span>
+                  </p>
+                </SceneItem>
+              )}
+            />
+          </div>
+        </section>
+      </LevelScene>
     </>
   )
 }
