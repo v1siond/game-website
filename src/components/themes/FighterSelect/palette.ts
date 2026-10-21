@@ -1,6 +1,7 @@
-// The arcade versus palette, for the world's SVG art: the night of the stage, player one blue (him),
-// player two red (the challenger), the gold of the round call, the green of a full health bar, chrome for
-// the cabinet metal. FS_VARS puts the same values on the world's root as --fs-* variables, which
+// The arcade versus palette of the early 90s fighters, for the world's SVG art and classes: the deep blue
+// of the select screen and its orange world map, player one blue (him), player two red (the challenger),
+// the yellow life bar over its red loss, the red KO badge, the orange to yellow of the round call
+// lettering with its navy outline, the green of a running job, and the stage colours. FS_VARS puts the same values on the world's root as --fs-* variables, which
 // world.module.css, fight.module.css and the Tailwind arbitrary values read, so no colour is written twice.
 
 import { paletteVars } from '../shared/paletteVars'
@@ -20,6 +21,19 @@ export const FS = {
   chrome: '#c9cede',
   steel: '#5b6078',
   ink: '#03030a',
+  // The select screen's sea and its deep edge, the map's land and coast
+  select: '#1530b8',
+  selectDeep: '#071463',
+  land: '#e8923a',
+  coast: '#ffd27a',
+  // The fight HUD: life left, life lost, the KO badge, and the navy every call letter is outlined in
+  hudYellow: '#f8e800',
+  hudRed: '#e01818',
+  ko: '#c8102e',
+  navy: '#0a1060',
+  // The round call lettering, lit at the top and burning orange at the foot
+  callTop: '#fff27a',
+  callBottom: '#ff7a10',
   flash: '#ffffff',
   // His gi, lit and in its two cel shades, the black belt, and the deepest tone of his skin for far limbs
   gi: '#f4f1ea',

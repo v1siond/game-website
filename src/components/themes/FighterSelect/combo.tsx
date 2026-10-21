@@ -2,11 +2,12 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type PointerEvent, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { ImpactBurst } from './badges'
+import { CallText, ImpactBurst } from './badges'
 import look from './world.module.css'
 import fight from './fight.module.css'
 
-// The combo counter over the projects. Every card the pointer lands on is a hit: the card freezes and
+// The combo counter over the projects, the hit count in the round call lettering with the word beside it
+// the way the arcade counted a combo on player one's side. Every card the pointer lands on is a hit: the card freezes and
 // vibrates for the hitstop, a burst flashes where the pointer entered, and the counter on player one's
 // side climbs. A pause longer than COMBO_WINDOW_MS drops the combo, like the defender recovering; the
 // counter stops at MAX_HITS, as the arcade counters did. React renders only on a hit: the burst's
@@ -21,9 +22,11 @@ function ComboCounter({ hits }: { hits: number }) {
   const { hud } = useLabels()
 
   return (
-    <span key={hits} className={`ml-2 mt-2 inline-flex items-baseline gap-1 bg-[color:var(--fs-ink)] px-3 py-1 ${look.display} ${fight.comboPop}`}>
-      <span className={`text-4xl ${look.roundCall}`}>{hits}</span>
-      <span className="text-sm uppercase text-[color:var(--fs-chrome)]">{hud.hits}</span>
+    <span key={hits} className={`ml-2 mt-2 inline-flex items-baseline gap-2 border-2 border-black bg-black/80 px-3 py-1 ${fight.comboPop}`}>
+      <span className="text-4xl leading-none">
+        <CallText>{hits}</CallText>
+      </span>
+      <span className={`text-base uppercase text-[color:var(--fs-call-top)] [text-shadow:2px_2px_0_var(--fs-navy)] ${look.display}`}>{hud.hits}</span>
     </span>
   )
 }

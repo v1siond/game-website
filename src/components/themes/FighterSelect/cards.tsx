@@ -9,19 +9,20 @@ import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 
-// The fight cards every list entry sits on: cabinet metal with the cut corner of a move list panel,
-// the accent border, highlights marked with a hit spark. A running job glows health green, a highlighted
-// project gold.
+// The fight cards every list entry sits on: a flat dark box ruled in its accent, ringed in black, with
+// the cut corner of a move list panel; highlights are marked with a hit spark. A running job is ruled
+// health green, a highlighted project life bar yellow.
 
-const TITLE = `text-base uppercase text-white ${look.display}`
+const TITLE = `text-lg uppercase leading-tight text-white [text-shadow:2px_2px_0_var(--fs-navy)] ${look.display}`
 const BODY = 'text-sm leading-relaxed text-[color:var(--fs-chrome)]'
 const TAG = `px-3 py-1 text-sm ${look.tag}`
 const FOCUS = 'focus-visible:outline focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--fs-gold)]'
 
 function FightCard({ accent, children }: { accent: Accent; children: ReactNode }) {
   return (
-    <article className={`relative h-full ${look.metal} ${look.card} ${look.cutCorner} ${ACCENT[accent]}`}>
+    <article className={`relative h-full ${look.card} ${look.cutCorner} ${ACCENT[accent]}`}>
       <div className="relative p-5">{children}</div>
       <span className={`absolute bottom-0 right-0 h-6 w-6 ${look.cornerTab}`} aria-hidden="true" />
     </article>
@@ -159,27 +160,30 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
   )
 }
 
-// The tech stack as a move list: each category a heading, its technologies a grid of command slots.
+// The tech stack as a move list: each category its own command card in the shared masonry, its
+// technologies a grid of command slots.
 export function MoveList({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
 
   return (
-    <div className="space-y-8">
+    <ul className={MASONRY_LIST}>
       {categories.map((category) => (
-        <div key={category.id}>
-          <h3 className={`mb-4 flex items-center gap-3 ${TITLE}`}>
-            <span aria-hidden="true">{category.icon}</span>
-            {category.name}
-          </h3>
-          <ul className="grid grid-cols-2 gap-2 md:grid-cols-4 lg:grid-cols-6" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
-            {category.items.map((tech) => (
-              <li key={tech} className="border border-[color:var(--fs-steel)] bg-[color:var(--fs-panel)] px-3 py-2 text-sm">
-                {tech}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <li key={category.id} className={MASONRY_ITEM}>
+          <FightCard accent="cyan">
+            <h3 className={`mb-4 flex items-center gap-3 ${TITLE}`}>
+              <span aria-hidden="true">{category.icon}</span>
+              {category.name}
+            </h3>
+            <ul className="grid grid-cols-2 gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
+              {category.items.map((tech) => (
+                <li key={tech} className="min-w-0 break-words border border-[color:var(--fs-steel)] bg-black px-3 py-2 text-sm text-white">
+                  {tech}
+                </li>
+              ))}
+            </ul>
+          </FightCard>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
