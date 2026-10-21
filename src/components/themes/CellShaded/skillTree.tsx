@@ -67,7 +67,7 @@ export function SkillTree({ categories }: { categories: Category[] }) {
         <div className="h-48 w-28 shrink-0" aria-hidden="true">
           <VaultSprite profession="engineer" motion={triggered || reduced ? 'action' : 'idle'} className="h-full w-full" />
         </div>
-        <p className="mb-4 ml-24 min-w-0 flex-1 text-base text-[var(--cel-paper)] sm:ml-28">{hud.treeHint}</p>
+        <p className="mb-4 w-full min-w-0 text-base text-[var(--cel-paper)] sm:ml-28 sm:w-auto sm:flex-1">{hud.treeHint}</p>
       </div>
       <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3" aria-label={cards.techByCategory}>
         {categories.map((category, index) => (

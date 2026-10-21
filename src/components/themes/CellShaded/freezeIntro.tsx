@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { NameWords } from '@/components/cv/NameWords'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
@@ -76,8 +77,13 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
     <header ref={ref} className={`relative z-20 overflow-hidden ${cel.intro}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
       <div className={`pointer-events-none absolute inset-0 ${cel.wash} bg-[var(--cel-dusk-high)] mix-blend-multiply`} aria-hidden="true" />
       <SpeedRays color={CEL.sun} className={`pointer-events-none absolute inset-0 h-full w-full ${cel.rays}`} />
-      <div className={`pointer-events-none absolute inset-x-0 top-0 h-14 origin-left bg-[var(--cel-ink)] ${cel.barTop}`} aria-hidden="true" />
-      <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-14 origin-left bg-[var(--cel-ink)] ${cel.barBottom}`} aria-hidden="true" />
+      {/* the letterbox exists only while the entrance plays, so no part of its slant is left at rest */}
+      {!done && (
+        <>
+          <div className={`pointer-events-none absolute inset-x-0 top-0 h-14 origin-left bg-[var(--cel-ink)] ${cel.barTop}`} aria-hidden="true" />
+          <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-14 origin-left bg-[var(--cel-ink)] ${cel.barBottom}`} aria-hidden="true" />
+        </>
+      )}
 
       <div className={`relative mx-auto grid min-h-[86vh] max-w-6xl items-end gap-6 px-4 pb-20 pt-24 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center ${cel.shake}`}>
         {/* a pointer extra: pointing at him or clicking him plays his action, the same as each section shows */}
@@ -104,8 +110,12 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
             <div className="min-w-0">
-              <h1 className={`text-5xl leading-none sm:text-7xl lg:text-8xl ${cel.display} ${cel.nameCard}`}>
-                <span className={`inline-block break-words ${cel.nameLetters}`}>{name}</span>
+              {/* the size runs with the viewport between 3rem and 6rem, so the longest word fits a 320px
+                  screen and the whole name sits on one line from about 1024px; it only wraps between words */}
+              <h1 className={`text-[clamp(3rem,2rem+5vw,6rem)] leading-none ${cel.display} ${cel.nameCard}`}>
+                <span className={`inline-block ${cel.nameLetters}`}>
+                  <NameWords name={name} />
+                </span>
               </h1>
               <p className={`mt-5 inline-block px-4 py-2 text-lg font-bold ${cel.subtitleCard} ${cel.subtitle}`}>{headline}</p>
               <div className={cel.tagline}>

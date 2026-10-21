@@ -6,6 +6,11 @@ import cel from './cel.module.css'
 // night) of which the root's data-zone shows one, the sun that sets and the stars that come out with
 // them, and two ridges of mesas inked and hatched on their shadow sides, the near ridge following the
 // pointer further than the far one. Everything here moves by opacity or transform only.
+//
+// Each ridge is an absolutely placed svg, a replaced element: left and right alone do not stretch it,
+// its width would follow its 4:1 viewBox from the height (42vh x 4) and stop short of the right edge
+// on any screen wider than that. So each ridge sets its width, the viewport plus the overhang its
+// pointer drift needs, and xMidYMax slice crops the art to fill it at every size.
 
 export type Zone = 'noon' | 'town' | 'dusk' | 'night'
 
@@ -34,13 +39,13 @@ export function Wasteland() {
         <path d="M70 22 A38 38 0 0 1 70 78 A44 44 0 0 0 70 22 Z" fill={CEL.orange} data-bare />
       </svg>
 
-      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className={`absolute -inset-x-8 bottom-0 h-[42vh] ${cel.ridgeFar} ${cel.inked}`}>
+      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className={`absolute -left-8 bottom-0 h-[42vh] w-[calc(100%+4rem)] ${cel.ridgeFar} ${cel.inked}`}>
         <path d="M0 300 L0 170 L90 170 L110 120 L240 120 L262 168 L420 168 L440 96 L600 96 L622 160 L800 160 L822 112 L980 112 L1000 150 L1200 150 L1200 300 Z" fill={CEL.mesa} />
         <path d="M200 120 L240 120 L262 168 L222 168 Z M560 96 L600 96 L622 160 L582 160 Z M940 112 L980 112 L1000 150 L960 150 Z" fill={CEL.mesaShade} data-bare />
         <path d="M200 120 L240 120 L262 168 L222 168 Z M560 96 L600 96 L622 160 L582 160 Z M940 112 L980 112 L1000 150 L960 150 Z" fill={HATCH} opacity={0.45} data-bare />
       </svg>
 
-      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className={`absolute -inset-x-12 bottom-0 h-[30vh] ${cel.ridgeNear} ${cel.inked}`}>
+      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className={`absolute -left-12 bottom-0 h-[30vh] w-[calc(100%+6rem)] ${cel.ridgeNear} ${cel.inked}`}>
         <path d="M0 300 L0 190 L150 190 L176 140 L330 140 L360 214 L700 214 L724 160 L880 160 L910 220 L1200 220 L1200 300 Z" fill={CEL.dune} />
         <path d="M300 140 L330 140 L360 214 L330 214 Z M850 160 L880 160 L910 220 L880 220 Z" fill={CEL.duneShade} data-bare />
         <path d="M300 140 L330 140 L360 214 L330 214 Z M850 160 L880 160 L910 220 L880 220 Z" fill={HATCH} opacity={0.45} data-bare />

@@ -444,12 +444,15 @@
   animation: celFlash 220ms ease-out both;
 }
 
+/* The bars skew from their left end (origin-left), so the bottom bar's right end rises by
+   tan(3deg) x width, up to 5.3vw on a full width header: off screen it drops its own height plus 6vw,
+   or that end would still show above the header's bottom edge on any wide screen. */
 .barTop {
   transform: translate3d(0, -110%, 0) skewY(-3deg);
 }
 
 .barBottom {
-  transform: translate3d(0, 110%, 0) skewY(-3deg);
+  transform: translate3d(0, calc(110% + 6vw), 0) skewY(-3deg);
 }
 
 .intro[data-freeze] :is(.barTop, .barBottom) {
@@ -467,7 +470,7 @@
 }
 
 .intro[data-release] .barBottom {
-  transform: translate3d(0, 110%, 0) skewY(-3deg);
+  transform: translate3d(0, calc(110% + 6vw), 0) skewY(-3deg);
 }
 
 /* the name slams in, the stage shakes with it */
