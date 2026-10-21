@@ -1,0 +1,941 @@
+/*
+ * Retro Atomic, the whole look in one sheet: inside the shelter (the riveted wall, the cog door, the
+ * olive wrist terminal with its green tube), the printed poster (the perk chart), and outside (the
+ * wasteland at dusk, the public terminal). Every colour is the palette's, read through theme() from the
+ * `atomic` Tailwind group that palette.ts feeds. Motion is transform and opacity only; state changes
+ * come from data attributes the components set (data-phase, data-on, data-target, data-shot,
+ * data-angle, data-booted, data-vats), so React flips a value and the browser runs the transition.
+ * The few endless loops carry .ambient (or are named below) and freeze while the targeting system is
+ * locked and under reduced motion.
+ */
+
+/* ---- the page ---- */
+
+.root {
+  background: theme('colors.atomic.ink');
+  color: theme('colors.atomic.phosphor');
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+}
+
+.root:has([data-vats='on']) .ambient,
+.root:has([data-vats='on']) .cursor,
+.root:has([data-vats='on']) .questActive {
+  animation-play-state: paused;
+}
+
+.stage {
+  position: relative;
+}
+
+.focusRing:focus-visible {
+  outline: 2px solid theme('colors.atomic.yellow');
+  outline-offset: 3px;
+}
+
+/* ---- the shelter wall behind everything (backdrop.tsx) ---- */
+
+.shelterWall {
+  background-color: theme('colors.atomic.blue-dark');
+  background-image:
+    radial-gradient(circle at 12px 12px, theme('colors.atomic.steel-edge / 0.55') 0 2.5px, transparent 3px),
+    linear-gradient(90deg, theme('colors.atomic.ink / 0.35') 0 2px, transparent 2px),
+    linear-gradient(0deg, theme('colors.atomic.ink / 0.35') 0 2px, transparent 2px),
+    linear-gradient(180deg, theme('colors.atomic.blue') 0%, theme('colors.atomic.blue-dark') 60%, theme('colors.atomic.bunker') 100%);
+  background-size: 160px 120px, 160px 120px, 160px 120px, 100% 100%;
+}
+
+.backFar {
+  opacity: 0.55;
+  transform: translate3d(calc(var(--mx, 0) * -10px), calc(var(--my, 0) * -6px), 0);
+}
+
+.backNear {
+  opacity: 0.9;
+  transform: translate3d(calc(var(--mx, 0) * -26px), calc(var(--my, 0) * -14px), 0);
+}
+
+.wallLamp {
+  background: theme('colors.atomic.red-light');
+  box-shadow: 0 0 18px 6px theme('colors.atomic.red / 0.45');
+  animation: lampPulse 2.6s ease-in-out infinite;
+}
+
+.hazardStripe {
+  background: repeating-linear-gradient(-45deg, theme('colors.atomic.yellow') 0 18px, theme('colors.atomic.ink') 18px 36px);
+  opacity: 0.85;
+}
+
+.wallShade {
+  background:
+    radial-gradient(ellipse at 50% 35%, transparent 0%, theme('colors.atomic.ink / 0.55') 70%, theme('colors.atomic.ink / 0.85') 100%),
+    linear-gradient(180deg, transparent 60%, theme('colors.atomic.ink / 0.75') 100%);
+}
+
+@keyframes lampPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* ---- the cog door, the hero entrance (vaultDoor.tsx) ---- */
+
+.doorWall {
+  background-color: theme('colors.atomic.steel');
+  background-image:
+    radial-gradient(ellipse at 50% 50%, theme('colors.atomic.steel-light') 0%, theme('colors.atomic.steel') 45%, theme('colors.atomic.rubber') 100%),
+    repeating-linear-gradient(0deg, theme('colors.atomic.ink / 0.25') 0 2px, transparent 2px 64px);
+  background-blend-mode: multiply;
+  cursor: pointer;
+  transition:
+    opacity 480ms ease-in,
+    transform 480ms ease-in;
+}
+
+.doorWall[data-phase='enter'] {
+  opacity: 0;
+  transform: scale(1.35);
+}
+
+.doorLight {
+  background: radial-gradient(circle at 50% 50%, theme('colors.atomic.cream') 0%, theme('colors.atomic.yellow / 0.8') 22%, transparent 55%);
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+
+.doorWall[data-phase='roll'] .doorLight {
+  opacity: 0.85;
+}
+
+.doorWall[data-phase='enter'] .doorLight {
+  opacity: 1;
+  transform: scale(1.6);
+  transition:
+    opacity 300ms ease-out,
+    transform 480ms ease-in;
+}
+
+.doorFrame {
+  background: radial-gradient(circle at 50% 50%, theme('colors.atomic.ink') 0 58%, theme('colors.atomic.rubber') 64%, theme('colors.atomic.steel-light') 68%, theme('colors.atomic.steel') 72%, transparent 73%);
+}
+
+.doorBolts {
+  transition: transform 320ms cubic-bezier(0.5, 0, 0.75, 0);
+}
+
+.doorWall:not([data-phase='sealed']) .doorBolts {
+  transform: scale(0.84);
+}
+
+.door {
+  transition: transform 420ms cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+.doorWall[data-phase='pull'] .door {
+  transform: scale(0.93);
+}
+
+.doorWall[data-phase='roll'] .door,
+.doorWall[data-phase='enter'] .door {
+  transform: translateX(118%) rotate(220deg) scale(0.93);
+  transition: transform 1100ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.beaconSweep {
+  border-radius: 9999px;
+  background: conic-gradient(from 0deg, theme('colors.atomic.red-light / 0.75') 0deg 40deg, transparent 70deg 360deg);
+  animation: beaconTurn 900ms linear infinite;
+}
+
+@keyframes beaconTurn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- the wrist terminal (wristComputer.tsx) ---- */
+
+.device {
+  border-radius: 2rem;
+  background:
+    linear-gradient(160deg, theme('colors.atomic.olive-light') 0%, theme('colors.atomic.olive') 30%, theme('colors.atomic.olive-dark') 100%);
+  box-shadow:
+    inset 0 2px 0 theme('colors.atomic.olive-light'),
+    inset 0 -6px 0 theme('colors.atomic.rubber / 0.7'),
+    0 24px 48px theme('colors.atomic.ink / 0.7');
+  border: 3px solid theme('colors.atomic.rubber');
+}
+
+.deviceScrews {
+  position: absolute;
+  inset: 12px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 0 0, theme('colors.atomic.steel-edge') 0 4px, theme('colors.atomic.rubber') 5px, transparent 6px),
+    radial-gradient(circle at 100% 0, theme('colors.atomic.steel-edge') 0 4px, theme('colors.atomic.rubber') 5px, transparent 6px),
+    radial-gradient(circle at 0 100%, theme('colors.atomic.steel-edge') 0 4px, theme('colors.atomic.rubber') 5px, transparent 6px),
+    radial-gradient(circle at 100% 100%, theme('colors.atomic.steel-edge') 0 4px, theme('colors.atomic.rubber') 5px, transparent 6px);
+}
+
+.tube {
+  background:
+    radial-gradient(ellipse at 50% 40%, theme('colors.atomic.phosphor-deep / 0.35') 0%, transparent 70%),
+    theme('colors.atomic.glass');
+  border: 6px solid theme('colors.atomic.rubber');
+  box-shadow:
+    inset 0 0 40px theme('colors.atomic.ink'),
+    inset 0 0 0 2px theme('colors.atomic.glass-edge');
+}
+
+/* The tube warms up when the door has opened: a line, then the full glass. */
+.device[data-booted] .tube {
+  animation: crtOn 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.tubeWarm {
+  position: relative;
+}
+
+.tabRail {
+  border-bottom: 2px solid theme('colors.atomic.phosphor / 0.45');
+}
+
+.screenTab {
+  color: theme('colors.atomic.phosphor-dim');
+}
+
+.screenTab::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -2px;
+  height: 4px;
+  background: theme('colors.atomic.phosphor');
+  transform: scaleX(0);
+  transition: transform 220ms ease-out;
+}
+
+.screenTab[data-on],
+.screenTab:hover {
+  color: theme('colors.atomic.phosphor');
+}
+
+.screenTab[data-on]::after {
+  transform: scaleX(1);
+}
+
+.statusBox {
+  position: relative;
+}
+
+.statusBrackets {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 0 0 / 18px 2px no-repeat,
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 0 0 / 2px 18px no-repeat,
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 100% 0 / 18px 2px no-repeat,
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 100% 0 / 2px 18px no-repeat,
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 0 100% / 18px 2px no-repeat,
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 0 100% / 2px 18px no-repeat,
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 100% 100% / 18px 2px no-repeat,
+    linear-gradient(theme('colors.atomic.phosphor'), theme('colors.atomic.phosphor')) 100% 100% / 2px 18px no-repeat;
+}
+
+.statusFigure {
+  position: absolute;
+}
+
+.statusCell {
+  border: 1px solid theme('colors.atomic.phosphor / 0.4');
+  background: theme('colors.atomic.phosphor / 0.06');
+  color: theme('colors.atomic.phosphor');
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* The selector knob: the pointer turns to the lit profession, with a little overshoot. */
+.dialKnob {
+  background:
+    radial-gradient(circle at 38% 32%, theme('colors.atomic.steel-edge') 0%, theme('colors.atomic.bakelite') 55%, theme('colors.atomic.rubber') 100%);
+  box-shadow: inset 0 -3px 0 theme('colors.atomic.rubber');
+  transition: transform 460ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dialKnob::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 4px;
+  height: 36%;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: theme('colors.atomic.yellow');
+}
+
+.dialKnob[data-angle='drummer'] {
+  transform: rotate(-55deg);
+}
+
+.dialKnob[data-angle='fighter'] {
+  transform: rotate(55deg);
+}
+
+.lamp {
+  background: theme('colors.atomic.steel');
+  box-shadow: inset 0 0 0 2px theme('colors.atomic.rubber');
+}
+
+.lamp[data-on] {
+  background: theme('colors.atomic.phosphor');
+  box-shadow:
+    inset 0 0 0 2px theme('colors.atomic.phosphor-deep'),
+    0 0 10px 2px theme('colors.atomic.phosphor / 0.6');
+}
+
+.grille {
+  background:
+    repeating-linear-gradient(0deg, theme('colors.atomic.rubber') 0 4px, theme('colors.atomic.olive-dark') 4px 9px);
+  box-shadow: inset 0 0 0 3px theme('colors.atomic.rubber');
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1em;
+  margin-left: 0.15em;
+  vertical-align: -0.12em;
+  background: theme('colors.atomic.phosphor');
+  animation: blink 1s steps(1) infinite;
+}
+
+.glow {
+  text-shadow:
+    0 0 6px theme('colors.atomic.phosphor / 0.55'),
+    0 0 18px theme('colors.atomic.phosphor / 0.25');
+}
+
+.scanlines {
+  background: repeating-linear-gradient(0deg, theme('colors.atomic.ink / 0.32') 0 1px, transparent 1px 3px);
+}
+
+.refreshBar {
+  background: linear-gradient(180deg, transparent, theme('colors.atomic.phosphor / 0.07'), transparent);
+  animation: refresh 7s linear infinite;
+}
+
+.vignette {
+  background: radial-gradient(ellipse at 50% 50%, transparent 55%, theme('colors.atomic.ink / 0.7') 100%);
+}
+
+/* The tube switching on: a bright line opening to the picture. Plays on every mount (keyed content). */
+.powerOn {
+  animation: crtOn 460ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes crtOn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6, 0.02);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1, 0.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes refresh {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(1400%);
+  }
+}
+
+/* ---- him: the two tones and the poses (character.tsx on the shared HeroFigure) ---- */
+
+/* The poster tone's ink outline, a stroke under each fill. */
+.poster :is(path, rect, circle, ellipse) {
+  stroke: theme('colors.atomic.poster-ink');
+  stroke-width: 1.1px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+/* The status screen's line figure. */
+.phosphorLine :is(path, rect, circle, ellipse) {
+  stroke: theme('colors.atomic.phosphor');
+  stroke-width: 0.7px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+/* The front arm is the svg's last group, the back arm its first; each turns from its shoulder. */
+.thumbsUp > g:last-of-type,
+.poseRaise > g:last-of-type,
+.poseGuard > g:last-of-type,
+.posePoint > g:last-of-type {
+  transform-box: view-box;
+  transform-origin: 41px 33px;
+}
+
+.poseGuard > g:first-of-type {
+  transform-box: view-box;
+  transform-origin: 23px 33px;
+  transform: rotate(70deg);
+}
+
+.thumbsUp > g:last-of-type {
+  animation: thumbUp 620ms cubic-bezier(0.34, 1.56, 0.64, 1) 260ms both;
+}
+
+.poseRaise > g:last-of-type {
+  transform: rotate(-150deg);
+}
+
+.poseGuard > g:last-of-type {
+  transform: rotate(-70deg);
+}
+
+.posePoint > g:last-of-type {
+  transform: rotate(-95deg);
+}
+
+@keyframes thumbUp {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(-150deg);
+  }
+}
+
+/* ---- surfaces and rows shared by the sections ---- */
+
+.panel {
+  border-radius: 0.75rem;
+  border: 2px solid theme('colors.atomic.phosphor / 0.35');
+  background:
+    radial-gradient(ellipse at 50% 0%, theme('colors.atomic.phosphor / 0.08') 0%, transparent 60%),
+    theme('colors.atomic.glass / 0.94');
+  box-shadow: inset 0 0 24px theme('colors.atomic.ink / 0.8');
+}
+
+/* A pick: the phosphor bar fills in from the left and the text inverts, the terminal's selection. */
+.menuRow,
+.pickRow {
+  isolation: isolate;
+}
+
+.menuRow::before,
+.pickRow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: theme('colors.atomic.phosphor');
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 160ms ease-out;
+}
+
+.menuRow:hover,
+.menuRow:focus-visible,
+.pickRow:hover,
+.pickRow[data-on] {
+  color: theme('colors.atomic.glass');
+}
+
+.menuRow:hover::before,
+.menuRow:focus-visible::before,
+.pickRow:hover::before,
+.pickRow[data-on]::before {
+  transform: scaleX(1);
+}
+
+.menuCaret {
+  opacity: 0;
+  transition: opacity 120ms;
+}
+
+.menuRow:hover .menuCaret,
+.menuRow:focus-visible .menuCaret {
+  opacity: 1;
+}
+
+/* ---- the quest log (quests.tsx) ---- */
+
+.stage:not([data-on]) .cardOn {
+  opacity: 0;
+}
+
+.stage[data-on] .cardOn {
+  animation: crtOn 480ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--i, 0) * 90ms) both;
+}
+
+.questActive,
+.questDone {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+}
+
+.questActive {
+  background: theme('colors.atomic.phosphor');
+  transform: rotate(45deg);
+  animation: blink 1.2s steps(1) infinite;
+}
+
+.questDone {
+  border: 2px solid theme('colors.atomic.phosphor-dim');
+  background:
+    linear-gradient(45deg, transparent 40%, theme('colors.atomic.phosphor-dim') 40% 60%, transparent 60%);
+}
+
+/* ---- the holotapes (inventory.tsx) ---- */
+
+.holotape {
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.holotape:hover,
+.holotape:focus-visible {
+  transform: translateY(-6px) rotate(-2deg);
+}
+
+.reel {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.holotape:hover .reel,
+.holotape:focus-visible .reel {
+  animation: spin 1.4s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- the targeting system (targeting.tsx) ---- */
+
+.target {
+  transition:
+    transform 200ms ease-out,
+    opacity 200ms ease-out;
+}
+
+[data-vats='on'] .target:not([data-target]) {
+  opacity: 0.32;
+}
+
+.target[data-target] {
+  transform: scale(1.02);
+  z-index: 2;
+}
+
+.target[data-shot='aim'] {
+  transform: scale(1.07);
+  transition-duration: 380ms;
+}
+
+.target[data-shot='hit'] {
+  animation: shake 300ms linear both;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: scale(1.07) translate(0, 0);
+  }
+  20% {
+    transform: scale(1.07) translate(-7px, 3px);
+  }
+  40% {
+    transform: scale(1.07) translate(6px, -4px);
+  }
+  60% {
+    transform: scale(1.07) translate(-4px, 2px);
+  }
+  80% {
+    transform: scale(1.07) translate(3px, -1px);
+  }
+}
+
+.brackets {
+  position: absolute;
+  inset: -10px;
+  pointer-events: none;
+  background:
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 0 0 / 26px 3px no-repeat,
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 0 0 / 3px 26px no-repeat,
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 100% 0 / 26px 3px no-repeat,
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 100% 0 / 3px 26px no-repeat,
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 0 100% / 26px 3px no-repeat,
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 0 100% / 3px 26px no-repeat,
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 100% 100% / 26px 3px no-repeat,
+    linear-gradient(theme('colors.atomic.yellow'), theme('colors.atomic.yellow')) 100% 100% / 3px 26px no-repeat;
+  opacity: 0;
+  transform: scale(1.12);
+  transition:
+    opacity 160ms ease-out,
+    transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.target[data-target] .brackets {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.partTag {
+  opacity: 0;
+  transform: translateX(8px);
+  transition:
+    opacity 160ms ease-out,
+    transform 200ms ease-out;
+}
+
+.target[data-target] .partTag {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.apTrack {
+  background: theme('colors.atomic.glass');
+}
+
+.apFill {
+  transform: scaleX(var(--ap, 1));
+  transition: transform 300ms ease-out;
+}
+
+.letterboxTop,
+.letterboxBottom {
+  transition: transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.letterboxTop {
+  transform: translateY(-100%);
+}
+
+.letterboxBottom {
+  transform: translateY(100%);
+}
+
+.letterboxTop[data-on],
+.letterboxBottom[data-on] {
+  transform: translateY(0);
+}
+
+.shotFlash {
+  opacity: 0;
+}
+
+.shotFlash[data-on] {
+  animation: flash 240ms ease-out both;
+}
+
+@keyframes flash {
+  0% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---- the radio (radio.tsx) ---- */
+
+.dialScale {
+  container-type: inline-size;
+  border: 2px solid theme('colors.atomic.phosphor / 0.5');
+  background:
+    repeating-linear-gradient(90deg, theme('colors.atomic.phosphor / 0.7') 0 2px, transparent 2px 24px) 0 100% / 100% 40% no-repeat,
+    repeating-linear-gradient(90deg, theme('colors.atomic.phosphor / 0.35') 0 1px, transparent 1px 6px) 0 100% / 100% 22% no-repeat,
+    theme('colors.atomic.glass');
+}
+
+/* The needle glides along the scale to the tuned station's place (--needle, 0 to 1). */
+.needle {
+  left: 4%;
+  transform: translateX(calc(var(--needle, 0.5) * 92cqw));
+  transition: transform 620ms cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.wavePanel {
+  background:
+    linear-gradient(0deg, theme('colors.atomic.phosphor / 0.12') 1px, transparent 1px) 0 0 / 100% 20%,
+    linear-gradient(90deg, theme('colors.atomic.phosphor / 0.12') 1px, transparent 1px) 0 0 / 10% 100%,
+    theme('colors.atomic.glass');
+}
+
+.waveSlide {
+  animation: waveRun var(--wave, 2s) linear infinite;
+}
+
+.waveHeight {
+  transform: scaleY(var(--amp, 0.7));
+  transition: transform 420ms ease-out;
+}
+
+.static {
+  background:
+    repeating-linear-gradient(0deg, theme('colors.atomic.phosphor / 0.35') 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, theme('colors.atomic.ink / 0.6') 0 2px, transparent 2px 5px);
+  animation: staticBurst 380ms steps(4) both;
+}
+
+@keyframes waveRun {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes staticBurst {
+  0% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.station {
+  transition: transform 200ms ease-out;
+}
+
+.station[data-on] {
+  transform: translateY(-4px);
+  border-color: theme('colors.atomic.phosphor');
+}
+
+.speaker {
+  border-radius: 0.4rem;
+  background:
+    radial-gradient(circle, theme('colors.atomic.phosphor / 0.35') 0 1.5px, transparent 2px) 0 0 / 8px 8px,
+    theme('colors.atomic.rubber');
+}
+
+/* ---- the perk chart, printed (perks.tsx) ---- */
+
+.posterPaper {
+  border: 4px solid theme('colors.atomic.poster-ink');
+  background:
+    radial-gradient(circle, theme('colors.atomic.cream-shade') 0 1.2px, transparent 1.6px) 0 0 / 10px 10px,
+    theme('colors.atomic.cream');
+  box-shadow: 10px 10px 0 theme('colors.atomic.ink / 0.6');
+}
+
+.posterDrop {
+  box-shadow: 6px 6px 0 theme('colors.atomic.poster-ink');
+}
+
+.perkCard {
+  border: 4px solid theme('colors.atomic.poster-ink');
+  background: theme('colors.atomic.cream');
+  box-shadow: 6px 6px 0 theme('colors.atomic.poster-ink');
+  transition: transform 200ms ease-out;
+}
+
+.stage:not([data-on]) .perkCard {
+  opacity: 0;
+}
+
+.stage[data-on] .perkCard {
+  animation: flipIn 620ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--i, 0) * 130ms) both;
+}
+
+.perkCard:hover {
+  transform: translateY(-6px);
+}
+
+.perkHop {
+  transform-origin: 50% 100%;
+}
+
+.perkCard:hover .perkHop {
+  animation: hop 520ms cubic-bezier(0.3, 0, 0.3, 1);
+}
+
+.perkStar {
+  transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stage[data-on] .perkStar {
+  animation: stamp 360ms cubic-bezier(0.5, 0, 0.75, 0) calc(var(--i, 0) * 130ms + 520ms) both;
+}
+
+.perkCard:hover .perkStar {
+  transform: rotate(72deg);
+}
+
+@keyframes flipIn {
+  0% {
+    opacity: 0;
+    transform: perspective(900px) rotateY(-90deg);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(900px) rotateY(0deg);
+  }
+}
+
+@keyframes hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  25% {
+    transform: translateY(0) scale(1.06, 0.92);
+  }
+  55% {
+    transform: translateY(-14px) scale(0.96, 1.05);
+  }
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---- outside: contact (terminal.tsx) ---- */
+
+.dusk {
+  background: linear-gradient(180deg, theme('colors.atomic.bunker') 0%, theme('colors.atomic.rust') 55%, theme('colors.atomic.dust') 78%, theme('colors.atomic.dust-dark') 100%);
+}
+
+.farLayer {
+  transform: translate3d(calc(var(--mx, 0) * -10px), 0, 0);
+}
+
+.nearLayer {
+  transform: translate3d(calc(var(--mx, 0) * -28px), 0, 0);
+}
+
+.doorAside {
+  transform: rotate(-24deg);
+  opacity: 0.9;
+}
+
+.sectionPower {
+  opacity: 0;
+}
+
+.device[data-on] .sectionPower {
+  animation: crtOn 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.hackScreen {
+  position: relative;
+}
+
+.dumpPick {
+  color: theme('colors.atomic.phosphor');
+}
+
+.dumpPick:hover,
+.dumpPick:focus-visible {
+  background: theme('colors.atomic.phosphor');
+  color: theme('colors.atomic.glass');
+}
+
+.attempt {
+  border: 1px solid theme('colors.atomic.phosphor / 0.6');
+  background: transparent;
+}
+
+.attempt[data-on] {
+  background: theme('colors.atomic.phosphor');
+}
+
+/* ---- reduced motion: everything lands at its end state, no loops ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient,
+  .wallLamp,
+  .beaconSweep,
+  .cursor,
+  .questActive,
+  .refreshBar,
+  .waveSlide,
+  .holotape:hover .reel,
+  .holotape:focus-visible .reel,
+  .perkCard:hover .perkHop {
+    animation: none;
+  }
+
+  .refreshBar,
+  .static,
+  .shotFlash[data-on] {
+    opacity: 0;
+    animation: none;
+  }
+
+  .powerOn,
+  .thumbsUp > g:last-of-type,
+  .device[data-booted] .tube,
+  .stage[data-on] .cardOn,
+  .stage[data-on] .perkCard,
+  .stage[data-on] .perkStar,
+  .device[data-on] .sectionPower,
+  .target[data-shot='hit'] {
+    animation-duration: 1ms;
+    animation-delay: 0ms;
+  }
+
+  .backFar,
+  .backNear,
+  .farLayer,
+  .nearLayer {
+    transform: none;
+  }
+
+  .doorWall,
+  .doorWall *,
+  .screenTab::after,
+  .dialKnob,
+  .needle,
+  .waveHeight,
+  .target,
+  .brackets,
+  .partTag,
+  .apFill,
+  .letterboxTop,
+  .letterboxBottom,
+  .holotape,
+  .station,
+  .perkCard,
+  .perkStar,
+  .menuRow::before,
+  .pickRow::before {
+    transition-duration: 1ms;
+  }
+}

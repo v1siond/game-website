@@ -436,6 +436,27 @@ collections:
                   - { <<: *text, label: "Level number", name: level, hint: 'Keep {number}' }
                   - { <<: *text, label: "Time", name: time }
                   - { <<: *text, label: "Portal hint", name: hubHint }
+                  - { <<: *text, label: "Wrist terminal", name: wristTerminal }
+                  - { <<: *text, label: "Dial hint", name: dialHint }
+                  - { <<: *text, label: "Section tabs", name: sectionTabs }
+                  - { <<: *text, label: "Skip intro", name: skipIntro }
+                  - { <<: *text, label: "Completed", name: completed }
+                  - { <<: *text, label: "Target part: role", name: role }
+                  - { <<: *text, label: "Action points (short)", name: ap }
+                  - { <<: *text, label: "Action points left", name: apLeft, hint: 'Keep {left} {total}' }
+                  - { <<: *text, label: "Target hint", name: targetHint }
+                  - { <<: *text, label: "Tune hint", name: tuneHint }
+                  - { <<: *text, label: "Tuned to", name: tunedTo, hint: 'Keep {name}' }
+                  - { <<: *text, label: "Password game title", name: hackTitle }
+                  - { <<: *text, label: "Password game hint", name: hackHint }
+                  - { <<: *text, label: "Attempts left", name: attemptsLeft }
+                  - { <<: *text, label: "Entry denied", name: entryDenied }
+                  - { <<: *text, label: "Likeness", name: likeness, hint: 'Keep {count}' }
+                  - { <<: *text, label: "Access granted", name: accessGranted }
+                  - { <<: *text, label: "Terminal locked", name: terminalLocked }
+                  - { <<: *text, label: "Dud removed", name: dudRemoved }
+                  - { <<: *text, label: "Attempts restored", name: attemptsRestored }
+                  - { <<: *text, label: "Reboot", name: reboot }
               - label: Language names (each in its own language)
                 name: languages
                 widget: object

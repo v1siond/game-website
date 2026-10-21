@@ -1,192 +1,102 @@
 'use client'
 
-import { ProjectList } from '@/components/cv/ProjectList'
-import { BandList } from '@/components/cv/BandList'
-import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { drumsSince } from '@/components/cv/sectionText'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { PhosphorFrame, RustedPanel, ShelterPanel, WornDocumentPanel } from './panels'
-import { RocketArt, ShelterArt, SkylineArt } from './art'
-import { BandCard, CompanyCard, ExperienceCard, ProjectCard, TechStackTerminal } from './cards'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { LevelScene } from '@/components/scroll/stage'
-import { Lane, SceneItem } from './scenes'
-import { drumsSince } from '@/components/cv/sectionText'
+import { atomicId } from './anchors'
+import { QuestLog } from './quests'
+import { Holotapes, Inventory } from './inventory'
+import { TargetingSystem } from './targeting'
+import { Radio } from './radio'
+import { PerkChart } from './perks'
+import atomic from './atomic.module.css'
 
-// Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
-// Projects, Bands and the Muay Thai record are shelter levels he crosses, each entry arriving as part of
-// the level.
+// The picked profession's sections, each one a stage: useSectionTrigger adds data-on once it scrolls
+// into view and the CSS plays that section's own entrance off it (the quest cards power on like the
+// tube, the perk cards flip in and their stars stamp down). Every heading's id is atomicId of its title,
+// the same the wrist terminal's section tabs jump to. The engineer's sections sit on the terminal's
+// glass panels, the musician's on the radio, the fighter's on the printed perk chart.
 
-export const SECTION_WRAP = 'relative z-20 py-6 px-4 md:px-6'
+function SectionTitle({ title }: { title: string }) {
+  return (
+    <h2 id={atomicId(title)} className={`mb-6 flex items-center gap-3 text-2xl font-bold uppercase tracking-[0.2em] text-atomic-phosphor sm:text-3xl ${atomic.glow}`}>
+      <span className="h-3 w-3 shrink-0 bg-atomic-phosphor" aria-hidden="true" />
+      {title}
+    </h2>
+  )
+}
+
+function Stage({ title, children }: { title: string; children: ReactNode }) {
+  const { ref, triggered } = useSectionTrigger()
+
+  return (
+    <section ref={ref} data-on={triggered || undefined} aria-labelledby={atomicId(title)} className={`mb-20 scroll-mt-24 ${atomic.stage}`}>
+      <SectionTitle title={title} />
+      {children}
+    </section>
+  )
+}
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
-  const labels = useLabels()
+  const titles = useLabels().sections
 
   return (
     <>
-      <FadeInScene>
-        <div className={SECTION_WRAP}>
-          <div className="max-w-4xl mx-auto">
-            <WornDocumentPanel title={labels.sections.about}>
-              <p className="font-mono text-base leading-relaxed text-atomic-phosphor">
-                {professionalSummary.bio}
-              </p>
-            </WornDocumentPanel>
-          </div>
+      <Stage title={titles.about}>
+        <div className={`max-w-3xl p-5 sm:p-6 ${atomic.panel}`}>
+          <p className="text-base leading-relaxed text-atomic-phosphor">{professionalSummary.bio}</p>
         </div>
-      </FadeInScene>
-
-      <ShelterArt />
+      </Stage>
 
       {sections.jobs.length > 0 && (
-        <LevelScene>
-          <div className={SECTION_WRAP}>
-            <div className="max-w-4xl mx-auto">
-              <Lane profession="engineer" zone="record" />
-              <RustedPanel title={labels.sections.workExperience}>
-                <ul className="space-y-4 pl-2">
-                  {sections.jobs.map((entry) => (
-                    <li key={entry.id}>
-                      <SceneItem kind="file">
-                        <ExperienceCard entry={entry} />
-                      </SceneItem>
-                    </li>
-                  ))}
-                </ul>
-              </RustedPanel>
-            </div>
-          </div>
-        </LevelScene>
+        <Stage title={titles.workExperience}>
+          <QuestLog jobs={sections.jobs} />
+        </Stage>
       )}
 
-      <SkylineArt />
+      <Stage title={titles.techStack}>
+        <Inventory categories={sections.techStack} />
+      </Stage>
 
-      <FadeInScene>
-        <div className={SECTION_WRAP}>
-          <div className="max-w-4xl mx-auto">
-            <PhosphorFrame title={labels.sections.techStack}>
-              <TechStackTerminal categories={sections.techStack} />
-            </PhosphorFrame>
-          </div>
-        </div>
-      </FadeInScene>
+      {sections.projects.length > 0 && (
+        <Stage title={titles.projects}>
+          <TargetingSystem projects={sections.projects} />
+        </Stage>
+      )}
 
-      <LevelScene>
-        <div className={SECTION_WRAP}>
-          <div className="max-w-4xl mx-auto">
-            <Lane profession="engineer" zone="work" />
-            <RustedPanel title={labels.sections.projects}>
-              <ProjectList
-                projects={sections.projects}
-                className="grid md:grid-cols-2 gap-4"
-                renderProject={(slot) => (
-                  <SceneItem kind="screen">
-                    <ProjectCard {...slot} />
-                  </SceneItem>
-                )}
-              />
-            </RustedPanel>
-          </div>
-        </div>
-      </LevelScene>
-
-      <RocketArt />
-
-      <FadeInScene>
-        <div className={SECTION_WRAP}>
-          <div className="max-w-4xl mx-auto">
-            <ShelterPanel title={labels.sections.ventures}>
-              <div className="grid md:grid-cols-3 gap-4">
-                {sections.companies.map((company) => (
-                  <CompanyCard key={company.id} company={company} />
-                ))}
-              </div>
-            </ShelterPanel>
-          </div>
-        </div>
-      </FadeInScene>
+      {sections.companies.length > 0 && (
+        <Stage title={titles.ventures}>
+          <Holotapes companies={sections.companies} />
+        </Stage>
+      )}
     </>
   )
 }
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { musician, bands } = sections
   const labels = useLabels()
+  const { musician, bands } = sections
 
   return (
-    <>
-      <RocketArt />
-      <LevelScene>
-        <div className={SECTION_WRAP}>
-          <div className="max-w-4xl mx-auto">
-            <Lane profession="drummer" zone="record" />
-            <RustedPanel title={labels.sections.bands}>
-              <p className="mb-4 font-mono text-base text-atomic-phosphor">
-                {drumsSince(musician, labels.years)}
-              </p>
-              <BandList
-                bands={bands}
-                className="grid md:grid-cols-3 gap-4"
-                renderBand={(slot) => (
-                  <SceneItem kind="screen">
-                    <BandCard {...slot} />
-                  </SceneItem>
-                )}
-              />
-              <p className="mt-4 font-mono text-sm italic text-atomic-amber">
-                {musician.line}
-              </p>
-            </RustedPanel>
-          </div>
-        </div>
-      </LevelScene>
-    </>
+    <Stage title={labels.sections.bands}>
+      <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
+      <Radio bands={bands} />
+      <p className="mt-6 text-base italic text-atomic-phosphor-dim">{musician.line}</p>
+    </Stage>
   )
 }
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { martialArts } = sections
   const labels = useLabels()
 
   return (
-    <>
-      <SkylineArt />
-      <LevelScene>
-        <div className={SECTION_WRAP}>
-          <div className="max-w-4xl mx-auto">
-            <Lane profession="fighter" zone="record" />
-            <PhosphorFrame title={labels.sections.muayThai}>
-              <h3 className="mb-4 font-mono text-lg font-bold uppercase tracking-wide text-atomic-yellow">
-                {martialArts.primary.title}
-              </h3>
-              <MuayThaiRecord
-                martialArts={martialArts}
-                classNames={{
-                  facts: 'grid md:grid-cols-2 gap-3 mb-5 font-mono',
-                  fact: 'p-3 border border-atomic-phosphor/30 bg-atomic-phosphor/5',
-                  term: 'text-sm tracking-wider uppercase text-atomic-yellow',
-                  value: 'text-sm mt-1 text-atomic-phosphor',
-                  achievements: 'space-y-2 pl-2 font-mono',
-                  achievement: 'text-sm text-atomic-phosphor',
-                }}
-                renderAchievement={(achievement) => (
-                  <SceneItem kind="file">
-                    <p className="flex items-start gap-2 border border-atomic-phosphor/30 bg-atomic-ink p-2">
-                      <span className="text-atomic-amber" aria-hidden="true">
-                        +
-                      </span>
-                      <span>{achievement}</span>
-                    </p>
-                  </SceneItem>
-                )}
-              />
-            </PhosphorFrame>
-          </div>
-        </div>
-      </LevelScene>
-    </>
+    <Stage title={labels.sections.muayThai}>
+      <PerkChart martialArts={sections.martialArts} />
+    </Stage>
   )
 }
 
