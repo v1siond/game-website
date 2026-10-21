@@ -82,7 +82,7 @@ describe('viewFor: the recruiter hero', () => {
 })
 
 describe('viewFor: System Engineer', () => {
-  it('lists jobs, projects and the tech stack, and nothing of the other professions', () => {
+  it('lists jobs, projects, the tech stack and the companies, and nothing of the other professions', () => {
     const cv = realCV()
     const view = viewFor(cv, 'engineer', 'full', NOW)
     const sections = engineerOf(view)
@@ -90,7 +90,8 @@ describe('viewFor: System Engineer', () => {
     expect(sections.jobs.length).toBe(cv.workExperience.length)
     expect(ids(sections.projects).sort()).toEqual(ids(cv.projects).sort())
     expect(sections.techStack).toEqual(cv.techStack)
-    expect(Object.keys(sections).sort()).toEqual(['jobs', 'profession', 'projects', 'techStack'])
+    expect(sections.companies).toEqual(cv.companies)
+    expect(Object.keys(sections).sort()).toEqual(['companies', 'jobs', 'profession', 'projects', 'techStack'])
   })
 
   it('orders jobs by recency: current first, then by end date', () => {

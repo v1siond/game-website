@@ -1,5 +1,5 @@
 import { screen, waitFor } from '@testing-library/react'
-import Home from '@/app/(site)/page'
+import { WorldRenderer } from '@/app/(site)/WorldRenderer'
 import { render } from '../helpers/test-utils'
 
 // Mock the heavy themed layouts: we only care that the right *world* renders.
@@ -28,18 +28,18 @@ describe('Home page (boot into a world)', () => {
   })
 
   it('boots into the default world (neon-cyber) when nothing is stored', () => {
-    render(<Home />)
+    render(<WorldRenderer />)
     expect(screen.getByTestId('theme-neon-cyber')).toBeInTheDocument()
   })
 
   it('boots into the stored world from localStorage', async () => {
     ;(localStorage.getItem as jest.Mock).mockReturnValue('retro-rpg')
-    render(<Home />)
+    render(<WorldRenderer />)
     await waitFor(() => expect(screen.getByTestId('theme-retro-rpg')).toBeInTheDocument())
   })
 
   it('renders only the active world, not the others', () => {
-    render(<Home />)
+    render(<WorldRenderer />)
     expect(screen.queryByTestId('theme-mythic')).not.toBeInTheDocument()
     expect(screen.queryByTestId('theme-dark-fantasy')).not.toBeInTheDocument()
   })

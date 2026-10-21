@@ -21,7 +21,13 @@ export interface RecruiterHero {
 }
 
 export type ProfessionSections =
-  | { profession: 'engineer'; jobs: Job[]; projects: Project[]; techStack: Array<TechCategory & { id: string }> }
+  | {
+      profession: 'engineer'
+      jobs: Job[]
+      projects: Project[]
+      techStack: Array<TechCategory & { id: string }>
+      companies: CVData['companies']
+    }
   | { profession: 'drummer'; musician: Musician; bands: Band[] }
   | { profession: 'fighter'; martialArts: MartialArts }
 
@@ -92,6 +98,7 @@ const SECTIONS_FOR: Record<Profession, (cv: CVData, keep: Keep) => ProfessionSec
     jobs: jobsFor(cv, keep),
     projects: projectsFor(cv, keep),
     techStack: cv.techStack,
+    companies: cv.companies,
   }),
   drummer: (cv) => ({ profession: 'drummer', musician: cv.musician, bands: bandsFor(cv) }),
   fighter: (cv) => ({ profession: 'fighter', martialArts: cv.martialArts }),
