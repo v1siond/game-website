@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // =============================================================================
 // SUPER MARIO BROS (NES) THEMED CV
@@ -842,63 +843,47 @@ function CastlePanel({ children, title, icon }: {
 // UI COMPONENTS
 // =============================================================================
 
-// Profession Selector - styled as Power-Ups
-function ProfessionPowerUp({
-  profession,
-  isActive,
-  onClick,
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  isActive: boolean
-  onClick: () => void
-}) {
-  const icons = {
-    engineer: <FireFlower size={50} />,
-    drummer: <Starman size={50} />,
-    fighter: <SuperMushroom size={50} />,
-  }
-  const labels = {
-    engineer: 'TECH WORLD',
-    drummer: 'MUSIC WORLD',
-    fighter: 'POWER WORLD'
-  }
-  const colors = {
-    engineer: MARIO_COLORS.questionOrange,
-    drummer: MARIO_COLORS.coinGold,
-    fighter: MARIO_COLORS.marioRed,
-  }
+// The power-up each profession's block holds.
+const PROFESSION_POWER_UPS: Record<Profession, React.ReactNode> = {
+  drummer: <Starman size={50} />,
+  engineer: <FireFlower size={50} />,
+  fighter: <SuperMushroom size={50} />,
+}
 
+const PROFESSION_GLOW: Record<Profession, string> = {
+  drummer: MARIO_COLORS.coinGold,
+  engineer: MARIO_COLORS.questionOrange,
+  fighter: MARIO_COLORS.marioRed,
+}
+
+// Profession option styled as a power-up block, drawn for the shared ProfessionSwitch
+function ProfessionPowerUp({ id, label, selected, optionProps }: ProfessionOption) {
   return (
     <button
       type="button"
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        onClick()
-      }}
+      {...optionProps}
       className={`relative flex flex-col items-center transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-400 cursor-pointer ${
-        isActive ? 'scale-110' : 'hover:scale-105 opacity-80 hover:opacity-100'
+        selected ? 'scale-110' : 'hover:scale-105 opacity-80 hover:opacity-100'
       }`}
-      aria-label={`Select ${labels[profession]} ${isActive ? '(currently selected)' : ''}`}
-      aria-pressed={isActive}
     >
       {/* Power-up block */}
       <div
-        className="w-20 h-20 flex items-center justify-center relative"
+        className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center relative"
         style={{
-          background: isActive
+          background: selected
             ? `linear-gradient(180deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionDark})`
             : `linear-gradient(180deg, ${MARIO_COLORS.brickRed}, ${MARIO_COLORS.brickDark})`,
-          border: `4px solid ${isActive ? MARIO_COLORS.groundBrown : MARIO_COLORS.groundDarkest}`,
+          border: `4px solid ${selected ? MARIO_COLORS.groundBrown : MARIO_COLORS.groundDarkest}`,
           borderRadius: '4px',
-          boxShadow: isActive
-            ? `0 4px 0 ${MARIO_COLORS.groundDarkest}, 0 0 20px ${colors[profession]}60`
+          boxShadow: selected
+            ? `0 4px 0 ${MARIO_COLORS.groundDarkest}, 0 0 20px ${PROFESSION_GLOW[id]}60`
             : `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
         }}
+        aria-hidden="true"
       >
-        {icons[profession]}
-        {isActive && (
-          <div className="absolute -top-2 -right-2" aria-hidden="true">
+        {PROFESSION_POWER_UPS[id]}
+        {selected && (
+          <div className="absolute -top-2 -right-2">
             <Coin size={20} />
           </div>
         )}
@@ -906,39 +891,38 @@ function ProfessionPowerUp({
 
       {/* Label */}
       <div
-        className="mt-3 px-3 py-1 text-[10px] font-bold tracking-wider whitespace-nowrap"
+        className="mt-3 px-2 sm:px-3 py-1 text-sm font-bold tracking-wider text-center"
         style={{
-          background: isActive
+          background: selected
             ? `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`
             : `linear-gradient(180deg, ${MARIO_COLORS.castleGrey}, ${MARIO_COLORS.castleDark})`,
           color: '#FFF',
-          border: `2px solid ${isActive ? MARIO_COLORS.questionYellow : MARIO_COLORS.flagGrey}`,
+          border: `2px solid ${selected ? MARIO_COLORS.questionYellow : MARIO_COLORS.flagGrey}`,
           borderRadius: '2px',
           textShadow: '1px 1px 0 #000',
-          fontFamily: '"Press Start 2P", monospace, sans-serif',
         }}
       >
-        {labels[profession]}
+        {label}
       </div>
     </button>
   )
 }
 
 // Tech inventory - Question block style
-function TechInventory({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+function TechInventory({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-5">
-      {categories.slice(0, 7).map((category, catIdx) => (
-        <div key={category.name}>
-          <h3 className="text-xs tracking-wider mb-2 flex items-center gap-2" style={{ color: MARIO_COLORS.groundBrown }}>
-            <Coin size={16} />
-            <span style={{ fontFamily: '"Press Start 2P", monospace, sans-serif', fontSize: '10px' }}>{category.name.toUpperCase()}</span>
+      {categories.map((category) => (
+        <div key={category.id}>
+          <h3 className="text-sm tracking-wider mb-2 flex items-center gap-2" style={{ color: MARIO_COLORS.groundBrown }}>
+            <span aria-hidden="true"><Coin size={16} /></span>
+            <span style={{ fontFamily: '"Press Start 2P", monospace, sans-serif' }}>{category.name.toUpperCase()}</span>
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
             {category.items.map((tech) => (
-              <span
+              <li
                 key={tech}
-                className="px-3 py-1.5 text-xs transition-transform hover:scale-105 cursor-default"
+                className="px-3 py-1.5 text-sm transition-transform hover:scale-105 cursor-default"
                 style={{
                   background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
                   border: `2px solid ${MARIO_COLORS.pipeMid}`,
@@ -949,82 +933,104 @@ function TechInventory({ categories }: { categories: ReturnType<typeof getEngine
                 }}
               >
                 {tech}
-              </span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
       ))}
     </div>
   )
 }
 
-// Project card - Star style
-function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+// Project card - Star style: his role, the result line and the links that open the project
+function ProjectCard({ project, years, links }: ProjectSlot) {
   return (
-    <div
-      className="relative p-4 transition-transform hover:scale-[1.02] cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
+    <article
+      className="relative h-full p-4"
       style={{
         background: `linear-gradient(180deg, #FFF9E6, #FFF3CC)`,
         border: `3px solid ${MARIO_COLORS.groundBrown}`,
         borderRadius: '4px',
         boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
       }}
-      tabIndex={0}
-      role="article"
-      aria-label={`Project: ${project.name}`}
     >
-      {/* Featured star */}
-      {project.featured && (
+      {project.highlight && (
         <div className="absolute -top-3 -right-3" aria-hidden="true">
           <Starman size={28} />
         </div>
       )}
 
       <div className="relative z-10">
-        {project.featured && (
-          <div className="flex items-center gap-1 mb-2">
-            <Coin size={12} />
-            <span className="text-[8px] tracking-wider" style={{ color: MARIO_COLORS.questionDark, fontFamily: '"Press Start 2P", monospace' }}>STARRED</span>
-          </div>
-        )}
-        <h3 className="text-sm font-bold mb-1" style={{ color: MARIO_COLORS.groundDarkest }}>
-          {project.name}
-        </h3>
-        <p className="text-[10px] mb-2" style={{ color: MARIO_COLORS.groundDark }}>
+        <div className="flex justify-between items-start gap-2 mb-1">
+          <h3 className="text-sm font-bold" style={{ color: MARIO_COLORS.groundDarkest }}>
+            {project.name}
+          </h3>
+          {years && (
+            <span className="text-sm whitespace-nowrap" style={{ color: MARIO_COLORS.groundDark }}>{years}</span>
+          )}
+        </div>
+        <p className="text-sm font-semibold mb-1" style={{ color: MARIO_COLORS.marioDarkRed }}>
+          {project.role}
+        </p>
+        <p className="text-sm mb-2" style={{ color: MARIO_COLORS.groundDark }}>
           {project.tagline}
         </p>
         {project.impact && (
-          <p className="text-[10px] mb-2 italic flex items-center gap-1" style={{ color: MARIO_COLORS.pipeGreen }}>
-            <Coin size={10} /> {project.impact}
+          <p className="text-sm mb-2 italic flex items-start gap-1" style={{ color: MARIO_COLORS.pipeDark }}>
+            <span className="shrink-0 mt-0.5" aria-hidden="true"><Coin size={10} /></span>
+            {project.impact}
           </p>
         )}
-        <div className="flex gap-1 flex-wrap">
-          {project.techStack.slice(0, 4).map((tech) => (
-            <span
-              key={tech}
-              className="text-[8px] px-2 py-0.5 rounded"
-              style={{
-                background: MARIO_COLORS.skyBlue,
-                color: '#FFF',
-                border: `1px solid ${MARIO_COLORS.skyLight}`,
-              }}
-            >
-              {tech}
-            </span>
-          ))}
-        </div>
+        {project.techStack.length > 0 && (
+          <ul className="flex gap-1 flex-wrap" aria-label="Technologies used">
+            {project.techStack.slice(0, 4).map((tech) => (
+              <li
+                key={tech}
+                className="text-sm px-2 py-0.5 rounded"
+                style={{
+                  background: MARIO_COLORS.pipeDark,
+                  color: '#FFF',
+                }}
+              >
+                {tech}
+              </li>
+            ))}
+          </ul>
+        )}
+        {links.length > 0 ? (
+          <div className="flex flex-wrap gap-2 mt-3">
+            {links.map(({ kind, label, linkProps }) => (
+              <a
+                key={kind}
+                {...linkProps}
+                className="inline-flex items-center min-h-[44px] px-3 text-sm font-bold transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
+                style={{
+                  background: `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`,
+                  border: `2px solid ${MARIO_COLORS.groundBrown}`,
+                  color: '#FFF',
+                  borderRadius: '4px',
+                }}
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm mt-3" style={{ color: MARIO_COLORS.groundDark }}>No public link</p>
+        )}
       </div>
-    </div>
+    </article>
   )
 }
 
 // Company card - Pipe style
-function PipeCard({ company }: { company: typeof COMPANIES[0] }) {
+function PipeCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
       className="block p-4 transition-transform hover:scale-[1.02] group focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-400 relative overflow-hidden"
       style={{
         background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
@@ -1037,25 +1043,25 @@ function PipeCard({ company }: { company: typeof COMPANIES[0] }) {
         <div className="flex items-center gap-3 mb-2">
           <GreenPipe height={40} width={32} />
           <div>
-            <h4 className="text-sm text-white group-hover:text-yellow-200 transition-colors">
+            <h3 className="text-sm text-white group-hover:text-yellow-200 transition-colors">
               {company.name}
-            </h4>
-            <p className="text-[10px]" style={{ color: MARIO_COLORS.coinGold }}>{company.tagline}</p>
+            </h3>
+            <p className="text-sm" style={{ color: MARIO_COLORS.coinGold }}>{company.tagline}</p>
           </div>
         </div>
-        <p className="text-xs" style={{ color: '#C8E8C8' }}>{company.description}</p>
+        <p className="text-sm" style={{ color: '#C8E8C8' }}>{company.description}</p>
       </div>
     </a>
   )
 }
 
 // Band card - Music note style
-function MusicCard({ band }: { band: typeof BANDS[0] }) {
+function MusicCard({ band, years, linkProps }: BandSlot) {
   const content = (
-    <div
-      className="p-4 transition-transform hover:scale-[1.02] group relative"
+    <article
+      className="h-full p-4 transition-transform hover:scale-[1.02] group relative"
       style={{
-        background: `linear-gradient(180deg, ${MARIO_COLORS.coinGold}, ${MARIO_COLORS.questionDark})`,
+        background: `linear-gradient(180deg, #FFF9E6, #FFF3CC)`,
         border: `3px solid ${MARIO_COLORS.groundBrown}`,
         borderRadius: '4px',
         boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
@@ -1063,31 +1069,40 @@ function MusicCard({ band }: { band: typeof BANDS[0] }) {
     >
       <div className="relative z-10">
         <div className="flex items-center gap-2 mb-2">
-          <Starman size={24} />
-          <h4 className="text-sm font-bold text-white group-hover:text-yellow-100 transition-colors">
+          <span aria-hidden="true"><Starman size={24} /></span>
+          <h3 className="text-sm font-bold" style={{ color: MARIO_COLORS.groundDarkest }}>
             {band.name}
-          </h4>
+          </h3>
         </div>
-        <p className="text-[10px] mt-1" style={{ color: MARIO_COLORS.groundDarkest }}>{band.genre} | {band.role}</p>
-        <p className="text-xs mt-2 text-white">{band.description}</p>
-        {!band.url && <p className="text-[10px] mt-2 italic" style={{ color: MARIO_COLORS.groundDark }}>World locked...</p>}
+        <p className="text-sm mt-1" style={{ color: MARIO_COLORS.groundDark }}>
+          {band.role}
+          {years && <span aria-hidden="true"> | </span>}
+          {years && <span>{years}</span>}
+        </p>
+        {band.release && (
+          <p className="text-sm mt-2" style={{ color: MARIO_COLORS.groundDarkest }}>
+            Released <cite>&ldquo;{band.release}&rdquo;</cite>
+          </p>
+        )}
       </div>
-    </div>
+    </article>
   )
 
-  if (band.url) {
-    return <a href={band.url} target="_blank" rel="noopener noreferrer" className="block focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400">{content}</a>
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a {...linkProps} className="block h-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400">
+      {content}
+    </a>
+  )
 }
 
-// Experience entry - Quest log style
-function QuestEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'NOW'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+// Experience entry - Quest log style. Dates are date only strings (UTC midnight), so the year is read in UTC.
+function QuestEntry({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'NOW'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
-    <div
+    <article
       className="p-4 transition-transform hover:scale-[1.01] relative"
       style={{
         background: `linear-gradient(180deg, #3A3A8A, ${MARIO_COLORS.undergroundBlack})`,
@@ -1095,71 +1110,42 @@ function QuestEntry({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
         borderRadius: '4px',
         boxShadow: `0 3px 0 #1A1A4A`,
       }}
+      aria-label={`${entry.title} at ${entry.company}, ${startDisplay} to ${endDisplay}`}
     >
       <div className="relative z-10">
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-start gap-2 mb-2 flex-wrap">
           <div className="flex items-start gap-2">
-            <Coin size={18} />
+            <span aria-hidden="true"><Coin size={18} /></span>
             <div>
-              <h4 className="text-sm font-bold text-white">{entry.title}</h4>
-              <p className="text-xs" style={{ color: MARIO_COLORS.coinGold }}>{entry.organization}</p>
+              <h3 className="text-sm font-bold text-white">{entry.title}</h3>
+              <p className="text-sm" style={{ color: MARIO_COLORS.coinGold }}>{entry.company}</p>
             </div>
           </div>
           <span
-            className="text-[9px] px-2 py-1"
+            className="text-sm px-2 py-1"
             style={{
-              background: MARIO_COLORS.pipeGreen,
+              background: MARIO_COLORS.pipeDark,
               color: '#FFF',
               border: `1px solid ${MARIO_COLORS.pipeMid}`,
               borderRadius: '2px',
-              fontFamily: '"Press Start 2P", monospace',
             }}
           >
             {startDisplay}-{endDisplay}
           </span>
         </div>
-        <p className="text-xs mb-2" style={{ color: '#B8B8D8' }}>{entry.description}</p>
-        {entry.highlights && entry.highlights.length > 0 && (
-          <ul className="space-y-1 mt-2">
-            {entry.highlights.map((highlight, i) => (
-              <li key={i} className="text-xs flex items-start gap-2" style={{ color: '#D8D8F8' }}>
-                <span style={{ color: MARIO_COLORS.coinGold }}>*</span>
+        {entry.description && <p className="text-sm mb-2" style={{ color: '#D8D8F8' }}>{entry.description}</p>}
+        {entry.highlights.length > 0 && (
+          <ul className="space-y-1 mt-2" aria-label="Key achievements">
+            {entry.highlights.map((highlight) => (
+              <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: '#D8D8F8' }}>
+                <span style={{ color: MARIO_COLORS.coinGold }} aria-hidden="true">*</span>
                 {highlight}
               </li>
             ))}
           </ul>
         )}
       </div>
-    </div>
-  )
-}
-
-// Skill display
-function SkillBadges({ category }: { category: ReturnType<typeof getSkillsByProfession>[0] }) {
-  return (
-    <div className="mb-4">
-      <h3 className="text-xs tracking-wider mb-2 flex items-center gap-2" style={{ color: MARIO_COLORS.castleGrey }}>
-        <span>{category.icon}</span>
-        <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}>{category.name.toUpperCase()}</span>
-      </h3>
-      <div className="flex flex-wrap gap-2">
-        {category.skills.map((skill) => (
-          <span
-            key={skill.name}
-            className="px-3 py-1.5 text-xs transition-transform hover:scale-105 cursor-default"
-            style={{
-              background: `linear-gradient(180deg, ${MARIO_COLORS.coinGold}, ${MARIO_COLORS.questionDark})`,
-              border: `2px solid ${MARIO_COLORS.groundBrown}`,
-              color: MARIO_COLORS.groundDarkest,
-              borderRadius: '2px',
-              boxShadow: `0 2px 0 ${MARIO_COLORS.groundDarkest}`,
-            }}
-          >
-            {skill.name}
-          </span>
-        ))}
-      </div>
-    </div>
+    </article>
   )
 }
 
@@ -1179,20 +1165,212 @@ function MarioDivider() {
   )
 }
 
+const PRESS_START = '"Press Start 2P", monospace'
+
+// Email is the red primary block, LinkedIn the green pipe one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
+  email: {
+    background: `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`,
+    border: `3px solid ${MARIO_COLORS.groundBrown}`,
+    color: '#FFF',
+    boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
+  },
+  linkedin: {
+    background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
+    border: `3px solid ${MARIO_COLORS.pipeMid}`,
+    color: '#FFF',
+    boxShadow: `0 4px 0 ${MARIO_COLORS.pipeDark}`,
+  },
+}
+
+const MARIO_BUTTON =
+  'mario-button inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 text-sm tracking-wider rounded transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400'
+
+function HeroAction({ action }: { action: HeroActionSlot }) {
+  return (
+    <a {...action.linkProps} className={MARIO_BUTTON} style={HERO_ACTION_LOOK[action.id]}>
+      {action.label}
+    </a>
+  )
+}
+
+function CVLink() {
+  return (
+    <Link
+      href="/cv"
+      className={MARIO_BUTTON}
+      style={{
+        background: `linear-gradient(180deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionDark})`,
+        border: `3px solid ${MARIO_COLORS.groundBrown}`,
+        color: MARIO_COLORS.groundDarkest,
+        boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
+      }}
+    >
+      <QuestionBlock size={16} hit />
+      CV
+    </Link>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      <div className="relative z-20 px-4 sm:px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <section className="mb-8">
+            <QuestionBlockPanel title="About" icon={<MarioSilhouette size={24} />}>
+              <p className="text-sm leading-relaxed" style={{ color: MARIO_COLORS.groundDarkest }}>
+                {professionalSummary.bio}
+              </p>
+            </QuestionBlockPanel>
+          </section>
+        </div>
+      </div>
+
+      <MushroomKingdomScene />
+
+      {sections.jobs.length > 0 && (
+        <div className="relative z-20 px-4 sm:px-6 py-8">
+          <div className="max-w-4xl mx-auto">
+            <section className="mb-8">
+              <UndergroundPanel title="Work Experience" icon={<Coin size={24} />}>
+                <div className="space-y-4">
+                  {sections.jobs.map((entry) => (
+                    <QuestEntry key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              </UndergroundPanel>
+            </section>
+          </div>
+        </div>
+      )}
+
+      <UndergroundScene />
+
+      <div className="relative z-20 px-4 sm:px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <section className="mb-8">
+            <QuestionBlockPanel title="Tech Stack" icon={<FireFlower size={28} />}>
+              <TechInventory categories={sections.techStack} />
+            </QuestionBlockPanel>
+          </section>
+
+          <MarioDivider />
+
+          <section className="mb-8">
+            <CastlePanel title="Projects" icon={<Starman size={28} />}>
+              <ProjectList
+                projects={sections.projects}
+                className="grid md:grid-cols-2 gap-4"
+                renderProject={(slot) => <ProjectCard {...slot} />}
+              />
+            </CastlePanel>
+          </section>
+        </div>
+      </div>
+
+      <CastleVictoryScene />
+
+      <div className="relative z-20 px-4 sm:px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <section className="mb-8">
+            <QuestionBlockPanel title="Ventures" icon={<GreenPipe height={28} width={24} />}>
+              <div className="grid md:grid-cols-3 gap-4">
+                {sections.companies.map((company) => (
+                  <PipeCard key={company.id} company={company} />
+                ))}
+              </div>
+            </QuestionBlockPanel>
+          </section>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function MusicianLevel({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <MushroomKingdomScene />
+      <div className="relative z-20 px-4 sm:px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <section className="mb-8">
+            <QuestionBlockPanel title="Bands" icon={<Starman size={28} />}>
+              <p className="text-sm mb-4" style={{ color: MARIO_COLORS.groundDarkest }}>
+                Drums since {musician.since}, {musician.yearsPlaying} years
+              </p>
+              <BandList
+                bands={bands}
+                className="grid md:grid-cols-2 gap-4"
+                renderBand={(slot) => <MusicCard {...slot} />}
+              />
+              <p className="text-sm mt-4" style={{ color: MARIO_COLORS.groundDarkest }}>
+                {musician.line}
+              </p>
+            </QuestionBlockPanel>
+          </section>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function MartialArtistLevel({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <MushroomKingdomScene />
+      <div className="relative z-20 px-4 sm:px-6 py-8">
+        <div className="max-w-4xl mx-auto">
+          <section className="mb-8">
+            <UndergroundPanel title="Muay Thai" icon={<SuperMushroom size={28} />}>
+              <h3 className="text-base font-bold text-white mb-4">{martialArts.primary.title}</h3>
+              <MuayThaiRecord
+                martialArts={martialArts}
+                classNames={{
+                  facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+                  fact: 'p-3 rounded border-2 border-[#5A5A9A] bg-[#3A3A8A]',
+                  term: 'text-sm font-bold tracking-wider text-[#FFD700] uppercase',
+                  value: 'text-sm text-white mt-1',
+                  achievements: 'space-y-1',
+                  achievement: 'text-sm text-[#D8D8F8] flex items-start gap-2',
+                }}
+                renderAchievement={(achievement) => (
+                  <>
+                    <span className="text-[#FFD700]" aria-hidden="true">*</span>
+                    <span>{achievement}</span>
+                  </>
+                )}
+              />
+            </UndergroundPanel>
+          </section>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function ProfessionLevels({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianLevel sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistLevel sections={sections} />
+  return <EngineerLevels sections={sections} />
+}
+
 // =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
 export default function AdventurePathsTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
+  const { active } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
@@ -1217,356 +1395,154 @@ export default function AdventurePathsTheme() {
         <div className="absolute top-[12%] right-[40%] cloud-float-1"><MarioCloud width={110} /></div>
       </div>
 
-      {/* Header */}
-      <header className="relative z-30 p-6">
-        <div className="max-w-6xl mx-auto flex justify-between items-start">
-          <div className="flex items-start gap-4">
-            <MarioSilhouette size={70} />
-            <div>
-              <h1
-                className="text-2xl tracking-wider font-bold"
-                style={{
-                  color: '#FFF',
-                  textShadow: `3px 3px 0 ${MARIO_COLORS.marioRed}, 6px 6px 0 #000`,
-                  fontFamily: '"Press Start 2P", "Arial Black", sans-serif',
-                }}
-              >
-                ALEXANDER PULIDO
-              </h1>
-              <p
-                className="text-xs tracking-wide mt-2"
-                style={{
-                  color: MARIO_COLORS.groundDarkest,
-                  textShadow: '1px 1px 0 #FFF',
-                }}
-              >
-                {PROFESSIONAL_SUMMARY[active].headline}
-              </p>
-              <p className="text-[10px] tracking-wide mt-1 italic" style={{ color: MARIO_COLORS.groundDark }}>
-                {PROFESSIONAL_SUMMARY[active].tagline}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end gap-3">
-            {/* Coin/Star counters */}
-            <div className="flex items-center gap-4">
-              <div
-                className="flex items-center gap-2 px-3 py-1.5"
-                style={{
-                  background: `linear-gradient(180deg, #2A2A2A, #1A1A1A)`,
-                  border: `2px solid ${MARIO_COLORS.coinGold}`,
-                  borderRadius: '4px',
-                }}
-              >
-                <Coin size={20} />
-                <span className="text-sm font-bold" style={{ color: '#FFF', fontFamily: '"Press Start 2P", monospace' }}>x99</span>
-              </div>
-              <div
-                className="flex items-center gap-2 px-3 py-1.5"
-                style={{
-                  background: `linear-gradient(180deg, #2A2A2A, #1A1A1A)`,
-                  border: `2px solid ${MARIO_COLORS.coinGold}`,
-                  borderRadius: '4px',
-                }}
-              >
-                <Starman size={20} />
-                <span className="text-sm font-bold" style={{ color: '#FFF', fontFamily: '"Press Start 2P", monospace' }}>x7</span>
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex gap-3 items-center">
-              <Link
-                href="/cv"
-                className="mario-button px-4 py-2 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
-                style={{
-                  background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
-                  border: `3px solid ${MARIO_COLORS.pipeMid}`,
-                  color: '#FFF',
-                  borderRadius: '4px',
-                  boxShadow: `0 4px 0 ${MARIO_COLORS.pipeDark}`,
-                  fontFamily: '"Press Start 2P", monospace',
-                  fontSize: '10px',
-                }}
-              >
-                <span className="flex items-center gap-2">
-                  <QuestionBlock size={16} hit />
-                  RESUME
-                </span>
-              </Link>
-              <Link
-                href="/personal-projects/game-engine"
-                className="mario-button px-4 py-2 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
-                style={{
-                  background: `linear-gradient(180deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionDark})`,
-                  border: `3px solid ${MARIO_COLORS.groundBrown}`,
-                  color: MARIO_COLORS.groundDarkest,
-                  borderRadius: '4px',
-                  boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
-                  fontFamily: '"Press Start 2P", monospace',
-                  fontSize: '10px',
-                }}
-              >
-                <span className="flex items-center gap-2">
-                  <Starman size={16} />
-                  PLAY
-                </span>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Current Roles */}
-      <section className="relative z-20 py-4 px-6" aria-label="Current Roles">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-4">
-            {CURRENT_ROLES.map((role, idx) => (
-              <div
-                key={role.id}
-                className="flex items-center gap-3 px-4 py-2"
-                style={{
-                  background: `linear-gradient(180deg, #FFF9E6, #FFF3CC)`,
-                  border: `3px solid ${MARIO_COLORS.groundBrown}`,
-                  borderRadius: '4px',
-                  boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
-                }}
-              >
-                {idx === 0 ? <SuperMushroom size={28} /> : <SuperMushroom size={28} is1UP />}
-                <div>
-                  <p className="text-[10px] tracking-wider" style={{ color: MARIO_COLORS.groundDark, fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}>{role.title}</p>
-                  <p className="text-sm font-medium" style={{ color: MARIO_COLORS.groundDarkest }}>{role.company}</p>
+      {/* Header - the recruiter first screen */}
+      <header className="relative z-30 px-4 py-5 sm:p-6">
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-6xl mx-auto flex justify-between items-start flex-wrap gap-4">
+              <div className="flex items-start gap-4">
+                <div className="hidden sm:block shrink-0" aria-hidden="true">
+                  <MarioSilhouette size={70} />
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Profession Selector - Power-up blocks */}
-      <section className="relative z-20 py-8" aria-label="Profession Selection">
-        <div className="max-w-3xl mx-auto flex justify-center gap-12">
-          {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-            <ProfessionPowerUp
-              key={prof}
-              profession={prof}
-              isActive={active === prof}
-              onClick={() => setActive(prof)}
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Main content - NEW LAYOUT ORDER */}
-      <main className="relative z-20 px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-
-          {/* === ABOUT === */}
-          <section className="mb-8">
-            <QuestionBlockPanel title="About" icon={<MarioSilhouette size={24} />}>
-              <p className="text-sm leading-relaxed mb-4" style={{ color: MARIO_COLORS.groundDarkest }}>
-                {aboutData.bio}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span
-                    key={i}
-                    className="text-xs px-3 py-1.5 flex items-center gap-2"
+                <div>
+                  <h1
+                    className="text-xl sm:text-2xl tracking-wider font-bold uppercase"
                     style={{
-                      background: [
-                        `${MARIO_COLORS.marioRed}20`,
-                        `${MARIO_COLORS.pipeGreen}20`,
-                        `${MARIO_COLORS.skyBlue}20`,
-                        `${MARIO_COLORS.coinGold}20`
-                      ][i % 4],
-                      border: `2px solid ${[
-                        MARIO_COLORS.marioRed,
-                        MARIO_COLORS.pipeGreen,
-                        MARIO_COLORS.skyBlue,
-                        MARIO_COLORS.coinGold
-                      ][i % 4]}50`,
-                      borderRadius: '2px',
-                      color: MARIO_COLORS.groundDarkest,
+                      color: '#FFF',
+                      textShadow: `3px 3px 0 ${MARIO_COLORS.marioRed}, 6px 6px 0 #000`,
+                      fontFamily: '"Press Start 2P", "Arial Black", sans-serif',
                     }}
                   >
-                    <Coin size={12} />
-                    {fact}
-                  </span>
-                ))}
+                    {name}
+                  </h1>
+                  <p className="text-sm font-semibold tracking-wide mt-3" style={{ color: MARIO_COLORS.groundDarkest }}>
+                    {headline}
+                  </p>
+                  <p className="text-sm tracking-wide mt-1 italic" style={{ color: MARIO_COLORS.groundDarkest }}>
+                    {tagline}
+                  </p>
+                  <p className="text-sm mt-1" style={{ color: MARIO_COLORS.groundDarkest }}>
+                    {line}
+                  </p>
+                </div>
               </div>
-            </QuestionBlockPanel>
-          </section>
 
-          {/* === ART SECTION 1: Mushroom Kingdom (after About) === */}
-        </div>
-      </main>
-
-      <MushroomKingdomScene />
-
-      <main className="relative z-20 px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-
-          {/* === EXPERIENCE === */}
-          {experience.length > 0 && (
-            <section className="mb-8">
-              <UndergroundPanel title="Work Experience" icon={<Coin size={24} />}>
-                <div className="space-y-4">
-                  {experience.map((entry) => (
-                    <QuestEntry key={entry.id} entry={entry} />
-                  ))}
+              <div className="flex flex-col items-start sm:items-end gap-3">
+                {/* Coin/Star counters */}
+                <div className="hidden sm:flex items-center gap-4" aria-hidden="true">
+                  <div
+                    className="flex items-center gap-2 px-3 py-1.5"
+                    style={{
+                      background: `linear-gradient(180deg, #2A2A2A, #1A1A1A)`,
+                      border: `2px solid ${MARIO_COLORS.coinGold}`,
+                      borderRadius: '4px',
+                    }}
+                  >
+                    <Coin size={20} />
+                    <span className="text-sm font-bold" style={{ color: '#FFF', fontFamily: PRESS_START }}>x99</span>
+                  </div>
+                  <div
+                    className="flex items-center gap-2 px-3 py-1.5"
+                    style={{
+                      background: `linear-gradient(180deg, #2A2A2A, #1A1A1A)`,
+                      border: `2px solid ${MARIO_COLORS.coinGold}`,
+                      borderRadius: '4px',
+                    }}
+                  >
+                    <Starman size={20} />
+                    <span className="text-sm font-bold" style={{ color: '#FFF', fontFamily: PRESS_START }}>x7</span>
+                  </div>
                 </div>
-              </UndergroundPanel>
-            </section>
-          )}
 
-          {/* === ART SECTION 2: Underground (after Experience) === */}
-        </div>
-      </main>
-
-      <UndergroundScene />
-
-      <main className="relative z-20 px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-
-          {/* === SKILLS === */}
-          <section className="mb-8">
-            <QuestionBlockPanel
-              title={active === 'engineer' ? 'Tech Stack' : 'Skills'}
-              icon={active === 'engineer' ? <FireFlower size={28} /> : <SuperMushroom size={28} />}
-            >
-              {active === 'engineer' ? (
-                <TechInventory categories={engineerTech} />
-              ) : (
-                <div className="space-y-4">
-                  {otherSkills.map((category) => (
-                    <SkillBadges key={category.name} category={category} />
+                {/* Action buttons */}
+                <nav className="flex gap-3 items-center flex-wrap" aria-label="Contact and CV">
+                  {actions.map((action) => (
+                    <HeroAction key={action.id} action={action} />
                   ))}
-                </div>
-              )}
-            </QuestionBlockPanel>
-          </section>
-
-          <MarioDivider />
-
-          {/* === PROJECTS === */}
-          <section className="mb-8">
-            <CastlePanel title="Featured Work" icon={<Starman size={28} />}>
-              <div className="grid md:grid-cols-2 gap-4">
-                {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
+                  <CVLink />
+                  <Link
+                    href="/personal-projects/game-engine"
+                    className={MARIO_BUTTON}
+                    style={{
+                      background: `linear-gradient(180deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionDark})`,
+                      border: `3px solid ${MARIO_COLORS.groundBrown}`,
+                      color: MARIO_COLORS.groundDarkest,
+                      boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
+                    }}
+                  >
+                    <Starman size={16} />
+                    PLAY
+                  </Link>
+                </nav>
               </div>
-            </CastlePanel>
-          </section>
+            </div>
+          )}
+        />
+      </header>
 
-          {/* === ART SECTION 3: Castle Victory (after Projects) === */}
-        </div>
-      </main>
+      {/* Profession Selector - Power-up blocks, System Engineer in the centre */}
+      <section className="relative z-20 py-6 sm:py-8 px-4" aria-label="Profession Selection">
+        <ProfessionSwitch
+          className="max-w-3xl mx-auto flex justify-center items-start gap-4 sm:gap-12"
+          label="Profession"
+          renderOption={(option) => <ProfessionPowerUp {...option} />}
+        />
+      </section>
 
-      <CastleVictoryScene />
+      {/* The picked profession's levels, and only those */}
+      <div role="region" aria-label={`${active} profession details`}>
+        <ProfessionLevels sections={view.sections} />
+      </div>
 
-      <main className="relative z-20 px-6 py-8">
+      <div className="relative z-20 px-4 sm:px-6 py-8">
         <div className="max-w-4xl mx-auto">
-
-          {/* === VENTURES (Companies for Engineer / Bands for Drummer) === */}
-          {active === 'engineer' && (
-            <section className="mb-8">
-              <QuestionBlockPanel title="Ventures" icon={<GreenPipe height={28} width={24} />}>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {COMPANIES.map((company) => (
-                    <PipeCard key={company.id} company={company} />
-                  ))}
-                </div>
-              </QuestionBlockPanel>
-            </section>
-          )}
-
-          {active === 'drummer' && (
-            <section className="mb-8">
-              <QuestionBlockPanel title="Bands" icon={<Starman size={28} />}>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {BANDS.map((band) => (
-                    <MusicCard key={band.id} band={band} />
-                  ))}
-                </div>
-              </QuestionBlockPanel>
-            </section>
-          )}
-
           {/* === POSTS (placeholder) === */}
           <section className="mb-8">
             <UndergroundPanel title="Posts" icon={<QuestionBlock size={24} />}>
               <div className="text-center py-8">
                 <QuestionBlock size={60} hit />
-                <p className="mt-4 text-sm" style={{ color: '#8888AA' }}>Coming soon... check back for blog posts!</p>
+                <p className="mt-4 text-sm" style={{ color: '#C8C8E8' }}>Coming soon... check back for blog posts!</p>
               </div>
             </UndergroundPanel>
           </section>
         </div>
-      </main>
+      </div>
 
       {/* Contact CTA */}
-      <section className="relative z-20 py-16 px-6" aria-label="Contact">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="mb-8">
-            <div className="flex justify-center gap-2 mb-4">
-              <Coin size={20} />
-              <QuestionBlock size={32} />
-              <Coin size={20} />
+      <section className="relative z-20 py-16 px-4 sm:px-6" aria-labelledby="mario-contact-heading">
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <div className="flex justify-center gap-2 mb-4" aria-hidden="true">
+                  <Coin size={20} />
+                  <QuestionBlock size={32} />
+                  <Coin size={20} />
+                </div>
+                <h2
+                  id="mario-contact-heading"
+                  className="text-lg tracking-[0.15em] mb-3"
+                  style={{
+                    color: MARIO_COLORS.marioRed,
+                    textShadow: `2px 2px 0 ${MARIO_COLORS.groundDarkest}`,
+                    fontFamily: '"Press Start 2P", monospace, sans-serif',
+                  }}
+                >
+                  READY TO TEAM UP?
+                </h2>
+                <p className="text-sm" style={{ color: MARIO_COLORS.groundDarkest }}>
+                  {line}
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                {actions.map((action) => (
+                  <HeroAction key={action.id} action={action} />
+                ))}
+                <CVLink />
+              </div>
             </div>
-            <h2
-              className="text-lg tracking-[0.15em] mb-3"
-              style={{
-                color: MARIO_COLORS.marioRed,
-                textShadow: `2px 2px 0 ${MARIO_COLORS.groundDarkest}`,
-                fontFamily: '"Press Start 2P", monospace, sans-serif',
-              }}
-            >
-              READY TO TEAM UP?
-            </h2>
-            <p
-              className="text-sm"
-              style={{ color: MARIO_COLORS.groundDarkest }}
-            >
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:alexanderpulido81@gmail.com"
-              className="mario-button px-6 py-3 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400 inline-flex items-center justify-center gap-2"
-              style={{
-                background: `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`,
-                border: `3px solid ${MARIO_COLORS.groundBrown}`,
-                color: '#FFF',
-                borderRadius: '4px',
-                boxShadow: `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '10px',
-              }}
-            >
-              <Starman size={16} />
-              GET IN TOUCH
-            </a>
-            <Link
-              href="/cv"
-              className="mario-button px-6 py-3 text-xs tracking-wider transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400 inline-flex items-center justify-center gap-2"
-              style={{
-                background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
-                border: `3px solid ${MARIO_COLORS.pipeMid}`,
-                color: '#FFF',
-                borderRadius: '4px',
-                boxShadow: `0 4px 0 ${MARIO_COLORS.pipeDark}`,
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '10px',
-              }}
-            >
-              <QuestionBlock size={16} hit />
-              VIEW CV
-            </Link>
-          </div>
-        </div>
+          )}
+        />
       </section>
 
       
@@ -1586,7 +1562,7 @@ export default function AdventurePathsTheme() {
             <GreenPipe height={40} width={32} />
             <div className="flex items-center gap-2">
               <Starman size={24} />
-              <span className="text-[10px] tracking-wider text-white" style={{ fontFamily: '"Press Start 2P", monospace' }}>PLAYER SINCE 2014</span>
+              <span className="text-[10px] tracking-wider text-white" style={{ fontFamily: '"Press Start 2P", monospace' }}>PLAYER ONE</span>
               <Starman size={24} />
             </div>
             <GreenPipe height={40} width={32} />
