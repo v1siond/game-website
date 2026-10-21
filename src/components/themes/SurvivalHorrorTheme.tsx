@@ -2,7 +2,8 @@
 
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { SH_VARS } from './SurvivalHorror/palette'
@@ -28,6 +29,7 @@ const EMPTY_SLOTS = [1, 2, 3, 4, 5]
 export default function SurvivalHorrorTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation, professions } = useLabels()
 
   return (
     <div className={`relative min-h-screen overflow-x-clip ${look.root}`} style={SH_VARS}>
@@ -46,7 +48,7 @@ export default function SurvivalHorrorTheme() {
                   <p className="mt-2 text-sm text-[color:var(--sh-cream)]">{line}</p>
                 </div>
 
-                <nav className="flex flex-wrap items-center gap-3" aria-label="Contact and CV">
+                <nav className="flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
                   {actions.map((action) => (
                     <HeroAction key={action.id} action={action} />
                   ))}
@@ -62,7 +64,7 @@ export default function SurvivalHorrorTheme() {
           <div className="mx-auto max-w-4xl">
             {/* The item box: the shared profession switch, one item per profession */}
             <div className={`mx-auto mb-8 max-w-xl p-4 sm:p-6 ${look.panel}`}>
-              <ProfessionSwitch className="grid grid-cols-3 gap-3" label="Profession" renderOption={(option) => <ItemSlot option={option} />} />
+              <ProfessionSwitch className="grid grid-cols-3 gap-3" label={navigation.profession} renderOption={(option) => <ItemSlot option={option} />} />
               <div className="mt-3 grid grid-cols-5 gap-3" aria-hidden="true">
                 {EMPTY_SLOTS.map((slot) => (
                   <div key={slot} className={`h-10 sm:h-14 ${look.emptySlot}`} />
@@ -70,7 +72,7 @@ export default function SurvivalHorrorTheme() {
               </div>
             </div>
 
-            <div role="region" aria-label={`${active} profession details`}>
+            <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
               <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
             </div>
           </div>

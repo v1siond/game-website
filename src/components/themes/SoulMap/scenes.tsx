@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import { ContactStage, atClass } from '@/components/scroll/stage'
@@ -72,6 +73,7 @@ function ContactMap() {
 }
 
 export function ContactScene({ profession }: { profession: Profession }) {
+  const { sections } = useLabels()
   const { Corner } = PROFESSION_STAGES[profession]
 
   return (
@@ -91,7 +93,7 @@ export function ContactScene({ profession }: { profession: Profession }) {
           <div className={scene.arrive}>
             <div className={`relative p-6 ${world.room}`}>
               <h2 id={CONTACT_HEADING} className={`mb-3 text-2xl uppercase text-[var(--soul-glow)] ${world.lettering} ${world.title}`}>
-                Contact
+                {sections.contact}
               </h2>
               <p className="mb-6 text-base text-[var(--soul-text-soft)]">{line}</p>
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">

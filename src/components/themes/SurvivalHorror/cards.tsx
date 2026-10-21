@@ -2,7 +2,9 @@ import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, NO_PUBLIC_LINK, RELEASED } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { CARD_BUTTON } from './actions'
 import look from './world.module.css'
 
@@ -28,7 +30,8 @@ function MarkedLine({ children }: { children: ReactNode }) {
 }
 
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className={`p-4 ${look.file}`}>
@@ -43,7 +46,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       </div>
       {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="space-y-1" aria-label="Key accomplishments">
+        <ul className="space-y-1" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <MarkedLine key={highlight}>{highlight}</MarkedLine>
           ))}
@@ -68,6 +71,7 @@ function Chevron({ open }: { open: boolean }) {
 // description and the result line.
 export function ProjectFile({ slot: { project, years, links }, isOpen, onToggle }: { slot: ProjectSlot; isOpen: boolean; onToggle: () => void }) {
   const bodyId = `survival-horror-file-${project.id}`
+  const { actions, links: linkLabels } = useLabels()
 
   return (
     <article className={look.file}>
@@ -84,10 +88,10 @@ export function ProjectFile({ slot: { project, years, links }, isOpen, onToggle 
               {label}
             </a>
           ))}
-          {links.length === 0 && <span className={`italic ${BODY}`}>{NO_PUBLIC_LINK}</span>}
+          {links.length === 0 && <span className={`italic ${BODY}`}>{linkLabels.noPublicLink}</span>}
           <button type="button" onClick={onToggle} aria-expanded={isOpen} aria-controls={bodyId} className={TOGGLE_PLATE}>
             <Chevron open={isOpen} />
-            {isOpen ? 'Close file' : 'Read file'}
+            {isOpen ? actions.closeFile : actions.readFile}
           </button>
         </div>
       </div>
@@ -102,12 +106,14 @@ export function ProjectFile({ slot: { project, years, links }, isOpen, onToggle 
 }
 
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
+
   return (
     <div className="space-y-6">
       {categories.map((category) => (
         <div key={category.id}>
           <h3 className={`mb-3 text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>{category.name}</h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li key={tech} className="border border-[color:var(--sh-wood)] bg-[color:var(--sh-shadow)] px-2 py-1 text-sm text-[color:var(--sh-cream)]">
                 {tech}
@@ -121,12 +127,14 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
 }
 
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
+
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name} (opens in a new tab)`}
+      aria-label={newTabName(links, company.name)}
       className={`block h-full p-4 hover:border-[color:var(--sh-brass)] ${look.file} ${look.focus}`}
     >
       <h3 className={TITLE}>{company.name}</h3>
@@ -137,6 +145,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const content = (
     <div className={`h-full p-4 ${look.file}`}>
       <h3 className={TITLE}>{band.name}</h3>
@@ -147,7 +156,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${BODY}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </div>

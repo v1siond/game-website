@@ -2,7 +2,8 @@
 
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
-import { useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
@@ -27,6 +28,7 @@ import world from './Mythic/world.module.css'
 export default function MythicTheme() {
   const { active } = useProfession()
   const view = useWorldView()
+  const { navigation, professions } = useLabels()
 
   return (
     <div className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={MYTH_VARS}>
@@ -46,7 +48,7 @@ export default function MythicTheme() {
                 <p className="mt-1 text-sm text-[color:var(--myth-ink)]">{line}</p>
               </div>
 
-              <nav className="flex flex-wrap items-center gap-3" aria-label="Contact and CV">
+              <nav className="flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
                 {actions.map((action) => (
                   <HeroAction key={action.id} action={action} />
                 ))}
@@ -59,16 +61,16 @@ export default function MythicTheme() {
       </header>
 
       {/* the profession switch, three shrines with him in each costume */}
-      <section className="relative z-20 px-4 py-6" aria-label="Profession selection">
+      <section className="relative z-20 px-4 py-6" aria-label={navigation.professionSelection}>
         <ProfessionSwitch
           className="mx-auto grid max-w-xl grid-cols-3 gap-3 sm:flex sm:max-w-none sm:justify-center sm:gap-8"
-          label="Profession"
+          label={navigation.profession}
           renderOption={(option) => <ProfessionShrine {...option} />}
         />
       </section>
 
       <main id="main-content" tabIndex={-1} className="relative z-20 px-4 py-8 outline-none sm:px-6">
-        <div className="mx-auto max-w-5xl" role="region" aria-label={`${active} profession details`}>
+        <div className="mx-auto max-w-5xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </div>
       </main>

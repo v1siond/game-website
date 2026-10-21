@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -35,12 +35,13 @@ function useOpenFiles() {
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const { sections: titles } = useLabels()
   const files = useOpenFiles()
 
   return (
     <>
       <FadeInScene>
-        <PaperPanel title="About">
+        <PaperPanel title={titles.about}>
           <p className={LEAD}>{professionalSummary.bio}</p>
         </PaperPanel>
       </FadeInScene>
@@ -50,7 +51,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.jobs.length > 0 && (
         <LevelScene>
           <Strip profession="engineer" zone="record" />
-          <PaperPanel title="Work Experience">
+          <PaperPanel title={titles.workExperience}>
             <ul className="space-y-4">
               {sections.jobs.map((entry) => (
                 <li key={entry.id}>
@@ -67,14 +68,14 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <DoorBreak />
 
       <FadeInScene>
-        <PaperPanel title="Tech Stack">
+        <PaperPanel title={titles.techStack}>
           <TechCloud categories={sections.techStack} />
         </PaperPanel>
       </FadeInScene>
 
       <LevelScene>
         <Strip profession="engineer" zone="work" />
-        <PaperPanel title="Projects">
+        <PaperPanel title={titles.projects}>
           <ProjectList
             projects={sections.projects}
             className="grid gap-4 md:grid-cols-2"
@@ -90,7 +91,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <SaveRoomBreak />
 
       <FadeInScene>
-        <PaperPanel title="Ventures">
+        <PaperPanel title={titles.ventures}>
           <ul className="grid gap-4 md:grid-cols-3">
             {sections.companies.map((company) => (
               <li key={company.id}>
@@ -106,15 +107,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const { sections: titles, years } = useLabels()
 
   return (
     <>
       <DoorBreak />
       <LevelScene>
         <Strip profession="drummer" zone="record" />
-        <PaperPanel title="Bands">
+        <PaperPanel title={titles.bands}>
           <p className={`mb-4 ${LEAD}`}>
-            {drumsSince(musician)}
+            {drumsSince(musician, years)}
           </p>
           <BandList
             bands={bands}
@@ -134,13 +136,14 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <DoorBreak />
       <LevelScene>
         <Strip profession="fighter" zone="record" />
-        <PaperPanel title="Muay Thai">
+        <PaperPanel title={titles.muayThai}>
           <h3 className={`mb-4 text-base text-[color:var(--sh-flame)] ${look.typed}`}>{martialArts.primary.title}</h3>
           <MuayThaiRecord
             martialArts={martialArts}

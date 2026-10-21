@@ -1,7 +1,9 @@
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, RELEASED } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { RoomGlyph } from './art'
 import { SOUL } from './palette'
 import world from './world.module.css'
@@ -19,12 +21,13 @@ export function Marker({ color = 'bg-[var(--soul-glow)]' }: { color?: string }) 
 }
 
 export function TechStack({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
     <div className="space-y-5">
       {categories.map((category) => (
         <div key={category.id}>
           <h3 className={`mb-2 text-base uppercase text-[var(--soul-lantern)] ${world.lettering}`}>{category.name}</h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li key={tech} className={`px-2.5 py-1 text-sm ${world.chip}`}>
                 {tech}
@@ -38,7 +41,8 @@ export function TechStack({ categories }: { categories: CVData['techStack'] }) {
 }
 
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className={`p-4 sm:p-5 ${world.card}`}>
@@ -51,7 +55,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       <p className="mb-2 text-base text-[var(--soul-glow)]">{entry.company}</p>
       {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="mt-3 space-y-1.5" aria-label="Key accomplishments">
+        <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
               <Marker />
@@ -65,6 +69,8 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 }
 
 export function ProjectCard({ project, years, links }: ProjectSlot) {
+  const { cards } = useLabels()
+
   return (
     <article className={`h-full p-4 ${world.card}`} aria-labelledby={`soul-project-${project.id}`}>
       <div className="mb-1 flex items-start gap-2">
@@ -82,7 +88,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
       </p>
       <p className={`mb-2 ${BODY}`}>{project.tagline}</p>
       {project.impact && <p className="mb-3 border-l-2 border-[var(--soul-lantern)] pl-2 text-sm text-[var(--soul-text)]">{project.impact}</p>}
-      <ul className="mb-3 flex flex-wrap gap-1.5" aria-label={`${project.name} technologies`}>
+      <ul className="mb-3 flex flex-wrap gap-1.5" aria-label={fillLabel(cards.categoryTechnologies, { name: project.name })}>
         {project.techStack.map((tech) => (
           <li key={tech} className={`px-2 py-0.5 text-sm ${world.chip}`}>
             {tech}
@@ -103,12 +109,14 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 }
 
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
+
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}, ${company.tagline}`)}
       className={`block h-full p-4 transition-colors hover:bg-[var(--soul-rock)] motion-reduce:transition-none ${world.card}`}
     >
       <h3 className={NAME}>{company.name}</h3>
@@ -119,6 +127,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const card = (
     <article className={`h-full p-4 ${world.card}`}>
       <h3 className={NAME}>{band.name}</h3>
@@ -129,7 +138,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
       </p>
       {band.release && (
         <p className={`mt-2 ${BODY}`}>
-          {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
     </article>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCVData } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -22,11 +22,12 @@ const LEAD = 'text-base text-[var(--soul-text-soft)]'
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <FadeInScene>
-        <MapPanel title="About">
+        <MapPanel title={titles.about}>
           <p className={`leading-relaxed ${LEAD}`}>{professionalSummary.bio}</p>
         </MapPanel>
       </FadeInScene>
@@ -36,7 +37,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.jobs.length > 0 && (
         <LevelScene>
           <Strip profession="engineer" zone="record" />
-          <OpenSection title="Work Experience">
+          <OpenSection title={titles.workExperience}>
             <ul className="space-y-6">
               {sections.jobs.map((entry) => (
                 <li key={entry.id}>
@@ -53,7 +54,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <PathBreak />
 
       <FadeInScene>
-        <MapPanel title="Tech Stack">
+        <MapPanel title={titles.techStack}>
           <TechStack categories={sections.techStack} />
         </MapPanel>
       </FadeInScene>
@@ -62,7 +63,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <LevelScene>
         <Strip profession="engineer" zone="work" />
-        <OpenSection title="Featured Work">
+        <OpenSection title={titles.featuredWork}>
           <ProjectList
             projects={sections.projects}
             className="grid gap-6 md:grid-cols-2"
@@ -78,7 +79,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <PathBreak />
 
       <FadeInScene>
-        <OpenSection title="Ventures">
+        <OpenSection title={titles.ventures}>
           <ul className="grid gap-4 md:grid-cols-3">
             {sections.companies.map((company) => (
               <li key={company.id}>
@@ -94,15 +95,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
 export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
+  const { sections: titles, years } = useLabels()
 
   return (
     <>
       <PathBreak />
       <LevelScene>
         <Strip profession="drummer" zone="record" />
-        <OpenSection title="Bands">
+        <OpenSection title={titles.bands}>
           <p className={`mb-6 ${LEAD}`}>
-            {drumsSince(musician)}
+            {drumsSince(musician, years)}
           </p>
           <BandList
             bands={bands}
@@ -122,13 +124,14 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
+  const { sections: titles } = useLabels()
 
   return (
     <>
       <PathBreak />
       <LevelScene>
         <Strip profession="fighter" zone="record" />
-        <MapPanel title="Muay Thai">
+        <MapPanel title={titles.muayThai}>
           <h3 className={`mb-4 text-lg uppercase text-[var(--soul-text)] ${world.lettering}`}>{martialArts.primary.title}</h3>
           <MuayThaiRecord
             martialArts={martialArts}

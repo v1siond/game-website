@@ -2,7 +2,9 @@ import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobYears, RELEASED } from '@/components/cv/sectionText'
+import { jobYears, newTabName } from '@/components/cv/sectionText'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { fillLabel } from '@/lib/cv/labels'
 import { HeroCharacter } from './character'
 import { MYTH } from './palette'
 import world from './world.module.css'
@@ -34,6 +36,7 @@ const CHIP = 'border border-[color:var(--myth-stone)] bg-[var(--myth-marble)] px
 const NAME = `text-lg sm:text-xl ${world.carved}`
 
 export function TechStackBoard({ categories }: { categories: CVData['techStack'] }) {
+  const { cards } = useLabels()
   return (
     <div className="space-y-6">
       {categories.map((category) => (
@@ -42,7 +45,7 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
             <span className="block h-3 w-3 rotate-45 bg-[var(--myth-terracotta)]" aria-hidden="true" />
             {category.name}
           </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
+          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
             {category.items.map((tech) => (
               <li key={tech} className={CHIP}>
                 {tech}
@@ -56,7 +59,8 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
 }
 
 export function ExperienceCard({ entry }: { entry: Job }) {
-  const { start, end } = jobYears(entry, 'Present')
+  const { cards, years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
     <article className={`p-4 ${world.block}`}>
@@ -71,7 +75,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       </div>
       {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
-        <ul className="mt-3 space-y-1.5" aria-label="Key achievements">
+        <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
             <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
               <span className="mt-1.5 block h-2 w-2 flex-shrink-0 rotate-45 bg-[var(--myth-terracotta)]" aria-hidden="true" />
@@ -81,7 +85,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         </ul>
       )}
       {entry.skills.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1" aria-label="Skills used">
+        <ul className="mt-3 flex flex-wrap gap-1" aria-label={cards.skillsUsed}>
           {entry.skills.slice(0, 4).map((skill) => (
             <li key={skill} className={CHIP}>
               {skill}
@@ -98,6 +102,7 @@ const LINK_BUTTON =
 
 export function ProjectCard({ project, years, links }: ProjectSlot) {
   const titleId = `mythic-project-${project.id}`
+  const { cards } = useLabels()
 
   return (
     <article className={`h-full ${world.block}`} aria-labelledby={titleId}>
@@ -111,7 +116,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         <p className="mb-1 text-sm font-bold text-[color:var(--myth-aegean)]">{project.role}</p>
         <p className={`mb-3 ${BODY}`}>{project.tagline}</p>
         {project.impact && <p className={`mb-3 px-3 py-2 text-sm italic ${world.plaque}`}>{project.impact}</p>}
-        <ul className="flex flex-wrap gap-1" aria-label={`${project.name} technologies`}>
+        <ul className="flex flex-wrap gap-1" aria-label={fillLabel(cards.categoryTechnologies, { name: project.name })}>
           {project.techStack.slice(0, 4).map((tech) => (
             <li key={tech} className={CHIP}>
               {tech}
@@ -133,12 +138,14 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 }
 
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
+  const { links } = useLabels()
+
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
+      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
       className={`block h-full p-4 transition-transform hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:transform-none ${world.block}`}
     >
       <div className="mb-2 flex items-center gap-3">
@@ -156,6 +163,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
 }
 
 export function BandCard({ band, years, linkProps }: BandSlot) {
+  const { links } = useLabels()
   const card = (
     <article className={`h-full ${world.block}`}>
       <h3 className={`px-4 py-2 ${NAME} ${world.clay}`}>{band.name}</h3>
@@ -167,7 +175,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
         </p>
         {band.release && (
           <p className={`mt-2 ${BODY}`}>
-            {RELEASED} <cite>&ldquo;{band.release}&rdquo;</cite>
+            {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
           </p>
         )}
       </div>

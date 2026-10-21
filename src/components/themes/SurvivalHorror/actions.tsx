@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import look from './world.module.css'
 
 // The world's buttons, typed labels on worn plates: email is the lit rust plate, LinkedIn, the CV and the
@@ -24,17 +25,21 @@ export function HeroAction({ action }: { action: HeroActionSlot }) {
 }
 
 export function CVLink() {
+  const { actions } = useLabels()
+
   return (
     <Link href="/cv" className={PLAIN}>
-      CV
+      {actions.cv}
     </Link>
   )
 }
 
 export function PortfolioLink() {
+  const { actions } = useLabels()
+
   return (
     <Link href="/personal-projects/game-engine" className={PLAIN}>
-      Portfolio
+      {actions.portfolio}
     </Link>
   )
 }

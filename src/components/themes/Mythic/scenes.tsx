@@ -1,6 +1,7 @@
 'use client'
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/components/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import { ContactStage } from '@/components/scroll/stage'
@@ -67,6 +68,7 @@ function TempleDoors() {
 const CONTACT_HEADING = headingId('mythic', 'Contact')
 
 export function ContactScene({ profession }: { profession: Profession }) {
+  const { sections } = useLabels()
   const { Corner } = PROFESSION_STAGES[profession]
 
   return (
@@ -91,7 +93,7 @@ export function ContactScene({ profession }: { profession: Profession }) {
           <div className={scene.arrive}>
             <div className={`relative px-6 pb-6 pt-10 ${world.slab}`}>
               <h2 id={CONTACT_HEADING} className={`absolute -top-5 left-6 ${PLAQUE}`}>
-                Contact
+                {sections.contact}
               </h2>
               <p className="mb-6 text-base text-[color:var(--myth-ink)]">{line}</p>
               <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
