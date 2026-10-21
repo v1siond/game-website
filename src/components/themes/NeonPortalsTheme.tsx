@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { Luckiest_Guy } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -16,6 +18,10 @@ import { WarpScore } from './NeonPortals/score'
 import { SECTION_VIEWS } from './NeonPortals/views'
 import { WarpRoom } from './NeonPortals/warpRoom'
 import ui from './NeonPortals/warped.module.css'
+
+// The world's own lettering: fat rounded cartoon capitals like the game's logo, level names and score
+// digits. The root carries its --np-face variable and warped.module.css reads it.
+const warpFace = Luckiest_Guy({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--np-face' })
 
 // Neon Portals: the page as one visit to the time machine of the 1998 time travel platformer (Warped,
 // named in code only), with him as its orange hero. He beams in on the warp pad and spins open the
@@ -44,7 +50,7 @@ export default function NeonPortalsTheme() {
 
   return (
     <WarpScore>
-      <div ref={rootRef} style={PORTAL_VARS} className={`relative min-h-screen overflow-x-clip ${ui.root}`}>
+      <div ref={rootRef} style={PORTAL_VARS} className={`relative min-h-screen overflow-x-clip ${ui.root} ${warpFace.variable}`}>
         <PickupDefs />
         <BandicootDefs />
         <a
@@ -75,7 +81,7 @@ export default function NeonPortalsTheme() {
 
         <footer className="relative z-20 py-8 text-center">
           <p className="text-sm tracking-[0.2em] text-[color:var(--np-muted)]">
-            &copy; {new Date().getFullYear()} {view.hero.name}
+            &copy; {new Date().getFullYear()} <NameWords name={view.hero.name} />
           </p>
         </footer>
       </div>

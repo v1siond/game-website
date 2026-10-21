@@ -43,9 +43,10 @@ export function LevelPortal({ entry, index }: { entry: Job; index: number }) {
       className={`relative overflow-hidden ${ui.panel} ${ui.rise} focus:outline-none`}
       style={{ '--i': index } as CSSProperties}
     >
-      <div className="relative aspect-[5/3] border-b-4 border-[color:var(--np-plate)] bg-[color:var(--np-void)]" aria-hidden="true">
-        <span className="absolute inset-[8%] overflow-hidden rounded-[50%] border-4 border-[color:var(--np-brass)]">
+      <div className={`relative aspect-[5/3] border-b-[3px] border-[color:var(--np-void)] ${levels.sky}`} aria-hidden="true">
+        <span className="absolute left-1/2 top-1/2 aspect-square h-[86%] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border-[3px] border-[color:var(--np-void)]">
           <EraScene era={LEVEL_ERAS[index % LEVEL_ERAS.length]} className={`h-full w-full ${levels.window}`} />
+          <span className={`absolute inset-0 rounded-full ${levels.glass}`} />
         </span>
         {rising && (
           <span className={`absolute left-1/2 top-[22%] h-[44%] w-[16%] -translate-x-1/2 ${levels.rise}`} onAnimationEnd={() => setRising(false)}>
@@ -53,8 +54,8 @@ export function LevelPortal({ entry, index }: { entry: Job; index: number }) {
           </span>
         )}
       </div>
-      <header className="flex items-center gap-3 bg-[color:var(--np-plate)] px-5 py-3">
-        <span className={`flex h-11 min-w-11 items-center justify-center rounded-full border-4 border-[color:var(--np-void)] px-2 text-base ${taken ? 'bg-[color:var(--np-gold)]' : 'bg-[color:var(--np-stone-lit)]'} ${ui.chunk} text-[color:var(--np-void)]`}>
+      <header className="flex items-center gap-3 border-b-[3px] border-[color:var(--np-void)] bg-[color:var(--np-void)] px-5 py-3">
+        <span className={`flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full border-[3px] border-[color:var(--np-void)] px-2 text-lg ${taken ? levels.badgeTaken : levels.badge} ${ui.chunk}`}>
           {taken ? (
             <span className="block h-7 w-5" aria-hidden="true">
               <Crystal className="h-full w-full" />

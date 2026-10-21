@@ -5,11 +5,11 @@ import { PORTAL } from './palette'
 // The time periods the warp room's level portals preview (the time travel platformer, Warped, named in
 // code only), each a small scene in a 200 by 120 box that a portal's round hologram shows before you step
 // in: the period's sky, its landmark on the horizon, the path in front.
-//   future       a neon city at night, towers with lit windows, a hover lane
+//   future       a purple night city, towers banded in neon, a hover lane
 //   arabian      domes and a minaret under a crescent moon, a flying carpet
-//   wall         the great wall winding over green hills at sunrise
-//   egypt        pyramids and a sphinx under a white sun, dunes
-//   medieval     a castle on a crag over a swamp, a stormy sky
+//   wall         the grey stone wall with red banners winding over bright green hills
+//   egypt        painted orange and red pillars before a pyramid under a white sun
+//   medieval     golden hills, a castle with blue cone roofs and a purple harlequin tent
 //   prehistoric  a smoking volcano behind palms, a trail of stepping stones
 //   underwater   light shafts, seaweed, bubbles and a sunken wreck
 //   highway      a desert road at dusk running to the horizon, dashes and cactus
@@ -27,13 +27,13 @@ interface Tone {
 }
 
 const ERA_TONE: Record<Era, Tone> = {
-  future: { skyTop: '#060a2a', skyLow: '#3b1d7a', far: '#1d2a6b', near: '#0d1440', accent: '#3fe0d0' },
+  future: { skyTop: '#12043a', skyLow: '#6a1f9a', far: '#2a1666', near: '#160a3e', accent: '#3fe0ff' },
   arabian: { skyTop: '#0e1a4a', skyLow: '#6a3a8f', far: '#d9a85a', near: '#8f5a2c', accent: '#ffe08a' },
-  wall: { skyTop: '#ff9d5c', skyLow: '#ffe2a1', far: '#4f9a4a', near: '#2f6b2e', accent: '#c9b28a' },
-  egypt: { skyTop: '#4fa6e8', skyLow: '#ffe7b0', far: '#e3b360', near: '#c48a3a', accent: '#fff4c8' },
-  medieval: { skyTop: '#28304a', skyLow: '#5f6e7a', far: '#3c4a3e', near: '#24331f', accent: '#9aa7b0' },
+  wall: { skyTop: '#5fb0ff', skyLow: '#d8f0ff', far: '#5cc23a', near: '#2f8a22', accent: '#9a9a90' },
+  egypt: { skyTop: '#3f8fe0', skyLow: '#ffd98a', far: '#f08a2a', near: '#c0461a', accent: '#fff4c8' },
+  medieval: { skyTop: '#4fa0f0', skyLow: '#ffe9a8', far: '#e8b43a', near: '#b07a1a', accent: '#2f5ad8' },
   prehistoric: { skyTop: '#ff7a3a', skyLow: '#ffcf7a', far: '#5a3a2a', near: '#2f6b2e', accent: '#ff4a1a' },
-  underwater: { skyTop: '#0a5a8a', skyLow: '#05243f', far: '#0d7a8a', near: '#1f8f4a', accent: '#9ff3ff' },
+  underwater: { skyTop: '#0b4a5e', skyLow: '#031a26', far: '#0d6a6a', near: '#1f8a5a', accent: '#9ff3ff' },
   highway: { skyTop: '#3a1d5c', skyLow: '#ff8a4a', far: '#a8542a', near: '#3a2a3a', accent: '#ffd23f' },
 }
 
@@ -53,7 +53,7 @@ const LANDMARK: Record<Era, (tone: Tone) => ReactNode> = {
         <g key={x}>
           <rect x={x} y={top} width={w} height={96 - top} fill={t.far} stroke={PORTAL.VOID} strokeWidth="1" />
           {[0, 1, 2, 3].map((row) => (
-            <rect key={row} x={x + 3} y={top + 6 + row * 12} width={w - 6} height="3" fill={row % 2 ? t.accent : PORTAL.VIOLET} opacity="0.8" />
+            <rect key={row} x={x + 3} y={top + 6 + row * 12} width={w - 6} height="3" fill={row % 2 ? t.accent : PORTAL.CRYSTAL} opacity="0.9" />
           ))}
         </g>
       ))}
@@ -72,31 +72,47 @@ const LANDMARK: Record<Era, (tone: Tone) => ReactNode> = {
   ),
   wall: (t) => (
     <>
-      <circle cx="160" cy="34" r="14" fill="#fff4c8" />
-      <path d="M0 80 Q40 50 80 70 Q120 40 160 62 Q180 56 200 60 V120 H0 Z" fill={t.far} />
+      <path d="M0 78 Q40 52 80 70 Q120 42 160 62 Q180 56 200 60 V120 H0 Z" fill={t.far} stroke={PORTAL.VOID} strokeWidth="1" />
+      <path d="M0 86 Q40 58 80 76 Q120 48 160 68 Q182 62 200 66" fill="none" stroke={PORTAL.VOID} strokeWidth="11" />
       <path d="M0 86 Q40 58 80 76 Q120 48 160 68 Q182 62 200 66" fill="none" stroke={t.accent} strokeWidth="8" />
-      <path d="M0 86 Q40 58 80 76 Q120 48 160 68 Q182 62 200 66" fill="none" stroke={PORTAL.VOID} strokeWidth="1" strokeDasharray="3 5" transform="translate(0 -5)" />
-      <rect x="76" y="56" width="10" height="16" fill={t.accent} stroke={PORTAL.VOID} strokeWidth="1" />
-      <path d="M74 56 H88 L81 49 Z" fill={PORTAL.FRUIT_RED} />
+      <path d="M0 81 Q40 53 80 71 Q120 43 160 63 Q182 57 200 61" fill="none" stroke={PORTAL.STONE_DARK} strokeWidth="3" strokeDasharray="4 4" />
+      {[
+        [34, 60],
+        [116, 50],
+      ].map(([x, y]) => (
+        <g key={x}>
+          <rect x={x} y={y} width="14" height="18" fill={t.accent} stroke={PORTAL.VOID} strokeWidth="1" />
+          <path d={`M${x - 2} ${y} H${x + 16} L${x + 7} ${y - 8} Z`} fill={PORTAL.FRUIT_RED} stroke={PORTAL.VOID} strokeWidth="1" />
+          <path d={`M${x + 7} ${y - 8} V${y - 20} H${x + 17} V${y - 13} H${x + 7}`} fill={PORTAL.TNT} stroke={PORTAL.VOID} strokeWidth="0.8" />
+        </g>
+      ))}
     </>
   ),
   egypt: (t) => (
     <>
-      <circle cx="40" cy="30" r="13" fill={t.accent} />
-      <path d="M70 92 L110 36 L150 92 Z" fill={t.far} stroke={PORTAL.VOID} strokeWidth="1" />
-      <path d="M110 36 L150 92 H124 Z" fill={t.near} />
-      <path d="M140 92 L166 56 L192 92 Z" fill={t.far} stroke={PORTAL.VOID} strokeWidth="1" />
-      <path d="M20 92 V76 Q24 66 32 68 L36 76 H52 V92 Z" fill={t.near} stroke={PORTAL.VOID} strokeWidth="1" />
+      <circle cx="40" cy="26" r="12" fill={t.accent} />
+      <path d="M90 92 L130 40 L170 92 Z" fill={PORTAL.GOLD} stroke={PORTAL.VOID} strokeWidth="1" />
+      <path d="M130 40 L170 92 H146 Z" fill={PORTAL.BRASS_DARK} opacity="0.6" />
+      {[18, 46, 74].map((x) => (
+        <g key={x}>
+          <rect x={x} y="40" width="16" height="56" fill={t.far} stroke={PORTAL.VOID} strokeWidth="1" />
+          <path d={`M${x} 52 H${x + 16} M${x} 70 H${x + 16}`} stroke={t.near} strokeWidth="4" />
+          <path d={`M${x + 4} 60 H${x + 12}`} stroke={PORTAL.TEAL_DEEP} strokeWidth="3" />
+          <rect x={x - 3} y="34" width="22" height="6" fill={t.near} stroke={PORTAL.VOID} strokeWidth="1" />
+        </g>
+      ))}
     </>
   ),
   medieval: (t) => (
     <>
-      <path d="M118 18 L112 34 L120 32 L114 48" fill="none" stroke={PORTAL.GOLD} strokeWidth="1.6" />
-      <path d="M40 90 L60 50 L100 46 L120 90 Z" fill={t.far} stroke={PORTAL.VOID} strokeWidth="1" />
-      <path d="M62 50 V26 H72 V50 Z M86 46 V30 H96 V46 Z" fill={t.accent} stroke={PORTAL.VOID} strokeWidth="1" />
-      <path d="M60 26 H74 L67 16 Z M84 30 H98 L91 20 Z" fill={PORTAL.FRUIT_DEEP} />
-      <rect x="64" y="34" width="4" height="5" fill={PORTAL.GOLD} />
-      <ellipse cx="100" cy="100" rx="110" ry="12" fill="#3f5a3a" opacity="0.9" />
+      <path d="M0 76 Q50 54 100 70 Q150 50 200 66 V120 H0 Z" fill={t.far} stroke={PORTAL.VOID} strokeWidth="1" />
+      <path d="M112 70 V40 H158 V70 Z" fill={PORTAL.STONE_LIT} stroke={PORTAL.VOID} strokeWidth="1" />
+      <path d="M106 40 V24 H118 V40 Z M152 40 V24 H164 V40 Z M128 40 V18 H142 V40 Z" fill={PORTAL.STONE_LIT} stroke={PORTAL.VOID} strokeWidth="1" />
+      <path d="M104 24 H120 L112 8 Z M150 24 H166 L158 8 Z M126 18 H144 L135 0 Z" fill={t.accent} stroke={PORTAL.VOID} strokeWidth="1" />
+      <path d="M130 70 V58 Q135 52 140 58 V70 Z" fill={PORTAL.VOID} />
+      <path d="M20 92 L44 62 L68 92 Z" fill={PORTAL.VIOLET} stroke={PORTAL.VOID} strokeWidth="1" />
+      <path d="M44 62 L32 77 L44 92 L56 77 Z" fill={PORTAL.GOLD} opacity="0.85" />
+      <path d="M44 62 V54 L52 57 L44 60" fill={PORTAL.FRUIT_RED} stroke={PORTAL.VOID} strokeWidth="0.6" />
     </>
   ),
   prehistoric: (t) => (

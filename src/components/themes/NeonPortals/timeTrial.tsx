@@ -102,9 +102,9 @@ export function BandTrial({ slot, index }: { slot: BandSlot; index: number }) {
         </div>
       </div>
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <p className="flex items-center gap-2 rounded-lg border-2 border-[color:var(--np-gold)] bg-[color:var(--np-void)] px-3 py-1">
-          <span className={`text-sm uppercase text-[color:var(--np-gold)] ${ui.chunk}`}>{hud.time}</span>
-          <span className={`text-xl tabular-nums text-[color:var(--np-gold)] ${ui.chunk}`}>{clock}</span>
+        <p className="flex items-center gap-2 rounded-xl border-[3px] border-[color:var(--np-void)] bg-[color:var(--np-void)] px-3 py-1 shadow-[inset_0_0_0_2px_var(--np-seam)]">
+          <span className={`text-sm uppercase text-[color:var(--np-white)] ${ui.chunk}`}>{hud.time}</span>
+          <span className={`text-xl tabular-nums text-[color:var(--np-teal)] ${ui.chunk}`}>{clock}</span>
         </p>
         <span className="flex gap-1" aria-hidden="true">
           {[0, 1, 2].map((i) => (

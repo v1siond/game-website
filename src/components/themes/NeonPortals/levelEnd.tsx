@@ -14,6 +14,7 @@ import { Crystal, Fruit, Gem, MaskFace, Relic } from './pickups'
 import { MaskCompanion } from './scoreBar'
 import { allCratesOpen, useScore, type Score } from './score'
 import end from './levelEnd.module.css'
+import { LevelPad } from './pad'
 import ui from './warped.module.css'
 
 // Contact as the end of a level (the time travel platformer, Warped, named in code only): the exit
@@ -77,7 +78,7 @@ function TallyRow({ row, index, on }: { row: Row; index: number; on: boolean }) 
       <span className="flex-1 text-base font-bold text-[color:var(--np-white)]" aria-hidden="true">
         {row.name}
       </span>
-      <span className={`text-2xl tabular-nums text-[color:var(--np-gold)] ${ui.chunk}`} aria-hidden="true">
+      <span className={`text-2xl tabular-nums ${ui.display}`} aria-hidden="true">
         {row.total === null ? shown : `${shown}/${row.total}`}
       </span>
       <span className="sr-only">{spoken}</span>
@@ -99,7 +100,9 @@ export function LevelEnd({ profession }: { profession: Profession }) {
         <div>
           <p className={`text-center text-2xl ${ui.display}`}>{warp.levelComplete}</p>
           <div className="relative mx-auto mt-4 h-56 w-40">
-            <span className={`absolute inset-x-[-20%] bottom-0 block h-10 rounded-[50%] border-4 border-[color:var(--np-brass)] bg-[color:var(--np-teal-deep)] ${end.pad}`} aria-hidden="true" />
+            <span className={`absolute inset-x-[-25%] -bottom-2 block h-14 ${end.pad}`} aria-hidden="true">
+              <LevelPad lit className="h-full w-full" />
+            </span>
             <button type="button" onClick={() => setEncore((now) => now + 1)} className="absolute inset-x-0 bottom-4 top-0 focus:outline-none" aria-label={warp.danceAgain}>
               <span key={encore} className={`relative block h-full w-full ${end.hop}`}>
                 <Bandicoot profession={profession} pose={triggered ? 'dance' : 'idle'} className="h-full w-full" />

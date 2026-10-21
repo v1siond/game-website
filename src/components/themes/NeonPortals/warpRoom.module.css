@@ -5,11 +5,44 @@
  * tunnel runs, the flash, the period drop and its worker.
  */
 
+/* The night the room floats in: navy sky with a magenta glow, a few stars, and the dark violet sea under
+ * a pale horizon line. The gold bevel is drawn over the scenery by ::after. */
 .room {
+  box-shadow: 0 6px 0 var(--np-void);
   background:
-    radial-gradient(circle at 50% 18%, var(--np-teal-deep), transparent 40%),
-    linear-gradient(var(--np-void), var(--np-chamber) 60%, var(--np-plate));
-  box-shadow: inset 0 0 0 3px var(--np-brass-dark);
+    radial-gradient(1.5px 1.5px at 18% 12%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(1px 1px at 34% 30%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(2px 2px at 64% 9%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(1px 1px at 82% 26%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 48% 20%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(ellipse 50% 35% at 85% 0%, color-mix(in srgb, var(--np-haze) 70%, transparent), transparent 75%),
+    linear-gradient(
+      180deg,
+      var(--np-void),
+      var(--np-night) 52%,
+      color-mix(in srgb, var(--np-haze) 60%, var(--np-night)) 58%,
+      var(--np-chamber) 58.6%,
+      var(--np-void)
+    );
+}
+
+.room::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 3px var(--np-brass),
+    inset 0 -6px 0 3px var(--np-brass-dark);
+}
+
+/* The portal sphere's glass: a white shine top left and a blue-white electric rim, still. */
+.glass {
+  background: radial-gradient(circle at 32% 26%, rgb(255 255 255 / 0.65), rgb(255 255 255 / 0) 30%);
+  box-shadow:
+    inset 0 0 0 3px var(--np-teal),
+    inset 0 0 14px 4px color-mix(in srgb, var(--np-teal) 60%, transparent);
 }
 
 /* ---- the level buttons ---- */

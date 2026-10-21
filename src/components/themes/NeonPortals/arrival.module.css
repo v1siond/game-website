@@ -5,8 +5,26 @@
  * the letters in turn (each plays once) and the chamber's lean to the pointer.
  */
 
+/* The stage's frame: a hard drop, and the gold bevel of the world's panels drawn over the scene. */
 .frame {
-  box-shadow: inset 0 0 0 3px var(--np-brass-dark);
+  box-shadow: 0 6px 0 var(--np-void);
+}
+
+.frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    inset 0 0 0 3px var(--np-brass),
+    inset 0 -6px 0 3px var(--np-brass-dark);
+}
+
+/* The clock ring's numbers in the world's lettering. */
+.ringNumber {
+  font-family: var(--np-display);
 }
 
 /* The chamber leans against the pointer so the pad reads in depth. */

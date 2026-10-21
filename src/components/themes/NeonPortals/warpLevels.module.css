@@ -1,7 +1,38 @@
 /*
- * The job level portals (warpLevels.tsx): the period in the window drifts toward the pointer, and the
- * crystal rises out of it once when taken. Transforms and opacity only.
+ * The job level portals (warpLevels.tsx): the period shows in a glass sphere floating in the hub's night,
+ * the way a level preview rises over its pad; the period drifts toward the pointer, and the crystal rises
+ * out of it once when taken. Transforms and opacity only.
  */
+
+/* The night behind the sphere: navy with a magenta glow and a few still stars. */
+.sky {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 20%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(1px 1px at 86% 16%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 78%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(1px 1px at 20% 82%, var(--np-white) 50%, transparent 51%),
+    radial-gradient(ellipse 60% 70% at 50% 50%, color-mix(in srgb, var(--np-haze) 55%, transparent), transparent 70%),
+    var(--np-void);
+}
+
+/* The sphere's glass: a white shine top left and the blue-white electric rim. */
+.glass {
+  background: radial-gradient(circle at 32% 26%, rgb(255 255 255 / 0.6), rgb(255 255 255 / 0) 30%);
+  box-shadow:
+    inset 0 0 0 3px var(--np-teal),
+    inset 0 0 14px 4px color-mix(in srgb, var(--np-teal) 55%, transparent);
+}
+
+/* The level number on a little blue pad dome in white; gold once its crystal is taken. */
+.badge {
+  color: var(--np-white);
+  background: radial-gradient(circle at 38% 30%, var(--np-pad-lit), var(--np-pad) 45%, var(--np-pad-dark));
+}
+
+.badgeTaken {
+  color: var(--np-void);
+  background: radial-gradient(circle at 38% 30%, var(--np-white), var(--np-gold) 50%, var(--np-brass-dark));
+}
 
 .window {
   transform: scale(1.08) translate(calc(var(--mx, 0) * -3%), calc(var(--my, 0) * -2%));

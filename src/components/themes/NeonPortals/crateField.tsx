@@ -327,11 +327,11 @@ function MoveStrip({ onSpin, onSlam, played }: MoveStripProps) {
           {warp.bodySlam}
         </button>
       </div>
-      <p className="flex items-center gap-2 rounded-full border-4 border-[color:var(--np-void)] bg-[color:var(--np-void)] px-3 py-1">
+      <p className="flex items-center gap-2 px-1 py-1">
         <span className="block h-8 w-8" aria-hidden="true">
           {gem ? <Gem className={`h-full w-full ${ui.award}`} /> : <CrateArt kind="wood" className="h-full w-full" />}
         </span>
-        <span className={`text-xl tabular-nums text-[color:var(--np-white)] ${ui.chunk}`} aria-hidden="true">
+        <span className={`text-2xl tabular-nums ${ui.display}`} aria-hidden="true">
           {opened}/{total}
         </span>
         <span className="sr-only">

@@ -37,7 +37,7 @@ function Ramp({ id, stops, vertical = true }: { id: string; stops: readonly [str
   )
 }
 
-/** The gradients every pickup reads, set once on the world's root. */
+/** The gradients every pickup (and the level pad of pad.tsx) reads, set once on the world's root. */
 export function PickupDefs() {
   return (
     <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
@@ -72,6 +72,11 @@ export function PickupDefs() {
           <stop offset="0" stopColor={PORTAL.WHITE} />
           <stop offset="0.7" stopColor="#fff1b8" />
           <stop offset="1" stopColor={PORTAL.GOLD} />
+        </radialGradient>
+        <radialGradient id="npw-pad" cx="0.38" cy="0.3" r="0.75">
+          <stop offset="0" stopColor={PORTAL.PAD_LIT} />
+          <stop offset="0.45" stopColor={PORTAL.PAD} />
+          <stop offset="1" stopColor={PORTAL.PAD_DARK} />
         </radialGradient>
       </defs>
     </svg>
