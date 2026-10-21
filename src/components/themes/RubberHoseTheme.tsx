@@ -4,13 +4,15 @@ import { useEffect, useState, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
 
 // ============================================================================
@@ -595,8 +597,9 @@ function CartoonTitle({ text, subtitle }: { text: string; subtitle?: string }) {
   const reducedMotion = usePrefersReducedMotion()
 
   return (
-    <div className="text-center" role="heading" aria-level={1}>
-      <div className="flex justify-center gap-1 flex-wrap">
+    <div className="text-center">
+      <h1 className="sr-only">{text}</h1>
+      <div className="flex justify-center gap-1 flex-wrap" aria-hidden="true">
         {text.split('').map((char, i) => (
           <span
             key={i}
@@ -628,42 +631,32 @@ function CartoonTitle({ text, subtitle }: { text: string; subtitle?: string }) {
 }
 
 // ============================================================================
-// COMPONENT: Cartoon Character Selection Card
+// COMPONENT: Cartoon Character Selection Card, one option of the shared profession switch
 // ============================================================================
-function CartoonCharacter({
-  profession,
-  isActive,
-  onClick,
-}: {
-  profession: 'engineer' | 'drummer' | 'fighter'
-  isActive: boolean
-  onClick: () => void
-}) {
+const CARTOON_ICONS: Record<Profession, string> = {
+  drummer: '♫',
+  engineer: '⚙',
+  fighter: '⚔',
+}
+
+function CartoonCharacter({ id, label, selected, optionProps }: ProfessionOption) {
   const reducedMotion = usePrefersReducedMotion()
-  const icons = { engineer: '⚙', drummer: '♫', fighter: '⚔' }
-  const names = { engineer: 'THE ENGINEER', drummer: 'THE DRUMMER', fighter: 'THE FIGHTER' }
-  const ariaLabels = {
-    engineer: 'Select Engineer profession - Software development and architecture',
-    drummer: 'Select Drummer profession - Professional music and bands',
-    fighter: 'Select Fighter profession - Martial arts and instruction',
-  }
 
   return (
     <button
-      onClick={onClick}
-      className={`relative transition-all group ${isActive ? 'scale-110' : 'hover:scale-105'}`}
-      aria-label={ariaLabels[profession]}
-      aria-pressed={isActive}
+      type="button"
+      {...optionProps}
+      className={`relative pb-6 transition-all group ${selected ? 'scale-110' : 'hover:scale-105'}`}
     >
       {/* Circular frame like vintage cartoon character selection */}
       <div
-        className={`w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center relative ${
-          isActive && !reducedMotion ? 'cuphead-bounce-slow' : ''
+        className={`w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 mx-auto rounded-full flex items-center justify-center relative ${
+          selected && !reducedMotion ? 'cuphead-bounce-slow' : ''
         }`}
         style={{
-          background: isActive ? CUPHEAD_COLORS.accentRedDark : CUPHEAD_COLORS.paperCream,
+          background: selected ? CUPHEAD_COLORS.accentRedDark : CUPHEAD_COLORS.paperCream,
           border: `6px solid ${CUPHEAD_COLORS.inkBlack}`,
-          boxShadow: isActive
+          boxShadow: selected
             ? `0 8px 0 #5a0000, 0 10px 20px rgba(0,0,0,0.3)`
             : `0 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
         }}
@@ -672,29 +665,30 @@ function CartoonCharacter({
         <div
           className="absolute inset-2 rounded-full"
           style={{ border: `2px dashed ${CUPHEAD_COLORS.inkBlack}40` }}
+          aria-hidden="true"
         />
         <span
-          className={`text-4xl md:text-5xl ${!reducedMotion ? 'group-hover:cuphead-wiggle' : ''}`}
-          style={{ color: isActive ? CUPHEAD_COLORS.paperCream : CUPHEAD_COLORS.inkBlack }}
+          className={`text-3xl sm:text-4xl md:text-5xl ${!reducedMotion ? 'group-hover:cuphead-wiggle' : ''}`}
+          style={{ color: selected ? CUPHEAD_COLORS.paperCream : CUPHEAD_COLORS.inkBlack }}
+          aria-hidden="true"
         >
-          {icons[profession]}
+          {CARTOON_ICONS[id]}
         </span>
       </div>
 
       {/* Name banner - vintage title card style */}
-      <div
-        className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 whitespace-nowrap"
+      <span
+        className="absolute bottom-0 left-1/2 px-2 sm:px-3 py-1 text-sm whitespace-nowrap uppercase"
         style={{
           background: CUPHEAD_COLORS.inkBlack,
           color: CUPHEAD_COLORS.paperCream,
           fontFamily: '"Abril Fatface", serif',
-          fontSize: '0.65rem',
-          letterSpacing: '0.1em',
+          letterSpacing: '0.05em',
           transform: 'translateX(-50%) rotate(-3deg)',
         }}
       >
-        {names[profession]}
-      </div>
+        {label}
+      </span>
     </button>
   )
 }
@@ -744,62 +738,27 @@ function DecorativeBanner({ children }: { children: React.ReactNode }) {
 }
 
 // ============================================================================
-// COMPONENT: Role Ticket (vintage admission ticket style)
+// COMPONENT: Tech Stack Cloud
 // ============================================================================
-function RoleTicket({ role }: { role: typeof CURRENT_ROLES[0] }) {
+function TechBubbleCloud({ categories }: { categories: CVData['techStack'] }) {
   const reducedMotion = usePrefersReducedMotion()
 
   return (
-    <article
-      className={`relative px-6 py-3 ${reducedMotion ? '' : 'cuphead-wiggle'}`}
-      style={{
-        background: CUPHEAD_COLORS.paperDark,
-        border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
-        borderStyle: 'dashed',
-        fontFamily: 'serif',
-      }}
-      aria-label={`${role.title} at ${role.company}`}
-    >
-      {/* Ticket stub perforations */}
-      <div
-        className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8"
-        style={{ background: CUPHEAD_COLORS.paperCream, borderRight: `2px dashed ${CUPHEAD_COLORS.inkBlack}` }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8"
-        style={{ background: CUPHEAD_COLORS.paperCream, borderLeft: `2px dashed ${CUPHEAD_COLORS.inkBlack}` }}
-        aria-hidden="true"
-      />
-
-      <p className="text-xs tracking-wider" style={{ color: CUPHEAD_COLORS.accentRedDark }}>{role.title}</p>
-      <p className="text-sm font-bold" style={{ color: CUPHEAD_COLORS.inkBlack }}>{role.company}</p>
-    </article>
-  )
-}
-
-// ============================================================================
-// COMPONENT: Tech Stack Cloud (NO proficiency bars - shows impact instead)
-// ============================================================================
-function TechBubbleCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
-  const reducedMotion = usePrefersReducedMotion()
-
-  return (
-    <div className="space-y-6" role="list" aria-label="Technical skills by category">
+    <div className="space-y-6">
       {categories.map((category, catIdx) => (
-        <div key={category.name} role="listitem">
+        <div key={category.id}>
           <h3
-            className="text-xs tracking-widest mb-3 flex items-center gap-2"
+            className="text-sm tracking-widest mb-3 flex items-center gap-2"
             style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}
           >
             <span className="text-lg" aria-hidden="true">{category.icon}</span>
-            -- {category.name.toUpperCase()} --
+            <span aria-hidden="true">--</span> {category.name.toUpperCase()} <span aria-hidden="true">--</span>
           </h3>
-          <div className="flex flex-wrap gap-2" role="list">
+          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
             {category.items.map((tech, i) => (
-              <span
+              <li
                 key={tech}
-                className={`px-3 py-1 text-xs transition-all hover:scale-110 cursor-default ${reducedMotion ? '' : 'cuphead-pop-in'}`}
+                className={`px-3 py-1 text-sm transition-all hover:scale-110 cursor-default ${reducedMotion ? '' : 'cuphead-pop-in'}`}
                 style={{
                   animationDelay: reducedMotion ? '0s' : `${(catIdx * 0.1) + (i * 0.03)}s`,
                   background: CUPHEAD_COLORS.inkBlack,
@@ -808,106 +767,10 @@ function TechBubbleCloud({ categories }: { categories: ReturnType<typeof getEngi
                   boxShadow: '2px 2px 0 #1a1510',
                   fontFamily: 'serif',
                 }}
-                role="listitem"
               >
                 {tech}
-              </span>
+              </li>
             ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ============================================================================
-// COMPONENT: Skills List (NO 1-5 BARS - shows achievements/impact)
-// ============================================================================
-function CartoonSkillsList({ categories, profession }: { categories: ReturnType<typeof getSkillsByProfession>; profession: 'drummer' | 'fighter' }) {
-  const reducedMotion = usePrefersReducedMotion()
-
-  // Achievement statements instead of proficiency bars
-  const achievementsByProfession = {
-    drummer: {
-      'Rock/Metal': 'Headlined 30+ city national tour',
-      'Progressive': 'Complex time signatures, polyrhythmic compositions',
-      'Latin/Salsa': 'Traditional Afro-Cuban rhythms',
-      'Jazz Fusion': 'Session work with jazz ensembles',
-      'Funk/Soul': 'Tight pocket grooves, ghost note mastery',
-      'Double Bass': 'High-speed precision technique',
-      'Polyrhythms': '4 over 3, 5 over 4 independence',
-      'Odd Time Signatures': '7/8, 11/8, metric modulation',
-      'Ghost Notes': 'Dynamics control, nuanced playing',
-      'Linear Drumming': 'Non-simultaneous limb patterns',
-      'Studio Recording': 'Multiple album credits',
-      'Live Touring': 'National tour experience',
-      'Session Work': 'Cross-genre adaptability',
-      'Music Production': 'DAW proficiency, drum programming',
-    },
-    fighter: {
-      'Muay Thai (3 years)': 'Traditional 8-limb striking',
-      'Brazilian Jiu-Jitsu (2 years)': 'Ground game fundamentals + submissions',
-      'MMA (1 year)': 'Integrated striking and grappling',
-      'Wrestling': 'Takedown defense and control',
-      'Striking': 'Boxing, kicks, elbows, knees',
-      'Clinch Work': 'Thai clinch, dirty boxing',
-      'Ground Game': 'Sweeps, escapes, positioning',
-      'Submissions': 'Chokes, joint locks, transitions',
-      'Fundamentals Instruction': 'Teaching 3 classes weekly',
-      'Competition Prep': 'Trained 20+ students to competition',
-      'Self Defense': 'Practical application training',
-      'Private Coaching': 'Personalized skill development',
-    },
-  }
-
-  return (
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label={`${profession} skills and achievements`}>
-      {categories.map((category) => (
-        <div key={category.name} role="listitem">
-          <h3
-            className="text-xs tracking-widest mb-3 flex items-center gap-2"
-            style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}
-          >
-            <span className="text-lg" aria-hidden="true">{category.icon}</span>
-            {category.name.toUpperCase()}
-          </h3>
-          <ul className="space-y-3">
-            {category.skills.map((skill, i) => {
-              const achievement = achievementsByProfession[profession][skill.name as keyof typeof achievementsByProfession[typeof profession]] || ''
-              return (
-                <li
-                  key={skill.name}
-                  className={`${reducedMotion ? '' : 'cuphead-pop-in'}`}
-                  style={{ animationDelay: reducedMotion ? '0s' : `${i * 0.1}s` }}
-                >
-                  <div className="flex items-start gap-2">
-                    <span
-                      className="flex-shrink-0 mt-0.5"
-                      style={{ color: CUPHEAD_COLORS.accentGold }}
-                      aria-hidden="true"
-                    >
-                      ★
-                    </span>
-                    <div>
-                      <span
-                        className="text-sm font-semibold block"
-                        style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}
-                      >
-                        {skill.name}
-                      </span>
-                      {achievement && (
-                        <span
-                          className="text-xs block mt-0.5 italic"
-                          style={{ color: CUPHEAD_COLORS.shadowDark }}
-                        >
-                          {achievement}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </li>
-              )
-            })}
           </ul>
         </div>
       ))}
@@ -915,41 +778,48 @@ function CartoonSkillsList({ categories, profession }: { categories: ReturnType<
   )
 }
 
+// The ink splash a poster throws when the pointer lands on it.
+function useInkSplash() {
+  const [splash, setSplash] = useState<{ x: number; y: number } | null>(null)
+  const reducedMotion = usePrefersReducedMotion()
+
+  const onMouseEnter = (e: React.MouseEvent) => {
+    if (reducedMotion) return
+    setSplash({ x: e.clientX, y: e.clientY })
+    setTimeout(() => setSplash(null), 400)
+  }
+
+  return { splash, onMouseEnter }
+}
+
+const POSTER_STYLE: React.CSSProperties = {
+  background: CUPHEAD_COLORS.paperDark,
+  border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
+  boxShadow: `4px 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
+}
+
 // ============================================================================
 // COMPONENT: Company Poster (vintage advertisement style)
 // ============================================================================
-function CompanyPoster({ company }: { company: typeof COMPANIES[0] }) {
-  const [showSplash, setShowSplash] = useState(false)
-  const [splashPos, setSplashPos] = useState({ x: 0, y: 0 })
-  const reducedMotion = usePrefersReducedMotion()
-
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    if (reducedMotion) return
-    setSplashPos({ x: e.clientX, y: e.clientY })
-    setShowSplash(true)
-    setTimeout(() => setShowSplash(false), 400)
-  }
+function CompanyPoster({ company }: { company: CVData['companies'][number] }) {
+  const { splash, onMouseEnter } = useInkSplash()
 
   return (
     <>
-      {showSplash && <InkSplash x={splashPos.x} y={splashPos.y} />}
+      {splash && <InkSplash x={splash.x} y={splash.y} />}
       <a
         href={company.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="block p-4 relative group transition-all hover:scale-[1.02]"
-        style={{
-          background: CUPHEAD_COLORS.paperDark,
-          border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
-          boxShadow: `4px 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-        }}
-        onMouseEnter={handleMouseEnter}
-        aria-label={`${company.name} - ${company.tagline}. Opens in new tab.`}
+        className="block h-full p-4 relative group transition-all hover:scale-[1.02]"
+        style={POSTER_STYLE}
+        onMouseEnter={onMouseEnter}
+        aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
       >
         {/* Corner stars - vintage poster decoration */}
-        {['-top-2 -left-2', '-top-2 -right-2', '-bottom-2 -left-2', '-bottom-2 -right-2'].map((pos, i) => (
+        {['-top-2 -left-2', '-top-2 -right-2', '-bottom-2 -left-2', '-bottom-2 -right-2'].map((pos) => (
           <span
-            key={i}
+            key={pos}
             className={`absolute ${pos} text-lg`}
             style={{ color: CUPHEAD_COLORS.accentRedDark }}
             aria-hidden="true"
@@ -961,45 +831,33 @@ function CompanyPoster({ company }: { company: typeof COMPANIES[0] }) {
         <div className="flex items-center gap-3 mb-2">
           <span className="text-3xl" aria-hidden="true">{company.icon}</span>
           <div>
-            <h4
-              className="text-sm font-bold group-hover:text-red-800 transition-colors"
+            <h3
+              className="text-base font-bold group-hover:text-red-800 transition-colors"
               style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}
             >
               {company.name}
-            </h4>
+            </h3>
             <p className="text-sm" style={{ color: CUPHEAD_COLORS.accentRedDark }}>{company.tagline}</p>
           </div>
         </div>
-        <p className="text-xs" style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}>{company.description}</p>
+        <p className="text-sm" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>{company.description}</p>
       </a>
     </>
   )
 }
 
 // ============================================================================
-// COMPONENT: Band Record (vinyl record label style)
+// COMPONENT: Band Record (vinyl record label style): his role, the years and the release
 // ============================================================================
-function BandRecord({ band }: { band: typeof BANDS[0] }) {
-  const [showSplash, setShowSplash] = useState(false)
-  const [splashPos, setSplashPos] = useState({ x: 0, y: 0 })
+function BandRecord({ band, years, linkProps }: BandSlot) {
   const reducedMotion = usePrefersReducedMotion()
-
-  const handleMouseEnter = (e: React.MouseEvent) => {
-    if (reducedMotion) return
-    setSplashPos({ x: e.clientX, y: e.clientY })
-    setShowSplash(true)
-    setTimeout(() => setShowSplash(false), 400)
-  }
+  const { splash, onMouseEnter } = useInkSplash()
 
   const content = (
     <article
-      className={`p-4 relative group transition-all hover:scale-[1.02] ${!reducedMotion ? 'hover:rotate-1' : ''}`}
-      style={{
-        background: CUPHEAD_COLORS.paperDark,
-        border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
-        boxShadow: `4px 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-      }}
-      onMouseEnter={handleMouseEnter}
+      className={`h-full p-4 relative group transition-all hover:scale-[1.02] ${!reducedMotion ? 'hover:rotate-1' : ''}`}
+      style={POSTER_STYLE}
+      onMouseEnter={onMouseEnter}
     >
       {/* Vinyl record decoration */}
       <div
@@ -1010,31 +868,31 @@ function BandRecord({ band }: { band: typeof BANDS[0] }) {
         <div className="w-4 h-4 rounded-full" style={{ background: CUPHEAD_COLORS.accentRedDark }} />
       </div>
 
-      <h4
-        className="text-sm font-bold group-hover:text-red-800 transition-colors"
+      <h3
+        className="text-base font-bold group-hover:text-red-800 transition-colors"
         style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}
       >
-        ♫ {band.name}
-      </h4>
-      <p className="text-sm mt-1" style={{ color: CUPHEAD_COLORS.accentRedDark }}>{band.genre} • {band.role}</p>
-      <p className="text-xs mt-2" style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}>{band.description}</p>
-      {!band.url && (
-        <p className="text-sm mt-2 italic" style={{ color: CUPHEAD_COLORS.shadowDark }}>~ Website coming soon ~</p>
+        <span aria-hidden="true">♫ </span>
+        {band.name}
+      </h3>
+      <p className="text-sm mt-1" style={{ color: CUPHEAD_COLORS.accentRedDark }}>
+        {band.role}
+        {years && <span aria-hidden="true"> • </span>}
+        {years && <span>{years}</span>}
+      </p>
+      {band.release && (
+        <p className="text-sm mt-2" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
       )}
     </article>
   )
 
   return (
     <>
-      {showSplash && <InkSplash x={splashPos.x} y={splashPos.y} />}
-      {band.url ? (
-        <a
-          href={band.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block"
-          aria-label={`${band.name} - ${band.genre}. Opens in new tab.`}
-        >
+      {splash && <InkSplash x={splash.x} y={splash.y} />}
+      {linkProps ? (
+        <a {...linkProps} className="block h-full">
           {content}
         </a>
       ) : (
@@ -1045,35 +903,28 @@ function BandRecord({ band }: { band: typeof BANDS[0] }) {
 }
 
 // ============================================================================
-// COMPONENT: Experience Card (vintage ticket/poster style)
+// COMPONENT: Experience Card (vintage ticket/poster style). Dates are date only strings (UTC midnight),
+// so the year is read in UTC.
 // ============================================================================
-function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+function ExperienceCard({ entry }: { entry: Job }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
-    <article
-      className="p-4 relative"
-      style={{
-        background: CUPHEAD_COLORS.paperDark,
-        border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
-        boxShadow: `4px 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-      }}
-      aria-label={`${entry.title} at ${entry.organization}, ${startDisplay} to ${endDisplay}`}
-    >
+    <article className="p-4 relative" style={POSTER_STYLE}>
       {/* Corner decorations - art deco style */}
       <div className="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2" style={{ borderColor: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true" />
       <div className="absolute top-1 right-1 w-3 h-3 border-t-2 border-r-2" style={{ borderColor: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true" />
       <div className="absolute bottom-1 left-1 w-3 h-3 border-b-2 border-l-2" style={{ borderColor: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true" />
       <div className="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2" style={{ borderColor: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true" />
 
-      <div className="flex justify-between items-start mb-2">
+      <div className="flex justify-between items-start gap-3 mb-2 flex-wrap">
         <div>
-          <h4 className="text-sm font-bold" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+          <h3 className="text-base font-bold" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
             {entry.title}
-          </h4>
-          <p className="text-xs" style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}>
-            {entry.organization}
+          </h3>
+          <p className="text-sm" style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}>
+            {entry.company}
           </p>
         </div>
         <span
@@ -1087,19 +938,34 @@ function ExperienceCard({ entry }: { entry: typeof EXPERIENCE_DATA[0] }) {
           {startDisplay} - {endDisplay}
         </span>
       </div>
-      <p className="text-xs mb-2" style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}>
-        {entry.description}
-      </p>
-      {entry.highlights && entry.highlights.length > 0 && (
-        <ul className="space-y-1">
-          {entry.highlights.map((highlight, i) => (
+      {entry.description && (
+        <p className="text-sm mb-2" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+          {entry.description}
+        </p>
+      )}
+      {entry.highlights.length > 0 && (
+        <ul className="space-y-1" aria-label="Key achievements">
+          {entry.highlights.map((highlight) => (
             <li
-              key={i}
-              className="text-xs flex items-start gap-2"
+              key={highlight}
+              className="text-sm flex items-start gap-2"
               style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}
             >
-              <span style={{ color: CUPHEAD_COLORS.accentGold }} aria-hidden="true">★</span>
+              <span style={{ color: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true">★</span>
               {highlight}
+            </li>
+          ))}
+        </ul>
+      )}
+      {entry.skills.length > 0 && (
+        <ul className="flex gap-1 flex-wrap mt-3" aria-label="Skills used">
+          {entry.skills.slice(0, 4).map((skill) => (
+            <li
+              key={skill}
+              className="text-sm px-2 py-0.5 rounded-full"
+              style={{ background: CUPHEAD_COLORS.inkBlack, color: CUPHEAD_COLORS.paperCream }}
+            >
+              {skill}
             </li>
           ))}
         </ul>
@@ -1323,20 +1189,15 @@ function ArtSection({ variant = 'filmReel' }: { variant?: 'filmReel' | 'musicNot
 }
 
 // ============================================================================
-// COMPONENT: Project Poster (vintage movie/show poster style)
+// COMPONENT: Project Poster (vintage movie/show poster style): his role, the result line and the links
 // ============================================================================
-function VintagePoster({ project }: { project: typeof PROJECTS_DATA[0] }) {
+function VintagePoster({ project, years, links }: ProjectSlot) {
   const reducedMotion = usePrefersReducedMotion()
 
   return (
     <article
-      className={`p-4 relative group cursor-pointer transition-all hover:scale-[1.02] ${!reducedMotion ? 'hover:-rotate-1' : ''}`}
-      style={{
-        background: CUPHEAD_COLORS.paperDark,
-        border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
-        boxShadow: `4px 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-      }}
-      aria-label={`${project.name}: ${project.tagline}${project.impact ? `. Impact: ${project.impact}` : ''}`}
+      className={`h-full p-4 relative group transition-all hover:scale-[1.02] ${!reducedMotion ? 'hover:-rotate-1' : ''}`}
+      style={POSTER_STYLE}
     >
       {/* Corner decorations */}
       <div className="absolute top-1 left-1 w-4 h-4 border-t-2 border-l-2" style={{ borderColor: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true" />
@@ -1344,18 +1205,20 @@ function VintagePoster({ project }: { project: typeof PROJECTS_DATA[0] }) {
       <div className="absolute bottom-1 left-1 w-4 h-4 border-b-2 border-l-2" style={{ borderColor: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true" />
       <div className="absolute bottom-1 right-1 w-4 h-4 border-b-2 border-r-2" style={{ borderColor: CUPHEAD_COLORS.accentRedDark }} aria-hidden="true" />
 
-      {project.featured && (
-        <span
-          className="text-sm tracking-wider"
-          style={{ color: CUPHEAD_COLORS.accentGold }}
-        >
-          ★ FEATURED ★
-        </span>
-      )}
-      <h3 className="text-sm font-bold mt-1" style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}>
-        {project.name.toUpperCase()}
-      </h3>
-      <p className="text-sm mb-2" style={{ color: CUPHEAD_COLORS.shadowDark }}>
+      <div className="flex justify-between items-start gap-2 mt-1">
+        <h3 className="text-base font-bold" style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}>
+          {project.name.toUpperCase()}
+        </h3>
+        {years && (
+          <span className="text-sm whitespace-nowrap" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+            {years}
+          </span>
+        )}
+      </div>
+      <p className="text-sm font-bold mb-1" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+        {project.role}
+      </p>
+      <p className="text-sm mb-2" style={{ color: CUPHEAD_COLORS.inkBlack }}>
         {project.tagline}
       </p>
       {project.impact && (
@@ -1367,40 +1230,242 @@ function VintagePoster({ project }: { project: typeof PROJECTS_DATA[0] }) {
             border: `1px solid ${CUPHEAD_COLORS.accentGold}50`,
           }}
         >
-          → {project.impact}
+          <span aria-hidden="true">→ </span>
+          {project.impact}
         </p>
       )}
-      <div className="flex gap-1 flex-wrap">
-        {project.techStack.slice(0, 4).map((tech) => (
-          <span
-            key={tech}
-            className="text-sm px-2 py-0.5 rounded-full"
-            style={{
-              background: CUPHEAD_COLORS.inkBlack,
-              color: CUPHEAD_COLORS.paperCream,
-            }}
-          >
-            {tech}
-          </span>
-        ))}
-      </div>
+      {project.techStack.length > 0 && (
+        <ul className="flex gap-1 flex-wrap" aria-label="Technologies used">
+          {project.techStack.slice(0, 4).map((tech) => (
+            <li
+              key={tech}
+              className="text-sm px-2 py-0.5 rounded-full"
+              style={{
+                background: CUPHEAD_COLORS.inkBlack,
+                color: CUPHEAD_COLORS.paperCream,
+              }}
+            >
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )}
+      {links.length > 0 ? (
+        <div className="flex flex-wrap gap-3 mt-4">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-4 text-sm tracking-wider transition-all hover:scale-105"
+              style={{
+                background: CUPHEAD_COLORS.accentRedDark,
+                color: CUPHEAD_COLORS.paperCream,
+                border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
+                fontFamily: 'serif',
+                boxShadow: '3px 3px 0 #5a0000',
+              }}
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm mt-4 italic" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+          No public link
+        </p>
+      )}
     </article>
   )
+}
+
+const CARTOON_BUTTON =
+  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider transition-all hover:scale-105'
+
+// Email is the red primary action, LinkedIn and the CV the ink ones.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], React.CSSProperties> = {
+  email: {
+    background: CUPHEAD_COLORS.accentRedDark,
+    color: CUPHEAD_COLORS.paperCream,
+    border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
+    fontFamily: 'serif',
+    boxShadow: '3px 3px 0 #5a0000',
+  },
+  linkedin: {
+    background: CUPHEAD_COLORS.inkBlack,
+    color: CUPHEAD_COLORS.paperCream,
+    border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
+    fontFamily: 'serif',
+    boxShadow: '3px 3px 0 #1a1510',
+  },
+}
+
+function HeroAction({ action }: { action: HeroActionSlot }) {
+  return (
+    <a {...action.linkProps} className={`${CARTOON_BUTTON} hover:rotate-1`} style={HERO_ACTION_LOOK[action.id]}>
+      {action.label}
+    </a>
+  )
+}
+
+function CVLink() {
+  return (
+    <Link href="/cv" className={`${CARTOON_BUTTON} hover:-rotate-1`} style={HERO_ACTION_LOOK.linkedin}>
+      CV
+    </Link>
+  )
+}
+
+function SectionBanner({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="text-center mb-6">
+      <DecorativeBanner>
+        <span className="text-lg tracking-wider">{children}</span>
+      </DecorativeBanner>
+    </div>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+
+  return (
+    <>
+      <section className="text-center mb-8" aria-label="About">
+        <DecorativeBanner>
+          <span className="text-lg tracking-wider">ABOUT</span>
+        </DecorativeBanner>
+        <p
+          className="mt-8 text-base leading-relaxed max-w-2xl mx-auto"
+          style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}
+        >
+          {professionalSummary.bio}
+        </p>
+      </section>
+
+      {/* ========== ART SECTION 1: Film Reel Break ========== */}
+      <ArtSection variant="filmReel" />
+
+      {sections.jobs.length > 0 && (
+        <section className="mb-8" aria-label="Work experience">
+          <SectionBanner>WORK EXPERIENCE</SectionBanner>
+          <div className="space-y-4 max-w-3xl mx-auto">
+            {sections.jobs.map((entry) => (
+              <ExperienceCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ========== ART SECTION 2: Music Notes Break ========== */}
+      <ArtSection variant="musicNotes" />
+
+      <section className="mb-8" aria-label="Tech stack">
+        <SectionBanner>TECH STACK</SectionBanner>
+        <div
+          className="p-6 max-w-3xl mx-auto"
+          style={{ ...POSTER_STYLE, boxShadow: `6px 6px 0 ${CUPHEAD_COLORS.shadowBrown}` }}
+        >
+          <TechBubbleCloud categories={sections.techStack} />
+        </div>
+      </section>
+
+      <section className="mb-8" aria-label="Projects">
+        <SectionBanner>PROJECTS</SectionBanner>
+        <ProjectList
+          projects={sections.projects}
+          className="grid md:grid-cols-2 gap-4"
+          renderProject={(slot) => <VintagePoster {...slot} />}
+        />
+      </section>
+
+      {/* ========== ART SECTION 3: Bouncing Balls Break ========== */}
+      <ArtSection variant="bouncingBalls" />
+
+      <section className="mb-8" aria-label="Ventures">
+        <SectionBanner>VENTURES</SectionBanner>
+        <div className="grid md:grid-cols-3 gap-4">
+          {sections.companies.map((company) => (
+            <CompanyPoster key={company.id} company={company} />
+          ))}
+        </div>
+      </section>
+    </>
+  )
+}
+
+function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <ArtSection variant="musicNotes" />
+      <section className="mb-8" aria-label="Bands">
+        <SectionBanner>BANDS</SectionBanner>
+        <p className="text-base text-center mb-6" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList bands={bands} className="grid md:grid-cols-3 gap-4" renderBand={(slot) => <BandRecord {...slot} />} />
+        <p className="text-sm text-center mt-6 italic" style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}>
+          {musician.line}
+        </p>
+      </section>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <ArtSection variant="bouncingBalls" />
+      <section className="mb-8" aria-label="Muay Thai">
+        <SectionBanner>MUAY THAI</SectionBanner>
+        <div className="p-6 max-w-3xl mx-auto" style={{ ...POSTER_STYLE, boxShadow: `6px 6px 0 ${CUPHEAD_COLORS.shadowBrown}` }}>
+          <h3
+            className="text-xl text-center mb-6"
+            style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: '"Abril Fatface", serif' }}
+          >
+            {martialArts.primary.title}
+          </h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'grid sm:grid-cols-2 gap-4 mb-6',
+              fact: 'p-3 border-4 border-[#2a2015] bg-[#f7ead0]',
+              term: 'text-sm tracking-widest uppercase text-[#8b0000] font-serif',
+              value: 'text-sm mt-1 text-[#2a2015] font-serif',
+              achievements: 'space-y-2',
+              achievement: 'text-sm flex items-start gap-2 text-[#2a2015] font-serif',
+            }}
+            renderAchievement={(achievement) => (
+              <>
+                <span className="text-[#8b0000]" aria-hidden="true">★</span>
+                <span>{achievement}</span>
+              </>
+            )}
+          />
+        </div>
+      </section>
+    </>
+  )
+}
+
+function ProfessionDetails({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
+  return <EngineerSections sections={sections} />
 }
 
 // ============================================================================
 // MAIN COMPONENT: RubberHoseTheme (Cuphead Gameplay Style)
 // ============================================================================
 export default function RubberHoseTheme() {
-  const { active, setActive } = useProfession()
+  const { active } = useProfession()
+  const view = useWorldView()
   const [mounted, setMounted] = useState(false)
-  const reducedMotion = usePrefersReducedMotion()
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerSkills = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
 
   useEffect(() => {
     setMounted(true)
@@ -1416,8 +1481,6 @@ export default function RubberHoseTheme() {
         background: `linear-gradient(to bottom, ${CUPHEAD_COLORS.paperCream}, ${CUPHEAD_COLORS.paperSepia})`,
         fontFamily: '"Courier New", monospace',
       }}
-      role="main"
-      aria-label="Portfolio in 1930s Cuphead cartoon style"
     >
       {/* Skip to main content link for accessibility */}
       <a
@@ -1462,275 +1525,90 @@ export default function RubberHoseTheme() {
 
       {/* Main content area with padding for film strips */}
       <div className="ml-14 mr-14">
-        {/* Header */}
-        <header className="relative z-30 p-6">
-          <div className="max-w-6xl mx-auto flex justify-between items-start">
-            <div>
-              <CartoonTitle
-                text="ALEXANDER PULIDO"
-                subtitle={PROFESSIONAL_SUMMARY[active].headline}
-              />
-              <p
-                className="text-xs tracking-widest mt-2 italic"
-                style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}
-              >
-                &quot;{PROFESSIONAL_SUMMARY[active].tagline}&quot;
-              </p>
-            </div>
+        {/* Header - the recruiter first screen */}
+        <header className="relative z-30 px-2 py-6 sm:p-6">
+          <RecruiterHero
+            render={({ name, headline, tagline, line, actions }) => (
+              <div className="max-w-6xl mx-auto flex flex-col items-center gap-6">
+                <div className="text-center">
+                  <CartoonTitle text={name.toUpperCase()} subtitle={headline} />
+                  <p
+                    className="text-sm tracking-widest mt-2 italic"
+                    style={{ color: CUPHEAD_COLORS.accentRedDark, fontFamily: 'serif' }}
+                  >
+                    {tagline}
+                  </p>
+                  <p className="text-sm mt-2" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+                    {line}
+                  </p>
+                </div>
 
-            <nav className="flex gap-3 items-center flex-wrap" aria-label="Main navigation">
-              <Link
-                href="/cv"
-                className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:rotate-1"
-                style={{
-                  background: CUPHEAD_COLORS.inkBlack,
-                  color: CUPHEAD_COLORS.paperCream,
-                  border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
-                  fontFamily: 'serif',
-                  boxShadow: '3px 3px 0 #1a1510',
-                }}
-              >
-                RESUME
-              </Link>
-              <Link
-                href="/personal-projects/game-engine"
-                className="px-4 py-2 text-sm tracking-wider transition-all hover:scale-105 hover:-rotate-1"
-                style={{
-                  background: CUPHEAD_COLORS.accentRedDark,
-                  color: CUPHEAD_COLORS.paperCream,
-                  border: `3px solid ${CUPHEAD_COLORS.inkBlack}`,
-                  fontFamily: 'serif',
-                  boxShadow: '3px 3px 0 #5a0000',
-                }}
-              >
-                PLAY GAME
-              </Link>
-            </nav>
-          </div>
+                <nav className="flex gap-3 items-center justify-center flex-wrap" aria-label="Contact and CV">
+                  {actions.map((action) => (
+                    <HeroAction key={action.id} action={action} />
+                  ))}
+                  <CVLink />
+                  <Link
+                    href="/personal-projects/game-engine"
+                    className={`${CARTOON_BUTTON} hover:-rotate-1`}
+                    style={HERO_ACTION_LOOK.email}
+                  >
+                    PLAY GAME
+                  </Link>
+                </nav>
+              </div>
+            )}
+          />
         </header>
 
-        {/* Current Roles */}
-        <section className="relative z-20 py-4" aria-labelledby="roles-heading">
-          <h2 id="roles-heading" className="sr-only">Current Professional Roles</h2>
-          <div className="flex justify-center gap-4 flex-wrap">
-            {CURRENT_ROLES.map((role, i) => (
-              <div key={role.id} style={{ animationDelay: `${i * 0.1}s` }}>
-                <RoleTicket role={role} />
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Character/Profession selection */}
-        <section className="relative z-20 py-8" aria-labelledby="profession-heading">
-          <div className="text-center mb-6">
-            <h2 id="profession-heading" className="text-xs tracking-widest" style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}>
-              ~ SELECT YOUR ADVENTURE ~
-            </h2>
-          </div>
-          <div className="flex justify-center gap-8 md:gap-12 flex-wrap" role="radiogroup" aria-label="Select profession">
-            {(['engineer', 'drummer', 'fighter'] as const).map((prof) => (
-              <CartoonCharacter
-                key={prof}
-                profession={prof}
-                isActive={active === prof}
-                onClick={() => setActive(prof)}
-              />
-            ))}
-          </div>
+        {/* Character/Profession selection, System Engineer in the centre */}
+        <section className="relative z-20 py-8" aria-label="Profession selection">
+          <p className="text-center mb-6 text-sm tracking-widest" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }} aria-hidden="true">
+            ~ SELECT YOUR ADVENTURE ~
+          </p>
+          <ProfessionSwitch
+            className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
+            label="Profession"
+            renderOption={(option) => <CartoonCharacter {...option} />}
+          />
         </section>
 
         {/* Main content */}
-        <main id="main-content" className="relative z-20 px-4 md:px-8 py-8">
-          <div className="max-w-4xl mx-auto">
-            {/* 1. ABOUT SECTION */}
-            <section className="text-center mb-8" aria-labelledby="about-heading">
-              <DecorativeBanner>
-                <span id="about-heading" className="text-lg tracking-wider">ABOUT</span>
-              </DecorativeBanner>
-              <p
-                className="mt-8 text-sm leading-relaxed max-w-2xl mx-auto"
-                style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}
-              >
-                {aboutData.bio}
-              </p>
-            </section>
-
-            {/* Quick facts as film reel frames */}
-            <section className="mb-8" aria-labelledby="facts-heading">
-              <h2 id="facts-heading" className="sr-only">Quick Facts</h2>
-              <div className="flex justify-center gap-3 flex-wrap" role="list">
-                {aboutData.quickFacts.map((fact, i) => (
-                  <div
-                    key={i}
-                    className={`px-4 py-2 ${reducedMotion ? '' : 'cuphead-wiggle'}`}
-                    style={{
-                      animationDelay: reducedMotion ? '0s' : `${i * 0.2}s`,
-                      background: CUPHEAD_COLORS.inkBlack,
-                      color: CUPHEAD_COLORS.paperCream,
-                      fontFamily: 'serif',
-                      fontSize: '0.75rem',
-                      transform: `rotate(${(i % 2 === 0 ? -2 : 2)}deg)`,
-                      boxShadow: '2px 2px 0 #1a1510',
-                    }}
-                    role="listitem"
-                  >
-                    ✦ {fact} ✦
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* ========== ART SECTION 1: Film Reel Break ========== */}
-            <ArtSection variant="filmReel" />
-
-            {/* 2. WORK EXPERIENCE */}
-            {experience.length > 0 && (
-              <section className="mb-8" aria-labelledby="experience-heading">
-                <div className="text-center mb-6">
-                  <DecorativeBanner>
-                    <span id="experience-heading" className="text-lg tracking-wider">WORK EXPERIENCE</span>
-                  </DecorativeBanner>
-                </div>
-                <div className="space-y-4 max-w-3xl mx-auto">
-                  {experience.map((entry) => (
-                    <ExperienceCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* ========== ART SECTION 2: Music Notes Break ========== */}
-            <ArtSection variant="musicNotes" />
-
-            {/* 3. TECH STACK / SKILLS */}
-            <section className="mb-8" aria-labelledby="skills-heading">
-              <div className="text-center mb-6">
-                <DecorativeBanner>
-                  <span id="skills-heading" className="text-lg tracking-wider">
-                    {active === 'engineer' ? 'TECH STACK' : 'SKILLS'}
-                  </span>
-                </DecorativeBanner>
-              </div>
-              <div
-                className="p-6 max-w-3xl mx-auto"
-                style={{
-                  background: CUPHEAD_COLORS.paperDark,
-                  border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
-                  boxShadow: `6px 6px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-                }}
-              >
-                {active === 'engineer' ? (
-                  <TechBubbleCloud categories={engineerSkills} />
-                ) : (
-                  <CartoonSkillsList categories={otherSkills} profession={active as 'drummer' | 'fighter'} />
-                )}
-              </div>
-            </section>
-
-            {/* 4. FEATURED WORK / PROJECTS */}
-            <section className="mb-8" aria-labelledby="projects-heading">
-              <div className="text-center mb-6">
-                <DecorativeBanner>
-                  <span id="projects-heading" className="text-lg tracking-wider">FEATURED WORK</span>
-                </DecorativeBanner>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                  <VintagePoster key={project.id} project={project} />
-                ))}
-              </div>
-            </section>
-
-            {/* ========== ART SECTION 3: Bouncing Balls Break ========== */}
-            <ArtSection variant="bouncingBalls" />
-
-            {/* 5. VENTURES (Companies/Bands) */}
-            {active === 'engineer' && (
-              <section className="mb-8" aria-labelledby="companies-heading">
-                <div className="text-center mb-6">
-                  <DecorativeBanner>
-                    <span id="companies-heading" className="text-lg tracking-wider">VENTURES</span>
-                  </DecorativeBanner>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {COMPANIES.map((company) => (
-                    <CompanyPoster key={company.id} company={company} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {active === 'drummer' && (
-              <section className="mb-8" aria-labelledby="bands-heading">
-                <div className="text-center mb-6">
-                  <DecorativeBanner>
-                    <span id="bands-heading" className="text-lg tracking-wider">BANDS</span>
-                  </DecorativeBanner>
-                </div>
-                <div className="grid md:grid-cols-3 gap-4">
-                  {BANDS.map((band) => (
-                    <BandRecord key={band.id} band={band} />
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {/* 6. POSTS placeholder - can be expanded later */}
-            {/* Posts section would go here when content is available */}
+        <main id="main-content" className="relative z-20 px-2 md:px-8 py-8">
+          <div className="max-w-4xl mx-auto" role="region" aria-label={`${active} profession details`}>
+            <ProfessionDetails sections={view.sections} />
           </div>
         </main>
 
         {/* Contact CTA */}
         <section className="relative z-20 py-12" aria-label="Contact">
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="mb-8">
-              <h2
-                className="text-xl tracking-[0.15em] mb-3"
-                style={{
-                  color: CUPHEAD_COLORS.inkBlack,
-                  fontFamily: '"Abril Fatface", serif',
-                  textShadow: `2px 2px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-                }}
-              >
-                Ready to Work Together?
-              </h2>
-              <p
-                className="text-sm"
-                style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}
-              >
-                10+ years delivering production systems. Let&apos;s build something.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:alexanderpulido81@gmail.com"
-                className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 hover:rotate-1"
-                style={{
-                  background: CUPHEAD_COLORS.accentRedDark,
-                  color: CUPHEAD_COLORS.paperCream,
-                  border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
-                  fontFamily: '"Abril Fatface", serif',
-                  boxShadow: '4px 4px 0 #5a0000',
-                }}
-              >
-                ★ Get In Touch ★
-              </a>
-              <Link
-                href="/cv"
-                className="px-6 py-3 text-sm tracking-wider transition-all hover:scale-105 hover:-rotate-1"
-                style={{
-                  background: CUPHEAD_COLORS.paperDark,
-                  color: CUPHEAD_COLORS.inkBlack,
-                  border: `4px solid ${CUPHEAD_COLORS.inkBlack}`,
-                  fontFamily: '"Abril Fatface", serif',
-                  boxShadow: `4px 4px 0 ${CUPHEAD_COLORS.shadowBrown}`,
-                }}
-              >
-                Download CV
-              </Link>
-            </div>
-          </div>
+          <RecruiterHero
+            render={({ line, actions }) => (
+              <div className="max-w-2xl mx-auto text-center">
+                <div className="mb-8">
+                  <h2
+                    className="text-xl tracking-[0.15em] mb-3"
+                    style={{
+                      color: CUPHEAD_COLORS.inkBlack,
+                      fontFamily: '"Abril Fatface", serif',
+                      textShadow: `2px 2px 0 ${CUPHEAD_COLORS.shadowBrown}`,
+                    }}
+                  >
+                    Ready to Work Together?
+                  </h2>
+                  <p className="text-sm" style={{ color: CUPHEAD_COLORS.inkBlack, fontFamily: 'serif' }}>
+                    {line}
+                  </p>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {actions.map((action) => (
+                    <HeroAction key={action.id} action={action} />
+                  ))}
+                  <CVLink />
+                </div>
+              </div>
+            )}
+          />
         </section>
 
         
@@ -1740,7 +1618,7 @@ export default function RubberHoseTheme() {
           <div className="flex items-center justify-center gap-4">
             <div className="w-16 h-0.5" style={{ background: CUPHEAD_COLORS.inkBlack }} aria-hidden="true" />
             <p
-              className="text-xs tracking-widest"
+              className="text-sm tracking-widest"
               style={{ color: CUPHEAD_COLORS.shadowDark, fontFamily: 'serif' }}
             >
               ✦ A PRESENTATION IN GLORIOUS SEPIA ✦ MCMXXVI
