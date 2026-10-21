@@ -1,5 +1,5 @@
 import type { Profession } from '@/lib/cv/professions'
-import { at, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import {
   DeskCorner,
   DrumKit,
@@ -78,8 +78,7 @@ function Billboard({ position, color }: { position: number; color: string }) {
   return (
     <svg
       viewBox="0 0 48 44"
-      className="absolute bottom-3 left-[calc(var(--at)*100%_-_1.5rem)] h-10 w-11 sm:h-14 sm:w-16"
-      style={at(position)}
+      className={`absolute bottom-3 left-[calc(var(--at)*100%_-_1.5rem)] h-10 w-11 sm:h-14 sm:w-16 ${atClass(position)}`}
       aria-hidden="true"
       focusable="false"
     >

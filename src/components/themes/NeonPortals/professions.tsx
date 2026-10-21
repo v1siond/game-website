@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { at, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import {
   DeskCorner,
   DrumKit,
@@ -105,8 +105,7 @@ function Rifts() {
           key={position}
           viewBox="0 0 16 100"
           preserveAspectRatio="none"
-          className={`absolute inset-y-2 left-[calc(var(--at)*100%_-_0.5rem)] w-4 ${styles.rift}`}
-          style={at(position)}
+          className={`absolute inset-y-2 left-[calc(var(--at)*100%_-_0.5rem)] w-4 ${styles.rift} ${atClass(position)}`}
           aria-hidden="true"
           focusable="false"
         >
@@ -156,7 +155,7 @@ const circuits = (color: string) => (
 // A build block, the level piece a project adds: it drops into place as he walks under it.
 function BuildBlock({ position, color }: { position: number; color: string }) {
   return (
-    <svg viewBox="0 0 32 32" className={`${PROP_SLOT} h-8 w-8 sm:h-10 sm:w-10 ${styles.dropAt}`} style={at(position)} aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 32 32" className={`${PROP_SLOT} h-8 w-8 sm:h-10 sm:w-10 ${styles.dropAt} ${atClass(position)}`} aria-hidden="true" focusable="false">
       <rect x={2} y={2} width={28} height={28} fill={PORTAL.PANEL} stroke={color} strokeWidth={2} />
       <path d="M8 16 H24 M16 8 V24" stroke={color} strokeWidth={2} />
     </svg>

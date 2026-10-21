@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { at, type LevelZone, type StageLook } from '@/components/scroll/stage'
+import { atClass, type LevelZone, type StageLook } from '@/components/scroll/stage'
 import {
   DeskCorner,
   DrumKit,
@@ -70,7 +70,7 @@ function LitTower({ position, x, width, height }: (typeof LIT_TOWERS)[number]) {
   return (
     <>
       <path d={tower(x, width, height)} fill="#0e2a3e" stroke={C.brassDark} strokeWidth={0.8} />
-      <g className={scene.lightAt} style={at(position)}>
+      <g className={`${scene.lightAt} ${atClass(position)}`}>
         {WINDOW_ROWS.flatMap((row) =>
           WINDOW_COLUMNS.map((column) => (
             <rect key={`${row}-${column}`} x={x + width * column} y={top + height * row} width={width * 0.1} height={3} fill={C.goldBright} />
@@ -145,8 +145,7 @@ function ShopSign({ position, color }: { position: number; color: string }) {
   return (
     <svg
       viewBox="0 0 48 44"
-      className="absolute bottom-3 left-[calc(var(--at)*100%_-_1.5rem)] h-10 w-11 sm:h-14 sm:w-16"
-      style={at(position)}
+      className={`absolute bottom-3 left-[calc(var(--at)*100%_-_1.5rem)] h-10 w-11 sm:h-14 sm:w-16 ${atClass(position)}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -209,7 +208,7 @@ function SunburstFan() {
     <svg viewBox="0 0 120 60" className="absolute bottom-3 left-[10%] h-20 w-40 sm:h-28 sm:w-56" aria-hidden="true" focusable="false">
       <path d="M4 60 A56 56 0 0 1 116 60 Z" fill={C.abyss} stroke={C.brassMid} strokeWidth={1} />
       {FAN_RAYS.map(({ position, angles }) => (
-        <g key={position} className={scene.lightAt} style={at(position)}>
+        <g key={position} className={`${scene.lightAt} ${atClass(position)}`}>
           {angles.map((angle) => (
             <line
               key={angle}
@@ -264,7 +263,7 @@ function Chandelier({ position, x }: { position: number; x: number }) {
     <g>
       <line x1={x} y1={0} x2={x} y2={10} stroke={C.brassMid} strokeWidth={1} />
       <path d={`M${x - 14} 12 H${x + 14} L${x + 8} 22 H${x - 8} Z`} fill={C.brassDark} />
-      <g className={scene.lightAt} style={at(position)}>
+      <g className={`${scene.lightAt} ${atClass(position)}`}>
         {[-10, -4, 4, 10].map((dx) => (
           <circle key={dx} cx={x + dx} cy={14} r={2} fill={C.goldBright} />
         ))}

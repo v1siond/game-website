@@ -30,7 +30,8 @@ export interface StageLook {
 // A prop's place along the level (0 to 1) as --at: it sets the prop's left edge and when it answers.
 // atClass is the class route, no style object: the place is rounded to hundredths and split into a
 // tenths class and a hundredths class (literal Tailwind arbitrary properties, so the build sees all 21),
-// and heroScene's .at rule adds the two into --at. at() is the inline route the older props still take.
+// and heroScene's .at rule adds the two into --at. at() is the inline style route, kept only until the
+// lanes still building on it move to atClass.
 export const at = (position: number) => ({ '--at': position }) as CSSProperties
 
 const AT_TENTHS = [
