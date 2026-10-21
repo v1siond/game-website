@@ -1,20 +1,19 @@
 'use client'
 
-import { memo, useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import { memo, useEffect, useState, useMemo, useRef } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
 import { locales, localeNames, type Locale } from '@/i18n/config'
 import { LanguageSwitcher, type LocaleSwitchState } from '@/components/cv/LanguageSwitcher'
-import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA, filterProjectsByProfession, getFeaturedProjects } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { CURRENT_ROLES } from '@/data/roles'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
-import { WORK_EXPERIENCE } from '@/data/achievements'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 
 // =============================================================================
 // WARCRAFT 3 DUAL PALETTE - Reign of Chaos + Frozen Throne
@@ -195,6 +194,7 @@ function WC3Button({
   onClick,
   active,
   href,
+  linkProps,
   variant = 'default',
   zone = 'roc'
 }: {
@@ -202,6 +202,7 @@ function WC3Button({
   onClick?: () => void
   active?: boolean
   href?: string
+  linkProps?: React.AnchorHTMLAttributes<HTMLAnchorElement>
   variant?: 'default' | 'primary'
   zone?: 'roc' | 'ft'
 }) {
@@ -230,6 +231,7 @@ function WC3Button({
     display: 'inline-block',
   }
 
+  if (linkProps) return <a {...linkProps} style={style}>{children}</a>
   if (href) return <Link href={href} style={style}>{children}</Link>
   return <button onClick={onClick} style={style}>{children}</button>
 }
@@ -4365,24 +4367,428 @@ function SectionWithOrnament({
 }
 
 // =============================================================================
+// PROFESSION NODE - WC3 command card button, drawn for the shared ProfessionSwitch. The switch lays
+// the nodes out Musician, System Engineer, Martial Artist, so the engineer node is the raised centre.
+// =============================================================================
+
+const PROFESSION_NODE_ICONS: Record<Profession, (color: string) => React.ReactNode> = {
+  drummer: (color) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="2"/>
+      <circle cx="12" cy="12" r="3" fill={color}/>
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke={color} strokeWidth="2"/>
+    </svg>
+  ),
+  engineer: (color) => (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+  fighter: (color) => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M4 4l7.07 17.57 2.51-7.39 7.39-2.51L4 4z" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  ),
+}
+
+function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOption; isLargeScreen: boolean }) {
+  const { id, label, selected, optionProps } = option
+  const isCentre = id === 'engineer'
+  const size = isCentre ? (isLargeScreen ? '8rem' : '6rem') : (isLargeScreen ? '7rem' : '5.5rem')
+  const tint = selected ? WC3.roc.felBright : WC3.textMid
+
+  return (
+    <button
+      type="button"
+      {...optionProps}
+      className="focus:outline-none focus-visible:ring-2 focus-visible:ring-[#d4a017] focus-visible:ring-offset-2 focus-visible:ring-offset-[#060608]"
+      style={{
+        width: size,
+        height: size,
+        background: selected
+          ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
+          : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
+        border: `3px solid ${selected ? WC3.roc.felMid : WC3.metalMid}`,
+        boxShadow: selected
+          ? `0 0 20px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
+          : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.25rem',
+        transition: 'all 0.3s ease',
+        position: 'relative',
+        alignSelf: isCentre ? 'flex-start' : 'flex-end',
+        marginTop: isCentre ? (isLargeScreen ? '0.5rem' : '0.25rem') : undefined,
+        padding: '0.25rem',
+      }}
+    >
+      {PROFESSION_NODE_ICONS[id](tint)}
+      <span
+        aria-hidden="true"
+        style={{
+          color: tint,
+          fontSize: '0.875rem',
+          fontFamily: '"Cinzel", serif',
+          fontWeight: 700,
+          textTransform: 'uppercase',
+          letterSpacing: '0.05em',
+          lineHeight: 1.15,
+          textAlign: 'center',
+        }}
+      >
+        {label}
+      </span>
+    </button>
+  )
+}
+
+// =============================================================================
+// PROFESSION SECTIONS
+// =============================================================================
+
+interface SectionLayout {
+  sectionSpacing: string
+  artDividerMargin: string
+  artDividerScale: number
+}
+
+function ArtDivider({ layout, children }: { layout: SectionLayout; children: React.ReactNode }) {
+  return (
+    <FadeInSection>
+      <div style={{ margin: `${layout.artDividerMargin} 0` }}>{children}</div>
+    </FadeInSection>
+  )
+}
+
+const CARD_TITLE: React.CSSProperties = { color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.125rem' }
+const CARD_SUBTITLE: React.CSSProperties = { color: WC3.goldMid, fontSize: '0.875rem', marginBottom: '0.25rem' }
+const CARD_BODY: React.CSSProperties = { color: WC3.textMid, fontSize: '1rem', marginBottom: '0.25rem' }
+const CARD_CHIP: React.CSSProperties = {
+  background: WC3.roc.felDark + '40',
+  color: WC3.roc.felBright,
+  fontSize: '0.875rem',
+  padding: '0.125rem 0.25rem',
+  textTransform: 'uppercase',
+}
+
+// Dates are date only strings (UTC midnight), so the year is read in UTC: a January start keeps
+// its own year west of UTC.
+function jobYears(job: Job): string {
+  const end = job.endDate ? job.endDate.getUTCFullYear() : 'Present'
+  return `${job.startDate.getUTCFullYear()} - ${end}`
+}
+
+function JobCard({ job }: { job: Job }) {
+  return (
+    <InnerCard highlight={job.endDate === null} zone="roc">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '0.375rem' }}>
+        <div>
+          <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{job.title}</h3>
+          <p style={{ color: WC3.goldMid, fontSize: '0.875rem' }}>{job.company}</p>
+        </div>
+        <span style={{ color: WC3.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYears(job)}</span>
+      </div>
+      {job.description && <p style={{ color: WC3.textMid, fontSize: '0.875rem' }}>{job.description}</p>}
+      {job.highlights.length > 0 && (
+        <ul style={{ listStyle: 'none', padding: 0, margin: '0.375rem 0 0 0' }}>
+          {job.highlights.map((highlight) => (
+            <li key={highlight} style={{ color: WC3.textMid, fontSize: '0.875rem', paddingLeft: '0.75rem', position: 'relative', marginBottom: '0.125rem' }}>
+              <span style={{ position: 'absolute', left: 0, color: WC3.goldDark }} aria-hidden="true">›</span>{highlight}
+            </li>
+          ))}
+        </ul>
+      )}
+      {job.skills.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.5rem' }}>
+          {job.skills.map((skill) => (
+            <span key={skill} style={CARD_CHIP}>{skill}</span>
+          ))}
+        </div>
+      )}
+    </InnerCard>
+  )
+}
+
+function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
+  return (
+    <InnerCard zone="ft">
+      <h3 style={CARD_TITLE}>{project.name}</h3>
+      <p style={CARD_SUBTITLE}>
+        {project.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      <p style={CARD_BODY}>{project.tagline}</p>
+      {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '1rem', fontWeight: 500 }}>{project.impact}</p>}
+      {links.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
+          {links.map(({ kind, label, linkProps }) => (
+            <WC3Button key={kind} linkProps={linkProps} zone="ft">{label}</WC3Button>
+          ))}
+        </div>
+      )}
+    </InnerCard>
+  )
+}
+
+function BandCard({ band, years, linkProps }: BandSlot) {
+  return (
+    <InnerCard zone="ft">
+      <h3 style={CARD_TITLE}>
+        {linkProps ? (
+          <a {...linkProps} style={{ color: WC3.textBright, textDecoration: 'underline', textUnderlineOffset: '3px' }}>{band.name}</a>
+        ) : band.name}
+      </h3>
+      <p style={CARD_SUBTITLE}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
+      {band.release && (
+        <p style={CARD_BODY}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
+    </InnerCard>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections, layout, isLargeScreen }: { sections: SectionsOf<'engineer'>; layout: SectionLayout; isLargeScreen: boolean }) {
+  const { professionalSummary } = useCVData()
+  const { jobs, techStack, projects, companies } = sections
+
+  return (
+    <>
+      {/* About - More breathing room */}
+      <FadeInSection>
+        <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
+          <WC3Frame title="About" zone="roc">
+            <p style={{
+              color: WC3.textBright,
+              lineHeight: 1.8,
+              fontSize: isLargeScreen ? '1.125rem' : '1rem',
+              padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
+            }}>{professionalSummary.bio}</p>
+          </WC3Frame>
+        </section>
+      </FadeInSection>
+
+      {/* === RoC Art Divider: Crossed Weapons === */}
+      <ArtDivider layout={layout}>
+        <RoCArtDivider variant="horde" scale={layout.artDividerScale} />
+      </ArtDivider>
+
+      {/* Work Experience */}
+      {jobs.length > 0 && (
+        <FadeInSection>
+          <SectionWithOrnament
+            leftOrnament={<RoCOrnament side="left" type="flag" />}
+            rightOrnament={<RoCOrnament side="right" type="weapons" />}
+          >
+            <section style={{ marginBottom: layout.sectionSpacing }}>
+              <WC3Frame title="Work Experience" zone="roc">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {jobs.map((job) => (
+                    <JobCard key={job.id} job={job} />
+                  ))}
+                </div>
+              </WC3Frame>
+            </section>
+          </SectionWithOrnament>
+        </FadeInSection>
+      )}
+
+      {/* === RoC Art Divider: War Banner === */}
+      <ArtDivider layout={layout}>
+        <RoCArtDivider variant="alliance" scale={layout.artDividerScale} />
+      </ArtDivider>
+
+      {/* Tech Stack - with shield ornament */}
+      <FadeInSection>
+        <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
+          <section style={{ marginBottom: layout.sectionSpacing }}>
+            <WC3Frame title="Tech Stack" zone="roc">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
+                {techStack.map((category) => (
+                  <div key={category.id}>
+                    <h3 style={{ color: WC3.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
+                      {category.name}
+                    </h3>
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                      {category.items.map((tech) => (
+                        <li key={tech} style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{tech}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </WC3Frame>
+          </section>
+        </SectionWithOrnament>
+      </FadeInSection>
+
+      {/* ============ TRANSITION - FROZEN THRONE ZONE ============ */}
+
+      {/* === Transition Art Divider: Ice Crystals === */}
+      <ArtDivider layout={layout}>
+        <FTArtDivider variant="crystals" scale={layout.artDividerScale} />
+      </ArtDivider>
+
+      {/* Projects - FT zone begins */}
+      <FadeInSection>
+        <SectionWithOrnament
+          leftOrnament={<FTOrnament side="left" type="shard" />}
+          rightOrnament={<FTOrnament side="right" type="rune" />}
+        >
+          <section style={{ marginBottom: layout.sectionSpacing }}>
+            <WC3Frame title="Projects" zone="ft">
+              <ProjectList
+                projects={projects}
+                className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-3"
+                renderProject={(slot) => <ProjectCard slot={slot} />}
+              />
+            </WC3Frame>
+          </section>
+        </SectionWithOrnament>
+      </FadeInSection>
+
+      {/* === FT Art Divider: Frost Rune === */}
+      <ArtDivider layout={layout}>
+        <FTArtDivider variant="rune" scale={layout.artDividerScale} />
+      </ArtDivider>
+
+      {/* Ventures */}
+      <FadeInSection>
+        <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
+          <section style={{ marginBottom: layout.sectionSpacing }}>
+            <WC3Frame title="Ventures" zone="ft">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+                {companies.map((company) => (
+                  <InnerCard key={company.id} zone="ft">
+                    <h3 style={CARD_TITLE}>{company.name}</h3>
+                    <p style={{ ...CARD_SUBTITLE, fontSize: '1rem' }}>{company.tagline}</p>
+                    <p style={CARD_BODY}>{company.description}</p>
+                    <a
+                      href={company.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${company.name} (opens in a new tab)`}
+                      style={{ color: WC3.ft.iceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem' }}
+                    >
+                      {company.url}
+                    </a>
+                  </InnerCard>
+                ))}
+              </div>
+            </WC3Frame>
+          </section>
+        </SectionWithOrnament>
+      </FadeInSection>
+    </>
+  )
+}
+
+function MusicianSections({ sections, layout }: { sections: SectionsOf<'drummer'>; layout: SectionLayout }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <ArtDivider layout={layout}>
+        <RoCArtDivider variant="horde" scale={layout.artDividerScale} />
+      </ArtDivider>
+
+      <FadeInSection>
+        <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
+          <section style={{ marginBottom: layout.sectionSpacing }}>
+            <WC3Frame title="Bands" zone="ft">
+              <p style={{ color: WC3.textBright, fontSize: '1rem', marginBottom: '1rem' }}>
+                Drums since {musician.since}, {musician.yearsPlaying} years
+              </p>
+              <BandList
+                bands={bands}
+                className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-3"
+                renderBand={(slot) => <BandCard {...slot} />}
+              />
+              <p style={{ color: WC3.ft.iceMid, fontSize: '1rem', fontStyle: 'italic', marginTop: '1rem' }}>{musician.line}</p>
+            </WC3Frame>
+          </section>
+        </SectionWithOrnament>
+      </FadeInSection>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fighter'>; layout: SectionLayout }) {
+  const { martialArts } = sections
+
+  return (
+    <>
+      <ArtDivider layout={layout}>
+        <RoCArtDivider variant="weapons" scale={layout.artDividerScale} />
+      </ArtDivider>
+
+      <FadeInSection>
+        <SectionWithOrnament rightOrnament={<RoCOrnament side="right" type="shield" />}>
+          <section style={{ marginBottom: layout.sectionSpacing }}>
+            <WC3Frame title="Muay Thai" zone="roc">
+              <h3 style={{ ...CARD_TITLE, marginBottom: '1rem' }}>{martialArts.primary.title}</h3>
+              <MuayThaiRecord
+                martialArts={martialArts}
+                classNames={{
+                  facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+                  fact: 'p-3 bg-gradient-to-b from-[#0a0c0e] to-[#060608] border border-[#2a2428]',
+                  term: 'text-sm uppercase tracking-[0.08em] font-semibold text-[#b8860b]',
+                  value: 'text-base mt-1 text-[#e8dcc8]',
+                  achievements: 'space-y-1',
+                  achievement: 'text-base flex items-start gap-2 text-[#b09878]',
+                }}
+                renderAchievement={(achievement) => (
+                  <>
+                    <span className="text-[#8b6914]" aria-hidden="true">›</span>
+                    {achievement}
+                  </>
+                )}
+              />
+            </WC3Frame>
+          </section>
+        </SectionWithOrnament>
+      </FadeInSection>
+    </>
+  )
+}
+
+function ProfessionSectionsView({ sections, layout, isLargeScreen }: { sections: ProfessionSections; layout: SectionLayout; isLargeScreen: boolean }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} layout={layout} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} layout={layout} />
+  return <EngineerSections sections={sections} layout={layout} isLargeScreen={isLargeScreen} />
+}
+
+function HeroActions({ actions, zone }: { actions: HeroActionSlot[]; zone: 'roc' | 'ft' }) {
+  return (
+    <>
+      {actions.map((action) => (
+        <WC3Button key={action.id} linkProps={action.linkProps} variant={action.id === 'email' ? 'primary' : 'default'} zone={zone}>
+          {action.label}
+        </WC3Button>
+      ))}
+    </>
+  )
+}
+
+// =============================================================================
 // MAIN THEME
 // =============================================================================
 
 export default function MedievalFantasyTheme() {
-  useTheme()
-  const { active, setActive } = useProfession()
+  const view = useWorldView()
+  const active = view.profession
   const [mounted, setMounted] = useState(false)
   const [viewportHeight, setViewportHeight] = useState(800)
-  const [scrollY, setScrollY] = useState(0)
-
-  const aboutData = ABOUT_DATA[active]
-  const engineerTech = getEngineerSkills()
-  const otherSkills = getSkillsByProfession(active)
-  const projects = active === 'engineer'
-    ? PROJECTS_DATA.filter(p => p.professions.includes('engineer') || p.featured)
-    : filterProjectsByProfession(PROJECTS_DATA, active)
-  const experience = filterExperienceByProfession(EXPERIENCE_DATA, active)
-  const workExperience = WORK_EXPERIENCE
 
   // Track viewport height for content visibility and animation spacing
   useEffect(() => {
@@ -4390,15 +4796,8 @@ export default function MedievalFantasyTheme() {
     setViewportHeight(window.innerHeight)
 
     const handleResize = () => setViewportHeight(window.innerHeight)
-    const handleScroll = () => setScrollY(window.scrollY)
-
     window.addEventListener('resize', handleResize, { passive: true })
-    window.addEventListener('scroll', handleScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener('resize', handleResize)
-      window.removeEventListener('scroll', handleScroll)
-    }
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   // Calculate available space - EXACT match to Dark Fantasy spacing
@@ -4406,9 +4805,12 @@ export default function MedievalFantasyTheme() {
   // Section gap in DF = bottom padding + top padding of next = 3rem (small) / 4rem (md+)
   // Art divider total padding = 8rem (4rem top + 4rem bottom), but we use margin so just 4rem each side
   const isLargeScreen = viewportHeight >= 800
-  const sectionSpacing = isLargeScreen ? '4rem' : '3rem'  // gap between content sections
-  const artDividerMargin = isLargeScreen ? '4rem' : '3rem'  // margin around art dividers
-  const artDividerScale = isLargeScreen ? 1.3 : 1.1
+  const layout: SectionLayout = {
+    sectionSpacing: isLargeScreen ? '4rem' : '3rem',
+    artDividerMargin: isLargeScreen ? '4rem' : '3rem',
+    artDividerScale: isLargeScreen ? 1.3 : 1.1,
+  }
+  const { sectionSpacing } = layout
 
   if (!mounted) {
     return (
@@ -4432,39 +4834,34 @@ export default function MedievalFantasyTheme() {
         <FadeInSection>
           <header style={{ marginBottom: sectionSpacing }}>
             <WC3Frame zone="roc">
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
-                <div>
-                  <h1 style={{
-                    color: WC3.goldBright,
-                    fontSize: '1.5rem',
-                    fontWeight: 700,
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.12em',
-                    textShadow: `2px 2px 4px ${WC3.bgVoid}`,
-                    marginBottom: '0.375rem'
-                  }}>
-                    Alexander Pulido
-                  </h1>
-                  <p style={{ color: WC3.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{PROFESSIONAL_SUMMARY[active].headline}</p>
-                  <p style={{ color: WC3.textMid, fontSize: '0.875rem', fontStyle: 'italic' }}>{PROFESSIONAL_SUMMARY[active].tagline}</p>
-                </div>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                  <WC3Button href="/cv" zone="roc">CV</WC3Button>
-                  <WC3Button href="/personal-projects/game-engine" zone="roc">Nebulith</WC3Button>
-                  <LanguageSwitcher render={(state) => <WC3LanguageMenu {...state} />} />
-                </div>
-              </div>
-              <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: `1px solid ${WC3.metalDark}`, display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
-                {CURRENT_ROLES.map((role) => (
-                  <div key={role.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <div style={{ width: '6px', height: '6px', background: WC3.roc.felMid, boxShadow: `0 0 6px ${WC3.roc.felMid}` }} />
-                    <div>
-                      <p style={{ color: WC3.roc.felBright, fontSize: '0.875rem', fontWeight: 600 }}>{role.title}</p>
-                      <p style={{ color: WC3.textDim, fontSize: '0.875rem' }}>{role.company}</p>
+              <RecruiterHero
+                render={({ name, headline, tagline, line, actions }) => (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.5rem' }}>
+                    <div style={{ minWidth: 0 }}>
+                      <h1 style={{
+                        color: WC3.goldBright,
+                        fontSize: '1.5rem',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.12em',
+                        textShadow: `2px 2px 4px ${WC3.bgVoid}`,
+                        marginBottom: '0.375rem'
+                      }}>
+                        {name}
+                      </h1>
+                      <p style={{ color: WC3.textBright, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{headline}</p>
+                      <p style={{ color: WC3.textMid, fontSize: '0.875rem', fontStyle: 'italic', marginBottom: '0.25rem' }}>{tagline}</p>
+                      <p style={{ color: WC3.textBright, fontSize: '0.875rem' }}>{line}</p>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                      <HeroActions actions={actions} zone="roc" />
+                      <WC3Button href="/cv" zone="roc">CV</WC3Button>
+                      <WC3Button href="/personal-projects/game-engine" zone="roc">Nebulith</WC3Button>
+                      <LanguageSwitcher render={(state) => <WC3LanguageMenu {...state} />} />
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              />
             </WC3Frame>
           </header>
         </FadeInSection>
@@ -4472,7 +4869,7 @@ export default function MedievalFantasyTheme() {
 
         {/* Profession Selector - WC3 Style Command Card */}
         <FadeInSection delay={100}>
-          <nav style={{
+          <section aria-label="Select profession" style={{
             marginBottom: sectionSpacing,
             position: 'relative',
             height: isLargeScreen ? '12rem' : '9rem',
@@ -4489,7 +4886,7 @@ export default function MedievalFantasyTheme() {
             }} />
 
             {/* Connecting paths SVG */}
-            <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }} preserveAspectRatio="none">
+            <svg style={{ position: 'absolute', width: '100%', height: '100%', pointerEvents: 'none' }} preserveAspectRatio="none" aria-hidden="true">
               <defs>
                 <linearGradient id="felPathGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                   <stop offset="0%" stopColor={WC3.roc.felDark} stopOpacity="0.3" />
@@ -4503,9 +4900,9 @@ export default function MedievalFantasyTheme() {
                 stroke="url(#felPathGradient)"
                 strokeWidth="2"
                 fill="none"
-                strokeDasharray={active === 'engineer' ? "none" : "4 4"}
+                strokeDasharray={active === 'drummer' ? "none" : "4 4"}
                 style={{
-                  filter: active === 'engineer' ? `drop-shadow(0 0 4px ${WC3.roc.felMid})` : 'none',
+                  filter: active === 'drummer' ? `drop-shadow(0 0 4px ${WC3.roc.felMid})` : 'none',
                   transition: 'all 0.3s ease'
                 }}
               />
@@ -4524,393 +4921,54 @@ export default function MedievalFantasyTheme() {
             </svg>
 
             {/* Profession nodes */}
-            <div style={{
-              position: 'relative',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              width: '100%',
-              maxWidth: isLargeScreen ? '700px' : '500px',
-              padding: '0 1rem',
-            }}>
-              {/* Engineer Node - Left */}
-              <button
-                onClick={() => setActive('engineer')}
-                style={{
-                  width: isLargeScreen ? '6rem' : '4.5rem',
-                  height: isLargeScreen ? '6rem' : '4.5rem',
-                  background: active === 'engineer'
-                    ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
-                    : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
-                  border: `3px solid ${active === 'engineer' ? WC3.roc.felMid : WC3.metalMid}`,
-                  boxShadow: active === 'engineer'
-                    ? `0 0 20px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
-                    : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.25rem',
-                  transition: 'all 0.3s ease',
-                  position: 'relative',
-                  alignSelf: 'flex-end',
-                }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke={active === 'engineer' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span style={{
-                  color: active === 'engineer' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '1rem' : '0.875rem',
-                  fontFamily: '"Cinzel", serif',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>System</span>
-              </button>
-
-              {/* Musician Node - Center (elevated) */}
-              <button
-                onClick={() => setActive('drummer')}
-                style={{
-                  width: isLargeScreen ? '7rem' : '5rem',
-                  height: isLargeScreen ? '7rem' : '5rem',
-                  background: active === 'drummer'
-                    ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
-                    : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
-                  border: `3px solid ${active === 'drummer' ? WC3.roc.felMid : WC3.metalMid}`,
-                  boxShadow: active === 'drummer'
-                    ? `0 0 25px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
-                    : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.25rem',
-                  transition: 'all 0.3s ease',
-                  alignSelf: 'flex-start',
-                  marginTop: isLargeScreen ? '0.5rem' : '0.25rem',
-                }}
-              >
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke={active === 'drummer' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2"/>
-                  <circle cx="12" cy="12" r="3" fill={active === 'drummer' ? WC3.roc.felBright : WC3.textMid}/>
-                  <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke={active === 'drummer' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2"/>
-                </svg>
-                <span style={{
-                  color: active === 'drummer' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '1rem' : '0.875rem',
-                  fontFamily: '"Cinzel", serif',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>Drummer</span>
-              </button>
-
-              {/* Fighter Node - Right */}
-              <button
-                onClick={() => setActive('fighter')}
-                style={{
-                  width: isLargeScreen ? '6rem' : '4.5rem',
-                  height: isLargeScreen ? '6rem' : '4.5rem',
-                  background: active === 'fighter'
-                    ? `linear-gradient(135deg, ${WC3.metalLight} 0%, ${WC3.metalMid} 50%, ${WC3.metalDark} 100%)`
-                    : `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
-                  border: `3px solid ${active === 'fighter' ? WC3.roc.felMid : WC3.metalMid}`,
-                  boxShadow: active === 'fighter'
-                    ? `0 0 20px ${WC3.roc.felGlow}, inset 0 1px 2px rgba(255,255,255,0.1)`
-                    : `inset 0 -2px 4px rgba(0,0,0,0.5)`,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '0.25rem',
-                  transition: 'all 0.3s ease',
-                  alignSelf: 'flex-end',
-                }}
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M4 4l7.07 17.57 2.51-7.39 7.39-2.51L4 4z" stroke={active === 'fighter' ? WC3.roc.felBright : WC3.textMid} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <span style={{
-                  color: active === 'fighter' ? WC3.roc.felBright : WC3.textMid,
-                  fontSize: isLargeScreen ? '1rem' : '0.875rem',
-                  fontFamily: '"Cinzel", serif',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>Muay Thai</span>
-              </button>
-            </div>
-          </nav>
-        </FadeInSection>
-
-        {/* About - More breathing room */}
-        <FadeInSection>
-          <section style={{ marginBottom: sectionSpacing, marginTop: '1rem' }}>
-            <WC3Frame title="About" zone="roc">
-              <p style={{
-                color: WC3.textBright,
-                lineHeight: 1.8,
-                marginBottom: '1.25rem',
-                fontSize: isLargeScreen ? '1.125rem' : '1rem',
-                padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
-              }}>{aboutData.bio}</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: isLargeScreen ? '0.625rem' : '0.5rem' }}>
-                {aboutData.quickFacts.map((fact, i) => (
-                  <span key={i} style={{
-                    background: `linear-gradient(135deg, ${WC3.metalDark} 0%, ${WC3.bgDeep} 100%)`,
-                    border: `1px solid ${WC3.metalMid}`,
-                    color: WC3.textMid,
-                    fontSize: isLargeScreen ? '1rem' : '0.875rem',
-                    padding: isLargeScreen ? '0.5rem 0.875rem' : '0.375rem 0.625rem',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.05em',
-                    boxShadow: `inset 0 1px 2px rgba(0,0,0,0.3)`,
-                  }}>
-                    {fact}
-                  </span>
-                ))}
-              </div>
-            </WC3Frame>
+            <ProfessionSwitch
+              label="Profession selector"
+              className={`relative flex justify-between items-stretch w-full px-4 h-full py-2 ${isLargeScreen ? 'max-w-[700px]' : 'max-w-[500px]'}`}
+              renderOption={(option) => <ProfessionNode option={option} isLargeScreen={isLargeScreen} />}
+            />
           </section>
         </FadeInSection>
 
-        {/* === RoC Art Divider: Crossed Weapons === */}
-        <FadeInSection>
-          <div style={{ margin: `${artDividerMargin} 0` }}>
-            <RoCArtDivider variant="horde" scale={artDividerScale} />
-          </div>
-        </FadeInSection>
-
-        {/* Work Experience - subtle, faded like fog of war */}
-        <FadeInSection>
-          <SectionWithOrnament
-            leftOrnament={<RoCOrnament side="left" type="flag" />}
-            rightOrnament={<RoCOrnament side="right" type="weapons" />}
-          >
-            <section style={{ marginBottom: sectionSpacing, opacity: 0.7, filter: 'brightness(0.85)' }}>
-              <WC3Frame title="Work Experience" zone="roc">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                  {active === 'engineer' ? workExperience.map((job) => (
-                    <InnerCard key={job.company} highlight={job.current} zone="roc">
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.375rem' }}>
-                        <div>
-                          <h3 style={{ color: WC3.textBright, fontSize: '0.875rem', fontWeight: 600, marginBottom: '0.125rem' }}>{job.title}</h3>
-                          <p style={{ color: WC3.goldMid, fontSize: '0.875rem' }}>{job.company}</p>
-                        </div>
-                        <span style={{ color: WC3.textDim, fontSize: '0.875rem' }}>{job.period}</span>
-                      </div>
-                      <ul style={{ listStyle: 'none', padding: 0, margin: '0.375rem 0 0 0' }}>
-                        {job.highlights.slice(0, 2).map((h, i) => (
-                          <li key={i} style={{ color: WC3.textMid, fontSize: '0.875rem', paddingLeft: '0.75rem', position: 'relative', marginBottom: '0.125rem' }}>
-                            <span style={{ position: 'absolute', left: 0, color: WC3.goldDark }}>›</span>{h}
-                          </li>
-                        ))}
-                      </ul>
-                      {job.technologies && (
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.5rem' }}>
-                          {job.technologies.slice(0, 5).map((tech) => (
-                            <span key={tech} style={{
-                              background: WC3.roc.felDark + '40',
-                              color: WC3.roc.felBright,
-                              fontSize: '0.875rem',
-                              padding: '0.125rem 0.25rem',
-                              textTransform: 'uppercase'
-                            }}>
-                              {tech}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </InnerCard>
-                  )) : experience.map((entry) => (
-                    <InnerCard key={entry.id} zone="roc">
-                      <h3 style={{ color: WC3.textBright, fontSize: '0.875rem', fontWeight: 600 }}>{entry.title}</h3>
-                      <p style={{ color: WC3.goldMid, fontSize: '0.875rem', marginBottom: '0.25rem' }}>{entry.organization}</p>
-                      <p style={{ color: WC3.textMid, fontSize: '0.875rem' }}>{entry.description}</p>
-                    </InnerCard>
-                  ))}
-                </div>
-              </WC3Frame>
-            </section>
-          </SectionWithOrnament>
-        </FadeInSection>
-
-        {/* === RoC Art Divider: War Banner === */}
-        <FadeInSection>
-          <div style={{ margin: `${artDividerMargin} 0` }}>
-            <RoCArtDivider variant="alliance" scale={artDividerScale} />
-          </div>
-        </FadeInSection>
-
-        {/* Skills - with shield ornament */}
-        <FadeInSection>
-          <SectionWithOrnament
-            rightOrnament={<RoCOrnament side="right" type="shield" />}
-          >
-            <section style={{ marginBottom: sectionSpacing }}>
-              <WC3Frame title={active === 'engineer' ? 'Tech Stack' : 'Skills'} zone="roc">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1rem' }}>
-                  {active === 'engineer' ? engineerTech.map((category) => (
-                    <div key={category.name}>
-                      <h3 style={{ color: WC3.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
-                        {category.name}
-                      </h3>
-                      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                        {category.items.slice(0, 5).map((tech) => (
-                          <li key={tech} style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{tech}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )) : otherSkills.map((category) => (
-                    <div key={category.name}>
-                      <h3 style={{ color: WC3.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.375rem', borderBottom: `1px solid ${WC3.metalDark}`, paddingBottom: '0.25rem' }}>
-                        {category.name}
-                      </h3>
-                      <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                        {category.skills.slice(0, 5).map((skill) => (
-                          <li key={skill.name} style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{skill.name}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </WC3Frame>
-            </section>
-          </SectionWithOrnament>
-        </FadeInSection>
-
-        {/* ============ TRANSITION - FROZEN THRONE ZONE ============ */}
-
-        {/* === Transition Art Divider: Ice Crystals === */}
-        <FadeInSection>
-          <div style={{ margin: `${artDividerMargin} 0` }}>
-            <FTArtDivider variant="crystals" scale={artDividerScale} />
-          </div>
-        </FadeInSection>
-
-        {/* Projects - FT zone begins */}
-        <FadeInSection>
-          <SectionWithOrnament
-            leftOrnament={<FTOrnament side="left" type="shard" />}
-            rightOrnament={<FTOrnament side="right" type="rune" />}
-          >
-            <section style={{ marginBottom: sectionSpacing }}>
-              <WC3Frame title="Featured Work" zone="ft">
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.75rem' }}>
-                  {(active === 'engineer' ? getFeaturedProjects(projects) : projects).slice(0, 6).map((project) => (
-                    <InnerCard key={project.id} zone="ft">
-                      <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.25rem' }}>{project.name}</h3>
-                      <p style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.25rem' }}>{project.description}</p>
-                      {project.impact && <p style={{ color: WC3.ft.iceMid, fontSize: '1.125rem', fontWeight: 500 }}>{project.impact}</p>}
-                    </InnerCard>
-                  ))}
-                </div>
-              </WC3Frame>
-            </section>
-          </SectionWithOrnament>
-        </FadeInSection>
-
-        {/* === FT Art Divider: Frost Rune === */}
-        <FadeInSection>
-          <div style={{ margin: `${artDividerMargin} 0` }}>
-            <FTArtDivider variant="rune" scale={artDividerScale} />
-          </div>
-        </FadeInSection>
-
-        {/* Companies / Bands */}
-        <FadeInSection>
-          <SectionWithOrnament
-            leftOrnament={<FTOrnament side="left" type="frost" />}
-          >
-            {active === 'engineer' && (
-              <section style={{ marginBottom: sectionSpacing }}>
-                <WC3Frame title="Ventures" zone="ft">
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
-                    {COMPANIES.map((company) => (
-                      <InnerCard key={company.id} zone="ft">
-                        <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600 }}>{company.name}</h3>
-                        <p style={{ color: WC3.goldMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{company.tagline}</p>
-                        <p style={{ color: WC3.textMid, fontSize: '1.125rem', marginBottom: '0.25rem' }}>{company.description}</p>
-                        {company.url && <a href={company.url} target="_blank" rel="noopener noreferrer" style={{ color: WC3.ft.iceMid, fontSize: '0.875rem', textDecoration: 'none' }}>{company.url}</a>}
-                      </InnerCard>
-                    ))}
-                  </div>
-                </WC3Frame>
-              </section>
-            )}
-            {active === 'drummer' && (
-              <section style={{ marginBottom: sectionSpacing }}>
-                <WC3Frame title="Bands" zone="ft">
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
-                    {BANDS.map((band) => (
-                      <InnerCard key={band.id} zone="ft">
-                        <h3 style={{ color: WC3.textBright, fontSize: '1.125rem', fontWeight: 600 }}>{band.name}</h3>
-                        <p style={{ color: WC3.goldMid, fontSize: '1.125rem', marginBottom: '0.125rem' }}>{band.role}</p>
-                        <p style={{ color: WC3.textMid, fontSize: '1.125rem' }}>{band.description}</p>
-                      </InnerCard>
-                    ))}
-                  </div>
-                </WC3Frame>
-              </section>
-            )}
-          </SectionWithOrnament>
-        </FadeInSection>
-
-        {/* Posts */}
-        <FadeInSection>
-          <section style={{ marginBottom: sectionSpacing }}>
-            <WC3Frame title="Posts" zone="ft">
-              <div style={{ textAlign: 'center', padding: '1rem 0' }}>
-                <p style={{ color: WC3.textMid, marginBottom: '0.5rem' }}>
-                  Writings and thoughts coming soon...
-                </p>
-                <p style={{ color: WC3.ft.iceMid, fontSize: '0.875rem', fontStyle: 'italic' }}>
-                  * Check back for updates on development, music, and martial arts
-                </p>
-              </div>
-            </WC3Frame>
-          </section>
-        </FadeInSection>
+        <main>
+          <ProfessionSectionsView sections={view.sections} layout={layout} isLargeScreen={isLargeScreen} />
+        </main>
 
         {/* === FT Art Divider: Ice Throne === */}
-        <FadeInSection>
-          <div style={{ margin: `${artDividerMargin} 0` }}>
-            <FTArtDivider variant="throne" scale={artDividerScale} />
-          </div>
-        </FadeInSection>
+        <ArtDivider layout={layout}>
+          <FTArtDivider variant="throne" scale={layout.artDividerScale} />
+        </ArtDivider>
 
         {/* Contact - no card, floating text like Dark Fantasy */}
         <FadeInSection>
-          <section style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
-            <h2 style={{
-              color: WC3.ft.iceBright,
-              fontSize: '1.125rem',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              marginBottom: '0.75rem',
-              textShadow: `0 0 20px ${WC3.ft.iceMid}40`,
-            }}>
-              Ready to Work Together?
-            </h2>
-            <p style={{ color: WC3.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>
-              10+ years delivering production systems. Let&apos;s build something.
-            </p>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              <WC3Button variant="primary" href="mailto:alexanderpulido81@gmail.com" zone="ft">Send Message</WC3Button>
-              <WC3Button href="/cv" zone="ft">Download CV</WC3Button>
-            </div>
+          <section aria-label="Contact" style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
+            <RecruiterHero
+              render={({ line, actions }) => (
+                <>
+                  <h2 style={{
+                    color: WC3.ft.iceBright,
+                    fontSize: '1.125rem',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                    marginBottom: '0.75rem',
+                    textShadow: `0 0 20px ${WC3.ft.iceMid}40`,
+                  }}>
+                    Get In Touch
+                  </h2>
+                  <p style={{ color: WC3.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
+                  <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <HeroActions actions={actions} zone="ft" />
+                    <WC3Button href="/cv" zone="ft">Download CV</WC3Button>
+                  </div>
+                </>
+              )}
+            />
           </section>
         </FadeInSection>
 
         {/* Footer */}
         <footer style={{ textAlign: 'center', paddingTop: '0.75rem' }}>
-          <p style={{ color: WC3.textDim, fontSize: '0.875rem', letterSpacing: '0.1em' }}>
-            © {new Date().getFullYear()} ALEXANDER PULIDO
+          <p style={{ color: WC3.textDim, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+            © {new Date().getFullYear()} {view.hero.name}
           </p>
         </footer>
       </div>
