@@ -1,73 +1,52 @@
+import type { ReactNode } from 'react'
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { Profession } from '@/lib/cv/professions'
-import { MARIO_COLORS } from './palette'
-import { Coin, FireFlower, Starman, SuperMushroom } from './icons'
+import { TRAIL } from './palette'
 
-// =============================================================================
-// UI COMPONENTS
-// =============================================================================
+// The profession pick as a trail fork: one wooden sign per path, the picked one raised and painted route
+// red with its landmark lit: the glyph stone of the ruins, the campfire of the clearing, the temple
+// terrace ring.
 
-// The power-up each profession's block holds.
-const PROFESSION_POWER_UPS: Record<Profession, React.ReactNode> = {
-  drummer: <Starman size={50} />,
-  engineer: <FireFlower size={50} />,
-  fighter: <SuperMushroom size={50} />,
+const LANDMARK: Record<Profession, ReactNode> = {
+  engineer: (
+    <>
+      <path d="M8 30 V10 L16 4 L24 10 V30 Z" fill={TRAIL.STONE} />
+      <path d="M12 14 H16 V20 H20 M16 20 V26" stroke={TRAIL.RUNE} strokeWidth={1.6} fill="none" />
+    </>
+  ),
+  drummer: (
+    <>
+      <path d="M6 30 L26 24 M6 24 L26 30" stroke={TRAIL.WOOD} strokeWidth={2.5} />
+      <path d="M16 6 Q22 14 19 20 Q22 18 21 24 H11 Q10 18 13 20 Q10 14 16 6 Z" fill={TRAIL.GOLD} />
+    </>
+  ),
+  fighter: (
+    <>
+      <rect x={4} y={10} width={2.5} height={20} fill={TRAIL.WOOD} />
+      <rect x={25.5} y={10} width={2.5} height={20} fill={TRAIL.WOOD} />
+      <path d="M5 14 H27 M5 19 H27 M5 24 H27" stroke={TRAIL.ROUTE} strokeWidth={1.5} />
+    </>
+  ),
 }
 
-const PROFESSION_GLOW: Record<Profession, string> = {
-  drummer: MARIO_COLORS.coinGold,
-  engineer: MARIO_COLORS.questionOrange,
-  fighter: MARIO_COLORS.marioRed,
+const SIGN_LOOK = {
+  picked: '-translate-y-1 border-[color:var(--ap-gold)] bg-[color:var(--ap-route)] text-white',
+  open: 'border-[color:var(--ap-bark)] bg-[color:var(--ap-wood)] text-[color:var(--ap-parchment)] hover:-translate-y-0.5',
 }
 
-// Profession option styled as a power-up block, drawn for the shared ProfessionSwitch
-export function ProfessionPowerUp({ id, label, selected, optionProps }: ProfessionOption) {
+export function TrailSign({ id, label, selected, optionProps }: ProfessionOption) {
   return (
     <button
       type="button"
       {...optionProps}
-      className={`relative flex flex-col items-center transition-all duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-yellow-400 cursor-pointer ${
-        selected ? 'scale-110' : 'hover:scale-105 opacity-80 hover:opacity-100'
+      className={`flex min-h-[44px] flex-col items-center gap-1 rounded-sm border-2 px-2 py-2 text-sm font-bold transition-transform motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--ap-gold)] sm:px-4 ${
+        SIGN_LOOK[selected ? 'picked' : 'open']
       }`}
     >
-      {/* Power-up block */}
-      <div
-        className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center relative"
-        style={{
-          background: selected
-            ? `linear-gradient(180deg, ${MARIO_COLORS.questionYellow}, ${MARIO_COLORS.questionDark})`
-            : `linear-gradient(180deg, ${MARIO_COLORS.brickRed}, ${MARIO_COLORS.brickDark})`,
-          border: `4px solid ${selected ? MARIO_COLORS.groundBrown : MARIO_COLORS.groundDarkest}`,
-          borderRadius: '4px',
-          boxShadow: selected
-            ? `0 4px 0 ${MARIO_COLORS.groundDarkest}, 0 0 20px ${PROFESSION_GLOW[id]}60`
-            : `0 4px 0 ${MARIO_COLORS.groundDarkest}`,
-        }}
-        aria-hidden="true"
-      >
-        {PROFESSION_POWER_UPS[id]}
-        {selected && (
-          <div className="absolute -top-2 -right-2">
-            <Coin size={20} />
-          </div>
-        )}
-      </div>
-
-      {/* Label */}
-      <div
-        className="mt-3 px-2 sm:px-3 py-1 text-sm font-bold tracking-wider text-center"
-        style={{
-          background: selected
-            ? `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`
-            : `linear-gradient(180deg, ${MARIO_COLORS.castleGrey}, ${MARIO_COLORS.castleDark})`,
-          color: '#FFF',
-          border: `2px solid ${selected ? MARIO_COLORS.questionYellow : MARIO_COLORS.flagGrey}`,
-          borderRadius: '2px',
-          textShadow: '1px 1px 0 #000',
-        }}
-      >
-        {label}
-      </div>
+      <svg viewBox="0 0 32 32" className="h-10 w-10 rounded-sm bg-[color:var(--ap-night)] sm:h-12 sm:w-12" aria-hidden="true" focusable="false">
+        {LANDMARK[id]}
+      </svg>
+      <span className="text-center">{label}</span>
     </button>
   )
 }

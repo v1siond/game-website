@@ -1,162 +1,161 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { MARIO_COLORS } from './palette'
-import { Coin, FireFlower, GreenPipe, MarioSilhouette, Starman, SuperMushroom } from './icons'
-import { CastleVictoryScene, MushroomKingdomScene, UndergroundScene } from './art'
-import { CastlePanel, QuestionBlockPanel, UndergroundPanel } from './panels'
-import { MarioDivider, PipeCard, ProjectCard, MusicCard, QuestEntry, TechInventory } from './cards'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
+import { TrailPanel } from './panels'
+import { BandFind, CampCard, ExplorerPack, JourneyEntry, ProjectFind } from './cards'
+import { JOURNAL_SERIF } from './palette'
+import { Lane, SceneItem } from './scenes'
 
-export function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
+// Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
+// Projects, Bands and the Muay Thai record are trail levels he travels, each entry arriving as part of
+// the level.
+
+function Leg({ children }: { children: ReactNode }) {
+  return <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">{children}</div>
+}
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      <div className="relative z-20 px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <section className="mb-8">
-            <QuestionBlockPanel title="About" icon={<MarioSilhouette size={24} />}>
-              <p className="text-sm leading-relaxed" style={{ color: MARIO_COLORS.groundDarkest }}>
-                {professionalSummary.bio}
-              </p>
-            </QuestionBlockPanel>
-          </section>
-        </div>
-      </div>
-
-      <MushroomKingdomScene />
+      <FadeInScene>
+        <Leg>
+          <TrailPanel title="About" tone="journal">
+            <p className="text-base leading-relaxed">{professionalSummary.bio}</p>
+          </TrailPanel>
+        </Leg>
+      </FadeInScene>
 
       {sections.jobs.length > 0 && (
-        <div className="relative z-20 px-4 sm:px-6 py-8">
-          <div className="max-w-4xl mx-auto">
-            <section className="mb-8">
-              <UndergroundPanel title="Work Experience" icon={<Coin size={24} />}>
-                <div className="space-y-4">
-                  {sections.jobs.map((entry) => (
-                    <QuestEntry key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              </UndergroundPanel>
-            </section>
-          </div>
-        </div>
+        <LevelScene>
+          <Leg>
+            <Lane profession="engineer" zone="record" />
+            <TrailPanel title="Work Experience" tone="journal">
+              <ul className="space-y-4 pl-5">
+                {sections.jobs.map((entry) => (
+                  <li key={entry.id}>
+                    <SceneItem kind="stop">
+                      <JourneyEntry entry={entry} />
+                    </SceneItem>
+                  </li>
+                ))}
+              </ul>
+            </TrailPanel>
+          </Leg>
+        </LevelScene>
       )}
 
-      <UndergroundScene />
+      <FadeInScene>
+        <Leg>
+          <TrailPanel title="Tech Stack" tone="journal">
+            <ExplorerPack categories={sections.techStack} />
+          </TrailPanel>
+        </Leg>
+      </FadeInScene>
 
-      <div className="relative z-20 px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <section className="mb-8">
-            <QuestionBlockPanel title="Tech Stack" icon={<FireFlower size={28} />}>
-              <TechInventory categories={sections.techStack} />
-            </QuestionBlockPanel>
-          </section>
+      <LevelScene>
+        <Leg>
+          <Lane profession="engineer" zone="work" />
+          <TrailPanel title="Projects" tone="canopy">
+            <ProjectList
+              projects={sections.projects}
+              className="grid gap-4 md:grid-cols-2"
+              renderProject={(slot) => (
+                <SceneItem kind="find">
+                  <ProjectFind {...slot} />
+                </SceneItem>
+              )}
+            />
+          </TrailPanel>
+        </Leg>
+      </LevelScene>
 
-          <MarioDivider />
-
-          <section className="mb-8">
-            <CastlePanel title="Projects" icon={<Starman size={28} />}>
-              <ProjectList
-                projects={sections.projects}
-                className="grid md:grid-cols-2 gap-4"
-                renderProject={(slot) => <ProjectCard {...slot} />}
-              />
-            </CastlePanel>
-          </section>
-        </div>
-      </div>
-
-      <CastleVictoryScene />
-
-      <div className="relative z-20 px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <section className="mb-8">
-            <QuestionBlockPanel title="Ventures" icon={<GreenPipe height={28} width={24} />}>
-              <div className="grid md:grid-cols-3 gap-4">
-                {sections.companies.map((company) => (
-                  <PipeCard key={company.id} company={company} />
-                ))}
-              </div>
-            </QuestionBlockPanel>
-          </section>
-        </div>
-      </div>
+      <FadeInScene>
+        <Leg>
+          <TrailPanel title="Ventures" tone="canopy">
+            <div className="grid gap-4 md:grid-cols-3">
+              {sections.companies.map((company) => (
+                <CampCard key={company.id} company={company} />
+              ))}
+            </div>
+          </TrailPanel>
+        </Leg>
+      </FadeInScene>
     </>
   )
 }
 
-export function MusicianLevel({ sections }: { sections: SectionsOf<'drummer'> }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
-    <>
-      <MushroomKingdomScene />
-      <div className="relative z-20 px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <section className="mb-8">
-            <QuestionBlockPanel title="Bands" icon={<Starman size={28} />}>
-              <p className="text-sm mb-4" style={{ color: MARIO_COLORS.groundDarkest }}>
-                Drums since {musician.since}, {musician.yearsPlaying} years
-              </p>
-              <BandList
-                bands={bands}
-                className="grid md:grid-cols-2 gap-4"
-                renderBand={(slot) => <MusicCard {...slot} />}
-              />
-              <p className="text-sm mt-4" style={{ color: MARIO_COLORS.groundDarkest }}>
-                {musician.line}
-              </p>
-            </QuestionBlockPanel>
-          </section>
-        </div>
-      </div>
-    </>
+    <LevelScene>
+      <Leg>
+        <Lane profession="drummer" zone="record" />
+        <TrailPanel title="Bands" tone="canopy">
+          <p className="mb-4 text-base">
+            Drums since {musician.since}, {musician.yearsPlaying} years
+          </p>
+          <BandList
+            bands={bands}
+            className="grid gap-4 md:grid-cols-3"
+            renderBand={(slot) => (
+              <SceneItem kind="find">
+                <BandFind {...slot} />
+              </SceneItem>
+            )}
+          />
+          <p className="mt-4 text-sm italic text-[color:var(--ap-gold)]">{musician.line}</p>
+        </TrailPanel>
+      </Leg>
+    </LevelScene>
   )
 }
 
-export function MartialArtistLevel({ sections }: { sections: SectionsOf<'fighter'> }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
-    <>
-      <MushroomKingdomScene />
-      <div className="relative z-20 px-4 sm:px-6 py-8">
-        <div className="max-w-4xl mx-auto">
-          <section className="mb-8">
-            <UndergroundPanel title="Muay Thai" icon={<SuperMushroom size={28} />}>
-              <h3 className="text-base font-bold text-white mb-4">{martialArts.primary.title}</h3>
-              <MuayThaiRecord
-                martialArts={martialArts}
-                classNames={{
-                  facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-                  fact: 'p-3 rounded border-2 border-[#5A5A9A] bg-[#3A3A8A]',
-                  term: 'text-sm font-bold tracking-wider text-[#FFD700] uppercase',
-                  value: 'text-sm text-white mt-1',
-                  achievements: 'space-y-1',
-                  achievement: 'text-sm text-[#D8D8F8] flex items-start gap-2',
-                }}
-                renderAchievement={(achievement) => (
-                  <>
-                    <span className="text-[#FFD700]" aria-hidden="true">*</span>
-                    <span>{achievement}</span>
-                  </>
-                )}
-              />
-            </UndergroundPanel>
-          </section>
-        </div>
-      </div>
-    </>
+    <LevelScene>
+      <Leg>
+        <Lane profession="fighter" zone="record" />
+        <TrailPanel title="Muay Thai" tone="canopy">
+          <h3 className={`mb-4 text-lg font-bold text-[color:var(--ap-gold)] ${JOURNAL_SERIF}`}>{martialArts.primary.title}</h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'mb-5 grid gap-3 md:grid-cols-2',
+              fact: 'rounded-sm border border-[color:var(--ap-moss)] bg-[color:var(--ap-night)] p-3',
+              term: 'text-sm font-bold uppercase tracking-wider text-[color:var(--ap-gold)]',
+              value: 'mt-1 text-sm text-[color:var(--ap-parchment)]',
+              achievements: 'space-y-3 pl-5',
+              achievement: 'text-sm',
+            }}
+            renderAchievement={(achievement) => (
+              <SceneItem kind="stop">
+                <p className="rounded-sm border-l-4 border-[color:var(--ap-route)] bg-[color:var(--ap-page)] p-3 text-[color:var(--ap-ink)]">
+                  {achievement}
+                </p>
+              </SceneItem>
+            )}
+          />
+        </TrailPanel>
+      </Leg>
+    </LevelScene>
   )
 }
 
 export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerLevels,
-  drummer: MusicianLevel,
-  fighter: MartialArtistLevel,
+  engineer: EngineerSections,
+  drummer: MusicianSections,
+  fighter: MartialArtistSections,
 }

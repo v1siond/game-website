@@ -1,262 +1,141 @@
+import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobYears } from '@/components/cv/sectionText'
-import { MARIO_COLORS } from './palette'
-import { BrickBlock, Coin, GreenPipe, QuestionBlock, Starman } from './icons'
+import { JOURNAL_SERIF } from './palette'
 
-// Tech inventory - Question block style
-export function TechInventory({ categories }: { categories: CVData['techStack'] }) {
+// Adventure Paths' entries: a job is a dated page of the field journal with the route line down its left
+// edge, a project or a band is a find laid out on parchment, a venture is a camp marked on the map, and
+// the tech stack is the explorer's pack, one pouch per category.
+
+const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--ap-gold)]'
+
+const CHIP = 'rounded-sm bg-[color:var(--ap-forest)] px-2 py-0.5 text-sm text-[color:var(--ap-parchment)]'
+
+const FIND = 'h-full rounded-sm border-2 border-[color:var(--ap-edge)] bg-[color:var(--ap-parchment)] p-4 text-[color:var(--ap-ink)]'
+
+export const LINK_BUTTON = `inline-flex min-h-[44px] items-center rounded-sm bg-[color:var(--ap-route)] px-3 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${FOCUS}`
+
+function Chips({ items, label }: { items: string[]; label: string }) {
+  if (items.length === 0) return null
+
   return (
-    <div className="space-y-5">
-      {categories.map((category) => (
-        <div key={category.id}>
-          <h3 className="text-sm tracking-wider mb-2 flex items-center gap-2" style={{ color: MARIO_COLORS.groundBrown }}>
-            <span aria-hidden="true"><Coin size={16} /></span>
-            <span style={{ fontFamily: '"Press Start 2P", monospace, sans-serif' }}>{category.name.toUpperCase()}</span>
-          </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={`${category.name} technologies`}>
-            {category.items.map((tech) => (
-              <li
-                key={tech}
-                className="px-3 py-1.5 text-sm transition-transform hover:scale-105 cursor-default"
-                style={{
-                  background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
-                  border: `2px solid ${MARIO_COLORS.pipeMid}`,
-                  color: '#FFF',
-                  borderRadius: '2px',
-                  boxShadow: `0 2px 0 ${MARIO_COLORS.pipeDark}`,
-                  textShadow: '1px 1px 0 #000',
-                }}
-              >
-                {tech}
-              </li>
-            ))}
-          </ul>
-        </div>
+    <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={label}>
+      {items.map((item) => (
+        <li key={item} className={CHIP}>
+          {item}
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }
 
-// Project card - Star style: his role, the result line and the links that open the project
-export function ProjectCard({ project, years, links }: ProjectSlot) {
-  return (
-    <article
-      className="relative h-full p-4"
-      style={{
-        background: `linear-gradient(180deg, #FFF9E6, #FFF3CC)`,
-        border: `3px solid ${MARIO_COLORS.groundBrown}`,
-        borderRadius: '4px',
-        boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
-      }}
-    >
-      {project.highlight && (
-        <div className="absolute -top-3 -right-3" aria-hidden="true">
-          <Starman size={28} />
-        </div>
-      )}
+export function JourneyEntry({ entry }: { entry: Job }) {
+  const { start, end } = jobYears(entry, 'Present')
 
-      <div className="relative z-10">
-        <div className="flex justify-between items-start gap-2 mb-1">
-          <h3 className="text-sm font-bold" style={{ color: MARIO_COLORS.groundDarkest }}>
-            {project.name}
-          </h3>
-          {years && (
-            <span className="text-sm whitespace-nowrap" style={{ color: MARIO_COLORS.groundDark }}>{years}</span>
-          )}
+  return (
+    <article className="rounded-sm border-l-4 border-[color:var(--ap-route)] bg-[color:var(--ap-page)] p-4 text-[color:var(--ap-ink)]">
+      <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+        <div className="min-w-0">
+          <h3 className={`text-base font-bold ${JOURNAL_SERIF}`}>{entry.title}</h3>
+          <p className="text-sm font-semibold text-[color:var(--ap-route)]">{entry.company}</p>
         </div>
-        <p className="text-sm font-semibold mb-1" style={{ color: MARIO_COLORS.marioDarkRed }}>
-          {project.role}
-        </p>
-        <p className="text-sm mb-2" style={{ color: MARIO_COLORS.groundDark }}>
-          {project.tagline}
-        </p>
-        {project.impact && (
-          <p className="text-sm mb-2 italic flex items-start gap-1" style={{ color: MARIO_COLORS.pipeDark }}>
-            <span className="shrink-0 mt-0.5" aria-hidden="true"><Coin size={10} /></span>
-            {project.impact}
-          </p>
-        )}
-        {project.techStack.length > 0 && (
-          <ul className="flex gap-1 flex-wrap" aria-label="Technologies used">
-            {project.techStack.slice(0, 4).map((tech) => (
-              <li
-                key={tech}
-                className="text-sm px-2 py-0.5 rounded"
-                style={{
-                  background: MARIO_COLORS.pipeDark,
-                  color: '#FFF',
-                }}
-              >
-                {tech}
-              </li>
-            ))}
-          </ul>
-        )}
-        {links.length > 0 ? (
-          <div className="flex flex-wrap gap-2 mt-3">
-            {links.map(({ kind, label, linkProps }) => (
-              <a
-                key={kind}
-                {...linkProps}
-                className="inline-flex items-center min-h-[44px] px-3 text-sm font-bold transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400"
-                style={{
-                  background: `linear-gradient(180deg, ${MARIO_COLORS.marioRed}, ${MARIO_COLORS.marioDarkRed})`,
-                  border: `2px solid ${MARIO_COLORS.groundBrown}`,
-                  color: '#FFF',
-                  borderRadius: '4px',
-                }}
-              >
-                {label}
-              </a>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm mt-3" style={{ color: MARIO_COLORS.groundDark }}>No public link</p>
-        )}
+        <span className="rounded-sm bg-[color:var(--ap-ink)] px-2 py-1 text-sm text-[color:var(--ap-parchment)]">
+          {start} to {end}
+        </span>
       </div>
+      {entry.description && <p className="text-sm text-[color:var(--ap-ink-soft)]">{entry.description}</p>}
+      {entry.highlights.length > 0 && (
+        <ul className="mt-2 space-y-1" aria-label="Key achievements">
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="flex items-start gap-2 text-sm">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rotate-45 bg-[color:var(--ap-route)]" aria-hidden="true" />
+              <span>{highlight}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </article>
   )
 }
 
-// Company card - Pipe style
-export function PipeCard({ company }: { company: CVData['companies'][number] }) {
+export function ProjectFind({ project, years, links }: ProjectSlot) {
+  return (
+    <article className={FIND}>
+      <div className="mb-1 flex items-start justify-between gap-2">
+        <h3 className={`text-base font-bold ${JOURNAL_SERIF}`}>{project.name}</h3>
+        {years && <span className="whitespace-nowrap text-sm text-[color:var(--ap-ink-soft)]">{years}</span>}
+      </div>
+      <p className="text-sm font-semibold text-[color:var(--ap-route)]">{project.role}</p>
+      <p className="mt-1 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
+      {project.impact && <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">{project.impact}</p>}
+      <Chips items={project.techStack.slice(0, 4)} label="Technologies used" />
+      {links.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {links.map(({ kind, label, linkProps }) => (
+            <a key={kind} {...linkProps} className={LINK_BUTTON}>
+              {label}
+            </a>
+          ))}
+        </div>
+      )}
+    </article>
+  )
+}
+
+export function BandFind({ band, years, linkProps }: BandSlot) {
+  const card: ReactNode = (
+    <article className={FIND}>
+      <h3 className={`text-base font-bold ${JOURNAL_SERIF}`}>{band.name}</h3>
+      <p className="mt-1 text-sm text-[color:var(--ap-ink-soft)]">
+        {band.role}
+        {years && <span> · {years}</span>}
+      </p>
+      {band.release && (
+        <p className="mt-2 text-sm">
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
+    </article>
+  )
+
+  if (!linkProps) return card
+
+  return (
+    <a {...linkProps} className={`block h-full transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${FOCUS}`}>
+      {card}
+    </a>
+  )
+}
+
+export function CampCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
       aria-label={`${company.name}: ${company.tagline} (opens in a new tab)`}
-      className="block p-4 transition-transform hover:scale-[1.02] group focus-visible:outline focus-visible:outline-2 focus-visible:outline-green-400 relative overflow-hidden"
-      style={{
-        background: `linear-gradient(180deg, ${MARIO_COLORS.pipeGreen}, ${MARIO_COLORS.pipeDark})`,
-        border: `3px solid ${MARIO_COLORS.pipeMid}`,
-        borderRadius: '4px',
-        boxShadow: `0 3px 0 ${MARIO_COLORS.pipeDark}`,
-      }}
+      className={`block h-full transition-transform hover:-translate-y-0.5 motion-reduce:transition-none ${FOCUS}`}
     >
-      <div className="relative z-10">
-        <div className="flex items-center gap-3 mb-2">
-          <GreenPipe height={40} width={32} />
-          <div>
-            <h3 className="text-sm text-white group-hover:text-yellow-200 transition-colors">
-              {company.name}
-            </h3>
-            <p className="text-sm" style={{ color: MARIO_COLORS.coinGold }}>{company.tagline}</p>
-          </div>
-        </div>
-        <p className="text-sm" style={{ color: '#C8E8C8' }}>{company.description}</p>
-      </div>
+      <article className={FIND}>
+        <h3 className={`text-base font-bold ${JOURNAL_SERIF}`}>{company.name}</h3>
+        <p className="text-sm font-semibold text-[color:var(--ap-route)]">{company.tagline}</p>
+        <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{company.description}</p>
+      </article>
     </a>
   )
 }
 
-// Band card - Music note style
-export function MusicCard({ band, years, linkProps }: BandSlot) {
-  const content = (
-    <article
-      className="h-full p-4 transition-transform hover:scale-[1.02] group relative"
-      style={{
-        background: `linear-gradient(180deg, #FFF9E6, #FFF3CC)`,
-        border: `3px solid ${MARIO_COLORS.groundBrown}`,
-        borderRadius: '4px',
-        boxShadow: `0 3px 0 ${MARIO_COLORS.groundDarkest}`,
-      }}
-    >
-      <div className="relative z-10">
-        <div className="flex items-center gap-2 mb-2">
-          <span aria-hidden="true"><Starman size={24} /></span>
-          <h3 className="text-sm font-bold" style={{ color: MARIO_COLORS.groundDarkest }}>
-            {band.name}
-          </h3>
+export function ExplorerPack({ categories }: { categories: CVData['techStack'] }) {
+  return (
+    <div className="grid gap-5 sm:grid-cols-2">
+      {categories.map((category) => (
+        <div key={category.id}>
+          <h3 className={`text-base font-bold ${JOURNAL_SERIF}`}>{category.name}</h3>
+          <Chips items={category.items} label={`${category.name} technologies`} />
         </div>
-        <p className="text-sm mt-1" style={{ color: MARIO_COLORS.groundDark }}>
-          {band.role}
-          {years && <span aria-hidden="true"> | </span>}
-          {years && <span>{years}</span>}
-        </p>
-        {band.release && (
-          <p className="text-sm mt-2" style={{ color: MARIO_COLORS.groundDarkest }}>
-            Released <cite>&ldquo;{band.release}&rdquo;</cite>
-          </p>
-        )}
-      </div>
-    </article>
-  )
-
-  if (!linkProps) return content
-  return (
-    <a {...linkProps} className="block h-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-yellow-400">
-      {content}
-    </a>
-  )
-}
-
-// Experience entry - Quest log style. Dates are date only strings (UTC midnight), so the year is read in UTC.
-export function QuestEntry({ entry }: { entry: Job }) {
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, 'NOW')
-
-  return (
-    <article
-      className="p-4 transition-transform hover:scale-[1.01] relative"
-      style={{
-        background: `linear-gradient(180deg, #3A3A8A, ${MARIO_COLORS.undergroundBlack})`,
-        border: `3px solid #5A5A9A`,
-        borderRadius: '4px',
-        boxShadow: `0 3px 0 #1A1A4A`,
-      }}
-      aria-label={`${entry.title} at ${entry.company}, ${startDisplay} to ${endDisplay}`}
-    >
-      <div className="relative z-10">
-        <div className="flex justify-between items-start gap-2 mb-2 flex-wrap">
-          <div className="flex items-start gap-2">
-            <span aria-hidden="true"><Coin size={18} /></span>
-            <div>
-              <h3 className="text-sm font-bold text-white">{entry.title}</h3>
-              <p className="text-sm" style={{ color: MARIO_COLORS.coinGold }}>{entry.company}</p>
-            </div>
-          </div>
-          <span
-            className="text-sm px-2 py-1"
-            style={{
-              background: MARIO_COLORS.pipeDark,
-              color: '#FFF',
-              border: `1px solid ${MARIO_COLORS.pipeMid}`,
-              borderRadius: '2px',
-            }}
-          >
-            {startDisplay}-{endDisplay}
-          </span>
-        </div>
-        {entry.description && <p className="text-sm mb-2" style={{ color: '#D8D8F8' }}>{entry.description}</p>}
-        {entry.highlights.length > 0 && (
-          <ul className="space-y-1 mt-2" aria-label="Key achievements">
-            {entry.highlights.map((highlight) => (
-              <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: '#D8D8F8' }}>
-                <span style={{ color: MARIO_COLORS.coinGold }} aria-hidden="true">*</span>
-                {highlight}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </article>
-  )
-}
-
-// Divider with Mario elements
-export function MarioDivider() {
-  return (
-    <div className="flex justify-center items-center py-6 gap-3" aria-hidden="true">
-      <Coin size={20} />
-      <BrickBlock size={32} />
-      <QuestionBlock size={36} />
-      <Coin size={20} />
-      <Coin size={20} />
-      <QuestionBlock size={36} />
-      <BrickBlock size={32} />
-      <Coin size={20} />
+      ))}
     </div>
   )
 }

@@ -1,33 +1,45 @@
-// Adventure Paths' palette.
+import type { CSSProperties } from 'react'
 
-// === MARIO COLORS ===
-export const MARIO_COLORS = {
-  skyBlue: '#5C94FC',
-  skyLight: '#92CCFF',
-  groundBrown: '#D87B17',
-  groundDark: '#8B4513',
-  groundDarkest: '#5C3317',
-  brickRed: '#AD6B2F',
-  brickDark: '#7B3B0A',
-  pipeGreen: '#5C9E31',
-  pipeMid: '#3E6B1F',
-  pipeDark: '#1E4B0F',
-  questionYellow: '#FFD700',
-  questionOrange: '#F5A623',
-  questionDark: '#E5941B',
-  marioRed: '#E52521',
-  marioDarkRed: '#C41E3A',
-  luigiGreen: '#43B047',
-  coinGold: '#FFD700',
-  coinOrange: '#FFC107',
-  cloudWhite: '#FFFFFF',
-  cloudGrey: '#E8E8E8',
-  bushGreen: '#228B22',
-  bushLight: '#32CD32',
-  flagGrey: '#808080',
-  flagLight: '#A0A0A0',
-  undergroundBlue: '#000080',
-  undergroundBlack: '#0A0A20',
-  castleGrey: '#707070',
-  castleDark: '#404040',
-}
+// Adventure Paths' palette: an explorer's map at dusk. Night forest behind the page, parchment for the
+// field journal, the red route line drawn across the map, compass gold, mossy stone ruins and the teal
+// glow of the old glyphs. SVG fills read the constants; the page reads the same values as CSS variables
+// (`--ap-parchment` and so on) that the world's root sets once, so every colour has one owner.
+//
+// Text pairs: ink on parchment 13.2:1, soft ink on parchment 7.7:1, route red on parchment 4.8:1 and on
+// the journal page 5.4:1, forest on parchment 6.4:1, parchment on night 13.4:1, on canopy 10:1 and on
+// forest 6.4:1, gold on canopy 5.6:1 and on night 7.6:1, edge on night 7.4:1, ink on gold 7.5:1, white
+// on route red 6:1.
+export const TRAIL = {
+  NIGHT: '#14211a',
+  CANOPY: '#1f3a2b',
+  FOREST: '#2f5a3a',
+  MOSS: '#6f8f4e',
+  PARCHMENT: '#f3e6c4',
+  PAGE: '#fbf3dc',
+  EDGE: '#c9a86a',
+  INK: '#2b1d0e',
+  INK_SOFT: '#5a4026',
+  ROUTE: '#b23a22',
+  GOLD: '#e0a530',
+  LANTERN: '#ffd58a',
+  STONE: '#9a927f',
+  STONE_DARK: '#5c584e',
+  SKY: '#8fb4cf',
+  DUSK: '#f2b56b',
+  RIVER: '#4f8fb0',
+  RUNE: '#59d8c6',
+  WOOD: '#7a4e2a',
+  BARK: '#3e2a1a',
+} as const
+
+type Tone = keyof typeof TRAIL
+
+const cssName = (tone: Tone) => `--ap-${tone.toLowerCase().replace(/_/g, '-')}`
+
+/** The palette as CSS variables, set once on the world's root. */
+export const TRAIL_VARS = Object.fromEntries(
+  (Object.keys(TRAIL) as Tone[]).map((tone) => [cssName(tone), TRAIL[tone]]),
+) as CSSProperties
+
+// Field journal type: the serif of an expedition log for headings, a plain sans for reading.
+export const JOURNAL_SERIF = "font-['Georgia','Times_New_Roman',serif]"
