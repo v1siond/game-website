@@ -8,7 +8,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { SpartanSprite } from './sprite'
-import { useWorldMotion } from './stage'
+import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -126,7 +126,7 @@ function ClearedCounter({ cleared, total }: { cleared: number; total: number }) 
 const CLEAR_GAP_MS = 1900
 
 function useClearQueue(jobs: Job[]) {
-  const { reduced } = useWorldMotion()
+  const { reduced } = useZoneStageContext()
   const [entered, setEntered] = useState<ReadonlySet<string>>(new Set())
   const [cleared, setCleared] = useState<readonly string[]>([])
   const lastClear = useRef(0)

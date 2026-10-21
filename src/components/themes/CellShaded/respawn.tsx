@@ -8,7 +8,9 @@ import { Digistruct } from './digistruct'
 import { ContactActions, InkButton } from './buttons'
 import { HATCH } from './ink'
 import { CEL } from './palette'
-import { SectionTitle, celHeadingId, useStage } from './stage'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import { SectionTitle, celHeadingId } from './stage'
+import type { Zone } from './wasteland'
 import cel from './cel.module.css'
 
 // Contact as the respawn station at night: the station's rings pulse on the pad and, when the section
@@ -19,7 +21,7 @@ import cel from './cel.module.css'
 export function RespawnStation({ profession }: { profession: Profession }) {
   const { contact } = useCVData()
   const { sections, hud, navigation } = useLabels()
-  const { ref, on, reduced } = useStage('night')
+  const { ref, on, reduced } = useZoneStage<Zone>('night')
   const [build, setBuild] = useState(0)
   const title = sections.contact
 

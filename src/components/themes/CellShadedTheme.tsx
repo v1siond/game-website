@@ -6,6 +6,7 @@ import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
+import { ZoneStageProvider } from '@/hooks/useZoneStage'
 import { paletteVars } from './shared/paletteVars'
 import { fillLabel } from '@/lib/cv/labels'
 import { CEL } from './CellShaded/palette'
@@ -15,7 +16,6 @@ import { FreezeIntro } from './CellShaded/freezeIntro'
 import { QuickChange } from './CellShaded/quickChange'
 import { SECTION_VIEWS } from './CellShaded/sections'
 import { RespawnStation } from './CellShaded/respawn'
-import { WorldMotionProvider } from './CellShaded/stage'
 import cel from './CellShaded/cel.module.css'
 
 // Cell Shaded, the inked wasteland looter shooter: the page is one day in the desert. He arrives in a
@@ -50,7 +50,7 @@ export default function CellShadedTheme() {
     <div ref={pointerRef} style={ROOT_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${cel.root}`}>
       <HatchDefs />
       <Wasteland />
-      <WorldMotionProvider value={{ reduced, onZone }}>
+      <ZoneStageProvider value={{ reduced, onZone }}>
         <FreezeIntro profession={active} reduced={reduced} />
         <QuickChange profession={active} />
 
@@ -61,7 +61,7 @@ export default function CellShadedTheme() {
         </main>
 
         <RespawnStation profession={active} />
-      </WorldMotionProvider>
+      </ZoneStageProvider>
 
       <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <p className="inline-block bg-[var(--cel-ink)] px-3 py-1 text-base font-bold text-[var(--cel-paper)]">

@@ -1,48 +1,29 @@
 'use client'
 
-import { createContext, useContext, useEffect, type ReactNode } from 'react'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { createContext, useContext, type ReactNode } from 'react'
+import { useZoneStage } from '@/hooks/useZoneStage'
 import { headingId } from '@/components/cv/sectionText'
 import u from './underworld.module.css'
 
-// A section's stage in the descent: the gilded title plate and the section's own scene. useSectionTrigger
+// A section's stage in the descent: the gilded title plate and the section's own scene. useZoneStage
 // marks it data-on once, the first time it scrolls into view, and every entrance inside starts off that
-// flag; under reduced motion it is on from the start. While the stage is in view it hands its region to
-// the page, which fades the fixed depths (depths.tsx) to that region.
+// flag. While the stage is in view it hands its region to the page, which fades the fixed depths
+// (depths.tsx) to that region.
 
 /** The regions the page goes down, top to bottom. */
 export type Zone = 'hall' | 'depths' | 'magma' | 'fields' | 'temple'
 
-interface WorldMotion {
-  reduced: boolean
-  onZone: (zone: Zone) => void
+interface House {
   // Counts the visitor's returns to the house from the last gate; the hero replays the rise on each.
   rebirths: number
   returnToHouse: () => void
 }
 
-const WorldMotionContext = createContext<WorldMotion>({
-  reduced: false,
-  onZone: () => undefined,
-  rebirths: 0,
-  returnToHouse: () => undefined,
-})
+const HouseContext = createContext<House>({ rebirths: 0, returnToHouse: () => undefined })
 
-export const WorldMotionProvider = WorldMotionContext.Provider
+export const HouseProvider = HouseContext.Provider
 
-export const useWorldMotion = () => useContext(WorldMotionContext)
-
-/** Whether a stage has come into view, its region handed up while it is in view. */
-export function useStage(zone: Zone) {
-  const { reduced, onZone } = useWorldMotion()
-  const { ref, triggered, inView } = useSectionTrigger()
-
-  useEffect(() => {
-    if (inView) onZone(zone)
-  }, [inView, zone, onZone])
-
-  return { ref, on: triggered || reduced, reduced }
-}
+export const useHouse = () => useContext(HouseContext)
 
 export const mythHeadingId = (title: string) => headingId('myth', title)
 
@@ -70,7 +51,7 @@ export function SectionTitle({ title }: { title: string }) {
 }
 
 export function Stage({ title, zone, children }: { title: string; zone: Zone; children: ReactNode }) {
-  const { ref, on } = useStage(zone)
+  const { ref, on } = useZoneStage<Zone>(zone)
 
   return (
     <section ref={ref} data-on={on || undefined} aria-labelledby={mythHeadingId(title)} className="mb-28 scroll-mt-8">

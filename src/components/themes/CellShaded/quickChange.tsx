@@ -8,7 +8,8 @@ import { VaultSprite } from './sprite'
 import { Digistruct } from './digistruct'
 import { HATCH } from './ink'
 import { CEL } from './palette'
-import { useStage } from './stage'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import type { Zone } from './wasteland'
 import cel from './cel.module.css'
 
 // The profession switch as the wasteland's quick change station: a booth with a glowing pad and three
@@ -47,7 +48,7 @@ function useBuildOnChange(profession: Profession): number {
 export function QuickChange({ profession }: { profession: Profession }) {
   const { navigation, hud } = useLabels()
   const build = useBuildOnChange(profession)
-  const { ref } = useStage('noon')
+  const { ref } = useZoneStage<Zone>('noon')
 
   return (
     <section ref={ref} className="relative z-20 px-4 py-10 sm:px-6" aria-label={navigation.professionSelection}>

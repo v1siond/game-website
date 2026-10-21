@@ -5,7 +5,8 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { SpartanSprite } from './sprite'
-import { useStage } from './stage'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import type { Zone } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -41,7 +42,7 @@ function TalentPlate({ id, label, optionProps, turned }: ProfessionOption & { tu
 export function Mirror({ profession }: { profession: Profession }) {
   const { navigation, myth } = useLabels()
   const take = useTakeOnChange(profession)
-  const { ref } = useStage('hall')
+  const { ref } = useZoneStage<Zone>('hall')
 
   return (
     <section ref={ref} className="relative z-20 px-4 py-12 sm:px-6" aria-label={navigation.professionSelection}>

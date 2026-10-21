@@ -7,6 +7,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
+import { ZoneStageProvider } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { MYTH_VARS } from './Mythic/palette'
 import { Depths } from './Mythic/depths'
@@ -14,7 +15,7 @@ import { PoolRise } from './Mythic/poolRise'
 import { Mirror } from './Mythic/mirror'
 import { SECTION_VIEWS } from './Mythic/regions'
 import { LastGate } from './Mythic/gate'
-import { WorldMotionProvider, type Zone } from './Mythic/stage'
+import { HouseProvider, type Zone } from './Mythic/stage'
 import u from './Mythic/underworld.module.css'
 
 // Mythic, the underworld escape painted in ink over colour: the page goes down from the great hall to
@@ -54,18 +55,20 @@ export default function MythicTheme() {
     <div ref={pointerRef} style={MYTH_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${u.root}`}>
       <SkipLink href="#main-content" />
       <Depths />
-      <WorldMotionProvider value={{ reduced, onZone, rebirths, returnToHouse }}>
-        <PoolRise profession={active} reduced={reduced} />
-        <Mirror profession={active} />
+      <ZoneStageProvider value={{ reduced, onZone }}>
+        <HouseProvider value={{ rebirths, returnToHouse }}>
+          <PoolRise profession={active} reduced={reduced} />
+          <Mirror profession={active} />
 
-        <main id="main-content" tabIndex={-1} className="relative z-20 px-4 py-8 outline-none sm:px-6">
-          <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
-            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          </div>
-        </main>
+          <main id="main-content" tabIndex={-1} className="relative z-20 px-4 py-8 outline-none sm:px-6">
+            <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+              <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+            </div>
+          </main>
 
-        <LastGate profession={active} />
-      </WorldMotionProvider>
+          <LastGate profession={active} />
+        </HouseProvider>
+      </ZoneStageProvider>
 
       <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <p className="inline-block bg-[var(--myth-ink)] px-3 py-1 text-base text-[var(--myth-bone)]">

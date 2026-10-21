@@ -8,7 +8,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { SpartanSprite, type SpriteMotion } from './sprite'
 import { ContactActions, SlabButton } from './buttons'
 import { useMove } from './moves'
-import { useWorldMotion } from './stage'
+import { useHouse } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -56,7 +56,7 @@ const DRIPS = [
 // The rise timeline: runs when the header first shows and on every return to the house.
 function useRise(reduced: boolean) {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.05, rootMargin: '0px' })
-  const { rebirths } = useWorldMotion()
+  const { rebirths } = useHouse()
   const [reached, setReached] = useState<ReadonlySet<Phase>>(NO_PHASES)
   const skip = useCallback(() => setReached(ALL_PHASES), [])
   const done = reduced || reached.has('done')

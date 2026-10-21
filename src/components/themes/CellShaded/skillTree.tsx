@@ -6,7 +6,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { TechCategory } from '@/lib/cv/content'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { VaultSprite } from './sprite'
-import { useWorldMotion } from './stage'
+import { useZoneStageContext } from '@/hooks/useZoneStage'
 import cel from './cel.module.css'
 
 // The Tech Stack as the hunter's skill tree, opened by his action skill: when the tree first scrolls
@@ -58,7 +58,7 @@ function Branch({ category, index, lit, onLight }: { category: Category; index: 
 export function SkillTree({ categories }: { categories: Category[] }) {
   const { cards, hud } = useLabels()
   const [lit, setLit] = useState<Lit | null>(null)
-  const { reduced } = useWorldMotion()
+  const { reduced } = useZoneStageContext()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
   return (

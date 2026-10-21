@@ -6,7 +6,8 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
 import { SpartanSprite } from './sprite'
 import { ContactActions, SlabButton } from './buttons'
-import { SectionTitle, mythHeadingId, useStage, useWorldMotion } from './stage'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import { SectionTitle, mythHeadingId, useHouse, type Zone } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -18,8 +19,8 @@ import u from './underworld.module.css'
 
 export function LastGate({ profession }: { profession: Profession }) {
   const { sections, myth, navigation } = useLabels()
-  const { returnToHouse } = useWorldMotion()
-  const { ref, on } = useStage('temple')
+  const { returnToHouse } = useHouse()
+  const { ref, on } = useZoneStage<Zone>('temple')
   const [open, setOpen] = useState(false)
   const title = sections.contact
 

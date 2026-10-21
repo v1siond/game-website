@@ -9,7 +9,7 @@ import { VaultSprite, type SpriteMotion } from './sprite'
 import { Starburst } from './ink'
 import { InkButton } from './buttons'
 import { CEL } from './palette'
-import { useWorldMotion } from './stage'
+import { useZoneStageContext } from '@/hooks/useZoneStage'
 import cel from './cel.module.css'
 
 // Muay Thai at the heavy bag: when the section first shows he throws a kick, a knee and an elbow, and
@@ -38,7 +38,7 @@ function Bag({ swing }: { swing: number }) {
 
 export function HeavyBag({ martialArts, on }: { martialArts: MartialArts; on: boolean }) {
   const { hud } = useLabels()
-  const { reduced } = useWorldMotion()
+  const { reduced } = useZoneStageContext()
   const achievements = martialArts.primary.achievements
   const total = achievements.length
   const [strikes, setStrikes] = useState(0)

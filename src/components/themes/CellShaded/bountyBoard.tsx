@@ -7,7 +7,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
-import { useWorldMotion } from './stage'
+import { useZoneStageContext } from '@/hooks/useZoneStage'
 import cel from './cel.module.css'
 
 // Work Experience as the town's bounty board: each job a notice pinned to the planks, slapped on when it
@@ -20,7 +20,7 @@ const TILTS = ['-1.5deg', '1deg', '-0.6deg', '1.6deg', '-1deg']
 
 function Notice({ job, index, onRead }: { job: Job; index: number; onRead: (id: string) => void }) {
   const { years, cards, navigation, hud } = useLabels()
-  const { reduced } = useWorldMotion()
+  const { reduced } = useZoneStageContext()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.4 })
   const on = triggered || reduced
   const { start, end } = jobYears(job, years.present)
@@ -72,7 +72,7 @@ function Notice({ job, index, onRead }: { job: Job; index: number; onRead: (id: 
 
 function XpBar({ read, total }: { read: number; total: number }) {
   const { hud } = useLabels()
-  const { reduced } = useWorldMotion()
+  const { reduced } = useZoneStageContext()
 
   return (
     <div className={`relative mb-8 flex flex-wrap items-center gap-4 px-4 py-3 ${cel.xpBar}`}>

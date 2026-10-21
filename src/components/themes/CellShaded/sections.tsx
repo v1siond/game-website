@@ -3,7 +3,9 @@
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { Stage, useStage, SectionTitle, celHeadingId } from './stage'
+import { useZoneStage } from '@/hooks/useZoneStage'
+import { Stage, SectionTitle, celHeadingId } from './stage'
+import type { Zone } from './wasteland'
 import { BountyBoard } from './bountyBoard'
 import { SkillTree } from './skillTree'
 import { LootDrops } from './lootDrops'
@@ -68,7 +70,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 // The heavy bag needs the stage's flag to throw its first hits, so this stage is written out here.
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const title = useLabels().sections.muayThai
-  const { ref, on } = useStage('dusk')
+  const { ref, on } = useZoneStage<Zone>('dusk')
 
   return (
     <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`mb-24 scroll-mt-8 ${cel.stage}`}>

@@ -68,7 +68,7 @@ the shown profession from the world's map.
 | heroScene.module.css | `src/components/scroll/heroScene.module.css` | The walk, advance, limb, stick and wave motion. A world sets only numbers (`--strides`, `--swing`, `--stick-hits`, `--walk-inset` and the others) in its `.tempo` class. |
 | sectionText | `src/components/cv/sectionText.ts` | Shared text: project links, year spans, job years, Muay Thai facts, heading ids. |
 | RecruiterHero, ProfessionSwitch, ProfessionSectionsView | `src/components/cv/` | The hero, the profession switch, the per profession dispatch. |
-| useReducedMotion, useScrollScene, useSectionTrigger | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger. |
+| useReducedMotion, useScrollScene, useSectionTrigger, useZoneStage | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the zone in view handed to a page whose backdrop follows it. |
 | paletteVars | `src/components/themes/shared/paletteVars.ts` | Turns a palette into CSS variables (`paletteVars('tp', { leafDark })` sets `--tp-leaf-dark`). |
 | GlobalProfessionStage | `src/components/themes/shared/professionStage.tsx` | A recoloured profession stage for worlds that draw none of their own. |
 
