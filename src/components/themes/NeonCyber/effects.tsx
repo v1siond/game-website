@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useReducedMotion } from './motion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Intense glitch text effect with RGB split - Cyberpunk 2077 style chromatic aberration
 export function GlitchText({

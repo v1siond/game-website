@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type CSSProperties } from 'react'
-import { useReducedMotion } from './motion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // The fixed backdrop loops run all the time, so they are kept few: with the hero's status dot, the
 // selector's scan line and the two glitch names they hold 14 animated elements, which leaves the

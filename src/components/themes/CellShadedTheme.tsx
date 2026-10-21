@@ -11,6 +11,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job, Project } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Borderlands color palette - desert wasteland + loot rarity
 const BORDERLANDS_COLORS = {
@@ -33,25 +34,6 @@ const BORDERLANDS_COLORS = {
   eridium: '#9966cc',
   ink: '#1a1a1a',
   paper: '#f5ecd5',
-}
-
-// Hook to detect reduced motion preference
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-
-    const handler = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches)
-    }
-
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return prefersReducedMotion
 }
 
 // Comic book halftone pattern - enhanced with cel-shading gradient
@@ -1437,7 +1419,7 @@ function ProfessionPanels({ sections, reducedMotion }: { sections: ProfessionSec
 export default function CellShadedTheme() {
   const view = useWorldView()
   const [mounted, setMounted] = useState(false)
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     setMounted(true)

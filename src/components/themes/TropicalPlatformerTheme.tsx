@@ -12,6 +12,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // ============================================================================
 // CRASH BANDICOOT EXACT COLOR PALETTE
@@ -85,24 +86,6 @@ const COLORS = {
   warpPurple: '#8B00FF',
   warpBlue: '#00BFFF',
   warpPink: '#FF69B4',
-}
-
-
-// ============================================================================
-// REDUCED MOTION HOOK
-// ============================================================================
-function useReducedMotion(): boolean {
-  const [reducedMotion, setReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return reducedMotion
 }
 
 // ============================================================================

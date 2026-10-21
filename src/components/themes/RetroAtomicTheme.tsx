@@ -21,6 +21,7 @@ import { AtomSymbol, BottleCap, RadiationSymbol } from './RetroAtomic/icons'
 import { PipBoyTab } from './RetroAtomic/cards'
 import { CVLink, HeroAction, TERMINAL_BUTTON } from './RetroAtomic/actions'
 import { ProfessionDetails } from './RetroAtomic/sections'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Retro Atomic: the page composition. Its palette, icons, panels, art separators, cards and per
 // profession sections live in ./RetroAtomic.
@@ -29,15 +30,7 @@ export default function RetroAtomicTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const [mounted, setMounted] = useState(false)
-  const [reducedMotion, setReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReducedMotion(mq.matches)
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     setMounted(true)

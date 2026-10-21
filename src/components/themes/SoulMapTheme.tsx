@@ -11,6 +11,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Color palette - Dark Souls authentic
 const COLORS = {
@@ -36,15 +37,7 @@ function UndeadWarrior({
   direction?: 'left' | 'right'
   className?: string
 }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   const flipStyle = direction === 'left' ? { transform: 'scaleX(-1)' } : {}
 
@@ -203,15 +196,7 @@ function StoneSectionCard({
   glowColor?: string
   ariaLabelledby?: string
 }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <section
@@ -316,15 +301,7 @@ function StoneSectionCard({
 
 // Profession-specific ember ornaments
 function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   const ornamentsByProfession = {
     engineer: [
@@ -396,15 +373,7 @@ function EmberOrnaments({ profession }: { profession: 'engineer' | 'drummer' | '
 
 // Souls counter - floating soul particles
 function SoulsCounter({ count }: { count: number }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -448,15 +417,7 @@ function SoulsCounter({ count }: { count: number }) {
 function Bonfire({ size = 'normal', label }: { size?: 'small' | 'normal' | 'large'; label?: string }) {
   const scales = { small: 0.5, normal: 1, large: 1.5 }
   const scale = scales[size]
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -573,15 +534,7 @@ function Bonfire({ size = 'normal', label }: { size?: 'small' | 'normal' | 'larg
 
 // BonfireArtSection - Central bonfire with coiled sword, embers, "REST" prompt
 function BonfireArtSection() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -766,15 +719,7 @@ function BonfireArtSection() {
 
 // FogGateArtSection - Dramatic misty barrier with knight silhouette
 function FogGateArtSection() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -895,15 +840,7 @@ function FogGateArtSection() {
 
 // PraiseTheSunArtSection - Solaire silhouette with golden sun
 function PraiseTheSunArtSection() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -1042,15 +979,7 @@ function PraiseTheSunArtSection() {
 
 // Fog Gate - misty barrier as section divider
 function FogGate() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -1130,15 +1059,7 @@ function Bloodstain({ className = '' }: { className?: string }) {
 
 // Estus Flask - enhanced
 function EstusFlask({ charges = 5, maxCharges = 5 }: { charges?: number; maxCharges?: number }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -1191,15 +1112,7 @@ function EstusFlask({ charges = 5, maxCharges = 5 }: { charges?: number; maxChar
 
 // Darksign - Sun eclipse symbol - enhanced
 function Darksign({ size = 40 }: { size?: number }) {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div
@@ -1282,15 +1195,7 @@ function SwordMarker() {
 
 // Map fog/unexplored area effect - Dark Souls style
 function MapFog() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
+  const prefersReducedMotion = useReducedMotion()
 
   return (
     <div className="fixed inset-0 pointer-events-none z-[2]" aria-hidden="true">
@@ -1878,15 +1783,10 @@ export default function SoulMapTheme() {
   const [mounted, setMounted] = useState(false)
   const [explored, setExplored] = useState<ReadonlySet<Profession>>(new Set([active]))
   const [souls, setSouls] = useState(125890)
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     setMounted(true)
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
   }, [])
 
   useEffect(() => {

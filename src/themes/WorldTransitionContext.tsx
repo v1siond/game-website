@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useRef, useEffect, useCallback, Re
 import { useTheme } from './ThemeContext'
 import { getThemeById } from './themes'
 import WorldPortal, { PORTAL_VARIANTS, type PortalVariant } from '@/components/worlds/WorldPortal'
+import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 
 const COVER_MS = 720
 const REVEAL_MS = 620
@@ -19,15 +20,6 @@ interface WorldTransitionContextType {
 }
 
 const WorldTransitionContext = createContext<WorldTransitionContextType | undefined>(undefined)
-
-function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
-  try {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  } catch {
-    return false
-  }
-}
 
 export function WorldTransitionProvider({ children }: { children: ReactNode }) {
   const { theme, setThemeById } = useTheme()

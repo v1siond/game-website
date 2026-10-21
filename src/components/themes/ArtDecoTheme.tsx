@@ -7,7 +7,7 @@ import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { RAPTURE_COLORS } from './ArtDeco/palette'
-import { useReducedMotion } from './ArtDeco/motion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import {
   BigDaddySilhouette,
   DecoPatternBackground,

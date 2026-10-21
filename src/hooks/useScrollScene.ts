@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { usePreview } from '@/themes/PreviewContext'
+import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import {
   type FrameTask,
   type ScenePhase,
@@ -35,8 +36,6 @@ export interface ScrollSceneReturn<T extends HTMLElement> {
   ref: (element: T | null) => void
   phase: ScenePhase
 }
-
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)'
 
 type ArmedScene = FrameTask<number>
 
@@ -97,7 +96,7 @@ export function useScrollScene<T extends HTMLElement = HTMLDivElement>({
       writeProgress(element, SCENE_DONE)
       return
     }
-    if (isPreview || window.matchMedia(REDUCED_MOTION_QUERY).matches) {
+    if (isPreview || prefersReducedMotion()) {
       finish()
       return
     }

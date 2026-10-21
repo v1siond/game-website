@@ -14,25 +14,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
-
-// Check for reduced motion preference
-function usePrefersReducedMotion() {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-
-    const handler = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches)
-    }
-
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return prefersReducedMotion
-}
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // Phantom Thief Alexander - stylish masked figure
 function PhantomThiefCharacter({
@@ -1432,7 +1414,7 @@ export default function BoldNoirTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const [mounted, setMounted] = useState(false)
-  const prefersReducedMotion = usePrefersReducedMotion()
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     setMounted(true)

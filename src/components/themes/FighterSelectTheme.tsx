@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
@@ -12,6 +11,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // =============================================================================
 // EXACT COLOR PALETTE - STREET FIGHTER / MORTAL KOMBAT / TEKKEN INSPIRED
@@ -79,23 +79,6 @@ const lightningPattern = `
   radial-gradient(ellipse at 50% 0%, ${COLORS.electricYellow}10 0%, transparent 50%),
   radial-gradient(ellipse at 50% 100%, ${COLORS.orange}10 0%, transparent 50%)
 `
-
-// =============================================================================
-// HOOK: REDUCED MOTION DETECTION
-// =============================================================================
-function useReducedMotion() {
-  const [reducedMotion, setReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReducedMotion(mediaQuery.matches)
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return reducedMotion
-}
 
 // =============================================================================
 // ARCADE CABINET FRAME SVG - WORN METAL WITH BOLTS

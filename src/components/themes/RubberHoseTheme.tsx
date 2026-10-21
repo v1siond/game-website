@@ -14,6 +14,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useInViewTrigger } from '@/hooks/useScrollAnimation'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // ============================================================================
 // CUPHEAD COLOR PALETTE - Authentic 1930s Fleischer/Disney style
@@ -44,27 +45,6 @@ const CUPHEAD_COLORS = {
 }
 
 // ============================================================================
-// HOOK: Prefers Reduced Motion
-// ============================================================================
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-
-    const handler = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches)
-    }
-
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return prefersReducedMotion
-}
-
-// ============================================================================
 // COMPONENT: Cartoon Sprite with rubber hose animation
 // ============================================================================
 function CartoonSprite({
@@ -77,7 +57,7 @@ function CartoonSprite({
   className?: string
 }) {
   const [frame, setFrame] = useState(0)
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (reducedMotion) return
@@ -125,7 +105,7 @@ function CartoonSprite({
 // COMPONENT: Vintage Ornaments (profession-specific decorations)
 // ============================================================================
 function VintageOrnaments({ profession }: { profession: 'engineer' | 'drummer' | 'fighter' }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   const ornamentsByProfession = {
     engineer: [
@@ -185,7 +165,7 @@ function SplashRevealSection({
   const ref = useRef<HTMLDivElement>(null)
   const hasEntered = useInViewTrigger(ref, { threshold: 0.15 })
   const [phase, setPhase] = useState<'hidden' | 'splashing' | 'revealed'>('hidden')
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (hasEntered && phase === 'hidden') {
@@ -240,7 +220,7 @@ function SplashRevealSection({
 // COMPONENT: Film Reel Border with animated sprocket holes
 // ============================================================================
 function FilmReelBorder() {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   return (
     <>
@@ -289,7 +269,7 @@ function FilmReelBorder() {
 // ============================================================================
 function FilmEffects() {
   const [scratches, setScratches] = useState<Array<{ id: number; x: number; height: number; opacity: number }>>([])
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (reducedMotion) return
@@ -384,7 +364,7 @@ function FilmEffects() {
 // COMPONENT: Floating Music Notes (jazz age decoration)
 // ============================================================================
 function FloatingMusicNotes() {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   const notes = useMemo(() => {
     const noteTypes = ['\u{266A}', '\u{266B}', '\u{266C}', '\u{2669}']
@@ -428,7 +408,7 @@ function FloatingMusicNotes() {
 // ============================================================================
 function PieEyeFace({ position, size = 60 }: { position: { x: number; y: number }; size?: number }) {
   const [isBlinking, setIsBlinking] = useState(false)
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (reducedMotion) return
@@ -509,7 +489,7 @@ function PieEyeFace({ position, size = 60 }: { position: { x: number; y: number 
 // COMPONENT: Bouncing Ball with squash and stretch
 // ============================================================================
 function BouncingBall({ initialX, delay }: { initialX: number; delay: number }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   if (reducedMotion) return null
 
@@ -537,7 +517,7 @@ function BouncingBall({ initialX, delay }: { initialX: number; delay: number }) 
 // COMPONENT: Rubber Hose Arm decoration
 // ============================================================================
 function RubberHoseArm({ side, y }: { side: 'left' | 'right'; y: number }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   if (reducedMotion) return null
 
@@ -594,7 +574,7 @@ function InkSplash({ x, y }: { x: number; y: number }) {
 // COMPONENT: Cartoon Title with bouncing letters
 // ============================================================================
 function CartoonTitle({ text, subtitle }: { text: string; subtitle?: string }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   return (
     <div className="text-center">
@@ -640,7 +620,7 @@ const CARTOON_ICONS: Record<Profession, string> = {
 }
 
 function CartoonCharacter({ id, label, selected, optionProps }: ProfessionOption) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   return (
     <button
@@ -741,7 +721,7 @@ function DecorativeBanner({ children }: { children: React.ReactNode }) {
 // COMPONENT: Tech Stack Cloud
 // ============================================================================
 function TechBubbleCloud({ categories }: { categories: CVData['techStack'] }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   return (
     <div className="space-y-6">
@@ -781,7 +761,7 @@ function TechBubbleCloud({ categories }: { categories: CVData['techStack'] }) {
 // The ink splash a poster throws when the pointer lands on it.
 function useInkSplash() {
   const [splash, setSplash] = useState<{ x: number; y: number } | null>(null)
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   const onMouseEnter = (e: React.MouseEvent) => {
     if (reducedMotion) return
@@ -850,7 +830,7 @@ function CompanyPoster({ company }: { company: CVData['companies'][number] }) {
 // COMPONENT: Band Record (vinyl record label style): his role, the years and the release
 // ============================================================================
 function BandRecord({ band, years, linkProps }: BandSlot) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
   const { splash, onMouseEnter } = useInkSplash()
 
   const content = (
@@ -978,7 +958,7 @@ function ExperienceCard({ entry }: { entry: Job }) {
 // COMPONENT: Art Section - Cuphead themed decorative break
 // ============================================================================
 function ArtSection({ variant = 'filmReel' }: { variant?: 'filmReel' | 'musicNotes' | 'bouncingBalls' }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   if (variant === 'filmReel') {
     // Film reel with sprocket holes and vintage film elements
@@ -1192,7 +1172,7 @@ function ArtSection({ variant = 'filmReel' }: { variant?: 'filmReel' | 'musicNot
 // COMPONENT: Project Poster (vintage movie/show poster style): his role, the result line and the links
 // ============================================================================
 function VintagePoster({ project, years, links }: ProjectSlot) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   return (
     <article

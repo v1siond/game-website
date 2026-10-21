@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useReducedMotion } from './motion'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { CircuitPattern } from './effects'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'

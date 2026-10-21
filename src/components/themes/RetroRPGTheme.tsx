@@ -12,6 +12,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProfessionSections } from '@/lib/cv/cvView'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 // =============================================================================
 // CHRONO TRIGGER EXACT COLOR PALETTE
@@ -60,27 +61,6 @@ const CT_COLORS = {
 }
 
 // =============================================================================
-// ACCESSIBILITY HOOKS
-// =============================================================================
-function usePrefersReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setPrefersReducedMotion(mediaQuery.matches)
-
-    const handler = (event: MediaQueryListEvent) => {
-      setPrefersReducedMotion(event.matches)
-    }
-
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [])
-
-  return prefersReducedMotion
-}
-
-// =============================================================================
 // PIXEL ART SVG COMPONENTS - CHRONO TRIGGER STYLE
 // =============================================================================
 
@@ -94,7 +74,7 @@ function TimePortal({
   animate?: boolean
   className?: string
 }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
   const shouldAnimate = animate && !reducedMotion
 
   return (
@@ -253,7 +233,7 @@ function FrogPixelArt({ size = 64 }: { size?: number }) {
 
 // Epoch Time Machine
 function EpochPixelArt({ size = 100 }: { size?: number }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   return (
     <div
@@ -286,7 +266,7 @@ function EpochPixelArt({ size = 100 }: { size?: number }) {
 
 // Lavos (Final Boss Motif) - For dramatic elements
 function LavosEye({ size = 80, animate = true }: { size?: number; animate?: boolean }) {
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
   const shouldAnimate = animate && !reducedMotion
 
   return (
@@ -1008,7 +988,7 @@ export default function RetroRPGTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const [mounted, setMounted] = useState(false)
-  const reducedMotion = usePrefersReducedMotion()
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     setMounted(true)
