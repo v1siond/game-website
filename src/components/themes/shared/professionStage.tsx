@@ -773,12 +773,16 @@ function paletteFromColors(c: { background: string; accent: string; secondary: s
   }
 }
 
-/** Renders the profession boss-stage in any world, recoloured from its theme. Dark Fantasy
- *  renders its own hand-tuned set, so we skip it here to avoid doubling up. */
+// Worlds that draw their own profession stages (Dark Fantasy's hand tuned set, Neon Cyber's scroll
+// scenes); the shared stage would double them, so it stays out of these.
+const WORLDS_WITH_OWN_STAGE = new Set(['dark-fantasy', 'neon-cyber'])
+
+/** Renders the profession boss-stage in any world, recoloured from its theme, except the worlds that
+ *  draw their own. */
 export default function GlobalProfessionStage() {
   const { theme } = useTheme()
   const { active } = useProfession()
-  if (theme.id === 'dark-fantasy') return null
+  if (WORLDS_WITH_OWN_STAGE.has(theme.id)) return null
   const p = paletteFromColors(theme.colors)
   return <ProfessionStage profession={active} p={p} />
 }

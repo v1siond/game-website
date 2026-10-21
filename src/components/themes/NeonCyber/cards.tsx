@@ -1,90 +1,63 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { useReducedMotion } from './motion'
 import { CircuitPattern } from './effects'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { CVData, Job } from '@/lib/cv/content'
 
-// Cyber panel with neon border and holographic effect - Arasaka/Militech corporate UI
+export type PanelAccent = 'yellow' | 'green' | 'cyan' | 'magenta' | 'violet' | 'red' | 'orange'
+
+// Each accent as the classes it paints and the hex the circuit pattern strokes with. Static
+// classes only: no blur, no animated glow, so a panel costs nothing while the page scrolls.
+const PANEL_ACCENT: Record<PanelAccent, { text: string; border: string; dot: string; rule: string; hex: string }> = {
+  yellow: { text: 'text-[#ffff00]', border: 'border-[#ffff00]', dot: 'bg-[#ffff00]', rule: 'from-[#ffff00]/40', hex: '#ffff00' },
+  green: { text: 'text-[#00ff66]', border: 'border-[#00ff66]', dot: 'bg-[#00ff66]', rule: 'from-[#00ff66]/40', hex: '#00ff66' },
+  cyan: { text: 'text-[#00ffff]', border: 'border-[#00ffff]', dot: 'bg-[#00ffff]', rule: 'from-[#00ffff]/40', hex: '#00ffff' },
+  magenta: { text: 'text-[#ff00ff]', border: 'border-[#ff00ff]', dot: 'bg-[#ff00ff]', rule: 'from-[#ff00ff]/40', hex: '#ff00ff' },
+  violet: { text: 'text-[#b388e6]', border: 'border-[#9966cc]', dot: 'bg-[#9966cc]', rule: 'from-[#9966cc]/40', hex: '#9966cc' },
+  orange: { text: 'text-[#ff6600]', border: 'border-[#ff6600]', dot: 'bg-[#ff6600]', rule: 'from-[#ff6600]/40', hex: '#ff6600' },
+  red: { text: 'text-[#ff3385]', border: 'border-[#ff0066]', dot: 'bg-[#ff0066]', rule: 'from-[#ff0066]/40', hex: '#ff0066' },
+}
+
+const panelId = (title: string) => `panel-${title.toLowerCase().replace(/\s+/g, '-')}`
+
+// Cyber panel with neon border and circuit corners - Arasaka/Militech corporate UI
 export function CyberPanel({
   title,
   children,
-  accentColor = '#ff00ff',
-  holographic = false,
-  megacorpStyle = false
+  accent,
+  megacorpStyle = false,
 }: {
   title: string
-  children: React.ReactNode
-  accentColor?: string
-  holographic?: boolean
+  children: ReactNode
+  accent: PanelAccent
   megacorpStyle?: boolean
 }) {
-  const reducedMotion = useReducedMotion()
+  const look = PANEL_ACCENT[accent]
 
   return (
-    <section
-      className="relative group"
-      aria-labelledby={`panel-${title.toLowerCase().replace(/\s+/g, '-')}`}
-    >
-      {/* Glow effect */}
-      {!reducedMotion && (
-        <div
-          className="absolute -inset-0.5 opacity-40 blur-sm group-hover:opacity-60 transition-opacity"
-          style={{ background: `linear-gradient(45deg, ${accentColor}, #00ffff)` }}
-          aria-hidden="true"
-        />
-      )}
+    <section className="relative" aria-labelledby={panelId(title)}>
+      {megacorpStyle && <CircuitPattern color={look.hex} />}
 
-      {/* Circuit pattern border */}
-      {megacorpStyle && <CircuitPattern color={accentColor} />}
-
-      {/* Panel */}
-      <div
-        className={`relative p-4 ${holographic ? 'backdrop-blur-sm' : ''}`}
-        style={{
-          background: holographic
-            ? `linear-gradient(135deg, rgba(10, 5, 18, 0.85), rgba(20, 10, 30, 0.75))`
-            : 'rgba(10, 5, 18, 0.95)',
-          border: `1px solid ${accentColor}`,
-          boxShadow: `inset 0 0 30px rgba(0,0,0,0.5), 0 0 20px ${accentColor}30`,
-        }}
-      >
+      <div className={`relative p-4 border bg-[#0a0512]/95 shadow-[inset_0_0_30px_rgba(0,0,0,0.5)] ${look.border}`}>
         {/* Corner accents with circuit lines */}
-        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2" style={{ borderColor: '#00ffff' }} aria-hidden="true" />
-        <div className="absolute top-2 left-8 w-4 h-px" style={{ background: '#00ffff' }} aria-hidden="true" />
-        <div className="absolute top-8 left-2 w-px h-4" style={{ background: '#00ffff' }} aria-hidden="true" />
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400" aria-hidden="true" />
+        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-cyan-400" aria-hidden="true" />
+        <div className={`absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 ${look.border}`} aria-hidden="true" />
+        <div className={`absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 ${look.border}`} aria-hidden="true" />
 
-        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2" style={{ borderColor: '#00ffff' }} aria-hidden="true" />
-        <div className="absolute top-2 right-8 w-4 h-px" style={{ background: '#00ffff' }} aria-hidden="true" />
-        <div className="absolute top-8 right-2 w-px h-4" style={{ background: '#00ffff' }} aria-hidden="true" />
-
-        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2" style={{ borderColor: accentColor }} aria-hidden="true" />
-        <div className="absolute bottom-2 left-8 w-4 h-px" style={{ background: accentColor }} aria-hidden="true" />
-        <div className="absolute bottom-8 left-2 w-px h-4" style={{ background: accentColor }} aria-hidden="true" />
-
-        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2" style={{ borderColor: accentColor }} aria-hidden="true" />
-        <div className="absolute bottom-2 right-8 w-4 h-px" style={{ background: accentColor }} aria-hidden="true" />
-        <div className="absolute bottom-8 right-2 w-px h-4" style={{ background: accentColor }} aria-hidden="true" />
-
-        {/* Title with data overlay style */}
         <header className="flex items-center gap-2 mb-4 pb-2 border-b border-white/10">
-          <div className="flex items-center gap-1" aria-hidden="true">
-            <div
-              className={`w-2 h-2 rounded-full ${reducedMotion ? '' : 'animate-pulse'}`}
-              style={{ background: accentColor, boxShadow: `0 0 10px ${accentColor}` }}
-            />
-            <div className="w-1 h-1 rounded-full opacity-60" style={{ background: accentColor }} />
-            <div className="w-1 h-1 rounded-full opacity-30" style={{ background: accentColor }} />
-          </div>
-          <h2
-            id={`panel-${title.toLowerCase().replace(/\s+/g, '-')}`}
-            className="text-sm tracking-[0.3em] uppercase"
-            style={{ color: accentColor }}
-          >
+          <span className="flex items-center gap-1" aria-hidden="true">
+            <span className={`w-2 h-2 rounded-full ${look.dot}`} />
+            <span className={`w-1 h-1 rounded-full opacity-60 ${look.dot}`} />
+            <span className={`w-1 h-1 rounded-full opacity-30 ${look.dot}`} />
+          </span>
+          <h2 id={panelId(title)} className={`text-sm tracking-[0.3em] uppercase ${look.text}`}>
             {'//'} {title}
           </h2>
-          <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${accentColor}40, transparent)` }} aria-hidden="true" />
+          <span className={`flex-1 h-px bg-gradient-to-r to-transparent ${look.rule}`} aria-hidden="true" />
         </header>
 
         {children}
@@ -102,7 +75,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block relative group"
+      className="block relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
       aria-label={`${company.name}: ${company.tagline}. ${company.description}`}
     >
       <div
@@ -117,11 +90,6 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
         <div className="absolute top-0 right-0 w-4 h-4 border-t border-r border-cyan-400/50" aria-hidden="true" />
         <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-pink-500/50" aria-hidden="true" />
 
-        {/* Megacorp logo area */}
-        <div className="absolute top-1 right-5 text-[6px] text-cyan-400/30 font-mono" aria-hidden="true">
-          CORP_ID:{company.id.toUpperCase().slice(0, 4)}
-        </div>
-
         <div className="flex items-center gap-3 mb-3">
           <span className="text-2xl" role="img" aria-hidden="true">{company.icon}</span>
           <div>
@@ -131,7 +99,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
             <p className="text-sm text-pink-500">{company.tagline}</p>
           </div>
         </div>
-        <p className="text-xs text-white/70 mb-3">{company.description}</p>
+        <p className="text-sm text-white/80 mb-3">{company.description}</p>
         <div className="flex flex-wrap gap-1">
           {company.services.slice(0, 3).map((service) => (
             <span
@@ -141,14 +109,6 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
               {service}
             </span>
           ))}
-        </div>
-
-        {/* External link indicator */}
-        <div
-          className="absolute top-2 right-6 text-sm text-cyan-400/50 group-hover:text-cyan-400 transition-colors"
-          aria-hidden="true"
-        >
-          [LINK]
         </div>
       </div>
     </a>
@@ -305,7 +265,7 @@ export function TechCategory({ category }: { category: CVData['techStack'][numbe
         <span className="text-base" role="img" aria-hidden="true">{category.icon}</span>
         <h3
           id={`tech-cat-${category.name.toLowerCase().replace(/\s+/g, '-')}`}
-          className="text-xs text-pink-500 tracking-wider font-mono"
+          className="text-sm text-pink-500 tracking-wider font-mono"
         >
           {category.name.toUpperCase()}
         </h3>

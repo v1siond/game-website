@@ -1,7 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
+import type { ReactNode } from 'react'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -9,7 +8,8 @@ import { PROFESSION_LABELS, type Profession } from '@/lib/cv/professions'
 import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { CompanyCard, BandCard, CyberPanel, ExperienceCard, ProjectCard, TechCategory } from './cards'
-import { CyberArtSection } from './backdrop'
+import { ScrollScene } from '@/components/scroll/ScrollScene'
+import { LevelStrip, SceneItem, TravelScene } from './scenes'
 
 // The cyberware slot each profession's selector option shows.
 export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> = {
@@ -21,87 +21,73 @@ export const PROFESSION_CYBERWARE: Record<Profession, 'chip' | 'jack' | 'arm'> =
 // The selector's state line reads the profession the way the terminal would type it.
 export const terminalName = (profession: Profession): string => PROFESSION_LABELS[profession].toUpperCase().replace(/\s+/g, '_')
 
-// Email is the lit primary action, LinkedIn the outlined one.
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-pink-500 text-black hover:bg-pink-400',
-  linkedin: 'border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black',
-}
-
-const HUD_BUTTON =
-  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 [clip-path:polygon(8px_0,100%_0,calc(100%-8px)_100%,0_100%)]'
-
-export function HeroAction({ action }: { action: HeroActionSlot }) {
-  return (
-    <a {...action.linkProps} className={`${HUD_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
-      [{action.label.toUpperCase()}]
-    </a>
-  )
-}
-
-export function CVLink() {
-  return (
-    <Link href="/cv" className={`${HUD_BUTTON} border border-white/60 text-white hover:bg-white hover:text-black`}>
-      [GET_THE_CV]
-    </Link>
-  )
-}
-
 type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+// About, Tech Stack and Ventures fade in; the work sections are levels he crosses.
+function FadeIn({ children }: { children: ReactNode }) {
+  return <ScrollScene className="mb-8">{children}</ScrollScene>
+}
 
 export function EngineerPanels({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary, companies } = useCVData()
 
   return (
     <>
-      <div className="mb-8">
-        <CyberPanel title="About" accentColor="#ffff00" holographic>
+      <FadeIn>
+        <CyberPanel title="About" accent="yellow">
           <p className="text-sm text-white/80 leading-relaxed font-mono">{professionalSummary.bio}</p>
         </CyberPanel>
-      </div>
-
-      <CyberArtSection variant="neon" />
+      </FadeIn>
 
       {sections.jobs.length > 0 && (
-        <div className="mb-8">
-          <CyberPanel title="Work Experience" accentColor="#00ff66" holographic>
-            <div className="space-y-3">
+        <TravelScene>
+          <LevelStrip profession="engineer" zone="record" />
+          <CyberPanel title="Work Experience" accent="green">
+            <ul className="space-y-4">
               {sections.jobs.map((entry) => (
-                <ExperienceCard key={entry.id} entry={entry} />
+                <li key={entry.id}>
+                  <SceneItem kind="terminal">
+                    <ExperienceCard entry={entry} />
+                  </SceneItem>
+                </li>
               ))}
-            </div>
+            </ul>
           </CyberPanel>
-        </div>
+        </TravelScene>
       )}
 
-      <CyberArtSection variant="circuit" />
-
-      <div className="mb-8">
-        <CyberPanel title="Tech Stack" accentColor="#00ffff" holographic megacorpStyle>
+      <FadeIn>
+        <CyberPanel title="Tech Stack" accent="cyan" megacorpStyle>
           {sections.techStack.map((category) => (
             <TechCategory key={category.id} category={category} />
           ))}
         </CyberPanel>
-      </div>
+      </FadeIn>
 
-      <div className="mb-8">
-        <CyberPanel title="Projects" accentColor="#ff00ff" holographic>
+      <TravelScene>
+        <LevelStrip profession="engineer" zone="work" />
+        <CyberPanel title="Projects" accent="magenta">
           <ProjectList
             projects={sections.projects}
-            className="grid md:grid-cols-2 gap-3"
-            renderProject={(slot) => <ProjectCard {...slot} />}
+            className="grid md:grid-cols-2 gap-4"
+            renderProject={(slot) => (
+              <SceneItem kind="billboard">
+                <ProjectCard {...slot} />
+              </SceneItem>
+            )}
           />
         </CyberPanel>
-      </div>
+      </TravelScene>
 
-      <div className="mb-8">
-        <CyberPanel title="Ventures" accentColor="#ff00ff" holographic megacorpStyle>
+      <FadeIn>
+        <CyberPanel title="Ventures" accent="magenta" megacorpStyle>
           <div className="grid md:grid-cols-3 gap-4">
             {companies.map((company) => (
               <CompanyCard key={company.id} company={company} />
             ))}
           </div>
         </CyberPanel>
-      </div>
+      </FadeIn>
     </>
   )
 }
@@ -110,22 +96,27 @@ export function MusicianPanels({ sections }: { sections: SectionsOf<'drummer'> }
   const { musician, bands } = sections
 
   return (
-    <div className="mb-8">
-      <CyberPanel title="Bands" accentColor="#9966cc" holographic>
+    <TravelScene>
+      <LevelStrip profession="drummer" zone="record" />
+      <CyberPanel title="Bands" accent="violet">
         <p className="text-sm text-white/80 font-mono mb-4">
           Drums since {musician.since}, {musician.yearsPlaying} years
         </p>
         <BandList
           bands={bands}
           className="grid md:grid-cols-2 gap-4"
-          renderBand={(slot: BandSlot) => <BandCard {...slot} />}
+          renderBand={(slot: BandSlot) => (
+            <SceneItem kind="billboard">
+              <BandCard {...slot} />
+            </SceneItem>
+          )}
         />
         <p className="text-sm text-white/80 font-mono mt-4">
           <span className="text-pink-400" aria-hidden="true">&gt; </span>
           {musician.line}
         </p>
       </CyberPanel>
-    </div>
+    </TravelScene>
   )
 }
 
@@ -133,28 +124,31 @@ export function MartialArtistPanels({ sections }: { sections: SectionsOf<'fighte
   const { martialArts } = sections
 
   return (
-    <div className="mb-8">
-      <CyberPanel title="Muay Thai" accentColor="#ff0066" holographic>
+    <TravelScene>
+      <LevelStrip profession="fighter" zone="record" />
+      <CyberPanel title="Muay Thai" accent="red">
         <h3 className="text-base text-pink-400 font-mono mb-4">{martialArts.primary.title}</h3>
         <MuayThaiRecord
           martialArts={martialArts}
           classNames={{
-            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+            facts: 'grid sm:grid-cols-2 gap-3 mb-6',
             fact: 'p-3 border border-white/10 bg-white/5',
             term: 'text-sm tracking-wider text-cyan-400 font-mono uppercase',
             value: 'text-sm text-white/90 mt-1',
-            achievements: 'space-y-1',
+            achievements: 'space-y-3',
             achievement: 'text-sm text-yellow-300 font-mono',
           }}
           renderAchievement={(achievement) => (
-            <>
-              <span className="text-pink-400" aria-hidden="true">&gt; </span>
-              {achievement}
-            </>
+            <SceneItem kind="billboard">
+              <p className="p-3 bg-black/60">
+                <span className="text-pink-400" aria-hidden="true">&gt; </span>
+                {achievement}
+              </p>
+            </SceneItem>
           )}
         />
       </CyberPanel>
-    </div>
+    </TravelScene>
   )
 }
 

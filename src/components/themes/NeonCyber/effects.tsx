@@ -72,50 +72,6 @@ export function GlitchText({
   )
 }
 
-// Flickering neon sign with Japanese text - Night City storefront style
-export function NeonSign({
-  text,
-  subtext,
-  color = '#ff00ff'
-}: {
-  text: string
-  subtext?: string
-  color?: string
-}) {
-  const [flicker, setFlicker] = useState(1)
-  const reducedMotion = useReducedMotion()
-
-  useEffect(() => {
-    if (reducedMotion) return
-
-    const interval = setInterval(() => {
-      if (Math.random() > 0.95) {
-        setFlicker(0.3 + Math.random() * 0.4)
-        setTimeout(() => setFlicker(1), 50 + Math.random() * 100)
-      }
-    }, 100)
-    return () => clearInterval(interval)
-  }, [reducedMotion])
-
-  return (
-    <div
-      className="text-center py-2"
-      style={{
-        opacity: reducedMotion ? 1 : flicker,
-        textShadow: `0 0 10px ${color}, 0 0 20px ${color}, 0 0 40px ${color}, 0 0 80px ${color}`,
-        color: color,
-      }}
-      role="presentation"
-      aria-label={`Neon sign: ${text}${subtext ? ` - ${subtext}` : ''}`}
-    >
-      <span className="text-2xl font-bold tracking-wider">{text}</span>
-      {subtext && (
-        <span className="block text-xs mt-1 opacity-70">{subtext}</span>
-      )}
-    </div>
-  )
-}
-
 // Terminal line with typing effect - V's quickhack interface style
 export function TerminalLine({
   prefix,
@@ -202,40 +158,6 @@ export function ScannerCorners({
   )
 }
 
-// Holographic shimmer effect - like holo-ads in Night City
-export function HolographicShimmer({
-  children,
-  intensity = 'normal'
-}: {
-  children: React.ReactNode
-  intensity?: 'low' | 'normal' | 'high'
-}) {
-  const reducedMotion = useReducedMotion()
-  const opacityMap = { low: 0.05, normal: 0.1, high: 0.15 }
-
-  return (
-    <div className="relative">
-      {children}
-      {!reducedMotion && (
-        <div
-          className="absolute inset-0 pointer-events-none animate-holo-shimmer"
-          style={{
-            background: `linear-gradient(
-              45deg,
-              transparent 30%,
-              rgba(0, 255, 255, ${opacityMap[intensity]}) 45%,
-              rgba(255, 0, 255, ${opacityMap[intensity]}) 55%,
-              transparent 70%
-            )`,
-            backgroundSize: '200% 200%',
-          }}
-          aria-hidden="true"
-        />
-      )}
-    </div>
-  )
-}
-
 // Circuit board pattern background - tech infrastructure visual
 export function CircuitPattern({ color = '#ff00ff' }: { color?: string }) {
   return (
@@ -271,7 +193,7 @@ export function CyberwareIcon({ type }: { type: 'eye' | 'arm' | 'chip' | 'jack' 
   }
   return (
     <span
-      className="text-cyan-400 text-xs"
+      className="text-cyan-400 text-sm"
       style={{ textShadow: '0 0 5px #00ffff' }}
       role="img"
       aria-label={`${type} cyberware`}
@@ -290,7 +212,7 @@ export function ChromaticBorder({ children }: { children: React.ReactNode }) {
       {!reducedMotion && (
         <>
           <div
-            className="absolute -inset-px opacity-50 blur-[1px]"
+            className="absolute -inset-px opacity-50"
             style={{
               background: 'linear-gradient(45deg, #ff0066, transparent, #00ffff)',
               transform: 'translate(-2px, 0)',
@@ -298,7 +220,7 @@ export function ChromaticBorder({ children }: { children: React.ReactNode }) {
             aria-hidden="true"
           />
           <div
-            className="absolute -inset-px opacity-50 blur-[1px]"
+            className="absolute -inset-px opacity-50"
             style={{
               background: 'linear-gradient(45deg, #00ffff, transparent, #ff0066)',
               transform: 'translate(2px, 0)',
