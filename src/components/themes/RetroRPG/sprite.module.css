@@ -1,0 +1,188 @@
+/*
+ * His room walker sprite (walker.tsx): crisp pixels, frames that swap by opacity in one step, the sprite
+ * moved whole by transform. The game runs on a locked frame clock, so nothing eases.
+ */
+
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* ---- the stage: he faces the pointer, a hover is a battle moment ---- */
+
+/* --mx runs -1 to 1 (the shared pointer hook); past a third of the way to a side he turns to it. */
+.faceRight {
+  opacity: clamp(0, (var(--mx, 0) - 0.3) * 100, 1);
+}
+
+.faceLeft {
+  opacity: clamp(0, (-0.3 - var(--mx, 0)) * 100, 1);
+}
+
+.faceDown {
+  opacity: clamp(0, 1 - clamp(0, (var(--mx, 0) - 0.3) * 100, 1) - clamp(0, (-0.3 - var(--mx, 0)) * 100, 1), 1);
+}
+
+/* His eyes shut for one frame now and then. */
+@keyframes blink {
+  0%, 92%, 100% { opacity: 0; }
+  94% { opacity: 1; }
+}
+
+.blink {
+  opacity: 0;
+  animation: blink 3600ms steps(1, end) infinite;
+}
+
+.actA,
+.actB,
+.soul,
+.savedSoul {
+  opacity: 0;
+}
+
+/* Two frames on the beat: frame A, then frame B, each held. */
+@keyframes frameA {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes frameB {
+  0%, 49% { opacity: 0; }
+  50%, 100% { opacity: 1; }
+}
+
+.battle:hover .stand {
+  opacity: 0;
+}
+
+.battle:hover .actA {
+  animation: frameA 480ms steps(1, end) infinite;
+}
+
+.battle:hover .actB {
+  animation: frameB 480ms steps(1, end) infinite;
+}
+
+/* His soul flickers on his chest the way it leaves the body when a battle starts. */
+@keyframes soulShow {
+  0%, 30%, 60%, 100% { opacity: 1; }
+  15%, 45% { opacity: 0; }
+}
+
+.battle:hover .soul {
+  animation: soulShow 600ms steps(1, end) both;
+}
+
+/* ---- walking in: two step frames while the parent says he walks, then he stands ---- */
+
+.stepA,
+.stepB {
+  opacity: 0;
+}
+
+[data-phase='walk'] .stepA,
+[data-walk='on'] .stepA {
+  animation: frameA 320ms steps(1, end) infinite;
+}
+
+[data-phase='walk'] .stepB,
+[data-walk='on'] .stepB {
+  animation: frameB 320ms steps(1, end) infinite;
+}
+
+[data-phase='walk'] .arrived,
+[data-walk='on'] .arrived,
+[data-walk='idle'] .arrived {
+  opacity: 0;
+}
+
+/* The room: he crosses three tiles from the left, a tile a step. */
+@keyframes walkInRight {
+  from { transform: translateX(-72px); }
+  to { transform: translateX(0); }
+}
+
+[data-phase='wait'] .walksRight {
+  transform: translateX(-72px);
+}
+
+[data-phase='walk'] .walksRight {
+  animation: walkInRight 600ms steps(6, end) both;
+}
+
+/* The save point: he walks up to the star from below. */
+@keyframes walkInUp {
+  from { transform: translateY(36px); }
+  to { transform: translateY(0); }
+}
+
+[data-walk='idle'] .walksUp {
+  opacity: 0;
+}
+
+[data-walk='on'] .walksUp {
+  animation: walkInUp 900ms steps(6, end) both;
+}
+
+/* ---- the save: the determination sparkle, his soul lit ---- */
+
+@keyframes sparkle {
+  0% { opacity: 0; transform: scale(0); }
+  25% { opacity: 1; transform: scale(1.4); }
+  75% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+.sparkle {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: sparkle 900ms steps(4, end) both;
+}
+
+.sparkle:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.sparkle:nth-child(3) {
+  animation-delay: 300ms;
+}
+
+[data-saved='true'] .savedSoul {
+  animation: soulShow 600ms steps(1, end) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink,
+  .stepA,
+  .stepB,
+  .walksRight,
+  .walksUp,
+  .sparkle,
+  .battle:hover .actA,
+  .battle:hover .actB,
+  .battle:hover .soul,
+  [data-saved='true'] .savedSoul {
+    animation: none !important;
+  }
+
+  .walksRight,
+  .walksUp {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .stepA,
+  .stepB,
+  .sparkle {
+    opacity: 0 !important;
+  }
+
+  .arrived {
+    opacity: 1 !important;
+  }
+
+  .battle:hover .actA {
+    opacity: 1;
+  }
+}

@@ -5,7 +5,9 @@ import type { Profession } from '@/lib/cv/professions'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePreview } from '@/themes/PreviewContext'
-import { HeroCharacter } from './character'
+import { usePointerVars } from '@/hooks/usePointerVars'
+import { RoomWalker, StageWalker } from './walker'
+import sprite from './sprite.module.css'
 import { RPG } from './palette'
 import type { Play } from './play'
 import { Soul } from './soul'
@@ -13,11 +15,12 @@ import world from './world.module.css'
 
 // The hero entrance, played as the game's encounter start, once, when the hero first shows:
 //
-//   alert  0ms     him in the violet room, the exclamation mark pops over his head
-//   cut    700ms   the room cuts to black, the red heart blinks three times where he stood
-//   open   1250ms  the heart drops toward the box, the battle backdrop and his sprite step in, the box
+//   walk   0ms     he walks into the violet room from the left, three tiles in two step frames
+//   alert  600ms   he stops facing down, the exclamation mark pops over his head
+//   cut    1300ms  the room cuts to black, the red heart blinks three times where he stood
+//   open   1850ms  the heart drops toward the box, the battle backdrop and his sprite step in, the box
 //                  opens as a line then full height and its lines type (the CSS reveal, data-play="on")
-//   ready  3700ms  everything rests on its last frame (data-play="done")
+//   ready  4300ms  everything rests on its last frame (data-play="done")
 //
 // Pattern: setTimeout phases (a fixed choreography, no per frame values), each phase a data-phase value
 // the CSS reads; every move is a steps() keyframe on transform or opacity. Reduced motion and a World
@@ -26,17 +29,19 @@ import world from './world.module.css'
 // A profession switch replays two things on top: the screen flashes white once and his sprite turns
 // through four hard frames into the new outfit.
 
-type Phase = 'wait' | 'alert' | 'cut' | 'open' | 'ready'
+type Phase = 'wait' | 'walk' | 'alert' | 'cut' | 'open' | 'ready'
 
 const PHASE_AT: ReadonlyArray<readonly [Phase, number]> = [
-  ['alert', 0],
-  ['cut', 700],
-  ['open', 1250],
-  ['ready', 3700],
+  ['walk', 0],
+  ['alert', 600],
+  ['cut', 1300],
+  ['open', 1850],
+  ['ready', 4300],
 ]
 
 const PLAY_OF: Record<Phase, Play> = {
   wait: 'idle',
+  walk: 'idle',
   alert: 'idle',
   cut: 'idle',
   open: 'on',
@@ -60,7 +65,7 @@ function useEncounterPhase() {
     return () => timers.forEach(window.clearTimeout)
   }, [triggered, skip])
 
-  return { ref, phase }
+  return { ref, phase, skip }
 }
 
 /** Counts profession switches after the first render, so the flash and the turn play only on a switch. */
@@ -168,17 +173,18 @@ interface EncounterProps {
 }
 
 export function Encounter({ profession, children }: EncounterProps) {
-  const { ref, phase } = useEncounterPhase()
+  const { ref, phase, skip } = useEncounterPhase()
   const switches = useSwitchCount(profession)
+  const pointer = usePointerVars(!skip)
 
   return (
     <div ref={ref} data-phase={phase} data-play={PLAY_OF[phase]} className="relative mx-auto max-w-3xl">
       {/* the monster area: the backdrop and him */}
-      <div className={`relative h-44 overflow-hidden sm:h-56 ${world.stage}`} aria-hidden="true">
+      <div ref={pointer} className={`relative h-44 overflow-hidden sm:h-56 ${world.stage} ${sprite.battle}`} aria-hidden="true">
         <BattleBackdrop />
         <div className="absolute inset-x-0 bottom-2 flex justify-center">
           <div key={profession} className={switches > 0 ? world.turns : ''}>
-            <HeroCharacter profession={profession} className={`h-32 w-[86px] sm:h-40 sm:w-[107px] ${world.idle}`} />
+            <StageWalker profession={profession} className={`h-[120px] w-20 sm:h-[150px] sm:w-[100px] ${world.idle}`} />
           </div>
         </div>
       </div>
@@ -191,7 +197,7 @@ export function Encounter({ profession, children }: EncounterProps) {
           <Room />
           <div className="absolute inset-x-0 bottom-4 flex flex-col items-center">
             <Alert />
-            <HeroCharacter profession={profession} className="h-24 w-16 sm:h-28 sm:w-[75px]" />
+            <RoomWalker profession={profession} facing="right" className={`h-[90px] w-[60px] sm:h-[120px] sm:w-20 ${sprite.walksRight}`} />
           </div>
         </div>
       </div>

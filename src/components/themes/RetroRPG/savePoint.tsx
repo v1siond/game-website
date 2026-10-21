@@ -8,13 +8,18 @@ import { ActionOptions } from './actions'
 import { BODY, Box, Mark, Typed } from './panels'
 import { PIXEL, RPG } from './palette'
 import { usePlay } from './play'
+import { RoomWalker, Sparkles } from './walker'
 import world from './world.module.css'
+import sprite from './sprite.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 
 // Contact as the save point: the yellow star twinkles over the closing box the way the game's save
 // point flickers in its room. Clicking the star saves: it spins once fast, the box flashes white and
 // stays in its saved state (yellow border, the star lit), and the box shows the save line, his name
 // beside the profession, over the contact line and the options.
+//
+// He walks up to the star from below when the section shows (two step frames, facing up); a save is his
+// determination: pixel sparkles burst round him and his soul flickers on his chest.
 //
 // Pattern: CSS loops for the twinkle (steps(), opacity and a scaleX turn), one click state (data-saved)
 // that plays the spin and the flash once per click (the key replays them). The box opens with the same
@@ -40,11 +45,12 @@ export function SavePoint({ profession }: { profession: Profession }) {
   const [saves, setSaves] = useState(0)
   const saved = saves > 0
   const { ref, play } = usePlay(2400)
+  const walk = usePlay(900)
 
   return (
     <section ref={ref} data-play={play} data-saved={saved} className="relative z-20 px-4 pb-8 pt-16 sm:px-6" aria-labelledby={CONTACT_HEADING}>
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex justify-center">
+        <div className="mb-2 flex justify-center">
           <button
             type="button"
             onClick={() => setSaves((n) => n + 1)}
@@ -55,6 +61,11 @@ export function SavePoint({ profession }: { profession: Profession }) {
               <SaveStar />
             </span>
           </button>
+        </div>
+
+        <div ref={walk.ref} data-walk={walk.play} className="relative mx-auto mb-4 h-[60px] w-10" aria-hidden="true">
+          <RoomWalker profession={profession} facing="up" className={`h-full w-full ${sprite.walksUp}`} />
+          {saved && <Sparkles key={saves} className="absolute -inset-4" />}
         </div>
 
         <RecruiterHero

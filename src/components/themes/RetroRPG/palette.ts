@@ -49,17 +49,15 @@ export const RPG = {
   // The save star's light.
   starCore: '#fffbe0',
   starGlow: '#ffd23c',
-  // His clothes and the props he carries, in flat pixel colours.
-  tunic: '#3a6fd8',
-  stripe: '#9a5ad8',
-  vest: '#c43a3a',
-  trousers: '#3a2e52',
-  boot: '#5a3a24',
-  belt: '#ffff3c',
-  shorts: '#d83030',
-  glove: '#c41818',
-  stick: '#efe0b0',
-  eye: '#000000',
+  // His sprite (sprite.ts): the room's dark brown outline, his hair and beard lifted to read on black, the
+  // blue sweater with its two magenta stripes, brown shorts, the sticks' wood and the snare's red shell.
+  spriteLine: '#1e0f0c',
+  spriteHair: '#45261f',
+  sweater: '#67a4e0',
+  sweaterStripe: '#e607f8',
+  spriteShorts: '#7a4a26',
+  stickWood: '#efe0b0',
+  snare: '#c43a3a',
 } as const
 
 /** The palette as CSS variables (--rpg-void, --rpg-soul and so on), set once on the world's root. */
