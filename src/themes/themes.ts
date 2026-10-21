@@ -34,11 +34,11 @@ export interface Theme {
 }
 
 export const themes: Theme[] = [
-  // 1. Dark Fantasy (DEFAULT) - Hollow Knight/Iconoclast
+  // 1. Dark Fantasy - an ethereal ruined kingdom
   {
     id: 'dark-fantasy',
     name: 'Dark Fantasy',
-    description: 'Hollow Knight - ethereal interconnected map',
+    description: 'Ethereal ruined kingdom - an interconnected map',
     colors: {
       background: '#0f0a1a',
       backgroundGradient: 'linear-gradient(to bottom, #0f0a1a, #1a1025)',
@@ -64,11 +64,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 2. Survival Horror - Dark mansion, inventory grid
+  // 2. Survival Horror - dark mansion, inventory grid
   {
     id: 'survival-horror',
     name: 'Survival Horror',
-    description: 'Resident Evil - dark mansion, typewriter saves',
+    description: 'Dark mansion - typewriter saves, inventory grid',
     colors: {
       background: '#0a0805',
       backgroundGradient: 'linear-gradient(to bottom, #1a1510, #0a0805)',
@@ -94,11 +94,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 3. Neon Portals - Crash Bandicoot warp room
+  // 3. Neon Portals - orange and blue portals between dimensions
   {
     id: 'neon-portals',
     name: 'Neon Portals',
-    description: 'Crash Bandicoot - glowing circular portals',
+    description: 'Glowing portals - test chambers and light grids',
     colors: {
       background: '#0a0520',
       backgroundGradient: 'linear-gradient(to bottom, #150a30, #0a0520)',
@@ -124,11 +124,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 4. Soul Map - Metroidvania interconnected zones
+  // 4. Soul Map - interconnected zones
   {
     id: 'soul-map',
     name: 'Soul Map',
-    description: 'Metroidvania - interconnected zones reveal',
+    description: 'Interconnected zones that reveal as you explore',
     colors: {
       background: '#0d0d12',
       backgroundGradient: 'linear-gradient(to bottom, #14141f, #0d0d12)',
@@ -154,7 +154,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 5. Adventure Paths - an explorer's map at dusk, colours from its own palette
+  // 5. Adventure Paths - an explorer's map at dusk
   {
     id: 'adventure-paths',
     name: 'Adventure Paths',
@@ -184,11 +184,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 6. Rubber Hose - 1930s Cuphead cartoon
+  // 6. Rubber Hose - 1930s rubber hose cartoon
   {
     id: 'rubber-hose',
     name: 'Rubber Hose',
-    description: 'Cuphead - 1930s cartoon, film grain',
+    description: '1930s rubber hose cartoon - film grain',
     colors: {
       background: '#f5e6c8',
       backgroundGradient: 'linear-gradient(to bottom, #f5e6c8, #e8d4b0)',
@@ -214,11 +214,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 7. Retro RPG - Undertale black/white/yellow
+  // 7. Retro RPG - black, white and yellow battle menu
   {
     id: 'retro-rpg',
     name: 'Retro RPG',
-    description: 'Undertale - battle menu, determination',
+    description: 'Pixel battle menu - black, white and yellow',
     colors: {
       background: '#000000',
       backgroundGradient: 'linear-gradient(to bottom, #0a0a0a, #000000)',
@@ -244,11 +244,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 8. Bold Noir - Persona 5 red/black
+  // 8. Bold Noir - red and black, skewed angles
   {
     id: 'bold-noir',
     name: 'Bold Noir',
-    description: 'Persona 5 - red/black, skewed angles',
+    description: 'Red and black - skewed angles, sharp menus',
     colors: {
       background: '#0a0a0a',
       backgroundGradient: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
@@ -274,11 +274,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 9. Fighter Select - Street Fighter character grid
+  // 9. Fighter Select - arcade character grid
   {
     id: 'fighter-select',
     name: 'Fighter Select',
-    description: 'Street Fighter - character select grid',
+    description: 'Arcade fighter - character select grid',
     colors: {
       background: '#0a1530',
       backgroundGradient: 'linear-gradient(to bottom, #152550, #0a1530)',
@@ -304,11 +304,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 10. Art Deco - 1920s Bioshock
+  // 10. Art Deco - a 1920s city under the sea
   {
     id: 'art-deco',
     name: 'Art Deco',
-    description: 'Bioshock - 1920s gold filigree',
+    description: '1920s city under the sea - gold filigree',
     colors: {
       background: '#0a1520',
       backgroundGradient: 'linear-gradient(to bottom, #152535, #0a1520)',
@@ -334,11 +334,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 11. Retro Atomic - Fallout
+  // 11. Retro Atomic - an atomic age shelter
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',
-    description: 'Fallout - Vault-Tec, Pip-Boy, wasteland',
+    description: 'Atomic age shelter - phosphor terminals, wasteland',
     colors: {
       background: '#000000',
       backgroundGradient: 'linear-gradient(to bottom, #000000, #000000)',
@@ -364,11 +364,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 12. Neon Cyber - Cyberpunk magenta/cyan glitch
+  // 12. Neon Cyber - a neon city at night
   {
     id: 'neon-cyber',
     name: 'Neon Cyber',
-    description: 'Cyberpunk - magenta/cyan glitch',
+    description: 'Neon city at night - magenta and cyan glitch',
     colors: {
       background: '#0a0512',
       backgroundGradient: 'linear-gradient(to bottom, #150a20, #0a0512)',
@@ -394,11 +394,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 13. Cell Shaded - Borderlands comic book
+  // 13. Cell Shaded - comic book ink lines
   {
     id: 'cell-shaded',
     name: 'Cell Shaded',
-    description: 'Borderlands - comic book ink lines',
+    description: 'Comic book - cel shading, bold ink lines',
     colors: {
       background: '#f5f0e0',
       backgroundGradient: 'linear-gradient(to bottom, #f5f0e0, #e8e0d0)',
@@ -424,11 +424,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 15. Silhouette - Limbo pure black shapes
+  // 15. Silhouette - pure black shapes
   {
     id: 'silhouette',
     name: 'Silhouette',
-    description: 'Limbo - pure black and white shapes',
+    description: 'Pure black and white shapes',
     colors: {
       background: '#e8e8e8',
       backgroundGradient: 'linear-gradient(to bottom, #f0f0f0, #d0d0d0)',
@@ -454,11 +454,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 16. Mythic - Hades Greek mythology
+  // 16. Mythic - Greek mythology
   {
     id: 'mythic',
     name: 'Mythic',
-    description: 'Hades - Greek mythology, blood red',
+    description: 'Greek mythology - blood red',
     colors: {
       background: '#1a0a10',
       backgroundGradient: 'linear-gradient(to bottom, #2a1520, #1a0a10)',
