@@ -60,7 +60,12 @@ function KnottedJob({ job, index }: { job: Job; index: number }) {
       <span className={`pointer-events-none absolute left-4 top-[1.3rem] h-2 w-2 -translate-x-1/2 rounded-full bg-[color:var(--sh-dim)] ${hang.knot}`} aria-hidden="true" />
       <div
         className={`relative ${shade.knotHang} ${swing ? SWING[swing] : ''}`}
-        onPointerEnter={(event) => setSwing((current) => current ?? swingAway(event))}
+        onPointerEnter={(event) => {
+          // Read the side now: React clears currentTarget once the handler returns, so reading it
+          // inside a state updater (which runs later, while rendering) crashed the page.
+          if (swing) return
+          setSwing(swingAway(event))
+        }}
         onAnimationEnd={() => setSwing(null)}
       >
         <ExperienceCard entry={job} />
