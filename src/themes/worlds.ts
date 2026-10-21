@@ -24,18 +24,18 @@ import MedievalFantasyTheme from '@/components/themes/MedievalFantasyTheme'
 
 export type WorldCategory = 'Fantasy' | 'Retro' | 'Neon' | 'Action' | 'Artistic'
 
+// Each chip's icon is drawn in src/components/worlds/categoryIcons.tsx.
 export interface WorldCategoryMeta {
   name: WorldCategory
-  icon: string
 }
 
 // Display order of the filter chips on the World Select screen.
 export const WORLD_CATEGORIES: WorldCategoryMeta[] = [
-  { name: 'Fantasy', icon: '⚔️' },
-  { name: 'Retro', icon: '🕹️' },
-  { name: 'Neon', icon: '💫' },
-  { name: 'Action', icon: '🎮' },
-  { name: 'Artistic', icon: '🎨' },
+  { name: 'Fantasy' },
+  { name: 'Retro' },
+  { name: 'Neon' },
+  { name: 'Action' },
+  { name: 'Artistic' },
 ]
 
 export interface World {

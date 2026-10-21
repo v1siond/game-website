@@ -2,23 +2,20 @@
 
 import { useState } from 'react'
 import { useTheme } from '@/themes/ThemeContext'
-import { WORLDS, WORLD_CATEGORIES, type WorldCategory } from '@/themes/worlds'
+import { WORLDS, WORLD_CATEGORIES } from '@/themes/worlds'
 import type { Theme } from '@/themes/themes'
 import WorldCard from './WorldCard'
-
-type Filter = 'All' | WorldCategory
+import { CATEGORY_ICONS, type WorldFilter as Filter } from './categoryIcons'
 
 function FilterChip({
   active,
   label,
-  icon,
   count,
   theme,
   onClick,
 }: {
   active: boolean
-  label: string
-  icon: string
+  label: Filter
   count: number
   theme: Theme
   onClick: () => void
@@ -35,7 +32,7 @@ function FilterChip({
         color: active ? theme.colors.accent : theme.colors.textMuted,
       }}
     >
-      <span aria-hidden="true">{icon}</span>
+      {CATEGORY_ICONS[label]()}
       <span>{label}</span>
       <span aria-hidden="true" style={{ color: theme.colors.textMuted }}>
         {count}
@@ -75,7 +72,6 @@ export default function WorldsGrid() {
           active={filter === 'All'}
           onClick={() => setFilter('All')}
           label="All"
-          icon="✦"
           count={ordered.length}
           theme={theme}
         />
@@ -85,7 +81,6 @@ export default function WorldsGrid() {
             active={filter === cat.name}
             onClick={() => setFilter(cat.name)}
             label={cat.name}
-            icon={cat.icon}
             count={cat.count}
             theme={theme}
           />
