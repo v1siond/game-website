@@ -1,4 +1,19 @@
+// Each rebuilt world owns its colours in its palette.ts; its registry entry reads them from there. Dark
+// Fantasy, Neon Cyber and Medieval Fantasy have no palette module yet, so their hex stays here.
 import { TRAIL } from '@/components/themes/AdventurePaths/palette'
+import { DECO_COLORS } from '@/components/themes/ArtDeco/palette'
+import { NOIR } from '@/components/themes/BoldNoir/palette'
+import { CEL } from '@/components/themes/CellShaded/palette'
+import { FS } from '@/components/themes/FighterSelect/palette'
+import { MYTH } from '@/components/themes/Mythic/palette'
+import { PORTAL } from '@/components/themes/NeonPortals/palette'
+import { ATOMIC_COLORS } from '@/components/themes/RetroAtomic/palette'
+import { RPG } from '@/components/themes/RetroRPG/palette'
+import { HOSE } from '@/components/themes/RubberHose/palette'
+import { SHADE } from '@/components/themes/Silhouette/palette'
+import { SOUL } from '@/components/themes/SoulMap/palette'
+import { SH } from '@/components/themes/SurvivalHorror/palette'
+import { COLORS } from '@/components/themes/TropicalPlatformer/palette'
 
 export interface ThemeColors {
   background: string
@@ -64,23 +79,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 2. Survival Horror - dark mansion, inventory grid
+  // 2. Survival Horror - an old house at night, one lamp at a time
   {
     id: 'survival-horror',
     name: 'Survival Horror',
-    description: 'Dark mansion - typewriter saves, inventory grid',
+    description: 'An old house at night - one lamp at a time, fog and the save room',
     colors: {
-      background: '#0a0805',
-      backgroundGradient: 'linear-gradient(to bottom, #1a1510, #0a0805)',
-      accent: '#8b0000',
-      text: '#998866',
-      textMuted: '#665544',
-      secondary: '#aa8855',
-      highlight: '#cc4444',
-      border: '#3a3020',
-      borderHover: '#8b0000',
-      surface: '#1a1510',
-      surfaceHover: '#2a2015',
+      background: SH.void,
+      backgroundGradient: `linear-gradient(to bottom, ${SH.shadow}, ${SH.void})`,
+      accent: SH.brass,
+      text: SH.cream,
+      textMuted: SH.fog,
+      secondary: SH.rust,
+      highlight: SH.flame,
+      border: SH.sepia,
+      borderHover: SH.brass,
+      surface: SH.panel,
+      surfaceHover: SH.paper,
     },
     font: 'monospace',
     effects: {
@@ -94,23 +109,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 3. Neon Portals - orange and blue portals between dimensions
+  // 3. Neon Portals - orange portal in, blue portal out
   {
     id: 'neon-portals',
     name: 'Neon Portals',
-    description: 'Glowing portals - test chambers and light grids',
+    description: 'Glowing portals - orange in, blue out, violet rifts between',
     colors: {
-      background: '#0a0520',
-      backgroundGradient: 'linear-gradient(to bottom, #150a30, #0a0520)',
-      accent: '#ff6b00',
-      text: '#f0e8ff',
-      textMuted: '#9988cc',
-      secondary: '#00ccff',
-      highlight: '#ffcc00',
-      border: '#3322aa',
-      borderHover: '#ff6b00',
-      surface: '#1a1040',
-      surfaceHover: '#251560',
+      background: PORTAL.VOID,
+      backgroundGradient: `linear-gradient(to bottom, ${PORTAL.CHAMBER}, ${PORTAL.VOID})`,
+      accent: PORTAL.ORANGE,
+      text: PORTAL.WHITE,
+      textMuted: PORTAL.MUTED,
+      secondary: PORTAL.BLUE,
+      highlight: PORTAL.VIOLET,
+      border: PORTAL.SEAM,
+      borderHover: PORTAL.ORANGE,
+      surface: PORTAL.CHAMBER,
+      surfaceHover: PORTAL.PANEL,
     },
     font: 'sans-serif',
     effects: {
@@ -124,23 +139,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 4. Soul Map - interconnected zones
+  // 4. Soul Map - deep blue caverns of a map exploration game
   {
     id: 'soul-map',
     name: 'Soul Map',
-    description: 'Interconnected zones that reveal as you explore',
+    description: 'Deep blue caverns - rooms that reveal as you explore, glowing paths',
     colors: {
-      background: '#0d0d12',
-      backgroundGradient: 'linear-gradient(to bottom, #14141f, #0d0d12)',
-      accent: '#5588ff',
-      text: '#d0d8e8',
-      textMuted: '#707890',
-      secondary: '#88cc55',
-      highlight: '#ffaa33',
-      border: '#252535',
-      borderHover: '#5588ff',
-      surface: '#16161f',
-      surfaceHover: '#202030',
+      background: SOUL.abyss,
+      backgroundGradient: `linear-gradient(to bottom, ${SOUL.deep}, ${SOUL.abyss})`,
+      accent: SOUL.glow,
+      text: SOUL.text,
+      textMuted: SOUL.textSoft,
+      secondary: SOUL.moss,
+      highlight: SOUL.lantern,
+      border: SOUL.rock,
+      borderHover: SOUL.glow,
+      surface: SOUL.deep,
+      surfaceHover: SOUL.cavern,
     },
     font: 'sans-serif',
     effects: {
@@ -184,23 +199,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 6. Rubber Hose - 1930s rubber hose cartoon
+  // 6. Rubber Hose - a 1930s rubber hose cartoon in sepia
   {
     id: 'rubber-hose',
     name: 'Rubber Hose',
-    description: '1930s rubber hose cartoon - film grain',
+    description: '1930s rubber hose cartoon - sepia, one ink line, film grain',
     colors: {
-      background: '#f5e6c8',
-      backgroundGradient: 'linear-gradient(to bottom, #f5e6c8, #e8d4b0)',
-      accent: '#8b0000',
-      text: '#2a2015',
-      textMuted: '#5a4a35',
-      secondary: '#1a3050',
-      highlight: '#cc4400',
-      border: '#8a7a60',
-      borderHover: '#8b0000',
-      surface: '#efe0c0',
-      surfaceHover: '#e8d4b0',
+      background: HOSE.paper,
+      backgroundGradient: `linear-gradient(to bottom, ${HOSE.paper}, ${HOSE.paperSepia})`,
+      accent: HOSE.redDark,
+      text: HOSE.ink,
+      textMuted: HOSE.inkSoft,
+      secondary: HOSE.blue,
+      highlight: HOSE.orange,
+      border: HOSE.shadow,
+      borderHover: HOSE.redDark,
+      surface: HOSE.paperSepia,
+      surfaceHover: HOSE.paperDark,
     },
     font: 'serif',
     effects: {
@@ -214,23 +229,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 7. Retro RPG - black, white and yellow battle menu
+  // 7. Retro RPG - a 16 bit role playing game at night
   {
     id: 'retro-rpg',
     name: 'Retro RPG',
-    description: 'Pixel battle menu - black, white and yellow',
+    description: '16 bit role playing game at night - dialogue windows and the overworld road',
     colors: {
-      background: '#000000',
-      backgroundGradient: 'linear-gradient(to bottom, #0a0a0a, #000000)',
-      accent: '#ffff00',
-      text: '#ffffff',
-      textMuted: '#888888',
-      secondary: '#ff6600',
-      highlight: '#ff0000',
-      border: '#ffffff',
-      borderHover: '#ffff00',
-      surface: '#1a1a1a',
-      surfaceHover: '#2a2a2a',
+      background: RPG.void,
+      backgroundGradient: `linear-gradient(to bottom, ${RPG.night}, ${RPG.void})`,
+      accent: RPG.gold,
+      text: RPG.text,
+      textMuted: RPG.muted,
+      secondary: RPG.sky,
+      highlight: RPG.green,
+      border: RPG.border,
+      borderHover: RPG.gold,
+      surface: RPG.windowLow,
+      surfaceHover: RPG.windowTop,
     },
     font: 'monospace',
     effects: {
@@ -244,23 +259,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 8. Bold Noir - red and black, skewed angles
+  // 8. Bold Noir - a graphic novel night with one red accent
   {
     id: 'bold-noir',
     name: 'Bold Noir',
-    description: 'Red and black - skewed angles, sharp menus',
+    description: 'Graphic novel night - black, white and one red accent, rain',
     colors: {
-      background: '#0a0a0a',
-      backgroundGradient: 'linear-gradient(135deg, #1a0a0a, #0a0a0a)',
-      accent: '#ff0033',
-      text: '#ffffff',
-      textMuted: '#999999',
-      secondary: '#ff0033',
-      highlight: '#ffcc00',
-      border: '#ff0033',
-      borderHover: '#ff3366',
-      surface: '#1a0a0a',
-      surfaceHover: '#2a1515',
+      background: NOIR.ink,
+      backgroundGradient: `linear-gradient(135deg, ${NOIR.coal}, ${NOIR.ink})`,
+      accent: NOIR.red,
+      text: NOIR.paper,
+      textMuted: NOIR.fog,
+      secondary: NOIR.redDeep,
+      highlight: NOIR.paper,
+      border: NOIR.smoke,
+      borderHover: NOIR.red,
+      surface: NOIR.coal,
+      surfaceHover: NOIR.smoke,
     },
     font: 'sans-serif',
     effects: {
@@ -274,23 +289,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 9. Fighter Select - arcade character grid
+  // 9. Fighter Select - an arcade fighting game's select screen and stages
   {
     id: 'fighter-select',
     name: 'Fighter Select',
-    description: 'Arcade fighter - character select grid',
+    description: 'Arcade fighting game - select screen, match HUD and stages',
     colors: {
-      background: '#0a1530',
-      backgroundGradient: 'linear-gradient(to bottom, #152550, #0a1530)',
-      accent: '#ffd700',
-      text: '#ffffff',
-      textMuted: '#88aacc',
-      secondary: '#ff4444',
-      highlight: '#00ff88',
-      border: '#4466aa',
-      borderHover: '#ffd700',
-      surface: '#152040',
-      surfaceHover: '#1a2850',
+      background: FS.night,
+      backgroundGradient: `linear-gradient(to bottom, ${FS.panel}, ${FS.night})`,
+      accent: FS.gold,
+      text: FS.chrome,
+      textMuted: FS.p1Light,
+      secondary: FS.p2,
+      highlight: FS.health,
+      border: FS.p1,
+      borderHover: FS.gold,
+      surface: FS.panel,
+      surfaceHover: FS.panelLight,
     },
     font: 'sans-serif',
     effects: {
@@ -308,19 +323,19 @@ export const themes: Theme[] = [
   {
     id: 'art-deco',
     name: 'Art Deco',
-    description: '1920s city under the sea - gold filigree',
+    description: '1920s city under the sea - brass, gold filigree and neon signs',
     colors: {
-      background: '#0a1520',
-      backgroundGradient: 'linear-gradient(to bottom, #152535, #0a1520)',
-      accent: '#d4af37',
-      text: '#e8e0d0',
-      textMuted: '#a09080',
-      secondary: '#2a6080',
-      highlight: '#f0c850',
-      border: '#4a3a20',
-      borderHover: '#d4af37',
-      surface: '#152030',
-      surfaceHover: '#1a2840',
+      background: DECO_COLORS.abyss,
+      backgroundGradient: `linear-gradient(to bottom, ${DECO_COLORS.deepSeaDark}, ${DECO_COLORS.abyss})`,
+      accent: DECO_COLORS.gold,
+      text: DECO_COLORS.cream,
+      textMuted: DECO_COLORS.bronze,
+      secondary: DECO_COLORS.tealLight,
+      highlight: DECO_COLORS.goldBright,
+      border: DECO_COLORS.brassDark,
+      borderHover: DECO_COLORS.gold,
+      surface: DECO_COLORS.deepSeaDark,
+      surfaceHover: DECO_COLORS.deepSea,
     },
     font: 'serif',
     effects: {
@@ -338,19 +353,19 @@ export const themes: Theme[] = [
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',
-    description: 'Atomic age shelter - phosphor terminals, wasteland',
+    description: 'Atomic age shelter - phosphor terminals and steel bunker rooms',
     colors: {
-      background: '#000000',
-      backgroundGradient: 'linear-gradient(to bottom, #000000, #000000)',
-      accent: '#ffff00',
-      text: '#ffb897',
-      textMuted: '#888888',
-      secondary: '#2121ff',
-      highlight: '#ffff00',
-      border: '#2121ff',
-      borderHover: '#ffff00',
-      surface: '#0a0a0a',
-      surfaceHover: '#151515',
+      background: ATOMIC_COLORS.ink,
+      backgroundGradient: `linear-gradient(to bottom, ${ATOMIC_COLORS.bunker}, ${ATOMIC_COLORS.ink})`,
+      accent: ATOMIC_COLORS.yellow,
+      text: ATOMIC_COLORS.phosphor,
+      textMuted: ATOMIC_COLORS.ash,
+      secondary: ATOMIC_COLORS.blue,
+      highlight: ATOMIC_COLORS['red-light'],
+      border: ATOMIC_COLORS['steel-edge'],
+      borderHover: ATOMIC_COLORS.yellow,
+      surface: ATOMIC_COLORS.panel,
+      surfaceHover: ATOMIC_COLORS.bunker,
     },
     font: 'monospace',
     effects: {
@@ -394,23 +409,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 13. Cell Shaded - comic book ink lines
+  // 13. Cell Shaded - a toon shaded comic
   {
     id: 'cell-shaded',
     name: 'Cell Shaded',
-    description: 'Comic book - cel shading, bold ink lines',
+    description: 'Toon shaded comic - flat colour bands, bold ink lines, impact bursts',
     colors: {
-      background: '#f5f0e0',
-      backgroundGradient: 'linear-gradient(to bottom, #f5f0e0, #e8e0d0)',
-      accent: '#ff6600',
-      text: '#1a1a1a',
-      textMuted: '#555555',
-      secondary: '#3366cc',
-      highlight: '#ffcc00',
-      border: '#1a1a1a',
-      borderHover: '#ff6600',
-      surface: '#ebe5d5',
-      surfaceHover: '#e0d8c8',
+      background: CEL.paper,
+      backgroundGradient: `linear-gradient(to bottom, ${CEL.paper}, ${CEL.paperShade})`,
+      accent: CEL.skyDeep,
+      text: CEL.ink,
+      textMuted: CEL.inkSoft,
+      secondary: CEL.orange,
+      highlight: CEL.sun,
+      border: CEL.ink,
+      borderHover: CEL.skyDeep,
+      surface: CEL.paper,
+      surfaceHover: CEL.paperShade,
     },
     font: 'sans-serif',
     effects: {
@@ -424,23 +439,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 15. Silhouette - pure black shapes
+  // 14. Silhouette - black shapes on a lit sky
   {
     id: 'silhouette',
     name: 'Silhouette',
-    description: 'Pure black and white shapes',
+    description: 'Black shapes on a lit sky - fog, dawn, ember and crimson light',
     colors: {
-      background: '#e8e8e8',
-      backgroundGradient: 'linear-gradient(to bottom, #f0f0f0, #d0d0d0)',
-      accent: '#000000',
-      text: '#000000',
-      textMuted: '#555555',
-      secondary: '#333333',
-      highlight: '#666666',
-      border: '#000000',
-      borderHover: '#333333',
-      surface: '#e0e0e0',
-      surfaceHover: '#d8d8d8',
+      background: SHADE.void,
+      backgroundGradient: `linear-gradient(to bottom, ${SHADE.panel}, ${SHADE.void})`,
+      accent: SHADE.rim,
+      text: SHADE.text,
+      textMuted: SHADE.muted,
+      secondary: SHADE.ember,
+      highlight: SHADE.sun,
+      border: SHADE.edge,
+      borderHover: SHADE.rim,
+      surface: SHADE.panel,
+      surfaceHover: SHADE.raised,
     },
     font: 'sans-serif',
     effects: {
@@ -454,23 +469,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 16. Mythic - Greek mythology
+  // 15. Mythic - a sunlit Aegean noon over marble temples
   {
     id: 'mythic',
     name: 'Mythic',
-    description: 'Greek mythology - blood red',
+    description: 'Sunlit Aegean noon - marble temples, terracotta pottery and laurel gold',
     colors: {
-      background: '#1a0a10',
-      backgroundGradient: 'linear-gradient(to bottom, #2a1520, #1a0a10)',
-      accent: '#ff3344',
-      text: '#f0e8e0',
-      textMuted: '#a08888',
-      secondary: '#d4af37',
-      highlight: '#ff6655',
-      border: '#4a2020',
-      borderHover: '#ff3344',
-      surface: '#251518',
-      surfaceHover: '#301a20',
+      background: MYTH.sky,
+      backgroundGradient: `linear-gradient(to bottom, ${MYTH.sky}, ${MYTH.marble})`,
+      accent: MYTH.aegean,
+      text: MYTH.ink,
+      textMuted: MYTH.inkSoft,
+      secondary: MYTH.terracotta,
+      highlight: MYTH.gold,
+      border: MYTH.terracottaDeep,
+      borderHover: MYTH.aegean,
+      surface: MYTH.marble,
+      surfaceHover: MYTH.marbleShade,
     },
     font: 'serif',
     effects: {
@@ -484,23 +499,23 @@ export const themes: Theme[] = [
     },
   },
 
-  // 17. Tropical Platformer - jungle, crates, vibrant colors
+  // 16. Tropical Platformer - an island at midday
   {
     id: 'tropical-platformer',
     name: 'Tropical Platformer',
-    description: 'Jungle platformer - vibrant colors, wooden crates',
+    description: 'Island platformer - jungle greens, lagoon blues, ripe fruit and crates',
     colors: {
-      background: '#0a1505',
-      backgroundGradient: 'linear-gradient(to bottom, #1a2810, #0a1505)',
-      accent: '#ff6b00',
-      text: '#ffffff',
-      textMuted: '#a0a0a0',
-      secondary: '#00d4ff',
-      highlight: '#ff8800',
-      border: '#8b5a2b',
-      borderHover: '#ff6b00',
-      surface: '#1a1510',
-      surfaceHover: '#2a2010',
+      background: COLORS.canopy,
+      backgroundGradient: `linear-gradient(to bottom, ${COLORS.leafDark}, ${COLORS.canopy})`,
+      accent: COLORS.fruitGold,
+      text: COLORS.parchment,
+      textMuted: COLORS.sandLight,
+      secondary: COLORS.lagoon,
+      highlight: COLORS.sun,
+      border: COLORS.wood,
+      borderHover: COLORS.fruitGold,
+      surface: COLORS.woodDark,
+      surfaceHover: COLORS.wood,
     },
     font: 'sans-serif',
     effects: {
@@ -514,7 +529,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 18. Medieval Fantasy - RTS-inspired gold and stone
+  // 17. Medieval Fantasy - RTS-inspired gold and stone
   {
     id: 'medieval-fantasy',
     name: 'Medieval Fantasy',
