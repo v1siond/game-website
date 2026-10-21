@@ -2,14 +2,15 @@
 
 import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
-import { useTheme } from '@/themes/ThemeContext'
-import { useProfession } from '@/contexts/ProfessionContext'
-import { ABOUT_DATA, PROFESSIONAL_SUMMARY } from '@/data/about'
-import { PROJECTS_DATA } from '@/data/projects'
-import { getSkillsByProfession, getEngineerSkills } from '@/data/skills'
-import { COMPANIES } from '@/data/companies'
-import { BANDS } from '@/data/bands'
-import { EXPERIENCE_DATA, filterExperienceByProfession } from '@/data/experience'
+import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import type { Profession } from '@/lib/cv/professions'
+import type { CVData, Job } from '@/lib/cv/content'
+import type { ProfessionSections } from '@/lib/cv/cvView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { KratosChainPullReveal } from './Mythic/KratosSprite'
@@ -1118,38 +1119,24 @@ const DiamondIcon = () => (
 
 // =============================================================================
 // WAYSTATION NODE (Profession selector)
+// The switch lays the waystations out Musician, System Engineer, Martial Artist; the engineer one
+// is the raised centre of the path.
 // =============================================================================
-const WaystationNode = memo(function WaystationNode({
-  icon,
-  label,
-  sublabel,
-  color,
-  isActive,
-  onClick,
-  position,
-}: {
-  icon: React.ReactNode
-  label: string
-  sublabel: string
-  color: string
-  isActive: boolean
-  onClick: () => void
-  position: { x: number; y: number }
-}) {
+const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; sublabel: string; color: string; position: string }> = {
+  drummer: { icon: <WaveIcon />, sublabel: 'Drums', color: GOW.fire, position: 'left-[25%] top-[55%]' },
+  engineer: { icon: <GearIcon />, sublabel: 'Software', color: GOW.gold, position: 'left-1/2 top-[35%]' },
+  fighter: { icon: <DiamondIcon />, sublabel: 'Muay Thai', color: GOW.bloodBright, position: 'left-[75%] top-[55%]' },
+}
+
+const WaystationNode = memo(function WaystationNode({ option }: { option: ProfessionOption }) {
+  const { id, label, selected: isActive, optionProps } = option
+  const { icon, sublabel, color, position } = WAYSTATIONS[id]
+
   return (
     <button
-      onClick={onClick}
-      className="absolute transform -translate-x-1/2 -translate-y-1/2 group min-w-[70px] md:min-w-[100px] min-h-[70px] md:min-h-[100px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-      style={{
-        left: `${position.x}%`,
-        top: `${position.y}%`,
-        ['--tw-ring-color' as string]: color,
-        ['--tw-ring-offset-color' as string]: GOW.void,
-      }}
-      aria-pressed={isActive}
-      aria-label={`Select ${label} - ${sublabel} profession${isActive ? ' (currently selected)' : ''}`}
-      role="tab"
-      tabIndex={isActive ? 0 : -1}
+      type="button"
+      {...optionProps}
+      className={`absolute ${position} transform -translate-x-1/2 -translate-y-1/2 group min-w-[70px] md:min-w-[100px] min-h-[70px] md:min-h-[100px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c040] focus-visible:ring-offset-2 focus-visible:ring-offset-black`}
     >
       <div
         className={`absolute inset-0 transition-all duration-500 ${
@@ -1161,7 +1148,7 @@ const WaystationNode = memo(function WaystationNode({
         aria-hidden="true"
       />
       <div
-        className={`relative w-20 h-20 md:w-28 md:h-28 flex flex-col items-center justify-center transition-all duration-300 ${
+        className={`relative w-24 h-20 md:w-32 md:h-28 flex flex-col items-center justify-center transition-all duration-300 ${
           isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
         style={{
@@ -1177,18 +1164,19 @@ const WaystationNode = memo(function WaystationNode({
             ? `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 0 15px ${color}40`
             : `inset 0 0 20px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.3)`,
         }}
+        aria-hidden="true"
       >
         <div className="mb-0.5 md:mb-1 scale-75 md:scale-100" style={{ color: isActive ? color : GOW.silver }}>
           {icon}
         </div>
         <span
-          className="text-sm tracking-[0.1em] md:tracking-[0.15em] uppercase font-medium"
+          className="text-sm tracking-[0.05em] md:tracking-[0.1em] uppercase font-medium text-center leading-tight"
           style={{ color: isActive ? color : GOW.silver }}
         >
           {label}
         </span>
         <span
-          className="text-sm tracking-wider opacity-70 text-center leading-tight hidden md:block"
+          className="text-sm tracking-wider opacity-80 text-center leading-tight hidden md:block"
           style={{ color: isActive ? color : GOW.silver }}
         >
           {sublabel}
@@ -1201,11 +1189,11 @@ const WaystationNode = memo(function WaystationNode({
 // =============================================================================
 // TECH CLOUD (Engineer skills)
 // =============================================================================
-const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnType<typeof getEngineerSkills> }) {
+const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className="space-y-6">
-      {categories.slice(0, 5).map((category) => (
-        <div key={category.name}>
+      {categories.map((category) => (
+        <div key={category.id}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
             style={{ color: GOW.silver }}
@@ -1236,67 +1224,52 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: ReturnTy
 })
 
 // =============================================================================
-// SKILLS LIST (Drummer/Fighter)
+// PROJECT CARD - his role, the years, the result and the links
 // =============================================================================
-const SkillsList = memo(function SkillsList({ categories }: { categories: ReturnType<typeof getSkillsByProfession> }) {
-  return (
-    <div className="grid md:grid-cols-3 gap-6">
-      {categories.map((category) => (
-        <div key={category.name}>
-          <h3
-            className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: GOW.silver }}
-          >
-            <span aria-hidden="true">{category.icon}</span>
-            {category.name}
-          </h3>
-          <ul className="space-y-2" aria-label={`${category.name} skills`}>
-            {category.skills.map((skill) => (
-              <li key={skill.name} className="text-sm flex items-center gap-2" style={{ color: GOW.bone }}>
-                <span style={{ color: GOW.blood }} aria-hidden="true">◆</span>
-                {skill.name}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  )
-})
-
-// =============================================================================
-// PROJECT CARD
-// =============================================================================
-const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PROJECTS_DATA[0] }) {
+const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
   return (
     <article
-      className="p-4 transition-transform hover:scale-[1.02] cursor-pointer group"
+      className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(135deg, ${GOW.void}, ${GOW.voidWarm}50)`,
         border: `1px solid ${GOW.stormBrown}`,
         borderRadius: '4px',
       }}
-      tabIndex={0}
-      role="button"
-      aria-label={`View ${project.name} project details`}
     >
       <h3 className="text-lg transition-colors" style={{ color: GOW.bone }}>
         {project.name}
       </h3>
+      <p className="text-sm mt-1" style={{ color: GOW.gold }}>
+        {project.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
+      </p>
       <p className="text-sm mt-2" style={{ color: GOW.silver }}>{project.tagline}</p>
       {project.impact && (
-        <p className="text-sm mt-2 italic" style={{ color: GOW.gold }}>
-          <span aria-hidden="true">, </span>
+        <p className="text-sm mt-2 italic" style={{ color: GOW.goldBright }}>
           <span className="sr-only">Impact: </span>{project.impact}
         </p>
       )}
       <div className="flex flex-wrap gap-1 mt-3" aria-label="Technologies used">
-        {project.techStack.slice(0, 4).map((tech) => (
+        {project.techStack.map((tech) => (
           <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${GOW.gold}12`, color: GOW.silver }}>
             {tech}
           </span>
         ))}
       </div>
+      {links.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-3">
+          {links.map(({ kind, label, linkProps }) => (
+            <a
+              key={kind}
+              {...linkProps}
+              className="inline-flex items-center min-h-[44px] px-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c040] border border-[#c9a227]/40 text-[#c9a227] bg-black/80 rounded-[3px]"
+            >
+              {label}
+            </a>
+          ))}
+        </div>
+      )}
     </article>
   )
 })
@@ -1304,28 +1277,25 @@ const ProjectCard = memo(function ProjectCard({ project }: { project: typeof PRO
 // =============================================================================
 // COMPANY CARD
 // =============================================================================
-const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COMPANIES[0] }) {
+const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['companies'][number] }) {
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c9a227] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
       style={{
         background: `linear-gradient(135deg, ${GOW.void}, ${GOW.voidWarm}40)`,
         border: `1px solid ${GOW.stormBrown}`,
         borderRadius: '4px',
-        ['--tw-ring-color' as string]: GOW.gold,
-        ['--tw-ring-offset-color' as string]: GOW.void,
       }}
-      aria-label={`${company.name} - ${company.tagline}. Opens in new tab.`}
+      aria-label={`${company.name}, ${company.tagline} (opens in a new tab)`}
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-2xl" aria-hidden="true">{company.icon}</span>
         <div>
           <h3 className="text-lg transition-colors" style={{ color: GOW.bone }}>
             {company.name}
-            <span className="sr-only"> (opens in new tab)</span>
           </h3>
           <p className="text-sm" style={{ color: GOW.gold }}>{company.tagline}</p>
         </div>
@@ -1338,10 +1308,10 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: typeof COM
 // =============================================================================
 // BAND CARD
 // =============================================================================
-const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
+const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
   const content = (
     <article
-      className="p-4 transition-transform hover:scale-[1.02] group"
+      className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(135deg, ${GOW.void}, ${GOW.fire}15)`,
         border: `1px solid ${GOW.fire}40`,
@@ -1350,60 +1320,56 @@ const BandCard = memo(function BandCard({ band }: { band: typeof BANDS[0] }) {
     >
       <h3 className="text-lg transition-colors" style={{ color: GOW.bone }}>
         {band.name}
-        {band.url && <span className="sr-only"> (opens in new tab)</span>}
       </h3>
-      <p className="text-sm mt-1" style={{ color: GOW.fire }}>
-        {band.genre} <span aria-hidden="true">|</span> {band.role}
+      <p className="text-sm mt-1" style={{ color: GOW.fireGlow }}>
+        {band.role}
+        {years && <span aria-hidden="true"> | </span>}
+        {years}
       </p>
-      <p className="text-sm mt-2" style={{ color: GOW.silver }}>{band.description}</p>
-      {!band.url && <p className="text-sm mt-2 italic" style={{ color: GOW.silver }}>Website coming soon</p>}
+      {band.release && (
+        <p className="text-sm mt-2" style={{ color: GOW.silver }}>
+          Released <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
     </article>
   )
 
-  if (band.url) {
-    return (
-      <a
-        href={band.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-        style={{
-          ['--tw-ring-color' as string]: GOW.fire,
-          ['--tw-ring-offset-color' as string]: GOW.void,
-        }}
-        aria-label={`${band.name} - ${band.genre}. Opens in new tab.`}
-      >
-        {content}
-      </a>
-    )
-  }
-  return content
+  if (!linkProps) return content
+  return (
+    <a
+      {...linkProps}
+      className="block h-full min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e05000] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+    >
+      {content}
+    </a>
+  )
 })
 
 // =============================================================================
-// EXPERIENCE CARD
+// EXPERIENCE CARD. Dates are date only strings (UTC midnight), so the year is read in UTC: a
+// January start keeps its own year west of UTC.
 // =============================================================================
-const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: typeof EXPERIENCE_DATA[0]; isLast?: boolean }) {
-  const endDisplay = entry.endDate ? new Date(entry.endDate).getFullYear() : 'Present'
-  const startDisplay = new Date(entry.startDate).getFullYear()
+const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: Job; isLast?: boolean }) {
+  const endDisplay = entry.endDate ? entry.endDate.getUTCFullYear() : 'Present'
+  const startDisplay = entry.startDate.getUTCFullYear()
 
   return (
     <article className="py-4">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div>
           <h3 className="text-lg font-medium" style={{ color: GOW.bone }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: GOW.gold }}>{entry.organization}</p>
+          <p className="text-sm" style={{ color: GOW.gold }}>{entry.company}</p>
         </div>
         <span className="text-sm" style={{ color: GOW.gold }}>
           <time>{startDisplay}</time> - <time>{endDisplay}</time>
         </span>
       </div>
-      <p className="text-sm mb-2" style={{ color: GOW.silver }}>{entry.description}</p>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {entry.description && <p className="text-sm mb-2" style={{ color: GOW.silver }}>{entry.description}</p>}
+      {entry.highlights.length > 0 && (
         <ul className="space-y-1" aria-label="Key achievements">
-          {entry.highlights.map((highlight, i) => (
-            <li key={i} className="text-sm flex items-start gap-2" style={{ color: GOW.bone }}>
-              <span style={{ color: GOW.blood }} aria-hidden="true">◆</span>
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: GOW.bone }}>
+              <span style={{ color: GOW.bloodBright }} aria-hidden="true">◆</span>
               {highlight}
             </li>
           ))}
@@ -1665,28 +1631,202 @@ const ArtSectionOlympus = memo(function ArtSectionOlympus() {
 })
 
 // =============================================================================
+// PROFESSION SECTIONS
+// =============================================================================
+const SECTION_TRIGGER = { threshold: 0.15, rootMargin: '0px 0px -10% 0px' }
+
+const MY_BUTTON =
+  'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c040] focus-visible:ring-offset-2 focus-visible:ring-offset-black'
+
+// Email is the gold action, LinkedIn the outlined one.
+const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+  email: 'bg-[#c9a227] text-black',
+  linkedin: 'bg-transparent border-2 border-[#c9a227] text-[#c9a227]',
+}
+
+function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
+  return (
+    <>
+      {actions.map((action) => (
+        <a key={action.id} {...action.linkProps} className={`${MY_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
+          {action.label}
+        </a>
+      ))}
+    </>
+  )
+}
+
+function FramedSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <FadeInSection>
+      <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto">
+          <SpartanFrame title={title}>{children}</SpartanFrame>
+        </div>
+      </section>
+    </FadeInSection>
+  )
+}
+
+type SectionsOf<Id extends Profession> = Extract<ProfessionSections, { profession: Id }>
+
+function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+  const { professionalSummary } = useCVData()
+  const experienceTrigger = useSectionTrigger(SECTION_TRIGGER)
+  const projectsTrigger = useSectionTrigger(SECTION_TRIGGER)
+  const { jobs, techStack, projects, companies } = sections
+
+  return (
+    <>
+      <FramedSection title="About">
+        <p className="leading-relaxed" style={{ color: GOW.bone }}>{professionalSummary.bio}</p>
+      </FramedSection>
+
+      {/* Art Section 1 - Weapons */}
+      <FadeInSection delay={150}>
+        <ArtSectionWeapons />
+      </FadeInSection>
+
+      {/* Work Experience - Kratos runs in, then pulls content with Blades of Chaos */}
+      {jobs.length > 0 && (
+        <section ref={experienceTrigger.ref} className="relative z-20 py-8 px-6 overflow-visible">
+          <KratosChainPullReveal triggered={experienceTrigger.triggered} className="max-w-4xl mx-auto">
+            <SpartanFrame title="Work Experience">
+              <div>
+                {jobs.map((entry, index) => (
+                  <ExperienceCard key={entry.id} entry={entry} isLast={index === jobs.length - 1} />
+                ))}
+              </div>
+            </SpartanFrame>
+          </KratosChainPullReveal>
+        </section>
+      )}
+
+      {/* Art Section 2 - Greek Pillars */}
+      <FadeInSection>
+        <ArtSectionPillars />
+      </FadeInSection>
+
+      <FramedSection title="Tech Stack">
+        <TechCloud categories={techStack} />
+      </FramedSection>
+
+      {/* Projects */}
+      <section
+        ref={projectsTrigger.ref}
+        className={`relative z-20 py-6 md:py-8 px-4 md:px-6 transition-[opacity,transform] duration-[600ms] ease-out ${
+          projectsTrigger.triggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]'
+        }`}
+      >
+        <div className="max-w-4xl mx-auto">
+          <SpartanFrame title="Projects">
+            <ProjectList
+              projects={projects}
+              className="grid md:grid-cols-2 gap-3 md:gap-4"
+              renderProject={(slot) => <ProjectCard slot={slot} />}
+            />
+          </SpartanFrame>
+        </div>
+      </section>
+
+      {/* Art Section 3 - Mount Olympus */}
+      <FadeInSection>
+        <ArtSectionOlympus />
+      </FadeInSection>
+
+      <FramedSection title="Ventures">
+        <div className="grid md:grid-cols-3 gap-3 md:gap-4">
+          {companies.map((company) => (
+            <CompanyCard key={company.id} company={company} />
+          ))}
+        </div>
+      </FramedSection>
+    </>
+  )
+}
+
+function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+  const { musician, bands } = sections
+
+  return (
+    <>
+      <FadeInSection delay={150}>
+        <ArtSectionWeapons />
+      </FadeInSection>
+
+      <FramedSection title="Bands">
+        <p className="text-sm mb-4 text-center" style={{ color: GOW.bone }}>
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
+        <p className="text-sm mt-4 italic text-center" style={{ color: GOW.goldBright }}>{musician.line}</p>
+      </FramedSection>
+
+      <FadeInSection>
+        <ArtSectionOlympus />
+      </FadeInSection>
+    </>
+  )
+}
+
+function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+  const { martialArts } = sections
+  const recordTrigger = useSectionTrigger(SECTION_TRIGGER)
+
+  return (
+    <>
+      <FadeInSection>
+        <ArtSectionPillars />
+      </FadeInSection>
+
+      {/* Muay Thai record - Kratos pulls it in with the Blades of Chaos */}
+      <section ref={recordTrigger.ref} className="relative z-20 py-8 px-6 overflow-visible">
+        <KratosChainPullReveal triggered={recordTrigger.triggered} className="max-w-4xl mx-auto">
+          <SpartanFrame title="Muay Thai">
+            <h3 className="text-lg font-medium mb-4" style={{ color: GOW.bone }}>{martialArts.primary.title}</h3>
+            <MuayThaiRecord
+              martialArts={martialArts}
+              classNames={{
+                facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+                fact: 'p-3 bg-black/60 border border-[#2a2420] rounded',
+                term: 'text-sm tracking-[0.15em] uppercase text-[#c9a227]',
+                value: 'text-sm mt-1 text-[#e8e0d0]',
+                achievements: 'space-y-1',
+                achievement: 'text-sm flex items-start gap-2 text-[#e8e0d0]',
+              }}
+              renderAchievement={(achievement) => (
+                <>
+                  <span className="text-[#8b1a1a]" aria-hidden="true">◆</span>
+                  {achievement}
+                </>
+              )}
+            />
+          </SpartanFrame>
+        </KratosChainPullReveal>
+      </section>
+
+      <FadeInSection>
+        <ArtSectionOlympus />
+      </FadeInSection>
+    </>
+  )
+}
+
+function ProfessionSectionsView({ sections }: { sections: ProfessionSections }) {
+  if (sections.profession === 'drummer') return <MusicianSections sections={sections} />
+  if (sections.profession === 'fighter') return <MartialArtistSections sections={sections} />
+  return <EngineerSections sections={sections} />
+}
+
+// =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 export default function MythicTheme() {
-  const { theme } = useTheme()
-  const { active, setActive, config } = useProfession()
+  const view = useWorldView()
+  const active = view.profession
   const [mounted, setMounted] = useState(false)
 
-  const experienceTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
-  const projectsTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
-  const contactTrigger = useSectionTrigger({ threshold: 0.15, rootMargin: '0px 0px -10% 0px' })
-
-  const aboutData = useMemo(() => ABOUT_DATA[active], [active])
-  const engineerTech = useMemo(() => getEngineerSkills(), [])
-  const otherSkills = useMemo(() => getSkillsByProfession(active), [active])
-  const projects = useMemo(
-    () => PROJECTS_DATA.filter(p => p.professions.includes(active) || p.featured),
-    [active]
-  )
-  const experience = useMemo(
-    () => filterExperienceByProfession(EXPERIENCE_DATA, active),
-    [active]
-  )
+  const contactTrigger = useSectionTrigger(SECTION_TRIGGER)
 
   useEffect(() => {
     setMounted(true)
@@ -1706,33 +1846,6 @@ export default function MythicTheme() {
       </div>
     )
   }
-
-  const professionNodes = [
-    {
-      id: 'engineer',
-      icon: <GearIcon />,
-      label: 'System',
-      sublabel: 'Engineer / CTO',
-      color: GOW.gold,
-      position: { x: 25, y: 50 },
-    },
-    {
-      id: 'drummer',
-      icon: <WaveIcon />,
-      label: 'Musician',
-      sublabel: 'Pro Drummer',
-      color: GOW.fire,
-      position: { x: 50, y: 30 },
-    },
-    {
-      id: 'fighter',
-      icon: <DiamondIcon />,
-      label: 'Martial',
-      sublabel: 'Muay Thai',
-      color: GOW.bloodBright,
-      position: { x: 75, y: 50 },
-    },
-  ]
 
   return (
     <div
@@ -1792,7 +1905,6 @@ export default function MythicTheme() {
           backdropFilter: 'blur(8px)',
           borderBottom: `1px solid ${GOW.gold}15`,
         }}
-        role="banner"
         aria-label="Primary navigation"
       >
         <div className="max-w-6xl mx-auto flex justify-between items-center gap-2 md:gap-4">
@@ -1805,32 +1917,27 @@ export default function MythicTheme() {
                 opacity="0.8"
               />
             </svg>
-            <h1
+            <span
               className="text-sm md:text-lg tracking-[0.2em] md:tracking-[0.25em] font-semibold uppercase whitespace-nowrap"
               style={{
                 color: GOW.goldBright,
                 textShadow: `0 0 30px ${GOW.gold}40, 0 2px 4px rgba(0,0,0,0.5)`,
               }}
             >
-              Alexander Pulido
-            </h1>
+              {view.hero.name}
+            </span>
           </Link>
 
           <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
-              style={{
-                border: `1px solid ${GOW.gold}40`,
-                color: GOW.gold,
-                background: `${GOW.void}ee`,
-              }}
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c040] border border-[#c9a227]/40 text-[#c9a227] bg-black/90"
             >
               CV
             </Link>
             <Link
               href="/personal-projects/game-engine"
-              className="px-2 md:px-3 py-1.5 md:py-2 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#e8c040]"
               style={{
                 border: `1px solid ${GOW.blood}`,
                 color: GOW.bone,
@@ -1845,28 +1952,36 @@ export default function MythicTheme() {
         </div>
       </nav>
 
-      {/* Hero Section - Below nav and blood banner */}
+      {/* Hero Section - Below nav and blood banner, the recruiter first screen */}
       <header className="relative z-20 pt-32 md:pt-36 pb-6 px-4 md:px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <p
-            className="text-base md:text-xl tracking-wider mb-2 font-medium"
-            style={{
-              color: GOW.bone,
-              textShadow: `0 2px 4px rgba(0,0,0,0.8)`,
-            }}
-          >
-            {PROFESSIONAL_SUMMARY[active].headline}
-          </p>
-          <p
-            className="text-sm md:text-base tracking-wider italic"
-            style={{
-              color: GOW.goldBright,
-              textShadow: `0 0 20px ${GOW.gold}50, 0 2px 4px rgba(0,0,0,0.6)`,
-            }}
-          >
-            {PROFESSIONAL_SUMMARY[active].tagline}
-          </p>
-        </div>
+        <RecruiterHero
+          render={({ name, headline, tagline, line, actions }) => (
+            <div className="max-w-4xl mx-auto text-center">
+              <h1
+                className="text-2xl md:text-4xl tracking-[0.2em] font-semibold uppercase mb-3"
+                style={{ color: GOW.goldBright, textShadow: `0 0 30px ${GOW.gold}40, 0 2px 4px rgba(0,0,0,0.6)` }}
+              >
+                {name}
+              </h1>
+              <p
+                className="text-base md:text-xl tracking-wider mb-2 font-medium"
+                style={{ color: GOW.bone, textShadow: `0 2px 4px rgba(0,0,0,0.8)` }}
+              >
+                {headline}
+              </p>
+              <p
+                className="text-sm md:text-base tracking-wider italic"
+                style={{ color: GOW.goldBright, textShadow: `0 0 20px ${GOW.gold}50, 0 2px 4px rgba(0,0,0,0.6)` }}
+              >
+                {tagline}
+              </p>
+              <p className="text-sm mt-2" style={{ color: GOW.bone }}>{line}</p>
+              <div className="flex flex-wrap gap-3 justify-center mt-4">
+                <HeroActions actions={actions} />
+              </div>
+            </div>
+          )}
+        />
       </header>
 
       {/* Main content */}
@@ -1884,8 +1999,6 @@ export default function MythicTheme() {
                   border: `1px solid ${GOW.gold}20`,
                   borderRadius: '4px',
                 }}
-                role="tablist"
-                aria-label="Profession selector"
               >
                 <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
                   <defs>
@@ -1895,224 +2008,51 @@ export default function MythicTheme() {
                       <stop offset="100%" stopColor={GOW.gold} stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  <line x1="25%" y1="50%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-                  <line x1="50%" y1="30%" x2="75%" y2="50%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                  <line x1="25%" y1="55%" x2="50%" y2="35%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+                  <line x1="50%" y1="35%" x2="75%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
                 </svg>
 
-                {professionNodes.map((node) => (
-                  <WaystationNode
-                    key={node.id}
-                    {...node}
-                    isActive={active === node.id}
-                    onClick={() => setActive(node.id as 'engineer' | 'drummer' | 'fighter')}
-                  />
-                ))}
+                <ProfessionSwitch
+                  className="absolute inset-0"
+                  label="Profession selector"
+                  renderOption={(option) => <WaystationNode option={option} />}
+                />
               </div>
             </div>
           </section>
         </FadeInSection>
 
-        {/* About */}
-        <FadeInSection delay={100}>
-          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <SpartanFrame title="About">
-                <p className="leading-relaxed mb-4" style={{ color: GOW.bone }}>{aboutData.bio}</p>
-                <div className="flex flex-wrap gap-2 md:gap-3">
-                  {aboutData.quickFacts.map((fact, i) => (
-                    <span
-                      key={i}
-                      className="px-2 md:px-3 py-1"
-                      style={{
-                        background: `${GOW.gold}12`,
-                        border: `1px solid ${GOW.gold}30`,
-                        color: GOW.gold,
-                        borderRadius: '3px',
-                      }}
-                    >
-                      ◆ {fact}
-                    </span>
-                  ))}
-                </div>
-              </SpartanFrame>
-            </div>
-          </section>
-        </FadeInSection>
-
-        {/* Art Section 1 - Weapons */}
-        <FadeInSection delay={150}>
-          <ArtSectionWeapons />
-        </FadeInSection>
-
-        {/* Work Experience - Kratos runs in, then pulls content with Blades of Chaos */}
-        {experience.length > 0 && (
-          <section
-            ref={experienceTrigger.ref}
-            className="relative z-20 py-8 px-6 overflow-visible"
-          >
-            <KratosChainPullReveal
-              triggered={experienceTrigger.triggered}
-              className="max-w-4xl mx-auto"
-            >
-              <SpartanFrame title="Work Experience">
-                <div>
-                  {experience.map((entry, index) => (
-                    <ExperienceCard key={entry.id} entry={entry} isLast={index === experience.length - 1} />
-                  ))}
-                </div>
-              </SpartanFrame>
-            </KratosChainPullReveal>
-          </section>
-        )}
-
-        {/* Art Section 2 - Greek Pillars */}
-        <FadeInSection>
-          <ArtSectionPillars />
-        </FadeInSection>
-
-        {/* Tech Stack / Skills */}
-        <FadeInSection>
-          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <SpartanFrame title={active === 'engineer' ? 'Tech Stack' : 'Skills'}>
-                {active === 'engineer' ? (
-                  <TechCloud categories={engineerTech} />
-                ) : (
-                  <SkillsList categories={otherSkills} />
-                )}
-              </SpartanFrame>
-            </div>
-          </section>
-        </FadeInSection>
-
-        {/* Projects - Featured Work */}
-        <section
-          ref={projectsTrigger.ref}
-          className="relative z-20 py-6 md:py-8 px-4 md:px-6"
-          style={{
-            opacity: projectsTrigger.triggered ? 1 : 0,
-            transform: projectsTrigger.triggered ? 'translateY(0)' : 'translateY(30px)',
-            transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
-            willChange: 'opacity, transform',
-          }}
-        >
-            <div className="max-w-4xl mx-auto">
-              <SpartanFrame title="Featured Work">
-                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
-                  {projects.filter(p => p.featured).slice(0, 6).map((project) => (
-                    <ProjectCard key={project.id} project={project} />
-                  ))}
-                </div>
-              </SpartanFrame>
-            </div>
-          </section>
-
-        {/* Art Section 3 - Mount Olympus */}
-        <FadeInSection>
-          <ArtSectionOlympus />
-        </FadeInSection>
-
-        {/* Ventures (Companies/Bands) */}
-        <FadeInSection>
-          {active === 'engineer' && (
-            <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-              <div className="max-w-4xl mx-auto">
-                <SpartanFrame title="Ventures">
-                  <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-                    {COMPANIES.map((company) => (
-                      <CompanyCard key={company.id} company={company} />
-                    ))}
-                  </div>
-                </SpartanFrame>
-              </div>
-            </section>
-          )}
-
-          {active === 'drummer' && (
-            <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-              <div className="max-w-4xl mx-auto">
-                <SpartanFrame title="Bands">
-                  <div className="grid md:grid-cols-3 gap-3 md:gap-4">
-                    {BANDS.map((band) => (
-                      <BandCard key={band.id} band={band} />
-                    ))}
-                  </div>
-                </SpartanFrame>
-              </div>
-            </section>
-          )}
-        </FadeInSection>
-
-        {/* Posts */}
-        <FadeInSection>
-          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <SpartanFrame title="Posts">
-                <div className="text-center py-6 md:py-8">
-                  <p style={{ color: GOW.silver }}>
-                    Writings and thoughts coming soon...
-                  </p>
-                  <p className="mt-2 italic" style={{ color: GOW.gold }}>
-                    ◆ Check back for updates on development, music, and martial arts
-                  </p>
-                </div>
-              </SpartanFrame>
-            </div>
-          </section>
-        </FadeInSection>
+        <ProfessionSectionsView sections={view.sections} />
 
       </main>
 
       {/* Contact CTA */}
       <section
         ref={contactTrigger.ref}
-        className="relative z-20 py-16 px-6"
+        className={`relative z-20 py-16 px-6 transition-[opacity,transform] duration-[600ms] ease-out ${
+          contactTrigger.triggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-[30px]'
+        }`}
         aria-label="Contact"
-        style={{
-          opacity: contactTrigger.triggered ? 1 : 0,
-          transform: contactTrigger.triggered ? 'translateY(0)' : 'translateY(30px)',
-          transition: 'opacity 0.6s ease-out, transform 0.6s ease-out',
-          willChange: 'opacity, transform',
-        }}
       >
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="mb-8">
-              <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: GOW.gold }}>
-                Ready to Work Together?
-              </h2>
-              <p className="text-sm" style={{ color: GOW.silver }}>
-                10+ years delivering production systems. Let&apos;s build something.
-              </p>
+        <RecruiterHero
+          render={({ line, actions }) => (
+            <div className="max-w-2xl mx-auto text-center">
+              <div className="mb-8">
+                <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: GOW.gold }}>
+                  Get In Touch
+                </h2>
+                <p className="text-sm" style={{ color: GOW.silver }}>{line}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <HeroActions actions={actions} />
+                <Link href="/cv" className={`${MY_BUTTON} bg-transparent border-2 border-[#c9a227] text-[#c9a227]`}>
+                  Download CV
+                </Link>
+              </div>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="mailto:alexanderpulido81@gmail.com"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                style={{
-                  background: GOW.gold,
-                  color: GOW.void,
-                  borderRadius: '4px',
-                }}
-              >
-                Get In Touch
-              </a>
-              <Link
-                href="/cv"
-                className="inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-all hover:scale-105 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-                style={{
-                  background: 'transparent',
-                  border: `2px solid ${GOW.gold}`,
-                  color: GOW.gold,
-                  borderRadius: '4px',
-                }}
-              >
-                Download CV
-              </Link>
-            </div>
-          </div>
-        </section>
-
-      
+          )}
+        />
+      </section>
 
       {/* Bottom obscure overlay */}
       <div
@@ -2128,7 +2068,7 @@ export default function MythicTheme() {
         <div className="inline-flex items-center gap-4" style={{ color: GOW.silver }}>
           <div className="w-12 h-px" style={{ background: GOW.gold }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]">
-            <span className="sr-only">Copyright </span>© {new Date().getFullYear()} Alexander Pulido
+            <span className="sr-only">Copyright </span>© {new Date().getFullYear()} {view.hero.name}
           </span>
           <div className="w-12 h-px" style={{ background: GOW.gold }} aria-hidden="true" />
         </div>
