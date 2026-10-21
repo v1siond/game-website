@@ -722,43 +722,6 @@
   }
 }
 
-/* ---- Muay Thai: gold job toasts stacking in from the right ---- */
-
-/* Pointing at a toast lights its gold edge: an overlay frame that fades in, the border never repaints. */
-.toast {
-  position: relative;
-}
-
-.toast::after {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border: 1px solid var(--neon-gold);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.toast:hover::after {
-  opacity: 1;
-}
-
-.toasting .toast {
-  animation: toastIn 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
-  animation-delay: calc(var(--i) * 0.18s);
-}
-
-.waiting .toast {
-  opacity: 0;
-}
-
-@keyframes toastIn {
-  from {
-    opacity: 0;
-    transform: translateX(60px);
-  }
-}
-
 /* ---- Contact: the incoming call rings, then his portrait resolves line by line ---- */
 
 .ring {
@@ -818,11 +781,22 @@
     transition: none !important;
   }
 
-  .waiting .toast {
-    opacity: 1;
-  }
-
   .waiting .resolve {
     transform: scaleX(0);
+  }
+}
+
+/* ---------------------------------------------------------------- the districts the backdrop scrolls through */
+
+.district {
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+.district[data-on='true'] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .district {
+    transition: none;
   }
 }

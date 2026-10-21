@@ -7,7 +7,9 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/components/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { HudPanel } from './hud'
+import { MercSprite, type MercMotion } from './merc'
 import { Scannable } from './scanner'
 import world from './world.module.css'
 
@@ -68,6 +70,12 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
   const { hud, sections, years } = labels
   const [tuned, setTuned] = useState(0)
   const tunedBand = bands[tuned]
+  // Him on the neon snare by the dial: every band tuned in is a fill on the drum, then he rests.
+  const drummer = usePoseSequence<MercMotion>({ entrance: [], rest: 'idle', still: 'still', moveMs: 700, policy: 'always' })
+  const tune = (index: number) => {
+    if (index !== tuned) drummer.play('drum')
+    setTuned(index)
+  }
 
   return (
     <HudPanel title={sections.bands}>
@@ -75,7 +83,11 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
       <p className="mt-1 text-sm text-[color:var(--neon-ice)]">{musician.line}</p>
 
       {/* the dial: the station marks, the needle on the tuned band */}
-      <div className="mt-5 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] px-2 pb-2 pt-3" aria-hidden="true">
+      <div className="mt-5 flex items-end gap-3">
+      <span className="block w-14 shrink-0 sm:w-16" aria-hidden="true">
+        <MercSprite key={drummer.take} profession="drummer" motion={drummer.move ?? drummer.pose} className="h-auto w-full" />
+      </span>
+      <div className="min-w-0 flex-1 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] px-2 pb-2 pt-3" aria-hidden="true">
         <div className="relative h-14" style={{ '--tuned': tuned, '--count': bands.length } as CSSProperties}>
           <div className="absolute inset-x-0 top-0 h-3 bg-[repeating-linear-gradient(90deg,var(--neon-data)_0_1px,transparent_1px_10px)] opacity-60" />
           <div className={`absolute inset-x-0 top-5 grid ${world.stations}`}>
@@ -90,6 +102,7 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
           </div>
         </div>
       </div>
+      </div>
       <p className="mt-2 flex flex-wrap justify-between gap-2 text-sm">
         <span className="text-[color:var(--neon-hud)]">{tunedBand ? fillLabel(hud.tunedTo, { name: tunedBand.name }) : ''}</span>
         <span className="text-[color:var(--neon-ash)]">{hud.tuneHint}</span>
@@ -101,7 +114,7 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
         itemClassName={MASONRY_ITEM}
         renderBand={(slot) => {
           const index = bands.findIndex((band) => band.id === slot.band.id)
-          return <Preset slot={slot} number={index + 1} tuned={index === tuned} onTune={() => setTuned(index)} />
+          return <Preset slot={slot} number={index + 1} tuned={index === tuned} onTune={() => tune(index)} />
         }}
       />
     </HudPanel>

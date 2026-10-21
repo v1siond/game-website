@@ -1,0 +1,388 @@
+/*
+ * The merc's scenes in the sections (life.tsx): transform and opacity only. Every scene rests whole
+ * (its last frame is its base style) and plays its entrance when its stage turns on (data-on='true');
+ * before that the parts that arrive wait hidden. Under reduced motion the world root drops every
+ * animation and the stage is on from the start, so each scene shows its last frame.
+ */
+
+/* ---------------------------------------------------------------- About: he walks in and scans the bio */
+
+.scanStage[data-on='false'] .walker,
+.scanStage[data-on='false'] .sweep,
+.scanStage[data-on='false'] .infoTag {
+  opacity: 0;
+}
+
+.scanStage[data-on='true'] .walker {
+  animation: walk-up 1s ease-out both;
+}
+
+@keyframes walk-up {
+  from {
+    opacity: 0;
+    transform: translateX(-6rem);
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* the scan line crosses the bio once, then is gone */
+.sweep {
+  opacity: 0;
+}
+.scanStage[data-on='true'] .sweep {
+  animation: sweep 0.9s ease-in-out 1.1s both;
+}
+
+@keyframes sweep {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  90% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(calc(100cqw - 4px));
+  }
+}
+
+.scanBox {
+  container-type: inline-size;
+}
+
+.scanStage[data-on='true'] .infoTag {
+  animation: tag-pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) calc(2s + var(--i) * 0.18s) both;
+}
+.infoTag:hover {
+  animation: tag-ping 0.4s steps(3) both !important;
+}
+
+@keyframes tag-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes tag-ping {
+  0%,
+  100% {
+    transform: none;
+  }
+  33% {
+    transform: translateX(-3px);
+  }
+  66% {
+    transform: translateX(3px);
+  }
+}
+
+/* ---------------------------------------------------------------- Tech stack: the time slow dash */
+
+.dashLane {
+  height: 6rem;
+}
+
+.runner {
+  transform: translateX(calc(100% + 2rem));
+}
+.dashStage[data-on='true'] .runner {
+  animation: dash 1.3s cubic-bezier(0.5, 0, 0.5, 1) both;
+  animation-delay: var(--lag, 0s);
+}
+.dashStage[data-on='false'] .runner {
+  transform: translateX(-6rem);
+}
+
+@keyframes dash {
+  from {
+    transform: translateX(-6rem);
+  }
+  to {
+    transform: translateX(calc(100% + 2rem));
+  }
+}
+
+/* the after images: tinted copies trailing the runner, each a little later and fainter */
+.echo {
+  opacity: var(--fade);
+}
+.echoCyan {
+  filter: sepia(1) saturate(6) hue-rotate(140deg);
+}
+.echoPink {
+  filter: sepia(1) saturate(6) hue-rotate(290deg);
+}
+.echoGreen {
+  filter: sepia(1) saturate(6) hue-rotate(70deg);
+}
+
+/* the green time slow tint over the section while he runs */
+.slowTint {
+  opacity: 0;
+}
+.dashStage[data-on='true'] .slowTint {
+  animation: slow-tint 1.6s ease both;
+}
+
+@keyframes slow-tint {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  70% {
+    opacity: 1;
+  }
+}
+
+/* each category card snaps in as he passes it */
+.dashStage[data-on='false'] .snapCard {
+  opacity: 0;
+}
+.dashStage[data-on='true'] .snapCard {
+  animation: snap 0.4s steps(3) calc(0.25s + var(--i) * 0.14s) both;
+}
+
+@keyframes snap {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5rem) skewX(-12deg);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(0.4rem) skewX(4deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------- Ventures: the fixer's contracts on the map */
+
+.mapStage[data-on='false'] .pin,
+.mapStage[data-on='false'] .contract {
+  opacity: 0;
+}
+.mapStage[data-on='true'] .pin {
+  animation: pin-drop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) calc(0.4s + var(--i) * 0.35s) both;
+}
+.mapStage[data-on='true'] .contract {
+  animation: contract-in 0.5s ease-out calc(0.7s + var(--i) * 0.35s) both;
+}
+.pin[data-hot='true'] .pinRing {
+  animation: pin-ping 0.8s ease-out infinite;
+}
+.pinRing {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes pin-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes contract-in {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pin-ping {
+  from {
+    opacity: 1;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+/* the flying car crosses the map once */
+.av {
+  opacity: 0;
+}
+.mapStage[data-on='true'] .av {
+  animation: av-cross 3.2s linear 0.2s both;
+}
+
+@keyframes av-cross {
+  from {
+    opacity: 1;
+    transform: translateX(-120px);
+  }
+  95% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(1100px);
+  }
+}
+
+/* ---------------------------------------------------------------- Muay Thai: the ripperdoc installs each achievement */
+
+.installBar {
+  transform-origin: left center;
+}
+.ripStage[data-on='false'] .installBar {
+  transform: scaleX(0);
+}
+.ripStage[data-on='true'] .installBar {
+  animation: install 0.8s steps(8) calc(0.6s + var(--i) * 0.9s) both;
+}
+.installRow:hover .installBar {
+  animation: reinstall 0.8s steps(8) both;
+}
+.ripStage[data-on='false'] .installed {
+  opacity: 0;
+}
+.ripStage[data-on='true'] .installed {
+  animation: installed-in 0.2s steps(2) calc(1.4s + var(--i) * 0.9s) both;
+}
+
+@keyframes install {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes reinstall {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes installed-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* the chair's clamp arms close on him while he sits, and open when he stands */
+.clamp {
+  transform-box: fill-box;
+  transform-origin: right center;
+}
+.ripStage[data-done='false'] .clamp {
+  transform: rotate(-18deg);
+}
+.clamp {
+  transition: transform 0.4s ease;
+}
+
+/* he stands out of the chair, a step to the right, for the kick */
+.patient {
+  transition: transform 0.45s ease-out;
+}
+.ripStage[data-done='true'] .patient {
+  transform: translateX(28%);
+}
+
+/* ---------------------------------------------------------------- Contact: he drives off into the skyline */
+
+.driveLane {
+  height: 7.5rem;
+}
+.car {
+  transform: translateX(calc(100cqw + 2rem));
+}
+.driveStage {
+  container-type: inline-size;
+}
+.driveStage[data-on='false'] .car {
+  transform: translateX(-16rem);
+}
+.driveStage[data-on='true'] .car {
+  animation: drive 4.2s both;
+}
+
+@keyframes drive {
+  from {
+    transform: translateX(-16rem);
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
+  }
+  30% {
+    transform: translateX(calc(50cqw - 6rem));
+  }
+  62% {
+    transform: translateX(calc(50cqw - 6rem));
+    animation-timing-function: cubic-bezier(0.7, 0, 0.9, 0.6);
+  }
+  to {
+    transform: translateX(calc(100cqw + 2rem));
+  }
+}
+
+/* the tail light streaks stretch out behind as he pulls away */
+.streak {
+  transform-origin: right center;
+  transform: scaleX(0);
+}
+.driveStage[data-on='true'] .streak {
+  animation: streak 4.2s both;
+}
+
+@keyframes streak {
+  0%,
+  62% {
+    transform: scaleX(0);
+  }
+  85%,
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+/* the headlights flash twice while he waits at the kerb */
+.headlight {
+  opacity: 0.4;
+}
+.driveStage[data-on='true'] .headlight {
+  animation: flash 4.2s steps(1) both;
+}
+
+@keyframes flash {
+  0%,
+  38%,
+  44%,
+  50% {
+    opacity: 0.4;
+  }
+  40%,
+  48%,
+  55%,
+  100% {
+    opacity: 1;
+  }
+}

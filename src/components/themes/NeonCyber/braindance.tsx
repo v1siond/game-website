@@ -11,6 +11,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { DataChip, HudPanel } from './hud'
+import { MercSprite } from './merc'
 import { Scannable } from './scanner'
 import world from './world.module.css'
 
@@ -105,6 +106,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
   const frame = useRef(0)
   const [layer, setLayer] = useState<Layer>('visual')
   const [scrubbed, setScrubbed] = useState(false)
+  const [riding, setRiding] = useState(false)
   const [head, setHead] = useState<HeadState>(() => ({ year: Math.floor(edit.last), lit: litAt(edit.clips, 1) }))
   const span = Math.max(edit.last - edit.first, 1)
 
@@ -121,11 +123,13 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
   const play = useCallback(() => {
     window.cancelAnimationFrame(frame.current)
     setScrubbed(true)
+    setRiding(true)
     const began = performance.now()
     const step = (now: number) => {
       const progress = Math.min(1, (now - began) / PLAY_TIME)
       moveHead(progress)
       if (progress < 1) frame.current = window.requestAnimationFrame(step)
+      else setRiding(false)
     }
     frame.current = window.requestAnimationFrame(step)
   }, [moveHead])
@@ -196,7 +200,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
   return (
     <div ref={sectionRef} className={world.bd} data-layer={layer} data-scrubbed={scrubbed}>
       <HudPanel title={sections.workExperience} tools={layerSwitch}>
-        <div className="mb-8">
+        <div className="mb-8 pt-16">
           <div
             ref={trackRef}
             className={`${world.track} relative cursor-ew-resize border-y border-[color-mix(in_srgb,var(--neon-chrome-red)_50%,transparent)] bg-[color:var(--neon-ink)]`}
@@ -227,6 +231,10 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
               >
                 <span className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-[color:var(--neon-hud)]" aria-hidden="true" />
                 <span className="absolute -top-1 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[color:var(--neon-hud)]" aria-hidden="true" />
+                {/* him riding the playhead through the years: walking while it plays, at rest when it stops */}
+                <span className="absolute bottom-full left-1/2 mb-2 block w-10 -translate-x-1/2" aria-hidden="true">
+                  <MercSprite profession="engineer" motion={reducedMotion ? 'still' : riding ? 'walk' : 'idle'} className="h-auto w-full" />
+                </span>
               </div>
             </div>
           </div>

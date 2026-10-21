@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
@@ -9,7 +9,9 @@ import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { CityBackdrop } from './NeonCyber/city'
+import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { CityBackdrop, type District } from './NeonCyber/city'
+import { DistrictStage, DriveOff } from './NeonCyber/life'
 import { BootHero } from './NeonCyber/boot'
 import { QuickhackMenu } from './NeonCyber/quickhack'
 import { ScanVeil, useTimeSlow } from './NeonCyber/scanner'
@@ -25,8 +27,10 @@ const neonFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display: '
 // composition: the hero boots the optics (./NeonCyber/boot), the profession switch is the quickhack
 // menu over his rig (./NeonCyber/quickhack, ./NeonCyber/rigs), the sections are the braindance of his
 // work, the gigs with their breach, the radio and the data tab (./NeonCyber/views), and contact is an
-// incoming call (./NeonCyber/holocall). Scan mode (./NeonCyber/scanner) is a flag on the root that
-// every card reads.
+// incoming call (./NeonCyber/holocall) after which he drives off into the skyline (./NeonCyber/life).
+// Scan mode (./NeonCyber/scanner) is a flag on the root that every card reads. The backdrop travels
+// through the city's districts as the page scrolls: each section stage hands its district up through
+// the shared ZoneStageProvider and the city fades to it.
 //
 // The root carries the palette as --neon-* variables and the pointer as --mx and --my, the only inline
 // styles, variables only. It clips sideways overflow with overflow-x: clip, not hidden: hidden would
@@ -39,6 +43,8 @@ export default function NeonCyberTheme() {
   const reducedMotion = useReducedMotion()
   const [mounted, setMounted] = useState(false)
   const [scanning, setScanning] = useState(false)
+  const [district, setDistrict] = useState<District>('watson')
+  const stage = useMemo(() => ({ reduced: reducedMotion, onZone: (zone: District) => setDistrict(zone) }), [reducedMotion])
   const rootRef = usePointerVars(mounted && !reducedMotion)
   useTimeSlow(rootRef, scanning)
 
@@ -50,16 +56,19 @@ export default function NeonCyberTheme() {
 
   return (
     <div ref={rootRef} data-scan={scanning ? 'on' : 'off'} className={`relative min-h-screen overflow-x-clip ${world.root} ${neonFace.variable}`} style={NEON_VARS}>
-      <CityBackdrop />
+      <ZoneStageProvider value={stage}>
+      <CityBackdrop district={district} />
       <ScanVeil />
 
-      <header className="relative z-30 px-4 pb-8 pt-8 sm:px-6 sm:pt-16">
-        <BootHero profession={active} scanning={scanning} onScan={() => setScanning((on) => !on)} />
-      </header>
+      <DistrictStage district="watson">
+        <header className="relative z-30 px-4 pb-8 pt-8 sm:px-6 sm:pt-16">
+          <BootHero profession={active} scanning={scanning} onScan={() => setScanning((on) => !on)} />
+        </header>
 
-      <section className="relative z-20 px-4 pb-10 sm:px-6" aria-label={navigation.professionSelection}>
-        <QuickhackMenu active={active} />
-      </section>
+        <section className="relative z-20 px-4 pb-10 sm:px-6" aria-label={navigation.professionSelection}>
+          <QuickhackMenu active={active} />
+        </section>
+      </DistrictStage>
 
       <main className="relative z-20 px-4 py-6 sm:px-6">
         <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
@@ -68,6 +77,9 @@ export default function NeonCyberTheme() {
       </main>
 
       <HoloCall profession={active} />
+      <div className="relative z-20 px-4 pb-6 sm:px-6">
+        <DriveOff />
+      </div>
 
       <footer className="relative z-20 flex items-center justify-center gap-3 pb-10" role="contentinfo">
         <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
@@ -76,6 +88,7 @@ export default function NeonCyberTheme() {
         </p>
         <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
       </footer>
+      </ZoneStageProvider>
     </div>
   )
 }

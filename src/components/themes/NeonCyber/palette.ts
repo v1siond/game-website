@@ -53,8 +53,17 @@ export const NEON = {
   steel: '#3a2456',
   chrome: '#8a8a92',
 
+  // The districts the page scrolls through: Watson's dusk and concrete, the megabuilding's pink tube and
+  // fog, the Badlands' sunset (sampled from the store screenshots, research 2026-10-21-w4-neon-cyber)
+  watsonDusk: '#53381d',
+  concrete: '#2e2a26',
+  pinkTube: '#ff3c9a',
+  sunset: '#aa5a2c',
+  sunsetGlow: '#e5a868',
+
   // The hero's costume
-  jacket: '#23202e',
+  jacket: '#e8b80f',
+  jacketLit: '#f7d84a',
   jeans: '#2d2a3d',
   shoe: '#15121c',
   shorts: '#e8eef0',

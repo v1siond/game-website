@@ -553,3 +553,69 @@
     animation: none !important;
   }
 }
+
+/* ---------------------------------------------------------------- dash: the time slow run, leaning in, arms swept back */
+
+.dash .body {
+  transform: rotate(12deg);
+}
+.dash .armRight,
+.dash .armLeft {
+  transform: rotate(38deg);
+}
+.dash .foreRight,
+.dash .foreLeft {
+  transform: rotate(-22deg);
+}
+.dash .thighRight {
+  animation: dash-thigh-a 0.36s linear infinite;
+}
+.dash .thighLeft {
+  animation: dash-thigh-b 0.36s linear infinite;
+}
+.dash .shinRight,
+.dash .shinLeft {
+  transform: rotate(38deg);
+}
+
+@keyframes dash-thigh-a {
+  0%,
+  100% {
+    transform: rotate(-42deg);
+  }
+  50% {
+    transform: rotate(24deg);
+  }
+}
+@keyframes dash-thigh-b {
+  0%,
+  100% {
+    transform: rotate(24deg);
+  }
+  50% {
+    transform: rotate(-42deg);
+  }
+}
+
+/* ---------------------------------------------------------------- sit: in the ripperdoc's chair, thighs forward, shins down */
+
+.sit .body {
+  transform: translateY(18px);
+}
+.sit .thighRight,
+.sit .thighLeft {
+  transform: rotate(-72deg);
+}
+.sit .shinRight,
+.sit .shinLeft {
+  transform: rotate(72deg);
+}
+.sit .armLeft {
+  transform: rotate(-12deg);
+}
+.sit .foreLeft {
+  transform: rotate(-70deg);
+}
+.sit .optics {
+  animation: flare 0.9s steps(2) infinite;
+}

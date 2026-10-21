@@ -3,8 +3,9 @@ import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { NEON } from './palette'
 import s from './merc.module.css'
 
-// Him as this world's own figure, a parody of the night city merc of Cyberpunk 2077 (V): the black
-// samurai style jacket with its tall upturned yellow collar and the red sigil on the chest, a chrome
+// Him as this world's own figure, a parody of the night city merc of Cyberpunk 2077 (V): the yellow
+// samurai style jacket of the key art with its tall upturned collar lit cyan inside, the silver reflective
+// bands round the sleeves and the red sigil on the chest, a chrome
 // cyberarm with its segment seams, the optics glowing cyan at the eyes with the implant lines on the
 // temple, dark cargo trousers and heavy boots. Drawn the way the game's key art reads at sprite size:
 // hard dark outline, flat fills with one cut of neon rim light on the lit side, chrome in two tones.
@@ -14,10 +15,11 @@ import s from './merc.module.css'
 // Per profession: the System Engineer jacks a cable from the temple into a deck and runs a quickhack
 // (data glyphs climb off the hand); the Musician drops behind a neon snare with two sticks; the Martial
 // Artist sheds the jacket, wraps his hands and wears his own mongkhon, then throws the knee and the
-// roundhouse. Every one can idle (breath, optic blink), walk, pop the mantis blades for the strike, take
-// the scan pose with the optic reticle, double jump on the cyberlegs, and glitch when hit or hovered.
+// roundhouse. Every one can idle (breath, optic blink), walk, dash on the time slow implant (leaning
+// into the run, arms back), sit in the ripperdoc's chair, pop the mantis blades for the strike, take the
+// scan pose with the optic reticle, double jump on the cyberlegs, and glitch when hit or hovered.
 
-export type MercMotion = 'still' | 'idle' | 'walk' | 'blades' | 'scan' | 'jump' | 'hack' | 'drum' | 'kick'
+export type MercMotion = 'still' | 'idle' | 'walk' | 'dash' | 'sit' | 'blades' | 'scan' | 'jump' | 'hack' | 'drum' | 'kick'
 
 /** Each profession's action, the way the merc would do that job. */
 export const MERC_ACTION: Record<Profession, MercMotion> = {
@@ -30,6 +32,8 @@ const MOTION_CLASS: Record<MercMotion, string> = {
   still: '',
   idle: s.idle,
   walk: s.walk,
+  dash: s.dash,
+  sit: s.sit,
   blades: s.blades,
   scan: s.scan,
   jump: s.jump,
@@ -50,7 +54,9 @@ const SKIN = HERO_IDENTITY.skin
 const SKIN_SHADE = HERO_IDENTITY.skinShade
 const HAIR = HERO_IDENTITY.hair
 const JACKET = NEON.jacket
-const COLLAR = NEON.hud
+const COLLAR = NEON.jacketLit
+const LINING = NEON.data
+const BAND = NEON.ash
 const OPTIC = NEON.data
 const CHROME = NEON.chrome
 const CHROME_LIT = NEON.ash
@@ -146,7 +152,9 @@ function Torso({ profession }: { profession: Profession }) {
   return (
     <g>
       <Shape d={COLLAR_BACK} fill={COLLAR} />
+      <path d="M38 36 L44 39 L50 45 L56 39 L62 36 L60 46 L40 46 Z" fill={LINING} opacity={0.75} />
       <Shape d={JACKET_BODY} fill={JACKET} />
+      <path d="M31.5 70 H40 M60 70 H68.8" stroke={BAND} strokeWidth={2.4} />
       <path d="M44 42 L50 60 L56 42" fill={NEON.ink} stroke={LINE} strokeWidth={LW} />
       <path d="M50 60 V94" stroke={NEON.steel} strokeWidth={1.2} />
       {/* the sigil on the chest and the rim light down the lit side */}
@@ -201,6 +209,7 @@ function Arm({ side, profession }: { side: Side; profession: Profession }) {
   return (
     <g className={side === 'right' ? s.armRight : s.armLeft}>
       <Shape d={UPPER[side]} fill={chrome && profession === 'fighter' ? CHROME : sleeve} />
+      {profession !== 'fighter' && <path d={side === 'right' ? 'M27.4 58 L36 59.4' : 'M64 59.4 L73.4 58'} stroke={BAND} strokeWidth={2.6} />}
       <g className={side === 'right' ? s.foreRight : s.foreLeft}>
         <Blade side={side} />
         <Shape d={FORE[side]} fill={fore} />
