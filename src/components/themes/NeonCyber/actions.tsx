@@ -11,7 +11,7 @@ const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
 
 // The slanted cut would clip the focus ring, so a focused button drops it and shows the ring whole.
 const HUD_BUTTON =
-  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0512] [clip-path:polygon(8px_0,100%_0,calc(100%-8px)_100%,0_100%)] focus-visible:[clip-path:none]'
+  'inline-flex items-center justify-center min-h-[44px] px-4 py-2 text-sm tracking-wider font-mono transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--neon-void)] [clip-path:polygon(8px_0,100%_0,calc(100%-8px)_100%,0_100%)] focus-visible:[clip-path:none]'
 
 export function HeroAction({ action }: { action: HeroActionSlot }) {
   return (

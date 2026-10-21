@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { NEON } from './palette'
 
 // Intense glitch text effect with RGB split - neon city chromatic aberration
 export function GlitchText({
@@ -125,7 +126,7 @@ export function TerminalLine({
 // HUD Scanner corners - Kiroshi optics style targeting reticle
 export function ScannerCorners({
   children,
-  color = '#00ffff'
+  color = NEON.cyan
 }: {
   children: React.ReactNode
   color?: string
@@ -159,7 +160,7 @@ export function ScannerCorners({
 }
 
 // Circuit board pattern background - tech infrastructure visual
-export function CircuitPattern({ color = '#ff00ff' }: { color?: string }) {
+export function CircuitPattern({ color = NEON.magenta }: { color?: string }) {
   return (
     <svg
       className="absolute inset-0 w-full h-full opacity-10 pointer-events-none"
@@ -194,7 +195,7 @@ export function CyberwareIcon({ type }: { type: 'eye' | 'arm' | 'chip' | 'jack' 
   return (
     <span
       className="text-cyan-400 text-sm"
-      style={{ textShadow: '0 0 5px #00ffff' }}
+      style={{ textShadow: `0 0 5px ${NEON.cyan}` }}
       role="img"
       aria-label={`${type} cyberware`}
     >
@@ -214,7 +215,7 @@ export function ChromaticBorder({ children }: { children: React.ReactNode }) {
           <div
             className="absolute -inset-px opacity-50"
             style={{
-              background: 'linear-gradient(45deg, #ff0066, transparent, #00ffff)',
+              background: `linear-gradient(45deg, ${NEON.hotPink}, transparent, ${NEON.cyan})`,
               transform: 'translate(-2px, 0)',
             }}
             aria-hidden="true"
@@ -222,7 +223,7 @@ export function ChromaticBorder({ children }: { children: React.ReactNode }) {
           <div
             className="absolute -inset-px opacity-50"
             style={{
-              background: 'linear-gradient(45deg, #00ffff, transparent, #ff0066)',
+              background: `linear-gradient(45deg, ${NEON.cyan}, transparent, ${NEON.hotPink})`,
               transform: 'translate(2px, 0)',
             }}
             aria-hidden="true"

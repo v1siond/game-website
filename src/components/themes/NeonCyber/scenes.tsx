@@ -23,7 +23,7 @@ export function LevelStrip({ profession, zone }: { profession: Profession; zone:
     <SharedLevelStrip
       stage={PROFESSION_STAGES[profession]}
       zone={zone}
-      className={`${styles.tempo} h-28 border-y border-pink-500/60 bg-[#0a0512] sm:h-40`}
+      className={`${styles.tempo} h-28 border-y border-pink-500/60 bg-[color:var(--neon-void)] sm:h-40`}
       hero={
         <div className="absolute bottom-1 left-2">
           <HeroCharacter profession={profession} className={scene.hero} />
@@ -41,7 +41,7 @@ const ITEM_LOOK: Record<SceneItemKind, { frame: string; body: string }> = {
     body: styles.bootScreen,
   },
   billboard: {
-    frame: 'border-2 border-pink-500 shadow-[0_0_14px_#ff00ff80]',
+    frame: 'border-2 border-pink-500 shadow-[0_0_14px_color-mix(in_srgb,var(--neon-magenta)_50%,transparent)]',
     body: styles.billboardCopy,
   },
 }
@@ -66,7 +66,7 @@ export function ContactScene({ profession }: { profession: Profession }) {
     <ContactStage
       headingId="neon-contact-heading"
       corner={
-        <div className={`relative h-44 overflow-hidden border border-cyan-400/60 bg-[#0a0512] ${styles.tempo}`} aria-hidden="true">
+        <div className={`relative h-44 overflow-hidden border border-cyan-400/60 bg-[color:var(--neon-void)] ${styles.tempo}`} aria-hidden="true">
           <Corner />
         </div>
       }

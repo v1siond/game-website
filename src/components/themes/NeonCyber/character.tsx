@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_SKIN as SKIN, HeroArm, HeroFigure, HeroLeg } from '@/components/scroll/HeroFigure'
+import { NEON } from './palette'
 
 // Him in Neon Cyber (the shared HeroFigure): the dark tee, dressed per profession, the trim lit in the
 // world's magenta and cyan.
 
-const EYE = '#0a0512'
-const SHOE = '#15121c'
+const EYE = NEON.void
+const SHOE = NEON.shoe
 
 interface Outfit {
   shirt: string
@@ -19,20 +20,20 @@ interface Outfit {
 }
 
 const OUTFIT: Record<Profession, Outfit> = {
-  engineer: { shirt: '#23202e', trim: '#00ffff', legs: '#2d2a3d', long: true, feet: SHOE, hand: 'fist' },
-  drummer: { shirt: '#23202e', trim: '#ff00ff', legs: '#e8eef0', long: false, feet: SHOE, hand: 'sticks' },
-  fighter: { shirt: '#23202e', trim: '#ff0066', legs: '#ff0066', long: false, feet: SKIN, hand: 'gloves' },
+  engineer: { shirt: NEON.jacket, trim: NEON.cyan, legs: NEON.jeans, long: true, feet: SHOE, hand: 'fist' },
+  drummer: { shirt: NEON.jacket, trim: NEON.magenta, legs: NEON.shorts, long: false, feet: SHOE, hand: 'sticks' },
+  fighter: { shirt: NEON.jacket, trim: NEON.hotPink, legs: NEON.hotPink, long: false, feet: SKIN, hand: 'gloves' },
 }
 
 const HAND_DRAW: Record<Outfit['hand'], (x: number) => ReactNode> = {
   fist: (x) => <circle cx={x} cy={56} r={3} fill={SKIN} />,
   sticks: (x) => (
     <>
-      <line x1={x} y1={54} x2={x} y2={74} stroke="#f5d28a" strokeWidth={2} strokeLinecap="round" />
+      <line x1={x} y1={54} x2={x} y2={74} stroke={NEON.stickWood} strokeWidth={2} strokeLinecap="round" />
       <circle cx={x} cy={56} r={3} fill={SKIN} />
     </>
   ),
-  gloves: (x) => <circle cx={x} cy={56} r={4.5} fill="#ff0066" stroke="#ffd1e3" strokeWidth={0.8} />,
+  gloves: (x) => <circle cx={x} cy={56} r={4.5} fill={NEON.hotPink} stroke={NEON.gloveTrim} strokeWidth={0.8} />,
 }
 
 export function HeroCharacter({ profession, className = '' }: { profession: Profession; className?: string }) {

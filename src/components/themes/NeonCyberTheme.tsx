@@ -14,6 +14,7 @@ import { CVLink, HeroAction } from './NeonCyber/actions'
 import { PROFESSION_CYBERWARE, SECTION_VIEWS, terminalName } from './NeonCyber/sections'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ContactScene } from './NeonCyber/scenes'
+import { NEON_VARS } from './NeonCyber/palette'
 
 // Neon Cyber, the default world: the page composition. Its effects, backdrop, cards, per profession
 // panels and scroll scenes live in ./NeonCyber.
@@ -46,10 +47,10 @@ export default function NeonCyberTheme() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen relative overflow-x-clip bg-gradient-to-b from-[#0a0512] via-[#150a20] to-[#0a0512] font-['Share_Tech_Mono','Courier_New',monospace]">
+    <div style={NEON_VARS} className="min-h-screen relative overflow-x-clip bg-gradient-to-b from-[color:var(--neon-void)] via-[color:var(--neon-dusk)] to-[color:var(--neon-void)] font-['Share_Tech_Mono','Courier_New',monospace]">
       {screenTear && !reducedMotion && (
         <div
-          className="fixed left-0 right-0 top-[var(--tear)] h-2 z-50 pointer-events-none bg-gradient-to-r from-[#ff00ff] to-[#00ffff] mix-blend-screen"
+          className="fixed left-0 right-0 top-[var(--tear)] h-2 z-50 pointer-events-none bg-gradient-to-r from-[color:var(--neon-magenta)] to-[color:var(--neon-cyan)] mix-blend-screen"
           style={{ '--tear': `${screenTear}%` } as CSSProperties}
           aria-hidden="true"
         />
@@ -92,7 +93,7 @@ export default function NeonCyberTheme() {
                         <p className="mt-3 text-sm text-white/90">{headline}</p>
                         <div className="flex items-center gap-3 mt-2">
                           <span
-                            className={`w-2 h-2 shrink-0 rounded-full bg-green-400 shadow-[0_0_10px_#00ff00] ${!reducedMotion ? 'animate-pulse' : ''}`}
+                            className={`w-2 h-2 shrink-0 rounded-full bg-green-400 shadow-[0_0_10px_var(--neon-led)] ${!reducedMotion ? 'animate-pulse' : ''}`}
                             aria-hidden="true"
                           />
                           <q className="text-sm text-pink-400 tracking-wider italic">{tagline}</q>
@@ -139,13 +140,13 @@ export default function NeonCyberTheme() {
                 {...optionProps}
                 className={`p-3 sm:p-4 text-left transition-[opacity,transform] relative overflow-hidden border-2 [clip-path:polygon(15px_0,100%_0,calc(100%-15px)_100%,0_100%)] focus:outline-none focus-visible:[clip-path:none] focus-visible:ring-2 focus-visible:ring-yellow-300 ${
                   selected
-                    ? 'scale-105 border-[#ff00ff] bg-gradient-to-br from-[#ff00ff]/20 to-[#00ffff]/10'
-                    : 'opacity-70 hover:opacity-100 border-[#00ffff]/40 bg-[#00ffff]/5'
+                    ? 'scale-105 border-[color:var(--neon-magenta)] bg-gradient-to-br from-[color-mix(in_srgb,var(--neon-magenta)_20%,transparent)] to-[color-mix(in_srgb,var(--neon-cyan)_10%,transparent)]'
+                    : 'opacity-70 hover:opacity-100 border-[color-mix(in_srgb,var(--neon-cyan)_40%,transparent)] bg-[color-mix(in_srgb,var(--neon-cyan)_5%,transparent)]'
                 }`}
               >
                 {selected && !reducedMotion && (
                   <span
-                    className="absolute inset-0 opacity-30 bg-gradient-to-r from-transparent via-[#ff00ff] to-transparent animate-scan"
+                    className="absolute inset-0 opacity-30 bg-gradient-to-r from-transparent via-[color:var(--neon-magenta)] to-transparent animate-scan"
                     aria-hidden="true"
                   />
                 )}
@@ -153,7 +154,7 @@ export default function NeonCyberTheme() {
                 <span className="relative z-10 block">
                   <span className="flex flex-wrap items-center gap-x-2 mb-2">
                     <CyberwareIcon type={PROFESSION_CYBERWARE[prof]} />
-                    <span className={`text-sm tracking-wider font-mono ${selected ? 'text-[#ff00ff]' : 'text-[#00ffff]'}`}>
+                    <span className={`text-sm tracking-wider font-mono ${selected ? 'text-[color:var(--neon-magenta)]' : 'text-[color:var(--neon-cyan)]'}`}>
                       {label.toUpperCase()}
                     </span>
                   </span>

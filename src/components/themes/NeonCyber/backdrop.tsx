@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { NEON } from './palette'
 
 // The fixed backdrop loops run all the time, so they are kept few: with the hero's status dot, the
 // selector's scan line and the two glitch names they hold 14 animated elements, which leaves the
@@ -80,7 +81,7 @@ export function DataStream() {
             opacity: c.opacity,
             animationDuration: `${c.speed}s`,
             animationDelay: `${-c.speed * Math.random()}s`,
-            textShadow: '0 0 5px #00ffff',
+            textShadow: `0 0 5px ${NEON.cyan}`,
           }}
         >
           {c.char}
@@ -90,7 +91,7 @@ export function DataStream() {
   )
 }
 
-const LIGHT_COLORS = ['bg-[#ff00ff]', 'bg-[#00ffff]', 'bg-[#ffff00]', 'bg-[#ff0066]', 'bg-[#00ff66]']
+const LIGHT_COLORS = ['bg-[color:var(--neon-magenta)]', 'bg-[color:var(--neon-cyan)]', 'bg-[color:var(--neon-yellow)]', 'bg-[color:var(--neon-hot-pink)]', 'bg-[color:var(--neon-green)]']
 
 // Spread by the golden ratio so the lights scatter evenly and land in the same places every render.
 const SKYLINE_LIGHTS = Array.from({ length: 16 }, (_, i) => ({
@@ -107,18 +108,18 @@ export function NightCitySkyline() {
       <svg viewBox="0 0 1200 200" className="w-full h-full" preserveAspectRatio="none">
         <defs>
           <linearGradient id="skylineGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#0a0512" stopOpacity="0" />
-            <stop offset="100%" stopColor="#ff00ff" stopOpacity="0.3" />
+            <stop offset="0%" stopColor={NEON.void} stopOpacity="0" />
+            <stop offset="100%" stopColor={NEON.magenta} stopOpacity="0.3" />
           </linearGradient>
           <linearGradient id="buildingGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#1a0a2a" />
-            <stop offset="100%" stopColor="#0a0512" />
+            <stop offset="0%" stopColor={NEON.street} />
+            <stop offset="100%" stopColor={NEON.void} />
           </linearGradient>
           {/* Arasaka Tower style gradient */}
           <linearGradient id="arasakaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#ff0066" stopOpacity="0.3" />
-            <stop offset="50%" stopColor="#1a0a2a" />
-            <stop offset="100%" stopColor="#0a0512" />
+            <stop offset="0%" stopColor={NEON.hotPink} stopOpacity="0.3" />
+            <stop offset="50%" stopColor={NEON.street} />
+            <stop offset="100%" stopColor={NEON.void} />
           </linearGradient>
         </defs>
         {/* Buildings silhouette with Arasaka Tower centerpiece */}

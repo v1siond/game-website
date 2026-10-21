@@ -15,6 +15,7 @@ import {
 import scene from '@/components/scroll/heroScene.module.css'
 import { HeroCharacter } from './character'
 import styles from './scenes.module.css'
+import { NEON } from './palette'
 
 // The three Neon Cyber stages, one per profession, each in two places: the level strip that runs above
 // a section while it scrolls, and the corner of the contact scene. System Engineer runs a rooftop of
@@ -26,11 +27,11 @@ import styles from './scenes.module.css'
 // running, two drumming or striking) and the props that answer progress (three terminal screens or
 // billboards, two beams and five waves, one strike flash). Everything else here is static.
 
-const VOID = '#0a0512'
-const MAGENTA = '#ff00ff'
-const CYAN = '#00ffff'
-const HOT_PINK = '#ff0066'
-const YELLOW = '#ffff00'
+const VOID = NEON.void
+const MAGENTA = NEON.magenta
+const CYAN = NEON.cyan
+const HOT_PINK = NEON.hotPink
+const YELLOW = NEON.yellow
 
 // Tower outlines for the two skyline layers, fixed so every render draws the same city.
 const towers = (count: number, spacing: number, salt: number) =>
@@ -49,7 +50,7 @@ function Skyline() {
       <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${scene.far}`}>
         {FAR_TOWERS.map(({ x, width, height }) => (
           <g key={x}>
-            <rect x={x} y={100 - height} width={width} height={height} fill="#1a0a2a" />
+            <rect x={x} y={100 - height} width={width} height={height} fill={NEON.street} />
             <rect x={x + 4} y={104 - height} width={2} height={2} fill={CYAN} opacity={0.5} />
             <rect x={x + width - 7} y={112 - height} width={2} height={2} fill={MAGENTA} opacity={0.5} />
           </g>
@@ -58,12 +59,12 @@ function Skyline() {
       <LevelArt className={`absolute inset-y-0 left-0 h-full w-[140%] ${scene.mid}`}>
         {MID_TOWERS.map(({ x, width, height }) => (
           <g key={x}>
-            <rect x={x} y={100 - height * 0.8} width={width} height={height * 0.8} fill="#2a1240" />
+            <rect x={x} y={100 - height * 0.8} width={width} height={height * 0.8} fill={NEON.tower} />
             <line x1={x} y1={100 - height * 0.8} x2={x + width} y2={100 - height * 0.8} stroke={MAGENTA} strokeWidth={0.8} />
           </g>
         ))}
         <rect x={210} y={22} width={60} height={26} fill={VOID} stroke={CYAN} strokeWidth={1.2} />
-        <line x1={240} y1={48} x2={240} y2={70} stroke="#3a2456" strokeWidth={3} />
+        <line x1={240} y1={48} x2={240} y2={70} stroke={NEON.steel} strokeWidth={3} />
       </LevelArt>
     </>
   )
@@ -78,7 +79,7 @@ function Billboard({ position, color }: { position: number; color: string }) {
       aria-hidden="true"
       focusable="false"
     >
-      <path d="M14 26 V44 M34 26 V44" stroke="#3a2456" strokeWidth={2} />
+      <path d="M14 26 V44 M34 26 V44" stroke={NEON.steel} strokeWidth={2} />
       <g className={scene.lightAt}>
         <rect x={2} y={2} width={44} height={24} fill={VOID} stroke={color} strokeWidth={1.5} />
         <path d="M8 10 H40 M8 17 H30" stroke={color} strokeWidth={2} />
@@ -96,13 +97,13 @@ function CircuitLedge() {
   )
 }
 
-const TERMINAL = { body: '#2a1840', screen: CYAN, stand: '#3a2456' }
+const TERMINAL = { body: NEON.panel, screen: CYAN, stand: NEON.steel }
 
 function Rooftop({ zone }: { zone: LevelZone }) {
   return (
     <>
       <Skyline />
-      <LevelGround className="border-cyan-400 bg-[#1d1030]" />
+      <LevelGround className="border-cyan-400 bg-[color:var(--neon-alley)]" />
       <CircuitLedge />
       {zone === 'record' ? (
         <>
@@ -121,7 +122,7 @@ function Rooftop({ zone }: { zone: LevelZone }) {
   )
 }
 
-const KIT: DrumKitColors = { stand: '#8a8a92', shell: '#2a1840', rim: CYAN, bass: MAGENTA }
+const KIT: DrumKitColors = { stand: NEON.chrome, shell: NEON.panel, rim: CYAN, bass: MAGENTA }
 const WAVES: [string, string] = [MAGENTA, CYAN]
 
 function Stage() {
@@ -129,7 +130,7 @@ function Stage() {
     <>
       <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${scene.far}`}>
         {FAR_TOWERS.map(({ x }) => (
-          <g key={x} fill="#1a0a2a">
+          <g key={x} fill={NEON.street}>
             <circle cx={x + 8} cy={84} r={6} />
             <rect x={x + 2} y={88} width={12} height={12} />
             <circle cx={x + 22} cy={86} r={5} />
@@ -137,13 +138,13 @@ function Stage() {
         ))}
       </LevelArt>
       <LevelArt className={`absolute inset-y-0 left-0 h-full w-[140%] ${scene.mid}`}>
-        <line x1={0} y1={6} x2={600} y2={6} stroke="#3a2456" strokeWidth={3} />
+        <line x1={0} y1={6} x2={600} y2={6} stroke={NEON.steel} strokeWidth={3} />
         <polygon points="150,6 120,96 180,96" fill={MAGENTA} opacity={0.12} className={styles.beam} />
         <polygon points="390,6 360,96 420,96" fill={CYAN} opacity={0.12} className={styles.beam} />
-        <rect x={60} y={50} width={30} height={50} fill="#1d1030" stroke="#3a2456" />
-        <rect x={500} y={50} width={30} height={50} fill="#1d1030" stroke="#3a2456" />
+        <rect x={60} y={50} width={30} height={50} fill={NEON.alley} stroke={NEON.steel} />
+        <rect x={500} y={50} width={30} height={50} fill={NEON.alley} stroke={NEON.steel} />
       </LevelArt>
-      <LevelGround className="border-pink-500 bg-[#1d1030]" />
+      <LevelGround className="border-pink-500 bg-[color:var(--neon-alley)]" />
       <SoundWaves className="absolute bottom-4 right-4 h-12 w-14 sm:h-16 sm:w-20" colors={WAVES} />
     </>
   )
@@ -156,18 +157,18 @@ function Ring() {
         {FAR_TOWERS.map(({ x }) => (
           <circle key={x} cx={x + 12} cy={12} r={2} fill={YELLOW} opacity={0.6} />
         ))}
-        <rect x={0} y={70} width={600} height={30} fill="#1a0a2a" />
+        <rect x={0} y={70} width={600} height={30} fill={NEON.street} />
       </LevelArt>
       <LevelArt className={`absolute inset-y-0 left-0 h-full w-[140%] ${scene.mid}`}>
         {[40, 290, 540].map((x) => (
-          <rect key={x} x={x} y={30} width={6} height={70} fill="#3a2456" />
+          <rect key={x} x={x} y={30} width={6} height={70} fill={NEON.steel} />
         ))}
         <line x1={0} y1={40} x2={600} y2={40} stroke={HOT_PINK} strokeWidth={1.5} />
-        <line x1={0} y1={56} x2={600} y2={56} stroke="#e0f0ff" strokeWidth={1.5} />
+        <line x1={0} y1={56} x2={600} y2={56} stroke={NEON.ice} strokeWidth={1.5} />
         <line x1={0} y1={72} x2={600} y2={72} stroke={CYAN} strokeWidth={1.5} />
       </LevelArt>
-      <LevelGround className="border-cyan-400 bg-[#1d1030]" />
-      <PadHolder className="left-[calc(38%_+_4.5rem)] sm:left-[calc(38%_+_5.5rem)]" body="#2d2a3d" pads={HOT_PINK} />
+      <LevelGround className="border-cyan-400 bg-[color:var(--neon-alley)]" />
+      <PadHolder className="left-[calc(38%_+_4.5rem)] sm:left-[calc(38%_+_5.5rem)]" body={NEON.jeans} pads={HOT_PINK} />
     </>
   )
 }
@@ -185,7 +186,7 @@ function DeskCornerScene() {
   return (
     <DeskCorner
       hero={<HeroCharacter profession="engineer" className={scene.hero} />}
-      colors={{ panel: '#2a1840', screens: [CYAN, MAGENTA], desk: '#3a2456', keyboard: '#8a8a92' }}
+      colors={{ panel: NEON.panel, screens: [CYAN, MAGENTA], desk: NEON.steel, keyboard: NEON.chrome }}
     />
   )
 }
@@ -199,8 +200,8 @@ function RingCornerScene() {
     <RingCorner
       hero={<HeroCharacter profession="fighter" className={scene.hero} />}
       side="right"
-      post={ringPost('right', '#3a2456')}
-      ropes={[HOT_PINK, '#e0f0ff', CYAN]}
+      post={ringPost('right', NEON.steel)}
+      ropes={[HOT_PINK, NEON.ice, CYAN]}
       heroPlace="left-1/2 -translate-x-1/2"
     />
   )

@@ -1,11 +1,12 @@
 // Each rebuilt world owns its colours in its palette.ts; its registry entry reads them from there. Dark
-// Fantasy, Neon Cyber and Medieval Fantasy have no palette module yet, so their hex stays here.
+// Fantasy and Medieval Fantasy have no palette module yet, so their hex stays here.
 import { TRAIL } from '@/components/themes/AdventurePaths/palette'
 import { DECO_COLORS } from '@/components/themes/ArtDeco/palette'
 import { NOIR } from '@/components/themes/BoldNoir/palette'
 import { CEL } from '@/components/themes/CellShaded/palette'
 import { FS } from '@/components/themes/FighterSelect/palette'
 import { MYTH } from '@/components/themes/Mythic/palette'
+import { NEON } from '@/components/themes/NeonCyber/palette'
 import { PORTAL } from '@/components/themes/NeonPortals/palette'
 import { ATOMIC_COLORS } from '@/components/themes/RetroAtomic/palette'
 import { RPG } from '@/components/themes/RetroRPG/palette'
@@ -385,17 +386,17 @@ export const themes: Theme[] = [
     name: 'Neon Cyber',
     description: 'Neon city at night - magenta and cyan glitch',
     colors: {
-      background: '#0a0512',
-      backgroundGradient: 'linear-gradient(to bottom, #150a20, #0a0512)',
-      accent: '#ff00ff',
-      text: '#e0f0ff',
-      textMuted: '#8080a0',
-      secondary: '#00ffff',
-      highlight: '#ffff00',
-      border: '#4020a0',
-      borderHover: '#ff00ff',
-      surface: '#150a1a',
-      surfaceHover: '#201025',
+      background: NEON.void,
+      backgroundGradient: `linear-gradient(to bottom, ${NEON.dusk}, ${NEON.void})`,
+      accent: NEON.magenta,
+      text: NEON.ice,
+      textMuted: NEON.muted,
+      secondary: NEON.cyan,
+      highlight: NEON.yellow,
+      border: NEON.rim,
+      borderHover: NEON.magenta,
+      surface: NEON.surface,
+      surfaceHover: NEON.surfaceHover,
     },
     font: 'monospace',
     effects: {
