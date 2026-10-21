@@ -1,150 +1,160 @@
+'use client'
+
+import type { ReactNode } from 'react'
 import { useCVData } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { LIMBO } from './palette'
-import { ForestArt, GiantSpiderArt, IndustrialGearsArt } from './backdrop'
-import { BandCard, CompanyCard, ExperienceCard, LimboCard, ProjectCard, SectionHeader, TechCloud } from './cards'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
+import { LevelScene } from '@/components/scroll/stage'
+import { BandCard, CompanyCard, ExperienceCard, Panel, ProjectCard, SectionHeader, TechCloud } from './cards'
+import { Lane, SceneItem } from './scenes'
 
-function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
+// Each profession's sections, and only those. About, Tech Stack and Ventures fade in; Experience,
+// Featured Work, Bands and the Muay Thai record are silhouette levels he walks, each entry arriving as
+// part of the level.
+
+function Block({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <section className="px-4 py-8 sm:px-6" aria-label={label}>
+      <div className="mx-auto max-w-2xl">{children}</div>
+    </section>
+  )
+}
+
+export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
 
   return (
     <>
-      {/* ========== ABOUT ========== */}
-      <section className="px-6 py-8" aria-label="About">
-        <div className="max-w-2xl mx-auto">
+      <FadeInScene>
+        <Block label="About">
           <SectionHeader title="about" />
-          <LimboCard>
-            <p className="text-sm leading-relaxed" style={{ color: LIMBO.lightGrey2 }}>{professionalSummary.bio}</p>
-          </LimboCard>
-        </div>
-      </section>
+          <Panel>
+            <p className="text-sm leading-relaxed text-[color:var(--sh-muted)]">{professionalSummary.bio}</p>
+          </Panel>
+        </Block>
+      </FadeInScene>
 
-      {/* ========== ART: GIANT SPIDER ========== */}
-      <GiantSpiderArt />
-
-      {/* ========== EXPERIENCE ========== */}
       {sections.jobs.length > 0 && (
-        <section className="px-6 py-8" aria-label="Work experience">
-          <div className="max-w-2xl mx-auto">
+        <LevelScene>
+          <Block label="Work experience">
+            <Lane profession="engineer" zone="record" />
             <SectionHeader title="work experience" />
-            <div className="space-y-3">
+            <ul className="space-y-3">
               {sections.jobs.map((entry) => (
-                <ExperienceCard key={entry.id} entry={entry} />
+                <li key={entry.id}>
+                  <SceneItem kind="fog">
+                    <ExperienceCard entry={entry} />
+                  </SceneItem>
+                </li>
               ))}
-            </div>
-          </div>
-        </section>
+            </ul>
+          </Block>
+        </LevelScene>
       )}
 
-      {/* ========== ART: INDUSTRIAL GEARS ========== */}
-      <IndustrialGearsArt />
-
-      {/* ========== TECH STACK ========== */}
-      <section className="px-6 py-8" aria-label="Tech stack">
-        <div className="max-w-2xl mx-auto">
+      <FadeInScene>
+        <Block label="Tech stack">
           <SectionHeader title="tech stack" />
-          <LimboCard>
+          <Panel>
             <TechCloud categories={sections.techStack} />
-          </LimboCard>
-        </div>
-      </section>
+          </Panel>
+        </Block>
+      </FadeInScene>
 
-      {/* ========== PROJECTS ========== */}
-      <section className="px-6 py-8" aria-label="Projects">
-        <div className="max-w-2xl mx-auto">
+      <LevelScene>
+        <Block label="Projects">
+          <Lane profession="engineer" zone="work" />
           <SectionHeader title="featured work" />
           <ProjectList
             projects={sections.projects}
-            className="grid md:grid-cols-2 gap-4"
-            renderProject={(slot) => <ProjectCard {...slot} />}
+            className="grid gap-4 md:grid-cols-2"
+            renderProject={(slot) => (
+              <SceneItem kind="light">
+                <ProjectCard {...slot} />
+              </SceneItem>
+            )}
           />
-        </div>
-      </section>
+        </Block>
+      </LevelScene>
 
-      {/* ========== ART: FOREST ========== */}
-      <ForestArt />
-
-      {/* ========== VENTURES ========== */}
-      <section className="px-6 py-8" aria-label="Ventures">
-        <div className="max-w-2xl mx-auto">
+      <FadeInScene>
+        <Block label="Ventures">
           <SectionHeader title="ventures" />
-          <div className="grid md:grid-cols-3 gap-3">
+          <div className="grid gap-3 md:grid-cols-3">
             {sections.companies.map((company) => (
               <CompanyCard key={company.id} company={company} />
             ))}
           </div>
-        </div>
-      </section>
+        </Block>
+      </FadeInScene>
     </>
   )
 }
 
-function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
+export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
   const { musician, bands } = sections
 
   return (
-    <>
-      <GiantSpiderArt />
-
-      <section className="px-6 py-8" aria-label="Bands">
-        <div className="max-w-2xl mx-auto">
-          <SectionHeader title="bands" />
-          <p className="text-sm mb-4 text-center" style={{ color: LIMBO.lightGrey2 }}>
-            Drums since {musician.since}, {musician.yearsPlaying} years
-          </p>
-          <BandList
-            bands={bands}
-            className="grid md:grid-cols-3 gap-3"
-            renderBand={(slot) => <BandCard {...slot} />}
-          />
-          <p className="text-sm mt-4 italic text-center" style={{ color: LIMBO.lightGrey2 }}>{musician.line}</p>
-        </div>
-      </section>
-
-      <ForestArt />
-    </>
+    <LevelScene>
+      <Block label="Bands">
+        <Lane profession="drummer" zone="record" />
+        <SectionHeader title="bands" />
+        <p className="mb-4 text-center text-sm text-[color:var(--sh-muted)]">
+          Drums since {musician.since}, {musician.yearsPlaying} years
+        </p>
+        <BandList
+          bands={bands}
+          className="grid gap-3 md:grid-cols-3"
+          renderBand={(slot) => (
+            <SceneItem kind="light">
+              <BandCard {...slot} />
+            </SceneItem>
+          )}
+        />
+        <p className="mt-4 text-center text-sm italic text-[color:var(--sh-muted)]">{musician.line}</p>
+      </Block>
+    </LevelScene>
   )
 }
 
-function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
+export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
   const { martialArts } = sections
 
   return (
-    <>
-      <IndustrialGearsArt />
-
-      <section className="px-6 py-8" aria-label="Muay Thai">
-        <div className="max-w-2xl mx-auto">
-          <SectionHeader title="muay thai" />
-          <LimboCard>
-            <h3 className="text-sm tracking-[0.2em] uppercase mb-4 text-[#DDDDDD]">{martialArts.primary.title}</h3>
-            <MuayThaiRecord
-              martialArts={martialArts}
-              classNames={{
-                facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-                fact: 'p-3 border-l-2 border-black bg-[#121212]',
-                term: 'text-xs tracking-[0.25em] uppercase text-[#888888]',
-                value: 'text-sm mt-1 text-[#CCCCCC]',
-                achievements: 'space-y-1',
-                achievement: 'text-sm flex items-start gap-1.5 text-[#AAAAAA]',
-              }}
-              renderAchievement={(achievement) => (
-                <>
-                  <span className="text-[#888888]" aria-hidden="true">-</span>
+    <LevelScene>
+      <Block label="Muay Thai">
+        <Lane profession="fighter" zone="record" />
+        <SectionHeader title="muay thai" />
+        <Panel>
+          <h3 className="mb-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-heading)]">{martialArts.primary.title}</h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'mb-4 grid gap-3 sm:grid-cols-2',
+              fact: 'border-l-2 border-[color:var(--sh-black)] bg-[color:var(--sh-panel)] p-3',
+              term: 'text-sm uppercase tracking-[0.25em] text-[color:var(--sh-dim)]',
+              value: 'mt-1 text-sm text-[color:var(--sh-text)]',
+              achievements: 'space-y-2',
+              achievement: 'text-sm text-[color:var(--sh-muted)]',
+            }}
+            renderAchievement={(achievement) => (
+              <SceneItem kind="fog">
+                <p className="flex items-start gap-1.5 border-l-2 border-[color:var(--sh-rim)] bg-[color:var(--sh-night)] p-2">
+                  <span className="text-[color:var(--sh-dim)]" aria-hidden="true">
+                    -
+                  </span>
                   {achievement}
-                </>
-              )}
-            />
-          </LimboCard>
-        </div>
-      </section>
-
-      <ForestArt />
-    </>
+                </p>
+              </SceneItem>
+            )}
+          />
+        </Panel>
+      </Block>
+    </LevelScene>
   )
 }
 

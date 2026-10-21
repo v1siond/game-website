@@ -1,0 +1,153 @@
+/*
+ * Silhouette's page look, outside the scroll scenes: the near black ground, the fixed atmosphere of fog
+ * layers, film grain and vignette, and the offset block button. Every colour reads the palette's CSS
+ * variables (--sh-*, set on the root from palette.ts). The fog drifts are ambient keyframes on transform
+ * and opacity only, stopped under reduced motion.
+ */
+
+.world {
+  background: linear-gradient(180deg, var(--sh-night) 0%, var(--sh-void) 30%, var(--sh-void) 70%, var(--sh-night) 100%);
+  color: var(--sh-text);
+}
+
+/* ---- the fixed atmosphere ---- */
+
+.grain {
+  opacity: 0.2;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+.fogSlow {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--sh-edge) 12%, transparent) 25%,
+    color-mix(in srgb, var(--sh-fog) 8%, transparent) 50%,
+    color-mix(in srgb, var(--sh-edge) 12%, transparent) 75%,
+    transparent 100%
+  );
+  animation: fog-drift-slow 90s ease-in-out infinite alternate;
+}
+
+.fogFast {
+  background: linear-gradient(
+    90deg,
+    transparent 10%,
+    color-mix(in srgb, var(--sh-raised) 7%, transparent) 35%,
+    transparent 50%,
+    color-mix(in srgb, var(--sh-raised) 7%, transparent) 65%,
+    transparent 90%
+  );
+  animation: fog-drift-fast 60s ease-in-out infinite alternate;
+}
+
+.fogRise {
+  background: linear-gradient(
+    0deg,
+    color-mix(in srgb, var(--sh-edge) 15%, transparent) 0%,
+    color-mix(in srgb, var(--sh-fog) 6%, transparent) 30%,
+    transparent 60%
+  );
+  animation: fog-rise 40s ease-in-out infinite;
+}
+
+/* The heavy vignette, the letterbox at top and bottom and the side shade, one layer. */
+.vignette {
+  background:
+    radial-gradient(
+      ellipse at 50% 50%,
+      transparent 10%,
+      color-mix(in srgb, var(--sh-black) 25%, transparent) 40%,
+      color-mix(in srgb, var(--sh-black) 52%, transparent) 70%,
+      var(--sh-black) 100%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--sh-black) 52%, transparent) 0%,
+      transparent 18%,
+      transparent 82%,
+      color-mix(in srgb, var(--sh-black) 56%, transparent) 100%
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--sh-black) 38%, transparent) 0%,
+      transparent 15%,
+      transparent 85%,
+      color-mix(in srgb, var(--sh-black) 38%, transparent) 100%
+    );
+}
+
+@keyframes fog-drift-slow {
+  from {
+    transform: translate3d(-15%, 0, 0);
+  }
+  to {
+    transform: translate3d(15%, 0, 0);
+  }
+}
+
+@keyframes fog-drift-fast {
+  from {
+    transform: translate3d(10%, 0, 0);
+  }
+  to {
+    transform: translate3d(-10%, 0, 0);
+  }
+}
+
+@keyframes fog-rise {
+  0%,
+  100% {
+    transform: translate3d(0, 5%, 0);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translate3d(0, -3%, 0);
+    opacity: 0.4;
+  }
+}
+
+/* ---- panels ---- */
+
+.panel {
+  background: linear-gradient(135deg, var(--sh-panel) 0%, var(--sh-raised) 50%, var(--sh-panel) 100%);
+  box-shadow: 6px 6px 0 var(--sh-black);
+}
+
+.card {
+  background: linear-gradient(145deg, var(--sh-panel) 0%, var(--sh-raised) 100%);
+  box-shadow: 4px 4px 0 var(--sh-black);
+}
+
+/* ---- the offset block button: a fog grey block sits behind it (a static shadow) and the button
+   lifts off it on hover and presses into it on click ---- */
+
+.button {
+  box-shadow: 3px 3px 0 var(--sh-edge);
+  transition: transform 0.15s ease;
+}
+
+.button:hover {
+  transform: translate3d(-1px, -1px, 0);
+}
+
+.button:active {
+  transform: translate3d(2px, 2px, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fogSlow,
+  .fogFast,
+  .fogRise {
+    animation: none;
+  }
+
+  .button {
+    transition: none;
+  }
+
+  .button:hover,
+  .button:active {
+    transform: none;
+  }
+}
