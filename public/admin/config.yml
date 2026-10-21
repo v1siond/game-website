@@ -479,6 +479,11 @@ collections:
                   - { <<: *text, label: "Data tab", name: dataTab }
                   - { <<: *text, label: "Incoming call", name: incomingCall }
                   - { <<: *text, label: "Double jump", name: doubleJump }
+                  - { <<: *text, label: "Scan tag: education", name: tagEducation }
+                  - { <<: *text, label: "Scan tag: languages", name: tagLanguages }
+                  - { <<: *text, label: "Scan tag: highlight", name: tagHighlight }
+                  - { <<: *text, label: "Installed (ripperdoc)", name: installed }
+                  - { <<: *text, label: "Contract (ventures map)", name: contract, hint: 'Keep {number}' }
               - label: Explorer's map world (adventure paths)
                 name: trail
                 widget: object

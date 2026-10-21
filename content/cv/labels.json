@@ -140,7 +140,12 @@
         "retry": "Try again",
         "dataTab": "Data",
         "incomingCall": "Incoming call",
-        "doubleJump": "Double jump"
+        "doubleJump": "Double jump",
+        "tagEducation": "Education",
+        "tagLanguages": "Languages",
+        "tagHighlight": "Highlight",
+        "installed": "Installed",
+        "contract": "Contract {number}"
       },
       "trail": {
         "mapOf": "Expedition map of {name}",
@@ -585,7 +590,12 @@
         "retry": "Intentar de nuevo",
         "dataTab": "Datos",
         "incomingCall": "Llamada entrante",
-        "doubleJump": "Doble salto"
+        "doubleJump": "Doble salto",
+        "tagEducation": "Formación",
+        "tagLanguages": "Idiomas",
+        "tagHighlight": "Destacado",
+        "installed": "Instalado",
+        "contract": "Contrato {number}"
       },
       "trail": {
         "mapOf": "Mapa de la expedición de {name}",
@@ -1030,7 +1040,12 @@
         "retry": "Riprova",
         "dataTab": "Dati",
         "incomingCall": "Chiamata in arrivo",
-        "doubleJump": "Doppio salto"
+        "doubleJump": "Doppio salto",
+        "tagEducation": "Formazione",
+        "tagLanguages": "Lingue",
+        "tagHighlight": "In evidenza",
+        "installed": "Installato",
+        "contract": "Contratto {number}"
       },
       "trail": {
         "mapOf": "Mappa della spedizione di {name}",
