@@ -161,7 +161,7 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
 
 // ---- Musician: the echo hall, its lanterns, crystals and his kit ----
 
-const KIT: DrumKitColors = { stand: SOUL.ridge, shell: SOUL.rock, rim: SOUL.glow, bass: SOUL.rose }
+const KIT: DrumKitColors = { stand: SOUL.ridge, shell: SOUL.rock, rim: SOUL.glow, bass: SOUL.rose, cymbalsTip: true }
 const WAVES: [string, string] = [SOUL.rose, SOUL.glow]
 
 const HALL_LANTERNS = [

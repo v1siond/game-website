@@ -76,7 +76,7 @@ function Skyline() {
     <svg
       viewBox="0 0 690 100"
       preserveAspectRatio="none"
-      className={`absolute bottom-3 left-0 h-[72%] w-[115%] ${world.inked} ${styles.drift}`}
+      className={`absolute bottom-3 left-0 h-[72%] w-[115%] ${world.inked} ${scene.drift}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -112,7 +112,7 @@ function Billboard({ position, panels }: { position: number; panels: [string, st
   return (
     <svg
       viewBox="0 0 44 48"
-      className={`absolute bottom-3 left-[calc(var(--at)*100%_-_1.5rem)] h-11 w-10 sm:h-16 sm:w-14 ${world.inked} ${atClass(position)} ${styles.popAt}`}
+      className={`absolute bottom-3 left-[calc(var(--at)*100%_-_1.5rem)] h-11 w-10 sm:h-16 sm:w-14 ${world.inked} ${atClass(position)} ${scene.popAt}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -155,7 +155,7 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
 
 // ---- Musician: the comic stage, spotlights, speakers and his kit ----
 
-const KIT: DrumKitColors = { stand: CEL.ink, shell: CEL.red, rim: CEL.ink, bass: CEL.sun, cymbal: styles.cymbal }
+const KIT: DrumKitColors = { stand: CEL.ink, shell: CEL.red, rim: CEL.ink, bass: CEL.sun, cymbalsTip: true }
 const WAVES: [string, string] = [CEL.sun, CEL.sky]
 
 // The rays of the burst painted on the back wall, every other one in the darker band.
@@ -198,8 +198,8 @@ function Speakers() {
   return (
     <svg viewBox="0 0 30 60" className={`absolute bottom-3 right-3 h-16 w-8 sm:h-24 sm:w-12 ${world.inked}`} aria-hidden="true" focusable="false">
       <rect x={1} y={1} width={28} height={58} fill={CEL.inkSoft} />
-      <circle cx={15} cy={16} r={9} fill={CEL.steel} className={styles.pump} />
-      <circle cx={15} cy={42} r={11} fill={CEL.steel} className={`${styles.pump} [--phase:0.5turn]`} />
+      <circle cx={15} cy={16} r={9} fill={CEL.steel} className={scene.pump} />
+      <circle cx={15} cy={42} r={11} fill={CEL.steel} className={`${scene.pump} [--phase:0.5turn]`} />
     </svg>
   )
 }
@@ -230,7 +230,7 @@ function RooftopRing() {
         <rect x={-2} y={88} width={604} height={14} fill={CEL.skyDeep} />
       </Layer>
       {/* where his advance ends: 40% of the canvas, plus his own width */}
-      <div className={`absolute bottom-6 left-[calc(40%_+_3rem)] h-20 w-20 sm:left-[calc(40%_+_4rem)] sm:h-28 sm:w-28 ${styles.impactFrame}`} aria-hidden="true">
+      <div className={`absolute bottom-6 left-[calc(40%_+_3rem)] h-20 w-20 sm:left-[calc(40%_+_4rem)] sm:h-28 sm:w-28 ${scene.burst}`} aria-hidden="true">
         <ImpactBurst fill={CEL.orange} />
       </div>
       <PadHolder className={`left-[calc(40%_+_4.5rem)] sm:left-[calc(40%_+_5.5rem)] ${world.inked}`} body={CEL.inkSoft} pads={CEL.red} />

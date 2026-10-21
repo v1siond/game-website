@@ -168,7 +168,7 @@ const KIT: DrumKitColors = {
   shell: ROCKET_RED,
   rim: CHROME,
   bass: ATOMIC_YELLOW,
-  cymbal: styles.cymbal,
+  cymbalsTip: true,
 }
 
 const CURTAIN_FOLDS = Array.from({ length: 20 }, (_, i) => i * 30)

@@ -13,6 +13,7 @@
    arm in the club, the sound bars resting at a quarter of their height; in the gym he reaches the pads
    by half the scene and works them for the rest. */
 .tempo {
+  --drift: -12%;
   --strides: 10turn;
   --swing: 22deg;
   --stick-hits: 10turn;
@@ -28,11 +29,6 @@
 }
 
 /* ---- the wet street ---- */
-
-/* The skyline slides back slowly as he walks; it is 115% of the strip, so no edge comes into view. */
-.drift {
-  transform: translate3d(calc(var(--p) * -12%), 0, 0);
-}
 
 /* The rain pours down and a little left as the scene plays; the layer is a third taller and wider than
    the strip and starts a third above it, so it never runs out. */
@@ -55,14 +51,6 @@
   transform-box: fill-box;
   transform-origin: 50% 0%;
   transform: rotate(calc((var(--kick, 0) - var(--elbow, 0)) * 6deg));
-}
-
-/* An ink splash behind the pads bursts on every kick, knee and elbow (the strip carries the three). */
-.splash {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  opacity: max(var(--kick, 0), var(--knee, 0), var(--elbow, 0));
-  transform: scale(calc(0.5 + max(var(--kick, 0), var(--knee, 0), var(--elbow, 0)) * 0.6));
 }
 
 /* ---- per item reveals (their own scene each, so --p is the item's own progress) ---- */

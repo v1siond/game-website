@@ -51,7 +51,7 @@ const COLONNADE = [30, 120, 210, 300, 390, 480, 570]
 
 function Colonnade() {
   return (
-    <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${styles.drift}`}>
+    <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${scene.drift}`}>
       <rect x={-2} y={4} width={604} height={8} fill={MYTH.marble} />
       <rect x={-2} y={12} width={604} height={2} fill={MYTH.marbleShade} />
       {COLONNADE.map((x) => (

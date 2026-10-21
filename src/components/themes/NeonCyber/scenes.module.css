@@ -8,6 +8,8 @@
 /* The world's tempo: seven running strides across the level, ten stick hits per arm, the sound waves
    resting at 35% height between hits; in the ring he steps forward 38% across the whole scene. */
 .tempo {
+  --far-drift: -15%;
+  --mid-drift: -25%;
   --strides: 7turn;
   --swing: 34deg;
   --stick-hits: 10turn;
@@ -16,25 +18,6 @@
 }
 
 /* ---- the level strip, three layers deep ---- */
-
-/* Far 0.15x, mid 0.35x of the travel, foreground fixed: the layers are wider than the strip so a
-   shifted layer never shows its edge. */
-.far,
-.mid {
-  position: absolute;
-  inset: 0 auto 0 0;
-  height: 100%;
-}
-
-.far {
-  width: 120%;
-  transform: translate3d(calc(var(--p) * -15%), 0, 0);
-}
-
-.mid {
-  width: 140%;
-  transform: translate3d(calc(var(--p) * -25%), 0, 0);
-}
 
 /* He stands at the track's left edge and runs its width minus his own. */
 .planted {

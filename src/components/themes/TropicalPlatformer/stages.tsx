@@ -40,7 +40,7 @@ function Backdrop({ sky, children }: { sky: string; children?: ReactNode }) {
 // drift left as he runs right.
 function FarIslands() {
   return (
-    <div className={`absolute inset-y-0 left-0 w-[140%] ${styles.far}`} aria-hidden="true">
+    <div className={`absolute inset-y-0 left-0 w-[140%] ${scene.far}`} aria-hidden="true">
       <svg viewBox="0 0 840 100" preserveAspectRatio="none" className="h-full w-full" focusable="false">
         <rect y={58} width={840} height={42} fill={COLORS.sea} />
         <path d="M40 60 Q90 22 150 60 Z M300 60 Q340 34 390 60 Z M560 60 Q630 14 700 60 Z" fill={COLORS.lagoonDeep} />
@@ -69,7 +69,7 @@ function Palm({ x, sway = '' }: { x: number; sway?: string }) {
 
 function NearPalms() {
   return (
-    <div className={`absolute inset-y-0 left-0 w-[140%] ${styles.mid}`} aria-hidden="true">
+    <div className={`absolute inset-y-0 left-0 w-[140%] ${scene.mid}`} aria-hidden="true">
       <svg viewBox="0 0 840 100" preserveAspectRatio="none" className="h-full w-full" focusable="false">
         {PALM_XS.map((x) => (
           <Palm key={x} x={x} />
@@ -202,7 +202,7 @@ const KIT: DrumKitColors = {
   shell: COLORS.sea,
   rim: COLORS.sun,
   bass: COLORS.fruitGold,
-  cymbal: styles.cymbal,
+  cymbalsTip: true,
 }
 
 // A tiki torch whose flame flares on the stick hits.

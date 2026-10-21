@@ -14,6 +14,9 @@
    resting at 30% height between hits; he walks to 6rem short of the far edge, and in the ring reaches
    the pads, 42% across, by half the scene. */
 .tempo {
+  --cymbal-floor: -1;
+  --cymbal-hits: 6turn;
+  --cymbal-tip: 9deg;
   --strides: 8turn;
   --swing: 28deg;
   --stick-hits: 12turn;
@@ -57,13 +60,6 @@
 .dropAt {
   opacity: clamp(0, (var(--p) - var(--at, 0)) * 8, 1);
   transform: translate3d(0, calc(clamp(0, 1 - (var(--p) - var(--at, 0)) * 8, 1) * -2.5rem), 0);
-}
-
-/* The cymbals wobble on the crash. */
-.cymbal {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  transform: rotate(calc(sin(var(--p) * 6turn + var(--phase, 0turn)) * 9deg));
 }
 
 /* ---- contact: the exit portal opens on his corner, then the panel arrives ---- */

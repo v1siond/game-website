@@ -13,6 +13,7 @@
    sound bars resting at a quarter height between hits; in the ring he reaches the pads by 45% of the
    scene. */
 .tempo {
+  --cymbal-tip: 10deg;
   --strides: 15turn;
   --swing: 26deg;
   --stick-hits: 12turn;
@@ -57,13 +58,6 @@
 
 .valve {
   opacity: calc(0.4 + max(0, sin(var(--p) * var(--stick-hits) + 0.75turn)) * 0.6);
-}
-
-/* The cymbals tilt on the hits, the second half a turn later (DrumKit sets its --phase). */
-.cymbal {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  transform: rotate(calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 10deg));
 }
 
 /* ---- contact: the round hatch turns, then rolls aside to his corner ---- */

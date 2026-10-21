@@ -171,6 +171,70 @@
   );
 }
 
+/* The kit's cymbals tip on each stick hit (DrumKit's cymbalsTip; the second plays half a turn later on its
+   own --phase). The world's numbers in its tempo: --cymbal-tip (the turn at a full hit), --cymbal-lift (the
+   bounce), --cymbal-hits (when the cymbals swing on their own count) and --cymbal-floor (-1 swings them
+   both ways instead of only on the hit). */
+.cymbal {
+  --cymbal-hit: max(var(--cymbal-floor, 0), sin(var(--p) * var(--cymbal-hits, var(--stick-hits)) + var(--phase, 0turn)));
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: translate3d(0, calc(var(--cymbal-hit) * var(--cymbal-lift, 0px)), 0)
+    rotate(calc(var(--cymbal-hit) * var(--cymbal-tip, -10deg)));
+}
+
+/* A speaker cone pumps a quarter turn after each stick hit. The world's numbers: --pump-grow (how far
+   it swells), --pump-grow-y (a squash on the height instead) and --pump-origin. */
+.pump {
+  --pump-hit: max(0, sin(var(--p) * var(--stick-hits) + 0.25turn + var(--phase, 0turn)));
+  transform-box: fill-box;
+  transform-origin: var(--pump-origin, 50% 50%);
+  transform: scale(
+    calc(1 + var(--pump-hit) * var(--pump-grow, 0.14)),
+    calc(1 + var(--pump-hit) * var(--pump-grow-y, var(--pump-grow, 0.14)))
+  );
+}
+
+/* The burst where a strike lands: it opens on each kick, knee and elbow. The world's numbers:
+   --burst-from (its size between strikes) and --burst-turn (how far the knee and the elbow spin it). */
+.burst {
+  --strike: max(var(--kick, 0), var(--knee, 0), var(--elbow, 0));
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  opacity: var(--strike);
+  transform: scale(calc(var(--burst-from, 0.5) + var(--strike) * 0.6))
+    rotate(calc((var(--knee, 0) - var(--elbow, 0)) * var(--burst-turn, 0deg)));
+}
+
+/* A prop at --at pops up from its foot as he reaches it. The world's numbers: --pop-floor (its size
+   before he arrives), --pop-start (the size it jumps to), --pop-bounce (the overshoot as it lands) and
+   --pop-width (0 stretches only its height, a spring). */
+.popAt {
+  --pop-since: calc(var(--p) - var(--at, 0));
+  --pop: calc(
+    clamp(var(--pop-floor, 0.35), var(--pop-since) * 8 + var(--pop-start, 0.75), 1) +
+      sin(clamp(0, var(--pop-since) * 6, 1) * 0.5turn) * var(--pop-bounce, 0)
+  );
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: clamp(0.25, var(--pop-since) * 10 + 0.6, 1);
+  transform: scale(calc(1 - (1 - var(--pop)) * var(--pop-width, 1)), var(--pop));
+}
+
+/* Parallax: the level's layers slide left as he walks, the far one least. The world sets each layer's
+   share of its width in its tempo: --far-drift, --mid-drift, --drift (the nearest). */
+.far {
+  transform: translate3d(calc(var(--p) * var(--far-drift, -8%)), 0, 0);
+}
+
+.mid {
+  transform: translate3d(calc(var(--p) * var(--mid-drift, -20%)), 0, 0);
+}
+
+.drift {
+  transform: translate3d(calc(var(--p) * var(--drift, -12%)), 0, 0);
+}
+
 /* Contact: the panel arrives over the last part of the scene. */
 .arrive {
   opacity: clamp(0, var(--p) * 1.6 - 0.6, 1);

@@ -46,7 +46,7 @@ const MID_TOWERS = towers(12, 50, 3)
 function Skyline() {
   return (
     <>
-      <LevelArt className={styles.far}>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${scene.far}`}>
         {FAR_TOWERS.map(({ x, width, height }) => (
           <g key={x}>
             <rect x={x} y={100 - height} width={width} height={height} fill="#1a0a2a" />
@@ -55,7 +55,7 @@ function Skyline() {
           </g>
         ))}
       </LevelArt>
-      <LevelArt className={styles.mid}>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[140%] ${scene.mid}`}>
         {MID_TOWERS.map(({ x, width, height }) => (
           <g key={x}>
             <rect x={x} y={100 - height * 0.8} width={width} height={height * 0.8} fill="#2a1240" />
@@ -127,7 +127,7 @@ const WAVES: [string, string] = [MAGENTA, CYAN]
 function Stage() {
   return (
     <>
-      <LevelArt className={styles.far}>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${scene.far}`}>
         {FAR_TOWERS.map(({ x }) => (
           <g key={x} fill="#1a0a2a">
             <circle cx={x + 8} cy={84} r={6} />
@@ -136,7 +136,7 @@ function Stage() {
           </g>
         ))}
       </LevelArt>
-      <LevelArt className={styles.mid}>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[140%] ${scene.mid}`}>
         <line x1={0} y1={6} x2={600} y2={6} stroke="#3a2456" strokeWidth={3} />
         <polygon points="150,6 120,96 180,96" fill={MAGENTA} opacity={0.12} className={styles.beam} />
         <polygon points="390,6 360,96 420,96" fill={CYAN} opacity={0.12} className={styles.beam} />
@@ -152,13 +152,13 @@ function Stage() {
 function Ring() {
   return (
     <>
-      <LevelArt className={styles.far}>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${scene.far}`}>
         {FAR_TOWERS.map(({ x }) => (
           <circle key={x} cx={x + 12} cy={12} r={2} fill={YELLOW} opacity={0.6} />
         ))}
         <rect x={0} y={70} width={600} height={30} fill="#1a0a2a" />
       </LevelArt>
-      <LevelArt className={styles.mid}>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[140%] ${scene.mid}`}>
         {[40, 290, 540].map((x) => (
           <rect key={x} x={x} y={30} width={6} height={70} fill="#3a2456" />
         ))}

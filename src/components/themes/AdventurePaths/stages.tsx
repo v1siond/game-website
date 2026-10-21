@@ -47,7 +47,7 @@ function FarRidges() {
     <svg
       viewBox="0 0 780 100"
       preserveAspectRatio="none"
-      className={`absolute inset-y-0 left-0 h-full w-[130%] ${styles.farRidge}`}
+      className={`absolute inset-y-0 left-0 h-full w-[130%] ${scene.far}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -68,7 +68,7 @@ function NearRuins() {
     <svg
       viewBox="0 0 960 100"
       preserveAspectRatio="none"
-      className={`absolute inset-y-0 left-0 h-full w-[160%] ${styles.nearRidge}`}
+      className={`absolute inset-y-0 left-0 h-full w-[160%] ${scene.drift}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -156,7 +156,7 @@ const KIT: DrumKitColors = {
   shell: TRAIL.ROUTE,
   rim: TRAIL.PARCHMENT,
   bass: TRAIL.GOLD,
-  cymbal: styles.cymbal,
+  cymbalsTip: true,
 }
 
 const PINES = [20, 70, 130, 400, 460, 520, 575]

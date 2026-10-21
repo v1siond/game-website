@@ -13,6 +13,7 @@
    per arm in the theatre, the sound bars resting at a fifth of their height; in the palaestra he reaches
    the pads by half the scene and works them for the rest. */
 .tempo {
+  --drift: -15%;
   --strides: 12turn;
   --swing: 20deg;
   --stick-hits: 12turn;
@@ -28,11 +29,6 @@
 }
 
 /* ---- the colonnade ---- */
-
-/* The columns slide back as he walks; the layer is 120% of the strip, so no edge comes into view. */
-.drift {
-  transform: translate3d(calc(var(--p) * -15%), 0, 0);
-}
 
 /* A stele at --at rises out of the floor as he reaches it and stands. */
 .riseAt {

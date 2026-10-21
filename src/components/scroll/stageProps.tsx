@@ -29,15 +29,16 @@ export interface DrumKitColors {
   // The snare and floor tom rims, and the bass drum's.
   rim: string
   bass: string
-  // A world's own motion for the two cymbals (the second plays half a turn later).
-  cymbal?: string
+  // The cymbals tip on each stick hit (heroScene's .cymbal, the world's numbers in its tempo).
+  cymbalsTip?: boolean
 }
 
 const CYMBAL = '#f5d28a'
 
 // His kit: bass drum, snare, floor tom, hi-hat and the crash.
 export function DrumKit({ className = '', colors }: { className?: string; colors: DrumKitColors }) {
-  const { stand, shell, rim, bass, cymbal = '' } = colors
+  const { stand, shell, rim, bass, cymbalsTip = false } = colors
+  const cymbal = cymbalsTip ? scene.cymbal : ''
 
   return (
     <svg viewBox="0 0 80 60" className={className} aria-hidden="true" focusable="false">

@@ -13,6 +13,10 @@
    campfire, the sound bars resting at a fifth of their height between hits; the Martial Artist crosses
    the terrace to the pads by 45% of the scene (the shared walk and advance read the rest as defaults). */
 .tempo {
+  --cymbal-lift: 1.5px;
+  --cymbal-tip: 0deg;
+  --far-drift: -20%;
+  --drift: -35%;
   --strides: 12turn;
   --swing: 24deg;
   --stick-hits: 10turn;
@@ -26,16 +30,6 @@
 }
 
 /* ---- the trail ---- */
-
-/* Parallax: the far ridges are 130% of the strip and slide a fifth of their width, the near ruins are
-   160% and slide 35%, so neither edge ever comes into view. */
-.farRidge {
-  transform: translate3d(calc(var(--p) * -20%), 0, 0);
-}
-
-.nearRidge {
-  transform: translate3d(calc(var(--p) * -35%), 0, 0);
-}
 
 /* The unexplored ground over the route line slides off to the right as he walks, so the red dashes
    appear behind him. */
@@ -58,11 +52,6 @@
   transform-box: fill-box;
   transform-origin: 50% 100%;
   transform: scaleY(calc(0.75 + max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 0.35));
-}
-
-/* The cymbals dip on the hits, the second half a turn later (DrumKit sets its --phase). */
-.cymbal {
-  transform: translate3d(0, calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * 1.5px), 0);
 }
 
 /* ---- the temple terrace ---- */

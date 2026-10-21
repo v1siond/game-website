@@ -32,7 +32,7 @@ import styles from './scenes.module.css'
 //   knee and the elbow; the crowd in the stands jumps with each strike. He ends gloves up in his corner.
 // Switching profession swaps the whole stage; no prop is shared between professions.
 //
-// Animated elements per strip, at most 15: his travel and four limbs, and the props that answer (three
+// Animated elements per strip, at most 17: his travel and four limbs, the two meadow layers, and the props that answer (three
 // terminals, six village windows and the gate, or three save points and the gate; two star groups,
 // two flames and five sound bars; two crowd rows, two pads and the flash).
 
@@ -48,24 +48,32 @@ const DAY_SKY = 'from-[color:var(--rpg-day-top)] to-[color:var(--rpg-day-low)]'
 const PROP_POSITIONS = [0.24, 0.48, 0.72]
 const TREE_XS = [40, 150, 210, 330, 395, 520]
 
-// Stepped pixel mountains with snow caps, and round pixel trees on the meadow line.
+// Stepped pixel mountains with snow caps far back, and round pixel trees on the meadow line nearer; the
+// two layers slide at their own pace as he walks (the shared .far and .mid parallax), each wider than the
+// strip so no edge comes into view.
 function Meadow() {
   return (
-    <LevelArt>
-      <g {...PIXEL_EDGES}>
-        <path d="M0 62 H30 V52 H50 V40 H70 V30 H90 V42 H110 V54 H150 V46 H170 V36 H190 V24 H210 V38 H230 V50 H300 V44 H320 V32 H340 V22 H360 V34 H380 V48 H440 V40 H460 V30 H480 V42 H500 V56 H560 V48 H600 V100 H0 Z" fill={RPG.mountain} />
-        <path d="M70 30 H90 V34 H70 Z M190 24 H210 V28 H190 Z M340 22 H360 V26 H340 Z M460 30 H480 V34 H460 Z" fill={RPG.snow} />
-        <rect x={0} y={70} width={600} height={30} fill={RPG.grass} />
-        <rect x={0} y={70} width={600} height={3} fill={RPG.grassDark} />
-        {TREE_XS.map((x) => (
-          <g key={x}>
-            <rect x={x - 1.5} y={66} width={3} height={8} fill={RPG.pathEdge} />
-            <rect x={x - 6} y={56} width={12} height={10} fill={RPG.tree} />
-            <rect x={x - 4} y={52} width={8} height={4} fill={RPG.tree} />
-          </g>
-        ))}
-      </g>
-    </LevelArt>
+    <>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[120%] ${scene.far}`}>
+        <g {...PIXEL_EDGES}>
+          <path d="M0 62 H30 V52 H50 V40 H70 V30 H90 V42 H110 V54 H150 V46 H170 V36 H190 V24 H210 V38 H230 V50 H300 V44 H320 V32 H340 V22 H360 V34 H380 V48 H440 V40 H460 V30 H480 V42 H500 V56 H560 V48 H600 V100 H0 Z" fill={RPG.mountain} />
+          <path d="M70 30 H90 V34 H70 Z M190 24 H210 V28 H190 Z M340 22 H360 V26 H340 Z M460 30 H480 V34 H460 Z" fill={RPG.snow} />
+        </g>
+      </LevelArt>
+      <LevelArt className={`absolute inset-y-0 left-0 h-full w-[130%] ${scene.mid}`}>
+        <g {...PIXEL_EDGES}>
+          <rect x={0} y={70} width={600} height={30} fill={RPG.grass} />
+          <rect x={0} y={70} width={600} height={3} fill={RPG.grassDark} />
+          {TREE_XS.map((x) => (
+            <g key={x}>
+              <rect x={x - 1.5} y={66} width={3} height={8} fill={RPG.pathEdge} />
+              <rect x={x - 6} y={56} width={12} height={10} fill={RPG.tree} />
+              <rect x={x - 4} y={52} width={8} height={4} fill={RPG.tree} />
+            </g>
+          ))}
+        </g>
+      </LevelArt>
+    </>
   )
 }
 
@@ -156,6 +164,7 @@ const KIT: DrumKitColors = {
   shell: RPG.vest,
   rim: RPG.gold,
   bass: RPG.gold,
+  cymbalsTip: true,
 }
 
 // Two star groups, each twinkling on its own half of the stick hits.

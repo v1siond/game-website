@@ -49,14 +49,14 @@ export function Sky({ light }: { light: SkyLight }) {
 }
 
 // The depth layers: each a LevelArt wider than the strip, sliding at its own speed (scenes.module.css).
-const FAR_LAYER = `absolute inset-y-0 left-0 h-full w-[130%] ${styles.far}`
-const MID_LAYER = `absolute inset-y-0 left-0 h-full w-[150%] ${styles.mid}`
+const FAR_LAYER = `absolute inset-y-0 left-0 h-full w-[130%] ${scene.far}`
+const MID_LAYER = `absolute inset-y-0 left-0 h-full w-[150%] ${scene.mid}`
 const BIRD_LAYER = `absolute inset-y-0 left-0 h-full w-[200%] ${styles.birds}`
 
 function FogBand({ light }: { light: SkyLight }) {
   return (
     <div
-      className={`absolute bottom-3 left-0 h-6 w-[160%] bg-gradient-to-r from-transparent to-transparent sm:h-8 ${light.fog} ${styles.drift}`}
+      className={`absolute bottom-3 left-0 h-6 w-[160%] bg-gradient-to-r from-transparent to-transparent sm:h-8 ${light.fog} ${scene.drift}`}
       aria-hidden="true"
     />
   )
@@ -167,7 +167,7 @@ const KIT: DrumKitColors = {
   shell: SHADE.black,
   rim: EMBER.rim,
   bass: EMBER.rim,
-  cymbal: styles.cymbal,
+  cymbalsTip: true,
 }
 
 const BIRDS = [

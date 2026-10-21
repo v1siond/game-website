@@ -12,6 +12,10 @@
 /* The world's tempo: twelve strides along the run, ten stick hits per arm, the sound bars resting at a
    fifth of their height between hits. */
 .tempo {
+  --cymbal-lift: -1.5px;
+  --cymbal-tip: -8deg;
+  --far-drift: -8%;
+  --mid-drift: -22%;
   --strides: 12turn;
   --swing: 30deg;
   --stick-hits: 10turn;
@@ -38,15 +42,6 @@
 /* Martial Artist crosses the clearing to the pads by 45% of the scene, then holds his ground. */
 .advance {
   transform: translate3d(calc(min(var(--p) / 0.45, 1) * 40%), 0, 0);
-}
-
-/* The two depth layers drift left while he runs right; the far one slower. */
-.far {
-  transform: translate3d(calc(var(--p) * -8%), 0, 0);
-}
-
-.mid {
-  transform: translate3d(calc(var(--p) * -22%), 0, 0);
 }
 
 /* ---- the run ---- */
@@ -78,14 +73,6 @@
   transform-box: fill-box;
   transform-origin: 50% 100%;
   transform: scaleY(calc(0.75 + max(0, sin(var(--p) * var(--stick-hits) + 0.25turn)) * 0.5));
-}
-
-/* The cymbals jump a little on the hits, the second half a turn later (DrumKit sets its --phase). */
-.cymbal {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  transform: translate3d(0, calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * -1.5px), 0)
-    rotate(calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * -8deg));
 }
 
 /* ---- contact: the sun comes up and the palm fronds part to his corner ---- */

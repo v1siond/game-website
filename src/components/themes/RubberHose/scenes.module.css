@@ -13,6 +13,14 @@
    the sound bars resting at a quarter of their height, the level bobbing on twelve beats; in the ring
    he reaches the pads by 40% of the scene and works them for the rest. */
 .tempo {
+  --cymbal-lift: -2px;
+  --cymbal-tip: -16deg;
+  --pop-floor: 0.3;
+  --pop-start: 0.7;
+  --pop-bounce: 0.15;
+  --pop-width: 0;
+  --pump-grow-y: -0.08;
+  --pump-origin: 0% 100%;
   --strides: 6turn;
   --swing: 38deg;
   --stick-hits: 10turn;
@@ -73,35 +81,7 @@
   );
 }
 
-/* A show poster column at --at springs up from its foot as he reaches it, overshooting, then settles. */
-.springAt {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
-  opacity: clamp(0.25, (var(--p) - var(--at, 0)) * 10 + 0.6, 1);
-  transform: scaleY(
-    calc(clamp(0.3, (var(--p) - var(--at, 0)) * 8 + 0.7, 1) + sin(clamp(0, (var(--p) - var(--at, 0)) * 6, 1) * 0.5turn) * 0.15)
-  );
-}
-
 /* ---- the vaudeville stage ---- */
-
-/* The gramophone's horn pumps on each stick hit, squashing toward its bell. */
-.pump {
-  transform-box: fill-box;
-  transform-origin: 0% 100%;
-  transform: scale(
-    calc(1 + max(0, sin(var(--p) * var(--stick-hits) + 0.25turn)) * 0.14),
-    calc(1 - max(0, sin(var(--p) * var(--stick-hits) + 0.25turn)) * 0.08)
-  );
-}
-
-/* The cymbals jump and tip on the hits, the second half a turn later (DrumKit sets its --phase). */
-.cymbal {
-  transform-box: fill-box;
-  transform-origin: 50% 50%;
-  transform: translate3d(0, calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * -2px), 0)
-    rotate(calc(max(0, sin(var(--p) * var(--stick-hits) + var(--phase, 0turn))) * -16deg));
-}
 
 /* ---- the prize ring ---- */
 

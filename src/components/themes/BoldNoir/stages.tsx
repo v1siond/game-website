@@ -40,7 +40,7 @@ function NightStreet() {
         <rect x={-2} y={-2} width={604} height={104} fill={NOIR.coal} />
         <circle cx={480} cy={24} r={12} fill={NOIR.paper} />
       </LevelArt>
-      <Skyline className={`absolute bottom-3 left-0 h-[72%] w-[115%] ${styles.drift}`} fill={NOIR.ink} />
+      <Skyline className={`absolute bottom-3 left-0 h-[72%] w-[115%] ${scene.drift}`} fill={NOIR.ink} />
       <LevelArt>
         {LAMPS.map((x) => (
           <g key={x}>
@@ -194,7 +194,7 @@ function BasementGym() {
       </svg>
       <svg
         viewBox="0 0 100 100"
-        className={`absolute bottom-8 left-[calc(40%_+_3rem)] h-16 w-16 sm:left-[calc(40%_+_4rem)] sm:h-24 sm:w-24 ${styles.splash}`}
+        className={`absolute bottom-8 left-[calc(40%_+_3rem)] h-16 w-16 sm:left-[calc(40%_+_4rem)] sm:h-24 sm:w-24 ${scene.burst}`}
         aria-hidden="true"
         focusable="false"
       >

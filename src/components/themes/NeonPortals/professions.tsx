@@ -186,7 +186,7 @@ function EngineerLane({ zone }: { zone: LevelZone }) {
 // ---- Musician: his drum kit, the stage, sound ----
 
 // The cymbals wobble on the crash, the world's own touch on the kit.
-const KIT: DrumKitColors = { stand: PORTAL.MUTED, shell: PORTAL.PANEL, rim: PORTAL.BLUE, bass: PORTAL.ORANGE, cymbal: styles.cymbal }
+const KIT: DrumKitColors = { stand: PORTAL.MUTED, shell: PORTAL.PANEL, rim: PORTAL.BLUE, bass: PORTAL.ORANGE, cymbalsTip: true }
 const WAVES: [string, string] = [PORTAL.ORANGE, PORTAL.BLUE]
 
 const speakers = (stroke: string) => (

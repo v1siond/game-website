@@ -112,7 +112,7 @@ function PosterColumn({ position, poster }: { position: number; poster: [string,
   return (
     <svg
       viewBox="0 0 24 60"
-      className={`absolute bottom-3 left-[calc(var(--at)*100%_-_1rem)] h-12 w-5 sm:h-16 sm:w-7 ${world.inked} ${atClass(position)} ${styles.springAt}`}
+      className={`absolute bottom-3 left-[calc(var(--at)*100%_-_1rem)] h-12 w-5 sm:h-16 sm:w-7 ${world.inked} ${atClass(position)} ${scene.popAt}`}
       aria-hidden="true"
       focusable="false"
     >
@@ -156,7 +156,7 @@ function EngineerLevel({ zone }: { zone: LevelZone }) {
 
 // ---- Musician: the vaudeville stage ----
 
-const KIT: DrumKitColors = { stand: HOSE.ink, shell: HOSE.redDark, rim: HOSE.gold, bass: HOSE.gold, cymbal: styles.cymbal }
+const KIT: DrumKitColors = { stand: HOSE.ink, shell: HOSE.redDark, rim: HOSE.gold, bass: HOSE.gold, cymbalsTip: true }
 const WAVES: [string, string] = [HOSE.gold, HOSE.redDark]
 
 const FOOTLIGHTS = [
@@ -195,7 +195,7 @@ function Gramophone() {
       <rect x={6} y={36} width={26} height={20} fill={HOSE.shadowDark} />
       <rect x={4} y={32} width={30} height={5} fill={HOSE.inkSoft} />
       <rect x={17} y={22} width={3} height={11} fill={HOSE.gold} />
-      <g className={styles.pump}>
+      <g className={scene.pump}>
         <path d="M18 24 L30 4 Q44 6 42 22 Z" fill={HOSE.gold} />
         <PieEyes cx={34} cy={14} size={9} paper={HOSE.gold} />
       </g>
