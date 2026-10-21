@@ -28,26 +28,32 @@ export function CVContent() {
 
   return (
     <>
-      {/* Toolbar - hidden in print. Leaving the CV on the left, the CV's own controls together on the right.
-          A client side link keeps the world and the profession picked before opening the CV. */}
-      <div className="max-w-[850px] mx-auto px-8 pt-6 pb-4 flex flex-wrap justify-between items-center gap-4 print:hidden">
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-sm text-gray-700 rounded px-1 py-1 hover:text-black hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        >
-          <span aria-hidden="true">&larr;</span>
-          {cvPage.backToSite}
-        </Link>
-        <div className="flex flex-wrap items-center gap-4">
-          <LanguageSwitcher />
-          <DownloadPdfButton label={cvPage.downloadPdf} />
+      {/* Toolbar - hidden in print, pinned to the top at every width. Leaving the CV on the left, the CV's own
+          controls together on the right. A client side link keeps the world and the profession picked before
+          opening the CV. */}
+      <nav
+        aria-label={labels.navigation.primaryNavigation}
+        className="sticky top-0 z-40 border-b border-gray-200 bg-white print:hidden"
+      >
+        <div className="max-w-[850px] mx-auto px-4 py-3 sm:px-8 flex flex-wrap justify-between items-center gap-x-4 gap-y-2">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm text-gray-700 rounded px-1 py-1 hover:text-black hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          >
+            <span aria-hidden="true">&larr;</span>
+            {cvPage.backToSite}
+          </Link>
+          <div className="flex flex-wrap items-center gap-4">
+            <LanguageSwitcher />
+            <DownloadPdfButton label={cvPage.downloadPdf} />
+          </div>
         </div>
-      </div>
+      </nav>
 
       {/* CV Content - this is what gets converted to PDF */}
       <main
         id="cv-content"
-        className="max-w-[850px] mx-auto px-8 py-8 bg-white text-black font-sans print:px-0 print:py-0"
+        className="max-w-[850px] mx-auto px-4 py-8 sm:px-8 bg-white text-black font-sans scroll-mt-32 sm:scroll-mt-20 [&_header]:scroll-mt-32 [&_section]:scroll-mt-32 sm:[&_header]:scroll-mt-20 sm:[&_section]:scroll-mt-20 print:px-0 print:py-0"
       >
         {/* Header / Contact */}
         <header className="border-b-2 border-black pb-4 mb-6">
@@ -55,9 +61,9 @@ export function CVContent() {
           {professionalSummary && (
             <p className="text-lg text-gray-700 mb-2">{professionalSummary.headline}</p>
           )}
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
             <span>{contact.email}</span>
-            <span>|</span>
+            <span aria-hidden="true">|</span>
             <a href={contact.linkedin} className="text-blue-700 underline">
               {shownUrl(contact.linkedin)}
             </a>
@@ -80,7 +86,7 @@ export function CVContent() {
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
               {cvPage.coreCompetencies}
             </h2>
-            <ul className="text-sm list-disc list-inside columns-2 gap-8">
+            <ul className="text-sm list-disc list-inside columns-1 sm:columns-2 gap-8">
               {professionalSummary.highlights.map((h, i) => (
                 <li key={i}>{h}</li>
               ))}
@@ -98,7 +104,7 @@ export function CVContent() {
               const companyUrl = getCompanyUrl(role.slug)
               return (
                 <div key={role.id} className="mb-4">
-                  <div className="flex justify-between items-baseline">
+                  <div className="flex flex-wrap justify-between items-baseline gap-x-4">
                     <h3 className="text-base font-semibold">{role.title}</h3>
                     <span className="text-sm text-gray-600">{labels.years.present}</span>
                   </div>
@@ -162,7 +168,7 @@ export function CVContent() {
             </h2>
             {workExperience.map((exp) => (
               <div key={exp.id} className="mb-4">
-                <div className="flex justify-between items-baseline">
+                <div className="flex flex-wrap justify-between items-baseline gap-x-4">
                   <h3 className="text-base font-semibold">{exp.title}</h3>
                   <span className="text-sm text-gray-600">
                     {yearRange(exp)}
