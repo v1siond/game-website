@@ -91,7 +91,7 @@ function Banner({ company, open, wave, onTassel }: { company: Company; open: boo
         type="button"
         onClick={onTassel}
         aria-label={fillLabel(deco.pullCord, { venture: company.name })}
-        className={`absolute right-2 top-2 z-20 h-11 w-6 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--deco-gold-bright)] ${v.tassel}`}
+        className={`absolute right-2 top-2 z-20 h-11 w-6 before:absolute before:inset-y-0 before:-inset-x-2.5 before:content-[''] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--deco-gold-bright)] ${v.tassel}`}
       />
     </div>
   )

@@ -41,7 +41,7 @@ function PipeTile({ index, turned, flowed, stopped, onTurn, label }: { index: nu
       aria-pressed={!turned}
       data-turned={turned || undefined}
       data-flowed={flowed || undefined}
-      className={`relative h-10 w-10 flex-shrink-0 sm:h-16 sm:w-16 ${hack.tile}`}
+      className={`relative h-11 w-11 flex-shrink-0 sm:h-16 sm:w-16 ${hack.tile}`}
       style={{ '--i': index } as CSSProperties}
     >
       <svg viewBox="0 0 64 64" className={`h-full w-full ${hack.pipe}`} aria-hidden="true" focusable="false">
