@@ -26,10 +26,28 @@
   border-bottom: 1px solid var(--soul-glow-deep);
 }
 
+.dock,
 .gauges,
 .counter {
   background: rgb(5 4 4 / 0.72);
   border: 1px solid var(--soul-ridge);
+}
+
+/* A phone docks the whole HUD in one band along the bottom edge, so the panels inside it drop their own
+   frame; from sm up the band dissolves (display: contents) and each panel holds its corner again. */
+@media (max-width: 639px) {
+  .gauges,
+  .counter {
+    background: transparent;
+    border: 0;
+  }
+}
+
+@media (min-width: 640px) {
+  .dock {
+    background: transparent;
+    border: 0;
+  }
 }
 
 .barTrack {

@@ -15,8 +15,9 @@ import souls from './souls.module.css'
 // - the item box low in the middle, naming what was picked up and what it gave;
 // - the HUD in the corners, out of the content: health and stamina bars with their numbers and the
 //   flask with its charges bottom left (the flask is a button: drink to heal), the souls counter bottom
-//   right, which rolls up to its new total with the gain shown above it. A phone has no room for both
-//   corners side by side, so there the counter stacks over the gauges and the item box rises above both.
+//   right, which rolls up to its new total with the gain shown above it. A phone has no room for two
+//   corner panels over the content, so there the gauges, the flask and the counter share one thin band
+//   docked on the bottom edge (the footer pads past it) and the item box rises just above that band.
 // A World Select preview draws none of it: fixed layers would escape the preview card.
 
 const BANNER_TEXT: Record<BannerKind, string> = {
@@ -78,7 +79,7 @@ function ItemBoxPopup() {
   const { item } = useRun()
   const { souls: words } = useLabels()
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-52 z-50 flex justify-center px-4 sm:bottom-10" role="status" aria-live="polite">
+    <div className="pointer-events-none fixed inset-x-0 bottom-16 z-50 flex justify-center px-4 sm:bottom-10" role="status" aria-live="polite">
       {item && (
         <div key={item.key} className={`${souls.itemBox} ${CARVED} w-full max-w-md px-5 py-3`}>
           <p className="text-sm uppercase tracking-[0.3em] text-[color:var(--soul-text-soft)]">{words.found}</p>
@@ -95,7 +96,7 @@ function Bar({ label, value, max, fill, wide }: { label: string; value: number; 
   const level = { '--fill': value / max } as CSSProperties
   return (
     <div className="flex items-center gap-2">
-      <span className="w-16 text-sm uppercase tracking-wider text-[color:var(--soul-text-soft)]">{label}</span>
+      <span className="w-[3.75rem] text-sm uppercase tracking-normal sm:w-16 sm:tracking-wider text-[color:var(--soul-text-soft)]">{label}</span>
       <div className={`relative h-3 ${wide} ${souls.barTrack}`} style={level} aria-hidden="true">
         <div className={`absolute inset-y-0 left-0 w-full ${souls.barTrail}`} />
         <div className={`absolute inset-y-0 left-0 w-full ${souls.barFill} ${fill}`} />
@@ -133,7 +134,7 @@ function FlaskButton() {
     >
       <FlaskIcon full={flasks > 0} />
       <span className="text-sm uppercase tracking-wider">
-        {words.flask} <span className="tabular-nums">{flasks}</span>/{MAX_FLASKS}
+        <span className="hidden sm:inline">{words.flask} </span><span className="tabular-nums">{flasks}</span>/{MAX_FLASKS}
       </span>
     </button>
   )
@@ -154,15 +155,15 @@ function SoulsCounter() {
   }, [total])
 
   return (
-    <div className="pointer-events-none fixed bottom-[8.5rem] left-4 z-40 flex flex-col items-start gap-1 sm:bottom-4 sm:left-auto sm:right-4 sm:items-end">
+    <div className="pointer-events-none relative flex flex-col items-end gap-1 sm:fixed sm:bottom-4 sm:right-4 sm:z-40">
       {gain && (
-        <span key={gain.key} className={`${souls.gain} text-sm tabular-nums text-[color:var(--soul-glow)]`}>
+        <span key={gain.key} className={`${souls.gain} absolute bottom-full right-0 mb-1 whitespace-nowrap sm:static sm:mb-0 text-sm tabular-nums text-[color:var(--soul-glow)]`}>
           {fillLabel(words.gained, { count: `+${gain.count}` })}
         </span>
       )}
-      <div className={`${souls.counter} flex items-center gap-3 px-3 py-1.5`}>
+      <div className={`${souls.counter} flex flex-col items-end px-1 sm:flex-row sm:items-center sm:gap-3 sm:px-3 sm:py-1.5`}>
         <span className="text-sm uppercase tracking-[0.2em] text-[color:var(--soul-text-soft)]">{words.souls}</span>
-        <span className="min-w-[4ch] text-right text-lg tabular-nums text-[color:var(--soul-text)]">{shown}</span>
+        <span className="min-w-[4ch] text-right text-base leading-tight sm:text-lg tabular-nums text-[color:var(--soul-text)]">{shown}</span>
       </div>
     </div>
   )
@@ -172,12 +173,14 @@ function Gauges() {
   const { hp, stamina } = useRun()
   const { hud, souls: words } = useLabels()
   return (
-    <section aria-label={words.runStatus} className={`fixed bottom-4 left-4 z-40 ${souls.gauges} px-3 py-2`}>
-      <Bar label={hud.hp} value={hp} max={MAX_HP} fill={souls.hpFill} wide="w-28 sm:w-44" />
-      <div className="mt-1">
-        <Bar label={words.stamina} value={stamina} max={MAX_STAMINA} fill={souls.staminaFill} wide="w-20 sm:w-36" />
+    <section aria-label={words.runStatus} className={`${souls.gauges} flex items-center gap-2 sm:fixed sm:bottom-4 sm:left-4 sm:z-40 sm:block sm:px-3 sm:py-2`}>
+      <div>
+        <Bar label={hud.hp} value={hp} max={MAX_HP} fill={souls.hpFill} wide="w-12 sm:w-44" />
+        <div className="mt-0.5 sm:mt-1">
+          <Bar label={words.stamina} value={stamina} max={MAX_STAMINA} fill={souls.staminaFill} wide="w-12 sm:w-36" />
+        </div>
       </div>
-      <div className="mt-1">
+      <div className="sm:mt-1">
         <FlaskButton />
       </div>
     </section>
@@ -189,8 +192,10 @@ export function RunOverlay() {
   if (preview) return null
   return (
     <div className={CARVED}>
-      <Gauges />
-      <SoulsCounter />
+      <div className={`${souls.dock} fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-1 border-x-0 border-b-0 px-2 py-1 sm:contents`}>
+        <Gauges />
+        <SoulsCounter />
+      </div>
       <ItemBoxPopup />
       <BannerBand />
     </div>
