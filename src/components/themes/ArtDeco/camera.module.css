@@ -17,6 +17,15 @@
   transform: rotate(calc(var(--tilt) * 8));
 }
 
+/* A phone column runs every print down one line, where the growing tilt of the last prints swung their
+   corners past the clipping shutter; there each print sways left, level or right by one degree instead,
+   and the board keeps a small gutter (camera.tsx) for the corners of the tallest prints. */
+@media (max-width: 639px) {
+  .print {
+    --tilt: calc(var(--sway) * 1deg);
+  }
+}
+
 .board[data-on] .print {
   opacity: 1;
   transform: rotate(var(--tilt));

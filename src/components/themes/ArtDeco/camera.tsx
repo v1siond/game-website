@@ -89,7 +89,7 @@ function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
   const developed = snaps > 0
 
   return (
-    <article data-developed={developed || undefined} className={`group relative ${camera.print}`} style={{ '--i': index } as CSSProperties}>
+    <article data-developed={developed || undefined} className={`group relative ${camera.print}`} style={{ '--i': index, '--sway': (index % 3) - 1 } as CSSProperties}>
       <span className={`absolute -top-2 left-1/2 z-10 h-4 w-4 -translate-x-1/2 rounded-full ${camera.pin}`} aria-hidden="true" />
       <div className={`relative p-3 pb-5 ${camera.paper}`}>
         <div className="relative overflow-hidden">
@@ -178,7 +178,7 @@ export function ResearchBoard({ projects, arrived }: { projects: Project[]; arri
       <Viewfinder />
       <ProjectList
         projects={projects}
-        className={`pt-3 ${MASONRY_LIST}`}
+        className={`px-3 pt-3 sm:px-0 ${MASONRY_LIST}`}
         itemClassName={`${MASONRY_ITEM} pt-2`}
         renderProject={(slot) => <Photograph slot={slot} index={projects.indexOf(slot.project)} />}
       />
