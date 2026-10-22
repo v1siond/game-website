@@ -30,15 +30,15 @@ export function moveAndFade(timing: string): string {
  * live directly under <main> (no transformed ancestor), so `fixed` is genuinely
  * viewport-relative here.
  *
- * Below sm a phone column is all text, so a full size fight pinned at 15-20% from the bottom lands
- * on titles and buttons mid screen. There the whole layer shrinks from the bottom edge and slides
+ * Below lg (phones and tablets) the column is all text, so a full size fight pinned at 15-20% from
+ * the bottom lands on titles and buttons mid screen. There the whole layer shrinks from the bottom edge and slides
  * down onto it: the fighters keep their places relative to each other but fight on the floor of
  * the screen, a band of under a tenth of its height that a line reaches only on its way up.
  */
 export function FixedCombatLayer({ inView, children }: { inView: boolean; children: ReactNode }) {
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-40 origin-bottom translate-y-[8%] scale-[0.45] sm:translate-y-0 sm:scale-100"
+      className="pointer-events-none fixed inset-0 z-40 origin-bottom translate-y-[8%] scale-[0.45] lg:translate-y-0 lg:scale-100"
       style={{ opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' }}
       aria-hidden="true"
     >
