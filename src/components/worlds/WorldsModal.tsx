@@ -55,7 +55,7 @@ export default function WorldsModal() {
         <button
           onClick={closeWorlds}
           aria-label="Close world picker"
-          className="absolute top-3 right-3 z-10 w-9 h-9 flex items-center justify-center rounded-md transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2"
+          className="absolute top-3 right-3 z-10 w-11 h-11 lg:w-9 lg:h-9 flex items-center justify-center rounded-md transition-transform hover:scale-110 focus:outline-none focus-visible:ring-2"
           style={{ color: c.accent, border: `1px solid ${c.accent}55`, background: `${c.background}cc` }}
         >
           ✕
@@ -64,7 +64,7 @@ export default function WorldsModal() {
         <div className="p-5 md:p-8">
           <h2
             id="worlds-modal-heading"
-            className="text-xl md:text-2xl tracking-[0.15em] text-center mb-2"
+            className="px-10 lg:px-0 text-xl md:text-2xl tracking-[0.15em] text-center mb-2"
             style={{ color: c.accent }}
           >
             Enter Another World

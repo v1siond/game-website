@@ -25,7 +25,7 @@ function FilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="ws-chip flex items-center gap-2 rounded-full px-4 py-2 text-xs uppercase tracking-widest min-h-[40px] cursor-pointer"
+      className="ws-chip flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs uppercase tracking-widest min-h-11 lg:min-h-[40px] cursor-pointer"
       style={{
         border: `1px solid ${active ? theme.colors.accent : theme.colors.border}`,
         backgroundColor: active ? theme.colors.surfaceHover : 'transparent',
@@ -63,7 +63,8 @@ export default function WorldsGrid() {
       <div
         role="group"
         aria-label="Filter worlds by category"
-        className="mb-8 flex flex-wrap items-center justify-center gap-2"
+        // one row that scrolls sideways on a phone, so the chips never push the worlds below the screen
+        className="mb-8 flex items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0"
       >
         <FilterChip
           active={filter === 'All'}

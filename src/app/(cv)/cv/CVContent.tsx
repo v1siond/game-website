@@ -71,7 +71,7 @@ export function CVContent() {
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]">
             <span>{contact.email}</span>
             <span aria-hidden="true">|</span>
-            <a href={contact.linkedin} className="text-blue-700 underline">
+            <a href={contact.linkedin} className="inline-flex min-h-11 items-center text-blue-700 underline lg:min-h-0 print:min-h-0">
               {shownUrl(contact.linkedin)}
             </a>
           </div>
