@@ -1,10 +1,29 @@
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+import { useZoneStage } from '@/hooks/useZoneStage'
 import { DECO_COLORS as C } from './palette'
 import look from './world.module.css'
 
 // The fixed backdrop of the city under the sea behind every section: the SVG patterns, the deco
-// pattern, the light rays through the dome, the caustic light and a few rising bubbles.
-// Ambient loops stop under reduced motion (world.module.css).
+// pattern, the light rays through the dome, the drowned skyline, the caustic light and a few rising
+// bubbles. Ambient loops stop under reduced motion (world.module.css).
+//
+// The backdrop follows the depth the visitor is at, through the shared ZoneStageProvider on the page:
+// at the surface (the hero) the light rays come down from above; in the chambers the rays thin and the
+// far towers stand in the sea fog with their thin neon; at the revival chamber the light is gone. The
+// page keeps the zone and sets it as data-zone on its root; the layers fade by opacity
+// (world.module.css).
+
+export type DecoZone = 'surface' | 'city' | 'abyss'
+
+/** Hands its zone to the page while it is in view; mark a small element (a hero, a plaque, the contact). */
+export function DepthZone({ zone, children, className }: { zone: DecoZone; children: ReactNode; className?: string }) {
+  const { ref } = useZoneStage(zone)
+  return (
+    <div ref={ref} className={className}>
+      {children}
+    </div>
+  )
+}
 
 export function DecoSVGDefs() {
   return (
@@ -63,12 +82,49 @@ const RAY_LEFT = ['left-[5%]', 'left-[23%]', 'left-[41%]', 'left-[59%]', 'left-[
 
 export function UnderwaterRays() {
   return (
-    <div className="pointer-events-none fixed inset-0 z-[1] overflow-hidden" aria-hidden="true">
+    <div className={`pointer-events-none fixed inset-0 z-[1] overflow-hidden ${look.zoneRays}`} aria-hidden="true">
       {RAY_ANGLES.map((angle, i) => (
         <div key={angle} className={`absolute top-0 h-full w-44 origin-top ${RAY_LEFT[i]} ${angle} ${look.rays}`} />
       ))}
     </div>
   )
+}
+
+// The far city in the fog, low in the window: stepped towers, lit windows and thin neon lines, the way
+// the city shows through the glass (research 02 and 24: neon is lines, never filled boxes).
+const FAR_TOWERS =
+  'M0 400 V250 H40 V210 H60 V150 H70 V110 H76 V150 H90 V230 H130 V190 H150 V120 H160 V60 H166 V120 H176 V200 H210 V260 H250 V170 H270 V130 H290 V170 H310 V240 H350 V200 H380 V140 H392 V90 H398 V140 H410 V220 H450 V270 H490 V180 H510 V150 H530 V180 H550 V250 H600 V400 Z'
+const NEON_LINES = [
+  { d: 'M66 160 V200', color: C.neonPink },
+  { d: 'M156 140 V180', color: C.waterGlow },
+  { d: 'M276 150 H300', color: C.goldBright },
+  { d: 'M396 150 V196', color: C.vita },
+  { d: 'M514 170 H534', color: C.neonPink },
+]
+const WINDOWS = [
+  [48, 270], [96, 250], [140, 220], [168, 150], [222, 290], [262, 200],
+  [320, 280], [362, 230], [404, 250], [460, 300], [500, 210], [560, 290],
+] as const
+
+export function DrownedSkyline() {
+  return (
+    <div className={`pointer-events-none fixed inset-x-0 bottom-0 z-[1] h-[55vh] ${look.zoneCity}`} aria-hidden="true">
+      <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMax slice" className="h-full w-full" focusable="false">
+        <path d={FAR_TOWERS} fill={C.farCity} opacity="0.85" />
+        {WINDOWS.map(([x, y]) => (
+          <rect key={`${x}-${y}`} x={x} y={y} width="4" height="5" fill={C.goldBright} opacity="0.55" />
+        ))}
+        {NEON_LINES.map(({ d, color }) => (
+          <path key={d} d={d} stroke={color} strokeWidth="2" strokeLinecap="round" opacity="0.7" />
+        ))}
+      </svg>
+    </div>
+  )
+}
+
+// The dark of the bottom of the city, over everything behind the contact.
+export function AbyssVeil() {
+  return <div className={`pointer-events-none fixed inset-0 z-[4] ${look.zoneAbyss}`} aria-hidden="true" />
 }
 
 export function WaterCaustics() {

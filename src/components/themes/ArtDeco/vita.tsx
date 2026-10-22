@@ -55,9 +55,9 @@ export function VitaChamber() {
       ref={ref}
       data-on={triggered || undefined}
       aria-labelledby={CONTACT_HEADING}
-      className={`relative z-20 mx-auto flex max-w-5xl flex-col items-center gap-14 px-4 py-20 md:flex-row md:gap-12 ${vita.bay}`}
+      className={`relative z-20 mx-auto flex max-w-5xl flex-col items-center gap-14 px-4 py-20 md:flex-row md:gap-0 ${vita.bay}`}
     >
-      <div className={`relative h-60 w-40 flex-shrink-0 ${vita.tube}`} aria-hidden="true">
+      <div className={`relative mx-20 h-60 w-40 flex-shrink-0 ${vita.tube}`} aria-hidden="true">
         <Crown />
         <span className={`absolute inset-0 ${vita.glow}`} />
         {triggered && <RevivedSurvivor />}

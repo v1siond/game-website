@@ -3,12 +3,14 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { headingId } from '@/components/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { DepthZone } from './backdrop'
 import { DECO_COLORS as C } from './palette'
 import plaque from './plaque.module.css'
 
 // Every section is a chamber one level deeper in the city. Its title hangs on a stepped ziggurat plaque
 // in gold neon, and the depth gauge beside it swings its needle further round for each chamber down
-// (depth 0 is the first chamber), so scrolling the page reads as going down through the city.
+// (depth 0 is the first chamber), so scrolling the page reads as going down through the city. The plaque
+// hands the city zone to the page's backdrop while it is in view.
 //
 // Pattern: CSS off the chamber's own section trigger: the plaque's steps rise one after another and the
 // needle swings to its --depth angle once. Reduced motion: the plaque and the needle at rest.
@@ -37,7 +39,7 @@ export function Chamber({ title, depth, children }: { title: string; depth: numb
 
   return (
     <section ref={ref} data-on={triggered || undefined} aria-labelledby={id} className="relative" style={{ '--depth': depth } as CSSProperties}>
-      <div className="mb-8 flex flex-col items-center">
+      <DepthZone zone="city" className="mb-8 flex flex-col items-center">
         <div className="relative flex flex-col items-center" aria-hidden="true">
           {[1, 2, 3].map((step) => (
             <span key={step} className={`block border-2 border-b-0 ${plaque.step}`} style={{ '--s': step } as CSSProperties} />
@@ -49,7 +51,7 @@ export function Chamber({ title, depth, children }: { title: string; depth: numb
             {title}
           </h2>
         </div>
-      </div>
+      </DepthZone>
       {children}
     </section>
   )

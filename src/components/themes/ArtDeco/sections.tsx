@@ -33,7 +33,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <Chamber title={labels.sections.about} depth={0}>
           <PoweredRoom>
             <BrassPanel>
-              <p className="mx-auto max-w-3xl text-center text-base leading-relaxed text-[color:var(--deco-cream)]">{professionalSummary.bio}</p>
+              <p className="mx-auto max-w-3xl text-base leading-relaxed text-[color:var(--deco-cream)]">{professionalSummary.bio}</p>
             </BrassPanel>
           </PoweredRoom>
         </Chamber>
@@ -54,9 +54,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       </FadeInScene>
 
       <Chamber title={labels.sections.projects} depth={3}>
-        <HackedShutter>
-          <ResearchBoard projects={sections.projects} />
-        </HackedShutter>
+        <HackedShutter>{(opened) => <ResearchBoard projects={sections.projects} arrived={opened} />}</HackedShutter>
       </Chamber>
 
       <FadeInScene>

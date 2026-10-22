@@ -16,11 +16,17 @@ export const DECO_COLORS = {
   deepSeaDark: '#102030',
   abyss: '#05101a',
 
+  // The drowned city through the glass: the far towers in the fog, a lobby window and its towers
+  farCity: '#0a2a33',
+  lobbyGlass: '#2a7a6c',
+  lobbyTowers: '#0b2a2a',
+
   // Brass and gold
   brassDark: '#8B7320',
   brassMid: '#B8860B',
   gold: '#D4AF37',
   goldBright: '#F0C850',
+  shutter: '#2a2008',
 
   // Bronze
   bronzeDark: '#8B4513',

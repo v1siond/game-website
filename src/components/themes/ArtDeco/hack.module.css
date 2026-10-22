@@ -65,16 +65,24 @@
 
 .status {
   color: var(--deco-gold-bright);
-  font-family: var(--deco-display);
 }
 
 .shutter {
-  transform: translate3d(0, 0, 0);
+  background:
+    repeating-linear-gradient(180deg, var(--deco-brass-dark) 0 14px, var(--deco-sepia) 14px 16px, var(--deco-shutter) 16px 22px),
+    var(--deco-shutter);
+  border-top: 4px solid var(--deco-gold);
+  transform-origin: 50% 0;
+  transform: scaleY(1);
 }
 
+/* The roll up: the slats gather into the top, then the rolled shutter fades. */
 .works[data-open] .shutter {
-  transform: translate3d(0, -101%, 0);
-  transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.4s;
+  transform: scaleY(0);
+  opacity: 0;
+  transition:
+    transform 1s cubic-bezier(0.65, 0, 0.35, 1) 0.3s,
+    opacity 0.2s linear 1.2s;
 }
 
 @media (prefers-reduced-motion: reduce) {

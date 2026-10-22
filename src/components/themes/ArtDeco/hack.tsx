@@ -16,7 +16,8 @@ import hack from './hack.module.css'
 // water stops there with a spark; he steps up with the wrench and, after a beat, knocks the tile back
 // into line (the autohack), or the visitor turns it first with a click or Enter. Turning a tile the
 // water already passed cuts the flow there again. When the water reaches the lock it clicks open and
-// the shutter rolls up on the project board.
+// the shutter rolls up on the project board, and the board's own arrival plays from that first opening
+// (the board is a render prop that gets the opened flag).
 //
 // Pattern: React state for the turned tiles and how far the water got, one setTimeout per step (the
 // flow, or his knock); his swing is the shared usePoseSequence move. The visuals (tile turn, water
@@ -24,8 +25,8 @@ import hack from './hack.module.css'
 // shutter, so screen readers read it from the start. Reduced motion: every tile in line, the lock open
 // and the shutter up at once; turning still works without the motion.
 
-const FLOW_MS = 650
-const KNOCK_MS = 1300
+const FLOW_MS = 450
+const KNOCK_MS = 900
 const TILES = 5
 const TURNED_AT_START: ReadonlySet<number> = new Set([1, 3])
 
@@ -69,31 +70,33 @@ function Lock({ open }: { open: boolean }) {
   )
 }
 
-// The shutter's face: brass slats under a sunburst.
-function ShutterFace() {
+// The shutter's crest: a brass sunburst over the top slats. A fixed size, the slats are CSS at a fixed pitch
+// so a tall board keeps them shutter sized.
+function ShutterCrest() {
   return (
-    <svg viewBox="0 0 400 200" preserveAspectRatio="none" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
-      <rect width="400" height="200" fill="#2a2008" />
-      {Array.from({ length: 10 }, (_, i) => (
-        <path key={i} d={`M0 ${i * 20 + 10} H400`} stroke={C.brassDark} strokeWidth="9" />
+    <svg viewBox="0 0 160 80" className="absolute left-1/2 top-6 h-20 w-40 -translate-x-1/2" aria-hidden="true" focusable="false">
+      <path d="M10 80 A70 70 0 0 1 150 80 Z" fill={C.sepia} stroke={C.gold} strokeWidth="2" />
+      {[-72, -48, -24, 0, 24, 48, 72].map((angle) => (
+        <path key={angle} d="M80 80 V22" stroke={C.gold} strokeWidth="2" transform={`rotate(${angle} 80 80)`} />
       ))}
-      {[-60, -30, 0, 30, 60].map((angle) => (
-        <path key={angle} d={`M200 200 L${200 + Math.sin((angle * Math.PI) / 180) * 180} ${200 - Math.cos((angle * Math.PI) / 180) * 180}`} stroke={C.gold} strokeWidth="2" opacity="0.5" />
-      ))}
+      <path d="M50 80 A30 30 0 0 1 110 80 Z" fill={C.gold} />
     </svg>
   )
 }
 
-/** The project board under a shutter that the pipe hack lifts. */
-export function HackedShutter({ children }: { children: ReactNode }) {
+/** The project board under a shutter that the pipe hack lifts; the board learns when the shutter first opened. */
+export function HackedShutter({ children }: { children: (opened: boolean) => ReactNode }) {
   const { deco } = useLabels()
   const reduced = useReducedMotion()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.6 })
   const [turned, setTurned] = useState(startTurned)
   const [flow, setFlow] = useState(0)
   const { pose, play, advance } = usePoseSequence<DecoMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
 
   const done = flow >= TILES
+  // Latched: knocking a tile out again closes the shutter but the board, once arrived, stays arrived.
+  const [opened, setOpened] = useState(false)
+  if (done && !opened) setOpened(true)
   const stopped = triggered && !done && turned[flow]
 
   const turn = (index: number) => {
@@ -120,8 +123,8 @@ export function HackedShutter({ children }: { children: ReactNode }) {
   const status = done ? deco.flowDone : stopped ? deco.flowWaiting : ''
 
   return (
-    <div ref={ref} data-on={triggered || undefined} data-open={done || undefined} className={hack.works}>
-      <div className={`relative mx-auto mb-6 flex max-w-2xl flex-col items-center gap-2 p-3 sm:flex-row sm:items-end sm:gap-4 sm:p-5 ${hack.panel}`}>
+    <div data-on={triggered || undefined} data-open={done || undefined} className={hack.works}>
+      <div ref={ref} className={`relative mx-auto mb-6 flex max-w-2xl flex-col items-center gap-2 p-3 sm:flex-row sm:items-end sm:gap-4 sm:p-5 ${hack.panel}`}>
         <div className="h-28 w-[4.7rem] flex-shrink-0 sm:h-32 sm:w-20" aria-hidden="true">
           <SurvivorSprite profession="engineer" motion={pose} onDone={advance} className="h-full w-full" />
         </div>
@@ -148,9 +151,9 @@ export function HackedShutter({ children }: { children: ReactNode }) {
       </div>
 
       <div className="relative overflow-hidden">
-        {children}
+        {children(opened)}
         <div className={`pointer-events-none absolute inset-0 ${hack.shutter}`} aria-hidden="true">
-          <ShutterFace />
+          <ShutterCrest />
         </div>
       </div>
     </div>

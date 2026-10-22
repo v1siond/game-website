@@ -5,7 +5,6 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { DECO_COLORS as C } from './palette'
@@ -16,9 +15,10 @@ import camera from './camera.module.css'
 // from the root), and the brass corner brackets lock onto the photograph under it. Snap fires the flash,
 // the plate develops to full colour and the print is stamped developed.
 //
-// Pattern: CSS off one shared section trigger for the arrival (each print swings in on its pin, tilted
-// by its place), React state per print for the snap (the flash and the stamp remount under a key, so a
-// keyframe plays once a snap). Reduced motion: no swing, no flash, the plate develops at once.
+// Pattern: CSS off the arrived flag for the arrival (each print swings in on its pin, tilted by its
+// place); the board sits under the hack shutter, so it arrives when the shutter first opens, not when it
+// scrolls into view behind it. React state per print for the snap (the flash and the stamp remount under
+// a key, so a keyframe plays once a snap). Reduced motion: no swing, no flash, the plate develops at once.
 
 type Plate = (id: string) => ReactNode
 
@@ -171,12 +171,10 @@ function Viewfinder() {
   )
 }
 
-/** The projects as a masonry research board under the viewfinder. */
-export function ResearchBoard({ projects }: { projects: Project[] }) {
-  const { ref, triggered } = useSectionTrigger()
-
+/** The projects as a masonry research board under the viewfinder; the prints swing in once it has arrived. */
+export function ResearchBoard({ projects, arrived }: { projects: Project[]; arrived: boolean }) {
   return (
-    <div ref={ref} data-on={triggered || undefined} className={`relative ${camera.board}`}>
+    <div data-on={arrived || undefined} className={`relative ${camera.board}`}>
       <Viewfinder />
       <ProjectList
         projects={projects}

@@ -3,7 +3,7 @@
 import type { CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM } from '@/components/cv/masonry'
 import { drumsSince } from '@/components/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Band, Musician } from '@/lib/cv/content'
@@ -13,6 +13,8 @@ import marquee from './marquee.module.css'
 // gold neon that buzzes on (two dips, then steady) when the row of boards comes into view, framed by a
 // rim of bulbs. Pointing at a board (or focusing its link) sets the bulbs chasing round it, the way a
 // marquee calls the crowd in. The years and the release sit on the board's letter rail below.
+//
+// The boards are wide theatre fronts, so the masonry runs two columns, never three.
 //
 // Pattern: CSS off one shared section trigger for the buzz on (staggered by --i); hover and focus run
 // the chase. Reduced motion: the sign is lit and the bulbs still.
@@ -65,7 +67,7 @@ export function MarqueeRow({ bands, musician }: { bands: Band[]; musician: Music
       </p>
       <BandList
         bands={bands}
-        className={MASONRY_LIST}
+        className="columns-1 gap-6 md:columns-2"
         itemClassName={MASONRY_ITEM}
         renderBand={(slot) => <Board slot={slot} index={bands.indexOf(slot.band)} />}
       />

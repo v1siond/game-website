@@ -18,10 +18,12 @@ import diary from './diary.module.css'
 // counter runs and the highlights light one after another, a line every LINE_MS, then the tape stops.
 // One diary plays at a time; playing another stops the first. While a diary plays he steps up in
 // the card's corner and holds it by his face, listening, nodding with the voice; when the tape ends he is gone.
+// The newest diary starts on its own once a quarter of it is in view, so he is there as the visitor arrives.
 //
 // Pattern: hybrid. The arrival is CSS off one shared section trigger (data-on, staggered by --i); the
 // playback is one setTimeout per line in the shelf, so React renders once a line. Reduced motion keeps
-// the reels still and the arrival instant; the lines still light, that is the content, not motion.
+// the reels still and the arrival instant and plays nothing on its own; the lines still light on Play,
+// that is the content, not motion.
 
 const LINE_MS = 2200
 
@@ -132,8 +134,18 @@ function DiaryCard({ entry, index, playing, onToggle }: { entry: Job; index: num
 
 /** The jobs as a masonry shelf of diaries, one playing at a time. */
 export function DiaryShelf({ jobs }: { jobs: Job[] }) {
-  const { ref, triggered } = useSectionTrigger()
+  // A low threshold: on a phone the stacked shelf is several screens tall.
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.05 })
+  // The autoplay waits for the newest diary itself, so he steps in where the visitor is looking.
+  const { ref: newestRef, triggered: newestInView } = useSectionTrigger({ threshold: 0.25 })
+  const reduced = useReducedMotion()
   const [playing, setPlaying] = useState<Playing | null>(null)
+  const newest = jobs[0]?.id
+
+  useEffect(() => {
+    if (!newestInView || reduced || !newest) return
+    setPlaying({ id: newest, line: 0 })
+  }, [newestInView, reduced, newest])
 
   useEffect(() => {
     if (!playing) return
@@ -148,7 +160,7 @@ export function DiaryShelf({ jobs }: { jobs: Job[] }) {
   return (
     <ul ref={ref} data-on={triggered || undefined} className={`${MASONRY_LIST} ${diary.shelf}`}>
       {jobs.map((entry, index) => (
-        <li key={entry.id} className={MASONRY_ITEM}>
+        <li key={entry.id} ref={index === 0 ? newestRef : undefined} className={MASONRY_ITEM}>
           <DiaryCard entry={entry} index={index} playing={playing?.id === entry.id ? playing.line : null} onToggle={() => toggle(entry.id)} />
         </li>
       ))}

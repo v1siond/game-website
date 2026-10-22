@@ -109,11 +109,54 @@
   }
 }
 
+/* ---- depth zones (backdrop.tsx): the root's data-zone picks which layers show ---- */
+
+.zoneRays,
+.zoneCity,
+.zoneAbyss {
+  transition: opacity 1.4s ease-in-out;
+}
+
+.zoneCity,
+.zoneAbyss {
+  opacity: 0;
+}
+
+.root[data-zone='city'] .zoneRays {
+  opacity: 0.45;
+}
+
+.root[data-zone='city'] .zoneCity {
+  opacity: 1;
+}
+
+.root[data-zone='abyss'] .zoneRays {
+  opacity: 0;
+}
+
+.root[data-zone='abyss'] .zoneCity {
+  opacity: 0.3;
+}
+
+.root[data-zone='abyss'] .zoneAbyss {
+  opacity: 1;
+}
+
+.zoneAbyss {
+  background: radial-gradient(circle at 50% 40%, transparent 20%, color-mix(in srgb, var(--deco-abyss) 60%, transparent) 100%);
+}
+
 /* Under reduced motion the loops stop; a bubble rests where its --rest puts it. */
 @media (prefers-reduced-motion: reduce) {
   .causticsNear,
   .causticsFar {
     animation: none;
+  }
+
+  .zoneRays,
+  .zoneCity,
+  .zoneAbyss {
+    transition: none;
   }
 
   .bubble {
