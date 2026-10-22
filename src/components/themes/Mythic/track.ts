@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useEffect, type RefObject } from 'react'
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { MOVES, type Move } from './rig'
 import type { SpriteMotion } from './sprite'
@@ -33,4 +34,34 @@ export function useSceneMove(move: Move, start: boolean) {
 
   const replay = useCallback(() => play(move), [play, move])
   return { ...sequence, replay, ms: MOVES[move].ms }
+}
+
+/**
+ * One turn at a time, in the list's order: each item that scrolls in is entered, and the next entered item
+ * takes its turn a gap after the last one (a fight per job, a reach per tech group). Take counts the turns
+ * played, which keys the move; under reduced motion every item is done from the start.
+ */
+export function useTurnQueue(items: readonly { id: string }[], gapMs: number) {
+  const { reduced } = useZoneStageContext()
+  const [entered, setEntered] = useState<ReadonlySet<string>>(new Set())
+  const [done, setDone] = useState<readonly string[]>([])
+  const lastTurn = useRef(0)
+  const next = items.find((item) => entered.has(item.id) && !done.includes(item.id))
+
+  const enter = useCallback((id: string) => {
+    setEntered((current) => (current.has(id) ? current : new Set(current).add(id)))
+  }, [])
+
+  useEffect(() => {
+    if (!next || reduced) return
+    const wait = Math.max(0, lastTurn.current + gapMs - Date.now())
+    const timer = window.setTimeout(() => {
+      lastTurn.current = Date.now()
+      setDone((current) => [...current, next.id])
+    }, wait)
+    return () => window.clearTimeout(timer)
+  }, [next, reduced, gapMs])
+
+  const isDone = (id: string) => reduced || done.includes(id)
+  return { enter, isDone, take: done.length, count: reduced ? items.length : done.length }
 }

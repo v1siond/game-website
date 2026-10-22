@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/components/cv/sectionText'
 import { MASONRY_ITEM } from '@/components/cv/masonry'
@@ -13,7 +13,7 @@ import type { Job } from '@/lib/cv/content'
 import { SpartanSprite, type SpriteMotion } from './sprite'
 import { FOE, type FoeName } from './foes'
 import { MOVES } from './rig'
-import { useTrack } from './track'
+import { useTrack, useTurnQueue } from './track'
 import { Laurel } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
@@ -219,35 +219,9 @@ function TrialCard({ job, cleared, onEnter }: { job: Job; cleared: boolean; onEn
   )
 }
 
-// One fight at a time, in job order, the next a fight's length after the last.
-function useFightQueue(jobs: Job[]) {
-  const { reduced } = useZoneStageContext()
-  const [entered, setEntered] = useState<ReadonlySet<string>>(new Set())
-  const [cleared, setCleared] = useState<readonly string[]>([])
-  const lastFight = useRef(0)
-  const next = jobs.find((job) => entered.has(job.id) && !cleared.includes(job.id))
-
-  const enter = useCallback((id: string) => {
-    setEntered((current) => (current.has(id) ? current : new Set(current).add(id)))
-  }, [])
-
-  useEffect(() => {
-    if (!next || reduced) return
-    const wait = Math.max(0, lastFight.current + FIGHT_GAP_MS - Date.now())
-    const timer = window.setTimeout(() => {
-      lastFight.current = Date.now()
-      setCleared((current) => [...current, next.id])
-    }, wait)
-    return () => window.clearTimeout(timer)
-  }, [next, reduced])
-
-  const isCleared = (id: string) => reduced || cleared.includes(id)
-  return { enter, isCleared, take: cleared.length, count: reduced ? jobs.length : cleared.length }
-}
-
 export function Trials({ jobs }: { jobs: Job[] }) {
   const { myth } = useLabels()
-  const { enter, isCleared, take, count } = useFightQueue(jobs)
+  const { enter, isDone: isCleared, take, count } = useTurnQueue(jobs, FIGHT_GAP_MS)
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">

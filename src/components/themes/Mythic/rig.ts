@@ -9,7 +9,8 @@ import type { Profession } from '@/lib/cv/professions'
 // - elbow: the forearm turns relative to the upper arm and folds only forward, so it stays in [-160, 0];
 // - knee: the shin turns relative to the thigh and folds only back, so it stays in [0, 155];
 // - chest: leans forward when positive; head: tips the chin down when positive.
-// The figure's feet stay on the floor on their own (planted), unless a key lifts him with `y`.
+// The figure's feet stay on the floor on their own (planted), unless a key lifts him with `y`, or the move
+// hangs him from his hands (a climb), where the hips stay put and the legs swing free.
 
 export type Joint =
   | 'chest'
@@ -65,7 +66,7 @@ export interface Pose extends Angles {
   y: number
 }
 
-export type Move = 'idle' | 'walk' | 'combo' | 'roar' | 'haul' | 'finish' | 'heave' | 'hurl' | 'push' | 'drum' | 'knee' | 'elbow' | 'kick'
+export type Move = 'idle' | 'walk' | 'combo' | 'roar' | 'haul' | 'finish' | 'heave' | 'hurl' | 'push' | 'drum' | 'knee' | 'elbow' | 'kick' | 'climb'
 
 /** A key: when it falls in the move (0 to 1) and the joints it changes; the others hold from the key before. */
 export interface Key {
@@ -77,6 +78,8 @@ interface MoveSpec {
   ms: number
   loop: boolean
   keys: (rest: Pose) => Key[]
+  // hung from the hands: the planted drop is cancelled, so tucking the knees lifts the feet, not the hips
+  hang?: boolean
 }
 
 const LEGS_SET = { thighNear: -16, shinNear: 8, thighFar: 14, shinFar: 10 }
@@ -92,6 +95,23 @@ export const REST: Record<Profession, Pose> = {
 }
 
 const back = (rest: Pose): Key => ({ at: 1, pose: rest })
+
+// Hanging on the chain: the near hand straight up on the hold over his head, the far hand on the hold at
+// his chest, the chest in to the wall, the knees bent up under him.
+const CLIMB_HANG: Partial<Pose> = {
+  chest: 10,
+  head: -18,
+  armNear: -168,
+  foreNear: -10,
+  armFar: -95,
+  foreFar: -70,
+  thighNear: -45,
+  shinNear: 70,
+  thighFar: -20,
+  shinFar: 55,
+  x: 0,
+  y: 0,
+}
 
 export const MOVES: Record<Move, MoveSpec> = {
   // the breath: the chest rises, the arms settle out and back in
@@ -224,6 +244,20 @@ export const MOVES: Record<Move, MoveSpec> = {
       back(r),
     ],
   },
+  // one reach up the carved chain: the near hand high on the hold above, the far hand at the chest; he
+  // pulls on the near arm and the far hand reaches past it, then the knees come up to the wall and he
+  // hangs as he started, one hold higher (the scene lifts him by the hold's height over the move)
+  climb: {
+    ms: 1100,
+    loop: false,
+    hang: true,
+    keys: () => [
+      { at: 0, pose: { ...CLIMB_HANG } },
+      { at: 0.4, pose: { chest: 14, head: -12, armNear: -110, foreNear: -95, armFar: -168, foreFar: -12, thighNear: -30, shinNear: 50, thighFar: -10, shinFar: 30 } },
+      { at: 0.7, pose: { chest: 8, armNear: -150, foreNear: -40, armFar: -120, foreFar: -60, thighNear: -70, shinNear: 95, thighFar: -40, shinFar: 80 } },
+      { at: 1, pose: { ...CLIMB_HANG } },
+    ],
+  },
   // the knee: both hands clinch the head down, the near knee drives up
   knee: {
     ms: 800,
@@ -265,10 +299,11 @@ export const MOVES: Record<Move, MoveSpec> = {
 /** A move's keys for a kit, each one a whole pose (a key carries the joints it leaves alone from the key before). */
 export function resolveKeys(move: Move, profession: Profession): { at: number; pose: Pose }[] {
   const rest = REST[profession]
+  const { keys, hang = false } = MOVES[move]
   let carried = rest
-  return MOVES[move].keys(rest).map(({ at, pose }) => {
+  return keys(rest).map(({ at, pose }) => {
     carried = { ...carried, ...pose }
-    return { at, pose: carried }
+    return { at, pose: hang ? hung(carried) : carried }
   })
 }
 
@@ -282,6 +317,14 @@ export function plantedDrop(pose: Pose): number {
   const lowest = Math.max(ankleY(PIVOT.thighNear[1], pose.thighNear, pose.shinNear), ankleY(PIVOT.thighFar[1], pose.thighFar, pose.shinFar))
   return ANKLE_REST_Y - lowest
 }
+
+/** A pose hung from the hands: its lift cancels the planted drop, so the hips hold still whatever the legs do. */
+function hung(pose: Pose): Pose {
+  return { ...pose, y: pose.y - plantedDrop(pose) }
+}
+
+/** The first key of a move, the pose a scene shows still (reduced motion, before the move plays). */
+export const firstPose = (move: Move, profession: Profession): Pose => resolveKeys(move, profession)[0].pose
 
 /** The SVG transform that sets one joint in a pose, as an attribute (the drawing's own coordinates). */
 export function jointTransform(joint: Joint, angle: number): string {

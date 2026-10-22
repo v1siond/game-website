@@ -1,4 +1,4 @@
-import { JOINTS, MOVES, RANGE, REST, plantedDrop, resolveKeys, type Move } from './rig'
+import { JOINTS, MOVES, RANGE, REST, bodyTransform, plantedDrop, resolveKeys, type Move } from './rig'
 import type { Profession } from '@/lib/cv/professions'
 
 const PROFESSIONS: Profession[] = ['engineer', 'drummer', 'fighter']
@@ -42,5 +42,10 @@ describe('his rig', () => {
   it('stands on the floor at rest, and drops the hips when the knees bend', () => {
     expect(Math.abs(plantedDrop({ ...REST.engineer, thighNear: 0, shinNear: 0, thighFar: 0, shinFar: 0 }))).toBeLessThan(0.001)
     expect(plantedDrop({ ...REST.engineer, thighNear: -60, shinNear: 85, thighFar: -10, shinFar: 75 })).toBeGreaterThan(8)
+  })
+
+  it('hangs from the hands on the climb, so the hips hold still while the knees come up', () => {
+    const hips = resolveKeys('climb', 'engineer').map(({ pose }) => bodyTransform(pose))
+    expect(new Set(hips)).toEqual(new Set(['translate(0 0)']))
   })
 })

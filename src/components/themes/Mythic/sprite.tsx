@@ -146,6 +146,8 @@ interface PartProps {
   profession: Profession
   ids: GradientIds
   pose: Pose
+  // the blades on his back and his fists bare, for the climb
+  sheathed: boolean
 }
 
 /** A joint's group: rotated by the pose as an attribute, and found by the animation through data-joint. */
@@ -202,7 +204,7 @@ function Mongkhon() {
   )
 }
 
-function Torso({ profession, ids }: Omit<PartProps, 'pose'>) {
+function Torso({ profession, ids }: Pick<PartProps, 'profession' | 'ids'>) {
   return (
     <g>
       <Inked d={NECK} fill={`url(#${ids.skin})`} />
@@ -222,7 +224,7 @@ function Torso({ profession, ids }: Omit<PartProps, 'pose'>) {
   )
 }
 
-function Waist({ profession, ids }: Omit<PartProps, 'pose'>) {
+function Waist({ profession, ids }: Pick<PartProps, 'profession' | 'ids'>) {
   if (profession === 'fighter') {
     return (
       <g>
@@ -269,8 +271,10 @@ function Leg({ side, profession, ids, pose }: PartProps & { side: Side }) {
   )
 }
 
-// What a fist holds: a blade on its chain, a blade's hilt as a drum beater, or the Muay Thai wraps.
-function Grip({ side, profession, ids }: Omit<PartProps, 'pose'> & { side: Side }) {
+// What a fist holds: a blade on its chain, a blade's hilt as a drum beater, the Muay Thai wraps, or
+// nothing while the blades ride on his back.
+function Grip({ side, profession, ids, sheathed }: Omit<PartProps, 'pose'> & { side: Side }) {
+  if (sheathed) return <Inked d={FIST[side]} fill={skinOf(ids, side)} />
   if (profession === 'fighter') {
     return (
       <>
@@ -298,7 +302,7 @@ function Grip({ side, profession, ids }: Omit<PartProps, 'pose'> & { side: Side 
   )
 }
 
-function Arm({ side, profession, ids, pose }: PartProps & { side: Side }) {
+function Arm({ side, profession, ids, pose, sheathed }: PartProps & { side: Side }) {
   const fighter = profession === 'fighter'
   return (
     <JointGroup joint={side === 'far' ? 'armFar' : 'armNear'} pose={pose}>
@@ -320,7 +324,7 @@ function Arm({ side, profession, ids, pose }: PartProps & { side: Side }) {
           </>
         )}
         <g data-fx={side === 'near' ? 'grip' : undefined}>
-          <Grip side={side} profession={profession} ids={ids} />
+          <Grip side={side} profession={profession} ids={ids} sheathed={sheathed} />
         </g>
       </JointGroup>
     </JointGroup>
@@ -351,7 +355,7 @@ function WarDrum({ ids }: { ids: GradientIds }) {
   )
 }
 
-// The blades crossed on his back while his fists hold their hilts at the drum.
+// The blades crossed on his back while his fists hold their hilts at the drum, or while he climbs.
 function BladesOnBack({ ids }: { ids: GradientIds }) {
   return (
     <g>
@@ -413,6 +417,8 @@ interface FigureProps {
   svgRef?: Ref<SVGSVGElement>
   /** Where he stands inside a scene's own SVG, in that scene's units (a nested viewport). */
   place?: Place
+  /** The blades on his back and his fists bare (the climb). */
+  sheathed?: boolean
 }
 
 export interface Place {
@@ -434,9 +440,9 @@ export function FigureSpace({ place, children }: { place: Place; children: React
 }
 
 /** Him in one pose, drawn with SVG attributes only. */
-export function SpartanFigure({ profession, pose = REST[profession], className = '', svgRef, place }: FigureProps) {
+export function SpartanFigure({ profession, pose = REST[profession], className = '', svgRef, place, sheathed = false }: FigureProps) {
   const ids = useGradientIds()
-  const parts = { profession, ids, pose }
+  const parts = { profession, ids, pose, sheathed }
 
   return (
     <svg ref={svgRef} {...placeAttributes(place)} viewBox="0 0 160 210" className={`overflow-visible ${className}`} aria-hidden="true">
@@ -455,7 +461,7 @@ export function SpartanFigure({ profession, pose = REST[profession], className =
           <Leg side="near" {...parts} />
           <Waist profession={profession} ids={ids} />
           <JointGroup joint="chest" pose={pose}>
-            {profession === 'drummer' && <BladesOnBack ids={ids} />}
+            {(profession === 'drummer' || sheathed) && <BladesOnBack ids={ids} />}
             <Torso profession={profession} ids={ids} />
             <Head {...parts} />
             <Arm side="near" {...parts} />
@@ -501,6 +507,7 @@ interface SpriteProps {
   place?: Place
   /** A one shot move has played out (never called for a loop, or under reduced motion). */
   onDone?: () => void
+  sheathed?: boolean
 }
 
 /** Plays a move's keys on the figure's joints, its body and its lights, and cancels them when the move changes. */
@@ -531,8 +538,8 @@ function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion:
 }
 
 /** Him as the chained blade Spartan, in a profession's kit, playing one motion. */
-export function SpartanSprite({ profession, motion, className = '', place, onDone }: SpriteProps) {
+export function SpartanSprite({ profession, motion, className = '', place, onDone, sheathed = false }: SpriteProps) {
   const [svg, setSvg] = useState<SVGSVGElement | null>(null)
   useRigMotion(svg, profession, motion, onDone)
-  return <SpartanFigure profession={profession} className={className} place={place} svgRef={setSvg} />
+  return <SpartanFigure profession={profession} className={className} place={place} svgRef={setSvg} sheathed={sheathed} />
 }
