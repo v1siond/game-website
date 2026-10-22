@@ -19,7 +19,8 @@ import { MYTH } from './palette'
 import u from './underworld.module.css'
 
 // Work Experience as a fight on a ship's deck in a storm, the serpent rising out of the sea behind. The
-// arena stays in view beside the jobs (above them on a phone). Each job that scrolls into view sends
+// arena stays in view beside the jobs on a wide screen; below lg it sits above them and scrolls away, so it
+// never covers the job text. Each job that scrolls into view sends
 // him a foe in turn (the legionnaire, the harpy, the gorgon): it drops onto the deck, he grabs it, lifts
 // it over his head and slams it down, and its red orbs burst out and fly into the orb medallion; the
 // counter under it fills one cell per role and says its count in words, and the job's own seal lights.
@@ -225,7 +226,7 @@ export function Trials({ jobs }: { jobs: Job[] }) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-      <div className="sticky top-16 z-10 self-start lg:top-8">
+      <div className="lg:sticky lg:top-8 lg:z-10 lg:self-start">
         <Arena take={take} cleared={count} total={jobs.length} />
         <p className={`mt-3 hidden lg:block ${u.hint}`}>{myth.arenaHint}</p>
       </div>
