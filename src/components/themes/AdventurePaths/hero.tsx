@@ -346,7 +346,8 @@ export function ExpeditionHero({ name }: { name: string }) {
               renderOption={(option) => <Landmark option={option} onPick={pick} onPoint={point} />}
             />
 
-            <div className="pointer-events-none absolute bottom-3 left-3 opacity-90" aria-hidden="true">
+            {/* a phone map is too small for the compass beside the low landmark labels, so it shows from sm up */}
+            <div className="pointer-events-none absolute bottom-3 left-3 hidden opacity-90 sm:block" aria-hidden="true">
               <HubCompass />
             </div>
 
