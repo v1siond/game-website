@@ -14,6 +14,7 @@ import { Radio } from './radio'
 import { PerkChart } from './perks'
 import { Fetch, LevelUp } from './events'
 import { Loot } from './footlocker'
+import { Dig } from './dig'
 import type { Zone } from './journey'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
@@ -21,7 +22,7 @@ import j from './journey.module.css'
 // The picked profession's sections, each one a stage: useSectionTrigger adds data-on once it scrolls
 // into view and the CSS plays that section's own entrance off it (the quest cards power on like the
 // tube, the perk cards flip in and their stars stamp down); a moment with its own timers (the tech
-// stack's footlocker loot) takes the on flag as a render prop. Every heading's id is atomicId of its title,
+// stack's footlocker loot, the ventures' dig) takes the on flag as a render prop. Every heading's id is atomicId of its title,
 // the same the wrist terminal's section tabs jump to. The engineer's sections sit on the terminal's
 // glass panels, the musician's on the radio, the fighter's on the printed perk chart.
 
@@ -89,8 +90,12 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       )}
 
       {sections.companies.length > 0 && (
-        <Stage title={titles.ventures} zone="town">
-          <Holotapes companies={sections.companies} />
+        <Stage title={titles.ventures} zone="town" className={j.dig}>
+          {(on) => (
+            <Dig tapes={sections.companies.length} on={on}>
+              {(dug) => <Holotapes companies={sections.companies} dug={dug} />}
+            </Dig>
+          )}
         </Stage>
       )}
     </>

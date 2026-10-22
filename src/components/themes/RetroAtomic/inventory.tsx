@@ -16,7 +16,7 @@ import atomic from './atomic.module.css'
 // one after another.
 //
 // Ventures as holotapes on a shelf: each company a cassette with its label sticker, the two reels turning
-// while the pointer or focus is on it.
+// while the pointer or focus is on it. Each tape is marked dug once the dog has dug it up (dig.tsx).
 
 export function Inventory({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
@@ -74,13 +74,14 @@ function Cassette() {
   )
 }
 
-export function Holotapes({ companies }: { companies: CVData['companies'] }) {
+/** The holotape shelf; `dug` is how many tapes the dog has dug up so far (dig.tsx), all of them by default. */
+export function Holotapes({ companies, dug = companies.length }: { companies: CVData['companies']; dug?: number }) {
   const { links } = useLabels()
 
   return (
     <ul className="grid gap-6 md:grid-cols-3">
-      {companies.map((company) => (
-        <li key={company.id}>
+      {companies.map((company, index) => (
+        <li key={company.id} data-tape data-dug={index < dug || undefined}>
           <a
             href={company.url}
             target="_blank"

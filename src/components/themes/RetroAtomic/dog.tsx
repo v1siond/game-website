@@ -1,17 +1,19 @@
 import { POSTER_INK } from './palette'
 import j from './journey.module.css'
 
-// The wasteland dog that walks at his heel: a shepherd in the flat poster language, tan coat with the
-// dark saddle, ears up, facing right. Each leg turns at its hip (its transform origin in journey.module.css)
-// so the trot swings the front and back pairs against each other; sitting folds the hind legs under.
+// The wasteland dog that walks at his heel: a German shepherd in the flat poster language, facing right.
+// Tan legs, chest and face, the black saddle over the back, the black muzzle tip, tall pointed ears up,
+// the bushy tail held low (research dog-fo4 and loading-dog). Each leg turns at its hip (its transform
+// origin in journey.module.css) so the trot swings the front and back pairs against each other; sitting
+// folds the hind legs under; digging pitches him nose down while the front paws scrape in turn.
 
-export type DogMotion = 'trot' | 'sit' | 'run'
+export type DogMotion = 'trot' | 'sit' | 'run' | 'dig'
 
-const COAT = '#b07a45'
-const SADDLE = '#3a2a1c'
+const COAT = '#c08a4e'
+const SADDLE = '#1f1a14'
 const MUZZLE = '#e2c08d'
 
-const MOTION_CLASS: Record<DogMotion, string> = { trot: j.dogTrot, sit: j.dogSit, run: j.dogRun }
+const MOTION_CLASS: Record<DogMotion, string> = { trot: j.dogTrot, sit: j.dogSit, run: j.dogRun, dig: j.dogDig }
 
 function Leg({ x, className }: { x: number; className: string }) {
   return (
@@ -30,12 +32,13 @@ export function DogSprite({ motion, className = '' }: { motion: DogMotion; class
         <Leg x={28} className={j.dogHindFar} />
         <Leg x={80} className={j.dogFrontFar} />
         <g className={j.dogTail}>
-          <path d="M22 38 Q6 30 4 16" fill="none" stroke={COAT} strokeWidth={7} strokeLinecap="round" />
-          <path d="M22 38 Q6 30 4 16" fill="none" stroke={POSTER_INK} strokeWidth={1.5} strokeLinecap="round" opacity={0.5} />
+          <path d="M22 38 Q8 42 7 60" fill="none" stroke={POSTER_INK} strokeWidth={10} strokeLinecap="round" />
+          <path d="M22 38 Q8 42 7 60" fill="none" stroke={COAT} strokeWidth={7} strokeLinecap="round" />
+          <path d="M21 37 Q9 40 7.5 52" fill="none" stroke={SADDLE} strokeWidth={4} strokeLinecap="round" />
         </g>
         <g className={j.dogBody}>
           <rect x={18} y={30} width={74} height={22} rx={11} fill={COAT} stroke={POSTER_INK} strokeWidth={2} />
-          <path d="M28 31 Q52 22 80 31 L78 40 Q52 34 30 40 Z" fill={SADDLE} />
+          <path d="M22 36 Q24 29 34 29 Q56 25 82 30 Q86 34 82 41 Q56 38 30 44 Q22 43 22 36 Z" fill={SADDLE} />
         </g>
         <Leg x={36} className={j.dogHindNear} />
         <Leg x={86} className={j.dogFrontNear} />
@@ -43,6 +46,7 @@ export function DogSprite({ motion, className = '' }: { motion: DogMotion; class
           <path d="M84 34 L90 14 L100 22 Z" fill={SADDLE} stroke={POSTER_INK} strokeWidth={2} strokeLinejoin="round" />
           <rect x={86} y={18} width={22} height={20} rx={9} fill={COAT} stroke={POSTER_INK} strokeWidth={2} />
           <path d="M100 26 L118 28 Q118 36 104 36 Z" fill={MUZZLE} stroke={POSTER_INK} strokeWidth={2} strokeLinejoin="round" />
+          <path d="M110 27 L118 28 Q118 34 111 34.5 Z" fill={SADDLE} />
           <circle cx={117} cy={28} r={2.5} fill={POSTER_INK} />
           <circle cx={98} cy={24} r={2} fill={POSTER_INK} />
           <path d="M92 18 L96 4 L102 18 Z" fill={SADDLE} stroke={POSTER_INK} strokeWidth={2} strokeLinejoin="round" />
