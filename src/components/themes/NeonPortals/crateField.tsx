@@ -7,6 +7,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { useIsPhone } from '@/hooks/useMediaQuery'
 import { usePoseSequence, type PoseSequence } from '@/hooks/usePoseSequence'
 import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
@@ -40,7 +41,8 @@ import ui from './warped.module.css'
 // hops off and the T rex runs on out of the strip; every crate the visitor breaks by hand makes him
 // jump, the way he hops onto a crate to bust it.
 // A crate opened by the visitor's own click hands focus to the card it held. Reduced motion and a
-// World Select preview open every crate at once, with the score to match.
+// World Select preview open every crate at once, with the score to match. On a phone each crate breaks
+// itself as it scrolls into view, so a visitor who only scrolls still reads every project.
 
 const CYCLE: readonly CrateKind[] = ['wood', 'question', 'bounce', 'tnt', 'arrow', 'metal', 'nitro', 'mask', 'wood', 'checkpoint']
 
@@ -80,7 +82,7 @@ const CASCADE_MS = 140
 
 const kindAt = (index: number): CrateKind => CYCLE[index % CYCLE.length]
 
-function useCrate(id: string, kind: CrateKind, spin: number, slam: number, order: number) {
+function useCrate(id: string, kind: CrateKind, spin: number, slam: number, order: number, reached: boolean) {
   const { offer, take, has, addFruit, addMask } = useScore()
   const preview = usePreview()
   const [state, setState] = useState<CrateState>(() => (has('crates', id) ? 'open' : 'closed'))
@@ -113,6 +115,10 @@ function useCrate(id: string, kind: CrateKind, spin: number, slam: number, order
     setByHand(true)
     run('hand')
   }
+
+  useEffect(() => {
+    if (reached) run('hand')
+  }, [reached, run])
 
   useEffect(() => {
     if (!spin) return
@@ -254,14 +260,22 @@ interface ProjectCrateProps {
 
 function ProjectCrate({ slot, index, spin, slam, onHit }: ProjectCrateProps) {
   const kind = kindAt(index)
-  const { state, strikeByHand, byHand } = useCrate(slot.project.id, kind, spin, slam, index)
+  const phone = useIsPhone()
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.6 })
+  const { state, strikeByHand, byHand } = useCrate(slot.project.id, kind, spin, slam, index, phone && triggered)
   const opening = OPENING[kind]
   const strike = () => {
     strikeByHand()
     onHit()
   }
 
-  if (state !== 'burst' && state !== 'open') return <ClosedCrate slot={slot} kind={kind} state={state} onStrike={strike} />
+  if (state !== 'burst' && state !== 'open') {
+    return (
+      <div ref={ref}>
+        <ClosedCrate slot={slot} kind={kind} state={state} onStrike={strike} />
+      </div>
+    )
+  }
 
   return (
     <div className="relative" data-crate={state}>

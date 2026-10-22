@@ -27,6 +27,22 @@ export interface SectionTriggerOptions {
   triggerOnce?: boolean   // Only trigger once (default: true)
 }
 
+// A section taller than the screen can never show `threshold` of itself on a phone, so it counts as in view
+// once it fills TALL_FILL of the screen instead; anything shorter keeps the plain ratio test.
+const TALL_FILL = 0.5
+// Ratio steps from 0 to the threshold, so the observer reports a tall section's small ratios too.
+const STEPS = 20
+// Sub pixel slack, so the crossing that fires the callback is not missed by a rounding.
+const SLACK_PX = 1
+
+const ratioSteps = (threshold: number) => Array.from({ length: STEPS + 1 }, (_, step) => (threshold * step) / STEPS)
+
+function isShown(entry: IntersectionObserverEntry, threshold: number): boolean {
+  if (!entry.isIntersecting) return false
+  const needed = Math.min(entry.boundingClientRect.height * threshold, (entry.rootBounds?.height ?? Infinity) * TALL_FILL)
+  return entry.intersectionRect.height >= needed - SLACK_PX
+}
+
 export interface SectionTriggerReturn {
   ref: React.RefCallback<HTMLElement>
   triggered: boolean
@@ -65,9 +81,10 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
         const entry = entries[0]
         if (!entry) return
 
-        setInView(entry.isIntersecting)
+        const shown = isShown(entry, threshold)
+        setInView(shown)
 
-        if (entry.isIntersecting) {
+        if (shown) {
           setTriggered(true)
 
           // Unobserve if triggerOnce
@@ -79,7 +96,7 @@ export function useSectionTrigger(options: SectionTriggerOptions = {}): SectionT
         }
       },
       {
-        threshold,
+        threshold: ratioSteps(threshold),
         rootMargin,
       }
     )

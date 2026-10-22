@@ -44,13 +44,14 @@ const ICON = {
 
 function SectionTitle({ title, icon }: { title: string; icon?: keyof typeof ICON }) {
   return (
-    <h2 id={headingId('np', title)} className={`mb-6 flex w-fit max-w-full items-center gap-3 text-3xl sm:text-4xl ${ui.display} ${ui.plate}`}>
+    <h2 id={headingId('np', title)} className={`mb-6 flex w-fit max-w-full items-center gap-3 text-3xl sm:text-4xl ${ui.plate}`}>
       {icon && (
         <span className={ui.sectionIcon} aria-hidden="true">
           {ICON[icon]}
         </span>
       )}
-      {title}
+      {/* the clipped text gradient sits on its own span so the plate's fill does not clip to the letters */}
+      <span className={ui.display}>{title}</span>
     </h2>
   )
 }
@@ -222,7 +223,9 @@ function MartialArtistLevels({ sections }: { sections: SectionsOf<'fighter'> }) 
     <Stage title={labels.sections.muayThai} zone="wall" icon="gem">
       {() => (
         <>
-          <h3 className={`mb-5 w-fit max-w-full text-2xl ${ui.display} ${ui.plate}`}>{martialArts.primary.title}</h3>
+          <h3 className={`mb-5 w-fit max-w-full text-2xl ${ui.plate}`}>
+            <span className={ui.display}>{martialArts.primary.title}</span>
+          </h3>
           <BossRound martialArts={martialArts} />
         </>
       )}

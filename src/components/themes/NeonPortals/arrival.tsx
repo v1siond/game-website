@@ -333,7 +333,7 @@ function ArrivalLayout({ name, headline, tagline, line, profession, nav, spin, a
           <TitleLetters name={name} />
         </h1>
         <div className={stage.afterTitle}>
-          <p className={`mt-5 inline-block rounded-full border-[3px] border-[color:var(--np-void)] bg-[color:var(--np-orange)] px-4 pb-1 pt-1.5 text-lg uppercase text-[color:var(--np-void)] ${ui.chunk}`}>{headline}</p>
+          <p className={`mt-5 inline-block rounded-3xl border-[3px] border-[color:var(--np-void)] bg-[color:var(--np-orange)] px-4 pb-1 pt-1.5 text-lg uppercase text-[color:var(--np-void)] ${ui.chunk}`}>{headline}</p>
           <p className="mt-4 text-lg text-[color:var(--np-white)]">{tagline}</p>
           <p className="mt-2 text-base text-[color:var(--np-muted)]">{line}</p>
           <nav className="mt-6 flex flex-wrap items-center gap-3" aria-label={nav}>
