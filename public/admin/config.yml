@@ -538,6 +538,7 @@ collections:
                   - { <<: *text, label: "Roles cleared counter", name: rolesCleared, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Role cleared seal", name: roleCleared }
                   - { <<: *text, label: "Arena hint", name: arenaHint }
+                  - { <<: *text, label: "Climb hint", name: climbHint }
                   - { <<: *text, label: "Throw again button", name: throwAgain }
                   - { <<: *text, label: "Rarity heroic", name: rarityHeroic }
                   - { <<: *text, label: "Choose", name: choose }
