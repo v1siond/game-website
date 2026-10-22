@@ -227,7 +227,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                 aria-valuenow={head.year}
                 aria-valuetext={[String(head.year), ...litTitles].join(': ')}
                 onKeyDown={onKeyDown}
-                className="pointer-events-auto absolute -bottom-3 -top-3 left-0 w-6 -translate-x-1/2 cursor-ew-resize"
+                className="pointer-events-auto absolute -bottom-3 -top-3 left-0 w-11 -translate-x-1/2 cursor-ew-resize"
               >
                 <span className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-[color:var(--neon-hud)]" aria-hidden="true" />
                 <span className="absolute -top-1 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[color:var(--neon-hud)]" aria-hidden="true" />
