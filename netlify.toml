@@ -1,0 +1,8 @@
+# Netlify builds main on every push and serves it on alexanderpulido.dev. Next.js runs through Netlify's
+# own adapter, detected from the framework; this file only pins the command and the Node version.
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "24"
