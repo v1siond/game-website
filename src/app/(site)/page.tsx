@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getAllCVData } from '@/lib/cv-data'
 import { pageMetadata } from '@/lib/seo'
 import { PersonJsonLd } from '@/components/seo/PersonJsonLd'
+import { CVTextForCrawlers } from '@/components/seo/CVTextForCrawlers'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
 import { WorldRenderer } from './WorldRenderer'
 
@@ -17,6 +18,7 @@ export default async function Home() {
   return (
     <CVDataProvider cv={cv}>
       <PersonJsonLd cv={cv} path={'/'} />
+      <CVTextForCrawlers cv={cv} />
       <WorldRenderer />
     </CVDataProvider>
   )
