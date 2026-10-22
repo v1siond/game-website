@@ -239,6 +239,24 @@
   100% { opacity: 1; transform: none; }
 }
 
+/* ---- projects: the shot lands (targeting.tsx) ----
+ * The card he hits takes the comic burst on the hit phase: it pops out from nothing past full size and fades. */
+
+.hitBurst {
+  opacity: 0;
+  transform: translateX(-50%) scale(0);
+}
+
+.vats [data-shot='hit'] .hitBurst {
+  animation: burst 0.34s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+@keyframes burst {
+  0% { opacity: 1; transform: translateX(-50%) scale(0.2) rotate(0deg); }
+  60% { opacity: 1; transform: translateX(-50%) scale(1.15) rotate(12deg); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1.3) rotate(18deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .zone, .walker, .follower { transition: none; }
   .neon, .sunburst, .dog * { animation: none !important; }
@@ -251,4 +269,5 @@
   .lockerLid, .loot[data-on] .lockerLid { animation: none; transform: rotate(-118deg); }
   .lockerGlow, .loot[data-on] .lockerGlow { animation: none; opacity: 0.9; }
   .loot li[data-pocket], .loot[data-on] li[data-pocket] { animation: none; opacity: 1; }
+  .vats [data-shot='hit'] .hitBurst { animation: none; }
 }

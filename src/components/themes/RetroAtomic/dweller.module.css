@@ -22,7 +22,7 @@
 .star { transform-origin: 14px 31px; }
 .reticle { transform-origin: 88px 48px; }
 
-.winkLine, .star, .reticle { opacity: 0; }
+.winkLine, .star, .reticle, .pistol, .flash { opacity: 0; }
 
 /* ---------------------------------------------------------------- resting poses per kit */
 
@@ -172,6 +172,29 @@
 @keyframes hoist-arm-l { 0% { transform: rotate(0deg); } 40% { transform: rotate(20deg); } 100% { transform: rotate(-60deg); } }
 @keyframes hoist-fore-l { 0% { transform: rotate(0deg); } 40% { transform: rotate(10deg); } 100% { transform: rotate(-25deg); } }
 @keyframes hoist-head { 0% { transform: rotate(0deg); } 40% { transform: rotate(0deg) translateY(2px); } 100% { transform: rotate(8deg); } }
+
+/* ---------------------------------------------------------------- projects: the targeting shooter (targeting.tsx)
+ * aim: the pistol comes up level at arm's length toward the cards on his left, the other fist on his hip, the head
+ * turned to the target. fire: the same with the recoil, the barrel kicking up and the muzzle flash, played once
+ * per shot. Checked as pictures in poses/aim-fire.png. */
+
+.aim .pistol, .fire .pistol { opacity: 1; }
+.aim .armLeft { animation: aim-arm 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.aim .foreLeft { animation: aim-fore 0.35s ease-out both; }
+.aim .armRight, .fire .armRight { transform: rotate(28deg); }
+.aim .foreRight, .fire .foreRight { transform: rotate(-95deg); }
+.aim .head, .fire .head { transform: rotate(6deg) translateX(1px); }
+.fire .armLeft { animation: recoil-arm 0.42s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.fire .foreLeft { animation: recoil-fore 0.42s cubic-bezier(0.2, 0.9, 0.3, 1) both; }
+.fire .flash { animation: muzzle 0.42s steps(1, end) both; }
+.fire .body { animation: recoil-body 0.42s ease-out both; }
+
+@keyframes aim-arm { from { transform: rotate(0deg); } to { transform: rotate(-88deg); } }
+@keyframes aim-fore { from { transform: rotate(0deg); } to { transform: rotate(-4deg); } }
+@keyframes recoil-arm { 0%, 100% { transform: rotate(-88deg); } 20% { transform: rotate(-104deg); } }
+@keyframes recoil-fore { 0%, 100% { transform: rotate(-4deg); } 20% { transform: rotate(-18deg); } }
+@keyframes muzzle { 0% { opacity: 1; } 35%, 100% { opacity: 0; } }
+@keyframes recoil-body { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-3px); } }
 
 @media (prefers-reduced-motion: reduce) {
   .sprite, .sprite * { animation: none !important; }

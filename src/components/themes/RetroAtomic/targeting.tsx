@@ -8,7 +8,11 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import type { Project } from '@/lib/cv/content'
+import { useProfession } from '@/contexts/ProfessionContext'
+import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
+import { DwellerSprite, type DwellerMotion } from './dweller'
 import atomic from './atomic.module.css'
+import j from './journey.module.css'
 
 // Projects through the targeting system. The pointer or focus on a project locks the targeting on it:
 // the section goes into its paused state (data-vats on the section: every other card drains to a dim
@@ -22,6 +26,9 @@ import atomic from './atomic.module.css'
 // With fewer points than a shot costs, the file opens at once without the slow motion; the points come
 // back on a timer, shown as the bar and its number. Esc, the close button or the backdrop close the
 // file and focus returns to the card's button.
+// He is the shooter, on the rail at the cards' left edge (sticky beside the list from md up, above it on a
+// phone): idle while nothing is targeted, the pistol up at arm's length while a card is locked, and on the
+// hit phase the shot itself, recoil and muzzle flash, while the card he hit takes the comic burst.
 
 const AP_TOTAL = 100
 const AP_SHOT = 25
@@ -29,6 +36,13 @@ const AP_REFILL = 5
 const AP_REFILL_MS = 400
 
 type ShotPhase = 'aim' | 'hit'
+
+// The comic hit burst: twelve points round the centre, long and short in turn.
+const BURST = Array.from({ length: 24 }, (_, point) => {
+  const angle = (point / 24) * Math.PI * 2
+  const radius = point % 2 === 0 ? 48 : 26
+  return `${point === 0 ? 'M' : 'L'}${(Math.cos(angle) * radius).toFixed(1)} ${(Math.sin(angle) * radius).toFixed(1)}`
+}).join(' ') + ' Z'
 
 const SHOT: ReadonlyArray<readonly [ShotPhase | 'open', number]> = [
   ['hit', 420],
@@ -108,6 +122,10 @@ function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProp
       onClick={(event) => (event.target as HTMLElement).closest('a, button') === null && fire()}
     >
       <span className={atomic.brackets} aria-hidden="true" />
+      <svg viewBox="-50 -50 100 100" className={`pointer-events-none absolute left-1/2 top-1/3 h-28 w-28 ${j.hitBurst}`} aria-hidden="true" focusable="false">
+        <path d={BURST} fill={SHELTER_YELLOW} stroke={POSTER_INK} strokeWidth={4} strokeLinejoin="round" />
+        <path d={BURST} fill={CREAM} transform="scale(0.5)" />
+      </svg>
       <div className="flex items-start justify-between gap-3">
         <h3 className="min-w-0 text-lg font-bold uppercase tracking-wide text-atomic-phosphor">
           <SlashBreaks text={project.name} />
@@ -227,6 +245,21 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
   )
 }
 
+function shooterMotion(locked: boolean, phase: ShotPhase | undefined): DwellerMotion {
+  if (phase === 'hit') return 'fire'
+  return locked ? 'aim' : 'idle'
+}
+
+function Shooter({ motion }: { motion: DwellerMotion }) {
+  const { active } = useProfession()
+
+  return (
+    <div className="mb-4 shrink-0 self-start md:sticky md:top-[38vh] md:mb-0 md:w-24" aria-hidden="true">
+      <DwellerSprite profession={active} motion={motion} className="h-32 w-[5.4rem]" />
+    </div>
+  )
+}
+
 interface Opened {
   slot: ProjectSlot
   trigger: HTMLElement
@@ -277,21 +310,24 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
         <p className="text-sm text-atomic-phosphor-dim">{hud.targetHint}</p>
         <ActionPoints points={points} />
       </div>
-      <ProjectList
-        projects={projects}
-        className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => (
-          <TargetCard
-            slot={slot}
-            index={projects.indexOf(slot.project)}
-            targeted={locked === slot.project.id}
-            phase={shot?.id === slot.project.id ? shot.phase : null}
-            onTarget={(id) => !shot && setTarget(id)}
-            onFire={onFire}
-          />
-        )}
-      />
+      <div className="md:flex md:gap-4">
+        <Shooter motion={shooterMotion(locked !== null, shot?.phase)} />
+        <ProjectList
+          projects={projects}
+          className={`min-w-0 flex-1 ${MASONRY_LIST}`}
+          itemClassName={MASONRY_ITEM}
+          renderProject={(slot) => (
+            <TargetCard
+              slot={slot}
+              index={projects.indexOf(slot.project)}
+              targeted={locked === slot.project.id}
+              phase={shot?.id === slot.project.id ? shot.phase : null}
+              onTarget={(id) => !shot && setTarget(id)}
+              onFire={onFire}
+            />
+          )}
+        />
+      </div>
       <span className={`pointer-events-none fixed inset-x-0 top-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxTop}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-x-0 bottom-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxBottom}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-0 z-[71] bg-atomic-cream ${atomic.shotFlash}`} data-on={shot?.phase === 'hit' ? 'on' : undefined} aria-hidden="true" />

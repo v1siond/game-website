@@ -83,7 +83,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       </Stage>
 
       {sections.projects.length > 0 && (
-        <Stage title={titles.projects} zone="wasteland">
+        <Stage title={titles.projects} zone="wasteland" className={j.vats}>
           <TargetingSystem projects={sections.projects} />
         </Stage>
       )}

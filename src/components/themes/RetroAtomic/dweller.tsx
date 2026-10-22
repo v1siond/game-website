@@ -37,7 +37,7 @@ import s from './dweller.module.css'
 // with the bracket reticle, and give the level up thumbs up with a wink and a star.
 
 export type DwellerTone = 'poster' | 'phosphor'
-export type DwellerMotion = 'still' | 'idle' | 'walk' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike' | 'hoist'
+export type DwellerMotion = 'still' | 'idle' | 'walk' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike' | 'hoist' | 'aim' | 'fire'
 
 /** Each profession's action, the way the dweller would do that job. */
 export const DWELLER_ACTION: Record<Profession, DwellerMotion> = {
@@ -56,6 +56,8 @@ const MOTION_CLASS: Record<DwellerMotion, string> = {
   drum: s.drum,
   strike: s.strike,
   hoist: s.hoist,
+  aim: s.aim,
+  fire: s.fire,
 }
 
 const KIT_CLASS: Record<Profession, string> = {
@@ -238,6 +240,21 @@ function WristTerminal({ inks }: { inks: Inks }) {
   )
 }
 
+// The atomic age pistol in his left fist, drawn along the hanging forearm so the aim swings it level: a
+// chunky barrel with two cooling rings and a red emitter tip, the grip out of the fist, the muzzle flash
+// at the tip. Both rest hidden; the aim and fire motions show them.
+function Pistol({ inks }: { inks: Inks }) {
+  return (
+    <g className={s.pistol}>
+      <Shape d="M59 95 L66 95 L66 100.5 L59 100.5 Z" fill={inks.boot} inks={inks} />
+      <Shape d="M64.5 99 L72 99 L71.5 114 L65 114 Z" fill={inks.device} inks={inks} />
+      <path d="M64.8 104 H71.8 M64.9 108 H71.7" stroke={inks.trim} strokeWidth={1.6} />
+      <Shape d="M65.5 114 L71 114 L70 118 L66.5 118 Z" fill={inks.band} inks={inks} />
+      <path className={s.flash} d="M68.2 118 L71 124 L76 122 L72.5 127 L77 131 L70.5 129.5 L68.2 136 L66 129.5 L59.5 131 L64 127 L60.5 122 L65.5 124 Z" fill={inks.trim} stroke={inks.line} strokeWidth={inks.lineWidth} strokeLinejoin="round" />
+    </g>
+  )
+}
+
 function Hand({ side, profession, inks }: { side: Side; profession: Profession; inks: Inks }) {
   const { x, y } = HAND[side]
   const wrapped = profession === 'fighter'
@@ -263,6 +280,7 @@ function Arm({ side, profession, inks }: { side: Side; profession: Profession; i
         {!bare && <path d={side === 'right' ? 'M28 90 L35.8 90' : 'M64.3 90 L72.2 90'} stroke={inks.trim} strokeWidth={3} />}
         {side === 'left' && <WristTerminal inks={inks} />}
         <Hand side={side} profession={profession} inks={inks} />
+        {side === 'left' && <Pistol inks={inks} />}
       </g>
     </g>
   )
