@@ -93,7 +93,7 @@ const MARK: Record<CrateKind, (label: string) => ReactNode> = {
     <>
       <rect x="13" y="38" width="54" height="5" fill={PORTAL.NITRO_BAND} />
       <rect x="13" y="81" width="54" height="5" fill={PORTAL.NITRO_BAND} />
-      <text x="40" y="69" textAnchor="middle" className={ui.chunk} fontSize="15" fill={PORTAL.NITRO_BAND} stroke={PORTAL.NITRO_DARK} strokeWidth="3" paintOrder="stroke">
+      <text x="40" y="70" textAnchor="middle" className={ui.chunk} fontSize="19" textLength="50" lengthAdjust="spacingAndGlyphs" fill={PORTAL.NITRO_BAND} stroke={PORTAL.NITRO_DARK} strokeWidth="3" paintOrder="stroke">
         {label}
       </text>
     </>
