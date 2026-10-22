@@ -95,6 +95,14 @@
   transition: opacity 160ms linear;
 }
 
+/* The open hologram is wider than its button (most of all on a phone), so the button it opens from sits
+   above its neighbours, their standing hero and their small orbs (the hologram's z-10), or they paint over
+   its words. */
+.button:hover,
+.button:focus {
+  z-index: 11;
+}
+
 .button:hover .hologram,
 .button:focus .hologram {
   transform: translate(-50%, 0) scale(1);
