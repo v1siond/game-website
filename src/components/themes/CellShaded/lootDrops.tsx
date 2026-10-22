@@ -142,7 +142,7 @@ function LootCard({ slot, index, equipped, onEquip }: LootCardProps) {
               {isEquipped ? hud.equipped : hud.equip}
             </InkButton>
             {links.map((link) => (
-              <a key={link.kind} {...link.linkProps} className="inline-flex min-h-[44px] items-center text-base font-bold underline decoration-[3px] underline-offset-4">
+              <a key={link.kind} {...link.linkProps} className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-base font-bold underline decoration-[3px] underline-offset-4">
                 {link.label}
               </a>
             ))}
