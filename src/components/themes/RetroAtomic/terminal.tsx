@@ -96,7 +96,8 @@ function DumpRow({ address, cells, state, onPick }: { address: string; cells: Ha
             )
           }
           return (
-            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative ${atomic.dumpPick} ${atomic.focusRing}`}>
+            // the word sits on a dump line under 44px tall, so an invisible band above and below it carries the tap
+            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative before:absolute before:inset-x-0 before:-inset-y-2 before:content-[''] ${atomic.dumpPick} ${atomic.focusRing}`}>
               <span className="relative">{text}</span>
             </button>
           )
