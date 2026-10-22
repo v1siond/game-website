@@ -65,33 +65,37 @@ export function ExperienceCard({ entry }: { entry: Job }) {
   const { ref, play } = usePlay(LINE_START_MS + entry.highlights.length * LINE_GAP_MS + 600)
 
   return (
-    <article ref={ref} data-play={play} className={`p-4 sm:p-5 ${world.box} ${world.opens} ${TALKS}`}>
-      <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
-        <SentryPortrait />
-        <div className="min-w-0 flex-1">
-          <h3 className={TITLE}>
-            <Typed delay="open">{entry.title}</Typed>
-          </h3>
-          <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}><SlashBreaks text={entry.company} /></p>
+    // The play scope wraps the box: the box is scaled to a dot while idle, and a dot in the middle of a tall
+    // job on a phone sits below the screen, so the observer would not see the job until long after it shows.
+    <div ref={ref} data-play={play}>
+      <article className={`p-4 sm:p-5 ${world.box} ${world.opens} ${TALKS}`}>
+        <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
+          <SentryPortrait />
+          <div className="min-w-0 flex-1">
+            <h3 className={TITLE}>
+              <Typed delay="open">{entry.title}</Typed>
+            </h3>
+            <p className={`mt-1 ${META} ${SHOW_AFTER.second}`}><SlashBreaks text={entry.company} /></p>
+          </div>
+          <span className={`whitespace-nowrap text-sm tabular-nums text-[color:var(--rpg-sky)] ${MONO} ${SHOW_AFTER.second}`}>
+            {start} - {end}
+          </span>
         </div>
-        <span className={`whitespace-nowrap text-sm tabular-nums text-[color:var(--rpg-sky)] ${MONO} ${SHOW_AFTER.second}`}>
-          {start} - {end}
-        </span>
-      </div>
-      {entry.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{entry.description}</p>}
-      {entry.highlights.length > 0 && (
-        <ul className="space-y-2" aria-label={cards.keyAchievements}>
-          {entry.highlights.map((highlight, index) => (
-            <Said key={highlight} className={world.after} style={lineDelay(index)}>
-              {highlight}
-            </Said>
-          ))}
-        </ul>
-      )}
-      <div className={SHOW_AFTER.last}>
-        <Tags items={entry.skills.slice(0, 5)} label={cards.skillsUsed} />
-      </div>
-    </article>
+        {entry.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{entry.description}</p>}
+        {entry.highlights.length > 0 && (
+          <ul className="space-y-2" aria-label={cards.keyAchievements}>
+            {entry.highlights.map((highlight, index) => (
+              <Said key={highlight} className={world.after} style={lineDelay(index)}>
+                {highlight}
+              </Said>
+            ))}
+          </ul>
+        )}
+        <div className={SHOW_AFTER.last}>
+          <Tags items={entry.skills.slice(0, 5)} label={cards.skillsUsed} />
+        </div>
+      </article>
+    </div>
   )
 }
 
