@@ -24,8 +24,9 @@ import world from './world.module.css'
 // useZoneStage: it hands its district up to the backdrop while in view and turns on the first time it
 // scrolls in. About: he walks up and scans the bio, its tags pop out. Tech stack: one time slow dash with
 // after images, the cards snapping in as he passes. Ventures: the fixer's contracts drop as pins on a
-// district map. Muay Thai: the ripperdoc's chair installs each achievement, then he stands and kicks.
-// Contact: his car pulls in under the call and drives off into the skyline.
+// district map. Muay Thai: the ripperdoc's chair installs each achievement under the clinic's green
+// cross, then he stands and a gang punk steps in to take his roundhouse. Contact: his car waits at the
+// kerb with him sitting on the rear deck looking at the skyline; he hops in and drives off into it.
 
 const on = (value: boolean) => String(value)
 
@@ -205,10 +206,12 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
 // ---------------------------------------------------------------- Muay Thai
 
 // The ripperdoc's chair seen from the side, its back on the left, the seat facing right, two clamp arms
-// with their LED rows, the cable bundle down to the floor.
+// with their LED rows, the cable bundle down to the floor. Over it hangs the clinic's green neon cross
+// (research cp20), lit while the install runs.
 function RipperChair() {
   return (
     <g>
+      <path className={life.clinicCross} d="M10 2 H18 V10 H26 V18 H18 V26 H10 V18 H2 V10 H10 Z" fill="none" stroke={NEON.hack} strokeWidth={2.5} strokeLinejoin="round" />
       <path d="M8 40 L22 40 L26 112 L12 112 Z" fill={NEON.steel} stroke={NEON.ink} strokeWidth={2} />
       <path d="M12 112 H80 V120 H12 Z" fill={NEON.steel} stroke={NEON.ink} strokeWidth={2} />
       <path d="M40 120 V142 M24 145 H60" stroke={NEON.chrome} strokeWidth={5} />
@@ -218,6 +221,32 @@ function RipperChair() {
       </g>
       <path d="M8 104 Q-6 130 10 150" stroke={NEON.data} strokeWidth={2} fill="none" />
     </g>
+  )
+}
+
+// The gang punk who steps in when he leaves the chair (research cp12, cp18): a dark silhouette facing
+// left with a hot pink mohawk, three red optic dots for eyes, a studded jacket lit along its edge and a
+// chrome fist up. viewBox 50 by 150 at the chair's scale, feet on y 144; he takes the roundhouse.
+function GangFoe() {
+  return (
+    <svg viewBox="0 0 50 150" className={`${life.foe} absolute bottom-0 h-auto overflow-visible`} focusable="false">
+      <g className={life.foeBody}>
+        <path d="M14 96 L24 96 L22 144 L12 144 Z M27 96 L37 96 L39 144 L29 144 Z" fill={NEON.ink} stroke={NEON.steel} strokeWidth={1.4} />
+        <path d="M10 48 Q25 42 40 48 L42 98 L8 98 Z" fill={NEON.alley} stroke={NEON.steel} strokeWidth={1.4} strokeLinejoin="round" />
+        <path d="M9 50 L8 96" stroke={NEON.chromeRed} strokeWidth={1.4} />
+        <path d="M18 58 h2 M18 66 h2 M18 74 h2" stroke={NEON.chrome} strokeWidth={2} />
+        <path d="M14 24 Q14 12 25 12 Q36 12 36 25 Q36 38 25 41 Q14 38 14 24 Z" fill={NEON.surface} stroke={NEON.steel} strokeWidth={1.4} />
+        <path d="M20 13 Q24 0 28 2 Q29 8 30 13 Z" fill={NEON.hotPink} />
+        <g className={life.foeOptics} fill={NEON.chromeRed}>
+          <circle cx={17} cy={23} r={1.6} />
+          <circle cx={21} cy={21.5} r={1.6} />
+          <circle cx={20} cy={26} r={1.3} />
+        </g>
+        <path d="M10 50 L2 64 L6 74" fill="none" stroke={NEON.chrome} strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
+        <circle cx={6} cy={76} r={4} fill={NEON.chrome} stroke={NEON.ink} strokeWidth={1.2} />
+      </g>
+      <path className={life.impact} d="M2 74 L-6 66 M0 82 L-9 82 M2 90 L-6 98" stroke={NEON.hud} strokeWidth={2} strokeLinecap="round" />
+    </svg>
   )
 }
 
@@ -235,13 +264,14 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
       <HudPanel title={sections.muayThai}>
         <p className="mb-4 text-base text-[color:var(--neon-hud)]">{martialArts.primary.title}</p>
         <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-start">
-          <div className="relative mx-auto w-full max-w-[16rem]" aria-hidden="true">
+          <div className="relative w-1/2 max-w-[11rem]" aria-hidden="true">
             <svg viewBox="0 0 100 150" className="absolute inset-0 h-full w-full overflow-visible" focusable="false">
               <RipperChair />
             </svg>
             <div className={life.patient}>
               <MercSprite profession="fighter" motion={motion} className="relative h-auto w-full" />
             </div>
+            <GangFoe />
           </div>
           <Scannable kind="record" title={sections.muayThai} fact={martialArts.primary.rank}>
             <MuayThaiRecord
@@ -286,9 +316,11 @@ function Car() {
       <rect className={life.streak} x={-110} y={52} width={110} height={3} fill={NEON.hotPink} />
       <path d="M6 58 L14 40 L70 34 L104 16 H160 L196 34 L232 40 L236 58 Z" fill={NEON.ink} stroke={NEON.data} strokeWidth={2} />
       <path d="M110 20 H156 L184 34 H96 Z" fill={NEON.data} fillOpacity={0.3} />
-      <circle cx={140} cy={26} r={6} fill={HERO_IDENTITY.hair} />
-      <path d="M135 29 Q140 36 145 29" fill={HERO_IDENTITY.hair} />
-      <rect x={140} y={24} width={5} height={2} fill={NEON.data} />
+      <g className={life.driver}>
+        <circle cx={140} cy={26} r={6} fill={HERO_IDENTITY.hair} />
+        <path d="M135 29 Q140 36 145 29" fill={HERO_IDENTITY.hair} />
+        <rect x={140} y={24} width={5} height={2} fill={NEON.data} />
+      </g>
       <rect x={6} y={44} width={8} height={5} fill={NEON.chromeRed} />
       <rect className={life.headlight} x={226} y={42} width={10} height={5} fill={NEON.ice} />
       {[52, 190].map((x) => (
@@ -298,6 +330,18 @@ function Car() {
         </g>
       ))}
     </svg>
+  )
+}
+
+// Him on the car's rear deck before he drives (research cp21): sitting with his back to the cabin, legs
+// over the tail, looking out at the skyline. The sprite is flipped so the sit pose faces left.
+function DeckRider() {
+  return (
+    <div className={`${life.rider} absolute bottom-[0.9rem] left-0 w-[3.4rem]`}>
+      <div className="-scale-x-100">
+        <MercSprite profession="engineer" motion="sit" className="h-auto w-full" />
+      </div>
+    </div>
   )
 }
 
@@ -313,6 +357,7 @@ export function DriveOff() {
         </svg>
         <div className={`${life.car} absolute bottom-1 left-0 h-[4.5rem]`}>
           <Car />
+          <DeckRider />
         </div>
       </div>
     </div>

@@ -72,16 +72,16 @@
 /* ---------------------------------------------------------------- resting poses per kit */
 
 .kitSticks .armRight {
-  transform: rotate(18deg);
+  transform: rotate(14deg);
 }
 .kitSticks .foreRight {
-  transform: rotate(40deg);
+  transform: rotate(-30deg);
 }
 .kitSticks .armLeft {
-  transform: rotate(-18deg);
+  transform: rotate(-14deg);
 }
 .kitSticks .foreLeft {
-  transform: rotate(-40deg);
+  transform: rotate(30deg);
 }
 
 .kitGuard .armRight {
@@ -308,14 +308,16 @@
   animation: flare 1.2s steps(2) infinite;
 }
 
+/* Solved as a two bone reach: the elbow lifts out to the side and the forearm folds back so the fingers
+   rest on the temple at (36, 27). */
 @keyframes to-temple {
   to {
-    transform: rotate(40deg);
+    transform: rotate(119deg);
   }
 }
 @keyframes to-temple-fore {
   to {
-    transform: rotate(140deg);
+    transform: rotate(121deg);
   }
 }
 @keyframes lock {
@@ -427,6 +429,13 @@
 .hack .foreLeft {
   animation: deck-up-fore 0.5s ease-out both;
 }
+/* the cable and the deck belong to this pose only; anywhere else the deck would float beside him */
+.jack {
+  opacity: 0;
+}
+.hack .jack {
+  opacity: 1;
+}
 .hack .glyphs {
   animation: climb 1s steps(4) infinite;
 }
@@ -467,20 +476,21 @@
   animation: flash 0.28s steps(2) infinite;
 }
 
+/* The elbows stay out and the forearms come in over the head: lifted, then down onto the head at 96. */
 @keyframes hit-right {
   from {
-    transform: rotate(40deg);
+    transform: rotate(-55deg);
   }
   to {
-    transform: rotate(10deg);
+    transform: rotate(-30deg);
   }
 }
 @keyframes hit-left {
   from {
-    transform: rotate(-40deg);
+    transform: rotate(55deg);
   }
   to {
-    transform: rotate(-10deg);
+    transform: rotate(30deg);
   }
 }
 @keyframes flash {
@@ -544,13 +554,6 @@
   60%,
   74% {
     transform: rotate(-8deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .sprite,
-  .sprite * {
-    animation: none !important;
   }
 }
 
@@ -618,4 +621,11 @@
 }
 .sit .optics {
   animation: flare 0.9s steps(2) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite,
+  .sprite * {
+    animation: none !important;
+  }
 }

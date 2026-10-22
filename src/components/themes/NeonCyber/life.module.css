@@ -309,6 +309,106 @@
   transform: translateX(28%);
 }
 
+/* the clinic's green cross lights with the first install and flickers once like a worn tube */
+.ripStage[data-on='false'] .clinicCross {
+  opacity: 0.15;
+}
+.ripStage[data-on='true'] .clinicCross {
+  animation: cross-on 1s steps(1) 0.3s both;
+}
+
+@keyframes cross-on {
+  0% {
+    opacity: 0.15;
+  }
+  20%,
+  50% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* the gang punk: hidden while he sits, glitches in as he stands, then takes the roundhouse on the
+   kick's own 1.8 s beat (merc.module.css .kick, the leg lands at 60 %) and rocks back */
+.foe {
+  left: 128%;
+  width: 50%;
+  opacity: 0;
+}
+.foeBody {
+  transform-box: view-box;
+  transform-origin: 25px 144px;
+}
+.impact {
+  opacity: 0;
+}
+.ripStage[data-done='true'] .foe {
+  opacity: 1;
+  animation: foe-in 0.4s steps(3) both;
+}
+.ripStage[data-done='true'] .foeBody {
+  animation: foe-hit 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.ripStage[data-done='true'] .impact {
+  animation: impact 1.8s steps(1) infinite;
+}
+.ripStage[data-done='true'] .foeOptics {
+  animation: foe-optics 1.8s steps(1) infinite;
+}
+
+@keyframes foe-in {
+  0% {
+    opacity: 0;
+    transform: translateX(12%);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateX(-4%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes foe-hit {
+  0%,
+  56%,
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
+  64% {
+    transform: rotate(9deg) translateX(5px);
+  }
+  80% {
+    transform: rotate(3deg) translateX(3px);
+  }
+}
+@keyframes impact {
+  0%,
+  58%,
+  72% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+}
+@keyframes foe-optics {
+  0%,
+  58%,
+  70% {
+    opacity: 1;
+  }
+  62% {
+    opacity: 0.2;
+  }
+}
+
 /* ---------------------------------------------------------------- Contact: he drives off into the skyline */
 
 .driveLane {
@@ -321,26 +421,61 @@
   container-type: inline-size;
 }
 .driveStage[data-on='false'] .car {
-  transform: translateX(-16rem);
+  transform: translateX(calc(50cqw - 6rem));
 }
 .driveStage[data-on='true'] .car {
-  animation: drive 4.2s both;
+  animation: drive 5.4s both;
 }
 
 @keyframes drive {
-  from {
-    transform: translateX(-16rem);
-    animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
-  }
-  30% {
-    transform: translateX(calc(50cqw - 6rem));
-  }
-  62% {
+  from,
+  64% {
     transform: translateX(calc(50cqw - 6rem));
     animation-timing-function: cubic-bezier(0.7, 0, 0.9, 0.6);
   }
   to {
     transform: translateX(calc(100cqw + 2rem));
+  }
+}
+
+/* he sits on the rear deck looking at the skyline, then hops off the deck into the driver's seat */
+.rider {
+  transform-origin: 50% 100%;
+}
+.driveStage[data-on='true'] .rider {
+  animation: hop-in 5.4s both;
+}
+.driver {
+  opacity: 0;
+}
+.driveStage[data-on='true'] .driver {
+  animation: driver-in 5.4s steps(1) both;
+}
+
+@keyframes hop-in {
+  0%,
+  36% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  42% {
+    opacity: 1;
+    transform: translate(1.5rem, -1.2rem);
+  }
+  48%,
+  100% {
+    opacity: 0;
+    transform: translate(3.5rem, 0);
+  }
+}
+@keyframes driver-in {
+  0%,
+  47% {
+    opacity: 0;
+  }
+  48%,
+  100% {
+    opacity: 1;
   }
 }
 
@@ -350,12 +485,12 @@
   transform: scaleX(0);
 }
 .driveStage[data-on='true'] .streak {
-  animation: streak 4.2s both;
+  animation: streak 5.4s both;
 }
 
 @keyframes streak {
   0%,
-  62% {
+  64% {
     transform: scaleX(0);
   }
   85%,
@@ -364,24 +499,24 @@
   }
 }
 
-/* the headlights flash twice while he waits at the kerb */
+/* the headlights flash twice as he takes the wheel */
 .headlight {
   opacity: 0.4;
 }
 .driveStage[data-on='true'] .headlight {
-  animation: flash 4.2s steps(1) both;
+  animation: flash 5.4s steps(1) both;
 }
 
 @keyframes flash {
   0%,
-  38%,
-  44%,
-  50% {
+  50%,
+  54%,
+  58% {
     opacity: 0.4;
   }
-  40%,
-  48%,
-  55%,
+  52%,
+  56%,
+  60%,
   100% {
     opacity: 1;
   }

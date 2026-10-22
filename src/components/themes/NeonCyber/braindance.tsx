@@ -242,7 +242,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
             {yearMarks.map((year) => (
               <span
                 key={year}
-                className={`${world.yearMark} absolute -translate-x-1/2 text-sm text-[color:var(--neon-ash)] first:translate-x-0`}
+                className={`${world.yearMark} absolute -translate-x-1/2 text-sm text-[color:var(--neon-ash)] first:translate-x-0 last:-translate-x-full`}
                 style={{ '--at': (year - edit.first) / span } as CSSProperties}
               >
                 {year}

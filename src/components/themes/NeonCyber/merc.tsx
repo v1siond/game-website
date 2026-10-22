@@ -195,7 +195,7 @@ function Hand({ side, profession }: { side: Side; profession: Profession }) {
 
   return (
     <g>
-      {profession === 'drummer' && <path d={`M${x} ${y} L${x + (side === 'right' ? -15 : 15)} ${y + 9}`} stroke={NEON.stickWood} strokeWidth={2.2} strokeLinecap="round" />}
+      {profession === 'drummer' && <path d={`M${x} ${y} L${x + (side === 'right' ? 10 : -10)} ${y + 12}`} stroke={NEON.stickWood} strokeWidth={2.2} strokeLinecap="round" />}
       <circle cx={x} cy={y} r={4.4} fill={fill} stroke={LINE} strokeWidth={LW} />
     </g>
   )
@@ -221,27 +221,29 @@ function Arm({ side, profession }: { side: Side; profession: Profession }) {
   )
 }
 
-// The neon snare at his knees: a dark shell ringed in magenta, the lit head.
+// The neon snare on its stand at his waist, where the stick tips land: a dark shell ringed in magenta, the lit head.
 function Snare() {
   return (
     <g>
-      <Shape d="M33 110 L67 110 L65 126 L35 126 Z" fill={NEON.panel} />
-      <path d="M33 114 H67 M34 122 H66" stroke={NEON.magenta} strokeWidth={1.4} />
-      <ellipse className={s.drumHead} cx={50} cy={110} rx={17} ry={3.6} fill={NEON.data} stroke={LINE} strokeWidth={LW} />
+      <path d="M50 112 V138 M50 132 L40 144 M50 132 L60 144" stroke={NEON.steel} strokeWidth={1.6} />
+      <Shape d="M33 96 L67 96 L65 112 L35 112 Z" fill={NEON.panel} />
+      <path d="M33 100 H67 M34 108 H66" stroke={NEON.magenta} strokeWidth={1.4} />
+      <ellipse className={s.drumHead} cx={50} cy={96} rx={17} ry={3.6} fill={NEON.data} stroke={LINE} strokeWidth={LW} />
     </g>
   )
 }
 
-// The quickhack: the cable from the temple to a deck in the chrome hand, glyphs climbing off it.
+// The quickhack: the cable from the temple to the deck resting on the raised chrome palm (the hack pose
+// puts the hand at about 100, 65), glyphs climbing off it.
 function Jack() {
   return (
     <g className={s.jack}>
-      <path d="M60 30 Q78 40 72 64" fill="none" stroke={OPTIC} strokeWidth={1.2} strokeDasharray="2 1.5" />
-      <rect x={76} y={58} width={14} height={9} fill={NEON.ink} stroke={OPTIC} strokeWidth={1.2} />
+      <path d="M60 30 Q86 34 96 68" fill="none" stroke={OPTIC} strokeWidth={1.2} strokeDasharray="2 1.5" />
+      <rect x={92} y={68} width={15} height={8} fill={NEON.ink} stroke={OPTIC} strokeWidth={1.2} />
       <g className={s.glyphs} fill={NEON.hack}>
-        <rect x={79} y={50} width={3} height={3} />
-        <rect x={84} y={45} width={3} height={3} />
-        <rect x={80} y={40} width={3} height={3} />
+        <rect x={95} y={58} width={3} height={3} />
+        <rect x={101} y={53} width={3} height={3} />
+        <rect x={96} y={47} width={3} height={3} />
       </g>
     </g>
   )
