@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getAllCVData } from '@/lib/cv-data'
 import { requestLocale } from '@/i18n/requestLocale'
 import { pageMetadata } from '@/lib/seo'
+import { PersonJsonLd } from '@/components/seo/PersonJsonLd'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
 import { CVContent } from './CVContent'
 
@@ -15,6 +16,7 @@ export default async function CVPage() {
 
   return (
     <CVDataProvider cv={cv}>
+      <PersonJsonLd cv={cv} path={'/cv'} />
       <CVContent />
     </CVDataProvider>
   )
