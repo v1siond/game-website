@@ -1,7 +1,7 @@
 # Reference art, and where it came from
 
 Isometric art we MODEL AGAINST. None of it ships, and none of the image FILES live in this repository: they are
-licensed stock previews, so they sit in the workspace at `.claude-workspace/game-website/references/` and only
+licensed stock previews, so they sit in the workspace at the private references folder outside the repo and only
 their sources are recorded here. Every tile this engine draws is authored in `priv/tilegen/tiles.json`, baked
 by `bake.mjs` and served from the database.
 
@@ -29,7 +29,7 @@ share ones witht he same name"*. The set below is his.
 
 ## Splitting a sheet into its pieces
 
-One image holding twelve bridges becomes twelve references. `.claude-workspace/game-website/references/` holds
+One image holding twelve bridges becomes twelve references. the private references folder outside the repo holds
 the sheets and the pieces; the splitter floods the near-white ground, labels what is left as connected blobs,
 drops anything under a pixel-count floor, and writes each blob with a small margin. Bounding-box merging is OFF
 on purpose: neighbouring isometric objects have overlapping boxes, so merging chains the whole sheet into one.
@@ -51,7 +51,7 @@ DESIGN UNTIL IT MATCHES THE REFERENCE AS CLOSE TO 100% AS POSIBLE, ANYTHING LESS
 
 The sheets above were gathered for the bridge and entrance work. They are not everything he has sent: sweeping
 every prompt turned up **41 more** that had only ever existed in the chat, against 10 already held. They are
-in `.claude-workspace/game-website/references/by-subject/`, filed by what they are, with the sentence he typed
+in the private references folder outside the repo (by-subject), filed by what they are, with the sentence he typed
 around each recorded in `_recovered.json`. Same rule as above: the FILES stay out of this repository.
 
 Nine were filtered back OUT. They were screenshots of our own renders, which he sends to report a defect: the
