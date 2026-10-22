@@ -144,9 +144,11 @@ export function CVContent() {
                     {labels.cards.impact}: {project.impact}
                   </p>
                 )}
-                <p className="text-sm text-gray-600 mt-1">
-                  {labels.cards.tech}: {project.techStack.join(', ')}
-                </p>
+                {project.techStack.length > 0 && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    {labels.cards.tech}: {project.techStack.join(', ')}
+                  </p>
+                )}
               </div>
             ))}
           </section>
