@@ -106,7 +106,7 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
             {chosen ? myth.chosen : myth.choose}
           </SlabButton>
           {links.map((link) => (
-            <a key={link.kind} {...link.linkProps} className="inline-flex min-h-[44px] items-center text-base text-[var(--myth-gold-pale)] underline decoration-2 underline-offset-4">
+            <a key={link.kind} {...link.linkProps} className="inline-flex min-h-[44px] min-w-[44px] items-center justify-center text-base text-[var(--myth-gold-pale)] underline decoration-2 underline-offset-4">
               {link.label}
             </a>
           ))}
