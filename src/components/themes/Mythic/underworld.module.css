@@ -817,3 +817,33 @@
     transform: none !important;
   }
 }
+
+/* The tech stack climb: a panel lights once he grips it, glows while its page is pointed at; he rises a hold per reach. */
+.holdLight {
+  opacity: 0;
+  transition: opacity 400ms ease-out;
+}
+.hold[data-lit] .holdLight {
+  opacity: 0.45;
+}
+.hold[data-glow] .holdLight {
+  opacity: 0.9;
+}
+.climber {
+  transition: transform 1100ms ease-in-out;
+}
+.page {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  transition: outline-color 400ms ease-out;
+}
+.page[data-lit] {
+  outline-color: var(--myth-gold);
+}
+@media (prefers-reduced-motion: reduce) {
+  .holdLight,
+  .climber,
+  .page {
+    transition: none;
+  }
+}

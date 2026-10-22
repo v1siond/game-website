@@ -102,6 +102,10 @@ export const MYTH = {
 
   // ---- his kit: the ink line, the ash, the tattoo and the rage, leather, kilt, bronze, blades, wraps
   inkLine: '#16090e',
+  // ---- the carved chain of the tech stack climb: the oval links, the band and its carved panels
+  chainSteel: '#4a4a58',
+  chainBand: '#303040',
+  chainPanel: '#404050',
   ash: '#e4ded4',
   tattoo: '#c4161c',
   rage: '#ff3b1f',

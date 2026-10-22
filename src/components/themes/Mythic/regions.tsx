@@ -8,7 +8,7 @@ import { Trials } from './trials'
 import { ChainHaul } from './chains'
 import { ChestHeave } from './chest'
 import { BladeThrow } from './hurl'
-import { Codex } from './codex'
+import { Climb } from './climb'
 import { Boons } from './boons'
 import { Volcano } from './volcano'
 import { Keepsakes } from './keepsakes'
@@ -39,7 +39,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.techStack.length > 0 && (
         <Stage title={titles.techStack} zone="depths">
-          <Codex categories={sections.techStack} />
+          <Climb categories={sections.techStack} />
         </Stage>
       )}
 
