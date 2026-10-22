@@ -56,6 +56,15 @@
     0 6px 0 -2px rgb(10 6 3 / 0.55);
 }
 
+/* A plank that carries dark body text: the grain stays light down to the bottom edge (the bark shade
+   alone is 1.9:1 under bark-dark text), so every line reads at 5.8:1 or more. */
+.plankText {
+  background:
+    var(--tp-grain),
+    repeating-linear-gradient(178deg, transparent 0 7px, rgb(46 26 11 / 0.2) 7px 8px, transparent 8px 13px, rgb(255 236 190 / 0.12) 13px 14px),
+    linear-gradient(180deg, var(--tp-plank-light), var(--tp-plank) 30%, var(--tp-plank) 100%);
+}
+
 .plank::before,
 .plank::after {
   content: '';

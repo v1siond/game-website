@@ -54,7 +54,7 @@ export function VentureBoard({ companies }: { companies: CVData['companies'] }) 
             target="_blank"
             rel="noopener noreferrer"
             aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
-            className={`block h-full rounded-2xl p-5 text-[color:var(--tp-bark-dark)] ${look.plank} ${look.button} ${look.focus}`}
+            className={`block h-full rounded-2xl p-5 text-[color:var(--tp-bark-dark)] ${look.plank} ${look.plankText} ${look.button} ${look.focus}`}
           >
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">
