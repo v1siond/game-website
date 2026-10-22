@@ -51,7 +51,7 @@ export function LifeBar({ side, label, empty = false, delay = '' }: LifeBarProps
       <div className="h-4 overflow-hidden border-2 border-black bg-[color:var(--fs-hud-red)] shadow-[0_0_0_1px_#fff] sm:h-5" aria-hidden="true">
         {!empty && <div className={`h-full border-b-4 border-[color:var(--fs-call-bottom)] bg-[color:var(--fs-hud-yellow)] ${fill} ${delay}`} />}
       </div>
-      <p className={`mt-1.5 truncate text-sm uppercase text-white [text-shadow:2px_2px_0_var(--fs-navy)] ${look.display} ${align}`}>{label}</p>
+      <p className={`mt-1.5 break-words text-sm uppercase sm:truncate text-white [text-shadow:2px_2px_0_var(--fs-navy)] ${look.display} ${align}`}>{label}</p>
     </div>
   )
 }
