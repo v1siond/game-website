@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next";
+import type { Viewport } from "next";
 import localFont from "next/font/local";
 import { Bebas_Neue } from "next/font/google";
 import "../../styles/globals.css";
@@ -51,38 +51,6 @@ export const viewport: Viewport = {
   userScalable: true,
   viewportFit: 'cover',
   themeColor: '#0a0a0a',
-};
-
-export const metadata: Metadata = {
-  title: "Alexander Pulido | Senior Full-Stack Developer & Musician",
-  description: "Portfolio of Alexander Pulido, a Senior Full-Stack Developer specializing in Elixir, Phoenix, Vue.js, and Kubernetes. Based in Colombia, working globally on enterprise applications, game development, and music production.",
-  keywords: ["Alexander Pulido", "Full-Stack Developer", "Elixir", "Phoenix", "Vue.js", "Kubernetes", "Software Engineer", "Colombia", "Portfolio"],
-  authors: [{ name: "Alexander Pulido", url: "https://alexanderpulido.com" }],
-  creator: "Alexander Pulido",
-  publisher: "Alexander Pulido",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    title: "Alexander Pulido | Senior Full-Stack Developer & Musician",
-    description: "Portfolio of Alexander Pulido, a Senior Full-Stack Developer specializing in Elixir, Phoenix, Vue.js, and Kubernetes.",
-    siteName: "Alexander Pulido Portfolio",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Alexander Pulido | Senior Full-Stack Developer & Musician",
-    description: "Portfolio of Alexander Pulido, a Senior Full-Stack Developer specializing in Elixir, Phoenix, Vue.js, and Kubernetes.",
-  },
 };
 
 interface RootShellProps {
