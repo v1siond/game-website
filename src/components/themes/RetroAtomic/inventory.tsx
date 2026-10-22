@@ -97,8 +97,11 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
                 </p>
               </div>
             </div>
-            <p className="mt-3 text-sm font-bold text-atomic-yellow">{company.tagline}</p>
-            <p className="mt-1 text-sm leading-relaxed text-atomic-ash">{company.description}</p>
+            {/* On a phone the tape's words scroll over the pinned street, so they ride on a strip of ink. */}
+            <div className="mt-3 max-sm:rounded max-sm:bg-atomic-ink/90 max-sm:p-3">
+              <p className="text-sm font-bold text-atomic-yellow">{company.tagline}</p>
+              <p className="mt-1 text-sm leading-relaxed text-atomic-ash">{company.description}</p>
+            </div>
           </a>
         </li>
       ))}
