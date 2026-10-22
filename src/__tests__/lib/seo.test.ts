@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles } from '@/lib/cv/content'
+import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { siteMarkSvg } from '@/lib/siteMark'
 import { SITE_URL, pageMetadata, personJsonLd, shortRole, siteDescription, siteTitle, techKeywords } from '@/lib/seo'
 
 // The real Decap files, so the head and the JSON-LD are checked against what the pages read.
@@ -79,5 +81,15 @@ describe('personJsonLd', () => {
     })
     expect(person.knowsAbout).toEqual(techKeywords(cv))
     expect(new Set(person.knowsAbout).size).toBe(person.knowsAbout.length)
+  })
+})
+
+describe('siteMarkSvg', () => {
+  it('draws the mark on a 16 pixel grid in his sprite colours', () => {
+    const svg = siteMarkSvg()
+
+    expect(svg).toContain('viewBox="0 0 16 16"')
+    expect(svg).toContain(`fill="${HERO_IDENTITY.skin}"`)
+    expect(svg).toContain(`fill="${HERO_IDENTITY.beard}"`)
   })
 })
