@@ -445,7 +445,8 @@
         "strike": "Strike the bag",
         "critical": "Critical!",
         "hitLog": "{count} of {total} hits landed",
-        "respawn": "Respawn"
+        "respawn": "Respawn",
+        "carryWeight": "Carry weight {count} of {total}"
       },
       "languages": {
         "en": "English",
@@ -900,7 +901,8 @@
         "strike": "Golpear el saco",
         "critical": "¡Crítico!",
         "hitLog": "{count} de {total} golpes conectados",
-        "respawn": "Reaparecer"
+        "respawn": "Reaparecer",
+        "carryWeight": "Peso cargado {count} de {total}"
       },
       "languages": {
         "en": "English",
@@ -1355,7 +1357,8 @@
         "strike": "Colpisci il sacco",
         "critical": "Critico!",
         "hitLog": "{count} di {total} colpi a segno",
-        "respawn": "Rigenera"
+        "respawn": "Rigenera",
+        "carryWeight": "Peso trasportato {count} di {total}"
       },
       "languages": {
         "en": "English",

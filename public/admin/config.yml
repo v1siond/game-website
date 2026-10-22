@@ -793,6 +793,7 @@ collections:
                   - { <<: *text, label: "Critical", name: critical }
                   - { <<: *text, label: "Hit log", name: hitLog, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Respawn", name: respawn }
+                  - { <<: *text, label: "Carry weight", name: carryWeight, hint: 'Keep {count} {total}' }
                   - { <<: *text, label: "Wrist terminal", name: wristTerminal }
                   - { <<: *text, label: "Dial hint", name: dialHint }
                   - { <<: *text, label: "Section tabs", name: sectionTabs }

@@ -37,7 +37,7 @@ import s from './dweller.module.css'
 // with the bracket reticle, and give the level up thumbs up with a wink and a star.
 
 export type DwellerTone = 'poster' | 'phosphor'
-export type DwellerMotion = 'still' | 'idle' | 'walk' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike'
+export type DwellerMotion = 'still' | 'idle' | 'walk' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike' | 'hoist'
 
 /** Each profession's action, the way the dweller would do that job. */
 export const DWELLER_ACTION: Record<Profession, DwellerMotion> = {
@@ -55,6 +55,7 @@ const MOTION_CLASS: Record<DwellerMotion, string> = {
   type: s.type,
   drum: s.drum,
   strike: s.strike,
+  hoist: s.hoist,
 }
 
 const KIT_CLASS: Record<Profession, string> = {

@@ -1,5 +1,6 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -11,7 +12,8 @@ import atomic from './atomic.module.css'
 
 // Tech Stack as the terminal's inventory screen: every category a pocket packed in masonry columns, its
 // name on the picked, inverted row with the item count, its tools as the rows the pick sweeps over on
-// hover. Each pocket powers on like the screen when it first draws.
+// hover. Each pocket carries its place as --i, so the footlocker's loot (footlocker.tsx) tumbles them in
+// one after another.
 //
 // Ventures as holotapes on a shelf: each company a cassette with its label sticker, the two reels turning
 // while the pointer or focus is on it.
@@ -22,8 +24,8 @@ export function Inventory({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className={`p-4 sm:p-6 ${atomic.panel}`}>
       <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
-        {categories.map((category) => (
-          <li key={category.id} className={`${MASONRY_ITEM} ${atomic.powerOn}`}>
+        {categories.map((category, index) => (
+          <li key={category.id} data-pocket className={MASONRY_ITEM} style={{ '--i': index } as CSSProperties}>
             <h3
               data-on
               className={`relative flex min-h-[44px] items-center justify-between gap-3 px-3 text-sm font-bold uppercase tracking-widest ${atomic.pickRow}`}

@@ -165,6 +165,80 @@
   to { transform: rotate(360deg); }
 }
 
+/* ---- tech stack: the footlocker loot (footlocker.tsx) ----
+ * The locker waits on the floor at his side, rides up onto his shoulder with the hoist (1.1 s), the lid flips
+ * open, then it shakes once per pocket while each pocket tumbles down into the inventory. --pour, --pocket
+ * and --pockets come from footlocker.tsx. */
+
+.locker {
+  transform-origin: 50% 100%;
+  transform: translate(2.6rem, 5.5rem);
+}
+
+.loot[data-on] .locker {
+  animation: locker-up 1.1s cubic-bezier(0.34, 1.3, 0.64, 1) 0.15s both;
+}
+
+.lockerLid {
+  transform-box: view-box;
+  transform-origin: 6px 22px;
+}
+
+.loot[data-on] .lockerLid {
+  animation: lid-open 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) 1.2s both;
+}
+
+.lockerGlow {
+  opacity: 0;
+}
+
+.loot[data-on] .lockerGlow {
+  animation: glow-on 0.3s ease-out 1.3s both;
+}
+
+.loot[data-on] .lockerShake {
+  animation: locker-shake var(--pocket) ease-in-out var(--pour) var(--pockets);
+}
+
+.loot li[data-pocket] {
+  opacity: 0;
+}
+
+.loot[data-on] li[data-pocket] {
+  animation: tumble 0.6s cubic-bezier(0.3, 1.35, 0.5, 1) calc(var(--pour) + var(--i, 0) * var(--pocket)) both;
+}
+
+.weightFill {
+  transform: scaleX(var(--weight, 0));
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes locker-up {
+  0%, 30% { transform: translate(2.6rem, 5.5rem) rotate(0deg); }
+  55% { transform: translate(1.4rem, 2rem) rotate(16deg); }
+  100% { transform: translate(0, 0) rotate(-12deg); }
+}
+
+@keyframes lid-open {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-118deg); }
+}
+
+@keyframes glow-on {
+  to { opacity: 0.9; }
+}
+
+@keyframes locker-shake {
+  0%, 100% { transform: rotate(0deg); }
+  40% { transform: rotate(10deg) translateY(2px); }
+}
+
+@keyframes tumble {
+  0% { opacity: 0; transform: translate(-2.5rem, -5rem) rotate(-14deg) scale(0.6); }
+  25% { opacity: 1; }
+  100% { opacity: 1; transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .zone, .walker, .follower { transition: none; }
   .neon, .sunburst, .dog * { animation: none !important; }
@@ -172,4 +246,9 @@
   .fetchTape, .fetch[data-on] .fetchTape { animation: none; opacity: 1; transform: translate(12px, 22px) rotate(24deg); }
   .fetch .fetchPanel, .fetch[data-on] .fetchPanel { animation: none; opacity: 1; transform: none; }
   .levelUp, .stamp[data-on] .levelUp { animation: none; opacity: 1; transform: rotate(-2deg); }
+  .locker, .loot[data-on] .locker { animation: none; transform: rotate(-12deg); }
+  .loot[data-on] .lockerShake, .weightFill { animation: none; transition: none; }
+  .lockerLid, .loot[data-on] .lockerLid { animation: none; transform: rotate(-118deg); }
+  .lockerGlow, .loot[data-on] .lockerGlow { animation: none; opacity: 0.9; }
+  .loot li[data-pocket], .loot[data-on] li[data-pocket] { animation: none; opacity: 1; }
 }

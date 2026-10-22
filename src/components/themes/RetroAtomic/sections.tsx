@@ -13,13 +13,15 @@ import { TargetingSystem } from './targeting'
 import { Radio } from './radio'
 import { PerkChart } from './perks'
 import { Fetch, LevelUp } from './events'
+import { Loot } from './footlocker'
 import type { Zone } from './journey'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
 
 // The picked profession's sections, each one a stage: useSectionTrigger adds data-on once it scrolls
 // into view and the CSS plays that section's own entrance off it (the quest cards power on like the
-// tube, the perk cards flip in and their stars stamp down). Every heading's id is atomicId of its title,
+// tube, the perk cards flip in and their stars stamp down); a moment with its own timers (the tech
+// stack's footlocker loot) takes the on flag as a render prop. Every heading's id is atomicId of its title,
 // the same the wrist terminal's section tabs jump to. The engineer's sections sit on the terminal's
 // glass panels, the musician's on the radio, the fighter's on the printed perk chart.
 
@@ -32,13 +34,21 @@ function SectionTitle({ title }: { title: string }) {
   )
 }
 
-function Stage({ title, zone, className = '', children }: { title: string; zone: Zone; className?: string; children: ReactNode }) {
+interface StageProps {
+  title: string
+  zone: Zone
+  className?: string
+  // A moment that runs its own timers takes the stage's on flag as a render prop.
+  children: ReactNode | ((on: boolean) => ReactNode)
+}
+
+function Stage({ title, zone, className = '', children }: StageProps) {
   const { ref, on } = useZoneStage(zone)
 
   return (
     <section ref={ref} data-on={on || undefined} aria-labelledby={atomicId(title)} className={`mb-20 scroll-mt-24 ${atomic.stage} ${className}`}>
       <SectionTitle title={title} />
-      {children}
+      {typeof children === 'function' ? children(on) : children}
     </section>
   )
 }
@@ -64,8 +74,12 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </Stage>
       )}
 
-      <Stage title={titles.techStack} zone="wasteland">
-        <Inventory categories={sections.techStack} />
+      <Stage title={titles.techStack} zone="wasteland" className={j.loot}>
+        {(on) => (
+          <Loot categories={sections.techStack} on={on}>
+            <Inventory categories={sections.techStack} />
+          </Loot>
+        )}
       </Stage>
 
       {sections.projects.length > 0 && (
