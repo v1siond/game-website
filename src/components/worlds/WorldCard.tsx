@@ -77,7 +77,7 @@ export default function WorldCard({ world, isCurrent = false }: WorldCardProps) 
               {destTheme.name}
             </div>
             <div
-              className="truncate text-xs"
+              className="line-clamp-2 break-words text-xs"
               style={{ color: currentTheme.colors.textMuted }}
             >
               {destTheme.description}
