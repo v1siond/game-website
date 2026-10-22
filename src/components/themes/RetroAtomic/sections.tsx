@@ -21,10 +21,10 @@ import j from './journey.module.css'
 
 // The picked profession's sections, each one a stage: useSectionTrigger adds data-on once it scrolls
 // into view and the CSS plays that section's own entrance off it (the quest cards power on like the
-// tube, the perk cards flip in and their stars stamp down); a moment with its own timers (the tech
-// stack's footlocker loot, the ventures' dig) takes the on flag as a render prop. Every heading's id is atomicId of its title,
-// the same the wrist terminal's section tabs jump to. The engineer's sections sit on the terminal's
-// glass panels, the musician's on the radio, the fighter's on the printed perk chart.
+// tube, the perk cards flip in and their stars stamp down). A moment with its own timers takes the on
+// flag as a render prop: the tech stack's footlocker loot, the ventures' dig and the bands' radio dance.
+// Every heading's id is atomicId of its title, the same the wrist terminal's section tabs jump to. The engineer's sections sit on the
+// terminal's glass panels, the musician's on the radio, the fighter's on the printed perk chart.
 
 function SectionTitle({ title }: { title: string }) {
   return (
@@ -108,9 +108,13 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
   return (
     <Stage title={labels.sections.bands} zone="town">
-      <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
-      <Radio bands={bands} />
-      <p className="mt-6 text-base italic text-atomic-phosphor-dim">{musician.line}</p>
+      {(on) => (
+        <>
+          <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
+          <Radio bands={bands} on={on} />
+          <p className="mt-6 text-base italic text-atomic-phosphor-dim">{musician.line}</p>
+        </>
+      )}
     </Stage>
   )
 }

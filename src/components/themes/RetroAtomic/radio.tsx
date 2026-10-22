@@ -6,11 +6,12 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
+import { RadioDancer } from './dance'
 import { PHOSPHOR, PHOSPHOR_DEEP } from './palette'
 import atomic from './atomic.module.css'
 
-// Bands as the terminal's radio: each band a station. Above the stations the receiver: the tuning scale
-// with its needle and the waveform panel. Pointing at or focusing a station tunes it in: the needle
+// Bands as the terminal's radio: each band a station. Above the stations the receiver: him dancing with
+// the bakelite radio (dance.tsx), the tuning scale with its needle and the waveform panel. Pointing at or focusing a station tunes it in: the needle
 // slides to that station's place on the scale (transform, an eased glide), the wave's height and speed
 // change to that station's (the --amp and --wave variables the CSS reads), a short burst of static
 // flickers over the panel (keyed per station, so it plays on each retune), the station's lamp lights
@@ -31,7 +32,7 @@ const SINE = Array.from({ length: WAVE_POINTS * 2 + 1 }, (_, point) => {
 const AMPLITUDES = [0.9, 0.55, 0.75, 0.4]
 const SPEEDS = ['1.6s', '2.4s', '1.1s', '3s']
 
-function Receiver({ bands, tuned }: { bands: Band[]; tuned: number }) {
+function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: boolean }) {
   const { hud } = useLabels()
   const band = bands[tuned]
   const place = bands.length > 1 ? tuned / (bands.length - 1) : 0.5
@@ -42,8 +43,9 @@ function Receiver({ bands, tuned }: { bands: Band[]; tuned: number }) {
   } as CSSProperties
 
   return (
-    <div className={`mb-8 grid gap-4 p-4 sm:p-6 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] ${atomic.panel}`} style={look}>
-      <div>
+    <div className={`mb-8 grid grid-cols-[5.5rem_minmax(0,1fr)] gap-4 p-4 sm:p-6 md:grid-cols-[7rem_minmax(0,3fr)_minmax(0,2fr)] ${atomic.panel}`} style={look}>
+      <RadioDancer tuned={tuned} on={on} />
+      <div className="self-center">
         <div className={`relative h-16 ${atomic.dialScale}`} aria-hidden="true">
           <span className={`absolute bottom-0 top-0 w-1 bg-atomic-red ${atomic.needle}`} />
         </div>
@@ -51,7 +53,7 @@ function Receiver({ bands, tuned }: { bands: Band[]; tuned: number }) {
           {band ? fillLabel(hud.tunedTo, { name: band.name }) : ''}
         </p>
       </div>
-      <div className={`relative h-24 overflow-hidden border border-atomic-phosphor/50 ${atomic.wavePanel}`} aria-hidden="true">
+      <div className={`relative h-24 self-center overflow-hidden border border-atomic-phosphor/50 ${atomic.wavePanel}`} aria-hidden="true">
         <div className={`absolute inset-y-0 left-0 w-[200%] ${atomic.waveSlide} ${atomic.ambient}`}>
           <svg viewBox="0 0 400 60" preserveAspectRatio="none" className={`h-full w-full ${atomic.waveHeight}`} focusable="false">
             <path d={SINE} fill="none" stroke={PHOSPHOR} strokeWidth="2" vectorEffect="non-scaling-stroke" />
@@ -99,14 +101,14 @@ function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTu
   )
 }
 
-export function Radio({ bands }: { bands: Band[] }) {
+export function Radio({ bands, on }: { bands: Band[]; on: boolean }) {
   const { hud } = useLabels()
   const [tuned, setTuned] = useState(0)
 
   return (
     <>
       <p className="mb-3 text-sm text-atomic-phosphor-dim">{hud.tuneHint}</p>
-      <Receiver bands={bands} tuned={tuned} />
+      <Receiver bands={bands} tuned={tuned} on={on} />
       <BandList
         bands={bands}
         className={MASONRY_LIST}

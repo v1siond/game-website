@@ -2,6 +2,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import {
   BAKELITE,
+  BRASS,
   CREAM,
   CREAM_SHADE,
   GLASS,
@@ -34,10 +35,49 @@ import s from './dweller.module.css'
 // whose action is the drum roll; the Martial Artist with the jumpsuit rolled down to the waist and the
 // sleeves tied, bare chested with wrapped hands and his own mongkhon, whose action is the knee then the
 // side kick. Every one can idle (bounce, blink), walk the jaunty poster walk, take the targeting stance
-// with the bracket reticle, and give the level up thumbs up with a wink and a star.
+// with the bracket reticle, and give the level up thumbs up with a wink and a star. The bands section has
+// him hold the bakelite radio to his chest, turn its knob and dance each station's step.
 
 export type DwellerTone = 'poster' | 'phosphor'
-export type DwellerMotion = 'still' | 'idle' | 'walk' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike' | 'hoist' | 'aim' | 'fire'
+export type DwellerMotion =
+  | 'still'
+  | 'idle'
+  | 'walk'
+  | 'thumbsUp'
+  | 'target'
+  | 'type'
+  | 'drum'
+  | 'strike'
+  | 'hoist'
+  | 'aim'
+  | 'fire'
+  | 'tune'
+  | 'sway'
+  | 'twist'
+  | 'shuffle'
+  | 'bop'
+
+/** The radio dance's motions: he holds the bakelite radio in all of them. */
+export type RadioMotion = Extract<DwellerMotion, 'tune' | 'sway' | 'twist' | 'shuffle' | 'bop'>
+
+const HOLDS_RADIO: Record<DwellerMotion, boolean> = {
+  still: false,
+  idle: false,
+  walk: false,
+  thumbsUp: false,
+  target: false,
+  type: false,
+  drum: false,
+  strike: false,
+  hoist: false,
+  aim: false,
+  fire: false,
+  tune: true,
+  sway: true,
+  twist: true,
+  shuffle: true,
+  bop: true,
+}
 
 /** Each profession's action, the way the dweller would do that job. */
 export const DWELLER_ACTION: Record<Profession, DwellerMotion> = {
@@ -58,6 +98,11 @@ const MOTION_CLASS: Record<DwellerMotion, string> = {
   hoist: s.hoist,
   aim: s.aim,
   fire: s.fire,
+  tune: `${s.holdRadio} ${s.tune}`,
+  sway: `${s.holdRadio} ${s.sway}`,
+  twist: `${s.holdRadio} ${s.twist}`,
+  shuffle: `${s.holdRadio} ${s.shuffle}`,
+  bop: `${s.holdRadio} ${s.bop}`,
 }
 
 const KIT_CLASS: Record<Profession, string> = {
@@ -297,6 +342,27 @@ function Snare({ inks }: { inks: Inks }) {
   )
 }
 
+// The bakelite table radio he holds level against his chest for the dance: the arched red case, the cream
+// grille, the round dial window with its needle, and at the lower left the long pointer knob on its brass
+// boss, which his right hand pinches and turns; the pointer reaches past his fingers so the turn shows. The
+// knob and the dial needle turn with the receiver's --needle (0 to 1), which the radio panel sets on its
+// grid, so the knob in his hand follows the tuning scale's needle.
+function HeldRadio({ inks }: { inks: Inks }) {
+  return (
+    <g>
+      <Shape d="M34 84 L34 71 Q34 61.5 49 61.5 Q64 61.5 64 71 L64 84 Z" fill={inks.band} inks={inks} />
+      <rect x={41} y={67} width={11} height={13} rx={1.5} fill={inks.wrap} stroke={inks.line} strokeWidth={inks.lineWidth * 0.6} />
+      <path d="M41.5 70 H51.5 M41.5 73 H51.5 M41.5 76 H51.5" stroke={inks.boot} strokeWidth={1} />
+      <circle cx={57} cy={71} r={3.8} fill={inks.teeth} stroke={inks.line} strokeWidth={inks.lineWidth * 0.6} />
+      <path className={s.dialNeedle} d="M57 71 L57 67.8" stroke={inks.line} strokeWidth={1.2} strokeLinecap="round" />
+      <g className={s.knob}>
+        <circle cx={38.5} cy={78.5} r={3.4} fill={BRASS} stroke={inks.line} strokeWidth={inks.lineWidth} />
+        <Shape d="M38.5 70.5 L40.6 78.5 L38.5 86.5 L36.4 78.5 Z" fill={inks.teeth} inks={inks} />
+      </g>
+    </g>
+  )
+}
+
 // The targeting stance's bracket reticle and the level up star, both resting hidden.
 function Overlays({ inks }: { inks: Inks }) {
   return (
@@ -333,6 +399,7 @@ export function DwellerSprite({ profession, motion, tone = 'poster', className =
             <Head profession={profession} inks={inks} />
           </g>
           {profession === 'drummer' && <Snare inks={inks} />}
+          {HOLDS_RADIO[motion] && <HeldRadio inks={inks} />}
           <Arm side="right" profession={profession} inks={inks} />
           <Arm side="left" profession={profession} inks={inks} />
         </g>

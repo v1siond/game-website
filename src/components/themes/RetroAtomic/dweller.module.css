@@ -196,6 +196,69 @@
 @keyframes muzzle { 0% { opacity: 1; } 35%, 100% { opacity: 0; } }
 @keyframes recoil-body { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-3px); } }
 
+/* ---------------------------------------------------------------- bands: the radio dance (dance.tsx)
+ * holdRadio: the left hand grips the radio's right end against his chest, the elbow out, held through every step.
+ * tune: the right hand on the knob, the forearm turning with the receiver's --needle as the knob does. Then each
+ * station's own step, the right hand free: sway (side to side from the feet, the arm swinging wide), twist (knees
+ * and feet swivelling against each other, the elbow pumping), shuffle (a heel kicked out to each side in turn),
+ * bop (a hop on every beat, the finger pointing up then down). Checked as pictures in poses/dance-*.png. */
+
+.knob { transform-origin: 38.5px 78.5px; transform: rotate(calc(var(--needle, 0) * 300deg)); transition: transform 620ms cubic-bezier(0.34, 1.3, 0.64, 1); }
+.dialNeedle { transform-origin: 57px 71px; transform: rotate(calc(var(--needle, 0) * 160deg - 80deg)); transition: transform 620ms cubic-bezier(0.34, 1.3, 0.64, 1); }
+
+.holdRadio .armLeft { transform: rotate(-44deg); }
+.holdRadio .foreLeft { transform: rotate(118deg); }
+
+.tune .armRight { transform: rotate(50deg); }
+.tune .foreRight { transform: rotate(-104deg) rotate(calc(var(--needle, 0) * 10deg)); transition: transform 620ms cubic-bezier(0.34, 1.3, 0.64, 1); }
+.tune .head { transform: rotate(-7deg) translateY(1px); }
+
+.sway .body { animation: sway-body 1.2s ease-in-out infinite; }
+.sway .head { animation: sway-head 1.2s ease-in-out infinite; }
+.sway .armRight { animation: sway-arm 1.2s ease-in-out infinite; }
+.sway .foreRight { transform: rotate(-35deg); }
+
+@keyframes sway-body { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+@keyframes sway-head { 0%, 100% { transform: rotate(6deg); } 50% { transform: rotate(-6deg); } }
+@keyframes sway-arm { 0%, 100% { transform: rotate(35deg); } 50% { transform: rotate(75deg); } }
+
+.twist .body { animation: twist-body 0.55s ease-in-out infinite; }
+.twist .thighRight, .twist .thighLeft { animation: twist-thigh 0.55s ease-in-out infinite; }
+.twist .shinRight, .twist .shinLeft { animation: twist-shin 0.55s ease-in-out infinite; }
+.twist .armRight { transform: rotate(40deg); }
+.twist .foreRight { animation: twist-fore 0.55s ease-in-out infinite; }
+
+@keyframes twist-body { 0%, 100% { transform: translate(-2px, 4px); } 50% { transform: translate(2px, 4px); } }
+@keyframes twist-thigh { 0%, 100% { transform: rotate(16deg); } 50% { transform: rotate(-16deg); } }
+@keyframes twist-shin { 0%, 100% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } }
+@keyframes twist-fore { 0%, 100% { transform: rotate(-70deg); } 50% { transform: rotate(-110deg); } }
+
+.shuffle .body { animation: shuffle-body 0.8s ease-in-out infinite; }
+.shuffle .thighRight { animation: shuffle-thigh-r 0.8s ease-in-out infinite; }
+.shuffle .shinRight { animation: shuffle-shin-r 0.8s ease-in-out infinite; }
+.shuffle .thighLeft { animation: shuffle-thigh-l 0.8s ease-in-out infinite; }
+.shuffle .shinLeft { animation: shuffle-shin-l 0.8s ease-in-out infinite; }
+.shuffle .armRight { transform: rotate(20deg); }
+.shuffle .foreRight { animation: shuffle-fore 0.4s ease-in-out infinite alternate; }
+
+@keyframes shuffle-body { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-3px); } }
+@keyframes shuffle-thigh-r { 0%, 50%, 100% { transform: rotate(0deg); } 25% { transform: rotate(32deg); } }
+@keyframes shuffle-shin-r { 0%, 50%, 100% { transform: rotate(0deg); } 25% { transform: rotate(14deg); } }
+@keyframes shuffle-thigh-l { 0%, 50%, 100% { transform: rotate(0deg); } 75% { transform: rotate(-32deg); } }
+@keyframes shuffle-shin-l { 0%, 50%, 100% { transform: rotate(0deg); } 75% { transform: rotate(-14deg); } }
+@keyframes shuffle-fore { from { transform: rotate(-60deg); } to { transform: rotate(-100deg); } }
+
+.bop .body { animation: bop-body 0.45s cubic-bezier(0.3, 0, 0.3, 1) infinite; }
+.bop .head { animation: bop-head 0.45s ease-in-out infinite; }
+.bop .armRight { animation: bop-arm 1.8s steps(1, end) infinite; }
+.bop .foreRight { animation: bop-fore 1.8s steps(1, end) infinite; }
+
+@keyframes bop-body { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-7px); } }
+@keyframes bop-head { 0%, 100% { transform: rotate(0deg); } 40% { transform: rotate(-8deg); } }
+@keyframes bop-arm { 0%, 100% { transform: rotate(160deg); } 50% { transform: rotate(28deg); } }
+@keyframes bop-fore { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+
 @media (prefers-reduced-motion: reduce) {
   .sprite, .sprite * { animation: none !important; }
+  .knob, .dialNeedle, .tune .foreRight { transition: none; }
 }
