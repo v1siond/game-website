@@ -45,7 +45,15 @@ interface ColumnProps {
 function ColumnTop({ x, top, width, tone, broken }: Required<Omit<ColumnProps, 'bottom' | 'light'>>) {
   const half = width / 2
   if (broken) {
-    return <path d={`M${x - half} ${top} L${x - half * 0.4} ${top - 14} L${x} ${top - 4} L${x + half * 0.5} ${top - 20} L${x + half} ${top - 6} Z`} fill={tone} stroke={INK} strokeWidth={3} strokeLinejoin="round" />
+    return (
+      <path
+        d={`M${x - half} ${top} L${x - half * 0.4} ${top - 14} L${x} ${top - 4} L${x + half * 0.5} ${top - 20} L${x + half} ${top - 6} Z`}
+        fill={tone}
+        stroke={INK}
+        strokeWidth={3}
+        strokeLinejoin="round"
+      />
+    )
   }
   return <rect x={x - half - 12} y={top - 18} width={width + 24} height={20} fill={tone} stroke={INK} strokeWidth={3} />
 }
@@ -100,13 +108,16 @@ function StormArt() {
         <path d="M960 600 Q930 470 990 400 Q1010 380 1040 392 L1020 410 Q980 440 1000 600 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={3} opacity={0.7} />
       </g>
       {/* the near head: neck out of the sea, the skull with its horns and the jaw that opens */}
+      {/* drawn left of centre, shifted in so a phone's narrow slice of the sea still shows the head */}
       <g className={`${e} ${u.hydraRise}`}>
-        <path d="M250 800 Q200 560 300 420 Q330 380 380 380 L400 420 Q330 450 320 560 Q320 680 360 800 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={4} />
-        <path d="M262 780 Q230 600 300 470" fill="none" stroke={MYTH.hydraBelly} strokeWidth={10} opacity={0.6} />
-        <path d="M300 400 Q330 350 400 360 L480 390 L470 410 L380 420 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={4} />
-        <path d="M330 366 L300 320 L350 356 M370 360 L360 310 L392 358" fill={MYTH.hydra} stroke={INK} strokeWidth={3} />
-        <circle cx={400} cy={378} r={5} fill={MYTH.fireCore} />
-        <path d="M380 418 L470 410 L460 430 L390 440 Z" fill={MYTH.hydraBelly} stroke={INK} strokeWidth={3} className={`${e} ${u.hydraJaw}`} />
+        <g transform="translate(140 0)">
+          <path d="M250 800 Q200 560 300 420 Q330 380 380 380 L400 420 Q330 450 320 560 Q320 680 360 800 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={4} />
+          <path d="M262 780 Q230 600 300 470" fill="none" stroke={MYTH.hydraBelly} strokeWidth={10} opacity={0.6} />
+          <path d="M300 400 Q330 350 400 360 L480 390 L470 410 L380 420 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={4} />
+          <path d="M330 366 L300 320 L350 356 M370 360 L360 310 L392 358" fill={MYTH.hydra} stroke={INK} strokeWidth={3} />
+          <circle cx={400} cy={378} r={5} fill={MYTH.fireCore} />
+          <path d="M380 418 L470 410 L460 430 L390 440 Z" fill={MYTH.hydraBelly} stroke={INK} strokeWidth={3} className={`${e} ${u.hydraJaw}`} />
+        </g>
       </g>
       {/* the broken mast and its torn sail */}
       <path d="M720 700 L736 260 L748 262 L740 700 Z" fill={MYTH.leather} stroke={INK} strokeWidth={3} />
@@ -171,8 +182,20 @@ function RhodesArt() {
       </g>
       <ellipse cx={880} cy={640} rx={90} ry={40} fill={MYTH.boneShade} opacity={0} className={`${e} ${u.dust}`} />
       {/* the city and its harbour wall, fires in the windows */}
-      <path d="M0 640 L0 560 L60 560 L60 520 L120 520 L120 590 L200 590 L200 540 L260 540 L260 640 Z M940 640 L940 560 L1000 560 L1000 500 L1060 500 L1060 570 L1140 570 L1140 530 L1200 530 L1200 640 Z" fill={MYTH.city} stroke={INK} strokeWidth={3} />
-      {[[30, 580], [90, 540], [230, 560], [970, 580], [1030, 520], [1170, 550]].map(([x, y]) => (
+      <path
+        d="M0 640 L0 560 L60 560 L60 520 L120 520 L120 590 L200 590 L200 540 L260 540 L260 640 Z M940 640 L940 560 L1000 560 L1000 500 L1060 500 L1060 570 L1140 570 L1140 530 L1200 530 L1200 640 Z"
+        fill={MYTH.city}
+        stroke={INK}
+        strokeWidth={3}
+      />
+      {[
+        [30, 580],
+        [90, 540],
+        [230, 560],
+        [970, 580],
+        [1030, 520],
+        [1170, 550],
+      ].map(([x, y]) => (
         <Flame key={x} x={x} y={y} scale={0.5} />
       ))}
       <path d="M0 640 L1200 640 L1200 680 L0 680 Z" fill={MYTH.city} stroke={INK} strokeWidth={3} />
@@ -208,7 +231,12 @@ function OlympusArt() {
         </g>
       ))}
       <g className={`${e} ${u.clouds}`}>
-        <path d="M-100 640 Q0 580 120 620 Q220 560 340 620 Q460 570 560 630 Q680 570 800 630 Q920 570 1040 620 Q1160 570 1300 630 L1300 800 L-100 800 Z" fill={MYTH.cloud} stroke={INK} strokeWidth={3} />
+        <path
+          d="M-100 640 Q0 580 120 620 Q220 560 340 620 Q460 570 560 630 Q680 570 800 630 Q920 570 1040 620 Q1160 570 1300 630 L1300 800 L-100 800 Z"
+          fill={MYTH.cloud}
+          stroke={INK}
+          strokeWidth={3}
+        />
       </g>
       <g className={`${e} ${u.birds}`}>
         {[0, 1, 2].map((bird) => (

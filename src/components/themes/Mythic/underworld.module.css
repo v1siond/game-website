@@ -893,6 +893,8 @@
 }
 /* the near head rises out of the sea, lunges with the jaw open and sinks again, every 9 s */
 .hydraRise {
+  transform-box: fill-box;
+  transform-origin: 30% 100%;
   animation: hydra-rise 9s ease-in-out infinite;
 }
 @keyframes hydra-rise {
