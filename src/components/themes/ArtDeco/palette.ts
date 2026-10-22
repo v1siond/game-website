@@ -34,11 +34,11 @@ export const DECO_COLORS = {
   bloodDark: '#660000',
   blood: '#8B0000',
 
-  // His painted costume: the charcoal cable knit sweater, the slacks, the pipe wrench and the blue
+  // His painted costume: the grey heather cable knit sweater, the slacks, the pipe wrench and the blue
   // crackle of the electric plasmid in his veins
-  knit: '#4a463e',
-  knitShade: '#26241f',
-  knitLight: '#6d675a',
+  knit: '#7c7a74',
+  knitShade: '#4a4843',
+  knitLight: '#a3a19a',
   slacks: '#2e2b27',
   shoe: '#3a2414',
   steel: '#9aa0a4',
@@ -46,6 +46,16 @@ export const DECO_COLORS = {
   rust: '#8a4320',
   bolt: '#7fe0ff',
   boltCore: '#effcff',
+
+  // The revival chamber's life light
+  vita: '#3fe0b0',
+
+  // The guardian's helmet ports: amber while he minds his own walk, red once provoked
+  portCalm: '#ffc94a',
+  portAngry: '#ff3b2a',
+  diver: '#6b4a2a',
+  diverDark: '#3a2814',
+  sisterDress: '#e8b4bc',
 
   // Poster paper and text
   ivory: '#FFFFF0',

@@ -10,12 +10,17 @@ import { BrassPanel, Chamber } from './plaque'
 import { DiaryShelf } from './diary'
 import { ResearchBoard } from './camera'
 import { MarqueeRow } from './marquee'
-import { PipeCircuit } from './circuit'
+import { TheatreStage } from './stage'
+import { PoweredRoom } from './power'
+import { GlassTunnel } from './tunnel'
+import { HackedShutter } from './hack'
+import { GuardianStreet } from './guardian'
 
 // The picked profession's sections, each a chamber one level deeper in the city (the plaque's gauge
-// reads the depth). The short ones (about, the tech stack, ventures) fade in on a brass panel; the long
-// lists are the city's own machines: the audio diaries for the jobs, the research camera board for the
-// projects, the theatre marquees for the bands and the pipe works for the Muay Thai record.
+// reads the depth), and in each he or the city does something different: he powers the dark about room
+// with the bolt, listens to the job diaries, walks the tech stack's glass tunnel, hacks the pipes that
+// lift the projects shutter; the ventures stand on brass cards; the guardian pair walks behind the band
+// marquees; he fights on the theatre stage for the Muay Thai record.
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -25,9 +30,11 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
     <div className="space-y-20">
       <FadeInScene>
         <Chamber title={labels.sections.about} depth={0}>
-          <BrassPanel>
-            <p className="mx-auto max-w-3xl text-center text-base leading-relaxed text-[color:var(--deco-cream)]">{professionalSummary.bio}</p>
-          </BrassPanel>
+          <PoweredRoom>
+            <BrassPanel>
+              <p className="mx-auto max-w-3xl text-center text-base leading-relaxed text-[color:var(--deco-cream)]">{professionalSummary.bio}</p>
+            </BrassPanel>
+          </PoweredRoom>
         </Chamber>
       </FadeInScene>
 
@@ -39,14 +46,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <FadeInScene>
         <Chamber title={labels.sections.techStack} depth={2}>
-          <BrassPanel>
+          <GlassTunnel>
             <TechCloud categories={sections.techStack} />
-          </BrassPanel>
+          </GlassTunnel>
         </Chamber>
       </FadeInScene>
 
       <Chamber title={labels.sections.projects} depth={3}>
-        <ResearchBoard projects={sections.projects} />
+        <HackedShutter>
+          <ResearchBoard projects={sections.projects} />
+        </HackedShutter>
       </Chamber>
 
       <FadeInScene>
@@ -71,7 +80,9 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
   return (
     <Chamber title={labels.sections.bands} depth={0}>
-      <MarqueeRow bands={sections.bands} musician={sections.musician} />
+      <GuardianStreet>
+        <MarqueeRow bands={sections.bands} musician={sections.musician} />
+      </GuardianStreet>
     </Chamber>
   )
 }
@@ -83,7 +94,7 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
   return (
     <Chamber title={labels.sections.muayThai} depth={0}>
       <h3 className="mb-8 text-center text-xl tracking-[0.1em] text-[color:var(--deco-gold-bright)] [font-family:var(--deco-display)]">{martialArts.primary.title}</h3>
-      <PipeCircuit martialArts={martialArts} />
+      <TheatreStage martialArts={martialArts} />
     </Chamber>
   )
 }

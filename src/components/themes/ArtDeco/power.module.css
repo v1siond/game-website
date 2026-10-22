@@ -1,0 +1,68 @@
+/*
+ * The about chamber's power (power.tsx). Off: a dark glass lies over the panel, the box's lamps and the
+ * arc are out, the lever hangs. Live (data-live): the dark glass stutters away (two dips, then gone), the
+ * lamps catch, the lever throws and the arc snaps once. Each zap remounts the glass under a new key, so
+ * the stutter plays again. Transform and opacity only.
+ */
+
+.dark {
+  background: var(--deco-abyss);
+  opacity: 0.88;
+}
+
+.panel[data-live] .dark {
+  animation: stutter 1s steps(1, end) 0.35s both;
+}
+
+@keyframes stutter {
+  0% { opacity: 0.88; }
+  15% { opacity: 0.2; }
+  30% { opacity: 0.75; }
+  48% { opacity: 0.05; }
+  60% { opacity: 0.5; }
+  75%, 100% { opacity: 0; }
+}
+
+.lamps,
+.arc {
+  opacity: 0;
+}
+
+.lamps[data-live] {
+  opacity: 1;
+}
+
+.arc[data-live] {
+  animation: snap 0.6s steps(1, end) 0.3s both;
+}
+
+@keyframes snap {
+  0%, 70%, 100% { opacity: 0; }
+  20%, 50% { opacity: 1; }
+}
+
+.lever {
+  transform-box: view-box;
+  transform-origin: 30px 60px;
+  transform: rotate(40deg);
+}
+
+.lever[data-live] {
+  transform: rotate(0deg);
+  transition: transform 0.25s ease-out 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel[data-live] .dark {
+    animation: none;
+    opacity: 0;
+  }
+
+  .arc[data-live] {
+    animation: none;
+  }
+
+  .lever[data-live] {
+    transition: none;
+  }
+}

@@ -26,6 +26,7 @@
 .chamber { transform-origin: 62px 172px; }
 
 .sparks,
+.recorder,
 .bolt,
 .chamber,
 .hitSpark,
@@ -250,6 +251,22 @@
   48% { opacity: 0.9; transform: scaleY(1.04); }
   54% { opacity: 0.4; }
   62%, 100% { opacity: 1; transform: scaleY(1); }
+}
+
+/* ---------------------------------------------------------------- listen: the diary held up by his face while the tape runs */
+
+/* the upper arm forward and up, the elbow flexed so the hand comes back up to the jaw; the head leans
+   into the speaker and nods slowly with the voice */
+.listen .armFront { transform: rotate(-45deg); }
+.listen .foreFront { transform: rotate(-140deg); }
+.listen .recorder { opacity: 1; }
+.listen .head { animation: heed 2.6s ease-in-out infinite; }
+.listen .chest { animation: breathe 3.6s ease-in-out infinite; }
+.listen .veins { animation: pulse 2.8s ease-in-out infinite; }
+
+@keyframes heed {
+  0%, 100% { transform: rotate(4deg); }
+  50% { transform: rotate(7deg) translateY(0.5px); }
 }
 
 /* ---------------------------------------------------------------- the glass: he walks in from the left edge */

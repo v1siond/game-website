@@ -1,0 +1,95 @@
+/*
+ * The guardian pair's street (guardian.tsx). The pair crosses from the right end to the left end as
+ * --scene-progress runs 0 to 1 on the street. The giant stomps (legs swing at the hips, the body sinks
+ * on each step), she skips at twice the pace. Provoked (a fresh svg under each press key): the red ports
+ * flare over the amber, he rears back and the drill spins, then the red fades. Transform and opacity only.
+ */
+
+.street {
+  container-type: inline-size;
+}
+
+.pair {
+  transform: translate3d(calc((1 - var(--scene-progress, 0)) * (100cqw - 11rem)), 0, 0);
+  cursor: pointer;
+}
+
+.pair:focus-visible {
+  outline: 2px solid var(--deco-gold-bright);
+  outline-offset: 2px;
+}
+
+.guardian *,
+.sister {
+  transform-box: view-box;
+}
+
+.legBack { transform-origin: 88px 112px; animation: stomp 1.4s ease-in-out infinite; }
+.legFront { transform-origin: 61px 112px; animation: stomp 1.4s ease-in-out -0.7s infinite; }
+.body { transform-origin: 74px 116px; animation: sink 0.7s ease-in-out infinite; }
+.sister { transform-origin: 146px 150px; animation: skip 0.7s ease-in-out infinite; }
+.drillArm { transform-origin: 46px 70px; }
+.drill { transform-origin: 22px 103px; }
+
+@keyframes stomp {
+  0%, 100% { transform: rotate(-12deg); }
+  50% { transform: rotate(12deg); }
+}
+
+@keyframes sink {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+@keyframes skip {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.portAngry {
+  opacity: 0;
+}
+
+.provoked .portAngry[data-angry] {
+  animation: flare 2.2s ease-out both;
+}
+
+.provoked .body {
+  animation: rear 1.2s cubic-bezier(0.3, 0, 0.3, 1) both, sink 0.7s ease-in-out 1.2s infinite;
+}
+
+.provoked .drill[data-angry] {
+  animation: spin 0.15s linear 8;
+}
+
+@keyframes flare {
+  0%, 60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes rear {
+  0%, 100% { transform: rotate(0deg); }
+  35%, 60% { transform: rotate(9deg) translateY(-4px); }
+}
+
+@keyframes spin {
+  0% { transform: scaleY(1); }
+  50% { transform: scaleY(-1); }
+  100% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .legBack,
+  .legFront,
+  .body,
+  .sister,
+  .provoked .body,
+  .provoked .drill[data-angry] {
+    animation: none;
+  }
+
+  .provoked .portAngry[data-angry] {
+    animation: none;
+    opacity: 1;
+  }
+}

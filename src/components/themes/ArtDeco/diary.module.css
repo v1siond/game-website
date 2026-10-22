@@ -174,3 +174,19 @@
     transform: none;
   }
 }
+
+/* he rises in the playing card corner, the diary by his face */
+.listener {
+  animation: step-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes step-up {
+  from { opacity: 0; transform: translate3d(0, 40%, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listener {
+    animation: none;
+  }
+}

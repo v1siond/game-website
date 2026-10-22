@@ -15,7 +15,7 @@ import { BathysphereHero } from './ArtDeco/descent'
 import { VendingMachine } from './ArtDeco/machine'
 import { BrassPanel, Chamber } from './ArtDeco/plaque'
 import { POSTS_DEPTH, SECTION_VIEWS } from './ArtDeco/sections'
-import { ContactHatch } from './ArtDeco/hatch'
+import { VitaChamber } from './ArtDeco/vita'
 import look from './ArtDeco/world.module.css'
 
 // The world's own lettering: the root carries its --deco-face variable and the world's css reads it.
@@ -78,7 +78,7 @@ export default function ArtDecoTheme() {
         </div>
       </main>
 
-      <ContactHatch />
+      <VitaChamber />
 
       <footer className="relative z-20 flex justify-center py-12" aria-hidden="true">
         <svg width="50" height="80" viewBox="0 0 50 80" opacity="0.25" focusable="false">

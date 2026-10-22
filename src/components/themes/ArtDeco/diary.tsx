@@ -6,15 +6,18 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { jobYears } from '@/components/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { DECO_COLORS as C } from './palette'
+import { SurvivorSprite } from './sprite'
 import diary from './diary.module.css'
 
 // Work Experience as the city's audio diaries: each job is a reel to reel recorder left behind, arriving
 // with the gold glow the city gives the diaries that matter. Play runs the tape: the reels turn, the tape
 // counter runs and the highlights light one after another, a line every LINE_MS, then the tape stops.
-// One diary plays at a time; playing another stops the first.
+// One diary plays at a time; playing another stops the first. While a diary plays he steps up in
+// the card's corner and holds it by his face, listening, nodding with the voice; when the tape ends he is gone.
 //
 // Pattern: hybrid. The arrival is CSS off one shared section trigger (data-on, staggered by --i); the
 // playback is one setTimeout per line in the shelf, so React renders once a line. Reduced motion keeps
@@ -56,6 +59,7 @@ function DiaryCard({ entry, index, playing, onToggle }: { entry: Job; index: num
   const job = fillLabel(cards.jobSpan, { title: entry.title, company: entry.company, start, end })
   const lines = Math.max(entry.highlights.length, 1)
   const isPlaying = playing !== null
+  const reduced = useReducedMotion()
 
   return (
     <article
@@ -64,9 +68,14 @@ function DiaryCard({ entry, index, playing, onToggle }: { entry: Job; index: num
       style={{ '--i': index, '--tape': `${lines * LINE_MS}ms` } as CSSProperties}
     >
       <span className={`pointer-events-none absolute inset-0 ${diary.glow}`} aria-hidden="true" />
+      {isPlaying && (
+        <div className={`pointer-events-none absolute right-2 top-2 h-24 w-16 ${diary.listener}`} aria-hidden="true">
+          <SurvivorSprite profession="engineer" motion={reduced ? 'still' : 'listen'} className="h-full w-full" />
+        </div>
+      )}
       <div className="relative flex flex-col items-start gap-4 min-[375px]:flex-row">
         <Recorder />
-        <div className="min-w-0">
+        <div className="min-w-0 min-[375px]:pr-14">
           <h3 className={`text-lg leading-snug ${diary.title}`}>{entry.title}</h3>
           <p className="mt-1 text-sm text-[color:var(--deco-cream)]">
             <SlashBreaks text={entry.company} />

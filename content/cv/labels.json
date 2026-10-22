@@ -112,9 +112,12 @@
         "snap": "Snap",
         "snapOf": "Photograph {project}",
         "developed": "Developed",
-        "turnPipe": "Turn the pipe to {achievement}",
+        "turnPipe": "Turn pipe {n}",
         "flowWaiting": "The flow stopped at a turned pipe",
-        "flowDone": "Circuit complete"
+        "flowDone": "Circuit complete",
+        "zapAgain": "Zap the fuse box again",
+        "sealLeak": "Seal the leak",
+        "provoke": "Provoke the guardian"
       },
       "cyber": {
         "scan": "Scan",
@@ -229,7 +232,6 @@
         "rolesCleared": "{count} of {total} roles cleared",
         "roleCleared": "Cleared",
         "arenaHint": "Each role you scroll to sends me a foe, and its orbs fill the counter",
-        "climbHint": "Each group you scroll to is the next hold I grip on the chain",
         "throwAgain": "Throw again",
         "rarityHeroic": "Heroic",
         "choose": "Choose",
@@ -563,9 +565,12 @@
         "snap": "Foto",
         "snapOf": "Fotografiar {project}",
         "developed": "Revelada",
-        "turnPipe": "Girar la tubería hacia {achievement}",
+        "turnPipe": "Girar la tubería {n}",
         "flowWaiting": "El flujo se detuvo en una tubería girada",
-        "flowDone": "Circuito completo"
+        "flowDone": "Circuito completo",
+        "zapAgain": "Electrocutar de nuevo la caja de fusibles",
+        "sealLeak": "Sellar la fuga",
+        "provoke": "Provocar al guardián"
       },
       "cyber": {
         "scan": "Escanear",
@@ -680,7 +685,6 @@
         "rolesCleared": "{count} de {total} puestos superados",
         "roleCleared": "Superado",
         "arenaHint": "Cada puesto al que llegas me envía un enemigo, y sus orbes llenan el contador",
-        "climbHint": "Cada grupo al que llegas es el siguiente asidero que agarro en la cadena",
         "throwAgain": "Lanzar de nuevo",
         "rarityHeroic": "Heroico",
         "choose": "Elegir",
@@ -1014,9 +1018,12 @@
         "snap": "Scatta",
         "snapOf": "Fotografa {project}",
         "developed": "Sviluppata",
-        "turnPipe": "Gira il tubo verso {achievement}",
+        "turnPipe": "Gira il tubo {n}",
         "flowWaiting": "Il flusso si è fermato su un tubo girato",
-        "flowDone": "Circuito completo"
+        "flowDone": "Circuito completo",
+        "zapAgain": "Fulmina di nuovo la scatola dei fusibili",
+        "sealLeak": "Sigilla la perdita",
+        "provoke": "Provoca il guardiano"
       },
       "cyber": {
         "scan": "Scansiona",
@@ -1131,7 +1138,6 @@
         "rolesCleared": "{count} di {total} ruoli superati",
         "roleCleared": "Superato",
         "arenaHint": "Ogni ruolo che raggiungi mi manda un nemico, e le sue sfere riempiono il contatore",
-        "climbHint": "Ogni gruppo che raggiungi è il prossimo appiglio che afferro sulla catena",
         "throwAgain": "Lancia di nuovo",
         "rarityHeroic": "Eroico",
         "choose": "Scegli",

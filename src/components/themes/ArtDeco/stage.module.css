@@ -1,0 +1,76 @@
+/*
+ * The theatre stage (stage.tsx). The curtains part off data-on, the spotlight fades in after them; a
+ * programme line lights (a gold band fades in behind it) once his strike for it lands. Transform and
+ * opacity only.
+ */
+
+.box {
+  border: 3px solid var(--deco-gold);
+  background: linear-gradient(180deg, #1a0606, var(--deco-abyss));
+}
+
+.light {
+  background: radial-gradient(ellipse 45% 70% at 50% 0%, rgb(255 236 180 / 0.45), transparent 75%);
+  opacity: 0;
+}
+
+[data-on] .light {
+  opacity: 1;
+  transition: opacity 0.8s ease-out 0.9s;
+}
+
+.curtain {
+  background: repeating-linear-gradient(90deg, var(--deco-blood) 0 14px, var(--deco-blood-dark) 14px 22px);
+}
+
+[data-on] .curtainLeft {
+  transform: translate3d(-88%, 0, 0);
+  transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1) 0.2s;
+}
+
+[data-on] .curtainRight {
+  transform: translate3d(88%, 0, 0);
+  transition: transform 1.1s cubic-bezier(0.65, 0, 0.35, 1) 0.2s;
+}
+
+.valance {
+  background: repeating-linear-gradient(90deg, var(--deco-gold) 0 10px, var(--deco-brass-dark) 10px 20px);
+}
+
+.programme {
+  border: 2px solid var(--deco-gold);
+  background: linear-gradient(180deg, #1a140a, #0d0a05);
+}
+
+.fact {
+  border: 1px solid rgb(212 175 55 / 0.5);
+}
+
+.term {
+  color: var(--deco-gold);
+  font-family: var(--deco-display);
+}
+
+.line {
+  color: var(--deco-cream);
+  border-left: 3px solid var(--deco-brass-dark);
+}
+
+.lineGlow {
+  background: linear-gradient(90deg, rgb(212 175 55 / 0.28), transparent);
+  opacity: 0;
+}
+
+.line[data-lit] .lineGlow {
+  opacity: 1;
+  transition: opacity 0.4s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-on] .light,
+  [data-on] .curtainLeft,
+  [data-on] .curtainRight,
+  .line[data-lit] .lineGlow {
+    transition: none;
+  }
+}

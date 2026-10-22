@@ -1,0 +1,104 @@
+/*
+ * The revival chamber (vita.tsx). Off data-on, set once by the section trigger: the teal glow fills the
+ * glass (0 s), he revives inside (his own sprite motion), the frosted doors part (1.7 s) and the
+ * contact plate slides out (2 s). Transform and opacity only.
+ */
+
+.bay {
+  --ease-door: cubic-bezier(0.45, 0, 0.25, 1);
+}
+
+.tube {
+  border: 4px solid var(--deco-gold);
+  border-radius: 4.5rem 4.5rem 0.5rem 0.5rem;
+  background: var(--deco-abyss);
+  overflow: visible;
+}
+
+.glow {
+  border-radius: inherit;
+  background: radial-gradient(ellipse 60% 80% at 50% 60%, rgb(63 224 176 / 0.55), rgb(63 224 176 / 0.08) 70%, transparent);
+  opacity: 0;
+}
+
+.bay[data-on] .glow {
+  opacity: 1;
+  transition: opacity 0.8s ease-out;
+}
+
+.door {
+  background: linear-gradient(90deg, rgb(208 230 224 / 0.55), rgb(208 230 224 / 0.25));
+  border: 1px solid var(--deco-gold);
+}
+
+.doorLeft {
+  border-top-left-radius: 4.25rem;
+}
+
+.doorRight {
+  border-top-right-radius: 4.25rem;
+}
+
+.bay[data-on] .doorLeft {
+  transform: translate3d(-92%, 0, 0);
+  transition: transform 0.9s var(--ease-door) 1.7s;
+}
+
+.bay[data-on] .doorRight {
+  transform: translate3d(92%, 0, 0);
+  transition: transform 0.9s var(--ease-door) 1.7s;
+}
+
+.base {
+  background: var(--deco-brass-mid);
+}
+
+.plate {
+  border: 3px solid var(--deco-gold);
+  background:
+    linear-gradient(135deg, rgb(240 200 80 / 0.06), transparent 40%),
+    linear-gradient(180deg, var(--deco-deep-sea), var(--deco-abyss));
+  opacity: 0;
+  transform: translate3d(-2rem, 0, 0);
+}
+
+.bay[data-on] .plate {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 0.6s ease-out 2s,
+    transform 0.7s var(--ease-door) 2s;
+}
+
+.neon {
+  font-family: var(--deco-display);
+  color: var(--deco-gold-bright);
+  text-shadow:
+    0 0 4px var(--deco-gold),
+    0 0 16px rgb(212 175 55 / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bay[data-on] .glow {
+    transition: none;
+  }
+
+  .doorLeft,
+  .bay[data-on] .doorLeft {
+    transform: translate3d(-92%, 0, 0);
+    transition: none;
+  }
+
+  .doorRight,
+  .bay[data-on] .doorRight {
+    transform: translate3d(92%, 0, 0);
+    transition: none;
+  }
+
+  .plate,
+  .bay[data-on] .plate {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

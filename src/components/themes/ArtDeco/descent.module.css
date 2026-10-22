@@ -1,8 +1,8 @@
 /*
- * The ride down (descent.tsx). Every phase hangs off the hero's data-on, set once by the shared section
- * trigger, as a CSS delay: the shutter rises (0.15 s), the shaft sinks from the lighthouse to the city
- * (0.3 to 2.7 s, ease in out as the sea feels), the gauge needle swings with it, the windows come on
- * (1.6 s), the sign's letters buzz on 60 ms apart (from 1.7 s), the text and actions rise (2.2 s).
+ * The ride down (descent.tsx). The shutter and the sign hang off the hero's data-on as CSS delays: the
+ * shutter rises (0.15 s), the sign's letters buzz on 60 ms apart (from 0.9 s), the text and actions rise
+ * (1.4 s). The sink is the visitor's scroll: the shaft, the whale, the gauge needle and the windows read
+ * --scene-progress (0 at the lighthouse, 1 at the city) written on the porthole by the scroll engine.
  * The far and near layers and the glare move with --mx and --my. Transform and opacity only.
  */
 
@@ -13,12 +13,13 @@
 /* ---- the porthole ---- */
 
 .shaft {
-  transform: translate3d(0, 0, 0);
+  transform: translate3d(0, calc(var(--scene-progress, 0) * -66.6667%), 0);
 }
 
-.hero[data-on] .shaft {
-  transform: translate3d(0, -66.6667%, 0);
-  transition: transform 2.4s var(--ease-sea) 0.3s;
+/* the whale swims left to right across the glass while the sphere passes its depth */
+.whale {
+  transform-box: view-box;
+  transform: translate3d(calc(-150px + var(--scene-progress, 0) * 260px), 0, 0);
 }
 
 .far {
@@ -37,29 +38,7 @@
 }
 
 .lights {
-  opacity: 0;
-}
-
-.hero[data-on] .lights {
-  animation: lights-on 0.7s steps(1, end) 1.6s forwards;
-}
-
-@keyframes lights-on {
-  0% {
-    opacity: 0.6;
-  }
-  30% {
-    opacity: 0.1;
-  }
-  55% {
-    opacity: 0.85;
-  }
-  70% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 1;
-  }
+  opacity: clamp(0, calc((var(--scene-progress, 0) - 0.72) * 4), 1);
 }
 
 .shutter {
@@ -100,12 +79,10 @@
 .needle {
   transform-box: view-box;
   transform-origin: 40px 40px;
-  transform: rotate(-120deg);
 }
 
-.hero[data-on] .needle {
-  transform: rotate(110deg);
-  transition: transform 2.4s var(--ease-sea) 0.3s;
+.needle {
+  transform: rotate(calc(-120deg + var(--scene-progress, 0) * 230deg));
 }
 
 /* ---- the neon sign and the text ---- */
@@ -124,7 +101,7 @@
 
 .hero[data-on] .letter {
   animation: letter-on 0.5s steps(1, end) forwards;
-  animation-delay: calc(1.7s + var(--i) * 60ms);
+  animation-delay: calc(0.9s + var(--i) * 60ms);
 }
 
 @keyframes letter-on {
@@ -152,8 +129,8 @@
   opacity: 1;
   transform: translate3d(0, 0, 0);
   transition:
-    opacity 0.7s ease-out 2.2s,
-    transform 0.7s var(--ease-sea) 2.2s;
+    opacity 0.7s ease-out 1.4s,
+    transform 0.7s var(--ease-sea) 1.4s;
 }
 
 .follow {

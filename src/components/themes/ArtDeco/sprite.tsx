@@ -20,12 +20,13 @@ import s from './sprite.module.css'
 // red prajioud on the arms, wrapped hands and his own mongkhon round the head, whose action is the knee
 // then the round kick, the plasmid veins still lit.
 //
-// Every one can idle (breath, blink, the wrench tapping), walk, swing the wrench, zap, and come back
+// Every one can idle (breath, blink, the wrench tapping), walk, swing the wrench, zap, hold an audio diary
+// up by his face and listen (a held pose that loops while the tape runs), and come back
 // through the revival chamber: a column of light, the body knitting together from the feet up. The parts
 // are groups sprite.module.css turns round their own joints (transform and opacity only). A one shot
 // motion runs a clock animation on the root group and reports its end through onDone.
 
-export type DecoMotion = 'still' | 'idle' | 'walk' | 'swing' | 'zap' | 'drum' | 'strike' | 'revive'
+export type DecoMotion = 'still' | 'idle' | 'walk' | 'swing' | 'zap' | 'drum' | 'strike' | 'revive' | 'listen'
 
 /** The one shot motions; the rest loop. */
 export const ONE_SHOT: ReadonlySet<DecoMotion> = new Set(['swing', 'zap', 'drum', 'strike', 'revive'])
@@ -46,6 +47,7 @@ const MOTION_CLASS: Record<DecoMotion, string> = {
   drum: s.drum,
   strike: s.strike,
   revive: s.revive,
+  listen: s.listen,
 }
 
 const KIT_CLASS: Record<Profession, string> = {
@@ -93,10 +95,6 @@ const SHIN = {
 const SHOE = {
   back: 'M48.5 164 L60.5 164 Q67 166 67 172 L48.5 172 Z',
   front: 'M62.5 164 L75 164 Q81.5 166 81.5 172 L62.5 172 Z',
-}
-const BARE_SHIN = {
-  back: 'M50 108 L59 108 L58.5 166 L51 166 Z',
-  front: 'M64 108 L73 108 L72.5 166 L65 166 Z',
 }
 const FOOT = {
   back: 'M50 164 L59 164 Q64 167 64 171 L50 171 Z',
@@ -201,11 +199,11 @@ function Leg({ side, profession }: { side: 'back' | 'front'; profession: Profess
 
   return (
     <g className={thighClass}>
-      {!bare && <Painted d={THIGH[side]} fill={C.slacks} />}
+      <Painted d={THIGH[side]} fill={bare ? HERO_IDENTITY.skin : C.slacks} />
       <g className={shinClass}>
         {bare ? (
           <>
-            <Painted d={BARE_SHIN[side]} fill={HERO_IDENTITY.skin} />
+            <Painted d={SHIN[side]} fill={HERO_IDENTITY.skin} />
             <Painted d={FOOT[side]} fill={HERO_IDENTITY.skinShade} />
           </>
         ) : (
@@ -278,12 +276,28 @@ function Arm({ side, profession, ids }: { side: 'back' | 'front'; profession: Pr
         {bare && <path d={side === 'back' ? 'M45.5 90 L52.5 90 M45.5 93 L52.5 93' : 'M70 90 L77 90 M70 93 L77 93'} stroke={C.ivory} strokeWidth={2} />}
         <Hand side={side} profession={profession} ids={ids} />
         {plasmid && <Sparks />}
+        {plasmid && <Recorder />}
       </g>
     </g>
   )
 }
 
 // ---- the action props ----
+
+// The audio diary in the plasmid hand, shown only while he listens. Drawn turned with the forearm's
+// listening angle undone (about 185 degrees round the hand), so it stands upright by his face.
+function Recorder() {
+  return (
+    <g className={s.recorder} transform="rotate(185 73.8 99)">
+      <rect x={66} y={88} width={16} height={11} rx={1.5} fill={C.steel} stroke={LINE} strokeWidth={0.8} />
+      <rect x={67.5} y={89.5} width={7} height={6} fill={C.bronze} />
+      <circle cx={69.5} cy={92.5} r={1.4} fill={C.abyss} />
+      <circle cx={72.8} cy={92.5} r={1.4} fill={C.abyss} />
+      <path d="M76 90 V97 M78 90 V97 M80 90 V97" stroke={C.steelShade} strokeWidth={0.7} />
+      <circle cx={68.5} cy={97.3} r={0.9} fill={C.spark} />
+    </g>
+  )
+}
 
 // The bolt thrown from the plasmid hand, forked, with the white core inside the blue.
 function Bolt() {

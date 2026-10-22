@@ -4,21 +4,24 @@ import type { CSSProperties } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useScrollScene } from '@/hooks/useScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction, PortfolioLink } from './actions'
 import { DECO_COLORS as C } from './palette'
 import descent from './descent.module.css'
 
 // The recruiter first screen as the ride down: a brass porthole on the bathysphere. The deco shutter
-// over the glass rises, the view sinks from the lighthouse on its rock past the surface, the rails and
-// the light shafts down to the lit towers of the city, the depth gauge swings with it, then his name
-// buzzes on as a neon sign, letter by letter, and the headline and actions rise beside it.
+// over the glass rises on the lighthouse on its rock; then the visitor's scroll IS the descent: the view
+// sinks past the surface, the rails and the light shafts, a whale glides across the glass halfway down,
+// and the lit towers of the city rise into the glass, the depth gauge swinging with every metre. His
+// name buzzes on as a neon sign, letter by letter, and the headline and actions rise beside it.
 //
-// Pattern: CSS only, one trigger. useSectionTrigger adds data-on once the header is in view; every phase
-// is a CSS delay off that switch (descent.module.css: shutter 0.15 to 1.25 s, the sink 0.3 to 2.7 s,
-// windows at 1.6 s, letters from 1.7 s 60 ms apart, text and actions from 2.2 s), so React renders once
-// and the ride never replays. The far towers, the near towers and the glare on the glass shift apart
-// with the pointer (--mx, --my from the root). Reduced motion shows the city and the lit sign at once.
+// Pattern: the shutter and the sign are CSS delays off one trigger (data-on from useSectionTrigger:
+// shutter 0.15 to 1.25 s, letters from 0.9 s 60 ms apart, text and actions from 1.4 s). The sink, the
+// whale, the needle and the windows read --scene-progress, which the shared scroll engine writes on the
+// porthole over the first 70 percent of a screen of scroll, so React never renders per frame and the
+// ride, once at the bottom, stays there. The far towers, the near towers and the glare shift apart with
+// the pointer (--mx, --my from the root). Reduced motion starts the scene done: the city and the lit sign.
 
 const BOLTS = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4)
 const GAUGE_TICKS = Array.from({ length: 9 }, (_, i) => -120 + i * 30)
@@ -102,6 +105,14 @@ function Shaft() {
       {[0, 1, 2, 3, 4].map((i) => (
         <path key={i} d={`M${30 + i * 9} ${262 + (i % 2) * 6} l6 -2 l-6 -2 l2 2 Z`} fill={C.waterGlow} opacity="0.55" />
       ))}
+
+      {/* a whale crossing the descent, far off in the green, its own layer so the scroll can carry it */}
+      <g className={descent.whale}>
+        <path d="M60 300 Q80 286 112 290 Q130 292 140 298 L152 290 L150 302 L156 312 L141 306 Q128 314 106 314 Q76 314 60 300 Z" fill="#0e3a44" />
+        <path d="M76 308 Q96 318 120 312" fill="none" stroke="#1d5560" strokeWidth="1.5" />
+        <circle cx="72" cy="299" r="1.2" fill={C.waterGlow} opacity="0.7" />
+        <path d="M96 312 L90 324 L104 314 Z" fill="#0e3a44" />
+      </g>
 
       {/* the far skyline of the city */}
       {FAR_TOWERS.map(({ x, width, height }) => (
@@ -213,9 +224,14 @@ function DepthGauge() {
 
 const BUBBLE_PLACES = ['left-[28%]', 'left-[52%]', 'left-[70%]']
 
+// The ride runs over the first 70 percent of a screen of scroll from where the page opens.
+const DESCENT_LINES = { start: 0.12, end: -0.58 }
+
 function Porthole() {
+  const { ref } = useScrollScene<HTMLDivElement>(DESCENT_LINES)
+
   return (
-    <div className={`relative mx-auto aspect-square w-60 sm:w-72 lg:w-80 ${descent.follow}`}>
+    <div ref={ref} className={`relative mx-auto aspect-square w-60 sm:w-72 lg:w-80 ${descent.follow}`}>
       <div className="absolute inset-0 overflow-hidden rounded-full bg-[color:var(--deco-abyss)]">
         <div className={`absolute inset-x-0 top-0 h-[300%] ${descent.shaft}`}>
           <div className={`absolute inset-0 ${descent.far}`}>
