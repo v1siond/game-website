@@ -15,6 +15,7 @@ import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/a
 import { FTArtDivider } from './MedievalFantasy/ornaments'
 import { FelPaths, ProfessionNode } from './MedievalFantasy/professions'
 import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy/sections'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Medieval Fantasy: the page composition. Its palette, backdrop, frames, buttons, cards, ornaments and
 // per profession sections live in ./MedievalFantasy.
@@ -92,7 +93,7 @@ export default function MedievalFantasyTheme() {
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <HeroActions actions={actions} zone="roc" />
                       <RealmButton href="/cv" zone="roc">{actionLabels.cv}</RealmButton>
-                      <RealmButton href="/personal-projects/game-engine" zone="roc">{actionLabels.engine}</RealmButton>
+                      <RealmButton linkProps={ENGINE_LINK} zone="roc">{actionLabels.engine}</RealmButton>
                       <LanguageSwitcher render={(state) => <RealmLanguageMenu {...state} />} />
                     </div>
                   </div>

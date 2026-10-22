@@ -1,6 +1,7 @@
 'use client'
 
 import { ErrorScreen } from './ErrorScreen'
+import { ENGINE_URL } from '@/lib/engineLink'
 
 /**
  * The three failures the site can actually show, written once.
@@ -16,7 +17,7 @@ import { ErrorScreen } from './ErrorScreen'
 
 /** Where every screen can always send someone. Absolute paths: a failed page may have a broken router. */
 const HOME = '/'
-const GAME_ENGINE = '/personal-projects/game-engine'
+const GAME_ENGINE = ENGINE_URL
 
 /** 404, the address matches nothing. */
 export function NotFoundScreen() {

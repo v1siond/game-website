@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import look from './jungle.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The jungle's buttons, in the hero and again on the contact sign: email is the sun gold primary, the
 // rest are wooden. Each is 44px tall at least and has the world's gold focus ring.
@@ -36,7 +37,7 @@ export function JungleCVLink() {
 export function JunglePortfolioLink() {
   const { actions } = useLabels()
   return (
-    <Link href="/personal-projects/game-engine" className={WOOD_BUTTON}>
+    <Link {...ENGINE_LINK} className={WOOD_BUTTON}>
       {actions.portfolio}
     </Link>
   )

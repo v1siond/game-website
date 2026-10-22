@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import ui from './warped.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's actions, in the arrival and again at the level end: fat rounded buttons with a glossy top
 // and a hard bottom edge that press down a step on hover and click. Email is lit in the fruit orange,
@@ -36,7 +37,7 @@ export function CVLink() {
 export function DemoLink() {
   const { actions } = useLabels()
   return (
-    <Link href="/personal-projects/game-engine" className={`${ui.button} ${ui.gold}`}>
+    <Link {...ENGINE_LINK} className={`${ui.button} ${ui.gold}`}>
       {actions.playDemo}
     </Link>
   )

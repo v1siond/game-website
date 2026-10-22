@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import atomic from './atomic.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's actions as rows of the terminal's menu: the green text on the glass, and under the
 // pointer or focus the row inverts (the phosphor bar fills in from the left, the text turns glass dark),
@@ -44,7 +45,7 @@ export function ActionMenu({ className = '' }: { className?: string }) {
               </Link>
             </li>
             <li>
-              <Link href="/personal-projects/game-engine" className={MENU_ROW} aria-label={actions.viewEngine}>
+              <Link {...ENGINE_LINK} className={MENU_ROW} aria-label={actions.viewEngine}>
                 <Row>{actions.engine}</Row>
               </Link>
             </li>

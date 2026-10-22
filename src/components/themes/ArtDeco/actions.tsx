@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons: email is the gold primary action, everything else the gold outline.
 
@@ -35,7 +36,7 @@ export function CVLink() {
 export function PortfolioLink() {
   const { actions } = useLabels()
   return (
-    <Link href="/personal-projects/game-engine" className={GOLD_OUTLINE}>
+    <Link {...ENGINE_LINK} className={GOLD_OUTLINE}>
       {actions.portfolio}
     </Link>
   )

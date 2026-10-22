@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import look from './world.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons, typed labels on worn plates: email is the lit rust plate, LinkedIn, the CV and the
 // portfolio the plain dark ones.
@@ -38,7 +39,7 @@ export function PortfolioLink() {
   const { actions } = useLabels()
 
   return (
-    <Link href="/personal-projects/game-engine" className={PLAIN}>
+    <Link {...ENGINE_LINK} className={PLAIN}>
       {actions.portfolio}
     </Link>
   )

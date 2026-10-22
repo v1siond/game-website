@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's actions, in the hero and again in the contact section: email, LinkedIn, the CV, and the
 // link out to Nebulith.
@@ -42,7 +43,7 @@ export function EngineLink() {
   const { actions } = useLabels()
 
   return (
-    <Link href="/personal-projects/game-engine" className={`${NOIR_BUTTON} ${LOOK.paper}`}>
+    <Link {...ENGINE_LINK} className={`${NOIR_BUTTON} ${LOOK.paper}`}>
       {actions.engine}
     </Link>
   )

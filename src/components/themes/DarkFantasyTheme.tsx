@@ -27,6 +27,7 @@ import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Abstract spirit wisp - optimized: no SVG filter
 const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.ethereal }: { size?: number; color?: string }) {
@@ -1811,7 +1812,7 @@ export default function DarkFantasyTheme() {
               {actionLabels.cv}
             </Link>
             <Link
-              href="/personal-projects/game-engine"
+              {...ENGINE_LINK}
               className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
             >
               <span className="hidden sm:inline">{actionLabels.engine}</span>

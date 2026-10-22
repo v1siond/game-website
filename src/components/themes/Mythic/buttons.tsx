@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import u from './underworld.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons: carved capitals on a gold, blood or stone slab with a dark drop under it; they
 // lift on hover and press into the drop on a click (underworld.module.css, "buttons").
@@ -42,7 +43,7 @@ export function ContactActions({ actions }: { actions: readonly HeroActionSlot[]
       <Link href="/cv" className={slabClass('stone')}>
         {labels.cv}
       </Link>
-      <Link href="/personal-projects/game-engine" aria-label={labels.viewEngine} className={slabClass('stone')}>
+      <Link {...ENGINE_LINK} aria-label={labels.viewEngine} className={slabClass('stone')}>
         {labels.engine}
       </Link>
     </>

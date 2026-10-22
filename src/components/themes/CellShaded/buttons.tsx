@@ -3,6 +3,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import cel from './cel.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons: a heavy ink frame, a hard ink drop and the display lettering; they tilt up on
 // hover and press flat into their drop on a click (cel.module.css, "buttons"). The tone picks the fill.
@@ -43,7 +44,7 @@ export function ContactActions({ actions }: { actions: readonly HeroActionSlot[]
       <Link href="/cv" className={inkClass('paper')}>
         {labels.cv}
       </Link>
-      <Link href="/personal-projects/game-engine" aria-label={labels.viewEngine} className={inkClass('sun')}>
+      <Link {...ENGINE_LINK} aria-label={labels.viewEngine} className={inkClass('sun')}>
         {labels.engine}
       </Link>
     </>

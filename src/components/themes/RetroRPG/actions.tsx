@@ -6,6 +6,7 @@ import { MONO, PIXEL } from './palette'
 import { PixelIcon, type IconId } from './icons'
 import { Soul } from './soul'
 import world from './world.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Retro RPG's two kinds of button, both from the encounter screen:
 // - a command: the orange bordered button of the command row, with its pixel icon in the slot on the
@@ -87,7 +88,7 @@ export function ActionOptions({ actions, className = '' }: { actions: HeroAction
         <PageOption href="/cv" label={labels.cv} />
       </li>
       <li>
-        <PageOption href="/personal-projects/game-engine" label={labels.engineShort} />
+        <PageOption {...ENGINE_LINK} label={labels.engineShort} />
       </li>
     </ul>
   )

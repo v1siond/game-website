@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import ashen from './ashen.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons, cut like the game's menu entries: carved capitals on dark stone between two thin
 // gold rules, the lit highlight sweeping in behind the word on hover and focus. Email is the lit one (gold
@@ -42,7 +43,7 @@ export function CVLink() {
 export function EngineLink() {
   const { actions } = useLabels()
   return (
-    <Link href="/personal-projects/game-engine" aria-label={actions.viewEngine} className={BUTTON}>
+    <Link {...ENGINE_LINK} aria-label={actions.viewEngine} className={BUTTON}>
       {actions.engine}
     </Link>
   )

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import world from './world.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Silhouette's buttons, on the offset block (world.module.css): email is lit fog white, LinkedIn, the CV
 // and the engine are outlined in it.
@@ -40,7 +41,7 @@ export function CVLink() {
 export function PlayLink() {
   const { actions } = useLabels()
   return (
-    <Link href="/personal-projects/game-engine" className={`${BUTTON} ${LIT}`}>
+    <Link {...ENGINE_LINK} className={`${BUTTON} ${LIT}`}>
       {actions.enter.toLowerCase()}
     </Link>
   )

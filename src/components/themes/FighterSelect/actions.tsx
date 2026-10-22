@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import look from './world.module.css'
+import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons, flat arcade blocks with a hard black drop: email is the yellow primary action
 // (the colour of a full life bar), LinkedIn, the CV and the portfolio player one blue on black.
@@ -38,7 +39,7 @@ export function PortfolioLink() {
   const { actions } = useLabels()
 
   return (
-    <Link href="/personal-projects/game-engine" className={BLUE_OUTLINE}>
+    <Link {...ENGINE_LINK} className={BLUE_OUTLINE}>
       {actions.portfolio}
     </Link>
   )

@@ -2,6 +2,7 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { ErrorScreen } from '@/components/ErrorScreen'
 import { NotFoundScreen, ServerErrorScreen, CrashScreen } from '@/components/errorScreens'
 import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from '@/themes/themes'
+import { ENGINE_URL } from '@/lib/engineLink'
 
 /**
  * The screen reads the chosen world straight from storage (no provider), so drive getItem.
@@ -141,7 +142,7 @@ describe('the three screens the routes render', () => {
     expect(screen.getByRole('link', { name: 'Go to the home page' })).toHaveAttribute('href', '/')
     expect(screen.getByRole('link', { name: 'Open the game engine' })).toHaveAttribute(
       'href',
-      '/personal-projects/game-engine',
+      ENGINE_URL,
     )
   })
 
