@@ -26,10 +26,10 @@ import s from './sprite.module.css'
 // are groups sprite.module.css turns round their own joints (transform and opacity only). A one shot
 // motion runs a clock animation on the root group and reports its end through onDone.
 
-export type DecoMotion = 'still' | 'idle' | 'walk' | 'swing' | 'zap' | 'drum' | 'strike' | 'revive' | 'listen'
+export type DecoMotion = 'still' | 'idle' | 'walk' | 'swing' | 'zap' | 'drum' | 'strike' | 'revive' | 'listen' | 'pull'
 
 /** The one shot motions; the rest loop. */
-export const ONE_SHOT: ReadonlySet<DecoMotion> = new Set(['swing', 'zap', 'drum', 'strike', 'revive'])
+export const ONE_SHOT: ReadonlySet<DecoMotion> = new Set(['swing', 'zap', 'drum', 'strike', 'revive', 'pull'])
 
 /** Each profession's action, the way the survivor would do that job. */
 export const PROFESSION_ACTION: Record<Profession, DecoMotion> = {
@@ -48,6 +48,7 @@ const MOTION_CLASS: Record<DecoMotion, string> = {
   strike: s.strike,
   revive: s.revive,
   listen: s.listen,
+  pull: s.pull,
 }
 
 const KIT_CLASS: Record<Profession, string> = {

@@ -123,6 +123,7 @@
 .drum { animation: clock 1.6s linear both; }
 .strike { animation: clock 1.8s linear both; }
 .revive { animation: clock 1.8s linear both; }
+.pull { animation: clock 1.2s linear both; }
 
 @keyframes clock {
   from { opacity: 1; }
@@ -276,4 +277,34 @@
 @keyframes walk-in {
   from { transform: translateX(-70%); }
   to { transform: translateX(0); }
+}
+
+/* ---------------------------------------------------------------- pull: the free hand reaches up for a banner cord and yanks it down */
+.pull .armFront { animation: pull-arm 1.2s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.pull .foreFront { animation: pull-fore 1.2s cubic-bezier(0.4, 0, 0.2, 1) both; }
+.pull .chest { animation: pull-lean 1.2s ease-in-out both; }
+.pull .body { animation: pull-dip 1.2s ease-in-out both; }
+
+@keyframes pull-arm {
+  0%, 100% { transform: rotate(0deg); }
+  30%, 42% { transform: rotate(-165deg); }
+  68% { transform: rotate(-40deg); }
+  82% { transform: rotate(-30deg); }
+}
+
+@keyframes pull-fore {
+  0%, 100% { transform: rotate(0deg); }
+  30%, 42% { transform: rotate(-12deg); }
+  68%, 82% { transform: rotate(-105deg); }
+}
+
+@keyframes pull-lean {
+  0%, 100% { transform: rotate(0deg); }
+  30%, 42% { transform: rotate(-4deg); }
+  68% { transform: rotate(5deg); }
+}
+
+@keyframes pull-dip {
+  0%, 42%, 100% { transform: translateY(0); }
+  68% { transform: translateY(3px); }
 }

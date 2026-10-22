@@ -83,8 +83,10 @@ function Sister() {
       <circle cx="142" cy="102" r="1.4" fill={C.portCalm} />
       <circle cx="148" cy="102" r="1.4" fill={C.portCalm} />
       {/* the long needle held down at her side */}
-      <path d="M158 116 L170 136" stroke={C.steel} strokeWidth="2.2" strokeLinecap="round" />
-      <path d="M170 136 L176 146" stroke={C.ivory} strokeWidth="0.9" />
+      <path d="M155 113 Q160 120 159 128" fill="none" stroke={HAND_SKIN} strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="159" cy="128" r="2.2" fill={HAND_SKIN} />
+      <path d="M156 122 L166 142" stroke={C.steel} strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M166 142 L170 150" stroke={C.ivory} strokeWidth="0.9" />
     </g>
   )
 }

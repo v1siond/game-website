@@ -5,7 +5,8 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { Profession } from '@/lib/cv/professions'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { CompanyCard, TechCloud } from './cards'
+import { TechCloud } from './cards'
+import { PropagandaBanners } from './ventures'
 import { BrassPanel, Chamber } from './plaque'
 import { DiaryShelf } from './diary'
 import { ResearchBoard } from './camera'
@@ -19,8 +20,8 @@ import { GuardianStreet } from './guardian'
 // The picked profession's sections, each a chamber one level deeper in the city (the plaque's gauge
 // reads the depth), and in each he or the city does something different: he powers the dark about room
 // with the bolt, listens to the job diaries, walks the tech stack's glass tunnel, hacks the pipes that
-// lift the projects shutter; the ventures stand on brass cards; the guardian pair walks behind the band
-// marquees; he fights on the theatre stage for the Muay Thai record.
+// lift the projects shutter, pulls the cords that drop the ventures' propaganda banners; the guardian
+// pair walks behind the band marquees; he fights on the theatre stage for the Muay Thai record.
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -60,15 +61,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       <FadeInScene>
         <Chamber title={labels.sections.ventures} depth={4}>
-          <BrassPanel>
-            <ul className="grid gap-5 md:grid-cols-3">
-              {sections.companies.map((company) => (
-                <li key={company.id}>
-                  <CompanyCard company={company} />
-                </li>
-              ))}
-            </ul>
-          </BrassPanel>
+          <PropagandaBanners companies={sections.companies} />
         </Chamber>
       </FadeInScene>
     </div>

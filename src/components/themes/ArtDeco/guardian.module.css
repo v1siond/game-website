@@ -10,8 +10,16 @@
 }
 
 .pair {
-  transform: translate3d(calc((1 - var(--scene-progress, 0)) * (100cqw - 11rem)), 0, 0);
+  --pair-width: 11rem;
+  transform: translate3d(calc((1 - var(--scene-progress, 0)) * (100cqw - var(--pair-width))), 0, 0);
   cursor: pointer;
+}
+
+/* sm and up the pair is w-52, so the walk ends a wider figure from the edge */
+@media (min-width: 640px) {
+  .pair {
+    --pair-width: 13rem;
+  }
 }
 
 .pair:focus-visible {
