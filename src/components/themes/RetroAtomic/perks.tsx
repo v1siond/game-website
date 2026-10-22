@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react'
+import type { ReactNode } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { DwellerSprite, type DwellerMotion } from './dweller'
@@ -9,15 +9,18 @@ import atomic from './atomic.module.css'
 // paper, flat poster blue, ink outlines, the sunburst behind). The facts are the chart's columns, each
 // headed by its term on a blue band; each achievement is a perk card with him on it in the mascot style
 // (the poster tone, outlined in ink), each card in its own pose: the thumbs up, the knee and kick,
-// the targeting stance. When the section's trigger fires the cards flip in one after another (rotateY with
-// perspective, staggered by --i) and the star stamps down; under the pointer a card lifts, he hops and
-// the star turns.
+// the targeting stance. The chart's title and each perk's words are cut out and pasted on tilted pastel
+// blocks, the way the game prints its perk book covers (research special-chart, youre-special); the
+// blocks are drawn for the eye and the plain text sits beside them for screen readers. The spar
+// (spar.tsx) decides when each card shows: as his strike lands its card flips in (rotateY with
+// perspective) and the star stamps down; the ring it hands over is printed just above the cards. Under
+// the pointer a card lifts, he hops and the star turns.
 
 const POSES: DwellerMotion[] = ['thumbsUp', 'strike', 'target']
 
 function Sunburst() {
   return (
-    <svg viewBox="0 0 200 200" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice" className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <rect width="200" height="200" fill={SHELTER_YELLOW} />
       {Array.from({ length: 16 }, (_, ray) => (
         <path key={ray} d="M100 100 L92 -40 L108 -40 Z" fill={CREAM} opacity="0.55" transform={`rotate(${ray * 22.5} 100 100)`} />
@@ -34,9 +37,39 @@ function Star() {
   )
 }
 
-function PerkCard({ achievement, index }: { achievement: string; index: number }) {
+/** Text cut out letter by letter, each word kept on one line, every letter on its own tilted block. */
+function CutOutLetters({ text }: { text: string }) {
   return (
-    <div className={`relative flex h-full flex-col overflow-hidden ${atomic.perkCard}`} style={{ '--i': index } as CSSProperties}>
+    <span className="flex flex-wrap gap-x-4 gap-y-2" aria-hidden="true">
+      {text.split(' ').map((word, at) => (
+        <span key={`${word}-${at}`} className="inline-flex whitespace-nowrap">
+          {[...word].map((letter, place) => (
+            <span key={place} className={atomic.cutLetter}>
+              {letter}
+            </span>
+          ))}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+/** Text cut out word by word, every word on its own tilted block. */
+function CutOutWords({ text }: { text: string }) {
+  return (
+    <span className="flex flex-wrap content-start gap-x-1.5 gap-y-2" aria-hidden="true">
+      {text.split(' ').map((word, at) => (
+        <span key={`${word}-${at}`} className={atomic.cutWord}>
+          {word}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+function PerkCard({ achievement, index, shown }: { achievement: string; index: number; shown: boolean }) {
+  return (
+    <div className={`relative flex h-full flex-col overflow-hidden ${atomic.perkCard}`} data-shown={shown || undefined}>
       <div className="relative h-44 overflow-hidden border-b-4 border-atomic-poster-ink">
         <Sunburst />
         <div className={`absolute inset-x-0 bottom-0 mx-auto h-40 w-28 ${atomic.perkHop}`}>
@@ -46,17 +79,31 @@ function PerkCard({ achievement, index }: { achievement: string; index: number }
           <Star />
         </span>
       </div>
-      <p className="flex-1 bg-atomic-cream p-4 text-base font-bold leading-snug text-atomic-poster-ink">{achievement}</p>
+      <p className="flex-1 bg-atomic-cream p-4 text-base text-atomic-poster-ink">
+        <span className="sr-only">{achievement}</span>
+        <CutOutWords text={achievement} />
+      </p>
     </div>
   )
 }
 
-export function PerkChart({ martialArts }: { martialArts: MartialArts }) {
-  const { achievements } = martialArts.primary
+interface PerkChartProps {
+  martialArts: MartialArts
+  // How many achievements have been earned in the spar so far, and the ring printed above their cards.
+  shown: number
+  ring: ReactNode
+}
+
+export function PerkChart({ martialArts, shown, ring }: PerkChartProps) {
+  const { achievements, title } = martialArts.primary
 
   return (
-    <div className={`relative p-5 sm:p-8 ${atomic.posterPaper}`}>
-      <h3 className="mb-6 text-2xl font-bold uppercase tracking-wide text-atomic-poster-ink sm:text-3xl">{martialArts.primary.title}</h3>
+    <div className={`relative flex flex-col p-5 sm:p-8 ${atomic.posterPaper}`}>
+      <h3 className="mb-8 text-xl text-atomic-poster-ink sm:text-3xl">
+        <span className="sr-only">{title}</span>
+        <CutOutLetters text={title} />
+      </h3>
+      <div className="order-1">{ring}</div>
       <MuayThaiRecord
         martialArts={martialArts}
         classNames={{
@@ -64,10 +111,13 @@ export function PerkChart({ martialArts }: { martialArts: MartialArts }) {
           fact: `overflow-hidden border-4 border-atomic-poster-ink bg-atomic-cream ${atomic.posterDrop}`,
           term: 'bg-atomic-poster-blue px-3 py-2 text-sm font-bold uppercase tracking-widest text-atomic-cream',
           value: 'px-3 py-3 text-base text-atomic-poster-ink',
-          achievements: 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3',
+          achievements: 'order-2 grid gap-6 sm:grid-cols-2 lg:grid-cols-3',
           achievement: 'h-full',
         }}
-        renderAchievement={(achievement) => <PerkCard achievement={achievement} index={achievements.indexOf(achievement)} />}
+        renderAchievement={(achievement) => {
+          const index = achievements.indexOf(achievement)
+          return <PerkCard achievement={achievement} index={index} shown={index < shown} />
+        }}
       />
     </div>
   )

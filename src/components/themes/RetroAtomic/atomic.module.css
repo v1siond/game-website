@@ -698,12 +698,13 @@
   transition: transform 200ms ease-out;
 }
 
-.stage:not([data-on]) .perkCard {
+/* A card shows when the spar's strike for it lands (spar.tsx sets data-shown). */
+.perkCard:not([data-shown]) {
   opacity: 0;
 }
 
-.stage[data-on] .perkCard {
-  animation: flipIn 620ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--i, 0) * 130ms) both;
+.perkCard[data-shown] {
+  animation: flipIn 620ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .perkCard:hover {
@@ -722,12 +723,54 @@
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.stage[data-on] .perkStar {
-  animation: stamp 360ms cubic-bezier(0.5, 0, 0.75, 0) calc(var(--i, 0) * 130ms + 520ms) both;
+.perkCard[data-shown] .perkStar {
+  animation: stamp 360ms cubic-bezier(0.5, 0, 0.75, 0) 520ms both;
 }
 
 .perkCard:hover .perkStar {
   transform: rotate(72deg);
+}
+
+/* The cut out lettering: black serif letters on pastel blocks pasted at a tilt, the colour and the tilt
+   cycling so no two neighbours match. */
+.cutLetter,
+.cutWord {
+  display: inline-block;
+  border: 2px solid theme('colors.atomic.cream');
+  background: theme('colors.atomic.cut-tan');
+  box-shadow: 2px 2px 0 theme('colors.atomic.poster-ink / 0.55');
+  color: theme('colors.atomic.poster-ink');
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 700;
+  transform: rotate(-4deg);
+}
+
+.cutLetter {
+  padding: 0.05em 0.14em;
+  font-size: 1.15em;
+  line-height: 1.1;
+}
+
+.cutWord {
+  padding: 0.1em 0.35em;
+  line-height: 1.25;
+}
+
+.cutLetter:nth-child(4n + 2),
+.cutWord:nth-child(3n + 2) {
+  background: theme('colors.atomic.cut-mint');
+  transform: rotate(3deg) translateY(0.12em);
+}
+
+.cutLetter:nth-child(4n + 3),
+.cutWord:nth-child(3n) {
+  background: theme('colors.atomic.cut-blue');
+  transform: rotate(-1.5deg) translateY(-0.1em);
+}
+
+.cutLetter:nth-child(4n) {
+  background: theme('colors.atomic.cut-pink');
+  transform: rotate(5deg);
 }
 
 @keyframes flipIn {
@@ -869,8 +912,8 @@
   .powerOn,
   .device[data-booted] .tube,
   .stage[data-on] .cardOn,
-  .stage[data-on] .perkCard,
-  .stage[data-on] .perkStar,
+  .perkCard[data-shown],
+  .perkCard[data-shown] .perkStar,
   .device[data-on] .sectionPower,
   .target[data-shot='hit'] {
     animation-duration: 1ms;

@@ -36,7 +36,8 @@ import s from './dweller.module.css'
 // sleeves tied, bare chested with wrapped hands and his own mongkhon, whose action is the knee then the
 // side kick. Every one can idle (bounce, blink), walk the jaunty poster walk, take the targeting stance
 // with the bracket reticle, and give the level up thumbs up with a wink and a star. The bands section has
-// him hold the bakelite radio to his chest, turn its knob and dance each station's step.
+// him hold the bakelite radio to his chest, turn its knob and dance each station's step; the Muay Thai
+// spar has the clinch knee and the roundhouse kick, both landing on the foe at his left (the viewer's right).
 
 export type DwellerTone = 'poster' | 'phosphor'
 export type DwellerMotion =
@@ -56,6 +57,8 @@ export type DwellerMotion =
   | 'twist'
   | 'shuffle'
   | 'bop'
+  | 'knee'
+  | 'kick'
 
 /** The radio dance's motions: he holds the bakelite radio in all of them. */
 export type RadioMotion = Extract<DwellerMotion, 'tune' | 'sway' | 'twist' | 'shuffle' | 'bop'>
@@ -77,6 +80,8 @@ const HOLDS_RADIO: Record<DwellerMotion, boolean> = {
   twist: true,
   shuffle: true,
   bop: true,
+  knee: false,
+  kick: false,
 }
 
 /** Each profession's action, the way the dweller would do that job. */
@@ -103,6 +108,8 @@ const MOTION_CLASS: Record<DwellerMotion, string> = {
   twist: `${s.holdRadio} ${s.twist}`,
   shuffle: `${s.holdRadio} ${s.shuffle}`,
   bop: `${s.holdRadio} ${s.bop}`,
+  knee: s.knee,
+  kick: s.kick,
 }
 
 const KIT_CLASS: Record<Profession, string> = {

@@ -44,6 +44,18 @@ export const RUST = '#9a4a1c'
 export const WARNING_RED = '#d8392b'
 export const WARNING_RED_LIGHT = '#ff6b5c'
 
+// MUTANT: the spar foe's olive green hide, its ochre highlight and its shade (research mutant-brute).
+export const MUTANT = '#6f7a3a'
+export const MUTANT_LIGHT = '#b8a24a'
+export const MUTANT_SHADE = '#4f5828'
+
+// CUT OUT: the pastel blocks the poster letters are pasted on, tan, mint, blue grey and pink (research
+// special-chart). Ink on each measures over 9:1.
+export const CUTOUT_TAN = '#dcb98e'
+export const CUTOUT_MINT = '#bcdab4'
+export const CUTOUT_BLUE = '#b2c2d2'
+export const CUTOUT_PINK = '#e8b3a8'
+
 // BACKGROUNDS AND TEXT: the shelter's dark, the panel behind the device, the grey of worn lettering.
 export const INK = '#0b0c09'
 export const PANEL = '#121410'
@@ -79,6 +91,10 @@ export const ATOMIC_COLORS = {
   rust: RUST,
   red: WARNING_RED,
   'red-light': WARNING_RED_LIGHT,
+  'cut-tan': CUTOUT_TAN,
+  'cut-mint': CUTOUT_MINT,
+  'cut-blue': CUTOUT_BLUE,
+  'cut-pink': CUTOUT_PINK,
   ink: INK,
   panel: PANEL,
   bunker: BUNKER,

@@ -1,0 +1,86 @@
+/*
+ * The spar foe's motion (mutant.tsx): transform and opacity only, each part turning round its own joint in
+ * the viewBox's units. He faces left, so a positive turn swings a limb forward (toward the viewer's left).
+ * guard: fists up before the face, the bulk heaving. kneed and kicked are one shot reactions that end back
+ * in the guard; down is the end of the spar, dropped to the far knee with a fist on the near one.
+ * Checked as pictures in poses/spar-mutant.png.
+ */
+
+.sprite * { transform-box: view-box; }
+
+.body { transform-origin: 66px 146px; }
+.torso { transform-origin: 66px 96px; }
+.head { transform-origin: 42px 52px; }
+.armNear { transform-origin: 48px 50px; }
+.foreNear { transform-origin: 42px 75px; }
+.armFar { transform-origin: 74px 50px; }
+.foreFar { transform-origin: 68px 75px; }
+.thighNear { transform-origin: 56px 96px; }
+.shinNear { transform-origin: 54px 120px; }
+.thighFar { transform-origin: 78px 96px; }
+.shinFar { transform-origin: 76px 120px; }
+
+/* ---------------------------------------------------------------- the guard, also the rest of both reactions */
+
+.guard .armNear, .kneed .armNear, .kicked .armNear { transform: rotate(25deg); }
+.guard .foreNear, .kneed .foreNear, .kicked .foreNear { transform: rotate(110deg); }
+.guard .armFar, .kneed .armFar, .kicked .armFar { transform: rotate(35deg); }
+.guard .foreFar, .kneed .foreFar, .kicked .foreFar { transform: rotate(112deg); }
+
+.guard .body { animation: heave 1.6s ease-in-out infinite; }
+.guard .foreNear { animation: fist-bob 1.6s ease-in-out infinite; }
+
+@keyframes heave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.975); }
+}
+
+@keyframes fist-bob {
+  0%, 100% { transform: rotate(110deg); }
+  50% { transform: rotate(120deg); }
+}
+
+/* ---------------------------------------------------------------- the knee to the gut: he doubles over it */
+
+.kneed .body { animation: kneed-body 0.8s ease-out both; }
+.kneed .torso { animation: kneed-torso 0.8s ease-out both; }
+.kneed .head { animation: kneed-head 0.8s ease-out both; }
+.kneed .armNear { animation: kneed-arm 0.8s ease-out both; }
+.kneed .foreNear { animation: kneed-fore 0.8s ease-out both; }
+
+@keyframes kneed-body { 0%, 100% { transform: translateX(0); } 25%, 55% { transform: translateX(6px); } }
+@keyframes kneed-torso { 0%, 100% { transform: rotate(0deg); } 25%, 55% { transform: rotate(-22deg); } }
+@keyframes kneed-head { 0%, 100% { transform: rotate(0deg); } 25%, 55% { transform: rotate(-16deg); } }
+@keyframes kneed-arm { 0%, 100% { transform: rotate(25deg); } 25%, 55% { transform: rotate(-5deg); } }
+@keyframes kneed-fore { 0%, 100% { transform: rotate(110deg); } 25%, 55% { transform: rotate(55deg); } }
+
+/* ---------------------------------------------------------------- the kick to the head: he rocks back, arms flung */
+
+.kicked .body { animation: kicked-body 0.8s ease-out both; }
+.kicked .head { animation: kicked-head 0.8s ease-out both; }
+.kicked .armNear { animation: kicked-arm-n 0.8s ease-out both; }
+.kicked .foreNear { animation: kicked-fore-n 0.8s ease-out both; }
+.kicked .armFar { animation: kicked-arm-f 0.8s ease-out both; }
+
+@keyframes kicked-body { 0%, 100% { transform: rotate(0deg); } 25%, 55% { transform: translateX(7px) rotate(9deg); } }
+@keyframes kicked-head { 0%, 100% { transform: rotate(0deg); } 25%, 55% { transform: rotate(24deg); } }
+@keyframes kicked-arm-n { 0%, 100% { transform: rotate(25deg); } 25%, 55% { transform: rotate(-40deg); } }
+@keyframes kicked-fore-n { 0%, 100% { transform: rotate(110deg); } 25%, 55% { transform: rotate(40deg); } }
+@keyframes kicked-arm-f { 0%, 100% { transform: rotate(35deg); } 25%, 55% { transform: rotate(-60deg); } }
+
+/* ---------------------------------------------------------------- down: on the far knee, the head bowed */
+
+.down .body { transform: translateY(18px); }
+.down .torso { transform: rotate(-10deg); }
+.down .head { transform: rotate(-14deg); }
+.down .thighNear { transform: rotate(72deg); }
+.down .shinNear { transform: rotate(-78deg); }
+.down .thighFar { transform: rotate(-6deg); }
+.down .shinFar { transform: rotate(-84deg); }
+.down .armNear { transform: rotate(18deg); }
+.down .foreNear { transform: rotate(40deg); }
+.down .armFar { transform: rotate(8deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite, .sprite * { animation: none !important; }
+}
