@@ -32,13 +32,13 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       </Stage>
 
       {sections.jobs.length > 0 && (
-        <Stage title={titles.workExperience} zone="depths">
+        <Stage title={titles.workExperience} zone="storm">
           <Trials jobs={sections.jobs} />
         </Stage>
       )}
 
       {sections.techStack.length > 0 && (
-        <Stage title={titles.techStack} zone="depths">
+        <Stage title={titles.techStack} zone="storm">
           <Climb categories={sections.techStack} />
         </Stage>
       )}
@@ -65,7 +65,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   const titles = useLabels().sections
 
   return (
-    <Stage title={titles.bands} zone="fields">
+    <Stage title={titles.bands} zone="rhodes">
       <Portraits musician={sections.musician} bands={sections.bands} />
     </Stage>
   )
@@ -75,7 +75,7 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
   const titles = useLabels().sections
 
   return (
-    <Stage title={titles.muayThai} zone="fields">
+    <Stage title={titles.muayThai} zone="rhodes">
       <Prophecies martialArts={sections.martialArts} />
     </Stage>
   )

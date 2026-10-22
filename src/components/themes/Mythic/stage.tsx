@@ -11,7 +11,7 @@ import u from './underworld.module.css'
 // (depths.tsx) to that region.
 
 /** The regions the page goes down, top to bottom. */
-export type Zone = 'hall' | 'depths' | 'magma' | 'fields' | 'temple'
+export type Zone = 'hall' | 'storm' | 'magma' | 'rhodes' | 'olympus'
 
 interface House {
   // Counts the visitor's returns to the house from the last gate; the hero replays the rise on each.

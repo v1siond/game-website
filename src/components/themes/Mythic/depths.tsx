@@ -1,13 +1,11 @@
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
-// The fixed painting behind the page, one layer per region the page goes down: the great hall of
-// crimson marble with its braziers (the pool itself is the one he rises from, poolRise.tsx), the teal
-// brick vaults with their soul lamps, the basalt and the magma river, the gold light over the green
-// fields with their broken columns, and the red temple under the surface's dawn. Each region keeps its
-// own furniture: the braziers burn only in the hall, whole columns stand only in the hall and the
-// temple, the fields hold only their ruins. The root's data-zone fades the region in view up (stage.tsx);
-// each region's far and near art drifts against the pointer at two depths (--mx, --my).
+// The fixed painting behind the page, one era per stretch of the CV: the great hall of crimson marble
+// with its braziers (hero, about), the storm sea with the serpent (work history, tech stack), the basalt
+// and the magma river (projects, ventures), Rhodes at night under the bronze giant (bands, muay thai) and
+// Olympus at dawn (contact). The root's data-zone fades the era in view up (stage.tsx) and only that era
+// runs its own clock (the .era parts sit paused otherwise); each era drifts against the pointer (--mx, --my).
 
 const INK = MYTH.inkLine
 
@@ -88,24 +86,43 @@ function HallArt() {
   )
 }
 
-function DepthsArt() {
+// The storm sea of the first game: rain driving at a slant, lightning every 7 s, the swell rolling under a
+// broken mast with its torn sail, the serpent's near head rising out of the sea to lunge with its jaw open
+// and sinking again, a second head swaying far off.
+function StormArt() {
+  const e = u.era
   return (
     <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
-      {[0, 400, 800].map((x) => (
-        <g key={x}>
-          <path d={`M${x} 800 L${x} 260 Q${x + 200} 60 ${x + 400} 260 L${x + 400} 800 L${x + 340} 800 L${x + 340} 290 Q${x + 200} 150 ${x + 60} 290 L${x + 60} 800 Z`} fill={MYTH.brick} stroke={INK} strokeWidth={4} />
-          {[340, 420, 500, 580, 660, 740].map((y) => (
-            <path key={y} d={`M${x + 4} ${y} L${x + 56} ${y} M${x + 344} ${y} L${x + 396} ${y}`} stroke={INK} strokeWidth={2} opacity={0.55} />
-          ))}
-        </g>
-      ))}
-      <path d="M0 700 L1200 700 L1200 800 L0 800 Z" fill={MYTH.tartLow} stroke={INK} strokeWidth={3} />
-      {[200, 1000].map((x) => (
-        <g key={x}>
-          <path d={`M${x - 6} 700 L${x - 6} 520 L${x + 6} 520 L${x + 6} 700 Z`} fill={MYTH.steelShade} stroke={INK} strokeWidth={3} />
-          <Flame x={x - 2} y={522} scale={0.9} color={MYTH.soul} core={MYTH.common} />
-        </g>
-      ))}
+      <rect x={0} y={0} width={1200} height={800} fill={MYTH.lightning} className={`${e} ${u.lightning}`} opacity={0} />
+      <path d="M820 0 L780 140 L820 150 L760 320" fill="none" stroke={MYTH.lightning} strokeWidth={5} className={`${e} ${u.lightning}`} />
+      {/* the far head, swaying */}
+      <g className={`${e} ${u.hydraSway}`}>
+        <path d="M960 600 Q930 470 990 400 Q1010 380 1040 392 L1020 410 Q980 440 1000 600 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={3} opacity={0.7} />
+      </g>
+      {/* the near head: neck out of the sea, the skull with its horns and the jaw that opens */}
+      <g className={`${e} ${u.hydraRise}`}>
+        <path d="M250 800 Q200 560 300 420 Q330 380 380 380 L400 420 Q330 450 320 560 Q320 680 360 800 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={4} />
+        <path d="M262 780 Q230 600 300 470" fill="none" stroke={MYTH.hydraBelly} strokeWidth={10} opacity={0.6} />
+        <path d="M300 400 Q330 350 400 360 L480 390 L470 410 L380 420 Z" fill={MYTH.hydra} stroke={INK} strokeWidth={4} />
+        <path d="M330 366 L300 320 L350 356 M370 360 L360 310 L392 358" fill={MYTH.hydra} stroke={INK} strokeWidth={3} />
+        <circle cx={400} cy={378} r={5} fill={MYTH.fireCore} />
+        <path d="M380 418 L470 410 L460 430 L390 440 Z" fill={MYTH.hydraBelly} stroke={INK} strokeWidth={3} className={`${e} ${u.hydraJaw}`} />
+      </g>
+      {/* the broken mast and its torn sail */}
+      <path d="M720 700 L736 260 L748 262 L740 700 Z" fill={MYTH.leather} stroke={INK} strokeWidth={3} />
+      <path d="M700 300 L840 300" stroke={MYTH.leather} strokeWidth={8} />
+      <path d="M742 304 L840 304 L830 420 L800 400 L780 450 L746 430 Z" fill={MYTH.sail} stroke={INK} strokeWidth={3} className={`${e} ${u.sailFlap}`} />
+      {/* the swell */}
+      <g className={`${e} ${u.swell}`}>
+        <path d="M-60 660 Q60 610 180 660 T420 660 T660 660 T900 660 T1140 660 T1380 660 L1380 800 L-60 800 Z" fill={MYTH.sea} stroke={INK} strokeWidth={4} />
+        <path d="M-60 664 Q60 620 180 664 T420 664 T660 664 T900 664 T1140 664 T1380 664" fill="none" stroke={MYTH.seaFoam} strokeWidth={3} opacity={0.7} />
+      </g>
+      {/* the rain, one slanted sheet that loops */}
+      <g className={`${e} ${u.rain}`} opacity={0.35}>
+        {Array.from({ length: 40 }, (_, i) => (
+          <path key={i} d={`M${(i * 37) % 1240} ${((i * 53) % 880) - 80} l-14 44`} stroke={MYTH.seaFoam} strokeWidth={2} />
+        ))}
+      </g>
     </svg>
   )
 }
@@ -122,33 +139,79 @@ function MagmaArt() {
   )
 }
 
-function FieldsArt() {
+// Rhodes at night under the bronze giant: the harbour city with its fires, the giant towering over it with
+// the laurel crown, its blue eyes flaring, its fist rising and smashing the harbour wall every 8 s with a
+// burst of dust, smoke going up from the city.
+function RhodesArt() {
+  const e = u.era
   return (
     <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
-      {[-30, -12, 6, 24].map((angle) => (
-        <path key={angle} d="M600 -40 L560 800 L640 800 Z" fill={MYTH.elyLight} opacity={0.12} transform={`rotate(${angle} 600 -40)`} />
+      {[0, 1, 2].map((plume) => (
+        <circle key={plume} cx={300 + plume * 280} cy={560} r={50} fill={MYTH.smoke} className={`${e} ${u.smoke}`} style={{ animationDelay: `${plume * -4}s` }} />
       ))}
-      <path d="M0 560 Q300 470 620 560 T1200 520 L1200 800 L0 800 Z" fill={MYTH.elyLow} stroke={INK} strokeWidth={4} />
-      <path d="M0 650 Q400 580 800 650 T1200 640 L1200 800 L0 800 Z" fill={MYTH.elyGreen} opacity={0.55} stroke={INK} strokeWidth={3} />
-      <Column x={180} top={420} bottom={600} width={40} tone={MYTH.marbleShade} light={MYTH.marble} broken />
-      <Column x={1040} top={470} bottom={590} width={40} tone={MYTH.marbleShade} light={MYTH.marble} broken />
-      <path d="M1000 470 L1080 452 L1084 468 L1004 486 Z" fill={MYTH.marbleShade} stroke={INK} strokeWidth={3} />
+      {/* the giant: legs astride the harbour, the body, the head with the laurel and the eyes */}
+      <path d="M540 800 L560 520 L600 520 L610 800 Z M640 800 L650 520 L690 520 L700 800 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
+      <path d="M520 540 L540 300 Q620 260 720 300 L740 540 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
+      <path d="M560 320 Q620 300 700 320 L690 420 Q620 440 570 420 Z" fill={MYTH.bronzeGiantLight} opacity={0.45} />
+      <path d="M590 300 L590 200 Q630 160 670 200 L670 300 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
+      <path d="M590 270 Q630 330 670 270 L670 300 Q630 340 590 300 Z" fill={MYTH.giant} stroke={INK} strokeWidth={3} />
+      <path d="M582 200 Q630 150 678 200" fill="none" stroke={MYTH.gold} strokeWidth={7} />
+      <g className={`${e} ${u.giantEyes}`}>
+        <circle cx={612} cy={236} r={6} fill={MYTH.giantEye} />
+        <circle cx={648} cy={236} r={6} fill={MYTH.giantEye} />
+      </g>
+      {/* the far arm hangs, the near arm rises and smashes down from the shoulder */}
+      <path d="M520 320 L470 480 L500 490 L540 340 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
+      <g className={`${e} ${u.giantArm}`}>
+        <path d="M740 300 L860 460 L840 480 L720 330 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
+        <circle cx={860} cy={478} r={26} fill={MYTH.bronzeGiantLight} stroke={INK} strokeWidth={4} />
+      </g>
+      <ellipse cx={880} cy={640} rx={90} ry={40} fill={MYTH.boneShade} className={`${e} ${u.dust}`} />
+      {/* the city and its harbour wall, fires in the windows */}
+      <path d="M0 640 L0 560 L60 560 L60 520 L120 520 L120 590 L200 590 L200 540 L260 540 L260 640 Z M940 640 L940 560 L1000 560 L1000 500 L1060 500 L1060 570 L1140 570 L1140 530 L1200 530 L1200 640 Z" fill={MYTH.city} stroke={INK} strokeWidth={3} />
+      {[[30, 580], [90, 540], [230, 560], [970, 580], [1030, 520], [1170, 550]].map(([x, y]) => (
+        <Flame key={x} x={x} y={y} scale={0.5} />
+      ))}
+      <path d="M0 640 L1200 640 L1200 680 L0 680 Z" fill={MYTH.city} stroke={INK} strokeWidth={3} />
+      <path d="M0 680 L1200 680 L1200 800 L0 800 Z" fill={MYTH.harbourNight} />
+      <path d="M0 700 Q300 690 600 700 T1200 700" fill="none" stroke={MYTH.fire} strokeWidth={3} opacity={0.5} />
     </svg>
   )
 }
 
-function TempleArt() {
+// Olympus at dawn: the mountain over the gold clouds, the temple lit on its top, waterfalls down its cliffs,
+// the clouds drifting, the sun's rays turning slowly, birds crossing.
+function OlympusArt() {
+  const e = u.era
   return (
     <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
-      <circle cx={600} cy={130} r={110} fill={MYTH.dawn} opacity={0.35} />
-      <path d="M300 300 L600 160 L900 300 Z" fill={MYTH.kiltShade} stroke={INK} strokeWidth={4} />
-      <path d="M300 300 L900 300 L900 330 L300 330 Z" fill={MYTH.terracottaDeep} stroke={INK} strokeWidth={3} />
-      {[350, 450, 750, 850].map((x) => (
-        <Column key={x} x={x} top={340} bottom={620} width={48} tone={MYTH.terracottaDeep} light={MYTH.crimson} />
+      <g className={`${e} ${u.rays}`}>
+        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle) => (
+          <path key={angle} d="M600 120 L580 -500 L620 -500 Z" fill={MYTH.cloud} opacity={0.12} transform={`rotate(${angle} 600 120)`} />
+        ))}
+      </g>
+      <circle cx={600} cy={120} r={70} fill={MYTH.fireCore} opacity={0.6} />
+      <path d="M300 700 L480 300 L560 240 L640 240 L720 300 L900 700 Z" fill={MYTH.olympusRock} stroke={INK} strokeWidth={4} />
+      {/* the temple on the top, lit */}
+      <path d="M540 240 L600 200 L660 240 Z" fill={MYTH.gold} stroke={INK} strokeWidth={3} />
+      {[548, 572, 596, 620, 644].map((x) => (
+        <rect key={x} x={x} y={240} width={8} height={30} fill={MYTH.marble} stroke={INK} strokeWidth={1.5} />
       ))}
-      {[0, 1, 2, 3].map((step) => (
-        <path key={step} d={`M${240 - step * 60} ${640 + step * 40} L${960 + step * 60} ${640 + step * 40} L${960 + step * 60} ${680 + step * 40} L${240 - step * 60} ${680 + step * 40} Z`} fill={MYTH.styxLow} stroke={INK} strokeWidth={3} />
+      {/* the waterfalls down the cliffs */}
+      {[470, 720].map((x) => (
+        <g key={x}>
+          <rect x={x} y={340} width={14} height={300} fill={MYTH.waterfall} opacity={0.7} />
+          <path d={`M${x + 4} 340 l0 300`} stroke={MYTH.seaFoam} strokeWidth={3} strokeDasharray="12 28" className={`${e} ${u.fall}`} />
+        </g>
       ))}
+      <g className={`${e} ${u.clouds}`}>
+        <path d="M-100 640 Q0 580 120 620 Q220 560 340 620 Q460 570 560 630 Q680 570 800 630 Q920 570 1040 620 Q1160 570 1300 630 L1300 800 L-100 800 Z" fill={MYTH.cloud} stroke={INK} strokeWidth={3} />
+      </g>
+      <g className={`${e} ${u.birds}`}>
+        {[0, 1, 2].map((bird) => (
+          <path key={bird} d={`M${bird * 40} ${180 + bird * 14} q10 -10 20 0 q10 -10 20 0`} fill="none" stroke={INK} strokeWidth={3} />
+        ))}
+      </g>
     </svg>
   )
 }
@@ -170,17 +233,17 @@ export function Depths() {
       <div className={`${u.zone} ${u.zoneHall}`}>
         <HallArt />
       </div>
-      <div className={`${u.zone} ${u.zoneDepths}`}>
-        <DepthsArt />
+      <div className={`${u.zone} ${u.zoneStorm}`}>
+        <StormArt />
       </div>
       <div className={`${u.zone} ${u.zoneMagma}`}>
         <MagmaArt />
       </div>
-      <div className={`${u.zone} ${u.zoneFields}`}>
-        <FieldsArt />
+      <div className={`${u.zone} ${u.zoneRhodes}`}>
+        <RhodesArt />
       </div>
-      <div className={`${u.zone} ${u.zoneTemple}`}>
-        <TempleArt />
+      <div className={`${u.zone} ${u.zoneOlympus}`}>
+        <OlympusArt />
       </div>
       {EMBERS.map(({ left, drift }, index) => (
         <span key={left} className={u.ember} style={{ ['--left' as string]: left, ['--i' as string]: index, ['--drift' as string]: drift }} />

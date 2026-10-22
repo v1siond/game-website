@@ -71,10 +71,10 @@
 }
 
 .root[data-zone='hall'] .zoneHall,
-.root[data-zone='depths'] .zoneDepths,
+.root[data-zone='storm'] .zoneStorm,
 .root[data-zone='magma'] .zoneMagma,
-.root[data-zone='fields'] .zoneFields,
-.root[data-zone='temple'] .zoneTemple {
+.root[data-zone='rhodes'] .zoneRhodes,
+.root[data-zone='olympus'] .zoneOlympus {
   opacity: 1;
 }
 
@@ -83,9 +83,9 @@
     linear-gradient(180deg, var(--myth-hall-high) 0%, var(--myth-hall-low) 100%);
 }
 
-.zoneDepths {
-  background: radial-gradient(ellipse at 50% 30%, rgb(111 224 207 / 18%) 0%, transparent 55%),
-    linear-gradient(180deg, var(--myth-tart-high) 0%, var(--myth-tart-low) 100%);
+.zoneStorm {
+  background: radial-gradient(ellipse at 70% 20%, rgb(232 244 255 / 10%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-storm-high) 0%, var(--myth-storm-low) 100%);
 }
 
 .zoneMagma {
@@ -93,14 +93,14 @@
     linear-gradient(180deg, var(--myth-asp-high) 0%, var(--myth-asp-low) 100%);
 }
 
-.zoneFields {
-  background: radial-gradient(ellipse at 50% -10%, var(--myth-ely-light) 0%, transparent 50%),
-    linear-gradient(180deg, var(--myth-ely-high) 0%, var(--myth-ely-low) 100%);
+.zoneRhodes {
+  background: radial-gradient(ellipse at 50% 100%, rgb(255 138 42 / 30%) 0%, transparent 45%),
+    linear-gradient(180deg, var(--myth-rhodes-high) 0%, var(--myth-harbour-night) 100%);
 }
 
-.zoneTemple {
-  background: radial-gradient(ellipse at 50% 0%, rgb(255 178 122 / 35%) 0%, transparent 45%),
-    linear-gradient(180deg, var(--myth-styx-high) 0%, var(--myth-styx-low) 100%);
+.zoneOlympus {
+  background: radial-gradient(ellipse at 50% 30%, rgb(255 230 170 / 45%) 0%, transparent 50%),
+    linear-gradient(180deg, var(--myth-olympus-high) 0%, var(--myth-olympus-low) 100%);
 }
 
 /* The far and near art of a region drift against the pointer at two depths. */
@@ -845,5 +845,161 @@
   .climber,
   .page {
     transition: none;
+  }
+}
+
+/* ---------------------------------------------------------------- each era's own clock (depths.tsx)
+   Only the era on screen runs its clock: every era's parts sit paused until the root's data-zone names it. */
+.era {
+  animation-play-state: paused;
+}
+.root[data-zone='storm'] .zoneStorm .era,
+.root[data-zone='rhodes'] .zoneRhodes .era,
+.root[data-zone='olympus'] .zoneOlympus .era {
+  animation-play-state: running;
+}
+
+/* the storm: rain driving down at a slant, a lightning flash every 7 s, the swell, the torn sail, the serpent */
+.rain {
+  animation: rain 0.6s linear infinite;
+}
+@keyframes rain {
+  from { transform: translate3d(0, -80px, 0); }
+  to { transform: translate3d(-20px, 0, 0); }
+}
+.lightning {
+  opacity: 0;
+  animation: lightning 7s linear infinite;
+}
+@keyframes lightning {
+  0%, 88%, 92%, 95%, 100% { opacity: 0; }
+  89%, 93% { opacity: 1; }
+}
+.swell {
+  animation: swell 5s ease-in-out infinite alternate;
+}
+@keyframes swell {
+  from { transform: translate3d(-30px, 6px, 0); }
+  to { transform: translate3d(30px, -6px, 0); }
+}
+.sailFlap {
+  transform-box: fill-box;
+  transform-origin: 0% 0%;
+  animation: sail-flap 1.8s ease-in-out infinite alternate;
+}
+@keyframes sail-flap {
+  from { transform: skewY(-4deg) scaleX(1); }
+  to { transform: skewY(5deg) scaleX(0.9); }
+}
+/* the near head rises out of the sea, lunges with the jaw open and sinks again, every 9 s */
+.hydraRise {
+  animation: hydra-rise 9s ease-in-out infinite;
+}
+@keyframes hydra-rise {
+  0%, 8% { transform: translate3d(0, 380px, 0); }
+  25% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  45% { transform: translate3d(0, 0, 0) rotate(-6deg); }
+  52% { transform: translate3d(-60px, 30px, 0) rotate(10deg); }
+  62% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  80%, 100% { transform: translate3d(0, 380px, 0); }
+}
+.hydraJaw {
+  transform-box: fill-box;
+  transform-origin: 100% 0%;
+  animation: hydra-jaw 9s ease-in-out infinite;
+}
+@keyframes hydra-jaw {
+  0%, 40%, 62%, 100% { transform: rotate(0deg); }
+  48%, 54% { transform: rotate(28deg); }
+}
+.hydraSway {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hydra-sway 6s ease-in-out infinite alternate;
+}
+@keyframes hydra-sway {
+  from { transform: rotate(-5deg); }
+  to { transform: rotate(5deg); }
+}
+
+/* Rhodes: the giant's eyes flare, his fist rises and smashes the harbour wall every 8 s, dust bursts, smoke goes up */
+.giantEyes {
+  animation: giant-eyes 8s ease-in-out infinite;
+}
+@keyframes giant-eyes {
+  0%, 30%, 70%, 100% { opacity: 0.5; }
+  40%, 55% { opacity: 1; }
+}
+.giantArm {
+  transform-box: view-box;
+  transform-origin: 760px 300px;
+  animation: giant-arm 8s ease-in-out infinite;
+}
+@keyframes giant-arm {
+  0%, 20% { transform: rotate(0deg); }
+  45% { transform: rotate(-55deg); }
+  55% { transform: rotate(12deg); }
+  75%, 100% { transform: rotate(0deg); }
+}
+.dust {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: 0;
+  animation: dust 8s ease-out infinite;
+}
+@keyframes dust {
+  0%, 54% { opacity: 0; transform: scale(0.3); }
+  58% { opacity: 0.9; transform: scale(1); }
+  80%, 100% { opacity: 0; transform: scale(1.6); }
+}
+.smoke {
+  animation: smoke 12s linear infinite;
+}
+@keyframes smoke {
+  from { transform: translate3d(0, 0, 0); opacity: 0.7; }
+  to { transform: translate3d(40px, -220px, 0); opacity: 0; }
+}
+
+/* Olympus: the clouds drift, the sun's rays turn, birds cross, the waterfalls run */
+.clouds {
+  animation: clouds 40s linear infinite alternate;
+}
+@keyframes clouds {
+  from { transform: translate3d(-80px, 0, 0); }
+  to { transform: translate3d(80px, 0, 0); }
+}
+.rays {
+  transform-box: view-box;
+  transform-origin: 600px 120px;
+  animation: rays 60s linear infinite;
+}
+@keyframes rays {
+  to { transform: rotate(360deg); }
+}
+.birds {
+  animation: birds 14s linear infinite;
+}
+@keyframes birds {
+  from { transform: translate3d(-200px, 0, 0); }
+  to { transform: translate3d(1400px, -60px, 0); }
+}
+.fall {
+  animation: fall 1.2s linear infinite;
+}
+@keyframes fall {
+  from { transform: translate3d(0, -40px, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .era {
+    animation: none;
+  }
+  .hydraRise {
+    transform: none;
+  }
+  .lightning,
+  .dust {
+    opacity: 0;
   }
 }

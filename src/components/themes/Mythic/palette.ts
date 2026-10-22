@@ -1,10 +1,9 @@
 import { paletteVars } from '../shared/paletteVars'
 
 // Mythic's palette, every colour of the world once: the underworld escape painted in ink over colour.
-// The crimson marble and gold of the great hall with its blood red pool, the four regions the page goes
-// down (the teal brick of the first, the magma of the second, the gold light over the green fields of
-// the third, the red temple and the dawn of the surface), the mirror's darkness, the boons' rarity
-// ladder, the parchment of the codex and the prophecies, and his own kit (the Spartan's tattoo, rage,
+// The crimson marble and gold of the great hall with its blood red pool, the eras behind the page (the
+// storm sea, the magma, Rhodes under the bronze giant, Olympus at dawn), the carved chain of the climb,
+// the mirror's darkness, the boons' rarity ladder, the parchment of the tech stack and the prophecies, and his own kit (the Spartan's tattoo, rage,
 // leather, kilt, bronze and blades). The SVG art reads MYTH; MYTH_VARS puts the same values on the
 // world's root as --myth-* variables for the CSS modules and the Tailwind arbitrary values.
 
@@ -44,10 +43,7 @@ export const MYTH = {
   fire: '#ff8a2a',
   fireCore: '#ffd36b',
 
-  // ---- the first region: teal brick and soul lamps
-  tartHigh: '#061214',
-  tartLow: '#163234',
-  brick: '#1f3a3c',
+  // ---- the soul lamps
   soul: '#6fe0cf',
 
   // ---- the second region: basalt and magma
@@ -92,7 +88,6 @@ export const MYTH = {
 
   // ---- the mountain over the clouds at dawn
   olympus: '#a88868',
-  olympusMarble: '#485868',
 
   // ---- the boons' rarity ladder, lowest to highest
   common: '#f2ede4',
@@ -106,6 +101,22 @@ export const MYTH = {
   chainSteel: '#4a4a58',
   chainBand: '#303040',
   chainPanel: '#404050',
+  // ---- the eras behind the page: the storm sea with the serpent, the harbour city under the bronze giant, the mountain at dawn
+  stormLow: '#2a3a38',
+  sea: '#405050',
+  seaFoam: '#c8d8d0',
+  sail: '#a89050',
+  lightning: '#e8f4ff',
+  hydraBelly: '#7a8a5a',
+  rhodesHigh: '#101828',
+  bronzeGiantLight: '#7a9a78',
+  city: '#18202c',
+  smoke: '#3a3a44',
+  olympusHigh: '#485868',
+  olympusLow: '#e3b24f',
+  olympusRock: '#6a5a50',
+  cloud: '#f4e6c8',
+  waterfall: '#d8ecf4',
   ash: '#e4ded4',
   tattoo: '#c4161c',
   rage: '#ff3b1f',

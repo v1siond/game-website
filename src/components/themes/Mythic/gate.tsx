@@ -27,7 +27,7 @@ type GatePhase = 'shut' | 'pushing' | 'through'
 export function LastGate({ profession }: { profession: Profession }) {
   const { sections, myth, navigation } = useLabels()
   const { returnToHouse } = useHouse()
-  const { ref, on, reduced } = useZoneStage<Zone>('temple')
+  const { ref, on, reduced } = useZoneStage<Zone>('olympus')
   const [phase, setPhase] = useState<GatePhase>('shut')
   const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
   const open = phase !== 'shut'
