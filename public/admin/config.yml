@@ -818,7 +818,7 @@ collections:
               - label: Language names (each in its own language)
                 name: languages
                 widget: object
-                i18n: duplicate
+                i18n: true
                 fields:
                   - { <<: *fixed, label: "English", name: en }
                   - { <<: *fixed, label: "Spanish", name: es }
