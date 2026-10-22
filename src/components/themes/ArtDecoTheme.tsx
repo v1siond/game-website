@@ -6,6 +6,7 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { PostsGate } from '@/components/cv/PostsGate'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -85,15 +86,17 @@ export default function ArtDecoTheme() {
           <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
-            <div className="pt-20">
-              <FadeInScene>
-                <Chamber title={sections.posts} depth={POSTS_DEPTH[active]}>
-                  <BrassPanel>
-                    <p className="py-6 text-center text-base italic text-[color:var(--deco-mist)]">{cards.noPosts}</p>
-                  </BrassPanel>
-                </Chamber>
-              </FadeInScene>
-            </div>
+            <PostsGate>
+              <div className="pt-20">
+                <FadeInScene>
+                  <Chamber title={sections.posts} depth={POSTS_DEPTH[active]}>
+                    <BrassPanel>
+                      <p className="py-6 text-center text-base italic text-[color:var(--deco-mist)]">{cards.noPosts}</p>
+                    </BrassPanel>
+                  </Chamber>
+                </FadeInScene>
+              </div>
+            </PostsGate>
           </div>
         </main>
 

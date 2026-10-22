@@ -7,6 +7,7 @@ import { NameWords } from '@/components/cv/NameWords'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { PostsGate } from '@/components/cv/PostsGate'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { PALETTE_VARS } from './TropicalPlatformer/palette'
@@ -70,7 +71,9 @@ export default function TropicalPlatformerTheme() {
         <div className="mx-auto max-w-6xl space-y-24" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
           <VineCrossing />
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          <PostsLevel />
+          <PostsGate>
+            <PostsLevel />
+          </PostsGate>
         </div>
       </main>
 
