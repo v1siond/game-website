@@ -14,15 +14,19 @@ import u from './underworld.module.css'
 
 // The Tech Stack as the climb up the carved chain: a band of carved panels hangs beside the groups, one
 // panel per group. Each group that scrolls in queues one reach; he climbs hand over hand with his blades
-// on his back, and the panel he grips lights with its group's page. Pointing at a page makes its panel glow.
+// on his back, the chain running down a panel per reach, and the panel he grips lights with its group's
+// page. Pointing at a page makes its panel glow.
 
 type Category = TechCategory & { id: string }
 
+// The rail is 100 by 480 with 30 more on the left for his body; he stays put and the chain runs down a
+// hold per reach, so the panel he grips is always the one at his hands (HOLD_BASE).
 const HOLD_STEP = 60
-const HOLD_BASE = 430
+const HOLD_BASE = 300
 const holdY = (index: number) => HOLD_BASE - index * HOLD_STEP
-// his box: the hands of the hang reach the top of the box, so the box top sits on the hold
-const HIM = { x: 6, y: HOLD_BASE - 8, height: 120 }
+// his box: the fists of the hang sit 5 units under the box top, on the gripped panel
+const HIM = { x: -19, y: HOLD_BASE - 18, height: 120 }
+const LINKS = Array.from({ length: 18 }, (_, index) => -600 + index * 60)
 const CLIMB_GAP_MS = MOVES.climb.ms + 250
 
 function Chain({ ids, gripped, glow, take }: { ids: readonly string[]; gripped: number; glow: string | null; take: number }) {
@@ -32,27 +36,27 @@ function Chain({ ids, gripped, glow, take }: { ids: readonly string[]; gripped: 
     if (take > 0) play('climb')
   }, [take, play])
 
-  const lift = -Math.max(0, gripped - 1) * HOLD_STEP
+  const drop = Math.max(0, gripped - 1) * HOLD_STEP
   return (
-    <svg viewBox="0 0 100 480" className="block h-[70vh] max-h-[34rem] w-full" aria-hidden="true">
-      {/* the oval links either side of the carved band */}
-      {[0, 1, 2, 3, 4, 5, 6, 7].map((link) => (
-        <g key={link}>
-          <ellipse cx={22} cy={30 + link * 60} rx={9} ry={26} fill="none" stroke={MYTH.chainSteel} strokeWidth={5} />
-          <ellipse cx={78} cy={30 + link * 60} rx={9} ry={26} fill="none" stroke={MYTH.chainSteel} strokeWidth={5} />
-        </g>
-      ))}
-      <rect x={34} y={0} width={32} height={480} fill={MYTH.chainBand} />
-      {ids.map((id, index) => (
-        <g key={id} data-lit={index < gripped || undefined} data-glow={glow === id || undefined} className={u.hold}>
-          <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.chainPanel} stroke={MYTH.inkLine} strokeWidth={1.5} />
-          <circle cx={50} cy={holdY(index) - 10} r={7} fill="none" stroke={MYTH.bronze} strokeWidth={2} />
-          <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.gold} className={u.holdLight} />
-        </g>
-      ))}
-      <g className={u.climber} style={{ transform: `translateY(${lift}px)` }}>
-        <SpartanSprite key={moveTake} profession="engineer" motion={pose} place={HIM} onDone={settle} sheathed />
+    <svg viewBox="-30 0 130 480" className="block h-[70vh] max-h-[34rem] w-full" aria-hidden="true">
+      <g className={u.chainRun} style={{ transform: `translateY(${drop}px)` }}>
+        {/* the oval links either side of the carved band */}
+        {LINKS.map((y) => (
+          <g key={y}>
+            <ellipse cx={22} cy={y + 30} rx={9} ry={26} fill="none" stroke={MYTH.chainSteel} strokeWidth={5} />
+            <ellipse cx={78} cy={y + 30} rx={9} ry={26} fill="none" stroke={MYTH.chainSteel} strokeWidth={5} />
+          </g>
+        ))}
+        <rect x={34} y={-600} width={32} height={1080} fill={MYTH.chainBand} />
+        {ids.map((id, index) => (
+          <g key={id} data-lit={index < gripped || undefined} data-glow={glow === id || undefined} className={u.hold}>
+            <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.chainPanel} stroke={MYTH.inkLine} strokeWidth={1.5} />
+            <circle cx={50} cy={holdY(index) - 10} r={7} fill="none" stroke={MYTH.bronze} strokeWidth={2} />
+            <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.gold} className={u.holdLight} />
+          </g>
+        ))}
       </g>
+      <SpartanSprite key={moveTake} profession="engineer" motion={pose} place={HIM} onDone={settle} sheathed />
     </svg>
   )
 }
@@ -74,7 +78,12 @@ function Page({ category, lit, onEnter, onPoint }: { category: Category; lit: bo
       className={`p-5 ${u.parchment} ${u.page}`}
     >
       <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{category.name}</h3>
-      <ul className="mt-3 flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
+      <ul
+        className="mt-3 flex flex-wrap gap-2"
+        aria-label={fillLabel(cards.categoryTechnologies, {
+          name: category.name,
+        })}
+      >
         {category.items.map((item) => (
           <li key={item} className="border border-[var(--myth-ink-soft)] px-2 py-0.5 text-base">
             {item}

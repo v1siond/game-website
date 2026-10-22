@@ -19,12 +19,13 @@ import { LastGate } from './Mythic/gate'
 import { HouseProvider, type Zone } from './Mythic/stage'
 import u from './Mythic/underworld.module.css'
 
-// Mythic, the underworld escape painted in ink over colour: the page goes down from the great hall to
-// the surface. He rises out of the blood pool in the hall, the mirror changes his talent, his work is the
-// chambers he clears in the teal brick vaults and the codex there, his projects the boons over the magma
-// with his ventures as keepsakes, his bands and his Muay Thai in the green fields, and the last gate of
-// the red temple opens on the dawn. The fixed depths fade to the region in view (data-zone); Return to
-// the house at the gate scrolls back up and he rises again. Every part is drawn in ./Mythic.
+// Mythic, the chained blade Spartan's ascent painted in ink over colour: the page climbs from the great
+// hall to Olympus. He rises out of the blood pool in the hall, the mirror changes his talent, his work is
+// the foes he fights on the storm deck and his tech stack the carved chain he climbs over the storm sea,
+// his projects the boons over the magma with his ventures as keepsakes, his bands and his Muay Thai under
+// the bronze giant of Rhodes, and the last gate opens on Olympus at dawn. The fixed eras fade to the one
+// in view (data-zone); Return to the house at the gate scrolls back up and he rises again. Every part is
+// drawn in ./Mythic.
 //
 // The root clips sideways overflow with overflow-x: clip, not hidden, so it stays out of the scroll
 // container chain.

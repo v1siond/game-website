@@ -147,15 +147,18 @@ function RhodesArt() {
   return (
     <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
       {[0, 1, 2].map((plume) => (
-        <circle key={plume} cx={300 + plume * 280} cy={560} r={50} fill={MYTH.smoke} className={`${e} ${u.smoke}`} style={{ animationDelay: `${plume * -4}s` }} />
+        <circle key={plume} cx={300 + plume * 280} cy={560} r={50} fill={MYTH.smoke} opacity={0.5} className={`${e} ${u.smoke}`} style={{ animationDelay: `${plume * -4}s` }} />
       ))}
       {/* the giant: legs astride the harbour, the body, the head with the laurel and the eyes */}
       <path d="M540 800 L560 520 L600 520 L610 800 Z M640 800 L650 520 L690 520 L700 800 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
       <path d="M520 540 L540 300 Q620 260 720 300 L740 540 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
       <path d="M560 320 Q620 300 700 320 L690 420 Q620 440 570 420 Z" fill={MYTH.bronzeGiantLight} opacity={0.45} />
       <path d="M590 300 L590 200 Q630 160 670 200 L670 300 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
-      <path d="M590 270 Q630 330 670 270 L670 300 Q630 340 590 300 Z" fill={MYTH.giant} stroke={INK} strokeWidth={3} />
+      {/* the curled beard and the laurel crown */}
+      <path d="M592 262 Q596 318 630 326 Q664 318 668 262 Q650 280 630 276 Q610 280 592 262 Z" fill={MYTH.giant} stroke={INK} strokeWidth={3} />
+      <path d="M604 290 q6 8 12 0 M624 300 q6 8 12 0 M644 290 q6 8 12 0" fill="none" stroke={INK} strokeWidth={2} />
       <path d="M582 200 Q630 150 678 200" fill="none" stroke={MYTH.gold} strokeWidth={7} />
+      <path d="M592 190 l-10 -8 M606 180 l-8 -10 M654 180 l8 -10 M668 190 l10 -8" stroke={MYTH.gold} strokeWidth={4} />
       <g className={`${e} ${u.giantEyes}`}>
         <circle cx={612} cy={236} r={6} fill={MYTH.giantEye} />
         <circle cx={648} cy={236} r={6} fill={MYTH.giantEye} />
@@ -166,7 +169,7 @@ function RhodesArt() {
         <path d="M740 300 L860 460 L840 480 L720 330 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
         <circle cx={860} cy={478} r={26} fill={MYTH.bronzeGiantLight} stroke={INK} strokeWidth={4} />
       </g>
-      <ellipse cx={880} cy={640} rx={90} ry={40} fill={MYTH.boneShade} className={`${e} ${u.dust}`} />
+      <ellipse cx={880} cy={640} rx={90} ry={40} fill={MYTH.boneShade} opacity={0} className={`${e} ${u.dust}`} />
       {/* the city and its harbour wall, fires in the windows */}
       <path d="M0 640 L0 560 L60 560 L60 520 L120 520 L120 590 L200 590 L200 540 L260 540 L260 640 Z M940 640 L940 560 L1000 560 L1000 500 L1060 500 L1060 570 L1140 570 L1140 530 L1200 530 L1200 640 Z" fill={MYTH.city} stroke={INK} strokeWidth={3} />
       {[[30, 580], [90, 540], [230, 560], [970, 580], [1030, 520], [1170, 550]].map(([x, y]) => (

@@ -829,7 +829,7 @@
 .hold[data-glow] .holdLight {
   opacity: 0.9;
 }
-.climber {
+.chainRun {
   transition: transform 1100ms ease-in-out;
 }
 .page {
@@ -842,7 +842,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .holdLight,
-  .climber,
+  .chainRun,
   .page {
     transition: none;
   }
