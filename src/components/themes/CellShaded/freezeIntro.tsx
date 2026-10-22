@@ -120,7 +120,7 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
               <p className={`mt-5 inline-block px-4 py-2 text-lg font-bold ${cel.subtitleCard} ${cel.subtitle}`}>{headline}</p>
               <div className={cel.tagline}>
                 <p className="mt-4 inline-block bg-[var(--cel-ink)] px-3 py-1 text-base font-bold italic text-[var(--cel-sun)]">{tagline}</p>
-                <p className="mt-2 text-base font-bold">{line}</p>
+                <p className="mt-2 text-base font-bold max-sm:w-fit max-sm:bg-[var(--cel-paper)] max-sm:px-3 max-sm:py-1">{line}</p>
               </div>
               <nav className={`mt-6 flex flex-wrap gap-3 ${cel.introActions}`} aria-label={navigation.contactAndCv}>
                 <ContactActions actions={actions} />

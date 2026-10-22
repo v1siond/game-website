@@ -15,7 +15,9 @@ import cel from './cel.module.css'
 // branch's action skill and its tools as the nodes down the tiers, joined by the spine. Pointing at a
 // node, or tapping it, lights its branch from the top down to it, the way a tree shows the points it took to get
 // there. The light is a pointer extra over a plain list: the nodes are not tab stops (sixty of them
-// would bury the page's keyboard path), and a screen reader reads each branch as a titled list.
+// would bury the page's keyboard path), and a screen reader reads each branch as a titled list. On a
+// phone the tiers wrap as rows of chips under the skill, without the spine, so a branch is not a
+// screen tall column of one word lines.
 
 type Category = TechCategory & { id: string }
 
@@ -39,8 +41,8 @@ function Branch({ category, index, lit, onLight }: { category: Category; index: 
         <span className="relative">{category.name}</span>
       </div>
       <div className="relative">
-        <span className="absolute bottom-6 left-1/2 top-0 w-2 -translate-x-1/2 border-x-2 border-[var(--cel-ink)] bg-[var(--cel-ink-soft)]" aria-hidden="true" />
-        <ul className="relative flex flex-col items-center gap-3 pt-4" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
+        <span className="absolute bottom-6 left-1/2 top-0 hidden w-2 -translate-x-1/2 border-x-2 sm:block border-[var(--cel-ink)] bg-[var(--cel-ink-soft)]" aria-hidden="true" />
+        <ul className="relative flex flex-wrap justify-center gap-2 pt-4 sm:flex-col sm:flex-nowrap sm:items-center sm:gap-3" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
           {category.items.map((item, tier) => (
             <li
               key={item}
