@@ -59,14 +59,15 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
   )
 }
 
-// A job as a rank card: the years stamped on its corner in big tilted calendar digits.
+// A job as a rank card: the years stamped on its corner in big tilted calendar digits. A phone card is
+// too narrow for the title to run beside the stamp, so there the title starts below it.
 export function RankCard({ entry, index }: { entry: Job; index: number }) {
   const { cards, years } = useLabels()
   const { start, end } = jobYears(entry, years.present)
 
   return (
     <div className={world.rank} style={orderVars(index)}>
-      <article className={`p-6 pt-9 ${world.slab} ${world.lift}`}>
+      <article className={`p-6 pt-14 sm:pt-9 ${world.slab} ${world.lift}`}>
         <p className={`absolute -top-1 right-4 ${world.stamp}`}>
           <span className={`block bg-[color:var(--noir-red)] px-3 py-1 text-2xl text-[color:var(--noir-paper)] ${world.stampRest}`}>
             {start} - {end}
