@@ -71,7 +71,7 @@ export default function WorldCard({ world, isCurrent = false }: WorldCardProps) 
           />
           <div className="min-w-0">
             <div
-              className="truncate text-sm font-bold tracking-wide"
+              className="line-clamp-2 break-words text-sm font-bold tracking-wide"
               style={{ color: currentTheme.colors.text }}
             >
               {destTheme.name}
