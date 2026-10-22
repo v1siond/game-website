@@ -60,6 +60,14 @@ describe('pageMetadata', () => {
     expect(metadata.openGraph).toMatchObject({ url: '/cv', type: 'profile', siteName: cv.fullName })
   })
 
+  it('names the 1200x630 preview card for open graph and twitter', () => {
+    const metadata = pageMetadata(cv, '/cv')
+    const card = [{ url: '/opengraph-image', width: 1200, height: 630, alt: siteTitle(cv) }]
+
+    expect(metadata.openGraph?.images).toEqual(card)
+    expect(metadata.twitter?.images).toEqual(card)
+  })
+
   it('takes its keywords only from his name and the tech stack', () => {
     const allowed = new Set([cv.fullName, ...cv.techStack.flatMap((category) => category.items)])
     expect((pageMetadata(cv, '/').keywords as string[]).every((keyword) => allowed.has(keyword))).toBe(true)

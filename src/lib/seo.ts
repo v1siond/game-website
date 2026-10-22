@@ -13,6 +13,9 @@ export type IndexedPath = (typeof INDEXED_PATHS)[number]
 
 const DESCRIPTION_LIMIT = 160
 
+/** The link preview card, rendered by src/app/opengraph-image.tsx at this path and size. */
+export const PREVIEW_IMAGE = { url: '/opengraph-image', width: 1200, height: 630 } as const
+
 type SeoFacts = Pick<CVData, 'fullName' | 'professionalSummary' | 'contact' | 'techStack' | 'labels'>
 
 /** The role part of the headline: "X Engineer with 10+ years of proven success" gives "X Engineer". */
@@ -57,6 +60,8 @@ const PAGE_TITLES: Record<IndexedPath, (cv: SeoFacts) => string> = {
 export function pageMetadata(cv: SeoFacts, path: IndexedPath): Metadata {
   const title = PAGE_TITLES[path](cv)
   const description = siteDescription(cv)
+  // A page's openGraph replaces the parent's whole, so the card the root image file provides is named here.
+  const images = [{ ...PREVIEW_IMAGE, alt: siteTitle(cv) }]
 
   return {
     metadataBase: new URL(SITE_URL),
@@ -75,8 +80,9 @@ export function pageMetadata(cv: SeoFacts, path: IndexedPath): Metadata {
       siteName: cv.fullName,
       title,
       description,
+      images,
     },
-    twitter: { card: 'summary_large_image', title, description },
+    twitter: { card: 'summary_large_image', title, description, images },
   }
 }
 

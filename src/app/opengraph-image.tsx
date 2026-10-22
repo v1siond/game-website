@@ -2,13 +2,13 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 import { getAllCVData } from '@/lib/cv-data'
-import { SITE_URL, shortRole } from '@/lib/seo'
+import { PREVIEW_IMAGE, SITE_URL, shortRole } from '@/lib/seo'
 import { MARK_BACKGROUND, siteMarkSvg } from '@/lib/siteMark'
 
 // The link preview of every page (Open Graph and Twitter): the mark, his name, his role from the
 // summary and the domain, in the site's pixel face.
 
-export const size = { width: 1200, height: 630 }
+export const size = { width: PREVIEW_IMAGE.width, height: PREVIEW_IMAGE.height }
 export const contentType = 'image/png'
 
 const FONT_FILE = join(process.cwd(), 'src', 'assets', 'fonts', 'Silkscreen-Regular.ttf')
