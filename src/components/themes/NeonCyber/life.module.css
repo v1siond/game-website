@@ -200,14 +200,49 @@
     transform: none;
   }
 }
+/* cut loose by the blades passing over it: in from the left with a jolt */
 @keyframes contract-in {
-  from {
+  0% {
     opacity: 0;
-    transform: translateY(-1rem);
+    transform: translate3d(-1rem, 0, 0);
   }
-  to {
+  40% {
+    opacity: 1;
+    transform: translate3d(0.4rem, 0, 0);
+  }
+  70% {
+    transform: translate3d(-0.15rem, 0, 0);
+  }
+  100% {
     opacity: 1;
     transform: none;
+  }
+}
+
+/* the mantis blades along the contracts' top edge (BladesPass): a zero height lane, a track as wide as
+   the row less his width, carried 0 to 100 percent from 525 to 1575 ms, then a fade by 1900 ms */
+.bladeLane {
+  height: 0;
+}
+.bladeTrack {
+  animation: blade-pass 1375ms linear 525ms both;
+}
+
+@keyframes blade-pass {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  6% {
+    opacity: 1;
+  }
+  76% {
+    opacity: 1;
+    transform: translate3d(100%, 0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(100%, 0, 0);
   }
 }
 @keyframes pin-ping {

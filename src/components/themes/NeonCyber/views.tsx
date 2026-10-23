@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { Service } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
@@ -11,13 +10,14 @@ import { Braindance } from './braindance'
 import { Gigs } from './gigs'
 import { Radio } from './radio'
 import { HudPanel } from './hud'
+import { JackIn } from './jackin'
 import { DistrictStage, FixerContracts, RipperdocRecord, SandevistanStack, ScanAbout } from './life'
 
 // Neon Cyber's sections per profession, each with the merc doing a different thing in it (./life): the
 // System Engineer's bio is scanned, the braindance of his work is ridden by him on the playhead
 // (./braindance), the tech stack is crossed in one time slow dash, the gigs are breached with him jacked in
-// (./gigs) and the ventures are the fixer's contracts on the map; the services are a plain HUD panel
-// under the shared fade; the Musician drums on the radio
+// (./gigs) and the ventures are the fixer's contracts on the map, cut loose by his mantis blades; the
+// services panel boots from the cable he jacks into it (./jackin); the Musician drums on the radio
 // (./radio); the Martial Artist sits in the ripperdoc's chair while each achievement installs. Each
 // section hands its district (Japantown, the megabuilding, the Badlands) to the backdrop.
 
@@ -30,7 +30,7 @@ function Services({ services }: { services: Service[] }) {
 
   return (
     <Block>
-      <FadeInScene>
+      <JackIn>
         <HudPanel title={sections.services}>
           <ul className={MASONRY_LIST}>
             {services.map((service) => (
@@ -41,7 +41,7 @@ function Services({ services }: { services: Service[] }) {
             ))}
           </ul>
         </HudPanel>
-      </FadeInScene>
+      </JackIn>
     </Block>
   )
 }

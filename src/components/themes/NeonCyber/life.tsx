@@ -11,6 +11,7 @@ import { headingId, newTabName } from '@/components/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { useZoneStage } from '@/hooks/useZoneStage'
+import { usePreview } from '@/themes/PreviewContext'
 import type { District } from './city'
 import { MercSprite, type MercMotion } from './merc'
 import { DataChip, HudPanel } from './hud'
@@ -24,7 +25,8 @@ import world from './world.module.css'
 // useZoneStage: it hands its district up to the backdrop while in view and turns on the first time it
 // scrolls in. About: he walks up and scans the bio, its tags pop out. Tech stack: one time slow dash with
 // after images, the cards snapping in as he passes. Ventures: the fixer's contracts drop as pins on a
-// district map. Muay Thai: the ripperdoc's chair installs each achievement under the clinic's green
+// district map, and he dashes along the cards with the mantis blades out, each contract cut loose and
+// jolting in as he passes it. Muay Thai: the ripperdoc's chair installs each achievement under the clinic's green
 // cross, then he stands and a gang punk steps in to take his roundhouse. Contact: his car waits at the
 // kerb with him sitting on the rear deck looking at the skyline; he hops in and drives off into it.
 
@@ -148,10 +150,30 @@ export function SandevistanStack({ techStack }: { techStack: SectionsOf<'enginee
 // The pins' places on the map strip, spread across it from left to right.
 const pinX = (i: number, count: number): number => 120 + (i * 760) / Math.max(count - 1, 1)
 
+// The mantis blades pass along the contracts' top edge: one animation on a track as wide as the row less
+// his own width, so its 0 to 100 percent carries him from the first card to the last. He crosses from
+// 525 to 1575 ms, over each card's middle as that card's own entrance (0.7 s plus 0.35 s a card) cuts it
+// loose, then fades by 1900 ms and unmounts on the animation's end. Started by the stage turning on;
+// never mounted under reduced motion or in a World Select preview, where the cards just rest in place.
+function BladesPass({ onPassed }: { onPassed: () => void }) {
+  return (
+    <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 ${life.bladeLane}`} aria-hidden="true">
+      <span className={`absolute bottom-0 left-0 right-20 ${life.bladeTrack}`} onAnimationEnd={(event) => event.target === event.currentTarget && onPassed()}>
+        <span className="absolute bottom-0 left-0 h-28 w-20">
+          <MercSprite profession="engineer" motion="blades" className="h-full w-full" />
+        </span>
+      </span>
+    </div>
+  )
+}
+
 export function FixerContracts({ companies }: { companies: Company[] }) {
   const { sections, links, cyber } = useLabels()
-  const { ref, on: lit } = useZoneStage<District>('badlands')
+  const { ref, on: lit, reduced } = useZoneStage<District>('badlands')
+  const preview = usePreview()
   const [hot, setHot] = useState<number | null>(null)
+  const [passed, setPassed] = useState(false)
+  const slashing = lit && !reduced && !preview && !passed
 
   return (
     <div ref={ref} className={`${life.mapStage} mb-10`} data-on={on(lit)}>
@@ -165,39 +187,46 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
             <rect x={22} y={13} width={22} height={5} fill={NEON.data} fillOpacity={0.7} />
           </g>
           {companies.map((company, i) => (
-            <g key={company.id} className={life.pin} data-hot={on(hot === i)} style={{ '--i': i } as CSSProperties} transform={`translate(${pinX(i, companies.length)} 0)`}>
-              <circle className={life.pinRing} cx={0} cy={86} r={16} fill="none" stroke={NEON.gold} strokeWidth={3} />
-              <path d="M0 96 L-12 72 A14 14 0 1 1 12 72 Z" fill={NEON.gold} stroke={NEON.ink} strokeWidth={2} />
-              <text x={0} y={76} textAnchor="middle" fontSize={16} fill={NEON.ink}>
-                {String(i + 1).padStart(2, '0')}
-              </text>
+            // the place sits on an outer group: the drop's CSS transform on the pin would replace an SVG
+            // transform attribute on the same element and stack every pin at x 0
+            <g key={company.id} transform={`translate(${pinX(i, companies.length)} 0)`}>
+              <g className={life.pin} data-hot={on(hot === i)} style={{ '--i': i } as CSSProperties}>
+                <circle className={life.pinRing} cx={0} cy={86} r={16} fill="none" stroke={NEON.gold} strokeWidth={3} />
+                <path d="M0 96 L-12 72 A14 14 0 1 1 12 72 Z" fill={NEON.gold} stroke={NEON.ink} strokeWidth={2} />
+                <text x={0} y={76} textAnchor="middle" fontSize={16} fill={NEON.ink}>
+                  {String(i + 1).padStart(2, '0')}
+                </text>
+              </g>
             </g>
           ))}
         </svg>
-        <ul className="grid gap-5 md:grid-cols-3">
-          {companies.map((company, i) => (
-            <li key={company.id} className={life.contract} style={{ '--i': i } as CSSProperties} onPointerEnter={() => setHot(i)} onPointerLeave={() => setHot(null)} onFocus={() => setHot(i)} onBlur={() => setHot(null)}>
-              <Scannable kind="use" title={sections.ventures} fact={company.tagline}>
-                <a
-                  href={company.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={newTabName(links, `${company.name}: ${company.tagline}. ${company.description}`)}
-                  className={`${world.cut} block border border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)] bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)]`}
-                >
-                  <span className="block text-sm uppercase tracking-wider text-[color:var(--neon-gold)]">
-                    {fillLabel(cyber.contract, { number: String(i + 1).padStart(2, '0') })}
-                  </span>
-                  <span className="mt-1 block text-base text-[color:var(--neon-ice)]">
-                    <SlashBreaks text={company.name} />
-                  </span>
-                  <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>
-                  <span className="mt-2 block text-sm text-[color:var(--neon-ice)]">{company.description}</span>
-                </a>
-              </Scannable>
-            </li>
-          ))}
-        </ul>
+        <div className="relative">
+          {slashing && <BladesPass onPassed={() => setPassed(true)} />}
+          <ul className="grid gap-5 md:grid-cols-3">
+            {companies.map((company, i) => (
+              <li key={company.id} className={life.contract} style={{ '--i': i } as CSSProperties} onPointerEnter={() => setHot(i)} onPointerLeave={() => setHot(null)} onFocus={() => setHot(i)} onBlur={() => setHot(null)}>
+                <Scannable kind="use" title={sections.ventures} fact={company.tagline}>
+                  <a
+                    href={company.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={newTabName(links, `${company.name}: ${company.tagline}. ${company.description}`)}
+                    className={`${world.cut} block border border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)] bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)]`}
+                  >
+                    <span className="block text-sm uppercase tracking-wider text-[color:var(--neon-gold)]">
+                      {fillLabel(cyber.contract, { number: String(i + 1).padStart(2, '0') })}
+                    </span>
+                    <span className="mt-1 block text-base text-[color:var(--neon-ice)]">
+                      <SlashBreaks text={company.name} />
+                    </span>
+                    <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>
+                    <span className="mt-2 block text-sm text-[color:var(--neon-ice)]">{company.description}</span>
+                  </a>
+                </Scannable>
+              </li>
+            ))}
+          </ul>
+        </div>
       </HudPanel>
     </div>
   )
