@@ -8,11 +8,13 @@ import { jobYears } from '@/components/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import type { Locale } from '@/i18n/config'
 
 // A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
 const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
-export function CVContent() {
+/** The CV of the page's language; the language switch goes to the same CV in another one. */
+export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
   const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, services, workExperience, labels } =
     useCVData()
   const { cvPage } = labels
@@ -49,7 +51,7 @@ export function CVContent() {
             {cvPage.backToSite}
           </Link>
           <div className="flex flex-wrap items-center gap-4">
-            <LanguageSwitcher />
+            <LanguageSwitcher locale={locale} />
             <DownloadPdfButton label={cvPage.downloadPdf} />
           </div>
         </div>

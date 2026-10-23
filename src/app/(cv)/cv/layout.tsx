@@ -1,10 +1,9 @@
 import RootShell from '@/components/layouts/RootShell'
-import { requestLocale } from '@/i18n/requestLocale'
 
 export { viewport } from '@/components/layouts/RootShell'
 
-// The CV is translated: its document language is the locale of this request (cookie, then
-// Accept-Language), so screen readers read it in the language it is shown in.
-export default async function CVLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <RootShell lang={await requestLocale()}>{children}</RootShell>
+// The English CV's document language. Reading no cookie or header here keeps /cv static; the other
+// languages have their own address and layout ([locale]).
+export default function CVLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  return <RootShell lang="en">{children}</RootShell>
 }

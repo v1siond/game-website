@@ -1,23 +1,8 @@
-import type { Metadata } from 'next'
-import { getAllCVData } from '@/lib/cv-data'
-import { requestLocale } from '@/i18n/requestLocale'
-import { pageMetadata } from '@/lib/seo'
-import { PersonJsonLd } from '@/components/seo/PersonJsonLd'
-import { CVDataProvider } from '@/components/cv/CVDataProvider'
-import { CVContent } from './CVContent'
+import { CVPage, cvMetadata } from '../cvPage'
 
-export async function generateMetadata(): Promise<Metadata> {
-  return pageMetadata(await getAllCVData(await requestLocale()), '/cv')
-}
+export const generateMetadata = () => cvMetadata('en')
 
-// The CV of the request's locale, its facts and its labels from content/cv, read like the worlds read it.
-export default async function CVPage() {
-  const cv = await getAllCVData(await requestLocale())
-
-  return (
-    <CVDataProvider cv={cv}>
-      <PersonJsonLd cv={cv} path={'/cv'} />
-      <CVContent />
-    </CVDataProvider>
-  )
+// The English CV; src/middleware.ts sends a visitor whose language is another one to its address.
+export default function EnglishCVPage() {
+  return <CVPage locale="en" />
 }

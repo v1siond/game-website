@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles } from '@/lib/cv/content'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { siteMarkSvg } from '@/lib/siteMark'
-import { SITE_URL, pageMetadata, personJsonLd, shortRole, siteDescription, siteTitle, techKeywords } from '@/lib/seo'
+import { INDEXED_PATHS, SITE_URL, pageMetadata, personJsonLd, shortRole, siteDescription, siteTitle, techKeywords } from '@/lib/seo'
 
 // The real Decap files, so the head and the JSON-LD are checked against what the pages read.
 const readFiles = (): CVContentFiles =>
@@ -58,6 +58,20 @@ describe('pageMetadata', () => {
     expect(metadata.title).toBe(`${cv.labels.actions.cv} | ${cv.fullName}`)
     expect(metadata.alternates?.canonical).toBe('/cv')
     expect(metadata.openGraph).toMatchObject({ url: '/cv', type: 'profile', siteName: cv.fullName })
+  })
+
+  it('gives each CV language its own canonical and names all three plus x-default', () => {
+    const languages = { en: '/cv', es: '/es/cv', it: '/it/cv', 'x-default': '/cv' }
+
+    for (const path of ['/cv', '/es/cv', '/it/cv'] as const) {
+      const metadata = pageMetadata(cv, path)
+      expect(metadata.alternates).toEqual({ canonical: path, languages })
+      expect(metadata.openGraph).toMatchObject({ url: path })
+    }
+  })
+
+  it('points crawlers at the home page and the CV in every language', () => {
+    expect(INDEXED_PATHS).toEqual(['/', '/cv', '/es/cv', '/it/cv'])
   })
 
   it('names the 1200x630 preview card for open graph and twitter', () => {

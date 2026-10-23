@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import type { CVData } from './cv/content'
+import { CV_PATHS, locales, type CVPath } from '@/i18n/config'
 
 // What search engines, link previews and the web manifest say about the site, built from the Decap
 // content so a CV edit changes them too. Plain functions of the CV, no Next runtime.
@@ -7,9 +8,13 @@ import type { CVData } from './cv/content'
 /** The one address the site is served on; canonicals, the sitemap and the JSON-LD are built from it. */
 export const SITE_URL = 'https://alexanderpulido.dev'
 
-/** The pages crawlers are pointed at, by path. */
-export const INDEXED_PATHS = ['/', '/cv'] as const
-export type IndexedPath = (typeof INDEXED_PATHS)[number]
+/** The pages crawlers are pointed at, by path: the home page and the CV in every language. */
+export type IndexedPath = '/' | CVPath
+export const INDEXED_PATHS: readonly IndexedPath[] = ['/', ...locales.map((locale) => CV_PATHS[locale])]
+
+// The CV's language versions, named on each of them so search engines show the visitor's own; a
+// visitor whose language is none of them gets the English one.
+const CV_LANGUAGES = { ...CV_PATHS, 'x-default': CV_PATHS.en }
 
 const DESCRIPTION_LIMIT = 160
 
@@ -50,15 +55,17 @@ export function siteTitle(cv: SeoFacts): string {
   return `${cv.fullName} | ${shortRole(cv.professionalSummary.headline)}`
 }
 
-// Each indexed page's own title; the home page carries the site title.
-const PAGE_TITLES: Record<IndexedPath, (cv: SeoFacts) => string> = {
-  '/': siteTitle,
-  '/cv': (cv) => `${cv.labels.actions.cv} | ${cv.fullName}`,
-}
+// Each indexed page's own title; the home page carries the site title, every CV page the CV's.
+const pageTitle = (cv: SeoFacts, path: IndexedPath): string =>
+  path === '/' ? siteTitle(cv) : `${cv.labels.actions.cv} | ${cv.fullName}`
+
+// The home page is English only; a CV page also names its other languages.
+const alternatesFor = (path: IndexedPath): Metadata['alternates'] =>
+  path === '/' ? { canonical: path } : { canonical: path, languages: CV_LANGUAGES }
 
 /** The head of one indexed page: title, description, canonical, Open Graph, Twitter and keywords. */
 export function pageMetadata(cv: SeoFacts, path: IndexedPath): Metadata {
-  const title = PAGE_TITLES[path](cv)
+  const title = pageTitle(cv, path)
   const description = siteDescription(cv)
   // A page's openGraph replaces the parent's whole, so the card the root image file provides is named here.
   const images = [{ ...PREVIEW_IMAGE, alt: siteTitle(cv) }]
@@ -72,7 +79,7 @@ export function pageMetadata(cv: SeoFacts, path: IndexedPath): Metadata {
     authors: [{ name: cv.fullName, url: SITE_URL }],
     creator: cv.fullName,
     publisher: cv.fullName,
-    alternates: { canonical: path },
+    alternates: alternatesFor(path),
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
     openGraph: {
       type: 'profile',

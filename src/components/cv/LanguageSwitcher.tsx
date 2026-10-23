@@ -2,12 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useTransition, useEffect, useState, type ReactNode } from 'react'
-import { isLocale, locales, type Locale } from '@/i18n/config'
+import { cvPath, isLocale, locales, type Locale } from '@/i18n/config'
 import { useLabels } from './CVDataProvider'
 
-// The one language switcher. It owns reading and writing the locale cookie and the refresh; a world that
-// wants its own look passes `render` and draws the state. The cookie is the only store: it is what the
-// server renders from, so the picker can never name a language the page is not in.
+// The one language switcher. It owns the locale cookie and what a pick does; a world that wants its own
+// look passes `render` and draws the state. On a CV page (`locale` given, the language of its address) a
+// pick opens the CV at that language's address, so the picker always names the language the page is in.
+// Elsewhere it starts from the cookie and refreshes; the cookie is also what sends /cv to the picked
+// language (src/middleware.ts).
 
 export interface LocaleSwitchState {
   currentLocale: Locale
@@ -17,6 +19,8 @@ export interface LocaleSwitchState {
 
 interface LanguageSwitcherProps {
   render?: (state: LocaleSwitchState) => ReactNode
+  /** The language of the CV page the switcher sits on. */
+  locale?: Locale
 }
 
 const LOCALE_COOKIE_MAX_AGE = 60 * 60 * 24 * 365
@@ -55,21 +59,23 @@ function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitch
 
 const renderSelect = (state: LocaleSwitchState) => <SelectSwitcher {...state} />
 
-export function LanguageSwitcher({ render = renderSelect }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ render = renderSelect, locale }: LanguageSwitcherProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
-  const [currentLocale, setCurrentLocale] = useState<Locale>('en')
+  const [currentLocale, setCurrentLocale] = useState<Locale>(locale ?? 'en')
 
   useEffect(() => {
+    if (locale) return
     const stored = storedLocale()
     if (stored) setCurrentLocale(stored)
-  }, [])
+  }, [locale])
 
   const changeLocale = (newLocale: Locale) => {
-    document.cookie = `locale=${newLocale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}`
+    document.cookie = `locale=${newLocale}; path=/; max-age=${LOCALE_COOKIE_MAX_AGE}; samesite=lax`
     setCurrentLocale(newLocale)
     startTransition(() => {
-      router.refresh()
+      if (locale) router.push(cvPath(newLocale))
+      else router.refresh()
     })
   }
 
