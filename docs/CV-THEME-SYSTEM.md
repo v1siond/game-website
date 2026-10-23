@@ -2,12 +2,14 @@
 
 The site shows Alexander's CV inside one of 17 game styled worlds, or as a plain page at `/cv`. Every world
 reads the same CV content (Decap files in `content/cv/`) and the same shared scroll, hero and text pieces; a
-world only adds its own look: its palette, its art and its scenes. The default world is Neon Cyber.
+world only adds its own look: its palette, its art and its scenes. The default world is Medieval Fantasy.
 
 ## How a visitor gets a world
 
 - The homepage renders the world picked in the worlds menu, remembered in localStorage under
-  `portfolio-theme`. `?t=<id>` opens a world directly. With nothing stored, the default `neon-cyber` opens.
+  `portfolio-theme`. `?t=<id>` opens a world directly. With nothing stored, the default `medieval-fantasy`
+  opens (`DEFAULT_THEME_ID` in `src/themes/themes.ts`). The server renders the default, so a first visit
+  paints it with no other world first.
 - `?profession=<id>` opens a profession directly (`engineer`, `drummer`, `fighter`). With none, the world
   opens on the engineer.
 - `/cv` is the plain CV in English, Spanish or Italian, with a PDF download.
@@ -15,8 +17,8 @@ world only adds its own look: its palette, its art and its scenes. The default w
 ## The 17 worlds
 
 Dark Fantasy, Survival Horror, Neon Portals, Soul Map, Adventure Paths, Rubber Hose, Retro RPG, Bold Noir,
-Fighter Select, Art Deco, Retro Atomic, Neon Cyber (default), Cell Shaded, Silhouette, Mythic, Tropical
-Platformer, Medieval Fantasy. The worlds menu groups them in five categories: Fantasy, Retro, Neon, Action,
+Fighter Select, Art Deco, Retro Atomic, Neon Cyber, Cell Shaded, Silhouette, Mythic, Tropical
+Platformer, Medieval Fantasy (default). The worlds menu groups them in five categories: Fantasy, Retro, Neon, Action,
 Artistic.
 
 ## Where the CV content comes from

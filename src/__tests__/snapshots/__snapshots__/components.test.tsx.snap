@@ -105,8 +105,8 @@ exports[`Theme Data Snapshots default theme configuration matches snapshot 1`] =
     "grainOpacity",
     "vignetteIntensity",
   ],
-  "id": "neon-cyber",
-  "name": "Neon Cyber",
+  "id": "medieval-fantasy",
+  "name": "Medieval Fantasy",
 }
 `;
 

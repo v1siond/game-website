@@ -1,6 +1,7 @@
 import { render, screen, act } from '@testing-library/react'
 import { ThemeProvider, useTheme } from '@/themes/ThemeContext'
 import { WorldTransitionProvider, useWorldTransition } from '@/themes/WorldTransitionContext'
+import { DEFAULT_THEME_ID } from '@/themes/themes'
 
 function Probe() {
   const { theme } = useTheme()
@@ -10,7 +11,7 @@ function Probe() {
       <span data-testid="current">{theme.id}</span>
       <span data-testid="transitioning">{String(isTransitioning)}</span>
       <button onClick={() => selectWorld('mythic')}>go-mythic</button>
-      <button onClick={() => selectWorld('neon-cyber')}>go-current</button>
+      <button onClick={() => selectWorld(DEFAULT_THEME_ID)}>go-current</button>
     </div>
   )
 }
@@ -39,7 +40,7 @@ describe('WorldTransition (portal)', () => {
 
   it('starts in the default world and not transitioning', () => {
     setup()
-    expect(screen.getByTestId('current')).toHaveTextContent('neon-cyber')
+    expect(screen.getByTestId('current')).toHaveTextContent(DEFAULT_THEME_ID)
     expect(screen.getByTestId('transitioning')).toHaveTextContent('false')
   })
 
@@ -51,7 +52,7 @@ describe('WorldTransition (portal)', () => {
     })
     // Cover phase has begun, but the world hasn't swapped yet.
     expect(screen.getByTestId('transitioning')).toHaveTextContent('true')
-    expect(screen.getByTestId('current')).toHaveTextContent('neon-cyber')
+    expect(screen.getByTestId('current')).toHaveTextContent(DEFAULT_THEME_ID)
 
     // Cover peak -> world swaps, scrolls to top, persists.
     act(() => {
@@ -74,6 +75,6 @@ describe('WorldTransition (portal)', () => {
       screen.getByText('go-current').click()
     })
     expect(screen.getByTestId('transitioning')).toHaveTextContent('false')
-    expect(screen.getByTestId('current')).toHaveTextContent('neon-cyber')
+    expect(screen.getByTestId('current')).toHaveTextContent(DEFAULT_THEME_ID)
   })
 })

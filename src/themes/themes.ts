@@ -381,7 +381,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 12. Neon Cyber - the default world: a netrunner's night city through the optics HUD, with quickhacks and scan mode
+  // 12. Neon Cyber - a netrunner's night city through the optics HUD, with quickhacks and scan mode
   {
     id: 'neon-cyber',
     name: 'Neon Cyber',
@@ -531,7 +531,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 17. Medieval Fantasy - a real time strategy kingdom in gold and stone
+  // 17. Medieval Fantasy - the default world: a real time strategy kingdom in gold and stone
   {
     id: 'medieval-fantasy',
     name: 'Medieval Fantasy',
@@ -562,7 +562,7 @@ export const themes: Theme[] = [
   },
 ]
 
-export const DEFAULT_THEME_ID = 'neon-cyber'
+export const DEFAULT_THEME_ID = 'medieval-fantasy'
 
 /** Where the chosen world is remembered. Exported because the failure screen has to read the world
  *  WITHOUT the ThemeProvider: a root-layout crash unmounts the providers, and the Pages Router tree

@@ -13,7 +13,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Boot into the last-chosen world, defaulting to neon-cyber when nothing is stored.
+  // Boot into the last-chosen world, defaulting to DEFAULT_THEME_ID (medieval-fantasy) when nothing is stored.
   const [theme, setTheme] = useState<Theme>(getThemeById(DEFAULT_THEME_ID))
   const [mounted, setMounted] = useState(false)
 

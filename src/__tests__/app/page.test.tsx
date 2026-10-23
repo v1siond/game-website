@@ -27,9 +27,9 @@ describe('Home page (boot into a world)', () => {
     jest.clearAllMocks()
   })
 
-  it('boots into the default world (neon-cyber) when nothing is stored', () => {
+  it('boots into the default world (medieval-fantasy) when nothing is stored', () => {
     render(<WorldRenderer />)
-    expect(screen.getByTestId('theme-neon-cyber')).toBeInTheDocument()
+    expect(screen.getByTestId('theme-medieval-fantasy')).toBeInTheDocument()
   })
 
   it('boots into the stored world from localStorage', async () => {

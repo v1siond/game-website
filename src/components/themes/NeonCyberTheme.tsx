@@ -23,7 +23,7 @@ import world from './NeonCyber/world.module.css'
 // The world's own lettering: the root carries its --neon-face variable and the world's css reads it.
 const neonFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display: 'swap', variable: '--neon-face' })
 
-// Neon Cyber, the default world: a netrunner's night city seen through the optics HUD. The page
+// Neon Cyber: a netrunner's night city seen through the optics HUD. The page
 // composition: the hero boots the optics (./NeonCyber/boot), the profession switch is the quickhack
 // menu over his rig (./NeonCyber/quickhack, ./NeonCyber/rigs), the sections are the braindance of his
 // work, the gigs with their breach, the radio and the data tab (./NeonCyber/views), and contact is an
