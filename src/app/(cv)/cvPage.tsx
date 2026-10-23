@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { getAllCVData } from '@/lib/cv-data'
 import { cvPath, defaultLocale, isLocale, type Locale } from '@/i18n/config'
 import { pageMetadata } from '@/lib/seo'
-import { PersonJsonLd } from '@/components/seo/PersonJsonLd'
+import { ProfilePageJsonLd } from '@/components/seo/ProfilePageJsonLd'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
 import { CVContent } from './cv/CVContent'
 
@@ -28,7 +28,7 @@ export async function CVPage({ locale }: Readonly<{ locale: Locale }>) {
 
   return (
     <CVDataProvider cv={cv}>
-      <PersonJsonLd cv={cv} path={cvPath(locale)} />
+      <ProfilePageJsonLd cv={cv} path={cvPath(locale)} />
       <CVContent locale={locale} />
     </CVDataProvider>
   )

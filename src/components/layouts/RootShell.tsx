@@ -1,8 +1,9 @@
-import type { Viewport } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Bebas_Neue } from "next/font/google";
 import "../../styles/globals.css";
 import ClientProviders from "../providers/ClientProviders";
+import { SITE_URL } from "@/lib/seo";
 
 const silkScreen = localFont({
   src: [
@@ -43,6 +44,12 @@ const bebasNeue = Bebas_Neue({
   preload: false,
   variable: '--font-bebas-neue',
 });
+
+// Every page's relative metadata URLs (the root opengraph-image file, canonicals) resolve against the
+// site's address, the 404 page's included, which sets no page metadata of its own.
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+};
 
 export const viewport: Viewport = {
   width: 'device-width',

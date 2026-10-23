@@ -2,7 +2,7 @@ import RootShell from '@/components/layouts/RootShell'
 import { defaultLocale, isLocale, locales } from '@/i18n/config'
 import type { TranslatedLocale } from '../cvPage'
 
-export { viewport } from '@/components/layouts/RootShell'
+export { metadata, viewport } from '@/components/layouts/RootShell'
 
 // The translated CVs, /es/cv and /it/cv, each rendered at build time; English stays on /cv.
 export function generateStaticParams(): { locale: TranslatedLocale }[] {

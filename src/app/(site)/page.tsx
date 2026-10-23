@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getAllCVData } from '@/lib/cv-data'
 import { pageMetadata } from '@/lib/seo'
-import { PersonJsonLd } from '@/components/seo/PersonJsonLd'
+import { ProfilePageJsonLd } from '@/components/seo/ProfilePageJsonLd'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
 import { WORLD_PENDING_SCRIPT } from '@/themes/worldPending'
 import { WorldRenderer } from './WorldRenderer'
@@ -18,7 +18,7 @@ export default async function Home() {
 
   return (
     <CVDataProvider cv={cv}>
-      <PersonJsonLd cv={cv} path={'/'} />
+      <ProfilePageJsonLd cv={cv} path={'/'} />
       <script dangerouslySetInnerHTML={{ __html: WORLD_PENDING_SCRIPT }} />
       <WorldRenderer />
     </CVDataProvider>

@@ -19,7 +19,7 @@ import world from './world.module.css'
 const PORTRAIT_LINES = [0, 1, 2, 3, 4, 5, 6, 7]
 
 export function HoloCall({ profession }: { profession: Profession }) {
-  const { cyber, sections, navigation } = useLabels()
+  const { cyber, sections } = useLabels()
   const { ref, triggered } = useSectionTrigger()
 
   return (
@@ -62,7 +62,7 @@ export function HoloCall({ profession }: { profession: Profession }) {
                   <NameWords name={name} />
                 </p>
                 <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{line}</p>
-                <nav className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start" aria-label={navigation.contactAndCv}>
+                <nav className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start" aria-labelledby={panelHeadingId(sections.contact)}>
                   {actions.map((action) => (
                     <HeroAction key={action.id} action={action} className={world.answer} />
                   ))}

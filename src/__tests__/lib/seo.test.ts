@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles } from '@/lib/cv/content'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { siteMarkSvg } from '@/lib/siteMark'
-import { INDEXED_PATHS, SITE_URL, pageMetadata, personJsonLd, shortRole, siteDescription, siteTitle, techKeywords } from '@/lib/seo'
+import { INDEXED_PATHS, SITE_URL, pageMetadata, profilePageJsonLd, shortRole, siteDescription, siteTitle, techKeywords } from '@/lib/seo'
 
 // The real Decap files, so the head and the JSON-LD are checked against what the pages read.
 const readFiles = (): CVContentFiles =>
@@ -88,21 +88,31 @@ describe('pageMetadata', () => {
   })
 })
 
-describe('personJsonLd', () => {
-  it('describes him as a schema.org Person from the content', () => {
-    const person = personJsonLd(cv, '/cv')
+describe('profilePageJsonLd', () => {
+  const modified = new Date('2026-10-20T12:00:00Z')
+  const page = profilePageJsonLd(cv, '/es/cv', modified)
 
-    expect(person).toMatchObject({
+  it('describes the page as a schema.org ProfilePage of its address, dated by the content', () => {
+    expect(page).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
+      url: `${SITE_URL}/es/cv`,
+      dateModified: '2026-10-20T12:00:00.000Z',
+    })
+  })
+
+  it('names him as its main entity, a Person from the content with the preview image', () => {
+    expect(page.mainEntity).toMatchObject({
       '@type': 'Person',
       name: cv.fullName,
       jobTitle: shortRole(cv.professionalSummary.headline),
       url: SITE_URL,
-      mainEntityOfPage: `${SITE_URL}/cv`,
+      image: `${SITE_URL}/opengraph-image`,
       email: `mailto:${cv.contact.email}`,
       sameAs: [cv.contact.linkedin],
     })
-    expect(person.knowsAbout).toEqual(techKeywords(cv))
-    expect(new Set(person.knowsAbout).size).toBe(person.knowsAbout.length)
+    expect(page.mainEntity.knowsAbout).toEqual(techKeywords(cv))
+    expect(new Set(page.mainEntity.knowsAbout).size).toBe(page.mainEntity.knowsAbout.length)
   })
 })
 

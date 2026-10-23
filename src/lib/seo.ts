@@ -93,18 +93,24 @@ export function pageMetadata(cv: SeoFacts, path: IndexedPath): Metadata {
   }
 }
 
-/** The schema.org Person the page describes, for the application/ld+json script. */
-export function personJsonLd(cv: SeoFacts, path: IndexedPath) {
+/** The schema.org ProfilePage of one indexed page: its address, when its content last changed, and him
+ *  as its main entity, for the application/ld+json script. */
+export function profilePageJsonLd(cv: SeoFacts, path: IndexedPath, dateModified: Date) {
   return {
     '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: cv.fullName,
-    jobTitle: shortRole(cv.professionalSummary.headline),
-    description: siteDescription(cv),
-    url: SITE_URL,
-    mainEntityOfPage: absoluteUrl(path),
-    email: `mailto:${cv.contact.email}`,
-    sameAs: [cv.contact.linkedin],
-    knowsAbout: techKeywords(cv),
+    '@type': 'ProfilePage',
+    url: absoluteUrl(path),
+    dateModified: dateModified.toISOString(),
+    mainEntity: {
+      '@type': 'Person',
+      name: cv.fullName,
+      jobTitle: shortRole(cv.professionalSummary.headline),
+      description: siteDescription(cv),
+      url: SITE_URL,
+      image: absoluteUrl(PREVIEW_IMAGE.url),
+      email: `mailto:${cv.contact.email}`,
+      sameAs: [cv.contact.linkedin],
+      knowsAbout: techKeywords(cv),
+    },
   }
 }
