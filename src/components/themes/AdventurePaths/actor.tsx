@@ -18,8 +18,10 @@ import side from './side.module.css'
 function Pixels({ parts, colours }: { parts: readonly SpritePart[]; colours: Record<string, string> }) {
   return (
     <>
-      {parts.flatMap(({ rows, top }) =>
-        pixelRuns(rows, top).map((run) => <rect key={`${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={colours[run.key]} />),
+      {parts.flatMap(({ rows, top }, part) =>
+        pixelRuns(rows, top).map((run) => (
+          <rect key={`${part}-${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={colours[run.key]} />
+        )),
       )}
     </>
   )

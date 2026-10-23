@@ -1,0 +1,47 @@
+/*
+ * Work Experience (platforms.tsx): the job card under the ledge he lands on bumps up and back in steps,
+ * the source game's block bump. Two identical animations under two names, so a second landing on the
+ * same card restarts it. Transforms only, and only when motion is wanted.
+ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .bumpA {
+    animation: bump-a 240ms steps(4, end) both;
+  }
+
+  .bumpB {
+    animation: bump-b 240ms steps(4, end) both;
+  }
+}
+
+@keyframes bump-a {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translate3d(0, -10px, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+  75% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@keyframes bump-b {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translate3d(0, -10px, 0);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+  75% {
+    transform: translate3d(0, -2px, 0);
+  }
+}

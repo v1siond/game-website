@@ -1,0 +1,32 @@
+/*
+ * Services, the stomp (services.tsx). The lane is a zero height line 32 px under the cards' top edge, so
+ * the rig's track and the foe (both stand 32 px over their ground, side.module.css) stand on the edge
+ * itself. The row's thud waits for his landing with its delay. Transforms only; reduced motion never
+ * mounts the scene or the thud.
+ */
+
+.lane {
+  top: 32px;
+  height: 0;
+}
+
+/* the card row takes his weight as the stomp lands: down and back in steps */
+.thud {
+  animation: thud 280ms steps(4, end) 880ms both;
+}
+
+@keyframes thud {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translate3d(0, 8px, 0);
+  }
+  50% {
+    transform: translate3d(0, -3px, 0);
+  }
+  75% {
+    transform: translate3d(0, 1px, 0);
+  }
+}

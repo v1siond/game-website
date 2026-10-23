@@ -16,17 +16,22 @@ import { JOURNAL_SERIF, TRAIL } from './palette'
 import { Banner, PAPER_CARD, Playfield, Region } from './region'
 import type { Zone } from './world'
 import side from './side.module.css'
+import bump from './jobBump.module.css'
 
 // Work Experience as a sky level of floating ledges (research images 06, 16, 30): one ledge per job,
 // oldest on the left, rising in two staggered rows to the job he holds now. On arrival he runs in and
 // jumps ledge to ledge, one at a time, up to the latest job. Pointing at or focusing a job card, or
 // pressing a ledge, sends him hopping across the ledges in between to that job's, and the HUD line names
-// it. Under reduced motion he stands on the ledge at once.
+// it. Each time he lands on a ledge, that job's card below takes the landing: it bumps up and back in
+// steps, the way a block bumps under the source game's hero (jobBump.module.css, 240 ms). A landing on
+// the same card twice in a row swaps between two identical animations so the bump plays again. Under
+// reduced motion he stands on the ledge at once and no card bumps.
 
 const LEDGE_HEIGHT = 44
 const ENTRY: Spot = { x: 0, lift: 0 }
 const RUN_IN: Motion = { pose: 'run', frame: 'run', path: 'line', from: { x: -20, lift: 0 }, to: ENTRY, ms: 520 }
 const HOP_MS = 280
+const BUMPS = [bump.bumpA, bump.bumpB]
 
 /** The jobs in course order: oldest first, so the ledges climb through time. */
 const byStart = (jobs: readonly Job[]): Job[] => [...jobs].sort((a, b) => a.startDate.getTime() - b.startDate.getTime())
@@ -122,11 +127,14 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
   const targetRef = useRef(latest)
   // He starts off the left edge; the run in ends at the entry spot (-1), then he hops up the ledges.
   const [hop, setHop] = useState<Hop>({ from: -2, at: -1 })
+  // The ledge he last landed on and how many landings so far (its parity picks the bump's twin).
+  const [landing, setLanding] = useState({ at: -1, count: 0 })
   const shown: Hop = reduced ? { from: target, at: target } : hop
   const settled = shown.at >= 0 && shown.from === shown.at
 
   const step = (event: AnimationEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return
+    if (hop.at >= 0) setLanding((now) => ({ at: hop.at, count: now.count + 1 }))
     setHop((now) => hopToward(now, targetRef.current))
   }
 
@@ -142,6 +150,7 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
   }
 
   const standing = settled ? route[shown.at] : null
+  const bumpOf = (index: number) => (reduced || landing.at !== index ? '' : BUMPS[landing.count % 2])
 
   return (
     <Region title={sections.workExperience} hint={labels.jobHint} stageRef={ref} on={on}>
@@ -172,7 +181,7 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
         {jobs.map((job) => {
           const index = route.indexOf(job)
           return (
-            <li key={job.id} className={MASONRY_ITEM}>
+            <li key={job.id} className={`${MASONRY_ITEM} ${bumpOf(index)}`}>
               <JobCard job={job} stop={index + 1} onPoint={() => point(index)} />
             </li>
           )
