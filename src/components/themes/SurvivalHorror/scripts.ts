@@ -1,6 +1,7 @@
 import type { Profession } from '@/lib/cv/professions'
-import type { HeroPose } from './survivor'
-import type { StalkerPose } from './stalker'
+import { HERO_GAITS, type HeroPose } from './survivor'
+import { STALKER_GAITS, type StalkerPose } from './stalker'
+import { stepsFor, type Gait } from './gait'
 import type { Condition } from './ecg'
 
 // What he and the pursuer do in each room behind the page (./stage), as timed beats. A room's script runs
@@ -44,10 +45,13 @@ export interface Frame {
   gone: boolean
   // How long his joints take to reach the pose.
   tempo: number
-  // The pursuer: none, near (the same floor as him) or far (behind the glass, small and dark).
+  // The pursuer: none, near (the same floor as him) or far (behind the glass, small and dark), his place,
+  // his move, which way he faces (drawn facing right, so -1 is towards him) and how long his joints take.
   foe: StalkerPose | null
   fx: number
   fmove: number
+  fface: 1 | -1
+  ftempo: number
   far: boolean
   flags: Flags
 }
@@ -82,7 +86,24 @@ const NO_FLAGS: Flags = {
   inside: false,
 }
 
-const BASE: Frame = { hero: 'stand', x: 0, move: 0, face: 1, gone: false, tempo: 320, foe: null, fx: 8, fmove: 0, far: false, flags: NO_FLAGS }
+// How small the pursuer is far behind the corridor glass (stage.module.css .far).
+export const FAR_SCALE = 0.55
+
+const BASE: Frame = {
+  hero: 'stand',
+  x: 0,
+  move: 0,
+  face: 1,
+  gone: false,
+  tempo: 320,
+  foe: null,
+  fx: 8,
+  fmove: 0,
+  fface: -1,
+  ftempo: 320,
+  far: false,
+  flags: NO_FLAGS,
+}
 
 // Off camera to the left and to the right of every screen.
 const OFF_LEFT = -4
@@ -98,29 +119,45 @@ export function apply(frame: Frame, beat: Partial<Beat>): Frame {
 export const startFrame = (script: Script) => apply(BASE, script.start)
 
 /** Every beat folded over the start, with no moves left to play: the frame a finished script holds. */
-export const lastFrame = (script: Script): Frame => ({ ...script.beats.reduce(apply, startFrame(script)), move: 0, fmove: 0, tempo: 0 })
+export const lastFrame = (script: Script): Frame => ({ ...script.beats.reduce(apply, startFrame(script)), move: 0, fmove: 0, tempo: 0, ftempo: 0 })
 
-interface Walk {
+interface Crossing<Pose extends string> {
+  // When it starts, the place it starts from and the place it ends on, how long it takes, the gait, and
+  // the pose taken on arrival.
   from: number
+  start: number
   to: number
   ms: number
-  poses?: readonly [HeroPose, HeroPose]
-  step?: number
-  end?: HeroPose
+  gait?: Gait<Pose>
+  end?: Pose
 }
 
-const steps = (from: number, ms: number, step: number) => Array.from({ length: Math.max(1, Math.round(ms / step)) }, (_, index) => from + index * step)
-
-/** He crosses to `to` over `ms`, his legs swapping between the two poses each step, then takes `end`. */
-function walk({ from, to, ms, poses = ['walkA', 'walkB'], step = 360, end = 'stand' }: Walk): Beat[] {
-  const strides = steps(from, ms, step).map((at, index): Beat => ({ at, hero: poses[index % 2], tempo: step }))
-  return [{ ...strides[0], x: to, move: ms }, ...strides.slice(1), { at: from + ms, hero: end, tempo: 320 }]
+/**
+ * A crossing in steps: as many steps as the distance holds the gait's stride, so the planted sole sweeps
+ * back under the figure as far as the stage carries it, two keys a step (contact, then passing), each
+ * eased over its own share of the time. The figure starts on the cycle's first key (its start frame puts
+ * it there), so every beat moves it on to the next key.
+ */
+function keysOf<Pose extends string>({ from, start, to, ms }: Crossing<Pose>, gait: Gait<Pose>, stride: number) {
+  const count = stepsFor(to - start, stride) * 2
+  const beat = ms / count
+  return Array.from({ length: count }, (_, index) => ({ at: Math.round(from + index * beat), pose: gait.cycle[(index + 1) % gait.cycle.length], beat: Math.round(beat) }))
 }
 
-/** The pursuer's walk: the same, on his own place. */
-function stalk({ from, to, ms, poses = ['walkA', 'walkB'], step = 520, end = 'stand' }: Omit<Walk, 'poses' | 'end'> & { poses?: readonly [StalkerPose, StalkerPose]; end?: StalkerPose }): Beat[] {
-  const strides = steps(from, ms, step).map((at, index): Beat => ({ at, foe: poses[index % 2] }))
-  return [{ ...strides[0], fx: to, fmove: ms }, ...strides.slice(1), { at: from + ms, foe: end }]
+/** He crosses from `start` to `to` over `ms` in his gait, then takes `end`. */
+function walk({ gait = HERO_GAITS.walk, end = 'stand', ...crossing }: Crossing<HeroPose>): Beat[] {
+  const keys = keysOf(crossing, gait, gait.stride).map(({ at, pose, beat }): Beat => ({ at, hero: pose, tempo: beat }))
+  return [{ ...keys[0], x: crossing.to, move: crossing.ms }, ...keys.slice(1), { at: crossing.from + crossing.ms, hero: end, tempo: 320 }]
+}
+
+/**
+ * The pursuer's crossing, the same on his own place, turned to face where he goes. Far behind the glass he
+ * is drawn smaller, so the same crossing takes more of his steps.
+ */
+function stalk({ gait = STALKER_GAITS.walk, end = 'stand', far = false, ...crossing }: Crossing<StalkerPose> & { far?: boolean }): Beat[] {
+  const keys = keysOf(crossing, gait, gait.stride * (far ? FAR_SCALE : 1)).map(({ at, pose, beat }): Beat => ({ at, foe: pose, ftempo: beat }))
+  const facing = crossing.to > crossing.start ? 1 : -1
+  return [{ ...keys[0], fx: crossing.to, fmove: crossing.ms, fface: facing }, ...keys.slice(1), { at: crossing.from + crossing.ms, foe: end, ftempo: 320 }]
 }
 
 const READY: Record<Profession, { pose: HeroPose; laser: boolean }> = {
@@ -136,7 +173,7 @@ function hall({ profession, entrance }: ScriptContext): Script {
   const ready = READY[profession]
   return {
     start: { x: OFF_LEFT, hero: 'walkA' },
-    beats: [...walk({ from: entrance, to: 0.8, ms: 1400, end: ready.pose }), { at: entrance + 1700, set: { laser: ready.laser } }],
+    beats: [...walk({ from: entrance, start: OFF_LEFT, to: 0.8, ms: 1400, end: ready.pose }), { at: entrance + 1700, set: { laser: ready.laser } }],
   }
 }
 
@@ -145,7 +182,7 @@ function store(): Script {
   return {
     start: { x: OFF_LEFT, hero: 'walkA' },
     beats: [
-      ...walk({ from: 0, to: 0.1, ms: 1300 }),
+      ...walk({ from: 0, start: OFF_LEFT, to: 0.1, ms: 1300 }),
       { at: 1400, hero: 'kneel', tempo: 420 },
       { at: 1800, set: { lid: true } },
       { at: 2100, hero: 'take' },
@@ -172,10 +209,10 @@ function about(): Script {
 // The long corridor: the pursuer crosses behind the glass; he turns to it, raises the gun, lowers it.
 function experience(): Script {
   return {
-    start: { x: OFF_LEFT, hero: 'walkA', foe: 'walkA', fx: OFF_RIGHT, far: true },
+    start: { x: OFF_LEFT, hero: 'walkA', foe: 'chargeA', fx: OFF_RIGHT, far: true },
     beats: byTime([
-      ...walk({ from: 0, to: 0.3, ms: 1200 }),
-      ...stalk({ from: 600, to: OFF_FAR_LEFT, ms: 7000 }),
+      ...walk({ from: 0, start: OFF_LEFT, to: 0.3, ms: 1200 }),
+      ...stalk({ from: 600, start: OFF_RIGHT, to: OFF_FAR_LEFT, ms: 7000, gait: STALKER_GAITS.charge, far: true }),
       { at: 1900, hero: 'alert', tempo: 260 },
       { at: 3300, hero: 'aim', tempo: 420 },
       { at: 6400, hero: 'stand' },
@@ -210,9 +247,9 @@ function projects(): Script {
     beats: [
       { at: 400, set: { backDoor: true } },
       { at: 800, foe: 'stand' },
-      { at: 1200, hero: 'aim', tempo: 260 },
-      ...walk({ from: 1600, to: -0.1, ms: 1200, poses: ['aimStepA', 'aimStepB'], step: 400, end: 'aim' }),
-      { at: 2600, foe: 'reach', tempo: 600 },
+      { at: 1200, hero: 'aimStepA', tempo: 260 },
+      ...walk({ from: 1600, start: 0.4, to: -0.1, ms: 1200, gait: HERO_GAITS.backAway, end: 'aim' }),
+      { at: 2600, foe: 'reach', ftempo: 600 },
     ],
   }
 }
@@ -221,20 +258,20 @@ function projects(): Script {
 function ventures(): Script {
   return {
     start: { x: OFF_LEFT, hero: 'walkA' },
-    beats: [...walk({ from: 0, to: 0.3, ms: 1400 }), { at: 1600, set: { coat: true } }, { at: 2100, hero: 'nod' }, { at: 2700, hero: 'stand' }],
+    beats: [...walk({ from: 0, start: OFF_LEFT, to: 0.3, ms: 1400 }), { at: 1600, set: { coat: true } }, { at: 2100, hero: 'nod' }, { at: 2700, hero: 'stand' }],
   }
 }
 
 // The suit door: he turns the key, the door swings open, and the pursuer passes behind the glass.
 function bands(): Script {
   return {
-    start: { x: OFF_LEFT, hero: 'walkA', foe: 'walkA', fx: OFF_RIGHT, far: true },
+    start: { x: OFF_LEFT, hero: 'walkA', foe: 'chargeA', fx: OFF_RIGHT, far: true },
     beats: byTime([
-      ...walk({ from: 0, to: 0.1, ms: 1200 }),
+      ...walk({ from: 0, start: OFF_LEFT, to: 0.1, ms: 1200 }),
       { at: 1400, hero: 'keyReach' },
       { at: 1900, hero: 'keyTurn' },
       { at: 2300, set: { suitDoor: true } },
-      ...stalk({ from: 2600, to: OFF_FAR_LEFT, ms: 6000 }),
+      ...stalk({ from: 2600, start: OFF_RIGHT, to: OFF_FAR_LEFT, ms: 6000, gait: STALKER_GAITS.charge, far: true }),
       { at: 3000, hero: 'alert', tempo: 260 },
       { at: 6800, hero: 'stand' },
       { at: 8700, foe: null },
@@ -247,19 +284,19 @@ function bands(): Script {
 const GYM: Record<Condition, () => Script> = {
   danger: () => ({
     start: { x: OFF_LEFT, hero: 'limpA' },
-    beats: walk({ from: 0, to: 0.2, ms: 2600, poses: ['limpA', 'limpB'], step: 520, end: 'limp' }),
+    beats: walk({ from: 0, start: OFF_LEFT, to: 0.2, ms: 2600, gait: HERO_GAITS.limp, end: 'limp' }),
   }),
   caution: () => ({ start: { x: 0.2, hero: 'limp' }, beats: [{ at: 300, hero: 'stand', tempo: 700 }] }),
   fine: () => ({
     start: { x: 0.2, foe: 'walkA', fx: 5 },
     beats: byTime([
       { at: 200, hero: 'guard' },
-      ...stalk({ from: 400, to: 1.5, ms: 1800 }),
+      ...stalk({ from: 400, start: 5, to: 1.5, ms: 1800 }),
       { at: 2400, hero: 'kickChamber', tempo: 240 },
       { at: 2700, hero: 'kick', tempo: 140 },
-      { at: 2850, foe: 'stagger', tempo: 200 },
+      { at: 2850, foe: 'stagger', ftempo: 200 },
       { at: 3400, hero: 'guard', tempo: 320 },
-      ...stalk({ from: 3800, to: OFF_RIGHT, ms: 2800 }),
+      ...stalk({ from: 3800, start: 1.5, to: OFF_RIGHT, ms: 2800 }),
       { at: 6700, foe: null },
     ]),
   }),
@@ -278,21 +315,21 @@ function contact({ saves }: ScriptContext): Script {
     }
   }
   return {
-    start: { x: 2.4, face: -1, foe: null, fx: 6 },
+    start: { x: 2.4, face: -1, hero: 'runA', foe: null, fx: 6 },
     beats: byTime([
-      ...walk({ from: 300, to: 0.2, ms: 1200, poses: ['runA', 'runB'], step: 200, end: 'runA' }),
+      ...walk({ from: 300, start: 2.4, to: 0.2, ms: 1200, gait: HERO_GAITS.run, end: 'runA' }),
       { at: 300, foe: 'chargeA' },
-      ...stalk({ from: 400, to: 1.4, ms: 1500, poses: ['chargeA', 'chargeB'], step: 250, end: 'stand' }),
+      ...stalk({ from: 400, start: 6, to: 1.4, ms: 1500, gait: STALKER_GAITS.charge }),
       { at: 1200, set: { safeDoor: true } },
       { at: 1500, gone: true },
       { at: 1700, set: { safeDoor: false } },
-      { at: 2000, foe: 'raise', tempo: 300 },
-      { at: 2300, foe: 'pound', tempo: 120, set: { shake: true } },
-      { at: 2700, foe: 'raise', tempo: 300, set: { shake: false } },
-      { at: 3000, foe: 'pound', tempo: 120, set: { shake: true } },
-      { at: 3400, foe: 'stand', tempo: 400, set: { shake: false } },
-      ...stalk({ from: 3800, to: OFF_RIGHT, ms: 2600 }),
-      { at: 6600, foe: null, gone: false, x: 0.5, face: 1, hero: 'sit', set: { inside: true } },
+      { at: 2000, foe: 'raise', ftempo: 300 },
+      { at: 2300, foe: 'pound', ftempo: 120, set: { shake: true } },
+      { at: 2700, foe: 'raise', ftempo: 300, set: { shake: false } },
+      { at: 3000, foe: 'pound', ftempo: 120, set: { shake: true } },
+      { at: 3400, foe: 'stand', ftempo: 400, set: { shake: false } },
+      ...stalk({ from: 3800, start: 1.4, to: OFF_RIGHT, ms: 2600 }),
+      { at: 6600, foe: null, fface: -1, gone: false, x: 0.5, face: 1, hero: 'sit', set: { inside: true } },
     ]),
   }
 }

@@ -4,12 +4,12 @@ import { createContext, useContext, useEffect, useRef, useState, type CSSPropert
 import type { Profession } from '@/lib/cv/professions'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { Survivor } from './survivor'
-import { Stalker } from './stalker'
+import { STALKER_BOX, Stalker } from './stalker'
 import { RoomArt } from './rooms'
 import { Magazine, Props } from './props'
 import { ENTRANCE_MS } from './door'
 import type { Condition } from './ecg'
-import { apply, lastFrame, playKey, scriptFor, startFrame, type Frame, type Zone } from './scripts'
+import { FAR_SCALE, apply, lastFrame, playKey, scriptFor, startFrame, type Frame, type Zone } from './scripts'
 import look from './world.module.css'
 import stage from './stage.module.css'
 
@@ -59,7 +59,15 @@ export function RoomWindow({ zone, children, className = '' }: { zone: Zone; chi
 const GLASS: ReadonlySet<Zone> = new Set(['experience', 'bands'])
 
 const heroVars = (frame: Frame) => ({ '--x': frame.x, '--move': `${frame.move}ms`, '--tempo': `${frame.tempo}ms` }) as CSSProperties
-const foeVars = (frame: Frame) => ({ '--x': frame.fx, '--move': `${frame.fmove}ms`, '--tempo': `${frame.tempo}ms` }) as CSSProperties
+const foeVars = (frame: Frame) =>
+  ({
+    '--x': frame.fx,
+    '--move': `${frame.fmove}ms`,
+    '--tempo': `${frame.ftempo}ms`,
+    '--foe-w': STALKER_BOX.width,
+    '--foe-h': STALKER_BOX.height,
+    '--far': FAR_SCALE,
+  }) as CSSProperties
 
 interface StageProps {
   zone: Zone
@@ -93,7 +101,7 @@ export function Stage({ zone, profession, reduced, still }: StageProps) {
   const foe = frame.foe && (
     <div className={`${stage.actor} ${stage.walker}`} style={foeVars(frame)}>
       <div className={`${stage.foe} ${frame.far ? stage.far : ''}`}>
-        <Stalker pose={frame.foe} className="h-full w-full -scale-x-100" />
+        <Stalker pose={frame.foe} className={`h-full w-full ${frame.fface < 0 ? '-scale-x-100' : ''}`} />
       </div>
     </div>
   )

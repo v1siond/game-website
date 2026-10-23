@@ -3,6 +3,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { Breath, Drop, Joint, Limb } from './rig'
 import { SH } from './palette'
+import { sweepOf, turnFor, type Gait, type Leg, type LegTurn, type Point } from './gait'
 import rig from './rig.module.css'
 
 // Him as this world's character, a parody of the 2005 survival horror hero (Leon in the village game, named
@@ -19,6 +20,26 @@ import rig from './rig.module.css'
 // Built on the world's rig (./rig): shoulder, elbow, hip and knee joints, the lean at the hips, the head at
 // the neck, and a drop for kneeling and sitting. A pose is a row of angles in HERO_POSES; the stage
 // (./stage) steps him through them. viewBox units: 48 by 112, feet on y 110.
+
+// Joints in viewBox units: shoulders and elbows per arm, hips and knees per leg, the lean and the neck.
+const BACK_X = 19.4
+const FRONT_X = 30.6
+const BACK_LEG_X = 22
+const FRONT_LEG_X = 27
+const SHOULDER_Y = 30.5
+const ELBOW_Y = 44
+const HIP_Y = 56
+const KNEE_Y = 79
+const LEAN_AT = [25, 55] as const
+const NECK_AT = [26, 25] as const
+const FLOOR_Y = 110
+const VIEW_WIDTH = 48
+
+/** His legs for the gait math (./gait): each hip, the thigh to the knee, the shin to the sole. */
+export const HERO_LEGS = {
+  back: { hip: [BACK_LEG_X, HIP_Y], thigh: KNEE_Y - HIP_Y, shin: FLOOR_Y - KNEE_Y },
+  front: { hip: [FRONT_LEG_X, HIP_Y], thigh: KNEE_Y - HIP_Y, shin: FLOOR_Y - KNEE_Y },
+} as const satisfies Record<string, Leg>
 
 interface Angles {
   lean: number
@@ -54,22 +75,68 @@ const STAND: PoseRow = {
 
 const pose = (row: Partial<PoseRow>, from: PoseRow = STAND): PoseRow => ({ ...from, ...row })
 
+const tenth = (value: number) => Math.round(value * 10) / 10
+
+// A stepping pose from where his soles are: each sole's point (x, and y 110 on the floor or less when
+// lifted) and how far he is lowered; the hip and knee turns come from the leg math (./gait), so a planted
+// sole is on the floor exactly and a knee always bends forward.
+function feet(drop: number, back: Point, front: Point) {
+  const turn = (leg: Leg, sole: Point): LegTurn => {
+    const [hip, knee] = turnFor(leg, [sole[0], sole[1] - drop])
+    return [tenth(hip), tenth(knee)]
+  }
+  return { drop, backLeg: turn(HERO_LEGS.back, back), frontLeg: turn(HERO_LEGS.front, front) }
+}
+
+// The gaits are four keys a cycle: a contact (one sole landing ahead of its hip, the other behind), the
+// passing key (the planted sole under its hip, the other lifted past it), then the same on the other leg.
+// The arm opposite the leading leg swings forward. A stride is how far one leg's sole sweeps between the
+// two contacts, so the stage moves him exactly that far a step (scripts.ts) and the planted sole holds.
+// Walk: soles 21 ahead and behind their hips, lowered 5 at contact and 2 passing, the lifted sole 9 up.
+const WALK_A = pose({ lean: 2, backArm: [-22, -16], frontArm: [24, -10], ...feet(5, [1, 110], [48, 110]) })
+const WALK_PASS_A = pose({ lean: 2, backArm: [-4, -10], frontArm: [6, -8], ...feet(2, [24, 101], [27, 110]) })
+const WALK_B = pose({ lean: 2, backArm: [20, -10], frontArm: [-22, -18], ...feet(5, [43, 110], [6, 110]) })
+const WALK_PASS_B = pose({ lean: 2, backArm: [4, -8], frontArm: [-6, -10], ...feet(2, [22, 110], [29, 101]) })
+// Run: a short fast stride for the dash to the safe room, the lead sole 12 ahead, the trailing one pushing
+// off 14 behind and lifting, the passing leg tucked high under him, arms pumping with elbows near square.
+const RUN = pose({ lean: 14, head: -4 })
+const RUN_A = pose({ backArm: [-55, -85], frontArm: [45, -80], ...feet(5, [8, 102], [39, 110]) }, RUN)
+const RUN_PASS_A = pose({ backArm: [-10, -90], frontArm: [5, -90], ...feet(3, [20, 92], [26, 110]) }, RUN)
+const RUN_B = pose({ backArm: [45, -80], frontArm: [-55, -85], ...feet(5, [34, 110], [13, 102]) }, RUN)
+const RUN_PASS_B = pose({ backArm: [5, -90], frontArm: [-10, -90], ...feet(3, [21, 110], [25, 92]) }, RUN)
+
 // The two handed aim of the genre: both arms straight to the eye line, the back hand under the front.
 const AIM = pose({ lean: -2, head: 4, frontArm: [-88, -2], backArm: [-78, -12], backLeg: [6, 3], frontLeg: [-8, 4], hold: 'gun' })
+// Backing away on aim: short steps, the soles kept apart either side of him, the gun held level.
+const AIM_STEP_A = pose(feet(2, [11, 110], [38, 110]), AIM)
+const AIM_PASS_A = pose(feet(1, [17, 104], [32, 110]), AIM)
+const AIM_STEP_B = pose(feet(1, [23, 110], [26, 110]), AIM)
+const AIM_PASS_B = pose(feet(1, [17, 110], [32, 104]), AIM)
+
 const GUARD = pose({ lean: -3, head: 4, frontArm: [-50, -105], backArm: [-38, -115], backLeg: [10, 8], frontLeg: [-16, 12], hold: 'bare' })
 const KNEEL = pose({ lean: 18, head: 10, frontArm: [-42, -28], backArm: [-20, -30], backLeg: [0, 92], frontLeg: [-88, 88], drop: 24, hold: 'bare' })
 const READ = pose({ lean: 2, head: 14, frontArm: [-40, -95], backArm: [-30, -100], hold: 'paper' })
 const GUN_CHECK = pose({ lean: 4, head: 18, frontArm: [-40, -70], backArm: [-35, -75], hold: 'gun' })
 const LIMP = pose({ lean: 16, head: 10, backArm: [-25, -110], frontArm: [8, -4], backLeg: [8, 16], frontLeg: [-4, 12], drop: 2 })
+// The limp: the hurt back leg barely lifts and its toe drags; the good front leg takes the long swing.
+const LIMP_A = pose(feet(3, [8, 109], [41, 110]), LIMP)
+const LIMP_PASS_A = pose(feet(2, [24, 106], [27, 110]), LIMP)
+const LIMP_B = pose(feet(3, [36, 110], [13, 110]), LIMP)
+const LIMP_PASS_B = pose(feet(1, [22, 110], [29, 101]), LIMP)
+
 const SIT = pose({ lean: 4, head: 6, frontArm: [-50, -50], backArm: [-45, -55], backLeg: [-84, 84], frontLeg: [-86, 86], drop: 22, hold: 'bare' })
 
 export const HERO_POSES = {
   stand: STAND,
-  walkA: pose({ backArm: [-16, -10], frontArm: [18, -8], backLeg: [16, 10], frontLeg: [-20, 4] }),
-  walkB: pose({ backArm: [18, -8], frontArm: [-16, -10], backLeg: [-20, 4], frontLeg: [16, 12] }),
+  walkA: WALK_A,
+  passA: WALK_PASS_A,
+  walkB: WALK_B,
+  passB: WALK_PASS_B,
   aim: AIM,
-  aimStepA: pose({ backLeg: [-10, 8], frontLeg: [8, 6] }, AIM),
-  aimStepB: pose({ backLeg: [10, 4], frontLeg: [-12, 10] }, AIM),
+  aimStepA: AIM_STEP_A,
+  aimPassA: AIM_PASS_A,
+  aimStepB: AIM_STEP_B,
+  aimPassB: AIM_PASS_B,
   guard: GUARD,
   sticksUp: pose({ head: -4, frontArm: [-140, -20], backArm: [-40, -60] }),
   kneel: KNEEL,
@@ -87,12 +154,16 @@ export const HERO_POSES = {
   keyReach: pose({ lean: 4, head: 4, frontArm: [-78, -6], hold: 'key' }),
   keyTurn: pose({ lean: 4, head: 4, frontArm: [-78, -22], hold: 'key' }),
   limp: LIMP,
-  limpA: pose({ backLeg: [14, 22], frontLeg: [-14, 6] }, LIMP),
-  limpB: pose({ backLeg: [-6, 10], frontLeg: [6, 20] }, LIMP),
+  limpA: LIMP_A,
+  limpPassA: LIMP_PASS_A,
+  limpB: LIMP_B,
+  limpPassB: LIMP_PASS_B,
   kickChamber: pose({ lean: -10, frontArm: [-40, -100], backArm: [-30, -110], backLeg: [4, 4], frontLeg: [-95, 100], hold: 'bare' }),
   kick: pose({ lean: -28, frontArm: [40, -40], backArm: [-60, -100], backLeg: [8, 4], frontLeg: [-100, 10], drop: -2, hold: 'bare' }),
-  runA: pose({ lean: 14, head: -4, frontArm: [45, -80], backArm: [-55, -85], frontLeg: [-55, 30], backLeg: [30, 85] }),
-  runB: pose({ lean: 14, head: -4, frontArm: [-55, -85], backArm: [45, -80], frontLeg: [30, 85], backLeg: [-55, 30] }),
+  runA: RUN_A,
+  runPassA: RUN_PASS_A,
+  runB: RUN_B,
+  runPassB: RUN_PASS_B,
   sit: SIT,
   typeA: pose({ frontArm: [-50, -40] }, SIT),
   typeB: pose({ frontArm: [-50, -58], backArm: [-45, -45] }, SIT),
@@ -100,6 +171,19 @@ export const HERO_POSES = {
 } satisfies Record<string, PoseRow>
 
 export type HeroPose = keyof typeof HERO_POSES
+
+const strideOf = (from: PoseRow, to: PoseRow) => (sweepOf(HERO_LEGS.back, from.backLeg, to.backLeg) + sweepOf(HERO_LEGS.front, from.frontLeg, to.frontLeg)) / 2 / VIEW_WIDTH
+
+const gait = (cycle: Gait<HeroPose>['cycle']): Gait<HeroPose> => ({ cycle, stride: strideOf(HERO_POSES[cycle[0]], HERO_POSES[cycle[2]]) })
+
+// His gaits for the stage (scripts.ts), each with how far one step carries him in his body widths. Backing
+// away plays the aimed step in reverse, so the planted sole sweeps forward as he goes back.
+export const HERO_GAITS = {
+  walk: gait(['walkA', 'passA', 'walkB', 'passB']),
+  run: gait(['runA', 'runPassA', 'runB', 'runPassB']),
+  limp: gait(['limpA', 'limpPassA', 'limpB', 'limpPassB']),
+  backAway: gait(['aimStepA', 'aimPassB', 'aimStepB', 'aimPassA']),
+} satisfies Record<string, Gait<HeroPose>>
 
 const ID = HERO_IDENTITY
 
@@ -168,17 +252,6 @@ const KIT: Record<Profession, Kit> = {
   },
 }
 
-// Joints in viewBox units: shoulders and elbows per arm, hips and knees per leg, the lean and the neck.
-const BACK_X = 19.4
-const FRONT_X = 30.6
-const BACK_LEG_X = 22
-const FRONT_LEG_X = 27
-const SHOULDER_Y = 30.5
-const ELBOW_Y = 44
-const HIP_Y = 56
-const KNEE_Y = 79
-const LEAN_AT = [25, 55] as const
-const NECK_AT = [26, 25] as const
 
 // The fist at the end of the forearm (local frame, the arm hanging), a glove or a wrap.
 function Fist({ x, wrapped }: { x: number; wrapped: boolean }) {

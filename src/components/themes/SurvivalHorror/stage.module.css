@@ -37,18 +37,18 @@
   opacity: 0;
 }
 
-/* The pursuer, half again his height, from the same floor. */
+/* The pursuer, half again his height, from the same floor; his box size comes from stalker.tsx. */
 .foe {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 152%;
-  height: 130%;
+  width: calc(var(--foe-w) * 100%);
+  height: calc(var(--foe-h) * 100%);
 }
 
-/* Far behind the corridor glass: smaller, higher up the wall's foot, and in the dark. */
+/* Far behind the corridor glass: smaller (--far, from scripts.ts), higher up the wall's foot, and in the dark. */
 .far {
-  transform: translateY(-26%) scale(0.55);
+  transform: translateY(-26%) scale(var(--far));
   transform-origin: 0 100%;
   filter: brightness(0.45);
 }
