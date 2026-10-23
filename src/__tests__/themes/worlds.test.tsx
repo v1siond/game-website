@@ -37,7 +37,10 @@ describe('worlds registry', () => {
   it('gives every world a component and a known category', () => {
     const known = new Set(WORLD_CATEGORIES.map((c) => c.name))
     for (const world of WORLDS) {
-      expect(typeof world.component).toBe('function')
+      // The default world is a plain function component; the others are next/dynamic's loadable
+      // wrappers, which React exposes as element type objects ($$typeof).
+      const element = world.component as unknown as { $$typeof?: symbol }
+      expect(typeof world.component === 'function' || typeof element.$$typeof === 'symbol').toBe(true)
       expect(known.has(world.category)).toBe(true)
     }
   })
