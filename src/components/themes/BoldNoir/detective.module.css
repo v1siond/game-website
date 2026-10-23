@@ -70,11 +70,16 @@
   animation: hatTip 6400ms cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
 }
 
-/* ---- the walk: legs scissor, the body bobs ---- */
+/* ---- the walk: a front view two step, the body bobs ----
+ * Two steps per 640ms cycle, snapped with steps(2) like a cut out. He faces the camera, so a limb that
+ * swings forward comes toward the viewer: `toward` shortens it from its own joint (the knee or the hand
+ * rises, the shoe leaves the floor) while the other limb of the pair stays down. The back leg and the
+ * front arm play their keyframes half a cycle behind (-320ms), so the legs take turns and each arm comes
+ * forward with the opposite leg. */
 
-@keyframes legSwing {
-  0%, 100% { transform: rotate(12deg); }
-  50% { transform: rotate(-12deg); }
+@keyframes toward {
+  0%, 100% { transform: none; }
+  50% { transform: scaleY(0.88); }
 }
 
 @keyframes bob {
@@ -82,11 +87,11 @@
   25%, 75% { transform: translateY(-1.5px); }
 }
 
-[data-motion='walk'] .frontLeg { animation: legSwing 640ms steps(2, jump-none) infinite; }
-[data-motion='walk'] .backLeg { animation: legSwing 640ms steps(2, jump-none) infinite reverse; }
+[data-motion='walk'] .frontLeg { animation: toward 640ms steps(2, jump-none) infinite; }
+[data-motion='walk'] .backLeg { animation: toward 640ms steps(2, jump-none) -320ms infinite; }
 [data-motion='walk'] .body { animation: bob 640ms steps(2, jump-none) infinite; }
-[data-motion='walk'] .frontUpper { animation: legSwing 640ms steps(2, jump-none) infinite reverse; }
-[data-motion='walk'] .backUpper { animation: legSwing 640ms steps(2, jump-none) infinite; }
+[data-motion='walk'] .frontUpper { animation: toward 640ms steps(2, jump-none) -320ms infinite; }
+[data-motion='walk'] .backUpper { animation: toward 640ms steps(2, jump-none) infinite; }
 
 /* ---- the actions ---- */
 
