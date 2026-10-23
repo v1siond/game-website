@@ -7,9 +7,18 @@ world only adds its own look: its palette, its art and its scenes. The default w
 ## How a visitor gets a world
 
 - The homepage renders the world picked in the worlds menu, remembered in localStorage under
-  `portfolio-theme`. `?t=<id>` opens a world directly. With nothing stored, the default `medieval-fantasy`
-  opens (`DEFAULT_THEME_ID` in `src/themes/themes.ts`). The server renders the default, so a first visit
-  paints it with no other world first.
+  `portfolio-theme`. With nothing stored, the default `medieval-fantasy` opens (`DEFAULT_THEME_ID` in
+  `src/themes/themes.ts`). `?capture=<id>` forces a world for the preview screenshot script.
+- The server always renders the default world, in full: its hero, sections and every CV string are in the
+  HTML a fresh visitor and every crawler get. Only its random backdrop mounts on the client. The default
+  world must never sit behind a whole page mounted gate (most other worlds have one, so a world becomes
+  the default only after that gate is moved to its decoration), and SVG trig values go through
+  `svgNumber` (`src/components/themes/shared/svgNumber.ts`) so the server and the browser print the same
+  numbers.
+- A returning visitor with another world stored: an inline script in `src/app/(site)/page.tsx`
+  (`src/themes/worldPending.ts`) sets `data-world-pending` on `<html>` before the world markup is parsed,
+  `globals.css` hides `[data-world-root]` under it, and `ThemeProvider` removes it once the stored world
+  has rendered. The default never flashes for them, and the server HTML stays what a fresh visitor sees.
 - `?profession=<id>` opens a profession directly (`engineer`, `drummer`, `fighter`). With none, the world
   opens on the engineer.
 - `/cv` is the plain CV in English, Spanish or Italian, with a PDF download.

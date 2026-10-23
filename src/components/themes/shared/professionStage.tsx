@@ -3,10 +3,8 @@
 import { memo } from 'react'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { svgNumber } from './svgNumber'
 
-// Trig results rounded to 3 decimals, so the server's and the browser's last float digit agree and the
-// server rendered ornaments hydrate without an attribute mismatch.
-const svgNumber = (n: number) => Math.round(n * 1000) / 1000
 
 // Palette the boss-stage ornaments need (mirrors the 10 Dark Fantasy fields they reference).
 export interface OrnamentPalette {

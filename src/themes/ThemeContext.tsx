@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
 import { Theme, themes, DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from './themes'
 import { PreviewProvider } from './PreviewContext'
+import { WORLD_PENDING_ATTR } from './worldPending'
 
 interface ThemeContextType {
   theme: Theme
@@ -29,6 +30,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const stored = localStorage.getItem(THEME_STORAGE_KEY)
     if (stored) setTheme(getThemeById(stored))
   }, [])
+
+  // Runs after the commit that rendered the picked world, so the hidden default is never shown.
+  useEffect(() => {
+    if (mounted) document.documentElement.removeAttribute(WORLD_PENDING_ATTR)
+  }, [mounted, theme])
 
   const setThemeById = useCallback((id: string) => {
     const newTheme = getThemeById(id)

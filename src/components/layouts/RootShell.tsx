@@ -63,8 +63,10 @@ interface RootShellProps {
  * separate root layouts (route groups) only so each can set its own `lang`; everything else is this.
  */
 export default function RootShell({ lang, children }: Readonly<RootShellProps>) {
+  // The home page's inline script may set data-world-pending on <html> before hydration
+  // (src/themes/worldPending.ts); suppressHydrationWarning covers that one attribute level only.
   return (
-    <html lang={lang}>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

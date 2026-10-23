@@ -1,5 +1,6 @@
 import { memo } from 'react'
 import { REALM } from './palette'
+import { svgNumber } from '@/components/themes/shared/svgNumber'
 
 // The zone ornaments set beside each section and the art dividers drawn between them.
 
@@ -95,7 +96,7 @@ export const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left
       <circle cx="30" cy="30" r="25" fill="none" stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
       <circle cx="30" cy="30" r="18" fill="none" stroke={REALM.frostIceBright} strokeWidth="1" opacity="0.4" />
       {[0, 60, 120, 180, 240, 300].map((angle, i) => (
-        <line key={i} x1="30" y1="30" x2={30 + 22 * Math.cos(angle * Math.PI / 180)} y2={30 + 22 * Math.sin(angle * Math.PI / 180)} stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
+        <line key={i} x1="30" y1="30" x2={svgNumber(30 + 22 * Math.cos(angle * Math.PI / 180))} y2={svgNumber(30 + 22 * Math.sin(angle * Math.PI / 180))} stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
       ))}
       <circle cx="30" cy="30" r="5" fill={REALM.frostIceBright} opacity="0.6" />
     </svg>
@@ -356,8 +357,8 @@ export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', s
               {/* Hexagonal frost pattern */}
               {[0, 60, 120, 180, 240, 300].map((angle, i) => (
                 <g key={i}>
-                  <line x1={Math.cos(angle * Math.PI / 180) * 8} y1={Math.sin(angle * Math.PI / 180) * 8} x2={Math.cos(angle * Math.PI / 180) * 24} y2={Math.sin(angle * Math.PI / 180) * 24} stroke={REALM.frostIceBright} strokeWidth="1.5" opacity="0.6" />
-                  <circle cx={Math.cos(angle * Math.PI / 180) * 24} cy={Math.sin(angle * Math.PI / 180) * 24} r="2" fill={REALM.frostIceBright} opacity="0.5" />
+                  <line x1={svgNumber(Math.cos(angle * Math.PI / 180) * 8)} y1={svgNumber(Math.sin(angle * Math.PI / 180) * 8)} x2={svgNumber(Math.cos(angle * Math.PI / 180) * 24)} y2={svgNumber(Math.sin(angle * Math.PI / 180) * 24)} stroke={REALM.frostIceBright} strokeWidth="1.5" opacity="0.6" />
+                  <circle cx={svgNumber(Math.cos(angle * Math.PI / 180) * 24)} cy={svgNumber(Math.sin(angle * Math.PI / 180) * 24)} r="2" fill={REALM.frostIceBright} opacity="0.5" />
                 </g>
               ))}
               <circle cx="0" cy="0" r="6" fill={REALM.frostIceBright} opacity="0.3" />

@@ -49,17 +49,10 @@ export default function MedievalFantasyTheme() {
   }
   const { sectionSpacing } = layout
 
-  if (!mounted) {
-    return (
-      <div style={{ minHeight: '100vh', background: REALM.bgVoid, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: REALM.textDim, fontFamily: '"Cinzel", Georgia, serif', letterSpacing: '0.2em' }}>{navigation.loading.toUpperCase()}</p>
-      </div>
-    )
-  }
-
   return (
     <div style={{ ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
-      <DualZoneAtmosphere />
+      {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
+      {mounted && <DualZoneAtmosphere />}
 
       {/* ============ MAIN CONTENT - Starts at top like Dark Fantasy ============ */}
       <div style={{ position: 'relative', zIndex: 2, padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '900px', margin: '0 auto' }}>

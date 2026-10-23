@@ -31,6 +31,15 @@ body {
   line-height: 1.6;
 }
 
+/* A returning visitor's stored world is still replacing the server rendered default (src/themes/worldPending.ts). */
+html[data-world-pending] body {
+  background: #0a0a0a;
+}
+
+html[data-world-pending] [data-world-root] {
+  visibility: hidden;
+}
+
 /* Prevent scroll-to-top on focus */
 :focus {
   scroll-margin-top: 0;
