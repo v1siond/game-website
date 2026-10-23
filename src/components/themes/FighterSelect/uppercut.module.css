@@ -1,0 +1,107 @@
+/*
+ * Services, the rising uppercut (uppercut.tsx). The lane is a zero height line on the card grid's top
+ * edge; his feet stand on it. Each beat is one animation on his track, its end steps the beat; the cards'
+ * launch waits for the fist with its delay. Transforms and opacity only; reduced motion never mounts any
+ * of it.
+ */
+
+.lane {
+  height: 0;
+}
+
+.place {
+  left: 50%;
+  margin-left: -3.3rem;
+}
+
+/* he walks in from the left to the grid's middle */
+.walkIn {
+  animation: walk-in 600ms linear both;
+}
+
+@keyframes walk-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(-18rem, 0, 0);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* he holds his mark while the rig plays the uppercut's frames */
+.riseHold {
+  animation: rise-hold 760ms linear both;
+}
+
+@keyframes rise-hold {
+  from {
+    transform: none;
+  }
+  to {
+    transform: none;
+  }
+}
+
+.fadeOff {
+  animation: fade-off 300ms ease-in both;
+}
+
+@keyframes fade-off {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* the burst at his fist as the uppercut connects, 160 ms into the rise */
+.burst {
+  opacity: 0;
+  animation: burst 260ms steps(4, end) 160ms both;
+}
+
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: scale(0.4);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* The cards before the uppercut: sunk below their places. */
+.sunk li {
+  opacity: 0;
+}
+
+/* The cards launched up into place together. */
+.launched li {
+  animation: launch 420ms cubic-bezier(0.2, 0.8, 0.3, 1) 760ms both;
+}
+
+@keyframes launch {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 1.5rem, 0);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(0, -0.4rem, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}

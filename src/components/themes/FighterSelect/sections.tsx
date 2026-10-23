@@ -5,7 +5,6 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { drumsSince } from '@/components/cv/sectionText'
@@ -16,15 +15,17 @@ import { ComboZone, HitCard } from './combo'
 import { BandStage, LockIn, ResultRecord, RoundEntry } from './rounds'
 import { BlastRow, CarSmash, DeckShow, ParryRow, SparRing, SuperArt } from './scenes'
 import { FlightMap, FlightStop } from './flight'
+import { UppercutLaunch } from './uppercut'
 import living from './living.module.css'
 
 // The picked profession's sections, each opened by its own stage moment with him and his sparring
 // partner (./scenes), no two alike:
-// - About: the bonus stage, he smashes the car apart above his summary.
+// - About: the bonus stage, he smashes the car apart above his summary and a wheel lands on it.
 // - Work Experience: the plane flies the world map from job to job as each round scrolls in (./flight);
 //   each job is still a round of the match (./rounds), in masonry.
 // - Tech Stack: a ki blast flies across the row for each category and lights its move list card.
-// - Services: plain fight cards under the shared fade, no stage moment.
+// - Services: he walks onto the card grid and his rising uppercut launches the cards up into place
+//   (./uppercut).
 // - Projects: the super move, its dark flash and cut in, its hits counted on the combo counter; the
 //   cards lock in and take hits under the pointer (./combo), in masonry.
 // - Ventures: his partner attacks once per venture and each parry lights its card in parry blue.
@@ -46,8 +47,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
   return (
     <>
       <ArcadePanel accent="cyan" title={titles.about} id="about-heading">
-        <CarSmash profession="engineer" />
-        <p className={`mt-6 ${LEAD}`}>{professionalSummary.bio}</p>
+        <CarSmash profession="engineer">
+          <p className={`mt-6 ${LEAD}`}>{professionalSummary.bio}</p>
+        </CarSmash>
       </ArcadePanel>
 
       <ClashSeparator />
@@ -87,7 +89,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.services.length > 0 && (
         <ArcadePanel accent="p1" title={titles.services} id="services-heading">
-          <FadeInScene>
+          <UppercutLaunch>
             <ul className={MASONRY_LIST}>
               {sections.services.map((service) => (
                 <li key={service.id} className={MASONRY_ITEM}>
@@ -95,7 +97,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
                 </li>
               ))}
             </ul>
-          </FadeInScene>
+          </UppercutLaunch>
         </ArcadePanel>
       )}
 

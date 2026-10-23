@@ -12,13 +12,15 @@ import { CallText, ImpactBurst } from './badges'
 import { useComboLand } from './combo'
 import { FS } from './palette'
 import { CrowdGroup, type Zone } from './backdrop'
+import { WheelStrike } from './wreck'
 import living from './living.module.css'
 
 // The stage moments the sections open with, each a different beat of an arcade match, played once when
 // its section scrolls in (useZoneStage, which also hands the section's zone to the backdrop) and again
 // on a tap of the ring:
 // - CarSmash (About): the bonus stage. He walks up to the car and takes it apart, a jab, a jab, the
-//   spinning kick, the rising uppercut; the car dents, loses its glass, then its doors and wheels fly.
+//   spinning kick, the rising uppercut; the car dents, loses its glass, then its doors and wheels fly,
+//   one wheel out of the ring onto his summary, which jolts under it (./wreck).
 // - BlastRow (Tech Stack): he throws a ki blast across the row for each category, lighting its card.
 // - SuperArt (Projects): the screen goes dark, his face cuts in on a band, the white flash, and the
 //   super move's hits land on the combo counter, one per project.
@@ -114,7 +116,11 @@ function Car({ damage }: { damage: number }) {
   )
 }
 
-export function CarSmash({ profession }: { profession: Profession }) {
+// The summary under the ring (children) takes the wreck's flying wheel (./wreck).
+// Every beat bumps the take, so the wreck beat's own take is the take less the beats played since it.
+const WRECK_BEAT = CAR_BOUT.findIndex((beat) => beat.mark === 'wreck')
+
+export function CarSmash({ profession, children }: { profession: Profession; children: ReactNode }) {
   const { arcade } = useLabels()
   const { ref, on, reduced } = useScene('castle')
   const { index, beat, take, started, replay } = useBout(CAR_BOUT, on, reduced)
@@ -156,6 +162,9 @@ export function CarSmash({ profession }: { profession: Profession }) {
           </span>
         )}
       </Ring>
+      <WheelStrike wrecked={wrecked && !reduced} take={take - index + WRECK_BEAT}>
+        {children}
+      </WheelStrike>
     </div>
   )
 }

@@ -1,0 +1,66 @@
+/*
+ * About, the wreck's wheel (wreck.tsx). The lane is a zero height line on the summary's top edge (its
+ * margin collapses through the wrapper, so the wrapper's top is the text's); the wheel's landing spot sits on it. Its flight starts up and right, where the car stands in
+ * the ring above. Transforms and opacity only; reduced motion never mounts any of it.
+ */
+
+.lane {
+  height: 0;
+}
+
+.place {
+  right: 22%;
+}
+
+/* out of the ring, down onto the edge at 300 ms, one bounce, then it rolls off and fades */
+.wheel {
+  animation: wheel 700ms linear both;
+}
+
+@keyframes wheel {
+  0% {
+    opacity: 0;
+    transform: translate3d(5rem, -4rem, 0) rotate(0deg);
+  }
+  10% {
+    opacity: 1;
+  }
+  20% {
+    transform: translate3d(3.5rem, -6rem, 0) rotate(-90deg);
+  }
+  43% {
+    transform: translate3d(0, 0, 0) rotate(-240deg);
+  }
+  60% {
+    transform: translate3d(-1.5rem, -1.5rem, 0) rotate(-330deg);
+  }
+  75% {
+    opacity: 1;
+    transform: translate3d(-3rem, 0, 0) rotate(-420deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-6rem, 0, 0) rotate(-600deg);
+  }
+}
+
+/* the summary takes the wheel's landing: down and back in steps, the car's own shudder turned down */
+.jolt {
+  animation: jolt 240ms steps(4, end) 300ms both;
+}
+
+@keyframes jolt {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translate3d(0, 4px, 0);
+  }
+  50% {
+    transform: translate3d(0, -2px, 0);
+  }
+  75% {
+    transform: translate3d(0, 1px, 0);
+  }
+}
