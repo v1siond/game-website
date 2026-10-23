@@ -1,0 +1,127 @@
+/* The two sections the jungle delivers (deliveries.tsx). The stage carries data-on once in view and
+   data-beat (in, act, leave, gone or still). Every beat's motion is its wrapper's own keyframe; its end
+   steps the sequence on. The source's feel: weighty, bouncy landings. */
+
+.runner,
+.vulture { will-change: transform, opacity; }
+
+.stage[data-beat='in'] .runner { animation: tp-run-in 400ms cubic-bezier(0.3, 0.7, 0.4, 1) both; }
+.stage[data-beat='act'] .runner { animation: tp-hold 1300ms linear both; }
+.stage[data-beat='leave'] .runner { animation: tp-run-off 520ms ease-in both; }
+
+@keyframes tp-run-in {
+  from { transform: translateX(-110%); opacity: 0; }
+  25% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes tp-hold {
+  0%, 100% { transform: none; }
+}
+
+/* He turns round (the mirror) and runs back out the way he came. */
+@keyframes tp-run-off {
+  from { transform: scaleX(-1); opacity: 1; }
+  to { transform: scaleX(-1) translateX(110%); opacity: 0; }
+}
+
+/* The thrown barrel: out of his hands at 700 ms, tumbling along an arc to the boards by 900 ms. */
+.flyingBarrel { opacity: 0; animation: tp-barrel 900ms linear both; }
+
+@keyframes tp-barrel {
+  0%, 77% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  78% { opacity: 1; transform: translate(0, 0) rotate(0); }
+  89% { transform: translate(100px, -30px) rotate(200deg); }
+  99% { opacity: 1; transform: translate(200px, 0) rotate(400deg); }
+  100% { opacity: 0; transform: translate(200px, 0) rotate(400deg); }
+}
+
+/* The burst on the boards at 900 ms: the white flash and the staves flying apart. */
+.blast { opacity: 0; animation: tp-blast 1300ms linear both; }
+
+@keyframes tp-blast {
+  0%, 68% { opacity: 0; transform: scale(0.4); }
+  70% { opacity: 1; transform: scale(1); }
+  92% { opacity: 0; transform: scale(1.4); }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+.stave { animation: tp-stave 1300ms ease-out both; }
+
+@keyframes tp-stave {
+  0%, 69% { transform: none; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--turn)); }
+}
+
+/* Services: hidden until the barrel bursts, then popped out of it. */
+.stage:not([data-on]) .smashed,
+.stage[data-beat='in'] .smashed { opacity: 0; }
+
+.stage[data-beat='act'] .smashed,
+.stage[data-beat='leave'] .smashed,
+.stage[data-beat='gone'] .smashed { transform-origin: 30% 30%; animation: tp-smashed 400ms 900ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes tp-smashed {
+  0% { transform: scale(0.85); opacity: 0; }
+  35% { opacity: 1; }
+  70% { transform: scale(1.03); opacity: 1; }
+  100% { transform: none; opacity: 1; }
+}
+
+/* The vulture: in from the right over the record, a hover as it lets go, off to the left. */
+.stage[data-beat='in'] .vulture { animation: tp-fly-in 650ms cubic-bezier(0.2, 0.6, 0.4, 1) both; }
+.stage[data-beat='act'] .vulture { animation: tp-hover 600ms ease-in-out both; }
+.stage[data-beat='leave'] .vulture { animation: tp-fly-off 650ms ease-in both; }
+
+@keyframes tp-fly-in {
+  from { transform: translate(40vw, -30px); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: translateX(-50%); opacity: 1; }
+}
+
+@keyframes tp-hover {
+  0%, 100% { transform: translateX(-50%); }
+  40% { transform: translate(-50%, -14px); }
+}
+
+@keyframes tp-fly-off {
+  from { transform: translateX(-50%); opacity: 1; }
+  to { transform: translate(-40vw, -50px); opacity: 0; }
+}
+
+.wingFront,
+.wingBack { transform-box: fill-box; transform-origin: 0% 100%; }
+.stage[data-beat='in'] .wingFront,
+.stage[data-beat='act'] .wingFront,
+.stage[data-beat='leave'] .wingFront { animation: tp-flap 220ms ease-in-out infinite alternate; }
+.stage[data-beat='in'] .wingBack,
+.stage[data-beat='act'] .wingBack,
+.stage[data-beat='leave'] .wingBack { animation: tp-flap 220ms ease-in-out -110ms infinite alternate; }
+
+@keyframes tp-flap {
+  from { transform: rotate(-12deg); }
+  to { transform: rotate(38deg); }
+}
+
+/* Muay Thai: the record hangs from the talons until the drop, then falls and bounces twice. */
+.stage:not([data-on]) .dropped,
+.stage[data-beat='in'] .dropped { opacity: 0; }
+
+.stage[data-beat='act'] .dropped,
+.stage[data-beat='leave'] .dropped,
+.stage[data-beat='gone'] .dropped { animation: tp-dropped 600ms ease-in both; }
+
+@keyframes tp-dropped {
+  0% { transform: translateY(-90px); opacity: 0; }
+  10% { opacity: 1; }
+  50% { transform: none; animation-timing-function: ease-out; }
+  65% { transform: translateY(-8px); animation-timing-function: ease-in; }
+  80% { transform: none; animation-timing-function: ease-out; }
+  90% { transform: translateY(-3px); animation-timing-function: ease-in; }
+  100% { transform: none; opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smashed, .dropped, .runner, .vulture, .flyingBarrel, .blast, .stave, .wingFront, .wingBack { animation: none !important; }
+  .smashed, .dropped { opacity: 1 !important; transform: none !important; }
+}

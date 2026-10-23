@@ -14,16 +14,17 @@ import { CartProjects } from './projects'
 import { RhinoCharge } from './rhino'
 import { GroundSlap } from './slap'
 import { VineBands } from './vines'
+import { BarrelSmash, VultureDrop } from './deliveries'
 import look from './jungle.module.css'
 
 // The picked profession's sections, each a level opened by its plank sign and standing in its own scene,
 // and each one a different thing he does with its content: about in the old timer's yard (a barrel
 // cannon fires him in, the board unfolds, the old timer grumbles), the jobs as barrel cannons he blasts
 // between collecting the letters of his name, the tech stack shaken by his ground slap, the services on
-// plain boards under a fade, a vine crossing
+// boards his thrown barrel smashes open (./deliveries), a vine crossing
 // into the cave, the projects as stations of a mine cart ride, the ventures rammed by the rhino, the
 // bands as hanging planks he swings between, and the Muay Thai record as a bout with the walking
-// crocodiles. The posts level closes every profession on a plain board.
+// crocodiles, dropped onto the page by the vulture (./deliveries). The posts level closes every profession on a plain board.
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -54,7 +55,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.services.length > 0 && (
         <Level title={titles.services} scene="jungle">
           <FadeInScene>
-            <ServiceBoard services={sections.services} />
+            <BarrelSmash>
+              <ServiceBoard services={sections.services} />
+            </BarrelSmash>
           </FadeInScene>
         </Level>
       )}
@@ -96,7 +99,9 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
   return (
     <Level title={titles.muayThai} scene="jungle">
       <h3 className={`mb-8 text-center text-xl text-[color:var(--tp-sun-gold)] ${look.display} ${look.caption}`}>{martialArts.primary.title}</h3>
-      <BrawlRecord martialArts={martialArts} />
+      <VultureDrop>
+        <BrawlRecord martialArts={martialArts} />
+      </VultureDrop>
     </Level>
   )
 }
