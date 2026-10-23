@@ -16,6 +16,7 @@ import { Volcano } from './volcano'
 import { Keepsakes } from './keepsakes'
 import { Portraits } from './portraits'
 import { Prophecies } from './prophecies'
+import { CyclopsStomp, GorgonGaze } from './wrath'
 import u from './underworld.module.css'
 
 // The picked profession's sections, each a stage in the descent: About in the great hall, the chambers
@@ -49,14 +50,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.services.length > 0 && (
         <Stage title={titles.services} zone="storm">
           <FadeInScene>
-            <ul className={MASONRY_LIST}>
-              {sections.services.map((service) => (
-                <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
-                  <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
-                  <p className="mt-3 text-base leading-relaxed">{service.line}</p>
-                </li>
-              ))}
-            </ul>
+            <GorgonGaze>
+              <ul className={MASONRY_LIST}>
+                {sections.services.map((service) => (
+                  <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
+                    <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
+                    <p className="mt-3 text-base leading-relaxed">{service.line}</p>
+                  </li>
+                ))}
+              </ul>
+            </GorgonGaze>
           </FadeInScene>
         </Stage>
       )}
@@ -84,7 +87,9 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
 
   return (
     <Stage title={titles.bands} zone="rhodes">
-      <Portraits musician={sections.musician} bands={sections.bands} />
+      <CyclopsStomp>
+        <Portraits musician={sections.musician} bands={sections.bands} />
+      </CyclopsStomp>
     </Stage>
   )
 }
