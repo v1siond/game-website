@@ -4,6 +4,10 @@ import { memo } from 'react'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
 
+// Trig results rounded to 3 decimals, so the server's and the browser's last float digit agree and the
+// server rendered ornaments hydrate without an attribute mismatch.
+const svgNumber = (n: number) => Math.round(n * 1000) / 1000
+
 // Palette the boss-stage ornaments need (mirrors the 10 Dark Fantasy fields they reference).
 export interface OrnamentPalette {
   void: string; voidDeep: string; voidPurple: string
@@ -58,7 +62,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
     <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.5">
       <rect x={-30} y={-130} width={60} height={104} rx={18} fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
       <line x1={0} y1={-26} x2={0} y2={18} stroke={HW} strokeWidth="6" />
-      {[0, 72, 144, 216, 288].map((a, i) => { const r = (a * Math.PI) / 180; return <line key={i} x1={0} y1={18} x2={Math.cos(r) * 38} y2={18 + Math.sin(r) * 12} stroke={HW} strokeWidth="4" /> })}
+      {[0, 72, 144, 216, 288].map((a, i) => { const r = (a * Math.PI) / 180; return <line key={i} x1={0} y1={18} x2={svgNumber(Math.cos(r) * 38)} y2={svgNumber(18 + Math.sin(r) * 12)} stroke={HW} strokeWidth="4" /> })}
     </g>
   )
 
@@ -213,10 +217,10 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ p }: { p: OrnamentPa
       <ellipse cx={cx} cy={cy} rx={rx * 0.92} ry={ry * 0.92} fill="none" stroke={RIM_H} strokeWidth="1.5" opacity="0.4" />
       {Array.from({ length: 8 }, (_, i) => {
         const a = (i / 8) * Math.PI * 2 - Math.PI / 2
-        const lx = cx + Math.cos(a) * rx
-        const ly = cy + Math.sin(a) * ry
+        const lx = svgNumber(cx + Math.cos(a) * rx)
+        const ly = svgNumber(cy + Math.sin(a) * ry)
         return (
-          <g key={i} transform={`translate(${lx},${ly}) rotate(${(a * 180) / Math.PI + 90})`}>
+          <g key={i} transform={`translate(${lx},${ly}) rotate(${svgNumber((a * 180) / Math.PI + 90)})`}>
             <path d="M0,-8 Q4.5,-2 0,7 Q-4.5,-2 0,-8 Z" fill={RIM} stroke={RIM_S} strokeWidth="0.6" />
           </g>
         )
