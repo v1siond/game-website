@@ -123,6 +123,9 @@ for him is `HERO_IDENTITY`. The bar is Dark Fantasy's `KnightCharacter.tsx` and 
 - Tailwind classes, not inline styles, wherever Tailwind fits. A CSS variable set from a palette is the
   exception that fits.
 - Animate transform and opacity only. No animated shadow or blur.
+- A front facing figure walks by shortening the stepping leg (scaleY from the hip) with the opposite arm,
+  never by rotating the legs past each other; a second limb pair plays the same keyframes in the same
+  direction with a delay of one iteration, never alternate-reverse.
 - Honour reduced motion through `useReducedMotion` (or the shared CSS), never a local media query check.
 - Titles stay professional (System Engineer, Musician, Martial Artist). Content comes only from the Decap
   files through `useWorldView`, and every label through `useLabels`. A world may change a label's casing
