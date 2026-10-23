@@ -119,6 +119,24 @@ describe('viewFor: System Engineer', () => {
     const { projects } = engineerOf(viewFor(shuffled, 'engineer', 'full', NOW))
     expect(projects.map((project) => project.position)).toEqual(cv.projects.map((p) => p.position).sort((a, b) => a - b))
   })
+
+  it.each(['world', 'full'] as const)('puts his own products first in the ventures, each group in file order (%s)', (mode) => {
+    const cv = realCV()
+    const plain = cv.companies.find((company) => !company.featured) ?? cv.companies[0]
+    const venture = (id: string, featured?: boolean) => ({ ...plain, id, slug: id, featured })
+    const companies = [venture('dba'), venture('nebulith', true), venture('pmx', false), venture('sillabo', true), venture('grctechme')]
+
+    const sections = engineerOf(viewFor({ ...cv, companies }, 'engineer', mode, NOW))
+
+    expect(ids(sections.companies)).toEqual(['nebulith', 'sillabo', 'dba', 'pmx', 'grctechme'])
+  })
+
+  it('shows the five ventures of companies.json with Nebulith and Sillabo first, the only featured ones', () => {
+    const { companies } = engineerOf(viewFor(realCV(), 'engineer', 'world', NOW))
+
+    expect(ids(companies)).toEqual(['nebulith', 'sillabo', 'dba', 'pmx', 'grctechme'])
+    expect(companies.filter((company) => company.featured).map((company) => company.id)).toEqual(['nebulith', 'sillabo'])
+  })
 })
 
 describe('viewFor: the five year cut in a world', () => {

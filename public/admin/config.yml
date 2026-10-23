@@ -211,6 +211,7 @@ collections:
               - { <<: *fixed, label: Link, name: url }
               - { label: Services, name: services, widget: list, i18n: true, required: false }
               - { <<: *fixed, label: Icon, name: icon }
+              - { <<: *flag, label: 'His own product: shown first, with a badge', name: featured }
 
       - name: roles
         label: Current roles
@@ -372,6 +373,7 @@ collections:
                   - { <<: *text, label: "Category technologies", name: categoryTechnologies, hint: 'Keep {name}' }
                   - { <<: *text, label: "Tech by category", name: techByCategory }
                   - { <<: *text, label: "Featured", name: featured }
+                  - { <<: *text, label: "Own product badge", name: ownProduct }
                   - { <<: *text, label: "Impact", name: impact }
                   - { <<: *text, label: "Tech", name: tech }
                   - { <<: *text, label: "No posts", name: noPosts }

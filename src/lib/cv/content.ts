@@ -113,6 +113,8 @@ export interface Company {
   url: string
   services: string[]
   icon: string
+  /** His own product rather than a client or consulting company: shown first, with a badge. */
+  featured?: boolean
 }
 
 /** One thing he offers to build: a title and one short line, in the order he sets in Decap. */

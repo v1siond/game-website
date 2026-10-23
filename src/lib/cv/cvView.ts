@@ -92,6 +92,15 @@ const jobsFor = (cv: CVData, keep: Keep): Job[] =>
 const projectsFor = (cv: CVData, keep: Keep): Project[] =>
   cv.projects.filter((project) => keep(project, project.endYear)).sort((a, b) => a.position - b.position)
 
+/**
+ * The ventures in the order every world and /cv shows them: his own products (featured) first, then the
+ * rest, each group in the order of companies.json.
+ */
+export const venturesFor = (companies: CVData['companies']): CVData['companies'] => [
+  ...companies.filter((company) => company.featured),
+  ...companies.filter((company) => !company.featured),
+]
+
 const bandsFor = (cv: CVData): Band[] => [...cv.bands].sort(byRecency(bandEnd, (band) => band.startYear ?? UNDATED))
 
 // The services, bands and the Muay Thai record are listed whole: the spec names every band and every martial arts
@@ -103,7 +112,7 @@ const SECTIONS_FOR: Record<Profession, (cv: CVData, keep: Keep) => ProfessionSec
     projects: projectsFor(cv, keep),
     techStack: cv.techStack,
     services: cv.services,
-    companies: cv.companies,
+    companies: venturesFor(cv.companies),
   }),
   drummer: (cv) => ({ profession: 'drummer', musician: cv.musician, bands: bandsFor(cv) }),
   fighter: (cv) => ({ profession: 'fighter', martialArts: cv.martialArts }),

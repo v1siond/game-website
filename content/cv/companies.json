@@ -2,6 +2,36 @@
   "en": {
     "companies": [
       {
+        "id": "nebulith",
+        "name": "Nebulith",
+        "tagline": "Highly optimized custom game engine",
+        "description": "Game engine and map editor: generated worlds, iso and top views, tiles, units, quests. Launching to the commercial market soon.",
+        "url": "https://nebulith-production.up.railway.app",
+        "services": [
+          "Generated worlds",
+          "Map editor",
+          "Iso and top views",
+          "Tiles, units, quests"
+        ],
+        "icon": "🎮",
+        "featured": true
+      },
+      {
+        "id": "sillabo",
+        "name": "Sillabo",
+        "tagline": "Language learning with an AI tutor",
+        "description": "Sillabo takes a real human language course and turns it into an AI course. Italian for Spanish speakers.",
+        "url": "https://sillabo.up.railway.app",
+        "services": [
+          "AI tutor",
+          "Lesson room",
+          "Grading, exact at submit and judged",
+          "STT and TTS"
+        ],
+        "icon": "📚",
+        "featured": true
+      },
+      {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
         "tagline": "Enterprise Software Solutions",
@@ -48,6 +78,36 @@
   "es": {
     "companies": [
       {
+        "id": "nebulith",
+        "name": "Nebulith",
+        "tagline": "Motor de juegos propio altamente optimizado",
+        "description": "Motor de juegos y editor de mapas: mundos generados, vistas isométrica y cenital, tiles, unidades, misiones. Pronto en el mercado comercial.",
+        "url": "https://nebulith-production.up.railway.app",
+        "services": [
+          "Mundos generados",
+          "Editor de mapas",
+          "Vistas isométrica y cenital",
+          "Tiles, unidades, misiones"
+        ],
+        "icon": "🎮",
+        "featured": true
+      },
+      {
+        "id": "sillabo",
+        "name": "Sillabo",
+        "tagline": "Aprendizaje de idiomas con un tutor de IA",
+        "description": "Sillabo toma un curso de idiomas real, hecho por personas, y lo convierte en un curso con IA. Italiano para hispanohablantes.",
+        "url": "https://sillabo.up.railway.app",
+        "services": [
+          "Tutor de IA",
+          "Sala de lecciones",
+          "Corrección exacta y evaluada",
+          "Voz a texto y texto a voz"
+        ],
+        "icon": "📚",
+        "featured": true
+      },
+      {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
         "tagline": "Soluciones de software empresarial",
@@ -93,6 +153,36 @@
   },
   "it": {
     "companies": [
+      {
+        "id": "nebulith",
+        "name": "Nebulith",
+        "tagline": "Motore di gioco proprietario altamente ottimizzato",
+        "description": "Motore di gioco ed editor di mappe: mondi generati, viste isometrica e dall'alto, tile, unità, missioni. Presto sul mercato commerciale.",
+        "url": "https://nebulith-production.up.railway.app",
+        "services": [
+          "Mondi generati",
+          "Editor di mappe",
+          "Viste isometrica e dall'alto",
+          "Tile, unità, missioni"
+        ],
+        "icon": "🎮",
+        "featured": true
+      },
+      {
+        "id": "sillabo",
+        "name": "Sillabo",
+        "tagline": "Apprendimento delle lingue con un tutor IA",
+        "description": "Sillabo prende un vero corso di lingua, fatto da persone, e lo trasforma in un corso con IA. Italiano per ispanofoni.",
+        "url": "https://sillabo.up.railway.app",
+        "services": [
+          "Tutor IA",
+          "Aula delle lezioni",
+          "Correzione esatta e valutata",
+          "Voce in testo e testo in voce"
+        ],
+        "icon": "📚",
+        "featured": true
+      },
       {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",

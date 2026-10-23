@@ -69,10 +69,14 @@ const historyPath = process.argv[2] ?? process.env.CV_HISTORY ?? DEFAULT_HISTORY
 const history = normalise(readFileSync(historyPath, 'utf8').replace(/\*\*/g, ''))
 const inHistory = matches(history)
 
-const checked = HISTORY_FILES.flatMap((file) => {
-  const { en } = JSON.parse(readFileSync(join(CONTENT_DIR, `${file}.json`), 'utf8'))
-  return strings(en, file)
-})
+const englishOf = (file) => JSON.parse(readFileSync(join(CONTENT_DIR, `${file}.json`), 'utf8')).en
+
+// His own products (featured ventures) were written from the history, so their English is checked like the history files.
+const featuredVentures = englishOf('companies')
+  .companies.filter(({ featured }) => featured)
+  .flatMap((company) => strings(company, `companies.${company.id}`))
+
+const checked = [...HISTORY_FILES.flatMap((file) => strings(englishOf(file), file)), ...featuredVentures]
 const mismatches = checked.filter(({ text }) => !inHistory(text))
 
 // A fact passes when _sources.json holds it word for word with at least one sha, and every sha is in the history.
