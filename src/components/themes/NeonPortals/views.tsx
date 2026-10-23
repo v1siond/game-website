@@ -1,11 +1,10 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import { useCallback, useState, type CSSProperties, type ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { BandList } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/components/cv/masonry'
 import { drumsSince, headingId, newTabName } from '@/components/cv/sectionText'
-import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { CVData, Service } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
@@ -13,6 +12,7 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { BossRound } from './bossRound'
 import { CrateArt } from './crateArt'
 import { CrateField } from './crateField'
+import { BodySlam, CrateSpin } from './deliveries'
 import type { Zone } from './eraBackdrop'
 import { BridgeSlide, Crossing, Hint, TombRun } from './eraScenes'
 import scenes from './eraScenes.module.css'
@@ -29,9 +29,10 @@ import ui from './warped.module.css'
 //   About        medieval     he slides in along the bridge, the bio unrolls as a banner, the death gag
 //   Experience   Egypt        he runs along the tomb floor with the scroll; the level portals (warpLevels)
 //   Tech stack   underwater   the scuba swim across; the panels rise like bubbles
-//   Services     underwater   plain panels under the shared fade, no moment of his
+//   Services     underwater   he spins into a crate and the panels burst out of it (deliveries)
 //   Projects     prehistoric  he rides the baby T rex in and hops off at the crates (crateField)
-//   Ventures     future       the motorbike passes under the cards and lights each one as it goes
+//   Ventures     future       his body slam knocks the cards into place (deliveries), then the
+//                             motorbike passes under them and lights each one as it goes
 //   Bands        Arabian      the jet ski across the harbour; the time trials (timeTrial)
 //   Muay Thai    great wall   the boss round against the time foe (bossRound)
 // Headings and hints sit on dark plates so they read on every era's painting; the long lists are
@@ -93,7 +94,7 @@ function TechStack({ categories }: { categories: CVData['techStack'] }) {
 
 function Services({ services }: { services: Service[] }) {
   return (
-    <FadeInScene>
+    <CrateSpin profession="engineer">
       <ul className={MASONRY_LIST}>
         {services.map((service) => (
           <li key={service.id} className={`${MASONRY_ITEM} ${ui.panel} p-5`}>
@@ -102,7 +103,7 @@ function Services({ services }: { services: Service[] }) {
           </li>
         ))}
       </ul>
-    </FadeInScene>
+    </CrateSpin>
   )
 }
 
@@ -139,6 +140,9 @@ function Ventures({ companies }: { companies: CVData['companies'] }) {
 function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
   const labels = useLabels()
+  // The motorbike comes once the body slam is over: one figure moving in a view at a time.
+  const [slammed, setSlammed] = useState(false)
+  const onSlammed = useCallback(() => setSlammed(true), [])
 
   return (
     <>
@@ -190,8 +194,10 @@ function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
       <Stage title={labels.sections.ventures} zone="future">
         {(on) => (
           <>
-            <Ventures companies={sections.companies} />
-            <Crossing on={on} profession="engineer" traveller={{ kind: 'ride', vehicle: 'bike' }} className="mt-2" />
+            <BodySlam profession="engineer" onDone={onSlammed}>
+              <Ventures companies={sections.companies} />
+            </BodySlam>
+            {slammed && <Crossing on={on} profession="engineer" traveller={{ kind: 'ride', vehicle: 'bike' }} className="mt-2" />}
           </>
         )}
       </Stage>

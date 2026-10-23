@@ -1,0 +1,174 @@
+/*
+ * The two sections he delivers (deliveries.tsx): the crate spin over the services and the body slam on
+ * the ventures. The lane is a zero height line on the section's top edge; his feet and the crate stand on
+ * it. Each beat is one animation on his track, its end steps the beat; the section's reaction waits for
+ * the contact with its delay. Transforms and opacity only; reduced motion never mounts any of it.
+ */
+
+.lane {
+  height: 0;
+}
+
+.runnerPlace {
+  left: 18%;
+}
+
+.cratePlace {
+  left: calc(18% + 5.25rem);
+  margin-bottom: -0.25rem;
+}
+
+.slamPlace {
+  left: 50%;
+  margin-left: -3rem;
+}
+
+/* The crate flies apart in a frame when the spin hits it. */
+.crateBreak {
+  animation: crate-break 260ms ease-out both;
+}
+
+@keyframes crate-break {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(1rem, -0.5rem, 0) scale(1.5) rotate(18deg);
+  }
+}
+
+/* Crate spin: run in from the left, spin into the crate with a small push, hop off up and left. */
+.runIn {
+  animation: run-in 480ms linear both;
+}
+
+@keyframes run-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(-24rem, 0, 0);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.spinHold {
+  animation: spin-hold 500ms ease-out both;
+}
+
+@keyframes spin-hold {
+  0% {
+    transform: none;
+  }
+  35% {
+    transform: translate3d(0.75rem, 0, 0);
+  }
+  100% {
+    transform: translate3d(0.5rem, 0, 0);
+  }
+}
+
+.hopOff {
+  animation: hop-off 420ms ease-in both;
+}
+
+@keyframes hop-off {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-6rem, -5rem, 0);
+  }
+}
+
+/* Body slam: in from the upper right, tucked, onto the cards' edge at 600 ms; then the flat landing held. */
+.dropIn {
+  animation: drop-in 600ms cubic-bezier(0.5, 0, 0.9, 0.5) both;
+}
+
+@keyframes drop-in {
+  0% {
+    opacity: 0;
+    transform: translate3d(10rem, -9rem, 0);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.landHold {
+  transform-origin: bottom;
+  animation: land-hold 400ms ease-out both;
+}
+
+@keyframes land-hold {
+  0% {
+    transform: scale(1.15, 0.8);
+  }
+  40% {
+    transform: scale(0.96, 1.04);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* The section before he delivers it. */
+.packed {
+  opacity: 0;
+}
+
+/* Services: out of the crate's spot with an overshoot, from the crate's point on the top edge. */
+.burstOut {
+  transform-origin: calc(18% + 8rem) 0;
+  animation: burst-out 520ms cubic-bezier(0.34, 1.56, 0.64, 1) 480ms both;
+}
+
+@keyframes burst-out {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Ventures: knocked down into place by the slam. */
+.slamDown {
+  animation: slam-down 360ms ease-out 600ms both;
+}
+
+@keyframes slam-down {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -28px, 0);
+  }
+  40% {
+    opacity: 1;
+    transform: translate3d(0, 8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -3px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
