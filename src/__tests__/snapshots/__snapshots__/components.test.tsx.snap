@@ -53,13 +53,15 @@ exports[`Component Snapshots LanguageSwitcher matches default snapshot 1`] = `
   <div
     class="flex items-center gap-2 print:hidden"
   >
-    <span
+    <label
       class="text-sm text-gray-600"
+      for="_r_0_"
     >
       Language:
-    </span>
+    </label>
     <select
       class="min-h-11 text-sm border border-gray-300 rounded px-2 py-1 bg-white cursor-pointer hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      id="_r_0_"
     >
       <option
         value="en"
