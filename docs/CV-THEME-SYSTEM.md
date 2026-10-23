@@ -33,7 +33,7 @@ Artistic.
 ## Where the CV content comes from
 
 - The content is Decap CMS files, `content/cv/*.json` (summary, contact, experience, projects, bands,
-  martial-arts, tech-stack, companies, roles), each holding `en`, `es` and `it`. He edits them at `/admin`.
+  martial-arts, tech-stack, services, companies, roles), each holding `en`, `es` and `it`. He edits them at `/admin`.
 - One loader, `getAllCVData(locale)` in `src/lib/cv-data.ts`, reads the files on each render, so an edit
   shows without a code change. A key missing in a locale keeps the English value.
 - Interface text (section titles, buttons, accessible names, "Released", "Since {year}") lives in
@@ -55,7 +55,7 @@ Artist (`fighter`), listed in `src/lib/cv/professions.ts`.
 
 | Profession | Sections it gets |
 |------------|------------------|
-| engineer | jobs, projects, tech stack, companies |
+| engineer | jobs, projects, tech stack, services, companies |
 | drummer | the musician block and every band |
 | fighter | the Muay Thai record |
 

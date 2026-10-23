@@ -20,7 +20,7 @@ picked profession, then a contact corner. What the sections hold comes from `vie
 
 | Profession | Sections, in the order worlds show them | Data from `viewFor` |
 |------------|------------------------------------------|---------------------|
-| System Engineer | About, Work Experience, Tech Stack, Projects, Ventures | `jobs`, `projects`, `techStack`, `companies` |
+| System Engineer | About, Work Experience, Tech Stack, Services, Projects, Ventures | `jobs`, `projects`, `techStack`, `services`, `companies` |
 | Musician | Bands, opened by how long he has played drums | `musician`, `bands` |
 | Martial Artist | Muay Thai record: primary title, training, background | `martialArts` |
 
@@ -33,13 +33,14 @@ formats the same way (year spans, job years, project links, the Muay Thai facts,
 - Jobs and projects older than 5 years are left out, unless current or marked `highlight` in Decap.
 - A project with no years recorded is kept.
 - Jobs sort newest first; projects keep the order he set in Decap.
-- Bands and the Muay Thai record are always shown whole.
-- `/cv` shows everything, in English, Spanish or Italian.
+- Bands, the services and the Muay Thai record are always shown whole. The services list, its length and
+  each title and line come from `content/cv/services.json`; no world holds a count or a word of it.
+- `/cv` shows everything, in English, Spanish or Italian. Its Services section follows Technical Skills.
 
 ## How a section moves
 
 Each world moves its sections with its own scenes on the shared `useScrollScene` and `useSectionTrigger`;
-plain blocks between levels (About, Tech Stack, Ventures) sit in `FadeInScene`. Both read
+plain blocks between levels (About, Tech Stack, Services, Ventures) sit in `FadeInScene`. Both read
 `--scene-progress` and animate transform and opacity only. With reduced motion (or in a World Select preview) every scene starts done, so each section shows in place.
 
 ## How this was worked out
