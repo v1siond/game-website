@@ -105,14 +105,25 @@
     animation: head-lag 0.5s ease-in-out -0.1s infinite;
   }
 
-  .figure[data-pose='idle'] .armBack,
+  /* Limb pairs (idle, run, drum): the second pair plays the same alternate loop in the same direction,
+     one iteration (half a back and forth) earlier, so each arm swings against the leg on its side and
+     the sticks land in turn. alternate-reverse on top of that delay would flip twice and move as one. */
+  /* The idle is a step in place facing out: each leg kicks out to its own side and back, the arm on
+     the other side swings out with it, so the feet never cross. */
   .figure[data-pose='idle'] .legFront {
-    animation: swing 0.5s ease-in-out infinite alternate;
+    animation: step-out-front 0.5s ease-in-out infinite alternate;
   }
 
-  .figure[data-pose='idle'] .armFront,
+  .figure[data-pose='idle'] .armBack {
+    animation: step-out-back 0.5s ease-in-out infinite alternate;
+  }
+
   .figure[data-pose='idle'] .legBack {
-    animation: swing 0.5s ease-in-out -0.5s infinite alternate-reverse;
+    animation: step-out-back 0.5s ease-in-out -0.5s infinite alternate;
+  }
+
+  .figure[data-pose='idle'] .armFront {
+    animation: step-out-front 0.5s ease-in-out -0.5s infinite alternate;
   }
 
   /* The run: leaning in, stretched on the push and squashed on the landing, legs and arms wheeling,
@@ -128,7 +139,7 @@
 
   .figure[data-pose='run'] .legFront,
   .figure[data-pose='run'] .armBack {
-    animation: stride 0.36s ease-in-out -0.36s infinite alternate-reverse;
+    animation: stride 0.36s ease-in-out -0.36s infinite alternate;
   }
 
   .figure[data-pose='run'] .dash {
@@ -165,7 +176,7 @@
   }
 
   .figure[data-pose='drum'] .armBack {
-    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) -0.25s infinite alternate-reverse;
+    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) -0.25s infinite alternate;
   }
 
   /* The rubber hose jab: the arm shoots out twice its length and snaps back. */
@@ -223,9 +234,18 @@
   }
 }
 
-@keyframes swing {
+@keyframes step-out-front {
   from {
+    transform: rotate(0deg);
+  }
+  to {
     transform: rotate(-12deg);
+  }
+}
+
+@keyframes step-out-back {
+  from {
+    transform: rotate(0deg);
   }
   to {
     transform: rotate(12deg);
