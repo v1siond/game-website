@@ -41,12 +41,15 @@
   transform-origin: 50% 0;
 }
 
+/* Diagonal pairs (every other leg): legB plays the same alternate loop in the same direction one
+   iteration earlier, so it swings back while legA swings forward; its ninth iteration fills the one the
+   negative delay skips, so both pairs stop together at 1.6 s. */
 .trail[data-charging] .legA {
   animation: trot 0.2s ease-in-out 8 alternate;
 }
 
 .trail[data-charging] .legB {
-  animation: trot 0.2s ease-in-out -0.2s 8 alternate-reverse;
+  animation: trot 0.2s ease-in-out -0.2s 9 alternate;
 }
 
 @keyframes trot {

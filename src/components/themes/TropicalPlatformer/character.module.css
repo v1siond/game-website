@@ -85,20 +85,23 @@
     animation: pound-fore 3.6s ease-in-out -0.11s infinite;
   }
 
-  /* ---- run: the knuckle run ---- */
+  /* ---- run: the knuckle run ----
+     Diagonal pairs: one arm lifts with the leg on the other side while the other pair plants. The
+     second pair plays the same alternate loop in the same direction one iteration (half a back and
+     forth) earlier; the front limbs are drawn mirrored, so the same keyframes lift them outward too. */
 
   .figure[data-pose='run'] .body {
     animation: run-bob 0.15s ease-in-out infinite alternate;
   }
 
   .figure[data-pose='run'] .armBack,
-  .figure[data-pose='run'] .legBack {
+  .figure[data-pose='run'] .legFront {
     animation: knuckle-plant 0.3s ease-in-out infinite alternate;
   }
 
   .figure[data-pose='run'] .armFront,
-  .figure[data-pose='run'] .legFront {
-    animation: knuckle-plant 0.3s ease-in-out -0.3s infinite alternate-reverse;
+  .figure[data-pose='run'] .legBack {
+    animation: knuckle-plant 0.3s ease-in-out -0.3s infinite alternate;
   }
 
   /* ---- roll: the spinning ball ---- */
