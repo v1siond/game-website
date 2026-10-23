@@ -14,13 +14,15 @@ import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsV
 import { HitStar } from './backdrop'
 import { BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
 import { AllOutAttack } from './allOut'
+import { SlappedStatement, StampedCase } from './evidence'
 import { NOIR } from './palette'
 import world from './world.module.css'
 
 // The picked profession's sections. Tech Stack, Services and Ventures take the plain fade; every other section is
 // a stage: one useSectionTrigger per section adds data-on once it is in view, and the CSS plays each
 // item's own entrance off it, staggered by --i (the speech box wobble, the rank flip and year stamp, the
-// result slide over the red line, the hit slam). The long lists are masonry.
+// result slide over the red line, the hit slam). The long lists are masonry. Two sections the detective
+// works on himself (./evidence): he slaps the about statement down and stamps the services as a closed case.
 
 const LEAD = `text-base text-[color:var(--noir-paper-dim)] ${world.copy}`
 
@@ -49,9 +51,11 @@ function About({ bio }: { bio: string }) {
 
   return (
     <Stage title={sections.about}>
-      <div className={`max-w-3xl px-6 pb-10 pt-6 sm:px-8 ${world.speech}`}>
-        <p className={`text-base leading-relaxed ${world.copy}`}>{bio}</p>
-      </div>
+      <SlappedStatement>
+        <div className={`max-w-3xl px-6 pb-10 pt-6 sm:px-8 ${world.speech}`}>
+          <p className={`text-base leading-relaxed ${world.copy}`}>{bio}</p>
+        </div>
+      </SlappedStatement>
     </Stage>
   )
 }
@@ -104,13 +108,15 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <FadeInScene>
           <section aria-labelledby={headingId('noir', titles.services)} className="mb-16">
             <SectionTitle title={titles.services} />
-            <ul className={MASONRY_LIST}>
-              {sections.services.map((service) => (
-                <li key={service.id} className={MASONRY_ITEM}>
-                  <ServiceSlab service={service} />
-                </li>
-              ))}
-            </ul>
+            <StampedCase>
+              <ul className={MASONRY_LIST}>
+                {sections.services.map((service) => (
+                  <li key={service.id} className={MASONRY_ITEM}>
+                    <ServiceSlab service={service} />
+                  </li>
+                ))}
+              </ul>
+            </StampedCase>
           </section>
         </FadeInScene>
       )}

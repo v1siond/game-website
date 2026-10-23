@@ -1,0 +1,97 @@
+/* The two sections the detective lays down (evidence.tsx). The stage carries data-on once in view,
+   data-beat (the pose playing) and data-side. Every beat's motion is the wrapper's own keyframe, its end
+   steps the sequence on. Noir cuts in steps, like the world's own entrances. */
+
+.figure { will-change: transform, opacity; }
+
+/* From the right he faces left: the drawing faces right, so it is mirrored while he walks in and acts. */
+.stage[data-side='right'] .facing { transform: scaleX(-1); }
+.stage[data-side='right'][data-beat='leave'] .facing { transform: none; }
+
+.stage[data-side='left'][data-beat='walk'] .figure { animation: noir-in-left 480ms linear both; }
+.stage[data-side='right'][data-beat='walk'] .figure { animation: noir-in-right 480ms linear both; }
+.stage[data-beat='act'] .figure { animation: noir-lunge 620ms steps(4, end) both; }
+.stage[data-side='left'][data-beat='act'] .figure { --lean: 10px; }
+.stage[data-side='right'][data-beat='act'] .figure { --lean: -10px; }
+.stage[data-side='left'][data-beat='leave'] .figure { animation: noir-off-left 520ms ease-in both; }
+.stage[data-side='right'][data-beat='leave'] .figure { animation: noir-off-right 520ms ease-in both; }
+
+@keyframes noir-in-left {
+  from { transform: translateX(-90%); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes noir-in-right {
+  from { transform: translateX(90%); opacity: 0; }
+  30% { opacity: 1; }
+  to { transform: none; opacity: 1; }
+}
+
+@keyframes noir-lunge {
+  0%, 100% { transform: none; }
+  50% { transform: translateX(var(--lean)) translateY(-2px); }
+}
+
+/* Leaving the left he turns back: mirrored, walking out the way he came. */
+@keyframes noir-off-left {
+  from { transform: scaleX(-1); opacity: 1; }
+  to { transform: scaleX(-1) translateX(90%); opacity: 0; }
+}
+
+@keyframes noir-off-right {
+  from { transform: none; opacity: 1; }
+  to { transform: translateX(90%); opacity: 0; }
+}
+
+/* The statement: hidden until the act, then out of his hand and down with a slap. */
+.stage:not([data-on]) .slap,
+.stage[data-beat='walk'] .slap { opacity: 0; }
+
+.stage[data-beat='act'] .slap,
+.stage[data-beat='leave'] .slap,
+.stage[data-beat='gone'] .slap { animation: noir-slap 700ms 100ms steps(7, end) both; }
+
+@keyframes noir-slap {
+  0% { transform: translateX(-55%) rotate(-8deg) scale(0.9); opacity: 0; }
+  20% { opacity: 1; }
+  40% { transform: translateX(2%) rotate(1deg) scale(1.02); opacity: 1; }
+  55% { transform: translateX(-4px) rotate(0); }
+  70% { transform: translateX(4px); }
+  85% { transform: translateX(-2px); }
+  100% { transform: none; opacity: 1; }
+}
+
+/* The case slabs: dim on the desk until the stamp lands, then punched down and full. */
+.stage:not([data-on]) .stamp,
+.stage[data-beat='walk'] .stamp { opacity: 0.35; }
+
+.stage[data-beat='act'] .stamp,
+.stage[data-beat='leave'] .stamp,
+.stage[data-beat='gone'] .stamp { transform-origin: 50% 100%; animation: noir-stamp 520ms 300ms steps(5, end) both; }
+
+@keyframes noir-stamp {
+  0% { transform: none; opacity: 0.35; }
+  20% { transform: translateY(6px) scaleY(0.97); opacity: 1; }
+  50% { transform: translateY(-3px) scaleY(1.01); }
+  75% { transform: translateY(1px); }
+  100% { transform: none; opacity: 1; }
+}
+
+.ring { opacity: 0; transform: rotate(-8deg); }
+.stage[data-beat='act'] .ring,
+.stage[data-beat='leave'] .ring,
+.stage[data-beat='gone'] .ring { animation: noir-ring 900ms 300ms steps(6, end) both; }
+
+@keyframes noir-ring {
+  0% { opacity: 0; transform: rotate(-8deg) scale(1.4); }
+  15% { opacity: 0.9; transform: rotate(-8deg) scale(1); }
+  60% { opacity: 0.9; transform: rotate(-8deg) scale(1); }
+  100% { opacity: 0; transform: rotate(-8deg) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slap, .stamp, .ring, .figure { animation: none !important; }
+  .slap, .stamp { opacity: 1 !important; transform: none !important; }
+  .ring { opacity: 0 !important; }
+}
