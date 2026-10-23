@@ -18,6 +18,7 @@ import { Fetch, LevelUp } from './events'
 import { Loot } from './footlocker'
 import { Dig } from './dig'
 import { Spar } from './spar'
+import { BeamedLog, BootedTube } from './repairs'
 import type { Zone } from './journey'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
@@ -28,7 +29,8 @@ import j from './journey.module.css'
 // loot, the ventures' dig, the bands' radio dance and the Muay Thai spar. Every heading's id is atomicId of
 // its title, the same the wrist terminal's section tabs jump to. The engineer's sections sit on the
 // terminal's glass panels (the services as plain panels under a fade), the musician's on the radio,
-// the fighter's on the printed perk chart.
+// the fighter's on the printed perk chart. Two sections the dweller fixes himself (./repairs): he boots
+// the services' dead tube on, and beams the quest log onto the glass from his wrist terminal.
 
 function SectionTitle({ title }: { title: string }) {
   return (
@@ -75,7 +77,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.jobs.length > 0 && (
         <Stage title={titles.workExperience} zone="wasteland" className={j.stamp}>
           <LevelUp job={sections.jobs[0]} />
-          <QuestLog jobs={sections.jobs} />
+          <BeamedLog>
+            <QuestLog jobs={sections.jobs} />
+          </BeamedLog>
         </Stage>
       )}
 
@@ -90,14 +94,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.services.length > 0 && (
         <Stage title={titles.services} zone="wasteland">
           <FadeInScene>
-            <ul className={MASONRY_LIST}>
-              {sections.services.map((service) => (
-                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
-                  <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed text-atomic-phosphor">{service.line}</p>
-                </li>
-              ))}
-            </ul>
+            <BootedTube>
+              <ul className={MASONRY_LIST}>
+                {sections.services.map((service) => (
+                  <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
+                    <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>
+                    <p className="mt-2 text-base leading-relaxed text-atomic-phosphor">{service.line}</p>
+                  </li>
+                ))}
+              </ul>
+            </BootedTube>
           </FadeInScene>
         </Stage>
       )}
