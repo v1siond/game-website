@@ -2,87 +2,117 @@
   "en": {
     "services": [
       {
+        "id": "ai-products",
+        "title": "AI built into your product",
+        "line": "Agents, RAG and LLM features on Claude and Gemini, voice in and out with STT and TTS, wired into the app you already run. Training models since before 2023, starting with personal games."
+      },
+      {
+        "id": "ai-to-production",
+        "title": "AI prototype to production",
+        "line": "Quality prototypes in hours, live with you if needed, then the tests, guardrails and costs that take them to production instead of leaving them as a pilot."
+      },
+      {
+        "id": "security-compliance",
+        "title": "Security, accessibility and compliance",
+        "line": "Security audits and fixes, WCAG AA and AAA, ISO 9001 certified processes at GRCTechMe and ISO 27001 in preparation."
+      },
+      {
+        "id": "marketplace-launches",
+        "title": "Marketplace launches",
+        "line": "Your app listed on Google Marketplace or the Shopify App Store, with the procurement, webhooks and compliance reviews they ask for. Done for GRCTechMe and PMX."
+      },
+      {
         "id": "product-builds",
         "title": "Product builds",
-        "line": "Anything, from idea to production, out faster than anyone. Full stack in Elixir and Phoenix, React and Vue."
+        "line": "Anything, from idea to production, out faster than anyone. Elixir and Phoenix, React, Vue and Angular on the web, Flutter on mobile."
       },
       {
-        "id": "ai-systems",
-        "title": "AI systems",
-        "line": "LLM orchestration with Claude and Gemini, speech pipelines with TTS and STT, custom neural networks. Training models since before 2023, starting with personal games."
-      },
-      {
-        "id": "fintech-insuretech",
-        "title": "Fintech and InsureTech infrastructure",
-        "line": "High volume data, database migrations and compliance heavy apps."
+        "id": "migrations",
+        "title": "Legacy migrations",
+        "line": "Live systems moved without stopping the business: a payments platform's Node.js API rebuilt in Elixir with its Angular front end and tests, Firestore moved into PostgreSQL."
       },
       {
         "id": "cloud-kubernetes",
         "title": "Cloud and Kubernetes",
-        "line": "Deploys, GitOps and PostgreSQL in production."
-      },
-      {
-        "id": "games-interactive-web",
-        "title": "Games and interactive web",
-        "line": "Game engines, map editors and animated sites like this one."
+        "line": "Kubernetes on GKE and AKS, GitOps with ArgoCD, Terraform and PostgreSQL in production."
       }
     ]
   },
   "es": {
     "services": [
       {
+        "id": "ai-products",
+        "title": "IA dentro de tu producto",
+        "line": "Agentes, RAG y funciones LLM con Claude y Gemini, voz de entrada y salida con STT y TTS, integrados en la app que ya usas. Entrenando modelos desde antes de 2023, empezando con juegos personales."
+      },
+      {
+        "id": "ai-to-production",
+        "title": "De prototipo de IA a producción",
+        "line": "Prototipos de calidad en horas, en vivo contigo si hace falta, y luego las pruebas, los controles y los costos que los llevan a producción en vez de dejarlos como piloto."
+      },
+      {
+        "id": "security-compliance",
+        "title": "Seguridad, accesibilidad y cumplimiento",
+        "line": "Auditorías de seguridad con sus correcciones, WCAG AA y AAA, procesos certificados ISO 9001 en GRCTechMe e ISO 27001 en preparación."
+      },
+      {
+        "id": "marketplace-launches",
+        "title": "Publicación en marketplaces",
+        "line": "Tu app publicada en Google Marketplace o en la Shopify App Store, con el procurement, los webhooks y las revisiones de cumplimiento que piden. Hecho para GRCTechMe y PMX."
+      },
+      {
         "id": "product-builds",
         "title": "Desarrollo de productos",
-        "line": "Cualquier cosa, de la idea a producción, más rápido que nadie. Full stack en Elixir y Phoenix, React y Vue."
+        "line": "Cualquier cosa, de la idea a producción, más rápido que nadie. Elixir y Phoenix, React, Vue y Angular en la web, Flutter en móvil."
       },
       {
-        "id": "ai-systems",
-        "title": "Sistemas de IA",
-        "line": "Orquestación de LLM con Claude y Gemini, pipelines de voz con TTS y STT, redes neuronales propias. Entrenando modelos desde antes de 2023, empezando con juegos personales."
-      },
-      {
-        "id": "fintech-insuretech",
-        "title": "Infraestructura Fintech e InsureTech",
-        "line": "Datos de alto volumen, migraciones de bases de datos y aplicaciones con mucho cumplimiento normativo."
+        "id": "migrations",
+        "title": "Migración de sistemas legacy",
+        "line": "Sistemas en vivo migrados sin detener el negocio: la API Node.js de una plataforma de pagos reconstruida en Elixir con su front end Angular y sus pruebas, Firestore migrado a PostgreSQL."
       },
       {
         "id": "cloud-kubernetes",
         "title": "Cloud y Kubernetes",
-        "line": "Despliegues, GitOps y PostgreSQL en producción."
-      },
-      {
-        "id": "games-interactive-web",
-        "title": "Juegos y web interactiva",
-        "line": "Motores de juego, editores de mapas y sitios animados como este."
+        "line": "Kubernetes en GKE y AKS, GitOps con ArgoCD, Terraform y PostgreSQL en producción."
       }
     ]
   },
   "it": {
     "services": [
       {
+        "id": "ai-products",
+        "title": "IA dentro il tuo prodotto",
+        "line": "Agenti, RAG e funzioni LLM con Claude e Gemini, voce in entrata e in uscita con STT e TTS, integrati nell'app che usi già. Addestro modelli da prima del 2023, a partire dai miei giochi personali."
+      },
+      {
+        "id": "ai-to-production",
+        "title": "Dal prototipo IA alla produzione",
+        "line": "Prototipi di qualità in poche ore, anche dal vivo con te, poi i test, i controlli e i costi che li portano in produzione invece di lasciarli come pilota."
+      },
+      {
+        "id": "security-compliance",
+        "title": "Sicurezza, accessibilità e conformità",
+        "line": "Audit di sicurezza con le relative correzioni, WCAG AA e AAA, processi certificati ISO 9001 in GRCTechMe e ISO 27001 in preparazione."
+      },
+      {
+        "id": "marketplace-launches",
+        "title": "Pubblicazione nei marketplace",
+        "line": "La tua app pubblicata su Google Marketplace o sullo Shopify App Store, con procurement, webhook e revisioni di conformità richieste. Fatto per GRCTechMe e PMX."
+      },
+      {
         "id": "product-builds",
         "title": "Sviluppo di prodotti",
-        "line": "Qualsiasi cosa, dall'idea alla produzione, più veloce di chiunque. Full stack in Elixir e Phoenix, React e Vue."
+        "line": "Qualsiasi cosa, dall'idea alla produzione, più veloce di chiunque. Elixir e Phoenix, React, Vue e Angular sul web, Flutter su mobile."
       },
       {
-        "id": "ai-systems",
-        "title": "Sistemi di IA",
-        "line": "Orchestrazione di LLM con Claude e Gemini, pipeline vocali con TTS e STT, reti neurali su misura. Modelli addestrati da prima del 2023, a partire da giochi personali."
-      },
-      {
-        "id": "fintech-insuretech",
-        "title": "Infrastruttura Fintech e InsureTech",
-        "line": "Dati ad alto volume, migrazioni di database e applicazioni ad alta conformità normativa."
+        "id": "migrations",
+        "title": "Migrazione di sistemi legacy",
+        "line": "Sistemi in produzione migrati senza fermare il business: l'API Node.js di una piattaforma di pagamenti ricostruita in Elixir con il suo front end Angular e i suoi test, Firestore migrato in PostgreSQL."
       },
       {
         "id": "cloud-kubernetes",
         "title": "Cloud e Kubernetes",
-        "line": "Deploy, GitOps e PostgreSQL in produzione."
-      },
-      {
-        "id": "games-interactive-web",
-        "title": "Giochi e web interattivo",
-        "line": "Motori di gioco, editor di mappe e siti animati come questo."
+        "line": "Kubernetes su GKE e AKS, GitOps con ArgoCD, Terraform e PostgreSQL in produzione."
       }
     ]
   }
