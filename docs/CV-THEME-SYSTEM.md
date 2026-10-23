@@ -60,7 +60,8 @@ Artistic.
   component reads it with `useLabels()` from `CVDataProvider`: `const { sections } = useLabels()`, then
   `title={sections.about}`. A `{slot}` is filled with `fillLabel` from `src/lib/cv/labels.ts`. A key missing
   in es or it keeps the English text. There is no next-intl and no `messages/` folder; the locale comes from
-  the cookie or Accept-Language (`src/i18n/requestLocale.ts`).
+  the CV's address, /cv English, /es/cv and /it/cv (`src/app/(cv)`); `src/middleware.ts` sends /cv to the
+  cookie's or Accept-Language's locale.
 - No other source exists: no hand written data folder and no API. nebulith is not this site's backend.
 - `node scripts/check-cv-text.mjs` fails when an English string no longer matches the job history it was
   copied from, or a project fact has no commit behind it.
