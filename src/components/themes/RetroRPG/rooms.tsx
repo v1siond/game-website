@@ -20,7 +20,8 @@ import rooms from './rooms.module.css'
 //
 //   About       the encounter: the heart steps beside Check, the monster shakes, the bio types, it is spared
 //   Experience  he walks up to the snowy booth, the dog sentry pops up with the "!" and talks in each job box
-//   Tech stack  he walks in to the shop counter, the keeper waves; pointing at an item makes the keeper hop
+//   Tech stack  he walks in to the shop counter, the keeper waves and tosses the item bag over the counter,
+//               the item box drops in from it and shakes; pointing at an item makes the keeper hop
 //   Projects    he walks over three floor switches, each clicks, the spike row sinks, the projects rise
 //   Ventures    he walks the pastel street, each shop door opens as he passes, a taxi drives by
 //   Bands       he walks the waterfall bridge, one echo flower per band lights and rings as he passes
@@ -174,13 +175,16 @@ function Pines() {
   )
 }
 
-/** The bang over the sentry: white pixels in a black bubble. */
+/** The bang over the sentry: white pixels in a black bubble. Its place is on the outer group, since the
+ * bang's CSS transform would replace an SVG transform attribute on the same element. */
 function Bang({ x, y }: { x: number; y: number }) {
   return (
-    <g transform={`translate(${x} ${y})`} className={rooms.bang}>
-      <path d="M2 0 H7 V1 H8 V9 H7 V10 H5 V12 H4 V10 H2 V9 H1 V1 H2 Z" fill={RPG.void} />
-      <rect x={4} y={2} width={1} height={5} fill={RPG.text} />
-      <rect x={4} y={8} width={1} height={1} fill={RPG.text} />
+    <g transform={`translate(${x} ${y})`}>
+      <g className={rooms.bang}>
+        <path d="M2 0 H7 V1 H8 V9 H7 V10 H5 V12 H4 V10 H2 V9 H1 V1 H2 Z" fill={RPG.void} />
+        <rect x={4} y={2} width={1} height={5} fill={RPG.text} />
+        <rect x={4} y={8} width={1} height={1} fill={RPG.text} />
+      </g>
     </g>
   )
 }
@@ -250,6 +254,14 @@ export function ShopRoom({ profession, children }: { profession: Profession; chi
       <rect x="150" y="44" width="88" height="2" fill={RPG.shopPale} />
       <rect x="160" y="54" width="68" height="2" fill={RPG.gold} />
       <Walker profession={profession} className="[--walk-from:-24px] [--walk-ms:1200ms] [--walk-steps:8] [--walk-to:118px] [--walk-y:46px]" />
+      {/* the item bag the keeper tosses over the counter at the wave; it drops out of the room's bottom
+          edge into the item box below, which lands from it (rooms.module.css, Tech stack) */}
+      <g className={rooms.bag}>
+        <rect x="166" y="30" width="8" height="7" fill={RPG.shopDark} />
+        <rect x="167" y="31" width="6" height="5" fill={RPG.shopBoard} />
+        <rect x="168" y="28" width="4" height="2" fill={RPG.shopDark} />
+        <rect x="168" y="30" width="4" height="1" fill={RPG.gold} />
+      </g>
     </>
   )
 

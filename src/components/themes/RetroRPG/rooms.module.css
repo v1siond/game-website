@@ -212,6 +212,44 @@
   animation: wave 300ms steps(1, end) 3;
 }
 
+/* The keeper's toss: the bag leaves the paw at 100 ms into the wave, arcs over the counter and drops out
+   of the room's bottom edge by its end (1300 to 1800 ms of the room); the item box below then lands from
+   it, 24 px down in steps with an overshoot and two shake steps, in place of the other rooms' rise. */
+.bag {
+  opacity: 0;
+}
+
+@keyframes toss {
+  0% { opacity: 1; transform: translate(0, 0); }
+  30% { opacity: 1; transform: translate(-20px, -16px); }
+  55% { opacity: 1; transform: translate(-38px, 0); }
+  100% { opacity: 1; transform: translate(-56px, 60px); }
+}
+
+[data-room='act'] .bag {
+  animation: toss 500ms steps(8, end) 100ms both;
+}
+
+@keyframes landed {
+  0% { opacity: 0; transform: translateY(-24px); }
+  25% { opacity: 1; transform: translateY(-12px); }
+  50% { opacity: 1; transform: translateY(4px); }
+  62% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+  88% { transform: translateX(-1px); }
+  100% { opacity: 1; transform: none; }
+}
+
+.shop[data-shown='true'] .gated {
+  animation: landed 400ms steps(8, end) both;
+}
+
+/* the item box's line lands at its top edge, under the room, and opens down from there */
+/* (the gated block holds the OpenBox play scope, which holds the box) */
+.shop .gated > div > div {
+  transform-origin: 50% 0;
+}
+
 @keyframes hop {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
@@ -408,6 +446,7 @@
   .rises,
   .flicker,
   .keeper,
+  .bag,
   .mouthOpen,
   .monster,
   .spareable {

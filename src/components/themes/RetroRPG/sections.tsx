@@ -18,6 +18,7 @@ import {
   ProjectCard,
 } from "./cards";
 import { BulletBox } from "./bulletBox";
+import { MonsterTurnBox } from "./monsterTurn";
 import { BODY, Box, Mark, SectionHeader } from "./panels";
 import { PIXEL } from "./palette";
 import { usePlay } from "./play";
@@ -36,6 +37,8 @@ import world from "./world.module.css";
 // Services, Ventures, the band lines) are one box each; heavy blocks are the long lists in masonry columns
 // (MASONRY_LIST), each entry its own box with its own reveal (cards.tsx). The bullet box sits above
 // each profession's main list, playing that profession's soul mode (bulletBox.tsx).
+//
+// The services box is opened by the About monster landing on it (monsterTurn.tsx).
 //
 // Every reveal has its own play scope (usePlay), so a block's heading, its box and each card in a list
 // open and type once, each when it shows, and never drive one another.
@@ -135,7 +138,7 @@ export function EngineerSections({
 
       {sections.services.length > 0 && (
         <Block label={titles.services} title={titles.services} width={WIDE}>
-          <OpenBox>
+          <MonsterTurnBox>
             <ul className={MASONRY_LIST}>
               {sections.services.map((service) => (
                 <li key={service.id} className={MASONRY_ITEM}>
@@ -149,7 +152,7 @@ export function EngineerSections({
                 </li>
               ))}
             </ul>
-          </OpenBox>
+          </MonsterTurnBox>
         </Block>
       )}
 

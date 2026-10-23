@@ -1,0 +1,107 @@
+/*
+ * Services, the monster's turn (monsterTurn.tsx). The lane is a zero height line on the box's top edge;
+ * the monster's feet stand on it. Each beat is one steps() animation on its track, its end steps the beat.
+ * The box's opening is the world's own boxOpen (world.module.css, read through data-play); the shake waits
+ * for the opening to finish. Transforms and opacity only; reduced motion never mounts any of it.
+ */
+
+.lane {
+  height: 0;
+}
+
+/* the closed box's line sits on the top edge, under the monster, and opens down from it */
+div.fromTop {
+  transform-origin: 50% 0;
+}
+
+.place {
+  right: 20%;
+}
+
+/* three hops in from the right, two frames each */
+.hopIn {
+  animation: hop-in 600ms steps(2, end) both;
+}
+
+@keyframes hop-in {
+  0% {
+    opacity: 0;
+    transform: translate(18rem, 0);
+  }
+  10% {
+    opacity: 1;
+  }
+  17% {
+    transform: translate(15rem, -2rem);
+  }
+  33% {
+    transform: translate(12rem, 0);
+  }
+  50% {
+    transform: translate(9rem, -2rem);
+  }
+  67% {
+    transform: translate(6rem, 0);
+  }
+  83% {
+    transform: translate(3rem, -2.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* it sits on the box while the box opens under it */
+.sit {
+  transform-origin: bottom;
+  animation: sit 500ms steps(1, end) both;
+}
+
+@keyframes sit {
+  0% {
+    transform: scale(1.15, 0.85);
+  }
+  20%,
+  100% {
+    transform: none;
+  }
+}
+
+.hopOff {
+  animation: hop-off 300ms steps(3, end) both;
+}
+
+@keyframes hop-off {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6rem, -4rem);
+  }
+}
+
+/* the battle box shakes on the hit, two steps each way, once the box is open */
+.shake {
+  animation: shake 160ms steps(1, end) 420ms both;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(-4px);
+  }
+  25% {
+    transform: translateX(4px);
+  }
+  50% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: none;
+  }
+}
