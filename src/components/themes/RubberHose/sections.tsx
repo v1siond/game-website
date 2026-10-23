@@ -13,6 +13,7 @@ import { HOSE } from './palette'
 import { BandRecord, CompanyPoster, ExperienceCard, TechBubbleCloud } from './cards'
 import { Reveal, RunBar, staggerAt } from './scenes'
 import { ParryBoard } from './parry'
+import { FingerGunPop, ParrySlap } from './gags'
 import { IsleStage } from './isles'
 import { BagFoe, Bandstand, FlowerKnockout, MapRun, ShopCounter, StageCurtains } from './stages'
 import world from './world.module.css'
@@ -22,8 +23,9 @@ import { drumsSince } from '@/components/cv/sectionText'
 // The picked profession's sections, each on its isle (./isles, the backdrop follows) and each with its own
 // act of his (./stages). About: he knocks out the flower boss and the text unfolds. Work Experience: the
 // lost round's run bar, his figure running past a flag per job as they scroll by, the jobs dropping in as
-// phase cards. Tech Stack: he pays at the shop counter and the items lift off the shelf. Services: plain
-// poster cards under a fade. Featured Work: the parry board (./parry). Ventures: the curtains part and he
+// phase cards. Tech Stack: he pays at the shop counter and the items lift off the shelf. Services: poster
+// cards he pops into place with the finger gun (./gags). Featured Work: the parry board (./parry), bounced
+// by his parry slap (./gags). Ventures: the curtains part and he
 // bows. Bands: he drums on the bandstand, each record spinning up under the pointer. Muay Thai: he drops the heavy bag, the knockout slams the
 // title, the achievements land as hit stars. Between About, Work and Tech he runs the isle map.
 
@@ -122,14 +124,16 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
             <section aria-labelledby="hose-services" className="mb-8">
               <CurlBanner id="hose-services">{titles.services}</CurlBanner>
               <FadeInScene>
-                <ul className={MASONRY_LIST}>
-                  {sections.services.map((service) => (
-                    <li key={service.id} className={`${MASONRY_ITEM} p-5 ${world.poster}`}>
-                      <h3 className={`text-lg ${world.lettering}`}>{service.title}</h3>
-                      <p className={`mt-2 text-base leading-relaxed ${world.ink}`}>{service.line}</p>
-                    </li>
-                  ))}
-                </ul>
+                <FingerGunPop>
+                  <ul className={MASONRY_LIST}>
+                    {sections.services.map((service) => (
+                      <li key={service.id} className={`${MASONRY_ITEM} p-5 ${world.poster}`}>
+                        <h3 className={`text-lg ${world.lettering}`}>{service.title}</h3>
+                        <p className={`mt-2 text-base leading-relaxed ${world.ink}`}>{service.line}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </FingerGunPop>
               </FadeInScene>
             </section>
           )}
@@ -140,7 +144,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         {() => (
           <section aria-labelledby="hose-featured-work" className="mb-8">
             <CurlBanner id="hose-featured-work">{titles.featuredWork}</CurlBanner>
-            <ParryBoard projects={sections.projects} />
+            <ParrySlap>
+              <ParryBoard projects={sections.projects} />
+            </ParrySlap>
           </section>
         )}
       </IsleStage>
