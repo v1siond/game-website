@@ -13,13 +13,15 @@ import { ItemProjects } from './items'
 import { FloorMessages } from './messages'
 import { SunStages } from './stage'
 import { FogArena } from './arena'
+import { IllusoryWall, RollIn } from './plunge'
 
 // Each profession's sections, each with its own event of the bonfire world: the System Engineer walks
 // out of a fog gate into About (./gate), his jobs are the lift ride down past bloodstains that replay his
 // ghost (./descent), his projects are summon signs his phantom rises out of (./items), his ventures are
 // messages a spirit of him kneels and writes (./messages); the Musician's bands play in a shaft of sun
 // (./stage); the Martial Artist's record is the bout behind the fog wall, its boss dropping in (./arena).
-// The Tech Stack and the Services stay the game's plain menu screen, fading open when reached (./menu).
+// The Tech Stack and the Services are the game's menu screen (./menu): the stack's stands behind an
+// illusory wall he breaks with a plunging attack, the services are knocked into place by his roll (./plunge).
 
 function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
   const id = headingId('soul', title)
@@ -54,23 +56,27 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       )}
 
       <Block title={titles.techStack} wide>
-        <MenuPanel>
-          <TechSlots categories={sections.techStack} />
-        </MenuPanel>
+        <IllusoryWall>
+          <MenuPanel>
+            <TechSlots categories={sections.techStack} />
+          </MenuPanel>
+        </IllusoryWall>
       </Block>
 
       {sections.services.length > 0 && (
         <Block title={titles.services} wide>
-          <MenuPanel>
-            <ul className={MASONRY_LIST}>
-              {sections.services.map((service) => (
-                <li key={service.id} className={MASONRY_ITEM}>
-                  <h3 className={CARD_TITLE}>{service.title}</h3>
-                  <p className={`mt-2 ${CARD_BODY}`}>{service.line}</p>
-                </li>
-              ))}
-            </ul>
-          </MenuPanel>
+          <RollIn>
+            <MenuPanel>
+              <ul className={MASONRY_LIST}>
+                {sections.services.map((service) => (
+                  <li key={service.id} className={MASONRY_ITEM}>
+                    <h3 className={CARD_TITLE}>{service.title}</h3>
+                    <p className={`mt-2 ${CARD_BODY}`}>{service.line}</p>
+                  </li>
+                ))}
+              </ul>
+            </MenuPanel>
+          </RollIn>
         </Block>
       )}
 
