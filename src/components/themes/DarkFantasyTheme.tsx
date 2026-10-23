@@ -9,7 +9,7 @@ import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
-import type { CVData, Job } from '@/lib/cv/content'
+import type { CVData, Job, Service } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -1017,6 +1017,22 @@ const VoidFrame = memo(function VoidFrame({
 
 const DF_FONT = '"Comic Sans MS", "Comic Sans", cursive'
 
+// Services: a title and its line each, read in the same frame as the tech stack.
+function ServiceList({ services }: { services: Service[] }) {
+  return (
+    <ul className={MASONRY_LIST}>
+      {services.map((service) => (
+        <li key={service.id} className={MASONRY_ITEM}>
+          <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver)]" style={{ fontFamily: DF_FONT }}>
+            {service.title}
+          </h3>
+          <p className="text-base leading-relaxed text-[color:var(--df-bone)]">{service.line}</p>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 // Tech stack display
 const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
@@ -1546,7 +1562,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
   const labels = useLabels()
   const projectsTrigger = useSectionTrigger()
-  const { jobs, techStack, projects, companies } = sections
+  const { jobs, techStack, services, projects, companies } = sections
 
   return (
     <>
@@ -1578,6 +1594,12 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
       <FramedSection title={labels.sections.techStack}>
         <TechCloud categories={techStack} />
       </FramedSection>
+
+      {services.length > 0 && (
+        <FramedSection title={labels.sections.services}>
+          <ServiceList services={services} />
+        </FramedSection>
+      )}
 
       {/* Projects - Bug Pull Reveal */}
       <div ref={projectsTrigger.ref}>

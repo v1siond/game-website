@@ -5,6 +5,8 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { drumsSince, headingId } from '@/components/cv/sectionText'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { SectionHeader } from './cards'
 import { ChaseAbout } from './chase'
 import { HangingJobs } from './ropes'
@@ -14,11 +16,13 @@ import { MillProjects } from './mill'
 import { VentureSigns } from './signs'
 import { ShockStage } from './stage'
 import { GravityRecord } from './gravity'
+import world from './world.module.css'
 
 // Each profession's sections, and only those, each its own set piece on the walk from the dark forest
 // to the machine city, so no two look or move alike: the System Engineer's about is a spider chase
 // through the thicket, his jobs hang down one rope into a chasm, his tech stack floats as crates in a
-// flooded hold, the spider loses a leg in the trap line, his projects lie on a sawmill floor under a
+// flooded hold, his services stand as plain slabs under a fade, the spider loses a leg in the trap
+// line, his projects lie on a sawmill floor under a
 // running saw and his ventures are lit signs over the city; the Musician's bands are plates on an electrified floor stepping in time; the Martial
 // Artist's record sits in the gravity room.
 
@@ -53,6 +57,21 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <Block title={titles.techStack} wide>
         <FloatingCrates categories={sections.techStack} />
       </Block>
+
+      {sections.services.length > 0 && (
+        <Block title={titles.services} wide>
+          <FadeInScene>
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={`${MASONRY_ITEM} border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-[color:var(--sh-text)]">{service.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-muted)]">{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </FadeInScene>
+        </Block>
+      )}
 
       <TrapLine />
 

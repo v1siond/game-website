@@ -54,7 +54,7 @@ export function ArtDivider({ layout, children }: { layout: SectionLayout; childr
 function EngineerSections({ sections, layout, isLargeScreen }: { sections: SectionsOf<'engineer'>; layout: SectionLayout; isLargeScreen: boolean }) {
   const labels = useLabels()
   const { professionalSummary } = useCVData()
-  const { jobs, techStack, projects, companies } = sections
+  const { jobs, techStack, services, projects, companies } = sections
 
   return (
     <>
@@ -125,6 +125,26 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
           </section>
         </SectionWithOrnament>
       </ScrollScene>
+
+      {/* Services */}
+      {services.length > 0 && (
+        <ScrollScene>
+          <section style={{ marginBottom: layout.sectionSpacing }}>
+            <RealmFrame title={labels.sections.services} zone="roc">
+              <ul className={MASONRY_LIST}>
+                {services.map((service) => (
+                  <li key={service.id} className={MASONRY_ITEM}>
+                    <InnerCard zone="roc">
+                      <h3 style={CARD_TITLE}>{service.title}</h3>
+                      <p style={CARD_BODY}>{service.line}</p>
+                    </InnerCard>
+                  </li>
+                ))}
+              </ul>
+            </RealmFrame>
+          </section>
+        </ScrollScene>
+      )}
 
       {/* ============ TRANSITION - FROZEN THRONE ZONE ============ */}
 
