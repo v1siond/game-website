@@ -71,30 +71,40 @@
 
 /* ---------------------------------------------------------------- resting poses per kit */
 
+/* Each rest pose is kept in --rest, so a motion that composes over it (the walk) keeps his guard. */
+
 .kitSticks .armRight {
-  transform: rotate(14deg);
+  --rest: rotate(14deg);
+  transform: var(--rest);
 }
 .kitSticks .foreRight {
-  transform: rotate(-30deg);
+  --rest: rotate(-30deg);
+  transform: var(--rest);
 }
 .kitSticks .armLeft {
-  transform: rotate(-14deg);
+  --rest: rotate(-14deg);
+  transform: var(--rest);
 }
 .kitSticks .foreLeft {
-  transform: rotate(30deg);
+  --rest: rotate(30deg);
+  transform: var(--rest);
 }
 
 .kitGuard .armRight {
-  transform: rotate(25deg);
+  --rest: rotate(25deg);
+  transform: var(--rest);
 }
 .kitGuard .foreRight {
-  transform: rotate(150deg);
+  --rest: rotate(150deg);
+  transform: var(--rest);
 }
 .kitGuard .armLeft {
-  transform: rotate(-25deg);
+  --rest: rotate(-25deg);
+  transform: var(--rest);
 }
 .kitGuard .foreLeft {
-  transform: rotate(-150deg);
+  --rest: rotate(-150deg);
+  transform: var(--rest);
 }
 
 /* ---------------------------------------------------------------- glitch: hit or hovered, the figure tears and splits */
@@ -176,16 +186,41 @@
 
 /* ---------------------------------------------------------------- walk: the low street stride */
 
+/*
+ * He faces the camera, so the stride is drawn the way a front view walk reads: a leg that steps comes
+ * toward the viewer, the thigh foreshortens from the hip (the knee rises), the shin tucks in under it
+ * and the boot leaves the street, while the other leg stays planted. The arm on the other side comes
+ * forward with it, the upper arm and the forearm foreshortening as the elbow bends toward the viewer.
+ * One 0.8s cycle, two steps: the right leg and the left arm step in the first half, the left leg and
+ * the right arm play the same keyframes half a cycle later (-0.4s). The body rises on each passing.
+ */
 .walk .body {
   animation: stride 0.8s ease-in-out infinite;
 }
 .walk .thighRight,
-.walk .armLeft {
-  animation: swing-a 0.8s ease-in-out infinite;
+.walk .thighLeft {
+  animation: knee-lift 0.8s ease-in-out infinite;
 }
-.walk .thighLeft,
+.walk .shinRight {
+  animation: shin-tuck-right 0.8s ease-in-out infinite;
+}
+.walk .shinLeft {
+  animation: shin-tuck-left 0.8s ease-in-out infinite;
+}
+.walk .armLeft,
 .walk .armRight {
-  animation: swing-b 0.8s ease-in-out infinite;
+  animation: arm-reach 0.8s ease-in-out infinite;
+}
+.walk .foreLeft,
+.walk .foreRight {
+  animation: fore-reach 0.8s ease-in-out infinite;
+}
+/* after the shorthands above, which reset the delay */
+.walk .thighLeft,
+.walk .shinLeft,
+.walk .armRight,
+.walk .foreRight {
+  animation-delay: -0.4s;
 }
 
 @keyframes stride {
@@ -200,23 +235,58 @@
   }
 }
 
-@keyframes swing-a {
+@keyframes knee-lift {
   0%,
+  50%,
   100% {
-    transform: rotate(16deg);
+    transform: none;
   }
-  50% {
-    transform: rotate(-16deg);
+  25% {
+    transform: scaleY(0.82);
   }
 }
 
-@keyframes swing-b {
+@keyframes shin-tuck-right {
   0%,
+  50%,
   100% {
-    transform: rotate(-16deg);
+    transform: none;
   }
-  50% {
-    transform: rotate(16deg);
+  25% {
+    transform: rotate(-7deg) scaleY(0.92);
+  }
+}
+
+@keyframes shin-tuck-left {
+  0%,
+  50%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: rotate(7deg) scaleY(0.92);
+  }
+}
+
+@keyframes arm-reach {
+  0%,
+  50%,
+  100% {
+    transform: var(--rest, rotate(0deg));
+  }
+  25% {
+    transform: var(--rest, rotate(0deg)) scaleY(0.92);
+  }
+}
+
+@keyframes fore-reach {
+  0%,
+  50%,
+  100% {
+    transform: var(--rest, rotate(0deg));
+  }
+  25% {
+    transform: var(--rest, rotate(0deg)) scaleY(0.8);
   }
 }
 
