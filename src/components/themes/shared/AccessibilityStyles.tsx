@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { contrastRatio } from '@/lib/contrast'
 
 /**
  * WCAG AA Accessibility Styles for Game Website Themes
@@ -253,21 +254,8 @@ export function getAccessibleTextColor(backgroundColor: string): string {
   return luminance > 0.5 ? '#1a1a1a' : '#ffffff'
 }
 
-// Calculate contrast ratio between two colors
-export function getContrastRatio(color1: string, color2: string): number {
-  const getLuminance = (hex: string): number => {
-    const rgb = hex.replace('#', '').match(/.{2}/g)?.map(x => parseInt(x, 16) / 255) || [0, 0, 0]
-    const [r, g, b] = rgb.map(c => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4))
-    return 0.2126 * r + 0.7152 * g + 0.0722 * b
-  }
-
-  const l1 = getLuminance(color1)
-  const l2 = getLuminance(color2)
-  const lighter = Math.max(l1, l2)
-  const darker = Math.min(l1, l2)
-
-  return (lighter + 0.05) / (darker + 0.05)
-}
+// Contrast ratio between two colors, from the one WCAG formula in src/lib/contrast.ts
+export const getContrastRatio = contrastRatio
 
 // Check if a color pair meets WCAG AA requirements
 export function meetsWCAGAA(foreground: string, background: string, isLargeText = false): boolean {

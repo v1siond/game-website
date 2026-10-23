@@ -1,9 +1,12 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
+import { loadSeenWorlds } from '@/hooks/useWorldsNudge'
+import { WORLDS } from '@/themes/worlds'
 import WorldsGrid from './WorldsGrid'
+import { launcherVars } from './WorldsLauncher'
 
 /**
  * WorldsModal, the "Enter Another World" picker, lifted OUT of the page content flow
@@ -12,6 +15,11 @@ import WorldsGrid from './WorldsGrid'
 export default function WorldsModal() {
   const { isWorldsOpen, closeWorlds } = useWorldTransition()
   const { theme } = useTheme()
+  const [seenCount, setSeenCount] = useState(0)
+
+  useEffect(() => {
+    if (isWorldsOpen) setSeenCount(loadSeenWorlds().length)
+  }, [isWorldsOpen])
 
   // close on Escape + lock body scroll while open
   useEffect(() => {
@@ -72,6 +80,11 @@ export default function WorldsModal() {
           <p className="text-sm text-center mb-6 opacity-70" style={{ color: c.secondary }}>
             Step through to a different version of this realm
           </p>
+          {seenCount > 1 && (
+            <p style={launcherVars(c)} className="c-worlds-seen -mt-4 mb-6 text-center text-sm">
+              You have seen {seenCount} of {WORLDS.length}
+            </p>
+          )}
           <WorldsGrid />
         </div>
       </div>

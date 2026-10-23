@@ -1,0 +1,61 @@
+/* ===================================================================
+   ITCSS Components: THE WORLDS LAUNCHER AND ITS ONE TIME HINT
+   ===================================================================
+   The launcher (top right, every world) and the hint card under it paint from custom properties the
+   React components set from the current world's palette (launcherColors in src/lib/worlds/nudge.ts):
+   --wl-text the label colour, --wl-body running text, --wl-fill the world's background, --wl-edge the black or
+   white outer hairline. Both text pairs read at 7 to 1 or more; the rings keep 3 to 1 from any page behind. Defaults are medieval-fantasy, the default world.
+   =================================================================== */
+
+.c-worlds-launcher,
+.c-worlds-hint {
+  --wl-text: #d4a017;
+  --wl-body: #e8dcc8;
+  --wl-fill: #0a0c0e;
+  --wl-edge: #ffffff;
+  color: var(--wl-text);
+  background-color: var(--wl-fill);
+  border: 2px solid var(--wl-text);
+}
+
+.c-worlds-launcher {
+  box-shadow: 0 0 0 2px var(--wl-fill), 0 0 0 3px var(--wl-edge), 0 6px 24px rgba(0, 0, 0, 0.45);
+  transition: transform 0.15s ease;
+}
+.c-worlds-launcher:hover { transform: scale(1.05); }
+.c-worlds-launcher:focus-visible,
+.c-worlds-hint button:focus-visible {
+  outline: 3px solid var(--wl-text);
+  outline-offset: 3px;
+}
+
+.c-worlds-hint {
+  box-shadow: 0 0 0 2px var(--wl-fill), 0 0 0 3px var(--wl-edge), 0 18px 48px rgba(0, 0, 0, 0.55);
+}
+.c-worlds-hint__body { color: var(--wl-body); }
+.c-worlds-hint__primary {
+  color: var(--wl-fill);
+  background-color: var(--wl-text);
+  border: 2px solid var(--wl-text);
+}
+.c-worlds-hint__secondary {
+  color: var(--wl-text);
+  background-color: var(--wl-fill);
+  border: 2px solid var(--wl-text);
+}
+
+/* Drops in from under the launcher: opacity and a short slide, once. */
+@keyframes worlds-hint-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: none; }
+}
+.c-worlds-hint { animation: worlds-hint-in 0.28s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .c-worlds-launcher { transition: none; }
+  .c-worlds-launcher:hover { transform: none; }
+  .c-worlds-hint { animation: none; }
+}
+
+/* The seen counter under the worlds picker's title. */
+.c-worlds-seen { color: var(--wl-body, #e8dcc8); }

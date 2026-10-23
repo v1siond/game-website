@@ -2,6 +2,8 @@
 @import "./themes/dark-fantasy.css";
 /* The failure screen (404 / 500 / crash). Theme-driven through custom properties. */
 @import "./components/error-screen.css";
+/* The worlds launcher and its one time hint, painted from the current world's palette. */
+@import "./components/worlds-nudge.css";
 
 @tailwind base;
 @tailwind components;

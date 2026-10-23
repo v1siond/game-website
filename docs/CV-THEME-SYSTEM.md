@@ -30,6 +30,25 @@ Fighter Select, Art Deco, Retro Atomic, Neon Cyber, Cell Shaded, Silhouette, Myt
 Platformer, Medieval Fantasy (default). The worlds menu groups them in five categories: Fantasy, Retro, Neon, Action,
 Artistic.
 
+## The worlds launcher and its hint
+
+- `WorldsLauncher` (`src/components/worlds/`) sits top right on every page, the homepage and `/cv`, and names
+  itself with the count from the registry: "17 worlds" (stacked "17" over "worlds" under 640 px, so it
+  clears a world's own top bar; Dark Fantasy keeps 64 px and 144 px free for it). It opens `WorldsModal`.
+- Its colours come from the current world's palette through `launcherColors` (`src/lib/worlds/nudge.ts`):
+  the fill is the world's background, the label the first of accent, highlight and text that reads at 7 to
+  1 on it, and a black or white outer hairline keeps the button 3 to 1 apart from any page behind it.
+  `src/styles/components/worlds-nudge.css` paints from the `--wl-*` properties the component sets.
+- `WorldsHint` is a one time card under the launcher: "This CV has 17 worlds", the current world and how
+  many the visitor has seen, "Next world" (a random world not seen yet, through the portal) and "All
+  worlds". `useWorldsNudge` (`src/hooks/`) offers it once per visit (sessionStorage
+  `portfolio-worlds-hint-offered`), only after 20 s and one scrolled screen, never to a visitor who opened
+  the picker or has seen two worlds. It never takes focus and closes on its x, Escape or a tap outside.
+- Seen worlds are kept in localStorage under `portfolio-worlds-seen` (a world counts after 1.5 s on
+  screen); the picker shows "You have seen n of 17" once n is 2 or more.
+- The launcher, hint and picker text is English in the components: they render above the CV data
+  provider, so they cannot read `labels.json` yet.
+
 ## Where the CV content comes from
 
 - The content is Decap CMS files, `content/cv/*.json` (summary, contact, experience, projects, bands,
