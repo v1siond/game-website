@@ -36,19 +36,19 @@ import ui from './warped.module.css'
 //
 // The entry, phases from the pick (setTimeout, each a data-warp value the CSS keys on):
 //   slam   0ms     he lands on the new button with a slam and a shockwave
-//   pull   560ms   the tunnel's rings stream out toward the camera
-//   flash  1150ms  one white flash hides the swap
-//   out    1280ms  the tunnel thins away, the new period drops in below with a bounce
-//   off    1700ms  the overlay is gone
+//   pull   450ms   the tunnel's rings stream out toward the camera
+//   flash  860ms   one white flash hides the swap
+//   out    960ms   the tunnel thins away (300ms), the new period drops in below with a bounce (400ms)
+//   off    1360ms  the overlay is gone and the period has landed
 // The first render plays nothing; reduced motion swaps with no entry.
 
 type Warp = 'off' | 'slam' | 'pull' | 'flash' | 'out'
 
 const WARP_AT: ReadonlyArray<readonly [Warp, number]> = [
-  ['pull', 560],
-  ['flash', 1150],
-  ['out', 1280],
-  ['off', 1700],
+  ['pull', 450],
+  ['flash', 860],
+  ['out', 960],
+  ['off', 1360],
 ]
 
 const PAD_TONE: Record<Profession, string> = {
@@ -60,22 +60,29 @@ const PAD_TONE: Record<Profession, string> = {
 // The pad's number, in the switch's order, painted on the pad as the hub's level pads carry theirs.
 const PAD_NUMBER: Record<Profession, number> = { engineer: 1, drummer: 2, fighter: 3 }
 
-/** The entry phase: 'slam' the moment the profession changes, then on through the timeline to 'off'. */
+/** The entry phase: 'slam' the moment the profession changes, then on through the timeline to 'off'.
+ *  The timers belong to one entry (its number), not to the phase: keyed on the phase, the step to 'pull'
+ *  would run the cleanup and clear the rest of the timeline, leaving the tunnel over the page. A pick
+ *  during a running entry starts a new entry, whose cleanup clears the old timers. */
 function useEntry(profession: Profession) {
   const reduced = useReducedMotion()
   const [seen, setSeen] = useState(profession)
+  const [entry, setEntry] = useState(0)
   const [warp, setWarp] = useState<Warp>('off')
 
   if (profession !== seen) {
     setSeen(profession)
-    if (!reduced) setWarp('slam')
+    if (!reduced) {
+      setEntry(entry + 1)
+      setWarp('slam')
+    }
   }
 
   useEffect(() => {
-    if (warp !== 'slam') return
+    if (entry === 0) return
     const timers = WARP_AT.map(([phase, at]) => window.setTimeout(() => setWarp(phase), at))
     return () => timers.forEach(window.clearTimeout)
-  }, [warp])
+  }, [entry])
 
   return warp
 }
@@ -274,7 +281,7 @@ export function WarpRoom({ profession }: { profession: Profession }) {
           label={navigation.profession}
           renderOption={(option) => <LevelButton option={option} warp={warp} />}
         />
-        <div className="absolute bottom-[10%] right-[6%] h-14 w-14 sm:h-16 sm:w-16" aria-hidden="true">
+        <div className="pointer-events-none absolute bottom-[10%] right-[6%] h-14 w-14 sm:h-16 sm:w-16" aria-hidden="true">
           {maskOut ? (
             <>
               <Planks />

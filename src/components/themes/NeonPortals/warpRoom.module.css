@@ -157,7 +157,7 @@
 
 /* He drops onto the new button from above. */
 .standing[data-warp='slam'] {
-  animation: drop-in 560ms cubic-bezier(0.5, 0, 0.75, 0) both;
+  animation: drop-in 450ms cubic-bezier(0.5, 0, 0.75, 0) both;
 }
 
 @keyframes drop-in {
@@ -187,7 +187,7 @@
 
 .tunnel[data-warp='out'] {
   opacity: 0;
-  transition: opacity 400ms linear;
+  transition: opacity 300ms linear;
 }
 
 .tunnelRing {
@@ -249,7 +249,7 @@
 }
 
 .period[data-warp='out'] {
-  animation: period-drop 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: period-drop 400ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
 @keyframes period-drop {
