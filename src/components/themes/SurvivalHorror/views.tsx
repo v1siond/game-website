@@ -5,7 +5,7 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { PaperPanel } from './panels'
-import { TechCloud } from './cards'
+import { ServiceNotes, TechCloud } from './cards'
 import { MapFiles } from './files'
 import { AttacheCase } from './case'
 import { TraderWares } from './trader'
@@ -16,7 +16,7 @@ import { RoomWindow } from './stage'
 // The picked profession's sections, each one of the genre's own screens: Work Experience is the house map
 // and its files (./files), Projects the attache case (./case), Ventures the trader's wares (./trader), Bands
 // the suit key doors (./keys), the Muay Thai record the herb recovery (./condition). About and Tech Stack
-// are papers found on the desk and fade in. Each is a window onto its room of the house behind the page
+// are papers found on the desk and fade in, and so are the Services, typed notes in the same room as the Tech Stack. Each is a window onto its room of the house behind the page
 // (RoomWindow, ./stage): the study, the corridor, the armoury, the back door, the trader, the suit door,
 // the gym.
 
@@ -49,6 +49,16 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
           </PaperPanel>
         </FadeInScene>
       </RoomWindow>
+
+      {sections.services.length > 0 && (
+        <RoomWindow zone="tech">
+          <FadeInScene>
+            <PaperPanel title={titles.services}>
+              <ServiceNotes services={sections.services} />
+            </PaperPanel>
+          </FadeInScene>
+        </RoomWindow>
+      )}
 
       {sections.projects.length > 0 && (
         <RoomWindow zone="projects">

@@ -1,11 +1,11 @@
-import type { CVData } from '@/lib/cv/content'
+import type { CVData, Service } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import look from './world.module.css'
 
 // The small marks the house's papers share: the brass bullet of a typed list, the rust date stamp, and the
-// Tech Stack as the labels pinned on the desk, one group per category.
+// Tech Stack as the labels pinned on the desk, one group per category, and the Services as typed notes.
 
 export const STAMP = `whitespace-nowrap border border-[color:var(--sh-rust)] px-2 py-1 text-sm text-[color:var(--sh-flame)] ${look.typed}`
 
@@ -28,6 +28,22 @@ export function TechCloud({ categories }: { categories: CVData['techStack'] }) {
               </li>
             ))}
           </ul>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+export function ServiceNotes({ services }: { services: Service[] }) {
+  return (
+    <ul className={MASONRY_LIST}>
+      {services.map((service) => (
+        <li key={service.id} className={`${MASONRY_ITEM} border border-[color:var(--sh-wood)] bg-[color:var(--sh-shadow)] p-4`}>
+          <h3 className="flex gap-3 text-base font-bold text-[color:var(--sh-cream)]">
+            <Mark />
+            {service.title}
+          </h3>
+          <p className="mt-2 text-base leading-relaxed text-[color:var(--sh-cream)]">{service.line}</p>
         </li>
       ))}
     </ul>
