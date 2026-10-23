@@ -21,7 +21,8 @@ import cel from './cel.module.css'
 // crown tied at the back with two tails). Every outfit keeps the commando's shoulder pad.
 //
 // The parts are groups the world's CSS moves with transforms only (cel.module.css, "Sprite"): the body
-// breathes, the eyes blink, the limbs swing from shoulder and hip. `motion` picks the cycle.
+// breathes, the eyes blink, the limbs swing from shoulder and hip and fold at the elbow and the knee.
+// `motion` picks the cycle.
 
 export type SpriteMotion = 'still' | 'idle' | 'run' | 'leap' | 'action' | 'kick' | 'knee' | 'elbow'
 
@@ -96,13 +97,23 @@ const BARE_FOOT = {
   front: 'M66 180 L82 180 L87 192 Q77 195 65 194 Z',
 }
 
-const LEG = {
-  back: 'M36 110 L57 110 L55 150 L53 182 L39 182 L37 150 Z',
-  front: 'M63 110 L84 110 L83 150 L81 182 L67 182 L65 150 Z',
+// Each leg is a thigh and a shin that folds at the knee, (46, 146) and (74, 146). The thigh's lower ink
+// edge is the knee line; the shin starts under it at 142 so the knee stays closed when it bends.
+const THIGH = {
+  back: 'M36 110 L57 110 L55.2 146 L37.2 146 Z',
+  front: 'M63 110 L84 110 L83.2 146 L64.8 146 Z',
 }
-const LEG_SHADOW = {
-  back: 'M50 110 L57 110 L55 150 L53 182 L48 182 Q51 146 50 110 Z',
-  front: 'M77 110 L84 110 L83 150 L81 182 L76 182 Q79 146 77 110 Z',
+const THIGH_SHADOW = {
+  back: 'M50 110 L57 110 L55.2 146 L50.5 146 Q51 128 50 110 Z',
+  front: 'M77 110 L84 110 L83.2 146 L78.6 146 Q79 128 77 110 Z',
+}
+const CALF = {
+  back: 'M37 142 L55 142 L53 182 L39 182 Z',
+  front: 'M65 142 L83 142 L81 182 L67 182 Z',
+}
+const CALF_SHADOW = {
+  back: 'M50.5 142 L55 142 L53 182 L48 182 Q51 162 50.5 142 Z',
+  front: 'M78.6 142 L83 142 L81 182 L76 182 Q79 162 78.6 142 Z',
 }
 const SHORTS = {
   back: 'M35 108 L58 108 L57 142 L37 144 Z',
@@ -320,6 +331,8 @@ function ShoulderPad() {
   )
 }
 
+// An arm: the upper arm turns at the shoulder, the forearm and hand fold at the elbow, (31, 89) and
+// (89, 89).
 function Arm({ side, gear }: { side: 'back' | 'front'; gear: Gear }) {
   const shadeEdge = side === 'back' ? 'M33 57 L39 57 L38 91 L33 91 Z' : 'M92 57 L98 57 L96 91 L91 91 Z'
   return (
@@ -327,30 +340,42 @@ function Arm({ side, gear }: { side: 'back' | 'front'; gear: Gear }) {
       <Ink d={UPPER_ARM[side]} fill={gear.sleeve} />
       <Shade d={shadeEdge} fill={gear.sleeveShade} />
       {gear.shorts && <path d={side === 'back' ? 'M23 68 L39 68' : 'M81 68 L97 68'} stroke={CEL.red} strokeWidth={4} />}
-      <Ink d={FOREARM[side]} fill={gear.forearm} />
-      {gear.hand(side)}
+      <g className={side === 'back' ? cel.sprForeB : cel.sprForeF}>
+        <Ink d={FOREARM[side]} fill={gear.forearm} />
+        {gear.hand(side)}
+      </g>
       {side === 'front' && <ShoulderPad />}
     </g>
   )
 }
 
+// A leg: the thigh turns at the hip, the shin and the foot fold at the knee. The shin is drawn first so
+// the shorts' hem or the trouser thigh lies over the top of it.
 function Leg({ side, gear }: { side: 'back' | 'front'; gear: Gear }) {
   return (
     <g className={`${cel.limb} ${side === 'back' ? cel.sprLegB : cel.sprLegF}`}>
+      <g className={side === 'back' ? cel.sprShinB : cel.sprShinF}>
+        {gear.shorts ? (
+          <Ink d={SHIN[side]} fill={SKIN} />
+        ) : (
+          <>
+            <Ink d={CALF[side]} fill={gear.legs} />
+            <Shade d={CALF_SHADOW[side]} fill={gear.legsShade} />
+          </>
+        )}
+        {gear.feet(side)}
+      </g>
       {gear.shorts ? (
         <>
-          <Ink d={SHIN[side]} fill={SKIN} />
           <Ink d={SHORTS[side]} fill={gear.legs} />
           <path d={side === 'back' ? 'M37 138 L57 136' : 'M63 136 L83 138'} stroke={CEL.sun} strokeWidth={3} />
         </>
       ) : (
         <>
-          <Ink d={LEG[side]} fill={gear.legs} />
-          <Shade d={LEG_SHADOW[side]} fill={gear.legsShade} />
-          <path d={side === 'back' ? 'M39 146 L54 146' : 'M66 146 L82 146'} stroke={INK} strokeWidth={2} />
+          <Ink d={THIGH[side]} fill={gear.legs} />
+          <Shade d={THIGH_SHADOW[side]} fill={gear.legsShade} />
         </>
       )}
-      {gear.feet(side)}
     </g>
   )
 }

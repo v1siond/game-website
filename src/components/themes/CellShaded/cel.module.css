@@ -211,6 +211,19 @@
   transform-origin: 50% 100%;
 }
 
+/* The forearms fold at the elbows and the shins at the knees, the joints given in the viewBox's units. */
+.sprForeB,
+.sprForeF,
+.sprShinB,
+.sprShinF {
+  transform-box: view-box;
+}
+
+.sprForeB { transform-origin: 31px 89px; }
+.sprForeF { transform-origin: 89px 89px; }
+.sprShinB { transform-origin: 46px 146px; }
+.sprShinF { transform-origin: 74px 146px; }
+
 .sprEyes {
   transform-box: fill-box;
   transform-origin: 50% 50%;
@@ -251,15 +264,43 @@
   animation: celBlink 4200ms linear infinite;
 }
 
-/* run: legs and arms swing against each other, the body bobs on each step */
+/* run: he faces the camera, so each stride drives a knee toward the viewer: the thigh foreshortens from
+   the hip, the shin tucks in under it and the boot leaves the ground while the other leg stays planted.
+   The opposite arm pumps forward, the forearm folding toward the viewer and in across the chest. One
+   cycle is two steps (twice --sprite-run): the front leg and the back arm drive in the first half, the
+   back leg and the front arm play the same keyframes half a cycle later. The body bobs on each step. */
 .motionRun .sprLegF,
-.motionRun .sprArmB {
-  animation: celSwing var(--sprite-run) ease-in-out infinite alternate;
+.motionRun .sprLegB {
+  animation: celStride calc(var(--sprite-run) * 2) ease-in-out infinite;
 }
 
+.motionRun .sprShinF {
+  animation: celTuckF calc(var(--sprite-run) * 2) ease-in-out infinite;
+}
+
+.motionRun .sprShinB {
+  animation: celTuckB calc(var(--sprite-run) * 2) ease-in-out infinite;
+}
+
+.motionRun .sprArmF,
+.motionRun .sprArmB {
+  animation: celPump calc(var(--sprite-run) * 2) ease-in-out infinite;
+}
+
+.motionRun .sprForeF {
+  animation: celPumpForeF calc(var(--sprite-run) * 2) ease-in-out infinite;
+}
+
+.motionRun .sprForeB {
+  animation: celPumpForeB calc(var(--sprite-run) * 2) ease-in-out infinite;
+}
+
+/* after the shorthands above, which reset the delay */
 .motionRun .sprLegB,
-.motionRun .sprArmF {
-  animation: celSwing var(--sprite-run) ease-in-out infinite alternate-reverse;
+.motionRun .sprShinB,
+.motionRun .sprArmF,
+.motionRun .sprForeF {
+  animation-delay: calc(var(--sprite-run) * -1);
 }
 
 .motionRun .sprBody {
@@ -300,7 +341,7 @@
 }
 
 .actsDrum.motionAction .sprArmB {
-  animation: celStick 300ms cubic-bezier(0.5, 0, 0.75, 0) infinite alternate-reverse;
+  animation: celStickB 300ms cubic-bezier(0.5, 0, 0.75, 0) infinite alternate-reverse;
 }
 
 .actsStrike.motionAction .sprLegF,
@@ -317,12 +358,23 @@
   transform: rotate(-28deg);
 }
 
+/* the knee strike: the thigh drives up and out, the shin folds tight under it so the knee leads */
 .motionKnee .sprLegF {
   animation: celKnee 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
+.motionKnee .sprShinF {
+  animation: celKneeFold 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+/* the elbow strike: the upper arm comes up level, the forearm folds back so the fist sits by his
+   head and the point of the elbow leads */
 .motionElbow .sprArmF {
   animation: celElbow 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+.motionElbow .sprForeF {
+  animation: celElbowFold 420ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
 }
 
 .motionElbow .sprArmB {
@@ -338,9 +390,34 @@
   96% { transform: scaleY(0.1); }
 }
 
-@keyframes celSwing {
-  from { transform: rotate(-32deg); }
-  to { transform: rotate(32deg); }
+@keyframes celStride {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: scaleY(0.7); }
+}
+
+@keyframes celTuckF {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: rotate(14deg) scaleY(0.8); }
+}
+
+@keyframes celTuckB {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: rotate(-14deg) scaleY(0.8); }
+}
+
+@keyframes celPump {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: scaleY(0.88); }
+}
+
+@keyframes celPumpForeF {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: rotate(24deg) scaleY(0.6); }
+}
+
+@keyframes celPumpForeB {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: rotate(-24deg) scaleY(0.6); }
 }
 
 @keyframes celBob {
@@ -369,9 +446,15 @@
   100% { opacity: 0.7; }
 }
 
+/* the sticks raised out to each side: the back arm is the front arm's mirror */
 @keyframes celStick {
   from { transform: rotate(-115deg); }
   to { transform: rotate(-55deg); }
+}
+
+@keyframes celStickB {
+  from { transform: rotate(115deg); }
+  to { transform: rotate(55deg); }
 }
 
 @keyframes celKick {
@@ -386,10 +469,22 @@
   100% { transform: rotate(0); }
 }
 
+@keyframes celKneeFold {
+  0% { transform: rotate(0); }
+  35%, 60% { transform: rotate(115deg); }
+  100% { transform: rotate(0); }
+}
+
 @keyframes celElbow {
   0% { transform: rotate(-28deg); }
-  35%, 60% { transform: rotate(-140deg); }
+  35%, 60% { transform: rotate(-100deg); }
   100% { transform: rotate(-28deg); }
+}
+
+@keyframes celElbowFold {
+  0% { transform: rotate(0); }
+  35%, 60% { transform: rotate(-160deg); }
+  100% { transform: rotate(0); }
 }
 
 /* ---------------------------------------------------------------- the freeze frame entrance (freezeIntro.tsx) */
