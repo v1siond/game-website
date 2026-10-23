@@ -25,16 +25,17 @@
 .winkLine, .star, .reticle, .pistol, .flash { opacity: 0; }
 
 /* ---------------------------------------------------------------- resting poses per kit */
+/* Each rest pose is kept in --rest, so a motion that composes over it (the walk) keeps his guard. */
 
-.kitSticks .armRight { transform: rotate(-20deg); }
-.kitSticks .foreRight { transform: rotate(-40deg); }
-.kitSticks .armLeft { transform: rotate(20deg); }
-.kitSticks .foreLeft { transform: rotate(40deg); }
+.kitSticks .armRight { --rest: rotate(-20deg); transform: var(--rest); }
+.kitSticks .foreRight { --rest: rotate(-40deg); transform: var(--rest); }
+.kitSticks .armLeft { --rest: rotate(20deg); transform: var(--rest); }
+.kitSticks .foreLeft { --rest: rotate(40deg); transform: var(--rest); }
 
-.kitGuard .armRight { transform: rotate(25deg); }
-.kitGuard .foreRight { transform: rotate(150deg); }
-.kitGuard .armLeft { transform: rotate(-25deg); }
-.kitGuard .foreLeft { transform: rotate(-150deg); }
+.kitGuard .armRight { --rest: rotate(25deg); transform: var(--rest); }
+.kitGuard .foreRight { --rest: rotate(150deg); transform: var(--rest); }
+.kitGuard .armLeft { --rest: rotate(-25deg); transform: var(--rest); }
+.kitGuard .foreLeft { --rest: rotate(-150deg); transform: var(--rest); }
 
 /* ---------------------------------------------------------------- idle: the cartoon bounce and a blink */
 
@@ -52,10 +53,22 @@
 }
 
 /* ---------------------------------------------------------------- walk: the jaunty poster stroll */
+/*
+ * He faces the viewer, so each step is a knee lift toward the viewer: the thigh foreshortens from the
+ * hip, the shin swings out from the knee with the toe flicked, the shoe leaves the floor, the other leg
+ * stays planted. The opposite arm pumps forward with it, foreshortened at the shoulder and the elbow,
+ * over the kit's rest pose. 0.7s, two steps: the right leg and the left arm in the first half, the left
+ * leg and the right arm the same keyframes half a cycle later (-0.35s). Overshoot timing on the lift.
+ */
 
 .walk .body { animation: strut 0.7s ease-in-out infinite; }
-.walk .thighRight, .walk .armLeft { animation: swing-a 0.7s ease-in-out infinite; }
-.walk .thighLeft, .walk .armRight { animation: swing-b 0.7s ease-in-out infinite; }
+.walk .thighRight, .walk .thighLeft { animation: strut-knee 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) infinite; }
+.walk .shinRight { animation: strut-shin-right 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) infinite; }
+.walk .shinLeft { animation: strut-shin-left 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) infinite; }
+.walk .armRight, .walk .armLeft { animation: strut-arm 0.7s ease-in-out infinite; }
+.walk .foreRight, .walk .foreLeft { animation: strut-fore 0.7s ease-in-out infinite; }
+/* after the shorthands above, which reset the delay */
+.walk .thighLeft, .walk .shinLeft, .walk .armRight, .walk .foreRight { animation-delay: -0.35s; }
 .walk .head { animation: tilt 1.4s ease-in-out infinite; }
 
 @keyframes strut {
@@ -63,14 +76,29 @@
   25%, 75% { transform: translateY(-3px); }
 }
 
-@keyframes swing-a {
-  0%, 100% { transform: rotate(14deg); }
-  50% { transform: rotate(-14deg); }
+@keyframes strut-knee {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: scaleY(0.8); }
 }
 
-@keyframes swing-b {
-  0%, 100% { transform: rotate(-14deg); }
-  50% { transform: rotate(14deg); }
+@keyframes strut-shin-right {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: rotate(10deg) scaleY(0.9); }
+}
+
+@keyframes strut-shin-left {
+  0%, 50%, 100% { transform: none; }
+  25% { transform: rotate(-10deg) scaleY(0.9); }
+}
+
+@keyframes strut-arm {
+  0%, 50%, 100% { transform: var(--rest, rotate(0deg)); }
+  25% { transform: var(--rest, rotate(0deg)) scaleY(0.9); }
+}
+
+@keyframes strut-fore {
+  0%, 50%, 100% { transform: var(--rest, rotate(0deg)); }
+  25% { transform: var(--rest, rotate(0deg)) scaleY(0.78); }
 }
 
 @keyframes tilt {
