@@ -1,6 +1,8 @@
 'use client'
 
 import { memo } from 'react'
+import { usePathname } from 'next/navigation'
+import { CV_PATHS } from '@/i18n/config'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { svgNumber } from './svgNumber'
@@ -766,12 +768,16 @@ function paletteFromColors(c: { background: string; accent: string; secondary: s
 // scenes); the shared stage would double them, so it stays out of these.
 const WORLDS_WITH_OWN_STAGE = new Set(['dark-fantasy', 'neon-cyber', 'neon-portals', 'retro-atomic', 'art-deco', 'adventure-paths', 'tropical-platformer', 'cell-shaded', 'fighter-select', 'silhouette', 'bold-noir', 'survival-horror', 'soul-map', 'retro-rpg', 'rubber-hose', 'mythic'])
 
+// The CV pages are a plain document: no world scenery behind them, in their margins or under the text.
+const CV_PAGE_PATHS = new Set<string>(Object.values(CV_PATHS))
+
 /** Renders the profession boss-stage in any world, recoloured from its theme, except the worlds that
- *  draw their own. */
+ *  draw their own and the CV pages. */
 export default function GlobalProfessionStage() {
   const { theme } = useTheme()
   const { active } = useProfession()
-  if (WORLDS_WITH_OWN_STAGE.has(theme.id)) return null
+  const pathname = usePathname()
+  if (WORLDS_WITH_OWN_STAGE.has(theme.id) || CV_PAGE_PATHS.has(pathname ?? '')) return null
   const p = paletteFromColors(theme.colors)
   return <ProfessionStage profession={active} p={p} />
 }

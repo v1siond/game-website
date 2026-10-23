@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useTransition, useEffect, useState, type ReactNode } from 'react'
+import { useId, useTransition, useEffect, useState, type ReactNode } from 'react'
 import { cvPath, isLocale, locales, type Locale } from '@/i18n/config'
 import { useLabels } from './CVDataProvider'
 
@@ -35,10 +35,14 @@ function storedLocale(): Locale | null {
 
 function SelectSwitcher({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
   const { cvPage, languages, navigation } = useLabels()
+  const selectId = useId()
   return (
     <div className="flex items-center gap-2 print:hidden">
-      <span className="text-sm text-gray-600">{cvPage.language}</span>
+      <label htmlFor={selectId} className="text-sm text-gray-600">
+        {cvPage.language}
+      </label>
       <select
+        id={selectId}
         value={currentLocale}
         onChange={(e) => changeLocale(e.target.value as Locale)}
         disabled={isPending}
