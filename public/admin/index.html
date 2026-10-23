@@ -13,7 +13,12 @@
     <script>
       window.CMS_MANUAL_INIT = true
     </script>
-    <script src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
+    <!-- The pinned bundle's sha384: the browser refuses it if unpkg ever serves other bytes. -->
+    <script
+      src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"
+      integrity="sha384-A/Gdn928CNLufmnGWGs9RM4Q9o8bSNLeJERqBFrBjwzL7FRpoLT3MPF8Tl0+Wd2p"
+      crossorigin="anonymous"
+    ></script>
     <script>
       CMS.init({ config: { backend: { base_url: location.origin, auth_endpoint: 'api/decap-auth' } } })
     </script>
