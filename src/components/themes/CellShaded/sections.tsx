@@ -14,11 +14,13 @@ import { LootDrops } from './lootDrops'
 import { MakersPlates } from './badges'
 import { BossCards } from './bossCards'
 import { HeavyBag } from './heavyBag'
+import { LootChest, SlamLanding } from './melee'
 import cel from './cel.module.css'
 
 // The picked profession's sections, each one a stage in the wasteland's day: About at noon, the bounty
 // board, the skill tree and the services (plain papers under a fade) in the town's afternoon, the loot field, the makers' plates, the boss cards
-// and the heavy bag at dusk. The respawn station closes the page at night (respawn.tsx).
+// and the heavy bag at dusk. The respawn station closes the page at night (respawn.tsx). Two sections he
+// hits himself (./melee): he lands on the about paper from a leap, and kicks open the chest the services come out of.
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -27,9 +29,11 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
   return (
     <>
       <Stage title={titles.about} zone="noon">
-        <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
-          <p className="text-base leading-relaxed">{professionalSummary.bio}</p>
-        </div>
+        <SlamLanding>
+          <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
+            <p className="text-base leading-relaxed">{professionalSummary.bio}</p>
+          </div>
+        </SlamLanding>
       </Stage>
 
       {sections.jobs.length > 0 && (
@@ -46,16 +50,18 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
 
       {sections.services.length > 0 && (
         <Stage title={titles.services} zone="town">
-          <FadeInScene>
-            <ul className={MASONRY_LIST}>
-              {sections.services.map((service) => (
-                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${cel.paper}`}>
-                  <h3 className="text-lg font-bold">{service.title}</h3>
-                  <p className="mt-2 text-base leading-relaxed">{service.line}</p>
-                </li>
-              ))}
-            </ul>
-          </FadeInScene>
+          <LootChest>
+            <FadeInScene>
+              <ul className={MASONRY_LIST}>
+                {sections.services.map((service) => (
+                  <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${cel.paper}`}>
+                    <h3 className="text-lg font-bold">{service.title}</h3>
+                    <p className="mt-2 text-base leading-relaxed">{service.line}</p>
+                  </li>
+                ))}
+              </ul>
+            </FadeInScene>
+          </LootChest>
         </Stage>
       )}
 
