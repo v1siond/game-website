@@ -16,13 +16,16 @@ import { PoweredRoom } from './power'
 import { GlassTunnel } from './tunnel'
 import { HackedShutter } from './hack'
 import { GuardianStreet } from './guardian'
+import { SparkedMarquees, Telekinesis } from './arrivals'
 
 // The picked profession's sections, each a chamber one level deeper in the city (the plaque's gauge
 // reads the depth), and in each he or the city does something different: he powers the dark about room
 // with the bolt, listens to the job diaries, walks the tech stack's glass tunnel, reads the services on
 // the same level of the city (its gauge keeps the tech stack's depth), hacks the pipes that
 // lift the projects shutter, pulls the cords that drop the ventures' propaganda banners; the guardian
-// pair walks behind the band marquees; he fights on the theatre stage for the Muay Thai record.
+// pair walks behind the band marquees; he fights on the theatre stage for the Muay Thai record. Two
+// sections he acts on himself (./arrivals): he lifts the services into place with the plasmid, and his
+// drum strike sparks the band marquees on.
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -57,7 +60,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.services.length > 0 && (
         <FadeInScene>
           <Chamber title={labels.sections.services} depth={2}>
-            <ServiceCards services={sections.services} />
+            <Telekinesis>
+              <ServiceCards services={sections.services} />
+            </Telekinesis>
           </Chamber>
         </FadeInScene>
       )}
@@ -81,7 +86,9 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   return (
     <Chamber title={labels.sections.bands} depth={0}>
       <GuardianStreet>
-        <MarqueeRow bands={sections.bands} musician={sections.musician} />
+        <SparkedMarquees>
+          <MarqueeRow bands={sections.bands} musician={sections.musician} />
+        </SparkedMarquees>
       </GuardianStreet>
     </Chamber>
   )
