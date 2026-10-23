@@ -89,10 +89,19 @@
 }
 
 /* ---------------------------------------------------------------- walk: a wary first person stride */
+/*
+ * He walks in profile to the right. His hips are drawn 16px apart for the three quarter stance, so
+ * while walking each thigh also slides 5px toward the middle: the legs swing round nearly one hip and
+ * open as an inverted V instead of crossing into an X. Opposite arm and leg, 0.8s per two steps; the
+ * swinging leg's knee folds 24 degrees at the passing (25% and 75%), the body rises there and sinks on
+ * each contact.
+ */
 
 .walk .body { animation: bob 0.8s ease-in-out infinite; }
-.walk .thighBack, .walk .armFront { animation: stride-a 0.8s ease-in-out infinite; }
-.walk .thighFront, .walk .armBack { animation: stride-b 0.8s ease-in-out infinite; }
+.walk .thighBack { animation: thigh-a 0.8s ease-in-out infinite; }
+.walk .thighFront { animation: thigh-b 0.8s ease-in-out infinite; }
+.walk .armFront { animation: stride-a 0.8s ease-in-out infinite; }
+.walk .armBack { animation: stride-b 0.8s ease-in-out infinite; }
 .walk .shinBack { animation: knee 0.8s ease-in-out infinite; }
 .walk .shinFront { animation: knee 0.8s ease-in-out -0.4s infinite; }
 
@@ -111,9 +120,19 @@
   50% { transform: rotate(16deg); }
 }
 
+@keyframes thigh-a {
+  0%, 100% { transform: translateX(5px) rotate(16deg); }
+  50% { transform: translateX(5px) rotate(-16deg); }
+}
+
+@keyframes thigh-b {
+  0%, 100% { transform: translateX(-5px) rotate(-16deg); }
+  50% { transform: translateX(-5px) rotate(16deg); }
+}
+
 @keyframes knee {
   0%, 50%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(14deg); }
+  25% { transform: rotate(24deg); }
 }
 
 /* ---------------------------------------------------------------- one shots: each runs the clock */
