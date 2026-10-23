@@ -13,7 +13,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
 export function CVContent() {
-  const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, workExperience, labels } =
+  const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, services, workExperience, labels } =
     useCVData()
   const { cvPage } = labels
 
@@ -165,6 +165,22 @@ export function CVContent() {
                 <li key={category.id} className={MASONRY_ITEM}>
                   <span className="font-semibold">{category.name}:</span>{' '}
                   <span>{category.items.join(', ')}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Services */}
+        {services.length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
+              {labels.sections.services}
+            </h2>
+            <ul className={`text-sm ${MASONRY_LIST}`}>
+              {services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <span className="font-semibold">{service.title}:</span> <span>{service.line}</span>
                 </li>
               ))}
             </ul>

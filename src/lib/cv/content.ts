@@ -115,6 +115,13 @@ export interface Company {
   icon: string
 }
 
+/** One thing he offers to build: a title and one short line, in the order he sets in Decap. */
+export interface Service {
+  id: string
+  title: string
+  line: string
+}
+
 export interface Role {
   id: string
   title: string
@@ -135,6 +142,7 @@ export interface CVContentSections {
   'tech-stack': { techStack: TechCategory[] }
   companies: { companies: Company[] }
   roles: { currentRoles: Role[] }
+  services: { services: Service[] }
 }
 
 export type CVSectionFile = keyof CVContentSections
@@ -150,6 +158,7 @@ const CV_SECTION_FILES: readonly CVSectionFile[] = [
   'tech-stack',
   'companies',
   'roles',
+  'services',
 ]
 
 /** Every file in content/cv the loader reads: the CV sections and the interface labels. */
@@ -171,7 +180,8 @@ type CVContent = CVContentSections['summary'] &
   CVContentSections['martial-arts'] &
   CVContentSections['tech-stack'] &
   CVContentSections['companies'] &
-  CVContentSections['roles']
+  CVContentSections['roles'] &
+  CVContentSections['services']
 
 export type Job = Omit<JobEntry, 'startDate' | 'endDate'> & { startDate: Date; endDate: Date | null }
 

@@ -91,7 +91,21 @@ describe('viewFor: System Engineer', () => {
     expect(ids(sections.projects).sort()).toEqual(ids(cv.projects).sort())
     expect(sections.techStack).toEqual(cv.techStack)
     expect(sections.companies).toEqual(cv.companies)
-    expect(Object.keys(sections).sort()).toEqual(['companies', 'jobs', 'profession', 'projects', 'techStack'])
+    expect(sections.services).toEqual(cv.services)
+    expect(Object.keys(sections).sort()).toEqual(['companies', 'jobs', 'profession', 'projects', 'services', 'techStack'])
+  })
+
+  it('lists every service in services.json in the order he set, the same in a world and on /cv', () => {
+    const cv = realCV()
+    const { services } = engineerOf(viewFor(cv, 'engineer', 'world', NOW))
+
+    expect(services.length).toBeGreaterThan(0)
+    expect(services).toEqual(cv.services)
+    expect(services).toEqual(engineerOf(viewFor(cv, 'engineer', 'full', NOW)).services)
+    services.forEach((service) => {
+      expect(service.title).not.toBe('')
+      expect(service.line).not.toBe('')
+    })
   })
 
   it('orders jobs by recency: current first, then by end date', () => {

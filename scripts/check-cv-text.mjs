@@ -11,7 +11,7 @@ const DEFAULT_HISTORY =
 const CONTENT_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'content', 'cv')
 
 // Files whose English comes from the history. companies, roles and tech-stack were first copied from the old hand written data files.
-const HISTORY_FILES = ['summary', 'contact', 'experience', 'projects', 'bands', 'martial-arts']
+const HISTORY_FILES = ['summary', 'contact', 'experience', 'projects', 'bands', 'martial-arts', 'services']
 
 // Keys that hold identifiers or machine values, never prose from the history. Project `details` are
 // summaries of commits, checked through content/cv/_sources.json instead.
@@ -21,6 +21,16 @@ const SKIPPED_KEYS = new Set(['id', 'slug', 'startDate', 'endDate', 'status', 'i
 const APPROVED = new Map([
   ['Always interested in hearing new ideas and proposals', 'contact line fixed in cv-site.md Contract'],
   ['Lima, Peru', 'HISTORY: "a dojo in lima peru", written as a place'],
+  ['Product builds', 'services (C8 draft, his to change at /admin): his words 10-23: "I can basically built anything and get projects out faster than anyone"'],
+  ['Anything, from idea to production, out faster than anyone. Full stack in Elixir and Phoenix, React and Vue.', 'services (C8 draft, his to change at /admin): his words 10-23 "built anything and get projects out faster than anyone"; stack from HISTORY repo evidence (Phoenix, React, Vue.js)'],
+  ['AI systems', 'services (C8 draft, his to change at /admin): his words 10-23: "I\'m an AI expert"'],
+  ['LLM orchestration with Claude and Gemini, speech pipelines with TTS and STT, custom neural networks. Training models since before 2023, starting with personal games.', 'services (C8 draft, his to change at /admin): HISTORY LinkedIn "secure LLM orchestration (Gemini, Claude)", "custom audio TTS synthesis pipelines", Sillabo "STT and TTS behind behaviours" f4e9f5f, "custom neural network architectures"; his words 10-23 "started training models and build neural networks before the 2023 boom, mainly for personal games"'],
+  ['Fintech and InsureTech infrastructure', 'services (C8 draft, his to change at /admin): HISTORY summary "high-throughput Fintech/InsureTech infrastructure"'],
+  ['High volume data, database migrations and compliance heavy apps.', 'services (C8 draft, his to change at /admin): HISTORY LinkedIn "High-Volume Database Migrations"; GRCTechMe governance, risk and compliance app'],
+  ['Cloud and Kubernetes', 'services (C8 draft, his to change at /admin): HISTORY tech stack Cloud and DevOps (Kubernetes, ArgoCD)'],
+  ['Deploys, GitOps and PostgreSQL in production.', 'services (C8 draft, his to change at /admin): HISTORY tech stack (ArgoCD, Kubernetes, PostgreSQL)'],
+  ['Games and interactive web', 'services (C8 draft, his to change at /admin): HISTORY Nebulith "Game engine and map editor"; his words 10-23 "mainly for personal games"'],
+  ['Game engines, map editors and animated sites like this one.', 'services (C8 draft, his to change at /admin): HISTORY Nebulith "Game engine and map editor"; this site'],
 ])
 
 const normalise = (text) => text.replace(/\s+/g, ' ').trim().toLowerCase()

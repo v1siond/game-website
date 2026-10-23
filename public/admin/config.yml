@@ -245,6 +245,21 @@ collections:
               - { <<: *fixed, label: Icon, name: icon }
               - { label: Items, name: items, widget: list, i18n: true, required: false }
 
+      - name: services
+        label: Services
+        file: content/cv/services.json
+        i18n: true
+        fields:
+          - label: Services
+            name: services
+            widget: list
+            i18n: true
+            summary: '{{fields.title}}'
+            fields:
+              - { <<: *fixed, label: Id, name: id }
+              - { <<: *text, label: Title, name: title }
+              - { <<: *text, label: Line, name: line }
+
       - name: labels
         label: Site text
         file: content/cv/labels.json
@@ -265,6 +280,7 @@ collections:
                   - { <<: *text, label: "About", name: about }
                   - { <<: *text, label: "Work experience", name: workExperience }
                   - { <<: *text, label: "Tech stack", name: techStack }
+                  - { <<: *text, label: "Services", name: services }
                   - { <<: *text, label: "Projects", name: projects }
                   - { <<: *text, label: "Featured work", name: featuredWork }
                   - { <<: *text, label: "Ventures", name: ventures }

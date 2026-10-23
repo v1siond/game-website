@@ -1,0 +1,89 @@
+{
+  "en": {
+    "services": [
+      {
+        "id": "product-builds",
+        "title": "Product builds",
+        "line": "Anything, from idea to production, out faster than anyone. Full stack in Elixir and Phoenix, React and Vue."
+      },
+      {
+        "id": "ai-systems",
+        "title": "AI systems",
+        "line": "LLM orchestration with Claude and Gemini, speech pipelines with TTS and STT, custom neural networks. Training models since before 2023, starting with personal games."
+      },
+      {
+        "id": "fintech-insuretech",
+        "title": "Fintech and InsureTech infrastructure",
+        "line": "High volume data, database migrations and compliance heavy apps."
+      },
+      {
+        "id": "cloud-kubernetes",
+        "title": "Cloud and Kubernetes",
+        "line": "Deploys, GitOps and PostgreSQL in production."
+      },
+      {
+        "id": "games-interactive-web",
+        "title": "Games and interactive web",
+        "line": "Game engines, map editors and animated sites like this one."
+      }
+    ]
+  },
+  "es": {
+    "services": [
+      {
+        "id": "product-builds",
+        "title": "Desarrollo de productos",
+        "line": "Cualquier cosa, de la idea a producción, más rápido que nadie. Full stack en Elixir y Phoenix, React y Vue."
+      },
+      {
+        "id": "ai-systems",
+        "title": "Sistemas de IA",
+        "line": "Orquestación de LLM con Claude y Gemini, pipelines de voz con TTS y STT, redes neuronales propias. Entrenando modelos desde antes de 2023, empezando con juegos personales."
+      },
+      {
+        "id": "fintech-insuretech",
+        "title": "Infraestructura Fintech e InsureTech",
+        "line": "Datos de alto volumen, migraciones de bases de datos y aplicaciones con mucho cumplimiento normativo."
+      },
+      {
+        "id": "cloud-kubernetes",
+        "title": "Cloud y Kubernetes",
+        "line": "Despliegues, GitOps y PostgreSQL en producción."
+      },
+      {
+        "id": "games-interactive-web",
+        "title": "Juegos y web interactiva",
+        "line": "Motores de juego, editores de mapas y sitios animados como este."
+      }
+    ]
+  },
+  "it": {
+    "services": [
+      {
+        "id": "product-builds",
+        "title": "Sviluppo di prodotti",
+        "line": "Qualsiasi cosa, dall'idea alla produzione, più veloce di chiunque. Full stack in Elixir e Phoenix, React e Vue."
+      },
+      {
+        "id": "ai-systems",
+        "title": "Sistemi di IA",
+        "line": "Orchestrazione di LLM con Claude e Gemini, pipeline vocali con TTS e STT, reti neurali su misura. Modelli addestrati da prima del 2023, a partire da giochi personali."
+      },
+      {
+        "id": "fintech-insuretech",
+        "title": "Infrastruttura Fintech e InsureTech",
+        "line": "Dati ad alto volume, migrazioni di database e applicazioni ad alta conformità normativa."
+      },
+      {
+        "id": "cloud-kubernetes",
+        "title": "Cloud e Kubernetes",
+        "line": "Deploy, GitOps e PostgreSQL in produzione."
+      },
+      {
+        "id": "games-interactive-web",
+        "title": "Giochi e web interattivo",
+        "line": "Motori di gioco, editor di mappe e siti animati come questo."
+      }
+    ]
+  }
+}

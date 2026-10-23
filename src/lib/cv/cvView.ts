@@ -1,4 +1,4 @@
-import type { Band, CVData, Job, MartialArts, Musician, Project, TechCategory } from './content'
+import type { Band, CVData, Job, MartialArts, Musician, Project, Service, TechCategory } from './content'
 import { DEFAULT_PROFESSION, isProfession, type Profession } from './professions'
 
 // What one world draws for one profession: the recruiter first screen and only that profession's entries.
@@ -26,6 +26,7 @@ export type ProfessionSections =
       jobs: Job[]
       projects: Project[]
       techStack: Array<TechCategory & { id: string }>
+      services: Service[]
       companies: CVData['companies']
     }
   | { profession: 'drummer'; musician: Musician; bands: Band[] }
@@ -93,7 +94,7 @@ const projectsFor = (cv: CVData, keep: Keep): Project[] =>
 
 const bandsFor = (cv: CVData): Band[] => [...cv.bands].sort(byRecency(bandEnd, (band) => band.startYear ?? UNDATED))
 
-// The bands and the Muay Thai record are listed whole: the spec names every band and every martial arts
+// The services, bands and the Muay Thai record are listed whole: the spec names every band and every martial arts
 // fact, and neither carries the highlight toggle the cut relies on.
 const SECTIONS_FOR: Record<Profession, (cv: CVData, keep: Keep) => ProfessionSections> = {
   engineer: (cv, keep) => ({
@@ -101,6 +102,7 @@ const SECTIONS_FOR: Record<Profession, (cv: CVData, keep: Keep) => ProfessionSec
     jobs: jobsFor(cv, keep),
     projects: projectsFor(cv, keep),
     techStack: cv.techStack,
+    services: cv.services,
     companies: cv.companies,
   }),
   drummer: (cv) => ({ profession: 'drummer', musician: cv.musician, bands: bandsFor(cv) }),
