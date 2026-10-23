@@ -11,7 +11,7 @@ export const atomicId = (title: string): string => headingId('atomic', title)
 type SectionKey = keyof Labels['sections']
 
 const SECTIONS_OF: Record<Profession, SectionKey[]> = {
-  engineer: ['about', 'workExperience', 'techStack', 'projects', 'ventures', 'contact'],
+  engineer: ['about', 'workExperience', 'techStack', 'services', 'projects', 'ventures', 'contact'],
   drummer: ['bands', 'contact'],
   fighter: ['muayThai', 'contact'],
 }

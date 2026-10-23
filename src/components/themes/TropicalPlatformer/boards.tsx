@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
-import type { CVData } from '@/lib/cv/content'
+import type { CVData, Service } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { Board } from './levelSign'
@@ -14,7 +14,8 @@ import look from './jungle.module.css'
 // arrival): the tech stack as a masonry of boards, one per category with its wooden tags, so categories
 // of different lengths pack without gaps (each board carries its place as --i, for the ground slap's
 // jolt in slap.tsx); the ventures as plank cards that open
-// the venture's site (also placed by --i, for the rhino's charge in rhino.tsx).
+// the venture's site (also placed by --i, for the rhino's charge in rhino.tsx). The services read as a
+// masonry of plain boards, a title and its line, under the shared fade.
 
 export function TechBoard({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
@@ -69,6 +70,21 @@ export function VentureBoard({ companies }: { companies: CVData['companies'] }) 
             </span>
             <span className="mt-3 block text-sm leading-relaxed">{company.description}</span>
           </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+export function ServiceBoard({ services }: { services: Service[] }) {
+  return (
+    <ul className={MASONRY_LIST}>
+      {services.map((service) => (
+        <li key={service.id} className={MASONRY_ITEM}>
+          <Board>
+            <h3 className={`mb-3 text-base uppercase text-[color:var(--tp-sun-gold)] ${look.display}`}>{service.title}</h3>
+            <p className="text-base leading-relaxed text-[color:var(--tp-parchment)]">{service.line}</p>
+          </Board>
         </li>
       ))}
     </ul>

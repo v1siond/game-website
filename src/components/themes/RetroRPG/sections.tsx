@@ -33,7 +33,7 @@ import {
 import world from "./world.module.css";
 
 // Each profession's sections, and only those, as the encounter's boxes. Light blocks (About, Tech stack,
-// Ventures, the band lines) are one box each; heavy blocks are the long lists in masonry columns
+// Services, Ventures, the band lines) are one box each; heavy blocks are the long lists in masonry columns
 // (MASONRY_LIST), each entry its own box with its own reveal (cards.tsx). The bullet box sits above
 // each profession's main list, playing that profession's soul mode (bulletBox.tsx).
 //
@@ -132,6 +132,26 @@ export function EngineerSections({
           </OpenBox>
         </ShopRoom>
       </Block>
+
+      {sections.services.length > 0 && (
+        <Block label={titles.services} title={titles.services} width={WIDE}>
+          <OpenBox>
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <h3
+                    className={`mb-2 flex items-center gap-2 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-gold)] ${PIXEL}`}
+                  >
+                    <Mark />
+                    {service.title}
+                  </h3>
+                  <p className={BODY}>{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </OpenBox>
+        </Block>
+      )}
 
       <Block label={titles.projects} title={titles.featuredWork} width={WIDE}>
         <PuzzleRoom profession={active}>

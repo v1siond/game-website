@@ -4,8 +4,9 @@ import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { drumsSince, headingId } from '@/components/cv/sectionText'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import type { SectionsOf } from '@/lib/cv/cvView'
-import { AreaTitle, MenuPanel, TechSlots } from './menu'
+import { AreaTitle, CARD_BODY, CARD_TITLE, MenuPanel, TechSlots } from './menu'
 import { FogGate } from './gate'
 import { LiftDescent } from './descent'
 import { ItemProjects } from './items'
@@ -18,7 +19,7 @@ import { FogArena } from './arena'
 // ghost (./descent), his projects are summon signs his phantom rises out of (./items), his ventures are
 // messages a spirit of him kneels and writes (./messages); the Musician's bands play in a shaft of sun
 // (./stage); the Martial Artist's record is the bout behind the fog wall, its boss dropping in (./arena).
-// The Tech Stack stays the game's plain menu screen, fading open when reached (./menu).
+// The Tech Stack and the Services stay the game's plain menu screen, fading open when reached (./menu).
 
 function Block({ title, wide = false, children }: { title: string; wide?: boolean; children: ReactNode }) {
   const id = headingId('soul', title)
@@ -57,6 +58,21 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <TechSlots categories={sections.techStack} />
         </MenuPanel>
       </Block>
+
+      {sections.services.length > 0 && (
+        <Block title={titles.services} wide>
+          <MenuPanel>
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <h3 className={CARD_TITLE}>{service.title}</h3>
+                  <p className={`mt-2 ${CARD_BODY}`}>{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </MenuPanel>
+        </Block>
+      )}
 
       <Block title={titles.featuredWork} wide>
         <ItemProjects projects={sections.projects} />

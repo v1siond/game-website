@@ -12,12 +12,12 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { HitStar } from './backdrop'
-import { BandPanel, CaseCard, CompanyTag, RankCard, TechStackBoard } from './cards'
+import { BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
 import { AllOutAttack } from './allOut'
 import { NOIR } from './palette'
 import world from './world.module.css'
 
-// The picked profession's sections. Tech Stack and Ventures take the plain fade; every other section is
+// The picked profession's sections. Tech Stack, Services and Ventures take the plain fade; every other section is
 // a stage: one useSectionTrigger per section adds data-on once it is in view, and the CSS plays each
 // item's own entrance off it, staggered by --i (the speech box wobble, the rank flip and year stamp, the
 // result slide over the red line, the hit slam). The long lists are masonry.
@@ -99,6 +99,21 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <TechStackBoard categories={sections.techStack} />
         </section>
       </FadeInScene>
+
+      {sections.services.length > 0 && (
+        <FadeInScene>
+          <section aria-labelledby={headingId('noir', titles.services)} className="mb-16">
+            <SectionTitle title={titles.services} />
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <ServiceSlab service={service} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        </FadeInScene>
+      )}
 
       <Projects projects={sections.projects} />
 

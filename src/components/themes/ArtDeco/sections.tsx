@@ -5,7 +5,7 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { Profession } from '@/lib/cv/professions'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { TechCloud } from './cards'
+import { ServiceCards, TechCloud } from './cards'
 import { PropagandaBanners } from './ventures'
 import { BrassPanel, Chamber } from './plaque'
 import { DiaryShelf } from './diary'
@@ -19,7 +19,8 @@ import { GuardianStreet } from './guardian'
 
 // The picked profession's sections, each a chamber one level deeper in the city (the plaque's gauge
 // reads the depth), and in each he or the city does something different: he powers the dark about room
-// with the bolt, listens to the job diaries, walks the tech stack's glass tunnel, hacks the pipes that
+// with the bolt, listens to the job diaries, walks the tech stack's glass tunnel, reads the services on
+// the same level of the city (its gauge keeps the tech stack's depth), hacks the pipes that
 // lift the projects shutter, pulls the cords that drop the ventures' propaganda banners; the guardian
 // pair walks behind the band marquees; he fights on the theatre stage for the Muay Thai record.
 
@@ -52,6 +53,14 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           </GlassTunnel>
         </Chamber>
       </FadeInScene>
+
+      {sections.services.length > 0 && (
+        <FadeInScene>
+          <Chamber title={labels.sections.services} depth={2}>
+            <ServiceCards services={sections.services} />
+          </Chamber>
+        </FadeInScene>
+      )}
 
       <Chamber title={labels.sections.projects} depth={3}>
         <HackedShutter>{(opened) => <ResearchBoard projects={sections.projects} arrived={opened} />}</HackedShutter>

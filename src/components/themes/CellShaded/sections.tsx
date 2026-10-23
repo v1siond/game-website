@@ -1,6 +1,8 @@
 'use client'
 
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { useZoneStage } from '@/hooks/useZoneStage'
@@ -15,7 +17,7 @@ import { HeavyBag } from './heavyBag'
 import cel from './cel.module.css'
 
 // The picked profession's sections, each one a stage in the wasteland's day: About at noon, the bounty
-// board and the skill tree in the town's afternoon, the loot field, the makers' plates, the boss cards
+// board, the skill tree and the services (plain papers under a fade) in the town's afternoon, the loot field, the makers' plates, the boss cards
 // and the heavy bag at dusk. The respawn station closes the page at night (respawn.tsx).
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
@@ -39,6 +41,21 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       {sections.techStack.length > 0 && (
         <Stage title={titles.techStack} zone="town">
           <SkillTree categories={sections.techStack} />
+        </Stage>
+      )}
+
+      {sections.services.length > 0 && (
+        <Stage title={titles.services} zone="town">
+          <FadeInScene>
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${cel.paper}`}>
+                  <h3 className="text-lg font-bold">{service.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed">{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </FadeInScene>
         </Stage>
       )}
 

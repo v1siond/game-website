@@ -5,11 +5,12 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { drumsSince } from '@/components/cv/sectionText'
 import { ArcadePanel } from './frames'
-import { MoveCard, ProjectCard, VentureCard } from './cards'
+import { MoveCard, ProjectCard, ServiceCard, VentureCard } from './cards'
 import { ClashSeparator, LightningLine, RoundWins } from './separators'
 import { ComboZone, HitCard } from './combo'
 import { BandStage, LockIn, ResultRecord, RoundEntry } from './rounds'
@@ -23,6 +24,7 @@ import living from './living.module.css'
 // - Work Experience: the plane flies the world map from job to job as each round scrolls in (./flight);
 //   each job is still a round of the match (./rounds), in masonry.
 // - Tech Stack: a ki blast flies across the row for each category and lights its move list card.
+// - Services: plain fight cards under the shared fade, no stage moment.
 // - Projects: the super move, its dark flash and cut in, its hits counted on the combo counter; the
 //   cards lock in and take hits under the pointer (./combo), in masonry.
 // - Ventures: his partner attacks once per venture and each parry lights its card in parry blue.
@@ -82,6 +84,20 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           )}
         />
       </ArcadePanel>
+
+      {sections.services.length > 0 && (
+        <ArcadePanel accent="p1" title={titles.services} id="services-heading">
+          <FadeInScene>
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <ServiceCard service={service} />
+                </li>
+              ))}
+            </ul>
+          </FadeInScene>
+        </ArcadePanel>
+      )}
 
       <ArcadePanel accent="gold" title={titles.projects} id="projects-heading">
         <ComboZone>

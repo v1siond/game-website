@@ -3,7 +3,7 @@
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { ScrollScene } from '@/components/scroll/ScrollScene'
+import { FadeInScene, ScrollScene } from '@/components/scroll/ScrollScene'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import type { SectionsOf } from '@/lib/cv/cvView'
@@ -22,9 +22,9 @@ import { drumsSince } from '@/components/cv/sectionText'
 // The picked profession's sections, each on its isle (./isles, the backdrop follows) and each with its own
 // act of his (./stages). About: he knocks out the flower boss and the text unfolds. Work Experience: the
 // lost round's run bar, his figure running past a flag per job as they scroll by, the jobs dropping in as
-// phase cards. Tech Stack: he pays at the shop counter and the items lift off the shelf. Featured Work:
-// the parry board (./parry). Ventures: the curtains part and he bows. Bands: he drums on the bandstand,
-// each record spinning up under the pointer. Muay Thai: he drops the heavy bag, the knockout slams the
+// phase cards. Tech Stack: he pays at the shop counter and the items lift off the shelf. Services: plain
+// poster cards under a fade. Featured Work: the parry board (./parry). Ventures: the curtains part and he
+// bows. Bands: he drums on the bandstand, each record spinning up under the pointer. Muay Thai: he drops the heavy bag, the knockout slams the
 // title, the achievements land as hit stars. Between About, Work and Tech he runs the isle map.
 
 const LEAD = `text-center text-base ${world.ink}`
@@ -115,6 +115,26 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           </section>
         )}
       </IsleStage>
+
+      {sections.services.length > 0 && (
+        <IsleStage isle="carnival">
+          {() => (
+            <section aria-labelledby="hose-services" className="mb-8">
+              <CurlBanner id="hose-services">{titles.services}</CurlBanner>
+              <FadeInScene>
+                <ul className={MASONRY_LIST}>
+                  {sections.services.map((service) => (
+                    <li key={service.id} className={`${MASONRY_ITEM} p-5 ${world.poster}`}>
+                      <h3 className={`text-lg ${world.lettering}`}>{service.title}</h3>
+                      <p className={`mt-2 text-base leading-relaxed ${world.ink}`}>{service.line}</p>
+                    </li>
+                  ))}
+                </ul>
+              </FadeInScene>
+            </section>
+          )}
+        </IsleStage>
+      )}
 
       <IsleStage isle="carnival">
         {() => (

@@ -5,8 +5,9 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { BandList } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/components/cv/masonry'
 import { drumsSince, headingId, newTabName } from '@/components/cv/sectionText'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import type { CVData } from '@/lib/cv/content'
+import type { CVData, Service } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { BossRound } from './bossRound'
@@ -28,6 +29,7 @@ import ui from './warped.module.css'
 //   About        medieval     he slides in along the bridge, the bio unrolls as a banner, the death gag
 //   Experience   Egypt        he runs along the tomb floor with the scroll; the level portals (warpLevels)
 //   Tech stack   underwater   the scuba swim across; the panels rise like bubbles
+//   Services     underwater   plain panels under the shared fade, no moment of his
 //   Projects     prehistoric  he rides the baby T rex in and hops off at the crates (crateField)
 //   Ventures     future       the motorbike passes under the cards and lights each one as it goes
 //   Bands        Arabian      the jet ski across the harbour; the time trials (timeTrial)
@@ -86,6 +88,21 @@ function TechStack({ categories }: { categories: CVData['techStack'] }) {
         </li>
       ))}
     </ul>
+  )
+}
+
+function Services({ services }: { services: Service[] }) {
+  return (
+    <FadeInScene>
+      <ul className={MASONRY_LIST}>
+        {services.map((service) => (
+          <li key={service.id} className={`${MASONRY_ITEM} ${ui.panel} p-5`}>
+            <h3 className={`mb-2 text-base uppercase tracking-wide text-[color:var(--np-teal)] ${ui.chunk}`}>{service.title}</h3>
+            <p className="text-base text-[color:var(--np-white)]">{service.line}</p>
+          </li>
+        ))}
+      </ul>
+    </FadeInScene>
   )
 }
 
@@ -159,6 +176,12 @@ function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
           </>
         )}
       </Stage>
+
+      {sections.services.length > 0 && (
+        <Stage title={labels.sections.services} zone="underwater">
+          {() => <Services services={sections.services} />}
+        </Stage>
+      )}
 
       <Stage title={labels.sections.projects} zone="prehistoric" icon="crate">
         {() => <CrateField projects={sections.projects} />}

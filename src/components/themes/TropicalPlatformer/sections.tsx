@@ -4,7 +4,7 @@ import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
-import { TechBoard, VentureBoard } from './boards'
+import { ServiceBoard, TechBoard, VentureBoard } from './boards'
 import { BrawlRecord } from './brawl'
 import { CannonRun } from './cannons'
 import { VineCrossing } from './crossing'
@@ -19,7 +19,8 @@ import look from './jungle.module.css'
 // The picked profession's sections, each a level opened by its plank sign and standing in its own scene,
 // and each one a different thing he does with its content: about in the old timer's yard (a barrel
 // cannon fires him in, the board unfolds, the old timer grumbles), the jobs as barrel cannons he blasts
-// between collecting the letters of his name, the tech stack shaken by his ground slap, a vine crossing
+// between collecting the letters of his name, the tech stack shaken by his ground slap, the services on
+// plain boards under a fade, a vine crossing
 // into the cave, the projects as stations of a mine cart ride, the ventures rammed by the rhino, the
 // bands as hanging planks he swings between, and the Muay Thai record as a bout with the walking
 // crocodiles. The posts level closes every profession on a plain board.
@@ -49,6 +50,14 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <TechBoard categories={sections.techStack} />
         </GroundSlap>
       </Level>
+
+      {sections.services.length > 0 && (
+        <Level title={titles.services} scene="jungle">
+          <FadeInScene>
+            <ServiceBoard services={sections.services} />
+          </FadeInScene>
+        </Level>
+      )}
 
       {sections.projects.length > 0 && (
         <>

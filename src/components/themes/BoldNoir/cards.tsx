@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import type { CVData, Job } from '@/lib/cv/content'
+import type { CVData, Job, Service } from '@/lib/cv/content'
 import { jobYears, newTabName } from '@/components/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { HitStar } from './backdrop'
@@ -179,6 +179,16 @@ export function BandPanel({ slot, index }: { slot: BandSlot; index: number }) {
       ) : (
         <article className={look}>{body}</article>
       )}
+    </div>
+  )
+}
+
+// A service on the ventures' slab, a title and its line, with no link to kick.
+export function ServiceSlab({ service }: { service: Service }) {
+  return (
+    <div className={`p-5 ${world.slab}`}>
+      <h3 className="text-2xl tracking-wide">{service.title}</h3>
+      <p className={`mt-2 ${BODY}`}>{service.line}</p>
     </div>
   )
 }

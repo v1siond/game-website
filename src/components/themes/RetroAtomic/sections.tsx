@@ -3,6 +3,8 @@
 import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
 import { drumsSince } from '@/components/cv/sectionText'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
@@ -25,7 +27,8 @@ import j from './journey.module.css'
 // tube). A moment with its own timers takes the on flag as a render prop: the tech stack's footlocker
 // loot, the ventures' dig, the bands' radio dance and the Muay Thai spar. Every heading's id is atomicId of
 // its title, the same the wrist terminal's section tabs jump to. The engineer's sections sit on the
-// terminal's glass panels, the musician's on the radio, the fighter's on the printed perk chart.
+// terminal's glass panels (the services as plain panels under a fade), the musician's on the radio,
+// the fighter's on the printed perk chart.
 
 function SectionTitle({ title }: { title: string }) {
   return (
@@ -83,6 +86,21 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           </Loot>
         )}
       </Stage>
+
+      {sections.services.length > 0 && (
+        <Stage title={titles.services} zone="wasteland">
+          <FadeInScene>
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
+                  <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-atomic-phosphor">{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </FadeInScene>
+        </Stage>
+      )}
 
       {sections.projects.length > 0 && (
         <Stage title={titles.projects} zone="wasteland" className={j.vats}>

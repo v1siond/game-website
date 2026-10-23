@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
-import type { CVData, Job } from '@/lib/cv/content'
+import type { CVData, Job, Service } from '@/lib/cv/content'
 import { HitSpark } from './badges'
 import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
@@ -188,6 +188,16 @@ export function MoveCard({ category }: { category: CVData['techStack'][number] }
           </li>
         ))}
       </ul>
+    </FightCard>
+  )
+}
+
+// A service as a plain fight card: its title and one line.
+export function ServiceCard({ service }: { service: Service }) {
+  return (
+    <FightCard accent="p1">
+      <h3 className={`mb-3 ${TITLE}`}>{service.title}</h3>
+      <p className="text-base leading-relaxed text-white">{service.line}</p>
     </FightCard>
   )
 }

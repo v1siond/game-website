@@ -6,13 +6,14 @@ import { AboutLevel } from './about'
 import { CoinRoom } from './coinRoom'
 import { NoteBlockLevel } from './noteBlocks'
 import { LedgeLevel } from './platforms'
+import { ServicesLevel } from './services'
 import { ShellLevel } from './shell'
 import { StompLevel } from './stomps'
 import { SwitchPalaces } from './switches'
 
 // Each profession's sections as levels of a side view course, and only those, each with its own thing
 // he does: hit the ? block (about), jump the job ledges (experience), kick the shell through the bricks
-// (tech stack), stomp the big switch and go down the pipe (projects), drop into the coin room
+// (tech stack), read the services on plain cards, stomp the big switch and go down the pipe (projects), drop into the coin room
 // (ventures), bounce on the note blocks (bands), stomp the foes in a chain (Muay Thai).
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
@@ -21,6 +22,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <AboutLevel profession="engineer" />
       {sections.jobs.length > 0 && <LedgeLevel jobs={sections.jobs} profession="engineer" />}
       <ShellLevel categories={sections.techStack} profession="engineer" />
+      {sections.services.length > 0 && <ServicesLevel services={sections.services} />}
       <SwitchPalaces projects={sections.projects} profession="engineer" />
       <CoinRoom companies={sections.companies} profession="engineer" />
     </>
