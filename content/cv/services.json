@@ -68,6 +68,12 @@
         "line": "PDFs, ACORD XML and CSV feeds turned into clean data your app can use. IUL parser for 20+ carriers (2023), whole life (2022) and annuity (2026) parsers, InsurAdmin ACORD feeds (2025), WJV commission parser (2023)."
       },
       {
+        "id": "crypto",
+        "group": "domains",
+        "title": "Crypto and blockchain products",
+        "line": "Product engineering for crypto and blockchain products, from the backend to the interface."
+      },
+      {
         "id": "marketplace-launches",
         "group": "launchAndPlatform",
         "title": "Marketplace launches",
@@ -156,6 +162,12 @@
         "line": "PDFs, XML ACORD y feeds CSV convertidos en datos limpios que tu app puede usar. Parser IUL para más de 20 aseguradoras (2023), parsers de vida entera (2022) y de anualidades (2026), feeds ACORD de InsurAdmin (2025), parser de comisiones WJV (2023)."
       },
       {
+        "id": "crypto",
+        "group": "domains",
+        "title": "Productos cripto y blockchain",
+        "line": "Ingeniería de producto para productos cripto y blockchain, del backend a la interfaz."
+      },
+      {
         "id": "marketplace-launches",
         "group": "launchAndPlatform",
         "title": "Publicación en marketplaces",
@@ -242,6 +254,12 @@
         "group": "domains",
         "title": "Parser di documenti e dati",
         "line": "PDF, XML ACORD e feed CSV trasformati in dati puliti che la tua app può usare. Parser IUL per oltre 20 compagnie (2023), parser whole life (2022) e di rendite (2026), feed ACORD di InsurAdmin (2025), parser delle provvigioni WJV (2023)."
+      },
+      {
+        "id": "crypto",
+        "group": "domains",
+        "title": "Prodotti crypto e blockchain",
+        "line": "Ingegneria di prodotto per prodotti crypto e blockchain, dal backend all'interfaccia."
       },
       {
         "id": "marketplace-launches",
