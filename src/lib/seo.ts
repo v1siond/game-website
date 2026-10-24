@@ -37,10 +37,23 @@ const clip = (text: string, limit: number): string => {
   return `${cut.slice(0, cut.lastIndexOf(' '))}…`
 }
 
-/** The headline and the tagline, about one search result snippet long. */
+const sentencesOf = (text: string): string[] => text.split(/(?<=[.!?])\s+/).filter(Boolean).map(sentence)
+
+// Add the next sentence while it fits and stop at the first that does not, so the snippet never ends mid
+// sentence and never skips one.
+const fitSentences = (lead: string, [next, ...rest]: string[], limit: number): string => {
+  if (next === undefined) return lead
+  const longer = `${lead} ${next}`
+  if (longer.length > limit) return lead
+  return fitSentences(longer, rest, limit)
+}
+
+/** The headline and the tagline's whole sentences that fit, about one search result snippet long. */
 export function siteDescription({ professionalSummary }: SeoFacts): string {
   const { headline, tagline } = professionalSummary
-  return clip(`${sentence(headline)} ${sentence(tagline)}`, DESCRIPTION_LIMIT)
+  const lead = sentence(headline)
+  if (lead.length > DESCRIPTION_LIMIT) return clip(lead, DESCRIPTION_LIMIT)
+  return fitSentences(lead, sentencesOf(tagline), DESCRIPTION_LIMIT)
 }
 
 /** Every tool of the tech stack once, in the order the CV lists them. */

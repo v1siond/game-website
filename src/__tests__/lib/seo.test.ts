@@ -32,6 +32,15 @@ describe('siteDescription', () => {
     expect(siteDescription(short)).toBe(`${cv.professionalSummary.headline}. Built PMX.`)
   })
 
+  it.each(['en', 'es', 'it'] as const)('ends the %s summary at its last whole sentence within 160 characters', (locale) => {
+    const summary = cvDataFrom(readFiles(), locale).professionalSummary
+    const description = siteDescription({ ...cv, professionalSummary: summary })
+
+    expect(description.length).toBeLessThanOrEqual(160)
+    expect(description).toMatch(/\.$/)
+    expect(description.startsWith(`${summary.headline}. `)).toBe(true)
+  })
+
   it('cuts a long summary at a whole word within 160 characters', () => {
     const long = { ...cv, professionalSummary: { ...cv.professionalSummary, headline: 'word '.repeat(60).trim() } }
     const description = siteDescription(long)
