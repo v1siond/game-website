@@ -14,6 +14,13 @@
         "contact": "Contact",
         "posts": "Posts"
       },
+      "serviceGroups": {
+        "build": "Build",
+        "rescueAndLead": "Rescue and lead",
+        "ai": "AI",
+        "domains": "Domains",
+        "launchAndPlatform": "Launch and platform"
+      },
       "professions": {
         "engineer": "System Engineer",
         "drummer": "Musician",
@@ -472,6 +479,13 @@
         "contact": "Contacto",
         "posts": "Publicaciones"
       },
+      "serviceGroups": {
+        "build": "Desarrollo",
+        "rescueAndLead": "Rescate y liderazgo",
+        "ai": "IA",
+        "domains": "Sectores",
+        "launchAndPlatform": "Lanzamiento y plataforma"
+      },
       "professions": {
         "engineer": "Ingeniero de Sistemas",
         "drummer": "Músico",
@@ -929,6 +943,13 @@
         "muayThai": "Muay Thai",
         "contact": "Contatti",
         "posts": "Articoli"
+      },
+      "serviceGroups": {
+        "build": "Sviluppo",
+        "rescueAndLead": "Salvataggio e guida",
+        "ai": "IA",
+        "domains": "Settori",
+        "launchAndPlatform": "Lancio e piattaforma"
       },
       "professions": {
         "engineer": "Ingegnere di Sistemi",

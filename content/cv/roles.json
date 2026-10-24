@@ -3,7 +3,7 @@
     "currentRoles": [
       {
         "id": "dba",
-        "title": "Senior Staff Engineer",
+        "title": "Senior Staff Software Engineer",
         "company": "DBA",
         "type": "employment",
         "current": true,
@@ -24,6 +24,14 @@
         "type": "leadership",
         "current": true,
         "description": "Building audit and compliance technology for legal professionals."
+      },
+      {
+        "id": "insuradmin",
+        "title": "CTO",
+        "company": "InsurAdmin",
+        "type": "leadership",
+        "current": true,
+        "description": "Agency management for insurance agencies and IMOs, with carrier feeds and team hierarchies."
       }
     ]
   },
@@ -31,7 +39,7 @@
     "currentRoles": [
       {
         "id": "dba",
-        "title": "Ingeniero Senior Staff",
+        "title": "Ingeniero de Software Senior Staff",
         "company": "DBA",
         "type": "employment",
         "current": true,
@@ -52,6 +60,14 @@
         "type": "leadership",
         "current": true,
         "description": "Construye tecnología de auditoría y cumplimiento para profesionales del derecho."
+      },
+      {
+        "id": "insuradmin",
+        "title": "CTO",
+        "company": "InsurAdmin",
+        "type": "leadership",
+        "current": true,
+        "description": "Gestión para agencias de seguros e IMOs, con feeds de aseguradoras y jerarquías de equipos."
       }
     ]
   },
@@ -59,7 +75,7 @@
     "currentRoles": [
       {
         "id": "dba",
-        "title": "Ingegnere Senior Staff",
+        "title": "Ingegnere del Software Senior Staff",
         "company": "DBA",
         "type": "employment",
         "current": true,
@@ -80,6 +96,14 @@
         "type": "leadership",
         "current": true,
         "description": "Costruisce tecnologia per audit e conformità per professionisti legali."
+      },
+      {
+        "id": "insuradmin",
+        "title": "CTO",
+        "company": "InsurAdmin",
+        "type": "leadership",
+        "current": true,
+        "description": "Gestione per agenzie assicurative e IMO, con feed delle compagnie e gerarchie dei team."
       }
     ]
   }

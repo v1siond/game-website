@@ -10,8 +10,6 @@
           "JavaScript",
           "Ruby",
           "Python",
-          "C#",
-          "C++",
           "PHP",
           "SQL",
           "HTML/CSS",
@@ -26,7 +24,6 @@
           "Rails",
           "Express",
           "Laravel",
-          ".NET",
           "Node.js",
           "Ash Framework",
           "Absinthe (GraphQL)"
@@ -52,7 +49,6 @@
         "items": [
           "PostgreSQL",
           "MySQL",
-          "MongoDB",
           "Redis",
           "Elasticsearch",
           "Firebase/Firestore"
@@ -67,7 +63,7 @@
           "Terraform",
           "Google Cloud (GCP)",
           "AWS",
-          "Azure (AKS)",
+          "Azure AKS",
           "Railway",
           "Netlify",
           "GitLab CI/CD",
@@ -94,7 +90,6 @@
         "icon": "🤖",
         "items": [
           "Claude/Anthropic API",
-          "OpenAI/GPT",
           "Google Gemini",
           "Prompt Engineering",
           "AI-assisted Development"
@@ -113,8 +108,6 @@
           "JavaScript",
           "Ruby",
           "Python",
-          "C#",
-          "C++",
           "PHP",
           "SQL",
           "HTML/CSS",
@@ -129,7 +122,6 @@
           "Rails",
           "Express",
           "Laravel",
-          ".NET",
           "Node.js",
           "Ash Framework",
           "Absinthe (GraphQL)"
@@ -155,7 +147,6 @@
         "items": [
           "PostgreSQL",
           "MySQL",
-          "MongoDB",
           "Redis",
           "Elasticsearch",
           "Firebase/Firestore"
@@ -170,7 +161,7 @@
           "Terraform",
           "Google Cloud (GCP)",
           "AWS",
-          "Azure (AKS)",
+          "Azure AKS",
           "Railway",
           "Netlify",
           "GitLab CI/CD",
@@ -197,7 +188,6 @@
         "icon": "🤖",
         "items": [
           "Claude/Anthropic API",
-          "OpenAI/GPT",
           "Google Gemini",
           "Prompt Engineering",
           "AI-assisted Development"
@@ -216,8 +206,6 @@
           "JavaScript",
           "Ruby",
           "Python",
-          "C#",
-          "C++",
           "PHP",
           "SQL",
           "HTML/CSS",
@@ -232,7 +220,6 @@
           "Rails",
           "Express",
           "Laravel",
-          ".NET",
           "Node.js",
           "Ash Framework",
           "Absinthe (GraphQL)"
@@ -258,7 +245,6 @@
         "items": [
           "PostgreSQL",
           "MySQL",
-          "MongoDB",
           "Redis",
           "Elasticsearch",
           "Firebase/Firestore"
@@ -273,7 +259,7 @@
           "Terraform",
           "Google Cloud (GCP)",
           "AWS",
-          "Azure (AKS)",
+          "Azure AKS",
           "Railway",
           "Netlify",
           "GitLab CI/CD",
@@ -300,7 +286,6 @@
         "icon": "🤖",
         "items": [
           "Claude/Anthropic API",
-          "OpenAI/GPT",
           "Google Gemini",
           "Prompt Engineering",
           "AI-assisted Development"

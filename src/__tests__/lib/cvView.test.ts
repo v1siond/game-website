@@ -108,6 +108,17 @@ describe('viewFor: System Engineer', () => {
     })
   })
 
+  it('files every service under a group the site text has a heading for, each group in one run', () => {
+    const cv = realCV()
+    const groups = cv.services.map((service) => service.group)
+    const headings = Object.keys(cv.labels.serviceGroups ?? {})
+
+    expect(headings.length).toBeGreaterThan(0)
+    groups.forEach((group) => expect(headings).toContain(group))
+    const runs = groups.filter((group, index) => group !== groups[index - 1])
+    expect(new Set(runs).size).toBe(runs.length)
+  })
+
   it('orders jobs by recency: current first, then by end date', () => {
     const { jobs } = engineerOf(viewFor(smallCV(), 'engineer', 'full', NOW))
     expect(ids(jobs)).toEqual(['dba-staff', 'ended-2021', 'ended-2020', 'smoothterminal', 'solutionrus'])

@@ -2,117 +2,264 @@
   "en": {
     "services": [
       {
+        "id": "full-stack-products",
+        "group": "build",
+        "title": "Full stack products, idea to launch",
+        "line": "One engineer who takes your product from the first commit to paying users, web and mobile. PMX (2022), InsurAdmin (2024), Sillabo (2026), Datepal web and Flutter app (2026)."
+      },
+      {
+        "id": "elixir-backends",
+        "group": "build",
+        "title": "Elixir and Phoenix backends",
+        "line": "APIs, background jobs and real time features in Elixir, Phoenix, Ash and GraphQL that stay up as you grow. Agency Rocket API since 2018, InsurAdmin (2024), Datepal on Ash (2026), Firestorm rebuilt in Ash and published on Hex (2026)."
+      },
+      {
+        "id": "accessible-frontends",
+        "group": "build",
+        "title": "Frontends that pass accessibility audits",
+        "line": "React, Next and Vue interfaces built pixel perfect and to WCAG AA and AAA. Agency Rocket Vue app, largest author since 2018; PMX Next client (2022); Sillabo built to WCAG AAA (2026); AAA accessibility updates for ProctorU; taught WCAG AAA audits at DailyDrip (2017 to 2019)."
+      },
+      {
+        "id": "rescue",
+        "group": "rescueAndLead",
+        "title": "Getting a late project over the line",
+        "line": "You have a launch date and a stuck codebase: I learn the system and ship the missing part. SecureBancard (2023), a DBA client: I came in as main backend developer after 2 months of slow progress and moved the multi BIN launch from Node.js to Elixir."
+      },
+      {
+        "id": "legacy-migrations",
+        "group": "rescueAndLead",
+        "title": "Legacy migrations",
+        "line": "Moving live data and code to a new platform while the business keeps running. Pearson Channels data migration from ClutchPrep (2022 to 2023), SecureBancard Node.js to Elixir (2023), GRCTechMe Firestore to PostgreSQL (2026)."
+      },
+      {
+        "id": "technical-leadership",
+        "group": "rescueAndLead",
+        "title": "Architecture and technical leadership",
+        "line": "A CTO or lead engineer for your team: architecture, roadmap, reviews and delivery. CTO at GRCTechMe and InsurAdmin (since 2024), co PM and development lead at Datepal (2026), co architect of Pearson Channels, leader of the Clutch Prep B2B system."
+      },
+      {
         "id": "ai-products",
+        "group": "ai",
         "title": "AI built into your product",
-        "line": "Agents, RAG and LLM features on Claude and Gemini, voice in and out with STT and TTS, wired into the app you already run. Training models since before 2023, starting with personal games."
+        "line": "Agents, RAG and LLM features on Claude and Gemini, voice in and out with STT and TTS, wired into the app you already run. Sillabo tutor and judge on Claude (2026), GRCTechMe on Gemini (2025)."
       },
       {
         "id": "ai-to-production",
+        "group": "ai",
         "title": "AI prototype to production",
-        "line": "Quality prototypes in hours, live with you if needed, then the tests, guardrails and costs that take them to production instead of leaving them as a pilot."
+        "line": "Quality prototypes in hours, live with you if needed, then the tests, guardrails and cost limits that get them to production. Sillabo LLM judge (2026)."
       },
       {
-        "id": "security-compliance",
-        "title": "Security, accessibility and compliance",
-        "line": "Security audits and fixes, WCAG AA and AAA, ISO 9001 certified processes at GRCTechMe and ISO 27001 in preparation."
+        "id": "insurance-software",
+        "group": "domains",
+        "title": "Insurance software",
+        "line": "Agency management, carrier feeds, commissions and sales tools for agencies and IMOs. InsurAdmin (2024), Agency Rocket suite with My New Retirement, Wealth United and Debt Action Plan (since 2018)."
+      },
+      {
+        "id": "payments",
+        "group": "domains",
+        "title": "Payments, billing and money platforms",
+        "line": "Payment processing, Stripe subscriptions, commissions and payouts. SecureBancard's Pioneer platform for ISOs and ISVs (2023), Agency Rocket Stripe billing (since 2018), PMX commissions and plans (2022), BCharitable ACH and Stripe (2021, 2026)."
+      },
+      {
+        "id": "parsers",
+        "group": "domains",
+        "title": "Document and data parsers",
+        "line": "PDFs, ACORD XML and CSV feeds turned into clean data your app can use. IUL parser for 20+ carriers (2023), whole life (2022) and annuity (2026) parsers, InsurAdmin ACORD feeds (2025), WJV commission parser (2023)."
       },
       {
         "id": "marketplace-launches",
+        "group": "launchAndPlatform",
         "title": "Marketplace launches",
-        "line": "Your app listed on Google Marketplace or the Shopify App Store, with the procurement, webhooks and compliance reviews they ask for. Done for GRCTechMe and PMX."
+        "line": "Your app listed on the Google Cloud Marketplace or the Shopify App Store, with the procurement, webhooks and compliance reviews they ask for. Done for GRCTechMe and PMX."
       },
       {
-        "id": "product-builds",
-        "title": "Product builds",
-        "line": "Anything, from idea to production, out faster than anyone. Elixir and Phoenix, React, Vue and Angular on the web, Flutter on mobile."
+        "id": "security-compliance",
+        "group": "launchAndPlatform",
+        "title": "Security and compliance",
+        "line": "Security audits with the fixes, and process work for ISO 9001 (certified) and ISO 27001 (in preparation). GRCTechMe audit (2026), InsurAdmin security release (2026), PMX authorization with tests (2022), ISO 9001 at GRCTechMe."
       },
       {
-        "id": "migrations",
-        "title": "Legacy migrations",
-        "line": "Live systems moved without stopping the business: a payments platform's Node.js API rebuilt in Elixir with its Angular front end and tests, Firestore moved into PostgreSQL."
-      },
-      {
-        "id": "cloud-kubernetes",
-        "title": "Cloud and Kubernetes",
-        "line": "Kubernetes on GKE and AKS, GitOps with ArgoCD, Terraform and PostgreSQL in production."
+        "id": "cloud-deploys",
+        "group": "launchAndPlatform",
+        "title": "Cloud and deploys",
+        "line": "Kubernetes on Google Cloud, CI and releases that ship on every push. Agency Rocket on GKE with ArgoCD (since 2021), InsurAdmin infrastructure (2025), Nebulith on Railway with CI (2026), PMX and my own sites on Netlify, Sentry on every project."
       }
     ]
   },
   "es": {
     "services": [
       {
+        "id": "full-stack-products",
+        "group": "build",
+        "title": "Productos full stack, de la idea al lanzamiento",
+        "line": "Un ingeniero que lleva tu producto del primer commit a los primeros clientes que pagan, en web y móvil. PMX (2022), InsurAdmin (2024), Sillabo (2026), Datepal web y app Flutter (2026)."
+      },
+      {
+        "id": "elixir-backends",
+        "group": "build",
+        "title": "Backends en Elixir y Phoenix",
+        "line": "APIs, tareas en segundo plano y funciones en tiempo real con Elixir, Phoenix, Ash y GraphQL que siguen en pie mientras creces. API de Agency Rocket desde 2018, InsurAdmin (2024), Datepal sobre Ash (2026), Firestorm reconstruido en Ash y publicado en Hex (2026)."
+      },
+      {
+        "id": "accessible-frontends",
+        "group": "build",
+        "title": "Frontends que pasan auditorías de accesibilidad",
+        "line": "Interfaces en React, Next y Vue hechas al píxel y con WCAG AA y AAA. App Vue de Agency Rocket, su mayor autor desde 2018; cliente Next de PMX (2022); Sillabo hecho con WCAG AAA (2026); actualizaciones de accesibilidad AAA para ProctorU; enseñó auditorías WCAG AAA en DailyDrip (2017 a 2019)."
+      },
+      {
+        "id": "rescue",
+        "group": "rescueAndLead",
+        "title": "Sacar adelante un proyecto atrasado",
+        "line": "Tienes una fecha de lanzamiento y un código atascado: aprendo el sistema y entrego la parte que falta. SecureBancard (2023), cliente de DBA: entré como desarrollador backend principal tras 2 meses de poco avance y llevé el lanzamiento multi BIN de Node.js a Elixir."
+      },
+      {
+        "id": "legacy-migrations",
+        "group": "rescueAndLead",
+        "title": "Migración de sistemas legacy",
+        "line": "Datos y código en producción llevados a una nueva plataforma mientras el negocio sigue funcionando. Migración de datos de ClutchPrep a Pearson Channels (2022 a 2023), SecureBancard de Node.js a Elixir (2023), GRCTechMe de Firestore a PostgreSQL (2026)."
+      },
+      {
+        "id": "technical-leadership",
+        "group": "rescueAndLead",
+        "title": "Arquitectura y liderazgo técnico",
+        "line": "Un CTO o ingeniero líder para tu equipo: arquitectura, roadmap, revisiones y entregas. CTO en GRCTechMe e InsurAdmin (desde 2024), co PM y líder de desarrollo en Datepal (2026), coarquitecto de Pearson Channels, líder del sistema B2B de Clutch Prep."
+      },
+      {
         "id": "ai-products",
+        "group": "ai",
         "title": "IA dentro de tu producto",
-        "line": "Agentes, RAG y funciones LLM con Claude y Gemini, voz de entrada y salida con STT y TTS, integrados en la app que ya usas. Entrenando modelos desde antes de 2023, empezando con juegos personales."
+        "line": "Agentes, RAG y funciones LLM con Claude y Gemini, voz de entrada y salida con STT y TTS, integrados en la app que ya usas. Tutor y evaluador de Sillabo con Claude (2026), GRCTechMe con Gemini (2025)."
       },
       {
         "id": "ai-to-production",
+        "group": "ai",
         "title": "De prototipo de IA a producción",
-        "line": "Prototipos de calidad en horas, en vivo contigo si hace falta, y luego las pruebas, los controles y los costos que los llevan a producción en vez de dejarlos como piloto."
+        "line": "Prototipos de calidad en horas, en vivo contigo si hace falta, y luego las pruebas, los controles y los límites de costo que los llevan a producción. Evaluador LLM de Sillabo (2026)."
       },
       {
-        "id": "security-compliance",
-        "title": "Seguridad, accesibilidad y cumplimiento",
-        "line": "Auditorías de seguridad con sus correcciones, WCAG AA y AAA, procesos certificados ISO 9001 en GRCTechMe e ISO 27001 en preparación."
+        "id": "insurance-software",
+        "group": "domains",
+        "title": "Software para seguros",
+        "line": "Gestión de agencias, feeds de aseguradoras, comisiones y herramientas de venta para agencias e IMOs. InsurAdmin (2024), la suite Agency Rocket con My New Retirement, Wealth United y Debt Action Plan (desde 2018)."
+      },
+      {
+        "id": "payments",
+        "group": "domains",
+        "title": "Pagos, cobros y plataformas de dinero",
+        "line": "Procesamiento de pagos, suscripciones con Stripe, comisiones y pagos a terceros. La plataforma Pioneer de SecureBancard para ISOs e ISVs (2023), cobros con Stripe en Agency Rocket (desde 2018), comisiones y planes de PMX (2022), ACH y Stripe en BCharitable (2021, 2026)."
+      },
+      {
+        "id": "parsers",
+        "group": "domains",
+        "title": "Parsers de documentos y datos",
+        "line": "PDFs, XML ACORD y feeds CSV convertidos en datos limpios que tu app puede usar. Parser IUL para más de 20 aseguradoras (2023), parsers de vida entera (2022) y de anualidades (2026), feeds ACORD de InsurAdmin (2025), parser de comisiones WJV (2023)."
       },
       {
         "id": "marketplace-launches",
+        "group": "launchAndPlatform",
         "title": "Publicación en marketplaces",
-        "line": "Tu app publicada en Google Marketplace o en la Shopify App Store, con el procurement, los webhooks y las revisiones de cumplimiento que piden. Hecho para GRCTechMe y PMX."
+        "line": "Tu app publicada en Google Cloud Marketplace o en la Shopify App Store, con el procurement, los webhooks y las revisiones de cumplimiento que piden. Hecho para GRCTechMe y PMX."
       },
       {
-        "id": "product-builds",
-        "title": "Desarrollo de productos",
-        "line": "Cualquier cosa, de la idea a producción, más rápido que nadie. Elixir y Phoenix, React, Vue y Angular en la web, Flutter en móvil."
+        "id": "security-compliance",
+        "group": "launchAndPlatform",
+        "title": "Seguridad y cumplimiento",
+        "line": "Auditorías de seguridad con sus correcciones, y trabajo de procesos para ISO 9001 (certificado) e ISO 27001 (en preparación). Auditoría de GRCTechMe (2026), versión de seguridad de InsurAdmin (2026), autorización con pruebas en PMX (2022), ISO 9001 en GRCTechMe."
       },
       {
-        "id": "migrations",
-        "title": "Migración de sistemas legacy",
-        "line": "Sistemas en vivo migrados sin detener el negocio: la API Node.js de una plataforma de pagos reconstruida en Elixir con su front end Angular y sus pruebas, Firestore migrado a PostgreSQL."
-      },
-      {
-        "id": "cloud-kubernetes",
-        "title": "Cloud y Kubernetes",
-        "line": "Kubernetes en GKE y AKS, GitOps con ArgoCD, Terraform y PostgreSQL en producción."
+        "id": "cloud-deploys",
+        "group": "launchAndPlatform",
+        "title": "Cloud y despliegues",
+        "line": "Kubernetes en Google Cloud, CI y versiones que salen con cada push. Agency Rocket en GKE con ArgoCD (desde 2021), infraestructura de InsurAdmin (2025), Nebulith en Railway con CI (2026), PMX y mis propios sitios en Netlify, Sentry en cada proyecto."
       }
     ]
   },
   "it": {
     "services": [
       {
+        "id": "full-stack-products",
+        "group": "build",
+        "title": "Prodotti full stack, dall'idea al lancio",
+        "line": "Un ingegnere che porta il tuo prodotto dal primo commit ai primi clienti paganti, su web e mobile. PMX (2022), InsurAdmin (2024), Sillabo (2026), Datepal web e app Flutter (2026)."
+      },
+      {
+        "id": "elixir-backends",
+        "group": "build",
+        "title": "Backend in Elixir e Phoenix",
+        "line": "API, job in background e funzioni in tempo reale con Elixir, Phoenix, Ash e GraphQL che reggono mentre cresci. API di Agency Rocket dal 2018, InsurAdmin (2024), Datepal su Ash (2026), Firestorm ricostruito in Ash e pubblicato su Hex (2026)."
+      },
+      {
+        "id": "accessible-frontends",
+        "group": "build",
+        "title": "Frontend che superano gli audit di accessibilità",
+        "line": "Interfacce in React, Next e Vue curate al pixel e conformi a WCAG AA e AAA. App Vue di Agency Rocket, il suo autore principale dal 2018; client Next di PMX (2022); Sillabo realizzato secondo WCAG AAA (2026); aggiornamenti di accessibilità AAA per ProctorU; ha insegnato gli audit WCAG AAA in DailyDrip (dal 2017 al 2019)."
+      },
+      {
+        "id": "rescue",
+        "group": "rescueAndLead",
+        "title": "Portare al traguardo un progetto in ritardo",
+        "line": "Hai una data di lancio e un codice bloccato: imparo il sistema e consegno la parte che manca. SecureBancard (2023), cliente di DBA: sono entrato come sviluppatore backend principale dopo 2 mesi di avanzamento lento e ho portato il lancio multi BIN da Node.js a Elixir."
+      },
+      {
+        "id": "legacy-migrations",
+        "group": "rescueAndLead",
+        "title": "Migrazione di sistemi legacy",
+        "line": "Dati e codice in produzione portati su una nuova piattaforma mentre il business continua a funzionare. Migrazione dei dati da ClutchPrep a Pearson Channels (dal 2022 al 2023), SecureBancard da Node.js a Elixir (2023), GRCTechMe da Firestore a PostgreSQL (2026)."
+      },
+      {
+        "id": "technical-leadership",
+        "group": "rescueAndLead",
+        "title": "Architettura e leadership tecnica",
+        "line": "Un CTO o lead engineer per il tuo team: architettura, roadmap, revisioni e consegne. CTO in GRCTechMe e InsurAdmin (dal 2024), co PM e responsabile dello sviluppo in Datepal (2026), co-architetto di Pearson Channels, responsabile del sistema B2B di Clutch Prep."
+      },
+      {
         "id": "ai-products",
+        "group": "ai",
         "title": "IA dentro il tuo prodotto",
-        "line": "Agenti, RAG e funzioni LLM con Claude e Gemini, voce in entrata e in uscita con STT e TTS, integrati nell'app che usi già. Addestro modelli da prima del 2023, a partire dai miei giochi personali."
+        "line": "Agenti, RAG e funzioni LLM con Claude e Gemini, voce in entrata e in uscita con STT e TTS, integrati nell'app che usi già. Tutor e valutatore di Sillabo con Claude (2026), GRCTechMe con Gemini (2025)."
       },
       {
         "id": "ai-to-production",
+        "group": "ai",
         "title": "Dal prototipo IA alla produzione",
-        "line": "Prototipi di qualità in poche ore, anche dal vivo con te, poi i test, i controlli e i costi che li portano in produzione invece di lasciarli come pilota."
+        "line": "Prototipi di qualità in poche ore, anche dal vivo con te, poi i test, i controlli e i limiti di costo che li portano in produzione. Valutatore LLM di Sillabo (2026)."
       },
       {
-        "id": "security-compliance",
-        "title": "Sicurezza, accessibilità e conformità",
-        "line": "Audit di sicurezza con le relative correzioni, WCAG AA e AAA, processi certificati ISO 9001 in GRCTechMe e ISO 27001 in preparazione."
+        "id": "insurance-software",
+        "group": "domains",
+        "title": "Software per le assicurazioni",
+        "line": "Gestione delle agenzie, feed delle compagnie, provvigioni e strumenti di vendita per agenzie e IMO. InsurAdmin (2024), la suite Agency Rocket con My New Retirement, Wealth United e Debt Action Plan (dal 2018)."
+      },
+      {
+        "id": "payments",
+        "group": "domains",
+        "title": "Pagamenti, fatturazione e piattaforme finanziarie",
+        "line": "Elaborazione dei pagamenti, abbonamenti Stripe, provvigioni e pagamenti in uscita. La piattaforma Pioneer di SecureBancard per ISO e ISV (2023), fatturazione Stripe in Agency Rocket (dal 2018), provvigioni e piani di PMX (2022), ACH e Stripe in BCharitable (2021, 2026)."
+      },
+      {
+        "id": "parsers",
+        "group": "domains",
+        "title": "Parser di documenti e dati",
+        "line": "PDF, XML ACORD e feed CSV trasformati in dati puliti che la tua app può usare. Parser IUL per oltre 20 compagnie (2023), parser whole life (2022) e di rendite (2026), feed ACORD di InsurAdmin (2025), parser delle provvigioni WJV (2023)."
       },
       {
         "id": "marketplace-launches",
+        "group": "launchAndPlatform",
         "title": "Pubblicazione nei marketplace",
-        "line": "La tua app pubblicata su Google Marketplace o sullo Shopify App Store, con procurement, webhook e revisioni di conformità richieste. Fatto per GRCTechMe e PMX."
+        "line": "La tua app pubblicata su Google Cloud Marketplace o sullo Shopify App Store, con procurement, webhook e revisioni di conformità richieste. Fatto per GRCTechMe e PMX."
       },
       {
-        "id": "product-builds",
-        "title": "Sviluppo di prodotti",
-        "line": "Qualsiasi cosa, dall'idea alla produzione, più veloce di chiunque. Elixir e Phoenix, React, Vue e Angular sul web, Flutter su mobile."
+        "id": "security-compliance",
+        "group": "launchAndPlatform",
+        "title": "Sicurezza e conformità",
+        "line": "Audit di sicurezza con le relative correzioni, e lavoro sui processi per ISO 9001 (certificato) e ISO 27001 (in preparazione). Audit di GRCTechMe (2026), release di sicurezza di InsurAdmin (2026), autorizzazioni con test in PMX (2022), ISO 9001 in GRCTechMe."
       },
       {
-        "id": "migrations",
-        "title": "Migrazione di sistemi legacy",
-        "line": "Sistemi in produzione migrati senza fermare il business: l'API Node.js di una piattaforma di pagamenti ricostruita in Elixir con il suo front end Angular e i suoi test, Firestore migrato in PostgreSQL."
-      },
-      {
-        "id": "cloud-kubernetes",
-        "title": "Cloud e Kubernetes",
-        "line": "Kubernetes su GKE e AKS, GitOps con ArgoCD, Terraform e PostgreSQL in produzione."
+        "id": "cloud-deploys",
+        "group": "launchAndPlatform",
+        "title": "Cloud e deploy",
+        "line": "Kubernetes su Google Cloud, CI e release che escono a ogni push. Agency Rocket su GKE con ArgoCD (dal 2021), infrastruttura di InsurAdmin (2025), Nebulith su Railway con CI (2026), PMX e i miei siti su Netlify, Sentry in ogni progetto."
       }
     ]
   }

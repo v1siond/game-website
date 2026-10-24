@@ -28,8 +28,8 @@ describe('shortRole', () => {
 
 describe('siteDescription', () => {
   it('joins the headline and the tagline from the summary', () => {
-    const { headline, tagline } = cv.professionalSummary
-    expect(siteDescription(cv)).toBe(`${headline}. ${tagline}.`)
+    const short = { ...cv, professionalSummary: { ...cv.professionalSummary, tagline: 'Built PMX' } }
+    expect(siteDescription(short)).toBe(`${cv.professionalSummary.headline}. Built PMX.`)
   })
 
   it('cuts a long summary at a whole word within 160 characters', () => {

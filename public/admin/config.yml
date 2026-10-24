@@ -258,6 +258,8 @@ collections:
             summary: '{{fields.title}}'
             fields:
               - { <<: *fixed, label: Id, name: id }
+              # The heading the service sits under: a key of Site text, Service groups.
+              - { label: Group, name: group, widget: select, i18n: duplicate, required: false, options: [build, rescueAndLead, ai, domains, launchAndPlatform] }
               - { <<: *text, label: Title, name: title }
               - { <<: *text, label: Line, name: line }
 
@@ -289,6 +291,16 @@ collections:
                   - { <<: *text, label: "Muay thai", name: muayThai }
                   - { <<: *text, label: "Contact", name: contact }
                   - { <<: *text, label: "Posts", name: posts }
+              - label: Service groups (headings over the services)
+                name: serviceGroups
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Build", name: build }
+                  - { <<: *text, label: "Rescue and lead", name: rescueAndLead }
+                  - { <<: *text, label: "AI", name: ai }
+                  - { <<: *text, label: "Domains", name: domains }
+                  - { <<: *text, label: "Launch and platform", name: launchAndPlatform }
               - label: Profession names
                 name: professions
                 widget: object
