@@ -35,7 +35,8 @@ formats the same way (year spans, job years, project links, the Muay Thai facts,
 - Jobs sort newest first; projects keep the order he set in Decap.
 - Bands, the services and the Muay Thai record are always shown whole. The services list, its length and
   each title and line come from `content/cv/services.json`; no world holds a count or a word of it.
-- `/cv` shows everything, in English, Spanish or Italian. Its Services section follows Technical Skills.
+- `/cv` shows everything, in English, Spanish or Italian. Its Services section follows Technical Skills,
+  each group under its heading from labels `serviceGroups`, then the contact line and an Email me link.
 
 ## How a section moves
 
