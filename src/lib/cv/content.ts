@@ -118,7 +118,7 @@ export interface Company {
 }
 
 /** The heading a service is listed under, a key of the serviceGroups labels. */
-type ServiceGroup = keyof Labels['serviceGroups']
+export type ServiceGroup = keyof Labels['serviceGroups']
 
 /** One thing he offers to build: a title and one short line, in the order he sets in Decap. */
 export interface Service {
