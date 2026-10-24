@@ -8,7 +8,7 @@ picked profession, then a contact corner. What the sections hold comes from `vie
 ## The page, top to bottom
 
 1. **Hero** (`RecruiterHero`, `src/components/cv/RecruiterHero.tsx`): his name, the headline and tagline from
-   the summary file, his contact line, and the email and LinkedIn actions. The world adds its links to `/cv`
+   the summary file, his availability (remote and the hours, `contact.availability`, also in the `/cv` header) and contact line, and the email and LinkedIn actions. The world adds its links to `/cv`
    and to the engine.
 2. **Profession switch** (`ProfessionSwitch`, `src/components/cv/ProfessionSwitch.tsx`): Musician, System
    Engineer, Martial Artist, in that order, the engineer in the centre and opened by default.
