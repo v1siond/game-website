@@ -9,7 +9,9 @@ import cel from './cel.module.css'
 // The ventures as the wasteland's makers' plates: each company a riveted plate stamped with its mark,
 // its name in the display lettering and its tagline as the maker's motto, the way every gun in the
 // inked shooter carries its maker's stamp. Pointing at or focusing a plate presses the stamp in and a
-// burst of its colour splats behind it; a plate with a site is the link to it.
+// burst of its colour splats behind it; a plate with a site is the link to it. His own products
+// (featured) are the wide plates of the first row, an inked maker's tag over the name; the other
+// ventures follow three to a row.
 
 type Company = CVData['companies'][number]
 
@@ -33,7 +35,12 @@ function PlateFace({ company, tone }: { company: Company; tone: string }) {
           {company.name.charAt(0)}
         </span>
       </div>
-      <h3 className={`text-2xl leading-tight ${cel.display} [-webkit-text-stroke:0]`}>
+      {company.featured && (
+        <p className="mb-2 inline-block -skew-x-6 border-2 border-[var(--cel-ink)] bg-[var(--cel-ink)] px-2 py-0.5 text-sm font-bold uppercase tracking-wider text-[var(--cel-white)]">
+          {cards.ownProduct}
+        </p>
+      )}
+      <h3 className={`leading-tight ${company.featured ? 'text-3xl' : 'text-2xl'} ${cel.display} [-webkit-text-stroke:0]`}>
         <SlashBreaks text={company.name} />
       </h3>
       {company.tagline && <p className={`mt-1 text-base font-bold italic ${cel.flavour}`}>{company.tagline}</p>}
@@ -52,21 +59,21 @@ function PlateFace({ company, tone }: { company: Company; tone: string }) {
 }
 
 export function MakersPlates({ companies }: { companies: Company[] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
-    <ul className="grid gap-8 md:grid-cols-3">
+    <ul className="grid gap-8 md:grid-cols-6">
       {companies.map((company, index) => {
         const tone = PLATE_TONES[index % PLATE_TONES.length]
         const style = { ['--i' as string]: index }
         return (
-          <li key={company.id}>
+          <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
             {company.url ? (
               <a
                 href={company.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={newTabName(links, company.name)}
+                aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
                 className={`block h-full ${cel.plate}`}
                 style={style}
               >

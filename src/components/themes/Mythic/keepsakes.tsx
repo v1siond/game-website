@@ -7,7 +7,8 @@ import u from './underworld.module.css'
 
 // The ventures as keepsakes in the cabinet: each company a gold token resting on its velvet slot, its
 // name and motto on the plaque under it. Pointing at or focusing a keepsake lifts it out of its slot; a
-// keepsake with a site is the link to it.
+// keepsake with a site is the link to it. His own products (featured) rest in the two wide slots of the
+// top shelf, a larger token and a gold plate over the name; the other ventures fill the shelf below.
 
 type Company = CVData['companies'][number]
 
@@ -24,7 +25,7 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
   return (
     <div className="flex h-full flex-col">
       <div className={`relative flex h-36 items-center justify-center ${u.slot}`} aria-hidden="true">
-        <div className={`relative h-20 w-20 ${u.keepsake}`}>
+        <div className={`relative ${company.featured ? 'h-24 w-24' : 'h-20 w-20'} ${u.keepsake}`}>
           <svg viewBox="0 0 64 64" className="absolute inset-0 h-full w-full">
             <path d={TOKENS[index % TOKENS.length]} fill={MYTH.gold} stroke={MYTH.inkLine} strokeWidth={3} />
             <path d={TOKENS[index % TOKENS.length]} fill="none" stroke={MYTH.goldPale} strokeWidth={1.5} transform="translate(32 32) scale(0.78) translate(-32 -32)" />
@@ -33,7 +34,12 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
         </div>
       </div>
       <div className="flex-1 border-x-2 border-b-2 border-[var(--myth-gold-deep)] bg-[var(--myth-panel)] p-5">
-        <h3 className={`text-lg text-[var(--myth-gold)] ${u.display}`}>
+        {company.featured && (
+          <p className={`mb-2 inline-block bg-[var(--myth-gold)] px-2 py-0.5 text-sm uppercase tracking-widest text-[var(--myth-ink)] ${u.display}`}>
+            {cards.ownProduct}
+          </p>
+        )}
+        <h3 className={`${company.featured ? 'text-xl' : 'text-lg'} text-[var(--myth-gold)] ${u.display}`}>
           <SlashBreaks text={company.name} />
         </h3>
         {company.tagline && <p className="mt-1 text-base italic text-[var(--myth-gold-pale)]">{company.tagline}</p>}
@@ -53,16 +59,22 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
 }
 
 export function Keepsakes({ companies }: { companies: Company[] }) {
-  const { links, myth } = useLabels()
+  const { links, myth, cards } = useLabels()
 
   return (
     <>
       <p className={`mb-6 ${u.hint}`}>{myth.keepsakeHint}</p>
-      <ul className={`grid gap-6 border-4 border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-3`}>
+      <ul className={`grid gap-6 border-4 border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-6`}>
         {companies.map((company, index) => (
-          <li key={company.id} className={`${u.cabinetItem} ${u.reveal}`} style={{ ['--i' as string]: index }}>
+          <li key={company.id} className={`${u.cabinetItem} ${u.reveal} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ ['--i' as string]: index }}>
             {company.url ? (
-              <a href={company.url} target="_blank" rel="noopener noreferrer" aria-label={newTabName(links, company.name)} className="block h-full">
+              <a
+                href={company.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
+                className="block h-full"
+              >
                 <Keepsake company={company} index={index} />
               </a>
             ) : (

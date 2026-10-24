@@ -15,21 +15,29 @@ import look from './world.module.css'
 // each a tag from the coat's lining that drops in once when the section comes into view and lifts toward
 // the visitor when pointed at or focused, the way the trader's screen lifts the ware in view.
 //
+// His own products (featured) are the wide wares laid first across the whole lining, a flame lit tag
+// over the name; the other ventures hang in the columns under them.
+//
 // Animated: the tags' drop (once), a ware's lift on hover or focus.
 
 function Ware({ company }: { company: Company }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={newTabName(links, company.name)}
+      aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
       className={`relative block p-4 ${look.file} ${look.focus} ${horror.ware}`}
     >
       <span className="absolute -top-2 left-1/2 h-4 w-1 -translate-x-1/2 bg-[color:var(--sh-brass)]" aria-hidden="true" />
-      <h3 className="text-base text-[color:var(--sh-ivory)]">
+      {company.featured && (
+        <p className="mb-2 inline-block bg-[color:var(--sh-flame)] px-2 py-0.5 text-sm font-bold uppercase tracking-wider text-[color:var(--sh-void)]">
+          {cards.ownProduct}
+        </p>
+      )}
+      <h3 className={`${company.featured ? 'text-lg' : 'text-base'} text-[color:var(--sh-ivory)]`}>
         <SlashBreaks text={company.name} />
       </h3>
       <p className="mb-2 text-sm text-[color:var(--sh-brass)]">{company.tagline}</p>
@@ -56,7 +64,7 @@ export function TraderWares({ companies }: { companies: Company[] }) {
       <p className="mb-4 text-sm italic text-[color:var(--sh-fog)]">{words.waresHint}</p>
       <ul className={`${MASONRY_LIST} pt-2`}>
         {companies.map((company, index) => (
-          <li key={company.id} className={`${MASONRY_ITEM} ${horror.cellDrop} ${triggered ? horror.cellDropped : ''}`} style={{ '--i': index } as CSSProperties}>
+          <li key={company.id} className={`${MASONRY_ITEM} ${company.featured ? '[column-span:all]' : ''} ${horror.cellDrop} ${triggered ? horror.cellDropped : ''}`} style={{ '--i': index } as CSSProperties}>
             <Ware company={company} />
           </li>
         ))}

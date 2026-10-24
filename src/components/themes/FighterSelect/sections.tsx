@@ -125,9 +125,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <ParryRow
           profession="engineer"
           items={sections.companies}
-          render={(items) => <ul className="grid gap-6 md:grid-cols-3">{items}</ul>}
+          render={(items) => <ul className="grid gap-6 md:grid-cols-6">{items}</ul>}
           renderItem={(company, lit) => (
-            <li key={company.id}>
+            <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
               <Lit on={lit} frame={living.parriedFrame}>
                 <VentureCard company={company} />
               </Lit>

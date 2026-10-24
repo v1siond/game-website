@@ -167,8 +167,10 @@ function BladesPass({ onPassed }: { onPassed: () => void }) {
   )
 }
 
+// His own products (featured) are the two wide contracts of the first row, ruled in full gold with a
+// gold tag under the contract number; the other ventures follow three to a row.
 export function FixerContracts({ companies }: { companies: Company[] }) {
-  const { sections, links, cyber } = useLabels()
+  const { sections, links, cyber, cards } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('badlands')
   const preview = usePreview()
   const [hot, setHot] = useState<number | null>(null)
@@ -202,21 +204,26 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
         </svg>
         <div className="relative">
           {slashing && <BladesPass onPassed={() => setPassed(true)} />}
-          <ul className="grid gap-5 md:grid-cols-3">
+          <ul className="grid gap-5 md:grid-cols-6">
             {companies.map((company, i) => (
-              <li key={company.id} className={life.contract} style={{ '--i': i } as CSSProperties} onPointerEnter={() => setHot(i)} onPointerLeave={() => setHot(null)} onFocus={() => setHot(i)} onBlur={() => setHot(null)}>
+              <li key={company.id} className={`${life.contract} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ '--i': i } as CSSProperties} onPointerEnter={() => setHot(i)} onPointerLeave={() => setHot(null)} onFocus={() => setHot(i)} onBlur={() => setHot(null)}>
                 <Scannable kind="use" title={sections.ventures} fact={company.tagline}>
                   <a
                     href={company.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={newTabName(links, `${company.name}: ${company.tagline}. ${company.description}`)}
-                    className={`${world.cut} block border border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)] bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)]`}
+                    aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}. ${company.description}`)}
+                    className={`${world.cut} block border bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)] ${company.featured ? 'border-[color:var(--neon-gold)]' : 'border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)]'}`}
                   >
                     <span className="block text-sm uppercase tracking-wider text-[color:var(--neon-gold)]">
                       {fillLabel(cyber.contract, { number: String(i + 1).padStart(2, '0') })}
                     </span>
-                    <span className="mt-1 block text-base text-[color:var(--neon-ice)]">
+                    {company.featured && (
+                      <span className="mt-2 inline-block bg-[color:var(--neon-gold)] px-2 py-0.5 text-sm uppercase tracking-wider text-[color:var(--neon-ink)]">
+                        {cards.ownProduct}
+                      </span>
+                    )}
+                    <span className={`mt-1 block text-[color:var(--neon-ice)] ${company.featured ? 'text-lg' : 'text-base'}`}>
                       <SlashBreaks text={company.name} />
                     </span>
                     <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>

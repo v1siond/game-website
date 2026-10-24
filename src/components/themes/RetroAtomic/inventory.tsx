@@ -74,19 +74,23 @@ function Cassette() {
   )
 }
 
-/** The holotape shelf; `dug` is how many tapes the dog has dug up so far (dig.tsx), all of them by default. */
+/**
+ * The holotape shelf; `dug` is how many tapes the dog has dug up so far (dig.tsx), all of them by default.
+ * His own products (featured) are the two big tapes of the first row, a yellow vault tag over the
+ * tagline; the other ventures follow three to a row.
+ */
 export function Holotapes({ companies, dug = companies.length }: { companies: CVData['companies']; dug?: number }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
-    <ul className="grid gap-6 md:grid-cols-3">
+    <ul className="grid gap-6 md:grid-cols-6">
       {companies.map((company, index) => (
-        <li key={company.id} data-tape data-dug={index < dug || undefined}>
+        <li key={company.id} data-tape data-dug={index < dug || undefined} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
           <a
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className={`group relative block ${atomic.holotape} ${atomic.focusRing}`}
           >
             <div className="relative">
@@ -99,6 +103,9 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
             </div>
             {/* On a phone the tape's words scroll over the pinned street, so they ride on a strip of ink. */}
             <div className="mt-3 max-sm:rounded max-sm:bg-atomic-ink/90 max-sm:p-3">
+              {company.featured && (
+                <p className="mb-2 inline-block bg-atomic-yellow px-2 py-0.5 text-sm font-bold uppercase tracking-wider text-atomic-ink">{cards.ownProduct}</p>
+              )}
               <p className="text-sm font-bold text-atomic-yellow">{company.tagline}</p>
               <p className="mt-1 text-sm leading-relaxed text-atomic-ash">{company.description}</p>
             </div>

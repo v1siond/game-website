@@ -137,18 +137,25 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
   )
 }
 
+// A venture as a fight card; one of his own products (featured) is a wider gold card with a gold
+// player tag over the name, the way the select screen marks the pick.
 export function VentureCard({ company }: { company: CVData['companies'][number] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
       className={`block h-full motion-safe:transition-transform motion-safe:hover:scale-[1.02] ${FOCUS}`}
     >
-      <FightCard accent="cyan">
+      <FightCard accent={company.featured ? 'gold' : 'cyan'}>
+        {company.featured && (
+          <p className={`mb-3 inline-block bg-[color:var(--accent)] px-2 py-0.5 text-sm uppercase tracking-widest text-black ${look.display}`}>
+            {cards.ownProduct}
+          </p>
+        )}
         <div className="flex items-center gap-4">
           <span className="text-4xl" aria-hidden="true">
             {company.icon}

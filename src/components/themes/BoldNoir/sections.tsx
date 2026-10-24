@@ -126,9 +126,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <FadeInScene>
         <section aria-labelledby={headingId('noir', titles.ventures)} className="mb-16">
           <SectionTitle title={titles.ventures} />
-          <ul className="grid gap-8 md:grid-cols-3">
+          <ul className="grid gap-8 md:grid-cols-6">
             {sections.companies.map((company) => (
-              <li key={company.id}>
+              <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
                 <CompanyTag company={company} />
               </li>
             ))}

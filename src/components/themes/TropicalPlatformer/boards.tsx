@@ -15,7 +15,9 @@ import look from './jungle.module.css'
 // of different lengths pack without gaps (each board carries its place as --i, for the ground slap's
 // jolt in slap.tsx); the ventures as plank cards that open
 // the venture's site (also placed by --i, for the rhino's charge in rhino.tsx). The services read as a
-// masonry of plain boards, a title and its line, under the shared fade.
+// masonry of plain boards, a title and its line, under the shared fade. His own products (featured)
+// are the two wide planks of the first row, a bark tag in sun gold over the name; the other ventures
+// follow three to a row.
 
 export function TechBoard({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
@@ -44,25 +46,30 @@ export function TechBoard({ categories }: { categories: CVData['techStack'] }) {
 }
 
 export function VentureBoard({ companies }: { companies: CVData['companies'] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
-    <ul className="grid gap-5 md:grid-cols-3">
+    <ul className="grid gap-5 md:grid-cols-6">
       {companies.map((company, index) => (
-        <li key={company.id} style={{ '--i': index } as CSSProperties}>
+        <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'} style={{ '--i': index } as CSSProperties}>
           <a
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className={`block h-full rounded-2xl p-5 text-[color:var(--tp-bark-dark)] ${look.plank} ${look.plankText} ${look.button} ${look.focus}`}
           >
+            {company.featured && (
+              <span className={`mb-3 inline-block rounded-lg bg-[color:var(--tp-bark-dark)] px-3 py-0.5 text-sm uppercase text-[color:var(--tp-sun-gold)] ${look.display}`}>
+                {cards.ownProduct}
+              </span>
+            )}
             <span className="flex items-center gap-3">
               <span className="text-2xl" aria-hidden="true">
                 {company.icon}
               </span>
               <span className="min-w-0">
-                <span className={`block text-lg ${look.display}`}>
+                <span className={`block ${company.featured ? 'text-xl' : 'text-lg'} ${look.display}`}>
                   <SlashBreaks text={company.name} />
                 </span>
                 <span className="block text-sm">{company.tagline}</span>

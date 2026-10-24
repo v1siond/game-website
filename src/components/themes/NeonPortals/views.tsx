@@ -107,25 +107,32 @@ function Services({ services }: { services: Service[] }) {
   )
 }
 
+// His own products (featured) are the two wide panels of the first row, a gold gem tag over the name;
+// the other ventures follow three to a row.
 function Ventures({ companies }: { companies: CVData['companies'] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
   return (
-    <ul className="grid gap-6 md:grid-cols-3">
+    <ul className="grid gap-6 md:grid-cols-6">
       {companies.map((company, index) => (
-        <li key={company.id} className={scenes.lightUp} style={{ '--i': index } as CSSProperties}>
+        <li key={company.id} className={`${scenes.lightUp} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ '--i': index } as CSSProperties}>
           <a
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className={`block h-full p-5 focus:outline-none ${ui.panel}`}
           >
+            {company.featured && (
+              <span className={`mb-3 inline-block rounded-full bg-[color:var(--np-gold)] px-3 py-0.5 text-sm uppercase tracking-wide text-[color:var(--np-void)] ${ui.chunk}`}>
+                {cards.ownProduct}
+              </span>
+            )}
             <span className="flex items-center gap-3">
-              <span className="text-2xl" aria-hidden="true">
+              <span className={company.featured ? 'text-3xl' : 'text-2xl'} aria-hidden="true">
                 {company.icon}
               </span>
               <span>
-                <span className={`block text-xl ${ui.display}`}>{company.name}</span>
+                <span className={`block ${company.featured ? 'text-2xl' : 'text-xl'} ${ui.display}`}>{company.name}</span>
                 <span className="block text-sm text-[color:var(--np-gold)]">{company.tagline}</span>
               </span>
             </span>

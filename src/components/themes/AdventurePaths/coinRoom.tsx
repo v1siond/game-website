@@ -18,7 +18,9 @@ import side from './side.module.css'
 // The ventures as the underground room under the pipe (research images 10, 14, 24): black, with teal
 // bricks. He drops out of the pipe in the ceiling, lands, and runs across the room through a row of
 // coins, each one gone with a flick as he takes it, and the ventures' cards pop up one after another as
-// he runs. Under reduced motion he stands at the far side and every card shows.
+// he runs. Under reduced motion he stands at the far side and every card shows. His own products
+// (featured) pop up first, two wide cards to a row with a coin gold top and the black HUD plate over the
+// name; the other ventures follow three to a row.
 
 type RoomPose = 'drop' | 'run' | 'stand'
 
@@ -54,7 +56,7 @@ function RoomScene({ profession }: { profession: Profession }) {
 }
 
 export function CoinRoom({ companies, profession }: { companies: SectionsOf<'engineer'>['companies']; profession: Profession }) {
-  const { sections, links } = useLabels()
+  const { sections, links, cards } = useLabels()
   const { ref, on, reduced } = useZoneStage<Zone>('underground')
   // The cards come up as he runs through the room: spread over the run, after the drop.
   const cardDelay = (index: number) => DROP_MS + Math.round(((index + 1) * RUN.ms) / (companies.length + 1))
@@ -67,17 +69,24 @@ export function CoinRoom({ companies, profession }: { companies: SectionsOf<'eng
         </div>
         {on && <RoomScene profession={profession} />}
       </Playfield>
-      <ul className="grid gap-6 md:grid-cols-3" data-shown={on || reduced}>
+      <ul className="grid gap-6 md:grid-cols-6" data-shown={on || reduced}>
         {companies.map((company, index) => (
-          <li key={company.id} className={POP_CARD} style={cssVars({ '--delay': `${cardDelay(index)}ms` })}>
+          <li key={company.id} className={`${POP_CARD} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={cssVars({ '--delay': `${cardDelay(index)}ms` })}>
             <a
               href={company.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+              aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
               className="block h-full transition-transform hover:-translate-y-1 motion-reduce:transition-none"
             >
-              <article className={`${PAPER_CARD} h-full border-t-8 border-t-[color:var(--ap-cave-brick)]`}>
+              <article
+                className={`${PAPER_CARD} h-full border-t-8 ${company.featured ? 'border-t-[color:var(--ap-coin)]' : 'border-t-[color:var(--ap-cave-brick)]'}`}
+              >
+                {company.featured && (
+                  <p className="mb-2 inline-block rounded-sm bg-[color:var(--ap-hud)] px-2 py-0.5 text-sm font-bold uppercase tracking-wider text-[color:var(--ap-coin)]">
+                    {cards.ownProduct}
+                  </p>
+                )}
                 <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>
                   <SlashBreaks text={company.name} />
                 </h3>

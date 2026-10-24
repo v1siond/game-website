@@ -122,23 +122,30 @@ export function CaseCard({ slot, index, onOpen }: { slot: ProjectSlot; index: nu
   )
 }
 
+// A venture as a crooked slab; one of his own products (featured) is a wider slab with a paper tag, ink
+// capitals, pinned over the name.
 export function CompanyTag({ company }: { company: CVData['companies'][number] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
       className={`block h-full p-5 ${world.slab} ${world.kick}`}
     >
+      {company.featured && (
+        <span className="mb-3 inline-block -rotate-2 bg-[color:var(--noir-paper)] px-2 py-0.5 text-sm font-bold uppercase tracking-widest text-[color:var(--noir-ink)]">
+          {cards.ownProduct}
+        </span>
+      )}
       <span className="flex items-center gap-3">
         <span className="text-3xl" aria-hidden="true">
           {company.icon}
         </span>
         <span className="min-w-0">
-          <span className="block text-2xl tracking-wide">
+          <span className={`block tracking-wide ${company.featured ? 'text-3xl' : 'text-2xl'}`}>
             <SlashBreaks text={company.name} />
           </span>
           <span className={`block font-bold ${BODY}`}>{company.tagline}</span>

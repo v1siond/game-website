@@ -181,22 +181,31 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
         <SectionWithOrnament leftOrnament={<FTOrnament side="left" type="frost" />}>
           <section style={{ marginBottom: layout.sectionSpacing }}>
             <RealmFrame title={labels.sections.ventures} zone="ft">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(200px, 100%), 1fr))', gap: '0.75rem' }}>
+              {/* His own products (featured) take the first row two to a row, each a gold trimmed card with
+                  a gold seal over the name; the other ventures follow three to a row. */}
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-6">
                 {companies.map((company) => (
-                  <InnerCard key={company.id} zone="ft">
-                    <h3 style={CARD_TITLE}><SlashBreaks text={company.name} /></h3>
-                    <p style={{ ...CARD_SUBTITLE, fontSize: '1rem' }}>{company.tagline}</p>
-                    <p style={CARD_BODY}>{company.description}</p>
-                    <a
-                      href={company.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={newTabName(labels.links, company.name)}
-                      style={{ color: REALM.frostIceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem', overflowWrap: 'anywhere' }}
-                    >
-                      {company.url}
-                    </a>
-                  </InnerCard>
+                  <div key={company.id} className={`grid ${company.featured ? 'sm:col-span-2 lg:col-span-3' : 'lg:col-span-2'}`}>
+                    <InnerCard zone="ft" highlight={company.featured}>
+                      {company.featured && (
+                        <p className="mb-2 inline-block border border-[color:var(--realm-gold-dark)] px-2 py-0.5 text-sm font-semibold uppercase tracking-[0.08em] text-[color:var(--realm-gold-bright)]">
+                          {labels.cards.ownProduct}
+                        </p>
+                      )}
+                      <h3 style={CARD_TITLE}><SlashBreaks text={company.name} /></h3>
+                      <p style={{ ...CARD_SUBTITLE, fontSize: '1rem' }}>{company.tagline}</p>
+                      <p style={CARD_BODY}>{company.description}</p>
+                      <a
+                        href={company.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={newTabName(labels.links, company.name)}
+                        style={{ color: REALM.frostIceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem', overflowWrap: 'anywhere' }}
+                      >
+                        {company.url}
+                      </a>
+                    </InnerCard>
+                  </div>
                 ))}
               </div>
             </RealmFrame>

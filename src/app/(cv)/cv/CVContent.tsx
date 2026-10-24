@@ -8,6 +8,7 @@ import { jobYears } from '@/components/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { venturesFor } from '@/lib/cv/cvView'
 import type { Locale } from '@/i18n/config'
 
 // A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
@@ -18,6 +19,7 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
   const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, services, workExperience, labels } =
     useCVData()
   const { cvPage } = labels
+  const ventures = venturesFor(companies)
 
   // A running job has no end date, so it ends in the label for now.
   const yearRange = (job: (typeof workExperience)[number]): string => {
@@ -151,6 +153,35 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                     {labels.cards.tech}: {project.techStack.join(', ')}
                   </p>
                 )}
+              </div>
+            ))}
+          </section>
+        )}
+
+        {/* Ventures: his own products first, each marked, then the companies he works through */}
+        {ventures.length > 0 && (
+          <section className="mb-6">
+            <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">{labels.sections.ventures}</h2>
+            {ventures.map((venture) => (
+              <div key={venture.id} className="mb-4">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <h3 className="text-base font-semibold">
+                    <SlashBreaks text={venture.name} />
+                  </h3>
+                  {venture.featured && (
+                    <span className="border border-gray-900 px-1.5 text-sm font-semibold uppercase tracking-wide text-gray-900">
+                      {labels.cards.ownProduct}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm italic text-gray-700">{venture.tagline}</p>
+                <p className="text-sm mt-1">{venture.description}</p>
+                <a
+                  href={venture.url}
+                  className="inline-flex min-h-11 items-center text-sm text-blue-800 underline [overflow-wrap:anywhere] print:min-h-0"
+                >
+                  {shownUrl(venture.url)}
+                </a>
               </div>
             ))}
           </section>

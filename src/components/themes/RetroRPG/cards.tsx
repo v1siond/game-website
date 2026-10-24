@@ -181,17 +181,24 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
   )
 }
 
+// A venture as a dialogue box; one of his own products (featured) is a wider box ruled in gold with a
+// gold pixel tag over the name.
 export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${world.box} ${world.pick} ${FOCUS}`}
-      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)] md:col-span-3' : 'md:col-span-2'} ${world.box} ${world.pick} ${FOCUS}`}
+      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
     >
+      {company.featured && (
+        <p className={`mb-3 inline-block bg-[color:var(--rpg-gold)] px-2 py-1 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-void)] ${PIXEL}`}>
+          {cards.ownProduct}
+        </p>
+      )}
       <div className="mb-2 flex items-start gap-3">
         <span className="text-xl" aria-hidden="true">
           {company.icon}

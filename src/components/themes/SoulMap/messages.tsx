@@ -28,6 +28,9 @@ import souls from './souls.module.css'
 // then fades away the way another world's player does, leaving only the words. It goes once per slab and
 // is taken off the page when gone; under reduced motion only the message shows.
 
+// His own products (featured) are the wide slabs laid first across the whole floor, a gold banner tag
+// over the name; the other ventures pack into the columns under them.
+
 type Venture = CVData['companies'][number]
 
 const APPRAISE_SOULS = 100
@@ -45,7 +48,7 @@ function Scribe({ writing }: { writing: boolean }) {
 
 function Slab({ venture }: { venture: Venture }) {
   const run = useRun()
-  const { souls: words, links } = useLabels()
+  const { souls: words, links, cards } = useLabels()
   const [appraised, setAppraised] = useState(false)
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
@@ -58,8 +61,14 @@ function Slab({ venture }: { venture: Venture }) {
   return (
     <article ref={ref} className={`relative ${souls.slab} ${souls.message} ${triggered ? souls.messageOn : ''} mt-[4.75rem] p-5`}>
       <Scribe writing={triggered} />
+      {/* The badge sits outside the inscription, whose dimmed opacity and fire glow would drop its contrast */}
+      {venture.featured && (
+        <p className={`mb-2 inline-block bg-[color:var(--soul-glow)] px-2 py-0.5 text-sm uppercase tracking-[0.12em] text-[color:var(--soul-ink)] ${CARVED}`}>
+          {cards.ownProduct}
+        </p>
+      )}
       <div className={souls.inscription}>
-        <h3 className={`${CARVED} text-lg tracking-[0.08em] text-[color:var(--soul-message)]`}>
+        <h3 className={`${CARVED} ${venture.featured ? 'text-xl' : 'text-lg'} tracking-[0.08em] text-[color:var(--soul-message)]`}>
           <span className="grayscale" aria-hidden="true">
             {venture.icon}{' '}
           </span>
@@ -104,7 +113,7 @@ export function FloorMessages({ companies }: { companies: CVData['companies'] })
       <Hint>{words.messageHint}</Hint>
       <ul className={MASONRY_LIST}>
         {companies.map((venture) => (
-          <li key={venture.id} className={MASONRY_ITEM}>
+          <li key={venture.id} className={`${MASONRY_ITEM} ${venture.featured ? '[column-span:all]' : ''}`}>
             <Slab venture={venture} />
           </li>
         ))}

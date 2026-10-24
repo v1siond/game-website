@@ -169,7 +169,7 @@ export function EngineerSections({
 
       <Block label={titles.ventures} title={titles.ventures} width={WIDE}>
         <StreetRoom profession={active}>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-6">
             {sections.companies.map((company) => (
               <CompanyCard key={company.id} company={company} />
             ))}

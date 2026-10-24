@@ -142,9 +142,10 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
   )
 }
 
-// A venture as a vintage advertisement, the whole poster its link.
+// A venture as a vintage advertisement, the whole poster its link. One of his own products (featured)
+// is a wider poster with an inked roundel over the name, the way a 1930s bill shouts its headliner.
 export function CompanyPoster({ company }: { company: CVData['companies'][number] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
     <a
@@ -152,16 +153,21 @@ export function CompanyPoster({ company }: { company: CVData['companies'][number
       target="_blank"
       rel="noopener noreferrer"
       className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}
-      aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
     >
       <CornerTicks />
       <InkBlot />
+      {company.featured && (
+        <p className="relative mb-3 inline-block -rotate-3 rounded-full bg-[color:var(--hose-ink)] px-3 py-0.5 text-sm font-bold uppercase tracking-wider text-[color:var(--hose-paper)]">
+          {cards.ownProduct}
+        </p>
+      )}
       <div className="mb-2 flex items-center gap-3">
         <span className="text-3xl" aria-hidden="true">
           {company.icon}
         </span>
         <div className="min-w-0">
-          <h3 className={`text-base font-bold ${world.ink}`}>
+          <h3 className={`font-bold ${company.featured ? 'text-xl' : 'text-base'} ${world.ink}`}>
             <SlashBreaks text={company.name} />
           </h3>
           <p className={`text-sm ${world.red}`}>{company.tagline}</p>

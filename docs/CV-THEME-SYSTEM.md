@@ -85,6 +85,14 @@ whole. `/cv` reads the full CV and shows everything. Worlds get their view throu
 `src/components/cv/CVDataProvider.tsx`, and `ProfessionSectionsView` picks the world's section component for
 the shown profession from the world's map.
 
+The ventures (`companies`) come in one order everywhere: `venturesFor` in `cvView.ts` puts his own products
+first (the `featured` toggle in companies.json, Nebulith and Sillabo), then the rest, each group in file
+order. `/cv` calls the same helper; no world sorts on its own. A featured venture carries the badge
+`labels.cards.ownProduct` ("My product") and reads larger in each world's own card parts: two wide cards
+over a row of three in the grid worlds (`grid-cols-6`, `col-span-3` and `col-span-2`), the full width
+slabs above the columns in the masonry worlds (Soul Map, Survival Horror), the first cords with a larger
+medal in Art Deco, whose cord columns stay three.
+
 ## The shared pieces every world uses
 
 | Piece | File | What it does |

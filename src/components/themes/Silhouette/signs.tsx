@@ -18,6 +18,9 @@ import shade from './shade.module.css'
 // signs side by side on their posts; stacked on a phone. A power cable runs over the signs, and as
 // they light he crosses it hand over hand from one end to the other, once, and hangs there.
 //
+// His own products (featured) hang first, two wide signs to a row from a laptop up, each with a small
+// plate over the name; the other ventures follow three to a row.
+//
 // Animated: one sign per entry (once), the one being touched, him on the cable (once) and his parts.
 
 const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]'
@@ -87,16 +90,16 @@ function Rooftops({ light, children }: { light: SkyLight; children: ReactNode })
 }
 
 export function VentureSigns({ companies }: { companies: CVData['companies'] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.15 })
 
   return (
     <div ref={ref}>
       <Rooftops light={PROFESSION_SKY.engineer}>
         <Cable crossing={triggered} />
-        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
           {companies.map((company, index) => (
-            <li key={company.id}>
+            <li key={company.id} className={company.featured ? 'lg:col-span-3' : 'lg:col-span-2'}>
               <Sign
                 index={index}
                 lit={triggered}
@@ -106,11 +109,16 @@ export function VentureSigns({ companies }: { companies: CVData['companies'] }) 
                         href: company.url,
                         target: '_blank',
                         rel: 'noopener noreferrer',
-                        'aria-label': newTabName(links, company.name),
+                        'aria-label': newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name),
                       }
                     : undefined
                 }
               >
+                {company.featured && (
+                  <p className="mb-3 inline-block border border-[color:var(--sh-rim)] px-2 py-0.5 text-sm uppercase tracking-[0.25em] text-[color:var(--sh-heading)]">
+                    {cards.ownProduct}
+                  </p>
+                )}
                 <h3 className={`${TITLE} group-hover:underline`}>
                   <span className="mr-2 grayscale" aria-hidden="true">
                     {company.icon}

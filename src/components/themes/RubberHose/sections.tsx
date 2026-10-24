@@ -158,9 +158,9 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <section aria-labelledby="hose-ventures">
             <CurlBanner id="hose-ventures">{titles.ventures}</CurlBanner>
             <StageCurtains on={on} profession="engineer">
-              <ul className="grid gap-4 md:grid-cols-3">
+              <ul className="grid gap-4 md:grid-cols-6">
                 {sections.companies.map((company) => (
-                  <li key={company.id}>
+                  <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
                     <CompanyPoster company={company} />
                   </li>
                 ))}

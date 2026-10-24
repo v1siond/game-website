@@ -1126,25 +1126,32 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
 })
 
 // Company card
+// His own products (featured) take the first row two to a row, a wider card with a gold plaque over
+// the name; the other ventures follow three to a row.
 const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  const { links } = useLabels()
+  const { links, cards } = useLabels()
   return (
     <a
       href={company.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]"
+      className={`block p-4 transition-transform hover:scale-[1.02] group min-h-[44px] ${company.featured ? 'md:col-span-3' : 'md:col-span-2'} focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]`}
       style={{
         background: `linear-gradient(135deg, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidPurple})`,
         border: `1px solid ${DARK_FANTASY.stoneDark}`,
         borderRadius: '4px',
       }}
-      aria-label={newTabName(links, `${company.name}, ${company.tagline}`)}
+      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}, ${company.tagline}`)}
     >
+      {company.featured && (
+        <span className="mb-3 inline-block border border-[color:var(--df-spirit-gold)] px-2 py-0.5 text-sm uppercase tracking-widest text-[color:var(--df-spirit-gold)]">
+          {cards.ownProduct}
+        </span>
+      )}
       <div className="flex items-center gap-3 mb-2">
-        <span className="text-2xl" aria-hidden="true">{company.icon}</span>
+        <span className={company.featured ? 'text-3xl' : 'text-2xl'} aria-hidden="true">{company.icon}</span>
         <div className="min-w-0">
-          <h3 className="text-lg transition-colors" style={{ color: DARK_FANTASY.bone }}>
+          <h3 className={`${company.featured ? 'text-xl' : 'text-lg'} transition-colors`} style={{ color: DARK_FANTASY.bone }}>
             <SlashBreaks text={company.name} />
           </h3>
           <p className="text-sm" style={{ color: DARK_FANTASY.spiritGold }}>{company.tagline}</p>
@@ -1624,7 +1631,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
       </ScrollScene>
 
       <FramedSection title={labels.sections.ventures}>
-        <div className="grid md:grid-cols-3 gap-3 md:gap-4">
+        <div className="grid md:grid-cols-6 gap-3 md:gap-4">
           {companies.map((company) => (
             <CompanyCard key={company.id} company={company} />
           ))}

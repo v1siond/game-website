@@ -25,6 +25,9 @@ import v from './ventures.module.css'
 // walk plays in place and one yank drops every furled banner in a cascade down the stack (the column
 // count is read from the laid out list at the pull). Reduced motion: every banner hangs open, he stands
 // still, the tassels do nothing.
+//
+// His own products (featured) hang in the first cords, each with a larger medal and a gold plate
+// over the name, so the grid and its cord columns stay as they are.
 
 type Company = CVData['companies'][number]
 type Act = 'rest' | 'walk' | 'pull'
@@ -60,7 +63,7 @@ function LobbyBay() {
 }
 
 function Banner({ company, open, wave, onTassel }: { company: Company; open: boolean; wave: number; onTassel: () => void }) {
-  const { links, deco } = useLabels()
+  const { links, deco, cards } = useLabels()
   return (
     <div className="relative">
       <div className={`relative z-10 h-3 ${v.rod}`} aria-hidden="true" />
@@ -72,12 +75,20 @@ function Banner({ company, open, wave, onTassel }: { company: Company; open: boo
             target="_blank"
             rel="noopener noreferrer"
             tabIndex={open ? undefined : -1}
-            aria-label={newTabName(links, `${company.name}: ${company.tagline}`)}
+            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className="block text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--deco-gold-bright)]"
           >
-            <span className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center text-3xl ${v.medal}`} aria-hidden="true">
+            <span
+              className={`mx-auto mb-4 flex items-center justify-center ${company.featured ? 'h-20 w-20 text-4xl' : 'h-16 w-16 text-3xl'} ${v.medal}`}
+              aria-hidden="true"
+            >
               {company.icon}
             </span>
+            {company.featured && (
+              <span className="mb-3 inline-block bg-[color:var(--deco-gold-bright)] px-3 py-0.5 text-sm uppercase tracking-[0.3em] text-[color:var(--deco-abyss)]">
+                {cards.ownProduct}
+              </span>
+            )}
             <h3 className={`text-lg uppercase tracking-[0.12em] ${v.title}`}>
               <SlashBreaks text={company.name} />
             </h3>
