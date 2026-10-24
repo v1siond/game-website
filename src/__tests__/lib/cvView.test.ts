@@ -68,7 +68,10 @@ describe('viewFor: the recruiter hero', () => {
     expect(hero.name).toBe('Alexander Pulido')
     expect(hero.headline).toBe(cv.professionalSummary.headline)
     expect(hero.tagline).toBe(cv.professionalSummary.tagline)
-    expect(hero.line).toBe(cv.contact.line)
+    expect(hero.line).toBe(
+      'Remote, working US Eastern and Italian hours. Always interested in hearing new ideas and proposals. Send the project and the date it has to ship.',
+    )
+    expect(hero.line).toBe(`${cv.contact.availability} ${cv.contact.line}`)
     expect(hero.actions).toEqual({
       email: { href: `mailto:${cv.contact.email}`, value: cv.contact.email },
       linkedin: { href: cv.contact.linkedin, value: cv.contact.linkedin },

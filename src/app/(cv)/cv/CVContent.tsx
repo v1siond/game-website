@@ -79,6 +79,8 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
             <a href={contact.linkedin} className="inline-flex min-h-11 items-center text-blue-800 underline print:min-h-0">
               {shownUrl(contact.linkedin)}
             </a>
+            <span aria-hidden="true">|</span>
+            <span>{contact.availability}</span>
           </div>
         </header>
 

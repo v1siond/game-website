@@ -138,7 +138,7 @@ const heroFor = ({ fullName, professionalSummary, contact }: CVData): RecruiterH
   name: fullName,
   headline: professionalSummary.headline,
   tagline: professionalSummary.tagline,
-  line: contact.line,
+  line: `${contact.availability} ${contact.line}`,
   actions: {
     email: { href: `mailto:${contact.email}`, value: contact.email },
     linkedin: { href: contact.linkedin, value: contact.linkedin },

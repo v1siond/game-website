@@ -63,6 +63,7 @@ collections:
             fields:
               - { <<: *fixed, label: Email, name: email }
               - { <<: *fixed, label: LinkedIn, name: linkedin }
+              - { <<: *text, label: Availability (remote and hours, shown first), name: availability }
               - { <<: *text, label: Line, name: line }
 
       - name: experience
