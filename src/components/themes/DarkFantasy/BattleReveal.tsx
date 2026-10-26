@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, memo, ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_IN_VIEW, moveAndFade } from './fixedCombat'
+import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
 import bugMotion from './bug.module.css'
 import { DARK_FANTASY } from './palette'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -57,6 +57,9 @@ const PHASE_TIMING = {
   'content-drop': 2000,
   'complete': 2500,
 }
+
+// The floor the knight and the bug stand on, read by both so their feet meet one line.
+const GROUND = 'bottom-[15%]'
 
 export const BattleReveal = memo(function BattleReveal({
   children,
@@ -373,13 +376,13 @@ export const BattleReveal = memo(function BattleReveal({
         aria-live="polite"
         aria-label={isAnimating ? navigation.battleInProgress : navigation.contentRevealed}
       >
-        {/* Knight + bug pinned to the viewport corners (left-15% / right-18%, bottom-15-20%);
+        {/* Knight + bug pinned to the viewport corners (left-15% / right-18%), both standing on GROUND;
             only the content below scrolls past them. Fades out as the section leaves view. */}
         <FixedCombatLayer inView={inView}>
         {/* Knight - CLOSER to center */}
         {showKnight && (
           <div
-            className="absolute left-[15%] bottom-[20%] z-20"
+            className={`absolute left-[15%] ${GROUND} z-20`}
             style={getKnightStyle()}
           >
             <div className={phase === 'slash' ? 'animate-knightSlash' : ''}>
@@ -426,7 +429,7 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Bug container - all bug-related effects are children so they follow the bug */}
         {showBug && (
           <div
-            className={`absolute right-[18%] bottom-[15%] z-10 ${bugTremble ? 'animate-bugTremble' : ''}`}
+            className={`absolute right-[18%] ${GROUND} z-10 ${bugTremble ? 'animate-bugTremble' : ''}`}
             style={getBugStyle()}
           >
             {/* Impact Burst - centered on bug */}
@@ -486,7 +489,7 @@ export const BattleReveal = memo(function BattleReveal({
 
         {/* Content - center, drops from above */}
         <div
-          className="relative z-15"
+          className={`relative ${COMBAT_Z.content}`}
           style={getContentStyle()}
         >
           {/* Drop shadow that appears as content falls */}

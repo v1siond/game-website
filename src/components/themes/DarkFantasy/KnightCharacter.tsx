@@ -1,8 +1,8 @@
 'use client'
 
-import { memo, ReactNode, useState, useEffect, useRef } from 'react'
+import { memo, ReactNode, useState, useEffect, useRef, type CSSProperties } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_IN_VIEW, moveAndFade } from './fixedCombat'
+import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
 import { DARK_FANTASY } from './palette'
 
 /**
@@ -20,6 +20,9 @@ import { DARK_FANTASY } from './palette'
  * ALEXANDER ADAPTATION:
  * - Beard extends from bottom of mask
  */
+
+// The knight's drawing width in viewBox units; his width on screen is this times his scale.
+const KNIGHT_VIEW_WIDTH = 60
 
 interface KnightCharacterProps {
   scale?: number
@@ -40,7 +43,7 @@ export const KnightCharacter = memo(function KnightCharacter({
   className = '',
   breathing = false,
 }: KnightCharacterProps) {
-  const effectiveScale = size ? size / 60 : scale
+  const effectiveScale = size ? size / KNIGHT_VIEW_WIDTH : scale
   const isLeft = facingDirection === 'left'
 
   const getNailRotation = () => {
@@ -68,9 +71,9 @@ export const KnightCharacter = memo(function KnightCharacter({
       `}</style>
     )}
     <svg
-      width={60 * effectiveScale}
+      width={KNIGHT_VIEW_WIDTH * effectiveScale}
       height={80 * effectiveScale}
-      viewBox="0 0 60 80"
+      viewBox={`0 0 ${KNIGHT_VIEW_WIDTH} 80`}
       className={className}
       style={{
         overflow: 'visible',
@@ -264,6 +267,19 @@ interface KnightSlashRevealProps {
 
 type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'content-reveal' | 'complete'
 
+// The work experience panel's width in rem (DarkFantasyTheme gives the panel this max width), the knight's
+// size there, and how far left of his entry place he rests. At rest he stands clear of the panel's right
+// edge: his entry place is the farther right of the panel's edge plus that rest, and 8% in from the
+// screen's right edge as before.
+export const SLASH_PANEL_REM = 56
+const SLASH_KNIGHT_SCALE = 1.8
+const REST_SHIFT_PX = 90
+const SLASH_KNIGHT_PLACE = {
+  '--panel-half': `${SLASH_PANEL_REM / 2}rem`,
+  '--rest': `${REST_SHIFT_PX}px`,
+  '--knight-w': `${KNIGHT_VIEW_WIDTH * SLASH_KNIGHT_SCALE}px`,
+} as CSSProperties
+
 const PHASE_TIMING = {
   'knight-enter': 500,      // 0.5s delay before animation starts
   'knight-raise': 700,
@@ -342,7 +358,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       case 'complete':
         // Knight rests closer to content (more to the left)
         return {
-          transform: 'translateX(-90px)',
+          transform: `translateX(-${REST_SHIFT_PX}px)`,
           opacity: 0.7,
           transition: moveAndFade('300ms ease-out'),
         }
@@ -383,9 +399,9 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
         />
       )}
 
-      {/* relative z-20: the transform from getContentStyle() makes this a stacking context;
-          without an explicit z-index it sinks below the fixed z-[1..6] background (transparent) */}
-      <div className="relative z-20" style={getContentStyle()}>
+      {/* COMBAT_Z.content: the transform from getContentStyle() makes this a stacking context;
+          without an explicit z-index it sinks below the fixed z-[1..8] background and the fighters */}
+      <div className={`relative ${COMBAT_Z.content}`} style={getContentStyle()}>
         {children}
       </div>
 
@@ -393,11 +409,11 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       {showKnight && (
         <FixedCombatLayer inView={inView}>
           <div
-            className="absolute right-[8%] bottom-[18%] z-20 pointer-events-none"
-            style={getKnightStyle()}
+            className="absolute bottom-[18%] left-[max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w)))] z-20 pointer-events-none"
+            style={{ ...SLASH_KNIGHT_PLACE, ...getKnightStyle() }}
           >
             <KnightCharacter
-              scale={1.8}
+              scale={SLASH_KNIGHT_SCALE}
               attacking={isAttacking}
               attackPhase={attackPhase}
               facingDirection="left"

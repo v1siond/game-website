@@ -2,7 +2,7 @@
 
 import { useState, useEffect, memo, ReactNode, useRef } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_IN_VIEW, moveAndFade } from './fixedCombat'
+import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
 import { KnightCharacter } from './KnightCharacter'
 import { BattleBug } from './BattleReveal'
 
@@ -241,7 +241,7 @@ export const BugPullReveal = memo(function BugPullReveal({
         </FixedCombatLayer>
       )}
 
-      <div className="relative z-20" style={getContentStyle()}>
+      <div className={`relative ${COMBAT_Z.content}`} style={getContentStyle()}>
         {children}
       </div>
 

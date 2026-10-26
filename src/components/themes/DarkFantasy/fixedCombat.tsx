@@ -23,6 +23,13 @@ export function moveAndFade(timing: string): string {
 }
 
 /**
+ * The one stacking order of a combat stage, read by the fixed fighters and by each reveal's content: the
+ * fighters above the room's fixed backdrop layers (z-[1] to z-[8]) and under the section content and the
+ * footer (z-20), so panel text always draws over them.
+ */
+export const COMBAT_Z = { fighters: 'z-10', content: 'z-20' } as const
+
+/**
  * FixedCombatLayer, pins the knight/bug combat to the viewport so only the section
  * CONTENT scrolls. `fixed inset-0` makes this a full-viewport box, so any child with
  * `left/right/bottom` percentages resolves against the viewport (knight ~15-20% from a
@@ -38,7 +45,7 @@ export function moveAndFade(timing: string): string {
 export function FixedCombatLayer({ inView, children }: { inView: boolean; children: ReactNode }) {
   return (
     <div
-      className="pointer-events-none fixed inset-0 z-40 origin-bottom translate-y-[8%] scale-[0.45] lg:translate-y-0 lg:scale-100"
+      className={`pointer-events-none fixed inset-0 ${COMBAT_Z.fighters} origin-bottom translate-y-[8%] scale-[0.45] lg:translate-y-0 lg:scale-100`}
       style={{ opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' }}
       aria-hidden="true"
     >
