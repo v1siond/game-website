@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { getAllCVData } from '@/lib/cv-data'
 import { getPost, listPosts } from '@/lib/blog/posts'
@@ -33,21 +32,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return blogMetadata(cv, post)
 }
 
-function Cover({ post }: Readonly<{ post: Post }>) {
-  if (!post.cover) return null
-  return (
-    <Image
-      src={post.cover}
-      alt={post.coverAlt ?? ''}
-      width={0}
-      height={0}
-      sizes="(min-width: 850px) 786px, 100vw"
-      priority
-      className="mt-6 h-auto w-full rounded-md border border-gray-300"
-    />
-  )
-}
-
 export default async function PostPage({ params }: Props) {
   const post = await postAt(params)
   const cv = await getAllCVData('en')
@@ -64,16 +48,15 @@ export default async function PostPage({ params }: Props) {
       <BlogToolbar label={navigation.primaryNavigation} links={links} />
       <main className="mx-auto max-w-[850px] px-4 py-8 sm:px-8">
         <article>
-          <header className="max-w-[72ch] border-b-2 border-black pb-4">
+          <header className="max-w-[40rem] border-b-2 border-black pb-4">
             <h1 className="text-[clamp(1.75rem,6vw,2.25rem)] font-bold leading-tight">{post.title}</h1>
             <p className="mt-3 flex flex-wrap items-center gap-3 text-base text-gray-600">
               <time dateTime={post.date}>{shownDate(post.date)}</time>
               {post.draft && <DraftMark label={blog.draft} />}
             </p>
           </header>
-          <Cover post={post} />
           {/* The HTML renderMarkdown built from the post's own Markdown, raw HTML left out. */}
-          <div className="post-body mt-8 max-w-[72ch]" dangerouslySetInnerHTML={{ __html: html }} />
+          <div className="post-body mt-8 max-w-[40rem]" dangerouslySetInnerHTML={{ __html: html }} />
         </article>
         <BlogFooterLinks links={links} />
       </main>

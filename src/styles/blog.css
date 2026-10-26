@@ -48,12 +48,6 @@
   text-decoration-thickness: 2px;
 }
 
-.post-body a:focus-visible {
-  outline: 2px solid #1e40af;
-  outline-offset: 2px;
-  border-radius: 2px;
-}
-
 .post-body strong {
   font-weight: 700;
 }
@@ -139,12 +133,6 @@
   border: 1px solid #d1d5db;
   border-radius: 6px;
   tab-size: 2;
-}
-
-/* A code block is a tab stop (it may scroll sideways), so its focus shows like the links'. */
-.post-body pre:focus-visible {
-  outline: 2px solid #1e40af;
-  outline-offset: 2px;
 }
 
 .post-body pre code {

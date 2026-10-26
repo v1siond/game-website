@@ -30,18 +30,18 @@ A state machine runs cover for COVER_MS (720 ms), swaps the world, scrolls to 0 
 *The swap happens while nothing of the old page is visible.*
 
 ```ts
-      const t1 = window.setTimeout(() => {
-        setThemeById(id)
-        window.scrollTo(0, 0)
-        setPhase('reveal')
+const t1 = window.setTimeout(() => {
+  setThemeById(id)
+  window.scrollTo(0, 0)
+  setPhase('reveal')
 
-        const t2 = window.setTimeout(() => {
-          setPhase('idle')
-          setDestId(null)
-        }, REVEAL_MS)
-        timers.current.push(t2)
-      }, COVER_MS)
-      timers.current.push(t1)
+  const t2 = window.setTimeout(() => {
+    setPhase('idle')
+    setDestId(null)
+  }, REVEAL_MS)
+  timers.current.push(t2)
+}, COVER_MS)
+timers.current.push(t1)
 ```
 
 *WorldTransitionContext.tsx at 4b5d3ba*
