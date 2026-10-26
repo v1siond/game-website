@@ -130,16 +130,16 @@ export function ShopCounter({ on, reduced, profession, children }: { on: boolean
 
 export function StageCurtains({ on, profession, children }: { on: boolean; profession: Profession; children: ReactNode }) {
   return (
-    <div className={`relative overflow-clip px-2 pb-10 pt-4 ${stage.theatre}`} data-open={on || undefined}>
+    <div className={`relative overflow-clip px-2 pt-4 ${stage.theatre}`} data-open={on || undefined}>
       {children}
       <div className={`pointer-events-none absolute inset-y-0 left-0 w-1/2 ${stage.curtain} ${stage.curtainLeft}`} aria-hidden="true" />
       <div className={`pointer-events-none absolute inset-y-0 right-0 w-1/2 ${stage.curtain} ${stage.curtainRight}`} aria-hidden="true" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-8 items-center justify-around" aria-hidden="true">
+      <div className={`pointer-events-none absolute inset-x-0 bottom-0 flex items-center justify-around ${stage.footlights}`} aria-hidden="true">
         {[0, 1, 2, 3, 4].map((i) => (
           <span key={i} className={`h-3 w-6 rounded-t-full bg-[var(--hose-gold)] ${stage.footlight}`} />
         ))}
       </div>
-      <div className={`pointer-events-none absolute -bottom-1 right-2 h-24 w-14 ${stage.bow}`} aria-hidden="true">
+      <div className={`pointer-events-none absolute right-2 w-14 ${stage.bow}`} aria-hidden="true">
         <HeroCharacter profession={profession} pose="cheer" className="h-full w-full" />
       </div>
     </div>

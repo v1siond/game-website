@@ -215,7 +215,21 @@
   transform: scaleX(0.08);
 }
 
+/* The footlight strip is the stage floor he bows on, and the stage keeps room under the posters for the
+ * strip and his height, so he stands clear of the last poster. */
+.theatre {
+  --footlights: 2rem;
+  --bow-height: 6rem;
+  padding-bottom: calc(var(--footlights) + var(--bow-height));
+}
+
+.footlights {
+  height: var(--footlights);
+}
+
 .bow {
+  bottom: var(--footlights);
+  height: var(--bow-height);
   opacity: 0;
   transform: translate3d(0, 20px, 0);
 }
