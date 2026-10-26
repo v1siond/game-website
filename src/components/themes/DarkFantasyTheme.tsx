@@ -1769,7 +1769,7 @@ export default function DarkFantasyTheme() {
   return (
     <div
       style={DARK_FANTASY_VARS}
-      className="min-h-screen relative overflow-hidden [--focus-ring:var(--df-spirit-gold)] bg-gradient-to-b from-[color:var(--df-void)] via-[color:var(--df-void-deep)] to-[color:var(--df-void-purple)] font-['Comic_Sans_MS','Comic_Sans',cursive]"
+      className="min-h-screen relative overflow-hidden [--focus-ring:var(--df-spirit-gold)] [--focus-halo:var(--df-void)] bg-gradient-to-b from-[color:var(--df-void)] via-[color:var(--df-void-deep)] to-[color:var(--df-void-purple)] font-['Comic_Sans_MS','Comic_Sans',cursive]"
     >
       {/* Skip Link for accessibility */}
       <SkipLink href="#main-content" />

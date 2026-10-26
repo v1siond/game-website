@@ -221,10 +221,11 @@ function Hardware() {
 function Screen({ children }: { children: ReactNode }) {
   return (
     <div className={`relative overflow-hidden rounded-[1.6rem] p-4 sm:p-6 ${atomic.tube}`}>
-      {children}
+      {/* the vignette darkens the glass under the words, never the words at the tube's edge */}
+      <span className={`pointer-events-none absolute inset-0 ${atomic.vignette}`} aria-hidden="true" />
+      <div className="relative">{children}</div>
       <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
       <span className={`pointer-events-none absolute inset-x-0 top-0 h-16 ${atomic.refreshBar} ${atomic.ambient}`} aria-hidden="true" />
-      <span className={`pointer-events-none absolute inset-0 ${atomic.vignette}`} aria-hidden="true" />
     </div>
   )
 }

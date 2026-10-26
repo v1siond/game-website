@@ -101,8 +101,8 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
                 </p>
               </div>
             </div>
-            {/* On a phone the tape's words scroll over the pinned street, so they ride on a strip of ink. */}
-            <div className="mt-3 max-sm:rounded max-sm:bg-atomic-ink/90 max-sm:p-3">
+            {/* The tape's words pass over the street scene at every width, so they ride on a strip of ink. */}
+            <div className="mt-3 rounded bg-atomic-ink/90 p-3">
               {company.featured && (
                 <p className="mb-2 inline-block bg-atomic-yellow px-2 py-0.5 text-sm font-bold uppercase tracking-wider text-atomic-ink">{cards.ownProduct}</p>
               )}

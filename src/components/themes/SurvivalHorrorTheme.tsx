@@ -54,7 +54,7 @@ export default function SurvivalHorrorTheme() {
   const state = useMemo(() => ({ herbs, takeHerbs, saves, save }), [herbs, saves, save])
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-flame)] ${look.root}`} style={SH_VARS}>
+    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-flame)] [--focus-halo:var(--sh-void)] ${look.root}`} style={SH_VARS}>
       <DoorProvider>
         <ZoneStageProvider value={zones}>
           <StageProvider value={state}>

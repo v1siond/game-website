@@ -33,7 +33,7 @@ export function RealmButton({
 
   const style: CSSProperties = {
     background: variant === 'primary'
-      ? `linear-gradient(180deg, ${REALM.goldMid} 0%, ${REALM.goldDark} 50%, ${REALM.goldDeep} 100%)`
+      ? `linear-gradient(180deg, ${REALM.goldPlate} 0%, ${REALM.goldPlateDark} 50%, ${REALM.goldPlateDeep} 100%)`
       : active
         ? `linear-gradient(180deg, ${REALM.metalLight} 0%, ${REALM.metalMid} 100%)`
         : `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
@@ -41,7 +41,7 @@ export function RealmButton({
     boxShadow: active
       ? `0 0 10px ${accentColor}, inset 1px 1px 0 ${REALM.metalHighlight}`
       : `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-    color: variant === 'primary' ? REALM.primaryInk : active ? accentBright : REALM.textBright,
+    color: variant === 'primary' ? REALM.bgVoid : active ? accentBright : REALM.textBright,
     fontFamily: '"Cinzel", Georgia, serif',
     fontSize: '1.125rem',
     fontWeight: 600,

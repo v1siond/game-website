@@ -320,8 +320,9 @@
     0 0 18px theme('colors.atomic.phosphor / 0.25');
 }
 
+/* The scanline dims a phosphor glyph it crosses to 75 percent, 7.9 to 1 on the glass; deeper lines took it under 7. */
 .scanlines {
-  background: repeating-linear-gradient(0deg, theme('colors.atomic.ink / 0.32') 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(0deg, theme('colors.atomic.ink / 0.25') 0 1px, transparent 1px 3px);
 }
 
 .refreshBar {

@@ -41,7 +41,7 @@ export default function SoulMapTheme() {
 
   return (
     <RunProvider>
-      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--soul-glow)] ${CARVED} ${ashen.world}`} style={SOUL_VARS}>
+      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--soul-glow)] [--focus-halo:var(--soul-abyss)] ${CARVED} ${ashen.world}`} style={SOUL_VARS}>
         <AshFall />
 
         <header className="relative z-20">

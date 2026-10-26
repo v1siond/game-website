@@ -40,7 +40,7 @@ export default function SilhouetteTheme() {
 
   return (
     <CutProvider>
-      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-rim)] ${TYPEWRITER} ${world.world}`} style={SHADE_VARS}>
+      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-rim)] [--focus-halo:var(--sh-void)] ${TYPEWRITER} ${world.world}`} style={SHADE_VARS}>
         <Atmosphere />
 
         <header className="relative z-30">

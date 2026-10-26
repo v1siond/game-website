@@ -56,8 +56,11 @@ export const REALM = {
   textBright: '#e8dcc8',
   textMid: '#b09878',
   textDim: '#bcaf9e',
-  // The primary button's ink: a near white of the void's own grey, the lightest the gold plate allows.
-  primaryInk: '#f6f6f8',
+  // The Email me plate: goldMid, goldDark and goldDeep each lifted in their own hue so the void ink reads 7.2 to 1
+  // from the top of the gradient to the bottom; the three golds stay on the trim and the art.
+  goldPlate: '#c6910c',
+  goldPlateDark: '#c2931c',
+  goldPlateDeep: '#bb9618',
 
   // Stone and shadow, the dark neutrals of rock, walls and night ground
   stone1: '#010203',

@@ -50,7 +50,7 @@ export default function MedievalFantasyTheme() {
   const { sectionSpacing } = layout
 
   return (
-    <div className="[--focus-ring:var(--realm-gold-bright)]" style={{ ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
+    <div className="[--focus-ring:var(--realm-gold-bright)] [--focus-halo:var(--realm-bg-void)]" style={{ ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
       {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
       {mounted && <DualZoneAtmosphere />}
 

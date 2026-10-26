@@ -53,7 +53,7 @@ export default function RetroAtomicTheme() {
   if (!mounted) return null
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] ${atomic.root} ${atomicFace.variable}`}>
+    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] ${atomic.root} ${atomicFace.variable}`}>
       <JourneyBackdrop zone={zone} />
       {!reducedMotion && <VaultEntrance onOpened={onOpened} />}
 

@@ -80,7 +80,7 @@ const pickOf = (cell: HackCell, state: HackState): HackAction | null => {
 
 function DumpRow({ address, cells, state, onPick }: { address: string; cells: HackCell[]; state: HackState; onPick: (pick: HackAction) => void }) {
   return (
-    <p className="flex gap-3 whitespace-pre text-sm leading-7">
+    <p className="flex gap-3 whitespace-pre text-sm leading-[2.75rem]">
       <span className="text-atomic-phosphor-dim-text" aria-hidden="true">
         {address}
       </span>
@@ -96,9 +96,9 @@ function DumpRow({ address, cells, state, onPick }: { address: string; cells: Ha
             )
           }
           return (
-            // the word sits on a dump line under 44px tall and the shortest word is 24px wide, so an invisible
-            // band 8px above and below and 10px each side carries the tap at 44px or more both ways
-            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative before:absolute before:-inset-x-2.5 before:-inset-y-2 before:content-[''] ${atomic.dumpPick} ${atomic.focusRing}`}>
+            // each dump line is 44px tall and the pick fills it, so picks on lines above and below never share a
+            // pixel; a pick under 44px wide grows an invisible band each side to 44px, a wider one keeps its width
+            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative inline-block h-11 leading-[2.75rem] before:absolute before:inset-y-0 before:left-[min(0px,calc((100%-44px)/2))] before:right-[min(0px,calc((100%-44px)/2))] before:content-[''] ${atomic.dumpPick} ${atomic.focusRing}`}>
               <span className="relative">{text}</span>
             </button>
           )
@@ -203,7 +203,8 @@ export function ContactTerminal() {
       <Wasteland walking={on} />
       <div className={`relative mx-auto max-w-6xl p-3 sm:p-5 ${atomic.device}`} data-on={on || undefined}>
         <div className={`relative overflow-hidden rounded-[1.4rem] p-5 sm:p-8 ${atomic.tube}`}>
-          <div className={`grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${atomic.sectionPower}`}>
+          <span className={`pointer-events-none absolute inset-0 ${atomic.vignette}`} aria-hidden="true" />
+          <div className={`relative grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${atomic.sectionPower}`}>
             <div>
               <h2 id={atomicId(title)} className={`text-3xl font-bold uppercase tracking-[0.2em] text-atomic-phosphor ${atomic.glow}`}>
                 {title}
@@ -214,7 +215,6 @@ export function ContactTerminal() {
             {board && <PasswordGame key={seed} board={board} onReboot={() => setSeed((current) => current + 1)} />}
           </div>
           <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
-          <span className={`pointer-events-none absolute inset-0 ${atomic.vignette}`} aria-hidden="true" />
         </div>
       </div>
     </section>
