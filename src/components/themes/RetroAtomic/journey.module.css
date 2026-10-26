@@ -191,8 +191,8 @@
 
 /* ---- tech stack: the footlocker loot (footlocker.tsx) ----
  * The locker waits on the floor at his side, rides up onto his shoulder with the hoist (1.1 s), the lid flips
- * open, then it shakes once per pocket while each pocket tumbles down into the inventory. --pour, --pocket
- * and --pockets come from footlocker.tsx. */
+ * open, then it shakes once per pocket while each pocket tumbles down into the inventory. --pour, --pocket,
+ * --pockets and the carry's turns (--lid-open, --carry-tilt, --lid-hinge) come from footlocker.tsx. */
 
 .locker {
   transform-origin: 50% 100%;
@@ -205,7 +205,7 @@
 
 .lockerLid {
   transform-box: view-box;
-  transform-origin: 6px 22px;
+  transform-origin: var(--lid-hinge);
 }
 
 .loot[data-on] .lockerLid {
@@ -240,12 +240,12 @@
 @keyframes locker-up {
   0%, 30% { transform: translate(2.6rem, 5.5rem) rotate(0deg); }
   55% { transform: translate(1.4rem, 2rem) rotate(16deg); }
-  100% { transform: translate(0, 0) rotate(-12deg); }
+  100% { transform: translate(0, 0) rotate(var(--carry-tilt)); }
 }
 
 @keyframes lid-open {
   from { transform: rotate(0deg); }
-  to { transform: rotate(-118deg); }
+  to { transform: rotate(var(--lid-open)); }
 }
 
 @keyframes glow-on {
@@ -362,9 +362,9 @@
   .fetchTape, .fetch[data-on] .fetchTape { animation: none; opacity: 1; transform: translate(12px, 22px) rotate(24deg); }
   .fetch .fetchPanel, .fetch[data-on] .fetchPanel { animation: none; opacity: 1; transform: none; }
   .levelUp, .stamp[data-on] .levelUp { animation: none; opacity: 1; transform: rotate(-2deg); }
-  .locker, .loot[data-on] .locker { animation: none; transform: rotate(-12deg); }
+  .locker, .loot[data-on] .locker { animation: none; transform: rotate(var(--carry-tilt)); }
   .loot[data-on] .lockerShake, .weightFill { animation: none; transition: none; }
-  .lockerLid, .loot[data-on] .lockerLid { animation: none; transform: rotate(-118deg); }
+  .lockerLid, .loot[data-on] .lockerLid { animation: none; transform: rotate(var(--lid-open)); }
   .lockerGlow, .loot[data-on] .lockerGlow { animation: none; opacity: 0.9; }
   .loot li[data-pocket], .loot[data-on] li[data-pocket] { animation: none; opacity: 1; }
   .vats [data-shot='hit'] .hitBurst { animation: none; }

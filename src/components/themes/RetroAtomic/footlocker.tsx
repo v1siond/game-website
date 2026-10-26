@@ -21,11 +21,69 @@ import j from './journey.module.css'
 const POUR_MS = 1500
 const POCKET_MS = 320
 
-// His drawn box takes his viewBox's ratio, so the hoist grip is the same fraction of it at every size.
-const DRAWN = {
+// The locker's drawing in px (its viewBox draws 1 to 1): the box, the lid on its hinge at the lid's bottom
+// left, and the two turns of the carry, the lid flipped open and the whole locker tilted on his shoulder
+// round its handle. journey.module.css reads the turns and the hinge as --lid-open, --carry-tilt and
+// --lid-hinge, and the room he keeps for the lid is worked out from the same numbers below.
+const LOCKER = { width: 80, height: 56 }
+const LID = { x: 6, y: 10, width: 68, height: 12 }
+const HINGE = { x: LID.x, y: LID.y + LID.height }
+const LID_OPEN_DEG = -118
+const CARRY_TILT_DEG = -12
+
+// His box in px, and his drawing inside it at his viewBox's ratio, centred, where his hand ends the hoist.
+const BOX = { width: 86.4, height: 128 }
+const DRAWN_WIDTH = (BOX.height * VIEW.width) / VIEW.height
+const GRIP = {
+  left: (BOX.width - DRAWN_WIDTH) / 2 + (HOIST_GRIP.x / VIEW.width) * DRAWN_WIDTH,
+  top: (HOIST_GRIP.y / VIEW.height) * BOX.height,
+}
+
+interface Point {
+  x: number
+  y: number
+}
+
+const turn = ({ x, y }: Point, about: Point, deg: number): Point => {
+  const rad = (deg * Math.PI) / 180
+  const dx = x - about.x
+  const dy = y - about.y
+  return { x: about.x + dx * Math.cos(rad) - dy * Math.sin(rad), y: about.y + dx * Math.sin(rad) + dy * Math.cos(rad) }
+}
+
+const corners = ({ x, y, width, height }: Point & { width: number; height: number }): Point[] => [
+  { x, y },
+  { x: x + width, y },
+  { x, y: y + height },
+  { x: x + width, y: y + height },
+]
+
+// The handle at the locker's bottom centre: the point his hand holds and the point the carry tilts round.
+const HANDLE = { x: LOCKER.width / 2, y: LOCKER.height }
+const CARRIED = [...corners(LID).map((point) => turn(point, HINGE, LID_OPEN_DEG)), ...corners({ x: 0, y: 0, ...LOCKER })].map((point) =>
+  turn(point, HANDLE, CARRY_TILT_DEG),
+)
+
+// How far the open locker reaches left of and above his hand, and the room his box keeps on its left and
+// above it, so the lid stays inside his row and under the heading.
+const REACH = {
+  left: Math.max(...CARRIED.map((point) => HANDLE.x - point.x)),
+  up: Math.max(...CARRIED.map((point) => HANDLE.y - point.y)),
+}
+
+const CARRY = {
   '--view': `${VIEW.width} / ${VIEW.height}`,
   '--grip-x': `${(HOIST_GRIP.x / VIEW.width) * 100}%`,
   '--grip-y': `${(HOIST_GRIP.y / VIEW.height) * 100}%`,
+  '--box-w': `${BOX.width}px`,
+  '--box-h': `${BOX.height}px`,
+  '--room-left': `${Math.max(0, REACH.left - GRIP.left)}px`,
+  '--room-top': `${Math.max(0, REACH.up - GRIP.top)}px`,
+  '--locker-w': `${LOCKER.width}px`,
+  '--locker-h': `${LOCKER.height}px`,
+  '--lid-hinge': `${HINGE.x}px ${HINGE.y}px`,
+  '--lid-open': `${LID_OPEN_DEG}deg`,
+  '--carry-tilt': `${CARRY_TILT_DEG}deg`,
 } as CSSProperties
 
 /** How many pockets have landed: none until the pour starts, then one more every POCKET_MS. */
@@ -44,9 +102,9 @@ function useLanded(on: boolean, total: number, instant: boolean) {
 /** The olive drab footlocker seen from the front: steel corners, a brass latch, the lid on its side hinge. */
 function Footlocker() {
   return (
-    <svg viewBox="0 0 80 56" className="h-full w-full overflow-visible" focusable="false">
+    <svg viewBox={`0 0 ${LOCKER.width} ${LOCKER.height}`} className="h-full w-full overflow-visible" focusable="false">
       <g className={j.lockerLid}>
-        <rect x={6} y={10} width={68} height={12} rx={2} fill={OLIVE_LIGHT} stroke={POSTER_INK} strokeWidth={2.5} />
+        <rect x={LID.x} y={LID.y} width={LID.width} height={LID.height} rx={2} fill={OLIVE_LIGHT} stroke={POSTER_INK} strokeWidth={2.5} />
         <path d="M6 16 H74" stroke={OLIVE_DARK} strokeWidth={1.5} />
       </g>
       <rect x={9} y={22} width={62} height={6} fill={PHOSPHOR} className={j.lockerGlow} />
@@ -84,10 +142,10 @@ export function Loot({ categories, on, children }: { categories: CVData['techSta
   return (
     <div style={timing}>
       <div className="mb-4 flex items-end gap-4 sm:gap-6">
-        <div className="relative ml-8 h-32 w-[5.4rem] shrink-0" aria-hidden="true">
-          <div className="absolute left-1/2 top-0 h-full -translate-x-1/2 aspect-[var(--view)]" style={DRAWN}>
-            {/* the locker's bottom centre (its handle, the turn's origin) hangs from his hand: -ml-10 and -mt-14 are half its w-20 and its whole h-14 */}
-            <span className={`absolute left-[var(--grip-x)] top-[var(--grip-y)] -ml-10 -mt-14 block h-14 w-20 ${j.locker}`}>
+        <div className="relative ml-[var(--room-left)] mt-[var(--room-top)] h-[var(--box-h)] w-[var(--box-w)] shrink-0" style={CARRY} aria-hidden="true">
+          <div className="absolute left-1/2 top-0 h-full -translate-x-1/2 aspect-[var(--view)]">
+            {/* the locker's handle, its bottom centre, hangs from his hand */}
+            <span className={`absolute left-[var(--grip-x)] top-[var(--grip-y)] ml-[calc(var(--locker-w)/-2)] mt-[calc(var(--locker-h)*-1)] block h-[var(--locker-h)] w-[var(--locker-w)] ${j.locker}`}>
               <span className={`block h-full w-full ${j.lockerShake}`}>
                 <Footlocker />
               </span>
