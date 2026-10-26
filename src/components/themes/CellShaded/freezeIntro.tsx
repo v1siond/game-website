@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { NameWords } from '@/components/cv/NameWords'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -49,14 +49,40 @@ const phaseFlags = (reached: ReadonlySet<Phase>) =>
 
 const DUST = [0, 1, 2]
 
-// The mesa top he lands on, in the near ridge's dune colours and hatching, drawn at the top of a
-// 120 by 24 box with its flat top on y 0, so the ridge top is the edge the box is hung from.
-function MesaTop() {
+// The mesa he lands on, in the near ridge's dune colours and hatching. Its flat top on y 0 spans the
+// viewBox's 0 to 120, which the box stretches to his box's width, and its cliffs flare past that as they
+// drop, so the ground under him is at least as wide as he is. It hangs from his box's bottom edge, a quarter
+// of his height deep, and fades out downward through its mask so it reads as the ridge going on below, not
+// a slab. The mask spans the flared cliffs too, which run past the svg's own box.
+const MESA = { flare: 12, width: 120, height: 60 }
+
+function Mesa() {
+  const fade = useId()
+  const left = -MESA.flare
+  const right = MESA.width + MESA.flare
   return (
-    <svg viewBox="0 0 120 24" preserveAspectRatio="none" className={`absolute -inset-x-6 top-full h-6 overflow-visible ${cel.inked}`} aria-hidden="true" focusable="false">
-      <path d="M0 24 L12 0 L108 0 L120 24 Z" fill={CEL.dune} />
-      <path d="M96 0 L108 0 L120 24 L108 24 Z" fill={CEL.duneShade} data-bare />
-      <path d="M96 0 L108 0 L120 24 L108 24 Z" fill={HATCH} opacity={0.45} data-bare />
+    <svg
+      viewBox={`0 0 ${MESA.width} ${MESA.height}`}
+      preserveAspectRatio="none"
+      className={`absolute left-0 top-full h-1/4 w-full overflow-visible ${cel.inked}`}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <defs>
+        <linearGradient id={`${fade}-ramp`} x1={0} y1={0} x2={0} y2={1}>
+          <stop offset={0} stopColor="white" />
+          <stop offset={1} stopColor="black" />
+        </linearGradient>
+        <mask id={fade} maskUnits="userSpaceOnUse" x={left} y={-MESA.height} width={right - left} height={MESA.height * 2}>
+          <rect x={left} y={-MESA.height} width={right - left} height={MESA.height} fill="white" data-bare />
+          <rect x={left} y={0} width={right - left} height={MESA.height} fill={`url(#${fade}-ramp)`} data-bare />
+        </mask>
+      </defs>
+      <g mask={`url(#${fade})`}>
+        <path d={`M${left} ${MESA.height} L0 0 L${MESA.width} 0 L${right} ${MESA.height} Z`} fill={CEL.dune} />
+        <path d={`M${MESA.width - MESA.flare} 0 L${MESA.width} 0 L${right} ${MESA.height} L${MESA.width} ${MESA.height} Z`} fill={CEL.duneShade} data-bare />
+        <path d={`M${MESA.width - MESA.flare} 0 L${MESA.width} 0 L${right} ${MESA.height} L${MESA.width} ${MESA.height} Z`} fill={HATCH} opacity={0.45} data-bare />
+      </g>
     </svg>
   )
 }
@@ -99,9 +125,9 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
 
       <div className={`relative mx-auto grid min-h-[86vh] max-w-6xl items-end gap-6 px-4 pb-20 pt-24 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center ${cel.shake}`}>
         {/* a pointer extra: pointing at him or clicking him plays his action, the same as each section shows */}
-        {/* his box: he runs in inside it, and the mesa top hangs from its bottom edge, so his bottom is the ridge top */}
+        {/* his box: he runs in inside it, and the mesa hangs from its bottom edge, so his bottom is the ridge top */}
         <div className="relative mx-auto h-64 w-40 sm:h-80 sm:w-48" aria-hidden="true">
-          <MesaTop />
+          <Mesa />
           <div
             className={`relative h-full w-full ${cel.runner}`}
             onPointerEnter={() => setActing(true)}
@@ -124,7 +150,8 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
 
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
-            <div className="min-w-0">
+            <div className="relative min-w-0">
+              {/* relative so on a phone, where the name sits under him, it draws over the mesa's faded foot */}
               {/* the size runs with the viewport between 3rem and 6rem, so the longest word fits a 320px
                   screen and the whole name sits on one line from about 1024px; it only wraps between words */}
               <h1 className={`text-[clamp(3rem,2rem+5vw,6rem)] leading-none ${cel.display} ${cel.nameCard}`}>
