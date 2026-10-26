@@ -74,14 +74,19 @@
     linear-gradient(160deg, color-mix(in srgb, var(--sh-moon) 18%, transparent), transparent 40%);
 }
 
-/* A prop on his floor, its place and size in his body widths and heights. */
+/* A prop on his floor, its place and width in his body widths, as tall as its drawing at that width. */
 .prop {
   position: absolute;
   bottom: 0;
   left: calc(var(--at) * 100%);
   width: calc(var(--w) * 100%);
-  height: calc(var(--h) * 100%);
+  aspect-ratio: var(--ratio);
   overflow: visible;
+}
+
+/* A prop asked to stand a given height, in his body heights. */
+.sized {
+  height: calc(var(--h) * 100%);
 }
 
 .lid,

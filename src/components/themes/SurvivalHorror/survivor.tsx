@@ -3,7 +3,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { Breath, Drop, Joint, Limb } from './rig'
 import { SH } from './palette'
-import { sweepOf, turnFor, type Gait, type Leg, type LegTurn, type Point } from './gait'
+import { footAt, sweepOf, turnFor, type Gait, type Leg, type LegTurn, type Point } from './gait'
 import rig from './rig.module.css'
 
 // Him as this world's character, a parody of the 2005 survival horror hero (Leon in the village game, named
@@ -34,6 +34,10 @@ const LEAN_AT = [25, 55] as const
 const NECK_AT = [26, 25] as const
 const FLOOR_Y = 110
 const VIEW_WIDTH = 48
+const VIEW_HEIGHT = 112
+// Half the thickness of a thigh and of a shin, as drawn by Thigh and Shin.
+const THIGH_HALF = 3.1
+const SHIN_HALF = 2.8
 
 /** His legs for the gait math (./gait): each hip, the thigh to the knee, the shin to the sole. */
 export const HERO_LEGS = {
@@ -125,6 +129,18 @@ const LIMP_B = pose(feet(3, [36, 110], [13, 110]), LIMP)
 const LIMP_PASS_B = pose(feet(1, [22, 110], [29, 101]), LIMP)
 
 const SIT = pose({ lean: 4, head: 6, frontArm: [-50, -50], backArm: [-45, -55], backLeg: [-84, 84], frontLeg: [-86, 86], drop: 22, hold: 'bare' })
+
+/**
+ * Him seated, measured from the sit pose, so the safe room's chair and desk are placed from him (./scripts,
+ * ./props): the back of his thighs in body widths from his left edge, the underside of his thighs at the hip
+ * in body heights above the floor his props stand on (the bottom of his box), and the front of his front
+ * shin in body widths.
+ */
+export const SITTING = {
+  rear: (BACK_LEG_X - THIGH_HALF) / VIEW_WIDTH,
+  seat: (VIEW_HEIGHT - (HIP_Y + SIT.drop + THIGH_HALF)) / VIEW_HEIGHT,
+  shins: (footAt(HERO_LEGS.front, SIT.frontLeg)[0] + SHIN_HALF) / VIEW_WIDTH,
+} as const
 
 export const HERO_POSES = {
   stand: STAND,
@@ -337,7 +353,7 @@ function Forearm({ x, fill, cuff }: { x: number; fill: string; cuff: boolean }) 
 function Thigh({ x, fill, holster }: { x: number; fill: string; holster: boolean }) {
   return (
     <>
-      <rect x={x - 3.1} y={54.6} width={6.2} height={26} rx={2.6} fill={fill} />
+      <rect x={x - THIGH_HALF} y={54.6} width={THIGH_HALF * 2} height={26} rx={2.6} fill={fill} />
       <rect x={x - 2.6} y={66} width={4} height={6} rx={0.6} fill={SH.cargoShade} />
       {holster && (
         <>
@@ -353,7 +369,7 @@ function Thigh({ x, fill, holster }: { x: number; fill: string; holster: boolean
 function Shin({ x, fill }: { x: number; fill: string }) {
   return (
     <>
-      <rect x={x - 2.8} y={78} width={5.6} height={24} rx={2.4} fill={fill} />
+      <rect x={x - SHIN_HALF} y={78} width={SHIN_HALF * 2} height={24} rx={2.4} fill={fill} />
       <path d={`M${x - 3.2} 100.4 H${x + 2.6} Q${x + 7} 104 ${x + 6.6} 110 H${x - 3.2} Z`} fill={SH.boot} />
       <rect x={x - 3.2} y={108.6} width={9.8} height={1.4} fill={SH.void} />
     </>
@@ -418,7 +434,7 @@ export function Survivor({ profession, pose: poseName, laser = false, className 
   )
 
   return (
-    <svg viewBox="0 0 48 112" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
+    <svg viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id={`${id}-leather`} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor={SH.bomberLit} />

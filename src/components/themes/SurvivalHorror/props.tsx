@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
-import type { Flags, Zone } from './scripts'
+import { DESK_AT, SEAT, type Flags, type Zone } from './scripts'
+import { SITTING } from './survivor'
 import { SH } from './palette'
 import stage from './stage.module.css'
 
@@ -11,17 +12,20 @@ import stage from './stage.module.css'
 // sets: the lid lifts, the lamp lights, a door leaf swings, the coat opens, the safe door shakes.
 
 interface PlaceProps {
-  // From his left edge, in his body widths; its own size in his widths and heights.
+  // From his left edge and wide, in his body widths. Tall in his body heights when `h` is given, the drawing
+  // stretched to that box; without it, as tall as the drawing is at that width.
   at: number
   w: number
-  h: number
+  h?: number
   children: ReactNode
   viewBox: string
 }
 
 function Place({ at, w, h, viewBox, children }: PlaceProps) {
+  const [, , width, height] = viewBox.split(' ').map(Number)
+  const vars = { '--at': at, '--w': w, '--h': h, '--ratio': width / height } as CSSProperties
   return (
-    <svg viewBox={viewBox} preserveAspectRatio="xMidYMax meet" className={stage.prop} style={{ '--at': at, '--w': w, '--h': h } as CSSProperties} aria-hidden="true" focusable="false">
+    <svg viewBox={viewBox} preserveAspectRatio="none" className={`${stage.prop} ${h === undefined ? '' : stage.sized}`} style={vars} aria-hidden="true" focusable="false">
       {children}
     </svg>
   )
@@ -31,7 +35,7 @@ const turned = (on: boolean, className: string) => `${className} ${on ? stage.on
 
 function Chest({ open }: { open: boolean }) {
   return (
-    <Place at={1} w={1.1} h={0.34} viewBox="0 0 110 76">
+    <Place at={1} w={1.1} viewBox="0 0 110 76">
       <g className={turned(open, stage.lid)}>
         <path d="M4 34 Q55 2 106 34 Z" fill={SH.rust} />
         <path d="M4 34 Q55 2 106 34" fill="none" stroke={SH.brass} strokeWidth={2} />
@@ -46,7 +50,7 @@ function Chest({ open }: { open: boolean }) {
 
 function DeskLamp({ lit }: { lit: boolean }) {
   return (
-    <Place at={1.15} w={1} h={0.7} viewBox="0 0 100 160">
+    <Place at={1.15} w={1} viewBox="0 0 100 160">
       <ellipse cx={46} cy={50} rx={60} ry={44} fill="url(#sh-prop-glow)" className={turned(lit, stage.glow)} />
       <rect x={6} y={84} width={84} height={8} fill={SH.wood} />
       <path d="M14 92 V160 M82 92 V160" stroke={SH.wood} strokeWidth={6} />
@@ -79,7 +83,7 @@ const WARES = [0, 1, 2].flatMap((row) => [0, 1].map((col) => ({ key: `${row}-${c
 
 function Trader({ open }: { open: boolean }) {
   return (
-    <Place at={1.7} w={1.3} h={1.02} viewBox="0 0 120 150">
+    <Place at={1.7} w={1.3} viewBox="0 0 120 150">
       <ellipse cx={18} cy={60} rx={30} ry={38} fill="url(#sh-prop-blue)" />
       <path d="M14 150 V70" stroke={SH.wood} strokeWidth={3} />
       <path d="M8 70 Q18 44 26 70 Z" fill={SH.moon} />
@@ -104,7 +108,7 @@ function Trader({ open }: { open: boolean }) {
 
 function SuitDoor({ open }: { open: boolean }) {
   return (
-    <Place at={1.15} w={0.95} h={1.18} viewBox="0 0 70 132">
+    <Place at={1.15} w={0.95} viewBox="0 0 70 132">
       <rect x={0} y={0} width={70} height={132} fill={SH.wood} />
       <rect x={6} y={6} width={58} height={126} fill={SH.void} />
       <g className={turned(open, stage.leaf)}>
@@ -120,7 +124,7 @@ function SuitDoor({ open }: { open: boolean }) {
 
 function SafeDoor({ open, shaking }: { open: boolean; shaking: boolean }) {
   return (
-    <Place at={-0.2} w={1} h={1.18} viewBox="0 0 70 132">
+    <Place at={-0.2} w={1} viewBox="0 0 70 132">
       <g className={shaking ? stage.shake : ''}>
         <rect x={0} y={0} width={70} height={132} fill={SH.wood} />
         <rect x={6} y={6} width={58} height={126} fill={SH.void} />
@@ -134,11 +138,17 @@ function SafeDoor({ open, shaking }: { open: boolean; shaking: boolean }) {
   )
 }
 
+// The chair's drawing, and its seat's back edge and top in it. The chair is set from his seat (./scripts):
+// the seat's back edge under the back of his thighs, and as tall as puts the seat top at their underside.
+const CHAIR = { width: 50, height: 72, seatX: 4, seatY: 34, w: 0.7 } as const
+const CHAIR_AT = SEAT + SITTING.rear - (CHAIR.seatX / CHAIR.width) * CHAIR.w
+const CHAIR_H = SITTING.seat / ((CHAIR.height - CHAIR.seatY) / CHAIR.height)
+
 function Chair() {
   return (
-    <Place at={0.15} w={0.7} h={0.62} viewBox="0 0 50 72">
+    <Place at={CHAIR_AT} w={CHAIR.w} h={CHAIR_H} viewBox={`0 0 ${CHAIR.width} ${CHAIR.height}`}>
       <path d="M4 0 V70" stroke={SH.wood} strokeWidth={5} />
-      <rect x={4} y={34} width={42} height={6} fill={SH.wood} />
+      <rect x={CHAIR.seatX} y={CHAIR.seatY} width={42} height={6} fill={SH.wood} />
       <path d="M44 40 V72 M8 40 V72" stroke={SH.wood} strokeWidth={4} />
     </Place>
   )
@@ -146,7 +156,7 @@ function Chair() {
 
 function TypewriterDesk() {
   return (
-    <Place at={0.95} w={1.4} h={0.5} viewBox="0 0 140 56">
+    <Place at={DESK_AT} w={1.4} viewBox="0 0 140 56">
       <rect x={0} y={16} width={140} height={6} fill={SH.wood} />
       <path d="M8 22 V56 M132 22 V56" stroke={SH.wood} strokeWidth={5} />
       <path d="M12 16 L18 2 H58 L64 16 Z" fill={SH.gunmetal} />

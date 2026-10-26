@@ -1,5 +1,5 @@
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_GAITS, type HeroPose } from './survivor'
+import { HERO_GAITS, SITTING, type HeroPose } from './survivor'
 import { STALKER_GAITS, type StalkerPose } from './stalker'
 import { stepsFor, type Gait } from './gait'
 import type { Condition } from './ecg'
@@ -305,12 +305,17 @@ const GYM: Record<Condition, () => Script> = {
 const TYPING = 8
 const KEY_MS = 140
 
+// The safe room, in his body widths: where the typewriter desk stands, and his seat, just short of the
+// desk so his shins clear its top. The chair (./props) is set under his hips from the same seat.
+export const DESK_AT = 0.95
+export const SEAT = DESK_AT - SITTING.shins
+
 // Contact: he runs from the pursuer to the safe room and shuts the door; the pursuer pounds on it and
 // goes; inside he sits at the typewriter. Every save types his line again.
 function contact({ saves }: ScriptContext): Script {
   if (saves > 0) {
     return {
-      start: { x: 0.5, hero: 'sit', set: { inside: true } },
+      start: { x: SEAT, hero: 'sit', set: { inside: true } },
       beats: [...Array.from({ length: TYPING }, (_, index): Beat => ({ at: index * KEY_MS, hero: index % 2 ? 'typeB' : 'typeA', tempo: 100 })), { at: TYPING * KEY_MS, hero: 'sit' }],
     }
   }
@@ -329,7 +334,7 @@ function contact({ saves }: ScriptContext): Script {
       { at: 3000, foe: 'pound', ftempo: 120, set: { shake: true } },
       { at: 3400, foe: 'stand', ftempo: 400, set: { shake: false } },
       ...stalk({ from: 3800, start: 1.4, to: OFF_RIGHT, ms: 2600 }),
-      { at: 6600, foe: null, fface: -1, gone: false, x: 0.5, face: 1, hero: 'sit', set: { inside: true } },
+      { at: 6600, foe: null, fface: -1, gone: false, x: SEAT, face: 1, hero: 'sit', set: { inside: true } },
     ]),
   }
 }
