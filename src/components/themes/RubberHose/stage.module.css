@@ -216,10 +216,13 @@
 }
 
 /* The footlight strip is the stage floor he bows on, and the stage keeps room under the posters for the
- * strip and his height, so he stands clear of the last poster. */
+ * strip and his full drawn height, so he stands clear of the last poster. --figure-height is his box;
+ * --reach (stages.tsx, from cup.tsx HERO_REACH) is how much taller his straw tip reaches at the top of the
+ * bounce, so --bow-height covers him, straw included. */
 .theatre {
   --footlights: 2rem;
-  --bow-height: 6rem;
+  --figure-height: 6rem;
+  --bow-height: calc(var(--figure-height) * var(--reach));
   padding-bottom: calc(var(--footlights) + var(--bow-height));
 }
 
@@ -232,6 +235,14 @@
   height: var(--bow-height);
   opacity: 0;
   transform: translate3d(0, 20px, 0);
+}
+
+.bowFigure {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: var(--figure-height);
 }
 
 .theatre[data-open] .bow {

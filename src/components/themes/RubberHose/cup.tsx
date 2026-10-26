@@ -139,12 +139,19 @@ function CupHead({ profession }: { profession: Profession }) {
   )
 }
 
+// His drawing's box in viewBox units, and the highest point he reaches in it: the straw tip (cap included)
+// at the top of the bounce, with the straw's and the head's turns and the bounce's lift and stretch
+// (cup.module.css) all at their highest.
+export const HERO_BOX = { top: -20, height: 170, reachTop: -36 } as const
+/** His drawn height in motion over his box's height: how much taller than his box a stage leaves room for. */
+export const HERO_REACH = (HERO_BOX.top + HERO_BOX.height - HERO_BOX.reachTop) / HERO_BOX.height
+
 export function HeroCharacter({ profession, pose = 'idle', className = '' }: { profession: Profession; pose?: HeroPose; className?: string }) {
   const kit = KIT[profession]
   const gun = pose === 'shoot'
 
   return (
-    <svg viewBox="0 -20 100 170" className={`${cup.figure} ${className}`} data-pose={pose} aria-hidden="true" focusable="false">
+    <svg viewBox={`0 ${HERO_BOX.top} 100 ${HERO_BOX.height}`} className={`${cup.figure} ${className}`} data-pose={pose} aria-hidden="true" focusable="false">
       <ellipse cx={50} cy={146} rx={26} ry={3.4} fill={INK} opacity={0.3} />
       <g className={cup.dash}>
         <g className={cup.bounce}>

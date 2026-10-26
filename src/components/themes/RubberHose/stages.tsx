@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { PieEyes } from './art'
-import { HeroCharacter, type HeroPose } from './cup'
+import { HERO_REACH, HeroCharacter, type HeroPose } from './cup'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import stage from './stage.module.css'
@@ -128,9 +128,12 @@ export function ShopCounter({ on, reduced, profession, children }: { on: boolean
   )
 }
 
+// How much taller than his box his bow reaches (the straw at the top of the bounce), read by the stage's room.
+const THEATRE_REACH = { '--reach': HERO_REACH } as CSSProperties
+
 export function StageCurtains({ on, profession, children }: { on: boolean; profession: Profession; children: ReactNode }) {
   return (
-    <div className={`relative overflow-clip px-2 pt-4 ${stage.theatre}`} data-open={on || undefined}>
+    <div className={`relative overflow-clip px-2 pt-4 ${stage.theatre}`} style={THEATRE_REACH} data-open={on || undefined}>
       {children}
       <div className={`pointer-events-none absolute inset-y-0 left-0 w-1/2 ${stage.curtain} ${stage.curtainLeft}`} aria-hidden="true" />
       <div className={`pointer-events-none absolute inset-y-0 right-0 w-1/2 ${stage.curtain} ${stage.curtainRight}`} aria-hidden="true" />
@@ -140,7 +143,7 @@ export function StageCurtains({ on, profession, children }: { on: boolean; profe
         ))}
       </div>
       <div className={`pointer-events-none absolute right-2 w-14 ${stage.bow}`} aria-hidden="true">
-        <HeroCharacter profession={profession} pose="cheer" className="h-full w-full" />
+        <HeroCharacter profession={profession} pose="cheer" className={stage.bowFigure} />
       </div>
     </div>
   )
