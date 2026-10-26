@@ -13,6 +13,8 @@
   --tp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 -0.12'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
   /* The keyboard focus ring (globals.css) in the gold of the letters, 7.11:1 on the dusk at the top. */
   --focus-ring: var(--tp-letter);
+  /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
+  --focus-halo: var(--tp-bark-dark);
   --tp-display: var(--tp-face), 'Arial Rounded MT Bold', 'Trebuchet MS', 'Arial Black', system-ui, sans-serif;
   font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: var(--tp-parchment);

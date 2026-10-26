@@ -11,6 +11,8 @@
 .root {
   /* The keyboard focus ring (globals.css) in the pale gold of its own ring, 14.86:1 on the hall. */
   --focus-ring: var(--myth-gold-pale);
+  /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
+  --focus-halo: var(--myth-hall-high);
   background: var(--myth-hall-high);
   color: var(--myth-bone);
   font-family: Georgia, 'Times New Roman', serif;

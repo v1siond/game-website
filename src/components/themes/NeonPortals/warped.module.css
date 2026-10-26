@@ -21,6 +21,8 @@
   --np-display: var(--np-face), 'Arial Black', system-ui, sans-serif;
   /* The keyboard focus ring (globals.css) in the gold of the trims, 14.0:1 on the night. */
   --focus-ring: var(--np-gold);
+  /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
+  --focus-halo: var(--np-void);
   background: var(--np-void);
   color: var(--np-white);
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;

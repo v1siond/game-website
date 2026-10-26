@@ -14,6 +14,8 @@
   --crook: polygon(0 2%, 100% 0, 98.5% 100%, 1.2% 97%);
   /* The keyboard focus ring (globals.css) in the one loud red, 3.62:1 on the night. */
   --focus-ring: var(--noir-red);
+  /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
+  --focus-halo: var(--noir-paper);
 
   background: var(--noir-ink);
   color: var(--noir-paper);

@@ -51,13 +51,12 @@
   transform: scale(0.4);
 }
 
-/* A gold ring round each joint marks it as a control (1.4.11): 4.96:1 on the sea behind it. Where it
-   crosses the brass rib the gold alone reads 2.03, so a 2px abyss keyline inside it carries the edge
-   there: 5.89:1 on the brass and 11.94:1 against the gold. */
+/* Each joint's ring is the focus ring's pair (1.4.11): a 3px gold ring with a 3px abyss halo outside it.
+   Where the gold melts into the brass rib or the sea, the halo carries the edge (abyss on gold 11.94:1). */
 .leak {
-  border: 2px solid var(--deco-gold-bright);
+  border: 3px solid var(--deco-gold-bright);
   border-radius: 9999px;
-  box-shadow: inset 0 0 0 2px var(--deco-abyss);
+  box-shadow: 0 0 0 3px var(--deco-abyss);
 }
 
 .leak[data-sealed] .jet {

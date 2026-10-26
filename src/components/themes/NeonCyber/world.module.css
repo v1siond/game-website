@@ -8,6 +8,8 @@
   --my: 0;
   /* The keyboard focus ring (globals.css) in the HUD yellow, 14.71:1 on the dusk of the city behind. */
   --focus-ring: var(--neon-hud);
+  /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
+  --focus-halo: var(--neon-ink);
   font-family: var(--neon-face), ui-monospace, 'Courier New', monospace;
   color: var(--neon-ice);
   background: var(--neon-ink);

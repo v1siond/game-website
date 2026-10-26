@@ -12,6 +12,8 @@
 .world {
   /* The keyboard focus ring (globals.css) in the cursor's yellow, 15.71:1 on the grid lines. */
   --focus-ring: var(--rpg-gold);
+  /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
+  --focus-halo: var(--rpg-void);
   background-color: var(--rpg-void);
   background-image:
     linear-gradient(var(--rpg-grid) 1px, transparent 1px),

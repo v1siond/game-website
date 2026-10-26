@@ -13,6 +13,8 @@
 
   /* The keyboard focus ring (globals.css) in the brightest gold, 7:1 on the lightest water. */
   --focus-ring: var(--deco-gold-bright);
+  /* The halo just outside the ring, so the pair stands out where the ring melts into a surface. */
+  --focus-halo: var(--deco-abyss);
 
   background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-deep-sea), var(--deco-abyss));
   color: var(--deco-cream);
