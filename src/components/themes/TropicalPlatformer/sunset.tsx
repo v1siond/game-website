@@ -35,12 +35,19 @@ import sunset from './sunset.module.css'
 const SCENE = { width: 400, height: 300 }
 const VIEW = `0 0 ${SCENE.width} ${SCENE.height}`
 
-// The ground he lands on: the palms' ground band passes through this y at x 272, the middle of his
-// landing box (left 62%, width 12%), and the landing box's bottom is this y. The band's curve is split
-// at that point (the same curve, one more node), and both sit in the palms' plane, so the plane's
-// parting moves them together.
+// Where he lands, in the scene's units: his landing box's left edge and width, its bottom on the ground y.
+// The palms' ground band is split at the box's middle and passes through the ground y there, its two
+// control points set off from that point so the band's bend rides with it. Both sit in the palms' plane,
+// so the plane's parting moves them together.
+const LANDING_BOX = { x: 248, width: 48 }
 const GROUND_Y = 261
-const LANDING = { '--ground': GROUND_Y / SCENE.height } as CSSProperties
+const LANDING_X = LANDING_BOX.x + LANDING_BOX.width / 2
+const GROUND_BAND = `M-30 262 Q100 250 200 258 Q${LANDING_X - 38} ${GROUND_Y - 0.3} ${LANDING_X} ${GROUND_Y} Q${LANDING_X + 72.5} ${GROUND_Y + 0.9} 430 254 V300 H-30 Z`
+const LANDING = {
+  '--ground': GROUND_Y / SCENE.height,
+  '--landing-left': `${(LANDING_BOX.x / SCENE.width) * 100}%`,
+  '--landing-width': `${(LANDING_BOX.width / SCENE.width) * 100}%`,
+} as CSSProperties
 
 // The sky in the flat steps the source's sunsets are painted in, the sun swelling behind streaks of
 // cloud, and birds.
@@ -88,7 +95,7 @@ function Palms() {
       <use href="#tp-palm" transform="translate(200 262) rotate(5) scale(0.55)" className={scenery.haze} />
       <use href="#tp-palm" transform="translate(318 266) rotate(-9) scale(0.86)" />
       <use href="#tp-palm" transform="translate(362 266) rotate(7) scale(0.68)" />
-      <path d={`M-30 262 Q100 250 200 258 Q234 260.7 272 ${GROUND_Y} Q344.5 261.9 430 254 V300 H-30 Z`} fill={C.shadowSoft} />
+      <path d={GROUND_BAND} fill={C.shadowSoft} />
     </svg>
   )
 }
@@ -161,7 +168,7 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
       </div>
 
       <div className={`pointer-events-none absolute inset-0 ${sunset.mid}`} style={LANDING} aria-hidden="true">
-        <div key={shot} className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[62%] h-[24%] w-[12%] ${sunset.flightX}`}>
+        <div key={shot} className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[var(--landing-left)] h-[24%] w-[var(--landing-width)] ${sunset.flightX}`}>
           <div className={`relative h-full w-full ${sunset.flightY}`}>
             <HeroCharacter profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
             <div className={`absolute inset-0 ${sunset.land}`}>
