@@ -22,6 +22,10 @@ import side from './side.module.css'
 
 type GoalPose = 'run' | 'leap' | 'slide' | 'off' | 'walk' | 'cheer'
 
+// Where he stops at the castle, in % of the playfield: his last leg ends here and the castle stands on it.
+const END_X = 76
+const CASTLE_PLACE = cssVars({ '--end-x': END_X })
+
 const COURSE: Course<GoalPose> = {
   start: { x: -20, lift: 0 },
   legs: [
@@ -29,7 +33,7 @@ const COURSE: Course<GoalPose> = {
     { pose: 'leap', frame: 'jump', path: 'arc', to: { x: 54, lift: 150 }, ms: 380, peak: 20 },
     { pose: 'slide', frame: 'grab', path: 'line', to: { x: 54, lift: 4 }, ms: 800 },
     { pose: 'off', frame: 'jump', path: 'arc', to: { x: 64, lift: 0 }, ms: 300, peak: 26 },
-    { pose: 'walk', frame: 'run', path: 'line', to: { x: 76, lift: 0 }, ms: 420 },
+    { pose: 'walk', frame: 'run', path: 'line', to: { x: END_X, lift: 0 }, ms: 420 },
   ],
   rest: { pose: 'cheer', frame: 'cheer' },
 }
@@ -82,7 +86,7 @@ export function GoalPole({ profession }: { profession: Profession }) {
         <div>
           <Banner>{cleared ? trail.trailCleared : trail.goal}</Banner>
           <Playfield height="h-72">
-            <div className={`absolute bottom-8 right-1 h-16 w-16 sm:h-24 sm:w-24`} aria-hidden="true">
+            <div className={side.castle} style={CASTLE_PLACE} aria-hidden="true">
               <Castle />
             </div>
             <button type="button" className={`${side.pole} rounded-sm`} aria-label={trail.grabAgain} onClick={() => setRound((now) => now + 1)}>

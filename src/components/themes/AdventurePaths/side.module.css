@@ -14,8 +14,8 @@
 
 .heroSprite {
   display: block;
-  width: 48px;
-  height: 78px;
+  width: var(--hero-w);
+  height: var(--hero-h);
   overflow: visible;
 }
 
@@ -74,7 +74,7 @@
 
 .track {
   position: absolute;
-  bottom: 32px;
+  bottom: var(--ground);
   left: 0;
   width: 100%;
   pointer-events: none;
@@ -83,7 +83,7 @@
 }
 
 .hop {
-  width: 48px;
+  width: var(--hero-w);
 }
 
 .track[data-path='line'] {
@@ -130,15 +130,21 @@
  * Playfield, ground, cards
  * ------------------------------------------------------------------------------------------------- */
 
+/* --ground is the ground row's height: its top edge is the line he and every prop stand on. --hero-w and
+ * --hero-h are his sprite's size (16 by 26 pixels drawn 3 times over), read by him and by what is sized
+ * from him. */
 .playfield {
   border-radius: 6px;
+  --ground: 32px;
+  --hero-w: 48px;
+  --hero-h: 78px;
 }
 
 .ground {
   position: absolute;
   inset-inline: 0;
   bottom: 0;
-  height: 32px;
+  height: var(--ground);
   border-top: 3px solid var(--ap-hud);
   z-index: 3;
 }
@@ -149,7 +155,9 @@
     repeating-linear-gradient(90deg, var(--ap-soil) 0 14px, var(--ap-soil-dark) 14px 16px);
 }
 
+/* The coin room is black, so its floor's top edge is drawn in the brick teal to show on it. */
 .ground[data-ground='brick'] {
+  border-top-color: var(--ap-cave-brick);
   background:
     linear-gradient(var(--ap-cave-brick-dark) 0 2px, transparent 2px 14px, var(--ap-cave-brick-dark) 14px 16px, transparent 16px),
     repeating-linear-gradient(90deg, var(--ap-cave-brick) 0 30px, var(--ap-cave-brick-dark) 30px 32px);
@@ -320,7 +328,7 @@
 .platform {
   position: absolute;
   left: calc(var(--x) * 1% - 4px);
-  bottom: calc(32px + var(--y) * 1px);
+  bottom: calc(var(--ground) + var(--y) * 1px);
   width: 56px;
   height: 44px;
   z-index: 1;
@@ -343,7 +351,7 @@
 .shellTrack {
   position: absolute;
   left: 0;
-  bottom: 32px;
+  bottom: var(--ground);
   width: 100%;
   pointer-events: none;
   transform: translate3d(26%, 0, 0);
@@ -362,7 +370,7 @@
 .brick {
   position: absolute;
   left: calc(var(--x) * 1%);
-  bottom: 32px;
+  bottom: var(--ground);
   width: 40px;
   height: 40px;
 }
@@ -389,7 +397,7 @@
 .bigSwitch {
   position: absolute;
   left: calc(44% - 4px);
-  bottom: 32px;
+  bottom: var(--ground);
   width: 56px;
   height: 44px;
   z-index: 1;
@@ -407,7 +415,7 @@
 .pipe {
   position: absolute;
   left: calc(80% - 8px);
-  bottom: 32px;
+  bottom: var(--ground);
   width: 64px;
   height: 52px;
   z-index: 3;
@@ -526,7 +534,7 @@
 .foe {
   position: absolute;
   left: calc(var(--x) * 1% + 6px);
-  bottom: 32px;
+  bottom: var(--ground);
   width: 36px;
   height: 48px;
 }
@@ -559,10 +567,21 @@
 .pole {
   position: absolute;
   left: calc(54% + 14px);
-  bottom: 32px;
+  bottom: var(--ground);
   width: 44px;
   height: 236px;
   z-index: 1;
+}
+
+/* The castle at the end of the course: its door centred on where he stops (--end-x, from flagpole.tsx),
+ * and 1.2 times his height, so the castle he walks up to stands taller than him. */
+.castle {
+  position: absolute;
+  left: calc(var(--end-x) * 1% + var(--hero-w) / 2);
+  bottom: var(--ground);
+  height: calc(var(--hero-h) * 1.2);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
 }
 
 /* The flag hangs off the left of the pole's top, where his hands meet the pole as he grabs it. */
