@@ -38,6 +38,10 @@ const VIEW_HEIGHT = 112
 // Half the thickness of a thigh and of a shin, as drawn by Thigh and Shin.
 const THIGH_HALF = 3.1
 const SHIN_HALF = 2.8
+// The fist's centre on the forearm hanging straight down (Fist), and the typewriter's keys: the height each
+// striking fist lands on, which the safe room's desk (./props) sets its keys at.
+const FIST_Y = 57.6
+const KEY_Y = 63
 
 /** His legs for the gait math (./gait): each hip, the thigh to the knee, the shin to the sole. */
 export const HERO_LEGS = {
@@ -130,6 +134,21 @@ const LIMP_PASS_B = pose(feet(1, [22, 110], [29, 101]), LIMP)
 
 const SIT = pose({ lean: 4, head: 6, frontArm: [-50, -50], backArm: [-45, -55], backLeg: [-84, 84], frontLeg: [-86, 86], drop: 22, hold: 'bare' })
 
+const DEG = Math.PI / 180
+const turnAbout = ([x, y]: Point, degrees: number, [cx, cy]: Point): Point => [
+  cx + (x - cx) * Math.cos(degrees * DEG) - (y - cy) * Math.sin(degrees * DEG),
+  cy + (x - cx) * Math.sin(degrees * DEG) + (y - cy) * Math.cos(degrees * DEG),
+]
+
+/** The elbow turn that lands the fist on KEY_Y, for the arm at `shoulderX` turned by `shoulder`, in a seated pose. */
+function strikeElbow(shoulderX: number, shoulder: number, { lean, drop }: { lean: number; drop: number }): number {
+  const [, elbowY] = turnAbout(turnAbout([shoulderX, ELBOW_Y], shoulder, [shoulderX, SHOULDER_Y]), lean, LEAN_AT)
+  return -Math.acos((KEY_Y - drop - elbowY) / (FIST_Y - ELBOW_Y)) / DEG - lean - shoulder
+}
+
+/** The keys' height above the floor his props stand on (the bottom of his box), in body widths. */
+export const TYPING_KEYS = (VIEW_HEIGHT - KEY_Y) / VIEW_WIDTH
+
 /**
  * Him seated, measured from the sit pose, so the safe room's chair and desk are placed from him (./scripts,
  * ./props): the back of his thighs in body widths from his left edge, the underside of his thighs at the hip
@@ -181,8 +200,8 @@ export const HERO_POSES = {
   runB: RUN_B,
   runPassB: RUN_PASS_B,
   sit: SIT,
-  typeA: pose({ frontArm: [-50, -40] }, SIT),
-  typeB: pose({ frontArm: [-50, -58], backArm: [-45, -45] }, SIT),
+  typeA: pose({ frontArm: [-50, strikeElbow(FRONT_X, -50, SIT)] }, SIT),
+  typeB: pose({ frontArm: [-50, -58], backArm: [-45, strikeElbow(BACK_X, -45, SIT)] }, SIT),
   nod: pose({ head: 12 }),
 } satisfies Record<string, PoseRow>
 
@@ -271,10 +290,10 @@ const KIT: Record<Profession, Kit> = {
 
 // The fist at the end of the forearm (local frame, the arm hanging), a glove or a wrap.
 function Fist({ x, wrapped }: { x: number; wrapped: boolean }) {
-  if (wrapped) return <circle cx={x} cy={57.6} r={2.4} fill={SH.cream} />
+  if (wrapped) return <circle cx={x} cy={FIST_Y} r={2.4} fill={SH.cream} />
   return (
     <>
-      <circle cx={x} cy={57.6} r={2} fill={SH.top} />
+      <circle cx={x} cy={FIST_Y} r={2} fill={SH.top} />
       <circle cx={x + 0.9} cy={58.6} r={0.8} fill={ID.skin} />
     </>
   )

@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react'
 import { DESK_AT, SEAT, type Flags, type Zone } from './scripts'
-import { SITTING } from './survivor'
+import { SITTING, TYPING_KEYS } from './survivor'
 import { SH } from './palette'
 import stage from './stage.module.css'
 
@@ -154,11 +154,16 @@ function Chair() {
   )
 }
 
+// The desk's drawing width, the middle of the typewriter's key slope in it, and its width in his body widths.
+// Its legs run down to the floor from wherever puts the keys at his striking fists (TYPING_KEYS).
+const DESK = { width: 140, keysY: 9, w: 1.4 } as const
+const DESK_HEIGHT = DESK.keysY + (TYPING_KEYS * DESK.width) / DESK.w
+
 function TypewriterDesk() {
   return (
-    <Place at={DESK_AT} w={1.4} viewBox="0 0 140 56">
-      <rect x={0} y={16} width={140} height={6} fill={SH.wood} />
-      <path d="M8 22 V56 M132 22 V56" stroke={SH.wood} strokeWidth={5} />
+    <Place at={DESK_AT} w={DESK.w} viewBox={`0 0 ${DESK.width} ${DESK_HEIGHT}`}>
+      <rect x={0} y={16} width={DESK.width} height={6} fill={SH.wood} />
+      <path d={`M8 22 V${DESK_HEIGHT} M132 22 V${DESK_HEIGHT}`} stroke={SH.wood} strokeWidth={5} />
       <path d="M12 16 L18 2 H58 L64 16 Z" fill={SH.gunmetal} />
       <rect x={24} y={-8} width={28} height={10} fill={SH.ivory} />
       {[96, 106].map((x) => (
