@@ -5,7 +5,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { MYTH } from './palette'
-import { MOVES, REST, bodyCss, bodyTransform, jointCss, jointTransform, resolveKeys, type Joint, type Move, type Pose } from './rig'
+import { MOVES, NEAR_FIST, REST, bodyCss, bodyTransform, jointCss, jointTransform, resolveKeys, type Joint, type Move, type Pose } from './rig'
 import s from './sprite.module.css'
 
 // Him as this world's own sprite, a parody of the ash pale Spartan with the chained blades (reference
@@ -78,9 +78,11 @@ const CHAIN_WRAP: Record<Side, string> = {
   far: 'M78 108 L90 111 M78 113 L90 116 M79 118 L89 119',
   near: 'M91 112 L105 115 M91 117 L105 120 M92 122 L104 123',
 }
+// The near fist is drawn around NEAR_FIST, the point the rig hangs him from, so the drawing and the hold agree.
+const [FIST_X, FIST_Y] = NEAR_FIST
 const FIST: Record<Side, string> = {
   far: 'M78 119 Q84 115 90 119 L90 130 Q84 134 78 130 Z',
-  near: 'M91 123 Q98 119 105 123 L105 135 Q98 139 91 135 Z',
+  near: `M${FIST_X - 7} ${FIST_Y - 6} Q${FIST_X} ${FIST_Y - 10} ${FIST_X + 7} ${FIST_Y - 6} L${FIST_X + 7} ${FIST_Y + 6} Q${FIST_X} ${FIST_Y + 10} ${FIST_X - 7} ${FIST_Y + 6} Z`,
 }
 const WRAP_LINES: Record<Side, string> = {
   far: 'M78 123 L90 125 M78 127 L90 129',

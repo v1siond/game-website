@@ -336,8 +336,8 @@ function hung(pose: Pose): Pose {
 /** The first key of a move, the pose a scene shows still (reduced motion, before the move plays). */
 export const firstPose = (move: Move, profession: Profession): Pose => resolveKeys(move, profession)[0].pose
 
-// The near fist's centre on the drawing at rest (the FIST path in sprite.tsx), the point a scene puts a hold in.
-const NEAR_FIST: readonly [number, number] = [98, 129]
+// The near fist's centre on the drawing at rest: sprite.tsx draws the near FIST around it, and a scene puts a hold in it.
+export const NEAR_FIST: readonly [number, number] = [98, 129]
 
 const turnAbout = ([x, y]: readonly [number, number], angle: number, [cx, cy]: readonly [number, number]): [number, number] => {
   const rad = (angle * Math.PI) / 180
