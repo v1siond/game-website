@@ -2,6 +2,7 @@
 
 import { useEffect, type CSSProperties, type RefObject } from 'react'
 import { fillLabel } from '@/lib/cv/labels'
+import { countTemplate } from '@/lib/worlds/nudge'
 import { useWorldsLabels } from './WorldsLabels'
 
 interface WorldsHintProps {
@@ -26,6 +27,7 @@ interface WorldsHintProps {
  */
 export default function WorldsHint({ cardRef, open, style, worldName, nextName, seenCount, total, onNext, onAll, onClose }: WorldsHintProps) {
   const labels = useWorldsLabels()
+  const seen = Math.max(seenCount, 1)
 
   useEffect(() => {
     if (!open) return
@@ -67,7 +69,7 @@ export default function WorldsHint({ cardRef, open, style, worldName, nextName, 
         ✕
       </button>
       <p id="worlds-hint-body" className="c-worlds-hint__body mb-2 mt-1 text-sm leading-snug">
-        {fillLabel(labels.hintBody, { world: worldName, seen: Math.max(seenCount, 1), total })}
+        {fillLabel(countTemplate(seen, { one: labels.hintBodyOne, many: labels.hintBody }), { world: worldName, seen, total })}
       </p>
       <div className="flex gap-2">
         <button type="button" onClick={onNext} className="c-worlds-hint__primary min-h-11 flex-1 rounded-md px-3 text-sm font-bold">

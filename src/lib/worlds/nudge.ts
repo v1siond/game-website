@@ -107,15 +107,15 @@ export function nextInTour(currentId: string, seen: readonly string[]): string {
   return TOUR_ORDER[(TOUR_ORDER.indexOf(currentId) + 1) % TOUR_ORDER.length]
 }
 
-export interface ProgressTemplates {
-  pickerProgressOne: string
-  pickerProgress: string
+export interface CountTemplates {
+  one: string
+  many: string
 }
 
-/** The picker's seen count line: the singular wording for exactly one world, the plural one otherwise. */
-export function progressTemplate(seenCount: number, templates: ProgressTemplates): string {
-  if (seenCount === 1) return templates.pickerProgressOne
-  return templates.pickerProgress
+/** The wording of a count of worlds: the singular one for exactly one, the plural one for any other count. */
+export function countTemplate(count: number, templates: CountTemplates): string {
+  if (count === 1) return templates.one
+  return templates.many
 }
 
 export type PickerMark = 'next' | 'unseen' | 'seen' | 'here'

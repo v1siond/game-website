@@ -821,7 +821,8 @@ collections:
                   - { <<: *text, label: "Launcher name for a screen reader", name: launcherAria }
                   - { <<: *text, label: "Launcher tooltip", name: launcherTitle }
                   - { <<: *text, label: "Hint title, naming the next world", name: hintNextTitle }
-                  - { <<: *text, label: "Hint line under the title", name: hintBody }
+                  - { <<: *text, label: "Hint line under the title when the visitor has seen one world", name: hintBodyOne }
+                  - { <<: *text, label: "Hint line under the title, two or more worlds seen", name: hintBody }
                   - { <<: *text, label: "Hint button entering the next world", name: hintEnter }
                   - { <<: *text, label: "Hint button opening the picker", name: hintAll }
                   - { <<: *text, label: "Hint close button for a screen reader", name: hintClose }

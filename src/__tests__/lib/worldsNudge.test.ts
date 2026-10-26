@@ -10,7 +10,7 @@ import {
   mayOfferHint,
   nextInTour,
   orderForPicker,
-  progressTemplate,
+  countTemplate,
   readSeen,
   recordWorld,
 } from '@/lib/worlds/nudge'
@@ -88,15 +88,15 @@ describe('hintBelongsOn', () => {
   })
 })
 
-describe('progressTemplate', () => {
-  const templates = { pickerProgressOne: 'one {seen}', pickerProgress: 'many {seen}' }
+describe('countTemplate', () => {
+  const templates = { one: 'one {seen}', many: 'many {seen}' }
 
   it('words the count in the singular for exactly one world', () => {
-    expect(progressTemplate(1, templates)).toBe('one {seen}')
+    expect(countTemplate(1, templates)).toBe('one {seen}')
   })
 
   it.each([[0], [2], [17]])('words the count in the plural for %p worlds', (count) => {
-    expect(progressTemplate(count, templates)).toBe('many {seen}')
+    expect(countTemplate(count, templates)).toBe('many {seen}')
   })
 })
 
