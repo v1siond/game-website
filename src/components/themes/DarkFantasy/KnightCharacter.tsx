@@ -21,8 +21,11 @@ import { DARK_FANTASY } from './palette'
  * - Beard extends from bottom of mask
  */
 
-// The knight's drawing width in viewBox units; his width on screen is this times his scale.
+// The knight's drawing in viewBox units: its width and height, his size on screen being these times his
+// scale, and the line his soles and his ground shadow sit on, KNIGHT_SOLE_Y below the drawing's top.
 const KNIGHT_VIEW_WIDTH = 60
+const KNIGHT_VIEW_HEIGHT = 80
+const KNIGHT_SOLE_Y = 79
 
 interface KnightCharacterProps {
   scale?: number
@@ -56,7 +59,7 @@ export const KnightCharacter = memo(function KnightCharacter({
   const nailRotation = getNailRotation()
 
   return (
-    <span style={{ display: 'inline-block', animation: breathing && !attacking ? 'knightIdleFloat 3.6s ease-in-out infinite' : undefined }}>
+    <span style={{ display: 'block', animation: breathing && !attacking ? 'knightIdleFloat 3.6s ease-in-out infinite' : undefined }}>
     {/* Idle: gentle float wrapper + cloak breathing (HK-style); disabled while attacking */}
     {breathing && (
       <style>{`
@@ -72,9 +75,9 @@ export const KnightCharacter = memo(function KnightCharacter({
     )}
     <svg
       width={KNIGHT_VIEW_WIDTH * effectiveScale}
-      height={80 * effectiveScale}
-      viewBox={`0 0 ${KNIGHT_VIEW_WIDTH} 80`}
-      className={className}
+      height={KNIGHT_VIEW_HEIGHT * effectiveScale}
+      viewBox={`0 0 ${KNIGHT_VIEW_WIDTH} ${KNIGHT_VIEW_HEIGHT}`}
+      className={`block ${className}`}
       style={{
         overflow: 'visible',
         transform: isLeft ? 'scaleX(-1)' : 'none',
@@ -82,8 +85,8 @@ export const KnightCharacter = memo(function KnightCharacter({
       }}
     >
       {/* Ground contact shadow, two soft stacked ellipses (replaces the old glow-only shadow) */}
-      <ellipse cx="30" cy="79" rx="21" ry="4.5" fill={DARK_FANTASY.black} opacity="0.22" />
-      <ellipse cx="30" cy="79" rx="14" ry="3" fill={DARK_FANTASY.black} opacity="0.4" />
+      <ellipse cx="30" cy={KNIGHT_SOLE_Y} rx="21" ry="4.5" fill={DARK_FANTASY.black} opacity="0.22" />
+      <ellipse cx="30" cy={KNIGHT_SOLE_Y} rx="14" ry="3" fill={DARK_FANTASY.black} opacity="0.4" />
       {/* === KNIGHT - 3/4 VIEW FACING RIGHT === */}
       {/* Based on reference image proportions */}
 
@@ -274,13 +277,19 @@ type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'cont
 // entry place the farther right of the panel's edge plus that rest and 8% in from the screen's right edge,
 // never past the screen's right edge. Below lg the panel fills the column, so no place beside it is left: he
 // rests standing on the panel's top edge at its right corner, above the panel and its text, at the size the
-// combat layer gives him there.
+// combat layer gives him there: his soles on the line the panel's frame draws, FRAME_INSET_REM inside the
+// panel's top, his box sunk below that line by --sole-drop, the part of his drawing under his soles.
 const SLASH_PANEL_REM = 56
 const SLASH_KNIGHT_SCALE = 1.8
 const REST_SHIFT_PX = 90
+const PHONE_KNIGHT_SCALE = SLASH_KNIGHT_SCALE * COMBAT_PHONE_SCALE
+/** How far inside its box the panel's frame (VoidFrame) draws its border, read by the frame and the knight. */
+export const FRAME_INSET_REM = 1
 const SLASH_STAGE = {
   '--slash-panel': `${SLASH_PANEL_REM}rem`,
   '--panel-top': '2rem',
+  '--frame-inset': `${FRAME_INSET_REM}rem`,
+  '--sole-drop': `${(KNIGHT_VIEW_HEIGHT - KNIGHT_SOLE_Y) * PHONE_KNIGHT_SCALE}px`,
   '--panel-inset': '1.5rem',
   '--rest': `${REST_SHIFT_PX}px`,
   '--knight-w': `${KNIGHT_VIEW_WIDTH * SLASH_KNIGHT_SCALE}px`,
@@ -413,15 +422,15 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
         {children}
       </div>
 
-      {/* Below lg: the knight rests on the panel's top edge at its right corner (SLASH_STAGE) */}
+      {/* Below lg: the knight stands on the panel frame's top line at its right corner (SLASH_STAGE) */}
       {showKnight && (
         <div
-          className="pointer-events-none absolute bottom-[calc(100%_-_var(--panel-top))] right-[calc(var(--panel-inset)_-_var(--rest))] z-20 lg:hidden"
+          className="pointer-events-none absolute bottom-[calc(100%_-_var(--panel-top)_-_var(--frame-inset)_-_var(--sole-drop))] right-[calc(var(--panel-inset)_-_var(--rest))] z-20 lg:hidden"
           style={getKnightStyle()}
           aria-hidden="true"
         >
           <KnightCharacter
-            scale={SLASH_KNIGHT_SCALE * COMBAT_PHONE_SCALE}
+            scale={PHONE_KNIGHT_SCALE}
             attacking={isAttacking}
             attackPhase={attackPhase}
             facingDirection="left"

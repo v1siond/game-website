@@ -18,7 +18,7 @@ import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/prof
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
-import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
+import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, newTabName } from '@/components/cv/sectionText'
@@ -970,7 +970,12 @@ const VoidFrame = memo(function VoidFrame({
   const sectionHeadingId = headingId('section', title)
 
   return (
-    <div className="relative pt-4 pb-4" role="region" aria-labelledby={sectionHeadingId}>
+    <div
+      className="relative py-[var(--frame-inset)]"
+      style={{ '--frame-inset': `${FRAME_INSET_REM}rem` } as React.CSSProperties}
+      role="region"
+      aria-labelledby={sectionHeadingId}
+    >
       {/* Main dialogue box container */}
       <div className="df-panel bg-df-panel relative">
         {/* Top decorative flourish - elegant vine-like pattern */}
