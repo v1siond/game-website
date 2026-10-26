@@ -6,8 +6,8 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { fillLabel } from '@/lib/cv/labels'
 import type { TechCategory } from '@/lib/cv/content'
-import { SpartanSprite, type SpriteMotion } from './sprite'
-import { MOVES } from './rig'
+import { SpartanSprite, placeOn, type SpriteMotion } from './sprite'
+import { MOVES, firstPose, nearFistAt } from './rig'
 import { useTurnQueue } from './track'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
@@ -24,13 +24,15 @@ type Category = TechCategory & { id: string }
 const HOLD_STEP = 60
 const HOLD_BASE = 300
 const holdY = (index: number) => HOLD_BASE - index * HOLD_STEP
-// his box: the fists of the hang sit 5 units under the box top, on the gripped panel
-const HIM = { x: -19, y: HOLD_BASE - 18, height: 120 }
+// the bronze ring carved on each panel, the spot his near fist grips
+const RING = { x: 50, rise: 10 }
+// his box: placed so the near fist of the hang he rests in sits on the ring of the gripped panel (HOLD_BASE)
+const HIM = placeOn(120, nearFistAt(firstPose('hang', 'engineer')), [RING.x, HOLD_BASE - RING.rise])
 const LINKS = Array.from({ length: 18 }, (_, index) => -600 + index * 60)
 const CLIMB_GAP_MS = MOVES.climb.ms + 250
 
 function Chain({ ids, gripped, glow, take }: { ids: readonly string[]; gripped: number; glow: string | null; take: number }) {
-  const { pose, take: moveTake, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
+  const { pose, take: moveTake, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'hang', still: 'still', policy: 'always' })
 
   useEffect(() => {
     if (take > 0) play('climb')
@@ -51,7 +53,7 @@ function Chain({ ids, gripped, glow, take }: { ids: readonly string[]; gripped: 
         {ids.map((id, index) => (
           <g key={id} data-lit={index < gripped || undefined} data-glow={glow === id || undefined} className={u.hold}>
             <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.chainPanel} stroke={MYTH.inkLine} strokeWidth={1.5} />
-            <circle cx={50} cy={holdY(index) - 10} r={7} fill="none" stroke={MYTH.bronze} strokeWidth={2} />
+            <circle cx={RING.x} cy={holdY(index) - RING.rise} r={7} fill="none" stroke={MYTH.bronze} strokeWidth={2} />
             <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.gold} className={u.holdLight} />
           </g>
         ))}

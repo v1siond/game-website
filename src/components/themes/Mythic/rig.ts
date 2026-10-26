@@ -66,7 +66,7 @@ export interface Pose extends Angles {
   y: number
 }
 
-export type Move = 'idle' | 'walk' | 'combo' | 'roar' | 'haul' | 'finish' | 'heave' | 'hurl' | 'push' | 'drum' | 'knee' | 'elbow' | 'kick' | 'climb'
+export type Move = 'idle' | 'walk' | 'combo' | 'roar' | 'haul' | 'finish' | 'heave' | 'hurl' | 'push' | 'drum' | 'knee' | 'elbow' | 'kick' | 'climb' | 'hang'
 
 /** A key: when it falls in the move (0 to 1) and the joints it changes; the others hold from the key before. */
 export interface Key {
@@ -258,6 +258,16 @@ export const MOVES: Record<Move, MoveSpec> = {
       { at: 1, pose: { ...CLIMB_HANG } },
     ],
   },
+  // at rest on the chain: he holds the hang the climb starts and ends on, still, so his fists stay on the holds
+  hang: {
+    ms: 2600,
+    loop: true,
+    hang: true,
+    keys: () => [
+      { at: 0, pose: { ...CLIMB_HANG } },
+      { at: 1, pose: { ...CLIMB_HANG } },
+    ],
+  },
   // the knee: both hands clinch the head down, the near knee drives up
   knee: {
     ms: 800,
@@ -325,6 +335,21 @@ function hung(pose: Pose): Pose {
 
 /** The first key of a move, the pose a scene shows still (reduced motion, before the move plays). */
 export const firstPose = (move: Move, profession: Profession): Pose => resolveKeys(move, profession)[0].pose
+
+// The near fist's centre on the drawing at rest (the FIST path in sprite.tsx), the point a scene puts a hold in.
+const NEAR_FIST: readonly [number, number] = [98, 129]
+
+const turnAbout = ([x, y]: readonly [number, number], angle: number, [cx, cy]: readonly [number, number]): [number, number] => {
+  const rad = (angle * Math.PI) / 180
+  return [cx + (x - cx) * Math.cos(rad) - (y - cy) * Math.sin(rad), cy + (x - cx) * Math.sin(rad) + (y - cy) * Math.cos(rad)]
+}
+
+/** Where the near fist sits in the 160 by 210 box in a pose: the forearm, the arm and the chest turned, then the body moved. */
+export function nearFistAt(pose: Pose): readonly [number, number] {
+  const joints: Joint[] = ['foreNear', 'armNear', 'chest']
+  const [x, y] = joints.reduce<readonly [number, number]>((point, joint) => turnAbout(point, pose[joint], PIVOT[joint]), NEAR_FIST)
+  return [x + pose.x, y + plantedDrop(pose) + pose.y]
+}
 
 /** The SVG transform that sets one joint in a pose, as an attribute (the drawing's own coordinates). */
 export function jointTransform(joint: Joint, angle: number): string {

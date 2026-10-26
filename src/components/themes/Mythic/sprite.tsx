@@ -427,13 +427,23 @@ export interface Place {
   height: number
 }
 
-/** A placed figure's viewport: his 160 by 210 box scaled to the height. */
-const placeAttributes = (place?: Place) => (place ? { x: place.x, y: place.y, height: place.height, width: (place.height * 160) / 210 } : {})
+/** His drawing's own box, the viewBox every placed figure scales to its height. */
+const FIGURE_BOX = { width: 160, height: 210 } as const
+const FIGURE_VIEW_BOX = `0 0 ${FIGURE_BOX.width} ${FIGURE_BOX.height}`
+
+/** A placed figure's viewport: his box scaled to the height. */
+const placeAttributes = (place?: Place) => (place ? { x: place.x, y: place.y, height: place.height, width: (place.height * FIGURE_BOX.width) / FIGURE_BOX.height } : {})
+
+/** The place of a figure of this height whose point (in his box) lands on a scene point, so a prop and his hand read one spot. */
+export function placeOn(height: number, [x, y]: readonly [number, number], [sceneX, sceneY]: readonly [number, number]): Place {
+  const scale = height / FIGURE_BOX.height
+  return { x: sceneX - x * scale, y: sceneY - y * scale, height }
+}
 
 /** A viewport over a placed figure's own box, so a scene draws the props he handles in his units (the hand positions of rig.ts). */
 export function FigureSpace({ place, children }: { place: Place; children: ReactNode }) {
   return (
-    <svg {...placeAttributes(place)} viewBox="0 0 160 210" className="overflow-visible">
+    <svg {...placeAttributes(place)} viewBox={FIGURE_VIEW_BOX} className="overflow-visible">
       {children}
     </svg>
   )
@@ -445,7 +455,7 @@ export function SpartanFigure({ profession, pose = REST[profession], className =
   const parts = { profession, ids, pose, sheathed }
 
   return (
-    <svg ref={svgRef} {...placeAttributes(place)} viewBox="0 0 160 210" className={`overflow-visible ${className}`} aria-hidden="true">
+    <svg ref={svgRef} {...placeAttributes(place)} viewBox={FIGURE_VIEW_BOX} className={`overflow-visible ${className}`} aria-hidden="true">
       <Gradients ids={ids} />
       <g className={s.sprite}>
         <ellipse cx={90} cy={199} rx={40} ry={5} fill={MYTH.inkLine} opacity={0.45} />
