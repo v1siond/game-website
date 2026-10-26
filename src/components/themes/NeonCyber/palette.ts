@@ -38,7 +38,7 @@ export const NEON = {
   data: '#5ef2ff',
   // The data cyan a step lighter for the words on the chips: a lens the scrub leaves dim (0.7) still
   // reads 7:1; the chip's frame and the city keep data.
-  dataText: '#7df5ff',
+  dataText: '#a0f8ff',
   gold: '#ffc23d',
   hack: '#3dff9a',
   use: '#4da3ff',
