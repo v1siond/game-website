@@ -5,16 +5,16 @@
    properties the React components set from the current world's palette (launcherColors in
    src/lib/worlds/nudge.ts): --wl-text the label colour, --wl-body running text, --wl-fill the world's
    background, --wl-edge the black or white outer hairline. Both text pairs read at 7 to 1 or more; the rings
-   keep 3 to 1 from any page behind. The defaults (Medieval Fantasy's) only cover a paint before the
+   keep 3 to 1 from any page behind. The defaults (Retro Atomic's, the default world) only cover a paint before the
    component sets its own.
    =================================================================== */
 
 .c-worlds-launcher,
 .c-worlds-hint,
 .c-worlds-picker {
-  --wl-text: #d4a017;
-  --wl-body: #e8dcc8;
-  --wl-fill: #0a0c0e;
+  --wl-text: #f5c400;
+  --wl-body: #12ff15;
+  --wl-fill: #0b0c09;
   --wl-edge: #ffffff;
   color: var(--wl-text);
   background-color: var(--wl-fill);

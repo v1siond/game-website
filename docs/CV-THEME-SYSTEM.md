@@ -41,15 +41,31 @@ Artistic.
   the fill is the world's background, the label the first of accent, highlight and text that reads at 7 to
   1 on it, and a black or white outer hairline keeps the button 3 to 1 apart from any page behind it.
   `src/styles/components/worlds-nudge.css` paints from the `--wl-*` properties the component sets.
-- `WorldsHint` is a one time card under the launcher: "This CV has 17 worlds", the current world and how
-  many the visitor has seen, "Next world" (a random world not seen yet, through the portal) and "All
+- `WorldsHint` is a one time card under the launcher that names the next world in the tour: "Next world:
+  <name>", the current world and how many the visitor has seen, "Enter <name>" (through the portal) and "All
   worlds". `useWorldsNudge` (`src/hooks/`) offers it once per visit (sessionStorage
   `portfolio-worlds-hint-offered`), only after 20 s and one scrolled screen, never to a visitor who opened
-  the picker or has seen two worlds. It never takes focus and closes on its x, Escape or a tap outside.
-- Seen worlds are kept in localStorage under `portfolio-worlds-seen` (a world counts after 1.5 s on
-  screen); the picker shows "You have seen n of 17" once n is 2 or more.
-- The launcher, hint and picker text is English in the components: they render above the CV data
-  provider, so they cannot read `labels.json` yet.
+  the picker or has seen two worlds. It then waits, rendered hidden and inert so its real box can be measured,
+  and opens only where that box covers no text and no control (`coversNothing`); if no such place comes
+  before the end of the page it stays closed that visit. It never takes focus and closes on its x, Escape or
+  a tap outside.
+- The next world is `nextInTour` (`src/lib/worlds/nudge.ts`): the first world of `TOUR_ORDER` that is not
+  seen and not the current one, so a first visitor in the default world is offered Medieval Fantasy. With
+  every world seen it offers the one after the current world.
+- Seen worlds are kept in localStorage under `portfolio-worlds-seen` and this visit's in sessionStorage
+  under `portfolio-worlds-visit` (a world counts after 1.5 s on screen).
+- The picker (`WorldsModal`) remembers them: "You have seen n of 17 worlds" over 17 dots, then the worlds in
+  `orderForPicker` order: the next unseen world first as the wide up next card (`WorldCard`), then the
+  other unseen worlds, the seen ones in grey and the current one, "You are here". On open the focus goes
+  to the up next "Enter <name>" button, Tab stays inside, and on close it goes back to the control that
+  opened it (the opener is held in `WorldTransitionContext`). It paints from the same `--wl-*` properties.
+- Focus rings: the launcher sets `--focus-ring` to the fill and `--focus-halo` to the black or white edge,
+  so ring or halo reads 3 to 1 or more on any page behind it; the hint and picker set the halo to the label
+  colour, 7 to 1 or more on their own fill.
+- Every launcher, hint and picker word is Site text in Decap (`content/cv/labels.json` `labels.worlds`, in
+  English, Spanish and Italian). `RootShell` reads it with `getLabels` (`src/lib/cv-data.ts`) on the server
+  and hands it down through `WorldsLabelsProvider` (`src/components/worlds/WorldsLabels.tsx`), since the
+  launcher renders above the CV data provider.
 
 ## Where the CV content comes from
 
