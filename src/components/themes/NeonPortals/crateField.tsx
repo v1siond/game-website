@@ -335,6 +335,8 @@ function MoveStrip({ onSpin, onSlam, figure, gem }: MoveStripProps) {
           <Bandicoot key={figure.move ? figure.take : 0} profession="engineer" pose={triggered ? figure.pose : 'idle'} className="h-full w-full" />
         )}
         {hopping && <Ride vehicle="rex" profession="engineer" rider={false} className={`absolute inset-y-0 -left-1/2 ${crates.rexOff}`} />}
+        {/* the floor he stands on, drawn in his own span so its top is the span's bottom edge, where his figure ends */}
+        <span className="absolute -inset-x-2 top-full block h-1 rounded-full bg-[color:var(--np-stone-lit)]" />
       </span>
       <div className="flex flex-wrap gap-3">
         <button type="button" onClick={onSpin} className={`${ui.button} ${ui.lit}`}>
