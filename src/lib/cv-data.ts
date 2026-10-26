@@ -5,6 +5,7 @@ import { promisify } from 'node:util'
 import type { Locale } from '@/i18n/config'
 import { lastModifiedFrom } from './contentDate'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData } from './cv/content'
+import { labelsFor, type Labels, type LabelsFile } from './cv/labels'
 
 export type { CVData } from './cv/content'
 
@@ -25,6 +26,12 @@ export async function getAllCVData(locale: Locale): Promise<CVData> {
   return cvDataFrom(Object.fromEntries(entries) as CVContentFiles, locale)
 }
 
+/** The interface text of one locale, read from content/cv/labels.json alone, for the document shell that
+ *  renders around every page (the worlds launcher, hint and picker). */
+export async function getLabels(locale: Locale): Promise<Labels> {
+  const [, file] = await readContentFile('labels')
+  return labelsFor(file as LabelsFile, locale)
+}
 
 // The committer date of the last commit touching the content, or '' where git or the history is missing.
 const lastCommitDate = async (): Promise<string> => {

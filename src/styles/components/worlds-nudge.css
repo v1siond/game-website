@@ -1,14 +1,17 @@
 /* ===================================================================
-   ITCSS Components: THE WORLDS LAUNCHER AND ITS ONE TIME HINT
+   ITCSS Components: THE WORLDS LAUNCHER, ITS ONE TIME HINT AND THE PICKER
    ===================================================================
-   The launcher (top right, every world) and the hint card under it paint from custom properties the
-   React components set from the current world's palette (launcherColors in src/lib/worlds/nudge.ts):
-   --wl-text the label colour, --wl-body running text, --wl-fill the world's background, --wl-edge the black or
-   white outer hairline. Both text pairs read at 7 to 1 or more; the rings keep 3 to 1 from any page behind. Defaults are medieval-fantasy, the default world.
+   The launcher (top right, every world), the hint card under it and the worlds picker paint from custom
+   properties the React components set from the current world's palette (launcherColors in
+   src/lib/worlds/nudge.ts): --wl-text the label colour, --wl-body running text, --wl-fill the world's
+   background, --wl-edge the black or white outer hairline. Both text pairs read at 7 to 1 or more; the rings
+   keep 3 to 1 from any page behind. The defaults (Medieval Fantasy's) only cover a paint before the
+   component sets its own.
    =================================================================== */
 
 .c-worlds-launcher,
-.c-worlds-hint {
+.c-worlds-hint,
+.c-worlds-picker {
   --wl-text: #d4a017;
   --wl-body: #e8dcc8;
   --wl-fill: #0a0c0e;
@@ -49,13 +52,54 @@
   from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: none; }
 }
-.c-worlds-hint { animation: worlds-hint-in 0.28s ease-out both; }
+.c-worlds-hint--open { animation: worlds-hint-in 0.28s ease-out both; }
 
 @media (prefers-reduced-motion: reduce) {
   .c-worlds-launcher { transition: none; }
   .c-worlds-launcher:hover { transform: none; }
-  .c-worlds-hint { animation: none; }
+  .c-worlds-hint--open { animation: none; }
 }
 
-/* The seen counter under the worlds picker's title. */
-.c-worlds-seen { color: var(--wl-body, #e8dcc8); }
+/* The picker: the panel on the world's background, the title, seen count and dots in the label colour, the
+   rest in running text. A filled button is the fill on the label, as in the hint. */
+.c-worlds-backdrop {
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+}
+.c-worlds-picker {
+  color: var(--wl-body);
+  border: 1px solid var(--wl-text);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.6);
+}
+.c-worlds-picker__title,
+.c-world-card__name { color: var(--wl-text); }
+.c-worlds-picker__close {
+  color: var(--wl-text);
+  border: 1px solid var(--wl-text);
+}
+.c-worlds-pip {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--wl-text);
+}
+.c-worlds-pip--on { background-color: var(--wl-text); }
+.c-worlds-chip {
+  color: var(--wl-body);
+  border: 1px solid var(--wl-body);
+}
+.c-worlds-chip[aria-pressed="true"] {
+  color: var(--wl-fill);
+  background-color: var(--wl-text);
+  border-color: var(--wl-text);
+}
+.c-world-card {
+  color: var(--wl-body);
+  background-color: var(--wl-fill);
+  border: 1px solid var(--wl-body);
+}
+.c-world-card--next { border: 2px solid var(--wl-text); }
+.c-world-card__enter {
+  color: var(--wl-fill);
+  background-color: var(--wl-text);
+}

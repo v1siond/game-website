@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useRef, useEffect, useCallback, ReactNode, type RefObject } from 'react'
 import { useTheme } from './ThemeContext'
 import { getThemeById } from './themes'
 import WorldPortal, { PORTAL_VARIANTS, type PortalVariant } from '@/components/worlds/WorldPortal'
@@ -15,8 +15,11 @@ interface WorldTransitionContextType {
   isTransitioning: boolean
   /** The "Enter Another World" picker modal (lives outside the page content flow). */
   isWorldsOpen: boolean
-  openWorlds: () => void
+  /** Opens the picker; `opener` is the control that opened it, which gets the focus back on close. */
+  openWorlds: (opener?: HTMLElement | null) => void
   closeWorlds: () => void
+  /** The control that last opened the picker (WorldsLauncher moves the focus back to it). */
+  worldsOpener: RefObject<HTMLElement | null>
 }
 
 const WorldTransitionContext = createContext<WorldTransitionContextType | undefined>(undefined)
@@ -27,7 +30,11 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
   const [variant, setVariant] = useState<PortalVariant>('vortex')
   const [destId, setDestId] = useState<string | null>(null)
   const [isWorldsOpen, setIsWorldsOpen] = useState(false)
-  const openWorlds = useCallback(() => setIsWorldsOpen(true), [])
+  const worldsOpener = useRef<HTMLElement | null>(null)
+  const openWorlds = useCallback((opener: HTMLElement | null = null) => {
+    worldsOpener.current = opener
+    setIsWorldsOpen(true)
+  }, [])
   const closeWorlds = useCallback(() => setIsWorldsOpen(false), [])
   const timers = useRef<number[]>([])
   // "Shuffle bag": draw all 4 variants once before any repeats, and never repeat
@@ -91,7 +98,7 @@ export function WorldTransitionProvider({ children }: { children: ReactNode }) {
   const destTheme = destId ? getThemeById(destId) : theme
 
   return (
-    <WorldTransitionContext.Provider value={{ selectWorld, isTransitioning: phase !== 'idle', isWorldsOpen, openWorlds, closeWorlds }}>
+    <WorldTransitionContext.Provider value={{ selectWorld, isTransitioning: phase !== 'idle', isWorldsOpen, openWorlds, closeWorlds, worldsOpener }}>
       {children}
       {phase !== 'idle' && (
         <WorldPortal

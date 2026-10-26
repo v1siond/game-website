@@ -1,31 +1,39 @@
 'use client'
 
-import { useEffect, useRef, type CSSProperties } from 'react'
+import { useEffect, type CSSProperties, type RefObject } from 'react'
+import { fillLabel } from '@/lib/cv/labels'
+import { useWorldsLabels } from './WorldsLabels'
 
 interface WorldsHintProps {
+  cardRef: RefObject<HTMLDivElement | null>
+  /** Waiting: rendered hidden and inert, only so useWorldsNudge can measure where it would land. */
+  open: boolean
   style: CSSProperties
   worldName: string
+  nextName: string
   seenCount: number
   total: number
   onNext: () => void
-  onAll: () => void
+  onAll: (opener: HTMLElement) => void
   onClose: () => void
 }
 
 /**
- * The one time worlds hint, a small card under the launcher. A non modal dialog: it never takes focus,
- * and closes on its x, Escape or a tap anywhere outside it. Drops in with opacity and a short slide
- * (worlds-nudge.css), shown at once under reduced motion. When it shows: useWorldsNudge.
+ * The one time worlds hint, a small card under the launcher that names the next world in the tour and
+ * enters it in one press. A non modal dialog: it never takes focus, and closes on its x, Escape or a tap
+ * anywhere outside it. Drops in with opacity and a short slide when it opens (worlds-nudge.css), shown at
+ * once under reduced motion. When it shows and where: useWorldsNudge.
  */
-export default function WorldsHint({ style, worldName, seenCount, total, onNext, onAll, onClose }: WorldsHintProps) {
-  const card = useRef<HTMLDivElement>(null)
+export default function WorldsHint({ cardRef, open, style, worldName, nextName, seenCount, total, onNext, onAll, onClose }: WorldsHintProps) {
+  const labels = useWorldsLabels()
 
   useEffect(() => {
+    if (!open) return
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
     }
     const onPointer = (event: PointerEvent) => {
-      if (!card.current?.contains(event.target as Node)) onClose()
+      if (!cardRef.current?.contains(event.target as Node)) onClose()
     }
     document.addEventListener('keydown', onKey)
     document.addEventListener('pointerdown', onPointer)
@@ -33,37 +41,44 @@ export default function WorldsHint({ style, worldName, seenCount, total, onNext,
       document.removeEventListener('keydown', onKey)
       document.removeEventListener('pointerdown', onPointer)
     }
-  }, [onClose])
+  }, [open, onClose, cardRef])
 
   return (
     <div
-      ref={card}
+      ref={cardRef}
+      data-worlds-hint
       role="dialog"
       aria-labelledby="worlds-hint-title"
       aria-describedby="worlds-hint-body"
+      aria-hidden={!open || undefined}
+      inert={!open}
       style={style}
-      className="c-worlds-hint fixed top-[60px] left-4 right-4 z-[150] rounded-lg p-3 sm:top-[72px] sm:left-auto sm:w-80"
+      className={`c-worlds-hint fixed top-[60px] left-4 right-4 z-[150] rounded-lg p-3 sm:top-[72px] sm:left-auto sm:w-80 ${open ? 'c-worlds-hint--open' : 'invisible'}`}
     >
       <p id="worlds-hint-title" className="pr-11 pt-1 text-base font-bold leading-tight">
-        This CV has {total} worlds
+        {fillLabel(labels.hintNextTitle, { world: nextName })}
       </p>
       <button
         type="button"
         onClick={onClose}
-        aria-label="Close the worlds hint"
+        aria-label={labels.hintClose}
         className="absolute right-0.5 top-0.5 flex h-11 w-11 items-center justify-center rounded-md text-base"
       >
         ✕
       </button>
       <p id="worlds-hint-body" className="c-worlds-hint__body mb-2 mt-1 text-sm leading-snug">
-        You are in {worldName}. Seen {Math.max(seenCount, 1)} of {total}.
+        {fillLabel(labels.hintBody, { world: worldName, seen: Math.max(seenCount, 1), total })}
       </p>
       <div className="flex gap-2">
         <button type="button" onClick={onNext} className="c-worlds-hint__primary min-h-11 flex-1 rounded-md px-3 text-sm font-bold">
-          Next world
+          {fillLabel(labels.hintEnter, { world: nextName })}
         </button>
-        <button type="button" onClick={onAll} className="c-worlds-hint__secondary min-h-11 flex-1 rounded-md px-3 text-sm">
-          All worlds
+        <button
+          type="button"
+          onClick={(event) => onAll(event.currentTarget)}
+          className="c-worlds-hint__secondary min-h-11 flex-1 rounded-md px-3 text-sm"
+        >
+          {labels.hintAll}
         </button>
       </div>
     </div>

@@ -4,13 +4,26 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
 import { WORLDS } from '@/themes/worlds'
-import { HINT_MIN_MS, HINT_OFFERED_KEY, SEEN_STORAGE_KEY, markSeen, mayOfferHint, pickNextWorld, readSeen } from '@/lib/worlds/nudge'
+import {
+  HINT_OFFERED_KEY,
+  HINT_MIN_MS,
+  SEEN_STORAGE_KEY,
+  VISIT_STORAGE_KEY,
+  coversNothing,
+  mayOfferHint,
+  nextInTour,
+  readSeen,
+  recordWorld,
+} from '@/lib/worlds/nudge'
 
 // A world counts as seen once it has been on screen this long. The provider renders the default world for
 // one commit before a returning visitor's own world, and this wait keeps that commit from counting.
 const SEEN_AFTER_MS = 1500
 
 const WORLD_IDS = WORLDS.map((world) => world.id)
+
+// What the hint must not cover when it opens: any text, and any control a visitor could reach.
+const CONTROLS = 'a[href], button, input, select, textarea, summary, [role="button"], [role="link"], [tabindex]:not([tabindex="-1"])'
 
 // Storage throws when the browser blocks site data; the nudge then works for this page view only.
 const readStorage = (storage: () => Storage, key: string): string | null => {
@@ -35,16 +48,52 @@ const session = () => window.sessionStorage
 /** The worlds this browser has seen, read from storage at the moment it is called. */
 export const loadSeenWorlds = (): string[] => readSeen(readStorage(local, SEEN_STORAGE_KEY), WORLD_IDS)
 
+const recordIn = (storage: () => Storage, key: string, id: string): string[] => {
+  const next = recordWorld(readStorage(storage, key), id, WORLD_IDS)
+  writeStorage(storage, key, JSON.stringify(next))
+  return next
+}
+
+const isShown = (element: Element): boolean => element.checkVisibility({ opacityProperty: true, visibilityProperty: true })
+
+/** The boxes of every shown text line and control on the page that meet the card's box, the card's own aside. */
+function boxesUnder(card: HTMLElement): DOMRect[] {
+  const box = card.getBoundingClientRect()
+  const meets = (element: Element): boolean =>
+    !card.contains(element) && !coversNothing(box, [element.getBoundingClientRect()]) && isShown(element)
+  const controls = Array.from(document.querySelectorAll(CONTROLS)).filter(meets).map((element) => element.getBoundingClientRect())
+  const lines: DOMRect[] = []
+  const range = document.createRange()
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const parent = node.parentElement
+    if (!parent || !node.textContent?.trim() || !meets(parent)) continue
+    range.selectNodeContents(node)
+    lines.push(...Array.from(range.getClientRects()))
+  }
+  return [...controls, ...lines]
+}
+
+const atPageEnd = (): boolean => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2
+
 /**
- * The worlds nudge state: the seen worlds (localStorage), the one time hint (sessionStorage, offered after
- * HINT_MIN_MS and one scrolled screen) and "Next world", a random unseen world through the portal.
+ * Where the one time hint stands: closed, waiting for a clear place (rendered hidden so its real box can be
+ * measured), or open.
+ */
+export type HintState = 'closed' | 'waiting' | 'open'
+
+/**
+ * The worlds nudge state: the seen worlds (localStorage) and the worlds entered this visit (sessionStorage),
+ * the one time hint (offered after HINT_MIN_MS and one scrolled screen, opened only where its card covers
+ * no text and no control, else closed that visit) and the next world in the tour it names.
  * Used once, by WorldsLauncher.
  */
 export function useWorldsNudge() {
   const { theme } = useTheme()
   const { isWorldsOpen, isTransitioning, openWorlds, selectWorld } = useWorldTransition()
   const [seen, setSeen] = useState<string[]>([])
-  const [hintOpen, setHintOpen] = useState(false)
+  const [hint, setHint] = useState<HintState>('closed')
+  const hintRef = useRef<HTMLDivElement>(null)
   const pickerOpened = useRef(false)
 
   useEffect(() => {
@@ -53,9 +102,8 @@ export function useWorldsNudge() {
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
-      const next = markSeen(loadSeenWorlds(), theme.id)
-      writeStorage(local, SEEN_STORAGE_KEY, JSON.stringify(next))
-      setSeen(next)
+      setSeen(recordIn(local, SEEN_STORAGE_KEY, theme.id))
+      recordIn(session, VISIT_STORAGE_KEY, theme.id)
     }, SEEN_AFTER_MS)
     return () => window.clearTimeout(timer)
   }, [theme.id])
@@ -63,7 +111,7 @@ export function useWorldsNudge() {
   useEffect(() => {
     if (!isWorldsOpen) return
     pickerOpened.current = true
-    setHintOpen(false)
+    setHint('closed')
   }, [isWorldsOpen])
 
   // Checked on scroll and once when the minimum read time has passed; stops listening once offered.
@@ -85,7 +133,7 @@ export function useWorldsNudge() {
       if (!offer) return
       done = true
       writeStorage(session, HINT_OFFERED_KEY, '1')
-      setHintOpen(true)
+      setHint('waiting')
     }
     const timer = window.setTimeout(check, HINT_MIN_MS + 50)
     window.addEventListener('scroll', check, { passive: true })
@@ -95,22 +143,55 @@ export function useWorldsNudge() {
     }
   }, [])
 
-  const closeHint = useCallback(() => setHintOpen(false), [])
+  // While waiting, the hidden card is measured against the page once per scrolled frame: it opens at the
+  // first place where it covers nothing, and stays closed this visit when the page ends first.
+  useEffect(() => {
+    if (hint !== 'waiting') return
+    let frame = 0
+    const place = () => {
+      frame = 0
+      const card = hintRef.current
+      if (!card) return
+      if (coversNothing(card.getBoundingClientRect(), boxesUnder(card))) {
+        setHint('open')
+        return
+      }
+      if (atPageEnd()) setHint('closed')
+    }
+    const onScroll = () => {
+      if (frame === 0) frame = window.requestAnimationFrame(place)
+    }
+    place()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', onScroll)
+    }
+  }, [hint])
+
+  const nextId = nextInTour(theme.id, seen)
+
+  const closeHint = useCallback(() => setHint('closed'), [])
 
   const nextWorld = useCallback(() => {
-    setHintOpen(false)
-    selectWorld(pickNextWorld(WORLD_IDS, theme.id, loadSeenWorlds(), Math.random))
-  }, [selectWorld, theme.id])
+    setHint('closed')
+    selectWorld(nextId)
+  }, [selectWorld, nextId])
 
-  const allWorlds = useCallback(() => {
-    setHintOpen(false)
-    openWorlds()
-  }, [openWorlds])
+  const allWorlds = useCallback(
+    (opener: HTMLElement) => {
+      setHint('closed')
+      openWorlds(opener)
+    },
+    [openWorlds],
+  )
 
   return {
     total: WORLD_IDS.length,
     seenCount: seen.length,
-    hintOpen: hintOpen && !isWorldsOpen && !isTransitioning,
+    nextId,
+    hint: isWorldsOpen || isTransitioning ? 'closed' : hint,
+    hintRef,
     closeHint,
     nextWorld,
     allWorlds,

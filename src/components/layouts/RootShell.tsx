@@ -4,6 +4,8 @@ import { Bebas_Neue } from "next/font/google";
 import "../../styles/globals.css";
 import ClientProviders from "../providers/ClientProviders";
 import { SITE_URL } from "@/lib/seo";
+import { getLabels } from "@/lib/cv-data";
+import type { Locale } from "@/i18n/config";
 
 const silkScreen = localFont({
   src: [
@@ -61,15 +63,17 @@ export const viewport: Viewport = {
 };
 
 interface RootShellProps {
-  lang: string;
+  lang: Locale;
   children: React.ReactNode;
 }
 
 /**
- * The document every root layout renders: fonts, head and the world providers. The site and the CV are
- * separate root layouts (route groups) only so each can set its own `lang`; everything else is this.
+ * The document every root layout renders: fonts, head and the world providers, with the worlds text in the
+ * document's language. The site and the CV are separate root layouts (route groups) only so each can set its
+ * own `lang`; everything else is this.
  */
-export default function RootShell({ lang, children }: Readonly<RootShellProps>) {
+export default async function RootShell({ lang, children }: Readonly<RootShellProps>) {
+  const labels = await getLabels(lang);
   // The home page's inline script may set data-world-pending on <html> before hydration
   // (src/themes/worldPending.ts); suppressHydrationWarning covers that one attribute level only.
   return (
@@ -82,7 +86,7 @@ export default function RootShell({ lang, children }: Readonly<RootShellProps>) 
       <body
         className={`${silkScreen.className} ${silkScreen.variable} ${permanentMarker.className} ${bebasNeue.variable} antialiased`}
       >
-        <ClientProviders>
+        <ClientProviders worldsLabels={labels.worlds}>
           {children}
         </ClientProviders>
       </body>

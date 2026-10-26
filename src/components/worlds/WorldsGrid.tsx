@@ -1,23 +1,23 @@
 'use client'
 
 import { useState } from 'react'
-import { useTheme } from '@/themes/ThemeContext'
-import { WORLDS, WORLD_CATEGORIES } from '@/themes/worlds'
-import type { Theme } from '@/themes/themes'
+import { WORLDS, WORLD_CATEGORIES, type World } from '@/themes/worlds'
+import type { PickerEntry } from '@/lib/worlds/nudge'
 import WorldCard from './WorldCard'
 import { CATEGORY_ICONS, type WorldFilter as Filter } from './categoryIcons'
+import { useWorldsLabels } from './WorldsLabels'
+
+const WORLD_BY_ID = new Map<string, World>(WORLDS.map((world) => [world.id, world]))
 
 function FilterChip({
   active,
   label,
   count,
-  theme,
   onClick,
 }: {
   active: boolean
   label: Filter
   count: number
-  theme: Theme
   onClick: () => void
 }) {
   return (
@@ -25,34 +25,26 @@ function FilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="ws-chip flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs uppercase tracking-widest min-h-11 lg:min-h-[40px] cursor-pointer"
-      style={{
-        border: `1px solid ${active ? theme.colors.accent : theme.colors.border}`,
-        backgroundColor: active ? theme.colors.surfaceHover : 'transparent',
-        color: active ? theme.colors.accent : theme.colors.textMuted,
-      }}
+      className="ws-chip c-worlds-chip flex shrink-0 items-center gap-2 rounded-full px-4 min-h-11 text-base tracking-[0.1em] cursor-pointer"
     >
       {CATEGORY_ICONS[label]()}
       <span>{label}</span>
-      <span aria-hidden="true" style={{ color: theme.colors.textMuted }}>
-        {count}
-      </span>
+      <span aria-hidden="true">{count}</span>
     </button>
   )
 }
 
 /**
- * The functional Worlds grid: category filter chips + a responsive grid of every
- * world as a live-preview card. Chrome (chips, card frames) is styled from the CURRENT
- * theme via `useTheme()`, so it inherits whatever world hosts it. Themes wrap this in
- * their own <section> + heading to provide the signature framing. See WorldCard.
+ * The worlds grid inside the picker: the kind filter chips, then every world as a card in the picker's
+ * order (orderForPicker: up next, unseen, seen, here), the up next card first and two columns wide. A
+ * filter keeps that order and shows only the worlds of its kind. Painted from the launcher tokens the
+ * picker sets (worlds-nudge.css). See WorldCard.
  */
-export default function WorldsGrid() {
-  const { theme } = useTheme()
+export default function WorldsGrid({ order }: { order: PickerEntry[] }) {
+  const labels = useWorldsLabels()
   const [filter, setFilter] = useState<Filter>('All')
 
-  // One fixed order (the registry's); the current world is flagged in place, never moved.
-  const visibleWorlds = filter === 'All' ? WORLDS : WORLDS.filter((w) => w.category === filter)
+  const entries = order.filter((entry) => filter === 'All' || WORLD_BY_ID.get(entry.id)?.category === filter)
   const categoriesWithCounts = WORLD_CATEGORIES.map((cat) => ({
     ...cat,
     count: WORLDS.filter((w) => w.category === cat.name).length,
@@ -62,17 +54,11 @@ export default function WorldsGrid() {
     <div>
       <div
         role="group"
-        aria-label="Filter worlds by category"
+        aria-label={labels.pickerFilterAria}
         // one row that scrolls sideways on a phone, so the chips never push the worlds below the screen
-        className="mb-8 flex items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0"
+        className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0"
       >
-        <FilterChip
-          active={filter === 'All'}
-          onClick={() => setFilter('All')}
-          label="All"
-          count={WORLDS.length}
-          theme={theme}
-        />
+        <FilterChip active={filter === 'All'} onClick={() => setFilter('All')} label="All" count={WORLDS.length} />
         {categoriesWithCounts.map((cat) => (
           <FilterChip
             key={cat.name}
@@ -80,14 +66,13 @@ export default function WorldsGrid() {
             onClick={() => setFilter(cat.name)}
             label={cat.name}
             count={cat.count}
-            theme={theme}
           />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {visibleWorlds.map((world) => (
-          <WorldCard key={world.id} world={world} isCurrent={world.id === theme.id} />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
+        {entries.map((entry) => (
+          <WorldCard key={entry.id} id={entry.id} mark={entry.mark} />
         ))}
       </div>
     </div>

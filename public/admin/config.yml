@@ -811,6 +811,30 @@ collections:
                   - { <<: *text, label: "No posts yet", name: empty }
                   - { <<: *text, label: "No post at this address", name: notFound }
                   - { <<: *text, label: "Code example (the name a screen reader gives each code block)", name: codeExample }
+              # {count} and {total} are the number of worlds, {seen} how many the visitor has seen, {world} a world's name.
+              - label: Worlds launcher, hint and picker
+                name: worlds
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Launcher (the number goes in bold, the rest beside it)", name: launcher }
+                  - { <<: *text, label: "Launcher name for a screen reader", name: launcherAria }
+                  - { <<: *text, label: "Launcher tooltip", name: launcherTitle }
+                  - { <<: *text, label: "Hint title, naming the next world", name: hintNextTitle }
+                  - { <<: *text, label: "Hint line under the title", name: hintBody }
+                  - { <<: *text, label: "Hint button entering the next world", name: hintEnter }
+                  - { <<: *text, label: "Hint button opening the picker", name: hintAll }
+                  - { <<: *text, label: "Hint close button for a screen reader", name: hintClose }
+                  - { <<: *text, label: "Picker title", name: pickerTitle }
+                  - { <<: *text, label: "Picker subtitle", name: pickerSubtitle }
+                  - { <<: *text, label: "Picker close button for a screen reader", name: pickerClose }
+                  - { <<: *text, label: "Picker count of worlds seen", name: pickerProgress }
+                  - { <<: *text, label: "Picker category filters for a screen reader", name: pickerFilterAria }
+                  - { <<: *text, label: "Up next card heading", name: pickerUpNext }
+                  - { <<: *text, label: "Up next card button", name: pickerEnter }
+                  - { <<: *text, label: "Mark on a world not seen yet", name: pickerNotSeen }
+                  - { <<: *text, label: "Mark on a world seen", name: pickerSeenMark }
+                  - { <<: *text, label: "Mark on the world the visitor is in", name: pickerHere }
 
   # One Markdown file per post, content/blog/<slug>.md, English only. The front matter is JSON (Decap's
   # json-frontmatter), which the site reads with JSON.parse. A new post starts as a draft: drafts show

@@ -463,6 +463,26 @@
         "empty": "No posts yet.",
         "notFound": "No post at this address.",
         "codeExample": "Code example"
+      },
+      "worlds": {
+        "launcher": "{count} worlds",
+        "launcherAria": "{count} worlds, choose another world",
+        "launcherTitle": "This CV comes in {count} worlds",
+        "hintNextTitle": "Next world: {world}",
+        "hintBody": "You are in {world}. Seen {seen} of {total}.",
+        "hintEnter": "Enter {world}",
+        "hintAll": "All worlds",
+        "hintClose": "Close the worlds hint",
+        "pickerTitle": "Enter Another World",
+        "pickerSubtitle": "Step through to a different version of this realm",
+        "pickerClose": "Close world picker",
+        "pickerProgress": "You have seen {seen} of {total} worlds",
+        "pickerFilterAria": "Filter worlds by category",
+        "pickerUpNext": "Up next, not seen yet",
+        "pickerEnter": "Enter {world}",
+        "pickerNotSeen": "Not seen yet",
+        "pickerSeenMark": "Seen",
+        "pickerHere": "You are here"
       }
     }
   },
@@ -930,6 +950,26 @@
         "empty": "Todavía no hay publicaciones.",
         "notFound": "No hay ninguna publicación en esta dirección.",
         "codeExample": "Ejemplo de código"
+      },
+      "worlds": {
+        "launcher": "{count} mundos",
+        "launcherAria": "{count} mundos, elige otro mundo",
+        "launcherTitle": "Este CV viene en {count} mundos",
+        "hintNextTitle": "Siguiente mundo: {world}",
+        "hintBody": "Estás en {world}. Has visto {seen} de {total}.",
+        "hintEnter": "Entrar en {world}",
+        "hintAll": "Todos los mundos",
+        "hintClose": "Cerrar el aviso de mundos",
+        "pickerTitle": "Entra en otro mundo",
+        "pickerSubtitle": "Cruza a otra versión de este reino",
+        "pickerClose": "Cerrar el selector de mundos",
+        "pickerProgress": "Has visto {seen} de {total} mundos",
+        "pickerFilterAria": "Filtrar los mundos por categoría",
+        "pickerUpNext": "El siguiente, aún sin ver",
+        "pickerEnter": "Entrar en {world}",
+        "pickerNotSeen": "Aún sin ver",
+        "pickerSeenMark": "Visto",
+        "pickerHere": "Estás aquí"
       }
     }
   },
@@ -1397,6 +1437,26 @@
         "empty": "Ancora nessun articolo.",
         "notFound": "Nessun articolo a questo indirizzo.",
         "codeExample": "Esempio di codice"
+      },
+      "worlds": {
+        "launcher": "{count} mondi",
+        "launcherAria": "{count} mondi, scegli un altro mondo",
+        "launcherTitle": "Questo CV esiste in {count} mondi",
+        "hintNextTitle": "Prossimo mondo: {world}",
+        "hintBody": "Sei in {world}. Ne hai visti {seen} su {total}.",
+        "hintEnter": "Entra in {world}",
+        "hintAll": "Tutti i mondi",
+        "hintClose": "Chiudi l'avviso dei mondi",
+        "pickerTitle": "Entra in un altro mondo",
+        "pickerSubtitle": "Passa a un'altra versione di questo regno",
+        "pickerClose": "Chiudi la scelta dei mondi",
+        "pickerProgress": "Hai visto {seen} mondi su {total}",
+        "pickerFilterAria": "Filtra i mondi per categoria",
+        "pickerUpNext": "Il prossimo, non ancora visto",
+        "pickerEnter": "Entra in {world}",
+        "pickerNotSeen": "Non ancora visto",
+        "pickerSeenMark": "Visto",
+        "pickerHere": "Sei qui"
       }
     }
   }

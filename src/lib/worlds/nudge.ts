@@ -1,11 +1,38 @@
-// The rules behind the worlds nudge: which worlds a visitor has seen, when the one time hint may show,
-// which world "Next world" opens, and which palette tokens the launcher reads in. No DOM here; the
-// useWorldsNudge hook is the thin adapter over storage, timers and scroll.
+// The rules behind the worlds nudge: which worlds a visitor has seen and entered this visit, when the one
+// time hint may show and where it may open, which world comes next in the tour, the order the picker lists
+// the worlds in, and which palette tokens the launcher reads in. No DOM here; the useWorldsNudge hook is
+// the thin adapter over storage, timers and scroll.
 import { contrastRatio } from '@/lib/contrast'
 import type { ThemeColors } from '@/themes/themes'
 
 export const SEEN_STORAGE_KEY = 'portfolio-worlds-seen'
 export const HINT_OFFERED_KEY = 'portfolio-worlds-hint-offered'
+/** The worlds entered this visit (sessionStorage), the measure the hint and the picker are judged by. */
+export const VISIT_STORAGE_KEY = 'portfolio-worlds-visit'
+
+/**
+ * The fixed tour the hint and the picker offer the worlds in: first the worlds that read most unlike each
+ * other, then the rest. Holds every world id once (worldsNudge.test.ts checks it against themes.ts).
+ */
+export const TOUR_ORDER: readonly string[] = [
+  'medieval-fantasy',
+  'neon-portals',
+  'survival-horror',
+  'art-deco',
+  'retro-rpg',
+  'rubber-hose',
+  'neon-cyber',
+  'soul-map',
+  'tropical-platformer',
+  'bold-noir',
+  'fighter-select',
+  'cell-shaded',
+  'mythic',
+  'retro-atomic',
+  'silhouette',
+  'adventure-paths',
+  'dark-fantasy',
+]
 
 /** The hint waits this long after the page opened, so it never interrupts the first read. */
 export const HINT_MIN_MS = 20000
@@ -55,12 +82,59 @@ export function mayOfferHint(moment: HintMoment): boolean {
   return moment.scrolledPx >= moment.viewportPx
 }
 
-/** A random world the visitor has not seen yet; any other world once they have seen them all. */
-export function pickNextWorld(ids: readonly string[], currentId: string, seen: readonly string[], random: () => number): string {
-  const others = ids.filter((id) => id !== currentId)
+/** A stored list of worlds with one more entered: unreadable lists start over, each world counts once. */
+export function recordWorld(raw: string | null, id: string, knownIds: readonly string[]): string[] {
+  return markSeen(readSeen(raw, knownIds), id)
+}
+
+/**
+ * The world the hint and the picker offer next: the first world of the tour the visitor has not seen and is
+ * not in now. Once every world was seen, the one after the current world in the tour, wrapping at the end.
+ */
+export function nextInTour(currentId: string, seen: readonly string[]): string {
+  const unseen = TOUR_ORDER.find((id) => id !== currentId && !seen.includes(id))
+  if (unseen) return unseen
+  return TOUR_ORDER[(TOUR_ORDER.indexOf(currentId) + 1) % TOUR_ORDER.length]
+}
+
+export type PickerMark = 'next' | 'unseen' | 'seen' | 'here'
+
+export interface PickerEntry {
+  id: string
+  mark: PickerMark
+}
+
+/**
+ * The picker's order: the next unseen world first (the up next card), the other unseen worlds, the seen
+ * ones, and the world the visitor is in last. Each group keeps the tour order.
+ */
+export function orderForPicker(currentId: string, seen: readonly string[]): PickerEntry[] {
+  const others = TOUR_ORDER.filter((id) => id !== currentId)
   const unseen = others.filter((id) => !seen.includes(id))
-  const pool = unseen.length > 0 ? unseen : others
-  return pool[Math.min(pool.length - 1, Math.floor(random() * pool.length))]
+  const seenOthers = others.filter((id) => seen.includes(id))
+  return [
+    ...unseen.map((id, index): PickerEntry => ({ id, mark: index === 0 ? 'next' : 'unseen' })),
+    ...seenOthers.map((id): PickerEntry => ({ id, mark: 'seen' })),
+    { id: currentId, mark: 'here' },
+  ]
+}
+
+/** A box on screen in viewport pixels, the shape getBoundingClientRect gives. */
+export interface ScreenBox {
+  left: number
+  top: number
+  right: number
+  bottom: number
+}
+
+const hasArea = (box: ScreenBox): boolean => box.right > box.left && box.bottom > box.top
+
+const overlaps = (a: ScreenBox, b: ScreenBox): boolean =>
+  a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom
+
+/** True when no text or control box shares any area with the hint's box; touching an edge is clear. */
+export function coversNothing(box: ScreenBox, under: readonly ScreenBox[]): boolean {
+  return !under.some((other) => hasArea(other) && overlaps(box, other))
 }
 
 const readsAtAAA = (fill: string) => (color: string): boolean => contrastRatio(color, fill) >= AAA_TEXT
