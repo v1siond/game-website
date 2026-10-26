@@ -34,7 +34,7 @@ export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOp
   // The three nodes share one row, so on a phone each shrinks with the width (a third of it at most) and the
   // longest label word still fits inside the border.
   const size = isCentre ? (isLargeScreen ? 'clamp(5.75rem, 30vw, 8rem)' : 'clamp(5.5rem, 30vw, 6rem)') : (isLargeScreen ? 'clamp(5.5rem, 28vw, 7rem)' : '5.5rem')
-  const tint = selected ? REALM.chaosFelBright : REALM.textMid
+  const tint = selected ? REALM.chaosFelText : REALM.textMid
 
   return (
     <button

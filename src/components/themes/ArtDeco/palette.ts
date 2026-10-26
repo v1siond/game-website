@@ -48,7 +48,8 @@ export const DECO_COLORS = {
   // Maroon theatre boards
   bloodDark: '#660000',
   blood: '#8B0000',
-  // The edge of a ventures banner, so the cloth deepens from bloodDark behind the title outward
+  // The edge of a ventures banner, so the cloth deepens from bloodDark behind the title outward, and the
+  // board under the vending machine's thin marquee letters
   bloodDeep: '#3F0000',
 
   // His painted costume: the grey heather cable knit sweater, the slacks, the pipe wrench and the blue

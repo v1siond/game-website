@@ -314,6 +314,11 @@
   animation: blink 1s steps(1) infinite;
 }
 
+/* The boot text: the full copy holds the layout unseen while the typed copy counts up over it. */
+.typedFull {
+  visibility: hidden;
+}
+
 .glow {
   text-shadow:
     0 0 6px theme('colors.atomic.phosphor / 0.55'),
@@ -939,6 +944,16 @@
 
   /* The server draws the sealed door for every first visit; under reduced motion it never shows. */
   .doorWall {
+    display: none;
+  }
+
+  /* The boot text reads whole from the first paint: the server cannot know the preference, so the full
+     copy shows and the typed copy over it stays out of the way. */
+  .typedFull {
+    visibility: visible;
+  }
+
+  .typedLive {
     display: none;
   }
 

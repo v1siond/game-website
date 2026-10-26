@@ -12,8 +12,9 @@ export const REALM = {
   chaosSkyMid: '#081008',
   chaosSkyBot: '#0c150c',
   chaosFelBright: '#5a6a3a',
-  // Fel green as text: the same hue lifted to 9 to 1 on the dark chips; chaosFelBright stays on the glows.
-  chaosFelText: '#aabd86',
+  // Fel green as text: the same hue lifted to 7 to 1 on every metal shade a label sits on (the selected
+  // profession node's metalMid, 7.07 to 1) and higher on the dark chips; chaosFelBright stays on the glows.
+  chaosFelText: '#bdcba0',
   chaosFelMid: '#3a4a28',
   chaosFelDark: '#2a3518',
   chaosFireBright: '#ffaa44',

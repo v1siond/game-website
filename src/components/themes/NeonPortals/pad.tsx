@@ -5,7 +5,8 @@ import { PORTAL } from './palette'
 // blue dome, lit from the top left, sitting in a grey ring set into the floor, its number in white
 // italic serif on top. The hub's three profession buttons, the job levels' number and the exit pad at
 // the level end are all this pad. Its gradient (npw-pad) lives in PickupDefs on the world's root.
-// viewBox 0 0 120 44: the ring spans y 16 to 41, the dome's top y 10 to 30.
+// viewBox 0 0 120 44: the ring spans y 16 to 41, the dome's top y 10 to 30. The number is 20 units tall,
+// so the narrowest hub pad (84 px wide, 0.7 px a unit) still paints it at 14 px.
 
 interface LevelPadProps {
   /** The number (or nothing) painted on the dome. */
@@ -28,7 +29,7 @@ export function LevelPad({ label, lit = false, topClassName = '', className }: L
         <ellipse cx="60" cy="20" rx="44" ry="10" fill="url(#npw-pad)" stroke={lit ? PORTAL.GOLD : PORTAL.VOID} strokeWidth={lit ? 3 : 2} />
         <ellipse cx="47" cy="16" rx="17" ry="3.2" fill={PORTAL.WHITE} opacity="0.55" />
         {label !== undefined && (
-          <text x="60" y="26" textAnchor="middle" fontFamily="Georgia, 'Times New Roman', serif" fontSize="17" fontStyle="italic" fontWeight="900" fill={PORTAL.WHITE} stroke={PORTAL.VOID} strokeWidth="1" paintOrder="stroke">
+          <text x="60" y="27" textAnchor="middle" fontFamily="Georgia, 'Times New Roman', serif" fontSize="20" fontStyle="italic" fontWeight="900" fill={PORTAL.WHITE} stroke={PORTAL.VOID} strokeWidth="1" paintOrder="stroke">
             {label}
           </text>
         )}

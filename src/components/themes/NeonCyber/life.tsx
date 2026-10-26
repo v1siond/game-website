@@ -195,7 +195,9 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
               <g className={life.pin} data-hot={on(hot === i)} style={{ '--i': i } as CSSProperties}>
                 <circle className={life.pinRing} cx={0} cy={86} r={16} fill="none" stroke={NEON.gold} strokeWidth={3} />
                 <path d="M0 96 L-12 72 A14 14 0 1 1 12 72 Z" fill={NEON.gold} stroke={NEON.ink} strokeWidth={2} />
-                <text x={0} y={76} textAnchor="middle" fontSize={16} fill={NEON.ink}>
+                {/* The map scales with the panel: its 16 unit digits reach 14 px only from lg, so below it the
+                    pins go unnumbered and the contract cards under the map carry the numbers. */}
+                <text x={0} y={76} textAnchor="middle" fontSize={16} fill={NEON.ink} className="hidden lg:inline">
                   {String(i + 1).padStart(2, '0')}
                 </text>
               </g>

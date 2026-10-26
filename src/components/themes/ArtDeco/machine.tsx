@@ -117,7 +117,7 @@ export function VendingMachine() {
     <div ref={ref} data-on={triggered || undefined} className={`relative mx-auto mt-16 max-w-4xl ${machine.machine}`}>
       <Crown />
       <div className={`relative border-[3px] border-[color:var(--deco-gold)] px-4 pb-5 pt-4 sm:px-8 sm:pb-8 ${machine.cabinet}`}>
-        <div className="relative mb-5 overflow-hidden border-2 border-[color:var(--deco-brass-dark)] bg-[color:var(--deco-blood-dark)] px-4 py-3 text-center">
+        <div className="relative mb-5 overflow-hidden border-2 border-[color:var(--deco-brass-dark)] bg-[color:var(--deco-blood-deep)] px-4 py-3 text-center">
           <Fragment key={active}>
             <span className={`pointer-events-none absolute inset-0 ${machine.bulbs} ${machine.bulbsOdd}`} aria-hidden="true" />
             <span className={`pointer-events-none absolute inset-0 ${machine.bulbs} ${machine.bulbsEven}`} aria-hidden="true" />
