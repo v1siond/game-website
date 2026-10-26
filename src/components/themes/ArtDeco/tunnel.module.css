@@ -52,11 +52,23 @@
 }
 
 /* Each joint's ring is the focus ring's pair (1.4.11): a 3px gold ring with a 3px abyss halo outside it.
-   Where the gold melts into the brass rib or the sea, the halo carries the edge (abyss on gold 11.94:1). */
+   Where the gold melts into the brass rib or the sea, the halo carries the edge (abyss on gold 11.94:1).
+   The jet is a child of the button and would paint over the button's own border, so the ring lives on an
+   overlay above the children; the transparent border keeps the children where they were. */
 .leak {
+  border: 3px solid transparent;
+  border-radius: 9999px;
+}
+
+.leak::after {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: 1;
   border: 3px solid var(--deco-gold-bright);
   border-radius: 9999px;
   box-shadow: 0 0 0 3px var(--deco-abyss);
+  pointer-events: none;
 }
 
 .leak[data-sealed] .jet {
