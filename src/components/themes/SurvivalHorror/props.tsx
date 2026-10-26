@@ -154,17 +154,19 @@ function Chair() {
   )
 }
 
-// The desk's drawing width, the middle of the typewriter's key slope in it, and its width in his body widths.
-// Its legs run down to the floor from wherever puts the keys at his striking fists (TYPING_KEYS).
-const DESK = { width: 140, keysY: 9, w: 1.4 } as const
-const DESK_HEIGHT = DESK.keysY + (TYPING_KEYS * DESK.width) / DESK.w
+// The desk's drawing width, its top (the typewriter's base), the typewriter's top, and its width in his body
+// widths. The keys sit in the middle of the typewriter's slope; the legs run down to the floor from wherever
+// puts those keys at his striking fists (TYPING_KEYS).
+const DESK = { width: 140, topY: 16, typewriterTopY: 2, w: 1.4 } as const
+const KEYS_Y = (DESK.topY + DESK.typewriterTopY) / 2
+const DESK_HEIGHT = KEYS_Y + (TYPING_KEYS * DESK.width) / DESK.w
 
 function TypewriterDesk() {
   return (
     <Place at={DESK_AT} w={DESK.w} viewBox={`0 0 ${DESK.width} ${DESK_HEIGHT}`}>
-      <rect x={0} y={16} width={DESK.width} height={6} fill={SH.wood} />
+      <rect x={0} y={DESK.topY} width={DESK.width} height={6} fill={SH.wood} />
       <path d={`M8 22 V${DESK_HEIGHT} M132 22 V${DESK_HEIGHT}`} stroke={SH.wood} strokeWidth={5} />
-      <path d="M12 16 L18 2 H58 L64 16 Z" fill={SH.gunmetal} />
+      <path d={`M12 ${DESK.topY} L18 ${DESK.typewriterTopY} H58 L64 ${DESK.topY} Z`} fill={SH.gunmetal} />
       <rect x={24} y={-8} width={28} height={10} fill={SH.ivory} />
       {[96, 106].map((x) => (
         <rect key={x} x={x} y={8} width={8} height={8} rx={1} fill={SH.leather} />
