@@ -26,10 +26,18 @@
   transition: transform 0.15s ease;
 }
 .c-worlds-launcher:hover { transform: scale(1.05); }
-.c-worlds-launcher:focus-visible,
-.c-worlds-hint button:focus-visible {
-  outline: 3px solid var(--wl-text);
-  outline-offset: 3px;
+/* The keyboard focus ring and halo the shared rule in globals.css draws (--focus-ring, --focus-halo): the
+   ring in the fill, the halo right outside it. On the launcher the halo is the black or white edge, so ring
+   or halo reads 3 to 1 or more on any page behind it, /cv's white included; on the hint card and the picker
+   panel, both in the fill, the halo is the label colour, 7 to 1 or more on them. */
+.c-worlds-launcher {
+  --focus-ring: var(--wl-fill);
+  --focus-halo: var(--wl-edge);
+}
+.c-worlds-hint,
+.c-worlds-picker {
+  --focus-ring: var(--wl-fill);
+  --focus-halo: var(--wl-text);
 }
 
 .c-worlds-hint {

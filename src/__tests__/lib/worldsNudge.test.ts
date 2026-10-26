@@ -218,6 +218,25 @@ describe('launcher edge', () => {
   })
 })
 
+describe('launcher focus ring', () => {
+  // worlds-nudge.css: on the launcher the ring is the fill and the halo the edge; on the hint card and the
+  // picker panel, both painted in the fill, the ring is the fill and the halo the label colour.
+  const greys = Array.from({ length: 256 }, (_, v) => `#${v.toString(16).padStart(2, '0').repeat(3)}`)
+  const pages = [...greys, '#ffffff', '#f09a4b', '#601511', '#1c1b40', '#bde675', ...themes.map((t) => t.colors.background)]
+
+  it.each(themes.map((t) => [t.id, t.colors] as const))('gives the %s launcher a ring or halo of 3 to 1 or more on any page behind it', (_id, colors) => {
+    const { fill, edge } = launcherColors(colors)
+    const weakest = Math.min(...pages.map((page) => Math.max(contrastRatio(fill, page), contrastRatio(edge, page))))
+    expect(weakest).toBeGreaterThanOrEqual(3)
+    expect(contrastRatio(fill, edge)).toBeGreaterThanOrEqual(3)
+  })
+
+  it.each(themes.map((t) => [t.id, t.colors] as const))('gives the %s hint and picker controls a halo of 3 to 1 or more on their panel', (_id, colors) => {
+    const { text, fill } = launcherColors(colors)
+    expect(contrastRatio(text, fill)).toBeGreaterThanOrEqual(3)
+  })
+})
+
 describe('contrastRatio', () => {
   it('reads black on white as 21 to 1', () => {
     expect(contrastRatio('#000000', '#ffffff')).toBeCloseTo(21, 5)
