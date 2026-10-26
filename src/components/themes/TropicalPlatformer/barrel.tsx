@@ -63,10 +63,15 @@ interface BarrelArtProps {
   inside?: ReactNode
 }
 
+/** The barrel's drawing box and its mouth's rim, so a scene can place a thing at the mouth. */
+export const BARREL = { width: 60, height: 72, mouth: { cx: 30, cy: 10, rx: 22, ry: 6.5 } }
+
+const { mouth: RIM } = BARREL
+
 export function BarrelArt({ mark = 'burst', className = '', inside = null }: BarrelArtProps) {
   return (
-    <svg viewBox="0 0 60 72" className={className} aria-hidden="true" focusable="false">
-      <ellipse cx="30" cy="10" rx="22" ry="6.5" fill={C.shadow} />
+    <svg viewBox={`0 0 ${BARREL.width} ${BARREL.height}`} className={className} aria-hidden="true" focusable="false">
+      <ellipse cx={RIM.cx} cy={RIM.cy} rx={RIM.rx} ry={RIM.ry} fill={C.shadow} />
       {inside}
       <path d="M8 10 Q2 36 8 62 Q30 70 52 62 Q58 36 52 10 Q30 16 8 10 Z" fill="url(#tp-wood)" />
       <path d="M18 13 Q13 38 18 66 M30 14 V69 M42 13 Q47 38 42 66" fill="none" stroke={C.barkDark} strokeWidth="1.2" opacity="0.5" />
@@ -74,8 +79,8 @@ export function BarrelArt({ mark = 'burst', className = '', inside = null }: Bar
       <path d="M5.5 22 Q30 30 54.5 22" fill="none" stroke="url(#tp-hoop)" strokeWidth="4.5" />
       <path d="M5.5 52 Q30 60 54.5 52" fill="none" stroke="url(#tp-hoop)" strokeWidth="4.5" />
       {MARKS[mark]}
-      <ellipse cx="30" cy="10" rx="22" ry="6.5" fill="none" stroke={C.bark} strokeWidth="3" />
-      <ellipse cx="30" cy="10" rx="22" ry="6.5" fill="none" stroke="url(#tp-hoop)" strokeWidth="1.5" />
+      <ellipse cx={RIM.cx} cy={RIM.cy} rx={RIM.rx} ry={RIM.ry} fill="none" stroke={C.bark} strokeWidth="3" />
+      <ellipse cx={RIM.cx} cy={RIM.cy} rx={RIM.rx} ry={RIM.ry} fill="none" stroke="url(#tp-hoop)" strokeWidth="1.5" />
     </svg>
   )
 }

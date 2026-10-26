@@ -125,8 +125,9 @@
 
 /*
  * ---- his flight ----
- * His box rests on the landing spot; the flight starts at the barrel's mouth. Percentages of his own
- * box: the mouth is 258% of his width to the left and 150% of his height up, the top of the arc 237%.
+ * His box rests on the landing spot; the flight starts at the barrel's mouth. sunset.tsx works out, as
+ * percentages of his own box, how far left the mouth is (--from-x), how far up (--from-y) and how far up
+ * the top of the arc is (--peak-y), from the landing box and the cannon.
  * The horizontal travel is linear and the vertical one eases out up and in down, so the two layers
  * draw a thrown arc.
  */
@@ -142,7 +143,7 @@
 @keyframes fly-x {
   0% {
     opacity: 0;
-    transform: translate3d(-258%, 0, 0);
+    transform: translate3d(var(--from-x), 0, 0);
   }
   8% {
     opacity: 1;
@@ -159,11 +160,11 @@
 
 @keyframes fly-y {
   0% {
-    transform: translate3d(0, -150%, 0);
+    transform: translate3d(0, var(--from-y), 0);
     animation-timing-function: cubic-bezier(0.2, 0.7, 0.4, 1);
   }
   42% {
-    transform: translate3d(0, -237%, 0);
+    transform: translate3d(0, var(--peak-y), 0);
     animation-timing-function: cubic-bezier(0.6, 0, 0.8, 0.4);
   }
   100% {

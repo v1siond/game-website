@@ -6,7 +6,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { NameWords } from '@/components/cv/NameWords'
-import { BarrelArt, MuzzleBurst } from './barrel'
+import { BARREL, BarrelArt, MuzzleBurst } from './barrel'
 import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
@@ -39,14 +39,37 @@ const VIEW = `0 0 ${SCENE.width} ${SCENE.height}`
 // The palms' ground band is split at the box's middle and passes through the ground y there, its two
 // control points set off from that point so the band's bend rides with it. Both sit in the palms' plane,
 // so the plane's parting moves them together.
-const LANDING_BOX = { x: 248, width: 48 }
+const LANDING_BOX = { x: 248, width: 48, height: 72 }
 const GROUND_Y = 261
 const LANDING_X = LANDING_BOX.x + LANDING_BOX.width / 2
 const GROUND_BAND = `M-30 262 Q100 250 200 258 Q${LANDING_X - 38} ${GROUND_Y - 0.3} ${LANDING_X} ${GROUND_Y} Q${LANDING_X + 72.5} ${GROUND_Y + 0.9} 430 254 V300 H-30 Z`
+
+// The tree house cannon's box in the scene's units, its height the barrel's drawing at that width.
+const CANNON = { x: 100, y: 78, width: 48 }
+const CANNON_AT = {
+  '--cannon-left': `${(CANNON.x / SCENE.width) * 100}%`,
+  '--cannon-top': `${(CANNON.y / SCENE.height) * 100}%`,
+  '--cannon-width': `${(CANNON.width / SCENE.width) * 100}%`,
+} as CSSProperties
+
+// His flight starts with his box's top left corner at the barrel's mouth (the rim's top at its middle,
+// before the cannon's tilt) and tops out with his box's top on ARC_TOP_Y, both in the scene's units.
+// sunset.module.css reads them as percentages of his own box, the way a translate counts.
+const BARREL_SCALE = CANNON.width / BARREL.width
+const MOUTH = {
+  x: CANNON.x + BARREL.mouth.cx * BARREL_SCALE,
+  y: CANNON.y + (BARREL.mouth.cy - BARREL.mouth.ry) * BARREL_SCALE,
+}
+const ARC_TOP_Y = 18.4
+const LANDED_TOP = GROUND_Y - LANDING_BOX.height
 const LANDING = {
   '--ground': GROUND_Y / SCENE.height,
   '--landing-left': `${(LANDING_BOX.x / SCENE.width) * 100}%`,
   '--landing-width': `${(LANDING_BOX.width / SCENE.width) * 100}%`,
+  '--landing-height': `${(LANDING_BOX.height / SCENE.height) * 100}%`,
+  '--from-x': `${((MOUTH.x - LANDING_BOX.x) / LANDING_BOX.width) * 100}%`,
+  '--from-y': `${((MOUTH.y - LANDED_TOP) / LANDING_BOX.height) * 100}%`,
+  '--peak-y': `${((ARC_TOP_Y - LANDED_TOP) / LANDING_BOX.height) * 100}%`,
 } as CSSProperties
 
 // The sky in the flat steps the source's sunsets are painted in, the sun swelling behind streaks of
@@ -152,13 +175,13 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
       <div className={`absolute inset-0 ${sunset.mid}`}>
         <Palms />
       </div>
-      <div className={`absolute inset-0 ${sunset.house}`}>
+      <div className={`absolute inset-0 ${sunset.house}`} style={CANNON_AT}>
         <TreeHouse />
         <button
           type="button"
           onClick={onBlast}
           aria-label={blastLabel}
-          className={`absolute left-[25%] top-[26%] w-[12%] rounded-full ${look.focus} ${sunset.cannon}`}
+          className={`absolute left-[var(--cannon-left)] top-[var(--cannon-top)] w-[var(--cannon-width)] rounded-full ${look.focus} ${sunset.cannon}`}
         >
           <span key={shot} className={`block ${sunset.recoil}`}>
             <BarrelArt mark="burst" className="block h-auto w-full" />
@@ -168,7 +191,7 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
       </div>
 
       <div className={`pointer-events-none absolute inset-0 ${sunset.mid}`} style={LANDING} aria-hidden="true">
-        <div key={shot} className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[var(--landing-left)] h-[24%] w-[var(--landing-width)] ${sunset.flightX}`}>
+        <div key={shot} className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[var(--landing-left)] h-[var(--landing-height)] w-[var(--landing-width)] ${sunset.flightX}`}>
           <div className={`relative h-full w-full ${sunset.flightY}`}>
             <HeroCharacter profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
             <div className={`absolute inset-0 ${sunset.land}`}>
