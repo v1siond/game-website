@@ -351,7 +351,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 11. Retro Atomic - an atomic age fallout shelter seen through his wrist terminal, out to the wasteland
+  // 11. Retro Atomic - the default world: an atomic age fallout shelter seen through his wrist terminal, out to the wasteland
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',
@@ -531,7 +531,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 17. Medieval Fantasy - the default world: a real time strategy kingdom in gold and stone
+  // 17. Medieval Fantasy - a real time strategy kingdom in gold and stone
   {
     id: 'medieval-fantasy',
     name: 'Medieval Fantasy',
@@ -562,7 +562,7 @@ export const themes: Theme[] = [
   },
 ]
 
-export const DEFAULT_THEME_ID = 'medieval-fantasy'
+export const DEFAULT_THEME_ID = 'retro-atomic'
 
 /** Where the chosen world is remembered. Exported because the failure screen has to read the world
  *  WITHOUT the ThemeProvider: a root-layout crash unmounts the providers, and the Pages Router tree

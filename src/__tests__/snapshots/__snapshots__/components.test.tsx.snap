@@ -107,8 +107,8 @@ exports[`Theme Data Snapshots default theme configuration matches snapshot 1`] =
     "grainOpacity",
     "vignetteIntensity",
   ],
-  "id": "medieval-fantasy",
-  "name": "Medieval Fantasy",
+  "id": "retro-atomic",
+  "name": "Retro Atomic",
 }
 `;
 

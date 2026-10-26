@@ -2,15 +2,17 @@
 
 The site shows Alexander's CV inside one of 17 game styled worlds, or as a plain page at `/cv`. Every world
 reads the same CV content (Decap files in `content/cv/`) and the same shared scroll, hero and text pieces; a
-world only adds its own look: its palette, its art and its scenes. The default world is Medieval Fantasy.
+world only adds its own look: its palette, its art and its scenes. The default world is Retro Atomic.
 
 ## How a visitor gets a world
 
 - The homepage renders the world picked in the worlds menu, remembered in localStorage under
-  `portfolio-theme`. With nothing stored, the default `medieval-fantasy` opens (`DEFAULT_THEME_ID` in
+  `portfolio-theme`. With nothing stored, the default `retro-atomic` opens (`DEFAULT_THEME_ID` in
   `src/themes/themes.ts`). `?capture=<id>` forces a world for the preview screenshot script.
 - The server always renders the default world, in full: its hero, sections and every CV string are in the
-  HTML a fresh visitor and every crawler get. Only its random backdrop mounts on the client. The default
+  HTML a fresh visitor and every crawler get. Only its browser parts start on the client: the cog door's
+  timeline (the server draws it sealed, hidden under reduced motion), the pointer parallax and the
+  password game's random seed. The default
   world must never sit behind a whole page mounted gate (most other worlds have one, so a world becomes
   the default only after that gate is moved to its decoration), and SVG trig values go through
   `svgNumber` (`src/components/themes/shared/svgNumber.ts`) so the server and the browser print the same
@@ -26,8 +28,8 @@ world only adds its own look: its palette, its art and its scenes. The default w
 ## The 17 worlds
 
 Dark Fantasy, Survival Horror, Neon Portals, Soul Map, Adventure Paths, Rubber Hose, Retro RPG, Bold Noir,
-Fighter Select, Art Deco, Retro Atomic, Neon Cyber, Cell Shaded, Silhouette, Mythic, Tropical
-Platformer, Medieval Fantasy (default). The worlds menu groups them in five categories: Fantasy, Retro, Neon, Action,
+Fighter Select, Art Deco, Retro Atomic (default), Neon Cyber, Cell Shaded, Silhouette, Mythic, Tropical
+Platformer, Medieval Fantasy. The worlds menu groups them in five categories: Fantasy, Retro, Neon, Action,
 Artistic.
 
 ## The worlds launcher and its hint

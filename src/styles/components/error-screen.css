@@ -5,18 +5,18 @@
    rendering, and the root-layout crash that has no providers left. It is theme-driven rather
    than fixed: the colours and the type family arrive as custom properties set by the React
    component from the WORLD the visitor is currently in, so an error looks like the place it
-   happened instead of like a different website. Defaults below are medieval-fantasy, the site's
+   happened instead of like a different website. Defaults below are retro-atomic, the site's
    default world, so the screen is still legible if it ever renders with nothing set.
    =================================================================== */
 
 .c-error {
-  --err-bg: #0a0c0e;
-  --err-surface: #2a2428;
-  --err-text: #e8dcc8;
-  --err-muted: #b09878;
-  --err-accent: #d4a017;
-  --err-border: #5a5458;
-  --err-font: serif;
+  --err-bg: #0b0c09;
+  --err-surface: #121410;
+  --err-text: #12ff15;
+  --err-muted: #bcbdaa;
+  --err-accent: #f5c400;
+  --err-border: #7c8072;
+  --err-font: monospace;
 
   min-height: 100vh;
   min-height: 100dvh;
