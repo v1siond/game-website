@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useId, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { NameWords } from '@/components/cv/NameWords'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -49,40 +49,21 @@ const phaseFlags = (reached: ReadonlySet<Phase>) =>
 
 const DUST = [0, 1, 2]
 
-// The mesa he lands on, in the near ridge's dune colours and hatching. Its flat top on y 0 spans the
-// viewBox's 0 to 120, which the box stretches to his box's width, and its cliffs flare past that as they
-// drop, so the ground under him is at least as wide as he is. It hangs from his box's bottom edge, a quarter
-// of his height deep, and fades out downward through its mask so it reads as the ridge going on below, not
-// a slab. The mask spans the flared cliffs too, which run past the svg's own box.
-const MESA = { flare: 12, width: 120, height: 60 }
+// The mesa he stands on, in the near ridge's dune colours and hatching: a butte as wide as his box, its flat
+// top at his box's bottom edge and its cliffs dropping straight down past the hero's bottom edge, where the
+// header's overflow-hidden cuts it, so the rock under him always meets the ground the hero ends on with no
+// sky between. Two screens deep is more than the hero ever runs below him. The shaded cliff face on the
+// right, a tenth of its width, is the near ridge's shade, hatched like its faces. Drawn in px with no
+// viewBox, so the hatch keeps its own scale down the whole cliff.
+const SHADE_FACE = 10
 
 function Mesa() {
-  const fade = useId()
-  const left = -MESA.flare
-  const right = MESA.width + MESA.flare
+  const face = { x: `${100 - SHADE_FACE}%`, width: `${SHADE_FACE}%`, height: '100%' }
   return (
-    <svg
-      viewBox={`0 0 ${MESA.width} ${MESA.height}`}
-      preserveAspectRatio="none"
-      className={`absolute left-0 top-full h-1/4 w-full overflow-visible ${cel.inked}`}
-      aria-hidden="true"
-      focusable="false"
-    >
-      <defs>
-        <linearGradient id={`${fade}-ramp`} x1={0} y1={0} x2={0} y2={1}>
-          <stop offset={0} stopColor="white" />
-          <stop offset={1} stopColor="black" />
-        </linearGradient>
-        <mask id={fade} maskUnits="userSpaceOnUse" x={left} y={-MESA.height} width={right - left} height={MESA.height * 2}>
-          <rect x={left} y={-MESA.height} width={right - left} height={MESA.height} fill="white" data-bare />
-          <rect x={left} y={0} width={right - left} height={MESA.height} fill={`url(#${fade}-ramp)`} data-bare />
-        </mask>
-      </defs>
-      <g mask={`url(#${fade})`}>
-        <path d={`M${left} ${MESA.height} L0 0 L${MESA.width} 0 L${right} ${MESA.height} Z`} fill={CEL.dune} />
-        <path d={`M${MESA.width - MESA.flare} 0 L${MESA.width} 0 L${right} ${MESA.height} L${MESA.width} ${MESA.height} Z`} fill={CEL.duneShade} data-bare />
-        <path d={`M${MESA.width - MESA.flare} 0 L${MESA.width} 0 L${right} ${MESA.height} L${MESA.width} ${MESA.height} Z`} fill={HATCH} opacity={0.45} data-bare />
-      </g>
+    <svg className={`absolute left-0 top-full h-[200vh] w-full overflow-visible ${cel.inked}`} aria-hidden="true" focusable="false">
+      <rect width="100%" height="100%" fill={CEL.dune} />
+      <rect {...face} fill={CEL.duneShade} data-bare />
+      <rect {...face} fill={HATCH} opacity={0.45} data-bare />
     </svg>
   )
 }
@@ -151,7 +132,7 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
             <div className="relative min-w-0">
-              {/* relative so on a phone, where the name sits under him, it draws over the mesa's faded foot */}
+              {/* relative so on a phone, where the name sits under him, it draws over the mesa's cliff */}
               {/* the size runs with the viewport between 3rem and 6rem, so the longest word fits a 320px
                   screen and the whole name sits on one line from about 1024px; it only wraps between words */}
               <h1 className={`text-[clamp(3rem,2rem+5vw,6rem)] leading-none ${cel.display} ${cel.nameCard}`}>
