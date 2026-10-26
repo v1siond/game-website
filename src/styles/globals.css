@@ -101,8 +101,9 @@ html[data-world-pending] [data-world-root] {
   line-height: 1.5;
 }
 
-/* Focus indicators - visible on all interactive elements. Each world sets --focus-ring to its brightest accent on
-   its outermost element, so the ring stays 3 to 1 against the page; currentColor is the fallback elsewhere. */
+/* Focus indicators - visible on all interactive elements. Each world sets --focus-ring and --focus-halo on its
+   outermost element: the 3px ring with a 3px halo right outside it, the two 3 to 1 or more against each other,
+   so where a surface swallows one colour the other still stands out. currentColor and no halo are the fallback. */
 a:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible,
@@ -111,7 +112,8 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline: 3px solid var(--focus-ring, currentColor) !important;
-  outline-offset: 2px !important;
+  outline-offset: 0 !important;
+  box-shadow: 0 0 0 6px var(--focus-halo, transparent) !important;
 }
 
 /* Skip link for keyboard navigation */
