@@ -163,7 +163,7 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
   return (
     <div ref={ref}>
       <div className={`relative h-36 overflow-hidden ${v.catwalk}`} aria-hidden="true">
-        <div className="absolute inset-x-0 bottom-2 top-0 flex">
+        <div className={`absolute inset-x-0 top-0 flex ${v.onLedge}`}>
           {Array.from({ length: columns }, (_, column) => (
             <div key={column} className={`h-full flex-1 ${column > 0 ? 'max-md:hidden' : ''}`}>
               <LobbyBay />
@@ -179,16 +179,17 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
           />
         ))}
         {triggered && (
-          <div key={trip.count} className={`absolute bottom-2 left-0 ${v.lane} ${reduced ? '' : v.walker}`} style={walkVars} onAnimationEnd={walked}>
+          <div key={trip.count} className={`absolute left-0 ${v.onLedge} ${v.lane} ${reduced ? '' : v.walker}`} style={walkVars} onAnimationEnd={walked}>
+            {/* his box at his viewBox's 2:3, so the drawing reaches the box bottom, which stands on the ledge */}
             <SurvivorSprite
               profession="engineer"
               motion={reduced ? 'still' : MOTION[act]}
               onDone={act === 'pull' ? pulled : undefined}
-              className={`mx-auto block h-32 w-20 ${act === 'walk' && trip.to < trip.from ? v.back : ''}`}
+              className={`mx-auto block aspect-[2/3] w-20 ${act === 'walk' && trip.to < trip.from ? v.back : ''}`}
             />
           </div>
         )}
-        <div className={`absolute inset-x-0 bottom-0 h-2 ${v.rail}`} />
+        <div className={`absolute inset-x-0 bottom-0 ${v.rail}`} />
       </div>
       <ul ref={list} className="grid gap-6 md:grid-cols-3">
         {companies.map((company, index) => (

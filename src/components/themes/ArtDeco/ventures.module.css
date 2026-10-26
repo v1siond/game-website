@@ -7,11 +7,18 @@
  */
 
 .catwalk {
+  /* the gold ledge: the rail is this tall from the strip's bottom, and the bays and his lane stand on its top */
+  --ledge: 0.5rem;
   background: linear-gradient(to bottom, color-mix(in srgb, var(--deco-sepia) 55%, transparent) 0, color-mix(in srgb, var(--deco-abyss) 85%, transparent) 100%);
 }
 
 .rail {
+  height: var(--ledge);
   background: repeating-linear-gradient(90deg, var(--deco-brass-dark) 0 2px, transparent 2px 18px), linear-gradient(var(--deco-gold), var(--deco-brass-dark));
+}
+
+.onLedge {
+  bottom: var(--ledge);
 }
 
 .cord {
