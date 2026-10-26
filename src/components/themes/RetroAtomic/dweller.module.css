@@ -10,8 +10,8 @@
 .body { transform-origin: 50px 144px; }
 .chest { transform-origin: 50px 96px; }
 .head { transform-origin: 50px 56px; }
-.armRight { transform-origin: 34px 60px; }
-.foreRight { transform-origin: 32px 77px; }
+.armRight { transform-origin: var(--shoulder-r); }
+.foreRight { transform-origin: var(--elbow-r); }
 .armLeft { transform-origin: 66px 60px; }
 .foreLeft { transform-origin: 68px 77px; }
 .thighRight { transform-origin: 42px 95px; }
@@ -190,13 +190,13 @@
 .hoist .foreLeft { animation: hoist-fore-l 1.1s ease-out both; }
 .hoist .head { animation: hoist-head 1.1s ease-out both; }
 
-@keyframes hoist-body { 0% { transform: translateY(0); } 40% { transform: translateY(14px); } 100% { transform: translateY(6px); } }
+@keyframes hoist-body { 0% { transform: translateY(0); } 40% { transform: translateY(14px); } 100% { transform: translateY(var(--hoist-body)); } }
 @keyframes hoist-thigh-r { 0% { transform: rotate(0deg); } 40% { transform: rotate(38deg); } 100% { transform: rotate(22deg); } }
 @keyframes hoist-shin-r { 0% { transform: rotate(0deg); } 40% { transform: rotate(-62deg); } 100% { transform: rotate(-36deg); } }
 @keyframes hoist-thigh-l { 0% { transform: rotate(0deg); } 40% { transform: rotate(-38deg); } 100% { transform: rotate(-22deg); } }
 @keyframes hoist-shin-l { 0% { transform: rotate(0deg); } 40% { transform: rotate(62deg); } 100% { transform: rotate(36deg); } }
-@keyframes hoist-arm-r { 0% { transform: rotate(0deg); } 40% { transform: rotate(-20deg); } 100% { transform: rotate(165deg); } }
-@keyframes hoist-fore-r { 0% { transform: rotate(0deg); } 40% { transform: rotate(-10deg); } 100% { transform: rotate(22deg); } }
+@keyframes hoist-arm-r { 0% { transform: rotate(0deg); } 40% { transform: rotate(-20deg); } 100% { transform: rotate(var(--hoist-arm)); } }
+@keyframes hoist-fore-r { 0% { transform: rotate(0deg); } 40% { transform: rotate(-10deg); } 100% { transform: rotate(var(--hoist-fore)); } }
 @keyframes hoist-arm-l { 0% { transform: rotate(0deg); } 40% { transform: rotate(20deg); } 100% { transform: rotate(-60deg); } }
 @keyframes hoist-fore-l { 0% { transform: rotate(0deg); } 40% { transform: rotate(10deg); } 100% { transform: rotate(-25deg); } }
 @keyframes hoist-head { 0% { transform: rotate(0deg); } 40% { transform: rotate(0deg) translateY(2px); } 100% { transform: rotate(8deg); } }

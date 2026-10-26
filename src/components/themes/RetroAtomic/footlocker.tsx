@@ -5,7 +5,7 @@ import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
-import { DwellerSprite, HOIST_GRIP, VIEW } from './dweller'
+import { DwellerSprite, HOIST_GRIP, VIEW, turn, type Point } from './dweller'
 import { BRASS, CHROME, OLIVE, OLIVE_DARK, OLIVE_LIGHT, PHOSPHOR, POSTER_INK } from './palette'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
@@ -37,18 +37,6 @@ const DRAWN_WIDTH = (BOX.height * VIEW.width) / VIEW.height
 const GRIP = {
   left: (BOX.width - DRAWN_WIDTH) / 2 + (HOIST_GRIP.x / VIEW.width) * DRAWN_WIDTH,
   top: (HOIST_GRIP.y / VIEW.height) * BOX.height,
-}
-
-interface Point {
-  x: number
-  y: number
-}
-
-const turn = ({ x, y }: Point, about: Point, deg: number): Point => {
-  const rad = (deg * Math.PI) / 180
-  const dx = x - about.x
-  const dy = y - about.y
-  return { x: about.x + dx * Math.cos(rad) - dy * Math.sin(rad), y: about.y + dx * Math.sin(rad) + dy * Math.cos(rad) }
 }
 
 const corners = ({ x, y, width, height }: Point & { width: number; height: number }): Point[] => [

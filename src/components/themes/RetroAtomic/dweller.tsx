@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import {
@@ -178,13 +179,6 @@ const INKS: Record<DwellerTone, Inks> = {
 /** His viewBox's size, so a scene can place a prop at a point of his drawing as a fraction of his box. */
 export const VIEW = { width: 100, height: 150 }
 
-/**
- * Where his right hand rests at the end of the hoist, in viewBox units: the hand (HAND.right) turned by the
- * hoist's last keyframes in dweller.module.css, the forearm 22deg round the elbow (32, 77), the arm 165deg
- * round the shoulder (34, 60), the body 6 down. The footlocker hangs from this point.
- */
-export const HOIST_GRIP = { x: 34.2, y: 29.2 }
-
 const HEAD = 'M30 34 Q30 12 50 12 Q70 12 70 34 Q70 54 50 57 Q30 54 30 34 Z'
 const HAIR = 'M30.5 31 Q29 10 50 9.5 Q66 9 70.5 26 Q63 16.5 53 19 Q45 15 38 20 Q33 24 32.5 32 Z'
 const BEARD = 'M31.5 37 Q32 56 50 60 Q68 56 68.5 37 Q64.5 45.5 58.5 45.5 Q50 42.5 41.5 45.5 Q35.5 45.5 31.5 37 Z'
@@ -201,6 +195,45 @@ const FORE = {
   left: 'M63.5 77.5 L72.5 76 L72 93 L64.5 93 Z',
 }
 const HAND = { right: { x: 31.8, y: 97 }, left: { x: 68.2, y: 97 } }
+
+// The right arm's joints, in viewBox units: dweller.module.css turns the arm and the forearm round them.
+const SHOULDER_RIGHT = { x: 34, y: 60 }
+const ELBOW_RIGHT = { x: 32, y: 77 }
+
+// The hoist's held end pose: the body this far down, the arm and the forearm turned this far (degrees,
+// clockwise as CSS turns them). The keyframes' last step reads them as CSS variables.
+const HOIST_END = { bodyDrop: 6, arm: 165, fore: 22 }
+
+export interface Point {
+  x: number
+  y: number
+}
+
+/** A point turned round another by deg degrees, clockwise on screen as a CSS rotate turns it. */
+export const turn = ({ x, y }: Point, about: Point, deg: number): Point => {
+  const rad = (deg * Math.PI) / 180
+  const dx = x - about.x
+  const dy = y - about.y
+  return { x: about.x + dx * Math.cos(rad) - dy * Math.sin(rad), y: about.y + dx * Math.sin(rad) + dy * Math.cos(rad) }
+}
+
+const HOIST_HAND = turn(turn(HAND.right, ELBOW_RIGHT, HOIST_END.fore), SHOULDER_RIGHT, HOIST_END.arm)
+
+/**
+ * Where his right hand rests at the end of the hoist, in viewBox units: the hand turned by the hoist's end
+ * pose round the elbow, then round the shoulder, then the body's drop. The footlocker hangs from this point.
+ */
+export const HOIST_GRIP = { x: HOIST_HAND.x, y: HOIST_HAND.y + HOIST_END.bodyDrop }
+
+// The joints and the hoist's end pose as the CSS variables dweller.module.css reads, so the drawing and the
+// footlocker's grip have one owner.
+const POSE_VARS = {
+  '--shoulder-r': `${SHOULDER_RIGHT.x}px ${SHOULDER_RIGHT.y}px`,
+  '--elbow-r': `${ELBOW_RIGHT.x}px ${ELBOW_RIGHT.y}px`,
+  '--hoist-body': `${HOIST_END.bodyDrop}px`,
+  '--hoist-arm': `${HOIST_END.arm}deg`,
+  '--hoist-fore': `${HOIST_END.fore}deg`,
+} as CSSProperties
 
 const THIGH = {
   right: 'M35.5 94 L49.5 94 L48 120 L38 120 Z',
@@ -406,7 +439,7 @@ export function DwellerSprite({ profession, motion, tone = 'poster', className =
 
   return (
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`}>
+      <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} style={POSE_VARS}>
         {tone === 'poster' && <ellipse cx={50} cy={145} rx={22} ry={3} fill={POSTER_INK} opacity={0.35} />}
         <g className={s.body}>
           <Leg side="right" inks={inks} />
