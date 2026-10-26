@@ -11,6 +11,7 @@ import { DUMMY, FLOWER, KEEPER, KEEPER_PAW, MONSTER, PORTRAIT_OPEN, PORTRAIT_SHU
 import { RoomOpen } from './play'
 import { Soul } from './soul'
 import { Actor, PixelArt } from './walker'
+import { SPRITE } from './sprite'
 import type { Zone } from './overworld'
 import rooms from './rooms.module.css'
 
@@ -335,6 +336,10 @@ const FRONTS = [
   { x: 224, at: '[--open-at:1720ms]' },
 ]
 
+// A shop front stands on the street line; its door is his height (SPRITE), so he fits the doorway.
+const FRONT_BASE = 58
+const DOOR = { width: 16, height: SPRITE.height, y: FRONT_BASE - SPRITE.height } as const
+
 export function StreetRoom({ profession, children }: { profession: Profession; children: ReactNode }) {
   const art = (
     <>
@@ -346,11 +351,11 @@ export function StreetRoom({ profession, children }: { profession: Profession; c
           <rect x={x + 4} y="12" width="76" height="3" fill={RPG.townMint} />
           <rect x={x + 12} y="22" width="14" height="12" fill={RPG.waterWall} />
           <rect x={x + 58} y="22" width="14" height="12" fill={RPG.waterWall} />
-          <rect x={x + 34} y="34" width="16" height="24" fill={RPG.void} />
-          <rect x={x + 34} y="34" width="16" height="24" fill={RPG.shopWood} className={`${rooms.door} ${at}`} />
+          <rect x={x + 34} y={DOOR.y} width={DOOR.width} height={DOOR.height} fill={RPG.void} />
+          <rect x={x + 34} y={DOOR.y} width={DOOR.width} height={DOOR.height} fill={RPG.shopWood} className={`${rooms.door} ${at}`} />
         </g>
       ))}
-      <rect y="58" width="320" height="4" fill={RPG.townRoof} />
+      <rect y={FRONT_BASE} width="320" height="4" fill={RPG.townRoof} />
       <rect y="70" width="320" height="10" fill={RPG.borderShade} />
       <g className={rooms.taxi}>
         <rect x="0" y="70" width="26" height="7" fill={RPG.taxi} />
