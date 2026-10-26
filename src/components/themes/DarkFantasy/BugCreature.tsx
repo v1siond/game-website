@@ -257,10 +257,11 @@ export const BugPullReveal = memo(function BugPullReveal({
 
   return (
     <div ref={stageRef} className={`relative w-full ${PULL_STAGE_CLASS} ${className}`} style={PULL_STAGE}>
-      {/* Below lg: the fight in the page, standing on the panel frame's top line (PULL_STAGE) */}
+      {/* Below lg: the fight in the page, standing on the panel frame's top line (PULL_STAGE); COMBAT_Z.fighters
+          keeps it over the fixed backdrop and vignette and under the panel, as the pinned fighters are from lg */}
       {fighting && (
         <div
-          className="pointer-events-none relative -mb-[calc(var(--panel-top)_+_var(--frame-inset))] overflow-x-clip lg:hidden"
+          className={`pointer-events-none relative ${COMBAT_Z.fighters} -mb-[calc(var(--panel-top)_+_var(--frame-inset))] overflow-x-clip lg:hidden`}
           style={{ height: PHONE_FIGHT_HEIGHT_PX }}
           aria-hidden="true"
         >
