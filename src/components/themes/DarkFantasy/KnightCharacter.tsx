@@ -26,6 +26,8 @@ import { DARK_FANTASY } from './palette'
 const KNIGHT_VIEW_WIDTH = 60
 const KNIGHT_VIEW_HEIGHT = 80
 const KNIGHT_SOLE_Y = 79
+// The small ground shadow drawn over his legs sits this far above the sole line the contact shadows sit on.
+const KNIGHT_INNER_SHADOW_RISE = 3
 
 interface KnightCharacterProps {
   scale?: number
@@ -251,7 +253,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       </g>
 
       {/* Ground shadow */}
-      <ellipse cx="30" cy="76" rx="14" ry="2" fill={DARK_FANTASY.black} opacity="0.3" />
+      <ellipse cx="30" cy={KNIGHT_SOLE_Y - KNIGHT_INNER_SHADOW_RISE} rx="14" ry="2" fill={DARK_FANTASY.black} opacity="0.3" />
     </svg>
     </span>
   )
