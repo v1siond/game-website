@@ -4,11 +4,13 @@ import {
   TOUR_ORDER,
   VISIT_STORAGE_KEY,
   coversNothing,
+  hintBelongsOn,
   launcherColors,
   markSeen,
   mayOfferHint,
   nextInTour,
   orderForPicker,
+  progressTemplate,
   readSeen,
   recordWorld,
 } from '@/lib/worlds/nudge'
@@ -39,7 +41,7 @@ describe('markSeen', () => {
 })
 
 describe('mayOfferHint', () => {
-  const ready = { elapsedMs: HINT_MIN_MS, scrolledPx: 900, viewportPx: 800, offeredThisVisit: false, pickerOpened: false, seenCount: 1 }
+  const ready = { pathname: '/', elapsedMs: HINT_MIN_MS, scrolledPx: 900, viewportPx: 800, offeredThisVisit: false, pickerOpened: false, seenCount: 1 }
 
   it('offers the hint once the visitor has read a while and scrolled a screen', () => {
     expect(mayOfferHint(ready)).toBe(true)
@@ -64,6 +66,37 @@ describe('mayOfferHint', () => {
 
   it('stays away from a visitor who has already tried another world', () => {
     expect(mayOfferHint({ ...ready, seenCount: 2 })).toBe(false)
+  })
+
+  it.each([['/cv'], ['/es/cv'], ['/it/cv']])('never offers it on the CV page %s', (pathname) => {
+    expect(mayOfferHint({ ...ready, pathname })).toBe(false)
+  })
+
+  it('offers it on a world page and on the blog', () => {
+    expect(mayOfferHint({ ...ready, pathname: '/' })).toBe(true)
+    expect(mayOfferHint({ ...ready, pathname: '/blog' })).toBe(true)
+  })
+})
+
+describe('hintBelongsOn', () => {
+  it.each([['/cv'], ['/es/cv'], ['/it/cv'], ['/cv/'], ['/it/cv/']])('keeps the hint off the CV page %s', (pathname) => {
+    expect(hintBelongsOn(pathname)).toBe(false)
+  })
+
+  it.each([['/'], ['/blog'], ['/blog/some-post'], ['/cvs'], ['/fr/cv']])('lets the hint offer itself on %s', (pathname) => {
+    expect(hintBelongsOn(pathname)).toBe(true)
+  })
+})
+
+describe('progressTemplate', () => {
+  const templates = { pickerProgressOne: 'one {seen}', pickerProgress: 'many {seen}' }
+
+  it('words the count in the singular for exactly one world', () => {
+    expect(progressTemplate(1, templates)).toBe('one {seen}')
+  })
+
+  it.each([[0], [2], [17]])('words the count in the plural for %p worlds', (count) => {
+    expect(progressTemplate(count, templates)).toBe('many {seen}')
   })
 })
 

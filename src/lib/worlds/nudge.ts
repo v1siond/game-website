@@ -3,6 +3,7 @@
 // the worlds in, and which palette tokens the launcher reads in. No DOM here; the useWorldsNudge hook is
 // the thin adapter over storage, timers and scroll.
 import { contrastRatio } from '@/lib/contrast'
+import { CV_PATHS } from '@/i18n/config'
 import type { ThemeColors } from '@/themes/themes'
 
 export const SEEN_STORAGE_KEY = 'portfolio-worlds-seen'
@@ -65,7 +66,15 @@ export function markSeen(seen: string[], id: string): string[] {
   return [...seen, id]
 }
 
+const CV_PAGES: readonly string[] = Object.values(CV_PATHS)
+
+/** False on the CV pages of every language: the CV is just the CV, so the hint never offers itself there. */
+export function hintBelongsOn(pathname: string): boolean {
+  return !CV_PAGES.includes(pathname.replace(/(.)\/+$/, '$1'))
+}
+
 export interface HintMoment {
+  pathname: string
   elapsedMs: number
   scrolledPx: number
   viewportPx: number
@@ -76,6 +85,7 @@ export interface HintMoment {
 
 /** True once a first time visitor has read a while and scrolled a screen, and never twice in a visit. */
 export function mayOfferHint(moment: HintMoment): boolean {
+  if (!hintBelongsOn(moment.pathname)) return false
   if (moment.offeredThisVisit || moment.pickerOpened) return false
   if (moment.seenCount > 1) return false
   if (moment.elapsedMs < HINT_MIN_MS) return false
@@ -95,6 +105,17 @@ export function nextInTour(currentId: string, seen: readonly string[]): string {
   const unseen = TOUR_ORDER.find((id) => id !== currentId && !seen.includes(id))
   if (unseen) return unseen
   return TOUR_ORDER[(TOUR_ORDER.indexOf(currentId) + 1) % TOUR_ORDER.length]
+}
+
+export interface ProgressTemplates {
+  pickerProgressOne: string
+  pickerProgress: string
+}
+
+/** The picker's seen count line: the singular wording for exactly one world, the plural one otherwise. */
+export function progressTemplate(seenCount: number, templates: ProgressTemplates): string {
+  if (seenCount === 1) return templates.pickerProgressOne
+  return templates.pickerProgress
 }
 
 export type PickerMark = 'next' | 'unseen' | 'seen' | 'here'

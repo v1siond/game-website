@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
 import { WORLDS } from '@/themes/worlds'
@@ -10,6 +11,7 @@ import {
   SEEN_STORAGE_KEY,
   VISIT_STORAGE_KEY,
   coversNothing,
+  hintBelongsOn,
   mayOfferHint,
   nextInTour,
   readSeen,
@@ -54,9 +56,13 @@ const recordIn = (storage: () => Storage, key: string, id: string): string[] => 
   return next
 }
 
-const isShown = (element: Element): boolean => element.checkVisibility({ opacityProperty: true, visibilityProperty: true })
+// Text and controls at opacity 0 still count: a reveal fades them in where they are laid out, so the card
+// would end up over them. Only what is not rendered (display none), hidden (visibility hidden) or marked
+// as decoration for screen readers (aria-hidden) is skipped.
+const isShown = (element: Element): boolean =>
+  element.checkVisibility({ visibilityProperty: true }) && !element.closest('[aria-hidden="true"]')
 
-/** The boxes of every shown text line and control on the page that meet the card's box, the card's own aside. */
+/** The boxes of every laid out text line and control on the page that meet the card's box, the card's own aside. */
 function boxesUnder(card: HTMLElement): DOMRect[] {
   const box = card.getBoundingClientRect()
   const meets = (element: Element): boolean =>
@@ -84,8 +90,8 @@ export type HintState = 'closed' | 'waiting' | 'open'
 
 /**
  * The worlds nudge state: the seen worlds (localStorage) and the worlds entered this visit (sessionStorage),
- * the one time hint (offered after HINT_MIN_MS and one scrolled screen, opened only where its card covers
- * no text and no control, else closed that visit) and the next world in the tour it names.
+ * the one time hint (offered after HINT_MIN_MS and one scrolled screen, never on a CV page, opened only
+ * where its card covers no text and no control, else closed that visit) and the next world in the tour it names.
  * Used once, by WorldsLauncher.
  */
 export function useWorldsNudge() {
@@ -95,6 +101,14 @@ export function useWorldsNudge() {
   const [hint, setHint] = useState<HintState>('closed')
   const hintRef = useRef<HTMLDivElement>(null)
   const pickerOpened = useRef(false)
+  // usePathname is null only outside the app router, which this site does not use.
+  const pathname = usePathname() ?? ''
+  const pathnameRef = useRef(pathname)
+
+  useEffect(() => {
+    pathnameRef.current = pathname
+    if (!hintBelongsOn(pathname)) setHint('closed')
+  }, [pathname])
 
   useEffect(() => {
     setSeen(loadSeenWorlds())
@@ -123,6 +137,7 @@ export function useWorldsNudge() {
       deepest = Math.max(deepest, window.scrollY)
       if (done) return
       const offer = mayOfferHint({
+        pathname: pathnameRef.current,
         elapsedMs: performance.now() - startedAt,
         scrolledPx: deepest,
         viewportPx: window.innerHeight,

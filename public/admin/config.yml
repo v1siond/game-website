@@ -828,7 +828,8 @@ collections:
                   - { <<: *text, label: "Picker title", name: pickerTitle }
                   - { <<: *text, label: "Picker subtitle", name: pickerSubtitle }
                   - { <<: *text, label: "Picker close button for a screen reader", name: pickerClose }
-                  - { <<: *text, label: "Picker count of worlds seen", name: pickerProgress }
+                  - { <<: *text, label: "Picker count when the visitor has seen one world", name: pickerProgressOne }
+                  - { <<: *text, label: "Picker count of worlds seen, two or more", name: pickerProgress }
                   - { <<: *text, label: "Picker category filters for a screen reader", name: pickerFilterAria }
                   - { <<: *text, label: "Up next card heading", name: pickerUpNext }
                   - { <<: *text, label: "Up next card button", name: pickerEnter }
