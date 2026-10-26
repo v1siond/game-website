@@ -8,7 +8,7 @@ import { jobYears } from '@/components/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
-import { servicesByGroup, venturesFor } from '@/lib/cv/cvView'
+import { venturesFor } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Locale } from '@/i18n/config'
 
@@ -207,26 +207,24 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
           </section>
         )}
 
-        {/* Services: each group a masonry block under its heading, then the next step for a buyer */}
+        {/* Services: one masonry list, each service its title, description and use cases, then the next step for a buyer */}
         {services.length > 0 && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">
               {labels.sections.services}
             </h2>
-            <div className={MASONRY_LIST}>
-              {servicesByGroup(services).map(({ group, services: grouped }) => (
-                <div key={group ?? 'ungrouped'} className={MASONRY_ITEM}>
-                  {group && <h3 className="text-base font-semibold mb-1">{labels.serviceGroups[group]}</h3>}
-                  <ul className="text-sm space-y-1">
-                    {grouped.map((service) => (
-                      <li key={service.id}>
-                        <span className="font-semibold">{service.title}:</span> <span>{service.line}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            <ul className={`text-sm ${MASONRY_LIST}`}>
+              {services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <span className="font-semibold">{service.title}:</span> <span>{service.line}</span>
+                  {service.useCases && service.useCases.length > 0 && (
+                    <p className="mt-1 text-sm text-gray-700">
+                      {cvPage.useCases}: {service.useCases.join(', ')}
+                    </p>
+                  )}
+                </li>
               ))}
-            </div>
+            </ul>
             <p className="text-sm">
               {contact.line}{' '}
               <a

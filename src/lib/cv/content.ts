@@ -118,15 +118,15 @@ export interface Company {
   featured?: boolean
 }
 
-/** The heading a service is listed under, a key of the serviceGroups labels. */
-export type ServiceGroup = keyof Labels['serviceGroups']
-
-/** One thing he offers to build: a title and one short line, in the order he sets in Decap. */
+/**
+ * One thing he offers to build, in the order he sets in Decap: a title, its description (`line`) and the
+ * companies or products it was done for, which only /cv prints.
+ */
 export interface Service {
   id: string
   title: string
   line: string
-  group?: ServiceGroup
+  useCases?: string[]
 }
 
 export interface Role {

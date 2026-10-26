@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData, type Job, type Project } from '@/lib/cv/content'
-import { servicesByGroup, viewFor } from '@/lib/cv/cvView'
+import { viewFor } from '@/lib/cv/cvView'
 
 // The real Decap files, so every fixture has the shape and the strings the page reads.
 const realCV = (): CVData =>
@@ -111,17 +111,6 @@ describe('viewFor: System Engineer', () => {
     })
   })
 
-  it('files every service under a group the site text has a heading for, each group in one run', () => {
-    const cv = realCV()
-    const groups = cv.services.map((service) => service.group)
-    const headings = Object.keys(cv.labels.serviceGroups ?? {})
-
-    expect(headings.length).toBeGreaterThan(0)
-    groups.forEach((group) => expect(headings).toContain(group))
-    const runs = groups.filter((group, index) => group !== groups[index - 1])
-    expect(new Set(runs).size).toBe(runs.length)
-  })
-
   it('orders jobs by recency: current first, then by end date', () => {
     const { jobs } = engineerOf(viewFor(smallCV(), 'engineer', 'full', NOW))
     expect(ids(jobs)).toEqual(['dba-staff', 'ended-2021', 'ended-2020', 'smoothterminal', 'solutionrus'])
@@ -225,29 +214,5 @@ describe('viewFor: an unknown profession', () => {
 
     expect(view.profession).toBe('engineer')
     expect(view).toEqual(viewFor(cv, 'engineer', 'world', NOW))
-  })
-})
-
-describe('servicesByGroup', () => {
-  it('lists the services under their five groups in the order of services.json, each service once', () => {
-    const { services } = realCV()
-    const groups = servicesByGroup(services)
-
-    expect(groups.map(({ group }) => group)).toEqual(['build', 'rescueAndLead', 'ai', 'domains', 'launchAndPlatform'])
-    expect(groups.flatMap((entry) => entry.services)).toEqual(services)
-  })
-
-  it('keeps a service without a group in a group of its own with no heading', () => {
-    const [first, second] = realCV().services
-    const groups = servicesByGroup([{ ...first, group: undefined }, second])
-
-    expect(groups).toEqual([
-      { group: undefined, services: [{ ...first, group: undefined }] },
-      { group: second.group, services: [second] },
-    ])
-  })
-
-  it('gives no groups for no services', () => {
-    expect(servicesByGroup([])).toEqual([])
   })
 })

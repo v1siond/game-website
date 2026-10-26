@@ -14,13 +14,6 @@
         "contact": "Contact",
         "posts": "Posts"
       },
-      "serviceGroups": {
-        "build": "Build",
-        "rescueAndLead": "Rescue and lead",
-        "ai": "AI",
-        "domains": "Domains",
-        "launchAndPlatform": "Launch and platform"
-      },
       "professions": {
         "engineer": "System Engineer",
         "drummer": "Musician",
@@ -399,7 +392,8 @@
         "keyProjects": "Key Projects & Achievements",
         "technicalSkills": "Technical Skills",
         "professionalExperience": "Professional Experience",
-        "education": "Education"
+        "education": "Education",
+        "useCases": "Use cases"
       },
       "hud": {
         "playerOne": "1P",
@@ -478,13 +472,6 @@
         "muayThai": "Muay Thai",
         "contact": "Contacto",
         "posts": "Publicaciones"
-      },
-      "serviceGroups": {
-        "build": "Desarrollo",
-        "rescueAndLead": "Rescate y liderazgo",
-        "ai": "IA",
-        "domains": "Sectores",
-        "launchAndPlatform": "Lanzamiento y plataforma"
       },
       "professions": {
         "engineer": "Ingeniero de Sistemas",
@@ -864,7 +851,8 @@
         "keyProjects": "Proyectos Clave y Logros",
         "technicalSkills": "Habilidades Técnicas",
         "professionalExperience": "Experiencia Profesional",
-        "education": "Educación"
+        "education": "Educación",
+        "useCases": "Casos de uso"
       },
       "hud": {
         "playerOne": "1J",
@@ -943,13 +931,6 @@
         "muayThai": "Muay Thai",
         "contact": "Contatti",
         "posts": "Articoli"
-      },
-      "serviceGroups": {
-        "build": "Sviluppo",
-        "rescueAndLead": "Salvataggio e guida",
-        "ai": "IA",
-        "domains": "Settori",
-        "launchAndPlatform": "Lancio e piattaforma"
       },
       "professions": {
         "engineer": "Ingegnere di Sistemi",
@@ -1329,7 +1310,8 @@
         "keyProjects": "Progetti Chiave e Risultati",
         "technicalSkills": "Competenze Tecniche",
         "professionalExperience": "Esperienza Professionale",
-        "education": "Formazione"
+        "education": "Formazione",
+        "useCases": "Casi d'uso"
       },
       "hud": {
         "playerOne": "1G",

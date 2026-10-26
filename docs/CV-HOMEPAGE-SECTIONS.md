@@ -33,10 +33,12 @@ formats the same way (year spans, job years, project links, the Muay Thai facts,
 - Jobs and projects older than 5 years are left out, unless current or marked `highlight` in Decap.
 - A project with no years recorded is kept.
 - Jobs sort newest first; projects keep the order he set in Decap.
-- Bands, the services and the Muay Thai record are always shown whole. The services list, its length and
-  each title and line come from `content/cv/services.json`; no world holds a count or a word of it.
-- `/cv` shows everything, in English, Spanish or Italian. Its Services section follows Technical Skills,
-  each group under its heading from labels `serviceGroups`, then the contact line and an Email me link.
+- Bands, the services and the Muay Thai record are always shown whole. The services are one flat list, no
+  group headings: each service a title and a description (`line`) from `content/cv/services.json`, and no
+  world holds a count or a word of it. The worlds print the title and the description only.
+- `/cv` shows everything, in English, Spanish or Italian. Its Services section follows Technical Skills:
+  each service its title and description, then a line of use cases (labels `cvPage.useCases`, the
+  service's `useCases`) when it has any, then the contact line and an Email me link.
 
 ## How a section moves
 

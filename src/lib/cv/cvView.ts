@@ -1,4 +1,4 @@
-import type { Band, CVData, Job, MartialArts, Musician, Project, Service, ServiceGroup, TechCategory } from './content'
+import type { Band, CVData, Job, MartialArts, Musician, Project, Service, TechCategory } from './content'
 import { DEFAULT_PROFESSION, isProfession, type Profession } from './professions'
 
 // What one world draws for one profession: the recruiter first screen and only that profession's entries.
@@ -100,22 +100,6 @@ export const venturesFor = (companies: CVData['companies']): CVData['companies']
   ...companies.filter((company) => company.featured),
   ...companies.filter((company) => !company.featured),
 ]
-
-/** One heading of the services list and the services under it; no group means no heading. */
-export interface ServiceGroupEntry {
-  group?: ServiceGroup
-  services: Service[]
-}
-
-/**
- * The services gathered under their group headings, the groups in the order their first service comes in
- * services.json and the services in file order inside each group.
- */
-export const servicesByGroup = (services: Service[]): ServiceGroupEntry[] => {
-  const byGroup = new Map<ServiceGroup | undefined, Service[]>()
-  services.forEach((service) => byGroup.set(service.group, [...(byGroup.get(service.group) ?? []), service]))
-  return [...byGroup].map(([group, grouped]) => ({ group, services: grouped }))
-}
 
 const bandsFor = (cv: CVData): Band[] => [...cv.bands].sort(byRecency(bandEnd, (band) => band.startYear ?? UNDATED))
 

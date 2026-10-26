@@ -62,3 +62,55 @@ describe('cvDataFrom', () => {
     expect(cv.featuredProjects.every((project) => project.featured)).toBe(true)
   })
 })
+
+describe('services.json', () => {
+  type RawService = { id: string; title: string; line: string; group?: string; useCases?: string[] }
+  const servicesOf = (locale: 'en' | 'es' | 'it'): RawService[] =>
+    (readFiles().services[locale]?.services ?? []) as RawService[]
+  const byId = (services: RawService[]) => new Map(services.map((service) => [service.id, service]))
+
+  // Services whose use cases no HISTORY.md line backs, so the list is left empty. None today: every
+  // service keeps at least one name.
+  const EMPTIED: string[] = []
+  const AUDITS = 'security-accessibility-audits'
+
+  it.each(['en', 'es', 'it'] as const)('lists the ten services with no group in %s', (locale) => {
+    const services = servicesOf(locale)
+
+    expect(services).toHaveLength(10)
+    expect(services.filter((service) => 'group' in service)).toEqual([])
+  })
+
+  it('keeps every use case name out of every description', () => {
+    const names = [...new Set(servicesOf('en').flatMap((service) => service.useCases ?? []))]
+    expect(names.length).toBeGreaterThan(0)
+    ;(['en', 'es', 'it'] as const).forEach((locale) =>
+      servicesOf(locale).forEach((service) =>
+        expect([service.id, names.filter((name) => service.line.includes(name))]).toEqual([service.id, []]),
+      ),
+    )
+  })
+
+  it.each(['es', 'it'] as const)('names the same use cases as English for each service in %s', (locale) => {
+    const english = byId(servicesOf('en'))
+    const translated = servicesOf(locale)
+
+    expect(translated.map((service) => service.id)).toEqual([...english.keys()])
+    translated.forEach((service) =>
+      expect([service.id, service.useCases]).toEqual([service.id, english.get(service.id)?.useCases]),
+    )
+  })
+
+  it('gives every English service a use case, except the emptied ones', () => {
+    const withoutUseCases = servicesOf('en')
+      .filter((service) => (service.useCases ?? []).length === 0)
+      .map((service) => service.id)
+
+    expect(withoutUseCases).toEqual(EMPTIED)
+  })
+
+  it.each(['en', 'es', 'it'] as const)('lists GRCTechMe as a use case of the audits service in %s', (locale) => {
+    expect(EMPTIED).not.toContain(AUDITS)
+    expect(byId(servicesOf(locale)).get(AUDITS)?.useCases).toContain('GRCTechMe')
+  })
+})
