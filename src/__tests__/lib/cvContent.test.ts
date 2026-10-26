@@ -91,14 +91,22 @@ describe('services.json', () => {
     )
   })
 
-  it.each(['es', 'it'] as const)('names the same use cases as English for each service in %s', (locale) => {
-    const english = byId(servicesOf('en'))
-    const translated = servicesOf(locale)
+  // Equal to English per id, and non empty unless emptied, so a service missing its use cases in
+  // both English and the translation still fails.
+  const expectSameUseCasesAsEnglish = (englishServices: RawService[], translated: RawService[]) => {
+    const english = byId(englishServices)
 
     expect(translated.map((service) => service.id)).toEqual([...english.keys()])
     translated.forEach((service) =>
       expect([service.id, service.useCases]).toEqual([service.id, english.get(service.id)?.useCases]),
     )
+    translated
+      .filter((service) => !EMPTIED.includes(service.id))
+      .forEach((service) => expect([service.id, (service.useCases ?? []).length > 0]).toEqual([service.id, true]))
+  }
+
+  it.each(['es', 'it'] as const)('names the same use cases as English for each service in %s', (locale) => {
+    expectSameUseCasesAsEnglish(servicesOf('en'), servicesOf(locale))
   })
 
   it('gives every English service a use case, except the emptied ones', () => {

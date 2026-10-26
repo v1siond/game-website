@@ -218,14 +218,14 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
                 <li key={service.id} className={MASONRY_ITEM}>
                   <span className="font-semibold">{service.title}:</span> <span>{service.line}</span>
                   {service.useCases && service.useCases.length > 0 && (
-                    <p className="mt-1 text-sm text-gray-700">
+                    <p className="mt-1 text-gray-700">
                       {cvPage.useCases}: {service.useCases.join(', ')}
                     </p>
                   )}
                 </li>
               ))}
             </ul>
-            <p className="text-sm">
+            <p className="mt-3 text-sm">
               {contact.line}{' '}
               <a
                 href={`mailto:${contact.email}`}
