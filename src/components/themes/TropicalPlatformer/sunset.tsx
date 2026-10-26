@@ -32,7 +32,15 @@ import sunset from './sunset.module.css'
 
 // The scene is a 400 by 300 box drawn at 4:3, so a place in the drawing is the same percentage of the
 // frame at every width.
-const VIEW = '0 0 400 300'
+const SCENE = { width: 400, height: 300 }
+const VIEW = `0 0 ${SCENE.width} ${SCENE.height}`
+
+// The ground he lands on: the palms' ground band passes through this y at x 272, the middle of his
+// landing box (left 62%, width 12%), and the landing box's bottom is this y. The band's curve is split
+// at that point (the same curve, one more node), and both sit in the palms' plane, so the plane's
+// parting moves them together.
+const GROUND_Y = 261
+const LANDING = { '--ground': GROUND_Y / SCENE.height } as CSSProperties
 
 // The sky in the flat steps the source's sunsets are painted in, the sun swelling behind streaks of
 // cloud, and birds.
@@ -80,7 +88,7 @@ function Palms() {
       <use href="#tp-palm" transform="translate(200 262) rotate(5) scale(0.55)" className={scenery.haze} />
       <use href="#tp-palm" transform="translate(318 266) rotate(-9) scale(0.86)" />
       <use href="#tp-palm" transform="translate(362 266) rotate(7) scale(0.68)" />
-      <path d="M-30 262 Q100 250 200 258 T430 254 V300 H-30 Z" fill={C.shadowSoft} />
+      <path d={`M-30 262 Q100 250 200 258 Q234 260.7 272 ${GROUND_Y} Q344.5 261.9 430 254 V300 H-30 Z`} fill={C.shadowSoft} />
     </svg>
   )
 }
@@ -152,11 +160,13 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
         </button>
       </div>
 
-      <div key={shot} className={`pointer-events-none absolute left-[62%] top-[62%] h-[24%] w-[12%] ${sunset.flightX}`} aria-hidden="true">
-        <div className={`relative h-full w-full ${sunset.flightY}`}>
-          <HeroCharacter profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
-          <div className={`absolute inset-0 ${sunset.land}`}>
-            <HeroCharacter profession={active} pose="throw" delay="calc(var(--fire) + 1.3s)" silhouette className="h-full w-full" />
+      <div className={`pointer-events-none absolute inset-0 ${sunset.mid}`} style={LANDING} aria-hidden="true">
+        <div key={shot} className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[62%] h-[24%] w-[12%] ${sunset.flightX}`}>
+          <div className={`relative h-full w-full ${sunset.flightY}`}>
+            <HeroCharacter profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
+            <div className={`absolute inset-0 ${sunset.land}`}>
+              <HeroCharacter profession={active} pose="throw" delay="calc(var(--fire) + 1.3s)" silhouette className="h-full w-full" />
+            </div>
           </div>
         </div>
       </div>

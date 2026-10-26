@@ -44,7 +44,8 @@ export function GroundSlap({ children }: { children: ReactNode }) {
 
   return (
     <div ref={ref} className={quake.field} data-slapping={slapping || undefined}>
-      <div className="relative mx-auto mb-4 h-28 w-20 sm:h-32 sm:w-24" aria-hidden="true">
+      {/* his box sits straight on the boards' wrapper, no margin between, so the cards' top edge is his bottom */}
+      <div className="relative mx-auto h-28 w-20 sm:h-32 sm:w-24" aria-hidden="true">
         <HeroCharacter profession="engineer" pose={slapping ? 'slap' : 'idle'} className="h-full w-full" />
         <span className={`absolute bottom-0 left-0 block h-4 w-8 rounded-full ${quake.dust}`} />
         <span className={`absolute bottom-0 right-0 block h-4 w-8 rounded-full ${quake.dust} ${quake.dustLate}`} />
