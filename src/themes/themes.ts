@@ -569,6 +569,9 @@ export const DEFAULT_THEME_ID = 'medieval-fantasy'
  *  never had one, so `useTheme()` would throw exactly where nothing is allowed to. */
 export const THEME_STORAGE_KEY = 'portfolio-theme'
 
+// An unknown or stale stored id opens the default world, the same one a fresh visitor gets.
+const DEFAULT_THEME = themes.find(t => t.id === DEFAULT_THEME_ID)!
+
 export function getThemeById(id: string): Theme {
-  return themes.find(t => t.id === id) || themes[0]
+  return themes.find(t => t.id === id) ?? DEFAULT_THEME
 }

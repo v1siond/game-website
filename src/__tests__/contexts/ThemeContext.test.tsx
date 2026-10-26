@@ -79,9 +79,8 @@ describe('ThemeContext', () => {
         result.current.setThemeById('non-existent-theme')
       })
 
-      // Should fallback to first theme
-      expect(result.current.theme).toBeDefined()
-      expect(result.current.theme.id).toBe(themes[0].id)
+      // An unknown id falls back to the default world
+      expect(result.current.theme.id).toBe(DEFAULT_THEME_ID)
     })
   })
 
@@ -130,14 +129,14 @@ describe('ThemeContext', () => {
       expect(theme.name).toBe('Retro RPG')
     })
 
-    it('returns first theme for invalid ID', () => {
+    it('returns the default theme for invalid ID', () => {
       const theme = getThemeById('invalid-theme-id')
-      expect(theme).toBe(themes[0])
+      expect(theme.id).toBe(DEFAULT_THEME_ID)
     })
 
     it('returns default theme for empty string', () => {
       const theme = getThemeById('')
-      expect(theme).toBe(themes[0])
+      expect(theme.id).toBe(DEFAULT_THEME_ID)
     })
   })
 })
