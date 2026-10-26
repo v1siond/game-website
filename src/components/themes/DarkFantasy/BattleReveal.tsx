@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, memo, ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
+import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
 import bugMotion from './bug.module.css'
 import { DARK_FANTASY } from './palette'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -58,8 +58,14 @@ const PHASE_TIMING = {
   'complete': 2500,
 }
 
-// The floor the knight and the bug stand on, read by both so their feet meet one line.
-const GROUND = 'bottom-[15%]'
+// The bug's size and its height over its width, and how it lies dead on the ground (COMBAT_GROUND) the knight
+// stands on: rolled left of where it stood and shrunk about its centre to DEAD_SCALE, then sunk by the height
+// that shrink lifts its box's bottom, so its body lies on that ground and not under it.
+const BUG_SIZE = 120
+const BUG_ASPECT = 0.85
+const DEAD_SCALE = 0.75
+const DEAD_LIE = `translateX(-120px) translateY(${(BUG_SIZE * BUG_ASPECT * (1 - DEAD_SCALE)) / 2}px)`
+const DEAD_POSE = `${DEAD_LIE} rotateZ(540deg) scale(${DEAD_SCALE})`
 
 export const BattleReveal = memo(function BattleReveal({
   children,
@@ -239,7 +245,7 @@ export const BattleReveal = memo(function BattleReveal({
       transition: 'transform 200ms ease-out, opacity 200ms ease-out',
     }
 
-    // Bug base: right-[18%] bottom-[15%]
+    // Bug base: right-[18%] on COMBAT_GROUND
     // All effects (explosion, blood) are now CHILDREN of bug container,
     // so they automatically follow the bug's position
 
@@ -296,7 +302,7 @@ export const BattleReveal = memo(function BattleReveal({
         // Bug tumbles/rolls to the RIGHT like a boulder after explosion
         return {
           ...baseStyle,
-          transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
+          transform: DEAD_POSE,
           opacity: 0.7,
           transition: 'transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }
@@ -304,14 +310,14 @@ export const BattleReveal = memo(function BattleReveal({
         // Dead on the ground - rolled/tumbled to the right
         return {
           ...baseStyle,
-          transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
+          transform: DEAD_POSE,
           opacity: 0.55,
         }
       case 'complete':
         // Dead on the ground - no twitch, just static (blood drips handled in DeadBugCreature SVG)
         return {
           ...baseStyle,
-          transform: 'translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75)',
+          transform: DEAD_POSE,
           opacity: 0.6,
         }
       default:
@@ -376,13 +382,13 @@ export const BattleReveal = memo(function BattleReveal({
         aria-live="polite"
         aria-label={isAnimating ? navigation.battleInProgress : navigation.contentRevealed}
       >
-        {/* Knight + bug pinned to the viewport corners (left-15% / right-18%), both standing on GROUND;
+        {/* Knight + bug pinned to the viewport corners (left-15% / right-18%), both standing on COMBAT_GROUND;
             only the content below scrolls past them. Fades out as the section leaves view. */}
         <FixedCombatLayer inView={inView}>
         {/* Knight - CLOSER to center */}
         {showKnight && (
           <div
-            className={`absolute left-[15%] ${GROUND} z-20`}
+            className={`absolute left-[15%] ${COMBAT_GROUND} z-20`}
             style={getKnightStyle()}
           >
             <div className={phase === 'slash' ? 'animate-knightSlash' : ''}>
@@ -429,7 +435,7 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Bug container - all bug-related effects are children so they follow the bug */}
         {showBug && (
           <div
-            className={`absolute right-[18%] ${GROUND} z-10 ${bugTremble ? 'animate-bugTremble' : ''}`}
+            className={`absolute right-[18%] ${COMBAT_GROUND} z-10 ${bugTremble ? 'animate-bugTremble' : ''}`}
             style={getBugStyle()}
           >
             {/* Impact Burst - centered on bug */}
@@ -457,10 +463,10 @@ export const BattleReveal = memo(function BattleReveal({
             )}
 
             {isBugDead ? (
-              <DeadBugCreature size={120} />
+              <DeadBugCreature size={BUG_SIZE} />
             ) : (
               <BattleBug
-                size={120}
+                size={BUG_SIZE}
                 legPhase={legPhase}
                 antennaPhase={antennaPhase}
                 isHit={bugHit}
@@ -470,15 +476,13 @@ export const BattleReveal = memo(function BattleReveal({
         )}
 
         {/* Blood Pool - RIGHT EDGE at dead bug CENTER */}
-        {/* Bug final pos: right:18%, translateX(-120px), translateY(50px) */}
+        {/* Bug final pos: right:18% on COMBAT_GROUND, moved by DEAD_LIE */}
         {/* Blood pool right edge should touch bug center */}
         {showBloodPool && isBugDead && (
           <div
-            className="absolute z-4 pointer-events-none"
+            className={`absolute right-[18%] ${COMBAT_GROUND} z-4 pointer-events-none`}
             style={{
-              right: '18%',
-              bottom: '15%',
-              transform: 'translateX(-120px) translateY(55px)',
+              transform: DEAD_LIE,
               animation: phase === 'complete' ? 'bloodPoolPulse 3s ease-in-out infinite' : undefined,
             }}
           >
@@ -571,7 +575,7 @@ export const BattleBug = memo(function BattleBug({
   return (
     <svg
       width={size}
-      height={size * 0.85}
+      height={size * BUG_ASPECT}
       viewBox="0 0 100 85"
       style={{ filter: `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 6px ${infected}80)` }}
     >
@@ -694,7 +698,7 @@ const DeadBugCreature = memo(function DeadBugCreature({ size = 120 }: { size?: n
   return (
     <svg
       width={size}
-      height={size * 0.85}
+      height={size * BUG_ASPECT}
       viewBox="0 0 100 85"
       style={{
         opacity: 0.85,
@@ -1337,28 +1341,13 @@ const battleRevealKeyframes = `
     }
   }
 
-  @keyframes deadBugTwitch {
-    0%, 85%, 100% {
-      transform: translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75);
-    }
-    87% {
-      transform: translateX(-118px) translateY(48px) rotateZ(538deg) scale(0.76);
-    }
-    89% {
-      transform: translateX(-121px) translateY(51px) rotateZ(541deg) scale(0.74);
-    }
-    91% {
-      transform: translateX(-120px) translateY(50px) rotateZ(540deg) scale(0.75);
-    }
-  }
-
   @keyframes bloodPoolPulse {
     0%, 100% {
-      transform: translateX(-120px) translateY(55px) scale(1);
+      transform: ${DEAD_LIE} scale(1);
       opacity: 0.8;
     }
     50% {
-      transform: translateX(-120px) translateY(55px) scale(1.03);
+      transform: ${DEAD_LIE} scale(1.03);
       opacity: 0.85;
     }
   }

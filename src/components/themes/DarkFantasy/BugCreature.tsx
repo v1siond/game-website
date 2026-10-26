@@ -2,7 +2,7 @@
 
 import { useState, useEffect, memo, ReactNode, useRef } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
+import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
 import { KnightCharacter } from './KnightCharacter'
 import { BattleBug } from './BattleReveal'
 
@@ -195,7 +195,7 @@ export const BugPullReveal = memo(function BugPullReveal({
       {(showAlex || showBug) && (
         <FixedCombatLayer inView={inView}>
           {showAlex && (
-            <div className="absolute inset-x-0 bottom-[15%] z-10 pointer-events-none" style={alexTrackStyle}>
+            <div className={`absolute inset-x-0 ${COMBAT_GROUND} z-10 pointer-events-none`} style={alexTrackStyle}>
               <div className="absolute left-0 bottom-0" style={alexStyle}>
                 <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
               </div>
@@ -205,7 +205,7 @@ export const BugPullReveal = memo(function BugPullReveal({
           {showBug && (
             <>
               <div
-                className="absolute inset-x-0 bottom-[15%] pointer-events-none"
+                className={`absolute inset-x-0 ${COMBAT_GROUND} pointer-events-none`}
                 style={{ transform: `translateX(${bug.track})`, transition: `transform ${SHADOW_TIMING}` }}
               >
                 <div
@@ -231,7 +231,7 @@ export const BugPullReveal = memo(function BugPullReveal({
                   />
                 </div>
               </div>
-              <div className="absolute inset-x-0 bottom-[15%] z-30 pointer-events-none" style={bugTrackStyle}>
+              <div className={`absolute inset-x-0 ${COMBAT_GROUND} z-30 pointer-events-none`} style={bugTrackStyle}>
                 <div className="absolute right-0 bottom-0" style={bugStyle}>
                   <BattleBug size={140} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
                 </div>

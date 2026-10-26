@@ -33,6 +33,13 @@ export const COMBAT_Z = { fighters: 'z-10', content: 'z-20' } as const
 export const COMBAT_PHONE_SCALE = 0.45
 
 /**
+ * The floor every fighter in the combat layer stands on: its height above the screen's bottom, set on the
+ * layer as --ground, and the class a fighter's wrapper takes to stand on it.
+ */
+const GROUND_HEIGHT = '15%'
+export const COMBAT_GROUND = 'bottom-[var(--ground)]'
+
+/**
  * FixedCombatLayer, pins the knight/bug combat to the viewport so only the section
  * CONTENT scrolls. `fixed inset-0` makes this a full-viewport box, so any child with
  * `left/right/bottom` percentages resolves against the viewport (knight ~15-20% from a
@@ -42,14 +49,15 @@ export const COMBAT_PHONE_SCALE = 0.45
  *
  * Below lg (phones and tablets) the column is all text, so a full size fight pinned at 15-20% from
  * the bottom lands on titles and buttons mid screen. There the whole layer shrinks from the bottom edge and slides
- * down onto it: the fighters keep their places relative to each other but fight on the floor of
- * the screen, a band of under a tenth of its height that a line reaches only on its way up.
+ * down by exactly its shrunk ground height, so the ground lands on the screen's bottom edge: the fighters keep
+ * their places relative to each other, their feet stay on the screen, and they fight on its floor, under the
+ * last line of the page.
  */
 export function FixedCombatLayer({ inView, children }: { inView: boolean; children: ReactNode }) {
   return (
     <div
-      className={`pointer-events-none fixed inset-0 ${COMBAT_Z.fighters} origin-bottom translate-y-[8%] scale-[var(--phone-scale)] lg:translate-y-0 lg:scale-100`}
-      style={{ '--phone-scale': COMBAT_PHONE_SCALE, opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' } as CSSProperties}
+      className={`pointer-events-none fixed inset-0 ${COMBAT_Z.fighters} origin-bottom translate-y-[calc(var(--phone-scale)*var(--ground))] scale-[var(--phone-scale)] lg:translate-y-0 lg:scale-100`}
+      style={{ '--phone-scale': COMBAT_PHONE_SCALE, '--ground': GROUND_HEIGHT, opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' } as CSSProperties}
       aria-hidden="true"
     >
       {children}
