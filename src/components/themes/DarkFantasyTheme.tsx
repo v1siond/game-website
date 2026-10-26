@@ -18,7 +18,7 @@ import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/prof
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
-import { KnightSlashReveal, SLASH_PANEL_REM } from './DarkFantasy/KnightCharacter'
+import { KnightSlashReveal, SLASH_STAGE } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, newTabName } from '@/components/cv/sectionText'
@@ -1548,9 +1548,6 @@ function FramedSection({ title, children }: { title: string; children: React.Rea
   )
 }
 
-// The panel's width is the one the resting knight stands clear of (SLASH_PANEL_REM).
-const SLASH_PANEL_WIDTH = { '--slash-panel': `${SLASH_PANEL_REM}rem` } as React.CSSProperties
-
 // Knight Slash Reveal: the knight cuts in and the frame slides from the right.
 function SlashRevealSection({ title, children }: { title: string; children: React.ReactNode }) {
   const trigger = useSectionTrigger()
@@ -1559,7 +1556,7 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
     <div ref={trigger.ref}>
       <KnightSlashReveal triggered={trigger.triggered}>
         <section className="relative z-20 py-8 px-6">
-          <div className="mx-auto max-w-[var(--slash-panel)]" style={SLASH_PANEL_WIDTH}>
+          <div className="mx-auto max-w-[var(--slash-panel)] lg:max-w-[calc(2*var(--panel-half))]" style={SLASH_STAGE}>
             <VoidFrame title={title}>{children}</VoidFrame>
           </div>
         </section>

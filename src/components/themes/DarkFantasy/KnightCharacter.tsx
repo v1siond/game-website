@@ -267,17 +267,19 @@ interface KnightSlashRevealProps {
 
 type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'content-reveal' | 'complete'
 
-// The work experience panel's width in rem (DarkFantasyTheme gives the panel this max width), the knight's
-// size there, and how far left of his entry place he rests. At rest he stands clear of the panel's right
-// edge: his entry place is the farther right of the panel's edge plus that rest, and 8% in from the
-// screen's right edge as before.
-export const SLASH_PANEL_REM = 56
+// The work experience stage, read by the panel (DarkFantasyTheme) and the knight: the panel's widest, the
+// knight's size there, and how far left of his entry place he rests. --panel-half is half the panel: at most
+// half of SLASH_PANEL_REM, and on a narrower screen as much as leaves room right of it for the knight and his
+// rest step. His entry place is the farther right of the panel's edge plus that rest and 8% in from the
+// screen's right edge, and never past the screen's right edge, so at rest he is clear of the panel and whole.
+const SLASH_PANEL_REM = 56
 const SLASH_KNIGHT_SCALE = 1.8
 const REST_SHIFT_PX = 90
-const SLASH_KNIGHT_PLACE = {
-  '--panel-half': `${SLASH_PANEL_REM / 2}rem`,
+export const SLASH_STAGE = {
+  '--slash-panel': `${SLASH_PANEL_REM}rem`,
   '--rest': `${REST_SHIFT_PX}px`,
   '--knight-w': `${KNIGHT_VIEW_WIDTH * SLASH_KNIGHT_SCALE}px`,
+  '--panel-half': `min(${SLASH_PANEL_REM / 2}rem, 50vw - var(--knight-w) - var(--rest))`,
 } as CSSProperties
 
 const PHASE_TIMING = {
@@ -409,8 +411,8 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       {showKnight && (
         <FixedCombatLayer inView={inView}>
           <div
-            className="absolute bottom-[18%] left-[max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w)))] z-20 pointer-events-none"
-            style={{ ...SLASH_KNIGHT_PLACE, ...getKnightStyle() }}
+            className="absolute bottom-[18%] left-[min(max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w))),calc(100%_-_var(--knight-w)))] z-20 pointer-events-none"
+            style={{ ...SLASH_STAGE, ...getKnightStyle() }}
           >
             <KnightCharacter
               scale={SLASH_KNIGHT_SCALE}
