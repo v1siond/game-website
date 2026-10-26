@@ -2,7 +2,7 @@
 
 import { memo, ReactNode, useState, useEffect, useRef, type CSSProperties } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
+import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
 import { DARK_FANTASY } from './palette'
 
 /**
@@ -267,19 +267,25 @@ interface KnightSlashRevealProps {
 
 type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'content-reveal' | 'complete'
 
-// The work experience stage, read by the panel (DarkFantasyTheme) and the knight: the panel's widest, the
-// knight's size there, and how far left of his entry place he rests. --panel-half is half the panel: at most
-// half of SLASH_PANEL_REM, and on a narrower screen as much as leaves room right of it for the knight and his
-// rest step. His entry place is the farther right of the panel's edge plus that rest and 8% in from the
-// screen's right edge, and never past the screen's right edge, so at rest he is clear of the panel and whole.
+// The slash stage, set on the reveal and read by the panel inside it (DarkFantasyTheme) and the knight: the
+// panel's widest, its inset from the stage's top and sides, the knight's size, and how far left of his entry
+// place he rests. --panel-half is half the panel: at most half of SLASH_PANEL_REM, and on a narrower screen as
+// much as leaves room right of it for the knight and his rest step. From lg he is pinned to the screen, his
+// entry place the farther right of the panel's edge plus that rest and 8% in from the screen's right edge,
+// never past the screen's right edge. Below lg the panel fills the column, so no place beside it is left: he
+// rests standing on the panel's top edge at its right corner, above the panel and its text, at the size the
+// combat layer gives him there.
 const SLASH_PANEL_REM = 56
 const SLASH_KNIGHT_SCALE = 1.8
 const REST_SHIFT_PX = 90
-export const SLASH_STAGE = {
+const SLASH_STAGE = {
   '--slash-panel': `${SLASH_PANEL_REM}rem`,
+  '--panel-top': '2rem',
+  '--panel-inset': '1.5rem',
   '--rest': `${REST_SHIFT_PX}px`,
   '--knight-w': `${KNIGHT_VIEW_WIDTH * SLASH_KNIGHT_SCALE}px`,
   '--panel-half': `min(${SLASH_PANEL_REM / 2}rem, 50vw - var(--knight-w) - var(--rest))`,
+  minHeight: '200px',
 } as CSSProperties
 
 const PHASE_TIMING = {
@@ -390,7 +396,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const isAttacking = phase === 'knight-raise' || phase === 'slash'
 
   return (
-    <div ref={stageRef} className={`relative w-full ${className}`} style={{ minHeight: '200px' }}>
+    <div ref={stageRef} className={`relative w-full max-lg:overflow-x-clip ${className}`} style={SLASH_STAGE}>
       {showSlash && (
         <div
           className="absolute inset-0 z-10 pointer-events-none"
@@ -407,12 +413,29 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
         {children}
       </div>
 
-      {/* Knight pinned to the viewport (bottom-right ~15-18%); only the content above scrolls */}
+      {/* Below lg: the knight rests on the panel's top edge at its right corner (SLASH_STAGE) */}
+      {showKnight && (
+        <div
+          className="pointer-events-none absolute bottom-[calc(100%_-_var(--panel-top))] right-[calc(var(--panel-inset)_-_var(--rest))] z-20 lg:hidden"
+          style={getKnightStyle()}
+          aria-hidden="true"
+        >
+          <KnightCharacter
+            scale={SLASH_KNIGHT_SCALE * COMBAT_PHONE_SCALE}
+            attacking={isAttacking}
+            attackPhase={attackPhase}
+            facingDirection="left"
+            breathing={phase === 'complete'}
+          />
+        </div>
+      )}
+
+      {/* From lg: the knight pinned to the viewport (bottom-right ~15-18%); only the content above scrolls */}
       {showKnight && (
         <FixedCombatLayer inView={inView}>
           <div
-            className="absolute bottom-[18%] left-[min(max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w))),calc(100%_-_var(--knight-w)))] z-20 pointer-events-none"
-            style={{ ...SLASH_STAGE, ...getKnightStyle() }}
+            className="absolute bottom-[18%] left-[min(max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w))),calc(100%_-_var(--knight-w)))] z-20 pointer-events-none max-lg:hidden"
+            style={getKnightStyle()}
           >
             <KnightCharacter
               scale={SLASH_KNIGHT_SCALE}

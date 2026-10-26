@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import type { SectionTriggerOptions } from '@/hooks/useSectionTrigger'
 
 /**
@@ -29,6 +29,9 @@ export function moveAndFade(timing: string): string {
  */
 export const COMBAT_Z = { fighters: 'z-10', content: 'z-20' } as const
 
+/** How far the combat layer shrinks below lg, read by a fighter drawn outside it at the same size. */
+export const COMBAT_PHONE_SCALE = 0.45
+
 /**
  * FixedCombatLayer, pins the knight/bug combat to the viewport so only the section
  * CONTENT scrolls. `fixed inset-0` makes this a full-viewport box, so any child with
@@ -45,8 +48,8 @@ export const COMBAT_Z = { fighters: 'z-10', content: 'z-20' } as const
 export function FixedCombatLayer({ inView, children }: { inView: boolean; children: ReactNode }) {
   return (
     <div
-      className={`pointer-events-none fixed inset-0 ${COMBAT_Z.fighters} origin-bottom translate-y-[8%] scale-[0.45] lg:translate-y-0 lg:scale-100`}
-      style={{ opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' }}
+      className={`pointer-events-none fixed inset-0 ${COMBAT_Z.fighters} origin-bottom translate-y-[8%] scale-[var(--phone-scale)] lg:translate-y-0 lg:scale-100`}
+      style={{ '--phone-scale': COMBAT_PHONE_SCALE, opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' } as CSSProperties}
       aria-hidden="true"
     >
       {children}

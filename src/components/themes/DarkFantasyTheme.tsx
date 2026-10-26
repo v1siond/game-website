@@ -18,7 +18,7 @@ import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/prof
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
-import { KnightSlashReveal, SLASH_STAGE } from './DarkFantasy/KnightCharacter'
+import { KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, newTabName } from '@/components/cv/sectionText'
@@ -1555,8 +1555,8 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
   return (
     <div ref={trigger.ref}>
       <KnightSlashReveal triggered={trigger.triggered}>
-        <section className="relative z-20 py-8 px-6">
-          <div className="mx-auto max-w-[var(--slash-panel)] lg:max-w-[calc(2*var(--panel-half))]" style={SLASH_STAGE}>
+        <section className="relative z-20 px-[var(--panel-inset)] py-[var(--panel-top)]">
+          <div className="mx-auto max-w-[var(--slash-panel)] lg:max-w-[calc(2*var(--panel-half))]">
             <VoidFrame title={title}>{children}</VoidFrame>
           </div>
         </section>
