@@ -22,8 +22,10 @@ export const DARK_FANTASY = {
   spiritGold: '#e8c841',
   spiritGoldDark: '#d4af37',
   brass: '#b08d57',
-  // Brass as text: the same hue lifted to 9 to 1 on the caverns; brass itself stays on lines, borders and the Email me plate.
+  // Brass as text: the same hue lifted to 9 to 1 on the caverns; brass itself stays on lines and borders.
   brassText: '#cbb591',
+  // The Email me plate: brass lightened in its own hue so the void ink on it reads 7.2 to 1.
+  brassPlate: '#b89968',
   copper: '#8b6914',
 
   // Forest, stone, bone and metal

@@ -1525,7 +1525,7 @@ const DF_BUTTON =
 
 // Email is the brass action, LinkedIn the outlined one.
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-[color:var(--df-brass)] text-[color:var(--df-void)]',
+  email: 'bg-[color:var(--df-brass-plate)] text-[color:var(--df-void)]',
   linkedin: 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]',
 }
 
