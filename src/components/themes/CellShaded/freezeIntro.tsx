@@ -7,7 +7,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
 import { VaultSprite, type SpriteMotion } from './sprite'
-import { SpeedRays } from './ink'
+import { HATCH, SpeedRays } from './ink'
 import { ContactActions, InkButton } from './buttons'
 import { CEL } from './palette'
 import cel from './cel.module.css'
@@ -49,6 +49,18 @@ const phaseFlags = (reached: ReadonlySet<Phase>) =>
 
 const DUST = [0, 1, 2]
 
+// The mesa top he lands on, in the near ridge's dune colours and hatching, drawn at the top of a
+// 120 by 24 box with its flat top on y 0, so the ridge top is the edge the box is hung from.
+function MesaTop() {
+  return (
+    <svg viewBox="0 0 120 24" preserveAspectRatio="none" className={`absolute -inset-x-6 top-full h-6 overflow-visible ${cel.inked}`} aria-hidden="true" focusable="false">
+      <path d="M0 24 L12 0 L108 0 L120 24 Z" fill={CEL.dune} />
+      <path d="M96 0 L108 0 L120 24 L108 24 Z" fill={CEL.duneShade} data-bare />
+      <path d="M96 0 L108 0 L120 24 L108 24 Z" fill={HATCH} opacity={0.45} data-bare />
+    </svg>
+  )
+}
+
 export function FreezeIntro({ profession, reduced }: { profession: Profession; reduced: boolean }) {
   const { hud, navigation } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.05, rootMargin: '0px' })
@@ -87,23 +99,26 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
 
       <div className={`relative mx-auto grid min-h-[86vh] max-w-6xl items-end gap-6 px-4 pb-20 pt-24 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center ${cel.shake}`}>
         {/* a pointer extra: pointing at him or clicking him plays his action, the same as each section shows */}
-        <div
-          className={`relative mx-auto h-64 w-40 sm:h-80 sm:w-48 ${cel.runner}`}
-          onPointerEnter={() => setActing(true)}
-          onPointerLeave={() => setActing(false)}
-          onClick={() => setActing((now) => !now)}
-          aria-hidden="true"
-        >
-          {DUST.map((index) => (
-            <span
-              key={index}
-              className={`absolute bottom-0 left-2 h-6 w-6 rounded-full border-[3px] border-[var(--cel-ink)] bg-[var(--cel-dune)] ${cel.dust}`}
-              style={{ ['--i' as string]: index }}
-              aria-hidden="true"
-            />
-          ))}
-          <div className={`h-full w-full ${cel.leap}`}>
-            <VaultSprite profession={profession} motion={spriteMotion(shown, acting)} className="h-full w-full" />
+        {/* his box: he runs in inside it, and the mesa top hangs from its bottom edge, so his bottom is the ridge top */}
+        <div className="relative mx-auto h-64 w-40 sm:h-80 sm:w-48" aria-hidden="true">
+          <MesaTop />
+          <div
+            className={`relative h-full w-full ${cel.runner}`}
+            onPointerEnter={() => setActing(true)}
+            onPointerLeave={() => setActing(false)}
+            onClick={() => setActing((now) => !now)}
+          >
+            {DUST.map((index) => (
+              <span
+                key={index}
+                className={`absolute bottom-0 left-2 h-6 w-6 rounded-full border-[3px] border-[var(--cel-ink)] bg-[var(--cel-dune)] ${cel.dust}`}
+                style={{ ['--i' as string]: index }}
+                aria-hidden="true"
+              />
+            ))}
+            <div className={`h-full w-full ${cel.leap}`}>
+              <VaultSprite profession={profession} motion={spriteMotion(shown, acting)} className="h-full w-full" />
+            </div>
           </div>
         </div>
 
