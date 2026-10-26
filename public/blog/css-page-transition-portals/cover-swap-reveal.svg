@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" font-family="system-ui, sans-serif">
+  <rect width="1200" height="360" fill="#ffffff"/>
+  <text x="40" y="56" font-size="30" font-weight="700" fill="#1f2328">One world change, start to end</text>
+  <line x1="40" y1="200" x2="1160" y2="200" stroke="#57606a" stroke-width="3"/>
+  <rect x="40" y="150" width="180" height="100" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="2"/>
+  <text x="130" y="208" font-size="24" text-anchor="middle" fill="#1f2328">idle</text>
+  <rect x="240" y="150" width="380" height="100" rx="10" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+  <text x="430" y="196" font-size="24" font-weight="700" text-anchor="middle" fill="#1f2328">cover</text>
+  <text x="430" y="228" font-size="20" text-anchor="middle" fill="#1f2328">720 ms, portal grows</text>
+  <rect x="610" y="120" width="20" height="160" fill="#0969da"/>
+  <text x="620" y="105" font-size="20" font-weight="700" text-anchor="middle" fill="#1f2328">swap</text>
+  <text x="620" y="310" font-size="18" text-anchor="middle" fill="#1f2328">setThemeById, scrollTo(0, 0), saved</text>
+  <rect x="640" y="150" width="320" height="100" rx="10" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+  <text x="800" y="196" font-size="24" font-weight="700" text-anchor="middle" fill="#1f2328">reveal</text>
+  <text x="800" y="228" font-size="20" text-anchor="middle" fill="#1f2328">620 ms, portal fades</text>
+  <rect x="980" y="150" width="180" height="100" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="2"/>
+  <text x="1070" y="208" font-size="24" text-anchor="middle" fill="#1f2328">idle</text>
+</svg>

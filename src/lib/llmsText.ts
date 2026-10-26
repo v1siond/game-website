@@ -1,6 +1,8 @@
 import { CV_PATHS, locales } from '@/i18n/config'
 import type { CVData } from './cv/content'
 import { absoluteUrl, siteDescription } from './seo'
+import type { PostMeta } from './blog/post'
+import { postPath } from './blog/links'
 
 type LlmsFacts = Pick<CVData, 'fullName' | 'professionalSummary' | 'contact' | 'techStack' | 'services' | 'labels'>
 
@@ -12,8 +14,15 @@ const cvLinks = ({ labels }: LlmsFacts): string[] =>
 
 const serviceLines = ({ services }: LlmsFacts): string[] => services.map((service) => `- ${service.title}: ${service.line}`)
 
-/** The text AI crawlers read at /llms.txt: who he is, where his CV is in each language, what he offers. */
-export function llmsText(cv: LlmsFacts): string {
+// The posts the build lists (drafts never reach a production build), or no section with none.
+const postSection = ({ labels }: LlmsFacts, posts: readonly PostMeta[]): string[] => {
+  if (posts.length === 0) return []
+  return [`## ${labels.sections.posts}`, '', ...posts.map((post) => `- [${post.title}](${absoluteUrl(postPath(post.slug))}): ${post.description}`), '']
+}
+
+/** The text AI crawlers read at /llms.txt: who he is, where his CV is in each language, what he offers,
+ *  and the posts it is given. */
+export function llmsText(cv: LlmsFacts, posts: readonly PostMeta[]): string {
   return [
     `# ${cv.fullName}`,
     '',
@@ -29,5 +38,6 @@ export function llmsText(cv: LlmsFacts): string {
     '',
     ...serviceLines(cv),
     '',
+    ...postSection(cv, posts),
   ].join('\n')
 }

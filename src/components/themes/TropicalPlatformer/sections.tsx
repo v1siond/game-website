@@ -1,10 +1,14 @@
 'use client'
 
+import Link from 'next/link'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { usePosts } from '@/components/blog/BlogProvider'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
+import { BLOG_PATH, postLinks } from '@/lib/blog/links'
 import { ServiceBoard, TechBoard, VentureBoard } from './boards'
+import { WOOD_BUTTON } from './buttons'
 import { BrawlRecord } from './brawl'
 import { CannonRun } from './cannons'
 import { VineCrossing } from './crossing'
@@ -24,7 +28,7 @@ import look from './jungle.module.css'
 // boards his thrown barrel smashes open (./deliveries), a vine crossing
 // into the cave, the projects as stations of a mine cart ride, the ventures rammed by the rhino, the
 // bands as hanging planks he swings between, and the Muay Thai record as a bout with the walking
-// crocodiles, dropped onto the page by the vulture (./deliveries). The posts level closes every profession on a plain board.
+// crocodiles, dropped onto the page by the vulture (./deliveries). The posts level closes every profession on a plain board with the latest posts.
 
 export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
@@ -112,15 +116,37 @@ export const SECTION_VIEWS: ProfessionSectionViews = {
   fighter: MartialArtistSections,
 }
 
-/** The closing posts level, the same after every profession. */
+/** The closing posts level, the same after every profession: the latest posts on a plain board, each
+ *  title a sun gold link with its date, and the wooden button to the whole list. */
 export function PostsLevel() {
-  const { sections, cards } = useLabels()
+  const { blog } = useLabels()
+  const links = postLinks(usePosts())
+  if (!links) return null
 
   return (
-    <Level title={sections.posts} scene="dusk">
+    <Level title={blog.latestPosts} scene="dusk">
       <FadeInScene>
         <Board>
-          <p className="py-4 text-center text-base italic text-[color:var(--tp-parchment)]">{cards.noPosts}</p>
+          <ul className="space-y-1">
+            {links.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className={`flex min-h-[44px] flex-col justify-center gap-1 rounded-lg py-2 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 ${look.focus}`}
+                >
+                  <span className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] underline decoration-2 underline-offset-4 ${look.display}`}>{link.title}</span>
+                  <time dateTime={link.date} className="shrink-0 text-sm text-[color:var(--tp-plank-light)]">
+                    {link.shownDate}
+                  </time>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 flex justify-center">
+            <Link href={BLOG_PATH} className={WOOD_BUTTON}>
+              {blog.allPosts}
+            </Link>
+          </div>
         </Board>
       </FadeInScene>
     </Level>

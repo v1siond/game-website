@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import type { CVData } from './cv/content'
 import { CV_PATHS, locales, type CVPath } from '@/i18n/config'
+import type { PostMeta } from './blog/post'
+import { BLOG_PATH, postPath } from './blog/links'
 
 // What search engines, link previews and the web manifest say about the site, built from the Decap
 // content so a CV edit changes them too. Plain functions of the CV, no Next runtime.
@@ -125,5 +127,82 @@ export function profilePageJsonLd(cv: SeoFacts, path: IndexedPath, dateModified:
       sameAs: [cv.contact.linkedin],
       knowsAbout: techKeywords(cv),
     },
+  }
+}
+
+// "<" is escaped so no content string can close the script tag early.
+/** A JSON-LD object as the text of its application/ld+json script. */
+export const jsonLdHtml = (value: unknown): string => JSON.stringify(value).replace(/</g, '\\u003c')
+
+type PreviewImage = { url: string; alt: string; width?: number; height?: number }
+
+// A post's cover is its link preview; a post without one, and the list, show the site's card.
+const previewImageOf = (cv: SeoFacts, post?: PostMeta): PreviewImage => {
+  if (!post?.cover) return { ...PREVIEW_IMAGE, alt: siteTitle(cv) }
+  return { url: post.cover, alt: post.coverAlt ?? post.title }
+}
+
+type BlogHead = {
+  path: string
+  title: string
+  description: string
+  image: PreviewImage
+  openGraph: Record<string, unknown>
+  keywords?: string[]
+}
+
+const blogHead = (cv: SeoFacts, { path, title, description, image, openGraph, keywords }: BlogHead): Metadata => ({
+  metadataBase: new URL(SITE_URL),
+  title,
+  description,
+  keywords,
+  authors: [{ name: cv.fullName, url: SITE_URL }],
+  creator: cv.fullName,
+  alternates: { canonical: path },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-image-preview': 'large' } },
+  openGraph: { url: path, siteName: cv.fullName, title, description, images: [image], ...openGraph },
+  twitter: { card: 'summary_large_image', title, description, images: [image] },
+})
+
+const postKeywords = ({ keyword, tags }: PostMeta): string[] => [...new Set([keyword, ...tags])]
+
+/** The head of /blog (no post given) or of one post: title, description, canonical, Open Graph with the
+ *  post's cover, Twitter and keywords. */
+export function blogMetadata(cv: SeoFacts, post?: PostMeta): Metadata {
+  if (!post) {
+    return blogHead(cv, {
+      path: BLOG_PATH,
+      title: `${cv.labels.sections.posts} | ${cv.fullName}`,
+      description: siteDescription(cv),
+      image: previewImageOf(cv),
+      openGraph: { type: 'website' },
+    })
+  }
+  return blogHead(cv, {
+    path: postPath(post.slug),
+    title: `${post.title} | ${cv.fullName}`,
+    description: post.description,
+    image: previewImageOf(cv, post),
+    keywords: postKeywords(post),
+    openGraph: { type: 'article', publishedTime: post.date, authors: [cv.fullName], tags: post.tags },
+  })
+}
+
+/** The schema.org BlogPosting of one post: what it is, when he published it, its cover and him as its
+ *  author, for the application/ld+json script of the post page. */
+export function blogPostingJsonLd(cv: SeoFacts, post: PostMeta) {
+  const url = absoluteUrl(postPath(post.slug))
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    url,
+    mainEntityOfPage: url,
+    image: absoluteUrl(previewImageOf(cv, post).url),
+    keywords: postKeywords(post),
+    inLanguage: 'en',
+    author: { '@type': 'Person', name: cv.fullName, url: SITE_URL },
   }
 }

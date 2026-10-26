@@ -14,7 +14,10 @@ picked profession, then a contact corner. What the sections hold comes from `vie
    Engineer, Martial Artist, in that order, the engineer in the centre and opened by default.
 3. **Profession sections** (`ProfessionSectionsView`, `src/components/cv/ProfessionSectionsView.tsx`): the
    world's component for the shown profession, from its `SECTION_VIEWS` map in `<Name>/sections.tsx`.
-4. **Contact**: the world's closing corner, drawn in its own folder.
+4. **Latest posts** (Art Deco and Tropical Platformer for now): the newest 3 posts of the blog, each its
+   title linked to `/blog/<slug>` and its date, then an All posts link to `/blog`. The world wraps it in
+   `PostsGate`, so with no post the section is not on the page.
+5. **Contact**: the world's closing corner, drawn in its own folder.
 
 ## Sections per profession
 
@@ -51,4 +54,5 @@ plain blocks between levels (About, Tech Stack, Services, Ventures) sit in `Fade
 Read from the code on 2026-10-21: `src/lib/cv/cvView.ts`, `src/lib/cv/professions.ts`,
 `src/components/cv/`, `src/components/scroll/`, and `TropicalPlatformerTheme.tsx` with its
 `TropicalPlatformer/sections.tsx` as the example world. This file replaces an older plan that listed
-sections the site never built (blog, gallery, certificates, store, testimonials).
+sections the site never built (gallery, certificates, store, testimonials); the blog was built on
+2026-10-26 (the posts section above and `/blog`).

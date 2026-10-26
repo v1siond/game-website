@@ -1,0 +1,220 @@
+/* The blog's post body and its code: the element styles Tailwind's preflight strips (headings, lists,
+   links, images, tables, code blocks), scoped under .post-body so nothing else on the site changes, and
+   the Prism token colours for the spans rehype-prism-plus writes at build time.
+
+   Light only, like /cv. Every text colour measures 7:1 or more on its background: body text on white,
+   every token colour (and the plain code text) on the code background #f6f8fa. */
+
+.post-body {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #111827;
+  overflow-wrap: break-word;
+}
+
+.post-body > * + * {
+  margin-top: 1.25rem;
+}
+
+.post-body h2 {
+  margin-top: 2.75rem;
+  font-size: 1.625rem;
+  font-weight: 700;
+  line-height: 1.3;
+  scroll-margin-top: 5rem;
+}
+
+.post-body h3 {
+  margin-top: 2rem;
+  font-size: 1.3125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  scroll-margin-top: 5rem;
+}
+
+.post-body h4 {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.post-body a {
+  color: #1e40af;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.post-body a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.post-body a:focus-visible {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.post-body strong {
+  font-weight: 700;
+}
+
+.post-body ul,
+.post-body ol {
+  padding-left: 1.5rem;
+}
+
+.post-body ul {
+  list-style: disc;
+}
+
+.post-body ol {
+  list-style: decimal;
+}
+
+.post-body li + li {
+  margin-top: 0.5rem;
+}
+
+.post-body blockquote {
+  border-left: 4px solid #4b5563;
+  padding-left: 1rem;
+  color: #374151;
+}
+
+.post-body hr {
+  border-top: 1px solid #4b5563;
+}
+
+.post-body img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+}
+
+/* The caption a post writes in italics right under an image or a code block. */
+.post-body p > em:only-child {
+  display: block;
+  margin-top: -0.5rem;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.post-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.post-body th,
+.post-body td {
+  border: 1px solid #4b5563;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+.post-body th {
+  font-weight: 700;
+}
+
+/* Inline code and code blocks share the code background the token colours are measured on. */
+.post-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.9375em;
+  color: #1f2328;
+  background: #f6f8fa;
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+}
+
+.post-body pre {
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #1f2328;
+  background: #f6f8fa;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  tab-size: 2;
+}
+
+.post-body pre code {
+  display: block;
+  min-width: max-content;
+  padding: 0;
+  font-size: inherit;
+  background: none;
+  white-space: pre;
+}
+
+.post-body .code-line {
+  display: block;
+}
+
+/* Prism tokens, on #f6f8fa. */
+.post-body .token.comment,
+.post-body .token.prolog,
+.post-body .token.doctype,
+.post-body .token.cdata {
+  color: #374151;
+  font-style: italic;
+}
+
+.post-body .token.punctuation {
+  color: #1f2328;
+}
+
+.post-body .token.keyword,
+.post-body .token.atrule,
+.post-body .token.important,
+.post-body .token.deleted {
+  color: #8a1020;
+}
+
+.post-body .token.string,
+.post-body .token.char,
+.post-body .token.attr-value,
+.post-body .token.template-string {
+  color: #0a3069;
+}
+
+.post-body .token.function,
+.post-body .token.class-name,
+.post-body .token.builtin {
+  color: #5a2ea6;
+}
+
+.post-body .token.number,
+.post-body .token.boolean,
+.post-body .token.constant,
+.post-body .token.symbol {
+  color: #0b4a8b;
+}
+
+.post-body .token.property,
+.post-body .token.tag,
+.post-body .token.selector,
+.post-body .token.attr-name,
+.post-body .token.inserted {
+  color: #0f5323;
+}
+
+.post-body .token.operator,
+.post-body .token.entity,
+.post-body .token.url,
+.post-body .token.regex,
+.post-body .token.variable {
+  color: #7a3100;
+}
+
+.post-body .token.bold,
+.post-body .token.important {
+  font-weight: 700;
+}
+
+.post-body .token.italic {
+  font-style: italic;
+}

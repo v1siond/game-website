@@ -3,7 +3,21 @@ import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles } from '@/lib/cv/content'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
 import { siteMarkSvg } from '@/lib/siteMark'
-import { INDEXED_PATHS, SITE_URL, pageMetadata, profilePageJsonLd, shortRole, siteDescription, siteTitle, techKeywords } from '@/lib/seo'
+import {
+  INDEXED_PATHS,
+  PREVIEW_IMAGE,
+  SITE_URL,
+  blogMetadata,
+  blogPostingJsonLd,
+  jsonLdHtml,
+  pageMetadata,
+  profilePageJsonLd,
+  shortRole,
+  siteDescription,
+  siteTitle,
+  techKeywords,
+} from '@/lib/seo'
+import type { PostMeta } from '@/lib/blog/post'
 
 // The real Decap files, so the head and the JSON-LD are checked against what the pages read.
 const readFiles = (): CVContentFiles =>
@@ -132,5 +146,76 @@ describe('siteMarkSvg', () => {
     expect(svg).toContain('viewBox="0 0 16 16"')
     expect(svg).toContain(`fill="${HERO_IDENTITY.skin}"`)
     expect(svg).toContain(`fill="${HERO_IDENTITY.beard}"`)
+  })
+})
+
+// A post as the loader reads it from content/blog.
+const post: PostMeta = {
+  title: 'CSS page transition: four portals between my 17 CV worlds',
+  slug: 'css-page-transition-portals',
+  date: '2026-10-26',
+  description: 'How I swapped a theme dropdown for world cards and four CSS portal effects.',
+  keyword: 'css page transition',
+  cover: '/blog/css-page-transition-portals/cover-swap-reveal.png',
+  coverAlt: 'Timeline of the transition',
+  tags: ['css page transition', 'portal transition'],
+  draft: false,
+}
+const uncovered: PostMeta = { ...post, cover: undefined, coverAlt: undefined }
+
+describe('blogMetadata', () => {
+  it('heads the post list with the posts title, the site description and its canonical', () => {
+    const metadata = blogMetadata(cv)
+    expect(metadata.title).toBe(`${cv.labels.sections.posts} | ${cv.fullName}`)
+    expect(metadata.description).toBe(siteDescription(cv))
+    expect(metadata.alternates).toEqual({ canonical: '/blog' })
+    expect(metadata.openGraph).toMatchObject({ type: 'website', url: '/blog', images: [{ ...PREVIEW_IMAGE, alt: siteTitle(cv) }] })
+  })
+
+  it('heads a post with its title, its description, its canonical and its cover as the preview image', () => {
+    const metadata = blogMetadata(cv, post)
+    expect(metadata.title).toBe(`${post.title} | ${cv.fullName}`)
+    expect(metadata.description).toBe(post.description)
+    expect(metadata.keywords).toEqual(['css page transition', 'portal transition'])
+    expect(metadata.alternates).toEqual({ canonical: '/blog/css-page-transition-portals' })
+    expect(metadata.openGraph).toMatchObject({
+      type: 'article',
+      url: '/blog/css-page-transition-portals',
+      publishedTime: '2026-10-26',
+      images: [{ url: post.cover, alt: post.coverAlt }],
+    })
+    expect(metadata.twitter).toMatchObject({ card: 'summary_large_image', images: [{ url: post.cover, alt: post.coverAlt }] })
+  })
+
+  it('heads a post with no cover with the site preview card', () => {
+    expect(blogMetadata(cv, uncovered).openGraph).toMatchObject({ images: [{ ...PREVIEW_IMAGE, alt: siteTitle(cv) }] })
+  })
+})
+
+describe('blogPostingJsonLd', () => {
+  it('describes a post as a schema.org BlogPosting by him, at its address', () => {
+    expect(blogPostingJsonLd(cv, post)).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.description,
+      datePublished: '2026-10-26',
+      url: `${SITE_URL}/blog/css-page-transition-portals`,
+      mainEntityOfPage: `${SITE_URL}/blog/css-page-transition-portals`,
+      image: `${SITE_URL}/blog/css-page-transition-portals/cover-swap-reveal.png`,
+      keywords: ['css page transition', 'portal transition'],
+      inLanguage: 'en',
+      author: { '@type': 'Person', name: cv.fullName, url: SITE_URL },
+    })
+  })
+
+  it('points a post with no cover at the site preview card', () => {
+    expect(blogPostingJsonLd(cv, uncovered).image).toBe(`${SITE_URL}${PREVIEW_IMAGE.url}`)
+  })
+})
+
+describe('jsonLdHtml', () => {
+  it('escapes "<" so no text can close the script tag', () => {
+    expect(jsonLdHtml({ headline: '</script><b>' })).toBe('{"headline":"\\u003c/script>\\u003cb>"}')
   })
 })

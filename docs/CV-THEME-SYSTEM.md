@@ -105,6 +105,21 @@ medal in Art Deco, whose cord columns stay three.
 | paletteVars | `src/components/themes/shared/paletteVars.ts` | Turns a palette into CSS variables (`paletteVars('tp', { leafDark })` sets `--tp-leaf-dark`). |
 | GlobalProfessionStage | `src/components/themes/shared/professionStage.tsx` | A recoloured profession stage for worlds that draw none of their own. |
 
+## The blog and a world's posts section
+
+The posts are Markdown files in `content/blog/<slug>.md`, written in Decap (collection `blog`, a JSON front
+matter block and the body) with their images in `public/blog/<slug>/`. `src/lib/blog/posts.ts` is the one
+loader: `listPosts`, `getPost` and `latestPosts` read the folder, newest first, and show drafts only when
+`NODE_ENV` is `development`. The pages are `/blog` and `/blog/<slug>` in `src/app/(blog)/`, built
+statically, the body rendered to HTML at build time by `src/lib/blog/markdown.ts` (raw HTML in a post is
+dropped) and styled by `src/styles/blog.css`.
+
+The home page reads the newest 3 posts and hands them to `BlogProvider` (`src/components/blog/`). A world
+reads them with `usePosts()` and turns them into links with `postLinks` (`src/lib/blog/links.ts`), which
+returns null when there is no post. `PostsGate` (`src/components/cv/PostsGate.tsx`) uses the same rule, so a
+world wraps its posts section in it and the section disappears with 0 posts; a world never counts posts
+or builds a `/blog` address itself.
+
 ## Colours: one source per world
 
 Each world's `palette.ts` is its only colour source. The world root sets the palette as CSS variables with

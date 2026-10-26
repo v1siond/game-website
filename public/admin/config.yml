@@ -379,7 +379,6 @@ collections:
                   - { <<: *text, label: "Own product badge", name: ownProduct }
                   - { <<: *text, label: "Impact", name: impact }
                   - { <<: *text, label: "Tech", name: tech }
-                  - { <<: *text, label: "No posts", name: noPosts }
                   - { <<: *text, label: "Job span", name: jobSpan, hint: 'Keep {title} {company} {start} {end}' }
                   - { <<: *text, label: "Cyberware", name: cyberware, hint: 'Keep {type}' }
                   - { <<: *text, label: "Details", name: details }
@@ -800,3 +799,51 @@ collections:
                   - { <<: *fixed, label: "English", name: en }
                   - { <<: *fixed, label: "Spanish", name: es }
                   - { <<: *fixed, label: "Italian", name: it }
+              - label: Blog (the posts sections, /blog and each post)
+                name: blog
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Latest posts", name: latestPosts }
+                  - { <<: *text, label: "All posts", name: allPosts }
+                  - { <<: *text, label: "Back to home", name: backHome }
+                  - { <<: *text, label: "Draft", name: draft }
+                  - { <<: *text, label: "No posts yet", name: empty }
+                  - { <<: *text, label: "No post at this address", name: notFound }
+
+  # One Markdown file per post, content/blog/<slug>.md, English only. The front matter is JSON (Decap's
+  # json-frontmatter), which the site reads with JSON.parse. A new post starts as a draft: drafts show
+  # only on the local dev server, never in a production build. A post's images go in
+  # public/blog/<slug>/ and are served at /blog/<slug>/.
+  - name: blog
+    label: Blog posts
+    label_singular: Post
+    folder: content/blog
+    extension: md
+    format: json-frontmatter
+    create: true
+    identifier_field: slug
+    slug: "{{slug}}"
+    summary: "{{date}} {{title}}"
+    sortable_fields: [date, title]
+    media_folder: /public/blog/{{slug}}
+    public_folder: /blog/{{slug}}
+    fields:
+      - { label: Title, name: title, widget: string }
+      - { label: "Slug (the address /blog/<slug>; lowercase words joined by hyphens)", name: slug, widget: string, pattern: ['^[a-z0-9]+(-[a-z0-9]+)*$', 'Lowercase letters, digits and single hyphens'] }
+      - { label: Date, name: date, widget: datetime, format: YYYY-MM-DD, date_format: YYYY-MM-DD, time_format: false, picker_utc: true }
+      - { label: "Description (search result and link preview, 160 characters or less)", name: description, widget: text, pattern: ['^[\s\S]{1,160}$', '160 characters or less'] }
+      - { label: Search keyword, name: keyword, widget: string }
+      - { label: Cover image, name: cover, widget: image, required: false }
+      - { label: Cover image alt text, name: coverAlt, widget: string, required: false }
+      - { label: Tags, name: tags, widget: list, required: false, default: [] }
+      - label: Series
+        name: series
+        widget: object
+        required: false
+        collapsed: true
+        fields:
+          - { label: Series id, name: id, widget: string, required: false }
+          - { label: Part, name: part, widget: number, value_type: int, required: false }
+      - { label: Draft, name: draft, widget: boolean, default: true }
+      - { label: Body, name: body, widget: markdown }

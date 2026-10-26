@@ -1,12 +1,15 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import Link from 'next/link'
 import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { PostsGate } from '@/components/cv/PostsGate'
+import { usePosts } from '@/components/blog/BlogProvider'
+import { BLOG_PATH, postLinks } from '@/lib/blog/links'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -23,6 +26,7 @@ import {
   WaterCaustics,
   type DecoZone,
 } from './ArtDeco/backdrop'
+import { GOLD_OUTLINE } from './ArtDeco/actions'
 import { BathysphereHero } from './ArtDeco/descent'
 import { VendingMachine } from './ArtDeco/machine'
 import { BrassPanel, Chamber } from './ArtDeco/plaque'
@@ -43,10 +47,43 @@ const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap'
 // The root clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
 // scroll container and break the fixed viewfinder's place.
 
+// The latest posts on the brass panel: each title a cream link with its date in mist, and the gold
+// outline button to the whole list.
+function DecoPosts() {
+  const { blog } = useLabels()
+  const links = postLinks(usePosts())
+  if (!links) return null
+
+  return (
+    <>
+      <ul className="divide-y divide-[color:var(--deco-gold)]/30">
+        {links.map((link) => (
+          <li key={link.href}>
+            <Link
+              href={link.href}
+              className="flex min-h-[44px] flex-col justify-center gap-1 py-3 text-[color:var(--deco-cream)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--deco-gold-bright)] sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+            >
+              <span className="text-lg underline decoration-[color:var(--deco-gold)] underline-offset-4">{link.title}</span>
+              <time dateTime={link.date} className="shrink-0 text-sm uppercase tracking-wider text-[color:var(--deco-mist)]">
+                {link.shownDate}
+              </time>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-6 flex justify-center">
+        <Link href={BLOG_PATH} className={GOLD_OUTLINE}>
+          {blog.allPosts}
+        </Link>
+      </div>
+    </>
+  )
+}
+
 export default function ArtDecoTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions, sections, cards } = useLabels()
+  const { navigation, professions, blog } = useLabels()
   const [mounted, setMounted] = useState(false)
   const reducedMotion = useReducedMotion()
   const pointer = usePointerVars(mounted && !reducedMotion)
@@ -89,9 +126,9 @@ export default function ArtDecoTheme() {
             <PostsGate>
               <div className="pt-20">
                 <FadeInScene>
-                  <Chamber title={sections.posts} depth={POSTS_DEPTH[active]}>
+                  <Chamber title={blog.latestPosts} depth={POSTS_DEPTH[active]}>
                     <BrassPanel>
-                      <p className="py-6 text-center text-base italic text-[color:var(--deco-mist)]">{cards.noPosts}</p>
+                      <DecoPosts />
                     </BrassPanel>
                   </Chamber>
                 </FadeInScene>

@@ -83,7 +83,6 @@
         "ownProduct": "My product",
         "impact": "Impact",
         "tech": "Tech",
-        "noPosts": "No posts yet",
         "jobSpan": "{title} at {company}, {start} to {end}",
         "cyberware": "{type} cyberware"
       },
@@ -455,6 +454,14 @@
         "en": "English",
         "es": "Español",
         "it": "Italiano"
+      },
+      "blog": {
+        "latestPosts": "Latest posts",
+        "allPosts": "All posts",
+        "backHome": "Back to home",
+        "draft": "Draft",
+        "empty": "No posts yet.",
+        "notFound": "No post at this address."
       }
     }
   },
@@ -542,7 +549,6 @@
         "ownProduct": "Mi producto",
         "impact": "Impacto",
         "tech": "Tecnologías",
-        "noPosts": "Aún no hay publicaciones",
         "jobSpan": "{title} en {company}, de {start} a {end}",
         "cyberware": "Ciberimplante {type}"
       },
@@ -914,6 +920,14 @@
         "en": "English",
         "es": "Español",
         "it": "Italiano"
+      },
+      "blog": {
+        "latestPosts": "Últimas publicaciones",
+        "allPosts": "Todas las publicaciones",
+        "backHome": "Volver al inicio",
+        "draft": "Borrador",
+        "empty": "Todavía no hay publicaciones.",
+        "notFound": "No hay ninguna publicación en esta dirección."
       }
     }
   },
@@ -1001,7 +1015,6 @@
         "ownProduct": "Il mio prodotto",
         "impact": "Impatto",
         "tech": "Tecnologie",
-        "noPosts": "Ancora nessun articolo",
         "jobSpan": "{title} presso {company}, dal {start} al {end}",
         "cyberware": "Cyberware {type}"
       },
@@ -1373,6 +1386,14 @@
         "en": "English",
         "es": "Español",
         "it": "Italiano"
+      },
+      "blog": {
+        "latestPosts": "Ultimi articoli",
+        "allPosts": "Tutti gli articoli",
+        "backHome": "Torna alla home",
+        "draft": "Bozza",
+        "empty": "Ancora nessun articolo.",
+        "notFound": "Nessun articolo a questo indirizzo."
       }
     }
   }
