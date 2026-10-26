@@ -5,14 +5,17 @@ import { paletteVars } from '../shared/paletteVars'
 // glow of the old glyphs. SVG fills read the constants; the page reads the same values as CSS variables
 // (`--ap-parchment` and so on) that the world's root sets once, so every colour has one owner.
 //
-// Text pairs: ink on parchment 13.2:1, soft ink on parchment 7.7:1, route red on parchment 4.8:1 and on
-// the journal page 5.4:1, forest on parchment 6.4:1, parchment on night 13.4:1, on canopy 10:1 and on
-// forest 6.4:1, gold on canopy 5.6:1 and on night 7.6:1, edge on night 7.4:1, ink on gold 7.5:1, white
-// on route red 6:1, white on the black HUD bar 21:1, the coin gold on the HUD 14:1.
+// Text pairs: ink on parchment 13.2:1, soft ink on parchment 7.7:1, route text on the journal page 7.7:1,
+// forest on parchment 6.4:1, parchment on night 13.4:1, on canopy 10:1 and on the forest plate 7.7:1,
+// gold on canopy 5.6:1 and on night 7.6:1, edge on night 7.4:1, ink on gold 7.5:1, white on the route
+// plate 7.7:1 and on the blue plate 7.7:1, white on the black HUD bar 21:1, the coin gold on the HUD 14:1.
+// ROUTE, FOREST and BLUE keep drawing the map line, the art and the overalls; their TEXT and PLATE twins
+// are the same hues deepened for the words and for the buttons that carry words.
 export const TRAIL = {
   NIGHT: '#14211a',
   CANOPY: '#1f3a2b',
   FOREST: '#2f5a3a',
+  FOREST_PLATE: '#284d32',
   MOSS: '#6f8f4e',
   PARCHMENT: '#f3e6c4',
   PAGE: '#fbf3dc',
@@ -20,6 +23,8 @@ export const TRAIL = {
   INK: '#2b1d0e',
   INK_SOFT: '#5a4026',
   ROUTE: '#b23a22',
+  ROUTE_TEXT: '#8b2d1a',
+  ROUTE_PLATE: '#94311e',
   GOLD: '#e0a530',
   LANTERN: '#ffd58a',
   STONE: '#9a927f',
@@ -45,8 +50,9 @@ export const TRAIL = {
   FALL: '#d0913f',
   FALL_DARK: '#8a4e22',
   TEAL: '#3f9a92',
-  // The blue of the overalls and the blue switch; white on it 6.4:1.
+  // The blue of the overalls and the blue switch; white words sit on BLUE_PLATE.
   BLUE: '#2f5fae',
+  BLUE_PLATE: '#275198',
   // The levels behind the page, sampled from the research images (notes.md): the day sky, pill hills far
   // off and round hills with eyes near, the grass and soil of the ground, the clouds with faces.
   SKY_HIGH: '#2c78e8',

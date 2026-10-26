@@ -10,7 +10,7 @@ export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactN
     <div style={{ position: 'relative' }}>
       {/* Corner ornaments */}
       {['tl', 'tr', 'bl', 'br'].map((pos) => (
-        <svg
+        <svg aria-hidden="true"
           key={pos}
           width="24"
           height="24"

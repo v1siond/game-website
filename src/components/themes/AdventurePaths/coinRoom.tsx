@@ -90,7 +90,7 @@ export function CoinRoom({ companies, profession }: { companies: SectionsOf<'eng
                 <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>
                   <SlashBreaks text={company.name} />
                 </h3>
-                <p className="text-sm font-semibold text-[color:var(--ap-route)]">{company.tagline}</p>
+                <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">{company.tagline}</p>
                 <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{company.description}</p>
               </article>
             </a>

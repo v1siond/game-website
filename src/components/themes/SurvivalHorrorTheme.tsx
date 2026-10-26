@@ -54,7 +54,7 @@ export default function SurvivalHorrorTheme() {
   const state = useMemo(() => ({ herbs, takeHerbs, saves, save }), [herbs, saves, save])
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${look.root}`} style={SH_VARS}>
+    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-flame)] ${look.root}`} style={SH_VARS}>
       <DoorProvider>
         <ZoneStageProvider value={zones}>
           <StageProvider value={state}>
@@ -82,7 +82,7 @@ export default function SurvivalHorrorTheme() {
               </RoomWindow>
 
               <footer className="py-10 text-center">
-                <p className={`inline-block bg-[color:var(--sh-void)] px-3 py-1 text-sm text-[color:var(--sh-fog)] ${look.typed}`}>
+                <p className={`inline-block bg-[color:var(--sh-void)] px-3 py-1 text-sm text-[color:var(--sh-fog-text)] ${look.typed}`}>
                   © {new Date().getFullYear()} <NameWords name={view.hero.name} />
                 </p>
               </footer>

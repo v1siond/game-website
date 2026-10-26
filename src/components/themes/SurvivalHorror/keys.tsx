@@ -85,7 +85,7 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
         <SuitMark suit={suit} className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--sh-brass)]" />
         <div className="min-w-0">
           <h3 className="text-base text-[color:var(--sh-ivory)]">{band.name}</h3>
-          <p className="text-sm text-[color:var(--sh-brass)]">
+          <p className="text-sm text-[color:var(--sh-brass-text)]">
             {band.role}
             {years && <span aria-hidden="true"> | </span>}
             {years}
@@ -101,7 +101,7 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
             </p>
           )}
           {linkProps && (
-            <a {...linkProps} className={`${CARD_BUTTON} self-start border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame)] hover:border-[color:var(--sh-flame)]`}>
+            <a {...linkProps} className={`${CARD_BUTTON} self-start border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] hover:border-[color:var(--sh-flame)]`}>
               {band.name}
             </a>
           )}
@@ -135,7 +135,7 @@ export function SuitDoors({ musician, bands }: { musician: Musician; bands: Band
   return (
     <>
       <p className="mb-2 text-base leading-relaxed text-[color:var(--sh-cream)]">{drumsSince(musician, years)}</p>
-      <p className="mb-6 text-sm italic text-[color:var(--sh-fog)]">{words.keyHint}</p>
+      <p className="mb-6 text-sm italic text-[color:var(--sh-fog-text)]">{words.keyHint}</p>
       <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <SuitDoor slot={slot} suit={suitOf.get(slot.band.id) ?? 'spade'} />} />
       <p className="mt-2 text-sm italic text-[color:var(--sh-cream)]">{musician.line}</p>
     </>

@@ -37,7 +37,7 @@ function Crate({ category, index }: { category: CVData['techStack'][number]; ind
           </h3>
           <ul className="flex flex-wrap gap-1.5">
             {category.items.map((tech) => (
-              <li key={tech} className="border border-[color:var(--sh-fog)] px-2 py-1 text-sm uppercase tracking-wider text-[color:var(--sh-muted)]">
+              <li key={tech} className="border border-[color:var(--sh-fog)] px-2 py-1 text-sm uppercase tracking-wider text-[color:var(--sh-muted-text)]">
                 {tech}
               </li>
             ))}

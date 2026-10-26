@@ -217,7 +217,7 @@ function NamePlaque() {
               <h1 className={`text-[clamp(1.75rem,8vw,2.25rem)] font-bold tracking-wide ${JOURNAL_SERIF}`}>
                 <NameWords name={name} />
               </h1>
-              <p className="mt-2 text-base font-semibold text-[color:var(--ap-route)]">{headline}</p>
+              <p className="mt-2 text-base font-semibold text-[color:var(--ap-route-text)]">{headline}</p>
               <p className="mt-1 text-sm italic text-[color:var(--ap-ink-soft)]">{tagline}</p>
               <p className="mt-1 text-sm">{line}</p>
               <nav className="mt-4 flex flex-wrap items-center justify-center gap-3" aria-label={navigation.contactAndCv}>

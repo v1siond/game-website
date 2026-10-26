@@ -29,7 +29,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
       <RoomWindow zone="about">
         <FadeInScene>
           <PaperPanel title={titles.about}>
-            <p className="text-base leading-relaxed text-[color:var(--sh-cream)]">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-[color:var(--sh-cream)]">{professionalSummary.bio}</p>
           </PaperPanel>
         </FadeInScene>
       </RoomWindow>

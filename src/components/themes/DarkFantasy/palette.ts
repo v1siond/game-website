@@ -22,6 +22,8 @@ export const DARK_FANTASY = {
   spiritGold: '#e8c841',
   spiritGoldDark: '#d4af37',
   brass: '#b08d57',
+  // Brass as text: the same hue lifted to 9 to 1 on the caverns; brass itself stays on lines, borders and the Email me plate.
+  brassText: '#cbb591',
   copper: '#8b6914',
 
   // Forest, stone, bone and metal
@@ -31,6 +33,8 @@ export const DARK_FANTASY = {
   stoneDark: '#333333',
   bone: '#e8e4dc',
   silver: '#a0a0a0',
+  // Silver as text: lifted to 10.9 to 1 on the panels; silver itself stays on the icons and the nail.
+  silverText: '#c8c8c8',
   lavender: '#b7a9d9',
   white: '#ffffff',
 

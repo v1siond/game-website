@@ -87,7 +87,7 @@ export function ChaseAbout({ bio }: { bio: string }) {
 
   return (
     <div ref={ref}>
-      <p className="mx-auto max-w-2xl border-y border-[color:var(--sh-fog)] py-5 text-center text-sm leading-loose tracking-wide text-[color:var(--sh-text)] sm:text-base">{bio}</p>
+      <p className="mx-auto max-w-prose border-y border-[color:var(--sh-fog)] py-5 text-center text-sm leading-loose tracking-wide text-[color:var(--sh-text)] sm:text-base">{bio}</p>
       <div className="relative mt-6 aspect-[3/1] overflow-hidden border-y-2 border-[color:var(--sh-black)]" aria-hidden="true">
         <Sky light={SKY.dawn} />
         {triggered && <ChaseStrip key={run} onDone={() => setDone(true)} />}
@@ -97,7 +97,7 @@ export function ChaseAbout({ bio }: { bio: string }) {
           type="button"
           onClick={again}
           disabled={!done}
-          className={`${world.button} inline-flex min-h-[44px] items-center border-2 border-dashed border-[color:var(--sh-muted)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-muted)] hover:text-[color:var(--sh-text)] disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]`}
+          className={`${world.button} inline-flex min-h-[44px] items-center border-2 border-dashed border-[color:var(--sh-muted)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-muted-text)] hover:text-[color:var(--sh-text)] disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]`}
         >
           {words.chaseAgain}
         </button>

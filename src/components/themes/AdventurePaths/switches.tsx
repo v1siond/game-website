@@ -42,8 +42,8 @@ interface SwitchColour {
 const SWITCH_COLOURS: readonly SwitchColour[] = [
   { fill: 'bg-[color:var(--ap-gold)]', text: 'text-[color:var(--ap-ink)]', svg: TRAIL.GOLD, shade: '#9a6a14' },
   { fill: 'bg-[color:var(--ap-forest)]', text: 'text-white', svg: TRAIL.FOREST, shade: TRAIL.CANOPY },
-  { fill: 'bg-[color:var(--ap-route)]', text: 'text-white', svg: TRAIL.ROUTE, shade: '#6e1f12' },
-  { fill: 'bg-[color:var(--ap-blue)]', text: 'text-white', svg: TRAIL.BLUE, shade: '#1f3f78' },
+  { fill: 'bg-[color:var(--ap-route-plate)]', text: 'text-white', svg: TRAIL.ROUTE, shade: '#6e1f12' },
+  { fill: 'bg-[color:var(--ap-blue-plate)]', text: 'text-white', svg: TRAIL.BLUE, shade: '#1f3f78' },
 ]
 
 const LINK = 'inline-flex min-h-[44px] items-center gap-2 rounded-sm border-2 border-[color:var(--ap-ink)] px-3 text-sm font-bold transition-transform hover:-translate-y-0.5 motion-reduce:transition-none'
@@ -134,7 +134,7 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}><SlashBreaks text={project.name} /></h3>
-          <p className="text-sm font-semibold text-[color:var(--ap-route)]">{project.role}</p>
+          <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">{project.role}</p>
           {years && <p className="text-sm text-[color:var(--ap-ink-soft)]">{years}</p>}
         </div>
         <button
@@ -159,8 +159,8 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
             {main.label}
           </a>
           {secret.map(({ kind, label, linkProps }) => (
-            <a key={kind} {...linkProps} className={`${LINK} bg-[color:var(--ap-route)] text-white`}>
-              <span className="h-3 w-3 rounded-full border-2 border-white bg-[color:var(--ap-route)]" aria-hidden="true" />
+            <a key={kind} {...linkProps} className={`${LINK} bg-[color:var(--ap-route-plate)] text-white`}>
+              <span className="h-3 w-3 rounded-full border-2 border-white bg-[color:var(--ap-route-plate)]" aria-hidden="true" />
               {label}
               <span className="text-sm font-normal">{trail.secretExit}</span>
             </a>

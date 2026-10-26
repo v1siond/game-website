@@ -10,7 +10,7 @@ import { REALM } from './palette'
 export function FrostHero() {
   return (
     <>
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '11%',

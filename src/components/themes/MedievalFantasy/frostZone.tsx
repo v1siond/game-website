@@ -65,7 +65,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       }} />
 
       {/* === FROZEN THRONE BACKGROUND - Animated Painting === */}
-      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
+      <svg aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
         <defs>
           {/* Gradients for depth and ice effects */}
           <linearGradient id="ftGroundFade" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -245,7 +245,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Volumetric blizzard clouds */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '45%' }} viewBox="0 0 1000 450" preserveAspectRatio="none">
+      <svg aria-hidden="true" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '45%' }} viewBox="0 0 1000 450" preserveAspectRatio="none">
         <defs>
           <filter id="iceCloudBlur" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="15" />
@@ -350,7 +350,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       }} />
 
       {/* === INVINCIBLE - Standing beside Lich King === */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '1%',
@@ -594,7 +594,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
 
       {/* === SEMI-BURIED SKELETONS near footer === */}
       {/* Skeleton 1 - left side, arm reaching up */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '8%',
@@ -617,7 +617,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Skeleton 2 - right side, skull half visible */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           right: '12%',
@@ -644,7 +644,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Skeleton 3 - center-left, ribcage visible */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '30%',
@@ -669,7 +669,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Skeleton 4 - far right, another reaching arm */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           right: '25%',
@@ -692,7 +692,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Skeleton 5 - far background, fallen warrior */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '45%',
@@ -720,7 +720,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Skeleton 6 - background, crawling out */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '55%',
@@ -746,7 +746,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Skeleton 7 - far right background */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           right: '5%',
@@ -769,7 +769,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Undead ghoul 1 - silhouette in background */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '70%',
@@ -792,7 +792,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       {/* Undead ghoul 2 - far background */}
-      <svg
+      <svg aria-hidden="true"
         style={{
           position: 'absolute',
           left: '38%',

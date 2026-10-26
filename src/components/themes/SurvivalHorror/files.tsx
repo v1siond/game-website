@@ -70,7 +70,7 @@ function HouseMap({ jobs, read, here }: { jobs: Job[]; read: ReadonlySet<string>
   return (
     <div className="mb-8 border-2 border-[color:var(--sh-sepia)] bg-[color:var(--sh-map-floor)] p-4">
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-3">
-        <p className={`text-sm uppercase tracking-[0.2em] text-[color:var(--sh-brass)] ${look.typed}`}>{words.map}</p>
+        <p className={`text-sm uppercase tracking-[0.2em] text-[color:var(--sh-brass-text)] ${look.typed}`}>{words.map}</p>
         <p className={`text-sm text-[color:var(--sh-cream)] ${look.typed}`} role="status">
           {done ? words.searchComplete : fillLabel(words.roomsSearched, { count: searched, total: jobs.length })}
         </p>
@@ -83,7 +83,7 @@ function HouseMap({ jobs, read, here }: { jobs: Job[]; read: ReadonlySet<string>
       <div className="mt-3 h-2 overflow-hidden bg-[color:var(--sh-void)]" aria-hidden="true">
         <div className={`h-full origin-left bg-[color:var(--sh-room-searched)] ${horror.searchBar}`} style={{ '--searched': searched / Math.max(jobs.length, 1) } as CSSProperties} />
       </div>
-      <p className="mt-3 text-sm italic text-[color:var(--sh-fog)]">{words.fileHint}</p>
+      <p className="mt-3 text-sm italic text-[color:var(--sh-fog-text)]">{words.fileHint}</p>
     </div>
   )
 }
@@ -98,7 +98,7 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
       <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="text-base text-[color:var(--sh-ivory)]">{job.title}</h3>
-          <p className="text-sm text-[color:var(--sh-brass)]">
+          <p className="text-sm text-[color:var(--sh-brass-text)]">
             <SlashBreaks text={job.company} />
           </p>
         </div>
@@ -106,7 +106,7 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
           {start} - {end}
         </span>
       </div>
-      {job.description && <p className="mb-3 text-sm leading-relaxed text-[color:var(--sh-fog)]">{job.description}</p>}
+      {job.description && <p className="mb-3 text-sm leading-relaxed text-[color:var(--sh-fog-text)]">{job.description}</p>}
       {job.highlights.length > 0 && (
         <>
           <button
@@ -114,7 +114,7 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
             onClick={onRead}
             aria-expanded={isRead}
             aria-controls={bodyId}
-            className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame)] hover:border-[color:var(--sh-flame)]`}
+            className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] hover:border-[color:var(--sh-flame)]`}
           >
             {actions.readFile}
           </button>

@@ -13,8 +13,8 @@ import world from './world.module.css'
 
 const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--sh-glow)]'
 const CARD_TITLE = 'text-sm font-bold uppercase tracking-wider text-[color:var(--sh-text)]'
-const CARD_META = 'text-sm tracking-wider text-[color:var(--sh-dim)]'
-const CARD_BODY = 'text-sm leading-relaxed text-[color:var(--sh-muted)]'
+const CARD_META = 'text-sm tracking-wider text-[color:var(--sh-dim-text)]'
+const CARD_BODY = 'text-sm leading-relaxed text-[color:var(--sh-muted-text)]'
 
 export function Panel({ children }: { children: ReactNode }) {
   return (
@@ -34,7 +34,7 @@ export function SectionHeader({ id, title }: { id: string; title: string }) {
   return (
     <div className="mb-4 flex items-center gap-3">
       <div className="h-px flex-1 bg-[color:var(--sh-fog)]" aria-hidden="true" />
-      <h2 id={id} className={`text-sm uppercase tracking-[0.4em] text-[color:var(--sh-muted)] ${TYPEWRITER}`}>
+      <h2 id={id} className={`text-sm uppercase tracking-[0.4em] text-[color:var(--sh-muted-text)] ${TYPEWRITER}`}>
         {title}
       </h2>
       <div className="h-px flex-1 bg-[color:var(--sh-fog)]" aria-hidden="true" />
@@ -66,7 +66,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         <ul className="mt-2 space-y-1">
           {entry.highlights.map((highlight) => (
             <li key={highlight} className={`flex items-start gap-1.5 ${CARD_BODY}`}>
-              <span className="text-[color:var(--sh-dim)]" aria-hidden="true">
+              <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
                 -
               </span>
               {highlight}
@@ -77,7 +77,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       {entry.skills.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {entry.skills.slice(0, 5).map((skill) => (
-            <span key={skill} className="border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim)]">
+            <span key={skill} className="border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim-text)]">
               {skill}
             </span>
           ))}
@@ -106,7 +106,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
       )}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {project.techStack.slice(0, 4).map((tech) => (
-          <span key={tech} className="bg-[color:var(--sh-black)] px-1.5 py-0.5 text-sm uppercase tracking-wider text-[color:var(--sh-muted)]">
+          <span key={tech} className="bg-[color:var(--sh-black)] px-1.5 py-0.5 text-sm uppercase tracking-wider text-[color:var(--sh-muted-text)]">
             {tech}
           </span>
         ))}

@@ -9,7 +9,7 @@ import { ENGINE_LINK } from '@/lib/engineLink'
 
 const PLATE = `inline-flex min-h-[44px] items-center justify-center border-2 px-4 py-2 text-sm uppercase motion-safe:transition-colors ${look.typed} ${look.focus}`
 
-const LIT = `${PLATE} border-[color:var(--sh-brass)] bg-[color:var(--sh-rust)] text-[color:var(--sh-ivory)] hover:bg-[color:var(--sh-wood)]`
+const LIT = `${PLATE} border-[color:var(--sh-brass)] bg-[color:var(--sh-rust-plate)] text-[color:var(--sh-ivory)] hover:bg-[color:var(--sh-wood)]`
 const PLAIN = `${PLATE} border-[color:var(--sh-wood)] bg-[color:var(--sh-paper)] text-[color:var(--sh-cream)] hover:border-[color:var(--sh-brass)]`
 
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {

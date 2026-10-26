@@ -23,14 +23,14 @@ function Row({ children }: { children: ReactNode }) {
   )
 }
 
-/** The four actions, one menu row each. */
-export function ActionMenu({ className = '' }: { className?: string }) {
+/** The four actions, one menu row each. A second copy on the page takes its own label so the two navs differ. */
+export function ActionMenu({ className = '', label }: { className?: string; label?: string }) {
   const { actions, navigation } = useLabels()
 
   return (
     <RecruiterHero
       render={(hero) => (
-        <nav aria-label={navigation.contactAndCv} className={className}>
+        <nav aria-label={label ?? navigation.contactAndCv} className={className}>
           <ul className="space-y-1">
             {hero.actions.map((action) => (
               <li key={action.id}>

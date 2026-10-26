@@ -12,11 +12,11 @@ import { RealmButton } from './actions'
 // One card per job, project and band, read from the shared section slots.
 
 export const CARD_TITLE: CSSProperties = { color: REALM.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.125rem' }
-export const CARD_SUBTITLE: CSSProperties = { color: REALM.goldMid, fontSize: '0.875rem', marginBottom: '0.25rem' }
+export const CARD_SUBTITLE: CSSProperties = { color: REALM.goldText, fontSize: '0.875rem', marginBottom: '0.25rem' }
 export const CARD_BODY: CSSProperties = { color: REALM.textMid, fontSize: '1rem', marginBottom: '0.25rem' }
 export const CARD_CHIP: CSSProperties = {
   background: REALM.chaosFelDark + '40',
-  color: REALM.chaosFelBright,
+  color: REALM.chaosFelText,
   fontSize: '0.875rem',
   padding: '0.125rem 0.25rem',
   textTransform: 'uppercase',
@@ -34,7 +34,7 @@ export function JobCard({ job }: { job: Job }) {
       <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.25rem 0.75rem', marginBottom: '0.375rem' }}>
         <div style={{ minWidth: 0 }}>
           <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{job.title}</h3>
-          <p style={{ color: REALM.goldMid, fontSize: '0.875rem' }}><SlashBreaks text={job.company} /></p>
+          <p style={{ color: REALM.goldText, fontSize: '0.875rem' }}><SlashBreaks text={job.company} /></p>
         </div>
         <span style={{ color: REALM.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYearsLabel(job, years.present)}</span>
       </div>

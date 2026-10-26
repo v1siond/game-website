@@ -81,7 +81,7 @@ const pickOf = (cell: HackCell, state: HackState): HackAction | null => {
 function DumpRow({ address, cells, state, onPick }: { address: string; cells: HackCell[]; state: HackState; onPick: (pick: HackAction) => void }) {
   return (
     <p className="flex gap-3 whitespace-pre text-sm leading-7">
-      <span className="text-atomic-phosphor-dim" aria-hidden="true">
+      <span className="text-atomic-phosphor-dim-text" aria-hidden="true">
         {address}
       </span>
       <span>
@@ -96,8 +96,9 @@ function DumpRow({ address, cells, state, onPick }: { address: string; cells: Ha
             )
           }
           return (
-            // the word sits on a dump line under 44px tall, so an invisible band above and below it carries the tap
-            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative before:absolute before:inset-x-0 before:-inset-y-2 before:content-[''] ${atomic.dumpPick} ${atomic.focusRing}`}>
+            // the word sits on a dump line under 44px tall and the shortest word is 24px wide, so an invisible
+            // band 8px above and below and 10px each side carries the tap at 44px or more both ways
+            <button key={index} type="button" onClick={() => onPick(pick)} className={`relative before:absolute before:-inset-x-2.5 before:-inset-y-2 before:content-[''] ${atomic.dumpPick} ${atomic.focusRing}`}>
               <span className="relative">{text}</span>
             </button>
           )
@@ -136,7 +137,7 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
   return (
     <div className={atomic.hackScreen} data-status={state.status}>
       <h3 className="text-base font-bold uppercase tracking-widest text-atomic-phosphor">{hud.hackTitle}</h3>
-      <p className="mt-1 max-w-prose text-sm text-atomic-phosphor-dim">{hud.hackHint}</p>
+      <p className="mt-1 max-w-prose text-sm text-atomic-phosphor-dim-text">{hud.hackHint}</p>
 
       <div className="mt-3 flex items-center gap-3 text-sm uppercase tracking-widest text-atomic-phosphor">
         <span>{hud.attemptsLeft}</span>
@@ -207,8 +208,8 @@ export function ContactTerminal() {
               <h2 id={atomicId(title)} className={`text-3xl font-bold uppercase tracking-[0.2em] text-atomic-phosphor ${atomic.glow}`}>
                 {title}
               </h2>
-              <p className="mt-3 text-base text-atomic-phosphor-dim">{hero.line}</p>
-              <ActionMenu className="mt-6" />
+              <p className="mt-3 text-base text-atomic-phosphor-dim-text">{hero.line}</p>
+              <ActionMenu className="mt-6" label={sections.contact} />
             </div>
             {board && <PasswordGame key={seed} board={board} onReboot={() => setSeed((current) => current + 1)} />}
           </div>

@@ -50,7 +50,7 @@ export default function MedievalFantasyTheme() {
   const { sectionSpacing } = layout
 
   return (
-    <div style={{ ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
+    <div className="[--focus-ring:var(--realm-gold-bright)]" style={{ ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
       {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
       {mounted && <DualZoneAtmosphere />}
 
@@ -136,8 +136,9 @@ export default function MedievalFantasyTheme() {
           <FTArtDivider variant="throne" scale={layout.artDividerScale} />
         </ArtDivider>
 
-        {/* Contact - no card, floating text like Dark Fantasy */}
-        <ScrollScene>
+        {/* Contact - no card, floating text like Dark Fantasy. The last section never reaches the default end
+            line (half the viewport) before the page runs out, so its reveal ends higher, at full opacity. */}
+        <ScrollScene end={0.8}>
           <section aria-label={sections.contact} style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
             <RecruiterHero
               render={({ line, actions }) => (

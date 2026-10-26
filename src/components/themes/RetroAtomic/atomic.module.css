@@ -204,7 +204,7 @@
 }
 
 .screenTab {
-  color: theme('colors.atomic.phosphor-dim');
+  color: theme('colors.atomic.phosphor-dim-text');
 }
 
 .screenTab::after {

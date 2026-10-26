@@ -120,7 +120,7 @@ export function WakeHero({ profession }: { profession: Profession }) {
               <NameWords name={name} />
             </h1>
             <p className="mt-3 text-sm tracking-[0.2em] text-[color:var(--sh-text)] sm:text-base">{headline}</p>
-            <p className="mt-1 text-sm italic tracking-wider text-[color:var(--sh-muted)]">{tagline}</p>
+            <p className="mt-1 text-sm italic tracking-wider text-[color:var(--sh-muted-text)]">{tagline}</p>
             <div className="mx-auto mt-4 h-px w-24 bg-[color:var(--sh-fog)]" aria-hidden="true" />
           </div>
 

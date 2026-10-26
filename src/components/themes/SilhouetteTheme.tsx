@@ -40,7 +40,7 @@ export default function SilhouetteTheme() {
 
   return (
     <CutProvider>
-      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${TYPEWRITER} ${world.world}`} style={SHADE_VARS}>
+      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-rim)] ${TYPEWRITER} ${world.world}`} style={SHADE_VARS}>
         <Atmosphere />
 
         <header className="relative z-30">
@@ -60,10 +60,10 @@ export default function SilhouetteTheme() {
         <footer className="relative z-20 py-10 text-center">
           <div className="mb-4 flex items-center justify-center gap-3" aria-hidden="true">
             <div className="h-px w-6 bg-[color:var(--sh-edge)]" />
-            <p className="text-sm tracking-[0.5em] text-[color:var(--sh-dim)]">. . .</p>
+            <p className="text-sm tracking-[0.5em] text-[color:var(--sh-dim-text)]">. . .</p>
             <div className="h-px w-6 bg-[color:var(--sh-edge)]" />
           </div>
-          <p className="text-sm text-[color:var(--sh-dim)]">
+          <p className="text-sm text-[color:var(--sh-dim-text)]">
             © {new Date().getFullYear()} <NameWords name={view.hero.name} />
           </p>
         </footer>

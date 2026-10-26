@@ -6,10 +6,12 @@
 // and atomic.module.css (theme(), with its opacity) paint the same values.
 
 // TUBE: the phosphor and the glass it glows on. The phosphor is the series' default HUD green, the
-// game ini's iHUDColor 18, 255, 21. Phosphor on glass measures 13.8:1, dim on glass 7.1:1, glass on a
+// game ini's iHUDColor 18, 255, 21. Phosphor on glass measures 13.8:1, dim text on glass 10.7:1, glass on a
 // phosphor fill (the picked row) 13.8:1; ink on cream 14.8:1, cream on poster blue 5.3:1.
 export const PHOSPHOR = '#12ff15'
 export const PHOSPHOR_DIM = '#0fb812'
+// Dim phosphor as words: the same green lifted to 9 to 1 on the lit glass; PHOSPHOR_DIM stays on hair, trim and frames.
+export const PHOSPHOR_DIM_TEXT = '#12e116'
 export const PHOSPHOR_DEEP = '#0a5c0c'
 export const GLASS = '#03140a'
 export const GLASS_EDGE = '#062a15'
@@ -60,13 +62,14 @@ export const CUTOUT_PINK = '#e8b3a8'
 export const INK = '#0b0c09'
 export const PANEL = '#121410'
 export const BUNKER = '#1b1d17'
-export const ASH = '#b3b49f'
+export const ASH = '#bcbdaa'
 
 
 // The `atomic` Tailwind colour group, one entry per palette colour the page's classes and atomic.module.css paint.
 export const ATOMIC_COLORS = {
   phosphor: PHOSPHOR,
   'phosphor-dim': PHOSPHOR_DIM,
+  'phosphor-dim-text': PHOSPHOR_DIM_TEXT,
   'phosphor-deep': PHOSPHOR_DEEP,
   glass: GLASS,
   'glass-edge': GLASS_EDGE,

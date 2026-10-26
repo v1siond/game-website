@@ -62,7 +62,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
       <ScrollScene>
         <section style={{ marginBottom: layout.sectionSpacing, marginTop: '1rem' }}>
           <RealmFrame title={labels.sections.about} zone="roc">
-            <p style={{
+            <p className="max-w-prose" style={{
               color: REALM.textBright,
               lineHeight: 1.8,
               fontSize: isLargeScreen ? '1.125rem' : '1rem',
@@ -110,7 +110,7 @@ function EngineerSections({ sections, layout, isLargeScreen }: { sections: Secti
               <ul className={MASONRY_LIST} aria-label={labels.cards.techByCategory}>
                 {techStack.map((category) => (
                   <li key={category.id} className={MASONRY_ITEM}>
-                    <h3 style={{ color: REALM.goldMid, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${REALM.metalDark}`, paddingBottom: '0.25rem' }}>
+                    <h3 style={{ color: REALM.goldText, fontSize: '1.125rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '0.375rem', borderBottom: `1px solid ${REALM.metalDark}`, paddingBottom: '0.25rem' }}>
                       {category.name}
                     </h3>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
@@ -267,7 +267,7 @@ function MartialArtistSections({ sections, layout }: { sections: SectionsOf<'fig
                 classNames={{
                   facts: 'grid sm:grid-cols-2 gap-3 mb-4',
                   fact: 'p-3 bg-gradient-to-b from-[color:var(--realm-bg-deep)] to-[color:var(--realm-bg-void)] border border-[color:var(--realm-metal-dark)]',
-                  term: 'text-sm uppercase tracking-[0.08em] font-semibold text-[color:var(--realm-gold-mid)]',
+                  term: 'text-sm uppercase tracking-[0.08em] font-semibold text-[color:var(--realm-gold-text)]',
                   value: 'text-base mt-1 text-[color:var(--realm-text-bright)]',
                   achievements: 'space-y-1',
                   achievement: 'text-base flex items-start gap-2 text-[color:var(--realm-text-mid)]',

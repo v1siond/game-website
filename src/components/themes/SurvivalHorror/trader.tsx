@@ -40,8 +40,8 @@ function Ware({ company }: { company: Company }) {
       <h3 className={`${company.featured ? 'text-lg' : 'text-base'} text-[color:var(--sh-ivory)]`}>
         <SlashBreaks text={company.name} />
       </h3>
-      <p className="mb-2 text-sm text-[color:var(--sh-brass)]">{company.tagline}</p>
-      <p className="text-sm leading-relaxed text-[color:var(--sh-fog)]">{company.description}</p>
+      <p className="mb-2 text-sm text-[color:var(--sh-brass-text)]">{company.tagline}</p>
+      <p className="text-sm leading-relaxed text-[color:var(--sh-fog-text)]">{company.description}</p>
       {company.services.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-1.5">
           {company.services.map((service) => (
@@ -61,7 +61,7 @@ export function TraderWares({ companies }: { companies: Company[] }) {
 
   return (
     <div ref={ref}>
-      <p className="mb-4 text-sm italic text-[color:var(--sh-fog)]">{words.waresHint}</p>
+      <p className="mb-4 text-sm italic text-[color:var(--sh-fog-text)]">{words.waresHint}</p>
       <ul className={`${MASONRY_LIST} pt-2`}>
         {companies.map((company, index) => (
           <li key={company.id} className={`${MASONRY_ITEM} ${company.featured ? '[column-span:all]' : ''} ${horror.cellDrop} ${triggered ? horror.cellDropped : ''}`} style={{ '--i': index } as CSSProperties}>

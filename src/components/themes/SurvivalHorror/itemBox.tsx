@@ -114,14 +114,14 @@ export function ItemBox() {
               <ItemIcon key={active} profession={active} className={`h-16 w-16 ${horror.examineTurn}`} />
             </div>
             <div className="min-w-0">
-              <p className={`text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>{hud.equipped}</p>
+              <p className={`text-sm uppercase text-[color:var(--sh-brass-text)] ${look.typed}`}>{hud.equipped}</p>
               <p className="text-base text-[color:var(--sh-ivory)]">{professions[active]}</p>
             </div>
           </div>
           <div>
-            <p className={`mb-2 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-brass)] ${look.typed}`}>{words.itemBox}</p>
+            <p className={`mb-2 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-brass-text)] ${look.typed}`}>{words.itemBox}</p>
             <ProfessionSwitch className="grid grid-cols-3 gap-2 sm:gap-3" label={navigation.profession} renderOption={(option) => <ItemSlot option={option} onTake={() => take(option)} />} />
-            <p className="mt-3 text-sm italic text-[color:var(--sh-fog)]">{words.itemBoxHint}</p>
+            <p className="mt-3 text-sm italic text-[color:var(--sh-fog-text)]">{words.itemBoxHint}</p>
           </div>
         </div>
       </div>

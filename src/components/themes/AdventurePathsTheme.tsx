@@ -49,7 +49,7 @@ export default function AdventurePathsTheme() {
   return (
     <div
       ref={pointerRef}
-      className={`relative min-h-screen overflow-x-clip bg-[color:var(--ap-sky-high)] font-['Segoe_UI',system-ui,sans-serif] text-[color:var(--ap-parchment)] ${map.root}`}
+      className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--ap-ink)] bg-[color:var(--ap-sky-high)] font-['Segoe_UI',system-ui,sans-serif] text-[color:var(--ap-parchment)] ${map.root}`}
       style={TRAIL_VARS}
     >
       <LivingWorld zone={zone} />

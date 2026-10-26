@@ -8,8 +8,9 @@ import { paletteVars } from '../shared/paletteVars'
 // This is the one source of the world's colours: SVG fills read the constants, class strings read the
 // same values as CSS variables (SHADE_VARS, set once on the world's root).
 //
-// Text pairs: text on panel 10.4:1, muted on panel 7.8:1, dim on panel 5.4:1 and on raised 5.0:1,
-// heading on void 14.6:1, black on text 12.6:1, rim on void 12.7:1.
+// Text pairs: text on panel 10.4:1, mutedText on panel 10.7:1, dimText on panel 9.0:1 and on raised 8.4:1,
+// heading on void 14.6:1, black on text 12.6:1, rim on void 12.7:1. dim and muted stay on ropes, levers
+// and dashed borders; their Text twins paint the words.
 export const SHADE = {
   black: '#000000',
   void: '#050505',
@@ -20,6 +21,8 @@ export const SHADE = {
   fog: '#3a3a3a',
   dim: '#8a8a8a',
   muted: '#aaaaaa',
+  dimText: '#b4b4b4',
+  mutedText: '#c4c4c4',
   text: '#cccccc',
   heading: '#dddddd',
   glow: '#eeeeee',

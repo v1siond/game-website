@@ -66,7 +66,7 @@ export function AboutLevel({ profession }: { profession: Profession }) {
           {on && <Actor motion={course.motion} profession={profession} take={course.take} onAnimationEnd={course.onOwnAnimationEnd} />}
         </Playfield>
         <div key={course.take} className={`${side.unfold} rounded-md border-4 border-double border-white bg-[color:var(--ap-hud)] p-5 sm:p-6`}>
-          <p className={`max-w-3xl text-lg leading-relaxed text-white ${JOURNAL_SERIF}`}>{professionalSummary.bio}</p>
+          <p className={`max-w-prose text-lg leading-relaxed text-white ${JOURNAL_SERIF}`}>{professionalSummary.bio}</p>
         </div>
       </div>
     </Region>

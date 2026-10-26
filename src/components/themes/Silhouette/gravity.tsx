@@ -83,10 +83,10 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
             classNames={{
               facts: 'mb-4 grid gap-3 sm:grid-cols-2',
               fact: 'border-l-2 border-[color:var(--sh-black)] bg-[color:var(--sh-panel)] p-3',
-              term: 'text-sm uppercase tracking-[0.25em] text-[color:var(--sh-dim)]',
+              term: 'text-sm uppercase tracking-[0.25em] text-[color:var(--sh-dim-text)]',
               value: 'mt-1 text-sm text-[color:var(--sh-text)]',
               achievements: 'space-y-2',
-              achievement: 'text-sm text-[color:var(--sh-muted)]',
+              achievement: 'text-sm text-[color:var(--sh-muted-text)]',
             }}
             renderAchievement={(achievement) => (
               <span
@@ -94,7 +94,7 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
                 className={`flex items-start gap-1.5 border-l-2 border-[color:var(--sh-rim)] bg-[color:var(--sh-night)] p-2 ${triggered ? fall : 'opacity-0'}`}
                 style={{ '--i': achievements.indexOf(achievement) } as CSSProperties}
               >
-                <span className="text-[color:var(--sh-dim)]" aria-hidden="true">
+                <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
                   -
                 </span>
                 {achievement}

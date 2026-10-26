@@ -32,9 +32,11 @@ import j from './journey.module.css'
 // the fighter's on the printed perk chart. Two sections the dweller fixes himself (./repairs): he boots
 // the services' dead tube on, and beams the quest log onto the glass from his wrist terminal.
 
+// The title sits on its own glass plate: where a stage has no panel the wasteland's pale sky shows behind
+// it, and phosphor on that sky reads under 2 to 1.
 function SectionTitle({ title }: { title: string }) {
   return (
-    <h2 id={atomicId(title)} className={`mb-6 flex items-center gap-3 text-2xl font-bold uppercase tracking-[0.2em] text-atomic-phosphor sm:text-3xl ${atomic.glow}`}>
+    <h2 id={atomicId(title)} className={`mb-6 flex w-fit items-center gap-3 bg-atomic-glass px-3 py-1 text-2xl font-bold uppercase tracking-[0.2em] text-atomic-phosphor sm:text-3xl ${atomic.glow}`}>
       <span className="h-3 w-3 shrink-0 bg-atomic-phosphor" aria-hidden="true" />
       {title}
     </h2>
@@ -69,7 +71,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <Stage title={titles.about} zone="shelter" className={j.fetch}>
         <Fetch>
           <div className={`max-w-3xl p-5 sm:p-6 ${atomic.panel}`}>
-            <p className="text-base leading-relaxed text-atomic-phosphor">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-atomic-phosphor">{professionalSummary.bio}</p>
           </div>
         </Fetch>
       </Stage>
@@ -137,7 +139,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
         <>
           <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
           <Radio bands={bands} on={on} />
-          <p className="mt-6 text-base italic text-atomic-phosphor-dim">{musician.line}</p>
+          <p className="mt-6 text-base italic text-atomic-phosphor-dim-text">{musician.line}</p>
         </>
       )}
     </Stage>

@@ -72,7 +72,7 @@ function ActionPoints({ points }: { points: number }) {
   const label = fillLabel(hud.apLeft, { left: points, total: AP_TOTAL })
 
   return (
-    <div className="flex items-center gap-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor">
+    <div className="flex items-center gap-3 bg-atomic-glass px-2 py-1 text-sm font-bold uppercase tracking-widest text-atomic-phosphor">
       <span>{hud.ap}</span>
       <span className={`relative block h-3 w-32 overflow-hidden border border-atomic-phosphor sm:w-44 ${atomic.apTrack}`} role="img" aria-label={label}>
         <span className={`absolute inset-y-0 left-0 w-full origin-left bg-atomic-phosphor ${atomic.apFill}`} style={{ '--ap': points / AP_TOTAL } as CSSProperties} />
@@ -147,7 +147,7 @@ function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProp
         <Part tag={cards.tech}>
           <ul className="mt-3 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
             {project.techStack.slice(0, 5).map((tech) => (
-              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim">
+              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
                 {tech}
               </li>
             ))}
@@ -223,7 +223,7 @@ function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void
         {project.techStack.length > 0 && (
           <ul className="mt-5 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
             {project.techStack.map((tech) => (
-              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim">
+              <li key={tech} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
                 {tech}
               </li>
             ))}
@@ -309,7 +309,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
   return (
     <div className="relative" data-vats={locked ? 'on' : undefined}>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <p className="text-sm text-atomic-phosphor-dim">{hud.targetHint}</p>
+        <p className="bg-atomic-glass px-2 py-1 text-sm text-atomic-phosphor-dim-text">{hud.targetHint}</p>
         <ActionPoints points={points} />
       </div>
       <div className="md:flex md:gap-4">

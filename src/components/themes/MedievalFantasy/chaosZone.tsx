@@ -273,7 +273,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
       }} />
 
       {/* === REALM ROC MENU BACKGROUND - Grassy battlefield with war debris === */}
-      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
+      <svg aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '85%' }} viewBox="0 0 1000 850" preserveAspectRatio="xMidYMax slice">
         <defs>
           {/* Grass ground gradient */}
           <linearGradient id="grassGround" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -853,7 +853,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
       }} />
 
       {/* Volumetric storm clouds - DARK GREENISH, top 18% only */}
-      <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '18%' }} viewBox="0 0 1000 180" preserveAspectRatio="none">
+      <svg aria-hidden="true" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '18%' }} viewBox="0 0 1000 180" preserveAspectRatio="none">
         <defs>
           <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
             <feGaussianBlur in="SourceGraphic" stdDeviation="10" />
@@ -1045,7 +1045,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             filter: 'blur(8px)',
           }} />
           {/* Meteor body */}
-          <svg width="25" height="25" viewBox="0 0 30 30" style={{ position: 'relative', zIndex: 2 }}>
+          <svg aria-hidden="true" width="25" height="25" viewBox="0 0 30 30" style={{ position: 'relative', zIndex: 2 }}>
             <defs>
               <radialGradient id={`meteor${fallingMeteor.id}`} cx="30%" cy="30%">
                 <stop offset="0%" stopColor={REALM.chaosFireCore} />
@@ -1142,7 +1142,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
               )}
 
               {/* Crater - appears after explosion */}
-              <svg
+              <svg aria-hidden="true"
                 width="160"
                 height="40"
                 viewBox="0 0 160 40"
@@ -1191,7 +1191,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
               }} />
 
               {/* Assembling rocks */}
-              <svg
+              <svg aria-hidden="true"
                 width="160"
                 height="200"
                 viewBox="0 0 160 200"
@@ -1272,7 +1272,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           pointerEvents: 'none',
         }}
       >
-        <svg width="120" height="300" viewBox="0 0 120 300" style={{ overflow: 'visible' }}>
+        <svg aria-hidden="true" width="120" height="300" viewBox="0 0 120 300" style={{ overflow: 'visible' }}>
           {/* Dirt mound at pole base - dark brownish, matches shadowed terrain */}
           <ellipse cx="12" cy="282" rx="28" ry="12" fill={REALM.stone5b} />
           <ellipse cx="12" cy="280" rx="22" ry="9" fill={REALM.stone7a} />
@@ -1474,7 +1474,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
       </div>
 
       {/* === FOREGROUND GRASS TUFTS === */}
-      <svg style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '80px', pointerEvents: 'none' }} viewBox="0 0 1000 80" preserveAspectRatio="none">
+      <svg aria-hidden="true" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '80px', pointerEvents: 'none' }} viewBox="0 0 1000 80" preserveAspectRatio="none">
         {/* Grass silhouettes */}
         <g opacity="0.85">
           {[30, 120, 250, 400, 550, 700, 850, 950].map((x, i) => (

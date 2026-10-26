@@ -65,7 +65,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
               {sections.services.map((service) => (
                 <li key={service.id} className={`${MASONRY_ITEM} border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
                   <h3 className="text-sm font-bold uppercase tracking-wider text-[color:var(--sh-text)]">{service.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-muted)]">{service.line}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-muted-text)]">{service.line}</p>
                 </li>
               ))}
             </ul>
@@ -96,7 +96,7 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
     <Block title={titles.bands} wide>
       <p className="mb-6 text-center text-sm text-[color:var(--sh-text)]">{drumsSince(musician, years)}</p>
       <ShockStage bands={bands} />
-      <p className="mt-6 text-center text-sm italic text-[color:var(--sh-muted)]">{musician.line}</p>
+      <p className="mt-6 text-center text-sm italic text-[color:var(--sh-muted-text)]">{musician.line}</p>
     </Block>
   )
 }

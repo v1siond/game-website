@@ -51,7 +51,7 @@ function Lever({ option, pulling, onPull }: { option: ProfessionOption; pulling:
         <path d="M10 64 L14 46 H34 L38 64 Z" fill="var(--sh-black)" stroke="var(--sh-dim)" strokeWidth={1.5} />
       </svg>
       <span
-        className={`text-sm uppercase tracking-[0.2em] ${option.selected ? 'text-[color:var(--sh-heading)] underline decoration-[color:var(--sh-rim)] underline-offset-4' : 'text-[color:var(--sh-muted)] group-hover:text-[color:var(--sh-text)]'} ${TYPEWRITER}`}
+        className={`text-sm uppercase tracking-[0.2em] ${option.selected ? 'text-[color:var(--sh-heading)] underline decoration-[color:var(--sh-rim)] underline-offset-4' : 'text-[color:var(--sh-muted-text)] group-hover:text-[color:var(--sh-text)]'} ${TYPEWRITER}`}
       >
         {option.label}
       </span>
@@ -127,7 +127,7 @@ export function LeverSwitch() {
             label={navigation.profession}
             renderOption={(option) => <Lever option={option} pulling={pulling === option.id} onPull={() => pull(option)} />}
           />
-          <p className="text-center text-sm italic tracking-wider text-[color:var(--sh-muted)] md:text-left">{words.leverHint}</p>
+          <p className="text-center text-sm italic tracking-wider text-[color:var(--sh-muted-text)] md:text-left">{words.leverHint}</p>
         </div>
       </div>
     </section>

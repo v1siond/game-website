@@ -91,7 +91,7 @@ export function MillProjects({ projects }: { projects: Project[] }) {
     <div ref={ref} className={`relative px-4 pb-6 sm:px-6 ${world.mill}`}>
       <Lantern />
       <SawRail running={triggered} />
-      <p className="relative mb-4 text-center text-sm italic tracking-wider text-[color:var(--sh-muted)]">{words.lightHint}</p>
+      <p className="relative mb-4 text-center text-sm italic tracking-wider text-[color:var(--sh-muted-text)]">{words.lightHint}</p>
       <ProjectList projects={projects} className={`relative ${MASONRY_LIST}`} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ProjectCard {...slot} />} />
     </div>
   )

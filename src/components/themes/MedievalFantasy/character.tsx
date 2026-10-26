@@ -70,7 +70,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
     : {}
 
   return (
-    <svg
+    <svg aria-hidden="true"
       width={160 * scale}
       height={200 * scale}
       viewBox="0 0 160 200"

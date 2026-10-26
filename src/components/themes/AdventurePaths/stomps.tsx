@@ -126,7 +126,7 @@ export function StompLevel({ martialArts }: { martialArts: MartialArts }) {
                 </span>
                 <span className="min-w-0">
                   <span className="block text-base">{achievement}</span>
-                  {done && <span className="mt-1 block text-sm font-bold text-[color:var(--ap-route)]">{labels.cleared}</span>}
+                  {done && <span className="mt-1 block text-sm font-bold text-[color:var(--ap-route-text)]">{labels.cleared}</span>}
                 </span>
               </div>
             )

@@ -12,6 +12,8 @@ export const REALM = {
   chaosSkyMid: '#081008',
   chaosSkyBot: '#0c150c',
   chaosFelBright: '#5a6a3a',
+  // Fel green as text: the same hue lifted to 9 to 1 on the dark chips; chaosFelBright stays on the glows.
+  chaosFelText: '#aabd86',
   chaosFelMid: '#3a4a28',
   chaosFelDark: '#2a3518',
   chaosFireBright: '#ffaa44',
@@ -43,6 +45,8 @@ export const REALM = {
   metalHighlight: '#6a6468',
   goldBright: '#d4a017',
   goldMid: '#b8860b',
+  // Gold as text: the same hue lifted to 9 to 1 on the frames; goldMid stays on the button plate and trim.
+  goldText: '#e4a60e',
   goldDark: '#8b6914',
   goldDeep: '#5f4c0c',
   bloodRed: '#8b0000',
@@ -51,7 +55,9 @@ export const REALM = {
   elfPurple: '#4a2a6a',
   textBright: '#e8dcc8',
   textMid: '#b09878',
-  textDim: '#8a7860',
+  textDim: '#bcaf9e',
+  // The primary button's ink: a near white of the void's own grey, the lightest the gold plate allows.
+  primaryInk: '#f6f6f8',
 
   // Stone and shadow, the dark neutrals of rock, walls and night ground
   stone1: '#010203',

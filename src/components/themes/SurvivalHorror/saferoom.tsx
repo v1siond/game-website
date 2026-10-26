@@ -39,7 +39,7 @@ function SaveDesk({ line }: { line: string }) {
           }}
           disabled={ribbons === 0}
           title={words.saveHint}
-          className={`${CARD_BUTTON} justify-center border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame)] enabled:hover:border-[color:var(--sh-flame)] disabled:opacity-60`}
+          className={`${CARD_BUTTON} justify-center border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] enabled:hover:border-[color:var(--sh-flame)] disabled:opacity-60`}
         >
           {words.save}
         </button>
@@ -47,7 +47,7 @@ function SaveDesk({ line }: { line: string }) {
         <p className={`text-sm text-[color:var(--sh-fine)] ${look.typed}`} role="status">
           {saved ? words.saved : ''}
         </p>
-        <p className="text-sm italic text-[color:var(--sh-fog)]">{words.saveHint}</p>
+        <p className="text-sm italic text-[color:var(--sh-fog-text)]">{words.saveHint}</p>
       </div>
     </div>
   )
@@ -56,7 +56,7 @@ function SaveDesk({ line }: { line: string }) {
 const HEADING = sectionHeadingId('Contact')
 
 export function SafeRoom() {
-  const { sections, horror: words, navigation } = useLabels()
+  const { sections, horror: words } = useLabels()
 
   return (
     <section aria-labelledby={HEADING} className="mx-auto max-w-4xl px-4 pb-8 sm:px-6">
@@ -64,13 +64,13 @@ export function SafeRoom() {
         <h2 id={HEADING} className={PANEL_HEADING}>
           {sections.contact}
         </h2>
-        <p className={`text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>{words.safeRoom}</p>
+        <p className={`text-sm uppercase text-[color:var(--sh-brass-text)] ${look.typed}`}>{words.safeRoom}</p>
 
         <RecruiterHero
           render={({ line, actions }) => (
             <>
               <SaveDesk line={line} />
-              <nav className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap" aria-label={navigation.contactAndCv}>
+              <nav className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap" aria-label={sections.contact}>
                 {actions.map((action) => (
                   <HeroAction key={action.id} action={action} />
                 ))}

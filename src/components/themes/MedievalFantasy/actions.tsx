@@ -41,7 +41,7 @@ export function RealmButton({
     boxShadow: active
       ? `0 0 10px ${accentColor}, inset 1px 1px 0 ${REALM.metalHighlight}`
       : `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-    color: variant === 'primary' ? REALM.bgVoid : active ? accentBright : REALM.textBright,
+    color: variant === 'primary' ? REALM.primaryInk : active ? accentBright : REALM.textBright,
     fontFamily: '"Cinzel", Georgia, serif',
     fontSize: '1.125rem',
     fontWeight: 600,
@@ -85,6 +85,7 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
       <button
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
+        aria-label={languages[currentLocale]}
         style={{
           background: `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
           border: `2px solid ${REALM.metalDark}`,
@@ -104,9 +105,9 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
           opacity: isPending ? 0.7 : 1,
         }}
       >
-        <span style={{ fontSize: '0.75rem' }}>🌐</span>
+        <span aria-hidden="true" style={{ fontSize: '0.875rem' }}>🌐</span>
         <span>{currentLocale.toUpperCase()}</span>
-        <span style={{ fontSize: '0.625rem', marginLeft: '0.125rem' }}>▼</span>
+        <span aria-hidden="true" style={{ fontSize: '0.875rem', marginLeft: '0.125rem' }}>▼</span>
       </button>
 
       {isOpen && (

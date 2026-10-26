@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePreview } from '@/themes/PreviewContext'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
@@ -130,7 +130,7 @@ function FlaskButton() {
       disabled={Boolean(reason)}
       aria-label={reason ? `${name}. ${reason}` : name}
       title={reason || name}
-      className={`${souls.flask} flex min-h-[44px] items-center gap-2 px-2 text-[color:var(--soul-text)] disabled:opacity-60 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--soul-glow)]`}
+      className={`${souls.flask} flex min-h-[44px] items-center gap-2 px-2 text-[color:var(--soul-text)] disabled:text-[color:var(--soul-text-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--soul-glow)]`}
     >
       <FlaskIcon full={flasks > 0} />
       <span className="text-sm uppercase tracking-wider">
@@ -155,7 +155,7 @@ function SoulsCounter() {
   }, [total])
 
   return (
-    <div className="pointer-events-none relative flex flex-col items-end gap-1 sm:fixed sm:bottom-4 sm:right-4 sm:z-40">
+    <aside aria-label={words.souls} className="pointer-events-none relative flex flex-col items-end gap-1 sm:fixed sm:bottom-4 sm:right-4 sm:z-40">
       {gain && (
         <span key={gain.key} className={`${souls.gain} absolute bottom-full right-0 mb-1 whitespace-nowrap sm:static sm:mb-0 text-sm tabular-nums text-[color:var(--soul-glow)]`}>
           {fillLabel(words.gained, { count: `+${gain.count}` })}
@@ -165,7 +165,7 @@ function SoulsCounter() {
         <span className="text-sm uppercase tracking-[0.2em] text-[color:var(--soul-text-soft)]">{words.souls}</span>
         <span className="min-w-[4ch] text-right text-base leading-tight sm:text-lg tabular-nums text-[color:var(--soul-text)]">{shown}</span>
       </div>
-    </div>
+    </aside>
   )
 }
 
@@ -187,12 +187,45 @@ function Gauges() {
   )
 }
 
+// The fixed HUD covers the foot of the window, so a control that takes keyboard focus there would scroll in
+// under it. Scroll padding on the scroll container (the html element) keeps it above the HUD: under 640px the
+// docked band, from 640px the taller of the two corner boxes, each measured with its gap to the window edge.
+const WIDE_HUD = '(min-width: 640px)'
+
+function useHudScrollPadding(dock: RefObject<HTMLDivElement | null>) {
+  useEffect(() => {
+    const band = dock.current
+    if (!band) return
+    const wide = window.matchMedia(WIDE_HUD)
+    const boxes = () => (wide.matches ? Array.from(band.children) : [band])
+    const apply = () => {
+      const covered = Math.max(0, ...boxes().map((box) => window.innerHeight - box.getBoundingClientRect().top))
+      document.documentElement.style.scrollPaddingBottom = `${Math.ceil(covered)}px`
+    }
+    apply()
+    const observer = new ResizeObserver(apply)
+    for (const box of [band, ...Array.from(band.children)]) observer.observe(box)
+    window.addEventListener('resize', apply)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', apply)
+      document.documentElement.style.scrollPaddingBottom = ''
+    }
+  }, [dock])
+}
+
 export function RunOverlay() {
   const preview = usePreview()
   if (preview) return null
+  return <RunHud />
+}
+
+function RunHud() {
+  const dock = useRef<HTMLDivElement>(null)
+  useHudScrollPadding(dock)
   return (
     <div className={CARVED}>
-      <div className={`${souls.dock} fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-1 border-x-0 border-b-0 px-2 py-1 sm:contents`}>
+      <div ref={dock} className={`${souls.dock} fixed inset-x-0 bottom-0 z-40 flex items-center justify-between gap-1 border-x-0 border-b-0 px-2 py-1 sm:contents`}>
         <Gauges />
         <SoulsCounter />
       </div>

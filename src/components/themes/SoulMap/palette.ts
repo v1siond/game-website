@@ -9,8 +9,8 @@ import { paletteVars } from '../shared/paletteVars'
 // class strings (bg-[color:var(--soul-deep)]) and the CSS modules paint them too. The keys abyss, deep,
 // cavern, rock, glow, moss, lantern, text and textSoft are also read by the theme registry.
 //
-// Text pairs (WCAG): text on deep 14.1:1, textSoft on cavern 8.4:1, glow on deep 9.6:1, ember on deep 6.1:1,
-// message on slab 5.3:1, lantern on panel 10.2:1, ink on glow 11.4:1. Blood is never small text; the knock
+// Text pairs (WCAG): text on deep 14.1:1, textSoft on cavern 12.0:1, glow on deep 9.6:1, ember on deep 6.1:1,
+// message on slab 11.0:1, lantern on panel 10.2:1, ink on glow 11.4:1. Blood is never small text; the knock
 // down banner is large text in bloodBright (4.0:1 on ink).
 
 export const SOUL = {
@@ -44,7 +44,7 @@ export const SOUL = {
   glow: '#e3c27a',
   glowDeep: '#8f7337',
   lantern: '#f0cf86',
-  message: '#f39a4f',
+  message: '#fce4d0',
   phantom: '#f3dd9a',
 
   // The red phantom of an invader: the sparring partner in the Muay Thai ring
@@ -77,7 +77,7 @@ export const SOUL = {
 
   // Lettering
   text: '#ebe0c8',
-  textSoft: '#c2b69d',
+  textSoft: '#e6d4ae',
 } as const
 
 export type SoulColor = keyof typeof SOUL

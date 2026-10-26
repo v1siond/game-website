@@ -18,7 +18,7 @@ function QuestState({ current }: { current: boolean }) {
   const { navigation, hud } = useLabels()
 
   return (
-    <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-atomic-phosphor-dim">
+    <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-atomic-phosphor-dim-text">
       <span className={current ? atomic.questActive : atomic.questDone} aria-hidden="true" />
       {current ? navigation.active : hud.completed}
     </p>
@@ -36,7 +36,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
       <p className="mt-1 text-base text-atomic-yellow">
         <SlashBreaks text={job.company} />
       </p>
-      <p className="mt-1 text-sm text-atomic-phosphor-dim">{fillLabel(years.range, { start, end })}</p>
+      <p className="mt-1 text-sm text-atomic-phosphor-dim-text">{fillLabel(years.range, { start, end })}</p>
 
       {job.description && <p className="mt-3 text-sm leading-relaxed text-atomic-ash">{job.description}</p>}
 
@@ -56,7 +56,7 @@ function QuestCard({ job, index }: { job: Job; index: number }) {
       {job.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
           {job.skills.map((skill) => (
-            <li key={skill} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim">
+            <li key={skill} className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">
               {skill}
             </li>
           ))}

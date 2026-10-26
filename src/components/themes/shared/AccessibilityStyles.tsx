@@ -57,100 +57,6 @@ export const ACCESSIBLE_FONT_SIZES = {
   heading: '1.25rem',        // 20px - minimum for h4+
 }
 
-// Global CSS for accessibility - add to each theme
-export const accessibilityGlobalStyles = `
-  /* =================================================================== */
-  /* WCAG AA ACCESSIBILITY OVERRIDES                                     */
-  /* =================================================================== */
-
-  /* Ensure minimum font sizes */
-  .text-xs,
-  .text-\\[10px\\],
-  .text-\\[11px\\],
-  .text-\\[9px\\],
-  .text-\\[8px\\] {
-    font-size: 0.875rem !important; /* 14px minimum */
-    line-height: 1.4 !important;
-  }
-
-  /* Focus indicators - visible on all interactive elements */
-  a:focus-visible,
-  button:focus-visible,
-  [role="button"]:focus-visible,
-  [tabindex="0"]:focus-visible,
-  input:focus-visible,
-  select:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid currentColor !important;
-    outline-offset: 2px !important;
-  }
-
-  /* High contrast focus for dark themes */
-  .theme-dark a:focus-visible,
-  .theme-dark button:focus-visible,
-  .theme-dark [role="button"]:focus-visible,
-  .theme-dark [tabindex="0"]:focus-visible {
-    outline-color: #ffffff !important;
-  }
-
-  /* High contrast focus for light themes */
-  .theme-light a:focus-visible,
-  .theme-light button:focus-visible,
-  .theme-light [role="button"]:focus-visible,
-  .theme-light [tabindex="0"]:focus-visible {
-    outline-color: #000000 !important;
-  }
-
-  /* Skip link for keyboard users */
-  .skip-link {
-    position: absolute;
-    left: -9999px;
-    top: auto;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-  }
-
-  .skip-link:focus {
-    position: fixed;
-    top: 1rem;
-    left: 1rem;
-    width: auto;
-    height: auto;
-    padding: 1rem 1.5rem;
-    background: #000;
-    color: #fff;
-    font-size: 1rem;
-    font-weight: bold;
-    z-index: 9999;
-    outline: 2px solid #fff;
-    outline-offset: 2px;
-  }
-
-  /* Ensure sufficient color contrast for muted text */
-  .text-muted,
-  [style*="color: #666"],
-  [style*="color: #555"],
-  [style*="color: #777"],
-  [style*="color: #888"],
-  [style*="color: #999"],
-  [style*="color: #aaa"] {
-    filter: brightness(1.3) !important;
-  }
-
-  /* Motion preference support */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-`
-
 // Theme-specific focus colors - high contrast for each theme
 export const THEME_FOCUS_COLORS: Record<string, string> = {
   // Dark fantasy / horror themes
@@ -266,7 +172,6 @@ export function meetsWCAGAA(foreground: string, background: string, isLargeText 
 export default {
   ACCESSIBLE_COLORS,
   ACCESSIBLE_FONT_SIZES,
-  accessibilityGlobalStyles,
   THEME_FOCUS_COLORS,
   SkipLink,
   getAccessibleTextColor,

@@ -96,7 +96,13 @@ html[data-world-pending] [data-world-root] {
   line-height: 1.5 !important;
 }
 
-/* Focus indicators - visible on all interactive elements */
+/* Tailwind's text-sm pairs 14px with a 20px line (1.43); AAA 1.4.8 wants 1.5. An explicit leading-* class still wins. */
+.text-sm:not([class*="leading-"]) {
+  line-height: 1.5;
+}
+
+/* Focus indicators - visible on all interactive elements. Each world sets --focus-ring to its brightest accent on
+   its outermost element, so the ring stays 3 to 1 against the page; currentColor is the fallback elsewhere. */
 a:focus-visible,
 button:focus-visible,
 [role="button"]:focus-visible,
@@ -104,7 +110,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid currentColor !important;
+  outline: 3px solid var(--focus-ring, currentColor) !important;
   outline-offset: 2px !important;
 }
 

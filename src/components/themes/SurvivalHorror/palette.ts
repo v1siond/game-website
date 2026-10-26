@@ -7,8 +7,8 @@ import { paletteVars } from '../shared/paletteVars'
 // The one source of the world's colours: SVG fills read SH, class strings and world.module.css read the
 // same values as --sh-* variables (SH_VARS, set once on the world's root).
 //
-// Text pairs: cream on paper 9.2:1, fog on paper 5.9:1, brass on paper 5.4:1, flame on paper 7.4:1,
-// ivory on rust 6.0:1, void on flame 9.6:1; on the monitor black: fine 10.0:1, caution 11.4:1, danger 5.7:1; ivory on either map room 5.5:1 and up.
+// Text pairs: cream on paper 9.2:1, fogText on paper 8.5:1, brassText on paper 8.8:1, flameText on paper 8.5:1,
+// ivory on the rust plate 7.7:1, void on flame 9.6:1; brass, fog and flame keep painting lamps, frames and lines; on the monitor black: fine 10.0:1, caution 11.4:1, danger 5.7:1; ivory on the left map room 7.7:1, on the searched one 5.7:1.
 export const SH = {
   void: '#0f0a08',
   shadow: '#1a1410',
@@ -18,12 +18,17 @@ export const SH = {
   wood: '#5c4a38',
   olive: '#4a4a30',
   rust: '#7a4a34',
+  // The lit button's plate: rust deepened so ivory reads 7 to 1 and more on it.
+  rustPlate: '#643d2b',
   leather: '#5a1e1a',
   brass: '#c49050',
+  brassText: '#ddc09c',
   flame: '#e8a860',
+  flameText: '#ecb87d',
   cream: '#d8c8a8',
   ivory: '#f0e8d8',
   fog: '#a8a090',
+  fogText: '#c6c1b6',
   ash: '#706860',
   steel: '#4a5258',
   // The boots, his and the stalker's.
@@ -47,7 +52,7 @@ export const SH = {
   danger: '#f05a4a',
   monitor: '#07120a',
   // The map: a room with something left in it, a searched room, the floor between.
-  roomLeft: '#963430',
+  roomLeft: '#7c2b28',
   roomSearched: '#2a5a9c',
   mapFloor: '#141b24',
   // The herbs.

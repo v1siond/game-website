@@ -68,17 +68,17 @@ export function HerbRecovery({ martialArts }: { martialArts: MartialArts }) {
             <HerbSlot herb="green" label={words.greenHerb} used={herbs >= 1} waiting={false} onUse={() => takeHerbs(1)} />
             <HerbSlot herb="red" label={herbs >= 1 ? words.mixedHerb : words.redHerb} used={herbs >= 2} waiting={herbs < 1} onUse={() => takeHerbs(2)} />
           </div>
-          <p className="text-sm italic text-[color:var(--sh-fog)]">{words.herbHint}</p>
+          <p className="text-sm italic text-[color:var(--sh-fog-text)]">{words.herbHint}</p>
         </div>
       </div>
 
-      <h3 className={`mb-4 text-base text-[color:var(--sh-flame)] ${look.typed}`}>{martialArts.primary.title}</h3>
+      <h3 className={`mb-4 text-base text-[color:var(--sh-flame-text)] ${look.typed}`}>{martialArts.primary.title}</h3>
       <MuayThaiRecord
         martialArts={martialArts}
         classNames={{
           facts: 'mb-4 grid gap-3 sm:grid-cols-2',
           fact: 'border border-[color:var(--sh-wood)] bg-[color:var(--sh-shadow)] p-3',
-          term: `text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`,
+          term: `text-sm uppercase text-[color:var(--sh-brass-text)] ${look.typed}`,
           value: 'mt-1 text-sm text-[color:var(--sh-cream)]',
           achievements: 'grid gap-3 md:grid-cols-2',
           achievement: 'text-sm text-[color:var(--sh-cream)]',

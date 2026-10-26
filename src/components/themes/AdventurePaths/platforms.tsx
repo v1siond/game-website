@@ -87,7 +87,7 @@ function JobCard({ job, stop, onPoint }: { job: Job; stop: number; onPoint: () =
       <div className="mb-2 flex flex-wrap items-start justify-between gap-2 pl-4">
         <div className="min-w-0">
           <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{job.title}</h3>
-          <p className="text-sm font-semibold text-[color:var(--ap-route)]">
+          <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">
             <SlashBreaks text={job.company} />
           </p>
         </div>

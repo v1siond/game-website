@@ -69,7 +69,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
           <section aria-labelledby="hose-about" className="mb-8">
             <CurlBanner id="hose-about">{titles.about}</CurlBanner>
             <FlowerKnockout on={on} reduced={reduced} profession="engineer">
-              <p className={`mx-auto max-w-2xl p-5 leading-relaxed ${world.titleCard} ${LEAD}`}>{professionalSummary.bio}</p>
+              <p className={`mx-auto max-w-prose p-5 leading-relaxed ${world.titleCard} ${LEAD}`}>{professionalSummary.bio}</p>
             </FlowerKnockout>
           </section>
         )}

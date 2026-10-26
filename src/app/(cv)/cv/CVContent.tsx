@@ -43,7 +43,7 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
           the centred toolbar ends left of it. */}
       <nav
         aria-label={labels.navigation.primaryNavigation}
-        className="sticky top-0 z-40 border-b border-gray-200 bg-white print:hidden"
+        className="sticky top-0 z-40 border-b border-gray-200 bg-white [--focus-ring:#2563eb] print:hidden"
       >
         <div className="max-w-[850px] mx-auto py-3 pl-4 pr-16 sm:pl-8 sm:pr-36 xl:pr-8 flex flex-wrap justify-between items-center gap-x-4 gap-y-2">
           <Link
@@ -63,7 +63,7 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
       {/* CV Content - this is what gets converted to PDF */}
       <main
         id="cv-content"
-        className="max-w-[850px] mx-auto px-4 py-8 sm:px-8 bg-white text-black font-sans scroll-mt-32 sm:scroll-mt-20 [&_header]:scroll-mt-32 [&_section]:scroll-mt-32 sm:[&_header]:scroll-mt-20 sm:[&_section]:scroll-mt-20 print:px-0 print:py-0"
+        className="max-w-[850px] mx-auto px-4 py-8 sm:px-8 bg-white text-black font-sans [--focus-ring:#2563eb] scroll-mt-32 sm:scroll-mt-20 [&_header]:scroll-mt-32 [&_section]:scroll-mt-32 sm:[&_header]:scroll-mt-20 sm:[&_section]:scroll-mt-20 print:px-0 print:py-0"
       >
         {/* Header / Contact */}
         <header className="border-b-2 border-black pb-4 mb-6">

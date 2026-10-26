@@ -37,7 +37,7 @@ export function HallHero({ profession }: { profession: Profession }) {
       render={({ name, headline, tagline, line, actions }) => (
         <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
           <div className="h-[14vh]" aria-hidden="true" />
-          {profession === 'engineer' && <p className={`mx-auto w-fit bg-[color:var(--sh-void)] px-3 py-1 text-center text-sm italic text-[color:var(--sh-fog)] ${look.typed}`}>{words.aimHint}</p>}
+          {profession === 'engineer' && <p className={`mx-auto w-fit bg-[color:var(--sh-void)] px-3 py-1 text-center text-sm italic text-[color:var(--sh-fog-text)] ${look.typed}`}>{words.aimHint}</p>}
 
           <div className={`relative mx-auto mt-6 max-w-4xl p-6 ${look.panel}`}>
             <div className="relative overflow-hidden">
@@ -47,7 +47,7 @@ export function HallHero({ profession }: { profession: Profession }) {
               <span className={`${horror.typeCover} ${TYPED(shown)}`} aria-hidden="true" />
             </div>
             <p className="mt-3 text-base text-[color:var(--sh-cream)]">{headline}</p>
-            <p className={`mt-2 text-sm italic text-[color:var(--sh-brass)] ${look.typed}`}>{tagline}</p>
+            <p className={`mt-2 text-sm italic text-[color:var(--sh-brass-text)] ${look.typed}`}>{tagline}</p>
             <p className="mt-2 text-sm text-[color:var(--sh-cream)]">{line}</p>
             <nav className="mt-5 flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
               {actions.map((action) => (

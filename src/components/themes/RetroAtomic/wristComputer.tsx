@@ -79,8 +79,8 @@ function BootText({ lines, running, instant }: { lines: [string, string, string,
     <div className="space-y-2">
       <TypedLine as="h1" text={name} shown={shownOf(0)} className={`text-[clamp(1.5rem,7vw,2.25rem)] font-bold uppercase tracking-[0.18em] text-atomic-phosphor ${atomic.glow}`} />
       <TypedLine text={headline} shown={shownOf(1)} className="text-base text-atomic-phosphor sm:text-lg" />
-      <TypedLine text={tagline} shown={shownOf(2)} className="text-base text-atomic-phosphor-dim" />
-      <TypedLine text={line} shown={shownOf(3)} className="text-sm text-atomic-phosphor-dim" />
+      <TypedLine text={tagline} shown={shownOf(2)} className="text-base text-atomic-phosphor-dim-text" />
+      <TypedLine text={line} shown={shownOf(3)} className="text-sm text-atomic-phosphor-dim-text" />
     </div>
   )
 }
@@ -108,7 +108,7 @@ function SectionTabs({ profession }: { profession: Profession }) {
       <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1">
         {sectionTabs(profession, sections).map((tab) => (
           <li key={tab.href}>
-            <a href={tab.href} className={`inline-flex min-h-[44px] items-center px-1 text-sm uppercase tracking-widest text-atomic-phosphor-dim hover:text-atomic-phosphor ${atomic.focusRing}`}>
+            <a href={tab.href} className={`inline-flex min-h-[44px] items-center px-1 text-sm uppercase tracking-widest text-atomic-phosphor-dim-text hover:text-atomic-phosphor ${atomic.focusRing}`}>
               {tab.title}
             </a>
           </li>

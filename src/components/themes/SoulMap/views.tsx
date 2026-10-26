@@ -44,7 +44,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <Block title={titles.about}>
         <FogGate>
           <MenuPanel>
-            <p className="text-base leading-relaxed text-[color:var(--soul-text)]">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-[color:var(--soul-text)]">{professionalSummary.bio}</p>
           </MenuPanel>
         </FogGate>
       </Block>

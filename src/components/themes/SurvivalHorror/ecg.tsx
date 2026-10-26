@@ -28,7 +28,7 @@ export function ConditionMonitor({ condition, className = '' }: { condition: Con
   return (
     <div className={`border border-[color:var(--sh-sepia)] bg-[color:var(--sh-monitor)] p-3 ${className}`} role="status">
       <p className={`flex items-baseline justify-between gap-3 text-sm uppercase ${look.typed}`}>
-        <span className="text-[color:var(--sh-fog)]">{words.condition}</span>
+        <span className="text-[color:var(--sh-fog-text)]">{words.condition}</span>
         <span className={`${state.text} ${condition === 'fine' ? '' : horror.conditionFlash}`}>{words[condition]}</span>
       </p>
       <div className="mt-2 h-10 overflow-hidden" aria-hidden="true">

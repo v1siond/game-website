@@ -769,16 +769,16 @@ const WaystationNode = memo(function WaystationNode({
         <span
           className="text-sm tracking-[0.05em] md:tracking-[0.1em] uppercase font-medium text-center leading-tight"
           style={{
-            color: isActive ? color : DARK_FANTASY.silver,
+            color: isActive ? color : DARK_FANTASY.silverText,
             fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
           {label}
         </span>
         <span
-          className="text-sm tracking-wider opacity-70 text-center leading-tight hidden md:block"
+          className="text-sm tracking-wider text-center leading-tight hidden md:block"
           style={{
-            color: isActive ? color : DARK_FANTASY.silver,
+            color: isActive ? color : DARK_FANTASY.silverText,
             fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
@@ -1028,7 +1028,7 @@ function ServiceList({ services }: { services: Service[] }) {
     <ul className={MASONRY_LIST}>
       {services.map((service) => (
         <li key={service.id} className={MASONRY_ITEM}>
-          <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver)]" style={{ fontFamily: DF_FONT }}>
+          <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver-text)]" style={{ fontFamily: DF_FONT }}>
             {service.title}
           </h3>
           <p className="text-base leading-relaxed text-[color:var(--df-bone)]">{service.line}</p>
@@ -1047,7 +1047,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
         <li key={category.id} className={MASONRY_ITEM}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DARK_FANTASY.silver, fontFamily: DF_FONT }}
+            style={{ color: DARK_FANTASY.silverText, fontFamily: DF_FONT }}
           >
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -1099,16 +1099,16 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
-      <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silver }}>{project.tagline}</p>
+      <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>{project.tagline}</p>
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
           <span className="sr-only">{cards.impact}: </span>{project.impact}
         </p>
       )}
-      <div className="flex flex-wrap gap-1 mt-3" aria-label={cards.technologiesUsed}>
+      <div className="flex flex-wrap gap-1 mt-3" role="list" aria-label={cards.technologiesUsed}>
         {project.techStack.map((tech) => (
-          <span key={tech} className="text-sm px-1 py-0.5" style={{ background: `${DARK_FANTASY.ethereal}12`, color: DARK_FANTASY.silver }}>
+          <span key={tech} role="listitem" className="text-sm px-1 py-0.5" style={{ background: `${DARK_FANTASY.ethereal}12`, color: DARK_FANTASY.silverText }}>
             {tech}
           </span>
         ))}
@@ -1162,7 +1162,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
           <p className="text-sm" style={{ color: DARK_FANTASY.spiritGold }}>{company.tagline}</p>
         </div>
       </div>
-      <p className="text-sm" style={{ color: DARK_FANTASY.silver }}>{company.description}</p>
+      <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{company.description}</p>
     </a>
   )
 })
@@ -1188,7 +1188,7 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
         {years}
       </p>
       {band.release && (
-        <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silver }}>
+        <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>
           {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
       )}
@@ -1226,7 +1226,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
           <time>{startDisplay}</time> - <time>{endDisplay}</time>
         </span>
       </div>
-      {entry.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silver }}>{entry.description}</p>}
+      {entry.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{entry.description}</p>}
       {entry.highlights.length > 0 && (
         <ul className="space-y-1" aria-label={cards.keyAchievements}>
           {entry.highlights.map((highlight) => (
@@ -1526,7 +1526,7 @@ const DF_BUTTON =
 // Email is the brass action, LinkedIn the outlined one.
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
   email: 'bg-[color:var(--df-brass)] text-[color:var(--df-void)]',
-  linkedin: 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass)]',
+  linkedin: 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]',
 }
 
 function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
@@ -1579,7 +1579,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
   return (
     <>
       <FramedSection title={labels.sections.about}>
-        <p className="leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{professionalSummary.bio}</p>
+        <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{professionalSummary.bio}</p>
       </FramedSection>
 
       {/* Art Section 1 - Spirits and Gears */}
@@ -1769,7 +1769,7 @@ export default function DarkFantasyTheme() {
   return (
     <div
       style={DARK_FANTASY_VARS}
-      className="min-h-screen relative overflow-hidden bg-gradient-to-b from-[color:var(--df-void)] via-[color:var(--df-void-deep)] to-[color:var(--df-void-purple)] font-['Comic_Sans_MS','Comic_Sans',cursive]"
+      className="min-h-screen relative overflow-hidden [--focus-ring:var(--df-spirit-gold)] bg-gradient-to-b from-[color:var(--df-void)] via-[color:var(--df-void-deep)] to-[color:var(--df-void-purple)] font-['Comic_Sans_MS','Comic_Sans',cursive]"
     >
       {/* Skip Link for accessibility */}
       <SkipLink href="#main-content" />
@@ -1841,7 +1841,7 @@ export default function DarkFantasyTheme() {
           <div className="flex gap-2 md:gap-3 items-center">
             <Link
               href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
+              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
             >
               {actionLabels.cv}
             </Link>
@@ -1867,7 +1867,7 @@ export default function DarkFantasyTheme() {
               >
                 <NameWords name={name} />
               </h1>
-              <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silver }}>
+              <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silverText }}>
                 {headline}
               </p>
               <p
@@ -1947,14 +1947,14 @@ export default function DarkFantasyTheme() {
             render={({ line, actions }) => (
               <div className="max-w-2xl mx-auto text-center">
                 <div className="mb-8">
-                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brass, fontFamily: DF_FONT }}>
+                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brassText, fontFamily: DF_FONT }}>
                     {actionLabels.getInTouch}
                   </h2>
-                  <p className="text-sm" style={{ color: DARK_FANTASY.silver }}>{line}</p>
+                  <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{line}</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <HeroActions actions={actions} />
-                  <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass)]`}>
+                  <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]`}>
                     {actionLabels.downloadCv}
                   </Link>
                 </div>
@@ -1976,7 +1976,7 @@ export default function DarkFantasyTheme() {
 
       {/* Footer */}
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
-        <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silver }}>
+        <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silverText }}>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
             <span className="sr-only">{navigation.copyright} </span>© {new Date().getFullYear()} <NameWords name={view.hero.name} />

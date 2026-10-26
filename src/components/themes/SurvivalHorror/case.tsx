@@ -69,7 +69,7 @@ function ItemPicture({ index }: { index: number }) {
   )
 }
 
-const LINK_PLATE = `${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame)] hover:border-[color:var(--sh-flame)]`
+const LINK_PLATE = `${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] hover:border-[color:var(--sh-flame)]`
 const TURN_PLATE = `${CARD_BUTTON} border-[color:var(--sh-felt-line)] bg-[color:var(--sh-void)] text-[color:var(--sh-ivory)] hover:border-[color:var(--sh-flame)]`
 
 function ItemFront({ slot, index, onExamine }: { slot: ProjectSlot; index: number; onExamine: () => void }) {
@@ -113,7 +113,7 @@ function ItemBack({ slot, onPutBack }: { slot: ProjectSlot; onPutBack: () => voi
 
   return (
     <div className="flex h-full flex-col p-4">
-      <h3 className={`text-sm uppercase text-[color:var(--sh-brass)] ${look.typed}`}>
+      <h3 className={`text-sm uppercase text-[color:var(--sh-brass-text)] ${look.typed}`}>
         <SlashBreaks text={project.name} />
       </h3>
       <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.description}</p>
@@ -163,7 +163,7 @@ export function AttacheCase({ projects }: { projects: Project[] }) {
         <div className="mx-auto mt-3 h-3 w-24 rounded-sm bg-[color:var(--sh-brass)]" />
       </div>
       <div className={`p-3 sm:p-5 ${horror.caseBody}`}>
-        <p className="mb-4 text-sm italic text-[color:var(--sh-cream)]">{words.caseHint}</p>
+        <p className="mb-4 text-sm italic text-[color:var(--sh-ivory)]">{words.caseHint}</p>
         <ProjectList
           projects={projects}
           className={MASONRY_LIST}

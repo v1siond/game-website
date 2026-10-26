@@ -16,7 +16,7 @@ export const RoCOrnament = memo(function RoCOrnament({ side, type }: { side: 'le
 
   if (type === 'flag') {
     return (
-      <svg style={{ ...posStyle, width: '60px', height: '120px' }} viewBox="0 0 60 120">
+      <svg aria-hidden="true" style={{ ...posStyle, width: '60px', height: '120px' }} viewBox="0 0 60 120">
         <line x1="15" y1="5" x2="15" y2="115" stroke={REALM.ember16c} strokeWidth="4" />
         <line x1="5" y1="20" x2="25" y2="20" stroke={REALM.ember11a} strokeWidth="3" />
         <path d="M17,8 Q45,18 42,45 Q40,60 48,75 L19,68 Q22,50 19,30 Z" fill={REALM.bloodRed} opacity="0.8" />
@@ -27,7 +27,7 @@ export const RoCOrnament = memo(function RoCOrnament({ side, type }: { side: 'le
 
   if (type === 'weapons') {
     return (
-      <svg style={{ ...posStyle, width: '70px', height: '80px' }} viewBox="0 0 70 80">
+      <svg aria-hidden="true" style={{ ...posStyle, width: '70px', height: '80px' }} viewBox="0 0 70 80">
         {/* Broken sword */}
         <g transform="translate(15,60) rotate(-50)">
           <path d="M0,0 L3,-35 L6,-32 L4,0 Z" fill={REALM.metalLight} />
@@ -44,7 +44,7 @@ export const RoCOrnament = memo(function RoCOrnament({ side, type }: { side: 'le
   }
 
   return (
-    <svg style={{ ...posStyle, width: '60px', height: '80px' }} viewBox="0 0 60 80">
+    <svg aria-hidden="true" style={{ ...posStyle, width: '60px', height: '80px' }} viewBox="0 0 60 80">
       {/* Shield with arrows */}
       <path d="M10,5 L50,15 L50,45 Q50,65 30,75 Q10,65 10,45 Z" fill={REALM.ember28a} stroke={REALM.metalMid} strokeWidth="2" />
       <circle cx="30" cy="35" r="8" fill={REALM.goldDark} opacity="0.5" />
@@ -68,7 +68,7 @@ export const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left
 
   if (type === 'shard') {
     return (
-      <svg style={{ ...posStyle, width: '50px', height: '100px' }} viewBox="0 0 50 100">
+      <svg aria-hidden="true" style={{ ...posStyle, width: '50px', height: '100px' }} viewBox="0 0 50 100">
         <polygon points="25,0 32,45 28,100 22,100 18,45" fill={REALM.frostIceMid} />
         <polygon points="25,8 29,40 25,80" fill={REALM.frostIceBright} opacity="0.5" />
         <polygon points="12,30 18,55 15,85 9,85 6,55" fill={REALM.frostIceDark} opacity="0.6" />
@@ -79,7 +79,7 @@ export const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left
 
   if (type === 'rune') {
     return (
-      <svg style={{ ...posStyle, width: '45px', height: '70px' }} viewBox="0 0 45 70">
+      <svg aria-hidden="true" style={{ ...posStyle, width: '45px', height: '70px' }} viewBox="0 0 45 70">
         <path d="M22,0 L42,12 L42,48 L22,60 L2,48 L2,12 Z" fill={REALM.metalDark} stroke={REALM.metalMid} strokeWidth="2" />
         <path d="M22,6 L36,15 L36,45 L22,54 L8,45 L8,15 Z" fill={REALM.bgDeep} />
         <g fill={REALM.frostIceMid} opacity="0.7">
@@ -91,7 +91,7 @@ export const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left
   }
 
   return (
-    <svg style={{ ...posStyle, width: '60px', height: '60px' }} viewBox="0 0 60 60">
+    <svg aria-hidden="true" style={{ ...posStyle, width: '60px', height: '60px' }} viewBox="0 0 60 60">
       {/* Frost pattern */}
       <circle cx="30" cy="30" r="25" fill="none" stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
       <circle cx="30" cy="30" r="18" fill="none" stroke={REALM.frostIceBright} strokeWidth="1" opacity="0.4" />
@@ -143,7 +143,7 @@ export const RoCArtDivider = memo(function RoCArtDivider({ variant = 'horde', sc
       }} />
 
       {/* Center shield ornament */}
-      <svg width="140" height="100" viewBox="0 0 140 100" style={{ position: 'relative', zIndex: 2 }}>
+      <svg aria-hidden="true" width="140" height="100" viewBox="0 0 140 100" style={{ position: 'relative', zIndex: 2 }}>
         {variant === 'horde' && (
           <g transform="translate(70,50)">
             {/* Horde shield shape - pointed bottom */}
@@ -327,7 +327,7 @@ export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', s
       }} />
 
       {/* Center art piece - larger */}
-      <svg width="200" height="110" viewBox="0 0 200 110" style={{ position: 'relative', zIndex: 2 }}>
+      <svg aria-hidden="true" width="200" height="110" viewBox="0 0 200 110" style={{ position: 'relative', zIndex: 2 }}>
         {variant === 'crystals' && (
           <>
             {/* Ice crystal cluster - more elaborate */}

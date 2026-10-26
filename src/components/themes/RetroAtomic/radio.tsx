@@ -76,7 +76,7 @@ function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTu
       <span className={`mb-4 block h-10 ${atomic.speaker}`} aria-hidden="true" />
       <h3 className="text-lg font-bold uppercase tracking-wide text-atomic-phosphor">{band.name}</h3>
       <p className="mt-1 text-base text-atomic-yellow">{band.role}</p>
-      {years && <p className="mt-1 text-sm text-atomic-phosphor-dim">{years}</p>}
+      {years && <p className="mt-1 text-sm text-atomic-phosphor-dim-text">{years}</p>}
       {band.release && (
         <p className="mt-3 text-sm text-atomic-ash">
           {links.released} <cite>{band.release}</cite>
@@ -107,7 +107,7 @@ export function Radio({ bands, on }: { bands: Band[]; on: boolean }) {
 
   return (
     <>
-      <p className="mb-3 text-sm text-atomic-phosphor-dim">{hud.tuneHint}</p>
+      <p className="mb-3 text-sm text-atomic-phosphor-dim-text">{hud.tuneHint}</p>
       <Receiver bands={bands} tuned={tuned} on={on} />
       <BandList
         bands={bands}

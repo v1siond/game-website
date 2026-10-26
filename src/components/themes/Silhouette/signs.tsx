@@ -25,7 +25,7 @@ import shade from './shade.module.css'
 
 const LINK_FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--sh-glow)]'
 const TITLE = 'text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--sh-heading)]'
-const META = 'text-sm tracking-wider text-[color:var(--sh-muted)]'
+const META = 'text-sm tracking-wider text-[color:var(--sh-muted-text)]'
 
 const ROOFTOPS =
   'M0 60 V34 H40 V22 H58 V34 H96 V14 H104 V6 H110 V14 H122 V30 H170 V18 H210 V40 H250 V26 H262 V10 H270 V26 H300 V36 H350 V20 H392 V44 H430 V28 H470 V16 H486 V28 H520 V38 H560 V24 H600 V60 Z'
