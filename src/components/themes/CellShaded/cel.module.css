@@ -8,7 +8,11 @@
 
 /* ---------------------------------------------------------------- page */
 
+/* --select-gap is the gap between the hero and the profession panel under it: the panel's section keeps it
+ * as its top padding (quickChange.tsx), and the hero reaches down through it (freezeIntro.tsx), so the mesa
+ * he stands on runs down to the panel's top edge and goes behind it, with no sky between at any scroll. */
 .root {
+  --select-gap: 2.5rem;
   background: var(--cel-noon-low);
   color: var(--cel-ink);
   font-family: ui-sans-serif, system-ui, sans-serif;

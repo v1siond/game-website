@@ -50,11 +50,12 @@ const phaseFlags = (reached: ReadonlySet<Phase>) =>
 const DUST = [0, 1, 2]
 
 // The mesa he stands on, in the near ridge's dune colours and hatching: a butte as wide as his box, its flat
-// top at his box's bottom edge and its cliffs dropping straight down past the hero's bottom edge, where the
-// header's overflow-hidden cuts it, so the rock under him always meets the ground the hero ends on with no
-// sky between. Two screens deep is more than the hero ever runs below him. The shaded cliff face on the
-// right, a tenth of its width, is the near ridge's shade, hatched like its faces. Drawn in px with no
-// viewBox, so the hatch keeps its own scale down the whole cliff.
+// top at his box's bottom edge and its cliffs dropping straight down. The hero reaches --select-gap past its
+// own bottom, behind the top of the profession panel's section, and its overflow-hidden cuts the rock there,
+// at the panel's top edge, so the rock under him always runs into the panel with no sky between, at any
+// scroll. Two screens deep is more than the hero ever runs below him. The shaded cliff face on the right, a
+// tenth of its width, is the near ridge's shade, hatched like its faces. Drawn in px with no viewBox, so the
+// hatch keeps its own scale down the whole cliff.
 const SHADE_FACE = 10
 
 function Mesa() {
@@ -93,14 +94,15 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
   }, [done, triggered, skip])
 
   return (
-    <header ref={ref} className={`relative z-20 overflow-hidden ${cel.intro}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
-      <div className={`pointer-events-none absolute inset-0 ${cel.wash} bg-[var(--cel-dusk-high)] mix-blend-multiply`} aria-hidden="true" />
-      <SpeedRays color={CEL.sun} className={`pointer-events-none absolute inset-0 h-full w-full ${cel.rays}`} />
+    <header ref={ref} className={`relative z-20 -mb-[var(--select-gap)] overflow-hidden pb-[var(--select-gap)] ${cel.intro}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
+      {/* the hero reaches --select-gap down behind the panel's section for the mesa alone: the freeze's layers stop above it */}
+      <div className={`pointer-events-none absolute inset-x-0 bottom-[var(--select-gap)] top-0 ${cel.wash} bg-[var(--cel-dusk-high)] mix-blend-multiply`} aria-hidden="true" />
+      <SpeedRays color={CEL.sun} className={`pointer-events-none absolute inset-x-0 top-0 h-[calc(100%-var(--select-gap))] w-full ${cel.rays}`} />
       {/* the letterbox exists only while the entrance plays, so no part of its slant is left at rest */}
       {!done && (
         <>
           <div className={`pointer-events-none absolute inset-x-0 top-0 h-14 origin-left bg-[var(--cel-ink)] ${cel.barTop}`} aria-hidden="true" />
-          <div className={`pointer-events-none absolute inset-x-0 bottom-0 h-14 origin-left bg-[var(--cel-ink)] ${cel.barBottom}`} aria-hidden="true" />
+          <div className={`pointer-events-none absolute inset-x-0 bottom-[var(--select-gap)] h-14 origin-left bg-[var(--cel-ink)] ${cel.barBottom}`} aria-hidden="true" />
         </>
       )}
 
@@ -154,11 +156,11 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
       </div>
 
       {!done && (
-        <InkButton tone="paper" className="absolute bottom-4 right-4 z-10" onClick={skip}>
+        <InkButton tone="paper" className="absolute bottom-[calc(var(--select-gap)+1rem)] right-4 z-10" onClick={skip}>
           {hud.skipIntro}
         </InkButton>
       )}
-      <div className={`pointer-events-none absolute inset-0 bg-[var(--cel-white)] ${cel.flash}`} aria-hidden="true" />
+      <div className={`pointer-events-none absolute inset-x-0 bottom-[var(--select-gap)] top-0 bg-[var(--cel-white)] ${cel.flash}`} aria-hidden="true" />
     </header>
   )
 }
