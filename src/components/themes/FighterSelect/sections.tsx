@@ -48,7 +48,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
     <>
       <ArcadePanel accent="cyan" title={titles.about} id="about-heading">
         <CarSmash profession="engineer">
-          <p className={`mt-6 ${LEAD}`}>{professionalSummary.bio}</p>
+          <p className={`mt-6 max-w-prose ${LEAD}`}>{professionalSummary.bio}</p>
         </CarSmash>
       </ArcadePanel>
 

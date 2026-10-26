@@ -13,6 +13,8 @@
  * he stands on runs down to the panel's top edge and goes behind it, with no sky between at any scroll. */
 .root {
   --select-gap: 2.5rem;
+  /* The keyboard focus ring (globals.css) in the ink line, 12.13:1 on the noon sky. */
+  --focus-ring: var(--cel-ink);
   background: var(--cel-noon-low);
   color: var(--cel-ink);
   font-family: ui-sans-serif, system-ui, sans-serif;
@@ -812,7 +814,7 @@
 }
 
 .stamp {
-  color: var(--cel-flavour);
+  color: var(--cel-flavour-text);
   border: 3px solid var(--cel-flavour);
   transform: rotate(-8deg);
 }
@@ -908,8 +910,8 @@
 
 .loot[data-rarity='common'] { --rarity: var(--cel-common); --rarity-text: var(--cel-ink); }
 .loot[data-rarity='uncommon'] { --rarity: var(--cel-uncommon); --rarity-text: var(--cel-ink); }
-.loot[data-rarity='rare'] { --rarity: var(--cel-rare); --rarity-text: var(--cel-ink); }
-.loot[data-rarity='epic'] { --rarity: var(--cel-epic); --rarity-text: var(--cel-white); }
+.loot[data-rarity='rare'] { --rarity: var(--cel-rare); --rarity-band: var(--cel-rare-band); --rarity-text: var(--cel-ink); }
+.loot[data-rarity='epic'] { --rarity: var(--cel-epic); --rarity-band: var(--cel-epic-band); --rarity-text: var(--cel-white); }
 .loot[data-rarity='legendary'] { --rarity: var(--cel-legendary); --rarity-text: var(--cel-ink); }
 
 .loot {
@@ -960,7 +962,7 @@
 }
 
 .rarityBand {
-  background: var(--rarity);
+  background: var(--rarity-band, var(--rarity));
   color: var(--rarity-text);
   border-bottom: 4px solid var(--cel-ink);
 }
@@ -987,7 +989,7 @@
 .down { color: var(--cel-flavour); }
 
 .flavour {
-  color: var(--cel-flavour);
+  color: var(--cel-flavour-text);
 }
 
 @keyframes celDrop {

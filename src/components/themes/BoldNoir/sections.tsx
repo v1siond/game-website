@@ -53,7 +53,7 @@ function About({ bio }: { bio: string }) {
     <Stage title={sections.about}>
       <SlappedStatement>
         <div className={`max-w-3xl px-6 pb-10 pt-6 sm:px-8 ${world.speech}`}>
-          <p className={`text-base leading-relaxed ${world.copy}`}>{bio}</p>
+          <p className={`max-w-prose text-base leading-relaxed ${world.copy}`}>{bio}</p>
         </div>
       </SlappedStatement>
     </Stage>

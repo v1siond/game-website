@@ -6,6 +6,8 @@
 .root {
   --mx: 0;
   --my: 0;
+  /* The keyboard focus ring (globals.css) in the HUD yellow, 14.71:1 on the dusk of the city behind. */
+  --focus-ring: var(--neon-hud);
   font-family: var(--neon-face), ui-monospace, 'Courier New', monospace;
   color: var(--neon-ice);
   background: var(--neon-ink);
@@ -226,7 +228,9 @@
   }
 }
 
-/* Typed lines: an ink shutter slides off the real text one character step at a time. */
+/* Typed lines: an ink shutter slides off the real text one character step at a time. Its final frame
+   folds it to nothing (scaleX(0)) instead of resting past the right edge, so once typed the line's box is
+   only as wide as its text and nothing clips at 320 px. */
 .typed {
   position: relative;
   display: inline-block;
@@ -239,13 +243,16 @@
   inset: 0;
   background: var(--neon-glass);
   border-left: 0.6em solid var(--neon-hud);
-  transform: translateX(101%);
-  animation: shutter var(--type-time, 0.9s) steps(var(--chars, 24)) var(--type-at, 1.1s) both;
+  transform: scaleX(0);
+  animation: shutter var(--type-time, 0.9s) steps(var(--chars, 24)) var(--type-at, 1.1s) backwards;
 }
 
 @keyframes shutter {
   from {
     transform: translateX(0);
+  }
+  to {
+    transform: translateX(101%);
   }
 }
 

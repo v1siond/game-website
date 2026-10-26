@@ -36,13 +36,16 @@ export const NEON = {
   hudDim: '#8f8700',
   chromeRed: '#ff3b4e',
   data: '#5ef2ff',
+  // The data cyan a step lighter for the words on the chips: a lens the scrub leaves dim (0.7) still
+  // reads 7:1; the chip's frame and the city keep data.
+  dataText: '#7df5ff',
   gold: '#ffc23d',
   hack: '#3dff9a',
   use: '#4da3ff',
   cold: '#2d4bff',
   heat: '#ff5a1f',
   ink: '#07060c',
-  ash: '#c9c4da',
+  ash: '#dcd8e7',
   glass: '#120d1e',
 
   // The city: street, alley walls, towers, steel, panels and chrome

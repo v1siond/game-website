@@ -298,7 +298,7 @@ export function BathysphereHero() {
             </h1>
             <div className={descent.after}>
               <p className="mt-5 text-lg tracking-wide text-[color:var(--deco-cream)]">{headline}</p>
-              <p className="mt-2 text-base italic text-[color:var(--deco-gold)]">{tagline}</p>
+              <p className="mt-2 text-base italic text-[color:var(--deco-gold-text)]">{tagline}</p>
               <p className="mt-2 text-base text-[color:var(--deco-mist)]">{line}</p>
               <nav className="mt-7 flex flex-wrap items-center justify-center gap-3 md:justify-start" aria-label={navigation.contactAndCv}>
                 {actions.map((action) => (

@@ -92,7 +92,7 @@ function Banner({ company, open, wave, onTassel }: { company: Company; open: boo
             <h3 className={`text-lg uppercase tracking-[0.12em] ${v.title}`}>
               <SlashBreaks text={company.name} />
             </h3>
-            <p className="mt-2 text-sm uppercase tracking-[0.2em] text-[color:var(--deco-gold-bright)]">{company.tagline}</p>
+            <p className="mt-2 text-sm uppercase tracking-[0.2em] text-[color:var(--deco-gold-bright-text)]">{company.tagline}</p>
             <p className="mt-4 text-base text-[color:var(--deco-cream)]">{company.description}</p>
           </a>
           <span className={`absolute inset-x-0 bottom-0 h-4 ${v.roll}`} aria-hidden="true" />

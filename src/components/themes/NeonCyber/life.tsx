@@ -60,7 +60,7 @@ export function ScanAbout() {
             <MercSprite profession="engineer" motion={motion} className="h-auto w-full" />
           </div>
           <div className={`${life.scanBox} relative min-w-0 flex-1 overflow-hidden`}>
-            <p className="max-w-3xl text-base leading-relaxed text-[color:var(--neon-ice)]">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-[color:var(--neon-ice)]">{professionalSummary.bio}</p>
             <span className={`${life.sweep} pointer-events-none absolute inset-y-0 left-0 w-1 bg-[color:var(--neon-hud)]`} aria-hidden="true" />
           </div>
         </div>

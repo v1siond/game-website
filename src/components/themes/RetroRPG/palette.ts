@@ -10,9 +10,9 @@ import { paletteVars } from '../shared/paletteVars'
 // same values as CSS variables (RPG_VARS, set once on the world's root). The keys void, night, gold,
 // text, muted, sky, green, border, windowLow and windowTop also feed the theme registry.
 //
-// Text pairs on void (#000): text 21:1, muted 13.3:1, gold 19.6:1, orange 9.6:1, green 15.2:1,
-// sky 13.4:1, purple 7.4:1, soul 5.3:1 (used at 14px bold or larger, or for shapes only), void on gold
-// 19.6:1 and void on orange 9.6:1.
+// Text pairs on void (#000): text 21:1, muted 16.1:1 (7.7:1 on the purple behind the footer), gold
+// 19.6:1, orange 9.6:1, green 15.2:1, sky 13.4:1, purple 7.4:1, soul 5.3:1 (used at 14px bold or larger,
+// or for shapes only), void on gold 19.6:1 and void on orange 9.6:1.
 export const RPG = {
   void: '#000000',
   night: '#0b0b12',
@@ -21,7 +21,7 @@ export const RPG = {
   border: '#ffffff',
   borderShade: '#5a5a66',
   text: '#ffffff',
-  muted: '#d2d2d8',
+  muted: '#e1e1e5',
   gold: '#ffff3c',
   orange: '#ff9a2e',
   orangeDark: '#a8501a',

@@ -69,7 +69,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
     <div className={world.rank} style={orderVars(index)}>
       <article className={`p-6 pt-14 sm:pt-9 ${world.slab} ${world.lift}`}>
         <p className={`absolute -top-1 right-4 ${world.stamp}`}>
-          <span className={`block bg-[color:var(--noir-red)] px-3 py-1 text-2xl text-[color:var(--noir-paper)] ${world.stampRest}`}>
+          <span className={`block bg-[color:var(--noir-red-plate)] px-3 py-1 text-2xl text-[color:var(--noir-paper)] ${world.stampRest}`}>
             {start} - {end}
           </span>
         </p>

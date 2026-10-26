@@ -37,6 +37,9 @@ export const COLORS = {
   bark: '#6b3f1d',
   barkDark: '#2e1a0b',
   plank: '#c98d4a',
+  // The plank under body text only, a step lighter: under the grain it paints #c7a485, 7.15:1 with
+  // bark-dark; barrels, borders and letters keep plank.
+  plankText: '#deba91',
   plankLight: '#e8b874',
   hoop: '#4f545c',
   hoopLight: '#b9bec6',

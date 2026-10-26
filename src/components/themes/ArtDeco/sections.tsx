@@ -37,7 +37,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         <Chamber title={labels.sections.about} depth={0}>
           <PoweredRoom>
             <BrassPanel>
-              <p className="mx-auto max-w-3xl text-base leading-relaxed text-[color:var(--deco-cream)]">{professionalSummary.bio}</p>
+              <p className="mx-auto max-w-prose text-base leading-relaxed text-[color:var(--deco-cream)]">{professionalSummary.bio}</p>
             </BrassPanel>
           </PoweredRoom>
         </Chamber>

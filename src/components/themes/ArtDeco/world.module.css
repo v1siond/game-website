@@ -11,6 +11,9 @@
   --deco-display: var(--deco-face), 'Century Gothic', 'Futura', 'Avenir Next', 'Trebuchet MS', sans-serif;
   --deco-body: Georgia, 'Times New Roman', serif;
 
+  /* The keyboard focus ring (globals.css) in the brightest gold, 7:1 on the lightest water. */
+  --focus-ring: var(--deco-gold-bright);
+
   background: linear-gradient(180deg, var(--deco-sea-mid), var(--deco-deep-sea), var(--deco-abyss));
   color: var(--deco-cream);
   font-family: var(--deco-body);
@@ -24,7 +27,7 @@
 
 /* Gold neon lettering: a static glow, never animated. */
 .neon {
-  color: var(--deco-gold);
+  color: var(--deco-gold-text);
   text-shadow:
     0 0 5px var(--deco-gold),
     0 0 15px var(--deco-gold),

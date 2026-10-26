@@ -9,6 +9,8 @@
 /* ---------------------------------------------------------------- page */
 
 .root {
+  /* The keyboard focus ring (globals.css) in the pale gold of its own ring, 14.86:1 on the hall. */
+  --focus-ring: var(--myth-gold-pale);
   background: var(--myth-hall-high);
   color: var(--myth-bone);
   font-family: Georgia, 'Times New Roman', serif;
@@ -205,7 +207,7 @@
 }
 
 .btnBlood {
-  background: linear-gradient(180deg, var(--myth-blood) 0%, var(--myth-terracotta-deep) 100%);
+  background: linear-gradient(180deg, var(--myth-blood-plate) 0%, var(--myth-terracotta-deep) 100%);
   color: var(--myth-bone);
   border-color: var(--myth-gold-deep);
 }
@@ -378,7 +380,7 @@
 .talent:focus-visible { transform: translate3d(0, -3px, 0); }
 
 .talent[aria-checked='true'] {
-  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 55%, var(--myth-gold-deep) 100%);
+  background: linear-gradient(180deg, var(--myth-gold-pale) 0%, var(--myth-gold) 55%, var(--myth-gold-plate) 100%);
   color: var(--myth-ink);
   border-color: var(--myth-ink);
 }

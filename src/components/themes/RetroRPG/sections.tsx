@@ -102,7 +102,7 @@ export function EngineerSections({
       <Block label={titles.about} title={titles.about}>
         <EncounterRoom>
           <OpenBox>
-            <p className={BODY}>{professionalSummary.bio}</p>
+            <p className={`max-w-prose ${BODY}`}>{professionalSummary.bio}</p>
           </OpenBox>
           <div className="mt-6">
             <BulletBox profession="engineer" />

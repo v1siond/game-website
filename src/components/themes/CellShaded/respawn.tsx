@@ -20,7 +20,7 @@ import cel from './cel.module.css'
 
 export function RespawnStation({ profession }: { profession: Profession }) {
   const { contact } = useCVData()
-  const { sections, hud, navigation } = useLabels()
+  const { sections, hud } = useLabels()
   const { ref, on, reduced } = useZoneStage<Zone>('night')
   const [build, setBuild] = useState(0)
   const title = sections.contact
@@ -54,7 +54,7 @@ export function RespawnStation({ profession }: { profession: Profession }) {
             <p className={`text-2xl text-[var(--cel-sun)] sm:text-3xl ${cel.display}`}>{contact.line}</p>
             <RecruiterHero
               render={({ actions }) => (
-                <nav className="mt-6 flex flex-wrap gap-3" aria-label={navigation.contactAndCv}>
+                <nav className="mt-6 flex flex-wrap gap-3" aria-label={sections.contact}>
                   <ContactActions actions={actions} />
                 </nav>
               )}

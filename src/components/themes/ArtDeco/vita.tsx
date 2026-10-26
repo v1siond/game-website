@@ -47,7 +47,7 @@ function RevivedSurvivor() {
 
 /** The closing section: he comes back in the chamber and the contact plate comes out beside it. */
 export function VitaChamber() {
-  const { sections, navigation } = useLabels()
+  const { sections } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.25 })
 
   return (
@@ -73,7 +73,7 @@ export function VitaChamber() {
               {sections.contact}
             </h2>
             <p className="mt-4 text-base text-[color:var(--deco-cream)]">{line}</p>
-            <nav className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" aria-label={navigation.contactAndCv}>
+            <nav className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" aria-label={sections.contact}>
               {actions.map((action) => (
                 <HeroAction key={action.id} action={action} />
               ))}

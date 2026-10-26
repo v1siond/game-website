@@ -19,7 +19,7 @@
 
 .marquee {
   font-family: var(--deco-display);
-  color: var(--deco-gold-bright);
+  color: var(--deco-gold-bright-text);
   text-shadow: 0 0 6px rgb(240 200 80 / 0.7);
 }
 

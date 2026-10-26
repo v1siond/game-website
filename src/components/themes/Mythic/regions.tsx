@@ -31,7 +31,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
     <>
       <Stage title={titles.about} zone="hall">
         <ChainHaul>
-          <p className="text-lg leading-relaxed">{professionalSummary.bio}</p>
+          <p className="max-w-prose text-lg leading-relaxed">{professionalSummary.bio}</p>
         </ChainHaul>
       </Stage>
 

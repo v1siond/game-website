@@ -11,7 +11,7 @@ const NOIR_BUTTON =
 
 // Email is the red action, LinkedIn and the CV the paper outlined ones, Nebulith the solid paper one.
 const LOOK = {
-  red: 'border-[color:var(--noir-red)] bg-[color:var(--noir-red)] text-[color:var(--noir-paper)]',
+  red: 'border-[color:var(--noir-red-plate)] bg-[color:var(--noir-red-plate)] text-[color:var(--noir-paper)]',
   outline: 'border-[color:var(--noir-paper)] bg-transparent text-[color:var(--noir-paper)] hover:bg-[color:var(--noir-paper)] hover:text-[color:var(--noir-ink)]',
   paper: 'border-[color:var(--noir-paper)] bg-[color:var(--noir-paper)] text-[color:var(--noir-ink)]',
 }

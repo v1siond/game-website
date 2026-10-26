@@ -26,6 +26,10 @@ export const DECO_COLORS = {
   brassMid: '#B8860B',
   gold: '#D4AF37',
   goldBright: '#F0C850',
+  // The same golds a step lighter, for lettering only: the shapes, borders and glows keep gold and
+  // goldBright, the words on teal cards and red boards reach 7:1.
+  goldText: '#E3CB7C',
+  goldBrightText: '#F4D882',
   shutter: '#2a2008',
 
   // Bronze

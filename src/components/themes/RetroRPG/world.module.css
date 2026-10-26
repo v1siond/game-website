@@ -10,6 +10,8 @@
  */
 
 .world {
+  /* The keyboard focus ring (globals.css) in the cursor's yellow, 15.71:1 on the grid lines. */
+  --focus-ring: var(--rpg-gold);
   background-color: var(--rpg-void);
   background-image:
     linear-gradient(var(--rpg-grid) 1px, transparent 1px),
@@ -59,7 +61,8 @@
 }
 
 /* A line types itself: a black block over it slides off to the right in one step per letter group
-   (--type-steps), after --type-delay. */
+   (--type-steps), after --type-delay. Once typed the block folds to nothing (scaleX(0)) instead of
+   resting past the right edge, so the line's box is only as wide as its text and nothing clips at 320 px. */
 .type {
   position: relative;
   display: inline-block;
@@ -76,15 +79,17 @@
 }
 
 @keyframes typeOut {
+  from { transform: translateX(0); }
   to { transform: translateX(102%); }
 }
 
-[data-play='on'] .type::after {
-  animation: typeOut var(--type-ms, 900ms) steps(var(--type-steps, 18), end) var(--type-delay, 0ms) both;
+[data-play='on'] .type::after,
+[data-play='done'] .type::after {
+  transform: scaleX(0);
 }
 
-[data-play='done'] .type::after {
-  transform: translateX(102%);
+[data-play='on'] .type::after {
+  animation: typeOut var(--type-ms, 900ms) steps(var(--type-steps, 18), end) var(--type-delay, 0ms) backwards;
 }
 
 /* Text or a row that appears all at once after the line before it is typed (--show-delay). */
@@ -385,7 +390,7 @@
   }
 
   .type::after {
-    transform: translateX(102%);
+    transform: scaleX(0);
   }
 
   .room,

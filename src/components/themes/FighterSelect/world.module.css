@@ -10,6 +10,8 @@
  */
 
 .root {
+  /* The keyboard focus ring (globals.css) in the select screen's gold, 6.77:1 on its brightest blue. */
+  --focus-ring: var(--fs-gold);
   background:
     radial-gradient(ellipse at 50% 0%, color-mix(in srgb, var(--fs-select) 70%, transparent) 0%, transparent 60%),
     linear-gradient(180deg, var(--fs-select-deep) 0%, #040a3c 55%, #020520 100%);

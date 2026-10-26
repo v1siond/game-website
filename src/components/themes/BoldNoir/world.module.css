@@ -12,6 +12,8 @@
   --snap: cubic-bezier(0.34, 1.56, 0.64, 1);
   --cut: cubic-bezier(0.7, 0, 0.2, 1);
   --crook: polygon(0 2%, 100% 0, 98.5% 100%, 1.2% 97%);
+  /* The keyboard focus ring (globals.css) in the one loud red, 3.62:1 on the night. */
+  --focus-ring: var(--noir-red);
 
   background: var(--noir-ink);
   color: var(--noir-paper);
@@ -123,7 +125,7 @@
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: var(--noir-red);
+  background: var(--noir-red-plate);
   clip-path: polygon(0 10%, 100% 0, 96% 100%, 3% 88%);
 }
 

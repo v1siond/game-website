@@ -58,7 +58,7 @@ export function LifeBar({ side, label, empty = false, delay = '' }: LifeBarProps
 
 export function RoundPip({ children }: { children: ReactNode }) {
   return (
-    <span className={`grid h-8 min-w-11 shrink-0 place-items-center border-2 border-white bg-[color:var(--fs-ko)] px-1 text-lg leading-none text-white shadow-[0_0_0_2px_#000] ${look.display}`}>
+    <span className={`grid h-8 min-w-11 shrink-0 place-items-center border-2 border-white bg-[color:var(--fs-ko-plate)] px-1 text-lg leading-none text-white shadow-[0_0_0_2px_#000] ${look.display}`}>
       {children}
     </span>
   )

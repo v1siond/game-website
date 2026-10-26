@@ -39,7 +39,7 @@ export function HudPanel({ title, children, tools = null, className = '' }: HudP
 /** A chip of tech or skills, square, the data cyan on glass. */
 export function DataChip({ children }: { children: ReactNode }) {
   return (
-    <li className="border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color-mix(in_srgb,var(--neon-data)_8%,transparent)] px-2 py-0.5 text-sm text-[color:var(--neon-data)]">
+    <li className="border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color-mix(in_srgb,var(--neon-data)_8%,transparent)] px-2 py-0.5 text-sm text-[color:var(--neon-data-text)]">
       {children}
     </li>
   )

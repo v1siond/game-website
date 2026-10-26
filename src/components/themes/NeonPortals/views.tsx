@@ -156,7 +156,7 @@ function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
       <Stage title={labels.sections.about} zone="medieval">
         {(on) => (
           <BridgeSlide on={on} profession="engineer">
-            <p className={`${ui.panel} max-w-3xl p-6 text-lg leading-relaxed text-[color:var(--np-white)]`}>{professionalSummary.bio}</p>
+            <p className={`${ui.panel} max-w-prose p-6 text-lg leading-relaxed text-[color:var(--np-white)]`}>{professionalSummary.bio}</p>
           </BridgeSlide>
         )}
       </Stage>

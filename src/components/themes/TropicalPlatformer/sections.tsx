@@ -39,7 +39,7 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
       <Level title={titles.about} scene="jungle">
         <ElderYard>
           <Board>
-            <p className="mx-auto max-w-3xl text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{professionalSummary.bio}</p>
+            <p className="mx-auto max-w-prose text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{professionalSummary.bio}</p>
           </Board>
         </ElderYard>
       </Level>

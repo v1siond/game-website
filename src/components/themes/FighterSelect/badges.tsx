@@ -59,7 +59,7 @@ export function ClashEmblem({ large = false }: { large?: boolean }) {
 // The KO badge at the heart of the fight HUD: red, ruled white, the two letters in white over navy.
 export function KoBadge() {
   return (
-    <span className={`inline-grid h-7 w-11 place-items-center border-2 border-white bg-[color:var(--fs-ko)] text-base leading-none text-white shadow-[0_0_0_2px_#000] ${look.display}`} aria-hidden="true">
+    <span className={`inline-grid h-7 w-11 place-items-center border-2 border-white bg-[color:var(--fs-ko-plate)] text-base leading-none text-white shadow-[0_0_0_2px_#000] ${look.display}`} aria-hidden="true">
       KO
     </span>
   )

@@ -51,6 +51,12 @@
   transform: scale(0.4);
 }
 
+/* A brass ring round each joint marks it as a control: 4.96:1 on the sea behind it (1.4.11). */
+.leak {
+  border: 2px solid var(--deco-gold-bright);
+  border-radius: 9999px;
+}
+
 .leak[data-sealed] .jet {
   animation: none;
   opacity: 0;

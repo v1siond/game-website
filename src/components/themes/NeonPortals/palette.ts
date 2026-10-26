@@ -15,7 +15,7 @@ import { paletteVars } from '../shared/paletteVars'
 // 14.0:1, TEAL 13.2:1, HUD_TOP 6.5:1, HUD_LOW 8.5:1, NAME_LOW 7.0:1; on a PANEL card WHITE 14.6:1, MUTED
 // 8.3:1, GOLD 11.4:1, TEAL 10.8:1, VIOLET 6.6:1, GREEN 9.7:1. VOID ink on ORANGE 9.5:1, GOLD 14.0:1,
 // TEAL 13.2:1, STONE_LIT 8.1:1 and PLANK_LIT 7.4:1 (the buttons and the crate name plates); WHITE on
-// PAD 5.9:1 (the level pad buttons).
+// PAD_DEEP 8.0:1 (the level pad buttons and number domes; PAD itself, 5.9:1, carries no words).
 
 export const PORTAL = {
   // the night over the hub, darkest first, and its magenta glow (HAZE)
@@ -106,6 +106,8 @@ export const PORTAL = {
   // the hub's level pads on their grey rings, the time trial clock, the score digits' ramp, the logo's
   // letters and the level names' ramp (read from the game's pixels)
   PAD: '#0155f1',
+  // The pad a step deeper under white letters (the LinkedIn pad button, the level number domes): 8.0:1
+  PAD_DEEP: '#013eb0',
   PAD_DARK: '#013694',
   PAD_LIT: '#6fa8ff',
   PAD_RING: '#5c5f6b',

@@ -25,7 +25,7 @@ const GATE_LEAVES = { left: u.gateLeft, right: u.gateRight }
 type GatePhase = 'shut' | 'pushing' | 'through'
 
 export function LastGate({ profession }: { profession: Profession }) {
-  const { sections, myth, navigation } = useLabels()
+  const { sections, myth } = useLabels()
   const { returnToHouse } = useHouse()
   const { ref, on, reduced } = useZoneStage<Zone>('olympus')
   const [phase, setPhase] = useState<GatePhase>('shut')
@@ -65,7 +65,7 @@ export function LastGate({ profession }: { profession: Profession }) {
         render={({ line, actions }) => (
           <div className={`relative -mt-2 p-6 sm:p-8 ${u.panel}`}>
             <p className="text-lg">{line}</p>
-            <nav className="mt-5 flex flex-wrap gap-3" aria-label={navigation.contactAndCv}>
+            <nav className="mt-5 flex flex-wrap gap-3" aria-label={sections.contact}>
               <ContactActions actions={actions} />
             </nav>
             <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-[var(--myth-gold-deep)] pt-5">

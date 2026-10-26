@@ -11,6 +11,8 @@
 .root {
   /* The speckle the source's rendered textures carry, a tile of dark noise laid over wood and boards. */
   --tp-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.5 -0.12'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
+  /* The keyboard focus ring (globals.css) in the gold of the letters, 7.11:1 on the dusk at the top. */
+  --focus-ring: var(--tp-letter);
   --tp-display: var(--tp-face), 'Arial Rounded MT Bold', 'Trebuchet MS', 'Arial Black', system-ui, sans-serif;
   font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: var(--tp-parchment);
@@ -57,12 +59,13 @@
 }
 
 /* A plank that carries dark body text: the grain stays light down to the bottom edge (the bark shade
-   alone is 1.9:1 under bark-dark text), so every line reads at 5.8:1 or more. */
+   alone is 1.9:1 under bark-dark text) and the wood is the lighter plank-text, so every line reads at 7:1
+   or more. */
 .plankText {
   background:
     var(--tp-grain),
     repeating-linear-gradient(178deg, transparent 0 7px, rgb(46 26 11 / 0.2) 7px 8px, transparent 8px 13px, rgb(255 236 190 / 0.12) 13px 14px),
-    linear-gradient(180deg, var(--tp-plank-light), var(--tp-plank) 30%, var(--tp-plank) 100%);
+    linear-gradient(180deg, var(--tp-plank-light), var(--tp-plank-text) 30%, var(--tp-plank-text) 100%);
 }
 
 .plank::before,

@@ -63,7 +63,7 @@ export function PoweredRoom({ children }: { children: ReactNode }) {
             </div>
           )}
         </div>
-        <button type="button" onClick={() => play('zap')} aria-label={deco.zapAgain} className="h-24 w-16 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--deco-gold-bright)]">
+        <button type="button" onClick={() => play('zap')} aria-label={deco.zapAgain} className="h-24 w-16 rounded-sm border-2 border-[color:var(--deco-gold-bright)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--deco-gold-bright)]">
           <FuseBox live={live} />
         </button>
       </div>

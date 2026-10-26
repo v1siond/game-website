@@ -30,6 +30,8 @@ export const FS = {
   hudYellow: '#f8e800',
   hudRed: '#e01818',
   ko: '#c8102e',
+  // The KO red a step deeper behind small white numbers (the round count, the job badge): 7.1:1
+  koPlate: '#b10e29',
   navy: '#0a1060',
   // The round call lettering, lit at the top and burning orange at the foot
   callTop: '#fff27a',

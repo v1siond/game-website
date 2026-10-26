@@ -26,7 +26,7 @@
 /* The level number on a little blue pad dome in white; gold once its crystal is taken. */
 .badge {
   color: var(--np-white);
-  background: radial-gradient(circle at 38% 30%, var(--np-pad-lit), var(--np-pad) 45%, var(--np-pad-dark));
+  background: radial-gradient(circle at 30% 22%, var(--np-pad-lit), var(--np-pad-deep) 15%, var(--np-pad-dark));
 }
 
 .badgeTaken {

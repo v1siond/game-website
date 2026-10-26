@@ -29,12 +29,16 @@ export const MYTH = {
   panelEdge: '#3a1a24',
   goldDeep: '#8a6420',
   goldPale: '#f7dd92',
+  // The foot of a picked talent plate, a lighter gold than goldDeep so the ink name on it reads 7:1
+  goldPlate: '#cf9630',
 
   // ---- the great hall
   hallHigh: '#12060c',
   hallLow: '#4a0f1e',
   crimson: '#7d1626',
   blood: '#c2142b',
+  // The top of the blood button, a step deeper than blood so the bone words on it read 7:1
+  bloodPlate: '#960f21',
   bloodDeep: '#5c0613',
   pool: '#9e0e1f',
   poolLight: '#e8384a',

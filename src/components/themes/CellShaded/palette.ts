@@ -54,9 +54,15 @@ export const CEL = {
   rare: '#2f7bff',
   epic: '#9b3df0',
   legendary: '#ff8a00',
+  // The rare and epic colour bands under their rarity word: blue a step lighter under ink, purple a step
+  // deeper under white, so the word reads 7:1; the beams and borders keep rare and epic.
+  rareBand: '#69a0ff',
+  epicBand: '#7c11dc',
 
   // The red flavour line on a card and the critical hit text
   flavour: '#b3170c',
+  // The flavour red a step deeper for its words on the card paper (7:1); the stamp's frame keeps flavour.
+  flavourText: '#9c140a',
   crit: '#ff2a1a',
 
   // The respawn station's hologram and its glow

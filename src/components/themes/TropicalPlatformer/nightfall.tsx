@@ -61,7 +61,7 @@ function NightHouse() {
 }
 
 export function TreehouseContact() {
-  const { sections, navigation, jungle } = useLabels()
+  const { sections, jungle } = useLabels()
   const [finishes, setFinishes] = useState(0)
   const { active } = useProfession()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
@@ -110,7 +110,7 @@ export function TreehouseContact() {
                   {sections.contact}
                 </h2>
                 <p className="mt-4 text-base text-[color:var(--tp-parchment)]">{line}</p>
-                <nav className="mt-6 flex flex-wrap gap-3" aria-label={navigation.contactAndCv}>
+                <nav className="mt-6 flex flex-wrap gap-3" aria-label={sections.contact}>
                   {actions.map((action) => (
                     <JungleAction key={action.id} action={action} />
                   ))}
