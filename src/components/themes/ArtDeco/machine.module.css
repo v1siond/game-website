@@ -137,7 +137,7 @@
 
 .row[aria-checked='true'] {
   border-color: var(--deco-gold-bright);
-  background: linear-gradient(180deg, var(--deco-gold-bright), var(--deco-gold));
+  background: linear-gradient(180deg, var(--deco-gold-bright-text), var(--deco-gold-pick));
   color: var(--deco-abyss);
 }
 

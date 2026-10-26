@@ -30,6 +30,11 @@ export const DECO_COLORS = {
   // goldBright, the words on teal cards and red boards reach 7:1.
   goldText: '#E3CB7C',
   goldBrightText: '#F4D882',
+  // The ventures banner titles: the thin display letters only reach about three quarters of their colour
+  // over the red, so they take the palest gold, which still renders 7:1 on bloodDark.
+  goldPaleText: '#FBEEC8',
+  // The picked machine row, a paler gold under the abyss letters for the same reason (7:1 as rendered).
+  goldPick: '#EFD892',
   shutter: '#2a2008',
 
   // Bronze
@@ -43,6 +48,8 @@ export const DECO_COLORS = {
   // Maroon theatre boards
   bloodDark: '#660000',
   blood: '#8B0000',
+  // The edge of a ventures banner, so the cloth deepens from bloodDark behind the title outward
+  bloodDeep: '#3F0000',
 
   // His painted costume: the grey heather cable knit sweater, the slacks, the pipe wrench and the blue
   // crackle of the electric plasmid in his veins
