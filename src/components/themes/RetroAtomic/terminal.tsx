@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useReducer, useState } from 'react'
+import { useEffect, useMemo, useReducer, useState } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStage } from '@/hooks/useZoneStage'
@@ -194,8 +194,10 @@ export function ContactTerminal() {
   const { techStack } = useCVData()
   const { ref, on } = useZoneStage('town')
   const tools = useMemo(() => techStack.flatMap((category) => category.items), [techStack])
-  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 2 ** 31))
-  const board = useMemo(() => buildBoard(tools, seed), [tools, seed])
+  // The board's random seed is drawn in the browser, so the server and the first client render agree on no board.
+  const [seed, setSeed] = useState<number | null>(null)
+  useEffect(() => setSeed(Math.floor(Math.random() * 2 ** 31)), [])
+  const board = useMemo(() => (seed === null ? null : buildBoard(tools, seed)), [tools, seed])
   const title = sections.contact
 
   return (
@@ -212,7 +214,7 @@ export function ContactTerminal() {
               <p className="mt-3 text-base text-atomic-phosphor-dim-text">{hero.line}</p>
               <ActionMenu className="mt-6" label={sections.contact} />
             </div>
-            {board && <PasswordGame key={seed} board={board} onReboot={() => setSeed((current) => current + 1)} />}
+            {board && <PasswordGame key={seed} board={board} onReboot={() => setSeed((current) => (current ?? 0) + 1)} />}
           </div>
           <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
         </div>

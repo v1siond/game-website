@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { svgNumber } from '@/components/themes/shared/svgNumber'
 import {
   BAKELITE,
   BRASS,
@@ -209,12 +210,15 @@ export interface Point {
   y: number
 }
 
-/** A point turned round another by deg degrees, clockwise on screen as a CSS rotate turns it. */
+/**
+ * A point turned round another by deg degrees, clockwise on screen as a CSS rotate turns it. Rounded
+ * through svgNumber, so the carry's style values print the same on the server and in the browser.
+ */
 export const turn = ({ x, y }: Point, about: Point, deg: number): Point => {
   const rad = (deg * Math.PI) / 180
   const dx = x - about.x
   const dy = y - about.y
-  return { x: about.x + dx * Math.cos(rad) - dy * Math.sin(rad), y: about.y + dx * Math.sin(rad) + dy * Math.cos(rad) }
+  return { x: svgNumber(about.x + dx * Math.cos(rad) - dy * Math.sin(rad)), y: svgNumber(about.y + dx * Math.sin(rad) + dy * Math.cos(rad)) }
 }
 
 const HOIST_HAND = turn(turn(HAND.right, ELBOW_RIGHT, HOIST_END.fore), SHOULDER_RIGHT, HOIST_END.arm)

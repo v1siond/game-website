@@ -2,11 +2,11 @@ import dynamic from 'next/dynamic'
 import type { ComponentType } from 'react'
 import { themes } from './themes'
 
-// The default world (Medieval Fantasy, DEFAULT_THEME_ID) is imported statically: the server renders it
+// The default world (Retro Atomic, DEFAULT_THEME_ID) is imported statically: the server renders it
 // into the home page HTML and it ships in the first load. Every other world is its own chunk, fetched
 // only when a visitor enters it (a returning visitor's stored world, or a pick in the worlds modal).
 // Each import() is written out with a literal path so the bundler splits each world on its own.
-import MedievalFantasyTheme from '@/components/themes/MedievalFantasyTheme'
+import RetroAtomicTheme from '@/components/themes/RetroAtomicTheme'
 
 const DarkFantasyTheme = dynamic(() => import('@/components/themes/DarkFantasyTheme'))
 const SurvivalHorrorTheme = dynamic(() => import('@/components/themes/SurvivalHorrorTheme'))
@@ -18,12 +18,12 @@ const RetroRPGTheme = dynamic(() => import('@/components/themes/RetroRPGTheme'))
 const BoldNoirTheme = dynamic(() => import('@/components/themes/BoldNoirTheme'))
 const FighterSelectTheme = dynamic(() => import('@/components/themes/FighterSelectTheme'))
 const ArtDecoTheme = dynamic(() => import('@/components/themes/ArtDecoTheme'))
-const RetroAtomicTheme = dynamic(() => import('@/components/themes/RetroAtomicTheme'))
 const NeonCyberTheme = dynamic(() => import('@/components/themes/NeonCyberTheme'))
 const CellShadedTheme = dynamic(() => import('@/components/themes/CellShadedTheme'))
 const SilhouetteTheme = dynamic(() => import('@/components/themes/SilhouetteTheme'))
 const MythicTheme = dynamic(() => import('@/components/themes/MythicTheme'))
 const TropicalPlatformerTheme = dynamic(() => import('@/components/themes/TropicalPlatformerTheme'))
+const MedievalFantasyTheme = dynamic(() => import('@/components/themes/MedievalFantasyTheme'))
 
 export type WorldCategory = 'Fantasy' | 'Retro' | 'Neon' | 'Action' | 'Artistic'
 

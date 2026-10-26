@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { NameWords } from '@/components/cv/NameWords'
@@ -32,25 +32,23 @@ const atomicFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display:
 // The root carries the pointer as --mx and --my (-1 to 1) for the shelter's and the wasteland's
 // parallax. It clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
 // scroll container. Under reduced motion the door is skipped and the terminal is on from the start.
+//
+// The whole world renders on the server, the default world's contract (docs/CV-THEME-SYSTEM.md): the
+// browser only parts start in effects (the door's timeline, the pointer parallax, the password game's
+// random seed), and the sealed door the server draws is hidden by CSS under reduced motion until the
+// client drops it.
 
 export default function RetroAtomicTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
   const [booted, setBooted] = useState(false)
-  const rootRef = usePointerVars(mounted && !reducedMotion)
+  const rootRef = usePointerVars(!reducedMotion)
   const onOpened = useCallback(() => setBooted(true), [])
   const [zone, setZone] = useState<Zone>('shelter')
   const onZone = useCallback((next: Zone) => setZone(next), [])
   const stage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] ${atomic.root} ${atomicFace.variable}`}>

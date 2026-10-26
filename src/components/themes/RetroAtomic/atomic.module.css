@@ -937,6 +937,11 @@
     animation: none;
   }
 
+  /* The server draws the sealed door for every first visit; under reduced motion it never shows. */
+  .doorWall {
+    display: none;
+  }
+
   .doorWall,
   .doorWall *,
   .screenTab::after,
