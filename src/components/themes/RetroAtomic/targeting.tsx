@@ -254,8 +254,10 @@ function Shooter({ motion }: { motion: DwellerMotion }) {
   const { active } = useProfession()
 
   return (
-    <div className="mb-4 shrink-0 self-start md:sticky md:top-[38vh] md:mb-0 md:w-24" aria-hidden="true">
-      <DwellerSprite profession={active} motion={motion} className="h-32 w-[5.4rem]" />
+    <div className="relative mb-4 shrink-0 self-start md:sticky md:top-[38vh] md:mb-0 md:w-24" aria-hidden="true">
+      <DwellerSprite profession={active} motion={motion} className="h-32 w-[5.4rem] md:block" />
+      {/* his ground on the desktop, where the div sticks: his box is a block there, so the div's bottom is his box's bottom, and the plate's top sits on it and moves with him */}
+      <span className="absolute inset-x-0 top-full hidden h-2 border-t-2 border-atomic-steel-edge bg-atomic-steel md:block" />
     </div>
   )
 }

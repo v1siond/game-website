@@ -5,7 +5,7 @@ import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
-import { DwellerSprite } from './dweller'
+import { DwellerSprite, HOIST_GRIP, VIEW } from './dweller'
 import { BRASS, CHROME, OLIVE, OLIVE_DARK, OLIVE_LIGHT, PHOSPHOR, POSTER_INK } from './palette'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
@@ -20,6 +20,13 @@ import j from './journey.module.css'
 
 const POUR_MS = 1500
 const POCKET_MS = 320
+
+// His drawn box takes his viewBox's ratio, so the hoist grip is the same fraction of it at every size.
+const DRAWN = {
+  '--view': `${VIEW.width} / ${VIEW.height}`,
+  '--grip-x': `${(HOIST_GRIP.x / VIEW.width) * 100}%`,
+  '--grip-y': `${(HOIST_GRIP.y / VIEW.height) * 100}%`,
+} as CSSProperties
 
 /** How many pockets have landed: none until the pour starts, then one more every POCKET_MS. */
 function useLanded(on: boolean, total: number, instant: boolean) {
@@ -78,12 +85,15 @@ export function Loot({ categories, on, children }: { categories: CVData['techSta
     <div style={timing}>
       <div className="mb-4 flex items-end gap-4 sm:gap-6">
         <div className="relative ml-8 h-32 w-[5.4rem] shrink-0" aria-hidden="true">
-          <span className={`absolute -left-6 -top-9 block h-14 w-20 ${j.locker}`}>
-            <span className={`block h-full w-full ${j.lockerShake}`}>
-              <Footlocker />
+          <div className="absolute left-1/2 top-0 h-full -translate-x-1/2 aspect-[var(--view)]" style={DRAWN}>
+            {/* the locker's bottom centre (its handle, the turn's origin) hangs from his hand: -ml-10 and -mt-14 are half its w-20 and its whole h-14 */}
+            <span className={`absolute left-[var(--grip-x)] top-[var(--grip-y)] -ml-10 -mt-14 block h-14 w-20 ${j.locker}`}>
+              <span className={`block h-full w-full ${j.lockerShake}`}>
+                <Footlocker />
+              </span>
             </span>
-          </span>
-          <DwellerSprite profession="engineer" motion={on ? 'hoist' : 'still'} className="absolute inset-0 h-full w-full" />
+            <DwellerSprite profession="engineer" motion={on ? 'hoist' : 'still'} className="absolute inset-0 h-full w-full" />
+          </div>
         </div>
         <CarryWeight weight={weight} total={total} />
       </div>

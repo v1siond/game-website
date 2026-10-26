@@ -175,6 +175,16 @@ const INKS: Record<DwellerTone, Inks> = {
 
 // ---- shapes (viewBox 100 by 150, facing the viewer, feet on y 144) ----
 
+/** His viewBox's size, so a scene can place a prop at a point of his drawing as a fraction of his box. */
+export const VIEW = { width: 100, height: 150 }
+
+/**
+ * Where his right hand rests at the end of the hoist, in viewBox units: the hand (HAND.right) turned by the
+ * hoist's last keyframes in dweller.module.css, the forearm 22deg round the elbow (32, 77), the arm 165deg
+ * round the shoulder (34, 60), the body 6 down. The footlocker hangs from this point.
+ */
+export const HOIST_GRIP = { x: 34.2, y: 29.2 }
+
 const HEAD = 'M30 34 Q30 12 50 12 Q70 12 70 34 Q70 54 50 57 Q30 54 30 34 Z'
 const HAIR = 'M30.5 31 Q29 10 50 9.5 Q66 9 70.5 26 Q63 16.5 53 19 Q45 15 38 20 Q33 24 32.5 32 Z'
 const BEARD = 'M31.5 37 Q32 56 50 60 Q68 56 68.5 37 Q64.5 45.5 58.5 45.5 Q50 42.5 41.5 45.5 Q35.5 45.5 31.5 37 Z'
@@ -395,7 +405,7 @@ export function DwellerSprite({ profession, motion, tone = 'poster', className =
   const inks = INKS[tone]
 
   return (
-    <svg viewBox="0 0 100 150" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
+    <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`}>
         {tone === 'poster' && <ellipse cx={50} cy={145} rx={22} ry={3} fill={POSTER_INK} opacity={0.35} />}
         <g className={s.body}>
