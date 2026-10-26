@@ -9,7 +9,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { CVData } from '@/lib/cv/content'
 import { fillLabel } from '@/lib/cv/labels'
 import { DECO_COLORS as C } from './palette'
-import { SurvivorSprite, type DecoMotion } from './sprite'
+import { SOLE_DROP, SurvivorSprite, type DecoMotion } from './sprite'
 import v from './ventures.module.css'
 
 // The ventures as the city's propaganda banners: red cloth with gold capitals, furled on the brass rod
@@ -158,7 +158,13 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
   }
 
   const shown = (index: number) => reduced || open[index]
-  const walkVars = { '--from': trip.from, '--to': trip.to, '--span': Math.abs(trip.to - trip.from), '--columns': columns } as CSSProperties
+  const walkVars = {
+    '--from': trip.from,
+    '--to': trip.to,
+    '--span': Math.abs(trip.to - trip.from),
+    '--columns': columns,
+    '--sole-drop': SOLE_DROP,
+  } as CSSProperties
 
   return (
     <div ref={ref}>
@@ -180,12 +186,12 @@ export function PropagandaBanners({ companies }: { companies: Company[] }) {
         ))}
         {triggered && (
           <div key={trip.count} className={`absolute left-0 ${v.onLedge} ${v.lane} ${reduced ? '' : v.walker}`} style={walkVars} onAnimationEnd={walked}>
-            {/* his box at his viewBox's 2:3, so the drawing reaches the box bottom, which stands on the ledge */}
+            {/* his box at his viewBox's 2:3 stands on the ledge, and the drawing drops by the room under his soles so they meet the box bottom */}
             <SurvivorSprite
               profession="engineer"
               motion={reduced ? 'still' : MOTION[act]}
               onDone={act === 'pull' ? pulled : undefined}
-              className={`mx-auto block aspect-[2/3] w-20 ${act === 'walk' && trip.to < trip.from ? v.back : ''}`}
+              className={`mx-auto block aspect-[2/3] w-20 ${v.onSoles} ${act === 'walk' && trip.to < trip.from ? v.back : ''}`}
             />
           </div>
         )}

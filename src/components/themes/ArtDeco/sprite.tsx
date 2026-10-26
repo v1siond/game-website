@@ -72,6 +72,13 @@ function Painted({ d, fill, className }: { d: string; fill: string; className?: 
 
 // ---- shapes (viewBox 120 by 180, facing right, feet on y 172) ----
 
+const VIEW = { width: 120, height: 180 }
+const SOLES_Y = 172
+
+/** The share of his drawn height that sits under his soles, so a scene can drop the drawing by it and stand
+ * the soles on its box bottom. */
+export const SOLE_DROP = (VIEW.height - SOLES_Y) / VIEW.height
+
 const HEAD = 'M51 28 Q51 15 62 15 Q74 15 74.5 28 L74.5 34 Q73 41 66 44 L58 44 Q51 40 51 34 Z'
 const HAIR = 'M50 29 Q48 12 62 12.5 Q76 13 75.5 26 Q71 19.5 63 19.5 Q56 20 53.5 30 Z'
 const BEARD = 'M51.5 31 Q52.5 44 59 48.5 Q66 51 71.5 46.5 Q75.5 41.5 75 32 Q72 36.5 68 36.5 Q63 37.5 58 34.5 Q55 33 53 31 Z'
@@ -394,7 +401,7 @@ export function SurvivorSprite({ profession, motion, onDone, className = '' }: S
   }
 
   return (
-    <svg viewBox="0 0 120 180" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
+    <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <Gradients ids={ids} />
       <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} onAnimationEnd={finish}>
         <Chamber />

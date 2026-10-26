@@ -21,6 +21,12 @@
   bottom: var(--ledge);
 }
 
+/* The drawing drops by --sole-drop of its own height (SOLE_DROP in sprite.tsx), so his soles, not the room
+ * under them, meet the box bottom. translate composes with .back's mirror. */
+.onSoles {
+  translate: 0 calc(var(--sole-drop) * 100%);
+}
+
 .cord {
   left: 3.6rem;
   background: var(--deco-mist);
