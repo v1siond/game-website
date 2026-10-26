@@ -18,7 +18,7 @@ function PostList({ posts, blog }: Readonly<{ posts: Post[]; blog: Labels['blog'
   return (
     <ul className="divide-y divide-gray-200">
       {posts.map((post) => (
-        <li key={post.slug} className="max-w-[72ch] py-6">
+        <li key={post.slug} className="max-w-[40rem] py-6">
           <article>
             <p className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
               <time dateTime={post.date}>{shownDate(post.date)}</time>
