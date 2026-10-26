@@ -1,10 +1,13 @@
 import {
   HINT_MIN_MS,
+  HINT_WATCH_MS,
   SEEN_STORAGE_KEY,
   TOUR_ORDER,
   VISIT_STORAGE_KEY,
   coversNothing,
   hintBelongsOn,
+  hintWatch,
+  isVisuallyHidden,
   launcherColors,
   markSeen,
   mayOfferHint,
@@ -41,7 +44,16 @@ describe('markSeen', () => {
 })
 
 describe('mayOfferHint', () => {
-  const ready = { pathname: '/', elapsedMs: HINT_MIN_MS, scrolledPx: 900, viewportPx: 800, offeredThisVisit: false, pickerOpened: false, seenCount: 1 }
+  const ready = {
+    pathname: '/',
+    elapsedMs: HINT_MIN_MS,
+    scrolledPx: 900,
+    viewportPx: 800,
+    pageHeightPx: 4000,
+    offeredThisVisit: false,
+    pickerOpened: false,
+    seenCount: 1,
+  }
 
   it('offers the hint once the visitor has read a while and scrolled a screen', () => {
     expect(mayOfferHint(ready)).toBe(true)
@@ -75,6 +87,18 @@ describe('mayOfferHint', () => {
   it('offers it on a world page and on the blog', () => {
     expect(mayOfferHint({ ...ready, pathname: '/' })).toBe(true)
     expect(mayOfferHint({ ...ready, pathname: '/blog' })).toBe(true)
+  })
+
+  it('counts the scroll as met on a page that cannot scroll a screen, once the read time has passed', () => {
+    const blog = { ...ready, pathname: '/blog', scrolledPx: 0, viewportPx: 844, pageHeightPx: 844 }
+    expect(mayOfferHint(blog)).toBe(true)
+    expect(mayOfferHint({ ...blog, elapsedMs: HINT_MIN_MS - 1 })).toBe(false)
+  })
+
+  it('still waits for a real scroll on a page that can scroll a screen', () => {
+    const post = { ...ready, pathname: '/blog/css-page-transition-portals', viewportPx: 844, pageHeightPx: 2087 }
+    expect(mayOfferHint({ ...post, scrolledPx: 0 })).toBe(false)
+    expect(mayOfferHint({ ...post, scrolledPx: 844 })).toBe(true)
   })
 })
 
@@ -214,6 +238,55 @@ describe('coversNothing', () => {
 
   it('ignores a box with no area', () => {
     expect(coversNothing(box, [{ left: 200, top: 100, right: 200, bottom: 150 }])).toBe(true)
+  })
+})
+
+describe('isVisuallyHidden', () => {
+  const box = { width: 320, height: 24, overflow: 'visible', position: 'static', clip: 'auto', clipPath: 'none' }
+
+  it('is true for the Tailwind sr-only box', () => {
+    const srOnly = { width: 1, height: 1, overflow: 'hidden', position: 'absolute', clip: 'rect(0px, 0px, 0px, 0px)', clipPath: 'none' }
+    expect(isVisuallyHidden(srOnly)).toBe(true)
+  })
+
+  it('is true for a 1 by 1 box that clips its overflow', () => {
+    expect(isVisuallyHidden({ ...box, width: 1, height: 1, overflow: 'hidden' })).toBe(true)
+  })
+
+  it('is false for a 0 by 0 box whose text overflows visibly', () => {
+    expect(isVisuallyHidden({ ...box, width: 0, height: 0, overflow: 'visible' })).toBe(false)
+  })
+
+  it('is true for an absolute or fixed box clipped to nothing', () => {
+    const clipped = { ...box, clip: 'rect(0px, 0px, 0px, 0px)' }
+    expect(isVisuallyHidden({ ...clipped, position: 'absolute' })).toBe(true)
+    expect(isVisuallyHidden({ ...clipped, position: 'fixed' })).toBe(true)
+    expect(isVisuallyHidden({ ...clipped, position: 'static' })).toBe(false)
+  })
+
+  it('is true for a box clipped by inset(50%)', () => {
+    expect(isVisuallyHidden({ ...box, clipPath: 'inset(50%)' })).toBe(true)
+  })
+
+  it('is false for a normal box', () => {
+    expect(isVisuallyHidden(box)).toBe(false)
+  })
+})
+
+describe('hintWatch', () => {
+  it('keeps watching a clear card inside the window', () => {
+    expect(hintWatch({ openedAtMs: 1000, nowMs: 1000, covered: false })).toBe('watch')
+    expect(hintWatch({ openedAtMs: 1000, nowMs: 1000 + HINT_WATCH_MS - 1, covered: false })).toBe('watch')
+  })
+
+  it('closes the card when text comes under it inside the window', () => {
+    expect(hintWatch({ openedAtMs: 1000, nowMs: 1300, covered: true })).toBe('close')
+  })
+
+  it('stops watching once the window has passed', () => {
+    expect(HINT_WATCH_MS).toBe(3000)
+    expect(hintWatch({ openedAtMs: 1000, nowMs: 1000 + HINT_WATCH_MS, covered: false })).toBe('done')
+    expect(hintWatch({ openedAtMs: 1000, nowMs: 1000 + HINT_WATCH_MS, covered: true })).toBe('done')
   })
 })
 

@@ -38,6 +38,9 @@ export const TOUR_ORDER: readonly string[] = [
 /** The hint waits this long after the page opened, so it never interrupts the first read. */
 export const HINT_MIN_MS = 20000
 
+/** How long the open hint keeps checking that nothing slid or faded in under it, the QA window. */
+export const HINT_WATCH_MS = 3000
+
 const AAA_TEXT = 7
 const BLACK = '#000000'
 const WHITE = '#ffffff'
@@ -78,18 +81,27 @@ export interface HintMoment {
   elapsedMs: number
   scrolledPx: number
   viewportPx: number
+  /** The page's full height (document scrollHeight), to tell a page that cannot scroll a screen. */
+  pageHeightPx: number
   offeredThisVisit: boolean
   pickerOpened: boolean
   seenCount: number
 }
 
-/** True once a first time visitor has read a while and scrolled a screen, and never twice in a visit. */
+// A page shorter than two screens cannot scroll a full screen, so the read time alone stands for the scroll.
+const scrollMet = ({ scrolledPx, viewportPx, pageHeightPx }: HintMoment): boolean =>
+  scrolledPx >= viewportPx || pageHeightPx - viewportPx < viewportPx
+
+/**
+ * True once a first time visitor has read a while and scrolled a screen (or is on a page that cannot
+ * scroll one), and never twice in a visit.
+ */
 export function mayOfferHint(moment: HintMoment): boolean {
   if (!hintBelongsOn(moment.pathname)) return false
   if (moment.offeredThisVisit || moment.pickerOpened) return false
   if (moment.seenCount > 1) return false
   if (moment.elapsedMs < HINT_MIN_MS) return false
-  return moment.scrolledPx >= moment.viewportPx
+  return scrollMet(moment)
 }
 
 /** A stored list of worlds with one more entered: unreadable lists start over, each world counts once. */
@@ -156,6 +168,42 @@ const overlaps = (a: ScreenBox, b: ScreenBox): boolean =>
 /** True when no text or control box shares any area with the hint's box; touching an edge is clear. */
 export function coversNothing(box: ScreenBox, under: readonly ScreenBox[]): boolean {
   return !under.some((other) => hasArea(other) && overlaps(box, other))
+}
+
+/** The computed box and styles of an element, enough to tell whether its text is drawn at all. */
+export interface HiddenProbe {
+  width: number
+  height: number
+  overflow: string
+  position: string
+  clip: string
+  clipPath: string
+}
+
+const CLIPPED_TO_NOTHING = 'rect(0px, 0px, 0px, 0px)'
+const OUT_OF_FLOW = ['absolute', 'fixed']
+
+/**
+ * True for text kept for screen readers only (Tailwind sr-only and the common variants): a box of 1 by 1
+ * px or less that clips its overflow, an absolute or fixed box clipped to nothing, or one clipped by
+ * inset(50%). Nothing of it is drawn, so the hint may sit over it.
+ */
+export function isVisuallyHidden({ width, height, overflow, position, clip, clipPath }: HiddenProbe): boolean {
+  if (width <= 1 && height <= 1 && overflow !== 'visible') return true
+  if (OUT_OF_FLOW.includes(position) && clip === CLIPPED_TO_NOTHING) return true
+  return clipPath === 'inset(50%)'
+}
+
+export type WatchVerdict = 'watch' | 'close' | 'done'
+
+/**
+ * The open hint's check, once per frame: done once HINT_WATCH_MS have passed since it opened, closed when
+ * text or a control is under it before then, else watched another frame.
+ */
+export function hintWatch({ openedAtMs, nowMs, covered }: { openedAtMs: number; nowMs: number; covered: boolean }): WatchVerdict {
+  if (nowMs - openedAtMs >= HINT_WATCH_MS) return 'done'
+  if (covered) return 'close'
+  return 'watch'
 }
 
 const readsAtAAA = (fill: string) => (color: string): boolean => contrastRatio(color, fill) >= AAA_TEXT

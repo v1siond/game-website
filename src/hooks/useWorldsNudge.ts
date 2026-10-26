@@ -12,6 +12,8 @@ import {
   VISIT_STORAGE_KEY,
   coversNothing,
   hintBelongsOn,
+  hintWatch,
+  isVisuallyHidden,
   mayOfferHint,
   nextInTour,
   readSeen,
@@ -21,6 +23,9 @@ import {
 // A world counts as seen once it has been on screen this long. The provider renders the default world for
 // one commit before a returning visitor's own world, and this wait keeps that commit from counting.
 const SEEN_AFTER_MS = 1500
+
+// The longest the waiting card holds a measure for running animations to end, so a long reveal cannot stall it.
+const SETTLE_CAP_MS = 1000
 
 const WORLD_IDS = WORLDS.map((world) => world.id)
 
@@ -62,6 +67,13 @@ const recordIn = (storage: () => Storage, key: string, id: string): string[] => 
 const isShown = (element: Element): boolean =>
   element.checkVisibility({ visibilityProperty: true }) && !element.closest('[aria-hidden="true"]')
 
+// Text kept for screen readers only (an sr-only counter) is never drawn, so the card may sit over it.
+const drawsNothing = (element: Element): boolean => {
+  const { width, height } = element.getBoundingClientRect()
+  const { overflow, position, clip, clipPath } = window.getComputedStyle(element)
+  return isVisuallyHidden({ width, height, overflow, position, clip, clipPath })
+}
+
 /** The boxes of every laid out text line and control on the page that meet the card's box, the card's own aside. */
 function boxesUnder(card: HTMLElement): DOMRect[] {
   const box = card.getBoundingClientRect()
@@ -73,11 +85,25 @@ function boxesUnder(card: HTMLElement): DOMRect[] {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT)
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const parent = node.parentElement
-    if (!parent || !node.textContent?.trim() || !meets(parent)) continue
+    if (!parent || !node.textContent?.trim() || !meets(parent) || drawsNothing(parent)) continue
     range.selectNodeContents(node)
     lines.push(...Array.from(range.getClientRects()))
   }
   return [...controls, ...lines]
+}
+
+const covered = (card: HTMLElement): boolean => !coversNothing(card.getBoundingClientRect(), boxesUnder(card))
+
+// A running animation with an end moves or fades its text into place (a reveal), so a measure waits for it.
+// Infinite loops and paused or idle animations are left out: their finished promise never settles.
+const endsSoon = (animation: Animation): boolean =>
+  animation.playState === 'running' && Number.isFinite(Number(animation.effect?.getComputedTiming().endTime))
+
+/** Settles once every reveal running now has ended, or after SETTLE_CAP_MS, whichever comes first. */
+function revealsSettled(): Promise<unknown> {
+  const finishing = document.getAnimations().filter(endsSoon).map((animation) => animation.finished)
+  const cap = new Promise((resolve) => window.setTimeout(resolve, SETTLE_CAP_MS))
+  return Promise.race([Promise.allSettled(finishing), cap])
 }
 
 const atPageEnd = (): boolean => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2
@@ -141,6 +167,7 @@ export function useWorldsNudge() {
         elapsedMs: performance.now() - startedAt,
         scrolledPx: deepest,
         viewportPx: window.innerHeight,
+        pageHeightPx: document.documentElement.scrollHeight,
         offeredThisVisit: readStorage(session, HINT_OFFERED_KEY) !== null,
         pickerOpened: pickerOpened.current,
         seenCount: loadSeenWorlds().length,
@@ -158,20 +185,30 @@ export function useWorldsNudge() {
     }
   }, [])
 
-  // While waiting, the hidden card is measured against the page once per scrolled frame: it opens at the
-  // first place where it covers nothing, and stays closed this visit when the page ends first.
+  // While waiting, the hidden card is measured against the page once per scrolled frame, each measure after
+  // the reveals running then have ended: it opens at the first place where it covers nothing, and stays
+  // closed this visit when the page ends first. One wait at a time; scrolls during it are taken by the
+  // measure that ends it, which reads the page where it is then.
   useEffect(() => {
     if (hint !== 'waiting') return
     let frame = 0
-    const place = () => {
-      frame = 0
+    let settling = false
+    let stopped = false
+    const measure = () => {
+      settling = false
       const card = hintRef.current
-      if (!card) return
-      if (coversNothing(card.getBoundingClientRect(), boxesUnder(card))) {
+      if (stopped || !card) return
+      if (!covered(card)) {
         setHint('open')
         return
       }
       if (atPageEnd()) setHint('closed')
+    }
+    const place = () => {
+      frame = 0
+      if (settling) return
+      settling = true
+      revealsSettled().then(measure)
     }
     const onScroll = () => {
       if (frame === 0) frame = window.requestAnimationFrame(place)
@@ -179,9 +216,27 @@ export function useWorldsNudge() {
     place()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => {
+      stopped = true
       window.cancelAnimationFrame(frame)
       window.removeEventListener('scroll', onScroll)
     }
+  }, [hint])
+
+  // Once open, the card is measured every frame for HINT_WATCH_MS and closes this visit if a reveal that
+  // began after the opening measure brings text or a control under it.
+  useEffect(() => {
+    if (hint !== 'open') return
+    const openedAtMs = performance.now()
+    let frame = 0
+    const watch = () => {
+      const card = hintRef.current
+      if (!card) return
+      const verdict = hintWatch({ openedAtMs, nowMs: performance.now(), covered: covered(card) })
+      if (verdict === 'close') setHint('closed')
+      if (verdict === 'watch') frame = window.requestAnimationFrame(watch)
+    }
+    frame = window.requestAnimationFrame(watch)
+    return () => window.cancelAnimationFrame(frame)
   }, [hint])
 
   const nextId = nextInTour(theme.id, seen)
