@@ -810,6 +810,7 @@ collections:
                   - { <<: *text, label: "Draft", name: draft }
                   - { <<: *text, label: "No posts yet", name: empty }
                   - { <<: *text, label: "No post at this address", name: notFound }
+                  - { <<: *text, label: "Code example (the name a screen reader gives each code block)", name: codeExample }
 
   # One Markdown file per post, content/blog/<slug>.md, English only. The front matter is JSON (Decap's
   # json-frontmatter), which the site reads with JSON.parse. A new post starts as a draft: drafts show

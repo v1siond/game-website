@@ -11,8 +11,9 @@ import { BlogFooterLinks, BlogToolbar, DraftMark, type BackLink } from '@/compon
 
 type Props = Readonly<{ params: Promise<{ slug: string }> }>
 
-// One page per post the build shows, rendered at build time; any other slug is the 404 page.
-export const dynamicParams = false
+// One page per post the build shows, rendered at build time. Another slug still reaches postAt, whose
+// notFound() renders the blog's own 404 inside the blog layout.
+export const dynamicParams = true
 
 const options = () => ({ env: process.env.NODE_ENV })
 
@@ -49,8 +50,9 @@ function Cover({ post }: Readonly<{ post: Post }>) {
 
 export default async function PostPage({ params }: Props) {
   const post = await postAt(params)
-  const [cv, html] = await Promise.all([getAllCVData('en'), renderMarkdown(post.body)])
+  const cv = await getAllCVData('en')
   const { blog, navigation } = cv.labels
+  const html = await renderMarkdown(post.body, { codeLabel: blog.codeExample })
   const links: BackLink[] = [
     { href: BLOG_PATH, label: blog.allPosts },
     { href: '/', label: blog.backHome },

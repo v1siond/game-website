@@ -461,7 +461,8 @@
         "backHome": "Back to home",
         "draft": "Draft",
         "empty": "No posts yet.",
-        "notFound": "No post at this address."
+        "notFound": "No post at this address.",
+        "codeExample": "Code example"
       }
     }
   },
@@ -927,7 +928,8 @@
         "backHome": "Volver al inicio",
         "draft": "Borrador",
         "empty": "Todavía no hay publicaciones.",
-        "notFound": "No hay ninguna publicación en esta dirección."
+        "notFound": "No hay ninguna publicación en esta dirección.",
+        "codeExample": "Ejemplo de código"
       }
     }
   },
@@ -1393,7 +1395,8 @@
         "backHome": "Torna alla home",
         "draft": "Bozza",
         "empty": "Ancora nessun articolo.",
-        "notFound": "Nessun articolo a questo indirizzo."
+        "notFound": "Nessun articolo a questo indirizzo.",
+        "codeExample": "Esempio di codice"
       }
     }
   }

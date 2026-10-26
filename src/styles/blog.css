@@ -141,6 +141,12 @@
   tab-size: 2;
 }
 
+/* A code block is a tab stop (it may scroll sideways), so its focus shows like the links'. */
+.post-body pre:focus-visible {
+  outline: 2px solid #1e40af;
+  outline-offset: 2px;
+}
+
 .post-body pre code {
   display: block;
   min-width: max-content;

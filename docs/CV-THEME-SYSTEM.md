@@ -112,7 +112,8 @@ matter block and the body) with their images in `public/blog/<slug>/`. `src/lib/
 loader: `listPosts`, `getPost` and `latestPosts` read the folder, newest first, and show drafts only when
 `NODE_ENV` is `development`. The pages are `/blog` and `/blog/<slug>` in `src/app/(blog)/`, built
 statically, the body rendered to HTML at build time by `src/lib/blog/markdown.ts` (raw HTML in a post is
-dropped) and styled by `src/styles/blog.css`.
+dropped) and styled by `src/styles/blog.css`. Any other `/blog/<slug>` shows the blog's own 404
+(`src/app/(blog)/not-found.tsx`).
 
 The home page reads the newest 3 posts and hands them to `BlogProvider` (`src/components/blog/`). A world
 reads them with `usePosts()` and turns them into links with `postLinks` (`src/lib/blog/links.ts`), which

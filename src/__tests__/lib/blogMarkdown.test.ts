@@ -1,4 +1,7 @@
-import { renderMarkdown } from '@/lib/blog/markdown'
+import { renderMarkdown as render } from '@/lib/blog/markdown'
+
+const OPTIONS = { codeLabel: 'Code example' }
+const renderMarkdown = (body: string) => render(body, OPTIONS)
 
 describe('renderMarkdown', () => {
   it('turns a ts fence into Prism token spans', async () => {
@@ -22,5 +25,21 @@ describe('renderMarkdown', () => {
 
   it('reads GitHub flavoured tables', async () => {
     expect(await renderMarkdown('| a | b |\n|---|---|\n| 1 | 2 |')).toContain('<table>')
+  })
+
+  it('makes every code block a keyboard stop named by the label', async () => {
+    const html = await renderMarkdown('```ts\nconst a = 1\n```\n\nText\n\n```\nplain\n```')
+    const pres = html.match(/<pre[^>]*>/g) ?? []
+    expect(pres).toHaveLength(2)
+    pres.forEach((pre) => {
+      expect(pre).toContain('tabindex="0"')
+      expect(pre).toContain('role="group"')
+      expect(pre).toContain('aria-label="Code example"')
+    })
+  })
+
+  it('leaves text outside code blocks without a tab stop', async () => {
+    const html = await renderMarkdown('Before\n\n`inline` code\n\n```ts\nconst a = 1\n```')
+    expect(html.match(/tabindex/g)).toHaveLength(1)
   })
 })
