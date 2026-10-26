@@ -230,10 +230,13 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                 className="pointer-events-auto absolute -bottom-3 -top-3 left-0 w-11 -translate-x-1/2 cursor-ew-resize"
               >
                 <span className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-[color:var(--neon-hud)]" aria-hidden="true" />
-                <span className="absolute -top-1 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 bg-[color:var(--neon-hud)]" aria-hidden="true" />
-                {/* him riding the playhead through the years: walking while it plays, at rest when it stops */}
-                <span className="absolute bottom-full left-1/2 mb-2 block w-10 -translate-x-1/2" aria-hidden="true">
-                  <MercSprite profession="engineer" motion={reducedMotion ? 'still' : riding ? 'walk' : 'idle'} className="h-auto w-full" />
+                {/* the playhead diamond's box: the diamond turns inside it, and he rides on its top edge */}
+                <span className="absolute -top-1 left-1/2 block h-3 w-3 -translate-x-1/2" aria-hidden="true">
+                  <span className="block h-full w-full rotate-45 bg-[color:var(--neon-hud)]" />
+                  {/* him riding the playhead through the years: walking while it plays, at rest when it stops */}
+                  <span className="absolute bottom-full left-1/2 block w-10 -translate-x-1/2">
+                    <MercSprite profession="engineer" motion={reducedMotion ? 'still' : riding ? 'walk' : 'idle'} className="block h-auto w-full" />
+                  </span>
                 </span>
               </div>
             </div>
