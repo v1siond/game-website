@@ -1616,7 +1616,7 @@ function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
       {/* Projects - Bug Pull Reveal */}
       <div ref={projectsTrigger.ref}>
         <BugPullReveal triggered={projectsTrigger.triggered}>
-          <section className="relative z-20 py-6 md:py-8 px-4 md:px-6">
+          <section className="relative z-20 py-[var(--panel-top)] px-4 md:px-6">
             <div className="max-w-4xl mx-auto">
               <VoidFrame title={labels.sections.projects}>
                 <ProjectList

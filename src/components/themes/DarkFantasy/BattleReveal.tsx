@@ -62,7 +62,7 @@ const PHASE_TIMING = {
 // stands on: rolled left of where it stood and shrunk about its centre to DEAD_SCALE, then sunk by the height
 // that shrink lifts its box's bottom, so its body lies on that ground and not under it.
 const BUG_SIZE = 120
-const BUG_ASPECT = 0.85
+export const BUG_ASPECT = 0.85
 const DEAD_SCALE = 0.75
 const DEAD_LIE = `translateX(-120px) translateY(${(BUG_SIZE * BUG_ASPECT * (1 - DEAD_SCALE)) / 2}px)`
 const DEAD_POSE = `${DEAD_LIE} rotateZ(540deg) scale(${DEAD_SCALE})`

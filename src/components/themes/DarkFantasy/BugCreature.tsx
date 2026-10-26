@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, memo, ReactNode, useRef } from 'react'
+import { useState, useEffect, memo, ReactNode, useRef, type CSSProperties } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
-import { KnightCharacter } from './KnightCharacter'
-import { BattleBug } from './BattleReveal'
+import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
+import { FRAME_INSET_REM, KnightCharacter } from './KnightCharacter'
+import { BattleBug, BUG_ASPECT } from './BattleReveal'
 
 // ============================================
 // BUG ATTACK REVEAL ANIMATION
@@ -52,6 +52,10 @@ const ALEX_POSES: Record<AnimationPhase, AlexPose> = {
   'complete': { track: '15%', self: '0', opacity: 1, timing: '200ms ease-out' },
 }
 
+/** The bug's size, and how high it hovers once it floats: from low up to high and back. */
+const PULL_BUG_SIZE = 140
+const BUG_HOVER = { low: 70, high: 85 }
+
 /** The bug's pose: `track` is its x from the layer's right edge (negative is inward). */
 interface BugPose {
   track: string
@@ -72,11 +76,23 @@ const BUG_POSES: Record<AnimationPhase, BugPose> = {
     timing: '150ms ease-out',
   },
   'alex-blocks': { track: '-3%', transform: 'translateY(0) rotate(0deg)', opacity: 1, timing: '200ms ease-out' },
-  'attack-stance': { track: '-16%', transform: 'translateY(-70px)', opacity: 1, timing: '400ms ease-out', float: true },
-  'complete': { track: '-16%', transform: 'translateY(-70px)', opacity: 1, timing: '400ms ease-out', float: true },
+  'attack-stance': { track: '-16%', transform: `translateY(-${BUG_HOVER.low}px)`, opacity: 1, timing: '400ms ease-out', float: true },
+  'complete': { track: '-16%', transform: `translateY(-${BUG_HOVER.low}px)`, opacity: 1, timing: '400ms ease-out', float: true },
 }
 
 const BUG_FLOAT = 'bugFloat 1.5s ease-in-out infinite'
+
+/**
+ * The fight's stage. Its panel sits --panel-top inside it and draws its border --frame-inset inside that.
+ * From lg the fighters are pinned to the screen. Below lg a pinned fight stays over the long projects panel the
+ * whole way down, so there it is drawn in the page instead: a band above the panel, as tall as the fight at the
+ * phone scale (the bug's height at the peak of its hover), sunk into the panel's top inset so the fighters stand on
+ * the line the frame draws and nothing of theirs reaches the panel or the section above.
+ */
+const PULL_STAGE_CLASS = '[--panel-top:1.5rem] md:[--panel-top:2rem]'
+const PULL_STAGE = { '--frame-inset': `${FRAME_INSET_REM}rem`, minHeight: '280px' } as CSSProperties
+const PHONE_FIGHT_HEIGHT_PX = (PULL_BUG_SIZE * BUG_ASPECT + BUG_HOVER.high) * COMBAT_PHONE_SCALE
+const PHONE_FIGHT = { '--phone-scale': COMBAT_PHONE_SCALE, '--ground': '0px' } as CSSProperties
 const SHADOW_TIMING = '400ms ease-out'
 
 export const BugPullReveal = memo(function BugPullReveal({
@@ -189,55 +205,75 @@ export const BugPullReveal = memo(function BugPullReveal({
   const showBug = phase !== 'idle' && phase !== 'alex-enters'
   const showAlex = phase !== 'idle'
 
-  return (
-    <div ref={stageRef} className={`relative w-full ${className}`} style={{ minHeight: '280px' }}>
-      {/* Alex (knight) + bug pinned to the viewport bottom; only the content scrolls */}
-      {(showAlex || showBug) && (
-        <FixedCombatLayer inView={inView}>
-          {showAlex && (
-            <div className={`absolute inset-x-0 ${COMBAT_GROUND} z-10 pointer-events-none`} style={alexTrackStyle}>
-              <div className="absolute left-0 bottom-0" style={alexStyle}>
-                <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
-              </div>
-            </div>
-          )}
+  const fighters = (
+    <>
+      {showAlex && (
+        <div className={`absolute inset-x-0 ${COMBAT_GROUND} z-10 pointer-events-none`} style={alexTrackStyle}>
+          <div className="absolute left-0 bottom-0" style={alexStyle}>
+            <KnightCharacter scale={1.5} facingDirection="right" breathing={phase === 'complete'} />
+          </div>
+        </div>
+      )}
 
-          {showBug && (
-            <>
+      {showBug && (
+        <>
+          <div
+            className={`absolute inset-x-0 ${COMBAT_GROUND} pointer-events-none`}
+            style={{ transform: `translateX(${bug.track})`, transition: `transform ${SHADOW_TIMING}` }}
+          >
+            <div
+              className="absolute right-0 bottom-0"
+              style={{
+                transform: isFloating ? 'translateY(60px)' : 'translateY(40px)',
+                opacity: bug.opacity,
+                transition: moveAndFade(SHADOW_TIMING),
+                animation: isFloating ? BUG_FLOAT : undefined,
+              }}
+            >
+              {/* drawn at the floating size and scaled from its bottom right corner, so it grows
+                  up and to the left like a box anchored to the right and bottom */}
               <div
-                className={`absolute inset-x-0 ${COMBAT_GROUND} pointer-events-none`}
-                style={{ transform: `translateX(${bug.track})`, transition: `transform ${SHADOW_TIMING}` }}
-              >
-                <div
-                  className="absolute right-0 bottom-0"
-                  style={{
-                    transform: isFloating ? 'translateY(60px)' : 'translateY(40px)',
-                    opacity: bug.opacity,
-                    transition: moveAndFade(SHADOW_TIMING),
-                    animation: isFloating ? BUG_FLOAT : undefined,
-                  }}
-                >
-                  {/* drawn at the floating size and scaled from its bottom right corner, so it grows
-                      up and to the left like a box anchored to the right and bottom */}
-                  <div
-                    className="rounded-full origin-bottom-right"
-                    style={{
-                      width: 100,
-                      height: 20,
-                      background: 'radial-gradient(ellipse, rgba(15,10,26,0.6) 0%, transparent 70%)',
-                      transform: isFloating ? 'translateX(20px)' : 'translateX(20px) scale(0.8)',
-                      transition: `transform ${SHADOW_TIMING}`,
-                    }}
-                  />
-                </div>
-              </div>
-              <div className={`absolute inset-x-0 ${COMBAT_GROUND} z-30 pointer-events-none`} style={bugTrackStyle}>
-                <div className="absolute right-0 bottom-0" style={bugStyle}>
-                  <BattleBug size={140} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
-                </div>
-              </div>
-            </>
-          )}
+                className="rounded-full origin-bottom-right"
+                style={{
+                  width: 100,
+                  height: 20,
+                  background: 'radial-gradient(ellipse, rgba(15,10,26,0.6) 0%, transparent 70%)',
+                  transform: isFloating ? 'translateX(20px)' : 'translateX(20px) scale(0.8)',
+                  transition: `transform ${SHADOW_TIMING}`,
+                }}
+              />
+            </div>
+          </div>
+          <div className={`absolute inset-x-0 ${COMBAT_GROUND} z-30 pointer-events-none`} style={bugTrackStyle}>
+            <div className="absolute right-0 bottom-0" style={bugStyle}>
+              <BattleBug size={PULL_BUG_SIZE} legPhase={legPhase} antennaPhase={legPhase * 1.3} />
+            </div>
+          </div>
+        </>
+      )}
+    </>
+  )
+  const fighting = showAlex || showBug
+
+  return (
+    <div ref={stageRef} className={`relative w-full ${PULL_STAGE_CLASS} ${className}`} style={PULL_STAGE}>
+      {/* Below lg: the fight in the page, standing on the panel frame's top line (PULL_STAGE) */}
+      {fighting && (
+        <div
+          className="pointer-events-none relative -mb-[calc(var(--panel-top)_+_var(--frame-inset))] overflow-x-clip lg:hidden"
+          style={{ height: PHONE_FIGHT_HEIGHT_PX }}
+          aria-hidden="true"
+        >
+          <div className="absolute inset-0 origin-bottom scale-[var(--phone-scale)]" style={PHONE_FIGHT}>
+            {fighters}
+          </div>
+        </div>
+      )}
+
+      {/* From lg: Alex (knight) + bug pinned to the viewport bottom; only the content scrolls */}
+      {fighting && (
+        <FixedCombatLayer inView={inView}>
+          <div className="max-lg:hidden">{fighters}</div>
         </FixedCombatLayer>
       )}
 
@@ -247,8 +283,8 @@ export const BugPullReveal = memo(function BugPullReveal({
 
       <style>{`
         @keyframes bugFloat {
-          0%, 100% { transform: translateY(-70px); }
-          50% { transform: translateY(-85px); }
+          0%, 100% { transform: translateY(-${BUG_HOVER.low}px); }
+          50% { transform: translateY(-${BUG_HOVER.high}px); }
         }
       `}</style>
     </div>
