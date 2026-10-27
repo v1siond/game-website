@@ -193,7 +193,8 @@ export function Encounter({ profession, children }: EncounterProps) {
         </div>
       </div>
 
-      <Wardrobe look={OUTFIT_LOOK} ready={phase === 'ready'} className={`mt-4 ${PIXEL}`} />
+      {/* out of the flow: across the stage's top edge on a phone, at his right inside the stage from sm, under the room */}
+      <Wardrobe look={OUTFIT_LOOK} ready={phase === 'ready'} className={`c-wardrobe--fan-down-below-sm absolute left-0 -top-7 z-10 sm:left-[calc(50%_+_66px)] sm:top-28 ${PIXEL}`} />
 
       {children}
 

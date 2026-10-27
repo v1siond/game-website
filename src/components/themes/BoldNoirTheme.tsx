@@ -14,7 +14,8 @@ import { ProfessionMenu } from './BoldNoir/menu'
 import { ProfessionSet } from './BoldNoir/sets'
 import { SECTION_VIEWS } from './BoldNoir/sections'
 import { DeliveredCard } from './BoldNoir/contact'
-import { NOIR_VARS } from './BoldNoir/palette'
+import { NOIR, NOIR_VARS } from './BoldNoir/palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import world from './BoldNoir/world.module.css'
 
 // Bold Noir, a stylish heist night (black slabs and paper on crooked boxes,
@@ -27,6 +28,9 @@ import world from './BoldNoir/world.module.css'
 // The root carries the palette as --noir-* variables and the pointer as --mx and --my (-1 to 1), the
 // only inline styles, variables only. It clips sideways overflow with overflow-x: clip, not hidden:
 // hidden would make the root a scroll container.
+
+// The wardrobe's crooked cut-out slab over the menu: paper on ink, ringed in the red.
+const OUTFIT_LOOK: WardrobeLook = { plate: NOIR.ink, text: NOIR.paper, ring: NOIR.red }
 
 export default function BoldNoirTheme() {
   const { active } = useProfession()
@@ -50,6 +54,9 @@ export default function BoldNoirTheme() {
       <div data-worlds-hero="">
         <header className="relative z-30 px-4 pb-10 pt-16 sm:px-6 sm:py-16">
           <CallingCardHero />
+          {/* out of the flow, in the header so it stacks over the menu section (z-20): on a phone slim at the
+              right of the card's last link row, from sm centred across the header's foot, over the slabs */}
+          <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-sm c-wardrobe--fan-left-from-lg absolute bottom-10 right-4 z-10 sm:inset-x-0 sm:-bottom-[5px] lg:left-1/2 lg:right-auto lg:-translate-x-1/2" />
         </header>
 
         <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>

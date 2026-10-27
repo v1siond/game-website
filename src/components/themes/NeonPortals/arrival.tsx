@@ -240,7 +240,7 @@ function Stage({ profession, nav }: { profession: Profession; nav: { spin: strin
   const pose: BandicootPose = spinning ? 'spin' : 'idle'
 
   return (
-    <div>
+    <div className="relative">
       <div className={`relative aspect-[5/4] w-full overflow-hidden rounded-[2rem] border-[3px] border-[color:var(--np-void)] ${stage.frame}`}>
         <Chamber />
         <div className={`absolute bottom-[14%] left-1/2 h-[86%] w-[26%] -translate-x-1/2 ${stage.beam}`} aria-hidden="true">
@@ -265,7 +265,7 @@ function Stage({ profession, nav }: { profession: Profession; nav: { spin: strin
           </span>
         </button>
       </div>
-      <Wardrobe look={OUTFIT_LOOK} className="relative z-10 -mt-7 sm:-mt-9" />
+      <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--fan-down-below-sm c-wardrobe--fan-right-from-lg absolute left-0 -top-14 z-10 sm:right-0 sm:top-auto sm:-mt-10 lg:left-1/2 lg:right-auto lg:-translate-x-1/2" />
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <button type="button" onClick={spin} className={`${ui.button} ${ui.lit}`}>
           {nav.spin}

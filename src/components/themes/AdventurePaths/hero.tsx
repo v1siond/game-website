@@ -364,9 +364,9 @@ export function ExpeditionHero({ name }: { name: string }) {
           {/* his trail tag pinned to the map beside him, out of the flow: under the low landmark labels
               from lg (he stands round the middle of the lower map), across the map's bottom edge below lg,
               where the landmarks and their labels fill the map */}
-          <Wardrobe look={OUTFIT_LOOK} ready={reached.landed} className="absolute inset-x-0 bottom-[-12px] z-10 lg:inset-x-auto lg:bottom-auto lg:left-[24.6%] lg:top-[69.9%]" />
+          <Wardrobe look={OUTFIT_LOOK} ready={reached.landed} className="c-wardrobe--fan-right-from-lg c-wardrobe--fan-down-from-lg absolute inset-x-0 bottom-[-10px] z-10 lg:inset-x-auto lg:bottom-auto lg:left-[24.6%] lg:top-[69.9%]" />
         </div>
-        <p className="mx-auto mt-5 w-fit rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-center text-sm text-white">{trail.walkHint}</p>
+        <p className="mx-auto mt-3 w-fit rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-center text-sm text-white">{trail.walkHint}</p>
       </section>
     </div>
   )

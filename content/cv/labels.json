@@ -490,7 +490,10 @@
         "lensCaption": "{name}",
         "lensGo": "Go to {name}",
         "lensAria": "Look into {name}",
-        "faceAria": "Next world: {name}. Open all {count} worlds"
+        "faceAria": "Next world: {name}. Open all {count} worlds",
+        "wardrobeCount": "Outfit {n} of {count}",
+        "lensClick": "Click to go",
+        "lensHold": "Let go, then tap Go"
       }
     }
   },
@@ -985,7 +988,10 @@
         "lensCaption": "{name}",
         "lensGo": "Ir a {name}",
         "lensAria": "Asomarse a {name}",
-        "faceAria": "Siguiente mundo: {name}. Abrir los {count} mundos"
+        "faceAria": "Siguiente mundo: {name}. Abrir los {count} mundos",
+        "wardrobeCount": "Atuendo {n} de {count}",
+        "lensClick": "Haz clic para ir",
+        "lensHold": "Suelta y toca Ir"
       }
     }
   },
@@ -1480,7 +1486,10 @@
         "lensCaption": "{name}",
         "lensGo": "Vai a {name}",
         "lensAria": "Guarda dentro {name}",
-        "faceAria": "Prossimo mondo: {name}. Apri tutti i {count} mondi"
+        "faceAria": "Prossimo mondo: {name}. Apri tutti i {count} mondi",
+        "wardrobeCount": "Costume {n} di {count}",
+        "lensClick": "Clicca per andare",
+        "lensHold": "Rilascia, poi tocca Vai"
       }
     }
   }

@@ -6,7 +6,9 @@
    world's palette: --wd-plate the fill, --wd-text the name, the arrows and the plate's edge (7 to 1 or more
    on the fill), --wd-ring the outer ring that keeps the plate 3 to 1 apart from the scene behind it.
    Each world then gives the plate its own idiom below (.c-wardrobe--<world id>): its lettering, corners,
-   edge and arrow keys. The name is 16 px (14 px floor), each arrow a 44 by 44 px target. Only transform and
+   edge and arrow keys. The name is 16 px (14 px floor) over its count line, "Outfit n of 17" at 12.5 px in the
+   same colour, each arrow a 44 by 44 px target. Every hero places the plate out of the page flow, so the
+   plate never moves the hero's own boxes. Only transform and
    opacity move; the fan of outfits plays once per visit for --wd-fan-ms (WARDROBE_FAN_MS) and never
    under reduced motion.
    =================================================================== */
@@ -40,17 +42,30 @@
   box-shadow: 0 0 0 2px var(--wd-ring), 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
-.c-wardrobe__name {
+.c-wardrobe__label {
+  display: grid;
   flex: 1 1 auto;
+  justify-items: center;
+  gap: 2px;
   padding: 0 8px;
   font-family: var(--wd-face);
+  text-align: center;
+  text-transform: var(--wd-case);
+  white-space: nowrap;
+}
+
+.c-wardrobe__name {
   font-size: 16px;
   font-weight: var(--wd-weight);
   line-height: 1.2;
   letter-spacing: var(--wd-track);
-  text-align: center;
-  text-transform: var(--wd-case);
-  white-space: nowrap;
+}
+
+.c-wardrobe__count {
+  font-size: 12.5px;
+  font-weight: var(--wd-weight);
+  line-height: 1.2;
+  letter-spacing: 0.05em;
 }
 
 .c-wardrobe__key {
@@ -153,6 +168,51 @@
   }
 }
 
+/* A plate placed over his figure on a narrow screen (the first screen's top edge, a stage's top): the fan opens
+   downward, over him, instead of past the top of the screen. */
+@media (max-width: 639.98px) {
+  .c-wardrobe--fan-down-below-sm .c-wardrobe__fan {
+    top: calc(100% + 8px);
+    bottom: auto;
+  }
+}
+@media (max-width: 767.98px) {
+  .c-wardrobe--fan-down-below-md .c-wardrobe__fan {
+    top: calc(100% + 8px);
+    bottom: auto;
+  }
+}
+@media (max-width: 1023.98px) {
+  .c-wardrobe--fan-down-below-lg .c-wardrobe__fan {
+    top: calc(100% + 8px);
+    bottom: auto;
+  }
+}
+
+/* From lg, where the free room around a plate is not above it: the fan opens below it, level with it, or to one
+   side, each side card clear of the plate by its shift (78 % of a card) plus 20 px. A side fan needs a .c-wardrobe
+   as wide as its plate. */
+@media (min-width: 1024px) {
+  .c-wardrobe--fan-down-from-lg .c-wardrobe__fan {
+    top: calc(100% + 8px);
+    bottom: auto;
+  }
+  .c-wardrobe--fan-level-from-lg .c-wardrobe__fan {
+    top: 50%;
+    bottom: auto;
+    margin-top: calc(var(--wd-card-w) * -2 / 3);
+  }
+  .c-wardrobe--fan-right-from-lg .c-wardrobe__fan {
+    left: calc(100% + var(--wd-card-w) * 0.78 + 20px);
+    margin-left: 0;
+  }
+  .c-wardrobe--fan-left-from-lg .c-wardrobe__fan {
+    right: calc(100% + var(--wd-card-w) * 0.78 + 20px);
+    left: auto;
+    margin-left: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .c-wardrobe__fan { display: none; }
   .c-wardrobe__key { transition: none; }
@@ -170,7 +230,55 @@
   --wd-track: 0.08em;
   --wd-weight: 400;
 }
-.c-wardrobe--retro-atomic .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 0 10px color-mix(in srgb, var(--wd-text) 35%, transparent); }
+/* The design's split readout (b.js): the plate takes his frame's box (WristComputer places the wardrobe over
+   it), its keys stand at the frame's sides at mid-height (beside them on a phone, where the frame is 112 px
+   wide, inside them from md, where the text column starts right after the frame), the name reads on a strip
+   under the frame and the count on a tab over it, each across the bracket by 11 px. The fan opens over him
+   with 64 px cards, which keep clear of the text column at its side. */
+.c-wardrobe--retro-atomic { --wd-card-w: 64px; }
+.c-wardrobe--retro-atomic .c-wardrobe__plate {
+  position: absolute;
+  inset: 0;
+  display: block;
+  min-height: 0;
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.c-wardrobe--retro-atomic .c-wardrobe__label { display: contents; }
+.c-wardrobe--retro-atomic .c-wardrobe__name,
+.c-wardrobe--retro-atomic .c-wardrobe__count {
+  position: absolute;
+  left: 50%;
+  padding: 3px 12px;
+  background-color: var(--wd-plate);
+  border: 1px solid var(--wd-text);
+  box-shadow: 0 0 0 2px var(--wd-ring), 0 0 10px color-mix(in srgb, var(--wd-text) 35%, transparent);
+  transform: translateX(-50%);
+}
+.c-wardrobe--retro-atomic .c-wardrobe__name { top: calc(100% - 11px); }
+.c-wardrobe--retro-atomic .c-wardrobe__count {
+  bottom: calc(100% - 11px);
+  padding: 2px 8px;
+}
+.c-wardrobe--retro-atomic .c-wardrobe__key {
+  position: absolute;
+  top: 50%;
+  margin-top: -22px;
+  box-shadow: 0 0 0 2px var(--wd-ring), 0 0 8px color-mix(in srgb, var(--wd-text) 45%, transparent);
+}
+.c-wardrobe--retro-atomic .c-wardrobe__key:first-child { right: calc(100% + 4px); }
+.c-wardrobe--retro-atomic .c-wardrobe__key:last-child { left: calc(100% + 4px); }
+.c-wardrobe--retro-atomic .c-wardrobe__fan {
+  top: 50%;
+  bottom: auto;
+  margin-top: calc(var(--wd-card-w) * -2 / 3);
+}
+@media (min-width: 768px) {
+  .c-wardrobe--retro-atomic .c-wardrobe__key:first-child { right: auto; left: 0; }
+  .c-wardrobe--retro-atomic .c-wardrobe__key:last-child { left: auto; right: 0; }
+}
 
 /* Neon Portals: a chunky pill on the stage floor at his feet, round keys like the world's Spin button. */
 .c-wardrobe--neon-portals {
@@ -182,7 +290,8 @@
   --wd-weight: 400;
 }
 .c-wardrobe--neon-portals .c-wardrobe__plate { padding: 4px 6px; box-shadow: 0 0 0 2px var(--wd-ring), 0 4px 0 var(--wd-ring); }
-.c-wardrobe--neon-portals .c-wardrobe__name { font-size: 19px; padding: 0 14px; }
+.c-wardrobe--neon-portals .c-wardrobe__label { padding: 0 14px; }
+.c-wardrobe--neon-portals .c-wardrobe__name { font-size: 19px; }
 .c-wardrobe--neon-portals .c-wardrobe__key { color: var(--wd-plate); background-color: var(--wd-text); }
 .c-wardrobe--neon-portals .c-wardrobe__key:hover { color: var(--wd-text); background-color: var(--wd-plate); }
 
@@ -230,6 +339,16 @@
   --wd-weight: 900;
 }
 .c-wardrobe--bold-noir .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 6px 6px 0 var(--wd-ring); }
+/* From lg the plate sits between the calling card above and the profession cards below (BoldNoirTheme.tsx): his
+   outfits fan out to its left with their feet on the plate's foot, under the card's lettering and clear of the
+   tilted Musician card. */
+@media (min-width: 1024px) {
+  .c-wardrobe--bold-noir .c-wardrobe__fan {
+    top: auto;
+    bottom: 0;
+    margin-top: 0;
+  }
+}
 
 /* Cell Shaded: a comic speech plate with a thick ink outline and a flat ink drop shadow. */
 .c-wardrobe--cell-shaded {
@@ -315,15 +434,17 @@
   --wd-track: 0.04em;
 }
 .c-wardrobe--rubber-hose .c-wardrobe__plate { box-shadow: 3px 4px 0 var(--wd-ring); }
-/* From lg the plate stands at his side under the contact row (RubberHoseTheme.tsx), so his outfits fan out
-   to the plate's right along its top edge, clear of the lines and links above it. The fan's centre sits past the
-   plate by a side card's shift (78 % of a card) and half a card, plus 20 px: about 10 px for the tilted card's
-   corner and 10 px of air. */
+/* From lg the plate stands at his side across the card's bottom edge (RubberHoseTheme.tsx), so his outfits fan
+   out to the plate's left along its top edge, over him and clear of the profession badges to its right. The
+   fan's right edge sits short of the plate by a side card's shift (78 % of a card) plus 20 px: about 10 px for
+   the tilted card's corner and 10 px of air. */
 @media (min-width: 1024px) {
   .c-wardrobe--rubber-hose .c-wardrobe__fan {
     top: 0;
+    right: calc(100% + var(--wd-card-w) * 0.78 + 20px);
     bottom: auto;
-    left: calc(100% + var(--wd-card-w) * 0.78 + var(--wd-card-w) / 2 + 20px);
+    left: auto;
+    margin-left: 0;
   }
 }
 

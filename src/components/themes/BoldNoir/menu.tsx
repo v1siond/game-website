@@ -6,7 +6,6 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { DETECTIVE_HOST, Detective, type DetectiveMotion } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -22,9 +21,6 @@ import world from './world.module.css'
 const JAG = 'M6 18 L60 4 L72 14 L150 0 L196 22 L184 46 L198 70 L132 96 L118 84 L40 100 L2 74 L14 50 Z'
 
 const WALK_ON: readonly DetectiveMotion[] = ['walk']
-
-// The wardrobe's crooked cut-out slab under the menu: paper on ink, ringed in the red.
-const OUTFIT_LOOK: WardrobeLook = { plate: NOIR.ink, text: NOIR.paper, ring: NOIR.red }
 
 /**
  * Him in one slab: the walk in from the slab's left, then the idle; still under reduced motion. The
@@ -107,8 +103,6 @@ export function ProfessionMenu({ active }: { active: Profession }) {
 
   return (
     <>
-      {/* over the slabs, so on a phone it shows on the first screen right above his figure */}
-      <Wardrobe look={OUTFIT_LOOK} className="mb-8" />
       <ProfessionSwitch
         className="mx-auto grid max-w-xl grid-cols-3 gap-2 sm:flex sm:max-w-none sm:justify-center sm:gap-10"
         label={navigation.profession}

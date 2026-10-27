@@ -121,7 +121,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
             <path d="M4 4 Q100 40 196 4 L196 30 L4 30 Z" fill={MYTH.bloodDeep} />
             <path d="M4 4 Q100 40 196 4" fill="none" stroke={MYTH.inkLine} strokeWidth={3} />
           </svg>
-          <Wardrobe look={OUTFIT_LOOK} ready={done} className={`mt-8 ${u.display}`} />
+          <Wardrobe look={OUTFIT_LOOK} ready={done} className={`c-wardrobe--fan-down-below-md c-wardrobe--fan-down-from-lg absolute inset-x-0 bottom-[calc(100%_+_12px)] z-10 md:bottom-auto md:top-[calc(100%_+_2rem)] ${u.display}`} />
         </div>
 
         <RecruiterHero

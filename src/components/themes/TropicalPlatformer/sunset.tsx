@@ -247,9 +247,9 @@ export function SunsetHero() {
           data-again={shot > 0 || undefined}
           className={`mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2 md:gap-12 ${sunset.hero}`}
         >
-          <div>
+          <div className="relative">
             <SunsetScene shot={shot} onBlast={() => setShot((count) => count + 1)} blastLabel={jungle.blastAgain} />
-            <Wardrobe look={OUTFIT_LOOK} ready={triggered} className={`mt-5 ${look.display}`} />
+            <Wardrobe look={OUTFIT_LOOK} ready={triggered} className={`c-wardrobe--slim-below-lg absolute inset-x-0 top-[calc(100%_-_6px)] z-10 md:top-[calc(100%_+_1.25rem)] ${look.display}`} />
           </div>
 
           <div className="text-center md:text-left">

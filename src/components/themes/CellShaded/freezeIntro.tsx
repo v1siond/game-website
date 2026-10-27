@@ -113,7 +113,7 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
       <div className={`relative mx-auto grid min-h-[86vh] max-w-6xl items-end gap-6 px-4 pb-20 pt-24 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center ${cel.shake}`}>
         {/* a pointer extra: pointing at him or clicking him plays his action, the same as each section shows */}
         {/* his box: he runs in inside it, and the mesa hangs from its bottom edge, so his bottom is the ridge top */}
-        <div className="flex flex-col items-center gap-4">
+        <div className="relative flex flex-col items-center gap-4">
           <div data-worlds-figure="" className="relative mx-auto h-64 w-40 sm:h-80 sm:w-48" aria-hidden="true">
             <Mesa />
             <div
@@ -135,7 +135,7 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
               </div>
             </div>
           </div>
-          <Wardrobe look={OUTFIT_LOOK} ready={done} className="relative z-10" />
+          <Wardrobe look={OUTFIT_LOOK} ready={done} className="c-wardrobe--fan-down-below-md absolute inset-x-0 bottom-[calc(100%_+_1rem)] z-10 md:bottom-auto md:top-[calc(100%_+_1rem)]" />
         </div>
 
         <RecruiterHero

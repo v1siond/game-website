@@ -40,11 +40,12 @@ export function HallHero({ profession }: { profession: Profession }) {
   return (
     <RecruiterHero
       render={({ name, headline, tagline, line, actions }) => (
-        <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
+        <div className="relative mx-auto max-w-6xl px-4 pt-6 sm:px-6">
           <div className="h-[14vh]" aria-hidden="true" />
           {profession === 'engineer' && <p className={`mx-auto w-fit bg-[color:var(--sh-void)] px-3 py-1 text-center text-sm italic text-[color:var(--sh-fog-text)] ${look.typed}`}>{words.aimHint}</p>}
 
-          <Wardrobe look={OUTFIT_LOOK} ready={shown} className="mx-auto mt-6 max-w-4xl lg:justify-start" />
+          {/* out of the flow: in the free band over the aim hint below lg, under the panel at his side from lg */}
+          <Wardrobe look={OUTFIT_LOOK} ready={shown} className="c-wardrobe--fan-right-from-lg c-wardrobe--fan-level-from-lg absolute inset-x-0 top-[calc(1.5rem_+_7vh_-_28px)] z-10 mx-auto max-w-4xl lg:right-auto lg:left-[calc(50%_-_28rem)] lg:top-[calc(100%_+_1.5rem)]" />
 
           <div className={`relative mx-auto mt-6 max-w-4xl p-6 ${look.panel}`}>
             <div className="relative overflow-hidden">

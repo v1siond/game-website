@@ -255,9 +255,10 @@ export function WristComputer({ booted, instant }: WristComputerProps) {
               <SectionTabs profession={active} />
 
               <div key={active} className={`mt-5 grid items-center gap-6 md:grid-cols-[auto_1fr] ${atomic.powerOn}`}>
-                <div className="flex flex-col items-center gap-3">
+                <div className="relative flex flex-col items-center gap-3">
                   <StatusFigure profession={active} />
-                  <Wardrobe look={OUTFIT_LOOK} ready={booted || instant} />
+                  {/* over his frame's own box (w-28, sm:w-36), out of the flow: the split readout in wardrobe.css */}
+                  <Wardrobe look={OUTFIT_LOOK} ready={booted || instant} className="absolute inset-0 mx-auto w-28 sm:w-36" />
                 </div>
                 <RecruiterHero
                   render={({ name, headline, tagline, line }) => <BootText lines={[name, headline, tagline, line]} running={booted} instant={instant} />}

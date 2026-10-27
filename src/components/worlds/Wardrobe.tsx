@@ -7,7 +7,8 @@ import { useWorldTransition } from '@/themes/WorldTransitionContext'
 import { getThemeById } from '@/themes/themes'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
-import { WARDROBE_FAN_KEY, WARDROBE_FAN_MS, followingInTour, previousInTour } from '@/lib/worlds/nudge'
+import { TOUR_ORDER, WARDROBE_FAN_KEY, WARDROBE_FAN_MS, followingInTour, previousInTour } from '@/lib/worlds/nudge'
+import { outfitPlace } from '@/lib/worlds/wardrobe'
 import { useWorldsLabels } from './WorldsLabels'
 
 /**
@@ -161,9 +162,23 @@ function useSwipeAcrossFigure(onStep: (step: Step) => void) {
   }, [])
 }
 
+/** The plate's two lines: the outfit he wears (the world's name), then its place, "Outfit n of 17". */
+function OutfitLabel({ id, name }: { id: string; name: string }) {
+  const labels = useWorldsLabels()
+  const place = outfitPlace(id)
+
+  return (
+    <span className="c-wardrobe__label">
+      <span className="c-wardrobe__name">{name}</span>
+      {place !== null && <span className="c-wardrobe__count">{fillLabel(labels.wardrobeCount, { n: place, count: TOUR_ORDER.length })}</span>}
+    </span>
+  )
+}
+
 /**
- * The wardrobe, one per hero: a plate beside his figure naming the outfit he wears (the world), with a
- * previous and a next arrow. Next, a swipe across him to the left or ArrowRight inside the plate go to the
+ * The wardrobe, one per hero: a plate beside his figure naming the outfit he wears (the world) and its place
+ * in the tour, with a previous and a next arrow. The hero places it out of the page flow, so nothing of
+ * the hero moves for it. Next, a swipe across him to the left or ArrowRight inside the plate go to the
  * next world of TOUR_ORDER through the portal (selectWorld, as the picker does); previous, a swipe to the
  * right or ArrowLeft to the one before, in a circle. On the first visit his previous, current and next
  * outfits fan out of the plate for WARDROBE_FAN_MS (never under reduced motion). The look per world is
@@ -200,7 +215,7 @@ export default function Wardrobe({ look, className = '', ready = true }: Wardrob
         <button type="button" onClick={() => go(-1)} aria-label={fillLabel(labels.wardrobePrev, { name: getThemeById(previous).name })} className="c-wardrobe__key">
           <Chevron step={-1} />
         </button>
-        <span className="c-wardrobe__name">{theme.name}</span>
+        <OutfitLabel id={theme.id} name={theme.name} />
         <button type="button" onClick={() => go(1)} aria-label={fillLabel(labels.wardrobeNext, { name: getThemeById(next).name })} className="c-wardrobe__key">
           <Chevron step={1} />
         </button>
