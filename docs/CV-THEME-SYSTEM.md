@@ -99,9 +99,13 @@ Artistic.
   still opens the picker.
 - The lens (`src/components/worlds/WorldLens.tsx`): a mouse over the launcher, the keyboard's focus on it, or
   a press held 0.45 s on a touch screen opens a round lens under it onto a still of the next world's hero,
-  centred on his figure, with the world's name inside its lower edge in the launcher's colours (15 px). A
-  click inside the lens goes there through the portal. The keyboard gets a "Go to <name>" button, the next
-  Tab stop after the launcher, and so does a finger once it lifts; a tap elsewhere closes it. Escape closes
+  centred on his figure, with the world's name inside its lower edge in the launcher's colours (15 px). Under
+  the name a second line says what to do, 14 px in the launcher's body colour: "Click to go" (`lensClick`)
+  under the mouse and "Let go, then tap Go" (`lensHold`) while a finger holds it. A click inside the lens
+  goes there through the portal. The keyboard gets a "Go to <name>" button, the next Tab stop after the
+  launcher, and so does a finger once it lifts; the button takes the second line's place, and a tap
+  elsewhere closes it. The lens's top is `--wl-lens-top` in `worlds-nudge.css`: the launcher's bottom
+  (`--wl-launcher-bottom`) plus 6 px under 640 px and 2 px from 640 px up, so 66 px and 72 px. Escape closes
   it and leaves the focus on the launcher; the mouse leaving the launcher and the lens closes it too. Enter
   on the launcher opens the picker as before. The lens fades and grows in for 0.18 s (no growth under
   reduced motion). It reads the 1440 still on a screen 640 px wide or more and the 390 one below. The still
@@ -115,15 +119,28 @@ Artistic.
   by 900 and 390 by 844), `portraits/<id>.webp` his figure (the `data-worlds-figure` box at 1440, 160 px at
   most, drawn alone on a transparent ground; a figure that shows only further down, Dark Fantasy's knights
   or Medieval Fantasy's frost figure, is scrolled to first), and `focus.json`, the centre of that figure in
-  each still where it is drawn on screen, where the lens looks (the middle of the hero's upper part when it
-  is not). Once every world's shots are written it writes `stamp.json`, per world a sha256 of its hero
+  each still, where the lens looks. Every lens still shows him drawn: at first paint when he is drawn there,
+  else where the capture's scroll first finds him drawn (Dark Fantasy's knight shows only while Work
+  Experience is in view, Medieval Fantasy's frost figure fades in as the page scrolls, Survival Horror's panel
+  covers him on the first screen). Below opacity 1 the capture then scrolls on half a screen at a time
+  while his settled opacity keeps rising, and takes the still where it was highest and he still shows
+  (Medieval Fantasy's frost figure brightens with the scroll; Dark Fantasy's knight rests at 0.7 and stays
+  where he was found). A width that lays out no figure at all (Rubber Hose at 390) is shot at the
+  top, with the lens on the middle of the hero's upper part; a figure laid out but never drawn makes the
+  capture name the world, write no stamp and exit 1. Drawn, for every world, the portrait and `focus.json`
+  alike, means his opacity is settled (the same on two reads 0.6 s apart, nothing running on him or around
+  him) and above 0, and at least 30% of his own pixels (those he paints drawn alone) change when he alone is
+  hidden, so a figure fading in or painted under a panel is not drawn. The worlds hint is hidden in every
+  shot like the launcher.
+  Once every world's shots are written it writes `stamp.json`, per world a sha256 of its hero
   sources; a run that exits 1 leaves it as it was. It refuses to start while another headless Chromium
   runs, closes its own, and exits 1 naming any world with no figure to crop. It takes about 6 minutes for
   the 17 worlds.
 - Refresh them after changing a hero: run the capture and commit the previews and `stamp.json` with the
   hero. `node scripts/check-world-previews.mjs` (`npm run check:previews`, run as `prebuild`) hashes each
   world's hero sources again (everything under `src/components/themes/<World>/`, its `<World>Theme.tsx` and
-  module CSS, and `src/styles/themes/<id>.css`) and compares them with the stamp the capture wrote, by
+  module CSS, `src/styles/themes/<id>.css`, and the files every hero shares: `Wardrobe.tsx`,
+  `wardrobe.css` and `content/cv/labels.json`, whose plate words show in every still) and compares them with the stamp the capture wrote, by
   content: it fails the build and names the world whose hash is missing or differs, or that has no
   `<id>-1440.webp` still. It reads files only, so any clone or copy (Netlify) reads the same, and it never
   launches a browser.

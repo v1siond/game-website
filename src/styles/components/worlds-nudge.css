@@ -24,11 +24,13 @@
 
 /* Where the launcher stands and how tall its tallest face is (the turned face: his portrait inside the
    padding and the 2 px border, top and bottom), so the hint card hangs under it whichever face it shows or
-   turns to while the card is open. The launcher reads its top, padding and portrait size from here and the
-   hint its top, so a change of the face moves the card with it; nothing measures either at run time. The
-   card's top leaves the gap, then the slide it opens with, so even its first frame is clear of the launcher. */
+   turns to while the card is open. The launcher reads its top, padding and portrait size from here, and the
+   hint and the lens their tops, so a change of the face moves both with it; nothing measures them at run
+   time. The card's top leaves the gap, then the slide it opens with, so even its first frame is clear of the
+   launcher; the lens opens from its top edge, so it leaves only its own gap. */
 .c-worlds-launcher,
-.c-worlds-hint {
+.c-worlds-hint,
+.c-world-lens {
   --wl-launcher-top: 8px;
   --wl-launcher-pad-y: 4px;
   --wl-face-size: 40px;
@@ -36,13 +38,17 @@
   --wl-hint-gap: 12px;
   --wl-hint-slide: 8px;
   --wl-hint-top: calc(var(--wl-launcher-bottom) + var(--wl-hint-gap) + var(--wl-hint-slide));
+  --wl-lens-gap: 6px;
+  --wl-lens-top: calc(var(--wl-launcher-bottom) + var(--wl-lens-gap));
 }
 @media (min-width: 640px) {
   .c-worlds-launcher,
-  .c-worlds-hint {
+  .c-worlds-hint,
+  .c-world-lens {
     --wl-launcher-top: 16px;
     --wl-launcher-pad-y: 8px;
     --wl-face-size: 34px;
+    --wl-lens-gap: 2px;
   }
 }
 
@@ -160,6 +166,8 @@
   background-color: var(--wl-fill);
   border: 1.5px solid var(--wl-text);
 }
+/* The second line under the name, how to go there (a click, or letting go then Go), in running text. */
+.c-world-lens__line { color: var(--wl-body); }
 .c-world-lens__go {
   color: var(--wl-fill);
   background-color: var(--wl-text);

@@ -26,7 +26,10 @@ const WIDE_QUERY = '(min-width: 640px)'
 // Where the capture saved the centre of his figure in each still (scripts/capture-world-previews.mjs).
 const FOCUS_URL = '/world-previews/focus.json'
 
-const SHOWS_GO: Record<LensMode, boolean> = { hover: false, focus: true, hold: false, held: true }
+// What the caption under the world's name holds per mode: the "Go to <name>" button for the keyboard and a
+// lifted finger, else a second line saying how to go there (a click, or letting go then Go).
+type CaptionKind = 'go' | 'lensClick' | 'lensHold'
+const CAPTION_OF: Record<LensMode, CaptionKind> = { hover: 'lensClick', focus: 'go', hold: 'lensHold', held: 'go' }
 
 // Read once per page view, on the first opening, and shared by every later one. An unreadable file reads as
 // null, and lensFocus then centres on the middle of the hero.
@@ -178,8 +181,9 @@ interface WorldLensProps {
 
 /**
  * The round lens under the launcher onto a still of the next world's hero, centred on his figure, with the
- * world's name inside its lower edge. A click inside goes there through the portal; the keyboard and a
- * lifted finger get a "Go to <name>" button. The still (and the figure centres) load on the first opening
+ * world's name inside its lower edge and under it how to go there ("Click to go", or "Let go, then tap Go"
+ * while a finger holds the launcher). A click inside goes there through the portal; the keyboard and a
+ * lifted finger get a "Go to <name>" button in their place. The still (and the figure centres) load on the first opening
  * only, never with the page.
  */
 export default function WorldLens({ mode, nextId, nextName, onGo, style }: WorldLensProps) {
@@ -201,12 +205,13 @@ export default function WorldLens({ mode, nextId, nextName, onGo, style }: World
   const width: LensWidth = wide ? 1440 : 390
   const point = lensFocus(focusMap, nextId, width)
   const stillVars = { '--lens-x': point.x, '--lens-y': point.y } as CSSProperties
+  const caption = CAPTION_OF[mode]
   return (
     <div
       role="group"
       aria-label={fillLabel(labels.lensAria, { name: nextName })}
       style={style}
-      className="c-world-lens fixed inset-x-0 top-[66px] z-[149] mx-auto aspect-square w-[220px] sm:left-auto sm:right-4 sm:top-[72px] sm:mx-0 sm:w-[260px]"
+      className="c-world-lens fixed inset-x-0 top-[var(--wl-lens-top)] z-[149] mx-auto aspect-square w-[220px] sm:left-auto sm:right-4 sm:mx-0 sm:w-[260px]"
     >
       <div aria-hidden="true" onClick={onGo} className="c-world-lens__window absolute inset-0 cursor-pointer overflow-hidden rounded-full">
         <Image
@@ -220,15 +225,20 @@ export default function WorldLens({ mode, nextId, nextName, onGo, style }: World
           className="c-world-lens__still absolute left-0 top-0 max-w-none"
         />
       </div>
-      <div className="c-world-lens__caption absolute inset-x-0 bottom-3 mx-auto w-[72%] rounded-xl px-2 py-1 text-center">
-        {SHOWS_GO[mode] ? (
+      <div className="c-world-lens__caption absolute inset-x-0 bottom-6 mx-auto w-[72%] rounded-xl px-2 py-1 text-center">
+        {caption === 'go' ? (
           <button type="button" onClick={onGo} className="c-world-lens__go grid min-h-11 w-full place-items-center rounded-lg px-2 text-[15px] font-bold leading-tight">
             {fillLabel(labels.lensGo, { name: nextName })}
           </button>
         ) : (
-          <span aria-hidden="true" className="block text-[15px] font-bold leading-tight">
-            {fillLabel(labels.lensCaption, { name: nextName })}
-          </span>
+          <>
+            <span aria-hidden="true" className="block text-[15px] font-bold leading-tight">
+              {fillLabel(labels.lensCaption, { name: nextName })}
+            </span>
+            <span aria-hidden="true" className="c-world-lens__line block text-sm font-semibold leading-tight">
+              {labels[caption]}
+            </span>
+          </>
         )}
       </div>
     </div>

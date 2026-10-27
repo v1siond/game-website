@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // Fails when a world's previews were not taken from its hero as it stands. The capture writes
 // public/world-previews/stamp.json, per world a sha256 of its hero sources at that moment: everything under
-// src/components/themes/<World>/, its <World>Theme.tsx and any <World>Theme*.module.css beside it, and
-// src/styles/themes/<id>.css when it exists. This check hashes the same files again and names each world whose
+// src/components/themes/<World>/, its <World>Theme.tsx and any <World>Theme*.module.css beside it,
+// src/styles/themes/<id>.css when it exists, and the files every still draws from, the wardrobe's plate
+// (src/components/worlds/Wardrobe.tsx, src/styles/components/wardrobe.css) and its words
+// (content/cv/labels.json), so a change to the plate stales every world. This check hashes the same files again and names each world whose
 // stamp is missing or differs, and each world with no 1440 lens still. It compares content only, so any clone
 // or copy of the site (Netlify) reads the same, and a capture that writes the same bytes again still passes.
 // It reads files only and never launches a browser; it runs as prebuild (npm run check:previews).
@@ -16,6 +18,9 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const THEMES_DIR = 'src/components/themes'
 const REGISTRY = 'src/themes/worlds.ts'
 const STAMP = 'public/world-previews/stamp.json'
+
+// Drawn in every world's stills: the wardrobe's plate, its styles and its name and count text.
+const SHARED_SOURCES = ['src/components/worlds/Wardrobe.tsx', 'src/styles/components/wardrobe.css', 'content/cv/labels.json']
 
 /** The still the check requires for a world: the 1440 px lens still. */
 const stillOf = (id) => `public/world-previews/${id}-1440.webp`
@@ -38,13 +43,13 @@ const filesUnder = (dir) =>
     .filter((entry) => entry.isFile())
     .map((entry) => join(entry.parentPath, entry.name).slice(ROOT.length).split('\\').join('/'))
 
-/** The hero sources of a world that exist in the tree, as paths from the site root. */
+/** The hero sources of a world that exist in the tree, the shared ones included, as paths from the site root. */
 function heroSources({ id, name }) {
   const folder = `${THEMES_DIR}/${name}`
   const modules = readdirSync(join(ROOT, THEMES_DIR))
     .filter((file) => file.startsWith(`${name}Theme`) && file.endsWith('.module.css'))
     .map((file) => `${THEMES_DIR}/${file}`)
-  const files = [`${THEMES_DIR}/${name}Theme.tsx`, `src/styles/themes/${id}.css`].filter((path) => existsSync(join(ROOT, path)))
+  const files = [`${THEMES_DIR}/${name}Theme.tsx`, `src/styles/themes/${id}.css`, ...SHARED_SOURCES].filter((path) => existsSync(join(ROOT, path)))
   const nested = existsSync(join(ROOT, folder)) ? filesUnder(folder) : []
   return [...nested, ...files, ...modules]
 }
