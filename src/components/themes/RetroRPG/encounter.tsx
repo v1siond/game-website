@@ -8,10 +8,14 @@ import { usePreview } from '@/themes/PreviewContext'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { RoomWalker, StageWalker } from './walker'
 import sprite from './sprite.module.css'
-import { RPG } from './palette'
+import { PIXEL, RPG } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import type { Play } from './play'
 import { Soul } from './soul'
 import world from './world.module.css'
+
+// His outfit plate: a battle box, white pixel lettering on black inside a white frame.
+const OUTFIT_LOOK: WardrobeLook = { plate: RPG.void, text: RPG.text, ring: RPG.border }
 
 // The hero entrance, played as the game's encounter start, once, when the hero first shows:
 //
@@ -183,11 +187,13 @@ export function Encounter({ profession, children }: EncounterProps) {
       <div ref={pointer} className={`relative h-44 overflow-hidden sm:h-56 ${world.stage} ${sprite.battle}`} aria-hidden="true">
         <BattleBackdrop />
         <div className="absolute inset-x-0 bottom-2 flex justify-center">
-          <div key={profession} className={switches > 0 ? world.turns : ''}>
+          <div key={profession} data-worlds-figure="" className={switches > 0 ? world.turns : ''}>
             <StageWalker profession={profession} className={`h-[120px] w-20 sm:h-[150px] sm:w-[100px] ${world.idle}`} />
           </div>
         </div>
       </div>
+
+      <Wardrobe look={OUTFIT_LOOK} ready={phase === 'ready'} className={`mt-4 ${PIXEL}`} />
 
       {children}
 

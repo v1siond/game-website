@@ -9,6 +9,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
 import { REALM, REALM_VARS } from './MedievalFantasy/palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
 import { RealmFrame } from './MedievalFantasy/panels'
 import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/actions'
@@ -19,6 +20,9 @@ import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Medieval Fantasy: the page composition. Its palette, backdrop, frames, buttons, cards, ornaments and
 // per profession sections live in ./MedievalFantasy.
+
+// His outfit plate: a dark iron plaque with lifted gold lettering and a gold rim, like the realm's frames.
+const OUTFIT_LOOK: WardrobeLook = { plate: REALM.bgVoid, text: REALM.goldText, ring: REALM.goldMid }
 
 export default function MedievalFantasyTheme() {
   const view = useWorldView()
@@ -93,6 +97,7 @@ export default function MedievalFantasyTheme() {
                 )}
               />
             </RealmFrame>
+            <Wardrobe look={OUTFIT_LOOK} className="mt-4" />
           </header>
         </ScrollScene>
         </div>

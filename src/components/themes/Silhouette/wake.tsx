@@ -12,6 +12,7 @@ import { Layer, pinePath } from './depth'
 import { GROUND, Sky, Soft } from './places'
 import { CVLink, HeroActions, PlayLink } from './actions'
 import { SHADE, SKY, TYPEWRITER } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import shade from './shade.module.css'
 
 // The hero: he wakes at the edge of the forest, the way a silhouette platformer opens. The page starts
@@ -42,6 +43,9 @@ const POSE: Record<WakePhase, SpritePose> = {
 const SHOWN: Record<WakePhase, boolean> = { dark: false, iris: false, rise: false, title: true, done: true }
 
 const DAWN = SKY.dawn
+
+// The plate is a black cut-out with the sky's rim of light for its name.
+const OUTFIT_LOOK: WardrobeLook = { plate: SHADE.black, text: SHADE.rim, ring: SHADE.dawnRim }
 const FAR_PINES = [24, 66, 104, 160, 214, 380, 432, 470, 520, 566]
 
 function Forest({ profession, pose }: { profession: Profession; pose: SpritePose }) {
@@ -71,7 +75,9 @@ function Forest({ profession, pose }: { profession: Profession; pose: SpritePose
           <line x1={300} y1={0} x2={300} y2={120} stroke={SHADE.black} strokeWidth={1.6} />
           <circle cx={300} cy={122} r={2.2} fill={SHADE.black} />
         </g>
-        <HeroCharacter profession={profession} pose={pose} place={{ x: 228, y: 180, height: 54 }} />
+        <g data-worlds-figure="">
+          <HeroCharacter profession={profession} pose={pose} place={{ x: 228, y: 180, height: 54 }} />
+        </g>
       </Layer>
       <Layer depth="near">
         <Soft d="M0 0 H120 Q80 20 60 46 Q30 70 0 76 Z" />
@@ -130,6 +136,7 @@ export function WakeHero({ profession }: { profession: Profession }) {
           </div>
 
           <div className={`flex flex-col items-center gap-4 px-4 pt-6 ${TEXT_SHOWN(shown)}`}>
+            <Wardrobe look={OUTFIT_LOOK} ready={shown} className={TYPEWRITER} />
             <p className="max-w-xl text-center text-sm tracking-wider text-[color:var(--sh-text)]">{line}</p>
             <nav className="flex flex-wrap items-center justify-center gap-3" aria-label={navigation.contactAndCv}>
               <HeroActions actions={actions} />

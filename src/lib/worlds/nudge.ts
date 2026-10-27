@@ -35,6 +35,12 @@ export const TOUR_ORDER: readonly string[] = [
   'dark-fantasy',
 ]
 
+/** Set once the wardrobe's fan of outfits has played (sessionStorage), so it plays once per visit. */
+export const WARDROBE_FAN_KEY = 'portfolio-worlds-wardrobe-fan'
+
+/** How long the wardrobe's outfits stay fanned out of the plate, in and out included (BD26: under 5 s). */
+export const WARDROBE_FAN_MS = 2750
+
 /** The hint waits this long after the page opened, so it never interrupts the first read. */
 export const HINT_MIN_MS = 20000
 
@@ -118,6 +124,19 @@ export function nextInTour(currentId: string, seen: readonly string[]): string {
   if (unseen) return unseen
   return TOUR_ORDER[(TOUR_ORDER.indexOf(currentId) + 1) % TOUR_ORDER.length]
 }
+
+// An id outside the tour stands just before its start, so next is the first world and previous the last.
+const tourStep = (currentId: string, step: 1 | -1): string => {
+  const at = TOUR_ORDER.indexOf(currentId)
+  if (at === -1) return step === 1 ? TOUR_ORDER[0] : TOUR_ORDER[TOUR_ORDER.length - 1]
+  return TOUR_ORDER[(at + step + TOUR_ORDER.length) % TOUR_ORDER.length]
+}
+
+/** The world after the current one in TOUR_ORDER, wrapping at the end: the wardrobe's next outfit. */
+export const followingInTour = (currentId: string): string => tourStep(currentId, 1)
+
+/** The world before the current one in TOUR_ORDER, wrapping at the start: the wardrobe's previous outfit. */
+export const previousInTour = (currentId: string): string => tourStep(currentId, -1)
 
 export interface CountTemplates {
   one: string

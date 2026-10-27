@@ -12,6 +12,8 @@ import {
   markSeen,
   mayOfferHint,
   nextInTour,
+  followingInTour,
+  previousInTour,
   orderForPicker,
   countTemplate,
   readSeen,
@@ -162,6 +164,38 @@ describe('nextInTour', () => {
   it('offers the world after the current one once every world was seen, wrapping at the end', () => {
     expect(nextInTour('neon-portals', TOUR_ORDER)).toBe('survival-horror')
     expect(nextInTour('dark-fantasy', TOUR_ORDER)).toBe('medieval-fantasy')
+  })
+})
+
+describe('followingInTour and previousInTour', () => {
+  it('step one world along the tour order, whatever was seen', () => {
+    expect(followingInTour('medieval-fantasy')).toBe('neon-portals')
+    expect(previousInTour('neon-portals')).toBe('medieval-fantasy')
+    expect(followingInTour('retro-atomic')).toBe('silhouette')
+    expect(previousInTour('retro-atomic')).toBe('mythic')
+  })
+
+  it('go round the tour in a circle at both ends', () => {
+    expect(followingInTour('dark-fantasy')).toBe('medieval-fantasy')
+    expect(previousInTour('medieval-fantasy')).toBe('dark-fantasy')
+  })
+
+  it('come back to the same world after a previous then a next, for every world', () => {
+    TOUR_ORDER.forEach((id) => {
+      expect(followingInTour(previousInTour(id))).toBe(id)
+      expect(previousInTour(followingInTour(id))).toBe(id)
+    })
+  })
+
+  it('visit every world once in a full turn of next', () => {
+    const visited = TOUR_ORDER.reduce<string[]>((path) => [...path, followingInTour(path[path.length - 1])], ['retro-atomic'])
+    expect(new Set(visited.slice(1)).size).toBe(TOUR_ORDER.length)
+    expect(visited[visited.length - 1]).toBe('retro-atomic')
+  })
+
+  it('start an unknown id at the ends of the tour: next is the first world, previous the last', () => {
+    expect(followingInTour('no-such-world')).toBe('medieval-fantasy')
+    expect(previousInTour('no-such-world')).toBe('dark-fantasy')
   })
 })
 

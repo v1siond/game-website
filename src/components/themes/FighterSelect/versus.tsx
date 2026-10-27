@@ -11,6 +11,8 @@ import { ClashEmblem } from './badges'
 import { Cue } from './hud'
 import look from './world.module.css'
 import fight from './fight.module.css'
+import { FS } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 
 // The hero entrance as the versus screen before a fight: his stage portrait in a white frame on the left
 // with the 1P tag, the VS burst on the seam, his name on the black on the right in the round call
@@ -24,7 +26,11 @@ const RISE_DELAYS = ['[--delay:760ms]', '[--delay:860ms]', '[--delay:960ms]', '[
 
 // The VS burst sits on the seam: between the two stacked panels on a phone and a tablet (the left panel
 // is h-56, sm:h-72, the gap 1rem), on the diagonal cut at lg where the panels stand side by side.
-const SEAM = 'left-1/2 top-[14.5rem] sm:top-[18.5rem] lg:left-[40%] lg:top-1/2'
+// The plate row under the stage panel (3.5rem plate and 0.75rem gap) pushes the seam down on the stacked layout.
+const SEAM = 'left-1/2 top-[18.75rem] sm:top-[22.75rem] lg:left-[40%] lg:top-1/2'
+
+// His outfit plate: the versus screen's name bar, gold call lettering on the select navy with a white frame.
+const OUTFIT_LOOK: WardrobeLook = { plate: FS.navy, text: FS.gold, ring: FS.flash }
 
 export function HeroSplash({ profession }: { profession: Profession }) {
   const { navigation, hud } = useLabels()
@@ -34,18 +40,22 @@ export function HeroSplash({ profession }: { profession: Profession }) {
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
           <div className="relative grid gap-4 lg:grid-cols-[2fr_3fr]">
-            <div className={`relative h-56 overflow-hidden border-4 border-white bg-black shadow-[inset_0_0_0_2px_#000] sm:h-72 ${look.splashLeft} ${fight.enter} ${fight.slashIn}`}>
-              <StageBackdrop profession={profession} />
-              <div className={`absolute inset-0 bg-white ${fight.enter} ${fight.flash} [--delay:360ms] opacity-0`} aria-hidden="true" />
-              <ArenaFighter
-                profession={profession}
-                rest="stance"
-                className={`absolute bottom-0 left-[12%] ${fight.enter} ${fight.portraitIn}`}
-                spriteClass="h-48 w-[11.25rem] sm:h-64 sm:w-60"
-              />
-              <span className={`pointer-events-none absolute left-3 top-3 z-20 bg-[color:var(--fs-p1-light)] px-2 text-base leading-6 text-[color:var(--fs-ink)] shadow-[2px_2px_0_#000] ${look.display}`} aria-hidden="true">
-                {hud.playerOne}
-              </span>
+            <div className="flex flex-col gap-3">
+              <div className={`relative h-56 overflow-hidden border-4 border-white bg-black shadow-[inset_0_0_0_2px_#000] sm:h-72 ${look.splashLeft} ${fight.enter} ${fight.slashIn}`}>
+                <StageBackdrop profession={profession} />
+                <div className={`absolute inset-0 bg-white ${fight.enter} ${fight.flash} [--delay:360ms] opacity-0`} aria-hidden="true" />
+                <ArenaFighter
+                  profession={profession}
+                  rest="stance"
+                  figure
+                  className={`absolute bottom-0 left-[12%] ${fight.enter} ${fight.portraitIn}`}
+                  spriteClass="h-48 w-[11.25rem] sm:h-64 sm:w-60"
+                />
+                <span className={`pointer-events-none absolute left-3 top-3 z-20 bg-[color:var(--fs-p1-light)] px-2 text-base leading-6 text-[color:var(--fs-ink)] shadow-[2px_2px_0_#000] ${look.display}`} aria-hidden="true">
+                  {hud.playerOne}
+                </span>
+              </div>
+              <Wardrobe look={OUTFIT_LOOK} className={`${look.display} ${fight.enter} ${fight.slashIn}`} />
             </div>
 
             <div className={`absolute z-20 -translate-x-1/2 -translate-y-1/2 ${SEAM}`} aria-hidden="true">

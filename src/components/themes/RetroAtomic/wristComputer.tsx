@@ -12,7 +12,8 @@ import { NameWords } from '@/components/cv/NameWords'
 import { DWELLER_ACTION, DwellerSprite } from './dweller'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
-import { BRASS, CHROME, OLIVE, OLIVE_DARK, OLIVE_LIGHT, RUBBER, STEEL_LIGHT } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+import { BRASS, CHROME, GLASS, INK, OLIVE, OLIVE_DARK, OLIVE_LIGHT, PHOSPHOR, RUBBER, STEEL_LIGHT } from './palette'
 import atomic from './atomic.module.css'
 
 // The hero and the profession switch as one device: the wrist terminal, a moulded olive slab with a
@@ -33,6 +34,9 @@ import atomic from './atomic.module.css'
 // - The bottom bar holds the profession's field and how long he has been at it, from the CV.
 
 const TYPE_TICK_MS = 16
+
+// The wardrobe's phosphor readout under his portrait frame: phosphor on ink, 14.3 to 1.
+const OUTFIT_LOOK: WardrobeLook = { plate: INK, text: PHOSPHOR, ring: GLASS }
 
 /** How many characters of the text have been typed: all of it when off, counting up once started. */
 function useTyped(total: number, running: boolean, instant: boolean): number {
@@ -122,7 +126,7 @@ function SectionTabs({ profession }: { profession: Profession }) {
 /** His figure on the tube, in the green line tone, at the picked profession's work as the screen comes on. */
 function StatusFigure({ profession }: { profession: Profession }) {
   return (
-    <div className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
+    <div data-worlds-figure="" className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
       <span className={atomic.statusBrackets} aria-hidden="true" />
       <div className={`absolute inset-3 ${atomic.statusFigure}`}>
         <DwellerSprite key={profession} profession={profession} tone="phosphor" motion={DWELLER_ACTION[profession]} className="h-full w-full" />
@@ -251,7 +255,10 @@ export function WristComputer({ booted, instant }: WristComputerProps) {
               <SectionTabs profession={active} />
 
               <div key={active} className={`mt-5 grid items-center gap-6 md:grid-cols-[auto_1fr] ${atomic.powerOn}`}>
-                <StatusFigure profession={active} />
+                <div className="flex flex-col items-center gap-3">
+                  <StatusFigure profession={active} />
+                  <Wardrobe look={OUTFIT_LOOK} ready={booted || instant} />
+                </div>
                 <RecruiterHero
                   render={({ name, headline, tagline, line }) => <BootText lines={[name, headline, tagline, line]} running={booted} instant={instant} />}
                 />

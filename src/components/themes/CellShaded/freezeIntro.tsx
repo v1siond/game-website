@@ -9,6 +9,7 @@ import type { Profession } from '@/lib/cv/professions'
 import { VaultSprite, type SpriteMotion } from './sprite'
 import { HATCH, SpeedRays } from './ink'
 import { ContactActions, InkButton } from './buttons'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { CEL } from './palette'
 import cel from './cel.module.css'
 
@@ -48,6 +49,9 @@ const phaseFlags = (reached: ReadonlySet<Phase>) =>
   Object.fromEntries(TIMELINE.map(([phase]) => [`data-${phase}`, reached.has(phase) || undefined]))
 
 const DUST = [0, 1, 2]
+
+// The wardrobe's inked name card under his box: ink on paper, outlined thick in ink.
+const OUTFIT_LOOK: WardrobeLook = { plate: CEL.paper, text: CEL.ink, ring: CEL.ink }
 
 // The mesa he stands on, in the near ridge's dune colours and hatching: a butte as wide as his box, its flat
 // top at his box's bottom edge and its cliffs dropping straight down. The hero reaches --select-gap past its
@@ -109,26 +113,29 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
       <div className={`relative mx-auto grid min-h-[86vh] max-w-6xl items-end gap-6 px-4 pb-20 pt-24 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center ${cel.shake}`}>
         {/* a pointer extra: pointing at him or clicking him plays his action, the same as each section shows */}
         {/* his box: he runs in inside it, and the mesa hangs from its bottom edge, so his bottom is the ridge top */}
-        <div className="relative mx-auto h-64 w-40 sm:h-80 sm:w-48" aria-hidden="true">
-          <Mesa />
-          <div
-            className={`relative h-full w-full ${cel.runner}`}
-            onPointerEnter={() => setActing(true)}
-            onPointerLeave={() => setActing(false)}
-            onClick={() => setActing((now) => !now)}
-          >
-            {DUST.map((index) => (
-              <span
-                key={index}
-                className={`absolute bottom-0 left-2 h-6 w-6 rounded-full border-[3px] border-[var(--cel-ink)] bg-[var(--cel-dune)] ${cel.dust}`}
-                style={{ ['--i' as string]: index }}
-                aria-hidden="true"
-              />
-            ))}
-            <div className={`h-full w-full ${cel.leap}`}>
-              <VaultSprite profession={profession} motion={spriteMotion(shown, acting)} className="h-full w-full" />
+        <div className="flex flex-col items-center gap-4">
+          <div data-worlds-figure="" className="relative mx-auto h-64 w-40 sm:h-80 sm:w-48" aria-hidden="true">
+            <Mesa />
+            <div
+              className={`relative h-full w-full ${cel.runner}`}
+              onPointerEnter={() => setActing(true)}
+              onPointerLeave={() => setActing(false)}
+              onClick={() => setActing((now) => !now)}
+            >
+              {DUST.map((index) => (
+                <span
+                  key={index}
+                  className={`absolute bottom-0 left-2 h-6 w-6 rounded-full border-[3px] border-[var(--cel-ink)] bg-[var(--cel-dune)] ${cel.dust}`}
+                  style={{ ['--i' as string]: index }}
+                  aria-hidden="true"
+                />
+              ))}
+              <div className={`h-full w-full ${cel.leap}`}>
+                <VaultSprite profession={profession} motion={spriteMotion(shown, acting)} className="h-full w-full" />
+              </div>
             </div>
           </div>
+          <Wardrobe look={OUTFIT_LOOK} ready={done} className="relative z-10" />
         </div>
 
         <RecruiterHero

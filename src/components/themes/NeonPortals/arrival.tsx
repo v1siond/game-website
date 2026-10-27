@@ -8,6 +8,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePreview } from '@/themes/PreviewContext'
 import type { Profession } from '@/lib/cv/professions'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { Bandicoot, type BandicootPose } from './bandicoot'
 import { Blast, Planks, PopUp } from './burst'
 import { CVLink, DemoLink, HeroActions } from './buttons'
@@ -18,6 +19,9 @@ import { MaskCompanion } from './scoreBar'
 import { useScore } from './score'
 import stage from './arrival.module.css'
 import ui from './warped.module.css'
+
+// The wardrobe's crate orange pill on the stage floor at his feet: void on orange, 9.5 to 1, ringed in void.
+const OUTFIT_LOOK: WardrobeLook = { plate: PORTAL.ORANGE, text: PORTAL.VOID, ring: PORTAL.VOID }
 
 // The recruiter first screen as his arrival in the time machine (the hub of the time travel platformer,
 // Warped, named in code only): the time machine's central hub under its great clock ring, a beam comes
@@ -249,6 +253,7 @@ function Stage({ profession, nav }: { profession: Profession; nav: { spin: strin
         <button
           type="button"
           tabIndex={-1}
+          data-worlds-figure=""
           onClick={spin}
           aria-label={nav.spin}
           className={`absolute bottom-[11%] left-1/2 h-[58%] w-[30%] -translate-x-1/2 cursor-pointer focus:outline-none`}
@@ -260,6 +265,7 @@ function Stage({ profession, nav }: { profession: Profession; nav: { spin: strin
           </span>
         </button>
       </div>
+      <Wardrobe look={OUTFIT_LOOK} className="relative z-10 -mt-7 sm:-mt-9" />
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <button type="button" onClick={spin} className={`${ui.button} ${ui.lit}`}>
           {nav.spin}

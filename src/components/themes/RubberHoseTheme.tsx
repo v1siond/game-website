@@ -11,7 +11,8 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
-import { HOSE_VARS } from './RubberHose/palette'
+import { HOSE, HOSE_VARS } from './RubberHose/palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { FilmFrame, FilmGrain, RisingNotes } from './RubberHose/backdrop'
 import { CartoonTitle } from './RubberHose/art'
 import { CartoonCharacter } from './RubberHose/selector'
@@ -23,6 +24,9 @@ import { IsleStage, Isles, type Isle } from './RubberHose/isles'
 import { HeroCharacter } from './RubberHose/cup'
 import { headingId } from '@/components/cv/sectionText'
 import world from './RubberHose/world.module.css'
+
+// His outfit plate: an inked title card, ink lettering on paper with an ink outline.
+const OUTFIT_LOOK: WardrobeLook = { plate: HOSE.paper, text: HOSE.ink, ring: HOSE.ink }
 
 // Rubber Hose, a 1930s rubber hose cartoon in sepia (one ink line, pie eyed props, film grain, the iris,
 // everything bobbing on the beat): the page composition. Its palette, backdrop, art, cards, his costume,
@@ -83,7 +87,7 @@ export default function RubberHoseTheme() {
               <TitleCardIntro>
                 {(look) => (
                   <div className={`relative mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-8 text-center sm:px-10 ${world.titleCard} ${look.card}`}>
-                    <div className={`pointer-events-none absolute -bottom-2 -left-10 hidden h-36 w-24 lg:block ${look.word}`} aria-hidden="true">
+                    <div data-worlds-figure="" className={`pointer-events-none absolute -bottom-2 -left-10 hidden h-36 w-24 lg:block ${look.word}`} aria-hidden="true">
                       <HeroCharacter profession={active} pose="idle" className="h-full w-full" />
                     </div>
                     <div>
@@ -100,6 +104,7 @@ export default function RubberHoseTheme() {
                       <CVLink />
                       <EngineLink />
                     </nav>
+                    <Wardrobe look={OUTFIT_LOOK} className={`${staggerAt(3)} ${look.word}`} />
                   </div>
                 )}
               </TitleCardIntro>

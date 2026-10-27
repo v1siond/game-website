@@ -10,10 +10,14 @@ import { BARREL, BarrelArt, MuzzleBurst } from './barrel'
 import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { ToneScope } from './scenery'
 import look from './jungle.module.css'
 import scenery from './scenery.module.css'
 import sunset from './sunset.module.css'
+
+// His outfit plate: a dark plank sign with sun gold lettering and a plank rim.
+const OUTFIT_LOOK: WardrobeLook = { plate: C.barkDark, text: C.sunGold, ring: C.plank }
 
 // The recruiter first screen as the opening of the level: a sunset drawn in five planes, the stepped sky
 // and the sun at the back, then the banded treeline in haze, the palms, his tree house on stilts and the
@@ -191,7 +195,7 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
       </div>
 
       <div className={`pointer-events-none absolute inset-0 ${sunset.mid}`} style={LANDING} aria-hidden="true">
-        <div key={shot} className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[var(--landing-left)] h-[var(--landing-height)] w-[var(--landing-width)] ${sunset.flightX}`}>
+        <div key={shot} data-worlds-figure="" className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[var(--landing-left)] h-[var(--landing-height)] w-[var(--landing-width)] ${sunset.flightX}`}>
           <div className={`relative h-full w-full ${sunset.flightY}`}>
             <HeroCharacter profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
             <div className={`absolute inset-0 ${sunset.land}`}>
@@ -242,7 +246,10 @@ export function SunsetHero() {
           data-again={shot > 0 || undefined}
           className={`mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2 md:gap-12 ${sunset.hero}`}
         >
-          <SunsetScene shot={shot} onBlast={() => setShot((count) => count + 1)} blastLabel={jungle.blastAgain} />
+          <div>
+            <SunsetScene shot={shot} onBlast={() => setShot((count) => count + 1)} blastLabel={jungle.blastAgain} />
+            <Wardrobe look={OUTFIT_LOOK} ready={triggered} className={`mt-5 ${look.display}`} />
+          </div>
 
           <div className="text-center md:text-left">
             <h1 className={`inline-block rounded-2xl px-6 pb-4 pt-6 text-[clamp(1.5rem,7.5vw,3rem)] uppercase text-[color:var(--tp-sun-gold)] md:text-[clamp(1.75rem,3.75vw,3rem)] ${look.board} ${look.display} ${look.outlined} ${sunset.plank}`}>

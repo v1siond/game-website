@@ -6,9 +6,13 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { GlassSurvivor } from './survivor'
 import { DECO_COLORS as C } from './palette'
 import machine from './machine.module.css'
+
+// The wardrobe's marquee plate under his glass: pale gold on the deepest blood, 15 to 1, ringed in gold.
+const OUTFIT_LOOK: WardrobeLook = { plate: C.bloodDeep, text: C.goldPaleText, ring: C.gold }
 
 // The profession switch as the city's vending machine: a stepped brass crown with its marquee, a glass
 // case showing him in the picked profession's costume beside that profession's own prop, the item rows
@@ -126,18 +130,21 @@ export function VendingMachine() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
-          <div className={`relative h-64 overflow-hidden rounded-t-[7rem] border-[3px] border-[color:var(--deco-brass-mid)] sm:h-72 ${machine.glass}`}>
-            <Fragment key={active}>
-              <svg viewBox="0 0 120 120" className={`absolute bottom-6 right-2 h-28 w-28 ${machine.prop}`} aria-hidden="true" focusable="false">
-                {PROPS[active]}
-              </svg>
-              <div className={`absolute bottom-6 left-[18%] h-44 w-28 sm:h-52 sm:w-32 ${machine.figure}`}>
-                <GlassSurvivor profession={active} className="h-full w-full" />
-              </div>
-              <div className={`pointer-events-none absolute inset-0 ${machine.blind}`} aria-hidden="true" />
-            </Fragment>
-            <div className="absolute inset-x-0 bottom-0 h-6 border-t-2 border-[color:var(--deco-gold)] bg-[color:var(--deco-brass-dark)]" aria-hidden="true" />
-            <div className={`pointer-events-none absolute inset-0 ${machine.shine}`} aria-hidden="true" />
+          <div className="flex flex-col gap-4">
+            <div className={`relative h-64 overflow-hidden rounded-t-[7rem] border-[3px] border-[color:var(--deco-brass-mid)] sm:h-72 ${machine.glass}`}>
+              <Fragment key={active}>
+                <svg viewBox="0 0 120 120" className={`absolute bottom-6 right-2 h-28 w-28 ${machine.prop}`} aria-hidden="true" focusable="false">
+                  {PROPS[active]}
+                </svg>
+                <div data-worlds-figure="" className={`absolute bottom-6 left-[18%] h-44 w-28 sm:h-52 sm:w-32 ${machine.figure}`}>
+                  <GlassSurvivor profession={active} className="h-full w-full" />
+                </div>
+                <div className={`pointer-events-none absolute inset-0 ${machine.blind}`} aria-hidden="true" />
+              </Fragment>
+              <div className="absolute inset-x-0 bottom-0 h-6 border-t-2 border-[color:var(--deco-gold)] bg-[color:var(--deco-brass-dark)]" aria-hidden="true" />
+              <div className={`pointer-events-none absolute inset-0 ${machine.shine}`} aria-hidden="true" />
+            </div>
+            <Wardrobe look={OUTFIT_LOOK} />
           </div>
 
           <div className="flex flex-col justify-between gap-5">

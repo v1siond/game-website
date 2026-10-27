@@ -427,6 +427,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       {/* Below lg: the knight stands on the panel frame's top line at its right corner (SLASH_STAGE) */}
       {showKnight && (
         <div
+          data-worlds-figure=""
           className="pointer-events-none absolute bottom-[calc(100%_-_var(--panel-top)_-_var(--frame-inset)_-_var(--sole-drop))] right-[calc(var(--panel-inset)_-_var(--rest))] z-20 lg:hidden"
           style={getKnightStyle()}
           aria-hidden="true"
@@ -445,6 +446,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       {showKnight && (
         <FixedCombatLayer inView={inView}>
           <div
+            data-worlds-figure=""
             className="absolute bottom-[18%] left-[min(max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w))),calc(100%_-_var(--knight-w)))] z-20 pointer-events-none max-lg:hidden"
             style={getKnightStyle()}
           >

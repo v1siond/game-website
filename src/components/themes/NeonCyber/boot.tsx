@@ -10,6 +10,11 @@ import { CVLink, HeroAction } from './actions'
 import { MercSprite, type MercMotion } from './merc'
 import { ScanToggle } from './scanner'
 import world from './world.module.css'
+import { NEON } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+
+// His outfit plate: an optics readout in HUD yellow on ink, ringed in the scanner's data cyan.
+const OUTFIT_LOOK: WardrobeLook = { plate: NEON.ink, text: NEON.hud, ring: NEON.data }
 
 // The recruiter first screen as the optics booting, once, about 2.4 s: a scanline sweeps the panel,
 // the four brackets snap in, his name lands with its red and cyan ghosts splitting off and settling,
@@ -149,12 +154,15 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                 </div>
               </div>
 
-              {/* his portrait in the optics frame, built from one line, then he walks in */}
-              <div className="relative mx-auto w-32 overflow-hidden border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40">
-                <div className={world.build}>
-                  <HeroMerc profession={profession} />
+              {/* his portrait in the optics frame, built from one line, then he walks in, his outfit plate under it */}
+              <div className="flex flex-col items-center gap-4">
+                <div data-worlds-figure="" className="relative mx-auto w-32 overflow-hidden border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40">
+                  <div className={world.build}>
+                    <HeroMerc profession={profession} />
+                  </div>
+                  <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" aria-hidden="true" />
                 </div>
-                <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" aria-hidden="true" />
+                <Wardrobe look={OUTFIT_LOOK} className={world.fadeLate} />
               </div>
             </div>
           </div>

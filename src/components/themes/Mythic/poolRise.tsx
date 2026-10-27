@@ -13,6 +13,10 @@ import type { Move } from './rig'
 import { useHouse } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+
+// His outfit plate: a gilded plaque on the hall's dark panel, pale gold lettering and a gold rim.
+const OUTFIT_LOOK: WardrobeLook = { plate: MYTH.panel, text: MYTH.goldPale, ring: MYTH.gold }
 
 // The hero entrance, the return through the blood pool: in the great hall the pool stirs, he rises out
 // of it with the blood running off him, the tattoo and his eyes light and he roars (the hall shakes),
@@ -99,7 +103,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
               <ellipse key={index} cx={100} cy={30} rx={60} ry={12} fill="none" stroke={MYTH.poolLight} strokeWidth={2} className={u.ripple} style={{ ['--i' as string]: index }} />
             ))}
           </svg>
-          <div className="relative h-72 overflow-hidden sm:h-80">
+          <div data-worlds-figure="" className="relative h-72 overflow-hidden sm:h-80">
             <div className={`absolute inset-0 ${u.riser}`}>
               {done ? (
                 <button type="button" className={`h-full w-full ${u.heroFigure}`} aria-label={myth.combo} title={myth.comboHint} onClick={() => play(HERO_MOVE[profession])}>
@@ -117,6 +121,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
             <path d="M4 4 Q100 40 196 4 L196 30 L4 30 Z" fill={MYTH.bloodDeep} />
             <path d="M4 4 Q100 40 196 4" fill="none" stroke={MYTH.inkLine} strokeWidth={3} />
           </svg>
+          <Wardrobe look={OUTFIT_LOOK} ready={done} className={`mt-8 ${u.display}`} />
         </div>
 
         <RecruiterHero

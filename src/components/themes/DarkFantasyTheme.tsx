@@ -27,7 +27,11 @@ import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { ENGINE_LINK } from '@/lib/engineLink'
+
+// His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
+const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
 
 // Abstract spirit wisp - optimized: no SVG filter
 const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.ethereal }: { size?: number; color?: string }) {
@@ -1880,6 +1884,7 @@ export default function DarkFantasyTheme() {
               <div className="flex flex-wrap gap-3 justify-center mt-4">
                 <HeroActions actions={actions} />
               </div>
+              <Wardrobe look={OUTFIT_LOOK} className="mt-5" />
             </div>
           )}
         />

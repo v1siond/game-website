@@ -123,7 +123,7 @@ export function Stage({ zone, profession, reduced, still }: StageProps) {
       <div className={stage.anchor}>
         <Props zone={zone} flags={frame.flags} />
         {!frame.far && foe}
-        <div className={`${stage.actor} ${stage.walker} ${frame.gone ? stage.gone : ''}`} style={heroVars(frame)}>
+        <div data-worlds-figure="" className={`${stage.actor} ${stage.walker} ${frame.gone ? stage.gone : ''}`} style={heroVars(frame)}>
           <Survivor profession={profession} pose={frame.hero} laser={frame.flags.laser} className={`h-full w-full ${frame.face < 0 ? '-scale-x-100' : ''}`} />
           {zone === 'tech' && <Magazine dropped={frame.flags.dropped} />}
         </div>

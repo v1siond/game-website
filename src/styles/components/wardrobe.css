@@ -1,0 +1,341 @@
+/* ===================================================================
+   ITCSS Components: THE WARDROBE, HIS OUTFIT PLATE IN EVERY HERO
+   ===================================================================
+   The plate beside his figure names the world he wears, with a previous and a next arrow
+   (src/components/worlds/Wardrobe.tsx). Its colours come from the hero that places it, read from that
+   world's palette: --wd-plate the fill, --wd-text the name, the arrows and the plate's edge (7 to 1 or more
+   on the fill), --wd-ring the outer ring that keeps the plate 3 to 1 apart from the scene behind it.
+   Each world then gives the plate its own idiom below (.c-wardrobe--<world id>): its lettering, corners,
+   edge and arrow keys. The name is 16 px (14 px floor), each arrow a 44 by 44 px target. Only transform and
+   opacity move; the fan of outfits plays once per visit for --wd-fan-ms (WARDROBE_FAN_MS) and never
+   under reduced motion.
+   =================================================================== */
+
+.c-wardrobe {
+  --wd-radius: 6px;
+  --wd-key-radius: 4px;
+  --wd-edge: 2px;
+  --wd-card-w: 64px;
+  --wd-face: inherit;
+  --wd-case: none;
+  --wd-track: 0.02em;
+  --wd-weight: 700;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.c-wardrobe__plate {
+  --focus-ring: var(--wd-text);
+  --focus-halo: var(--wd-plate);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 56px;
+  padding: 4px;
+  color: var(--wd-text);
+  background-color: var(--wd-plate);
+  border: var(--wd-edge) solid var(--wd-text);
+  border-radius: var(--wd-radius);
+  box-shadow: 0 0 0 2px var(--wd-ring), 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+.c-wardrobe__name {
+  flex: 1 1 auto;
+  padding: 0 8px;
+  font-family: var(--wd-face);
+  font-size: 16px;
+  font-weight: var(--wd-weight);
+  line-height: 1.2;
+  letter-spacing: var(--wd-track);
+  text-align: center;
+  text-transform: var(--wd-case);
+  white-space: nowrap;
+}
+
+.c-wardrobe__key {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  color: var(--wd-text);
+  background-color: var(--wd-plate);
+  border: 2px solid var(--wd-text);
+  border-radius: var(--wd-key-radius);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.c-wardrobe__key:hover {
+  color: var(--wd-plate);
+  background-color: var(--wd-text);
+}
+.c-wardrobe__key:active { transform: scale(0.92); }
+
+.c-wardrobe__chevron {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The fan: his previous, current and next outfits, each his figure in that world, slide out of the plate,
+   hold and slide back in, over him and above the plate. The next one is ringed in the plate's text colour. */
+.c-wardrobe__fan {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 20;
+  width: var(--wd-card-w);
+  aspect-ratio: 3 / 4;
+  margin-left: calc(var(--wd-card-w) / -2);
+  pointer-events: none;
+}
+
+.c-wardrobe__card {
+  --fan-dir: 0;
+  --fan-lift: 0px;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  background-color: var(--wd-plate);
+  border: 2px solid var(--wd-text);
+  border-radius: 8px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  animation: wardrobe-fan var(--wd-fan-ms, 2750ms) both;
+}
+.c-wardrobe__card[data-slot='-1'] { --fan-dir: -1; }
+.c-wardrobe__card[data-slot='0'] { --fan-lift: -6px; z-index: 2; }
+.c-wardrobe__card[data-slot='1'] {
+  --fan-dir: 1;
+  z-index: 3;
+  box-shadow: 0 0 0 4px var(--wd-text), 0 8px 18px rgba(0, 0, 0, 0.5);
+}
+.c-wardrobe__card img {
+  object-fit: cover;
+  object-position: 50% 20%;
+}
+
+/* 0.45 s out with a small overshoot, held to 2.35 s, 0.4 s back in: 2.75 s in all. */
+@keyframes wardrobe-fan {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+    animation-timing-function: cubic-bezier(0.3, 1.3, 0.5, 1);
+  }
+  16.4%,
+  85.5% {
+    opacity: 1;
+    transform: translate(calc(var(--fan-dir) * 78%), var(--fan-lift)) rotate(calc(var(--fan-dir) * 11deg));
+    animation-timing-function: ease-in;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .c-wardrobe { --wd-card-w: 80px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-wardrobe__fan { display: none; }
+  .c-wardrobe__key { transition: none; }
+}
+
+/* ---- Each world's plate -------------------------------------------------------------------------- */
+
+/* Retro Atomic: a phosphor readout on his portrait frame, square keys glowing in the tube's green. */
+.c-wardrobe--retro-atomic {
+  --wd-radius: 2px;
+  --wd-key-radius: 3px;
+  --wd-edge: 1px;
+  --wd-face: var(--atomic-face, inherit);
+  --wd-case: uppercase;
+  --wd-track: 0.08em;
+  --wd-weight: 400;
+}
+.c-wardrobe--retro-atomic .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 0 10px color-mix(in srgb, var(--wd-text) 35%, transparent); }
+
+/* Neon Portals: a chunky pill on the stage floor at his feet, round keys like the world's Spin button. */
+.c-wardrobe--neon-portals {
+  --wd-radius: 999px;
+  --wd-key-radius: 999px;
+  --wd-edge: 3px;
+  --wd-face: var(--np-face, inherit);
+  --wd-track: 0.03em;
+  --wd-weight: 400;
+}
+.c-wardrobe--neon-portals .c-wardrobe__plate { padding: 4px 6px; box-shadow: 0 0 0 2px var(--wd-ring), 0 4px 0 var(--wd-ring); }
+.c-wardrobe--neon-portals .c-wardrobe__name { font-size: 19px; padding: 0 14px; }
+.c-wardrobe--neon-portals .c-wardrobe__key { color: var(--wd-plate); background-color: var(--wd-text); }
+.c-wardrobe--neon-portals .c-wardrobe__key:hover { color: var(--wd-text); background-color: var(--wd-plate); }
+
+/* Survival Horror: an inventory box in typewriter letters, ruled twice, square triangle keys. */
+.c-wardrobe--survival-horror {
+  --wd-radius: 0;
+  --wd-key-radius: 0;
+  --wd-edge: 1px;
+  --wd-face: 'Courier New', Courier, monospace;
+  --wd-case: uppercase;
+  --wd-track: 0.06em;
+}
+.c-wardrobe--survival-horror .c-wardrobe__plate {
+  box-shadow: inset 0 0 0 3px var(--wd-plate), inset 0 0 0 4px var(--wd-text), 0 0 0 2px var(--wd-ring), 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+.c-wardrobe--survival-horror .c-wardrobe__key { border-width: 1px; }
+.c-wardrobe--survival-horror .c-wardrobe__card { border-radius: 0; }
+
+/* Adventure Paths: a paper trail tag, ink letters on the map's page, bark rim, rounded like a luggage label. */
+.c-wardrobe--adventure-paths {
+  --wd-radius: 10px;
+  --wd-key-radius: 999px;
+  --wd-track: 0.04em;
+}
+.c-wardrobe--adventure-paths .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 3px 4px 0 var(--wd-ring); }
+
+/* Art Deco: a lacquered marquee plaque, spaced capitals in pale gold, stepped gold edges. */
+.c-wardrobe--art-deco {
+  --wd-radius: 0;
+  --wd-key-radius: 0;
+  --wd-case: uppercase;
+  --wd-track: 0.18em;
+}
+.c-wardrobe--art-deco .c-wardrobe__plate {
+  box-shadow: inset 0 0 0 3px var(--wd-plate), inset 0 0 0 4px var(--wd-ring), 0 0 0 2px var(--wd-ring);
+}
+
+/* Bold Noir: a cut paper slab, heavy capitals, hard offset shadow in the red. */
+.c-wardrobe--bold-noir {
+  --wd-radius: 0;
+  --wd-key-radius: 0;
+  --wd-edge: 3px;
+  --wd-case: uppercase;
+  --wd-track: 0.08em;
+  --wd-weight: 900;
+}
+.c-wardrobe--bold-noir .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 6px 6px 0 var(--wd-ring); }
+
+/* Cell Shaded: a comic speech plate with a thick ink outline and a flat ink drop shadow. */
+.c-wardrobe--cell-shaded {
+  --wd-radius: 14px;
+  --wd-key-radius: 10px;
+  --wd-edge: 3px;
+  --wd-weight: 900;
+}
+.c-wardrobe--cell-shaded .c-wardrobe__plate { box-shadow: 4px 4px 0 var(--wd-ring); }
+.c-wardrobe--cell-shaded .c-wardrobe__key { border-width: 3px; }
+
+/* Dark Fantasy: a cavern shard, bone capitals, the soul light round its edge. */
+.c-wardrobe--dark-fantasy {
+  --wd-radius: 2px;
+  --wd-key-radius: 2px;
+  --wd-edge: 1px;
+  --wd-case: uppercase;
+  --wd-track: 0.15em;
+  --wd-weight: 400;
+}
+.c-wardrobe--dark-fantasy .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 0 14px color-mix(in srgb, var(--wd-ring) 35%, transparent); }
+.c-wardrobe--dark-fantasy .c-wardrobe__key { border-width: 1px; }
+
+/* Fighter Select: the versus name bar, slanted, gold call lettering, square keys. */
+.c-wardrobe--fighter-select {
+  --wd-radius: 0;
+  --wd-key-radius: 0;
+  --wd-edge: 3px;
+  --wd-case: uppercase;
+  --wd-track: 0.05em;
+  --wd-weight: 400;
+}
+.c-wardrobe--fighter-select .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 4px 4px 0 rgba(0, 0, 0, 0.85); }
+
+/* Medieval Fantasy: an iron plaque with gold capitals and a gold rim, like the realm frames. */
+.c-wardrobe--medieval-fantasy {
+  --wd-radius: 3px;
+  --wd-key-radius: 3px;
+  --wd-case: uppercase;
+  --wd-track: 0.12em;
+}
+.c-wardrobe--medieval-fantasy .c-wardrobe__plate {
+  box-shadow: inset 0 0 0 3px var(--wd-plate), inset 0 0 0 4px var(--wd-ring), 0 0 0 2px var(--wd-ring), 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* Mythic: a gilded plaque, carved display capitals, a double gold rim. */
+.c-wardrobe--mythic {
+  --wd-radius: 4px;
+  --wd-key-radius: 4px;
+  --wd-case: uppercase;
+  --wd-track: 0.1em;
+  --wd-weight: 400;
+}
+.c-wardrobe--mythic .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 0 0 5px var(--wd-plate), 0 0 0 6px var(--wd-ring); }
+
+/* Neon Cyber: an optics readout, clipped corners drawn by the HUD yellow edge, cyan outer line. */
+.c-wardrobe--neon-cyber {
+  --wd-radius: 0;
+  --wd-key-radius: 0;
+  --wd-edge: 1px;
+  --wd-case: uppercase;
+  --wd-track: 0.12em;
+}
+.c-wardrobe--neon-cyber .c-wardrobe__key { border-width: 1px; }
+
+/* Retro RPG: the battle box, pixel letters, white frame with a black gap and a white outer line. */
+.c-wardrobe--retro-rpg {
+  --wd-radius: 0;
+  --wd-key-radius: 0;
+  --wd-edge: 3px;
+  --wd-case: uppercase;
+  --wd-weight: 400;
+}
+.c-wardrobe--retro-rpg .c-wardrobe__plate { box-shadow: 0 0 0 3px var(--wd-plate), 0 0 0 5px var(--wd-ring); }
+.c-wardrobe--retro-rpg .c-wardrobe__name { font-size: 14px; }
+
+/* Rubber Hose: an inked title card, round and bouncy, a soft ink drop shadow. */
+.c-wardrobe--rubber-hose {
+  --wd-radius: 999px;
+  --wd-key-radius: 999px;
+  --wd-edge: 3px;
+  --wd-weight: 800;
+  --wd-track: 0.04em;
+}
+.c-wardrobe--rubber-hose .c-wardrobe__plate { box-shadow: 3px 4px 0 var(--wd-ring); }
+
+/* Silhouette: a black cut-out with the sky's rim of light, wide typewriter capitals. */
+.c-wardrobe--silhouette {
+  --wd-radius: 0;
+  --wd-key-radius: 0;
+  --wd-edge: 1px;
+  --wd-case: uppercase;
+  --wd-track: 0.3em;
+  --wd-weight: 400;
+}
+.c-wardrobe--silhouette .c-wardrobe__key { border-width: 1px; }
+
+/* Soul Map: a carved stone slab, the bonfire glow in its letters and edge. */
+.c-wardrobe--soul-map {
+  --wd-radius: 2px;
+  --wd-key-radius: 2px;
+  --wd-edge: 1px;
+  --wd-case: uppercase;
+  --wd-track: 0.16em;
+  --wd-weight: 400;
+}
+.c-wardrobe--soul-map .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 0 18px color-mix(in srgb, var(--wd-text) 25%, transparent); }
+.c-wardrobe--soul-map .c-wardrobe__key { border-width: 1px; }
+
+/* Tropical Platformer: a plank sign, rounded wood, sun gold display lettering, a plank rim. */
+.c-wardrobe--tropical-platformer {
+  --wd-radius: 16px;
+  --wd-key-radius: 999px;
+  --wd-edge: 3px;
+  --wd-weight: 400;
+  --wd-track: 0.03em;
+}
+.c-wardrobe--tropical-platformer .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 5px 0 var(--wd-ring); }

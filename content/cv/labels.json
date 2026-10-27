@@ -484,7 +484,13 @@
         "pickerEnter": "Enter {world}",
         "pickerNotSeen": "Not seen yet",
         "pickerSeenMark": "Seen",
-        "pickerHere": "You are here"
+        "pickerHere": "You are here",
+        "wardrobePrev": "Previous outfit: {name}",
+        "wardrobeNext": "Next outfit: {name}",
+        "lensCaption": "{name}",
+        "lensGo": "Go to {name}",
+        "lensAria": "Look into {name}",
+        "faceAria": "Next world: {name}. Open all {count} worlds"
       }
     }
   },
@@ -973,7 +979,13 @@
         "pickerEnter": "Entrar en {world}",
         "pickerNotSeen": "Aún sin ver",
         "pickerSeenMark": "Visto",
-        "pickerHere": "Estás aquí"
+        "pickerHere": "Estás aquí",
+        "wardrobePrev": "Atuendo anterior: {name}",
+        "wardrobeNext": "Siguiente atuendo: {name}",
+        "lensCaption": "{name}",
+        "lensGo": "Ir a {name}",
+        "lensAria": "Asomarse a {name}",
+        "faceAria": "Siguiente mundo: {name}. Abrir los {count} mundos"
       }
     }
   },
@@ -1462,7 +1474,13 @@
         "pickerEnter": "Entra in {world}",
         "pickerNotSeen": "Non ancora visto",
         "pickerSeenMark": "Visto",
-        "pickerHere": "Sei qui"
+        "pickerHere": "Sei qui",
+        "wardrobePrev": "Costume precedente: {name}",
+        "wardrobeNext": "Costume successivo: {name}",
+        "lensCaption": "{name}",
+        "lensGo": "Vai a {name}",
+        "lensAria": "Guarda dentro {name}",
+        "faceAria": "Prossimo mondo: {name}. Apri tutti i {count} mondi"
       }
     }
   }

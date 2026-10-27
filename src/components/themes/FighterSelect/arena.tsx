@@ -20,9 +20,11 @@ interface ArenaFighterProps {
   // Places him on the stage (absolute position and enter animation classes).
   className?: string
   spriteClass: string
+  /** True on the versus screen: his figure there is the one the wardrobe and the portrait capture read. */
+  figure?: boolean
 }
 
-export function ArenaFighter({ profession, rest, intro, className = '', spriteClass }: ArenaFighterProps) {
+export function ArenaFighter({ profession, rest, intro, className = '', spriteClass, figure = false }: ArenaFighterProps) {
   const { pose, step, special, walk, end } = useMoves(rest, intro ?? null)
 
   return (
@@ -32,7 +34,7 @@ export function ArenaFighter({ profession, rest, intro, className = '', spriteCl
         <div onPointerEnter={special} onPointerDown={special} />
         <div onPointerEnter={() => walk(1)} />
       </div>
-      <div className={className}>
+      <div data-worlds-figure={figure ? '' : undefined} className={className}>
         <div className={`${STEP} transition-transform duration-[600ms] ease-linear motion-reduce:transition-none`} style={{ '--step': step } as CSSProperties}>
           <Fighter profession={profession} pose={pose} className={spriteClass} onMoveEnd={end} />
         </div>

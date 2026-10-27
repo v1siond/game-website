@@ -7,7 +7,9 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { usePreview } from '@/themes/PreviewContext'
 import { NameWords } from '@/components/cv/NameWords'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { ENTRANCE_MS } from './door'
+import { SH } from './palette'
 import { CVLink, HeroAction, PortfolioLink } from './actions'
 import horror from './horror.module.css'
 import look from './world.module.css'
@@ -18,6 +20,9 @@ import look from './world.module.css'
 // card says so. One timer on mount; reduced motion and the World Select preview start typed.
 
 const WALK_IN_MS = 1400
+
+// The wardrobe's inventory box beside him: lamp flame on the void, 9.6 to 1.
+const OUTFIT_LOOK: WardrobeLook = { plate: SH.void, text: SH.flame, ring: SH.void }
 
 const TYPED = (shown: boolean) => (shown ? horror.typeIn : '')
 
@@ -38,6 +43,8 @@ export function HallHero({ profession }: { profession: Profession }) {
         <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
           <div className="h-[14vh]" aria-hidden="true" />
           {profession === 'engineer' && <p className={`mx-auto w-fit bg-[color:var(--sh-void)] px-3 py-1 text-center text-sm italic text-[color:var(--sh-fog-text)] ${look.typed}`}>{words.aimHint}</p>}
+
+          <Wardrobe look={OUTFIT_LOOK} ready={shown} className="mx-auto mt-6 max-w-4xl lg:justify-start" />
 
           <div className={`relative mx-auto mt-6 max-w-4xl p-6 ${look.panel}`}>
             <div className="relative overflow-hidden">

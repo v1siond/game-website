@@ -6,6 +6,7 @@ import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/Profess
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { DETECTIVE_HOST, Detective, type DetectiveMotion } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -22,12 +23,18 @@ const JAG = 'M6 18 L60 4 L72 14 L150 0 L196 22 L184 46 L198 70 L132 96 L118 84 L
 
 const WALK_ON: readonly DetectiveMotion[] = ['walk']
 
-/** Him in one slab: the walk in from the slab's left, then the idle; still under reduced motion. */
-function SlabFigure({ profession }: { profession: Profession }) {
+// The wardrobe's crooked cut-out slab under the menu: paper on ink, ringed in the red.
+const OUTFIT_LOOK: WardrobeLook = { plate: NOIR.ink, text: NOIR.paper, ring: NOIR.red }
+
+/**
+ * Him in one slab: the walk in from the slab's left, then the idle; still under reduced motion. The
+ * picked slab's figure is the one the wardrobe names (data-worlds-figure).
+ */
+function SlabFigure({ profession, picked }: { profession: Profession; picked: boolean }) {
   const { pose, onOwnAnimationEnd } = usePoseSequence<DetectiveMotion>({ entrance: WALK_ON, rest: 'idle', still: 'still' })
 
   return (
-    <span className={`block ${world.walkOn}`} onAnimationEnd={onOwnAnimationEnd}>
+    <span data-worlds-figure={picked ? '' : undefined} className={`block ${world.walkOn}`} onAnimationEnd={onOwnAnimationEnd}>
       <Detective profession={profession} motion={pose} className={`h-24 w-16 sm:h-32 sm:w-20 ${world.redShadow}`} />
     </span>
   )
@@ -45,7 +52,7 @@ function MenuSlab({ id, label, selected, optionProps }: ProfessionOption) {
       </svg>
       <span className={`relative flex w-full flex-col items-center ${world.slab} px-1 pb-2 pt-3 sm:px-2`}>
         <span className={`block ${world.unskew}`}>
-          <SlabFigure profession={id} />
+          <SlabFigure profession={id} picked={selected} />
         </span>
         <span className={`mt-1 block text-center text-base uppercase leading-tight tracking-wider sm:text-2xl ${world.unskew} ${selected ? 'text-[color:var(--noir-paper)]' : 'text-[color:var(--noir-fog)]'}`}>
           {label}
@@ -105,6 +112,7 @@ export function ProfessionMenu({ active }: { active: Profession }) {
         label={navigation.profession}
         renderOption={(option) => <MenuSlab {...option} />}
       />
+      <Wardrobe look={OUTFIT_LOOK} className="mt-8" />
       <CutIn profession={active} />
     </>
   )

@@ -14,11 +14,15 @@ import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction, PlayLink } from './actions'
 import { cssVars } from './art'
 import { ARRIVAL, BRANCHES, HUB, HubCompass, HubMapArt, landmarkPoint } from './hubMap'
-import { JOURNAL_SERIF } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+import { JOURNAL_SERIF, TRAIL } from './palette'
 import { shareOf } from './trail'
 import { useTrailWalker, type WalkLeg } from './walk'
 import { TrailWalker } from './walker'
 import map from './map.module.css'
+
+// The wardrobe's journal plate under the map he walks: ink on the page, 14.8 to 1, edged in bark.
+const OUTFIT_LOOK: WardrobeLook = { plate: TRAIL.PAGE, text: TRAIL.INK, ring: TRAIL.BARK }
 
 // The recruiter first screen and the profession pick, as the overworld map he arrives on.
 //
@@ -331,7 +335,7 @@ export function ExpeditionHero({ name }: { name: string }) {
                 <HubMapArt />
                 <div ref={hub.markerRef} className={`pointer-events-none absolute inset-0 ${map.marker}`} data-acting={hub.acting} aria-hidden="true">
                   <div className={`absolute left-0 top-0 w-[5.2%] -translate-x-1/2 -translate-y-[92%] ${map.markerDrop}`}>
-                    <div className={map.figure}>
+                    <div data-worlds-figure="" className={map.figure}>
                       <TrailWalker profession={active} className="h-auto w-full" />
                     </div>
                   </div>
@@ -357,6 +361,7 @@ export function ExpeditionHero({ name }: { name: string }) {
             </div>
           </div>
         </div>
+        <Wardrobe look={OUTFIT_LOOK} ready={reached.landed} className="mt-4" />
         <p className="mx-auto mt-3 w-fit rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-center text-sm text-white">{trail.walkHint}</p>
       </section>
     </div>

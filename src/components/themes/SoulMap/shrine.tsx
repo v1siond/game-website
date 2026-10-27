@@ -12,7 +12,11 @@ import { usePoseScript } from './poses'
 import { useRun } from './run'
 import { CVLink, EngineLink, HeroActions } from './links'
 import { CARVED, SOUL } from './palette'
+import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import souls from './souls.module.css'
+
+// His outfit plate: a carved stone slab with the bonfire's glow in its letters and edge.
+const OUTFIT_LOOK: WardrobeLook = { plate: SOUL.panel, text: SOUL.glow, ring: SOUL.glowDeep }
 
 // The hero: the ruined shrine at dusk, the circular plaza on its cliff under a grey sky, the aqueduct's
 // arches behind it, the lift tower to the right and a broken arch to the left, the way the game's first
@@ -205,6 +209,7 @@ export function ShrineHero() {
           <button
             type="button"
             onClick={roll}
+            data-worlds-figure=""
             disabled={!ready}
             aria-label={words.roll}
             title={words.roll}
@@ -235,6 +240,7 @@ export function ShrineHero() {
               <CVLink />
               <EngineLink />
             </div>
+            <Wardrobe look={OUTFIT_LOOK} ready={ready} className={`mt-5 ${CARVED}`} />
             <p className="mt-5 text-sm italic text-[color:var(--soul-text-soft)]">{words.restHint}</p>
           </div>
         )}

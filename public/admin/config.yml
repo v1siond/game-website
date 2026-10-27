@@ -837,6 +837,12 @@ collections:
                   - { <<: *text, label: "Mark on a world not seen yet", name: pickerNotSeen }
                   - { <<: *text, label: "Mark on a world seen", name: pickerSeenMark }
                   - { <<: *text, label: "Mark on the world the visitor is in", name: pickerHere }
+                  - { <<: *text, label: "Wardrobe previous arrow for a screen reader, {name} is the world", name: wardrobePrev }
+                  - { <<: *text, label: "Wardrobe next arrow for a screen reader, {name} is the world", name: wardrobeNext }
+                  - { <<: *text, label: "Lens caption, {name} is the next world", name: lensCaption }
+                  - { <<: *text, label: "Lens button going to the next world", name: lensGo }
+                  - { <<: *text, label: "Lens name for a screen reader", name: lensAria }
+                  - { <<: *text, label: "Launcher name for a screen reader once it shows the next world", name: faceAria }
 
   # One Markdown file per post, content/blog/<slug>.md, English only. The front matter is JSON (Decap's
   # json-frontmatter), which the site reads with JSON.parse. A new post starts as a draft: drafts show
