@@ -104,7 +104,8 @@ export default function RubberHoseTheme() {
                       <CVLink />
                       <EngineLink />
                     </nav>
-                    <Wardrobe look={OUTFIT_LOOK} className={`${staggerAt(3)} ${look.word}`} />
+                    {/* from lg his figure stands at the card's left edge, so the plate leaves the centre and stands at his side */}
+                    <Wardrobe look={OUTFIT_LOOK} className={`lg:ml-6 lg:self-start ${staggerAt(3)} ${look.word}`} />
                   </div>
                 )}
               </TitleCardIntro>

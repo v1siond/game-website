@@ -315,6 +315,17 @@
   --wd-track: 0.04em;
 }
 .c-wardrobe--rubber-hose .c-wardrobe__plate { box-shadow: 3px 4px 0 var(--wd-ring); }
+/* From lg the plate stands at his side under the contact row (RubberHoseTheme.tsx), so his outfits fan out
+   to the plate's right along its top edge, clear of the lines and links above it. The fan's centre sits past the
+   plate by a side card's shift (78 % of a card) and half a card, plus 20 px: about 10 px for the tilted card's
+   corner and 10 px of air. */
+@media (min-width: 1024px) {
+  .c-wardrobe--rubber-hose .c-wardrobe__fan {
+    top: 0;
+    bottom: auto;
+    left: calc(100% + var(--wd-card-w) * 0.78 + var(--wd-card-w) / 2 + 20px);
+  }
+}
 
 /* Silhouette: a black cut-out with the sky's rim of light, wide typewriter capitals. */
 .c-wardrobe--silhouette {
