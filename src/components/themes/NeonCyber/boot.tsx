@@ -164,7 +164,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                   </div>
                   <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" aria-hidden="true" />
                 </div>
-                <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-md absolute -right-[18px] bottom-[calc(100%_+_1.5rem)] z-10 md:bottom-auto md:right-0 md:top-[calc(100%_+_1rem)] ${world.fadeLate}`} />
+                <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-md c-wardrobe--fan-down-from-lg absolute -right-[18px] bottom-[calc(100%_+_1.5rem)] z-10 md:bottom-auto md:right-0 md:top-[calc(100%_+_1rem)] ${world.fadeLate}`} />
               </div>
             </div>
           </div>

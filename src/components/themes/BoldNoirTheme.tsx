@@ -56,7 +56,7 @@ export default function BoldNoirTheme() {
           <CallingCardHero />
           {/* out of the flow, in the header so it stacks over the menu section (z-20): on a phone slim at the
               right of the card's last link row, from sm centred across the header's foot, over the slabs */}
-          <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-sm c-wardrobe--fan-left-from-lg absolute bottom-10 right-4 z-10 sm:inset-x-0 sm:-bottom-[5px] lg:left-1/2 lg:right-auto lg:-translate-x-1/2" />
+          <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:-44px] c-wardrobe--fan-left-from-lg absolute bottom-10 right-4 z-10 sm:inset-x-0 sm:-bottom-[5px] lg:left-1/2 lg:right-auto lg:-translate-x-1/2" />
         </header>
 
         <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>

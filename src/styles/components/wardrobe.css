@@ -98,10 +98,12 @@
 }
 
 /* The fan: his previous, current and next outfits, each his figure in that world, slide out of the plate,
-   hold and slide back in, over him and above the plate. The next one is ringed in the plate's text colour. */
+   hold and slide back in, over him and above the plate. The next one is ringed in the plate's text colour.
+   --wd-fan-gap (8 px unless a hero sets it on its plate, per width) is the room between the plate and an upward
+   or downward fan; a negative gap lays the fan over the plate, where a hero has no free band beside it. */
 .c-wardrobe__fan {
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + var(--wd-fan-gap, 8px));
   left: 50%;
   z-index: 20;
   width: var(--wd-card-w);
@@ -172,19 +174,19 @@
    downward, over him, instead of past the top of the screen. */
 @media (max-width: 639.98px) {
   .c-wardrobe--fan-down-below-sm .c-wardrobe__fan {
-    top: calc(100% + 8px);
+    top: calc(100% + var(--wd-fan-gap, 8px));
     bottom: auto;
   }
 }
 @media (max-width: 767.98px) {
   .c-wardrobe--fan-down-below-md .c-wardrobe__fan {
-    top: calc(100% + 8px);
+    top: calc(100% + var(--wd-fan-gap, 8px));
     bottom: auto;
   }
 }
 @media (max-width: 1023.98px) {
   .c-wardrobe--fan-down-below-lg .c-wardrobe__fan {
-    top: calc(100% + 8px);
+    top: calc(100% + var(--wd-fan-gap, 8px));
     bottom: auto;
   }
 }
@@ -194,7 +196,7 @@
    as wide as its plate. */
 @media (min-width: 1024px) {
   .c-wardrobe--fan-down-from-lg .c-wardrobe__fan {
-    top: calc(100% + 8px);
+    top: calc(100% + var(--wd-fan-gap, 8px));
     bottom: auto;
   }
   .c-wardrobe--fan-level-from-lg .c-wardrobe__fan {
@@ -445,6 +447,15 @@
     bottom: auto;
     left: auto;
     margin-left: 0;
+  }
+}
+/* Below xl the plate stands too near the screen's left edge for that fan, so it opens centred on the plate's
+   left end, over him and short of the Musician badge. */
+@media (min-width: 1024px) and (max-width: 1279.98px) {
+  .c-wardrobe--rubber-hose .c-wardrobe__fan {
+    right: auto;
+    left: 0;
+    margin-left: calc(var(--wd-card-w) / -2);
   }
 }
 
