@@ -55,8 +55,12 @@ Artistic.
   text still waiting for its reveal (at opacity 0) counts as covered. Text kept for screen readers only
   (`isVisuallyHidden`, such as the Neon Portals counters) is never drawn and does not count. Once open, the
   card checks itself every frame for `HINT_WATCH_MS` (3000, 3 s) and closes for the visit if text or a
-  control slides or fades in under it (`hintWatch`). It never takes focus and closes on its x, Escape or a
-  tap outside.
+  control slides or fades in under it (`hintWatch`). Its top is fixed under the launcher's tallest face, the
+  turned one: `--wl-hint-top` in `worlds-nudge.css` is the launcher's bottom (`--wl-launcher-bottom`, 70 px
+  from 640 px up and 60 px below, from the same top, padding and portrait size the launcher reads) plus a
+  12 px gap and the 8 px it slides in from, so 90 px and 80 px, and its covered check does not count the
+  launcher, so a face turning while the card is open never closes it. It never takes focus and closes on its
+  x, Escape or a tap outside.
 - The next world is `nextInTour` (`src/lib/worlds/nudge.ts`): the first world of `TOUR_ORDER` that is not
   seen and not the current one, so a first visitor in the default world is offered Medieval Fantasy. With
   every world seen it offers the one after the current world.
@@ -80,7 +84,7 @@ Artistic.
   `portfolio-worlds-wardrobe-fan`) his previous and next outfits, each his full figure in that world, fan out
   of the plate for `WARDROBE_FAN_MS` (2750, 2.75 s) and settle back; never under reduced motion. Dark Fantasy,
   Medieval Fantasy and Silhouette get the plate beside the figure and keep their own look. Each hero marks
-  his figure `data-worlds-figure` (the capture crops it) and the wardrobe's wrapper `data-worlds-hero` (the
+  his figure `data-worlds-figure` (the capture crops it) and its hero section `data-worlds-hero` (the
   launcher watches it).
 - The launcher's face (`useWorldsNudge`, `launcherFace` in `src/lib/worlds/lens.ts`): while the hero is in
   view it reads "17 worlds". Once the `data-worlds-hero` element has left the screen (an
@@ -112,16 +116,17 @@ Artistic.
   most, drawn alone on a transparent ground; a figure that shows only further down, Dark Fantasy's knights
   or Medieval Fantasy's frost figure, is scrolled to first), and `focus.json`, the centre of that figure in
   each still where it is drawn on screen, where the lens looks (the middle of the hero's upper part when it
-  is not). It refuses to start while another
-  headless Chromium runs, closes its own, and exits 1 naming any world with no figure to crop. It takes
-  about 6 minutes for the 17 worlds.
-- Refresh them after changing a hero: run the capture and commit the previews with the hero.
-  `node scripts/check-world-previews.mjs` (`npm run check:previews`, run as `prebuild`) fails the build and
-  names the world when a hero source (everything under `src/components/themes/<World>/`, its
-  `<World>Theme.tsx` and module CSS, and `src/styles/themes/<id>.css`) was committed after its
-  `<id>-1440.webp` still, or is changed in the tree while the still is not. A still that is new or changed in
-  the tree counts as current. It compares git commit times, so a fresh clone (Netlify) reads the same, and
-  it never launches a browser.
+  is not). Once every world's shots are written it writes `stamp.json`, per world a sha256 of its hero
+  sources; a run that exits 1 leaves it as it was. It refuses to start while another headless Chromium
+  runs, closes its own, and exits 1 naming any world with no figure to crop. It takes about 6 minutes for
+  the 17 worlds.
+- Refresh them after changing a hero: run the capture and commit the previews and `stamp.json` with the
+  hero. `node scripts/check-world-previews.mjs` (`npm run check:previews`, run as `prebuild`) hashes each
+  world's hero sources again (everything under `src/components/themes/<World>/`, its `<World>Theme.tsx` and
+  module CSS, and `src/styles/themes/<id>.css`) and compares them with the stamp the capture wrote, by
+  content: it fails the build and names the world whose hash is missing or differs, or that has no
+  `<id>-1440.webp` still. It reads files only, so any clone or copy (Netlify) reads the same, and it never
+  launches a browser.
 - Every launcher, hint and picker word is Site text in Decap (`content/cv/labels.json` `labels.worlds`, in
   English, Spanish and Italian). `RootShell` reads it with `getLabels` (`src/lib/cv-data.ts`) on the server
   and hands it down through `WorldsLabelsProvider` (`src/components/worlds/WorldsLabels.tsx`), since the

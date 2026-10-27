@@ -30,12 +30,12 @@ function NextFace({ face, nextId, nextName }: { face: Exclude<LauncherFace, 'cou
   return (
     <>
       <span aria-hidden="true" className={`${FACE_CLASS[face]} flex items-center gap-2`}>
-        <Image src={portraitOf(nextId)} alt="" width={40} height={40} unoptimized className="c-worlds-face__portrait h-10 w-10 flex-none rounded-full object-cover object-[50%_18%] sm:h-[34px] sm:w-[34px]" />
+        <Image src={portraitOf(nextId)} alt="" width={40} height={40} unoptimized className="c-worlds-face__portrait h-[var(--wl-face-size)] w-[var(--wl-face-size)] flex-none rounded-full object-cover object-[50%_18%]" />
         <span className="hidden max-w-[8.5rem] text-left text-sm font-bold leading-[1.05] sm:inline">{nextName}</span>
       </span>
       {face === 'turn' && (
         <span aria-hidden="true" className="c-worlds-face-wide absolute right-0 top-0 flex h-full w-[172px] items-center gap-2 rounded-lg pl-1 pr-2 sm:hidden">
-          <Image src={portraitOf(nextId)} alt="" width={40} height={40} unoptimized className="c-worlds-face__portrait h-10 w-10 flex-none rounded-full object-cover object-[50%_18%]" />
+          <Image src={portraitOf(nextId)} alt="" width={40} height={40} unoptimized className="c-worlds-face__portrait h-[var(--wl-face-size)] w-[var(--wl-face-size)] flex-none rounded-full object-cover object-[50%_18%]" />
           <span className="text-left text-[15px] font-bold leading-[1.1]">{nextName}</span>
         </span>
       )}
@@ -99,6 +99,7 @@ export default function WorldsLauncher() {
       <div data-worlds-lens-group="" {...lens.groupProps}>
         <button
           ref={button}
+          data-worlds-launcher=""
           type="button"
           onClick={open}
           {...lens.buttonProps}
@@ -106,7 +107,7 @@ export default function WorldsLauncher() {
           title={fillLabel(labels.launcherTitle, { count: nudge.total })}
           inert={hidden}
           style={vars}
-          className={`c-worlds-launcher fixed top-2 right-1 z-[150] flex min-h-11 min-w-11 flex-col items-center justify-center rounded-lg px-0.5 py-1 leading-none sm:top-4 sm:right-4 sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-3.5 sm:py-2 ${hidden ? 'invisible' : ''}`}
+          className={`c-worlds-launcher fixed top-[var(--wl-launcher-top)] right-1 z-[150] flex min-h-11 min-w-11 flex-col items-center justify-center rounded-lg px-0.5 py-[var(--wl-launcher-pad-y)] leading-none sm:right-4 sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-3.5 ${hidden ? 'invisible' : ''}`}
         >
           {nudge.face === 'count' ? (
             <CountFace template={labels.launcher} total={nudge.total} />

@@ -55,7 +55,7 @@ export default function WorldsHint({ cardRef, open, style, worldName, nextName, 
       aria-hidden={!open || undefined}
       inert={!open}
       style={style}
-      className={`c-worlds-hint fixed top-[60px] left-4 right-4 z-[150] rounded-lg p-3 sm:top-[72px] sm:left-auto sm:w-80 ${open ? 'c-worlds-hint--open' : 'invisible'}`}
+      className={`c-worlds-hint fixed top-[var(--wl-hint-top)] left-4 right-4 z-[150] rounded-lg p-3 sm:left-auto sm:w-80 ${open ? 'c-worlds-hint--open' : 'invisible'}`}
     >
       <p id="worlds-hint-title" className="pr-11 pt-1 text-base font-bold leading-tight">
         {fillLabel(labels.hintNextTitle, { world: nextName })}

@@ -22,6 +22,30 @@
   border: 2px solid var(--wl-text);
 }
 
+/* Where the launcher stands and how tall its tallest face is (the turned face: his portrait inside the
+   padding and the 2 px border, top and bottom), so the hint card hangs under it whichever face it shows or
+   turns to while the card is open. The launcher reads its top, padding and portrait size from here and the
+   hint its top, so a change of the face moves the card with it; nothing measures either at run time. The
+   card's top leaves the gap, then the slide it opens with, so even its first frame is clear of the launcher. */
+.c-worlds-launcher,
+.c-worlds-hint {
+  --wl-launcher-top: 8px;
+  --wl-launcher-pad-y: 4px;
+  --wl-face-size: 40px;
+  --wl-launcher-bottom: calc(var(--wl-launcher-top) + var(--wl-face-size) + 2 * var(--wl-launcher-pad-y) + 2 * 2px);
+  --wl-hint-gap: 12px;
+  --wl-hint-slide: 8px;
+  --wl-hint-top: calc(var(--wl-launcher-bottom) + var(--wl-hint-gap) + var(--wl-hint-slide));
+}
+@media (min-width: 640px) {
+  .c-worlds-launcher,
+  .c-worlds-hint {
+    --wl-launcher-top: 16px;
+    --wl-launcher-pad-y: 8px;
+    --wl-face-size: 34px;
+  }
+}
+
 .c-worlds-launcher {
   box-shadow: 0 0 0 2px var(--wl-fill), 0 0 0 3px var(--wl-edge), 0 6px 24px rgba(0, 0, 0, 0.45);
   transition: transform 0.15s ease;
@@ -58,7 +82,7 @@
 
 /* Drops in from under the launcher: opacity and a short slide, once. */
 @keyframes worlds-hint-in {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(calc(-1 * var(--wl-hint-slide))); }
   to { opacity: 1; transform: none; }
 }
 .c-worlds-hint--open { animation: worlds-hint-in 0.28s ease-out both; }

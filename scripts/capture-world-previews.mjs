@@ -6,8 +6,10 @@
 //   <id>-390.webp        the lens still at 390 by 844 (WorldLens on a phone)
 //   portraits/<id>.webp  his figure, the box of the [data-worlds-figure] element (the launcher's face)
 // and focus.json, the centre of that figure in each still when it is drawn on screen there, where the lens looks;
-// a figure further down is scrolled to for the portrait only. The launcher is hidden in
-// every shot. Run it again after changing a hero; scripts/check-world-previews.mjs fails the build until then.
+// a figure further down is scrolled to for the portrait only. The launcher is hidden in every shot. Once every
+// world's shots are written it writes stamp.json, each world's hero hash (writeStamp in
+// scripts/check-world-previews.mjs); a run that exits 1 leaves it as it was. Run it again after changing a hero
+// and commit stamp.json with the previews; scripts/check-world-previews.mjs fails the build until then.
 // One headless browser on the box at a time: it refuses to start while another one runs, and closes its own.
 // Usage: node scripts/capture-world-previews.mjs [base]   (default http://localhost:4100)
 import { execFileSync } from 'node:child_process'
@@ -15,7 +17,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from '@playwright/test'
-import { readWorlds } from './check-world-previews.mjs'
+import { readWorlds, writeStamp } from './check-world-previews.mjs'
 
 const BASE = process.argv[2] ?? 'http://localhost:4100'
 const OUT = fileURLToPath(new URL('../public/world-previews/', import.meta.url))
@@ -207,6 +209,7 @@ async function main() {
     }
     writeFileSync(join(OUT, 'focus.json'), `${JSON.stringify(focus, null, 2)}\n`)
     if (missing.length === 0) {
+      writeStamp()
       console.log(`done: ${OUT}`)
       return 0
     }

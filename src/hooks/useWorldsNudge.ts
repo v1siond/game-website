@@ -75,11 +75,19 @@ const drawsNothing = (element: Element): boolean => {
   return isVisuallyHidden({ width, height, overflow, position, clip, clipPath })
 }
 
-/** The boxes of every laid out text line and control on the page that meet the card's box, the card's own aside. */
+// The launcher the card hangs under. Its own text and button never count as covered: the card's fixed top
+// (worlds-nudge.css) already keeps it under the launcher's tallest face, and a face turning while the card
+// is open must not close it.
+const LAUNCHER_SELECTOR = '[data-worlds-launcher]'
+
+/** The boxes of every laid out text line and control on the page that meet the card's box, the card's own and the launcher's aside. */
 function boxesUnder(card: HTMLElement): DOMRect[] {
   const box = card.getBoundingClientRect()
   const meets = (element: Element): boolean =>
-    !card.contains(element) && !coversNothing(box, [element.getBoundingClientRect()]) && isShown(element)
+    !card.contains(element) &&
+    !element.closest(LAUNCHER_SELECTOR) &&
+    !coversNothing(box, [element.getBoundingClientRect()]) &&
+    isShown(element)
   const controls = Array.from(document.querySelectorAll(CONTROLS)).filter(meets).map((element) => element.getBoundingClientRect())
   const lines: DOMRect[] = []
   const range = document.createRange()
@@ -107,7 +115,7 @@ function revealsSettled(): Promise<unknown> {
   return Promise.race([Promise.allSettled(finishing), cap])
 }
 
-// The hero's anchor each world marks (the wardrobe's wrapper); the launcher's face turns once it leaves the screen.
+// The hero section each world marks; the launcher's face turns once it leaves the screen.
 const HERO_SELECTOR = '[data-worlds-hero]'
 
 // A page with no hero element counts as scrolled, but only after a world loading its chunk has had the time
