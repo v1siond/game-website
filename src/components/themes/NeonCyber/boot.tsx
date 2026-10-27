@@ -100,7 +100,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
   return (
     <RecruiterHero
       render={({ name, headline, tagline, line, actions }) => (
-        <div className={`relative mx-auto max-w-6xl ${world.tilt}`}>
+        <div data-worlds-hero="" className={`relative mx-auto max-w-6xl ${world.tilt}`}>
           <div className={`${world.panel} relative overflow-hidden p-5 sm:p-8`}>
             <span className={`pointer-events-none absolute inset-0 border-t-2 border-[color:var(--neon-hud)] ${world.sweep}`} aria-hidden="true" />
             {BRACKETS.map((place) => (
@@ -154,7 +154,8 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                 </div>
               </div>
 
-              {/* his portrait in the optics frame, built from one line, then he walks in, his outfit plate under it */}
+              {/* his portrait in the optics frame, built from one line, then he walks in; his outfit plate sits over it
+                  on phones, where the frame runs past the first screen, and under it from md */}
               <div className="flex flex-col items-center gap-4">
                 <div data-worlds-figure="" className="relative mx-auto w-32 overflow-hidden border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40">
                   <div className={world.build}>
@@ -162,7 +163,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                   </div>
                   <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" aria-hidden="true" />
                 </div>
-                <Wardrobe look={OUTFIT_LOOK} className={world.fadeLate} />
+                <Wardrobe look={OUTFIT_LOOK} className={`order-first md:order-none ${world.fadeLate}`} />
               </div>
             </div>
           </div>

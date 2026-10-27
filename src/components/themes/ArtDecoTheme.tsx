@@ -109,15 +109,18 @@ export default function ArtDecoTheme() {
         <AbyssVeil />
         <div className={`pointer-events-none fixed inset-0 z-[7] ${look.vignette}`} aria-hidden="true" />
 
-        <header className="relative z-30 px-4 pb-6 pt-10 sm:px-6 sm:pt-16">
-          <DepthZone zone="surface">
-            <BathysphereHero />
-          </DepthZone>
-        </header>
+        {/* the first screen: his name at the surface and the machine where he stands */}
+        <div data-worlds-hero="">
+          <header className="relative z-30 px-4 pb-6 pt-10 sm:px-6 sm:pt-16">
+            <DepthZone zone="surface">
+              <BathysphereHero />
+            </DepthZone>
+          </header>
 
-        <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
-          <VendingMachine />
-        </section>
+          <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
+            <VendingMachine />
+          </section>
+        </div>
 
         <main className="relative z-20 px-4 py-16 sm:px-8">
           <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>

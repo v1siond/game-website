@@ -46,6 +46,13 @@ const DAWN = SKY.dawn
 
 // The plate is a black cut-out with the sky's rim of light for its name.
 const OUTFIT_LOOK: WardrobeLook = { plate: SHADE.black, text: SHADE.rim, ring: SHADE.dawnRim }
+// The plate stands in the forest beside him, out of the page flow, so the intertitle and the actions keep
+// their places. The forest's svg is 108 % wide and slices to its bottom, so one viewBox unit is --u
+// (0.18cqw or 0.5cqh, the larger) and he stands from x 228 at 50cqw - 72u, between y 126 and 180 of 200.
+// On a phone the plate is centred over his head; from md it stands on his right, level with his chest.
+const PLATE_SCALE = '[--u:max(0.18cqw,0.5cqh)]'
+const PLATE_PLACE =
+  'left-1/2 top-[calc(100cqh_-_74*var(--u)_-_68px)] -translate-x-1/2 md:left-[calc(50cqw_-_44*var(--u))] md:top-[calc(100cqh_-_47*var(--u)_-_28px)] md:translate-x-0'
 const FAR_PINES = [24, 66, 104, 160, 214, 380, 432, 470, 520, 566]
 
 function Forest({ profession, pose }: { profession: Profession; pose: SpritePose }) {
@@ -119,7 +126,7 @@ export function WakeHero({ profession }: { profession: Profession }) {
   return (
     <RecruiterHero
       render={({ name, headline, tagline, line, actions }) => (
-        <div className="mx-auto max-w-6xl">
+        <div data-worlds-hero="" className="mx-auto max-w-6xl">
           <div className={`px-4 pb-6 pt-8 text-center sm:pt-12 ${TEXT_SHOWN(shown)}`}>
             <div className="mx-auto mb-4 h-px w-24 bg-[color:var(--sh-fog)]" aria-hidden="true" />
             <h1 className={`text-[clamp(1.5rem,7vw,2.25rem)] font-normal uppercase tracking-[0.3em] text-[color:var(--sh-heading)] sm:tracking-[0.45em] ${TYPEWRITER}`}>
@@ -133,10 +140,12 @@ export function WakeHero({ profession }: { profession: Profession }) {
           <div className="relative h-[42vh] min-h-[240px] max-h-[460px] overflow-hidden border-y-2 border-[color:var(--sh-black)]">
             <Forest profession={profession} pose={POSE[phase]} />
             <Iris phase={phase} />
+            <div className={`pointer-events-none absolute inset-0 z-20 [container-type:size] ${PLATE_SCALE}`}>
+              <Wardrobe look={OUTFIT_LOOK} ready={shown} className={`pointer-events-auto absolute ${PLATE_PLACE} ${TYPEWRITER} ${TEXT_SHOWN(shown)}`} />
+            </div>
           </div>
 
           <div className={`flex flex-col items-center gap-4 px-4 pt-6 ${TEXT_SHOWN(shown)}`}>
-            <Wardrobe look={OUTFIT_LOOK} ready={shown} className={TYPEWRITER} />
             <p className="max-w-xl text-center text-sm tracking-wider text-[color:var(--sh-text)]">{line}</p>
             <nav className="flex flex-wrap items-center justify-center gap-3" aria-label={navigation.contactAndCv}>
               <HeroActions actions={actions} />

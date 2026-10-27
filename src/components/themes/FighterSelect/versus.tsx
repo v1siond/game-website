@@ -26,7 +26,8 @@ const RISE_DELAYS = ['[--delay:760ms]', '[--delay:860ms]', '[--delay:960ms]', '[
 
 // The VS burst sits on the seam: between the two stacked panels on a phone and a tablet (the left panel
 // is h-56, sm:h-72, the gap 1rem), on the diagonal cut at lg where the panels stand side by side.
-// The plate row under the stage panel (3.5rem plate and 0.75rem gap) pushes the seam down on the stacked layout.
+// The plate row over the stage panel (3.5rem plate and 0.75rem gap) pushes the seam down on the stacked layout,
+// so the burst lands between the panels, clear of the plate.
 const SEAM = 'left-1/2 top-[18.75rem] sm:top-[22.75rem] lg:left-[40%] lg:top-1/2'
 
 // His outfit plate: the versus screen's name bar, gold call lettering on the select navy with a white frame.
@@ -39,8 +40,10 @@ export function HeroSplash({ profession }: { profession: Profession }) {
     <Cue>
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
-          <div className="relative grid gap-4 lg:grid-cols-[2fr_3fr]">
+          <div data-worlds-hero="" className="relative grid gap-4 lg:grid-cols-[2fr_3fr]">
             <div className="flex flex-col gap-3">
+              {/* on a phone it keeps to the left, clear of the worlds button in the top right corner */}
+              <Wardrobe look={OUTFIT_LOOK} className={`justify-start sm:justify-center ${look.display} ${fight.enter} ${fight.slashIn}`} />
               <div className={`relative h-56 overflow-hidden border-4 border-white bg-black shadow-[inset_0_0_0_2px_#000] sm:h-72 ${look.splashLeft} ${fight.enter} ${fight.slashIn}`}>
                 <StageBackdrop profession={profession} />
                 <div className={`absolute inset-0 bg-white ${fight.enter} ${fight.flash} [--delay:360ms] opacity-0`} aria-hidden="true" />
@@ -55,7 +58,6 @@ export function HeroSplash({ profession }: { profession: Profession }) {
                   {hud.playerOne}
                 </span>
               </div>
-              <Wardrobe look={OUTFIT_LOOK} className={`${look.display} ${fight.enter} ${fight.slashIn}`} />
             </div>
 
             <div className={`absolute z-20 -translate-x-1/2 -translate-y-1/2 ${SEAM}`} aria-hidden="true">

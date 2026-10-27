@@ -62,7 +62,7 @@ export default function SurvivalHorrorTheme() {
 
             <div className="relative z-10">
               <RoomWindow zone="hall">
-                <header>
+                <header data-worlds-hero="">
                   <HallHero profession={active} />
                 </header>
               </RoomWindow>

@@ -242,6 +242,7 @@ export function SunsetHero() {
       render={({ name, headline, tagline, line, actions }) => (
         <div
           ref={ref}
+          data-worlds-hero=""
           data-on={triggered || undefined}
           data-again={shot > 0 || undefined}
           className={`mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-2 md:gap-12 ${sunset.hero}`}

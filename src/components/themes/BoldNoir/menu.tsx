@@ -107,12 +107,13 @@ export function ProfessionMenu({ active }: { active: Profession }) {
 
   return (
     <>
+      {/* over the slabs, so on a phone it shows on the first screen right above his figure */}
+      <Wardrobe look={OUTFIT_LOOK} className="mb-8" />
       <ProfessionSwitch
         className="mx-auto grid max-w-xl grid-cols-3 gap-2 sm:flex sm:max-w-none sm:justify-center sm:gap-10"
         label={navigation.profession}
         renderOption={(option) => <MenuSlab {...option} />}
       />
-      <Wardrobe look={OUTFIT_LOOK} className="mt-8" />
       <CutIn profession={active} />
     </>
   )

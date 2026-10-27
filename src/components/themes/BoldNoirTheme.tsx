@@ -46,16 +46,19 @@ export default function BoldNoirTheme() {
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={NOIR_VARS}>
       <NoirBackdrop />
 
-      <header className="relative z-30 px-4 pb-10 pt-16 sm:px-6 sm:py-16">
-        <CallingCardHero />
-      </header>
+      {/* the first screen: his calling card and the menu where he stands */}
+      <div data-worlds-hero="">
+        <header className="relative z-30 px-4 pb-10 pt-16 sm:px-6 sm:py-16">
+          <CallingCardHero />
+        </header>
 
-      <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
-        <ProfessionMenu active={active} />
-        <div className="mt-10">
-          <ProfessionSet key={active} profession={active} />
-        </div>
-      </section>
+        <section className="relative z-20 px-4 py-8" aria-label={navigation.professionSelection}>
+          <ProfessionMenu active={active} />
+          <div className="mt-10">
+            <ProfessionSet key={active} profession={active} />
+          </div>
+        </section>
+      </div>
 
       <main className="relative z-20 px-4 py-10 sm:px-6">
         <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>

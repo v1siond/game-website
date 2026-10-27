@@ -1861,7 +1861,8 @@ export default function DarkFantasyTheme() {
       </nav>
 
       {/* Hero Section - below fixed nav, the recruiter first screen */}
-      <header className="relative z-20 pt-20 md:pt-24 pb-6 px-4 md:px-6">
+      {/* one step over the next section below lg, so the plate hanging into its top padding takes the clicks */}
+      <header data-worlds-hero="" className="relative z-20 max-lg:z-[21] pt-20 md:pt-24 pb-6 px-4 md:px-6">
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
             <div className="max-w-4xl mx-auto text-center">
@@ -1883,8 +1884,15 @@ export default function DarkFantasyTheme() {
               <p className="text-sm mt-2" style={{ color: DARK_FANTASY.bone }}>{line}</p>
               <div className="flex flex-wrap gap-3 justify-center mt-4">
                 <HeroActions actions={actions} />
+                {/* out of the page flow so the hero keeps its places. From lg a zero size item at the end of the
+                    actions row (its gap taken back) hangs the plate 30px right of the last action, on the row's
+                    centre line; below lg the slim plate sits between the actions and the profession nodes, in
+                    the header's bottom padding and the gap under it */}
+                <Wardrobe
+                  look={OUTFIT_LOOK}
+                  className="c-wardrobe--slim-below-lg absolute inset-x-0 top-[calc(100%_-_22px)] lg:relative lg:inset-x-auto lg:top-auto lg:-ml-3 lg:h-0 lg:w-0 lg:translate-x-[30px] lg:items-center lg:justify-start lg:self-center"
+                />
               </div>
-              <Wardrobe look={OUTFIT_LOOK} className="mt-5" />
             </div>
           )}
         />

@@ -192,7 +192,7 @@ export function ShrineHero() {
   }
 
   return (
-    <div className="relative">
+    <div data-worlds-hero="" className="relative">
       <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden md:aspect-[2/1]">
         <Ruins />
         <div className="absolute bottom-0 left-1/2 aspect-[2/1] h-full -translate-x-1/2">
@@ -219,6 +219,9 @@ export function ShrineHero() {
           </button>
         </div>
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[color:var(--soul-abyss)]" aria-hidden="true" />
+        {/* his plate in the ruins beside him: over his head on a phone, on his left from md (he stands from
+            33 % to 42 % across and from 9 % to 36 % up the scene) */}
+        <Wardrobe look={OUTFIT_LOOK} ready={ready} className={`absolute inset-x-0 bottom-[38%] z-10 md:inset-x-auto md:bottom-[18%] md:right-[68%] ${CARVED}`} />
       </div>
 
       <RecruiterHero
@@ -240,7 +243,6 @@ export function ShrineHero() {
               <CVLink />
               <EngineLink />
             </div>
-            <Wardrobe look={OUTFIT_LOOK} ready={ready} className={`mt-5 ${CARVED}`} />
             <p className="mt-5 text-sm italic text-[color:var(--soul-text-soft)]">{words.restHint}</p>
           </div>
         )}

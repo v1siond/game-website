@@ -315,6 +315,7 @@ export function ExpeditionHero({ name }: { name: string }) {
   return (
     <div
       ref={entrance.ref}
+      data-worlds-hero=""
       className="relative px-4 pb-6 pt-14 sm:px-6"
       data-unrolled={reached.unrolled}
       data-inked={reached.inked}
@@ -324,7 +325,7 @@ export function ExpeditionHero({ name }: { name: string }) {
       <NamePlaque />
 
       <section className="relative mx-auto mt-6 max-w-5xl" aria-label={navigation.professionSelection}>
-        <div className={map.mapTilt}>
+        <div className={`relative ${map.mapTilt}`}>
           <div
             className="relative overflow-hidden rounded-md border-[6px] border-[color:var(--ap-wood)] bg-[color:var(--ap-parchment)] shadow-[0_10px_0_var(--ap-bark)]"
             data-season={hub.season}
@@ -360,9 +361,12 @@ export function ExpeditionHero({ name }: { name: string }) {
               <div className="absolute inset-y-0 -left-3 w-6 rounded-full bg-[linear-gradient(90deg,var(--ap-bark),var(--ap-wood)_45%,var(--ap-bark))]" />
             </div>
           </div>
+          {/* his trail tag pinned to the map beside him, out of the flow: under the low landmark labels
+              from lg (he stands round the middle of the lower map), across the map's bottom edge below lg,
+              where the landmarks and their labels fill the map */}
+          <Wardrobe look={OUTFIT_LOOK} ready={reached.landed} className="absolute inset-x-0 bottom-[-12px] z-10 lg:inset-x-auto lg:bottom-auto lg:left-[24.6%] lg:top-[69.9%]" />
         </div>
-        <Wardrobe look={OUTFIT_LOOK} ready={reached.landed} className="mt-4" />
-        <p className="mx-auto mt-3 w-fit rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-center text-sm text-white">{trail.walkHint}</p>
+        <p className="mx-auto mt-5 w-fit rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-center text-sm text-white">{trail.walkHint}</p>
       </section>
     </div>
   )

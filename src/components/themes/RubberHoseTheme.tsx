@@ -81,7 +81,7 @@ export default function RubberHoseTheme() {
         {/* the recruiter first screen */}
         <IsleStage isle="meadow">
         {() => (
-        <header className="relative z-30 px-2 py-6 sm:p-6">
+        <header data-worlds-hero="" className="relative z-30 px-2 py-6 sm:p-6">
           <RecruiterHero
             render={({ name, headline, tagline, line, actions }) => (
               <TitleCardIntro>

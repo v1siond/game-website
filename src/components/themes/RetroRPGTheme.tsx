@@ -75,7 +75,7 @@ export default function RetroRPGTheme() {
         </a>
 
         {/* The encounter: him, the box, the stats line and the command row */}
-        <header className="relative z-30 px-4 pb-6 pt-8 sm:px-6">
+        <header data-worlds-hero="" className="relative z-30 px-4 pb-6 pt-8 sm:px-6">
           <ZoneArea zone="ruins">
             <Encounter profession={active}>
               <RecruiterHero

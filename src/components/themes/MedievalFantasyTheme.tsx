@@ -66,7 +66,7 @@ export default function MedievalFantasyTheme() {
         {/* Header - wrapped in high z-index container so it sits above the scene */}
         <div style={{ position: 'relative', zIndex: 100 }}>
         <ScrollScene>
-          <header style={{ marginBottom: sectionSpacing }}>
+          <header data-worlds-hero="" className="relative" style={{ marginBottom: sectionSpacing }}>
             <RealmFrame zone="roc">
               <RecruiterHero
                 render={({ name, headline, tagline, line, actions }) => (
@@ -97,7 +97,9 @@ export default function MedievalFantasyTheme() {
                 )}
               />
             </RealmFrame>
-            <Wardrobe look={OUTFIT_LOOK} className="mt-4" />
+            {/* out of the page flow so the realm keeps its places: in the frame's top right corner beside his name
+                from lg, under the frame in the header's bottom margin below it */}
+            <Wardrobe look={OUTFIT_LOOK} className="absolute inset-x-0 top-[calc(100%_+_4px)] z-10 lg:inset-x-auto lg:right-[39px] lg:top-[18px]" />
           </header>
         </ScrollScene>
         </div>

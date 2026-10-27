@@ -332,7 +332,7 @@ function ArrivalLayout({ name, headline, tagline, line, profession, nav, spin, a
   const { ref, phase } = useArrival(name.length)
 
   return (
-    <div ref={ref} data-phase={phase} className={`mx-auto grid max-w-6xl items-center gap-8 px-4 pt-20 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] ${stage.arrival}`}>
+    <div ref={ref} data-phase={phase} data-worlds-hero="" className={`mx-auto grid max-w-6xl items-center gap-8 px-4 pt-20 sm:px-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] ${stage.arrival}`}>
       <div className="order-2 lg:order-1">
         <h1 className={`text-[clamp(2.25rem,1.25rem+4vw,4.25rem)] leading-[1.1] ${ui.title}`}>
           <span className="sr-only">{name}</span>

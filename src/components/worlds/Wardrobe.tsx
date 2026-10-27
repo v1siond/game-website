@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type RefObject } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type RefObject } from 'react'
 import Image from 'next/image'
 import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
@@ -116,6 +116,8 @@ function useFanOnce(anchor: RefObject<HTMLElement | null>, ready: boolean): bool
   return fanning
 }
 
+const stopHere = (event: MouseEvent): void => event.stopPropagation()
+
 const insideBox = (touch: Touch, figure: Element): boolean => {
   const { left, right, top, bottom } = figure.getBoundingClientRect()
   return touch.clientX >= left && touch.clientX <= right && touch.clientY >= top && touch.clientY <= bottom
@@ -165,8 +167,9 @@ function useSwipeAcrossFigure(onStep: (step: Step) => void) {
  * next world of TOUR_ORDER through the portal (selectWorld, as the picker does); previous, a swipe to the
  * right or ArrowLeft to the one before, in a circle. On the first visit his previous, current and next
  * outfits fan out of the plate for WARDROBE_FAN_MS (never under reduced motion). The look per world is
- * wardrobe.css (.c-wardrobe--<world id>) over the colours the hero passes from its palette. The wrapper
- * is the hero marker the lens observes (data-worlds-hero).
+ * wardrobe.css (.c-wardrobe--<world id>) over the colours the hero passes from its palette. A click or a key
+ * inside the plate stops there, so a hero that skips its intro on any click or key (Mythic, Cell Shaded)
+ * never sees the plate's own presses.
  */
 export default function Wardrobe({ look, className = '', ready = true }: WardrobeProps) {
   const { theme } = useTheme()
@@ -179,6 +182,7 @@ export default function Wardrobe({ look, className = '', ready = true }: Wardrob
   useSwipeAcrossFigure(go)
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    event.stopPropagation()
     const step = KEY_STEP[event.key]
     if (!step) return
     event.preventDefault()
@@ -190,9 +194,9 @@ export default function Wardrobe({ look, className = '', ready = true }: Wardrob
   const vars = { '--wd-plate': look.plate, '--wd-text': look.text, '--wd-ring': look.ring, '--wd-fan-ms': `${WARDROBE_FAN_MS}ms` } as CSSProperties
 
   return (
-    <div ref={anchor} data-worlds-hero="" style={vars} className={`c-wardrobe c-wardrobe--${theme.id} ${className}`}>
+    <div ref={anchor} style={vars} className={`c-wardrobe c-wardrobe--${theme.id} ${className}`}>
       {fanning && <Fan ids={[previous, theme.id, next]} />}
-      <div role="group" aria-label={theme.name} onKeyDown={onKeyDown} className="c-wardrobe__plate">
+      <div role="group" aria-label={theme.name} onKeyDown={onKeyDown} onClick={stopHere} className="c-wardrobe__plate">
         <button type="button" onClick={() => go(-1)} aria-label={fillLabel(labels.wardrobePrev, { name: getThemeById(previous).name })} className="c-wardrobe__key">
           <Chevron step={-1} />
         </button>

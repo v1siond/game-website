@@ -92,7 +92,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
   const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
 
   return (
-    <header ref={ref} className={`relative z-20 overflow-hidden ${u.hall}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
+    <header ref={ref} data-worlds-hero="" className={`relative z-20 overflow-hidden ${u.hall}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
       <div className={`relative mx-auto grid min-h-[92vh] max-w-6xl items-end gap-8 px-4 pb-16 pt-20 sm:px-6 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] md:items-center ${u.shake}`}>
         <div className="relative mx-auto w-56 sm:w-64">
           {/* the pool he rises from: its far lip behind him, the near lip over his legs */}

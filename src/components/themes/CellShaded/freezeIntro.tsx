@@ -98,7 +98,7 @@ export function FreezeIntro({ profession, reduced }: { profession: Profession; r
   }, [done, triggered, skip])
 
   return (
-    <header ref={ref} className={`relative z-20 -mb-[var(--select-gap)] overflow-hidden pb-[var(--select-gap)] ${cel.intro}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
+    <header ref={ref} data-worlds-hero="" className={`relative z-20 -mb-[var(--select-gap)] overflow-hidden pb-[var(--select-gap)] ${cel.intro}`} onClick={done ? undefined : skip} {...phaseFlags(shown)}>
       {/* the hero reaches --select-gap down behind the panel's section for the mesa alone: the freeze's layers stop above it */}
       <div className={`pointer-events-none absolute inset-x-0 bottom-[var(--select-gap)] top-0 ${cel.wash} bg-[var(--cel-dusk-high)] mix-blend-multiply`} aria-hidden="true" />
       <SpeedRays color={CEL.sun} className={`pointer-events-none absolute inset-x-0 top-0 h-[calc(100%-var(--select-gap))] w-full ${cel.rays}`} />

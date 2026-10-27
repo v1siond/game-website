@@ -144,6 +144,15 @@
   .c-wardrobe { --wd-card-w: 80px; }
 }
 
+/* A slim plate for a hero with a narrow free band below lg (Dark Fantasy): the keys stay 44 by 44 px and fill
+   the plate's height. */
+@media (max-width: 1023.98px) {
+  .c-wardrobe--slim-below-lg .c-wardrobe__plate {
+    min-height: 0;
+    padding-block: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .c-wardrobe__fan { display: none; }
   .c-wardrobe__key { transition: none; }

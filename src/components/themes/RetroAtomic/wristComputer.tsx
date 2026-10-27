@@ -245,7 +245,7 @@ export function WristComputer({ booted, instant }: WristComputerProps) {
   const { hud, navigation } = useLabels()
 
   return (
-    <section aria-label={hud.wristTerminal} className={`relative mx-auto max-w-6xl ${atomic.device}`} data-booted={booted || instant || undefined}>
+    <section data-worlds-hero="" aria-label={hud.wristTerminal} className={`relative mx-auto max-w-6xl ${atomic.device}`} data-booted={booted || instant || undefined}>
       <span className={atomic.deviceScrews} aria-hidden="true" />
       <div className="grid gap-0 lg:grid-cols-[1fr_auto]">
         <div className="p-3 sm:p-5">
