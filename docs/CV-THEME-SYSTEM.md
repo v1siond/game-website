@@ -71,6 +71,57 @@ Artistic.
 - Focus rings: the launcher sets `--focus-ring` to the fill and `--focus-halo` to the black or white edge,
   so ring or halo reads 3 to 1 or more on any page behind it; the hint and picker set the halo to the label
   colour, 7 to 1 or more on their own fill.
+- The wardrobe (`src/components/worlds/Wardrobe.tsx`, `src/styles/components/wardrobe.css`): in every hero his
+  figure wears a name plate in that world's idiom naming the outfit he wears (the world), 14 px or more, with
+  a previous and a next arrow of 44 by 44 px or more. Next, a swipe across him to the left or ArrowRight on the
+  plate go to the next world through the portal; previous, a swipe to the right or ArrowLeft to the one
+  before. Both step around `TOUR_ORDER` in a circle (`followingInTour` and `previousInTour` in
+  `src/lib/worlds/nudge.ts`), so previous then next comes back. On the first visit (sessionStorage
+  `portfolio-worlds-wardrobe-fan`) his previous and next outfits, each his full figure in that world, fan out
+  of the plate for `WARDROBE_FAN_MS` (2750, 2.75 s) and settle back; never under reduced motion. Dark Fantasy,
+  Medieval Fantasy and Silhouette get the plate beside the figure and keep their own look. Each hero marks
+  his figure `data-worlds-figure` (the capture crops it) and the wardrobe's wrapper `data-worlds-hero` (the
+  launcher watches it).
+- The launcher's face (`useWorldsNudge`, `launcherFace` in `src/lib/worlds/lens.ts`): while the hero is in
+  view it reads "17 worlds". Once the `data-worlds-hero` element has left the screen (an
+  IntersectionObserver; a page with none, such as the blog, counts as scrolled 1.5 s after it opened, so a
+  world still loading its chunk does not) the face shows him in the `nextInTour` world, the world the hint
+  names, with that world's name, and the button's name becomes "Next world: <name>. Open all 17 worlds". The
+  first time in a visit (sessionStorage `portfolio-worlds-face-turned`) it turns over in `FACE_TURN_MS` (2600,
+  2.6 s: 0.3 s over, 2 s lifted, 0.3 s settled), rotateX, scale and opacity only; on a phone, where the button
+  holds only the portrait, a 172 px face with the name grows left from it for those 2.6 s and folds back.
+  Under reduced motion it swaps with no turn. Back at the hero it reads "17 worlds" again with no
+  animation. The first turn waits while the hint card is open, so the two never meet. A click or a tap
+  still opens the picker.
+- The lens (`src/components/worlds/WorldLens.tsx`): a mouse over the launcher, the keyboard's focus on it, or
+  a press held 0.45 s on a touch screen opens a round lens under it onto a still of the next world's hero,
+  centred on his figure, with the world's name inside its lower edge in the launcher's colours (15 px). A
+  click inside the lens goes there through the portal. The keyboard gets a "Go to <name>" button, the next
+  Tab stop after the launcher, and so does a finger once it lifts; a tap elsewhere closes it. Escape closes
+  it and leaves the focus on the launcher; the mouse leaving the launcher and the lens closes it too. Enter
+  on the launcher opens the picker as before. The lens fades and grows in for 0.18 s (no growth under
+  reduced motion). It reads the 1440 still on a screen 640 px wide or more and the 390 one below. The still
+  and `focus.json` load on the first opening only, never with the page.
+- Neither the face nor the lens ever shows on the CV pages (`hintBelongsOn`): there the launcher reads "17
+  worlds" and opens the picker, nothing else.
+- The previews in `public/world-previews/`, all made by `node scripts/capture-world-previews.mjs [base]`
+  (default `http://localhost:4100`, the site running; `npm run capture:previews`) with the project's
+  Playwright, one fresh page per world and width with the launcher hidden: `<id>.webp` the picker card
+  (`WorldCard`, 1280 by 800 resized to 720 wide), `<id>-1440.webp` and `<id>-390.webp` the lens stills (1440
+  by 900 and 390 by 844), `portraits/<id>.webp` his figure (the `data-worlds-figure` box at 1440, 160 px at
+  most, drawn alone on a transparent ground; a figure that shows only further down, Dark Fantasy's knights
+  or Medieval Fantasy's frost figure, is scrolled to first), and `focus.json`, the centre of that figure in
+  each still where it is drawn on screen, where the lens looks (the middle of the hero's upper part when it
+  is not). It refuses to start while another
+  headless Chromium runs, closes its own, and exits 1 naming any world with no figure to crop. It takes
+  about 6 minutes for the 17 worlds.
+- Refresh them after changing a hero: run the capture and commit the previews with the hero.
+  `node scripts/check-world-previews.mjs` (`npm run check:previews`, run as `prebuild`) fails the build and
+  names the world when a hero source (everything under `src/components/themes/<World>/`, its
+  `<World>Theme.tsx` and module CSS, and `src/styles/themes/<id>.css`) was committed after its
+  `<id>-1440.webp` still, or is changed in the tree while the still is not. A still that is new or changed in
+  the tree counts as current. It compares git commit times, so a fresh clone (Netlify) reads the same, and
+  it never launches a browser.
 - Every launcher, hint and picker word is Site text in Decap (`content/cv/labels.json` `labels.worlds`, in
   English, Spanish and Italian). `RootShell` reads it with `getLabels` (`src/lib/cv-data.ts`) on the server
   and hands it down through `WorldsLabelsProvider` (`src/components/worlds/WorldsLabels.tsx`), since the

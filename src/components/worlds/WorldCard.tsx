@@ -14,7 +14,7 @@ interface WorldCardProps {
 
 /**
  * A static hero screenshot of the destination world (public/world-previews/<id>.webp, made by
- * scripts/capture-world-previews.sh) instead of the real themed layout, which dragged the page to a crawl.
+ * scripts/capture-world-previews.mjs) instead of the real themed layout, which dragged the page to a crawl.
  * Regenerate the webps after changing a theme's hero. Seen worlds and the current one show it in grey.
  */
 function Preview({ id, muted, className = '' }: { id: string; muted: boolean; className?: string }) {

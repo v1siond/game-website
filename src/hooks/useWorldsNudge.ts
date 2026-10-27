@@ -19,6 +19,7 @@ import {
   readSeen,
   recordWorld,
 } from '@/lib/worlds/nudge'
+import { FACE_TURNED_KEY, FACE_TURN_MS, launcherFace, type HeroView } from '@/lib/worlds/lens'
 
 // A world counts as seen once it has been on screen this long. The provider renders the default world for
 // one commit before a returning visitor's own world, and this wait keeps that commit from counting.
@@ -106,6 +107,57 @@ function revealsSettled(): Promise<unknown> {
   return Promise.race([Promise.allSettled(finishing), cap])
 }
 
+// The hero's anchor each world marks (the wardrobe's wrapper); the launcher's face turns once it leaves the screen.
+const HERO_SELECTOR = '[data-worlds-hero]'
+
+// A page with no hero element counts as scrolled, but only after a world loading its chunk has had the time
+// to render one, so a returning visitor's world never turns the face on its first paint.
+const HERO_WAIT_MS = 1500
+
+/**
+ * Where the page's hero stands: in view or out (IntersectionObserver), 'unknown' until the page has said.
+ * The hero is looked up again whenever the page's nodes change (a world's chunk arriving, a route change),
+ * at most once per frame; with none after HERO_WAIT_MS, the page counts as scrolled.
+ */
+function useHeroView(pageKey: string): HeroView {
+  const [hero, setHero] = useState<HeroView>('unknown')
+
+  useEffect(() => {
+    setHero('unknown')
+    let observed: Element | null = null
+    let waited = false
+    let frame = 0
+    const view = new IntersectionObserver(([entry]) => setHero(entry.isIntersecting ? 'in' : 'out'))
+    const attach = () => {
+      frame = 0
+      const found = document.querySelector(HERO_SELECTOR)
+      if (found === observed) return
+      if (observed) view.unobserve(observed)
+      observed = found
+      if (found) view.observe(found)
+      if (!found && waited) setHero('out')
+    }
+    const onChange = () => {
+      if (frame === 0) frame = window.requestAnimationFrame(attach)
+    }
+    const nodes = new MutationObserver(onChange)
+    const timer = window.setTimeout(() => {
+      waited = true
+      if (!observed) setHero('out')
+    }, HERO_WAIT_MS)
+    attach()
+    nodes.observe(document.body, { childList: true, subtree: true })
+    return () => {
+      window.clearTimeout(timer)
+      window.cancelAnimationFrame(frame)
+      nodes.disconnect()
+      view.disconnect()
+    }
+  }, [pageKey])
+
+  return hero
+}
+
 const atPageEnd = (): boolean => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2
 
 /**
@@ -117,7 +169,8 @@ export type HintState = 'closed' | 'waiting' | 'open'
 /**
  * The worlds nudge state: the seen worlds (localStorage) and the worlds entered this visit (sessionStorage),
  * the one time hint (offered after HINT_MIN_MS and one scrolled screen, never on a CV page, opened only
- * where its card covers no text and no control, else closed that visit) and the next world in the tour it names.
+ * where its card covers no text and no control, else closed that visit), the next world in the tour it names,
+ * and the launcher's face (launcherFace: the count at the hero, him in that next world once the hero is gone).
  * Used once, by WorldsLauncher.
  */
 export function useWorldsNudge() {
@@ -241,6 +294,31 @@ export function useWorldsNudge() {
 
   const nextId = nextInTour(theme.id, seen)
 
+  // The launcher's face: the count at the hero, him in the next world once the hero has left the screen,
+  // turned over once per visit (sessionStorage) and only while the hint card is not open over the page.
+  const hero = useHeroView(`${theme.id} ${pathname}`)
+  const [turnedThisVisit, setTurnedThisVisit] = useState(false)
+  const [turning, setTurning] = useState(false)
+
+  useEffect(() => {
+    setTurnedThisVisit(readStorage(session, FACE_TURNED_KEY) !== null)
+  }, [])
+
+  const face = launcherFace({ pathname, hero, hintOpen: hint === 'open', turnedThisVisit, turning })
+
+  useEffect(() => {
+    if (face !== 'turn' || turning) return
+    writeStorage(session, FACE_TURNED_KEY, '1')
+    setTurnedThisVisit(true)
+    setTurning(true)
+  }, [face, turning])
+
+  useEffect(() => {
+    if (!turning) return
+    const timer = window.setTimeout(() => setTurning(false), FACE_TURN_MS)
+    return () => window.clearTimeout(timer)
+  }, [turning])
+
   const closeHint = useCallback(() => setHint('closed'), [])
 
   const nextWorld = useCallback(() => {
@@ -260,6 +338,9 @@ export function useWorldsNudge() {
     total: WORLD_IDS.length,
     seenCount: seen.length,
     nextId,
+    face,
+    /** The lens and the face belong on this page (never on a CV page). */
+    lensAllowed: hintBelongsOn(pathname),
     hint: isWorldsOpen || isTransitioning ? 'closed' : hint,
     hintRef,
     closeHint,

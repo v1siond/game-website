@@ -4,13 +4,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
+    "prebuild": "npm run check:previews",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "check:previews": "node scripts/check-world-previews.mjs",
+    "capture:previews": "node scripts/capture-world-previews.mjs"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
