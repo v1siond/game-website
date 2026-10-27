@@ -34,6 +34,7 @@
         "icon": "🎨",
         "items": [
           "React",
+          "React Native",
           "Vue.js",
           "Angular",
           "Next.js",
@@ -80,7 +81,6 @@
           "Google Workspace API",
           "Slack API",
           "GraphQL/Apollo",
-          "REST APIs",
           "OAuth/Auth0",
           "Sentry"
         ]
@@ -93,6 +93,17 @@
           "Google Gemini",
           "Prompt Engineering",
           "AI-assisted Development"
+        ]
+      },
+      {
+        "name": "Architecture & Engineering",
+        "icon": "🏗️",
+        "items": [
+          "System Architecture",
+          "RESTful APIs",
+          "Software Development Lifecycle",
+          "Scalable Systems",
+          "Distributed Systems"
         ]
       }
     ]
@@ -132,6 +143,7 @@
         "icon": "🎨",
         "items": [
           "React",
+          "React Native",
           "Vue.js",
           "Angular",
           "Next.js",
@@ -178,7 +190,6 @@
           "Google Workspace API",
           "Slack API",
           "GraphQL/Apollo",
-          "REST APIs",
           "OAuth/Auth0",
           "Sentry"
         ]
@@ -191,6 +202,17 @@
           "Google Gemini",
           "Prompt Engineering",
           "AI-assisted Development"
+        ]
+      },
+      {
+        "name": "Arquitectura e ingeniería",
+        "icon": "🏗️",
+        "items": [
+          "Arquitectura de sistemas",
+          "APIs RESTful",
+          "Ciclo de vida del desarrollo de software",
+          "Sistemas escalables",
+          "Sistemas distribuidos"
         ]
       }
     ]
@@ -230,6 +252,7 @@
         "icon": "🎨",
         "items": [
           "React",
+          "React Native",
           "Vue.js",
           "Angular",
           "Next.js",
@@ -276,7 +299,6 @@
           "Google Workspace API",
           "Slack API",
           "GraphQL/Apollo",
-          "REST APIs",
           "OAuth/Auth0",
           "Sentry"
         ]
@@ -289,6 +311,17 @@
           "Google Gemini",
           "Prompt Engineering",
           "AI-assisted Development"
+        ]
+      },
+      {
+        "name": "Architettura e ingegneria",
+        "icon": "🏗️",
+        "items": [
+          "Architettura di sistemi",
+          "API RESTful",
+          "Ciclo di vita dello sviluppo software",
+          "Sistemi scalabili",
+          "Sistemi distribuiti"
         ]
       }
     ]

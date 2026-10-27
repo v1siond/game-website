@@ -20,21 +20,26 @@ const sectionTitled = (title: string) => {
 
 describe('CVContent', () => {
   describe('header', () => {
-    it('shows his name, headline, email and LinkedIn from the content files', () => {
+    it('shows his name, headline, email, LinkedIn, website and availability from the content files', () => {
       renderCV()
 
       expect(screen.getByRole('heading', { level: 1, name: cv.fullName })).toBeInTheDocument()
       expect(screen.getByText(cv.professionalSummary!.headline)).toBeInTheDocument()
       expect(screen.getByText(cv.contact.email)).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /linkedin\.com/i })).toHaveAttribute('href', cv.contact.linkedin)
+      expect(screen.getByRole('link', { name: /alexanderpulido\.dev/i })).toHaveAttribute('href', cv.contact.website)
+      expect(screen.getByText(cv.contact.availability)).toBeInTheDocument()
     })
 
-    it('links only his email and LinkedIn, no GitHub or employer site', () => {
+    it('links only his LinkedIn and his own website, no GitHub or employer site', () => {
       renderCV()
 
       const header = screen.getByRole('heading', { level: 1 }).closest('header')
       if (!header) throw new Error('the name sits outside the header')
-      expect(within(header).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([cv.contact.linkedin])
+      expect(within(header).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+        cv.contact.linkedin,
+        cv.contact.website,
+      ])
     })
   })
 

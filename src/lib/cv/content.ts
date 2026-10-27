@@ -17,6 +17,7 @@ export interface ProfessionalSummary {
 export interface Contact {
   email: string
   linkedin: string
+  website: string
   availability: string
   line: string
 }

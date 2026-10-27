@@ -73,15 +73,18 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
           {professionalSummary && (
             <p className="text-lg text-gray-700 mb-2">{professionalSummary.headline}</p>
           )}
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600 [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600 [&>*]:min-w-0 [&>*]:[overflow-wrap:anywhere]">
             <span>{contact.email}</span>
             <span aria-hidden="true">|</span>
             <a href={contact.linkedin} className="inline-flex min-h-11 items-center text-blue-800 underline print:min-h-0">
               {shownUrl(contact.linkedin)}
             </a>
             <span aria-hidden="true">|</span>
-            <span>{contact.availability}</span>
+            <a href={contact.website} className="inline-flex min-h-11 items-center text-blue-800 underline print:min-h-0">
+              {shownUrl(contact.website)}
+            </a>
           </div>
+          <p className="text-sm text-gray-600">{contact.availability}</p>
         </header>
 
         {/* Professional Summary */}
