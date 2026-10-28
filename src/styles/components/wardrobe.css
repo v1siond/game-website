@@ -458,6 +458,16 @@
     margin-left: calc(var(--wd-card-w) / -2);
   }
 }
+/* Under sm the plate fills the only free band of the card (the links end 7 px above it, the profession badges
+   start 20 px below it), so the fan lies over the plate, top edge on its top edge, with 55 px cards: the largest
+   whole size whose tilted cards stay inside that band at 360, 390 and 600 px. */
+@media (max-width: 639.98px) {
+  .c-wardrobe--rubber-hose { --wd-card-w: 55px; }
+  .c-wardrobe--rubber-hose .c-wardrobe__fan {
+    top: 0;
+    bottom: auto;
+  }
+}
 
 /* Silhouette: a black cut-out with the sky's rim of light, wide typewriter capitals. */
 .c-wardrobe--silhouette {
