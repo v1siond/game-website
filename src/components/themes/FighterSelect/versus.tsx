@@ -42,7 +42,7 @@ export function HeroSplash({ profession }: { profession: Profession }) {
             <div className="relative flex flex-col gap-3">
               {/* out of the flow, slim while the panels stack: as the name bar across the portrait's lower edge on a phone,
                   above the VS emblem; in the stage's free right side from sm; under the stage panel (sm:h-72) from lg */}
-              <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg absolute bottom-[22px] right-2 z-10 sm:bottom-auto sm:top-[100px] lg:left-0 lg:right-0 lg:top-[calc(18rem_+_0.75rem)] ${look.display} ${fight.enter} ${fight.slashIn}`} />
+              <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg sm:max-lg:[--wd-fan-gap:-143px] absolute bottom-[22px] right-2 z-10 sm:bottom-auto sm:top-[100px] lg:left-0 lg:right-0 lg:top-[calc(18rem_+_0.75rem)] ${look.display} ${fight.enter} ${fight.slashIn}`} />
               <div className={`relative h-56 overflow-hidden border-4 border-white bg-black shadow-[inset_0_0_0_2px_#000] sm:h-72 ${look.splashLeft} ${fight.enter} ${fight.slashIn}`}>
                 <StageBackdrop profession={profession} />
                 <div className={`absolute inset-0 bg-white ${fight.enter} ${fight.flash} [--delay:360ms] opacity-0`} aria-hidden="true" />

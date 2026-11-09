@@ -99,7 +99,7 @@ export default function MedievalFantasyTheme() {
             </RealmFrame>
             {/* out of the page flow so the realm keeps its places: in the frame's top right corner beside his name
                 from lg, under the frame in the header's bottom margin below it */}
-            <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:-68px] c-wardrobe--fan-down-from-lg lg:[--wd-fan-gap:208px] absolute inset-x-0 top-[calc(100%_+_4px)] z-10 lg:inset-x-auto lg:right-[39px] lg:top-[18px]" />
+            <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--fan-down-below-lg max-sm:[--wd-fan-gap:-74px] sm:max-lg:[--wd-fan-gap:180px] c-wardrobe--fan-down-from-lg lg:[--wd-fan-gap:208px] absolute inset-x-0 top-[calc(100%_+_4px)] z-10 lg:inset-x-auto lg:right-[39px] lg:top-[18px]" />
           </header>
         </ScrollScene>
         </div>

@@ -191,6 +191,21 @@
   }
 }
 
+/* From md to lg, a plate whose only free band is beside it (Bold Noir, with the links above it and the profession
+   slabs below it): the fan opens level with the plate at its left, as the from-lg rules below do. */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .c-wardrobe--fan-level-md-to-lg .c-wardrobe__fan {
+    top: 50%;
+    bottom: auto;
+    margin-top: calc(var(--wd-card-w) * -2 / 3);
+  }
+  .c-wardrobe--fan-left-md-to-lg .c-wardrobe__fan {
+    right: calc(100% + var(--wd-card-w) * 0.78 + 20px);
+    left: auto;
+    margin-left: 0;
+  }
+}
+
 /* From lg, where the free room around a plate is not above it: the fan opens below it, level with it, or to one
    side, each side card clear of the plate by its shift (78 % of a card) plus 20 px. A side fan needs a .c-wardrobe
    as wide as its plate. */

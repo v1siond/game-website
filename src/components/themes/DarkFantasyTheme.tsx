@@ -1890,7 +1890,7 @@ export default function DarkFantasyTheme() {
                     the header's bottom padding and the gap under it */}
                 <Wardrobe
                   look={OUTFIT_LOOK}
-                  className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:145px] c-wardrobe--fan-right-from-lg c-wardrobe--fan-down-from-lg absolute inset-x-0 top-[calc(100%_-_22px)] lg:relative lg:inset-x-auto lg:top-auto lg:-ml-3 lg:h-0 lg:w-0 lg:translate-x-[30px] lg:items-center lg:justify-start lg:self-center"
+                  className="c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-lg max-sm:[--wd-fan-gap:145px] sm:max-lg:[--wd-fan-gap:155px] c-wardrobe--fan-right-from-lg c-wardrobe--fan-down-from-lg absolute inset-x-0 top-[calc(100%_-_22px)] lg:relative lg:inset-x-auto lg:top-auto lg:-ml-3 lg:h-0 lg:w-0 lg:translate-x-[30px] lg:items-center lg:justify-start lg:self-center"
                 />
               </div>
             </div>

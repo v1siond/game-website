@@ -265,7 +265,7 @@ function Stage({ profession, nav }: { profession: Profession; nav: { spin: strin
           </span>
         </button>
       </div>
-      <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:40px] absolute left-0 -top-14 z-10 sm:right-0 sm:top-auto sm:-mt-10 lg:left-1/2 lg:right-auto lg:-translate-x-1/2" />
+      <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:170px] absolute left-0 -top-14 z-10 sm:right-0 sm:top-auto sm:-mt-10 lg:left-1/2 lg:right-auto lg:-translate-x-1/2" />
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <button type="button" onClick={spin} className={`${ui.button} ${ui.lit}`}>
           {nav.spin}
