@@ -516,3 +516,52 @@
   --wd-track: 0.03em;
 }
 .c-wardrobe--tropical-platformer .c-wardrobe__plate { box-shadow: 0 0 0 2px var(--wd-ring), 0 5px 0 var(--wd-ring); }
+
+/* ---- The world only fan rules (C38-18), each where no shared direction finds a free band ---------- */
+
+/* Bold Noir from sm to md: the links end about 20 px above the plate and the profession slabs start right under
+   it, so the only free band is beside the plate, 96 px tall at its left between the links and the Musician slab.
+   The fan opens at the plate's left, as from md, 5 px lower than the shared level rule (the band reaches 8 px
+   further below the plate than above it), with 60 px cards: the largest whole size whose tilted cards keep 1 px
+   of air to the links and the slab at the keyframe's overshoot peak, at 640, 680, 700, 740 and 767 px. The plate
+   is centred at its own width there (BoldNoirTheme.tsx), so the fan's offset counts from the plate's left edge. */
+@media (min-width: 640px) and (max-width: 767.98px) {
+  .c-wardrobe--bold-noir { --wd-card-w: 60px; }
+  .c-wardrobe--bold-noir .c-wardrobe__fan {
+    top: 50%;
+    right: calc(100% + var(--wd-card-w) * 0.78 + 20px);
+    bottom: auto;
+    left: auto;
+    margin-top: calc(var(--wd-card-w) * -2 / 3 + 5px);
+    margin-left: 0;
+  }
+}
+
+/* Neon Cyber under 400 px wide: the plate stands at the screen's foot with the links and the Scan key packed
+   above and beside it, so the fan lies over the plate, top edge on its top edge, as Rubber Hose does under sm,
+   with 60 px cards: the largest whole size whose tilted left card keeps 1 px of air to the Scan key at the
+   keyframe's overshoot peak at 360 by 780 (and stays on screen at 390 by 844). */
+@media (max-width: 399.98px) {
+  .c-wardrobe--neon-cyber { --wd-card-w: 60px; }
+  .c-wardrobe--neon-cyber .c-wardrobe__fan {
+    top: 0;
+    bottom: auto;
+  }
+}
+
+/* Survival Horror from 1372 px wide: the plate stands under the panel near the first screen's foot (its bottom
+   1 px above it at 1440 by 900), so a fan level with it hangs off the screen. Its left is clear from the screen's
+   edge to the plate, so the fan opens there with its feet 8 px above the plate's foot, where the tilted side
+   cards still end inside the plate's height. 1372 px is the first whole width where the tilted left card keeps
+   1 px inside the screen's edge at the keyframe's overshoot peak; below it the level fan at its right stays,
+   which fits where the plate lies below the first screen and is scrolled into view (1024 by 768, 1280 by 800). */
+@media (min-width: 1372px) {
+  .c-wardrobe--survival-horror .c-wardrobe__fan {
+    top: auto;
+    right: calc(100% + var(--wd-card-w) * 0.78 + 20px);
+    bottom: 8px;
+    left: auto;
+    margin-top: 0;
+    margin-left: 0;
+  }
+}

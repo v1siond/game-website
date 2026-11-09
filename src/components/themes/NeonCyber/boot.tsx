@@ -156,7 +156,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
 
               {/* his portrait in the optics frame, built from one line, then he walks in; his outfit plate, out of the
                   flow, sits beside the Scan key above the frame on phones, where the frame runs past the first screen,
-                  and under the frame from md */}
+                  and under the frame from md, its fan opening downward, clear of the text column at the frame's left */}
               <div className="relative flex flex-col items-center gap-4">
                 <div data-worlds-figure="" className="relative mx-auto w-32 overflow-hidden border border-[color-mix(in_srgb,var(--neon-data)_60%,transparent)] bg-[color:var(--neon-ink)] p-2 sm:w-40">
                   <div className={world.build}>
@@ -164,7 +164,7 @@ export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
                   </div>
                   <div className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(0deg,transparent_0_2px,rgba(94,242,255,0.12)_2px_3px)]" aria-hidden="true" />
                 </div>
-                <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-md c-wardrobe--fan-down-from-lg absolute -right-[18px] bottom-[calc(100%_+_1.5rem)] z-10 md:bottom-auto md:right-0 md:top-[calc(100%_+_1rem)] ${world.fadeLate}`} />
+                <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg c-wardrobe--fan-down-below-lg c-wardrobe--fan-down-from-lg absolute -right-[18px] bottom-[calc(100%_+_1.5rem)] z-10 md:bottom-auto md:right-0 md:top-[calc(100%_+_1rem)] ${world.fadeLate}`} />
               </div>
             </div>
           </div>
