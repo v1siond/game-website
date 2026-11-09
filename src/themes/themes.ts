@@ -171,7 +171,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 5. Adventure Paths - an explorer's overworld map whose regions hold each profession, ending at the goal gate
+  // 5. Adventure Paths - the default world: an explorer's overworld map whose regions hold each profession, ending at the goal gate
   {
     id: 'adventure-paths',
     name: 'Adventure Paths',
@@ -351,7 +351,7 @@ export const themes: Theme[] = [
     },
   },
 
-  // 11. Retro Atomic - the default world: an atomic age fallout shelter seen through his wrist terminal, out to the wasteland
+  // 11. Retro Atomic - an atomic age fallout shelter seen through his wrist terminal, out to the wasteland
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',
@@ -562,7 +562,7 @@ export const themes: Theme[] = [
   },
 ]
 
-export const DEFAULT_THEME_ID = 'retro-atomic'
+export const DEFAULT_THEME_ID = 'adventure-paths'
 
 /** Where the chosen world is remembered. Exported because the failure screen has to read the world
  *  WITHOUT the ThemeProvider: a root-layout crash unmounts the providers, and the Pages Router tree

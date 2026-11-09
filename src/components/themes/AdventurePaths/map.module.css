@@ -535,4 +535,22 @@
   .ring {
     transition: none;
   }
+
+  /* The server draws the hub map before its phases are set; under reduced motion it shows the map
+   * unrolled, inked and dotted from the first paint instead of waiting for the client to set them.
+   * The marker stays hidden until the client places him at his landmark. */
+  [data-unrolled='false'] .cover {
+    transform: translate3d(101%, 0, 0);
+  }
+
+  [data-inked='false'] .inked,
+  [data-inked='false'] .plaque {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-trailed='false'] .dot,
+  [data-trailed='false'] .tileLit {
+    opacity: 1;
+  }
 }

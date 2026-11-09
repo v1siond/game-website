@@ -27,9 +27,9 @@ describe('Home page (boot into a world)', () => {
     jest.clearAllMocks()
   })
 
-  it('boots into the default world (retro-atomic) when nothing is stored', () => {
+  it('boots into the default world (adventure-paths) when nothing is stored', () => {
     render(<WorldRenderer />)
-    expect(screen.getByTestId('theme-retro-atomic')).toBeInTheDocument()
+    expect(screen.getByTestId('theme-adventure-paths')).toBeInTheDocument()
   })
 
   it('boots into the stored world from localStorage', async () => {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
@@ -28,6 +28,10 @@ import map from './AdventurePaths/map.module.css'
 // The root sets the palette as CSS variables (TRAIL_VARS) and the pointer as --mx and --my, the only
 // inline styles, and clips sideways overflow with overflow-x: clip, not hidden, so it never becomes a
 // scroll container.
+//
+// The whole world renders on the server, the default world's contract (docs/CV-THEME-SYSTEM.md): the
+// browser only parts start in effects (the hub map's entrance timeline, his walk, the pointer tilt), and
+// under reduced motion the server drawn map shows its resting frame through CSS until the client sets it.
 
 export default function AdventurePathsTheme() {
   const { active } = useProfession()
@@ -35,16 +39,10 @@ export default function AdventurePathsTheme() {
   const { fullName } = useCVData()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const pointerRef = usePointerVars(mounted && !reducedMotion)
+  const pointerRef = usePointerVars(!reducedMotion)
   const [zone, setZone] = useState<Zone>('plains')
   const onZone = useCallback((next: Zone) => setZone(next), [])
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
+  const stage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
 
   return (
     <div
@@ -65,7 +63,7 @@ export default function AdventurePathsTheme() {
         <ExpeditionHero name={fullName} />
       </header>
 
-      <ZoneStageProvider value={{ reduced: reducedMotion, onZone }}>
+      <ZoneStageProvider value={stage}>
         <main id="trail-main" className="relative z-10 pb-16">
           <div role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
