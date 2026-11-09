@@ -26,7 +26,7 @@ export function CVLink() {
   const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${HUD_BUTTON} border border-[color:var(--neon-ice)] text-[color:var(--neon-ice)] [--lit:color-mix(in_srgb,var(--neon-ice)_12%,transparent)]`}>
-      {actions.getCv}
+      {actions.cv}
     </Link>
   )
 }

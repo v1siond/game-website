@@ -366,7 +366,6 @@ export function ExpeditionHero({ name }: { name: string }) {
               where the landmarks and their labels fill the map */}
           <Wardrobe look={OUTFIT_LOOK} ready={reached.landed} className="c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:264px] c-wardrobe--fan-right-from-lg c-wardrobe--fan-down-from-lg absolute inset-x-0 bottom-[-10px] z-10 lg:inset-x-auto lg:bottom-auto lg:left-[24.6%] lg:top-[69.9%]" />
         </div>
-        <p className="mx-auto mt-3 w-fit rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-center text-sm text-white">{trail.walkHint}</p>
       </section>
     </div>
   )

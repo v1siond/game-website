@@ -85,7 +85,6 @@ function FogWall({ parting, onTraverse }: { parting: boolean; onTraverse: () => 
         <span className={`${souls.fogLayer} absolute inset-0`} />
         <span className={`${souls.fogLayer} ${souls.fogLayerBack} absolute inset-0`} />
       </div>
-      <p className="relative text-sm italic text-[color:var(--soul-text)]">{words.fogHint}</p>
       <button type="button" onClick={onTraverse} disabled={parting} className={`relative ${BUTTON_LIT}`}>
         {words.traverse}
       </button>

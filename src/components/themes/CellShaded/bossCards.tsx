@@ -71,7 +71,7 @@ function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
 }
 
 export function BossCards({ musician, bands }: { musician: Musician; bands: Band[] }) {
-  const { years, hud } = useLabels()
+  const { years } = useLabels()
 
   return (
     <>
@@ -80,7 +80,6 @@ export function BossCards({ musician, bands }: { musician: Musician; bands: Band
         <div>
           <p className={`text-2xl ${cel.display} [-webkit-text-stroke:0]`}>{drumsSince(musician, years)}</p>
           <p className="mt-2 text-base font-bold">{musician.line}</p>
-          <p className="mt-4 inline-block bg-[var(--cel-ink)] px-3 py-1.5 text-base font-bold text-[var(--cel-paper)]">{hud.introHint}</p>
         </div>
       </div>
       <BandList

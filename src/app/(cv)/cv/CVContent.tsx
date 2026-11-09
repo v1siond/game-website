@@ -136,7 +136,7 @@ export function CVContent({ locale }: Readonly<{ locale: Locale }>) {
           </section>
         )}
 
-        {/* Key Projects & Achievements */}
+        {/* Key projects */}
         {featuredProjects.length > 0 && (
           <section className="mb-6">
             <h2 className="text-xl font-bold border-b border-gray-300 pb-1 mb-3">

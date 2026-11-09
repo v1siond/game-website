@@ -76,7 +76,7 @@ function Hatch({ profession, pose, turn, turns }: { profession: Profession; pose
 
 export function LeverSwitch() {
   const { active } = useProfession()
-  const { navigation, shade: words } = useLabels()
+  const { navigation } = useLabels()
   const [pose, setPose] = useState<SpritePose>('act')
   const [pulling, setPulling] = useState<Profession | null>(null)
   const [turn, setTurn] = useState<Turn>('still')
@@ -127,7 +127,6 @@ export function LeverSwitch() {
             label={navigation.profession}
             renderOption={(option) => <Lever option={option} pulling={pulling === option.id} onPull={() => pull(option)} />}
           />
-          <p className="text-center text-sm italic tracking-wider text-[color:var(--sh-muted-text)] md:text-left">{words.leverHint}</p>
         </div>
       </div>
     </section>

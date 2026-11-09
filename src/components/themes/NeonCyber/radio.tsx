@@ -105,7 +105,6 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
       </div>
       <p className="mt-2 flex flex-wrap justify-between gap-2 text-sm">
         <span className="text-[color:var(--neon-hud)]">{tunedBand ? fillLabel(hud.tunedTo, { name: tunedBand.name }) : ''}</span>
-        <span className="text-[color:var(--neon-ash)]">{hud.tuneHint}</span>
       </p>
 
       <BandList

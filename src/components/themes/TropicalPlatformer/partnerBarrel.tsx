@@ -130,9 +130,7 @@ export function PartnerBarrel() {
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={`mx-auto max-w-5xl ${partner.root}`}>
-      <p className={`mx-auto mb-8 w-fit rounded-xl px-6 py-3 text-center text-xl uppercase text-[color:var(--tp-sun-gold)] ${look.plank} ${look.display} ${look.outlined}`}>
-        {navigation.selectYourProfession}
-      </p>
+      <h2 className="sr-only">{navigation.selectYourProfession}</h2>
       <div className="grid items-center gap-6 sm:grid-cols-2 sm:gap-10">
         <BarrelStage />
         <ProfessionSwitch className="flex flex-col gap-4" label={navigation.profession} renderOption={(option) => <Plate {...option} />} />

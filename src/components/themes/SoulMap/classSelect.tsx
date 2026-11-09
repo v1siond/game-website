@@ -153,10 +153,9 @@ export function ClassSelect() {
   return (
     <section className="relative px-4 py-12 sm:px-6" aria-labelledby="soul-class-select">
       <div className="mx-auto max-w-6xl">
-        <h2 id="soul-class-select" className={`${CARVED} mb-2 text-center text-2xl uppercase tracking-[0.3em] text-[color:var(--soul-text)]`}>
+        <h2 id="soul-class-select" className="sr-only">
           {navigation.selectYourProfession}
         </h2>
-        <p className="mb-8 text-center text-sm italic text-[color:var(--soul-text-soft)]">{words.classHint}</p>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,17rem)]">
           <ProfessionSwitch

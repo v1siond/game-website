@@ -57,7 +57,6 @@ export function LastFire({ profession }: { profession: Profession }) {
         <div className="mt-6 flex flex-col items-center gap-3 text-center">
           {lit ? null : (
             <>
-              <p className="text-sm italic text-[color:var(--soul-text-soft)]">{words.kindleHint}</p>
               <button type="button" onClick={kindle} className={BUTTON_LIT}>
                 {words.kindle}
               </button>

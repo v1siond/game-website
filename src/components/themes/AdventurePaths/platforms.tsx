@@ -153,7 +153,7 @@ export function LedgeLevel({ jobs, profession }: { jobs: Job[]; profession: Prof
   const bumpOf = (index: number) => (reduced || landing.at !== index ? '' : BUMPS[landing.count % 2])
 
   return (
-    <Region title={sections.workExperience} hint={labels.jobHint} stageRef={ref} on={on}>
+    <Region title={sections.workExperience} stageRef={ref} on={on}>
       <Banner>{standing ? fillLabel(labels.stopOf, { n: shown.at + 1, place: `${standing.title}, ${standing.company}` }) : sections.workExperience}</Banner>
       <Playfield height="h-[22rem]">
         {route.map((job, index) => {

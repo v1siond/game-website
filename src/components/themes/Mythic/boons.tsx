@@ -140,7 +140,6 @@ function Tray({ chosen, projects }: { chosen: readonly Project[]; projects: Proj
 }
 
 export function Boons({ projects }: { projects: Project[] }) {
-  const { myth } = useLabels()
   const [chosenIds, setChosenIds] = useState<readonly string[]>([])
 
   const toggle = useCallback((id: string) => {
@@ -152,7 +151,6 @@ export function Boons({ projects }: { projects: Project[] }) {
   return (
     <>
       <Tray chosen={chosen} projects={projects} />
-      <p className={`mb-6 ${u.hint}`}>{myth.boonHint}</p>
       <ProjectList
         projects={projects}
         className={MASONRY_LIST}

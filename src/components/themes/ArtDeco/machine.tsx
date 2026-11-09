@@ -126,7 +126,7 @@ export function VendingMachine() {
             <span className={`pointer-events-none absolute inset-0 ${machine.bulbs} ${machine.bulbsOdd}`} aria-hidden="true" />
             <span className={`pointer-events-none absolute inset-0 ${machine.bulbs} ${machine.bulbsEven}`} aria-hidden="true" />
           </Fragment>
-          <p className={`relative text-base uppercase tracking-[0.3em] ${machine.marquee}`}>{navigation.selectYourProfession}</p>
+          <h2 className="sr-only">{navigation.selectYourProfession}</h2>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">

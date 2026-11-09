@@ -42,10 +42,6 @@ export function AreaTitle({ id, title, className = '' }: { id?: string; title: s
   )
 }
 
-export function Hint({ children }: { children: ReactNode }) {
-  return <p className="mb-6 mt-2 text-center text-sm italic text-[color:var(--soul-text-soft)]">{children}</p>
-}
-
 // The tech stack as an equipment screen: each category a group of item slots, the groups packed in
 // masonry by their length, coming up one after another as the menu opens.
 export function TechSlots({ categories }: { categories: CVData['techStack'] }) {

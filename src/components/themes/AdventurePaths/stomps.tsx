@@ -85,7 +85,7 @@ export function StompLevel({ martialArts }: { martialArts: MartialArts }) {
   const all = cleared >= count
 
   return (
-    <Region title={sections.muayThai} hint={labels.fortressHint} stageRef={ref} on={on}>
+    <Region title={sections.muayThai} stageRef={ref} on={on}>
       <h3 className={`mb-4 inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1.5 text-xl font-bold text-white ${JOURNAL_SERIF}`}>{martialArts.primary.title}</h3>
       <Banner>{all ? labels.fortressCleared : sections.muayThai}</Banner>
       <Playfield ground="gold">{on && <ChainScene key={round} count={count} onStomped={stomped} />}</Playfield>

@@ -90,7 +90,7 @@ describe('ErrorScreen', () => {
         technical="TypeError: cannot read property of undefined"
       />,
     )
-    const details = screen.getByText('What the code said').closest('details')
+    const details = screen.getByText('Error details').closest('details')
     expect(details).not.toBeNull()
     expect(details).not.toHaveAttribute('open')
     expect(screen.getByText('TypeError: cannot read property of undefined')).toBeInTheDocument()
@@ -98,7 +98,7 @@ describe('ErrorScreen', () => {
 
   it('omits the technical block entirely when there is nothing to show', () => {
     render(<ErrorScreen status={404} headline="Gone" detail="Gone." actions={[]} />)
-    expect(screen.queryByText('What the code said')).not.toBeInTheDocument()
+    expect(screen.queryByText('Error details')).not.toBeInTheDocument()
   })
 
   it("wears the visitor's chosen world", () => {

@@ -60,9 +60,9 @@ export function yearSpan({ startYear, endYear, current, years = null }: Span, la
 
 export const bandSpan = (band: Band, labels: Labels['years']): string => yearSpan(band, labels)
 
-/** The line over the bands: "Drums since 2005, 19 years". */
-export const drumsSince = ({ since, yearsPlaying }: Pick<Musician, 'since' | 'yearsPlaying'>, labels: Labels['years']): string =>
-  fillLabel(labels.drumsSince, { since, years: yearsPlaying })
+/** The line over the bands: "Drumming since 2005". */
+export const drumsSince = ({ since }: Pick<Musician, 'since'>, labels: Labels['years']): string =>
+  fillLabel(labels.drumsSince, { since })
 
 export interface JobYears {
   start: number

@@ -235,7 +235,7 @@ function PadCrate({ kind, broken, prize, place }: { kind: 'question' | 'mask'; b
   )
 }
 
-function Stage({ profession, nav }: { profession: Profession; nav: { spin: string; hint: string } }) {
+function Stage({ profession, nav }: { profession: Profession; nav: { spin: string } }) {
   const { spinning, broken, spin } = useSpin()
   const pose: BandicootPose = spinning ? 'spin' : 'idle'
 
@@ -270,7 +270,6 @@ function Stage({ profession, nav }: { profession: Profession; nav: { spin: strin
         <button type="button" onClick={spin} className={`${ui.button} ${ui.lit}`}>
           {nav.spin}
         </button>
-        <p className="text-base text-[color:var(--np-muted)]">{nav.hint}</p>
       </div>
     </div>
   )
@@ -309,7 +308,7 @@ export function Arrival({ profession }: { profession: Profession }) {
           line={line}
           profession={profession}
           nav={navigation.contactAndCv}
-          spin={{ spin: warp.spin, hint: warp.arrivalHint }}
+          spin={{ spin: warp.spin }}
           actions={<HeroActions actions={actions} />}
         />
       )}
@@ -324,7 +323,7 @@ interface ArrivalLayoutProps {
   line: string
   profession: Profession
   nav: string
-  spin: { spin: string; hint: string }
+  spin: { spin: string }
   actions: ReactNode
 }
 

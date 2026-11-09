@@ -49,9 +49,7 @@ export function QuickhackMenu({ active }: { active: Profession }) {
   return (
     <div className="mx-auto grid max-w-6xl gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] md:gap-6">
       <div className={`${world.panel} p-3 sm:p-4`}>
-        <p className="mb-3 text-sm uppercase tracking-[0.3em] text-[color:var(--neon-hud)]" aria-hidden="true">
-          {navigation.selectYourProfession}
-        </p>
+        <h2 className="sr-only">{navigation.selectYourProfession}</h2>
         <ProfessionSwitch
           className="grid grid-cols-1 gap-2 sm:grid-cols-3 md:grid-cols-1"
           label={navigation.professionSelection}

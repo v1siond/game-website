@@ -153,7 +153,6 @@ function CaseItem({ slot, index }: { slot: ProjectSlot; index: number }) {
 }
 
 export function AttacheCase({ projects }: { projects: Project[] }) {
-  const { horror: words } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.1 })
   const order = new Map(projects.map((project, index) => [project.id, index]))
 
@@ -163,7 +162,6 @@ export function AttacheCase({ projects }: { projects: Project[] }) {
         <div className="mx-auto mt-3 h-3 w-24 rounded-sm bg-[color:var(--sh-brass)]" />
       </div>
       <div className={`p-3 sm:p-5 ${horror.caseBody}`}>
-        <p className="mb-4 text-sm italic text-[color:var(--sh-ivory)]">{words.caseHint}</p>
         <ProjectList
           projects={projects}
           className={MASONRY_LIST}

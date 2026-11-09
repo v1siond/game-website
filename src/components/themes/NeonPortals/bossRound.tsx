@@ -159,7 +159,6 @@ export function BossRound({ martialArts }: { martialArts: SectionsOf<'fighter'>[
             <TimeFoe hit={kicking} beaten={beaten} />
           </span>
         </div>
-        <p className="mt-3 text-base text-[color:var(--np-muted)]">{warp.bossHint}</p>
       </div>
       <MuayThaiRecord
         martialArts={martialArts}

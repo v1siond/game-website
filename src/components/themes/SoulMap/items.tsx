@@ -14,7 +14,7 @@ import { usePoseScript } from './poses'
 import { useRun } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
-import { CARD_BODY, CARD_META, CARD_TITLE, Hint, TAG } from './menu'
+import { CARD_BODY, CARD_META, CARD_TITLE, TAG } from './menu'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
@@ -136,10 +136,8 @@ function ItemCard({ project, years, links }: ProjectSlot) {
 }
 
 export function ItemProjects({ projects }: { projects: Project[] }) {
-  const { souls: words } = useLabels()
   return (
     <>
-      <Hint>{words.itemHint}</Hint>
       <ProjectList projects={projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ItemCard {...slot} />} />
     </>
   )

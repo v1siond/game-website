@@ -85,7 +85,7 @@ function TalentPlate({ id, label, optionProps, turned }: ProfessionOption & { tu
 }
 
 export function Mirror({ profession }: { profession: Profession }) {
-  const { navigation, myth } = useLabels()
+  const { navigation } = useLabels()
   const take = useTakeOnChange(profession)
   const { ref } = useZoneStage<Zone>('hall')
 
@@ -105,13 +105,12 @@ export function Mirror({ profession }: { profession: Profession }) {
         </div>
 
         <div className="min-w-0">
-          <p className={`mb-4 text-2xl text-[var(--myth-gold)] sm:text-3xl ${u.display}`}>{navigation.selectYourProfession}</p>
+          <h2 className="sr-only">{navigation.selectYourProfession}</h2>
           <ProfessionSwitch
             className="grid gap-3 sm:grid-cols-3"
             label={navigation.profession}
             renderOption={(option) => <TalentPlate {...option} turned={take > 0} />}
           />
-          <p className={`mt-5 ${u.hint}`}>{myth.mirrorHint}</p>
         </div>
       </div>
     </section>

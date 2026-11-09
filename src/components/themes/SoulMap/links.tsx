@@ -35,7 +35,7 @@ export function CVLink() {
   const { actions } = useLabels()
   return (
     <Link href="/cv" className={BUTTON}>
-      {actions.resume}
+      {actions.cv}
     </Link>
   )
 }

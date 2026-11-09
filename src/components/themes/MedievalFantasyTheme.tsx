@@ -158,12 +158,12 @@ export default function MedievalFantasyTheme() {
                     marginBottom: '0.75rem',
                     textShadow: `0 0 20px ${REALM.frostIceMid}40`,
                   }}>
-                    {actionLabels.getInTouch}
+                    {actionLabels.emailMe}
                   </h2>
                   <p style={{ color: REALM.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <HeroActions actions={actions} zone="ft" />
-                    <RealmButton href="/cv" zone="ft">{actionLabels.downloadCv}</RealmButton>
+                    <RealmButton href="/cv" zone="ft">{actionLabels.cv}</RealmButton>
                   </div>
                 </>
               )}

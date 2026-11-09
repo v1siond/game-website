@@ -49,7 +49,7 @@ function BandCard({ slot, flare, onStrike }: { slot: BandSlot; flare: number; on
 }
 
 export function Portraits({ musician, bands }: { musician: Musician; bands: Band[] }) {
-  const { years, myth } = useLabels()
+  const { years } = useLabels()
   const [struck, setStruck] = useState<string | null>(null)
   const { pose, take, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
 
@@ -61,7 +61,6 @@ export function Portraits({ musician, bands }: { musician: Musician; bands: Band
         </div>
         <p className={`mt-4 text-lg text-[var(--myth-gold)] ${u.display}`}>{drumsSince(musician, years)}</p>
         {musician.line && <p className="mt-2 text-base leading-relaxed">{musician.line}</p>}
-        <p className={`mt-4 ${u.hint}`}>{myth.drumHint}</p>
       </div>
       <BandList
         bands={bands}

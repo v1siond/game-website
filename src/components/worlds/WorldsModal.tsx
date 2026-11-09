@@ -101,8 +101,7 @@ export default function WorldsModal() {
           >
             {labels.pickerTitle}
           </h2>
-          <p className="text-base text-center">{labels.pickerSubtitle}</p>
-          <p className="c-worlds-picker__title mt-3.5 text-base text-center">
+          <p className="c-worlds-picker__title text-base text-center">
             {fillLabel(countTemplate(seen.length, { one: labels.pickerProgressOne, many: labels.pickerProgress }), { seen: seen.length, total })}
           </p>
           <div aria-hidden="true" className="mt-2 mb-4 flex flex-wrap justify-center gap-1.5">

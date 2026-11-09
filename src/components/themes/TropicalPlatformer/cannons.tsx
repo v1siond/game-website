@@ -216,15 +216,10 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={run.run}>
-      <div className={`relative mx-auto mb-6 max-w-md rounded-3xl px-5 py-4 text-center ${look.board}`}>
-        <p className="mb-3 text-base text-[color:var(--tp-parchment)]">{labels.jungle.lettersHint}</p>
+      <div className={`relative mx-auto mb-8 max-w-md rounded-3xl px-4 py-3 text-center ${look.board}`}>
         <LetterTracker letters={letters} found={found} />
-        <p className="mt-3 text-base text-[color:var(--tp-sun-gold)]">
-          {complete ? labels.jungle.extraLife : fillLabel(labels.jungle.lettersFound, { count: found.size, total: letters.length })}
-        </p>
         {complete && <ExtraLifeBalloon />}
       </div>
-      <p className={`mb-8 text-center text-base text-[color:var(--tp-parchment)] ${look.caption}`}>{labels.jungle.cannonHint}</p>
       <div ref={stage} className="relative">
         <ul className={MASONRY_LIST}>
           {jobs.map((entry, index) => (

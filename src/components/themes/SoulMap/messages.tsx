@@ -12,7 +12,7 @@ import type { CVData } from '@/lib/cv/content'
 import { Knight } from './knight'
 import { useRun } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
-import { CARD_BODY, Hint, TAG } from './menu'
+import { CARD_BODY, TAG } from './menu'
 import { CARVED } from './palette'
 import souls from './souls.module.css'
 
@@ -107,10 +107,8 @@ function Slab({ venture }: { venture: Venture }) {
 }
 
 export function FloorMessages({ companies }: { companies: CVData['companies'] }) {
-  const { souls: words } = useLabels()
   return (
     <>
-      <Hint>{words.messageHint}</Hint>
       <ul className={MASONRY_LIST}>
         {companies.map((venture) => (
           <li key={venture.id} className={`${MASONRY_ITEM} ${venture.featured ? '[column-span:all]' : ''}`}>

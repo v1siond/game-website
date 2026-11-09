@@ -111,7 +111,6 @@ function Arena() {
       <SlabButton tone="blood" className="mt-4" onClick={strike}>
         {myth.strike}
       </SlabButton>
-      <p className={`mt-4 ${u.hint}`}>{myth.strikeHint}</p>
     </div>
   )
 }

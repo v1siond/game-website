@@ -4,20 +4,19 @@ import { JOURNAL_SERIF } from './palette'
 import side from './side.module.css'
 
 // A region of the adventure: one CV section as one level. Its title sits on the black HUD bar of the
-// 16 bit games (white type, so it reads over any zone of the living backdrop), with a one line hint of
-// what the visitor can do; then the level's playfield, where he does his part, and the section's cards.
+// 16 bit games (white type, so it reads over any zone of the living backdrop); then the level's
+// playfield, where he does his part, and the section's cards.
 // The section is the zone stage: `stageRef` and `on` come from useZoneStage, and every entrance inside
 // starts off data-on.
 
 interface RegionProps {
   title: string
-  hint?: string
   stageRef?: Ref<HTMLElement>
   on?: boolean
   children: ReactNode
 }
 
-export function Region({ title, hint, stageRef, on = true, children }: RegionProps) {
+export function Region({ title, stageRef, on = true, children }: RegionProps) {
   const id = headingId('trail', title)
   return (
     <section ref={stageRef} data-on={on} aria-labelledby={id} className="relative z-20 mx-auto max-w-6xl scroll-mt-8 px-4 py-10 sm:px-6">
@@ -25,7 +24,6 @@ export function Region({ title, hint, stageRef, on = true, children }: RegionPro
         <h2 id={id} className={`rounded-md border-[3px] border-white bg-[color:var(--ap-hud)] px-4 py-1.5 text-2xl font-bold tracking-wide text-white sm:text-3xl ${JOURNAL_SERIF}`}>
           {title}
         </h2>
-        {hint && <p className="rounded-md bg-[color:var(--ap-hud)] px-3 py-1.5 text-sm text-[color:var(--ap-coin)]">{hint}</p>}
       </header>
       {children}
     </section>

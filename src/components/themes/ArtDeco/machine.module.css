@@ -17,15 +17,6 @@
   box-shadow: inset 0 0 60px rgb(0 0 0 / 0.6);
 }
 
-/* The marquee's thin display letters only reach about four fifths of their gold over the red, so the
-   board takes the deepest blood and the letters a dark drop shadow: a gold glow lightened the red round
-   every stroke and cost the lettering its 7:1. */
-.marquee {
-  font-family: var(--deco-display);
-  color: var(--deco-gold-bright-text);
-  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
-}
-
 /* Bulbs round the marquee: two layers of dots offset by one bulb, so alternating them chases. */
 .bulbs {
   background-image: radial-gradient(circle, var(--deco-gold-bright) 0 2.5px, transparent 3px);

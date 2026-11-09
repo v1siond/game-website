@@ -358,7 +358,6 @@ function MoveStrip({ onSpin, onSlam, figure, gem }: MoveStripProps) {
           {gem && ` ${hud.gemAwarded}`}
         </span>
       </p>
-      <p className="basis-full text-base text-[color:var(--np-muted)]">{warp.crateHint}</p>
     </div>
   )
 }

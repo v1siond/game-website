@@ -154,13 +154,11 @@ function LootCard({ slot, index, equipped, onEquip }: LootCardProps) {
 }
 
 export function LootDrops({ projects }: { projects: Project[] }) {
-  const { hud } = useLabels()
   const [equippedId, setEquippedId] = useState(projects[0]?.id)
   const equipped = projects.find((project) => project.id === equippedId) ?? projects[0]
 
   return (
     <>
-      <p className="mb-6 inline-block bg-[var(--cel-ink)] px-3 py-1.5 text-base font-bold text-[var(--cel-paper)]">{hud.lootHint}</p>
       <ProjectList
         projects={projects}
         className={MASONRY_LIST}

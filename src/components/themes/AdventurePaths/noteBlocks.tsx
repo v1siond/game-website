@@ -86,7 +86,7 @@ export function NoteBlockLevel({ bands, musician }: { bands: Band[]; musician: M
   }
 
   return (
-    <Region title={sections.bands} hint={trail.bandHint} stageRef={ref} on={on}>
+    <Region title={sections.bands} stageRef={ref} on={on}>
       <p className={`mb-4 inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1.5 text-lg text-white ${JOURNAL_SERIF}`}>{drumsSince(musician, years)}</p>
       <Banner>{standing ? fillLabel(trail.playingWith, { name: standing.name }) : sections.bands}</Banner>
       <Playfield height="h-64">

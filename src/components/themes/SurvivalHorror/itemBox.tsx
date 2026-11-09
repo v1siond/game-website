@@ -121,7 +121,6 @@ export function ItemBox() {
           <div>
             <p className={`mb-2 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-brass-text)] ${look.typed}`}>{words.itemBox}</p>
             <ProfessionSwitch className="grid grid-cols-3 gap-2 sm:gap-3" label={navigation.profession} renderOption={(option) => <ItemSlot option={option} onTake={() => take(option)} />} />
-            <p className="mt-3 text-sm italic text-[color:var(--sh-fog-text)]">{words.itemBoxHint}</p>
           </div>
         </div>
       </div>

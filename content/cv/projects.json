@@ -7,13 +7,13 @@
         "name": "Agency Rocket",
         "role": "Built the Stripe billing engine for the suite",
         "tagline": "Sales and illustration suite for insurance agents",
-        "description": "The Agency Rocket marketing suite (My New Retirement, Wealth United, etc.)",
+        "description": "The marketing suite behind My New Retirement, Wealth United and Debt Action Plan.",
         "impact": "Testimonials cite 5x business and $50,000+ months",
         "details": [
           "Stripe billing: Stripe Elements, subscriptions, coupons and add ons",
-          "Illustrations created from an uploaded CSV, with PDF output",
+          "Illustrations built from an uploaded CSV and exported to PDF",
           "Team hierarchy views",
-          "SSO callback routes and annuity illustrations through the annuity parser"
+          "SSO callback routes and annuity illustrations from the parser"
         ],
         "techStack": [
           "Vue",
@@ -42,12 +42,12 @@
         "name": "My New Retirement",
         "role": "Agency Rocket suite, billing",
         "tagline": "Indexed life retirement planning for families",
-        "description": "One of the suite's three platforms",
+        "description": "",
         "impact": "",
         "details": [
           "Landing pages with custom webinar content",
           "Iframe views with a cross origin plug",
-          "French and a locale redirect"
+          "French translation and a locale redirect"
         ],
         "techStack": [
           "Phoenix",
@@ -76,8 +76,8 @@
         "description": "",
         "impact": "",
         "details": [
-          "Made the initial setup",
-          "Add on setup parser logic",
+          "Set up the project",
+          "Parser for the add on setup",
           "The Debt Action Plan PDF report, rendered with Puppeteer",
           "Cloud Build and GitHub Actions deploys"
         ],
@@ -112,7 +112,7 @@
           "Made the initial commit",
           "National debt counter",
           "Insurance product, carrier and app admin",
-          "Permissions and plugs QA flow"
+          "Permissions and their QA flow"
         ],
         "techStack": [
           "Phoenix",
@@ -136,9 +136,9 @@
         "id": "pmx-affiliate-marketplace",
         "slug": "pmx-affiliate-marketplace",
         "name": "PMX Affiliate Marketplace",
-        "role": "Engineered and launched the full stack, native Shopify integration",
+        "role": "Built and launched the full stack",
         "tagline": "Affiliate program for Shopify brands that traces every order to its affiliate",
-        "description": "Engineered, developed and launched the full-stack architecture of the affiliate marketplace, with a native integration into the Shopify ecosystem.",
+        "description": "A Rails and GraphQL API, a Next client and a native Shopify app.",
         "impact": "Top client grew affiliate ROAS from 2 to 3x to 5.5x",
         "details": [
           "Made the initial commits of the API and the client",
@@ -173,13 +173,13 @@
         "name": "InsurAdmin",
         "role": "CTO",
         "tagline": "Agency management for insurance agencies and IMOs",
-        "description": "A platform managing complex carrier feeds and agency teams",
+        "description": "Carrier feeds, commission files and agency teams in one app.",
         "impact": "Clients live in 2 to 4 weeks",
         "details": [
           "Made the initial commit and the setup with dashboard, htmx and onboarding",
-          "Carrier feed parser creating carrier, product, carrier appointment and apps linked to the agent",
+          "Carrier feed parser that creates carriers, products, appointments and applications for each agent",
           "Commission files and party commissions",
-          "Team and agency dashboards, and agencies managing user subscriptions"
+          "Team and agency dashboards and user subscriptions per agency"
         ],
         "techStack": [
           "Elixir",
@@ -206,10 +206,10 @@
         "id": "securebancard",
         "slug": "securebancard",
         "name": "SecureBancard",
-        "role": "The key developer: saved the launch",
-        "tagline": "Payments company for ISOs and ISVs (\"the alternative to big payment processors\"), Pioneer platform",
-        "description": "He learned and built what multi BIN needed, migrating thousands of lines and hundreds of queries and mutations from Node.js to Elixir by hand",
-        "impact": "Saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines",
+        "role": "Key developer",
+        "tagline": "Payment processing for independent sales organizations and software vendors, on its Pioneer platform",
+        "description": "Learned the multi BIN domain and ported thousands of lines and hundreds of queries and mutations from Node.js to Elixir by hand.",
+        "impact": "Built 80% of the Dual BIN support alone",
         "details": [
           "API and web app dev setup docs, controller and route docs",
           "Deployment process docs",
@@ -242,7 +242,7 @@
         "name": "Pearson Channels",
         "role": "Co-architect, key developer",
         "tagline": "Pearson's video learning product, built nearly from the ground up",
-        "description": "He moved all of ClutchPrep's data into it, working, and built major features: exam preps, video lessons, shared widgets",
+        "description": "Moved all of Clutch Prep's data into it and built its exam preps, video lessons and shared widgets.",
         "impact": "",
         "details": [],
         "techStack": [],
@@ -264,9 +264,9 @@
         "id": "clutchprep",
         "slug": "clutchprep",
         "name": "ClutchPrep",
-        "role": "Leader of the B2B system",
+        "role": "B2B lead",
         "tagline": "The B2B system that kept schools running through the pandemic",
-        "description": "Key in the work that closed the acquisition by Pearson",
+        "description": "Acquired by Pearson",
         "impact": "",
         "details": [],
         "techStack": [
@@ -290,9 +290,9 @@
         "id": "nebulith",
         "slug": "nebulith",
         "name": "Nebulith",
-        "role": "Creator, solo",
+        "role": "Creator",
         "tagline": "Game engine and map editor",
-        "description": "Generated worlds, iso and top views, tiles, units, quests",
+        "description": "",
         "impact": "",
         "details": [
           "Template editor with a randomizer and isometric rendering",
@@ -331,7 +331,7 @@
         "impact": "",
         "details": [
           "Rebuilt Firestorm's forum domain in Ash 3",
-          "In forum moderation: pin, lock, hide, report",
+          "Moderation: pin, lock, hide, report",
           "Feed, chat and mentions in every composer",
           "Security fixes: the API token GraphQL field and the markdown fallback"
         ],
@@ -401,7 +401,7 @@
         "impact": "",
         "details": [
           "Grant request select, receipt mailer and media gallery",
-          "Iframe support and investment strategy on the user",
+          "Iframe support and a per user investment strategy",
           "ACH and Stripe fixes, Stripe webhook data migration",
           "Playwright suite replacing Jest, CI gated on rubocop and rspec"
         ],
@@ -432,7 +432,7 @@
         "name": "Truth Social",
         "role": "Backend engineer, 2 to 3 months",
         "tagline": "Helped set the initial backend architecture and features while the full team was hired",
-        "description": "Embedded as a backend engineer during the foundational architecture phases, collaborating closely with Mastodon core developers to scale and optimize the Ruby on Rails backend.",
+        "description": "",
         "impact": "",
         "details": [],
         "techStack": [],
@@ -456,8 +456,8 @@
         "name": "GRCTechMe",
         "role": "CTO",
         "tagline": "Governance, risk and compliance app",
-        "description": "He got it onto the Google Cloud Marketplace",
-        "impact": "Passing review on the first try with no fixes",
+        "description": "Got it listed on the Google Cloud Marketplace",
+        "impact": "Passed the marketplace review on the first try",
         "details": [
           "Google Cloud Marketplace: separate keys, redirect to the marketplace, signed push and procurement fixes",
           "Demo side",
@@ -495,8 +495,8 @@
         "impact": "",
         "details": [
           "Claude adapter behind the tutor and the judge",
-          "Grading, exact at submit and judged",
-          "STT and TTS behind behaviours, with a narration render job",
+          "Exact grading on submit, AI judged answers",
+          "Speech to text and text to speech behind one interface, plus a narration render job",
           "Billing with Stripe and RevenueCat"
         ],
         "techStack": [
@@ -530,13 +530,13 @@
         "name": "Agency Rocket",
         "role": "Construyó el motor de cobros con Stripe de la suite",
         "tagline": "Suite de ventas e ilustraciones para agentes de seguros",
-        "description": "La suite de marketing Agency Rocket (My New Retirement, Wealth United, etc.)",
+        "description": "La suite de marketing detrás de My New Retirement, Wealth United y Debt Action Plan.",
         "impact": "Los testimonios citan 5x en negocio y meses de más de $50,000",
         "details": [
           "Cobros con Stripe: Stripe Elements, suscripciones, cupones y complementos",
-          "Ilustraciones creadas desde un CSV subido, con salida en PDF",
+          "Ilustraciones generadas desde un CSV subido y exportadas a PDF",
           "Vistas de jerarquía de equipos",
-          "Rutas de callback SSO e ilustraciones de anualidades a través del parser de anualidades"
+          "Rutas de callback SSO e ilustraciones de anualidades desde el parser"
         ],
         "techStack": [
           "Vue",
@@ -565,12 +565,12 @@
         "name": "My New Retirement",
         "role": "Suite Agency Rocket, cobros",
         "tagline": "Planificación de retiro con seguros de vida indexados para familias",
-        "description": "Una de las tres plataformas de la suite",
+        "description": "",
         "impact": "",
         "details": [
           "Páginas de aterrizaje con contenido de webinar a medida",
           "Vistas en iframe con un plug de origen cruzado",
-          "Francés y una redirección por idioma"
+          "Traducción al francés y una redirección por idioma"
         ],
         "techStack": [
           "Phoenix",
@@ -599,8 +599,8 @@
         "description": "",
         "impact": "",
         "details": [
-          "Hizo la configuración inicial",
-          "Lógica del parser de configuración de complementos",
+          "Configuré el proyecto",
+          "Parser para la configuración de complementos",
           "El informe PDF de Debt Action Plan, generado con Puppeteer",
           "Despliegues con Cloud Build y GitHub Actions"
         ],
@@ -635,7 +635,7 @@
           "Hizo el commit inicial",
           "Contador de la deuda nacional",
           "Administración de productos de seguro, aseguradoras y apps",
-          "Flujo de QA de permisos y plugs"
+          "Permisos y su flujo de QA"
         ],
         "techStack": [
           "Phoenix",
@@ -659,9 +659,9 @@
         "id": "pmx-affiliate-marketplace",
         "slug": "pmx-affiliate-marketplace",
         "name": "PMX Affiliate Marketplace",
-        "role": "Diseñó y lanzó todo el full stack, integración nativa con Shopify",
+        "role": "Construí y lancé todo el stack",
         "tagline": "Programa de afiliados para marcas de Shopify que asigna cada pedido a su afiliado",
-        "description": "Diseñó, desarrolló y lanzó la arquitectura full-stack del marketplace de afiliados, con una integración nativa en el ecosistema de Shopify.",
+        "description": "Una API en Rails y GraphQL, un cliente en Next y una app nativa de Shopify.",
         "impact": "El mayor cliente subió su ROAS de afiliados de 2 a 3x a 5.5x",
         "details": [
           "Hizo los commits iniciales de la API y del cliente",
@@ -696,13 +696,13 @@
         "name": "InsurAdmin",
         "role": "CTO",
         "tagline": "Gestión de agencias para agencias de seguros e IMOs",
-        "description": "Una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias",
+        "description": "Feeds de aseguradoras, archivos de comisiones y equipos de agencia en una sola app.",
         "impact": "Clientes en marcha en 2 a 4 semanas",
         "details": [
           "Hizo el commit inicial y la configuración con dashboard, htmx y onboarding",
-          "Parser de feeds de aseguradoras que crea aseguradora, producto, nombramiento y apps vinculadas al agente",
+          "Parser de feeds de aseguradoras que crea aseguradoras, productos, nombramientos y solicitudes para cada agente",
           "Archivos de comisiones y comisiones por parte",
-          "Dashboards de equipos y agencias, y agencias que gestionan las suscripciones de usuarios"
+          "Dashboards de equipos y agencias y suscripciones de usuarios por agencia"
         ],
         "techStack": [
           "Elixir",
@@ -729,10 +729,10 @@
         "id": "securebancard",
         "slug": "securebancard",
         "name": "SecureBancard",
-        "role": "El desarrollador clave: salvó el lanzamiento",
-        "tagline": "Empresa de pagos para ISOs e ISVs (\"la alternativa a los grandes procesadores de pago\"), plataforma Pioneer",
-        "description": "Aprendió y construyó lo que multi BIN necesitaba, migrando a mano miles de líneas y cientos de queries y mutations de Node.js a Elixir",
-        "impact": "Salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa",
+        "role": "Desarrollador clave",
+        "tagline": "Procesamiento de pagos para organizaciones de ventas independientes y proveedores de software, en su plataforma Pioneer",
+        "description": "Aprendí el dominio multi BIN y porté a mano miles de líneas y cientos de queries y mutations de Node.js a Elixir.",
+        "impact": "Construí yo solo el 80% del soporte Dual BIN",
         "details": [
           "Documentación de configuración de la API y la app web, y de controladores y rutas",
           "Documentación del proceso de despliegue",
@@ -765,7 +765,7 @@
         "name": "Pearson Channels",
         "role": "Coarquitecto, desarrollador clave",
         "tagline": "El producto de aprendizaje en video de Pearson, construido casi desde cero",
-        "description": "Migró todos los datos de ClutchPrep a Channels, funcionando, y construyó funcionalidades principales: preparación de exámenes, lecciones en video, widgets compartidos",
+        "description": "Migré a Channels todos los datos de Clutch Prep y construí sus preparaciones de exámenes, lecciones en video y widgets compartidos.",
         "impact": "",
         "details": [],
         "techStack": [],
@@ -787,9 +787,9 @@
         "id": "clutchprep",
         "slug": "clutchprep",
         "name": "ClutchPrep",
-        "role": "Líder del sistema B2B",
+        "role": "Líder B2B",
         "tagline": "El sistema B2B que mantuvo a las escuelas funcionando durante la pandemia",
-        "description": "Clave en el trabajo que cerró la adquisición por Pearson",
+        "description": "Adquirida por Pearson",
         "impact": "",
         "details": [],
         "techStack": [
@@ -813,9 +813,9 @@
         "id": "nebulith",
         "slug": "nebulith",
         "name": "Nebulith",
-        "role": "Creador, en solitario",
+        "role": "Creador",
         "tagline": "Motor de juegos y editor de mapas",
-        "description": "Mundos generados, vistas isométrica y cenital, tiles, unidades, misiones",
+        "description": "",
         "impact": "",
         "details": [
           "Editor de plantillas con aleatorizador y render isométrico",
@@ -854,7 +854,7 @@
         "impact": "",
         "details": [
           "Reconstruyó el dominio del foro de Firestorm en Ash 3",
-          "Moderación dentro del foro: fijar, bloquear, ocultar, reportar",
+          "Moderación: fijar, bloquear, ocultar, reportar",
           "Feed, chat y menciones en cada editor",
           "Correcciones de seguridad: el campo GraphQL del token de API y el fallback de markdown"
         ],
@@ -924,7 +924,7 @@
         "impact": "",
         "details": [
           "Selector de solicitudes de donación, correo de recibos y galería multimedia",
-          "Soporte de iframe y estrategia de inversión en el usuario",
+          "Soporte de iframe y una estrategia de inversión por usuario",
           "Correcciones de ACH y Stripe, migración de datos de webhooks de Stripe",
           "Suite de Playwright en lugar de Jest, CI condicionado a rubocop y rspec"
         ],
@@ -955,7 +955,7 @@
         "name": "Truth Social",
         "role": "Ingeniero backend, 2 a 3 meses",
         "tagline": "Ayudó a definir la arquitectura y las funcionalidades iniciales del backend mientras se contrataba al equipo completo",
-        "description": "Integrado como ingeniero backend durante las fases de arquitectura fundacional, colaborando estrechamente con desarrolladores del núcleo de Mastodon para escalar y optimizar el backend en Ruby on Rails.",
+        "description": "",
         "impact": "",
         "details": [],
         "techStack": [],
@@ -979,8 +979,8 @@
         "name": "GRCTechMe",
         "role": "CTO",
         "tagline": "App de gobierno, riesgo y cumplimiento",
-        "description": "La llevó al Google Cloud Marketplace",
-        "impact": "Aprobó la revisión al primer intento, sin correcciones",
+        "description": "La publiqué en Google Cloud Marketplace",
+        "impact": "Aprobó la revisión del marketplace al primer intento",
         "details": [
           "Google Cloud Marketplace: claves separadas, redirección al marketplace, push firmado y correcciones de procurement",
           "Lado demo",
@@ -1018,8 +1018,8 @@
         "impact": "",
         "details": [
           "Adaptador de Claude detrás del tutor y del juez",
-          "Calificación, exacta al enviar y evaluada",
-          "STT y TTS detrás de behaviours, con un job de render de narración",
+          "Corrección exacta al enviar, respuestas evaluadas por IA",
+          "Voz a texto y texto a voz detrás de una sola interfaz, más un job de render de narración",
           "Cobros con Stripe y RevenueCat"
         ],
         "techStack": [
@@ -1053,13 +1053,13 @@
         "name": "Agency Rocket",
         "role": "Ha costruito il motore di fatturazione Stripe della suite",
         "tagline": "Suite di vendita e illustrazioni per agenti assicurativi",
-        "description": "La suite di marketing Agency Rocket (My New Retirement, Wealth United, ecc.)",
+        "description": "La suite di marketing dietro My New Retirement, Wealth United e Debt Action Plan.",
         "impact": "Le testimonianze citano 5x di affari e mesi da oltre $50,000",
         "details": [
           "Fatturazione Stripe: Stripe Elements, abbonamenti, coupon e componenti aggiuntivi",
-          "Illustrazioni create da un CSV caricato, con output in PDF",
+          "Illustrazioni generate da un CSV caricato ed esportate in PDF",
           "Viste della gerarchia dei team",
-          "Route di callback SSO e illustrazioni di rendite tramite il parser delle rendite"
+          "Route di callback SSO e illustrazioni di rendite dal parser"
         ],
         "techStack": [
           "Vue",
@@ -1088,12 +1088,12 @@
         "name": "My New Retirement",
         "role": "Suite Agency Rocket, fatturazione",
         "tagline": "Pianificazione pensionistica con polizze vita indicizzate per le famiglie",
-        "description": "Una delle tre piattaforme della suite",
+        "description": "",
         "impact": "",
         "details": [
           "Landing page con contenuti webinar su misura",
           "Viste in iframe con un plug cross origin",
-          "Francese e un reindirizzamento per lingua"
+          "Traduzione in francese e un reindirizzamento per lingua"
         ],
         "techStack": [
           "Phoenix",
@@ -1122,8 +1122,8 @@
         "description": "",
         "impact": "",
         "details": [
-          "Ha fatto la configurazione iniziale",
-          "Logica del parser di configurazione dei componenti aggiuntivi",
+          "Ho configurato il progetto",
+          "Parser per la configurazione dei componenti aggiuntivi",
           "Il report PDF di Debt Action Plan, generato con Puppeteer",
           "Deploy con Cloud Build e GitHub Actions"
         ],
@@ -1158,7 +1158,7 @@
           "Ha fatto il commit iniziale",
           "Contatore del debito nazionale",
           "Amministrazione di prodotti assicurativi, compagnie e app",
-          "Flusso QA di permessi e plug"
+          "Permessi e il loro flusso di QA"
         ],
         "techStack": [
           "Phoenix",
@@ -1182,9 +1182,9 @@
         "id": "pmx-affiliate-marketplace",
         "slug": "pmx-affiliate-marketplace",
         "name": "PMX Affiliate Marketplace",
-        "role": "Ha progettato e lanciato l'intero full stack, integrazione nativa con Shopify",
+        "role": "Ho costruito e lanciato l'intero stack",
         "tagline": "Programma di affiliazione per brand Shopify che attribuisce ogni ordine al suo affiliato",
-        "description": "Ha progettato, sviluppato e lanciato l'architettura full-stack del marketplace di affiliazione, con un'integrazione nativa nell'ecosistema Shopify.",
+        "description": "Un'API Rails e GraphQL, un client Next e un'app Shopify nativa.",
         "impact": "Il cliente principale ha portato il ROAS affiliati da 2 a 3x a 5.5x",
         "details": [
           "Ha fatto i commit iniziali dell'API e del client",
@@ -1219,13 +1219,13 @@
         "name": "InsurAdmin",
         "role": "CTO",
         "tagline": "Gestione di agenzie per agenzie assicurative e IMO",
-        "description": "Una piattaforma che gestisce feed complessi delle compagnie e team di agenzia",
+        "description": "Feed delle compagnie, file delle commissioni e team di agenzia in un'unica app.",
         "impact": "Clienti operativi in 2-4 settimane",
         "details": [
           "Ha fatto il commit iniziale e la configurazione con dashboard, htmx e onboarding",
-          "Parser dei feed delle compagnie che crea compagnia, prodotto, nomina e app collegate all'agente",
+          "Parser dei feed delle compagnie che crea compagnie, prodotti, nomine e domande per ogni agente",
           "File delle commissioni e commissioni per parte",
-          "Dashboard di team e agenzie, e agenzie che gestiscono gli abbonamenti degli utenti"
+          "Dashboard di team e agenzie e abbonamenti degli utenti per agenzia"
         ],
         "techStack": [
           "Elixir",
@@ -1252,10 +1252,10 @@
         "id": "securebancard",
         "slug": "securebancard",
         "name": "SecureBancard",
-        "role": "Lo sviluppatore chiave: ha salvato il lancio",
-        "tagline": "Società di pagamenti per ISO e ISV (\"l'alternativa ai grandi processori di pagamento\"), piattaforma Pioneer",
-        "description": "Ha imparato e costruito ciò che serviva al multi BIN, migrando a mano migliaia di righe e centinaia di query e mutation da Node.js a Elixir",
-        "impact": "Ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide",
+        "role": "Sviluppatore chiave",
+        "tagline": "Elaborazione dei pagamenti per organizzazioni di vendita indipendenti e fornitori di software, sulla sua piattaforma Pioneer",
+        "description": "Ho imparato il dominio multi BIN e ho portato a mano migliaia di righe e centinaia di query e mutation da Node.js a Elixir.",
+        "impact": "Ho costruito da solo l'80% del supporto Dual BIN",
         "details": [
           "Documentazione di setup dell'API e della web app, e di controller e route",
           "Documentazione del processo di deploy",
@@ -1288,7 +1288,7 @@
         "name": "Pearson Channels",
         "role": "Co-architetto, sviluppatore chiave",
         "tagline": "Il prodotto di apprendimento video di Pearson, costruito quasi da zero",
-        "description": "Ha migrato in Channels tutti i dati di ClutchPrep, funzionanti, e ha costruito funzionalità principali: preparazione agli esami, video lezioni, widget condivisi",
+        "description": "Ho migrato in Channels tutti i dati di Clutch Prep e ho costruito le preparazioni agli esami, le video lezioni e i widget condivisi.",
         "impact": "",
         "details": [],
         "techStack": [],
@@ -1310,9 +1310,9 @@
         "id": "clutchprep",
         "slug": "clutchprep",
         "name": "ClutchPrep",
-        "role": "Responsabile del sistema B2B",
+        "role": "Responsabile B2B",
         "tagline": "Il sistema B2B che ha tenuto aperte le scuole durante la pandemia",
-        "description": "Chiave nel lavoro che ha chiuso l'acquisizione da parte di Pearson",
+        "description": "Acquisita da Pearson",
         "impact": "",
         "details": [],
         "techStack": [
@@ -1336,9 +1336,9 @@
         "id": "nebulith",
         "slug": "nebulith",
         "name": "Nebulith",
-        "role": "Creatore, da solo",
+        "role": "Creatore",
         "tagline": "Motore di gioco ed editor di mappe",
-        "description": "Mondi generati, viste isometrica e dall'alto, tile, unità, missioni",
+        "description": "",
         "impact": "",
         "details": [
           "Editor di template con randomizzatore e rendering isometrico",
@@ -1377,7 +1377,7 @@
         "impact": "",
         "details": [
           "Ha ricostruito il dominio del forum di Firestorm in Ash 3",
-          "Moderazione nel forum: fissare, bloccare, nascondere, segnalare",
+          "Moderazione: fissare, bloccare, nascondere, segnalare",
           "Feed, chat e menzioni in ogni editor",
           "Correzioni di sicurezza: il campo GraphQL del token API e il fallback markdown"
         ],
@@ -1447,7 +1447,7 @@
         "impact": "",
         "details": [
           "Selettore delle richieste di donazione, mailer delle ricevute e galleria multimediale",
-          "Supporto iframe e strategia di investimento sull'utente",
+          "Supporto iframe e una strategia di investimento per utente",
           "Correzioni ACH e Stripe, migrazione dei dati dei webhook Stripe",
           "Suite Playwright al posto di Jest, CI vincolata a rubocop e rspec"
         ],
@@ -1478,7 +1478,7 @@
         "name": "Truth Social",
         "role": "Ingegnere backend, 2-3 mesi",
         "tagline": "Ha contribuito all'architettura e alle funzionalità iniziali del backend mentre si assumeva il team completo",
-        "description": "Inserito come ingegnere backend durante le fasi di architettura iniziale, collaborando a stretto contatto con gli sviluppatori del core di Mastodon per scalare e ottimizzare il backend in Ruby on Rails.",
+        "description": "",
         "impact": "",
         "details": [],
         "techStack": [],
@@ -1502,8 +1502,8 @@
         "name": "GRCTechMe",
         "role": "CTO",
         "tagline": "App di governance, rischio e conformità",
-        "description": "L'ha portata sul Google Cloud Marketplace",
-        "impact": "Ha superato la revisione al primo tentativo, senza correzioni",
+        "description": "L'ho pubblicata sul Google Cloud Marketplace",
+        "impact": "Ha superato la revisione del marketplace al primo tentativo",
         "details": [
           "Google Cloud Marketplace: chiavi separate, reindirizzamento al marketplace, push firmato e correzioni del procurement",
           "Lato demo",
@@ -1541,8 +1541,8 @@
         "impact": "",
         "details": [
           "Adattatore Claude dietro il tutor e il giudice",
-          "Valutazione, esatta all'invio e giudicata",
-          "STT e TTS dietro behaviour, con un job di rendering della narrazione",
+          "Correzione esatta all'invio, risposte valutate dall'IA",
+          "Voce in testo e testo in voce dietro un'unica interfaccia, più un job di rendering della narrazione",
           "Fatturazione con Stripe e RevenueCat"
         ],
         "techStack": [

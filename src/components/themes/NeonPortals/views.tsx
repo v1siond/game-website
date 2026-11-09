@@ -14,7 +14,7 @@ import { CrateArt } from './crateArt'
 import { CrateField } from './crateField'
 import { BodySlam, CrateSpin } from './deliveries'
 import type { Zone } from './eraBackdrop'
-import { BridgeSlide, Crossing, Hint, TombRun } from './eraScenes'
+import { BridgeSlide, Crossing, TombRun } from './eraScenes'
 import scenes from './eraScenes.module.css'
 import { Crystal, Gem, Relic } from './pickups'
 import { useScore } from './score'
@@ -165,7 +165,6 @@ function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
         <Stage title={labels.sections.workExperience} zone="egypt" icon="crystal">
           {() => (
             <>
-              <Hint>{labels.warp.levelHint}</Hint>
               <TombRun profession="engineer" />
               <ul className={MASONRY_LIST}>
                 {sections.jobs.map((entry, index) => (
@@ -236,7 +235,6 @@ function MusicianLevels({ sections }: { sections: SectionsOf<'drummer'> }) {
             <p className={`w-fit text-lg font-bold text-[color:var(--np-gold)] ${ui.plate}`}>{drumsSince(musician, labels.years)}</p>
             <RelicGem />
           </div>
-          <Hint>{labels.warp.trialHint}</Hint>
           <Crossing on={on} profession="drummer" traveller={{ kind: 'ride', vehicle: 'jetski' }} className="mb-2" />
           <BandList
             bands={bands}

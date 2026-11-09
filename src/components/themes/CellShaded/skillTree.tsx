@@ -61,7 +61,7 @@ function Branch({ category, index, lit, onLight }: { category: Category; index: 
 }
 
 export function SkillTree({ categories }: { categories: Category[] }) {
-  const { cards, hud } = useLabels()
+  const { cards } = useLabels()
   const [lit, setLit] = useState<Lit | null>(null)
   const { reduced } = useZoneStageContext()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
@@ -72,7 +72,6 @@ export function SkillTree({ categories }: { categories: Category[] }) {
         <div className="h-48 w-28 shrink-0" aria-hidden="true">
           <VaultSprite profession="engineer" motion={triggered || reduced ? 'action' : 'idle'} className="h-full w-full" />
         </div>
-        <p className="mb-4 w-full min-w-0 text-base text-[var(--cel-paper)] sm:ml-28 sm:w-auto sm:flex-1">{hud.treeHint}</p>
       </div>
       <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
         {categories.map((category, index) => (

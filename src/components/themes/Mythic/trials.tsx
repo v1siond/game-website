@@ -221,14 +221,12 @@ function TrialCard({ job, cleared, onEnter }: { job: Job; cleared: boolean; onEn
 }
 
 export function Trials({ jobs }: { jobs: Job[] }) {
-  const { myth } = useLabels()
   const { enter, isDone: isCleared, take, count } = useTurnQueue(jobs, FIGHT_GAP_MS)
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
       <div className="lg:sticky lg:top-8 lg:z-10 lg:self-start">
         <Arena take={take} cleared={count} total={jobs.length} />
-        <p className={`mt-3 hidden lg:block ${u.hint}`}>{myth.arenaHint}</p>
       </div>
       <ul className="columns-1 gap-6 xl:columns-2">
         {jobs.map((job) => (

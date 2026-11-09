@@ -102,12 +102,10 @@ function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTu
 }
 
 export function Radio({ bands, on }: { bands: Band[]; on: boolean }) {
-  const { hud } = useLabels()
   const [tuned, setTuned] = useState(0)
 
   return (
     <>
-      <p className="mb-3 text-sm text-atomic-phosphor-dim-text">{hud.tuneHint}</p>
       <Receiver bands={bands} tuned={tuned} on={on} />
       <BandList
         bands={bands}

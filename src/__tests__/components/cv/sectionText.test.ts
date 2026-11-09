@@ -31,7 +31,7 @@ describe('the phrases read the labels', () => {
   })
 
   it('writes the drums line', () => {
-    expect(drumsSince({ since: 2005, yearsPlaying: 19 }, english.years)).toBe('Drums since 2005, 19 years')
+    expect(drumsSince({ since: 2005 }, english.years)).toBe('Drumming since 2005')
   })
 
   it('names the project links and the new tab', () => {

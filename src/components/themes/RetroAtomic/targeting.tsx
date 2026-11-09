@@ -268,7 +268,6 @@ interface Opened {
 }
 
 export function TargetingSystem({ projects }: { projects: Project[] }) {
-  const { hud } = useLabels()
   const { points, spend } = useActionPoints()
   const [target, setTarget] = useState<string | null>(null)
   const [shot, setShot] = useState<{ id: string; phase: ShotPhase } | null>(null)
@@ -309,7 +308,6 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
   return (
     <div className="relative" data-vats={locked ? 'on' : undefined}>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <p className="bg-atomic-glass px-2 py-1 text-sm text-atomic-phosphor-dim-text">{hud.targetHint}</p>
         <ActionPoints points={points} />
       </div>
       <div className="md:flex md:gap-4">

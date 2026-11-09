@@ -143,13 +143,11 @@ function JobStop({ job, order }: { job: Job; order: number }) {
 
 export function LiftDescent({ jobs }: { jobs: Job[] }) {
   const { ref } = useScrollScene<HTMLDivElement>(RIDE)
-  const { souls: words } = useLabels()
 
   return (
     <div ref={ref} className="grid gap-6 lg:grid-cols-[6rem_minmax(0,1fr)]">
       <LiftShaft />
       <div>
-        <p className="mb-6 hidden text-sm italic text-[color:var(--soul-text-soft)] lg:block">{words.liftHint}</p>
         <ul className={MASONRY_LIST}>
           {jobs.map((job, order) => (
             <li key={job.id} className={MASONRY_ITEM}>

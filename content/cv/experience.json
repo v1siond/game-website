@@ -7,14 +7,14 @@
         "endDate": "",
         "current": true,
         "employment": "Independent",
-        "description": "Long-term core engineer and architect trusted by high-profile enterprise companies and scaling startups to lead critical system overhauls, compliance-driven deployments, and zero-to-one product development.",
+        "description": "Core engineer and architect for enterprise clients and startups: system rewrites, launches under compliance deadlines and new products from zero.",
         "highlights": [
-          "InsurAdmin (InsureTech automation): developed InsurAdmin from scratch, a platform managing complex carrier feeds and agency teams.",
-          "Agency Rocket: engineered core automation parsers (Annuity, IUL, Whole Life) and fully integrated the Stripe billing engine for the Agency Rocket marketing suite (My New Retirement, Wealth United, Debt Action Plan).",
-          "Datepal: co PM and development lead of a dating app where singles are invited by their coupled friends to events and get to meet other people from those circles. Built Veriff identity and age verification, ranking APIs with card stacks, SMS notifications on lifecycle events and Stripe checkout in the Phoenix and Ash backend.",
-          "PMX Affiliate Marketplace: engineered, developed and launched the full-stack architecture of the affiliate marketplace, with a native integration into the Shopify ecosystem.",
-          "SecureBancard (critical project rescue): saved a high-stakes, time-sensitive launch by single-handedly engineering 80% of the Dual BIN support implementation, hitting strict compliance deadlines.",
-          "Truth Social (foundational stages): embedded as a backend engineer during the foundational architecture phases, collaborating closely with Mastodon core developers to scale and optimize the Ruby on Rails backend."
+          "InsurAdmin: built it from scratch to manage carrier feeds and agency teams.",
+          "Agency Rocket: built the annuity, IUL and whole life parsers and the Stripe billing for the suite (My New Retirement, Wealth United, Debt Action Plan).",
+          "Datepal: co PM and development lead of a dating app where coupled friends invite singles to events. Built Veriff age checks, ranking APIs with card stacks, SMS notifications and Stripe checkout on Phoenix and Ash.",
+          "PMX Affiliate Marketplace: built and launched the whole stack and its native Shopify integration.",
+          "SecureBancard: saved the launch by building 80% of the Dual BIN support alone, in time for the compliance deadline.",
+          "Truth Social: backend engineer in the early stages. Scaled the Rails backend with Mastodon core developers."
         ],
         "skills": [],
         "title": "Senior Staff Software Engineer",
@@ -30,8 +30,8 @@
         "employment": "Full time",
         "description": "Pearson Channels: co-architected Channels nearly from the ground up with the core team.",
         "highlights": [
-          "Designed and executed the data migration strategy, linking legacy SQL data into Pearson's enterprise NoSQL infrastructure.",
-          "He moved all of ClutchPrep's data into it, working, and built major features: exam preps, video lessons, shared widgets"
+          "Planned and ran the migration of the legacy SQL data into Pearson's NoSQL stores.",
+          "Built exam preps, video lessons and shared widgets."
         ],
         "skills": [
           "AWS Lambda",
@@ -48,10 +48,9 @@
         "endDate": "2022-04-01",
         "current": false,
         "employment": "Full time",
-        "description": "Engineering leader for the Clutch Prep B2B product, driving the technical milestones that led to the acquisition by Pearson.",
+        "description": "Engineering lead of the Clutch Prep B2B product through its acquisition by Pearson.",
         "highlights": [
-          "Led the B2B system that kept schools running through the pandemic",
-          "Key in the work that closed the acquisition by Pearson"
+          "Led the B2B system that kept schools running through the pandemic"
         ],
         "skills": [
           "AWS Lambda"
@@ -67,11 +66,11 @@
         "endDate": "2019-09-01",
         "current": false,
         "employment": "Full time",
-        "description": "An online learning platform tailored for software developers and busy technical professionals. Both a developer of the platforms and an expert teacher, usually sharing frontend tricks and latest trends",
+        "description": "Online courses for software developers. I built the platform and taught on it, mostly frontend.",
         "highlights": [
-          "One of my most popular video series taught how to build pixel art characters with shadows and css when css was still very limited",
-          "Taught how to migrate the code from css to sass and stylus, taught ITCSS and how to work with javascript and handle WCAG AAA audits",
-          "How to work to get pixel perfect design implementations when it was hard and figma wasn't a thing"
+          "One of my most popular series: pixel art characters with shadows in pure CSS, when CSS was still very limited.",
+          "Lessons on moving CSS to Sass and Stylus, ITCSS, JavaScript and WCAG AAA audits.",
+          "Pixel perfect builds from designs, before Figma existed."
         ],
         "skills": [],
         "title": "Senior Full Stack Developer",
@@ -145,14 +144,14 @@
         "endDate": "",
         "current": true,
         "employment": "Independiente",
-        "description": "Ingeniero y arquitecto central de largo plazo, de confianza para grandes empresas y startups en crecimiento, para liderar renovaciones de sistemas críticos, despliegues regidos por normativas y desarrollo de productos desde cero.",
+        "description": "Ingeniero y arquitecto central para clientes empresariales y startups: reescrituras de sistemas, lanzamientos con plazos de cumplimiento y productos nuevos desde cero.",
         "highlights": [
-          "InsurAdmin (automatización InsureTech): desarrolló InsurAdmin desde cero, una plataforma que gestiona feeds complejos de aseguradoras y equipos de agencias.",
-          "Agency Rocket: desarrolló los parsers de automatización centrales (Annuity, IUL, Whole Life) e integró por completo el motor de cobros con Stripe de la suite de marketing Agency Rocket (My New Retirement, Wealth United, Debt Action Plan).",
-          "Datepal: co PM y líder de desarrollo de una app de citas donde los solteros son invitados por sus amigos en pareja a eventos y conocen a otras personas de esos círculos. Desarrolló la verificación de identidad y edad con Veriff, APIs de ranking con pilas de tarjetas, notificaciones SMS en eventos del ciclo de vida y el checkout de Stripe en el backend con Phoenix y Ash.",
-          "PMX Affiliate Marketplace: diseñó, desarrolló y lanzó la arquitectura full-stack del marketplace de afiliados, con una integración nativa en el ecosistema de Shopify.",
-          "SecureBancard (rescate de un proyecto crítico): salvó un lanzamiento de alto riesgo y con plazos ajustados desarrollando él solo el 80% de la implementación del soporte Dual BIN, cumpliendo plazos estrictos de normativa.",
-          "Truth Social (etapas fundacionales): integrado como ingeniero backend durante las fases de arquitectura fundacional, colaborando estrechamente con desarrolladores del núcleo de Mastodon para escalar y optimizar el backend en Ruby on Rails."
+          "InsurAdmin: lo construí desde cero para gestionar los feeds de aseguradoras y los equipos de agencia.",
+          "Agency Rocket: construí los parsers de Annuity, IUL y Whole Life y el cobro con Stripe de la suite (My New Retirement, Wealth United, Debt Action Plan).",
+          "Datepal: co PM y líder de desarrollo de una app de citas donde los amigos en pareja invitan a solteros a eventos. Construí la verificación de edad con Veriff, APIs de ranking con mazos de tarjetas, notificaciones SMS y el checkout de Stripe sobre Phoenix y Ash.",
+          "PMX Affiliate Marketplace: construí y lancé todo el stack y su integración nativa con Shopify.",
+          "SecureBancard: salvé el lanzamiento construyendo yo solo el 80% del soporte Dual BIN, a tiempo para el plazo de cumplimiento.",
+          "Truth Social: ingeniero backend en las primeras etapas. Escalé el backend en Rails con desarrolladores del núcleo de Mastodon."
         ],
         "skills": [],
         "title": "Ingeniero de Software Senior Staff",
@@ -168,8 +167,8 @@
         "employment": "Tiempo completo",
         "description": "Pearson Channels: coarquitecto de Channels, construido casi desde cero con el equipo principal.",
         "highlights": [
-          "Diseñó y ejecutó la estrategia de migración de datos, llevando los datos SQL heredados a la infraestructura NoSQL empresarial de Pearson.",
-          "Migró todos los datos de ClutchPrep a Channels, funcionando, y construyó funcionalidades principales: preparación de exámenes, lecciones en video, widgets compartidos"
+          "Planifiqué y ejecuté la migración de los datos SQL heredados a los almacenes NoSQL de Pearson.",
+          "Construí preparaciones de exámenes, lecciones en video y widgets compartidos."
         ],
         "skills": [
           "AWS Lambda",
@@ -186,10 +185,9 @@
         "endDate": "2022-04-01",
         "current": false,
         "employment": "Tiempo completo",
-        "description": "Líder de ingeniería del producto B2B de Clutch Prep, impulsando los hitos técnicos que llevaron a la adquisición por Pearson.",
+        "description": "Líder de ingeniería del producto B2B de Clutch Prep hasta su adquisición por Pearson.",
         "highlights": [
-          "Lideró el sistema B2B que mantuvo a las escuelas funcionando durante la pandemia",
-          "Clave en el trabajo que cerró la adquisición por Pearson"
+          "Lideró el sistema B2B que mantuvo a las escuelas funcionando durante la pandemia"
         ],
         "skills": [
           "AWS Lambda"
@@ -205,11 +203,11 @@
         "endDate": "2019-09-01",
         "current": false,
         "employment": "Tiempo completo",
-        "description": "Una plataforma de aprendizaje en línea pensada para desarrolladores de software y profesionales técnicos ocupados. Desarrollador de las plataformas y profesor experto a la vez, compartiendo trucos de frontend y las últimas tendencias",
+        "description": "Cursos en línea para desarrolladores de software. Construí la plataforma y enseñé en ella, sobre todo frontend.",
         "highlights": [
-          "Una de sus series de video más populares enseñó a crear personajes en pixel art con sombras y CSS cuando CSS aún era muy limitado",
-          "Enseñó a migrar el código de CSS a Sass y Stylus, enseñó ITCSS y a trabajar con JavaScript y llevar auditorías WCAG AAA",
-          "Cómo lograr implementaciones de diseño al píxel cuando era difícil y Figma no existía"
+          "Una de mis series más populares: personajes en pixel art con sombras en CSS puro, cuando CSS aún era muy limitado.",
+          "Lecciones sobre pasar de CSS a Sass y Stylus, ITCSS, JavaScript y auditorías WCAG AAA.",
+          "Maquetación al píxel a partir de diseños, antes de que existiera Figma."
         ],
         "skills": [],
         "title": "Desarrollador Full Stack Senior",
@@ -283,14 +281,14 @@
         "endDate": "",
         "current": true,
         "employment": "Indipendente",
-        "description": "Ingegnere e architetto centrale di lungo corso, scelto da grandi aziende e startup in crescita per guidare il rinnovo di sistemi critici, rilasci vincolati alla conformità e lo sviluppo di prodotti da zero.",
+        "description": "Ingegnere e architetto centrale per clienti enterprise e startup: riscritture di sistemi, lanci con scadenze di conformità e nuovi prodotti da zero.",
         "highlights": [
-          "InsurAdmin (automazione InsureTech): ha sviluppato InsurAdmin da zero, una piattaforma che gestisce feed complessi delle compagnie e team di agenzia.",
-          "Agency Rocket: ha sviluppato i parser di automazione principali (Annuity, IUL, Whole Life) e integrato completamente il motore di fatturazione Stripe della suite di marketing Agency Rocket (My New Retirement, Wealth United, Debt Action Plan).",
-          "Datepal: co-PM e responsabile dello sviluppo di un'app di incontri in cui i single vengono invitati dagli amici in coppia a eventi e conoscono altre persone di quelle cerchie. Ha sviluppato la verifica di identità ed età con Veriff, le API di ranking con pile di carte, le notifiche SMS sugli eventi del ciclo di vita e il checkout Stripe nel backend Phoenix e Ash.",
-          "PMX Affiliate Marketplace: ha progettato, sviluppato e lanciato l'architettura full-stack del marketplace di affiliazione, con un'integrazione nativa nell'ecosistema Shopify.",
-          "SecureBancard (salvataggio di un progetto critico): ha salvato un lancio ad alto rischio e a tempo sviluppando da solo l'80% dell'implementazione del supporto Dual BIN, rispettando scadenze di conformità rigide.",
-          "Truth Social (fasi iniziali): inserito come ingegnere backend durante le fasi di architettura iniziale, collaborando a stretto contatto con gli sviluppatori del core di Mastodon per scalare e ottimizzare il backend in Ruby on Rails."
+          "InsurAdmin: l'ho costruito da zero per gestire i feed delle compagnie e i team di agenzia.",
+          "Agency Rocket: ho costruito i parser Annuity, IUL e Whole Life e la fatturazione Stripe della suite (My New Retirement, Wealth United, Debt Action Plan).",
+          "Datepal: co-PM e responsabile dello sviluppo di un'app di incontri in cui gli amici in coppia invitano i single agli eventi. Ho costruito la verifica dell'età con Veriff, API di ranking con pile di carte, notifiche SMS e il checkout Stripe su Phoenix e Ash.",
+          "PMX Affiliate Marketplace: ho costruito e lanciato l'intero stack e la sua integrazione nativa con Shopify.",
+          "SecureBancard: ho salvato il lancio costruendo da solo l'80% del supporto Dual BIN, in tempo per la scadenza di conformità.",
+          "Truth Social: ingegnere backend nelle prime fasi. Ho scalato il backend Rails con gli sviluppatori core di Mastodon."
         ],
         "skills": [],
         "title": "Ingegnere del Software Senior Staff",
@@ -306,8 +304,8 @@
         "employment": "Tempo pieno",
         "description": "Pearson Channels: co-architetto di Channels, costruito quasi da zero con il team principale.",
         "highlights": [
-          "Ha progettato ed eseguito la strategia di migrazione dei dati, portando i dati SQL legacy nell'infrastruttura NoSQL aziendale di Pearson.",
-          "Ha migrato in Channels tutti i dati di ClutchPrep, funzionanti, e ha costruito funzionalità principali: preparazione agli esami, video lezioni, widget condivisi"
+          "Ho pianificato ed eseguito la migrazione dei dati SQL legacy negli archivi NoSQL di Pearson.",
+          "Ho costruito preparazioni agli esami, video lezioni e widget condivisi."
         ],
         "skills": [
           "AWS Lambda",
@@ -324,10 +322,9 @@
         "endDate": "2022-04-01",
         "current": false,
         "employment": "Tempo pieno",
-        "description": "Responsabile tecnico del prodotto B2B di Clutch Prep, alla guida delle tappe tecniche che hanno portato all'acquisizione da parte di Pearson.",
+        "description": "Responsabile tecnico del prodotto B2B di Clutch Prep fino all'acquisizione da parte di Pearson.",
         "highlights": [
-          "Ha guidato il sistema B2B che ha tenuto aperte le scuole durante la pandemia",
-          "Chiave nel lavoro che ha chiuso l'acquisizione da parte di Pearson"
+          "Ha guidato il sistema B2B che ha tenuto aperte le scuole durante la pandemia"
         ],
         "skills": [
           "AWS Lambda"
@@ -343,11 +340,11 @@
         "endDate": "2019-09-01",
         "current": false,
         "employment": "Tempo pieno",
-        "description": "Una piattaforma di formazione online pensata per sviluppatori software e professionisti tecnici impegnati. Sviluppatore delle piattaforme e docente esperto allo stesso tempo, condividendo trucchi frontend e le ultime tendenze",
+        "description": "Corsi online per sviluppatori software. Ho costruito la piattaforma e ci ho insegnato, soprattutto frontend.",
         "highlights": [
-          "Una delle sue serie video più seguite insegnava a creare personaggi in pixel art con ombre e CSS quando il CSS era ancora molto limitato",
-          "Ha insegnato a migrare il codice da CSS a Sass e Stylus, ha insegnato ITCSS e a lavorare con JavaScript e gestire gli audit WCAG AAA",
-          "Come ottenere implementazioni di design al pixel quando era difficile e Figma non esisteva"
+          "Una delle mie serie più seguite: personaggi in pixel art con ombre in puro CSS, quando il CSS era ancora molto limitato.",
+          "Lezioni sul passaggio da CSS a Sass e Stylus, ITCSS, JavaScript e audit WCAG AAA.",
+          "Implementazioni al pixel a partire dai design, prima che esistesse Figma."
         ],
         "skills": [],
         "title": "Sviluppatore Full Stack Senior",

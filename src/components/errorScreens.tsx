@@ -40,7 +40,7 @@ export function ServerErrorScreen({ status = 500, technical }: { status?: number
     <ErrorScreen
       status={status}
       headline="The server could not finish this request"
-      detail="This one is on the server, not on your connection. Loading the page again usually clears it."
+      detail="The fault is on the server. Loading the page again usually clears it."
       actions={[
         { label: 'Reload this page', onClick: () => window.location.reload(), primary: true },
         { label: 'Go to the home page', href: HOME },
@@ -63,7 +63,7 @@ export function CrashScreen({ error, reset }: { error: Error & { digest?: string
   return (
     <ErrorScreen
       headline="This page stopped running"
-      detail="Something in the page threw an error before it finished drawing. Try it again, and if it keeps happening the home page is a clean start."
+      detail="Something in the page threw an error before it finished drawing."
       actions={[
         { label: 'Try again', onClick: retry, primary: true },
         { label: 'Go to the home page', href: HOME },

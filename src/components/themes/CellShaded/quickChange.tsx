@@ -46,7 +46,7 @@ function useBuildOnChange(profession: Profession): number {
 }
 
 export function QuickChange({ profession }: { profession: Profession }) {
-  const { navigation, hud } = useLabels()
+  const { navigation } = useLabels()
   const build = useBuildOnChange(profession)
   const { ref } = useZoneStage<Zone>('noon')
 
@@ -68,13 +68,12 @@ export function QuickChange({ profession }: { profession: Profession }) {
         </div>
 
         <div className="min-w-0">
-          <p className={`mb-4 text-2xl text-[var(--cel-sun)] sm:text-3xl ${cel.display}`}>{navigation.selectYourProfession}</p>
+          <h2 className="sr-only">{navigation.selectYourProfession}</h2>
           <ProfessionSwitch
             className="grid grid-cols-3 gap-2 sm:gap-3"
             label={navigation.profession}
             renderOption={(option) => <OutfitTab {...option} />}
           />
-          <p className="mt-4 text-base text-[var(--cel-paper)]">{hud.changeHint}</p>
         </div>
       </div>
     </section>

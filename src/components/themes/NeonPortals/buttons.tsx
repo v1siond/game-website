@@ -29,7 +29,7 @@ export function CVLink() {
   const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${ui.button} ${ui.stone}`}>
-      {actions.getCv}
+      {actions.cv}
     </Link>
   )
 }

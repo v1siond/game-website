@@ -13,10 +13,10 @@
         "current": true,
         "achievements": [
           "National runner up",
-          "Competed in many tournaments, like top combat, national championship, achieving sub champion",
-          "Starting as assistant trainer, then getting my certification as teacher"
+          "Fought in many tournaments, Top Combat and the national championship among them.",
+          "Started as assistant trainer, then certified as an instructor."
         ],
-        "now": "Currently training for national championship"
+        "now": "Training for the national championship."
       },
       "training": [
         {
@@ -26,7 +26,7 @@
           "current": true
         }
       ],
-      "background": "I train martial arts since I was 19 years old, trained siscomada, choson mu sul, wrestling, jiujutsu, mma and muay thai."
+      "background": "I've trained martial arts since I was 19: Siscomada, Choson Mu Sul, wrestling, jiu-jitsu, MMA and Muay Thai."
     }
   },
   "es": {
@@ -43,10 +43,10 @@
         "current": true,
         "achievements": [
           "Subcampeón nacional",
-          "Compitió en muchos torneos, como Top Combat y el campeonato nacional, logrando el subcampeonato",
-          "Empezó como entrenador asistente y luego obtuvo su certificación como profesor"
+          "Competí en muchos torneos, entre ellos Top Combat y el campeonato nacional.",
+          "Empecé como entrenador asistente y luego me certifiqué como instructor."
         ],
-        "now": "Entrenando actualmente para el campeonato nacional"
+        "now": "Me preparo para el campeonato nacional."
       },
       "training": [
         {
@@ -56,7 +56,7 @@
           "current": true
         }
       ],
-      "background": "Entreno artes marciales desde los 19 años; he entrenado Siscomada, Choson Mu Sul, lucha, jiu-jitsu, MMA y Muay Thai."
+      "background": "Entreno artes marciales desde los 19 años: Siscomada, Choson Mu Sul, lucha, jiu-jitsu, MMA y Muay Thai."
     }
   },
   "it": {
@@ -73,10 +73,10 @@
         "current": true,
         "achievements": [
           "Vicecampione nazionale",
-          "Ha gareggiato in molti tornei, come Top Combat e il campionato nazionale, ottenendo il titolo di vicecampione",
-          "Ha iniziato come allenatore assistente, poi ha ottenuto la certificazione da istruttore"
+          "Ho combattuto in molti tornei, tra cui Top Combat e il campionato nazionale.",
+          "Ho iniziato come allenatore assistente, poi mi sono certificato come istruttore."
         ],
-        "now": "Attualmente in allenamento per il campionato nazionale"
+        "now": "Mi preparo per il campionato nazionale."
       },
       "training": [
         {
@@ -86,7 +86,7 @@
           "current": true
         }
       ],
-      "background": "Mi alleno nelle arti marziali da quando avevo 19 anni; ho praticato Siscomada, Choson Mu Sul, lotta, jiu-jitsu, MMA e Muay Thai."
+      "background": "Pratico arti marziali da quando avevo 19 anni: Siscomada, Choson Mu Sul, lotta, jiu-jitsu, MMA e Muay Thai."
     }
   }
 }

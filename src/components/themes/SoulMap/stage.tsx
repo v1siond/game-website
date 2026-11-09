@@ -13,7 +13,7 @@ import { Knight } from './knight'
 import { usePoseScript, type PoseStep } from './poses'
 import { useRun } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
-import { CARD_META, CARD_TITLE, Hint } from './menu'
+import { CARD_META, CARD_TITLE } from './menu'
 import { SOUL } from './palette'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
@@ -104,10 +104,8 @@ function Stage({ slot: { band, years, linkProps } }: { slot: BandSlot }) {
 }
 
 export function SunStages({ bands }: { bands: Band[] }) {
-  const { souls: words } = useLabels()
   return (
     <>
-      <Hint>{words.stageHint}</Hint>
       <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <Stage slot={slot} />} />
     </>
   )

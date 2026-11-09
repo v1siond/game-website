@@ -106,7 +106,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
           <div data-worlds-figure="" className="relative h-72 overflow-hidden sm:h-80">
             <div className={`absolute inset-0 ${u.riser}`}>
               {done ? (
-                <button type="button" className={`h-full w-full ${u.heroFigure}`} aria-label={myth.combo} title={myth.comboHint} onClick={() => play(HERO_MOVE[profession])}>
+                <button type="button" className={`h-full w-full ${u.heroFigure}`} aria-label={myth.combo} onClick={() => play(HERO_MOVE[profession])}>
                   <SpartanSprite key={take} profession={profession} motion={pose} onDone={settle} className="h-full w-full" />
                 </button>
               ) : (
@@ -142,7 +142,6 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
                 <nav className="mt-6 flex flex-wrap gap-3" aria-label={navigation.contactAndCv}>
                   <ContactActions actions={actions} />
                 </nav>
-                {done && <p className={`mt-6 ${u.hint}`}>{myth.comboHint}</p>}
               </div>
             </div>
           )}

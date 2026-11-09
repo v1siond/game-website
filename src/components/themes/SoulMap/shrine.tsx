@@ -243,7 +243,6 @@ export function ShrineHero() {
               <CVLink />
               <EngineLink />
             </div>
-            <p className="mt-5 text-sm italic text-[color:var(--soul-text-soft)]">{words.restHint}</p>
           </div>
         )}
       />

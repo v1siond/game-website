@@ -97,14 +97,13 @@ function Page({ category, lit, onEnter, onPoint }: { category: Category; lit: bo
 }
 
 export function Climb({ categories }: { categories: Category[] }) {
-  const { cards, myth } = useLabels()
+  const { cards } = useLabels()
   const { enter, isDone, take, count } = useTurnQueue(categories, CLIMB_GAP_MS)
   const [glow, setGlow] = useState<string | null>(null)
   const ids = categories.map((category) => category.id)
 
   return (
     <div>
-      <p className={`mb-4 ${u.hint}`}>{myth.climbHint}</p>
       <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-4 md:grid-cols-[7rem_minmax(0,1fr)]">
         <div className="sticky top-16 self-start">
           <Chain ids={ids} gripped={count} glow={glow} take={take} />

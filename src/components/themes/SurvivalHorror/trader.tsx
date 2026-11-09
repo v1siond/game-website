@@ -56,12 +56,10 @@ function Ware({ company }: { company: Company }) {
 }
 
 export function TraderWares({ companies }: { companies: Company[] }) {
-  const { horror: words } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
 
   return (
     <div ref={ref}>
-      <p className="mb-4 text-sm italic text-[color:var(--sh-fog-text)]">{words.waresHint}</p>
       <ul className={`${MASONRY_LIST} pt-2`}>
         {companies.map((company, index) => (
           <li key={company.id} className={`${MASONRY_ITEM} ${company.featured ? '[column-span:all]' : ''} ${horror.cellDrop} ${triggered ? horror.cellDropped : ''}`} style={{ '--i': index } as CSSProperties}>

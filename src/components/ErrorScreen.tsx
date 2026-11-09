@@ -105,7 +105,7 @@ export function ErrorScreen({ status, headline, detail, actions, technical }: Er
 
         {technical && (
           <details className="c-error__technical">
-            <summary>What the code said</summary>
+            <summary>Error details</summary>
             <pre className="c-error__trace">{technical}</pre>
           </details>
         )}

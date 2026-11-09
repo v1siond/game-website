@@ -55,7 +55,7 @@ export const themes: Theme[] = [
   {
     id: 'dark-fantasy',
     name: 'Dark Fantasy',
-    description: 'Ethereal ruined kingdom - an interconnected map',
+    description: 'A ruined kingdom of spirits and lanterns',
     colors: {
       background: DARK_FANTASY.void,
       backgroundGradient: `linear-gradient(to bottom, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidDeep})`,
@@ -85,7 +85,7 @@ export const themes: Theme[] = [
   {
     id: 'survival-horror',
     name: 'Survival Horror',
-    description: 'An old house at night under fixed cameras: doors that creak open, an item box, rooms to search and a safe room with a typewriter',
+    description: 'Search an old house at night and reach the safe room',
     colors: {
       background: SH.void,
       backgroundGradient: `linear-gradient(to bottom, ${SH.shadow}, ${SH.void})`,
@@ -115,7 +115,7 @@ export const themes: Theme[] = [
   {
     id: 'neon-portals',
     name: 'Neon Portals',
-    description: 'A warp room with level buttons: crates to spin open, crystals, time trials and a boss, the whole visit tallied at the end',
+    description: 'A warp room of levels, crates and a boss fight',
     colors: {
       background: PORTAL.VOID,
       backgroundGradient: `linear-gradient(to bottom, ${PORTAL.CHAMBER}, ${PORTAL.VOID})`,
@@ -145,7 +145,7 @@ export const themes: Theme[] = [
   {
     id: 'soul-map',
     name: 'Soul Map',
-    description: 'Grey ash and one warm fire: a ruined shrine at dusk, a lift down through the jobs, summon signs and a bout behind a fog wall',
+    description: 'A ruined shrine at dusk and a lift down through the jobs',
     colors: {
       background: SOUL.abyss,
       backgroundGradient: `linear-gradient(to bottom, ${SOUL.deep}, ${SOUL.abyss})`,
@@ -175,7 +175,7 @@ export const themes: Theme[] = [
   {
     id: 'adventure-paths',
     name: 'Adventure Paths',
-    description: 'An overworld map: a hub that picks the profession, regions with their own trails and a goal gate at the end',
+    description: 'An overworld map with a region for each part of the CV',
     colors: {
       background: TRAIL.NIGHT,
       backgroundGradient: `linear-gradient(to bottom, ${TRAIL.CANOPY}, ${TRAIL.NIGHT})`,
@@ -205,7 +205,7 @@ export const themes: Theme[] = [
   {
     id: 'rubber-hose',
     name: 'Rubber Hose',
-    description: '1930s rubber hose cartoon: sepia sets, the pink parry slap, the knockout',
+    description: 'A 1930s rubber hose cartoon in sepia',
     colors: {
       background: HOSE.paper,
       backgroundGradient: `linear-gradient(to bottom, ${HOSE.paper}, ${HOSE.paperSepia})`,
@@ -235,7 +235,7 @@ export const themes: Theme[] = [
   {
     id: 'retro-rpg',
     name: 'Retro RPG',
-    description: 'Lo-fi pixel RPG encounter, white boxes on black, a red heart dodging the bullet box',
+    description: 'A pixel RPG encounter in white boxes on black',
     colors: {
       background: RPG.void,
       backgroundGradient: `linear-gradient(to bottom, ${RPG.night}, ${RPG.void})`,
@@ -265,7 +265,7 @@ export const themes: Theme[] = [
   {
     id: 'bold-noir',
     name: 'Bold Noir',
-    description: 'Gentleman thief night in black, white and one loud red: a calling card in ransom letters, crooked black and red menu slabs with a cut-in, every project opened by a finisher rush',
+    description: "A gentleman thief's night in black, white and red",
     colors: {
       background: NOIR.ink,
       backgroundGradient: `linear-gradient(135deg, ${NOIR.coal}, ${NOIR.ink})`,
@@ -295,7 +295,7 @@ export const themes: Theme[] = [
   {
     id: 'fighter-select',
     name: 'Fighter Select',
-    description: 'Arcade fighting game: the versus splash, a select grid with the player one cursor, jobs as rounds, projects taking combo hits, a challenger stepping in',
+    description: 'An arcade fighting game with one round per job',
     colors: {
       background: FS.night,
       backgroundGradient: `linear-gradient(to bottom, ${FS.panel}, ${FS.night})`,
@@ -325,7 +325,7 @@ export const themes: Theme[] = [
   {
     id: 'art-deco',
     name: 'Art Deco',
-    description: '1920s city under the sea - brass, gold filigree and neon signs',
+    description: 'A 1920s city under the sea in brass and neon',
     colors: {
       background: DECO_COLORS.abyss,
       backgroundGradient: `linear-gradient(to bottom, ${DECO_COLORS.deepSeaDark}, ${DECO_COLORS.abyss})`,
@@ -355,7 +355,7 @@ export const themes: Theme[] = [
   {
     id: 'retro-atomic',
     name: 'Retro Atomic',
-    description: 'An atomic age shelter on a green wrist terminal: the cog door, the radio, a perk chart and a password game outside',
+    description: 'An atomic age shelter read on a green wrist terminal',
     colors: {
       background: ATOMIC_COLORS.ink,
       backgroundGradient: `linear-gradient(to bottom, ${ATOMIC_COLORS.bunker}, ${ATOMIC_COLORS.ink})`,
@@ -385,7 +385,7 @@ export const themes: Theme[] = [
   {
     id: 'neon-cyber',
     name: 'Neon Cyber',
-    description: 'Neon city at night - magenta and cyan glitch',
+    description: 'A neon city at night in magenta and cyan',
     colors: {
       background: NEON.void,
       backgroundGradient: `linear-gradient(to bottom, ${NEON.dusk}, ${NEON.void})`,
@@ -415,7 +415,7 @@ export const themes: Theme[] = [
   {
     id: 'cell-shaded',
     name: 'Cell Shaded',
-    description: 'One day in an inked comic desert: a freeze frame intro at noon, a bounty board and skill tree, loot at dusk, a respawn station at night',
+    description: 'One day in an inked comic desert, from noon to night',
     colors: {
       background: CEL.paper,
       backgroundGradient: `linear-gradient(to bottom, ${CEL.paper}, ${CEL.paperShade})`,
@@ -445,7 +445,7 @@ export const themes: Theme[] = [
   {
     id: 'silhouette',
     name: 'Silhouette',
-    description: "A black forest in the fog: levers, ropes, a spider's webbing, a gravity room and a cut to black between scenes",
+    description: 'A black forest in the fog',
     colors: {
       background: SHADE.void,
       backgroundGradient: `linear-gradient(to bottom, ${SHADE.panel}, ${SHADE.void})`,
@@ -475,7 +475,7 @@ export const themes: Theme[] = [
   {
     id: 'mythic',
     name: 'Mythic',
-    description: 'An escape up from the underworld in ink over colour: the blood pool hall, chambers to clear, boons over the magma and a gate onto the dawn',
+    description: 'An escape from the underworld, drawn in ink over colour',
     colors: {
       background: MYTH.sky,
       backgroundGradient: `linear-gradient(to bottom, ${MYTH.sky}, ${MYTH.hallLow})`,
@@ -505,7 +505,7 @@ export const themes: Theme[] = [
   {
     id: 'tropical-platformer',
     name: 'Tropical Platformer',
-    description: 'A jungle run from sunset to night: shot out of barrels across the canopy levels and back to the tree house',
+    description: 'A jungle run from sunset to night, barrel to barrel',
     colors: {
       background: COLORS.canopy,
       backgroundGradient: `linear-gradient(to bottom, ${COLORS.leafDark}, ${COLORS.canopy})`,
@@ -535,7 +535,7 @@ export const themes: Theme[] = [
   {
     id: 'medieval-fantasy',
     name: 'Medieval Fantasy',
-    description: 'RTS fantasy - gold accents, stone frames, parchment',
+    description: 'A strategy game realm of stone and parchment',
     colors: {
       background: REALM.bgDeep,
       backgroundGradient: `linear-gradient(to bottom, ${REALM.bgDeep}, ${REALM.bgVoid})`,

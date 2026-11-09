@@ -686,7 +686,9 @@ const WaystationNode = memo(function WaystationNode({
   isReceivingEnergy?: boolean
 }) {
   const { id, label, selected: isActive, optionProps } = option
-  const { icon, sublabel, color } = WAYSTATIONS[id]
+  const { professionFields } = useLabels()
+  const { icon, color } = WAYSTATIONS[id]
+  const sublabel = professionFields[id]
   const position = WAYSTATION_POSITIONS[id]
 
   return (
@@ -822,10 +824,10 @@ const WaystationNode = memo(function WaystationNode({
   )
 })
 
-const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; sublabel: string; color: string }> = {
-  drummer: { icon: <WaveIcon />, sublabel: 'Drums', color: DARK_FANTASY.lavender },
-  engineer: { icon: <GearIcon />, sublabel: 'Software', color: DARK_FANTASY.ethereal },
-  fighter: { icon: <DiamondIcon />, sublabel: 'Muay Thai', color: DARK_FANTASY.spiritGold },
+const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; color: string }> = {
+  drummer: { icon: <WaveIcon />, color: DARK_FANTASY.lavender },
+  engineer: { icon: <GearIcon />, color: DARK_FANTASY.ethereal },
+  fighter: { icon: <DiamondIcon />, color: DARK_FANTASY.spiritGold },
 }
 
 /**
@@ -1961,14 +1963,14 @@ export default function DarkFantasyTheme() {
               <div className="max-w-2xl mx-auto text-center">
                 <div className="mb-8">
                   <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brassText, fontFamily: DF_FONT }}>
-                    {actionLabels.getInTouch}
+                    {actionLabels.emailMe}
                   </h2>
                   <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{line}</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <HeroActions actions={actions} />
                   <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]`}>
-                    {actionLabels.downloadCv}
+                    {actionLabels.cv}
                   </Link>
                 </div>
               </div>

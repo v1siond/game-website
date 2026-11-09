@@ -69,7 +69,7 @@ describe('viewFor: the recruiter hero', () => {
     expect(hero.headline).toBe(cv.professionalSummary.headline)
     expect(hero.tagline).toBe(cv.professionalSummary.tagline)
     expect(hero.line).toBe(
-      'Remote, working US Eastern and Italian hours. Always interested in hearing new ideas and proposals. Send the project and the date it has to ship.',
+      'Remote, working US Eastern and Italian hours. Send me the project and the date it has to ship.',
     )
     expect(hero.line).toBe(`${cv.contact.availability} ${cv.contact.line}`)
     expect(hero.actions).toEqual({

@@ -59,11 +59,10 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
 }
 
 export function Keepsakes({ companies }: { companies: Company[] }) {
-  const { links, myth, cards } = useLabels()
+  const { links, cards } = useLabels()
 
   return (
     <>
-      <p className={`mb-6 ${u.hint}`}>{myth.keepsakeHint}</p>
       <ul className={`grid gap-6 border-4 border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-6`}>
         {companies.map((company, index) => (
           <li key={company.id} className={`${u.cabinetItem} ${u.reveal} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ ['--i' as string]: index }}>

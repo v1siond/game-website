@@ -264,7 +264,7 @@ function Tower({ side }: { side: keyof typeof TOWER_PLACE }) {
 }
 
 export function WarpRoom({ profession }: { profession: Profession }) {
-  const { navigation, warp: words } = useLabels()
+  const { navigation } = useLabels()
   const warp = useEntry(profession)
   const maskOut = useHubMask(profession)
 
@@ -275,7 +275,6 @@ export function WarpRoom({ profession }: { profession: Profession }) {
         <Tower side="right" />
         <Floor />
         <BossDoor />
-        <p className={`relative mb-48 mt-3 text-center text-base uppercase tracking-[0.12em] text-[color:var(--np-gold)] sm:mb-56 ${ui.chunk}`}>{words.hubHint}</p>
         <ProfessionSwitch
           className="relative flex items-end justify-center gap-1 sm:gap-10"
           label={navigation.profession}

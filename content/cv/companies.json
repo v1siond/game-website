@@ -4,8 +4,8 @@
       {
         "id": "nebulith",
         "name": "Nebulith",
-        "tagline": "Highly optimized custom game engine",
-        "description": "Game engine and map editor: generated worlds, iso and top views, tiles, units, quests. Launching to the commercial market soon.",
+        "tagline": "Custom game engine",
+        "description": "A game engine and map editor for generated worlds. Launching soon.",
         "url": "https://nebulith-production.up.railway.app",
         "services": [
           "Generated worlds",
@@ -25,8 +25,8 @@
         "services": [
           "AI tutor",
           "Lesson room",
-          "Grading, exact at submit and judged",
-          "STT and TTS"
+          "Exact and AI judged grading",
+          "Speech to text and text to speech"
         ],
         "icon": "📚",
         "featured": true
@@ -34,8 +34,8 @@
       {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
-        "tagline": "Enterprise Software Solutions",
-        "description": "Custom software development, system architecture, and technical consulting for businesses of all sizes.",
+        "tagline": "Custom software for enterprises",
+        "description": "Custom software and consulting for insurance and financial companies.",
         "url": "https://dbadbadba.com/",
         "services": [
           "Custom Software Development",
@@ -49,7 +49,7 @@
         "id": "pmx",
         "name": "PMX",
         "tagline": "Affiliate Marketplace for E-commerce",
-        "description": "Full marketing affiliates platform with payment system and Shopify integration. Connect brands with affiliates seamlessly.",
+        "description": "Affiliate platform where Shopify brands find affiliates and pay their commissions.",
         "url": "https://getpmx.com",
         "services": [
           "Shopify Integration",
@@ -63,7 +63,7 @@
         "id": "grctechme",
         "name": "GRCTechMe",
         "tagline": "Audit & Compliance Technology",
-        "description": "Digital audit platform for lawyers and agencies. Google Cloud Marketplace approved. Streamline compliance workflows.",
+        "description": "Digital audit platform for lawyers and agencies, listed on the Google Cloud Marketplace.",
         "url": "https://grctechme.com/",
         "services": [
           "Digital Audits",
@@ -80,8 +80,8 @@
       {
         "id": "nebulith",
         "name": "Nebulith",
-        "tagline": "Motor de juegos propio altamente optimizado",
-        "description": "Motor de juegos y editor de mapas: mundos generados, vistas isométrica y cenital, tiles, unidades, misiones. Pronto en el mercado comercial.",
+        "tagline": "Motor de juegos propio",
+        "description": "Un motor de juegos y editor de mapas para mundos generados. Sale pronto.",
         "url": "https://nebulith-production.up.railway.app",
         "services": [
           "Mundos generados",
@@ -101,7 +101,7 @@
         "services": [
           "Tutor de IA",
           "Sala de lecciones",
-          "Corrección exacta y evaluada",
+          "Corrección exacta y evaluada por IA",
           "Voz a texto y texto a voz"
         ],
         "icon": "📚",
@@ -110,8 +110,8 @@
       {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
-        "tagline": "Soluciones de software empresarial",
-        "description": "Desarrollo de software a medida, arquitectura de sistemas y consultoría técnica para empresas de todos los tamaños.",
+        "tagline": "Software a medida para empresas",
+        "description": "Software a medida y consultoría para empresas de seguros y financieras.",
         "url": "https://dbadbadba.com/",
         "services": [
           "Desarrollo de software a medida",
@@ -125,7 +125,7 @@
         "id": "pmx",
         "name": "PMX",
         "tagline": "Marketplace de afiliados para e-commerce",
-        "description": "Plataforma completa de marketing de afiliados con sistema de pagos e integración con Shopify. Conecta marcas con afiliados sin fricciones.",
+        "description": "Plataforma de afiliados donde las marcas de Shopify encuentran afiliados y les pagan sus comisiones.",
         "url": "https://getpmx.com",
         "services": [
           "Integración con Shopify",
@@ -139,7 +139,7 @@
         "id": "grctechme",
         "name": "GRCTechMe",
         "tagline": "Tecnología de auditoría y cumplimiento",
-        "description": "Plataforma de auditoría digital para abogados y agencias. Aprobada en Google Cloud Marketplace. Agiliza los flujos de cumplimiento.",
+        "description": "Plataforma de auditoría digital para abogados y agencias, publicada en Google Cloud Marketplace.",
         "url": "https://grctechme.com/",
         "services": [
           "Auditorías digitales",
@@ -156,8 +156,8 @@
       {
         "id": "nebulith",
         "name": "Nebulith",
-        "tagline": "Motore di gioco proprietario altamente ottimizzato",
-        "description": "Motore di gioco ed editor di mappe: mondi generati, viste isometrica e dall'alto, tile, unità, missioni. Presto sul mercato commerciale.",
+        "tagline": "Motore di gioco proprietario",
+        "description": "Un motore di gioco ed editor di mappe per mondi generati. In uscita a breve.",
         "url": "https://nebulith-production.up.railway.app",
         "services": [
           "Mondi generati",
@@ -177,7 +177,7 @@
         "services": [
           "Tutor IA",
           "Aula delle lezioni",
-          "Correzione esatta e valutata",
+          "Correzione esatta e valutata dall'IA",
           "Voce in testo e testo in voce"
         ],
         "icon": "📚",
@@ -186,8 +186,8 @@
       {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
-        "tagline": "Soluzioni software aziendali",
-        "description": "Sviluppo software su misura, architettura di sistemi e consulenza tecnica per aziende di ogni dimensione.",
+        "tagline": "Software su misura per le aziende",
+        "description": "Software su misura e consulenza per compagnie assicurative e finanziarie.",
         "url": "https://dbadbadba.com/",
         "services": [
           "Sviluppo software su misura",
@@ -201,7 +201,7 @@
         "id": "pmx",
         "name": "PMX",
         "tagline": "Marketplace di affiliazione per e-commerce",
-        "description": "Piattaforma completa di marketing di affiliazione con sistema di pagamento e integrazione Shopify. Collega i brand agli affiliati senza attriti.",
+        "description": "Piattaforma di affiliazione dove i brand Shopify trovano affiliati e pagano le loro commissioni.",
         "url": "https://getpmx.com",
         "services": [
           "Integrazione Shopify",
@@ -215,7 +215,7 @@
         "id": "grctechme",
         "name": "GRCTechMe",
         "tagline": "Tecnologia per audit e conformità",
-        "description": "Piattaforma di audit digitale per avvocati e agenzie. Approvata su Google Cloud Marketplace. Semplifica i flussi di conformità.",
+        "description": "Piattaforma di audit digitale per avvocati e agenzie, pubblicata sul Google Cloud Marketplace.",
         "url": "https://grctechme.com/",
         "services": [
           "Audit digitali",

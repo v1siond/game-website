@@ -83,7 +83,6 @@ function HouseMap({ jobs, read, here }: { jobs: Job[]; read: ReadonlySet<string>
       <div className="mt-3 h-2 overflow-hidden bg-[color:var(--sh-void)]" aria-hidden="true">
         <div className={`h-full origin-left bg-[color:var(--sh-room-searched)] ${horror.searchBar}`} style={{ '--searched': searched / Math.max(jobs.length, 1) } as CSSProperties} />
       </div>
-      <p className="mt-3 text-sm italic text-[color:var(--sh-fog-text)]">{words.fileHint}</p>
     </div>
   )
 }

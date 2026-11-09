@@ -151,7 +151,6 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
       />
       <div className="flex w-full flex-col items-center gap-4 md:w-80">
         <Clearing phase={phase} round={won} />
-        <p className={`text-center text-base text-[color:var(--tp-parchment)] ${look.caption}`}>{jungle.fightHint}</p>
         <button type="button" onClick={fight} className={`min-h-[44px] rounded-xl px-6 text-base ${look.button} ${look.buttonGold} ${look.focus}`}>
           {all ? jungle.fightAgain : jungle.fight}
         </button>

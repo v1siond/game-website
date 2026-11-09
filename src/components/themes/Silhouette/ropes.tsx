@@ -2,7 +2,6 @@
 
 import { useState, type PointerEvent } from 'react'
 import type { Job } from '@/lib/cv/content'
-import { useLabels } from '@/components/cv/CVDataProvider'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { HeroCharacter } from './character'
 import { ReachingLegs } from './spider'
@@ -77,7 +76,6 @@ function KnottedJob({ job, index }: { job: Job; index: number }) {
 }
 
 export function HangingJobs({ jobs }: { jobs: Job[] }) {
-  const { shade: words } = useLabels()
   const { ref, phase } = useScrollScene<HTMLDivElement>({
     start: 0.7,
     end: -1.6,
@@ -85,7 +83,6 @@ export function HangingJobs({ jobs }: { jobs: Job[] }) {
 
   return (
     <div ref={ref} className="relative">
-      <p className="mb-6 text-center text-sm italic tracking-wider text-[color:var(--sh-muted-text)]">{words.swingHint}</p>
       <div className="relative pb-16">
         <div className="pointer-events-none absolute inset-x-0 -top-2 h-3 border-t-4 border-[color:var(--sh-black)]" aria-hidden="true" />
         <div className={`pointer-events-none absolute -top-2 h-16 w-16 -translate-x-1/2 overflow-hidden md:h-20 md:w-24 ${ROPE_X}`} aria-hidden="true">

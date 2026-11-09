@@ -179,7 +179,7 @@ export function SwitchPalaces({ projects, profession }: { projects: Project[]; p
   const colourOf = (project: Project) => SWITCH_COLOURS[projects.indexOf(project) % SWITCH_COLOURS.length]
 
   return (
-    <Region title={sections.projects} hint={trail.switchHint} stageRef={ref} on={on}>
+    <Region title={sections.projects} stageRef={ref} on={on}>
       <Playfield>
         <button
           type="button"

@@ -33,7 +33,7 @@ export function CVLink() {
   const { actions } = useLabels()
   return (
     <Link href="/cv" className={`${BUTTON} ${OUTLINED}`}>
-      {actions.resume.toLowerCase()}
+      {actions.cv.toLowerCase()}
     </Link>
   )
 }

@@ -46,7 +46,7 @@ export function AboutLevel({ profession }: { profession: Profession }) {
   const hit: HitState = course.take > 0 ? 'again' : on && course.past('jump') ? 'true' : 'false'
 
   return (
-    <Region title={sections.about} hint={reduced ? undefined : trail.blockHint} stageRef={ref} on={on}>
+    <Region title={sections.about} stageRef={ref} on={on}>
       <div data-hit={hit}>
         <Playfield>
           {reduced ? (

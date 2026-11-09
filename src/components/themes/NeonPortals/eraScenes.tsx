@@ -77,7 +77,6 @@ export function BridgeSlide({ on, profession, children }: { on: boolean; profess
       </div>
       <div className="min-w-0 flex-1">
         <div className={scene.banner}>{children}</div>
-        {!reduced && <p className={`mt-3 ${scene.hint}`}>{warp.lifeHint}</p>}
       </div>
     </div>
   )
@@ -136,9 +135,4 @@ export function Crossing({ on, profession, traveller, className = '' }: { on: bo
       )}
     </div>
   )
-}
-
-/** The plate behind a hint line, so it reads on every era's painting. */
-export function Hint({ children }: { children: ReactNode }) {
-  return <p className={`mb-6 ${scene.hint}`}>{children}</p>
 }

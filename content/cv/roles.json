@@ -15,7 +15,7 @@
         "company": "PMX",
         "type": "leadership",
         "current": true,
-        "description": "Leading technical strategy for affiliate marketplace platform."
+        "description": "Leading the tech of the PMX affiliate marketplace."
       },
       {
         "id": "grctechme",
@@ -23,7 +23,7 @@
         "company": "GRCTechMe",
         "type": "leadership",
         "current": true,
-        "description": "Building audit and compliance technology for legal professionals."
+        "description": "Building audit and compliance software for lawyers and agencies."
       },
       {
         "id": "insuradmin",
@@ -31,7 +31,7 @@
         "company": "InsurAdmin",
         "type": "leadership",
         "current": true,
-        "description": "Agency management for insurance agencies and IMOs, with carrier feeds and team hierarchies."
+        "description": "Agency management software for insurance agencies and IMOs."
       }
     ]
   },
@@ -51,7 +51,7 @@
         "company": "PMX",
         "type": "leadership",
         "current": true,
-        "description": "Lidera la estrategia técnica de la plataforma de marketplace de afiliados."
+        "description": "Dirijo la parte técnica del marketplace de afiliados PMX."
       },
       {
         "id": "grctechme",
@@ -59,7 +59,7 @@
         "company": "GRCTechMe",
         "type": "leadership",
         "current": true,
-        "description": "Construye tecnología de auditoría y cumplimiento para profesionales del derecho."
+        "description": "Construyo software de auditoría y cumplimiento para abogados y agencias."
       },
       {
         "id": "insuradmin",
@@ -67,7 +67,7 @@
         "company": "InsurAdmin",
         "type": "leadership",
         "current": true,
-        "description": "Gestión para agencias de seguros e IMOs, con feeds de aseguradoras y jerarquías de equipos."
+        "description": "Software de gestión para agencias de seguros e IMOs."
       }
     ]
   },
@@ -87,7 +87,7 @@
         "company": "PMX",
         "type": "leadership",
         "current": true,
-        "description": "Guida la strategia tecnica della piattaforma di marketplace di affiliazione."
+        "description": "Guido la parte tecnica del marketplace di affiliazione PMX."
       },
       {
         "id": "grctechme",
@@ -95,7 +95,7 @@
         "company": "GRCTechMe",
         "type": "leadership",
         "current": true,
-        "description": "Costruisce tecnologia per audit e conformità per professionisti legali."
+        "description": "Costruisco software di audit e conformità per avvocati e agenzie."
       },
       {
         "id": "insuradmin",
@@ -103,7 +103,7 @@
         "company": "InsurAdmin",
         "type": "leadership",
         "current": true,
-        "description": "Gestione per agenzie assicurative e IMO, con feed delle compagnie e gerarchie dei team."
+        "description": "Software gestionale per agenzie assicurative e IMO."
       }
     ]
   }

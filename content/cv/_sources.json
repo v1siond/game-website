@@ -10,7 +10,7 @@
         ]
       },
       {
-        "fact": "Illustrations created from an uploaded CSV, with PDF output",
+        "fact": "Illustrations built from an uploaded CSV and exported to PDF",
         "shas": [
           "f49cae044",
           "0012ea52c"
@@ -23,7 +23,7 @@
         ]
       },
       {
-        "fact": "SSO callback routes and annuity illustrations through the annuity parser",
+        "fact": "SSO callback routes and annuity illustrations from the parser",
         "shas": [
           "a3463a86e",
           "5f88c6ebf"
@@ -47,7 +47,7 @@
         ]
       },
       {
-        "fact": "French and a locale redirect",
+        "fact": "French translation and a locale redirect",
         "shas": [
           "825a40b"
         ]
@@ -58,13 +58,13 @@
     "years": "debt-action-plan 2021-06-02 to 2026-07-13",
     "details": [
       {
-        "fact": "Made the initial setup",
+        "fact": "Set up the project",
         "shas": [
           "8509a8e"
         ]
       },
       {
-        "fact": "Add on setup parser logic",
+        "fact": "Parser for the add on setup",
         "shas": [
           "41baca2"
         ]
@@ -106,7 +106,7 @@
         ]
       },
       {
-        "fact": "Permissions and plugs QA flow",
+        "fact": "Permissions and their QA flow",
         "shas": [
           "9313281"
         ]
@@ -158,7 +158,7 @@
         ]
       },
       {
-        "fact": "Carrier feed parser creating carrier, product, carrier appointment and apps linked to the agent",
+        "fact": "Carrier feed parser that creates carriers, products, appointments and applications for each agent",
         "shas": [
           "88d8cfb8"
         ]
@@ -171,7 +171,7 @@
         ]
       },
       {
-        "fact": "Team and agency dashboards, and agencies managing user subscriptions",
+        "fact": "Team and agency dashboards and user subscriptions per agency",
         "shas": [
           "418dbc3f",
           "bf660dbb"
@@ -251,7 +251,7 @@
         ]
       },
       {
-        "fact": "In forum moderation: pin, lock, hide, report",
+        "fact": "Moderation: pin, lock, hide, report",
         "shas": [
           "51faab5"
         ]
@@ -316,7 +316,7 @@
         ]
       },
       {
-        "fact": "Iframe support and investment strategy on the user",
+        "fact": "Iframe support and a per user investment strategy",
         "shas": [
           "42eba292",
           "30d416ae"
@@ -384,13 +384,13 @@
         ]
       },
       {
-        "fact": "Grading, exact at submit and judged",
+        "fact": "Exact grading on submit, AI judged answers",
         "shas": [
           "66e8f4c"
         ]
       },
       {
-        "fact": "STT and TTS behind behaviours, with a narration render job",
+        "fact": "Speech to text and text to speech behind one interface, plus a narration render job",
         "shas": [
           "f4e9f5f",
           "ee162e2"

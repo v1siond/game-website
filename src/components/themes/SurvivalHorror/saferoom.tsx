@@ -38,7 +38,6 @@ function SaveDesk({ line }: { line: string }) {
             save()
           }}
           disabled={ribbons === 0}
-          title={words.saveHint}
           className={`${CARD_BUTTON} justify-center border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] enabled:hover:border-[color:var(--sh-flame)] disabled:opacity-60`}
         >
           {words.save}
@@ -47,7 +46,6 @@ function SaveDesk({ line }: { line: string }) {
         <p className={`text-sm text-[color:var(--sh-fine)] ${look.typed}`} role="status">
           {saved ? words.saved : ''}
         </p>
-        <p className="text-sm italic text-[color:var(--sh-fog-text)]">{words.saveHint}</p>
       </div>
     </div>
   )
