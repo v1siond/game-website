@@ -109,45 +109,12 @@ const RING_NUMBERS: ReadonlyArray<readonly [string, number]> = [
   ['3', 240],
 ]
 
-/** The hourglass in its wooden frame, standing on the floor at the left. */
-function Hourglass() {
-  return (
-    <g>
-      <rect x="40" y="132" width="52" height="8" rx="3" fill={PORTAL.PLANK} stroke={PORTAL.VOID} strokeWidth="2" />
-      <rect x="40" y="214" width="52" height="8" rx="3" fill={PORTAL.PLANK} stroke={PORTAL.VOID} strokeWidth="2" />
-      <path d="M46 140 V214 M86 140 V214" stroke={PORTAL.PLANK_DARK} strokeWidth="5" />
-      <path d="M50 140 H82 Q82 168 68 177 Q82 186 82 214 H50 Q50 186 64 177 Q50 168 50 140 Z" fill="url(#npa-glass)" stroke={PORTAL.VOID} strokeWidth="2" />
-      <path d="M56 206 Q66 194 76 206 Z M60 156 H72 L66 166 Z" fill={PORTAL.GOLD} />
-      <path d="M54 146 Q54 160 60 166" fill="none" stroke={PORTAL.WHITE} strokeWidth="2" opacity="0.6" strokeLinecap="round" />
-    </g>
-  )
-}
-
-/** The electric pylon on the right: a copper coil drum and three white bulbs on a rod. */
-function Pylon() {
-  return (
-    <g>
-      <rect x="318" y="170" width="44" height="52" rx="8" fill={PORTAL.ORANGE_DEEP} stroke={PORTAL.VOID} strokeWidth="2" />
-      {[180, 192, 204].map((y) => (
-        <path key={y} d={`M320 ${y} H360`} stroke={PORTAL.BRASS} strokeWidth="3" />
-      ))}
-      <rect x="337" y="92" width="6" height="80" fill={PORTAL.METAL_DARK} stroke={PORTAL.VOID} strokeWidth="1.5" />
-      {[100, 124, 148].map((y) => (
-        <g key={y}>
-          <circle cx="340" cy={y} r="9" fill={PORTAL.WHITE} stroke={PORTAL.VOID} strokeWidth="2" />
-          <circle cx="337" cy={y - 3} r="3" fill={PORTAL.TEAL} opacity="0.8" />
-        </g>
-      ))}
-      <path d="M352 96 L362 104 L356 108 L368 118" fill="none" stroke={PORTAL.TEAL} strokeWidth="2" strokeLinejoin="round" />
-    </g>
-  )
-}
-
 /**
  * The time machine's central hub, as the game shows it: a round riveted metal floor with a yellow dotted
- * track, the great clock ring with its rivets, numbers and lightning behind, the hourglass and the
- * electric pylon either side, all under the navy night; the pad he lands on is the room's white topped
- * pedestal on its grey ring.
+ * track and the great clock ring with its rivets and numbers, under the navy night; the pad he lands on is
+ * the room's white topped pedestal on its grey ring. The ring is one blue band round a solid dark disc, so
+ * his head and ears read on one calm shape; the hourglass and the coil are the hub painting's behind the
+ * page (eraBackdrop), never drawn a second time here.
  */
 function Chamber() {
   return (
@@ -167,20 +134,16 @@ function Chamber() {
           <stop offset="0" stopColor={PORTAL.STONE_LIT} />
           <stop offset="1" stopColor={PORTAL.STONE_DARK} />
         </radialGradient>
-        <linearGradient id="npa-glass" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor={PORTAL.PAD_LIT} />
-          <stop offset="1" stopColor={PORTAL.PAD} />
-        </linearGradient>
       </defs>
       <rect width="400" height="320" fill="url(#npa-wall)" />
       <g className={stage.back}>
         {STARS.map(([x, y, r]) => (
           <circle key={`${x}-${y}`} cx={x} cy={y} r={r} fill={PORTAL.WHITE} />
         ))}
-        <circle cx="200" cy="118" r="98" fill="none" stroke={PORTAL.VOID} strokeWidth="26" />
-        <circle cx="200" cy="118" r="98" fill="none" stroke={PORTAL.NITRO_DARK} strokeWidth="20" />
-        <circle cx="200" cy="118" r="104" fill="none" stroke={PORTAL.PAD} strokeWidth="6" />
-        <circle cx="200" cy="118" r="90" fill="none" stroke={PORTAL.TEAL} strokeWidth="2" opacity="0.8" />
+        <circle cx="200" cy="118" r="89" fill={PORTAL.CHAMBER} />
+        <circle cx="200" cy="118" r="98" fill="none" stroke={PORTAL.VOID} strokeWidth="22" />
+        <circle cx="200" cy="118" r="98" fill="none" stroke={PORTAL.PAD_DARK} strokeWidth="16" />
+        <circle cx="200" cy="118" r="89" fill="none" stroke={PORTAL.TEAL} strokeWidth="2" opacity="0.8" />
         {Array.from({ length: 24 }, (_, i) => (
           <circle key={i} cx="200" cy="20" r="2.2" fill={PORTAL.PLATINUM} stroke={PORTAL.VOID} strokeWidth="0.8" transform={`rotate(${i * 15} 200 118)`} />
         ))}
@@ -201,12 +164,6 @@ function Chamber() {
             {number}
           </text>
         ))}
-        {[60, 180, 300].map((angle) => (
-          <path key={angle} d="M196 6 L206 18 L200 20 L208 32" fill="none" stroke={PORTAL.GOLD} strokeWidth="3" strokeLinejoin="round" transform={`rotate(${angle} 200 118)`} />
-        ))}
-        <circle cx="200" cy="118" r="76" fill={PORTAL.CHAMBER} opacity="0.55" />
-        <Hourglass />
-        <Pylon />
         <ellipse cx="200" cy="300" rx="260" ry="78" fill={PORTAL.VOID} />
         <ellipse cx="200" cy="294" rx="250" ry="70" fill="url(#npa-floor)" />
         <ellipse cx="200" cy="292" rx="196" ry="50" fill="none" stroke={PORTAL.GOLD} strokeWidth="4" strokeDasharray="2 12" strokeLinecap="round" />
@@ -267,7 +224,7 @@ function Stage({ profession, nav }: { profession: Profession; nav: { spin: strin
       </div>
       <Wardrobe look={OUTFIT_LOOK} className="c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:170px] absolute left-0 -top-14 z-10 sm:right-0 sm:top-auto sm:-mt-10 lg:left-1/2 lg:right-auto lg:-translate-x-1/2" />
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button type="button" onClick={spin} className={`${ui.button} ${ui.lit}`}>
+        <button type="button" onClick={spin} className={`${ui.button} ${ui.stone}`}>
           {nav.spin}
         </button>
       </div>
@@ -337,8 +294,9 @@ function ArrivalLayout({ name, headline, tagline, line, profession, nav, spin, a
           <span className="sr-only">{name}</span>
           <TitleLetters name={name} />
         </h1>
-        <div className={stage.afterTitle}>
-          <p className={`mt-5 inline-block rounded-3xl border-[3px] border-[color:var(--np-void)] bg-[color:var(--np-orange)] px-4 pb-1 pt-1.5 text-lg uppercase text-[color:var(--np-void)] ${ui.chunk}`}>{headline}</p>
+        {/* the copy on one dark slab, so no line of it sits on the hub painting behind the page */}
+        <div className={`mt-6 p-5 sm:p-6 ${stage.afterTitle} ${ui.slab}`}>
+          <p className={`inline-block rounded-3xl border-[3px] border-[color:var(--np-void)] bg-[color:var(--np-orange)] px-4 pb-1 pt-1.5 text-lg uppercase text-[color:var(--np-void)] ${ui.chunk}`}>{headline}</p>
           <p className="mt-4 text-lg text-[color:var(--np-white)]">{tagline}</p>
           <p className="mt-2 text-base text-[color:var(--np-muted)]">{line}</p>
           <nav className="mt-6 flex flex-wrap items-center gap-3" aria-label={nav}>

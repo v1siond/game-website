@@ -15,7 +15,7 @@ import { paletteVars } from '../shared/paletteVars'
 // 14.0:1, TEAL 13.2:1, HUD_TOP 6.5:1, HUD_LOW 8.5:1, NAME_LOW 7.0:1; on a PANEL card WHITE 14.6:1, MUTED
 // 8.3:1, GOLD 11.4:1, TEAL 10.8:1, VIOLET 6.6:1, GREEN 9.7:1. VOID ink on ORANGE 9.5:1, GOLD 14.0:1,
 // TEAL 13.2:1, STONE_LIT 8.1:1 and PLANK_LIT 7.4:1 (the buttons and the crate name plates); WHITE on
-// PAD_DEEP 8.0:1 (the level pad buttons and number domes; PAD itself, 5.9:1, carries no words).
+// PAD_DEEP 8.0:1 (the level number domes; PAD itself, 5.9:1, carries no words).
 
 export const PORTAL = {
   // the night over the hub, darkest first, and its magenta glow (HAZE)
@@ -83,12 +83,18 @@ export const PORTAL = {
   FUR: '#d7842c',
   FUR_LIT: '#f2b742',
   FUR_DARK: '#962d08',
-  JEANS: '#001db2',
-  JEANS_DARK: '#171e48',
+  // the denim bright enough that his legs read on the night: JEANS 5.4:1 and JEANS_DARK 3.9:1 on VOID,
+  // JEANS_DARK 3.5:1 on CHAMBER (the stage disc) and 3.1:1 on NIGHT
+  JEANS: '#4a80ee',
+  JEANS_DARK: '#3366dc',
+  JEANS_LIT: '#7ea6ea',
   SNEAKER: '#a22524',
   SNEAKER_DARK: '#5c2828',
+  SNEAKER_LIT: '#ff5a4e',
   SOLE: '#cfc3b6',
   GLOVE: '#582a23',
+  GLOVE_DARK: '#3d1c17',
+  GLOVE_SEAM: '#6b4a36',
   MUZZLE: HERO_IDENTITY.skin,
   MUZZLE_SHADE: HERO_IDENTITY.skinShade,
   HAIR: HERO_IDENTITY.hair,
@@ -96,6 +102,7 @@ export const PORTAL = {
   EYE: HERO_IDENTITY.eyes,
   TOOTH: '#fffaf0',
   MOUTH: '#5a1410',
+  SWIRL: '#ff9ad5',
 
   // the floating mask: carved wood, its paint and feathers
   MASK_WOOD: '#b52302',
@@ -106,7 +113,7 @@ export const PORTAL = {
   // the hub's level pads on their grey rings, the time trial clock, the score digits' ramp, the logo's
   // letters and the level names' ramp (read from the game's pixels)
   PAD: '#0155f1',
-  // The pad a step deeper under white letters (the LinkedIn pad button, the level number domes): 8.0:1
+  // The pad a step deeper under white letters (the level number domes): 8.0:1
   PAD_DEEP: '#013eb0',
   PAD_DARK: '#013694',
   PAD_LIT: '#6fa8ff',

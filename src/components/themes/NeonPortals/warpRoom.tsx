@@ -20,12 +20,14 @@ import ui from './warped.module.css'
 
 // The profession switch as the time machine's warp room (Warped's hub, named in code only), drawn as the
 // game's first room: a round tower top floating in the night over a dark sea, a stone rim round a plank
-// floor, crenellated towers either side, the boss gate at the back over the room's white pedestal, and
-// three glossy blue level pads in the floor, one per profession.
+// floor, the boss gate at the back over the room's white pedestal, and three glossy blue level pads in the
+// floor, one per profession. The towers with their banners are the room painting's behind the page
+// (eraBackdrop), not drawn a second time in the panel. The boss door's bottom margin keeps the band where
+// the holograms open clear of the door.
 // - Each level button carries a round hologram above it showing the time period it warps to (the
 //   engineer's neon future city, the musician's Arabian night, the fighter's great wall). Pointing at
-//   or focusing a button opens its hologram with the profession and its field, the way the game shows a
-//   level's preview before you step in.
+//   or focusing a button opens its hologram with the profession's field (the name is already on the
+//   pad under it), the way the game shows a level's preview before you step in.
 // - He stands on the picked button. Picking another (a click, Enter, or the arrows: ProfessionSwitch
 //   owns the pick and the keyboard) plays the game's level entry: he double jumps across and body slams
 //   the new button, which breaks the mask crate by it the first time (the second mask), then the warp
@@ -114,8 +116,7 @@ function LevelButton({ option, warp }: { option: ProfessionOption; warp: Warp })
           <span className={`absolute inset-0 rounded-full ${room.glass}`} />
         </span>
         <span className="mt-2 block rounded-xl border-[3px] border-[color:var(--np-void)] bg-[color:var(--np-void)] px-3 pb-1.5 pt-2 text-center shadow-[inset_0_0_0_2px_var(--np-seam)]">
-          <span className={`block text-xl uppercase leading-none ${ui.display}`}>{label}</span>
-          <span className="mt-1 block text-sm text-[color:var(--np-white)]">{professionFields[id]}</span>
+          <span className="block text-sm text-[color:var(--np-white)]">{professionFields[id]}</span>
         </span>
       </span>
       <span className="relative block h-28 w-full sm:h-36" aria-hidden="true">
@@ -162,7 +163,7 @@ function BossDoor() {
   const total = score.totals.crystals
 
   return (
-    <a href="#contact" className={`group relative mx-auto flex w-36 flex-col items-center focus:outline-none ${room.door}`}>
+    <a href="#contact" className={`group relative mx-auto mb-48 flex w-36 flex-col items-center focus:outline-none sm:mb-56 ${room.door}`}>
       <span className="flex gap-1.5" aria-hidden="true">
         {Array.from({ length: total }, (_, i) => (
           <span key={i} className={`block h-5 w-4 ${i < crystals ? '' : 'opacity-30'}`}>
@@ -237,32 +238,6 @@ function Floor() {
   )
 }
 
-// One of the two crenellated stone towers at the back of the room; the right one wears the conical
-// orange tile roof and the red banner, the left one a green banner with a gold crescent.
-const TOWER_PLACE = { left: 'left-[1%]', right: 'right-[1%]' } as const
-
-function Tower({ side }: { side: keyof typeof TOWER_PLACE }) {
-  const roofed = side === 'right'
-
-  return (
-    <svg viewBox="0 0 80 200" preserveAspectRatio="xMidYMax meet" className={`absolute top-0 h-[62%] w-[16%] max-w-[7rem] ${TOWER_PLACE[side]}`} aria-hidden="true" focusable="false">
-      {roofed ? (
-        <path d="M4 58 L40 4 L76 58 Z" fill={PORTAL.ORANGE_DEEP} stroke={PORTAL.VOID} strokeWidth="2.5" strokeLinejoin="round" />
-      ) : (
-        <path d="M8 58 V40 H20 V50 H30 V40 H50 V50 H60 V40 H72 V58 Z" fill={PORTAL.STONE_LIT} stroke={PORTAL.VOID} strokeWidth="2.5" />
-      )}
-      {roofed && <path d="M16 40 H64 M26 24 H54" stroke={PORTAL.FRUIT_DEEP} strokeWidth="2" />}
-      <rect x="10" y="58" width="60" height="142" fill={PORTAL.STONE} stroke={PORTAL.VOID} strokeWidth="2.5" />
-      {[80, 104, 128, 152, 176].map((y, row) => (
-        <path key={y} d={`M10 ${y} H70 M${row % 2 ? 30 : 40} ${y - 24} V${y} M${row % 2 ? 58 : 22} ${y - 24} V${y}`} stroke={PORTAL.STONE_DARK} strokeWidth="1.6" />
-      ))}
-      <path d="M37 92 H43 V100 H50 V106 H43 V122 H37 V106 H30 V100 H37 Z" fill={PORTAL.VOID} />
-      <path d="M42 132 H62 V166 L52 158 L42 166 Z" fill={roofed ? PORTAL.TNT : PORTAL.LEAF_DARK} stroke={PORTAL.VOID} strokeWidth="1.6" />
-      {roofed ? <path d="M46 140 H58 M46 148 H58" stroke={PORTAL.WHITE} strokeWidth="2.4" /> : <path d="M52 138 A6 6 0 1 0 52 150 A4.6 4.6 0 1 1 52 138 Z" fill={PORTAL.GOLD} />}
-    </svg>
-  )
-}
-
 export function WarpRoom({ profession }: { profession: Profession }) {
   const { navigation } = useLabels()
   const warp = useEntry(profession)
@@ -271,8 +246,6 @@ export function WarpRoom({ profession }: { profession: Profession }) {
   return (
     <div className="relative mx-auto max-w-5xl">
       <div className={`relative overflow-hidden rounded-[2rem] border-[3px] border-[color:var(--np-void)] px-2 pb-6 pt-6 ${room.room}`}>
-        <Tower side="left" />
-        <Tower side="right" />
         <Floor />
         <BossDoor />
         <ProfessionSwitch

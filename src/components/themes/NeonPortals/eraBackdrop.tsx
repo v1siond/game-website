@@ -389,6 +389,10 @@ function WarpBurst() {
   )
 }
 
+// The zones whose place the page draws itself (the arrival stage, the warp room panel): the painting under
+// them takes the deep shade.
+const DEEP: ReadonlySet<Zone> = new Set(['hub', 'room'])
+
 /** The fixed backdrop: every era painted, the one in view shown, the warp on each change. */
 export function EraBackdrop({ zone, reduced }: { zone: Zone; reduced: boolean }) {
   return (
@@ -402,6 +406,7 @@ export function EraBackdrop({ zone, reduced }: { zone: Zone; reduced: boolean })
         )
       })}
       <div className={`absolute inset-0 ${era.shade}`} />
+      <div className={`absolute inset-0 ${era.deep}`} data-on={DEEP.has(zone) || undefined} />
       {!reduced && <WarpBurst key={zone} />}
     </div>
   )
