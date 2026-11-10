@@ -1,87 +1,97 @@
 'use client'
 
-import { useCallback, useState, type CSSProperties, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { BandList } from '@/components/cv/BandList'
+import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/components/cv/masonry'
-import { drumsSince, headingId, newTabName } from '@/components/cv/sectionText'
-import { useZoneStage } from '@/hooks/useZoneStage'
-import type { CVData, Service } from '@/lib/cv/content'
+import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
+import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { drumsSince, jobYears, newTabName } from '@/components/cv/sectionText'
+import { fillLabel } from '@/lib/cv/labels'
+import type { CVData, Job, Service } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { BossRound } from './bossRound'
-import { CrateArt } from './crateArt'
-import { CrateField } from './crateField'
-import { BodySlam, CrateSpin } from './deliveries'
-import type { Zone } from './eraBackdrop'
-import { BridgeSlide, Crossing, TombRun } from './eraScenes'
-import scenes from './eraScenes.module.css'
-import { Crystal, Gem, Relic } from './pickups'
-import { useScore } from './score'
-import { BandTrial } from './timeTrial'
-import { LevelPortal } from './warpLevels'
-import ui from './warped.module.css'
+import type { Era } from './eras'
+import type { Ending } from './level'
+import { Level } from './levelWindow'
+import css from './portals.module.css'
 
-// The picked profession's sections, each one a level in its own era of the time travel platformer
-// (Warped, named in code only; design worlds-v2/neon-portals.md section W4). A stage hands its era to
-// the page while it is in view (useZoneStage), the fixed backdrop warps to it (eraBackdrop.tsx), and his
-// moment there plays once the stage is on (eraScenes.tsx):
-//   About        medieval     he slides in along the bridge, the bio unrolls as a banner, the death gag
-//   Experience   Egypt        he runs along the tomb floor with the scroll; the level portals (warpLevels)
-//   Tech stack   underwater   the scuba swim across; the panels rise like bubbles
-//   Services     underwater   he spins into a crate and the panels burst out of it (deliveries)
-//   Projects     prehistoric  he rides the baby T rex in and hops off at the crates (crateField)
-//   Ventures     future       his body slam knocks the cards into place (deliveries), then the
-//                             motorbike passes under them and lights each one as it goes
-//   Bands        Arabian      the jet ski across the harbour; the time trials (timeTrial)
-//   Muay Thai    great wall   the boss round against the time foe (bossRound)
-// Headings and hints sit on dark plates so they read on every era's painting; the long lists are
-// masonry.
+// The picked profession's sections, each a level in its own era with his moment at its end (level.ts), the
+// CV under it on calm panels:
+//   About          medieval village   the crate at the end
+//   Experience     the tomb           the crate before the sphinx
+//   Tech stack     under water        he swims; the crate under the coral arch
+//   Services       the great wall     the crate before the watchtower
+//   Projects       prehistoric        a crate on the path for each project
+//   Ventures       future city        the crate under the neon gate
+//   Bands          Arabian rooftops   two beats on the drum crates
+//   Muay Thai      oriental courtyard the kick on the gong
+// A level's number counts the levels the profession shows.
 
-const ICON = {
-  crystal: <Crystal className="h-full w-full" />,
-  crate: <CrateArt kind="wood" className="h-full w-full" />,
-  relic: <Relic className="h-full w-full" />,
-  gem: <Gem className="h-full w-full" tone="violet" />,
-} as const
+interface LevelSpec {
+  key: string
+  title: string
+  era: Era
+  ending: Ending
+  crates?: number
+  body: ReactNode
+}
 
-function SectionTitle({ title, icon }: { title: string; icon?: keyof typeof ICON }) {
+function Levels({ levels, profession }: { levels: LevelSpec[]; profession: 'engineer' | 'drummer' | 'fighter' }) {
   return (
-    <h2 id={headingId('np', title)} className={`mb-6 flex w-fit max-w-full items-center gap-3 text-3xl sm:text-4xl ${ui.plate}`}>
-      {icon && (
-        <span className={ui.sectionIcon} aria-hidden="true">
-          {ICON[icon]}
-        </span>
-      )}
-      {/* the clipped text gradient sits on its own span so the plate's fill does not clip to the letters */}
-      <span className={ui.display}>{title}</span>
-    </h2>
+    <>
+      {levels.map(({ key, title, era, ending, crates, body }, index) => (
+        <Level key={key} number={index + 1} title={title} era={era} ending={ending} profession={profession} crates={crates}>
+          {body}
+        </Level>
+      ))}
+    </>
   )
 }
 
-function Stage({ title, zone, icon, children }: { title: string; zone: Zone; icon?: keyof typeof ICON; children: (on: boolean) => ReactNode }) {
-  const { ref, on } = useZoneStage<Zone>(zone)
+const FRUIT = <span className="mt-1.5 block h-3 w-3 shrink-0 rounded-full bg-[color:var(--np-fruit)] shadow-[inset_-2px_-2px_0_var(--np-band)]" aria-hidden="true" />
+
+function JobCard({ entry }: { entry: Job }) {
+  const { years } = useLabels()
+  const { start, end } = jobYears(entry, years.present)
 
   return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={headingId('np', title)} className={`relative mb-24 scroll-mt-8 ${ui.stage}`}>
-      <SectionTitle title={title} icon={icon} />
-      {children(on)}
-    </section>
+    <article aria-labelledby={`np-job-${entry.id}`} className={`p-5 ${css.panel}`}>
+      <h3 id={`np-job-${entry.id}`} className={`text-xl leading-tight text-[color:var(--np-gold)] ${css.display}`}>
+        {entry.title}
+      </h3>
+      <p className="mt-1 text-base font-bold text-[color:var(--np-white)]">
+        <SlashBreaks text={entry.company} />
+      </p>
+      <p className="mt-1 text-sm font-bold tabular-nums text-[color:var(--np-muted)]">{fillLabel(years.range, { start, end })}</p>
+      {entry.description && <p className="mt-3 text-base text-[color:var(--np-white)]">{entry.description}</p>}
+      {entry.highlights.length > 0 && (
+        <ul className="mt-3 space-y-2">
+          {entry.highlights.map((highlight) => (
+            <li key={highlight} className="flex items-start gap-3 text-base text-[color:var(--np-white)]">
+              {FRUIT}
+              {highlight}
+            </li>
+          ))}
+        </ul>
+      )}
+    </article>
   )
 }
 
 function TechStack({ categories }: { categories: CVData['techStack'] }) {
   return (
     <ul className={MASONRY_LIST}>
-      {categories.map((category, index) => (
-        <li key={category.id} className={`${MASONRY_ITEM} ${ui.panel} ${ui.rise} ${scenes.bubble} p-5`} style={{ '--i': index } as CSSProperties}>
-          <h3 className={`mb-3 flex items-center gap-2 text-base uppercase tracking-wide text-[color:var(--np-teal)] ${ui.chunk}`}>
+      {categories.map((category) => (
+        <li key={category.id} className={`${MASONRY_ITEM} p-5 ${css.panel}`}>
+          <h3 className={`mb-3 flex items-center gap-2 text-lg text-[color:var(--np-gold)] ${css.display}`}>
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
           </h3>
           <ul className={`${MASONRY_TILES} gap-1.5`}>
             {category.items.map((tech) => (
-              <li key={tech} className="rounded-md border-2 border-[color:var(--np-plate)] bg-[color:var(--np-void)] px-2 py-1 text-sm text-[color:var(--np-white)]">
+              <li key={tech} className="rounded-md bg-[color:var(--np-band)] px-2 py-1 text-sm text-[color:var(--np-white)]">
                 {tech}
               </li>
             ))}
@@ -94,46 +104,84 @@ function TechStack({ categories }: { categories: CVData['techStack'] }) {
 
 function Services({ services }: { services: Service[] }) {
   return (
-    <CrateSpin profession="engineer">
-      <ul className={MASONRY_LIST}>
-        {services.map((service) => (
-          <li key={service.id} className={`${MASONRY_ITEM} ${ui.panel} p-5`}>
-            <h3 className={`mb-2 text-base uppercase tracking-wide text-[color:var(--np-teal)] ${ui.chunk}`}>{service.title}</h3>
-            <p className="text-base text-[color:var(--np-white)]">{service.line}</p>
-          </li>
-        ))}
-      </ul>
-    </CrateSpin>
+    <ul className={MASONRY_LIST}>
+      {services.map((service) => (
+        <li key={service.id} className={`${MASONRY_ITEM} p-5 ${css.panel}`}>
+          <h3 className={`mb-2 text-lg text-[color:var(--np-gold)] ${css.display}`}>{service.title}</h3>
+          <p className="text-base text-[color:var(--np-white)]">{service.line}</p>
+        </li>
+      ))}
+    </ul>
   )
 }
 
-// His own products (featured) are the two wide panels of the first row, a gold gem tag over the name;
-// the other ventures follow three to a row.
+function ProjectCard({ slot }: { slot: ProjectSlot }) {
+  const labels = useLabels()
+  const { project, years, links } = slot
+
+  return (
+    <article aria-labelledby={`np-project-${project.id}`} className={`p-5 ${css.panel}`}>
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 id={`np-project-${project.id}`} className={`min-w-0 text-xl leading-tight text-[color:var(--np-gold)] ${css.display}`}>
+          <SlashBreaks text={project.name} />
+        </h3>
+        {years && <span className="text-sm font-bold text-[color:var(--np-muted)]">{years}</span>}
+      </div>
+      <p className="mt-1 text-sm font-bold text-[color:var(--np-orange)]">{project.role}</p>
+      <p className="mt-3 text-base text-[color:var(--np-white)]">{project.tagline}</p>
+      {project.impact && (
+        <p className="mt-3 rounded-lg border-l-4 border-[color:var(--np-orange)] bg-[color:var(--np-band)] px-3 py-2 text-base text-[color:var(--np-white)]">
+          <span className="sr-only">{labels.cards.impact}: </span>
+          {project.impact}
+        </p>
+      )}
+      {project.techStack.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={labels.cards.technologiesUsed}>
+          {project.techStack.map((tech) => (
+            <li key={tech} className="rounded-md bg-[color:var(--np-band)] px-2 py-0.5 text-sm text-[color:var(--np-white)]">
+              {tech}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-4 flex flex-wrap gap-2">
+        {links.length > 0 ? (
+          links.map(({ kind, label, linkProps }) => (
+            <a key={kind} {...linkProps} className={`${css.button} ${css.quiet}`}>
+              {label}
+            </a>
+          ))
+        ) : (
+          <p className="text-sm text-[color:var(--np-muted)]">{labels.links.noPublicLink}</p>
+        )}
+      </div>
+    </article>
+  )
+}
+
+// His own products (featured) are the two wide panels of the first row with the own product badge; the
+// other ventures follow three to a row.
 function Ventures({ companies }: { companies: CVData['companies'] }) {
   const { links, cards } = useLabels()
   return (
     <ul className="grid gap-6 md:grid-cols-6">
-      {companies.map((company, index) => (
-        <li key={company.id} className={`${scenes.lightUp} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ '--i': index } as CSSProperties}>
+      {companies.map((company) => (
+        <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
           <a
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
             aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
-            className={`block h-full p-5 focus:outline-none ${ui.panel}`}
+            className={`block h-full p-5 ${css.panel}`}
           >
-            {company.featured && (
-              <span className={`mb-3 inline-block rounded-full bg-[color:var(--np-gold)] px-3 py-0.5 text-sm uppercase tracking-wide text-[color:var(--np-void)] ${ui.chunk}`}>
-                {cards.ownProduct}
-              </span>
-            )}
+            {company.featured && <span className={`mb-3 inline-block px-3 py-0.5 text-sm ${css.chip}`}>{cards.ownProduct}</span>}
             <span className="flex items-center gap-3">
               <span className={company.featured ? 'text-3xl' : 'text-2xl'} aria-hidden="true">
                 {company.icon}
               </span>
               <span>
-                <span className={`block ${company.featured ? 'text-2xl' : 'text-xl'} ${ui.display}`}>{company.name}</span>
-                <span className="block text-sm text-[color:var(--np-gold)]">{company.tagline}</span>
+                <span className={`block text-[color:var(--np-gold)] ${company.featured ? 'text-2xl' : 'text-xl'} ${css.display}`}>{company.name}</span>
+                <span className="block text-sm text-[color:var(--np-muted)]">{company.tagline}</span>
               </span>
             </span>
             <span className="mt-3 block text-base text-[color:var(--np-white)]">{company.description}</span>
@@ -147,124 +195,118 @@ function Ventures({ companies }: { companies: CVData['companies'] }) {
 function EngineerLevels({ sections }: { sections: SectionsOf<'engineer'> }) {
   const { professionalSummary } = useCVData()
   const labels = useLabels()
-  // The motorbike comes once the body slam is over: one figure moving in a view at a time.
-  const [slammed, setSlammed] = useState(false)
-  const onSlammed = useCallback(() => setSlammed(true), [])
-
-  return (
-    <>
-      <Stage title={labels.sections.about} zone="medieval">
-        {(on) => (
-          <BridgeSlide on={on} profession="engineer">
-            <p className={`${ui.panel} max-w-prose p-6 text-lg leading-relaxed text-[color:var(--np-white)]`}>{professionalSummary.bio}</p>
-          </BridgeSlide>
-        )}
-      </Stage>
-
-      {sections.jobs.length > 0 && (
-        <Stage title={labels.sections.workExperience} zone="egypt" icon="crystal">
-          {() => (
-            <>
-              <TombRun profession="engineer" />
+  const levels: LevelSpec[] = [
+    {
+      key: 'about',
+      title: labels.sections.about,
+      era: 'medieval',
+      ending: 'crate',
+      body: <p className={`max-w-prose p-6 text-lg leading-relaxed text-[color:var(--np-white)] ${css.panel}`}>{professionalSummary.bio}</p>,
+    },
+    ...(sections.jobs.length > 0
+      ? [
+          {
+            key: 'jobs',
+            title: labels.sections.workExperience,
+            era: 'tomb' as const,
+            ending: 'crate' as const,
+            body: (
               <ul className={MASONRY_LIST}>
-                {sections.jobs.map((entry, index) => (
+                {sections.jobs.map((entry) => (
                   <li key={entry.id} className={MASONRY_ITEM}>
-                    <LevelPortal entry={entry} index={index} />
+                    <JobCard entry={entry} />
                   </li>
                 ))}
               </ul>
-            </>
-          )}
-        </Stage>
-      )}
-
-      <Stage title={labels.sections.techStack} zone="underwater">
-        {(on) => (
-          <>
-            <Crossing on={on} profession="engineer" traveller={{ kind: 'swim' }} className="mb-2" />
-            <TechStack categories={sections.techStack} />
-          </>
-        )}
-      </Stage>
-
-      {sections.services.length > 0 && (
-        <Stage title={labels.sections.services} zone="underwater">
-          {() => <Services services={sections.services} />}
-        </Stage>
-      )}
-
-      <Stage title={labels.sections.projects} zone="prehistoric" icon="crate">
-        {() => <CrateField projects={sections.projects} />}
-      </Stage>
-
-      <Stage title={labels.sections.ventures} zone="future">
-        {(on) => (
-          <>
-            <BodySlam profession="engineer" onDone={onSlammed}>
-              <Ventures companies={sections.companies} />
-            </BodySlam>
-            {slammed && <Crossing on={on} profession="engineer" traveller={{ kind: 'ride', vehicle: 'bike' }} className="mt-2" />}
-          </>
-        )}
-      </Stage>
-    </>
-  )
+            ),
+          },
+        ]
+      : []),
+    { key: 'tech', title: labels.sections.techStack, era: 'underwater', ending: 'crate', body: <TechStack categories={sections.techStack} /> },
+    ...(sections.services.length > 0 ? [{ key: 'services', title: labels.sections.services, era: 'wall' as const, ending: 'crate' as const, body: <Services services={sections.services} /> }] : []),
+    {
+      key: 'projects',
+      title: labels.sections.projects,
+      era: 'prehistoric',
+      ending: 'crates',
+      crates: sections.projects.length,
+      body: <ProjectList projects={sections.projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ProjectCard key={slot.project.id} slot={slot} />} />,
+    },
+    { key: 'ventures', title: labels.sections.ventures, era: 'future', ending: 'crate', body: <Ventures companies={sections.companies} /> },
+  ]
+  return <Levels levels={levels} profession="engineer" />
 }
 
-/** The gem over the bands once every time trial is won. */
-function RelicGem() {
-  const { score } = useScore()
-  const { relics } = score.counts
-  if (score.totals.relics === 0 || relics < score.totals.relics) return null
+function BandCard({ slot }: { slot: BandSlot }) {
+  const { links } = useLabels()
+  const band = slot.band
+  const { years, linkProps } = slot
+
   return (
-    <span className={`block h-12 w-10 ${ui.award}`} aria-hidden="true">
-      <Gem className="h-full w-full" tone="gold" />
-    </span>
+    <article aria-labelledby={`np-band-${band.id}`} className={`p-5 ${css.panel}`}>
+      <h3 id={`np-band-${band.id}`} className={`text-xl leading-tight text-[color:var(--np-gold)] ${css.display}`}>
+        {linkProps ? (
+          <a {...linkProps} className="underline decoration-[color:var(--np-orange)] decoration-4 underline-offset-4">
+            {band.name}
+          </a>
+        ) : (
+          band.name
+        )}
+      </h3>
+      <p className="mt-1 text-sm font-bold text-[color:var(--np-orange)]">{band.role}</p>
+      {years && <p className="mt-1 text-sm text-[color:var(--np-muted)]">{years}</p>}
+      {band.release && (
+        <p className="mt-2 text-base text-[color:var(--np-white)]">
+          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+        </p>
+      )}
+    </article>
   )
 }
 
 function MusicianLevels({ sections }: { sections: SectionsOf<'drummer'> }) {
   const labels = useLabels()
   const { musician, bands } = sections
-
-  return (
-    <Stage title={labels.sections.bands} zone="arabian" icon="relic">
-      {(on) => (
-        <>
-          <div className="mb-4 flex flex-wrap items-center gap-4">
-            <p className={`w-fit text-lg font-bold text-[color:var(--np-gold)] ${ui.plate}`}>{drumsSince(musician, labels.years)}</p>
-            <RelicGem />
-          </div>
-          <Crossing on={on} profession="drummer" traveller={{ kind: 'ride', vehicle: 'jetski' }} className="mb-2" />
-          <BandList
-            bands={bands}
-            className={MASONRY_LIST}
-            itemClassName={MASONRY_ITEM}
-            renderBand={(slot) => <BandTrial slot={slot} index={bands.indexOf(slot.band)} />}
-          />
-          <p className={`mt-2 w-fit max-w-full text-base italic text-[color:var(--np-white)] ${ui.plate}`}>{musician.line}</p>
-        </>
-      )}
-    </Stage>
+  const body = (
+    <>
+      <p className={`mb-4 w-fit px-4 py-2 text-lg font-bold text-[color:var(--np-gold)] ${css.panel}`}>{drumsSince(musician, labels.years)}</p>
+      <BandList
+        bands={bands}
+        className={MASONRY_LIST}
+        itemClassName={MASONRY_ITEM}
+        renderBand={(slot) => <BandCard slot={slot} />}
+      />
+      <p className={`mt-2 w-fit max-w-full px-4 py-2 text-base italic text-[color:var(--np-white)] ${css.panel}`}>{musician.line}</p>
+    </>
   )
+  return <Levels levels={[{ key: 'bands', title: labels.sections.bands, era: 'arabian', ending: 'drum', body }]} profession="drummer" />
 }
 
 function MartialArtistLevels({ sections }: { sections: SectionsOf<'fighter'> }) {
   const labels = useLabels()
   const { martialArts } = sections
-
-  return (
-    <Stage title={labels.sections.muayThai} zone="wall" icon="gem">
-      {() => (
-        <>
-          <h3 className={`mb-5 w-fit max-w-full text-2xl ${ui.plate}`}>
-            <span className={ui.display}>{martialArts.primary.title}</span>
-          </h3>
-          <BossRound martialArts={martialArts} />
-        </>
-      )}
-    </Stage>
+  const body = (
+    <>
+      <h3 className={`mb-5 w-fit max-w-full px-4 py-2 text-2xl text-[color:var(--np-gold)] ${css.display} ${css.panel}`}>{martialArts.primary.title}</h3>
+      <MuayThaiRecord
+        martialArts={martialArts}
+        classNames={{
+          facts: 'mb-8 grid gap-4 sm:grid-cols-2',
+          fact: `${css.panel} p-4`,
+          term: 'text-sm font-black uppercase tracking-wide text-[color:var(--np-gold)]',
+          value: 'mt-1 text-base text-[color:var(--np-white)]',
+          achievements: 'space-y-3',
+        }}
+        renderAchievement={(achievement) => (
+          <span className={`flex items-start gap-3 px-4 py-3 text-base text-[color:var(--np-white)] ${css.panel}`}>
+            {FRUIT}
+            {achievement}
+          </span>
+        )}
+      />
+    </>
   )
+  return <Levels levels={[{ key: 'muayThai', title: labels.sections.muayThai, era: 'courtyard', ending: 'gong', body }]} profession="fighter" />
 }
 
 export const SECTION_VIEWS: ProfessionSectionViews = {

@@ -1,0 +1,272 @@
+/* Neon Portals: the page around the 3D. Every colour is a --np-* variable from palette.ts (PORTAL_VARS on the
+   root); the two faces are --np-face (Luckiest Guy, the fat cartoon capitals of the logo and the level names)
+   and --np-body (Nunito). Motion here: the name's letters drop in (0.5 s each, 45 ms apart), the copy rises
+   (0.5 s), the beam over his pad (0.9 s), his box slides between pads (0.6 s), the button press (0.15 s).
+   The root's data-still (reduced motion or a World Select preview) stops all of it. */
+
+.root {
+  font-family: var(--np-body), system-ui, sans-serif;
+  color: var(--np-white);
+  background: linear-gradient(to bottom, var(--np-chamber), var(--np-void) 40rem);
+}
+
+.root[data-still] *,
+.root[data-still] *::before,
+.root[data-still] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+.canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.display {
+  font-family: var(--np-face), system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* The name in the logo's fat yellow capitals with their red brown edge. */
+.title {
+  font-family: var(--np-face), system-ui, sans-serif;
+  color: var(--np-title);
+  -webkit-text-stroke: 2px var(--np-title-edge);
+  paint-order: stroke fill;
+  text-shadow: 0 4px 0 var(--np-title-edge);
+}
+
+.letter {
+  display: inline-block;
+}
+
+[data-phase='wait'] .letter,
+[data-phase='beam'] .letter,
+[data-phase='form'] .letter,
+[data-phase='land'] .letter {
+  opacity: 0;
+}
+
+[data-phase='title'] .letter {
+  animation: np-drop 0.5s cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+[data-phase='wait'] .afterTitle,
+[data-phase='beam'] .afterTitle,
+[data-phase='form'] .afterTitle,
+[data-phase='land'] .afterTitle {
+  opacity: 0;
+}
+
+[data-phase='title'] .afterTitle {
+  animation: np-rise 0.5s ease-out both;
+}
+
+/* The copy on one dark plate, never on the 3D. */
+.plate {
+  background: var(--np-band);
+  border: 2px solid var(--np-seam);
+  border-radius: 1.25rem;
+}
+
+.chip {
+  font-family: var(--np-face), system-ui, sans-serif;
+  background: var(--np-orange);
+  color: var(--np-void);
+  border-radius: 999px;
+}
+
+/* Fat rounded buttons with a hard bottom edge that press down a step. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.25rem;
+  border: 3px solid var(--np-void);
+  border-radius: 999px;
+  font-family: var(--np-face), system-ui, sans-serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 0 var(--np-void);
+  transition: transform 0.15s ease-out;
+}
+
+.button:hover {
+  transform: translateY(2px);
+}
+
+.button:active {
+  transform: translateY(4px);
+}
+
+.lit {
+  background: var(--np-orange);
+  color: var(--np-void);
+}
+
+.quiet {
+  background: var(--np-white);
+  color: var(--np-void);
+}
+
+/* A window onto the 3D: its era's sky as a gradient (also what shows without WebGL), its size fixed before
+   three.js loads. */
+.window {
+  position: relative;
+  overflow: hidden;
+  border: 5px solid var(--np-band);
+  border-radius: 0.6rem;
+  background: linear-gradient(to bottom, var(--np-sky-top), var(--np-sky-low));
+  box-shadow: 0 6px 0 var(--np-band);
+}
+
+/* Once the shared engine runs, the window is a hole onto the canvas behind the page, which draws the same
+   sky as the scene's background. */
+.window[data-live] {
+  background: none;
+}
+
+/* The level name over the top of its window, on its own dark band, in the orange to red ramp of the source
+   game's level names. */
+.levelName {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.35rem 1rem 0.35rem 0.4rem;
+  background: var(--np-band);
+  border-radius: 999px;
+  z-index: 2;
+}
+
+.levelText {
+  background: linear-gradient(to bottom, var(--np-level-top), var(--np-level-low));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.dome {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: var(--np-pad-blue-deep);
+  color: var(--np-white);
+  font-family: var(--np-face), system-ui, sans-serif;
+}
+
+/* His box on the stage follows the picked pad: the layer is the stage's size, so a percent of it is a percent
+   of the stage, and --np-pad-x and --np-pad-y (0 to 1, from pads.ts) put the box's bottom middle on the pad. */
+.figureLayer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translate(calc((var(--np-pad-x) - 0.5) * 100%), calc((var(--np-pad-y) - 0.9) * 100%));
+  transition: transform 0.6s linear;
+}
+
+.figure {
+  position: absolute;
+  left: 33%;
+  top: 28%;
+  width: 34%;
+  height: 64%;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.beam {
+  position: absolute;
+  left: 25%;
+  right: 25%;
+  top: -40%;
+  bottom: 4%;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, transparent, var(--np-blue) 40%, var(--np-white));
+  opacity: 0;
+}
+
+[data-phase='beam'] .beam,
+[data-phase='form'] .beam {
+  animation: np-beam 0.9s ease-out both;
+}
+
+.pad {
+  transition: transform 0.15s ease-out;
+}
+
+.pad:hover {
+  transform: translateY(2px);
+}
+
+.panel {
+  background: var(--np-panel);
+  border: 2px solid var(--np-seam);
+  border-radius: 1rem;
+  box-shadow: 0 4px 0 var(--np-band);
+}
+
+/* The hub's curved save monitor: green letters on dark glass in a metal rim. */
+.monitor {
+  background:
+    repeating-linear-gradient(to bottom, transparent 0 3px, color-mix(in srgb, var(--np-screen-text) 4%, transparent) 3px 4px),
+    radial-gradient(ellipse at 50% 40%, var(--np-chamber), var(--np-screen) 70%);
+  border: 10px solid var(--np-screen-rim);
+  border-radius: 2rem;
+  box-shadow: 0 0 0 3px var(--np-band), 0 8px 0 var(--np-band);
+}
+
+.screenText {
+  color: var(--np-screen-text);
+}
+
+@keyframes np-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-0.8em) scale(1.3);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes np-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes np-beam {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.2);
+  }
+  30% {
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+}

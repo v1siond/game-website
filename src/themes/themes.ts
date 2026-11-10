@@ -111,11 +111,11 @@ export const themes: Theme[] = [
     },
   },
 
-  // 3. Neon Portals - a time machine's warp room and levels, crates and crystals, him as its orange hero
+  // 3. Neon Portals - a time machine's warp room and the levels it opens, in low poly 3D, him as its orange hero
   {
     id: 'neon-portals',
     name: 'Neon Portals',
-    description: 'A warp room of levels, crates and a boss fight',
+    description: 'A warp room and its levels, run in low poly 3D',
     colors: {
       background: PORTAL.VOID,
       backgroundGradient: `linear-gradient(to bottom, ${PORTAL.CHAMBER}, ${PORTAL.VOID})`,

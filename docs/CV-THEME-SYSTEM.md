@@ -53,7 +53,7 @@ Artistic.
   comes before the end of the page it stays closed that visit. Each measure runs only after the reveals
   running then have ended, held at most `SETTLE_CAP_MS` (1000, 1 s) so a long reveal cannot stall it, and
   text still waiting for its reveal (at opacity 0) counts as covered. Text kept for screen readers only
-  (`isVisuallyHidden`, such as the Neon Portals counters) is never drawn and does not count. Once open, the
+  (`isVisuallyHidden`) is never drawn and does not count. Once open, the
   card checks itself every frame for `HINT_WATCH_MS` (3000, 3 s) and closes for the visit if text or a
   control slides or fades in under it (`hintWatch`). Its top is fixed under the launcher's tallest face, the
   turned one: `--wl-hint-top` in `worlds-nudge.css` is the launcher's bottom (`--wl-launcher-bottom`, 70 px
