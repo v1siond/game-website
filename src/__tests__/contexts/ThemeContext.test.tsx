@@ -21,13 +21,6 @@ describe('ThemeContext', () => {
       expect(result.current.theme.id).toBe(DEFAULT_THEME_ID)
     })
 
-    it('provides all available themes', () => {
-      const { result } = renderHook(() => useTheme(), { wrapper })
-
-      expect(result.current.allThemes).toEqual(themes)
-      expect(result.current.allThemes.length).toBeGreaterThan(0)
-    })
-
     it('provides setThemeById function', () => {
       const { result } = renderHook(() => useTheme(), { wrapper })
 
@@ -108,16 +101,6 @@ describe('ThemeContext', () => {
       themes.forEach((theme) => {
         expect(theme.name).toBeTruthy()
         expect(theme.description).toBeTruthy()
-      })
-    })
-
-    it('all themes have valid effect settings', () => {
-      themes.forEach((theme) => {
-        expect(theme.effects).toBeDefined()
-        expect(typeof theme.effects.vignette).toBe('boolean')
-        expect(typeof theme.effects.grain).toBe('boolean')
-        expect(typeof theme.effects.scanlines).toBe('boolean')
-        expect(typeof theme.effects.grainOpacity).toBe('number')
       })
     })
   })

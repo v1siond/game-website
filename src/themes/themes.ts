@@ -31,23 +31,12 @@ export interface ThemeColors {
   surfaceHover: string
 }
 
-export interface ThemeEffects {
-  vignette: boolean
-  grain: boolean
-  scanlines: boolean
-  glitch: boolean
-  flicker: boolean
-  grainOpacity: number
-  vignetteIntensity: number
-}
-
 export interface Theme {
   id: string
   name: string
   description: string
   colors: ThemeColors
   font: string
-  effects: ThemeEffects
 }
 
 export const themes: Theme[] = [
@@ -70,15 +59,6 @@ export const themes: Theme[] = [
       surfaceHover: DARK_FANTASY.surfaceHover,
     },
     font: 'serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: true,
-      grainOpacity: 0.02,
-      vignetteIntensity: 0.6,
-    },
   },
 
   // 2. Survival Horror - an old house at night with fixed camera rooms, the item box and the last corridor
@@ -100,15 +80,6 @@ export const themes: Theme[] = [
       surfaceHover: SH.paper,
     },
     font: 'monospace',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: true,
-      grainOpacity: 0.03,
-      vignetteIntensity: 0.7,
-    },
   },
 
   // 3. Neon Portals - a time machine's warp room and the levels it opens, in low poly 3D, him as its orange hero
@@ -130,15 +101,6 @@ export const themes: Theme[] = [
       surfaceHover: PORTAL.PANEL,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: true,
-      grain: false,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0,
-      vignetteIntensity: 0.5,
-    },
   },
 
   // 4. Soul Map - an ash and bonfire world of a hard knight game: the shrine, the class pick, the fog wall
@@ -160,15 +122,6 @@ export const themes: Theme[] = [
       surfaceHover: SOUL.cavern,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0.015,
-      vignetteIntensity: 0.5,
-    },
   },
 
   // 5. Adventure Paths - the default world: an explorer's overworld map whose regions hold each profession, ending at the goal gate
@@ -190,15 +143,6 @@ export const themes: Theme[] = [
       surfaceHover: TRAIL.FOREST,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: false,
-      grain: false,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0,
-      vignetteIntensity: 0,
-    },
   },
 
   // 6. Rubber Hose - a 1930s rubber hose cartoon in sepia with the iris, him as the cup headed toon
@@ -220,15 +164,6 @@ export const themes: Theme[] = [
       surfaceHover: HOSE.paperDark,
     },
     font: 'serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: true,
-      grainOpacity: 0.08,
-      vignetteIntensity: 0.4,
-    },
   },
 
   // 7. Retro RPG - a lo-fi pixel role playing game's encounter screen, its boxes and the save point
@@ -250,15 +185,6 @@ export const themes: Theme[] = [
       surfaceHover: RPG.windowTop,
     },
     font: 'monospace',
-    effects: {
-      vignette: false,
-      grain: false,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0,
-      vignetteIntensity: 0,
-    },
   },
 
   // 8. Bold Noir - a stylish heist night in black, paper and one red: calling cards, the menu cut-in, the finisher
@@ -280,15 +206,6 @@ export const themes: Theme[] = [
       surfaceHover: NOIR.smoke,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0.02,
-      vignetteIntensity: 0.4,
-    },
   },
 
   // 9. Fighter Select - an arcade fighting game's select screen and its matches, a challenger at the end
@@ -310,15 +227,6 @@ export const themes: Theme[] = [
       surfaceHover: FS.panelLight,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: false,
-      grain: false,
-      scanlines: true,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0,
-      vignetteIntensity: 0,
-    },
   },
 
   // 10. Art Deco - a 1920s city at the bottom of the sea in brass and gold, reached by bathysphere
@@ -340,15 +248,6 @@ export const themes: Theme[] = [
       surfaceHover: DECO_COLORS.deepSea,
     },
     font: 'serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0.02,
-      vignetteIntensity: 0.5,
-    },
   },
 
   // 11. Retro Atomic - an atomic age fallout shelter seen through his wrist terminal, out to the wasteland
@@ -370,15 +269,6 @@ export const themes: Theme[] = [
       surfaceHover: ATOMIC_COLORS.bunker,
     },
     font: 'monospace',
-    effects: {
-      vignette: false,
-      grain: false,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0,
-      vignetteIntensity: 0,
-    },
   },
 
   // 12. Neon Cyber - a netrunner's night city through the optics HUD, with quickhacks and scan mode
@@ -400,15 +290,6 @@ export const themes: Theme[] = [
       surfaceHover: NEON.surfaceHover,
     },
     font: 'monospace',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: true,
-      glitch: true,
-      flicker: false,
-      grainOpacity: 0.03,
-      vignetteIntensity: 0.5,
-    },
   },
 
   // 13. Cell Shaded - an inked wasteland looter shooter, one desert day from the intro card to the respawn station
@@ -430,15 +311,6 @@ export const themes: Theme[] = [
       surfaceHover: CEL.paperShade,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: false,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0.02,
-      vignetteIntensity: 0,
-    },
   },
 
   // 14. Silhouette - a black forest in the fog, a monochrome puzzle platformer with levers, ropes and death cuts
@@ -460,15 +332,6 @@ export const themes: Theme[] = [
       surfaceHover: SHADE.raised,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0.04,
-      vignetteIntensity: 0.7,
-    },
   },
 
   // 15. Mythic - an underworld escape painted in ink over colour, from the great hall up to the dawn
@@ -490,15 +353,6 @@ export const themes: Theme[] = [
       surfaceHover: MYTH.panelEdge,
     },
     font: 'serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0.02,
-      vignetteIntensity: 0.5,
-    },
   },
 
   // 16. Tropical Platformer - a jungle barrel platformer from sunset to night, shot out of his tree house
@@ -520,15 +374,6 @@ export const themes: Theme[] = [
       surfaceHover: COLORS.wood,
     },
     font: 'sans-serif',
-    effects: {
-      vignette: true,
-      grain: false,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0,
-      vignetteIntensity: 0.4,
-    },
   },
 
   // 17. Medieval Fantasy - a real time strategy kingdom in gold and stone
@@ -550,15 +395,6 @@ export const themes: Theme[] = [
       surfaceHover: REALM.metalMid,
     },
     font: 'serif',
-    effects: {
-      vignette: true,
-      grain: true,
-      scanlines: false,
-      glitch: false,
-      flicker: false,
-      grainOpacity: 0.02,
-      vignetteIntensity: 0.5,
-    },
   },
 ]
 

@@ -8,7 +8,6 @@ import { WORLD_PENDING_ATTR } from './worldPending'
 interface ThemeContextType {
   theme: Theme
   setThemeById: (id: string) => void
-  allThemes: Theme[]
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
@@ -48,7 +47,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const value: ThemeContextType = {
     theme: mounted ? theme : getThemeById(DEFAULT_THEME_ID),
     setThemeById,
-    allThemes: themes,
   }
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
@@ -63,7 +61,6 @@ export function WorldPreviewProvider({ theme, children }: { theme: Theme; childr
   const value: ThemeContextType = {
     theme,
     setThemeById: () => {},
-    allThemes: themes,
   }
 
   return (

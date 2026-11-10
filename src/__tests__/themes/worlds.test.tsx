@@ -26,7 +26,6 @@ import {
   WORLDS,
   WORLD_CATEGORIES,
   getWorldComponent,
-  getWorldsByCategory,
 } from '@/themes/worlds'
 
 describe('worlds registry', () => {
@@ -47,13 +46,13 @@ describe('worlds registry', () => {
 
   it('every declared category contains at least one world', () => {
     for (const cat of WORLD_CATEGORIES) {
-      expect(getWorldsByCategory(cat.name).length).toBeGreaterThan(0)
+      expect(WORLDS.filter((w) => w.category === cat.name).length).toBeGreaterThan(0)
     }
   })
 
   it('partitions all worlds across the categories (no orphans, no dupes)', () => {
     const total = WORLD_CATEGORIES.reduce(
-      (sum, c) => sum + getWorldsByCategory(c.name).length,
+      (sum, c) => sum + WORLDS.filter((w) => w.category === c.name).length,
       0
     )
     expect(total).toBe(WORLDS.length)

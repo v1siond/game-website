@@ -108,7 +108,3 @@ export const WORLDS: World[] = themes.map((theme) => {
 export function getWorldComponent(id: string): ComponentType | undefined {
   return COMPONENT_BY_ID[id]
 }
-
-export function getWorldsByCategory(category: WorldCategory): World[] {
-  return WORLDS.filter((w) => w.category === category)
-}

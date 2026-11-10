@@ -98,15 +98,6 @@ exports[`Theme Data Snapshots default theme configuration matches snapshot 1`] =
     "surface",
     "surfaceHover",
   ],
-  "effectKeys": [
-    "vignette",
-    "grain",
-    "scanlines",
-    "glitch",
-    "flicker",
-    "grainOpacity",
-    "vignetteIntensity",
-  ],
   "id": "adventure-paths",
   "name": "Adventure Paths",
 }

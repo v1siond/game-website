@@ -50,7 +50,6 @@ describe('Theme Data Snapshots', () => {
       id: defaultTheme.id,
       name: defaultTheme.name,
       colorKeys: Object.keys(defaultTheme.colors),
-      effectKeys: Object.keys(defaultTheme.effects),
     }).toMatchSnapshot()
   })
 
