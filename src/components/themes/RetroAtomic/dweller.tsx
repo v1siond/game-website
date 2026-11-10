@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
 import {
   BAKELITE,

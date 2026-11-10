@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useReducedMotion } from '@/hooks/useReducedMotion'

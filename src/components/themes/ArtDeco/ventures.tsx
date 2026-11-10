@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type AnimationEvent, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'

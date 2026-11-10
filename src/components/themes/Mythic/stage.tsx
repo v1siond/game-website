@@ -2,7 +2,7 @@
 
 import { createContext, useContext, type ReactNode } from 'react'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import u from './underworld.module.css'
 
 // A section's stage in the descent: the gilded title plate and the section's own scene. useZoneStage

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { Band } from '@/lib/cv/content'
 import type { Labels } from '@/lib/cv/labels'
 import { useLabels } from './CVDataProvider'
-import { bandSpan, newTabName } from './sectionText'
+import { bandSpan, newTabName } from '@/lib/cv/sectionText'
 
 // The bands (R5) as a list without a look, in the order viewFor gives (current first). A band with a
 // site carries `linkProps` for the world's anchor; one without carries null and is drawn as text.

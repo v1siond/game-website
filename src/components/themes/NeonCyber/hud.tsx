@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import world from './world.module.css'
 
 // The optics HUD chrome every section sits in: a glass panel with one clipped corner and its red

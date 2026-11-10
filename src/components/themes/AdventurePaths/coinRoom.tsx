@@ -1,7 +1,7 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { SectionsOf } from '@/lib/cv/cvView'

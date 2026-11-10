@@ -1,5 +1,5 @@
 import { pixelRuns } from '@/lib/pixelRuns'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { RPG } from './palette'
 

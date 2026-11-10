@@ -2,7 +2,7 @@
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import { ArenaFighter } from './arena'
 import { ScreenPanel } from './frames'

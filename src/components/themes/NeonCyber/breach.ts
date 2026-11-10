@@ -4,6 +4,8 @@
 // matrix is drawn from the project's slug, so the same project always shows the same matrix, and the
 // sequence is planted on a legal path, so every matrix can be solved within the buffer.
 
+import { mulberry32, seedOf } from '@/lib/random/seeded'
+
 // The world's six bytes (its own set, not the source game's), shown as two hex digits.
 const BYTES = [0x3a, 0x7e, 0xc2, 0x5d, 0x91, 0xe4] as const
 
@@ -35,18 +37,6 @@ export type BreachOutcome = 'open' | 'full' | 'running'
 
 export const byteText = (byte: number): string => byte.toString(16).toUpperCase().padStart(2, '0')
 
-/** A small seeded generator (mulberry32), so a slug always gives the same matrix. */
-function seeded(seedText: string): () => number {
-  let seed = [...seedText].reduce((hash, char) => Math.imul(hash ^ char.charCodeAt(0), 2654435761) >>> 0, 1779033703)
-  return () => {
-    seed = (seed + 0x6d2b79f5) >>> 0
-    let t = seed
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
 const pickIndex = (random: () => number, count: number): number => Math.floor(random() * count)
 
 /** Another index on the line, never `taken`. */
@@ -70,7 +60,7 @@ function plantPath(random: () => number, length: number): Cell[] {
 }
 
 export function breachPuzzle(slug: string): BreachPuzzle {
-  const random = seeded(slug)
+  const random = mulberry32(seedOf(slug))
   const matrix = Array.from({ length: MATRIX_SIZE }, () => Array.from({ length: MATRIX_SIZE }, () => BYTES[pickIndex(random, BYTES.length)]))
   const path = plantPath(random, SEQUENCE_LENGTH)
   const sequence = path.map(() => BYTES[pickIndex(random, BYTES.length)])

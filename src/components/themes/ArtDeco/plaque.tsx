@@ -1,7 +1,7 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { DepthZone } from './backdrop'
 import { DECO_COLORS as C } from './palette'

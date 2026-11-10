@@ -1,5 +1,5 @@
 import type { ReactNode, Ref } from 'react'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import { JOURNAL_SERIF } from './palette'
 import side from './side.module.css'
 

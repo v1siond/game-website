@@ -3,7 +3,7 @@
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'

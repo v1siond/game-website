@@ -4,6 +4,8 @@
 // removes a dud or restores the attempts; at zero attempts the terminal locks until it is rebooted.
 // The candidate words are his own tools (the tech stack), so the game spells his CV.
 
+import { mulberry32 } from '@/lib/random/seeded'
+
 export type HackCell =
   | { kind: 'junk'; text: string }
   | { kind: 'word'; word: string }
@@ -54,18 +56,6 @@ const BRACKETS: ReadonlyArray<readonly [string, string]> = [
 const BRACKET_ROWS = 4
 const ADDRESS_BASE = 0xf000
 
-/** A seeded generator (mulberry32), so one seed always builds the same board. */
-function random(seed: number): () => number {
-  let state = seed >>> 0
-  return () => {
-    state = (state + 0x6d2b79f5) >>> 0
-    let t = state
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
 const junk = (next: () => number, length: number): string =>
   Array.from({ length }, () => JUNK[Math.floor(next() * JUNK.length)]).join('')
 
@@ -108,7 +98,7 @@ const bracketRow = (next: () => number, id: number): HackCell[] => {
 export function buildBoard(tools: string[], seed: number): HackBoard | null {
   const words = candidateWords(tools)
   if (words.length === 0) return null
-  const next = random(seed)
+  const next = mulberry32(seed)
   const step = Math.floor(ROW_COUNT / words.length)
   const wordAt = new Map(words.map((word, index) => [index * step + Math.floor(next() * step), word]))
   const free = Array.from({ length: ROW_COUNT }, (_, row) => row).filter((row) => !wordAt.has(row))

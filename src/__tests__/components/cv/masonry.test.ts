@@ -1,4 +1,4 @@
-import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/lib/cv/masonry'
 
 const classesOf = (list: string) => list.split(' ')
 

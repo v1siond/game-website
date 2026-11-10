@@ -1,8 +1,8 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
-import { jobYears } from '@/components/cv/sectionText'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { jobYears } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'

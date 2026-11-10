@@ -6,8 +6,8 @@ import { useProfession } from "@/contexts/ProfessionContext";
 import { ProjectList } from "@/components/cv/ProjectList";
 import { BandList } from "@/components/cv/BandList";
 import { MuayThaiRecord } from "@/components/cv/MuayThaiRecord";
-import { MASONRY_ITEM, MASONRY_LIST } from "@/components/cv/masonry";
-import { drumsSince } from "@/components/cv/sectionText";
+import { MASONRY_ITEM, MASONRY_LIST } from "@/lib/cv/masonry";
+import { drumsSince } from "@/lib/cv/sectionText";
 import type { SectionsOf } from "@/lib/cv/cvView";
 import type { ProfessionSectionViews } from "@/components/cv/ProfessionSectionsView";
 import {

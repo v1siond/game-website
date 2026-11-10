@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { jobYears } from '@/components/cv/sectionText'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { jobYears } from '@/lib/cv/sectionText'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'

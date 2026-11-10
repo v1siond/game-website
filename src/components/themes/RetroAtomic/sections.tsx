@@ -2,8 +2,8 @@
 
 import type { ReactNode } from 'react'
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { drumsSince } from '@/components/cv/sectionText'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { drumsSince } from '@/lib/cv/sectionText'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { SectionsOf } from '@/lib/cv/cvView'

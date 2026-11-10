@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, type CSSProperties, type ReactNode } from 'react'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import type { Era } from './eras'
 import { buildLevel, type Ending } from './level'

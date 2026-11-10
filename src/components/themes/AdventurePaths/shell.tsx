@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import type { SectionsOf } from '@/lib/cv/cvView'

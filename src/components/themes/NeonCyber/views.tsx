@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import type { Service } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'

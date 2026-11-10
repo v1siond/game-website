@@ -2,10 +2,10 @@
 
 import type { CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData, Service } from '@/lib/cv/content'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { Board } from './levelSign'
 import look from './jungle.module.css'

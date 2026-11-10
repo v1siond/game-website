@@ -7,7 +7,7 @@ import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 

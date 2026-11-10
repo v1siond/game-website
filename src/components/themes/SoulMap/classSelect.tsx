@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { drumsSince, muayThaiFacts } from '@/components/cv/sectionText'
+import { drumsSince, muayThaiFacts } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
 import type { ProfessionSections } from '@/lib/cv/cvView'
 import type { Labels } from '@/lib/cv/labels'

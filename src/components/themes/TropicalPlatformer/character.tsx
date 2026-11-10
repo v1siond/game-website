@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, type CSSProperties, type ReactNode } from 'react'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { COLORS } from './palette'
 import sprite from './character.module.css'

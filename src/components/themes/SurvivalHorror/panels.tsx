@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import look from './world.module.css'
 
 // The paper panel every section sits on, its heading typed in brass; the heading names the region.

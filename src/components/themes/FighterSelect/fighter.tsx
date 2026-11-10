@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, type CSSProperties, type ReactNode } from 'react'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { FS } from './palette'
 import { CELL, framesFor, type ArmPose, type FighterPose, type Frame, type Fx, type LegPose, type Pt } from './poses'

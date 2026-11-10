@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
 import { useLabels } from './CVDataProvider'
-import { muayThaiFacts } from './sectionText'
+import { muayThaiFacts } from '@/lib/cv/sectionText'
 
 // The Muay Thai record (R6) without a look: the facts as a description list and the achievements as a
 // list, every word from the content. The world draws the heading (`martialArts.primary.title`) and

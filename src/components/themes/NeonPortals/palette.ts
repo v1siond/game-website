@@ -1,4 +1,4 @@
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { paletteVars } from '../shared/paletteVars'
 
 // The world's one colour source (the time machine platformer, Warped, named in code only; research

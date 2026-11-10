@@ -22,7 +22,7 @@ import { IrisWipe, SunWatcher, TitleCardIntro, staggerAt } from './RubberHose/sc
 import { ProfessionSet } from './RubberHose/sets'
 import { IsleStage, Isles, type Isle } from './RubberHose/isles'
 import { HeroCharacter } from './RubberHose/cup'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import world from './RubberHose/world.module.css'
 
 // His outfit plate: an inked title card, ink lettering on paper with an ink outline.

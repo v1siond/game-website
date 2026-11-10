@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type ReactNode, type Ref } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { MYTH } from './palette'
 import { MOVES, NEAR_FIST, REST, bodyCss, bodyTransform, jointCss, jointTransform, resolveKeys, type Joint, type Move, type Pose } from './rig'

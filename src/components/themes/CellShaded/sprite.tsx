@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { CEL } from './palette'
 import { HATCH } from './ink'
 import cel from './cel.module.css'

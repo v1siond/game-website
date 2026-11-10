@@ -1,6 +1,6 @@
 import { screen, within } from '@testing-library/react'
 import { CVContent } from '@/app/(cv)/cv/CVContent'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears } from '@/lib/cv/sectionText'
 import { locales } from '@/i18n/config'
 import type { CVData } from '@/lib/cv/content'
 import { renderWithCV, testCV } from '../../helpers/test-utils'

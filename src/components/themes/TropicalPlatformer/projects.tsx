@@ -1,7 +1,7 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import type { Project } from '@/lib/cv/content'

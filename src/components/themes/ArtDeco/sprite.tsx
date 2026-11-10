@@ -1,6 +1,6 @@
 import { useId, type AnimationEvent } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { DECO_COLORS as C } from './palette'
 import s from './sprite.module.css'
 

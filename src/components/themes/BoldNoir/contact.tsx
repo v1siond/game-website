@@ -2,7 +2,7 @@
 
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HitStar, RansomWord } from './backdrop'
 import { CVLink, HeroAction } from './actions'

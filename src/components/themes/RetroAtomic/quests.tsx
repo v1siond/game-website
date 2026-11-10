@@ -3,8 +3,8 @@ import type { Job } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
-import { jobYears } from '@/components/cv/sectionText'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { jobYears } from '@/lib/cv/sectionText'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import atomic from './atomic.module.css'
 
 // Experience as the terminal's quest log: each job an entry with its state box (the current one a

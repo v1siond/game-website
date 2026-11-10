@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { drumsSince, jobYears, newTabName, projectLinks, yearSpan } from '@/components/cv/sectionText'
+import { drumsSince, jobYears, newTabName, projectLinks, yearSpan } from '@/lib/cv/sectionText'
 import { labelsFor, type LabelsFile } from '@/lib/cv/labels'
 
 const file: LabelsFile = JSON.parse(readFileSync(join(process.cwd(), 'content', 'cv', 'labels.json'), 'utf8'))

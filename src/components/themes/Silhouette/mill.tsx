@@ -2,7 +2,7 @@
 
 import type { Project } from '@/lib/cv/content'
 import { ProjectList } from '@/components/cv/ProjectList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HeroCharacter } from './character'

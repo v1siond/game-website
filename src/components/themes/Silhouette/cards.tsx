@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { Job } from '@/lib/cv/content'
-import { jobYears } from '@/components/cv/sectionText'
+import { jobYears } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TYPEWRITER } from './palette'

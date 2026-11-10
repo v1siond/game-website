@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
 import { ActionOptions } from './actions'
 import { BODY, Box, Mark, Typed } from './panels'

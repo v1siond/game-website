@@ -3,7 +3,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HeroCharacter } from './character'

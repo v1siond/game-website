@@ -5,7 +5,7 @@ import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { FadeInScene, ScrollScene } from '@/components/scroll/ScrollScene'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { ArtBreak, CurlBanner, PieEyes } from './art'
@@ -18,7 +18,7 @@ import { IsleStage } from './isles'
 import { BagFoe, Bandstand, FlowerKnockout, MapRun, ShopCounter, StageCurtains } from './stages'
 import world from './world.module.css'
 import styles from './scenes.module.css'
-import { drumsSince } from '@/components/cv/sectionText'
+import { drumsSince } from '@/lib/cv/sectionText'
 
 // The picked profession's sections, each on its isle (./isles, the backdrop follows) and each with its own
 // act of his (./stages). About: he knocks out the flower boss and the text unfolds. Work Experience: the

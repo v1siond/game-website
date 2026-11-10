@@ -1,6 +1,6 @@
 import { useId, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { NOIR } from './palette'
 import s from './detective.module.css'
 

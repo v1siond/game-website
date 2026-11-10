@@ -1,4 +1,4 @@
-import { slashParts } from '@/components/cv/slashParts'
+import { slashParts } from '@/lib/cv/slashParts'
 
 describe('slashParts', () => {
   it('cuts a slash joined name after its slash, the slash kept on the first name', () => {

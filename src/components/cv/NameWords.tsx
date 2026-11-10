@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from 'react'
-import { nameWords } from './nameWords'
+import { nameWords } from '@/lib/cv/nameWords'
 
 // His name set one unbreakable word at a time: a narrow screen can wrap it between the words, never inside
 // one. A world that draws the name letter by letter passes `letter`; its index counts from the start of the

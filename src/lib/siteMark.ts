@@ -1,4 +1,4 @@
-import { HERO_IDENTITY } from '../components/cv/heroIdentity'
+import { HERO_IDENTITY } from './cv/heroIdentity'
 import { pixelRuns } from './pixelRuns'
 
 // The site's mark: his face as a 16 by 16 pixel sprite (short dark hair, oval eyes, full dark beard),

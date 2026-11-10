@@ -2,9 +2,9 @@
 
 import type { CSSProperties } from 'react'
 import type { Company } from '@/lib/cv/content'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import horror from './horror.module.css'

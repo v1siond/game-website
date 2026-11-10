@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type AnimationEvent } from 'react'
 import { useReducedMotion } from './useReducedMotion'
-import { advancePose, hasArrived, playMove, poseOf, settleMove, START, stepEntrance, type MovePolicy, type PoseState } from './poseSequence'
+import { advancePose, hasArrived, playMove, poseOf, settleMove, START, stepEntrance, type MovePolicy, type PoseState } from '@/lib/motion/poseSequence'
 
 // The one entrance, rest and one shot move sequence for every world's figure. The world owns the
 // poses and the motion; this owns only when each pose shows. An entrance pose ends when the caller

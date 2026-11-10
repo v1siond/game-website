@@ -1,6 +1,6 @@
 import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 
 // The wrist terminal's second row of tabs: the picked profession's sections, in page order, each a jump
 // to its heading. The sections file builds each heading's id with the same atomicId, so a tab and its

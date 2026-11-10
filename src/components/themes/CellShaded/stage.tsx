@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import type { Zone } from './wasteland'
 import cel from './cel.module.css'
 

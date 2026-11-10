@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react'
 import { fillLabel } from '@/lib/cv/labels'
 import { useLabels, useWorldView } from './CVDataProvider'
-import { newTabName } from './sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 
 // The recruiter first screen (R7) without a look: his name, the headline, the tagline, the contact
 // line and the two actions, email and LinkedIn. Each world draws it through `render`, spreading

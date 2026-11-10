@@ -1,7 +1,7 @@
 'use client'
 
 import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'

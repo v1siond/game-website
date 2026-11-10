@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from './CVDataProvider'
-import { newTabName, projectLinks, yearSpan, type ProjectLink } from './sectionText'
+import { newTabName, projectLinks, yearSpan, type ProjectLink } from '@/lib/cv/sectionText'
 
 // The projects of a world (R4) as a list without a look: one item per project in the order viewFor
 // gives, each with its year span and its links ready to spread on an anchor (new tab, a name that says

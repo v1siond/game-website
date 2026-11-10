@@ -1,5 +1,5 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { Starburst } from './ink'

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Reac
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import type { Project } from '@/lib/cv/content'

@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { headingId } from '@/components/cv/sectionText'
+import { headingId } from '@/lib/cv/sectionText'
 import { useReachLevel } from './hud'
 import { Backdrop, type SceneKind } from './scenery'
 import look from './jungle.module.css'

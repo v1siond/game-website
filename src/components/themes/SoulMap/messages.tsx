@@ -2,10 +2,10 @@
 
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { newTabName } from '@/components/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData } from '@/lib/cv/content'

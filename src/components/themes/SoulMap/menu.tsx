@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { CVData } from '@/lib/cv/content'
 import { CARVED } from './palette'

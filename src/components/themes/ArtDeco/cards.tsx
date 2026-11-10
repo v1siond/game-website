@@ -1,6 +1,6 @@
 import type { CVData, Service } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/components/cv/masonry'
+import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import look from './world.module.css'
 

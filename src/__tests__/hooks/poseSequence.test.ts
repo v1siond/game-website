@@ -1,4 +1,4 @@
-import { advancePose, hasArrived, playMove, poseOf, settleMove, START, stepEntrance, type PoseState } from '@/hooks/poseSequence'
+import { advancePose, hasArrived, playMove, poseOf, settleMove, START, stepEntrance, type PoseState } from '@/lib/motion/poseSequence'
 
 type Pose = 'revive' | 'walk' | 'idle' | 'zap' | 'swing'
 

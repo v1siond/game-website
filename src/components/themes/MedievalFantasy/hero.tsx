@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { HERO_IDENTITY } from '@/components/cv/heroIdentity'
+import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { REALM } from './palette'
 
 // Him as the death knight king of the frost zone: the spiked pauldrons, the skull chest plate, the fur trimmed

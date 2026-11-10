@@ -1,4 +1,4 @@
-import { nameWords } from '@/components/cv/nameWords'
+import { nameWords } from '@/lib/cv/nameWords'
 
 describe('nameWords', () => {
   it('splits the name into its words, each with where it starts in the name', () => {

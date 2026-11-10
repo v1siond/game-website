@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { slashParts } from './slashParts'
+import { slashParts } from '@/lib/cv/slashParts'
 
 // A company or project name that may wrap after each slash and nowhere else, so a long joined pair fits a
 // narrow card without the browser cutting inside one of the names.
