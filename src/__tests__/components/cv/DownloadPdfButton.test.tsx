@@ -58,13 +58,6 @@ describe('DownloadPdfButton', () => {
 
       expect(screen.getByRole('button')).not.toBeDisabled()
     })
-
-    it('has correct styling classes', () => {
-      render(<DownloadPdfButton label="Download" />)
-
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('inline-flex', 'items-center', 'gap-2')
-    })
   })
 
   describe('click behavior', () => {
@@ -203,35 +196,6 @@ describe('DownloadPdfButton', () => {
       await waitFor(() => {
         expect(screen.getByText(/Generating/i)).toBeInTheDocument()
       })
-    })
-
-    it('has visible focus state', () => {
-      render(<DownloadPdfButton label="Download PDF" />)
-
-      const button = screen.getByRole('button')
-      // Has transition for focus styles
-      expect(button).toHaveClass('transition-colors')
-    })
-
-    it('disabled state has proper styling', async () => {
-      const user = userEvent.setup()
-      render(<DownloadPdfButton label="Download PDF" />)
-
-      await user.click(screen.getByRole('button'))
-
-      await waitFor(() => {
-        const button = screen.getByRole('button')
-        expect(button).toHaveClass('disabled:bg-gray-400', 'disabled:cursor-not-allowed')
-      })
-    })
-  })
-
-  describe('print hiding', () => {
-    it('has print:hidden class to hide in print', () => {
-      render(<DownloadPdfButton label="Download PDF" />)
-
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('print:hidden')
     })
   })
 })

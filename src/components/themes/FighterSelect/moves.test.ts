@@ -1,14 +1,13 @@
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { MAX_STEP, endMove, motionFor, nextSpecial, startSpecial, startWalk, type MoveState } from './moves'
-import { framesFor, type FighterPose } from './poses'
+import { FIGHTER_POSES, framesFor } from './poses'
 
-const POSES: FighterPose[] = ['stance', 'walk', 'walkBack', 'hadouken', 'shoryuken', 'tatsumaki', 'win', 'act']
 const REST: MoveState = { playing: null, last: null, step: 0 }
 
 describe('fighter moves', () => {
   it('gives every pose four frames and a key frame inside them', () => {
     for (const profession of PROFESSION_ORDER) {
-      for (const pose of POSES) {
+      for (const pose of FIGHTER_POSES) {
         expect(framesFor(pose, profession)).toHaveLength(4)
         expect(motionFor(pose, profession).key).toBeLessThan(4)
       }

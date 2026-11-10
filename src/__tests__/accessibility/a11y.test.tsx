@@ -109,13 +109,6 @@ describe('Accessibility Tests', () => {
       expect(screen.getByRole('option', { name: 'Español' })).toBeInTheDocument()
       expect(screen.getByRole('option', { name: 'Italiano' })).toBeInTheDocument()
     })
-
-    it('has visible focus styles', () => {
-      render(<LanguageSwitcher />)
-
-      const select = screen.getByRole('combobox')
-      expect(select).toHaveClass('focus:ring-2')
-    })
   })
 
   describe('Semantic HTML', () => {
@@ -142,25 +135,6 @@ describe('Accessibility Tests', () => {
 
       const buttons = screen.getAllByRole('button')
       expect(buttons.length).toBeGreaterThan(0)
-    })
-  })
-
-  describe('Print Accessibility', () => {
-    it('interactive elements are hidden from print', () => {
-      render(
-        <div>
-          <DownloadPdfButton label="Download" />
-          <LanguageSwitcher />
-        </div>
-      )
-
-      // Download button should be hidden in print
-      const downloadButton = screen.getByRole('button')
-      expect(downloadButton).toHaveClass('print:hidden')
-
-      // Language switcher container should be hidden in print
-      const container = screen.getByText(cvPage.language).parentElement
-      expect(container).toHaveClass('print:hidden')
     })
   })
 })

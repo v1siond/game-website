@@ -49,8 +49,11 @@ export interface Frame {
   fx?: Fx[]
 }
 
-export type FighterPose =
-  'stance' | 'walk' | 'walkBack' | 'hadouken' | 'shoryuken' | 'tatsumaki' | 'win' | 'punch' | 'hurt' | 'parry' | 'down' | 'act'
+export const FIGHTER_POSES = [
+  'stance', 'walk', 'walkBack', 'hadouken', 'shoryuken', 'tatsumaki', 'win', 'punch', 'hurt', 'parry', 'down', 'act',
+] as const
+
+export type FighterPose = (typeof FIGHTER_POSES)[number]
 
 export const CELL = { width: 160, height: 170, ground: 166 } as const
 
