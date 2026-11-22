@@ -201,14 +201,22 @@ const LEAF_TILE = {
 
 const VINE_PATH = 'M0 0 C-10 80 12 160 0 240 C-10 320 10 400 0 480 C-8 520 6 550 0 560'
 
+// The round leaves up the vine, turned out to alternate sides: x, y, angle.
+const VINE_LEAVES: ReadonlyArray<readonly [number, number, number]> = [
+  [14, 70, -30],
+  [40, 190, 30],
+  [14, 310, -30],
+  [40, 430, 30],
+]
+
 const VINE_TILE = {
   width: 220,
   height: 560,
   art: (
     <>
       <path d={VINE_PATH} transform="translate(26 0)" className={paint.vine} strokeWidth="5" />
-      {[70, 190, 310, 430].map((y, i) => (
-        <use key={y} href="#tp-broad" transform={at(i % 2 ? 40 : 14, y, 0.42, i % 2 ? 30 : -30)} />
+      {VINE_LEAVES.map(([x, y, angle]) => (
+        <use key={y} href="#tp-broad" transform={at(x, y, 0.42, angle)} />
       ))}
       <use href="#tp-frond" transform={at(0, 260, 1.15, 18)} className={paint.back} />
       <path d={VINE_PATH} transform="translate(84 -120)" className={paint.vine} strokeWidth="3" opacity="0.7" />
@@ -276,11 +284,12 @@ const CAVE_CORNER = (
   </>
 )
 
-// The hoard: bunches heaped into a mound in the corner, stalagmites round it.
+// The hoard: bunches heaped into a mound in the corner, stalagmites round it. Rows of 6, 4, 3 and 1
+// bunches, each row starting at its first bunch's index and set half a bunch in from the one under it.
+const ROW_STARTS = [0, 6, 10, 13]
 const HOARD = Array.from({ length: 14 }, (_, i) => {
-  const row = i < 6 ? 0 : i < 10 ? 1 : i < 13 ? 2 : 3
-  const first = [0, 6, 10, 13][row]
-  return { x: 40 + (i - first) * 44 + row * 22, y: 186 - row * 30 }
+  const row = ROW_STARTS.filter((start) => i >= start).length - 1
+  return { x: 40 + (i - ROW_STARTS[row]) * 44 + row * 22, y: 186 - row * 30 }
 })
 
 const CAVE_GROUND = (

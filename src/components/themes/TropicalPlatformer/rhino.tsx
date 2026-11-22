@@ -18,13 +18,21 @@ import charge from './rhino.module.css'
 
 const CHARGE_BUTTON = jungleButton({ tone: 'wood', size: 'large' })
 
+// His four legs, every other one the far side's, darker, trotting a beat apart.
+const LEGS = [
+  { x: 30, fill: C.rhino, pair: charge.legA },
+  { x: 44, fill: C.rhinoDark, pair: charge.legB },
+  { x: 72, fill: C.rhino, pair: charge.legA },
+  { x: 86, fill: C.rhinoDark, pair: charge.legB },
+]
+
 // The rhino side on, facing right: grey hide, a big ivory horn, a small one behind it, four trotting legs.
 export function Rhino() {
   return (
     <svg viewBox="0 0 120 70" className="block h-auto w-full" aria-hidden="true" focusable="false">
       <ellipse cx="58" cy="66" rx="44" ry="3.5" fill={C.shadow} opacity="0.35" />
-      {[30, 44, 72, 86].map((x, i) => (
-        <rect key={x} x={x} y="44" width="10" height="20" rx="4" fill={i % 2 ? C.rhinoDark : C.rhino} className={i % 2 ? charge.legB : charge.legA} />
+      {LEGS.map(({ x, fill, pair }) => (
+        <rect key={x} x={x} y="44" width="10" height="20" rx="4" fill={fill} className={pair} />
       ))}
       <path d="M18 34 C18 18 38 12 62 13 C84 14 98 22 100 34 C100 46 88 52 60 52 C34 52 18 48 18 34 Z" fill={C.rhino} />
       <path d="M24 40 C40 48 80 48 98 38" fill="none" stroke={C.rhinoDark} strokeWidth="2.5" opacity="0.6" />

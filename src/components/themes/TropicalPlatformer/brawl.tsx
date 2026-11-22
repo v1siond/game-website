@@ -5,7 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
-import { fillLabel } from '@/lib/cv/labels'
+import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
 import { StatusLine, jungleButton } from './buttons'
 import { HeroCharacter } from './character'
@@ -28,6 +28,13 @@ type Phase = 'ready' | 'walk' | 'hit'
 const PHASE_MS: Record<Exclude<Phase, 'ready'>, number> = { walk: 1000, hit: 700 }
 const FIGHT_BUTTON = jungleButton({ tone: 'gold', size: 'wide' })
 const NEXT: Record<Exclude<Phase, 'ready'>, Phase> = { walk: 'hit', hit: 'ready' }
+
+// What the status says after `won` foes: nothing before the first, the last one won, or the whole round.
+function boutStatus(won: number, achievements: readonly string[], jungle: Labels['jungle']): string {
+  if (won === 0) return ''
+  if (won >= achievements.length) return jungle.allBeaten
+  return fillLabel(jungle.beaten, { achievement: achievements[won - 1] })
+}
 
 function Burst({ solid }: { solid: boolean }) {
   return (
@@ -97,15 +104,18 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
   const [won, setWon] = useState(0)
   const [phase, setPhase] = useState<Phase>('ready')
   const all = won >= achievements.length
-  const status = won === 0 ? '' : all ? jungle.allBeaten : fillLabel(jungle.beaten, { achievement: achievements[won - 1] })
+  const status = boutStatus(won, achievements, jungle)
 
   // One bout: the chain of phases, or straight to the win under reduced motion. After the last foe the
   // round starts again.
   const fight = () => {
     if (phase !== 'ready' || achievements.length === 0) return
     if (all) setWon(0)
-    if (prefersReducedMotion()) setWon((count) => count + 1)
-    else setPhase('walk')
+    if (!prefersReducedMotion()) {
+      setPhase('walk')
+      return
+    }
+    setWon((count) => count + 1)
   }
 
   useEffect(() => {

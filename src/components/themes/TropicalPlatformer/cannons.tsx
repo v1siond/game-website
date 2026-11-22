@@ -182,7 +182,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
     () => new Set(holders.flatMap((holder, index) => (visited.has(holder) || (triggered && holder === 0) ? [index] : []))),
     [holders, visited, triggered],
   )
-  // The letters waiting on each job, one list per job, kept while no letter is found.
+  // The letters waiting on each job, one list per job, the same lists until a letter is found.
   const coinsByJob = useMemo(
     () => jobs.map((_, job) => holders.flatMap((holder, index): Coin[] => (holder === job ? [{ index, letter: letters[index], found: found.has(index) }] : []))),
     [jobs, holders, letters, found],
