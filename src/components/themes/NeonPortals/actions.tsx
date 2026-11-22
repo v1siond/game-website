@@ -4,7 +4,7 @@ import { FACE } from './cards'
 
 // The world's buttons: chunky rounded crate plates in the game's capitals. Email is the gold of the title,
 // LinkedIn the blue pad, the CV and the engine are wood plates. A scene's button is the same plate, 44 px
-// tall, disabled while its scene plays.
+// tall, aria-disabled while its scene plays.
 
 const PLATE =
   'inline-flex min-h-[44px] items-center justify-center gap-2 rounded-full border-[3px] px-5 py-2 text-base tracking-wide shadow-[0_4px_0_var(--np-ink)] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 motion-reduce:transition-none'
@@ -37,10 +37,15 @@ interface SceneButtonProps {
   className?: string
 }
 
-/** A scene's own button: replays it or plays its next step. */
+/** A scene's own button: replays it or plays its next step. While it cannot be pressed it says so
+ *  (aria-disabled) and refuses the press, but keeps keyboard focus, so Tab goes on from it. */
 export function SceneButton({ label, onPress, disabled = false, className = '' }: SceneButtonProps) {
+  const press = () => {
+    if (disabled) return
+    onPress()
+  }
   return (
-    <button type="button" onClick={onPress} disabled={disabled} className={`${PLATE} ${FACE} ${WOOD} disabled:opacity-60 ${className}`}>
+    <button type="button" onClick={press} aria-disabled={disabled} className={`${PLATE} ${FACE} ${WOOD} aria-disabled:cursor-default aria-disabled:opacity-60 ${className}`}>
       {label}
     </button>
   )
