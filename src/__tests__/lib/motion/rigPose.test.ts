@@ -1,4 +1,4 @@
-import { STAND, handAt, mix, walk, type ArmPivots } from '@/lib/motion/rigPose'
+import { STAND, footAt, handAt, mix, walk, type ArmPivots, type LegPivots } from '@/lib/motion/rigPose'
 import { rigJoints, setRigPose } from '@/components/themes/shared/rig'
 
 // The pose math every jointed theatre hero shares, and its writer on a figure built the way a world draws one.
@@ -31,6 +31,28 @@ describe('walk', () => {
   it('swings the arm on the other side of the lifted knee', () => {
     expect(walk(0.5).armLeft).toBeGreaterThan(0)
     expect(walk(0.5).armRight).toBeCloseTo(0)
+  })
+})
+
+describe('walk in profile', () => {
+  const leg: LegPivots = { hip: [50, 95], knee: [50, 118], foot: [50, 142] }
+  const footX = (phase: number, facing: 1 | -1, side: 'Right' | 'Left') => {
+    const pose = walk(phase, facing)
+    return footAt(leg, pose[`thigh${side}`], pose[`shin${side}`])[0]
+  }
+
+  it.each([1, -1] as const)('steps forward as the phase rises, facing %i: the swinging foot moves the way he faces', (facing) => {
+    // the right leg swings through the first half step, the left through the second
+    expect(Math.sign(footX(0.4, facing, 'Right') - footX(0.1, facing, 'Right'))).toBe(facing)
+    expect(Math.sign(footX(1.4, facing, 'Left') - footX(1.1, facing, 'Left'))).toBe(facing)
+  })
+
+  it('plants the other foot, which slides back under him as he moves on', () => {
+    expect(Math.sign(footX(0.4, 1, 'Left') - footX(0.1, 1, 'Left'))).toBe(-1)
+  })
+
+  it('keeps the front view stride with no facing: knees lift, no leg swings sideways', () => {
+    expect(walk(0.5)).toMatchObject({ thighRight: 0, thighLeft: 0, kneeRight: 1 })
   })
 })
 
