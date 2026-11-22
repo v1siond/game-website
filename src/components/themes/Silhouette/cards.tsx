@@ -7,6 +7,7 @@ import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
@@ -55,6 +56,18 @@ const DASH_LIST: MarkedLinesLook = {
   ),
 }
 
+// A job's skills, ruled in the edge grey.
+const SKILL_TAGS: TagListLook = {
+  list: 'mt-2 flex flex-wrap gap-1.5',
+  tag: 'border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim-text)]',
+}
+
+// A project's technologies, on the black.
+const TECH_TAGS: TagListLook = {
+  list: 'mt-2 flex flex-wrap gap-1.5',
+  tag: 'bg-[color:var(--sh-black)] px-1.5 py-0.5 text-sm uppercase tracking-wider text-[color:var(--sh-muted-text)]',
+}
+
 // Every field of the job's card, the years in the label ("2019 to 2022").
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { years, cards } = useLabels()
@@ -76,15 +89,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       </div>
       {job.description && <p className={`mt-2 ${CARD_BODY}`}>{job.description}</p>}
       <MarkedLines items={job.highlights} label={cards.keyAchievements} look={DASH_LIST} />
-      {job.skills.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {job.skills.map((skill) => (
-            <span key={skill} className="border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim-text)]">
-              {skill}
-            </span>
-          ))}
-        </div>
-      )}
+      <TagList items={job.skills} label={cards.skillsUsed} look={SKILL_TAGS} />
     </article>
   )
 }
@@ -113,13 +118,7 @@ export function ProjectCard({ project: entry, links }: ProjectSlot) {
           {project.impact}
         </p>
       )}
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {project.techStack.map((tech) => (
-          <span key={tech} className="bg-[color:var(--sh-black)] px-1.5 py-0.5 text-sm uppercase tracking-wider text-[color:var(--sh-muted-text)]">
-            {tech}
-          </span>
-        ))}
-      </div>
+      <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={TECH_TAGS} />
       {links.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {links.map(({ kind, label, linkProps }) => (

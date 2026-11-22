@@ -3,6 +3,7 @@
 import { useMemo, useState, type AnimationEvent } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
 import { jobCard } from '@/lib/cv/cvView'
@@ -31,6 +32,12 @@ import bump from './jobBump.module.css'
 // reduced motion he stands on the ledge at once and no card bumps.
 
 const LEDGE_HEIGHT = 44
+
+// A job's skills on dashed tags.
+const SKILL_TAGS: TagListLook = {
+  list: 'mt-3 flex flex-wrap gap-1.5',
+  tag: 'rounded-sm border border-dashed border-[color:var(--ap-ink-soft)] px-2 py-0.5 text-sm',
+}
 
 // A job's highlights as coin rows on its paper card.
 const COIN_ROWS: MarkedLinesLook = {
@@ -106,15 +113,7 @@ function JobCard({ job, stop, onPoint }: { job: Job; stop: number; onPoint: () =
       </div>
       {card.description && <p className="text-sm text-[color:var(--ap-ink-soft)]">{card.description}</p>}
       <MarkedLines items={card.highlights} label={cards.keyAchievements} look={COIN_ROWS} />
-      {card.skills.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.skillsUsed}>
-          {card.skills.map((skill) => (
-            <li key={skill} className="rounded-sm border border-dashed border-[color:var(--ap-ink-soft)] px-2 py-0.5 text-sm">
-              {skill}
-            </li>
-          ))}
-        </ul>
-      )}
+      <TagList items={card.skills} label={cards.skillsUsed} look={SKILL_TAGS} />
     </article>
   )
 }

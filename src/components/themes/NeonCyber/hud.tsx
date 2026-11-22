@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { headingId } from '@/lib/cv/sectionText'
+import type { TagListLook } from '@/components/cv/TagList'
 import world from './world.module.css'
 
 // The optics HUD chrome every section sits in: a glass panel with one clipped corner and its red
@@ -53,11 +54,8 @@ export function HudPanel({ title, children, tools = null, className = '' }: HudP
   )
 }
 
-/** A chip of tech or skills, square, the data cyan on glass. */
-export function DataChip({ children }: { children: ReactNode }) {
-  return (
-    <li className="border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color-mix(in_srgb,var(--neon-data)_8%,transparent)] px-2 py-0.5 text-sm text-[color:var(--neon-data-text)]">
-      {children}
-    </li>
-  )
+/** Chips of tech, skills or services, square, the data cyan on glass. */
+export const DATA_CHIPS: TagListLook = {
+  list: 'flex flex-wrap gap-1',
+  tag: 'border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color-mix(in_srgb,var(--neon-data)_8%,transparent)] px-2 py-0.5 text-sm text-[color:var(--neon-data-text)]',
 }

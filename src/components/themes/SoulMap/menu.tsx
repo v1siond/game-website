@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
+import type { TagListLook } from '@/components/cv/TagList'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -16,6 +17,9 @@ export const CARD_TITLE = `${CARVED} text-base uppercase tracking-[0.14em] text-
 export const CARD_META = 'text-sm tracking-wide text-[color:var(--soul-text-soft)]'
 export const CARD_BODY = 'text-sm leading-relaxed text-[color:var(--soul-text)]'
 export const TAG = `${ashen.slot} inline-block px-2 py-0.5 text-sm text-[color:var(--soul-text-soft)]`
+
+/** A card's item slots: a job's skills, a project's technologies, a message's services. */
+export const TAGS: TagListLook = { list: 'mt-3 flex flex-wrap gap-1.5', tag: TAG }
 
 // A list in the card body type, each line behind the small ember diamond the world marks its points with.
 export const EMBER_LIST: MarkedLinesLook = {

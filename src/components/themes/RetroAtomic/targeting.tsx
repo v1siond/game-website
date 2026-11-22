@@ -14,7 +14,8 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { AtomicChip, PHOSPHOR_BUTTON, PLUS_ROWS } from './controls'
+import { TagList } from '@/components/cv/TagList'
+import { ATOMIC_CHIPS, PHOSPHOR_BUTTON, PLUS_ROWS } from './controls'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
 import { cssVars } from '@/lib/cssVars'
@@ -155,11 +156,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
 
       {project.techStack.length > 0 && (
         <Part tag={cards.tech}>
-          <ul className="mt-3 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <AtomicChip key={tech}>{tech}</AtomicChip>
-            ))}
-          </ul>
+          <TagList items={project.techStack} label={cards.technologiesUsed} look={ATOMIC_CHIPS} />
         </Part>
       )}
 
@@ -243,13 +240,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
 
         <MarkedLines items={project.details} label={cards.details} look={{ ...PLUS_ROWS, list: 'mt-5 space-y-1' }} />
 
-        {project.techStack.length > 0 && (
-          <ul className="mt-5 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <AtomicChip key={tech}>{tech}</AtomicChip>
-            ))}
-          </ul>
-        )}
+        <TagList items={project.techStack} label={cards.technologiesUsed} look={{ ...ATOMIC_CHIPS, list: 'mt-5 flex flex-wrap gap-2' }} />
 
         {links.length > 0 && (
           <div className="mt-5 flex flex-wrap gap-3">

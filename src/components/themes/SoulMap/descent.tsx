@@ -1,6 +1,7 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -11,7 +12,7 @@ import type { Job } from '@/lib/cv/content'
 import { Knight } from './knight'
 import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, TAG } from './menu'
+import { CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, TAGS } from './menu'
 import { CARVED, SOUL } from './palette'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
@@ -118,15 +119,7 @@ function JobStop({ job: entry, order }: { job: Job; order: number }) {
         {job.location && <p className={`mt-1 ${CARD_META}`}>{job.location}</p>}
         {job.description && <p className={`mt-3 ${CARD_BODY}`}>{job.description}</p>}
         <MarkedLines items={job.highlights} label={cards.keyAchievements} look={EMBER_LIST} />
-        {job.skills.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-1.5" aria-label={cards.skillsUsed}>
-            {job.skills.map((skill) => (
-              <li key={skill} className={TAG}>
-                {skill}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={job.skills} label={cards.skillsUsed} look={{ ...TAGS, list: 'mt-4 flex flex-wrap gap-1.5' }} />
       </div>
     </article>
   )

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -10,7 +11,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { ORANGE_POINTS } from './stage'
+import { INKED_TAGS, ORANGE_POINTS } from './stage'
 import cel from './cel.module.css'
 
 // Work Experience as the town's bounty board: each job a notice pinned to the planks, slapped on when it
@@ -49,15 +50,7 @@ function Notice({ job, index, onRead }: { job: Job; index: number; onRead: (id: 
         </p>
         <p className="mt-3 text-base leading-relaxed">{card.description}</p>
         <MarkedLines items={card.highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
-        {card.skills.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-            {card.skills.map((skill) => (
-              <li key={skill} className="border-2 border-[var(--cel-ink)] bg-[var(--cel-white)] px-2 py-0.5 text-sm font-bold">
-                {skill}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={card.skills} label={cards.skillsUsed} look={{ ...INKED_TAGS, list: 'mt-4 flex flex-wrap gap-2' }} />
       </div>
     </article>
   )

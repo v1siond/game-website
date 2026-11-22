@@ -4,7 +4,8 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { AtomicChip, PLUS_ROWS } from './controls'
+import { TagList } from '@/components/cv/TagList'
+import { ATOMIC_CHIPS, PLUS_ROWS } from './controls'
 import atomic from './atomic.module.css'
 import { cssVars } from '@/lib/cssVars'
 
@@ -44,13 +45,7 @@ function QuestCard({ job: entry, index }: { job: Job; index: number }) {
 
       <MarkedLines items={job.highlights} label={cards.keyAchievements} look={PLUS_ROWS} />
 
-      {job.skills.length > 0 && (
-        <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-          {job.skills.map((skill) => (
-            <AtomicChip key={skill}>{skill}</AtomicChip>
-          ))}
-        </ul>
-      )}
+      <TagList items={job.skills} label={cards.skillsUsed} look={{ ...ATOMIC_CHIPS, list: 'mt-4 flex flex-wrap gap-2' }} />
     </article>
   )
 }

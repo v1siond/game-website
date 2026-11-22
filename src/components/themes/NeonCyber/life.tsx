@@ -5,6 +5,7 @@ import type { CVData, MartialArts } from '@/lib/cv/content'
 import { ventureCard, type SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -15,7 +16,7 @@ import { useZoneStage } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
 import type { District } from './city'
 import { MercSprite, stillWhen, type MercMotion } from './merc'
-import { DataChip, HudPanel, hudButton } from './hud'
+import { DATA_CHIPS, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
 import { NEON } from './palette'
 import life from './life.module.css'
@@ -132,11 +133,7 @@ export function SandevistanStack({ techStack }: { techStack: SectionsOf<'enginee
                 <h3 id={headingId('nc-tech', category.name)} className="mb-2 text-sm uppercase tracking-wider text-[color:var(--neon-hud)]">
                   {category.name}
                 </h3>
-                <ul className="flex flex-wrap gap-1" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
-                  {category.items.map((tech) => (
-                    <DataChip key={tech}>{tech}</DataChip>
-                  ))}
-                </ul>
+                <TagList items={category.items} label={fillLabel(cards.categoryTechnologies, { name: category.name })} look={DATA_CHIPS} />
               </section>
             </li>
           ))}
@@ -237,13 +234,7 @@ export function FixerContracts({ companies: entries }: { companies: CVData['comp
                     <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>
                     <span className="mt-2 block text-sm text-[color:var(--neon-ice)]">{company.description}</span>
                   </a>
-                  {company.services.length > 0 && (
-                    <ul className="mt-2 flex flex-wrap gap-1" aria-label={sections.services}>
-                      {company.services.map((service) => (
-                        <DataChip key={service}>{service}</DataChip>
-                      ))}
-                    </ul>
-                  )}
+                  <TagList items={company.services} label={sections.services} look={{ ...DATA_CHIPS, list: 'mt-2 flex flex-wrap gap-1' }} />
                 </Scannable>
               </li>
             ))}

@@ -3,6 +3,7 @@
 import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ventureCard } from '@/lib/cv/cvView'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -26,6 +27,12 @@ import shade from './shade.module.css'
 
 const TITLE = 'text-sm font-bold uppercase tracking-[0.25em] text-[color:var(--sh-heading)]'
 const META = 'text-sm tracking-wider text-[color:var(--sh-muted-text)]'
+
+// A sign's services, ruled in the rim grey in the meta type.
+const SERVICE_TAGS: TagListLook = {
+  list: 'mt-3 flex flex-wrap gap-1.5',
+  tag: `border border-[color:var(--sh-rim)] px-1.5 py-0.5 uppercase ${META}`,
+}
 
 const ROOFTOPS =
   'M0 60 V34 H40 V22 H58 V34 H96 V14 H104 V6 H110 V14 H122 V30 H170 V18 H210 V40 H250 V26 H262 V10 H270 V26 H300 V36 H350 V20 H392 V44 H430 V28 H470 V16 H486 V28 H520 V38 H560 V24 H600 V60 Z'
@@ -128,15 +135,7 @@ export function VentureSigns({ companies: entries }: { companies: CVData['compan
                 </h3>
                 <p className={`mt-1 ${META}`}>{company.tagline}</p>
                 <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-text)]">{company.description}</p>
-                {company.services.length > 0 && (
-                  <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={sections.services}>
-                    {company.services.map((service) => (
-                      <li key={service} className={`border border-[color:var(--sh-rim)] px-1.5 py-0.5 uppercase ${META}`}>
-                        {service}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <TagList items={company.services} label={sections.services} look={SERVICE_TAGS} />
                 {company.url && <span className="sr-only"> {newTabHint(links)}</span>}
               </Sign>
             </li>

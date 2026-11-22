@@ -13,7 +13,8 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { usePreview } from '@/themes/PreviewContext'
 import { SceneButton } from './actions'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { BODY, CARD_LINE, CARD_TITLE, PANEL, POINTS, Tags } from './cards'
+import { TagList } from '@/components/cv/TagList'
+import { BODY, CARD_LINE, CARD_TITLE, PANEL, POINTS, TAGS } from './cards'
 import { PATH, RUN_MS, postAt, postX, type Motion } from './choreography'
 import { ERA, PORTAL, type Era } from './palette'
 import { Region, Rig, Strip } from './stage'
@@ -92,7 +93,7 @@ function JobPlate({ card }: { card: JobCard }) {
         </p>
         <p className="mt-2 text-sm leading-relaxed">{card.description}</p>
         <MarkedLines items={card.highlights} label={cards.keyAchievements} look={POINTS} />
-        <Tags items={card.skills} label={cards.skillsUsed} />
+        <TagList items={card.skills} label={cards.skillsUsed} look={TAGS} />
       </div>
     </article>
   )

@@ -11,7 +11,8 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { MARK_LIST, PinnedTags, STAMP } from './cards'
+import { TagList } from '@/components/cv/TagList'
+import { MARK_LIST, PINNED_TAGS, STAMP } from './cards'
 import horror from './horror.module.css'
 import look from './world.module.css'
 
@@ -133,7 +134,7 @@ function JobFile({ job: entry, isRead, onRead, onPoint }: { job: Job; isRead: bo
           </div>
         </>
       )}
-      <PinnedTags items={job.skills} label={cards.skillsUsed} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={PINNED_TAGS} />
     </article>
   )
 }

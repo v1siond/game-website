@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -12,7 +13,7 @@ import { VentureList, type VentureSlot } from '@/components/cv/VentureList'
 import { Knight } from './knight'
 import { useRunActions } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
-import { CARD_BODY, TAG } from './menu'
+import { CARD_BODY, TAGS } from './menu'
 import { CARVED } from './palette'
 import souls from './souls.module.css'
 
@@ -46,7 +47,7 @@ function Scribe({ writing }: { writing: boolean }) {
 
 function Slab({ slot: { venture, linkProps, nameFor } }: { slot: VentureSlot }) {
   const run = useRunActions()
-  const { souls: words, links, cards } = useLabels()
+  const { souls: words, links, cards, sections } = useLabels()
   const [appraised, setAppraised] = useState(false)
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
@@ -75,15 +76,7 @@ function Slab({ slot: { venture, linkProps, nameFor } }: { slot: VentureSlot }) 
         <p className="mt-1 text-sm italic text-[color:var(--soul-message)]">{venture.tagline}</p>
       </div>
       {venture.description && <p className={`mt-3 ${CARD_BODY}`}>{venture.description}</p>}
-      {venture.services.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5">
-          {venture.services.map((service) => (
-            <li key={service} className={TAG}>
-              {service}
-            </li>
-          ))}
-        </ul>
-      )}
+      <TagList items={venture.services} label={sections.services} look={TAGS} />
       <div className="mt-4 flex flex-wrap gap-2">
         <button
           type="button"

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type AnimationEvent, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -35,6 +36,12 @@ type Company = CVData['companies'][number]
 type Act = 'rest' | 'walk' | 'pull'
 
 const COLUMNS = 3
+
+// A banner's services, each on a gold ruled tag in the bright gold capitals.
+const GOLD_TAGS: TagListLook = {
+  list: 'mt-5 flex flex-wrap justify-center gap-2',
+  tag: 'border border-[color:var(--deco-gold)] px-2 py-0.5 text-sm uppercase tracking-[0.12em] text-[color:var(--deco-gold-bright-text)]',
+}
 
 const MOTION: Record<Act, DecoMotion> = { rest: 'idle', walk: 'walk', pull: 'pull' }
 
@@ -98,15 +105,7 @@ function Banner({ company: entry, open, wave, onTassel }: { company: Company; op
             <p className="mt-4 text-base text-[color:var(--deco-cream)]">{company.description}</p>
             <span className="sr-only"> {newTabHint(links)}</span>
           </a>
-          {company.services.length > 0 && (
-            <ul className="mt-5 flex flex-wrap justify-center gap-2" aria-label={sections.services}>
-              {company.services.map((service) => (
-                <li key={service} className="border border-[color:var(--deco-gold)] px-2 py-0.5 text-sm uppercase tracking-[0.12em] text-[color:var(--deco-gold-bright-text)]">
-                  {service}
-                </li>
-              ))}
-            </ul>
-          )}
+          <TagList items={company.services} label={sections.services} look={GOLD_TAGS} />
           <span className={`absolute inset-x-0 bottom-0 h-4 ${v.roll}`} aria-hidden="true" />
         </div>
       </div>

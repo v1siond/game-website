@@ -7,7 +7,8 @@ import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { LOOK, NOIR_BUTTON } from './actions'
 import { GlassStar, HitStar } from './backdrop'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { BULLETS, Chips } from './cards'
+import { TagList } from '@/components/cv/TagList'
+import { BULLETS, CHIPS } from './cards'
 import { Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -165,7 +166,7 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
           </p>
         )}
         <MarkedLines items={project.details} label={labels.cards.details} look={{ ...BULLETS, list: 'mt-4 space-y-1.5' }} />
-        {project.techStack.length > 0 && <Chips items={project.techStack} label={labels.sections.techStack} className="mt-4" />}
+        <TagList items={project.techStack} label={labels.sections.techStack} look={{ ...CHIPS, list: 'mt-4 flex flex-wrap gap-1.5' }} />
         <div className="mt-6 flex flex-wrap gap-3">
           {links.map((link) => (
             <a

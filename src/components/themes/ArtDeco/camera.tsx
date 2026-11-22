@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -93,6 +94,8 @@ const BLOOD_DIAMONDS: MarkedLinesLook = {
   ),
 }
 
+const TECH_TAGS: TagListLook = { list: 'mt-3 flex flex-wrap gap-2', tag: `px-2 py-0.5 text-sm ${camera.tech}` }
+
 const BRACKETS = ['left-0 top-0 border-l-2 border-t-2', 'right-0 top-0 border-r-2 border-t-2', 'bottom-0 left-0 border-b-2 border-l-2', 'bottom-0 right-0 border-b-2 border-r-2']
 
 function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
@@ -132,15 +135,7 @@ function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
               {project.impact}
             </p>
           )}
-          {project.techStack.length > 0 && (
-            <ul className="mt-3 flex flex-wrap gap-2" aria-label={labels.cards.technologiesUsed}>
-              {project.techStack.map((tech) => (
-                <li key={tech} className={`px-2 py-0.5 text-sm ${camera.tech}`}>
-                  {tech}
-                </li>
-              ))}
-            </ul>
-          )}
+          <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={TECH_TAGS} />
           <div className="mt-4 flex flex-wrap items-center gap-2">
             {links.map(({ kind, label, linkProps }) => (
               <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center px-3 text-sm uppercase tracking-[0.12em] ${camera.link}`}>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -16,7 +17,7 @@ import { useRunActions } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, TAG } from './menu'
+import { CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, TAGS } from './menu'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
@@ -127,15 +128,7 @@ function ItemCard({ project: entry, links }: ProjectSlot) {
             {project.impact}
           </p>
         )}
-        {project.techStack.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <li key={tech} className={TAG}>
-                {tech}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={project.techStack} label={cards.technologiesUsed} look={TAGS} />
         <div className="mt-4 flex flex-wrap gap-2">
           <PickUp project={project} picked={picked} onPick={() => setPicked(true)} />
           {links.map(({ kind, label, linkProps }) => (

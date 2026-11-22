@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
 import { jobCard } from '@/lib/cv/cvView'
@@ -13,7 +14,7 @@ import type { Job } from '@/lib/cv/content'
 import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { SUN_POINTS } from './boards'
+import { SUN_POINTS, WOOD_TAGS } from './boards'
 import { StatusLine } from './buttons'
 import { HeroCharacter } from './character'
 import { ExtraLifeBalloon, HiddenCoin, LetterTracker } from './letterCoin'
@@ -138,15 +139,7 @@ const Platform = memo(function Platform({ entry, coins, index, armed, occupied, 
 
       <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SUN_POINTS} />
 
-      {job.skills.length > 0 && (
-        <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-          {job.skills.map((skill) => (
-            <li key={skill} className={`rounded-lg px-2 py-1 text-sm ${look.tag}`}>
-              {skill}
-            </li>
-          ))}
-        </ul>
-      )}
+      <TagList items={job.skills} label={cards.skillsUsed} look={WOOD_TAGS} />
     </article>
   )
 })

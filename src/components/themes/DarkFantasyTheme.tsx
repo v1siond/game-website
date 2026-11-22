@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
@@ -1016,7 +1017,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project: entry, links } 
           <ImpactLabel />{project.impact}
         </p>
       )}
-      <TagList label={cards.technologiesUsed} tags={project.techStack} className="mt-3" />
+      <TagList items={project.techStack} label={cards.technologiesUsed} look={SOUL_TAGS} />
       {links.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
           {links.map(({ kind, label, linkProps }) => (
@@ -1068,7 +1069,7 @@ const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVD
         </div>
       </div>
       <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{company.description}</p>
-      {company.services.length > 0 && <TagList label={sections.services} tags={company.services} className="mt-3" />}
+      <TagList items={company.services} label={sections.services} look={SOUL_TAGS} />
       <span className="sr-only"> {newTabHint(links)}</span>
     </a>
   )
@@ -1114,16 +1115,9 @@ const BandCard = memo(function BandCard({ band, years, linkProps, release }: Ban
 
 // A row of tags in the soul light, the look the project cards give their technologies (the ethereal at alpha
 // 0x12, 18 of 255).
-function TagList({ label, tags, className = '' }: { label: string; tags: string[]; className?: string }) {
-  return (
-    <ul className={`flex flex-wrap gap-1 ${className}`} aria-label={label}>
-      {tags.map((tag) => (
-        <li key={tag} className="text-sm px-1 py-0.5 bg-[color-mix(in_srgb,var(--df-ethereal)_7.0588%,transparent)] text-[color:var(--df-silver-text)]">
-          {tag}
-        </li>
-      ))}
-    </ul>
-  )
+const SOUL_TAGS: TagListLook = {
+  list: 'flex flex-wrap gap-1 mt-3',
+  tag: 'text-sm px-1 py-0.5 bg-[color-mix(in_srgb,var(--df-ethereal)_7.0588%,transparent)] text-[color:var(--df-silver-text)]',
 }
 
 // Work experience card: every field of the job's card, the years in the label ("2019 to 2022").
@@ -1148,7 +1142,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
       </div>
       {job.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{job.description}</p>}
       <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SPIRIT_LINES} />
-      {job.skills.length > 0 && <TagList label={cards.skillsUsed} tags={job.skills} className="mt-3" />}
+      <TagList items={job.skills} label={cards.skillsUsed} look={SOUL_TAGS} />
       {!isLast && (
         <div
           className="mt-4"

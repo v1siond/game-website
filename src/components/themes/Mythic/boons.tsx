@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -14,7 +15,7 @@ import type { Project } from '@/lib/cv/content'
 import { BOONS_PER_WAVE, rarityOf, waveOf, type Rarity } from './fates'
 import { SlabButton } from './buttons'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { BLOOD_POINTS } from './stage'
+import { BLOOD_POINTS, GOLD_TAGS } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -94,15 +95,7 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
             {project.impact}
           </p>
         )}
-        {project.techStack.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <li key={tech} className="border border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm">
-                {tech}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={project.techStack} label={cards.technologiesUsed} look={GOLD_TAGS} />
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <SlabButton
             tone={chosen ? 'gold' : 'stone'}

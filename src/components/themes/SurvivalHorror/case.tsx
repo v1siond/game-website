@@ -14,7 +14,8 @@ import { useOnChange } from '@/hooks/useOnChange'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { MARK_LIST, PinnedTags, STAMP } from './cards'
+import { TagList } from '@/components/cv/TagList'
+import { MARK_LIST, PINNED_TAGS, STAMP } from './cards'
 import { SH } from './palette'
 import horror from './horror.module.css'
 import look from './world.module.css'
@@ -124,7 +125,7 @@ function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
           {project.impact}
         </p>
       )}
-      <PinnedTags items={project.techStack} label={fillLabel(cards.categoryTechnologies, { name: project.name })} />
+      <TagList items={project.techStack} label={fillLabel(cards.categoryTechnologies, { name: project.name })} look={PINNED_TAGS} />
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
         {links.map(({ kind, label, linkProps }) => (
           <a key={kind} {...linkProps} className={LINK_PLATE}>

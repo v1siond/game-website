@@ -10,6 +10,7 @@ import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
@@ -35,19 +36,7 @@ function CornerTicks() {
   )
 }
 
-function Chips({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-
-  return (
-    <ul className="mt-3 flex flex-wrap gap-1" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={CHIP}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
-}
+const CHIPS: TagListLook = { list: 'mt-3 flex flex-wrap gap-1', tag: CHIP }
 
 export function TechBubbleCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
@@ -90,7 +79,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       {job.location && <p className={`italic ${BODY}`}>{job.location}</p>}
       {job.description && <p className={`mb-2 mt-2 ${BODY}`}>{job.description}</p>}
       <MarkedLines items={job.highlights} label={cards.keyAchievements} look={STAR_LINES} />
-      <Chips items={job.skills} label={cards.skillsUsed} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={CHIPS} />
     </article>
   )
 }
@@ -122,7 +111,7 @@ export function VintagePoster({ project: entry, links, noLink }: ProjectSlot) {
           {project.impact}
         </p>
       )}
-      <Chips items={project.techStack} label={labels.cards.technologiesUsed} />
+      <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={CHIPS} />
       {links.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-3">
           {links.map(({ kind, label, linkProps }) => (
@@ -166,7 +155,7 @@ export function CompanyPoster({ venture, linkProps }: VentureSlot) {
         </div>
       </div>
       <p className={BODY}>{company.description}</p>
-      <Chips items={company.services} label={sections.services} />
+      <TagList items={company.services} label={sections.services} look={CHIPS} />
       {linkProps && <span className="sr-only"> {newTabHint(links)}</span>}
     </a>
   )

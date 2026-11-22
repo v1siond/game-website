@@ -1,9 +1,11 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { newTabHint } from '@/lib/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
 import { MYTH } from './palette'
+import { GOLD_TAGS } from './stage'
 import u from './underworld.module.css'
 
 // The ventures as keepsakes in the cabinet: each company a gold token resting on its velvet slot, its
@@ -21,7 +23,7 @@ const TOKENS = [
 ]
 
 function Keepsake({ company, index }: { company: Company; index: number }) {
-  const { cards } = useLabels()
+  const { cards, sections } = useLabels()
 
   return (
     <div className="flex h-full flex-col">
@@ -45,15 +47,7 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
         </h3>
         {company.tagline && <p className="mt-1 text-base italic text-[var(--myth-gold-pale)]">{company.tagline}</p>}
         <p className="mt-2 text-base leading-relaxed">{company.description}</p>
-        {company.services.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.details}>
-            {company.services.map((service) => (
-              <li key={service} className="border border-[var(--myth-gold-deep)] px-2 py-0.5 text-sm">
-                {service}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={company.services} label={sections.services} look={{ ...GOLD_TAGS, tag: 'border border-[var(--myth-gold-deep)] px-2 py-0.5 text-sm' }} />
       </div>
     </div>
   )

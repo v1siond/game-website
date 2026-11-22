@@ -7,6 +7,7 @@ import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
@@ -32,18 +33,7 @@ function FightCard({ accent, children }: { accent: Accent; children: ReactNode }
   )
 }
 
-function Tags({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="flex flex-wrap gap-2" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={TAG}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
-}
+const TAGS: TagListLook = { list: 'flex flex-wrap gap-2', tag: TAG }
 
 /** Lines marked with a hit spark: a job's highlights, a project's details, the About highlights. */
 export const SPARK_LINES: MarkedLinesLook = {
@@ -72,7 +62,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 
       <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SPARK_LINES} />
 
-      <Tags items={job.skills} label={cards.skillsUsed} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={TAGS} />
     </FightCard>
   )
 }
@@ -104,7 +94,7 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
 
       <MarkedLines items={project.details} label={labels.cards.details} look={SPARK_LINES} />
 
-      <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
+      <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={TAGS} />
 
       {links.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-3">
@@ -179,7 +169,7 @@ export function VentureCard({ company: entry }: { company: CVData['companies'][n
         <p className={`mt-4 ${BODY}`}>{company.description}</p>
         {company.services.length > 0 && (
           <div className="mt-4">
-            <Tags items={company.services} label={sections.services} />
+            <TagList items={company.services} label={sections.services} look={TAGS} />
           </div>
         )}
         <span className="sr-only"> {newTabHint(links)}</span>

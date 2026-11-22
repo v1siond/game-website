@@ -7,7 +7,8 @@ import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { ventureCard } from '@/lib/cv/cvView'
-import { AtomicChip } from './controls'
+import { TagList } from '@/components/cv/TagList'
+import { ATOMIC_CHIPS } from './controls'
 import { BAKELITE, CHROME, CREAM, OLIVE_DARK, RUBBER, STEEL_LIGHT } from './palette'
 import atomic from './atomic.module.css'
 import { cssVars } from '@/lib/cssVars'
@@ -110,13 +111,7 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
               )}
               <p className="text-sm font-bold text-atomic-yellow">{company.tagline}</p>
               <p className="mt-1 text-sm leading-relaxed text-atomic-ash">{company.description}</p>
-              {company.services.length > 0 && (
-                <ul className="mt-3 flex flex-wrap gap-2" aria-label={sections.services}>
-                  {company.services.map((service) => (
-                    <AtomicChip key={service}>{service}</AtomicChip>
-                  ))}
-                </ul>
-              )}
+              <TagList items={company.services} label={sections.services} look={ATOMIC_CHIPS} />
               <span className="sr-only"> {newTabHint(links)}</span>
             </div>
           </a>

@@ -8,6 +8,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { HitStar } from './backdrop'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
@@ -31,17 +32,10 @@ const CROOKS = [
 export const orderVars = (index: number): CSSProperties =>
   ({ '--i': index, '--tilt': `${index % 2 ? 1.5 : -1.5}deg`, '--crook': CROOKS[index % CROOKS.length] }) as CSSProperties
 
-/** A named list of tag chips; `className` places it in its card. */
-export function Chips({ items, label, className = 'mt-3' }: { items: string[]; label: string; className?: string }) {
-  return (
-    <ul className={`${className} flex flex-wrap gap-1.5`} aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={CHIP}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
+/** A card's tag chips. */
+export const CHIPS: TagListLook = {
+  list: 'mt-3 flex flex-wrap gap-1.5',
+  tag: CHIP,
 }
 
 /** Rows behind a red diamond, the highlights or details of a card, in the dim paper of a slab (the About
@@ -63,7 +57,7 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
             <HitStar className="h-5 w-5" />
             {category.name}
           </h3>
-          <Chips items={category.items} label={fillLabel(cards.categoryTechnologies, { name: category.name })} />
+          <TagList items={category.items} label={fillLabel(cards.categoryTechnologies, { name: category.name })} look={CHIPS} />
         </li>
       ))}
     </ul>
@@ -91,7 +85,7 @@ export function RankCard({ entry, index }: { entry: Job; index: number }) {
         {job.location && <p className={`mt-1 text-sm font-bold text-[color:var(--noir-fog)] ${world.copy}`}>{job.location}</p>}
         {job.description && <p className={`mt-3 ${BODY}`}>{job.description}</p>}
         <MarkedLines items={job.highlights} label={cards.keyAchievements} look={BULLETS} />
-        {job.skills.length > 0 && <Chips items={job.skills} label={cards.skillsUsed} />}
+        <TagList items={job.skills} label={cards.skillsUsed} look={CHIPS} />
       </article>
     </div>
   )
@@ -156,7 +150,7 @@ export function CompanyTag({ company: entry }: { company: CVData['companies'][nu
         </span>
       </span>
       <span className={`mt-2 block ${BODY}`}>{company.description}</span>
-      {company.services.length > 0 && <Chips items={company.services} label={sections.services} />}
+      <TagList items={company.services} label={sections.services} look={CHIPS} />
       <span className="sr-only"> {newTabHint(links)}</span>
     </a>
   )

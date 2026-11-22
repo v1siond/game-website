@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { projectCard, type ProjectCard as ProjectCardView } from '@/lib/cv/cvView'
@@ -12,7 +13,7 @@ import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { BREACH_START, BUFFER_SIZE, MATRIX_SIZE, breachPuzzle, bufferBytes, byteText, canPick, matched, outcome, pick, type BreachOutcome } from './breach'
-import { DataChip, HUD_LINK, HudPanel, hudButton } from './hud'
+import { DATA_CHIPS, HUD_LINK, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
 import { MercSprite } from './merc'
 import world from './world.module.css'
@@ -302,13 +303,7 @@ function GigCard({ project: entry, links, noLink }: ProjectSlot) {
               {project.impact}
             </p>
           )}
-          {project.techStack.length > 0 && (
-            <ul className="mt-3 flex flex-wrap gap-1" aria-label={cards.technologiesUsed}>
-              {project.techStack.map((tech) => (
-                <DataChip key={tech}>{tech}</DataChip>
-              ))}
-            </ul>
-          )}
+          <TagList items={project.techStack} label={cards.technologiesUsed} look={{ ...DATA_CHIPS, list: 'mt-3 flex flex-wrap gap-1' }} />
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               ref={trigger}

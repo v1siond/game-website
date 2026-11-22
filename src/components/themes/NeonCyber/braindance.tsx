@@ -4,13 +4,14 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import type { Job } from '@/lib/cv/content'
 import type { Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { DataChip, HudPanel, hudButton } from './hud'
+import { DATA_CHIPS, HudPanel, hudButton } from './hud'
 import { MercSprite, stillWhen } from './merc'
 import { Scannable } from './scanner'
 import world from './world.module.css'
@@ -298,13 +299,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                       </header>
                       {job.description && <p className="mb-2 text-sm text-[color:var(--neon-ice)]">{job.description}</p>}
                       <MarkedLines items={job.highlights} label={labels.cards.keyAchievements} look={DATA_LINES} />
-                      {job.skills.length > 0 && (
-                        <ul className="flex flex-wrap gap-1" aria-label={labels.cards.skillsUsed}>
-                          {job.skills.map((skill) => (
-                            <DataChip key={skill}>{skill}</DataChip>
-                          ))}
-                        </ul>
-                      )}
+                      <TagList items={job.skills} label={labels.cards.skillsUsed} look={DATA_CHIPS} />
                     </article>
                   </Scannable>
                 </li>

@@ -13,7 +13,8 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
-import { BODY, CARD_LINE, CARD_TITLE, PANEL, Tags } from './cards'
+import { TagList } from '@/components/cv/TagList'
+import { BODY, CARD_LINE, CARD_TITLE, PANEL, TAGS } from './cards'
 import { restSpot } from '@/lib/motion/course'
 import { COLLECT, GEMS_IN, collectMotion } from './choreography'
 import { findId } from './finds'
@@ -114,7 +115,7 @@ function GemCard({ slot, colour, collected, flight, canCollect, onCollect, onLan
       </h3>
       <p className={`${CARD_LINE} mt-1`}>{venture.tagline}</p>
       <p className="mt-2 text-sm leading-relaxed">{venture.description}</p>
-      <Tags items={venture.services} label={sections.services} />
+      <TagList items={venture.services} label={sections.services} look={TAGS} />
       {canCollect && (
         <SceneButton label={fillLabel(actions.collect, { name: venture.name })} onPress={press} disabled={collected || flight !== null} className="mt-4" />
       )}

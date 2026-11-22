@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -28,6 +29,8 @@ import diary from './diary.module.css'
 // that is the content, not motion.
 
 const LINE_MS = 2200
+
+const SKILL_TAGS: TagListLook = { list: 'flex flex-wrap gap-2', tag: `px-2 py-1 text-sm ${diary.skill}` }
 
 // A job's highlights, each behind a diamond in the line's own colour, lit one by one as the diary plays.
 const DIARY_LINES: MarkedLinesLook = {
@@ -124,15 +127,7 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
       />
 
       <div className="relative mt-5 flex flex-wrap items-center justify-between gap-3">
-        {card.skills.length > 0 && (
-          <ul className="flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-            {card.skills.map((skill) => (
-              <li key={skill} className={`px-2 py-1 text-sm ${diary.skill}`}>
-                {skill}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={card.skills} label={cards.skillsUsed} look={SKILL_TAGS} />
         <button
           type="button"
           onClick={() => onToggle(entry.id)}

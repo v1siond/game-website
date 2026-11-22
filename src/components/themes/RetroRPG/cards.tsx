@@ -19,6 +19,7 @@ import { usePlay } from './play'
 import { Soul } from './soul'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MASONRY_TILES } from '@/lib/cv/masonry'
 import { ITEM, SentryPortrait, TALKS } from './rooms'
@@ -36,18 +37,7 @@ const TITLE = `text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-text)] 
 const META = `text-sm text-[color:var(--rpg-gold)] ${MONO}`
 const TAG = `border-2 border-[color:var(--rpg-border-shade)] px-2 py-0.5 text-sm text-[color:var(--rpg-sky)] ${MONO}`
 
-function Tags({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mt-4 flex flex-wrap gap-2" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={TAG}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
-}
+const TAGS: TagListLook = { list: 'mt-4 flex flex-wrap gap-2', tag: TAG }
 
 /** Lines the box speaks, each behind the asterisk: a job's highlights, a project's details, the About highlights. */
 export const SAID_LINES: MarkedLinesLook = {
@@ -93,7 +83,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           lineProps={(index) => ({ className: world.after, style: lineDelay(index) })}
         />
         <div className={SHOW_AFTER.last}>
-          <Tags items={job.skills} label={cards.skillsUsed} />
+          <TagList items={job.skills} label={cards.skillsUsed} look={TAGS} />
         </div>
       </article>
     </div>
@@ -164,7 +154,7 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
             </span>
           </p>
         )}
-        <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
+        <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={TAGS} />
         {links.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map(({ kind, label, linkProps }) => (
@@ -191,7 +181,7 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
 // gold pixel tag over the name. The link drops the slot's short name and is named by everything the box
 // shows, its services included, plus the new tab note a screen reader alone hears.
 export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
-  const { cards, links } = useLabels()
+  const { cards, links, sections } = useLabels()
 
   return (
     <a
@@ -216,13 +206,7 @@ export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
         </div>
       </div>
       <p className={`mb-3 ${BODY}`}>{company.description}</p>
-      <div className="flex flex-wrap gap-2">
-        {company.services.map((service) => (
-          <span key={service} className={TAG}>
-            {service}
-          </span>
-        ))}
-      </div>
+      <TagList items={company.services} label={sections.services} look={{ ...TAGS, list: 'flex flex-wrap gap-2' }} />
       {linkProps && <span className="sr-only"> {newTabHint(links)}</span>}
     </a>
   )
