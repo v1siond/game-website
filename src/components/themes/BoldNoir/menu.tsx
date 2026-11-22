@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
+import { useOnChange } from '@/hooks/useOnChange'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -74,15 +75,12 @@ function EyeStrip({ profession }: { profession: Profession }) {
  */
 function CutIn({ profession }: { profession: Profession }) {
   const reducedMotion = useReducedMotion()
-  const shown = useRef(profession)
   const [playing, setPlaying] = useState<Profession | null>(null)
 
-  useEffect(() => {
-    if (shown.current === profession) return
-    shown.current = profession
+  useOnChange(profession, (picked) => {
     if (reducedMotion) return
-    setPlaying(profession)
-  }, [profession, reducedMotion])
+    setPlaying(picked)
+  })
 
   if (!playing) return null
 

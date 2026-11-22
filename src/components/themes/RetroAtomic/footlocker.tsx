@@ -1,8 +1,9 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { useMemo, type CSSProperties, type ReactNode } from 'react'
 import type { CVData } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { useTimedSteps } from '@/hooks/useTimedSteps'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { DwellerSprite, HOIST_GRIP, VIEW, turn, type Point } from './dweller'
@@ -76,15 +77,9 @@ const CARRY = {
 
 /** How many pockets have landed: none until the pour starts, then one more every POCKET_MS. */
 function useLanded(on: boolean, total: number, instant: boolean) {
-  const [landed, setLanded] = useState(0)
-
-  useEffect(() => {
-    if (instant || !on || landed >= total) return
-    const timer = window.setTimeout(() => setLanded((count) => count + 1), landed === 0 ? POUR_MS + POCKET_MS : POCKET_MS)
-    return () => window.clearTimeout(timer)
-  }, [on, landed, total, instant])
-
-  return instant ? total : landed
+  const pockets = useMemo(() => Array.from({ length: total }, () => POCKET_MS), [total])
+  // Step n is pocket n + 1 landed, so before the first step none has.
+  return useTimedSteps(pockets, { on, reduced: instant, firstMs: POUR_MS + POCKET_MS }) + 1
 }
 
 /** The olive drab footlocker seen from the front: steel corners, a brass latch, the lid on its side hinge. */

@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { useMemo, type CSSProperties, type ReactNode } from 'react'
+import { useTimedSteps } from '@/hooks/useTimedSteps'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { DogSprite, type DogMotion } from './dog'
 import { DUST, DUST_DARK, POSTER_INK } from './palette'
@@ -10,7 +11,7 @@ import j from './journey.module.css'
 // over the first cassette's column, pitches nose down and digs with the clods flying off his paws; the
 // spot leaves its mound and that holotape rises out of the ground. Then the next spot, and the next; after
 // the last tape he trots past its mound and sits beside it, tail on the ground, looking up. The steps run
-// in setTimeout phases from the tape count (TROT_MS per move, DIG_MS per dig); `children` gets the dug
+// as the shared timed steps from the tape count (TROT_MS per move, DIG_MS per dig); `children` gets the dug
 // count. Under reduced motion all the tapes are up and he sits at the end.
 
 const TROT_MS = 700
@@ -42,20 +43,13 @@ const spotAt = (spot: number, tapes: number) => (spot + 0.5) / Math.max(1, tapes
 export function Dig({ tapes, on, children }: { tapes: number; on: boolean; children: (dug: number) => ReactNode }) {
   const { reduced } = useZoneStageContext()
   const steps = useMemo(() => digSteps(tapes), [tapes])
-  const [step, setStep] = useState(-1)
+  const durations = useMemo(() => steps.map(({ ms }) => ms), [steps])
+  const step = useTimedSteps(durations, { on, reduced, firstMs: 0 })
 
-  useEffect(() => {
-    if (reduced || !on || step >= steps.length - 1) return
-    const timer = window.setTimeout(() => setStep((at) => at + 1), step < 0 ? 0 : steps[step].ms)
-    return () => window.clearTimeout(timer)
-  }, [on, step, steps, reduced])
-
-  const last = steps.length - 1
-  const current = reduced ? steps[last] : steps[step] ?? { spot: 0, motion: 'sit' as const, ms: 0 }
-  const shown = reduced ? last : step
+  const current = steps[step] ?? { spot: 0, motion: 'sit' as const, ms: 0 }
   // A tape is up once the dig step at its spot has finished, that is from the step after it.
-  const dug = steps.slice(0, Math.max(0, shown)).filter((past) => past.motion === 'dig').length
-  const at = step < 0 && !reduced ? 0 : spotAt(current.spot, tapes)
+  const dug = steps.slice(0, Math.max(0, step)).filter((past) => past.motion === 'dig').length
+  const at = step < 0 ? 0 : spotAt(current.spot, tapes)
 
   return (
     <>

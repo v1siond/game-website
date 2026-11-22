@@ -1,8 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { SectionCameo } from '../shared/SectionCameo'
 import { Detective, type DetectiveMotion } from './detective'
 import { NOIR } from './palette'
 import e from './evidence.module.css'
@@ -13,18 +12,17 @@ import e from './evidence.module.css'
 // - Case closed (services): he walks in from the right, brings the rubber stamp down on the dim case
 //   slabs; they punch down under it, the red ring flashes and fades, and they come up full.
 //
-// Pattern: the shared usePoseSequence plays walk, act and leave once the section is in view
-// (useSectionTrigger, so it plays once); every beat ends on the figure wrapper's own animationend, so
-// nothing is timed in React. The section's reaction is one CSS keyframe from the act on that ends at
-// the section's own resting place and look (evidence.module.css). Timing: walk 480 ms, act 620 ms (the
-// slap lands 350 ms in, the stamp 300 ms in), leave 520 ms. Reduced motion: no figure, the section rests
-// in place from the start.
+// Pattern: the shared SectionCameo plays walk, act and leave once the section is in view; every beat ends
+// on the figure wrapper's own animationend, so nothing is timed in React. The section's reaction is one
+// CSS keyframe from the act on that ends at the section's own resting place and look
+// (evidence.module.css). Timing: walk 480 ms, act 620 ms (the slap lands 350 ms in, the stamp 300 ms in),
+// leave 520 ms. Reduced motion: no figure, the section rests in place from the start.
 
-type Beat = 'walk' | 'act' | 'leave' | 'gone' | 'still'
+type Beat = 'walk' | 'act' | 'leave'
 
-const ENTRANCE: readonly Beat[] = ['walk', 'act', 'leave']
+const BEATS: readonly Beat[] = ['walk', 'act', 'leave']
 
-const MOTION: Record<Beat, DetectiveMotion> = { walk: 'walk', act: 'act', leave: 'walk', gone: 'still', still: 'still' }
+const MOTION: Record<Beat, DetectiveMotion> = { walk: 'walk', act: 'act', leave: 'walk' }
 
 interface CaseMoveProps {
   children: ReactNode
@@ -35,23 +33,24 @@ interface CaseMoveProps {
   prop?: ReactNode
 }
 
-function CaseMove({ children, side, reaction, prop }: CaseMoveProps) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
-  const { pose, onOwnAnimationEnd } = usePoseSequence<Beat>({ entrance: ENTRANCE, rest: 'gone', still: 'still' })
-  const shown = pose === 'walk' || pose === 'act' || pose === 'leave'
+const SIDE_PLACE: Record<CaseMoveProps['side'], string> = { left: 'left-0', right: 'right-0' }
 
+const detective = (beat: Beat) => <Detective profession="engineer" motion={MOTION[beat]} className={`h-full w-full ${e.facing}`} />
+
+function CaseMove({ children, side, reaction, prop }: CaseMoveProps) {
   return (
-    <div ref={ref} className={`relative ${e.stage}`} data-on={triggered || undefined} data-beat={pose} data-side={side}>
-      <div className={`relative ${reaction}`}>
-        {children}
-        {prop}
-      </div>
-      {triggered && shown && (
-        <div className={`pointer-events-none absolute bottom-0 z-30 h-32 w-20 ${side === 'left' ? 'left-0' : 'right-0'} ${e.figure}`} onAnimationEnd={onOwnAnimationEnd} aria-hidden="true">
-          <Detective profession="engineer" motion={MOTION[pose]} className={`h-full w-full ${e.facing}`} />
-        </div>
-      )}
-    </div>
+    <SectionCameo
+      beats={BEATS}
+      threshold={0.3}
+      stage={e.stage}
+      mark={{ 'data-side': side }}
+      reaction={reaction}
+      place={`bottom-0 h-32 w-20 ${SIDE_PLACE[side]} ${e.figure}`}
+      figure={detective}
+      prop={prop}
+    >
+      {children}
+    </SectionCameo>
   )
 }
 

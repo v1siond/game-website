@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { drumsSince, muayThaiFacts } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { useOnChange } from '@/hooks/useOnChange'
 import type { ProfessionSections } from '@/lib/cv/cvView'
 import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
@@ -103,15 +104,10 @@ const PROP: Record<Profession, () => ReactNode> = {
 function ClassStage({ profession }: { profession: Profession }) {
   const script = usePoseScript('act')
   const { replay } = script
-  const previous = useRef(profession)
 
   // A new class: out of the black he comes up off one knee in its gear, the way he comes back at a fire,
   // then takes up its work.
-  useEffect(() => {
-    if (previous.current === profession) return
-    previous.current = profession
-    replay([{ pose: 'respawn', ms: RESPAWN_MS }])
-  }, [profession, replay])
+  useOnChange(profession, () => replay([{ pose: 'respawn', ms: RESPAWN_MS }]))
 
   return (
     <div className={`relative aspect-[4/3] overflow-hidden ${ashen.panel}`}>

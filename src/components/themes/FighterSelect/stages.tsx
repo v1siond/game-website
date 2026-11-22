@@ -33,7 +33,7 @@ interface Onlooker {
   scale: number
 }
 
-function Crowd({ people, base }: { people: Onlooker[]; base: number }) {
+function StageCrowd({ people, base }: { people: Onlooker[]; base: number }) {
   return (
     <>
       {people.map(({ x, scale }, i) => (
@@ -76,7 +76,7 @@ const SERVER_HALL: Depth = {
       <rect x={250} y={70} width={140} height={60} fill={FS.panelLight} stroke={FS.cyan} strokeWidth={2} />
       <rect x={260} y={78} width={120} height={40} fill={FS.cyan} opacity={0.25} />
       <path d="M268 90 H320 M268 100 H350 M268 110 H300" stroke={FS.cyan} strokeWidth={3} />
-      <Crowd people={onlookers([120, 150, 186, 454, 490, 522])} base={150} />
+      <StageCrowd people={onlookers([120, 150, 186, 454, 490, 522])} base={150} />
     </>
   ),
   near: (
@@ -122,8 +122,8 @@ const CONCERT: Depth = {
   ),
   near: (
     <>
-      <Crowd people={onlookers(Array.from({ length: 12 }, (_, i) => 14 + i * 26))} base={200} />
-      <Crowd people={onlookers(Array.from({ length: 12 }, (_, i) => 340 + i * 26))} base={200} />
+      <StageCrowd people={onlookers(Array.from({ length: 12 }, (_, i) => 14 + i * 26))} base={200} />
+      <StageCrowd people={onlookers(Array.from({ length: 12 }, (_, i) => 340 + i * 26))} base={200} />
     </>
   ),
 }
@@ -161,7 +161,7 @@ const TEMPLE_RING: Depth = {
           <rect x={x - 4} y={27} width={8} height={14} rx={4} fill={FS.gold} />
         </g>
       ))}
-      <Crowd people={onlookers([40, 70, 100, 132, 508, 540, 572, 602])} base={150} />
+      <StageCrowd people={onlookers([40, 70, 100, 132, 508, 540, 572, 602])} base={150} />
     </>
   ),
   near: (

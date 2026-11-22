@@ -1,8 +1,7 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { SectionCameo } from '../shared/SectionCameo'
 import { VaultSprite, type SpriteMotion } from './sprite'
 import { CEL } from './palette'
 import m from './melee.module.css'
@@ -13,44 +12,47 @@ import m from './melee.module.css'
 // - Loot chest (services): he runs in to a red ammo chest and kicks it; the lid flips open and the
 //   services spring up out of it like a loot drop and settle.
 //
-// Pattern: the shared usePoseSequence plays run, the strike (leap or kick) and leave once the section is
-// in view (useSectionTrigger, so it plays once); every beat ends on the figure wrapper's own
-// animationend. The section's reaction is one CSS keyframe that ends at the section's own place and look
-// (melee.module.css). Timing: run 450 ms, leap 500 ms (the paper lands as it ends) or kick 480 ms (the lid
-// opens 240 ms in, the services spring out over the next 520 ms), leave 520 ms. Reduced motion: no
-// figure and no chest, the section rests in place from the start.
+// Pattern: the shared SectionCameo plays run, the strike (leap or kick) and leave once the section is in
+// view; every beat ends on the figure wrapper's own animationend. The section's reaction is one CSS
+// keyframe that ends at the section's own place and look (melee.module.css). Timing: run 450 ms, leap
+// 500 ms (the paper lands as it ends) or kick 480 ms (the lid opens 240 ms in, the services spring out
+// over the next 520 ms), leave 520 ms. Reduced motion: no figure and no chest, the section rests in place
+// from the start.
 
-type Beat = 'run' | 'strike' | 'leave' | 'gone' | 'still'
+type Beat = 'run' | 'strike' | 'leave'
 
-const ENTRANCE: readonly Beat[] = ['run', 'strike', 'leave']
+const BEATS: readonly Beat[] = ['run', 'strike', 'leave']
 
 interface MeleeProps {
   children: ReactNode
   strike: Extract<SpriteMotion, 'leap' | 'kick'>
   /** The section's reaction, a class of melee.module.css. */
   reaction: string
-  prop?: ReactNode
+  /** Beside him on the stage while he is there (the chest he kicks). */
+  aside?: ReactNode
 }
 
-function Melee({ children, strike, reaction, prop }: MeleeProps) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
-  const { pose, onOwnAnimationEnd } = usePoseSequence<Beat>({ entrance: ENTRANCE, rest: 'gone', still: 'still' })
-  const shown = pose === 'run' || pose === 'strike' || pose === 'leave'
-  const motion: SpriteMotion = pose === 'strike' ? strike : 'run'
+function Melee({ children, strike, reaction, aside }: MeleeProps) {
+  const fighter = (beat: Beat) => (
+    <>
+      <VaultSprite profession="engineer" motion={beat === 'strike' ? strike : 'run'} className="h-full w-full" />
+      <span className={`absolute -bottom-2 left-1/2 h-6 w-28 -translate-x-1/2 ${m.burst}`} />
+    </>
+  )
 
   return (
-    <div ref={ref} className={`relative ${m.stage}`} data-on={triggered || undefined} data-beat={pose} data-strike={strike}>
-      <div className={`relative ${reaction}`}>{children}</div>
-      {triggered && shown && (
-        <>
-          {prop}
-          <div className={`pointer-events-none absolute bottom-0 left-0 z-30 h-32 w-20 ${m.figure}`} onAnimationEnd={onOwnAnimationEnd} aria-hidden="true">
-            <VaultSprite profession="engineer" motion={motion} className="h-full w-full" />
-            <span className={`absolute -bottom-2 left-1/2 h-6 w-28 -translate-x-1/2 ${m.burst}`} />
-          </div>
-        </>
-      )}
-    </div>
+    <SectionCameo
+      beats={BEATS}
+      threshold={0.3}
+      stage={m.stage}
+      mark={{ 'data-strike': strike }}
+      reaction={reaction}
+      place={`bottom-0 left-0 h-32 w-20 ${m.figure}`}
+      figure={fighter}
+      aside={aside}
+    >
+      {children}
+    </SectionCameo>
   )
 }
 
@@ -78,7 +80,7 @@ const CHEST = (
 /** Services: kicked out of the loot chest. */
 export function LootChest({ children }: { children: ReactNode }) {
   return (
-    <Melee strike="kick" reaction={m.looted} prop={CHEST}>
+    <Melee strike="kick" reaction={m.looted} aside={CHEST}>
       {children}
     </Melee>
   )
