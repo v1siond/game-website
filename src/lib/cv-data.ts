@@ -2,6 +2,7 @@ import { execFile } from 'node:child_process'
 import { readFile, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
+import { cache } from 'react'
 import type { Locale } from '@/i18n/config'
 import { lastModifiedFrom } from './contentDate'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData } from './cv/content'
@@ -10,7 +11,8 @@ import { labelsFor, type Labels, type LabelsFile } from './cv/labels'
 export type { CVData } from './cv/content'
 
 // Decap edits these files (locally through decap-server, in production as commits), so they are read
-// on each render and an edit shows without a code change.
+// on each render and an edit shows without a code change. Each loader is cached per request (react
+// cache), so a page's metadata, its body and the document shell read a locale's files once between them.
 const CONTENT_DIR = join(process.cwd(), 'content', 'cv')
 
 const contentFilePath = (name: string): string => join(CONTENT_DIR, `${name}.json`)
@@ -21,17 +23,17 @@ const readContentFile = async (name: string): Promise<[string, unknown]> => [
 ]
 
 /** The CV of one locale, read from content/cv. Throws when a file is missing or is not valid JSON. */
-export async function getAllCVData(locale: Locale): Promise<CVData> {
+export const getAllCVData = cache(async (locale: Locale): Promise<CVData> => {
   const entries = await Promise.all(CV_CONTENT_FILES.map(readContentFile))
   return cvDataFrom(Object.fromEntries(entries) as CVContentFiles, locale)
-}
+})
 
 /** The interface text of one locale, read from content/cv/labels.json alone, for the document shell that
  *  renders around every page (the worlds launcher, hint and picker). */
-export async function getLabels(locale: Locale): Promise<Labels> {
+export const getLabels = cache(async (locale: Locale): Promise<Labels> => {
   const [, file] = await readContentFile('labels')
   return labelsFor(file as LabelsFile, locale)
-}
+})
 
 // The committer date of the last commit touching the content, or '' where git or the history is missing.
 const lastCommitDate = async (): Promise<string> => {

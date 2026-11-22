@@ -1,8 +1,14 @@
-import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getPost, latestPosts, listPosts } from '@/lib/blog/posts'
 import type { PostMeta } from '@/lib/blog/post'
+
+// readFile is wrapped, real underneath, so a case can count the files a loader opens.
+jest.mock('node:fs/promises', () => {
+  const actual = jest.requireActual('node:fs/promises')
+  return { ...actual, readFile: jest.fn(actual.readFile) }
+})
 
 // Post files written the way Decap's json-frontmatter format writes them (gray-matter with "{" and "}"
 // as the delimiters, the object's own braces trimmed), so the loader reads what /admin saves.
@@ -90,6 +96,30 @@ describe('getPost', () => {
   it('gives null for a draft in production and the draft in development', async () => {
     expect(await getPost('draft', { env: 'production', dir })).toBeNull()
     expect((await getPost('draft', { env: 'development', dir }))?.slug).toBe('draft')
+  })
+
+  it('reads only the one file of the slug', async () => {
+    jest.mocked(readFile).mockClear()
+    await getPost('published', { env: 'production', dir })
+    expect(jest.mocked(readFile).mock.calls.map(([path]) => path)).toEqual([join(dir, 'published.md')])
+  })
+
+  it('gives null for a slug with no file', async () => {
+    expect(await getPost('missing', { env: 'production', dir })).toBeNull()
+  })
+
+  it('never reads outside the blog folder', async () => {
+    const blog = join(dir, 'blog')
+    await mkdir(blog)
+    await writeFile(join(dir, 'labels.md'), decapFile(meta('labels', '2026-01-05', false), 'Outside the blog.'))
+    jest.mocked(readFile).mockClear()
+    expect(await getPost('../labels', { env: 'production', dir: blog })).toBeNull()
+    expect(jest.mocked(readFile)).not.toHaveBeenCalled()
+  })
+
+  it('gives null when the file names another slug than its own', async () => {
+    await writeFile(join(dir, 'renamed.md'), decapFile(meta('original', '2026-01-05', false), 'Body'))
+    expect(await getPost('renamed', { env: 'production', dir })).toBeNull()
   })
 })
 
