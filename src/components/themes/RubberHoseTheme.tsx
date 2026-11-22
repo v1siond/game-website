@@ -8,10 +8,10 @@ import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
-import { fillLabel } from '@/lib/cv/labels'
 import { HOSE, HOSE_VARS } from './RubberHose/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { FilmFrame, FilmGrain, RisingNotes } from './RubberHose/backdrop'
@@ -61,7 +61,7 @@ const CONTACT_HEADING = headingId('hose', 'Contact')
 export default function RubberHoseTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions, sections } = useLabels()
+  const { navigation, sections } = useLabels()
   const { cv, engine } = useSiteLinks('engine')
   const reducedMotion = useReducedMotion()
   const rootRef = usePointerVars(!reducedMotion)
@@ -125,12 +125,12 @@ export default function RubberHoseTheme() {
         </section>
 
         <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">
-          <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionRegion className="mx-auto max-w-6xl">
             <IrisWipe key={active}>
               <ProfessionSet profession={active} />
               <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
             </IrisWipe>
-          </div>
+          </ProfessionRegion>
         </main>
 
         <IsleStage isle="casino">
