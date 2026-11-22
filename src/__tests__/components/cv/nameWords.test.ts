@@ -1,4 +1,4 @@
-import { nameWords } from '@/lib/cv/nameWords'
+import { initialsOf, nameWords } from '@/lib/cv/nameWords'
 
 describe('nameWords', () => {
   it('splits the name into its words, each with where it starts in the name', () => {
@@ -17,5 +17,19 @@ describe('nameWords', () => {
 
   it('gives no words for an empty name', () => {
     expect(nameWords('')).toEqual([])
+  })
+})
+
+describe('initialsOf', () => {
+  it('takes the first letter of each word of the name', () => {
+    expect(initialsOf('Alexander Pulido')).toBe('AP')
+  })
+
+  it('skips runs of spaces', () => {
+    expect(initialsOf('  Alexander   Pulido ')).toBe('AP')
+  })
+
+  it('gives nothing for an empty name', () => {
+    expect(initialsOf('')).toBe('')
   })
 })
