@@ -62,8 +62,8 @@ function KnottedJob({ job, index }: { job: Job; index: number }) {
       <div
         className={`relative ${shade.knotHang} ${swing ? SWING[swing] : ''}`}
         onPointerEnter={(event) => {
-          // Read the side now: React clears currentTarget once the handler returns, so reading it
-          // inside a state updater (which runs later, while rendering) crashed the page.
+          // Read currentTarget before the handler returns: React clears it then, so a state updater,
+          // which runs later while rendering, must be handed the side already read.
           if (swing) return
           setSwing(swingAway(event))
         }}
