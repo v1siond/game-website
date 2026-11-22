@@ -17,6 +17,12 @@
     animation: slash-in 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
   }
 
+  /* A control's slash in: opaque and in place from the first frame, so it can be seen and focused while the cue
+     waits; armed, only its transform slides it in. */
+  .cue:not([data-scene-phase='idle']) .slashInSolid {
+    animation: slash-in-solid 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+  }
+
   .cue:not([data-scene-phase='idle']) .slashInRight {
     animation: slash-in-right 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
   }
@@ -185,6 +191,15 @@
   }
   to {
     opacity: 1;
+    transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+@keyframes slash-in-solid {
+  from {
+    transform: translate3d(-110%, 0, 0) skewX(-18deg);
+  }
+  to {
     transform: translate3d(0, 0, 0) skewX(0);
   }
 }
