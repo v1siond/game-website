@@ -188,7 +188,7 @@ const figureAt = (x: number): string => `translate(${(x - FIGURE_W / 2).toFixed(
 /** Him on the floor at `x` (his centre), in a profession's kit; the scene's writer moves and poses him. */
 export function Survivor({ x, profession }: { x: number; profession: Profession }) {
   return (
-    <g data-fx="survivor" data-worlds-figure="" transform={figureAt(x)}>
+    <g data-fx="survivor" transform={figureAt(x)}>
       <SurvivorSprite profession={profession} box={{ width: FIGURE_W, height: FIGURE_H }} />
     </g>
   )
