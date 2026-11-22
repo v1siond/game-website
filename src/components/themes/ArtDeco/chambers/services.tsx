@@ -1,6 +1,9 @@
+import { litOf } from '@/lib/scroll/propRow'
 import { fadeTo, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
+import { PropRow, propNodes } from '../../shared/propRow'
+import { Walker, walkerOf, type Chamber } from '../chamber'
+import { FLOOR } from '../city'
 import { lift } from '../pose'
 
 // Services: the telekinesis hall. A sealed crate of the city stands on the floor for each service; as each
@@ -35,7 +38,7 @@ export const services: Chamber = {
   light: C.bolt,
   floor: ({ xs, profession }) => (
     <>
-      <PropRow xs={xs} art={() => <Crate />} light={() => <Telekinesis />} />
+      <PropRow xs={xs} floor={FLOOR} art={() => <Crate />} light={() => <Telekinesis />} />
       <Walker xs={xs} profession={profession} />
     </>
   ),

@@ -1,6 +1,8 @@
+import { litOf } from '@/lib/scroll/propRow'
 import { fadeTo, fx, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
+import { PropRow, propNodes } from '../../shared/propRow'
+import { Walker, walkerOf, type Chamber } from '../chamber'
 import { Canvas, FLOOR } from '../city'
 import { grip } from '../pose'
 
@@ -67,6 +69,7 @@ export const projects: Chamber = {
     <>
       <PropRow
         xs={xs}
+        floor={FLOOR}
         art={(_i, size) => <Valve size={size} />}
         light={(_i, size) => <Flowing size={size} />}
       />

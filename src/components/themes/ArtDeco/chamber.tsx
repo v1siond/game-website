@@ -2,10 +2,9 @@ import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { mix } from '@/lib/motion/rigPose'
 import { walkAlong } from '@/lib/scroll/walkAlong'
-import { ramp } from '@/lib/scroll/stage'
 import { fx } from '../shared/stageNodes'
 import type { StageWriter } from '../shared/theatre/useTheatre'
-import { FLOOR, Survivor, placeSurvivor } from './city'
+import { Survivor, placeSurvivor } from './city'
 import { decoJoints, setDecoPose, walk, type DecoPose } from './pose'
 
 // What every chamber of the city is: its light, an optional set of its own between the hall and the floor,
@@ -60,43 +59,4 @@ export function walkerOf(stage: ParentNode, { xs, profession }: ChamberInput, ac
     if (!joints) return
     setDecoPose(joints, mix(act(profession, amount, at), walk(profession, x / STEP), moving))
   }
-}
-
-/** How lit prop `i` is, 0 to 1, `reached` cards in: it lights as his act on it lands and stays lit. */
-export const litOf = (reached: number, i: number): number => ramp(reached - i, 0.35, 0.5)
-
-/** One prop's nodes: the art that moves and the light over it. */
-export interface PropNodes {
-  move: Element | null
-  lit: Element | null
-}
-
-/** Every prop's nodes, found once. */
-export const propNodes = (stage: ParentNode, count: number): PropNodes[] =>
-  Array.from({ length: count }, (_, i) => ({ move: fx(stage, `move-${i}`), lit: fx(stage, `lit-${i}`) }))
-
-// A prop is drawn whole while its neighbours stand at least PROP_ROOM apart, and shrinks to fit a closer row,
-// down to PROP_MIN of its size.
-const PROP_ROOM = 140
-const PROP_MIN = 0.4
-
-/** How big the props of a row are drawn: whole when they have room, smaller in a long row. */
-export const propSize = (xs: readonly number[]): number => (xs.length < 2 ? 1 : Math.max(PROP_MIN, Math.min(1, (xs[1] - xs[0]) / PROP_ROOM)))
-
-/** The props on the floor, each drawn round its foot at the floor (x 0, y 0) at the row's size: its art,
- *  and its light hidden until he acts on it. */
-export function PropRow({ xs, art, light }: { xs: readonly number[]; art: (i: number, size: number) => ReactNode; light: (i: number, size: number) => ReactNode }) {
-  const size = propSize(xs)
-  return (
-    <>
-      {xs.map((x, i) => (
-        <g key={i} transform={`translate(${x} ${FLOOR}) scale(${size.toFixed(3)})`}>
-          <g data-fx={`move-${i}`}>{art(i, size)}</g>
-          <g data-fx={`lit-${i}`} opacity="0">
-            {light(i, size)}
-          </g>
-        </g>
-      ))}
-    </>
-  )
 }

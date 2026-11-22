@@ -1,6 +1,8 @@
+import { litOf } from '@/lib/scroll/propRow'
 import { fadeTo, transformTo } from '../../shared/stageNodes'
 import { DECO_COLORS as C } from '../palette'
-import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
+import { PropRow, propNodes } from '../../shared/propRow'
+import { Walker, walkerOf, type Chamber } from '../chamber'
 import { Canvas, FLOOR } from '../city'
 import { strike } from '../pose'
 
@@ -50,6 +52,7 @@ export const muayThai: Chamber = {
     <>
       <PropRow
         xs={xs}
+        floor={FLOOR}
         art={() => (
           <>
             <circle cx={0} cy={HOOK + 40} r={14} fill={C.brassShadow} />
