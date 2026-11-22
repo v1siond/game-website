@@ -170,11 +170,6 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
-  // He starts in the first job's barrel, so its letter is found as the run opens.
-  useEffect(() => {
-    if (triggered) setVisited((current) => (current.has(0) ? current : new Set(current).add(0)))
-  }, [triggered])
-
   useEffect(() => {
     if (!focusAfterLanding.current) return
     focusAfterLanding.current = false
@@ -220,7 +215,9 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   if (jobs.length === 0) return null
   const nextName = jobName(jobs[(at + 1) % jobs.length], labels)
-  const found = new Set(holders.flatMap((holder, index) => (visited.has(holder) ? [index] : [])))
+  // He starts in the first job's barrel, so its letter is found as the run opens.
+  const reached = (job: number) => visited.has(job) || (triggered && job === 0)
+  const found = new Set(holders.flatMap((holder, index) => (reached(holder) ? [index] : [])))
   const complete = letters.length > 0 && found.size === letters.length
   const coinsOn = (job: number): Coin[] =>
     holders.flatMap((holder, index) => (holder === job ? [{ index, letter: letters[index], found: found.has(index) }] : []))

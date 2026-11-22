@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
@@ -22,26 +22,20 @@ export const JOLTED = quake.item
 
 export function GroundSlap({ children }: { children: ReactNode }) {
   const { jungle } = useLabels()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.15 })
   const [slaps, setSlaps] = useState(0)
   const [slapping, setSlapping] = useState(false)
   const timer = useRef(0)
-  const started = useRef(false)
 
-  const slap = useCallback(() => {
+  const slap = () => {
     setSlaps((count) => count + 1)
     if (prefersReducedMotion()) return
     setSlapping(true)
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setSlapping(false), SLAP_MS)
-  }, [])
+  }
 
   // The first slap plays once, on arrival; a later one comes from the button.
-  useEffect(() => {
-    if (!triggered || started.current) return
-    started.current = true
-    slap()
-  }, [triggered, slap])
+  const { ref } = useSectionTrigger({ threshold: 0.15, onEnter: slap })
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 

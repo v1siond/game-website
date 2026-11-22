@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -92,10 +92,8 @@ function Clearing({ phase, round }: { phase: Phase; round: number }) {
 export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
   const { jungle } = useLabels()
   const { achievements } = martialArts.primary
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.25 })
   const [won, setWon] = useState(0)
   const [phase, setPhase] = useState<Phase>('ready')
-  const started = useRef(false)
   const all = won >= achievements.length
   const status = won === 0 ? '' : all ? jungle.allBeaten : fillLabel(jungle.beaten, { achievement: achievements[won - 1] })
 
@@ -119,12 +117,7 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
   }, [phase])
 
   // The first bout plays once, when the section arrives.
-  useEffect(() => {
-    if (!triggered || started.current || achievements.length === 0) return
-    started.current = true
-    if (prefersReducedMotion()) setWon(1)
-    else setPhase('walk')
-  }, [triggered, achievements.length])
+  const { ref } = useSectionTrigger({ threshold: 0.25, onEnter: fight })
 
   return (
     <div ref={ref} className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto]">

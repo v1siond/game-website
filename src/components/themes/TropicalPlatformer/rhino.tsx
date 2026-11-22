@@ -1,6 +1,6 @@
 'use client'
 
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useState, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { HeroCharacter } from './character'
@@ -41,16 +41,9 @@ export const RAMMED = charge.item
 
 export function RhinoCharge({ children }: { children: ReactNode }) {
   const { jungle } = useLabels()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
   const [charges, setCharges] = useState(0)
-  const started = useRef(false)
-
   // The first charge runs once, on arrival.
-  useEffect(() => {
-    if (!triggered || started.current) return
-    started.current = true
-    setCharges(1)
-  }, [triggered])
+  const { ref } = useSectionTrigger({ threshold: 0.2, onEnter: () => setCharges(1) })
 
   return (
     <div ref={ref} data-charging={charges > 0 || undefined} className={charge.trail}>
