@@ -9,6 +9,7 @@ import battle from './battle.module.css'
 import bugMotion from './bug.module.css'
 import { DARK_FANTASY } from './palette'
 import { cssVars } from '@/lib/cssVars'
+import { cycles } from '@/components/themes/shared/loops'
 
 /**
  * BATTLE REVEAL ANIMATION
@@ -62,6 +63,9 @@ const PHASE_TIMING = {
   'content-settled': 2100,
   'complete': 2500,
 }
+
+// The bug trembles from bug-tremble to bug-death, 50 ms a shake.
+const TREMBLES = (PHASE_TIMING['bug-death'] - PHASE_TIMING['bug-tremble']) / 50
 
 // What each phase shows beside the fighters: the slash arc, the hit burst and splatter, the bug's hit flash and
 // tremble, the death burst and screen shake, and the blood pool.
@@ -148,7 +152,7 @@ const BUG_POSES: Record<AnimationPhase, CSSProperties> = {
     transform: 'translateX(0) translateY(0) rotateZ(0deg)',
     opacity: 1,
     transition: moveAndFade('500ms ease-out'),
-    animation: `${battle.bugWander} 600ms ease-in-out infinite`,
+    animation: `${battle.bugWander} 600ms ease-in-out 1 forwards`,
   },
   'knight-dash': { transition: BUG_EASE, transform: 'translateX(0) translateY(0) rotateZ(0deg)', opacity: 1 },
   'slash': BUG_RECOIL,
@@ -157,7 +161,7 @@ const BUG_POSES: Record<AnimationPhase, CSSProperties> = {
   'bug-tremble': {
     transform: 'translateX(20px) translateY(-8px) rotateZ(-8deg) scale(0.95)',
     opacity: 1,
-    animation: `${battle.bugTremble} 50ms ease-in-out infinite`,
+    animation: `${battle.bugTremble} 50ms ease-in-out ${TREMBLES} forwards`,
     transition: 'none',
   },
   // It pops up and flips as the death burst goes off
@@ -358,7 +362,7 @@ export const BattleReveal = memo(function BattleReveal({
                 width: 80,
                 height: 16,
                 background: 'radial-gradient(ellipse, rgba(15,10,26,0.5) 0%, transparent 70%)',
-                animation: `${battle.shadowBreathing} 2s ease-in-out infinite`,
+                animation: `${battle.shadowBreathing} 2s ease-in-out 1 forwards`,
               }}
             />
           </div>
@@ -416,7 +420,7 @@ export const BattleReveal = memo(function BattleReveal({
             style={{
               ...DEAD_LIE_VAR,
               transform: DEAD_LIE,
-              animation: phase === 'complete' ? `${battle.bloodPoolPulse} 3s ease-in-out infinite` : undefined,
+              animation: phase === 'complete' ? cycles(battle.bloodPoolPulse, 3, 'ease-in-out', PHASE_TIMING.complete / 1000) : undefined,
             }}
           >
             <BloodPool />

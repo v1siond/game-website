@@ -20,6 +20,9 @@ import shade from './shade.module.css'
 // Animated: his parts, his flip, one fall per achievement.
 
 const LAND_MS = 600
+// A record line falls 80 ms after the one before it over 0.5 s (shade.module.css), so the 57th and every one
+// after it fall together, all within 5 s of the room showing however many lines there are.
+const LAST_FALL_STEP = 56
 
 const CRIMSON = SKY.crimson
 const ROOTS = 'M0 0 H600 V18 Q560 22 540 18 L536 34 L530 18 Q470 24 420 18 L414 40 L408 18 Q300 26 220 18 L214 30 L208 18 Q120 22 80 18 L76 44 L70 18 Q40 20 0 18 Z'
@@ -91,7 +94,7 @@ export function GravityRecord({ martialArts }: { martialArts: MartialArts }) {
               <span
                 key={flips}
                 className={`flex items-start gap-1.5 border-l-2 border-[color:var(--sh-rim)] bg-[color:var(--sh-night)] p-2 ${triggered ? fall : 'opacity-0'}`}
-                style={{ '--i': index } as CSSProperties}
+                style={{ '--i': Math.min(index, LAST_FALL_STEP) } as CSSProperties}
               >
                 <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
                   -

@@ -2,7 +2,10 @@
  * The overworld rooms (rooms.tsx): every section opens with him in a small room doing that room's event,
  * then the content shows. The room's beat is data-room on its root: idle (not yet seen), walk, act, done;
  * data-shown turns true at the first done and stays. The game runs on a locked frame clock, so every move
- * is steps(), never an ease. Transform and opacity only.
+ * is steps(), never an ease. Transform and opacity only. A room's own life waits until the room's beat
+ * starts (heldUntil on its root) and every loop plays a set number of times inside 5 s of that, a hover's
+ * inside 5 s of the hover, and holds a frame of its move. The backdrop zones' life plays only while its zone
+ * is on show, the first 5 s of each fall or rise once, from the place each starts in, and holds there.
  */
 
 /* ---- him: frames and the walk ---- */
@@ -25,11 +28,11 @@
 }
 
 [data-room='walk'] .stepA {
-  animation: frameA 320ms steps(1, end) infinite;
+  animation: frameA 320ms steps(1, end) 15 forwards;
 }
 
 [data-room='walk'] .stepB {
-  animation: frameB 320ms steps(1, end) infinite;
+  animation: frameB 320ms steps(1, end) 15 forwards;
 }
 
 [data-room='idle'] .rest,
@@ -41,11 +44,11 @@
 }
 
 [data-room='act'] .actA {
-  animation: frameA 500ms steps(1, end) infinite;
+  animation: frameA 500ms steps(1, end) 9 forwards;
 }
 
 [data-room='act'] .actB {
-  animation: frameB 500ms steps(1, end) infinite;
+  animation: frameB 500ms steps(1, end) 9 forwards;
 }
 
 /* The actor walks from --walk-from to --walk-to along the floor (--walk-y), a tile a step. */
@@ -90,7 +93,7 @@
 }
 
 .monsterBob {
-  animation: bob 900ms steps(1, end) infinite;
+  animation: bob 900ms steps(1, end) 5 forwards;
 }
 
 @keyframes shake {
@@ -268,7 +271,7 @@
 
 .shop:has(.item:hover) .keeper,
 .shop:has(.item:focus-visible) .keeper {
-  animation: hop 300ms steps(2, end) infinite;
+  animation: hop 300ms steps(2, end) 16 forwards;
 }
 
 /* ---- Projects: the switch puzzle ---- */
@@ -312,7 +315,7 @@
 
 .steam {
   opacity: 0;
-  animation: steam 1800ms steps(6, end) infinite;
+  animation: steam 1800ms steps(6, end) 2 forwards;
 }
 
 .steam:nth-of-type(2) {
@@ -346,7 +349,7 @@
 }
 
 .taxi {
-  animation: drive 5200ms steps(40, end) infinite;
+  animation: drive 4800ms steps(40, end) 1 forwards;
 }
 
 /* ---- Bands: echo flowers ring as he passes ---- */
@@ -426,7 +429,7 @@
 }
 
 .falls {
-  animation: fall var(--fall-ms, 9000ms) steps(60, end) var(--fall-at, 0ms) infinite;
+  animation: fall var(--fall-ms, 9000ms) steps(60, end) var(--fall-at, 0ms) var(--fall-n, 1) forwards;
 }
 
 @keyframes riseUp {
@@ -437,7 +440,7 @@
 
 .rises {
   opacity: 0;
-  animation: riseUp 6000ms steps(30, end) var(--fall-at, 0ms) infinite;
+  animation: riseUp 6000ms steps(30, end) var(--fall-at, 0ms) var(--fall-n, 1) forwards;
 }
 
 @keyframes flicker {
@@ -446,7 +449,7 @@
 }
 
 .flicker {
-  animation: flicker 1200ms steps(1, end) infinite;
+  animation: flicker 1200ms steps(1, end) 4 forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

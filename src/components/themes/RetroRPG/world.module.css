@@ -185,14 +185,15 @@
   animation: spriteTurn 320ms steps(4, end) both;
 }
 
-/* The two frame idle of a pixel sprite: he bobs two pixels down and back, never a smooth breath. */
+/* The two frame idle of a pixel sprite: he bobs two pixels down and back, never a smooth breath, four
+   times, and stands. */
 @keyframes idle {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(2px); }
 }
 
 .idle {
-  animation: idle 1000ms steps(1, end) infinite;
+  animation: idle 1000ms steps(1, end) 4 forwards;
 }
 
 /* The screen flashes white once: a profession switch, a save. */
@@ -255,7 +256,7 @@
 
 .target:hover .meterLine,
 .target:focus-within .meterLine {
-  animation: sweep 1200ms steps(30, end) infinite;
+  animation: sweep 1200ms steps(30, end) 4 forwards;
 }
 
 /* The slash a strike plays (cards.tsx animates it): red, gold on a critical strike. */
@@ -329,7 +330,8 @@
 
 /* ---- the save point ---- */
 
-/* The save star turns like a sprite and its glow flickers. Clicked, it spins fast once. */
+/* The save star turns like a sprite and its glow flickers, four turns once the save point shows, then it
+   rests face on, its glow low. Clicked, it spins fast once. */
 @keyframes starTurn {
   0%, 100% { transform: scaleX(1); }
   50% { transform: scaleX(0.2); }
@@ -338,7 +340,7 @@
 .star {
   transform-origin: 50% 50%;
   transform-box: fill-box;
-  animation: starTurn 1200ms steps(6, end) infinite;
+  animation: starTurn 1200ms steps(6, end) 4 forwards;
 }
 
 @keyframes glow {
@@ -347,7 +349,7 @@
 }
 
 .glow {
-  animation: glow 1200ms steps(3, end) infinite;
+  animation: glow 1200ms steps(3, end) 4 forwards;
 }
 
 @keyframes starSave {

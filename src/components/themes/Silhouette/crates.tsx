@@ -19,6 +19,10 @@ import world from './world.module.css'
 //
 // Animated: one bob per category, him and the crate he pushes (moved by --scene-progress), his parts.
 
+// The crates bob out of step in four phases (0.9 s apart in a 3.6 s bob), so every crate's one bob plays
+// however many crates there are, never one already over before the hold shows.
+const BOB_PHASES = 4
+
 // A crate's cross brace, corner to corner, stretched over its box; `className` adds to its placing.
 function CrateBrace({ className = '' }: { className?: string }) {
   return (
@@ -30,7 +34,7 @@ function CrateBrace({ className = '' }: { className?: string }) {
 
 function Crate({ category, index }: { category: CVData['techStack'][number]; index: number }) {
   return (
-    <div className={shade.bob} style={{ '--i': index } as CSSProperties}>
+    <div className={shade.bob} style={{ '--i': index % BOB_PHASES } as CSSProperties}>
       <div className={`relative border-4 border-[color:var(--sh-black)] p-4 ${world.crate}`}>
         <CrateBrace className="pointer-events-none" />
         <div className="relative bg-[color:var(--sh-panel)] p-3">

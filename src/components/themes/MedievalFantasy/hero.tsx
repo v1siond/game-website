@@ -1,9 +1,9 @@
-import type { CSSProperties } from 'react'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { REALM } from './palette'
 import frost from './frostZone.module.css'
-import { pulse } from './pulse'
+import { drift, pulse } from './pulse'
 import hero from './hero.module.css'
+import { cycles } from '@/components/themes/shared/loops'
 
 // Him as the death knight king of the frost zone: the spiked pauldrons, the skull chest plate, the fur trimmed
 // cape and the runeblade held point down. His skin, hair, beard and eyes come from HERO_IDENTITY; the armour,
@@ -53,7 +53,7 @@ export function FrostHero() {
       </defs>
 
       {/* Cape - dark with fur trim, wave animation */}
-      <g style={{ animation: `${frost.capeWave} 3s ease-in-out infinite`, transformOrigin: '100px 120px' }}>
+      <g style={{ animation: cycles(frost.capeWave, 3, 'ease-in-out'), transformOrigin: '100px 120px' }}>
         <path d="M55,95 Q20,150 12,240 L8,310 L192,310 L188,240 Q180,150 145,95" fill={REALM.night6} opacity="0.9" />
         <path d="M60,100 Q28,155 22,235 L18,305 L182,305 L178,235 Q172,155 140,100" fill={REALM.night7a} />
         {/* Fur trim at shoulders */}
@@ -81,7 +81,7 @@ export function FrostHero() {
       <path d="M45,305 L75,305 M125,305 L155,305" stroke="url(#goldTrim)" strokeWidth="1.5" fill="none" />
 
       {/* === TORSO with skull chest plate === */}
-      <g style={{ animation: `${hero.breathe} 4s ease-in-out infinite`, transformOrigin: '100px 160px' }}>
+      <g style={{ animation: cycles(hero.breathe, 4, 'ease-in-out'), transformOrigin: '100px 160px' }}>
         {/* Main chest plate */}
         <path d="M60,92 L68,75 L100,68 L132,75 L140,92 L145,160 L135,200 L100,210 L65,200 L55,160 Z" fill="url(#lichArmor)" />
         {/* Gold trim on chest */}
@@ -251,7 +251,7 @@ export function FrostHero() {
 
       {/* Frost breath */}
       <g opacity="0.15" {...pulse(0.1, 0.22, 3)}>
-        <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} filter="url(#frostGlow)" className={frost.drift} style={{ '--drift-dur': '3s', '--drift-sx': 1.6667 } as CSSProperties} />
+        <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} filter="url(#frostGlow)" {...drift(3, { '--drift-sx': 1.6667 })} />
       </g>
 
       {/* Ground frost */}

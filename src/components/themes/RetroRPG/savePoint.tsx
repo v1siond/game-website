@@ -12,6 +12,7 @@ import { RoomWalker, Sparkles } from './walker'
 import world from './world.module.css'
 import sprite from './sprite.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { heldUntil } from '@/components/themes/shared/held'
 
 // Contact as the save point: the yellow star twinkles over the closing box the way the game's save
 // point flickers in its room. Clicking the star saves: it spins once fast, the box flashes white and
@@ -48,7 +49,7 @@ export function SavePoint({ profession }: { profession: Profession }) {
   const walk = usePlay(900)
 
   return (
-    <section ref={ref} data-play={play} data-saved={saved} className="relative z-20 px-4 pb-8 pt-16 sm:px-6" aria-labelledby={CONTACT_HEADING}>
+    <section ref={ref} data-play={play} data-saved={saved} className={`relative z-20 px-4 pb-8 pt-16 sm:px-6 ${heldUntil(play !== 'idle')}`} aria-labelledby={CONTACT_HEADING}>
       <div className="mx-auto max-w-3xl">
         <div className="mb-2 flex justify-center">
           <button

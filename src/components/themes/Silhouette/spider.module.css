@@ -4,8 +4,9 @@
  * so a negative turn lifts a leg's tip up and back, a positive one drives it forward and down.
  * A leg's place in the step is --i. Transforms and opacity only; reduced motion holds every pose still.
  *
- * - lurk: the body sinks and rises on its legs, slow.
- * - stalk: the near legs lift and set down out of turn, the body bobs on each step.
+ * - lurk: the body sinks and rises on its legs, slow, twice.
+ * - rest: lurk at rest, once a scene has played out: the body still on its legs.
+ * - stalk: the near legs lift and set down out of turn, the body bobs on each step, for 4.8 s at most.
  * - stab: the foreleg rears high, then drives its tip into the ground and holds; dust jumps at the tip.
  * - flinch: the whole spider jerks back and up on its legs, then settles.
  */
@@ -46,7 +47,11 @@
 /* ---- lurk ---- */
 
 .lurk .body {
-  animation: lurk 2.4s ease-in-out infinite;
+  animation: lurk 2.4s ease-in-out 2 forwards;
+}
+
+.rest .body {
+  transform: translateY(0);
 }
 
 @keyframes lurk {
@@ -62,15 +67,15 @@
 /* ---- stalk ---- */
 
 .stalk .step {
-  animation: step 0.8s ease-in-out calc(var(--i, 0) * -0.27s) infinite;
+  animation: step 0.8s ease-in-out calc(var(--i, 0) * -0.27s) 6 forwards;
 }
 
 .stalk .fore {
-  animation: step 0.8s ease-in-out infinite;
+  animation: step 0.8s ease-in-out 6 forwards;
 }
 
 .stalk .body {
-  animation: stalk-bob 0.4s ease-in-out infinite;
+  animation: stalk-bob 0.4s ease-in-out 12 forwards;
 }
 
 @keyframes step {

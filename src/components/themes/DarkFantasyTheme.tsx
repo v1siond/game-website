@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
+import { useEffect, useState, useRef, useMemo, useId, memo, type ReactNode } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -38,6 +38,8 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 import world from './DarkFantasy/world.module.css'
+import { heldUntil } from '@/components/themes/shared/held'
+import { cycles, slice } from '@/components/themes/shared/loops'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 
 // The lines of a card or the About frame, each behind the spirit gold asterisk.
@@ -165,6 +167,19 @@ const FloatingLantern = memo(function FloatingLantern({ size = 30 }: { size?: nu
   )
 })
 
+// An art section between the frames: it reveals on scroll, and its spirits and lanterns float once it
+// shows (heldUntil), never at mount below the first screen.
+function ArtScene({ children }: { children: ReactNode }) {
+  const { ref, triggered } = useSectionTrigger()
+  return (
+    <ScrollScene>
+      <div ref={ref} className={heldUntil(triggered)}>
+        {children}
+      </div>
+    </ScrollScene>
+  )
+}
+
 // Ethereal rain effect - optimized with fewer elements
 const EtherealRain = memo(function EtherealRain() {
   const drops = useMemo(() =>
@@ -195,7 +210,7 @@ const EtherealRain = memo(function EtherealRain() {
             top: '-30px',
             height: d.height,
             background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.ethereal}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
-            animation: `${world.etherealRain} ${d.speed}s linear infinite`,
+            animation: slice(world.etherealRain, d.speed, 'linear', d.delay),
             animationDelay: `${d.delay}s`,
           }}
         />
@@ -238,7 +253,7 @@ const SpiritParticles = memo(function SpiritParticles() {
             width: p.size * 2.5,
             height: p.size * 2.5,
             background: `radial-gradient(circle, ${p.color} 20%, ${p.color}40 50%, transparent 70%)`,
-            animation: `${world.spiritFloat} ${p.speed}s ease-in-out infinite`,
+            animation: slice(world.spiritFloat, p.speed, 'ease-in-out', p.delay),
             animationDelay: `${p.delay}s`,
           }}
         />
@@ -376,7 +391,8 @@ const VoidDepths = memo(function VoidDepths() {
         top: (i * 23 + 7) % 70,
         size: 2 + (i % 3),
         dur: 9 + ((i * 5) % 11),
-        delay: i % 7,
+        // a start 0.5 s further on per mote, at most 3 s, so each still drifts for 2 s before 5 s
+        delay: (i % 7) * 0.5,
         gold: i % 5 === 0,
       })),
     []
@@ -493,7 +509,7 @@ const VoidDepths = memo(function VoidDepths() {
             width: m.size,
             height: m.size,
             background: `radial-gradient(circle, ${m.gold ? DARK_FANTASY.spiritGold : DARK_FANTASY.etherealDark}, transparent 70%)`,
-            animationDuration: `${m.dur}s`,
+            animation: slice(world.drift, m.dur, 'ease-in-out', m.delay),
             animationDelay: `${m.delay}s`,
           }}
         />
@@ -1250,7 +1266,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
               left: p.x,
               top: p.y,
               background: `radial-gradient(circle, ${p.color} 20%, ${p.color}50 50%, transparent 70%)`,
-              animation: `${world.spiritFloat} ${8 + i * 2}s ease-in-out infinite`,
+              animation: cycles(world.spiritFloat, 8 + i * 2, 'ease-in-out'),
               animationDelay: `${i * -2}s`,
             }}
           />
@@ -1294,7 +1310,7 @@ const ArtSectionLanterns = memo(function ArtSectionLanterns() {
             style={{
               left: `${l.x}%`,
               top: `${l.y}%`,
-              animation: `${world.lanternFloat} 4s ease-in-out infinite`,
+              animation: cycles(world.lanternFloat, 4, 'ease-in-out', l.delay),
               animationDelay: `${l.delay}s`,
             }}
           >
@@ -1577,9 +1593,9 @@ const FRAMES: SectionFrames = {
         </FramedSection>
 
         {/* Art Section 1 - Spirits and Gears */}
-        <ScrollScene>
+        <ArtScene>
           <ArtSectionSpirits />
-        </ScrollScene>
+        </ArtScene>
       </>
     )
   },
@@ -1598,9 +1614,9 @@ const FRAMES: SectionFrames = {
         </SlashRevealSection>
 
         {/* Art Section 2 - Lanterns */}
-        <ScrollScene>
+        <ArtScene>
           <ArtSectionLanterns />
-        </ScrollScene>
+        </ArtScene>
       </>
     )
   },
@@ -1643,9 +1659,9 @@ const FRAMES: SectionFrames = {
         </div>
 
         {/* Art Section 3 - Crystals */}
-        <ScrollScene>
+        <ArtScene>
           <ArtSectionCrystals />
-        </ScrollScene>
+        </ArtScene>
       </>
     )
   },
@@ -1666,9 +1682,9 @@ const FRAMES: SectionFrames = {
     const { musician, bands } = slot
     return (
       <>
-        <ScrollScene>
+        <ArtScene>
           <ArtSectionSpirits />
-        </ScrollScene>
+        </ArtScene>
 
         <SlashRevealSection title={sections[slot.titleKey]}>
           <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
@@ -1678,9 +1694,9 @@ const FRAMES: SectionFrames = {
           <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
         </SlashRevealSection>
 
-        <ScrollScene>
+        <ArtScene>
           <ArtSectionLanterns />
-        </ScrollScene>
+        </ArtScene>
       </>
     )
   },
@@ -1689,9 +1705,9 @@ const FRAMES: SectionFrames = {
     const { martialArts } = slot
     return (
       <>
-        <ScrollScene>
+        <ArtScene>
           <ArtSectionSpirits />
-        </ScrollScene>
+        </ArtScene>
 
         <SlashRevealSection title={sections[slot.titleKey]}>
           <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
@@ -1714,9 +1730,9 @@ const FRAMES: SectionFrames = {
           />
         </SlashRevealSection>
 
-        <ScrollScene>
+        <ArtScene>
           <ArtSectionCrystals />
-        </ScrollScene>
+        </ArtScene>
       </>
     )
   },

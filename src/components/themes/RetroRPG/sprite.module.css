@@ -1,6 +1,8 @@
 /*
  * His room walker sprite (walker.tsx): crisp pixels, frames that swap by opacity in one step, the sprite
- * moved whole by transform. The game runs on a locked frame clock, so nothing eases.
+ * moved whole by transform. The game runs on a locked frame clock, so nothing eases. Every frame loop plays
+ * a set number of beats inside 5 s of its start (the sprite showing, a hover, a walk) and holds a frame of
+ * the move: his eyes open, the act or the step on its second frame.
  */
 
 .pixelated {
@@ -22,7 +24,7 @@
   opacity: clamp(0, 1 - clamp(0, (var(--mx, 0) - 0.3) * 100, 1) - clamp(0, (-0.3 - var(--mx, 0)) * 100, 1), 1);
 }
 
-/* His eyes shut for one frame now and then. */
+/* His eyes shut for one frame, once, after the sprite shows. */
 @keyframes blink {
   0%, 92%, 100% { opacity: 0; }
   94% { opacity: 1; }
@@ -30,7 +32,7 @@
 
 .blink {
   opacity: 0;
-  animation: blink 3600ms steps(1, end) infinite;
+  animation: blink 3600ms steps(1, end) 1 forwards;
 }
 
 .actA,
@@ -56,11 +58,11 @@
 }
 
 .battle:hover .actA {
-  animation: frameA 480ms steps(1, end) infinite;
+  animation: frameA 480ms steps(1, end) 10 forwards;
 }
 
 .battle:hover .actB {
-  animation: frameB 480ms steps(1, end) infinite;
+  animation: frameB 480ms steps(1, end) 10 forwards;
 }
 
 /* His soul flickers on his chest the way it leaves the body when a battle starts. */
@@ -82,12 +84,12 @@
 
 [data-phase='walk'] .stepA,
 [data-walk='on'] .stepA {
-  animation: frameA 320ms steps(1, end) infinite;
+  animation: frameA 320ms steps(1, end) 15 forwards;
 }
 
 [data-phase='walk'] .stepB,
 [data-walk='on'] .stepB {
-  animation: frameB 320ms steps(1, end) infinite;
+  animation: frameB 320ms steps(1, end) 15 forwards;
 }
 
 [data-phase='walk'] .arrived,

@@ -14,6 +14,7 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import type { Play } from './play'
 import { Soul } from './soul'
 import world from './world.module.css'
+import { heldUntil } from '@/components/themes/shared/held'
 
 // His outfit plate: a battle box, white pixel lettering on black inside a white frame.
 const OUTFIT_LOOK: WardrobeLook = { plate: RPG.void, text: RPG.text, ring: RPG.border }
@@ -187,7 +188,7 @@ export function Encounter({ profession, children }: EncounterProps) {
   const pointer = usePointerVars(!skip)
 
   return (
-    <div ref={ref} data-phase={phase} data-play={PLAY_OF[phase]} onFocus={reveal} className="relative mx-auto max-w-3xl">
+    <div ref={ref} data-phase={phase} data-play={PLAY_OF[phase]} onFocus={reveal} className={`relative mx-auto max-w-3xl ${heldUntil(skip || phase !== 'wait')}`}>
       {/* the monster area: the backdrop and him */}
       <div ref={pointer} className={`relative h-44 overflow-hidden sm:h-56 ${world.stage} ${sprite.battle}`} aria-hidden="true">
         <BattleBackdrop />

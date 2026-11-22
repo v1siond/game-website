@@ -16,6 +16,8 @@ import { InnerCard, RealmFrame } from './panels'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { BandCard, CARD_BODY, CARD_TITLE, JobCard, MARKED_LIST, ProjectCard, VentureCard } from './cards'
 import { FTArtDivider, FTOrnament, RoCArtDivider, RoCOrnament } from './ornaments'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 
 // Each profession's sections, framed per zone between ornaments and art dividers.
 
@@ -43,10 +45,12 @@ export interface SectionLayout {
   artDividerScale: number
 }
 
+// A divider's glints pulse once it shows (heldUntil), never at mount below the first screen.
 export function ArtDivider({ layout, children }: { layout: SectionLayout; children: ReactNode }) {
+  const { ref, triggered } = useSectionTrigger()
   return (
     <ScrollScene>
-      <div style={{ margin: `${layout.artDividerMargin} 0` }}>{children}</div>
+      <div ref={ref} className={heldUntil(triggered)} style={{ margin: `${layout.artDividerMargin} 0` }}>{children}</div>
     </ScrollScene>
   )
 }

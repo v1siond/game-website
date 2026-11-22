@@ -7,6 +7,7 @@ import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, CO
 import { FRAME_INSET_REM, KnightCharacter } from './KnightCharacter'
 import { BattleBug, BUG_ASPECT } from './BattleReveal'
 import bugMotion from './bug.module.css'
+import { cycles } from '@/components/themes/shared/loops'
 
 // ============================================
 // BUG ATTACK REVEAL ANIMATION
@@ -81,7 +82,8 @@ const BUG_POSES: Record<AnimationPhase, BugPose> = {
   'complete': { track: '-16%', transform: `translateY(-${BUG_HOVER.low}px)`, opacity: 1, timing: '400ms ease-out', float: true },
 }
 
-const BUG_FLOAT = `${bugMotion.bugFloat} 1.5s ease-in-out infinite`
+// The pulled bug hovers from attack-stance on, whole hovers to 5 s after the fight's start.
+const BUG_FLOAT = cycles(bugMotion.bugFloat, 1.5, 'ease-in-out', ATTACK_TIMING['attack-stance'] / 1000)
 
 /**
  * The fight's stage. Its panel sits --panel-top inside it and draws its border --frame-inset inside that.

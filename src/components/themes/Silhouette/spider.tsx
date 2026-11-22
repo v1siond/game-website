@@ -8,12 +8,12 @@ import spider from './spider.module.css'
 // slung between the knees. The three near legs and the foreleg are black and move; the two far legs sit
 // behind in the fog colour and stay still. It faces right, toward him.
 //
-// Poses (spider.module.css): lurk (a slow breath), stalk (the legs step out of turn), stab (the foreleg
+// Poses (spider.module.css): lurk (a slow breath), rest (lurk at rest once a scene has played out), stalk (the legs step out of turn), stab (the foreleg
 // rears and drives its tip into the ground, dust at the tip), flinch (it jerks back on its legs). Lame
 // draws the foreleg as a torn stump, after the trap line has taken it.
 // viewBox units: 240 by 160, the tips on y 158.
 
-export type SpiderPose = 'lurk' | 'stalk' | 'stab' | 'flinch'
+export type SpiderPose = 'lurk' | 'rest' | 'stalk' | 'stab' | 'flinch'
 
 interface Point {
   x: number

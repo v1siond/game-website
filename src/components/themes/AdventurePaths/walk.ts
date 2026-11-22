@@ -6,11 +6,18 @@ import { pointAt, type Point, type Trail } from './trail'
 
 // His walk on a map, the way an overworld marker travels: node to node along the dotted trail at one
 // steady pace, never cutting across, turning to face the way he goes, and stepping in two frames while
-// he moves. One requestAnimationFrame loop writes one transform on one element per frame; React never
-// re-renders during the walk. Under reduced motion he is placed on the last stop at once.
+// he moves, as many step frames as the walk takes. One requestAnimationFrame loop writes one transform on
+// one element per frame and ends when he arrives; React never re-renders during the walk. Under reduced
+// motion he is placed on the last stop at once.
 //
 // The marker element is a box laid over the whole map (absolute, inset 0), so a translate in percent of
 // its own size is a percent of the map, and the figure inside hangs from its top left corner.
+
+/** How long each of his two step frames shows while he walks (map.module.css reads it as --walk-frame). */
+export const WALK_FRAME_MS = 280
+
+/** How many step frames cover a walk of `walkMs`, so he steps the whole way and never glides. */
+export const walkBeats = (walkMs: number) => Math.ceil(walkMs / WALK_FRAME_MS)
 
 /** One stretch of a walk: along `trail` from one distance to another (backward when `to` < `from`). */
 export interface WalkLeg {
@@ -80,7 +87,11 @@ export function useTrailWalker({ width, height, speed, follow }: MapBox) {
       }
 
       const marker = markerRef.current
-      if (marker) marker.dataset.walking = 'true'
+      if (marker) {
+        marker.style.setProperty('--walk-frame', `${WALK_FRAME_MS}ms`)
+        marker.style.setProperty('--walk-beats', String(walkBeats((total / speed) * 1000)))
+        marker.dataset.walking = 'true'
+      }
       const started = performance.now()
       const tick = (now: number) => {
         const travelled = Math.min(((now - started) / 1000) * speed, total)

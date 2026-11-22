@@ -5,14 +5,16 @@
   50% { transform: rotate(1.5deg); }
 }
 /* Smoke and breath that swell and drift: each wisp moves by --drift-x and --drift-y and stretches by
-   --drift-sx and --drift-sy about its own centre, then returns, linear like the opacity beside it */
+   --drift-sx and --drift-sy about its own centre, then returns, linear like the opacity beside it, --drift-n
+   times (the whole cycles that fit in 5 s, pulse.ts) */
 .drift {
   transform-box: fill-box;
   transform-origin: center;
   animation-name: mfDrift;
   animation-duration: var(--drift-dur);
   animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  animation-iteration-count: var(--drift-n, 1);
+  animation-fill-mode: forwards;
 }
 @keyframes mfDrift {
   0%, 100% { transform: translate(0, 0) scale(1, 1); }
@@ -36,12 +38,14 @@
   0% { transform: translate(0, 0); opacity: 0.7; }
   100% { transform: translate(-50vw, 115vh); opacity: 0; }
 }
-/* The glow pulses (pulse.ts): opacity from --pulse-from to --pulse-to and back over --pulse-dur, linear. */
+/* The glow pulses (pulse.ts): opacity from --pulse-from to --pulse-to and back over --pulse-dur, linear,
+   --pulse-n times (the whole cycles that fit in 5 s), resting on --pulse-from. */
 .pulse {
   animation-name: mfPulse;
   animation-duration: var(--pulse-dur);
   animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  animation-iteration-count: var(--pulse-n, 1);
+  animation-fill-mode: forwards;
 }
 @keyframes mfPulse {
   0%, 100% { opacity: var(--pulse-from); }

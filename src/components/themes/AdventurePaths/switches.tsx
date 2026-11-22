@@ -94,11 +94,15 @@ function PipeScene({ profession, onStomp }: { profession: Profession; onStomp: (
   return <Actor motion={course.motion} profession={profession} onAnimationEnd={course.onOwnAnimationEnd} />
 }
 
+// A block turns solid 70 ms after the one before it (map.module.css), so the 61st and every one after it turn
+// together, all within 5 s of the press however many items a switch holds.
+const LAST_BLOCK_STEP = 60
+
 function TechBlocks({ items, colour, pressed, label }: { items: string[]; colour: SwitchColour; pressed: boolean; label: string }) {
   return (
     <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={label}>
       {items.map((item, index) => (
-        <li key={item} className="relative px-2 py-1 text-sm font-semibold" style={cssVars({ '--i': index })}>
+        <li key={item} className="relative px-2 py-1 text-sm font-semibold" style={cssVars({ '--i': Math.min(index, LAST_BLOCK_STEP) })}>
           <span className="absolute inset-0 rounded-sm border-2 border-dashed border-[color:var(--ap-ink-soft)]" aria-hidden="true" />
           <span className={`absolute inset-0 rounded-sm border-2 border-[color:var(--ap-ink)] ${colour.fill} ${map.block}`} data-solid={pressed} aria-hidden="true" />
           <span className={`relative ${pressed ? colour.text : 'text-[color:var(--ap-ink)]'}`}>{item}</span>

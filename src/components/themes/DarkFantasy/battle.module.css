@@ -236,5 +236,6 @@
 }
 
 .trembling {
-  animation: bugTremble 50ms ease-in-out infinite;
+  /* the 400 ms from bug-tremble to bug-death (BattleReveal.tsx), then still */
+  animation: bugTremble 50ms ease-in-out 8 forwards;
 }

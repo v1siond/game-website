@@ -13,6 +13,7 @@ import { Actor, PixelArt } from './walker'
 import { SPRITE } from './sprite'
 import type { Zone } from './overworld'
 import rooms from './rooms.module.css'
+import { heldUntil } from '@/components/themes/shared/held'
 
 // The overworld rooms: every section opens with him in a small room of the zone it belongs to, doing that
 // room's event, and only then does the section's content show (Dark Fantasy's reveal rule, in this game's
@@ -79,7 +80,7 @@ function Room({ zone, beat, art, overlay, replay, className = '', children }: Ro
   const { ref, room, shown, take, replay: again } = useRoom(zone, beat)
 
   return (
-    <div ref={ref} data-room={room} data-shown={shown} className={className}>
+    <div ref={ref} data-room={room} data-shown={shown} className={`${className} ${heldUntil(room !== 'idle')}`}>
       <div className="relative mb-6 overflow-hidden border-4 border-[color:var(--rpg-border)] bg-[color:var(--rpg-void)]" aria-hidden="true">
         <svg key={take} viewBox="0 0 320 80" className={STRIP} shapeRendering="crispEdges" focusable="false">
           {art}

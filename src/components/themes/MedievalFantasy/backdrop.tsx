@@ -1,6 +1,7 @@
 'use client'
 
-import { memo, useEffect, useRef } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import { heldUntil } from '@/components/themes/shared/held'
 import { REALM } from './palette'
 import { ChaosAtmosphere } from './chaosZone'
 import { FrostAtmosphere } from './frostZone'
@@ -17,12 +18,16 @@ const crossfade = (progress: number): { roc: number; ft: number } => {
 }
 
 // The scroll writes the two zone opacities as --roc and --ft on the backdrop's root once per frame, so a
-// scroll re-renders nothing; each layer reads its variable and eases into it over half a second.
+// scroll re-renders nothing; each layer reads its variable and eases into it over half a second. The chaos
+// zone shows with the page, so its storm plays from the start; the frost zone's blizzard, wind and figure
+// wait on their first frame (heldUntil) until the scroll first fades the frost in, then play once.
 export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
   const rootRef = useRef<HTMLDivElement>(null)
+  const [frostShown, setFrostShown] = useState(false)
 
   useEffect(() => {
     let frame = 0
+    let frostSeen = false
     const paint = () => {
       frame = 0
       const root = rootRef.current
@@ -31,6 +36,9 @@ export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
       const { roc, ft } = crossfade(Math.min(window.scrollY / maxScroll, 1))
       root.style.setProperty('--roc', String(roc))
       root.style.setProperty('--ft', String(ft))
+      if (frostSeen || ft <= 0) return
+      frostSeen = true
+      setFrostShown(true)
     }
     const handleScroll = () => {
       if (frame) return
@@ -55,7 +63,7 @@ export const DualZoneAtmosphere = memo(function DualZoneAtmosphere() {
       </div>
 
       {/* FROZEN THRONE atmosphere */}
-      <div className="absolute inset-0 opacity-[var(--ft,0)] transition-opacity duration-500 ease-[ease]">
+      <div className={`absolute inset-0 opacity-[var(--ft,0)] transition-opacity duration-500 ease-[ease] ${heldUntil(frostShown)}`}>
         <FrostAtmosphere />
       </div>
 

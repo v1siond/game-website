@@ -10,10 +10,13 @@ import shade from './shade.module.css'
 // so the boy must cross it by the chain above: each band is a steel plate on a cable, and the current
 // runs the cable plate to plate in a steady four count, each plate's edge lighting on its beat the way
 // a drum machine steps through a bar. The plates stand in one row on a wide screen, two by two on a
-// tablet and in one column down the cable on a phone. The current stops under reduced motion, every
-// plate edge lit. At the cable's head he beats an oil drum, and the current steps on his strokes.
+// tablet and in one column down the cable on a phone. The current runs seven beats once the section
+// shows and rests between beats, every plate dim; it stops under reduced motion, every plate edge lit. At the cable's head he beats an oil drum, and the current steps on his strokes.
 //
 // Animated: one current per band, his parts.
+
+// The beats of the current's count; a plate lights on the beat its place in the row falls on.
+const BEATS = 4
 
 // The four bolts holding a plate down, one per corner.
 const BOLTS = ['left-1.5 top-1.5', 'right-1.5 top-1.5', 'bottom-1.5 left-1.5', 'bottom-1.5 right-1.5']
@@ -23,7 +26,7 @@ function Plate({ index, link, children }: { index: number; link: BandSlot['linkP
     <div className={`relative h-full border-2 border-[color:var(--sh-black)] p-4 ${world.plate}`}>
       <div
         className={`pointer-events-none absolute -inset-px border-2 border-[color:var(--sh-rim)] ${shade.current}`}
-        style={{ '--i': index } as CSSProperties}
+        style={{ '--i': index % BEATS } as CSSProperties}
         aria-hidden="true"
       />
       {BOLTS.map((corner) => (
