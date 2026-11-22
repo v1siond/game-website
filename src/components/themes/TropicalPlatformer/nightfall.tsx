@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { memo, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { JungleAction, JungleCVLink } from './buttons'
-import { HeroCharacter } from './character'
+import { cssVars } from '@/lib/cssVars'
+import { JungleLinks, jungleButton } from './buttons'
+import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import { Backdrop, NightFront, NightSky, ToneScope } from './scenery'
 import { EndTarget } from './target'
@@ -23,6 +24,11 @@ import night from './nightfall.module.css'
 // the window at 0.6 s, the target from 0.9 s, the sign from 1 s; a replay count remounts the scene's
 // actors.
 
+// The contact sign offers the CV beside email and LinkedIn.
+const CONTACT_SITE_LINKS = ['cv'] as const
+
+const JUMP_BUTTON = jungleButton({ tone: 'wood', size: 'small', extra: 'absolute left-3 top-3' })
+
 // The four fireflies: where each drifts from and its delay.
 const FIREFLIES = [
   { left: '18%', top: '62%', delay: '0s' },
@@ -34,7 +40,7 @@ const FIREFLIES = [
 // The tree house in teal moonlight, the way the source tints its night levels: the night sky and palms
 // behind, the house on its stilts with a plank wall, a thatched roof and the lamp in the window, the
 // ladder, and the night's leaves in the corners.
-function NightHouse() {
+const NightHouse = memo(function NightHouse() {
   return (
     <svg viewBox="0 0 400 260" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
       <NightSky />
@@ -58,7 +64,7 @@ function NightHouse() {
       <NightFront />
     </svg>
   )
-}
+})
 
 export function TreehouseContact() {
   const { sections, jungle } = useLabels()
@@ -79,21 +85,21 @@ export function TreehouseContact() {
             <span
               key={fly.left}
               className={`absolute block h-2 w-2 rounded-full ${night.firefly}`}
-              style={{ '--left': fly.left, '--top': fly.top, '--delay': fly.delay } as CSSProperties}
+              style={cssVars({ '--left': fly.left, '--top': fly.top, '--delay': fly.delay })}
               aria-hidden="true"
             />
           ))}
           <div key={finishes} className="absolute inset-0">
             <EndTarget />
             <div className={`absolute bottom-3 left-[50%] h-28 w-20 ${night.roller}`} aria-hidden="true">
-              <HeroCharacter profession={active} pose="roll" className={`absolute inset-0 h-full w-full ${night.ball}`} />
+              <PassingHero profession={active} pose="roll" className={`absolute inset-0 h-full w-full ${night.ball}`} />
               <HeroCharacter profession={active} pose="idle" className={`absolute inset-0 h-full w-full ${night.standing}`} />
             </div>
           </div>
           <button
             type="button"
             onClick={() => setFinishes((count) => count + 1)}
-            className={`absolute left-3 top-3 min-h-[44px] rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}
+            className={JUMP_BUTTON}
           >
             {jungle.jumpAgain}
           </button>
@@ -111,10 +117,7 @@ export function TreehouseContact() {
                 </h2>
                 <p className="mt-4 text-base text-[color:var(--tp-parchment)]">{line}</p>
                 <nav className="mt-6 flex flex-wrap gap-3" aria-label={sections.contact}>
-                  {actions.map((action) => (
-                    <JungleAction key={action.id} action={action} />
-                  ))}
-                  <JungleCVLink />
+                  <JungleLinks actions={actions} site={CONTACT_SITE_LINKS} />
                 </nav>
               </div>
             </div>

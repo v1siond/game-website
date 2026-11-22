@@ -1,11 +1,12 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useState, type AnimationEvent, type ReactNode } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
+import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
@@ -54,7 +55,7 @@ const STAVES = [-70, -40, -12, 14, 42, 72]
 function InsigniaBand({ active }: { active: Profession }) {
   return (
     <div className="absolute left-[14%] top-[37%] h-[22%] w-[72%] overflow-hidden rounded-md border-2 border-[color:var(--tp-bark-dark)] bg-[color:var(--tp-bark-dark)]" aria-hidden="true">
-      <div className={`flex h-full w-[300%] ${partner.band}`} style={{ '--slot': PROFESSION_ORDER.indexOf(active) } as CSSProperties}>
+      <div className={`flex h-full w-[300%] ${partner.band}`} style={cssVars({ '--slot': PROFESSION_ORDER.indexOf(active) })}>
         {PROFESSION_ORDER.map((id) => (
           <svg key={id} viewBox="0 0 40 40" className="h-full w-1/3 py-1" focusable="false">
             {INSIGNIA[id](C.sunGold)}
@@ -69,6 +70,11 @@ function BarrelStage() {
   const { active } = useProfession()
   const [cast, setCast] = useState<{ lead: Profession; leaving: Profession | null }>({ lead: active, leaving: null })
   if (cast.lead !== active) setCast({ lead: active, leaving: cast.lead })
+  // The one he was is gone once his run off the ledge ends; his legs' loops bubble up and are ignored.
+  const ranOff = (event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return
+    setCast((now) => ({ ...now, leaving: null }))
+  }
 
   return (
     <div className={`relative h-72 overflow-hidden rounded-[2rem] border-4 border-[color:var(--tp-bark-dark)] sm:h-80 ${partner.stage}`} aria-hidden="true">
@@ -76,7 +82,7 @@ function BarrelStage() {
       <div className={`absolute inset-x-0 bottom-0 h-12 ${partner.ledge}`} />
 
       {cast.leaving && (
-        <div key={`${cast.leaving}-${active}`} className={`absolute bottom-10 left-[8%] h-40 w-28 ${partner.runner}`}>
+        <div key={`${cast.leaving}-${active}`} className={`absolute bottom-10 left-[8%] h-40 w-28 ${partner.runner}`} onAnimationEnd={ranOff}>
           <HeroCharacter profession={cast.leaving} pose="run" className="h-full w-full" />
         </div>
       )}
@@ -91,7 +97,7 @@ function BarrelStage() {
             <InsigniaBand active={active} />
           </div>
           {STAVES.map((angle) => (
-            <span key={angle} className={`absolute left-1/2 top-1/3 block h-14 w-4 rounded-md ${partner.stave}`} style={{ '--a': `${angle}deg` } as CSSProperties} />
+            <span key={angle} className={`absolute left-1/2 top-1/3 block h-14 w-4 rounded-md ${partner.stave}`} style={cssVars({ '--a': `${angle}deg` })} />
           ))}
         </div>
       </div>

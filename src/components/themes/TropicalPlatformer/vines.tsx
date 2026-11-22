@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -8,12 +8,15 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Band, Musician } from '@/lib/cv/content'
+import { cssVars } from '@/lib/cssVars'
+import { StatusLine, jungleButton } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
 import grove from './vines.module.css'
+import motion from './motion.module.css'
 
-// The bands as a grove of hanging planks in the cave of the hoard: each band hangs from two leafy vines
+// The bands as a grove of hanging planks under the dusk vines: each band hangs from two leafy vines
 // and sways when pointed at or focused. He hangs by one hand from the vine of the band he is at, legs
 // loose, swaying on it the way the source's ropes swing. Swing here sends him over: he lets go of the
 // old vine and swings in on the new one, overshooting and settling like a pendulum; the band he hangs
@@ -39,20 +42,23 @@ interface CardProps {
   slot: BandSlot
   index: number
   here: boolean
+  // Whether the grove has scrolled in: from then on he swings in on each band he moves to.
+  entered: boolean
+  // The swing count keys his swing in, so only the card he hangs from gets it; the others get 0.
   swings: number
-  onSwing: () => void
+  onSwing: (index: number) => void
 }
 
-function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
+const HangingBand = memo(function HangingBand({ slot, index, here, entered, swings, onSwing }: CardProps) {
   const { jungle } = useLabels()
   const { band, years, linkProps, release } = slot
 
   return (
-    <div className={`relative pt-10 ${grove.hang}`} style={{ '--i': index } as CSSProperties}>
+    <div className={`relative pt-10 ${grove.hang}`} style={cssVars({ '--i': index })}>
       <article data-here={here || undefined} className={`relative rounded-3xl p-5 ${look.board} ${grove.card}`}>
         <Vines />
         {here && (
-          <div key={swings} className={`pointer-events-none absolute -top-12 right-[12%] z-10 w-16 ${grove.swinger}`} aria-hidden="true">
+          <div key={swings} className={`pointer-events-none absolute -top-12 right-[12%] z-10 w-16 ${entered ? motion.swingIn : motion.swing}`} aria-hidden="true">
             <HeroCharacter profession="drummer" pose="swing" className="block h-auto w-full" />
           </div>
         )}
@@ -75,34 +81,29 @@ function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
         )}
         <button
           type="button"
-          onClick={onSwing}
+          onClick={() => onSwing(index)}
           aria-pressed={here}
           aria-label={fillLabel(jungle.swingTo, { band: band.name })}
-          className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
+          className={jungleButton({ tone: here ? 'gold' : 'wood', size: 'small', extra: 'mt-4 inline-flex items-center' })}
         >
           {here ? jungle.swingHere : jungle.swing}
         </button>
       </article>
     </div>
   )
-}
+})
 
 /** The bands hanging from vines; he swings from band to band. */
 export function VineBands({ bands, musician }: { bands: Band[]; musician: Musician }) {
   const labels = useLabels()
   const { ref, triggered } = useSectionTrigger()
-  const [at, setAt] = useState(0)
-  const [swings, setSwings] = useState(0)
-  const [status, setStatus] = useState('')
+  const [{ at, swings }, setSwing] = useState({ at: 0, swings: 0 })
 
-  const swingTo = (index: number) => {
-    if (index === at) return
-    setAt(index)
-    setSwings((count) => count + 1)
-    setStatus(fillLabel(labels.jungle.swingAt, { band: bands[index].name }))
-  }
+  const swingTo = useCallback((index: number) => setSwing((now) => (index === now.at ? now : { at: index, swings: now.swings + 1 })), [])
 
   if (bands.length === 0) return null
+  // Each swing lands him on `at`; before the first he has swung to nothing.
+  const status = swings > 0 ? fillLabel(labels.jungle.swingAt, { band: bands[at].name }) : ''
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={grove.grove}>
@@ -111,11 +112,9 @@ export function VineBands({ bands, musician }: { bands: Band[]; musician: Musici
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={`${MASONRY_ITEM} pt-6`}
-        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} swings={swings} onSwing={() => swingTo(index)} />}
+        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} entered={triggered} swings={index === at ? swings : 0} onSwing={swingTo} />}
       />
-      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
-        {status}
-      </p>
+      <StatusLine>{status}</StatusLine>
     </div>
   )
 }

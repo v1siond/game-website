@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
-import { fillLabel } from '@/lib/cv/labels'
+import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
+import { StatusLine, jungleButton } from './buttons'
 import { HeroCharacter } from './character'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
@@ -25,7 +26,15 @@ import ring from './brawl.module.css'
 type Phase = 'ready' | 'walk' | 'hit'
 
 const PHASE_MS: Record<Exclude<Phase, 'ready'>, number> = { walk: 1000, hit: 700 }
+const FIGHT_BUTTON = jungleButton({ tone: 'gold', size: 'wide' })
 const NEXT: Record<Exclude<Phase, 'ready'>, Phase> = { walk: 'hit', hit: 'ready' }
+
+// What the status says after `won` foes: nothing before the first, the last one won, or the whole round.
+function boutStatus(won: number, achievements: readonly string[], jungle: Labels['jungle']): string {
+  if (won === 0) return ''
+  if (won >= achievements.length) return jungle.allBeaten
+  return fillLabel(jungle.beaten, { achievement: achievements[won - 1] })
+}
 
 function Burst({ solid }: { solid: boolean }) {
   return (
@@ -92,20 +101,21 @@ function Clearing({ phase, round }: { phase: Phase; round: number }) {
 export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
   const { jungle } = useLabels()
   const { achievements } = martialArts.primary
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.25 })
   const [won, setWon] = useState(0)
   const [phase, setPhase] = useState<Phase>('ready')
-  const started = useRef(false)
   const all = won >= achievements.length
-  const status = won === 0 ? '' : all ? jungle.allBeaten : fillLabel(jungle.beaten, { achievement: achievements[won - 1] })
+  const status = boutStatus(won, achievements, jungle)
 
   // One bout: the chain of phases, or straight to the win under reduced motion. After the last foe the
   // round starts again.
   const fight = () => {
     if (phase !== 'ready' || achievements.length === 0) return
     if (all) setWon(0)
-    if (prefersReducedMotion()) setWon((count) => count + 1)
-    else setPhase('walk')
+    if (!prefersReducedMotion()) {
+      setPhase('walk')
+      return
+    }
+    setWon((count) => count + 1)
   }
 
   useEffect(() => {
@@ -119,12 +129,7 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
   }, [phase])
 
   // The first bout plays once, when the section arrives.
-  useEffect(() => {
-    if (!triggered || started.current || achievements.length === 0) return
-    started.current = true
-    if (prefersReducedMotion()) setWon(1)
-    else setPhase('walk')
-  }, [triggered, achievements.length])
+  const { ref } = useSectionTrigger({ threshold: 0.25, onEnter: fight })
 
   return (
     <div ref={ref} className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto]">
@@ -151,12 +156,10 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
       />
       <div className="flex w-full flex-col items-center gap-4 md:w-80">
         <Clearing phase={phase} round={won} />
-        <button type="button" onClick={fight} className={`min-h-[44px] rounded-xl px-6 text-base ${look.button} ${look.buttonGold} ${look.focus}`}>
+        <button type="button" onClick={fight} className={FIGHT_BUTTON}>
           {all ? jungle.fightAgain : jungle.fight}
         </button>
-        <p role="status" className={`min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
-          {status}
-        </p>
+        <StatusLine spaced={false}>{status}</StatusLine>
       </div>
     </div>
   )

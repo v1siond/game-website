@@ -1,20 +1,24 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { memo, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { NameWords } from '@/components/cv/NameWords'
 import { BARREL, BarrelArt, MuzzleBurst } from './barrel'
-import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
-import { HeroCharacter } from './character'
+import { JungleLinks } from './buttons'
+import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+import { cssVars } from '@/lib/cssVars'
 import { ToneScope } from './scenery'
 import look from './jungle.module.css'
 import scenery from './scenery.module.css'
 import sunset from './sunset.module.css'
+
+// The hero offers the CV and his engine beside email and LinkedIn.
+const HERO_SITE_LINKS = ['cv', 'engine'] as const
 
 // His outfit plate: a dark plank sign with sun gold lettering and a plank rim.
 const OUTFIT_LOOK: WardrobeLook = { plate: C.barkDark, text: C.sunGold, ring: C.plank }
@@ -50,11 +54,11 @@ const GROUND_BAND = `M-30 262 Q100 250 200 258 Q${LANDING_X - 38} ${GROUND_Y - 0
 
 // The tree house cannon's box in the scene's units, its height the barrel's drawing at that width.
 const CANNON = { x: 100, y: 78, width: 48 }
-const CANNON_AT = {
+const CANNON_AT = cssVars({
   '--cannon-left': `${(CANNON.x / SCENE.width) * 100}%`,
   '--cannon-top': `${(CANNON.y / SCENE.height) * 100}%`,
   '--cannon-width': `${(CANNON.width / SCENE.width) * 100}%`,
-} as CSSProperties
+})
 
 // His flight starts with his box's top left corner at the barrel's mouth (the rim's top at its middle,
 // before the cannon's tilt) and tops out with his box's top on ARC_TOP_Y, both in the scene's units.
@@ -66,7 +70,7 @@ const MOUTH = {
 }
 const ARC_TOP_Y = 18.4
 const LANDED_TOP = GROUND_Y - LANDING_BOX.height
-const LANDING = {
+const LANDING = cssVars({
   '--ground': GROUND_Y / SCENE.height,
   '--landing-left': `${(LANDING_BOX.x / SCENE.width) * 100}%`,
   '--landing-width': `${(LANDING_BOX.width / SCENE.width) * 100}%`,
@@ -74,7 +78,7 @@ const LANDING = {
   '--from-x': `${((MOUTH.x - LANDING_BOX.x) / LANDING_BOX.width) * 100}%`,
   '--from-y': `${((MOUTH.y - LANDED_TOP) / LANDING_BOX.height) * 100}%`,
   '--peak-y': `${((ARC_TOP_Y - LANDED_TOP) / LANDING_BOX.height) * 100}%`,
-} as CSSProperties
+})
 
 // The sky in the flat steps the source's sunsets are painted in, the sun swelling behind streaks of
 // cloud, and birds.
@@ -86,7 +90,7 @@ const CLOUD_STREAKS: ReadonlyArray<readonly [number, number, number]> = [
   [150, 214, 190],
 ]
 
-function Sky() {
+const Sky = memo(function Sky() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <rect width="400" height="300" fill="url(#tp-sky)" />
@@ -103,20 +107,20 @@ function Sky() {
       <path d="M60 70 q6 -5 12 0 q6 -5 12 0 M96 52 q4 -4 8 0 q4 -4 8 0 M318 64 q5 -4 10 0 q5 -4 10 0" fill="none" stroke={C.shadowSoft} strokeWidth="2" />
     </svg>
   )
-}
+})
 
 // The far jungle: the banded treeline in the dusk's purple haze over a low ridge.
-function Ridge() {
+const Ridge = memo(function Ridge() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <use href="#tp-treeline" transform="translate(-20 178) scale(1.1 0.9)" />
       <path d="M-30 250 Q60 228 140 240 T300 236 T430 230 V300 H-30 Z" fill={C.duskDeep} />
     </svg>
   )
-}
+})
 
 // The palms, black against the light with the sun catching their edges; the one furthest off in haze.
-function Palms() {
+const Palms = memo(function Palms() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <use href="#tp-palm" transform="translate(200 262) rotate(5) scale(0.55)" className={scenery.haze} />
@@ -125,12 +129,12 @@ function Palms() {
       <path d={GROUND_BAND} fill={C.shadowSoft} />
     </svg>
   )
-}
+})
 
 // His tree house on four stilts: a plank wall, a thatched roof, the doorway and the ladder, every edge
 // that faces the sun lit; the barrel cannon stands on the platform's edge (drawn in the HTML layer above,
 // so it can be a button).
-function TreeHouse() {
+const TreeHouse = memo(function TreeHouse() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <path d="M30 160 Q24 220 34 300 H52 Q44 220 48 160 Z M118 160 Q124 220 116 300 H98 Q106 220 104 160 Z" fill={C.shadow} />
@@ -148,11 +152,11 @@ function TreeHouse() {
       ))}
     </svg>
   )
-}
+})
 
 // The leaves right in front, out of the light: fronds and round leaves in the corners, a fern tuft,
 // fronds hanging into the top corners.
-function NearFronds() {
+const NearFronds = memo(function NearFronds() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <use href="#tp-frond" transform="translate(-10 300) rotate(-40) scale(1.1)" />
@@ -164,7 +168,7 @@ function NearFronds() {
       <use href="#tp-frond" transform="translate(410 -4) scale(-1 1) rotate(28) scale(0.75)" />
     </svg>
   )
-}
+})
 
 function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () => void; blastLabel: string }) {
   const { active } = useProfession()
@@ -197,7 +201,7 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
       <div className={`pointer-events-none absolute inset-0 ${sunset.mid}`} style={LANDING} aria-hidden="true">
         <div key={shot} data-worlds-figure="" className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[var(--landing-left)] h-[var(--landing-height)] w-[var(--landing-width)] ${sunset.flightX}`}>
           <div className={`relative h-full w-full ${sunset.flightY}`}>
-            <HeroCharacter profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
+            <PassingHero profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
             <div className={`absolute inset-0 ${sunset.land}`}>
               <HeroCharacter profession={active} pose="throw" delay="calc(var(--fire) + 1.3s)" silhouette className="h-full w-full" />
             </div>
@@ -222,7 +226,7 @@ function PlankName({ name }: { name: string }) {
         <NameWords
           name={name}
           letter={(letter, i) => (
-            <span className={sunset.letter} style={{ '--i': i } as CSSProperties}>
+            <span className={sunset.letter} style={cssVars({ '--i': i })}>
               {letter}
             </span>
           )}
@@ -261,11 +265,7 @@ export function SunsetHero() {
               <p className="mt-2 text-base italic text-[color:var(--tp-sun-gold)]">{tagline}</p>
               <p className="mt-2 text-base text-[color:var(--tp-parchment)]">{line}</p>
               <nav className="mt-7 flex flex-wrap items-center justify-center gap-3 md:justify-start" aria-label={navigation.contactAndCv}>
-                {actions.map((action) => (
-                  <JungleAction key={action.id} action={action} />
-                ))}
-                <JungleCVLink />
-                <JunglePortfolioLink />
+                <JungleLinks actions={actions} site={HERO_SITE_LINKS} />
               </nav>
             </div>
           </div>

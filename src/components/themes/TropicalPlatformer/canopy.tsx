@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { ToneScope } from './scenery'
 import paint from './scenery.module.css'
 
@@ -26,7 +27,7 @@ function Fronds({ flip }: { flip: boolean }) {
   )
 }
 
-export function Canopy() {
+export const Canopy = memo(function Canopy() {
   return (
     <ToneScope tone="jungle" className="pointer-events-none fixed inset-y-0 left-0 right-0 z-[5] hidden md:block">
       <div className="absolute inset-y-0 left-0 w-12 lg:w-16" aria-hidden="true">
@@ -37,4 +38,4 @@ export function Canopy() {
       </div>
     </ToneScope>
   )
-}
+})

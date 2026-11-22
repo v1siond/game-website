@@ -1,9 +1,12 @@
 'use client'
 
-import { useId, type CSSProperties, type ReactNode } from 'react'
+import { memo, useId, type AnimationEventHandler, type ReactNode } from 'react'
+import { mix } from '@/lib/color'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
+import { cssVars } from '@/lib/cssVars'
 import { COLORS } from './palette'
+import { usePlayedOut } from './playedOut'
 import sprite from './character.module.css'
 
 // Him as a parody of the source's hero, the big tie wearing gorilla, in the look of its pre rendered 3D
@@ -16,7 +19,7 @@ import sprite from './character.module.css'
 // Poses, transform keyframes in character.module.css keyed off data-pose:
 // - idle: a big breath, a blink, and every few seconds the chest pound;
 // - run: the knuckle run, the body bouncing while the arms plant and swing;
-// - roll: tucked into a spinning ball, the roll attack;
+// - roll: tucked into a spinning ball, the roll attack (the ball turns on Tailwind's spin);
 // - throw: a barrel hoisted overhead and thrown, once, then back to rest;
 // - slap: the ground slap, both hands raised and slammed flat on the ground in turn, the body squashing
 //   on each slam (the section around him shakes, slap.tsx);
@@ -30,17 +33,7 @@ import sprite from './character.module.css'
 
 export type HeroPose = 'idle' | 'run' | 'roll' | 'throw' | 'slap' | 'swing' | 'act'
 
-// A hex colour moved toward another by t (0 to 1), for the light and the shade of a volume.
-const mix = (from: string, to: string, t: number): string => {
-  const channel = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16)
-  const value = [0, 1, 2].map((i) => Math.round(channel(from, i) + (channel(to, i) - channel(from, i)) * t))
-  return `#${value.map((v) => v.toString(16).padStart(2, '0')).join('')}`
-}
-
-const WHITE = '#ffffff'
-const BLACK = '#000000'
-const FUR = '#6a3a1c'
-const TIE = '#d42a1e'
+const { white: WHITE, black: BLACK, heroFur: FUR, heroTie: TIE } = COLORS
 
 interface Look {
   fur: string
@@ -78,12 +71,47 @@ interface Paints {
   shorts: string
 }
 
-function Volume({ id, color }: { id: string; color: string }) {
+// A volume's radial stops: lit from the upper left, its own colour, its shade.
+interface Stops {
+  light: string
+  base: string
+  dark: string
+}
+
+const stopsOf = (color: string): Stops => ({ light: mix(color, WHITE, 0.3), base: color, dark: mix(color, BLACK, 0.5) })
+
+// A look with every colour mixed from it, worked out once per look at module scope instead of per render:
+// the stops of each volume and the darker lines drawn over the skin and the beard.
+interface Shaded extends Look {
+  volumes: Record<keyof Paints, Stops>
+  knuckles: string
+  chest: string
+  mouth: string
+}
+
+const TIE_STOPS = stopsOf(TIE)
+const GLOVE_STOPS = stopsOf(COLORS.target)
+const SHORTS_STOPS = stopsOf(COLORS.sunGold)
+const TIE_STRIPE = mix(TIE, BLACK, 0.35)
+const TIE_KNOT = mix(TIE, BLACK, 0.2)
+
+const shaded = (look: Look): Shaded => ({
+  ...look,
+  volumes: { fur: stopsOf(look.fur), skin: stopsOf(look.skin), tie: TIE_STOPS, glove: GLOVE_STOPS, shorts: SHORTS_STOPS },
+  knuckles: mix(look.skin, BLACK, 0.4),
+  chest: mix(look.skin, BLACK, 0.35),
+  mouth: mix(look.beard, WHITE, 0.18),
+})
+
+const OWN = shaded(OWN_LOOK)
+const SHADOW = shaded(SHADOW_LOOK)
+
+function Volume({ id, stops }: { id: string; stops: Stops }) {
   return (
     <radialGradient id={id} cx="0.34" cy="0.3" r="0.8">
-      <stop offset="0" stopColor={mix(color, WHITE, 0.3)} />
-      <stop offset="0.45" stopColor={color} />
-      <stop offset="1" stopColor={mix(color, BLACK, 0.5)} />
+      <stop offset="0" stopColor={stops.light} />
+      <stop offset="0.45" stopColor={stops.base} />
+      <stop offset="1" stopColor={stops.dark} />
     </radialGradient>
   )
 }
@@ -110,7 +138,7 @@ const SHORTS = 'M27 84 H73 C73 92 71 98 67 101 H54 L50 95 L46 101 H33 C29 98 27 
 const MIRROR = 'translate(100 0) scale(-1 1)'
 
 interface PartProps {
-  look: Look
+  look: Shaded
   paints: Paints
   profession: Profession
 }
@@ -129,7 +157,7 @@ function Hand({ look, paints, profession }: PartProps) {
     <>
       <ellipse cx="17.5" cy="105.2" rx="10" ry="7.5" fill={look.rim} opacity="0.85" />
       <ellipse cx="16.5" cy="106" rx="10" ry="7.5" fill={`url(#${paints.skin})`} />
-      <path d="M11 104 v4 M16 103.5 v4.5 M21 104 v4" stroke={mix(look.skin, BLACK, 0.4)} strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M11 104 v4 M16 103.5 v4.5 M21 104 v4" stroke={look.knuckles} strokeWidth="1.2" strokeLinecap="round" />
     </>
   )
 }
@@ -150,7 +178,7 @@ function Arm({ side, ...part }: PartProps & { side: 'back' | 'front' }) {
   )
 }
 
-function Leg({ side, look, paints }: { side: 'back' | 'front'; look: Look; paints: Paints }) {
+function Leg({ side, look, paints }: { side: 'back' | 'front'; look: Shaded; paints: Paints }) {
   const back = side === 'back'
   return (
     <g transform={back ? undefined : MIRROR}>
@@ -185,7 +213,7 @@ function Head({ look, paints, profession }: PartProps) {
       <path d="M50 17 C60 17 63 24 63 32 C63 41 58 47 50 47 C42 47 37 41 37 32 C37 24 40 17 50 17 Z" fill={`url(#${paints.skin})`} />
       <path d="M36 25 Q50 15 64 25 Q60 21.5 50 21.5 Q40 21.5 36 25 Z" fill={`url(#${paints.fur})`} />
       <path d="M37 31 C37 44 42 52 50 52 C58 52 63 44 63 31 C61 36 58 37.5 55 37.5 C53 39.5 51.5 40 50 40 C48.5 40 47 39.5 45 37.5 C42 37.5 39 36 37 31 Z" fill={look.beard} />
-      <path d="M45.5 43.5 Q50 46 54.5 43.5" fill="none" stroke={mix(look.beard, WHITE, 0.18)} strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M45.5 43.5 Q50 46 54.5 43.5" fill="none" stroke={look.mouth} strokeWidth="1.4" strokeLinecap="round" />
       <g className={sprite.eyes}>
         <ellipse cx="44.5" cy="29.5" rx="2.6" ry="3.8" fill={look.eyes} />
         <ellipse cx="55.5" cy="29.5" rx="2.6" ry="3.8" fill={look.eyes} />
@@ -234,7 +262,7 @@ function HeldBarrel() {
 // Tucked into the roll: a ball of fur with his hair, his beard and the end of the tie flying round it.
 function RollBall({ look, paints, profession }: PartProps) {
   return (
-    <g className={sprite.ball}>
+    <g className={`${sprite.ball} motion-safe:animate-[spin_0.45s_linear_infinite]`}>
       <circle cx="51.5" cy="80" r="31" fill={look.rim} opacity="0.85" />
       <circle cx="50" cy="81" r="31" fill={`url(#${paints.fur})`} />
       <path d="M50 50 C56 46 62 47 66 52 C60 52 55 53 50 56 Z" fill={look.hair} />
@@ -246,7 +274,7 @@ function RollBall({ look, paints, profession }: PartProps) {
       ) : (
         <path d="M70 58 L84 50 L86 58 Z" fill={`url(#${paints.tie})`} />
       )}
-      <path d="M26 70 Q50 58 74 74" fill="none" stroke={mix(look.fur, WHITE, 0.3)} strokeWidth="1.6" opacity="0.5" />
+      <path d="M26 70 Q50 58 74 74" fill="none" stroke={look.volumes.fur.light} strokeWidth="1.6" opacity="0.5" />
     </g>
   )
 }
@@ -258,11 +286,13 @@ interface HeroCharacterProps {
   silhouette?: boolean
   /** When a one shot pose (throw) starts, as a CSS time. */
   delay?: string
+  onAnimationEnd?: AnimationEventHandler<SVGSVGElement>
 }
 
-export function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s' }: HeroCharacterProps) {
-  const uid = useId().replace(/:/g, '')
-  const look = silhouette ? SHADOW_LOOK : OWN_LOOK
+// Pure on primitive props, so a parent's render that changes none of them leaves him as he is.
+export const HeroCharacter = memo(function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s', onAnimationEnd }: HeroCharacterProps) {
+  const uid = useId()
+  const look = silhouette ? SHADOW : OWN
   const paints: Paints = {
     fur: `${uid}-fur`,
     skin: `${uid}-skin`,
@@ -279,16 +309,17 @@ export function HeroCharacter({ profession, pose = 'idle', className = '', silho
       className={`${sprite.figure} ${className}`}
       data-pose={pose}
       data-profession={profession}
-      style={{ '--pose-delay': delay } as CSSProperties}
+      onAnimationEnd={onAnimationEnd}
+      style={cssVars({ '--pose-delay': delay })}
       aria-hidden="true"
       focusable="false"
     >
       <defs>
-        <Volume id={paints.fur} color={look.fur} />
-        <Volume id={paints.skin} color={look.skin} />
-        <Volume id={paints.tie} color={TIE} />
-        <Volume id={paints.glove} color={COLORS.target} />
-        <Volume id={paints.shorts} color={COLORS.sunGold} />
+        <Volume id={paints.fur} stops={look.volumes.fur} />
+        <Volume id={paints.skin} stops={look.volumes.skin} />
+        <Volume id={paints.tie} stops={look.volumes.tie} />
+        <Volume id={paints.glove} stops={look.volumes.glove} />
+        <Volume id={paints.shorts} stops={look.volumes.shorts} />
       </defs>
       <ellipse cx="50" cy="116" rx="34" ry="4.5" fill={BLACK} opacity="0.3" />
       {pose === 'roll' ? (
@@ -299,14 +330,14 @@ export function HeroCharacter({ profession, pose = 'idle', className = '', silho
           <Leg side="front" look={look} paints={paints} />
           <Lit d={TORSO} fill={`url(#${paints.fur})`} rim={look.rim} />
           <ellipse cx="50" cy="69" rx="18" ry="21" fill={`url(#${paints.skin})`} />
-          <path d="M40 62 Q45 66 49 62 M51 62 Q55 66 60 62" fill="none" stroke={mix(look.skin, BLACK, 0.35)} strokeWidth="1.4" strokeLinecap="round" />
+          <path d="M40 62 Q45 66 49 62 M51 62 Q55 66 60 62" fill="none" stroke={look.chest} strokeWidth="1.4" strokeLinecap="round" />
           {fighter && <Lit d={SHORTS} fill={`url(#${paints.shorts})`} rim={look.rim} />}
           {fighter && <path d="M27 86 H73" stroke={COLORS.seaDeep} strokeWidth="3" />}
           {!fighter && (
             <g className={sprite.tie}>
               <path d={TIE_SHAPE} fill={`url(#${paints.tie})`} />
-              <path d="M48 56 L54 62 M47 64 L55 70" stroke={mix(TIE, BLACK, 0.35)} strokeWidth="1.6" />
-              <path d="M45.5 46 H54.5 L53.5 52 H46.5 Z" fill={mix(TIE, BLACK, 0.2)} />
+              <path d="M48 56 L54 62 M47 64 L55 70" stroke={TIE_STRIPE} strokeWidth="1.6" />
+              <path d="M45.5 46 H54.5 L53.5 52 H46.5 Z" fill={TIE_KNOT} />
             </g>
           )}
           {pose === 'act' && ACT_PROPS[profession]}
@@ -318,4 +349,12 @@ export function HeroCharacter({ profession, pose = 'idle', className = '', silho
       )}
     </svg>
   )
+})
+
+/** Him for one moment the scene's class plays on the figure itself, gone once that animation ends, until
+ *  the scene remounts him for the next play. */
+export function PassingHero(props: Omit<HeroCharacterProps, 'onAnimationEnd'>) {
+  const { over, onOwnEnd } = usePlayedOut()
+  if (over) return null
+  return <HeroCharacter {...props} onAnimationEnd={onOwnEnd} />
 }

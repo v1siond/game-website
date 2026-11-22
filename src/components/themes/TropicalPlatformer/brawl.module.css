@@ -5,7 +5,7 @@
  */
 
 .clearing {
-  background: linear-gradient(180deg, #1d5a2a 0%, #0f3519 100%);
+  background: linear-gradient(180deg, var(--tp-clearing-top) 0%, var(--tp-clearing-bottom) 100%);
   border: 3px solid var(--tp-bark-dark);
 }
 

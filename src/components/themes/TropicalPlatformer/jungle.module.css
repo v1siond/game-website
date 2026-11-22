@@ -99,7 +99,7 @@
     var(--tp-grain),
     radial-gradient(120% 80% at 15% 0%, rgb(95 168 58 / 0.16), transparent 60%),
     repeating-linear-gradient(90deg, transparent 0 7.5rem, rgb(0 0 0 / 0.35) 7.5rem calc(7.5rem + 2px), rgb(232 184 116 / 0.06) calc(7.5rem + 2px) calc(7.5rem + 3px)),
-    linear-gradient(180deg, #24150a, #160c05);
+    linear-gradient(180deg, var(--tp-board-top), var(--tp-board-bottom));
   border: 3px solid var(--tp-bark);
   box-shadow:
     inset 0 0 0 2px rgb(232 184 116 / 0.12),

@@ -4,10 +4,12 @@ import { useState, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { BarrelArt } from './barrel'
+import { jungleButton } from './buttons'
 import { HeroCharacter } from './character'
+import { usePlayedOut } from './playedOut'
 import { COLORS as C } from './palette'
-import look from './jungle.module.css'
 import yard from './elder.module.css'
+import motion from './motion.module.css'
 
 // About in the old timer's yard. A barrel cannon at the left fires him in rolled into a ball; he lands,
 // stands and pounds his chest, and the about board unfolds under him from its top edge. At the right the
@@ -23,7 +25,7 @@ export function OldTimer() {
   return (
     <svg viewBox="0 0 100 110" className="block h-auto w-full" aria-hidden="true" focusable="false">
       <ellipse cx="52" cy="106" rx="40" ry="3.5" fill={C.shadow} opacity="0.35" />
-      <g className={yard.rock}>
+      <g className={motion.rock}>
         <path d="M8 98 Q50 112 94 96" fill="none" stroke={C.barkDark} strokeWidth="5" strokeLinecap="round" />
         <path d="M30 100 V84 M76 98 V84" stroke={C.bark} strokeWidth="4" />
         {[58, 66, 74, 82].map((x, i) => (
@@ -49,12 +51,14 @@ export function OldTimer() {
 }
 
 const LINES = ['elderSays1', 'elderSays2', 'elderSays3'] as const
+const ASK_BUTTON = jungleButton({ tone: 'wood', size: 'small' })
 
 /** About: he is fired into the old timer's yard, the board opens, the old timer grumbles. */
 export function ElderYard({ children }: { children: ReactNode }) {
   const { jungle } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
   const [line, setLine] = useState(0)
+  const flight = usePlayedOut()
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={yard.yard}>
@@ -62,11 +66,13 @@ export function ElderYard({ children }: { children: ReactNode }) {
         <div className={`absolute bottom-2 left-0 w-14 sm:w-16 ${yard.cannon}`}>
           <BarrelArt mark="burst" className="block h-auto w-full" />
         </div>
-        <div className={`pointer-events-none absolute inset-0 ${yard.flyX}`}>
-          <div className={`absolute bottom-2 left-2 h-20 w-14 sm:h-24 sm:w-16 ${yard.flyY}`}>
-            <HeroCharacter profession="engineer" pose="roll" className="h-full w-full" />
+        {!flight.over && (
+          <div className={`pointer-events-none absolute inset-0 ${yard.flyX}`} onAnimationEnd={flight.onOwnEnd}>
+            <div className={`absolute bottom-2 left-2 h-20 w-14 sm:h-24 sm:w-16 ${yard.flyY}`}>
+              <HeroCharacter profession="engineer" pose="roll" className="h-full w-full" />
+            </div>
           </div>
-        </div>
+        )}
         <div className={`absolute bottom-2 left-[calc(32%+0.5rem)] h-20 w-14 sm:h-24 sm:w-16 ${yard.standing}`}>
           <HeroCharacter profession="engineer" pose="idle" className="h-full w-full" />
         </div>
@@ -82,7 +88,7 @@ export function ElderYard({ children }: { children: ReactNode }) {
         <button
           type="button"
           onClick={() => setLine((current) => (current + 1) % LINES.length)}
-          className={`min-h-[44px] rounded-xl px-4 text-sm ${look.button} ${look.buttonWood} ${look.focus}`}
+          className={ASK_BUTTON}
         >
           {jungle.elderAsk}
         </button>

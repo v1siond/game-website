@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
@@ -9,7 +9,9 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
+import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
+import { StatusLine } from './buttons'
 import { HeroCharacter } from './character'
 import { ExtraLifeBalloon, HiddenCoin, LetterTracker } from './letterCoin'
 import { letterCards, nameLetters } from './letters'
@@ -30,6 +32,9 @@ import run from './cannons.module.css'
 // flight offsets (--dx, --dy, --peak) as CSS variables, and two timers end the aim and the flight; the
 // arc itself is CSS (a linear horizontal layer over an eased vertical one). Reduced motion moves him at
 // once.
+
+// An empty barrel turns a full turn every 2.4 s, as the source's auto barrels do; still under reduced motion.
+const TURNING = 'motion-safe:animate-[spin_2.4s_linear_infinite]'
 
 const AIM_MS = 280
 const FLIGHT_MS = 820
@@ -63,26 +68,32 @@ interface PlatformProps {
   entry: Job
   coins: Coin[]
   index: number
+  // His barrel: a button from his landing until he lands on the next one, so the pressed control keeps
+  // focus through the flight; occupied while he sits in it, empty and turning while he flies.
+  armed: boolean
   occupied: boolean
   landed: number
   aim: number | null
+  // The next job's name and the blast, read only by the armed barrel; the others get none, so a blast
+  // re-renders only the platforms it changes.
   nextName: string
-  onBlast: () => void
-  barrelRef: (element: HTMLElement | null) => void
+  onBlast?: () => void
+  onBarrel: (index: number, element: HTMLElement | null) => void
 }
 
-function Platform({ entry, coins, index, occupied, landed, aim, nextName, onBlast, barrelRef }: PlatformProps) {
+const Platform = memo(function Platform({ entry, coins, index, armed, occupied, landed, aim, nextName, onBlast, onBarrel }: PlatformProps) {
   const { years, cards, jungle } = useLabels()
+  const barrelRef = useCallback((element: HTMLElement | null) => onBarrel(index, element), [onBarrel, index])
   const { start, end } = jobYears(entry, years.present)
   const cannon = (
-    <span className={`relative block ${run.cannon}`} data-aim={aim !== null || undefined} style={{ '--aim': `${aim ?? 0}deg` } as CSSProperties}>
+    <span className={`relative block ${run.cannon}`} data-aim={aim !== null || undefined} style={cssVars({ '--aim': `${aim ?? 0}deg` })}>
       {occupied && <HeroCharacter profession="engineer" pose="idle" className={`absolute bottom-[58%] left-[10%] w-[80%] ${run.peek}`} />}
       <BarrelArt mark="burst" className="relative block h-auto w-full" />
     </span>
   )
 
   return (
-    <article key={landed} data-landed={landed > 0 || undefined} className={`relative rounded-3xl p-5 pt-6 ${look.board} ${run.platform}`} style={{ '--i': index } as CSSProperties}>
+    <article key={landed} data-landed={landed > 0 || undefined} className={`relative rounded-3xl p-5 pt-6 ${look.board} ${run.platform}`} style={cssVars({ '--i': index })}>
       <span className={`absolute inset-x-0 top-0 h-3 rounded-t-3xl ${run.grass}`} aria-hidden="true" />
       {coins.length > 0 && (
         <div className="absolute -top-5 left-4 flex gap-2">
@@ -92,12 +103,20 @@ function Platform({ entry, coins, index, occupied, landed, aim, nextName, onBlas
         </div>
       )}
       <div className="absolute -top-6 right-4 w-14">
-        {occupied ? (
-          <button ref={barrelRef} type="button" onClick={onBlast} aria-label={fillLabel(jungle.blastTo, { job: nextName })} className={`block w-full rounded-full ${look.focus}`}>
+        {armed && (
+          <button
+            ref={barrelRef}
+            type="button"
+            onClick={onBlast}
+            aria-disabled={!occupied || undefined}
+            aria-label={fillLabel(jungle.blastTo, { job: nextName })}
+            className={`block w-full rounded-full ${look.focus} ${occupied ? '' : TURNING}`}
+          >
             {cannon}
           </button>
-        ) : (
-          <span ref={barrelRef} className={`block ${run.idle}`} aria-hidden="true">
+        )}
+        {!armed && (
+          <span ref={barrelRef} className={`block ${TURNING}`} aria-hidden="true">
             {cannon}
           </span>
         )}
@@ -137,21 +156,20 @@ function Platform({ entry, coins, index, occupied, landed, aim, nextName, onBlas
       )}
     </article>
   )
-}
+})
 
 /** The jobs as a masonry run of platforms and barrel cannons; he blasts from one job to the next. */
 export function CannonRun({ jobs }: { jobs: Job[] }) {
   const labels = useLabels()
   const { hero } = useWorldView()
   const { ref, triggered } = useSectionTrigger()
-  const letters = nameLetters(hero.name)
-  const holders = letterCards(letters.length, jobs.length)
+  const letters = useMemo(() => nameLetters(hero.name), [hero.name])
+  const holders = useMemo(() => letterCards(letters.length, jobs.length), [letters.length, jobs.length])
   const [visited, setVisited] = useState<ReadonlySet<number>>(() => new Set())
   const [at, setAt] = useState(0)
   const [aim, setAim] = useState<number | null>(null)
   const [flight, setFlight] = useState<Flight | null>(null)
   const [landings, setLandings] = useState<Record<number, number>>({})
-  const [status, setStatus] = useState('')
   const stage = useRef<HTMLDivElement>(null)
   const barrels = useRef<Array<HTMLElement | null>>([])
   const timers = useRef<number[]>([])
@@ -160,9 +178,18 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
   // He starts in the first job's barrel, so its letter is found as the run opens.
-  useEffect(() => {
-    if (triggered) setVisited((current) => (current.has(0) ? current : new Set(current).add(0)))
-  }, [triggered])
+  const found = useMemo(
+    () => new Set(holders.flatMap((holder, index) => (visited.has(holder) || (triggered && holder === 0) ? [index] : []))),
+    [holders, visited, triggered],
+  )
+  // The letters waiting on each job, one list per job, the same lists until a letter is found.
+  const coinsByJob = useMemo(
+    () => jobs.map((_, job) => holders.flatMap((holder, index): Coin[] => (holder === job ? [{ index, letter: letters[index], found: found.has(index) }] : []))),
+    [jobs, holders, letters, found],
+  )
+  const setBarrel = useCallback((index: number, element: HTMLElement | null) => {
+    barrels.current[index] = element
+  }, [])
 
   useEffect(() => {
     if (!focusAfterLanding.current) return
@@ -176,7 +203,6 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
     setAim(null)
     setFlight(null)
     setLandings((count) => ({ ...count, [to]: (count[to] ?? 0) + 1 }))
-    setStatus(fillLabel(labels.jungle.landedAt, { job: jobName(jobs[to], labels) }))
     focusAfterLanding.current = true
   }
 
@@ -209,10 +235,9 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
 
   if (jobs.length === 0) return null
   const nextName = jobName(jobs[(at + 1) % jobs.length], labels)
-  const found = new Set(holders.flatMap((holder, index) => (visited.has(holder) ? [index] : [])))
+  // The status says where he landed last; before his first blast he has landed nowhere.
+  const status = landings[at] ? fillLabel(labels.jungle.landedAt, { job: jobName(jobs[at], labels) }) : ''
   const complete = letters.length > 0 && found.size === letters.length
-  const coinsOn = (job: number): Coin[] =>
-    holders.flatMap((holder, index) => (holder === job ? [{ index, letter: letters[index], found: found.has(index) }] : []))
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={run.run}>
@@ -226,16 +251,15 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
             <li key={entry.id} className={`${MASONRY_ITEM} pt-6`}>
               <Platform
                 entry={entry}
-                coins={coinsOn(index)}
+                coins={coinsByJob[index]}
                 index={index}
+                armed={index === at}
                 occupied={index === at && !flight}
                 landed={landings[index] ?? 0}
                 aim={index === at ? aim : null}
-                nextName={nextName}
-                onBlast={blast}
-                barrelRef={(element) => {
-                  barrels.current[index] = element
-                }}
+                nextName={index === at ? nextName : ''}
+                onBlast={index === at ? blast : undefined}
+                onBarrel={setBarrel}
               />
             </li>
           ))}
@@ -243,7 +267,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
         {flight && (
           <div
             className={`pointer-events-none absolute left-0 top-0 z-20 h-16 w-12 ${run.flyX}`}
-            style={{ '--dx': `${flight.dx}px`, '--dy': `${flight.dy}px`, '--peak': `${flight.peak}px` } as CSSProperties}
+            style={cssVars({ '--dx': `${flight.dx}px`, '--dy': `${flight.dy}px`, '--peak': `${flight.peak}px` })}
             aria-hidden="true"
           >
             <div className={`h-full w-full ${run.flyY}`}>
@@ -252,9 +276,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
           </div>
         )}
       </div>
-      <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
-        {status}
-      </p>
+      <StatusLine>{status}</StatusLine>
     </div>
   )
 }

@@ -1,11 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import type { ReactNode } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePosts } from '@/components/blog/BlogProvider'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
+import type { SectionSlot } from '@/lib/cv/sectionPlan'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import type { SectionsOf } from '@/lib/cv/cvView'
 import { BLOG_PATH, postLinks } from '@/lib/blog/links'
 import { ServiceBoard, TechBoard, VentureBoard } from './boards'
 import { WOOD_BUTTON } from './buttons'
@@ -14,9 +15,10 @@ import { CannonRun } from './cannons'
 import { VineCrossing } from './crossing'
 import { ElderYard } from './elder'
 import { Board, Level } from './levelSign'
+import type { SceneKind } from './scenery'
 import { CartProjects } from './projects'
-import { RhinoCharge } from './rhino'
-import { GroundSlap } from './slap'
+import { RAMMED, RhinoCharge } from './rhino'
+import { GroundSlap, JOLTED } from './slap'
 import { VineBands } from './vines'
 import { BarrelSmash, VultureDrop } from './deliveries'
 import look from './jungle.module.css'
@@ -28,93 +30,100 @@ import look from './jungle.module.css'
 // boards his thrown barrel smashes open (./deliveries), a vine crossing
 // into the cave, the projects as stations of a mine cart ride, the ventures rammed by the rhino, the
 // bands as hanging planks he swings between, and the Muay Thai record as a bout with the walking
-// crocodiles, dropped onto the page by the vulture (./deliveries). The posts level closes every profession on a plain board with the latest posts.
+// crocodiles, dropped onto the page by the vulture (./deliveries). The shared plan picks which levels a
+// profession runs and in which order. The posts level closes every profession on a plain board with the
+// latest posts.
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
+/** A section's level, titled with the section's own label. */
+function SectionLevel({ slot, scene, children }: { slot: SectionSlot; scene: SceneKind; children: ReactNode }) {
   const { sections: titles } = useLabels()
-
   return (
-    <div className="space-y-24">
-      <Level title={titles.about} scene="jungle">
+    <Level title={titles[slot.titleKey]} scene={scene}>
+      {children}
+    </Level>
+  )
+}
+
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    return (
+      <SectionLevel slot={slot} scene="jungle">
         <ElderYard>
           <Board>
-            <p className="mx-auto max-w-prose text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{professionalSummary.bio}</p>
+            <p className="mx-auto max-w-prose text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
           </Board>
         </ElderYard>
-      </Level>
-
-      {sections.jobs.length > 0 && (
-        <Level title={titles.workExperience} scene="treetop">
-          <CannonRun jobs={sections.jobs} />
-        </Level>
-      )}
-
-      <Level title={titles.techStack} scene="jungle">
+      </SectionLevel>
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    return (
+      <SectionLevel slot={slot} scene="treetop">
+        <CannonRun jobs={slot.jobs} />
+      </SectionLevel>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    return (
+      <SectionLevel slot={slot} scene="jungle">
         <GroundSlap>
-          <TechBoard categories={sections.techStack} />
+          <TechBoard categories={slot.categories} itemClassName={JOLTED} />
         </GroundSlap>
-      </Level>
-
-      {sections.services.length > 0 && (
-        <Level title={titles.services} scene="jungle">
-          <FadeInScene>
-            <BarrelSmash>
-              <ServiceBoard services={sections.services} />
-            </BarrelSmash>
-          </FadeInScene>
-        </Level>
-      )}
-
-      {sections.projects.length > 0 && (
-        <>
-          <VineCrossing />
-          <Level title={titles.projects} scene="cave">
-            <CartProjects projects={sections.projects} />
-          </Level>
-        </>
-      )}
-
-      {sections.companies.length > 0 && (
-        <Level title={titles.ventures} scene="jungle">
-          <RhinoCharge>
-            <VentureBoard companies={sections.companies} />
-          </RhinoCharge>
-        </Level>
-      )}
-    </div>
-  )
+      </SectionLevel>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    return (
+      <SectionLevel slot={slot} scene="jungle">
+        <FadeInScene>
+          <BarrelSmash>
+            <ServiceBoard services={slot.services} />
+          </BarrelSmash>
+        </FadeInScene>
+      </SectionLevel>
+    )
+  },
+  // He swings across the gap into the cave before the projects.
+  projects: function ProjectsFrame({ slot }) {
+    return (
+      <>
+        <VineCrossing />
+        <SectionLevel slot={slot} scene="cave">
+          <CartProjects projects={slot.projects} />
+        </SectionLevel>
+      </>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    return (
+      <SectionLevel slot={slot} scene="jungle">
+        <RhinoCharge>
+          <VentureBoard companies={slot.companies} itemClassName={RAMMED} />
+        </RhinoCharge>
+      </SectionLevel>
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    return (
+      <SectionLevel slot={slot} scene="vines">
+        <VineBands bands={slot.bands} musician={slot.musician} />
+      </SectionLevel>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    return (
+      <SectionLevel slot={slot} scene="jungle">
+        <h3 className={`mb-8 text-center text-xl text-[color:var(--tp-sun-gold)] ${look.display} ${look.caption}`}>{slot.martialArts.primary.title}</h3>
+        <VultureDrop>
+          <BrawlRecord martialArts={slot.martialArts} />
+        </VultureDrop>
+      </SectionLevel>
+    )
+  },
 }
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { sections: titles } = useLabels()
-
-  return (
-    <Level title={titles.bands} scene="vines">
-      <VineBands bands={sections.bands} musician={sections.musician} />
-    </Level>
-  )
-}
-
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { sections: titles } = useLabels()
-  const { martialArts } = sections
-
-  return (
-    <Level title={titles.muayThai} scene="jungle">
-      <h3 className={`mb-8 text-center text-xl text-[color:var(--tp-sun-gold)] ${look.display} ${look.caption}`}>{martialArts.primary.title}</h3>
-      <VultureDrop>
-        <BrawlRecord martialArts={martialArts} />
-      </VultureDrop>
-    </Level>
-  )
-}
-
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+// A profession's levels sit 6rem apart in one wrapper.
+export const SECTION_VIEWS = sectionViews(FRAMES, 'space-y-24')
 
 /** The closing posts level, the same after every profession: the latest posts on a plain board, each
  *  title a sun gold link with its date, and the wooden button to the whole list. */

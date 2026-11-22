@@ -16,6 +16,12 @@ export const COLORS = {
   woodDark: '#4a2208',
   // the light text on dark wood and leaf
   parchment: '#f6e7c8',
+  // the pure light and dark his volumes are lit and shaded toward
+  white: '#ffffff',
+  black: '#000000',
+  // his own fur and his tie
+  heroFur: '#6a3a1c',
+  heroTie: '#d42a1e',
   // the laptop screen, and the fighter's mongkhon and shorts band
   lagoon: '#00CED1',
   seaDeep: '#1f4fbf',
@@ -41,6 +47,12 @@ export const COLORS = {
   // bark-dark; barrels, borders and letters keep plank.
   plankText: '#deba91',
   plankLight: '#e8b874',
+  // the dark boards the sections are read on, top to bottom, and the deep wood under the plates and the
+  // mine cart's tunnel
+  boardTop: '#24150a',
+  boardBottom: '#160c05',
+  plateTop: '#2a180b',
+  woodDeep: '#1a0f06',
   hoop: '#4f545c',
   hoopLight: '#b9bec6',
   burst: '#fffdf4',
@@ -69,6 +81,9 @@ export const COLORS = {
   croc: '#3f8a3a',
   crocDark: '#1f4f24',
   crocBelly: '#d9b77a',
+  // the bout's clearing, top to bottom
+  clearingTop: '#1d5a2a',
+  clearingBottom: '#0f3519',
   // the rhino he rides through the ventures: grey hide, an ivory horn
   rhino: '#8a8f99',
   rhinoDark: '#4d5159',
@@ -97,15 +112,16 @@ export interface ToneColors {
 export type Tone = 'sunset' | 'dusk' | 'jungle' | 'treetop' | 'cave' | 'night'
 
 export const TONES: Record<Tone, ToneColors> = {
+  // the sunset's planes are its dusk and orange and the black shapes in front of the light
   sunset: {
-    skyHigh: '#6e2747',
-    skyLow: '#f2771f',
+    skyHigh: COLORS.dusk,
+    skyLow: COLORS.sunsetOrange,
     farLit: '#5a2340',
-    far: '#3a1430',
-    leafLit: '#2a1612',
+    far: COLORS.duskDeep,
+    leafLit: COLORS.shadowSoft,
     leaf: '#1d0f0c',
-    leafShade: '#140b0a',
-    rim: '#f2771f',
+    leafShade: COLORS.shadow,
+    rim: COLORS.sunsetOrange,
     trunk: '#1d0f0c',
     bloom: '#3a1418',
   },
@@ -117,7 +133,7 @@ export const TONES: Record<Tone, ToneColors> = {
     leafLit: '#3f8a2a',
     leaf: '#1f5420',
     leafShade: '#0a2410',
-    rim: '#ffb347',
+    rim: COLORS.lamp,
     trunk: '#3a2414',
     bloom: '#b8323e',
   },
@@ -155,11 +171,11 @@ export const TONES: Record<Tone, ToneColors> = {
     leafShade: '#25122f',
     rim: '#d8b4f0',
     trunk: '#3a1f48',
-    bloom: '#ffd84a',
+    bloom: COLORS.banana,
   },
   night: {
-    skyHigh: '#070c20',
-    skyLow: '#101a3a',
+    skyHigh: COLORS.nightDeep,
+    skyLow: COLORS.nightSky,
     farLit: '#1f5560',
     far: '#123040',
     leafLit: '#3aa5a0',
