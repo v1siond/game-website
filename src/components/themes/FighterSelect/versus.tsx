@@ -17,11 +17,12 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 // The hero entrance as the versus screen before a fight: his stage portrait in a white frame on the left
 // with the 1P tag, the VS burst on the seam, his name on the black on the right in the round call
 // lettering. CSS keyframes chained by delay, played once:
-// 0ms the stage panel slashes in from the left and the name panel from the right (380ms), the wardrobe with
-// the stage panel but on its transform alone, seen and focusable from the first frame,
+// 0ms the stage panel slashes in from the left and the name panel from the right (380ms), the wardrobe in its
+// place from the first frame, seen and focusable,
 // 260ms he slides into his corner and lands with an overshoot (420ms),
 // 360ms a white flash over the stage and the VS burst slamming onto the seam mark the moment the
-// panels meet, 520ms his name slams down from 2.4x (360ms), 760ms the headline lines rise in turn.
+// panels meet, the clash jolting the wardrobe a few pixels and back (300ms), 520ms his name slams down
+// from 2.4x (360ms), 760ms the headline lines rise in turn.
 
 const HERO_SITES = ['cv', 'engine'] as const
 
@@ -45,7 +46,7 @@ export function HeroSplash({ profession }: { profession: Profession }) {
             <div className="relative flex flex-col gap-3">
               {/* out of the flow, slim while the panels stack: as the name bar across the portrait's lower edge on a phone,
                   above the VS emblem; in the stage's free right side from sm; under the stage panel (sm:h-72) from lg */}
-              <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg sm:max-lg:[--wd-fan-gap:-143px] absolute bottom-[22px] right-2 z-10 sm:bottom-auto sm:top-[100px] lg:left-0 lg:right-0 lg:top-[calc(18rem_+_0.75rem)] ${look.display} ${fight.slashInSolid}`} />
+              <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--slim-below-lg sm:max-lg:[--wd-fan-gap:-143px] absolute bottom-[22px] right-2 z-10 sm:bottom-auto sm:top-[100px] lg:left-0 lg:right-0 lg:top-[calc(18rem_+_0.75rem)] ${look.display} ${fight.clashJolt}`} />
               <div className={`relative h-56 overflow-hidden border-4 border-white bg-black shadow-[inset_0_0_0_2px_#000] sm:h-72 ${look.splashLeft} ${fight.enter} ${fight.slashIn}`}>
                 <StageBackdrop profession={profession} />
                 <div className={`absolute inset-0 bg-white ${fight.enter} ${fight.flash} [--delay:360ms] opacity-0`} aria-hidden="true" />
