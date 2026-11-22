@@ -60,7 +60,6 @@ export function LockIn({ children }: { children: ReactNode }) {
 
 export function ResultRecord({ martialArts }: { martialArts: MartialArts }) {
   const { achievements } = martialArts.primary
-  const stampAt = (achievement: string) => staggerAt(achievements.indexOf(achievement))
 
   return (
     <Cue>
@@ -87,8 +86,8 @@ export function ResultRecord({ martialArts }: { martialArts: MartialArts }) {
             achievements: 'grid gap-4 sm:grid-cols-2',
             achievement: 'text-sm text-white',
           }}
-          renderAchievement={(achievement) => (
-            <p className={`flex h-full items-start gap-3 border-2 border-white bg-black p-4 shadow-[0_0_0_2px_#000,4px_4px_0_2px_#000] ${fight.enter} ${fight.stamp} ${stampAt(achievement)}`}>
+          renderAchievement={(achievement, index) => (
+            <p className={`flex h-full items-start gap-3 border-2 border-white bg-black p-4 shadow-[0_0_0_2px_#000,4px_4px_0_2px_#000] ${fight.enter} ${fight.stamp} ${staggerAt(index)}`}>
               <HitSpark />
               <span>{achievement}</span>
             </p>
