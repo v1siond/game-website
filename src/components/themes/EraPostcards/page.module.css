@@ -152,18 +152,29 @@
 }
 
 /* Every text over the art stands on an opaque plate of its era's card colour, so no light in the art (a sun,
-   a beam) can sit behind a letter: chalk, mist and every era accent reach 7:1 (AAA) on every card colour. */
+   a beam) can sit behind a letter: chalk, mist and every era accent reach 7:1 (AAA) on every card colour.
+   The hero's plates end short of him: he stands under the ring at the picture's middle, so the copy keeps
+   to the left of it (600 px from the 6vw gutter) and his name is sized to fit that column. */
 .heroCopy {
-  max-width: 720px;
-  padding: 28px clamp(20px, 3vw, 36px) 30px;
+  display: grid;
+  gap: 12px;
+  max-width: 600px;
+}
+
+.heroPlate {
+  padding: 24px clamp(20px, 3vw, 36px) 26px;
   border-radius: 24px;
   border: 1px solid color-mix(in srgb, var(--era-accent) 40%, transparent);
   background: var(--era-card);
   box-shadow: 0 24px 60px -30px rgb(0 0 0 / 0.9);
 }
 
+.heroPlate > :first-child {
+  margin-top: 0;
+}
+
 .name {
-  font-size: clamp(4rem, 11vw, 10.5rem);
+  font-size: clamp(3.6rem, 8vw, 8rem);
   letter-spacing: -0.01em;
 }
 
@@ -614,7 +625,12 @@
   .hero {
     flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-end;
+    justify-content: flex-start;
+  }
+
+  /* On a phone he stands low in the picture's middle, under the name: the second plate starts below him. */
+  .heroCopy {
+    gap: 52svh;
   }
 
   .wardrobe {
