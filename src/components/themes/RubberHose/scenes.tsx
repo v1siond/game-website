@@ -45,12 +45,11 @@ export function TitleCardIntro({ children }: { children: (look: IntroLook) => Re
   const isPreview = usePreview()
   const [phase, setPhase] = useState<IntroPhase>('wait')
   const skip = reducedMotion || isPreview
+  // Reduced motion and a preview start on the end, read straight from skip rather than stored a commit later.
+  const shown = skip ? 'pop' : phase
 
   useEffect(() => {
-    if (skip) {
-      setPhase('pop')
-      return
-    }
+    if (skip) return
     const timers = [
       setTimeout(() => setPhase('drop'), INTRO_TIMING.drop),
       setTimeout(() => setPhase('pop'), INTRO_TIMING.pop),
@@ -65,7 +64,7 @@ export function TitleCardIntro({ children }: { children: (look: IntroLook) => Re
           <IrisRing className={`${styles.iris} ${styles.irisOpen}`} />
         </div>
       )}
-      {children(INTRO_LOOK[phase])}
+      {children(INTRO_LOOK[shown])}
     </div>
   )
 }
