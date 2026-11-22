@@ -317,12 +317,10 @@
 .clamp {
   transform-box: fill-box;
   transform-origin: right center;
+  transition: transform 0.4s ease;
 }
 .ripStage[data-done='false'] .clamp {
   transform: rotate(-18deg);
-}
-.clamp {
-  transition: transform 0.4s ease;
 }
 
 /* he stands out of the chair, a step to the right, for the kick */

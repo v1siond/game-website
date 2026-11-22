@@ -804,8 +804,3 @@
 .district[data-on='true'] {
   opacity: 1;
 }
-@media (prefers-reduced-motion: reduce) {
-  .district {
-    transition: none;
-  }
-}
