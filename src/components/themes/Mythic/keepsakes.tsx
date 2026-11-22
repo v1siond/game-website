@@ -1,7 +1,7 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
@@ -60,7 +60,7 @@ function Keepsake({ company, index }: { company: Company; index: number }) {
 }
 
 export function Keepsakes({ companies }: { companies: Company[] }) {
-  const { links, cards } = useLabels()
+  const { links } = useLabels()
 
   return (
     <>
@@ -72,10 +72,10 @@ export function Keepsakes({ companies }: { companies: Company[] }) {
                 href={company.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
                 className="block h-full"
               >
                 <Keepsake company={company} index={index} />
+                <span className="sr-only"> {newTabHint(links)}</span>
               </a>
             ) : (
               <Keepsake company={company} index={index} />

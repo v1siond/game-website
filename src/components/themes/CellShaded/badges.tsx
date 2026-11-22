@@ -1,5 +1,5 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { Starburst } from './ink'
@@ -59,7 +59,7 @@ function PlateFace({ company, tone }: { company: Company; tone: string }) {
 }
 
 export function MakersPlates({ companies }: { companies: Company[] }) {
-  const { links, cards } = useLabels()
+  const { links } = useLabels()
 
   return (
     <ul className="grid gap-8 md:grid-cols-6">
@@ -73,11 +73,11 @@ export function MakersPlates({ companies }: { companies: Company[] }) {
                 href={company.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
                 className={`block h-full ${cel.plate}`}
                 style={style}
               >
                 <PlateFace company={company} tone={tone} />
+                <span className="sr-only"> {newTabHint(links)}</span>
               </a>
             ) : (
               <div className={`h-full ${cel.plate}`} style={style}>
