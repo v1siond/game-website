@@ -154,9 +154,9 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
 export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   return (
     <>
-      {actions.map((action) => (
-        <RealmButton key={action.id} linkProps={action.linkProps} variant={action.id === 'email' ? 'primary' : 'default'}>
-          {action.label}
+      {actions.map(({ id, label, linkProps }) => (
+        <RealmButton key={id} linkProps={linkProps} variant={id === 'email' ? 'primary' : 'default'}>
+          {label}
         </RealmButton>
       ))}
     </>

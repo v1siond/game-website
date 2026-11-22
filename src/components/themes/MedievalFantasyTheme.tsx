@@ -5,6 +5,7 @@ import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
@@ -17,7 +18,6 @@ import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/a
 import { FTArtDivider } from './MedievalFantasy/ornaments'
 import { FelPaths, ProfessionNode } from './MedievalFantasy/professions'
 import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy/sections'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Medieval Fantasy: the page composition. Its palette, backdrop, frames, buttons, cards, ornaments and
 // per profession sections live in ./MedievalFantasy.
@@ -29,6 +29,7 @@ export default function MedievalFantasyTheme() {
   const view = useWorldView()
   const { navigation, actions: actionLabels, sections } = useLabels()
   const active = view.profession
+  const { cv, engine } = useSiteLinks()
   const [mounted, setMounted] = useState(false)
   const [viewportHeight, setViewportHeight] = useState(800)
 
@@ -90,8 +91,8 @@ export default function MedievalFantasyTheme() {
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <HeroActions actions={actions} />
-                      <RealmButton href="/cv">{actionLabels.cv}</RealmButton>
-                      <RealmButton linkProps={ENGINE_LINK}>{actionLabels.engine}</RealmButton>
+                      <RealmButton href={cv.linkProps.href}>{cv.label}</RealmButton>
+                      <RealmButton linkProps={engine.linkProps}>{engine.label}</RealmButton>
                       <LanguageSwitcher render={(state) => <RealmLanguageMenu {...state} />} />
                     </div>
                   </div>
@@ -164,7 +165,7 @@ export default function MedievalFantasyTheme() {
                   <p style={{ color: REALM.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
                     <HeroActions actions={actions} />
-                    <RealmButton href="/cv">{actionLabels.cv}</RealmButton>
+                    <RealmButton href={cv.linkProps.href}>{cv.label}</RealmButton>
                   </div>
                 </>
               )}
