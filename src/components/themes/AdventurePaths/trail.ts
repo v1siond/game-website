@@ -19,8 +19,6 @@ export interface Trail {
 export interface TrailDot {
   x: number
   y: number
-  /** Where the dot sits along the trail, 0 at the first stop and 1 at the last. */
-  at: number
 }
 
 const SAMPLES_PER_CURVE = 24
@@ -107,7 +105,7 @@ export function dotsAlong(trail: Trail, spacing: number): TrailDot[] {
   return Array.from({ length: count - 1 }, (_, index) => {
     const along = step * (index + 1)
     const [x, y] = pointAt(trail, along)
-    return { x: round(x), y: round(y), at: round(along / trail.length) }
+    return { x: round(x), y: round(y) }
   })
 }
 

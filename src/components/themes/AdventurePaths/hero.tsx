@@ -4,79 +4,41 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { NameWords } from '@/components/cv/NameWords'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useLatest } from '@/hooks/useLatest'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
-import { NameWords } from '@/components/cv/NameWords'
-import { ContactSigns } from './actions'
 import { cssVars } from '@/lib/cssVars'
-import { ARRIVAL, BRANCHES, HUB, HubCompass, HubMapArt, landmarkPoint } from './hubMap'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+import { Stage } from '../shared/theatre/Stage'
+import { ContactSigns } from './actions'
+import { BRANCHES, HUB, HubCompass, HubMapArt, landmarkPoint } from './hubMap'
 import { JOURNAL_SERIF, TRAIL } from './palette'
+import { LAYER_MOTION, type TrailScene } from './scenes'
 import { shareOf } from './trail'
 import { useTrailWalker, type WalkLeg } from './walk'
-import { ACT_MS, ENTRANCE_FIT, ENTRANCE_STEPS, WALK_AT, WALK_SPEED, type EntranceStep } from './entrance'
 import { TrailWalker } from './walker'
 import map from './map.module.css'
-import { heldUntil } from '@/components/themes/shared/held'
+import page from './page.module.css'
 
-// The wardrobe's journal plate under the map he walks: ink on the page, 14.8 to 1, edged in bark.
+// The hero: a big first screen over the plains picture (scenes/hub.tsx), his name plaque and the overworld
+// map he picks a profession on. He stands on the landmark of the shown profession. Each landmark is a radio
+// of the shared ProfessionSwitch laid over the map; choosing one sends him back along his trail to the
+// crossroads and out along the chosen one, and on arrival the profession changes and the camera dives into
+// the landmark and back, the way the map enters a level. Arrow keys change the profession at once and he
+// walks after it. One walk at a time: a pick made while he walks waits for him to arrive. His outfit plate
+// sits under the plaque from lg, its fan opening down into the free sky, and under the map below lg, its fan opening up into a band of open sky.
+
+// The wardrobe's journal plate: ink on the page, 14.8 to 1, edged in bark.
 const OUTFIT_LOOK: WardrobeLook = { plate: TRAIL.PAGE, text: TRAIL.INK, ring: TRAIL.BARK }
 
-// The recruiter first screen and the profession pick, as the overworld map he arrives on.
-//
-//   unroll  the rolled map slides open to the right behind its wooden roller
-//   ink     the island, woods, hills and landmarks rise into place; the name plaque swings down
-//   trail   the trail dots in one dot at a time, harbour to crossroads, then out to each landmark
-//   land    he drops onto the harbour tile
-//   walk    he walks the trail to the landmark of the shown profession; arriving makes it ready
-//
-// The beats' times, his pace and his act are entrance.ts, fitted so the whole entrance ends within 5 s of
-// the trigger; the root hands the fit to the map's transitions as --fit.
-//
-// Pattern: setTimeout phases as data attributes the CSS keys its transitions on (transform and opacity
-// only), and one requestAnimationFrame walker (walk.ts) for his steps. The resting frame is the plain
-// style, so reduced motion shows the finished map with him at his landmark.
-//
-// The pick: each landmark is a radio of the shared ProfessionSwitch laid over the map. Choosing one sends
-// him back along his trail to the crossroads and out along the chosen one; on arrival the profession
-// changes and the camera dives into the landmark and back, the way the map enters a level. Arrow keys
-// change the profession at once and he walks after it. One walk at a time: a pick made while he walks
-// waits for him to arrive.
-
+// Map units a second: about a third of the hub map's width a second.
+const WALK_SPEED = 345
+// How long he plays his profession's action after arriving at its landmark.
+const ACT_MS = 1800
+// The camera's dive into the landmark he arrives at (camera-enter and mosaic-in in map.module.css).
 const ENTER_MS = 900
-
-type Reached = Record<EntranceStep, boolean>
-
-const NONE: Reached = { unrolled: false, inked: false, trailed: false, landed: false }
-const ALL: Reached = { unrolled: true, inked: true, trailed: true, landed: true }
-
-/** The entrance's phases on their timers, and `onLanded` at WALK_AT, once he has landed, to start his walk. */
-function useEntrance(onLanded: () => void) {
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.1, rootMargin: '0px' })
-  const reduced = useReducedMotion()
-  const [reached, setReached] = useState<Reached>(NONE)
-  const landed = useLatest(onLanded)
-  const skip = reduced
-
-  useEffect(() => {
-    if (skip) {
-      setReached(ALL)
-      return
-    }
-    if (!triggered) return
-    const timers = [
-      ...ENTRANCE_STEPS.map(([step, at]) => window.setTimeout(() => setReached((now) => ({ ...now, [step]: true })), at)),
-      window.setTimeout(() => landed.current(), WALK_AT),
-    ]
-    return () => timers.forEach(window.clearTimeout)
-  }, [triggered, skip, landed])
-
-  return { ref, reached, skip, triggered }
-}
 
 const BRANCH_COUNT = Object.keys(BRANCHES).length
 
@@ -84,11 +46,6 @@ const branchEnd = (profession: Profession): number => BRANCHES[profession].lengt
 
 const toLandmark = (from: Profession, to: Profession): WalkLeg[] => [
   { trail: BRANCHES[from], from: branchEnd(from), to: 0 },
-  { trail: BRANCHES[to], from: 0, to: branchEnd(to) },
-]
-
-const fromHarbour = (to: Profession): WalkLeg[] => [
-  { trail: ARRIVAL, from: 0, to: ARRIVAL.length },
   { trail: BRANCHES[to], from: 0, to: branchEnd(to) },
 ]
 
@@ -104,7 +61,6 @@ function useHub(active: Profession) {
   const at = useRef<Profession | null>(null)
   const walking = useRef(false)
   const pending = useRef<Pending | null>(null)
-  const [ready, setReady] = useState(false)
   const [entering, setEntering] = useState<Profession | null>(null)
   const [standing, setStanding] = useState<Profession | null>(null)
   const [visited, setVisited] = useState<ReadonlySet<Profession>>(() => new Set())
@@ -131,8 +87,7 @@ function useHub(active: Profession) {
     at.current = target
     setStanding(target)
     setVisited((now) => (now.has(target) ? now : new Set(now).add(target)))
-    act()
-  }, [act])
+  }, [])
 
   const enter = useCallback((target: Profession) => {
     // A second pick inside the dive restarts it, so the first pick's timer never cuts the new dive short.
@@ -147,16 +102,17 @@ function useHub(active: Profession) {
         pending.current = { target, then }
         return
       }
-      const from = at.current
+      const from = at.current ?? target
       if (from === target) {
         then?.()
         enter(target)
         return
       }
       walking.current = true
-      walk(from ? toLandmark(from, target) : fromHarbour(target), () => {
+      walk(toLandmark(from, target), () => {
         walking.current = false
         arrive(target)
+        act()
         then?.()
         enter(target)
         const next = pending.current
@@ -164,70 +120,57 @@ function useHub(active: Profession) {
         if (next) go(next.target, next.then)
       })
     },
-    [arrive, enter, walk],
+    [act, arrive, enter, walk],
   )
 
-  // The entrance walk starts once, toward the profession shown when he lands.
-  const entrance = useEntrance(() => {
-    if (ready) return
-    goTo(active, () => setReady(true))
-  })
+  // He starts on the landmark of the profession shown when the page opens.
   const shown = useLatest(active)
-
-  // He waits on the harbour until the entrance lands him; with no entrance he stands at the shown profession.
   useEffect(() => {
-    if (entrance.skip) {
-      arrive(shown.current)
-      place(landmarkPoint(shown.current))
-      setReady(true)
-      return
-    }
-    place(ARRIVAL.samples[0])
-  }, [entrance.skip, place, arrive, shown])
+    arrive(shown.current)
+    place(landmarkPoint(shown.current))
+  }, [arrive, place, shown])
 
   // A profession changed without a walk (arrow keys, another control): he follows it.
   useEffect(() => {
-    if (!ready || at.current === active) return
+    if (at.current === null || at.current === active) return
     goTo(active)
-  }, [active, ready, goTo])
+  }, [active, goTo])
 
   const season = visited.size === BRANCH_COUNT ? 'fall' : 'summer'
 
-  return { ...walker, entrance, goTo, ready, entering, standing, season, acting, act }
+  return { ...walker, goTo, entering, standing, season, acting, act }
 }
 
 function PlaqueRopes() {
   return (
-    <div className="pointer-events-none absolute -top-10 inset-x-0 flex justify-between px-10" aria-hidden="true">
-      <span className="h-10 w-1 rounded-full bg-[color:var(--ap-bark)]" />
-      <span className="h-10 w-1 rounded-full bg-[color:var(--ap-bark)]" />
+    <div className="pointer-events-none absolute -top-8 inset-x-0 flex justify-between px-10" aria-hidden="true">
+      <span className="h-8 w-1 rounded-full bg-[color:var(--ap-bark)]" />
+      <span className="h-8 w-1 rounded-full bg-[color:var(--ap-bark)]" />
     </div>
   )
 }
 
-/** The name plaque: a parchment board in a wooden frame, hung from the top of the map on two ropes. */
+/** The name plaque: a parchment board in a wooden frame, hung on two ropes. */
 function NamePlaque() {
   const { navigation } = useLabels()
   return (
     <RecruiterHero
       render={({ name, headline, tagline, line, actions }) => (
-        <div className={`relative mx-auto max-w-3xl ${map.plaque}`}>
-          <div className={map.plaqueSettle}>
-            <PlaqueRopes />
-            <div className="relative rounded-md border-[6px] border-[color:var(--ap-wood)] bg-[color:var(--ap-page)] px-5 py-5 text-center text-[color:var(--ap-ink)] shadow-[0_6px_0_var(--ap-bark)] sm:px-8">
-              {(['left-2 top-2', 'right-2 top-2', 'left-2 bottom-2', 'right-2 bottom-2'] as const).map((corner) => (
-                <span key={corner} className={`absolute ${corner} h-2 w-2 rounded-full bg-[color:var(--ap-bark)]`} aria-hidden="true" />
-              ))}
-              <h1 className={`text-[clamp(1.75rem,8vw,2.25rem)] font-bold tracking-wide ${JOURNAL_SERIF}`}>
-                <NameWords name={name} />
-              </h1>
-              <p className="mt-2 text-base font-semibold text-[color:var(--ap-route-text)]">{headline}</p>
-              <p className="mt-1 text-sm italic text-[color:var(--ap-ink-soft)]">{tagline}</p>
-              <p className="mt-1 text-sm">{line}</p>
-              <nav className="mt-4 flex flex-wrap items-center justify-center gap-3" aria-label={navigation.contactAndCv}>
-                <ContactSigns actions={actions} />
-              </nav>
-            </div>
+        <div className="relative">
+          <PlaqueRopes />
+          <div className="relative rounded-md border-[6px] border-[color:var(--ap-wood)] bg-[color:var(--ap-page)] px-4 py-4 text-center text-[color:var(--ap-ink)] shadow-[0_6px_0_var(--ap-bark)] sm:px-6">
+            {(['left-2 top-2', 'right-2 top-2', 'left-2 bottom-2', 'right-2 bottom-2'] as const).map((corner) => (
+              <span key={corner} className={`absolute ${corner} h-2 w-2 rounded-full bg-[color:var(--ap-bark)]`} aria-hidden="true" />
+            ))}
+            <h1 id="trail-hero" className={`text-[clamp(1.6rem,7vw,2.4rem)] font-bold leading-tight tracking-wide ${JOURNAL_SERIF}`}>
+              <NameWords name={name} />
+            </h1>
+            <p className="mt-1 text-base font-semibold text-[color:var(--ap-route-text)]">{headline}</p>
+            <p className="mt-1 text-sm italic text-[color:var(--ap-ink-soft)]">{tagline}</p>
+            <p className="mt-1 text-sm">{line}</p>
+            <nav className="mt-3 flex flex-wrap items-center justify-center gap-2" aria-label={navigation.contactAndCv}>
+              <ContactSigns actions={actions} />
+            </nav>
           </div>
         </div>
       )}
@@ -272,7 +215,7 @@ function Landmark({ option, onPick, onPoint }: LandmarkProps) {
 function NameBox({ place }: { place: Profession | null }) {
   const { professions, professionFields, trail } = useLabels()
   return (
-    <p className="flex min-h-[3rem] flex-wrap items-baseline justify-center gap-x-3 border-b-4 border-[color:var(--ap-wood)] bg-[color:var(--ap-ink)] px-4 py-2 text-center text-[color:var(--ap-page)]" aria-live="polite">
+    <p className="flex min-h-[2.75rem] flex-wrap items-baseline justify-center gap-x-3 border-b-4 border-[color:var(--ap-wood)] bg-[color:var(--ap-ink)] px-4 py-2 text-center text-[color:var(--ap-page)]" aria-live="polite">
       {place && (
         <>
           <span key={place} className={`text-base font-bold uppercase tracking-widest ${JOURNAL_SERIF} ${map.nameBox}`}>
@@ -286,82 +229,62 @@ function NameBox({ place }: { place: Profession | null }) {
   )
 }
 
-export function ExpeditionHero({ name }: { name: string }) {
+function HubMap({ name }: { name: string }) {
   const { active } = useProfession()
   const { navigation, trail } = useLabels()
   const hub = useHub(active)
-  const { entrance } = hub
-  const { reached } = entrance
   const [ox, oy] = shareOf(landmarkPoint(hub.entering ?? active), HUB.width, HUB.height)
 
-  const pick = (option: ProfessionOption) => {
-    if (!hub.ready) {
-      option.optionProps.onClick()
-      return
-    }
-    hub.goTo(option.id, option.optionProps.onClick)
-  }
+  const pick = (option: ProfessionOption) => hub.goTo(option.id, option.optionProps.onClick)
 
   const point = (option: ProfessionOption) => {
-    if (hub.ready && option.id === hub.standing) hub.act()
+    if (option.id === hub.standing) hub.act()
   }
 
   return (
-    <div
-      ref={entrance.ref}
-      data-worlds-hero=""
-      className={`relative px-4 pb-6 pt-14 sm:px-6 ${heldUntil(entrance.triggered || entrance.skip)}`}
-      style={cssVars({ '--fit': ENTRANCE_FIT })}
-      data-unrolled={reached.unrolled}
-      data-inked={reached.inked}
-      data-trailed={reached.trailed}
-      data-landed={reached.landed}
-    >
-      <NamePlaque />
-
-      <section className="relative mx-auto mt-6 max-w-5xl" aria-label={navigation.professionSelection}>
-        <div className={`relative ${map.mapTilt}`}>
-          <div
-            className="relative overflow-hidden rounded-md border-[6px] border-[color:var(--ap-wood)] bg-[color:var(--ap-parchment)] shadow-[0_10px_0_var(--ap-bark)]"
-            data-season={hub.season}
-          >
-            <NameBox place={hub.standing} />
-            <div className="relative" role="img" aria-label={fillLabel(trail.mapOf, { name })}>
-              <div className={map.camera} data-entering={hub.entering !== null} style={cssVars({ '--ox': `${ox}%`, '--oy': `${oy}%` })}>
-                <HubMapArt />
-                <div ref={hub.markerRef} className={`pointer-events-none absolute inset-0 ${map.marker}`} data-acting={hub.acting} aria-hidden="true">
-                  <div className={`absolute left-0 top-0 w-[5.2%] -translate-x-1/2 -translate-y-[92%] ${map.markerDrop}`}>
-                    <div data-worlds-figure="" className={map.figure}>
-                      <TrailWalker profession={active} className="h-auto w-full" />
-                    </div>
+    <section className={page.map} aria-label={navigation.professionSelection}>
+      <div className={map.mapTilt}>
+        <div className="relative overflow-hidden rounded-md border-[6px] border-[color:var(--ap-wood)] bg-[color:var(--ap-parchment)] shadow-[0_10px_0_var(--ap-bark)]" data-season={hub.season}>
+          <NameBox place={hub.standing} />
+          <div className="relative" role="img" aria-label={fillLabel(trail.mapOf, { name })}>
+            <div className={map.camera} data-entering={hub.entering !== null} style={cssVars({ '--ox': `${ox}%`, '--oy': `${oy}%` })}>
+              <HubMapArt />
+              <div ref={hub.markerRef} className={`pointer-events-none absolute inset-0 ${map.marker}`} data-acting={hub.acting} aria-hidden="true">
+                <div className="absolute left-0 top-0 w-[5.2%] -translate-x-1/2 -translate-y-[92%]">
+                  <div data-worlds-figure="" className={map.figure}>
+                    <TrailWalker profession={active} className="h-auto w-full" />
                   </div>
                 </div>
               </div>
-              <div className={`pointer-events-none absolute inset-0 ${map.mosaic}`} aria-hidden="true" />
             </div>
-
-            <ProfessionSwitch
-              className="absolute inset-x-0 bottom-0 aspect-[5/3]"
-              label={navigation.profession}
-              renderOption={(option) => <Landmark option={option} onPick={pick} onPoint={point} />}
-            />
-
-            {/* a phone map is too small for the compass beside the low landmark labels, so it shows from sm up */}
-            <div className="pointer-events-none absolute bottom-3 left-3 hidden opacity-90 sm:block" aria-hidden="true">
-              <HubCompass />
-            </div>
-
-            {/* the rolled part of the map: the dark table, and the wooden roller at its edge */}
-            <div className={`pointer-events-none absolute inset-0 bg-[color:var(--ap-night)] ${map.cover}`} aria-hidden="true">
-              <div className="absolute inset-y-0 -left-3 w-6 rounded-full bg-[linear-gradient(90deg,var(--ap-bark),var(--ap-wood)_45%,var(--ap-bark))]" />
-            </div>
+            <div className={`pointer-events-none absolute inset-0 ${map.mosaic}`} aria-hidden="true" />
           </div>
-          {/* his trail tag pinned to the map beside him, out of the flow: under the low landmark labels
-              from lg (he stands round the middle of the lower map), across the map's bottom edge below lg,
-              where the landmarks and their labels fill the map */}
-          <Wardrobe look={OUTFIT_LOOK} ready={reached.landed} className="c-wardrobe--fan-down-below-sm max-sm:[--wd-fan-gap:264px] c-wardrobe--fan-right-from-lg c-wardrobe--fan-down-from-lg absolute inset-x-0 bottom-[-10px] z-10 lg:inset-x-auto lg:bottom-auto lg:left-[24.6%] lg:top-[69.9%]" />
+
+          <ProfessionSwitch
+            className="absolute inset-x-0 bottom-0 aspect-[5/3]"
+            label={navigation.profession}
+            renderOption={(option) => <Landmark option={option} onPick={pick} onPoint={point} />}
+          />
+
+          {/* a phone map is too small for the compass beside the low landmark labels, so it shows from sm up */}
+          <div className="pointer-events-none absolute bottom-3 left-3 hidden opacity-90 sm:block" aria-hidden="true">
+            <HubCompass />
+          </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
+  )
+}
+
+export function ExpeditionHero({ scene, name, still }: { scene: TrailScene; name: string; still: boolean }) {
+  return (
+    <section id={scene.anchor} data-scene={scene.id} data-worlds-hero="" aria-labelledby="trail-hero" className={page.hero}>
+      {still && <Stage scene={scene} layers={scene.layers} motion={LAYER_MOTION} settled className={page.scrim} />}
+      <div className={page.plaque}>
+        <NamePlaque />
+      </div>
+      <HubMap name={name} />
+      <Wardrobe look={OUTFIT_LOOK} className={`c-wardrobe--fan-down-from-lg ${page.wardrobe}`} />
+    </section>
   )
 }
