@@ -111,10 +111,7 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
         bands={bands}
         className={`${MASONRY_LIST} mt-6`}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => {
-          const index = bands.findIndex((band) => band.id === slot.band.id)
-          return <Preset slot={slot} number={index + 1} tuned={index === tuned} onTune={() => tune(index)} />
-        }}
+        renderBand={(slot, index) => <Preset slot={slot} number={index + 1} tuned={index === tuned} onTune={() => tune(index)} />}
       />
     </HudPanel>
   )

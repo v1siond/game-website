@@ -292,8 +292,7 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
   const { cyber, sections } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('megablock')
   const [done, setDone] = useState(false)
-  const { achievements } = martialArts.primary
-  const last = achievements.length - 1
+  const last = martialArts.primary.achievements.length - 1
   const standing = done || reduced
   const motion: MercMotion = reduced ? 'still' : standing ? 'kick' : 'sit'
 
@@ -321,20 +320,17 @@ export function RipperdocRecord({ martialArts }: { martialArts: MartialArts }) {
                 value: 'mt-1 text-sm text-[color:var(--neon-ice)]',
                 achievements: 'space-y-3',
               }}
-              renderAchievement={(achievement) => {
-                const i = achievements.indexOf(achievement)
-                return (
-                  <span className={`${life.installRow} block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3`} style={{ '--i': i } as CSSProperties}>
-                    <span className="flex items-start justify-between gap-3">
-                      <span className="min-w-0 text-sm text-[color:var(--neon-ice)]">{achievement}</span>
-                      <span className={`${life.installed} shrink-0 text-sm uppercase tracking-wider text-[color:var(--neon-hack)]`}>{cyber.installed}</span>
-                    </span>
-                    <span className="mt-2 block h-1.5 bg-[color:var(--neon-ink)]" aria-hidden="true">
-                      <span className={`${life.installBar} block h-full bg-[color:var(--neon-gold)]`} onAnimationEnd={i === last ? () => setDone(true) : undefined} />
-                    </span>
+              renderAchievement={(achievement, i) => (
+                <span className={`${life.installRow} block border border-[color-mix(in_srgb,var(--neon-gold)_40%,transparent)] bg-[color:var(--neon-glass)] p-3`} style={{ '--i': i } as CSSProperties}>
+                  <span className="flex items-start justify-between gap-3">
+                    <span className="min-w-0 text-sm text-[color:var(--neon-ice)]">{achievement}</span>
+                    <span className={`${life.installed} shrink-0 text-sm uppercase tracking-wider text-[color:var(--neon-hack)]`}>{cyber.installed}</span>
                   </span>
-                )
-              }}
+                  <span className="mt-2 block h-1.5 bg-[color:var(--neon-ink)]" aria-hidden="true">
+                    <span className={`${life.installBar} block h-full bg-[color:var(--neon-gold)]`} onAnimationEnd={i === last ? () => setDone(true) : undefined} />
+                  </span>
+                </span>
+              )}
             />
           </Scannable>
         </div>
