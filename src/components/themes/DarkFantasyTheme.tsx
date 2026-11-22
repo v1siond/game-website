@@ -3,15 +3,17 @@
 import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
+import type { SiteLinkId } from '@/lib/cv/siteLinks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job, Service } from '@/lib/cv/content'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
@@ -28,8 +30,8 @@ import { CopyrightLine } from './shared/CopyrightLine'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
+import world from './DarkFantasy/world.module.css'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
 const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
@@ -163,7 +165,7 @@ const EtherealRain = memo(function EtherealRain() {
             top: '-30px',
             height: d.height,
             background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.ethereal}${Math.round(d.opacity * 255).toString(16).padStart(2, '0')})`,
-            animation: `etherealRain ${d.speed}s linear infinite`,
+            animation: `${world.etherealRain} ${d.speed}s linear infinite`,
             animationDelay: `${d.delay}s`,
           }}
         />
@@ -173,6 +175,7 @@ const EtherealRain = memo(function EtherealRain() {
 })
 
 // Spirit particles - optimized: no box-shadow, fewer elements
+const SPIRIT_COLORS = [DARK_FANTASY.spiritGold, DARK_FANTASY.ethereal, DARK_FANTASY.forestGreen]
 const SpiritParticles = memo(function SpiritParticles() {
   const particles = useMemo(() =>
     Array.from({ length: 6 }, (_, i) => ({
@@ -183,7 +186,7 @@ const SpiritParticles = memo(function SpiritParticles() {
       opacity: Math.random() * 0.4 + 0.2,
       speed: Math.random() * 30 + 20,
       delay: Math.random() * -25,
-      color: i % 3 === 0 ? DARK_FANTASY.spiritGold : i % 3 === 1 ? DARK_FANTASY.ethereal : DARK_FANTASY.forestGreen,
+      color: SPIRIT_COLORS[i % SPIRIT_COLORS.length],
     })),
     []
   )
@@ -205,7 +208,7 @@ const SpiritParticles = memo(function SpiritParticles() {
             width: p.size * 2.5,
             height: p.size * 2.5,
             background: `radial-gradient(circle, ${p.color} 20%, ${p.color}40 50%, transparent 70%)`,
-            animation: `spiritFloat ${p.speed}s ease-in-out infinite`,
+            animation: `${world.spiritFloat} ${p.speed}s ease-in-out infinite`,
             animationDelay: `${p.delay}s`,
           }}
         />
@@ -443,7 +446,7 @@ const VoidDepths = memo(function VoidDepths() {
       {motes.map((m, i) => (
         <span
           key={i}
-          className="hk-mote"
+          className={world.mote}
           style={{
             left: `${m.left}%`,
             top: `${m.top}%`,
@@ -484,42 +487,10 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
   )
 })
 
-/**
- * ENERGY FLOW ANIMATION
- * =====================
- * Pattern: setTimeout-phase with CSS transforms
- * Why chosen: User interaction (click) triggers a short animation sequence.
- *             JS coordinates timing, CSS handles GPU-accelerated visuals.
- *
- * Phases: idle -> flowing -> arrived -> idle
- * Timing: { flowing: 0ms (start), arrived: 350ms, idle: 500ms }
- *
- * How it works:
- * - Tracks previous profession via useRef
- * - On profession change, calculates path from old to new node
- * - Spawns energy particles that travel along the connection path
- * - Uses CSS keyframes with transform/opacity (GPU-accelerated)
- * - Particles fade out as destination node "lights up"
- *
- * Replication steps for other themes:
- * 1. Create component that tracks previous selection with useRef
- * 2. Define node positions and path connections
- * 3. Calculate animation direction based on from/to indices
- * 4. Use CSS @keyframes with transform: translate3d for movement
- * 5. Sync destination glow with particle arrival time
- */
-
-/**
- * ELECTRICITY THROUGH WIRE ANIMATION
- * ===================================
- * Energy flows along the actual wire paths between profession nodes.
- * The path goes: Musician (25%,55%) ↔ System Engineer (50%,30%) ↔ Martial Artist (75%,55%),
- * the order the shared ProfessionSwitch lays the nodes out, with the engineer as the raised hub.
- *
- * When switching between the two outer nodes (Musician↔Martial Artist),
- * energy travels THROUGH the hub node (System Engineer).
- */
-
+// A pick sends the soul light along the wire from the station he left to the one he picked (WireGlow, 300ms,
+// 450ms through the hub) while the picked station pulses (nodeArrival, energyArrival). The wire runs musician,
+// engineer, martial artist, the order ProfessionSwitch lays the stations out, so a pick between the two outer
+// stations runs through the engineer's, the raised hub.
 // The side stations sit near the edges so the three cards never overlap on a 320px phone.
 const WAYSTATION_POSITIONS: Record<Profession, { x: number; y: number }> = {
   drummer: { x: 17, y: 55 },
@@ -534,54 +505,6 @@ function getWirePath(from: Profession, to: Profession): Array<{ x: number; y: nu
     ? [WAYSTATION_POSITIONS[from], WAYSTATION_POSITIONS.engineer, WAYSTATION_POSITIONS[to]]
     : [WAYSTATION_POSITIONS[from], WAYSTATION_POSITIONS[to]]
 }
-
-// Single energy particle that travels along a path
-const WireEnergyParticle = memo(function WireEnergyParticle({
-  pathPoints,
-  delay,
-  duration,
-  color,
-  size,
-}: {
-  pathPoints: Array<{ x: number; y: number }>
-  delay: number
-  duration: number
-  color: string
-  size: number
-}) {
-  // Generate CSS animation that follows the path waypoints
-  const keyframeId = `wirePath-${delay}-${Date.now()}`
-  const keyframes = pathPoints.map((point, i) => {
-    const progress = (i / (pathPoints.length - 1)) * 100
-    return `${progress}% { left: ${point.x}%; top: ${point.y}%; }`
-  }).join('\n')
-
-  return (
-    <>
-      <style>{`
-        @keyframes ${keyframeId} {
-          ${keyframes}
-        }
-      `}</style>
-      <div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          left: `${pathPoints[0].x}%`,
-          top: `${pathPoints[0].y}%`,
-          width: 8 * size,
-          height: 8 * size,
-          background: `radial-gradient(circle, ${color} 30%, ${color}80 60%, transparent 100%)`,
-          boxShadow: `0 0 12px ${color}, 0 0 24px ${color}60`,
-          transform: 'translate(-50%, -50%)',
-          animation: `${keyframeId} ${duration}ms ease-in-out ${delay}ms forwards`,
-          opacity: 0,
-          animationFillMode: 'forwards',
-        }}
-        aria-hidden="true"
-      />
-    </>
-  )
-})
 
 // Wire glow effect that shows the path lighting up
 const WireGlow = memo(function WireGlow({
@@ -623,7 +546,7 @@ const WireGlow = memo(function WireGlow({
         style={{
           strokeDasharray: '100',
           strokeDashoffset: '100',
-          animation: `wireStroke ${duration}ms ease-out forwards`,
+          animation: `${world.wireStroke} ${duration}ms ease-out forwards`,
         }}
       />
     </svg>
@@ -647,39 +570,18 @@ const EnergyFlowAnimation = memo(function EnergyFlowAnimation({
   const pathPoints = getWirePath(fromProfession, toProfession)
   const totalDuration = pathPoints.length > 2 ? 450 : 300
 
-  // Create multiple particles with staggered timing for a "stream" effect
-  const particles = [
-    { delay: 0, size: 1 },
-    { delay: 30, size: 0.85 },
-    { delay: 60, size: 0.7 },
-    { delay: 90, size: 0.9 },
-    { delay: 120, size: 0.75 },
-  ]
-
   const energyColor = DARK_FANTASY.soulBlue
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
       {/* Wire glow effect */}
       <WireGlow pathPoints={pathPoints} duration={totalDuration} color={energyColor} />
-
-      {/* Energy particles following the wire */}
-      {particles.map((p, i) => (
-        <WireEnergyParticle
-          key={i}
-          pathPoints={pathPoints}
-          delay={p.delay}
-          duration={totalDuration}
-          color={energyColor}
-          size={p.size}
-        />
-      ))}
     </div>
   )
 })
 
 // Waystation node for profession selection (generic rest point, not HK bench)
-const WaystationNode = memo(function WaystationNode({
+function WaystationNode({
   option,
   isReceivingEnergy,
 }: {
@@ -710,7 +612,7 @@ const WaystationNode = memo(function WaystationNode({
           className="absolute inset-0 pointer-events-none"
           style={{
             background: `radial-gradient(ellipse, color-mix(in srgb, ${DARK_FANTASY.soulBlue} 38%, transparent) 0%, color-mix(in srgb, ${DARK_FANTASY.soulBlue} 19%, transparent) 40%, transparent 70%)`,
-            animation: 'energyArrival 400ms ease-out forwards',
+            animation: `${world.energyArrival} 400ms ease-out forwards`,
           }}
           aria-hidden="true"
         />
@@ -727,10 +629,10 @@ const WaystationNode = memo(function WaystationNode({
       />
       {/* Main container - VoidFrame style with decorative elements */}
       <div
-        className={`df-card bg-df-panel relative z-0 w-[5.5rem] h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
+        className={`df-card bg-[color:var(--df-panel)] relative z-0 w-[5.5rem] h-20 md:w-32 md:h-28 px-1 flex flex-col items-center justify-center transition-transform duration-300 ${
           isActive ? 'scale-110' : 'group-hover:scale-105'
         }`}
-        style={{ animation: isReceivingEnergy ? 'nodeArrival 400ms ease-out' : undefined }}
+        style={{ animation: isReceivingEnergy ? `${world.nodeArrival} 400ms ease-out` : undefined }}
       >
         {/* Active border and glow: the active card drawn under the content, fading in by opacity */}
         <div
@@ -777,7 +679,6 @@ const WaystationNode = memo(function WaystationNode({
           className="text-sm tracking-[0.05em] md:tracking-[0.1em] uppercase font-medium text-center leading-tight"
           style={{
             color: isActive ? color : DARK_FANTASY.silverText,
-            fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
           {label}
@@ -786,7 +687,6 @@ const WaystationNode = memo(function WaystationNode({
           className="text-sm tracking-wider text-center leading-tight hidden md:block"
           style={{
             color: isActive ? color : DARK_FANTASY.silverText,
-            fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
           }}
         >
           {sublabel}
@@ -823,7 +723,7 @@ const WaystationNode = memo(function WaystationNode({
       </div>
     </button>
   )
-})
+}
 
 const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; color: string }> = {
   drummer: { icon: <WaveIcon />, color: DARK_FANTASY.lavender },
@@ -831,16 +731,7 @@ const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; color: string }> 
   fighter: { icon: <DiamondIcon />, color: DARK_FANTASY.spiritGold },
 }
 
-/**
- * Gothic decorative flourish
- * =======================================
- * Elegant curved vine-like pattern used at top/bottom of dialogue boxes.
- * Organic, gothic curves with small embellishments.
- *
- * Pattern: CSS-only (SVG paths)
- * Why chosen: Static decorative element, no animation needed. SVG paths give us
- * precise control over the organic curved shapes that define HK's aesthetic.
- */
+// The vine flourish on a frame's top or bottom edge, drawn flipped for the bottom.
 const DialogueFlourish = memo(function DialogueFlourish({
   position,
   width = 200
@@ -943,27 +834,8 @@ const DialogueFlourish = memo(function DialogueFlourish({
   )
 })
 
-/**
- * Gothic dialogue box frame (VoidFrame)
- * ==================================================
- * Visual styling matching HK's in-game dialogue boxes:
- * - Dark semi-transparent background (deep blue/purple tones)
- * - Decorative flourishes at top and bottom borders
- * - Clean white text on dark background
- * - Slight backdrop blur for depth
- * - Gothic, elegant feel with organic curved borders
- *
- * Pattern: CSS-only styling (no JS animation for the frame itself)
- * Why chosen: Static visual element, CSS is more performant than JS.
- * The flourishes use SVG paths for precise organic curves.
- *
- * Replication steps for other themes:
- * 1. Create a DialogueFlourish component with theme-appropriate SVG patterns
- * 2. Use semi-transparent background matching theme's void/dark colors
- * 3. Add backdrop-filter blur for depth
- * 4. Position flourishes at top (-12px) and bottom (-12px)
- * 5. Use centered title with subtle underline accent
- */
+// The section frame, after the game's dialogue boxes: an opaque panel (.df-panel, so the stage behind never
+// shows through), a vine flourish on its top and bottom edges and the title centred over a short rule.
 const VoidFrame = memo(function VoidFrame({
   children,
   title,
@@ -984,7 +856,7 @@ const VoidFrame = memo(function VoidFrame({
       aria-labelledby={sectionHeadingId}
     >
       {/* Main dialogue box container */}
-      <div className="df-panel bg-df-panel relative">
+      <div className="df-panel bg-[color:var(--df-panel)] relative">
         {/* Top decorative flourish - elegant vine-like pattern */}
         <DialogueFlourish position="top" width={220} />
 
@@ -992,10 +864,9 @@ const VoidFrame = memo(function VoidFrame({
         <div className="pt-6 pb-4 px-6 text-center">
           <HeadingTag
             id={sectionHeadingId}
-            className="text-sm tracking-[0.3em] uppercase inline-block"
+            className="text-sm uppercase inline-block"
             style={{
               color: DARK_FANTASY.bone,
-              fontFamily: '"Comic Sans MS", "Comic Sans", cursive',
               fontWeight: 400,
               letterSpacing: '0.25em',
               // Subtle text shadow for readability on dark background
@@ -1027,15 +898,13 @@ const VoidFrame = memo(function VoidFrame({
   )
 })
 
-const DF_FONT = '"Comic Sans MS", "Comic Sans", cursive'
-
 // Services: a title and its line each, read in the same frame as the tech stack.
 function ServiceList({ services }: { services: Service[] }) {
   return (
     <ul className={MASONRY_LIST}>
       {services.map((service) => (
         <li key={service.id} className={MASONRY_ITEM}>
-          <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver-text)]" style={{ fontFamily: DF_FONT }}>
+          <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver-text)]">
             {service.title}
           </h3>
           <p className="text-base leading-relaxed text-[color:var(--df-bone)]">{service.line}</p>
@@ -1054,7 +923,7 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
         <li key={category.id} className={MASONRY_ITEM}>
           <h3
             className="text-sm tracking-[0.15em] mb-3 flex items-center gap-2 uppercase"
-            style={{ color: DARK_FANTASY.silverText, fontFamily: DF_FONT }}
+            style={{ color: DARK_FANTASY.silverText }}
           >
             <span aria-hidden="true">{category.icon}</span>
             {category.name}
@@ -1175,8 +1044,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
 })
 
 // Band card
-const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
-  const { links } = useLabels()
+const BandCard = memo(function BandCard({ band, years, linkProps, release }: BandSlot) {
   const content = (
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
@@ -1194,9 +1062,9 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
-      {band.release && (
+      {release && (
         <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>
-          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </article>
@@ -1341,7 +1209,7 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
               left: p.x,
               top: p.y,
               background: `radial-gradient(circle, ${p.color} 20%, ${p.color}50 50%, transparent 70%)`,
-              animation: `spiritFloat ${8 + i * 2}s ease-in-out infinite`,
+              animation: `${world.spiritFloat} ${8 + i * 2}s ease-in-out infinite`,
               animationDelay: `${i * -2}s`,
             }}
           />
@@ -1385,7 +1253,7 @@ const ArtSectionLanterns = memo(function ArtSectionLanterns() {
             style={{
               left: `${l.x}%`,
               top: `${l.y}%`,
-              animation: `lanternFloat 4s ease-in-out infinite`,
+              animation: `${world.lanternFloat} 4s ease-in-out infinite`,
               animationDelay: `${l.delay}s`,
             }}
           >
@@ -1526,23 +1394,99 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
   )
 })
 
-// Profession sections. Each animated section gets its own useSectionTrigger, from its real position.
+// The profession selector: the waystations on their wire and, for 500ms after each pick, the energy running
+// along it from the station he left to the one he picked. The selector keeps the station the energy leaves
+// from, so a pick and the energy's end re-render it alone, not the whole world.
+const ENERGY_FLOW_MS = 500
+
+function WaystationSelector({ active }: { active: Profession }) {
+  const { navigation } = useLabels()
+  const previous = useRef(active)
+  const [from, setFrom] = useState<Profession | null>(null)
+  const flowing = from !== null
+
+  useEffect(() => {
+    const left = previous.current
+    previous.current = active
+    if (left === active) return
+    setFrom(left)
+    const timer = setTimeout(() => setFrom(null), ENERGY_FLOW_MS)
+    return () => clearTimeout(timer)
+  }, [active])
+
+  return (
+    <ScrollScene>
+      <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
+        <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div
+            className={`relative h-40 md:h-56 overflow-hidden ${world.selector}`}
+            style={{
+              background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
+              borderRadius: '4px',
+            }}
+          >
+            {/* Connection paths */}
+            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
+                  <stop offset="50%" stopColor={DARK_FANTASY.brass} stopOpacity="0.4" />
+                  <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <line x1="17%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+              <line x1="50%" y1="30%" x2="83%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+              {/* Gear decorations at intersections */}
+              <circle cx="33.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+              <circle cx="66.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+            </svg>
+
+            {/* Energy flow animation between nodes */}
+            <EnergyFlowAnimation
+              fromProfession={from}
+              toProfession={active}
+              isAnimating={flowing}
+            />
+
+            <ProfessionSwitch
+              className="absolute inset-0"
+              label={navigation.professionSelection}
+              renderOption={(option) => (
+                <WaystationNode option={option} isReceivingEnergy={flowing && option.selected} />
+              )}
+            />
+          </div>
+        </div>
+      </section>
+    </ScrollScene>
+  )
+}
+
+// The hero and contact buttons.
 const DF_BUTTON =
   'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-transform hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
 
-// Email is the brass action, LinkedIn the outlined one.
+// Email is the brass action, LinkedIn and the CV in the contact row the outlined ones.
+const DF_OUTLINED = 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]'
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-[color:var(--df-brass-plate)] text-[color:var(--df-void)]',
-  linkedin: 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]',
+  email: `${DF_BUTTON} bg-[color:var(--df-brass-plate)] text-[color:var(--df-void)]`,
+  linkedin: `${DF_BUTTON} ${DF_OUTLINED}`,
+}
+
+// The nav's CV and engine links: small framed tabs, the CV in stone, the engine in the soul light.
+const NAV_LINK =
+  'px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)]'
+const NAV_LOOK: Record<SiteLinkId, string> = {
+  cv: `${NAV_LINK} border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]`,
+  engine: `${NAV_LINK} border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]`,
 }
 
 function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   return (
     <>
       {actions.map((action) => (
-        <a key={action.id} {...action.linkProps} className={`${DF_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
-          {action.label}
-        </a>
+        <ContactLink key={action.id} slot={action} className={HERO_ACTION_LOOK[action.id]} />
       ))}
     </>
   )
@@ -1577,180 +1521,173 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
   )
 }
 
-function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const labels = useLabels()
-  const projectsTrigger = useSectionTrigger()
-  const { jobs, techStack, services, projects, companies } = sections
+// Each section in its frame, the art divider that follows it inside the same frame. The shared plan picks which
+// sections a profession shows and in which order.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <>
+        <FramedSection title={sections[slot.titleKey]}>
+          <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
+        </FramedSection>
 
-  return (
-    <>
-      <FramedSection title={labels.sections.about}>
-        <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{professionalSummary.bio}</p>
-      </FramedSection>
-
-      {/* Art Section 1 - Spirits and Gears */}
-      <ScrollScene>
-        <ArtSectionSpirits />
-      </ScrollScene>
-
-      {/* Work Experience - Knight Slash Reveal (content slides from right) */}
-      {jobs.length > 0 && (
-        <SlashRevealSection title={labels.sections.workExperience}>
+        {/* Art Section 1 - Spirits and Gears */}
+        <ScrollScene>
+          <ArtSectionSpirits />
+        </ScrollScene>
+      </>
+    )
+  },
+  // Work Experience - Knight Slash Reveal (content slides from right)
+  work: function WorkFrame({ slot }) {
+    const { sections } = useLabels()
+    const { jobs } = slot
+    return (
+      <>
+        <SlashRevealSection title={sections[slot.titleKey]}>
           <div>
             {jobs.map((entry, index) => (
               <ExperienceCard key={entry.id} entry={entry} isLast={index === jobs.length - 1} />
             ))}
           </div>
         </SlashRevealSection>
-      )}
 
-      {/* Art Section 2 - Lanterns */}
-      <ScrollScene>
-        <ArtSectionLanterns />
-      </ScrollScene>
-
-      <FramedSection title={labels.sections.techStack}>
-        <TechCloud categories={techStack} />
+        {/* Art Section 2 - Lanterns */}
+        <ScrollScene>
+          <ArtSectionLanterns />
+        </ScrollScene>
+      </>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <FramedSection title={sections[slot.titleKey]}>
+        <TechCloud categories={slot.categories} />
       </FramedSection>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <FramedSection title={sections[slot.titleKey]}>
+        <ServiceList services={slot.services} />
+      </FramedSection>
+    )
+  },
+  // Projects - Bug Pull Reveal
+  projects: function ProjectsFrame({ slot }) {
+    const { sections } = useLabels()
+    const projectsTrigger = useSectionTrigger()
+    return (
+      <>
+        <div ref={projectsTrigger.ref}>
+          <BugPullReveal triggered={projectsTrigger.triggered}>
+            <section className="relative z-20 py-[var(--panel-top)] px-4 md:px-6">
+              <div className="max-w-4xl mx-auto">
+                <VoidFrame title={sections[slot.titleKey]}>
+                  <ProjectList
+                    projects={slot.projects}
+                    className="grid md:grid-cols-2 gap-3 md:gap-4"
+                    renderProject={(projectSlot) => <ProjectCard slot={projectSlot} />}
+                  />
+                </VoidFrame>
+              </div>
+            </section>
+          </BugPullReveal>
+        </div>
 
-      {services.length > 0 && (
-        <FramedSection title={labels.sections.services}>
-          <ServiceList services={services} />
-        </FramedSection>
-      )}
-
-      {/* Projects - Bug Pull Reveal */}
-      <div ref={projectsTrigger.ref}>
-        <BugPullReveal triggered={projectsTrigger.triggered}>
-          <section className="relative z-20 py-[var(--panel-top)] px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <VoidFrame title={labels.sections.projects}>
-                <ProjectList
-                  projects={projects}
-                  className="grid md:grid-cols-2 gap-3 md:gap-4"
-                  renderProject={(slot) => <ProjectCard slot={slot} />}
-                />
-              </VoidFrame>
-            </div>
-          </section>
-        </BugPullReveal>
-      </div>
-
-      {/* Art Section 3 - Crystals */}
-      <ScrollScene>
-        <ArtSectionCrystals />
-      </ScrollScene>
-
-      <FramedSection title={labels.sections.ventures}>
+        {/* Art Section 3 - Crystals */}
+        <ScrollScene>
+          <ArtSectionCrystals />
+        </ScrollScene>
+      </>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <FramedSection title={sections[slot.titleKey]}>
         <div className="grid md:grid-cols-6 gap-3 md:gap-4">
-          {companies.map((company) => (
+          {slot.companies.map((company) => (
             <CompanyCard key={company.id} company={company} />
           ))}
         </div>
       </FramedSection>
-    </>
-  )
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    const { sections, years } = useLabels()
+    const { musician, bands } = slot
+    return (
+      <>
+        <ScrollScene>
+          <ArtSectionSpirits />
+        </ScrollScene>
+
+        <SlashRevealSection title={sections[slot.titleKey]}>
+          <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
+            {drumsSince(musician, years)}
+          </p>
+          <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(bandSlot) => <BandCard {...bandSlot} />} />
+          <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
+        </SlashRevealSection>
+
+        <ScrollScene>
+          <ArtSectionLanterns />
+        </ScrollScene>
+      </>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    const { sections } = useLabels()
+    const { martialArts } = slot
+    return (
+      <>
+        <ScrollScene>
+          <ArtSectionSpirits />
+        </ScrollScene>
+
+        <SlashRevealSection title={sections[slot.titleKey]}>
+          <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+              fact: 'p-3 rounded bg-gradient-to-br from-[color:var(--df-void)] to-[color:var(--df-void-purple)] border border-[color:var(--df-stone-dark)]',
+              term: 'text-sm tracking-[0.15em] uppercase text-[color:var(--df-spirit-gold)]',
+              value: 'text-sm mt-1 text-[color:var(--df-bone)]',
+              achievements: 'space-y-1',
+              achievement: 'text-sm flex items-start gap-2 text-[color:var(--df-bone)]',
+            }}
+            renderAchievement={(achievement) => (
+              <>
+                <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
+                {achievement}
+              </>
+            )}
+          />
+        </SlashRevealSection>
+
+        <ScrollScene>
+          <ArtSectionCrystals />
+        </ScrollScene>
+      </>
+    )
+  },
 }
 
-function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { musician, bands } = sections
-  const labels = useLabels()
-
-  return (
-    <>
-      <ScrollScene>
-        <ArtSectionSpirits />
-      </ScrollScene>
-
-      <SlashRevealSection title={labels.sections.bands}>
-        <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
-          {drumsSince(musician, labels.years)}
-        </p>
-        <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
-        <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
-      </SlashRevealSection>
-
-      <ScrollScene>
-        <ArtSectionLanterns />
-      </ScrollScene>
-    </>
-  )
-}
-
-function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { martialArts } = sections
-  const labels = useLabels()
-
-  return (
-    <>
-      <ScrollScene>
-        <ArtSectionSpirits />
-      </ScrollScene>
-
-      <SlashRevealSection title={labels.sections.muayThai}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
-        <MuayThaiRecord
-          martialArts={martialArts}
-          classNames={{
-            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-            fact: 'p-3 rounded bg-gradient-to-br from-[color:var(--df-void)] to-[color:var(--df-void-purple)] border border-[color:var(--df-stone-dark)]',
-            term: 'text-sm tracking-[0.15em] uppercase text-[color:var(--df-spirit-gold)]',
-            value: 'text-sm mt-1 text-[color:var(--df-bone)]',
-            achievements: 'space-y-1',
-            achievement: 'text-sm flex items-start gap-2 text-[color:var(--df-bone)]',
-          }}
-          renderAchievement={(achievement) => (
-            <>
-              <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
-              {achievement}
-            </>
-          )}
-        />
-      </SlashRevealSection>
-
-      <ScrollScene>
-        <ArtSectionCrystals />
-      </ScrollScene>
-    </>
-  )
-}
-
-const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+const SECTION_VIEWS = sectionViews(FRAMES)
 
 export default function DarkFantasyTheme() {
   const view = useWorldView()
   const { navigation, actions: actionLabels, sections } = useLabels()
+  const siteLinks = useSiteLinks('engine')
   const active = view.profession
   const [mounted, setMounted] = useState(false)
 
-  // Track previous profession for energy flow animation
-  const previousProfession = useRef<Profession>(active)
-  const [isEnergyFlowing, setIsEnergyFlowing] = useState(false)
-  const [animatingFrom, setAnimatingFrom] = useState<Profession | null>(null)
-
-  // On a profession change, run the energy along the wire from the old node to the new one
-  useEffect(() => {
-    const from = previousProfession.current
-    previousProfession.current = active
-    if (from === active) return
-
-    setAnimatingFrom(from)
-    setIsEnergyFlowing(true)
-
-    // Clear animation state after animation completes
-    const timer = setTimeout(() => {
-      setIsEnergyFlowing(false)
-      setAnimatingFrom(null)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [active])
-
-  // fire the final battle just slightly before it's centered (small positive bottom margin), // a touch later than the previous +18% which kicked off before you'd even seen the section
+  // The final battle starts as the contact section comes into view, a little before it is centred.
   const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
 
   useEffect(() => {
@@ -1846,19 +1783,15 @@ export default function DarkFantasyTheme() {
 
           {/* Nav Links */}
           <div className="flex gap-2 md:gap-3 items-center">
-            <Link
-              href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
-            >
-              {actionLabels.cv}
-            </Link>
-            <Link
-              {...ENGINE_LINK}
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
-            >
-              <span className="hidden sm:inline">{actionLabels.engine}</span>
-              <span className="sm:hidden">{actionLabels.engineShort}</span>
-            </Link>
+            <ContactLink slot={siteLinks.cv} className={NAV_LOOK.cv} />
+            <ContactLink slot={siteLinks.engine} className={NAV_LOOK.engine}>
+              {(label) => (
+                <>
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{actionLabels.engineShort}</span>
+                </>
+              )}
+            </ContactLink>
           </div>
         </div>
       </nav>
@@ -1904,52 +1837,7 @@ export default function DarkFantasyTheme() {
       {/* Main content */}
       <main id="main-content" tabIndex={-1} className="outline-none">
 
-      {/* Profession Selector - Waystation style */}
-      <ScrollScene>
-        <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
-          <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
-          <div className="max-w-6xl mx-auto px-4 md:px-6">
-            <div
-              className="relative h-40 md:h-56 overflow-hidden"
-              style={{
-                background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
-                borderRadius: '4px',
-              }}
-            >
-              {/* Connection paths */}
-              <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
-                    <stop offset="50%" stopColor={DARK_FANTASY.brass} stopOpacity="0.4" />
-                    <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <line x1="17%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-                <line x1="50%" y1="30%" x2="83%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-                {/* Gear decorations at intersections */}
-                <circle cx="33.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
-                <circle cx="66.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
-              </svg>
-
-              {/* Energy flow animation between nodes */}
-              <EnergyFlowAnimation
-                fromProfession={animatingFrom}
-                toProfession={active}
-                isAnimating={isEnergyFlowing}
-              />
-
-              <ProfessionSwitch
-                className="absolute inset-0"
-                label={navigation.professionSelection}
-                renderOption={(option) => (
-                  <WaystationNode option={option} isReceivingEnergy={isEnergyFlowing && option.selected} />
-                )}
-              />
-            </div>
-          </div>
-        </section>
-      </ScrollScene>
+      <WaystationSelector active={active} />
 
       <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
@@ -1963,16 +1851,14 @@ export default function DarkFantasyTheme() {
             render={({ line, actions }) => (
               <div className="max-w-2xl mx-auto text-center">
                 <div className="mb-8">
-                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brassText, fontFamily: DF_FONT }}>
+                  <h2 className="text-xl tracking-[0.15em] mb-3" style={{ color: DARK_FANTASY.brassText }}>
                     {actionLabels.emailMe}
                   </h2>
                   <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{line}</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <HeroActions actions={actions} />
-                  <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]`}>
-                    {actionLabels.cv}
-                  </Link>
+                  <ContactLink slot={siteLinks.cv} className={`${DF_BUTTON} ${DF_OUTLINED}`} />
                 </div>
               </div>
             )}
@@ -1994,117 +1880,12 @@ export default function DarkFantasyTheme() {
       <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
         <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silverText }}>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
-          <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
+          <span className="text-sm tracking-[0.2em]">
             <CopyrightLine srPrefix={navigation.copyright} />
           </span>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
         </div>
       </footer>
-
-      {/* Animations - GPU accelerated */}
-      <style jsx global>{`
-        /* Ethereal rain - transform only */
-        @keyframes etherealRain {
-          0% { transform: translateY(-30px) translateZ(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(100vh) translateZ(0); opacity: 0; }
-        }
-
-        /* Spirit float - transform and opacity */
-        @keyframes spiritFloat {
-          0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.3; }
-          25% { transform: translate3d(8px, -25px, 0); opacity: 0.5; }
-          50% { transform: translate3d(-6px, -12px, 0); opacity: 0.4; }
-          75% { transform: translate3d(4px, -35px, 0); opacity: 0.45; }
-        }
-
-        /* Fade in */
-        @keyframes fade-in-down {
-          from { opacity: 0; transform: translate3d(0, -20px, 0); }
-          to { opacity: 1; transform: translate3d(0, 0, 0); }
-        }
-        .animate-fade-in-down {
-          animation: fade-in-down 0.8s ease-out;
-          will-change: transform, opacity;
-        }
-
-        /* Light sweep reveal */
-        @keyframes lightSweep {
-          0% { transform: scaleX(0) translateZ(0); opacity: 0; }
-          50% { transform: scaleX(1) translateZ(0); opacity: 1; }
-          100% { transform: scaleX(0) translateZ(0); opacity: 0; }
-        }
-
-        /* Lantern float */
-        @keyframes lanternFloat {
-          0%, 100% { transform: translateY(0) translateZ(0); }
-          50% { transform: translateY(-8px) translateZ(0); }
-        }
-
-        /* Spirit companion wisp trail */
-        @keyframes wispTrail {
-          0%, 100% { transform: translateX(0); }
-          50% { transform: translateX(3px); }
-        }
-
-        /* Wire stroke animation - electricity through wire */
-        @keyframes wireStroke {
-          0% {
-            stroke-dashoffset: 100;
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            stroke-dashoffset: 0;
-            opacity: 0;
-          }
-        }
-
-        /* Destination node pulse when energy arrives */
-        @keyframes nodeArrival {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.15); }
-          100% { transform: scale(1.1); }
-        }
-
-        /* Energy arrival burst effect */
-        @keyframes energyArrival {
-          0% {
-            opacity: 0;
-            transform: scale(0.5);
-          }
-          30% {
-            opacity: 1;
-            transform: scale(1.2);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(2);
-          }
-        }
-
-        /* Accessibility: Reduce motion */
-        @media (prefers-reduced-motion: reduce) {
-          .animate-fade-in-down,
-          .will-animate {
-            animation: none !important;
-            transition: none !important;
-          }
-          /* Disable energy flow animations for reduced motion */
-          [style*="energyFlow"],
-          [style*="energyArrival"],
-          [style*="nodeArrival"] {
-            animation: none !important;
-            opacity: 0 !important;
-          }
-        }
-      `}</style>
     </div>
   )
 }

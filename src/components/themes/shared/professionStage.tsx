@@ -1,12 +1,18 @@
 'use client'
 
-import { memo } from 'react'
+import { memo, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { CV_PATHS } from '@/i18n/config'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { mix } from '@/lib/color'
+import { cssVars } from '@/lib/cssVars'
+import stage from './professionStage.module.css'
 import { svgNumber } from './svgNumber'
 
+// An idle loop's start offset, read by the stage's rules (professionStage.module.css) as --stage-delay, so the
+// loops of one kind run out of step.
+const stageDelay = (delay: string) => cssVars({ '--stage-delay': delay })
 
 // Palette the boss-stage ornaments need (mirrors the 10 Dark Fantasy fields they reference).
 export interface OrnamentPalette {
@@ -24,7 +30,6 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
   const RIM_S = p.copper
   const HW = p.stoneGrey
   const GLOW = p.ethereal
-  void SHELL
 
   // brass-framed "arcane terminal" monitor, small; glowing code lines + blinking cursor
   const monitor = (cx: number, cy: number, w: number, h: number, k: string, rot: number) => (
@@ -33,9 +38,9 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
       <rect x={-18} y={h / 2 + 16} width={36} height={6} rx={2} fill="url(#egBrass)" stroke={RIM_S} strokeWidth="0.8" />
       <rect x={-w / 2 - 6} y={-h / 2 - 6} width={w + 12} height={h + 12} rx={6} fill="url(#egShell)" stroke={RIM} strokeWidth="2.5" />
       <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2} fill={SHELL_D} />
-      <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2} fill={GLOW} className="hk-screen" opacity="0.1" />
+      <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={2} fill={GLOW} className={stage.screen} opacity="0.1" />
       {[0.7, 0.45, 0.8, 0.35, 0.6].map((f, i) => { const cyl = -h / 2 + 9 + (i * (h - 16)) / 5; return <rect key={i} x={-w / 2 + 7} y={cyl} width={(w - 16) * f} height={2.5} rx={1} fill={i % 3 === 0 ? RIM_H : GLOW} opacity="0.55" /> })}
-      <rect x={-w / 2 + 7 + (w - 16) * 0.5} y={-h / 2 + 9 + (4 * (h - 16)) / 5 - 1} width={5} height={4} fill={RIM_H} className="hk-cursor" />
+      <rect x={-w / 2 + 7 + (w - 16) * 0.5} y={-h / 2 + 9 + (4 * (h - 16)) / 5 - 1} width={5} height={4} fill={RIM_H} className={stage.cursor} />
     </g>
   )
 
@@ -72,7 +77,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
       <line x1={0} y1={0} x2={-3} y2={-58} stroke={RIM} strokeWidth="3.5" />
       <line x1={-3} y1={-58} x2={28} y2={-80} stroke={RIM} strokeWidth="3.5" />
       <path d="M28,-80 q18,3 11,21 l-24,-6 Z" fill="url(#egBrass)" stroke={RIM_S} strokeWidth="1.2" />
-      <circle cx={30} cy={-68} r={6} fill={RIM_H} opacity="0.3" className="hk-screen" />
+      <circle cx={30} cy={-68} r={6} fill={RIM_H} opacity="0.3" className={stage.screen} />
     </g>
   )
 
@@ -81,7 +86,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
     <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.9">
       <rect x={-28} y={-150} width={56} height={170} rx={6} fill="url(#egShell)" stroke={RIM} strokeWidth="2.5" />
       {[-122, -106, -90].map((ly, i) => <rect key={i} x={-20} y={ly} width={40} height={10} rx={2} fill={SHELL_D} stroke={RIM_S} strokeWidth="0.6" />)}
-      {[-62, -46, -30].map((ly, i) => <circle key={i} cx={-12} cy={ly} r={4} fill={i === 0 ? RIM_H : GLOW} className="hk-cursor" style={{ animationDelay: `${i * 0.4}s` }} />)}
+      {[-62, -46, -30].map((ly, i) => <circle key={i} cx={-12} cy={ly} r={4} fill={i === 0 ? RIM_H : GLOW} className={stage.cursor} style={stageDelay(`${i * 0.4}s`)} />)}
       {Array.from({ length: 5 }, (_, i) => <line key={i} x1={0} y1={-60 + i * 8} x2={20} y2={-60 + i * 8} stroke={SHELL_D} strokeWidth="2" />)}
     </g>
   )
@@ -93,7 +98,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
       <g transform="translate(-2,0) skewX(-10)">
         <rect x={-58} y={-92} width={116} height={92} rx={4} fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
         <rect x={-50} y={-85} width={100} height={78} rx={2} fill={SHELL_D} />
-        <rect x={-50} y={-85} width={100} height={78} rx={2} fill={GLOW} className="hk-screen" opacity="0.1" />
+        <rect x={-50} y={-85} width={100} height={78} rx={2} fill={GLOW} className={stage.screen} opacity="0.1" />
         {[0.6, 0.4, 0.75, 0.5].map((f, i) => <rect key={i} x={-44} y={-78 + i * 17} width={88 * f} height={3} rx={1} fill={i % 2 ? RIM_H : GLOW} opacity="0.5" />)}
       </g>
     </g>
@@ -105,7 +110,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
       <rect x={-30} y={0} width={60} height={14} rx={3} fill="url(#egShell)" stroke={RIM} strokeWidth="1.5" />
       <path d="M-64,-96 Q-70,-100 -64,-104 L64,-104 Q70,-100 64,-96 L60,-4 Q60,2 52,2 L-52,2 Q-60,2 -60,-4 Z" fill="url(#egShell)" stroke={RIM} strokeWidth="2.5" />
       <rect x={-48} y={-90} width={96} height={78} rx={14} fill={SHELL_D} />
-      <rect x={-48} y={-90} width={96} height={78} rx={14} fill={GLOW} className="hk-screen" opacity="0.12" />
+      <rect x={-48} y={-90} width={96} height={78} rx={14} fill={GLOW} className={stage.screen} opacity="0.12" />
       {[0.5, 0.7, 0.4].map((f, i) => <rect key={i} x={-40} y={-78 + i * 20} width={80 * f} height={3} rx={1} fill={RIM_H} opacity="0.45" />)}
     </g>
   )
@@ -134,7 +139,7 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
     <g key={k} transform={`translate(${cx},${cy}) scale(${s})`} opacity="0.8">
       <rect x={-26} y={-26} width={52} height={52} rx={3} fill="url(#egShell)" stroke={RIM} strokeWidth="2" />
       <rect x={-15} y={-15} width={30} height={30} rx={2} fill={SHELL_D} stroke={RIM_S} strokeWidth="1" />
-      <circle cx={0} cy={0} r={5} fill={RIM_H} opacity="0.4" className="hk-screen" />
+      <circle cx={0} cy={0} r={5} fill={RIM_H} opacity="0.4" className={stage.screen} />
       {[-26, 26].map((ex) => [-16, 0, 16].map((ey, j) => <line key={`${ex}-${j}`} x1={ex} y1={ey} x2={ex > 0 ? ex + 8 : ex - 8} y2={ey} stroke={RIM} strokeWidth="2" />))}
       {[-26, 26].map((ey) => [-16, 0, 16].map((ex, j) => <line key={`v${ey}-${j}`} x1={ex} y1={ey} x2={ex} y2={ey > 0 ? ey + 8 : ey - 8} stroke={RIM} strokeWidth="2" />))}
     </g>
@@ -145,15 +150,15 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
   const codeCluster = (x: number, y: number, seed: number, k: string) => (
     <g key={k} aria-hidden="true">
       {[0, 1, 2].map((i) => (
-        <text key={i} x={x + (i - 1) * 24} y={y} className="hk-note" style={{ animationDelay: `${((seed + i * 1.3) % 3.4).toFixed(2)}s` }} fill={i % 2 ? GLOW : RIM_H} fontSize="22" opacity="0">{GLYPHS[(seed + i) % 6]}</text>
+        <text key={i} x={x + (i - 1) * 24} y={y} className={stage.note} style={stageDelay(`${((seed + i * 1.3) % 3.4).toFixed(2)}s`)} fill={i % 2 ? GLOW : RIM_H} fontSize="22" opacity="0">{GLYPHS[(seed + i) % 6]}</text>
       ))}
     </g>
   )
 
   return (
     <svg
-      className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.82 }}
+      className={`${stage.layer} fixed inset-0 w-full h-full pointer-events-none`}
+      opacity="0.82"
       viewBox="0 0 1920 1080"
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
@@ -373,8 +378,8 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ p }: { p: OrnamentPa
           key={i}
           x={x + (i - 1) * 18}
           y={y}
-          className="hk-note"
-          style={{ animationDelay: `${((seed + i * 1.3) % 3.4).toFixed(2)}s` }}
+          className={stage.note}
+          style={stageDelay(`${((seed + i * 1.3) % 3.4).toFixed(2)}s`)}
           fill={i % 2 === 0 ? GLOW : RIM_H}
           fontSize="30"
           opacity="0"
@@ -388,14 +393,14 @@ const MusicianOrnaments = memo(function MusicianOrnaments({ p }: { p: OrnamentPa
   // idle: drum kit gives a small struck-note burst (no rings, those read as blue circles)
   const drumFx = (x: number, y: number, k: string) => (
     <g key={k} aria-hidden="true">
-      <text x={x} y={y - 34} className="hk-thump" style={{ animationDelay: '0.5s' }} fill={RIM_H} fontSize="26" textAnchor="middle" opacity="0">✺</text>
+      <text x={x} y={y - 34} className={stage.thump} style={stageDelay('0.5s')} fill={RIM_H} fontSize="26" textAnchor="middle" opacity="0">✺</text>
     </g>
   )
 
   return (
     <svg
-      className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.82 }}
+      className={`${stage.layer} fixed inset-0 w-full h-full pointer-events-none`}
+      opacity="0.82"
       viewBox="0 0 1920 1080"
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
@@ -477,7 +482,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   // hanging heavy bag, chain + leather cylinder + brass cap/straps; swings on its hang point
   const heavyBag = (tx: number, ty: number, s: number, k: string, delay: number) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.92">
-      <g className="hk-swing" style={{ animationDelay: `${delay}s` }}>
+      <g className={stage.swing} style={stageDelay(`${delay}s`)}>
         <line x1="0" y1="-360" x2="0" y2="-250" stroke={HW} strokeWidth="5" opacity="0.6" />
         <path d="M-26,-250 L0,-205 L26,-250" fill="none" stroke={RIM} strokeWidth="4" />
         <path d="M-40,-205 Q-44,-212 -36,-216 L36,-216 Q44,-212 40,-205 L40,40 Q40,72 0,72 Q-40,72 -40,40 Z" fill="url(#fgLeather)" stroke={SHELL_D} strokeWidth="2.5" />
@@ -494,7 +499,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   // pair of boxing gloves hanging by their laces; sways
   const gloves = (tx: number, ty: number, s: number, k: string, delay: number) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
-      <g className="hk-sway" style={{ animationDelay: `${delay}s` }}>
+      <g className={stage.sway} style={stageDelay(`${delay}s`)}>
         <line x1="0" y1="-118" x2="-20" y2="-40" stroke={HW} strokeWidth="3" opacity="0.6" />
         <line x1="0" y1="-118" x2="20" y2="-40" stroke={HW} strokeWidth="3" opacity="0.6" />
         <circle cx="0" cy="-120" r="4" fill={RIM} />
@@ -545,7 +550,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <ellipse cx="0" cy="-110" rx="58" ry="14" fill="url(#fgBrass)" stroke={RIM_S} strokeWidth="1.5" />
       <ellipse cx="0" cy="-110" rx="58" ry="14" fill="none" stroke={RIM_H} strokeWidth="1" opacity="0.4" />
-      <g className="hk-sway" style={{ animationDelay: '0.3s' }}>
+      <g className={stage.sway} style={stageDelay('0.3s')}>
         <line x1="0" y1="-104" x2="0" y2="-78" stroke={HW} strokeWidth="3" opacity="0.6" />
         <path d="M-20,-78 Q-24,-40 0,-30 Q24,-40 20,-78 Q12,-86 0,-84 Q-12,-86 -20,-78 Z" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
         <line x1="-14" y1="-70" x2="14" y2="-70" stroke={RIM} strokeWidth="2" opacity="0.5" />
@@ -558,7 +563,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.9">
       <line x1="0" y1="-200" x2="0" y2="-70" stroke={HW} strokeWidth="2.5" opacity="0.5" strokeDasharray="6 5" />
       <line x1="0" y1="-30" x2="0" y2="40" stroke={HW} strokeWidth="2.5" opacity="0.5" strokeDasharray="6 5" />
-      <g className="hk-sway" style={{ animationDelay: '1.1s' }}>
+      <g className={stage.sway} style={stageDelay('1.1s')}>
         <circle cx="0" cy="-50" r="22" fill="url(#fgGlove)" stroke={SHELL_D} strokeWidth="2" />
         <path d="M-14,-58 Q-18,-44 -6,-36" fill="none" stroke={SHELL_D} strokeWidth="1.5" opacity="0.5" />
         <rect x="-6" y="-74" width="12" height="6" rx="2" fill={RIM} opacity="0.7" />
@@ -570,7 +575,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   const jumpRope = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-150" r="5" fill={RIM} />
-      <g className="hk-sway" style={{ animationDelay: '0.6s' }}>
+      <g className={stage.sway} style={stageDelay('0.6s')}>
         {[0, 1, 2].map((i) => (
           <path key={i} d={`M${-14 + i * 4},-148 Q${-46 - i * 8},-70 ${-6 + i * 3},-12 Q${30 + i * 6},-70 ${10 - i * 3},-148`} fill="none" stroke={RIM} strokeWidth="3" opacity="0.5" />
         ))}
@@ -594,7 +599,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   const mongkol = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-90" r="4" fill={RIM} />
-      <g className="hk-sway" style={{ animationDelay: '1.6s' }}>
+      <g className={stage.sway} style={stageDelay('1.6s')}>
         <ellipse cx="0" cy="-44" rx="38" ry="46" fill="none" stroke="url(#fgBrass)" strokeWidth="7" />
         <ellipse cx="0" cy="-44" rx="38" ry="46" fill="none" stroke={RIM_H} strokeWidth="2" opacity="0.4" />
         <path d="M-10,2 Q0,16 10,2" fill="none" stroke={RIM} strokeWidth="5" />
@@ -632,7 +637,7 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
   const handWraps = (tx: number, ty: number, s: number, k: string) => (
     <g key={k} transform={`translate(${tx},${ty}) scale(${s})`} opacity="0.85">
       <circle cx="0" cy="-120" r="4" fill={RIM} />
-      <g className="hk-sway" style={{ animationDelay: '2s' }}>
+      <g className={stage.sway} style={stageDelay('2s')}>
         <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke="url(#fgBrass)" strokeWidth="9" />
         <ellipse cx="0" cy="-96" rx="26" ry="22" fill="none" stroke={RIM_H} strokeWidth="1.5" opacity="0.3" />
         <path d="M-18,-80 Q-30,-30 -14,10" fill="none" stroke={RIM} strokeWidth="6" opacity="0.6" />
@@ -653,13 +658,13 @@ const FighterOrnaments = memo(function FighterOrnaments({ p }: { p: OrnamentPale
 
   // idle: a small struck-impact burst near a bag (sparse, like the drum's)
   const impact = (x: number, y: number) => (
-    <text x={x} y={y} className="hk-thump" style={{ animationDelay: '0.7s' }} fill={RIM_H} fontSize="24" textAnchor="middle" opacity="0" aria-hidden="true">✦</text>
+    <text x={x} y={y} className={stage.thump} style={stageDelay('0.7s')} fill={RIM_H} fontSize="24" textAnchor="middle" opacity="0" aria-hidden="true">✦</text>
   )
 
   return (
     <svg
-      className="ornament-layer fixed inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.95 }}
+      className={`${stage.layer} fixed inset-0 w-full h-full pointer-events-none`}
+      opacity="0.95"
       viewBox="0 0 1920 1080"
       preserveAspectRatio="xMidYMax slice"
       aria-hidden="true"
@@ -722,32 +727,20 @@ const ORNAMENTS_FOR: Record<StageProfession, typeof EngineerOrnaments> = {
   fighter: FighterOrnaments,
 }
 
-/** The profession boss-stage, drawn in the palette it is given: Dark Fantasy passes its own, every
- *  other world gets one derived from its theme colours by GlobalProfessionStage. */
+/** The profession boss-stage, drawn in the palette it is given: Dark Fantasy passes its own, and
+ *  GlobalProfessionStage derives one from the theme colours of a world without its own stage. */
 export const ProfessionStage = memo(function ProfessionStage({ profession, p }: { profession: StageProfession; p: OrnamentPalette }) {
   const Ornaments = ORNAMENTS_FOR[profession]
   return (
     <div className="fixed inset-0 pointer-events-none z-[0] overflow-hidden" aria-hidden="true">
-      {/* z-[0]: sits BELOW the z-[1] VoidDepths columns so instruments read as set
-          BEHIND the architecture (was z-[2], which painted them in front of the columns). */}
+      {/* z-[0], under Dark Fantasy's z-[1] VoidDepths columns, so the instruments stand behind the architecture */}
       <Ornaments p={p} />
     </div>
   )
 })
 
-// ---- theme-derived palette + global render (Dark Fantasy renders ProfessionStage with its own palette) ----
-function clampHex(n: number) { return Math.max(0, Math.min(255, Math.round(n))) }
-function parseHex(h: string) {
-  let s = h.replace('#', '')
-  if (s.length === 3) s = s.split('').map((ch) => ch + ch).join('')
-  return [parseInt(s.slice(0, 2), 16) || 0, parseInt(s.slice(2, 4), 16) || 0, parseInt(s.slice(4, 6), 16) || 0]
-}
-function mix(a: string, b: string, t: number) {
-  const [ar, ag, ab] = parseHex(a), [br, bg, bb] = parseHex(b)
-  const r = clampHex(ar + (br - ar) * t), g = clampHex(ag + (bg - ag) * t), bl = clampHex(ab + (bb - ab) * t)
-  return '#' + [r, g, bl].map((v) => v.toString(16).padStart(2, '0')).join('')
-}
-
+// A palette for the stage from a world's theme colours: the void from its background, the soul light from its
+// accent, the brass from its secondary colour, the rest mixed between them.
 function paletteFromColors(c: { background: string; accent: string; secondary: string; text?: string }): OrnamentPalette {
   const bg = c.background, ac = c.accent, sc = c.secondary || c.accent
   return {
@@ -777,8 +770,9 @@ export default function GlobalProfessionStage() {
   const { theme } = useTheme()
   const { active } = useProfession()
   const pathname = usePathname()
+  // One palette object per theme, so the memo stage skips the renders that change nothing it draws.
+  const p = useMemo(() => paletteFromColors(theme.colors), [theme.colors])
   if (WORLDS_WITH_OWN_STAGE.has(theme.id) || CV_PAGE_PATHS.has(pathname ?? '')) return null
-  const p = paletteFromColors(theme.colors)
   return <ProfessionStage profession={active} p={p} />
 }
 

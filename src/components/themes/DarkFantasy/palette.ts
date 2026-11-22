@@ -41,6 +41,8 @@ export const DARK_FANTASY = {
   white: '#ffffff',
 
   // The registry's text, rims and panels
+  // The dialogue box surface (.df-panel, .df-card), opaque so the stage behind never shows through.
+  panel: '#15102b',
   text: '#c8d4e8',
   textMuted: '#6b7a94',
   violet: '#9966cc',

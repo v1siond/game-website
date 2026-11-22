@@ -3,6 +3,7 @@
 import { memo, ReactNode, useState, useEffect, useRef, type CSSProperties } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
+import knight from './knight.module.css'
 import { DARK_FANTASY } from './palette'
 
 /**
@@ -31,24 +32,19 @@ const KNIGHT_INNER_SHADOW_RISE = 3
 
 interface KnightCharacterProps {
   scale?: number
-  size?: number
   attacking?: boolean
   attackPhase?: number
   facingDirection?: 'left' | 'right'
-  className?: string
   breathing?: boolean
 }
 
 export const KnightCharacter = memo(function KnightCharacter({
   scale = 1,
-  size,
   attacking = false,
   attackPhase = 0,
   facingDirection = 'right',
-  className = '',
   breathing = false,
 }: KnightCharacterProps) {
-  const effectiveScale = size ? size / KNIGHT_VIEW_WIDTH : scale
   const isLeft = facingDirection === 'left'
 
   const getNailRotation = () => {
@@ -61,25 +57,13 @@ export const KnightCharacter = memo(function KnightCharacter({
   const nailRotation = getNailRotation()
 
   return (
-    <span style={{ display: 'block', animation: breathing && !attacking ? 'knightIdleFloat 3.6s ease-in-out infinite' : undefined }}>
+    <span style={{ display: 'block', animation: breathing && !attacking ? `${knight.knightIdleFloat} 3.6s ease-in-out infinite` : undefined }}>
     {/* Idle: gentle float wrapper + cloak breathing (HK-style); disabled while attacking */}
-    {breathing && (
-      <style>{`
-        @keyframes knightCloakBreathing {
-          0%, 100% { transform: scaleY(1) scaleX(1); }
-          50% { transform: scaleY(1.06) scaleX(1.03); }
-        }
-        @keyframes knightIdleFloat {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-4px); }
-        }
-      `}</style>
-    )}
     <svg
-      width={KNIGHT_VIEW_WIDTH * effectiveScale}
-      height={KNIGHT_VIEW_HEIGHT * effectiveScale}
+      width={KNIGHT_VIEW_WIDTH * scale}
+      height={KNIGHT_VIEW_HEIGHT * scale}
       viewBox={`0 0 ${KNIGHT_VIEW_WIDTH} ${KNIGHT_VIEW_HEIGHT}`}
-      className={`block ${className}`}
+      className="block"
       style={{
         overflow: 'visible',
         transform: isLeft ? 'scaleX(-1)' : 'none',
@@ -96,7 +80,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       <g
         style={{
           transformOrigin: '30px 60px',
-          animation: breathing ? 'knightCloakBreathing 3s ease-in-out infinite' : undefined,
+          animation: breathing ? `${knight.knightCloakBreathing} 3s ease-in-out infinite` : undefined,
         }}
       >
         <path
@@ -267,7 +251,6 @@ export const KnightCharacter = memo(function KnightCharacter({
 interface KnightSlashRevealProps {
   children: ReactNode
   triggered: boolean
-  className?: string
 }
 
 type AnimationPhase = 'idle' | 'knight-enter' | 'knight-raise' | 'slash' | 'content-reveal' | 'complete'
@@ -307,10 +290,31 @@ const PHASE_TIMING = {
   'complete': 1300,
 }
 
+// His pose in each phase: he steps in from the right, raises, slashes and backs off to rest beside the panel.
+const KNIGHT_POSES: Record<AnimationPhase, CSSProperties> = {
+  'idle': { transform: 'translateX(120px)', opacity: 0 },
+  'knight-enter': { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('200ms ease-out') },
+  'knight-raise': { transform: 'translateX(-10px)', opacity: 1, transition: moveAndFade('150ms ease-out') },
+  'slash': { transform: 'translateX(-25px)', opacity: 1, transition: moveAndFade('100ms ease-out') },
+  'content-reveal': { transform: 'translateX(-70px)', opacity: 0.75, transition: moveAndFade('250ms ease-out') },
+  // He rests closer to the content, to its left
+  'complete': { transform: `translateX(-${REST_SHIFT_PX}px)`, opacity: 0.7, transition: moveAndFade('300ms ease-out') },
+}
+
+// The panel waits off to the right until his slash, then slides in.
+const CONTENT_HIDDEN: CSSProperties = { transform: 'translateX(100%)', opacity: 0 }
+const CONTENT_POSES: Record<AnimationPhase, CSSProperties> = {
+  'idle': CONTENT_HIDDEN,
+  'knight-enter': CONTENT_HIDDEN,
+  'knight-raise': CONTENT_HIDDEN,
+  'slash': CONTENT_HIDDEN,
+  'content-reveal': { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)') },
+  'complete': { transform: 'translateX(0)', opacity: 1 },
+}
+
 export const KnightSlashReveal = memo(function KnightSlashReveal({
   children,
   triggered,
-  className = '',
 }: KnightSlashRevealProps) {
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [attackPhase, setAttackPhase] = useState(0)
@@ -320,20 +324,15 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const { ref: stageRef, inView } = useSectionTrigger(COMBAT_IN_VIEW)
 
   useEffect(() => {
-    if (!triggered || hasAnimated.current) {
-      if (!triggered) {
-        // Only reset if we haven't animated yet
-        if (!hasAnimated.current) {
-          setPhase('idle')
-        }
-      }
-      return
-    }
+    // The trigger fires once, so the reveal plays once and the phase starts idle
+    if (!triggered || hasAnimated.current) return
 
     // Mark as animated so we don't replay
     hasAnimated.current = true
 
     const timers: NodeJS.Timeout[] = []
+    // The slash's frame by frame ramp, cancelled with the timers when the reveal unmounts mid slash
+    let attackFrame = 0
 
     // 0.5s delay before animation starts
     timers.push(setTimeout(() => setPhase('knight-enter'), PHASE_TIMING['knight-enter']))
@@ -346,9 +345,9 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       const animateAttack = (now: number) => {
         const progress = Math.min((now - start) / 100, 1)
         setAttackPhase(progress)
-        if (progress < 1) requestAnimationFrame(animateAttack)
+        if (progress < 1) attackFrame = requestAnimationFrame(animateAttack)
       }
-      requestAnimationFrame(animateAttack)
+      attackFrame = requestAnimationFrame(animateAttack)
     }, PHASE_TIMING['slash']))
 
     timers.push(setTimeout(() => {
@@ -359,68 +358,30 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
 
     timers.push(setTimeout(() => setPhase('complete'), PHASE_TIMING['complete']))
 
-    return () => timers.forEach(t => clearTimeout(t))
+    return () => {
+      timers.forEach(t => clearTimeout(t))
+      cancelAnimationFrame(attackFrame)
+    }
   }, [triggered])
-
-  const getKnightStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        return { transform: 'translateX(120px)', opacity: 0 }
-      case 'knight-enter':
-        return { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('200ms ease-out') }
-      case 'knight-raise':
-        return { transform: 'translateX(-10px)', opacity: 1, transition: moveAndFade('150ms ease-out') }
-      case 'slash':
-        return { transform: 'translateX(-25px)', opacity: 1, transition: moveAndFade('100ms ease-out') }
-      case 'content-reveal':
-        return { transform: 'translateX(-70px)', opacity: 0.75, transition: moveAndFade('250ms ease-out') }
-      case 'complete':
-        // Knight rests closer to content (more to the left)
-        return {
-          transform: `translateX(-${REST_SHIFT_PX}px)`,
-          opacity: 0.7,
-          transition: moveAndFade('300ms ease-out'),
-        }
-      default:
-        return { transform: 'translateX(120px)', opacity: 0 }
-    }
-  }
-
-  const getContentStyle = (): React.CSSProperties => {
-    switch (phase) {
-      case 'idle':
-        return { transform: 'translateX(100%)', opacity: 0 }
-      case 'knight-enter':
-      case 'knight-raise':
-      case 'slash':
-        return { transform: 'translateX(100%)', opacity: 0 }
-      case 'content-reveal':
-        return { transform: 'translateX(0)', opacity: 1, transition: moveAndFade('250ms cubic-bezier(0.34, 1.56, 0.64, 1)') }
-      case 'complete':
-        return { transform: 'translateX(0)', opacity: 1 }
-      default:
-        return { transform: 'translateX(0)', opacity: 1 }
-    }
-  }
 
   const showKnight = phase !== 'idle'
   const isAttacking = phase === 'knight-raise' || phase === 'slash'
 
   return (
-    <div ref={stageRef} className={`relative w-full max-lg:overflow-x-clip ${className}`} style={SLASH_STAGE}>
+    <div ref={stageRef} className="relative w-full max-lg:overflow-x-clip" style={SLASH_STAGE}>
       {showSlash && (
         <div
           className="absolute inset-0 z-10 pointer-events-none"
           style={{
             background: `linear-gradient(90deg, transparent 20%, ${DARK_FANTASY.soulBlue}40 50%, transparent 80%)`,
-            animation: 'slashFlash 100ms ease-out'
+            animation: `${knight.slashFlash} 100ms ease-out`
           }}
         />
       )}
 
       {/* COMBAT_Z.content: the transform from getContentStyle() makes this a stacking context;
           without an explicit z-index it sinks below the fixed z-[1..8] background and the fighters */}
-      <div className={`relative ${COMBAT_Z.content}`} style={getContentStyle()}>
+      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]}>
         {children}
       </div>
 
@@ -429,7 +390,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
         <div
           data-worlds-figure=""
           className="pointer-events-none absolute bottom-[calc(100%_-_var(--panel-top)_-_var(--frame-inset)_-_var(--sole-drop))] right-[calc(var(--panel-inset)_-_var(--rest))] z-20 lg:hidden"
-          style={getKnightStyle()}
+          style={KNIGHT_POSES[phase]}
           aria-hidden="true"
         >
           <KnightCharacter
@@ -448,7 +409,7 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           <div
             data-worlds-figure=""
             className="absolute bottom-[18%] left-[min(max(calc(50%_+_var(--panel-half)_+_var(--rest)),calc(92%_-_var(--knight-w))),calc(100%_-_var(--knight-w)))] z-20 pointer-events-none max-lg:hidden"
-            style={getKnightStyle()}
+            style={KNIGHT_POSES[phase]}
           >
             <KnightCharacter
               scale={SLASH_KNIGHT_SCALE}
@@ -460,14 +421,6 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
           </div>
         </FixedCombatLayer>
       )}
-
-      <style>{`
-        @keyframes slashFlash {
-          0% { opacity: 0; transform: translateX(-100%); }
-          50% { opacity: 1; }
-          100% { opacity: 0; transform: translateX(100%); }
-        }
-      `}</style>
     </div>
   )
 })
