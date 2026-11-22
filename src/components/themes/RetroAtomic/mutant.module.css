@@ -27,8 +27,8 @@
 .guard .armFar, .kneed .armFar, .kicked .armFar { transform: rotate(35deg); }
 .guard .foreFar, .kneed .foreFar, .kicked .foreFar { transform: rotate(112deg); }
 
-.guard .body { animation: heave 1.6s ease-in-out infinite; }
-.guard .foreNear { animation: fist-bob 1.6s ease-in-out infinite; }
+.guard .body { animation: heave 1.6s ease-in-out 3 both; }
+.guard .foreNear { animation: fist-bob 1.6s ease-in-out 3 both; }
 
 @keyframes heave {
   0%, 100% { transform: scaleY(1); }

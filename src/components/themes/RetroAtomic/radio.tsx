@@ -17,7 +17,8 @@ import { cssVars } from '@/lib/cssVars'
 // change to that station's (the --amp and --wave variables the CSS reads), a short burst of static
 // flickers over the panel (keyed per station, so it plays on each retune), the station's lamp lights
 // and the caption names it for screen readers (aria-live). The wave is one long sine path sliding
-// sideways forever, the panel's only loop, frozen under reduced motion.
+// sideways at the station's speed for as many cycles as fit in 5 s, replayed on each retune (keyed per
+// station) and resting after, the panel's only loop, still under reduced motion.
 
 const WAVE_CYCLES = 8
 const WAVE_POINTS = WAVE_CYCLES * 8
@@ -29,18 +30,26 @@ const SINE = Array.from({ length: WAVE_POINTS * 2 + 1 }, (_, point) => {
   return `${point === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`
 }).join(' ')
 
-// Each station's height and speed, picked by its place in the list.
+// Each station's height and wave, picked by its place in the list: a wave's cycle and how many of them
+// fit in 5 s.
 const AMPLITUDES = [0.9, 0.55, 0.75, 0.4]
-const SPEEDS = ['1.6s', '2.4s', '1.1s', '3s']
+const WAVES = [
+  { cycle: '1.6s', loops: 3 },
+  { cycle: '2.4s', loops: 2 },
+  { cycle: '1.1s', loops: 4 },
+  { cycle: '3s', loops: 1 },
+]
 
 function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: boolean }) {
   const { hud } = useLabels()
   const band = bands[tuned]
   const place = bands.length > 1 ? tuned / (bands.length - 1) : 0.5
+  const wave = WAVES[tuned % WAVES.length]
   const look = cssVars({
     '--needle': place,
     '--amp': AMPLITUDES[tuned % AMPLITUDES.length],
-    '--wave': SPEEDS[tuned % SPEEDS.length],
+    '--wave': wave.cycle,
+    '--wave-loops': wave.loops,
   })
 
   return (
@@ -55,7 +64,7 @@ function Receiver({ bands, tuned, on }: { bands: Band[]; tuned: number; on: bool
         </p>
       </div>
       <div className={`relative h-24 self-center overflow-hidden border border-atomic-phosphor/50 ${atomic.wavePanel}`} aria-hidden="true">
-        <div className={`absolute inset-y-0 left-0 w-[200%] ${atomic.waveSlide} ${atomic.ambient}`}>
+        <div key={tuned} className={`absolute inset-y-0 left-0 w-[200%] ${atomic.waveSlide} ${atomic.ambient}`}>
           <svg viewBox="0 0 400 60" preserveAspectRatio="none" className={`h-full w-full ${atomic.waveHeight}`} focusable="false">
             <path d={SINE} fill="none" stroke={PHOSPHOR} strokeWidth="2" vectorEffect="non-scaling-stroke" />
             <path d="M0 30 H400" stroke={PHOSPHOR_DEEP} strokeWidth="1" vectorEffect="non-scaling-stroke" />
