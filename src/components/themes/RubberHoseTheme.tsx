@@ -66,7 +66,7 @@ export default function RubberHoseTheme() {
   const { zones, stage } = useZoneStore<Isle>('meadow', reducedMotion)
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--hose-ink)] [--focus-halo:var(--hose-paper)] ${world.root} ${world.focusRing} ${hoseLettering.variable}`} style={HOSE_VARS}>
+    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--hose-ink)] [--focus-halo:var(--hose-paper)] ${world.root} ${hoseLettering.variable}`} style={HOSE_VARS}>
       <a href="#main-content" className={`sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 ${world.chip}`}>
         {navigation.skipToContent}
       </a>

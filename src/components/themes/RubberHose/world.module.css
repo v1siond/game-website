@@ -345,12 +345,6 @@
   animation-delay: var(--delay, 0s);
 }
 
-.focusRing :focus-visible {
-  outline: 4px solid var(--hose-ink);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 7px var(--hose-gold);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sprockets,
   .grain,
