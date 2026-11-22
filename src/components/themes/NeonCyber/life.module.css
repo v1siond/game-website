@@ -58,7 +58,7 @@
 }
 
 .scanStage[data-on='true'] .infoTag {
-  animation: tag-pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) calc(2s + var(--i) * 0.18s) both;
+  animation: tag-pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) calc(2s + var(--i) * var(--step)) both;
 }
 /* The hover ping beats the entrance with !important, so it is kept to visitors who allow motion. */
 @media (prefers-reduced-motion: no-preference) {
@@ -298,7 +298,7 @@
   transform: scaleX(0);
 }
 .ripStage[data-on='true'] .installBar {
-  animation: install 0.8s steps(8) calc(0.6s + var(--i) * 0.9s) both;
+  animation: install 0.8s steps(8) calc(0.6s + var(--i) * var(--step)) both;
 }
 .installRow:hover .installBar {
   animation: reinstall 0.8s steps(8) both;
