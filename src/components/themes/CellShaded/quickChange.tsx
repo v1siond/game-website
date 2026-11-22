@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
@@ -8,6 +8,7 @@ import { VaultSprite } from './sprite'
 import { Digistruct } from './digistruct'
 import { HATCH } from './ink'
 import { CEL } from './palette'
+import { useOnChange } from '@/hooks/useOnChange'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Zone } from './wasteland'
 import cel from './cel.module.css'
@@ -34,14 +35,7 @@ function OutfitTab({ id, label, selected, optionProps }: ProfessionOption) {
 // A new build each time the shown profession changes after the first render.
 function useBuildOnChange(profession: Profession): number {
   const [build, setBuild] = useState(0)
-  const shown = useRef(profession)
-
-  useEffect(() => {
-    if (shown.current === profession) return
-    shown.current = profession
-    setBuild((count) => count + 1)
-  }, [profession])
-
+  useOnChange(profession, () => setBuild((count) => count + 1))
   return build
 }
 

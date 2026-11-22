@@ -1,7 +1,8 @@
 'use client'
 
-import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { useOnChange } from '@/hooks/useOnChange'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
@@ -85,16 +86,18 @@ export function ItemBox() {
   const { active } = useProfession()
   const { navigation, professions, hud, horror: words } = useLabels()
   const door = useDoor()
-  const shown = useRef(active)
   const taken = useRef(false)
 
-  // A change that came from the keyboard, not a click: the door still plays over the new room.
-  useLayoutEffect(() => {
-    if (shown.current === active) return
-    shown.current = active
-    if (!taken.current) door()
-    taken.current = false
-  }, [active, door])
+  // A change that came from the keyboard, not a click: the door still plays over the new room, closing
+  // before the new room paints.
+  useOnChange(
+    active,
+    () => {
+      if (!taken.current) door()
+      taken.current = false
+    },
+    { timing: 'layout' },
+  )
 
   const take = (option: ProfessionOption) => {
     if (option.selected) return
