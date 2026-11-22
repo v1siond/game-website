@@ -80,8 +80,6 @@ export default async function RootShell({ lang, children }: Readonly<RootShellPr
   return (
     <html lang={lang} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <meta name="format-detection" content="telephone=no" />
       </head>
       <body
