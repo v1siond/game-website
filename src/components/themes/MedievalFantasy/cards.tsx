@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import type { Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
+import type { VentureSlot } from '@/components/cv/VentureList'
 import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -9,7 +10,7 @@ import { REALM } from './palette'
 import { InnerCard } from './panels'
 import { RealmButton } from './actions'
 
-// One card per job, project and band, read from the shared section slots.
+// One card per job, project, venture and band, read from the shared section slots.
 
 export const CARD_TITLE: CSSProperties = { color: REALM.textBright, fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.125rem' }
 export const CARD_SUBTITLE: CSSProperties = { color: REALM.goldText, fontSize: '0.875rem', marginBottom: '0.25rem' }
@@ -94,6 +95,32 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
         <p style={CARD_BODY}>
           {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
         </p>
+      )}
+    </InnerCard>
+  )
+}
+
+// The venture's link shows its address, so its accessible name starts with that address (label in name).
+export function VentureCard({ slot: { venture, linkProps, nameFor } }: { slot: VentureSlot }) {
+  const { cards } = useLabels()
+  return (
+    <InnerCard zone="ft" highlight={venture.featured}>
+      {venture.featured && (
+        <p className="mb-2 inline-block border border-[color:var(--realm-gold-dark)] px-2 py-0.5 text-sm font-semibold uppercase tracking-[0.08em] text-[color:var(--realm-gold-bright)]">
+          {cards.ownProduct}
+        </p>
+      )}
+      <h3 style={CARD_TITLE}><SlashBreaks text={venture.name} /></h3>
+      <p style={{ ...CARD_SUBTITLE, fontSize: '1rem' }}>{venture.tagline}</p>
+      <p style={CARD_BODY}>{venture.description}</p>
+      {linkProps && (
+        <a
+          {...linkProps}
+          aria-label={nameFor(venture.url)}
+          style={{ color: REALM.frostIceMid, fontSize: '0.875rem', textDecoration: 'none', display: 'inline-block', minHeight: '44px', paddingTop: '0.75rem', overflowWrap: 'anywhere' }}
+        >
+          {venture.url}
+        </a>
       )}
     </InnerCard>
   )
