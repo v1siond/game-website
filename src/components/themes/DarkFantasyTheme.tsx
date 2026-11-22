@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
+import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
+import type { SiteLinkId } from '@/lib/cv/siteLinks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -30,7 +32,6 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 import world from './DarkFantasy/world.module.css'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
 const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
@@ -1526,19 +1527,26 @@ function WaystationSelector({ active }: { active: Profession }) {
 const DF_BUTTON =
   'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-transform hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
 
-// Email is the brass action, LinkedIn the outlined one.
+// Email is the brass action, LinkedIn and the CV in the contact row the outlined ones.
+const DF_OUTLINED = 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]'
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
-  email: 'bg-[color:var(--df-brass-plate)] text-[color:var(--df-void)]',
-  linkedin: 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]',
+  email: `${DF_BUTTON} bg-[color:var(--df-brass-plate)] text-[color:var(--df-void)]`,
+  linkedin: `${DF_BUTTON} ${DF_OUTLINED}`,
+}
+
+// The nav's CV and engine links: small framed tabs, the CV in stone, the engine in the soul light.
+const NAV_LINK =
+  'px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)]'
+const NAV_LOOK: Record<SiteLinkId, string> = {
+  cv: `${NAV_LINK} border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]`,
+  engine: `${NAV_LINK} border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]`,
 }
 
 function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   return (
     <>
       {actions.map((action) => (
-        <a key={action.id} {...action.linkProps} className={`${DF_BUTTON} ${HERO_ACTION_LOOK[action.id]}`}>
-          {action.label}
-        </a>
+        <ContactLink key={action.id} slot={action} className={HERO_ACTION_LOOK[action.id]} />
       ))}
     </>
   )
@@ -1721,6 +1729,7 @@ const SECTION_VIEWS: ProfessionSectionViews = {
 export default function DarkFantasyTheme() {
   const view = useWorldView()
   const { navigation, actions: actionLabels, sections } = useLabels()
+  const siteLinks = useSiteLinks('engine')
   const active = view.profession
   const [mounted, setMounted] = useState(false)
 
@@ -1820,19 +1829,15 @@ export default function DarkFantasyTheme() {
 
           {/* Nav Links */}
           <div className="flex gap-2 md:gap-3 items-center">
-            <Link
-              href="/cv"
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]"
-            >
-              {actionLabels.cv}
-            </Link>
-            <Link
-              {...ENGINE_LINK}
-              className="px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]"
-            >
-              <span className="hidden sm:inline">{actionLabels.engine}</span>
-              <span className="sm:hidden">{actionLabels.engineShort}</span>
-            </Link>
+            <ContactLink slot={siteLinks.cv} className={NAV_LOOK.cv} />
+            <ContactLink slot={siteLinks.engine} className={NAV_LOOK.engine}>
+              {(label) => (
+                <>
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{actionLabels.engineShort}</span>
+                </>
+              )}
+            </ContactLink>
           </div>
         </div>
       </nav>
@@ -1899,9 +1904,7 @@ export default function DarkFantasyTheme() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <HeroActions actions={actions} />
-                  <Link href="/cv" className={`${DF_BUTTON} bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]`}>
-                    {actionLabels.cv}
-                  </Link>
+                  <ContactLink slot={siteLinks.cv} className={`${DF_BUTTON} ${DF_OUTLINED}`} />
                 </div>
               </div>
             )}
