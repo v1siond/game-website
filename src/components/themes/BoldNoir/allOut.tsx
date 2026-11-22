@@ -12,6 +12,7 @@ import { NOIR } from './palette'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
+import { projectCard } from '@/lib/cv/cvView'
 
 // The finisher a project open plays, then the project's finish card. The phases follow the game's
 // sequence, compressed from its 8 s to 1.9 s so a reader is not kept waiting:
@@ -118,7 +119,8 @@ function Rush() {
 
 function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: string; onClose: () => void }) {
   const labels = useLabels()
-  const { project, years, links, noLink } = slot
+  const { links, noLink } = slot
+  const project = projectCard(slot.project, labels)
 
   return (
     <div className="relative flex min-h-full items-center justify-center overflow-hidden px-4 py-10">
@@ -150,12 +152,15 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
         </h2>
         <p className={`mt-2 text-base font-bold text-[color:var(--noir-paper)] ${world.copy}`}>
           {project.role}
-          {years && <span className="text-[color:var(--noir-fog)]"> | {years}</span>}
+          {project.years && <span className="text-[color:var(--noir-fog)]"> | {project.years}</span>}
         </p>
         {project.tagline && <p className={`mt-4 text-base text-[color:var(--noir-paper)] ${world.copy}`}>{project.tagline}</p>}
         {project.description && <p className={`mt-3 text-sm text-[color:var(--noir-paper-dim)] ${world.copy}`}>{project.description}</p>}
         {project.impact && (
-          <p className={`mt-4 inline-block px-3 py-1 text-base font-bold ${world.heading} ${world.copy}`}>{project.impact}</p>
+          <p className={`mt-4 inline-block px-3 py-1 text-base font-bold ${world.heading} ${world.copy}`}>
+            <span className="sr-only">{labels.cards.impact}: </span>
+            {project.impact}
+          </p>
         )}
         {project.details.length > 0 && (
           <ul className="mt-4 space-y-1.5" aria-label={labels.cards.details}>

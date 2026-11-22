@@ -2,7 +2,8 @@ import type { CSSProperties, ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job, Service } from '@/lib/cv/content'
-import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
+import { newTabName } from '@/lib/cv/sectionText'
+import { jobCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { HitStar } from './backdrop'
 import world from './world.module.css'
@@ -42,10 +43,11 @@ export function Chips({ items, label, className = 'mt-3' }: { items: string[]; l
   )
 }
 
-/** A list row behind a red diamond, a highlight or a detail of a card. */
-export function Bullet({ children }: { children: ReactNode }) {
+/** A list row behind a red diamond, a highlight or a detail of a card; `tone` sets its type and colour
+ *  (the dim paper of a slab by default, the ink of the speech box on the About statement). */
+export function Bullet({ children, tone = BODY }: { children: ReactNode; tone?: string }) {
   return (
-    <li className={`flex items-start gap-2 ${BODY}`}>
+    <li className={`flex items-start gap-2 ${tone}`}>
       <span className="mt-1 block h-2.5 w-2.5 flex-shrink-0 rotate-45 bg-[color:var(--noir-red)]" aria-hidden="true" />
       {children}
     </li>
@@ -74,29 +76,30 @@ export function TechStackBoard({ categories }: { categories: CVData['techStack']
 // too narrow for the title to run beside the stamp, so there the title starts below it.
 export function RankCard({ entry, index }: { entry: Job; index: number }) {
   const { cards, years } = useLabels()
-  const span = jobSpanCompact(entry, years)
+  const job = jobCard(entry, years)
 
   return (
     <div className={world.rank} style={orderVars(index)}>
       <article className={`p-6 pt-14 sm:pt-9 ${world.slab} ${world.lift}`}>
         <p className={`absolute -top-1 right-4 ${world.stamp}`}>
           <span className={`block bg-[color:var(--noir-red-plate)] px-3 py-1 text-2xl text-[color:var(--noir-paper)] ${world.stampRest}`}>
-            {span}
+            {job.years}
           </span>
         </p>
-        <h3 className="text-3xl leading-none tracking-wide">{entry.title}</h3>
+        <h3 className="text-3xl leading-none tracking-wide">{job.title}</h3>
         <p className={`mt-1 font-bold uppercase tracking-wider text-[color:var(--noir-paper)] ${world.copy} text-sm`}>
-          <SlashBreaks text={entry.company} />
+          <SlashBreaks text={job.company} />
         </p>
-        {entry.description && <p className={`mt-3 ${BODY}`}>{entry.description}</p>}
-        {entry.highlights.length > 0 && (
+        {job.location && <p className={`mt-1 text-sm font-bold text-[color:var(--noir-fog)] ${world.copy}`}>{job.location}</p>}
+        {job.description && <p className={`mt-3 ${BODY}`}>{job.description}</p>}
+        {job.highlights.length > 0 && (
           <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
-            {entry.highlights.map((highlight) => (
+            {job.highlights.map((highlight) => (
               <Bullet key={highlight}>{highlight}</Bullet>
             ))}
           </ul>
         )}
-        {entry.skills.length > 0 && <Chips items={entry.skills} label={cards.skillsUsed} />}
+        {job.skills.length > 0 && <Chips items={job.skills} label={cards.skillsUsed} />}
       </article>
     </div>
   )
@@ -132,8 +135,9 @@ export function CaseCard({ slot, index, onOpen }: { slot: ProjectSlot; index: nu
 
 // A venture as a crooked slab; one of his own products (featured) is a wider slab with a paper tag, ink
 // capitals, pinned over the name.
-export function CompanyTag({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+export function CompanyTag({ company: entry }: { company: CVData['companies'][number] }) {
+  const { links, cards, sections } = useLabels()
+  const company = ventureCard(entry)
 
   return (
     <a
@@ -160,6 +164,7 @@ export function CompanyTag({ company }: { company: CVData['companies'][number] }
         </span>
       </span>
       <span className={`mt-2 block ${BODY}`}>{company.description}</span>
+      {company.services.length > 0 && <Chips items={company.services} label={sections.services} />}
     </a>
   )
 }
