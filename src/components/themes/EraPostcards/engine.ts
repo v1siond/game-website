@@ -12,6 +12,17 @@ import type { EraWriter, Layer } from './eras/era'
 // each counted card on load and resize, and per frame writes only each visible stage's opacity, its veil,
 // its layers' transforms and its era's props and pose. The ledger's place and count and the rail's current
 // mark change only when the leading scene or its count does.
+//
+// The text settles with the art: the page scroll stays native (scrollbar, keyboard, find in page, screen
+// readers and touch momentum are the browser's own) and the text layer, main with the footer under it, is drawn where the settled
+// position puts it, a translateY of the lag (scrollY minus the drawn position) written in the same frame
+// as the stages. So art and text trail the wheel or the finger together and come to rest together, about
+// half a second after it stops. At rest the transform is cleared, so nothing is left translated. The
+// measures subtract the lag written at the time, so a resize mid settle reads the boxes where the layout
+// puts them.
+
+// Under this many px of lag the text is drawn at the scroll, with no transform.
+const TEXT_REST_PX = 0.5
 
 // A card counts as reached once its top crosses this share of the screen from the top.
 const READ_LINE = 0.62
@@ -62,13 +73,15 @@ const show = (bound: Bound, visible: boolean): void => {
   bound.stage.style.visibility = visible ? 'visible' : 'hidden'
 }
 
-/** The refs of the theatre, main and the ledger's two lines; the engine runs while motion is allowed. */
+/** The refs of the theatre, the text layer and the ledger's two lines; the engine runs while motion is allowed. */
 export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], reduced: boolean) {
   const theatreRef = useRef<HTMLDivElement>(null)
   const placeRef = useRef<HTMLSpanElement>(null)
   const countRef = useRef<HTMLSpanElement>(null)
   const bound = useRef<Bound[]>([])
   const lead = useRef<{ id: string; reached: number }>({ id: '', reached: -1 })
+  const text = useRef<HTMLElement | null>(null)
+  const lagNow = useRef(0)
 
   useLayoutEffect(() => {
     const theatre = theatreRef.current
@@ -77,11 +90,21 @@ export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], re
   }, [scenes, reduced])
 
   const measure = useCallback((scrollY: number, { viewport }: StageMetrics) => {
+    const origin = scrollY - lagNow.current
     for (const each of bound.current) {
       const box = each.section?.getBoundingClientRect()
-      each.span = box ? { top: box.top + scrollY, bottom: box.bottom + scrollY } : { top: 0, bottom: 0 }
-      each.triggers = Array.from(each.section?.querySelectorAll(ITEMS) ?? [], (item) => item.getBoundingClientRect().top + scrollY - READ_LINE * viewport)
+      each.span = box ? { top: box.top + origin, bottom: box.bottom + origin } : { top: 0, bottom: 0 }
+      each.triggers = Array.from(each.section?.querySelectorAll(ITEMS) ?? [], (item) => item.getBoundingClientRect().top + origin - READ_LINE * viewport)
     }
+  }, [])
+
+  // The text layer drawn at the settled position: the lag as a translate, cleared at rest.
+  const settleText = useCallback((lag: number) => {
+    const node = text.current
+    const shown = Math.abs(lag) < TEXT_REST_PX ? 0 : lag
+    if (!node || shown === lagNow.current) return
+    lagNow.current = shown
+    node.style.transform = shown ? `translate3d(0,${shown.toFixed(1)}px,0)` : ''
   }, [])
 
   const mark = useCallback(
@@ -101,7 +124,8 @@ export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], re
   )
 
   const draw = useCallback(
-    (position: number, _lag: number, { viewport, phone }: StageMetrics) => {
+    (position: number, lag: number, { viewport, phone }: StageMetrics) => {
+      settleText(lag)
       const all = bound.current
       const visibilities = all.map((each, i) => {
         const { vis, progress } = stateOf(each, position, viewport, i === all.length - 1)
@@ -118,9 +142,16 @@ export function useEraEngine(scenes: readonly Scene[], words: Labels['eras'], re
       const leader = all[leadOf(visibilities)]
       mark(leader, Math.floor(itemsReached(leader.triggers, position, viewport) + 0.001))
     },
-    [mark],
+    [mark, settleText],
   )
 
-  const mainRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
-  return { theatreRef, mainRef, placeRef, countRef }
+  const stageRef = useScrollStage<HTMLElement>({ enabled: !reduced, measure, draw, content: scenes })
+  const textRef = useCallback(
+    (element: HTMLElement | null) => {
+      text.current = element
+      stageRef(element)
+    },
+    [stageRef],
+  )
+  return { theatreRef, textRef, placeRef, countRef }
 }

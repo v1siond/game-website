@@ -130,6 +130,12 @@
 }
 
 /* ---- The text layer ---- */
+/* The text layer: main and the footer, which the engine draws at the settled scroll position. */
+.text {
+  position: relative;
+  z-index: 1;
+}
+
 .main {
   position: relative;
   z-index: 1;

@@ -28,7 +28,7 @@ const eraBody = Bricolage_Grotesque({ weight: ['400', '600', '700'], subsets: ['
 // picture and does one thing per card of the section: lights a rune stone, passes a mile sign, opens a
 // crate. Every motion is a function of the scroll position (engine.ts on the shared useScrollStage), drawn
 // with the settle: stop and it comes to rest, scroll up and it plays back. The text is plain HTML in the
-// page flow over the fixed theatre of pictures, opaque from its first frame.
+// page flow over the fixed theatre of pictures, opaque from its first frame, and settles with the art.
 //
 // The whole world renders on the server, the default world's contract (docs/CV-THEME-SYSTEM.md): every CV
 // string is in the HTML and the hero's picture shows its first frame through CSS before the engine runs.
@@ -41,7 +41,7 @@ export default function EraPostcardsTheme() {
   const year = useYearNow()
   const reduced = useReducedMotion()
   const scenes = useMemo(() => scenesOf(cv, labels, year), [cv, labels, year])
-  const { theatreRef, mainRef, placeRef, countRef } = useEraEngine(scenes, labels.eras, reduced)
+  const { theatreRef, textRef, placeRef, countRef } = useEraEngine(scenes, labels.eras, reduced)
   const gates = scenes.filter((scene): scene is Scene & { slot: NonNullable<Scene['slot']> } => scene.slot !== null)
   const contact = scenes[scenes.length - 1]
 
@@ -51,16 +51,18 @@ export default function EraPostcardsTheme() {
       {!reduced && <Theatre scenes={scenes} theatreRef={theatreRef} />}
       <Ledger placeRef={placeRef} countRef={countRef} />
       <Rail scenes={scenes} />
-      <main id="main-content" ref={mainRef} className={css.main}>
-        <HubHero still={reduced} scene={scenes[0]} />
-        {gates.map((scene, i) => (
-          <EraSection key={scene.id} scene={scene} gate={i + 1} gates={gates.length} still={reduced} />
-        ))}
-        <Beacon scene={contact} still={reduced} />
-      </main>
-      <footer className={css.footer}>
-        <CopyrightLine />
-      </footer>
+      <div ref={textRef} className={css.text}>
+        <main id="main-content" className={css.main}>
+          <HubHero still={reduced} scene={scenes[0]} />
+          {gates.map((scene, i) => (
+            <EraSection key={scene.id} scene={scene} gate={i + 1} gates={gates.length} still={reduced} />
+          ))}
+          <Beacon scene={contact} still={reduced} />
+        </main>
+        <footer className={css.footer}>
+          <CopyrightLine />
+        </footer>
+      </div>
     </div>
   )
 }
