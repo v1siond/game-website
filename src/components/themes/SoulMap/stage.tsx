@@ -96,9 +96,5 @@ function Stage({ slot: { band, years, linkProps, nameFor, release } }: { slot: B
 }
 
 export function SunStages({ bands }: { bands: Band[] }) {
-  return (
-    <>
-      <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <Stage slot={slot} />} />
-    </>
-  )
+  return <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <Stage slot={slot} />} />
 }

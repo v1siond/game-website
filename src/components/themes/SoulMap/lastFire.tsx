@@ -58,12 +58,10 @@ export function LastFire({ profession }: { profession: Profession }) {
         </div>
 
         <div className="mt-6 flex flex-col items-center gap-3 text-center">
-          {lit ? null : (
-            <>
-              <button type="button" onClick={kindle} className={BUTTON_LIT}>
-                {words.kindle}
-              </button>
-            </>
+          {!lit && (
+            <button type="button" onClick={kindle} className={BUTTON_LIT}>
+              {words.kindle}
+            </button>
           )}
         </div>
 

@@ -1,6 +1,6 @@
 /*
- * The bonfire world's scenes and HUD (hud.tsx, bonfire.tsx, shrine.tsx, classSelect.tsx, descent.tsx,
- * items.tsx, messages.tsx, summons.tsx, arena.tsx, lastFire.tsx, views.tsx). Heavy and slow the way the
+ * The bonfire world's scenes and HUD (hud.tsx, bonfire.tsx, shrine.tsx, classSelect.tsx, gate.tsx, descent.tsx,
+ * items.tsx, messages.tsx, stage.tsx, arena.tsx, lastFire.tsx, menu.tsx). Heavy and slow the way the
  * hard knight action game moves: things settle with ease out, a flare is fast and its fade is long, the
  * loops run on periods that never divide into each other, and each section enters its own way (a menu
  * fades open, an area's name surfaces, a glint flares, a message is written, a phantom materialises, the

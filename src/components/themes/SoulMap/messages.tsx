@@ -106,14 +106,12 @@ function Slab({ slot: { venture, linkProps, nameFor } }: { slot: VentureSlot }) 
 
 export function FloorMessages({ companies }: { companies: CVData['companies'] }) {
   return (
-    <>
-      <VentureList
-        companies={companies}
-        className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        featuredItemClassName="[column-span:all]"
-        renderVenture={(slot) => <Slab slot={slot} />}
-      />
-    </>
+    <VentureList
+      companies={companies}
+      className={MASONRY_LIST}
+      itemClassName={MASONRY_ITEM}
+      featuredItemClassName="[column-span:all]"
+      renderVenture={(slot) => <Slab slot={slot} />}
+    />
   )
 }

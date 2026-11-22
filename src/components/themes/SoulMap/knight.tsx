@@ -228,7 +228,8 @@ function Flask({ x, className }: { x: number; className: string }) {
 }
 
 function Gauntlet({ x, paint, wrapped }: { x: number; paint: Paint; wrapped: boolean }) {
-  return <circle cx={x} cy={HAND_Y} r={wrapped ? 2.6 : 2.3} fill={wrapped ? paint.ink.wraps : paint.ink.steelDark} />
+  const fill = wrapped ? paint.ink.wraps : paint.ink.steelDark
+  return <circle cx={x} cy={HAND_Y} r={wrapped ? 2.6 : 2.3} fill={fill} />
 }
 
 // The heater shield strapped to the near forearm: steel face, a darker rim, the boss and a centre ridge.
@@ -413,11 +414,12 @@ export const Knight = memo(function Knight({ gear, pose = 'idle', spirit, facing
   const ink = spirit ? SPIRIT_INK[spirit] : STEEL_INK
   const paint: Paint = { ink, steelFill: `url(#${id}-steel)`, coatFill: `url(#${id}-coat)` }
   const look = GEAR[gear]
+  const spiritClass = spirit ? SPIRIT_CLASS[spirit] : ''
 
   return (
     <svg
       viewBox="0 0 60 96"
-      className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spirit ? SPIRIT_CLASS[spirit] : ''} ${facingLeft ? knight.facingLeft : ''} ${className}`}
+      className={`${knight.sprite} ${knight[pose]} ${knight[gear]} ${spiritClass} ${facingLeft ? knight.facingLeft : ''} ${className}`}
       aria-hidden="true"
       focusable="false"
     >

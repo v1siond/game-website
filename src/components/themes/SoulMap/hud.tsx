@@ -86,11 +86,18 @@ function FlaskIcon({ full }: { full: boolean }) {
   )
 }
 
+// Why the flask cannot be drunk now, or '' when it can.
+function flaskRefusal(flasks: number, hp: number, words: { flaskEmpty: string; healthFull: string }): string {
+  if (flasks === 0) return words.flaskEmpty
+  if (hp >= MAX_HP) return words.healthFull
+  return ''
+}
+
 function FlaskButton() {
   const { flasks, hp } = useRunState()
   const { drink } = useRunActions()
   const { souls: words } = useLabels()
-  const reason = flasks === 0 ? words.flaskEmpty : hp >= MAX_HP ? words.healthFull : ''
+  const reason = flaskRefusal(flasks, hp, words)
   const name = fillLabel(words.drink, { count: flasks })
 
   return (

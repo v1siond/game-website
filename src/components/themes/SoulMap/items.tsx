@@ -99,9 +99,10 @@ function ItemCard({ project, years, links }: ProjectSlot) {
   const [home, setHome] = useState(false)
   const { ref, triggered, script } = useTriggeredScript(summon(() => setHome(true)), { threshold: 0.25 })
   const [picked, setPicked] = useState(false)
+  const reached = triggered ? souls.itemOn : ''
 
   return (
-    <article ref={ref} className={`${souls.item} ${triggered ? souls.itemOn : ''} ${picked ? souls.itemPicked : ''}`}>
+    <article ref={ref} className={`${souls.item} ${reached} ${picked ? souls.itemPicked : ''}`}>
       <SummonedPhantom summoned={triggered} home={home} script={script} />
       <div className={`${souls.itemCard} ${ashen.panel} -mt-2 p-5`}>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -136,9 +137,5 @@ function ItemCard({ project, years, links }: ProjectSlot) {
 }
 
 export function ItemProjects({ projects }: { projects: Project[] }) {
-  return (
-    <>
-      <ProjectList projects={projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ItemCard {...slot} />} />
-    </>
-  )
+  return <ProjectList projects={projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <ItemCard {...slot} />} />
 }

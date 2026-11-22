@@ -157,15 +157,16 @@ export function ClassSelect() {
           <ProfessionSwitch
             className={`${ashen.panel} flex flex-col p-2`}
             renderOption={({ id, label, selected, optionProps }) => (
-              <div
+              <button
+                type="button"
                 {...optionProps}
-                className={`${ashen.highlight} ${selected ? ashen.highlightOn : ''} flex min-h-[56px] cursor-pointer flex-col justify-center px-4 py-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[color:var(--soul-glow)]`}
+                className={`${ashen.highlight} ${selected ? ashen.highlightOn : ''} flex min-h-[56px] cursor-pointer flex-col justify-center px-4 py-2 text-left`}
               >
                 <span className={`${CARVED} text-base uppercase tracking-[0.18em] ${selected ? 'text-[color:var(--soul-glow)]' : 'text-[color:var(--soul-text)]'}`}>
                   {label}
                 </span>
                 <span className="text-sm text-[color:var(--soul-text-soft)]">{professionFields[id]}</span>
-              </div>
+              </button>
             )}
           />
 

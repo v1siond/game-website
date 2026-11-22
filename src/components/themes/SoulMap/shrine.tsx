@@ -7,7 +7,7 @@ import { usePreview } from '@/themes/PreviewContext'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { NameWords } from '@/components/cv/NameWords'
 import { Bonfire, type FireState } from './bonfire'
-import { Knight } from './knight'
+import { Knight, type KnightPose } from './knight'
 import { usePoseScript } from './poses'
 import { useRunActions } from './run'
 import { ContactButtons } from './links'
@@ -42,6 +42,8 @@ const TIMELINE: Array<[Phase, number]> = [
 ]
 
 const FIRE: Record<Phase, FireState> = { ash: 'out', ember: 'ember', lit: 'lit', rise: 'lit', ready: 'lit' }
+// His pose while the fire is lit: seated by it, then rising with it; once ready his script poses him.
+const LIGHTING_POSE: Record<Exclude<Phase, 'ready'>, KnightPose> = { ash: 'seated', ember: 'seated', lit: 'seated', rise: 'rise' }
 
 const ROLL_COST = 20
 const REST_SOULS = 50
@@ -175,7 +177,7 @@ export function ShrineHero() {
   const ready = phase === 'ready'
   // Before the lighting is done he is already sitting by the dead fire (no sitting down on the first
   // draw), then rises with it.
-  const pose = ready ? script.pose : phase === 'rise' ? 'rise' : 'seated'
+  const pose = phase === 'ready' ? script.pose : LIGHTING_POSE[phase]
 
   const rest = () => {
     if (!ready) return
