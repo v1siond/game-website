@@ -5,6 +5,7 @@ import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanVie
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { sectionPlan, type SectionId } from '@/lib/cv/sectionPlan'
+import { CountBoxLevel } from './countBox'
 import { findTotal } from './finds'
 import type { Era } from './palette'
 import { Region } from './stage'
@@ -44,7 +45,9 @@ function Level({ id }: { id: SectionId }) {
 }
 
 const FRAMES: SectionFrames = {
-  about: () => <Level id="about" />,
+  about: function AboutFrame() {
+    return <CountBoxLevel />
+  },
   work: () => <Level id="work" />,
   tech: () => <Level id="tech" />,
   services: () => <Level id="services" />,

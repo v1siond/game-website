@@ -93,6 +93,28 @@ export function heroEntranceMs(): number {
   return Math.max(platform.at + platform.ms, padsEnd, beam.at + beam.ms, ring.at + ring.ms)
 }
 
+// About: he walks up to the count box, pulls the plunger on its side, the three light pips on its lid
+// blink in three beats and its front panel swings open; the box stays whole (research part 2 [13]).
+const AT_PLUNGER: Spot = { x: 38, lift: 0 }
+
+export const COUNT_BOX: Scene = {
+  start: { x: 8, lift: 0 },
+  beats: [
+    { name: 'walk', pose: 'run', ms: 600, to: AT_PLUNGER },
+    { name: 'pull', pose: 'pull', ms: 500, to: AT_PLUNGER },
+    { name: 'count', pose: 'idle', ms: 900, to: AT_PLUNGER },
+    { name: 'open', pose: 'hop', ms: 400, to: AT_PLUNGER },
+  ],
+  rest: 'idle',
+}
+
+export const PIPS = 3
+
+const PIP_MS = 300
+
+/** When pip `index` lights, counted from the start of the scene. */
+export const pipAt = (index: number): number => beatStart(COUNT_BOX, 'count') + index * PIP_MS
+
 // Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
 // so a fourth achievement adds no step.
 const MASK_STEP_MAX = 3

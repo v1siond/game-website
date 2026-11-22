@@ -1,4 +1,4 @@
-import { HERO_TIMING, POSES, beatStart, heroEntranceMs, motionAt, restSpot, sceneMs, type Scene } from './choreography'
+import { COUNT_BOX, HERO_TIMING, PIPS, POSES, beatStart, heroEntranceMs, motionAt, pipAt, restSpot, sceneMs, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -67,5 +67,23 @@ describe('the hero', () => {
     expect(POSES).toEqual(
       expect.arrayContaining(['idle', 'scratch', 'run', 'pull', 'spin', 'hit', 'point', 'drum', 'guard', 'knee', 'press', 'dance', 'hop']),
     )
+  })
+})
+
+describe('About: the count box', () => {
+  it('plays the walk, the plunger pull, the three pips and the panel opening in 2.4 s', () => {
+    expect(COUNT_BOX.beats.map((beat) => beat.name)).toEqual(['walk', 'pull', 'count', 'open'])
+    expect(sceneMs(COUNT_BOX)).toBe(2400)
+  })
+
+  it('blinks the three pips one after another inside the count beat', () => {
+    expect(PIPS).toBe(3)
+    const count = COUNT_BOX.beats.find((beat) => beat.name === 'count')
+    expect(pipAt(0)).toBe(beatStart(COUNT_BOX, 'count'))
+    expect(pipAt(PIPS - 1)).toBeLessThan(beatStart(COUNT_BOX, 'count') + (count?.ms ?? 0))
+  })
+
+  it('leaves him at the plunger on the box, never on top of it', () => {
+    expect(new Set(COUNT_BOX.beats.map((beat) => beat.to.lift))).toEqual(new Set([0]))
   })
 })
