@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { fillLabel } from '@/lib/cv/labels'
@@ -68,6 +69,7 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
   const { years, cards, deco, actions } = useLabels()
   const { start, end } = jobYears(entry, years.present)
   const job = fillLabel(cards.jobSpan, { title: entry.title, company: entry.company, start, end })
+  const card = jobCard(entry, years)
   const lines = Math.max(entry.highlights.length, 1)
   const isPlaying = playing !== null
   const reduced = useReducedMotion()
@@ -87,11 +89,12 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
       <div className="relative flex flex-col items-start gap-4 min-[375px]:flex-row">
         <Recorder />
         <div className="min-w-0 min-[375px]:pr-14">
-          <h3 className={`text-lg leading-snug ${diary.title}`}>{entry.title}</h3>
+          <h3 className={`text-lg leading-snug ${diary.title}`}>{card.title}</h3>
           <p className="mt-1 text-sm text-[color:var(--deco-cream)]">
-            <SlashBreaks text={entry.company} />
+            <SlashBreaks text={card.company} />
           </p>
-          <p className="mt-1 text-sm text-[color:var(--deco-gold)]">{fillLabel(years.range, { start, end })}</p>
+          <p className="mt-1 text-sm text-[color:var(--deco-gold)]">{card.years}</p>
+          {card.location && <p className="mt-1 text-sm text-[color:var(--deco-mist)]">{card.location}</p>}
         </div>
       </div>
 
@@ -99,11 +102,11 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
         <span className={`absolute inset-0 origin-left bg-[color:var(--deco-gold)] ${diary.counter}`} />
       </div>
 
-      {entry.description && <p className="relative mt-4 text-sm leading-relaxed text-[color:var(--deco-mist)]">{entry.description}</p>}
+      {card.description && <p className="relative mt-4 text-sm leading-relaxed text-[color:var(--deco-mist)]">{card.description}</p>}
 
-      {entry.highlights.length > 0 && (
+      {card.highlights.length > 0 && (
         <ul className="relative mt-4 space-y-2" aria-label={cards.keyAchievements}>
-          {entry.highlights.map((highlight, line) => (
+          {card.highlights.map((highlight, line) => (
             <li key={highlight} data-lit={(isPlaying && line <= playing) || undefined} className={`flex items-start gap-2 text-sm ${diary.line}`}>
               <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0" aria-hidden="true" focusable="false">
                 <path d="M5 0 L10 5 L5 10 L0 5 Z" fill="currentColor" />
@@ -115,9 +118,9 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
       )}
 
       <div className="relative mt-5 flex flex-wrap items-center justify-between gap-3">
-        {entry.skills.length > 0 && (
+        {card.skills.length > 0 && (
           <ul className="flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-            {entry.skills.map((skill) => (
+            {card.skills.map((skill) => (
               <li key={skill} className={`px-2 py-1 text-sm ${diary.skill}`}>
                 {skill}
               </li>

@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState, type AnimationEvent, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { CVData } from '@/lib/cv/content'
 import { fillLabel } from '@/lib/cv/labels'
+import { ventureCard } from '@/lib/cv/cvView'
 import { DECO_COLORS as C } from './palette'
 import { SOLE_DROP, SurvivorSprite, type DecoMotion } from './sprite'
 import v from './ventures.module.css'
@@ -27,7 +28,8 @@ import v from './ventures.module.css'
 // still, the tassels do nothing.
 //
 // His own products (featured) hang in the first cords, each with a larger medal and a gold plate
-// over the name, so the grid and its cord columns stay as they are.
+// over the name, so the grid and its cord columns stay as they are. A banner's link is named by the
+// words it shows plus the new tab note a screen reader alone hears; its services follow the link.
 
 type Company = CVData['companies'][number]
 type Act = 'rest' | 'walk' | 'pull'
@@ -62,8 +64,9 @@ function LobbyBay() {
   )
 }
 
-function Banner({ company, open, wave, onTassel }: { company: Company; open: boolean; wave: number; onTassel: () => void }) {
-  const { links, deco, cards } = useLabels()
+function Banner({ company: entry, open, wave, onTassel }: { company: Company; open: boolean; wave: number; onTassel: () => void }) {
+  const { links, deco, cards, sections } = useLabels()
+  const company = ventureCard(entry)
   return (
     <div className="relative">
       <div className={`relative z-10 h-3 ${v.rod}`} aria-hidden="true" />
@@ -75,7 +78,6 @@ function Banner({ company, open, wave, onTassel }: { company: Company; open: boo
             target="_blank"
             rel="noopener noreferrer"
             tabIndex={open ? undefined : -1}
-            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className="block text-center"
           >
             <span
@@ -94,7 +96,17 @@ function Banner({ company, open, wave, onTassel }: { company: Company; open: boo
             </h3>
             <p className="mt-2 text-sm uppercase tracking-[0.2em] text-[color:var(--deco-gold-bright-text)]">{company.tagline}</p>
             <p className="mt-4 text-base text-[color:var(--deco-cream)]">{company.description}</p>
+            <span className="sr-only"> {newTabHint(links)}</span>
           </a>
+          {company.services.length > 0 && (
+            <ul className="mt-5 flex flex-wrap justify-center gap-2" aria-label={sections.services}>
+              {company.services.map((service) => (
+                <li key={service} className="border border-[color:var(--deco-gold)] px-2 py-0.5 text-sm uppercase tracking-[0.12em] text-[color:var(--deco-gold-bright-text)]">
+                  {service}
+                </li>
+              ))}
+            </ul>
+          )}
           <span className={`absolute inset-x-0 bottom-0 h-4 ${v.roll}`} aria-hidden="true" />
         </div>
       </div>

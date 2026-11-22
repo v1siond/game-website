@@ -6,6 +6,7 @@ import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
+import { projectCard } from '@/lib/cv/cvView'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import type { Project } from '@/lib/cv/content'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -143,7 +144,10 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
 
       {project.impact && (
         <Part tag={cards.impact}>
-          <p className="mt-3 border-l-4 border-atomic-phosphor pl-3 text-sm text-atomic-phosphor">{project.impact}</p>
+          <p className="mt-3 border-l-4 border-atomic-phosphor pl-3 text-sm text-atomic-phosphor">
+            <span className="sr-only">{cards.impact}: </span>
+            {project.impact}
+          </p>
         </Part>
       )}
 
@@ -180,8 +184,10 @@ interface ProjectFileProps {
 }
 
 function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
-  const { actions, cards } = useLabels()
-  const { project, years, links } = slot
+  const labels = useLabels()
+  const { actions, cards } = labels
+  const { links } = slot
+  const project = projectCard(slot.project, labels)
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = `atomic-file-${project.id}`
 
@@ -215,18 +221,26 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
             <h3 id={titleId} className={`text-2xl font-bold uppercase tracking-wide text-atomic-phosphor ${atomic.glow}`}>
               <SlashBreaks text={project.name} />
             </h3>
-            <p className="mt-1 text-base text-atomic-yellow">{[project.role, years].filter(Boolean).join(' / ')}</p>
+            <p className="mt-1 text-base text-atomic-yellow">{project.role}
+              {project.years && <span aria-hidden="true"> / </span>}
+              {project.years}</p>
           </div>
           <button type="button" autoFocus onClick={onClose} className={`${PHOSPHOR_BUTTON} shrink-0`}>
             <span className="relative">{actions.closeFile}</span>
           </button>
         </div>
 
-        <p className="mt-4 text-base leading-relaxed text-atomic-phosphor">{project.description || project.tagline}</p>
-        {project.impact && <p className="mt-4 border-l-4 border-atomic-phosphor pl-3 text-base text-atomic-phosphor">{project.impact}</p>}
+        <p className="mt-4 text-base font-bold text-atomic-yellow">{project.tagline}</p>
+        {project.description && <p className="mt-3 text-base leading-relaxed text-atomic-phosphor">{project.description}</p>}
+        {project.impact && (
+          <p className="mt-4 border-l-4 border-atomic-phosphor pl-3 text-base text-atomic-phosphor">
+            <span className="sr-only">{cards.impact}: </span>
+            {project.impact}
+          </p>
+        )}
 
         {project.details.length > 0 && (
-          <ul className="mt-5 space-y-1" aria-label={cards.keyAchievements}>
+          <ul className="mt-5 space-y-1" aria-label={cards.details}>
             {project.details.map((detail) => (
               <PlusRow key={detail}>{detail}</PlusRow>
             ))}

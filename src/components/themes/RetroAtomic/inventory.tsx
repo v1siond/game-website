@@ -5,7 +5,9 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
+import { ventureCard } from '@/lib/cv/cvView'
+import { AtomicChip } from './controls'
 import { BAKELITE, CHROME, CREAM, OLIVE_DARK, RUBBER, STEEL_LIGHT } from './palette'
 import atomic from './atomic.module.css'
 import { cssVars } from '@/lib/cssVars'
@@ -77,20 +79,20 @@ function Cassette() {
 /**
  * The holotape shelf; `dug` is how many tapes the dog has dug up so far (dig.tsx), all of them by default.
  * His own products (featured) are the two big tapes of the first row, a yellow vault tag over the
- * tagline; the other ventures follow three to a row.
+ * tagline; the other ventures follow three to a row. Each tape's link is named by everything it shows,
+ * its services included, plus the new tab note a screen reader alone hears.
  */
 export function Holotapes({ companies, dug = companies.length }: { companies: CVData['companies']; dug?: number }) {
-  const { links, cards } = useLabels()
+  const { links, cards, sections } = useLabels()
 
   return (
     <ul className="grid gap-6 md:grid-cols-6">
-      {companies.map((company, index) => (
+      {companies.map(ventureCard).map((company, index) => (
         <li key={company.id} data-tape data-dug={index < dug || undefined} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
           <a
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className={`group relative block ${atomic.holotape}`}
           >
             <div className="relative">
@@ -108,6 +110,14 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
               )}
               <p className="text-sm font-bold text-atomic-yellow">{company.tagline}</p>
               <p className="mt-1 text-sm leading-relaxed text-atomic-ash">{company.description}</p>
+              {company.services.length > 0 && (
+                <ul className="mt-3 flex flex-wrap gap-2" aria-label={sections.services}>
+                  {company.services.map((service) => (
+                    <AtomicChip key={service}>{service}</AtomicChip>
+                  ))}
+                </ul>
+              )}
+              <span className="sr-only"> {newTabHint(links)}</span>
             </div>
           </a>
         </li>

@@ -1,9 +1,10 @@
-import { useId } from 'react'
+import { useId, type ReactNode } from 'react'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { VentureSlot } from '@/components/cv/VentureList'
-import { jobSpanCompact } from '@/lib/cv/sectionText'
+import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
@@ -59,43 +60,52 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
   )
 }
 
-// A job on a title card, the dates on an ink tab above it. Dates are date only strings, read in UTC.
+/** A row behind the red star the title cards mark a highlight or a detail with. */
+export function StarLine({ children }: { children: ReactNode }) {
+  return (
+    <li className={`flex items-start gap-2 ${BODY}`}>
+      <span className={world.red} aria-hidden="true">
+        ★
+      </span>
+      {children}
+    </li>
+  )
+}
+
+// A job on a title card, the years ("2019 to 2022") on an ink tab above it.
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { cards, years } = useLabels()
-  const span = jobSpanCompact(entry, years)
+  const job = jobCard(entry, years)
 
   return (
     <article className={`relative p-5 pt-7 ${world.titleCard}`}>
       <p className={`absolute -top-4 left-4 -rotate-2 px-3 py-1 text-sm ${world.chip}`}>
-        {span}
+        {job.years}
       </p>
-      <h3 className={`text-lg ${world.lettering}`}>{entry.title}</h3>
-      <p className={`mb-2 text-sm ${world.red}`}>
-        <SlashBreaks text={entry.company} />
+      <h3 className={`text-lg ${world.lettering}`}>{job.title}</h3>
+      <p className={`text-sm ${world.red}`}>
+        <SlashBreaks text={job.company} />
       </p>
-      {entry.description && <p className={`mb-2 ${BODY}`}>{entry.description}</p>}
-      {entry.highlights.length > 0 && (
-        <ul className="space-y-1" aria-label={cards.keyAchievements}>
-          {entry.highlights.map((highlight) => (
-            <li key={highlight} className={`flex items-start gap-2 ${BODY}`}>
-              <span className={world.red} aria-hidden="true">
-                ★
-              </span>
-              {highlight}
-            </li>
+      {job.location && <p className={`italic ${BODY}`}>{job.location}</p>}
+      {job.description && <p className={`mb-2 mt-2 ${BODY}`}>{job.description}</p>}
+      {job.highlights.length > 0 && (
+        <ul className="mt-2 space-y-1" aria-label={cards.keyAchievements}>
+          {job.highlights.map((highlight) => (
+            <StarLine key={highlight}>{highlight}</StarLine>
           ))}
         </ul>
       )}
-      <Chips items={entry.skills} label={cards.skillsUsed} />
+      <Chips items={job.skills} label={cards.skillsUsed} />
     </article>
   )
 }
 
 const LINK_BUTTON = `inline-flex min-h-[44px] items-center px-4 text-sm tracking-wider transition-transform hover:scale-105 motion-reduce:transition-none ${world.button} ${world.buttonRed}`
 
-// A project on a show poster: the name, the years, his role, the result line and the links.
-export function VintagePoster({ project, years, links, noLink }: ProjectSlot) {
+// A project on a show poster: every field of its card, then the links.
+export function VintagePoster({ project: entry, links, noLink }: ProjectSlot) {
   const labels = useLabels()
+  const project = projectCard(entry, labels)
   return (
     <article className={`group relative h-full p-4 ${world.poster}`}>
       <CornerTicks />
@@ -104,13 +114,22 @@ export function VintagePoster({ project, years, links, noLink }: ProjectSlot) {
         <h3 className={`min-w-0 text-base uppercase ${world.red} ${world.lettering}`}>
           <SlashBreaks text={project.name} />
         </h3>
-        {years && <span className={`whitespace-nowrap ${BODY}`}>{years}</span>}
+        {project.years && <span className={`whitespace-nowrap ${BODY}`}>{project.years}</span>}
       </div>
       <p className={`mb-1 font-bold ${BODY}`}>{project.role}</p>
       <p className={`mb-2 ${BODY}`}>{project.tagline}</p>
+      {project.description && <p className={`mb-2 ${BODY}`}>{project.description}</p>}
+      {project.details.length > 0 && (
+        <ul className="mb-2 space-y-1" aria-label={labels.cards.details}>
+          {project.details.map((detail) => (
+            <StarLine key={detail}>{detail}</StarLine>
+          ))}
+        </ul>
+      )}
       {project.impact && (
         <p className={`mb-2 rounded px-2 py-1 italic ${BODY} ${world.impact}`}>
           <span aria-hidden="true">→ </span>
+          <span className="sr-only">{labels.cards.impact}: </span>
           {project.impact}
         </p>
       )}
@@ -131,11 +150,14 @@ export function VintagePoster({ project, years, links, noLink }: ProjectSlot) {
 
 // A venture as a vintage advertisement, the whole poster its link. One of his own products (featured)
 // is a wider poster with an inked roundel over the name, the way a 1930s bill shouts its headliner.
-export function CompanyPoster({ venture: company, linkProps }: VentureSlot) {
-  const { cards } = useLabels()
+// The link drops the slot's short name and is named by everything the poster shows, its services
+// included, plus the new tab note a screen reader alone hears.
+export function CompanyPoster({ venture, linkProps }: VentureSlot) {
+  const { cards, sections, links } = useLabels()
+  const company = ventureCard(venture)
 
   return (
-    <a {...linkProps} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
+    <a {...linkProps} aria-label={undefined} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
       <CornerTicks />
       <InkBlot />
       {company.featured && (
@@ -155,6 +177,8 @@ export function CompanyPoster({ venture: company, linkProps }: VentureSlot) {
         </div>
       </div>
       <p className={BODY}>{company.description}</p>
+      <Chips items={company.services} label={sections.services} />
+      {linkProps && <span className="sr-only"> {newTabHint(links)}</span>}
     </a>
   )
 }
