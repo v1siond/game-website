@@ -149,19 +149,31 @@ export function BulletBox({ profession }: { profession: Profession }) {
   useEffect(() => {
     const el = box.current
     if (!el) return
-    const { width: w, height: h } = el.getBoundingClientRect()
-    pointer.current = { x: w / 2, y: h / 2 }
-    const soulAt = () => mode.soul(pointer.current ?? { x: w / 2, y: h / 2 }, w, h)
-    const guard = () => sideOf(pointer.current ?? { x: w / 2, y: 0 }, w, h)
+    // The layout size, not getBoundingClientRect: the wrapper's open animation scales the box, so its rect
+    // is about 4 % of the box on mount. A resize (rotation, a wider window) measures again.
+    const size = { w: el.offsetWidth, h: el.offsetHeight }
+    pointer.current = { x: size.w / 2, y: size.h / 2 }
+    const soulAt = () => mode.soul(pointer.current ?? { x: size.w / 2, y: size.h / 2 }, size.w, size.h)
+    const guard = () => sideOf(pointer.current ?? { x: size.w / 2, y: 0 }, size.w, size.h)
     const drawShield = () => {
       const side = guard()
-      place(shield.current, SHIELD_AT[side](w, h), SHIELD_SIZE, side * 90)
+      place(shield.current, SHIELD_AT[side](size.w, size.h), SHIELD_SIZE, side * 90)
+    }
+    const drawStill = () => {
+      place(heart.current, soulAt(), HEART)
+      drawShield()
+      pellets.current.forEach((p, i) => place(p, mode.pellet(i, 0, size.w, size.h), PELLET))
     }
 
-    place(heart.current, soulAt(), HEART)
-    drawShield()
-    pellets.current.forEach((p, i) => place(p, mode.pellet(i, 0, w, h), PELLET))
-    if (reduced || !inView) return
+    const playing = inView && !reduced
+    const resized = new ResizeObserver(() => {
+      size.w = el.offsetWidth
+      size.h = el.offsetHeight
+      if (!playing) drawStill()
+    })
+    resized.observe(el)
+    drawStill()
+    if (!playing) return () => resized.disconnect()
 
     let frame = 0
     let safeUntil = 0
@@ -208,14 +220,17 @@ export function BulletBox({ profession }: { profession: Profession }) {
       place(heart.current, soulAt(), HEART)
       drawShield()
       pellets.current.forEach((p, i) => {
-        const at = mode.pellet(i, t, w, h)
+        const at = mode.pellet(i, t, size.w, size.h)
         place(p, at, PELLET)
         check(i, t, at, now)
       })
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      cancelAnimationFrame(frame)
+      resized.disconnect()
+    }
   }, [profession, mode, inView, reduced])
 
   const follow = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -225,32 +240,34 @@ export function BulletBox({ profession }: { profession: Profession }) {
 
   return (
     <div ref={watch} className="mx-auto mb-10 w-full" aria-hidden="true">
-      <div
-        key={profession}
-        ref={box}
-        data-hit={hurt}
-        onPointerMove={follow}
-        onPointerDown={follow}
-        className={`relative mx-auto w-full cursor-none touch-none overflow-hidden ${mode.box} ${world.box} ${world.resize} ${world.hitBox}`}
-      >
-        {profession === 'drummer' &&
-          STRING_TOPS.map((top) => <span key={top} className={`absolute inset-x-0 h-px bg-[color:var(--rpg-purple)] opacity-60 ${top}`} />)}
-        {Array.from({ length: PELLETS }, (_, i) => (
-          <span
-            key={i}
-            ref={(el) => {
-              pellets.current[i] = el
-            }}
-            className={`absolute left-0 top-0 h-2 w-2 ${mode.pelletClass} ${world.placed}`}
-          />
-        ))}
-        {profession === 'fighter' && <span ref={shield} className={`absolute left-0 top-0 h-5 w-5 border-t-4 border-[color:var(--rpg-green)] ${world.placed}`} />}
-        <div ref={heart} className={`absolute left-0 top-0 h-4 w-4 ${world.placed}`}>
-          {broken ? (
-            <SoulHalves className="h-4 w-4" color={mode.soulColor} leftClass={world.splitLeft} rightClass={world.splitRight} />
-          ) : (
-            <Soul className={`h-4 w-4 ${world.hurt}`} color={mode.soulColor} />
-          )}
+      {/* the open plays on the wrapper and the hit shake on the box, so a hit never restarts the open */}
+      <div key={profession} className={world.resize}>
+        <div
+          ref={box}
+          data-hit={hurt}
+          onPointerMove={follow}
+          onPointerDown={follow}
+          className={`relative mx-auto w-full cursor-none touch-none overflow-hidden ${mode.box} ${world.box} ${world.hitBox}`}
+        >
+          {profession === 'drummer' &&
+            STRING_TOPS.map((top) => <span key={top} className={`absolute inset-x-0 h-px bg-[color:var(--rpg-purple)] opacity-60 ${top}`} />)}
+          {Array.from({ length: PELLETS }, (_, i) => (
+            <span
+              key={i}
+              ref={(el) => {
+                pellets.current[i] = el
+              }}
+              className={`absolute left-0 top-0 h-2 w-2 ${mode.pelletClass} ${world.placed}`}
+            />
+          ))}
+          {profession === 'fighter' && <span ref={shield} className={`absolute left-0 top-0 h-5 w-5 border-t-4 border-[color:var(--rpg-green)] ${world.placed}`} />}
+          <div ref={heart} className={`absolute left-0 top-0 h-4 w-4 ${world.placed}`}>
+            {broken ? (
+              <SoulHalves className="h-4 w-4" color={mode.soulColor} leftClass={world.splitLeft} rightClass={world.splitRight} />
+            ) : (
+              <Soul className={`h-4 w-4 ${world.hurt}`} color={mode.soulColor} />
+            )}
+          </div>
         </div>
       </div>
 

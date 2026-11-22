@@ -61,7 +61,8 @@
   animation: boxOpen 420ms steps(7, end) both;
 }
 
-/* The bullet box re-opens in its new shape when the profession, and so the attack, changes. */
+/* The bullet box opens in its profession's shape. It sits on a wrapper of the box: on the box itself the
+   hit shake below would replace it, and when the shake ends the open would play again from scale(0.04). */
 .resize {
   transform-origin: 50% 50%;
   animation: boxOpen 420ms steps(7, end) both;
@@ -283,7 +284,7 @@
   75% { transform: translateX(-3px); }
 }
 
-/* A hit: the box shakes and the heart flickers while it cannot be hit again. */
+/* A hit: the box (inside the .resize wrapper) shakes and the heart flickers while it cannot be hit again. */
 [data-hit='true'].hitBox {
   animation: hitShake 240ms steps(4, end) both;
 }
