@@ -391,9 +391,9 @@ const BRIDGE_TO = 300
 const BRIDGE_MS = 2200
 
 /** Where each band's flower stands on the bridge and when his feet reach it. */
-export function flowerSpots(count: number): Array<{ x: number; at: number }> {
+function flowerSpots(count: number): Array<{ x: number; at: number }> {
   if (count <= 0) return []
-  const gap = 280 / Math.max(count, 1)
+  const gap = 280 / count
   return Array.from({ length: count }, (_, index) => {
     const x = Math.round(20 + gap * index + gap / 2 - 3)
     return { x, at: Math.round(((x - 10 - BRIDGE_FROM) / (BRIDGE_TO - BRIDGE_FROM)) * BRIDGE_MS) }

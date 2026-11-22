@@ -1,4 +1,3 @@
-import { pixelRuns } from '@/lib/pixelRuns'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { RPG } from './palette'
@@ -239,8 +238,6 @@ export const EYES: ReadonlyArray<readonly [number, number]> = [
 
 /** The heart over his chest, 6 by 4 pixels, its top left corner. */
 export const HEART = { x: 7, y: 18, rows: ['hh..hh', 'hhhhhh', '.hhhh.', '..hh..'] } as const
-
-export { pixelRuns }
 
 // His traits quantised for the pixel world: the hair and beard lifted to the dark brown the room's
 // outline reads in, so his head keeps its shape on the black battle screen.

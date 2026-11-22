@@ -1,5 +1,6 @@
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
-import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, pixelRuns, walkPose, type Facing, type Pose, type Step } from './sprite'
+import { pixelRuns } from '@/lib/pixelRuns'
+import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, walkPose, type Facing, type Pose, type Step } from './sprite'
 
 const FACINGS: Facing[] = ['down', 'up', 'right', 'left']
 const STEPS: Step[] = ['stand', 'stepA', 'stepB']
@@ -26,13 +27,6 @@ describe('the room walker sprite', () => {
     const left = walkPose('engineer', 'left', 'stepA')
     expect(left.head[7]).toBe([...right.head[7]].reverse().join(''))
     expect(left.legs[3]).toBe([...right.legs[3]].reverse().join(''))
-  })
-
-  it('merges a row into runs of one colour and skips the transparent pixels', () => {
-    expect(pixelRuns(['..KKSS..'], 3)).toEqual([
-      { x: 2, y: 3, width: 2, key: 'K' },
-      { x: 4, y: 3, width: 2, key: 'S' },
-    ])
   })
 
   it('finds his dot eyes where the face draws them', () => {
