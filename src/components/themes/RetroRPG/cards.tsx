@@ -8,6 +8,7 @@ import type { BandSlot } from '@/components/cv/BandList'
 import type { VentureSlot } from '@/components/cv/VentureList'
 import type { CVData, Job } from '@/lib/cv/content'
 import { jobCard, projectCard } from '@/lib/cv/cvView'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
 import { MONO, PIXEL } from './palette'
@@ -196,13 +197,15 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
 }
 
 // A venture as a dialogue box; one of his own products (featured) is a wider box ruled in gold with a
-// gold pixel tag over the name.
+// gold pixel tag over the name. The link drops the slot's short name and is named by everything the box
+// shows, its services included, plus the new tab note a screen reader alone hears.
 export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
-  const { cards } = useLabels()
+  const { cards, links } = useLabels()
 
   return (
     <a
       {...linkProps}
+      aria-label={undefined}
       className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)]' : ''} ${world.box} ${world.pick}`}
     >
       {company.featured && (
@@ -229,6 +232,7 @@ export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
           </span>
         ))}
       </div>
+      {linkProps && <span className="sr-only"> {newTabHint(links)}</span>}
     </a>
   )
 }
