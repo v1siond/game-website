@@ -21,6 +21,9 @@ export const CARD_TITLE = `${FACE} text-xl leading-tight tracking-wide text-[col
 /** A plain line of a card's facts on the cream face. */
 export const CARD_LINE = 'text-sm font-semibold text-[color:var(--np-ink-soft)]'
 
+/** A tag on the cream face: a technology, a skill, a service. */
+export const TAG = 'rounded-sm border-2 border-[color:var(--np-wood-dark)] bg-[color:var(--np-tag)] px-2 py-0.5 text-sm font-semibold text-[color:var(--np-ink)]'
+
 interface ListProps {
   items: readonly string[]
   label: string
@@ -33,7 +36,7 @@ export function Tags({ items, label, className = '' }: ListProps) {
   return (
     <ul className={`mt-3 flex flex-wrap gap-1.5 ${className}`} aria-label={label}>
       {items.map((item) => (
-        <li key={item} className="rounded-sm border-2 border-[color:var(--np-wood-dark)] bg-[color:var(--np-tag)] px-2 py-0.5 text-sm font-semibold text-[color:var(--np-ink)]">
+        <li key={item} className={TAG}>
           {item}
         </li>
       ))}

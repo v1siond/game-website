@@ -1,4 +1,4 @@
-import { COUNT_BOX, HERO_TIMING, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, pipAt, postAt, postX, restSpot, sceneMs, type Scene } from './choreography'
+import { COUNT_BOX, HERO_TIMING, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, breakAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -110,5 +110,26 @@ describe('Work Experience: the checkpoint path', () => {
   it('runs the whole path on "Run" in 3 s, within 5 s', () => {
     expect(RUN_MS).toBe(3000)
     expect(RUN_MS).toBeLessThanOrEqual(FIVE_S)
+  })
+})
+
+describe('Tech Stack: the spin through the boxes', () => {
+  it('staggers the boxes by 0.3 s, closer when there are many, so the last breaks by 3.5 s', () => {
+    expect(techStep(4)).toBe(300)
+    expect(techStep(8)).toBe(300)
+    expect(techStep(14)).toBe(250)
+    expect(techStep(20) * 20).toBeLessThanOrEqual(3500)
+  })
+
+  it('breaks box i a step after the one before, once he is spinning', () => {
+    expect(breakAt(1, 8) - breakAt(0, 8)).toBe(techStep(8))
+    expect(breakAt(0, 8)).toBeGreaterThan(0)
+  })
+
+  it.each([1, 4, 8, 12, 30])('spins him across the row until the last of %i boxes has broken, within 4.5 s', (count) => {
+    const scene = techScene(count)
+    expect(scene.beats.map((beat) => beat.pose)).toEqual(['spin'])
+    expect(sceneMs(scene)).toBeGreaterThanOrEqual(breakAt(count - 1, count))
+    expect(sceneMs(scene)).toBeLessThanOrEqual(4500)
   })
 })

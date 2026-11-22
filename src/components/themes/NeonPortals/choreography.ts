@@ -128,6 +128,27 @@ export const postAt = (index: number, count: number): number => (index + 0.5) / 
 /** Where post `index` stands along the strip, in %: where he is when it lights. */
 export const postX = (index: number, count: number): number => PATH.from + postAt(index, count) * (PATH.to - PATH.from)
 
+// Tech Stack: he spins across the row above the boxes and each X braced box breaks into planks in turn,
+// a step apart: 0.3 s, closer when there are many, so the last box breaks within 3.5 s of the start.
+const BREAK_LEAD_MS = 300
+const BREAK_MS = 700
+const STAGGER_SPAN_MS = 3500
+const STAGGER_MAX_MS = 300
+
+export const techStep = (count: number): number => Math.min(STAGGER_MAX_MS, Math.floor(STAGGER_SPAN_MS / count))
+
+/** When box `index` of `count` breaks, counted from the start of the spin. */
+export const breakAt = (index: number, count: number): number => BREAK_LEAD_MS + index * techStep(count)
+
+export const BOX_BREAK = { leadMs: BREAK_LEAD_MS, ms: BREAK_MS } as const
+
+/** The spin: across the row, lasting until the last box has broken. */
+export const techScene = (count: number): Scene => ({
+  start: { x: 6, lift: 0 },
+  beats: [{ name: 'spin', pose: 'spin', ms: breakAt(Math.max(0, count - 1), count) + BREAK_MS, to: { x: 94, lift: 0 } }],
+  rest: 'idle',
+})
+
 // Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
 // so a fourth achievement adds no step.
 const MASK_STEP_MAX = 3
