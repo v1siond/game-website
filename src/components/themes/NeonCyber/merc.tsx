@@ -16,11 +16,11 @@ import s from './merc.module.css'
 // Per profession: the System Engineer jacks a cable from the temple into a deck and runs a quickhack
 // (data glyphs climb off the hand); the Musician drops behind a neon snare with two sticks; the Martial
 // Artist sheds the jacket, wraps his hands and wears his own mongkhon, then throws the knee and the
-// roundhouse. Every one can idle (breath, optic blink), walk, dash on the time slow implant (leaning
-// into the run, arms back), sit in the ripperdoc's chair, pop the mantis blades for the strike, take the
-// scan pose with the optic reticle, double jump on the cyberlegs, and glitch when hit or hovered.
+// roundhouse; that action plays on his rig in the quickhack menu, and he glitches when hovered. In the
+// scroll scenes the scene poses him instead (pose.ts): the walk, the Sandevistan dash, the scan with the
+// optic reticle, the hop on the cyberlegs, the chair, the mantis blades.
 
-export type MercMotion = 'still' | 'idle' | 'walk' | 'dash' | 'sit' | 'blades' | 'scan' | 'jump' | 'hack' | 'drum' | 'kick'
+export type MercMotion = 'still' | 'hack' | 'drum' | 'kick'
 
 /** Each profession's action, the way the merc would do that job. */
 export const MERC_ACTION: Record<Profession, MercMotion> = {
@@ -29,18 +29,8 @@ export const MERC_ACTION: Record<Profession, MercMotion> = {
   fighter: 'kick',
 }
 
-/** Him held still under reduced motion, else playing `motion`. */
-export const stillWhen = (reduced: boolean, motion: MercMotion): MercMotion => (reduced ? 'still' : motion)
-
 const MOTION_CLASS: Record<MercMotion, string> = {
   still: '',
-  idle: s.idle,
-  walk: s.walk,
-  dash: s.dash,
-  sit: s.sit,
-  blades: s.blades,
-  scan: s.scan,
-  jump: s.jump,
   hack: s.hack,
   drum: s.drum,
   kick: s.kick,

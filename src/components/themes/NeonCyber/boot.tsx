@@ -58,7 +58,7 @@ interface BootHeroProps {
   onScan: () => void
 }
 
-export function BootHero({ profession, scanning, onScan }: BootHeroProps) {
+function BootHero({ profession, scanning, onScan }: BootHeroProps) {
   const { navigation, professions } = useLabels()
 
   return (

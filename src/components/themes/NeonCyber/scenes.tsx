@@ -29,7 +29,7 @@ export type SceneId = 'hero' | SectionId | 'contact'
 export const GROUND = 856
 
 /** Where a scene's props stand: one x per card, `cx` the scene's centre, all inside what a phone shows. */
-export interface Layout {
+interface Layout {
   count: number
   /** Cards the section counts before its props (the Muay Thai record's facts), taken off before a writer reads f. */
   lead: number
@@ -47,10 +47,10 @@ export interface MercState {
   opacity: number
 }
 
-export type SceneWriter = (p: number, f: number) => MercState
+type SceneWriter = (p: number, f: number) => MercState
 
 /** What a writer reads its nodes from: a stage, or NO_NODES to compute his place alone (the first paint). */
-export type StageNodes = Pick<ParentNode, 'querySelector'>
+type StageNodes = Pick<ParentNode, 'querySelector'>
 
 export const NO_NODES: StageNodes = { querySelector: () => null }
 
