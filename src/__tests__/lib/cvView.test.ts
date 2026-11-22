@@ -3,17 +3,13 @@ import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData, type Job, type Project } from '@/lib/cv/content'
 import { viewFor, yearOf } from '@/lib/cv/cvView'
 
-// The real Decap files, so every fixture has the shape and the strings the page reads.
-const realCV = (): CVData =>
-  cvDataFrom(
-    Object.fromEntries(
-      CV_CONTENT_FILES.map((name) => [
-        name,
-        JSON.parse(readFileSync(join(process.cwd(), 'content', 'cv', `${name}.json`), 'utf8')),
-      ]),
-    ) as CVContentFiles,
-    'en',
-  )
+// The real Decap files, so every fixture has the shape and the strings the page reads. They are read
+// once at load, so no test waits on the disk; each test still builds its own CV from them.
+const FILES = Object.fromEntries(
+  CV_CONTENT_FILES.map((name) => [name, JSON.parse(readFileSync(join(process.cwd(), 'content', 'cv', `${name}.json`), 'utf8'))]),
+) as CVContentFiles
+
+const realCV = (): CVData => cvDataFrom(FILES, 'en')
 
 // The year the five year cut reads, as the page and useYearNow hand it to viewFor.
 const NOW = yearOf(new Date('2026-10-21T12:00:00Z'))
