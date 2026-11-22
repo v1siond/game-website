@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties } from 'react'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -35,18 +35,25 @@ const LAYOUT: Record<'large' | 'small', SectionLayout> = {
   small: { sectionSpacing: '3rem', artDividerMargin: '3rem', artDividerScale: 1.1 },
 }
 
+// The world renders only in the browser (the server sends the default world), so its first render can read
+// the window and lay the page out for its height at once, with no shift after mount.
+const isLargeWindow = (): boolean => window.innerHeight >= LARGE_SCREEN_HEIGHT
+
+// The root's palette variables and base look, built once instead of on every render.
+const ROOT_STYLE: CSSProperties = { ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }
+
 export default function MedievalFantasyTheme() {
   const view = useWorldView()
   const { navigation, actions: actionLabels, sections } = useLabels()
   const active = view.profession
   const { cv, engine } = useSiteLinks()
   const [mounted, setMounted] = useState(false)
-  const [isLargeScreen, setIsLargeScreen] = useState(true)
+  const [isLargeScreen, setIsLargeScreen] = useState(isLargeWindow)
 
   // The spacing follows the window height; a resize re-renders the page only when it crosses 800 px.
   useEffect(() => {
     setMounted(true)
-    const measure = () => setIsLargeScreen(window.innerHeight >= LARGE_SCREEN_HEIGHT)
+    const measure = () => setIsLargeScreen(isLargeWindow())
     measure()
     window.addEventListener('resize', measure, { passive: true })
     return () => window.removeEventListener('resize', measure)
@@ -56,7 +63,7 @@ export default function MedievalFantasyTheme() {
   const { sectionSpacing } = layout
 
   return (
-    <div className="[--focus-ring:var(--realm-gold-bright)] [--focus-halo:var(--realm-bg-void)]" style={{ ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }}>
+    <div className="[--focus-ring:var(--realm-gold-bright)] [--focus-halo:var(--realm-bg-void)]" style={ROOT_STYLE}>
       {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
       {mounted && <DualZoneAtmosphere />}
 
