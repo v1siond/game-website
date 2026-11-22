@@ -8,7 +8,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { NameWords } from '@/components/cv/NameWords'
 import { BARREL, BarrelArt, MuzzleBurst } from './barrel'
 import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
-import { HeroCharacter } from './character'
+import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { ToneScope } from './scenery'
@@ -197,7 +197,7 @@ function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () 
       <div className={`pointer-events-none absolute inset-0 ${sunset.mid}`} style={LANDING} aria-hidden="true">
         <div key={shot} data-worlds-figure="" className={`absolute bottom-[calc((1_-_var(--ground))_*_100%)] left-[var(--landing-left)] h-[var(--landing-height)] w-[var(--landing-width)] ${sunset.flightX}`}>
           <div className={`relative h-full w-full ${sunset.flightY}`}>
-            <HeroCharacter profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
+            <PassingHero profession={active} pose="roll" silhouette className={`absolute inset-0 h-full w-full ${sunset.inAir}`} />
             <div className={`absolute inset-0 ${sunset.land}`}>
               <HeroCharacter profession={active} pose="throw" delay="calc(var(--fire) + 1.3s)" silhouette className="h-full w-full" />
             </div>

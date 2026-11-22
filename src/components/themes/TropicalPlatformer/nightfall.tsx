@@ -7,7 +7,7 @@ import { headingId } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { JungleAction, JungleCVLink } from './buttons'
-import { HeroCharacter } from './character'
+import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import { Backdrop, NightFront, NightSky, ToneScope } from './scenery'
 import { EndTarget } from './target'
@@ -86,7 +86,7 @@ export function TreehouseContact() {
           <div key={finishes} className="absolute inset-0">
             <EndTarget />
             <div className={`absolute bottom-3 left-[50%] h-28 w-20 ${night.roller}`} aria-hidden="true">
-              <HeroCharacter profession={active} pose="roll" className={`absolute inset-0 h-full w-full ${night.ball}`} />
+              <PassingHero profession={active} pose="roll" className={`absolute inset-0 h-full w-full ${night.ball}`} />
               <HeroCharacter profession={active} pose="idle" className={`absolute inset-0 h-full w-full ${night.standing}`} />
             </div>
           </div>

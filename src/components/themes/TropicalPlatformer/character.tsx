@@ -1,9 +1,10 @@
 'use client'
 
-import { useId, type CSSProperties, type ReactNode } from 'react'
+import { useId, type AnimationEventHandler, type CSSProperties, type ReactNode } from 'react'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { COLORS } from './palette'
+import { usePlayedOut } from './playedOut'
 import sprite from './character.module.css'
 
 // Him as a parody of the source's hero, the big tie wearing gorilla, in the look of its pre rendered 3D
@@ -258,9 +259,10 @@ interface HeroCharacterProps {
   silhouette?: boolean
   /** When a one shot pose (throw) starts, as a CSS time. */
   delay?: string
+  onAnimationEnd?: AnimationEventHandler<SVGSVGElement>
 }
 
-export function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s' }: HeroCharacterProps) {
+export function HeroCharacter({ profession, pose = 'idle', className = '', silhouette = false, delay = '0s', onAnimationEnd }: HeroCharacterProps) {
   const uid = useId().replace(/:/g, '')
   const look = silhouette ? SHADOW_LOOK : OWN_LOOK
   const paints: Paints = {
@@ -279,6 +281,7 @@ export function HeroCharacter({ profession, pose = 'idle', className = '', silho
       className={`${sprite.figure} ${className}`}
       data-pose={pose}
       data-profession={profession}
+      onAnimationEnd={onAnimationEnd}
       style={{ '--pose-delay': delay } as CSSProperties}
       aria-hidden="true"
       focusable="false"
@@ -318,4 +321,12 @@ export function HeroCharacter({ profession, pose = 'idle', className = '', silho
       )}
     </svg>
   )
+}
+
+/** Him for one moment the scene's class plays on the figure itself, gone once that animation ends, until
+ *  the scene remounts him for the next play. */
+export function PassingHero(props: Omit<HeroCharacterProps, 'onAnimationEnd'>) {
+  const { over, onOwnEnd } = usePlayedOut()
+  if (over) return null
+  return <HeroCharacter {...props} onAnimationEnd={onOwnEnd} />
 }

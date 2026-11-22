@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { BarrelArt } from './barrel'
 import { HeroCharacter } from './character'
+import { usePlayedOut } from './playedOut'
 import { COLORS as C } from './palette'
 import look from './jungle.module.css'
 import yard from './elder.module.css'
@@ -55,6 +56,7 @@ export function ElderYard({ children }: { children: ReactNode }) {
   const { jungle } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
   const [line, setLine] = useState(0)
+  const flight = usePlayedOut()
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={yard.yard}>
@@ -62,11 +64,13 @@ export function ElderYard({ children }: { children: ReactNode }) {
         <div className={`absolute bottom-2 left-0 w-14 sm:w-16 ${yard.cannon}`}>
           <BarrelArt mark="burst" className="block h-auto w-full" />
         </div>
-        <div className={`pointer-events-none absolute inset-0 ${yard.flyX}`}>
-          <div className={`absolute bottom-2 left-2 h-20 w-14 sm:h-24 sm:w-16 ${yard.flyY}`}>
-            <HeroCharacter profession="engineer" pose="roll" className="h-full w-full" />
+        {!flight.over && (
+          <div className={`pointer-events-none absolute inset-0 ${yard.flyX}`} onAnimationEnd={flight.onOwnEnd}>
+            <div className={`absolute bottom-2 left-2 h-20 w-14 sm:h-24 sm:w-16 ${yard.flyY}`}>
+              <HeroCharacter profession="engineer" pose="roll" className="h-full w-full" />
+            </div>
           </div>
-        </div>
+        )}
         <div className={`absolute bottom-2 left-[calc(32%+0.5rem)] h-20 w-14 sm:h-24 sm:w-16 ${yard.standing}`}>
           <HeroCharacter profession="engineer" pose="idle" className="h-full w-full" />
         </div>

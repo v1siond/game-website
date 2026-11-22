@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useState, type AnimationEvent, type CSSProperties, type ReactNode } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -69,6 +69,11 @@ function BarrelStage() {
   const { active } = useProfession()
   const [cast, setCast] = useState<{ lead: Profession; leaving: Profession | null }>({ lead: active, leaving: null })
   if (cast.lead !== active) setCast({ lead: active, leaving: cast.lead })
+  // The one he was is gone once his run off the ledge ends; his legs' loops bubble up and are ignored.
+  const ranOff = (event: AnimationEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return
+    setCast((now) => ({ ...now, leaving: null }))
+  }
 
   return (
     <div className={`relative h-72 overflow-hidden rounded-[2rem] border-4 border-[color:var(--tp-bark-dark)] sm:h-80 ${partner.stage}`} aria-hidden="true">
@@ -76,7 +81,7 @@ function BarrelStage() {
       <div className={`absolute inset-x-0 bottom-0 h-12 ${partner.ledge}`} />
 
       {cast.leaving && (
-        <div key={`${cast.leaving}-${active}`} className={`absolute bottom-10 left-[8%] h-40 w-28 ${partner.runner}`}>
+        <div key={`${cast.leaving}-${active}`} className={`absolute bottom-10 left-[8%] h-40 w-28 ${partner.runner}`} onAnimationEnd={ranOff}>
           <HeroCharacter profession={cast.leaving} pose="run" className="h-full w-full" />
         </div>
       )}
