@@ -1,10 +1,11 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import type { ReactNode } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import type { SectionsOf } from '@/lib/cv/cvView'
+import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
 import type { Profession } from '@/lib/cv/professions'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { ServiceCards, TechCloud } from './cards'
 import { PropagandaBanners } from './ventures'
 import { BrassPanel, Chamber } from './plaque'
@@ -25,92 +26,116 @@ import { SparkedMarquees, Telekinesis } from './arrivals'
 // lift the projects shutter, pulls the cords that drop the ventures' propaganda banners; the guardian
 // pair walks behind the band marquees; he fights on the theatre stage for the Muay Thai record. Two
 // sections he acts on himself (./arrivals): he lifts the services into place with the plasmid, and his
-// drum strike sparks the band marquees on.
+// drum strike sparks the band marquees on. The shared section plan picks which a profession shows and in
+// which order.
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const labels = useLabels()
-
-  return (
-    <div className="space-y-20">
-      <FadeInScene>
-        <Chamber title={labels.sections.about} depth={0}>
-          <PoweredRoom>
-            <BrassPanel>
-              <p className="mx-auto max-w-prose text-base leading-relaxed text-[color:var(--deco-cream)]">{professionalSummary.bio}</p>
-            </BrassPanel>
-          </PoweredRoom>
-        </Chamber>
-      </FadeInScene>
-
-      {sections.jobs.length > 0 && (
-        <Chamber title={labels.sections.workExperience} depth={1}>
-          <DiaryShelf jobs={sections.jobs} />
-        </Chamber>
-      )}
-
-      <FadeInScene>
-        <Chamber title={labels.sections.techStack} depth={2}>
-          <GlassTunnel>
-            <TechCloud categories={sections.techStack} />
-          </GlassTunnel>
-        </Chamber>
-      </FadeInScene>
-
-      {sections.services.length > 0 && (
-        <FadeInScene>
-          <Chamber title={labels.sections.services} depth={2}>
-            <Telekinesis>
-              <ServiceCards services={sections.services} />
-            </Telekinesis>
-          </Chamber>
-        </FadeInScene>
-      )}
-
-      <Chamber title={labels.sections.projects} depth={3}>
-        <HackedShutter>{(opened) => <ResearchBoard projects={sections.projects} arrived={opened} />}</HackedShutter>
-      </Chamber>
-
-      <FadeInScene>
-        <Chamber title={labels.sections.ventures} depth={4}>
-          <PropagandaBanners companies={sections.companies} />
-        </Chamber>
-      </FadeInScene>
-    </div>
-  )
+/** How deep each section's chamber sits; a profession's first chamber is depth 0. */
+const DEPTH: Record<SectionId, number> = {
+  about: 0,
+  work: 1,
+  tech: 2,
+  services: 2,
+  projects: 3,
+  ventures: 4,
+  bands: 0,
+  muayThai: 0,
 }
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const labels = useLabels()
+interface LevelProps {
+  slot: SectionSlot
+  // The short sections fade in; the ones with a scene of their own stand as they are.
+  fade?: boolean
+  children: ReactNode
+}
 
-  return (
-    <Chamber title={labels.sections.bands} depth={0}>
-      <GuardianStreet>
-        <SparkedMarquees>
-          <MarqueeRow bands={sections.bands} musician={sections.musician} />
-        </SparkedMarquees>
-      </GuardianStreet>
+// A section as its chamber, titled from the labels at its depth.
+function Level({ slot, fade = false, children }: LevelProps) {
+  const { sections: titles } = useLabels()
+  const chamber = (
+    <Chamber title={titles[slot.titleKey]} depth={DEPTH[slot.id]}>
+      {children}
     </Chamber>
   )
+  if (!fade) return chamber
+  return <FadeInScene>{chamber}</FadeInScene>
 }
 
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const labels = useLabels()
-  const { martialArts } = sections
-
-  return (
-    <Chamber title={labels.sections.muayThai} depth={0}>
-      <h3 className="mb-8 text-center text-xl tracking-[0.1em] text-[color:var(--deco-gold-bright)] [font-family:var(--deco-display)]">{martialArts.primary.title}</h3>
-      <TheatreStage martialArts={martialArts} />
-    </Chamber>
-  )
+// One frame per section of the shared plan, which picks the ones a profession shows and their order.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    return (
+      <Level slot={slot} fade>
+        <PoweredRoom>
+          <BrassPanel>
+            <p className="mx-auto max-w-prose text-base leading-relaxed text-[color:var(--deco-cream)]">{slot.bio}</p>
+          </BrassPanel>
+        </PoweredRoom>
+      </Level>
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    return (
+      <Level slot={slot}>
+        <DiaryShelf jobs={slot.jobs} />
+      </Level>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    return (
+      <Level slot={slot} fade>
+        <GlassTunnel>
+          <TechCloud categories={slot.categories} />
+        </GlassTunnel>
+      </Level>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    return (
+      <Level slot={slot} fade>
+        <Telekinesis>
+          <ServiceCards services={slot.services} />
+        </Telekinesis>
+      </Level>
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    return (
+      <Level slot={slot}>
+        <HackedShutter>{(opened) => <ResearchBoard projects={slot.projects} arrived={opened} />}</HackedShutter>
+      </Level>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    return (
+      <Level slot={slot} fade>
+        <PropagandaBanners companies={slot.companies} />
+      </Level>
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    return (
+      <Level slot={slot}>
+        <GuardianStreet>
+          <SparkedMarquees>
+            <MarqueeRow bands={slot.bands} musician={slot.musician} />
+          </SparkedMarquees>
+        </GuardianStreet>
+      </Level>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    const { martialArts } = slot
+    return (
+      <Level slot={slot}>
+        <h3 className="mb-8 text-center text-xl tracking-[0.1em] text-[color:var(--deco-gold-bright)] [font-family:var(--deco-display)]">{martialArts.primary.title}</h3>
+        <TheatreStage martialArts={martialArts} />
+      </Level>
+    )
+  },
 }
 
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+// The chambers stand 5rem apart.
+export const SECTION_VIEWS = sectionViews(FRAMES, 'space-y-20')
 
 /** How deep the closing posts chamber sits after each profession's own chambers. */
 export const POSTS_DEPTH: Record<Profession, number> = {
