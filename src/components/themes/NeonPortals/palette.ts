@@ -8,9 +8,9 @@ import { paletteVars } from '../shared/paletteVars'
 // page reads PORTAL as --np-* variables (PORTAL_VARS on the root); the SVG art reads the constants.
 //
 // Text pairs, WCAG ratio: WHITE on VOID 18.1:1, on CHAMBER 16.6:1, on PANEL 15.4:1, on BOARD 18.2:1, on
-// WOOD_DEEP 16.4:1; MUTED on PANEL 10.4:1, on VOID 12.2:1; GOLD on PANEL 11.5:1, on VOID 13.5:1, on
-// CHAMBER 12.5:1, on BOARD 13.6:1, on WOOD_DEEP 12.3:1; SCREEN_TEXT on BOARD 17.0:1; INK on CREAM 16.7:1,
-// on TAG 13.9:1, on GOLD 13.0:1, on ORANGE 8.8:1, on GLASS_TEXT 13.8:1, on SAND 11.4:1, on IRON_FACE
+// WOOD_DEEP 16.4:1; MUTED on PANEL 10.4:1, on VOID 12.2:1, on BOARD 12.3:1; GOLD on PANEL 11.5:1, on VOID
+// 13.5:1, on CHAMBER 12.5:1, on BOARD 13.6:1, on WOOD_DEEP 12.3:1; SCREEN_TEXT on BOARD 17.0:1; INK on CREAM
+// 16.7:1, on TAG 13.9:1, on GOLD 13.0:1, on ORANGE 8.8:1, on GLASS_TEXT 13.8:1, on SAND 11.4:1, on IRON_FACE
 // 14.6:1, on LILAC 9.3:1, on LAMP 15.6:1; INK_SOFT on CREAM 10.3:1; WOOD_TEXT on CREAM 9.3:1; WHITE on
 // GLASS 14.7:1, GLASS_TEXT on GLASS 11.7:1; WHITE on RED_DEEP 10.1:1. Every other colour is art only.
 export const PORTAL = {

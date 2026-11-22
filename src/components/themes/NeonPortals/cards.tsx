@@ -15,6 +15,10 @@ export const PANEL =
 /** The time trial's black board: gold and white on black. */
 export const BOARD = 'rounded-md border-2 border-[color:var(--np-seam)] bg-[color:var(--np-board)] text-[color:var(--np-white)]'
 
+/** The black plate under a line of text that would otherwise cross the backdrop's art (level names, the Muay
+ *  Thai title, the musician line): GOLD on it 13.6:1, MUTED 12.3:1. It sets no text colour of its own. */
+export const ART_PLATE = 'rounded-xl border-2 border-[color:var(--np-seam)] bg-[color:var(--np-board)] px-4 py-1'
+
 /** A card's name, in the game's capitals, the wood text twin on the cream face. */
 export const CARD_TITLE = `${FACE} text-xl leading-tight tracking-wide text-[color:var(--np-wood-text)]`
 

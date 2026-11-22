@@ -12,7 +12,7 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
-import { BODY, CARD_LINE, CARD_TITLE, FACE, PANEL } from './cards'
+import { ART_PLATE, BODY, CARD_LINE, CARD_TITLE, FACE, PANEL } from './cards'
 import { bandScene, bandTiming, boxX, lidAt } from './choreography'
 import { findId } from './finds'
 import { ERA, PORTAL, type Era } from './palette'
@@ -114,7 +114,7 @@ export function BounceBoxLevel({ bands, musician }: { bands: Band[]; musician: M
       <div className={css.cards} data-run={on} data-round={replay.round % 2} data-still={still || undefined}>
         <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot, index) => <BandCard slot={slot} lid={lidAt(index, count)} />} />
       </div>
-      {musician.line && <p className={`${BODY} mt-2 max-w-3xl text-base italic text-[color:var(--np-muted)]`}>{musician.line}</p>}
+      {musician.line && <p className={`${BODY} ${ART_PLATE} mt-4 max-w-3xl py-2 text-base italic text-[color:var(--np-muted)]`}>{musician.line}</p>}
     </Region>
   )
 }

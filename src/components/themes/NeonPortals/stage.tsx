@@ -7,7 +7,7 @@ import { cssVars } from '@/lib/cssVars'
 import { headingId } from '@/lib/cv/sectionText'
 import { motionAt, type Motion, type Scene } from './choreography'
 import { Character } from './character'
-import { FACE } from './cards'
+import { ART_PLATE, FACE } from './cards'
 import { Tally } from './tally'
 import stage from './stage.module.css'
 
@@ -35,7 +35,7 @@ export function Region({ title, stageRef, on, tally = false, children }: RegionP
   return (
     <section ref={stageRef} data-on={on} aria-labelledby={id} className="relative z-10 mx-auto max-w-6xl scroll-mt-8 px-4 py-10 sm:px-6">
       <header className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <h2 id={id} className={`${FACE} ${stage.levelName} text-3xl tracking-wide text-[color:var(--np-gold)] sm:text-4xl`}>
+        <h2 id={id} className={`${FACE} ${ART_PLATE} ${stage.levelName} text-3xl tracking-wide text-[color:var(--np-gold)] sm:text-4xl`}>
           {title}
         </h2>
         {tally && <Tally />}

@@ -10,7 +10,7 @@ import type { MartialArts } from '@/lib/cv/content'
 import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
-import { BODY, CARD_TITLE, PANEL } from './cards'
+import { ART_PLATE, BODY, FACE, PANEL } from './cards'
 import { MASK_STEP_MS, maskMotion, maskScene, maskSpot, maskSteps } from './choreography'
 import { findId } from './finds'
 import { ERA, PORTAL, type Era } from './palette'
@@ -101,7 +101,7 @@ export function MaskLevel({ martialArts }: { martialArts: MartialArts }) {
         </div>
       </Strip>
       {!still && <SceneButton label={actions.next} onPress={() => setAsked(step + 1)} disabled={moving || step >= steps} className="-mt-2 mb-6" />}
-      <h3 className={`${CARD_TITLE} mb-4 text-2xl text-[color:var(--np-gold)]`}>{martialArts.primary.title}</h3>
+      <h3 className={`${FACE} ${ART_PLATE} mb-4 inline-block text-2xl leading-tight tracking-wide text-[color:var(--np-gold)]`}>{martialArts.primary.title}</h3>
       <div className={BODY}>
         <MuayThaiRecord martialArts={martialArts} classNames={RECORD_LOOK} renderAchievement={(text, index) => <Mark text={text} lit={index < step} />} />
       </div>
