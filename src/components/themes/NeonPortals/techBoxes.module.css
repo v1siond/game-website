@@ -20,54 +20,6 @@
   box-shadow: 0 5px 0 var(--np-wood-dark);
 }
 
-.boxes > ul > li:nth-child(2) {
-  --i: 1;
-}
-
-.boxes > ul > li:nth-child(3) {
-  --i: 2;
-}
-
-.boxes > ul > li:nth-child(4) {
-  --i: 3;
-}
-
-.boxes > ul > li:nth-child(5) {
-  --i: 4;
-}
-
-.boxes > ul > li:nth-child(6) {
-  --i: 5;
-}
-
-.boxes > ul > li:nth-child(7) {
-  --i: 6;
-}
-
-.boxes > ul > li:nth-child(8) {
-  --i: 7;
-}
-
-.boxes > ul > li:nth-child(9) {
-  --i: 8;
-}
-
-.boxes > ul > li:nth-child(10) {
-  --i: 9;
-}
-
-.boxes > ul > li:nth-child(11) {
-  --i: 10;
-}
-
-.boxes > ul > li:nth-child(12) {
-  --i: 11;
-}
-
-.boxes > ul > li:nth-child(n + 13) {
-  --i: 12;
-}
-
 /* The lid: two plank halves, each braced with its own X. */
 .boxes > ul > li::before,
 .boxes > ul > li::after {

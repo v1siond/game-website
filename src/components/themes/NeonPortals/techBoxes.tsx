@@ -29,6 +29,9 @@ import css from './techBoxes.module.css'
 
 type Categories = SectionsOf<'engineer'>['techStack']
 
+/** Box i's place, which its break waits on (--i times --step), for any number of categories. */
+const boxAt = (index: number) => cssVars({ '--i': index })
+
 function SpinScene({ count, run, still, onDone }: { count: number; run: boolean; still: boolean; onDone: () => void }) {
   const scene = useScene(useMemo(() => techScene(count), [count]), { still, onDone })
   return <Rig motion={scene.motion} step={scene.step} run={run} size="row" onAnimationEnd={scene.onRigEnd} />
@@ -64,6 +67,7 @@ export function TechBoxLevel({ categories }: { categories: Categories }) {
           itemsClassName="mt-3 flex flex-wrap gap-1.5"
           itemClassName={TAG}
           renderItem={(tech) => tech}
+          categoryStyle={boxAt}
         />
       </div>
     </Region>
