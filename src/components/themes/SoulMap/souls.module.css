@@ -586,6 +586,15 @@
   .itemOn .itemCard {
     animation: item-rise 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) 0.7s both;
   }
+
+  /* A card a keyboard user tabs into before he brings it up shows at once (a pointer click never matches).
+     Its rise is emptied, not removed: a removed animation would start again when the focus leaves. */
+  .item .itemCard:has(:focus-visible) {
+    opacity: 1;
+    transform: none;
+    animation-duration: 0s;
+    animation-fill-mode: none;
+  }
 }
 
 @keyframes sigil-flare {
