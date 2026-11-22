@@ -125,17 +125,22 @@ function useBout() {
   const hp = useRef(health)
   const guarding = useRef(false)
   const strikes = useRef(0)
-  const timers = useRef<number[]>([])
+  // The timers still pending; each leaves the set as it fires, so a long bout never piles up ids.
+  const [timers] = useState(() => new Set<number>())
 
   useEffect(() => {
     hp.current = health
   }, [health])
 
-  useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
+  useEffect(() => () => timers.forEach((timer) => window.clearTimeout(timer)), [timers])
 
   const later = useCallback((ms: number, effect: () => void) => {
-    timers.current.push(window.setTimeout(effect, ms))
-  }, [])
+    const timer = window.setTimeout(() => {
+      timers.delete(timer)
+      effect()
+    }, ms)
+    timers.add(timer)
+  }, [timers])
 
   const say = useCallback(
     (text: string) => {
