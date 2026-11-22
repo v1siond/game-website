@@ -4,6 +4,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { VentureSlot } from '@/components/cv/VentureList'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
@@ -149,12 +150,14 @@ export function VintagePoster({ project: entry, links, noLink }: ProjectSlot) {
 
 // A venture as a vintage advertisement, the whole poster its link. One of his own products (featured)
 // is a wider poster with an inked roundel over the name, the way a 1930s bill shouts its headliner.
+// The link drops the slot's short name and is named by everything the poster shows, its services
+// included, plus the new tab note a screen reader alone hears.
 export function CompanyPoster({ venture, linkProps }: VentureSlot) {
-  const { cards, sections } = useLabels()
+  const { cards, sections, links } = useLabels()
   const company = ventureCard(venture)
 
   return (
-    <a {...linkProps} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
+    <a {...linkProps} aria-label={undefined} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
       <CornerTicks />
       <InkBlot />
       {company.featured && (
@@ -175,6 +178,7 @@ export function CompanyPoster({ venture, linkProps }: VentureSlot) {
       </div>
       <p className={BODY}>{company.description}</p>
       <Chips items={company.services} label={sections.services} />
+      {linkProps && <span className="sr-only"> {newTabHint(links)}</span>}
     </a>
   )
 }
