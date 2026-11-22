@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
+import type { SiteLinkId } from '@/lib/cv/siteLinks'
 import look from './world.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons, typed labels on worn plates: email is the lit rust plate, LinkedIn, the CV and the
 // portfolio the plain dark ones.
@@ -12,36 +11,22 @@ const PLATE = `inline-flex min-h-[44px] items-center justify-center border-2 px-
 const LIT = `${PLATE} border-[color:var(--sh-brass)] bg-[color:var(--sh-rust-plate)] text-[color:var(--sh-ivory)] hover:bg-[color:var(--sh-wood)]`
 const PLAIN = `${PLATE} border-[color:var(--sh-wood)] bg-[color:var(--sh-paper)] text-[color:var(--sh-cream)] hover:border-[color:var(--sh-brass)]`
 
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+const CONTACT_LOOK: Record<ContactLinkId, string> = {
   email: LIT,
   linkedin: PLAIN,
+  cv: PLAIN,
+  engine: PLAIN,
 }
 
-export function HeroAction({ action }: { action: HeroActionSlot }) {
+/** The hero's actions, then the site links named in `sites` (the engine one reads "Portfolio"). */
+export function ContactPlates({ actions, sites }: { actions: readonly HeroActionSlot[]; sites: readonly SiteLinkId[] }) {
+  const siteLinks = useSiteLinks('portfolio')
   return (
-    <a {...action.linkProps} className={HERO_ACTION_LOOK[action.id]}>
-      {action.label}
-    </a>
-  )
-}
-
-export function CVLink() {
-  const { actions } = useLabels()
-
-  return (
-    <Link href="/cv" className={PLAIN}>
-      {actions.cv}
-    </Link>
-  )
-}
-
-export function PortfolioLink() {
-  const { actions } = useLabels()
-
-  return (
-    <Link {...ENGINE_LINK} className={PLAIN}>
-      {actions.portfolio}
-    </Link>
+    <>
+      {[...actions, ...sites.map((id) => siteLinks[id])].map((slot) => (
+        <ContactLink key={slot.id} slot={slot} className={CONTACT_LOOK[slot.id]} />
+      ))}
+    </>
   )
 }
 

@@ -10,7 +10,7 @@ import { NameWords } from '@/components/cv/NameWords'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { ENTRANCE_MS } from './door'
 import { SH } from './palette'
-import { CVLink, HeroAction, PortfolioLink } from './actions'
+import { ContactPlates } from './actions'
 import horror from './horror.module.css'
 import look from './world.module.css'
 
@@ -58,11 +58,7 @@ export function HallHero({ profession }: { profession: Profession }) {
             <p className={`mt-2 text-sm italic text-[color:var(--sh-brass-text)] ${look.typed}`}>{tagline}</p>
             <p className="mt-2 text-sm text-[color:var(--sh-cream)]">{line}</p>
             <nav className="mt-5 flex flex-wrap items-center gap-3" aria-label={navigation.contactAndCv}>
-              {actions.map((action) => (
-                <HeroAction key={action.id} action={action} />
-              ))}
-              <CVLink />
-              <PortfolioLink />
+              <ContactPlates actions={actions} sites={['cv', 'engine']} />
             </nav>
           </div>
         </div>

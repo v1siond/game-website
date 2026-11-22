@@ -3,7 +3,7 @@
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
-import { CARD_BUTTON, CVLink, HeroAction } from './actions'
+import { CARD_BUTTON, ContactPlates } from './actions'
 import { PANEL_HEADING, sectionHeadingId } from './panels'
 import { useStageState } from './stage'
 import horror from './horror.module.css'
@@ -68,10 +68,7 @@ export function SafeRoom() {
             <>
               <SaveDesk line={line} />
               <nav className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap" aria-label={sections.contact}>
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
+                <ContactPlates actions={actions} sites={['cv']} />
               </nav>
             </>
           )}
