@@ -5,8 +5,9 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { cssVars } from '@/lib/cssVars'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
+import type { VentureSlot } from '@/components/cv/VentureList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
 import { MONO, PIXEL } from './palette'
@@ -184,16 +185,13 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 
 // A venture as a dialogue box; one of his own products (featured) is a wider box ruled in gold with a
 // gold pixel tag over the name.
-export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
+  const { cards } = useLabels()
 
   return (
     <a
-      href={company.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)] md:col-span-3' : 'md:col-span-2'} ${world.box} ${world.pick} ${FOCUS}`}
-      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
+      {...linkProps}
+      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)]' : ''} ${world.box} ${world.pick} ${FOCUS}`}
     >
       {company.featured && (
         <p className={`mb-3 inline-block bg-[color:var(--rpg-gold)] px-2 py-1 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-void)] ${PIXEL}`}>

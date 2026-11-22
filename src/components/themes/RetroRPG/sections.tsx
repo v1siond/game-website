@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { useCVData, useLabels } from "@/components/cv/CVDataProvider";
 import { ProjectList } from "@/components/cv/ProjectList";
 import { BandList } from "@/components/cv/BandList";
+import { VentureList } from "@/components/cv/VentureList";
 import { MuayThaiRecord } from "@/components/cv/MuayThaiRecord";
 import { MASONRY_ITEM, MASONRY_LIST } from "@/lib/cv/masonry";
 import { drumsSince } from "@/lib/cv/sectionText";
@@ -168,11 +169,13 @@ export function EngineerSections({
 
       <Block label={titles.ventures} title={titles.ventures} width={WIDE}>
         <StreetRoom profession="engineer">
-          <div className="grid gap-6 md:grid-cols-6">
-            {sections.companies.map((company) => (
-              <CompanyCard key={company.id} company={company} />
-            ))}
-          </div>
+          <VentureList
+            companies={sections.companies}
+            className="grid gap-6 md:grid-cols-6"
+            itemClassName="md:col-span-2"
+            featuredItemClassName="md:col-span-3"
+            renderVenture={(slot) => <CompanyCard {...slot} />}
+          />
         </StreetRoom>
       </Block>
     </>
