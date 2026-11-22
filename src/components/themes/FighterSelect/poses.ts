@@ -1,8 +1,9 @@
 import type { Profession } from '@/lib/cv/professions'
 
 // His fighter's frames as joint tables (the arcade karate hero parody: white gi, red headband, bare feet).
-// Every frame is a skeleton in one 160 x 170 cell facing right, the ankles on the ground at y 162; the
-// renderer in fighter.tsx dresses the same skeleton in each profession's costume, so a move is drawn once.
+// Every frame is a skeleton in one 160 x 170 cell facing right; a planted foot has its ankle at y 160 and
+// its toe at y 163, over the shadow at CELL.ground (166). The renderer in fighter.tsx dresses the same
+// skeleton in each profession's costume, so a move is drawn once.
 // Four frames per move, the way the arcade sprite plays them: the stance is the classic four frame bounce
 // played there and back, the specials are wind up, release, follow through and recover.
 
