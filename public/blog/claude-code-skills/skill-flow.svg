@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606a"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="630" fill="#ffffff"/>
+  <text x="40" y="58" font-family="system-ui, sans-serif" font-size="30" font-weight="700" fill="#1f2328">How a prompt reaches a Claude Code skill</text>
+
+  <g font-family="system-ui, sans-serif" fill="#1f2328">
+    <!-- row 1 -->
+    <rect x="40" y="110" width="250" height="120" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="2"/>
+    <text x="165" y="160" font-size="22" font-weight="700" text-anchor="middle">Your prompt</text>
+    <text x="165" y="192" font-size="17" text-anchor="middle">"the login page</text>
+    <text x="165" y="214" font-size="17" text-anchor="middle">is broken again"</text>
+
+    <rect x="370" y="110" width="400" height="120" rx="10" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+    <text x="570" y="150" font-size="22" font-weight="700" text-anchor="middle">skill-router.py</text>
+    <text x="570" y="180" font-size="17" text-anchor="middle">UserPromptSubmit hook</text>
+    <text x="570" y="206" font-size="17" text-anchor="middle">reads the triggers in every SKILL.md</text>
+
+    <rect x="850" y="110" width="310" height="120" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="2"/>
+    <text x="1005" y="152" font-size="20" font-weight="700" text-anchor="middle">SKILL CHECK line</text>
+    <text x="1005" y="184" font-family="ui-monospace, monospace" font-size="16" text-anchor="middle">SKILL CHECK:</text>
+    <text x="1005" y="208" font-family="ui-monospace, monospace" font-size="16" text-anchor="middle">bug-investigation</text>
+
+    <!-- protocol -->
+    <rect x="370" y="280" width="400" height="90" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="570" y="318" font-size="20" font-weight="700" text-anchor="middle">protocol.txt</text>
+    <text x="570" y="348" font-size="17" text-anchor="middle">the few rules no skill can hold</text>
+
+    <!-- row 2 -->
+    <rect x="850" y="420" width="310" height="150" rx="10" fill="#ddf4ff" stroke="#0969da" stroke-width="2"/>
+    <text x="1005" y="462" font-size="20" font-weight="700" text-anchor="middle">The skill loads</text>
+    <text x="1005" y="494" font-size="17" text-anchor="middle">its SKILL.md body,</text>
+    <text x="1005" y="518" font-size="17" text-anchor="middle">then only the references</text>
+    <text x="1005" y="542" font-size="17" text-anchor="middle">the step needs</text>
+
+    <rect x="370" y="420" width="400" height="150" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="2"/>
+    <text x="570" y="462" font-size="20" font-weight="700" text-anchor="middle">Development work</text>
+    <text x="570" y="494" font-size="17" text-anchor="middle">autodevelopment sizes the ticket</text>
+    <text x="570" y="518" font-size="17" text-anchor="middle">and briefs each agent with</text>
+    <text x="570" y="544" font-family="ui-monospace, monospace" font-size="16" text-anchor="middle">Skills you run: a, b, c</text>
+
+    <rect x="40" y="420" width="250" height="150" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="2"/>
+    <text x="165" y="462" font-size="20" font-weight="700" text-anchor="middle">Agents</text>
+    <text x="165" y="494" font-size="17" text-anchor="middle">each loads the</text>
+    <text x="165" y="518" font-size="17" text-anchor="middle">skills its part</text>
+    <text x="165" y="542" font-size="17" text-anchor="middle">of the work needs</text>
+  </g>
+
+  <g stroke="#57606a" stroke-width="2.5" fill="none" marker-end="url(#a)">
+    <path d="M290,170 L366,170"/>
+    <path d="M770,170 L846,170"/>
+    <path d="M770,325 L999,325"/>
+    <path d="M1005,230 L1005,416"/>
+    <path d="M850,495 L774,495"/>
+    <path d="M370,495 L294,495"/>
+  </g>
+  <g font-family="system-ui, sans-serif" font-size="15" fill="#57606a">
+    <text x="885" y="315" text-anchor="middle">added to every prompt</text>
+    <text x="1015" y="395">Skill tool</text>
+    <text x="810" y="408" text-anchor="middle">a fix or a feature</text>
+  </g>
+</svg>
