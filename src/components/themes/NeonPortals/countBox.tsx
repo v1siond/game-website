@@ -80,7 +80,7 @@ function BoxScene({ run, still, onDone }: { run: boolean; still: boolean; onDone
 }
 
 export function CountBoxLevel() {
-  const { sections, actions, cvPage } = useLabels()
+  const { sections, actions, cvPage, about: aboutLabels } = useLabels()
   const { professionalSummary } = useCVData()
   const about = useMemo(() => aboutBlock(professionalSummary), [professionalSummary])
   const { active } = useProfession()
@@ -109,7 +109,10 @@ export function CountBoxLevel() {
           <span className="font-bold">{cvPage.education}: </span>
           {about.education}
         </p>
-        <p className="mt-1 text-base">{about.languages}</p>
+        <p className="mt-1 text-base">
+          <span className="font-bold">{aboutLabels.languages}: </span>
+          {about.languages}
+        </p>
         <Points items={about.highlights} label={cvPage.coreCompetencies} />
       </div>
     </Region>
