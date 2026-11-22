@@ -295,10 +295,7 @@
 .ripStage[data-on='false'] .installed {
   opacity: 0;
 }
-.ripStage[data-on='true'] .installed {
-  animation: installed-in 0.2s steps(2) calc(1.4s + var(--i) * 0.9s) both;
-}
-
+/* once the stage is on, world.installedIn fades the word in on the world's one fade keyframe */
 @keyframes install {
   from {
     transform: scaleX(0);
@@ -313,14 +310,6 @@
   }
   to {
     transform: scaleX(1);
-  }
-}
-@keyframes installed-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
   }
 }
 
