@@ -7,7 +7,7 @@ import { headingId } from '@/lib/cv/sectionText'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { cssVars } from '@/lib/cssVars'
-import { JungleAction, JungleCVLink, jungleButton } from './buttons'
+import { JungleLinks, jungleButton } from './buttons'
 import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import { Backdrop, NightFront, NightSky, ToneScope } from './scenery'
@@ -23,6 +23,9 @@ import night from './nightfall.module.css'
 // rocks it; Jump again replays the finish. Pattern: CSS off one trigger (data-on), the roll 0 to 0.9 s,
 // the window at 0.6 s, the target from 0.9 s, the sign from 1 s; a replay count remounts the scene's
 // actors.
+
+// The contact sign offers the CV beside email and LinkedIn.
+const CONTACT_SITE_LINKS = ['cv'] as const
 
 const JUMP_BUTTON = jungleButton({ tone: 'wood', size: 'small', extra: 'absolute left-3 top-3' })
 
@@ -114,10 +117,7 @@ export function TreehouseContact() {
                 </h2>
                 <p className="mt-4 text-base text-[color:var(--tp-parchment)]">{line}</p>
                 <nav className="mt-6 flex flex-wrap gap-3" aria-label={sections.contact}>
-                  {actions.map((action) => (
-                    <JungleAction key={action.id} action={action} />
-                  ))}
-                  <JungleCVLink />
+                  <JungleLinks actions={actions} site={CONTACT_SITE_LINKS} />
                 </nav>
               </div>
             </div>

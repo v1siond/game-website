@@ -7,7 +7,7 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { NameWords } from '@/components/cv/NameWords'
 import { BARREL, BarrelArt, MuzzleBurst } from './barrel'
-import { JungleAction, JungleCVLink, JunglePortfolioLink } from './buttons'
+import { JungleLinks } from './buttons'
 import { HeroCharacter, PassingHero } from './character'
 import { COLORS as C } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -16,6 +16,9 @@ import { ToneScope } from './scenery'
 import look from './jungle.module.css'
 import scenery from './scenery.module.css'
 import sunset from './sunset.module.css'
+
+// The hero offers the CV and his engine beside email and LinkedIn.
+const HERO_SITE_LINKS = ['cv', 'engine'] as const
 
 // His outfit plate: a dark plank sign with sun gold lettering and a plank rim.
 const OUTFIT_LOOK: WardrobeLook = { plate: C.barkDark, text: C.sunGold, ring: C.plank }
@@ -262,11 +265,7 @@ export function SunsetHero() {
               <p className="mt-2 text-base italic text-[color:var(--tp-sun-gold)]">{tagline}</p>
               <p className="mt-2 text-base text-[color:var(--tp-parchment)]">{line}</p>
               <nav className="mt-7 flex flex-wrap items-center justify-center gap-3 md:justify-start" aria-label={navigation.contactAndCv}>
-                {actions.map((action) => (
-                  <JungleAction key={action.id} action={action} />
-                ))}
-                <JungleCVLink />
-                <JunglePortfolioLink />
+                <JungleLinks actions={actions} site={HERO_SITE_LINKS} />
               </nav>
             </div>
           </div>

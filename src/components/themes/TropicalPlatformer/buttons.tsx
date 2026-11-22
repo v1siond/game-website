@@ -1,9 +1,10 @@
-import Link from 'next/link'
+'use client'
+
 import type { ReactNode } from 'react'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
+import type { SiteLinkId } from '@/lib/cv/siteLinks'
 import look from './jungle.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The jungle's controls. Every button is wood or sun gold, 44px tall at least, with the world's gold focus
 // ring, in one of three sizes; `extra` holds its place and layout. In the hero and again on the contact
@@ -33,33 +34,21 @@ export function StatusLine({ children, spaced = true }: { children: ReactNode; s
   )
 }
 
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+const CONTACT_LOOK: Record<ContactLinkId, string> = {
   email: GOLD_BUTTON,
   linkedin: WOOD_BUTTON,
+  cv: WOOD_BUTTON,
+  engine: WOOD_BUTTON,
 }
 
-export function JungleAction({ action }: { action: HeroActionSlot }) {
+/** The hero's two actions, then the site links named in `site`, as jungle buttons; the engine reads "Portfolio". */
+export function JungleLinks({ actions, site }: { actions: readonly HeroActionSlot[]; site: readonly SiteLinkId[] }) {
+  const links = useSiteLinks('portfolio')
   return (
-    <a {...action.linkProps} className={HERO_ACTION_LOOK[action.id]}>
-      {action.label}
-    </a>
-  )
-}
-
-export function JungleCVLink() {
-  const { actions } = useLabels()
-  return (
-    <Link href="/cv" className={WOOD_BUTTON}>
-      {actions.cv}
-    </Link>
-  )
-}
-
-export function JunglePortfolioLink() {
-  const { actions } = useLabels()
-  return (
-    <Link {...ENGINE_LINK} className={WOOD_BUTTON}>
-      {actions.portfolio}
-    </Link>
+    <>
+      {[...actions, ...site.map((id) => links[id])].map((slot) => (
+        <ContactLink key={slot.id} slot={slot} className={CONTACT_LOOK[slot.id]} />
+      ))}
+    </>
   )
 }
