@@ -46,6 +46,18 @@ function Stage({ title, children, className = '' }: { title: string; children: R
   )
 }
 
+/** A section that fades in whole as it scrolls into view, with no entrance per item. */
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <FadeInScene>
+      <section aria-labelledby={headingId('noir', title)} className="mb-16">
+        <SectionTitle title={title} />
+        {children}
+      </section>
+    </FadeInScene>
+  )
+}
+
 function About({ bio }: { bio: string }) {
   const { sections } = useLabels()
 
@@ -97,44 +109,35 @@ export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'
         </Stage>
       )}
 
-      <FadeInScene>
-        <section aria-labelledby={headingId('noir', titles.techStack)} className="mb-16">
-          <SectionTitle title={titles.techStack} />
-          <TechStackBoard categories={sections.techStack} />
-        </section>
-      </FadeInScene>
+      <Section title={titles.techStack}>
+        <TechStackBoard categories={sections.techStack} />
+      </Section>
 
       {sections.services.length > 0 && (
-        <FadeInScene>
-          <section aria-labelledby={headingId('noir', titles.services)} className="mb-16">
-            <SectionTitle title={titles.services} />
-            <StampedCase>
-              <ul className={MASONRY_LIST}>
-                {sections.services.map((service) => (
-                  <li key={service.id} className={MASONRY_ITEM}>
-                    <ServiceSlab service={service} />
-                  </li>
-                ))}
-              </ul>
-            </StampedCase>
-          </section>
-        </FadeInScene>
+        <Section title={titles.services}>
+          <StampedCase>
+            <ul className={MASONRY_LIST}>
+              {sections.services.map((service) => (
+                <li key={service.id} className={MASONRY_ITEM}>
+                  <ServiceSlab service={service} />
+                </li>
+              ))}
+            </ul>
+          </StampedCase>
+        </Section>
       )}
 
       <Projects projects={sections.projects} />
 
-      <FadeInScene>
-        <section aria-labelledby={headingId('noir', titles.ventures)} className="mb-16">
-          <SectionTitle title={titles.ventures} />
-          <ul className="grid gap-8 md:grid-cols-6">
-            {sections.companies.map((company) => (
-              <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
-                <CompanyTag company={company} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      </FadeInScene>
+      <Section title={titles.ventures}>
+        <ul className="grid gap-8 md:grid-cols-6">
+          {sections.companies.map((company) => (
+            <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
+              <CompanyTag company={company} />
+            </li>
+          ))}
+        </ul>
+      </Section>
     </>
   )
 }
