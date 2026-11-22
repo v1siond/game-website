@@ -5,6 +5,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import type { MartialArts } from '@/lib/cv/content'
 import { SurvivorSprite, type DecoMotion } from './sprite'
 import { STORY_MS } from '@/lib/motion/stepWithin'
@@ -46,7 +47,7 @@ export function TheatreStage({ martialArts }: { martialArts: MartialArts }) {
 
   return (
     <div ref={ref} data-on={triggered || undefined} className="grid items-start gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-      <div className={`relative mx-auto h-64 w-full max-w-xs overflow-hidden sm:h-72 ${stage.box}`} aria-hidden="true">
+      <div className={`relative mx-auto h-64 w-full max-w-xs overflow-hidden sm:h-72 ${stage.box} ${heldUntil(triggered)}`} aria-hidden="true">
         <span className={`absolute inset-x-0 top-0 h-full ${stage.light}`} />
         <div className="absolute bottom-3 left-1/2 h-44 w-28 -translate-x-1/2 sm:h-52 sm:w-32" onPointerEnter={() => play('strike')} onPointerDown={() => play('strike')}>
           <SurvivorSprite profession="fighter" motion={pose} onDone={lit < achievements.length ? struck : advance} className="h-full w-full" />
