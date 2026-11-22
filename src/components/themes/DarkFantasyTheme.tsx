@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useMemo, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import type { SiteLinkId } from '@/lib/cv/siteLinks'
@@ -12,8 +12,8 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job, Service } from '@/lib/cv/content'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import { ProfessionSectionsView, type ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
@@ -1581,150 +1581,164 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
   )
 }
 
-function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const labels = useLabels()
-  const projectsTrigger = useSectionTrigger()
-  const { jobs, techStack, services, projects, companies } = sections
+// Each section in its frame, the art divider that follows it inside the same frame. The shared plan picks which
+// sections a profession shows and in which order.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <>
+        <FramedSection title={sections[slot.titleKey]}>
+          <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
+        </FramedSection>
 
-  return (
-    <>
-      <FramedSection title={labels.sections.about}>
-        <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{professionalSummary.bio}</p>
-      </FramedSection>
-
-      {/* Art Section 1 - Spirits and Gears */}
-      <ScrollScene>
-        <ArtSectionSpirits />
-      </ScrollScene>
-
-      {/* Work Experience - Knight Slash Reveal (content slides from right) */}
-      {jobs.length > 0 && (
-        <SlashRevealSection title={labels.sections.workExperience}>
+        {/* Art Section 1 - Spirits and Gears */}
+        <ScrollScene>
+          <ArtSectionSpirits />
+        </ScrollScene>
+      </>
+    )
+  },
+  // Work Experience - Knight Slash Reveal (content slides from right)
+  work: function WorkFrame({ slot }) {
+    const { sections } = useLabels()
+    const { jobs } = slot
+    return (
+      <>
+        <SlashRevealSection title={sections[slot.titleKey]}>
           <div>
             {jobs.map((entry, index) => (
               <ExperienceCard key={entry.id} entry={entry} isLast={index === jobs.length - 1} />
             ))}
           </div>
         </SlashRevealSection>
-      )}
 
-      {/* Art Section 2 - Lanterns */}
-      <ScrollScene>
-        <ArtSectionLanterns />
-      </ScrollScene>
-
-      <FramedSection title={labels.sections.techStack}>
-        <TechCloud categories={techStack} />
+        {/* Art Section 2 - Lanterns */}
+        <ScrollScene>
+          <ArtSectionLanterns />
+        </ScrollScene>
+      </>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <FramedSection title={sections[slot.titleKey]}>
+        <TechCloud categories={slot.categories} />
       </FramedSection>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <FramedSection title={sections[slot.titleKey]}>
+        <ServiceList services={slot.services} />
+      </FramedSection>
+    )
+  },
+  // Projects - Bug Pull Reveal
+  projects: function ProjectsFrame({ slot }) {
+    const { sections } = useLabels()
+    const projectsTrigger = useSectionTrigger()
+    return (
+      <>
+        <div ref={projectsTrigger.ref}>
+          <BugPullReveal triggered={projectsTrigger.triggered}>
+            <section className="relative z-20 py-[var(--panel-top)] px-4 md:px-6">
+              <div className="max-w-4xl mx-auto">
+                <VoidFrame title={sections[slot.titleKey]}>
+                  <ProjectList
+                    projects={slot.projects}
+                    className="grid md:grid-cols-2 gap-3 md:gap-4"
+                    renderProject={(projectSlot) => <ProjectCard slot={projectSlot} />}
+                  />
+                </VoidFrame>
+              </div>
+            </section>
+          </BugPullReveal>
+        </div>
 
-      {services.length > 0 && (
-        <FramedSection title={labels.sections.services}>
-          <ServiceList services={services} />
-        </FramedSection>
-      )}
-
-      {/* Projects - Bug Pull Reveal */}
-      <div ref={projectsTrigger.ref}>
-        <BugPullReveal triggered={projectsTrigger.triggered}>
-          <section className="relative z-20 py-[var(--panel-top)] px-4 md:px-6">
-            <div className="max-w-4xl mx-auto">
-              <VoidFrame title={labels.sections.projects}>
-                <ProjectList
-                  projects={projects}
-                  className="grid md:grid-cols-2 gap-3 md:gap-4"
-                  renderProject={(slot) => <ProjectCard slot={slot} />}
-                />
-              </VoidFrame>
-            </div>
-          </section>
-        </BugPullReveal>
-      </div>
-
-      {/* Art Section 3 - Crystals */}
-      <ScrollScene>
-        <ArtSectionCrystals />
-      </ScrollScene>
-
-      <FramedSection title={labels.sections.ventures}>
+        {/* Art Section 3 - Crystals */}
+        <ScrollScene>
+          <ArtSectionCrystals />
+        </ScrollScene>
+      </>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    const { sections } = useLabels()
+    return (
+      <FramedSection title={sections[slot.titleKey]}>
         <div className="grid md:grid-cols-6 gap-3 md:gap-4">
-          {companies.map((company) => (
+          {slot.companies.map((company) => (
             <CompanyCard key={company.id} company={company} />
           ))}
         </div>
       </FramedSection>
-    </>
-  )
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    const { sections, years } = useLabels()
+    const { musician, bands } = slot
+    return (
+      <>
+        <ScrollScene>
+          <ArtSectionSpirits />
+        </ScrollScene>
+
+        <SlashRevealSection title={sections[slot.titleKey]}>
+          <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
+            {drumsSince(musician, years)}
+          </p>
+          <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(bandSlot) => <BandCard {...bandSlot} />} />
+          <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
+        </SlashRevealSection>
+
+        <ScrollScene>
+          <ArtSectionLanterns />
+        </ScrollScene>
+      </>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    const { sections } = useLabels()
+    const { martialArts } = slot
+    return (
+      <>
+        <ScrollScene>
+          <ArtSectionSpirits />
+        </ScrollScene>
+
+        <SlashRevealSection title={sections[slot.titleKey]}>
+          <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
+          <MuayThaiRecord
+            martialArts={martialArts}
+            classNames={{
+              facts: 'grid sm:grid-cols-2 gap-3 mb-4',
+              fact: 'p-3 rounded bg-gradient-to-br from-[color:var(--df-void)] to-[color:var(--df-void-purple)] border border-[color:var(--df-stone-dark)]',
+              term: 'text-sm tracking-[0.15em] uppercase text-[color:var(--df-spirit-gold)]',
+              value: 'text-sm mt-1 text-[color:var(--df-bone)]',
+              achievements: 'space-y-1',
+              achievement: 'text-sm flex items-start gap-2 text-[color:var(--df-bone)]',
+            }}
+            renderAchievement={(achievement) => (
+              <>
+                <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
+                {achievement}
+              </>
+            )}
+          />
+        </SlashRevealSection>
+
+        <ScrollScene>
+          <ArtSectionCrystals />
+        </ScrollScene>
+      </>
+    )
+  },
 }
 
-function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { musician, bands } = sections
-  const labels = useLabels()
-
-  return (
-    <>
-      <ScrollScene>
-        <ArtSectionSpirits />
-      </ScrollScene>
-
-      <SlashRevealSection title={labels.sections.bands}>
-        <p className="text-sm mb-4 text-center" style={{ color: DARK_FANTASY.bone }}>
-          {drumsSince(musician, labels.years)}
-        </p>
-        <BandList bands={bands} className="grid md:grid-cols-3 gap-3 md:gap-4" renderBand={(slot) => <BandCard {...slot} />} />
-        <p className="text-sm mt-4 italic text-center" style={{ color: DARK_FANTASY.lavender }}>{musician.line}</p>
-      </SlashRevealSection>
-
-      <ScrollScene>
-        <ArtSectionLanterns />
-      </ScrollScene>
-    </>
-  )
-}
-
-function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { martialArts } = sections
-  const labels = useLabels()
-
-  return (
-    <>
-      <ScrollScene>
-        <ArtSectionSpirits />
-      </ScrollScene>
-
-      <SlashRevealSection title={labels.sections.muayThai}>
-        <h3 className="text-lg font-medium mb-4" style={{ color: DARK_FANTASY.bone }}>{martialArts.primary.title}</h3>
-        <MuayThaiRecord
-          martialArts={martialArts}
-          classNames={{
-            facts: 'grid sm:grid-cols-2 gap-3 mb-4',
-            fact: 'p-3 rounded bg-gradient-to-br from-[color:var(--df-void)] to-[color:var(--df-void-purple)] border border-[color:var(--df-stone-dark)]',
-            term: 'text-sm tracking-[0.15em] uppercase text-[color:var(--df-spirit-gold)]',
-            value: 'text-sm mt-1 text-[color:var(--df-bone)]',
-            achievements: 'space-y-1',
-            achievement: 'text-sm flex items-start gap-2 text-[color:var(--df-bone)]',
-          }}
-          renderAchievement={(achievement) => (
-            <>
-              <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
-              {achievement}
-            </>
-          )}
-        />
-      </SlashRevealSection>
-
-      <ScrollScene>
-        <ArtSectionCrystals />
-      </ScrollScene>
-    </>
-  )
-}
-
-const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+const SECTION_VIEWS = sectionViews(FRAMES)
 
 export default function DarkFantasyTheme() {
   const view = useWorldView()
