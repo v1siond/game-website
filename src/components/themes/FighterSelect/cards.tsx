@@ -7,6 +7,7 @@ import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
@@ -95,7 +96,7 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
         <p className={`mb-4 flex items-start gap-2 px-4 py-2.5 text-sm text-[color:var(--accent)] ${look.impact}`}>
           <HitSpark />
           <span>
-            <span className="sr-only">{labels.cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </span>
         </p>

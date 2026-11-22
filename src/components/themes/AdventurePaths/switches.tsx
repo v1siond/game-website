@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -152,7 +153,7 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
       <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
       {project.impact && (
         <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">
-          <span className="sr-only">{cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -89,7 +90,7 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
         <MarkedLines items={project.details} label={cards.details} look={BLOOD_POINTS} />
         {project.impact && (
           <p className="mt-3 border-l-4 border-[var(--rarity)] pl-3 text-base">
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}

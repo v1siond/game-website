@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
@@ -1012,7 +1013,7 @@ const ProjectCard = memo(function ProjectCard({ slot: { project: entry, links } 
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
-          <span className="sr-only">{cards.impact}: </span>{project.impact}
+          <ImpactLabel />{project.impact}
         </p>
       )}
       <TagList label={cards.technologiesUsed} tags={project.techStack} className="mt-3" />

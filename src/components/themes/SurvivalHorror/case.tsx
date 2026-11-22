@@ -5,6 +5,7 @@ import type { Project } from '@/lib/cv/content'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { projectCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
@@ -119,7 +120,7 @@ function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
       <MarkedLines items={project.details} label={cards.details} look={{ ...MARK_LIST, list: 'mt-2 space-y-1' }} />
       {project.impact && (
         <p className="mt-2 text-sm italic text-[color:var(--sh-ivory)]">
-          <span className="sr-only">{cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}

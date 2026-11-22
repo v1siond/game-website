@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -122,7 +123,7 @@ function ItemCard({ project: entry, links }: ProjectSlot) {
         <MarkedLines items={project.details} label={cards.details} look={EMBER_LIST} />
         {project.impact && (
           <p className={`mt-3 border-l-2 border-[color:var(--soul-ember)] pl-3 ${CARD_BODY}`}>
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}

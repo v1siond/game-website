@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/lib/cv/sectionText'
 import { projectCard } from '@/lib/cv/cvView'
@@ -123,7 +124,7 @@ function LootCard({ slot, index, equippedId, equippedStats, onEquip }: LootCardP
 
           {project.impact && (
             <p className={`mt-3 text-base font-bold italic ${cel.flavour}`}>
-              <span className="sr-only">{cards.impact}: </span>
+              <ImpactLabel />
               {project.impact}
             </p>
           )}

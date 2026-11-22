@@ -19,6 +19,7 @@ import { usePlay } from './play'
 import { Soul } from './soul'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MASONRY_TILES } from '@/lib/cv/masonry'
 import { ITEM, SentryPortrait, TALKS } from './rooms'
 
@@ -158,7 +159,7 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
           <p ref={impact} className={`flex items-start gap-2 text-sm text-[color:var(--rpg-green)] ${MONO}`}>
             <Mark />
             <span>
-              <span className="sr-only">{labels.cards.impact}: </span>
+              <ImpactLabel />
               {project.impact}
             </span>
           </p>

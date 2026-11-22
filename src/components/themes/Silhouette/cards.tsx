@@ -3,6 +3,7 @@ import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { Job } from '@/lib/cv/content'
 import { jobCard, projectCard } from '@/lib/cv/cvView'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
@@ -108,7 +109,7 @@ export function ProjectCard({ project: entry, links }: ProjectSlot) {
       {project.impact && (
         <p className={`mt-1.5 italic ${CARD_BODY}`}>
           <span aria-hidden="true">{'-> '}</span>
-          <span className="sr-only">{cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}

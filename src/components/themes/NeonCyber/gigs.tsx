@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNod
 import type { Project } from '@/lib/cv/content'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { projectCard, type ProjectCard as ProjectCardView } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -83,7 +84,7 @@ function BreachFile({ project, children }: { project: ProjectCardView; children?
       <MarkedLines items={project.details} label={cards.details} look={PROMPT_LINES} />
       {project.impact && (
         <p className="mt-3 text-sm text-[color:var(--neon-hud)]">
-          <span className="sr-only">{cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}
@@ -297,7 +298,7 @@ function GigCard({ project: entry, links, noLink }: ProjectSlot) {
           <p className="mt-1 text-sm text-[color:var(--neon-ice)]">{project.tagline}</p>
           {project.impact && (
             <p className="mt-2 text-sm text-[color:var(--neon-hack)]">
-              <span className="sr-only">{cards.impact}: </span>
+              <ImpactLabel />
               {project.impact}
             </p>
           )}

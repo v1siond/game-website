@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -146,7 +147,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
       {project.impact && (
         <Part tag={cards.impact}>
           <p className="mt-3 border-l-4 border-atomic-phosphor pl-3 text-sm text-atomic-phosphor">
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         </Part>
@@ -235,7 +236,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
         {project.description && <p className="mt-3 text-base leading-relaxed text-atomic-phosphor">{project.description}</p>}
         {project.impact && (
           <p className="mt-4 border-l-4 border-atomic-phosphor pl-3 text-base text-atomic-phosphor">
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}

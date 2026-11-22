@@ -10,6 +10,7 @@ import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
@@ -117,7 +118,7 @@ export function VintagePoster({ project: entry, links, noLink }: ProjectSlot) {
       {project.impact && (
         <p className={`mb-2 rounded px-2 py-1 italic ${BODY} ${world.impact}`}>
           <span aria-hidden="true">→ </span>
-          <span className="sr-only">{labels.cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}

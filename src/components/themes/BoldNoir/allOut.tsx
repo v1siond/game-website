@@ -12,6 +12,7 @@ import { Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { fillLabel } from '@/lib/cv/labels'
 import { projectCard } from '@/lib/cv/cvView'
 
@@ -159,7 +160,7 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
         {project.description && <p className={`mt-3 text-sm text-[color:var(--noir-paper-dim)] ${world.copy}`}>{project.description}</p>}
         {project.impact && (
           <p className={`mt-4 inline-block px-3 py-1 text-base font-bold ${world.heading} ${world.copy}`}>
-            <span className="sr-only">{labels.cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}
