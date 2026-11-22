@@ -1,10 +1,10 @@
 /*
  * The letter pickups (letterCoin.tsx). A waiting letter spins like a coin twice (1.8 s a turn, faked with a
- * horizontal squeeze) and rests face on; a found one flies up and fades, and its tracker slot fills with a pop. All found:
+ * horizontal squeeze) when its card scrolls in, and rests face on; a found one flies up and fades, and its tracker slot fills with a pop. All found:
  * the balloon floats up. Transform and opacity only.
  */
 
-.coin {
+.coin[data-on] {
   animation: coin-spin 1.8s ease-in-out 2;
 }
 
@@ -82,7 +82,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .coin,
+  .coin[data-on],
   .landed,
   .balloon {
     animation: none;
