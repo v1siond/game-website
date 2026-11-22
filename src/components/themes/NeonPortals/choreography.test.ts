@@ -1,4 +1,4 @@
-import { COUNT_BOX, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, breakAt, frameAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, breakAt, collectMotion, frameAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -169,5 +169,22 @@ describe('Projects: pointing at a sphere', () => {
   it('reads a share outside the grid as its nearest edge', () => {
     expect(aimAt(-1)).toBe(aimAt(0))
     expect(aimAt(2)).toBe(aimAt(1))
+  })
+})
+
+describe('Ventures: collecting the gems', () => {
+  it('runs him into the row when the section shows, within 1 s', () => {
+    expect(GEMS_IN.beats.map((beat) => beat.pose)).toEqual(['run'])
+    expect(sceneMs(GEMS_IN)).toBeLessThan(1000)
+  })
+
+  it('runs him to the gem in under 1 s and flies the gem to the tally once he is there, all within 5 s', () => {
+    expect(COLLECT.glideMs).toBeLessThan(1000)
+    expect(COLLECT.glideMs + COLLECT.flightMs).toBeLessThanOrEqual(FIVE_S)
+  })
+
+  it('moves him from where he stands to the gem while he runs, and holds him there after', () => {
+    expect(collectMotion(10, 70, true)).toEqual({ pose: 'run', from: { x: 10, lift: 0 }, to: { x: 70, lift: 0 }, ms: COLLECT.glideMs })
+    expect(collectMotion(10, 70, false)).toEqual({ pose: 'idle', from: { x: 70, lift: 0 }, to: { x: 70, lift: 0 }, ms: 0 })
   })
 })

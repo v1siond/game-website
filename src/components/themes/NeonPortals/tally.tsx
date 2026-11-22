@@ -45,7 +45,7 @@ export function Tally({ className = '' }: { className?: string }) {
   const shown = useRolling(found)
 
   return (
-    <p className={`inline-flex items-center gap-2 rounded-full border-2 border-[color:var(--np-seam)] bg-[color:var(--np-board)] py-1 pl-1.5 pr-4 ${className}`}>
+    <p data-tally="" className={`inline-flex items-center gap-2 rounded-full border-2 border-[color:var(--np-seam)] bg-[color:var(--np-board)] py-1 pl-1.5 pr-4 ${className}`}>
       <Hologram state={found >= total ? 'gem' : 'box'} className="h-8 w-8 shrink-0" />
       <span className={`${FACE} text-lg tracking-wide text-[color:var(--np-gold)]`}>{fillLabel(navigation.findTally, { found: shown, total })}</span>
     </p>

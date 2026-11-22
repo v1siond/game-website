@@ -8,6 +8,7 @@ import { sectionPlan, type SectionId } from '@/lib/cv/sectionPlan'
 import { CheckpointLevel } from './checkpoints'
 import { CountBoxLevel } from './countBox'
 import { findTotal } from './finds'
+import { GemLevel } from './gems'
 import { IronBoxLevel } from './ironBox'
 import { SphereLevel } from './spheres'
 import { TechBoxLevel } from './techBoxes'
@@ -64,7 +65,9 @@ const FRAMES: SectionFrames = {
   projects: function ProjectsFrame({ slot }) {
     return <SphereLevel projects={slot.projects} />
   },
-  ventures: () => <Level id="ventures" />,
+  ventures: function VenturesFrame({ slot }) {
+    return <GemLevel companies={slot.companies} />
+  },
   bands: () => <Level id="bands" />,
   muayThai: () => <Level id="muayThai" />,
 }

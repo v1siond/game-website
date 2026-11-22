@@ -177,6 +177,24 @@ const AIM_OUT_DEG = 20
 
 export const aimAt = (share: number): number => (0.5 - Math.min(1, Math.max(0, share))) * AIM_SPAN_DEG - AIM_OUT_DEG
 
+// Ventures: he runs into the row above the cards when the section shows; pressing a venture's "Collect"
+// runs him to its gem, and once he is there the gem flies up into the tally.
+export const GEMS_IN: Scene = {
+  start: { x: -6, lift: 0 },
+  beats: [{ name: 'enter', pose: 'run', ms: 800, to: { x: 10, lift: 0 } }],
+  rest: 'idle',
+}
+
+export const COLLECT = { glideMs: 500, flightMs: 700 } as const
+
+const onRow = (x: number): Spot => ({ x, lift: 0 })
+
+/** His motion along the row: running from `from` to `to` while he collects, else standing at `to`. */
+export function collectMotion(from: number, to: number, moving: boolean): Motion {
+  if (!moving) return { pose: 'idle', from: onRow(to), to: onRow(to), ms: 0 }
+  return { pose: 'run', from: onRow(from), to: onRow(to), ms: COLLECT.glideMs }
+}
+
 // Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
 // so a fourth achievement adds no step.
 const MASK_STEP_MAX = 3
