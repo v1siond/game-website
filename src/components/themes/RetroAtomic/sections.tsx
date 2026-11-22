@@ -1,13 +1,12 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { atomicId } from './anchors'
 import { QuestLog } from './quests'
 import { Holotapes, Inventory } from './inventory'
@@ -30,7 +29,8 @@ import j from './journey.module.css'
 // its title, the same the wrist terminal's section tabs jump to. The engineer's sections sit on the
 // terminal's glass panels (the services as plain panels under a fade), the musician's on the radio,
 // the fighter's on the printed perk chart. Two sections the dweller fixes himself (./repairs): he boots
-// the services' dead tube on, and beams the quest log onto the glass from his wrist terminal.
+// the services' dead tube on, and beams the quest log onto the glass from his wrist terminal. The shared
+// plan picks which stages a profession shows and in which order.
 
 // The title sits on its own glass plate: where a stage has no panel the wasteland's pale sky shows behind
 // it, and phosphor on that sky reads under 2 to 1.
@@ -62,106 +62,108 @@ function Stage({ title, zone, className = '', children }: StageProps) {
   )
 }
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const titles = useLabels().sections
-
-  return (
-    <>
-      <Stage title={titles.about} zone="shelter" className={j.fetch}>
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]} zone="shelter" className={j.fetch}>
         <Fetch>
           <div className={`max-w-3xl p-5 sm:p-6 ${atomic.panel}`}>
-            <p className="max-w-prose text-base leading-relaxed text-atomic-phosphor">{professionalSummary.bio}</p>
+            <p className="max-w-prose text-base leading-relaxed text-atomic-phosphor">{slot.bio}</p>
           </div>
         </Fetch>
       </Stage>
-
-      {sections.jobs.length > 0 && (
-        <Stage title={titles.workExperience} zone="wasteland" className={j.stamp}>
-          <LevelUp job={sections.jobs[0]} />
-          <BeamedLog>
-            <QuestLog jobs={sections.jobs} />
-          </BeamedLog>
-        </Stage>
-      )}
-
-      <Stage title={titles.techStack} zone="wasteland" className={j.loot}>
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]} zone="wasteland" className={j.stamp}>
+        <LevelUp job={slot.jobs[0]} />
+        <BeamedLog>
+          <QuestLog jobs={slot.jobs} />
+        </BeamedLog>
+      </Stage>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]} zone="wasteland" className={j.loot}>
         {(on) => (
-          <Loot categories={sections.techStack} on={on}>
-            <Inventory categories={sections.techStack} />
+          <Loot categories={slot.categories} on={on}>
+            <Inventory categories={slot.categories} />
           </Loot>
         )}
       </Stage>
-
-      {sections.services.length > 0 && (
-        <Stage title={titles.services} zone="wasteland">
-          <FadeInScene>
-            <BootedTube>
-              <ul className={MASONRY_LIST}>
-                {sections.services.map((service) => (
-                  <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
-                    <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>
-                    <p className="mt-2 text-base leading-relaxed text-atomic-phosphor">{service.line}</p>
-                  </li>
-                ))}
-              </ul>
-            </BootedTube>
-          </FadeInScene>
-        </Stage>
-      )}
-
-      {sections.projects.length > 0 && (
-        <Stage title={titles.projects} zone="wasteland" className={j.vats}>
-          <TargetingSystem projects={sections.projects} />
-        </Stage>
-      )}
-
-      {sections.companies.length > 0 && (
-        <Stage title={titles.ventures} zone="town" className={j.dig}>
-          {(on) => (
-            <Dig tapes={sections.companies.length} on={on}>
-              {(dug) => <Holotapes companies={sections.companies} dug={dug} />}
-            </Dig>
-          )}
-        </Stage>
-      )}
-    </>
-  )
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]} zone="wasteland">
+        <FadeInScene>
+          <BootedTube>
+            <ul className={MASONRY_LIST}>
+              {slot.services.map((service) => (
+                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${atomic.panel}`}>
+                  <h3 className="text-lg font-bold uppercase tracking-wider text-atomic-phosphor">{service.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-atomic-phosphor">{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </BootedTube>
+        </FadeInScene>
+      </Stage>
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]} zone="wasteland" className={j.vats}>
+        <TargetingSystem projects={slot.projects} />
+      </Stage>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]} zone="town" className={j.dig}>
+        {(on) => (
+          <Dig tapes={slot.companies.length} on={on}>
+            {(dug) => <Holotapes companies={slot.companies} dug={dug} />}
+          </Dig>
+        )}
+      </Stage>
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    const labels = useLabels()
+    const { musician, bands } = slot
+    return (
+      <Stage title={labels.sections[slot.titleKey]} zone="town">
+        {(on) => (
+          <>
+            <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
+            <Radio bands={bands} on={on} />
+            <p className="mt-6 text-base italic text-atomic-phosphor-dim-text">{musician.line}</p>
+          </>
+        )}
+      </Stage>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles[slot.titleKey]} zone="town">
+        {(on) => (
+          <Spar count={slot.martialArts.primary.achievements.length} on={on}>
+            {({ shown, ring }) => <PerkChart martialArts={slot.martialArts} shown={shown} ring={ring} />}
+          </Spar>
+        )}
+      </Stage>
+    )
+  },
 }
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const labels = useLabels()
-  const { musician, bands } = sections
-
-  return (
-    <Stage title={labels.sections.bands} zone="town">
-      {(on) => (
-        <>
-          <p className="mb-6 text-base text-atomic-yellow">{drumsSince(musician, labels.years)}</p>
-          <Radio bands={bands} on={on} />
-          <p className="mt-6 text-base italic text-atomic-phosphor-dim-text">{musician.line}</p>
-        </>
-      )}
-    </Stage>
-  )
-}
-
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const labels = useLabels()
-
-  return (
-    <Stage title={labels.sections.muayThai} zone="town">
-      {(on) => (
-        <Spar count={sections.martialArts.primary.achievements.length} on={on}>
-          {({ shown, ring }) => <PerkChart martialArts={sections.martialArts} shown={shown} ring={ring} />}
-        </Spar>
-      )}
-    </Stage>
-  )
-}
-
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+export const SECTION_VIEWS = sectionViews(FRAMES)
