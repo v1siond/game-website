@@ -1,0 +1,135 @@
+/* The warp corridor's fixed stage: aria-hidden art moved only by transform and opacity from corridor.tsx.
+   --a1 and --a2 are the era the camera is in, written on the world root when the era changes. */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: strict;
+}
+
+.fog {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 55% 45% at var(--np-vpx, 64vw) var(--np-vpy, 42vh), color-mix(in srgb, var(--a1) 22%, transparent), transparent 70%);
+}
+
+.rails,
+.layer,
+.dark {
+  position: absolute;
+  inset: 0;
+}
+
+.rails {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.rail {
+  fill: none;
+  stroke: var(--a1);
+  stroke-opacity: 0.2;
+  stroke-width: 1.5;
+}
+
+.dark {
+  background: var(--np-void);
+  opacity: 0;
+}
+
+.plane,
+.figure,
+.spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+}
+
+.plane {
+  visibility: hidden;
+}
+
+.plane svg {
+  display: block;
+  overflow: visible;
+}
+
+.spark {
+  width: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--a1) 50%, #fff);
+  opacity: 0;
+}
+
+/* The left of the screen holds the text: a still scrim keeps the moving neon low behind it. The runner
+   stands over it, so he is never dimmed. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(7 4 24 / 0.94) 0%, rgb(7 4 24 / 0.9) 40%, rgb(7 4 24 / 0) 58%);
+}
+
+/* A prop's moving parts turn about their own box. */
+.stage :global(.o-bottom),
+.stage :global(.o-top),
+.stage :global(.o-center) {
+  transform-box: fill-box;
+}
+
+.stage :global(.o-bottom) {
+  transform-origin: 50% 100%;
+}
+
+.stage :global(.o-top) {
+  transform-origin: 50% 0;
+}
+
+.stage :global(.o-center) {
+  transform-origin: 50% 50%;
+}
+
+/* His chrono pack glows in the era's colour. */
+.figure :global(.np-pack-halo) {
+  fill: var(--a1);
+  opacity: 0.3;
+}
+
+.figure :global(.np-pack-ring) {
+  stroke: var(--a1);
+}
+
+.figure :global(.np-pack-core) {
+  fill: var(--a2);
+}
+
+.hud {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 10;
+  display: flex;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.45rem 0.9rem;
+  background: var(--np-panel);
+  border-left: 3px solid var(--a1);
+  color: var(--np-ink);
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767.98px) {
+  .scrim {
+    background: linear-gradient(180deg, rgb(7 4 24 / 0.9) 0%, rgb(7 4 24 / 0.55) 40%, rgb(7 4 24 / 0.1) 70%);
+  }
+
+  .hud {
+    font-size: 0.85rem;
+  }
+}
