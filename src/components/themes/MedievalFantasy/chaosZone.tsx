@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { REALM } from './palette'
 import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
@@ -97,9 +98,11 @@ function AmbientFlash() {
   const [ambientFlashX, setAmbientFlashX] = useState(30)
   const [activeZone, setActiveZone] = useState(0)
   const lastZoneRef = useRef(-1)
+  const reduced = useReducedMotion()
 
-  // Ambient thunder flashes - realistic sequential cloud zone flashing
+  // Ambient thunder flashes - realistic sequential cloud zone flashing; none under reduced motion.
   useEffect(() => {
+    if (reduced) return
     let isActive = true
     const timeouts: NodeJS.Timeout[] = []
 
@@ -157,9 +160,9 @@ function AmbientFlash() {
       isActive = false
       timeouts.forEach(t => clearTimeout(t))
     }
-  }, [])
+  }, [reduced])
 
-  if (!ambientFlash) return null
+  if (reduced || !ambientFlash) return null
   const zone = CLOUD_ZONES[activeZone] || { x: 50, y: 30, spread: 18 }
   return (
     <div style={{
@@ -185,8 +188,11 @@ function FallingMeteor() {
     direction: 'left' | 'right'
     active: boolean
   } | null>(null)
+  const reduced = useReducedMotion()
 
+  // No meteor crosses the sky under reduced motion.
   useEffect(() => {
+    if (reduced) return
     let meteorId = 0
     let isActive = true
     const timeouts: NodeJS.Timeout[] = []
@@ -223,9 +229,9 @@ function FallingMeteor() {
       isActive = false
       timeouts.forEach(t => clearTimeout(t))
     }
-  }, [])
+  }, [reduced])
 
-  if (!fallingMeteor || !fallingMeteor.active) return null
+  if (reduced || !fallingMeteor || !fallingMeteor.active) return null
   return (
     <div
       key={`meteor-${fallingMeteor.id}`}
@@ -290,8 +296,10 @@ function FallingMeteor() {
 function GolemSpawn() {
   const [golemPhase, setGolemPhase] = useState<'waiting' | 'meteor' | 'explosion' | 'assembling' | 'final'>('waiting')
   const [hideAssembly, setHideAssembly] = useState(false)
+  const reduced = useReducedMotion()
 
   useEffect(() => {
+    if (reduced) return
     const timeouts: NodeJS.Timeout[] = []
 
     // Phase 1: Meteor falls (starts after 2s, lasts 1.5s)
@@ -310,9 +318,13 @@ function GolemSpawn() {
     timeouts.push(setTimeout(() => setHideAssembly(true), 7000))
 
     return () => timeouts.forEach(t => clearTimeout(t))
-  }, [])
+  }, [reduced])
 
-  if (golemPhase === 'waiting') return null
+  // Under reduced motion the golem stands from the start: no meteor, explosion or assembly plays.
+  const phase = reduced ? 'final' : golemPhase
+  const assemblyDone = reduced || hideAssembly
+
+  if (phase === 'waiting') return null
   return (
     <div
       style={{
@@ -326,7 +338,7 @@ function GolemSpawn() {
       }}
     >
       {/* PHASE 1: METEOR FALLING - diagonal, starts small and grows */}
-      {golemPhase === 'meteor' && (
+      {phase === 'meteor' && (
         <div
           style={{
             position: 'absolute',
@@ -361,10 +373,10 @@ function GolemSpawn() {
       )}
 
       {/* PHASE 2: EXPLOSION */}
-      {(golemPhase === 'explosion' || golemPhase === 'assembling' || golemPhase === 'final') && (
+      {(phase === 'explosion' || phase === 'assembling' || phase === 'final') && (
         <>
           {/* Explosion flash - only during explosion phase */}
-          {golemPhase === 'explosion' && (
+          {phase === 'explosion' && (
             <div style={{
               position: 'absolute',
               left: '80px',
@@ -411,7 +423,7 @@ function GolemSpawn() {
       )}
 
       {/* PHASE 3: ROCK ASSEMBLY - stays visible until final golem fades in */}
-      {(golemPhase === 'assembling' || golemPhase === 'explosion' || (golemPhase === 'final' && !hideAssembly)) && (
+      {(phase === 'assembling' || phase === 'explosion' || (phase === 'final' && !assemblyDone)) && (
         <>
           {/* Emergence glow */}
           <div style={{
@@ -436,7 +448,7 @@ function GolemSpawn() {
               left: '-10px',
               top: '0px',
               overflow: 'visible',
-              opacity: (golemPhase === 'assembling' || golemPhase === 'final') ? 1 : 0,
+              opacity: (phase === 'assembling' || phase === 'final') ? 1 : 0,
               transition: 'opacity 0.5s ease',
             }}
           >
@@ -454,7 +466,7 @@ function GolemSpawn() {
       )}
 
       {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
-      {golemPhase === 'final' && (
+      {phase === 'final' && (
         <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} 1s ease-out forwards` }}>
           <InfernalGolemSVG id="final" />
         </div>
