@@ -5,6 +5,7 @@ import { cvPath, defaultLocale, isLocale, type Locale } from '@/i18n/config'
 import { pageMetadata } from '@/lib/seo'
 import { ProfilePageJsonLd } from '@/components/seo/ProfilePageJsonLd'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
+import { yearOf } from '@/lib/cv/cvView'
 import { CVContent } from './cv/CVContent'
 
 // The CV page of one language, shared by /cv (English) and /es/cv, /it/cv. The language comes from the
@@ -27,7 +28,7 @@ export async function CVPage({ locale }: Readonly<{ locale: Locale }>) {
   const cv = await getAllCVData(locale)
 
   return (
-    <CVDataProvider cv={cv}>
+    <CVDataProvider cv={cv} year={yearOf(new Date())}>
       <ProfilePageJsonLd cv={cv} path={cvPath(locale)} />
       <CVContent locale={locale} />
     </CVDataProvider>

@@ -6,6 +6,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData } from '@/lib/cv/content'
+import { yearOf } from '@/lib/cv/cvView'
 import type { Locale } from '@/i18n/config'
 
 interface WrapperProps {
@@ -79,7 +80,9 @@ function renderWithCV(
 ): RenderResult {
   const Wrapper = ({ children }: WrapperProps) => (
     <AllProviders>
-      <CVDataProvider cv={cv}>{children}</CVDataProvider>
+      <CVDataProvider cv={cv} year={yearOf(new Date())}>
+        {children}
+      </CVDataProvider>
     </AllProviders>
   )
   return render(ui, { wrapper: Wrapper, ...options })

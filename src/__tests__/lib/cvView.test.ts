@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData, type Job, type Project } from '@/lib/cv/content'
-import { viewFor } from '@/lib/cv/cvView'
+import { viewFor, yearOf } from '@/lib/cv/cvView'
 
 // The real Decap files, so every fixture has the shape and the strings the page reads.
 const realCV = (): CVData =>
@@ -15,7 +15,8 @@ const realCV = (): CVData =>
     'en',
   )
 
-const NOW = new Date('2026-10-21T12:00:00Z')
+// The year the five year cut reads, as the page and useYearNow hand it to viewFor.
+const NOW = yearOf(new Date('2026-10-21T12:00:00Z'))
 
 const realJob = (cv: CVData, id: string): Job => {
   const job = cv.workExperience.find((entry) => entry.id === id)
@@ -142,6 +143,14 @@ describe('viewFor: System Engineer', () => {
   })
 })
 
+describe('yearOf', () => {
+  it('reads the year in UTC, so a clock behind UTC on 31 December already counts the new year', () => {
+    expect(yearOf(new Date('2026-12-31T20:00:00-05:00'))).toBe(2027)
+    expect(yearOf(new Date('2027-01-01T00:00:00Z'))).toBe(2027)
+    expect(yearOf(new Date('2026-12-31T23:59:59Z'))).toBe(2026)
+  })
+})
+
 describe('viewFor: the five year cut in a world', () => {
   it('keeps a job that ended in 2021 and drops one that ended in 2020', () => {
     const { jobs } = engineerOf(viewFor(smallCV(), 'engineer', 'world', NOW))
@@ -149,10 +158,13 @@ describe('viewFor: the five year cut in a world', () => {
     expect(ids(jobs)).not.toContain('ended-2020')
   })
 
-  it('moves the boundary with the clock', () => {
-    const { jobs } = engineerOf(viewFor(smallCV(), 'engineer', 'world', new Date('2027-01-15T12:00:00Z')))
-    expect(ids(jobs)).not.toContain('ended-2021')
-    expect(ids(jobs)).toContain('dba-staff')
+  it('moves the boundary on 1 January in UTC', () => {
+    const lastDay = engineerOf(viewFor(smallCV(), 'engineer', 'world', yearOf(new Date('2026-12-31T23:59:00Z')))).jobs
+    const firstDay = engineerOf(viewFor(smallCV(), 'engineer', 'world', yearOf(new Date('2027-01-01T00:00:00Z')))).jobs
+
+    expect(ids(lastDay)).toContain('ended-2021')
+    expect(ids(firstDay)).not.toContain('ended-2021')
+    expect(ids(firstDay)).toContain('dba-staff')
   })
 
   it('keeps an old job marked highlight', () => {

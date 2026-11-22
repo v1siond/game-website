@@ -47,7 +47,8 @@ export interface CVView {
 // 2021 or later. Older entries stay on /cv, and a highlight is shown whatever its age.
 export const RECENT_WORK_YEARS = 5
 
-const recentSince = (now: Date): number => now.getUTCFullYear() - RECENT_WORK_YEARS
+/** The calendar year a clock reads in UTC: the one year the server render, useYearNow and the cut share. */
+export const yearOf = (now: Date): number => now.getUTCFullYear()
 
 // Whether an entry belongs in the view: everything on /cv; in a world, current, recent or a highlight.
 type Keep = (entry: { current: boolean; highlight: boolean }, endYear: number | null) => boolean
@@ -63,9 +64,9 @@ const keepRecent =
     return endYear >= since
   }
 
-const KEEP_FOR_MODE: Record<CVViewMode, (now: Date) => Keep> = {
+const KEEP_FOR_MODE: Record<CVViewMode, (year: number) => Keep> = {
   full: () => keepAll,
-  world: (now) => keepRecent(recentSince(now)),
+  world: (year) => keepRecent(year - RECENT_WORK_YEARS),
 }
 
 // Newest first. A current entry has no end, so it sorts after every dated one; an undated one sorts last.
@@ -133,15 +134,15 @@ const heroFor = ({ fullName, professionalSummary, contact }: CVData): RecruiterH
 
 /**
  * The view one world (or /cv) renders for a profession. An unknown profession id opens the default one,
- * so a stale `?profession=` or stored value still renders a page. `now` is the clock the five year cut
- * reads, injectable for tests.
+ * so a stale `?profession=` or stored value still renders a page. `year` is the year the five year cut
+ * counts back from (yearOf), passed in so the server render and the hydrating client cut the same entries.
  */
-export function viewFor(cv: CVData, profession: string, mode: CVViewMode, now: Date = new Date()): CVView {
+export function viewFor(cv: CVData, profession: string, mode: CVViewMode, year: number): CVView {
   const picked = isProfession(profession) ? profession : DEFAULT_PROFESSION
   return {
     profession: picked,
     hero: heroFor(cv),
-    sections: SECTIONS_FOR[picked](cv, KEEP_FOR_MODE[mode](now)),
+    sections: SECTIONS_FOR[picked](cv, KEEP_FOR_MODE[mode](year)),
   }
 }
 

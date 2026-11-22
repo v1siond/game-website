@@ -4,6 +4,7 @@ import { latestPosts } from '@/lib/blog/posts'
 import { pageMetadata } from '@/lib/seo'
 import { ProfilePageJsonLd } from '@/components/seo/ProfilePageJsonLd'
 import { CVDataProvider } from '@/components/cv/CVDataProvider'
+import { yearOf } from '@/lib/cv/cvView'
 import { BlogProvider } from '@/components/blog/BlogProvider'
 import { WORLD_PENDING_SCRIPT } from '@/themes/worldPending'
 import { WorldRenderer } from './WorldRenderer'
@@ -18,12 +19,13 @@ export async function generateMetadata(): Promise<Metadata> {
 // The worlds are written in English only (see the site layout), so the site loads the English CV once
 // and every world reads it from the provider, and the latest posts beside it (drafts only on the dev
 // server). The server renders the default world in full, so its CV text is in the HTML crawlers read;
-// the inline script hides it only for a visitor who picked another one.
+// the inline script hides it only for a visitor who picked another one. The page is built once per deploy,
+// so the year it renders with is the build's; the client moves to its own clock after hydration.
 export default async function Home() {
   const [cv, posts] = await Promise.all([getAllCVData('en'), latestPosts(LATEST_POSTS, { env: process.env.NODE_ENV })])
 
   return (
-    <CVDataProvider cv={cv}>
+    <CVDataProvider cv={cv} year={yearOf(new Date())}>
       <BlogProvider posts={posts}>
         <ProfilePageJsonLd cv={cv} path={'/'} />
         <script dangerouslySetInnerHTML={{ __html: WORLD_PENDING_SCRIPT }} />

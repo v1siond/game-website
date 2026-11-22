@@ -8,6 +8,7 @@ import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { useYearNow } from '@/hooks/useYearNow'
 import { ZoneStageProvider } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { TRAIL_VARS } from './AdventurePaths/palette'
@@ -39,6 +40,7 @@ export default function AdventurePathsTheme() {
   const { fullName } = useCVData()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
+  const year = useYearNow()
   const pointerRef = usePointerVars(!reducedMotion)
   const [zone, setZone] = useState<Zone>('plains')
   const onZone = useCallback((next: Zone) => setZone(next), [])
@@ -76,7 +78,7 @@ export default function AdventurePathsTheme() {
         <RecruiterHero
           render={({ name }) => (
             <p className="inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-sm text-white">
-              © {new Date().getFullYear()} <NameWords name={name} />
+              © {year} <NameWords name={name} />
             </p>
           )}
         />
