@@ -132,6 +132,7 @@ function useHub(active: Profession) {
   const [visited, setVisited] = useState<ReadonlySet<Profession>>(() => new Set())
   const [acting, setActing] = useState(false)
   const actTimer = useRef(0)
+  const enterTimer = useRef(0)
 
   /** He plays his profession's action for a moment: on arrival, and when the visitor points at him. */
   const act = useCallback(() => {
@@ -140,7 +141,13 @@ function useHub(active: Profession) {
     actTimer.current = window.setTimeout(() => setActing(false), ACT_MS)
   }, [])
 
-  useEffect(() => () => window.clearTimeout(actTimer.current), [])
+  useEffect(
+    () => () => {
+      window.clearTimeout(actTimer.current)
+      window.clearTimeout(enterTimer.current)
+    },
+    [],
+  )
 
   const arrive = useCallback((target: Profession) => {
     at.current = target
@@ -151,7 +158,7 @@ function useHub(active: Profession) {
 
   const enter = useCallback((target: Profession) => {
     setEntering(target)
-    window.setTimeout(() => setEntering(null), ENTER_MS)
+    enterTimer.current = window.setTimeout(() => setEntering(null), ENTER_MS)
   }, [])
 
   const goTo = useCallback(
