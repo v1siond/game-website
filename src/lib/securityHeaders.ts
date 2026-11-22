@@ -32,7 +32,8 @@ const UPGRADE: Directives = { 'upgrade-insecure-requests': [] }
 /** The policy of every page. Each source and why:
  *  - default-src 'self': fonts (next/font serves them), the music in public/music, the manifest.
  *  - script-src 'self' 'unsafe-inline': the Next chunks and its inline flight scripts, the home page's
- *    world pending script, the JSON-LD; Netlify's badge script is served from the site's own origin.
+ *    world pending and world preload scripts, the JSON-LD; Netlify's badge script is served from the
+ *    site's own origin.
  *  - style-src 'self' 'unsafe-inline': the CSS files, React style props and styled-jsx (the CV print
  *    styles), the badge's srcdoc frame.
  *  - img-src 'self' data: blob:: the world previews and sprites, inline SVG data URLs, and the canvas the

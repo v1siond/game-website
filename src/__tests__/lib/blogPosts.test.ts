@@ -1,4 +1,5 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getPost, latestPosts, listPosts } from '@/lib/blog/posts'
@@ -26,25 +27,46 @@ const meta = (slug: string, date: string, draft: boolean): Partial<PostMeta> => 
   draft,
 })
 
-let dir: string
+type PostFile = { name: string; text: string }
 
-const writePosts = (posts: Partial<PostMeta>[]): Promise<void[]> =>
-  Promise.all(posts.map((post) => writeFile(join(dir, `${post.slug}.md`), decapFile(post, `## ${post.title}\n\nBody of ${post.slug}.`))))
+const postFile = (post: Partial<PostMeta>): PostFile => ({
+  name: `${post.slug}.md`,
+  text: decapFile(post, `## ${post.title}\n\nBody of ${post.slug}.`),
+})
 
 const slugs = (posts: { slug: string }[]): string[] => posts.map((post) => post.slug)
 
-beforeEach(async () => {
-  dir = await mkdtemp(join(tmpdir(), 'blog-'))
-})
+// Every case's folder is written once, synchronously, while the module loads. Jest gives each hook and
+// test 5 s, and a file system call made inside one (a mkdtemp in /tmp per test, then the writes and the
+// rm) waits on the machine's disk: when other builds and suites saturate it, that wait passed 5 s and
+// failed a hook. The folders are never written after this, so no case sees another's files.
+const ROOT = mkdtempSync(join(tmpdir(), 'blog-'))
 
-afterEach(async () => {
-  await rm(dir, { recursive: true, force: true })
-})
+const folder = (name: string, files: PostFile[]): string => {
+  const dir = join(ROOT, name)
+  mkdirSync(dir, { recursive: true })
+  files.forEach((file) => writeFileSync(join(dir, file.name), file.text))
+  return dir
+}
+
+const LISTED_POSTS = [meta('older', '2026-01-05', false), meta('draft', '2026-12-01', true), meta('newest', '2026-10-20', false), meta('middle', '2026-03-15', false)].map(postFile)
+const LISTED = folder('listed', LISTED_POSTS)
+const BROKEN = folder('broken', [...LISTED_POSTS, { name: 'broken.md', text: decapFile({ title: 'No slug', date: '2026-01-01' }, 'Body') }])
+const GOT = folder('got', [
+  postFile(meta('published', '2026-01-05', false)),
+  postFile(meta('draft', '2026-02-01', true)),
+  { name: 'labels.md', text: decapFile(meta('labels', '2026-01-05', false), 'Outside the blog.') },
+  { name: 'renamed.md', text: decapFile(meta('original', '2026-01-05', false), 'Body') },
+])
+const GOT_BLOG = folder('got/blog', [])
+const NONE = folder('none', [])
+const ONE = folder('one', [postFile(meta('only', '2026-04-01', false))])
+const FOUR = folder('four', [meta('a', '2026-01-01', false), meta('b', '2026-02-01', false), meta('c', '2026-03-01', false), meta('d', '2026-04-01', false)].map(postFile))
+
+afterAll(() => rmSync(ROOT, { recursive: true, force: true }))
 
 describe('listPosts', () => {
-  beforeEach(() =>
-    writePosts([meta('older', '2026-01-05', false), meta('draft', '2026-12-01', true), meta('newest', '2026-10-20', false), meta('middle', '2026-03-15', false)]),
-  )
+  const dir = LISTED
 
   it('lists the published posts newest first and hides drafts in production', async () => {
     expect(slugs(await listPosts({ env: 'production', dir }))).toEqual(['newest', 'middle', 'older'])
@@ -81,13 +103,12 @@ describe('listPosts', () => {
   })
 
   it('names the file whose front matter lacks a field', async () => {
-    await writeFile(join(dir, 'broken.md'), decapFile({ title: 'No slug', date: '2026-01-01' }, 'Body'))
-    await expect(listPosts({ env: 'production', dir })).rejects.toThrow('content/blog/broken.md: missing slug, description, keyword')
+    await expect(listPosts({ env: 'production', dir: BROKEN })).rejects.toThrow('content/blog/broken.md: missing slug, description, keyword')
   })
 })
 
 describe('getPost', () => {
-  beforeEach(() => writePosts([meta('published', '2026-01-05', false), meta('draft', '2026-02-01', true)]))
+  const dir = GOT
 
   it('finds a published post by its slug in production', async () => {
     expect((await getPost('published', { env: 'production', dir }))?.title).toBe('Post published')
@@ -109,35 +130,29 @@ describe('getPost', () => {
   })
 
   it('never reads outside the blog folder', async () => {
-    const blog = join(dir, 'blog')
-    await mkdir(blog)
-    await writeFile(join(dir, 'labels.md'), decapFile(meta('labels', '2026-01-05', false), 'Outside the blog.'))
     jest.mocked(readFile).mockClear()
-    expect(await getPost('../labels', { env: 'production', dir: blog })).toBeNull()
+    expect(await getPost('../labels', { env: 'production', dir: GOT_BLOG })).toBeNull()
     expect(jest.mocked(readFile)).not.toHaveBeenCalled()
   })
 
   it('gives null when the file names another slug than its own', async () => {
-    await writeFile(join(dir, 'renamed.md'), decapFile(meta('original', '2026-01-05', false), 'Body'))
     expect(await getPost('renamed', { env: 'production', dir })).toBeNull()
   })
 })
 
 describe('latestPosts', () => {
   it('gives no post when there are none', async () => {
-    expect(await latestPosts(3, { env: 'production', dir })).toEqual([])
+    expect(await latestPosts(3, { env: 'production', dir: NONE })).toEqual([])
   })
 
   it('gives the one post there is, without its body', async () => {
-    await writePosts([meta('only', '2026-04-01', false)])
-    expect(await latestPosts(3, { env: 'production', dir })).toEqual([
+    expect(await latestPosts(3, { env: 'production', dir: ONE })).toEqual([
       { slug: 'only', title: 'Post only', date: '2026-04-01', description: 'About only', draft: false },
     ])
   })
 
   it('gives the newest 3 of 4 posts', async () => {
-    await writePosts([meta('a', '2026-01-01', false), meta('b', '2026-02-01', false), meta('c', '2026-03-01', false), meta('d', '2026-04-01', false)])
-    expect(slugs(await latestPosts(3, { env: 'production', dir }))).toEqual(['d', 'c', 'b'])
+    expect(slugs(await latestPosts(3, { env: 'production', dir: FOUR }))).toEqual(['d', 'c', 'b'])
   })
 })
 
