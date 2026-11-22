@@ -136,12 +136,8 @@ export const BugPullReveal = memo(function BugPullReveal({
   }, [phase])
 
   useEffect(() => {
-    if (!triggered || hasAnimated.current) {
-      if (!triggered && !hasAnimated.current) {
-        setPhase('idle')
-      }
-      return
-    }
+    // The trigger fires once, so the reveal plays once and the phase starts idle
+    if (!triggered || hasAnimated.current) return
 
     hasAnimated.current = true
     setPhase('alex-enters')

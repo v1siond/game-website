@@ -309,15 +309,8 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
   const { ref: stageRef, inView } = useSectionTrigger(COMBAT_IN_VIEW)
 
   useEffect(() => {
-    if (!triggered || hasAnimated.current) {
-      if (!triggered) {
-        // Only reset if we haven't animated yet
-        if (!hasAnimated.current) {
-          setPhase('idle')
-        }
-      }
-      return
-    }
+    // The trigger fires once, so the reveal plays once and the phase starts idle
+    if (!triggered || hasAnimated.current) return
 
     // Mark as animated so we don't replay
     hasAnimated.current = true

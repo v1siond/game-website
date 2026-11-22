@@ -158,13 +158,8 @@ export const BattleReveal = memo(function BattleReveal({
 
   // Trigger animation sequence
   useEffect(() => {
-    if (!triggered || hasAnimated.current) {
-      // Only reset if we haven't animated yet
-      if (!triggered && !hasAnimated.current) {
-        setPhase('idle')
-      }
-      return
-    }
+    // The trigger fires once, so the reveal plays once and the phase starts idle
+    if (!triggered || hasAnimated.current) return
 
     // Mark as animated so we don't replay
     hasAnimated.current = true
