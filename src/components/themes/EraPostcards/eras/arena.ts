@@ -4,12 +4,16 @@ import { courier, joints, setPose, type Pose } from '../courier'
 import { reached, type Era } from './era'
 
 // Bands: the neon arena, 1985. He drums: the sticks, the cymbal and the hi hat follow the scroll; a screen
-// per band lights on the back wall; the beams sweep, the crowd jumps, confetti falls.
+// per band lights on the back wall; the beams sweep, the crowd jumps, confetti falls. He sits on a drum
+// throne whose cushion is under his hips (about 862,694) and whose legs stand on the stage (812).
 
 const SCREEN_TINTS = [ARENA.pink, ARENA.cyan, ARENA.gold, ARENA.lime] as const
 const BEAMS = [260, 520, 800, 1080, 1340] as const
 
 const stick = `<rect x="-2.5" y="20" width="5" height="62" rx="2.5" fill="${ARENA.stick}" transform="rotate(-70 0 31)"/>`
+
+const throne = `<g><path d="M860,708 L860,800 M860,790 L832,814 M860,790 L888,814" stroke="${ARENA.stand}" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="860" cy="704" rx="34" ry="10" fill="${ARENA.throne}" stroke="${ARENA.drumEdge}" stroke-width="3"/></g>`
 
 const beat = (p: number): number => p * 48
 
@@ -46,7 +50,7 @@ export const arena: Era = {
       mid: svg(`<rect x="-200" y="820" width="2000" height="200" fill="${ARENA.stage}"/><rect x="-200" y="812" width="2000" height="10" fill="${ARENA.stageEdge}"/>
         ${[200, 1340].map((x) => `<g transform="translate(${x} 0)"><rect x="0" y="560" width="120" height="252" fill="${ARENA.speaker}" stroke="${ARENA.speakerEdge}" stroke-width="4"/>${[600, 690, 760].map((y) => `<circle cx="60" cy="${y}" r="${y === 760 ? 34 : 26}" fill="${ARENA.cone}" stroke="${ARENA.coneEdge}" stroke-width="4"/>`).join('')}</g>`).join('')}`),
       near: svg(`<g data-fx="confetti">${Array.from({ length: 50 }, (_, i) => `<rect x="${((i * 131) % 1700) - 50}" y="${((i * 71) % 1400) - 900}" width="8" height="14" fill="${SCREEN_TINTS[i % 4]}" transform="rotate(${i * 33} ${((i * 131) % 1700) - 50} ${((i * 71) % 1400) - 900})"/>`).join('')}</g>`),
-      figure: svg(`${courier(drumPose(0), { held: stick, heldBack: stick })}${kit}`),
+      figure: svg(`${throne}${courier(drumPose(0), { held: stick, heldBack: stick })}${kit}`),
       fg: svg(crowd),
     }
   },

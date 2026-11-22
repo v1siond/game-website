@@ -176,6 +176,9 @@ export const HIGHWAY = {
   bike: '#d94a6a',
   bikeEdge: '#2a0e3f',
   bikeShine: '#ffd1dc',
+  seat: '#1a0b2e',
+  seatShine: '#5b2a6e',
+  wheel: '#2a0e3f',
   thrust: '#55f2ff',
 } as const
 
@@ -333,6 +336,7 @@ export const ARENA = {
   brass: '#ffd36b',
   brassEdge: '#a87a1a',
   stand: '#c9c2e0',
+  throne: '#1a0a2e',
   stick: '#f5deb3',
   crowd: '#06020d',
   cyan: '#55f2ff',

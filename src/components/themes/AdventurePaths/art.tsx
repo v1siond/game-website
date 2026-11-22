@@ -76,27 +76,22 @@ const TILE_FILL: Record<TileKind, string> = {
   secret: 'url(#ap-red)',
 }
 
-/**
- * A level tile: a round stone set in the ground with a ring of ink and a lit rim. `className` lets a scene
- * fade it in (its reveal) without touching its colour.
- */
+/** A level tile: a round stone set in the ground with a ring of ink and a lit rim. */
 export function LevelTile({
   x,
   y,
   r = 13,
   kind,
-  className,
   children,
 }: {
   x: number
   y: number
   r?: number
   kind: TileKind
-  className?: string
   children?: ReactNode
 }) {
   return (
-    <g className={`${map.tile} ${className ?? ''}`}>
+    <g className={map.tile}>
       <ellipse cx={x} cy={y + r * 0.45} rx={r * 1.15} ry={r * 0.55} fill={TRAIL.INK} opacity={0.28} />
       <circle cx={x} cy={y} r={r} fill={TILE_FILL[kind]} stroke={TRAIL.INK} strokeWidth={2.4} />
       <ellipse cx={x - r * 0.3} cy={y - r * 0.35} rx={r * 0.38} ry={r * 0.22} fill={TRAIL.PAGE} opacity={0.7} />
@@ -105,18 +100,8 @@ export function LevelTile({
   )
 }
 
-/** The dotted trail: an ink dot every step, each carrying its place along the trail for the reveal. */
-export function TrailDots({
-  dots,
-  leg = 0,
-  className = map.dot,
-  r = 4,
-}: {
-  dots: TrailDot[]
-  leg?: number
-  className?: string
-  r?: number
-}) {
+/** The dotted trail: an ink dot every step. */
+export function TrailDots({ dots, r = 4 }: { dots: TrailDot[]; r?: number }) {
   return (
     <g>
       {dots.map((dot) => (
@@ -128,15 +113,13 @@ export function TrailDots({
           fill={TRAIL.ROUTE}
           stroke={TRAIL.INK}
           strokeWidth={1.2}
-          className={className}
-          style={cssVars({ '--at': dot.at, '--leg': leg })}
         />
       ))}
     </g>
   )
 }
 
-/** The trail's worn bed under the dots, so the path reads even before it is dotted in. */
+/** The trail's worn bed under the dots. */
 export function TrailBed({ trail, width = 14 }: { trail: Trail; width?: number }) {
   return (
     <g fill="none" strokeLinecap="round" strokeLinejoin="round">

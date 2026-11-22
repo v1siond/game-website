@@ -31,7 +31,7 @@ export const PREVIEW_IMAGE = { url: '/opengraph-image', width: 1200, height: 630
 
 type SeoFacts = Pick<CVData, 'fullName' | 'professionalSummary' | 'contact' | 'techStack' | 'labels'>
 
-/** The role part of the headline: "X Engineer with 10+ years of proven success" gives "X Engineer". */
+/** The role part of the headline: "Senior Staff Full-Stack & AI Systems Engineer with 10+ years of proven success" gives "Senior Staff Full-Stack & AI Systems Engineer". */
 export function shortRole(headline: string): string {
   return headline.split(/\s+with\s+/i)[0].trim()
 }

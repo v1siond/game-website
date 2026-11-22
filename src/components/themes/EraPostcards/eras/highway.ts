@@ -1,11 +1,12 @@
 import { HIGHWAY } from '../palette'
-import { defs, fx, glow, linear, rect, r1, stars, stripedSun, svg, tf } from '../draw'
+import { defs, fx, fxAll, glow, linear, rect, r1, stars, stripedSun, svg, tf } from '../draw'
 import { courier, joints, setPose, type Pose } from '../courier'
 import type { Era } from './era'
 
 // Work: the desert highway, 1957. A time trial on a hover bike: a mile sign per job carries the year it
 // started and passes by as its card is read; the stopwatch hand runs, the mesas, the poles and the road
-// slide at three speeds, a tumbleweed rolls across.
+// slide at three speeds, a tumbleweed rolls across. He sits on the bike's saddle with both hands on its
+// steering wheel: the saddle and the wheel are drawn behind him, the hull in front of his legs.
 
 const poles = Array.from({ length: 16 }, (_, i) => {
   const x = -200 + i * 260
@@ -20,16 +21,26 @@ const cacti = Array.from({ length: 10 }, (_, i) => {
 
 const dashes = Array.from({ length: 40 }, (_, i) => `<rect x="${i * 160}" y="872" width="80" height="8" rx="3" fill="${HIGHWAY.roadDash}"/>`).join('')
 
-const bike = `<g data-fx="bike">
+// The saddle under his hips (about 838,768) and the wheel at his hands (about 930,747) for the RIDE pose.
+const cockpit = `<g data-fx="bike-cockpit">
+  <path d="M942,750 L984,810" stroke="${HIGHWAY.wheel}" stroke-width="9" stroke-linecap="round"/>
+  <ellipse cx="934" cy="744" rx="8" ry="25" transform="rotate(-24 934 744)" fill="none" stroke="${HIGHWAY.wheel}" stroke-width="7"/>
+  <ellipse cx="934" cy="744" rx="8" ry="25" transform="rotate(-24 934 744)" fill="none" stroke="${HIGHWAY.bikeShine}" stroke-width="1.5" opacity="0.6"/>
+  <path d="M796,808 L804,780 Q810,766 836,766 L866,768 Q878,770 876,782 L870,808 Z" fill="${HIGHWAY.seat}" stroke="${HIGHWAY.bikeEdge}" stroke-width="3"/>
+  <path d="M812,772 Q836,768 864,772" stroke="${HIGHWAY.seatShine}" stroke-width="3" stroke-linecap="round" fill="none"/></g>`
+
+const bike = `<g data-fx="bike-hull">
   ${glow('wk-thrust', 690, 860, 90, HIGHWAY.thrust, 0.8)}
   <path d="M700,850 Q720,810 790,806 L930,800 Q990,800 1010,830 L1000,856 Q900,868 760,866 Z" fill="${HIGHWAY.bike}" stroke="${HIGHWAY.bikeEdge}" stroke-width="4"/>
   <path d="M780,812 L900,806" stroke="${HIGHWAY.bikeShine}" stroke-width="4" stroke-linecap="round"/>
-  <ellipse cx="760" cy="872" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/><ellipse cx="960" cy="868" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/>
-  <path d="M985,812 l30,-30" stroke="${HIGHWAY.bikeEdge}" stroke-width="6" stroke-linecap="round"/></g>`
+  <ellipse cx="760" cy="872" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/><ellipse cx="960" cy="868" rx="44" ry="8" fill="${HIGHWAY.thrust}" opacity="0.7"/></g>`
 
 const RIDE: Partial<Pose> = { x: 850, scale: 1.15, lean: 18, hipF: 88, hipB: 80, kneeF: -96, kneeB: -100, shF: 72, shB: 66, elF: 18, elB: 22, head: -6 }
 
-const ridePose = (p: number): Partial<Pose> => ({ ...RIDE, y: 818 + Math.sin(p * 60) * 3, scarf: -16 + Math.sin(p * 40) * 8 })
+// The bob of the bike and its rider on the air cushion.
+const bob = (p: number): number => Math.sin(p * 60) * 3
+
+const ridePose = (p: number): Partial<Pose> => ({ ...RIDE, y: 870 + bob(p), scarf: -16 + Math.sin(p * 40) * 8 })
 
 export const highway: Era = {
   build: ({ years }) => {
@@ -54,7 +65,7 @@ export const highway: Era = {
         <g data-fx="poles">${poles}${cacti}</g>`),
       near: svg(`<rect x="-200" y="820" width="2000" height="120" fill="${HIGHWAY.road}"/><rect x="-200" y="820" width="2000" height="5" fill="${HIGHWAY.roadEdge}"/><rect x="-200" y="932" width="2000" height="4" fill="${HIGHWAY.roadEdge}" opacity="0.6"/>
         <g data-fx="dashes">${dashes}</g><rect x="-200" y="936" width="2000" height="80" fill="${HIGHWAY.shoulder}"/>${signs}`),
-      figure: svg(`${courier(ridePose(0))}${bike}`),
+      figure: svg(`${cockpit}${courier(ridePose(0))}${bike}`),
       fg: svg(`<g data-fx="dust" opacity="0.6">${Array.from({ length: 30 }, (_, i) => `<rect x="${(i * 211) % 4800}" y="${600 + ((i * 97) % 380)}" width="${60 + (i % 5) * 30}" height="2" fill="${HIGHWAY.dust}"/>`).join('')}</g>
         <g data-fx="weed" transform="translate(1700 960)"><circle r="34" fill="none" stroke="${HIGHWAY.weed}" stroke-width="5" stroke-dasharray="12 6"/><circle r="20" fill="none" stroke="${HIGHWAY.weed}" stroke-width="4" stroke-dasharray="8 5"/></g>`),
     }
@@ -62,7 +73,8 @@ export const highway: Era = {
   bind: (stage, { count }) => {
     const j = joints(stage)
     const signs = Array.from({ length: count }, (_, i) => fx(stage, `sign-${i}`))
-    const [mesas, polesNode, dashNode, dust, weed, bikeNode, hand] = ['mesas', 'poles', 'dashes', 'dust', 'weed', 'bike', 'hand'].map((name) => fx(stage, name))
+    const [mesas, polesNode, dashNode, dust, weed, hand] = ['mesas', 'poles', 'dashes', 'dust', 'weed', 'hand'].map((name) => fx(stage, name))
+    const bikeParts = fxAll(stage, 'bike-')
     return (p, f) => {
       const travel = p + f * 0.25
       tf(mesas, `translate(${r1(-travel * 160)} 0)`)
@@ -72,7 +84,7 @@ export const highway: Era = {
       tf(weed, `translate(${r1(1700 - travel * 2200)} ${r1(960 - Math.abs(Math.sin(travel * 18)) * 30)}) rotate(${r1(-travel * 1400)})`)
       tf(hand, `rotate(${r1(f * 90 + p * 360)})`)
       signs.forEach((sign, i) => tf(sign, `translate(${r1(1180 - (f - i) * 820)} 0)`))
-      tf(bikeNode, `translate(0 ${r1(Math.sin(p * 60) * 3)})`)
+      bikeParts.forEach((part) => tf(part, `translate(0 ${r1(bob(p))})`))
       setPose(j, ridePose(p))
     }
   },
