@@ -6,12 +6,6 @@
  * loop plays a set number of times from its scene's start and rests within 5 s.
  */
 
-/* A scene that plays from the moment it is in view (the isle on show, a section's stage, a cue in
-   stages.tsx): until it carries data-on every part of it stands on its first frame. */
-.cue:not([data-on]) * {
-  animation-play-state: paused !important;
-}
-
 .ko,
 .shop,
 .theatre,

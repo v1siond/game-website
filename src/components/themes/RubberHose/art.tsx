@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { NameWords } from '@/components/cv/NameWords'
-import { Cue } from './cue'
+import { InView } from '@/components/themes/shared/held'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
@@ -147,6 +147,10 @@ function BouncingBalls() {
   )
 }
 
+// A scene outside the section stages (the profession switch, an art break, his set, the map run) plays
+// once 0.3 of it is on screen.
+export const CUE_THRESHOLD = 0.3
+
 export type ArtBreakKind = 'singAlong' | 'bouncingBalls'
 
 const ART_BREAKS: Record<ArtBreakKind, () => ReactNode> = {
@@ -157,8 +161,8 @@ const ART_BREAKS: Record<ArtBreakKind, () => ReactNode> = {
 export function ArtBreak({ kind }: { kind: ArtBreakKind }) {
   const Break = ART_BREAKS[kind]
   return (
-    <Cue>
+    <InView threshold={CUE_THRESHOLD}>
       <Break />
-    </Cue>
+    </InView>
   )
 }

@@ -16,7 +16,7 @@ import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { HOSE, HOSE_VARS } from './RubberHose/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { FilmFrame, FilmGrain, RisingNotes } from './RubberHose/backdrop'
-import { CartoonTitle } from './RubberHose/art'
+import { CUE_THRESHOLD, CartoonTitle } from './RubberHose/art'
 import { CartoonCharacter } from './RubberHose/selector'
 import { HoseLink } from './RubberHose/actions'
 import { SECTION_VIEWS } from './RubberHose/sections'
@@ -24,7 +24,7 @@ import { IrisWipe, SunWatcher, TitleCardIntro } from './RubberHose/scenes'
 import { staggerAt } from './shared/stagger'
 import { ProfessionSet } from './RubberHose/sets'
 import { IsleStage, Isles, type Isle } from './RubberHose/isles'
-import { Cue } from './RubberHose/cue'
+import { InView } from './shared/held'
 import { HeroCharacter } from './RubberHose/cup'
 import { headingId } from '@/lib/cv/sectionText'
 import world from './RubberHose/world.module.css'
@@ -118,13 +118,13 @@ export default function RubberHoseTheme() {
 
           {/* the profession switch, a row of cast badges with him in each costume */}
           <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
-            <Cue>
+            <InView threshold={CUE_THRESHOLD}>
               <ProfessionSwitch
                 className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
                 label={navigation.profession}
                 renderOption={(option) => <CartoonCharacter {...option} />}
               />
-            </Cue>
+            </InView>
           </section>
 
           <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">

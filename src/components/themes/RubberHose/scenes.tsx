@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { usePreview } from '@/themes/PreviewContext'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import { cssVars } from '@/lib/cssVars'
 import type { Profession } from '@/lib/cv/professions'
 import { IrisRing, PieEyes } from './art'
@@ -73,15 +74,15 @@ export function TitleCardIntro({ children }: { children: (look: IntroLook) => Re
 }
 
 // overflow-clip, not hidden: hidden would make the wipe a scroll container and stop the run bar inside
-// it from sticking to the viewport. The iris opens once the wipe is in view (the shared section trigger),
+// it from sticking to the viewport. The iris waits shut (heldUntil) and opens once the wipe is in view,
 // so the first one, below the first screen, is not played unseen as the page loads.
 export function IrisWipe({ children }: { children: ReactNode }) {
   const { ref, triggered } = useSectionTrigger()
 
   return (
-    <div ref={ref} data-on={triggered || undefined} className={`relative overflow-clip ${styles.scene} ${styles.wipe}`}>
+    <div ref={ref} className={`relative overflow-clip ${styles.scene}`}>
       {children}
-      <IrisRing className={`z-30 ${styles.iris} ${styles.irisOpen}`} />
+      <IrisRing className={`z-30 ${styles.iris} ${styles.irisOpen} ${heldUntil(triggered)}`} />
     </div>
   )
 }

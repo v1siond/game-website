@@ -30,11 +30,6 @@
   animation: irisOpen 0.9s var(--hose-bounce) both;
 }
 
-/* The scene change's iris waits shut until its wipe is in view (scenes.tsx IrisWipe). */
-.wipe:not([data-on]) > .irisOpen {
-  animation-play-state: paused;
-}
-
 @keyframes irisOpen {
   0% {
     opacity: 1;
