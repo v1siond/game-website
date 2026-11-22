@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useTimedSteps } from '@/hooks/useTimedSteps'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { MutantSprite, type MutantMotion } from './mutant'
@@ -12,8 +13,8 @@ import j from './journey.module.css'
 // once the stage is on and the ring itself is in view, for each achievement he steps in and throws a
 // clinch knee or a roundhouse (they alternate), the mutant doubles over the knee or rocks back from the
 // kick at the moment it lands, a comic burst pops at the contact point and that achievement's perk card
-// flips in. After the last one the mutant drops to one knee and he gives the thumbs up. The beats run in
-// setTimeout phases from the achievement count; `children` gets the shown count and the ring, which the
+// flips in. After the last one the mutant drops to one knee and he gives the thumbs up. The beats run as
+// the shared timed steps from the achievement count; `children` gets the shown count and the ring, which the
 // perk chart prints just above its cards. Under reduced motion every card is shown, the mutant is down
 // and he stands still.
 
@@ -96,16 +97,10 @@ interface SparProps {
 export function Spar({ count, on, children }: SparProps) {
   const { reduced } = useZoneStageContext()
   const beats = useMemo(() => sparBeats(count), [count])
-  const [step, setStep] = useState(-1)
+  const durations = useMemo(() => beats.map(({ ms }) => ms), [beats])
   // The bell rings once the ring itself is mostly in view: on a phone the record's facts come first.
   const { ref, triggered } = useSectionTrigger({ threshold: 0.6 })
-  const fighting = on && triggered
-
-  useEffect(() => {
-    if (reduced || !fighting || step >= beats.length - 1) return
-    const timer = window.setTimeout(() => setStep((at) => at + 1), step < 0 ? GUARD_MS : beats[step].ms)
-    return () => window.clearTimeout(timer)
-  }, [fighting, step, beats, reduced])
+  const step = useTimedSteps(durations, { on: on && triggered, reduced, firstMs: GUARD_MS })
 
   const beat = reduced ? settled(count) : beats[step] ?? READY
 
