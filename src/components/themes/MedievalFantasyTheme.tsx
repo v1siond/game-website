@@ -25,32 +25,34 @@ import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy
 // His outfit plate: a dark iron plaque with lifted gold lettering and a gold rim, like the realm's frames.
 const OUTFIT_LOOK: WardrobeLook = { plate: REALM.bgVoid, text: REALM.goldText, ring: REALM.goldMid }
 
+// A window 800 px tall or more spaces the sections and art dividers 4rem apart and draws the dividers
+// larger; a shorter window keeps them 3rem apart with smaller dividers. Both are built once, so the sections
+// fed a layout keep it across renders.
+const LARGE_SCREEN_HEIGHT = 800
+
+const LAYOUT: Record<'large' | 'small', SectionLayout> = {
+  large: { sectionSpacing: '4rem', artDividerMargin: '4rem', artDividerScale: 1.3 },
+  small: { sectionSpacing: '3rem', artDividerMargin: '3rem', artDividerScale: 1.1 },
+}
+
 export default function MedievalFantasyTheme() {
   const view = useWorldView()
   const { navigation, actions: actionLabels, sections } = useLabels()
   const active = view.profession
   const { cv, engine } = useSiteLinks()
   const [mounted, setMounted] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState(800)
+  const [isLargeScreen, setIsLargeScreen] = useState(true)
 
-  // Track viewport height for content visibility and animation spacing
+  // The spacing follows the window height; a resize re-renders the page only when it crosses 800 px.
   useEffect(() => {
     setMounted(true)
-    setViewportHeight(window.innerHeight)
-
-    const handleResize = () => setViewportHeight(window.innerHeight)
-    window.addEventListener('resize', handleResize, { passive: true })
-    return () => window.removeEventListener('resize', handleResize)
+    const measure = () => setIsLargeScreen(window.innerHeight >= LARGE_SCREEN_HEIGHT)
+    measure()
+    window.addEventListener('resize', measure, { passive: true })
+    return () => window.removeEventListener('resize', measure)
   }, [])
 
-  // A window 800 px tall or more spaces the sections and art dividers 4rem apart and draws the dividers
-  // larger; a shorter window keeps them 3rem apart with smaller dividers.
-  const isLargeScreen = viewportHeight >= 800
-  const layout: SectionLayout = {
-    sectionSpacing: isLargeScreen ? '4rem' : '3rem',
-    artDividerMargin: isLargeScreen ? '4rem' : '3rem',
-    artDividerScale: isLargeScreen ? 1.3 : 1.1,
-  }
+  const layout = LAYOUT[isLargeScreen ? 'large' : 'small']
   const { sectionSpacing } = layout
 
   return (

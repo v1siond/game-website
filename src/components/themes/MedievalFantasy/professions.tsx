@@ -28,12 +28,19 @@ const PROFESSION_NODE_ICONS: Record<Profession, (color: string) => ReactNode> = 
   ),
 }
 
+// The node's width and height by its place in the row and the window height.
+const NODE_SIZE: Record<'centre' | 'side', Record<'large' | 'small', string>> = {
+  centre: { large: 'clamp(5.75rem, 30vw, 8rem)', small: 'clamp(5.5rem, 30vw, 6rem)' },
+  side: { large: 'clamp(5.5rem, 28vw, 7rem)', small: '5.5rem' },
+}
+
 export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOption; isLargeScreen: boolean }) {
   const { id, label, selected, optionProps } = option
   const isCentre = id === 'engineer'
   // The three nodes share one row, so on a phone each shrinks with the width (a third of it at most) and the
   // longest label word still fits inside the border.
-  const size = isCentre ? (isLargeScreen ? 'clamp(5.75rem, 30vw, 8rem)' : 'clamp(5.5rem, 30vw, 6rem)') : (isLargeScreen ? 'clamp(5.5rem, 28vw, 7rem)' : '5.5rem')
+  const place = isCentre ? 'centre' : 'side'
+  const size = NODE_SIZE[place][isLargeScreen ? 'large' : 'small']
   const tint = selected ? REALM.chaosFelText : REALM.textMid
 
   return (

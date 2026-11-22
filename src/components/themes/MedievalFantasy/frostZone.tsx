@@ -240,7 +240,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         {/* Perspective lines (subtle, icy) */}
         <g opacity="0.06">
           {[-50, -30, -15, 0, 15, 30, 50].map((offset, i) => (
-            <line key={i} x1={500 + offset * 2} y1="150" x2={offset < 0 ? -300 : offset > 0 ? 1300 : 500} y2="850" stroke={REALM.night19a} strokeWidth="1" />
+            <line key={i} x1={500 + offset * 2} y1="150" x2={500 + Math.sign(offset) * 800} y2="850" stroke={REALM.night19a} strokeWidth="1" />
           ))}
         </g>
       </svg>

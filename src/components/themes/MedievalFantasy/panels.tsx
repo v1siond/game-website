@@ -1,7 +1,21 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { REALM } from './palette'
 
 // The heavy metal frame with gold bevels and the inner card the sections sit in, tinted per zone.
+
+// The four corner pieces: one bracket drawn for the top left corner, set 2px out on each corner and turned
+// to face it.
+const corner = (pos: string, edges: CSSProperties, turn: number) => ({
+  pos,
+  style: { position: 'absolute', zIndex: 10, ...edges, transform: `rotate(${turn}deg)` } satisfies CSSProperties,
+})
+
+const CORNERS = [
+  corner('tl', { top: '-2px', left: '-2px' }, 0),
+  corner('tr', { top: '-2px', right: '-2px' }, 90),
+  corner('bl', { bottom: '-2px', left: '-2px' }, 270),
+  corner('br', { bottom: '-2px', right: '-2px' }, 180),
+]
 
 export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactNode; title?: string; zone?: 'roc' | 'ft' }) {
   const accentColor = zone === 'ft' ? REALM.frostIceMid : REALM.chaosFelMid
@@ -9,19 +23,13 @@ export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactN
   return (
     <div style={{ position: 'relative' }}>
       {/* Corner ornaments */}
-      {['tl', 'tr', 'bl', 'br'].map((pos) => (
+      {CORNERS.map(({ pos, style }) => (
         <svg aria-hidden="true"
           key={pos}
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          style={{
-            position: 'absolute',
-            zIndex: 10,
-            ...(pos.includes('t') ? { top: '-2px' } : { bottom: '-2px' }),
-            ...(pos.includes('l') ? { left: '-2px' } : { right: '-2px' }),
-            transform: `rotate(${pos === 'tl' ? 0 : pos === 'tr' ? 90 : pos === 'bl' ? 270 : 180}deg)`,
-          }}
+          style={style}
         >
           <path d="M0 0 L24 0 L24 6 L6 6 L6 24 L0 24 Z" fill={REALM.metalMid} />
           <path d="M2 2 L20 2 L20 4 L4 4 L4 20 L2 20 Z" fill={REALM.metalLight} />

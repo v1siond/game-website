@@ -11,6 +11,40 @@ import { REALM } from './palette'
 // The world's buttons: the bevelled metal button, the language dropdown drawn for the shared
 // LanguageSwitcher, and the hero's contact actions as buttons.
 
+type RealmButtonVariant = 'default' | 'primary'
+
+// The bevelled frame every button shares, then the plate per variant: iron, or the gold Email me plate
+// with void ink. Both are built once, so a button's style keeps its identity across renders.
+const BUTTON_FRAME: CSSProperties = {
+  boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
+  fontFamily: '"Cinzel", Georgia, serif',
+  fontSize: '1.125rem',
+  fontWeight: 600,
+  textTransform: 'uppercase',
+  letterSpacing: '0.1em',
+  padding: '0.5rem 1rem',
+  minHeight: '44px',
+  cursor: 'pointer',
+  textDecoration: 'none',
+  display: 'inline-flex',
+  alignItems: 'center',
+}
+
+const BUTTON_STYLE: Record<RealmButtonVariant, CSSProperties> = {
+  default: {
+    ...BUTTON_FRAME,
+    background: `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
+    border: `2px solid ${REALM.metalDark}`,
+    color: REALM.textBright,
+  },
+  primary: {
+    ...BUTTON_FRAME,
+    background: `linear-gradient(180deg, ${REALM.goldPlate} 0%, ${REALM.goldPlateDark} 50%, ${REALM.goldPlateDeep} 100%)`,
+    border: `2px solid ${REALM.goldBright}`,
+    color: REALM.bgVoid,
+  },
+}
+
 // A button leads somewhere: inside the site through next/link, or out through an anchor's own props.
 type RealmButtonTarget = { href: string } | { linkProps: AnchorHTMLAttributes<HTMLAnchorElement> }
 
@@ -20,28 +54,9 @@ export function RealmButton({
   ...target
 }: {
   children: ReactNode
-  variant?: 'default' | 'primary'
+  variant?: RealmButtonVariant
 } & RealmButtonTarget) {
-  const style: CSSProperties = {
-    background: variant === 'primary'
-      ? `linear-gradient(180deg, ${REALM.goldPlate} 0%, ${REALM.goldPlateDark} 50%, ${REALM.goldPlateDeep} 100%)`
-      : `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
-    border: `2px solid ${variant === 'primary' ? REALM.goldBright : REALM.metalDark}`,
-    boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-    color: variant === 'primary' ? REALM.bgVoid : REALM.textBright,
-    fontFamily: '"Cinzel", Georgia, serif',
-    fontSize: '1.125rem',
-    fontWeight: 600,
-    textTransform: 'uppercase',
-    letterSpacing: '0.1em',
-    padding: '0.5rem 1rem',
-    minHeight: '44px',
-    cursor: 'pointer',
-    textDecoration: 'none',
-    display: 'inline-flex',
-    alignItems: 'center',
-  }
-
+  const style = BUTTON_STYLE[variant]
   if ('linkProps' in target) return <a {...target.linkProps} style={style}>{children}</a>
   return <Link href={target.href} style={style}>{children}</Link>
 }

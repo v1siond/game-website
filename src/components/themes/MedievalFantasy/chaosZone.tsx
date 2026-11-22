@@ -730,7 +730,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         {/* === PERSPECTIVE LINES - subtle depth like FT === */}
         <g opacity="0.04">
           {[-60, -35, -15, 0, 15, 35, 60].map((offset, i) => (
-            <line key={i} x1={500 + offset * 2} y1="180" x2={offset < 0 ? -400 : offset > 0 ? 1400 : 500} y2="850" stroke={REALM.stone11a} strokeWidth="1" />
+            <line key={i} x1={500 + offset * 2} y1="180" x2={500 + Math.sign(offset) * 900} y2="850" stroke={REALM.stone11a} strokeWidth="1" />
           ))}
         </g>
       </svg>
