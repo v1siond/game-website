@@ -5,8 +5,8 @@ import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
@@ -39,7 +39,7 @@ const neonFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display: '
 export default function NeonCyberTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions } = useLabels()
+  const { navigation } = useLabels()
   const reducedMotion = useReducedMotion()
   const [scanning, setScanning] = useState(false)
   const { zones, stage } = useZoneStore<District>('watson', reducedMotion)
@@ -63,9 +63,9 @@ export default function NeonCyberTheme() {
       </DistrictStage>
 
       <main className="relative z-20 px-4 py-6 sm:px-6">
-        <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+        <ProfessionRegion className="mx-auto max-w-6xl">
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-        </div>
+        </ProfessionRegion>
       </main>
 
       <HoloCall profession={active} />
