@@ -33,7 +33,7 @@ function Tags({ items, label }: { items: string[]; label: string }) {
   if (items.length === 0) return null
   return (
     <ul className="flex flex-wrap gap-2" aria-label={label}>
-      {items.slice(0, 5).map((item) => (
+      {items.map((item) => (
         <li key={item} className={TAG}>
           {item}
         </li>
