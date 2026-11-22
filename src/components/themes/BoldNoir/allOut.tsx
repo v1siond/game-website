@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
+import { LOOK, NOIR_BUTTON } from './actions'
 import { GlassStar, HitStar } from './backdrop'
 import { Bullet, Chips } from './cards'
 import { Detective } from './detective'
@@ -151,7 +152,7 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
           {project.role}
           {years && <span className="text-[color:var(--noir-fog)]"> | {years}</span>}
         </p>
-        <p className={`mt-4 text-base text-[color:var(--noir-paper)] ${world.copy}`}>{project.tagline}</p>
+        {project.tagline && <p className={`mt-4 text-base text-[color:var(--noir-paper)] ${world.copy}`}>{project.tagline}</p>}
         {project.description && <p className={`mt-3 text-sm text-[color:var(--noir-paper-dim)] ${world.copy}`}>{project.description}</p>}
         {project.impact && (
           <p className={`mt-4 inline-block px-3 py-1 text-base font-bold ${world.heading} ${world.copy}`}>{project.impact}</p>
@@ -169,7 +170,7 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
             <a
               key={link.kind}
               {...link.linkProps}
-              className="inline-flex min-h-[44px] items-center border-[3px] border-[color:var(--noir-paper)] bg-[color:var(--noir-paper)] px-5 py-2 text-lg uppercase tracking-widest text-[color:var(--noir-ink)] transition-transform hover:-translate-y-0.5 motion-reduce:transition-none"
+              className={`${NOIR_BUTTON} ${LOOK.paper}`}
             >
               {link.label}
             </a>

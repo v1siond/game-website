@@ -114,6 +114,9 @@ export function Stage({ zones, profession, reduced, still }: StageProps) {
   const condition = conditionAfter(herbs)
   const played = useRef(new Set<string>())
   const [frame, setFrame] = useState<Frame>(() => lastFrame(scriptFor('hall', { profession, condition, saves, entrance: 0 })))
+  // The room shows its last frame without playing (seen before, the preview, reduced motion): its one shot
+  // swings stay at rest instead of playing again on the remount.
+  const [replayed, setReplayed] = useState(false)
 
   useEffect(() => {
     const context = { profession, condition, saves, entrance: ENTRANCE_MS - 200 }
@@ -121,9 +124,11 @@ export function Stage({ zones, profession, reduced, still }: StageProps) {
     const key = playKey(zone, context)
     if (still || reduced || played.current.has(key)) {
       setFrame(lastFrame(script))
+      setReplayed(true)
       return
     }
     played.current.add(key)
+    setReplayed(false)
     setFrame(startFrame(script))
     const timers = script.beats.map((beat) => window.setTimeout(() => setFrame((current) => apply(current, beat)), beat.at))
     return () => timers.forEach((timer) => window.clearTimeout(timer))
@@ -140,7 +145,7 @@ export function Stage({ zones, profession, reduced, still }: StageProps) {
 
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
-      <RoomArt zone={zone} flags={frame.flags} />
+      <RoomArt zone={zone} flags={frame.flags} replayed={replayed} />
       {glass && (
         <div className={stage.anchor}>
           <div className={stage.night} />

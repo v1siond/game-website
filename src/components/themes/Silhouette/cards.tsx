@@ -96,7 +96,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
         {years && <span className={`whitespace-nowrap ${CARD_META}`}>{years}</span>}
       </div>
       <p className="mt-0.5 text-sm text-[color:var(--sh-text)]">{project.role}</p>
-      <p className={`mt-0.5 ${CARD_META}`}>{project.tagline}</p>
+      {project.tagline && <p className={`mt-0.5 ${CARD_META}`}>{project.tagline}</p>}
       {project.impact && (
         <p className={`mt-1.5 italic ${CARD_BODY}`}>
           <span aria-hidden="true">{'-> '}</span>
