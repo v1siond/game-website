@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
-import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
+import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
+import { stageItems, type StageItems } from '@/lib/cv/stageItems'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Labels } from '@/lib/cv/labels'
-import { muayThaiFacts } from '@/lib/cv/sectionText'
 import { ramp } from '@/lib/scroll/stage'
 import { walkAlong } from '@/lib/scroll/walkAlong'
 import { clamp01, fadeTo, fx, lerp, r1, reached, spread, transformTo } from '../shared/stageNodes'
@@ -543,33 +543,18 @@ export interface Scene {
   slot: SectionSlot | null
 }
 
-// How many props each section's picture holds: one per card its section counts (data-stage-items).
-const COUNT_FOR: { [Id in SectionId]: (slot: SlotOf<Id>, aboutTags: number) => number } = {
-  about: (_slot, aboutTags) => aboutTags,
-  work: ({ jobs }) => jobs.length,
-  tech: ({ categories }) => categories.length,
-  services: ({ services }) => services.length,
-  projects: ({ projects }) => projects.length,
-  ventures: ({ companies }) => companies.length,
-  bands: ({ bands }) => bands.length,
-  muayThai: ({ martialArts }) => martialArts.primary.achievements.length,
-}
-
-const countOf = (slot: SectionSlot, aboutTags: number): number => (COUNT_FOR[slot.id] as (slot: SectionSlot, aboutTags: number) => number)(slot, aboutTags)
-
-// The record's facts are counted cards that come before the installs (muayThaiFacts, as MuayThaiRecord draws them).
 type RecordWords = Pick<Labels, 'record' | 'years'>
 
-const leadOf = (slot: SectionSlot, labels: RecordWords): number => (slot.id === 'muayThai' ? muayThaiFacts(slot.martialArts, labels).length : 0)
-
-const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, lead: number, profession: Profession, phone: boolean): Scene => {
+const sceneOf = (id: SceneId, slot: SectionSlot | null, { lead, count }: StageItems, profession: Profession, phone: boolean): Scene => {
   const def = SCENE_DEFS[id]
   return { id, def, layout: layoutOf(count, lead, phone), kit: def.kit ?? profession, slot }
 }
 
+const NO_ITEMS: StageItems = { lead: 0, count: 0 }
+
 /** The page as scenes: the hero, one per section the profession shows in reading order, the contact. */
 export const scenesOf = (slots: readonly SectionSlot[], profession: Profession, phone: boolean, aboutTags: number, labels: RecordWords): Scene[] => [
-  sceneOf('hero', null, 0, 0, profession, phone),
-  ...slots.map((slot) => sceneOf(slot.id, slot, countOf(slot, aboutTags), leadOf(slot, labels), profession, phone)),
-  sceneOf('contact', null, 0, 0, profession, phone),
+  sceneOf('hero', null, NO_ITEMS, profession, phone),
+  ...slots.map((slot) => sceneOf(slot.id, slot, stageItems(slot, labels, aboutTags), profession, phone)),
+  sceneOf('contact', null, NO_ITEMS, profession, phone),
 ]
