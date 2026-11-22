@@ -177,12 +177,15 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
 
 interface ProjectFileProps {
   slot: ProjectSlot
+  open: boolean
   /** The card's button that opened the file, focused again once the file has closed. */
   opener: RefObject<HTMLElement | null>
   onClose: () => void
 }
 
-function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
+// The file is always in the page, closed until the shot lands, so the server HTML carries every project's
+// description and details. A memo file, for the same reason as the cards: only the one opening or closing draws again.
+const ProjectFile = memo(function ProjectFile({ slot, open, opener, onClose }: ProjectFileProps) {
   const labels = useLabels()
   const { actions, cards } = labels
   const { links } = slot
@@ -190,9 +193,11 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = `atomic-file-${project.id}`
 
-  // A modal dialog keeps Tab inside the file and leaves the page under it inert. It closes as it unmounts
-  // and only then hands focus back, since the opener is inert while the dialog is open.
+  // A modal dialog keeps Tab inside the file and leaves the page under it inert; showModal focuses its first
+  // control, the close button. The cleanup closes it and only then hands focus back, since the opener is inert
+  // while the dialog is open.
   useEffect(() => {
+    if (!open) return
     const dialog = dialogRef.current
     const trigger = opener.current
     dialog?.showModal()
@@ -200,7 +205,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
       dialog?.close()
       trigger?.focus()
     }
-  }, [opener])
+  }, [open, opener])
 
   return (
     <dialog
@@ -224,7 +229,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
               {project.years && <span aria-hidden="true"> / </span>}
               {project.years}</p>
           </div>
-          <button type="button" autoFocus onClick={onClose} className={`${PHOSPHOR_BUTTON} shrink-0`}>
+          <button type="button" onClick={onClose} className={`${PHOSPHOR_BUTTON} shrink-0`}>
             <span className="relative">{actions.closeFile}</span>
           </button>
         </div>
@@ -255,7 +260,7 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
       <span className={`pointer-events-none absolute inset-0 ${atomic.scanlines}`} aria-hidden="true" />
     </dialog>
   )
-}
+})
 
 function shooterMotion(locked: boolean, phase: ShotPhase | undefined): DwellerMotion {
   if (phase === 'hit') return 'fire'
@@ -280,7 +285,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
   const { points, spend } = useActionPoints()
   const [target, setTarget] = useState<string | null>(null)
   const [shot, setShot] = useState<Shot | null>(null)
-  const [opened, setOpened] = useState<ProjectSlot | null>(null)
+  const [opened, setOpened] = useState<string | null>(null)
   const timers = useRef<number[]>([])
   // The shot in play and the button that opened the file, read by the card callbacks so they stay the
   // same functions from render to render and the memo cards skip the renders that are not theirs.
@@ -304,7 +309,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
       if (playing.current) return
       opener.current = trigger
       if (prefersReducedMotion() || !spend()) {
-        setOpened(slot)
+        setOpened(slot.project.id)
         return
       }
       play({ id: slot.project.id, phase: 'aim' })
@@ -312,7 +317,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
         window.setTimeout(() => {
           if (phase === 'open') {
             play(null)
-            setOpened(slot)
+            setOpened(slot.project.id)
             return
           }
           play({ id: slot.project.id, phase })
@@ -338,21 +343,23 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
           className={`min-w-0 flex-1 ${MASONRY_LIST}`}
           itemClassName={MASONRY_ITEM}
           renderProject={(slot, index) => (
-            <TargetCard
-              slot={slot}
-              index={index}
-              targeted={locked === slot.project.id}
-              phase={shot?.id === slot.project.id ? shot.phase : null}
-              onTarget={onTarget}
-              onFire={onFire}
-            />
+            <>
+              <TargetCard
+                slot={slot}
+                index={index}
+                targeted={locked === slot.project.id}
+                phase={shot?.id === slot.project.id ? shot.phase : null}
+                onTarget={onTarget}
+                onFire={onFire}
+              />
+              <ProjectFile slot={slot} open={opened === slot.project.id} opener={opener} onClose={onClose} />
+            </>
           )}
         />
       </div>
       <span className={`pointer-events-none fixed inset-x-0 top-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxTop}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-x-0 bottom-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxBottom}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-0 z-[71] bg-atomic-cream ${atomic.shotFlash}`} data-on={shot?.phase === 'hit' ? 'on' : undefined} aria-hidden="true" />
-      {opened && <ProjectFile slot={opened} opener={opener} onClose={onClose} />}
     </div>
   )
 }

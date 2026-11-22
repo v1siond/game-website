@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
-import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
+import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -14,8 +14,8 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Project } from '@/lib/cv/content'
 import { HitStar } from './backdrop'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { BULLETS, BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard, staggerStep } from './cards'
-import { AllOutAttack } from './allOut'
+import { BULLETS, BandPanel, CompanyTag, RankCard, ServiceSlab, TechStackBoard, staggerStep } from './cards'
+import { ProjectCase } from './allOut'
 import { SlappedStatement, StampedCase } from './evidence'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -92,7 +92,6 @@ function About({ bio }: { bio: string }) {
 }
 
 function Projects({ projects }: { projects: Project[] }) {
-  const [opened, setOpened] = useState<{ slot: ProjectSlot; trigger: HTMLElement } | null>(null)
   const { sections } = useLabels()
 
   return (
@@ -101,9 +100,8 @@ function Projects({ projects }: { projects: Project[] }) {
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot, index) => <CaseCard slot={slot} index={index} onOpen={(picked, trigger) => setOpened({ slot: picked, trigger })} />}
+        renderProject={(slot, index) => <ProjectCase slot={slot} index={index} />}
       />
-      {opened && <AllOutAttack slot={opened.slot} trigger={opened.trigger} onClose={() => setOpened(null)} />}
     </Stage>
   )
 }

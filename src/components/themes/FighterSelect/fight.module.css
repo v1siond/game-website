@@ -17,6 +17,13 @@
     animation: slash-in 380ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
   }
 
+  /* A control on the versus screen: opaque and in place from the first frame, so it can be seen and focused
+     while the cue waits; armed, the clash at 360ms knocks it a few pixels and it settles back, transform only,
+     starting and ending where it rests. */
+  .cue:not([data-scene-phase='idle']) .clashJolt {
+    animation: clash-jolt 300ms cubic-bezier(0.34, 1.56, 0.64, 1) 360ms both;
+  }
+
   .cue:not([data-scene-phase='idle']) .portraitIn {
     animation: portrait-in 420ms cubic-bezier(0.34, 1.56, 0.64, 1) 260ms both;
   }
@@ -209,6 +216,19 @@
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0) skewX(0);
+  }
+}
+
+@keyframes clash-jolt {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) skewX(0);
+  }
+  30% {
+    transform: translate3d(-8px, 0, 0) skewX(-6deg);
+  }
+  65% {
+    transform: translate3d(3px, 0, 0) skewX(2deg);
   }
 }
 

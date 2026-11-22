@@ -25,12 +25,13 @@ import shade from './shade.module.css'
 // screen cuts to black and he drops back in from above at the checkpoint, the death the genre is
 // played through. The scene stands beside the words from a laptop up and above them on a phone.
 // The spider, lame since the trap line, lurks at the left edge and flinches back when the jaws snap.
-// Reduced motion skips the run and the snap.
+// Reduced motion skips the run and the cut: the jaws stand shut for a moment, with no motion, then open.
 //
 // Animated: the fog, his parts and his run or drop, the two jaws, the layers' lean, the spider. Their
 // loops wait until the scene shows and play once; a sprung trap plays its own beats.
 
-type Trap = 'ready' | 'run' | 'snap' | 'respawn'
+// shut is the reduced motion spring: the jaws closed and him standing where he was.
+type Trap = 'ready' | 'run' | 'snap' | 'respawn' | 'shut'
 
 // The clearing offers the CV beside the hero's actions; the engine waits at the forest's edge.
 const CLEARING_SITES = ['cv'] as const
@@ -38,18 +39,28 @@ const CLEARING_SITES = ['cv'] as const
 const RUN_MS = 550
 const SNAP_MS = 220
 const DROP_MS = 900
+const SHUT_MS = 1200
 
 const POSE: Record<Trap, SpritePose> = {
   ready: 'idle',
   run: 'run',
   snap: 'fall',
   respawn: 'hang',
+  shut: 'idle',
 }
 const RUNNER: Record<Trap, string> = {
   ready: '',
   run: `${shade.runner} ${shade.runnerAtTrap}`,
   snap: `${shade.runner} ${shade.runnerAtTrap}`,
   respawn: shade.dropIn,
+  shut: '',
+}
+const JAWS: Record<Trap, string> = {
+  ready: '',
+  run: '',
+  snap: shade.jawShut,
+  respawn: '',
+  shut: shade.jawShut,
 }
 
 const JAW_BACK = 'M400 176 H385 L387 170 L390 172 L391 166 L394 168 L396 163 L400 166 Z'
@@ -61,7 +72,7 @@ const FENCE_POSTS = [120, 200, 280, 360, 440]
 
 function ClearingScene({ profession, trap }: { profession: Profession; trap: Trap }) {
   const light = PROFESSION_SKY[profession]
-  const shut = trap === 'snap' ? shade.jawShut : ''
+  const shut = JAWS[trap]
   const { ref, triggered } = useSectionTrigger()
 
   return (
@@ -123,7 +134,8 @@ export function Clearing({ profession }: { profession: Profession }) {
   const spring = () => {
     if (trap !== 'ready') return
     if (prefersReducedMotion()) {
-      cut()
+      setTrap('shut')
+      timers.current = [window.setTimeout(() => setTrap('ready'), SHUT_MS)]
       return
     }
     setTrap('run')
