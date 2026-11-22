@@ -389,17 +389,19 @@ function Wings() {
 const PLATE = 'bg-[color:var(--np-panel)] border-l-4 border-[color:var(--ra1)]'
 
 /** The hub: his name, the recruiter copy and the wings, on panels; the runner stands right of them (on a
- *  phone, under the name), with the wardrobe plate at his feet. */
+ *  phone, under the name), with the wardrobe plate at his feet. From 768 px up the column ends half a plate
+ *  short of the vanishing point (58vw from the gutter, less 9.5rem), so neither he nor the plate covers a
+ *  panel at any width. */
 export function HubHero() {
   const { warp } = useLabels()
   return (
     <header data-worlds-hero="" style={eraVars(HUB_ERA)} className="relative flex min-h-[100svh] items-center px-[max(16px,6vw)] pb-12 pt-20 max-md:items-start max-md:pt-[5.5rem]">
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
-          <div data-hero-inner="" className="w-full max-w-[38rem] origin-left">
+          <div data-hero-inner="" className="w-full max-w-[38rem] origin-left md:max-w-[min(38rem,calc(58vw-9.5rem))]">
             <div className={`${PLATE} px-6 pb-5 pt-4`}>
               <p className={TINT}>{warp.hub}</p>
-              <h1 className={`${FACE} mt-1 text-[clamp(2.4rem,6vw,5.25rem)] leading-[0.95] text-[color:var(--np-white)]`}>
+              <h1 className={`${FACE} mt-1 text-[clamp(2.2rem,5vw,5.25rem)] leading-[0.95] text-[color:var(--np-white)]`}>
                 <NameWords name={name} wordClassName="block" />
               </h1>
             </div>
