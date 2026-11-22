@@ -5,7 +5,10 @@
 // motes) plays the first PLAY_S of its fall at its own pace, from where it starts, and holds there, a still
 // of the storm. Medieval Fantasy and Dark Fantasy write their loops inline, so they read the shorthand here.
 
-export const PLAY_S = 5
+import { STORY_MS } from '@/lib/motion/stepWithin'
+
+// The story budget in seconds, for CSS times; STORY_MS owns the value.
+export const PLAY_S = STORY_MS / 1000
 
 // Seconds as a CSS time, rounded so a sum like 1.8 + 0.1 prints as 1.9s.
 const secs = (seconds: number) => `${Number(seconds.toFixed(3))}s`
