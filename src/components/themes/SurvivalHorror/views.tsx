@@ -1,9 +1,10 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import type { ReactNode } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
+import type { Labels } from '@/lib/cv/labels'
 import { PaperPanel } from './panels'
 import { ServiceNotes, TechCloud } from './cards'
 import { MapFiles } from './files'
@@ -12,99 +13,89 @@ import { TraderWares } from './trader'
 import { SuitDoors } from './keys'
 import { HerbRecovery } from './condition'
 import { RoomWindow } from './stage'
+import type { Zone } from './scripts'
 
 // The picked profession's sections, each one of the genre's own screens: Work Experience is the house map
 // and its files (./files), Projects the attache case (./case), Ventures the trader's wares (./trader), Bands
 // the suit key doors (./keys), the Muay Thai record the herb recovery (./condition). About and Tech Stack
-// are papers found on the desk and fade in, and so are the Services, typed notes in the same room as the Tech Stack. Each is a window onto its room of the house behind the page
-// (RoomWindow, ./stage): the study, the corridor, the armoury, the back door, the trader, the suit door,
-// the gym.
+// are papers found on the desk and fade in, and so are the Services, typed notes in the same room as the
+// Tech Stack. Each is a window onto its room of the house behind the page (RoomWindow, ./stage): the study,
+// the corridor, the armoury, the back door, the trader, the suit door, the gym. The shared section plan
+// picks which a profession shows and in which order.
 
-function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
+interface RoomProps {
+  zone: Zone
+  titleKey: keyof Labels['sections']
+  // The papers found on the desk fade in; the genre's own screens stand as they are.
+  fade?: boolean
+  children: ReactNode
+}
+
+// A section as a window onto its room, its paper panel titled from the labels.
+function Room({ zone, titleKey, fade = false, children }: RoomProps) {
   const { sections: titles } = useLabels()
-
-  return (
-    <>
-      <RoomWindow zone="about">
-        <FadeInScene>
-          <PaperPanel title={titles.about}>
-            <p className="max-w-prose text-base leading-relaxed text-[color:var(--sh-cream)]">{professionalSummary.bio}</p>
-          </PaperPanel>
-        </FadeInScene>
-      </RoomWindow>
-
-      {sections.jobs.length > 0 && (
-        <RoomWindow zone="experience">
-          <PaperPanel title={titles.workExperience}>
-            <MapFiles jobs={sections.jobs} />
-          </PaperPanel>
-        </RoomWindow>
-      )}
-
-      <RoomWindow zone="tech">
-        <FadeInScene>
-          <PaperPanel title={titles.techStack}>
-            <TechCloud categories={sections.techStack} />
-          </PaperPanel>
-        </FadeInScene>
-      </RoomWindow>
-
-      {sections.services.length > 0 && (
-        <RoomWindow zone="tech">
-          <FadeInScene>
-            <PaperPanel title={titles.services}>
-              <ServiceNotes services={sections.services} />
-            </PaperPanel>
-          </FadeInScene>
-        </RoomWindow>
-      )}
-
-      {sections.projects.length > 0 && (
-        <RoomWindow zone="projects">
-          <PaperPanel title={titles.projects}>
-            <AttacheCase projects={sections.projects} />
-          </PaperPanel>
-        </RoomWindow>
-      )}
-
-      {sections.companies.length > 0 && (
-        <RoomWindow zone="ventures">
-          <PaperPanel title={titles.ventures}>
-            <TraderWares companies={sections.companies} />
-          </PaperPanel>
-        </RoomWindow>
-      )}
-    </>
-  )
+  const panel = <PaperPanel title={titles[titleKey]}>{children}</PaperPanel>
+  return <RoomWindow zone={zone}>{fade ? <FadeInScene>{panel}</FadeInScene> : panel}</RoomWindow>
 }
 
-function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const { sections: titles } = useLabels()
-
-  return (
-    <RoomWindow zone="bands">
-      <PaperPanel title={titles.bands}>
-        <SuitDoors musician={sections.musician} bands={sections.bands} />
-      </PaperPanel>
-    </RoomWindow>
-  )
+// One frame per section of the shared plan, which picks the ones a profession shows and their order.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    return (
+      <Room zone="about" titleKey="about" fade>
+        <p className="max-w-prose text-base leading-relaxed text-[color:var(--sh-cream)]">{slot.bio}</p>
+      </Room>
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    return (
+      <Room zone="experience" titleKey="workExperience">
+        <MapFiles jobs={slot.jobs} />
+      </Room>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    return (
+      <Room zone="tech" titleKey="techStack" fade>
+        <TechCloud categories={slot.categories} />
+      </Room>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    return (
+      <Room zone="tech" titleKey="services" fade>
+        <ServiceNotes services={slot.services} />
+      </Room>
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    return (
+      <Room zone="projects" titleKey="projects">
+        <AttacheCase projects={slot.projects} />
+      </Room>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    return (
+      <Room zone="ventures" titleKey="ventures">
+        <TraderWares companies={slot.companies} />
+      </Room>
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    return (
+      <Room zone="bands" titleKey="bands">
+        <SuitDoors musician={slot.musician} bands={slot.bands} />
+      </Room>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    return (
+      <Room zone="gym" titleKey="muayThai">
+        <HerbRecovery martialArts={slot.martialArts} />
+      </Room>
+    )
+  },
 }
 
-function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const { sections: titles } = useLabels()
-
-  return (
-    <RoomWindow zone="gym">
-      <PaperPanel title={titles.muayThai}>
-        <HerbRecovery martialArts={sections.martialArts} />
-      </PaperPanel>
-    </RoomWindow>
-  )
-}
-
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+export const SECTION_VIEWS = sectionViews(FRAMES)
