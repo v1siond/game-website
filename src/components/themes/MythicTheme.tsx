@@ -3,14 +3,14 @@
 import { useCallback, useState } from 'react'
 import { Cinzel } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
-import { fillLabel } from '@/lib/cv/labels'
 import { MYTH_VARS } from './Mythic/palette'
 import { Depths } from './Mythic/depths'
 import { PoolRise } from './Mythic/poolRise'
@@ -42,7 +42,6 @@ const mythDisplay = Cinzel({
 export default function MythicTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
   const [rebirths, setRebirths] = useState(0)
   const pointerRef = usePointerVars(!reduced)
@@ -64,9 +63,9 @@ export default function MythicTheme() {
           <Mirror profession={active} />
 
           <main id="main-content" tabIndex={-1} className="relative z-20 px-4 py-8 outline-none sm:px-6">
-            <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+            <ProfessionRegion className="mx-auto max-w-6xl">
               <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-            </div>
+            </ProfessionRegion>
           </main>
 
           <LastGate profession={active} />
