@@ -51,7 +51,8 @@ export function PoweredRoom({ children }: { children: ReactNode }) {
   const { deco } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
   const { pose, arrived, take, play, advance, onOwnAnimationEnd } = usePoseSequence<DecoMotion>({ entrance: ENTRANCE, rest: 'idle', still: 'still', policy: 'arrived' })
-  const live = triggered && (pose === 'still' || pose === 'zap' || arrived)
+  // The still pose is reduced motion's, which shows the room lit from mount, before any scroll.
+  const live = pose === 'still' || (triggered && (pose === 'zap' || arrived))
 
   return (
     <div ref={ref} className="grid items-end gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
