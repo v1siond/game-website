@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { nextIn } from '@/lib/nextIn'
 import type { Profession } from '@/lib/cv/professions'
 import type { FighterPose } from './poses'
 
@@ -54,8 +55,6 @@ export const motionFor = (pose: FighterPose, profession: Profession): Motion => 
 export const SPECIALS = ['hadouken', 'shoryuken', 'tatsumaki'] as const
 export type Special = (typeof SPECIALS)[number]
 
-export const nextSpecial = (last: Special | null): Special => SPECIALS[last === null ? 0 : (SPECIALS.indexOf(last) + 1) % SPECIALS.length]
-
 // How far he may walk from his mark either way, in steps.
 export const MAX_STEP = 2
 
@@ -67,7 +66,7 @@ export interface MoveState {
 
 export function startSpecial(state: MoveState): MoveState {
   if (state.playing) return state
-  const move = nextSpecial(state.last)
+  const move = nextIn(SPECIALS, state.last)
   return { ...state, playing: move, last: move }
 }
 
