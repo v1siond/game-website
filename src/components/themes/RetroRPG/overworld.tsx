@@ -3,7 +3,7 @@
 import { memo, type CSSProperties, type ReactNode } from 'react'
 import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { heldUntil } from '@/components/themes/shared/held'
-import { PLAY_S } from '@/components/themes/shared/loops'
+import { sliceCount } from '@/components/themes/shared/loops'
 import { RPG } from './palette'
 import rooms from './rooms.module.css'
 
@@ -24,14 +24,10 @@ const ZONES: readonly Zone[] = ['ruins', 'snow', 'water', 'heat', 'town']
 /** Something that falls or rises through the zone: its x, how far into its fall it starts and how long it takes. */
 type Mote = readonly [x: number, at: number, ms: number]
 
-// How long a mote moves once its zone is on show (the shared loop budget); it then holds where it is, or
-// has fallen out.
-const MOTE_PLAY_MS = PLAY_S * 1000
-
-// A mote starts `at` into its fall and plays on for MOTE_PLAY_MS at most, once: --fall-n is that much of one
-// fall counted from its start, never more than the whole fall.
+// A mote starts `at` ms into its fall of `ms` and plays on for the first 5 s its zone is on show (sliceCount, the
+// shared loop budget), never more than the whole fall: it then holds where it is, or has fallen out.
 const motion = (at: number, ms: number, drift = 12): CSSProperties =>
-  ({ '--fall-at': `${-at}ms`, '--fall-ms': `${ms}ms`, '--fall-n': Math.min((at + MOTE_PLAY_MS) / ms, 1).toFixed(3), '--drift': `${drift}px` }) as CSSProperties
+  ({ '--fall-at': `${-at}ms`, '--fall-ms': `${ms}ms`, '--fall-n': sliceCount(ms / 1000, -at / 1000, 1), '--drift': `${drift}px` }) as CSSProperties
 
 function Falling({ motes, fill, size, className = rooms.falls }: { motes: readonly Mote[]; fill: string; size: number; className?: string }) {
   return (

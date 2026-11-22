@@ -39,7 +39,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 import world from './DarkFantasy/world.module.css'
 import { heldUntil } from '@/components/themes/shared/held'
-import { cycles, slice } from '@/components/themes/shared/loops'
+import { cycles, PLAY_S, slice } from '@/components/themes/shared/loops'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 
 // The lines of a card or the About frame, each behind the spirit gold asterisk.
@@ -1182,6 +1182,10 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
 })
 
 // Art Section 1 - Spirit wisps with mechanical gears (spirit light and brass)
+// The art section's spirits start one after another, this far apart, and each plays one whole float in the
+// time left of the 5 s, so all four rest on the float's first frame, as drawn.
+const SPIRIT_STAGGER_S = 0.3
+
 const ArtSectionSpirits = memo(function ArtSectionSpirits() {
   return (
     <div className="relative z-20 py-16 px-6 overflow-hidden" aria-hidden="true" role="presentation">
@@ -1266,8 +1270,8 @@ const ArtSectionSpirits = memo(function ArtSectionSpirits() {
               left: p.x,
               top: p.y,
               background: `radial-gradient(circle, ${p.color} 20%, ${p.color}50 50%, transparent 70%)`,
-              animation: cycles(world.spiritFloat, 8 + i * 2, 'ease-in-out'),
-              animationDelay: `${i * -2}s`,
+              animation: cycles(world.spiritFloat, PLAY_S - i * SPIRIT_STAGGER_S, 'ease-in-out', i * SPIRIT_STAGGER_S),
+              animationDelay: `${i * SPIRIT_STAGGER_S}s`,
             }}
           />
         ))}

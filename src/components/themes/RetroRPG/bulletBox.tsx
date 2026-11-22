@@ -9,6 +9,7 @@ import { cssVars } from '@/lib/cssVars'
 import { PIXEL, RPG } from './palette'
 import { Soul, SoulHalves } from './soul'
 import world from './world.module.css'
+import { STORY_MS } from '@/lib/motion/stepWithin'
 
 // The bullet box: the game's dodging turn, played by the visitor above each profession's main list. Each
 // profession plays one of the game's soul modes, in its own box shape:
@@ -44,7 +45,8 @@ const MAX_HP = 20
 const HIT_COST = 4
 const BEAT_MS = 500
 const STRINGS = 3
-const TURN_MS = 5000
+// A turn of the box is one story's length (BD29).
+const TURN_MS = STORY_MS
 const SIDES = 4
 
 type Point = { x: number; y: number }
