@@ -28,7 +28,9 @@
   text-transform: uppercase;
 }
 
-.root :focus-visible {
+/* The page the skip link lands on shows where the keyboard landed with the gold ring; every control
+   keeps the global ring (globals.css) in the --focus-ring set above. */
+.root main:focus-visible {
   outline: 3px solid var(--myth-gold-pale);
   outline-offset: 3px;
 }
