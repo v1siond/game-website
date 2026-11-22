@@ -120,8 +120,14 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
     [edit, span],
   )
 
-  const play = useCallback(() => {
+  // The one way the playhead's run ends early: the frame is cancelled and he stops walking with it.
+  const stop = useCallback(() => {
     window.cancelAnimationFrame(frame.current)
+    setRiding(false)
+  }, [])
+
+  const play = useCallback(() => {
+    stop()
     setScrubbed(true)
     setRiding(true)
     const began = performance.now()
@@ -135,13 +141,13 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
       frame.current = window.requestAnimationFrame(step)
     }
     frame.current = window.requestAnimationFrame(step)
-  }, [moveHead])
+  }, [moveHead, stop])
 
   useEffect(() => {
     if (!triggered || reducedMotion) return
     play()
-    return () => window.cancelAnimationFrame(frame.current)
-  }, [triggered, reducedMotion, play])
+    return stop
+  }, [triggered, reducedMotion, play, stop])
 
   const scrubTo = (event: PointerEvent<HTMLDivElement>) => {
     const box = event.currentTarget.getBoundingClientRect()
@@ -149,7 +155,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
   }
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    window.cancelAnimationFrame(frame.current)
+    stop()
     event.currentTarget.setPointerCapture(event.pointerId)
     setScrubbed(true)
     scrubTo(event)
@@ -163,7 +169,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
     const step = KEY_STEPS[event.key]
     if (!step) return
     event.preventDefault()
-    window.cancelAnimationFrame(frame.current)
+    stop()
     setScrubbed(true)
     moveHead((step(head.year, edit) + 0.5 - edit.first) / span)
   }

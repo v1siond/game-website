@@ -8,14 +8,28 @@ import world from './world.module.css'
 // dims under a yellow raster, every card that can be scanned shows a dashed outline in its key colour,
 // and the card under the pointer or the keyboard focus locks a reticle and shows its tag (its kind and
 // one fact). The colour key follows the source: gold for work, green for what can be breached, blue for
-// what can be used, red for the fight record. While the mode is on, every running loop in the world
-// plays at a fifth of its speed, the way time slows while the optics scan.
+// what can be used, red for the fight record. While the mode is on, every animation in the world plays at
+// a fifth of its speed, the way time slows while the optics scan: the ones running at the toggle, and each
+// one that starts while the mode stays on.
 
 export type TagKind = 'job' | 'project' | 'use' | 'record'
 
 const SLOW_RATE = 0.2
 
-/** Slows every animation under the root while scan mode is on, and restores them when it goes off. */
+// A CSS animation that starts on the element: the event names it, so only that one is slowed and the
+// element's other animations, already slowed at the toggle, are left as they are.
+const slowStarted = (event: AnimationEvent) => {
+  const target = event.target as Element
+  target
+    .getAnimations()
+    .filter((animation) => (animation as CSSAnimation).animationName === event.animationName)
+    .forEach((animation) => {
+      animation.playbackRate = SLOW_RATE
+    })
+}
+
+/** Slows every animation under the root while scan mode is on, those that start during it included, and
+ *  restores them when it goes off. */
 export function useTimeSlow(rootRef: RefObject<HTMLElement | null>, scanning: boolean) {
   useEffect(() => {
     const root = rootRef.current
@@ -24,6 +38,9 @@ export function useTimeSlow(rootRef: RefObject<HTMLElement | null>, scanning: bo
     root.getAnimations({ subtree: true }).forEach((animation) => {
       animation.playbackRate = rate
     })
+    if (!scanning) return
+    root.addEventListener('animationstart', slowStarted)
+    return () => root.removeEventListener('animationstart', slowStarted)
   }, [rootRef, scanning])
 }
 
