@@ -117,7 +117,7 @@ const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: D
       <div className="relative mt-5 flex flex-wrap items-center justify-between gap-3">
         {entry.skills.length > 0 && (
           <ul className="flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-            {entry.skills.slice(0, 4).map((skill) => (
+            {entry.skills.map((skill) => (
               <li key={skill} className={`px-2 py-1 text-sm ${diary.skill}`}>
                 {skill}
               </li>
