@@ -19,11 +19,16 @@ export type Zone = 'ruins' | 'snow' | 'water' | 'heat' | 'town'
 
 const ZONES: readonly Zone[] = ['ruins', 'snow', 'water', 'heat', 'town']
 
-/** Something that falls or rises through the zone: its x, when it starts and how long it takes. */
+/** Something that falls or rises through the zone: its x, how far into its fall it starts and how long it takes. */
 type Mote = readonly [x: number, at: number, ms: number]
 
+// How long a mote moves once its zone is on show; it then holds where it is, or has fallen out.
+const MOTE_PLAY_MS = 5000
+
+// A mote starts `at` into its fall and plays on for MOTE_PLAY_MS at most, once: --fall-n is that much of one
+// fall counted from its start, never more than the whole fall.
 const motion = (at: number, ms: number, drift = 12): CSSProperties =>
-  ({ '--fall-at': `${-at}ms`, '--fall-ms': `${ms}ms`, '--drift': `${drift}px` }) as CSSProperties
+  ({ '--fall-at': `${-at}ms`, '--fall-ms': `${ms}ms`, '--fall-n': Math.min((at + MOTE_PLAY_MS) / ms, 1).toFixed(3), '--drift': `${drift}px` }) as CSSProperties
 
 function Falling({ motes, fill, size, className = rooms.falls }: { motes: readonly Mote[]; fill: string; size: number; className?: string }) {
   return (

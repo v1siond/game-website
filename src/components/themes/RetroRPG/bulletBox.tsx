@@ -26,8 +26,12 @@ import world from './world.module.css'
 //
 // Pattern: one requestAnimationFrame loop, only while the box is on screen, writes --x, --y and --r on
 // the pellets, the heart and the shield (transform only, no React render per frame). Pellet positions
-// are pure functions of time; the loop keeps only the HP, the invincible timer and, for the shield mode,
-// each strike's last progress to see it arrive. React renders only on a hit and on the recovery.
+// are pure functions of the turn's clock; the loop keeps only the HP, the invincible timer and, for the
+// shield mode, each strike's last progress to see it arrive. React renders only on a hit and on the
+// recovery. A turn lasts TURN_MS: the first plays when the box first shows, each pointer or finger on the
+// box gives a fresh one from that moment, and when it runs out (and any hit flicker has recovered) the
+// loop stops and the pellets hold where they are; scrolling back shows them there, the clock where it
+// stopped, never a new turn.
 // Reduced motion shows the first frame, still, with the heart in the middle.
 
 const PELLETS = 10
@@ -40,6 +44,7 @@ const MAX_HP = 20
 const HIT_COST = 4
 const BEAT_MS = 500
 const STRINGS = 3
+const TURN_MS = 5000
 const SIDES = 4
 
 type Point = { x: number; y: number }
@@ -142,6 +147,11 @@ export function BulletBox({ profession }: { profession: Profession }) {
   const pellets = useRef<(HTMLSpanElement | null)[]>([])
   const pointer = useRef<Point | null>(null)
   const life = useRef(MAX_HP)
+  // The turn's clock (ms played), when the turn runs out (null before the first), and how to start the
+  // loop again once it has stopped; all three outlive a pass of the box off screen and back.
+  const clock = useRef(0)
+  const turnEnds = useRef<number | null>(null)
+  const wake = useRef<() => void>(() => {})
   const [hp, setHp] = useState(MAX_HP)
   const [hurt, setHurt] = useState(false)
   const broken = hp === 0
@@ -164,25 +174,27 @@ export function BulletBox({ profession }: { profession: Profession }) {
     const drawStill = () => {
       place(heart.current, soulAt(), HEART)
       drawShield()
-      pellets.current.forEach((p, i) => place(p, pellet(i, 0, size.w, size.h), PELLET))
+      pellets.current.forEach((p, i) => place(p, pellet(i, clock.current, size.w, size.h), PELLET))
     }
 
     const playing = inView && !reduced
+    let frame = 0
+    let prev = 0
+    // A box that is not looping (off screen, reduced, or its turn run out) is drawn again on a resize.
     const resized = new ResizeObserver(() => {
       size.w = el.offsetWidth
       size.h = el.offsetHeight
-      if (!playing) drawStill()
+      if (!frame) drawStill()
     })
     resized.observe(el)
     drawStill()
     if (!playing) return () => resized.disconnect()
 
-    let frame = 0
     let safeUntil = 0
     // A split heart left by an earlier run of the loop recovers on the first frame.
     let flickering = life.current === 0
     const last = new Array<number>(PELLETS).fill(0)
-    const start = performance.now()
+    turnEnds.current ??= performance.now() + TURN_MS
 
     // A hit takes HP and starts the invincible flicker; the last one splits the heart until the refill.
     const landed = (now: number) => {
@@ -223,7 +235,9 @@ export function BulletBox({ profession }: { profession: Profession }) {
     }
 
     const tick = (now: number) => {
-      const t = now - start
+      clock.current += Math.max(now - prev, 0)
+      prev = now
+      const t = clock.current
       recover(now)
       place(heart.current, soulAt(), HEART)
       drawShield()
@@ -232,11 +246,20 @@ export function BulletBox({ profession }: { profession: Profession }) {
         place(p, at, PELLET)
         check(i, t, at, now)
       })
+      frame = 0
+      if (now >= (turnEnds.current ?? 0) && !flickering) return
       frame = requestAnimationFrame(tick)
     }
-    frame = requestAnimationFrame(tick)
+    // A stopped loop starts again from the frame it stopped on, the clock going on from there.
+    wake.current = () => {
+      if (frame) return
+      prev = performance.now()
+      frame = requestAnimationFrame(tick)
+    }
+    wake.current()
     return () => {
       cancelAnimationFrame(frame)
+      wake.current = () => {}
       resized.disconnect()
     }
   }, [profession, inView, reduced])
@@ -244,6 +267,8 @@ export function BulletBox({ profession }: { profession: Profession }) {
   const follow = (event: PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect()
     pointer.current = { x: event.clientX - rect.left, y: event.clientY - rect.top }
+    turnEnds.current = performance.now() + TURN_MS
+    wake.current()
   }
 
   return (
