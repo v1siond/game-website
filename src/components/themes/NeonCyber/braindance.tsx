@@ -300,7 +300,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                       )}
                       {job.skills.length > 0 && (
                         <ul className="flex flex-wrap gap-1" aria-label={labels.cards.skillsUsed}>
-                          {job.skills.slice(0, 6).map((skill) => (
+                          {job.skills.map((skill) => (
                             <DataChip key={skill}>{skill}</DataChip>
                           ))}
                         </ul>

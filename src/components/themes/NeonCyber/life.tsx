@@ -40,7 +40,7 @@ export function DistrictStage({ district, children }: { district: District; chil
 
 // ---------------------------------------------------------------- About
 
-/** The bio is the plan's; the tags read the rest of the summary (education, languages, a highlight). */
+/** The bio is the plan's; the tags read the rest of the summary (education, languages, every highlight). */
 export function ScanAbout({ bio }: { bio: string }) {
   const { professionalSummary } = useCVData()
   const { sections, cyber } = useLabels()
@@ -50,7 +50,7 @@ export function ScanAbout({ bio }: { bio: string }) {
   const tags = [
     { label: cyber.tagEducation, value: professionalSummary.education },
     { label: cyber.tagLanguages, value: professionalSummary.languages },
-    ...professionalSummary.highlights.slice(0, 1).map((value) => ({ label: cyber.tagHighlight, value })),
+    ...professionalSummary.highlights.map((value) => ({ label: cyber.tagHighlight, value })),
   ].filter((tag) => tag.value)
 
   return (
@@ -68,7 +68,7 @@ export function ScanAbout({ bio }: { bio: string }) {
         <ul className="mt-5 flex flex-wrap gap-3">
           {tags.map((tag, i) => (
             <li
-              key={tag.label}
+              key={tag.value}
               className={`${life.infoTag} ${world.cut} min-w-0 max-w-full border border-[color:var(--neon-hud)] bg-[color:var(--neon-ink)] px-3 py-2 sm:max-w-[22rem]`}
               style={{ '--i': i } as CSSProperties}
             >
