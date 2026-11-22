@@ -296,31 +296,29 @@
   80% { transform: translate3d(3px, -1px, 0); }
 }
 
-/* His name is struck onto the gilded plate, the headline unrolls under it, the rest follows. */
+/* His name, the headline and the rest are readable from the first frame; the entrance only moves them:
+   the name is struck onto the gilded plate, the headline unrolls under it, the rest settles up. */
 .namePlate {
-  opacity: 0;
   transform: scale(1.35);
-  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.3, 1.4, 0.5, 1);
+  transition: transform 0.45s cubic-bezier(0.3, 1.4, 0.5, 1);
 }
 
-[data-name] .namePlate { opacity: 1; transform: none; }
+[data-name] .namePlate { transform: none; }
 
 .scroll {
-  opacity: 0;
-  transform: scaleX(0.05);
+  transform: scaleX(0.6);
   transform-origin: 50% 50%;
-  transition: opacity 0.3s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-[data-title] .scroll { opacity: 1; transform: none; }
+[data-title] .scroll { transform: none; }
 
 .heroRest {
-  opacity: 0;
   transform: translate3d(0, 14px, 0);
-  transition: opacity 0.6s ease 0.25s, transform 0.6s ease 0.25s;
+  transition: transform 0.6s ease 0.25s;
 }
 
-[data-title] .heroRest { opacity: 1; transform: none; }
+[data-title] .heroRest { transform: none; }
 
 /* His figure is a button in the hero: a click throws the chain combo. */
 .heroFigure {
@@ -793,9 +791,6 @@
   }
 
   .riser,
-  .namePlate,
-  .scroll,
-  .heroRest,
   .reveal,
   .boon,
   .lavaFlow,
