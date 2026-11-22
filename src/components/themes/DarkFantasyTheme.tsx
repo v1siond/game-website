@@ -13,6 +13,7 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job, Service } from '@/lib/cv/content'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -1840,7 +1841,9 @@ export default function DarkFantasyTheme() {
 
       <WaystationSelector active={active} />
 
-      <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+      <ProfessionRegion>
+        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+      </ProfessionRegion>
 
       </main>
 
