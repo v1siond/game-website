@@ -247,45 +247,47 @@
   transform-origin: 0 50%;
 }
 
-/* idle: the chest breathes, the eyes blink every few seconds */
+/* Every loop of his figure plays a counted number of cycles, all inside 5 s of its motion starting, then
+   rests in the pose. idle: the chest breathes once, the eyes blink once */
 .motionIdle .sprBody {
-  animation: celBreathe 2600ms ease-in-out infinite;
+  animation: celBreathe 2600ms ease-in-out;
 }
 
 .motionIdle .sprEyes,
 .motionAction .sprEyes {
-  animation: celBlink 4200ms linear infinite;
+  animation: celBlink 4200ms linear;
 }
 
 /* run: he faces the camera, so each stride drives a knee toward the viewer: the thigh foreshortens from
    the hip, the shin tucks in under it and the boot leaves the ground while the other leg stays planted.
    The opposite arm pumps forward, the forearm folding toward the viewer and in across the chest. One
    cycle is two steps (twice --sprite-run): the front leg and the back arm drive in the first half, the
-   back leg and the front arm play the same keyframes half a cycle later. The body bobs on each step. */
+   back leg and the front arm play the same keyframes half a cycle later. The body bobs on each step.
+   Five cycles (4.4 s), then he stands. */
 .motionRun .sprLegF,
 .motionRun .sprLegB {
-  animation: celStride calc(var(--sprite-run) * 2) ease-in-out infinite;
+  animation: celStride calc(var(--sprite-run) * 2) ease-in-out 5;
 }
 
 .motionRun .sprShinF {
-  animation: celTuckF calc(var(--sprite-run) * 2) ease-in-out infinite;
+  animation: celTuckF calc(var(--sprite-run) * 2) ease-in-out 5;
 }
 
 .motionRun .sprShinB {
-  animation: celTuckB calc(var(--sprite-run) * 2) ease-in-out infinite;
+  animation: celTuckB calc(var(--sprite-run) * 2) ease-in-out 5;
 }
 
 .motionRun .sprArmF,
 .motionRun .sprArmB {
-  animation: celPump calc(var(--sprite-run) * 2) ease-in-out infinite;
+  animation: celPump calc(var(--sprite-run) * 2) ease-in-out 5;
 }
 
 .motionRun .sprForeF {
-  animation: celPumpForeF calc(var(--sprite-run) * 2) ease-in-out infinite;
+  animation: celPumpForeF calc(var(--sprite-run) * 2) ease-in-out 5;
 }
 
 .motionRun .sprForeB {
-  animation: celPumpForeB calc(var(--sprite-run) * 2) ease-in-out infinite;
+  animation: celPumpForeB calc(var(--sprite-run) * 2) ease-in-out 5;
 }
 
 /* after the shorthands above, which reset the delay */
@@ -297,7 +299,7 @@
 }
 
 .motionRun .sprBody {
-  animation: celBob calc(var(--sprite-run) / 2) ease-in-out infinite alternate;
+  animation: celBob calc(var(--sprite-run) / 2) ease-in-out 22 alternate;
 }
 
 /* leap: the freeze frame pose, front fist thrown up, legs split mid air */
@@ -309,7 +311,7 @@
 /* action, per profession: deploys the turret and works it from the wrist computer, hits the drums,
    throws the kick */
 .actsTurret.motionAction .sprArmF {
-  animation: celType 520ms ease-in-out infinite alternate;
+  animation: celType 520ms ease-in-out 8 alternate both;
 }
 
 .actsTurret.motionAction .sprArmB {
@@ -317,24 +319,26 @@
 }
 
 .actsTurret.motionAction .sprHolo {
-  animation: celHolo 1400ms steps(2, jump-none) infinite;
+  animation: celHolo 1400ms steps(2, jump-none) 3 both;
 }
 
-/* the turret drops from above, lands with a squash, then fires: the flash is on for one frame in three */
+/* the turret drops from above, lands with a squash, then fires: the flash is on for one frame in three,
+   sixteen shots, then the turret stands lit and quiet */
 .actsTurret.motionAction .sprTurret {
   animation: celDeploy 520ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
 .actsTurret.motionAction .sprFlash {
-  animation: celMuzzle 270ms steps(1, end) 600ms infinite;
+  animation: celMuzzle 270ms steps(1, end) 600ms 16;
 }
 
 .actsDrum.motionAction .sprArmF {
-  animation: celStick 300ms cubic-bezier(0.5, 0, 0.75, 0) infinite alternate;
+  animation: celStick 300ms cubic-bezier(0.5, 0, 0.75, 0) 16 alternate both;
 }
 
 .actsDrum.motionAction .sprArmB {
-  animation: celStickB 300ms cubic-bezier(0.5, 0, 0.75, 0) infinite alternate-reverse;
+  /* an odd count, so both sticks come to rest raised */
+  animation: celStickB 300ms cubic-bezier(0.5, 0, 0.75, 0) 15 alternate-reverse both;
 }
 
 .actsStrike.motionAction .sprLegF,
@@ -688,6 +692,12 @@
 
 /* ---------------------------------------------------------------- a section's stage (stage.tsx) */
 
+/* Nothing in a section plays before the section is seen: its loops (the drummer, the respawn rings) wait,
+   paused on their first frame, and play once it is on. */
+.stage:not([data-on]) * {
+  animation-play-state: paused;
+}
+
 /* The title slab slides in when the section first comes into view (data-on, useZoneStage). */
 .stage .titleSlab {
   opacity: 0;
@@ -761,8 +771,9 @@
   transform: rotate(-2deg) scale(1.04);
 }
 
+/* the pad glows up, dims and glows up again, then holds lit */
 .padGlow {
-  animation: celPulse 1800ms ease-in-out infinite alternate;
+  animation: celPulse 1600ms ease-in-out 3 alternate both;
 }
 
 @keyframes celPulse {
@@ -1062,7 +1073,8 @@
 }
 
 .stage[data-on] .kitHit {
-  animation: celHit 600ms steps(1, end) infinite;
+  /* seven hits each, the drum roll over 4.8 s with the sticks */
+  animation: celHit 600ms steps(1, end) 7;
   animation-delay: calc(var(--i) * 300ms);
 }
 
@@ -1130,12 +1142,13 @@
 
 /* ---------------------------------------------------------------- the respawn station (respawn.tsx) */
 
+/* the rings pulse up, down and up, then hold lit */
 .ring {
-  animation: celPulse 1400ms ease-in-out infinite alternate;
+  animation: celPulse 1400ms ease-in-out 3 alternate both;
 }
 
 .ringLate {
-  animation: celPulse 1400ms ease-in-out 700ms infinite alternate;
+  animation: celPulse 1400ms ease-in-out 700ms 3 alternate both;
 }
 
 /* ---------------------------------------------------------------- reduced motion */
