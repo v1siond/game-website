@@ -392,11 +392,13 @@ interface SpriteProps {
   onDone?: () => void
   /** The walk's strides follow the scroll (--scene-progress from an ancestor) instead of the clock. */
   scrub?: boolean
+  /** Its size where it is drawn inside another SVG (the theatre's canvas). */
+  box?: { width: number; height: number }
   className?: string
 }
 
 /** Him as the wrench and plasmid survivor of the undersea city, in a profession's kit, playing one motion. */
-export function SurvivorSprite({ profession, motion, onDone, scrub = false, className = '' }: SpriteProps) {
+export function SurvivorSprite({ profession, motion, onDone, scrub = false, box, className = '' }: SpriteProps) {
   const ids = useIds()
   const finish = (event: AnimationEvent<SVGGElement>) => {
     if (event.target !== event.currentTarget || !ONE_SHOT.has(motion)) return
@@ -404,7 +406,7 @@ export function SurvivorSprite({ profession, motion, onDone, scrub = false, clas
   }
 
   return (
-    <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
+    <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} {...box} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <Gradients ids={ids} />
       <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]} ${scrub ? s.scrub : ''}`} onAnimationEnd={finish}>
         <RevivalLight />
