@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, memo, type CSSProperties, type ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
 import battle from './battle.module.css'
 import bugMotion from './bug.module.css'
@@ -198,10 +199,14 @@ export const BattleReveal = memo(function BattleReveal({
   children,
   triggered
 }: BattleRevealProps) {
-  const [phase, setPhase] = useState<AnimationPhase>('idle')
+  const [playedPhase, setPlayedPhase] = useState<AnimationPhase>('idle')
   const [attackPhase, setAttackPhase] = useState(0)
   const [legPhase, setLegPhase] = useState(0)
   const [antennaPhase, setAntennaPhase] = useState(0)
+  // Under reduced motion the battle is already over: the contact links, the knight and the fallen bug show at
+  // once and no timer or frame loop starts.
+  const reducedMotion = useReducedMotion()
+  const phase: AnimationPhase = reducedMotion ? 'complete' : playedPhase
 
   const rafRef = useRef<number | null>(null)
   const lastTimeRef = useRef(0)
@@ -240,24 +245,24 @@ export const BattleReveal = memo(function BattleReveal({
   // Trigger animation sequence
   useEffect(() => {
     // The trigger fires once, so the reveal plays once and the phase starts idle
-    if (!triggered || hasAnimated.current) return
+    if (!triggered || hasAnimated.current || reducedMotion) return
 
     // Mark as animated so we don't replay
     hasAnimated.current = true
 
     // Start the sequence
-    setPhase('bug-wander')
+    setPlayedPhase('bug-wander')
 
     const timers: NodeJS.Timeout[] = []
     // The slash's frame by frame ramp, cancelled with the timers when the reveal unmounts mid slash
     let attackFrame = 0
 
     // Knight dash
-    timers.push(setTimeout(() => setPhase('knight-dash'), PHASE_TIMING['knight-dash']))
+    timers.push(setTimeout(() => setPlayedPhase('knight-dash'), PHASE_TIMING['knight-dash']))
 
     // Slash attack - animate attack phase
     timers.push(setTimeout(() => {
-      setPhase('slash')
+      setPlayedPhase('slash')
       // Animate attack phase from 0 to 1 over 200ms
       const start = performance.now()
       const animateAttack = (now: number) => {
@@ -269,34 +274,34 @@ export const BattleReveal = memo(function BattleReveal({
     }, PHASE_TIMING['slash']))
 
     // Bug hit - blood splatter!
-    timers.push(setTimeout(() => setPhase('bug-hit'), PHASE_TIMING['bug-hit']))
+    timers.push(setTimeout(() => setPlayedPhase('bug-hit'), PHASE_TIMING['bug-hit']))
 
     // Bug tremble - shaking violently before explosion
-    timers.push(setTimeout(() => setPhase('bug-tremble'), PHASE_TIMING['bug-tremble']))
+    timers.push(setTimeout(() => setPlayedPhase('bug-tremble'), PHASE_TIMING['bug-tremble']))
 
     // Bug death - EXPLOSIVE with screen shake!
     timers.push(setTimeout(() => {
-      setPhase('bug-death')
+      setPlayedPhase('bug-death')
       setAttackPhase(0)
     }, PHASE_TIMING['bug-death']))
 
     // Bug fall - start the tumble
-    timers.push(setTimeout(() => setPhase('bug-fall'), PHASE_TIMING['bug-fall']))
+    timers.push(setTimeout(() => setPlayedPhase('bug-fall'), PHASE_TIMING['bug-fall']))
 
     // Content drop
-    timers.push(setTimeout(() => setPhase('content-drop'), PHASE_TIMING['content-drop']))
+    timers.push(setTimeout(() => setPlayedPhase('content-drop'), PHASE_TIMING['content-drop']))
 
     // The death burst fades and the blood pool spreads once the tumble has landed
-    timers.push(setTimeout(() => setPhase('content-settled'), PHASE_TIMING['content-settled']))
+    timers.push(setTimeout(() => setPlayedPhase('content-settled'), PHASE_TIMING['content-settled']))
 
     // Complete
-    timers.push(setTimeout(() => setPhase('complete'), PHASE_TIMING['complete']))
+    timers.push(setTimeout(() => setPlayedPhase('complete'), PHASE_TIMING['complete']))
 
     return () => {
       timers.forEach(t => clearTimeout(t))
       cancelAnimationFrame(attackFrame)
     }
-  }, [triggered])
+  }, [triggered, reducedMotion])
 
   const showKnight = phase !== 'idle'
   const showBug = phase !== 'idle'

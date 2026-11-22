@@ -15,6 +15,7 @@ import type { CVData, Job, Service } from '@/lib/cv/content'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
@@ -1699,6 +1700,9 @@ export default function DarkFantasyTheme() {
   // The world draws on its first commit; only the layers placed by Math.random or by the pointer wait for the
   // mount, so a server render and the hydrating client never disagree on them.
   const [mounted, setMounted] = useState(false)
+  // The cursor trail and the parallax follow the pointer, motion a reduced motion visitor asked not to get.
+  const reducedMotion = useReducedMotion()
+  const pointerMotion = mounted && !reducedMotion
 
   // The final battle starts as the contact section comes into view, a little before it is centred.
   const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
@@ -1734,8 +1738,8 @@ export default function DarkFantasyTheme() {
       <ProfessionStage profession={active} p={DARK_FANTASY} />
 
       {/* Interactive Elements - desktop only */}
-      {mounted && <ParallaxLayers />}
-      {mounted && <CursorTrail />}
+      {pointerMotion && <ParallaxLayers />}
+      {pointerMotion && <CursorTrail />}
 
       {/* Vignette overlay - optimized: no box-shadow */}
       <div
