@@ -44,11 +44,15 @@ const KNIGHT_SCALE = 2.8
 const KNIGHT_HALF = (KNIGHT_VIEW_WIDTH * KNIGHT_SCALE) / 2
 const KNIGHT_TOP = FLOOR_Y - KNIGHT_SOLE_Y * KNIGHT_SCALE
 // He stands this far left of a relic to strike it, and starts this far left of the first one.
-const REACH = 120
-const LEAD_IN = 260
+const REACH = 110
+const LEAD_IN = 60
 // The relics stand between these x on the canvas, right of the text column.
-const ROW_FROM = 1060
-const ROW_TO = 1600
+const ROW_FROM = 1180
+const ROW_TO = 1640
+// A relic is drawn whole while its neighbours stand at least RELIC_ROOM apart, and shrinks to fit a closer
+// row, down to RELIC_MIN of its size.
+const RELIC_ROOM = 130
+const RELIC_MIN = 0.45
 // Of each card's share of the scroll, the first WALK he walks to its relic, the rest he slashes.
 const WALK = 0.4
 // A relic is freed over this part of its card's share, after the slash lands.
@@ -146,18 +150,22 @@ const RELIC_GLOW: Record<Relic, { y: number; r: number; color: string }> = {
   orb: { y: -40, r: 60, color: DARK_FANTASY.spiritGold },
 }
 
-const standing = (x: number, rise = 0): string => `translate(${x} ${(FLOOR_Y - rise).toFixed(1)})`
+/** How big the relics of a row are drawn: whole when they have room, smaller in a long row. */
+export const relicSize = (xs: readonly number[]): number =>
+  xs.length < 2 ? 1 : Math.max(RELIC_MIN, Math.min(1, (xs[1] - xs[0]) / RELIC_ROOM))
+
+const standing = (x: number, size: number, rise = 0): string => `translate(${x.toFixed(1)} ${(FLOOR_Y - rise * size).toFixed(1)}) scale(${size.toFixed(3)})`
 
 /** How a freed relic moves: a wisp rises out of reach, a gear turns, a lantern and an orb lift a little. */
-const RELIC_MOTION: Record<Relic, (x: number, lit: number) => string> = {
-  wisp: (x, lit) => standing(x, lit * 140),
-  lavenderWisp: (x, lit) => standing(x, lit * 140),
-  lantern: (x, lit) => standing(x, lit * 20),
-  crystal: (x) => standing(x),
-  goldCrystal: (x) => standing(x),
-  gear: (x, lit) => `${standing(x)} rotate(${(lit * 120).toFixed(1)} 0 -70)`,
-  lamp: (x) => standing(x),
-  orb: (x, lit) => standing(x, lit * 30),
+const RELIC_MOTION: Record<Relic, (x: number, size: number, lit: number) => string> = {
+  wisp: (x, size, lit) => standing(x, size, lit * 140),
+  lavenderWisp: (x, size, lit) => standing(x, size, lit * 140),
+  lantern: (x, size, lit) => standing(x, size, lit * 20),
+  crystal: (x, size) => standing(x, size),
+  goldCrystal: (x, size) => standing(x, size),
+  gear: (x, size, lit) => `${standing(x, size)} rotate(${(lit * 120).toFixed(1)} 0 -70)`,
+  lamp: (x, size) => standing(x, size),
+  orb: (x, size, lit) => standing(x, size, lit * 30),
 }
 
 // An unlit relic shows at this opacity; freed, it shows whole.
@@ -165,10 +173,11 @@ const UNLIT = 0.45
 
 function RelicRow({ relic, xs }: { relic: Relic; xs: readonly number[] }) {
   const glow = RELIC_GLOW[relic]
+  const size = relicSize(xs)
   return (
     <>
       {xs.map((x, i) => (
-        <g key={i} data-fx={`relic-${i}`} transform={RELIC_MOTION[relic](x, 0)}>
+        <g key={i} data-fx={`relic-${i}`} transform={RELIC_MOTION[relic](x, size, 0)}>
           <g data-fx={`lit-${i}`} opacity="0">
             <circle cx="0" cy={glow.y} r={glow.r} fill={glow.color} opacity="0.22" />
             <circle cx="0" cy={glow.y} r={glow.r * 0.45} fill={glow.color} opacity="0.3" />
@@ -185,10 +194,11 @@ function RelicRow({ relic, xs }: { relic: Relic; xs: readonly number[] }) {
 /** Binds a relic row and returns its writer: each relic moves, glows and shows whole as it is freed. */
 function relicWriter(stage: ParentNode, relic: Relic, xs: readonly number[]): (reached: number) => void {
   const rows = xs.map((_, i) => ({ relic: fx(stage, `relic-${i}`), lit: fx(stage, `lit-${i}`), body: fx(stage, `body-${i}`) }))
+  const size = relicSize(xs)
   return (reached) =>
     rows.forEach((row, i) => {
       const lit = freed(reached, i)
-      transformTo(row.relic, RELIC_MOTION[relic](xs[i], lit))
+      transformTo(row.relic, RELIC_MOTION[relic](xs[i], size, lit))
       fadeTo(row.lit, lit)
       fadeTo(row.body, UNLIT + (1 - UNLIT) * lit)
     })
@@ -228,7 +238,7 @@ function relicScene(relic: Relic, light: string): SceneSpec {
 
 const BUG_SIZE = 180
 const BUG_H = BUG_SIZE * BUG_ASPECT
-const BUG_X = 1720
+const BUG_X = 1700
 const BUG_HOVER = 60
 const BUG_SWAY_PX = 10
 const BUG_RECOIL_PX = 40

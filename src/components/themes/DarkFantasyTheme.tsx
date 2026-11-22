@@ -993,7 +993,7 @@ const CARDS: SectionFrames = {
 
 // The column a frame reads in: beside the scene from lg, the knight and his relics on its right; below lg the
 // whole width, the scene showing in the screens of picture alone above and below it.
-const COLUMN = 'relative mx-auto max-w-4xl lg:mx-0 lg:w-[min(46rem,50vw)]'
+const COLUMN = 'relative mx-auto max-w-4xl lg:mx-0 lg:w-[min(42rem,46vw)]'
 const SIDE = 'px-4 md:px-6 lg:pl-[clamp(1.5rem,4vw,4rem)]'
 
 /** One section: a screen of its scene alone, then its frame over the held scene, then the scene again
