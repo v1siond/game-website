@@ -6,12 +6,10 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Service } from '@/lib/cv/content'
 import { usePreview } from '@/themes/PreviewContext'
-import { Actor, FoeSprite, useCourse } from './actor'
-import { cssVars } from '@/lib/cssVars'
+import { Actor, useCourse } from './actor'
 import type { Course } from './course'
 import { JOURNAL_SERIF } from './palette'
-import { PAPER_CARD, Region } from './region'
-import side from './side.module.css'
+import { PAPER_CARD, Region, StompFoe } from './region'
 import thud from './servicesStomp.module.css'
 
 // The services as a stretch between levels: the HUD title and the message window's paper cards, a title
@@ -41,20 +39,11 @@ const STOMP_COURSE: Course = {
 
 function StompScene() {
   const course = useCourse(STOMP_COURSE)
-  const flat = course.past('stomp')
   if (course.arrived) return null
 
   return (
     <div className={`pointer-events-none absolute inset-x-0 z-20 ${thud.lane}`} aria-hidden="true">
-      <div className={side.foe} data-scored={flat} style={cssVars({ '--x': FOE_X })}>
-        <span className={`absolute inset-0 ${side.foeLive}`}>
-          <FoeSprite look="walker" className="h-full w-full" />
-        </span>
-        <span className={`absolute inset-0 ${side.foeFlat}`}>
-          <FoeSprite look="walkerFlat" className="h-full w-full" />
-        </span>
-        <span className={`absolute bottom-14 left-1/2 rounded-sm bg-[color:var(--ap-hud)] px-1.5 text-sm font-bold text-white ${side.score}`}>100</span>
-      </div>
+      <StompFoe x={FOE_X} scored={course.past('stomp')} score={100} />
       <Actor motion={course.motion} profession="engineer" onAnimationEnd={course.onOwnAnimationEnd} />
     </div>
   )

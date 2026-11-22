@@ -5,13 +5,11 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { MartialArts } from '@/lib/cv/content'
-import { Actor, FoeSprite, useCourse, usePassed } from './actor'
-import { cssVars } from '@/lib/cssVars'
+import { Actor, useCourse, usePassed } from './actor'
 import type { Course, Leg } from './course'
 import { JOURNAL_SERIF } from './palette'
-import { Banner, Playfield, Region } from './region'
+import { AgainButton, Banner, Playfield, Region, StompFoe } from './region'
 import type { Zone } from './world'
-import side from './side.module.css'
 
 // The Muay Thai record as the fortress (research images 15, 26, 27): gold blocks on the dark, and one
 // mushroom foe walking toward him for each of his titles. He runs in and stomps them in one chain
@@ -56,15 +54,7 @@ function ChainScene({ count, onStomped }: { count: number; onStomped: (stomped: 
   return (
     <>
       {Array.from({ length: count }, (_, index) => (
-        <div key={index} className={side.foe} data-scored={index < stomped} style={cssVars({ '--x': foeX(index, count) })} aria-hidden="true">
-          <span className={`absolute inset-0 ${side.foeLive}`}>
-            <FoeSprite look="walker" className="h-full w-full" />
-          </span>
-          <span className={`absolute inset-0 ${side.foeFlat}`}>
-            <FoeSprite look="walkerFlat" className="h-full w-full" />
-          </span>
-          <span className={`absolute bottom-14 left-1/2 rounded-sm bg-[color:var(--ap-hud)] px-1.5 text-sm font-bold text-white ${side.score}`}>{scoreOf(index)}</span>
-        </div>
+        <StompFoe key={index} x={foeX(index, count)} scored={index < stomped} score={scoreOf(index)} />
       ))}
       <Actor motion={course.motion} profession="fighter" onAnimationEnd={course.onOwnAnimationEnd} />
     </>
@@ -86,14 +76,9 @@ export function StompLevel({ martialArts }: { martialArts: MartialArts }) {
       <Banner>{all ? labels.fortressCleared : sections.muayThai}</Banner>
       <Playfield ground="gold">{on && <ChainScene key={round} count={count} onStomped={stomped} />}</Playfield>
       {!reduced && (
-        <button
-          type="button"
-          onClick={() => setRound((now) => now + 1)}
-          disabled={!all}
-          className={`-mt-3 mb-6 min-h-[44px] rounded-md border-[3px] border-white bg-[color:var(--ap-hud)] px-4 text-sm font-bold text-white transition-transform hover:-translate-y-0.5 disabled:opacity-60 motion-reduce:transition-none ${JOURNAL_SERIF}`}
-        >
+        <AgainButton onAgain={() => setRound((now) => now + 1)} ready={all}>
           {labels.stompAgain}
-        </button>
+        </AgainButton>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[2fr_3fr]">
