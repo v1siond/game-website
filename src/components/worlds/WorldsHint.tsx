@@ -71,14 +71,16 @@ export default function WorldsHint({ cardRef, open, style, worldName, nextName, 
       <p id="worlds-hint-body" className="c-worlds-hint__body mb-2 mt-1 text-sm leading-snug">
         {fillLabel(countTemplate(seen, { one: labels.hintBodyOne, many: labels.hintBody }), { world: worldName, seen, total })}
       </p>
-      <div className="flex gap-2">
-        <button type="button" onClick={onNext} className="c-worlds-hint__primary min-h-11 flex-1 rounded-md px-3 text-sm font-bold">
+      {/* A long world name wraps inside its own button, and on a narrow card the row breaks rather than
+          squeeze the label past the button's fill, where it would be the fill colour on the fill. */}
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={onNext} className="c-worlds-hint__primary min-h-11 min-w-36 flex-1 rounded-md px-3 text-sm font-bold text-balance [overflow-wrap:anywhere]">
           {fillLabel(labels.hintEnter, { world: nextName })}
         </button>
         <button
           type="button"
           onClick={(event) => onAll(event.currentTarget)}
-          className="c-worlds-hint__secondary min-h-11 flex-1 rounded-md px-3 text-sm"
+          className="c-worlds-hint__secondary min-h-11 min-w-36 flex-1 rounded-md px-3 text-sm text-balance [overflow-wrap:anywhere]"
         >
           {labels.hintAll}
         </button>
