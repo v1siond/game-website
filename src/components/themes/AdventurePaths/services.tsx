@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -41,7 +40,7 @@ const STOMP_COURSE: Course = {
 }
 
 function StompScene() {
-  const course = useCourse(useMemo(() => STOMP_COURSE, []))
+  const course = useCourse(STOMP_COURSE)
   const flat = course.past('stomp')
   if (course.arrived) return null
 

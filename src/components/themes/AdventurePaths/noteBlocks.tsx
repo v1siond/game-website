@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -73,7 +73,7 @@ export function NoteBlockLevel({ bands, musician }: { bands: Band[]; musician: M
   const { ref, on, reduced } = useZoneStage<Zone>('night')
   const [at, setAt] = useState(0)
   const count = bands.length
-  const course = useCourse(dropCourse(blockX(0, count)))
+  const course = useCourse(useMemo(() => dropCourse(blockX(0, count)), [count]))
   const bouncing = course.arrived && !reduced
   const spot = { x: blockX(at, count), lift: LIFT }
   // Once he has landed he glides from block to block; the drop is the course's one leg.
