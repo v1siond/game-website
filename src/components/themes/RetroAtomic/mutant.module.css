@@ -42,11 +42,11 @@
 
 /* ---------------------------------------------------------------- the knee to the gut: he doubles over it */
 
-.kneed .body { animation: kneed-body 0.8s ease-out both; }
-.kneed .torso { animation: kneed-torso 0.8s ease-out both; }
-.kneed .head { animation: kneed-head 0.8s ease-out both; }
-.kneed .armNear { animation: kneed-arm 0.8s ease-out both; }
-.kneed .foreNear { animation: kneed-fore 0.8s ease-out both; }
+.kneed .body { animation: kneed-body var(--react, 0.8s) ease-out both; }
+.kneed .torso { animation: kneed-torso var(--react, 0.8s) ease-out both; }
+.kneed .head { animation: kneed-head var(--react, 0.8s) ease-out both; }
+.kneed .armNear { animation: kneed-arm var(--react, 0.8s) ease-out both; }
+.kneed .foreNear { animation: kneed-fore var(--react, 0.8s) ease-out both; }
 
 @keyframes kneed-body { 0%, 100% { transform: translateX(0); } 25%, 55% { transform: translateX(6px); } }
 @keyframes kneed-torso { 0%, 100% { transform: rotate(0deg); } 25%, 55% { transform: rotate(-22deg); } }
@@ -56,11 +56,11 @@
 
 /* ---------------------------------------------------------------- the kick to the head: he rocks back, arms flung */
 
-.kicked .body { animation: kicked-body 0.8s ease-out both; }
-.kicked .head { animation: kicked-head 0.8s ease-out both; }
-.kicked .armNear { animation: kicked-arm-n 0.8s ease-out both; }
-.kicked .foreNear { animation: kicked-fore-n 0.8s ease-out both; }
-.kicked .armFar { animation: kicked-arm-f 0.8s ease-out both; }
+.kicked .body { animation: kicked-body var(--react, 0.8s) ease-out both; }
+.kicked .head { animation: kicked-head var(--react, 0.8s) ease-out both; }
+.kicked .armNear { animation: kicked-arm-n var(--react, 0.8s) ease-out both; }
+.kicked .foreNear { animation: kicked-fore-n var(--react, 0.8s) ease-out both; }
+.kicked .armFar { animation: kicked-arm-f var(--react, 0.8s) ease-out both; }
 
 @keyframes kicked-body { 0%, 100% { transform: rotate(0deg); } 25%, 55% { transform: translateX(7px) rotate(9deg); } }
 @keyframes kicked-head { 0%, 100% { transform: rotate(0deg); } 25%, 55% { transform: rotate(24deg); } }
