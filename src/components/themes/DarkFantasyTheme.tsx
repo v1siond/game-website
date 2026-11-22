@@ -1103,8 +1103,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
 })
 
 // Band card
-const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
-  const { links } = useLabels()
+const BandCard = memo(function BandCard({ band, years, linkProps, release }: BandSlot) {
   const content = (
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
@@ -1122,9 +1121,9 @@ const BandCard = memo(function BandCard({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
-      {band.release && (
+      {release && (
         <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>
-          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </article>
