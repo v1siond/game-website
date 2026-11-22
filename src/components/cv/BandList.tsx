@@ -15,7 +15,8 @@ export interface BandSlot {
 
 interface BandListProps {
   bands: Band[]
-  renderBand: (slot: BandSlot) => ReactNode
+  /** `index` is the band's place in `bands`. */
+  renderBand: (slot: BandSlot, index: number) => ReactNode
   className?: string
   itemClassName?: string
 }
@@ -35,9 +36,9 @@ export function BandList({ bands, renderBand, className, itemClassName }: BandLi
   const slots = useMemo(() => bands.map((band) => slotFor(band, labels)), [bands, labels])
   return (
     <ul className={className}>
-      {slots.map((slot) => (
+      {slots.map((slot, index) => (
         <li key={slot.band.id} className={itemClassName}>
-          {renderBand(slot)}
+          {renderBand(slot, index)}
         </li>
       ))}
     </ul>

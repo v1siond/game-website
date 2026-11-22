@@ -20,7 +20,8 @@ export interface ProjectSlot {
 
 interface ProjectListProps {
   projects: Project[]
-  renderProject: (slot: ProjectSlot) => ReactNode
+  /** `index` is the project's place in `projects`. */
+  renderProject: (slot: ProjectSlot, index: number) => ReactNode
   className?: string
   itemClassName?: string
 }
@@ -46,9 +47,9 @@ export function ProjectList({ projects, renderProject, className, itemClassName 
   const slots = useMemo(() => projects.map((project) => slotFor(project, labels)), [projects, labels])
   return (
     <ul className={className}>
-      {slots.map((slot) => (
+      {slots.map((slot, index) => (
         <li key={slot.project.id} className={itemClassName}>
-          {renderProject(slot)}
+          {renderProject(slot, index)}
         </li>
       ))}
     </ul>

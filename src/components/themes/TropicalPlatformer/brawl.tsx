@@ -138,8 +138,8 @@ export function BrawlRecord({ martialArts }: { martialArts: MartialArts }) {
           achievements: `space-y-3 self-center rounded-3xl p-6 ${look.board}`,
           achievement: 'flex items-start gap-3 text-base text-[color:var(--tp-parchment)]',
         }}
-        renderAchievement={(achievement) => {
-          const isWon = achievements.indexOf(achievement) < won
+        renderAchievement={(achievement, index) => {
+          const isWon = index < won
           return (
             <>
               <Burst solid={isWon} />

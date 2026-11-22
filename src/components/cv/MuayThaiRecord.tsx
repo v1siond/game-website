@@ -19,7 +19,8 @@ interface MuayThaiRecordClassNames {
 interface MuayThaiRecordProps {
   martialArts: MartialArts
   classNames?: MuayThaiRecordClassNames
-  renderAchievement?: (achievement: string) => ReactNode
+  /** `index` is the achievement's place in `martialArts.primary.achievements`. */
+  renderAchievement?: (achievement: string, index: number) => ReactNode
 }
 
 export function MuayThaiRecord({ martialArts, classNames = {}, renderAchievement = (text) => text }: MuayThaiRecordProps) {
@@ -35,9 +36,9 @@ export function MuayThaiRecord({ martialArts, classNames = {}, renderAchievement
         ))}
       </dl>
       <ul className={classNames.achievements} aria-label={labels.record.achievements}>
-        {martialArts.primary.achievements.map((achievement) => (
+        {martialArts.primary.achievements.map((achievement, index) => (
           <li key={achievement} className={classNames.achievement}>
-            {renderAchievement(achievement)}
+            {renderAchievement(achievement, index)}
           </li>
         ))}
       </ul>

@@ -111,10 +111,7 @@ export function VineBands({ bands, musician }: { bands: Band[]; musician: Musici
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={`${MASONRY_ITEM} pt-6`}
-        renderBand={(slot) => {
-          const index = bands.indexOf(slot.band)
-          return <HangingBand slot={slot} index={index} here={index === at} swings={swings} onSwing={() => swingTo(index)} />
-        }}
+        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} swings={swings} onSwing={() => swingTo(index)} />}
       />
       <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
         {status}

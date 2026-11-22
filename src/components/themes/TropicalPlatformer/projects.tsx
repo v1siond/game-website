@@ -70,10 +70,7 @@ export function CartProjects({ projects }: { projects: Project[] }) {
           projects={projects}
           className={MASONRY_LIST}
           itemClassName={MASONRY_ITEM}
-          renderProject={(slot) => {
-            const index = projects.indexOf(slot.project)
-            return <ProjectStation slot={slot} here={index === stop} onRide={() => rideTo(index)} />
-          }}
+          renderProject={(slot, index) => <ProjectStation slot={slot} here={index === stop} onRide={() => rideTo(index)} />}
         />
       )}
     </CartLine>
