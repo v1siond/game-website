@@ -90,10 +90,13 @@ const ECHOES = [
   { tint: life.echoCyan, lag: '0.24s', fade: 0.16 },
 ]
 
+// One figure of the dash. Before the stage turns on and once his own dash has ended he waits off the lane,
+// so he stands still there instead of running his leg loops where nobody sees them.
 function Runner({ motion, className = '', style }: { motion: MercMotion; className?: string; style?: CSSProperties }) {
+  const [ran, setRan] = useState(false)
   return (
-    <div className={`${life.runner} absolute inset-y-0 left-0 w-full ${className}`} style={style}>
-      <MercSprite profession="engineer" motion={motion} className="absolute bottom-0 left-0 h-full w-auto" />
+    <div className={`${life.runner} absolute inset-y-0 left-0 w-full ${className}`} style={style} onAnimationEnd={(event) => event.target === event.currentTarget && setRan(true)}>
+      <MercSprite profession="engineer" motion={ran ? 'still' : motion} className="absolute bottom-0 left-0 h-full w-auto" />
     </div>
   )
 }
@@ -102,7 +105,7 @@ export function SandevistanStack({ techStack }: { techStack: SectionsOf<'enginee
   const { sections, cards, cyber } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('megablock')
   const [take, setTake] = useState(0)
-  const motion: MercMotion = reduced ? 'still' : 'dash'
+  const motion: MercMotion = reduced || !lit ? 'still' : 'dash'
 
   const replay = reduced ? null : (
     <button
