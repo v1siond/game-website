@@ -47,6 +47,10 @@ const PARTNER_X = 1300
 
 const place = (x: number): string => `translate(${x.toFixed(1)} ${TOP}) scale(${SIZE})`
 
+// The centre of every call: on the stage's right half, inside what a 1024 by 768 screen still shows of the canvas
+// (x 200 to 1400) and clear of the screen column on the left; below 1024 the troupe's move brings it to the middle.
+const CALL_X = 1180
+
 // ---- the calls slammed on the screen: the round call lettering in gold on an ink outline ----
 
 function Call({ x, y, size, name, children }: { x: number; y: number; size: number; name: string; children: string }) {
@@ -160,10 +164,10 @@ const about: SceneSpec = {
           <Car key={damage} damage={damage} />
         ))}
       </g>
-      <Call x={W / 2} y={170} size={64} name="bonus">
+      <Call x={CALL_X} y={170} size={64} name="bonus">
         {labels.arcade.bonus}
       </Call>
-      <Call x={1320} y={420} size={80} name="perfect">
+      <Call x={CALL_X} y={420} size={80} name="perfect">
         {labels.arcade.perfect}
       </Call>
     </>
@@ -229,14 +233,14 @@ const projects: SceneSpec = {
     <>
       <rect data-fx="flash" width={W} height={H} fill={FS.flash} opacity="0" />
       <g data-fx="combo" opacity="0">
-        <text data-fx="hits" x={1440} y={300} textAnchor="end" fontSize={120} fill={FS.hudYellow} stroke={FS.ink} strokeWidth={12} paintOrder="stroke" className={look.face}>
+        <text data-fx="hits" x={CALL_X + 60} y={300} textAnchor="end" fontSize={120} fill={FS.hudYellow} stroke={FS.ink} strokeWidth={12} paintOrder="stroke" className={look.face}>
           0
         </text>
-        <text x={1460} y={300} fontSize={48} fill={FS.callTop} stroke={FS.ink} strokeWidth={6} paintOrder="stroke" className={`${look.face} uppercase`}>
+        <text x={CALL_X + 80} y={300} fontSize={48} fill={FS.callTop} stroke={FS.ink} strokeWidth={6} paintOrder="stroke" className={`${look.face} uppercase`}>
           {labels.hud.hits}
         </text>
       </g>
-      <Call x={W / 2} y={170} size={64} name="super">
+      <Call x={CALL_X} y={170} size={64} name="super">
         {labels.arcade.superMove}
       </Call>
     </>
@@ -296,10 +300,10 @@ const muayThai: SceneSpec = {
   },
   props: (_xs, labels) => (
     <>
-      <Call x={W / 2} y={260} size={110} name="ko">
+      <Call x={CALL_X} y={260} size={110} name="ko">
         {labels.arcade.ko}
       </Call>
-      <Call x={W / 2} y={420} size={90} name="perfect">
+      <Call x={CALL_X} y={420} size={90} name="perfect">
         {labels.arcade.perfect}
       </Call>
     </>
