@@ -1,27 +1,48 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
-// The one media query reader for every world. The hook starts false so the server render and the first
-// client render agree, then follows the query live.
+// The one media query reader for every world. The server render and hydration read false, so they agree;
+// a component mounted on the client reads the real answer in its first render, so a reduced motion caller
+// never starts its motion for one commit. One MediaQueryList and one subscribe function per query, kept
+// for the page's life, so every caller of a query shares them and React never resubscribes.
+
+const canMatch = (): boolean => typeof window !== 'undefined' && typeof window.matchMedia === 'function'
 
 /** A one off read for code that decides at the moment of an event, outside render. */
 export function matchesMedia(query: string): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false
+  if (!canMatch()) return false
   return window.matchMedia(query).matches
 }
 
+type Subscribe = (onChange: () => void) => () => void
+
+const lists = new Map<string, MediaQueryList>()
+const subscribers = new Map<string, Subscribe>()
+
+const listFor = (query: string): MediaQueryList => {
+  const known = lists.get(query)
+  if (known) return known
+  const list = window.matchMedia(query)
+  lists.set(query, list)
+  return list
+}
+
+const subscribeFor = (query: string): Subscribe => {
+  const known = subscribers.get(query)
+  if (known) return known
+  const subscribe: Subscribe = (onChange) => {
+    if (!canMatch()) return () => {}
+    const list = listFor(query)
+    list.addEventListener('change', onChange)
+    return () => list.removeEventListener('change', onChange)
+  }
+  subscribers.set(query, subscribe)
+  return subscribe
+}
+
+const serverSnapshot = (): boolean => false
+
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(false)
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(query)
-    setMatches(mediaQuery.matches)
-
-    const handler = (event: MediaQueryListEvent) => setMatches(event.matches)
-    mediaQuery.addEventListener('change', handler)
-    return () => mediaQuery.removeEventListener('change', handler)
-  }, [query])
-
-  return matches
+  return useSyncExternalStore(subscribeFor(query), () => canMatch() && listFor(query).matches, serverSnapshot)
 }
