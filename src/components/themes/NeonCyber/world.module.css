@@ -582,11 +582,13 @@
 .lens {
   --clip: var(--neon-data);
   border-left: 3px solid var(--clip);
-  transition: opacity 0.2s;
+  transition: filter 0.2s;
 }
 
+/* A job off the playhead dims as a whole, card and words together, so the city behind never shows through it
+   and its words keep 7:1 on the card. */
 .bd[data-scrubbed='true'] .lens[data-lit='false'] {
-  opacity: 0.7;
+  filter: brightness(0.75);
 }
 
 .lens[data-lit='true'] {

@@ -92,7 +92,7 @@ export default function NeonCyberTheme() {
           <HoloCall scene={contact} profession={active} number={sections.length + 1} still={reduced} />
         </main>
 
-        <footer className="flex items-center justify-center gap-3 pb-10">
+        <footer className="flex items-center justify-center gap-3 bg-[color:var(--neon-ink)] py-8">
           <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
           <p className="text-sm tracking-widest text-[color:var(--neon-ash)]">
             <CopyrightLine />
