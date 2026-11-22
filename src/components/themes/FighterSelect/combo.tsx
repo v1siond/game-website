@@ -19,8 +19,8 @@ const MAX_HITS = 99
 
 const ComboContext = createContext<() => void>(() => {})
 
-/** Lands one hit on the combo counter of the zone around it (the super move's hits). */
-export const useComboLand = () => useContext(ComboContext)
+/** Lands one hit on the combo counter of the zone around it. */
+const useComboLand = () => useContext(ComboContext)
 
 function ComboCounter({ hits }: { hits: number }) {
   const { hud } = useLabels()

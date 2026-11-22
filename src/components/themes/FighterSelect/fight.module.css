@@ -101,10 +101,6 @@
     animation: countdown 4s steps(9, end) 900ms both;
   }
 
-  .cue:not([data-scene-phase='idle']) .banner {
-    animation: banner 900ms cubic-bezier(0.2, 0.9, 0.2, 1) 200ms both;
-  }
-
   /* The coin call blinks with the clock, once a second until it reads zero, and rests lit. */
   .cue:not([data-scene-phase='idle']) .blink {
     animation: blink 1s steps(1, end) 900ms 4;
@@ -190,8 +186,7 @@
 }
 
 .spark,
-.roundBadge,
-.banner {
+.roundBadge {
   opacity: 0;
 }
 
@@ -382,25 +377,6 @@
   }
   to {
     transform: translate3d(0, -90%, 0);
-  }
-}
-
-@keyframes banner {
-  0% {
-    opacity: 0;
-    transform: translate3d(-100%, 0, 0) skewX(-20deg);
-  }
-  35% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) skewX(-20deg);
-  }
-  75% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) skewX(-20deg);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(100%, 0, 0) skewX(-20deg);
   }
 }
 
