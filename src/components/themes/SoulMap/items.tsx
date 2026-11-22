@@ -116,7 +116,7 @@ function ItemCard({ project, years, links }: ProjectSlot) {
         {project.impact && <p className={`mt-3 border-l-2 border-[color:var(--soul-ember)] pl-3 ${CARD_BODY}`}>{project.impact}</p>}
         {project.techStack.length > 0 && (
           <ul className="mt-3 flex flex-wrap gap-1.5">
-            {project.techStack.slice(0, 4).map((tech) => (
+            {project.techStack.map((tech) => (
               <li key={tech} className={TAG}>
                 {tech}
               </li>
