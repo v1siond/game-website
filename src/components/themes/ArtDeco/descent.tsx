@@ -7,6 +7,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
 import { CVLink, HeroAction, PortfolioLink } from './actions'
+import { DepthGauge } from './plaque'
 import { DECO_COLORS as C } from './palette'
 import descent from './descent.module.css'
 
@@ -24,7 +25,6 @@ import descent from './descent.module.css'
 // the pointer (--mx, --my from the root). Reduced motion starts the scene done: the city and the lit sign.
 
 const BOLTS = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4)
-const GAUGE_TICKS = Array.from({ length: 9 }, (_, i) => -120 + i * 30)
 const SHUTTER_RAYS = Array.from({ length: 9 }, (_, i) => -80 + i * 20)
 
 // A stepped tower with a spire, standing on y = 600, in the shaft's 200 by 600 box.
@@ -205,23 +205,6 @@ function Rim() {
   )
 }
 
-// The depth gauge bolted beside the glass; its needle swings round as the sphere sinks.
-function DepthGauge() {
-  return (
-    <svg viewBox="0 0 80 80" className="absolute -bottom-2 -right-2 h-20 w-20 sm:h-24 sm:w-24" aria-hidden="true" focusable="false">
-      <circle cx="40" cy="40" r="37" fill={C.cream} stroke={C.brassMid} strokeWidth="5" />
-      {GAUGE_TICKS.map((angle) => (
-        <path key={angle} d="M40 10 V17" stroke={C.sepia} strokeWidth={angle % 60 === 0 ? 2.5 : 1.2} transform={`rotate(${angle} 40 40)`} />
-      ))}
-      <path d="M22 58 A24 24 0 0 0 58 58" fill="none" stroke={C.blood} strokeWidth="3" />
-      <g className={descent.needle}>
-        <path d="M40 40 L40 14" stroke={C.blood} strokeWidth="2.5" strokeLinecap="round" />
-      </g>
-      <circle cx="40" cy="40" r="4" fill={C.brassDark} />
-    </svg>
-  )
-}
-
 const BUBBLE_PLACES = ['left-[28%]', 'left-[52%]', 'left-[70%]']
 
 // The ride runs over the first 70 percent of a screen of scroll from where the page opens.
@@ -253,7 +236,8 @@ function Porthole() {
         </div>
       </div>
       <Rim />
-      <DepthGauge />
+      {/* the depth gauge bolted beside the glass; its needle swings round as the sphere sinks */}
+      <DepthGauge size="porthole" className="absolute -bottom-2 -right-2 h-20 w-20 sm:h-24 sm:w-24" needle={descent.needle} />
     </div>
   )
 }
