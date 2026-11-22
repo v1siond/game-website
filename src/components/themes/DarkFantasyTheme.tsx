@@ -33,7 +33,7 @@ import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
+import { MASONRY_COLUMN_LIST, MASONRY_ITEM } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 import world from './DarkFantasy/world.module.css'
 import { slice } from '@/components/themes/shared/loops'
@@ -577,7 +577,7 @@ const VoidFrame = memo(function VoidFrame({
 // Services: a title and its line each, read in the same frame as the tech stack.
 function ServiceList({ services }: { services: Service[] }) {
   return (
-    <ul className={MASONRY_LIST}>
+    <ul className={MASONRY_COLUMN_LIST}>
       {services.map((service) => (
         <li key={service.id} className={MASONRY_ITEM}>
           <h3 className="text-sm tracking-[0.15em] mb-2 uppercase text-[color:var(--df-silver-text)]">
@@ -594,7 +594,7 @@ function ServiceList({ services }: { services: Service[] }) {
 const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
   return (
-    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
+    <ul className={MASONRY_COLUMN_LIST} aria-label={cards.techByCategory}>
       {categories.map((category) => (
         <li key={category.id} className={MASONRY_ITEM}>
           <h3
