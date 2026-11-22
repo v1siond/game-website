@@ -1,6 +1,7 @@
 'use client'
 
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { BandList } from '@/components/cv/BandList'
 import { VentureList } from '@/components/cv/VentureList'
@@ -10,7 +11,7 @@ import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ArtBreak, CurlBanner, PieEyes } from './art'
 import { HOSE } from './palette'
-import { BandRecord, CompanyPoster, ExperienceCard, TechBubbleCloud } from './cards'
+import { BandRecord, CompanyPoster, ExperienceCard, StarLine, TechBubbleCloud } from './cards'
 import { Reveal, RunBar } from './scenes'
 import { staggerAt } from '../shared/stagger'
 import { ParryBoard } from './parry'
@@ -72,10 +73,22 @@ const HEADING = {
   muayThai: headingId('hose', 'Muay Thai'),
 } as const
 
+// One line of the About title card's billing, the label in the red lettering; an empty fact leaves no line.
+function BillLine({ label, value }: { label: string; value: string }) {
+  if (!value) return null
+  return (
+    <div className="flex flex-wrap justify-center gap-x-2 text-sm">
+      <dt className={`uppercase tracking-widest ${world.red}`}>{label}</dt>
+      <dd className={world.ink}>{value}</dd>
+    </div>
+  )
+}
+
 // One frame per section of the shared plan, each on its isle.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const titles = useLabels().sections
+    const { sections: titles, cards, about } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     const { reduced } = useZoneStageContext()
 
     return (
@@ -85,7 +98,20 @@ const FRAMES: SectionFrames = {
             <section aria-labelledby={HEADING.about} className="mb-8">
               <CurlBanner id={HEADING.about}>{titles.about}</CurlBanner>
               <FlowerKnockout on={on} reduced={reduced} profession="engineer">
-                <p className={`mx-auto max-w-prose p-5 leading-relaxed ${world.titleCard} ${LEAD}`}>{slot.bio}</p>
+                <div className={`mx-auto max-w-prose p-5 ${world.titleCard}`}>
+                  <p className={`leading-relaxed ${LEAD}`}>{slot.bio}</p>
+                  {highlights.length > 0 && (
+                    <ul className="mt-4 space-y-1" aria-label={cards.keyAchievements}>
+                      {highlights.map((highlight) => (
+                        <StarLine key={highlight}>{highlight}</StarLine>
+                      ))}
+                    </ul>
+                  )}
+                  <dl className="mt-4 space-y-1">
+                    <BillLine label={about.education} value={education} />
+                    <BillLine label={about.languages} value={languages} />
+                  </dl>
+                </div>
               </FlowerKnockout>
             </section>
           )}
