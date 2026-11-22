@@ -79,15 +79,12 @@
   }
 }
 
-/* Soul motes: soft drifting specks in the depths (GPU transform and opacity), each with its own duration and
-   delay inline. */
+/* Soul motes: soft drifting specks in the depths (GPU transform and opacity), each drifting inline
+   (DarkFantasyTheme.tsx) for the first 5 s of its own drift and holding there. */
 .mote {
   position: absolute;
   border-radius: 9999px;
   opacity: 0;
-  animation-name: drift;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
   will-change: transform, opacity;
 }
 @keyframes drift {
@@ -98,5 +95,5 @@
   100% { transform: translate3d(-6px, -52px, 0); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .mote { animation: none; opacity: 0.35; }
+  .mote { animation: none !important; opacity: 0.35; }
 }

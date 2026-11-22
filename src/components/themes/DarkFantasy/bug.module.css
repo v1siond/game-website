@@ -1,6 +1,8 @@
 /* The bug's living and dead loops, as transform and opacity on its SVG shapes. Each shape scales and
    moves about its own centre (fill-box), so a scaleX of 1.1 on an ellipse reads as its rx growing by
-   10 percent and translateY moves its centre. Linear timing gives each three value loop an even pace.
+   10 percent and translateY moves its centre. Linear timing gives each three value loop an even pace. Each
+   plays one cycle from the moment its bug shows, the living bug's before it dies (1.1 s in), the corpse's
+   within 5 s of the fight's start (it lies from 1.1 s), and rests on the frame it started from.
    Keyframe names stay on animation-name so the CSS module scopes them. */
 
 .shape {
@@ -8,7 +10,8 @@
   transform-origin: center;
   animation-duration: var(--dur);
   animation-timing-function: linear;
-  animation-iteration-count: infinite;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
 }
 
 /* infection growths breathing on the living bug */
@@ -39,7 +42,7 @@
 .smoke { animation-name: smoke; }
 .smokeA { --dur: 3s; --rise: -15px; --from: 0.4; }
 .smokeB { --dur: 3.5s; --rise: -14px; --from: 0.35; }
-.smokeC { --dur: 4s; --rise: -14px; --from: 0.3; }
+.smokeC { --dur: 3.8s; --rise: -14px; --from: 0.3; }
 
 @keyframes smoke {
   0%, 100% { transform: translateY(0) scaleX(1); opacity: var(--from); }

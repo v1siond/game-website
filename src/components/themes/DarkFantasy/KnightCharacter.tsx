@@ -5,6 +5,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { FixedCombatLayer, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
 import knight from './knight.module.css'
 import { DARK_FANTASY } from './palette'
+import { cycles } from '@/components/themes/shared/loops'
 
 /**
  * ALEXANDER AS A MASKED CAVERN KNIGHT
@@ -29,6 +30,10 @@ const KNIGHT_VIEW_HEIGHT = 80
 const KNIGHT_SOLE_Y = 79
 // The small ground shadow drawn over his legs sits this far above the sole line the contact shadows sit on.
 const KNIGHT_INNER_SHADOW_RISE = 3
+
+// He breathes from his fight's complete phase on, the latest of which is the battle reveal's at 2.5 s
+// (BattleReveal.tsx), so his float and cloak play whole breaths that end within 5 s of any fight's start.
+const BREATH_AT_S = 2.5
 
 interface KnightCharacterProps {
   scale?: number
@@ -57,7 +62,7 @@ export const KnightCharacter = memo(function KnightCharacter({
   const nailRotation = getNailRotation()
 
   return (
-    <span style={{ display: 'block', animation: breathing && !attacking ? `${knight.knightIdleFloat} 3.6s ease-in-out infinite` : undefined }}>
+    <span style={{ display: 'block', animation: breathing && !attacking ? cycles(knight.knightIdleFloat, 3.6, 'ease-in-out', BREATH_AT_S) : undefined }}>
     {/* Idle: gentle float wrapper + cloak breathing (HK-style); disabled while attacking */}
     <svg
       width={KNIGHT_VIEW_WIDTH * scale}
@@ -80,7 +85,7 @@ export const KnightCharacter = memo(function KnightCharacter({
       <g
         style={{
           transformOrigin: '30px 60px',
-          animation: breathing ? `${knight.knightCloakBreathing} 3s ease-in-out infinite` : undefined,
+          animation: breathing ? cycles(knight.knightCloakBreathing, 3, 'ease-in-out', BREATH_AT_S) : undefined,
         }}
       >
         <path
