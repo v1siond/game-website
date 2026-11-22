@@ -5,9 +5,9 @@ import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
 import s from './sprite.module.css'
 
 // The survivor posed by the scroll, on the shared rig (rigPose, ../shared/rig): his limbs as the rig's
-// numbers, plus his own kit on top, each 0 to 1: the bolt out of the plasmid hand, the wrench's arc, the
+// numbers, plus his own kit on top, each 0 to 1: the bolt out of the charged hand, the wrench's arc, the
 // audio diary by his face, the sparks over the fingers, the spark off the snare, the revival chamber's light
-// and how far he is knit back together in it. His front side (the plasmid arm, the near leg) is the rig's
+// and how far he is knit back together in it. His front side (the charged arm, the near leg) is the rig's
 // right, his back side its left; he faces right, so he walks with the rig's profile stride facing 1.
 
 export type DecoPose = RigPose & { head: number; bolt: number; arc: number; recorder: number; sparks: number; hit: number; chamber: number; knit: number }
@@ -44,11 +44,11 @@ export function walk(profession: Profession, phase: number): DecoPose {
   }
 }
 
-/** The plasmid thrown forward and the bolt forked out of it, `t` of the way. */
+/** The charged hand thrown forward and the bolt forked out of it, `t` of the way. */
 const ZAP = pose({ armRight: -75, foreRight: -12, lean: -3 })
 export const zap = (profession: Profession, t: number): DecoPose => ({ ...mix(KIT[profession], ZAP, t), bolt: ramp(t, 0.7, 1), sparks: t })
 
-/** The plasmid hand raised over his head, lifting with the mind, `t` of the way. */
+/** The charged hand raised over his head, lifting with the mind, `t` of the way. */
 const LIFT = pose({ armRight: -150, foreRight: -15, lean: -4 })
 export const lift = (profession: Profession, t: number): DecoPose => ({ ...mix(KIT[profession], LIFT, t), sparks: t })
 

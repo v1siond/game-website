@@ -4,7 +4,7 @@ import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../ch
 import { zap } from '../pose'
 
 // About: the power station, dark when he arrives. A fuse box stands on its pole for each highlight, its
-// lamp out; as each highlight is read he walks up to its box and throws the plasmid's bolt into it, and
+// lamp out; as each highlight is read he walks up to its box and throws the charged hand's bolt into it, and
 // the box's dials and the lamp over it come on and stay lit, so the room fills with light as the section
 // is read.
 

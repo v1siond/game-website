@@ -4,7 +4,7 @@ import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../ch
 import { drum } from '../pose'
 
 // Bands: theatre row. A dark marquee stands on its brass legs for each band; as each band is read he walks
-// up to it and plays a roll on the snare at his waist, the plasmid stick sparking, and the marquee's bulbs
+// up to it and plays a roll on the snare at his waist, the charged stick sparking, and the marquee's bulbs
 // and its neon frame come on and stay lit.
 
 const BULBS = Array.from({ length: 9 }, (_, i) => -96 + i * 24)

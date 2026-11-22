@@ -67,7 +67,7 @@ function DecoPosts() {
 }
 
 /** The end of the page: the posts, then the contact plate, over the revival chamber. */
-export function VitaContact({ scene, still }: { scene: DecoScene; still: boolean }) {
+export function RevivalContact({ scene, still }: { scene: DecoScene; still: boolean }) {
   const { sections, blog } = useLabels()
   return (
     <section id={scene.anchor} data-scene={scene.id} aria-labelledby="deco-contact" className={page.goal}>

@@ -8,7 +8,7 @@ import { decoJoints, lift, setDecoPose } from '../pose'
 // The hero: the bathysphere station's lobby at the bottom of the sea. Beyond the great window, between his
 // sign and the vending machine, the bathysphere rides its rails down from the surface as the page starts
 // to scroll and docks over him, its porthole lit; he waits on the lobby floor in his kit and raises the
-// plasmid hand to it as it arrives.
+// charged hand to it as it arrives.
 
 const SPHERE = { x: 780, y: 420, r: 90 }
 // The sphere starts this far up its rails and docks over this share of the hero's scroll.

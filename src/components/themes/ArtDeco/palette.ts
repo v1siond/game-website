@@ -74,7 +74,7 @@ export const DECO_COLORS = {
   bloodDeep: '#3F0000',
 
   // His painted costume: the grey heather cable knit sweater, the slacks, the pipe wrench and the blue
-  // crackle of the electric plasmid in his veins
+  // crackle of the electric charge in his veins
   knit: '#7c7a74',
   knitShade: '#4a4843',
   knitLight: '#a3a19a',
@@ -87,7 +87,7 @@ export const DECO_COLORS = {
   boltCore: '#effcff',
 
   // The revival chamber's life light
-  vita: '#3fe0b0',
+  revival: '#3fe0b0',
 
   // The project photographs' paper, top to foot
   photoPaper: '#f6ecd6',

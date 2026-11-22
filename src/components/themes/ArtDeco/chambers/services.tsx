@@ -3,8 +3,8 @@ import { DECO_COLORS as C } from '../palette'
 import { PropRow, Walker, litOf, propNodes, walkerOf, type Chamber } from '../chamber'
 import { lift } from '../pose'
 
-// Services: the plasmid hall. A sealed crate of the city stands on the floor for each service; as each
-// service is read he walks up to its crate and raises the plasmid hand, and the crate lifts off the floor
+// Services: the telekinesis hall. A sealed crate of the city stands on the floor for each service; as each
+// service is read he walks up to its crate and raises the charged hand, and the crate lifts off the floor
 // in the blue of the telekinesis and hangs there, lit, over its own shadow.
 
 // A lifted crate hangs this far up.

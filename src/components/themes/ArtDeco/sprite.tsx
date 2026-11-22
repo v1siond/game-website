@@ -4,21 +4,21 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { DECO_COLORS as C } from './palette'
 import s from './sprite.module.css'
 
-// Him as this world's own figure, a parody of the plane crash survivor of the undersea city (BioShock's
-// Jack): the 1960 charcoal cable knit sweater with the ribbed crew neck, cuffs and hem, dark slacks, brown
-// shoes, the steel pipe wrench in the right hand and the left hand rewired by the electric plasmid, its
-// veins glowing blue under the skin with sparks crawling over the fingers. Drawn the way that game paints
-// its people: soft gradient fills lit from above by a cold sea light, a warm brass rim on the lit edge and
-// a thin sepia line, never a hard cartoon outline. Realistic proportions (about seven heads tall).
+// Him as this world's own figure, the plane crash survivor of the undersea city: the 1960 charcoal cable
+// knit sweater with the ribbed crew neck, cuffs and hem, dark slacks, brown shoes, the steel pipe wrench in
+// the right hand and the left hand charged with electricity, its veins glowing blue under the skin with
+// sparks crawling over the fingers. Drawn the way the genre paints its people: soft gradient fills lit from
+// above by a cold sea light, a warm brass rim on the lit edge and a thin sepia line, never a hard cartoon
+// outline. Realistic proportions (about seven heads tall).
 //
 // His traits come from HERO_IDENTITY: his brown skin, short dark hair, full dark beard and dark oval eyes.
 //
 // Per profession: the System Engineer in the sweater, whose action is the electric bolt thrown from the
-// plasmid hand (the zap that rewires a machine in that game); the Musician in the sweater with a bow
-// tie, a brass deco snare slung at the waist, a drumstick in each hand and the plasmid hand's stick
+// charged hand (the zap that brings a dead machine back on); the Musician in the sweater with a bow
+// tie, a brass deco snare slung at the waist, a drumstick in each hand and the charged hand's stick
 // sparking on every hit; the Martial Artist bare chested in gold Muay Thai shorts with the maroon band,
 // red prajioud on the arms, wrapped hands and his own mongkhon round the head, whose action is the knee
-// then the round kick, the plasmid veins still lit.
+// then the round kick, the charged veins still lit.
 //
 // The parts are groups that turn round their own joints (the origins in sprite.module.css): a scene poses
 // them from the scroll on the shared rig (pose.ts), walking him, swinging the wrench, throwing the bolt,
@@ -91,7 +91,7 @@ const FOREARM = {
   back: 'M45 75 L53.5 75 L52.5 96 L46 96 Z',
   front: 'M69.5 75 L78 75 L77 96 L70.5 96 Z',
 }
-// The sweater sleeve pushed up the plasmid forearm so the veins show.
+// The sweater sleeve pushed up the charged forearm so the veins show.
 const PUSHED_SLEEVE = 'M69 74.5 L78.5 74.5 L78 82 Q73.5 84 69.5 82 Z'
 const VEINS = 'M72 84 L73.5 89 L72.5 93 M75 85 L74 90 L75.5 95 M73.5 89 L75.5 91'
 const CUFF = { back: 'M45 92.5 L53 92.5', front: 'M70 92.5 L77.5 92.5' }
@@ -245,21 +245,21 @@ function Arm({ side, profession, ids }: { side: 'back' | 'front'; profession: Pr
   const bare = profession === 'fighter'
   const upperClass = side === 'back' ? s.armBack : s.armFront
   const foreClass = side === 'back' ? s.foreBack : s.foreFront
-  const plasmid = side === 'front'
+  const charged = side === 'front'
 
   return (
     <g className={upperClass}>
       <Painted d={UPPER_ARM[side]} fill={bare ? `url(#${ids.skin})` : `url(#${ids.knit})`} />
       {bare && <path d={side === 'back' ? 'M44 60 L54.5 61' : 'M68 61 L78.5 60'} stroke={C.blood} strokeWidth={3} strokeLinecap="round" />}
       <g className={foreClass}>
-        <Painted d={FOREARM[side]} fill={bare || plasmid ? `url(#${ids.skin})` : `url(#${ids.knit})`} />
-        {plasmid && !bare && <Painted d={PUSHED_SLEEVE} fill={C.knit} />}
-        {plasmid && <path d={VEINS} fill="none" stroke={C.bolt} strokeWidth={0.9} strokeLinecap="round" className={s.veins} />}
-        {!plasmid && !bare && <path d={CUFF[side]} stroke={C.knitShade} strokeWidth={2.6} />}
+        <Painted d={FOREARM[side]} fill={bare || charged ? `url(#${ids.skin})` : `url(#${ids.knit})`} />
+        {charged && !bare && <Painted d={PUSHED_SLEEVE} fill={C.knit} />}
+        {charged && <path d={VEINS} fill="none" stroke={C.bolt} strokeWidth={0.9} strokeLinecap="round" className={s.veins} />}
+        {!charged && !bare && <path d={CUFF[side]} stroke={C.knitShade} strokeWidth={2.6} />}
         {bare && <path d={side === 'back' ? 'M45.5 90 L52.5 90 M45.5 93 L52.5 93' : 'M70 90 L77 90 M70 93 L77 93'} stroke={C.ivory} strokeWidth={2} />}
         <Hand side={side} profession={profession} ids={ids} />
-        {plasmid && <Sparks />}
-        {plasmid && <Recorder />}
+        {charged && <Sparks />}
+        {charged && <Recorder />}
       </g>
     </g>
   )
@@ -267,7 +267,7 @@ function Arm({ side, profession, ids }: { side: 'back' | 'front'; profession: Pr
 
 // ---- the action props ----
 
-// The audio diary in the plasmid hand, shown only while he listens. Drawn turned with the forearm's
+// The audio diary in the charged hand, shown only while he listens. Drawn turned with the forearm's
 // listening angle undone (about 185 degrees round the hand), so it stands upright by his face.
 function Recorder() {
   return (
@@ -282,7 +282,7 @@ function Recorder() {
   )
 }
 
-// The bolt thrown from the plasmid hand, forked, with the white core inside the blue.
+// The bolt thrown from the charged hand, forked, with the white core inside the blue.
 function Bolt() {
   return (
     <g className={s.bolt} fill="none" strokeLinecap="round" strokeLinejoin="round">
@@ -366,7 +366,7 @@ interface SpriteProps {
   className?: string
 }
 
-/** Him as the wrench and plasmid survivor of the undersea city, standing in a profession's kit; a scene
+/** Him as the wrench and charged hand survivor of the undersea city, standing in a profession's kit; a scene
  *  poses his groups from the scroll (pose.ts). */
 export function SurvivorSprite({ profession, box, className = '' }: SpriteProps) {
   const ids = useIds()

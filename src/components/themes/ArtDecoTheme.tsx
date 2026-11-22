@@ -12,7 +12,7 @@ import { CopyrightLine } from './shared/CopyrightLine'
 import { SkipLink } from './shared/SkipLink'
 import { Stage, Theatre } from './shared/theatre/Stage'
 import { useTheatre } from './shared/theatre/useTheatre'
-import { GaugeBar, VitaContact } from './ArtDeco/chrome'
+import { GaugeBar, RevivalContact } from './ArtDeco/chrome'
 import { StationHero } from './ArtDeco/hero'
 import { DECO_VARS } from './ArtDeco/palette'
 import { LAYER_MOTION, scenesOf, type DecoScene } from './ArtDeco/scenes'
@@ -27,8 +27,8 @@ const decoFace = Poiret_One({ weight: '400', subsets: ['latin'], display: 'swap'
 // bathysphere docks at, his name in gold neon and the vending machine he picks a profession at), then every
 // section of the shown profession is one full screen chamber that rises from dark, holds while its cards
 // scroll over it, and sinks into dark while the next chamber rises: the power station, the diary archive,
-// the glass tunnel, the plasmid hall, the pipe works, propaganda square, theatre row, the fight club, and
-// the revival chamber at the end. He is the survivor with the wrench and the plasmid hand in each chamber
+// the glass tunnel, the telekinesis hall, the pipe works, propaganda square, theatre row, the fight club, and
+// the revival chamber at the end. He is the survivor with the wrench and the charged hand in each chamber
 // and does one thing per card of the section: throws a bolt into a fuse box, listens to a diary, seals a
 // leak, lifts a crate. Every motion is a function of the scroll position (the shared theatre on
 // useScrollStage), drawn with the settle: stop and it comes to rest, scroll up and it plays back. The text
@@ -85,7 +85,7 @@ export default function ArtDecoTheme() {
             <ChamberSection key={scene.id} scene={scene} still={reduced} />
           ))}
         </ProfessionRegion>
-        <VitaContact scene={contact} still={reduced} />
+        <RevivalContact scene={contact} still={reduced} />
       </main>
       <footer className={page.footer}>
         <p className={page.copyright}>

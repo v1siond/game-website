@@ -17,31 +17,31 @@ function Tube() {
   const left = TUBE.x - TUBE.width / 2
   return (
     <Canvas>
-      <g data-fx="vita" opacity="0">
-        <rect x={left} y={TUBE.top} width={TUBE.width} height={FLOOR - TUBE.top} fill={C.vita} opacity="0.22" />
-        <circle cx={TUBE.x} cy={FLOOR - 200} r={260} fill={C.vita} opacity="0.12" />
+      <g data-fx="revival" opacity="0">
+        <rect x={left} y={TUBE.top} width={TUBE.width} height={FLOOR - TUBE.top} fill={C.revival} opacity="0.22" />
+        <circle cx={TUBE.x} cy={FLOOR - 200} r={260} fill={C.revival} opacity="0.12" />
       </g>
       <rect x={left} y={TUBE.top} width={TUBE.width} height={FLOOR - TUBE.top} rx={40} fill="none" stroke={C.brassMid} strokeWidth="8" />
       <path d={`M${left + 40} ${TUBE.top + 30} V${FLOOR - 40}`} stroke={C.cream} strokeWidth="6" opacity="0.25" />
       <path d={`M${left - 30} ${TUBE.top} L${TUBE.x} ${TUBE.top - 110} L${left + TUBE.width + 30} ${TUBE.top} Z`} fill={C.brassMid} stroke={C.gold} strokeWidth="4" />
-      <circle cx={TUBE.x} cy={TUBE.top - 34} r={18} fill={C.vita} />
+      <circle cx={TUBE.x} cy={TUBE.top - 34} r={18} fill={C.revival} />
       <rect x={left - 30} y={FLOOR - 24} width={TUBE.width + 60} height={24} fill={C.brassDark} stroke={C.gold} strokeWidth="3" />
     </Canvas>
   )
 }
 
 export const contact: Chamber = {
-  light: C.vita,
+  light: C.revival,
   set: () => <Tube />,
   floor: ({ profession }) => <Survivor x={TUBE.x} profession={profession} />,
   bind: (stage, { profession }) => {
-    const vita = fx(stage, 'vita')
+    const glow = fx(stage, 'revival')
     const root = fx(stage, 'survivor')
     const joints = root ? decoJoints(root) : null
     placeSurvivor(root, TUBE.x)
     return (progress) => {
       const t = ramp(progress, 0.05, REVIVED_BY)
-      fadeTo(vita, t)
+      fadeTo(glow, t)
       if (joints) setDecoPose(joints, revive(profession, t))
     }
   },
