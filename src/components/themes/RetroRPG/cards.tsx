@@ -2,6 +2,7 @@
 
 import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { cssVars } from '@/lib/cssVars'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import type { CVData, Job } from '@/lib/cv/content'
@@ -56,7 +57,7 @@ function Said({ children, className = '', style }: { children: ReactNode; classN
 // Each achievement line shows a beat after the one before it, the way the box speaks line by line.
 const LINE_START_MS = 1400
 const LINE_GAP_MS = 300
-const lineDelay = (index: number) => ({ '--show-delay': `${LINE_START_MS + index * LINE_GAP_MS}ms` }) as CSSProperties
+const lineDelay = (index: number) => cssVars({ '--show-delay': `${LINE_START_MS + index * LINE_GAP_MS}ms` })
 
 // Dates are date only strings (UTC midnight), so the year is read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
