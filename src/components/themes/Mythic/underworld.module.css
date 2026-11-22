@@ -421,8 +421,8 @@
   transform-box: view-box;
 }
 
-/* The serpent sways once in the storm and stands upright; the work arena's storm (stormStage, its rain is
-   the depths' .rain below) waits for the first fight (data-on, trials.tsx). */
+/* The serpent sways once in the storm and stands upright; the work arena's storm (its rain is the depths'
+   .rain below) waits for the first fight (heldUntil, trials.tsx). */
 .serpent {
   transform-box: view-box;
   transform-origin: 284px 160px;
@@ -433,11 +433,6 @@
   0%, 100% { transform: rotate(0); }
   25% { transform: rotate(-3deg); }
   75% { transform: rotate(3deg); }
-}
-
-.stormStage:not([data-on]) .serpent,
-.stormStage:not([data-on]) .rain {
-  animation-play-state: paused;
 }
 
 /* A job's seal lights once its foe is down. */

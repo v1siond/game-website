@@ -7,6 +7,7 @@ import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { heldUntil } from '@/components/themes/shared/held'
 import { usePoseSequence, type PoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
@@ -96,7 +97,8 @@ function Orb({ index, take }: { index: number; take: number }) {
 }
 
 /** The storm behind the deck: the sky, the rain, the serpent's neck out of the sea, the waves, the planks. */
-function Storm() {
+// The serpent and the rain wait on their first frame until the first fight (`on`).
+function Storm({ on }: { on: boolean }) {
   return (
     <>
       <defs>
@@ -106,13 +108,13 @@ function Storm() {
         </linearGradient>
       </defs>
       <rect width={SCENE.width} height={SCENE.height} fill="url(#mythStormSky)" />
-      <g className={u.serpent}>
+      <g className={`${u.serpent} ${heldUntil(on)}`}>
         <path d="M268 160 Q250 100 276 60 Q292 38 312 44 Q318 56 304 60 Q290 64 288 84 Q284 120 300 160 Z" fill={MYTH.hydraShade} stroke={MYTH.inkLine} strokeWidth={2} />
         <path d="M276 60 Q262 54 256 62 L270 66 Z" fill={MYTH.hydraShade} stroke={MYTH.inkLine} strokeWidth={1.6} />
         <circle cx={286} cy={52} r={2.4} fill={MYTH.hydraEye} />
       </g>
       <path d="M0 150 Q40 140 80 152 T160 150 T240 152 T320 148 L320 176 L0 176 Z" fill={MYTH.aegean} opacity={0.8} />
-      <g className={u.rain} stroke={MYTH.rain} strokeWidth={1} opacity={0.35}>
+      <g className={`${u.rain} ${heldUntil(on)}`} stroke={MYTH.rain} strokeWidth={1} opacity={0.35}>
         {[20, 70, 120, 170, 220, 270, 310].map((x) => (
           <path key={x} d={`M${x} 0 l-14 40 M${x - 30} 70 l-14 40 M${x + 10} 120 l-14 40`} />
         ))}
@@ -137,9 +139,9 @@ function Arena({ take, fighter, cleared, total }: { take: number; fighter: PoseS
   useTrack(medallionRef, MEDALLION_TRACK, FIGHT_MS, take)
 
   return (
-    <div data-on={take > 0 || undefined} className={`overflow-hidden ${u.stormStage} ${u.panel}`}>
+    <div className={`overflow-hidden ${u.panel}`}>
       <svg viewBox={`0 0 ${SCENE.width} ${SCENE.height}`} preserveAspectRatio="xMidYMax slice" className="block aspect-[16/8] w-full lg:aspect-[16/11]" aria-hidden="true">
-        <Storm />
+        <Storm on={take > 0} />
         <g ref={foeRef} opacity={reduced || take > 0 ? 0 : 1} className={u.sceneProp}>
           <g transform={`translate(${FOE_AT.x} ${FOE_AT.y}) scale(${FOE_AT.scale})`}>
             <Foe />
