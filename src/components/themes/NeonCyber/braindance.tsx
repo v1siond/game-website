@@ -10,7 +10,7 @@ import { jobYears } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { DataChip, HudPanel } from './hud'
+import { DataChip, HudPanel, hudButton } from './hud'
 import { MercSprite } from './merc'
 import { Scannable } from './scanner'
 import world from './world.module.css'
@@ -189,7 +189,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
         <button
           type="button"
           onClick={play}
-          className={`${world.cut} min-h-[44px] border border-[color:var(--neon-hud)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-hud)] hover:bg-[color-mix(in_srgb,var(--neon-hud)_12%,transparent)]`}
+          className={hudButton('hud')}
         >
           {cyber.replay}
         </button>

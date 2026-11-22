@@ -8,6 +8,23 @@ import world from './world.module.css'
 
 export const panelHeadingId = (title: string): string => headingId('nc', title)
 
+export type HudTone = 'hud' | 'hack' | 'ice' | 'use'
+
+// Each tone as whole class strings, so Tailwind finds every one in the source. The link tone tints a
+// little deeper on hover than the button tones.
+const HUD_TONE: Record<HudTone, string> = {
+  hud: 'border-[color:var(--neon-hud)] text-[color:var(--neon-hud)] hover:bg-[color-mix(in_srgb,var(--neon-hud)_12%,transparent)]',
+  hack: 'border-[color:var(--neon-hack)] text-[color:var(--neon-hack)] hover:bg-[color-mix(in_srgb,var(--neon-hack)_12%,transparent)]',
+  ice: 'border-[color:var(--neon-ice)] text-[color:var(--neon-ice)] hover:bg-[color-mix(in_srgb,var(--neon-ice)_12%,transparent)]',
+  use: 'border-[color:var(--neon-use)] text-[color:var(--neon-use)] hover:bg-[color-mix(in_srgb,var(--neon-use)_14%,transparent)]',
+}
+
+/** The HUD's outlined control in one tone: the clipped corner, a 44 px target, the tone's line and hover tint. */
+export const hudButton = (tone: HudTone): string => `${world.cut} min-h-[44px] border px-3 text-sm uppercase tracking-wider ${HUD_TONE[tone]}`
+
+/** A link out of a card (a stream, a repository, a demo), the outlined control in the use tone. */
+export const HUD_LINK = `${hudButton('use')} inline-flex items-center`
+
 interface HudPanelProps {
   title: string
   children: ReactNode

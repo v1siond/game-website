@@ -14,7 +14,7 @@ import { useZoneStage } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
 import type { District } from './city'
 import { MercSprite, type MercMotion } from './merc'
-import { DataChip, HudPanel } from './hud'
+import { DataChip, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
 import { NEON } from './palette'
 import life from './life.module.css'
@@ -111,7 +111,7 @@ export function SandevistanStack({ techStack }: { techStack: SectionsOf<'enginee
     <button
       type="button"
       onClick={() => setTake((n) => n + 1)}
-      className={`${world.cut} min-h-[44px] border border-[color:var(--neon-hack)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-hack)] hover:bg-[color-mix(in_srgb,var(--neon-hack)_12%,transparent)]`}
+      className={hudButton('hack')}
     >
       {cyber.replay}
     </button>

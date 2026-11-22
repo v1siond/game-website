@@ -9,7 +9,7 @@ import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { BREACH_START, BUFFER_SIZE, MATRIX_SIZE, breachPuzzle, bufferBytes, byteText, canPick, matched, outcome, pick, type BreachOutcome } from './breach'
-import { DataChip, HudPanel } from './hud'
+import { DataChip, HUD_LINK, HudPanel, hudButton } from './hud'
 import { Scannable } from './scanner'
 import { MercSprite } from './merc'
 import world from './world.module.css'
@@ -195,7 +195,7 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
               <button
                 type="button"
                 onClick={() => setState(BREACH_START)}
-                className={`${world.cut} min-h-[44px] border border-[color:var(--neon-hud)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-hud)] hover:bg-[color-mix(in_srgb,var(--neon-hud)_12%,transparent)]`}
+                className={hudButton('hud')}
               >
                 {cyber.retry}
               </button>
@@ -204,7 +204,7 @@ function BreachDialog({ project, trigger, onClose }: BreachDialogProps) {
               <button
                 type="button"
                 onClick={() => setSkipped(true)}
-                className={`${world.cut} min-h-[44px] border border-[color:var(--neon-ice)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-ice)] hover:bg-[color-mix(in_srgb,var(--neon-ice)_12%,transparent)]`}
+                className={hudButton('ice')}
               >
                 {cyber.openNow}
               </button>
@@ -281,7 +281,7 @@ function GigCard({ project, years, links }: ProjectSlot) {
               <a
                 key={kind}
                 {...linkProps}
-                className={`${world.cut} inline-flex min-h-[44px] items-center border border-[color:var(--neon-use)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-use)] hover:bg-[color-mix(in_srgb,var(--neon-use)_14%,transparent)]`}
+                className={HUD_LINK}
               >
                 {label}
               </a>

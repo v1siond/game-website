@@ -8,7 +8,7 @@ import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
-import { HudPanel } from './hud'
+import { HUD_LINK, HudPanel } from './hud'
 import { MercSprite, type MercMotion } from './merc'
 import { Scannable } from './scanner'
 import world from './world.module.css'
@@ -55,7 +55,7 @@ function Preset({ slot, number, tuned, onTune }: { slot: BandSlot; number: numbe
         {linkProps && (
           <a
             {...linkProps}
-            className={`${world.cut} mt-3 inline-flex min-h-[44px] items-center border border-[color:var(--neon-use)] px-3 text-sm uppercase tracking-wider text-[color:var(--neon-use)] hover:bg-[color-mix(in_srgb,var(--neon-use)_14%,transparent)]`}
+            className={`${HUD_LINK} mt-3`}
           >
             {actions.streamLink}
           </a>
