@@ -8,6 +8,7 @@ import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { newTabName } from '@/lib/cv/sectionText'
+import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 
@@ -42,57 +43,72 @@ function Tags({ items, label }: { items: string[]; label: string }) {
   )
 }
 
+/** Lines marked with a hit spark: a job's highlights, a project's details, the About highlights. */
+export function SparkLines({ items, label }: { items: string[]; label: string }) {
+  if (items.length === 0) return null
+  return (
+    <ul className="mb-4 space-y-2" aria-label={label}>
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-3 text-sm text-white">
+          <HitSpark />
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 // The job's years stand on the round's life bars above the card (./rounds), not on the card.
 export function ExperienceCard({ entry }: { entry: Job }) {
   const running = !entry.endDate
-  const { cards } = useLabels()
+  const { cards, years } = useLabels()
+  const job = jobCard(entry, years)
 
   return (
     <FightCard accent={running ? 'health' : 'cyan'}>
       <div className="mb-4">
-        <h3 className={TITLE}>{entry.title}</h3>
+        <h3 className={TITLE}>{job.title}</h3>
         <p className="text-sm text-[color:var(--accent)]">
-          <SlashBreaks text={entry.company} />
+          <SlashBreaks text={job.company} />
         </p>
+        {job.location && <p className={BODY}>{job.location}</p>}
       </div>
 
-      {entry.description && <p className={`mb-4 ${BODY}`}>{entry.description}</p>}
+      {job.description && <p className={`mb-4 ${BODY}`}>{job.description}</p>}
 
-      {entry.highlights.length > 0 && (
-        <ul className="mb-4 space-y-2" aria-label={cards.keyAchievements}>
-          {entry.highlights.map((highlight) => (
-            <li key={highlight} className="flex items-start gap-3 text-sm text-white">
-              <HitSpark />
-              <span>{highlight}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <SparkLines items={job.highlights} label={cards.keyAchievements} />
 
-      <Tags items={entry.skills} label={cards.skillsUsed} />
+      <Tags items={job.skills} label={cards.skillsUsed} />
     </FightCard>
   )
 }
 
-export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
+export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
   const labels = useLabels()
+  const project = projectCard(entry, labels)
   return (
-    <FightCard accent={project.highlight ? 'gold' : 'cyan'}>
+    <FightCard accent={entry.highlight ? 'gold' : 'cyan'}>
       <div className="mb-2 flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
         <h3 className={`min-w-0 ${TITLE}`}>
           <SlashBreaks text={project.name} />
         </h3>
-        {years && <span className={`whitespace-nowrap text-sm text-[color:var(--accent)] ${look.display}`}>{years}</span>}
+        {project.years && <span className={`whitespace-nowrap text-sm text-[color:var(--accent)] ${look.display}`}>{project.years}</span>}
       </div>
       <p className="mb-2 text-sm font-bold text-white">{project.role}</p>
       <p className={`mb-3 ${BODY}`}>{project.tagline}</p>
+      {project.description && <p className={`mb-4 ${BODY}`}>{project.description}</p>}
 
       {project.impact && (
         <p className={`mb-4 flex items-start gap-2 px-4 py-2.5 text-sm text-[color:var(--accent)] ${look.impact}`}>
           <HitSpark />
-          <span>{project.impact}</span>
+          <span>
+            <span className="sr-only">{labels.cards.impact}: </span>
+            {project.impact}
+          </span>
         </p>
       )}
+
+      <SparkLines items={project.details} label={labels.cards.details} />
 
       <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
 
@@ -137,8 +153,9 @@ export function BandCard({ band, years, linkProps, release }: BandSlot) {
 
 // A venture as a fight card; one of his own products (featured) is a wider gold card with a gold
 // player tag over the name, the way the select screen marks the pick.
-export function VentureCard({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+export function VentureCard({ company: entry }: { company: CVData['companies'][number] }) {
+  const { links, cards, sections } = useLabels()
+  const company = ventureCard(entry)
 
   return (
     <a
@@ -166,6 +183,11 @@ export function VentureCard({ company }: { company: CVData['companies'][number] 
           </div>
         </div>
         <p className={`mt-4 ${BODY}`}>{company.description}</p>
+        {company.services.length > 0 && (
+          <div className="mt-4">
+            <Tags items={company.services} label={sections.services} />
+          </div>
+        )}
       </FightCard>
     </a>
   )
