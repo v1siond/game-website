@@ -24,7 +24,6 @@ const EngineerOrnaments = memo(function EngineerOrnaments({ p }: { p: OrnamentPa
   const RIM_S = p.copper
   const HW = p.stoneGrey
   const GLOW = p.ethereal
-  void SHELL
 
   // brass-framed "arcane terminal" monitor, small; glowing code lines + blinking cursor
   const monitor = (cx: number, cy: number, w: number, h: number, k: string, rot: number) => (
@@ -722,20 +721,20 @@ const ORNAMENTS_FOR: Record<StageProfession, typeof EngineerOrnaments> = {
   fighter: FighterOrnaments,
 }
 
-/** The profession boss-stage, drawn in the palette it is given: Dark Fantasy passes its own, every
- *  other world gets one derived from its theme colours by GlobalProfessionStage. */
+/** The profession boss-stage, drawn in the palette it is given: Dark Fantasy passes its own, and
+ *  GlobalProfessionStage derives one from the theme colours of a world without its own stage. */
 export const ProfessionStage = memo(function ProfessionStage({ profession, p }: { profession: StageProfession; p: OrnamentPalette }) {
   const Ornaments = ORNAMENTS_FOR[profession]
   return (
     <div className="fixed inset-0 pointer-events-none z-[0] overflow-hidden" aria-hidden="true">
-      {/* z-[0]: sits BELOW the z-[1] VoidDepths columns so instruments read as set
-          BEHIND the architecture (was z-[2], which painted them in front of the columns). */}
+      {/* z-[0], under Dark Fantasy's z-[1] VoidDepths columns, so the instruments stand behind the architecture */}
       <Ornaments p={p} />
     </div>
   )
 })
 
-// ---- theme-derived palette + global render (Dark Fantasy renders ProfessionStage with its own palette) ----
+// A palette for the stage from a world's theme colours: the void from its background, the soul light from its
+// accent, the brass from its secondary colour, the rest mixed between them.
 function clampHex(n: number) { return Math.max(0, Math.min(255, Math.round(n))) }
 function parseHex(h: string) {
   let s = h.replace('#', '')

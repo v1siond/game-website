@@ -487,42 +487,10 @@ const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
   )
 })
 
-/**
- * ENERGY FLOW ANIMATION
- * =====================
- * Pattern: setTimeout-phase with CSS transforms
- * Why chosen: User interaction (click) triggers a short animation sequence.
- *             JS coordinates timing, CSS handles GPU-accelerated visuals.
- *
- * Phases: idle -> flowing -> arrived -> idle
- * Timing: { flowing: 0ms (start), arrived: 350ms, idle: 500ms }
- *
- * How it works:
- * - Tracks previous profession via useRef
- * - On profession change, calculates path from old to new node
- * - Spawns energy particles that travel along the connection path
- * - Uses CSS keyframes with transform/opacity (GPU-accelerated)
- * - Particles fade out as destination node "lights up"
- *
- * Replication steps for other themes:
- * 1. Create component that tracks previous selection with useRef
- * 2. Define node positions and path connections
- * 3. Calculate animation direction based on from/to indices
- * 4. Use CSS @keyframes with transform: translate3d for movement
- * 5. Sync destination glow with particle arrival time
- */
-
-/**
- * ELECTRICITY THROUGH WIRE ANIMATION
- * ===================================
- * Energy flows along the actual wire paths between profession nodes.
- * The path goes: Musician (25%,55%) ↔ System Engineer (50%,30%) ↔ Martial Artist (75%,55%),
- * the order the shared ProfessionSwitch lays the nodes out, with the engineer as the raised hub.
- *
- * When switching between the two outer nodes (Musician↔Martial Artist),
- * energy travels THROUGH the hub node (System Engineer).
- */
-
+// A pick sends the soul light along the wire from the station he left to the one he picked (WireGlow, 300ms,
+// 450ms through the hub) while the picked station pulses (nodeArrival, energyArrival). The wire runs musician,
+// engineer, martial artist, the order ProfessionSwitch lays the stations out, so a pick between the two outer
+// stations runs through the engineer's, the raised hub.
 // The side stations sit near the edges so the three cards never overlap on a 320px phone.
 const WAYSTATION_POSITIONS: Record<Profession, { x: number; y: number }> = {
   drummer: { x: 17, y: 55 },
@@ -763,16 +731,7 @@ const WAYSTATIONS: Record<Profession, { icon: React.ReactNode; color: string }> 
   fighter: { icon: <DiamondIcon />, color: DARK_FANTASY.spiritGold },
 }
 
-/**
- * Gothic decorative flourish
- * =======================================
- * Elegant curved vine-like pattern used at top/bottom of dialogue boxes.
- * Organic, gothic curves with small embellishments.
- *
- * Pattern: CSS-only (SVG paths)
- * Why chosen: Static decorative element, no animation needed. SVG paths give us
- * precise control over the organic curved shapes that define HK's aesthetic.
- */
+// The vine flourish on a frame's top or bottom edge, drawn flipped for the bottom.
 const DialogueFlourish = memo(function DialogueFlourish({
   position,
   width = 200
@@ -875,27 +834,8 @@ const DialogueFlourish = memo(function DialogueFlourish({
   )
 })
 
-/**
- * Gothic dialogue box frame (VoidFrame)
- * ==================================================
- * Visual styling matching HK's in-game dialogue boxes:
- * - Dark semi-transparent background (deep blue/purple tones)
- * - Decorative flourishes at top and bottom borders
- * - Clean white text on dark background
- * - Slight backdrop blur for depth
- * - Gothic, elegant feel with organic curved borders
- *
- * Pattern: CSS-only styling (no JS animation for the frame itself)
- * Why chosen: Static visual element, CSS is more performant than JS.
- * The flourishes use SVG paths for precise organic curves.
- *
- * Replication steps for other themes:
- * 1. Create a DialogueFlourish component with theme-appropriate SVG patterns
- * 2. Use semi-transparent background matching theme's void/dark colors
- * 3. Add backdrop-filter blur for depth
- * 4. Position flourishes at top (-12px) and bottom (-12px)
- * 5. Use centered title with subtle underline accent
- */
+// The section frame, after the game's dialogue boxes: an opaque panel (.df-panel, so the stage behind never
+// shows through), a vine flourish on its top and bottom edges and the title centred over a short rule.
 const VoidFrame = memo(function VoidFrame({
   children,
   title,
@@ -1523,7 +1463,7 @@ function WaystationSelector({ active }: { active: Profession }) {
   )
 }
 
-// Profession sections. Each animated section gets its own useSectionTrigger, from its real position.
+// The hero and contact buttons.
 const DF_BUTTON =
   'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-transform hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
 
@@ -1747,7 +1687,7 @@ export default function DarkFantasyTheme() {
   const active = view.profession
   const [mounted, setMounted] = useState(false)
 
-  // fire the final battle just slightly before it's centered (small positive bottom margin), // a touch later than the previous +18% which kicked off before you'd even seen the section
+  // The final battle starts as the contact section comes into view, a little before it is centred.
   const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
 
   useEffect(() => {
