@@ -19,6 +19,7 @@ const SKIPPED_KEYS = new Set(['id', 'slug', 'startDate', 'endDate', 'status', 'i
 
 // Strings set outside the history, each with the decision that set it.
 const APPROVED = new Map([
+  ['Built PMX, InsurAdmin and GRCTechMe. Saved the SecureBancard launch. Led the Clutch Prep B2B product through its acquisition by Pearson. Insurance, payments, education and AI products, from Elixir backends to React apps.', 'C49, the hero tagline he approved on 10-23 (5ce1942e), restored on his 11-22 ask'],
   ['Lima, Peru', 'HISTORY: "a dojo in lima peru", written as a place'],
   ['Remote, working US Eastern and Italian hours.', 'contact availability, the hours first and remote added to the cv-site.md Contract line (HISTORY line 144); HISTORY \'His answers to the content audit\' Remote line (line 329), changelog AllThemes item 30 ("yeah sure, remote")'],
   ['Full stack and mobile apps', 'changelog AllThemes 32, 36 to 38, C28 A3; HISTORY lines 33, 239, 240, 246, 250 (mobile kept, his 37)'],
@@ -47,11 +48,6 @@ const APPROVED = new Map([
   ['BCharitable', 'use case, changelog AllThemes 32, 36 to 38, C28 A3; fintech HISTORY lines 200, 247 (ACH and Stripe)'],
   ['WJV', 'use case, changelog AllThemes 32, 36 to 38, C28 A3; parsers HISTORY line 235 (wjv-parser)'],
   ['ProctorU', 'use case, changelog AllThemes 32, 36 to 38, C28 A3; audits HISTORY lines 322 to 323 (WCAG AAA updates)'],
-  ['Co-architected Pearson Channels nearly from the ground up and moved the relational data into Pearson\'s NoSQL stores with zero downtime.', 'C42 copy audit, his 11-09 words'],
-  ['Built the PMX Affiliate Marketplace and its native Shopify integration.', 'C42 copy audit, his 11-09 words'],
-  ['Nebulith: my own game engine and map editor, launching soon.', 'C42 copy audit, his 11-09 words'],
-  ['Building neural networks from scratch to connect backend systems with AI agents.', 'C42 copy audit, his 11-09 words'],
-  ['Backend developer in the early stages of Truth Social. Tuned the Rails backend with Mastodon core developers.', 'C42 copy audit, his 11-09 words'],
   ['Send me the project and the date it has to ship.', 'C42 copy audit, his 11-09 words'],
   ['InsurAdmin: built it from scratch to manage carrier feeds and agency teams.', 'C42 copy audit, his 11-09 words'],
   ['Agency Rocket: built the annuity, IUL and whole life parsers and the Stripe billing for the suite (My New Retirement, Wealth United, Debt Action Plan).', 'C42 copy audit, his 11-09 words'],
@@ -80,12 +76,6 @@ const APPROVED = new Map([
   ['A game engine and map editor for generated worlds. Launching soon.', 'C42 copy audit, his 11-09 words'],
   ['Exact and AI judged grading', 'C42 copy audit, his 11-09 words'],
   ['Speech to text and text to speech', 'C42 copy audit, his 11-09 words'],
-  ['Senior Staff Full Stack and AI Systems Engineer with 10+ years of experience', 'C42 wording audit round 2 (score/C42/audit.md) finding 8, his 11-21 ask to remove the AI patterns, facts unchanged'],
-  ['I built PMX, InsurAdmin and GRCTechMe and saved the SecureBancard launch. I led the Clutch Prep B2B product through its acquisition by Pearson.', 'C42 wording audit round 2 (score/C42/audit.md) finding 1, his 11-21 ask to remove the AI patterns, facts unchanged'],
-  ['I build fintech and insurance platforms and their AI features. Teams bring me in when a launch is at risk or a system has to start from zero, and I take it to production. I work as easily in Elixir as in Rails or Node.', 'C42 wording audit round 2 (score/C42/audit.md) finding 2, his 11-21 ask to remove the AI patterns, facts unchanged'],
-  ['Got GRCTechMe through the Google Cloud Marketplace compliance review.', 'C42 wording audit round 2 (score/C42/audit.md) finding 3, his 11-21 ask to remove the AI patterns, facts unchanged'],
-  ['I build secure LLM features on Gemini and Claude, enterprise AI portals and text to speech pipelines with edge-tts.', 'C42 wording audit round 2 (score/C42/audit.md) finding 3, his 11-21 ask to remove the AI patterns, facts unchanged'],
-  ['Built InsurAdmin from scratch for carrier feeds and agency teams, and the core of Agency Rocket: its policy parsers and Stripe billing.', 'C42 wording audit round 2 (score/C42/audit.md) finding 4, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['I\'m the core engineer and architect for enterprise clients and startups. I rewrite systems, ship launches against compliance deadlines and build new products.', 'C42 wording audit round 2 (score/C42/audit.md) finding 9, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['Datepal: co PM and development lead of a dating app on Phoenix and Ash.', 'C42 wording audit round 2 (score/C42/audit.md) finding 11, his 11-21 ask to remove the AI patterns, facts unchanged'],
   ['SecureBancard: saved the launch by building most of the Dual BIN support alone, in time for the compliance deadline.', 'C42 wording audit round 2 (score/C42/audit.md) finding 10 (the 80% lives in the project impact), his 11-21 ask to remove the AI patterns, facts unchanged'],
