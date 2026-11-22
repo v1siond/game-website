@@ -13,21 +13,19 @@
   ],
   "draft": true
 }
-## The result: one click, a portal, a new world
+## Clicking a world card opens a portal to it
 
 Clicking a world card plays a full screen portal tinted to the destination world, swaps the site at the peak and scrolls to the top.
 
 ## Why the dropdown went
 
-Each of the 17 themes is a full alternate version of the site, so a dropdown hid them; the dropdown was removed from all 17 and every world got world cards.
+Each of the 17 themes is a full version of the site, and a dropdown hid them. I removed it from all 17 and gave every world its world cards.
 
-## Cover, swap, reveal: the whole trick in three phases
+## The swap happens while the screen is covered
 
-A state machine runs cover for COVER_MS (720 ms), swaps the world, scrolls to 0 and saves the choice while the screen is fully covered, then reveals for REVEAL_MS (620 ms); those two constants are the knobs.
+A small state machine covers the screen for COVER_MS (720 ms). While it is fully covered, it swaps the world, scrolls to the top and saves the choice. Then it reveals for REVEAL_MS (620 ms). Those two constants are the only knobs.
 
 ![Timeline of the transition: cover for 720 ms, swap at the peak, reveal for 620 ms](/blog/css-page-transition-portals/cover-swap-reveal.svg)
-
-*The swap happens while nothing of the old page is visible.*
 
 ```ts
 const t1 = window.setTimeout(() => {
@@ -44,15 +42,15 @@ const t1 = window.setTimeout(() => {
 timers.current.push(t1)
 ```
 
-*WorldTransitionContext.tsx at 4b5d3ba*
+*From WorldTransitionContext.tsx*
 
 ## Why CSS keyframes over canvas
 
-GPU composited transforms and opacity stay smooth over a full screen overlay; JS only picks the variant and times the swap.
+I animate only transform and opacity, which the GPU composites, so a full screen overlay stays smooth. JavaScript only picks the variant and times the swap.
 
 ## Four variants, picked from a shuffle bag
 
-All four variants play once before any repeats, and the bag boundary never repeats the last one, so successive transitions feel distinct (the code comment's own reason).
+Each of the four variants plays once before any repeats, and a new bag never opens with the last one played, so two transitions in a row never look the same.
 
 ## Reduced motion skips the portal
 
@@ -60,4 +58,4 @@ With prefers-reduced-motion the world swaps instantly with no portal, and a CSS 
 
 ## What changed since June
 
-The cards later moved into a picker modal and the reduced motion check became one shared hook; the bag and the three phases are the same at HEAD.
+The cards later moved into a picker, and the reduced motion check became one shared hook. The bag and the three phases are the same today.
