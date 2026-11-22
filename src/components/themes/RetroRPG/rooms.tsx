@@ -123,7 +123,8 @@ function Big({ sprite, x, y, scale = 2, className }: { sprite: PixelSprite; x: n
   )
 }
 
-const goldOf = (sprite: PixelSprite): PixelSprite => ({ ...sprite, colours: { ...sprite.colours, W: RPG.gold } })
+// The spared monster, its white drawn gold, built once at load rather than per render.
+const GOLD_MONSTER: PixelSprite = { ...MONSTER, colours: { ...MONSTER.colours, W: RPG.gold } }
 
 // ---------------------------------------------------------------- About
 
@@ -139,7 +140,7 @@ export function EncounterRoom({ children }: { children: ReactNode }) {
         </g>
       </g>
       <g className={rooms.spareable}>
-        <Big sprite={goldOf(MONSTER)} x={176} y={30} scale={3} />
+        <Big sprite={GOLD_MONSTER} x={176} y={30} scale={3} />
       </g>
     </>
   )
@@ -374,6 +375,9 @@ export function StreetRoom({ profession, children }: { profession: Profession; c
 
 // ---------------------------------------------------------------- Bands
 
+// A flower before he passes it: its petals in the bridge's water line, built once at load.
+const DIM_FLOWER: PixelSprite = { ...FLOWER, colours: { ...FLOWER.colours, C: RPG.waterLine, c: RPG.waterLine } }
+
 const BRIDGE_FROM = -24
 const BRIDGE_TO = 300
 const BRIDGE_MS = 2200
@@ -428,7 +432,7 @@ export function BridgeRoom({ profession, count, children }: BridgeRoomProps) {
       {flowerSpots(count).map(({ x, at }, index) => (
         <g key={x} className={ringing?.index === index ? rooms.ringing : ''} style={{ ['--ring-at' as string]: `${at}ms` }}>
           <g transform={`translate(${x} 38) scale(2)`}>
-            <PixelArt sprite={{ ...FLOWER, colours: { ...FLOWER.colours, C: RPG.waterLine, c: RPG.waterLine } }} />
+            <PixelArt sprite={DIM_FLOWER} />
             <PixelArt sprite={FLOWER} className={rooms.flowerLit} />
           </g>
           <circle key={ringing?.index === index ? ringing.take : 0} cx={x + 7} cy={44} r={6} fill="none" stroke={RPG.glow} strokeWidth="1" className={rooms.ring} />
