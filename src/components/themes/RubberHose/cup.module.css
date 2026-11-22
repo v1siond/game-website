@@ -89,99 +89,112 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .eyes {
-    animation: blink 3.4s steps(1, end) infinite;
+    animation: blink 3.4s steps(1, end);
   }
 
   .straw {
-    animation: straw 0.5s ease-in-out infinite alternate;
+    animation: straw 0.5s ease-in-out 8 alternate;
   }
 
-  /* The bounce that never stops: squash on the beat, stretch on the up, the head a beat behind. */
+  /* The bounce, nine beats: squash on the beat, stretch on the up, the head a beat behind. */
   .figure:not([data-pose='run']) .bounce {
-    animation: bounce 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    animation: bounce 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) 9;
   }
 
   .head {
-    animation: head-lag 0.5s ease-in-out -0.1s infinite;
+    animation: head-lag 0.5s ease-in-out -0.1s 9;
   }
 
   /* Limb pairs (idle, run, drum): the second pair plays the same alternate loop in the same direction,
      one iteration (half a back and forth) earlier, so each arm swings against the leg on its side and
      the sticks land in turn. alternate-reverse on top of that delay would flip twice and move as one. */
   /* The idle is a step in place facing out: each leg kicks out to its own side and back, the arm on
-     the other side swings out with it, so the feet never cross. */
+     the other side swings out with it, so the feet never cross. Two steps each, so an idle reached late
+     in a scene (the knockout's end, 2.6 s in) still rests by 4.6 s. */
   .figure[data-pose='idle'] .legFront {
-    animation: step-out-front 0.5s ease-in-out infinite alternate;
+    animation: step-out-front 0.5s ease-in-out 4 alternate;
   }
 
   .figure[data-pose='idle'] .armBack {
-    animation: step-out-back 0.5s ease-in-out infinite alternate;
+    animation: step-out-back 0.5s ease-in-out 4 alternate;
   }
 
   .figure[data-pose='idle'] .legBack {
-    animation: step-out-back 0.5s ease-in-out -0.5s infinite alternate;
+    animation: step-out-back 0.5s ease-in-out -0.5s 4 alternate;
   }
 
   .figure[data-pose='idle'] .armFront {
-    animation: step-out-front 0.5s ease-in-out -0.5s infinite alternate;
+    animation: step-out-front 0.5s ease-in-out -0.5s 4 alternate;
   }
 
   /* The run: leaning in, stretched on the push and squashed on the landing, legs and arms wheeling,
-     and every few strides a dash burst. */
+     and a dash burst, for 4.32 s (twelve strides); his cameo's run beats are shorter. */
   .figure[data-pose='run'] .bounce {
-    animation: run-bob 0.18s ease-in-out infinite alternate;
+    animation: run-bob 0.18s ease-in-out 24 alternate;
   }
 
   .figure[data-pose='run'] .legBack,
   .figure[data-pose='run'] .armFront {
-    animation: stride 0.36s ease-in-out infinite alternate;
+    animation: stride 0.36s ease-in-out 12 alternate;
   }
 
   .figure[data-pose='run'] .legFront,
   .figure[data-pose='run'] .armBack {
-    animation: stride 0.36s ease-in-out -0.36s infinite alternate;
+    animation: stride 0.36s ease-in-out -0.36s 12 alternate;
   }
 
   .figure[data-pose='run'] .dash {
-    animation: dash 2.4s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    animation: dash 2.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
   }
 
-  /* The finger gun: the arm kicks back with each shot and the shot flies out. */
+  /* The finger gun: the arm kicks back with each of ten shots and the shot flies out. */
   .figure[data-pose='shoot'] .armFront {
-    animation: recoil 0.4s ease-out infinite;
+    animation: recoil 0.4s ease-out 10;
   }
 
   .figure[data-pose='shoot'] .bullet {
-    animation: shot 0.4s linear infinite;
+    animation: shot 0.4s linear 10;
   }
 
   .figure[data-pose='cheer'] .armFront {
-    animation: cheer-front 0.5s ease-in-out infinite alternate;
+    animation: cheer-front 0.5s ease-in-out 6 alternate;
   }
 
   .figure[data-pose='cheer'] .armBack {
-    animation: cheer-back 0.5s ease-in-out infinite alternate;
+    animation: cheer-back 0.5s ease-in-out 6 alternate;
   }
 
   .figure[data-pose='type'] .armFront {
-    animation: tap 0.2s ease-in-out infinite alternate;
+    animation: tap 0.2s ease-in-out 24 alternate;
   }
 
   .figure[data-pose='type'] .armBack {
-    animation: tap 0.2s ease-in-out -0.1s infinite alternate;
+    animation: tap 0.2s ease-in-out -0.1s 24 alternate;
   }
 
   .figure[data-pose='drum'] .armFront {
-    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) infinite alternate;
+    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) 16 alternate;
   }
 
   .figure[data-pose='drum'] .armBack {
-    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) -0.25s infinite alternate;
+    animation: drum 0.25s cubic-bezier(0.6, 0, 0.9, 0.5) -0.25s 16 alternate;
   }
 
-  /* The rubber hose jab: the arm shoots out twice its length and snaps back. */
+  /* The rubber hose jab: the arm shoots out twice its length and snaps back, five times. */
   .figure[data-pose='jab'] .armFront {
-    animation: jab 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+    animation: jab 0.9s cubic-bezier(0.68, -0.55, 0.27, 1.55) 5;
+  }
+
+  /* A scrubbed run stands paused on the frame --scene-progress points to, the lane's whole length over
+     the run's 4.32 s, so at the end of the lane every stride has played and he stands. */
+  .figure[data-scrub][data-pose='run'] :is(.bounce, .dash, .legBack, .armFront) {
+    animation-play-state: paused;
+    animation-delay: calc(var(--scene-progress, 0) * -4.32s);
+  }
+
+  .figure[data-scrub][data-pose='run'] :is(.legFront, .armBack) {
+    animation-play-state: paused;
+    animation-delay: calc(var(--scene-progress, 0) * -4.32s - 0.36s);
   }
 
   /* The parry: pointing at him makes him slap upward and flash the pink star. */

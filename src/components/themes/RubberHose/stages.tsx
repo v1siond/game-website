@@ -3,13 +3,14 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { PieEyes } from './art'
+import { Cue } from './cue'
 import { HERO_REACH, HeroCharacter, type HeroPose } from './cup'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import stage from './stage.module.css'
 
 // What he does in each section, every one a different move of the game. Each plays once, when its isle
-// stage first comes into view (the `on` from IsleStage), then holds its last drawing and breathes; under
+// stage first comes into view (the `on` from IsleStage), then holds its last drawing, at rest by 5 s; under
 // reduced motion `on` is true from the start and the scene shows its end drawing at once.
 // - FlowerKnockout (about): a pie eyed flower boss rises, he finger guns it three times, it flinches on each
 //   hit, goes down with a star burst, and the about text unfolds from behind it.
@@ -19,7 +20,8 @@ import stage from './stage.module.css'
 // - Bandstand (bands): he drums on a little bandstand while the pie eyed bass drum bounces on the beat.
 // - BagFoe (muay thai): he jabs a pie eyed heavy bag, it swings back, snaps its chain and drops.
 // - MapRun (between sections): a strip of the isle map, two islands and a plank bridge, that he runs across
-//   as the page scrolls (the shared ScrollScene's --scene-progress, no React render per frame).
+//   as the page scrolls (the shared ScrollScene's --scene-progress, no React render per frame), his legs
+//   scrubbed by it too.
 
 // A fixed sequence of drawings, each held for its time after `on`; the scene ends on the last one.
 function useBeats<Beat extends string>(on: boolean, beats: readonly (readonly [Beat, number])[]) {
@@ -196,11 +198,13 @@ export function MapRun({ profession }: { profession: Profession }) {
         <circle cx={60} cy={30} r={10} fill={HOSE.paperSepia} stroke={HOSE.ink} strokeWidth={1.6} />
         <circle cx={340} cy={30} r={10} fill={HOSE.paperSepia} stroke={HOSE.ink} strokeWidth={1.6} />
       </svg>
-      <div className={`absolute inset-x-4 bottom-2 top-0 ${stage.mapLane}`}>
-        <div className={`absolute bottom-0 left-0 h-16 w-10 ${stage.mapRunner}`}>
-          <HeroCharacter profession={profession} pose="run" className="h-full w-full" />
+      <Cue>
+        <div className={`absolute inset-x-4 bottom-2 top-0 ${stage.mapLane}`}>
+          <div className={`absolute bottom-0 left-0 h-16 w-10 ${stage.mapRunner}`}>
+            <HeroCharacter profession={profession} pose="run" scrub className="h-full w-full" />
+          </div>
         </div>
-      </div>
+      </Cue>
     </div>
   )
 }

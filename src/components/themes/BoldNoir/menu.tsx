@@ -14,9 +14,9 @@ import world from './world.module.css'
 // The profession switch as the game's menu: three crooked slabs, him in each costume with a flat red
 // silhouette offset behind (the battle menu's outline), the label a heavy cut-out word. The pick swells
 // and tilts and a red jag jumps behind it, jittering between hard poses like the highlighter box that
-// never keeps its shape. Picking a profession plays the cut-in: a red diagonal band with his eyes in a
+// never keeps its shape, for six beats before it rests. Picking a profession plays the cut-in: a red diagonal band with his eyes in a
 // strip sweeps across the screen and out. When the menu first shows he walks into each slab from its
-// left on the two step walk and stops there, settling into the idle.
+// left on the two step walk and stops there, settling into the idle (one breath, one blink, one hat tip).
 
 // The jagged highlighter behind the pick, in a 200 by 100 box.
 const JAG = 'M6 18 L60 4 L72 14 L150 0 L196 22 L184 46 L198 70 L132 96 L118 84 L40 100 L2 74 L14 50 Z'

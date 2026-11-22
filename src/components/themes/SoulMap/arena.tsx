@@ -13,6 +13,7 @@ import { useRunActions, useRunState } from './run'
 import { BUTTON, BUTTON_LIT } from './links'
 import { Panel } from './menu'
 import { CARVED, SOUL } from './palette'
+import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
 // The Muay Thai record is fought behind the game's fog wall. The visitor walks him through the fog
@@ -22,15 +23,17 @@ import souls from './souls.module.css'
 // slide in along the bottom the way the game shows a boss. Then it is a bout:
 // - Strike throws his roundhouse, if he has the stamina for it; it lands as his shin comes round.
 // - Guard raises his guard for a second.
-// - The partner pulls its rear hand back, holds the tell a beat and throws the cross on its own rhythm
-//   (only while the ring is on screen); a guard blocks it for stamina, an open guard takes the hit off
+// - The partner pulls its rear hand back, holds the tell a beat and throws the cross 3.4 s after the
+//   visitor's move (Traverse, Strike, Guard, another round), one cross per move at most and only while the
+//   ring is on screen, so a ring left alone goes still; a guard blocks it for stamina, an open guard takes the hit off
 //   his health (the HUD's bar, the flask heals it). A hit jolts whoever is not mid move; a committed
 //   move is never cut off by a flinch.
 // - At no health he is knocked down: the red banner, then he gets up off his back and the partner's bar
 //   is full again.
 // - The partner's bar at nothing is the gold banner, a round won, and souls; another round and the
 //   partner gets up.
-// The record itself (his dojo, rank, years, achievements) stands beside the ring the whole time.
+// The record itself (his dojo, rank, years, achievements) stands beside the ring the whole time. The fog
+// wall swirls once as the ring comes into view (its own section trigger, ashen.module.css .cue).
 
 type Bout = 'fog' | 'parting' | 'fight' | 'down' | 'won'
 
@@ -239,14 +242,25 @@ function useBout() {
 function SparRing() {
   const { souls: words } = useLabels()
   const { ref, inView } = useSectionTrigger({ threshold: 0.4, triggerOnce: false })
+  const cue = useSectionTrigger({ threshold: 0.4 })
   const { bout, partnerHp, notice, me, partner, partnerSwing, strike, guard, again, traverse } = useBout()
+  // Whether the visitor has moved since the partner's last cross: the partner answers a move, never runs on alone.
+  const [owed, setOwed] = useState(false)
 
-  // The partner fights on its own rhythm, only while the bout is on and the ring is on screen.
+  // The partner's cross, PARTNER_EVERY after the move it answers, while the bout is on and the ring is on screen.
   useEffect(() => {
-    if (bout !== 'fight' || !inView) return
-    const timer = window.setInterval(partnerSwing, PARTNER_EVERY)
-    return () => window.clearInterval(timer)
-  }, [bout, inView, partnerSwing])
+    if (bout !== 'fight' || !inView || !owed) return
+    const timer = window.setTimeout(() => {
+      setOwed(false)
+      partnerSwing()
+    }, PARTNER_EVERY)
+    return () => window.clearTimeout(timer)
+  }, [bout, inView, owed, partnerSwing])
+
+  const answered = (move: () => void) => () => {
+    move()
+    setOwed(true)
+  }
 
   const fighting = bout === 'fight'
   const won = bout === 'won'
@@ -259,6 +273,7 @@ function SparRing() {
   const enter = () => {
     handoff.current = true
     traverse()
+    setOwed(true)
   }
   useOnChange(
     inRing,
@@ -273,7 +288,7 @@ function SparRing() {
 
   return (
     <div ref={ref}>
-      <div className="relative aspect-[4/3] overflow-hidden border border-[color:var(--soul-ridge)] sm:aspect-[16/9]">
+      <div ref={cue.ref} data-on={cue.triggered || undefined} className={`relative aspect-[4/3] overflow-hidden border border-[color:var(--soul-ridge)] sm:aspect-[16/9] ${ashen.cue}`}>
         <Ring />
         <div className={`absolute bottom-[18%] left-[18%] aspect-[60/96] h-[56%] ${bout === 'fog' ? '' : souls.advance}`}>
           <Knight key={me.key} gear="fighter" pose={me.pose} className="h-full w-full" />
@@ -295,11 +310,11 @@ function SparRing() {
       </div>
       {inRing && (
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          <button ref={lead} type="button" onClick={won ? again : strike} aria-disabled={!fighting && !won} className={BUTTON_LIT}>
+          <button ref={lead} type="button" onClick={answered(won ? again : strike)} aria-disabled={!fighting && !won} className={BUTTON_LIT}>
             {won ? words.again : words.strike}
           </button>
           {!won && (
-            <button type="button" onClick={guard} aria-disabled={!fighting} className={BUTTON}>
+            <button type="button" onClick={answered(guard)} aria-disabled={!fighting} className={BUTTON}>
               {words.guard}
             </button>
           )}

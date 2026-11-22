@@ -5,7 +5,8 @@
  * overshoot (--snap) and lands hard; nothing floats. Animations move transform and opacity only; the
  * static filters (offset silhouettes, hard shadows) never animate. A reveal plays once: the component
  * adds data-on when it fires and never removes it. Under reduced motion every reveal shows its final
- * frame, the finisher goes straight to its card and the loops stop.
+ * frame, the finisher goes straight to its card and the loops stop. With motion no loop runs for good:
+ * each cycle plays a set number of times and the part rests, within 5 s of the scene's start.
  */
 
 .root {
@@ -49,14 +50,16 @@
 }
 
 .spin {
+  --turn: 20deg;
   transform-box: fill-box;
   transform-origin: 50% 50%;
-  animation: spin 90s linear infinite;
+  animation: turn 4.8s cubic-bezier(0.2, 0.6, 0.35, 1) both;
 }
 
-@keyframes spin {
+/* A burst turning slowly to a stop at --turn, held there (its own rule gives the angle). */
+@keyframes turn {
   to {
-    transform: rotate(360deg);
+    transform: rotate(var(--turn));
   }
 }
 
@@ -249,10 +252,10 @@
 
 .menuItem[aria-checked='true'] .jag {
   transform: scale(1, 1);
-  animation: jagJitter 720ms steps(1) infinite;
+  animation: jagJitter 720ms steps(1) 6;
 }
 
-/* The highlighter keeps changing shape: three hard poses, no tween between them. */
+/* The highlighter changes shape for six beats, three hard poses with no tween between them, then rests. */
 @keyframes jagJitter {
   0% {
     transform: scale(1, 1) skewX(0);
@@ -333,11 +336,19 @@
   }
 }
 
-/* The office: the code lines type in one after another and start over, the cursor blinks. */
+/* Each set plays once its frame is in view (data-on, sets.tsx): until then the frame's slam and every part
+   of it stand on their first frame, so a set below the fold still plays when it is reached. */
+.setFrame:not([data-on]),
+.setFrame:not([data-on]) * {
+  animation-play-state: paused !important;
+}
+
+/* The office: the code lines type in one after another and stay written (the last one done 3.4 s in),
+   the cursor blinks four times. */
 .typeLine {
   transform-box: fill-box;
   transform-origin: 0% 50%;
-  animation: typeLine 2.4s steps(6) infinite;
+  animation: typeLine 2.4s steps(6) both;
   animation-delay: calc(var(--i, 0) * 0.5s);
 }
 
@@ -352,7 +363,7 @@
 }
 
 .blink {
-  animation: blink 1s steps(1) infinite;
+  animation: blink 1s steps(1) 4;
 }
 
 @keyframes blink {
@@ -361,18 +372,19 @@
   }
 }
 
-/* The club: the spotlight sweeps the stage, the crash cymbal shakes on the hit. */
+/* The club: the spotlight sweeps the stage once each way and comes back onto him, the crash cymbal shakes
+   on five hits. */
 .sweep {
   transform-box: view-box;
   transform-origin: 300px -10px;
-  animation: sweep 3.2s ease-in-out infinite alternate;
+  animation: sweep 4.8s ease-in-out;
 }
 
 @keyframes sweep {
-  from {
+  25% {
     transform: rotate(-14deg);
   }
-  to {
+  75% {
     transform: rotate(14deg);
   }
 }
@@ -380,7 +392,7 @@
 .crash {
   transform-box: fill-box;
   transform-origin: 50% 50%;
-  animation: crash 0.9s var(--snap) infinite;
+  animation: crash 0.9s var(--snap) 5;
 }
 
 @keyframes crash {
@@ -396,11 +408,12 @@
   }
 }
 
-/* The gym: the heavy bag swings on its chain, a hit star bursts on it at the top of each swing. */
+/* The gym: the heavy bag swings on its chain three times, a hit star bursts on it at the top of each swing,
+   and it hangs still. */
 .swing {
   transform-box: view-box;
   transform-origin: 370px 0;
-  animation: swing 1.6s ease-in-out infinite;
+  animation: swing 1.6s ease-in-out 3;
 }
 
 @keyframes swing {
@@ -417,7 +430,7 @@
 }
 
 .bagHit {
-  animation: bagHit 1.6s var(--snap) infinite;
+  animation: bagHit 1.6s var(--snap) 3;
 }
 
 @keyframes bagHit {
@@ -803,7 +816,7 @@
 }
 
 /* 7. The finish: he drops onto the red and black field, a snappy zoom brings the card in with a shake,
-   the burst with its glass drifts slowly behind. */
+   the glass star behind turns a fifth of the way round and stops. */
 .finishDrop {
   animation: finishDrop 300ms var(--snap) both;
 }
@@ -813,7 +826,8 @@
 }
 
 .drift {
-  animation: spin 24s linear infinite;
+  --turn: 72deg;
+  animation: turn 4.8s cubic-bezier(0.2, 0.6, 0.35, 1) both;
 }
 
 @keyframes finishDrop {

@@ -28,9 +28,16 @@ const CROOKS = [
   'polygon(0 0, 98% 2.5%, 100% 100%, 2% 97.5%)',
 ]
 
+// The last step of a staggered entrance: every item after the eighth comes in with the eighth, so a long
+// list still lands within 5 s of its section's trigger (the slowest step, 160 ms, has the last in by 1.4 s).
+const LAST_STEP = 7
+
+/** The step of the item at `index` in a staggered entrance, capped at LAST_STEP. */
+export const staggerStep = (index: number) => Math.min(index, LAST_STEP)
+
 /** The --i the stage staggers an entrance by, the tilt a card rests at on hover and its crooked outline. */
 export const orderVars = (index: number): CSSProperties =>
-  ({ '--i': index, '--tilt': `${index % 2 ? 1.5 : -1.5}deg`, '--crook': CROOKS[index % CROOKS.length] }) as CSSProperties
+  ({ '--i': staggerStep(index), '--tilt': `${index % 2 ? 1.5 : -1.5}deg`, '--crook': CROOKS[index % CROOKS.length] }) as CSSProperties
 
 /** A card's tag chips. */
 export const CHIPS: TagListLook = {

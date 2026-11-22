@@ -24,6 +24,7 @@ import { IrisWipe, SunWatcher, TitleCardIntro } from './RubberHose/scenes'
 import { staggerAt } from './shared/stagger'
 import { ProfessionSet } from './RubberHose/sets'
 import { IsleStage, Isles, type Isle } from './RubberHose/isles'
+import { Cue } from './RubberHose/cue'
 import { HeroCharacter } from './RubberHose/cup'
 import { headingId } from '@/lib/cv/sectionText'
 import world from './RubberHose/world.module.css'
@@ -81,7 +82,8 @@ export default function RubberHoseTheme() {
         {/* the page sits inside the film frame */}
         <div className="mx-6 sm:mx-14">
           {/* the recruiter first screen */}
-          <IsleStage isle="meadow">
+          {/* the first screen is not cued: it plays as the page loads */}
+          <IsleStage isle="meadow" cued={false}>
             <header data-worlds-hero="" className="relative z-30 px-2 py-6 sm:p-6">
               <RecruiterHero
                 render={({ name, headline, tagline, line, actions }) => (
@@ -116,11 +118,13 @@ export default function RubberHoseTheme() {
 
           {/* the profession switch, a row of cast badges with him in each costume */}
           <section className="relative z-20 py-8" aria-label={navigation.professionSelection}>
-            <ProfessionSwitch
-              className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
-              label={navigation.profession}
-              renderOption={(option) => <CartoonCharacter {...option} />}
-            />
+            <Cue>
+              <ProfessionSwitch
+                className="grid grid-cols-3 gap-2 sm:flex sm:justify-center sm:gap-8 md:gap-12"
+                label={navigation.profession}
+                renderOption={(option) => <CartoonCharacter {...option} />}
+              />
+            </Cue>
           </section>
 
           <main id="main-content" className="relative z-20 px-2 py-8 md:px-8">

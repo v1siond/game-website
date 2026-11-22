@@ -52,7 +52,7 @@ function SummonSign({ lit }: { lit: boolean }) {
 }
 
 // Once he has faded home (.phantomHome on the figure ends) the column and the figure leave the page, so
-// his idle loop stops with them.
+// nothing of him stays on it.
 function SummonedPhantom({ summoned, home, script }: { summoned: boolean; home: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
   const [faded, setFaded] = useState(false)

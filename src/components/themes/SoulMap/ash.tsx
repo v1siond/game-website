@@ -1,6 +1,7 @@
 import ashen from './ashen.module.css'
 
-// Behind the whole page: ash drifting down through the dark (eight flakes, each on its own slow fall) and
+// Behind the whole page: ash drifting down through the dark (eight flakes, each on its own slow fall to
+// where it rests, ashen.module.css) and
 // the vignette that darkens the edges of the screen, fixed so they stay while the page scrolls.
 
 const FLAKES = 8

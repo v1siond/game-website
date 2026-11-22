@@ -5,6 +5,7 @@ import { useStoreValue, useZoneStage, type ValueStore } from '@/hooks/useZoneSta
 import { PieEyes } from './art'
 import { HOSE } from './palette'
 import stage from './stage.module.css'
+import world from './world.module.css'
 
 // The painted isles behind the whole page, fixed to the viewport like the game's watercolour sets: a far
 // wash, painted hills or tents or a felt table mid, dark foliage or curtains near. The page walks from the
@@ -13,7 +14,8 @@ import stage from './stage.module.css'
 // shared useZoneStage; the page keeps it and the isles cross fade (opacity only).
 //
 // Everything has a face and bobs on a two drawing beat (steps timing, 1930s twos): clouds drift past with
-// pie eyes, flowers sway, the moon and the dice grin. Only the isle in view animates; the others pause.
+// pie eyes, flowers sway, the moon and the dice grin, each for a few beats and then at rest. Only the isle
+// in view animates; the others pause.
 
 export type Isle = 'meadow' | 'carnival' | 'casino'
 
@@ -69,7 +71,7 @@ function Carnival() {
       <rect width={400} height={300} fill={HOSE.carnivalWash} />
       <path d="M0 150 L40 90 L70 140 L110 70 L150 150 Z M250 150 L300 80 L330 130 L360 96 L400 150 Z" fill={HOSE.shadow} opacity={0.35} />
       <g transform="translate(320 150)">
-        <g className="motion-safe:animate-[spin_30s_linear_infinite]">
+        <g className={`[--turn:45deg] ${world.turn}`}>
           <circle r={56} fill="none" stroke={HOSE.inkSoft} strokeWidth={3} />
           {[0, 45, 90, 135].map((a) => (
             <path key={a} d="M-56 0 H56" stroke={HOSE.inkSoft} strokeWidth={2} transform={`rotate(${a})`} />
@@ -114,7 +116,7 @@ export const Isles = memo(function Isles({ zones }: { zones: ValueStore<Isle> })
       {ISLES.map((isle) => {
         const Drawn = DRAWN[isle]
         return (
-          <svg key={isle} viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${stage.isle}`} data-on={isle === current || undefined} focusable="false">
+          <svg key={isle} viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${stage.isle} ${stage.cue}`} data-on={isle === current || undefined} focusable="false">
             <Drawn />
             <FacedCloud x={20} y={30} scale={0.9} className={stage.drift} />
             <FacedCloud x={220} y={96} scale={0.6} className={stage.driftSlow} />
@@ -133,11 +135,15 @@ function drawnOnIsle(children: IsleChildren, on: boolean): ReactNode {
   return children
 }
 
-/** A section's place on an isle: hands the isle up while in view, and says when it first came into view. */
-export function IsleStage({ isle, className = '', children }: { isle: Isle; className?: string; children: IsleChildren }) {
+/**
+ * A section's place on an isle: hands the isle up while in view, and says when it first came into view.
+ * Cued (the default), everything in it waits on its first frame until then (stage.module.css .cue), so its
+ * loops play from the moment it is reached; the first screen is not cued, it plays as the page loads.
+ */
+export function IsleStage({ isle, cued = true, className = '', children }: { isle: Isle; cued?: boolean; className?: string; children: IsleChildren }) {
   const { ref, on } = useZoneStage<Isle>(isle)
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} data-on={on || undefined} className={`${cued ? stage.cue : ''} ${className}`}>
       {drawnOnIsle(children, on)}
     </div>
   )

@@ -30,6 +30,11 @@
   animation: irisOpen 0.9s var(--hose-bounce) both;
 }
 
+/* The scene change's iris waits shut until its wipe is in view (scenes.tsx IrisWipe). */
+.wipe:not([data-on]) > .irisOpen {
+  animation-play-state: paused;
+}
+
 @keyframes irisOpen {
   0% {
     opacity: 1;
@@ -142,9 +147,9 @@
 
 /* ---- parry (Projects) ---- */
 
-/* The pink parry star pulses on the beat, waiting to be slapped. */
+/* The pink parry star pulses six beats, waiting to be slapped, then waits still. */
 .parryStar {
-  animation: parryPulse 0.7s ease-in-out infinite alternate;
+  animation: parryPulse 0.7s ease-in-out 6 alternate;
 }
 
 @keyframes parryPulse {

@@ -2,8 +2,15 @@
  * The painted isles behind the page (isles.tsx) and his act in each section (stages.tsx). The beat is drawn
  * on twos: loops step between two or three drawings (steps timing) like 1930s cels at 24 a second, one
  * shot moves overshoot on --hose-bounce. Transform and opacity only. Under reduced motion every loop is off
- * and every one shot scene shows its end drawing (the components hand it the end beat).
+ * and every one shot scene shows its end drawing (the components hand it the end beat). With motion every
+ * loop plays a set number of times from its scene's start and rests within 5 s.
  */
+
+/* A scene that plays from the moment it is in view (the isle on show, a section's stage, a cue in
+   stages.tsx): until it carries data-on every part of it stands on its first frame. */
+.cue:not([data-on]) * {
+  animation-play-state: paused !important;
+}
 
 .ko,
 .shop,
@@ -23,47 +30,45 @@
   opacity: 1;
 }
 
-.isle:not([data-on]) * {
-  animation-play-state: paused !important;
-}
-
 @media (prefers-reduced-motion: no-preference) {
+  /* The clouds drift 24 px at their old pace while their isle is on show, and stay there. */
   .drift {
-    animation: drift 26s steps(52) infinite alternate;
+    animation: drift 4.8s steps(10) forwards;
   }
 
   .driftSlow {
-    animation: drift 40s steps(80) infinite alternate-reverse;
+    animation: drift 4.8s steps(10) reverse backwards;
   }
 
   .sway {
     transform-box: fill-box;
     transform-origin: 50% 100%;
-    animation: sway 1s steps(2) infinite;
+    animation: sway 1s steps(2) 4;
   }
 
   .swayLate {
     transform-box: fill-box;
     transform-origin: 50% 100%;
-    animation: sway 1s steps(2) 0.5s infinite;
+    animation: sway 1s steps(2) 0.5s 4;
   }
 
   .moon {
-    animation: bob 1s steps(2) infinite;
+    animation: bob 1s steps(2) 4;
   }
 
   .bassDrum {
-    animation: bob 0.5s steps(2) infinite;
+    animation: bob 0.5s steps(2) 8;
   }
 
+  /* Three swells, so the lights rest full on. */
   .footlight {
-    animation: glow 1.2s steps(3) infinite alternate;
+    animation: glow 1.2s steps(3) 3 alternate;
   }
 }
 
 @keyframes drift {
   to {
-    transform: translate3d(120px, 0, 0);
+    transform: translate3d(24px, 0, 0);
   }
 }
 

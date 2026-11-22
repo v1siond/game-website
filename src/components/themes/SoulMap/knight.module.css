@@ -11,6 +11,9 @@
  * carries its own easing: wind ups ease in and out, strikes accelerate (ease in), landings and
  * recoveries decelerate (ease out). The loops (breath, the class acts) start on their own first frame
  * through a short lead in, and run on periods that do not divide into each other, so nothing beats in step.
+ * No loop runs for good: each plays a set number of times, so a scene has played out within 5 s of its
+ * start, and he rests on the held pose: the idle's breath, blink and sword arm drift play once and he
+ * stands still.
  *
  * A held pose (sit, a seated drink, guard, down, the fighter's high guard) is a plain transform, so
  * reduced motion still shows it; the motion into it, and every loop, runs only with no motion preference.
@@ -281,29 +284,48 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* ---- breath: the chest rises and falls (body only, never the whole figure), a blink ---- */
+  /* ---- life: the chest rises and falls once (body only, never the whole figure), a blink, and standing
+     the sword arm drifts once, all over the pose's --life, then he rests still. At work 3.6 s; sitting by
+     a fire 1.6 s (the hero rises from it 1.6 s in); standing --idle, 2 s, which a scene that reaches the
+     idle late shortens so it still ends within 5 s (the bands stage, 1 s). ---- */
+  .act {
+    --life: 3.6s;
+  }
+
+  .seated,
+  .drink {
+    --life: 1.6s;
+  }
+
+  .idle {
+    --life: var(--idle, 2s);
+  }
+
   .idle .body,
   .act .body {
-    animation: breathe 3.6s ease-in-out infinite;
+    animation: breathe var(--life) ease-in-out;
   }
 
   .seated .body,
   .drink .body {
-    animation: breathe-sat 3.6s ease-in-out infinite;
+    animation: breathe-sat var(--life) ease-in-out;
   }
 
   /* A phantom breathes on its own slower rhythm, so two figures on screen never rise together. */
   .phantom .body {
-    animation-duration: 4.3s;
+    animation-duration: calc(var(--life) * 1.2);
   }
 
-  .eyes {
-    animation: blink 5.2s ease-in-out infinite;
+  .idle .eyes,
+  .act .eyes,
+  .seated .eyes,
+  .drink .eyes {
+    animation: blink var(--life) ease-in-out;
   }
 
-  /* the sword arm drifts on a period of its own, out of step with the breath */
+  /* the sword arm drifts against the breath */
   .knight.idle .armFar {
-    animation: arm-drift 6.1s ease-in-out infinite;
+    animation: arm-drift var(--life) ease-in-out;
   }
 
   /* ---- walk: two heavy strides in armour, feet together at both ends, a dip on every footfall ---- */
@@ -402,9 +424,7 @@
   }
 
   .sit .body {
-    animation:
-      sit-body 0.9s ease-in-out both,
-      breathe-sat 3.6s ease-in-out 0.9s infinite;
+    animation: sit-body 0.9s ease-in-out both;
   }
 
   .sit .head,
@@ -557,61 +577,62 @@
     animation: knock-down 0.9s linear both;
   }
 
-  /* ---- System Engineer: the hammer resting on the anvil, raised slow, hung, brought down hard ---- */
+  /* ---- System Engineer: the hammer resting on the anvil, raised slow, hung, brought down hard, once ---- */
   .engineer.act .armFar {
     animation:
       hammer-ready 0.5s ease-in-out both,
-      hammer 2.4s linear 0.5s infinite;
+      hammer 2.4s linear 0.5s;
   }
 
   .engineer.act .body {
-    animation: hammer-lean 2.4s linear 0.5s infinite;
+    animation: hammer-lean 2.4s linear 0.5s;
   }
 
-  /* ---- Musician: the war drum, one mallet then the other, each lifted before it falls ---- */
+  /* ---- Musician: the war drum, one mallet then the other, each lifted before it falls, two bars ---- */
   .drummer.act .armFar {
     animation:
       drum-ready-arm 0.4s ease-in-out both,
-      drum-far 1.2s linear 0.4s infinite;
+      drum-far 1.2s linear 0.4s 2;
   }
 
   .drummer.act .armNear {
     animation:
       drum-ready-arm 0.4s ease-in-out both,
-      drum-near 1.2s linear 0.4s infinite;
+      drum-near 1.2s linear 0.4s 2;
   }
 
   .drummer.act .foreFar {
     animation:
       drum-ready-fore 0.4s ease-in-out both,
-      drum-fore-far 1.2s linear 0.4s infinite;
+      drum-fore-far 1.2s linear 0.4s 2;
   }
 
   .drummer.act .foreNear {
     animation:
       drum-ready-fore 0.4s ease-in-out both,
-      drum-fore-near 1.2s linear 0.4s infinite;
+      drum-fore-near 1.2s linear 0.4s 2;
   }
 
-  /* ---- Martial Artist: roundhouse, knee, elbow, each chambered, thrown, held and pulled back ---- */
+  /* ---- Martial Artist: roundhouse, knee, elbow, each chambered, thrown, held and pulled back, once in
+     3.6 s, and he holds the guard the cycle starts and ends on ---- */
   .fighter.act .legNear {
-    animation: kick-cycle 4.8s linear infinite;
+    animation: kick-cycle 3.6s linear forwards;
   }
 
   .fighter.act .shinNear {
-    animation: knee-cycle 4.8s linear infinite;
+    animation: knee-cycle 3.6s linear forwards;
   }
 
   .fighter.act .armNear {
-    animation: elbow-arm 4.8s linear infinite;
+    animation: elbow-arm 3.6s linear forwards;
   }
 
   .fighter.act .foreNear {
-    animation: elbow-fore 4.8s linear infinite;
+    animation: elbow-fore 3.6s linear forwards;
   }
 
   .fighter.act .body {
-    animation: kick-lean 4.8s linear infinite;
+    animation: kick-lean 3.6s linear forwards;
   }
 
   /* one committed roundhouse, the arena's Strike: a slow chamber, the snap, it lands at 50 % (500 ms) and
@@ -695,6 +716,16 @@
   }
 }
 
+@keyframes arm-drift {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-3deg);
+  }
+}
+
 @keyframes blink {
   0%,
   94%,
@@ -703,16 +734,6 @@
   }
   96% {
     transform: scaleY(0.1);
-  }
-}
-
-@keyframes arm-drift {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  50% {
-    transform: rotate(-3deg);
   }
 }
 
@@ -1349,17 +1370,18 @@
     animation: praise-head 1.8s ease-in-out both;
   }
 
-  /* ---- write: the soapstone hand works across the floor in short strokes, the head following it ---- */
+  /* ---- write: the soapstone hand works across the floor in short strokes, the head following it, for
+     2.7 s of the scribe's 4.4 s visit ---- */
   .write .armNear {
-    animation: write-arm 1.3s ease-in-out infinite alternate;
+    animation: write-arm 1.3s ease-in-out 2 alternate;
   }
 
   .write .foreNear {
-    animation: write-fore 0.45s ease-in-out infinite alternate;
+    animation: write-fore 0.45s ease-in-out 6 alternate;
   }
 
   .write .head {
-    animation: write-head 1.3s ease-in-out infinite alternate;
+    animation: write-head 1.3s ease-in-out 2 alternate;
   }
 }
 

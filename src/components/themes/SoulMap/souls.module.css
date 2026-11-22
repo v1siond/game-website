@@ -2,7 +2,8 @@
  * The bonfire world's scenes and HUD (hud.tsx, bonfire.tsx, shrine.tsx, classSelect.tsx, gate.tsx, descent.tsx,
  * items.tsx, messages.tsx, stage.tsx, arena.tsx, lastFire.tsx, menu.tsx). Heavy and slow the way the
  * hard knight action game moves: things settle with ease out, a flare is fast and its fade is long, the
- * loops run on periods that never divide into each other, and each section enters its own way (a menu
+ * loops run on periods that never divide into each other, each a set number of times so every scene has
+ * played out within 5 s of its start and rests on its last frame, and each section enters its own way (a menu
  * fades open, an area's name surfaces, a glint flares, a message is written, a phantom materialises, the
  * fog parts). Transforms and opacity only; every loop and every entrance runs only with no motion
  * preference, and the state it ends in is the plain rule, so reduced motion shows it still. Colours are
@@ -206,26 +207,27 @@
     transition: transform 1.8s ease-out, opacity 1.8s ease-out;
   }
 
-  /* Three tongues, each on its own uneven period, so the fire never repeats in step. */
+  /* Three tongues, each on its own uneven period, so the fire never flickers in step, and each settles
+     into the still lit flame within 3.2 s of catching (the hero's fire catches 1.7 s in, so by 4.9 s). */
   .fireLit .flameOuter {
-    animation: flicker-outer 1.9s ease-in-out infinite;
+    animation: flicker-outer 1.9s ease-in-out;
   }
 
   .fireLit .flameMid {
-    animation: flicker-mid 1.3s ease-in-out infinite;
+    animation: flicker-mid 1.3s ease-in-out 2;
   }
 
   .fireLit .flameCore {
-    animation: flicker-core 0.9s ease-in-out infinite;
+    animation: flicker-core 0.9s ease-in-out 3;
   }
 
   .fireLit .fireGlow {
-    animation: glow-breathe 4.1s ease-in-out infinite;
+    animation: glow-breathe 3.2s ease-in-out;
   }
 
-  /* Embers lift off the fire on curling paths, slowing and fading as they climb. */
+  /* Embers lift off the fire on curling paths, slowing and fading as they climb, one each. */
   .fireLit .spark {
-    animation: spark-rise 3.7s ease-out infinite;
+    animation: spark-rise 3.2s ease-out;
   }
 
   .fireLit .spark:nth-child(2) {
@@ -241,7 +243,7 @@
 
   .fireOut .lastEmber,
   .fireEmber .lastEmber {
-    animation: ember-pulse 2.9s ease-in-out infinite;
+    animation: ember-pulse 2.9s ease-in-out;
   }
 }
 
@@ -335,7 +337,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .fogBand {
-    animation: fog-drift 26s ease-in-out infinite alternate;
+    animation: fog-drift 4.8s ease-in-out forwards;
   }
 
   /* After he stands, the words under the scene surface one line at a time, out of the dark. */
@@ -362,9 +364,10 @@
   .heroWordsOn > :nth-child(7) { transition-delay: 1.3s; }
 }
 
+/* The fog band drifts 24 px at its old pace and holds there. */
 @keyframes fog-drift {
-  0% { transform: translateX(-60px); }
-  100% { transform: translateX(80px); }
+  0% { transform: translateX(-12px); }
+  100% { transform: translateX(12px); }
 }
 
 /* ======================================================= class select ================================== */
@@ -391,19 +394,19 @@
   /* Each prop answers his strokes in time with his own loop (knight.module.css), from his first stroke:
      the scene keys the prop to his step and marks it live only while he works. */
 
-  /* Sparks fly as the hammer lands, 52 % into its 2.4 s loop, after the 0.5 s lift into it. */
+  /* Sparks fly as the hammer lands, 52 % into its one 2.4 s blow, after the 0.5 s lift into it. */
   .propLive .forgeSparks {
-    animation: forge-sparks 2.4s linear 0.5s infinite;
+    animation: forge-sparks 2.4s linear 0.5s;
   }
 
-  /* The skin flashes on each mallet, 25 % and 75 % into the 1.2 s loop, after the 0.4 s lift. */
+  /* The skin flashes on each mallet, 25 % and 75 % into each of the two 1.2 s bars, after the 0.4 s lift. */
   .propLive .drumHead {
-    animation: drum-flash 0.6s ease-out 0.7s infinite;
+    animation: drum-flash 0.6s ease-out 0.7s 4;
   }
 
-  /* The post rocks on the roundhouse, the knee and the elbow (16, 49 and 74 % of the 4.8 s cycle). */
+  /* The post rocks on the roundhouse, the knee and the elbow (16, 49 and 74 % of the one 3.6 s cycle). */
   .propLive .post {
-    animation: post-shake 4.8s linear infinite;
+    animation: post-shake 3.6s linear;
   }
 }
 
@@ -557,11 +560,11 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* The sign flares as it is reached, then glows on slowly. */
+  /* The sign flares as it is reached, then glows once, slowly, and stays lit. */
   .sigilLit {
     animation:
       sigil-flare 1.1s ease-out both,
-      sigil-glow 4.6s ease-in-out 1.1s infinite;
+      sigil-glow 3.6s ease-in-out 1.1s;
   }
 
   /* The light rises out of the ring, the phantom gathers inside it as it peaks. */
@@ -683,7 +686,7 @@
   }
 
   .messageOn .inscription::before {
-    animation: script-glow 5.3s ease-in-out 1.8s infinite;
+    animation: script-glow 3s ease-in-out 1.8s forwards;
   }
 
   li:nth-child(even) > .messageOn .inscription {
@@ -782,11 +785,9 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .gateWall {
-    animation: fog-swirl 9s ease-in-out infinite alternate;
-  }
-
+  /* The wall swirls once as it thins for him, and holds. */
   .gateWallThin {
+    animation: fog-swirl 4.8s ease-in-out forwards;
     transition: opacity 2.4s ease-in-out;
   }
 
@@ -824,13 +825,14 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* The fog wall swirls once as the ring is reached (the ring waits for it, arena.tsx), the back sheet
+     against the front, and holds until Traverse parts it. */
   .fogLayer {
-    animation: fog-swirl 9s ease-in-out infinite alternate;
+    animation: fog-swirl 4.8s ease-in-out forwards;
   }
 
   .fogLayerBack {
-    animation-duration: 13s;
-    animation-direction: alternate-reverse;
+    animation-direction: reverse;
   }
 
   /* Traverse: the wall thins and lets him through over the 2.4 s of his walk. */
@@ -864,9 +866,10 @@
   100% { opacity: 0; transform: scale(1.15); }
 }
 
+/* Half the old sweep, so the one pass keeps the old pace. */
 @keyframes fog-swirl {
-  0% { transform: translateX(-6%) scale(1.1); }
-  100% { transform: translateX(6%) scale(1.25); }
+  0% { transform: translateX(-3%) scale(1.1); }
+  100% { transform: translateX(3%) scale(1.175); }
 }
 
 @keyframes partner-drop {

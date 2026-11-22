@@ -3,6 +3,7 @@
 import { memo, type ComponentProps, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { PieEyes } from './art'
+import { Cue } from './cue'
 import { HeroCharacter, type HeroPose } from './cup'
 import { HOSE } from './palette'
 import styles from './sets.module.css'
@@ -12,8 +13,9 @@ import styles from './sets.module.css'
 // of inked cut outs that slide against each other as the pointer moves (--mx and --my from the theme
 // root, the shared usePointerVars; depth through parallax, the way a cartoon camera shot cels in front of a built set). Two ink weights: a thick line
 // round every silhouette, a thin one for the detail inside. The props wear pie eyes and bob on the beat,
-// most loops stepped to 24 frames a second like hand drawn cels (sets.module.css). Him in the middle,
-// working: typing at the terminal, playing the kit, jabbing the heavy bag.
+// most loops stepped to 24 frames a second like hand drawn cels (sets.module.css), each for a few beats
+// from the moment the set is in view (Cue), at rest by 4.8 s. Him in the middle, working: typing at the
+// terminal, playing the kit, jabbing the heavy bag.
 // - System Engineer: the workshop town, pie eyed houses, the factory's smokestack puffing rings, his
 //   desk with a pie eyed terminal that squashes when the pointer lands on it.
 // - Musician: the vaudeville stage, a painted moon backdrop, swagged red curtains, the footlights
@@ -137,7 +139,7 @@ function Factory() {
         <rect x={42} y={154} width={22} height={18} fill={HOSE.ink} />
       </g>
       {/* the smoke rings, each rising off the stack on its own delay */}
-      {['[--delay:0s]', '[--delay:-0.9s]', '[--delay:-1.8s]'].map((delay) => (
+      {['[--delay:0s]', '[--delay:0.9s]', '[--delay:1.8s]'].map((delay) => (
         <circle key={delay} cx={82} cy={44} r={8} fill={HOSE.paper} className={`${styles.thick} ${styles.puff} ${delay}`} />
       ))}
     </g>
@@ -446,7 +448,9 @@ export const ProfessionSet = memo(function ProfessionSet({ profession }: { profe
 
   return (
     <div className={`relative mb-10 h-44 overflow-hidden sm:h-64 lg:h-72 ${styles.frame}`} aria-hidden="true">
-      <Scene />
+      <Cue>
+        <Scene />
+      </Cue>
     </div>
   )
 })

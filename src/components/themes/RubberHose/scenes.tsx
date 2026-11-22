@@ -16,14 +16,17 @@ import styles from './scenes.module.css'
 // - TitleCardIntro: the boss intro card. setTimeout phases, because it is a fixed sequence on page load
 //   for the first screen only: the iris opens (0 ms), the framed card drops and squashes (250 ms), its
 //   words pop in one by one (800 ms). Plays once; reduced motion or a World Select preview start at the end.
-// - IrisWipe: the scene change. Keyed on the profession by the caller, so every switch opens a new iris.
+// - IrisWipe: the scene change. Keyed on the profession by the caller, so every switch opens a new iris;
+//   the first waits until the wipe is in view.
 // - Reveal: one scroll trigger (the shared useSectionTrigger, once only) handing a wait or play class to
 //   its children, for the phase cards, the knockout and the hit stars.
 // - RunBar: the run bar of a lost round, his little figure running along a line past a flag per stop.
 //   Scroll driven: it reads the --scene-progress the shared ScrollScene writes round the section, so a
-//   frame never renders React, and each flag goes up as he passes it (scenes.module.css .flag).
-// - SunWatcher: the pie eyed sun over the contact card, its pupils following the pointer through the
-//   --mx and --my the theme root carries (the shared usePointerVars, no React render per move).
+//   frame never renders React, and each flag goes up as he passes it (scenes.module.css .flag). His legs
+//   are scrubbed by the same progress (scrub), so he runs only while the page moves.
+// - SunWatcher: the pie eyed sun over the contact card, its rays turning to a stop as the card is reached,
+//   its pupils following the pointer through the --mx and --my the theme root carries (the shared
+//   usePointerVars, no React render per move).
 
 type IntroPhase = 'wait' | 'drop' | 'pop'
 
@@ -70,10 +73,13 @@ export function TitleCardIntro({ children }: { children: (look: IntroLook) => Re
 }
 
 // overflow-clip, not hidden: hidden would make the wipe a scroll container and stop the run bar inside
-// it from sticking to the viewport.
+// it from sticking to the viewport. The iris opens once the wipe is in view (the shared section trigger),
+// so the first one, below the first screen, is not played unseen as the page loads.
 export function IrisWipe({ children }: { children: ReactNode }) {
+  const { ref, triggered } = useSectionTrigger()
+
   return (
-    <div className={`relative overflow-clip ${styles.scene}`}>
+    <div ref={ref} data-on={triggered || undefined} className={`relative overflow-clip ${styles.scene} ${styles.wipe}`}>
       {children}
       <IrisRing className={`z-30 ${styles.iris} ${styles.irisOpen}`} />
     </div>
@@ -115,7 +121,7 @@ export function RunBar({ profession, stops }: { profession: Profession; stops: n
           </svg>
         ))}
         <div className={`absolute bottom-3 left-0 h-12 w-10 ${styles.runner}`}>
-          <HeroCharacter profession={profession} pose="run" className="h-full w-full" />
+          <HeroCharacter profession={profession} pose="run" scrub className="h-full w-full" />
         </div>
       </div>
     </div>
@@ -125,7 +131,7 @@ export function RunBar({ profession, stops }: { profession: Profession; stops: n
 function Sun() {
   return (
     <svg viewBox="0 0 80 80" className={`h-24 w-24 sm:h-28 sm:w-28 ${world.inked}`} aria-hidden="true" focusable="false">
-      <g className={`motion-safe:animate-[spin_12s_linear_infinite] ${styles.sunRays}`}>
+      <g className={`[--turn:150deg] ${world.turn} ${styles.sunRays}`}>
         {[0, 30, 60, 90, 120, 150].map((angle) => (
           <path key={angle} d="M37 2 Q40 -2 43 2 L41 78 Q40 80 39 78 Z" fill={HOSE.gold} transform={`rotate(${angle} 40 40)`} />
         ))}

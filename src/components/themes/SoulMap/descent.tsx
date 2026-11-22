@@ -14,6 +14,7 @@ import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
 import { MarkedLines } from '@/components/cv/MarkedLines'
 import { CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, TAGS } from './menu'
 import { CARVED, SOUL } from './palette'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
@@ -34,9 +35,13 @@ import souls from './souls.module.css'
 // screen and a half past the top of it.
 const RIDE = { start: 1, end: -1.5 }
 
+// The shaft waits on its first frame until it is in view (ashen.module.css .cue), so the idle of him riding
+// it plays once when reached.
 function LiftShaft() {
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.15 })
+
   return (
-    <div className={`relative hidden h-full w-24 lg:block ${souls.shaft}`} aria-hidden="true">
+    <div ref={ref} data-on={triggered || undefined} className={`relative hidden h-full w-24 lg:block ${souls.shaft} ${ashen.cue}`} aria-hidden="true">
       <div className="absolute inset-y-0 left-1/2 w-px -translate-x-[18px] bg-[color:var(--soul-stone-light)] opacity-60" />
       <div className="absolute inset-y-0 left-1/2 w-px translate-x-[18px] bg-[color:var(--soul-stone-light)] opacity-60" />
       <div className={`absolute inset-x-0 top-0 h-[calc(100%-8rem)] ${souls.liftRide}`}>
@@ -68,7 +73,7 @@ const fall = (sink: () => void): PoseStep[] => [
   { pose: 'down', ms: 2600, effect: sink },
 ]
 
-// The ghost leaves the page once it has sunk (.ghostGone ends), so its pose loop stops with it.
+// The ghost leaves the page once it has sunk (.ghostGone ends), so nothing of it stays on the page.
 function Bloodstain({ replay, gone, script }: { replay: boolean; gone: boolean; script: PoseScript }) {
   const reduced = useReducedMotion()
   const [sunk, setSunk] = useState(false)

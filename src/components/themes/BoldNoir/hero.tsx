@@ -5,7 +5,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { RansomWord, StarBurst } from './backdrop'
+import { LAST_LETTER_STEP, RansomWord, StarBurst } from './backdrop'
 import { NoirLink } from './actions'
 import { NOIR } from './palette'
 import world from './world.module.css'
@@ -30,7 +30,7 @@ export function CallingCardHero() {
           ref={ref}
           data-on={triggered || undefined}
           className={`mx-auto grid max-w-6xl items-center gap-8 md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] ${world.hero}`}
-          style={{ '--n': name.length } as CSSProperties}
+          style={{ '--n': Math.min(name.length, LAST_LETTER_STEP) } as CSSProperties}
         >
           <div className={`relative ${world.follow}`}>
             <div className="pointer-events-none absolute -inset-10 opacity-60" aria-hidden="true">
