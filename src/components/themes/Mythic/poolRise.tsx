@@ -107,7 +107,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
             <div className={`absolute inset-0 ${u.riser}`}>
               {done ? (
                 <button type="button" className={`h-full w-full ${u.heroFigure}`} aria-label={myth.combo} onClick={() => play(HERO_MOVE[profession])}>
-                  <SpartanSprite key={take} profession={profession} motion={pose} onDone={settle} className="h-full w-full" />
+                  <SpartanSprite profession={profession} motion={pose} onDone={settle} className="h-full w-full" take={take} />
                 </button>
               ) : (
                 <SpartanSprite profession={profession} motion={entranceMotion(shown)} className="h-full w-full" />

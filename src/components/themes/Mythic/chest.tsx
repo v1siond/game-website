@@ -96,7 +96,7 @@ export function ChestHeave() {
           <path ref={glowRef} d="M148 152 L208 152 L242 0 L114 0 Z" fill={MYTH.fireCore} opacity={reduced ? 0.85 : 0} className={`${u.sceneProp} ${u.chestGlow}`} />
           <ChestBody />
         </FigureSpace>
-        <SpartanSprite key={take} profession="engineer" motion={pose} place={HIM} onDone={settle} />
+        <SpartanSprite profession="engineer" motion={pose} place={HIM} onDone={settle} take={take} />
         <FigureSpace place={HIM}>
           <g ref={lidRef} opacity={reduced ? 0 : 1} className={`${u.sceneProp} ${u.chestLid}`}>
             <Lid />

@@ -110,7 +110,7 @@ export function BladeThrow() {
         {SHARDS.map((_, index) => (
           <Shard key={index} index={index} take={take} ms={ms} />
         ))}
-        <SpartanSprite key={take} profession="engineer" motion={pose} place={HIM} onDone={settle} />
+        <SpartanSprite profession="engineer" motion={pose} place={HIM} onDone={settle} take={take} />
         <g ref={bladeRef} opacity={0} className={u.sceneProp}>
           <Blade />
         </g>

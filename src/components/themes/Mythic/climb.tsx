@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { memo, useCallback, useRef, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { usePoseSequence, type PoseSequence } from '@/hooks/usePoseSequence'
@@ -15,7 +15,7 @@ import u from './underworld.module.css'
 // The Tech Stack as the climb up the carved chain: a band of carved panels hangs beside the groups, one
 // panel per group. Each group that scrolls in queues one reach; he climbs hand over hand with his blades
 // on his back, the chain running down a panel per reach, and the panel he grips lights with its group's
-// page. Pointing at a page makes its panel glow.
+// page. Pointing at a page makes its panel glow, written on the chain's own hold, so a hover renders nothing.
 
 type Category = TechCategory & { id: string }
 
@@ -31,13 +31,25 @@ const HIM = placeOn(120, nearFistAt(firstPose('hang', 'engineer')), [RING.x, HOL
 const LINKS = Array.from({ length: 18 }, (_, index) => -600 + index * 60)
 const CLIMB_GAP_MS = MOVES.climb.ms + 250
 
-// `climber` is his move sequence, which the queue of reaches in Climb plays each climb on.
-function Chain({ ids, gripped, glow, climber }: { ids: readonly string[]; gripped: number; glow: string | null; climber: PoseSequence<SpriteMotion> }) {
+// Lights the hold of the page the pointer is on, and no other, as data-glow on the chain's elements.
+function glowHold(chain: SVGSVGElement | null, id: string | null) {
+  chain?.querySelectorAll<SVGGElement>('[data-hold]').forEach((hold) => hold.toggleAttribute('data-glow', hold.dataset.hold === id))
+}
+
+interface ChainProps {
+  ids: readonly string[]
+  gripped: number
+  // His move sequence, which the queue of reaches in Climb plays each climb on.
+  climber: PoseSequence<SpriteMotion>
+  chainRef: RefObject<SVGSVGElement | null>
+}
+
+function Chain({ ids, gripped, climber, chainRef }: ChainProps) {
   const { pose, take: moveTake, settle } = climber
 
   const drop = Math.max(0, gripped - 1) * HOLD_STEP
   return (
-    <svg viewBox="-30 0 130 480" className="block h-[70vh] max-h-[34rem] w-full" aria-hidden="true">
+    <svg ref={chainRef} viewBox="-30 0 130 480" className="block h-[70vh] max-h-[34rem] w-full" aria-hidden="true">
       <g className={u.chainRun} style={{ transform: `translateY(${drop}px)` }}>
         {/* the oval links either side of the carved band */}
         {LINKS.map((y) => (
@@ -48,19 +60,20 @@ function Chain({ ids, gripped, glow, climber }: { ids: readonly string[]; grippe
         ))}
         <rect x={34} y={-600} width={32} height={1080} fill={MYTH.chainBand} />
         {ids.map((id, index) => (
-          <g key={id} data-lit={index < gripped || undefined} data-glow={glow === id || undefined} className={u.hold}>
+          <g key={id} data-hold={id} data-lit={index < gripped || undefined} className={u.hold}>
             <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.chainPanel} stroke={MYTH.inkLine} strokeWidth={1.5} />
             <circle cx={RING.x} cy={holdY(index) - RING.rise} r={7} fill="none" stroke={MYTH.bronze} strokeWidth={2} />
             <rect x={36} y={holdY(index) - 24} width={28} height={28} fill={MYTH.gold} className={u.holdLight} />
           </g>
         ))}
       </g>
-      <SpartanSprite key={moveTake} profession="engineer" motion={pose} place={HIM} onDone={settle} sheathed />
+      <SpartanSprite profession="engineer" motion={pose} place={HIM} onDone={settle} sheathed take={moveTake} />
     </svg>
   )
 }
 
-function Page({ category, lit, onEnter, onPoint }: { category: Category; lit: boolean; onEnter: (id: string) => void; onPoint: (id: string | null) => void }) {
+// Memoised: a reach re-renders Climb, and only the page it lights needs to draw again.
+const Page = memo(function Page({ category, lit, onEnter, onPoint }: { category: Category; lit: boolean; onEnter: (id: string) => void; onPoint: (id: string | null) => void }) {
   const { cards } = useLabels()
   const { ref } = useSectionTrigger({ threshold: 0.4, onEnter: () => onEnter(category.id) })
 
@@ -87,25 +100,26 @@ function Page({ category, lit, onEnter, onPoint }: { category: Category; lit: bo
       </ul>
     </li>
   )
-}
+})
 
 export function Climb({ categories }: { categories: Category[] }) {
   const { cards } = useLabels()
   const climber = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'hang', still: 'still', policy: 'always' })
   const { play } = climber
   const { enter, isDone, count } = useTurnQueue(categories, CLIMB_GAP_MS, () => play('climb'))
-  const [glow, setGlow] = useState<string | null>(null)
+  const chainRef = useRef<SVGSVGElement>(null)
+  const point = useCallback((id: string | null) => glowHold(chainRef.current, id), [])
   const ids = categories.map((category) => category.id)
 
   return (
     <div>
       <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-4 md:grid-cols-[7rem_minmax(0,1fr)]">
         <div className="sticky top-16 self-start">
-          <Chain ids={ids} gripped={count} glow={glow} climber={climber} />
+          <Chain ids={ids} gripped={count} climber={climber} chainRef={chainRef} />
         </div>
         <ul className="grid gap-4 md:grid-cols-2" aria-label={cards.techByCategory}>
           {categories.map((category) => (
-            <Page key={category.id} category={category} lit={isDone(category.id)} onEnter={enter} onPoint={setGlow} />
+            <Page key={category.id} category={category} lit={isDone(category.id)} onEnter={enter} onPoint={point} />
           ))}
         </ul>
       </div>

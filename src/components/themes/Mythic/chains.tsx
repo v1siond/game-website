@@ -77,7 +77,7 @@ export function ChainHaul({ children }: { children: ReactNode }) {
           <Chain dy={0} />
           <Chain dy={4} />
         </g>
-        <SpartanSprite key={take} profession="engineer" motion={pose} place={HIM} onDone={settle} />
+        <SpartanSprite profession="engineer" motion={pose} place={HIM} onDone={settle} take={take} />
       </svg>
       <div className={`p-6 ${u.panel} ${u.hauled}`}>{children}</div>
     </div>

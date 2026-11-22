@@ -143,7 +143,7 @@ function Arena({ take, fighter, cleared, total }: { take: number; fighter: PoseS
             <Foe />
           </g>
         </g>
-        <SpartanSprite key={moveTake} profession="engineer" motion={pose} place={HIM} onDone={settle} />
+        <SpartanSprite profession="engineer" motion={pose} place={HIM} onDone={settle} take={moveTake} />
         {ORB_SCATTER.map((_, index) => (
           <Orb key={index} index={index} take={take} />
         ))}
