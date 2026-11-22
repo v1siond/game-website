@@ -69,14 +69,26 @@ export function heroHash(world) {
   return hash.digest('hex')
 }
 
-/** Writes stamp.json with every world's hero hash, in registry order; the capture calls it once all shots are written. */
-export function writeStamp() {
-  const stamp = Object.fromEntries(readWorlds().map((world) => [world.id, heroHash(world)]))
-  writeFileSync(join(ROOT, STAMP), `${JSON.stringify(stamp, null, 2)}\n`)
-}
-
 // No stamp yet reads as an empty one, so every world is named rather than the check throwing.
 const readStamp = () => (existsSync(join(ROOT, STAMP)) ? JSON.parse(readFileSync(join(ROOT, STAMP), 'utf8')) : {})
+
+/**
+ * Writes stamp.json in registry order; the capture calls it once all its shots are written. With `ids` only
+ * those worlds get their hero hash as it stands now, and every other world keeps the line it had (or stays
+ * without one), so a world that is stale elsewhere stays stale and this check still names it. With no ids
+ * every world is hashed.
+ */
+export function writeStamp(ids) {
+  const taken = ids === undefined ? null : new Set(ids)
+  const previous = readStamp()
+  const lineOf = (world) => {
+    if (taken === null || taken.has(world.id)) return [[world.id, heroHash(world)]]
+    if (previous[world.id] === undefined) return []
+    return [[world.id, previous[world.id]]]
+  }
+  const stamp = Object.fromEntries(readWorlds().flatMap(lineOf))
+  writeFileSync(join(ROOT, STAMP), `${JSON.stringify(stamp, null, 2)}\n`)
+}
 
 /** Why a world's previews are stale, or null when they are current. */
 function staleness(world, stamp) {
