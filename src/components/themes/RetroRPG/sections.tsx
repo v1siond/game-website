@@ -2,7 +2,6 @@
 
 import { useState, type ReactNode } from "react";
 import { useCVData, useLabels } from "@/components/cv/CVDataProvider";
-import { useProfession } from "@/contexts/ProfessionContext";
 import { ProjectList } from "@/components/cv/ProjectList";
 import { BandList } from "@/components/cv/BandList";
 import { MuayThaiRecord } from "@/components/cv/MuayThaiRecord";
@@ -94,7 +93,6 @@ export function EngineerSections({
   sections: SectionsOf<"engineer">;
 }) {
   const { professionalSummary } = useCVData();
-  const { active } = useProfession();
   const titles = useLabels().sections;
 
   return (
@@ -116,7 +114,7 @@ export function EngineerSections({
           title={titles.workExperience}
           width={WIDE}
         >
-          <SentryRoom profession={active}>
+          <SentryRoom profession="engineer">
             <ul className={MASONRY_LIST}>
               {sections.jobs.map((entry) => (
                 <li key={entry.id} className={MASONRY_ITEM}>
@@ -129,7 +127,7 @@ export function EngineerSections({
       )}
 
       <Block label={titles.techStack} title={titles.techStack} width={WIDE}>
-        <ShopRoom profession={active}>
+        <ShopRoom profession="engineer">
           <OpenBox>
             <ItemBag categories={sections.techStack} />
           </OpenBox>
@@ -157,7 +155,7 @@ export function EngineerSections({
       )}
 
       <Block label={titles.projects} title={titles.featuredWork} width={WIDE}>
-        <PuzzleRoom profession={active}>
+        <PuzzleRoom profession="engineer">
           <ProjectList
             projects={sections.projects}
             className={MASONRY_LIST}
@@ -168,7 +166,7 @@ export function EngineerSections({
       </Block>
 
       <Block label={titles.ventures} title={titles.ventures} width={WIDE}>
-        <StreetRoom profession={active}>
+        <StreetRoom profession="engineer">
           <div className="grid gap-6 md:grid-cols-6">
             {sections.companies.map((company) => (
               <CompanyCard key={company.id} company={company} />
@@ -186,7 +184,6 @@ export function MusicianSections({
   sections: SectionsOf<"drummer">;
 }) {
   const labels = useLabels();
-  const { active } = useProfession();
   const { musician, bands } = sections;
   const [ringing, setRinging] = useState<{
     index: number;
@@ -209,7 +206,7 @@ export function MusicianSections({
       >
         {drumsSince(musician, labels.years)}
       </p>
-      <BridgeRoom profession={active} count={bands.length} ringing={ringing}>
+      <BridgeRoom profession="drummer" count={bands.length} ringing={ringing}>
         <BandList
           bands={bands}
           className={MASONRY_LIST}
@@ -245,12 +242,11 @@ export function MartialArtistSections({
   sections: SectionsOf<"fighter">;
 }) {
   const { martialArts } = sections;
-  const { active } = useProfession();
   const titles = useLabels().sections;
 
   return (
     <Block label={titles.muayThai} title={titles.muayThai}>
-      <SparRoom profession={active}>
+      <SparRoom profession="fighter">
         <OpenBox>
           <h3
             className={`mb-4 flex items-start gap-2 text-sm uppercase tracking-wide text-[color:var(--rpg-gold)] sm:text-base ${PIXEL}`}
