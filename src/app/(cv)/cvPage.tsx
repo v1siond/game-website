@@ -30,7 +30,7 @@ export async function CVPage({ locale }: Readonly<{ locale: Locale }>) {
   return (
     <CVDataProvider cv={cv} year={yearOf(new Date())}>
       <ProfilePageJsonLd cv={cv} path={cvPath(locale)} />
-      <CVContent locale={locale} />
+      <CVContent cv={cv} locale={locale} />
     </CVDataProvider>
   )
 }

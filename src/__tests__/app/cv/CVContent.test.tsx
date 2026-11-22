@@ -9,7 +9,7 @@ import { renderWithCV, testCV } from '../../helpers/test-utils'
 const cv = testCV('en')
 const { cvPage } = cv.labels
 
-const renderCV = (data: CVData = cv) => renderWithCV(<CVContent />, { cv: data })
+const renderCV = (data: CVData = cv) => renderWithCV(<CVContent cv={data} locale="en" />, { cv: data })
 
 // The same title can sit in two sections (a current role is also a job), so queries scope to one section.
 const sectionTitled = (title: string) => {
@@ -24,7 +24,7 @@ describe('CVContent', () => {
       renderCV()
 
       expect(screen.getByRole('heading', { level: 1, name: cv.fullName })).toBeInTheDocument()
-      expect(screen.getByText(cv.professionalSummary!.headline)).toBeInTheDocument()
+      expect(screen.getByText(cv.professionalSummary.headline)).toBeInTheDocument()
       expect(screen.getByText(cv.contact.email)).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /linkedin\.com/i })).toHaveAttribute('href', cv.contact.linkedin)
       expect(screen.getByRole('link', { name: /alexanderpulido\.dev/i })).toHaveAttribute('href', cv.contact.website)
@@ -60,7 +60,7 @@ describe('CVContent', () => {
       renderCV()
 
       const section = sectionTitled(cvPage.coreCompetencies)
-      cv.professionalSummary!.highlights.forEach((highlight) => expect(section.getByText(highlight)).toBeInTheDocument())
+      cv.professionalSummary.highlights.forEach((highlight) => expect(section.getByText(highlight)).toBeInTheDocument())
     })
 
     it('lists every job with its year range, a running job ending in the present label', () => {
@@ -78,8 +78,8 @@ describe('CVContent', () => {
       renderCV()
 
       const section = sectionTitled(cvPage.education)
-      expect(section.getByText(cv.professionalSummary!.education)).toBeInTheDocument()
-      expect(section.getByText(cv.professionalSummary!.languages)).toBeInTheDocument()
+      expect(section.getByText(cv.professionalSummary.education)).toBeInTheDocument()
+      expect(section.getByText(cv.professionalSummary.languages)).toBeInTheDocument()
     })
   })
 
