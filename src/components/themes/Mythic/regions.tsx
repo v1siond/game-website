@@ -1,10 +1,9 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
 import { Stage } from './stage'
 import { Trials } from './trials'
 import { ChainHaul } from './chains'
@@ -22,90 +21,92 @@ import u from './underworld.module.css'
 // The picked profession's sections, each a stage in the descent: About in the great hall, the chambers
 // and the codex in the teal brick vaults, the services on plain parchment after them, the volcano erupting over the boons and the keepsakes in the
 // magma, the portraits and the arena in the green fields. The last gate of the red temple closes the page (gate.tsx).
+// The shared section plan picks which a profession shows and in which order.
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const titles = useLabels().sections
-
-  return (
-    <>
+// One frame per section of the shared plan, each its stage in the descent.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
       <Stage title={titles.about} zone="hall">
         <ChainHaul>
-          <p className="max-w-prose text-lg leading-relaxed">{professionalSummary.bio}</p>
+          <p className="max-w-prose text-lg leading-relaxed">{slot.bio}</p>
         </ChainHaul>
       </Stage>
-
-      {sections.jobs.length > 0 && (
-        <Stage title={titles.workExperience} zone="storm">
-          <Trials jobs={sections.jobs} />
-        </Stage>
-      )}
-
-      {sections.techStack.length > 0 && (
-        <Stage title={titles.techStack} zone="storm">
-          <Climb categories={sections.techStack} />
-        </Stage>
-      )}
-
-      {sections.services.length > 0 && (
-        <Stage title={titles.services} zone="storm">
-          <FadeInScene>
-            <GorgonGaze>
-              <ul className={MASONRY_LIST}>
-                {sections.services.map((service) => (
-                  <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
-                    <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
-                    <p className="mt-3 text-base leading-relaxed">{service.line}</p>
-                  </li>
-                ))}
-              </ul>
-            </GorgonGaze>
-          </FadeInScene>
-        </Stage>
-      )}
-
-      {sections.projects.length > 0 && (
-        <Stage title={titles.projects} zone="magma">
-          <Volcano />
-          <ChestHeave />
-          <Boons projects={sections.projects} />
-        </Stage>
-      )}
-
-      {sections.companies.length > 0 && (
-        <Stage title={titles.ventures} zone="magma">
-          <BladeThrow />
-          <Keepsakes companies={sections.companies} />
-        </Stage>
-      )}
-    </>
-  )
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles.workExperience} zone="storm">
+        <Trials jobs={slot.jobs} />
+      </Stage>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles.techStack} zone="storm">
+        <Climb categories={slot.categories} />
+      </Stage>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles.services} zone="storm">
+        <FadeInScene>
+          <GorgonGaze>
+            <ul className={MASONRY_LIST}>
+              {slot.services.map((service) => (
+                <li key={service.id} className={`${MASONRY_ITEM} p-5 ${u.parchment}`}>
+                  <h3 className={`border-b-2 border-[var(--myth-gold-deep)] pb-2 text-lg ${u.display}`}>{service.title}</h3>
+                  <p className="mt-3 text-base leading-relaxed">{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </GorgonGaze>
+        </FadeInScene>
+      </Stage>
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles.projects} zone="magma">
+        <Volcano />
+        <ChestHeave />
+        <Boons projects={slot.projects} />
+      </Stage>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles.ventures} zone="magma">
+        <BladeThrow />
+        <Keepsakes companies={slot.companies} />
+      </Stage>
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles.bands} zone="rhodes">
+        <CyclopsStomp>
+          <Portraits musician={slot.musician} bands={slot.bands} />
+        </CyclopsStomp>
+      </Stage>
+    )
+  },
+  muayThai: function MuayThaiFrame({ slot }) {
+    const titles = useLabels().sections
+    return (
+      <Stage title={titles.muayThai} zone="rhodes">
+        <Prophecies martialArts={slot.martialArts} />
+      </Stage>
+    )
+  },
 }
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const titles = useLabels().sections
-
-  return (
-    <Stage title={titles.bands} zone="rhodes">
-      <CyclopsStomp>
-        <Portraits musician={sections.musician} bands={sections.bands} />
-      </CyclopsStomp>
-    </Stage>
-  )
-}
-
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const titles = useLabels().sections
-
-  return (
-    <Stage title={titles.muayThai} zone="rhodes">
-      <Prophecies martialArts={sections.martialArts} />
-    </Stage>
-  )
-}
-
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+export const SECTION_VIEWS = sectionViews(FRAMES)
