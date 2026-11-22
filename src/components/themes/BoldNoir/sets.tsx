@@ -1,4 +1,7 @@
+'use client'
+
 import type { CSSProperties, ReactNode } from 'react'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Profession } from '@/lib/cv/professions'
 import { HitStar, StarBurst } from './backdrop'
 import { DETECTIVE_HOST, Detective } from './detective'
@@ -9,7 +12,8 @@ import world from './world.module.css'
 // picked profession. Each is a flat panel the way the game draws its menus: a red wash, a far layer in
 // ink, a near layer of solid black shapes and paper highlights, no gradient. The far and near layers
 // lean against the pointer (--mx, --my) in opposite directions for depth. A pick slams the new set in
-// (keyed by profession in the theme).
+// (keyed by profession in the theme). The set plays once, from the moment its frame is in view (the shared
+// section trigger marks it data-on), and every loop in it rests within 5 s (world.module.css).
 // - System Engineer: the night office, the city through the window, a standing desk with two
 //   monitors, the code lines typing in and the cursor blinking (4 animated).
 // - Musician: the club stage, a spotlight sweeping, his kit, the crash cymbal shaking on the hit
@@ -135,9 +139,10 @@ const SET: Record<Profession, () => ReactNode> = {
 
 export function ProfessionSet({ profession }: { profession: Profession }) {
   const Scene = SET[profession]
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
 
   return (
-    <div className={`relative mx-auto h-48 max-w-5xl overflow-hidden sm:h-64 ${world.setFrame} ${world.setIn} ${DETECTIVE_HOST.lean}`} aria-hidden="true">
+    <div ref={ref} data-on={triggered || undefined} className={`relative mx-auto h-48 max-w-5xl overflow-hidden sm:h-64 ${world.setFrame} ${world.setIn} ${DETECTIVE_HOST.lean}`} aria-hidden="true">
       <Scene />
     </div>
   )

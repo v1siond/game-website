@@ -26,7 +26,7 @@ import { projectCard } from '@/lib/cv/cvView'
 //   1320   streaks cross the screen, impact stars pop
 //   1700   one bright flash clears the board
 //   1900   the finish: he drops onto the red and black field, the card zooms in with a shake, the glass
-//          star drifts behind
+//          star turns behind and stops
 // Pattern: hybrid. The rush is one CSS timeline of delays from the moment it mounts; one setTimeout
 // swaps the rush for the finish. Any click, key or Escape during the rush skips straight to the finish,
 // under reduced motion the dialog opens on the finish. The native <dialog> with showModal keeps focus

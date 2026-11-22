@@ -5,7 +5,7 @@ import world from './world.module.css'
 
 // Bold Noir's static art, all flat fills: the star burst, the ransom note lettering, the glass star of the
 // finish splash, and the night behind the page (a red slab cut across the dark, halftone dots, the burst
-// turning slowly behind it, stickers and glass shards, a skyline of jagged towers at the foot). The back
+// turning slowly to a stop behind it, stickers and glass shards, a skyline of jagged towers at the foot). The back
 // layers lean against the pointer through --mx and --my.
 
 const RAYS = 18
