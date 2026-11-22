@@ -3,8 +3,8 @@
 import type { ReactNode } from 'react'
 import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
-import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
-import { muayThaiFacts } from '@/lib/cv/sectionText'
+import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
+import { stageItems } from '@/lib/cv/stageItems'
 import { ramp } from '@/lib/scroll/stage'
 import { walkAlong } from '@/lib/scroll/walkAlong'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
@@ -340,19 +340,11 @@ const SCENES: Record<SceneId, SceneSpec> = {
 
 // How many cards each section counts, read off the slot its cards are drawn from: one relic per card. The
 // Muay Thai record counts its facts and its achievements, one strike per line.
-const COUNT_FOR: { [Id in SectionId]: (slot: SlotOf<Id>, labels: Labels, highlights: readonly string[]) => number } = {
-  about: (_slot, _labels, highlights) => highlights.length,
-  work: ({ jobs }) => jobs.length,
-  tech: ({ categories }) => categories.length,
-  services: ({ services }) => services.length,
-  projects: ({ projects }) => projects.length,
-  ventures: ({ companies }) => companies.length,
-  bands: ({ bands }) => bands.length,
-  muayThai: ({ martialArts }, labels) => muayThaiFacts(martialArts, labels).length + martialArts.primary.achievements.length,
+// The cards a section counts, the shared count (stageItems): the record's facts and its achievements both.
+const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[]): number => {
+  const { lead, count } = stageItems(slot, labels, highlights.length)
+  return lead + count
 }
-
-const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[]): number =>
-  (COUNT_FOR[slot.id] as (slot: SectionSlot, labels: Labels, highlights: readonly string[]) => number)(slot, labels, highlights)
 
 export interface DarkScene extends TheatreScene {
   id: SceneId
