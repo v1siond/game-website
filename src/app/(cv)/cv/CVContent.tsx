@@ -11,6 +11,9 @@ import type { Locale } from '@/i18n/config'
 import type { CVData } from '@/lib/cv/content'
 import { CVSection } from './CVSection'
 
+// The element the PDF button turns into the PDF.
+const CV_CONTENT_ID = 'cv-content'
+
 // A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
 const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
@@ -76,14 +79,14 @@ export function CVContent({ cv, locale }: Readonly<{ cv: CVData; locale: Locale 
           </Link>
           <div className="flex flex-wrap items-center gap-4">
             <LanguageSwitcher locale={locale} />
-            <DownloadPdfButton label={cvPage.downloadPdf} />
+            <DownloadPdfButton contentId={CV_CONTENT_ID} />
           </div>
         </div>
       </nav>
 
       {/* CV Content - this is what gets converted to PDF */}
       <main
-        id="cv-content"
+        id={CV_CONTENT_ID}
         className="max-w-[850px] mx-auto px-4 py-8 sm:px-8 bg-white text-black font-sans [--focus-ring:#2563eb] scroll-mt-32 sm:scroll-mt-20 [&_header]:scroll-mt-32 [&_section]:scroll-mt-32 sm:[&_header]:scroll-mt-20 sm:[&_section]:scroll-mt-20 print:px-0 print:py-0"
       >
         <header className="border-b-2 border-black pb-4 mb-6">
