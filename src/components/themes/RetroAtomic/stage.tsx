@@ -5,8 +5,8 @@ import type { LayerMotion } from '@/lib/scroll/stage'
 import { Stage, type StageLayer } from '../shared/theatre/Stage'
 import type { TheatreScene } from '../shared/theatre/useTheatre'
 import { NO_NODES, figureScene, figureTransform } from '../shared/figureScene'
-import { DwellerFigure } from './dweller'
-import { dwellerJoints, setDwellerPose } from './pose'
+import { SurvivorFigure } from './survivor'
+import { survivorJoints, setSurvivorPose } from './pose'
 import type { Scene } from './scenes'
 import { GROUND, VIEW, ZONE_ART } from './zones'
 import { POSTER_INK } from './palette'
@@ -25,10 +25,10 @@ export const LAYER_MOTION: Readonly<Record<string, LayerMotion>> = {
   figure: { zoom: [1.06, 1.16], lift: [0, -3] },
 }
 
-const DWELLER_RIG = { joints: dwellerJoints, pose: setDwellerPose }
+const SURVIVOR_RIG = { joints: survivorJoints, pose: setSurvivorPose }
 
 /** The scene as the shared theatre runs it: the props' writer, then him placed and posed from what it returns. */
-export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, DWELLER_RIG)
+export const theatreScene = (scene: Scene): TheatreScene => figureScene(scene.id, scene.layout, scene.def.bind, SURVIVOR_RIG)
 
 const plane = (children: ReactNode): ReactNode => (
   <svg viewBox={VIEW} preserveAspectRatio="xMidYMax slice" focusable="false">
@@ -37,12 +37,12 @@ const plane = (children: ReactNode): ReactNode => (
 )
 
 /** Him at his first frame's place. */
-function Dweller({ scene }: { scene: Scene }) {
+function Survivor({ scene }: { scene: Scene }) {
   const first = scene.def.bind(NO_NODES, scene.layout)(0, 0)
   return (
     <g data-fx="figure" transform={figureTransform(first)}>
       <svg x={-50} y={-144} width={100} height={150} viewBox="0 0 100 150" overflow="visible">
-        <DwellerFigure profession={scene.kit} motion="still" radio={scene.def.radio ?? false} />
+        <SurvivorFigure profession={scene.kit} motion="still" radio={scene.def.radio ?? false} />
       </svg>
     </g>
   )
@@ -61,7 +61,7 @@ const layersOf = (scene: Scene): StageLayer[] => {
         <>
           <ellipse cx={scene.layout.cx} cy={GROUND[scene.def.zone] + 4} rx={340} ry={14} fill={POSTER_INK} opacity={0.12} />
           {scene.def.back(scene.layout)}
-          <Dweller scene={scene} />
+          <Survivor scene={scene} />
           {scene.def.front(scene.layout)}
         </>,
       ),

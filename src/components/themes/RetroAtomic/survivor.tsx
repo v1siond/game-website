@@ -18,11 +18,11 @@ import {
   SHELTER_YELLOW,
   WARNING_RED,
 } from './palette'
-import s from './dweller.module.css'
+import s from './survivor.module.css'
 import { cssVars } from '@/lib/cssVars'
 
-// Him as this world's own figure, a parody of the shelter dweller drawn as the mascot of that game's
-// posters and perk cards (Fallout's Vault Boy and the Vault Dweller): a big round head on a small body,
+// Him as this world's own figure, the shelter survivor drawn as an atomic age poster mascot, the one on the
+// posters and the badge cards: a big round head on a small body,
 // the wide toothy grin and the wink, the blue jumpsuit with the yellow collar, placket, cuffs and belt
 // buckle, black boots, the wrist terminal strapped on the left forearm with its green screen. Drawn the
 // poster way: flat fills, one thick ink outline round every shape, a cream highlight, no gradients. The
@@ -37,21 +37,21 @@ import { cssVars } from '@/lib/cssVars'
 // whose action is the drum roll; the Martial Artist with the jumpsuit rolled down to the waist and the
 // sleeves tied, bare chested with wrapped hands and his own mongkhon, whose action is the knee then the
 // side kick. Every one can take the targeting stance with the bracket reticle and give the level up thumbs
-// up with a wink and a star; these motions play on the wrist terminal and the perk cards. On a stage the
+// up with a wink and a star; these motions play on the wrist terminal and the badge cards. On a stage the
 // scroll poses him instead (pose.ts): the walk, the hoist, the aim and the shot, the radio sway, the knee
 // and the kick; on the bands stage he holds the bakelite radio to his chest.
 
-export type DwellerTone = 'poster' | 'phosphor'
-export type DwellerMotion = 'still' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike'
+export type SurvivorTone = 'poster' | 'phosphor'
+export type SurvivorMotion = 'still' | 'thumbsUp' | 'target' | 'type' | 'drum' | 'strike'
 
-/** Each profession's action, the way the dweller would do that job. */
-export const DWELLER_ACTION: Record<Profession, DwellerMotion> = {
+/** Each profession's action, the way the survivor would do that job. */
+export const SURVIVOR_ACTION: Record<Profession, SurvivorMotion> = {
   engineer: 'type',
   drummer: 'drum',
   fighter: 'strike',
 }
 
-const MOTION_CLASS: Record<DwellerMotion, string> = {
+const MOTION_CLASS: Record<SurvivorMotion, string> = {
   still: '',
   thumbsUp: s.thumbsUp,
   target: s.target,
@@ -86,7 +86,7 @@ interface Inks {
   highlight: string
 }
 
-const INKS: Record<DwellerTone, Inks> = {
+const INKS: Record<SurvivorTone, Inks> = {
   poster: {
     line: POSTER_INK,
     lineWidth: 2,
@@ -147,11 +147,11 @@ const FORE = {
   left: 'M63.5 77.5 L72.5 76 L72 93 L64.5 93 Z',
 }
 
-// The right arm's joints, in viewBox units: dweller.module.css turns the arm and the forearm round them.
+// The right arm's joints, in viewBox units: survivor.module.css turns the arm and the forearm round them.
 const SHOULDER_RIGHT = { x: 34, y: 60 }
 const ELBOW_RIGHT = { x: 32, y: 77 }
 
-// The right arm's joints as the CSS variables dweller.module.css turns the arm round.
+// The right arm's joints as the CSS variables survivor.module.css turns the arm round.
 const POSE_VARS = cssVars({
   '--shoulder-r': `${SHOULDER_RIGHT.x}px ${SHOULDER_RIGHT.y}px`,
   '--elbow-r': `${ELBOW_RIGHT.x}px ${ELBOW_RIGHT.y}px`,
@@ -348,17 +348,17 @@ function Overlays({ inks }: { inks: Inks }) {
   )
 }
 
-interface DwellerProps {
+interface SurvivorProps {
   profession: Profession
-  motion: DwellerMotion
-  tone?: DwellerTone
+  motion: SurvivorMotion
+  tone?: SurvivorTone
   className?: string
 }
 
 /** His figure's groups in the 100 by 150 viewBox, playing `motion`; a stage places it in a nested svg of
  *  that viewBox and poses its joints itself (pose.ts), with the motion left 'still' and `radio` set where
  *  he holds the bakelite radio. */
-export function DwellerFigure({ profession, motion, tone = 'poster', radio = false }: Omit<DwellerProps, 'className'> & { radio?: boolean }) {
+export function SurvivorFigure({ profession, motion, tone = 'poster', radio = false }: Omit<SurvivorProps, 'className'> & { radio?: boolean }) {
   const inks = INKS[tone]
   return (
     <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} style={POSE_VARS}>
@@ -380,12 +380,12 @@ export function DwellerFigure({ profession, motion, tone = 'poster', radio = fal
   )
 }
 
-/** Him as the shelter dweller of the posters, in a profession's kit, playing one motion. Memoised: its props
+/** Him as the shelter survivor of the posters, in a profession's kit, playing one motion. Memoised: its props
  *  are primitives, so a parent render that leaves them as they are draws nothing again. */
-export const DwellerSprite = memo(function DwellerSprite({ profession, motion, tone = 'poster', className = '' }: DwellerProps) {
+export const SurvivorSprite = memo(function SurvivorSprite({ profession, motion, tone = 'poster', className = '' }: SurvivorProps) {
   return (
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <DwellerFigure profession={profession} motion={motion} tone={tone} />
+      <SurvivorFigure profession={profession} motion={motion} tone={tone} />
     </svg>
   )
 })

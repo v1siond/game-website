@@ -19,7 +19,7 @@ import atomic from './atomic.module.css'
 import { cssVars } from '@/lib/cssVars'
 
 // Projects through the targeting system. The pointer or focus on a project locks the targeting on it:
-// the section goes into its paused state (data-vats on the section: every other card drains to a dim
+// the section goes into its paused state (data-aiming on the section: every other card drains to a dim
 // tint, the page's ambient loops freeze through the root's :has rule in atomic.module.css), the corner
 // brackets close in on the target and each of its parts (role, impact, tech, links) gets its tag, the
 // way the game names each body part it can hit.
@@ -299,7 +299,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
   const locked = shot?.id ?? target
 
   return (
-    <div className="relative" data-vats={locked ? 'on' : undefined}>
+    <div className="relative" data-aiming={locked ? 'on' : undefined}>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <ActionPoints points={points} />
       </div>

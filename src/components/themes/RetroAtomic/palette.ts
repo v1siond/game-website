@@ -51,8 +51,8 @@ export const MUTANT = '#6f7a3a'
 export const MUTANT_LIGHT = '#b8a24a'
 export const MUTANT_SHADE = '#4f5828'
 
-// CUT OUT: the pastel blocks the poster letters are pasted on, tan, mint, blue grey and pink (research
-// special-chart). Ink on each measures over 9:1.
+// CUT OUT: the pastel blocks the poster letters are pasted on, tan, mint, blue grey and pink (from the research
+// on the poster cut outs). Ink on each measures over 9:1.
 export const CUTOUT_TAN = '#dcb98e'
 export const CUTOUT_MINT = '#bcdab4'
 export const CUTOUT_BLUE = '#b2c2d2'

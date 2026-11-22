@@ -9,17 +9,17 @@ import { drumsSince } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_COLUMN_LIST } from '@/lib/cv/masonry'
 import { atomicId } from './anchors'
 import { QuestLog } from './quests'
-import { Holotapes, Inventory } from './inventory'
+import { Tapes, Inventory } from './inventory'
 import { TargetingSystem } from './targeting'
 import { Radio } from './radio'
-import { PerkChart } from './perks'
+import { BadgeChart } from './badges'
 import { PLUS_ROWS } from './controls'
 import type { Scene } from './scenes'
 import { AtomicStage } from './stage'
 import atomic from './atomic.module.css'
 
 // One section per scene: a tall head that first shows the place alone and then brings the title up on its
-// glass plate, then the cards (the terminal's glass panels, the radio, the printed perk chart), then a
+// glass plate, then the cards (the terminal's glass panels, the radio, the printed badge chart), then a
 // screen of the place alone before it sinks. The cards a scene counts sit in an element marked
 // data-stage-items, which the shared theatre measures for the reading line that drives each prop. Every
 // heading's id is atomicId of its title, the one the wrist terminal's section tabs jump to.
@@ -93,7 +93,7 @@ function ProjectCards({ slot }: { slot: SlotOf<'projects'> }) {
 function VentureCards({ slot }: { slot: SlotOf<'ventures'> }) {
   return (
     <div data-stage-items="">
-      <Holotapes companies={slot.companies} />
+      <Tapes companies={slot.companies} />
     </div>
   )
 }
@@ -110,7 +110,7 @@ function BandCards({ slot: { musician, bands } }: { slot: SlotOf<'bands'> }) {
 }
 
 function RecordCards({ slot }: { slot: SlotOf<'muayThai'> }) {
-  return <PerkChart martialArts={slot.martialArts} />
+  return <BadgeChart martialArts={slot.martialArts} />
 }
 
 const CARDS: { [Id in SectionId]: (props: { slot: SlotOf<Id> }) => ReactNode } = {

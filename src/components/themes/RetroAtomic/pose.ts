@@ -1,57 +1,57 @@
 import { STAND as RIG_STAND, mix as rigMix, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
 import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
-import s from './dweller.module.css'
+import s from './survivor.module.css'
 import d from './dog.module.css'
 import m from './mutant.module.css'
 
-// The dweller and his dog posed by the scroll. His limbs are the shared rig's numbers (rigPose,
+// The survivor and his dog posed by the scroll. His limbs are the shared rig's numbers (rigPose,
 // ../shared/rig); on top, his own overlays: the level up star with the wink, the targeting reticle, the
-// pistol and its flash. The angles are the ones his CSS motions end on (dweller.module.css), so he looks the
+// pistol and its flash. The angles are the ones his CSS motions end on (survivor.module.css), so he looks the
 // same on the wrist terminal. The dog trots in profile, facing right, its paws swinging with the phase;
 // the mutant of the Muay Thai scene keeps his guard, takes the knee or the kick, and goes down.
 
 /** The rig's pose and, 0 to 1: the star and wink, the reticle locked on, the pistol out, its flash. */
-export type DwellerPose = RigPose & { star: number; reticle: number; pistol: number; flash: number }
+export type SurvivorPose = RigPose & { star: number; reticle: number; pistol: number; flash: number }
 
-export const STAND: DwellerPose = { ...RIG_STAND, star: 0, reticle: 0, pistol: 0, flash: 0 }
+export const STAND: SurvivorPose = { ...RIG_STAND, star: 0, reticle: 0, pistol: 0, flash: 0 }
 
-export const mix = (a: DwellerPose, b: DwellerPose, t: number): DwellerPose => rigMix(a, b, t)
+export const mix = (a: SurvivorPose, b: SurvivorPose, t: number): SurvivorPose => rigMix(a, b, t)
 
-const pose = (partial: Partial<DwellerPose>): DwellerPose => ({ ...STAND, ...partial })
+const pose = (partial: Partial<SurvivorPose>): SurvivorPose => ({ ...STAND, ...partial })
 
 /** The jaunty poster walk at `phase`, toward the viewer's right. */
-export const walk = (phase: number): DwellerPose => pose(rigWalk(phase))
+export const walk = (phase: number): SurvivorPose => pose(rigWalk(phase))
 
 /** The level up: the thumb up, a hop, the wink and the star, `t` of the way. */
-export const thumbsUp = (t: number): DwellerPose => pose({ armRight: 70 * t, foreRight: 110 * t, rise: -6 * Math.sin(Math.PI * t), star: t })
+export const thumbsUp = (t: number): SurvivorPose => pose({ armRight: 70 * t, foreRight: 110 * t, rise: -6 * Math.sin(Math.PI * t), star: t })
 
 /** The wrist terminal raised and keyed, the key hand tapping with `tap`. */
-export const typing = (t: number, tap: number): DwellerPose => pose({ armLeft: 25 * t, foreLeft: 85 * t, armRight: -30 * t, foreRight: (-70 + 10 * Math.abs(Math.sin(tap * Math.PI))) * t })
+export const typing = (t: number, tap: number): SurvivorPose => pose({ armLeft: 25 * t, foreLeft: 85 * t, armRight: -30 * t, foreRight: (-70 + 10 * Math.abs(Math.sin(tap * Math.PI))) * t })
 
 /** The hoist: squatting, the locker lid up on his right hand. */
-export const hoist = (t: number): DwellerPose =>
+export const hoist = (t: number): SurvivorPose =>
   pose({ rise: 6 * t, thighRight: 22 * t, shinRight: -36 * t, thighLeft: -22 * t, shinLeft: 36 * t, armRight: 165 * t, foreRight: 22 * t, armLeft: -60 * t, foreLeft: -25 * t })
 
 /** The targeting stance, the pistol up and the reticle locked, and the shot's recoil with `shot`. */
-export const aim = (t: number, shot: number): DwellerPose =>
+export const aim = (t: number, shot: number): SurvivorPose =>
   pose({ armLeft: (-88 - 16 * shot) * t, foreLeft: (-4 - 14 * shot) * t, armRight: 28 * t, foreRight: -95 * t, pistol: t, reticle: t, flash: shot * t })
 
 /** The bakelite radio held to his chest, the free arm swaying with `beat`. */
-export const sway = (beat: number): DwellerPose => {
+export const sway = (beat: number): SurvivorPose => {
   const swing = (1 - Math.cos(beat * Math.PI)) / 2
   return pose({ lean: -5 + 10 * swing, armLeft: -44, foreLeft: 118, armRight: 35 + 40 * swing, foreRight: -35 })
 }
 
 /** The guard of the fighter's kit, then the clinch knee `t` of the way. */
-export const knee = (t: number): DwellerPose =>
+export const knee = (t: number): SurvivorPose =>
   pose({ armRight: 25 - 110 * t, foreRight: 150 - 125 * t, armLeft: -25 - 80 * t, foreLeft: -150 + 185 * t, lean: -8 * t, thighLeft: -105 * t, shinLeft: 115 * t })
 
 /** The side kick `t` of the way: the thigh up, the shin out, leaning back. */
-export const kick = (t: number): DwellerPose =>
+export const kick = (t: number): SurvivorPose =>
   pose({ armRight: 25 - 35 * t, foreRight: 150 - 140 * t, armLeft: -25, foreLeft: -150, lean: -16 * t, thighLeft: -96 * t, shinLeft: -4 * t })
 
 /** The fighter's guard. */
-export const GUARD: DwellerPose = pose({ armRight: 25, foreRight: 150, armLeft: -25, foreLeft: -150 })
+export const GUARD: SurvivorPose = pose({ armRight: 25, foreRight: 150, armLeft: -25, foreLeft: -150 })
 
 const LIMB_CLASSES = {
   body: s.body,
@@ -67,13 +67,13 @@ const LIMB_CLASSES = {
 
 const OVERLAY_CLASSES = { star: s.star, winkLine: s.winkLine, eyeShut: s.eyeShut, reticle: s.reticle, pistol: s.pistol, flash: s.flash }
 
-export type DwellerJoints = RigJoints & Record<keyof typeof OVERLAY_CLASSES, SVGElement | null>
+export type SurvivorJoints = RigJoints & Record<keyof typeof OVERLAY_CLASSES, SVGElement | null>
 
 const find = <Names extends string>(root: Element, classes: Record<Names, string>): Record<Names, SVGElement | null> =>
   Object.fromEntries(Object.entries(classes).map(([name, className]) => [name, root.querySelector<SVGElement>(`.${className as string}`)])) as Record<Names, SVGElement | null>
 
-/** His groups inside `root`, the group that holds one DwellerFigure. */
-export const dwellerJoints = (root: Element): DwellerJoints => ({ ...rigJoints(root, LIMB_CLASSES), ...find(root, OVERLAY_CLASSES) })
+/** His groups inside `root`, the group that holds one SurvivorFigure. */
+export const survivorJoints = (root: Element): SurvivorJoints => ({ ...rigJoints(root, LIMB_CLASSES), ...find(root, OVERLAY_CLASSES) })
 
 const show = (el: SVGElement | null, opacity: number, transform = 'none'): void => {
   if (!el) return
@@ -82,7 +82,7 @@ const show = (el: SVGElement | null, opacity: number, transform = 'none'): void 
 }
 
 /** Writes `p` on his groups: the rig's limbs, then his overlays. Transforms and opacity only. */
-export function setDwellerPose(j: DwellerJoints, p: DwellerPose): void {
+export function setSurvivorPose(j: SurvivorJoints, p: SurvivorPose): void {
   setRigPose(j, p)
   show(j.star, p.star, `scale(${p.star.toFixed(3)}) rotate(${(-90 + 90 * p.star).toFixed(1)}deg)`)
   show(j.winkLine, p.star)

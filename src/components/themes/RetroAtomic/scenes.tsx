@@ -7,7 +7,7 @@ import { ramp } from '@/lib/scroll/stage'
 import { walkAlong } from '@/lib/scroll/walkAlong'
 import { fadeTo, fx, lerp, r1, reached, transformTo } from '../shared/stageNodes'
 import { fxs, propLayout, type FigureState, type FigureWriter, type PropLayout, type StageNodes } from '../shared/figureScene'
-import { DoorArt } from './vaultDoor'
+import { DoorArt } from './shelterDoor'
 import { DogFigure } from './dog'
 import { MutantFigure } from './mutant'
 import { GROUND, type Zone } from './zones'
@@ -55,7 +55,7 @@ import {
   typing,
   walk,
   type DogPose,
-  type DwellerPose,
+  type SurvivorPose,
 } from './pose'
 
 // Each part of the page as a scene of the walk out of the shelter: its place (the shelter, the wasteland,
@@ -65,9 +65,9 @@ import {
 // lit with his thumbs up and the star. Work: a quest flag per job, run up its pole while he keys the wrist
 // terminal. Tech: a footlocker per category, its lid thrown open as he hoists it. Services: a dead tube per
 // service, booted on with a side kick. Projects: a target board per project, locked and shot. Ventures: the
-// dog digs a holotape out of each mound. Bands: the radio mast's lamps, one per station, light while he
+// dog digs a tape out of each mound. Bands: the radio mast's lamps, one per station, light while he
 // sways with the bakelite radio. Muay Thai: the mutant takes a knee or a kick per achievement, its star
-// lit on the perk board, and goes down after the last. Contact: he and the dog walk out to the public
+// lit on the badge board, and goes down after the last. Contact: he and the dog walk out to the public
 // terminal. The hero: him and the dog in the shelter, the cog door rolled aside.
 
 export type SceneId = 'hero' | SectionId | 'contact'
@@ -75,7 +75,7 @@ export type SceneId = 'hero' | SectionId | 'contact'
 type Layout = PropLayout
 
 /** Him in a frame: where his boots are, his size, his pose and how visible he is. */
-export type DwellerState = FigureState<DwellerPose>
+export type SurvivorState = FigureState<SurvivorPose>
 
 export interface SceneDef {
   zone: Zone
@@ -86,7 +86,7 @@ export interface SceneDef {
   /** The props behind him and in front of him, drawn in the figure layer. */
   back: (layout: Layout) => ReactNode
   front: (layout: Layout) => ReactNode
-  bind: (stage: StageNodes, layout: Layout) => FigureWriter<DwellerPose>
+  bind: (stage: StageNodes, layout: Layout) => FigureWriter<SurvivorPose>
 }
 
 // The band the props stand in: right of the text column on a wide screen, the middle a phone shows.
@@ -106,10 +106,10 @@ const ENTRY = 80
 
 const travel = (xs: readonly number[], f: number, offset: number) => walkAlong(xs, f, offset, ENTRY)
 
-const dweller = (zone: Zone, x: number, pose: DwellerPose, k = K, opacity = 1): DwellerState => ({ x, y: GROUND[zone], k, pose, opacity })
+const survivor = (zone: Zone, x: number, pose: SurvivorPose, k = K, opacity = 1): SurvivorState => ({ x, y: GROUND[zone], k, pose, opacity })
 
 /** His walk while he is between props, his act at one. */
-const walkOr = (act: number, f: number, p: number, acting: DwellerPose): DwellerPose => mix(walk(f * 3 + p * 2), acting, act)
+const walkOr = (act: number, f: number, p: number, acting: SurvivorPose): SurvivorPose => mix(walk(f * 3 + p * 2), acting, act)
 
 // ---------------------------------------------------------------- the dog, a second figure some scenes hold
 
@@ -165,7 +165,7 @@ const hero: SceneDef = {
       // the door has rolled aside from the opening: as the page moves on it rolls a little further on its track
       transformTo(door, doorAt(at.door, p))
       dog(at.dog, SITTING)
-      return dweller('shelter', at.him, { ...STAND, rise: -1.5 * Math.sin(p * 12) }, phone ? 1.9 : 2.1)
+      return survivor('shelter', at.him, { ...STAND, rise: -1.5 * Math.sin(p * 12) }, phone ? 1.9 : 2.1)
     }
   },
 }
@@ -198,7 +198,7 @@ const about: SceneDef = {
     return (p, f) => {
       posters.forEach((poster, i) => fadeTo(poster, 0.2 + 0.8 * reached(f, i)))
       const { x, act } = travel(xs, f, -100)
-      return dweller('shelter', x, walkOr(act, f, p, thumbsUp(1)))
+      return survivor('shelter', x, walkOr(act, f, p, thumbsUp(1)))
     }
   },
 }
@@ -227,7 +227,7 @@ const work: SceneDef = {
     return (p, f) => {
       flags.forEach((flag, i) => transformTo(flag, `translate(0 ${r1(-(FLAG_POLE - 66) * reached(f, i))})`))
       const { x, act } = travel(xs, f, -90)
-      return dweller('wasteland', x, walkOr(act, f, p, typing(1, f * 4)))
+      return survivor('wasteland', x, walkOr(act, f, p, typing(1, f * 4)))
     }
   },
 }
@@ -260,7 +260,7 @@ const tech: SceneDef = {
       lids.forEach((lid, i) => transformTo(lid, `rotate(${r1(-118 * reached(f, i))} -42 -48)`))
       glows.forEach((glow, i) => fadeTo(glow, reached(f, i)))
       const { x, act } = travel(xs, f, -70)
-      return dweller('wasteland', x, walkOr(act, f, p, hoist(Math.sin(Math.PI * Math.min(1, act)))))
+      return survivor('wasteland', x, walkOr(act, f, p, hoist(Math.sin(Math.PI * Math.min(1, act)))))
     }
   },
 }
@@ -295,7 +295,7 @@ const services: SceneDef = {
       lines.forEach((line, i) => fadeTo(line, 1 - reached(f, i)))
       const { x, act } = travel(xs, f, -110)
       // the boot to the set: the kick lands as he reaches it, then he draws the leg back
-      return dweller('wasteland', x, walkOr(act, f, p, kick(Math.sin(Math.PI * Math.min(1, act)))))
+      return survivor('wasteland', x, walkOr(act, f, p, kick(Math.sin(Math.PI * Math.min(1, act)))))
     }
   },
 }
@@ -336,12 +336,12 @@ const projects: SceneDef = {
       locks.forEach((lock, i) => fadeTo(lock, i === at ? act : 0))
       // the shot at the middle of his stop: the recoil and the flash
       const shot = act * Math.max(0, 1 - Math.abs(f - (at + 0.5)) * 8)
-      return dweller('wasteland', x, walkOr(act, f, p, aim(1, shot)))
+      return survivor('wasteland', x, walkOr(act, f, p, aim(1, shot)))
     }
   },
 }
 
-// ---------------------------------------------------------------- Ventures: the dog digs the holotapes
+// ---------------------------------------------------------------- Ventures: the dog digs the tapes
 
 const ventures: SceneDef = {
   zone: 'town',
@@ -370,7 +370,7 @@ const ventures: SceneDef = {
       dog(pup.x, { stride: trot(f * 3 + p * 2).stride * pup.moving, sit: 0, dig: pup.act })
       // he follows the dog a few steps behind and cheers each tape up
       const { x, act } = travel(xs, f, -150)
-      return dweller('town', x, walkOr(act, f, p, thumbsUp(1)))
+      return survivor('town', x, walkOr(act, f, p, thumbsUp(1)))
     }
   },
 }
@@ -400,7 +400,7 @@ const bands: SceneDef = {
     const lamps = fxs(stage, 'lamp', count)
     return (p, f) => {
       lamps.forEach((lamp, i) => fadeTo(lamp, 0.15 + 0.85 * reached(f, i)))
-      return dweller('town', cx - 40, sway(f * 4 + p * 3))
+      return survivor('town', cx - 40, sway(f * 4 + p * 3))
     }
   },
 }
@@ -447,7 +447,7 @@ const muayThai: SceneDef = {
       if (joints) setFoePose(joints, mixFoe(mixFoe(FOE_GUARD, kneeing ? FOE_KNEED : FOE_KICKED, reaction), FOE_DOWN, done))
       fadeTo(burst, reaction)
       const pose = done > 0 ? mix(GUARD, thumbsUp(1), done) : mix(GUARD, kneeing ? knee(strike) : kick(strike), Math.min(1, strike * 2))
-      return dweller('town', cx - 70 + 30 * strike, pose)
+      return survivor('town', cx - 70 + 30 * strike, pose)
     }
   },
 }
@@ -479,7 +479,7 @@ const contact: SceneDef = {
       fadeTo(screen, 0.2 + 0.8 * ramp(p, 0.5, 0.6))
       dog(x - 130, moving ? trot(p * 12) : SITTING)
       const pose = moving ? walk(p * 12) : mix(STAND, typing(1, p * 8), ramp(p, 0.5, 0.58))
-      return dweller('town', x, pose)
+      return survivor('town', x, pose)
     }
   },
 }

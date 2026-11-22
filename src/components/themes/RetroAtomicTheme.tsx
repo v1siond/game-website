@@ -32,7 +32,7 @@ const PHONE_QUERY = '(max-width: 767.98px)'
 // screen scene of the walk (./RetroAtomic/scenes) that rises from dark, holds while its title and cards
 // scroll over it, and sinks back into dark while the next one rises; he does one thing per card: lights a
 // poster with his thumbs up, runs a quest flag up, throws a footlocker open, boots a dead tube, shoots a
-// target, cheers the dog digging a holotape, sways under the radio mast, puts the mutant down. Contact is
+// target, cheers the dog digging a tape, sways under the radio mast, puts the mutant down. Contact is
 // the public terminal and its password game (./RetroAtomic/terminal), which he and the dog walk out to.
 // Every motion is a function of the scroll position, on the shared theatre (./shared/theatre) and its
 // settle: stop and art and text come to rest together, scroll up and it plays back. Under reduced motion

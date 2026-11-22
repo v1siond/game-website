@@ -9,7 +9,7 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
 import type { WorldCV } from '@/lib/cv/content'
 import { NameWords } from '@/components/cv/NameWords'
-import { DWELLER_ACTION, DwellerSprite } from './dweller'
+import { SURVIVOR_ACTION, SurvivorSprite } from './survivor'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -127,7 +127,7 @@ function StatusFigure({ profession }: { profession: Profession }) {
     <div data-worlds-figure="" className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
       <span className={atomic.statusBrackets} aria-hidden="true" />
       <div className={`absolute inset-3 ${atomic.statusFigure}`}>
-        <DwellerSprite key={profession} profession={profession} tone="phosphor" motion={DWELLER_ACTION[profession]} className="h-full w-full" />
+        <SurvivorSprite key={profession} profession={profession} tone="phosphor" motion={SURVIVOR_ACTION[profession]} className="h-full w-full" />
       </div>
     </div>
   )

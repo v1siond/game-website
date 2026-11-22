@@ -16,7 +16,7 @@ import atomic from './atomic.module.css'
 // name on the picked, inverted row with the item count, its tools as the rows the pick sweeps over on
 // hover; on the stage he throws open a footlocker per pocket as the page reaches it (scenes.tsx).
 //
-// Ventures as holotapes on a shelf: each company a cassette with its label sticker, the two reels turning
+// Ventures as tapes on a shelf: each company a cassette with its label sticker, the two reels turning
 // while the pointer or focus is on it; on the stage the dog digs each tape out of its mound (scenes.tsx).
 
 export function Inventory({ categories }: { categories: CVData['techStack'] }) {
@@ -76,12 +76,12 @@ function Cassette() {
 }
 
 /**
- * The holotape shelf; `dug` is how many tapes the dog has dug up so far (dig.tsx), all of them by default.
- * His own products (featured) are the two big tapes of the first row, a yellow vault tag over the
+ * The tape shelf; `dug` is how many tapes the dog has dug up so far (dig.tsx), all of them by default.
+ * His own products (featured) are the two big tapes of the first row, a yellow tag over the
  * tagline; the other ventures follow three to a row. Each tape's link is named by everything it shows,
  * its services included, plus the new tab note a screen reader alone hears.
  */
-export function Holotapes({ companies }: { companies: CVData['companies'] }) {
+export function Tapes({ companies }: { companies: CVData['companies'] }) {
   const { links, cards, sections } = useLabels()
 
   return (
@@ -92,7 +92,7 @@ export function Holotapes({ companies }: { companies: CVData['companies'] }) {
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`group relative block ${atomic.holotape}`}
+            className={`group relative block ${atomic.tape}`}
           >
             <div className="relative">
               <Cassette />

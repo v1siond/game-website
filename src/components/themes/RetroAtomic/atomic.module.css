@@ -1,10 +1,10 @@
 /*
  * Retro Atomic, the whole look in one sheet: inside the shelter (the riveted wall, the cog door, the
- * olive wrist terminal with its green tube), the printed poster (the perk chart), and outside (the
+ * olive wrist terminal with its green tube), the printed poster (the badge chart), and outside (the
  * wasteland at dusk, the public terminal). Every colour is the palette's, read through theme() from the
  * `atomic` Tailwind group that palette.ts feeds. Motion is transform and opacity only; state changes
  * come from data attributes the components set (data-phase, data-on, data-target, data-shot,
- * data-angle, data-booted, data-vats), so React flips a value and the browser runs the transition.
+ * data-angle, data-booted, data-aiming), so React flips a value and the browser runs the transition.
  * No loop is endless: each plays a counted number of cycles inside 5 s of its trigger and rests on a
  * still frame. The few that live on the page carry .ambient (or are named below) and freeze while the
  * targeting system is locked and under reduced motion.
@@ -18,9 +18,9 @@
   font-family: var(--atomic-face), ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
-.root:has([data-vats='on']) .ambient,
-.root:has([data-vats='on']) .cursor,
-.root:has([data-vats='on']) .questActive {
+.root:has([data-aiming='on']) .ambient,
+.root:has([data-aiming='on']) .cursor,
+.root:has([data-aiming='on']) .questActive {
   animation-play-state: paused;
 }
 
@@ -322,14 +322,14 @@
     linear-gradient(45deg, transparent 40%, theme('colors.atomic.phosphor-dim') 40% 60%, transparent 60%);
 }
 
-/* ---- the holotapes (inventory.tsx) ---- */
+/* ---- the tapes (inventory.tsx) ---- */
 
-.holotape {
+.tape {
   transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.holotape:hover,
-.holotape:focus-visible {
+.tape:hover,
+.tape:focus-visible {
   transform: translateY(-6px) rotate(-2deg);
 }
 
@@ -346,7 +346,7 @@
     opacity 200ms ease-out;
 }
 
-[data-vats='on'] .target:not([data-target]) {
+[data-aiming='on'] .target:not([data-target]) {
   opacity: 0.32;
 }
 
@@ -537,7 +537,7 @@
     theme('colors.atomic.rubber');
 }
 
-/* ---- the perk chart, printed (perks.tsx) ---- */
+/* ---- the badge chart, printed (badges.tsx) ---- */
 
 .posterPaper {
   border: 4px solid theme('colors.atomic.poster-ink');
@@ -551,30 +551,30 @@
   box-shadow: 6px 6px 0 theme('colors.atomic.poster-ink');
 }
 
-.perkCard {
+.badgeCard {
   border: 4px solid theme('colors.atomic.poster-ink');
   background: theme('colors.atomic.cream');
   box-shadow: 6px 6px 0 theme('colors.atomic.poster-ink');
   transition: transform 200ms ease-out;
 }
 
-.perkCard:hover {
+.badgeCard:hover {
   transform: translateY(-6px);
 }
 
-.perkHop {
+.badgeHop {
   transform-origin: 50% 100%;
 }
 
-.perkCard:hover .perkHop {
+.badgeCard:hover .badgeHop {
   animation: hop 520ms cubic-bezier(0.3, 0, 0.3, 1);
 }
 
-.perkStar {
+.badgeStar {
   transition: transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.perkCard:hover .perkStar {
+.badgeCard:hover .badgeStar {
   transform: rotate(72deg);
 }
 
@@ -674,7 +674,7 @@
   .questActive,
   .refreshBar,
   .waveSlide,
-  .perkCard:hover .perkHop {
+  .badgeCard:hover .badgeHop {
     animation: none;
   }
 
@@ -714,10 +714,10 @@
   .apFill,
   .letterboxTop,
   .letterboxBottom,
-  .holotape,
+  .tape,
   .station,
-  .perkCard,
-  .perkStar,
+  .badgeCard,
+  .badgeStar,
   .menuRow::before,
   .pickRow::before {
     transition-duration: 1ms;

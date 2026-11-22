@@ -1,8 +1,8 @@
 /*
- * The dweller's motion (dweller.tsx): transform and opacity only, in the bouncy overshoot timing of the
+ * The survivor's motion (survivor.tsx): transform and opacity only, in the bouncy overshoot timing of the
  * poster cartoons. Every part turns round its own joint in the viewBox's units, so a forearm turns at the
  * elbow wherever the shoulder took it. The kit classes set a profession's resting pose, a motion class
- * plays over it on the wrist terminal and the perk cards; on a stage the scroll writes each joint's turn
+ * plays over it on the wrist terminal and the badge cards; on a stage the scroll writes each joint's turn
  * inline (pose.ts) over the rest pose. The wink line, the reticle, the star, the pistol and its flash rest
  * hidden. A looping motion plays a counted number of cycles, all inside 5 s of its pose starting.
  */

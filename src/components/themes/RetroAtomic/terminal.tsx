@@ -4,7 +4,7 @@ import { useEffect, useMemo, useReducer, useState } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ActionMenu, PHOSPHOR_BUTTON } from './controls'
-import { DwellerSprite } from './dweller'
+import { SurvivorSprite } from './survivor'
 import type { Scene } from './scenes'
 import { AtomicStage } from './stage'
 import { atomicId } from './anchors'
@@ -64,7 +64,7 @@ function DumpRow({ address, cells, state, onPick }: { address: string; cells: Ha
 function LogLine({ entry }: { entry: HackLogEntry }) {
   const { hud } = useLabels()
   const lines: Record<HackLogEntry['kind'], string[]> = {
-    denied: [`> ${entry.word}`, hud.entryDenied, fillLabel(hud.likeness, { count: entry.likeness })],
+    denied: [`> ${entry.word}`, hud.entryDenied, fillLabel(hud.inPlace, { count: entry.inPlace })],
     granted: [`> ${entry.word}`, hud.accessGranted],
     dud: [hud.dudRemoved],
     reset: [hud.attemptsRestored],
@@ -135,7 +135,7 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
       {state.status === 'granted' && (
         <div className={`mt-4 flex items-center gap-4 border-2 border-atomic-phosphor p-3 ${atomic.powerOn}`}>
           <div className="h-24 w-16 shrink-0">
-            <DwellerSprite profession="engineer" tone="phosphor" motion="thumbsUp" className="h-full w-full" />
+            <SurvivorSprite profession="engineer" tone="phosphor" motion="thumbsUp" className="h-full w-full" />
           </div>
           <p className={`text-xl font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.glow}`}>{hud.accessGranted}</p>
         </div>
