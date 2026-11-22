@@ -36,8 +36,7 @@ const dropCourse = (x: number): Course<'drop' | 'bounce'> => ({
 })
 
 function BandCard({ slot, onPoint }: { slot: BandSlot; onPoint: () => void }) {
-  const { band, years, linkProps } = slot
-  const { links } = useLabels()
+  const { band, years, linkProps, release } = slot
   const body = (
     <article className={`${PAPER_CARD} h-full`}>
       <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{band.name}</h3>
@@ -45,9 +44,9 @@ function BandCard({ slot, onPoint }: { slot: BandSlot; onPoint: () => void }) {
         {band.role}
         {years && <span> · {years}</span>}
       </p>
-      {band.release && (
+      {release && (
         <p className="mt-2 text-sm">
-          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </article>
