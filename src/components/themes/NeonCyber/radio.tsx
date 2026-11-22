@@ -6,16 +6,14 @@ import { fillLabel } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { drumsSince } from '@/lib/cv/sectionText'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
-import { HUD_LINK, HudPanel } from './hud'
-import { MercSprite, type MercMotion } from './merc'
+import { HUD_LINK } from './hud'
 import { Scannable } from './scanner'
 import world from './world.module.css'
 
 // The bands as the car radio's presets: a dial runs across the top with each band as a station mark,
 // and pointing at a band (or focusing it) swings the needle to its mark and plays the equaliser on its
-// preset. The current band is tuned at first. A band with a site opens its stream link.
+// preset. The current band is tuned at first. A band with a site opens its stream link. In the scene
+// behind, he drums the neon snare while the dial over the street tunes to each band as its card is read.
 
 const EQ_BARS = [0, 1, 2, 3, 4]
 
@@ -71,27 +69,19 @@ function Preset({ slot, number, tuned, onTune }: { slot: BandSlot; number: numbe
 
 export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }) {
   const labels = useLabels()
-  const { hud, sections, years } = labels
+  const { hud, years } = labels
   const [tuned, setTuned] = useState(0)
   const tunedBand = bands[tuned]
-  // Him on the neon snare by the dial: every band tuned in is a fill on the drum, then he rests.
-  const drummer = usePoseSequence<MercMotion>({ entrance: [], rest: 'idle', still: 'still', moveMs: 700, policy: 'always' })
-  const tune = (index: number) => {
-    if (index !== tuned) drummer.play('drum')
-    setTuned(index)
-  }
 
   return (
-    <HudPanel title={sections.bands}>
+    <>
+      <div className={`${world.panel} mb-5 p-4 sm:p-5`}>
       <p className="text-sm text-[color:var(--neon-hud)]">{drumsSince(musician, years)}</p>
       <p className="mt-1 text-sm text-[color:var(--neon-ice)]">{musician.line}</p>
 
       {/* the dial: the station marks, the needle on the tuned band */}
-      <div className="mt-5 flex items-end gap-3">
-        <span className="block w-14 shrink-0 sm:w-16" aria-hidden="true">
-          <MercSprite key={drummer.take} profession="drummer" motion={drummer.move ?? drummer.pose} className="h-auto w-full" />
-        </span>
-        <div className="min-w-0 flex-1 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] px-2 pb-2 pt-3" aria-hidden="true">
+      <div className="mt-5">
+        <div className="min-w-0 border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color:var(--neon-ink)] px-2 pb-2 pt-3" aria-hidden="true">
           <div className="relative h-14" style={{ '--tuned': tuned, '--count': bands.length } as CSSProperties}>
             <div className="absolute inset-x-0 top-0 h-3 bg-[repeating-linear-gradient(90deg,var(--neon-data)_0_1px,transparent_1px_10px)] opacity-60" />
             <div className={`absolute inset-x-0 top-5 grid ${world.stations}`}>
@@ -108,13 +98,11 @@ export function Radio({ musician, bands }: { musician: Musician; bands: Band[] }
         </div>
       </div>
       <p className="mt-2 text-sm text-[color:var(--neon-hud)]">{tunedBand ? fillLabel(hud.tunedTo, { name: tunedBand.name }) : ''}</p>
+      </div>
 
-      <BandList
-        bands={bands}
-        className={`${MASONRY_LIST} mt-6`}
-        itemClassName={MASONRY_ITEM}
-        renderBand={(slot, index) => <Preset slot={slot} number={index + 1} tuned={index === tuned} onTune={() => tune(index)} />}
-      />
-    </HudPanel>
+      <div data-stage-items="">
+        <BandList bands={bands} className="grid gap-4" renderBand={(slot, index) => <Preset slot={slot} number={index + 1} tuned={index === tuned} onTune={() => setTuned(index)} />} />
+      </div>
+    </>
   )
 }
