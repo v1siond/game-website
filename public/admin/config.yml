@@ -839,6 +839,11 @@ collections:
                   - { <<: *text, label: "Picker count of worlds seen, two or more", name: pickerProgress }
                   - { <<: *text, label: "Picker category filters for a screen reader", name: pickerFilterAria }
                   - { <<: *text, label: "Picker filter chip showing every world", name: pickerFilterAll }
+                  - { <<: *text, label: "Picker filter chip of the Fantasy worlds", name: pickerFilterFantasy }
+                  - { <<: *text, label: "Picker filter chip of the Retro worlds", name: pickerFilterRetro }
+                  - { <<: *text, label: "Picker filter chip of the Neon worlds", name: pickerFilterNeon }
+                  - { <<: *text, label: "Picker filter chip of the Action worlds", name: pickerFilterAction }
+                  - { <<: *text, label: "Picker filter chip of the Artistic worlds", name: pickerFilterArtistic }
                   - { <<: *text, label: "Up next card heading", name: pickerUpNext }
                   - { <<: *text, label: "Up next card button", name: pickerEnter }
                   - { <<: *text, label: "Mark on a world not seen yet", name: pickerNotSeen }

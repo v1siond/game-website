@@ -5,9 +5,19 @@ import { WORLDS, WORLD_CATEGORIES, type World } from '@/lib/worlds/registry'
 import type { PickerEntry } from '@/lib/worlds/nudge'
 import WorldCard from './WorldCard'
 import { CATEGORY_ICONS, type WorldFilter as Filter } from './categoryIcons'
-import { useWorldsLabels } from './WorldsLabels'
+import { useWorldsLabels, type WorldsText } from './WorldsLabels'
 
 const WORLD_BY_ID = new Map<string, World>(WORLDS.map((world) => [world.id, world]))
+
+// Each filter chip's name in the page's language (labels.json worlds); the registry's names are its keys.
+const FILTER_LABEL: Record<Filter, keyof WorldsText> = {
+  All: 'pickerFilterAll',
+  Fantasy: 'pickerFilterFantasy',
+  Retro: 'pickerFilterRetro',
+  Neon: 'pickerFilterNeon',
+  Action: 'pickerFilterAction',
+  Artistic: 'pickerFilterArtistic',
+}
 
 // The registry is fixed for the page's life, so each chip's count is counted once, not per render.
 const CATEGORIES_WITH_COUNTS = WORLD_CATEGORIES.map((cat) => ({
@@ -62,14 +72,14 @@ export default function WorldsGrid({ order }: { order: PickerEntry[] }) {
         // one row that scrolls sideways on a phone, so the chips never push the worlds below the screen
         className="mb-6 flex items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0"
       >
-        <FilterChip active={filter === 'All'} onClick={() => setFilter('All')} filter="All" label={labels.pickerFilterAll} count={WORLDS.length} />
+        <FilterChip active={filter === 'All'} onClick={() => setFilter('All')} filter="All" label={labels[FILTER_LABEL.All]} count={WORLDS.length} />
         {CATEGORIES_WITH_COUNTS.map((cat) => (
           <FilterChip
             key={cat.name}
             active={filter === cat.name}
             onClick={() => setFilter(cat.name)}
             filter={cat.name}
-            label={cat.name}
+            label={labels[FILTER_LABEL[cat.name]]}
             count={cat.count}
           />
         ))}
