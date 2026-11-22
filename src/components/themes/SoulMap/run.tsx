@@ -20,6 +20,12 @@ export interface Banner {
   key: number
 }
 
+// The souls the last earn gave, shown over the counter; a new key replays its rise.
+export interface Gain {
+  count: number
+  key: number
+}
+
 export interface ItemBox {
   title: string
   detail: string
@@ -44,6 +50,7 @@ export interface RunState {
   flasks: number
   banner: Banner | null
   item: ItemBox | null
+  lastGain: Gain | null
   shown: number
 }
 
@@ -59,14 +66,14 @@ type RunAction =
   | { type: 'clearBanner'; key: number }
   | { type: 'clearItem'; key: number }
 
-const INITIAL: RunState = { souls: 0, hp: MAX_HP, stamina: MAX_STAMINA, flasks: MAX_FLASKS, banner: null, item: null, shown: 0 }
+const INITIAL: RunState = { souls: 0, hp: MAX_HP, stamina: MAX_STAMINA, flasks: MAX_FLASKS, banner: null, item: null, lastGain: null, shown: 0 }
 
 const clamp = (value: number, max: number) => Math.max(0, Math.min(max, value))
 
 const canDrink = (state: RunState) => state.flasks > 0 && state.hp < MAX_HP
 
 const REDUCERS: { [Type in RunAction['type']]: (state: RunState, action: Extract<RunAction, { type: Type }>) => RunState } = {
-  earn: (state, { souls }) => ({ ...state, souls: state.souls + souls }),
+  earn: (state, { souls }) => ({ ...state, souls: state.souls + souls, lastGain: { count: souls, key: (state.lastGain?.key ?? 0) + 1 } }),
   hurt: (state, { damage }) => ({ ...state, hp: clamp(state.hp - damage, MAX_HP) }),
   spend: (state, { stamina }) => ({ ...state, stamina: clamp(state.stamina - stamina, MAX_STAMINA) }),
   regen: (state) => ({ ...state, stamina: clamp(state.stamina + STAMINA_REGEN, MAX_STAMINA) }),

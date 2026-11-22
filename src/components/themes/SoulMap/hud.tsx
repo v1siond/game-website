@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react'
+import { useEffect, useRef, type CSSProperties, type RefObject } from 'react'
 import { useRolling } from '../shared/finds'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePreview } from '@/themes/PreviewContext'
@@ -111,18 +111,9 @@ function FlaskButton() {
 }
 
 function SoulsCounter() {
-  const { souls: total } = useRunState()
+  const { souls: total, lastGain: gain } = useRunState()
   const { souls: words } = useLabels()
   const shown = useRolling(total)
-  const [gain, setGain] = useState<{ count: number; key: number } | null>(null)
-  const last = useRef(total)
-
-  useEffect(() => {
-    const count = total - last.current
-    last.current = total
-    if (count <= 0) return
-    setGain((previous) => ({ count, key: (previous?.key ?? 0) + 1 }))
-  }, [total])
 
   return (
     <aside aria-label={words.souls} className="pointer-events-none relative flex flex-col items-end gap-1 sm:fixed sm:bottom-4 sm:right-4 sm:z-40">
