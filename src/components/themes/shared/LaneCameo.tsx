@@ -4,14 +4,13 @@ import type { ReactNode } from 'react'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { usePreview } from '@/themes/PreviewContext'
 
 // A section a world's figure crosses once along a lane above it: the shared section trigger starts it
 // once, and only then is the figure mounted, so its pose sequence starts with the play. Each beat is its
 // own CSS animation on his track, ended by that track's own animationend; after the last he unmounts and
 // the section rests exactly as it did without him. The section shows the reaction's idle look until the
-// play and its playing look from then on. Reduced motion and a World Select preview show the section in
-// place with no figure and no reaction class.
+// play and its playing look from then on. Reduced motion shows the section in place with
+// no figure and no reaction class.
 
 // How much of the section shows before he comes in.
 const THRESHOLD = 0.3
@@ -54,9 +53,7 @@ function LaneFigure<B extends string>({ beats, track, lane, place, figure, besid
 
 export function LaneCameo<B extends string>({ children, reaction, ...cameo }: LaneCameoProps<B>) {
   const { ref, triggered } = useSectionTrigger({ threshold: THRESHOLD })
-  const reduced = useReducedMotion()
-  const preview = usePreview()
-  const still = reduced || preview
+  const still = useReducedMotion()
   const playing = triggered && !still
   const look = playing ? reaction.playing : reaction.idle
 

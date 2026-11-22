@@ -5,7 +5,6 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Service } from '@/lib/cv/content'
-import { usePreview } from '@/themes/PreviewContext'
 import { Actor, useCourse } from './actor'
 import type { Course } from './course'
 import { JOURNAL_SERIF } from './palette'
@@ -21,7 +20,7 @@ import thud from './servicesStomp.module.css'
 //                          the card row takes his weight at 880 ms: down 8 px and back in steps (280 ms)
 //   off    880 to 1280 ms  he jumps off to the right
 // Then he and the mushroom unmount and the cards rest exactly as they did without him. The cards are
-// shown the whole time. Reduced motion and a World Select preview show the cards with no figure.
+// shown the whole time. Reduced motion shows the cards with no figure.
 // Transforms and opacity only (servicesStomp.module.css, the foe's own classes in side.module.css).
 
 const FOE_X = 46
@@ -53,8 +52,7 @@ export function ServicesLevel({ services }: { services: Service[] }) {
   const { sections } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
   const reduced = useReducedMotion()
-  const preview = usePreview()
-  const playing = triggered && !reduced && !preview
+  const playing = triggered && !reduced
 
   return (
     <Region title={sections.services}>

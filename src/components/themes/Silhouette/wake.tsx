@@ -5,7 +5,6 @@ import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
-import { usePreview } from '@/themes/PreviewContext'
 import { NameWords } from '@/components/cv/NameWords'
 import { HeroCharacter, type SpritePose } from './character'
 import { Layer, pinePath } from './depth'
@@ -18,8 +17,8 @@ import shade from './shade.module.css'
 // The hero: he wakes at the edge of the forest, the way a silhouette platformer opens. The page starts
 // black; an iris of light opens on the forest (four planes, ./depth); he lies in the grass, pushes up onto
 // his hands and stands; then his name and title fade in as a silent film intertitle above the scene and
-// the contact actions below it. setTimeout phases, once on mount; reduced motion and the World Select
-// preview start on the last frame, from the first render (the motion-reduce utilities cover the server's
+// the contact actions below it. setTimeout phases, once on mount; reduced motion starts on the last
+// frame, from the first render (the motion-reduce utilities cover the server's
 // frame, which cannot read the setting). The layers lean to the pointer the whole time.
 //
 // Animated: the iris and the black, his parts, the rope, four layer leans, the two text blocks.
@@ -113,17 +112,16 @@ const TEXT_SHOWN = (shown: boolean) => (shown ? `opacity-100 ${shade.titleIn}` :
 
 export function WakeHero({ profession }: { profession: Profession }) {
   const { navigation } = useLabels()
-  const preview = usePreview()
-  const [phase, setPhase] = useState<WakePhase>(() => (preview || prefersReducedMotion() ? 'done' : 'dark'))
+  const [phase, setPhase] = useState<WakePhase>(() => (prefersReducedMotion() ? 'done' : 'dark'))
 
   useEffect(() => {
-    if (preview || prefersReducedMotion()) {
+    if (prefersReducedMotion()) {
       setPhase('done')
       return
     }
     const timers = WAKE_AT.map(([next, at]) => window.setTimeout(() => setPhase(next), at))
     return () => timers.forEach((timer) => window.clearTimeout(timer))
-  }, [preview])
+  }, [])
 
   const shown = SHOWN[phase]
 
