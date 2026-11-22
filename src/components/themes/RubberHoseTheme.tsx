@@ -90,7 +90,7 @@ export default function RubberHoseTheme() {
                         <HeroCharacter profession={active} pose="idle" className="h-full w-full" />
                       </div>
                       <div>
-                        <CartoonTitle text={name.toUpperCase()} />
+                        <CartoonTitle text={name} />
                         <p className={`mt-4 text-base tracking-[0.1em] ${world.muted} ${staggerAt(0)} ${look.word}`}>{headline}</p>
                         <p className={`mt-2 text-sm italic tracking-widest ${world.red} ${staggerAt(1)} ${look.word}`}>{tagline}</p>
                         <p className={`mt-2 text-sm ${world.ink} ${staggerAt(2)} ${look.word}`}>{line}</p>
