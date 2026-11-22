@@ -84,7 +84,7 @@
   z-index: 1;
 }
 
-/* ---- the hero: the sign and his lines on a brass panel, the vending machine beside them from lg ---- */
+/* ---- the hero: the sign and his lines on a brass panel, the vending machine beside them from xl, below it on a narrower screen, where the machine needs the full width for its outfit fan ---- */
 .hero {
   position: relative;
   display: grid;
@@ -119,7 +119,7 @@
   padding-top: 56px;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .hero {
     grid-template-columns: minmax(380px, 520px) minmax(0, 1fr);
     align-content: center;
