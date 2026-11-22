@@ -20,7 +20,7 @@
         "id": "sillabo",
         "name": "Sillabo",
         "tagline": "Language learning with an AI tutor",
-        "description": "Sillabo takes a real human language course and turns it into an AI course. Italian for Spanish speakers.",
+        "description": "Sillabo turns a course written by people into an AI course. Italian for Spanish speakers.",
         "url": "https://sillabo.up.railway.app",
         "services": [
           "AI tutor",
@@ -34,42 +34,42 @@
       {
         "id": "dba",
         "name": "Daring Bit Assembly, Inc",
-        "tagline": "Custom software for enterprises",
+        "tagline": "Insurance and fintech software",
         "description": "Custom software and consulting for insurance and financial companies.",
         "url": "https://dbadbadba.com/",
         "services": [
-          "Custom Software Development",
-          "System Architecture",
-          "Technical Consulting",
-          "Cloud Infrastructure"
+          "Custom software",
+          "System architecture",
+          "Technical consulting",
+          "Cloud infrastructure"
         ],
         "icon": "🏢"
       },
       {
         "id": "pmx",
         "name": "PMX",
-        "tagline": "Affiliate Marketplace for E-commerce",
+        "tagline": "Affiliate marketplace for Shopify brands",
         "description": "Affiliate platform where Shopify brands find affiliates and pay their commissions.",
         "url": "https://getpmx.com",
         "services": [
-          "Shopify Integration",
-          "Affiliate Management",
-          "Payment Processing",
-          "Analytics Dashboard"
+          "Shopify integration",
+          "Affiliate management",
+          "Payment processing",
+          "Analytics dashboard"
         ],
         "icon": "🛒"
       },
       {
         "id": "grctechme",
         "name": "GRCTechMe",
-        "tagline": "Audit & Compliance Technology",
-        "description": "Digital audit platform for lawyers and agencies, listed on the Google Cloud Marketplace.",
+        "tagline": "Audit and compliance software",
+        "description": "Digital audit platform for lawyers and agencies.",
         "url": "https://grctechme.com/",
         "services": [
-          "Digital Audits",
-          "Compliance Management",
-          "Google Workspace Integration",
-          "Automated Reporting"
+          "Digital audits",
+          "Compliance management",
+          "Google Workspace integration",
+          "Automated reporting"
         ],
         "icon": "📋"
       }

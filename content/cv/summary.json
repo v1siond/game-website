@@ -2,16 +2,17 @@
   "en": {
     "fullName": "Alexander Pulido",
     "professionalSummary": {
-      "headline": "Senior Staff Full-Stack and AI Systems Engineer with 10+ years of experience",
-      "tagline": "Built PMX, InsurAdmin and GRCTechMe. Saved the SecureBancard launch. Led the Clutch Prep B2B product through its acquisition by Pearson. Insurance, payments, education and AI products, from Elixir backends to React apps.",
-      "bio": "I design and build fintech and insurance platforms and AI integrations. Teams bring me in when a launch is at risk or a system has to start from zero, and I take it to production. I work in concurrent functional backends like Elixir as easily as in enterprise stacks.",
+      "headline": "Senior Staff Full Stack and AI Systems Engineer with 10+ years of experience",
+      "tagline": "I built PMX, InsurAdmin and GRCTechMe and saved the SecureBancard launch. I led the Clutch Prep B2B product through its acquisition by Pearson.",
+      "bio": "I build fintech and insurance platforms and their AI features. Teams bring me in when a launch is at risk or a system has to start from zero, and I take it to production. I work as easily in Elixir as in Rails or Node.",
       "education": "Ingeniero en Sistemas, UNEFA, 2008 to 2014",
       "languages": "Spanish and English native, Italian basic",
       "highlights": [
         "Co-architected Pearson Channels nearly from the ground up and moved the relational data into Pearson's NoSQL stores with zero downtime.",
         "Built the PMX Affiliate Marketplace and its native Shopify integration.",
-        "Launched GRCTechMe on the Google Cloud Marketplace through its compliance review. I build secure LLM features on Gemini and Claude, enterprise AI portals and text to speech pipelines with edge-tts.",
-        "Built InsurAdmin from scratch for carrier feeds and agency teams. Built the core of Agency Rocket: its policy parsers and its Stripe billing.",
+        "Got GRCTechMe through the Google Cloud Marketplace compliance review.",
+        "I build secure LLM features on Gemini and Claude, enterprise AI portals and text to speech pipelines with edge-tts.",
+        "Built InsurAdmin from scratch for carrier feeds and agency teams, and the core of Agency Rocket: its policy parsers and Stripe billing.",
         "Nebulith: my own game engine and map editor, launching soon.",
         "Building neural networks from scratch to connect backend systems with AI agents.",
         "Backend developer in the early stages of Truth Social. Tuned the Rails backend with Mastodon core developers."

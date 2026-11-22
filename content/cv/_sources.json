@@ -58,12 +58,6 @@
     "years": "debt-action-plan 2021-06-02 to 2026-07-13",
     "details": [
       {
-        "fact": "Set up the project",
-        "shas": [
-          "8509a8e"
-        ]
-      },
-      {
         "fact": "Parser for the add on setup",
         "shas": [
           "41baca2"
@@ -88,12 +82,6 @@
     "years": "wealth-united 2019-08-05 to 2026-03-03",
     "details": [
       {
-        "fact": "Made the initial commit",
-        "shas": [
-          "1d49390"
-        ]
-      },
-      {
         "fact": "National debt counter",
         "shas": [
           "43afd10"
@@ -117,7 +105,7 @@
     "years": "hot-tub-api and hot-tub-client 2022-02-04 to 2026-10-15",
     "details": [
       {
-        "fact": "Made the initial commits of the API and the client",
+        "fact": "Started the API and the client",
         "shas": [
           "3c6b3568",
           "bb415b6e"
@@ -150,7 +138,7 @@
     "years": "insuradmin 2024-02-27 to 2026-10-20",
     "details": [
       {
-        "fact": "Made the initial commit and the setup with dashboard, htmx and onboarding",
+        "fact": "The setup: dashboard, htmx and onboarding",
         "shas": [
           "20b1a685",
           "da2523dd",
@@ -208,7 +196,7 @@
     "details": []
   },
   "clutchprep": {
-    "years": "LinkedIn Clutch Prep job, Aug 2019 to Apr 2022 (HISTORY experience table); the one newton commit 2023-04-28 is Pearson time, not the B2B system",
+    "years": "LinkedIn Clutch Prep job, Aug 2019 to Apr 2022 (HISTORY experience table); the one newton commit 2023-04-28 is Pearson time and outside the B2B system",
     "details": []
   },
   "nebulith": {

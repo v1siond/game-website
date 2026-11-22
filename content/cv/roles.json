@@ -15,7 +15,7 @@
         "company": "PMX",
         "type": "leadership",
         "current": true,
-        "description": "Leading the tech of the PMX affiliate marketplace."
+        "description": "I lead the engineering of the PMX affiliate marketplace."
       },
       {
         "id": "grctechme",
@@ -23,7 +23,7 @@
         "company": "GRCTechMe",
         "type": "leadership",
         "current": true,
-        "description": "Building audit and compliance software for lawyers and agencies."
+        "description": "I build GRCTechMe, audit and compliance software for lawyers and agencies."
       },
       {
         "id": "insuradmin",
@@ -31,7 +31,7 @@
         "company": "InsurAdmin",
         "type": "leadership",
         "current": true,
-        "description": "Agency management software for insurance agencies and IMOs."
+        "description": "I build InsurAdmin for insurance agencies and IMOs."
       }
     ]
   },

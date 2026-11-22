@@ -7,13 +7,13 @@
         "endDate": "",
         "current": true,
         "employment": "Independent",
-        "description": "Core engineer and architect for enterprise clients and startups: system rewrites, launches under compliance deadlines and new products from zero.",
+        "description": "I'm the core engineer and architect for enterprise clients and startups. I rewrite systems, ship launches against compliance deadlines and build new products.",
         "highlights": [
           "InsurAdmin: built it from scratch to manage carrier feeds and agency teams.",
           "Agency Rocket: built the annuity, IUL and whole life parsers and the Stripe billing for the suite (My New Retirement, Wealth United, Debt Action Plan).",
-          "Datepal: co PM and development lead of a dating app where coupled friends invite singles to events. Built Veriff age checks, ranking APIs with card stacks, SMS notifications and Stripe checkout on Phoenix and Ash.",
+          "Datepal: co PM and development lead of a dating app on Phoenix and Ash.",
           "PMX Affiliate Marketplace: built and launched the whole stack and its native Shopify integration.",
-          "SecureBancard: saved the launch by building 80% of the Dual BIN support alone, in time for the compliance deadline.",
+          "SecureBancard: saved the launch by building most of the Dual BIN support alone, in time for the compliance deadline.",
           "Truth Social: backend engineer in the early stages. Scaled the Rails backend with Mastodon core developers."
         ],
         "skills": [],
@@ -28,7 +28,7 @@
         "endDate": "2023-12-01",
         "current": false,
         "employment": "Full time",
-        "description": "Pearson Channels: co-architected Channels nearly from the ground up with the core team.",
+        "description": "Co-architected Pearson Channels with the core team, nearly from the ground up.",
         "highlights": [
           "Planned and ran the migration of the legacy SQL data into Pearson's NoSQL stores.",
           "Built exam preps, video lessons and shared widgets."
@@ -50,7 +50,7 @@
         "employment": "Full time",
         "description": "Engineering lead of the Clutch Prep B2B product through its acquisition by Pearson.",
         "highlights": [
-          "Led the B2B system that kept schools running through the pandemic"
+          "I led the B2B system that kept schools running through the pandemic."
         ],
         "skills": [
           "AWS Lambda"
@@ -68,8 +68,8 @@
         "employment": "Full time",
         "description": "Online courses for software developers. I built the platform and taught on it, mostly frontend.",
         "highlights": [
-          "One of my most popular series: pixel art characters with shadows in pure CSS, when CSS was still very limited.",
-          "Lessons on moving CSS to Sass and Stylus, ITCSS, JavaScript and WCAG AAA audits.",
+          "One of my most popular series: pixel art characters with shadows in pure CSS.",
+          "Lessons on Sass, Stylus, ITCSS, JavaScript and WCAG AAA audits.",
           "Pixel perfect builds from designs, before Figma existed."
         ],
         "skills": [],
@@ -87,7 +87,7 @@
         "description": "",
         "highlights": [],
         "skills": [],
-        "title": "Fullstack Developer",
+        "title": "Full Stack Developer",
         "company": "SolutionRus",
         "location": "Florida",
         "startDate": "2016-11-01"
@@ -101,7 +101,7 @@
         "description": "",
         "highlights": [],
         "skills": [],
-        "title": "Head of technical service",
+        "title": "Head of Technical Service",
         "company": "Altomi",
         "location": "Falcón, Venezuela",
         "startDate": "2014-12-01"
@@ -129,7 +129,7 @@
         "description": "",
         "highlights": [],
         "skills": [],
-        "title": "Junior programmer",
+        "title": "Junior Programmer",
         "company": "DeCompra Colombia",
         "location": "Falcón, Venezuela",
         "startDate": "2014-04-01"
