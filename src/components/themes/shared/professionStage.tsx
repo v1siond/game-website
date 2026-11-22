@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { CV_PATHS } from '@/i18n/config'
 import { useTheme } from '@/themes/ThemeContext'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { mix } from '@/lib/color'
 import { svgNumber } from './svgNumber'
 
 
@@ -735,18 +736,6 @@ export const ProfessionStage = memo(function ProfessionStage({ profession, p }: 
 
 // A palette for the stage from a world's theme colours: the void from its background, the soul light from its
 // accent, the brass from its secondary colour, the rest mixed between them.
-function clampHex(n: number) { return Math.max(0, Math.min(255, Math.round(n))) }
-function parseHex(h: string) {
-  let s = h.replace('#', '')
-  if (s.length === 3) s = s.split('').map((ch) => ch + ch).join('')
-  return [parseInt(s.slice(0, 2), 16) || 0, parseInt(s.slice(2, 4), 16) || 0, parseInt(s.slice(4, 6), 16) || 0]
-}
-function mix(a: string, b: string, t: number) {
-  const [ar, ag, ab] = parseHex(a), [br, bg, bb] = parseHex(b)
-  const r = clampHex(ar + (br - ar) * t), g = clampHex(ag + (bg - ag) * t), bl = clampHex(ab + (bb - ab) * t)
-  return '#' + [r, g, bl].map((v) => v.toString(16).padStart(2, '0')).join('')
-}
-
 function paletteFromColors(c: { background: string; accent: string; secondary: string; text?: string }): OrnamentPalette {
   const bg = c.background, ac = c.accent, sc = c.secondary || c.accent
   return {
