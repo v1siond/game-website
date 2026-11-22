@@ -117,7 +117,7 @@ function Rush() {
 
 function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void }) {
   const labels = useLabels()
-  const { project, years, links } = slot
+  const { project, years, links, noLink } = slot
 
   return (
     <div className="relative flex min-h-full items-center justify-center overflow-hidden px-4 py-10">
@@ -165,19 +165,16 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
         )}
         {project.techStack.length > 0 && <Chips items={project.techStack} label={labels.sections.techStack} className="mt-4" />}
         <div className="mt-6 flex flex-wrap gap-3">
-          {links.length > 0 ? (
-            links.map((link) => (
-              <a
-                key={link.kind}
-                {...link.linkProps}
-                className="inline-flex min-h-[44px] items-center border-[3px] border-[color:var(--noir-paper)] bg-[color:var(--noir-paper)] px-5 py-2 text-lg uppercase tracking-widest text-[color:var(--noir-ink)] transition-transform hover:-translate-y-0.5 motion-reduce:transition-none"
-              >
-                {link.label}
-              </a>
-            ))
-          ) : (
-            <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>{labels.links.noPublicLink}</p>
-          )}
+          {links.map((link) => (
+            <a
+              key={link.kind}
+              {...link.linkProps}
+              className="inline-flex min-h-[44px] items-center border-[3px] border-[color:var(--noir-paper)] bg-[color:var(--noir-paper)] px-5 py-2 text-lg uppercase tracking-widest text-[color:var(--noir-ink)] transition-transform hover:-translate-y-0.5 motion-reduce:transition-none"
+            >
+              {link.label}
+            </a>
+          ))}
+          {noLink && <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>{noLink}</p>}
         </div>
       </article>
     </div>

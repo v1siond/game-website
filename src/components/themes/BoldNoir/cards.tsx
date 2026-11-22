@@ -166,8 +166,7 @@ export function CompanyTag({ company }: { company: CVData['companies'][number] }
 
 // A band as a result panel sliding in from the side.
 export function BandPanel({ slot, index }: { slot: BandSlot; index: number }) {
-  const labels = useLabels()
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, release } = slot
   const body: ReactNode = (
     <>
       <span className="block text-3xl leading-none tracking-wide">{band.name}</span>
@@ -176,9 +175,9 @@ export function BandPanel({ slot, index }: { slot: BandSlot; index: number }) {
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </span>
-      {band.release && (
+      {release && (
         <span className={`mt-2 block ${BODY}`}>
-          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </span>
       )}
     </>
