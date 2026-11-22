@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
@@ -11,6 +12,7 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
 import { cssVars } from '@/lib/cssVars'
 import { BarrelArt } from './barrel'
+import { SunPoints } from './boards'
 import { StatusLine } from './buttons'
 import { HeroCharacter } from './character'
 import { ExtraLifeBalloon, HiddenCoin, LetterTracker } from './letterCoin'
@@ -84,7 +86,7 @@ interface PlatformProps {
 const Platform = memo(function Platform({ entry, coins, index, armed, occupied, landed, aim, nextName, onBlast, onBarrel }: PlatformProps) {
   const { years, cards, jungle } = useLabels()
   const barrelRef = useCallback((element: HTMLElement | null) => onBarrel(index, element), [onBarrel, index])
-  const { start, end } = jobYears(entry, years.present)
+  const job = jobCard(entry, years)
   const cannon = (
     <span className={`relative block ${run.cannon}`} data-aim={aim !== null || undefined} style={cssVars({ '--aim': `${aim ?? 0}deg` })}>
       {occupied && <HeroCharacter profession="engineer" pose="idle" className={`absolute bottom-[58%] left-[10%] w-[80%] ${run.peek}`} />}
@@ -123,31 +125,21 @@ const Platform = memo(function Platform({ entry, coins, index, armed, occupied, 
       </div>
 
       <div className={`pr-16 ${coins.length > 0 ? 'pt-6' : ''}`}>
-        <h3 className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>{entry.title}</h3>
+        <h3 className={`text-lg leading-snug text-[color:var(--tp-sun-gold)] ${look.display}`}>{job.title}</h3>
         <p className="mt-1 text-base text-[color:var(--tp-parchment)]">
-          <SlashBreaks text={entry.company} />
+          <SlashBreaks text={job.company} />
         </p>
-        <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{fillLabel(years.range, { start, end })}</p>
+        <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{job.years}</p>
+        {job.location && <p className="mt-1 text-sm text-[color:var(--tp-plank-light)]">{job.location}</p>}
       </div>
 
-      {entry.description && <p className="mt-4 text-sm leading-relaxed text-[color:var(--tp-parchment)]">{entry.description}</p>}
+      {job.description && <p className="mt-4 text-sm leading-relaxed text-[color:var(--tp-parchment)]">{job.description}</p>}
 
-      {entry.highlights.length > 0 && (
-        <ul className="mt-4 space-y-2" aria-label={cards.keyAchievements}>
-          {entry.highlights.map((highlight) => (
-            <li key={highlight} className="flex items-start gap-2 text-sm text-[color:var(--tp-parchment)]">
-              <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0" aria-hidden="true" focusable="false">
-                <circle cx="5" cy="5" r="4" fill="var(--tp-sun-gold)" />
-              </svg>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
+      <SunPoints items={job.highlights} label={cards.keyAchievements} />
 
-      {entry.skills.length > 0 && (
+      {job.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-          {entry.skills.map((skill) => (
+          {job.skills.map((skill) => (
             <li key={skill} className={`rounded-lg px-2 py-1 text-sm ${look.tag}`}>
               {skill}
             </li>

@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { usePosts } from '@/components/blog/BlogProvider'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import type { SectionSlot } from '@/lib/cv/sectionPlan'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { BLOG_PATH, postLinks } from '@/lib/blog/links'
-import { ServiceBoard, TechBoard, VentureBoard } from './boards'
+import { ServiceBoard, SunPoints, TechBoard, VentureBoard } from './boards'
 import { WOOD_BUTTON } from './buttons'
 import { BrawlRecord } from './brawl'
 import { CannonRun } from './cannons'
@@ -46,11 +47,28 @@ function SectionLevel({ slot, scene, children }: { slot: SectionSlot; scene: Sce
 
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
+    const { cards, about } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     return (
       <SectionLevel slot={slot} scene="jungle">
         <ElderYard>
           <Board>
             <p className="mx-auto max-w-prose text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
+            <div className="mx-auto max-w-prose">
+              <SunPoints items={highlights} label={cards.keyAchievements} />
+              {education && (
+                <p className="mt-4 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
+                  <span className="font-bold text-[color:var(--tp-sun-gold)]">{about.education}: </span>
+                  {education}
+                </p>
+              )}
+              {languages && (
+                <p className="mt-1 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
+                  <span className="font-bold text-[color:var(--tp-sun-gold)]">{about.languages}: </span>
+                  {languages}
+                </p>
+              )}
+            </div>
           </Board>
         </ElderYard>
       </SectionLevel>

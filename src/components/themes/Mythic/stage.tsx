@@ -27,6 +27,25 @@ export const useHouse = () => useContext(HouseContext)
 
 export const mythHeadingId = (title: string) => headingId('myth', title)
 
+/** Lines marked with the blood red diamond the trials give a job's highlights: a job's highlights, a
+ *  project's details, the About highlights, under their gold heading. Nothing when there are none. */
+export function BloodPoints({ title, items }: { title: string; items: string[] }) {
+  if (items.length === 0) return null
+  return (
+    <>
+      <h4 className={`mt-4 text-sm text-[var(--myth-gold)] ${u.display}`}>{title}</h4>
+      <ul className="mt-2 space-y-1.5">
+        {items.map((line) => (
+          <li key={line} className="flex gap-2 text-base">
+            <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--myth-blood)]" aria-hidden="true" />
+            <span>{line}</span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
 export function Laurel({ flip = false }: { flip?: boolean }) {
   return (
     <svg viewBox="0 0 24 24" className={`h-5 w-5 shrink-0 ${flip ? '-scale-x-100' : ''}`} aria-hidden="true">

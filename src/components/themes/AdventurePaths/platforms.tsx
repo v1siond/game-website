@@ -4,6 +4,7 @@ import { useMemo, useState, type AnimationEvent } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
@@ -70,7 +71,7 @@ function Ledge() {
 
 function JobCard({ job, stop, onPoint }: { job: Job; stop: number; onPoint: () => void }) {
   const { cards, years } = useLabels()
-  const { start, end } = jobYears(job, years.present)
+  const card = jobCard(job, years)
   return (
     <article
       id={`trail-job-${job.id}`}
@@ -87,17 +88,18 @@ function JobCard({ job, stop, onPoint }: { job: Job; stop: number; onPoint: () =
       </span>
       <div className="mb-2 flex flex-wrap items-start justify-between gap-2 pl-4">
         <div className="min-w-0">
-          <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{job.title}</h3>
+          <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}>{card.title}</h3>
           <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">
-            <SlashBreaks text={job.company} />
+            <SlashBreaks text={card.company} />
           </p>
+          {card.location && <p className="text-sm text-[color:var(--ap-ink-soft)]">{card.location}</p>}
         </div>
-        <span className="rounded-sm bg-[color:var(--ap-hud)] px-2 py-1 text-sm text-white">{fillLabel(years.range, { start, end })}</span>
+        <span className="rounded-sm bg-[color:var(--ap-hud)] px-2 py-1 text-sm text-white">{card.years}</span>
       </div>
-      {job.description && <p className="text-sm text-[color:var(--ap-ink-soft)]">{job.description}</p>}
-      {job.highlights.length > 0 && (
+      {card.description && <p className="text-sm text-[color:var(--ap-ink-soft)]">{card.description}</p>}
+      {card.highlights.length > 0 && (
         <ul className="mt-3 space-y-1.5" aria-label={cards.keyAchievements}>
-          {job.highlights.map((highlight) => (
+          {card.highlights.map((highlight) => (
             <li key={highlight} className="flex items-start gap-2 text-sm">
               <span className="mt-1 h-2.5 w-2 shrink-0 rounded-sm border border-[color:var(--ap-hud)] bg-[color:var(--ap-coin)]" aria-hidden="true" />
               <span>{highlight}</span>
@@ -105,9 +107,9 @@ function JobCard({ job, stop, onPoint }: { job: Job; stop: number; onPoint: () =
           ))}
         </ul>
       )}
-      {job.skills.length > 0 && (
+      {card.skills.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.skillsUsed}>
-          {job.skills.map((skill) => (
+          {card.skills.map((skill) => (
             <li key={skill} className="rounded-sm border border-dashed border-[color:var(--ap-ink-soft)] px-2 py-0.5 text-sm">
               {skill}
             </li>

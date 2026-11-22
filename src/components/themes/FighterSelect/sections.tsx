@@ -1,14 +1,15 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { ArcadePanel } from './frames'
-import { MoveCard, ProjectCard, ServiceCard, VentureCard } from './cards'
+import { MoveCard, ProjectCard, ServiceCard, SparkLines, VentureCard } from './cards'
 import { ClashSeparator, LightningLine, RoundWins } from './separators'
 import { ComboZone, HitCard } from './combo'
 import { BandStage, LockIn, ResultRecord, RoundEntry } from './rounds'
@@ -16,6 +17,7 @@ import { BlastRow, CarSmash, DeckShow, ParryRow, SparRing, SuperArt } from './sc
 import { FlightMap, FlightStop } from './flight'
 import { UppercutLaunch } from './uppercut'
 import living from './living.module.css'
+import look from './world.module.css'
 
 // The picked profession's sections, each opened by its own stage moment with him and his sparring
 // partner (./scenes), no two alike:
@@ -43,12 +45,28 @@ function Lit({ on, frame, children }: { on: boolean; frame: string; children: Re
 // One frame per section of the shared plan, which picks the ones a profession shows and their order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const titles = useLabels().sections
+    const { sections: titles, cards, about } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     return (
       <>
         <ArcadePanel accent="cyan" title={titles.about} id="about-heading">
           <CarSmash profession="engineer">
             <p className={`mt-6 max-w-prose ${LEAD}`}>{slot.bio}</p>
+            <div className="mt-6 max-w-prose">
+              <SparkLines items={highlights} label={cards.keyAchievements} />
+              {education && (
+                <p className="text-sm text-white">
+                  <span className={`uppercase text-[color:var(--fs-gold)] ${look.display}`}>{about.education}: </span>
+                  {education}
+                </p>
+              )}
+              {languages && (
+                <p className="mt-1 text-sm text-white">
+                  <span className={`uppercase text-[color:var(--fs-gold)] ${look.display}`}>{about.languages}: </span>
+                  {languages}
+                </p>
+              )}
+            </div>
           </CarSmash>
         </ArcadePanel>
         <ClashSeparator />

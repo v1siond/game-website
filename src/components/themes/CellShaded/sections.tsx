@@ -1,12 +1,13 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
-import { Stage } from './stage'
+import { OrangePoints, Stage } from './stage'
 import type { Zone } from './wasteland'
 import { BountyBoard } from './bountyBoard'
 import { SkillTree } from './skillTree'
@@ -48,11 +49,28 @@ function Hour({ slot, children }: { slot: SectionSlot; children: ReactNode | ((o
 // One frame per section of the shared plan, which picks the ones a profession shows and their order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
+    const { cards, about } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     return (
       <Hour slot={slot}>
         <SlamLanding>
           <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
             <p className="max-w-prose text-base leading-relaxed">{slot.bio}</p>
+            <div className="max-w-prose">
+              <OrangePoints title={cards.keyAchievements} items={highlights} />
+              {education && (
+                <p className="mt-4 text-base">
+                  <span className="font-bold uppercase tracking-wider">{about.education}: </span>
+                  {education}
+                </p>
+              )}
+              {languages && (
+                <p className="mt-1 text-base">
+                  <span className="font-bold uppercase tracking-wider">{about.languages}: </span>
+                  {languages}
+                </p>
+              )}
+            </div>
           </div>
         </SlamLanding>
       </Hour>

@@ -5,6 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { fillLabel } from '@/lib/cv/labels'
+import { projectCard, type ProjectCard } from '@/lib/cv/cvView'
 import type { Project } from '@/lib/cv/content'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
@@ -103,7 +104,7 @@ function TechBlocks({ items, colour, pressed, label }: { items: string[]; colour
  * markup, hidden until the switch is pressed, so the server HTML carries every description; leaving
  * `display: none` restarts `.messageBox`'s open animation on each press.
  */
-function MessageBox({ project, id, hidden }: { project: Project; id: string; hidden: boolean }) {
+function MessageBox({ project, id, hidden }: { project: ProjectCard; id: string; hidden: boolean }) {
   const { cards } = useLabels()
   return (
     <div id={id} hidden={hidden} className={`mt-4 rounded-sm border-4 border-double border-[color:var(--ap-ink)] bg-[color:var(--ap-ink)] p-4 text-[color:var(--ap-page)] ${map.messageBox}`}>
@@ -123,11 +124,12 @@ function MessageBox({ project, id, hidden }: { project: Project; id: string; hid
 }
 
 function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: SwitchColour; filled: boolean }) {
-  const { project, years, links } = slot
-  const { cards, trail } = useLabels()
+  const labels = useLabels()
+  const { cards, trail } = labels
+  const project = projectCard(slot.project, labels)
   const [pressed, setPressed] = useState(false)
   const boxId = `trail-project-${project.id}`
-  const [main, ...secret] = links
+  const [main, ...secret] = slot.links
 
   return (
     <article className={PAPER_CARD}>
@@ -135,7 +137,7 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
         <div className="min-w-0">
           <h3 className={`text-lg font-bold ${JOURNAL_SERIF}`}><SlashBreaks text={project.name} /></h3>
           <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">{project.role}</p>
-          {years && <p className="text-sm text-[color:var(--ap-ink-soft)]">{years}</p>}
+          {project.years && <p className="text-sm text-[color:var(--ap-ink-soft)]">{project.years}</p>}
         </div>
         <button
           type="button"
@@ -149,7 +151,12 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
         </button>
       </div>
       <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
-      {project.impact && <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">{project.impact}</p>}
+      {project.impact && (
+        <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">
+          <span className="sr-only">{cards.impact}: </span>
+          {project.impact}
+        </p>
+      )}
       <TechBlocks items={project.techStack} colour={colour} pressed={pressed || filled} label={cards.technologiesUsed} />
       <MessageBox project={project} id={boxId} hidden={!pressed} />
       {main && (

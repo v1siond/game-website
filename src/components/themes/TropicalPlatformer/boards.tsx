@@ -1,9 +1,10 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import type { CVData, Service } from '@/lib/cv/content'
+import { ventureCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { cssVars } from '@/lib/cssVars'
@@ -17,7 +18,26 @@ import look from './jungle.module.css'
 // the venture's site (also placed by --i, for the rhino's charge in rhino.tsx). The services read as a
 // masonry of plain boards, a title and its line, under the shared fade. His own products (featured)
 // are the two wide planks of the first row, a bark tag in sun gold over the name; the other ventures
-// follow three to a row.
+// follow three to a row. A plank's link is named by the words it shows (the description and services
+// included) plus the new tab note a screen reader alone hears.
+
+/** Lines read on a dark board, each after a sun gold dot: a job's highlights, a project's details, the
+ *  About highlights. Nothing when there are none. */
+export function SunPoints({ items, label }: { items: string[]; label: string }) {
+  if (items.length === 0) return null
+  return (
+    <ul className="mt-4 space-y-2" aria-label={label}>
+      {items.map((item) => (
+        <li key={item} className="flex items-start gap-2 text-sm text-[color:var(--tp-parchment)]">
+          <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0" aria-hidden="true" focusable="false">
+            <circle cx="5" cy="5" r="4" fill="var(--tp-sun-gold)" />
+          </svg>
+          {item}
+        </li>
+      ))}
+    </ul>
+  )
+}
 
 // `itemClassName` is the class the section's motion gives each top level card (the ground slap's jolt, the
 // rhino's ram), so the motion's module never reaches into this markup.
@@ -52,17 +72,16 @@ export function TechBoard({ categories, itemClassName = '' }: BoardListProps & {
 }
 
 export function VentureBoard({ companies, itemClassName = '' }: BoardListProps & { companies: CVData['companies'] }) {
-  const { links, cards } = useLabels()
+  const { links, cards, sections } = useLabels()
 
   return (
     <ul className="grid gap-5 md:grid-cols-6">
-      {companies.map((company, index) => (
+      {companies.map(ventureCard).map((company, index) => (
         <li key={company.id} className={`${company.featured ? 'md:col-span-3' : 'md:col-span-2'} ${itemClassName}`} style={cssVars({ '--i': index })}>
           <a
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className={`block h-full rounded-2xl p-5 text-[color:var(--tp-bark-dark)] ${look.plank} ${look.plankText} ${look.button} ${look.focus}`}
           >
             {company.featured && (
@@ -82,6 +101,16 @@ export function VentureBoard({ companies, itemClassName = '' }: BoardListProps &
               </span>
             </span>
             <span className="mt-3 block text-sm leading-relaxed">{company.description}</span>
+            {company.services.length > 0 && (
+              <ul className="mt-3 flex flex-wrap gap-2" aria-label={sections.services}>
+                {company.services.map((service) => (
+                  <li key={service} className={`rounded-lg px-2 py-1 text-sm ${look.tag}`}>
+                    {service}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <span className="sr-only"> {newTabHint(links)}</span>
           </a>
         </li>
       ))}

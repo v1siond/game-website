@@ -1,10 +1,11 @@
 'use client'
 
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import { Stage } from './stage'
+import { BloodPoints, Stage } from './stage'
 import { Trials } from './trials'
 import { ChainHaul } from './chains'
 import { ChestHeave } from './chest'
@@ -26,11 +27,27 @@ import u from './underworld.module.css'
 // One frame per section of the shared plan, each its stage in the descent.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const titles = useLabels().sections
+    const { sections: titles, cards, about } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     return (
       <Stage title={titles.about} zone="hall">
         <ChainHaul>
           <p className="max-w-prose text-lg leading-relaxed">{slot.bio}</p>
+          <div className="max-w-prose">
+            <BloodPoints title={cards.keyAchievements} items={highlights} />
+            {education && (
+              <p className="mt-4 text-base">
+                <span className={`text-sm text-[var(--myth-gold)] ${u.display}`}>{about.education}: </span>
+                {education}
+              </p>
+            )}
+            {languages && (
+              <p className="mt-1 text-base">
+                <span className={`text-sm text-[var(--myth-gold)] ${u.display}`}>{about.languages}: </span>
+                {languages}
+              </p>
+            )}
+          </div>
         </ChainHaul>
       </Stage>
     )

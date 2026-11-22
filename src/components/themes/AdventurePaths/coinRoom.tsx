@@ -1,10 +1,10 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import type { SectionsOf } from '@/lib/cv/cvView'
+import { ventureCard, type SectionsOf } from '@/lib/cv/cvView'
 import type { Profession } from '@/lib/cv/professions'
 import { Actor, useCourse } from './actor'
 import { cssVars } from '@/lib/cssVars'
@@ -20,7 +20,8 @@ import side from './side.module.css'
 // coins, each one gone with a flick as he takes it, and the ventures' cards pop up one after another as
 // he runs. Under reduced motion he stands at the far side and every card shows. His own products
 // (featured) pop up first, two wide cards to a row with a coin gold top and the black HUD plate over the
-// name; the other ventures follow three to a row.
+// name; the other ventures follow three to a row. A card's link is named by the words it shows (the
+// description and services included) plus the new tab note a screen reader alone hears.
 
 type RoomPose = 'drop' | 'run' | 'stand'
 
@@ -70,13 +71,12 @@ export function CoinRoom({ companies, profession }: { companies: SectionsOf<'eng
         {on && <RoomScene profession={profession} />}
       </Playfield>
       <ul className="grid gap-6 md:grid-cols-6" data-shown={on || reduced}>
-        {companies.map((company, index) => (
+        {companies.map(ventureCard).map((company, index) => (
           <li key={company.id} className={`${POP_CARD} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={cssVars({ '--delay': `${cardDelay(index)}ms` })}>
             <a
               href={company.url}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
               className="block h-full transition-transform hover:-translate-y-1 motion-reduce:transition-none"
             >
               <article
@@ -92,6 +92,17 @@ export function CoinRoom({ companies, profession }: { companies: SectionsOf<'eng
                 </h3>
                 <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">{company.tagline}</p>
                 <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{company.description}</p>
+                {company.services.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={sections.services}>
+                    {company.services.map((service) => (
+                      <li key={service} className="flex items-center gap-1.5 rounded-sm border border-[color:var(--ap-hud)] px-2 py-0.5 text-sm">
+                        <span className="h-2.5 w-2 shrink-0 rounded-sm border border-[color:var(--ap-hud)] bg-[color:var(--ap-coin)]" aria-hidden="true" />
+                        {service}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <span className="sr-only"> {newTabHint(links)}</span>
               </article>
             </a>
           </li>

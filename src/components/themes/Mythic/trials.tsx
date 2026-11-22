@@ -2,7 +2,7 @@
 
 import { memo, useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -14,7 +14,7 @@ import { SpartanSprite, type SpriteMotion } from './sprite'
 import { FOE, type FoeName } from './foes'
 import { MOVES } from './rig'
 import { useTrack, useTurnQueue } from './track'
-import { Laurel } from './stage'
+import { BloodPoints, Laurel } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -174,7 +174,7 @@ function Arena({ take, fighter, cleared, total }: { take: number; fighter: PoseS
 const TrialCard = memo(function TrialCard({ job, cleared, onEnter }: { job: Job; cleared: boolean; onEnter: (id: string) => void }) {
   const { years, cards, myth } = useLabels()
   const { ref } = useSectionTrigger({ threshold: 0.35, onEnter: () => onEnter(job.id) })
-  const { start, end } = jobYears(job, years.present)
+  const card = jobCard(job, years)
 
   return (
     <article ref={ref} data-on={cleared || undefined} className={`relative p-5 ${u.panel} ${u.trial}`}>
@@ -182,29 +182,17 @@ const TrialCard = memo(function TrialCard({ job, cleared, onEnter }: { job: Job;
         <Laurel />
         {myth.roleCleared}
       </p>
-      <h3 className={`pr-24 text-xl leading-tight text-[var(--myth-gold)] ${u.display}`}><SlashBreaks text={job.company} /></h3>
-      <p className="mt-1 text-base font-bold">{job.title}</p>
+      <h3 className={`pr-24 text-xl leading-tight text-[var(--myth-gold)] ${u.display}`}><SlashBreaks text={card.company} /></h3>
+      <p className="mt-1 text-base font-bold">{card.title}</p>
       <p className="text-sm text-[var(--myth-bone-shade)]">
-        {fillLabel(years.range, { start, end })}
-        {job.location && ` · ${job.location}`}
+        {card.years}
+        {card.location && ` · ${card.location}`}
       </p>
-      <p className="mt-3 text-base leading-relaxed">{job.description}</p>
-      {job.highlights.length > 0 && (
-        <>
-          <h4 className={`mt-4 text-sm text-[var(--myth-gold)] ${u.display}`}>{cards.keyAchievements}</h4>
-          <ul className="mt-2 space-y-1.5">
-            {job.highlights.map((line) => (
-              <li key={line} className="flex gap-2 text-base">
-                <span className="mt-2 h-2 w-2 shrink-0 rotate-45 bg-[var(--myth-blood)]" aria-hidden="true" />
-                <span>{line}</span>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      {job.skills.length > 0 && (
+      <p className="mt-3 text-base leading-relaxed">{card.description}</p>
+      <BloodPoints title={cards.keyAchievements} items={card.highlights} />
+      {card.skills.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-          {job.skills.map((skill) => (
+          {card.skills.map((skill) => (
             <li key={skill} className="border border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm">
               {skill}
             </li>

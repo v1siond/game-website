@@ -6,11 +6,13 @@ import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/lib/cv/sectionText'
+import { projectCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { BOONS_PER_WAVE, rarityOf, waveOf, type Rarity } from './fates'
 import { SlabButton } from './buttons'
+import { BloodPoints } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -59,8 +61,9 @@ interface BoonCardProps {
 function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
   const labels = useLabels()
   const { cards, myth } = labels
-  const { project, years, links } = slot
-  const rarity = rarityOf(project, links.length)
+  const { links } = slot
+  const rarity = rarityOf(slot.project, links.length)
+  const project = projectCard(slot.project, labels)
 
   return (
     <article data-rarity={rarity} className={`relative ${u.boon}`} style={cssVars({ '--w': waveOf(index), '--k': index % BOONS_PER_WAVE })}>
@@ -78,10 +81,11 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
         </h3>
         <p className="mt-1 text-sm text-[var(--myth-bone-shade)]">
           {project.role}
-          {years && ` · ${years}`}
+          {project.years && ` · ${project.years}`}
         </p>
         {project.tagline && <p className="mt-2 text-base italic text-[var(--myth-gold-pale)]">{project.tagline}</p>}
-        <p className="mt-2 text-base leading-relaxed">{project.description}</p>
+        {project.description && <p className="mt-2 text-base leading-relaxed">{project.description}</p>}
+        <BloodPoints title={cards.details} items={project.details} />
         {project.impact && (
           <p className="mt-3 border-l-4 border-[var(--rarity)] pl-3 text-base">
             <span className="sr-only">{cards.impact}: </span>
