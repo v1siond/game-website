@@ -1,4 +1,5 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { newTabName } from '@/lib/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
@@ -65,7 +66,7 @@ export function Keepsakes({ companies }: { companies: Company[] }) {
     <>
       <ul className={`grid gap-6 border-4 border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] p-4 sm:p-6 md:grid-cols-6`}>
         {companies.map((company, index) => (
-          <li key={company.id} className={`${u.cabinetItem} ${u.reveal} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ ['--i' as string]: index }}>
+          <li key={company.id} className={`${u.cabinetItem} ${u.reveal} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={cssVars({ '--i': index })}>
             {company.url ? (
               <a
                 href={company.url}

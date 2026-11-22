@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/lib/cv/sectionText'
@@ -62,7 +63,7 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
   const rarity = rarityOf(project, links.length)
 
   return (
-    <article data-rarity={rarity} className={`relative ${u.boon}`} style={{ ['--w' as string]: waveOf(index), ['--k' as string]: index % BOONS_PER_WAVE }}>
+    <article data-rarity={rarity} className={`relative ${u.boon}`} style={cssVars({ '--w': waveOf(index), '--k': index % BOONS_PER_WAVE })}>
       <div className={`p-5 ${u.boonFrame}`}>
         <div className="flex items-start justify-between gap-3">
           <p className={`text-sm ${u.display} ${u.rarityWord}`}>{RARITY_WORD[rarity](labels)}</p>

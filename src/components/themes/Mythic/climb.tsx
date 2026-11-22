@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useRef, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { usePoseSequence, type PoseSequence } from '@/hooks/usePoseSequence'
 import { fillLabel } from '@/lib/cv/labels'
@@ -50,7 +51,7 @@ function Chain({ ids, gripped, climber, chainRef }: ChainProps) {
   const drop = Math.max(0, gripped - 1) * HOLD_STEP
   return (
     <svg ref={chainRef} viewBox="-30 0 130 480" className="block h-[70vh] max-h-[34rem] w-full" aria-hidden="true">
-      <g className={u.chainRun} style={{ transform: `translateY(${drop}px)` }}>
+      <g className={u.chainRun} style={cssVars({ '--drop': `${drop}px` })}>
         {/* the oval links either side of the carved band */}
         {LINKS.map((y) => (
           <g key={y}>

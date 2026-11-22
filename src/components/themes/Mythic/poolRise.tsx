@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { cssVars } from '@/lib/cssVars'
 import { NameWords } from '@/components/cv/NameWords'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -100,7 +101,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
             <ellipse cx={100} cy={30} rx={96} ry={24} fill={MYTH.bloodDeep} stroke={MYTH.inkLine} strokeWidth={3} />
             <ellipse cx={100} cy={30} rx={80} ry={16} fill={MYTH.pool} />
             {[0, 1, 2].map((index) => (
-              <ellipse key={index} cx={100} cy={30} rx={60} ry={12} fill="none" stroke={MYTH.poolLight} strokeWidth={2} className={u.ripple} style={{ ['--i' as string]: index }} />
+              <ellipse key={index} cx={100} cy={30} rx={60} ry={12} fill="none" stroke={MYTH.poolLight} strokeWidth={2} className={u.ripple} style={cssVars({ '--i': index })} />
             ))}
           </svg>
           <div data-worlds-figure="" className="relative h-72 overflow-hidden sm:h-80">
@@ -113,7 +114,7 @@ export function PoolRise({ profession, reduced }: { profession: Profession; redu
                 <SpartanSprite profession={profession} motion={entranceMotion(shown)} className="h-full w-full" />
               )}
               {DRIPS.map(({ x, y }, index) => (
-                <span key={x} className={u.drip} style={{ ['--i' as string]: index, ['--x' as string]: `${x}%`, ['--y' as string]: `${y}%` }} aria-hidden="true" />
+                <span key={x} className={u.drip} style={cssVars({ '--i': index, '--x': `${x}%`, '--y': `${y}%` })} aria-hidden="true" />
               ))}
             </div>
           </div>

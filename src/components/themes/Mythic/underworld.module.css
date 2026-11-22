@@ -834,6 +834,7 @@
   opacity: 0.9;
 }
 .chainRun {
+  transform: translateY(var(--drop, 0px));
   transition: transform 1100ms ease-in-out;
 }
 .page {
@@ -960,6 +961,8 @@
 }
 .smoke {
   animation: smoke 12s linear infinite;
+  /* each plume 4 s behind the one before it (depths.tsx sets --i) */
+  animation-delay: calc(var(--i, 0) * -4s);
 }
 @keyframes smoke {
   from { transform: translate3d(0, 0, 0); opacity: 0.7; }

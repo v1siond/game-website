@@ -1,3 +1,4 @@
+import { cssVars } from '@/lib/cssVars'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -158,7 +159,7 @@ function RhodesArt() {
   return (
     <svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMax slice" className={`absolute inset-0 h-full w-full ${u.far}`}>
       {[0, 1, 2].map((plume) => (
-        <circle key={plume} cx={300 + plume * 280} cy={560} r={50} fill={MYTH.smoke} opacity={0.5} className={`${e} ${u.smoke}`} style={{ animationDelay: `${plume * -4}s` }} />
+        <circle key={plume} cx={300 + plume * 280} cy={560} r={50} fill={MYTH.smoke} opacity={0.5} className={`${e} ${u.smoke}`} style={cssVars({ '--i': plume })} />
       ))}
       {/* the giant: legs astride the harbour, the body, the head with the laurel and the eyes */}
       <path d="M540 800 L560 520 L600 520 L610 800 Z M640 800 L650 520 L690 520 L700 800 Z" fill={MYTH.giant} stroke={INK} strokeWidth={4} />
@@ -277,7 +278,7 @@ export function Depths() {
         <OlympusArt />
       </div>
       {EMBERS.map(({ left, drift }, index) => (
-        <span key={left} className={u.ember} style={{ ['--left' as string]: left, ['--i' as string]: index, ['--drift' as string]: drift }} />
+        <span key={left} className={u.ember} style={cssVars({ '--left': left, '--i': index, '--drift': drift })} />
       ))}
       {/* a dark veil over the painting so the page's text keeps its contrast in every region */}
       <div className="absolute inset-0 bg-[var(--myth-ink)] opacity-40" />

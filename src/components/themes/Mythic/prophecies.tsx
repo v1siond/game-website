@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Labels } from '@/lib/cv/labels'
 import type { MartialArts } from '@/lib/cv/content'
@@ -137,7 +138,7 @@ export function Prophecies({ martialArts }: { martialArts: MartialArts }) {
             renderAchievement={(achievement, index) => (
               <>
                 <span className="text-base">{achievement}</span>
-                <span className={`shrink-0 border-2 border-[var(--myth-ink)] bg-[var(--myth-blood)] px-2 py-0.5 text-sm text-[var(--myth-bone)] ${u.display} ${u.fulfilled}`} style={{ ['--i' as string]: index }}>
+                <span className={`shrink-0 border-2 border-[var(--myth-ink)] bg-[var(--myth-blood)] px-2 py-0.5 text-sm text-[var(--myth-bone)] ${u.display} ${u.fulfilled}`} style={cssVars({ '--i': index })}>
                   {myth.fulfilled}
                 </span>
               </>

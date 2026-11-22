@@ -1,3 +1,4 @@
+import { cssVars } from '@/lib/cssVars'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -70,8 +71,8 @@ export function Volcano() {
         </g>
 
         {ROCKS.map(({ r, dx, peak }, index) => (
-          <g key={dx} className={u.rockX} style={{ ['--dx' as string]: `${dx}px`, ['--i' as string]: index }}>
-            <circle cx={200} cy={74} r={r} fill={MYTH.magma} stroke={INK} strokeWidth={1.6} className={u.rockY} style={{ ['--peak' as string]: `${peak}px`, ['--i' as string]: index }} />
+          <g key={dx} className={u.rockX} style={cssVars({ '--dx': `${dx}px`, '--i': index })}>
+            <circle cx={200} cy={74} r={r} fill={MYTH.magma} stroke={INK} strokeWidth={1.6} className={u.rockY} style={cssVars({ '--peak': `${peak}px`, '--i': index })} />
           </g>
         ))}
 
