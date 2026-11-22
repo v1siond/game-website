@@ -14,7 +14,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Project } from '@/lib/cv/content'
 import { HitStar } from './backdrop'
 import { MarkedLines } from '@/components/cv/MarkedLines'
-import { BULLETS, BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
+import { BULLETS, BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard, staggerStep } from './cards'
 import { AllOutAttack } from './allOut'
 import { SlappedStatement, StampedCase } from './evidence'
 import { NOIR } from './palette'
@@ -205,7 +205,7 @@ const FRAMES: SectionFrames = {
             achievement: 'text-base text-[color:var(--noir-paper)]',
           }}
           renderAchievement={(achievement, index) => (
-            <span className={`flex items-center gap-4 ${world.hitRow}`} style={{ '--i': index } as CSSProperties}>
+            <span className={`flex items-center gap-4 ${world.hitRow}`} style={{ '--i': staggerStep(index) } as CSSProperties}>
               <span className={`relative block h-12 w-12 flex-shrink-0 ${world.burst}`} aria-hidden="true">
                 <HitStar className={`h-full w-full ${world.burstHover}`} />
               </span>

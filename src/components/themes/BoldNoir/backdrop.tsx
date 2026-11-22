@@ -48,6 +48,9 @@ const LETTER_TILTS = [-6, 4, -3, 7, -8, 2, 5, -4, 3, -7, 6, -2]
 const LETTER_DROPS = ['0em', '0.08em', '-0.06em', '0.12em', '-0.1em', '0.04em', '0.1em', '-0.04em']
 const LETTER_SIZES = ['text-[1em]', 'text-[0.86em]', 'text-[1.12em]', 'text-[0.94em]', 'text-[1.06em]']
 
+/** The last letter step of the ransom drop (45 ms each): a longer name lands its later letters together. */
+export const LAST_LETTER_STEP = 40
+
 /** The star that fills a word gap in ransom lettering. */
 function GapStar() {
   return (
@@ -78,7 +81,7 @@ export function RansomWord({ text, className = '', letterClassName = '' }: { tex
                 {
                   '--r': `${LETTER_TILTS[i % LETTER_TILTS.length]}deg`,
                   '--y': LETTER_DROPS[i % LETTER_DROPS.length],
-                  '--i': i,
+                  '--i': Math.min(i, LAST_LETTER_STEP),
                 } as CSSProperties
               }
             >

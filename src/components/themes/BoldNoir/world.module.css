@@ -336,8 +336,9 @@
   }
 }
 
-/* Each set plays once its frame is in view (data-on, sets.tsx): until then every part of it stands on its
-   first frame, so a set below the fold still plays when it is reached. */
+/* Each set plays once its frame is in view (data-on, sets.tsx): until then the frame's slam and every part
+   of it stand on their first frame, so a set below the fold still plays when it is reached. */
+.setFrame:not([data-on]),
 .setFrame:not([data-on]) * {
   animation-play-state: paused !important;
 }
