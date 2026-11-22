@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
+import { pixelRuns, type Run } from '@/lib/pixelRuns'
 import { RPG } from './palette'
-import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, pixelRuns, walkPose, type Facing, type Pose } from './sprite'
+import { COLOURS, EYES, HEART, PART_TOP, SPRITE, actionPose, walkPose, type Facing, type Pose } from './sprite'
 import sprite from './sprite.module.css'
 import rooms from './rooms.module.css'
 import type { PixelSprite } from './npcs'
@@ -10,14 +11,25 @@ import { PixelRuns } from '../shared/PixelRuns'
 // Him as the room walker (the pixel data in sprite.ts), drawn as one rect per run of a colour on the
 // 20 by 30 grid with crisp edges. Each component draws only the frames its place needs; sprite.module.css
 // shows one at a time by opacity in steps, the way sprite frames swap, and moves the whole sprite by
-// transform.
+// transform. The figures are memoised and their runs worked out once per rows and place, since every
+// sprite row is module data that never changes.
+
+const RUNS = new WeakMap<readonly string[], Map<string, Run[]>>()
+
+/** The rows' runs placed at `top` and `left`, from the cache once they have been worked out. */
+function runsOf(rows: readonly string[], top: number, left = 0): Run[] {
+  const placed = RUNS.get(rows) ?? new Map<string, Run[]>()
+  RUNS.set(rows, placed)
+  const at = `${top},${left}`
+  const known = placed.get(at)
+  if (known) return known
+  const runs = pixelRuns(rows, top, left)
+  placed.set(at, runs)
+  return runs
+}
 
 function Pixels({ pose, colours }: { pose: Pose; colours: Record<string, string> }) {
-  const runs = [
-    ...pixelRuns(pose.head, PART_TOP.head),
-    ...pixelRuns(pose.torso, PART_TOP.torso),
-    ...pixelRuns(pose.legs, PART_TOP.legs),
-  ]
+  const runs = [...runsOf(pose.head, PART_TOP.head), ...runsOf(pose.torso, PART_TOP.torso), ...runsOf(pose.legs, PART_TOP.legs)]
   return <PixelRuns runs={runs} colours={colours} />
 }
 
@@ -58,17 +70,18 @@ interface StageWalkerProps {
  * (--mx from the shared pointer hook on a parent). Hovering the stage is a battle moment: his soul shows
  * on his chest and he plays his profession's two frame action.
  */
-export function StageWalker({ profession, className = '' }: StageWalkerProps) {
+const FACINGS: ReadonlyArray<readonly [Facing, string]> = [
+  ['down', sprite.faceDown],
+  ['right', sprite.faceRight],
+  ['left', sprite.faceLeft],
+]
+
+export const StageWalker = memo(function StageWalker({ profession, className = '' }: StageWalkerProps) {
   const colours = COLOURS[profession]
-  const facings: ReadonlyArray<readonly [Facing, string]> = [
-    ['down', sprite.faceDown],
-    ['right', sprite.faceRight],
-    ['left', sprite.faceLeft],
-  ]
 
   return (
     <Sheet className={className}>
-      {facings.map(([facing, faceClass]) => (
+      {FACINGS.map(([facing, faceClass]) => (
         <g key={facing} className={`${sprite.stand} ${faceClass}`}>
           <Pixels pose={walkPose(profession, facing, 'stand')} colours={colours} />
         </g>
@@ -89,7 +102,7 @@ export function StageWalker({ profession, className = '' }: StageWalkerProps) {
       <ChestSoul className={sprite.soul} />
     </Sheet>
   )
-}
+})
 
 interface RoomWalkerProps {
   profession: Profession
@@ -103,7 +116,7 @@ interface RoomWalkerProps {
  * plays while a parent says so (data-phase="walk" in the encounter room, data-walk="on" at the save point,
  * read by sprite.module.css); the rest of the time he stands.
  */
-export function RoomWalker({ profession, facing, className = '' }: RoomWalkerProps) {
+export const RoomWalker = memo(function RoomWalker({ profession, facing, className = '' }: RoomWalkerProps) {
   const colours = COLOURS[profession]
 
   return (
@@ -120,7 +133,7 @@ export function RoomWalker({ profession, facing, className = '' }: RoomWalkerPro
       <ChestSoul className={sprite.savedSoul} />
     </Sheet>
   )
-}
+})
 
 /** The determination sparkle: four point pixel stars that burst round him when he saves. */
 export function Sparkles({ className = '' }: { className?: string }) {
@@ -142,7 +155,7 @@ export function Sparkles({ className = '' }: { className?: string }) {
 export function PixelArt({ sprite: { rows, colours }, x = 0, y = 0, className }: { sprite: PixelSprite; x?: number; y?: number; className?: string }) {
   return (
     <g className={className}>
-      <PixelRuns runs={pixelRuns(rows, y, x)} colours={colours} />
+      <PixelRuns runs={runsOf(rows, y, x)} colours={colours} />
     </g>
   )
 }
@@ -162,7 +175,7 @@ interface ActorProps {
  * walks (data-room="walk"), his rest facing once he has arrived, his action frames while it acts. The
  * room moves the whole actor by transform; rooms.module.css swaps the frames.
  */
-export function Actor({ profession, walk, rest, acts = false }: ActorProps) {
+export const Actor = memo(function Actor({ profession, walk, rest, acts = false }: ActorProps) {
   const colours = COLOURS[profession]
 
   return (
@@ -189,4 +202,4 @@ export function Actor({ profession, walk, rest, acts = false }: ActorProps) {
       )}
     </>
   )
-}
+})

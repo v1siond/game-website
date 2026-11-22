@@ -1,25 +1,22 @@
 /*
- * Services, the monster's turn (monsterTurn.tsx). The lane is a zero height line on the box's top edge;
- * the monster's feet stand on it. Each beat is one steps() animation on its track, its end steps the beat.
- * The box's opening is the world's own boxOpen (world.module.css, read through data-play); the shake waits
- * for the opening to finish. Transforms and opacity only; reduced motion never mounts any of it.
+ * Services, the monster's turn (monsterTurn.tsx). The monster stands on the box's top edge, its feet on
+ * the line. Each beat is one steps() animation on the monster, read from the stage's data-beat, and its end
+ * steps the beat. The box's opening is the world's own boxOpen (world.module.css, read from the same
+ * data-beat); the shake waits for the opening to finish. Transforms and opacity only; reduced motion never
+ * mounts the monster and leaves the box open.
  */
-
-.lane {
-  height: 0;
-}
 
 /* the closed box's line sits on the top edge, under the monster, and opens down from it */
 div.fromTop {
   transform-origin: 50% 0;
 }
 
-.place {
+.monster {
   right: 20%;
 }
 
 /* three hops in from the right, two frames each */
-.hopIn {
+.stage[data-beat='hop'] .monster {
   animation: hop-in 600ms steps(2, end) both;
 }
 
@@ -53,7 +50,7 @@ div.fromTop {
 }
 
 /* it sits on the box while the box opens under it */
-.sit {
+.stage[data-beat='sit'] .monster {
   transform-origin: bottom;
   animation: sit 500ms steps(1, end) both;
 }
@@ -68,7 +65,7 @@ div.fromTop {
   }
 }
 
-.hopOff {
+.stage[data-beat='off'] .monster {
   animation: hop-off 300ms steps(3, end) both;
 }
 
@@ -83,8 +80,10 @@ div.fromTop {
   }
 }
 
-/* the battle box shakes on the hit, two steps each way, once the box is open */
-.shake {
+/* the battle box shakes on the hit, two steps each way, once the box is open; the one animation runs on
+   from the landing through the hop off */
+.stage[data-beat='sit'] > .box,
+.stage[data-beat='off'] > .box {
   animation: shake 160ms steps(1, end) 420ms both;
 }
 

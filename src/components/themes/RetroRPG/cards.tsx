@@ -5,12 +5,13 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { cssVars } from '@/lib/cssVars'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
+import type { VentureSlot } from '@/components/cv/VentureList'
 import type { CVData, Job } from '@/lib/cv/content'
-import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
 import { MONO, PIXEL } from './palette'
-import { Command, FOCUS } from './actions'
+import { Command } from './actions'
 import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
 import { usePlay } from './play'
 import { Soul } from './soul'
@@ -45,7 +46,7 @@ function Tags({ items, label }: { items: string[]; label: string }) {
   )
 }
 
-function Said({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
+function SaidLine({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
     <li className={`flex items-start gap-2 ${BODY} ${className}`} style={style}>
       <Mark />
@@ -86,9 +87,9 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         {entry.highlights.length > 0 && (
           <ul className="space-y-2" aria-label={cards.keyAchievements}>
             {entry.highlights.map((highlight, index) => (
-              <Said key={highlight} className={world.after} style={lineDelay(index)}>
+              <SaidLine key={highlight} className={world.after} style={lineDelay(index)}>
                 {highlight}
-              </Said>
+              </SaidLine>
             ))}
           </ul>
         )}
@@ -117,7 +118,7 @@ const JUMP: Keyframe[] = [{ transform: 'translateY(0)' }, { transform: 'translat
 
 const stepped = (duration: number, frames: number, delay = 0): KeyframeAnimationOptions => ({ duration, delay, easing: `steps(${frames}, end)` })
 
-export function ProjectCard({ project, years, links }: ProjectSlot) {
+export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
   const labels = useLabels()
   const aimedAt = useRef(0)
   const body = useRef<HTMLDivElement>(null)
@@ -159,7 +160,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           </p>
         )}
         <Tags items={project.techStack.slice(0, 4)} label={labels.cards.technologiesUsed} />
-        {links.length > 0 ? (
+        {links.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map(({ kind, label, linkProps }) => (
               <Command key={kind} {...linkProps}>
@@ -167,9 +168,8 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
               </Command>
             ))}
           </div>
-        ) : (
-          <p className={`mt-4 ${BODY}`}>{labels.links.noPublicLink}</p>
         )}
+        {noLink && <p className={`mt-4 ${BODY}`}>{noLink}</p>}
         <div className={`relative mt-4 h-6 border-2 border-[color:var(--rpg-text)] ${world.meter}`} aria-hidden="true">
           <span className="absolute inset-y-0 left-1/2 w-1 -translate-x-1/2 bg-[color:var(--rpg-gold)]" />
           <span className={`absolute inset-0 ${world.meterLine}`}>
@@ -184,16 +184,13 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
 
 // A venture as a dialogue box; one of his own products (featured) is a wider box ruled in gold with a
 // gold pixel tag over the name.
-export function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
+  const { cards } = useLabels()
 
   return (
     <a
-      href={company.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)] md:col-span-3' : 'md:col-span-2'} ${world.box} ${world.pick} ${FOCUS}`}
-      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
+      {...linkProps}
+      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)]' : ''} ${world.box} ${world.pick}`}
     >
       {company.featured && (
         <p className={`mb-3 inline-block bg-[color:var(--rpg-gold)] px-2 py-1 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-void)] ${PIXEL}`}>
@@ -223,8 +220,7 @@ export function CompanyCard({ company }: { company: CVData['companies'][number] 
   )
 }
 
-export function BandCard({ band, years, linkProps }: BandSlot) {
-  const labels = useLabels()
+export function BandCard({ band, years, linkProps, release }: BandSlot) {
   const content = (
     <div className={`p-4 sm:p-5 ${world.box}`}>
       <h3 className={`flex items-start gap-2 ${TITLE} group-hover:text-[color:var(--rpg-gold)] group-focus-visible:text-[color:var(--rpg-gold)]`}>
@@ -236,9 +232,9 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> | </span>}
         {years && <span>{years}</span>}
       </p>
-      {band.release && (
+      {release && (
         <p className={`mt-2 ${BODY}`}>
-          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </div>
@@ -246,7 +242,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 
   if (!linkProps) return <div className={`group ${world.pick}`}>{content}</div>
   return (
-    <a {...linkProps} className={`group block ${world.pick} ${FOCUS}`}>
+    <a {...linkProps} className={`group block ${world.pick}`}>
       {content}
     </a>
   )

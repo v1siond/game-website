@@ -1,6 +1,6 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { useStoreValue, useZoneStage, type ValueStore } from '@/hooks/useZoneStage'
 import { PieEyes } from './art'
 import { HOSE } from './palette'
@@ -66,10 +66,10 @@ function Meadow() {
 function Carnival() {
   return (
     <>
-      <rect width={400} height={300} fill="#e7d9c4" />
+      <rect width={400} height={300} fill={HOSE.carnivalWash} />
       <path d="M0 150 L40 90 L70 140 L110 70 L150 150 Z M250 150 L300 80 L330 130 L360 96 L400 150 Z" fill={HOSE.shadow} opacity={0.35} />
       <g transform="translate(320 150)">
-        <g className={stage.wheel}>
+        <g className="motion-safe:animate-[spin_30s_linear_infinite]">
           <circle r={56} fill="none" stroke={HOSE.inkSoft} strokeWidth={3} />
           {[0, 45, 90, 135].map((a) => (
             <path key={a} d="M-56 0 H56" stroke={HOSE.inkSoft} strokeWidth={2} transform={`rotate(${a})`} />
@@ -97,7 +97,7 @@ function Casino() {
           <path d="M-9 9 Q0 16 9 9" fill="none" stroke={HOSE.ink} strokeWidth={2} strokeLinecap="round" />
         </g>
       </g>
-      <path d="M0 220 Q200 190 400 220 V300 H0 Z" fill="#2f5a3a" stroke={HOSE.ink} strokeWidth={2.4} />
+      <path d="M0 220 Q200 190 400 220 V300 H0 Z" fill={HOSE.feltGreen} stroke={HOSE.ink} strokeWidth={2.4} />
       <path d="M0 0 Q30 120 0 300 H-1 Z M0 0 H70 Q40 140 60 300 H0 Z" fill={HOSE.redDark} />
       <path d="M400 0 H330 Q360 140 340 300 H400 Z" fill={HOSE.redDark} />
     </>
@@ -107,7 +107,7 @@ function Casino() {
 const DRAWN: Record<Isle, () => ReactNode> = { meadow: Meadow, carnival: Carnival, casino: Casino }
 
 /** The fixed painted backdrop, showing the isle the page is on. */
-export function Isles({ zones }: { zones: ValueStore<Isle> }) {
+export const Isles = memo(function Isles({ zones }: { zones: ValueStore<Isle> }) {
   const current = useStoreValue(zones)
   return (
     <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
@@ -123,14 +123,22 @@ export function Isles({ zones }: { zones: ValueStore<Isle> }) {
       })}
     </div>
   )
+})
+
+/** What a section draws on its isle: the section itself, or a function of whether it has come into view. */
+type IsleChildren = ReactNode | ((on: boolean) => ReactNode)
+
+function drawnOnIsle(children: IsleChildren, on: boolean): ReactNode {
+  if (typeof children === 'function') return children(on)
+  return children
 }
 
 /** A section's place on an isle: hands the isle up while in view, and says when it first came into view. */
-export function IsleStage({ isle, className = '', children }: { isle: Isle; className?: string; children: (on: boolean) => ReactNode }) {
+export function IsleStage({ isle, className = '', children }: { isle: Isle; className?: string; children: IsleChildren }) {
   const { ref, on } = useZoneStage<Isle>(isle)
   return (
     <div ref={ref} className={className}>
-      {children(on)}
+      {drawnOnIsle(children, on)}
     </div>
   )
 }

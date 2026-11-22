@@ -46,13 +46,18 @@
   transform-origin: 50% 50%;
 }
 
+/* The services box (monsterTurn.tsx) reads the monster's beat instead: closed while it hops in, opening from
+   its landing on. */
 [data-play='idle'] .opens,
-[data-play='idle'].opens {
+[data-play='idle'].opens,
+[data-beat='hop'] .opens {
   transform: scale(0.04, 0.04);
 }
 
 [data-play='on'] .opens,
-[data-play='on'].opens {
+[data-play='on'].opens,
+[data-beat='sit'] .opens,
+[data-beat='off'] .opens {
   animation: boxOpen 420ms steps(7, end) both;
 }
 

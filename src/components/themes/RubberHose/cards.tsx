@@ -1,7 +1,9 @@
+import { useId } from 'react'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
+import type { VentureSlot } from '@/components/cv/VentureList'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
@@ -92,7 +94,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 const LINK_BUTTON = `inline-flex min-h-[44px] items-center px-4 text-sm tracking-wider transition-transform hover:scale-105 motion-reduce:transition-none ${world.button} ${world.buttonRed}`
 
 // A project on a show poster: the name, the years, his role, the result line and the links.
-export function VintagePoster({ project, years, links }: ProjectSlot) {
+export function VintagePoster({ project, years, links, noLink }: ProjectSlot) {
   const labels = useLabels()
   return (
     <article className={`group relative h-full p-4 ${world.poster}`}>
@@ -113,7 +115,7 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
         </p>
       )}
       <Chips items={project.techStack} label={labels.cards.technologiesUsed} />
-      {links.length > 0 ? (
+      {links.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-3">
           {links.map(({ kind, label, linkProps }) => (
             <a key={kind} {...linkProps} className={LINK_BUTTON}>
@@ -121,26 +123,19 @@ export function VintagePoster({ project, years, links }: ProjectSlot) {
             </a>
           ))}
         </div>
-      ) : (
-        <p className={`mt-4 italic ${BODY}`}>{labels.links.noPublicLink}</p>
       )}
+      {noLink && <p className={`mt-4 italic ${BODY}`}>{noLink}</p>}
     </article>
   )
 }
 
 // A venture as a vintage advertisement, the whole poster its link. One of his own products (featured)
 // is a wider poster with an inked roundel over the name, the way a 1930s bill shouts its headliner.
-export function CompanyPoster({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+export function CompanyPoster({ venture: company, linkProps }: VentureSlot) {
+  const { cards } = useLabels()
 
   return (
-    <a
-      href={company.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}
-      aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
-    >
+    <a {...linkProps} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
       <CornerTicks />
       <InkBlot />
       {company.featured && (
@@ -166,18 +161,19 @@ export function CompanyPoster({ company }: { company: CVData['companies'][number
 
 // A band on a record label on the shop shelf: the disc in the corner spins up when the pointer lands
 // on the record, his role, the years and the release.
-export function BandRecord({ band, years, linkProps }: BandSlot) {
-  const labels = useLabels()
+export function BandRecord({ band, years, linkProps, release }: BandSlot) {
+  // The disc's sheen, one id per record so no two cards share it.
+  const sheen = useId()
   const content = (
-    <article className={`group relative h-full p-4 ${world.poster} ${styles.record}`} tabIndex={linkProps ? undefined : -1}>
+    <article className={`group relative h-full p-4 ${world.poster} ${styles.record}`}>
       <svg viewBox="0 0 48 48" className={`absolute -right-3 -top-3 h-14 w-14 ${styles.disc}`} aria-hidden="true" focusable="false">
         <defs>
-          <radialGradient id="hose-disc-sheen" cx="0.35" cy="0.3" r="0.8">
+          <radialGradient id={sheen} cx="0.35" cy="0.3" r="0.8">
             <stop offset="0" stopColor={HOSE.inkSoft} />
             <stop offset="1" stopColor={HOSE.ink} />
           </radialGradient>
         </defs>
-        <circle cx={24} cy={24} r={23} fill="url(#hose-disc-sheen)" />
+        <circle cx={24} cy={24} r={23} fill={`url(#${sheen})`} />
         <path d="M10 14 Q16 8 24 7" fill="none" stroke={HOSE.shadow} strokeWidth={1.4} strokeLinecap="round" />
         <circle cx={24} cy={24} r={16} fill="none" stroke={HOSE.inkSoft} strokeWidth={1} />
         <circle cx={24} cy={24} r={8} fill={HOSE.redDark} />
@@ -189,9 +185,9 @@ export function BandRecord({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> • </span>}
         {years && <span>{years}</span>}
       </p>
-      {band.release && (
+      {release && (
         <p className={`mt-2 ${BODY}`}>
-          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </article>

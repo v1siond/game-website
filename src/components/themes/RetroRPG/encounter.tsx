@@ -7,6 +7,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePreview } from '@/themes/PreviewContext'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { RoomWalker, StageWalker } from './walker'
+import { Bang } from './rooms'
 import sprite from './sprite.module.css'
 import { PIXEL, RPG } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -60,16 +61,13 @@ function useEncounterPhase() {
   const skip = reduced || preview
 
   useEffect(() => {
-    if (skip) {
-      setPhase('ready')
-      return
-    }
-    if (!triggered) return
-    const timers = PHASE_AT.map(([next, at]) => window.setTimeout(() => setPhase((now) => (now === 'ready' ? now : next)), at))
+    if (skip || !triggered) return
+    const timers = PHASE_AT.map(([next, at]) => window.setTimeout(() => setPhase(next), at))
     return () => timers.forEach(window.clearTimeout)
   }, [triggered, skip])
 
-  return { ref, phase, skip }
+  // Reduced motion and a preview show the end, read straight from skip rather than stored a commit later.
+  return { ref, phase: skip ? 'ready' : phase, skip }
 }
 
 /** Counts profession switches after the first render, so the flash and the turn play only on a switch. */
@@ -159,13 +157,11 @@ function BattleBackdrop() {
   )
 }
 
-/** The exclamation mark over his head: white pixels in a black outlined bubble. */
+/** The exclamation mark over his head. */
 function Alert() {
   return (
     <svg viewBox="0 0 9 12" className={`h-8 w-6 ${world.alert}`} aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      <path d="M2 0 H7 V1 H8 V9 H7 V10 H5 V12 H4 V10 H2 V9 H1 V1 H2 Z" fill={RPG.void} />
-      <rect x={4} y={2} width={1} height={5} fill={RPG.text} />
-      <rect x={4} y={8} width={1} height={1} fill={RPG.text} />
+      <Bang />
     </svg>
   )
 }

@@ -54,7 +54,7 @@ export function SavePoint({ profession }: { profession: Profession }) {
           <button
             type="button"
             onClick={() => setSaves((n) => n + 1)}
-            className="relative h-14 w-14 p-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--rpg-text)]"
+            className="relative h-14 w-14 p-1"
             aria-label={labels.actions.spinStar}
           >
             <span key={saves} className={`block h-full w-full ${saved ? world.saveSpin : ''}`}>

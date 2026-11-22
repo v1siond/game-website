@@ -52,10 +52,6 @@
     animation: bob 1s steps(2) infinite;
   }
 
-  .wheel {
-    animation: spin 30s linear infinite;
-  }
-
   .bassDrum {
     animation: bob 0.5s steps(2) infinite;
   }
@@ -83,12 +79,6 @@
 @keyframes bob {
   to {
     transform: translate3d(0, -4px, 0) scale(1.03, 0.97);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 

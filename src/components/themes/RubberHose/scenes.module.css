@@ -394,14 +394,7 @@
 }
 
 .sunRays {
-  animation: spin 12s linear infinite;
   transform-origin: 50% 50%;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -438,7 +431,6 @@
   .slapHand,
   .pinkFlash,
   .superSpin > *,
-  .sunRays,
   .bellBox:hover .bell {
     animation: none;
   }

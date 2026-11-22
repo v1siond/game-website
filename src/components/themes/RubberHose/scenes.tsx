@@ -45,12 +45,11 @@ export function TitleCardIntro({ children }: { children: (look: IntroLook) => Re
   const isPreview = usePreview()
   const [phase, setPhase] = useState<IntroPhase>('wait')
   const skip = reducedMotion || isPreview
+  // Reduced motion and a preview start on the end, read straight from skip rather than stored a commit later.
+  const shown = skip ? 'pop' : phase
 
   useEffect(() => {
-    if (skip) {
-      setPhase('pop')
-      return
-    }
+    if (skip) return
     const timers = [
       setTimeout(() => setPhase('drop'), INTRO_TIMING.drop),
       setTimeout(() => setPhase('pop'), INTRO_TIMING.pop),
@@ -65,7 +64,7 @@ export function TitleCardIntro({ children }: { children: (look: IntroLook) => Re
           <IrisRing className={`${styles.iris} ${styles.irisOpen}`} />
         </div>
       )}
-      {children(INTRO_LOOK[phase])}
+      {children(INTRO_LOOK[shown])}
     </div>
   )
 }
@@ -94,9 +93,6 @@ export function Reveal({ children, className = '' }: { children: (look: RevealLo
     </div>
   )
 }
-
-// Re-exported for the sections and the root, which take their scene pieces from this module.
-export { staggerAt } from '../shared/stagger'
 
 // A stop's place along the bar, 0 to 1, as the --at variable its flag reads.
 const stopAt = (index: number, stops: number) => cssVars({ '--at': stops > 1 ? index / (stops - 1) : 1 })
@@ -129,7 +125,7 @@ export function RunBar({ profession, stops }: { profession: Profession; stops: n
 function Sun() {
   return (
     <svg viewBox="0 0 80 80" className={`h-24 w-24 sm:h-28 sm:w-28 ${world.inked}`} aria-hidden="true" focusable="false">
-      <g className={styles.sunRays}>
+      <g className={`motion-safe:animate-[spin_12s_linear_infinite] ${styles.sunRays}`}>
         {[0, 30, 60, 90, 120, 150].map((angle) => (
           <path key={angle} d="M37 2 Q40 -2 43 2 L41 78 Q40 80 39 78 Z" fill={HOSE.gold} transform={`rotate(${angle} 40 40)`} />
         ))}

@@ -1,12 +1,11 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MONO, PIXEL, RPG } from './palette'
-import { FOCUS } from './actions'
 import { DUMMY, FLOWER, KEEPER, KEEPER_PAW, MONSTER, PORTRAIT_OPEN, PORTRAIT_SHUT, SENTRY, type PixelSprite } from './npcs'
 import { RoomOpen } from './play'
 import { Soul } from './soul'
@@ -44,17 +43,15 @@ function useRoom(zone: Zone, beat: Beat) {
   const { ref, on, reduced } = useZoneStage(zone)
   const preview = usePreview()
   const [take, setTake] = useState(0)
-  const [room, setRoom] = useState<RoomPhase>('idle')
+  const [played, setRoom] = useState<RoomPhase>('idle')
   const [shown, setShown] = useState(false)
   const skip = reduced || preview
+  // Reduced motion and a preview open on done, read straight from skip rather than stored a commit later.
+  const room = skip ? 'done' : played
   if (room === 'done' && !shown) setShown(true)
 
   useEffect(() => {
-    if (skip) {
-      setRoom('done')
-      return
-    }
-    if (!on) return
+    if (skip || !on) return
     setRoom('walk')
     const timers = [window.setTimeout(() => setRoom('act'), beat.act), window.setTimeout(() => setRoom('done'), beat.done)]
     return () => timers.forEach(window.clearTimeout)
@@ -94,7 +91,7 @@ function Room({ zone, beat, art, overlay, replay, className = '', children }: Ro
           <button
             type="button"
             onClick={again}
-            className={`min-h-[44px] border-[3px] border-[color:var(--rpg-orange)] bg-[color:var(--rpg-void)] px-3 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-orange)] hover:border-[color:var(--rpg-gold)] hover:text-[color:var(--rpg-gold)] ${PIXEL} ${FOCUS}`}
+            className={`min-h-[44px] border-[3px] border-[color:var(--rpg-orange)] bg-[color:var(--rpg-void)] px-3 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-orange)] hover:border-[color:var(--rpg-gold)] hover:text-[color:var(--rpg-gold)] ${PIXEL}`}
           >
             {replay}
           </button>
@@ -125,7 +122,8 @@ function Big({ sprite, x, y, scale = 2, className }: { sprite: PixelSprite; x: n
   )
 }
 
-const goldOf = (sprite: PixelSprite): PixelSprite => ({ ...sprite, colours: { ...sprite.colours, W: RPG.gold } })
+// The spared monster, its white drawn gold, built once at load rather than per render.
+const GOLD_MONSTER: PixelSprite = { ...MONSTER, colours: { ...MONSTER.colours, W: RPG.gold } }
 
 // ---------------------------------------------------------------- About
 
@@ -141,7 +139,7 @@ export function EncounterRoom({ children }: { children: ReactNode }) {
         </g>
       </g>
       <g className={rooms.spareable}>
-        <Big sprite={goldOf(MONSTER)} x={176} y={30} scale={3} />
+        <Big sprite={GOLD_MONSTER} x={176} y={30} scale={3} />
       </g>
     </>
   )
@@ -176,15 +174,24 @@ function Pines() {
   )
 }
 
-/** The bang over the sentry: white pixels in a black bubble. Its place is on the outer group, since the
- * bang's CSS transform would replace an SVG transform attribute on the same element. */
-function Bang({ x, y }: { x: number; y: number }) {
+/** The exclamation mark: white pixels in a black outlined bubble, on a 9 by 12 grid. */
+export function Bang() {
+  return (
+    <>
+      <path d="M2 0 H7 V1 H8 V9 H7 V10 H5 V12 H4 V10 H2 V9 H1 V1 H2 Z" fill={RPG.void} />
+      <rect x={4} y={2} width={1} height={5} fill={RPG.text} />
+      <rect x={4} y={8} width={1} height={1} fill={RPG.text} />
+    </>
+  )
+}
+
+/** The bang over the sentry. Its place is on the outer group, since the bang's CSS transform would replace an
+ * SVG transform attribute on the same element. */
+function SentryBang({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <g className={rooms.bang}>
-        <path d="M2 0 H7 V1 H8 V9 H7 V10 H5 V12 H4 V10 H2 V9 H1 V1 H2 Z" fill={RPG.void} />
-        <rect x={4} y={2} width={1} height={5} fill={RPG.text} />
-        <rect x={4} y={8} width={1} height={1} fill={RPG.text} />
+        <Bang />
       </g>
     </g>
   )
@@ -205,7 +212,7 @@ export function SentryRoom({ profession, children }: { profession: Profession; c
       <Big sprite={SENTRY} x={256} y={32} className={rooms.sentry} />
       <rect x="236" y="50" width="64" height="20" fill={RPG.wood} />
       <rect x="236" y="50" width="64" height="3" fill={RPG.woodDark} />
-      <Bang x={276} y={14} />
+      <SentryBang x={276} y={14} />
       <Walker profession={profession} className="[--walk-from:-24px] [--walk-ms:1400ms] [--walk-steps:10] [--walk-to:200px] [--walk-y:44px]" />
     </>
   )
@@ -376,30 +383,48 @@ export function StreetRoom({ profession, children }: { profession: Profession; c
 
 // ---------------------------------------------------------------- Bands
 
+// A flower before he passes it: its petals in the bridge's water line, built once at load.
+const DIM_FLOWER: PixelSprite = { ...FLOWER, colours: { ...FLOWER.colours, C: RPG.waterLine, c: RPG.waterLine } }
+
 const BRIDGE_FROM = -24
 const BRIDGE_TO = 300
 const BRIDGE_MS = 2200
 
 /** Where each band's flower stands on the bridge and when his feet reach it. */
-export function flowerSpots(count: number): Array<{ x: number; at: number }> {
+function flowerSpots(count: number): Array<{ x: number; at: number }> {
   if (count <= 0) return []
-  const gap = 280 / Math.max(count, 1)
+  const gap = 280 / count
   return Array.from({ length: count }, (_, index) => {
     const x = Math.round(20 + gap * index + gap / 2 - 3)
     return { x, at: Math.round(((x - 10 - BRIDGE_FROM) / (BRIDGE_TO - BRIDGE_FROM)) * BRIDGE_MS) }
   })
 }
 
+// Rings the flower of the band at an index again. The bridge owns which flower rings, so pointing at a band
+// redraws the bridge only, never the band cards: they read this stable setter from the context.
+const RingFlower = createContext<(index: number) => void>(() => {})
+
+/** A band on the bridge: pointing at it or focusing it rings its flower again. */
+export function RingsFlower({ index, children }: { index: number; children: ReactNode }) {
+  const ring = useContext(RingFlower)
+  return (
+    <div onPointerEnter={() => ring(index)} onFocus={() => ring(index)}>
+      {children}
+    </div>
+  )
+}
+
 interface BridgeRoomProps {
   profession: Profession
   /** How many bands, one flower each. */
   count: number
-  /** The band under the pointer, whose flower rings again; its take replays the ring. */
-  ringing: { index: number; take: number } | null
   children: ReactNode
 }
 
-export function BridgeRoom({ profession, count, ringing, children }: BridgeRoomProps) {
+export function BridgeRoom({ profession, count, children }: BridgeRoomProps) {
+  // The band under the pointer, whose flower rings again; its take replays the ring.
+  const [ringing, setRinging] = useState<{ index: number; take: number } | null>(null)
+  const ring = useCallback((index: number) => setRinging((now) => ({ index, take: (now?.take ?? 0) + 1 })), [])
   const art = (
     <>
       <rect width="320" height="80" fill={RPG.waterFloor} />
@@ -415,7 +440,7 @@ export function BridgeRoom({ profession, count, ringing, children }: BridgeRoomP
       {flowerSpots(count).map(({ x, at }, index) => (
         <g key={x} className={ringing?.index === index ? rooms.ringing : ''} style={{ ['--ring-at' as string]: `${at}ms` }}>
           <g transform={`translate(${x} 38) scale(2)`}>
-            <PixelArt sprite={{ ...FLOWER, colours: { ...FLOWER.colours, C: RPG.waterLine, c: RPG.waterLine } }} />
+            <PixelArt sprite={DIM_FLOWER} />
             <PixelArt sprite={FLOWER} className={rooms.flowerLit} />
           </g>
           <circle key={ringing?.index === index ? ringing.take : 0} cx={x + 7} cy={44} r={6} fill="none" stroke={RPG.glow} strokeWidth="1" className={rooms.ring} />
@@ -427,7 +452,7 @@ export function BridgeRoom({ profession, count, ringing, children }: BridgeRoomP
 
   return (
     <Room zone="water" beat={{ act: BRIDGE_MS, done: BRIDGE_MS + 100 }} art={art}>
-      {children}
+      <RingFlower.Provider value={ring}>{children}</RingFlower.Provider>
     </Room>
   )
 }
