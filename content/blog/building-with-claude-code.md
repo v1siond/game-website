@@ -13,7 +13,7 @@
   ],
   "draft": true
 }
-From 2026-05-24 to 2026-11-13 I made 3,703 commits to Nebulith, my game engine and map editor, with Claude Code writing the code. That is 5 commits in May, none in August, 1,713 in the first 13 days of November, and 25 reverts along the way. Here are the numbers month by month, the gaps, what got thrown away and what shipped.
+From 2026-05-24 to 2026-11-13 Nebulith, my game engine and map editor, got 3,703 commits, every one of them made in a Claude Code session that I directed. That is 5 commits in May, none in August, 1,713 in the first 13 days of November, and 25 reverts along the way. Here are the numbers month by month, the gaps, what got thrown away and what shipped.
 
 ![Bar chart of Nebulith commits per month in 2026: 5, 243, 442, none in August, 526, 774 and 1,713, with reverts per month below](/blog/building-with-claude-code/commits-per-month.png)
 
@@ -30,19 +30,18 @@ The chart comes from one line of git, which you can run on any repo of yours.
 Output of the count per month, run on 2026-11-21:
 
 ```text
-$ bash -c git log staging --format=%ad --date=format:%Y-%m | sort | uniq -c
+$ git log staging --format=%ad --date=format:%Y-%m | sort | uniq -c
       5 2026-05
     243 2026-06
     442 2026-07
     526 2026-09
     774 2026-10
    1713 2026-11
-exit 0
 ```
 
 There were commits on 76 days. The busiest was 2026-11-05 with 333, then 2026-10-21 with 264.
 
-Every one of those commits carries my name, and every line in them was written in a Claude Code session. I decide what gets built, read what comes back, test it in the browser and say what is wrong. The agents write the code and the commits. I keep a note in my setup that says it plainly, "every line of code in this project was written in a Claude session", so no session ever talks about any of it as somebody else's.
+Every one of those commits carries my name. Claude Code sessions wrote the code and the commits; I decide what gets built, read what comes back, test it in the browser and say what is wrong.
 
 ## The gaps
 
@@ -50,7 +49,7 @@ Three stretches have no commits at all:
 
 - 23 days, from 05-29 to 06-21, between the first editor and the RPG engine;
 - 44 days, from 07-27 to 09-09, all of August, in every repo of the project;
-- 19 days, from 09-25 to 10-14, when the work moved to a laptop and the ticket doc was lost in the handoff. The first commit after it, `1e177ef2`, is a rebuilt plan called phase A.
+- 19 days, from 09-25 to 10-14, when the work moved to a laptop and the ticket doc was lost in the handoff. The first commit after it, `1e177ef2`, is the first commit of a rebuilt plan, phase A.
 
 So the 3,703 commits sit on 76 days out of the 174 between the first and the last.
 
@@ -59,19 +58,18 @@ So the 3,703 commits sit on 76 days out of the 174 between the first and the las
 Output of the revert count:
 
 ```text
-$ bash -c git log staging --format=%s | grep -ci "^revert"
+$ git log staging --format=%s | grep -ci "^revert"
 25
-exit 0
 ```
 
-The messiest day was 2026-06-24. Five ways of drawing the isometric buildings went in and out that day: cubes, billboards, boxes, tiles and voxel houses, with reverts of reverts in between. On 06-25 all five were discarded back to one known good commit (`29e39ee2`). The real cause turned up a commit later (`a44b8d0a`): building cells lost their label in `placeAsset`, so every cell fell through to the voxel house renderer.
+The messiest day was 2026-06-24. Five ways of drawing the isometric buildings went in and out that day: cubes, billboards, boxes, tiles and voxel houses, with reverts of reverts in between. On 06-25 all five were discarded in one commit (`29e39ee2`) back to the known good state of `aa8a34f`. The real cause turned up a commit later (`a44b8d0a`): building cells lost their label in `placeAsset`, so every cell fell through to the voxel house renderer.
+
+On 06-23, the day before the messiest day, I started a prompt log with one rule at the top: write down every prompt, validate a solution before calling it done, and work surgically. That log is 3,931 lines today, and it is where most of the June and July story is kept.
 
 Two more from September:
 
 - On 09-13 the agent had added exit gates to the generator that I never asked for, while the meadow already had the entrance I had approved. Its own revert message reads "remove the exit gates I invented" (`ba4c7ccc`).
 - On 09-15 a rewrite of the forest entrance went back out, keeping only the canopy art (`f9abb657`).
-
-The day before, on 06-23, I started a prompt log with one rule at the top: write down every prompt, validate a solution before calling it done, and work surgically. That log is 3,931 lines today, and it is where most of the June and July story is kept.
 
 ## What shipped, phase by phase
 
@@ -89,7 +87,7 @@ The day before, on 06-23, I started a prompt log with one rule at the top: write
 
 November has 1,713 commits in 13 days. From 11-05 on, commits name the ticket they serve, like `fix(#250.11)`: 810 of them, across 118 tickets from #14 to #253. By type, November is 566 fixes, 257 performance changes and 240 features, and the rest are tests, docs and plain sentence subjects.
 
-That is the month the agent workflow in [my Claude Code skills](/blog/claude-code-skills) ran the work: a director agent sizes each ticket and other agents build, test and review it. The commits also got smaller. The median commit changed 70 lines in November, 95 in October and 152 in September, so part of the taller bar is smaller commits.
+That is the month the agent workflow in [my Claude Code skills](/blog/claude-code-skills) ran the work: a director agent sizes each ticket and other agents build, test and review it. The commits also got smaller than in the autumn before it: the median commit changed 152 lines in September, 95 in October and 70 in November. June and July sat at 83 and 84, so September was the peak and November the low, and part of the taller bar is smaller commits.
 
 ## Where it stands
 
