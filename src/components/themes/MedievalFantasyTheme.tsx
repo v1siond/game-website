@@ -89,9 +89,9 @@ export default function MedievalFantasyTheme() {
                       <p style={{ color: REALM.textBright, fontSize: '0.875rem' }}>{line}</p>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                      <HeroActions actions={actions} zone="roc" />
-                      <RealmButton href="/cv" zone="roc">{actionLabels.cv}</RealmButton>
-                      <RealmButton linkProps={ENGINE_LINK} zone="roc">{actionLabels.engine}</RealmButton>
+                      <HeroActions actions={actions} />
+                      <RealmButton href="/cv">{actionLabels.cv}</RealmButton>
+                      <RealmButton linkProps={ENGINE_LINK}>{actionLabels.engine}</RealmButton>
                       <LanguageSwitcher render={(state) => <RealmLanguageMenu {...state} />} />
                     </div>
                   </div>
@@ -163,8 +163,8 @@ export default function MedievalFantasyTheme() {
                   </h2>
                   <p style={{ color: REALM.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    <HeroActions actions={actions} zone="ft" />
-                    <RealmButton href="/cv" zone="ft">{actionLabels.cv}</RealmButton>
+                    <HeroActions actions={actions} />
+                    <RealmButton href="/cv">{actionLabels.cv}</RealmButton>
                   </div>
                 </>
               )}

@@ -105,8 +105,6 @@ export function FrostHero() {
         <rect x="60" y="175" width="80" height="15" fill={REALM.night15a} />
         <path d="M60,175 L140,175 M60,190 L140,190" stroke="url(#goldTrim)" strokeWidth="1.5" fill="none" />
         <ellipse cx="100" cy="182" rx="10" ry="7" fill={REALM.night22} />
-        <circle cx="96" cy="180" rx="2" fill={REALM.night9c} />
-        <circle cx="104" cy="180" rx="2" fill={REALM.night9c} />
       </g>
 
       {/* === MASSIVE SHOULDER PAULDRONS with spikes === */}

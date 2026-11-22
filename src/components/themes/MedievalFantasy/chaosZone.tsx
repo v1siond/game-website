@@ -82,9 +82,6 @@ function flashOverlayAlpha(brightness: number): number {
 const METEOR_RAIN: Record<'left' | 'right', string> = { left: chaos.meteorRainLeft, right: chaos.meteorRainRight }
 
 export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
-  const lightningActive = false
-  const lightningX = 50
-  const cloudGlow = 0
   const [ambientFlash, setAmbientFlash] = useState(false)
   const [ambientFlashX, setAmbientFlashX] = useState(30)
   // Cloud zones for realistic sequential flashing (left, center-left, center, center-right, right)
@@ -726,90 +723,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           <polygon points="180,795 195,780 215,792" fill={REALM.ember18} opacity="0.5" />
           <polygon points="380,798 398,785 418,795" fill={REALM.ember16} opacity="0.4" />
           <polygon points="760,796 775,783 792,794" fill={REALM.ember16} opacity="0.4" />
-
-          {/* === HORDE WAR BANNER - Hidden here, rendered as fixed element above infernals === */}
-          <g transform="translate(200, 520) rotate(-10)" className="war-banner" opacity="0">
-            {/* Dirt mound at pole base - dark brownish like visible flagpole */}
-            <ellipse cx="6" cy="235" rx="25" ry="10" fill={REALM.stone5b} />
-            <ellipse cx="6" cy="233" rx="20" ry="8" fill={REALM.stone7a} />
-            <ellipse cx="6" cy="231" rx="12" ry="5" fill={REALM.stone9} />
-            {/* Small dirt clumps around base */}
-            <ellipse cx="-12" cy="238" rx="8" ry="4" fill={REALM.stone5b} opacity="0.7" />
-            <ellipse cx="22" cy="240" rx="10" ry="5" fill={REALM.stone7a} opacity="0.6" />
-            {/* Grass tufts growing from dirt - olive-green */}
-            <path d="M-8,232 Q-10,222 -6,218" stroke={REALM.chaosGrassOlive} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-            <path d="M18,234 Q22,224 19,220" stroke={REALM.chaosGrassYellow} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-            <path d="M-15,236 Q-18,228 -14,225" stroke={REALM.chaosGrassDark} strokeWidth="1.2" fill="none" strokeLinecap="round" />
-
-            {/* Banner pole */}
-            <rect x="0" y="0" width="12" height="230" fill={REALM.ember15} />
-            <rect x="2" y="0" width="8" height="230" fill={REALM.ember21a} />
-            <rect x="4" y="5" width="4" height="220" fill={REALM.ember27} opacity="0.5" />
-            {/* Pole top spike */}
-            <polygon points="6,-30 -4,5 16,5" fill={REALM.ember28} />
-            <polygon points="6,-25 0,3 12,3" fill={REALM.ember34} />
-            {/* Banner fabric with wave columns - Horde skull centered and sliced across columns */}
-            <g transform="translate(12, 15)" className="banner-fabric">
-              {/* Define clipping regions for skull parts - skull centered at x=44 */}
-              <defs>
-                <clipPath id="bannerCol1"><rect x="0" y="0" width="18" height="150" /></clipPath>
-                <clipPath id="bannerCol2"><rect x="18" y="0" width="18" height="150" /></clipPath>
-                <clipPath id="bannerCol3"><rect x="36" y="0" width="18" height="150" /></clipPath>
-                <clipPath id="bannerCol4"><rect x="54" y="0" width="18" height="150" /></clipPath>
-                <clipPath id="bannerCol5"><rect x="72" y="0" width="18" height="150" /></clipPath>
-              </defs>
-
-              {/* Horde skull definition - complete skull to be clipped by each column */}
-              {/* Skull is centered at x=44, y=70 relative to banner-fabric */}
-              {[
-                { id: 1, x: 0, w: 18, delay: '0s', fill: REALM.blood41, yOff: 0 },
-                { id: 2, x: 18, w: 18, delay: '0.12s', fill: REALM.blood37, yOff: 2 },
-                { id: 3, x: 36, w: 18, delay: '0.24s', fill: REALM.blood33, yOff: 4 },
-                { id: 4, x: 54, w: 18, delay: '0.36s', fill: REALM.blood28, yOff: 6 },
-                { id: 5, x: 72, w: 15, delay: '0.48s', fill: REALM.blood24, yOff: 8 },
-              ].map((col) => (
-                <g key={col.id} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: col.delay }}>
-                  {/* Fabric column */}
-                  <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
-                  {/* Skull slice - clipped to this column */}
-                  <g clipPath={`url(#bannerCol${col.id})`}>
-                    <g transform="translate(44, 70)">
-                      {/* Orc skull - brutish with lower jaw tusks */}
-                      {/* Skull outline - dark embossed */}
-                      <ellipse cx="0" cy="-2" rx="24" ry="16" fill={REALM.blood7} />
-                      {/* Skull main shape - wider, flatter */}
-                      <ellipse cx="0" cy="-4" rx="22" ry="14" fill={REALM.blood11} />
-                      {/* Brow ridge - pronounced */}
-                      <path d="M-18,-8 Q-10,-14 0,-12 Q10,-14 18,-8" stroke={REALM.blood16} strokeWidth="4" fill="none" />
-                      {/* Left eye socket - angular, deep */}
-                      <path d="M-12,-6 L-8,-10 L-2,-8 L-4,-2 L-10,-2 Z" fill={REALM.stone3b} />
-                      {/* Left eye glow - fel green hint */}
-                      <ellipse cx="-7" cy="-5" rx="2" ry="1.5" fill={REALM.moss16b} />
-                      {/* Right eye socket - angular, deep */}
-                      <path d="M12,-6 L8,-10 L2,-8 L4,-2 L10,-2 Z" fill={REALM.stone3b} />
-                      {/* Right eye glow - fel green hint */}
-                      <ellipse cx="7" cy="-5" rx="2" ry="1.5" fill={REALM.moss16b} />
-                      {/* Nose - just two holes */}
-                      <ellipse cx="-2" cy="2" rx="2" ry="3" fill={REALM.stone3b} />
-                      <ellipse cx="2" cy="2" rx="2" ry="3" fill={REALM.stone3b} />
-                      {/* Jaw - heavy, angular */}
-                      <path d="M-16,6 L-14,14 L-8,16 L0,14 L8,16 L14,14 L16,6" fill={REALM.blood11} />
-                      {/* Lower tusks - pointing UP from jaw, darker bone color */}
-                      <path d="M-12,12 Q-14,4 -10,-2" stroke={REALM.ember22} strokeWidth="3.5" fill="none" strokeLinecap="round" />
-                      <path d="M12,12 Q14,4 10,-2" stroke={REALM.ember22} strokeWidth="3.5" fill="none" strokeLinecap="round" />
-                      {/* Tusk highlights */}
-                      <path d="M-11,10 Q-13,5 -10,0" stroke={REALM.ember29} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                      <path d="M11,10 Q13,5 10,0" stroke={REALM.ember29} strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                    </g>
-                  </g>
-                </g>
-              ))}
-              {/* Banner edge fraying */}
-              <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: '0.55s' }} />
-            </g>
-            {/* Pole shadow */}
-            <ellipse cx="6" cy="235" rx="15" ry="5" fill={REALM.stone4b} opacity="0.4" />
-          </g>
         </g>
 
         {/* Ground plane fade */}
@@ -923,23 +836,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           `,
         }} />
 
-        {/* === THUNDER FLASH - Dramatic cloud illumination (infernal spawn) === */}
-        {lightningActive && (
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '100%',
-            background: `
-              radial-gradient(ellipse at ${lightningX}% 25%, ${REALM.chaosFelBright}95 0%, ${REALM.chaosFelBright}60 15%, ${REALM.chaosFelMid}35 35%, transparent 60%),
-              radial-gradient(ellipse at ${lightningX + 10}% 40%, ${REALM.chaosFelBright}70 0%, ${REALM.chaosFelMid}40 25%, transparent 50%),
-              radial-gradient(ellipse at ${lightningX - 15}% 35%, ${REALM.chaosFelMid}55 0%, transparent 40%)
-            `,
-            animation: `${chaos.thunderFlash} 0.15s ease-out`,
-          }} />
-        )}
-
         {/* === AMBIENT THUNDER FLASH - Localized to specific cloud zones === */}
         {ambientFlash && (() => {
           const zone = cloudZones[activeZone] || { x: 50, y: 30, spread: 18 }
@@ -959,20 +855,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           )
         })()}
 
-        {/* Pulsing storm glow - subtle ambient with cloudGlow intensity */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '100%',
-          background: `
-            radial-gradient(ellipse at ${lightningX}% 30%, ${REALM.chaosFelBright}${Math.floor(cloudGlow * 40).toString(16).padStart(2, '0')} 0%, ${REALM.chaosFelMid}${Math.floor(cloudGlow * 22).toString(16).padStart(2, '0')} 30%, transparent 55%),
-            radial-gradient(ellipse at ${100 - lightningX}% 40%, ${REALM.chaosFelMid}${Math.floor(cloudGlow * 25).toString(16).padStart(2, '0')} 0%, transparent 40%)
-          `,
-          transition: 'background 0.2s ease',
-        }} />
-
         {/* Cloud underlighting - ambient glow within clouds */}
         <div style={{
           position: 'absolute',
@@ -988,22 +870,6 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           `,
           animation: `${chaos.stormPulse} 6s ease-in-out infinite`,
         }} />
-
-        {/* Secondary flash echo - follows main flash */}
-        {lightningActive && (
-          <div style={{
-            position: 'absolute',
-            top: '10%',
-            left: 0,
-            right: 0,
-            height: '50%',
-            background: `
-              radial-gradient(ellipse at ${100 - lightningX}% 50%, ${REALM.chaosFelBright}40 0%, transparent 45%)
-            `,
-            animation: `${chaos.thunderFlash} 0.2s ease-out 0.08s`,
-            opacity: 0.6,
-          }} />
-        )}
       </div>
 
       {/* === OCCASIONAL FALLING METEOR - Every 8-15 seconds === */}
@@ -1209,7 +1075,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
           {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
           {golemPhase === 'final' && (
             <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} 1s ease-out forwards` }}>
-              <InfernalGolemSVG id="final" isIdle={true} />
+              <InfernalGolemSVG id="final" />
             </div>
           )}
         </div>

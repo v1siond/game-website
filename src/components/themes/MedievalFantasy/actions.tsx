@@ -11,37 +11,24 @@ import { REALM } from './palette'
 // The world's buttons: the bevelled metal button, the language dropdown drawn for the shared
 // LanguageSwitcher, and the hero's contact actions as buttons.
 
+// A button leads somewhere: inside the site through next/link, or out through an anchor's own props.
+type RealmButtonTarget = { href: string } | { linkProps: AnchorHTMLAttributes<HTMLAnchorElement> }
+
 export function RealmButton({
   children,
-  onClick,
-  active,
-  href,
-  linkProps,
   variant = 'default',
-  zone = 'roc'
+  ...target
 }: {
   children: ReactNode
-  onClick?: () => void
-  active?: boolean
-  href?: string
-  linkProps?: AnchorHTMLAttributes<HTMLAnchorElement>
   variant?: 'default' | 'primary'
-  zone?: 'roc' | 'ft'
-}) {
-  const accentColor = zone === 'ft' ? REALM.frostIceMid : REALM.chaosFelMid
-  const accentBright = zone === 'ft' ? REALM.frostIceBright : REALM.chaosFelBright
-
+} & RealmButtonTarget) {
   const style: CSSProperties = {
     background: variant === 'primary'
       ? `linear-gradient(180deg, ${REALM.goldPlate} 0%, ${REALM.goldPlateDark} 50%, ${REALM.goldPlateDeep} 100%)`
-      : active
-        ? `linear-gradient(180deg, ${REALM.metalLight} 0%, ${REALM.metalMid} 100%)`
-        : `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
-    border: `2px solid ${active ? accentColor : variant === 'primary' ? REALM.goldBright : REALM.metalDark}`,
-    boxShadow: active
-      ? `0 0 10px ${accentColor}, inset 1px 1px 0 ${REALM.metalHighlight}`
-      : `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-    color: variant === 'primary' ? REALM.bgVoid : active ? accentBright : REALM.textBright,
+      : `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
+    border: `2px solid ${variant === 'primary' ? REALM.goldBright : REALM.metalDark}`,
+    boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
+    color: variant === 'primary' ? REALM.bgVoid : REALM.textBright,
     fontFamily: '"Cinzel", Georgia, serif',
     fontSize: '1.125rem',
     fontWeight: 600,
@@ -55,9 +42,8 @@ export function RealmButton({
     alignItems: 'center',
   }
 
-  if (linkProps) return <a {...linkProps} style={style}>{children}</a>
-  if (href) return <Link href={href} style={style}>{children}</Link>
-  return <button onClick={onClick} style={style}>{children}</button>
+  if ('linkProps' in target) return <a {...target.linkProps} style={style}>{children}</a>
+  return <Link href={target.href} style={style}>{children}</Link>
 }
 
 export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: LocaleSwitchState) {
@@ -165,11 +151,11 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
   )
 }
 
-export function HeroActions({ actions, zone }: { actions: HeroActionSlot[]; zone: 'roc' | 'ft' }) {
+export function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
   return (
     <>
       {actions.map((action) => (
-        <RealmButton key={action.id} linkProps={action.linkProps} variant={action.id === 'email' ? 'primary' : 'default'} zone={zone}>
+        <RealmButton key={action.id} linkProps={action.linkProps} variant={action.id === 'email' ? 'primary' : 'default'}>
           {action.label}
         </RealmButton>
       ))}

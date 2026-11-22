@@ -8,9 +8,6 @@ import { paletteVars } from '../shared/paletteVars'
 
 export const REALM = {
   // The two zones and the shared frame, gold and text
-  chaosSkyTop: '#050805',
-  chaosSkyMid: '#081008',
-  chaosSkyBot: '#0c150c',
   chaosFelBright: '#5a6a3a',
   // Fel green as text: the same hue lifted to 7 to 1 on every metal shade a label sits on (the selected
   // profession node's metalMid, 7.07 to 1) and higher on the dark chips; chaosFelBright stays on the glows.
@@ -30,8 +27,6 @@ export const REALM = {
   chaosWaterDark: '#1a2a30',
   chaosRockDistant: '#4a4a48',
   chaosRockSilhouette: '#2a2a28',
-  frostSkyTop: '#080a10',
-  frostSkyMid: '#0a1420',
   frostSkyBot: '#102030',
   frostIceBright: '#c8e8ff',
   frostIceMid: '#6eb5ff',
@@ -53,7 +48,6 @@ export const REALM = {
   bloodRed: '#8b0000',
   hordeRed: '#5a1a1a',
   allianceBlue: '#1e3a5f',
-  elfPurple: '#4a2a6a',
   textBright: '#e8dcc8',
   textMid: '#b09878',
   textDim: '#bcaf9e',
@@ -176,11 +170,9 @@ export const REALM = {
   ember28a: '#6a4a25',
   ember29: '#5a4838',
   ember29a: '#5a4a38',
-  ember29b: '#5a4a3a',
   ember30: '#5a4a40',
   ember33: '#885522',
   ember34: '#6a5a45',
-  ember35: '#6a5a4a',
   ember43: '#aa6633',
   ember47: '#8a7a68',
   ember50: '#bb7744',

@@ -68,7 +68,7 @@ export function ProjectCard({ slot: { project, years, links } }: { slot: Project
       {links.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
           {links.map(({ kind, label, linkProps }) => (
-            <RealmButton key={kind} linkProps={linkProps} zone="ft">{label}</RealmButton>
+            <RealmButton key={kind} linkProps={linkProps}>{label}</RealmButton>
           ))}
         </div>
       )}

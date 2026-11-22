@@ -6,12 +6,6 @@
   60% { opacity: 0.4; }
   80% { opacity: 0.7; }
 }
-@keyframes thunderFlash {
-  0% { opacity: 1; }
-  30% { opacity: 0.9; }
-  60% { opacity: 0.4; }
-  100% { opacity: 0; }
-}
 /* Meteor rain - diagonal left (moves down and left) */
 @keyframes meteorRainLeft {
   0% {
@@ -44,85 +38,6 @@
   100% {
     transform: translate(40vw, 120vh);
     opacity: 0;
-  }
-}
-/* Meteor glow pulsing while falling - must include translate to maintain centering */
-@keyframes meteorPulse {
-  0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.15);
-    opacity: 0.9;
-  }
-}
-/* Shockwave ring expanding */
-@keyframes shockwaveExpand {
-  0% {
-    transform: scale(0.3);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(2.5);
-    opacity: 0;
-  }
-}
-/* Smoke rising from impact */
-@keyframes smokeRise {
-  0% {
-    transform: translateY(0) scale(1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(-80px) scale(1.5);
-    opacity: 0;
-  }
-}
-/* Debris particles flying outward */
-@keyframes debrisFly0 {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-40px, -60px) scale(0.3);
-    opacity: 0;
-  }
-}
-@keyframes debrisFly1 {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(10px, -70px) scale(0.2);
-    opacity: 0;
-  }
-}
-@keyframes debrisFly2 {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(50px, -50px) scale(0.4);
-    opacity: 0;
-  }
-}
-/* Infernal creature rising from impact (legacy) */
-@keyframes infernalRise {
-  0% {
-    transform: translateY(30px) scale(0.5);
-    opacity: 0;
-  }
-  40% {
-    transform: translateY(10px) scale(0.9);
-    opacity: 0.7;
-  }
-  100% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
   }
 }
 /* === GOLEM ASSEMBLY ANIMATIONS - rocks fly from scattered to final position === */
@@ -294,21 +209,6 @@
   100% {
     stroke-dashoffset: 0;
     opacity: 1;
-  }
-}
-/* Crack trembles/shakes after growing */
-@keyframes crackTremble {
-  0%, 100% {
-    transform: translate(0, 0);
-  }
-  25% {
-    transform: translate(-1px, 1px);
-  }
-  50% {
-    transform: translate(1px, -1px);
-  }
-  75% {
-    transform: translate(-1px, -1px);
   }
 }
 /* Wind gusts blowing across battlefield */

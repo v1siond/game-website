@@ -269,30 +269,6 @@ export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', s
       justifyContent: 'center',
       overflow: 'hidden',
     }}>
-      {/* Background gradient fade - blends with frozen landscape */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: `linear-gradient(180deg,
-          transparent 0%,
-          ${REALM.frostIceDark}08 20%,
-          ${`${REALM.frostIceMid}60`}12 50%,
-          ${REALM.frostIceDark}08 80%,
-          transparent 100%
-        )`,
-        pointerEvents: 'none',
-      }} />
-
-      {/* Ice glow behind center */}
-      <div style={{
-        position: 'absolute',
-        width: '300px',
-        height: '80px',
-        background: `radial-gradient(ellipse, ${`${REALM.frostIceMid}60`}30 0%, transparent 70%)`,
-        filter: 'blur(25px)',
-        pointerEvents: 'none',
-      }} />
-
       {/* Horizontal decorative lines - icy */}
       <div style={{
         position: 'absolute',
