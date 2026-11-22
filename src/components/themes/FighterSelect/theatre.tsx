@@ -3,10 +3,11 @@
 import type { ReactNode } from 'react'
 import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
-import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
-import { muayThaiFacts } from '@/lib/cv/sectionText'
+import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
+import { stageItems } from '@/lib/cv/stageItems'
+import { walkAlong } from '@/lib/scroll/walkAlong'
 import { ramp } from '@/lib/scroll/stage'
-import { fadeTo, frames, fx, lerp, spread, transformTo } from '@/components/themes/shared/stageNodes'
+import { fadeTo, frames, fx, spread, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage } from '@/components/themes/shared/theatre/Stage'
 import type { LayerMotions, StageWriter, TheatreScene } from '@/components/themes/shared/theatre/useTheatre'
 import { ImpactBurst } from './badges'
@@ -139,7 +140,8 @@ interface SceneSpec {
   /** The partner stands across from him in this bout. */
   partner?: boolean
   /** Where he stands at beat `index` of `beats`: forward of HERO_X as the bout moves him. */
-  heroX?: (beats: readonly Beat[], index: number, t: number) => number
+  /** Where he stands in the scene: from his bout's beat, or from the cards read along the scene's xs. */
+  heroX?: (at: { beats: readonly Beat[]; index: number; t: number; xs: readonly number[]; reached: number }) => number
   write?: (stage: HTMLElement, xs: readonly number[]) => (beats: readonly Beat[], index: number, t: number, cardsReached: number) => void
 }
 
@@ -150,7 +152,7 @@ const posesOf = (beats: readonly Beat[], who: 'hero' | 'partner'): FighterPose[]
 const about: SceneSpec = {
   zone: 'castle',
   bout: { lead: [{ hero: 'walk' }], item: { hero: 'punch', mark: 'hit' }, close: [{ hero: 'shoryuken', mark: 'wreck' }, { hero: 'win' }] },
-  heroX: (_beats, index, t) => HERO_X + (index === 0 ? t : 1) * HERO_STEP,
+  heroX: ({ index, t }) => HERO_X + (index === 0 ? t : 1) * HERO_STEP,
   props: (_xs, labels) => (
     <>
       <g data-fx="car" transform={`translate(${CAR_X} ${FLOOR - 86 * CAR_SCALE}) scale(${CAR_SCALE})`}>
@@ -179,15 +181,15 @@ const about: SceneSpec = {
   },
 }
 
-/** Work: he walks the market a step per job. */
+// Work's stops, one per job, and how far short of the first he waits.
+const WORK_STOPS = [HERO_X - 260, HERO_X + 260] as const
+const WORK_ENTRY = 120
+
+/** Work: he walks the market a step per job, on the shared walk. */
 const work: SceneSpec = {
   zone: 'market',
   bout: { lead: [{ hero: 'stance' }], item: { hero: 'walk' }, close: [{ hero: 'win' }] },
-  heroX: (beats, index, t) => {
-    const steps = beats.filter((beat) => beat.hero === 'walk').length
-    const walked = Math.min(steps, Math.max(0, index - 1 + (beats[index]?.hero === 'walk' ? t : 1)))
-    return lerp(HERO_X - 260, HERO_X + 260, steps ? walked / steps : 0)
-  },
+  heroX: ({ xs, reached }) => (xs.length ? walkAlong(xs, reached, 0, WORK_ENTRY).x : HERO_X),
 }
 
 const TARGETS = { from: 1260, to: 1480 }
@@ -321,19 +323,11 @@ const contact: SceneSpec = { zone: 'temple', partner: true, bout: { lead: [{ her
 const SCENES: Record<SceneId, SceneSpec> = { hero, about, work, tech, services, projects, ventures, bands, muayThai, contact }
 
 // How many cards each section counts, read off the slot its cards are drawn from: one beat per card.
-const COUNT_FOR: { [Id in SectionId]: (slot: SlotOf<Id>, labels: Labels, highlights: readonly string[]) => number } = {
-  about: (_slot, _labels, highlights) => highlights.length,
-  work: ({ jobs }) => jobs.length,
-  tech: ({ categories }) => categories.length,
-  services: ({ services: list }) => list.length,
-  projects: ({ projects: list }) => list.length,
-  ventures: ({ companies }) => companies.length,
-  bands: ({ bands: list }) => list.length,
-  muayThai: ({ martialArts }, labels) => muayThaiFacts(martialArts, labels).length + martialArts.primary.achievements.length,
+// The cards a section counts, the shared count (stageItems): the record's facts and its achievements both.
+const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[]): number => {
+  const { lead, count } = stageItems(slot, labels, highlights.length)
+  return lead + count
 }
-
-const countOf = (slot: SectionSlot, labels: Labels, highlights: readonly string[]): number =>
-  (COUNT_FOR[slot.id] as (slot: SectionSlot, labels: Labels, highlights: readonly string[]) => number)(slot, labels, highlights)
 
 export interface TourScene extends TheatreScene {
   id: SceneId
@@ -357,7 +351,7 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
     // A scene with no cards (the hero, the contact) plays its pose over the scene itself.
     const at = count === 0 ? progress : t
     pose(beat.hero, at)
-    transformTo(heroNode, place(spec.heroX?.(beats, index, at) ?? HERO_X))
+    transformTo(heroNode, place(spec.heroX?.({ beats, index, t: at, xs, reached: cardsReached }) ?? HERO_X))
     partner?.(beat.partner ?? 'stance', at)
     props?.(beats, index, at, cardsReached)
   }
@@ -366,6 +360,7 @@ function bindScene(stage: HTMLElement, spec: SceneSpec, scene: Omit<TourScene, '
 const XS_FOR: Partial<Record<SceneId, readonly [number, number]>> = {
   tech: [TARGETS.from, TARGETS.to],
   services: [1240, 1480],
+  work: WORK_STOPS,
 }
 
 /** The page's scenes in order: the hero, the profession's sections, the contact. */
