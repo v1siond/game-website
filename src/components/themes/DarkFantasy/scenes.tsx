@@ -6,6 +6,7 @@ import type { Profession } from '@/lib/cv/professions'
 import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
 import { muayThaiFacts } from '@/lib/cv/sectionText'
 import { ramp } from '@/lib/scroll/stage'
+import { walkAlong } from '@/lib/scroll/walkAlong'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
 import { fadeTo, fx, lerp, spread, transformTo } from '@/components/themes/shared/stageNodes'
 import { Stage, type StageLayer } from '@/components/themes/shared/theatre/Stage'
@@ -53,8 +54,6 @@ const ROW_TO = 1640
 // row, down to RELIC_MIN of its size.
 const RELIC_ROOM = 130
 const RELIC_MIN = 0.45
-// Of each card's share of the scroll, the first WALK he walks to its relic, the rest he slashes.
-const WALK = 0.4
 // A relic is freed over this part of its card's share, after the slash lands.
 const FREE_FROM = 0.55
 const FREE_TO = 0.85
@@ -62,14 +61,12 @@ const FREE_TO = 0.85
 const BOBS = 3
 const BOB_PX = 3
 
-/** Where the knight stands (his centre x) and how far his slash has played, `reached` cards in. */
+/** Where the knight stands (his centre x) and how far his slash has played, `reached` cards in: he walks the
+ *  row on the shared walk (walkAlong), REACH left of each relic, and swings as he arrives at it. */
 export function knightAt(xs: readonly number[], reached: number): { x: number; slash: number } {
   if (xs.length === 0) return { x: ROW_FROM - REACH, slash: 0 }
-  const item = Math.min(xs.length - 1, Math.floor(reached))
-  const share = Math.min(1, reached - item)
-  const from = item === 0 ? xs[0] - LEAD_IN : xs[item - 1]
-  const x = lerp(from, xs[item], ramp(share, 0, WALK)) - REACH
-  return { x, slash: ramp(share, WALK, 1) }
+  const { x, act } = walkAlong(xs, reached, -REACH, LEAD_IN)
+  return { x, slash: act }
 }
 
 /** How freed relic `i` is, 0 to 1, `reached` cards in. */
