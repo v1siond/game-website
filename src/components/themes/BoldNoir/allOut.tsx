@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
@@ -115,7 +115,7 @@ function Rush() {
   )
 }
 
-function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void }) {
+function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: string; onClose: () => void }) {
   const labels = useLabels()
   const { project, years, links, noLink } = slot
 
@@ -144,7 +144,7 @@ function FinishCard({ slot, onClose }: { slot: ProjectSlot; onClose: () => void 
         >
           <span aria-hidden="true">X</span>
         </button>
-        <h2 id="all-out-title" className="pr-14 text-3xl leading-none tracking-wide sm:text-5xl">
+        <h2 id={titleId} className="pr-14 text-3xl leading-none tracking-wide sm:text-5xl">
           {project.name}
         </h2>
         <p className={`mt-2 text-base font-bold text-[color:var(--noir-paper)] ${world.copy}`}>
@@ -189,6 +189,7 @@ interface AllOutProps {
 
 export function AllOutAttack({ slot, trigger, onClose }: AllOutProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
+  const titleId = useId()
   const [phase, setPhase] = useState<Phase>(() => (prefersReducedMotion() ? 'finish' : 'rush'))
 
   useEffect(() => {
@@ -212,12 +213,13 @@ export function AllOutAttack({ slot, trigger, onClose }: AllOutProps) {
   return (
     <dialog
       ref={dialogRef}
-      aria-labelledby="all-out-title"
+      aria-labelledby={titleId}
       className={`fixed inset-0 ${world.allOut}`}
       onCancel={(event) => {
         event.preventDefault()
-        if (phase === 'rush') skip()
-        else onClose()
+        // Escape during the rush skips to the finish card; on the card it closes the file.
+        if (phase === 'rush') return skip()
+        onClose()
       }}
       onClick={phase === 'rush' ? skip : undefined}
       onKeyDown={phase === 'rush' ? skip : undefined}
@@ -225,13 +227,13 @@ export function AllOutAttack({ slot, trigger, onClose }: AllOutProps) {
       {phase === 'rush' ? (
         <>
           <Rush />
-          <h2 id="all-out-title" className="sr-only">
+          <h2 id={titleId} className="sr-only">
             {slot.project.name}
           </h2>
         </>
       ) : (
         <div className="h-full overflow-y-auto overscroll-contain">
-          <FinishCard slot={slot} onClose={onClose} />
+          <FinishCard slot={slot} titleId={titleId} onClose={onClose} />
         </div>
       )}
     </dialog>

@@ -49,6 +49,10 @@ interface Kit {
   backProp: ReactNode
   frontProp: ReactNode
   head: ReactNode
+  // the hat brim's shadow on his face, under the fedora only
+  hatShade: boolean
+  // the snare he plays in front of him, the musician's only
+  snare: ReactNode
   trousers: Trousers
   hand: 'bare' | 'glove'
   band: boolean
@@ -175,9 +179,9 @@ const SNARE = (
 )
 
 const KITS: Record<Profession, Kit> = {
-  engineer: { torso: SUIT, sleeve: NOIR.ash, forearm: NOIR.ash, backProp: NOTEBOOK, frontProp: PENCIL, head: FEDORA, trousers: { fill: NOIR.ash, crease: NOIR.smoke }, hand: 'bare', band: false },
-  drummer: { torso: WAISTCOAT, sleeve: NOIR.paper, forearm: SKIN, backProp: stick(16, 22), frontProp: stick(48, 42), head: FEDORA, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'bare', band: false },
-  fighter: { torso: VEST, sleeve: SKIN, forearm: SKIN, backProp: null, frontProp: null, head: MONGKHON, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'glove', band: true },
+  engineer: { torso: SUIT, sleeve: NOIR.ash, forearm: NOIR.ash, backProp: NOTEBOOK, frontProp: PENCIL, head: FEDORA, hatShade: true, snare: null, trousers: { fill: NOIR.ash, crease: NOIR.smoke }, hand: 'bare', band: false },
+  drummer: { torso: WAISTCOAT, sleeve: NOIR.paper, forearm: SKIN, backProp: stick(16, 22), frontProp: stick(48, 42), head: FEDORA, hatShade: true, snare: SNARE, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'bare', band: false },
+  fighter: { torso: VEST, sleeve: SKIN, forearm: SKIN, backProp: null, frontProp: null, head: MONGKHON, hatShade: false, snare: null, trousers: { fill: NOIR.ink, crease: NOIR.ash }, hand: 'glove', band: true },
 }
 
 // ---- limbs ----
@@ -265,9 +269,9 @@ export const Detective = memo(function Detective({ profession, motion = 'idle', 
       <g className={s.body}>
         <Legs trousers={kit.trousers} />
         <g className={s.breath}>{kit.torso(dots)}</g>
-        {profession === 'drummer' && SNARE}
+        {kit.snare}
         <Arm side="back" kit={kit} dots={dots} />
-        <Head head={kit.head} dots={dots} hatShade={profession !== 'fighter'} />
+        <Head head={kit.head} dots={dots} hatShade={kit.hatShade} />
         <Arm side="front" kit={kit} dots={dots} extra={BADGE} />
       </g>
     </svg>
