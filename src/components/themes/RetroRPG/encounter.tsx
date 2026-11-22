@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type FocusEvent, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -29,7 +29,7 @@ const OUTFIT_LOOK: WardrobeLook = { plate: RPG.void, text: RPG.text, ring: RPG.b
 //
 // Pattern: setTimeout phases (a fixed choreography, no per frame values), each phase a data-phase value
 // the CSS reads; every move is a steps() keyframe on transform or opacity. Reduced motion and a World
-// Select preview start on ready.
+// Select preview start on ready; a keyboard focus inside jumps to ready.
 //
 // A profession switch replays two things on top: the screen flashes white once and his sprite turns
 // through four hard frames into the new outfit.
@@ -66,8 +66,17 @@ function useEncounterPhase() {
     return () => timers.forEach(window.clearTimeout)
   }, [triggered, skip])
 
-  // Reduced motion and a preview show the end, read straight from skip rather than stored a commit later.
-  return { ref, phase: skip ? 'ready' : phase, skip }
+  // A keyboard visitor who tabs in before the entrance ends it, so the focused control shows at once. Kept
+  // apart from the timed phase, which goes on running and would otherwise step back from ready.
+  const [revealed, setRevealed] = useState(false)
+  const reveal = (event: FocusEvent<HTMLElement>) => {
+    if (!event.target.matches(':focus-visible')) return
+    setRevealed(true)
+  }
+
+  // Reduced motion, a preview and a keyboard focus show the end, read straight from state rather than
+  // stored a commit later.
+  return { ref, phase: skip || revealed ? 'ready' : phase, skip, reveal }
 }
 
 /** Counts profession switches after the first render, so the flash and the turn play only on a switch. */
@@ -173,12 +182,12 @@ interface EncounterProps {
 }
 
 export function Encounter({ profession, children }: EncounterProps) {
-  const { ref, phase, skip } = useEncounterPhase()
+  const { ref, phase, skip, reveal } = useEncounterPhase()
   const switches = useSwitchCount(profession)
   const pointer = usePointerVars(!skip)
 
   return (
-    <div ref={ref} data-phase={phase} data-play={PLAY_OF[phase]} className="relative mx-auto max-w-3xl">
+    <div ref={ref} data-phase={phase} data-play={PLAY_OF[phase]} onFocus={reveal} className="relative mx-auto max-w-3xl">
       {/* the monster area: the backdrop and him */}
       <div ref={pointer} className={`relative h-44 overflow-hidden sm:h-56 ${world.stage} ${sprite.battle}`} aria-hidden="true">
         <BattleBackdrop />
