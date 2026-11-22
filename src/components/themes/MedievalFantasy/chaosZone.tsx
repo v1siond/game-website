@@ -5,6 +5,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { REALM } from './palette'
 import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
+import { cycles, PLAY_S, slice } from './play'
 
 // The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
 
@@ -91,6 +92,10 @@ const CLOUD_ZONES = [
   { x: 88, y: 30, spread: 15 },   // right
 ]
 
+// The first flash after the page opens, and the longest a flash with its chained one lasts.
+const FIRST_FLASH_MS = 1200
+const FLASH_TAIL_MS = 400
+
 // The ambient lightning over the clouds. Its state lives here, so each flash re-renders this layer alone and
 // never the backdrop around it or the golem on it.
 function AmbientFlash() {
@@ -143,18 +148,15 @@ function AmbientFlash() {
       }
     }
 
-    const scheduleAmbientFlash = () => {
-      if (!isActive) return
-      // Flash every 2-5 seconds for frequent storm effect
-      const delay = 2000 + Math.random() * 3000
-      timeouts.push(setTimeout(() => {
-        triggerAmbientFlash()
-        scheduleAmbientFlash()
-      }, delay))
+    // A flash at `at` ms, then one every 2 to 5 seconds after it, while a flash and its chained one (up to
+    // FLASH_TAIL_MS) still end within the 5 s the storm plays; then the sky rests dark.
+    const scheduleAmbientFlash = (at: number) => {
+      if (!isActive || at + FLASH_TAIL_MS > PLAY_S * 1000) return
+      timeouts.push(setTimeout(triggerAmbientFlash, at))
+      scheduleAmbientFlash(at + 2000 + Math.random() * 3000)
     }
 
-    // Start after a short delay
-    timeouts.push(setTimeout(scheduleAmbientFlash, 800))
+    scheduleAmbientFlash(FIRST_FLASH_MS)
 
     return () => {
       isActive = false
@@ -180,7 +182,11 @@ function AmbientFlash() {
   )
 }
 
-// The meteor that crosses the sky every 8 to 15 seconds, its state kept apart from the backdrop like the flash.
+// The meteor that crosses the sky once, METEOR_AT_MS after the page opens, over METEOR_MS, so it has landed
+// within the 5 s the realm's motion plays (play.ts); its state kept apart from the backdrop like the flash.
+const METEOR_AT_MS = 1000
+const METEOR_MS = 4000
+
 function FallingMeteor() {
   const [fallingMeteor, setFallingMeteor] = useState<{
     id: number
@@ -193,42 +199,13 @@ function FallingMeteor() {
   // No meteor crosses the sky under reduced motion.
   useEffect(() => {
     if (reduced) return
-    let meteorId = 0
-    let isActive = true
-    const timeouts: NodeJS.Timeout[] = []
-
-    const spawnMeteor = () => {
-      if (!isActive) return
-      const id = meteorId++
-      const startX = 15 + Math.random() * 70
-      const direction = Math.random() > 0.5 ? 'left' : 'right'
-
-      setFallingMeteor({ id, startX, direction: direction as 'left' | 'right', active: true })
-
-      // Clear meteor after animation (4s)
-      timeouts.push(setTimeout(() => {
-        if (!isActive) return
-        setFallingMeteor(null)
-      }, 4000))
-    }
-
-    const scheduleNext = () => {
-      if (!isActive) return
-      const delay = 8000 + Math.random() * 7000
-      timeouts.push(setTimeout(() => {
-        spawnMeteor()
-        scheduleNext()
-      }, delay))
-    }
-
-    // First meteor after 2 seconds
-    timeouts.push(setTimeout(spawnMeteor, 2000))
-    scheduleNext()
-
-    return () => {
-      isActive = false
-      timeouts.forEach(t => clearTimeout(t))
-    }
+    const startX = 15 + Math.random() * 70
+    const direction = Math.random() > 0.5 ? 'left' : 'right'
+    const timeouts = [
+      setTimeout(() => setFallingMeteor({ id: 0, startX, direction, active: true }), METEOR_AT_MS),
+      setTimeout(() => setFallingMeteor(null), METEOR_AT_MS + METEOR_MS),
+    ]
+    return () => timeouts.forEach((t) => clearTimeout(t))
   }, [reduced])
 
   if (reduced || !fallingMeteor || !fallingMeteor.active) return null
@@ -241,7 +218,7 @@ function FallingMeteor() {
         top: '-5%',
         width: '25px',
         height: '25px',
-        animation: `${METEOR_RAIN[fallingMeteor.direction]} 4s ease-in forwards`,
+        animation: `${METEOR_RAIN[fallingMeteor.direction]} ${METEOR_MS}ms ease-in forwards`,
         zIndex: 4,
         pointerEvents: 'none',
       }}
@@ -699,7 +676,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 opacity={opacity}
                 style={animated ? {
                   transformOrigin: `${x}px ${baseY}px`,
-                  animation: `${chaos.grassBlade} ${2.0 + (clusterIndex % 3) * 0.4}s ease-in-out infinite`,
+                  animation: cycles(chaos.grassBlade, 2.0 + (clusterIndex % 3) * 0.4, 'ease-in-out'),
                 } : undefined}
               />
             )
@@ -1099,7 +1076,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             radial-gradient(ellipse at 75% 55%, ${REALM.chaosFelBright}12 0%, transparent 30%),
             radial-gradient(ellipse at 90% 65%, ${REALM.chaosFelMid}15 0%, transparent 35%)
           `,
-          animation: `${chaos.stormPulse} 6s ease-in-out infinite`,
+          animation: cycles(chaos.stormPulse, 6, 'ease-in-out'),
         }} />
       </div>
 
@@ -1120,7 +1097,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             width: streak.length,
             height: streak.thickness,
             background: `linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--realm-frost66) 19%, transparent) 30%, color-mix(in srgb, var(--realm-frost75) 25%, transparent) 50%, color-mix(in srgb, var(--realm-frost66) 19%, transparent) 70%, transparent 100%)`,
-            animation: `${chaos.rainWindGust} ${streak.duration}s linear infinite`,
+            animation: slice(chaos.rainWindGust, streak.duration, 'linear', streak.delay),
             animationDelay: `${streak.delay}s`,
           }}
         />
@@ -1137,7 +1114,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
             width: '2px',
             height: `${drop.length}px`,
             background: 'linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--realm-frost66) 67%, transparent) 20%, color-mix(in srgb, var(--realm-frost81) 80%, transparent) 50%, color-mix(in srgb, var(--realm-frost66) 67%, transparent) 80%, transparent 100%)',
-            animation: `${chaos.rainFallWindy} ${drop.duration}s linear infinite`,
+            animation: slice(chaos.rainFallWindy, drop.duration, 'linear', drop.delay),
             animationDelay: `${drop.delay}s`,
           }}
         />
@@ -1290,7 +1267,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
               { id: 4, x: 54, w: 18, delay: '0.36s', fill: REALM.blood8, yOff: 6 },
               { id: 5, x: 72, w: 15, delay: '0.48s', fill: REALM.blood6, yOff: 8 },
             ].map((col) => (
-              <g key={col.id} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: col.delay }}>
+              <g key={col.id} style={{ animation: cycles(chaos.bannerWave, 1.4, 'ease-in-out alternate'), animationDelay: col.delay }}>
                 <rect x={col.x} y={col.yOff} width={col.w} height={150 - col.yOff} fill={col.fill} />
                 <g clipPath={`url(#flagBannerCol${col.id})`}>
                   <g transform="translate(44, 70)">
@@ -1328,7 +1305,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 </g>
               </g>
             ))}
-            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`, animationDelay: '0.55s' }} />
+            <polygon points="87,20 92,25 87,30 93,35 87,45 92,50 87,60 93,70 87,80 92,90 87,100 93,110 87,120 92,130 87,140 93,145 87,150" fill={REALM.blood10} style={{ animation: cycles(chaos.bannerWave, 1.4, 'ease-in-out alternate'), animationDelay: '0.55s' }} />
           </g>
 
           {/* Pole shadow */}
@@ -1346,7 +1323,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
                 fill={REALM.stone4b}
                 opacity={0.25 - i * 0.04}
                 style={{
-                  animation: `${chaos.bannerWave} 1.4s ease-in-out infinite alternate`,
+                  animation: cycles(chaos.bannerWave, 1.4, 'ease-in-out alternate'),
                   animationDelay: `${i * 0.12}s`,
                   transformOrigin: `${i * 15}px ${i * 2}px`,
                 }}
