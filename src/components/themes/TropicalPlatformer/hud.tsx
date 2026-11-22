@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { FindProvider, useFindCount } from '../shared/finds'
 import look from './jungle.module.css'
 import hud from './hud.module.css'
 
@@ -11,20 +12,13 @@ import hud from './hud.module.css'
 // it stays. The top right belongs to the worlds launcher. Decoration: the sections themselves carry
 // the content, so the counter is hidden from screen readers.
 //
-// Pattern: one context at the world's root; a level reports itself once with useReachLevel.
+// Pattern: the shared find counter (../shared/finds) at the world's root; a level finds itself, in the
+// group LEVELS, from its trigger's onEnter (./levelSign).
 
-const ReachContext = createContext<(level: string) => void>(() => undefined)
+export const LEVELS = 'all'
 
-/** Reports a level as reached once its section has scrolled in. */
-export function useReachLevel(level: string, reached: boolean) {
-  const reach = useContext(ReachContext)
-  useEffect(() => {
-    if (!reached) return
-    reach(level)
-  }, [level, reached, reach])
-}
-
-function BananaCounter({ count }: { count: number }) {
+function BananaCounter() {
+  const { found: count } = useFindCount(LEVELS)
   if (count === 0) return null
 
   return (
@@ -40,15 +34,10 @@ function BananaCounter({ count }: { count: number }) {
 }
 
 export function HudProvider({ children }: { children: ReactNode }) {
-  const [reached, setReached] = useState<ReadonlySet<string>>(() => new Set())
-  const reach = useCallback((level: string) => {
-    setReached((current) => (current.has(level) ? current : new Set(current).add(level)))
-  }, [])
-
   return (
-    <ReachContext.Provider value={reach}>
+    <FindProvider>
       {children}
-      <BananaCounter count={reached.size} />
-    </ReachContext.Provider>
+      <BananaCounter />
+    </FindProvider>
   )
 }
