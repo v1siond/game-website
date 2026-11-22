@@ -98,10 +98,10 @@ export function HeavyBag({ martialArts, on }: { martialArts: MartialArts; on: bo
             achievements: 'space-y-3',
             achievement: 'text-base font-bold',
           }}
-          renderAchievement={(achievement) => (
+          renderAchievement={(achievement, index) => (
             <span className="flex items-start gap-3">
               <span
-                data-on={achievements.indexOf(achievement) < landed || undefined}
+                data-on={index < landed || undefined}
                 className={`mt-0.5 inline-block h-5 w-5 shrink-0 bg-[var(--cel-crit)] [clip-path:polygon(50%_0,62%_35%,100%_38%,70%_60%,80%_100%,50%_76%,20%_100%,30%_60%,0_38%,38%_35%)] ${cel.hitMark}`}
                 aria-hidden="true"
               />

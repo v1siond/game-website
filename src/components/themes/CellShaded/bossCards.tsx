@@ -86,7 +86,7 @@ export function BossCards({ musician, bands }: { musician: Musician; bands: Band
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => <BossCard slot={slot} index={bands.indexOf(slot.band)} />}
+        renderBand={(slot, index) => <BossCard slot={slot} index={index} />}
       />
     </>
   )

@@ -163,7 +163,7 @@ export function LootDrops({ projects }: { projects: Project[] }) {
         projects={projects}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => <LootCard slot={slot} index={projects.indexOf(slot.project)} equipped={equipped} onEquip={setEquippedId} />}
+        renderProject={(slot, index) => <LootCard slot={slot} index={index} equipped={equipped} onEquip={setEquippedId} />}
       />
     </>
   )
