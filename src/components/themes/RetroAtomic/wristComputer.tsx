@@ -9,7 +9,6 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
 import type { WorldCV } from '@/lib/cv/content'
 import { NameWords } from '@/components/cv/NameWords'
-import { heldUntil } from '@/components/themes/shared/held'
 import { DWELLER_ACTION, DwellerSprite } from './dweller'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
@@ -39,17 +38,17 @@ const TYPE_TICK_MS = 16
 // The wardrobe's phosphor readout under his portrait frame: phosphor on ink, 14.3 to 1.
 const OUTFIT_LOOK: WardrobeLook = { plate: INK, text: PHOSPHOR, ring: GLASS }
 
-/** How many characters of the text have been typed: all of it when off, counting up once started. */
-function useTyped(total: number, running: boolean, instant: boolean): number {
+/** How many characters of the text have been typed: all of it under reduced motion, counting up from mount. */
+function useTyped(total: number, instant: boolean): number {
   const [typed, setTyped] = useState(0)
   const done = typed >= total
 
   // The clock runs only while characters are left, so a typed hero wakes nothing.
   useEffect(() => {
-    if (instant || !running || done) return
+    if (instant || done) return
     const timer = window.setInterval(() => setTyped((count) => Math.min(count + 1, total)), TYPE_TICK_MS)
     return () => window.clearInterval(timer)
-  }, [running, instant, total, done])
+  }, [instant, total, done])
 
   return instant ? total : typed
 }
@@ -73,10 +72,10 @@ function TypedLine({ text, shown, className, as: Tag = 'p' }: { text: string; sh
   )
 }
 
-function BootText({ lines, running, instant }: { lines: [string, string, string, string]; running: boolean; instant: boolean }) {
+function BootText({ lines, instant }: { lines: [string, string, string, string]; instant: boolean }) {
   const [name, headline, tagline, line] = lines
   const total = lines.reduce((sum, text) => sum + text.length, 0)
-  const typed = useTyped(total, running, instant)
+  const typed = useTyped(total, instant)
   const shownOf = (index: number) => typed - lines.slice(0, index).reduce((sum, text) => sum + text.length, 0)
 
   return (
@@ -123,11 +122,11 @@ function SectionTabs({ profession }: { profession: Profession }) {
 }
 
 /** His figure on the tube, in the green line tone, at the picked profession's work once the screen is on (`on`). */
-function StatusFigure({ profession, on }: { profession: Profession; on: boolean }) {
+function StatusFigure({ profession }: { profession: Profession }) {
   return (
     <div data-worlds-figure="" className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
       <span className={atomic.statusBrackets} aria-hidden="true" />
-      <div className={`absolute inset-3 ${atomic.statusFigure} ${heldUntil(on)}`}>
+      <div className={`absolute inset-3 ${atomic.statusFigure}`}>
         <DwellerSprite key={profession} profession={profession} tone="phosphor" motion={DWELLER_ACTION[profession]} className="h-full w-full" />
       </div>
     </div>
@@ -234,17 +233,12 @@ function Screen({ children }: { children: ReactNode }) {
   )
 }
 
-interface WristComputerProps {
-  booted: boolean
-  instant: boolean
-}
-
-export function WristComputer({ booted, instant }: WristComputerProps) {
+export function WristComputer({ instant }: { instant: boolean }) {
   const { active } = useProfession()
   const { hud, navigation } = useLabels()
 
   return (
-    <section data-worlds-hero="" aria-label={hud.wristTerminal} className={`relative mx-auto max-w-6xl ${atomic.device}`} data-booted={booted || instant || undefined}>
+    <section data-worlds-hero="" aria-label={hud.wristTerminal} className={`relative mx-auto max-w-6xl lg:mx-0 lg:max-w-[52rem] ${atomic.device}`} data-booted="">
       <span className={atomic.deviceScrews} aria-hidden="true" />
       <div className="grid gap-0 lg:grid-cols-[1fr_auto]">
         <div className="p-3 sm:p-5">
@@ -255,12 +249,12 @@ export function WristComputer({ booted, instant }: WristComputerProps) {
 
               <div key={active} className={`mt-5 grid items-center gap-6 md:grid-cols-[auto_1fr] ${atomic.powerOn}`}>
                 <div className="relative flex flex-col items-center gap-3">
-                  <StatusFigure profession={active} on={booted || instant} />
+                  <StatusFigure profession={active} />
                   {/* over his frame's own box (w-28, sm:w-36), out of the flow: the split readout in wardrobe.css */}
-                  <Wardrobe look={OUTFIT_LOOK} ready={booted || instant} className="absolute inset-0 mx-auto w-28 sm:w-36" />
+                  <Wardrobe look={OUTFIT_LOOK} className="absolute inset-0 mx-auto w-28 sm:w-36" />
                 </div>
                 <RecruiterHero
-                  render={({ name, headline, tagline, line }) => <BootText lines={[name, headline, tagline, line]} running={booted} instant={instant} />}
+                  render={({ name, headline, tagline, line }) => <BootText lines={[name, headline, tagline, line]} instant={instant} />}
                 />
               </div>
 

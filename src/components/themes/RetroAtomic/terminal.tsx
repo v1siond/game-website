@@ -2,68 +2,20 @@
 
 import { useEffect, useMemo, useReducer, useState } from 'react'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
-import { useZoneStage } from '@/hooks/useZoneStage'
-import { heldUntil } from '@/components/themes/shared/held'
-import { useProfession } from '@/contexts/ProfessionContext'
 import { fillLabel } from '@/lib/cv/labels'
 import { ActionMenu, PHOSPHOR_BUTTON } from './controls'
-import { DwellerSprite, type DwellerMotion } from './dweller'
-import { DoorArt } from './vaultDoor'
+import { DwellerSprite } from './dweller'
+import type { Scene } from './scenes'
+import { AtomicStage } from './stage'
 import { atomicId } from './anchors'
 import { buildBoard, hackReducer, initialHack, MAX_ATTEMPTS, type HackAction, type HackBoard, type HackCell, type HackLogEntry, type HackState } from './hacking'
-import { BAKELITE, DUST, DUST_DARK, RUST } from './palette'
 import atomic from './atomic.module.css'
 
-// Contact, outside: the page leaves the shelter. Behind, the wasteland at dusk (dust sky, the far ruined
-// skyline and the near one sliding apart with the pointer through --mx, the door standing rolled aside
-// in the rock). When the section scrolls in he walks out of the door on the jaunty poster walk, in
-// the poster tone and the picked profession's kit, and stops at the post to idle (the bounce and the
-// blink). In front, a public terminal on its post: the
-// contact menu on the left, always open, and on the right the password game (hacking.ts holds the
-// rules): his tools hidden in a memory dump, the attempts as blocks, every guess answered in the log.
-// A granted password powers on the reward line and he raises his thumb; a locked terminal offers a
-// reboot, which deals a fresh dump (a new seed remounts the game). The terminal powers on once when the section scrolls in.
-
-const WALK_OUT: readonly DwellerMotion[] = ['walk']
-
-/**
- * Him leaving the shelter: the strip he walks along spans the scene, so it starts pushed left with him
- * at the door and slides to rest with him at the post; its own animation ending turns the walk into
- * the idle. Under reduced motion he stands at the post, still.
- */
-function WalkOut({ walking }: { walking: boolean }) {
-  const { active } = useProfession()
-  const { pose, onOwnAnimationEnd } = usePoseSequence<DwellerMotion>({ entrance: WALK_OUT, rest: 'idle', still: 'still' })
-
-  return (
-    <div className={`absolute inset-x-0 bottom-[6%] hidden lg:block ${walking ? atomic.walkOut : atomic.atDoor} ${heldUntil(walking)}`} onAnimationEnd={onOwnAnimationEnd}>
-      <div className="ml-auto mr-[4%] h-40 w-28">
-        <DwellerSprite profession={active} motion={pose} className="h-full w-full" />
-      </div>
-    </div>
-  )
-}
-
-function Wasteland({ walking }: { walking: boolean }) {
-  return (
-    <div className={`pointer-events-none absolute inset-0 overflow-hidden ${atomic.dusk}`} aria-hidden="true">
-      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className={`absolute inset-x-[-4%] bottom-[18%] h-[45%] w-[108%] ${atomic.farLayer}`} focusable="false">
-        <path d="M0 300 V220 L60 220 L60 170 L95 170 L95 200 L150 200 L150 120 L170 110 L190 120 L190 210 L260 210 L260 160 L300 140 L340 160 L340 230 L420 230 L420 90 L440 70 L460 90 L460 220 L560 220 L560 180 L640 180 L640 140 L655 60 L670 140 L670 210 L780 210 L780 150 L830 150 L830 230 L930 230 L930 110 L960 100 L990 110 L990 200 L1080 200 L1080 170 L1200 170 V300 Z" fill={RUST} opacity="0.7" />
-      </svg>
-      <svg viewBox="0 0 1200 300" preserveAspectRatio="xMidYMax slice" className={`absolute inset-x-[-6%] bottom-0 h-[38%] w-[112%] ${atomic.nearLayer}`} focusable="false">
-        <path d="M0 300 V180 Q150 120 300 170 T620 160 Q800 110 950 170 T1200 150 V300 Z" fill={DUST_DARK} />
-        <path d="M0 300 V240 Q200 200 420 236 T860 226 Q1040 200 1200 230 V300 Z" fill={BAKELITE} />
-        <path d="M560 300 L600 236 L640 236 L700 300 Z" fill={DUST} opacity="0.35" />
-      </svg>
-      <div className="absolute bottom-[8%] left-[2%] hidden w-[18%] max-w-[220px] lg:block">
-        <DoorArt className={`h-auto w-full ${atomic.doorAside}`} />
-      </div>
-      <WalkOut walking={walking} />
-      <span className="absolute inset-x-0 bottom-0 h-2 bg-atomic-ink" />
-    </div>
-  )
-}
+// Contact, outside in the town at dusk: on the stage he and the dog walk out to a public terminal on its
+// post (scenes.tsx). Over it, the terminal itself: the contact menu on the left, always open, and on the
+// right the password game (hacking.ts holds the rules): his tools hidden in a memory dump, the attempts as
+// blocks, every guess answered in the log. A granted password powers on the reward line and he raises his
+// thumb; a locked terminal offers a reboot, which deals a fresh dump (a new seed remounts the game).
 
 const cellText = (cell: HackCell, removed: string[]): string => {
   if (cell.kind === 'word') return removed.includes(cell.word) ? '.'.repeat(cell.word.length) : cell.word
@@ -192,11 +144,10 @@ function PasswordGame({ board, onReboot }: { board: HackBoard; onReboot: () => v
   )
 }
 
-export function ContactTerminal() {
+export function ContactTerminal({ scene, still }: { scene: Scene; still: boolean }) {
   const { sections } = useLabels()
   const { hero } = useWorldView()
   const { techStack } = useCVData()
-  const { ref, on } = useZoneStage('town')
   const tools = useMemo(() => techStack.flatMap((category) => category.items), [techStack])
   // The board's random seed is drawn in an effect, so a render stays pure and draws no board until it is set.
   const [seed, setSeed] = useState<number | null>(null)
@@ -205,9 +156,10 @@ export function ContactTerminal() {
   const title = sections.contact
 
   return (
-    <section ref={ref} aria-labelledby={atomicId(title)} className="relative z-20 overflow-hidden px-4 pb-48 pt-16 sm:px-6 lg:pb-56">
-      <Wasteland walking={on} />
-      <div className={`relative mx-auto max-w-6xl p-3 sm:p-5 ${atomic.device}`} data-on={on || undefined}>
+    <section data-scene="contact" aria-labelledby={atomicId(title)} className="relative scroll-mt-24 px-4 pb-[110svh] motion-reduce:pb-16 sm:px-6 lg:px-[6vw]">
+      {still && <AtomicStage scene={scene} settled />}
+      <div className="min-h-[60svh] motion-reduce:min-h-[50svh]" />
+      <div className={`relative max-w-5xl p-3 sm:p-5 ${atomic.device}`} data-on="">
         <div className={`relative overflow-hidden rounded-[1.4rem] p-5 sm:p-8 ${atomic.tube}`}>
           <span className={`pointer-events-none absolute inset-0 ${atomic.vignette}`} aria-hidden="true" />
           <div className={`relative grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${atomic.sectionPower}`}>

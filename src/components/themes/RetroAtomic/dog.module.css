@@ -1,0 +1,11 @@
+/* The dog's joints (dog.tsx): each part turns round its own point of the 120 by 80 viewBox; the scroll writes
+   the turns (pose.ts setDogPose), transforms only. */
+
+.dog * { transform-box: view-box; }
+.dogBody { transform-origin: 55px 41px; }
+.dogHead { transform-origin: 90px 34px; }
+.dogTail { transform-origin: 22px 38px; }
+.dogHindFar { transform-origin: 34px 46px; }
+.dogFrontFar { transform-origin: 86px 46px; }
+.dogHindNear { transform-origin: 40px 46px; }
+.dogFrontNear { transform-origin: 90px 46px; }

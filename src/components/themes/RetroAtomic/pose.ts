@@ -1,0 +1,203 @@
+import { STAND as RIG_STAND, mix as rigMix, walk as rigWalk, type RigPose } from '@/lib/motion/rigPose'
+import { rigJoints, setRigPose, type RigJoints } from '../shared/rig'
+import s from './dweller.module.css'
+import d from './dog.module.css'
+import m from './mutant.module.css'
+
+// The dweller and his dog posed by the scroll. His limbs are the shared rig's numbers (rigPose,
+// ../shared/rig); on top, his own overlays: the level up star with the wink, the targeting reticle, the
+// pistol and its flash. The angles are the ones his CSS motions end on (dweller.module.css), so he looks the
+// same on the wrist terminal. The dog trots in profile, facing right, its paws swinging with the phase.
+
+/** The rig's pose and, 0 to 1: the star and wink, the reticle locked on, the pistol out, its flash. */
+export type DwellerPose = RigPose & { star: number; reticle: number; pistol: number; flash: number }
+
+export const STAND: DwellerPose = { ...RIG_STAND, star: 0, reticle: 0, pistol: 0, flash: 0 }
+
+export const mix = (a: DwellerPose, b: DwellerPose, t: number): DwellerPose => rigMix(a, b, t)
+
+const pose = (partial: Partial<DwellerPose>): DwellerPose => ({ ...STAND, ...partial })
+
+/** The jaunty poster walk at `phase`, toward the viewer's right. */
+export const walk = (phase: number): DwellerPose => pose(rigWalk(phase))
+
+/** The level up: the thumb up, a hop, the wink and the star, `t` of the way. */
+export const thumbsUp = (t: number): DwellerPose => pose({ armRight: 70 * t, foreRight: 110 * t, rise: -6 * Math.sin(Math.PI * t), star: t })
+
+/** The wrist terminal raised and keyed, the key hand tapping with `tap`. */
+export const type = (t: number, tap: number): DwellerPose => pose({ armLeft: 25 * t, foreLeft: 85 * t, armRight: -30 * t, foreRight: (-70 + 10 * Math.abs(Math.sin(tap * Math.PI))) * t })
+
+/** The hoist: squatting, the locker lid up on his right hand. */
+export const hoist = (t: number): DwellerPose =>
+  pose({ rise: 6 * t, thighRight: 22 * t, shinRight: -36 * t, thighLeft: -22 * t, shinLeft: 36 * t, armRight: 165 * t, foreRight: 22 * t, armLeft: -60 * t, foreLeft: -25 * t })
+
+/** The targeting stance, the pistol up and the reticle locked, and the shot's recoil with `shot`. */
+export const aim = (t: number, shot: number): DwellerPose =>
+  pose({ armLeft: (-88 - 16 * shot) * t, foreLeft: (-4 - 14 * shot) * t, armRight: 28 * t, foreRight: -95 * t, pistol: t, reticle: t, flash: shot * t })
+
+/** The bakelite radio held to his chest, the free arm swaying with `beat`. */
+export const sway = (beat: number): DwellerPose => {
+  const swing = (1 - Math.cos(beat * Math.PI)) / 2
+  return pose({ lean: -5 + 10 * swing, armLeft: -44, foreLeft: 118, armRight: 35 + 40 * swing, foreRight: -35 })
+}
+
+/** The guard of the fighter's kit, then the clinch knee `t` of the way. */
+export const knee = (t: number): DwellerPose =>
+  pose({ armRight: 25 - 110 * t, foreRight: 150 - 125 * t, armLeft: -25 - 80 * t, foreLeft: -150 + 185 * t, lean: -8 * t, thighLeft: -105 * t, shinLeft: 115 * t })
+
+/** The side kick `t` of the way: the thigh up, the shin out, leaning back. */
+export const kick = (t: number): DwellerPose =>
+  pose({ armRight: 25 - 35 * t, foreRight: 150 - 140 * t, armLeft: -25, foreLeft: -150, lean: -16 * t, thighLeft: -96 * t, shinLeft: -4 * t })
+
+/** The fighter's guard. */
+export const GUARD: DwellerPose = pose({ armRight: 25, foreRight: 150, armLeft: -25, foreLeft: -150 })
+
+const LIMB_CLASSES = {
+  body: s.body,
+  armRight: s.armRight,
+  foreRight: s.foreRight,
+  armLeft: s.armLeft,
+  foreLeft: s.foreLeft,
+  thighRight: s.thighRight,
+  shinRight: s.shinRight,
+  thighLeft: s.thighLeft,
+  shinLeft: s.shinLeft,
+}
+
+const OVERLAY_CLASSES = { star: s.star, winkLine: s.winkLine, eyeShut: s.eyeShut, reticle: s.reticle, pistol: s.pistol, flash: s.flash }
+
+export type DwellerJoints = RigJoints & Record<keyof typeof OVERLAY_CLASSES, SVGElement | null>
+
+const find = <Names extends string>(root: Element, classes: Record<Names, string>): Record<Names, SVGElement | null> =>
+  Object.fromEntries(Object.entries(classes).map(([name, className]) => [name, root.querySelector<SVGElement>(`.${className as string}`)])) as Record<Names, SVGElement | null>
+
+/** His groups inside `root`, the group that holds one DwellerFigure. */
+export const dwellerJoints = (root: Element): DwellerJoints => ({ ...rigJoints(root, LIMB_CLASSES), ...find(root, OVERLAY_CLASSES) })
+
+const show = (el: SVGElement | null, opacity: number, transform = 'none'): void => {
+  if (!el) return
+  el.style.opacity = opacity.toFixed(3)
+  el.style.transform = transform
+}
+
+/** Writes `p` on his groups: the rig's limbs, then his overlays. Transforms and opacity only. */
+export function setDwellerPose(j: DwellerJoints, p: DwellerPose): void {
+  setRigPose(j, p)
+  show(j.star, p.star, `scale(${p.star.toFixed(3)}) rotate(${(-90 + 90 * p.star).toFixed(1)}deg)`)
+  show(j.winkLine, p.star)
+  show(j.eyeShut, 1 - p.star)
+  show(j.reticle, p.reticle)
+  show(j.pistol, p.pistol)
+  show(j.flash, p.flash)
+}
+
+// ---- the dog ----
+
+export interface DogPose {
+  /** The paws' swing, -1 to 1, front and hind pairs against each other. */
+  stride: number
+  /** 0 standing, 1 sitting; 1 nose down digging. */
+  sit: number
+  dig: number
+}
+
+/** The trot at `phase`: the paws swing a full cycle per unit. */
+export const trot = (phase: number): DogPose => ({ stride: Math.sin(phase * 2 * Math.PI), sit: 0, dig: 0 })
+
+export const SITTING: DogPose = { stride: 0, sit: 1, dig: 0 }
+
+const DOG_CLASSES = { body: d.dogBody, head: d.dogHead, tail: d.dogTail, hindFar: d.dogHindFar, frontFar: d.dogFrontFar, hindNear: d.dogHindNear, frontNear: d.dogFrontNear }
+
+export type DogJoints = Record<keyof typeof DOG_CLASSES, SVGElement | null>
+
+export const dogJoints = (root: Element): DogJoints => find(root, DOG_CLASSES)
+
+const set = (el: SVGElement | null, transform: string): void => {
+  if (el) el.style.transform = transform
+}
+
+/** Writes the dog's pose: the paws' swing, the sit folding the hind legs under, the dig pitching him nose down. */
+export function setDogPose(j: DogJoints, { stride, sit, dig }: DogPose): void {
+  const paw = 24 * stride * (1 - sit) * (1 - dig)
+  set(j.frontNear, `rotate(${paw.toFixed(1)}deg)`)
+  set(j.hindFar, `rotate(${paw.toFixed(1)}deg)`)
+  set(j.frontFar, `rotate(${(-paw).toFixed(1)}deg)`)
+  set(j.hindNear, `rotate(${(-paw).toFixed(1)}deg)`)
+  const fold = `translate(${(6 * sit).toFixed(2)}px, ${(17 * sit).toFixed(2)}px) rotate(${(-85 * sit - 8 * dig).toFixed(1)}deg)`
+  if (sit > 0 || dig > 0) {
+    set(j.hindNear, fold)
+    set(j.hindFar, fold)
+  }
+  set(j.body, `rotate(${(-14 * sit + 12 * dig).toFixed(1)}deg) translateY(${(4 * sit + 2 * dig + Math.abs(stride) * -1.5).toFixed(2)}px)`)
+  set(j.head, `rotate(${(-12 * sit + 18 * dig).toFixed(1)}deg)`)
+  set(j.tail, `rotate(${(-62 * sit + 14 * stride).toFixed(1)}deg)`)
+}
+
+// ---- the mutant ----
+
+/** The mutant's turns in degrees (his body also shifts and drops, in his viewBox's units). */
+export interface FoePose {
+  shift: number
+  drop: number
+  lean: number
+  torso: number
+  head: number
+  armNear: number
+  foreNear: number
+  armFar: number
+  foreFar: number
+  thighNear: number
+  shinNear: number
+  thighFar: number
+  shinFar: number
+}
+
+/** The brawler's guard, fists up before the face. */
+export const FOE_GUARD: FoePose = { shift: 0, drop: 0, lean: 0, torso: 0, head: 0, armNear: 25, foreNear: 110, armFar: 35, foreFar: 112, thighNear: 0, shinNear: 0, thighFar: 0, shinFar: 0 }
+
+/** Doubled over the knee to the gut. */
+export const FOE_KNEED: FoePose = { ...FOE_GUARD, shift: 6, torso: -22, head: -16, armNear: -5, foreNear: 55 }
+
+/** Rocked back by the kick to the head, arms flung. */
+export const FOE_KICKED: FoePose = { ...FOE_GUARD, shift: 7, lean: 9, head: 24, armNear: -40, foreNear: 40, armFar: -60 }
+
+/** Down on the far knee, the head bowed. */
+export const FOE_DOWN: FoePose = { shift: 0, drop: 18, lean: 0, torso: -10, head: -14, armNear: 18, foreNear: 40, armFar: 8, foreFar: 112, thighNear: 72, shinNear: -78, thighFar: -6, shinFar: -84 }
+
+export const mixFoe = (a: FoePose, b: FoePose, t: number): FoePose =>
+  Object.fromEntries(Object.keys(a).map((key) => [key, a[key as keyof FoePose] + (b[key as keyof FoePose] - a[key as keyof FoePose]) * t])) as unknown as FoePose
+
+const FOE_CLASSES = {
+  body: m.body,
+  torso: m.torso,
+  head: m.head,
+  armNear: m.armNear,
+  foreNear: m.foreNear,
+  armFar: m.armFar,
+  foreFar: m.foreFar,
+  thighNear: m.thighNear,
+  shinNear: m.shinNear,
+  thighFar: m.thighFar,
+  shinFar: m.shinFar,
+}
+
+export type FoeJoints = Record<keyof typeof FOE_CLASSES, SVGElement | null>
+
+export const foeJoints = (root: Element): FoeJoints => find(root, FOE_CLASSES)
+
+const turnTo = (el: SVGElement | null, deg: number): void => set(el, `rotate(${deg.toFixed(1)}deg)`)
+
+/** Writes the mutant's pose: transforms only. */
+export function setFoePose(j: FoeJoints, p: FoePose): void {
+  set(j.body, `translate(${p.shift.toFixed(2)}px, ${p.drop.toFixed(2)}px) rotate(${p.lean.toFixed(1)}deg)`)
+  turnTo(j.torso, p.torso)
+  turnTo(j.head, p.head)
+  turnTo(j.armNear, p.armNear)
+  turnTo(j.foreNear, p.foreNear)
+  turnTo(j.armFar, p.armFar)
+  turnTo(j.foreFar, p.foreFar)
+  turnTo(j.thighNear, p.thighNear)
+  turnTo(j.shinNear, p.shinNear)
+  turnTo(j.thighFar, p.thighFar)
+  turnTo(j.shinFar, p.shinFar)
+}

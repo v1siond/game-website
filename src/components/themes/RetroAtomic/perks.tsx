@@ -1,7 +1,5 @@
-import type { ReactNode } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
-import { heldUntil } from '@/components/themes/shared/held'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { CREAM, POSTER_BLUE, POSTER_INK, SHELTER_YELLOW } from './palette'
 import atomic from './atomic.module.css'
@@ -12,10 +10,9 @@ import atomic from './atomic.module.css'
 // (the poster tone, outlined in ink), each card in its own pose: the thumbs up, the knee and kick,
 // the targeting stance. The chart's title and each perk's words are cut out and pasted on tilted pastel
 // blocks, the way the game prints its perk book covers (research special-chart, youre-special); the
-// blocks are drawn for the eye and the plain text sits beside them for screen readers. The spar
-// (spar.tsx) decides when each card shows: as his strike lands its card flips in (rotateY with
-// perspective) and the star stamps down; the ring it hands over is printed just above the cards. Under
-// the pointer a card lifts, he hops and the star turns.
+// blocks are drawn for the eye and the plain text sits beside them for screen readers. The facts and the
+// perks are the cards the Muay Thai scene counts: on the stage the mutant takes a strike per perk
+// (scenes.tsx). Under the pointer a card lifts, he hops and the star turns.
 
 const POSES: DwellerMotion[] = ['thumbsUp', 'strike', 'target']
 
@@ -68,9 +65,9 @@ function CutOutWords({ text }: { text: string }) {
   )
 }
 
-function PerkCard({ achievement, index, shown }: { achievement: string; index: number; shown: boolean }) {
+function PerkCard({ achievement, index }: { achievement: string; index: number }) {
   return (
-    <div className={`relative flex h-full flex-col overflow-hidden ${atomic.perkCard} ${heldUntil(shown)}`} data-shown={shown || undefined}>
+    <div className={`relative flex h-full flex-col overflow-hidden ${atomic.perkCard}`}>
       <div className="relative h-44 overflow-hidden border-b-4 border-atomic-poster-ink">
         <Sunburst />
         <div className={`absolute inset-x-0 bottom-0 mx-auto h-40 w-28 ${atomic.perkHop}`}>
@@ -88,14 +85,7 @@ function PerkCard({ achievement, index, shown }: { achievement: string; index: n
   )
 }
 
-interface PerkChartProps {
-  martialArts: MartialArts
-  // How many achievements have been earned in the spar so far, and the ring printed above their cards.
-  shown: number
-  ring: ReactNode
-}
-
-export function PerkChart({ martialArts, shown, ring }: PerkChartProps) {
+export function PerkChart({ martialArts }: { martialArts: MartialArts }) {
   const { title } = martialArts.primary
 
   return (
@@ -104,19 +94,20 @@ export function PerkChart({ martialArts, shown, ring }: PerkChartProps) {
         <span className="sr-only">{title}</span>
         <CutOutLetters text={title} />
       </h3>
-      <div className="order-1">{ring}</div>
-      <MuayThaiRecord
-        martialArts={martialArts}
-        classNames={{
-          facts: 'mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3',
-          fact: `overflow-hidden border-4 border-atomic-poster-ink bg-atomic-cream ${atomic.posterDrop}`,
-          term: 'bg-atomic-poster-blue px-3 py-2 text-sm font-bold uppercase tracking-widest text-atomic-cream',
-          value: 'px-3 py-3 text-base text-atomic-poster-ink',
-          achievements: 'order-2 grid gap-6 sm:grid-cols-2 lg:grid-cols-3',
-          achievement: 'h-full',
-        }}
-        renderAchievement={(achievement, index) => <PerkCard achievement={achievement} index={index} shown={index < shown} />}
-      />
+      <div data-stage-items="">
+        <MuayThaiRecord
+          martialArts={martialArts}
+          classNames={{
+            facts: 'mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3',
+            fact: `overflow-hidden border-4 border-atomic-poster-ink bg-atomic-cream ${atomic.posterDrop}`,
+            term: 'bg-atomic-poster-blue px-3 py-2 text-sm font-bold uppercase tracking-widest text-atomic-cream',
+            value: 'px-3 py-3 text-base text-atomic-poster-ink',
+            achievements: 'grid gap-6 sm:grid-cols-2 lg:grid-cols-3',
+            achievement: 'h-full',
+          }}
+          renderAchievement={(achievement, index) => <PerkCard achievement={achievement} index={index} />}
+        />
+      </div>
     </div>
   )
 }

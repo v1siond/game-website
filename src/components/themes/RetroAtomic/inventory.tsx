@@ -11,15 +11,13 @@ import { TagList } from '@/components/cv/TagList'
 import { ATOMIC_CHIPS } from './controls'
 import { BAKELITE, CHROME, CREAM, OLIVE_DARK, RUBBER, STEEL_LIGHT } from './palette'
 import atomic from './atomic.module.css'
-import { cssVars } from '@/lib/cssVars'
 
 // Tech Stack as the terminal's inventory screen: every category a pocket packed in masonry columns, its
 // name on the picked, inverted row with the item count, its tools as the rows the pick sweeps over on
-// hover. Each pocket carries its place as --i, so the footlocker's loot (footlocker.tsx) tumbles them in
-// one after another.
+// hover; on the stage he throws open a footlocker per pocket as the page reaches it (scenes.tsx).
 //
 // Ventures as holotapes on a shelf: each company a cassette with its label sticker, the two reels turning
-// while the pointer or focus is on it. Each tape is marked dug once the dog has dug it up (dig.tsx).
+// while the pointer or focus is on it; on the stage the dog digs each tape out of its mound (scenes.tsx).
 
 export function Inventory({ categories }: { categories: CVData['techStack'] }) {
   const { cards } = useLabels()
@@ -27,8 +25,8 @@ export function Inventory({ categories }: { categories: CVData['techStack'] }) {
   return (
     <div className={`p-4 sm:p-6 ${atomic.panel}`}>
       <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
-        {categories.map((category, index) => (
-          <li key={category.id} data-pocket className={MASONRY_ITEM} style={cssVars({ '--i': index })}>
+        {categories.map((category) => (
+          <li key={category.id} className={MASONRY_ITEM}>
             <h3
               data-on
               className={`relative flex min-h-[44px] items-center justify-between gap-3 px-3 text-sm font-bold uppercase tracking-widest ${atomic.pickRow}`}
@@ -83,13 +81,13 @@ function Cassette() {
  * tagline; the other ventures follow three to a row. Each tape's link is named by everything it shows,
  * its services included, plus the new tab note a screen reader alone hears.
  */
-export function Holotapes({ companies, dug = companies.length }: { companies: CVData['companies']; dug?: number }) {
+export function Holotapes({ companies }: { companies: CVData['companies'] }) {
   const { links, cards, sections } = useLabels()
 
   return (
     <ul className="grid gap-6 md:grid-cols-6">
-      {companies.map(ventureCard).map((company, index) => (
-        <li key={company.id} data-tape data-dug={index < dug || undefined} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
+      {companies.map(ventureCard).map((company) => (
+        <li key={company.id} className={company.featured ? 'md:col-span-3' : 'md:col-span-2'}>
           <a
             href={company.url}
             target="_blank"
