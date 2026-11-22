@@ -1,9 +1,9 @@
 import { cssVars } from '@/lib/cssVars'
 import frost from './frostZone.module.css'
-import { cyclesIn } from './play'
+import { cyclesIn } from '@/components/themes/shared/loops'
 
 // A glow that pulses its opacity from `from` to `to` and back over `seconds`, linear, as many times as fit in
-// the 5 s it plays once it shows (play.ts), resting on `from`, as a CSS animation the reduced motion rule can
+// the 5 s it plays once it shows (shared/loops.ts), resting on `from`, as a CSS animation the reduced motion rule can
 // stop. Spread on the svg shape that glows.
 export const pulse = (from: number, to: number, seconds: number) => ({
   className: frost.pulse,

@@ -2,7 +2,7 @@ import { memo, type ReactNode } from 'react'
 import { REALM } from './palette'
 import ornament from './ornaments.module.css'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
-import { cycles } from './play'
+import { cycles } from '@/components/themes/shared/loops'
 
 // The zone ornaments set beside each section and the art dividers drawn between them.
 

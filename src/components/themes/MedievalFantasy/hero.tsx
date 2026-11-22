@@ -3,7 +3,7 @@ import { REALM } from './palette'
 import frost from './frostZone.module.css'
 import { drift, pulse } from './pulse'
 import hero from './hero.module.css'
-import { cycles } from './play'
+import { cycles } from '@/components/themes/shared/loops'
 
 // Him as the death knight king of the frost zone: the spiked pauldrons, the skull chest plate, the fur trimmed
 // cape and the runeblade held point down. His skin, hair, beard and eyes come from HERO_IDENTITY; the armour,

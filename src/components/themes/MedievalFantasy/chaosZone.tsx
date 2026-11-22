@@ -5,7 +5,7 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { REALM } from './palette'
 import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
-import { cycles, PLAY_S, slice } from './play'
+import { cycles, PLAY_S, slice } from '@/components/themes/shared/loops'
 
 // The chaos zone backdrop: storm clouds and lightning, rain, the olive battlefield and the golem's fall.
 
@@ -183,7 +183,7 @@ function AmbientFlash() {
 }
 
 // The meteor that crosses the sky once, METEOR_AT_MS after the page opens, over METEOR_MS, so it has landed
-// within the 5 s the realm's motion plays (play.ts); its state kept apart from the backdrop like the flash.
+// within the 5 s the realm's motion plays (shared/loops.ts); its state kept apart from the backdrop like the flash.
 const METEOR_AT_MS = 1000
 const METEOR_MS = 4000
 

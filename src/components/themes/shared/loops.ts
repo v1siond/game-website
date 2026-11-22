@@ -1,8 +1,9 @@
-// How the realm's living loops play since BD29: each starts when its zone or section shows, has ended
-// within PLAY_S of that, and holds its last frame. A cycle (a flame, a sway, a pulse) plays as many whole
-// cycles as fit, so it rests on the frame it started from; one longer than PLAY_S plays once over PLAY_S.
-// A stream of particles (rain, snow, wind) plays the first PLAY_S of its fall at its own pace, from where
-// it starts, and holds there, a still of the storm.
+// How a world's living loops play since BD29: each starts when its zone or section shows, has ended within
+// PLAY_S of that, and holds its last frame. A cycle (a flame, a sway, a pulse) plays as many whole cycles as
+// fit, so it rests on the frame it started from; one longer than the time left plays once over that time,
+// which also caps a delay that grows with an item's place in a row. A stream of particles (rain, snow,
+// motes) plays the first PLAY_S of its fall at its own pace, from where it starts, and holds there, a still
+// of the storm. Medieval Fantasy and Dark Fantasy write their loops inline, so they read the shorthand here.
 
 export const PLAY_S = 5
 

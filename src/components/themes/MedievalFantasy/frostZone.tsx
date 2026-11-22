@@ -5,7 +5,7 @@ import { FrostHero } from './hero'
 import { REALM } from './palette'
 import frost from './frostZone.module.css'
 import { drift, pulse } from './pulse'
-import { cycles, slice } from './play'
+import { cycles, slice } from '@/components/themes/shared/loops'
 
 // The frost zone backdrop: snow layers, frost wind and the ice field.
 

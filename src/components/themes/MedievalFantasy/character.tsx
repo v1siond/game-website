@@ -1,6 +1,6 @@
 import { REALM } from './palette'
 import golem from './character.module.css'
-import { cycles } from './play'
+import { cycles } from '@/components/themes/shared/loops'
 
 // The infernal golem, the rock creature with fel fire joints that lands in the chaos zone.
 
