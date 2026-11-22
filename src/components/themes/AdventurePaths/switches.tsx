@@ -2,6 +2,8 @@
 
 import { useCallback, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { fillLabel } from '@/lib/cv/labels'
@@ -46,6 +48,13 @@ const SWITCH_COLOURS: readonly SwitchColour[] = [
   { fill: 'bg-[color:var(--ap-route-plate)]', text: 'text-white', svg: TRAIL.ROUTE, shade: TRAIL.ROUTE_DARK },
   { fill: 'bg-[color:var(--ap-blue-plate)]', text: 'text-white', svg: TRAIL.BLUE, shade: TRAIL.BLUE_DARK },
 ]
+
+// A project's details in its message box, each behind a lantern square.
+const LANTERN_ROWS: MarkedLinesLook = {
+  list: 'mt-2 space-y-1.5',
+  line: 'flex items-start gap-2 text-sm',
+  marker: <span className="mt-1.5 h-2 w-2 shrink-0 bg-[color:var(--ap-lantern)]" aria-hidden="true" />,
+}
 
 const LINK = 'inline-flex min-h-[44px] items-center gap-2 rounded-sm border-2 border-[color:var(--ap-ink)] px-3 text-sm font-bold transition-transform hover:-translate-y-0.5 motion-reduce:transition-none'
 
@@ -109,16 +118,7 @@ function MessageBox({ project, id, hidden }: { project: ProjectCard; id: string;
   return (
     <div id={id} hidden={hidden} className={`mt-4 rounded-sm border-4 border-double border-[color:var(--ap-ink)] bg-[color:var(--ap-ink)] p-4 text-[color:var(--ap-page)] ${map.messageBox}`}>
       {project.description && <p className="text-sm">{project.description}</p>}
-      {project.details.length > 0 && (
-        <ul className="mt-2 space-y-1.5" aria-label={cards.details}>
-          {project.details.map((detail) => (
-            <li key={detail} className="flex items-start gap-2 text-sm">
-              <span className="mt-1.5 h-2 w-2 shrink-0 bg-[color:var(--ap-lantern)]" aria-hidden="true" />
-              <span>{detail}</span>
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={project.details} label={cards.details} look={LANTERN_ROWS} />
     </div>
   )
 }
@@ -153,7 +153,7 @@ function SwitchPalace({ slot, colour, filled }: { slot: ProjectSlot; colour: Swi
       <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{project.tagline}</p>
       {project.impact && (
         <p className="mt-2 text-sm font-semibold text-[color:var(--ap-forest)]">
-          <span className="sr-only">{cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}

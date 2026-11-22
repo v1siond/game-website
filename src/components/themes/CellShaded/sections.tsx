@@ -1,13 +1,14 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
-import { OrangePoints, Stage } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { ORANGE_POINTS, Stage } from './stage'
 import type { Zone } from './wasteland'
 import { BountyBoard } from './bountyBoard'
 import { SkillTree } from './skillTree'
@@ -46,30 +47,28 @@ function Hour({ slot, children }: { slot: SectionSlot; children: ReactNode | ((o
   )
 }
 
+// His education and languages under the highlights, each label in the inked capitals.
+const INKED_FACTS: AboutFactsLook = {
+  list: 'mt-4 space-y-1',
+  fact: 'text-base',
+  term: 'inline font-bold uppercase tracking-wider',
+  value: 'inline',
+  termEnd: ': ',
+}
+
 // One frame per section of the shared plan, which picks the ones a profession shows and their order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { cards, about } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { cards } = useLabels()
+    const { highlights } = useAboutBlock()
     return (
       <Hour slot={slot}>
         <SlamLanding>
           <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
             <p className="max-w-prose text-base leading-relaxed">{slot.bio}</p>
             <div className="max-w-prose">
-              <OrangePoints title={cards.keyAchievements} items={highlights} />
-              {education && (
-                <p className="mt-4 text-base">
-                  <span className="font-bold uppercase tracking-wider">{about.education}: </span>
-                  {education}
-                </p>
-              )}
-              {languages && (
-                <p className="mt-1 text-base">
-                  <span className="font-bold uppercase tracking-wider">{about.languages}: </span>
-                  {languages}
-                </p>
-              )}
+              <MarkedLines items={highlights} label={cards.keyAchievements} look={ORANGE_POINTS} />
+              <AboutFacts look={INKED_FACTS} />
             </div>
           </div>
         </SlamLanding>

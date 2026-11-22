@@ -2,6 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { cssVars } from '@/lib/cssVars'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -12,7 +14,8 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { BOONS_PER_WAVE, rarityOf, waveOf, type Rarity } from './fates'
 import { SlabButton } from './buttons'
-import { BloodPoints } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BLOOD_POINTS, GOLD_TAGS } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -85,22 +88,14 @@ function BoonCard({ slot, index, chosen, onChoose }: BoonCardProps) {
         </p>
         {project.tagline && <p className="mt-2 text-base italic text-[var(--myth-gold-pale)]">{project.tagline}</p>}
         {project.description && <p className="mt-2 text-base leading-relaxed">{project.description}</p>}
-        <BloodPoints title={cards.details} items={project.details} />
+        <MarkedLines items={project.details} label={cards.details} look={BLOOD_POINTS} />
         {project.impact && (
           <p className="mt-3 border-l-4 border-[var(--rarity)] pl-3 text-base">
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}
-        {project.techStack.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <li key={tech} className="border border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm">
-                {tech}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={project.techStack} label={cards.technologiesUsed} look={GOLD_TAGS} />
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <SlabButton
             tone={chosen ? 'gold' : 'stone'}

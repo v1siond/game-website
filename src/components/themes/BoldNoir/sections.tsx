@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, type CSSProperties, type ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
@@ -13,7 +13,8 @@ import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Project } from '@/lib/cv/content'
 import { HitStar } from './backdrop'
-import { BandPanel, Bullet, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BULLETS, BandPanel, CaseCard, CompanyTag, RankCard, ServiceSlab, TechStackBoard } from './cards'
 import { AllOutAttack } from './allOut'
 import { SlappedStatement, StampedCase } from './evidence'
 import { NOIR } from './palette'
@@ -60,39 +61,30 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-// One fact under the statement, its label in the red capitals; an empty fact leaves no line.
-function StatementFact({ label, value }: { label: string; value: string }) {
-  if (!value) return null
-  return (
-    <p className={`text-sm ${world.copy}`}>
-      <span className="font-bold uppercase tracking-wider text-[color:var(--noir-red-plate)]">{label}: </span>
-      {value}
-    </p>
-  )
+// The facts under the statement, each label in the red capitals.
+const STATEMENT_FACTS: AboutFactsLook = {
+  list: 'mt-4 max-w-prose space-y-1',
+  fact: `text-sm ${world.copy}`,
+  term: 'inline font-bold uppercase tracking-wider text-[color:var(--noir-red-plate)]',
+  value: 'inline',
+  termEnd: ': ',
 }
 
 function About({ bio }: { bio: string }) {
-  const { sections, cards, about } = useLabels()
-  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+  const { sections, cards } = useLabels()
+  const { highlights } = useAboutBlock()
 
   return (
     <Stage title={sections.about}>
       <SlappedStatement>
         <div className={`max-w-3xl px-6 pb-10 pt-6 sm:px-8 ${world.speech}`}>
           <p className={`max-w-prose text-base leading-relaxed ${world.copy}`}>{bio}</p>
-          {highlights.length > 0 && (
-            <ul className="mt-4 max-w-prose space-y-1.5" aria-label={cards.keyAchievements}>
-              {highlights.map((highlight) => (
-                <Bullet key={highlight} tone={`text-sm ${world.copy}`}>
-                  {highlight}
-                </Bullet>
-              ))}
-            </ul>
-          )}
-          <div className="mt-4 max-w-prose space-y-1">
-            <StatementFact label={about.education} value={education} />
-            <StatementFact label={about.languages} value={languages} />
-          </div>
+          <MarkedLines
+            items={highlights}
+            label={cards.keyAchievements}
+            look={{ ...BULLETS, list: 'mt-4 max-w-prose space-y-1.5', line: `flex items-start gap-2 text-sm ${world.copy}` }}
+          />
+          <AboutFacts look={STATEMENT_FACTS} />
         </div>
       </SlappedStatement>
     </Stage>

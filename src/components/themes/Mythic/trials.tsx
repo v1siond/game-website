@@ -2,6 +2,7 @@
 
 import { memo, useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
 import { jobCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -14,7 +15,8 @@ import { SpartanSprite, type SpriteMotion } from './sprite'
 import { FOE, type FoeName } from './foes'
 import { MOVES } from './rig'
 import { useTrack, useTurnQueue } from './track'
-import { BloodPoints, Laurel } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BLOOD_POINTS, GOLD_TAGS, Laurel } from './stage'
 import { MYTH } from './palette'
 import u from './underworld.module.css'
 
@@ -189,16 +191,8 @@ const TrialCard = memo(function TrialCard({ job, cleared, onEnter }: { job: Job;
         {card.location && ` · ${card.location}`}
       </p>
       <p className="mt-3 text-base leading-relaxed">{card.description}</p>
-      <BloodPoints title={cards.keyAchievements} items={card.highlights} />
-      {card.skills.length > 0 && (
-        <ul className="mt-4 flex flex-wrap gap-2" aria-label={cards.skillsUsed}>
-          {card.skills.map((skill) => (
-            <li key={skill} className="border border-[var(--myth-gold-deep)] bg-[var(--myth-ink)] px-2 py-0.5 text-sm">
-              {skill}
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={card.highlights} label={cards.keyAchievements} look={BLOOD_POINTS} />
+      <TagList items={card.skills} label={cards.skillsUsed} look={{ ...GOLD_TAGS, list: 'mt-4 flex flex-wrap gap-2' }} />
     </article>
   )
 })

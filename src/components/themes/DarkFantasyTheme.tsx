@@ -3,7 +3,11 @@
 import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import type { SiteLinkId } from '@/lib/cv/siteLinks'
@@ -26,7 +30,7 @@ import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacte
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, newTabHint } from '@/lib/cv/sectionText'
-import { aboutBlock, jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
+import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -35,6 +39,26 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
 import world from './DarkFantasy/world.module.css'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+
+// The lines of a card or the About frame, each behind the spirit gold asterisk.
+const SPIRIT_LINES: MarkedLinesLook = {
+  list: 'space-y-1',
+  line: 'text-sm flex items-start gap-2 text-[color:var(--df-bone)]',
+  marker: (
+    <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">
+      *
+    </span>
+  ),
+}
+
+// His education and languages under the highlights, each label in the spirit gold.
+const SPIRIT_FACTS: AboutFactsLook = {
+  list: 'mt-4 space-y-1',
+  fact: 'max-w-prose mx-auto text-sm text-[color:var(--df-silver-text)]',
+  term: 'inline text-[color:var(--df-spirit-gold)]',
+  value: 'inline',
+  termEnd: ': ',
+}
 
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
 const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
@@ -996,23 +1020,14 @@ const ProjectCard = memo(function ProjectCard({ slot: { project: entry, links } 
       </p>
       <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>{project.tagline}</p>
       {project.description && <p className="text-sm mt-2 text-[color:var(--df-silver-text)]">{project.description}</p>}
-      {project.details.length > 0 && (
-        <ul className="space-y-1 mt-2" aria-label={cards.details}>
-          {project.details.map((detail) => (
-            <li key={detail} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
-              <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
-              {detail}
-            </li>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={project.details} label={cards.details} look={{ ...SPIRIT_LINES, list: 'space-y-1 mt-2' }} />
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
-          <span className="sr-only">{cards.impact}: </span>{project.impact}
+          <ImpactLabel />{project.impact}
         </p>
       )}
-      <TagList label={cards.technologiesUsed} tags={project.techStack} className="mt-3" />
+      <TagList items={project.techStack} label={cards.technologiesUsed} look={SOUL_TAGS} />
       {links.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
           {links.map(({ kind, label, linkProps }) => (
@@ -1064,7 +1079,7 @@ const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVD
         </div>
       </div>
       <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{company.description}</p>
-      {company.services.length > 0 && <TagList label={sections.services} tags={company.services} className="mt-3" />}
+      <TagList items={company.services} label={sections.services} look={SOUL_TAGS} />
       <span className="sr-only"> {newTabHint(links)}</span>
     </a>
   )
@@ -1110,16 +1125,9 @@ const BandCard = memo(function BandCard({ band, years, linkProps, release }: Ban
 
 // A row of tags in the soul light, the look the project cards give their technologies (the ethereal at alpha
 // 0x12, 18 of 255).
-function TagList({ label, tags, className = '' }: { label: string; tags: string[]; className?: string }) {
-  return (
-    <ul className={`flex flex-wrap gap-1 ${className}`} aria-label={label}>
-      {tags.map((tag) => (
-        <li key={tag} className="text-sm px-1 py-0.5 bg-[color-mix(in_srgb,var(--df-ethereal)_7.0588%,transparent)] text-[color:var(--df-silver-text)]">
-          {tag}
-        </li>
-      ))}
-    </ul>
-  )
+const SOUL_TAGS: TagListLook = {
+  list: 'flex flex-wrap gap-1 mt-3',
+  tag: 'text-sm px-1 py-0.5 bg-[color-mix(in_srgb,var(--df-ethereal)_7.0588%,transparent)] text-[color:var(--df-silver-text)]',
 }
 
 // Work experience card: every field of the job's card, the years in the label ("2019 to 2022").
@@ -1143,17 +1151,8 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
         </span>
       </div>
       {job.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{job.description}</p>}
-      {job.highlights.length > 0 && (
-        <ul className="space-y-1" aria-label={cards.keyAchievements}>
-          {job.highlights.map((highlight) => (
-            <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DARK_FANTASY.bone }}>
-              <span style={{ color: DARK_FANTASY.spiritGold }} aria-hidden="true">*</span>
-              {highlight}
-            </li>
-          ))}
-        </ul>
-      )}
-      {job.skills.length > 0 && <TagList label={cards.skillsUsed} tags={job.skills} className="mt-3" />}
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SPIRIT_LINES} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={SOUL_TAGS} />
       {!isLast && (
         <div
           className="mt-4"
@@ -1568,23 +1567,13 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
     const { sections, cards } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { highlights } = useAboutBlock()
     return (
       <>
         <FramedSection title={sections[slot.titleKey]}>
           <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
-          {highlights.length > 0 && (
-            <ul className="max-w-prose mx-auto mt-4 space-y-1" aria-label={cards.keyAchievements}>
-              {highlights.map((highlight) => (
-                <li key={highlight} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
-                  <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
-                  {highlight}
-                </li>
-              ))}
-            </ul>
-          )}
-          {education && <p className="max-w-prose mx-auto mt-4 text-sm text-[color:var(--df-silver-text)]">{education}</p>}
-          {languages && <p className="max-w-prose mx-auto mt-1 text-sm text-[color:var(--df-silver-text)]">{languages}</p>}
+          <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...SPIRIT_LINES, list: 'max-w-prose mx-auto mt-4 space-y-1' }} />
+          <AboutFacts look={SPIRIT_FACTS} />
         </FramedSection>
 
         {/* Art Section 1 - Spirits and Gears */}

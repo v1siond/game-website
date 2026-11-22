@@ -10,7 +10,9 @@ import { jobCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
-import { MarkList, PinnedTags, STAMP } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { TagList } from '@/components/cv/TagList'
+import { MARK_LIST, PINNED_TAGS, STAMP } from './cards'
 import horror from './horror.module.css'
 import look from './world.module.css'
 
@@ -124,11 +126,15 @@ function JobFile({ job: entry, isRead, onRead, onPoint }: { job: Job; isRead: bo
             {actions.readFile}
           </button>
           <div id={bodyId} hidden={!isRead}>
-            <MarkList items={job.highlights} label={cards.keyAchievements} className={`mt-3 space-y-1 border-t border-[color:var(--sh-wood)] pt-3 ${horror.fileOpen}`} />
+            <MarkedLines
+              items={job.highlights}
+              label={cards.keyAchievements}
+              look={{ ...MARK_LIST, list: `mt-3 space-y-1 border-t border-[color:var(--sh-wood)] pt-3 ${horror.fileOpen}` }}
+            />
           </div>
         </>
       )}
-      <PinnedTags items={job.skills} label={cards.skillsUsed} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={PINNED_TAGS} />
     </article>
   )
 }

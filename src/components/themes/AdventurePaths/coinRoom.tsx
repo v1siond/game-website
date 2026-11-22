@@ -1,6 +1,7 @@
 'use client'
 
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useZoneStage } from '@/hooks/useZoneStage'
@@ -35,6 +36,13 @@ const COURSE: Course<RoomPose> = {
     { pose: 'run', frame: 'run', path: 'line', to: { x: RUN.to, lift: 0 }, ms: RUN.ms },
   ],
   rest: { pose: 'stand', frame: 'stand' },
+}
+
+// A venture's services, each tag behind a coin.
+const COIN_TAGS: TagListLook = {
+  list: 'mt-3 flex flex-wrap gap-1.5',
+  tag: 'flex items-center gap-1.5 rounded-sm border border-[color:var(--ap-hud)] px-2 py-0.5 text-sm',
+  marker: <span className="h-2.5 w-2 shrink-0 rounded-sm border border-[color:var(--ap-hud)] bg-[color:var(--ap-coin)]" aria-hidden="true" />,
 }
 
 const COINS = [22, 32, 42, 52, 62, 72]
@@ -92,16 +100,7 @@ export function CoinRoom({ companies, profession }: { companies: SectionsOf<'eng
                 </h3>
                 <p className="text-sm font-semibold text-[color:var(--ap-route-text)]">{company.tagline}</p>
                 <p className="mt-2 text-sm text-[color:var(--ap-ink-soft)]">{company.description}</p>
-                {company.services.length > 0 && (
-                  <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={sections.services}>
-                    {company.services.map((service) => (
-                      <li key={service} className="flex items-center gap-1.5 rounded-sm border border-[color:var(--ap-hud)] px-2 py-0.5 text-sm">
-                        <span className="h-2.5 w-2 shrink-0 rounded-sm border border-[color:var(--ap-hud)] bg-[color:var(--ap-coin)]" aria-hidden="true" />
-                        {service}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <TagList items={company.services} label={sections.services} look={COIN_TAGS} />
                 <span className="sr-only"> {newTabHint(links)}</span>
               </article>
             </a>

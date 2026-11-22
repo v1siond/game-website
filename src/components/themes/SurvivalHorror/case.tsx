@@ -5,6 +5,7 @@ import type { Project } from '@/lib/cv/content'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { projectCard } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
@@ -12,7 +13,9 @@ import { cssVars } from '@/lib/cssVars'
 import { useOnChange } from '@/hooks/useOnChange'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
-import { MarkList, PinnedTags, STAMP } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { TagList } from '@/components/cv/TagList'
+import { MARK_LIST, PINNED_TAGS, STAMP } from './cards'
 import { SH } from './palette'
 import horror from './horror.module.css'
 import look from './world.module.css'
@@ -115,14 +118,14 @@ function ItemBack({ slot, turnRef, onTurn }: FaceProps) {
         <SlashBreaks text={project.name} />
       </h3>
       {project.description && <p className="mt-2 text-sm leading-relaxed text-[color:var(--sh-cream)]">{project.description}</p>}
-      <MarkList items={project.details} label={cards.details} className="mt-2 space-y-1" />
+      <MarkedLines items={project.details} label={cards.details} look={{ ...MARK_LIST, list: 'mt-2 space-y-1' }} />
       {project.impact && (
         <p className="mt-2 text-sm italic text-[color:var(--sh-ivory)]">
-          <span className="sr-only">{cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}
-      <PinnedTags items={project.techStack} label={fillLabel(cards.categoryTechnologies, { name: project.name })} />
+      <TagList items={project.techStack} label={fillLabel(cards.categoryTechnologies, { name: project.name })} look={PINNED_TAGS} />
       <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
         {links.map(({ kind, label, linkProps }) => (
           <a key={kind} {...linkProps} className={LINK_PLATE}>

@@ -6,11 +6,14 @@ import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { LOOK, NOIR_BUTTON } from './actions'
 import { GlassStar, HitStar } from './backdrop'
-import { Bullet, Chips } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { TagList } from '@/components/cv/TagList'
+import { BULLETS, CHIPS } from './cards'
 import { Detective } from './detective'
 import { NOIR } from './palette'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { fillLabel } from '@/lib/cv/labels'
 import { projectCard } from '@/lib/cv/cvView'
 
@@ -158,18 +161,12 @@ function FinishCard({ slot, titleId, onClose }: { slot: ProjectSlot; titleId: st
         {project.description && <p className={`mt-3 text-sm text-[color:var(--noir-paper-dim)] ${world.copy}`}>{project.description}</p>}
         {project.impact && (
           <p className={`mt-4 inline-block px-3 py-1 text-base font-bold ${world.heading} ${world.copy}`}>
-            <span className="sr-only">{labels.cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}
-        {project.details.length > 0 && (
-          <ul className="mt-4 space-y-1.5" aria-label={labels.cards.details}>
-            {project.details.map((detail) => (
-              <Bullet key={detail}>{detail}</Bullet>
-            ))}
-          </ul>
-        )}
-        {project.techStack.length > 0 && <Chips items={project.techStack} label={labels.sections.techStack} className="mt-4" />}
+        <MarkedLines items={project.details} label={labels.cards.details} look={{ ...BULLETS, list: 'mt-4 space-y-1.5' }} />
+        <TagList items={project.techStack} label={labels.sections.techStack} look={{ ...CHIPS, list: 'mt-4 flex flex-wrap gap-1.5' }} />
         <div className="mt-6 flex flex-wrap gap-3">
           {links.map((link) => (
             <a

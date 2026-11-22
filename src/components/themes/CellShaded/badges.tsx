@@ -1,9 +1,11 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { newTabName } from '@/lib/cv/sectionText'
+import { TagList } from '@/components/cv/TagList'
+import { newTabHint } from '@/lib/cv/sectionText'
 import type { CVData } from '@/lib/cv/content'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { Starburst } from './ink'
 import { CEL } from './palette'
+import { INKED_TAGS } from './stage'
 import cel from './cel.module.css'
 
 // The ventures as the wasteland's makers' plates: each company a riveted plate stamped with its mark,
@@ -18,7 +20,7 @@ type Company = CVData['companies'][number]
 const PLATE_TONES = [CEL.orange, CEL.sun, CEL.holo]
 
 function PlateFace({ company, tone }: { company: Company; tone: string }) {
-  const { cards } = useLabels()
+  const { cards, sections } = useLabels()
   return (
     <div className={`relative h-full p-5 ${cel.paper} ${cel.press}`}>
       <span className="absolute left-2 top-2 h-3 w-3 rounded-full border-2 border-[var(--cel-ink)] bg-[var(--cel-steel)]" aria-hidden="true" />
@@ -45,21 +47,13 @@ function PlateFace({ company, tone }: { company: Company; tone: string }) {
       </h3>
       {company.tagline && <p className={`mt-1 text-base font-bold italic ${cel.flavour}`}>{company.tagline}</p>}
       <p className="mt-2 text-base leading-relaxed">{company.description}</p>
-      {company.services.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.details}>
-          {company.services.map((service) => (
-            <li key={service} className="border-2 border-[var(--cel-ink)] bg-[var(--cel-white)] px-2 py-0.5 text-sm font-bold">
-              {service}
-            </li>
-          ))}
-        </ul>
-      )}
+      <TagList items={company.services} label={sections.services} look={INKED_TAGS} />
     </div>
   )
 }
 
 export function MakersPlates({ companies }: { companies: Company[] }) {
-  const { links, cards } = useLabels()
+  const { links } = useLabels()
 
   return (
     <ul className="grid gap-8 md:grid-cols-6">
@@ -73,11 +67,11 @@ export function MakersPlates({ companies }: { companies: Company[] }) {
                 href={company.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={newTabName(links, company.featured ? `${cards.ownProduct}, ${company.name}` : company.name)}
                 className={`block h-full ${cel.plate}`}
                 style={style}
               >
                 <PlateFace company={company} tone={tone} />
+                <span className="sr-only"> {newTabHint(links)}</span>
               </a>
             ) : (
               <div className={`h-full ${cel.plate}`} style={style}>

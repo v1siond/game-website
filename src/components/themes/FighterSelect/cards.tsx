@@ -7,10 +7,13 @@ import { ACCENT, type Accent } from './frames'
 import { BLUE_OUTLINE } from './actions'
 import look from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 
 // The fight cards every list entry sits on: a flat dark box ruled in its accent, ringed in black, with
 // the cut corner of a move list panel; highlights are marked with a hit spark. A running job is ruled
@@ -30,32 +33,13 @@ function FightCard({ accent, children }: { accent: Accent; children: ReactNode }
   )
 }
 
-function Tags({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="flex flex-wrap gap-2" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={TAG}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
-}
+const TAGS: TagListLook = { list: 'flex flex-wrap gap-2', tag: TAG }
 
 /** Lines marked with a hit spark: a job's highlights, a project's details, the About highlights. */
-export function SparkLines({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mb-4 space-y-2" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-3 text-sm text-white">
-          <HitSpark />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  )
+export const SPARK_LINES: MarkedLinesLook = {
+  list: 'mb-4 space-y-2',
+  line: 'flex items-start gap-3 text-sm text-white',
+  marker: <HitSpark />,
 }
 
 // The job's years stand on the round's life bars above the card (./rounds), not on the card.
@@ -76,9 +60,9 @@ export function ExperienceCard({ entry }: { entry: Job }) {
 
       {job.description && <p className={`mb-4 ${BODY}`}>{job.description}</p>}
 
-      <SparkLines items={job.highlights} label={cards.keyAchievements} />
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={SPARK_LINES} />
 
-      <Tags items={job.skills} label={cards.skillsUsed} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={TAGS} />
     </FightCard>
   )
 }
@@ -102,15 +86,15 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
         <p className={`mb-4 flex items-start gap-2 px-4 py-2.5 text-sm text-[color:var(--accent)] ${look.impact}`}>
           <HitSpark />
           <span>
-            <span className="sr-only">{labels.cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </span>
         </p>
       )}
 
-      <SparkLines items={project.details} label={labels.cards.details} />
+      <MarkedLines items={project.details} label={labels.cards.details} look={SPARK_LINES} />
 
-      <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
+      <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={TAGS} />
 
       {links.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-3">
@@ -185,7 +169,7 @@ export function VentureCard({ company: entry }: { company: CVData['companies'][n
         <p className={`mt-4 ${BODY}`}>{company.description}</p>
         {company.services.length > 0 && (
           <div className="mt-4">
-            <Tags items={company.services} label={sections.services} />
+            <TagList items={company.services} label={sections.services} look={TAGS} />
           </div>
         )}
         <span className="sr-only"> {newTabHint(links)}</span>

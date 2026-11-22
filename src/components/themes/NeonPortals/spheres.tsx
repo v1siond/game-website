@@ -7,7 +7,9 @@ import { createValueStore, useStoreValue, useZoneStage, type ValueStore } from '
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { cssVars } from '@/lib/cssVars'
 import type { Project } from '@/lib/cv/content'
-import { BODY, FACE, Fact, Points, Tags } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { TagList } from '@/components/cv/TagList'
+import { BODY, FACE, Fact, POINTS, TAGS } from './cards'
 import { aimAt, pointMotion, type Pose } from './choreography'
 import type { Era } from './palette'
 import { FigureRow, Region, Rig } from './stage'
@@ -50,10 +52,10 @@ function SphereCard({ slot, onPoint }: { slot: ProjectSlot; onPoint: (card: HTML
       <p className="mt-3 text-base font-semibold">{project.tagline}</p>
       <p className="mt-2 text-sm leading-relaxed">{project.description}</p>
       {project.impact && <Fact label={cards.impact}>{project.impact}</Fact>}
-      <Points items={project.details} label={cards.details} />
+      <MarkedLines items={project.details} label={cards.details} look={POINTS} />
       <div className="mt-4 rounded-md border-2 border-[color:var(--np-seam)] bg-[color:var(--np-board)] p-3">
         {years && <p className={`${FACE} text-lg tracking-wide text-[color:var(--np-gold)]`}>{years}</p>}
-        <Tags items={project.techStack} label={cards.technologiesUsed} className="mt-2" />
+        <TagList items={project.techStack} label={cards.technologiesUsed} look={TAGS} />
       </div>
       <p className="mt-4 flex flex-wrap gap-2">
         {links.map((link) => (

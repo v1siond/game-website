@@ -1,7 +1,7 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { BandList } from '@/components/cv/BandList'
 import { VentureList } from '@/components/cv/VentureList'
@@ -11,7 +11,8 @@ import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ArtBreak, CurlBanner, PieEyes } from './art'
 import { HOSE } from './palette'
-import { BandRecord, CompanyPoster, ExperienceCard, StarLine, TechBubbleCloud } from './cards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { BandRecord, CompanyPoster, ExperienceCard, STAR_LINES, TechBubbleCloud } from './cards'
 import { Reveal, RunBar } from './scenes'
 import { staggerAt } from '../shared/stagger'
 import { ParryBoard } from './parry'
@@ -73,22 +74,19 @@ const HEADING = {
   muayThai: headingId('hose', 'Muay Thai'),
 } as const
 
-// One line of the About title card's billing, the label in the red lettering; an empty fact leaves no line.
-function BillLine({ label, value }: { label: string; value: string }) {
-  if (!value) return null
-  return (
-    <div className="flex flex-wrap justify-center gap-x-2 text-sm">
-      <dt className={`uppercase tracking-widest ${world.red}`}>{label}</dt>
-      <dd className={world.ink}>{value}</dd>
-    </div>
-  )
+// The About title card's billing, each label in the red lettering.
+const BILL_LINES: AboutFactsLook = {
+  list: 'mt-4 space-y-1',
+  fact: 'flex flex-wrap justify-center gap-x-2 text-sm',
+  term: `uppercase tracking-widest ${world.red}`,
+  value: world.ink,
 }
 
 // One frame per section of the shared plan, each on its isle.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { sections: titles, cards, about } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { sections: titles, cards } = useLabels()
+    const { highlights } = useAboutBlock()
     const { reduced } = useZoneStageContext()
 
     return (
@@ -100,17 +98,8 @@ const FRAMES: SectionFrames = {
               <FlowerKnockout on={on} reduced={reduced} profession="engineer">
                 <div className={`mx-auto max-w-prose p-5 ${world.titleCard}`}>
                   <p className={`leading-relaxed ${LEAD}`}>{slot.bio}</p>
-                  {highlights.length > 0 && (
-                    <ul className="mt-4 space-y-1" aria-label={cards.keyAchievements}>
-                      {highlights.map((highlight) => (
-                        <StarLine key={highlight}>{highlight}</StarLine>
-                      ))}
-                    </ul>
-                  )}
-                  <dl className="mt-4 space-y-1">
-                    <BillLine label={about.education} value={education} />
-                    <BillLine label={about.languages} value={languages} />
-                  </dl>
+                  <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...STAR_LINES, list: 'mt-4 space-y-1' }} />
+                  <AboutFacts look={BILL_LINES} />
                 </div>
               </FlowerKnockout>
             </section>

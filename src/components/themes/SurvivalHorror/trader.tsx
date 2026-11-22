@@ -4,6 +4,7 @@ import type { CSSProperties } from 'react'
 import type { Company } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -22,6 +23,12 @@ import look from './world.module.css'
 
 // A ware's link is named by its visible text (the tag, name, tagline, description and services), so a screen
 // reader reaches every field of the card, then hears that it opens a new tab.
+// A ware's services, each on its wood edged tag.
+const TRADE_TAGS: TagListLook = {
+  list: 'mt-3 flex flex-wrap gap-1.5',
+  tag: 'border border-[color:var(--sh-wood)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]',
+}
+
 function Ware({ company }: { company: Company }) {
   const { links, cards, sections } = useLabels()
 
@@ -43,15 +50,7 @@ function Ware({ company }: { company: Company }) {
       </h3>
       <p className="mb-2 text-sm text-[color:var(--sh-brass-text)]">{company.tagline}</p>
       <p className="text-sm leading-relaxed text-[color:var(--sh-fog-text)]">{company.description}</p>
-      {company.services.length > 0 && (
-        <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={sections.services}>
-          {company.services.map((service) => (
-            <li key={service} className="border border-[color:var(--sh-wood)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]">
-              {service}
-            </li>
-          ))}
-        </ul>
-      )}
+      <TagList items={company.services} label={sections.services} look={TRADE_TAGS} />
       <span className="sr-only"> {newTabHint(links)}</span>
     </a>
   )

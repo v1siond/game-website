@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
@@ -14,7 +16,8 @@ import { useTriggeredScript, type PoseScript, type PoseStep } from './poses'
 import { useRunActions } from './run'
 import { SOUL } from './palette'
 import { BUTTON, BUTTON_LIT } from './links'
-import { CARD_BODY, CARD_META, CARD_TITLE, EmberList, TAG } from './menu'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { CARD_BODY, CARD_META, CARD_TITLE, EMBER_LIST, TAGS } from './menu'
 import ashen from './ashen.module.css'
 import souls from './souls.module.css'
 
@@ -118,22 +121,14 @@ function ItemCard({ project: entry, links }: ProjectSlot) {
         <p className="mt-1 text-sm text-[color:var(--soul-glow)]">{project.role}</p>
         <p className={`mt-1 ${CARD_META}`}>{project.tagline}</p>
         {project.description && <p className={`mt-3 ${CARD_BODY}`}>{project.description}</p>}
-        <EmberList items={project.details} label={cards.details} />
+        <MarkedLines items={project.details} label={cards.details} look={EMBER_LIST} />
         {project.impact && (
           <p className={`mt-3 border-l-2 border-[color:var(--soul-ember)] pl-3 ${CARD_BODY}`}>
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}
-        {project.techStack.length > 0 && (
-          <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <li key={tech} className={TAG}>
-                {tech}
-              </li>
-            ))}
-          </ul>
-        )}
+        <TagList items={project.techStack} label={cards.technologiesUsed} look={TAGS} />
         <div className="mt-4 flex flex-wrap gap-2">
           <PickUp project={project} picked={picked} onPick={() => setPicked(true)} />
           {links.map(({ kind, label, linkProps }) => (

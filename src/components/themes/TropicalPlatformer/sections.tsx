@@ -2,14 +2,15 @@
 
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { usePosts } from '@/components/blog/BlogProvider'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import type { SectionSlot } from '@/lib/cv/sectionPlan'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import { BLOG_PATH, postLinks } from '@/lib/blog/links'
-import { ServiceBoard, SunPoints, TechBoard, VentureBoard } from './boards'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { SUN_POINTS, ServiceBoard, TechBoard, VentureBoard } from './boards'
 import { WOOD_BUTTON } from './buttons'
 import { BrawlRecord } from './brawl'
 import { CannonRun } from './cannons'
@@ -45,29 +46,27 @@ function SectionLevel({ slot, scene, children }: { slot: SectionSlot; scene: Sce
   )
 }
 
+// His education and languages on the elder's board, each label in sun gold.
+const SUN_FACTS: AboutFactsLook = {
+  list: 'mt-4 space-y-1',
+  fact: 'text-sm leading-relaxed text-[color:var(--tp-parchment)]',
+  term: 'inline font-bold text-[color:var(--tp-sun-gold)]',
+  value: 'inline',
+  termEnd: ': ',
+}
+
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { cards, about } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { cards } = useLabels()
+    const { highlights } = useAboutBlock()
     return (
       <SectionLevel slot={slot} scene="jungle">
         <ElderYard>
           <Board>
             <p className="mx-auto max-w-prose text-center text-base leading-relaxed text-[color:var(--tp-parchment)]">{slot.bio}</p>
             <div className="mx-auto max-w-prose">
-              <SunPoints items={highlights} label={cards.keyAchievements} />
-              {education && (
-                <p className="mt-4 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
-                  <span className="font-bold text-[color:var(--tp-sun-gold)]">{about.education}: </span>
-                  {education}
-                </p>
-              )}
-              {languages && (
-                <p className="mt-1 text-sm leading-relaxed text-[color:var(--tp-parchment)]">
-                  <span className="font-bold text-[color:var(--tp-sun-gold)]">{about.languages}: </span>
-                  {languages}
-                </p>
-              )}
+              <MarkedLines items={highlights} label={cards.keyAchievements} look={SUN_POINTS} />
+              <AboutFacts look={SUN_FACTS} />
             </div>
           </Board>
         </ElderYard>

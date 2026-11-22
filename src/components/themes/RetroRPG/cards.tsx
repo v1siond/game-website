@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, type CSSProperties, type MouseEvent, type ReactNode } from 'react'
+import { useRef, type MouseEvent } from 'react'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { cssVars } from '@/lib/cssVars'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
@@ -11,6 +11,7 @@ import { jobCard, projectCard } from '@/lib/cv/cvView'
 import { newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { MONO, PIXEL } from './palette'
 import { Command } from './actions'
 import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
@@ -18,6 +19,8 @@ import { usePlay } from './play'
 import { Soul } from './soul'
 import world from './world.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { MASONRY_TILES } from '@/lib/cv/masonry'
 import { ITEM, SentryPortrait, TALKS } from './rooms'
 
@@ -34,26 +37,13 @@ const TITLE = `text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-text)] 
 const META = `text-sm text-[color:var(--rpg-gold)] ${MONO}`
 const TAG = `border-2 border-[color:var(--rpg-border-shade)] px-2 py-0.5 text-sm text-[color:var(--rpg-sky)] ${MONO}`
 
-function Tags({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mt-4 flex flex-wrap gap-2" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={TAG}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
-}
+const TAGS: TagListLook = { list: 'mt-4 flex flex-wrap gap-2', tag: TAG }
 
-export function SaidLine({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
-  return (
-    <li className={`flex items-start gap-2 ${BODY} ${className}`} style={style}>
-      <Mark />
-      <span>{children}</span>
-    </li>
-  )
+/** Lines the box speaks, each behind the asterisk: a job's highlights, a project's details, the About highlights. */
+export const SAID_LINES: MarkedLinesLook = {
+  list: 'space-y-2',
+  line: `flex items-start gap-2 ${BODY}`,
+  marker: <Mark />,
 }
 
 // Each achievement line shows a beat after the one before it, the way the box speaks line by line.
@@ -86,17 +76,14 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           </span>
         </div>
         {job.description && <p className={`mb-3 ${BODY} ${SHOW_AFTER.third}`}>{job.description}</p>}
-        {job.highlights.length > 0 && (
-          <ul className="space-y-2" aria-label={cards.keyAchievements}>
-            {job.highlights.map((highlight, index) => (
-              <SaidLine key={highlight} className={world.after} style={lineDelay(index)}>
-                {highlight}
-              </SaidLine>
-            ))}
-          </ul>
-        )}
+        <MarkedLines
+          items={job.highlights}
+          label={cards.keyAchievements}
+          look={SAID_LINES}
+          lineProps={(index) => ({ className: world.after, style: lineDelay(index) })}
+        />
         <div className={SHOW_AFTER.last}>
-          <Tags items={job.skills} label={cards.skillsUsed} />
+          <TagList items={job.skills} label={cards.skillsUsed} look={TAGS} />
         </div>
       </article>
     </div>
@@ -157,23 +144,17 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
         <p className={`mb-2 ${META}`}>{project.role}</p>
         <p className={`mb-3 ${BODY}`}>{project.tagline}</p>
         {project.description && <p className={`mb-3 ${BODY}`}>{project.description}</p>}
-        {project.details.length > 0 && (
-          <ul className="mb-3 space-y-2" aria-label={labels.cards.details}>
-            {project.details.map((detail) => (
-              <SaidLine key={detail}>{detail}</SaidLine>
-            ))}
-          </ul>
-        )}
+        <MarkedLines items={project.details} label={labels.cards.details} look={{ ...SAID_LINES, list: 'mb-3 space-y-2' }} />
         {project.impact && (
           <p ref={impact} className={`flex items-start gap-2 text-sm text-[color:var(--rpg-green)] ${MONO}`}>
             <Mark />
             <span>
-              <span className="sr-only">{labels.cards.impact}: </span>
+              <ImpactLabel />
               {project.impact}
             </span>
           </p>
         )}
-        <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
+        <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={TAGS} />
         {links.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map(({ kind, label, linkProps }) => (
@@ -200,12 +181,11 @@ export function ProjectCard({ project: entry, links, noLink }: ProjectSlot) {
 // gold pixel tag over the name. The link drops the slot's short name and is named by everything the box
 // shows, its services included, plus the new tab note a screen reader alone hears.
 export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
-  const { cards, links } = useLabels()
+  const { cards, links, sections } = useLabels()
 
   return (
     <a
       {...linkProps}
-      aria-label={undefined}
       className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)]' : ''} ${world.box} ${world.pick}`}
     >
       {company.featured && (
@@ -225,13 +205,7 @@ export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
         </div>
       </div>
       <p className={`mb-3 ${BODY}`}>{company.description}</p>
-      <div className="flex flex-wrap gap-2">
-        {company.services.map((service) => (
-          <span key={service} className={TAG}>
-            {service}
-          </span>
-        ))}
-      </div>
+      <TagList items={company.services} label={sections.services} look={{ ...TAGS, list: 'flex flex-wrap gap-2' }} />
       {linkProps && <span className="sr-only"> {newTabHint(links)}</span>}
     </a>
   )

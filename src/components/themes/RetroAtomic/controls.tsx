@@ -2,6 +2,8 @@ import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
+import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
+import type { TagListLook } from '@/components/cv/TagList'
 import atomic from './atomic.module.css'
 
 // The world's actions as rows of the terminal's menu: the green text on the glass, and under the
@@ -16,21 +18,22 @@ export const MENU_ROW = `relative flex min-h-[44px] w-full items-center gap-3 px
  *  `relative` span over the bar that fills in under the pointer. */
 export const PHOSPHOR_BUTTON = `relative min-h-[44px] border-2 border-atomic-phosphor px-3 text-sm font-bold uppercase tracking-widest text-atomic-phosphor ${atomic.menuRow}`
 
-/** A technology or skill tag in a card's list. */
-export function AtomicChip({ children }: { children: ReactNode }) {
-  return <li className="border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text">{children}</li>
+/** A card's technology, skill or service tags. */
+export const ATOMIC_CHIPS: TagListLook = {
+  list: 'mt-3 flex flex-wrap gap-2',
+  tag: 'border border-atomic-phosphor/40 px-2 py-0.5 text-sm text-atomic-phosphor-dim-text',
 }
 
 /** An objective row: a "+" and the text, inverting under the pointer like a menu pick. */
-export function PlusRow({ children }: { children: ReactNode }) {
-  return (
-    <li className={`relative flex gap-2 px-2 py-1 text-sm text-atomic-phosphor ${atomic.pickRow}`}>
-      <span className="relative" aria-hidden="true">
-        +
-      </span>
-      <span className="relative">{children}</span>
-    </li>
-  )
+export const PLUS_ROWS: MarkedLinesLook = {
+  list: 'mt-4 space-y-1 border-t border-atomic-phosphor/30 pt-3',
+  line: `relative flex gap-2 px-2 py-1 text-sm text-atomic-phosphor ${atomic.pickRow}`,
+  text: 'relative',
+  marker: (
+    <span className="relative" aria-hidden="true">
+      +
+    </span>
+  ),
 }
 
 function Row({ children }: { children: ReactNode }) {

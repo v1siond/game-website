@@ -1,10 +1,9 @@
 'use client'
 
 import { Lilita_One } from 'next/font/google'
-import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { PostsGate } from '@/components/cv/PostsGate'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -37,9 +36,8 @@ const jungleFace = Lilita_One({ weight: '400', subsets: ['latin'], display: 'swa
 // scroll container and break the fixed canopy.
 
 export default function TropicalPlatformerTheme() {
-  const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions } = useLabels()
+  const { navigation } = useLabels()
   const reducedMotion = useReducedMotion()
   const pointer = usePointerVars(!reducedMotion)
 
@@ -62,13 +60,13 @@ export default function TropicalPlatformerTheme() {
         </section>
 
         <main id="main-content" className="relative z-20 px-4 py-16 sm:px-8 md:px-20">
-          <div className="mx-auto max-w-6xl space-y-24" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionRegion className="mx-auto max-w-6xl space-y-24">
             <VineCrossing />
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
             <PostsGate>
               <PostsLevel />
             </PostsGate>
-          </div>
+          </ProfessionRegion>
         </main>
 
         <TreehouseContact />

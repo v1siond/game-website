@@ -1,9 +1,13 @@
 import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { Job } from '@/lib/cv/content'
-import { aboutBlock, jobCard, projectCard } from '@/lib/cv/cvView'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { jobCard, projectCard } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { TYPEWRITER } from './palette'
 import world from './world.module.css'
 
@@ -42,20 +46,26 @@ export function SectionHeader({ id, title }: { id: string; title: string }) {
 }
 
 // A list in the card's body type, each line behind the dash every Silhouette card marks its points with.
-function DashList({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mt-2 space-y-1" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={`flex items-start gap-1.5 ${CARD_BODY}`}>
-          <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
-            -
-          </span>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
+const DASH_LIST: MarkedLinesLook = {
+  list: 'mt-2 space-y-1',
+  line: `flex items-start gap-1.5 ${CARD_BODY}`,
+  marker: (
+    <span className="text-[color:var(--sh-dim-text)]" aria-hidden="true">
+      -
+    </span>
+  ),
+}
+
+// A job's skills, ruled in the edge grey.
+const SKILL_TAGS: TagListLook = {
+  list: 'mt-2 flex flex-wrap gap-1.5',
+  tag: 'border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim-text)]',
+}
+
+// A project's technologies, on the black.
+const TECH_TAGS: TagListLook = {
+  list: 'mt-2 flex flex-wrap gap-1.5',
+  tag: 'bg-[color:var(--sh-black)] px-1.5 py-0.5 text-sm uppercase tracking-wider text-[color:var(--sh-muted-text)]',
 }
 
 // Every field of the job's card, the years in the label ("2019 to 2022").
@@ -78,16 +88,8 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         </span>
       </div>
       {job.description && <p className={`mt-2 ${CARD_BODY}`}>{job.description}</p>}
-      <DashList items={job.highlights} label={cards.keyAchievements} />
-      {job.skills.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {job.skills.map((skill) => (
-            <span key={skill} className="border border-[color:var(--sh-edge)] px-1.5 py-0.5 text-sm uppercase text-[color:var(--sh-dim-text)]">
-              {skill}
-            </span>
-          ))}
-        </div>
-      )}
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={DASH_LIST} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={SKILL_TAGS} />
     </article>
   )
 }
@@ -108,21 +110,15 @@ export function ProjectCard({ project: entry, links }: ProjectSlot) {
       <p className="mt-0.5 text-sm text-[color:var(--sh-text)]">{project.role}</p>
       {project.tagline && <p className={`mt-0.5 ${CARD_META}`}>{project.tagline}</p>}
       {project.description && <p className={`mt-1.5 ${CARD_BODY}`}>{project.description}</p>}
-      <DashList items={project.details} label={cards.details} />
+      <MarkedLines items={project.details} label={cards.details} look={DASH_LIST} />
       {project.impact && (
         <p className={`mt-1.5 italic ${CARD_BODY}`}>
           <span aria-hidden="true">{'-> '}</span>
-          <span className="sr-only">{cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {project.techStack.map((tech) => (
-          <span key={tech} className="bg-[color:var(--sh-black)] px-1.5 py-0.5 text-sm uppercase tracking-wider text-[color:var(--sh-muted-text)]">
-            {tech}
-          </span>
-        ))}
-      </div>
+      <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={TECH_TAGS} />
       {links.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
           {links.map(({ kind, label, linkProps }) => (
@@ -140,28 +136,23 @@ export function ProjectCard({ project: entry, links }: ProjectSlot) {
   )
 }
 
+// His education and languages on the slab, each label in the meta type.
+const SLAB_FACTS: AboutFactsLook = {
+  list: 'space-y-2',
+  fact: '',
+  term: `uppercase ${CARD_META}`,
+  value: CARD_BODY,
+}
+
 // His education, languages and summary highlights under the chase, on the slab the job cards use.
-export function AboutFacts() {
-  const { about, cards } = useLabels()
-  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
-  const facts = [
-    { label: about.education, value: education },
-    { label: about.languages, value: languages },
-  ].filter((fact) => fact.value)
+export function AboutSlab() {
+  const { cards } = useLabels()
+  const { highlights } = useAboutBlock()
 
   return (
     <div className={`mx-auto mt-6 max-w-prose border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
-      {facts.length > 0 && (
-        <dl className="space-y-2">
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt className={`uppercase ${CARD_META}`}>{fact.label}</dt>
-              <dd className={CARD_BODY}>{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-      <DashList items={highlights} label={cards.keyAchievements} />
+      <AboutFacts look={SLAB_FACTS} />
+      <MarkedLines items={highlights} label={cards.keyAchievements} look={DASH_LIST} />
     </div>
   )
 }

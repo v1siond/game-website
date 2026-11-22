@@ -1,8 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCVData, useLabels } from "@/components/cv/CVDataProvider";
-import { aboutBlock } from "@/lib/cv/cvView";
+import { useLabels } from "@/components/cv/CVDataProvider";
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from "@/components/cv/AboutFacts";
 import {
   sectionViews,
   type SectionFrames,
@@ -10,6 +10,7 @@ import {
 import { ProjectList } from "@/components/cv/ProjectList";
 import { BandList } from "@/components/cv/BandList";
 import { VentureList } from "@/components/cv/VentureList";
+import { MarkedLines } from "@/components/cv/MarkedLines";
 import { MuayThaiRecord } from "@/components/cv/MuayThaiRecord";
 import { MASONRY_ITEM, MASONRY_LIST } from "@/lib/cv/masonry";
 import { drumsSince } from "@/lib/cv/sectionText";
@@ -20,7 +21,7 @@ import {
   ExperienceCard,
   ItemBag,
   ProjectCard,
-  SaidLine,
+  SAID_LINES,
 } from "./cards";
 import { BulletBox } from "./bulletBox";
 import { MonsterTurnBox } from "./monsterTurn";
@@ -100,17 +101,13 @@ function Block({
   );
 }
 
-// One line of the About box's stats, the label in the gold the boxes name things in; an empty fact
-// leaves no line.
-function StatLine({ label, value }: { label: string; value: string }) {
-  if (!value) return null;
-  return (
-    <div className="flex flex-wrap gap-x-2">
-      <dt className={`text-sm uppercase text-[color:var(--rpg-gold)] ${MONO}`}>{label}</dt>
-      <dd className={BODY}>{value}</dd>
-    </div>
-  );
-}
+// The About box's stats, each label in the gold the boxes name things in.
+const STAT_LINES: AboutFactsLook = {
+  list: "mt-4 max-w-prose space-y-1",
+  fact: "flex flex-wrap gap-x-2",
+  term: `text-sm uppercase text-[color:var(--rpg-gold)] ${MONO}`,
+  value: BODY,
+};
 
 const STAT =
   "border-2 border-[color:var(--rpg-border-shade)] bg-[color:var(--rpg-window-low)] p-3";
@@ -118,29 +115,19 @@ const STAT =
 // One frame per section of the shared plan, each in its room of the zone it belongs to.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { cards, about } = useLabels();
-    const { education, languages, highlights } = aboutBlock(
-      useCVData().professionalSummary,
-    );
+    const { cards } = useLabels();
+    const { highlights } = useAboutBlock();
     return (
       <Block labelKey={slot.titleKey}>
         <EncounterRoom>
           <OpenBox>
             <p className={`max-w-prose ${BODY}`}>{slot.bio}</p>
-            {highlights.length > 0 && (
-              <ul
-                className="mt-4 max-w-prose space-y-2"
-                aria-label={cards.keyAchievements}
-              >
-                {highlights.map((highlight) => (
-                  <SaidLine key={highlight}>{highlight}</SaidLine>
-                ))}
-              </ul>
-            )}
-            <dl className="mt-4 max-w-prose space-y-1">
-              <StatLine label={about.education} value={education} />
-              <StatLine label={about.languages} value={languages} />
-            </dl>
+            <MarkedLines
+              items={highlights}
+              label={cards.keyAchievements}
+              look={{ ...SAID_LINES, list: "mt-4 max-w-prose space-y-2" }}
+            />
+            <AboutFacts look={STAT_LINES} />
           </OpenBox>
           <div className="mt-6">
             <BulletBox profession="engineer" />

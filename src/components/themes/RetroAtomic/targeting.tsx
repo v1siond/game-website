@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useEffect, useRef, useState, type ReactNode, type RefObject } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -12,7 +13,9 @@ import type { Project } from '@/lib/cv/content'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CREAM, POSTER_INK, SHELTER_YELLOW } from './palette'
 import { DwellerSprite, type DwellerMotion } from './dweller'
-import { AtomicChip, PHOSPHOR_BUTTON, PlusRow } from './controls'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { TagList } from '@/components/cv/TagList'
+import { ATOMIC_CHIPS, PHOSPHOR_BUTTON, PLUS_ROWS } from './controls'
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
 import { cssVars } from '@/lib/cssVars'
@@ -145,7 +148,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
       {project.impact && (
         <Part tag={cards.impact}>
           <p className="mt-3 border-l-4 border-atomic-phosphor pl-3 text-sm text-atomic-phosphor">
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         </Part>
@@ -153,11 +156,7 @@ const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTa
 
       {project.techStack.length > 0 && (
         <Part tag={cards.tech}>
-          <ul className="mt-3 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <AtomicChip key={tech}>{tech}</AtomicChip>
-            ))}
-          </ul>
+          <TagList items={project.techStack} label={cards.technologiesUsed} look={ATOMIC_CHIPS} />
         </Part>
       )}
 
@@ -234,26 +233,14 @@ function ProjectFile({ slot, opener, onClose }: ProjectFileProps) {
         {project.description && <p className="mt-3 text-base leading-relaxed text-atomic-phosphor">{project.description}</p>}
         {project.impact && (
           <p className="mt-4 border-l-4 border-atomic-phosphor pl-3 text-base text-atomic-phosphor">
-            <span className="sr-only">{cards.impact}: </span>
+            <ImpactLabel />
             {project.impact}
           </p>
         )}
 
-        {project.details.length > 0 && (
-          <ul className="mt-5 space-y-1" aria-label={cards.details}>
-            {project.details.map((detail) => (
-              <PlusRow key={detail}>{detail}</PlusRow>
-            ))}
-          </ul>
-        )}
+        <MarkedLines items={project.details} label={cards.details} look={{ ...PLUS_ROWS, list: 'mt-5 space-y-1' }} />
 
-        {project.techStack.length > 0 && (
-          <ul className="mt-5 flex flex-wrap gap-2" aria-label={cards.technologiesUsed}>
-            {project.techStack.map((tech) => (
-              <AtomicChip key={tech}>{tech}</AtomicChip>
-            ))}
-          </ul>
-        )}
+        <TagList items={project.techStack} label={cards.technologiesUsed} look={{ ...ATOMIC_CHIPS, list: 'mt-5 flex flex-wrap gap-2' }} />
 
         {links.length > 0 && (
           <div className="mt-5 flex flex-wrap gap-3">

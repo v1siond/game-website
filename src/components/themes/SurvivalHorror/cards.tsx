@@ -2,6 +2,8 @@ import type { CVData, Service } from '@/lib/cv/content'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
+import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
+import type { TagListLook } from '@/components/cv/TagList'
 import look from './world.module.css'
 
 // The small marks the house's papers share: the brass bullet of a typed list, the rust date stamp, and the
@@ -14,32 +16,16 @@ export function Mark() {
 }
 
 /** A typed list, each line behind the brass bullet. */
-export function MarkList({ items, label, className = 'mt-3 space-y-1' }: { items: string[]; label: string; className?: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className={className} aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-2 text-sm text-[color:var(--sh-cream)]">
-          <Mark />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  )
+export const MARK_LIST: MarkedLinesLook = {
+  list: 'mt-3 space-y-1',
+  line: 'flex items-start gap-2 text-sm text-[color:var(--sh-cream)]',
+  marker: <Mark />,
 }
 
 /** The tags pinned on a paper: a job's skills, a project's tools. */
-export function PinnedTags({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className="border border-[color:var(--sh-felt-line)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]">
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
+export const PINNED_TAGS: TagListLook = {
+  list: 'mt-3 flex flex-wrap gap-1.5',
+  tag: 'border border-[color:var(--sh-felt-line)] px-2 py-0.5 text-sm text-[color:var(--sh-cream)]',
 }
 
 export function TechCloud({ categories }: { categories: CVData['techStack'] }) {

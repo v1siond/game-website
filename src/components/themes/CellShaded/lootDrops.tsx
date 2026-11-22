@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList } from '@/components/cv/TagList'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/lib/cv/sectionText'
 import { projectCard } from '@/lib/cv/cvView'
@@ -11,7 +13,8 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import type { Project } from '@/lib/cv/content'
 import { compareStat, rarityOf, statsOf, type Rarity, type Stat, type StatKey, type Trend } from './loot'
 import { InkButton } from './buttons'
-import { OrangePoints } from './stage'
+import { MarkedLines } from '@/components/cv/MarkedLines'
+import { INKED_TAGS, ORANGE_POINTS } from './stage'
 import cel from './cel.module.css'
 
 // The projects as loot on the dusk field: each one drops in with a column of its rarity's light
@@ -112,7 +115,7 @@ function LootCard({ slot, index, equippedId, equippedStats, onEquip }: LootCardP
           </p>
           {project.tagline && <p className="mt-2 text-base font-bold">{project.tagline}</p>}
           {project.description && <p className="mt-2 text-base leading-relaxed">{project.description}</p>}
-          <OrangePoints title={cards.details} items={project.details} />
+          <MarkedLines items={project.details} label={cards.details} look={ORANGE_POINTS} />
 
           <dl className="mt-4 border-[3px] border-[var(--cel-ink)] bg-[var(--cel-white)] px-3 py-1">
             {statsFor(slot.project, labels).map((stat, statIndex) => (
@@ -122,20 +125,16 @@ function LootCard({ slot, index, equippedId, equippedStats, onEquip }: LootCardP
 
           {project.impact && (
             <p className={`mt-3 text-base font-bold italic ${cel.flavour}`}>
-              <span className="sr-only">{cards.impact}: </span>
+              <ImpactLabel />
               {project.impact}
             </p>
           )}
 
-          {project.techStack.length > 0 && (
-            <ul className="mt-3 flex flex-wrap gap-1.5" aria-label={cards.technologiesUsed}>
-              {project.techStack.map((tech) => (
-                <li key={tech} className="border-2 border-[var(--cel-ink)] bg-[var(--cel-sun)] px-2 py-0.5 text-sm font-bold">
-                  {tech}
-                </li>
-              ))}
-            </ul>
-          )}
+          <TagList
+            items={project.techStack}
+            label={cards.technologiesUsed}
+            look={{ ...INKED_TAGS, tag: 'border-2 border-[var(--cel-ink)] bg-[var(--cel-sun)] px-2 py-0.5 text-sm font-bold' }}
+          />
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <InkButton

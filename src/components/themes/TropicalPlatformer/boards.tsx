@@ -7,6 +7,8 @@ import type { CVData, Service } from '@/lib/cv/content'
 import { ventureCard } from '@/lib/cv/cvView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
 import { cssVars } from '@/lib/cssVars'
 import { Board } from './levelSign'
 import look from './jungle.module.css'
@@ -22,21 +24,21 @@ import look from './jungle.module.css'
 // included) plus the new tab note a screen reader alone hears.
 
 /** Lines read on a dark board, each after a sun gold dot: a job's highlights, a project's details, the
- *  About highlights. Nothing when there are none. */
-export function SunPoints({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className="mt-4 space-y-2" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className="flex items-start gap-2 text-sm text-[color:var(--tp-parchment)]">
-          <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0" aria-hidden="true" focusable="false">
-            <circle cx="5" cy="5" r="4" fill="var(--tp-sun-gold)" />
-          </svg>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
+ *  About highlights. */
+export const SUN_POINTS: MarkedLinesLook = {
+  list: 'mt-4 space-y-2',
+  line: 'flex items-start gap-2 text-sm text-[color:var(--tp-parchment)]',
+  marker: (
+    <svg viewBox="0 0 10 10" className="mt-1 h-3 w-3 flex-shrink-0" aria-hidden="true" focusable="false">
+      <circle cx="5" cy="5" r="4" fill="var(--tp-sun-gold)" />
+    </svg>
+  ),
+}
+
+/** A card's tags on the wood: a job's skills, a project's technologies, a venture's services. */
+export const WOOD_TAGS: TagListLook = {
+  list: 'mt-4 flex flex-wrap gap-2',
+  tag: `rounded-lg px-2 py-1 text-sm ${look.tag}`,
 }
 
 // `itemClassName` is the class the section's motion gives each top level card (the ground slap's jolt, the
@@ -101,15 +103,7 @@ export function VentureBoard({ companies, itemClassName = '' }: BoardListProps &
               </span>
             </span>
             <span className="mt-3 block text-sm leading-relaxed">{company.description}</span>
-            {company.services.length > 0 && (
-              <ul className="mt-3 flex flex-wrap gap-2" aria-label={sections.services}>
-                {company.services.map((service) => (
-                  <li key={service} className={`rounded-lg px-2 py-1 text-sm ${look.tag}`}>
-                    {service}
-                  </li>
-                ))}
-              </ul>
-            )}
+            <TagList items={company.services} label={sections.services} look={{ ...WOOD_TAGS, list: 'mt-3 flex flex-wrap gap-2' }} />
             <span className="sr-only"> {newTabHint(links)}</span>
           </a>
         </li>

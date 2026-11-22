@@ -5,15 +5,16 @@ import { useLabels } from './CVDataProvider'
 import { newTabName } from '@/lib/cv/sectionText'
 
 // The ventures as a list without a look, in the order viewFor gives (his own products first). A venture
-// with a site carries `linkProps` for the world's anchor, named for a link that wraps the whole card
-// ("My product, Lumi: tagline (opens in a new tab)"); one without carries null. A link whose visible
-// text is a word ("Website") takes its name from `nameFor(word)` instead, so the name holds that word.
+// with a site carries `linkProps` for the world's anchor; one without carries null. The anchor is named by
+// its own visible text plus the new tab note (newTabHint in an sr-only span), so a link that wraps the
+// whole card reads its tagline, description and services too. A link whose visible text is a word
+// ("Website") takes its name from `nameFor(word)`, so the name says whose site it opens.
 
 export type Venture = CVData['companies'][number]
 
 export interface VentureSlot {
   venture: Venture
-  linkProps: { href: string; target: '_blank'; rel: string; 'aria-label': string } | null
+  linkProps: { href: string; target: '_blank'; rel: string } | null
   /** "Website of {venture} (opens in a new tab)" for a link that reads "Website". */
   nameFor: (visibleText: string) => string
 }
@@ -24,23 +25,18 @@ interface VentureListProps {
   renderVenture: (slot: VentureSlot, index: number) => ReactNode
   className?: string
   itemClassName?: string
-  /** Added to the item of a featured venture (his own product), e.g. to span the columns. */
+  /** The item class of a featured venture (his own product) in place of `itemClassName`, e.g. a wider span. */
   featuredItemClassName?: string
 }
 
-const cardName = (venture: Venture, labels: Labels): string =>
-  `${venture.featured ? `${labels.cards.ownProduct}, ` : ''}${venture.name}: ${venture.tagline}`
-
 const slotFor = (venture: Venture, labels: Labels): VentureSlot => ({
   venture,
-  linkProps: venture.url
-    ? { href: venture.url, target: '_blank', rel: 'noopener noreferrer', 'aria-label': newTabName(labels.links, cardName(venture, labels)) }
-    : null,
+  linkProps: venture.url ? { href: venture.url, target: '_blank', rel: 'noopener noreferrer' } : null,
   nameFor: (visibleText) => newTabName(labels.links, fillLabel(labels.links.linkOf, { link: visibleText, project: venture.name })),
 })
 
 const itemClassFor = (venture: Venture, itemClassName = '', featuredItemClassName = ''): string =>
-  venture.featured ? `${itemClassName} ${featuredItemClassName}` : itemClassName
+  venture.featured && featuredItemClassName ? featuredItemClassName : itemClassName
 
 export function VentureList({ companies, renderVenture, className, itemClassName, featuredItemClassName }: VentureListProps) {
   const labels = useLabels()

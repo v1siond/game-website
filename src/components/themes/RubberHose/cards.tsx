@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { useId } from 'react'
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
@@ -10,8 +10,11 @@ import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { TagList, type TagListLook } from '@/components/cv/TagList'
+import { ImpactLabel } from '@/components/cv/ImpactLabel'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
+import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 
 // Rubber Hose's cards, sepia posters and title cards under one ink line: the tech bubbles, a job's title
 // card, a project's show poster, a venture's advertisement and a band's record label. A poster throws an
@@ -33,19 +36,7 @@ function CornerTicks() {
   )
 }
 
-function Chips({ items, label }: { items: string[]; label: string }) {
-  if (items.length === 0) return null
-
-  return (
-    <ul className="mt-3 flex flex-wrap gap-1" aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={CHIP}>
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
-}
+const CHIPS: TagListLook = { list: 'mt-3 flex flex-wrap gap-1', tag: CHIP }
 
 export function TechBubbleCloud({ categories }: { categories: CVData['techStack'] }) {
   return (
@@ -60,16 +51,15 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
   )
 }
 
-/** A row behind the red star the title cards mark a highlight or a detail with. */
-export function StarLine({ children }: { children: ReactNode }) {
-  return (
-    <li className={`flex items-start gap-2 ${BODY}`}>
-      <span className={world.red} aria-hidden="true">
-        ★
-      </span>
-      {children}
-    </li>
-  )
+/** Rows behind the red star the title cards mark a highlight or a detail with. */
+export const STAR_LINES: MarkedLinesLook = {
+  list: 'mt-2 space-y-1',
+  line: `flex items-start gap-2 ${BODY}`,
+  marker: (
+    <span className={world.red} aria-hidden="true">
+      ★
+    </span>
+  ),
 }
 
 // A job on a title card, the years ("2019 to 2022") on an ink tab above it.
@@ -88,14 +78,8 @@ export function ExperienceCard({ entry }: { entry: Job }) {
       </p>
       {job.location && <p className={`italic ${BODY}`}>{job.location}</p>}
       {job.description && <p className={`mb-2 mt-2 ${BODY}`}>{job.description}</p>}
-      {job.highlights.length > 0 && (
-        <ul className="mt-2 space-y-1" aria-label={cards.keyAchievements}>
-          {job.highlights.map((highlight) => (
-            <StarLine key={highlight}>{highlight}</StarLine>
-          ))}
-        </ul>
-      )}
-      <Chips items={job.skills} label={cards.skillsUsed} />
+      <MarkedLines items={job.highlights} label={cards.keyAchievements} look={STAR_LINES} />
+      <TagList items={job.skills} label={cards.skillsUsed} look={CHIPS} />
     </article>
   )
 }
@@ -119,21 +103,15 @@ export function VintagePoster({ project: entry, links, noLink }: ProjectSlot) {
       <p className={`mb-1 font-bold ${BODY}`}>{project.role}</p>
       <p className={`mb-2 ${BODY}`}>{project.tagline}</p>
       {project.description && <p className={`mb-2 ${BODY}`}>{project.description}</p>}
-      {project.details.length > 0 && (
-        <ul className="mb-2 space-y-1" aria-label={labels.cards.details}>
-          {project.details.map((detail) => (
-            <StarLine key={detail}>{detail}</StarLine>
-          ))}
-        </ul>
-      )}
+      <MarkedLines items={project.details} label={labels.cards.details} look={{ ...STAR_LINES, list: 'mb-2 space-y-1' }} />
       {project.impact && (
         <p className={`mb-2 rounded px-2 py-1 italic ${BODY} ${world.impact}`}>
           <span aria-hidden="true">→ </span>
-          <span className="sr-only">{labels.cards.impact}: </span>
+          <ImpactLabel />
           {project.impact}
         </p>
       )}
-      <Chips items={project.techStack} label={labels.cards.technologiesUsed} />
+      <TagList items={project.techStack} label={labels.cards.technologiesUsed} look={CHIPS} />
       {links.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-3">
           {links.map(({ kind, label, linkProps }) => (
@@ -157,7 +135,7 @@ export function CompanyPoster({ venture, linkProps }: VentureSlot) {
   const company = ventureCard(venture)
 
   return (
-    <a {...linkProps} aria-label={undefined} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
+    <a {...linkProps} className={`group relative block h-full p-4 transition-transform hover:scale-[1.02] motion-reduce:transition-none ${world.poster}`}>
       <CornerTicks />
       <InkBlot />
       {company.featured && (
@@ -177,7 +155,7 @@ export function CompanyPoster({ venture, linkProps }: VentureSlot) {
         </div>
       </div>
       <p className={BODY}>{company.description}</p>
-      <Chips items={company.services} label={sections.services} />
+      <TagList items={company.services} label={sections.services} look={CHIPS} />
       {linkProps && <span className="sr-only"> {newTabHint(links)}</span>}
     </a>
   )

@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
+import type { TagListLook } from '@/components/cv/TagList'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -16,19 +18,14 @@ export const CARD_META = 'text-sm tracking-wide text-[color:var(--soul-text-soft
 export const CARD_BODY = 'text-sm leading-relaxed text-[color:var(--soul-text)]'
 export const TAG = `${ashen.slot} inline-block px-2 py-0.5 text-sm text-[color:var(--soul-text-soft)]`
 
+/** A card's item slots: a job's skills, a project's technologies, a message's services. */
+export const TAGS: TagListLook = { list: 'mt-3 flex flex-wrap gap-1.5', tag: TAG }
+
 // A list in the card body type, each line behind the small ember diamond the world marks its points with.
-export function EmberList({ items, label, className = 'mt-3' }: { items: string[]; label: string; className?: string }) {
-  if (items.length === 0) return null
-  return (
-    <ul className={`space-y-1.5 ${className}`} aria-label={label}>
-      {items.map((item) => (
-        <li key={item} className={`flex gap-2 ${CARD_BODY}`}>
-          <span className="mt-2 h-1 w-1 shrink-0 rotate-45 bg-[color:var(--soul-ember)]" aria-hidden="true" />
-          {item}
-        </li>
-      ))}
-    </ul>
-  )
+export const EMBER_LIST: MarkedLinesLook = {
+  list: 'space-y-1.5 mt-3',
+  line: `flex gap-2 ${CARD_BODY}`,
+  marker: <span className="mt-2 h-1 w-1 shrink-0 rotate-45 bg-[color:var(--soul-ember)]" aria-hidden="true" />,
 }
 
 export function Panel({ children, className = '' }: { children: ReactNode; className?: string }) {

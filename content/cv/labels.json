@@ -149,8 +149,6 @@
         "retry": "Try again",
         "incomingCall": "Incoming call",
         "doubleJump": "Double jump",
-        "tagEducation": "Education",
-        "tagLanguages": "Languages",
         "tagHighlight": "Highlight",
         "installed": "Installed",
         "contract": "Contract {number}"
@@ -621,8 +619,6 @@
         "retry": "Intentar de nuevo",
         "incomingCall": "Llamada entrante",
         "doubleJump": "Doble salto",
-        "tagEducation": "Formación",
-        "tagLanguages": "Idiomas",
         "tagHighlight": "Destacado",
         "installed": "Instalado",
         "contract": "Contrato {number}"
@@ -1093,8 +1089,6 @@
         "retry": "Riprova",
         "incomingCall": "Chiamata in arrivo",
         "doubleJump": "Doppio salto",
-        "tagEducation": "Formazione",
-        "tagLanguages": "Lingue",
         "tagHighlight": "In evidenza",
         "installed": "Installato",
         "contract": "Contratto {number}"
