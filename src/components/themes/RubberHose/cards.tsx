@@ -2,14 +2,13 @@ import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
 import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
-import { fillLabel } from '@/lib/cv/labels'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
 import world from './world.module.css'
 import styles from './scenes.module.css'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
+import { TechList } from '@/components/cv/TechList'
 
 // Rubber Hose's cards, sepia posters and title cards under one ink line: the tech bubbles, a job's title
 // card, a project's show poster, a venture's advertisement and a band's record label. A poster throws an
@@ -46,28 +45,15 @@ function Chips({ items, label }: { items: string[]; label: string }) {
 }
 
 export function TechBubbleCloud({ categories }: { categories: CVData['techStack'] }) {
-  const { cards } = useLabels()
-
   return (
-    <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
-      {categories.map((category) => (
-        <li key={category.id} className={MASONRY_ITEM}>
-          <h3 className={`mb-3 flex items-center gap-2 text-sm uppercase tracking-widest ${world.red}`}>
-            <span className="text-lg" aria-hidden="true">
-              {category.icon}
-            </span>
-            {category.name}
-          </h3>
-          <ul className="flex flex-wrap gap-2" aria-label={fillLabel(cards.categoryTechnologies, { name: category.name })}>
-            {category.items.map((tech) => (
-              <li key={tech} className={`px-3 py-1 ${CHIP} transition-transform hover:scale-110 motion-reduce:transition-none`}>
-                {tech}
-              </li>
-            ))}
-          </ul>
-        </li>
-      ))}
-    </ul>
+    <TechList
+      categories={categories}
+      headingClassName={`mb-3 flex items-center gap-2 text-sm uppercase tracking-widest ${world.red}`}
+      iconClassName="text-lg"
+      itemsClassName="flex flex-wrap gap-2"
+      itemClassName={`px-3 py-1 ${CHIP} transition-transform hover:scale-110 motion-reduce:transition-none`}
+      renderItem={(tech) => tech}
+    />
   )
 }
 

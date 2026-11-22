@@ -1,6 +1,6 @@
 'use client'
 
-import type { CSSProperties } from 'react'
+import { cssVars } from '@/lib/cssVars'
 
 export type PortalVariant = 'vortex' | 'wormhole' | 'hyperspace' | 'glitch'
 
@@ -34,13 +34,13 @@ export default function WorldPortal({
   coverMs,
   revealMs,
 }: WorldPortalProps) {
-  const style = {
-    ['--wp-accent']: accent,
-    ['--wp-secondary']: secondary,
-    ['--wp-bg']: background,
-    ['--wp-cover']: `${coverMs}ms`,
-    ['--wp-reveal']: `${revealMs}ms`,
-  } as CSSProperties
+  const style = cssVars({
+    '--wp-accent': accent,
+    '--wp-secondary': secondary,
+    '--wp-bg': background,
+    '--wp-cover': `${coverMs}ms`,
+    '--wp-reveal': `${revealMs}ms`,
+  })
 
   return (
     <div className="wp-root" data-variant={variant} data-phase={phase} style={style}>

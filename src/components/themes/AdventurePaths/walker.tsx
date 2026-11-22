@@ -1,5 +1,6 @@
 import type { Profession } from '@/lib/cv/professions'
 import { EYES, OUTFITS, PART_TOP, SPRITE, headRows, legRows, spriteRuns, torsoRows, type LegFrame, type TorsoFrame } from './sprite'
+import { PixelRuns } from '../shared/PixelRuns'
 import map from './map.module.css'
 
 // Him as the map walker (the pixel data in sprite.ts). Every frame is drawn once and the CSS picks the one
@@ -11,13 +12,7 @@ const TORSO_FRAMES: TorsoFrame[] = ['idle', 'walkA', 'walkB', 'actA', 'actB', 'c
 const LEG_FRAMES: LegFrame[] = ['stand', 'walkA', 'walkB']
 
 function Pixels({ rows, top, colours }: { rows: readonly string[]; top: number; colours: Record<string, string> }) {
-  return (
-    <>
-      {spriteRuns(rows, top).map((run) => (
-        <rect key={`${run.x}-${run.y}`} x={run.x} y={run.y} width={run.width} height={1} fill={colours[run.key]} />
-      ))}
-    </>
-  )
+  return <PixelRuns runs={spriteRuns(rows, top)} colours={colours} />
 }
 
 export function TrailWalker({ profession, className = '' }: { profession: Profession; className?: string }) {

@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { TRAIL } from './palette'
 import type { Trail, TrailDot } from './trail'
 import map from './map.module.css'
@@ -7,8 +8,8 @@ import map from './map.module.css'
 // MapDefs (rendered once on the root, so every map shares one set of ids): the parchment and its folds,
 // the level tile in its three states, the dotted trail, hills, tree clumps, waves and clouds.
 
-/** A CSS variable for an element's own style (the only inline style the world writes). */
-export const cssVars = (vars: Record<string, string | number>): CSSProperties => vars as CSSProperties
+// Re-exported for the map and level files that take their drawing pieces from this module.
+export { cssVars }
 
 export function MapDefs() {
   return (

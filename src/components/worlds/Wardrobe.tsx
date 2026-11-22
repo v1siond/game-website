@@ -1,11 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type MouseEvent, type RefObject } from 'react'
+import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type RefObject } from 'react'
 import Image from 'next/image'
 import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
 import { getThemeById } from '@/themes/themes'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { cssVars } from '@/lib/cssVars'
 import { fillLabel } from '@/lib/cv/labels'
 import { TOUR_ORDER, WARDROBE_FAN_KEY, WARDROBE_FAN_MS, followingInTour, previousInTour } from '@/lib/worlds/nudge'
 import { outfitPlace } from '@/lib/worlds/wardrobe'
@@ -192,7 +193,7 @@ export default function Wardrobe({ look, className = '', ready = true }: Wardrob
 
   const previous = previousInTour(theme.id)
   const next = followingInTour(theme.id)
-  const vars = { '--wd-plate': look.plate, '--wd-text': look.text, '--wd-ring': look.ring, '--wd-fan-ms': `${WARDROBE_FAN_MS}ms` } as CSSProperties
+  const vars = cssVars({ '--wd-plate': look.plate, '--wd-text': look.text, '--wd-ring': look.ring, '--wd-fan-ms': `${WARDROBE_FAN_MS}ms` })
 
   return (
     <div ref={anchor} style={vars} className={`c-wardrobe c-wardrobe--${theme.id} ${className}`}>

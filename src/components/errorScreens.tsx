@@ -17,7 +17,6 @@ import { ENGINE_URL } from '@/lib/engineLink'
 
 /** Where every screen can always send someone. Absolute paths: a failed page may have a broken router. */
 const HOME = '/'
-const GAME_ENGINE = ENGINE_URL
 
 /** 404, the address matches nothing. */
 export function NotFoundScreen() {
@@ -28,7 +27,7 @@ export function NotFoundScreen() {
       detail="The address does not match anything on the site. It is usually an old link, or a typo in the URL."
       actions={[
         { label: 'Go to the home page', href: HOME, primary: true },
-        { label: 'Open the game engine', href: GAME_ENGINE },
+        { label: 'Open the game engine', href: ENGINE_URL },
       ]}
     />
   )

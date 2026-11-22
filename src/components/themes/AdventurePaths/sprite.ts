@@ -1,7 +1,7 @@
 import { pixelRuns, type Run } from '@/lib/pixelRuns'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
-import { TRAIL } from './palette'
+import { SPRITE_INK, TRAIL } from './palette'
 
 // Him as the map walker, a parody of the plumber hero on the 16 bit overworld map: a red cap with its
 // brim, a red shirt under blue overalls with two gold buttons, white gloves and brown shoes, and his full
@@ -120,15 +120,12 @@ export const EYES: ReadonlyArray<readonly [number, number]> = [
 export const spriteRuns = (rows: readonly string[], top: number): Run[] =>
   rows.flatMap((row, index) => pixelRuns([row], top + index, (SPRITE.width - row.length) / 2))
 
-const OUTLINE = '#160e08'
 const CAP_RED = '#c8301f'
 const BRIM_RED = '#86200f'
 const OVERALL_SHADE = '#1f3f78'
-const GLOVE_WHITE = '#fbf8ee'
-const SHOE_BROWN = '#6b3a1c'
 
 const COSTUME = {
-  K: OUTLINE,
+  K: SPRITE_INK.OUTLINE,
   S: HERO_IDENTITY.skin,
   s: HERO_IDENTITY.skinShade,
   H: HERO_IDENTITY.hair,
@@ -140,8 +137,8 @@ const COSTUME = {
   T: CAP_RED,
   P: TRAIL.BLUE,
   p: OVERALL_SHADE,
-  G: GLOVE_WHITE,
-  F: SHOE_BROWN,
+  G: SPRITE_INK.GLOVE,
+  F: SPRITE_INK.SHOE,
 }
 
 export interface Outfit {

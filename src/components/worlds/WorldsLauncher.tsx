@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, type CSSProperties, type MouseEvent } from 'react'
+import { useEffect, useRef, type MouseEvent } from 'react'
 import Image from 'next/image'
 import { useTheme } from '@/themes/ThemeContext'
 import { useWorldTransition } from '@/themes/WorldTransitionContext'
 import { useWorldsNudge } from '@/hooks/useWorldsNudge'
+import { cssVars } from '@/lib/cssVars'
 import { fillLabel } from '@/lib/cv/labels'
 import { launcherColors } from '@/lib/worlds/nudge'
 import { portraitOf, type LauncherFace } from '@/lib/worlds/lens'
@@ -14,9 +15,9 @@ import WorldLens, { useLensTrigger } from './WorldLens'
 import { useWorldsLabels } from './WorldsLabels'
 
 /** The custom properties worlds-nudge.css paints the launcher, the hint and the picker from. */
-export function launcherVars(colors: ThemeColors): CSSProperties {
+export function launcherVars(colors: ThemeColors) {
   const { text, body, fill, edge } = launcherColors(colors)
-  return { '--wl-text': text, '--wl-body': body, '--wl-fill': fill, '--wl-edge': edge } as CSSProperties
+  return cssVars({ '--wl-text': text, '--wl-body': body, '--wl-fill': fill, '--wl-edge': edge })
 }
 
 // The face class per launcher face: the turn plays its CSS moment once, the face rests.
