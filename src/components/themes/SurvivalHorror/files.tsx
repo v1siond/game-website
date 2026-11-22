@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { useState } from 'react'
 import type { Job } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
+import { cssVars } from '@/lib/cssVars'
 import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
@@ -23,13 +24,14 @@ import look from './world.module.css'
 
 function useSearch() {
   const [read, setRead] = useState<ReadonlySet<string>>(new Set())
-  const toggle = (id: string) =>
+  // A room once searched stays searched.
+  const search = (id: string) =>
     setRead((current) => {
       const next = new Set(current)
       next.add(id)
       return next
     })
-  return { read, search: toggle }
+  return { read, search }
 }
 
 function Check() {
@@ -81,7 +83,7 @@ function HouseMap({ jobs, read, here }: { jobs: Job[]; read: ReadonlySet<string>
         ))}
       </ul>
       <div className="mt-3 h-2 overflow-hidden bg-[color:var(--sh-void)]" aria-hidden="true">
-        <div className={`h-full origin-left bg-[color:var(--sh-room-searched)] ${horror.searchBar}`} style={{ '--searched': searched / Math.max(jobs.length, 1) } as CSSProperties} />
+        <div className={`h-full origin-left bg-[color:var(--sh-room-searched)] ${horror.searchBar}`} style={cssVars({ '--searched': searched / Math.max(jobs.length, 1) })} />
       </div>
     </div>
   )
@@ -111,7 +113,6 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
           <button
             type="button"
             onClick={onRead}
-            aria-expanded={isRead}
             aria-controls={bodyId}
             className={`${CARD_BUTTON} border-[color:var(--sh-brass)] bg-[color:var(--sh-shadow)] text-[color:var(--sh-flame-text)] hover:border-[color:var(--sh-flame)]`}
           >
@@ -146,7 +147,7 @@ export function MapFiles({ jobs }: { jobs: Job[] }) {
       <HouseMap jobs={jobs} read={searched} here={here} />
       <ul className={MASONRY_LIST}>
         {jobs.map((job, index) => (
-          <li key={job.id} className={`${MASONRY_ITEM} ${horror.fileDrop} ${triggered ? horror.fileDropped : ''}`} style={{ '--i': index } as CSSProperties}>
+          <li key={job.id} className={`${MASONRY_ITEM} ${horror.fileDrop} ${triggered ? horror.fileDropped : ''}`} style={cssVars({ '--i': index })}>
             <JobFile job={job} isRead={read.has(job.id)} onRead={() => search(job.id)} onPoint={() => setHere(job.id)} />
           </li>
         ))}

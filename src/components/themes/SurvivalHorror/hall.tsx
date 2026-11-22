@@ -24,7 +24,7 @@ const WALK_IN_MS = 1400
 // The wardrobe's inventory box beside him: lamp flame on the void, 9.6 to 1.
 const OUTFIT_LOOK: WardrobeLook = { plate: SH.void, text: SH.flame, ring: SH.void }
 
-const TYPED = (shown: boolean) => (shown ? horror.typeIn : '')
+const typedClass = (shown: boolean) => (shown ? horror.typeIn : '')
 
 export function HallHero({ profession }: { profession: Profession }) {
   const { navigation, horror: words } = useLabels()
@@ -52,7 +52,7 @@ export function HallHero({ profession }: { profession: Profession }) {
               <h1 className={`text-[clamp(1.5rem,7vw,2.25rem)] uppercase tracking-[0.15em] text-[color:var(--sh-ivory)] ${look.typed}`}>
                 <NameWords name={name} />
               </h1>
-              <span className={`${horror.typeCover} ${TYPED(shown)}`} aria-hidden="true" />
+              <span className={`${horror.typeCover} ${typedClass(shown)}`} aria-hidden="true" />
             </div>
             <p className="mt-3 text-base text-[color:var(--sh-cream)]">{headline}</p>
             <p className={`mt-2 text-sm italic text-[color:var(--sh-brass-text)] ${look.typed}`}>{tagline}</p>

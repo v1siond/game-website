@@ -63,7 +63,7 @@ function DoorLeafArt({ suit }: { suit: Suit }) {
       <rect width={100} height={140} fill={SH.wood} />
       <rect x={10} y={10} width={80} height={52} fill="none" stroke={SH.sepia} strokeWidth={3} />
       <rect x={10} y={74} width={80} height={56} fill="none" stroke={SH.sepia} strokeWidth={3} />
-      <g transform="translate(38 24) scale(1)" fill={SH.brass}>
+      <g transform="translate(38 24)" fill={SH.brass}>
         {SUIT_ART[suit]}
       </g>
       <circle cx={86} cy={70} r={4} fill={SH.brass} />
