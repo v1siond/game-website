@@ -90,7 +90,7 @@ const ECHOES = [
 ]
 
 // One figure of the dash. Before the stage turns on and once his own dash has ended he waits off the lane,
-// so he stands still there instead of running his leg loops where nobody sees them.
+// so he stands still there instead of running his legs where nobody sees them.
 function Runner({ motion, className = '', style }: { motion: MercMotion; className?: string; style?: CSSProperties }) {
   const [ran, setRan] = useState(false)
   return (

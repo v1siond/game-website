@@ -65,20 +65,19 @@
     animation: pip 200ms steps(2, end) calc(var(--i, 0) * 260ms + 300ms) both;
   }
 
-  /* The challenge clock on player two's side: the digit strip ticks down one digit a second, nine to
-   * zero, then stops, like the arcade's ten second window for another player to step in. */
+  /* The challenge clock on player two's side: the digit strip ticks down nine to zero, then stops, like
+   * the arcade's window for another player to step in, cut to four seconds so it ends inside 5 s. */
   .cue:not([data-scene-phase='idle']) .countdown {
-    animation: countdown 9s steps(9, end) 900ms both;
+    animation: countdown 4s steps(9, end) 900ms both;
   }
 
   .cue:not([data-scene-phase='idle']) .banner {
     animation: banner 900ms cubic-bezier(0.2, 0.9, 0.2, 1) 200ms both;
   }
 
-  /* ---- loops: the blinking coin call ---- */
-
-  .blink {
-    animation: blink 1s steps(1, end) infinite;
+  /* The coin call blinks with the clock, once a second until it reads zero, and rests lit. */
+  .cue:not([data-scene-phase='idle']) .blink {
+    animation: blink 1s steps(1, end) 900ms 4;
   }
 
   /* ---- the select screen: the player one cursor snaps between slots, a pick re-runs the splash ---- */
@@ -93,6 +92,12 @@
 
   .callIn {
     animation: slam 340ms cubic-bezier(0.34, 1.56, 0.64, 1) 120ms both;
+  }
+
+  /* The preview's first play waits for its cue to arm. */
+  .cue[data-scene-phase='idle'] .previewIn,
+  .cue[data-scene-phase='idle'] .callIn {
+    animation-play-state: paused;
   }
 
   .pickFlash {

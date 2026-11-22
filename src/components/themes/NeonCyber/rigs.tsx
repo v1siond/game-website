@@ -5,13 +5,14 @@ import { NEON } from './palette'
 import world from './world.module.css'
 
 // His rig per profession, the place the quickhack menu swaps in: three layers (far, mid with him, near)
-// that lean apart under the pointer, each place with its own loop.
+// that lean apart under the pointer, each place with its own motions, played once inside 5 s when the
+// menu scrolls in and again on a profession pick.
 // - System Engineer, the den: the city through the window, cables from the ceiling, three screens with
-//   scrolling code, the deck on the desk and the netrunner chair; he types (5 loops).
+//   scrolling code, the deck on the desk and the netrunner chair; he types (5 motions).
 // - Musician, the club: a holo sign over the stage, two beams sweeping, his kit with the crash shaking
-//   on the hit; he plays behind it (6 loops).
+//   on the hit; he plays behind it (6 motions).
 // - Martial Artist, the overpass gym: the highway deck overhead with traffic crossing, the ring ropes
-//   in front, the heavy bag swinging on its chain; the guard, the jab and the roundhouse (4 loops).
+//   in front, the heavy bag swinging on its chain; the guard, the jab and the roundhouse (4 motions).
 
 const VIEW = '0 0 480 240'
 
@@ -29,7 +30,7 @@ function Layer({ depth, children }: { depth: 'far' | 'mid' | 'near'; children: R
   )
 }
 
-// Where he stands in the rig, in percent of the rig box; his loop there is the merc's profession action.
+// Where he stands in the rig, in percent of the rig box; his motion there is the merc's profession action.
 const PLACE: Record<Profession, string> = {
   engineer: 'left-[13%] bottom-[3%] w-[18%]',
   drummer: 'left-[41%] bottom-[10%] w-[18%]',
@@ -181,7 +182,8 @@ const RIG: Record<Profession, (props: { figure: ReactNode }) => ReactNode> = {
   fighter: Gym,
 }
 
-export function Rig({ profession }: { profession: Profession }) {
+// `on` is the quickhack menu's trigger: he holds his kit pose until it.
+export function Rig({ profession, on }: { profession: Profession; on: boolean }) {
   const Place = RIG[profession]
   const place = PLACE[profession]
 
@@ -190,7 +192,7 @@ export function Rig({ profession }: { profession: Profession }) {
       <Place
         figure={
           <div className={`absolute ${place} ${world.depth} ${world.mid}`}>
-            <MercSprite profession={profession} motion={MERC_ACTION[profession]} className="h-auto w-full" />
+            <MercSprite profession={profession} motion={on ? MERC_ACTION[profession] : 'still'} className="h-auto w-full" />
           </div>
         }
       />

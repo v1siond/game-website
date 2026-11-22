@@ -1,8 +1,9 @@
 import { ClashEmblem, KoBadge, WinOrb } from './badges'
-import { HudBar } from './hud'
+import { Cue, HudBar } from './hud'
 
 // The art between sections: the HUD's life bar run across the page with the KO badge at its heart, the
-// VS burst, and a band of three round win orbs like the rounds of a match.
+// VS burst (a cue, so its beat plays when it scrolls in), and a band of three round win orbs like the
+// rounds of a match.
 
 export function LightningLine() {
   return (
@@ -16,9 +17,9 @@ export function LightningLine() {
 
 export function ClashSeparator() {
   return (
-    <div className="flex justify-center py-8">
+    <Cue className="flex justify-center py-8">
       <ClashEmblem large />
-    </div>
+    </Cue>
   )
 }
 

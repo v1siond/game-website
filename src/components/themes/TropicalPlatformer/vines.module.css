@@ -21,7 +21,7 @@
 
 .card:hover,
 .card:focus-within {
-  animation: hang-sway 1.6s ease-in-out infinite;
+  animation: hang-sway 1.6s ease-in-out 2;
 }
 
 @keyframes hang-drop {

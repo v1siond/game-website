@@ -27,7 +27,11 @@
   top: var(--top);
   background: var(--tp-firefly);
   box-shadow: 0 0 10px 3px rgb(233 255 143 / 0.6);
-  animation: firefly-drift 3.6s ease-in-out var(--delay) infinite;
+}
+
+/* Each firefly drifts once from the trigger, its delay included inside 5 s, and rests dim where it began. */
+[data-on] .firefly {
+  animation: firefly-drift 3.2s ease-in-out var(--delay) both;
 }
 
 @keyframes firefly-drift {

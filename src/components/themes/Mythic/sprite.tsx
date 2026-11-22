@@ -518,24 +518,27 @@ interface SpriteProps {
   motion: SpriteMotion
   className?: string
   place?: Place
-  /** A one shot move has played out (never called for a loop, or under reduced motion). */
+  /** A one shot move has played out (never called for a cycle, or under reduced motion). */
   onDone?: () => void
   sheathed?: boolean
   /** Bumped to play the motion again from its start (the same move twice in a row) on the same figure. */
   take?: number
+  /** True until his scene's trigger: he stands in his rest pose and no motion plays, so a figure drawn below
+   *  the first screen does not breathe unseen at mount. */
+  waiting?: boolean
 }
 
 /** Plays a move's keys on the figure's joints, its body and its lights, and cancels them when the move or the take changes. */
-function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion: SpriteMotion, take: number, onDone?: () => void) {
+function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion: SpriteMotion, take: number, waiting: boolean, onDone?: () => void) {
   const reduced = useReducedMotion()
   // The latest onDone, so a new one each render never restarts the move.
   const doneRef = useLatest(onDone)
 
   useEffect(() => {
-    if (!svg || reduced || motion === 'still' || typeof svg.animate !== 'function') return
+    if (!svg || reduced || waiting || motion === 'still' || typeof svg.animate !== 'function') return
     const { ms, loop } = MOVES[motion]
     const keys = resolveKeys(motion, profession)
-    const timing: KeyframeAnimationOptions = { duration: ms, iterations: loop ? Infinity : 1 }
+    const timing: KeyframeAnimationOptions = { duration: ms, iterations: loop || 1 }
     const frames = (style: (pose: Pose) => Keyframe) => keys.map(({ at, pose }) => ({ offset: at, easing: 'ease-in-out', ...style(pose) }))
 
     const joints = [...svg.querySelectorAll<SVGGElement>('[data-joint]')].map((element) => {
@@ -549,12 +552,12 @@ function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion:
     const all = [...joints, ...body, ...lights]
     if (!loop) all[0]?.finished.then(() => doneRef.current?.(), () => undefined)
     return () => all.forEach((animation) => animation.cancel())
-  }, [svg, reduced, motion, profession, take, doneRef])
+  }, [svg, reduced, waiting, motion, profession, take, doneRef])
 }
 
 /** Him as the chained blade Spartan, in a profession's kit, playing one motion. */
-export function SpartanSprite({ profession, motion, className = '', place, onDone, sheathed = false, take = 0 }: SpriteProps) {
+export function SpartanSprite({ profession, motion, className = '', place, onDone, sheathed = false, take = 0, waiting = false }: SpriteProps) {
   const [svg, setSvg] = useState<SVGSVGElement | null>(null)
-  useRigMotion(svg, profession, motion, take, onDone)
+  useRigMotion(svg, profession, motion, take, waiting, onDone)
   return <SpartanFigure profession={profession} className={className} place={place} svgRef={setSvg} sheathed={sheathed} />
 }

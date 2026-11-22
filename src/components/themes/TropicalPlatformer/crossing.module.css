@@ -26,7 +26,7 @@
   .gap[data-on] .arc {
     animation:
       swing-arc 2.2s ease-in-out both,
-      hang-sway 2s ease-in-out 2.2s infinite alternate;
+      hang-sway 2.4s ease-in-out 2.2s;
   }
 
   .gap[data-on] .vine {
@@ -89,11 +89,16 @@
   }
 }
 
+/* One sway round his grip after the landing, back to hanging straight. */
 @keyframes hang-sway {
-  from {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
     transform: rotate(-3deg);
   }
-  to {
+  75% {
     transform: rotate(3deg);
   }
 }

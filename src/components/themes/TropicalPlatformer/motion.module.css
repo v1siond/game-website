@@ -1,7 +1,7 @@
 /*
  * The jungle's shared sway (elder.tsx, vines.tsx): the old timer's chair rocking on its rocker, and him
  * hanging from a vine, swinging in on it and then swaying round his grip. One keyframe for both, each at its
- * own pace. Transform and opacity only.
+ * own pace, a few sways inside 5 s, resting tilted on the sway's first frame. Transform and opacity only.
  */
 
 @keyframes sway {
@@ -18,7 +18,11 @@
 .rock {
   transform-box: view-box;
   transform-origin: 52px 104px;
-  animation: sway 2.4s ease-in-out infinite;
+}
+
+/* The chair rocks twice once the yard is on (elder.tsx). */
+[data-on] .rock {
+  animation: sway 2.4s ease-in-out 2 both;
 }
 
 /* He hangs by the back hand, near the figure's top left; the pendulum turns round that grip. */
@@ -28,14 +32,14 @@
 }
 
 .swing {
-  animation: sway 1.6s ease-in-out infinite;
+  animation: sway 1.6s ease-in-out 3 both;
 }
 
 /* Once the grove has scrolled in, the band he moves to swings him in first. */
 .swingIn {
   animation:
     swing-in 1.1s cubic-bezier(0.3, 0, 0.3, 1) both,
-    sway 1.6s ease-in-out 1.1s infinite;
+    sway 1.6s ease-in-out 1.1s 2 both;
 }
 
 @keyframes swing-in {

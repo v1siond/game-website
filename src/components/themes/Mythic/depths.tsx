@@ -6,14 +6,15 @@ import u from './underworld.module.css'
 // with its braziers (hero, about), the storm sea with the serpent (work history, tech stack), the basalt
 // and the magma river (projects, ventures), Rhodes at night under the bronze giant (bands, muay thai) and
 // Olympus at dawn (contact). The root's data-zone fades the era in view up (stage.tsx) and only that era
-// runs its own clock (the .era parts sit paused otherwise); each era drifts against the pointer (--mx, --my).
+// runs its own clock (the .era parts sit paused otherwise), so each era plays its motion once the first time
+// it is in view and then rests; each era drifts against the pointer (--mx, --my).
 
 const INK = MYTH.inkLine
 
 function Flame({ x, y, scale = 1, color = MYTH.fire, core = MYTH.fireCore }: { x: number; y: number; scale?: number; color?: string; core?: string }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <g className={u.flame}>
+      <g className={`${u.era} ${u.flame}`}>
         <path d="M0 0 Q-18 -20 -6 -46 Q-2 -30 6 -38 Q4 -58 14 -70 Q24 -40 16 -20 Q22 -26 20 -10 Q16 0 0 0 Z" fill={color} />
         <path d="M2 -2 Q-8 -14 0 -30 Q4 -20 8 -26 Q14 -12 2 -2 Z" fill={core} />
       </g>
@@ -95,9 +96,9 @@ function HallArt() {
   )
 }
 
-// The storm sea of the first game: rain driving at a slant, lightning every 7 s, the swell rolling under a
+// The storm sea of the first game: rain driving at a slant, a lightning flash, the swell rolling under a
 // broken mast with its torn sail, the serpent's near head rising out of the sea to lunge with its jaw open
-// and sinking again, a second head swaying far off.
+// and standing risen, a second head swaying far off.
 function StormArt() {
   const e = u.era
   return (
@@ -129,7 +130,7 @@ function StormArt() {
         <path d="M-60 660 Q60 610 180 660 T420 660 T660 660 T900 660 T1140 660 T1380 660 L1380 800 L-60 800 Z" fill={MYTH.sea} stroke={INK} strokeWidth={4} />
         <path d="M-60 664 Q60 620 180 664 T420 664 T660 664 T900 664 T1140 664 T1380 664" fill="none" stroke={MYTH.seaFoam} strokeWidth={3} opacity={0.7} />
       </g>
-      {/* the rain, one slanted sheet that loops */}
+      {/* the rain, one slanted sheet that falls eight times and rests */}
       <g className={`${e} ${u.rain}`} opacity={0.35}>
         {Array.from({ length: 40 }, (_, i) => (
           <path key={i} d={`M${(i * 37) % 1240} ${((i * 53) % 880) - 80} l-14 44`} stroke={MYTH.seaFoam} strokeWidth={2} />
@@ -152,7 +153,7 @@ function MagmaArt() {
 }
 
 // Rhodes at night under the bronze giant: the harbour city with its fires, the giant towering over it with
-// the laurel crown, its blue eyes flaring, its fist rising and smashing the harbour wall every 8 s with a
+// the laurel crown, its blue eyes flaring, its fist rising and smashing the harbour wall once with a
 // burst of dust, smoke going up from the city.
 function RhodesArt() {
   const e = u.era
@@ -207,7 +208,7 @@ function RhodesArt() {
 }
 
 // Olympus at dawn: the mountain over the gold clouds, the temple lit on its top, waterfalls down its cliffs,
-// the clouds drifting, the sun's rays turning slowly, birds crossing.
+// the clouds drifting in, the sun's rays turning into place, birds crossing once.
 function OlympusArt() {
   const e = u.era
   return (

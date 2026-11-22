@@ -93,7 +93,7 @@ export function TreehouseContact() {
             <EndTarget />
             <div className={`absolute bottom-3 left-[50%] h-28 w-20 ${night.roller}`} aria-hidden="true">
               <PassingHero profession={active} pose="roll" className={`absolute inset-0 h-full w-full ${night.ball}`} />
-              <HeroCharacter profession={active} pose="idle" className={`absolute inset-0 h-full w-full ${night.standing}`} />
+              <HeroCharacter profession={active} pose="idle" waiting={!triggered} className={`absolute inset-0 h-full w-full ${night.standing}`} />
             </div>
           </div>
           <button
