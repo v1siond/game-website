@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -72,7 +72,7 @@ export default function SurvivalHorrorTheme() {
 
               <footer className="py-10 text-center">
                 <p className={`inline-block bg-[color:var(--sh-void)] px-3 py-1 text-sm text-[color:var(--sh-fog-text)] ${look.typed}`}>
-                  © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+                  <CopyrightLine />
                 </p>
               </footer>
             </div>

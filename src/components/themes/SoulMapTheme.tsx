@@ -3,7 +3,7 @@
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { CARVED, SOUL_VARS } from './SoulMap/palette'
@@ -56,7 +56,7 @@ export default function SoulMapTheme() {
 
         <footer className="relative z-20 pb-20 pt-6 text-center sm:pb-28">
           <p className="text-sm text-[color:var(--soul-text-soft)]">
-            © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+            <CopyrightLine />
           </p>
         </footer>
 

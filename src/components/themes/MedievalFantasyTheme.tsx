@@ -8,6 +8,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { REALM, REALM_VARS } from './MedievalFantasy/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
@@ -174,7 +175,7 @@ export default function MedievalFantasyTheme() {
         {/* Footer */}
         <footer style={{ textAlign: 'center', paddingTop: '0.75rem' }}>
           <p style={{ color: REALM.textDim, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-            © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+            <CopyrightLine />
           </p>
         </footer>
       </div>

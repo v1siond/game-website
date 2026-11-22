@@ -1,7 +1,7 @@
 'use client'
 
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -58,7 +58,7 @@ export default function SilhouetteTheme() {
             <div className="h-px w-6 bg-[color:var(--sh-edge)]" />
           </div>
           <p className="text-sm text-[color:var(--sh-dim-text)]">
-            © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+            <CopyrightLine />
           </p>
         </footer>
       </div>

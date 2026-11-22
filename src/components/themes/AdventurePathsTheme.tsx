@@ -3,15 +3,13 @@
 import { useLayoutEffect } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { RecruiterHero } from '@/components/cv/RecruiterHero'
-import { NameWords } from '@/components/cv/NameWords'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { prefersReducedMotion, useReducedMotion } from '@/hooks/useReducedMotion'
-import { useYearNow } from '@/hooks/useYearNow'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { INTRO_ATTR } from '@/themes/introFlag'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { TRAIL_VARS } from './AdventurePaths/palette'
 import { MapDefs } from './AdventurePaths/art'
 import { ExpeditionHero } from './AdventurePaths/hero'
@@ -53,7 +51,6 @@ export default function AdventurePathsTheme() {
   const { fullName } = useCVData()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
-  const year = useYearNow()
   const pointerRef = usePointerVars(!reducedMotion)
   const { zones, stage } = useZoneStore<Zone>('plains', reducedMotion)
 
@@ -86,13 +83,9 @@ export default function AdventurePathsTheme() {
       </ZoneStageProvider>
 
       <footer className="relative z-10 pb-14 pt-4 text-center">
-        <RecruiterHero
-          render={({ name }) => (
-            <p className="inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-sm text-white">
-              © {year} <NameWords name={name} />
-            </p>
-          )}
-        />
+        <p className="inline-block rounded-md bg-[color:var(--ap-hud)] px-3 py-1 text-sm text-white">
+          <CopyrightLine />
+        </p>
       </footer>
     </div>
   )

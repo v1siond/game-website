@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -76,7 +76,7 @@ export default function NeonCyberTheme() {
       <footer className="relative z-20 flex items-center justify-center gap-3 pb-10" role="contentinfo">
         <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
         <p className="text-sm tracking-widest text-[color:var(--neon-ash)]">
-          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+          <CopyrightLine />
         </p>
         <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
       </footer>

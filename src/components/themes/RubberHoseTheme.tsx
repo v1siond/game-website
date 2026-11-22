@@ -1,7 +1,7 @@
 'use client'
 
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
@@ -152,7 +152,7 @@ export default function RubberHoseTheme() {
           <div className="flex items-center justify-center gap-4">
             <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
             <p className={`px-3 py-1 text-sm tracking-widest ${world.chip}`}>
-              © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+              <CopyrightLine />
             </p>
             <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
           </div>

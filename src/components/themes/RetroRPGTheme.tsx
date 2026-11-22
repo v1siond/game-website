@@ -6,6 +6,7 @@ import { useWorldView, useLabels } from "@/components/cv/CVDataProvider";
 import { RecruiterHero } from "@/components/cv/RecruiterHero";
 import { ProfessionSectionsView } from "@/components/cv/ProfessionSectionsView";
 import { NameWords } from "@/components/cv/NameWords";
+import { CopyrightLine } from "./shared/CopyrightLine";
 import { MONO, PIXEL, RPG_VARS } from "./RetroRPG/palette";
 import { ActionOptions, FOCUS } from "./RetroRPG/actions";
 import { Box, Mark, SHOW_AFTER, Typed } from "./RetroRPG/panels";
@@ -150,7 +151,7 @@ export default function RetroRPGTheme() {
 
         <footer className="relative z-20 py-10 text-center">
           <p className={`text-sm text-[color:var(--rpg-muted)] ${MONO}`}>
-            © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+            <CopyrightLine />
           </p>
         </footer>
       </div>
