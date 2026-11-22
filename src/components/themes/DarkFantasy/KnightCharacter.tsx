@@ -323,6 +323,8 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
     hasAnimated.current = true
 
     const timers: NodeJS.Timeout[] = []
+    // The slash's frame by frame ramp, cancelled with the timers when the reveal unmounts mid slash
+    let attackFrame = 0
 
     // 0.5s delay before animation starts
     timers.push(setTimeout(() => setPhase('knight-enter'), PHASE_TIMING['knight-enter']))
@@ -335,9 +337,9 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
       const animateAttack = (now: number) => {
         const progress = Math.min((now - start) / 100, 1)
         setAttackPhase(progress)
-        if (progress < 1) requestAnimationFrame(animateAttack)
+        if (progress < 1) attackFrame = requestAnimationFrame(animateAttack)
       }
-      requestAnimationFrame(animateAttack)
+      attackFrame = requestAnimationFrame(animateAttack)
     }, PHASE_TIMING['slash']))
 
     timers.push(setTimeout(() => {
@@ -348,7 +350,10 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
 
     timers.push(setTimeout(() => setPhase('complete'), PHASE_TIMING['complete']))
 
-    return () => timers.forEach(t => clearTimeout(t))
+    return () => {
+      timers.forEach(t => clearTimeout(t))
+      cancelAnimationFrame(attackFrame)
+    }
   }, [triggered])
 
   const getKnightStyle = (): React.CSSProperties => {

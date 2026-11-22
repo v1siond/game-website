@@ -173,6 +173,8 @@ export const BattleReveal = memo(function BattleReveal({
     setPhase('bug-wander')
 
     const timers: NodeJS.Timeout[] = []
+    // The slash's frame by frame ramp, cancelled with the timers when the reveal unmounts mid slash
+    let attackFrame = 0
 
     // Knight dash
     timers.push(setTimeout(() => setPhase('knight-dash'), PHASE_TIMING['knight-dash']))
@@ -185,9 +187,9 @@ export const BattleReveal = memo(function BattleReveal({
       const animateAttack = (now: number) => {
         const progress = Math.min((now - start) / 200, 1)
         setAttackPhase(progress)
-        if (progress < 1) requestAnimationFrame(animateAttack)
+        if (progress < 1) attackFrame = requestAnimationFrame(animateAttack)
       }
-      requestAnimationFrame(animateAttack)
+      attackFrame = requestAnimationFrame(animateAttack)
     }, PHASE_TIMING['slash']))
 
     // Bug hit - blood splatter!
@@ -214,7 +216,10 @@ export const BattleReveal = memo(function BattleReveal({
     // Complete
     timers.push(setTimeout(() => setPhase('complete'), PHASE_TIMING['complete']))
 
-    return () => timers.forEach(t => clearTimeout(t))
+    return () => {
+      timers.forEach(t => clearTimeout(t))
+      cancelAnimationFrame(attackFrame)
+    }
   }, [triggered])
 
   // Calculate positions based on phase
