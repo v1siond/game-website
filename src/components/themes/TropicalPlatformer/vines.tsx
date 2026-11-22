@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { memo, useCallback, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { BandList, type BandSlot } from '@/components/cv/BandList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -39,11 +39,12 @@ interface CardProps {
   slot: BandSlot
   index: number
   here: boolean
+  // The swing count keys his swing in, so only the card he hangs from gets it; the others get 0.
   swings: number
-  onSwing: () => void
+  onSwing: (index: number) => void
 }
 
-function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
+const HangingBand = memo(function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
   const { jungle } = useLabels()
   const { band, years, linkProps, release } = slot
 
@@ -75,7 +76,7 @@ function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
         )}
         <button
           type="button"
-          onClick={onSwing}
+          onClick={() => onSwing(index)}
           aria-pressed={here}
           aria-label={fillLabel(jungle.swingTo, { band: band.name })}
           className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
@@ -85,20 +86,15 @@ function HangingBand({ slot, index, here, swings, onSwing }: CardProps) {
       </article>
     </div>
   )
-}
+})
 
 /** The bands hanging from vines; he swings from band to band. */
 export function VineBands({ bands, musician }: { bands: Band[]; musician: Musician }) {
   const labels = useLabels()
   const { ref, triggered } = useSectionTrigger()
-  const [at, setAt] = useState(0)
-  const [swings, setSwings] = useState(0)
+  const [{ at, swings }, setSwing] = useState({ at: 0, swings: 0 })
 
-  const swingTo = (index: number) => {
-    if (index === at) return
-    setAt(index)
-    setSwings((count) => count + 1)
-  }
+  const swingTo = useCallback((index: number) => setSwing((now) => (index === now.at ? now : { at: index, swings: now.swings + 1 })), [])
 
   if (bands.length === 0) return null
   // Each swing lands him on `at`; before the first he has swung to nothing.
@@ -111,7 +107,7 @@ export function VineBands({ bands, musician }: { bands: Band[]; musician: Musici
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={`${MASONRY_ITEM} pt-6`}
-        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} swings={swings} onSwing={() => swingTo(index)} />}
+        renderBand={(slot, index) => <HangingBand slot={slot} index={index} here={index === at} swings={index === at ? swings : 0} onSwing={swingTo} />}
       />
       <p role="status" className={`mt-2 min-h-[1.5rem] text-center text-base text-[color:var(--tp-sun-gold)] ${look.caption}`}>
         {status}

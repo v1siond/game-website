@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
@@ -51,13 +51,18 @@ function Rails({ stations }: { stations: number }) {
   )
 }
 
-/** The ride button on a stop's card: pressed while the cart stands there. */
+/** The ride button on a stop's card: pressed while the cart stands there, where it does nothing. */
 export function RideButton({ name, here, onRide }: { name: string; here: boolean; onRide: () => void }) {
   const { jungle } = useLabels()
+  const ride = () => {
+    if (here) return
+    onRide()
+  }
+
   return (
     <button
       type="button"
-      onClick={onRide}
+      onClick={ride}
       aria-pressed={here}
       aria-label={fillLabel(jungle.rideTo, { stop: name })}
       className={`mt-4 inline-flex min-h-[44px] items-center rounded-xl px-4 text-sm ${look.button} ${here ? look.buttonGold : look.buttonWood} ${look.focus}`}
@@ -67,11 +72,20 @@ export function RideButton({ name, here, onRide }: { name: string; here: boolean
   )
 }
 
-/** The cart's stop and the ride to another one, handed to the list under the rails. */
+/** The cart's stop and the ride to another one, handed to the list under the rails. `rideTo` is the same
+ *  function on every render and is called for a stop the cart is not at. */
 export interface CartStop {
   stop: number
   rideTo: (index: number) => void
 }
+
+interface Cart {
+  stop: number
+  moved: boolean
+  ride: { count: number; hops: number }
+}
+
+const START: Cart = { stop: 0, moved: false, ride: { count: 0, hops: 0 } }
 
 interface CartLineProps {
   stops: string[]
@@ -83,24 +97,25 @@ interface CartLineProps {
 export function CartLine({ stops, profession, children }: CartLineProps) {
   const labels = useLabels()
   const { ref, triggered } = useSectionTrigger()
-  const [stop, setStop] = useState(0)
-  const [ride, setRide] = useState({ count: 0, hops: 0 })
+  const [{ stop, moved, ride }, setCart] = useState(START)
   const [riding, setRiding] = useState(false)
-  const [moved, setMoved] = useState(false)
   const timer = useRef(0)
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
-  const rideTo = (index: number) => {
-    if (index === stop) return
-    setMoved(true)
-    setStop(index)
-    if (prefersReducedMotion()) return
-    setRide((current) => ({ count: current.count + 1, hops: Math.abs(index - stop) }))
+  // Under reduced motion the cart is at the stop at once: no ride to remount, no riding pose.
+  const rideTo = useCallback((index: number) => {
+    const still = prefersReducedMotion()
+    setCart((now) => ({
+      stop: index,
+      moved: true,
+      ride: still ? now.ride : { count: now.ride.count + 1, hops: Math.abs(index - now.stop) },
+    }))
+    if (still) return
     setRiding(true)
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setRiding(false), RIDE_MS)
-  }
+  }, [])
 
   if (stops.length === 0) return null
   const status = moved ? fillLabel(labels.jungle.cartAt, { stop: stops[stop] }) : ''

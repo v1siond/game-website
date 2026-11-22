@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { jobYears } from '@/lib/cv/sectionText'
@@ -69,13 +69,16 @@ interface PlatformProps {
   occupied: boolean
   landed: number
   aim: number | null
+  // The next job's name and the blast, read only by the armed barrel; the others get none, so a blast
+  // re-renders only the platforms it changes.
   nextName: string
-  onBlast: () => void
-  barrelRef: (element: HTMLElement | null) => void
+  onBlast?: () => void
+  onBarrel: (index: number, element: HTMLElement | null) => void
 }
 
-function Platform({ entry, coins, index, armed, occupied, landed, aim, nextName, onBlast, barrelRef }: PlatformProps) {
+const Platform = memo(function Platform({ entry, coins, index, armed, occupied, landed, aim, nextName, onBlast, onBarrel }: PlatformProps) {
   const { years, cards, jungle } = useLabels()
+  const barrelRef = useCallback((element: HTMLElement | null) => onBarrel(index, element), [onBarrel, index])
   const { start, end } = jobYears(entry, years.present)
   const cannon = (
     <span className={`relative block ${run.cannon}`} data-aim={aim !== null || undefined} style={{ '--aim': `${aim ?? 0}deg` } as CSSProperties}>
@@ -148,15 +151,15 @@ function Platform({ entry, coins, index, armed, occupied, landed, aim, nextName,
       )}
     </article>
   )
-}
+})
 
 /** The jobs as a masonry run of platforms and barrel cannons; he blasts from one job to the next. */
 export function CannonRun({ jobs }: { jobs: Job[] }) {
   const labels = useLabels()
   const { hero } = useWorldView()
   const { ref, triggered } = useSectionTrigger()
-  const letters = nameLetters(hero.name)
-  const holders = letterCards(letters.length, jobs.length)
+  const letters = useMemo(() => nameLetters(hero.name), [hero.name])
+  const holders = useMemo(() => letterCards(letters.length, jobs.length), [letters.length, jobs.length])
   const [visited, setVisited] = useState<ReadonlySet<number>>(() => new Set())
   const [at, setAt] = useState(0)
   const [aim, setAim] = useState<number | null>(null)
@@ -168,6 +171,20 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
   const focusAfterLanding = useRef(false)
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
+
+  // He starts in the first job's barrel, so its letter is found as the run opens.
+  const found = useMemo(
+    () => new Set(holders.flatMap((holder, index) => (visited.has(holder) || (triggered && holder === 0) ? [index] : []))),
+    [holders, visited, triggered],
+  )
+  // The letters waiting on each job, one list per job, kept while no letter is found.
+  const coinsByJob = useMemo(
+    () => jobs.map((_, job) => holders.flatMap((holder, index): Coin[] => (holder === job ? [{ index, letter: letters[index], found: found.has(index) }] : []))),
+    [jobs, holders, letters, found],
+  )
+  const setBarrel = useCallback((index: number, element: HTMLElement | null) => {
+    barrels.current[index] = element
+  }, [])
 
   useEffect(() => {
     if (!focusAfterLanding.current) return
@@ -215,12 +232,7 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
   const nextName = jobName(jobs[(at + 1) % jobs.length], labels)
   // The status says where he landed last; before his first blast he has landed nowhere.
   const status = landings[at] ? fillLabel(labels.jungle.landedAt, { job: jobName(jobs[at], labels) }) : ''
-  // He starts in the first job's barrel, so its letter is found as the run opens.
-  const reached = (job: number) => visited.has(job) || (triggered && job === 0)
-  const found = new Set(holders.flatMap((holder, index) => (reached(holder) ? [index] : [])))
   const complete = letters.length > 0 && found.size === letters.length
-  const coinsOn = (job: number): Coin[] =>
-    holders.flatMap((holder, index) => (holder === job ? [{ index, letter: letters[index], found: found.has(index) }] : []))
 
   return (
     <div ref={ref} data-on={triggered || undefined} className={run.run}>
@@ -234,17 +246,15 @@ export function CannonRun({ jobs }: { jobs: Job[] }) {
             <li key={entry.id} className={`${MASONRY_ITEM} pt-6`}>
               <Platform
                 entry={entry}
-                coins={coinsOn(index)}
+                coins={coinsByJob[index]}
                 index={index}
                 armed={index === at}
                 occupied={index === at && !flight}
                 landed={landings[index] ?? 0}
                 aim={index === at ? aim : null}
-                nextName={nextName}
-                onBlast={blast}
-                barrelRef={(element) => {
-                  barrels.current[index] = element
-                }}
+                nextName={index === at ? nextName : ''}
+                onBlast={index === at ? blast : undefined}
+                onBarrel={setBarrel}
               />
             </li>
           ))}
