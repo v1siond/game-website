@@ -1,3 +1,4 @@
+import { CEL } from './palette'
 import cel from './cel.module.css'
 
 // The world's drawing kit, the marks its comic art is made of: the hatch patterns its shadow sides are
@@ -15,11 +16,11 @@ export function HatchDefs() {
     <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
       <defs>
         <pattern id="cel-hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <rect width="1.3" height="5" fill="#141414" />
+          <rect width="1.3" height="5" fill={CEL.ink} />
         </pattern>
         <pattern id="cel-cross" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-          <rect width="1.2" height="5" fill="#141414" />
-          <rect width="5" height="1.2" fill="#141414" />
+          <rect width="1.2" height="5" fill={CEL.ink} />
+          <rect width="5" height="1.2" fill={CEL.ink} />
         </pattern>
       </defs>
     </svg>

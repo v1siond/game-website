@@ -41,7 +41,7 @@ function Drummer() {
 
 function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
   const { links } = useLabels()
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, nameFor, release } = slot
 
   return (
     <article className={`relative overflow-hidden ${cel.paper} ${cel.boss}`} style={{ ['--i' as string]: index }}>
@@ -53,14 +53,14 @@ function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
           {band.role}
           {years && ` · ${years}`}
         </p>
-        {band.release && (
+        {release && (
           <p className="mt-3 inline-block bg-[var(--cel-ink)] px-2 py-1 text-sm font-bold text-[var(--cel-sun)]">
-            {links.released}: {band.release}
+            {release.label}: {release.title}
           </p>
         )}
         {linkProps && (
           <p className="mt-3">
-            <a {...linkProps} className="inline-flex min-h-[44px] items-center bg-[var(--cel-paper)] px-2 text-base font-bold underline decoration-[3px] underline-offset-4">
+            <a {...linkProps} aria-label={nameFor(links.website)} className="inline-flex min-h-[44px] items-center bg-[var(--cel-paper)] px-2 text-base font-bold underline decoration-[3px] underline-offset-4">
               {links.website}
             </a>
           </p>
@@ -86,7 +86,7 @@ export function BossCards({ musician, bands }: { musician: Musician; bands: Band
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => <BossCard slot={slot} index={bands.indexOf(slot.band)} />}
+        renderBand={(slot, index) => <BossCard slot={slot} index={index} />}
       />
     </>
   )

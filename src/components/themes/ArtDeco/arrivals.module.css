@@ -1,14 +1,22 @@
-/* The two sections he delivers (arrivals.tsx). The stage carries data-on once in view and data-beat, the
-   pose playing. Each reaction starts with the act and ends at the section's own place and look. */
+/* The two sections he delivers (arrivals.tsx). The stage carries data-on once in view, data-beat (the
+   pose playing) and data-act (zap or drum). Every beat's motion is the figure wrapper's own keyframe; its
+   end steps the sequence on. Each reaction starts with the act and ends at the section's own place and look. */
 
 .figure { will-change: transform, opacity; }
 .stage[data-beat='walk'] .figure { animation: deco-walk-in 450ms linear both; }
+/* He stands still for the act, as long as his zap or his drum roll (sprite.module.css), and its end steps on. */
+.stage[data-act='zap'][data-beat='act'] .figure { animation: deco-hold 1300ms linear both; }
+.stage[data-act='drum'][data-beat='act'] .figure { animation: deco-hold 1600ms linear both; }
 .stage[data-beat='leave'] .figure { animation: deco-walk-off 500ms ease-in both; }
 
 @keyframes deco-walk-in {
   from { transform: translateX(-80%); opacity: 0; }
   30% { opacity: 1; }
   to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes deco-hold {
+  0%, 100% { transform: none; }
 }
 
 /* He turns round (the mirror) and walks back out the way he came. */

@@ -1,12 +1,12 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import type { ReactNode } from 'react'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
-import type { SectionsOf } from '@/lib/cv/cvView'
-import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { useZoneStage } from '@/hooks/useZoneStage'
-import { Stage, SectionTitle, celHeadingId } from './stage'
+import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
+import { Stage } from './stage'
 import type { Zone } from './wasteland'
 import { BountyBoard } from './bountyBoard'
 import { SkillTree } from './skillTree'
@@ -20,91 +20,101 @@ import cel from './cel.module.css'
 // The picked profession's sections, each one a stage in the wasteland's day: About at noon, the bounty
 // board, the skill tree and the services (plain papers under a fade) in the town's afternoon, the loot field, the makers' plates, the boss cards
 // and the heavy bag at dusk. The respawn station closes the page at night (respawn.tsx). Two sections he
-// hits himself (./melee): he lands on the about paper from a leap, and kicks open the chest the services come out of.
+// hits himself (./melee): he lands on the about paper from a leap, and kicks open the chest the services
+// come out of. The shared section plan picks which a profession shows and in which order.
 
-export function EngineerSections({ sections }: { sections: SectionsOf<'engineer'> }) {
-  const { professionalSummary } = useCVData()
-  const titles = useLabels().sections
-
-  return (
-    <>
-      <Stage title={titles.about} zone="noon">
-        <SlamLanding>
-          <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
-            <p className="max-w-prose text-base leading-relaxed">{professionalSummary.bio}</p>
-          </div>
-        </SlamLanding>
-      </Stage>
-
-      {sections.jobs.length > 0 && (
-        <Stage title={titles.workExperience} zone="town">
-          <BountyBoard jobs={sections.jobs} />
-        </Stage>
-      )}
-
-      {sections.techStack.length > 0 && (
-        <Stage title={titles.techStack} zone="town">
-          <SkillTree categories={sections.techStack} />
-        </Stage>
-      )}
-
-      {sections.services.length > 0 && (
-        <Stage title={titles.services} zone="town">
-          <LootChest>
-            <FadeInScene>
-              <ul className={MASONRY_LIST}>
-                {sections.services.map((service) => (
-                  <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${cel.paper}`}>
-                    <h3 className="text-lg font-bold">{service.title}</h3>
-                    <p className="mt-2 text-base leading-relaxed">{service.line}</p>
-                  </li>
-                ))}
-              </ul>
-            </FadeInScene>
-          </LootChest>
-        </Stage>
-      )}
-
-      {sections.projects.length > 0 && (
-        <Stage title={titles.projects} zone="dusk">
-          <LootDrops projects={sections.projects} />
-        </Stage>
-      )}
-
-      {sections.companies.length > 0 && (
-        <Stage title={titles.ventures} zone="dusk">
-          <MakersPlates companies={sections.companies} />
-        </Stage>
-      )}
-    </>
-  )
+/** The hour of the desert each section's stage hands the sky. */
+const ZONE: Record<SectionId, Zone> = {
+  about: 'noon',
+  work: 'town',
+  tech: 'town',
+  services: 'town',
+  projects: 'dusk',
+  ventures: 'dusk',
+  bands: 'dusk',
+  muayThai: 'dusk',
 }
 
-export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'> }) {
-  const titles = useLabels().sections
-
+// A section as its stage, titled from the labels in its hour of the day.
+function Hour({ slot, children }: { slot: SectionSlot; children: ReactNode | ((on: boolean) => ReactNode) }) {
+  const { sections: titles } = useLabels()
   return (
-    <Stage title={titles.bands} zone="dusk">
-      <BossCards musician={sections.musician} bands={sections.bands} />
+    <Stage title={titles[slot.titleKey]} zone={ZONE[slot.id]}>
+      {children}
     </Stage>
   )
 }
 
-// The heavy bag needs the stage's flag to throw its first hits, so this stage is written out here.
-export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const title = useLabels().sections.muayThai
-  const { ref, on } = useZoneStage<Zone>('dusk')
-
-  return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`mb-24 scroll-mt-8 ${cel.stage}`}>
-      <SectionTitle title={title} />
-      <HeavyBag martialArts={sections.martialArts} on={on} />
-    </section>
-  )
+// One frame per section of the shared plan, which picks the ones a profession shows and their order.
+const FRAMES: SectionFrames = {
+  about: function AboutFrame({ slot }) {
+    return (
+      <Hour slot={slot}>
+        <SlamLanding>
+          <div className={`max-w-3xl p-5 sm:p-6 ${cel.paper}`}>
+            <p className="max-w-prose text-base leading-relaxed">{slot.bio}</p>
+          </div>
+        </SlamLanding>
+      </Hour>
+    )
+  },
+  work: function WorkFrame({ slot }) {
+    return (
+      <Hour slot={slot}>
+        <BountyBoard jobs={slot.jobs} />
+      </Hour>
+    )
+  },
+  tech: function TechFrame({ slot }) {
+    return (
+      <Hour slot={slot}>
+        <SkillTree categories={slot.categories} />
+      </Hour>
+    )
+  },
+  services: function ServicesFrame({ slot }) {
+    return (
+      <Hour slot={slot}>
+        <LootChest>
+          <FadeInScene>
+            <ul className={MASONRY_LIST}>
+              {slot.services.map((service) => (
+                <li key={service.id} className={`${MASONRY_ITEM} p-5 sm:p-6 ${cel.paper}`}>
+                  <h3 className="text-lg font-bold">{service.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed">{service.line}</p>
+                </li>
+              ))}
+            </ul>
+          </FadeInScene>
+        </LootChest>
+      </Hour>
+    )
+  },
+  projects: function ProjectsFrame({ slot }) {
+    return (
+      <Hour slot={slot}>
+        <LootDrops projects={slot.projects} />
+      </Hour>
+    )
+  },
+  ventures: function VenturesFrame({ slot }) {
+    return (
+      <Hour slot={slot}>
+        <MakersPlates companies={slot.companies} />
+      </Hour>
+    )
+  },
+  bands: function BandsFrame({ slot }) {
+    return (
+      <Hour slot={slot}>
+        <BossCards musician={slot.musician} bands={slot.bands} />
+      </Hour>
+    )
+  },
+  // The heavy bag throws its first hits off the stage's flag.
+  muayThai: function MuayThaiFrame({ slot }) {
+    return <Hour slot={slot}>{(on) => <HeavyBag martialArts={slot.martialArts} on={on} />}</Hour>
+  },
 }
 
-export const SECTION_VIEWS: ProfessionSectionViews = {
-  engineer: EngineerSections,
-  drummer: MusicianSections,
-  fighter: MartialArtistSections,
-}
+export const SECTION_VIEWS = sectionViews(FRAMES)

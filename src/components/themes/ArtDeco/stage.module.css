@@ -6,7 +6,7 @@
 
 .box {
   border: 3px solid var(--deco-gold);
-  background: linear-gradient(180deg, #1a0606, var(--deco-abyss));
+  background: linear-gradient(180deg, var(--deco-theatre-box), var(--deco-abyss));
 }
 
 .light {
@@ -39,7 +39,7 @@
 
 .programme {
   border: 2px solid var(--deco-gold);
-  background: linear-gradient(180deg, #1a140a, #0d0a05);
+  background: linear-gradient(180deg, var(--deco-bronze-panel), var(--deco-bronze-panel-deep));
 }
 
 .fact {

@@ -35,7 +35,7 @@ const PLATES: Plate[] = [
         [104, 56],
         [130, 44],
       ].map(([x, h]) => (
-        <path key={x} d={`M${x} 90 V${90 - h + 10} H${x + 4} V${90 - h} H${x + 16} V${90 - h + 10} H${x + 20} V90 Z`} fill="#0e2c44" stroke={C.gold} strokeWidth="0.8" />
+        <path key={x} d={`M${x} 90 V${90 - h + 10} H${x + 4} V${90 - h} H${x + 16} V${90 - h + 10} H${x + 20} V90 Z`} fill={C.tower} stroke={C.gold} strokeWidth="0.8" />
       ))}
       {[18, 44, 78, 112].map((x) => (
         <rect key={x} x={x} y="60" width="3" height="4" fill={C.goldBright} />
@@ -83,7 +83,7 @@ function PlateArt({ index, projectId }: { index: number; projectId: Project['id'
 const BRACKETS = ['left-0 top-0 border-l-2 border-t-2', 'right-0 top-0 border-r-2 border-t-2', 'bottom-0 left-0 border-b-2 border-l-2', 'bottom-0 right-0 border-b-2 border-r-2']
 
 function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
-  const { project, years, links } = slot
+  const { project, years, links, noLink } = slot
   const labels = useLabels()
   const [snaps, setSnaps] = useState(0)
   const developed = snaps > 0
@@ -126,15 +126,12 @@ function Photograph({ slot, index }: { slot: ProjectSlot; index: number }) {
             </ul>
           )}
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            {links.length > 0 ? (
-              links.map(({ kind, label, linkProps }) => (
-                <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center px-3 text-sm uppercase tracking-[0.12em] ${camera.link}`}>
-                  {label}
-                </a>
-              ))
-            ) : (
-              <p className="text-sm text-[color:var(--deco-sepia)]">{labels.links.noPublicLink}</p>
-            )}
+            {links.map(({ kind, label, linkProps }) => (
+              <a key={kind} {...linkProps} className={`inline-flex min-h-[44px] items-center px-3 text-sm uppercase tracking-[0.12em] ${camera.link}`}>
+                {label}
+              </a>
+            ))}
+            {noLink && <p className="text-sm text-[color:var(--deco-sepia)]">{noLink}</p>}
             <button
               type="button"
               onClick={() => setSnaps((count) => count + 1)}
@@ -180,7 +177,7 @@ export function ResearchBoard({ projects, arrived }: { projects: Project[]; arri
         projects={projects}
         className={`px-3 pt-3 sm:px-0 ${MASONRY_LIST}`}
         itemClassName={`${MASONRY_ITEM} pt-2`}
-        renderProject={(slot) => <Photograph slot={slot} index={projects.indexOf(slot.project)} />}
+        renderProject={(slot, index) => <Photograph slot={slot} index={index} />}
       />
     </div>
   )

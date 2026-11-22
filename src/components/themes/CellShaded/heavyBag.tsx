@@ -29,7 +29,7 @@ function Bag({ swing }: { swing: number }) {
       <g key={swing} className={`${cel.bag} ${swing > 0 ? cel.bagSwing : ''}`}>
         <path d="M24 26 L56 26 L40 40 Z" fill={CEL.steelDark} />
         <path d="M14 40 Q40 32 66 40 L66 196 Q40 206 14 196 Z" fill={CEL.red} />
-        <path d="M50 38 Q60 39 66 40 L66 196 Q60 200 52 202 Q58 120 50 38 Z" fill="#9e2219" data-bare />
+        <path d="M50 38 Q60 39 66 40 L66 196 Q60 200 52 202 Q58 120 50 38 Z" fill={CEL.redShade} data-bare />
         <path d="M14 70 L66 70 M14 166 L66 166" stroke={CEL.ink} strokeWidth={4} />
       </g>
     </svg>
@@ -98,10 +98,10 @@ export function HeavyBag({ martialArts, on }: { martialArts: MartialArts; on: bo
             achievements: 'space-y-3',
             achievement: 'text-base font-bold',
           }}
-          renderAchievement={(achievement) => (
+          renderAchievement={(achievement, index) => (
             <span className="flex items-start gap-3">
               <span
-                data-on={achievements.indexOf(achievement) < landed || undefined}
+                data-on={index < landed || undefined}
                 className={`mt-0.5 inline-block h-5 w-5 shrink-0 bg-[var(--cel-crit)] [clip-path:polygon(50%_0,62%_35%,100%_38%,70%_60%,80%_100%,50%_76%,20%_100%,30%_60%,0_38%,38%_35%)] ${cel.hitMark}`}
                 aria-hidden="true"
               />

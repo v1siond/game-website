@@ -14,21 +14,22 @@ import type { Zone } from './wasteland'
 import cel from './cel.module.css'
 
 // The profession switch as the wasteland's quick change station: a booth with a glowing pad and three
-// outfit tabs, each showing him in that profession's gear. Picking one (click, or the arrow keys the
+// outfit tabs, each a button showing him in that profession's gear. Picking one (click, or the arrow keys the
 // shared switch handles) rebuilds him on the pad slice by slice in the new outfit; the first render
 // shows him whole, so the station never builds on page load.
 
 function OutfitTab({ id, label, selected, optionProps }: ProfessionOption) {
   return (
-    <div
+    <button
+      type="button"
       {...optionProps}
-      className={`flex min-h-[44px] min-w-0 cursor-pointer flex-col items-center gap-2 border-4 border-[var(--cel-ink)] px-1 pb-3 sm:px-3 pt-2 shadow-[4px_4px_0_var(--cel-ink)] ${cel.outfit} ${
+      className={`flex min-h-[44px] w-full min-w-0 cursor-pointer flex-col items-center gap-2 border-4 border-[var(--cel-ink)] px-1 pb-3 sm:px-3 pt-2 shadow-[4px_4px_0_var(--cel-ink)] ${cel.outfit} ${
         selected ? 'bg-[var(--cel-sun)]' : 'bg-[var(--cel-paper)]'
       }`}
     >
       <VaultSprite profession={id} motion="still" className="h-24 w-14" />
       <span className={`text-center text-sm sm:text-base ${cel.display} [-webkit-text-stroke:0]`}>{label}</span>
-    </div>
+    </button>
   )
 }
 

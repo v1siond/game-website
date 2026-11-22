@@ -59,8 +59,8 @@ export function TheatreStage({ martialArts }: { martialArts: MartialArts }) {
             achievements: 'space-y-3',
             achievement: '',
           }}
-          renderAchievement={(achievement) => (
-            <p data-lit={achievements.indexOf(achievement) < shown || undefined} className={`relative px-4 py-3 text-base ${stage.line}`}>
+          renderAchievement={(achievement, index) => (
+            <p data-lit={index < shown || undefined} className={`relative px-4 py-3 text-base ${stage.line}`}>
               <span className={`pointer-events-none absolute inset-0 ${stage.lineGlow}`} aria-hidden="true" />
               <span className="relative">{achievement}</span>
             </p>

@@ -1,9 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
 import cel from './cel.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons: a heavy ink frame, a hard ink drop and the display lettering; they tilt up on
 // hover and press flat into their drop on a click (cel.module.css, "buttons"). The tone picks the fill.
@@ -25,28 +23,22 @@ export function InkButton({ tone = 'sun', className = '', type = 'button', ...pr
   return <button type={type} className={`${inkClass(tone)} ${className}`} {...props} />
 }
 
-// Email is the loud orange action, LinkedIn the paper one.
-const HERO_TONE: Record<HeroActionSlot['id'], InkTone> = {
+// Email is the loud orange action, LinkedIn and the CV the paper ones, the engine the sun.
+const CONTACT_TONE: Record<ContactLinkId, InkTone> = {
   email: 'orange',
   linkedin: 'paper',
+  cv: 'paper',
+  engine: 'sun',
 }
 
 /** The four ways to reach him, the same in the hero and at the respawn station. */
 export function ContactActions({ actions }: { actions: readonly HeroActionSlot[] }) {
-  const labels = useLabels().actions
+  const { cv, engine } = useSiteLinks('engine')
   return (
     <>
-      {actions.map((action) => (
-        <a key={action.id} {...action.linkProps} className={inkClass(HERO_TONE[action.id])}>
-          {action.label}
-        </a>
+      {[...actions, cv, engine].map((slot) => (
+        <ContactLink key={slot.id} slot={slot} className={inkClass(CONTACT_TONE[slot.id])} />
       ))}
-      <Link href="/cv" className={inkClass('paper')}>
-        {labels.cv}
-      </Link>
-      <Link {...ENGINE_LINK} aria-label={labels.viewEngine} className={inkClass('sun')}>
-        {labels.engine}
-      </Link>
     </>
   )
 }

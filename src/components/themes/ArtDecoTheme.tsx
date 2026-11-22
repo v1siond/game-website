@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { PostsGate } from '@/components/cv/PostsGate'
 import { usePosts } from '@/components/blog/BlogProvider'
@@ -60,7 +60,7 @@ function DecoPosts() {
           <li key={link.href}>
             <Link
               href={link.href}
-              className="flex min-h-[44px] flex-col justify-center gap-1 py-3 text-[color:var(--deco-cream)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--deco-gold-bright)] sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
+              className="flex min-h-[44px] flex-col justify-center gap-1 py-3 text-[color:var(--deco-cream)] sm:flex-row sm:items-baseline sm:justify-between sm:gap-6"
             >
               <span className="text-lg underline decoration-[color:var(--deco-gold)] underline-offset-4">{link.title}</span>
               <time dateTime={link.date} className="shrink-0 text-sm uppercase tracking-wider text-[color:var(--deco-mist)]">
@@ -82,7 +82,7 @@ function DecoPosts() {
 export default function ArtDecoTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions, blog } = useLabels()
+  const { navigation, blog } = useLabels()
   const reducedMotion = useReducedMotion()
   const pointer = usePointerVars(!reducedMotion)
   const { zones, stage } = useZoneStore<DecoZone>('surface', reducedMotion)
@@ -115,7 +115,7 @@ export default function ArtDecoTheme() {
         </div>
 
         <main className="relative z-20 px-4 py-16 sm:px-8">
-          <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionRegion className="mx-auto max-w-6xl">
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
             <PostsGate>
@@ -129,7 +129,7 @@ export default function ArtDecoTheme() {
                 </FadeInScene>
               </div>
             </PostsGate>
-          </div>
+          </ProfessionRegion>
         </main>
 
         <DepthZone zone="abyss">

@@ -20,7 +20,7 @@ section[data-on] .step {
 
 .board {
   border: 2px solid var(--deco-gold);
-  background: linear-gradient(180deg, #1a140a, var(--deco-abyss));
+  background: linear-gradient(180deg, var(--deco-bronze-panel), var(--deco-abyss));
   box-shadow: 0 0 24px rgb(212 175 55 / 0.15);
 }
 

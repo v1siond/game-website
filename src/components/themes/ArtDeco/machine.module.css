@@ -13,7 +13,7 @@
 .cabinet {
   background:
     repeating-linear-gradient(90deg, transparent 0 22px, rgb(212 175 55 / 0.05) 22px 24px),
-    linear-gradient(180deg, #2a1a10, #170d08 70%, #0f0905);
+    linear-gradient(180deg, var(--deco-cabinet-top), var(--deco-cabinet-mid) 70%, var(--deco-cabinet-foot));
   box-shadow: inset 0 0 60px rgb(0 0 0 / 0.6);
 }
 
@@ -57,7 +57,7 @@
 .glass {
   background:
     radial-gradient(ellipse 70% 50% at 50% 30%, rgb(65 200 232 / 0.18), transparent 70%),
-    linear-gradient(180deg, #0f3550, #07182a);
+    linear-gradient(180deg, var(--deco-machine-glass), var(--deco-machine-glass-deep));
 }
 
 .shine {
@@ -65,7 +65,7 @@
 }
 
 .blind {
-  background: repeating-linear-gradient(180deg, #6b5818 0 10px, #3a2c08 10px 12px);
+  background: repeating-linear-gradient(180deg, var(--deco-brass-shadow) 0 10px, var(--deco-brass-line) 10px 12px);
   transform: translate3d(0, -101%, 0);
 }
 
@@ -124,11 +124,6 @@
   transform: translate3d(0.25rem, 0, 0);
 }
 
-.row:focus-visible {
-  outline: 2px solid var(--deco-gold-bright);
-  outline-offset: 3px;
-}
-
 .row[aria-checked='true'] {
   border-color: var(--deco-gold-bright);
   background: linear-gradient(180deg, var(--deco-gold-bright-text), var(--deco-gold-pick));
@@ -152,7 +147,7 @@
 }
 
 .tray {
-  background: linear-gradient(180deg, #05101a, #0f0905);
+  background: linear-gradient(180deg, var(--deco-abyss), var(--deco-cabinet-foot));
 }
 
 .bottle {

@@ -5,7 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion, useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { fillLabel } from '@/lib/cv/labels'
+import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { SurvivorSprite, type DecoMotion } from './sprite'
 import { DECO_COLORS as C } from './palette'
 import hack from './hack.module.css'
@@ -29,6 +29,13 @@ const FLOW_MS = 450
 const KNOCK_MS = 900
 const TILES = 5
 const TURNED_AT_START: ReadonlySet<number> = new Set([1, 3])
+
+// The status line under the pipes: the lock open, the water held at a turned tile, or nothing while it runs.
+const flowStatus = (deco: Labels['deco'], done: boolean, stopped: boolean): string => {
+  if (done) return deco.flowDone
+  if (stopped) return deco.flowWaiting
+  return ''
+}
 
 const startTurned = (): boolean[] => Array.from({ length: TILES }, (_, i) => !prefersReducedMotion() && TURNED_AT_START.has(i))
 
@@ -120,7 +127,6 @@ export function HackedShutter({ children }: { children: (opened: boolean) => Rea
     return () => window.clearTimeout(timer)
   }, [stopped, flow, play])
 
-  const status = done ? deco.flowDone : stopped ? deco.flowWaiting : ''
 
   return (
     <div data-on={triggered || undefined} data-open={done || undefined} className={hack.works}>
@@ -145,7 +151,7 @@ export function HackedShutter({ children }: { children: (opened: boolean) => Rea
             <Lock open={done} />
           </div>
           <p role="status" aria-live="polite" className={`min-h-[1.5rem] text-center text-sm uppercase tracking-[0.15em] ${hack.status}`}>
-            {status}
+            {flowStatus(deco, done, stopped)}
           </p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
@@ -26,9 +26,17 @@ interface Lit {
   depth: number
 }
 
-function Branch({ category, index, lit, onLight }: { category: Category; index: number; lit: Lit | null; onLight: (lit: Lit | null) => void }) {
+interface BranchProps {
+  category: Category
+  index: number
+  /** How far down this branch is lit: 0 the skill, a tier below it, -1 unlit. */
+  depth: number
+  onLight: (lit: Lit | null) => void
+}
+
+// Memoised on its own depth: lighting a node redraws only the branch it lights and the one it leaves.
+const Branch = memo(function Branch({ category, index, depth, onLight }: BranchProps) {
   const { cards } = useLabels()
-  const depth = lit?.branch === category.id ? lit.depth : -1
 
   return (
     <li className={`relative pb-4 ${MASONRY_ITEM} ${cel.branch}`} style={{ ['--i' as string]: index }} onPointerLeave={() => onLight(null)}>
@@ -58,7 +66,7 @@ function Branch({ category, index, lit, onLight }: { category: Category; index: 
       </div>
     </li>
   )
-}
+})
 
 export function SkillTree({ categories }: { categories: Category[] }) {
   const { cards } = useLabels()
@@ -75,7 +83,7 @@ export function SkillTree({ categories }: { categories: Category[] }) {
       </div>
       <ul className={MASONRY_LIST} aria-label={cards.techByCategory}>
         {categories.map((category, index) => (
-          <Branch key={category.id} category={category} index={index} lit={lit} onLight={setLit} />
+          <Branch key={category.id} category={category} index={index} depth={lit?.branch === category.id ? lit.depth : -1} onLight={setLit} />
         ))}
       </ul>
     </div>

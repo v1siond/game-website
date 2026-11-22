@@ -8,7 +8,7 @@
   border: 2px solid rgb(212 175 55 / 0.5);
   background:
     linear-gradient(180deg, rgb(42 29 12 / 0.55), transparent 40%),
-    linear-gradient(180deg, #0d2a42, #071624);
+    linear-gradient(180deg, var(--deco-diary-card), var(--deco-diary-card-deep));
   opacity: 0;
   transform: translate3d(0, 1.5rem, 0);
 }
@@ -136,11 +136,6 @@
 .play[aria-pressed='true'] {
   background: var(--deco-gold);
   color: var(--deco-abyss);
-}
-
-.play:focus-visible {
-  outline: 2px solid var(--deco-gold-bright);
-  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {

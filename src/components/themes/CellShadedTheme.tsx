@@ -3,13 +3,13 @@
 import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { CopyrightLine } from './shared/CopyrightLine'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useWorldView } from '@/components/cv/CVDataProvider'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
 import { paletteVars } from './shared/paletteVars'
-import { fillLabel } from '@/lib/cv/labels'
 import { CEL } from './CellShaded/palette'
 import { HatchDefs } from './CellShaded/ink'
 import { Wasteland, type Zone } from './CellShaded/wasteland'
@@ -36,7 +36,6 @@ const ROOT_VARS = paletteVars('cel', CEL)
 export default function CellShadedTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
   const pointerRef = usePointerVars(!reduced)
   const { zones, stage } = useZoneStore<Zone>('noon', reduced)
@@ -51,9 +50,9 @@ export default function CellShadedTheme() {
         <QuickChange profession={active} />
 
         <main className="relative z-20 px-4 py-8 sm:px-6">
-          <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionRegion className="mx-auto max-w-6xl">
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          </div>
+          </ProfessionRegion>
         </main>
 
         <RespawnStation profession={active} />

@@ -254,13 +254,14 @@ function Sparks() {
 
 function Hand({ side, profession, ids }: { side: 'back' | 'front'; profession: Profession; ids: Ids }) {
   const x = HAND_X[side]
-  const wrapped = profession === 'fighter'
+  // The Muay Thai wrap makes the fist larger and ivory; a bare fist takes the skin's light.
+  const fist = profession === 'fighter' ? { rx: 4.4, ry: 4.2, fill: C.ivory } : { rx: 3.6, ry: 3.8, fill: `url(#${ids.skin})` }
 
   return (
     <g>
       {side === 'back' && profession === 'engineer' && <Wrench ids={ids} />}
       {profession === 'drummer' && <Stick x={x} />}
-      <ellipse cx={x} cy={99} rx={wrapped ? 4.4 : 3.6} ry={wrapped ? 4.2 : 3.8} fill={wrapped ? C.ivory : `url(#${ids.skin})`} stroke={LINE} strokeWidth={0.9} />
+      <ellipse cx={x} cy={99} {...fist} stroke={LINE} strokeWidth={0.9} />
       {side === 'front' && <ellipse cx={x} cy={99} rx={7} ry={7} fill={`url(#${ids.glow})`} className={s.palmGlow} />}
     </g>
   )
@@ -339,7 +340,7 @@ function Snare() {
 }
 
 // The revival chamber's light: a column of sea glow with brass rings where he is put back together.
-function Chamber() {
+function RevivalLight() {
   return (
     <g className={s.chamber}>
       <rect x={34} y={0} width={56} height={172} fill={C.waterGlow} opacity={0.22} />
@@ -404,7 +405,7 @@ export function SurvivorSprite({ profession, motion, onDone, className = '' }: S
     <svg viewBox={`0 0 ${VIEW.width} ${VIEW.height}`} className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
       <Gradients ids={ids} />
       <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`} onAnimationEnd={finish}>
-        <Chamber />
+        <RevivalLight />
         <ellipse cx={62} cy={172.5} rx={26} ry={3.4} fill={C.abyss} opacity={0.5} />
         <g className={s.body}>
           <Arm side="back" profession={profession} ids={ids} />

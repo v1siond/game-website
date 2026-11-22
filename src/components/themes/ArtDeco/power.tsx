@@ -55,15 +55,15 @@ export function PoweredRoom({ children }: { children: ReactNode }) {
 
   return (
     <div ref={ref} className="grid items-end gap-6 sm:grid-cols-[auto_minmax(0,1fr)]">
-      <div className="flex items-end justify-center gap-1 sm:justify-start" aria-hidden={!triggered || undefined}>
-        <div className="h-36 w-24">
+      <div className="flex items-end justify-center gap-1 sm:justify-start">
+        <div className="h-36 w-24" aria-hidden="true">
           {triggered && (
             <div className={`h-full w-full ${pose === 'walk' ? s.walkIn : ''}`} onAnimationEnd={onOwnAnimationEnd}>
               <SurvivorSprite profession="engineer" motion={pose} onDone={advance} className="h-full w-full" />
             </div>
           )}
         </div>
-        <button type="button" onClick={() => play('zap')} aria-label={deco.zapAgain} className="h-24 w-16 rounded-sm border-2 border-[color:var(--deco-gold-bright)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[color:var(--deco-gold-bright)]">
+        <button type="button" onClick={() => play('zap')} aria-label={deco.zapAgain} className="h-24 w-16 rounded-sm border-2 border-[color:var(--deco-gold-bright)]">
           <FuseBox live={live} />
         </button>
       </div>

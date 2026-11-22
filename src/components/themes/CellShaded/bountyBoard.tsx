@@ -87,7 +87,7 @@ function XpBar({ read, total }: { read: number; total: number }) {
           </span>
         ))}
       </div>
-      <span className="text-base font-bold" role="status">
+      <span className="text-base font-bold">
         {fillLabel(hud.level, { number: read })} · {fillLabel(hud.xpBar, { count: read, total })}
       </span>
       {read > 0 && !reduced && (
@@ -100,7 +100,7 @@ function XpBar({ read, total }: { read: number; total: number }) {
 }
 
 export function BountyBoard({ jobs }: { jobs: Job[] }) {
-  const [read, setRead] = useState<ReadonlySet<string>>(new Set())
+  const [read, setRead] = useState<ReadonlySet<string>>(() => new Set())
 
   const markRead = useCallback((id: string) => {
     setRead((current) => (current.has(id) ? current : new Set(current).add(id)))

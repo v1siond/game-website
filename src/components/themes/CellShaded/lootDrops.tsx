@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { projectLinks } from '@/lib/cv/sectionText'
@@ -75,17 +75,18 @@ function StatRow({ stat, equipped, showCompare }: { stat: Stat; equipped: number
 interface LootCardProps {
   slot: ProjectSlot
   index: number
-  equipped: Project
+  equippedId: string
+  /** The equipped project's stats, worked out once for every card to compare against. */
+  equippedStats: Stat[]
   onEquip: (id: string) => void
 }
 
-function LootCard({ slot, index, equipped, onEquip }: LootCardProps) {
+function LootCard({ slot, index, equippedId, equippedStats, onEquip }: LootCardProps) {
   const labels = useLabels()
   const { hud, cards } = labels
   const { project, years, links } = slot
   const rarity = rarityOf(project)
-  const isEquipped = project.id === equipped.id
-  const equippedStats = statsFor(equipped, labels)
+  const isEquipped = project.id === equippedId
 
   return (
     <article data-rarity={rarity} className={`relative ${cel.loot}`} style={{ ['--i' as string]: index }}>
@@ -154,17 +155,17 @@ function LootCard({ slot, index, equipped, onEquip }: LootCardProps) {
 }
 
 export function LootDrops({ projects }: { projects: Project[] }) {
+  const labels = useLabels()
   const [equippedId, setEquippedId] = useState(projects[0]?.id)
   const equipped = projects.find((project) => project.id === equippedId) ?? projects[0]
+  const equippedStats = useMemo(() => statsFor(equipped, labels), [equipped, labels])
 
   return (
-    <>
-      <ProjectList
-        projects={projects}
-        className={MASONRY_LIST}
-        itemClassName={MASONRY_ITEM}
-        renderProject={(slot) => <LootCard slot={slot} index={projects.indexOf(slot.project)} equipped={equipped} onEquip={setEquippedId} />}
-      />
-    </>
+    <ProjectList
+      projects={projects}
+      className={MASONRY_LIST}
+      itemClassName={MASONRY_ITEM}
+      renderProject={(slot, index) => <LootCard slot={slot} index={index} equippedId={equipped.id} equippedStats={equippedStats} onEquip={setEquippedId} />}
+    />
   )
 }

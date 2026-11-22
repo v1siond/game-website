@@ -31,7 +31,7 @@ function Guardian({ angry }: { angry: boolean }) {
     <g className={g.guardian}>
       <g className={g.legBack}>
         <path d="M78 112 L98 112 L100 146 L80 146 Z" fill={C.diverDark} />
-        <path d="M76 144 H104 Q108 150 104 154 H74 Z" fill="#2a2a2a" />
+        <path d="M76 144 H104 Q108 150 104 154 H74 Z" fill={C.diverBoot} />
       </g>
       <g className={g.body}>
         {/* the air tank on his back and the hose to the helmet */}
@@ -66,7 +66,7 @@ function Guardian({ angry }: { angry: boolean }) {
       </g>
       <g className={g.legFront}>
         <path d="M50 112 L72 112 L72 146 L52 146 Z" fill={C.diver} stroke={C.sepia} strokeWidth="1" />
-        <path d="M46 144 H76 Q80 150 76 154 H44 Z" fill="#2a2a2a" />
+        <path d="M46 144 H76 Q80 150 76 154 H44 Z" fill={C.diverBoot} />
       </g>
     </g>
   )
@@ -75,23 +75,21 @@ function Guardian({ angry }: { angry: boolean }) {
 function Sister() {
   return (
     <g className={g.sister}>
-      <path d="M140 146 L142 156 M150 146 L150 156" stroke={HAND_SKIN} strokeWidth="2.6" strokeLinecap="round" />
+      <path d="M140 146 L142 156 M150 146 L150 156" stroke={C.sisterSkin} strokeWidth="2.6" strokeLinecap="round" />
       <path d="M136 112 L156 112 L162 148 L130 148 Z" fill={C.sisterDress} stroke={C.sepia} strokeWidth="1" />
-      <path d="M136 112 Q128 108 126 108" stroke={HAND_SKIN} strokeWidth="2.6" strokeLinecap="round" />
-      <circle cx="146" cy="102" r="9" fill={HAND_SKIN} />
+      <path d="M136 112 Q128 108 126 108" stroke={C.sisterSkin} strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="146" cy="102" r="9" fill={C.sisterSkin} />
       <path d="M136 102 Q136 90 146 90 Q157 90 156 102 Q152 96 146 96 Q140 96 136 102 Z" fill={C.sepia} />
       <circle cx="142" cy="102" r="1.4" fill={C.portCalm} />
       <circle cx="148" cy="102" r="1.4" fill={C.portCalm} />
       {/* the long needle held down at her side */}
-      <path d="M155 113 Q160 120 159 128" fill="none" stroke={HAND_SKIN} strokeWidth="2.6" strokeLinecap="round" />
-      <circle cx="159" cy="128" r="2.2" fill={HAND_SKIN} />
+      <path d="M155 113 Q160 120 159 128" fill="none" stroke={C.sisterSkin} strokeWidth="2.6" strokeLinecap="round" />
+      <circle cx="159" cy="128" r="2.2" fill={C.sisterSkin} />
       <path d="M156 122 L166 142" stroke={C.steel} strokeWidth="2.2" strokeLinecap="round" />
       <path d="M166 142 L170 150" stroke={C.ivory} strokeWidth="0.9" />
     </g>
   )
 }
-
-const HAND_SKIN = '#e9c4a4'
 
 /** The street behind the marquees, where the guardian pair walks as the visitor scrolls. */
 export function GuardianStreet({ children }: { children: ReactNode }) {
