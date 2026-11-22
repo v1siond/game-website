@@ -28,11 +28,6 @@
   position: relative;
 }
 
-/* Nothing in a section plays before the section is seen: its loops wait, paused on their first frame. */
-.stage:not([data-on]) * {
-  animation-play-state: paused;
-}
-
 /* ---- the shelter wall behind everything (backdrop.tsx) ---- */
 
 .shelterWall {
@@ -246,11 +241,6 @@
 
 .statusFigure {
   position: absolute;
-}
-
-/* His action plays once the tube is on, not behind the door. */
-.device:not([data-booted]) .statusFigure * {
-  animation-play-state: paused;
 }
 
 .statusCell {
@@ -708,11 +698,6 @@
   opacity: 0;
 }
 
-/* His pose on a card plays when the card is earned, not while it waits unseen. */
-.perkCard:not([data-shown]) * {
-  animation-play-state: paused;
-}
-
 .perkCard[data-shown] {
   animation: flipIn 620ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
@@ -845,11 +830,6 @@
 .atDoor {
   opacity: 0;
   transform: translate3d(-70%, 0, 0);
-}
-
-/* His walk waits in the doorway for the section, so its strides are the ones seen. */
-.atDoor * {
-  animation-play-state: paused;
 }
 
 .walkOut {

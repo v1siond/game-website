@@ -9,6 +9,7 @@ import { fillLabel, type Labels } from '@/lib/cv/labels'
 import { PROFESSION_ORDER, stepProfession, type Profession } from '@/lib/cv/professions'
 import type { WorldCV } from '@/lib/cv/content'
 import { NameWords } from '@/components/cv/NameWords'
+import { heldUntil } from '@/components/themes/shared/held'
 import { DWELLER_ACTION, DwellerSprite } from './dweller'
 import { ActionMenu } from './controls'
 import { sectionTabs } from './anchors'
@@ -121,12 +122,12 @@ function SectionTabs({ profession }: { profession: Profession }) {
   )
 }
 
-/** His figure on the tube, in the green line tone, at the picked profession's work as the screen comes on. */
-function StatusFigure({ profession }: { profession: Profession }) {
+/** His figure on the tube, in the green line tone, at the picked profession's work once the screen is on (`on`). */
+function StatusFigure({ profession, on }: { profession: Profession; on: boolean }) {
   return (
     <div data-worlds-figure="" className={`relative mx-auto aspect-[2/3] w-28 sm:w-36 ${atomic.statusBox}`}>
       <span className={atomic.statusBrackets} aria-hidden="true" />
-      <div className={`absolute inset-3 ${atomic.statusFigure}`}>
+      <div className={`absolute inset-3 ${atomic.statusFigure} ${heldUntil(on)}`}>
         <DwellerSprite key={profession} profession={profession} tone="phosphor" motion={DWELLER_ACTION[profession]} className="h-full w-full" />
       </div>
     </div>
@@ -254,7 +255,7 @@ export function WristComputer({ booted, instant }: WristComputerProps) {
 
               <div key={active} className={`mt-5 grid items-center gap-6 md:grid-cols-[auto_1fr] ${atomic.powerOn}`}>
                 <div className="relative flex flex-col items-center gap-3">
-                  <StatusFigure profession={active} />
+                  <StatusFigure profession={active} on={booted || instant} />
                   {/* over his frame's own box (w-28, sm:w-36), out of the flow: the split readout in wardrobe.css */}
                   <Wardrobe look={OUTFIT_LOOK} ready={booted || instant} className="absolute inset-0 mx-auto w-28 sm:w-36" />
                 </div>
