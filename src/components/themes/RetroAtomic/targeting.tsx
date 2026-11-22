@@ -316,10 +316,10 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
           projects={projects}
           className={`min-w-0 flex-1 ${MASONRY_LIST}`}
           itemClassName={MASONRY_ITEM}
-          renderProject={(slot) => (
+          renderProject={(slot, index) => (
             <TargetCard
               slot={slot}
-              index={projects.indexOf(slot.project)}
+              index={index}
               targeted={locked === slot.project.id}
               phase={shot?.id === slot.project.id ? shot.phase : null}
               onTarget={(id) => !shot && setTarget(id)}

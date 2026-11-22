@@ -111,10 +111,7 @@ export function Radio({ bands, on }: { bands: Band[]; on: boolean }) {
         bands={bands}
         className={MASONRY_LIST}
         itemClassName={MASONRY_ITEM}
-        renderBand={(slot) => {
-          const index = bands.indexOf(slot.band)
-          return <Station slot={slot} tuned={index === tuned} onTune={() => setTuned(index)} />
-        }}
+        renderBand={(slot, index) => <Station slot={slot} tuned={index === tuned} onTune={() => setTuned(index)} />}
       />
     </>
   )

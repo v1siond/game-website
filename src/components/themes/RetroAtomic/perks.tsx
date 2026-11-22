@@ -95,7 +95,7 @@ interface PerkChartProps {
 }
 
 export function PerkChart({ martialArts, shown, ring }: PerkChartProps) {
-  const { achievements, title } = martialArts.primary
+  const { title } = martialArts.primary
 
   return (
     <div className={`relative flex flex-col p-5 sm:p-8 ${atomic.posterPaper}`}>
@@ -114,10 +114,7 @@ export function PerkChart({ martialArts, shown, ring }: PerkChartProps) {
           achievements: 'order-2 grid gap-6 sm:grid-cols-2 lg:grid-cols-3',
           achievement: 'h-full',
         }}
-        renderAchievement={(achievement) => {
-          const index = achievements.indexOf(achievement)
-          return <PerkCard achievement={achievement} index={index} shown={index < shown} />
-        }}
+        renderAchievement={(achievement, index) => <PerkCard achievement={achievement} index={index} shown={index < shown} />}
       />
     </div>
   )
