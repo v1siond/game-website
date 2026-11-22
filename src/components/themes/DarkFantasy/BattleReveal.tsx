@@ -7,7 +7,6 @@ import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade 
 import battle from './battle.module.css'
 import bugMotion from './bug.module.css'
 import { DARK_FANTASY } from './palette'
-import { useLabels } from '@/components/cv/CVDataProvider'
 import { cssVars } from '@/lib/cssVars'
 
 /**
@@ -75,7 +74,6 @@ export const BattleReveal = memo(function BattleReveal({
   children,
   triggered
 }: BattleRevealProps) {
-  const { navigation } = useLabels()
   const [phase, setPhase] = useState<AnimationPhase>('idle')
   const [showSlash, setShowSlash] = useState(false)
   const [showImpact, setShowImpact] = useState(false)
@@ -368,7 +366,6 @@ export const BattleReveal = memo(function BattleReveal({
     }
   }
 
-  const isAnimating = phase !== 'idle' && phase !== 'complete'
   const showKnight = phase !== 'idle'
   const showBug = phase !== 'idle'
   const showContent = phase === 'content-drop' || phase === 'complete'
@@ -379,8 +376,6 @@ export const BattleReveal = memo(function BattleReveal({
       <div
         ref={stageRef}
         className={`relative w-full min-h-[300px] flex items-center justify-center ${screenShake ? battle.shaking : ''}`}
-        aria-live="polite"
-        aria-label={isAnimating ? navigation.battleInProgress : navigation.contentRevealed}
       >
         {/* Knight + bug pinned to the viewport corners (left-15% / right-18%), both standing on COMBAT_GROUND;
             only the content below scrolls past them. Fades out as the section leaves view. */}
