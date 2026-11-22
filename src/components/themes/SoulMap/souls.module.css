@@ -327,32 +327,19 @@
   transform: translate(calc(var(--mx, 0) * -24px), calc(var(--my, 0) * -6px));
 }
 
-.heroWords {
-  opacity: 0;
-}
-
-.heroWordsOn {
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .fogBand {
     animation: fog-drift 4.8s ease-in-out forwards;
   }
 
-  /* After he stands, the words under the scene surface one line at a time, out of the dark. */
-  .heroWords {
-    opacity: 1;
-  }
-
+  /* The words under the scene are read from the first frame; as he rises they lift into place one line
+     at a time (the last one settles 4.5 s in). Only the transform moves, so the name is never hidden. */
   .heroWords > * {
-    opacity: 0;
     transform: translateY(10px);
-    transition: opacity 1.6s ease-out, transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition: transform 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
 
   .heroWordsOn > * {
-    opacity: 1;
     transform: none;
   }
 

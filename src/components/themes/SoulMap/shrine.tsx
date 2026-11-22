@@ -21,8 +21,8 @@ const OUTFIT_LOOK: WardrobeLook = { plate: SOUL.panel, text: SOUL.glow, ring: SO
 // The hero: the ruined shrine at dusk, the circular plaza on its cliff under a grey sky, the aqueduct's
 // arches behind it, the lift tower to the right and a broken arch to the left, the way the game's first
 // safe place looks. He sits by a dead fire. The lighting plays once: an ember catches in the ash, the
-// flame climbs the coiled sword, the gold banner says the fire is kindled, he stands up, and his name
-// fades in under the scene. Then the scene is the visitor's: the fire is a button (rest: he sits down,
+// flame climbs the coiled sword, the gold banner says the fire is kindled, he stands up, and his name,
+// readable from the first frame, lifts into place under the scene as he rises. Then the scene is the visitor's: the fire is a button (rest: he sits down,
 // drinks from the flask, gets up, and the HUD refills) and so is he (roll, which costs stamina). The
 // three layers of ruins lean to the pointer (--mx, --my from the world's root).
 //
@@ -175,6 +175,8 @@ export function ShrineHero() {
   const phase = useLighting(() => run.announce('kindled', words.kindled))
   const script = usePoseScript('idle')
   const ready = phase === 'ready'
+  // The words lift with him from the start of his rise (1.6 s), so their last line settles by 4.5 s.
+  const risen = phase === 'rise' || ready
   // Before the lighting is done he is already sitting by the dead fire (no sitting down on the first
   // draw), then rises with it.
   const pose = phase === 'ready' ? script.pose : LIGHTING_POSE[phase]
@@ -228,7 +230,7 @@ export function ShrineHero() {
 
       <RecruiterHero
         render={({ name, headline, tagline, line, actions }) => (
-          <div className={`${souls.heroWords} ${ready ? souls.heroWordsOn : ''} relative z-10 mx-auto -mt-10 max-w-3xl px-4 text-center sm:-mt-16`}>
+          <div className={`${souls.heroWords} ${risen ? souls.heroWordsOn : ''} relative z-10 mx-auto -mt-10 max-w-3xl px-4 text-center sm:-mt-16`}>
             <h1 className={`${CARVED} text-[clamp(1.75rem,6.6vw,3.25rem)] uppercase tracking-[0.16em] text-[color:var(--soul-text)]`}>
               <NameWords name={name} />
             </h1>
