@@ -7,12 +7,13 @@ import { VentureList } from '@/components/cv/VentureList'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { drumsSince } from '@/lib/cv/sectionText'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { aboutBlock } from '@/lib/cv/cvView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { REALM } from './palette'
 import { InnerCard, RealmFrame } from './panels'
-import { BandCard, CARD_BODY, CARD_TITLE, JobCard, ProjectCard, VentureCard } from './cards'
+import { BandCard, CARD_BODY, CARD_TITLE, JobCard, MarkedList, ProjectCard, VentureCard } from './cards'
 import { FTArtDivider, FTOrnament, RoCArtDivider, RoCOrnament } from './ornaments'
 
 // Each profession's sections, framed per zone between ornaments and art dividers.
@@ -60,6 +61,8 @@ interface FrameProps {
 const FRAMES: SectionFrames<FrameProps> = {
   about: function AboutFrame({ slot, layout, isLargeScreen }) {
     const { sections } = useLabels()
+    const { professionalSummary } = useCVData()
+    const { education, languages, highlights } = aboutBlock(professionalSummary)
     return (
       <>
         <ScrollScene>
@@ -71,6 +74,9 @@ const FRAMES: SectionFrames<FrameProps> = {
                 fontSize: isLargeScreen ? '1.125rem' : '1rem',
                 padding: isLargeScreen ? '0.5rem 0' : '0.25rem 0',
               }}>{slot.bio}</p>
+              {education && <p className="text-base text-[color:var(--realm-text-mid)]">{education}</p>}
+              {languages && <p className="text-base text-[color:var(--realm-text-mid)]">{languages}</p>}
+              <MarkedList items={highlights} />
             </RealmFrame>
           </section>
         </ScrollScene>
