@@ -118,7 +118,7 @@ const JUMP: Keyframe[] = [{ transform: 'translateY(0)' }, { transform: 'translat
 
 const stepped = (duration: number, frames: number, delay = 0): KeyframeAnimationOptions => ({ duration, delay, easing: `steps(${frames}, end)` })
 
-export function ProjectCard({ project, years, links }: ProjectSlot) {
+export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
   const labels = useLabels()
   const aimedAt = useRef(0)
   const body = useRef<HTMLDivElement>(null)
@@ -160,7 +160,7 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
           </p>
         )}
         <Tags items={project.techStack.slice(0, 4)} label={labels.cards.technologiesUsed} />
-        {links.length > 0 ? (
+        {links.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map(({ kind, label, linkProps }) => (
               <Command key={kind} {...linkProps}>
@@ -168,9 +168,8 @@ export function ProjectCard({ project, years, links }: ProjectSlot) {
               </Command>
             ))}
           </div>
-        ) : (
-          <p className={`mt-4 ${BODY}`}>{labels.links.noPublicLink}</p>
         )}
+        {noLink && <p className={`mt-4 ${BODY}`}>{noLink}</p>}
         <div className={`relative mt-4 h-6 border-2 border-[color:var(--rpg-text)] ${world.meter}`} aria-hidden="true">
           <span className="absolute inset-y-0 left-1/2 w-1 -translate-x-1/2 bg-[color:var(--rpg-gold)]" />
           <span className={`absolute inset-0 ${world.meterLine}`}>
@@ -221,8 +220,7 @@ export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
   )
 }
 
-export function BandCard({ band, years, linkProps }: BandSlot) {
-  const labels = useLabels()
+export function BandCard({ band, years, linkProps, release }: BandSlot) {
   const content = (
     <div className={`p-4 sm:p-5 ${world.box}`}>
       <h3 className={`flex items-start gap-2 ${TITLE} group-hover:text-[color:var(--rpg-gold)] group-focus-visible:text-[color:var(--rpg-gold)]`}>
@@ -234,9 +232,9 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> | </span>}
         {years && <span>{years}</span>}
       </p>
-      {band.release && (
+      {release && (
         <p className={`mt-2 ${BODY}`}>
-          {labels.links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </div>
