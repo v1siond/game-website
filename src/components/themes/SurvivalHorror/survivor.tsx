@@ -397,7 +397,7 @@ interface SurvivorProps {
 }
 
 export function Survivor({ profession, pose: poseName, laser = false, className = '' }: SurvivorProps) {
-  const id = useId().replace(/:/g, '')
+  const id = useId()
   const kit = KIT[profession]
   const row = HERO_POSES[poseName]
   const leather = `url(#${id}-leather)`

@@ -126,7 +126,7 @@ function Leg({ x, fill, angles }: { x: number; fill: string; angles: readonly [n
 const STRAPS = [52, 62, 72, 82]
 
 export function Stalker({ pose: poseName, className = '' }: { pose: StalkerPose; className?: string }) {
-  const id = useId().replace(/:/g, '')
+  const id = useId()
   const row = STALKER_POSES[poseName]
   const coat = `url(#${id}-coat)`
 
