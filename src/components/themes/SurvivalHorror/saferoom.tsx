@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
@@ -20,9 +19,9 @@ const RIBBONS = 3
 
 function SaveDesk({ line }: { line: string }) {
   const { horror: words } = useLabels()
-  const { save } = useStageState()
-  const [ribbons, setRibbons] = useState(RIBBONS)
-  const saved = ribbons < RIBBONS
+  const { save, saves } = useStageState()
+  const ribbons = Math.max(RIBBONS - saves, 0)
+  const saved = saves > 0
 
   return (
     <div className="mt-4 grid gap-4 md:grid-cols-[2fr_1fr]">
@@ -35,7 +34,6 @@ function SaveDesk({ line }: { line: string }) {
           type="button"
           onClick={() => {
             if (ribbons === 0) return
-            setRibbons((left) => Math.max(left - 1, 0))
             save()
           }}
           aria-disabled={ribbons === 0}
