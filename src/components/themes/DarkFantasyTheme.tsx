@@ -867,8 +867,9 @@ function WaystationSelector({ active }: { active: Profession }) {
 const DF_BUTTON =
   'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-transform hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
 
-// Email is the brass action, LinkedIn and the CV in the contact row the outlined ones.
-const DF_OUTLINED = 'bg-transparent border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]'
+// Email is the brass action, LinkedIn and the CV in the contact row the outlined ones, on the void so the hall
+// lit behind them never takes their words under AAA.
+const DF_OUTLINED = 'bg-[color:var(--df-void)] border-2 border-[color:var(--df-brass)] text-[color:var(--df-brass-text)]'
 const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
   email: `${DF_BUTTON} bg-[color:var(--df-brass-plate)] text-[color:var(--df-void)]`,
   linkedin: `${DF_BUTTON} ${DF_OUTLINED}`,
@@ -878,8 +879,8 @@ const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
 const NAV_LINK =
   'px-2 md:px-3 py-1.5 md:py-2 min-h-[44px] min-w-[44px] justify-center text-sm tracking-[0.1em] uppercase transition-transform hover:scale-105 flex items-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)]'
 const NAV_LOOK: Record<SiteLinkId, string> = {
-  cv: `${NAV_LINK} border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color-mix(in_srgb,var(--df-void)_80%,transparent)]`,
-  engine: `${NAV_LINK} border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,transparent)]`,
+  cv: `${NAV_LINK} border border-[color:var(--df-stone-dark)] text-[color:var(--df-silver-text)] bg-[color:var(--df-void)]`,
+  engine: `${NAV_LINK} border border-[color:var(--df-ethereal)] text-[color:var(--df-ethereal)] bg-[color-mix(in_srgb,var(--df-ethereal)_10%,var(--df-void))]`,
 }
 
 function HeroActions({ actions }: { actions: HeroActionSlot[] }) {
@@ -1128,22 +1129,26 @@ export default function DarkFantasyTheme() {
         <RecruiterHero
           render={({ name, headline, tagline, line, actions }) => (
             <div className="max-w-4xl mx-auto text-center">
-              <h1
-                className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3"
-                style={{ color: DARK_FANTASY.bone, textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30` }}
-              >
-                <NameWords name={name} />
-              </h1>
-              <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silverText }}>
-                {headline}
-              </p>
-              <p
-                className="text-sm tracking-wider italic"
-                style={{ color: DARK_FANTASY.spiritGold, textShadow: `0 0 10px ${DARK_FANTASY.spiritGold}40` }}
-              >
-                {tagline}
-              </p>
-              <p className="text-sm mt-2" style={{ color: DARK_FANTASY.bone }}>{line}</p>
+              {/* The lines sit on a void plate, its edge feathered into the hall, so the lamps lit behind them never
+                  take the words under AAA. */}
+              <div className="mx-auto w-fit max-w-full rounded-lg bg-[#0f0a1a]/90 px-4 py-3 shadow-[0_0_48px_24px_rgba(15,10,26,0.9)] md:px-8">
+                <h1
+                  className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3"
+                  style={{ color: DARK_FANTASY.bone, textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30` }}
+                >
+                  <NameWords name={name} />
+                </h1>
+                <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silverText }}>
+                  {headline}
+                </p>
+                <p
+                  className="text-sm tracking-wider italic"
+                  style={{ color: DARK_FANTASY.spiritGold, textShadow: `0 0 10px ${DARK_FANTASY.spiritGold}40` }}
+                >
+                  {tagline}
+                </p>
+                <p className="text-sm mt-2" style={{ color: DARK_FANTASY.bone }}>{line}</p>
+              </div>
               <div className="flex flex-wrap gap-3 justify-center mt-4">
                 <HeroActions actions={actions} />
                 {/* out of the page flow so the hero keeps its places. From lg a zero size item at the end of the
