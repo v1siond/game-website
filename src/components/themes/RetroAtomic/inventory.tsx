@@ -5,7 +5,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST, MASONRY_TILES } from '@/lib/cv/masonry'
 import { fillLabel } from '@/lib/cv/labels'
-import { newTabName } from '@/lib/cv/sectionText'
+import { newTabHint } from '@/lib/cv/sectionText'
 import { ventureCard } from '@/lib/cv/cvView'
 import { AtomicChip } from './controls'
 import { BAKELITE, CHROME, CREAM, OLIVE_DARK, RUBBER, STEEL_LIGHT } from './palette'
@@ -79,7 +79,8 @@ function Cassette() {
 /**
  * The holotape shelf; `dug` is how many tapes the dog has dug up so far (dig.tsx), all of them by default.
  * His own products (featured) are the two big tapes of the first row, a yellow vault tag over the
- * tagline; the other ventures follow three to a row.
+ * tagline; the other ventures follow three to a row. Each tape's link is named by everything it shows,
+ * its services included, plus the new tab note a screen reader alone hears.
  */
 export function Holotapes({ companies, dug = companies.length }: { companies: CVData['companies']; dug?: number }) {
   const { links, cards, sections } = useLabels()
@@ -92,7 +93,6 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
             href={company.url}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}`)}
             className={`group relative block ${atomic.holotape}`}
           >
             <div className="relative">
@@ -117,6 +117,7 @@ export function Holotapes({ companies, dug = companies.length }: { companies: CV
                   ))}
                 </ul>
               )}
+              <span className="sr-only"> {newTabHint(links)}</span>
             </div>
           </a>
         </li>
