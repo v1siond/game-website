@@ -70,12 +70,6 @@
   vector-effect: non-scaling-stroke;
 }
 
-.root :focus-visible {
-  outline: 4px solid var(--cel-ink);
-  outline-offset: 3px;
-  box-shadow: 0 0 0 7px var(--cel-sun);
-}
-
 /* ---------------------------------------------------------------- buttons (buttons.tsx) */
 
 .inkButton {
