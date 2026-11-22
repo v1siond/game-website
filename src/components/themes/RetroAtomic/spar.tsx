@@ -3,6 +3,7 @@
 import { useMemo, type ReactNode } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useTimedSteps } from '@/hooks/useTimedSteps'
+import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { DwellerSprite, type DwellerMotion } from './dweller'
 import { MutantSprite, type MutantMotion } from './mutant'
@@ -34,14 +35,19 @@ const HITS: { him: DwellerMotion; foe: MutantMotion }[] = [
   { him: 'kick', foe: 'kicked' },
 ]
 
-/** Wind up, land and reset per achievement, then the mutant goes down. */
+const ROUND_MS = CONTACT_MS + REACT_MS + GUARD_MS
+
+/** Wind up, land and reset per achievement, then the mutant goes down; every round quickened alike by
+ * stepWithin when enough achievements would run the spar past 5 s after the bell (GUARD_MS). */
 function sparBeats(count: number): Beat[] {
+  const pace = stepWithin({ step: ROUND_MS, count, fixed: GUARD_MS, budget: STORY_MS }) / ROUND_MS
+  const ms = (beat: number) => Math.floor(beat * pace)
   const rounds = Array.from({ length: count }, (_, round) => {
     const hit = HITS[round % HITS.length]
     return [
-      { him: hit.him, foe: 'guard' as const, shown: round, ms: CONTACT_MS },
-      { him: hit.him, foe: hit.foe, shown: round + 1, ms: REACT_MS },
-      { him: 'idle' as const, foe: 'guard' as const, shown: round + 1, ms: GUARD_MS },
+      { him: hit.him, foe: 'guard' as const, shown: round, ms: ms(CONTACT_MS) },
+      { him: hit.him, foe: hit.foe, shown: round + 1, ms: ms(REACT_MS) },
+      { him: 'idle' as const, foe: 'guard' as const, shown: round + 1, ms: ms(GUARD_MS) },
     ]
   }).flat()
   return [...rounds, { him: 'thumbsUp', foe: 'down', shown: count, ms: 0 }]

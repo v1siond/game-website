@@ -11,6 +11,7 @@ import { BRASS, CHROME, OLIVE, OLIVE_DARK, OLIVE_LIGHT, PHOSPHOR, POSTER_INK } f
 import atomic from './atomic.module.css'
 import j from './journey.module.css'
 import { cssVars } from '@/lib/cssVars'
+import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
 
 // Tech stack as looting a footlocker, the game's container screen. When the stage turns on he squats,
 // grabs the olive locker off the floor and hoists it onto his shoulder in the wide, strained carry stance
@@ -22,6 +23,11 @@ import { cssVars } from '@/lib/cssVars'
 
 const POUR_MS = 1500
 const POCKET_MS = 320
+// A pocket's tumble into the inventory (journey.module.css).
+const TUMBLE_MS = 600
+
+/** The gap between pockets: POCKET_MS, shorter when there are enough pockets that the last would land after 5 s. */
+const pocketMsFor = (pockets: number) => stepWithin({ step: POCKET_MS, count: pockets, fixed: POUR_MS + TUMBLE_MS, budget: STORY_MS })
 
 // The locker's drawing in px (its viewBox draws 1 to 1): the box, the lid on its hinge at the lid's bottom
 // left, and the two turns of the carry, the lid flipped open and the whole locker tilted on his shoulder
@@ -76,11 +82,12 @@ const CARRY = cssVars({
   '--carry-tilt': `${CARRY_TILT_DEG}deg`,
 })
 
-/** How many pockets have landed: none until the pour starts, then one more every POCKET_MS. */
+/** How many pockets have landed: none until the pour starts, then one more every pocketMsFor(total). */
 function useLanded(on: boolean, total: number, instant: boolean) {
-  const pockets = useMemo(() => Array.from({ length: total }, () => POCKET_MS), [total])
+  const pocketMs = pocketMsFor(total)
+  const pockets = useMemo(() => Array.from({ length: total }, () => pocketMs), [total, pocketMs])
   // Step n is pocket n + 1 landed, so before the first step none has.
-  return useTimedSteps(pockets, { on, reduced: instant, firstMs: POUR_MS + POCKET_MS }) + 1
+  return useTimedSteps(pockets, { on, reduced: instant, firstMs: POUR_MS + pocketMs }) + 1
 }
 
 /** The olive drab footlocker seen from the front: steel corners, a brass latch, the lid on its side hinge. */
@@ -121,7 +128,7 @@ export function Loot({ categories, on, children }: { categories: CVData['techSta
   const landed = useLanded(on, categories.length, reduced)
   const weight = categories.slice(0, landed).reduce((sum, category) => sum + category.items.length, 0)
   const total = categories.reduce((sum, category) => sum + category.items.length, 0)
-  const timing = cssVars({ '--pour': `${POUR_MS}ms`, '--pocket': `${POCKET_MS}ms`, '--pockets': categories.length })
+  const timing = cssVars({ '--pour': `${POUR_MS}ms`, '--pocket': `${pocketMsFor(categories.length)}ms`, '--pockets': categories.length })
 
   return (
     <div style={timing}>

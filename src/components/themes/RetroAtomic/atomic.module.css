@@ -443,7 +443,8 @@
 }
 
 .stage[data-on] .cardOn {
-  animation: crtOn 480ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--i, 0) * 90ms) both;
+  /* the stagger is capped, so the last item lands by 5 s for any count */
+  animation: crtOn 480ms cubic-bezier(0.2, 0.8, 0.2, 1) min(calc(var(--i, 0) * 90ms), 4.5s) both;
 }
 
 .questActive,
