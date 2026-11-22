@@ -14,6 +14,10 @@
         "contact": "Contact",
         "posts": "Posts"
       },
+      "about": {
+        "education": "Education",
+        "languages": "Languages"
+      },
       "professions": {
         "engineer": "System Engineer",
         "drummer": "Musician",
@@ -32,10 +36,7 @@
         "selectYourProfession": "Pick a profession",
         "primaryNavigation": "Primary navigation",
         "skipToContent": "Skip to main content",
-        "loadingTheme": "Loading theme",
         "loading": "Loading...",
-        "battleInProgress": "Battle animation in progress",
-        "contentRevealed": "Content revealed",
         "copyright": "Copyright",
         "active": "Active",
         "findTally": "{found} of {total}"
@@ -464,6 +465,10 @@
         "contact": "Contacto",
         "posts": "Publicaciones"
       },
+      "about": {
+        "education": "Formación",
+        "languages": "Idiomas"
+      },
       "professions": {
         "engineer": "Ingeniero de Sistemas",
         "drummer": "Músico",
@@ -482,10 +487,7 @@
         "selectYourProfession": "Elige tu profesión",
         "primaryNavigation": "Navegación principal",
         "skipToContent": "Saltar al contenido principal",
-        "loadingTheme": "Cargando tema",
         "loading": "Cargando...",
-        "battleInProgress": "Animación de batalla en curso",
-        "contentRevealed": "Contenido revelado",
         "copyright": "Derechos de autor",
         "active": "Activo",
         "findTally": "{found} de {total}"
@@ -914,6 +916,10 @@
         "contact": "Contatti",
         "posts": "Articoli"
       },
+      "about": {
+        "education": "Formazione",
+        "languages": "Lingue"
+      },
       "professions": {
         "engineer": "Ingegnere di Sistemi",
         "drummer": "Musicista",
@@ -932,10 +938,7 @@
         "selectYourProfession": "Scegli la tua professione",
         "primaryNavigation": "Navigazione principale",
         "skipToContent": "Vai al contenuto principale",
-        "loadingTheme": "Caricamento del tema",
         "loading": "Caricamento...",
-        "battleInProgress": "Animazione della battaglia in corso",
-        "contentRevealed": "Contenuto rivelato",
         "copyright": "Copyright",
         "active": "Attivo",
         "findTally": "{found} su {total}"
