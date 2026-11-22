@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { ProjectList } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
@@ -43,11 +43,20 @@ function Lit({ on, frame, children }: { on: boolean; frame: string; children: Re
   return <div className={`h-full ${on ? `${frame} ${living.lit}` : ''}`}>{children}</div>
 }
 
+// His education and languages under the highlights, each label in the gold display face.
+const GOLD_FACTS: AboutFactsLook = {
+  list: 'space-y-1',
+  fact: 'text-sm text-white',
+  term: `inline uppercase text-[color:var(--fs-gold)] ${look.display}`,
+  value: 'inline',
+  termEnd: ': ',
+}
+
 // One frame per section of the shared plan, which picks the ones a profession shows and their order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { sections: titles, cards, about } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { sections: titles, cards } = useLabels()
+    const { highlights } = useAboutBlock()
     return (
       <>
         <ArcadePanel accent="cyan" title={titles.about} id="about-heading">
@@ -55,18 +64,7 @@ const FRAMES: SectionFrames = {
             <p className={`mt-6 max-w-prose ${LEAD}`}>{slot.bio}</p>
             <div className="mt-6 max-w-prose">
               <MarkedLines items={highlights} label={cards.keyAchievements} look={SPARK_LINES} />
-              {education && (
-                <p className="text-sm text-white">
-                  <span className={`uppercase text-[color:var(--fs-gold)] ${look.display}`}>{about.education}: </span>
-                  {education}
-                </p>
-              )}
-              {languages && (
-                <p className="mt-1 text-sm text-white">
-                  <span className={`uppercase text-[color:var(--fs-gold)] ${look.display}`}>{about.languages}: </span>
-                  {languages}
-                </p>
-              )}
+              <AboutFacts look={GOLD_FACTS} />
             </div>
           </CarSmash>
         </ArcadePanel>

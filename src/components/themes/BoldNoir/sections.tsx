@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, type CSSProperties, type ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { BandList } from '@/components/cv/BandList'
@@ -61,20 +61,18 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
   )
 }
 
-// One fact under the statement, its label in the red capitals; an empty fact leaves no line.
-function StatementFact({ label, value }: { label: string; value: string }) {
-  if (!value) return null
-  return (
-    <p className={`text-sm ${world.copy}`}>
-      <span className="font-bold uppercase tracking-wider text-[color:var(--noir-red-plate)]">{label}: </span>
-      {value}
-    </p>
-  )
+// The facts under the statement, each label in the red capitals.
+const STATEMENT_FACTS: AboutFactsLook = {
+  list: 'mt-4 max-w-prose space-y-1',
+  fact: `text-sm ${world.copy}`,
+  term: 'inline font-bold uppercase tracking-wider text-[color:var(--noir-red-plate)]',
+  value: 'inline',
+  termEnd: ': ',
 }
 
 function About({ bio }: { bio: string }) {
-  const { sections, cards, about } = useLabels()
-  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+  const { sections, cards } = useLabels()
+  const { highlights } = useAboutBlock()
 
   return (
     <Stage title={sections.about}>
@@ -86,10 +84,7 @@ function About({ bio }: { bio: string }) {
             label={cards.keyAchievements}
             look={{ ...BULLETS, list: 'mt-4 max-w-prose space-y-1.5', line: `flex items-start gap-2 text-sm ${world.copy}` }}
           />
-          <div className="mt-4 max-w-prose space-y-1">
-            <StatementFact label={about.education} value={education} />
-            <StatementFact label={about.languages} value={languages} />
-          </div>
+          <AboutFacts look={STATEMENT_FACTS} />
         </div>
       </SlappedStatement>
     </Stage>

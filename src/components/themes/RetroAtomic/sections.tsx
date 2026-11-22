@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { drumsSince } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -65,21 +65,18 @@ function Stage({ title, zone, className = '', children }: StageProps) {
   )
 }
 
-// One line of the terminal's personnel record, the label in the dim phosphor capitals; an empty fact leaves no line.
-function TerminalFact({ label, value }: { label: string; value: string }) {
-  if (!value) return null
-  return (
-    <div className="flex flex-wrap gap-x-2">
-      <dt className="font-bold uppercase tracking-widest text-atomic-phosphor-dim-text">{label}</dt>
-      <dd className="text-atomic-ash">{value}</dd>
-    </div>
-  )
+// The terminal's personnel record, each label in the dim phosphor capitals.
+const TERMINAL_FACTS: AboutFactsLook = {
+  list: 'mt-4 max-w-prose space-y-1 text-sm',
+  fact: 'flex flex-wrap gap-x-2',
+  term: 'font-bold uppercase tracking-widest text-atomic-phosphor-dim-text',
+  value: 'text-atomic-ash',
 }
 
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { sections: titles, cards, about } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { sections: titles, cards } = useLabels()
+    const { highlights } = useAboutBlock()
     return (
       <Stage title={titles[slot.titleKey]} zone="shelter" className={j.fetch}>
         <Fetch>
@@ -90,10 +87,7 @@ const FRAMES: SectionFrames = {
               label={cards.keyAchievements}
               look={{ ...PLUS_ROWS, list: 'mt-4 max-w-prose space-y-1 border-t border-atomic-phosphor/30 pt-3' }}
             />
-            <dl className="mt-4 max-w-prose space-y-1 text-sm">
-              <TerminalFact label={about.education} value={education} />
-              <TerminalFact label={about.languages} value={languages} />
-            </dl>
+            <AboutFacts look={TERMINAL_FACTS} />
           </div>
         </Fetch>
       </Stage>

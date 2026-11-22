@@ -236,3 +236,16 @@ export const aboutBlock = ({ bio, education, languages, highlights }: Profession
   languages,
   highlights,
 })
+
+export interface AboutFact {
+  label: string
+  value: string
+}
+
+/** His education, then his languages, each under its label from `labels.about`; one Decap stores empty
+ *  is left out, so no world prints a label with nothing after it. */
+export const aboutFacts = ({ education, languages }: Pick<AboutBlock, 'education' | 'languages'>, about: Labels['about']): AboutFact[] =>
+  [
+    { label: about.education, value: education },
+    { label: about.languages, value: languages },
+  ].filter((fact) => fact.value)

@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { Job } from '@/lib/cv/content'
-import { aboutBlock, jobCard, projectCard } from '@/lib/cv/cvView'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { jobCard, projectCard } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { TYPEWRITER } from './palette'
@@ -135,27 +136,22 @@ export function ProjectCard({ project: entry, links }: ProjectSlot) {
   )
 }
 
+// His education and languages on the slab, each label in the meta type.
+const SLAB_FACTS: AboutFactsLook = {
+  list: 'space-y-2',
+  fact: '',
+  term: `uppercase ${CARD_META}`,
+  value: CARD_BODY,
+}
+
 // His education, languages and summary highlights under the chase, on the slab the job cards use.
-export function AboutFacts() {
-  const { about, cards } = useLabels()
-  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
-  const facts = [
-    { label: about.education, value: education },
-    { label: about.languages, value: languages },
-  ].filter((fact) => fact.value)
+export function AboutSlab() {
+  const { cards } = useLabels()
+  const { highlights } = useAboutBlock()
 
   return (
     <div className={`mx-auto mt-6 max-w-prose border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
-      {facts.length > 0 && (
-        <dl className="space-y-2">
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt className={`uppercase ${CARD_META}`}>{fact.label}</dt>
-              <dd className={CARD_BODY}>{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
+      <AboutFacts look={SLAB_FACTS} />
       <MarkedLines items={highlights} label={cards.keyAchievements} look={DASH_LIST} />
     </div>
   )

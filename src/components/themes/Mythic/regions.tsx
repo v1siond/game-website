@@ -1,7 +1,7 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
@@ -25,29 +25,27 @@ import u from './underworld.module.css'
 // magma, the portraits and the arena in the green fields. The last gate of the red temple closes the page (gate.tsx).
 // The shared section plan picks which a profession shows and in which order.
 
+// His education and languages under the highlights, each label in the gold display face.
+const GOLD_FACTS: AboutFactsLook = {
+  list: 'mt-4 space-y-1',
+  fact: 'text-base',
+  term: `inline text-sm text-[var(--myth-gold)] ${u.display}`,
+  value: 'inline',
+  termEnd: ': ',
+}
+
 // One frame per section of the shared plan, each its stage in the descent.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { sections: titles, cards, about } = useLabels()
-    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+    const { sections: titles, cards } = useLabels()
+    const { highlights } = useAboutBlock()
     return (
       <Stage title={titles.about} zone="hall">
         <ChainHaul>
           <p className="max-w-prose text-lg leading-relaxed">{slot.bio}</p>
           <div className="max-w-prose">
             <MarkedLines items={highlights} label={cards.keyAchievements} look={BLOOD_POINTS} />
-            {education && (
-              <p className="mt-4 text-base">
-                <span className={`text-sm text-[var(--myth-gold)] ${u.display}`}>{about.education}: </span>
-                {education}
-              </p>
-            )}
-            {languages && (
-              <p className="mt-1 text-base">
-                <span className={`text-sm text-[var(--myth-gold)] ${u.display}`}>{about.languages}: </span>
-                {languages}
-              </p>
-            )}
+            <AboutFacts look={GOLD_FACTS} />
           </div>
         </ChainHaul>
       </Stage>

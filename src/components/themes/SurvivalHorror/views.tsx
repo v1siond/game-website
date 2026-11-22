@@ -1,8 +1,8 @@
 'use client'
 
 import type { ReactNode } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
-import { aboutBlock } from '@/lib/cv/cvView'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { Labels } from '@/lib/cv/labels'
@@ -40,39 +40,24 @@ function Room({ zone, titleKey, fade = false, children }: RoomProps) {
   return <RoomWindow zone={zone}>{fade ? <FadeInScene>{panel}</FadeInScene> : panel}</RoomWindow>
 }
 
-// His education, languages and summary highlights, typed under the bio on the same paper.
-function AboutFacts() {
-  const { about, cards } = useLabels()
-  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
-  const facts = [
-    { label: about.education, value: education },
-    { label: about.languages, value: languages },
-  ].filter((fact) => fact.value)
-
-  return (
-    <>
-      {facts.length > 0 && (
-        <dl className="mt-4 space-y-2">
-          {facts.map((fact) => (
-            <div key={fact.label}>
-              <dt className="text-sm uppercase text-[color:var(--sh-brass-text)]">{fact.label}</dt>
-              <dd className="text-sm text-[color:var(--sh-cream)]">{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
-      )}
-      <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...MARK_LIST, list: 'mt-4 space-y-1' }} />
-    </>
-  )
+// His education and languages typed under the bio on the same paper, each label in brass.
+const PAPER_FACTS: AboutFactsLook = {
+  list: 'mt-4 space-y-2',
+  fact: '',
+  term: 'text-sm uppercase text-[color:var(--sh-brass-text)]',
+  value: 'text-sm text-[color:var(--sh-cream)]',
 }
 
 // One frame per section of the shared plan, which picks the ones a profession shows and their order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
+    const { cards } = useLabels()
+    const { highlights } = useAboutBlock()
     return (
       <Room zone="about" titleKey="about" fade>
         <p className="max-w-prose text-base leading-relaxed text-[color:var(--sh-cream)]">{slot.bio}</p>
-        <AboutFacts />
+        <AboutFacts look={PAPER_FACTS} />
+        <MarkedLines items={highlights} label={cards.keyAchievements} look={{ ...MARK_LIST, list: 'mt-4 space-y-1' }} />
       </Room>
     )
   },

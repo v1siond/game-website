@@ -2,9 +2,10 @@
 
 import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { CVData, MartialArts } from '@/lib/cv/content'
-import { aboutBlock, ventureCard, type SectionsOf } from '@/lib/cv/cvView'
+import { ventureCard, type SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { headingId, newTabName } from '@/lib/cv/sectionText'
@@ -42,16 +43,12 @@ export function DistrictStage({ district, children }: { district: District; chil
 
 /** The bio is the plan's; the tags read the rest of the summary (education, languages, every highlight). */
 export function ScanAbout({ bio }: { bio: string }) {
-  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
+  const { facts, highlights } = useAboutBlock()
   const { sections, cyber } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('japantown')
   const [arrived, setArrived] = useState(false)
   const motion = stillWhen(reduced, arrived ? 'scan' : 'walk')
-  const tags = [
-    { label: cyber.tagEducation, value: education },
-    { label: cyber.tagLanguages, value: languages },
-    ...highlights.map((value) => ({ label: cyber.tagHighlight, value })),
-  ].filter((tag) => tag.value)
+  const tags = [...facts, ...highlights.map((value) => ({ label: cyber.tagHighlight, value }))]
 
   return (
     <div ref={ref} className={`${life.scanStage} mb-10`} data-on={on(lit)}>

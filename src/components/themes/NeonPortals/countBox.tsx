@@ -1,11 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { cssVars } from '@/lib/cssVars'
-import { aboutBlock } from '@/lib/cv/cvView'
 import { usePreview } from '@/themes/PreviewContext'
 import { staggerAt } from '../shared/stagger'
 import { useFind } from '../shared/finds'
@@ -29,6 +28,15 @@ import css from './countBox.module.css'
 
 // The box stands from his pulling spot: --at is AT_PLUNGER's x and the box's left edge is 10 px right of it, so
 // the plunger's handle (7 px into the box) is where his front hand reaches in the pull, at the strip's fixed h-56.
+// His education and languages under the bio, each label in bold.
+const BOX_FACTS: AboutFactsLook = {
+  list: 'mt-4 space-y-1',
+  fact: 'text-base',
+  term: 'inline font-bold',
+  value: 'inline',
+  termEnd: ': ',
+}
+
 const BOX_TIMES = cssVars({ '--pip-ms': pipAt(1) - pipAt(0), '--at': AT_PLUNGER.x })
 
 function CountBoxArt() {
@@ -81,9 +89,8 @@ function BoxScene({ run, still, onDone }: { run: boolean; still: boolean; onDone
 }
 
 export function CountBoxLevel() {
-  const { sections, actions, cvPage, about: aboutLabels } = useLabels()
-  const { professionalSummary } = useCVData()
-  const about = useMemo(() => aboutBlock(professionalSummary), [professionalSummary])
+  const { sections, actions, cvPage } = useLabels()
+  const about = useAboutBlock()
   const { active } = useProfession()
   const find = useFind()
   const { ref, on, reduced } = useZoneStage<Era>('hub')
@@ -106,14 +113,7 @@ export function CountBoxLevel() {
       {!still && <SceneButton label={actions.again} onPress={replay.replay} disabled={replay.playing} className="-mt-2 mb-6" />}
       <div className={`${PANEL} ${BODY} max-w-3xl p-5 sm:p-6`}>
         <p className="text-lg leading-relaxed">{about.bio}</p>
-        <p className="mt-4 text-base">
-          <span className="font-bold">{cvPage.education}: </span>
-          {about.education}
-        </p>
-        <p className="mt-1 text-base">
-          <span className="font-bold">{aboutLabels.languages}: </span>
-          {about.languages}
-        </p>
+        <AboutFacts look={BOX_FACTS} />
         <MarkedLines items={about.highlights} label={cvPage.coreCompetencies} look={POINTS} />
       </div>
     </Region>

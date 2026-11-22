@@ -1,8 +1,8 @@
 'use client'
 
-import { useCVData, useLabels } from '@/components/cv/CVDataProvider'
+import { useLabels } from '@/components/cv/CVDataProvider'
+import { AboutFacts, useAboutBlock, type AboutFactsLook } from '@/components/cv/AboutFacts'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
-import { aboutBlock } from '@/lib/cv/cvView'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
 import { Actor, useCourse } from './actor'
@@ -25,6 +25,15 @@ const COIN_ROWS: MarkedLinesLook = {
   list: 'mt-4 max-w-prose space-y-1.5',
   line: 'flex items-start gap-2 text-sm text-white',
   marker: <span className="mt-1 h-2.5 w-2 shrink-0 rounded-sm border border-white bg-[color:var(--ap-coin)]" aria-hidden="true" />,
+}
+
+// His education and languages under the highlights, the labels in coin gold.
+const COIN_FACTS: AboutFactsLook = {
+  list: 'mt-4 max-w-prose space-y-1 text-sm text-white',
+  fact: '',
+  term: 'inline font-bold text-[color:var(--ap-coin)]',
+  value: 'inline',
+  termEnd: ': ',
 }
 
 type AboutPose = 'run' | 'jump' | 'land' | 'stand' | 'bump'
@@ -54,12 +63,8 @@ function hitOf(replays: number, struck: boolean): HitState {
 }
 
 export function AboutLevel({ bio, profession }: { bio: string; profession: Profession }) {
-  const { sections, trail, cards, about } = useLabels()
-  const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
-  const facts = [
-    { term: about.education, value: education },
-    { term: about.languages, value: languages },
-  ].filter((fact) => fact.value)
+  const { sections, trail, cards } = useLabels()
+  const { highlights } = useAboutBlock()
   const { ref, on, reduced } = useZoneStage<Zone>('plains')
   const course = useCourse(COURSE, BUMP_MS)
   const hit = hitOf(course.take, on && course.past('jump'))
@@ -87,16 +92,7 @@ export function AboutLevel({ bio, profession }: { bio: string; profession: Profe
         <div key={course.take} className={`${side.unfold} rounded-md border-4 border-double border-white bg-[color:var(--ap-hud)] p-5 sm:p-6`}>
           <p className={`max-w-prose text-lg leading-relaxed text-white ${JOURNAL_SERIF}`}>{bio}</p>
           <MarkedLines items={highlights} label={cards.keyAchievements} look={COIN_ROWS} />
-          {facts.length > 0 && (
-            <dl className="mt-4 max-w-prose space-y-1 text-sm text-white">
-              {facts.map(({ term, value }) => (
-                <div key={term}>
-                  <dt className="inline font-bold text-[color:var(--ap-coin)]">{term}: </dt>
-                  <dd className="inline">{value}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
+          <AboutFacts look={COIN_FACTS} />
         </div>
       </div>
     </Region>

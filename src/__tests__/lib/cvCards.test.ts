@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData, type Job, type Project } from '@/lib/cv/content'
-import { aboutBlock, jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
+import { aboutBlock, aboutFacts, jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { jobSpan } from '@/lib/cv/sectionText'
 
 // His 11-10 rule: "We should have the same content across all worlds, only the template changes." Each
@@ -114,5 +114,21 @@ describe('aboutBlock', () => {
       highlights: summary.highlights,
     })
     expect(aboutBlock(summary).highlights).toHaveLength(summary.highlights.length)
+  })
+})
+
+describe('aboutFacts', () => {
+  const { about } = cv.labels
+  const block = aboutBlock(cv.professionalSummary)
+
+  it('labels his education, then his languages, from the about labels', () => {
+    expect(aboutFacts(block, about)).toEqual([
+      { label: about.education, value: block.education },
+      { label: about.languages, value: block.languages },
+    ])
+  })
+
+  it('leaves out a fact Decap stores empty', () => {
+    expect(aboutFacts({ ...block, education: '' }, about)).toEqual([{ label: about.languages, value: block.languages }])
   })
 })
