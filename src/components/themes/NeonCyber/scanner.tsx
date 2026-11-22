@@ -27,13 +27,14 @@ export function useTimeSlow(rootRef: RefObject<HTMLElement | null>, scanning: bo
   }, [rootRef, scanning])
 }
 
+// The button's name says what the next press does ("Scan", then "Stop scan"), so it carries no pressed
+// state: a pressed state beside a name that flips would read "Stop scan, pressed".
 export function ScanToggle({ scanning, onToggle }: { scanning: boolean; onToggle: () => void }) {
   const { cyber } = useLabels()
   return (
     <div className="flex flex-wrap items-center gap-3">
       <button
         type="button"
-        aria-pressed={scanning}
         onClick={onToggle}
         className={`${world.cut} inline-flex min-h-[44px] items-center gap-2 border border-[color:var(--neon-hud)] px-4 text-sm uppercase tracking-[0.2em] ${
           scanning ? world.scanOn : 'text-[color:var(--neon-hud)] hover:bg-[color-mix(in_srgb,var(--neon-hud)_12%,transparent)]'

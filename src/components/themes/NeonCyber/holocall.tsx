@@ -62,7 +62,7 @@ export function HoloCall({ profession }: { profession: Profession }) {
                   <NameWords name={name} />
                 </p>
                 <p className="mt-2 text-sm text-[color:var(--neon-ash)]">{line}</p>
-                <nav className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start" aria-labelledby={panelHeadingId(sections.contact)}>
+                <nav className="mt-5 flex flex-wrap justify-center gap-3 sm:justify-start" aria-label={cyber.incomingCall}>
                   {actions.map((action) => (
                     <HeroAction key={action.id} action={action} className={world.answer} />
                   ))}
