@@ -9,7 +9,7 @@ import { TagList } from '@/components/cv/TagList'
 import { useAboutBlock } from '@/components/cv/AboutFacts'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { headingId, newTabName } from '@/lib/cv/sectionText'
+import { headingId, newTabHint } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useZoneStage } from '@/hooks/useZoneStage'
@@ -217,7 +217,6 @@ export function FixerContracts({ companies: entries }: { companies: CVData['comp
                     href={company.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={newTabName(links, `${company.featured ? `${cards.ownProduct}, ` : ''}${company.name}: ${company.tagline}. ${company.description}`)}
                     className={`${world.cut} block border bg-[color:var(--neon-glass)] p-4 hover:border-[color:var(--neon-gold)] ${company.featured ? 'border-[color:var(--neon-gold)]' : 'border-[color-mix(in_srgb,var(--neon-gold)_45%,transparent)]'}`}
                   >
                     <span className="block text-sm uppercase tracking-wider text-[color:var(--neon-gold)]">
@@ -233,6 +232,7 @@ export function FixerContracts({ companies: entries }: { companies: CVData['comp
                     </span>
                     <span className="mt-1 block text-sm text-[color:var(--neon-use)]">{company.tagline}</span>
                     <span className="mt-2 block text-sm text-[color:var(--neon-ice)]">{company.description}</span>
+                    <span className="sr-only"> {newTabHint(links)}</span>
                   </a>
                   <TagList items={company.services} label={sections.services} look={{ ...DATA_CHIPS, list: 'mt-2 flex flex-wrap gap-1' }} />
                 </Scannable>
