@@ -421,7 +421,7 @@ const placement = (place: KnightPlace | undefined) =>
 // Memoised: his props are plain values, so a scene that re-renders around him (the arena on every stamina
 // tick) leaves the sprite alone until his pose or gear changes.
 export const Knight = memo(function Knight({ gear, pose = 'idle', place, spirit, facingLeft = false, className = '' }: KnightProps) {
-  const id = useId().replace(/:/g, '')
+  const id = useId()
   const ink = spirit ? SPIRIT_INK[spirit] : STEEL_INK
   const paint: Paint = { ink, steelFill: `url(#${id}-steel)`, coatFill: `url(#${id}-coat)` }
   const look = GEAR[gear]

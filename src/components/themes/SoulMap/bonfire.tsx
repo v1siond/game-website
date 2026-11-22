@@ -23,7 +23,7 @@ const COIL_FRONT = 'M46 90 Q54 86 46 82 Q54 78 46 74 Q54 70 46 66 Q54 62 46 58 Q
 const COIL_BACK = 'M54 88 Q46 84 54 80 Q46 76 54 72 Q46 68 54 64 Q46 60 54 56 Q47 52 53 48'
 
 export function Bonfire({ state, className = '' }: { state: FireState; className?: string }) {
-  const id = useId().replace(/:/g, '')
+  const id = useId()
 
   return (
     <svg viewBox="0 0 100 110" className={`${souls.fire} ${STATE_CLASS[state]} ${className}`} aria-hidden="true" focusable="false">
