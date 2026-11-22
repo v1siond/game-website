@@ -87,7 +87,7 @@ function XpBar({ read, total }: { read: number; total: number }) {
           </span>
         ))}
       </div>
-      <span className="text-base font-bold" role="status">
+      <span className="text-base font-bold">
         {fillLabel(hud.level, { number: read })} · {fillLabel(hud.xpBar, { count: read, total })}
       </span>
       {read > 0 && !reduced && (
