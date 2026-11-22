@@ -8,10 +8,6 @@ import { readStored } from '@/lib/storage'
 /**
  * THE FAILURE SCREEN, one page behind every error the site can serve.
  *
- * Before this the site had no error page at all: `src/pages` held only
- * `_app`/`_document` and the game-engine routes, `src/app` had no `not-found`/`error`, so every miss
- * fell through to Next's own grey stock page in production and to the dev overlay in development.
- *
  * ONE component, six entry points (`app/(site)/not-found`, each route group's `error`, `app/global-error`,
  * `pages/404`, `pages/500`, `pages/_error`), so a 404 in the App Router and a 404 in the Pages Router are the same
  * screen rather than two that drift.

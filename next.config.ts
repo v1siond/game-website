@@ -9,12 +9,12 @@ const nextConfig: NextConfig = {
   async headers() {
     return securityHeaders(process.env.NODE_ENV === "development" ? "development" : "production");
   },
-  // Decap's admin is a static page in public/admin; Next serves public files only by their full path,
-  // so /admin (where /admin/ redirects) would 404 without this.
   // Old shared engine links (the engine used to be framed here) go to nebulith with the rest of their path.
   async redirects() {
     return [{ source: "/personal-projects/game-engine/:path*", destination: `${ENGINE_URL}/:path*`, permanent: true }];
   },
+  // Decap's admin is a static page in public/admin; Next serves public files only by their full path,
+  // so /admin (where /admin/ redirects) would 404 without this.
   async rewrites() {
     return [{ source: "/admin", destination: "/admin/index.html" }];
   },
