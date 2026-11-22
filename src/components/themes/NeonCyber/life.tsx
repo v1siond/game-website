@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import type { Company, MartialArts } from '@/lib/cv/content'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
@@ -168,19 +168,23 @@ function BladesPass({ onPassed }: { onPassed: () => void }) {
 }
 
 // His own products (featured) are the two wide contracts of the first row, ruled in full gold with a
-// gold tag under the contract number; the other ventures follow three to a row.
+// gold tag under the contract number; the other ventures follow three to a row. Pointing at or focusing
+// a contract rings its pin on the map: the ring is written straight on the pins' data-hot, so a hover
+// re-renders none of the contracts.
 export function FixerContracts({ companies }: { companies: Company[] }) {
   const { sections, links, cyber, cards } = useLabels()
   const { ref, on: lit, reduced } = useZoneStage<District>('badlands')
   const preview = usePreview()
-  const [hot, setHot] = useState<number | null>(null)
+  const mapRef = useRef<SVGSVGElement>(null)
   const [passed, setPassed] = useState(false)
   const slashing = lit && !reduced && !preview && !passed
+  const ring = (hot: number | null) =>
+    mapRef.current?.querySelectorAll(`.${life.pin}`).forEach((pin, i) => pin.setAttribute('data-hot', on(i === hot)))
 
   return (
     <div ref={ref} className={`${life.mapStage} mb-10`} data-on={on(lit)}>
       <HudPanel title={sections.ventures}>
-        <svg viewBox="0 0 1000 160" className="mb-5 h-auto w-full border border-[color-mix(in_srgb,var(--neon-chrome-red)_45%,transparent)] bg-[color:var(--neon-ink)]" aria-hidden="true" focusable="false">
+        <svg ref={mapRef} viewBox="0 0 1000 160" className="mb-5 h-auto w-full border border-[color-mix(in_srgb,var(--neon-chrome-red)_45%,transparent)] bg-[color:var(--neon-ink)]" aria-hidden="true" focusable="false">
           <path d="M0 40 H1000 M0 100 H1000 M180 0 V160 M420 0 V160 M650 0 V160 M860 0 V160" stroke={NEON.steel} strokeWidth={1} />
           <path d="M0 140 Q300 90 520 120 T1000 70" stroke={NEON.chromeRed} strokeWidth={3} fill="none" strokeDasharray="10 6" />
           <path d="M60 20 h90 v50 h-90 Z M460 30 h120 v40 h-120 Z M720 110 h100 v40 h-100 Z" fill={NEON.panel} />
@@ -192,7 +196,7 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
             // the place sits on an outer group: the drop's CSS transform on the pin would replace an SVG
             // transform attribute on the same element and stack every pin at x 0
             <g key={company.id} transform={`translate(${pinX(i, companies.length)} 0)`}>
-              <g className={life.pin} data-hot={on(hot === i)} style={{ '--i': i } as CSSProperties}>
+              <g className={life.pin} data-hot="false" style={{ '--i': i } as CSSProperties}>
                 <circle className={life.pinRing} cx={0} cy={86} r={16} fill="none" stroke={NEON.gold} strokeWidth={3} />
                 <path d="M0 96 L-12 72 A14 14 0 1 1 12 72 Z" fill={NEON.gold} stroke={NEON.ink} strokeWidth={2} />
                 {/* The map scales with the panel: its 16 unit digits reach 14 px only from lg, so below it the
@@ -208,7 +212,7 @@ export function FixerContracts({ companies }: { companies: Company[] }) {
           {slashing && <BladesPass onPassed={() => setPassed(true)} />}
           <ul className="grid gap-5 md:grid-cols-6">
             {companies.map((company, i) => (
-              <li key={company.id} className={`${life.contract} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ '--i': i } as CSSProperties} onPointerEnter={() => setHot(i)} onPointerLeave={() => setHot(null)} onFocus={() => setHot(i)} onBlur={() => setHot(null)}>
+              <li key={company.id} className={`${life.contract} ${company.featured ? 'md:col-span-3' : 'md:col-span-2'}`} style={{ '--i': i } as CSSProperties} onPointerEnter={() => ring(i)} onPointerLeave={() => ring(null)} onFocus={() => ring(i)} onBlur={() => ring(null)}>
                 <Scannable kind="use" title={sections.ventures} fact={company.tagline}>
                   <a
                     href={company.url}
