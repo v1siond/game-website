@@ -37,7 +37,7 @@ export function LevelUp({ job }: { job: Job }) {
 
   return (
     <div className={`relative mx-auto mb-8 flex max-w-md items-center gap-4 overflow-hidden border-4 border-atomic-poster-ink bg-atomic-cream p-4 ${j.levelUp}`}>
-      <svg viewBox="-50 -50 100 100" className={`pointer-events-none absolute -left-10 -top-10 h-56 w-56 opacity-30 ${j.sunburst}`} aria-hidden="true" focusable="false">
+      <svg viewBox="-50 -50 100 100" className="pointer-events-none absolute -left-10 -top-10 h-56 w-56 opacity-30 motion-safe:animate-[spin_24s_linear_infinite]" aria-hidden="true" focusable="false">
         {Array.from({ length: 12 }, (_, i) => (
           <path key={i} d="M0 0 L-6 -50 L6 -50 Z" fill={SHELTER_YELLOW} transform={`rotate(${i * 30})`} />
         ))}

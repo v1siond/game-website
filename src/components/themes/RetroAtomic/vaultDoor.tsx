@@ -107,7 +107,7 @@ function Beacon({ side }: { side: 'left' | 'right' }) {
         <rect x="18" y="58" width="44" height="14" rx="3" fill={STEEL} stroke={RUBBER} strokeWidth="2" />
         <path d="M22 58 Q22 18 40 18 Q58 18 58 58 Z" fill={WARNING_RED} opacity="0.85" />
       </svg>
-      <span className={`absolute inset-0 ${atomic.beaconSweep}`} />
+      <span className={`absolute inset-0 motion-safe:animate-[spin_900ms_linear_infinite] ${atomic.beaconSweep}`} />
     </div>
   )
 }

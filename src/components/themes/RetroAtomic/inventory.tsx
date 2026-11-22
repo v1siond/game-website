@@ -61,7 +61,7 @@ function Cassette() {
       <rect x="14" y="10" width="132" height="42" rx="3" fill={CREAM} />
       <rect x="40" y="58" width="80" height="30" rx="12" fill={RUBBER} />
       {[62, 98].map((cx) => (
-        <g key={cx} className={atomic.reel}>
+        <g key={cx} className={`motion-safe:group-hover:animate-[spin_1.4s_linear_infinite] motion-safe:group-focus-visible:animate-[spin_1.4s_linear_infinite] ${atomic.reel}`}>
           <circle cx={cx} cy="73" r="11" fill={BAKELITE} stroke={CHROME} strokeWidth="2" />
           {[0, 60, 120].map((angle) => (
             <rect key={angle} x={cx - 1.5} y="64" width="3" height="18" fill={STEEL_LIGHT} transform={`rotate(${angle} ${cx} 73)`} />
