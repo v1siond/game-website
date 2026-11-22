@@ -8,7 +8,6 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useLatest } from '@/hooks/useLatest'
-import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
 import { NameWords } from '@/components/cv/NameWords'
@@ -40,7 +39,7 @@ const OUTFIT_LOOK: WardrobeLook = { plate: TRAIL.PAGE, text: TRAIL.INK, ring: TR
 //
 // Pattern: setTimeout phases as data attributes the CSS keys its transitions on (transform and opacity
 // only), and one requestAnimationFrame walker (walk.ts) for his steps. The resting frame is the plain
-// style, so reduced motion and a World Select preview show the finished map with him at his landmark.
+// style, so reduced motion shows the finished map with him at his landmark.
 //
 // The pick: each landmark is a radio of the shared ProfessionSwitch laid over the map. Choosing one sends
 // him back along his trail to the crossroads and out along the chosen one; on arrival the profession
@@ -59,10 +58,9 @@ const ALL: Reached = { unrolled: true, inked: true, trailed: true, landed: true 
 function useEntrance(onLanded: () => void) {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.1, rootMargin: '0px' })
   const reduced = useReducedMotion()
-  const preview = usePreview()
   const [reached, setReached] = useState<Reached>(NONE)
   const landed = useLatest(onLanded)
-  const skip = reduced || preview
+  const skip = reduced
 
   useEffect(() => {
     if (skip) {

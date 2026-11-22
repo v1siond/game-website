@@ -5,7 +5,6 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useZoneStage } from '@/hooks/useZoneStage'
-import { usePreview } from '@/themes/PreviewContext'
 import { useFindCount } from '../shared/finds'
 import { ContactActions, SceneButton } from './actions'
 import { SAVE_FROM, saveScene, type Motion } from './choreography'
@@ -21,7 +20,7 @@ import css from './saveMonitor.module.css'
 // email, LinkedIn, CV and engine links sit on the plate beside the strip from md up, under it on a phone.
 //
 // Animated: him, the hologram, the flash, the screen's blink. Each save plays once, under 3 s.
-// Reduced motion and the preview: him at the monitor, the hologram as the gem (the run counts as full).
+// Reduced motion: him at the monitor, the hologram as the gem (the run counts as full).
 
 const WAITING: Motion = { pose: 'idle', from: SAVE_FROM, to: SAVE_FROM, ms: 0 }
 
@@ -69,9 +68,7 @@ export function SaveMonitorLevel() {
   const { sections, actions, navigation } = useLabels()
   const { active } = useProfession()
   const { found, total } = useFindCount(active)
-  const { ref, on, reduced } = useZoneStage<Era>('hub')
-  const preview = usePreview()
-  const still = reduced || preview
+  const { ref, on, reduced: still } = useZoneStage<Era>('hub')
   const [round, setRound] = useState(0)
   const [ended, setEnded] = useState(0)
   const full = still || found >= total

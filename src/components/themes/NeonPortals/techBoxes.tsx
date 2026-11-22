@@ -7,7 +7,6 @@ import { useProfession } from '@/contexts/ProfessionContext'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { cssVars } from '@/lib/cssVars'
 import type { SectionsOf } from '@/lib/cv/cvView'
-import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
 import { BODY, FACE, TAG } from './cards'
@@ -25,7 +24,7 @@ import css from './techBoxes.module.css'
 // crates by this world's css (the lid and planks are the item's own pseudo elements).
 //
 // Animated: him, the planks (one class), the berries (one class).
-// Reduced motion and the preview: the boxes already open, him resting at the row's end.
+// Reduced motion: the boxes already open, him resting at the row's end.
 
 type Categories = SectionsOf<'engineer'>['techStack']
 
@@ -41,9 +40,7 @@ export function TechBoxLevel({ categories }: { categories: Categories }) {
   const { sections, actions } = useLabels()
   const { active } = useProfession()
   const find = useFind()
-  const { ref, on, reduced } = useZoneStage<Era>('tomb')
-  const preview = usePreview()
-  const still = reduced || preview
+  const { ref, on, reduced: still } = useZoneStage<Era>('tomb')
   const replay = useReplay(on, still)
   const count = categories.length
   const vars = useMemo(() => cssVars({ '--step': techStep(count), '--lead': BOX_BREAK.leadMs, '--break': BOX_BREAK.ms }), [count])

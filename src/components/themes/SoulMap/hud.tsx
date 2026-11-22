@@ -3,7 +3,6 @@
 import { useEffect, useRef, type CSSProperties, type RefObject } from 'react'
 import { useRolling } from '../shared/finds'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { usePreview } from '@/themes/PreviewContext'
 import { fillLabel } from '@/lib/cv/labels'
 import { MAX_FLASKS, MAX_HP, MAX_STAMINA, useRunActions, useRunState, type BannerKind } from './run'
 import { CARVED } from './palette'
@@ -18,7 +17,6 @@ import souls from './souls.module.css'
 //   right, which rolls up to its new total with the gain shown above it. A phone has no room for two
 //   corner panels over the content, so there the gauges, the flask and the counter share one thin band
 //   docked on the bottom edge (the footer pads past it) and the item box rises just above that band.
-// A World Select preview draws none of it: fixed layers would escape the preview card.
 
 const BANNER_TEXT: Record<BannerKind, string> = {
   kindled: 'text-[color:var(--soul-glow)]',
@@ -183,12 +181,6 @@ function useHudScrollPadding(dock: RefObject<HTMLDivElement | null>) {
 }
 
 export function RunOverlay() {
-  const preview = usePreview()
-  if (preview) return null
-  return <RunHud />
-}
-
-function RunHud() {
   const dock = useRef<HTMLDivElement>(null)
   useHudScrollPadding(dock)
   return (

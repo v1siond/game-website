@@ -102,18 +102,15 @@ interface StageProps {
   zones: ValueStore<Zone>
   profession: Profession
   reduced: boolean
-  // The World Select preview: the hall's last frame, nothing played.
-  still: boolean
 }
 
-export function Stage({ zones, profession, reduced, still }: StageProps) {
-  const inView = useStoreValue(zones)
-  const zone = still ? 'hall' : inView
+export function Stage({ zones, profession, reduced }: StageProps) {
+  const zone = useStoreValue(zones)
   const { herbs, saves } = useStageState()
   const condition = conditionAfter(herbs)
   const played = useRef(new Set<string>())
   const [frame, setFrame] = useState<Frame>(() => lastFrame(scriptFor('hall', { profession, condition, saves })))
-  // The room shows its last frame without playing (seen before, the preview, reduced motion): its one shot
+  // The room shows its last frame without playing (seen before, reduced motion): its one shot
   // swings stay at rest instead of playing again on the remount.
   const [replayed, setReplayed] = useState(false)
 
@@ -121,7 +118,7 @@ export function Stage({ zones, profession, reduced, still }: StageProps) {
     const context = { profession, condition, saves }
     const script = scriptFor(zone, context)
     const key = playKey(zone, context)
-    if (still || reduced || played.current.has(key)) {
+    if (reduced || played.current.has(key)) {
       setFrame(lastFrame(script))
       setReplayed(true)
       return
@@ -131,7 +128,7 @@ export function Stage({ zones, profession, reduced, still }: StageProps) {
     setFrame(startFrame(script))
     const timers = script.beats.map((beat) => window.setTimeout(() => setFrame((current) => apply(current, beat)), beat.at))
     return () => timers.forEach((timer) => window.clearTimeout(timer))
-  }, [zone, profession, condition, saves, reduced, still])
+  }, [zone, profession, condition, saves, reduced])
 
   const glass = GLASS.has(zone)
   const foe = frame.foe && (

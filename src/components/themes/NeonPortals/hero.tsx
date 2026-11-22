@@ -13,7 +13,6 @@ import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { cssVars } from '@/lib/cssVars'
 import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
-import { usePreview } from '@/themes/PreviewContext'
 import { staggerAt } from '../shared/stagger'
 import { ContactActions } from './actions'
 import { BODY, FACE } from './cards'
@@ -37,7 +36,7 @@ import css from './hero.module.css'
 // with the hop and the scratch as moves, each ended by its own timing animation (hero.module.css).
 //
 // Animated: the platform, the pads (one class), the beam, the ring, the sphere's arcs, him.
-// Reduced motion and the preview: the finished hub, him standing on his pad, no entrance.
+// Reduced motion: the finished hub, him standing on his pad, no entrance.
 
 type HeroMove = 'beam' | 'rest' | 'hop' | 'scratch'
 
@@ -272,9 +271,7 @@ export function HubHero() {
   const { active } = useProfession()
   const { navigation } = useLabels()
   const { ref } = useZoneStage<Era>('hub')
-  const preview = usePreview()
-  const reduced = useReducedMotion()
-  const still = preview || reduced
+  const still = useReducedMotion()
   const vars = useMemo(() => cssVars({ ...TIMING, '--pad-x': PAD_AT[active].x, '--pad-y': PAD_AT[active].y }), [active])
 
   return (

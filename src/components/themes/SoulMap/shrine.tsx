@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { usePreview } from '@/themes/PreviewContext'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { NameWords } from '@/components/cv/NameWords'
 import { Bonfire, type FireState } from './bonfire'
@@ -56,7 +55,6 @@ const RISE_MS = 1400
 const ROLL_MS = 1200
 
 function useLighting(onLit: () => void): Phase {
-  const preview = usePreview()
   const [phase, setPhase] = useState<Phase>('ash')
   const lit = useRef(onLit)
 
@@ -64,9 +62,9 @@ function useLighting(onLit: () => void): Phase {
     lit.current = onLit
   })
 
-  // The lighting plays once, on the first draw; a preview and reduced motion open on the lit fire.
+  // The lighting plays once, on the first draw; reduced motion opens on the lit fire.
   useEffect(() => {
-    if (preview || prefersReducedMotion()) {
+    if (prefersReducedMotion()) {
       setPhase('ready')
       return
     }
@@ -77,7 +75,7 @@ function useLighting(onLit: () => void): Phase {
       }, at),
     )
     return () => timers.forEach((timer) => window.clearTimeout(timer))
-  }, [preview])
+  }, [])
 
   return phase
 }

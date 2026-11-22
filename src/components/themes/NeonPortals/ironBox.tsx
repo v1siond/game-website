@@ -6,7 +6,6 @@ import { useZoneStage } from '@/hooks/useZoneStage'
 import { cssVars } from '@/lib/cssVars'
 import type { Service } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { usePreview } from '@/themes/PreviewContext'
 import { staggerAt } from '../shared/stagger'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
@@ -24,7 +23,7 @@ import css from './ironBox.module.css'
 // it again. Hitting the box is a find.
 //
 // Animated: him, the box's ring, the card frames (one class, staggered).
-// Reduced motion and the preview: him under the box, every frame solid.
+// Reduced motion: him under the box, every frame solid.
 
 const FRAME_TIMES = cssVars({ '--land': frameAt(0), '--frame-step': frameAt(1) - frameAt(0) })
 
@@ -68,9 +67,7 @@ export function IronBoxLevel({ services }: { services: Service[] }) {
   const { sections, actions } = useLabels()
   const { active } = useProfession()
   const find = useFind()
-  const { ref, on, reduced } = useZoneStage<Era>('wall')
-  const preview = usePreview()
-  const still = reduced || preview
+  const { ref, on, reduced: still } = useZoneStage<Era>('wall')
   const replay = useReplay(on, still)
 
   const hit = () => {

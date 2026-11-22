@@ -6,7 +6,7 @@
  * stays open (BD29). Transforms and opacity only.
  *
  * Animated: the lids (one class), the sparks, the cards' jump (one class).
- * Reduced motion and the preview (data-still): every lid open, the cards at rest, no spark.
+ * Reduced motion (data-still): every lid open, the cards at rest, no spark.
  */
 
 .box {

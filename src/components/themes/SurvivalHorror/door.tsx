@@ -2,7 +2,6 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
-import { usePreview } from '@/themes/PreviewContext'
 import { SH } from './palette'
 import horror from './horror.module.css'
 
@@ -10,8 +9,8 @@ import horror from './horror.module.css'
 // door, it creaks a little, then swings open away from the camera, and the view passes through it into the
 // next room. Every profession change goes through it: door(change) runs the change while the screen is
 // covered, so the new room is already there when the door opens. The page itself opens on the hall with
-// no door, so his name and links are readable from the first frame. Reduced motion and the World Select
-// preview make the change with no door.
+// no door, so his name and links are readable from the first frame. Reduced motion makes the change with
+// no door.
 //
 // Phases by setTimeout: cover (the black and the shut door fade in), shut (the creak), open (the swing),
 // through (the dolly through the frame), clear.
@@ -75,7 +74,6 @@ function DoorArt() {
 }
 
 export function DoorProvider({ children }: { children: ReactNode }) {
-  const preview = usePreview()
   const [phase, setPhase] = useState<DoorPhase>('clear')
   const timers = useRef<number[]>([])
 
@@ -92,7 +90,7 @@ export function DoorProvider({ children }: { children: ReactNode }) {
 
   const door = useCallback<Door>(
     (behind) => {
-      if (preview || prefersReducedMotion()) {
+      if (prefersReducedMotion()) {
         behind?.()
         return
       }
@@ -105,7 +103,7 @@ export function DoorProvider({ children }: { children: ReactNode }) {
         }, COVER_MS),
       )
     },
-    [preview, play],
+    [play],
   )
 
   return (

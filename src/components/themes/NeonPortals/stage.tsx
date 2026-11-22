@@ -22,7 +22,7 @@ import stage from './stage.module.css'
 // Paths runs too, src/lib/motion/course.ts): his rig carries him from where one beat ended to where the
 // next ends (stage.module.css, travelVars), and the rig's own animationend
 // steps the sequence, so the beats are the only clock. Before the section shows, the rig is held on its
-// first frame (heldUntil, until `run`); under reduced motion or in a preview it rests on the last frame.
+// first frame (heldUntil, until `run`); under reduced motion it rests on the last frame.
 
 interface RegionProps {
   title: string
@@ -97,7 +97,7 @@ export function Rig({ motion, step, run, size, onAnimationEnd, track = stage.rig
 }
 
 interface ScenePlayOptions {
-  /** Reduced motion or a preview: the scene rests on its last frame. */
+  /** Reduced motion: the scene rests on its last frame. */
   still: boolean
   /** The last beat has played out. */
   onDone?: () => void

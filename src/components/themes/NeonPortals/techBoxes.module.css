@@ -7,7 +7,7 @@
  * stay open (BD29). Transforms and opacity only.
  *
  * Animated: the planks (one class), the berries (one class).
- * Reduced motion and the preview (data-still): every box open, no planks and no berries.
+ * Reduced motion (data-still): every box open, no planks and no berries.
  */
 
 .boxes > ul > li {

@@ -5,7 +5,7 @@
  * swaps the sphere's room. Transforms and opacity only; nothing loops (BD29).
  *
  * Animated: the platform, the pads (one class), the beam, the ring, the sphere's arcs, him.
- * Reduced motion and the preview (data-still): the finished hub, no entrance and no move.
+ * Reduced motion (data-still): the finished hub, no entrance and no move.
  */
 
 .scene {

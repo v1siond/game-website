@@ -1,8 +1,8 @@
 /*
  * Adventure Paths' look and motion: an explorer's hand inked map read like an overworld. Transform and
  * opacity only, never an animated shadow, blur or layout property. The resting frame of every reveal is
- * the plain style, so reduced motion (the block at the end) and a World Select preview show the finished
- * map with nothing playing. Colours are the --ap-* variables palette.ts sets on the root; --mx and --my
+ * the plain style, so reduced motion (the block at the end) shows the finished map with
+ * nothing playing. Colours are the --ap-* variables palette.ts sets on the root; --mx and --my
  * (-1 to 1) are the pointer from usePointerVars; --scene-progress (0 to 1) is a ScrollScene's progress.
  *
  * The feel is the overworld map's: things on the map step in two frames (steps(2)) like map sprites,

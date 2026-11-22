@@ -15,7 +15,7 @@ import world from './world.module.css'
 // on a tablet, three on a wide screen). Under them runs the waterline, where he leans his whole weight
 // into one more crate and shoves it across the hold as the visitor scrolls, the puzzle every flooded
 // room asks of him; when the hold has scrolled by he stands beside it at the far side. The bob stops
-// under reduced motion, and reduced motion and the World Select preview start him at the far side.
+// under reduced motion, and reduced motion starts him at the far side.
 //
 // Animated: one bob per category, him and the crate he pushes (moved by --scene-progress), his parts.
 

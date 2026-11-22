@@ -5,7 +5,6 @@ import type { Profession } from '@/lib/cv/professions'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
-import { usePreview } from '@/themes/PreviewContext'
 import { NameWords } from '@/components/cv/NameWords'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { SH } from './palette'
@@ -17,7 +16,7 @@ import look from './world.module.css'
 // the card from the first frame, and once he has walked into the hall the typewriter's carriage steps it
 // home, the line moving a letter at a time as if each key struck. As the System Engineer he takes aim with
 // the laser sight, which follows the visitor's pointer, and the hint under the card says so. One timer on
-// mount; reduced motion and the World Select preview start home.
+// mount; reduced motion starts home.
 
 const WALK_IN_MS = 1400
 
@@ -26,14 +25,13 @@ const OUTFIT_LOOK: WardrobeLook = { plate: SH.void, text: SH.flame, ring: SH.voi
 
 export function HallHero({ profession }: { profession: Profession }) {
   const { navigation, horror: words } = useLabels()
-  const preview = usePreview()
   const [shown, setShown] = useState(false)
 
   useEffect(() => {
-    const wait = preview || prefersReducedMotion() ? 0 : WALK_IN_MS
+    const wait = prefersReducedMotion() ? 0 : WALK_IN_MS
     const timer = window.setTimeout(() => setShown(true), wait)
     return () => window.clearTimeout(timer)
-  }, [preview])
+  }, [])
 
   return (
     <RecruiterHero

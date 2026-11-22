@@ -15,7 +15,6 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import { STORY_MS, stepWithin } from '@/lib/motion/stepWithin'
 import { cssVars } from '@/lib/cssVars'
-import { usePreview } from '@/themes/PreviewContext'
 import type { District } from './city'
 import { MercSprite, stillWhen, type MercMotion } from './merc'
 import { DATA_CHIPS, HudPanel, hudButton } from './hud'
@@ -167,7 +166,7 @@ const pinX = (i: number, count: number): number => 120 + (i * 760) / Math.max(co
 // his own width, so its 0 to 100 percent carries him from the first card to the last. He crosses from
 // 525 to 1575 ms, over each card's middle as that card's own entrance (0.7 s plus 0.35 s a card) cuts it
 // loose, then fades by 1900 ms and unmounts on the animation's end. Started by the stage turning on;
-// never mounted under reduced motion or in a World Select preview, where the cards just rest in place.
+// never mounted under reduced motion, where the cards just rest in place.
 function BladesPass({ onPassed }: { onPassed: () => void }) {
   return (
     <div className={`pointer-events-none absolute inset-x-0 top-0 z-30 ${life.bladeLane}`} aria-hidden="true">
@@ -188,10 +187,9 @@ export function FixerContracts({ companies: entries }: { companies: CVData['comp
   const { sections, links, cyber, cards } = useLabels()
   const companies = useMemo(() => entries.map(ventureCard), [entries])
   const { ref, on: lit, reduced } = useZoneStage<District>('badlands')
-  const preview = usePreview()
   const mapRef = useRef<SVGSVGElement>(null)
   const [passed, setPassed] = useState(false)
-  const slashing = lit && !reduced && !preview && !passed
+  const slashing = lit && !reduced && !passed
   const ring = (hot: number | null) =>
     mapRef.current?.querySelectorAll(`.${life.pin}`).forEach((pin, i) => pin.setAttribute('data-hot', on(i === hot)))
 

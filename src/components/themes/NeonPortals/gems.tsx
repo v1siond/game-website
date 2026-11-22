@@ -11,7 +11,6 @@ import type { SectionsOf } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { newTabHint } from '@/lib/cv/sectionText'
-import { usePreview } from '@/themes/PreviewContext'
 import { useFind } from '../shared/finds'
 import { SceneButton } from './actions'
 import { TagList } from '@/components/cv/TagList'
@@ -30,7 +29,7 @@ import css from './gems.module.css'
 // leaving its empty setting on the card. Each collected gem is a find.
 //
 // Animated: him, the flying gem.
-// Reduced motion and the preview: him resting in the row, every gem already collected.
+// Reduced motion: him resting in the row, every gem already collected.
 
 type Companies = SectionsOf<'engineer'>['companies']
 
@@ -129,9 +128,7 @@ export function GemLevel({ companies }: { companies: Companies }) {
   const { sections } = useLabels()
   const { active } = useProfession()
   const find = useFind()
-  const { ref, on, reduced } = useZoneStage<Era>('underwater')
-  const preview = usePreview()
-  const still = reduced || preview
+  const { ref, on, reduced: still } = useZoneStage<Era>('underwater')
   const scene = useScene(GEMS_IN, { still })
   const collect = usePoseSequence<CollectMove>({ entrance: NO_ENTRANCE, rest: 'stand', moveMs: COLLECT.glideMs })
   const row = useRef<HTMLDivElement>(null)

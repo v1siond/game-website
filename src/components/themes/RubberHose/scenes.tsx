@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
-import { usePreview } from '@/themes/PreviewContext'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { heldUntil } from '@/components/themes/shared/held'
@@ -16,7 +15,7 @@ import styles from './scenes.module.css'
 // Rubber Hose's own scenes, each a move of a 1930s rubber hose run and gun:
 // - TitleCardIntro: the boss intro card. setTimeout phases, because it is a fixed sequence on page load
 //   for the first screen only: the iris opens (0 ms), the framed card drops and squashes (250 ms), its
-//   words pop in one by one (800 ms). Plays once; reduced motion or a World Select preview start at the end.
+//   words pop in one by one (800 ms). Plays once; reduced motion starts at the end.
 // - IrisWipe: the scene change. Keyed on the profession by the caller, so every switch opens a new iris;
 //   the first waits until the wipe is in view.
 // - Reveal: one scroll trigger (the shared useSectionTrigger, once only) handing a wait or play class to
@@ -45,11 +44,9 @@ const INTRO_LOOK: Record<IntroPhase, IntroLook> = {
 }
 
 export function TitleCardIntro({ children }: { children: (look: IntroLook) => ReactNode }) {
-  const reducedMotion = useReducedMotion()
-  const isPreview = usePreview()
   const [phase, setPhase] = useState<IntroPhase>('wait')
-  const skip = reducedMotion || isPreview
-  // Reduced motion and a preview start on the end, read straight from skip rather than stored a commit later.
+  const skip = useReducedMotion()
+  // Reduced motion starts on the end, read straight from skip rather than stored a commit later.
   const shown = skip ? 'pop' : phase
 
   useEffect(() => {

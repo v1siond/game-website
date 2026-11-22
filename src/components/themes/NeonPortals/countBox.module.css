@@ -4,7 +4,7 @@
  * warm light inside. Each change holds once made, so scrolling back shows the open box (BD29).
  *
  * Animated: the plunger, the pips (one class), the panel and its light.
- * Reduced motion and the preview (data-still): the box drawn open at once.
+ * Reduced motion (data-still): the box drawn open at once.
  */
 
 .box svg * {

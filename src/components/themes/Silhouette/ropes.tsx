@@ -14,7 +14,7 @@ import shade from './shade.module.css'
 // slides down the rope hand over hand as the visitor scrolls, and stands on the last knot when the
 // section has scrolled by. Above him the spider's two forelegs reach down over the cliff edge after
 // him as he starts down, and stop short. A card the visitor touches swings away from the side the pointer came in,
-// then settles. Reduced motion and the World Select preview start with him at the bottom.
+// then settles. Reduced motion starts with him at the bottom.
 //
 // Animated: him and the reaching legs (moved by --scene-progress), his parts, the one card being swung.
 

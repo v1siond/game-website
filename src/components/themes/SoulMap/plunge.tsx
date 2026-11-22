@@ -4,7 +4,6 @@ import type { AnimationEvent, ReactNode } from 'react'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { usePreview } from '@/themes/PreviewContext'
 import { Knight, type KnightPose } from './knight'
 import plunge from './plunge.module.css'
 
@@ -20,7 +19,7 @@ import plunge from './plunge.module.css'
 //                 track carrying him in 780 ms), and at 780 ms the hidden panel is knocked into place
 //                 under him with a jolt (420 ms); he stands and fades (leave 1200 to 1500 ms).
 // When the beats are over he (and the wall) unmount and the panel rests exactly as it did without him.
-// Reduced motion and a World Select preview show the panel in place with no knight and no wall.
+// Reduced motion shows the panel in place with no knight and no wall.
 
 type Gone = 'gone'
 type WallBeat = 'drop' | 'strike' | 'leave'
@@ -37,9 +36,7 @@ const ROLL_TRACK: Record<RollBeat, string> = { roll: plunge.rollIn, leave: plung
 /** Whether the scene plays: the section has shown, and motion is wanted. */
 function useStage() {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.3 })
-  const reduced = useReducedMotion()
-  const preview = usePreview()
-  const still = reduced || preview
+  const still = useReducedMotion()
   return { ref, still, playing: triggered && !still }
 }
 
