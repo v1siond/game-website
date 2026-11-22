@@ -29,6 +29,7 @@ interface ListProps {
 
 /** Every tag of a card, none cut: the tech of a job, a project, a venture's services. */
 export function Tags({ items, label, className = '' }: ListProps) {
+  if (items.length === 0) return null
   return (
     <ul className={`mt-3 flex flex-wrap gap-1.5 ${className}`} aria-label={label}>
       {items.map((item) => (
@@ -42,6 +43,7 @@ export function Tags({ items, label, className = '' }: ListProps) {
 
 /** A card's points, each behind a small berry: a job's highlights, a project's details. */
 export function Points({ items, label, className = '' }: ListProps) {
+  if (items.length === 0) return null
   return (
     <ul className={`mt-3 space-y-1.5 ${className}`} aria-label={label}>
       {items.map((item) => (

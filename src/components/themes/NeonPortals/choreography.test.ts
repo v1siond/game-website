@@ -1,4 +1,4 @@
-import { COUNT_BOX, HERO_TIMING, PIPS, POSES, beatStart, heroEntranceMs, motionAt, pipAt, restSpot, sceneMs, type Scene } from './choreography'
+import { COUNT_BOX, HERO_TIMING, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, pipAt, postAt, postX, restSpot, sceneMs, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -85,5 +85,30 @@ describe('About: the count box', () => {
 
   it('leaves him at the plunger on the box, never on top of it', () => {
     expect(new Set(COUNT_BOX.beats.map((beat) => beat.to.lift))).toEqual(new Set([0]))
+  })
+})
+
+describe('Work Experience: the checkpoint path', () => {
+  it('lights post i halfway through its share of the path, evenly from the first job to the last', () => {
+    expect([0, 1, 2, 3].map((index) => postAt(index, 4))).toEqual([0.125, 0.375, 0.625, 0.875])
+    expect(postAt(0, 1)).toBe(0.5)
+  })
+
+  it('stands each post where he is at the moment it lights, so the light comes on as he passes', () => {
+    const count = 8
+    Array.from({ length: count }, (_, index) => index).forEach((index) => {
+      expect(postX(index, count)).toBeCloseTo(PATH.from + postAt(index, count) * (PATH.to - PATH.from))
+    })
+  })
+
+  it('keeps the path inside the strip, left to right', () => {
+    expect(PATH.from).toBeGreaterThanOrEqual(0)
+    expect(PATH.to).toBeLessThanOrEqual(100)
+    expect(PATH.to).toBeGreaterThan(PATH.from)
+  })
+
+  it('runs the whole path on "Run" in 3 s, within 5 s', () => {
+    expect(RUN_MS).toBe(3000)
+    expect(RUN_MS).toBeLessThanOrEqual(FIVE_S)
   })
 })

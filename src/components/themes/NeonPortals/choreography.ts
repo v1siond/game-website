@@ -115,6 +115,19 @@ const PIP_MS = 300
 /** When pip `index` lights, counted from the start of the scene. */
 export const pipAt = (index: number): number => beatStart(COUNT_BOX, 'count') + index * PIP_MS
 
+// Work Experience: he runs the path left to right past one checkpoint post per job, current job first.
+// Scroll scrubs his place along it (useScrollScene); post i lights halfway through its share of the path,
+// the moment he passes it. "Run" plays the whole path in RUN_MS, then scroll takes over again.
+export const PATH = { from: 4, to: 94 } as const
+
+export const RUN_MS = 3000
+
+/** The scroll progress (0 to 1) at which post `index` of `count` lights. */
+export const postAt = (index: number, count: number): number => (index + 0.5) / count
+
+/** Where post `index` stands along the strip, in %: where he is when it lights. */
+export const postX = (index: number, count: number): number => PATH.from + postAt(index, count) * (PATH.to - PATH.from)
+
 // Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
 // so a fourth achievement adds no step.
 const MASK_STEP_MAX = 3

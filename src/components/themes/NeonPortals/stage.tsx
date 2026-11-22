@@ -78,14 +78,16 @@ interface RigProps {
   run: boolean
   size: RigSize
   onAnimationEnd?: (event: AnimationEvent<HTMLDivElement>) => void
+  /** A track of the scene's own in place of the beats' travel (a path scrubbed by scroll). */
+  track?: string
   children?: ReactNode
 }
 
 /** His rig: the track carries him across the stage, the figure inside plays the pose. */
-export function Rig({ motion, step, run, size, onAnimationEnd, children }: RigProps) {
+export function Rig({ motion, step, run, size, onAnimationEnd, track = stage.rig, children }: RigProps) {
   const { active } = useProfession()
   return (
-    <div key={step} className={stage.rig} data-run={run} data-moving={motion.ms > 0} style={motionVars(motion)} onAnimationEnd={onAnimationEnd}>
+    <div key={step} className={track} data-run={run} data-moving={motion.ms > 0} style={motionVars(motion)} onAnimationEnd={onAnimationEnd}>
       <div className={`${stage.body} ${BODY_SIZE[size]}`}>
         <Character profession={active} pose={motion.pose} />
       </div>
