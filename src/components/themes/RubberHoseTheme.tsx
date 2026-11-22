@@ -6,6 +6,7 @@ import { CopyrightLine } from './shared/CopyrightLine'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
@@ -16,7 +17,7 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { FilmFrame, FilmGrain, RisingNotes } from './RubberHose/backdrop'
 import { CartoonTitle } from './RubberHose/art'
 import { CartoonCharacter } from './RubberHose/selector'
-import { CVLink, EngineLink, HeroAction } from './RubberHose/actions'
+import { HoseLink } from './RubberHose/actions'
 import { SECTION_VIEWS } from './RubberHose/sections'
 import { IrisWipe, SunWatcher, TitleCardIntro } from './RubberHose/scenes'
 import { staggerAt } from './shared/stagger'
@@ -61,6 +62,7 @@ export default function RubberHoseTheme() {
   const { active } = useProfession()
   const view = useWorldView()
   const { navigation, professions, sections } = useLabels()
+  const { cv, engine } = useSiteLinks('engine')
   const reducedMotion = useReducedMotion()
   const rootRef = usePointerVars(!reducedMotion)
   const { zones, stage } = useZoneStore<Isle>('meadow', reducedMotion)
@@ -98,11 +100,9 @@ export default function RubberHoseTheme() {
                       </div>
 
                       <nav className={`flex flex-wrap items-center justify-center gap-3 ${staggerAt(3)} ${look.word}`} aria-label={navigation.contactAndCv}>
-                        {actions.map((action) => (
-                          <HeroAction key={action.id} action={action} />
+                        {[...actions, cv, engine].map((slot) => (
+                          <HoseLink key={slot.id} slot={slot} />
                         ))}
-                        <CVLink />
-                        <EngineLink />
                       </nav>
                       {/* out of the flow, across the card's bottom edge; from lg his figure stands at the card's left edge, so the
                           plate leaves the centre and stands at his side */}
@@ -144,10 +144,9 @@ export default function RubberHoseTheme() {
                   </h2>
                   <p className={`mb-6 text-base ${world.ink}`}>{line}</p>
                   <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
-                    {actions.map((action) => (
-                      <HeroAction key={action.id} action={action} />
+                    {[...actions, cv].map((slot) => (
+                      <HoseLink key={slot.id} slot={slot} />
                     ))}
-                    <CVLink />
                   </div>
                 </div>
               )}

@@ -1,8 +1,7 @@
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, type ContactLinkId } from '@/components/cv/SiteLinks'
+import type { SiteLinkSlot } from '@/lib/cv/siteLinks'
 import world from './world.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's actions, in the hero and again in the contact scene: email, LinkedIn, the CV, and the
 // link out to Nebulith, each an ink framed poster button that tips as the pointer lands on it.
@@ -15,35 +14,14 @@ const LOOK = {
   ink: `${CARTOON_BUTTON} hover:-rotate-1 ${world.buttonInk}`,
 }
 
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+const CONTACT_LOOK: Record<ContactLinkId, string> = {
   email: LOOK.red,
   linkedin: LOOK.ink,
+  cv: LOOK.ink,
+  engine: LOOK.red,
 }
 
-export function HeroAction({ action }: { action: HeroActionSlot }) {
-  return (
-    <a {...action.linkProps} className={HERO_ACTION_LOOK[action.id]}>
-      {action.label}
-    </a>
-  )
-}
-
-export function CVLink() {
-  const { actions } = useLabels()
-
-  return (
-    <Link href="/cv" className={LOOK.ink}>
-      {actions.cv}
-    </Link>
-  )
-}
-
-export function EngineLink() {
-  const { actions } = useLabels()
-
-  return (
-    <Link {...ENGINE_LINK} className={LOOK.red}>
-      {actions.engine}
-    </Link>
-  )
+/** One of the world's contact links in its look: the hero's actions, the CV and the engine. */
+export function HoseLink({ slot }: { slot: HeroActionSlot | SiteLinkSlot }) {
+  return <ContactLink slot={slot} className={CONTACT_LOOK[slot.id]} />
 }
