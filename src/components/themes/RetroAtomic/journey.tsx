@@ -1,6 +1,6 @@
 'use client'
 
-import { memo, useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { ShelterBackdrop } from './backdrop'
@@ -103,17 +103,20 @@ export function Wanderer({ zones }: { zones: ValueStore<Zone> }) {
   const zone = useStoreValue(zones)
   const { active } = useProfession()
   const [walking, setWalking] = useState(false)
-  const first = useRef(true)
-
-  useEffect(() => {
-    if (first.current) {
-      first.current = false
-      return
-    }
+  // The zone he last set out for: a new zone in view starts the walk in this render (the previous value
+  // pattern), so the page's first zone never makes him walk and no effect relays the change.
+  const [headedFor, setHeadedFor] = useState(zone)
+  if (zone !== headedFor) {
+    setHeadedFor(zone)
     setWalking(true)
+  }
+
+  // He walks for WALK_MS from the last zone change, then stands.
+  useEffect(() => {
+    if (!walking) return
     const timer = window.setTimeout(() => setWalking(false), WALK_MS)
     return () => window.clearTimeout(timer)
-  }, [zone])
+  }, [walking, headedFor])
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-0 z-10 h-24 sm:h-28" aria-hidden="true">

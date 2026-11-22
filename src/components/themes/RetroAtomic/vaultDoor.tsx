@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { usePreview } from '@/themes/PreviewContext'
 import { BRASS, INK, SHELTER_YELLOW, STEEL, STEEL_EDGE, STEEL_LIGHT, WARNING_RED, CHROME, RUBBER } from './palette'
@@ -25,8 +25,10 @@ const PHASES: ReadonlyArray<readonly [DoorPhase, number]> = [
   ['pull', 800],
   ['roll', 1300],
   ['enter', 2350],
-  ['done', 2850],
 ]
+
+// The door is out of the way and the terminal boots.
+const OPEN_AT_MS = 2850
 
 const TEETH = 12
 const BOLTS = 10
@@ -120,28 +122,33 @@ export function VaultEntrance({ onOpened }: VaultEntranceProps) {
   const [phase, setPhase] = useState<DoorPhase>(preview ? 'done' : 'sealed')
   const opened = useRef(false)
 
-  // Report done exactly once, whichever way it got there (timer, skip, preview).
-  useEffect(() => {
-    if (phase !== 'done' || opened.current) return
+  // The door's one way out, whichever way it got there (the last timer, a key, a click, the preview): it
+  // drops the door and reports done exactly once.
+  const finish = useCallback(() => {
+    setPhase('done')
+    if (opened.current) return
     opened.current = true
     onOpened()
-  }, [phase, onOpened])
+  }, [onOpened])
 
   useEffect(() => {
-    if (preview) return
+    if (preview) {
+      finish()
+      return
+    }
     const timers = PHASES.map(([next, at]) => window.setTimeout(() => setPhase(next), at))
-    const skip = () => setPhase('done')
-    window.addEventListener('keydown', skip)
+    timers.push(window.setTimeout(finish, OPEN_AT_MS))
+    window.addEventListener('keydown', finish)
     return () => {
       timers.forEach((timer) => window.clearTimeout(timer))
-      window.removeEventListener('keydown', skip)
+      window.removeEventListener('keydown', finish)
     }
-  }, [preview])
+  }, [preview, finish])
 
   if (phase === 'done') return null
 
   return (
-    <div className={`fixed inset-0 z-[90] overflow-hidden ${atomic.doorWall}`} data-phase={phase} onClick={() => setPhase('done')} role="presentation">
+    <div className={`fixed inset-0 z-[90] overflow-hidden ${atomic.doorWall}`} data-phase={phase} onClick={finish} role="presentation">
       <Beacon side="left" />
       <Beacon side="right" />
       <div className={`absolute inset-0 ${atomic.doorLight}`} aria-hidden="true" />
@@ -154,7 +161,7 @@ export function VaultEntrance({ onOpened }: VaultEntranceProps) {
       </div>
       <button
         type="button"
-        onClick={() => setPhase('done')}
+        onClick={finish}
         className={`absolute bottom-6 right-6 min-h-[44px] border-2 border-atomic-yellow bg-atomic-ink px-4 text-sm font-bold uppercase tracking-widest text-atomic-yellow ${atomic.focusRing}`}
       >
         {hud.skipIntro}
