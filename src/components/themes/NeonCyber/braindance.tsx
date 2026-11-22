@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
+import { useCallback, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react'
 import type { Job } from '@/lib/cv/content'
 import type { Labels } from '@/lib/cv/labels'
 import { useLabels } from '@/components/cv/CVDataProvider'
@@ -8,19 +8,15 @@ import { TagList } from '@/components/cv/TagList'
 import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { jobCard } from '@/lib/cv/cvView'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { DATA_CHIPS, HudPanel, hudButton } from './hud'
-import { MercSprite, stillWhen } from './merc'
+import { DATA_CHIPS } from './hud'
 import { Scannable } from './scanner'
 import world from './world.module.css'
 
 // Work experience as a braindance edit: the years run along a timeline and each job is a clip on it,
-// striped the way the editor marks a clue, stacked in lanes where jobs overlap. The playhead runs the
-// timeline once when the section comes into view and lights each job as it passes; then the visitor
-// drags it, clicks the track, or moves it with the arrow keys (a slider, one year a step). The job under
-// the playhead is lit in the masonry below, the others dim. The layer switch repaints the edit: visual
+// striped the way the editor marks a clue, stacked in lanes where jobs overlap. The visitor drags the
+// playhead, clicks the track, or moves it with the arrow keys (a slider, one year a step); the job under
+// the playhead is lit in the cards below, the others dim. In the scene behind, he hops on the playhead
+// under each job's clip as its card is read (scenes.tsx). The layer switch repaints the edit: visual
 // (data cyan), audio (the sources in green), thermal (each job from cold to hot by how recent it is).
 // The playhead writes --head on the track each frame; React state changes only when the lit jobs or
 // the year under the playhead change.
@@ -45,8 +41,6 @@ const LAYER_LABEL: Record<Layer, (cyber: Labels['cyber']) => string> = {
   audio: (cyber) => cyber.layerAudio,
   thermal: (cyber) => cyber.layerThermal,
 }
-
-const PLAY_TIME = 4200
 
 const yearOf = (date: Date): number => date.getUTCFullYear() + date.getUTCMonth() / 12
 
@@ -111,14 +105,10 @@ const sameHead = (a: HeadState, b: HeadState): boolean => a.year === b.year && a
 export function Braindance({ jobs }: { jobs: Job[] }) {
   const labels = useLabels()
   const { cyber, sections, years } = labels
-  const reducedMotion = useReducedMotion()
-  const { ref: sectionRef, triggered } = useSectionTrigger()
   const edit = useMemo(() => cutEdit(jobs, new Date()), [jobs])
   const trackRef = useRef<HTMLDivElement>(null)
-  const frame = useRef(0)
   const [layer, setLayer] = useState<Layer>('visual')
   const [scrubbed, setScrubbed] = useState(false)
-  const [riding, setRiding] = useState(false)
   const [head, setHead] = useState<HeadState>(() => ({ year: Math.floor(edit.last), lit: litAt(edit.clips, 1) }))
   const span = Math.max(edit.last - edit.first, 1)
 
@@ -132,42 +122,12 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
     [edit, span],
   )
 
-  // The one way the playhead's run ends early: the frame is cancelled and he stops walking with it.
-  const stop = useCallback(() => {
-    window.cancelAnimationFrame(frame.current)
-    setRiding(false)
-  }, [])
-
-  const play = useCallback(() => {
-    stop()
-    setScrubbed(true)
-    setRiding(true)
-    const began = performance.now()
-    const step = (now: number) => {
-      const progress = Math.min(1, (now - began) / PLAY_TIME)
-      moveHead(progress)
-      if (progress === 1) {
-        setRiding(false)
-        return
-      }
-      frame.current = window.requestAnimationFrame(step)
-    }
-    frame.current = window.requestAnimationFrame(step)
-  }, [moveHead, stop])
-
-  useEffect(() => {
-    if (!triggered || reducedMotion) return
-    play()
-    return stop
-  }, [triggered, reducedMotion, play, stop])
-
   const scrubTo = (event: PointerEvent<HTMLDivElement>) => {
     const box = event.currentTarget.getBoundingClientRect()
     moveHead((event.clientX - box.left) / box.width)
   }
 
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    stop()
     event.currentTarget.setPointerCapture(event.pointerId)
     setScrubbed(true)
     scrubTo(event)
@@ -181,7 +141,6 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
     const step = KEY_STEPS[event.key]
     if (!step) return
     event.preventDefault()
-    stop()
     setScrubbed(true)
     moveHead((step(head.year, edit) + 0.5 - edit.first) / span)
   }
@@ -190,7 +149,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
   const yearMarks = Array.from({ length: Math.floor(span) + 1 }, (_, i) => edit.first + i).filter((year) => (year - edit.first) % 2 === 0)
 
   const layerSwitch = (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="mb-4 flex flex-wrap items-center gap-2">
       <div className="flex" role="group" aria-label={cyber.layer}>
         {LAYERS.map((id) => (
           <button
@@ -206,22 +165,13 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
           </button>
         ))}
       </div>
-      {!reducedMotion && (
-        <button
-          type="button"
-          onClick={play}
-          className={hudButton('hud')}
-        >
-          {cyber.replay}
-        </button>
-      )}
     </div>
   )
 
   return (
-    <div ref={sectionRef} className={world.bd} data-layer={layer} data-scrubbed={scrubbed}>
-      <HudPanel title={sections.workExperience} tools={layerSwitch}>
-        <div className="mb-8 pt-16">
+    <div className={world.bd} data-layer={layer} data-scrubbed={scrubbed}>
+      <div className={`${world.panel} mb-5 p-4 sm:p-5`}>
+        {layerSwitch}
           <div
             ref={trackRef}
             className={`${world.track} relative cursor-ew-resize border-y border-[color-mix(in_srgb,var(--neon-chrome-red)_50%,transparent)] bg-[color:var(--neon-ink)]`}
@@ -251,14 +201,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
                 className="pointer-events-auto absolute -bottom-3 -top-3 left-0 w-11 -translate-x-1/2 cursor-ew-resize"
               >
                 <span className="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-[color:var(--neon-hud)]" aria-hidden="true" />
-                {/* the playhead diamond's box: the diamond turns inside it, and he rides on its top edge */}
-                <span className="absolute -top-1 left-1/2 block h-3 w-3 -translate-x-1/2" aria-hidden="true">
-                  <span className="block h-full w-full rotate-45 bg-[color:var(--neon-hud)]" />
-                  {/* him riding the playhead through the years: walking while it plays, at rest when it stops */}
-                  <span className="absolute bottom-full left-1/2 block w-10 -translate-x-1/2">
-                    <MercSprite profession="engineer" motion={stillWhen(reducedMotion, riding ? 'walk' : 'idle')} className="block h-auto w-full" />
-                  </span>
-                </span>
+                <span className="absolute -top-1 left-1/2 block h-3 w-3 -translate-x-1/2 rotate-45 bg-[color:var(--neon-hud)]" aria-hidden="true" />
               </div>
             </div>
           </div>
@@ -273,16 +216,17 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
               </span>
             ))}
           </div>
-        </div>
+      </div>
 
-        <ul className={MASONRY_LIST}>
+      <div data-stage-items="">
+        <ul className="grid gap-4">
           {edit.clips
             .slice()
             .reverse()
             .map(({ job: entry, heat }) => {
               const job = jobCard(entry, years)
               return (
-                <li key={job.id} className={MASONRY_ITEM}>
+                <li key={job.id}>
                   <Scannable kind="job" title={sections.workExperience} fact={job.years}>
                     <article
                       className={`${world.lens} border border-[color-mix(in_srgb,var(--neon-ice)_15%,transparent)] bg-[color:var(--neon-glass)] p-4`}
@@ -306,7 +250,7 @@ export function Braindance({ jobs }: { jobs: Job[] }) {
               )
             })}
         </ul>
-      </HudPanel>
+      </div>
     </div>
   )
 }

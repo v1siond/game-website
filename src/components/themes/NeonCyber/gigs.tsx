@@ -10,16 +10,14 @@ import { MarkedLines, type MarkedLinesLook } from '@/components/cv/MarkedLines'
 import { projectCard, type ProjectCard as ProjectCardView } from '@/lib/cv/cvView'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
-import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useModalDialog } from '@/hooks/useModalDialog'
 import { BREACH_START, BUFFER_SIZE, MATRIX_SIZE, breachPuzzle, bufferBytes, byteText, canPick, matched, outcome, pick, type BreachOutcome } from './breach'
-import { DATA_CHIPS, HUD_LINK, HudPanel, hudButton } from './hud'
+import { DATA_CHIPS, HUD_LINK, hudButton } from './hud'
 import { Scannable } from './scanner'
-import { MercSprite } from './merc'
 import world from './world.module.css'
 
-// Projects as gigs, in a masonry of cards. Every card has Breach: a dialog with the project's code
+// Projects as gigs, one card each. Every card has Breach: a dialog with the project's code
 // matrix (./breach.ts), its buffer and its sequence. The first pick comes from the lit top row, then the
 // lit line turns to the picked column, then to the picked row, and so on; when the buffer ends with the
 // whole sequence the project's file opens (its description, the commit backed details, its result). A
@@ -322,21 +320,10 @@ function GigCard({ project: entry, links, noLink }: ProjectSlot) {
   )
 }
 
-// Him at the head of the gigs, jacked into his deck, the glyphs climbing off it while he breaches.
-function JackedIn() {
-  const reduced = useReducedMotion()
-  return (
-    <span className="block w-12 sm:w-14" aria-hidden="true">
-      <MercSprite profession="engineer" motion={reduced ? 'still' : 'hack'} className="h-auto w-full" />
-    </span>
-  )
-}
-
 export function Gigs({ projects }: { projects: Project[] }) {
-  const { sections } = useLabels()
   return (
-    <HudPanel title={sections.projects} tools={<JackedIn />}>
-      <ProjectList projects={projects} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderProject={(slot) => <GigCard {...slot} />} />
-    </HudPanel>
+    <div data-stage-items="">
+      <ProjectList projects={projects} className="grid gap-4" renderProject={(slot) => <GigCard {...slot} />} />
+    </div>
   )
 }
