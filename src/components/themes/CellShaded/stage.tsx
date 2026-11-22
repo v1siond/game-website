@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { useZoneStage } from '@/hooks/useZoneStage'
+import { heldUntil } from '@/components/themes/shared/held'
 import { headingId } from '@/lib/cv/sectionText'
 import type { MarkedLinesLook } from '@/components/cv/MarkedLines'
 import type { TagListLook } from '@/components/cv/TagList'
@@ -50,7 +51,7 @@ export function Stage({ title, zone, children }: StageProps) {
   const { ref, on } = useZoneStage<Zone>(zone)
 
   return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`mb-24 scroll-mt-8 ${cel.stage}`}>
+    <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`mb-24 scroll-mt-8 ${cel.stage} ${heldUntil(on)}`}>
       <SectionTitle title={title} />
       {typeof children === 'function' ? children(on) : children}
     </section>

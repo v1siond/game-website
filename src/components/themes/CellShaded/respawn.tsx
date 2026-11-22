@@ -9,6 +9,7 @@ import { ContactActions, InkButton } from './buttons'
 import { HATCH } from './ink'
 import { CEL } from './palette'
 import { useZoneStage } from '@/hooks/useZoneStage'
+import { heldUntil } from '@/components/themes/shared/held'
 import { SectionTitle, celHeadingId } from './stage'
 import type { Zone } from './wasteland'
 import cel from './cel.module.css'
@@ -30,7 +31,7 @@ export function RespawnStation({ profession }: { profession: Profession }) {
   }, [on, reduced])
 
   return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`relative z-20 px-4 pb-16 pt-8 sm:px-6 ${cel.stage}`}>
+    <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`relative z-20 px-4 pb-16 pt-8 sm:px-6 ${cel.stage} ${heldUntil(on)}`}>
       <div className="mx-auto max-w-5xl">
         <SectionTitle title={title} />
         <div className={`grid items-center gap-8 p-5 sm:p-8 md:grid-cols-[auto_minmax(0,1fr)] ${cel.darkPaper}`}>
