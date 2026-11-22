@@ -9,7 +9,7 @@
 .tunnel {
   background:
     radial-gradient(70% 90% at 50% 120%, rgb(255 179 71 / 0.25), transparent 70%),
-    linear-gradient(180deg, var(--tp-bark-dark) 0%, #1a0f06 100%);
+    linear-gradient(180deg, var(--tp-bark-dark) 0%, var(--tp-wood-deep) 100%);
   border: 3px solid var(--tp-bark);
 }
 

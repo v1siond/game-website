@@ -33,10 +33,7 @@ import sprite from './character.module.css'
 
 export type HeroPose = 'idle' | 'run' | 'roll' | 'throw' | 'slap' | 'swing' | 'act'
 
-const WHITE = '#ffffff'
-const BLACK = '#000000'
-const FUR = '#6a3a1c'
-const TIE = '#d42a1e'
+const { white: WHITE, black: BLACK, heroFur: FUR, heroTie: TIE } = COLORS
 
 interface Look {
   fur: string
