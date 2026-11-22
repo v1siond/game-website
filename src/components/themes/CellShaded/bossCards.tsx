@@ -41,7 +41,7 @@ function Drummer() {
 
 function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
   const { links } = useLabels()
-  const { band, years, linkProps } = slot
+  const { band, years, linkProps, nameFor } = slot
 
   return (
     <article className={`relative overflow-hidden ${cel.paper} ${cel.boss}`} style={{ ['--i' as string]: index }}>
@@ -60,7 +60,7 @@ function BossCard({ slot, index }: { slot: BandSlot; index: number }) {
         )}
         {linkProps && (
           <p className="mt-3">
-            <a {...linkProps} className="inline-flex min-h-[44px] items-center bg-[var(--cel-paper)] px-2 text-base font-bold underline decoration-[3px] underline-offset-4">
+            <a {...linkProps} aria-label={nameFor(links.website)} className="inline-flex min-h-[44px] items-center bg-[var(--cel-paper)] px-2 text-base font-bold underline decoration-[3px] underline-offset-4">
               {links.website}
             </a>
           </p>
