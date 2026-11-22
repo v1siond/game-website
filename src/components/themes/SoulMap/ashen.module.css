@@ -82,7 +82,8 @@
 }
 
 /* A scene that plays from the moment it is in view: until its section trigger marks it data-on, every
-   part of it stands on its first frame (classSelect.tsx, arena.tsx, lastFire.tsx). */
+   part of it stands on its first frame (classSelect.tsx, arena.tsx, lastFire.tsx, stage.tsx, gate.tsx,
+   descent.tsx). */
 .cue:not([data-on]) * {
   animation-play-state: paused !important;
 }

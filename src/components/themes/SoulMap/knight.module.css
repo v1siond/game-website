@@ -12,7 +12,8 @@
  * recoveries decelerate (ease out). The loops (breath, the class acts) start on their own first frame
  * through a short lead in, and run on periods that do not divide into each other, so nothing beats in step.
  * No loop runs for good: each plays a set number of times, so a scene has played out within 5 s of its
- * start, and he rests on the held pose. The idle is that rest, him standing still.
+ * start, and he rests on the held pose: the idle's breath, blink and sword arm drift play once and he
+ * stands still.
  *
  * A held pose (sit, a seated drink, guard, down, the fighter's high guard) is a plain transform, so
  * reduced motion still shows it; the motion into it, and every loop, runs only with no motion preference.
@@ -283,26 +284,48 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* ---- breath: the chest rises and falls once (body only, never the whole figure), a blink ----
-     At work and sitting by a fire; the idle is his rest, still. */
+  /* ---- life: the chest rises and falls once (body only, never the whole figure), a blink, and standing
+     the sword arm drifts once, all over the pose's --life, then he rests still. At work 3.6 s; sitting by
+     a fire 1.6 s (the hero rises from it 1.6 s in); standing --idle, 2 s, which a scene that reaches the
+     idle late shortens so it still ends within 5 s (the bands stage, 1 s). ---- */
+  .act {
+    --life: 3.6s;
+  }
+
+  .seated,
+  .drink {
+    --life: 1.6s;
+  }
+
+  .idle {
+    --life: var(--idle, 2s);
+  }
+
+  .idle .body,
   .act .body {
-    animation: breathe 3.6s ease-in-out;
+    animation: breathe var(--life) ease-in-out;
   }
 
   .seated .body,
   .drink .body {
-    animation: breathe-sat 3.6s ease-in-out;
+    animation: breathe-sat var(--life) ease-in-out;
   }
 
   /* A phantom breathes on its own slower rhythm, so two figures on screen never rise together. */
   .phantom .body {
-    animation-duration: 4.3s;
+    animation-duration: calc(var(--life) * 1.2);
   }
 
+  .idle .eyes,
   .act .eyes,
   .seated .eyes,
   .drink .eyes {
-    animation: blink 3.6s ease-in-out;
+    animation: blink var(--life) ease-in-out;
+  }
+
+  /* the sword arm drifts against the breath */
+  .knight.idle .armFar {
+    animation: arm-drift var(--life) ease-in-out;
   }
 
   /* ---- walk: two heavy strides in armour, feet together at both ends, a dip on every footfall ---- */
@@ -690,6 +713,16 @@
   }
   50% {
     transform: rotate(5deg) scaleY(1.014);
+  }
+}
+
+@keyframes arm-drift {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-3deg);
   }
 }
 

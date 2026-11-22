@@ -32,13 +32,13 @@ const OUTFIT_LOOK: WardrobeLook = { plate: SOUL.panel, text: SOUL.glow, ring: SO
 
 type Phase = 'ash' | 'ember' | 'lit' | 'rise' | 'ready'
 
-// He rises once the banner has had its moment, and the scene is the visitor's when he is fully up (the
-// rise is 1.4 s in knight.module.css).
+// He rises as the fire takes, and the scene is the visitor's when he is fully up (the rise is 1.4 s in
+// knight.module.css), 3 s in, so his idle's one breath, blink and arm drift (2 s) end by 5 s.
 const TIMELINE: Array<[Phase, number]> = [
-  ['ember', 700],
-  ['lit', 1700],
-  ['rise', 3400],
-  ['ready', 4800],
+  ['ember', 600],
+  ['lit', 1300],
+  ['rise', 1600],
+  ['ready', 3000],
 ]
 
 const FIRE: Record<Phase, FireState> = { ash: 'out', ember: 'ember', lit: 'lit', rise: 'lit', ready: 'lit' }
