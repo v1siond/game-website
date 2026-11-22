@@ -1,6 +1,6 @@
 'use client'
 
-import type { CSSProperties } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import type { Profession } from '@/lib/cv/professions'
 import { Fighter } from './fighter'
 import { useMoves } from './moves'
@@ -35,7 +35,7 @@ export function ArenaFighter({ profession, rest, intro, className = '', spriteCl
         <div onPointerEnter={() => walk(1)} />
       </div>
       <div data-worlds-figure={figure ? '' : undefined} className={className}>
-        <div className={`${STEP} transition-transform duration-[600ms] ease-linear motion-reduce:transition-none`} style={{ '--step': step } as CSSProperties}>
+        <div className={`${STEP} transition-transform duration-[600ms] ease-linear motion-reduce:transition-none`} style={cssVars({ '--step': step })}>
           <Fighter profession={profession} pose={pose} className={spriteClass} onMoveEnd={end} />
         </div>
       </div>

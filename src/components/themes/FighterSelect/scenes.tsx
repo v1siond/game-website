@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { useMemo, type CSSProperties, type ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
@@ -47,38 +48,22 @@ const DEBRIS: { d: string; fill: string; vars: CSSProperties }[] = [
   {
     d: 'M70 30 H110 V52 H70 Z',
     fill: FS.p2,
-    vars: {
-      '--fx': '60px',
-      '--fy': '-90px',
-      '--fr': '140deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '60px', '--fy': '-90px', '--fr': '140deg' }),
   },
   {
     d: 'M112 30 H150 V52 H112 Z',
     fill: FS.p2Dark,
-    vars: {
-      '--fx': '120px',
-      '--fy': '-50px',
-      '--fr': '-120deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '120px', '--fy': '-50px', '--fr': '-120deg' }),
   },
   {
     d: 'M60 66 a12 12 0 1 0 0.1 0 Z',
     fill: FS.ink,
-    vars: {
-      '--fx': '-40px',
-      '--fy': '-70px',
-      '--fr': '300deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '-40px', '--fy': '-70px', '--fr': '300deg' }),
   },
   {
     d: 'M150 66 a12 12 0 1 0 0.1 0 Z',
     fill: FS.ink,
-    vars: {
-      '--fx': '90px',
-      '--fy': '-30px',
-      '--fr': '-260deg',
-    } as CSSProperties,
+    vars: cssVars({ '--fx': '90px', '--fy': '-30px', '--fr': '-260deg' }),
   },
 ]
 
@@ -192,7 +177,7 @@ interface LitListProps<T> {
 export function BlastRow<T>({ profession, items, renderItem, render }: { profession: Profession } & LitListProps<T>) {
   const { arcade } = useLabels()
   const { ref, on, reduced } = useScene('market')
-  const [bout] = useState(() => blastBout(items.length))
+  const bout = useMemo(() => blastBout(items.length), [items.length])
   const { index, beat, take, replay } = useBout(bout, on, reduced)
   const lit = marksUpTo(bout, index, 'light')
   const blasting = beat.hero === 'hadouken'
@@ -246,7 +231,7 @@ export function SuperArt({ profession, count }: { profession: Profession; count:
   const { arcade } = useLabels()
   const land = useComboLand()
   const { ref, on, reduced } = useScene('harbour')
-  const [bout] = useState(() => superBout(count))
+  const bout = useMemo(() => superBout(count), [count])
   // Every hit of the super lands on the combo counter, once per beat, as the bout's clock reaches it.
   const { beat, take, started, replay } = useBout(bout, on, reduced, (next) => {
     if (!reduced && next.mark === 'hit') land()
@@ -314,7 +299,7 @@ const parryBout = (count: number): Beat[] => [
 export function ParryRow<T>({ profession, items, renderItem, render }: { profession: Profession } & LitListProps<T>) {
   const { arcade } = useLabels()
   const { ref, on, reduced } = useScene('harbour')
-  const [bout] = useState(() => parryBout(items.length))
+  const bout = useMemo(() => parryBout(items.length), [items.length])
   const { index, beat, take, started, replay } = useBout(bout, on, reduced)
   const lit = marksUpTo(bout, index, 'light')
 

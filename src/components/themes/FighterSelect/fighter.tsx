@@ -1,6 +1,7 @@
 'use client'
 
-import { memo, useId, type CSSProperties, type ReactNode } from 'react'
+import { memo, useId, type ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import type { Profession } from '@/lib/cv/professions'
 import { FS } from './palette'
@@ -614,11 +615,11 @@ export const Fighter = memo(function Fighter({ profession, pose, who = 'hero', t
   const clip = `fs-${useId().replace(/:/g, '')}`
   const motion = motionFor(pose, profession)
   const costume = COSTUME[who][profession]
-  const vars = {
+  const vars = cssVars({
     '--cycle': `${motion.cycleMs}ms`,
     '--key': motion.key,
     '--runs': String(motion.runs),
-  } as CSSProperties
+  })
 
   return (
     <svg

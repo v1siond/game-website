@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useCallback, useContext, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Job } from '@/lib/cv/content'
 import { FS } from './palette'
@@ -32,7 +33,7 @@ export function FlightStop({ index, children }: { index: number; children: React
 
 function Plane({ at, heading }: { at: Pin; heading: number }) {
   return (
-    <g className={living.plane} style={{ '--px': `${at[0]}px`, '--py': `${at[1]}px` } as CSSProperties}>
+    <g className={living.plane} style={cssVars({ '--px': `${at[0]}px`, '--py': `${at[1]}px` })}>
       <g transform={`rotate(${heading})`}>
         <path
           d="M9 0 L-7 -2 L-9 -7 L-11 -7 L-10 -1.5 L-12 0 L-10 1.5 L-11 7 L-9 7 L-7 2 Z"

@@ -1,6 +1,7 @@
 'use client'
 
-import type { CSSProperties, ReactNode } from 'react'
+import type { ReactNode } from 'react'
+import { cssVars } from '@/lib/cssVars'
 import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { FS } from './palette'
 import living from './living.module.css'
@@ -24,7 +25,7 @@ const SKINS = ['#e9b08a', '#b9774c', FS.skinDeep, '#f2c49b']
 // A bobbing group of onlookers standing on the line `base`, `count` of them from `x`, `gap` apart.
 export function CrowdGroup({ x, base, count, gap, scale, i }: { x: number; base: number; count: number; gap: number; scale: number; i: number }) {
   return (
-    <g className={living.bob} style={{ '--i': i } as CSSProperties}>
+    <g className={living.bob} style={cssVars({ '--i': i })}>
       {Array.from({ length: count }, (_, k) => (
         <g key={k} transform={`translate(${x + k * gap} ${base + (k % 2) * 6}) scale(${scale})`}>
           <path d="M-12 0 Q-12 -19 0 -20 Q12 -19 12 0 Z" fill={SHIRTS[(k + i) % SHIRTS.length]} stroke={FS.ink} strokeWidth={1.4} />
@@ -66,7 +67,7 @@ const CASTLE = (
     {Array.from({ length: 9 }, (_, k) => (
       <path key={k} d={`M${k * 200} 650 L${k * 200 - 120} 900`} stroke="#2a201c" strokeWidth={4} />
     ))}
-    <g className={living.sway} style={{ '--i': 0 } as CSSProperties}>
+    <g className={living.sway} style={cssVars({ '--i': 0 })}>
       <rect x={300} y={470} width={70} height={150} fill="#c9b48a" stroke={FS.ink} strokeWidth={4} />
       <path d="M318 500 H352 M318 530 H352 M318 560 H352" stroke={FS.ink} strokeWidth={6} />
     </g>
@@ -86,7 +87,7 @@ const MARKET = (
       </g>
     ))}
     {[180, 520, 860, 1200, 1500].map((x, k) => (
-      <g key={x} className={living.sway} style={{ '--i': k } as CSSProperties}>
+      <g key={x} className={living.sway} style={cssVars({ '--i': k })}>
         <path d={`M${x} 60 V100`} stroke={FS.ink} strokeWidth={3} />
         <ellipse cx={x} cy={126} rx={26} ry={30} fill={FS.p2} stroke={FS.ink} strokeWidth={4} />
         <path d={`M${x - 26} 126 H${x + 26}`} stroke={FS.gold} strokeWidth={4} />
