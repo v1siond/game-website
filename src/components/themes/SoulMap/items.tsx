@@ -87,7 +87,7 @@ function PickUp({ project, picked, onPick }: { project: Project; picked: boolean
     <button
       type="button"
       onClick={pickUp}
-      disabled={picked}
+      aria-disabled={picked}
       aria-label={picked ? `${project.name}: ${words.pickedUp}` : fillLabel(words.pickUpOf, { project: project.name })}
       className={picked ? BUTTON : BUTTON_LIT}
     >

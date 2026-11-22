@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useOnChange } from '@/hooks/useOnChange'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
@@ -85,7 +86,7 @@ function FogWall({ parting, onTraverse }: { parting: boolean; onTraverse: () => 
         <span className={`${souls.fogLayer} absolute inset-0`} />
         <span className={`${souls.fogLayer} ${souls.fogLayerBack} absolute inset-0`} />
       </div>
-      <button type="button" onClick={onTraverse} disabled={parting} className={`relative ${BUTTON_LIT}`}>
+      <button type="button" onClick={onTraverse} aria-disabled={parting} className={`relative ${BUTTON_LIT}`}>
         {words.traverse}
       </button>
     </div>
@@ -217,6 +218,7 @@ function useBout() {
 
   // Through the fog: he walks in while it parts; with no motion the ring is simply open.
   const traverse = () => {
+    if (bout !== 'fog') return
     if (prefersReducedMotion()) {
       setBout('fight')
       return
@@ -242,7 +244,27 @@ function SparRing() {
   }, [bout, inView, partnerSwing])
 
   const fighting = bout === 'fight'
+  const won = bout === 'won'
   const inRing = bout !== 'fog' && bout !== 'parting'
+
+  // The fog wall's button leaves as the ring opens, so a Traverse that held keyboard focus hands it to
+  // Strike before the frame paints. Strike and Again are one button, so focus stays through a round won.
+  const lead = useRef<HTMLButtonElement>(null)
+  const handoff = useRef(false)
+  const enter = () => {
+    handoff.current = true
+    traverse()
+  }
+  useOnChange(
+    inRing,
+    () => {
+      if (!handoff.current) return
+      handoff.current = false
+      if (document.activeElement !== document.body) return
+      lead.current?.focus()
+    },
+    { timing: 'layout' },
+  )
 
   return (
     <div ref={ref}>
@@ -259,7 +281,7 @@ function SparRing() {
             </div>
           </>
         )}
-        {inRing ? <BossBar hp={partnerHp} /> : <FogWall parting={bout === 'parting'} onTraverse={traverse} />}
+        {inRing ? <BossBar hp={partnerHp} /> : <FogWall parting={bout === 'parting'} onTraverse={enter} />}
         {notice && (
           <p className="absolute inset-x-0 top-4 text-center text-sm uppercase tracking-[0.2em] text-[color:var(--soul-text)]" role="status">
             {notice}
@@ -268,19 +290,13 @@ function SparRing() {
       </div>
       {inRing && (
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          {bout === 'won' ? (
-            <button type="button" onClick={again} className={BUTTON_LIT}>
-              {words.again}
+          <button ref={lead} type="button" onClick={won ? again : strike} aria-disabled={!fighting && !won} className={BUTTON_LIT}>
+            {won ? words.again : words.strike}
+          </button>
+          {!won && (
+            <button type="button" onClick={guard} aria-disabled={!fighting} className={BUTTON}>
+              {words.guard}
             </button>
-          ) : (
-            <>
-              <button type="button" onClick={strike} disabled={!fighting} className={BUTTON_LIT}>
-                {words.strike}
-              </button>
-              <button type="button" onClick={guard} disabled={!fighting} className={BUTTON}>
-                {words.guard}
-              </button>
-            </>
           )}
           <p className="w-full text-center text-sm italic text-[color:var(--soul-text-soft)]">{words.sparHint}</p>
         </div>

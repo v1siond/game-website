@@ -88,7 +88,7 @@ function Slab({ slot: { venture, linkProps, nameFor } }: { slot: VentureSlot }) 
         <button
           type="button"
           onClick={appraise}
-          disabled={appraised}
+          aria-disabled={appraised}
           aria-label={appraised ? `${venture.name}: ${words.appraised}` : fillLabel(words.appraiseOf, { name: venture.name })}
           className={appraised ? BUTTON : BUTTON_LIT}
         >

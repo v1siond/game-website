@@ -97,10 +97,10 @@ function FlaskButton() {
     <button
       type="button"
       onClick={drink}
-      disabled={Boolean(reason)}
+      aria-disabled={Boolean(reason)}
       aria-label={reason ? `${name}. ${reason}` : name}
       title={reason || name}
-      className={`${souls.flask} flex min-h-[44px] items-center gap-2 px-2 text-[color:var(--soul-text)] disabled:text-[color:var(--soul-text-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--soul-glow)]`}
+      className={`${souls.flask} flex min-h-[44px] items-center gap-2 px-2 text-[color:var(--soul-text)] aria-disabled:text-[color:var(--soul-text-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--soul-glow)]`}
     >
       <FlaskIcon full={flasks > 0} />
       <span className="text-sm uppercase tracking-wider">
