@@ -1,0 +1,565 @@
+/*
+ * His poses (character.tsx). Every part turns on its own joint, given in the sprite's viewBox units
+ * (transform-box: view-box): the hips at y 130, the shoulders at y 96, the elbows at y 121, the neck at
+ * y 90 and the feet at y 197. A hanging arm turned clockwise swings its hand to the viewer's left, so the
+ * back arm (left) reaches out with a positive turn and the front arm (right) with a negative one.
+ * Transforms and opacity only, and no loop runs forever (BD29): a cycle (the run, the spin, the drum roll)
+ * plays a fixed number of times that outlasts its beat, and the beat's end changes the pose.
+ *
+ * Animated: his parts (the whole, the upper body, the head, two arms and two forearms, two legs, the lids,
+ * the spin rings).
+ * Reduced motion: every pose is drawn at its last frame with no animation.
+ */
+
+.figure {
+  overflow: visible;
+}
+
+.figure g,
+.figure ellipse {
+  transform-box: view-box;
+}
+
+.whole {
+  transform-origin: 60px 197px;
+}
+
+.upper {
+  transform-origin: 60px 130px;
+}
+
+.head {
+  transform-origin: 60px 90px;
+}
+
+.armBack {
+  transform-origin: 46px 96px;
+}
+
+.armFront {
+  transform-origin: 74px 96px;
+}
+
+.foreBack {
+  transform-origin: 40px 121px;
+}
+
+.foreFront {
+  transform-origin: 80px 121px;
+}
+
+.legBack {
+  transform-origin: 47px 130px;
+}
+
+.legFront {
+  transform-origin: 73px 130px;
+}
+
+.lid {
+  transform: scaleY(0);
+}
+
+.lid:first-of-type {
+  transform-origin: 49px 33px;
+}
+
+.lid:last-of-type {
+  transform-origin: 70.5px 33px;
+}
+
+.rings {
+  opacity: 0;
+  transform-origin: 60px 120px;
+}
+
+.shadow {
+  opacity: 0.35;
+}
+
+.stick {
+  transform-box: view-box;
+}
+
+/* The arms hang a little forward of the body and the knees stay bent: the hunch at rest. */
+.armBack {
+  transform: rotate(6deg);
+}
+
+.armFront {
+  transform: rotate(-6deg);
+}
+
+/* ---- idle: he settles once on arrival and blinks once ---- */
+
+.idle .whole {
+  animation: settle 0.7s ease-out 1;
+}
+
+.idle .lid {
+  animation: blink 0.26s ease-in-out 1.2s 1;
+}
+
+@keyframes settle {
+  0% {
+    transform: scale(1.04, 0.94);
+  }
+  45% {
+    transform: scale(0.98, 1.03);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    transform: scaleY(0);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* ---- scratch: his reaction to the visitor, a puzzled scratch of the crest ---- */
+
+.scratch .armFront {
+  transform: rotate(-158deg);
+}
+
+.scratch .foreFront {
+  animation: scratch 0.24s ease-in-out 5;
+}
+
+.scratch .head {
+  transform: rotate(-7deg);
+}
+
+.scratch .look {
+  transform: translate(-1.5px, -2px);
+}
+
+@keyframes scratch {
+  0%,
+  100% {
+    transform: rotate(-34deg);
+  }
+  50% {
+    transform: rotate(-52deg);
+  }
+}
+
+/* ---- run: the forward lean, fists pumping, each leg shortened in turn from the hip ---- */
+
+.run .upper {
+  transform: rotate(7deg) translateY(2px);
+}
+
+.run .head {
+  transform: translateX(3px) rotate(4deg);
+}
+
+.run .whole {
+  animation: bob 0.36s linear 12;
+}
+
+.run .legBack,
+.run .armFront {
+  animation: stride 0.72s ease-in-out 6;
+}
+
+.run .legFront,
+.run .armBack {
+  animation: stride 0.72s ease-in-out -0.36s 6;
+}
+
+.run .armBack,
+.run .armFront {
+  animation-name: pump;
+}
+
+@keyframes stride {
+  0%,
+  50%,
+  100% {
+    transform: scaleY(1);
+  }
+  25% {
+    transform: scaleY(0.78);
+  }
+}
+
+@keyframes pump {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-28deg);
+  }
+  75% {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ---- pull: both hands on the plunger at his right, a lean back and one yank ---- */
+
+.pull .upper {
+  animation: lean-back 0.5s ease-in forwards;
+}
+
+.pull .armFront {
+  transform: rotate(-62deg);
+}
+
+.pull .armBack {
+  transform: rotate(-44deg);
+}
+
+.pull .foreFront,
+.pull .foreBack {
+  animation: yank 0.5s ease-in forwards;
+}
+
+@keyframes lean-back {
+  to {
+    transform: rotate(-9deg);
+  }
+}
+
+@keyframes yank {
+  0% {
+    transform: rotate(-20deg);
+  }
+  100% {
+    transform: rotate(18deg);
+  }
+}
+
+/* ---- spin: upright on his own axis, arms out, the body smeared into white and pink rings ---- */
+
+.spin .armBack {
+  transform: rotate(78deg);
+}
+
+.spin .armFront {
+  transform: rotate(-78deg);
+}
+
+.spin .upper {
+  animation: turn 0.3s linear 15;
+}
+
+.spin .rings {
+  animation: rings 0.3s linear 15;
+}
+
+@keyframes turn {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  25% {
+    transform: scaleX(0.25);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+  75% {
+    transform: scaleX(0.25);
+  }
+}
+
+@keyframes rings {
+  0%,
+  100% {
+    opacity: 0.95;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scaleX(0.82);
+  }
+}
+
+/* ---- hit: he jumps head first into the box above, a fist up ---- */
+
+.hit .head {
+  transform: rotate(-4deg) translateY(-3px);
+}
+
+.hit .armFront {
+  transform: rotate(-168deg);
+}
+
+.hit .armBack {
+  transform: rotate(40deg);
+}
+
+.hit .whole {
+  animation: stretch 0.5s ease-out forwards;
+}
+
+@keyframes stretch {
+  0% {
+    transform: scale(1.05, 0.9);
+  }
+  40% {
+    transform: scale(0.94, 1.08);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+/* ---- point: he turns his front arm toward the card the visitor points at (--aim from the row) ---- */
+
+.point .armFront {
+  transform: rotate(var(--aim, -70deg));
+  transition: transform 0.3s ease-out;
+}
+
+.point .upper {
+  transform: rotate(3deg);
+}
+
+/* ---- drum: a roll on the lid, the sticks coming down in turn, one hit every --hit ---- */
+
+.drum .upper {
+  transform: rotate(4deg) translateY(3px);
+}
+
+.drum .armBack {
+  animation: strike-back var(--hit, 0.16s) ease-in-out 6;
+}
+
+.drum .armFront {
+  animation: strike-front var(--hit, 0.16s) ease-in-out calc(var(--hit, 0.16s) / -2) 6;
+}
+
+@keyframes strike-back {
+  0%,
+  100% {
+    transform: rotate(-30deg);
+  }
+  50% {
+    transform: rotate(-58deg);
+  }
+}
+
+@keyframes strike-front {
+  0%,
+  100% {
+    transform: rotate(30deg);
+  }
+  50% {
+    transform: rotate(58deg);
+  }
+}
+
+/* ---- guard: fists up at the chin, knees bent, a short brace as the mask comes ---- */
+
+.guard .armBack,
+.knee .armFront {
+  transform: rotate(24deg);
+}
+
+.guard .armFront {
+  transform: rotate(-24deg);
+}
+
+.guard .foreBack {
+  transform: rotate(-158deg);
+}
+
+.guard .foreFront {
+  transform: rotate(158deg);
+}
+
+.guard .legBack,
+.guard .legFront {
+  transform: scaleY(0.93);
+}
+
+.guard .upper {
+  animation: brace 0.5s ease-out 1;
+  transform: translateY(5px);
+}
+
+@keyframes brace {
+  0%,
+  100% {
+    transform: translateY(5px);
+  }
+  50% {
+    transform: translateY(8px) rotate(-3deg);
+  }
+}
+
+/* ---- knee: the victory knee, the front knee driven up and a fist raised high ---- */
+
+.knee .legFront {
+  animation: knee 0.5s ease-out forwards;
+}
+
+.knee .armBack {
+  transform: rotate(164deg);
+}
+
+.knee .foreFront {
+  transform: rotate(150deg);
+}
+
+.knee .upper {
+  transform: rotate(-5deg);
+}
+
+@keyframes knee {
+  to {
+    transform: rotate(-14deg) scaleY(0.58);
+  }
+}
+
+/* ---- press: the front hand pushed flat onto the monitor ---- */
+
+.press .upper {
+  transform: rotate(6deg);
+}
+
+.press .armFront {
+  animation: press 0.4s ease-out forwards;
+}
+
+@keyframes press {
+  from {
+    transform: rotate(-30deg);
+  }
+  to {
+    transform: rotate(-82deg);
+  }
+}
+
+/* ---- dance: the victory dance, a hip sway with the arms flung wide, ending on a thumb up ---- */
+
+.dance .whole {
+  animation: sway 1.8s ease-in-out forwards;
+}
+
+.dance .armBack {
+  animation: fling-back 1.8s ease-in-out forwards;
+}
+
+.dance .armFront {
+  animation: fling-front 1.8s ease-in-out forwards;
+}
+
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-9deg) translateY(-3px);
+  }
+  40% {
+    transform: rotate(9deg);
+  }
+  60% {
+    transform: rotate(-9deg) translateY(-3px);
+  }
+  80% {
+    transform: scale(1.04, 0.92);
+  }
+}
+
+@keyframes fling-back {
+  0%,
+  40%,
+  80% {
+    transform: rotate(130deg);
+  }
+  20%,
+  60% {
+    transform: rotate(40deg);
+  }
+  100% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes fling-front {
+  0%,
+  40% {
+    transform: rotate(-40deg);
+  }
+  20%,
+  60% {
+    transform: rotate(-130deg);
+  }
+  100% {
+    transform: rotate(-168deg);
+  }
+}
+
+/* ---- hop: a short jump from one pad to the next, or to catch a gem ---- */
+
+.hop .whole {
+  animation: hop 0.6s ease-out 1;
+}
+
+.hop .armBack {
+  transform: rotate(60deg);
+}
+
+.hop .armFront {
+  transform: rotate(-60deg);
+}
+
+@keyframes hop {
+  0% {
+    transform: scale(1.06, 0.9);
+  }
+  45% {
+    transform: translateY(-34px) scale(0.96, 1.06);
+  }
+  85% {
+    transform: translateY(0) scale(1.06, 0.92);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure g,
+  .figure ellipse {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .idle .lid {
+    animation: none !important;
+  }
+
+  .spin .rings {
+    animation: none !important;
+    opacity: 0.95;
+  }
+
+  .point .armFront {
+    transition: none;
+  }
+}

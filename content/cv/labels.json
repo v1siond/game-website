@@ -37,7 +37,8 @@
         "battleInProgress": "Battle animation in progress",
         "contentRevealed": "Content revealed",
         "copyright": "Copyright",
-        "active": "Active"
+        "active": "Active",
+        "findTally": "{found} of {total}"
       },
       "actions": {
         "close": "Close {name}",
@@ -55,7 +56,14 @@
         "linkedin": "LinkedIn",
         "readFile": "Read file",
         "closeFile": "Close file",
-        "streamLink": "Stream link"
+        "streamLink": "Stream link",
+        "again": "Again",
+        "run": "Run",
+        "spin": "Spin",
+        "hit": "Hit",
+        "collect": "Collect {name}",
+        "next": "Next",
+        "save": "Save"
       },
       "links": {
         "website": "Website",
@@ -479,7 +487,8 @@
         "battleInProgress": "Animación de batalla en curso",
         "contentRevealed": "Contenido revelado",
         "copyright": "Derechos de autor",
-        "active": "Activo"
+        "active": "Activo",
+        "findTally": "{found} de {total}"
       },
       "actions": {
         "close": "Cerrar {name}",
@@ -497,7 +506,14 @@
         "linkedin": "LinkedIn",
         "readFile": "Leer archivo",
         "closeFile": "Cerrar archivo",
-        "streamLink": "Enlace para escuchar"
+        "streamLink": "Enlace para escuchar",
+        "again": "Otra vez",
+        "run": "Correr",
+        "spin": "Girar",
+        "hit": "Golpear",
+        "collect": "Recoger {name}",
+        "next": "Siguiente",
+        "save": "Guardar"
       },
       "links": {
         "website": "Sitio web",
@@ -921,7 +937,8 @@
         "battleInProgress": "Animazione della battaglia in corso",
         "contentRevealed": "Contenuto rivelato",
         "copyright": "Copyright",
-        "active": "Attivo"
+        "active": "Attivo",
+        "findTally": "{found} su {total}"
       },
       "actions": {
         "close": "Chiudi {name}",
@@ -939,7 +956,14 @@
         "linkedin": "LinkedIn",
         "readFile": "Leggi il file",
         "closeFile": "Chiudi il file",
-        "streamLink": "Link per ascoltare"
+        "streamLink": "Link per ascoltare",
+        "again": "Ancora",
+        "run": "Corri",
+        "spin": "Gira",
+        "hit": "Colpisci",
+        "collect": "Raccogli {name}",
+        "next": "Avanti",
+        "save": "Salva"
       },
       "links": {
         "website": "Sito web",

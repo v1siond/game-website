@@ -1,0 +1,100 @@
+// Every set piece of the world as data: where he starts, the beats he plays one after another, and the
+// pose he holds once they are over. A beat ends on the animationend of his own rig (stage.tsx), which
+// usePoseSequence turns into the next beat, so the timings here are the only clock. No React here, so
+// the rules are tested alone (choreography.test.ts): a section's scene ends within 5 s, a one shot move
+// under 1 s, the hero's entrance within 3 s, and every scene rests on a held last frame (BD29).
+
+/** His poses, one CSS class each in character.module.css. */
+export const POSES = [
+  'idle',
+  'scratch',
+  'run',
+  'pull',
+  'spin',
+  'hit',
+  'point',
+  'drum',
+  'guard',
+  'knee',
+  'press',
+  'dance',
+  'hop',
+] as const
+
+export type Pose = (typeof POSES)[number]
+
+/** A place on a stage: x in % of its width, lift in % of its height over the ground. */
+export interface Spot {
+  x: number
+  lift: number
+}
+
+export interface Beat {
+  name: string
+  pose: Pose
+  ms: number
+  /** Where he is when the beat ends; the beat moves him there from where the last one ended. */
+  to: Spot
+}
+
+export interface Scene {
+  start: Spot
+  beats: readonly Beat[]
+  /** The pose he holds once the beats are over. */
+  rest: Pose
+}
+
+/** What his rig shows for one step of a scene: a beat moving him, or the rest standing still. */
+export interface Motion {
+  pose: Pose
+  from: Spot
+  to: Spot
+  ms: number
+}
+
+export const sceneMs = (scene: Scene): number => scene.beats.reduce((total, beat) => total + beat.ms, 0)
+
+/** When a beat starts, counted from the start of the scene. */
+export function beatStart(scene: Scene, name: string): number {
+  const index = scene.beats.findIndex((beat) => beat.name === name)
+  return scene.beats.slice(0, Math.max(0, index)).reduce((total, beat) => total + beat.ms, 0)
+}
+
+export const restSpot = (scene: Scene): Spot => scene.beats.at(-1)?.to ?? scene.start
+
+/** The motion of step `index`: the beat playing, or the held rest once every beat has played. */
+export function motionAt(scene: Scene, index: number): Motion {
+  const beat = scene.beats[index]
+  const rest = restSpot(scene)
+  if (!beat) return { pose: scene.rest, from: rest, to: rest, ms: 0 }
+  const from = index === 0 ? scene.start : scene.beats[index - 1].to
+  return { pose: beat.pose, from, to: beat.to, ms: beat.ms }
+}
+
+// The hero: the platform rises, the three pads light in turn, he beams onto the picked pad and the clock
+// ring behind his name glows, all once per page load. A switch replays only his hop and the sphere's swap.
+export const HERO_TIMING = {
+  platform: { at: 0, ms: 700 },
+  pads: { at: 500, step: 220, ms: 420 },
+  beam: { at: 1250, ms: 700 },
+  ring: { at: 1950, ms: 700 },
+  hopMs: 700,
+  swapMs: 600,
+  // He scratches his head when the pointer rests on the scene 1.5 s, at most once every 8 s.
+  scratch: { restMs: 1500, everyMs: 8000, ms: 1200 },
+} as const
+
+export const PAD_COUNT = 3
+
+/** When the hero's entrance has played out: the latest of its parts to end. */
+export function heroEntranceMs(): number {
+  const { platform, pads, beam, ring } = HERO_TIMING
+  const padsEnd = pads.at + (PAD_COUNT - 1) * pads.step + pads.ms
+  return Math.max(platform.at + platform.ms, padsEnd, beam.at + beam.ms, ring.at + ring.ms)
+}
+
+// Muay Thai: the carved mask comes one step toward him per achievement; the game stacks three mask boxes,
+// so a fourth achievement adds no step.
+const MASK_STEP_MAX = 3
+
+export const maskSteps = (achievements: number): number => Math.min(MASK_STEP_MAX, achievements)
