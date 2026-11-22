@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Poiret_One } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { fillLabel } from '@/lib/cv/labels'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { PostsGate } from '@/components/cv/PostsGate'
 import { usePosts } from '@/components/blog/BlogProvider'
@@ -82,7 +82,7 @@ function DecoPosts() {
 export default function ArtDecoTheme() {
   const { active } = useProfession()
   const view = useWorldView()
-  const { navigation, professions, blog } = useLabels()
+  const { navigation, blog } = useLabels()
   const reducedMotion = useReducedMotion()
   const pointer = usePointerVars(!reducedMotion)
   const { zones, stage } = useZoneStore<DecoZone>('surface', reducedMotion)
@@ -115,7 +115,7 @@ export default function ArtDecoTheme() {
         </div>
 
         <main className="relative z-20 px-4 py-16 sm:px-8">
-          <div className="mx-auto max-w-6xl" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+          <ProfessionRegion className="mx-auto max-w-6xl">
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
             <PostsGate>
@@ -129,7 +129,7 @@ export default function ArtDecoTheme() {
                 </FadeInScene>
               </div>
             </PostsGate>
-          </div>
+          </ProfessionRegion>
         </main>
 
         <DepthZone zone="abyss">
