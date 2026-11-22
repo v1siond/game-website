@@ -623,46 +623,21 @@ collections:
                   - { <<: *text, label: "Save hint", name: saveHint }
                   - { <<: *text, label: "Ink ribbons", name: inkRibbons, hint: 'Keep {count}' }
                   - { <<: *text, label: "Saved", name: saved }
-              - label: Time machine world (time travel platformer)
+              - label: Neon Portals world (the era line under each room)
                 name: warp
                 widget: object
                 i18n: true
                 fields:
-                  - { <<: *text, label: "Spin", name: spin }
-                  - { <<: *text, label: "Arrival hint", name: arrivalHint }
-                  - { <<: *text, label: "Fruit count", name: fruitCount, hint: 'Keep {count}' }
-                  - { <<: *text, label: "Mask score", name: maskScore, hint: 'Keep {count}' }
-                  - { <<: *text, label: "Invincible", name: invincible }
-                  - { <<: *text, label: "Level button hint", name: hubHint }
-                  - { <<: *text, label: "Boss door", name: bossDoor }
-                  - { <<: *text, label: "Boss door link", name: toContact }
-                  - { <<: *text, label: "Crystal score", name: crystalScore, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Level hint", name: levelHint }
-                  - { <<: *text, label: "Crate hint", name: crateHint }
-                  - { <<: *text, label: "Body slam", name: bodySlam }
-                  - { <<: *text, label: "TNT crate word", name: tnt }
-                  - { <<: *text, label: "Nitro crate word", name: nitro }
-                  - { <<: *text, label: "Time trial hint", name: trialHint }
-                  - { <<: *text, label: "Start time trial", name: trial, hint: 'Keep {band}' }
-                  - { <<: *text, label: "Relic won", name: relicWon }
-                  - { <<: *text, label: "Relic score", name: relicScore, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Spin kick", name: kick }
-                  - { <<: *text, label: "Boss hint", name: bossHint }
-                  - { <<: *text, label: "Life hint", name: lifeHint }
-                  - { <<: *text, label: "Boss health", name: bossHealth, hint: 'Keep {left} {total}' }
-                  - { <<: *text, label: "Power score", name: powerScore, hint: 'Keep {count} {total}' }
-                  - { <<: *text, label: "Double jump", name: doubleJump }
-                  - { <<: *text, label: "Tornado spin", name: tornadoSpin }
-                  - { <<: *text, label: "Power unlocked", name: powerUnlocked, hint: 'Keep {power}' }
-                  - { <<: *text, label: "Level complete", name: levelComplete }
-                  - { <<: *text, label: "Tally fruit", name: tallyFruit }
-                  - { <<: *text, label: "Tally crates", name: tallyCrates }
-                  - { <<: *text, label: "Tally crystals", name: tallyCrystals }
-                  - { <<: *text, label: "Tally relics", name: tallyRelics }
-                  - { <<: *text, label: "Tally powers", name: tallyPowers }
-                  - { <<: *text, label: "Tally masks", name: tallyMasks }
-                  - { <<: *text, label: "Tally line", name: tallyLine, hint: 'Keep {name} {count} {total}' }
-                  - { <<: *text, label: "Dance again", name: danceAgain }
+                  - { <<: *text, label: "The hub", name: hub }
+                  - { <<: *text, label: "About room era", name: observatory }
+                  - { <<: *text, label: "Work room era", name: speedway }
+                  - { <<: *text, label: "Tech room era", name: forge }
+                  - { <<: *text, label: "Services room era", name: relay }
+                  - { <<: *text, label: "Projects room era", name: sands }
+                  - { <<: *text, label: "Ventures room era", name: keystone }
+                  - { <<: *text, label: "Bands room era", name: arena }
+                  - { <<: *text, label: "Muay Thai room era", name: pavilion }
+                  - { <<: *text, label: "Contact room era", name: beacon }
               - label: Era postcards world (era-postcards)
                 name: eras
                 widget: object
