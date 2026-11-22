@@ -1,4 +1,6 @@
-import type { Band, CVData, Job, MartialArts, Musician, Project, Service, TechCategory } from './content'
+import type { Band, CVData, Job, MartialArts, Musician, ProfessionalSummary, Project, Service, TechCategory } from './content'
+import type { Labels } from './labels'
+import { jobSpan, projectLinks, yearSpan, type ProjectLink } from './sectionText'
 import { DEFAULT_PROFESSION, isProfession, type Profession } from './professions'
 
 // What one world draws for one profession: the recruiter first screen and only that profession's entries.
@@ -142,3 +144,94 @@ export function viewFor(cv: CVData, profession: string, mode: CVViewMode, now: D
     sections: SECTIONS_FOR[picked](cv, KEEP_FOR_MODE[mode](now)),
   }
 }
+
+// The card view models (his 11-10 rule: "We should have the same content across all worlds, only the
+// template changes"). Each carries every field of its entry whole, the lists uncut, and every formatted
+// string from sectionText, so a world renders the fields of its card in its own look and never slices,
+// picks or formats one itself.
+
+export interface JobCard {
+  id: string
+  title: string
+  company: string
+  /** "2019 to 2022", "2023 to Present" (years.range). */
+  years: string
+  location: string
+  description: string
+  highlights: string[]
+  skills: string[]
+}
+
+export interface ProjectCard {
+  id: string
+  name: string
+  role: string
+  /** "Since 2018", "2016 to 2018", "" (yearSpan). */
+  years: string
+  tagline: string
+  description: string
+  impact: string
+  details: string[]
+  techStack: string[]
+  links: ProjectLink[]
+}
+
+export interface VentureCard {
+  id: string
+  name: string
+  tagline: string
+  description: string
+  url: string
+  icon: string
+  services: string[]
+  featured: boolean
+}
+
+export interface AboutBlock {
+  bio: string
+  education: string
+  languages: string
+  highlights: string[]
+}
+
+export const jobCard = (job: Job, years: Labels['years']): JobCard => ({
+  id: job.id,
+  title: job.title,
+  company: job.company,
+  years: jobSpan(job, years),
+  location: job.location,
+  description: job.description,
+  highlights: job.highlights,
+  skills: job.skills,
+})
+
+export const projectCard = (project: Project, labels: Pick<Labels, 'years' | 'links'>): ProjectCard => ({
+  id: project.id,
+  name: project.name,
+  role: project.role,
+  years: yearSpan(project, labels.years),
+  tagline: project.tagline,
+  description: project.description,
+  impact: project.impact,
+  details: project.details,
+  techStack: project.techStack,
+  links: projectLinks(project, labels.links),
+})
+
+export const ventureCard = (company: CVData['companies'][number]): VentureCard => ({
+  id: company.id,
+  name: company.name,
+  tagline: company.tagline,
+  description: company.description,
+  url: company.url,
+  icon: company.icon,
+  services: company.services,
+  featured: Boolean(company.featured),
+})
+
+export const aboutBlock = ({ bio, education, languages, highlights }: ProfessionalSummary): AboutBlock => ({
+  bio,
+  education,
+  languages,
+  highlights,
+})
