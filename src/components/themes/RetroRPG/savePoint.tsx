@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/lib/cv/sectionText'
 import type { Profession } from '@/lib/cv/professions'
-import { ActionOptions } from './actions'
+import { ActionOptions, FOCUS } from './actions'
 import { BODY, Box, Mark, Typed } from './panels'
 import { PIXEL, RPG } from './palette'
 import { usePlay } from './play'
@@ -54,7 +54,7 @@ export function SavePoint({ profession }: { profession: Profession }) {
           <button
             type="button"
             onClick={() => setSaves((n) => n + 1)}
-            className="relative h-14 w-14 p-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--rpg-text)]"
+            className={`relative h-14 w-14 p-1 ${FOCUS}`}
             aria-label={labels.actions.spinStar}
           >
             <span key={saves} className={`block h-full w-full ${saved ? world.saveSpin : ''}`}>

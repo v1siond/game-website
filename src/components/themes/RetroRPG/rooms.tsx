@@ -175,15 +175,24 @@ function Pines() {
   )
 }
 
-/** The bang over the sentry: white pixels in a black bubble. Its place is on the outer group, since the
- * bang's CSS transform would replace an SVG transform attribute on the same element. */
-function Bang({ x, y }: { x: number; y: number }) {
+/** The exclamation mark: white pixels in a black outlined bubble, on a 9 by 12 grid. */
+export function Bang() {
+  return (
+    <>
+      <path d="M2 0 H7 V1 H8 V9 H7 V10 H5 V12 H4 V10 H2 V9 H1 V1 H2 Z" fill={RPG.void} />
+      <rect x={4} y={2} width={1} height={5} fill={RPG.text} />
+      <rect x={4} y={8} width={1} height={1} fill={RPG.text} />
+    </>
+  )
+}
+
+/** The bang over the sentry. Its place is on the outer group, since the bang's CSS transform would replace an
+ * SVG transform attribute on the same element. */
+function SentryBang({ x, y }: { x: number; y: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <g className={rooms.bang}>
-        <path d="M2 0 H7 V1 H8 V9 H7 V10 H5 V12 H4 V10 H2 V9 H1 V1 H2 Z" fill={RPG.void} />
-        <rect x={4} y={2} width={1} height={5} fill={RPG.text} />
-        <rect x={4} y={8} width={1} height={1} fill={RPG.text} />
+        <Bang />
       </g>
     </g>
   )
@@ -204,7 +213,7 @@ export function SentryRoom({ profession, children }: { profession: Profession; c
       <Big sprite={SENTRY} x={256} y={32} className={rooms.sentry} />
       <rect x="236" y="50" width="64" height="20" fill={RPG.wood} />
       <rect x="236" y="50" width="64" height="3" fill={RPG.woodDark} />
-      <Bang x={276} y={14} />
+      <SentryBang x={276} y={14} />
       <Walker profession={profession} className="[--walk-from:-24px] [--walk-ms:1400ms] [--walk-steps:10] [--walk-to:200px] [--walk-y:44px]" />
     </>
   )

@@ -46,7 +46,7 @@ function Tags({ items, label }: { items: string[]; label: string }) {
   )
 }
 
-function Said({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
+function SaidLine({ children, className = '', style }: { children: ReactNode; className?: string; style?: CSSProperties }) {
   return (
     <li className={`flex items-start gap-2 ${BODY} ${className}`} style={style}>
       <Mark />
@@ -87,9 +87,9 @@ export function ExperienceCard({ entry }: { entry: Job }) {
         {entry.highlights.length > 0 && (
           <ul className="space-y-2" aria-label={cards.keyAchievements}>
             {entry.highlights.map((highlight, index) => (
-              <Said key={highlight} className={world.after} style={lineDelay(index)}>
+              <SaidLine key={highlight} className={world.after} style={lineDelay(index)}>
                 {highlight}
-              </Said>
+              </SaidLine>
             ))}
           </ul>
         )}
