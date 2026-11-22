@@ -10,7 +10,7 @@ import { NameWords } from '@/components/cv/NameWords'
 import { HeroCharacter, type SpritePose } from './character'
 import { Layer, pinePath } from './depth'
 import { GROUND, Sky, Soft } from './places'
-import { CVLink, HeroActions, PlayLink } from './actions'
+import { ContactButtons } from './actions'
 import { SHADE, SKY, TYPEWRITER } from './palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import shade from './shade.module.css'
@@ -31,6 +31,9 @@ const WAKE_AT: ReadonlyArray<readonly [WakePhase, number]> = [
   ['title', 1600],
   ['done', 2500],
 ]
+
+// Under his waking line: the hero's actions, the CV, and Enter into the engine.
+const WAKE_SITES = ['cv', 'engine'] as const
 
 const POSE: Record<WakePhase, SpritePose> = {
   dark: 'lie',
@@ -148,9 +151,7 @@ export function WakeHero({ profession }: { profession: Profession }) {
           <div className={`flex flex-col items-center gap-4 px-4 pt-6 ${TEXT_SHOWN(shown)}`}>
             <p className="max-w-xl text-center text-sm tracking-wider text-[color:var(--sh-text)]">{line}</p>
             <nav className="flex flex-wrap items-center justify-center gap-3" aria-label={navigation.contactAndCv}>
-              <HeroActions actions={actions} />
-              <CVLink />
-              <PlayLink />
+              <ContactButtons actions={actions} sites={WAKE_SITES} />
             </nav>
           </div>
         </div>

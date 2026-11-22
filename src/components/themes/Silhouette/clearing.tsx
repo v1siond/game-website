@@ -11,7 +11,7 @@ import { GiantSpider } from './spider'
 import { Layer } from './depth'
 import { GROUND, PROFESSION_SKY, Sky, Soft } from './places'
 import { useCut } from './cut'
-import { CVLink, HeroActions } from './actions'
+import { ContactButtons } from './actions'
 import { SHADE, TYPEWRITER } from './palette'
 import world from './world.module.css'
 import shade from './shade.module.css'
@@ -27,6 +27,9 @@ import shade from './shade.module.css'
 // Animated: the fog, his parts and his run or drop, the two jaws, the layers' lean, the spider.
 
 type Trap = 'ready' | 'run' | 'snap' | 'respawn'
+
+// The clearing offers the CV beside the hero's actions; the engine waits at the forest's edge.
+const CLEARING_SITES = ['cv'] as const
 
 const RUN_MS = 550
 const SNAP_MS = 220
@@ -137,8 +140,7 @@ export function Clearing({ profession }: { profession: Profession }) {
             </h2>
             <p className="max-w-xl text-sm text-[color:var(--sh-muted-text)]">{line}</p>
             <div className="flex flex-wrap items-center justify-center gap-3 lg:justify-start">
-              <HeroActions actions={actions} />
-              <CVLink />
+              <ContactButtons actions={actions} sites={CLEARING_SITES} />
               <button
                 type="button"
                 onClick={spring}
