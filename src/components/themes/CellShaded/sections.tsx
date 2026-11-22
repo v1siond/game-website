@@ -5,9 +5,7 @@ import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { FadeInScene } from '@/components/scroll/ScrollScene'
 import type { SectionsOf } from '@/lib/cv/cvView'
 import type { ProfessionSectionViews } from '@/components/cv/ProfessionSectionsView'
-import { useZoneStage } from '@/hooks/useZoneStage'
-import { Stage, SectionTitle, celHeadingId } from './stage'
-import type { Zone } from './wasteland'
+import { Stage } from './stage'
 import { BountyBoard } from './bountyBoard'
 import { SkillTree } from './skillTree'
 import { LootDrops } from './lootDrops'
@@ -90,16 +88,14 @@ export function MusicianSections({ sections }: { sections: SectionsOf<'drummer'>
   )
 }
 
-// The heavy bag needs the stage's flag to throw its first hits, so this stage is written out here.
+// The heavy bag throws its first hits off the stage's flag.
 export function MartialArtistSections({ sections }: { sections: SectionsOf<'fighter'> }) {
-  const title = useLabels().sections.muayThai
-  const { ref, on } = useZoneStage<Zone>('dusk')
+  const titles = useLabels().sections
 
   return (
-    <section ref={ref} data-on={on || undefined} aria-labelledby={celHeadingId(title)} className={`mb-24 scroll-mt-8 ${cel.stage}`}>
-      <SectionTitle title={title} />
-      <HeavyBag martialArts={sections.martialArts} on={on} />
-    </section>
+    <Stage title={titles.muayThai} zone="dusk">
+      {(on) => <HeavyBag martialArts={sections.martialArts} on={on} />}
+    </Stage>
   )
 }
 
