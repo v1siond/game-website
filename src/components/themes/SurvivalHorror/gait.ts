@@ -1,6 +1,6 @@
 // Leg math for the rig (./rig): where a foot lands for a pair of hip and knee turns, the turns that put a
-// foot on a point, a stepping pose placed by its soles, a gait's stride, how far a figure drops so its lowest
-// foot stands on the floor, and how many steps a walk takes for its distance. Same convention as the rig: viewBox units, y down, a bone drawn hanging straight
+// foot on a point, a stepping pose placed by its soles, a gait's stride, and how many steps a walk takes for
+// its distance. Same convention as the rig: viewBox units, y down, a bone drawn hanging straight
 // down from its pivot, a positive turn clockwise on screen, figures facing right.
 
 import type { Point } from '@/lib/motion/turnAbout'
@@ -88,11 +88,6 @@ export const gaitFor =
     const sweep = (sweepOf(legs.back, from.backLeg, to.backLeg) + sweepOf(legs.front, from.frontLeg, to.frontLeg)) / 2
     return { cycle, stride: toStage(sweep) }
   }
-
-/** How far to lower the figure (viewBox units, negative raises it) so its lowest foot is on `floor`. */
-export function plantedDrop(floor: number, legs: ReadonlyArray<readonly [Leg, LegTurn]>): number {
-  return floor - Math.max(...legs.map(([leg, turn]) => footAt(leg, turn)[1]))
-}
 
 /** How far a planted sole moves under the figure from one contact pose to the next: one step's travel. */
 export function sweepOf(leg: Leg, from: LegTurn, to: LegTurn): number {
