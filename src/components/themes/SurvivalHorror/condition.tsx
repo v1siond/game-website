@@ -1,9 +1,9 @@
 'use client'
 
-import type { CSSProperties } from 'react'
 import type { MartialArts } from '@/lib/cv/content'
 import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { cssVars } from '@/lib/cssVars'
 import { ConditionMonitor } from './ecg'
 import { conditionAfter, useStageState } from './stage'
 import { CORNER_MARKS } from './panels'
@@ -89,11 +89,8 @@ export function HerbRecovery({ martialArts }: { martialArts: MartialArts }) {
           achievements: 'grid gap-3 md:grid-cols-2',
           achievement: 'text-sm text-[color:var(--sh-cream)]',
         }}
-        renderAchievement={(achievement) => (
-          <p
-            className={`relative flex items-start gap-2 p-3 ${look.file} ${horror.stamp} ${fine ? horror.stamped : ''}`}
-            style={{ '--i': martialArts.primary.achievements.indexOf(achievement) } as CSSProperties}
-          >
+        renderAchievement={(achievement, index) => (
+          <p className={`relative flex items-start gap-2 p-3 ${look.file} ${horror.stamp} ${fine ? horror.stamped : ''}`} style={cssVars({ '--i': index })}>
             <span className="mt-1.5 h-2 w-2 shrink-0 rotate-45 bg-[color:var(--sh-herb-green)]" aria-hidden="true" />
             <span>{achievement}</span>
           </p>

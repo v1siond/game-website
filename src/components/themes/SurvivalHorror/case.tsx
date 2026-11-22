@@ -1,12 +1,13 @@
 'use client'
 
-import { useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
+import { useRef, useState, type ReactNode, type RefObject } from 'react'
 import type { Project } from '@/lib/cv/content'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { fillLabel } from '@/lib/cv/labels'
+import { cssVars } from '@/lib/cssVars'
 import { useOnChange } from '@/hooks/useOnChange'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
@@ -166,7 +167,6 @@ function CaseItem({ slot, index }: { slot: ProjectSlot; index: number }) {
 
 export function AttacheCase({ projects }: { projects: Project[] }) {
   const { ref, triggered } = useSectionTrigger({ threshold: 0.1 })
-  const order = new Map(projects.map((project, index) => [project.id, index]))
 
   return (
     <div ref={ref} className={horror.caseHinge}>
@@ -178,9 +178,9 @@ export function AttacheCase({ projects }: { projects: Project[] }) {
           projects={projects}
           className={MASONRY_LIST}
           itemClassName={MASONRY_ITEM}
-          renderProject={(slot) => (
-            <div className={`${horror.cellDrop} ${triggered ? horror.cellDropped : ''}`} style={{ '--i': order.get(slot.project.id) ?? 0 } as CSSProperties}>
-              <CaseItem slot={slot} index={order.get(slot.project.id) ?? 0} />
+          renderProject={(slot, index) => (
+            <div className={`${horror.cellDrop} ${triggered ? horror.cellDropped : ''}`} style={cssVars({ '--i': index })}>
+              <CaseItem slot={slot} index={index} />
             </div>
           )}
         />

@@ -134,12 +134,11 @@ function SuitDoor({ slot, suit }: { slot: BandSlot; suit: Suit }) {
 
 export function SuitDoors({ musician, bands }: { musician: Musician; bands: BandSlot['band'][] }) {
   const { years } = useLabels()
-  const suitOf = new Map(bands.map((band, index) => [band.id, SUITS[index % SUITS.length]]))
 
   return (
     <>
       <p className="mb-6 text-base leading-relaxed text-[color:var(--sh-cream)]">{drumsSince(musician, years)}</p>
-      <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot) => <SuitDoor slot={slot} suit={suitOf.get(slot.band.id) ?? 'spade'} />} />
+      <BandList bands={bands} className={MASONRY_LIST} itemClassName={MASONRY_ITEM} renderBand={(slot, index) => <SuitDoor slot={slot} suit={SUITS[index % SUITS.length]} />} />
       <p className="mt-2 text-sm italic text-[color:var(--sh-cream)]">{musician.line}</p>
     </>
   )
