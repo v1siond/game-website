@@ -137,6 +137,8 @@ interface Inks {
   screen: string
   wrap: string
   band: string
+  // The suit's sheen stroke down the chest.
+  highlight: string
 }
 
 const INKS: Record<DwellerTone, Inks> = {
@@ -156,6 +158,7 @@ const INKS: Record<DwellerTone, Inks> = {
     screen: PHOSPHOR,
     wrap: CREAM_SHADE,
     band: WARNING_RED,
+    highlight: CREAM,
   },
   phosphor: {
     line: PHOSPHOR,
@@ -173,6 +176,7 @@ const INKS: Record<DwellerTone, Inks> = {
     screen: PHOSPHOR,
     wrap: PHOSPHOR_DIM,
     band: PHOSPHOR_DIM,
+    highlight: PHOSPHOR_DIM,
   },
 }
 
@@ -311,7 +315,7 @@ function Torso({ profession, inks }: { profession: Profession; inks: Inks }) {
       <Shape d="M39.5 57 L50 64 L60.5 57 L57.5 54.5 L50 59.5 L42.5 54.5 Z" fill={inks.trim} inks={inks} />
       <Shape d="M33.5 86 L66.5 86 L66.5 91 L33.5 91 Z" fill={inks.suitShade} inks={inks} />
       <Shape d="M46.5 85.5 L53.5 85.5 L53.5 91.5 L46.5 91.5 Z" fill={inks.trim} inks={inks} />
-      <path d="M38 64 Q36 72 37.5 80" fill="none" stroke={CREAM} strokeWidth={1.4} opacity={0.5} strokeLinecap="round" />
+      <path d="M38 64 Q36 72 37.5 80" fill="none" stroke={inks.highlight} strokeWidth={1.4} opacity={0.5} strokeLinecap="round" />
     </g>
   )
 }
