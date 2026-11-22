@@ -75,6 +75,10 @@ export function jobYears(job: Pick<Job, 'startDate' | 'endDate'>, openLabel: str
   return { start: job.startDate.getUTCFullYear(), end: job.endDate ? job.endDate.getUTCFullYear() : openLabel }
 }
 
+/** A job's years in the label: "2019 to 2022", "2023 to Present". */
+export const jobSpan = (job: Pick<Job, 'startDate' | 'endDate'>, years: Labels['years']): string =>
+  fillLabel(years.range, { ...jobYears(job, years.present) })
+
 export interface RecordFact {
   label: string
   value: string
@@ -102,3 +106,4 @@ export function muayThaiFacts({ primary, training, background }: MartialArts, la
 
 /** The id a section heading carries so its region can name it: `section-tech-stack`. */
 export const headingId = (prefix: string, title: string): string => `${prefix}-${title.toLowerCase().replace(/\s+/g, '-')}`
+
