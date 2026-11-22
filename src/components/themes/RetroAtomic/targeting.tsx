@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { memo, useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { ProjectList, type ProjectSlot } from '@/components/cv/ProjectList'
@@ -103,7 +103,9 @@ interface CardProps {
   onFire: (slot: ProjectSlot, trigger: HTMLElement) => void
 }
 
-function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProps) {
+// A memo card: the parent re-renders on every target and shot change, and only the cards whose props
+// changed (the old and the new target) draw again.
+const TargetCard = memo(function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProps) {
   const { hud, cards, links: linkLabels, actions } = useLabels()
   const { project, years, links } = slot
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -168,7 +170,7 @@ function TargetCard({ slot, index, targeted, phase, onTarget, onFire }: CardProp
       </div>
     </article>
   )
-}
+})
 
 function ProjectFile({ slot, onClose }: { slot: ProjectSlot; onClose: () => void }) {
   const { actions, cards } = useLabels()
@@ -262,46 +264,58 @@ function Shooter({ motion }: { motion: DwellerMotion }) {
   )
 }
 
-interface Opened {
-  slot: ProjectSlot
-  trigger: HTMLElement
-}
+type Shot = { id: string; phase: ShotPhase }
 
 export function TargetingSystem({ projects }: { projects: Project[] }) {
   const { points, spend } = useActionPoints()
   const [target, setTarget] = useState<string | null>(null)
-  const [shot, setShot] = useState<{ id: string; phase: ShotPhase } | null>(null)
-  const [opened, setOpened] = useState<Opened | null>(null)
+  const [shot, setShot] = useState<Shot | null>(null)
+  const [opened, setOpened] = useState<ProjectSlot | null>(null)
   const timers = useRef<number[]>([])
+  // The shot in play and the button that opened the file, read by the card callbacks so they stay the
+  // same functions from render to render and the memo cards skip the renders that are not theirs.
+  const playing = useRef<Shot | null>(null)
+  const opener = useRef<HTMLElement | null>(null)
 
   useEffect(() => () => timers.current.forEach((timer) => window.clearTimeout(timer)), [])
 
+  const play = useCallback((next: Shot | null) => {
+    playing.current = next
+    setShot(next)
+  }, [])
+
+  const onTarget = useCallback((id: string | null) => {
+    if (playing.current) return
+    setTarget(id)
+  }, [])
+
   const onFire = useCallback(
     (slot: ProjectSlot, trigger: HTMLElement) => {
-      if (shot) return
+      if (playing.current) return
+      opener.current = trigger
       if (prefersReducedMotion() || !spend()) {
-        setOpened({ slot, trigger })
+        setOpened(slot)
         return
       }
-      setShot({ id: slot.project.id, phase: 'aim' })
+      play({ id: slot.project.id, phase: 'aim' })
       timers.current = SHOT.map(([phase, at]) =>
         window.setTimeout(() => {
           if (phase === 'open') {
-            setShot(null)
-            setOpened({ slot, trigger })
+            play(null)
+            setOpened(slot)
             return
           }
-          setShot({ id: slot.project.id, phase })
+          play({ id: slot.project.id, phase })
         }, at),
       )
     },
-    [shot, spend],
+    [spend, play],
   )
 
   const onClose = useCallback(() => {
-    opened?.trigger.focus()
+    opener.current?.focus()
     setOpened(null)
-  }, [opened])
+  }, [])
 
   const locked = shot?.id ?? target
 
@@ -322,7 +336,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
               index={index}
               targeted={locked === slot.project.id}
               phase={shot?.id === slot.project.id ? shot.phase : null}
-              onTarget={(id) => !shot && setTarget(id)}
+              onTarget={onTarget}
               onFire={onFire}
             />
           )}
@@ -331,7 +345,7 @@ export function TargetingSystem({ projects }: { projects: Project[] }) {
       <span className={`pointer-events-none fixed inset-x-0 top-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxTop}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-x-0 bottom-0 z-[70] h-[12vh] bg-atomic-ink ${atomic.letterboxBottom}`} data-on={shot ? 'on' : undefined} aria-hidden="true" />
       <span className={`pointer-events-none fixed inset-0 z-[71] bg-atomic-cream ${atomic.shotFlash}`} data-on={shot?.phase === 'hit' ? 'on' : undefined} aria-hidden="true" />
-      {opened && <ProjectFile slot={opened.slot} onClose={onClose} />}
+      {opened && <ProjectFile slot={opened} onClose={onClose} />}
     </div>
   )
 }
