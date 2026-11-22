@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { PROFESSION_ORDER, type Profession } from '@/lib/cv/professions'
 import { cssVars } from '@/lib/cssVars'
 import { CompassRose } from './icons'
@@ -122,8 +122,9 @@ const LANDMARKS: Record<Profession, { art: ReactNode; lift: number }> = {
 }
 
 /** The island, its scenery, the landmarks, the trails and the tiles, with the fall washes laid over the
- *  summer ones (hidden until the map turns, see .fall). */
-export function HubMapArt() {
+ *  summer ones (hidden until the map turns, see .fall). It takes no props, so memo keeps the whole map
+ *  out of the hub's renders (his walk, the dive, the name box). */
+export const HubMapArt = memo(function HubMapArt() {
   return (
     <svg viewBox={`0 0 ${HUB.width} ${HUB.height}`} className="block h-auto w-full" aria-hidden="true" focusable="false">
       <rect width={HUB.width} height={HUB.height} fill="url(#ap-paper)" />
@@ -215,7 +216,7 @@ export function HubMapArt() {
       <Cloud x={800} y={150} s={0.8} i={1} depth="10px" />
     </svg>
   )
-}
+})
 
 export function HubCompass() {
   return <CompassRose className="h-12 w-12 sm:h-16 sm:w-16" />
