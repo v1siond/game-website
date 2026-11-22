@@ -104,20 +104,25 @@
 
 /* ---- the condition screen (ecg.tsx) ---- */
 
+/* The trace runs as many beats as fit in 5 s at his condition's pace, then rests (the strip is seamless,
+   so its rest is a still trace). */
 .ecgTrace {
-  animation: ecg 1.6s linear infinite;
+  animation: ecg 1.6s linear 3;
 }
 
 .ecgFine {
   animation-duration: 1.6s;
+  animation-iteration-count: 3;
 }
 
 .ecgCaution {
   animation-duration: 1.1s;
+  animation-iteration-count: 4;
 }
 
 .ecgDanger {
   animation-duration: 0.7s;
+  animation-iteration-count: 7;
 }
 
 @keyframes ecg {
@@ -130,7 +135,7 @@
 }
 
 .conditionFlash {
-  animation: condition-flash 1.2s steps(1, end) infinite;
+  animation: condition-flash 1.2s steps(1, end) 4;
 }
 
 @keyframes condition-flash {
@@ -173,7 +178,7 @@
 }
 
 .youAreHere {
-  animation: here 1s ease-in-out infinite;
+  animation: here 1s ease-in-out 4;
 }
 
 @keyframes here {

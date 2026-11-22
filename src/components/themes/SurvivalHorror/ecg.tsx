@@ -1,10 +1,13 @@
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import look from './world.module.css'
 import horror from './horror.module.css'
 
 // The genre's condition screen: an ECG trace running across a black monitor, its colour and its word saying
 // how he is (Fine, Caution, Danger), the word always printed so the colour is never the only signal. The trace
-// is drawn twice side by side and slides one width per beat cycle, faster the worse he is. Animated: the trace.
+// is drawn twice side by side and slides one width per beat cycle, faster the worse he is. Animated: the trace
+// and the warning word, once the monitor is seen, for as many beats as fit in 5 s; each new condition (a
+// herb taken) plays them once more, then the trace rests still and the word steady.
 
 export type Condition = 'fine' | 'caution' | 'danger'
 
@@ -24,15 +27,18 @@ const CONDITION_LOOK: Record<Condition, { text: string; stroke: string; speed: s
 export function ConditionMonitor({ condition, className = '' }: { condition: Condition; className?: string }) {
   const { horror: words } = useLabels()
   const state = CONDITION_LOOK[condition]
+  const { ref, triggered } = useSectionTrigger({ threshold: 0.5 })
+  const trace = triggered ? `${horror.ecgTrace} ${state.speed}` : ''
+  const flash = triggered && condition !== 'fine' ? horror.conditionFlash : ''
 
   return (
-    <div className={`border border-[color:var(--sh-sepia)] bg-[color:var(--sh-monitor)] p-3 ${className}`} role="status">
+    <div ref={ref} className={`border border-[color:var(--sh-sepia)] bg-[color:var(--sh-monitor)] p-3 ${className}`} role="status">
       <p className={`flex items-baseline justify-between gap-3 text-sm uppercase ${look.typed}`}>
         <span className="text-[color:var(--sh-fog-text)]">{words.condition}</span>
-        <span className={`${state.text} ${condition === 'fine' ? '' : horror.conditionFlash}`}>{words[condition]}</span>
+        <span key={condition} className={`${state.text} ${flash}`}>{words[condition]}</span>
       </p>
       <div className="mt-2 h-10 overflow-hidden" aria-hidden="true">
-        <svg viewBox="0 0 200 32" preserveAspectRatio="none" className={`h-full w-[200%] ${horror.ecgTrace} ${state.speed}`} focusable="false">
+        <svg key={condition} viewBox="0 0 200 32" preserveAspectRatio="none" className={`h-full w-[200%] ${trace}`} focusable="false">
           <path d={TRACE} fill="none" stroke={state.stroke} strokeWidth={1.4} vectorEffect="non-scaling-stroke" />
         </svg>
       </div>
