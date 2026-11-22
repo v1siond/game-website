@@ -1131,23 +1131,17 @@ export default function DarkFantasyTheme() {
             <div className="max-w-4xl mx-auto text-center">
               {/* The lines sit on a void plate, its edge feathered into the hall, so the lamps lit behind them never
                   take the words under AAA. */}
-              <div className="mx-auto w-fit max-w-full rounded-lg bg-[#0f0a1a]/90 px-4 py-3 shadow-[0_0_48px_24px_rgba(15,10,26,0.9)] md:px-8">
-                <h1
-                  className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3"
-                  style={{ color: DARK_FANTASY.bone, textShadow: `0 0 20px ${DARK_FANTASY.ethereal}30` }}
-                >
+              <div className="mx-auto w-fit max-w-full rounded-lg bg-[color-mix(in_srgb,var(--df-void)_90%,transparent)] px-4 py-3 shadow-[0_0_48px_24px_color-mix(in_srgb,var(--df-void)_90%,transparent)] md:px-8">
+                <h1 className="text-[clamp(1.25rem,7vw,2.25rem)] tracking-[0.15em] uppercase mb-3 text-[color:var(--df-bone)] [text-shadow:0_0_20px_color-mix(in_srgb,var(--df-ethereal)_19%,transparent)]">
                   <NameWords name={name} />
                 </h1>
-                <p className="text-sm md:text-lg tracking-wider mb-2" style={{ color: DARK_FANTASY.silverText }}>
+                <p className="text-sm md:text-lg tracking-wider mb-2 text-[color:var(--df-silver-text)]">
                   {headline}
                 </p>
-                <p
-                  className="text-sm tracking-wider italic"
-                  style={{ color: DARK_FANTASY.spiritGold, textShadow: `0 0 10px ${DARK_FANTASY.spiritGold}40` }}
-                >
+                <p className="text-sm tracking-wider italic text-[color:var(--df-spirit-gold)] [text-shadow:0_0_10px_color-mix(in_srgb,var(--df-spirit-gold)_25%,transparent)]">
                   {tagline}
                 </p>
-                <p className="text-sm mt-2" style={{ color: DARK_FANTASY.bone }}>{line}</p>
+                <p className="text-sm mt-2 text-[color:var(--df-bone)]">{line}</p>
               </div>
               <div className="flex flex-wrap gap-3 justify-center mt-4">
                 <HeroActions actions={actions} />
