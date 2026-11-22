@@ -89,7 +89,7 @@ function Station({ slot, tuned, onTune }: { slot: BandSlot; tuned: boolean; onTu
 
   if (!linkProps) {
     return (
-      <article className={frame} tabIndex={0} {...tune}>
+      <article className={frame} tabIndex={0} aria-label={band.name} {...tune}>
         {body}
       </article>
     )
