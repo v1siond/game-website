@@ -29,7 +29,7 @@ picked profession, then a contact corner. What the sections hold comes from `vie
 
 The titles a world prints may wear its look, but stay plain and professional. Section text that every world
 formats the same way (year spans, job years, project links, the Muay Thai facts, heading ids) comes from
-`src/components/cv/sectionText.ts`.
+`src/lib/cv/sectionText.ts`.
 
 ## What is cut in a world
 

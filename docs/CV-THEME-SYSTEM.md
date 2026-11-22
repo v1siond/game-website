@@ -11,8 +11,10 @@ world only adds its own look: its palette, its art and its scenes. The default w
   `src/themes/themes.ts`). `?capture=<id>` forces a world for the preview screenshot script.
 - The server always renders the default world, in full: its hero, sections and every CV string are in the
   HTML a fresh visitor and every crawler get. Only its browser parts start on the client: the hub map's
-  entrance timeline (the server draws it rolled up, shown at rest under reduced motion), his walk on
-  the trail and the pointer tilt. The default world must never sit behind a whole page mounted gate
+  entrance timeline, his walk on the trail and the pointer tilt. The entrance hides its pieces only under
+  `data-intro` on `<html>`, which an inline script (`src/themes/introFlag.ts`) sets before the first paint
+  when JavaScript runs and motion is allowed, so with no JavaScript or under reduced motion the server HTML
+  is the finished map. The default world must never sit behind a whole page mounted gate
   (most other worlds have one, so a world becomes the default only after that gate is moved to its
   decoration), and SVG trig values go through
   `svgNumber` (`src/components/themes/shared/svgNumber.ts`) so the server and the browser print the same
@@ -171,7 +173,7 @@ Artistic.
 There are three professions: System Engineer (`engineer`, the default), Musician (`drummer`) and Martial
 Artist (`fighter`), listed in `src/lib/cv/professions.ts`.
 
-`viewFor(cv, profession, mode)` in `src/lib/cv/cvView.ts` builds what a world renders:
+`viewFor(cv, profession, mode, year)` in `src/lib/cv/cvView.ts` builds what a world renders:
 
 | Profession | Sections it gets |
 |------------|------------------|
@@ -179,11 +181,13 @@ Artist (`fighter`), listed in `src/lib/cv/professions.ts`.
 | drummer | the musician block and every band |
 | fighter | the Muay Thai record |
 
-In a world (`mode: 'world'`) jobs and projects are cut to the last 5 years (`RECENT_WORK_YEARS`), plus any
-current entry and any entry with the `highlight` toggle on. Bands and the martial arts record are always
-whole. `/cv` reads the full CV and shows everything. Worlds get their view through `useWorldView()` in
-`src/components/cv/CVDataProvider.tsx`, and `ProfessionSectionsView` picks the world's section component for
-the shown profession from the world's map.
+In a world (`mode: 'world'`) jobs and projects are cut to the last 5 years (`RECENT_WORK_YEARS`) counted back
+from `year`, plus any current entry and any entry with the `highlight` toggle on. Bands and the martial arts
+record are always whole. `/cv` reads the full CV on the server and shows everything. A world reads
+`WorldCV` (`worldCV` in `src/lib/cv/content.ts`: the CV without what only `/cv` prints) through
+`useCVData()`, and its view through `useWorldView()`, both from `src/components/cv/CVDataProvider.tsx`,
+which runs `viewFor` once for the picked profession and the year from `useYearNow`. `ProfessionSectionsView`
+picks the world's section component for the shown profession from the world's map.
 
 The ventures (`companies`) come in one order everywhere: `venturesFor` in `cvView.ts` puts his own products
 first (the `featured` toggle in companies.json, Nebulith and Sillabo), then the rest, each group in file
@@ -198,10 +202,13 @@ medal in Art Deco, whose cord columns stay three.
 | Piece | File | What it does |
 |-------|------|--------------|
 | ScrollScene, FadeInScene | `src/components/scroll/ScrollScene.tsx` | A section whose scene follows scroll: writes `--scene-progress` (0 to 1) so children animate with classes, no React re-render. FadeInScene is the plain fade block between levels. |
-| HERO_IDENTITY | `src/components/cv/heroIdentity.ts` | The only shared part of his character: skin, short dark hair, full dark beard, oval eyes. Each world maps these into its own palette. |
-| sectionText | `src/components/cv/sectionText.ts` | Shared text: project links, year spans, job years, Muay Thai facts, heading ids. |
+| HERO_IDENTITY | `src/lib/cv/heroIdentity.ts` | The only shared part of his character: skin, short dark hair, full dark beard, oval eyes. Each world maps these into its own palette. |
+| sectionText | `src/lib/cv/sectionText.ts` | Shared text: project links, year spans, job years, `jobSpan` ("2019 to 2022") and `jobSpanCompact` ("2019 - 2022"), Muay Thai facts, heading ids. |
+| jobCard, projectCard, ventureCard, aboutBlock | `src/lib/cv/cvView.ts` | The card view models: every field of a job, project, venture or the About block whole, with its strings formatted, so each world renders the same content in its own look. |
+| VentureList | `src/components/cv/VentureList.tsx` | The ventures without a look, in `viewFor`'s order, each with its link props and accessible names. |
+| FindProvider, useFind, useFindCount, useRolling | `src/components/themes/shared/finds.tsx`, `src/lib/finds.ts` | The find counter: `find(id, group)` marks a find, `useFindCount(group)` gives found and total, `useRolling` climbs the shown number; the reducer is in `src/lib/finds.ts`. |
 | RecruiterHero, ProfessionSwitch, ProfessionSectionsView | `src/components/cv/` | The hero, the profession switch, the per profession dispatch. |
-| useReducedMotion, useScrollScene, useSectionTrigger, useZoneStage | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the zone in view handed to a page whose backdrop follows it. |
+| useReducedMotion, useScrollScene, useSectionTrigger, useZoneStage, useYearNow | `src/hooks/` | The one reduced motion check, the scroll progress, the one shot reveal trigger, the zone in view handed to a page whose backdrop follows it, the year a footer prints (the server's until hydration, then the visitor's, in UTC). |
 | paletteVars | `src/components/themes/shared/paletteVars.ts` | Turns a palette into CSS variables (`paletteVars('tp', { leafDark })` sets `--tp-leaf-dark`). |
 | GlobalProfessionStage | `src/components/themes/shared/professionStage.tsx` | A recoloured profession stage for worlds that draw none of their own. |
 
