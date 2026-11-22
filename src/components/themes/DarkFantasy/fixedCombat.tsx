@@ -2,6 +2,7 @@
 
 import type { CSSProperties, ReactNode } from 'react'
 import type { SectionTriggerOptions } from '@/hooks/useSectionTrigger'
+import battle from './battle.module.css'
 
 /**
  * Continuous in-view signal for the combat stages, read through the shared useSectionTrigger.
@@ -53,14 +54,18 @@ export const COMBAT_GROUND = 'bottom-[var(--ground)]'
  * their places relative to each other, their feet stay on the screen, and they fight on its floor, under the
  * last line of the page.
  */
-export function FixedCombatLayer({ inView, children }: { inView: boolean; children: ReactNode }) {
+export function FixedCombatLayer({ inView, shake = false, children }: { inView: boolean; shake?: boolean; children: ReactNode }) {
+  // `shake` plays the battle's screen shake on an outer viewport box of its own: a transform on any ancestor
+  // would turn this fixed layer into a box of that ancestor and throw the fighters out of their corners, and on
+  // the layer itself it would be shrunk with it below lg.
   return (
-    <div
-      className={`pointer-events-none fixed inset-0 ${COMBAT_Z.fighters} origin-bottom translate-y-[calc(var(--phone-scale)*var(--ground))] scale-[var(--phone-scale)] lg:translate-y-0 lg:scale-100`}
-      style={{ '--phone-scale': COMBAT_PHONE_SCALE, '--ground': GROUND_HEIGHT, opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' } as CSSProperties}
-      aria-hidden="true"
-    >
-      {children}
+    <div className={`pointer-events-none fixed inset-0 ${COMBAT_Z.fighters} ${shake ? battle.shaking : ''}`} aria-hidden="true">
+      <div
+        className="pointer-events-none fixed inset-0 origin-bottom translate-y-[calc(var(--phone-scale)*var(--ground))] scale-[var(--phone-scale)] lg:translate-y-0 lg:scale-100"
+        style={{ '--phone-scale': COMBAT_PHONE_SCALE, '--ground': GROUND_HEIGHT, opacity: inView ? 1 : 0, transition: 'opacity 350ms ease-out' } as CSSProperties}
+      >
+        {children}
+      </div>
     </div>
   )
 }

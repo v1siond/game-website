@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, memo } from 'react'
 import { useMediaQuery } from '@/hooks/useMediaQuery'
+import { usePointerVars } from '@/hooks/usePointerVars'
 import { DARK_FANTASY } from './palette'
 
 /**
@@ -10,7 +11,7 @@ import { DARK_FANTASY } from './palette'
  *
  * GPU-optimized interactive animations:
  * - CursorTrail: Ethereal particles that follow cursor movement
- * - ParallaxLayers: Background depth effect on mouse move
+ * - ParallaxLayers: Background depth effect on mouse move, read from --mx and --my (usePointerVars)
  *
  * All animations use only transform and opacity for 60fps performance.
  */
@@ -102,38 +103,20 @@ export const CursorTrail = memo(function CursorTrail() {
 // ============================================
 // PARALLAX BACKGROUND LAYERS
 // ============================================
-// Subtle depth effect on mouse movement
+// Subtle depth effect on mouse movement. The mouse's place from the screen centre (-1 to 1) moves the near layer
+// up to 20px across and 15px down, the mid layer 0.6 of that and the deep layer 0.3, all in CSS: a move writes
+// two custom properties and renders nothing. A finger dragging on a tablet leaves the layers still.
 
 export const ParallaxLayers = memo(function ParallaxLayers() {
-  const [offset, setOffset] = useState({ x: 0, y: 0 })
   const isVisible = useMediaQuery(WIDER_THAN_MOBILE)
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      const centerX = window.innerWidth / 2
-      const centerY = window.innerHeight / 2
-      const x = (e.clientX - centerX) / centerX
-      const y = (e.clientY - centerY) / centerY
-
-      setOffset({ x: x * 20, y: y * 15 })
-    }
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true })
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+  const pointerRef = usePointerVars(isVisible, { mouseOnly: true })
 
   if (!isVisible) return null
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
+    <div ref={pointerRef} className="fixed inset-0 pointer-events-none z-[1] overflow-hidden" aria-hidden="true">
       {/* Deep background layer - moves slowest */}
-      <div
-        className="absolute inset-0"
-        style={{
-          transform: `translate(${offset.x * 0.3}px, ${offset.y * 0.3}px)`,
-          transition: 'transform 0.3s ease-out',
-        }}
-      >
+      <div className="absolute inset-0 [transform:translate(calc(var(--mx,0)*6px),calc(var(--my,0)*4.5px))] [transition:transform_0.3s_ease-out]">
         {/* Distant ethereal orbs */}
         {[
           { x: '10%', y: '20%', size: 100, color: DARK_FANTASY.ethereal, opacity: 0.05 },
@@ -157,13 +140,7 @@ export const ParallaxLayers = memo(function ParallaxLayers() {
       </div>
 
       {/* Mid layer - moves medium */}
-      <div
-        className="absolute inset-0"
-        style={{
-          transform: `translate(${offset.x * 0.6}px, ${offset.y * 0.6}px)`,
-          transition: 'transform 0.2s ease-out',
-        }}
-      >
+      <div className="absolute inset-0 [transform:translate(calc(var(--mx,0)*12px),calc(var(--my,0)*9px))] [transition:transform_0.2s_ease-out]">
         {/* Floating dust motes */}
         {[
           { x: '15%', y: '25%', size: 3 },
@@ -189,13 +166,7 @@ export const ParallaxLayers = memo(function ParallaxLayers() {
       </div>
 
       {/* Near layer - moves most */}
-      <div
-        className="absolute inset-0"
-        style={{
-          transform: `translate(${offset.x}px, ${offset.y}px)`,
-          transition: 'transform 0.1s ease-out',
-        }}
-      >
+      <div className="absolute inset-0 [transform:translate(calc(var(--mx,0)*20px),calc(var(--my,0)*15px))] [transition:transform_0.1s_ease-out]">
         {/* Close floating particles */}
         {[
           { x: '5%', y: '40%', size: 2, color: DARK_FANTASY.spiritGold },

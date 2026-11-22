@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo, memo } from 'react'
+import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
-import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
+import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero, type HeroActionSlot } from '@/components/cv/RecruiterHero'
 import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import type { SiteLinkId } from '@/lib/cv/siteLinks'
@@ -13,8 +13,10 @@ import { MuayThaiRecord } from '@/components/cv/MuayThaiRecord'
 import type { Profession } from '@/lib/cv/professions'
 import type { CVData, Job, Service } from '@/lib/cv/content'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
+import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
@@ -23,7 +25,8 @@ import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacter'
 import { BugPullReveal } from './DarkFantasy/BugCreature'
 import { BattleReveal } from './DarkFantasy/BattleReveal'
-import { drumsSince, headingId, jobYears, newTabName } from '@/lib/cv/sectionText'
+import { drumsSince, headingId, newTabName } from '@/lib/cv/sectionText'
+import { aboutBlock, jobCard, projectCard, ventureCard } from '@/lib/cv/cvView'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
@@ -36,9 +39,10 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
 const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
 
-// Abstract spirit wisp - optimized: no SVG filter
+// Abstract spirit wisp - optimized: no SVG filter. Each wisp owns its gradient id, so the nav's wisp, hidden
+// below sm, never holds the gradient another wisp's url(#id) resolves to.
 const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.ethereal }: { size?: number; color?: string }) {
-  const gradId = `wispGlow-${color?.replace('#', '')}`
+  const gradId = `${useId()}wisp`
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true" role="presentation">
       <defs>
@@ -70,10 +74,12 @@ const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.et
 // Mechanical gear
 const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: number }) {
   const teeth = 12
+  // Each gear owns its brass gradient id (useId), the same reason as the wisp's.
+  const brassId = `${useId()}brass`
   return (
     <svg width={size} height={size} viewBox="0 0 50 50" aria-hidden="true" role="presentation">
       <defs>
-        <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={brassId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={DARK_FANTASY.brass} />
           <stop offset="100%" stopColor={DARK_FANTASY.copper} />
         </linearGradient>
@@ -97,12 +103,12 @@ const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: numb
           <path
             key={i}
             d={`M${x1},${y1} L${x2},${y2} L${x3},${y3} L${x4},${y4}`}
-            fill="url(#brassGrad)"
+            fill={`url(#${brassId})`}
           />
         )
       })}
       {/* Inner ring */}
-      <circle cx="25" cy="25" r="16" fill="none" stroke="url(#brassGrad)" strokeWidth="3" />
+      <circle cx="25" cy="25" r="16" fill="none" stroke={`url(#${brassId})`} strokeWidth="3" />
       {/* Center hole */}
       <circle cx="25" cy="25" r="6" fill={DARK_FANTASY.voidDeep} stroke={DARK_FANTASY.brass} strokeWidth="1" />
       {/* Decorative spokes */}
@@ -262,7 +268,22 @@ const GothicChandelier = memo(function GothicChandelier() {
 })
 
 // Stone/crystal formations
+// The spikes and moss are placed once per mount, so a re-render never moves a stone.
+const STONE_SPIKES = 20
+const MOSS_X = [100, 350, 650, 850]
+const placeStones = () => ({
+  spikes: Array.from({ length: STONE_SPIKES }, (_, i) => ({
+    x: i * 50 + 25 + (Math.random() - 0.5) * 20,
+    height: 25 + Math.random() * 35,
+    width: 8 + Math.random() * 8,
+    lean: (Math.random() - 0.5) * 10,
+    isCrystal: i % 4 === 0,
+  })),
+  moss: MOSS_X.map((x) => ({ x, rx: 30 + Math.random() * 20 })),
+})
+
 const StoneFormations = memo(function StoneFormations() {
+  const [{ spikes, moss }] = useState(placeStones)
   return (
     <svg
       className="fixed bottom-0 left-0 w-full h-32 opacity-60 pointer-events-none z-[6]"
@@ -278,12 +299,7 @@ const StoneFormations = memo(function StoneFormations() {
       />
 
       {/* Crystal/stone spikes - irregular, weathered */}
-      {Array.from({ length: 20 }, (_, i) => {
-        const x = i * 50 + 25 + (Math.random() - 0.5) * 20
-        const height = 25 + Math.random() * 35
-        const width = 8 + Math.random() * 8
-        const lean = (Math.random() - 0.5) * 10
-        const isCrystal = i % 4 === 0
+      {spikes.map(({ x, height, width, lean, isCrystal }, i) => {
         return (
           <g key={i}>
             <path
@@ -308,12 +324,12 @@ const StoneFormations = memo(function StoneFormations() {
       })}
 
       {/* Moss/organic growth patches */}
-      {[100, 350, 650, 850].map((x, i) => (
+      {moss.map(({ x, rx }, i) => (
         <ellipse
           key={i}
           cx={x}
           cy={90}
-          rx={30 + Math.random() * 20}
+          rx={rx}
           ry={8}
           fill={DARK_FANTASY.mossGreen}
           opacity="0.3"
@@ -462,11 +478,12 @@ const VoidDepths = memo(function VoidDepths() {
   )
 })
 
-// Combined atmosphere layer - NO chandelier here (it's in header now)
-const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere() {
+// Combined atmosphere layer - NO chandelier here (it's in header now). The stones are placed at random, so they
+// wait for the mount.
+const DarkFantasyAtmosphere = memo(function DarkFantasyAtmosphere({ mounted }: { mounted: boolean }) {
   return (
     <div className="fixed inset-0 pointer-events-none z-[3] contain-strict" aria-hidden="true" role="presentation">
-      <StoneFormations />
+      {mounted && <StoneFormations />}
 
       {/* Central ethereal glow - no blur filter for performance */}
       <div
@@ -950,19 +967,21 @@ const TechCloud = memo(function TechCloud({ categories }: { categories: CVData['
   )
 })
 
-// Project card - his role, the years, the result and the links
-const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } }: { slot: ProjectSlot }) {
-  const { cards } = useLabels()
+// Project card: every field of the project's card, and the links with their names from the slot.
+const ProjectCard = memo(function ProjectCard({ slot: { project: entry, links } }: { slot: ProjectSlot }) {
+  const labels = useLabels()
+  const { cards } = labels
+  const project = projectCard(entry, labels)
   return (
     <article
       className="h-full p-4 transition-transform hover:scale-[1.02] group"
       style={{
         background: `linear-gradient(135deg, ${DARK_FANTASY.void}, ${DARK_FANTASY.voidPurple})`,
-        border: `1px solid ${project.featured ? DARK_FANTASY.spiritGold : DARK_FANTASY.stoneDark}`,
+        border: `1px solid ${entry.featured ? DARK_FANTASY.spiritGold : DARK_FANTASY.stoneDark}`,
         borderRadius: '4px',
       }}
     >
-      {project.featured && (
+      {entry.featured && (
         <span className="text-sm tracking-[0.15em] uppercase" style={{ color: DARK_FANTASY.spiritGold }}>
           <span aria-hidden="true">* </span>{cards.featured}
         </span>
@@ -972,23 +991,28 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
       </h3>
       <p className="text-sm mt-1" style={{ color: DARK_FANTASY.ethereal }}>
         {project.role}
-        {years && <span aria-hidden="true"> | </span>}
-        {years}
+        {project.years && <span aria-hidden="true"> | </span>}
+        {project.years}
       </p>
       <p className="text-sm mt-2" style={{ color: DARK_FANTASY.silverText }}>{project.tagline}</p>
+      {project.description && <p className="text-sm mt-2 text-[color:var(--df-silver-text)]">{project.description}</p>}
+      {project.details.length > 0 && (
+        <ul className="space-y-1 mt-2" aria-label={cards.details}>
+          {project.details.map((detail) => (
+            <li key={detail} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
+              <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
+              {detail}
+            </li>
+          ))}
+        </ul>
+      )}
       {project.impact && (
         <p className="text-sm mt-2 italic" style={{ color: DARK_FANTASY.bone }}>
           <span aria-hidden="true">- </span>
           <span className="sr-only">{cards.impact}: </span>{project.impact}
         </p>
       )}
-      <div className="flex flex-wrap gap-1 mt-3" role="list" aria-label={cards.technologiesUsed}>
-        {project.techStack.map((tech) => (
-          <span key={tech} role="listitem" className="text-sm px-1 py-0.5" style={{ background: `${DARK_FANTASY.ethereal}12`, color: DARK_FANTASY.silverText }}>
-            {tech}
-          </span>
-        ))}
-      </div>
+      <TagList label={cards.technologiesUsed} tags={project.techStack} className="mt-3" />
       {links.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-3">
           {links.map(({ kind, label, linkProps }) => (
@@ -1009,8 +1033,9 @@ const ProjectCard = memo(function ProjectCard({ slot: { project, years, links } 
 // Company card
 // His own products (featured) take the first row two to a row, a wider card with a gold plaque over
 // the name; the other ventures follow three to a row.
-const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['companies'][number] }) {
-  const { links, cards } = useLabels()
+const CompanyCard = memo(function CompanyCard({ company: entry }: { company: CVData['companies'][number] }) {
+  const { links, cards, sections } = useLabels()
+  const company = ventureCard(entry)
   return (
     <a
       href={company.url}
@@ -1039,6 +1064,7 @@ const CompanyCard = memo(function CompanyCard({ company }: { company: CVData['co
         </div>
       </div>
       <p className="text-sm" style={{ color: DARK_FANTASY.silverText }}>{company.description}</p>
+      {company.services.length > 0 && <TagList label={sections.services} tags={company.services} className="mt-3" />}
     </a>
   )
 })
@@ -1081,30 +1107,44 @@ const BandCard = memo(function BandCard({ band, years, linkProps, release }: Ban
   )
 })
 
-// Work experience card. Dates are date only strings (UTC midnight), so the year is read in UTC: a
-// January start keeps its own year west of UTC.
+// A row of tags in the soul light, the look the project cards give their technologies (the ethereal at alpha
+// 0x12, 18 of 255).
+function TagList({ label, tags, className = '' }: { label: string; tags: string[]; className?: string }) {
+  return (
+    <ul className={`flex flex-wrap gap-1 ${className}`} aria-label={label}>
+      {tags.map((tag) => (
+        <li key={tag} className="text-sm px-1 py-0.5 bg-[color-mix(in_srgb,var(--df-ethereal)_7.0588%,transparent)] text-[color:var(--df-silver-text)]">
+          {tag}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+// Work experience card: every field of the job's card, the years in the label ("2019 to 2022").
 const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: Job; isLast?: boolean }) {
   const { years, cards } = useLabels()
-  const { start: startDisplay, end: endDisplay } = jobYears(entry, years.present)
+  const job = jobCard(entry, years)
 
   return (
     <article className="py-4">
       <div className="flex justify-between items-start mb-2 flex-wrap gap-2">
         <div className="min-w-0">
-          <h3 className="text-lg font-medium" style={{ color: DARK_FANTASY.bone }}>{entry.title}</h3>
-          <p className="text-sm" style={{ color: DARK_FANTASY.ethereal }}><SlashBreaks text={entry.company} /></p>
+          <h3 className="text-lg font-medium" style={{ color: DARK_FANTASY.bone }}>{job.title}</h3>
+          <p className="text-sm" style={{ color: DARK_FANTASY.ethereal }}><SlashBreaks text={job.company} /></p>
+          {job.location && <p className="text-sm text-[color:var(--df-silver-text)]">{job.location}</p>}
         </div>
         <span
           className="text-sm"
           style={{ color: DARK_FANTASY.spiritGold }}
         >
-          <time>{startDisplay}</time> - <time>{endDisplay}</time>
+          {job.years}
         </span>
       </div>
-      {entry.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{entry.description}</p>}
-      {entry.highlights.length > 0 && (
+      {job.description && <p className="text-sm mb-2" style={{ color: DARK_FANTASY.silverText }}>{job.description}</p>}
+      {job.highlights.length > 0 && (
         <ul className="space-y-1" aria-label={cards.keyAchievements}>
-          {entry.highlights.map((highlight) => (
+          {job.highlights.map((highlight) => (
             <li key={highlight} className="text-sm flex items-start gap-2" style={{ color: DARK_FANTASY.bone }}>
               <span style={{ color: DARK_FANTASY.spiritGold }} aria-hidden="true">*</span>
               {highlight}
@@ -1112,6 +1152,7 @@ const ExperienceCard = memo(function ExperienceCard({ entry, isLast }: { entry: 
           ))}
         </ul>
       )}
+      {job.skills.length > 0 && <TagList label={cards.skillsUsed} tags={job.skills} className="mt-3" />}
       {!isLast && (
         <div
           className="mt-4"
@@ -1525,11 +1566,24 @@ function SlashRevealSection({ title, children }: { title: string; children: Reac
 // sections a profession shows and in which order.
 const FRAMES: SectionFrames = {
   about: function AboutFrame({ slot }) {
-    const { sections } = useLabels()
+    const { sections, cards } = useLabels()
+    const { education, languages, highlights } = aboutBlock(useCVData().professionalSummary)
     return (
       <>
         <FramedSection title={sections[slot.titleKey]}>
           <p className="max-w-prose mx-auto leading-relaxed" style={{ color: DARK_FANTASY.bone }}>{slot.bio}</p>
+          {highlights.length > 0 && (
+            <ul className="max-w-prose mx-auto mt-4 space-y-1" aria-label={cards.keyAchievements}>
+              {highlights.map((highlight) => (
+                <li key={highlight} className="text-sm flex items-start gap-2 text-[color:var(--df-bone)]">
+                  <span className="text-[color:var(--df-spirit-gold)]" aria-hidden="true">*</span>
+                  {highlight}
+                </li>
+              ))}
+            </ul>
+          )}
+          {education && <p className="max-w-prose mx-auto mt-4 text-sm text-[color:var(--df-silver-text)]">{education}</p>}
+          {languages && <p className="max-w-prose mx-auto mt-1 text-sm text-[color:var(--df-silver-text)]">{languages}</p>}
         </FramedSection>
 
         {/* Art Section 1 - Spirits and Gears */}
@@ -1685,7 +1739,12 @@ export default function DarkFantasyTheme() {
   const { navigation, actions: actionLabels, sections } = useLabels()
   const siteLinks = useSiteLinks('engine')
   const active = view.profession
+  // The world draws on its first commit; only the layers placed by Math.random or by the pointer wait for the
+  // mount, so a server render and the hydrating client never disagree on them.
   const [mounted, setMounted] = useState(false)
+  // The cursor trail and the parallax follow the pointer, motion a reduced motion visitor asked not to get.
+  const reducedMotion = useReducedMotion()
+  const pointerMotion = mounted && !reducedMotion
 
   // The final battle starts as the contact section comes into view, a little before it is centred.
   const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
@@ -1693,22 +1752,6 @@ export default function DarkFantasyTheme() {
   useEffect(() => {
     setMounted(true)
   }, [])
-
-  // Show loading skeleton
-  if (!mounted) {
-    return (
-      <div
-        style={DARK_FANTASY_VARS}
-        className="min-h-screen flex items-center justify-center bg-[color:var(--df-void)]"
-        role="status"
-        aria-label={navigation.loadingTheme}
-      >
-        <div className="animate-pulse text-center" style={{ color: DARK_FANTASY.bone }}>
-          {navigation.loading}
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div
@@ -1731,14 +1774,14 @@ export default function DarkFantasyTheme() {
         }}
       />
       <VoidDepths />
-      <EtherealRain />
-      <DarkFantasyAtmosphere />
-      <SpiritParticles />
+      {mounted && <EtherealRain />}
+      <DarkFantasyAtmosphere mounted={mounted} />
+      {mounted && <SpiritParticles />}
       <ProfessionStage profession={active} p={DARK_FANTASY} />
 
       {/* Interactive Elements - desktop only */}
-      <ParallaxLayers />
-      <CursorTrail />
+      {pointerMotion && <ParallaxLayers />}
+      {pointerMotion && <CursorTrail />}
 
       {/* Vignette overlay - optimized: no box-shadow */}
       <div
@@ -1839,7 +1882,9 @@ export default function DarkFantasyTheme() {
 
       <WaystationSelector active={active} />
 
-      <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+      <ProfessionRegion>
+        <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+      </ProfessionRegion>
 
       </main>
 

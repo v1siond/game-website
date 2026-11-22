@@ -281,7 +281,8 @@ export const BugPullReveal = memo(function BugPullReveal({
         </FixedCombatLayer>
       )}
 
-      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]}>
+      {/* Inert while the panel waits off screen, so a Tab never lands on a project link nobody can see */}
+      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]} inert={CONTENT_POSES[phase] === CONTENT_HIDDEN}>
         {children}
       </div>
     </div>

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef, memo, type CSSProperties, type ReactNode } from 'react'
+import { useState, useEffect, useRef, useId, memo, type CSSProperties, type ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_Z, moveAndFade } from './fixedCombat'
 import battle from './battle.module.css'
 import bugMotion from './bug.module.css'
@@ -198,10 +199,14 @@ export const BattleReveal = memo(function BattleReveal({
   children,
   triggered
 }: BattleRevealProps) {
-  const [phase, setPhase] = useState<AnimationPhase>('idle')
+  const [playedPhase, setPlayedPhase] = useState<AnimationPhase>('idle')
   const [attackPhase, setAttackPhase] = useState(0)
   const [legPhase, setLegPhase] = useState(0)
   const [antennaPhase, setAntennaPhase] = useState(0)
+  // Under reduced motion the battle is already over: the contact links, the knight and the fallen bug show at
+  // once and no timer or frame loop starts.
+  const reducedMotion = useReducedMotion()
+  const phase: AnimationPhase = reducedMotion ? 'complete' : playedPhase
 
   const rafRef = useRef<number | null>(null)
   const lastTimeRef = useRef(0)
@@ -240,24 +245,24 @@ export const BattleReveal = memo(function BattleReveal({
   // Trigger animation sequence
   useEffect(() => {
     // The trigger fires once, so the reveal plays once and the phase starts idle
-    if (!triggered || hasAnimated.current) return
+    if (!triggered || hasAnimated.current || reducedMotion) return
 
     // Mark as animated so we don't replay
     hasAnimated.current = true
 
     // Start the sequence
-    setPhase('bug-wander')
+    setPlayedPhase('bug-wander')
 
     const timers: NodeJS.Timeout[] = []
     // The slash's frame by frame ramp, cancelled with the timers when the reveal unmounts mid slash
     let attackFrame = 0
 
     // Knight dash
-    timers.push(setTimeout(() => setPhase('knight-dash'), PHASE_TIMING['knight-dash']))
+    timers.push(setTimeout(() => setPlayedPhase('knight-dash'), PHASE_TIMING['knight-dash']))
 
     // Slash attack - animate attack phase
     timers.push(setTimeout(() => {
-      setPhase('slash')
+      setPlayedPhase('slash')
       // Animate attack phase from 0 to 1 over 200ms
       const start = performance.now()
       const animateAttack = (now: number) => {
@@ -269,34 +274,34 @@ export const BattleReveal = memo(function BattleReveal({
     }, PHASE_TIMING['slash']))
 
     // Bug hit - blood splatter!
-    timers.push(setTimeout(() => setPhase('bug-hit'), PHASE_TIMING['bug-hit']))
+    timers.push(setTimeout(() => setPlayedPhase('bug-hit'), PHASE_TIMING['bug-hit']))
 
     // Bug tremble - shaking violently before explosion
-    timers.push(setTimeout(() => setPhase('bug-tremble'), PHASE_TIMING['bug-tremble']))
+    timers.push(setTimeout(() => setPlayedPhase('bug-tremble'), PHASE_TIMING['bug-tremble']))
 
     // Bug death - EXPLOSIVE with screen shake!
     timers.push(setTimeout(() => {
-      setPhase('bug-death')
+      setPlayedPhase('bug-death')
       setAttackPhase(0)
     }, PHASE_TIMING['bug-death']))
 
     // Bug fall - start the tumble
-    timers.push(setTimeout(() => setPhase('bug-fall'), PHASE_TIMING['bug-fall']))
+    timers.push(setTimeout(() => setPlayedPhase('bug-fall'), PHASE_TIMING['bug-fall']))
 
     // Content drop
-    timers.push(setTimeout(() => setPhase('content-drop'), PHASE_TIMING['content-drop']))
+    timers.push(setTimeout(() => setPlayedPhase('content-drop'), PHASE_TIMING['content-drop']))
 
     // The death burst fades and the blood pool spreads once the tumble has landed
-    timers.push(setTimeout(() => setPhase('content-settled'), PHASE_TIMING['content-settled']))
+    timers.push(setTimeout(() => setPlayedPhase('content-settled'), PHASE_TIMING['content-settled']))
 
     // Complete
-    timers.push(setTimeout(() => setPhase('complete'), PHASE_TIMING['complete']))
+    timers.push(setTimeout(() => setPlayedPhase('complete'), PHASE_TIMING['complete']))
 
     return () => {
       timers.forEach(t => clearTimeout(t))
       cancelAnimationFrame(attackFrame)
     }
-  }, [triggered])
+  }, [triggered, reducedMotion])
 
   const showKnight = phase !== 'idle'
   const showBug = phase !== 'idle'
@@ -307,11 +312,11 @@ export const BattleReveal = memo(function BattleReveal({
     <>
       <div
         ref={stageRef}
-        className={`relative w-full min-h-[300px] flex items-center justify-center ${flags.shake ? battle.shaking : ''}`}
+        className="relative w-full min-h-[300px] flex items-center justify-center"
       >
         {/* Knight + bug pinned to the viewport corners (left-15% / right-18%), both standing on COMBAT_GROUND;
             only the content below scrolls past them. Fades out as the section leaves view. */}
-        <FixedCombatLayer inView={inView}>
+        <FixedCombatLayer inView={inView} shake={flags.shake}>
         {/* Knight - CLOSER to center */}
         {showKnight && (
           <div
@@ -419,10 +424,12 @@ export const BattleReveal = memo(function BattleReveal({
         )}
         </FixedCombatLayer>
 
-        {/* Content - center, drops from above */}
+        {/* Content - center, drops from above. Inert while it waits above the screen, so a Tab never lands on
+            a contact link nobody can see. */}
         <div
           className={`relative ${COMBAT_Z.content}`}
           style={CONTENT_POSES[phase]}
+          inert={!showContent}
         >
           {/* Drop shadow that appears as content falls */}
           {showContent && (
@@ -473,6 +480,12 @@ export const BattleBug = memo(function BattleBug({
   const infected = DARK_FANTASY.infected
   const infectedBright = DARK_FANTASY.infectedBright
   const infectedGlow = DARK_FANTASY.infectedGlow
+  // Ids of this bug's own filter and gradients: two bugs on a page never resolve url(#id) into each other's,
+  // or into one a hidden copy holds.
+  const uid = useId()
+  const glowId = `${uid}glow`
+  const shellGradId = `${uid}shell`
+  const maskGradId = `${uid}mask`
 
   const getLegY = (index: number) => {
     const offset = index % 2 === 0 ? 0 : 0.5
@@ -508,19 +521,19 @@ export const BattleBug = memo(function BattleBug({
       style={{ filter: `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 6px ${infected}80)` }}
     >
       <defs>
-        <filter id="battleGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <radialGradient id="battleShellGrad" cx="50%" cy="30%" r="70%">
+        <radialGradient id={shellGradId} cx="50%" cy="30%" r="70%">
           <stop offset="0%" stopColor={shell} />
           <stop offset="70%" stopColor={shellMid} />
           <stop offset="100%" stopColor={shellDark} />
         </radialGradient>
-        <radialGradient id="battleMaskGrad" cx="50%" cy="40%" r="60%">
+        <radialGradient id={maskGradId} cx="50%" cy="40%" r="60%">
           <stop offset="0%" stopColor={maskLight} />
           <stop offset="100%" stopColor={mask} />
         </radialGradient>
@@ -539,7 +552,7 @@ export const BattleBug = memo(function BattleBug({
       </g>
 
       {/* BODY - chunky segmented shell */}
-      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#battleShellGrad)" stroke={DARK_FANTASY.void} strokeWidth="1.5" />
+      <ellipse cx="50" cy="55" rx="28" ry="20" fill={`url(#${shellGradId})`} stroke={DARK_FANTASY.void} strokeWidth="1.5" />
       <path d="M30,50 Q50,45 70,50" fill="none" stroke={shellDark} strokeWidth="2" opacity="0.6" />
       <path d="M32,58 Q50,54 68,58" fill="none" stroke={shellDark} strokeWidth="1.5" opacity="0.4" />
 
@@ -547,7 +560,7 @@ export const BattleBug = memo(function BattleBug({
       <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DARK_FANTASY.void} strokeWidth="1" />
 
       {/* HEAD/MASK */}
-      <ellipse cx="50" cy="26" rx="18" ry="15" fill="url(#battleMaskGrad)" stroke={DARK_FANTASY.void} strokeWidth="1" />
+      <ellipse cx="50" cy="26" rx="18" ry="15" fill={`url(#${maskGradId})`} stroke={DARK_FANTASY.void} strokeWidth="1" />
       <path d="M35,22 Q50,16 65,22" fill="none" stroke={maskLight} strokeWidth="2" opacity="0.5" />
 
       {/* MANDIBLES */}
@@ -559,7 +572,7 @@ export const BattleBug = memo(function BattleBug({
       {horns.map((d, i) => <path key={i} d={d} fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" />)}
 
       {/* EYES - void black with orange glow */}
-      <g filter="url(#battleGlow)">
+      <g filter={`url(#${glowId})`}>
         <ellipse cx="40" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
         <ellipse cx="60" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
         <ellipse cx="40" cy="24" rx="4" ry="5" fill={infected} opacity="0.7" />
@@ -569,7 +582,7 @@ export const BattleBug = memo(function BattleBug({
       </g>
 
       {/* INFECTION GROWTHS */}
-      <g filter="url(#battleGlow)">
+      <g filter={`url(#${glowId})`}>
         <ellipse className={`${bugMotion.shape} ${bugMotion.swellWide}`} cx="50" cy="50" rx="10" ry="8" fill={infected} opacity="0.85" />
         <ellipse className={`${bugMotion.shape} ${bugMotion.swellTall}`} cx="35" cy="56" rx="7" ry="5" fill={infected} opacity="0.75" />
         <ellipse className={`${bugMotion.shape} ${bugMotion.swellTallSlow}`} cx="65" cy="56" rx="7" ry="5" fill={infected} opacity="0.75" />
@@ -754,11 +767,13 @@ const SlashEffect = memo(function SlashEffect() {
 // Impact burst effect - sparks radiating from hit point
 const ImpactBurst = memo(function ImpactBurst() {
   const sparkCount = 8
-  const sparks = Array.from({ length: sparkCount }, (_, i) => ({
-    angle: (360 / sparkCount) * i,
-    length: 20 + Math.random() * 15,
-    delay: Math.random() * 50,
-  }))
+  const [sparks] = useState(() =>
+    Array.from({ length: sparkCount }, (_, i) => ({
+      angle: (360 / sparkCount) * i,
+      length: 20 + Math.random() * 15,
+      delay: Math.random() * 50,
+    })),
+  )
 
   return (
     <svg
@@ -815,38 +830,44 @@ const DeathParticles = memo(function DeathParticles() {
   const orangeColors = [DARK_FANTASY.flameOrange, DARK_FANTASY.flameAmber, DARK_FANTASY.flameYellow, DARK_FANTASY.flameDeep, DARK_FANTASY.infected, DARK_FANTASY.flameRed]
 
   // Core explosion particles - burst outward
-  const burstParticles = Array.from({ length: 20 }, (_, i) => {
-    const angle = (i / 20) * Math.PI * 2
-    const distance = 40 + Math.random() * 60
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance,
-      delay: Math.random() * 50,
-      duration: 300 + Math.random() * 200,
-      size: 6 + Math.random() * 8,
-      color: orangeColors[i % orangeColors.length],
-    }
-  })
+  const [burstParticles] = useState(() =>
+    Array.from({ length: 20 }, (_, i) => {
+      const angle = (i / 20) * Math.PI * 2
+      const distance = 40 + Math.random() * 60
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance,
+        delay: Math.random() * 50,
+        duration: 300 + Math.random() * 200,
+        size: 6 + Math.random() * 8,
+        color: orangeColors[i % orangeColors.length],
+      }
+    }),
+  )
 
   // Rising soul particles
-  const soulParticles = Array.from({ length: 15 }, () => ({
-    x: Math.random() * 100 - 50,
-    delay: 100 + Math.random() * 150,
-    duration: 400 + Math.random() * 200,
-    size: 4 + Math.random() * 6,
-  }))
+  const [soulParticles] = useState(() =>
+    Array.from({ length: 15 }, () => ({
+      x: Math.random() * 100 - 50,
+      delay: 100 + Math.random() * 150,
+      duration: 400 + Math.random() * 200,
+      size: 4 + Math.random() * 6,
+    })),
+  )
 
   // Spark/debris particles
-  const sparkParticles = Array.from({ length: 12 }, () => {
-    const angle = Math.random() * Math.PI * 2
-    const distance = 30 + Math.random() * 40
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance - 20,
-      delay: Math.random() * 80,
-      size: 2 + Math.random() * 3,
-    }
-  })
+  const [sparkParticles] = useState(() =>
+    Array.from({ length: 12 }, () => {
+      const angle = Math.random() * Math.PI * 2
+      const distance = 30 + Math.random() * 40
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance - 20,
+        delay: Math.random() * 80,
+        size: 2 + Math.random() * 3,
+      }
+    }),
+  )
 
   return (
     <div className="relative w-40 h-40" style={{ transform: 'translate(-50%, -50%)' }}>
@@ -924,31 +945,35 @@ const BloodSplatter = memo(function BloodSplatter() {
   const bloodColors = [DARK_FANTASY.infected, DARK_FANTASY.flameRed, DARK_FANTASY.bloodDark, DARK_FANTASY.flameOrange]
 
   // Main blood drops
-  const drops = Array.from({ length: 16 }, (_, i) => {
-    const angle = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 0.25
-    const distance = 30 + Math.random() * 50
-    const gravity = 20 + Math.random() * 30
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance + gravity,
-      delay: Math.random() * 50,
-      duration: 200 + Math.random() * 150,
-      size: 4 + Math.random() * 8,
-      color: bloodColors[i % bloodColors.length],
-    }
-  })
+  const [drops] = useState(() =>
+    Array.from({ length: 16 }, (_, i) => {
+      const angle = (Math.random() - 0.5) * Math.PI * 0.8 + Math.PI * 0.25
+      const distance = 30 + Math.random() * 50
+      const gravity = 20 + Math.random() * 30
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance + gravity,
+        delay: Math.random() * 50,
+        duration: 200 + Math.random() * 150,
+        size: 4 + Math.random() * 8,
+        color: bloodColors[i % bloodColors.length],
+      }
+    }),
+  )
 
   // Smaller spray particles
-  const spray = Array.from({ length: 12 }, () => {
-    const angle = (Math.random() - 0.5) * Math.PI
-    const distance = 20 + Math.random() * 30
-    return {
-      endX: Math.cos(angle) * distance,
-      endY: Math.sin(angle) * distance + 15,
-      delay: Math.random() * 30,
-      size: 2 + Math.random() * 3,
-    }
-  })
+  const [spray] = useState(() =>
+    Array.from({ length: 12 }, () => {
+      const angle = (Math.random() - 0.5) * Math.PI
+      const distance = 20 + Math.random() * 30
+      return {
+        endX: Math.cos(angle) * distance,
+        endY: Math.sin(angle) * distance + 15,
+        delay: Math.random() * 30,
+        size: 2 + Math.random() * 3,
+      }
+    }),
+  )
 
   return (
     <div className="relative w-32 h-32" style={{ transform: 'translate(-50%, -50%)' }}>
@@ -996,23 +1021,27 @@ const BloodPool = memo(function BloodPool() {
   const poolColors = [DARK_FANTASY.poolOrange, DARK_FANTASY.poolGreen, DARK_FANTASY.poolAmber, DARK_FANTASY.poolGreenLight, DARK_FANTASY.poolRed, DARK_FANTASY.poolGreenMid]
 
   // Main pool blobs - spread LEFT from right edge
-  const pools = Array.from({ length: 8 }, (_, i) => ({
-    x: -10 - Math.random() * 70,  // All negative = extends LEFT from right edge
-    y: Math.random() * 20,
-    width: 20 + Math.random() * 40,
-    height: 8 + Math.random() * 12,
-    delay: i * 50,
-    color: poolColors[i % poolColors.length],
-  }))
+  const [pools] = useState(() =>
+    Array.from({ length: 8 }, (_, i) => ({
+      x: -10 - Math.random() * 70, // All negative = extends LEFT from right edge
+      y: Math.random() * 20,
+      width: 20 + Math.random() * 40,
+      height: 8 + Math.random() * 12,
+      delay: i * 50,
+      color: poolColors[i % poolColors.length],
+    })),
+  )
 
   // Small drips/splats - also extend left
-  const drips = Array.from({ length: 12 }, (_, i) => ({
-    x: -5 - Math.random() * 90,
-    y: Math.random() * 15 - 5,
-    size: 4 + Math.random() * 8,
-    delay: 100 + i * 30,
-    color: poolColors[i % poolColors.length],
-  }))
+  const [drips] = useState(() =>
+    Array.from({ length: 12 }, (_, i) => ({
+      x: -5 - Math.random() * 90,
+      y: Math.random() * 15 - 5,
+      size: 4 + Math.random() * 8,
+      delay: 100 + i * 30,
+      color: poolColors[i % poolColors.length],
+    })),
+  )
 
   return (
     <div className="relative w-40 h-12">

@@ -381,7 +381,8 @@ export const KnightSlashReveal = memo(function KnightSlashReveal({
 
       {/* COMBAT_Z.content: the transform from getContentStyle() makes this a stacking context;
           without an explicit z-index it sinks below the fixed z-[1..8] background and the fighters */}
-      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]}>
+      {/* Inert while the panel waits off screen, so a Tab never lands on a control nobody can see */}
+      <div className={`relative ${COMBAT_Z.content}`} style={CONTENT_POSES[phase]} inert={CONTENT_POSES[phase] === CONTENT_HIDDEN}>
         {children}
       </div>
 

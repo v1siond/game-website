@@ -4,13 +4,18 @@ import { useEffect, useRef } from 'react'
 
 // The one pointer follower for every world. Each world decides its own motion from --mx and --my in CSS.
 
+interface PointerVarsOptions {
+  /** Follow a mouse only: a finger or a pen dragging across a tablet leaves the vars where they are. */
+  mouseOnly?: boolean
+}
+
 /**
  * Writes the pointer's place on the element as --mx and --my, -1 to 1 from the viewport centre: one
  * passive listener, at most one write a frame. It listens only while `enabled` is true; the hook reads
  * no media query itself, so each world passes `!reducedMotion` and its layers stay still under reduced
  * motion.
  */
-export function usePointerVars(enabled: boolean) {
+export function usePointerVars(enabled: boolean, { mouseOnly = false }: PointerVarsOptions = {}) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -26,6 +31,7 @@ export function usePointerVars(enabled: boolean) {
       element.style.setProperty('--my', y.toFixed(3))
     }
     const onMove = (event: PointerEvent) => {
+      if (mouseOnly && event.pointerType !== 'mouse') return
       x = (event.clientX / window.innerWidth) * 2 - 1
       y = (event.clientY / window.innerHeight) * 2 - 1
       if (!frame) frame = window.requestAnimationFrame(write)
@@ -36,7 +42,7 @@ export function usePointerVars(enabled: boolean) {
       window.removeEventListener('pointermove', onMove)
       window.cancelAnimationFrame(frame)
     }
-  }, [enabled])
+  }, [enabled, mouseOnly])
 
   return ref
 }
