@@ -269,33 +269,41 @@ interface MercProps {
   className?: string
 }
 
+/** His figure's groups in the 100 by 150 viewBox, playing `motion`; a stage places it in a nested svg of
+ *  that viewBox and poses its joints itself (pose.ts), with the motion left 'still'. */
+export function MercFigure({ profession, motion }: Omit<MercProps, 'className'>) {
+  return (
+    <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`}>
+      <ellipse className={s.shadow} cx={50} cy={145} rx={20} ry={2.6} fill={NEON.magenta} opacity={0.35} />
+      <g className={s.glitch}>
+        <g className={s.ghost} aria-hidden="true">
+          <path d={JACKET_BODY} fill={NEON.cyan} opacity={0.5} />
+          <path d={HEAD} fill={NEON.hotPink} opacity={0.5} />
+        </g>
+        <g className={s.body}>
+          <Leg side="right" profession={profession} />
+          <Leg side="left" profession={profession} />
+          <g className={s.chest}>
+            <Torso profession={profession} />
+            <Head profession={profession} />
+          </g>
+          {profession === 'drummer' && <Snare />}
+          <Arm side="right" profession={profession} />
+          <Arm side="left" profession={profession} />
+          {profession === 'engineer' && <Jack />}
+        </g>
+      </g>
+      <Reticle />
+    </g>
+  )
+}
+
 /** Him as the night city merc, in a profession's kit, playing one motion; he glitches when hovered.
  *  Memoised on its three primitive props, so a parent render that keeps them redraws none of his svg. */
 export const MercSprite = memo(function MercSprite({ profession, motion, className = '' }: MercProps) {
   return (
     <svg viewBox="0 0 100 150" className={`overflow-visible ${className}`} aria-hidden="true" focusable="false">
-      <g className={`${s.sprite} ${KIT_CLASS[profession]} ${MOTION_CLASS[motion]}`}>
-        <ellipse className={s.shadow} cx={50} cy={145} rx={20} ry={2.6} fill={NEON.magenta} opacity={0.35} />
-        <g className={s.glitch}>
-          <g className={s.ghost} aria-hidden="true">
-            <path d={JACKET_BODY} fill={NEON.cyan} opacity={0.5} />
-            <path d={HEAD} fill={NEON.hotPink} opacity={0.5} />
-          </g>
-          <g className={s.body}>
-            <Leg side="right" profession={profession} />
-            <Leg side="left" profession={profession} />
-            <g className={s.chest}>
-              <Torso profession={profession} />
-              <Head profession={profession} />
-            </g>
-            {profession === 'drummer' && <Snare />}
-            <Arm side="right" profession={profession} />
-            <Arm side="left" profession={profession} />
-            {profession === 'engineer' && <Jack />}
-          </g>
-        </g>
-        <Reticle />
-      </g>
+      <MercFigure profession={profession} motion={motion} />
     </svg>
   )
 })
