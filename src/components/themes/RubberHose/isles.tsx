@@ -69,7 +69,7 @@ function Carnival() {
       <rect width={400} height={300} fill="#e7d9c4" />
       <path d="M0 150 L40 90 L70 140 L110 70 L150 150 Z M250 150 L300 80 L330 130 L360 96 L400 150 Z" fill={HOSE.shadow} opacity={0.35} />
       <g transform="translate(320 150)">
-        <g className={stage.wheel}>
+        <g className="motion-safe:animate-[spin_30s_linear_infinite]">
           <circle r={56} fill="none" stroke={HOSE.inkSoft} strokeWidth={3} />
           {[0, 45, 90, 135].map((a) => (
             <path key={a} d="M-56 0 H56" stroke={HOSE.inkSoft} strokeWidth={2} transform={`rotate(${a})`} />

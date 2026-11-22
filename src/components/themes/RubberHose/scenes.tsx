@@ -128,7 +128,7 @@ export function RunBar({ profession, stops }: { profession: Profession; stops: n
 function Sun() {
   return (
     <svg viewBox="0 0 80 80" className={`h-24 w-24 sm:h-28 sm:w-28 ${world.inked}`} aria-hidden="true" focusable="false">
-      <g className={styles.sunRays}>
+      <g className={`motion-safe:animate-[spin_12s_linear_infinite] ${styles.sunRays}`}>
         {[0, 30, 60, 90, 120, 150].map((angle) => (
           <path key={angle} d="M37 2 Q40 -2 43 2 L41 78 Q40 80 39 78 Z" fill={HOSE.gold} transform={`rotate(${angle} 40 40)`} />
         ))}
