@@ -81,10 +81,7 @@ export function FlightMap({ jobs, children }: { jobs: Job[]; children: ReactNode
             </WorldMap>
           </div>
           {job && (
-            <p
-              className={`mx-auto max-w-xl border-2 border-t-0 border-white bg-black px-3 py-1.5 text-center text-sm uppercase text-white ${look.display}`}
-              aria-live="polite"
-            >
+            <p className={`mx-auto max-w-xl border-2 border-t-0 border-white bg-black px-3 py-1.5 text-center text-sm uppercase text-white ${look.display}`}>
               {job.company}, {job.location}
             </p>
           )}
