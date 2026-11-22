@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react'
 import type { Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { REALM } from './palette'
@@ -22,11 +22,6 @@ export const CARD_CHIP: CSSProperties = {
   textTransform: 'uppercase',
 }
 
-function jobYearsLabel(job: Job, present: string): string {
-  const { start, end } = jobYears(job, present)
-  return `${start} - ${end}`
-}
-
 export function JobCard({ job }: { job: Job }) {
   const { years } = useLabels()
   return (
@@ -36,7 +31,7 @@ export function JobCard({ job }: { job: Job }) {
           <h3 style={{ ...CARD_TITLE, fontSize: '0.875rem' }}>{job.title}</h3>
           <p style={{ color: REALM.goldText, fontSize: '0.875rem' }}><SlashBreaks text={job.company} /></p>
         </div>
-        <span style={{ color: REALM.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobYearsLabel(job, years.present)}</span>
+        <span style={{ color: REALM.textDim, fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{jobSpanCompact(job, years)}</span>
       </div>
       {job.description && <p style={{ color: REALM.textMid, fontSize: '0.875rem' }}>{job.description}</p>}
       {job.highlights.length > 0 && (

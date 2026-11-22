@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -48,12 +48,6 @@ export function CVContent({ cv, locale }: Readonly<{ cv: CVData; locale: Locale 
   const { fullName, contact, professionalSummary, currentRoles, companies, featuredProjects, techStack, services, workExperience, labels } = cv
   const { cvPage } = labels
   const ventures = venturesFor(companies)
-
-  // A running job has no end date, so it ends in the label for now.
-  const yearRange = (job: (typeof workExperience)[number]): string => {
-    const { start, end } = jobYears(job, labels.years.present)
-    return `${start} - ${end}`
-  }
 
   // A current role links the venture of the same slug.
   const getCompanyUrl = (roleSlug: string): string | undefined => {
@@ -245,9 +239,7 @@ export function CVContent({ cv, locale }: Readonly<{ cv: CVData; locale: Locale 
               <div key={exp.id} className="mb-4">
                 <div className="flex flex-wrap justify-between items-baseline gap-x-4">
                   <h3 className="text-base font-semibold">{exp.title}</h3>
-                  <span className="text-sm text-gray-600">
-                    {yearRange(exp)}
-                  </span>
+                  <span className="text-sm text-gray-600">{jobSpanCompact(exp, labels.years)}</span>
                 </div>
                 <p className="text-sm italic text-gray-700">
                   <SlashBreaks text={exp.company} />

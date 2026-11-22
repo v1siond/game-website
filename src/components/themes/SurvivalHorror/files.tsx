@@ -5,7 +5,7 @@ import type { Job } from '@/lib/cv/content'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { CARD_BUTTON } from './actions'
@@ -89,7 +89,7 @@ function HouseMap({ jobs, read, here }: { jobs: Job[]; read: ReadonlySet<string>
 
 function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; onRead: () => void; onPoint: () => void }) {
   const { cards, years, actions } = useLabels()
-  const { start, end } = jobYears(job, years.present)
+  const span = jobSpanCompact(job, years)
   const bodyId = `survival-horror-job-${job.id}`
 
   return (
@@ -102,7 +102,7 @@ function JobFile({ job, isRead, onRead, onPoint }: { job: Job; isRead: boolean; 
           </p>
         </div>
         <span className={STAMP}>
-          {start} - {end}
+          {span}
         </span>
       </div>
       {job.description && <p className="mb-3 text-sm leading-relaxed text-[color:var(--sh-fog-text)]">{job.description}</p>}

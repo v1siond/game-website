@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { drumsSince, jobYears, newTabName, projectLinks, yearSpan } from '@/lib/cv/sectionText'
+import { drumsSince, jobSpanCompact, jobYears, newTabName, projectLinks, yearSpan } from '@/lib/cv/sectionText'
 import { labelsFor, type LabelsFile } from '@/lib/cv/labels'
 
 const file: LabelsFile = JSON.parse(readFileSync(join(process.cwd(), 'content', 'cv', 'labels.json'), 'utf8'))
@@ -18,6 +18,13 @@ describe('jobYears', () => {
       start: 2021,
       end: english.years.present,
     })
+  })
+})
+
+describe('jobSpanCompact', () => {
+  it('prints a job stamp as both years around a dash, a running job ending in the label for now', () => {
+    expect(jobSpanCompact({ startDate: new Date('2019-01-01'), endDate: new Date('2023-01-01') }, english.years)).toBe('2019 - 2023')
+    expect(jobSpanCompact({ startDate: new Date('2021-06-01'), endDate: null }, spanish.years)).toBe('2021 - Presente')
   })
 })
 

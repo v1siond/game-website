@@ -1,7 +1,7 @@
 import type { CVData, Job } from '@/lib/cv/content'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { BandSlot } from '@/components/cv/BandList'
-import { jobYears, newTabName } from '@/lib/cv/sectionText'
+import { jobSpanCompact, newTabName } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { InkBlot } from './art'
 import { HOSE } from './palette'
@@ -74,12 +74,12 @@ export function TechBubbleCloud({ categories }: { categories: CVData['techStack'
 // A job on a title card, the dates on an ink tab above it. Dates are date only strings, read in UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { cards, years } = useLabels()
-  const { start, end } = jobYears(entry, years.present)
+  const span = jobSpanCompact(entry, years)
 
   return (
     <article className={`relative p-5 pt-7 ${world.titleCard}`}>
       <p className={`absolute -top-4 left-4 -rotate-2 px-3 py-1 text-sm ${world.chip}`}>
-        {start} - {end}
+        {span}
       </p>
       <h3 className={`text-lg ${world.lettering}`}>{entry.title}</h3>
       <p className={`mb-2 text-sm ${world.red}`}>

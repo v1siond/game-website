@@ -79,6 +79,10 @@ export function jobYears(job: Pick<Job, 'startDate' | 'endDate'>, openLabel: str
 export const jobSpan = (job: Pick<Job, 'startDate' | 'endDate'>, years: Labels['years']): string =>
   fillLabel(years.range, { ...jobYears(job, years.present) })
 
+/** A job's years as the short stamp a card prints beside its title: "2019 - 2022", "2023 - Present". */
+export const jobSpanCompact = (job: Pick<Job, 'startDate' | 'endDate'>, years: Labels['years']): string =>
+  fillLabel(years.rangeCompact, { ...jobYears(job, years.present) })
+
 export interface RecordFact {
   label: string
   value: string

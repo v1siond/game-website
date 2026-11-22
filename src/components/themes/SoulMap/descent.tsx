@@ -2,7 +2,7 @@
 
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useEffect, useState } from 'react'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -97,7 +97,7 @@ function Bloodstain({ replay, order }: { replay: boolean; order: number }) {
 function JobStop({ job, order }: { job: Job; order: number }) {
   const { years } = useLabels()
   const { ref, triggered } = useSectionTrigger({ threshold: 0.2 })
-  const { start, end } = jobYears(job, years.present)
+  const span = jobSpanCompact(job, years)
 
   return (
     <article ref={ref} className={`${souls.stop} ${triggered ? souls.stopOn : ''}`}>
@@ -113,7 +113,7 @@ function JobStop({ job, order }: { job: Job; order: number }) {
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h3 className={CARD_TITLE}>{job.title}</h3>
           <span className={`whitespace-nowrap ${CARD_META}`}>
-            {start} - {end}
+            {span}
           </span>
         </div>
         {job.description && <p className={`mt-3 ${CARD_BODY}`}>{job.description}</p>}

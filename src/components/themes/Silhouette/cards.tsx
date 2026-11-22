@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import type { Job } from '@/lib/cv/content'
-import { jobYears } from '@/lib/cv/sectionText'
+import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TYPEWRITER } from './palette'
@@ -46,7 +46,7 @@ export function SectionHeader({ id, title }: { id: string; title: string }) {
 // own year west of UTC.
 export function ExperienceCard({ entry }: { entry: Job }) {
   const { years } = useLabels()
-  const { start, end } = jobYears(entry, years.present)
+  const span = jobSpanCompact(entry, years)
 
   return (
     <article className={`border-l-4 border-[color:var(--sh-black)] p-4 ${world.card}`}>
@@ -58,7 +58,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           </p>
         </div>
         <span className={`whitespace-nowrap uppercase ${CARD_META}`}>
-          {start} - {end}
+          {span}
         </span>
       </div>
       {entry.description && <p className={`mt-2 ${CARD_BODY}`}>{entry.description}</p>}

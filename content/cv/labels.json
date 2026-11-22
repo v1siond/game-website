@@ -84,6 +84,7 @@
         "present": "Present",
         "since": "Since {year}",
         "range": "{start} to {end}",
+        "rangeCompact": "{start} - {end}",
         "yearOne": "{count} year",
         "yearMany": "{count} years",
         "drumsSince": "Drumming since {since}"
@@ -524,6 +525,7 @@
         "present": "Presente",
         "since": "Desde {year}",
         "range": "{start} a {end}",
+        "rangeCompact": "{start} - {end}",
         "yearOne": "{count} año",
         "yearMany": "{count} años",
         "drumsSince": "Batería desde {since}"
@@ -964,6 +966,7 @@
         "present": "Presente",
         "since": "Dal {year}",
         "range": "Dal {start} al {end}",
+        "rangeCompact": "{start} - {end}",
         "yearOne": "{count} anno",
         "yearMany": "{count} anni",
         "drumsSince": "Batteria dal {since}"
