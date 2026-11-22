@@ -166,10 +166,10 @@ const GEAR: Record<Profession, Gear> = {
         <Ink d={TORSO} fill={CEL.inkSoft} />
         {/* the plate carrier: the front plate, its shadow side, three mag pouches, the belt and buckle */}
         <Ink d="M33 58 Q60 52 87 58 L88 102 L32 102 Z" fill={CEL.scrub} />
-        <Shade d="M74 55 Q82 56 87 58 L88 102 L76 102 Q80 80 74 55 Z" fill="#4c5a3a" />
-        <Ink d="M38 80 L50 80 L50 98 L38 98 Z" fill="#4c5a3a" />
-        <Ink d="M54 80 L66 80 L66 98 L54 98 Z" fill="#4c5a3a" />
-        <Ink d="M70 80 L82 80 L82 98 L70 98 Z" fill="#4c5a3a" />
+        <Shade d="M74 55 Q82 56 87 58 L88 102 L76 102 Q80 80 74 55 Z" fill={CEL.scrubShade} />
+        <Ink d="M38 80 L50 80 L50 98 L38 98 Z" fill={CEL.scrubShade} />
+        <Ink d="M54 80 L66 80 L66 98 L54 98 Z" fill={CEL.scrubShade} />
+        <Ink d="M70 80 L82 80 L82 98 L70 98 Z" fill={CEL.scrubShade} />
         <path d="M40 66 L80 66 M40 72 L80 72" stroke={INK} strokeWidth={1.8} />
         <Ink d="M33 102 L87 102 L87 113 L33 113 Z" fill={INK} />
         <Ink d="M55 101 L65 101 L65 114 L55 114 Z" fill={CEL.sun} />
@@ -216,13 +216,13 @@ const GEAR: Record<Profession, Gear> = {
     torso: (
       <>
         <Ink d={TORSO} fill={CEL.red} />
-        <Shade d={TORSO_SHADOW} fill="#9e2219" />
+        <Shade d={TORSO_SHADOW} fill={CEL.redShade} />
         {/* the open vest over the tee */}
         {/* the commando's plate carrier worn open over the tee */}
         <Ink d="M30 56 Q40 52 48 52 L50 112 L33 112 L25 72 Z" fill={CEL.scrub} />
         <Ink d="M90 56 Q80 52 72 52 L70 112 L87 112 L95 72 Z" fill={CEL.scrub} />
-        <Ink d="M34 84 L46 84 L46 100 L34 100 Z" fill="#4c5a3a" />
-        <Ink d="M74 84 L86 84 L86 100 L74 100 Z" fill="#4c5a3a" />
+        <Ink d="M34 84 L46 84 L46 100 L34 100 Z" fill={CEL.scrubShade} />
+        <Ink d="M74 84 L86 84 L86 100 L74 100 Z" fill={CEL.scrubShade} />
         <Ink d="M33 104 L87 104 L87 113 L33 113 Z" fill={INK} />
         <circle cx={41} cy={70} r={2} fill={CEL.steel} />
         <circle cx={79} cy={70} r={2} fill={CEL.steel} />
@@ -247,8 +247,8 @@ const GEAR: Record<Profession, Gear> = {
         <path d={side === 'front' ? 'M82 104 L95 104' : 'M25 104 L38 104'} stroke={INK} strokeWidth={5} />
       </>
     ),
-    legs: '#2c3a5c',
-    legsShade: '#1b2440',
+    legs: CEL.denim,
+    legsShade: CEL.denimShade,
     shorts: false,
     feet: boots(INK),
     head: null,
@@ -273,7 +273,7 @@ const GEAR: Record<Profession, Gear> = {
       </>
     ),
     legs: CEL.red,
-    legsShade: '#9e2219',
+    legsShade: CEL.redShade,
     shorts: true,
     feet: (side) => <Ink d={BARE_FOOT[side]} fill={SKIN} />,
     head: (

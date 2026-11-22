@@ -129,11 +129,11 @@
 }
 
 .skyNoon {
-  background: linear-gradient(180deg, var(--cel-noon-high) 0 38%, #5cc4c9 38% 62%, var(--cel-noon-low) 62%);
+  background: linear-gradient(180deg, var(--cel-noon-high) 0 38%, var(--cel-noon-mid) 38% 62%, var(--cel-noon-low) 62%);
 }
 
 .skyTown {
-  background: linear-gradient(180deg, #3b8fb0 0 34%, var(--cel-sand) 34% 58%, var(--cel-orange) 58%);
+  background: linear-gradient(180deg, var(--cel-town-high) 0 34%, var(--cel-sand) 34% 58%, var(--cel-orange) 58%);
 }
 
 .skyDusk {
@@ -790,7 +790,7 @@
 .board {
   background:
     repeating-linear-gradient(180deg, transparent 0 52px, var(--cel-ink) 52px 55px),
-    repeating-linear-gradient(90deg, var(--cel-plank) 0 140px, #9a6836 140px 280px);
+    repeating-linear-gradient(90deg, var(--cel-plank) 0 140px, var(--cel-plank-light) 140px 280px);
   border: 6px solid var(--cel-ink);
   box-shadow: 8px 8px 0 var(--cel-ink);
 }
@@ -987,7 +987,7 @@
   }
 }
 
-.up { color: #1d7a12; }
+.up { color: var(--cel-up-text); }
 .down { color: var(--cel-flavour); }
 
 .flavour {

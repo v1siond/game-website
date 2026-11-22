@@ -29,7 +29,7 @@ function Bag({ swing }: { swing: number }) {
       <g key={swing} className={`${cel.bag} ${swing > 0 ? cel.bagSwing : ''}`}>
         <path d="M24 26 L56 26 L40 40 Z" fill={CEL.steelDark} />
         <path d="M14 40 Q40 32 66 40 L66 196 Q40 206 14 196 Z" fill={CEL.red} />
-        <path d="M50 38 Q60 39 66 40 L66 196 Q60 200 52 202 Q58 120 50 38 Z" fill="#9e2219" data-bare />
+        <path d="M50 38 Q60 39 66 40 L66 196 Q60 200 52 202 Q58 120 50 38 Z" fill={CEL.redShade} data-bare />
         <path d="M14 70 L66 70 M14 166 L66 166" stroke={CEL.ink} strokeWidth={4} />
       </g>
     </svg>

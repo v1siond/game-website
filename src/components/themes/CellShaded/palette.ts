@@ -22,6 +22,8 @@ export const CEL = {
   violet: '#5b3a9a',
   night: '#24214a',
   red: '#e2362c',
+  // The red's cel shadow side: his tee, his Muay Thai shorts and the heavy bag
+  redShade: '#9e2219',
   green: '#5fc14a',
   sand: '#f2c66d',
   steel: '#8a93a6',
@@ -29,7 +31,10 @@ export const CEL = {
 
   // The sky per zone, high to low: noon over the desert, dusk over the loot field, night at the station
   noonHigh: '#2a9fb0',
+  noonMid: '#5cc4c9',
   noonLow: '#8fe0d8',
+  // The town's afternoon sky over the sand and the orange
+  townHigh: '#3b8fb0',
   duskHigh: '#5b2b5e',
   duskLow: '#f2793a',
   nightHigh: '#0f1230',
@@ -42,13 +47,20 @@ export const CEL = {
   mesaShade: '#8d3b20',
   rock: '#6b3a26',
   scrub: '#6f8a3a',
+  // The scrub olive in shadow: his plate carrier's shadow side and its mag pouches
+  scrubShade: '#4c5a3a',
 
   // The bounty board's planks and its paper notices
   plank: '#a8743f',
+  plankLight: '#9a6836',
   plankShade: '#6e4524',
   notice: '#f6ecd2',
 
   // The loot rarity ladder, lowest to highest
+  // The musician's jeans and their shadow side
+  denim: '#2c3a5c',
+  denimShade: '#1b2440',
+
   common: '#f4f4f0',
   uncommon: '#4ccf3a',
   rare: '#2f7bff',
@@ -64,6 +76,8 @@ export const CEL = {
   // The flavour red a step deeper for its words on the card paper (7:1); the stamp's frame keeps flavour.
   flavourText: '#9c140a',
   crit: '#ff2a1a',
+  // A compare mark that goes up on a card: green deep enough for its words on the card paper
+  upText: '#1d7a12',
 
   // The respawn station's hologram and its glow
   holo: '#38d6ff',
