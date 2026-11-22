@@ -232,9 +232,9 @@ export function MartialArtistSections({ sections }: { sections: SectionsOf<'figh
                     achievements: 'space-y-4',
                     achievement: `text-sm ${world.ink}`,
                   }}
-                  renderAchievement={(achievement) => (
+                  renderAchievement={(achievement, index) => (
                     <p className={`flex items-start gap-2 p-4 ${world.titleCard}`}>
-                      <span className={`inline-block ${world.red} ${staggerAt(martialArts.primary.achievements.indexOf(achievement))} ${played ? styles.hitIn : styles.hitWait}`} aria-hidden="true">
+                      <span className={`inline-block ${world.red} ${staggerAt(index)} ${played ? styles.hitIn : styles.hitWait}`} aria-hidden="true">
                         ★
                       </span>
                       <span>{achievement}</span>
