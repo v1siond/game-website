@@ -94,7 +94,7 @@ export function ExperienceCard({ entry }: { entry: Job }) {
           </ul>
         )}
         <div className={SHOW_AFTER.last}>
-          <Tags items={entry.skills.slice(0, 5)} label={cards.skillsUsed} />
+          <Tags items={entry.skills} label={cards.skillsUsed} />
         </div>
       </article>
     </div>
@@ -159,7 +159,7 @@ export function ProjectCard({ project, years, links, noLink }: ProjectSlot) {
             {project.impact}
           </p>
         )}
-        <Tags items={project.techStack.slice(0, 4)} label={labels.cards.technologiesUsed} />
+        <Tags items={project.techStack} label={labels.cards.technologiesUsed} />
         {links.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {links.map(({ kind, label, linkProps }) => (
@@ -210,7 +210,7 @@ export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
       </div>
       <p className={`mb-3 ${BODY}`}>{company.description}</p>
       <div className="flex flex-wrap gap-2">
-        {company.services.slice(0, 2).map((service) => (
+        {company.services.map((service) => (
           <span key={service} className={TAG}>
             {service}
           </span>
