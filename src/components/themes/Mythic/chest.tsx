@@ -1,7 +1,6 @@
 'use client'
 
 import { useRef } from 'react'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { FigureSpace, SpartanSprite } from './sprite'
 import { useSceneMove, useTrack } from './track'
@@ -83,8 +82,7 @@ function Lid() {
 
 export function ChestHeave() {
   const { reduced } = useZoneStageContext()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.5 })
-  const { pose, take, settle, ms } = useSceneMove('heave', triggered)
+  const { ref, pose, take, settle, ms } = useSceneMove('heave', 0.5)
   const lidRef = useRef<SVGGElement>(null)
   const glowRef = useRef<SVGPathElement>(null)
   useTrack(lidRef, LID_TRACK, ms, take)

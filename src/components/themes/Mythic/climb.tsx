@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
+import { usePoseSequence, type PoseSequence } from '@/hooks/usePoseSequence'
 import { fillLabel } from '@/lib/cv/labels'
 import type { TechCategory } from '@/lib/cv/content'
 import { SpartanSprite, placeOn, type SpriteMotion } from './sprite'
@@ -31,12 +31,9 @@ const HIM = placeOn(120, nearFistAt(firstPose('hang', 'engineer')), [RING.x, HOL
 const LINKS = Array.from({ length: 18 }, (_, index) => -600 + index * 60)
 const CLIMB_GAP_MS = MOVES.climb.ms + 250
 
-function Chain({ ids, gripped, glow, take }: { ids: readonly string[]; gripped: number; glow: string | null; take: number }) {
-  const { pose, take: moveTake, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'hang', still: 'still', policy: 'always' })
-
-  useEffect(() => {
-    if (take > 0) play('climb')
-  }, [take, play])
+// `climber` is his move sequence, which the queue of reaches in Climb plays each climb on.
+function Chain({ ids, gripped, glow, climber }: { ids: readonly string[]; gripped: number; glow: string | null; climber: PoseSequence<SpriteMotion> }) {
+  const { pose, take: moveTake, settle } = climber
 
   const drop = Math.max(0, gripped - 1) * HOLD_STEP
   return (
@@ -65,11 +62,7 @@ function Chain({ ids, gripped, glow, take }: { ids: readonly string[]; gripped: 
 
 function Page({ category, lit, onEnter, onPoint }: { category: Category; lit: boolean; onEnter: (id: string) => void; onPoint: (id: string | null) => void }) {
   const { cards } = useLabels()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.4 })
-
-  useEffect(() => {
-    if (triggered) onEnter(category.id)
-  }, [triggered, category.id, onEnter])
+  const { ref } = useSectionTrigger({ threshold: 0.4, onEnter: () => onEnter(category.id) })
 
   return (
     <li
@@ -98,7 +91,9 @@ function Page({ category, lit, onEnter, onPoint }: { category: Category; lit: bo
 
 export function Climb({ categories }: { categories: Category[] }) {
   const { cards } = useLabels()
-  const { enter, isDone, take, count } = useTurnQueue(categories, CLIMB_GAP_MS)
+  const climber = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'hang', still: 'still', policy: 'always' })
+  const { play } = climber
+  const { enter, isDone, count } = useTurnQueue(categories, CLIMB_GAP_MS, () => play('climb'))
   const [glow, setGlow] = useState<string | null>(null)
   const ids = categories.map((category) => category.id)
 
@@ -106,7 +101,7 @@ export function Climb({ categories }: { categories: Category[] }) {
     <div>
       <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-4 md:grid-cols-[7rem_minmax(0,1fr)]">
         <div className="sticky top-16 self-start">
-          <Chain ids={ids} gripped={count} glow={glow} take={take} />
+          <Chain ids={ids} gripped={count} glow={glow} climber={climber} />
         </div>
         <ul className="grid gap-4 md:grid-cols-2" aria-label={cards.techByCategory}>
           {categories.map((category) => (

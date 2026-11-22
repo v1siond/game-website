@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactElement } from 'react'
+import { useState, type ReactElement } from 'react'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { Profession } from '@/lib/cv/professions'
@@ -17,17 +17,15 @@ import u from './underworld.module.css'
 // new kit, and the picked plate turns over to its lit gold face. The first render shows him as he is, so
 // the mirror never swirls on page load.
 
-// A new take each time the shown profession changes after the first render.
+// A new take each time the shown profession changes after the first render, counted in the render that
+// sees the change (the previous value pattern), so the swirl and the new kit commit together.
 function useTakeOnChange(profession: Profession): number {
   const [take, setTake] = useState(0)
-  const shown = useRef(profession)
-
-  useEffect(() => {
-    if (shown.current === profession) return
-    shown.current = profession
-    setTake((count) => count + 1)
-  }, [profession])
-
+  const [shown, setShown] = useState(profession)
+  if (shown !== profession) {
+    setShown(profession)
+    setTake(take + 1)
+  }
   return take
 }
 

@@ -1,12 +1,12 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { memo, useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { jobYears } from '@/lib/cv/sectionText'
 import { MASONRY_ITEM } from '@/lib/cv/masonry'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { usePoseSequence } from '@/hooks/usePoseSequence'
+import { usePoseSequence, type PoseSequence } from '@/hooks/usePoseSequence'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import type { Job } from '@/lib/cv/content'
@@ -122,17 +122,15 @@ function Storm() {
   )
 }
 
-function Arena({ take, cleared, total }: { take: number; cleared: number; total: number }) {
+// `fighter` is his move sequence, which the queue of fights in Trials plays the finisher on.
+function Arena({ take, fighter, cleared, total }: { take: number; fighter: PoseSequence<SpriteMotion>; cleared: number; total: number }) {
   const { myth } = useLabels()
   const { reduced } = useZoneStageContext()
   const foeRef = useRef<SVGGElement>(null)
   const medallionRef = useRef<SVGGElement>(null)
-  const { pose, take: moveTake, play, settle } = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
+  const { pose, take: moveTake, settle } = fighter
   const Foe = FOE[FOE_ORDER[Math.max(0, take - 1) % FOE_ORDER.length]]
 
-  useEffect(() => {
-    if (take > 0) play('finish')
-  }, [take, play])
   useTrack(foeRef, FOE_TRACK, FIGHT_MS, take)
   useTrack(medallionRef, MEDALLION_TRACK, FIGHT_MS, take)
 
@@ -172,14 +170,11 @@ function Arena({ take, cleared, total }: { take: number; cleared: number; total:
   )
 }
 
-function TrialCard({ job, cleared, onEnter }: { job: Job; cleared: boolean; onEnter: (id: string) => void }) {
+// Memoised: a fight's turn re-renders Trials, and only the card it clears needs to draw again.
+const TrialCard = memo(function TrialCard({ job, cleared, onEnter }: { job: Job; cleared: boolean; onEnter: (id: string) => void }) {
   const { years, cards, myth } = useLabels()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.35 })
+  const { ref } = useSectionTrigger({ threshold: 0.35, onEnter: () => onEnter(job.id) })
   const { start, end } = jobYears(job, years.present)
-
-  useEffect(() => {
-    if (triggered) onEnter(job.id)
-  }, [triggered, job.id, onEnter])
 
   return (
     <article ref={ref} data-on={cleared || undefined} className={`relative p-5 ${u.panel} ${u.trial}`}>
@@ -218,15 +213,17 @@ function TrialCard({ job, cleared, onEnter }: { job: Job; cleared: boolean; onEn
       )}
     </article>
   )
-}
+})
 
 export function Trials({ jobs }: { jobs: Job[] }) {
-  const { enter, isDone: isCleared, take, count } = useTurnQueue(jobs, FIGHT_GAP_MS)
+  const fighter = usePoseSequence<SpriteMotion>({ entrance: [], rest: 'idle', still: 'still', policy: 'always' })
+  const { play } = fighter
+  const { enter, isDone: isCleared, take, count } = useTurnQueue(jobs, FIGHT_GAP_MS, () => play('finish'))
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
       <div className="lg:sticky lg:top-8 lg:z-10 lg:self-start">
-        <Arena take={take} cleared={count} total={jobs.length} />
+        <Arena take={take} fighter={fighter} cleared={count} total={jobs.length} />
       </div>
       <ul className="columns-1 gap-6 xl:columns-2">
         {jobs.map((job) => (

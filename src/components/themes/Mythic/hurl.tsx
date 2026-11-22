@@ -2,7 +2,6 @@
 
 import { useRef } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
-import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useZoneStageContext } from '@/hooks/useZoneStage'
 import { SpartanSprite } from './sprite'
 import { useSceneMove, useTrack } from './track'
@@ -88,8 +87,7 @@ function Blade() {
 export function BladeThrow() {
   const { myth } = useLabels()
   const { reduced } = useZoneStageContext()
-  const { ref, triggered } = useSectionTrigger({ threshold: 0.5 })
-  const { pose, take, settle, replay, ms } = useSceneMove('hurl', triggered)
+  const { ref, pose, take, settle, replay, ms } = useSceneMove('hurl', 0.5)
   const bladeRef = useRef<SVGGElement>(null)
   const iceRef = useRef<SVGGElement>(null)
   const tokenRef = useRef<SVGGElement>(null)
