@@ -10,6 +10,7 @@ import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { SH_VARS } from './SurvivalHorror/palette'
 import { DoorProvider } from './SurvivalHorror/door'
 import { HallHero } from './SurvivalHorror/hall'
@@ -43,6 +44,7 @@ export default function SurvivalHorrorTheme() {
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-flame)] [--focus-halo:var(--sh-void)] ${look.root}`} style={SH_VARS}>
+      <SkipLink />
       <DoorProvider>
         <ZoneStageProvider value={stage}>
           <StageProvider value={state}>
@@ -59,7 +61,7 @@ export default function SurvivalHorrorTheme() {
                 <ItemBox />
               </RoomWindow>
 
-              <main className="px-4 sm:px-6">
+              <main id="main-content" className="px-4 sm:px-6">
                 <ProfessionRegion className="mx-auto max-w-6xl">
                   <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
                 </ProfessionRegion>

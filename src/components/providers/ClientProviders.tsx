@@ -24,15 +24,16 @@ export default function ClientProviders({ children, worldsLabels }: { children: 
   return (
     <ThemeProvider>
       <ProfessionProvider>
-        <WorldTransitionProvider>
-          <WorldsLabelsProvider labels={worldsLabels}>
+        {/* outside the transition provider, so the portal it mounts reads its line in the page's locale */}
+        <WorldsLabelsProvider labels={worldsLabels}>
+          <WorldTransitionProvider>
             <SharedProfessionStage />
             {children}
             {/* worlds picker lives outside the page content flow, available in every world */}
             <WorldsLauncher />
             <WorldsModal />
-          </WorldsLabelsProvider>
-        </WorldTransitionProvider>
+          </WorldTransitionProvider>
+        </WorldsLabelsProvider>
       </ProfessionProvider>
     </ThemeProvider>
   )

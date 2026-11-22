@@ -7,6 +7,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { CopyrightLine } from './shared/CopyrightLine'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { CARVED, SOUL_VARS } from './SoulMap/palette'
 import { RunProvider } from './SoulMap/run'
 import { AshFall } from './SoulMap/ash'
@@ -46,6 +47,7 @@ export default function SoulMapTheme() {
   return (
     <RunProvider>
       <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--soul-glow)] [--focus-halo:var(--soul-abyss)] ${CARVED} ${ashen.world} ${soulCarved.variable}`} style={SOUL_VARS}>
+        <SkipLink />
         <AshFall />
 
         <header className="relative z-20">
@@ -56,7 +58,7 @@ export default function SoulMapTheme() {
           <ClassSelect />
         </div>
 
-        <main className="relative z-20">
+        <main id="main-content" className="relative z-20">
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </main>
 

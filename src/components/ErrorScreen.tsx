@@ -32,9 +32,15 @@ export interface ErrorAction {
   primary?: boolean
 }
 
+/** An HTTP status: its number, and what a screen reader says for it in the page's language. */
+export interface ErrorStatus {
+  code: number
+  label: string
+}
+
 export interface ErrorScreenProps {
   /** The HTTP status, when there is one. A client-side crash has none and shows no number. */
-  status?: number
+  status?: ErrorStatus
   /** What happened, in the visitor's terms. Sentence case, no apology. */
   headline: string
   /** Why it happened and what to do about it. Two short sentences at most. */
@@ -83,8 +89,8 @@ export function ErrorScreen({ status, headline, detail, actions, technical }: Er
     <main className="c-error" style={errorVars(theme)} role="main">
       <div className="c-error__body">
         {status !== undefined && (
-          <p className="c-error__status" aria-label={`HTTP status ${status}`}>
-            {status}
+          <p className="c-error__status" aria-label={status.label}>
+            {status.code}
           </p>
         )}
         <hr className="c-error__rule" />

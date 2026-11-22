@@ -1,6 +1,8 @@
 'use client'
 
 import { cssVars } from '@/lib/cssVars'
+import { fillLabel } from '@/lib/cv/labels'
+import { useWorldsLabels } from './WorldsLabels'
 
 export type PortalVariant = 'vortex' | 'wormhole' | 'hyperspace' | 'glitch'
 
@@ -34,6 +36,7 @@ export default function WorldPortal({
   coverMs,
   revealMs,
 }: WorldPortalProps) {
+  const { portalLine } = useWorldsLabels()
   const style = cssVars({
     '--wp-accent': accent,
     '--wp-secondary': secondary,
@@ -52,7 +55,7 @@ export default function WorldPortal({
       <div className="wp-flash" aria-hidden="true" />
       <div className="wp-label">
         <span className="wp-label-text" role="status" aria-live="polite">
-          Entering {worldName}
+          {fillLabel(portalLine, { world: worldName })}
         </span>
       </div>
     </div>

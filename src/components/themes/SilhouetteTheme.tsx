@@ -6,6 +6,7 @@ import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { SHADE_VARS, TYPEWRITER } from './Silhouette/palette'
 import { Atmosphere } from './Silhouette/backdrop'
 import { CutProvider } from './Silhouette/cut'
@@ -35,6 +36,7 @@ export default function SilhouetteTheme() {
   return (
     <CutProvider>
       <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-rim)] [--focus-halo:var(--sh-void)] ${TYPEWRITER} ${world.world}`} style={SHADE_VARS}>
+        <SkipLink />
         <Atmosphere />
 
         <header className="relative z-30">
@@ -45,7 +47,7 @@ export default function SilhouetteTheme() {
           <LeverSwitch />
         </div>
 
-        <main className="relative z-20">
+        <main id="main-content" className="relative z-20">
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </main>
 

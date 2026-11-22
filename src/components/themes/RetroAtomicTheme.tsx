@@ -9,6 +9,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { JourneyBackdrop, Wanderer, type Zone } from './RetroAtomic/journey'
 import { VaultEntrance } from './RetroAtomic/vaultDoor'
 import { WristComputer } from './RetroAtomic/wristComputer'
@@ -46,6 +47,7 @@ export default function RetroAtomicTheme() {
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] ${atomic.root} ${atomicFace.variable}`}>
+      <SkipLink />
       <JourneyBackdrop zones={zones} />
       {!reducedMotion && <VaultEntrance onOpened={onOpened} />}
 
@@ -54,7 +56,7 @@ export default function RetroAtomicTheme() {
       </header>
 
       <ZoneStageProvider value={stage}>
-        <main className="relative z-20 px-4 py-10 sm:px-6">
+        <main id="main-content" className="relative z-20 px-4 py-10 sm:px-6">
           <ProfessionRegion className="mx-auto max-w-6xl">
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
           </ProfessionRegion>
@@ -65,7 +67,7 @@ export default function RetroAtomicTheme() {
 
       <Wanderer zones={zones} />
 
-      <footer className="relative z-20 bg-atomic-ink py-8 text-center" role="contentinfo">
+      <footer className="relative z-20 bg-atomic-ink py-8 text-center">
         <p className="text-sm text-atomic-ash">
           <CopyrightLine />
         </p>

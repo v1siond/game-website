@@ -1,22 +1,35 @@
 'use client'
 
 import { useState } from 'react'
-import { useLabels } from './CVDataProvider'
+import { useCVData } from './CVDataProvider'
 
 interface DownloadPdfButtonProps {
   /** The id of the element the PDF is made from, set by the page that renders it. */
   contentId: string
 }
 
+type ExportStatus = 'idle' | 'generating' | 'failed'
+
+// The status line is one polite live region beside the button: off screen while the PDF is made (the
+// button shows that), on screen when an export fails, until the next press.
+const STATUS_LINE_CLASS: Record<ExportStatus, string> = {
+  idle: 'sr-only',
+  generating: 'sr-only',
+  failed: 'text-sm text-red-800 print:hidden',
+}
+
 // The button stays enabled while the PDF is made (aria-disabled, a press is ignored), so keyboard focus
-// stays on it; the busy text is announced through a polite live region beside it.
+// stays on it.
 export function DownloadPdfButton({ contentId }: DownloadPdfButtonProps) {
-  const [isGenerating, setIsGenerating] = useState(false)
-  const { cvPage } = useLabels()
+  const [status, setStatus] = useState<ExportStatus>('idle')
+  const { fullName, labels } = useCVData()
+  const { cvPage } = labels
+  const isGenerating = status === 'generating'
+  const statusLine: Record<ExportStatus, string> = { idle: '', generating: cvPage.generating, failed: cvPage.pdfFailed }
 
   const handleDownload = async () => {
     if (isGenerating) return
-    setIsGenerating(true)
+    setStatus('generating')
 
     try {
       // Dynamically import html2pdf to avoid SSR issues
@@ -26,13 +39,14 @@ export function DownloadPdfButton({ contentId }: DownloadPdfButtonProps) {
 
       if (!element) {
         console.error('CV content element not found')
+        setStatus('failed')
         return
       }
 
       // Configure PDF options
       const options = {
         margin: [0.5, 0.5, 0.5, 0.5],
-        filename: 'Alexander_Pulido_CV.pdf',
+        filename: `${fullName.split(' ').join('_')}_CV.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: {
           scale: 2,
@@ -49,10 +63,10 @@ export function DownloadPdfButton({ contentId }: DownloadPdfButtonProps) {
 
       // Generate and download PDF
       await html2pdf().set(options).from(element).save()
+      setStatus('idle')
     } catch (error) {
       console.error('Error generating PDF:', error)
-    } finally {
-      setIsGenerating(false)
+      setStatus('failed')
     }
   }
 
@@ -109,8 +123,8 @@ export function DownloadPdfButton({ contentId }: DownloadPdfButtonProps) {
           </>
         )}
       </button>
-      <span className="sr-only" aria-live="polite">
-        {isGenerating ? cvPage.generating : ''}
+      <span className={STATUS_LINE_CLASS[status]} aria-live="polite">
+        {statusLine[status]}
       </span>
     </>
   )

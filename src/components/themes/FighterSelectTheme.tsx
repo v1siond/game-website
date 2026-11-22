@@ -7,6 +7,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { FS_VARS } from './FighterSelect/palette'
 import { ArcadePanel } from './FighterSelect/frames'
 import { HeroSplash } from './FighterSelect/versus'
@@ -52,6 +53,7 @@ export default function FighterSelectTheme() {
   return (
     <ZoneStageProvider value={stage}>
       <div className={`relative min-h-screen overflow-x-clip ${look.root} ${fsFace.variable}`} style={FS_VARS}>
+        <SkipLink />
         <TourBackdrop zones={zones} />
         <div className={`pointer-events-none fixed inset-0 z-0 ${look.scanlines}`} aria-hidden="true" />
 
@@ -60,7 +62,7 @@ export default function FighterSelectTheme() {
             <HeroSplash profession={active} />
           </header>
 
-          <main className="mx-auto max-w-6xl px-4 sm:px-6">
+          <main id="main-content" className="mx-auto max-w-6xl px-4 sm:px-6">
             <ArcadePanel accent="cyan">
               <SelectScreen active={active} title={labels.professions[active]} />
             </ArcadePanel>

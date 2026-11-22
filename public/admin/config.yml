@@ -727,6 +727,7 @@ collections:
                   - { <<: *text, label: "Back to site", name: backToSite }
                   - { <<: *text, label: "Download PDF", name: downloadPdf }
                   - { <<: *text, label: "Generating", name: generating }
+                  - { <<: *text, label: "Line shown when the PDF export fails", name: pdfFailed }
                   - { <<: *text, label: "Language", name: language }
                   - { <<: *text, label: "Professional summary", name: professionalSummary }
                   - { <<: *text, label: "Core competencies", name: coreCompetencies }
@@ -828,6 +829,7 @@ collections:
                   - { <<: *text, label: "Hint line under the title when the visitor has seen one world", name: hintBodyOne }
                   - { <<: *text, label: "Hint line under the title, two or more worlds seen", name: hintBody }
                   - { <<: *text, label: "Hint button entering the next world", name: hintEnter }
+                  - { <<: *text, label: "World switch overlay line, {world} is the world being entered", name: portalLine }
                   - { <<: *text, label: "Hint button opening the picker", name: hintAll }
                   - { <<: *text, label: "Hint close button for a screen reader", name: hintClose }
                   - { <<: *text, label: "Picker title", name: pickerTitle }
@@ -836,6 +838,12 @@ collections:
                   - { <<: *text, label: "Picker count when the visitor has seen one world", name: pickerProgressOne }
                   - { <<: *text, label: "Picker count of worlds seen, two or more", name: pickerProgress }
                   - { <<: *text, label: "Picker category filters for a screen reader", name: pickerFilterAria }
+                  - { <<: *text, label: "Picker filter chip showing every world", name: pickerFilterAll }
+                  - { <<: *text, label: "Picker filter chip of the Fantasy worlds", name: pickerFilterFantasy }
+                  - { <<: *text, label: "Picker filter chip of the Retro worlds", name: pickerFilterRetro }
+                  - { <<: *text, label: "Picker filter chip of the Neon worlds", name: pickerFilterNeon }
+                  - { <<: *text, label: "Picker filter chip of the Action worlds", name: pickerFilterAction }
+                  - { <<: *text, label: "Picker filter chip of the Artistic worlds", name: pickerFilterArtistic }
                   - { <<: *text, label: "Up next card heading", name: pickerUpNext }
                   - { <<: *text, label: "Up next card button", name: pickerEnter }
                   - { <<: *text, label: "Mark on a world not seen yet", name: pickerNotSeen }
@@ -847,6 +855,23 @@ collections:
                   - { <<: *text, label: "Lens button going to the next world", name: lensGo }
                   - { <<: *text, label: "Lens name for a screen reader", name: lensAria }
                   - { <<: *text, label: "Launcher name for a screen reader once it shows the next world", name: faceAria }
+              # The error pages, in the language of the address (/es/..., /it/...); {status} is the HTTP status number.
+              - label: Error pages
+                name: errors
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Page not found tab title", name: notFoundTitle }
+                  - { <<: *text, label: "Page not found headline", name: notFoundHeadline }
+                  - { <<: *text, label: "Page not found line under the headline", name: notFoundDetail }
+                  - { <<: *text, label: "Server error tab title", name: serverErrorTitle }
+                  - { <<: *text, label: "Server error headline", name: serverErrorHeadline }
+                  - { <<: *text, label: "Server error line under the headline", name: serverErrorDetail }
+                  - { <<: *text, label: "Server error button reloading the page", name: reload }
+                  - { <<: *text, label: "Tab title of any other error", name: otherErrorTitle }
+                  - { <<: *text, label: "Button to the home page", name: goHome }
+                  - { <<: *text, label: "Link to the game engine", name: openEngine }
+                  - { <<: *text, label: "Status number for a screen reader", name: status }
 
   # One Markdown file per post, content/blog/<slug>.md, English only. The front matter is JSON (Decap's
   # json-frontmatter), which the site reads with JSON.parse. A new post starts as a draft: drafts show

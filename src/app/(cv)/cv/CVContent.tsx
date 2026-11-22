@@ -14,34 +14,6 @@ import { CVSection } from './CVSection'
 // The element the PDF button turns into the PDF.
 const CV_CONTENT_ID = 'cv-content'
 
-// The page's print rules (colours kept, links plain, the page margin) as a plain style element, since
-// styled-jsx runs only in a client component and this one renders on the server.
-const PRINT_STYLES = `
-  @media print {
-    body {
-      -webkit-print-color-adjust: exact;
-      print-color-adjust: exact;
-    }
-    .print\\:hidden {
-      display: none !important;
-    }
-    .print\\:px-0 {
-      padding-left: 0;
-      padding-right: 0;
-    }
-    .print\\:py-0 {
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-    a {
-      text-decoration: none !important;
-    }
-  }
-  @page {
-    margin: 0.5in;
-  }
-`
-
 /** The CV of the page's language, rendered on the server; the language switch goes to the same CV in
  *  another one, and the toolbar's two controls are the page's only client parts. */
 export function CVContent({ cv, locale }: Readonly<{ cv: CVData; locale: Locale }>) {
@@ -261,7 +233,6 @@ export function CVContent({ cv, locale }: Readonly<{ cv: CVData; locale: Locale 
           <p className="text-sm">{professionalSummary.languages}</p>
         </CVSection>
 
-        <style>{PRINT_STYLES}</style>
       </main>
     </>
   )

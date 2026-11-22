@@ -10,6 +10,7 @@ import { ProfessionRegion } from '@/components/cv/ProfessionRegion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { CityBackdrop, type District } from './NeonCyber/city'
 import { DistrictStage, DriveOff } from './NeonCyber/life'
 import { BootHero } from './NeonCyber/boot'
@@ -48,6 +49,7 @@ export default function NeonCyberTheme() {
 
   return (
     <div ref={rootRef} data-scan={scanning ? 'on' : 'off'} className={`relative min-h-screen overflow-x-clip ${world.root} ${neonFace.variable}`} style={NEON_VARS}>
+      <SkipLink />
       <ZoneStageProvider value={stage}>
       <CityBackdrop zones={zones} />
       <ScanVeil />
@@ -62,7 +64,7 @@ export default function NeonCyberTheme() {
         </section>
       </DistrictStage>
 
-      <main className="relative z-20 px-4 py-6 sm:px-6">
+      <main id="main-content" className="relative z-20 px-4 py-6 sm:px-6">
         <ProfessionRegion className="mx-auto max-w-6xl">
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </ProfessionRegion>
@@ -73,7 +75,7 @@ export default function NeonCyberTheme() {
         <DriveOff />
       </div>
 
-      <footer className="relative z-20 flex items-center justify-center gap-3 pb-10" role="contentinfo">
+      <footer className="relative z-20 flex items-center justify-center gap-3 pb-10">
         <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
         <p className="text-sm tracking-widest text-[color:var(--neon-ash)]">
           <CopyrightLine />

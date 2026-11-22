@@ -15,6 +15,7 @@ import { SECTION_VIEWS } from './BoldNoir/sections'
 import { DeliveredCard } from './BoldNoir/contact'
 import { NOIR, NOIR_VARS } from './BoldNoir/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import world from './BoldNoir/world.module.css'
 
 // Bold Noir, a stylish heist night (black slabs and paper on crooked boxes,
@@ -40,6 +41,7 @@ export default function BoldNoirTheme() {
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root}`} style={NOIR_VARS}>
+      <SkipLink />
       <NoirBackdrop />
 
       {/* the first screen: his calling card and the menu where he stands */}
@@ -60,7 +62,7 @@ export default function BoldNoirTheme() {
         </section>
       </div>
 
-      <main className="relative z-20 px-4 py-10 sm:px-6">
+      <main id="main-content" className="relative z-20 px-4 py-10 sm:px-6">
         <ProfessionRegion className="mx-auto max-w-6xl">
           <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
         </ProfessionRegion>
@@ -68,7 +70,7 @@ export default function BoldNoirTheme() {
 
       <DeliveredCard />
 
-      <footer className="relative z-20 flex items-center justify-center gap-3 py-10" role="contentinfo">
+      <footer className="relative z-20 flex items-center justify-center gap-3 py-10">
         <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />
         <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>
           <CopyrightLine />

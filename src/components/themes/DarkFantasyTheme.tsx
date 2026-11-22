@@ -19,7 +19,7 @@ import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { DiamondIcon, GearIcon, WaveIcon } from '@/components/themes/shared/professionIcons'
-import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { ProfessionStage } from '@/components/themes/shared/professionStage'
 import { CursorTrail, ParallaxLayers } from './DarkFantasy/InteractiveElements'
 import { FRAME_INSET_REM, KnightSlashReveal } from './DarkFantasy/KnightCharacter'
@@ -1758,8 +1758,7 @@ export default function DarkFantasyTheme() {
       style={DARK_FANTASY_VARS}
       className="min-h-screen relative overflow-hidden [--focus-ring:var(--df-spirit-gold)] [--focus-halo:var(--df-void)] bg-gradient-to-b from-[color:var(--df-void)] via-[color:var(--df-void-deep)] to-[color:var(--df-void-purple)] font-['Comic_Sans_MS','Comic_Sans',cursive]"
     >
-      {/* Skip Link for accessibility */}
-      <SkipLink href="#main-content" />
+      <SkipLink />
 
       {/* Atmospheric background layers */}
       <div
@@ -1922,7 +1921,7 @@ export default function DarkFantasyTheme() {
       />
 
       {/* Footer */}
-      <footer className="relative z-20 py-12 px-6 text-center" role="contentinfo">
+      <footer className="relative z-20 py-12 px-6 text-center">
         <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silverText }}>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]">

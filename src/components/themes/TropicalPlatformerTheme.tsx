@@ -9,6 +9,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { PostsGate } from '@/components/cv/PostsGate'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import { SkipLink } from '@/components/themes/shared/SkipLink'
 import { PALETTE_VARS } from './TropicalPlatformer/palette'
 import { JungleDefs } from './TropicalPlatformer/barrel'
 import { Canopy } from './TropicalPlatformer/canopy'
@@ -44,6 +45,7 @@ export default function TropicalPlatformerTheme() {
 
   return (
     <div ref={pointer} style={PALETTE_VARS} className={`relative min-h-screen overflow-x-clip ${look.root} ${jungleFace.variable}`}>
+      <SkipLink />
       <HudProvider>
         <JungleDefs />
         <SceneryDefs />
@@ -59,7 +61,7 @@ export default function TropicalPlatformerTheme() {
           <PartnerBarrel />
         </section>
 
-        <main className="relative z-20 px-4 py-16 sm:px-8 md:px-20">
+        <main id="main-content" className="relative z-20 px-4 py-16 sm:px-8 md:px-20">
           <div className="mx-auto max-w-6xl space-y-24" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
             <VineCrossing />
             <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />

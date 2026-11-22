@@ -189,7 +189,7 @@
 /* ---- the curtains (Ventures) ---- */
 
 .curtain {
-  background: repeating-linear-gradient(90deg, var(--hose-redDark) 0 18px, var(--hose-red) 18px 30px);
+  background: repeating-linear-gradient(90deg, var(--hose-red-dark) 0 18px, var(--hose-red) 18px 30px);
   transition: transform 1.1s var(--hose-bounce);
 }
 
