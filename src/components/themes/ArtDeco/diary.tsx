@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties } from 'react'
+import { memo, useCallback, useEffect, useState, type CSSProperties } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -55,7 +55,16 @@ function Recorder() {
   )
 }
 
-function DiaryCard({ entry, index, playing, onToggle }: { entry: Job; index: number; playing: number | null; onToggle: () => void }) {
+interface DiaryCardProps {
+  entry: Job
+  index: number
+  /** The line playing on this card's tape, or null while it is stopped. */
+  playing: number | null
+  onToggle: (id: string) => void
+}
+
+// Memoised: a line ticking on one tape renders only that card, the shelf hands the rest the same props.
+const DiaryCard = memo(function DiaryCard({ entry, index, playing, onToggle }: DiaryCardProps) {
   const { years, cards, deco, actions } = useLabels()
   const { start, end } = jobYears(entry, years.present)
   const job = fillLabel(cards.jobSpan, { title: entry.title, company: entry.company, start, end })
@@ -117,7 +126,7 @@ function DiaryCard({ entry, index, playing, onToggle }: { entry: Job; index: num
         )}
         <button
           type="button"
-          onClick={onToggle}
+          onClick={() => onToggle(entry.id)}
           aria-pressed={isPlaying}
           aria-label={fillLabel(isPlaying ? deco.stopDiary : deco.playDiary, { job })}
           className={`inline-flex min-h-[44px] items-center gap-2 px-4 text-sm uppercase tracking-[0.15em] ${diary.play}`}
@@ -130,7 +139,7 @@ function DiaryCard({ entry, index, playing, onToggle }: { entry: Job; index: num
       </div>
     </article>
   )
-}
+})
 
 /** The jobs as a masonry shelf of diaries, one playing at a time. */
 export function DiaryShelf({ jobs }: { jobs: Job[] }) {
@@ -155,13 +164,13 @@ export function DiaryShelf({ jobs }: { jobs: Job[] }) {
     return () => window.clearTimeout(timer)
   }, [playing, jobs])
 
-  const toggle = (id: string) => setPlaying((current) => (current?.id === id ? null : { id, line: 0 }))
+  const toggle = useCallback((id: string) => setPlaying((current) => (current?.id === id ? null : { id, line: 0 })), [])
 
   return (
     <ul ref={ref} data-on={triggered || undefined} className={`${MASONRY_LIST} ${diary.shelf}`}>
       {jobs.map((entry, index) => (
         <li key={entry.id} ref={index === 0 ? newestRef : undefined} className={MASONRY_ITEM}>
-          <DiaryCard entry={entry} index={index} playing={playing?.id === entry.id ? playing.line : null} onToggle={() => toggle(entry.id)} />
+          <DiaryCard entry={entry} index={index} playing={playing?.id === entry.id ? playing.line : null} onToggle={toggle} />
         </li>
       ))}
     </ul>
