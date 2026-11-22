@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useMemo, useState, type CSSProperties, type ReactNode } from 'react'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import type { Job } from '@/lib/cv/content'
 import { FS } from './palette'
@@ -19,15 +19,13 @@ const FlightContext = createContext<(index: number) => void>(() => undefined)
 
 export function FlightStop({ index, children }: { index: number; children: ReactNode }) {
   const arrive = useContext(FlightContext)
-  const { ref, inView } = useSectionTrigger({
+  // Each time the round comes into view, down the page or back up, the plane flies to its pin.
+  const { ref } = useSectionTrigger({
     triggerOnce: false,
     threshold: 0.5,
     rootMargin: '-20% 0px -30% 0px',
+    onEnter: () => arrive(index),
   })
-
-  useEffect(() => {
-    if (inView) arrive(index)
-  }, [inView, index, arrive])
 
   return <div ref={ref}>{children}</div>
 }

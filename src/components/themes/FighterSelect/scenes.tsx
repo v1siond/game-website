@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useZoneStage } from '@/hooks/useZoneStage'
 import type { Profession } from '@/lib/cv/professions'
@@ -247,14 +247,12 @@ export function SuperArt({ profession, count }: { profession: Profession; count:
   const land = useComboLand()
   const { ref, on, reduced } = useScene('harbour')
   const [bout] = useState(() => superBout(count))
-  const { beat, take, started, replay } = useBout(bout, on, reduced)
+  // Every hit of the super lands on the combo counter, once per beat, as the bout's clock reaches it.
+  const { beat, take, started, replay } = useBout(bout, on, reduced, (next) => {
+    if (!reduced && next.mark === 'hit') land()
+  })
   const flashing = !reduced && started && beat.mark === 'flash'
   const hitBeat = !reduced && beat.mark === 'hit'
-
-  // Every hit of the super lands on the combo counter, once per beat.
-  useEffect(() => {
-    if (hitBeat) land()
-  }, [hitBeat, take, land])
 
   return (
     <div ref={ref}>
