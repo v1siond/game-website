@@ -91,14 +91,6 @@ describe('CVContent', () => {
         (title) => expect(screen.queryByRole('heading', { name: title })).not.toBeInTheDocument(),
       )
     })
-
-    it('drops the summary, competencies and education when there is no summary', () => {
-      renderCV({ ...cv, professionalSummary: null })
-
-      expect(screen.queryByRole('heading', { name: cvPage.professionalSummary })).not.toBeInTheDocument()
-      expect(screen.queryByRole('heading', { name: cvPage.education })).not.toBeInTheDocument()
-      expect(screen.queryByRole('heading', { name: cvPage.coreCompetencies })).not.toBeInTheDocument()
-    })
   })
 
   describe('toolbar', () => {

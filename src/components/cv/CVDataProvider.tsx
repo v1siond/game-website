@@ -13,11 +13,23 @@ import { ServerYearProvider, useYearNow } from '@/hooks/useYearNow'
 // rendered in, which useYearNow serves until hydration is done.
 
 const CVDataContext = createContext<CVData | null>(null)
+const WorldViewContext = createContext<CVView | null>(null)
+
+// The view of the profession picked now, computed once here for every component that reads useWorldView,
+// so a profession switch runs viewFor once instead of once per caller.
+function WorldViewProvider({ cv, children }: { cv: CVData; children: ReactNode }) {
+  const { active } = useProfession()
+  const year = useYearNow()
+  const view = useMemo(() => viewFor(cv, active, 'world', year), [cv, active, year])
+  return <WorldViewContext.Provider value={view}>{children}</WorldViewContext.Provider>
+}
 
 export function CVDataProvider({ cv, year, children }: { cv: CVData; year: number; children: ReactNode }) {
   return (
     <CVDataContext.Provider value={cv}>
-      <ServerYearProvider value={year}>{children}</ServerYearProvider>
+      <ServerYearProvider value={year}>
+        <WorldViewProvider cv={cv}>{children}</WorldViewProvider>
+      </ServerYearProvider>
     </CVDataContext.Provider>
   )
 }
@@ -35,8 +47,7 @@ export function useLabels(): Labels {
 
 /** What a world draws for the profession picked now: the recruiter hero and that profession's sections. */
 export function useWorldView(): CVView {
-  const cv = useCVData()
-  const { active } = useProfession()
-  const year = useYearNow()
-  return useMemo(() => viewFor(cv, active, 'world', year), [cv, active, year])
+  const view = useContext(WorldViewContext)
+  if (!view) throw new Error('useWorldView must be used within a CVDataProvider (the site page loads the CV and wraps the world in it)')
+  return view
 }
