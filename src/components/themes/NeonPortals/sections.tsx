@@ -2,53 +2,20 @@
 
 import { useMemo } from 'react'
 import { sectionViews, type SectionFrames } from '@/components/cv/SectionPlanView'
-import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
-import { useZoneStage } from '@/hooks/useZoneStage'
-import { sectionPlan, type SectionId } from '@/lib/cv/sectionPlan'
+import { useCVData, useWorldView } from '@/components/cv/CVDataProvider'
+import { sectionPlan } from '@/lib/cv/sectionPlan'
 import { BounceBoxLevel } from './bounceBoxes'
 import { CheckpointLevel } from './checkpoints'
 import { CountBoxLevel } from './countBox'
 import { findTotal } from './finds'
 import { GemLevel } from './gems'
 import { IronBoxLevel } from './ironBox'
+import { MaskLevel } from './masks'
 import { SphereLevel } from './spheres'
 import { TechBoxLevel } from './techBoxes'
-import type { Era } from './palette'
-import { Region } from './stage'
 
-// Each section as a level of the run, its set piece chosen from the shape of its data, and its era in the
-// backdrop chosen for what it holds. The shared plan picks which levels a profession runs and in which order.
-
-const ERA_OF: Record<SectionId, Era> = {
-  about: 'hub',
-  work: 'medieval',
-  tech: 'tomb',
-  services: 'wall',
-  projects: 'future',
-  ventures: 'underwater',
-  bands: 'arabian',
-  muayThai: 'prehistoric',
-}
-
-function Level({ id }: { id: SectionId }) {
-  const { sections } = useLabels()
-  const { ref, on } = useZoneStage<Era>(ERA_OF[id])
-  const titles: Record<SectionId, string> = {
-    about: sections.about,
-    work: sections.workExperience,
-    tech: sections.techStack,
-    services: sections.services,
-    projects: sections.projects,
-    ventures: sections.ventures,
-    bands: sections.bands,
-    muayThai: sections.muayThai,
-  }
-  return (
-    <Region title={titles[id]} stageRef={ref} on={on}>
-      {null}
-    </Region>
-  )
-}
+// Each section as a level of the run, its set piece chosen from the shape of its data; each set piece names
+// its own era for the backdrop. The shared plan picks which levels a profession runs and in which order.
 
 const FRAMES: SectionFrames = {
   about: function AboutFrame() {
@@ -72,7 +39,9 @@ const FRAMES: SectionFrames = {
   bands: function BandsFrame({ slot }) {
     return <BounceBoxLevel bands={slot.bands} musician={slot.musician} />
   },
-  muayThai: () => <Level id="muayThai" />,
+  muayThai: function MuayThaiFrame({ slot }) {
+    return <MaskLevel martialArts={slot.martialArts} />
+  },
 }
 
 export const SECTION_VIEWS = sectionViews(FRAMES)

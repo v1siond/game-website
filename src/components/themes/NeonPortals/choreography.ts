@@ -239,3 +239,19 @@ export function lidAt(index: number, count: number): number {
 const MASK_STEP_MAX = 3
 
 export const maskSteps = (achievements: number): number => Math.min(MASK_STEP_MAX, achievements)
+
+/** Where his guard stands on the strip, and the mask's place over his face at its last step. */
+export const MASK_GUARD = { x: 30, lift: 17, scale: 1 }
+const MASK_START = { x: 84, lift: 9, scale: 0.7 }
+
+/** The mask's place at a step: x and lift in % of the strip, scale of its full size; the last step is on his face. */
+export const maskSpot = (step: number, steps: number): typeof MASK_GUARD => {
+  if (steps === 0) return MASK_START
+  const share = step / steps
+  const toward = (from: number, to: number) => from + (to - from) * share
+  return {
+    x: toward(MASK_START.x, MASK_GUARD.x),
+    lift: toward(MASK_START.lift, MASK_GUARD.lift),
+    scale: toward(MASK_START.scale, MASK_GUARD.scale),
+  }
+}

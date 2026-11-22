@@ -1,4 +1,4 @@
-import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
+import { COLLECT, COUNT_BOX, GEMS_IN, HERO_TIMING, IRON_BOX, PATH, PIPS, POSES, RUN_MS, beatStart, heroEntranceMs, motionAt, aimAt, bandScene, bandTiming, boxX, breakAt, collectMotion, frameAt, lidAt, maskSpot, maskSteps, MASK_GUARD, pipAt, postAt, postX, restSpot, sceneMs, techScene, techStep, type Scene } from './choreography'
 
 // Every timing of the world, read the way BD29 and the standard count them: a section's scene ends within
 // 5 s, a one shot move under 1 s, the hero's entrance within 3 s, and every scene ends on a held frame.
@@ -214,5 +214,35 @@ describe('Bands: the drum roll on each box', () => {
     const scene = bandScene(4)
     expect(lidAt(0, 4)).toBe(beatStart(scene, 'roll-0') + 5 * bandTiming(4).beatMs)
     expect(lidAt(3, 4)).toBe(sceneMs(scene))
+  })
+})
+
+describe('Muay Thai: the carved mask', () => {
+  it('takes one step per achievement and no more than three', () => {
+    expect([0, 1, 3, 4, 7].map(maskSteps)).toEqual([0, 1, 3, 3, 3])
+  })
+
+  it('starts far from him, small and on the floor', () => {
+    const start = maskSpot(0, 3)
+    expect(start.x).toBeGreaterThan(MASK_GUARD.x + 40)
+    expect(start.scale).toBeLessThan(1)
+  })
+
+  it('comes closer, higher and larger with every step', () => {
+    const spots = [0, 1, 2, 3].map((step) => maskSpot(step, 3))
+    spots.slice(1).forEach((spot, index) => {
+      expect(spot.x).toBeLessThan(spots[index].x)
+      expect(spot.lift).toBeGreaterThan(spots[index].lift)
+      expect(spot.scale).toBeGreaterThan(spots[index].scale)
+    })
+  })
+
+  it('covers his face on the last step, however many steps there are', () => {
+    expect(maskSpot(3, 3)).toEqual(MASK_GUARD)
+    expect(maskSpot(1, 1)).toEqual(MASK_GUARD)
+  })
+
+  it('stays at its start when there is no achievement', () => {
+    expect(maskSpot(0, 0)).toEqual(maskSpot(0, 3))
   })
 })
