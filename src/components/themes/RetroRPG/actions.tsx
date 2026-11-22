@@ -1,12 +1,10 @@
 import type { AnchorHTMLAttributes, ReactNode } from 'react'
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import { MONO, PIXEL } from './palette'
 import { PixelIcon, type IconId } from './icons'
 import { Soul } from './soul'
 import world from './world.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Retro RPG's two kinds of button, both from the encounter screen:
 // - a command: the orange bordered button of the command row, with its pixel icon in the slot on the
@@ -53,41 +51,27 @@ function OptionMark() {
   )
 }
 
-export function Option({ children, ...linkProps }: AnchorHTMLAttributes<HTMLAnchorElement> & { children: ReactNode }) {
-  return (
-    <a {...linkProps} className={OPTION}>
-      <OptionMark />
-      {children}
-    </a>
-  )
-}
-
-function PageOption({ href, label }: { href: string; label: string }) {
-  return (
-    <Link href={href} className={OPTION}>
-      <OptionMark />
-      {label}
-    </Link>
-  )
-}
+// An option's line: the mark (the heart when lit) and the slot's label.
+const optionLine = (label: string) => (
+  <>
+    <OptionMark />
+    {label}
+  </>
+)
 
 /** The hero's and the contact box's choices: email, LinkedIn, the full CV and the engine, two columns. */
 export function ActionOptions({ actions, className = '' }: { actions: HeroActionSlot[]; className?: string }) {
-  const labels = useLabels().actions
+  const { cv, engine } = useSiteLinks('engineShort')
 
   return (
     <ul className={`grid grid-cols-1 gap-x-8 sm:grid-cols-2 ${className}`}>
-      {actions.map((action) => (
-        <li key={action.id}>
-          <Option {...action.linkProps}>{action.label}</Option>
+      {[...actions, cv, engine].map((slot) => (
+        <li key={slot.id}>
+          <ContactLink slot={slot} className={OPTION}>
+            {optionLine}
+          </ContactLink>
         </li>
       ))}
-      <li>
-        <PageOption href="/cv" label={labels.cv} />
-      </li>
-      <li>
-        <PageOption {...ENGINE_LINK} label={labels.engineShort} />
-      </li>
     </ul>
   )
 }
