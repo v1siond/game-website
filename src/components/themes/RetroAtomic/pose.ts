@@ -7,7 +7,8 @@ import m from './mutant.module.css'
 // The dweller and his dog posed by the scroll. His limbs are the shared rig's numbers (rigPose,
 // ../shared/rig); on top, his own overlays: the level up star with the wink, the targeting reticle, the
 // pistol and its flash. The angles are the ones his CSS motions end on (dweller.module.css), so he looks the
-// same on the wrist terminal. The dog trots in profile, facing right, its paws swinging with the phase.
+// same on the wrist terminal. The dog trots in profile, facing right, its paws swinging with the phase;
+// the mutant of the Muay Thai scene keeps his guard, takes the knee or the kick, and goes down.
 
 /** The rig's pose and, 0 to 1: the star and wink, the reticle locked on, the pistol out, its flash. */
 export type DwellerPose = RigPose & { star: number; reticle: number; pistol: number; flash: number }
@@ -25,7 +26,7 @@ export const walk = (phase: number): DwellerPose => pose(rigWalk(phase))
 export const thumbsUp = (t: number): DwellerPose => pose({ armRight: 70 * t, foreRight: 110 * t, rise: -6 * Math.sin(Math.PI * t), star: t })
 
 /** The wrist terminal raised and keyed, the key hand tapping with `tap`. */
-export const type = (t: number, tap: number): DwellerPose => pose({ armLeft: 25 * t, foreLeft: 85 * t, armRight: -30 * t, foreRight: (-70 + 10 * Math.abs(Math.sin(tap * Math.PI))) * t })
+export const typing = (t: number, tap: number): DwellerPose => pose({ armLeft: 25 * t, foreLeft: 85 * t, armRight: -30 * t, foreRight: (-70 + 10 * Math.abs(Math.sin(tap * Math.PI))) * t })
 
 /** The hoist: squatting, the locker lid up on his right hand. */
 export const hoist = (t: number): DwellerPose =>

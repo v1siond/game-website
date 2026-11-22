@@ -52,7 +52,7 @@ import {
   sway,
   thumbsUp,
   trot,
-  type,
+  typing,
   walk,
   type DogPose,
   type DwellerPose,
@@ -221,7 +221,7 @@ const work: SceneDef = {
     return (p, f) => {
       flags.forEach((flag, i) => transformTo(flag, `translate(0 ${r1(-(FLAG_POLE - 66) * reached(f, i))})`))
       const { x, act } = travel(xs, f, -90)
-      return dweller('wasteland', x, walkOr(act, f, p, type(1, f * 4)))
+      return dweller('wasteland', x, walkOr(act, f, p, typing(1, f * 4)))
     }
   },
 }
@@ -469,7 +469,7 @@ const contact: SceneDef = {
       const moving = there > 0 && there < 1 ? 1 : 0
       fadeTo(screen, 0.2 + 0.8 * ramp(p, 0.5, 0.6))
       dog(x - 130, moving ? trot(p * 12) : SITTING)
-      const pose = moving ? walk(p * 12) : mix(STAND, type(1, p * 8), ramp(p, 0.5, 0.58))
+      const pose = moving ? walk(p * 12) : mix(STAND, typing(1, p * 8), ramp(p, 0.5, 0.58))
       return dweller('town', x, pose)
     }
   },
