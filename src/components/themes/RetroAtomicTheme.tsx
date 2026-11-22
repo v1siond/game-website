@@ -32,10 +32,9 @@ const atomicFace = Share_Tech_Mono({ weight: '400', subsets: ['latin'], display:
 // parallax. It clips sideways overflow with overflow-x: clip, not hidden: hidden would make the root a
 // scroll container. Under reduced motion the door is skipped and the terminal is on from the start.
 //
-// The whole world renders on the server, the default world's contract (docs/CV-THEME-SYSTEM.md): the
-// browser only parts start in effects (the door's timeline, the pointer parallax, the password game's
-// random seed), and the sealed door the server draws is hidden by CSS under reduced motion until the
-// client drops it.
+// The world mounts on the client after the theme provider, so its first render already knows the reduced
+// motion answer; the door's timeline, the pointer parallax and the password game's random seed start in
+// effects.
 
 export default function RetroAtomicTheme() {
   const view = useWorldView()

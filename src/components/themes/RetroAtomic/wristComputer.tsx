@@ -23,8 +23,8 @@ import atomic from './atomic.module.css'
 // - Boot: once the door has rolled aside, the tube warms up (a bright line opens to the full screen),
 //   then the hero types itself out character by character on a 16 ms clock (setInterval; React holds
 //   only the count). Screen readers get the whole text at once; the typed copy is aria-hidden over an
-//   invisible full copy that holds the layout, so nothing jumps. Under reduced motion the CSS shows that
-//   full copy from the server's first paint, before the client learns the preference and fills the count.
+//   invisible full copy that holds the layout, so nothing jumps. Under reduced motion the count starts
+//   full and the CSS shows that full copy.
 // - Profession switch: the top tabs are the shared ProfessionSwitch (radio group, arrows); the dial on
 //   the right turns to the picked tab with a mechanical overshoot, and clicking the dial steps to the
 //   next one. A switch collapses the screen to a line and reopens it on the new profession (the screen's

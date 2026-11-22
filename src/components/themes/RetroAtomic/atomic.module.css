@@ -916,13 +916,13 @@
     animation: none;
   }
 
-  /* The server draws the sealed door for every first visit; under reduced motion it never shows. */
+  /* Under reduced motion the sealed door never shows. */
   .doorWall {
     display: none;
   }
 
-  /* The boot text reads whole from the first paint: the server cannot know the preference, so the full
-     copy shows and the typed copy over it stays out of the way. */
+  /* Under reduced motion the boot text reads whole: the full copy shows and the typed copy over it stays
+     out of the way. */
   .typedFull {
     visibility: visible;
   }

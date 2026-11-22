@@ -197,7 +197,7 @@ export function ContactTerminal() {
   const { techStack } = useCVData()
   const { ref, on } = useZoneStage('town')
   const tools = useMemo(() => techStack.flatMap((category) => category.items), [techStack])
-  // The board's random seed is drawn in the browser, so the server and the first client render agree on no board.
+  // The board's random seed is drawn in an effect, so a render stays pure and draws no board until it is set.
   const [seed, setSeed] = useState<number | null>(null)
   useEffect(() => setSeed(Math.floor(Math.random() * 2 ** 31)), [])
   const board = useMemo(() => (seed === null ? null : buildBoard(tools, seed)), [tools, seed])
