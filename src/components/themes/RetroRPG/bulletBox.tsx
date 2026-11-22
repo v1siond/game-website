@@ -18,9 +18,10 @@ import world from './world.module.css'
 // - Martial Artist, the green shield mode: the heart stays in the middle, a green shield turns to the side
 //   the pointer is on, and strikes fly in from the four sides; one that reaches an unguarded side hits.
 //
-// A hit costs 4 of 20 HP: the box shakes and the heart flickers for its invincible second. At 0 HP the
-// heart splits in two, then the HP refills and the turn goes on. The HP line under the box shows the bar
-// with its number.
+// The turn plays once the visitor does: until the pointer or a finger first reaches the box, the heart
+// waits in the middle and no attack lands. A hit costs 4 of 20 HP: the box shakes and the heart flickers
+// for its invincible second. At 0 HP the heart splits in two, then the HP refills and the turn goes on.
+// The HP line under the box shows the bar with its number.
 //
 // Pattern: one requestAnimationFrame loop, only while the box is on screen, writes --x, --y and --r on
 // the pellets, the heart and the shield (transform only, no React render per frame). Pellet positions
@@ -152,7 +153,6 @@ export function BulletBox({ profession }: { profession: Profession }) {
     // The layout size, not getBoundingClientRect: the wrapper's open animation scales the box, so its rect
     // is about 4 % of the box on mount. A resize (rotation, a wider window) measures again.
     const size = { w: el.offsetWidth, h: el.offsetHeight }
-    pointer.current = { x: size.w / 2, y: size.h / 2 }
     const soulAt = () => mode.soul(pointer.current ?? { x: size.w / 2, y: size.h / 2 }, size.w, size.h)
     const guard = () => sideOf(pointer.current ?? { x: size.w / 2, y: 0 }, size.w, size.h)
     const drawShield = () => {
@@ -201,7 +201,7 @@ export function BulletBox({ profession }: { profession: Profession }) {
     }
 
     // The shield mode hits on arrival at an unguarded side; the other modes hit on touch.
-    const check: (i: number, t: number, at: Point, now: number) => void =
+    const lands: (i: number, t: number, at: Point, now: number) => void =
       profession === 'fighter'
         ? (i, t, _at, now) => {
             const p = strikeProgress(i, t)
@@ -213,6 +213,12 @@ export function BulletBox({ profession }: { profession: Profession }) {
             const soul = soulAt()
             if (now > safeUntil && Math.hypot(at.x - soul.x, at.y - soul.y) < HIT_RADIUS) landed(now)
           }
+
+    // Nothing lands before the visitor plays: until a pointer or a finger is on the box, the pellets pass.
+    const check = (i: number, t: number, at: Point, now: number) => {
+      if (!pointer.current) return
+      lands(i, t, at, now)
+    }
 
     const tick = (now: number) => {
       const t = now - start
