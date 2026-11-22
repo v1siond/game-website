@@ -67,18 +67,72 @@ function Shade({ d, fill }: { d: string; fill: string }) {
   )
 }
 
+type Side = 'back' | 'front'
+
+interface SideParts {
+  arm: string
+  fore: string
+  leg: string
+  shin: string
+  stick: string
+  /** The boot's sole line. */
+  sole: string
+  /** The drumstick, tip up and out, and the fist's grip line over it. */
+  stickLine: string
+  grip: string
+  /** The white trim of the Muay Thai glove. */
+  gloveTrim: string
+  /** The upper arm's shadow edge. */
+  sleeveEdge: string
+  /** The prajioud band round the upper arm and the sun trim on the shorts' hem. */
+  armBand: string
+  hem: string
+}
+
+// What differs between his back limbs and his front ones: each part's class and the strokes across it.
+const SIDE: Record<Side, SideParts> = {
+  back: {
+    arm: cel.sprArmB,
+    fore: cel.sprForeB,
+    leg: cel.sprLegB,
+    shin: cel.sprShinB,
+    stick: cel.sprStickB,
+    sole: 'M34 190 L56 190',
+    stickLine: 'M30 118 L8 84',
+    grip: 'M25 104 L38 104',
+    gloveTrim: 'M22 124 Q31 129 40 124',
+    sleeveEdge: 'M33 57 L39 57 L38 91 L33 91 Z',
+    armBand: 'M23 68 L39 68',
+    hem: 'M37 138 L57 136',
+  },
+  front: {
+    arm: cel.sprArmF,
+    fore: cel.sprForeF,
+    leg: cel.sprLegF,
+    shin: cel.sprShinF,
+    stick: cel.sprStickF,
+    sole: 'M63 190 L88 190',
+    stickLine: 'M90 118 L112 84',
+    grip: 'M82 104 L95 104',
+    gloveTrim: 'M80 124 Q89 129 98 124',
+    sleeveEdge: 'M92 57 L98 57 L96 91 L91 91 Z',
+    armBand: 'M81 68 L97 68',
+    hem: 'M63 136 L83 138',
+  },
+}
+
 interface Gear {
   torso: ReactNode
   sleeve: string
   sleeveShade: string
   // The forearm: bare skin or the jacket's sleeve.
   forearm: string
-  hand: (side: 'back' | 'front') => ReactNode
+  hand: (side: Side) => ReactNode
   legs: string
   legsShade: string
   // Shorts stop at the knee and show the shin; trousers reach the boot.
   shorts: boolean
-  feet: (side: 'back' | 'front') => ReactNode
+  feet: (side: Side) => ReactNode
   head: ReactNode
   prop: ReactNode
 }
@@ -145,11 +199,11 @@ const GLOVE = {
 
 // The boots of one colour, with the sole line across.
 function boots(fill: string) {
-  return function drawBoot(side: 'back' | 'front') {
+  return function drawBoot(side: Side) {
     return (
       <>
         <Ink d={BOOT[side]} fill={fill} />
-        <path d={side === 'back' ? 'M34 190 L56 190' : 'M63 190 L88 190'} stroke={INK} strokeWidth={2.4} />
+        <path d={SIDE[side].sole} stroke={INK} strokeWidth={2.4} />
       </>
     )
   }
@@ -234,17 +288,12 @@ const GEAR: Record<Profession, Gear> = {
     hand: (side) => (
       <>
         {/* the stick held in the fist, tip up and out */}
-        <g className={side === 'front' ? cel.sprStickF : cel.sprStickB}>
-          <path
-            d={side === 'front' ? 'M90 118 L112 84' : 'M30 118 L8 84'}
-            stroke={INK}
-            strokeWidth={6}
-            strokeLinecap="round"
-          />
-          <path d={side === 'front' ? 'M90 118 L112 84' : 'M30 118 L8 84'} stroke={CEL.sand} strokeWidth={3} strokeLinecap="round" />
+        <g className={SIDE[side].stick}>
+          <path d={SIDE[side].stickLine} stroke={INK} strokeWidth={6} strokeLinecap="round" />
+          <path d={SIDE[side].stickLine} stroke={CEL.sand} strokeWidth={3} strokeLinecap="round" />
         </g>
         <Ink d={FIST[side]} fill={SKIN} />
-        <path d={side === 'front' ? 'M82 104 L95 104' : 'M25 104 L38 104'} stroke={INK} strokeWidth={5} />
+        <path d={SIDE[side].grip} stroke={INK} strokeWidth={5} />
       </>
     ),
     legs: CEL.denim,
@@ -269,7 +318,7 @@ const GEAR: Record<Profession, Gear> = {
     hand: (side) => (
       <>
         <Ink d={GLOVE[side]} fill={CEL.red} />
-        <path d={side === 'front' ? 'M80 124 Q89 129 98 124' : 'M22 124 Q31 129 40 124'} fill="none" stroke={CEL.white} strokeWidth={2.4} />
+        <path d={SIDE[side].gloveTrim} fill="none" stroke={CEL.white} strokeWidth={2.4} />
       </>
     ),
     legs: CEL.red,
@@ -333,14 +382,14 @@ function ShoulderPad() {
 
 // An arm: the upper arm turns at the shoulder, the forearm and hand fold at the elbow, (31, 89) and
 // (89, 89).
-function Arm({ side, gear }: { side: 'back' | 'front'; gear: Gear }) {
-  const shadeEdge = side === 'back' ? 'M33 57 L39 57 L38 91 L33 91 Z' : 'M92 57 L98 57 L96 91 L91 91 Z'
+function Arm({ side, gear }: { side: Side; gear: Gear }) {
+  const parts = SIDE[side]
   return (
-    <g className={`${cel.limb} ${side === 'back' ? cel.sprArmB : cel.sprArmF}`}>
+    <g className={`${cel.limb} ${parts.arm}`}>
       <Ink d={UPPER_ARM[side]} fill={gear.sleeve} />
-      <Shade d={shadeEdge} fill={gear.sleeveShade} />
-      {gear.shorts && <path d={side === 'back' ? 'M23 68 L39 68' : 'M81 68 L97 68'} stroke={CEL.red} strokeWidth={4} />}
-      <g className={side === 'back' ? cel.sprForeB : cel.sprForeF}>
+      <Shade d={parts.sleeveEdge} fill={gear.sleeveShade} />
+      {gear.shorts && <path d={parts.armBand} stroke={CEL.red} strokeWidth={4} />}
+      <g className={parts.fore}>
         <Ink d={FOREARM[side]} fill={gear.forearm} />
         {gear.hand(side)}
       </g>
@@ -349,33 +398,46 @@ function Arm({ side, gear }: { side: 'back' | 'front'; gear: Gear }) {
   )
 }
 
+// Below the knee: the bare shin under shorts, the trouser calf with its shadow side otherwise.
+function Shin({ side, gear }: { side: Side; gear: Gear }) {
+  if (gear.shorts) return <Ink d={SHIN[side]} fill={SKIN} />
+  return (
+    <>
+      <Ink d={CALF[side]} fill={gear.legs} />
+      <Shade d={CALF_SHADOW[side]} fill={gear.legsShade} />
+    </>
+  )
+}
+
+// Above the knee: the shorts with their sun trim on the hem, the trouser thigh with its shadow side otherwise.
+function Thigh({ side, gear }: { side: Side; gear: Gear }) {
+  if (gear.shorts) {
+    return (
+      <>
+        <Ink d={SHORTS[side]} fill={gear.legs} />
+        <path d={SIDE[side].hem} stroke={CEL.sun} strokeWidth={3} />
+      </>
+    )
+  }
+  return (
+    <>
+      <Ink d={THIGH[side]} fill={gear.legs} />
+      <Shade d={THIGH_SHADOW[side]} fill={gear.legsShade} />
+    </>
+  )
+}
+
 // A leg: the thigh turns at the hip, the shin and the foot fold at the knee. The shin is drawn first so
 // the shorts' hem or the trouser thigh lies over the top of it.
-function Leg({ side, gear }: { side: 'back' | 'front'; gear: Gear }) {
+function Leg({ side, gear }: { side: Side; gear: Gear }) {
+  const parts = SIDE[side]
   return (
-    <g className={`${cel.limb} ${side === 'back' ? cel.sprLegB : cel.sprLegF}`}>
-      <g className={side === 'back' ? cel.sprShinB : cel.sprShinF}>
-        {gear.shorts ? (
-          <Ink d={SHIN[side]} fill={SKIN} />
-        ) : (
-          <>
-            <Ink d={CALF[side]} fill={gear.legs} />
-            <Shade d={CALF_SHADOW[side]} fill={gear.legsShade} />
-          </>
-        )}
+    <g className={`${cel.limb} ${parts.leg}`}>
+      <g className={parts.shin}>
+        <Shin side={side} gear={gear} />
         {gear.feet(side)}
       </g>
-      {gear.shorts ? (
-        <>
-          <Ink d={SHORTS[side]} fill={gear.legs} />
-          <path d={side === 'back' ? 'M37 138 L57 136' : 'M63 136 L83 138'} stroke={CEL.sun} strokeWidth={3} />
-        </>
-      ) : (
-        <>
-          <Ink d={THIGH[side]} fill={gear.legs} />
-          <Shade d={THIGH_SHADOW[side]} fill={gear.legsShade} />
-        </>
-      )}
+      <Thigh side={side} gear={gear} />
     </g>
   )
 }
