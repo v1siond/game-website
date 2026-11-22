@@ -77,8 +77,7 @@ export function ProjectCard({ slot: { project, years, links } }: { slot: Project
   )
 }
 
-export function BandCard({ band, years, linkProps }: BandSlot) {
-  const { links } = useLabels()
+export function BandCard({ band, years, linkProps, release }: BandSlot) {
   return (
     <InnerCard zone="ft">
       <h3 style={CARD_TITLE}>
@@ -91,9 +90,9 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
         {years && <span aria-hidden="true"> | </span>}
         {years}
       </p>
-      {band.release && (
+      {release && (
         <p style={CARD_BODY}>
-          {links.released} <cite>&ldquo;{band.release}&rdquo;</cite>
+          {release.label} <cite>&ldquo;{release.title}&rdquo;</cite>
         </p>
       )}
     </InnerCard>
