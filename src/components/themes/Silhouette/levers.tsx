@@ -113,8 +113,9 @@ export function LeverSwitch() {
     }
     setPulling(option.id)
     setPose('push')
-    later(() => setTurn('out'), PULL_MS)
-    later(change, PULL_MS + TURN_OUT_MS)
+    // A pull starts the list afresh, so it holds one pull's timers and the turn in after it, never every
+    // pull's since the page opened.
+    timers.current = [window.setTimeout(() => setTurn('out'), PULL_MS), window.setTimeout(change, PULL_MS + TURN_OUT_MS)]
   }
 
   return (
