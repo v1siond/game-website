@@ -7,6 +7,7 @@ import type { Locale } from '@/i18n/config'
 import { lastModifiedFrom } from './contentDate'
 import { CV_CONTENT_FILES, cvDataFrom, type CVContentFiles, type CVData } from './cv/content'
 import { labelsFor, type Labels, type LabelsFile } from './cv/labels'
+import { errorPagesFrom, type ErrorPages } from './cv/errorPages'
 
 export type { CVData } from './cv/content'
 
@@ -33,6 +34,13 @@ export const getAllCVData = cache(async (locale: Locale): Promise<CVData> => {
 export const getLabels = cache(async (locale: Locale): Promise<Labels> => {
   const [, file] = await readContentFile('labels')
   return labelsFor(file as LabelsFile, locale)
+})
+
+/** The error pages' words in every locale and his name, from labels.json and summary.json alone: a 404
+ *  renders before it knows the address's language, so its screen picks one (NotFoundAtPath). */
+export const getErrorPages = cache(async (): Promise<ErrorPages> => {
+  const entries = await Promise.all(['labels', 'summary'].map(readContentFile))
+  return errorPagesFrom(Object.fromEntries(entries) as Pick<CVContentFiles, 'labels' | 'summary'>)
 })
 
 // The committer date of the last commit touching the content, or '' where git or the history is missing.

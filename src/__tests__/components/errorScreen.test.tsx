@@ -3,6 +3,10 @@ import { ErrorScreen } from '@/components/ErrorScreen'
 import { NotFoundScreen, ServerErrorScreen, CrashScreen } from '@/components/errorScreens'
 import { DEFAULT_THEME_ID, THEME_STORAGE_KEY, getThemeById } from '@/themes/themes'
 import { ENGINE_URL } from '@/lib/engineLink'
+import { testCV } from '../helpers/test-utils'
+
+// The error pages' words of the English labels, the ones the screens show at an address naming no language.
+const text = testCV().labels.errors
 
 /**
  * The screen reads the chosen world straight from storage (no provider), so drive getItem.
@@ -26,7 +30,7 @@ describe('ErrorScreen', () => {
   it('shows the status, what happened and what to do about it', () => {
     render(
       <ErrorScreen
-        status={404}
+        status={{ code: 404, label: 'HTTP status 404' }}
         headline="This page is not on the map"
         detail="The address does not match anything on the site."
         actions={[{ label: 'Go to the home page', href: '/' }]}
@@ -48,7 +52,7 @@ describe('ErrorScreen', () => {
     const onClick = jest.fn()
     render(
       <ErrorScreen
-        status={500}
+        status={{ code: 500, label: 'HTTP status 500' }}
         headline="The server could not finish this request"
         detail="Loading it again usually clears it."
         actions={[
@@ -68,7 +72,7 @@ describe('ErrorScreen', () => {
   it('marks exactly the primary action, so the recommended way out is visible', () => {
     render(
       <ErrorScreen
-        status={404}
+        status={{ code: 404, label: 'HTTP status 404' }}
         headline="Gone"
         detail="Gone."
         actions={[
@@ -97,13 +101,13 @@ describe('ErrorScreen', () => {
   })
 
   it('omits the technical block entirely when there is nothing to show', () => {
-    render(<ErrorScreen status={404} headline="Gone" detail="Gone." actions={[]} />)
+    render(<ErrorScreen status={{ code: 404, label: 'HTTP status 404' }} headline="Gone" detail="Gone." actions={[]} />)
     expect(screen.queryByText('Error details')).not.toBeInTheDocument()
   })
 
   it("wears the visitor's chosen world", () => {
     storedWorld('survival-horror')
-    const { container } = render(<ErrorScreen status={404} headline="Gone" detail="Gone." actions={[]} />)
+    const { container } = render(<ErrorScreen status={{ code: 404, label: 'HTTP status 404' }} headline="Gone" detail="Gone." actions={[]} />)
 
     const survivalHorror = getThemeById('survival-horror')
     const main = container.querySelector('.c-error') as HTMLElement
@@ -114,7 +118,7 @@ describe('ErrorScreen', () => {
 
   it('falls back to the default world when nothing is stored', () => {
     storedWorld(null)
-    const { container } = render(<ErrorScreen status={404} headline="Gone" detail="Gone." actions={[]} />)
+    const { container } = render(<ErrorScreen status={{ code: 404, label: 'HTTP status 404' }} headline="Gone" detail="Gone." actions={[]} />)
 
     const fallback = getThemeById(DEFAULT_THEME_ID)
     const main = container.querySelector('.c-error') as HTMLElement
@@ -125,7 +129,7 @@ describe('ErrorScreen', () => {
     localStorageGetItem.mockImplementation(() => {
       throw new Error('access denied')
     })
-    render(<ErrorScreen status={500} headline="The server could not finish this request" detail="Retry." actions={[]} />)
+    render(<ErrorScreen status={{ code: 500, label: 'HTTP status 500' }} headline="The server could not finish this request" detail="Retry." actions={[]} />)
     expect(screen.getByText('500')).toBeInTheDocument()
   })
 })
@@ -137,7 +141,7 @@ describe('the three screens the routes render', () => {
   })
 
   it('404 names the miss and offers two pathways on', () => {
-    render(<NotFoundScreen />)
+    render(<NotFoundScreen text={text} />)
     expect(screen.getByText('404')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Go to the home page' })).toHaveAttribute('href', '/')
     expect(screen.getByRole('link', { name: 'Open the game engine' })).toHaveAttribute(
@@ -147,13 +151,13 @@ describe('the three screens the routes render', () => {
   })
 
   it('500 leads with the retry, because retrying is the honest advice', () => {
-    render(<ServerErrorScreen />)
+    render(<ServerErrorScreen text={text} />)
     expect(screen.getByText('500')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Reload this page' })).toHaveClass('c-error__action--primary')
   })
 
   it('500 reports the status it was actually given', () => {
-    render(<ServerErrorScreen status={502} />)
+    render(<ServerErrorScreen text={text} status={502} />)
     expect(screen.getByText('502')).toBeInTheDocument()
   })
 

@@ -850,6 +850,23 @@ collections:
                   - { <<: *text, label: "Lens button going to the next world", name: lensGo }
                   - { <<: *text, label: "Lens name for a screen reader", name: lensAria }
                   - { <<: *text, label: "Launcher name for a screen reader once it shows the next world", name: faceAria }
+              # The error pages, in the language of the address (/es/..., /it/...); {status} is the HTTP status number.
+              - label: Error pages
+                name: errors
+                widget: object
+                i18n: true
+                fields:
+                  - { <<: *text, label: "Page not found tab title", name: notFoundTitle }
+                  - { <<: *text, label: "Page not found headline", name: notFoundHeadline }
+                  - { <<: *text, label: "Page not found line under the headline", name: notFoundDetail }
+                  - { <<: *text, label: "Server error tab title", name: serverErrorTitle }
+                  - { <<: *text, label: "Server error headline", name: serverErrorHeadline }
+                  - { <<: *text, label: "Server error line under the headline", name: serverErrorDetail }
+                  - { <<: *text, label: "Server error button reloading the page", name: reload }
+                  - { <<: *text, label: "Tab title of any other error", name: otherErrorTitle }
+                  - { <<: *text, label: "Button to the home page", name: goHome }
+                  - { <<: *text, label: "Link to the game engine", name: openEngine }
+                  - { <<: *text, label: "Status number for a screen reader", name: status }
 
   # One Markdown file per post, content/blog/<slug>.md, English only. The front matter is JSON (Decap's
   # json-frontmatter), which the site reads with JSON.parse. A new post starts as a draft: drafts show

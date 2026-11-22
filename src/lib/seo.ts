@@ -71,7 +71,7 @@ export function techKeywords({ techStack }: Pick<CVData, 'techStack'>): string[]
 
 export const absoluteUrl = (path: string): string => new URL(path, SITE_URL).toString()
 
-/** "Alexander Pulido | <role>", the title of the home page and of the site as a whole. */
+/** "<his full name> | <role>", the title of the home page and of the site as a whole. */
 export function siteTitle(cv: SeoFacts): string {
   return `${cv.fullName} | ${shortRole(cv.professionalSummary.headline)}`
 }

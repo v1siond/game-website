@@ -1,7 +1,12 @@
 'use client'
 
-import { ErrorScreen } from './ErrorScreen'
+import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { ErrorScreen, type ErrorStatus } from './ErrorScreen'
 import { ENGINE_URL } from '@/lib/engineLink'
+import { fillLabel } from '@/lib/cv/labels'
+import { errorTitle, localeOfPath, type ErrorPages, type ErrorText } from '@/lib/cv/errorPages'
+import { defaultLocale, type Locale } from '@/i18n/config'
 
 /**
  * The three failures the site can actually show, written once.
@@ -12,37 +17,69 @@ import { ENGINE_URL } from '@/lib/engineLink'
  *
  * The copy follows one rule: say what happened, then say what to do about it. No apology, no "oops",
  * nothing vague. A person who lands on one of these wants out of it, and the fastest way out is the
- * primary action.
+ * primary action. The 404 and 500 words come from labels.json (errors), in the language of the address.
  */
 
 /** Where every screen can always send someone. Absolute paths: a failed page may have a broken router. */
 const HOME = '/'
 
+const statusOf = (code: number, text: ErrorText): ErrorStatus => ({ code, label: fillLabel(text.status, { status: code }) })
+
+/** The language of the address an App Router error renders at, known on the server render too. */
+function usePathLocale(): Locale {
+  return localeOfPath(usePathname())
+}
+
+/**
+ * The language of the address a Pages Router error page is shown at. Those pages are built once, so the
+ * first render is the built English one (hydration matches it) and the address is read after mount.
+ */
+export function useAddressLocale(): Locale {
+  const [locale, setLocale] = useState<Locale>(defaultLocale)
+
+  useEffect(() => {
+    setLocale(localeOfPath(window.location.pathname))
+  }, [])
+
+  return locale
+}
+
 /** 404, the address matches nothing. */
-export function NotFoundScreen() {
+export function NotFoundScreen({ text }: { text: ErrorText }) {
   return (
     <ErrorScreen
-      status={404}
-      headline="This page is not on the map"
-      detail="The address does not match anything on the site. It is usually an old link, or a typo in the URL."
+      status={statusOf(404, text)}
+      headline={text.notFoundHeadline}
+      detail={text.notFoundDetail}
       actions={[
-        { label: 'Go to the home page', href: HOME, primary: true },
-        { label: 'Open the game engine', href: ENGINE_URL },
+        { label: text.goHome, href: HOME, primary: true },
+        { label: text.openEngine, href: ENGINE_URL },
       ]}
     />
   )
 }
 
+/** The App Router 404 with its tab title, in the language of the address (/es/old-link reads Spanish). */
+export function NotFoundAtPath({ pages }: { pages: ErrorPages }) {
+  const { fullName, text } = pages[usePathLocale()]
+  return (
+    <>
+      <title>{errorTitle(text.notFoundTitle, fullName)}</title>
+      <NotFoundScreen text={text} />
+    </>
+  )
+}
+
 /** 5xx, the server broke. Retrying is honest advice here, so it leads. */
-export function ServerErrorScreen({ status = 500, technical }: { status?: number; technical?: string }) {
+export function ServerErrorScreen({ text, status = 500, technical }: { text: ErrorText; status?: number; technical?: string }) {
   return (
     <ErrorScreen
-      status={status}
-      headline="The server could not finish this request"
-      detail="The fault is on the server. Loading the page again usually clears it."
+      status={statusOf(status, text)}
+      headline={text.serverErrorHeadline}
+      detail={text.serverErrorDetail}
       actions={[
-        { label: 'Reload this page', onClick: () => window.location.reload(), primary: true },
-        { label: 'Go to the home page', href: HOME },
+        { label: text.reload, onClick: () => window.location.reload(), primary: true },
+        { label: text.goHome, href: HOME },
       ]}
       technical={technical}
     />
