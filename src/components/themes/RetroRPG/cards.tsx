@@ -11,7 +11,7 @@ import { jobSpanCompact } from '@/lib/cv/sectionText'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { TechList } from '@/components/cv/TechList'
 import { MONO, PIXEL } from './palette'
-import { Command, FOCUS } from './actions'
+import { Command } from './actions'
 import { BODY, Mark, SHOW_AFTER, Typed } from './panels'
 import { usePlay } from './play'
 import { Soul } from './soul'
@@ -191,7 +191,7 @@ export function CompanyCard({ venture: company, linkProps }: VentureSlot) {
   return (
     <a
       {...linkProps}
-      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)]' : ''} ${world.box} ${world.pick} ${FOCUS}`}
+      className={`group block h-full p-4 sm:p-5 hover:border-[color:var(--rpg-gold)] ${company.featured ? '!border-[color:var(--rpg-gold)]' : ''} ${world.box} ${world.pick}`}
     >
       {company.featured && (
         <p className={`mb-3 inline-block bg-[color:var(--rpg-gold)] px-2 py-1 text-sm uppercase tracking-[0.12em] text-[color:var(--rpg-void)] ${PIXEL}`}>
@@ -244,7 +244,7 @@ export function BandCard({ band, years, linkProps }: BandSlot) {
 
   if (!linkProps) return <div className={`group ${world.pick}`}>{content}</div>
   return (
-    <a {...linkProps} className={`group block ${world.pick} ${FOCUS}`}>
+    <a {...linkProps} className={`group block ${world.pick}`}>
       {content}
     </a>
   )

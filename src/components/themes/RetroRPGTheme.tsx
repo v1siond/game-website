@@ -8,7 +8,7 @@ import { ProfessionSectionsView } from "@/components/cv/ProfessionSectionsView";
 import { NameWords } from "@/components/cv/NameWords";
 import { CopyrightLine } from "./shared/CopyrightLine";
 import { MONO, PIXEL, RPG_VARS } from "./RetroRPG/palette";
-import { ActionOptions, FOCUS } from "./RetroRPG/actions";
+import { ActionOptions } from "./RetroRPG/actions";
 import { Box, Mark, SHOW_AFTER, Typed } from "./RetroRPG/panels";
 import { CommandOption } from "./RetroRPG/selector";
 import { Encounter } from "./RetroRPG/encounter";
@@ -67,7 +67,7 @@ export default function RetroRPGTheme() {
 
         <a
           href="#main-content"
-          className={`sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2 ${FOCUS}`}
+          className="sr-only bg-[color:var(--rpg-gold)] text-[color:var(--rpg-void)] focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:px-4 focus:py-2"
         >
           {labels.navigation.skipToContent}
         </a>

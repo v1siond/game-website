@@ -6,7 +6,6 @@ import { useZoneStage } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { MONO, PIXEL, RPG } from './palette'
-import { FOCUS } from './actions'
 import { DUMMY, FLOWER, KEEPER, KEEPER_PAW, MONSTER, PORTRAIT_OPEN, PORTRAIT_SHUT, SENTRY, type PixelSprite } from './npcs'
 import { RoomOpen } from './play'
 import { Soul } from './soul'
@@ -92,7 +91,7 @@ function Room({ zone, beat, art, overlay, replay, className = '', children }: Ro
           <button
             type="button"
             onClick={again}
-            className={`min-h-[44px] border-[3px] border-[color:var(--rpg-orange)] bg-[color:var(--rpg-void)] px-3 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-orange)] hover:border-[color:var(--rpg-gold)] hover:text-[color:var(--rpg-gold)] ${PIXEL} ${FOCUS}`}
+            className={`min-h-[44px] border-[3px] border-[color:var(--rpg-orange)] bg-[color:var(--rpg-void)] px-3 text-sm uppercase tracking-[0.15em] text-[color:var(--rpg-orange)] hover:border-[color:var(--rpg-gold)] hover:text-[color:var(--rpg-gold)] ${PIXEL}`}
           >
             {replay}
           </button>
