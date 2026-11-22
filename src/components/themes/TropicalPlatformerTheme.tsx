@@ -45,32 +45,31 @@ export default function TropicalPlatformerTheme() {
   return (
     <div ref={pointer} style={PALETTE_VARS} className={`relative min-h-screen overflow-x-clip ${look.root} ${jungleFace.variable}`}>
       <HudProvider>
-      <JungleDefs />
-      <SceneryDefs />
-      <Canopy />
+        <JungleDefs />
+        <SceneryDefs />
+        <Canopy />
 
-      <header className="relative isolate z-30 px-4 pb-10 pt-10 sm:px-8 sm:pt-16 md:px-20">
-        <Backdrop kind="sunset" placement="band" />
-        <SunsetHero />
-      </header>
+        <header className="relative isolate z-30 px-4 pb-10 pt-10 sm:px-8 sm:pt-16 md:px-20">
+          <Backdrop kind="sunset" placement="band" />
+          <SunsetHero />
+        </header>
 
-      <section className="relative isolate z-20 px-4 py-12 sm:px-8 md:px-20" aria-label={navigation.professionSelection}>
-        <Backdrop kind="dusk" placement="band" />
-        <PartnerBarrel />
-      </section>
+        <section className="relative isolate z-20 px-4 py-12 sm:px-8 md:px-20" aria-label={navigation.professionSelection}>
+          <Backdrop kind="dusk" placement="band" />
+          <PartnerBarrel />
+        </section>
 
-      <main className="relative z-20 px-4 py-16 sm:px-8 md:px-20">
-        <div className="mx-auto max-w-6xl space-y-24" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
-          <VineCrossing />
-          <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
-          <PostsGate>
-            <PostsLevel />
-          </PostsGate>
-        </div>
-      </main>
+        <main className="relative z-20 px-4 py-16 sm:px-8 md:px-20">
+          <div className="mx-auto max-w-6xl space-y-24" role="region" aria-label={fillLabel(navigation.professionDetails, { profession: professions[active] })}>
+            <VineCrossing />
+            <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
+            <PostsGate>
+              <PostsLevel />
+            </PostsGate>
+          </div>
+        </main>
 
-      <TreehouseContact />
-
+        <TreehouseContact />
       </HudProvider>
 
       <footer className="relative z-20 bg-[color:var(--tp-night-deep)] py-10 text-center">

@@ -19,7 +19,7 @@ import sprite from './character.module.css'
 // Poses, transform keyframes in character.module.css keyed off data-pose:
 // - idle: a big breath, a blink, and every few seconds the chest pound;
 // - run: the knuckle run, the body bouncing while the arms plant and swing;
-// - roll: tucked into a spinning ball, the roll attack;
+// - roll: tucked into a spinning ball, the roll attack (the ball turns on Tailwind's spin);
 // - throw: a barrel hoisted overhead and thrown, once, then back to rest;
 // - slap: the ground slap, both hands raised and slammed flat on the ground in turn, the body squashing
 //   on each slam (the section around him shakes, slap.tsx);

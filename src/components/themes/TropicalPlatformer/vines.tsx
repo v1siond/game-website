@@ -16,7 +16,7 @@ import look from './jungle.module.css'
 import grove from './vines.module.css'
 import motion from './motion.module.css'
 
-// The bands as a grove of hanging planks in the cave of the hoard: each band hangs from two leafy vines
+// The bands as a grove of hanging planks under the dusk vines: each band hangs from two leafy vines
 // and sways when pointed at or focused. He hangs by one hand from the vine of the band he is at, legs
 // loose, swaying on it the way the source's ropes swing. Swing here sends him over: he lets go of the
 // old vine and swings in on the new one, overshooting and settling like a pendulum; the band he hangs
