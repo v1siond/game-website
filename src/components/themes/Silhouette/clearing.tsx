@@ -161,8 +161,8 @@ export function Clearing({ profession }: { profession: Profession }) {
               <button
                 type="button"
                 onClick={spring}
-                disabled={trap !== 'ready'}
-                className={`${world.button} inline-flex min-h-[44px] items-center border-2 border-dashed border-[color:var(--sh-muted)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-muted-text)] hover:text-[color:var(--sh-text)] disabled:opacity-60`}
+                aria-disabled={trap !== 'ready'}
+                className={`${world.button} inline-flex min-h-[44px] items-center border-2 border-dashed border-[color:var(--sh-muted)] bg-[color:var(--sh-void)] px-4 text-sm uppercase tracking-[0.2em] text-[color:var(--sh-muted-text)] hover:text-[color:var(--sh-text)] aria-disabled:opacity-60`}
               >
                 {words.springTrap}
               </button>
