@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { memo, useState, type CSSProperties } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { headingId } from '@/lib/cv/sectionText'
@@ -34,7 +34,7 @@ const FIREFLIES = [
 // The tree house in teal moonlight, the way the source tints its night levels: the night sky and palms
 // behind, the house on its stilts with a plank wall, a thatched roof and the lamp in the window, the
 // ladder, and the night's leaves in the corners.
-function NightHouse() {
+const NightHouse = memo(function NightHouse() {
   return (
     <svg viewBox="0 0 400 260" className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMax slice" aria-hidden="true" focusable="false">
       <NightSky />
@@ -58,7 +58,7 @@ function NightHouse() {
       <NightFront />
     </svg>
   )
-}
+})
 
 export function TreehouseContact() {
   const { sections, jungle } = useLabels()

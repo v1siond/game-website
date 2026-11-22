@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { memo, useId, type ReactNode } from 'react'
 import { COLORS as C, TONE_VARS, type Tone } from './palette'
 import paint from './scenery.module.css'
 
@@ -59,7 +59,7 @@ const BANANA = 'M0 0 C2 12 12 20 26 18 C24 22 18 24 12 23 C2 21 -3 12 -2 2 Z'
 const BANANAS = [-34, -12, 10, 32]
 
 /** The shapes every scene places; drawn once by the world's root, never shown on their own. */
-export function SceneryDefs() {
+export const SceneryDefs = memo(function SceneryDefs() {
   return (
     <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
       <defs>
@@ -137,7 +137,7 @@ export function SceneryDefs() {
       </defs>
     </svg>
   )
-}
+})
 
 /** A scope that gives the shapes inside it a tone. */
 export function ToneScope({ tone, className = '', children }: { tone: Tone; className?: string; children: ReactNode }) {
@@ -340,7 +340,7 @@ interface BackdropProps {
 }
 
 /** A section's jungle, layered behind it; decoration only. */
-export function Backdrop({ kind, placement }: BackdropProps) {
+export const Backdrop = memo(function Backdrop({ kind, placement }: BackdropProps) {
   const scene = SCENES[kind]
 
   return (
@@ -371,7 +371,7 @@ export function Backdrop({ kind, placement }: BackdropProps) {
       </svg>
     </div>
   )
-}
+})
 
 // ---- the stages inside the machines ----
 
@@ -384,7 +384,7 @@ const STAGE_PALMS: ReadonlyArray<readonly [number, number, number, boolean]> = [
 ]
 
 /** Behind the partner barrel: a dusk sky over the banded treeline, palms near and far, ferns at the ledge. */
-export function DuskStage() {
+export const DuskStage = memo(function DuskStage() {
   return (
     <ToneScope tone="dusk" className="absolute inset-0">
       <div className={`absolute inset-x-0 top-0 h-2/3 ${paint.sky}`} />
@@ -399,7 +399,7 @@ export function DuskStage() {
       </svg>
     </ToneScope>
   )
-}
+})
 
 const CEILING_DRIPS: ReadonlyArray<readonly [number, number]> = [
   [20, 0.42],
@@ -418,7 +418,7 @@ const CEILING_DRIPS: ReadonlyArray<readonly [number, number]> = [
 ]
 
 /** The mine cart's tunnel as the purple cave of the hoard: stalactites along the roof, a rock wall behind. */
-export function CaveCeiling() {
+export const CaveCeiling = memo(function CaveCeiling() {
   return (
     <ToneScope tone="cave" className="absolute inset-0">
       <svg viewBox="0 0 800 144" preserveAspectRatio="xMidYMin slice" className="absolute inset-0 h-full w-full" focusable="false">
@@ -432,7 +432,7 @@ export function CaveCeiling() {
       </svg>
     </ToneScope>
   )
-}
+})
 
 const NIGHT_STARS: ReadonlyArray<readonly [number, number]> = [
   [20, 18], [60, 40], [110, 14], [150, 52], [200, 24], [240, 60], [280, 20], [330, 44], [370, 16], [90, 70], [300, 84],

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type CSSProperties } from 'react'
+import { memo, useState, type CSSProperties } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import { useProfession } from '@/contexts/ProfessionContext'
@@ -86,7 +86,7 @@ const CLOUD_STREAKS: ReadonlyArray<readonly [number, number, number]> = [
   [150, 214, 190],
 ]
 
-function Sky() {
+const Sky = memo(function Sky() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <rect width="400" height="300" fill="url(#tp-sky)" />
@@ -103,20 +103,20 @@ function Sky() {
       <path d="M60 70 q6 -5 12 0 q6 -5 12 0 M96 52 q4 -4 8 0 q4 -4 8 0 M318 64 q5 -4 10 0 q5 -4 10 0" fill="none" stroke={C.shadowSoft} strokeWidth="2" />
     </svg>
   )
-}
+})
 
 // The far jungle: the banded treeline in the dusk's purple haze over a low ridge.
-function Ridge() {
+const Ridge = memo(function Ridge() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <use href="#tp-treeline" transform="translate(-20 178) scale(1.1 0.9)" />
       <path d="M-30 250 Q60 228 140 240 T300 236 T430 230 V300 H-30 Z" fill={C.duskDeep} />
     </svg>
   )
-}
+})
 
 // The palms, black against the light with the sun catching their edges; the one furthest off in haze.
-function Palms() {
+const Palms = memo(function Palms() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <use href="#tp-palm" transform="translate(200 262) rotate(5) scale(0.55)" className={scenery.haze} />
@@ -125,12 +125,12 @@ function Palms() {
       <path d={GROUND_BAND} fill={C.shadowSoft} />
     </svg>
   )
-}
+})
 
 // His tree house on four stilts: a plank wall, a thatched roof, the doorway and the ladder, every edge
 // that faces the sun lit; the barrel cannon stands on the platform's edge (drawn in the HTML layer above,
 // so it can be a button).
-function TreeHouse() {
+const TreeHouse = memo(function TreeHouse() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <path d="M30 160 Q24 220 34 300 H52 Q44 220 48 160 Z M118 160 Q124 220 116 300 H98 Q106 220 104 160 Z" fill={C.shadow} />
@@ -148,11 +148,11 @@ function TreeHouse() {
       ))}
     </svg>
   )
-}
+})
 
 // The leaves right in front, out of the light: fronds and round leaves in the corners, a fern tuft,
 // fronds hanging into the top corners.
-function NearFronds() {
+const NearFronds = memo(function NearFronds() {
   return (
     <svg viewBox={VIEW} className="absolute inset-0 h-full w-full" aria-hidden="true" focusable="false">
       <use href="#tp-frond" transform="translate(-10 300) rotate(-40) scale(1.1)" />
@@ -164,7 +164,7 @@ function NearFronds() {
       <use href="#tp-frond" transform="translate(410 -4) scale(-1 1) rotate(28) scale(0.75)" />
     </svg>
   )
-}
+})
 
 function SunsetScene({ shot, onBlast, blastLabel }: { shot: number; onBlast: () => void; blastLabel: string }) {
   const { active } = useProfession()

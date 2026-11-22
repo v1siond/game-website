@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { memo, type ReactNode } from 'react'
 import { COLORS as C } from './palette'
 
 // The jungle's barrel, drawn once and used by every machine of the world: the tree house cannon in the
@@ -9,7 +9,7 @@ import { COLORS as C } from './palette'
 //
 // JungleDefs holds the gradients every jungle drawing fills from; the world's root draws it once.
 
-export function JungleDefs() {
+export const JungleDefs = memo(function JungleDefs() {
   return (
     <svg className="absolute h-0 w-0" aria-hidden="true" focusable="false">
       <defs>
@@ -43,7 +43,7 @@ export function JungleDefs() {
       </defs>
     </svg>
   )
-}
+})
 
 export type BarrelMark = 'burst' | 'plain'
 
