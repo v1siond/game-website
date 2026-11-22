@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, memo, type CSSProperties, type ReactNode } from 'react'
+import { useState, useEffect, useRef, useId, memo, type CSSProperties, type ReactNode } from 'react'
 import { KnightCharacter } from './KnightCharacter'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -480,6 +480,12 @@ export const BattleBug = memo(function BattleBug({
   const infected = DARK_FANTASY.infected
   const infectedBright = DARK_FANTASY.infectedBright
   const infectedGlow = DARK_FANTASY.infectedGlow
+  // Ids of this bug's own filter and gradients: two bugs on a page never resolve url(#id) into each other's,
+  // or into one a hidden copy holds.
+  const uid = useId()
+  const glowId = `${uid}glow`
+  const shellGradId = `${uid}shell`
+  const maskGradId = `${uid}mask`
 
   const getLegY = (index: number) => {
     const offset = index % 2 === 0 ? 0 : 0.5
@@ -515,19 +521,19 @@ export const BattleBug = memo(function BattleBug({
       style={{ filter: `drop-shadow(0 0 12px ${infectedGlow}60) drop-shadow(0 0 6px ${infected}80)` }}
     >
       <defs>
-        <filter id="battleGlow" x="-50%" y="-50%" width="200%" height="200%">
+        <filter id={glowId} x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-        <radialGradient id="battleShellGrad" cx="50%" cy="30%" r="70%">
+        <radialGradient id={shellGradId} cx="50%" cy="30%" r="70%">
           <stop offset="0%" stopColor={shell} />
           <stop offset="70%" stopColor={shellMid} />
           <stop offset="100%" stopColor={shellDark} />
         </radialGradient>
-        <radialGradient id="battleMaskGrad" cx="50%" cy="40%" r="60%">
+        <radialGradient id={maskGradId} cx="50%" cy="40%" r="60%">
           <stop offset="0%" stopColor={maskLight} />
           <stop offset="100%" stopColor={mask} />
         </radialGradient>
@@ -546,7 +552,7 @@ export const BattleBug = memo(function BattleBug({
       </g>
 
       {/* BODY - chunky segmented shell */}
-      <ellipse cx="50" cy="55" rx="28" ry="20" fill="url(#battleShellGrad)" stroke={DARK_FANTASY.void} strokeWidth="1.5" />
+      <ellipse cx="50" cy="55" rx="28" ry="20" fill={`url(#${shellGradId})`} stroke={DARK_FANTASY.void} strokeWidth="1.5" />
       <path d="M30,50 Q50,45 70,50" fill="none" stroke={shellDark} strokeWidth="2" opacity="0.6" />
       <path d="M32,58 Q50,54 68,58" fill="none" stroke={shellDark} strokeWidth="1.5" opacity="0.4" />
 
@@ -554,7 +560,7 @@ export const BattleBug = memo(function BattleBug({
       <ellipse cx="50" cy="40" rx="22" ry="14" fill={shellMid} stroke={DARK_FANTASY.void} strokeWidth="1" />
 
       {/* HEAD/MASK */}
-      <ellipse cx="50" cy="26" rx="18" ry="15" fill="url(#battleMaskGrad)" stroke={DARK_FANTASY.void} strokeWidth="1" />
+      <ellipse cx="50" cy="26" rx="18" ry="15" fill={`url(#${maskGradId})`} stroke={DARK_FANTASY.void} strokeWidth="1" />
       <path d="M35,22 Q50,16 65,22" fill="none" stroke={maskLight} strokeWidth="2" opacity="0.5" />
 
       {/* MANDIBLES */}
@@ -566,7 +572,7 @@ export const BattleBug = memo(function BattleBug({
       {horns.map((d, i) => <path key={i} d={d} fill="none" stroke={shell} strokeWidth="3" strokeLinecap="round" />)}
 
       {/* EYES - void black with orange glow */}
-      <g filter="url(#battleGlow)">
+      <g filter={`url(#${glowId})`}>
         <ellipse cx="40" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
         <ellipse cx="60" cy="24" rx="6" ry="8" fill={DARK_FANTASY.void} />
         <ellipse cx="40" cy="24" rx="4" ry="5" fill={infected} opacity="0.7" />
@@ -576,7 +582,7 @@ export const BattleBug = memo(function BattleBug({
       </g>
 
       {/* INFECTION GROWTHS */}
-      <g filter="url(#battleGlow)">
+      <g filter={`url(#${glowId})`}>
         <ellipse className={`${bugMotion.shape} ${bugMotion.swellWide}`} cx="50" cy="50" rx="10" ry="8" fill={infected} opacity="0.85" />
         <ellipse className={`${bugMotion.shape} ${bugMotion.swellTall}`} cx="35" cy="56" rx="7" ry="5" fill={infected} opacity="0.75" />
         <ellipse className={`${bugMotion.shape} ${bugMotion.swellTallSlow}`} cx="65" cy="56" rx="7" ry="5" fill={infected} opacity="0.75" />

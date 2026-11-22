@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef, useMemo, memo } from 'react'
+import { useEffect, useState, useRef, useMemo, useId, memo } from 'react'
 import Link from 'next/link'
 import { ProfessionSwitch, type ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import { useCVData, useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -39,9 +39,10 @@ import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 // His outfit plate: a cavern shard with bone lettering, rimmed in the soul light.
 const OUTFIT_LOOK: WardrobeLook = { plate: DARK_FANTASY.voidDeep, text: DARK_FANTASY.bone, ring: DARK_FANTASY.ethereal }
 
-// Abstract spirit wisp - optimized: no SVG filter
+// Abstract spirit wisp - optimized: no SVG filter. Each wisp owns its gradient id, so the nav's wisp, hidden
+// below sm, never holds the gradient another wisp's url(#id) resolves to.
 const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.ethereal }: { size?: number; color?: string }) {
-  const gradId = `wispGlow-${color?.replace('#', '')}`
+  const gradId = `${useId()}wisp`
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" aria-hidden="true" role="presentation">
       <defs>
@@ -73,10 +74,12 @@ const SpiritWisp = memo(function SpiritWisp({ size = 40, color = DARK_FANTASY.et
 // Mechanical gear
 const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: number }) {
   const teeth = 12
+  // Each gear owns its brass gradient id (useId), the same reason as the wisp's.
+  const brassId = `${useId()}brass`
   return (
     <svg width={size} height={size} viewBox="0 0 50 50" aria-hidden="true" role="presentation">
       <defs>
-        <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={brassId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor={DARK_FANTASY.brass} />
           <stop offset="100%" stopColor={DARK_FANTASY.copper} />
         </linearGradient>
@@ -100,12 +103,12 @@ const MechanicalGear = memo(function MechanicalGear({ size = 50 }: { size?: numb
           <path
             key={i}
             d={`M${x1},${y1} L${x2},${y2} L${x3},${y3} L${x4},${y4}`}
-            fill="url(#brassGrad)"
+            fill={`url(#${brassId})`}
           />
         )
       })}
       {/* Inner ring */}
-      <circle cx="25" cy="25" r="16" fill="none" stroke="url(#brassGrad)" strokeWidth="3" />
+      <circle cx="25" cy="25" r="16" fill="none" stroke={`url(#${brassId})`} strokeWidth="3" />
       {/* Center hole */}
       <circle cx="25" cy="25" r="6" fill={DARK_FANTASY.voidDeep} stroke={DARK_FANTASY.brass} strokeWidth="1" />
       {/* Decorative spokes */}
