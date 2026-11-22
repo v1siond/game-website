@@ -6,11 +6,9 @@ import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's buttons, cut like the game's menu entries: carved capitals on dark stone between two thin
 // gold rules, the lit highlight sweeping in behind the word on hover and focus. Email is the lit one (gold
-// words), the others are plain.
+// words), the others are plain. The focus ring is the site's global one, in the world's gold.
 
-const FOCUS = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[color:var(--soul-glow)]'
-
-export const BUTTON = `${ashen.button} inline-flex min-h-[44px] items-center justify-center px-5 py-2 text-sm uppercase tracking-[0.24em] text-[color:var(--soul-text)] ${FOCUS}`
+export const BUTTON = `${ashen.button} inline-flex min-h-[44px] items-center justify-center px-5 py-2 text-sm uppercase tracking-[0.24em] text-[color:var(--soul-text)]`
 
 export const BUTTON_LIT = `${BUTTON} ${ashen.buttonLit} text-[color:var(--soul-glow)]`
 
