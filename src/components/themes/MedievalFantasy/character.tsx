@@ -1,19 +1,14 @@
 import { REALM } from './palette'
+import golem from './character.module.css'
 
 // The infernal golem, the rock creature with fel fire joints that lands in the chaos zone.
 
-interface InfernalGolemProps {
-  id: string
-  isIdle?: boolean
-  scale?: number
-}
-
-export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGolemProps) {
-  const suffix = isIdle ? 'Idle' : ''
-  const rockId = `rock${suffix}${id}`
-  const felFireId = `felFire${suffix}${id}`
-  const glowId = `glow${suffix}${id}`
-  const rockCrackId = `rockCrack${suffix}${id}`
+// The golem the chaos zone draws stands idle: it breathes, looks around and sways while its fel fires burn.
+export function InfernalGolemSVG({ id }: { id: string }) {
+  const rockId = `rockIdle${id}`
+  const felFireId = `felFireIdle${id}`
+  const glowId = `glowIdle${id}`
+  const rockCrackId = `rockCrackIdle${id}`
 
   // Simplified flame using CSS animations (much faster than feTurbulence)
   const FelFlame = ({ cx, cy, size = 1, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
@@ -25,19 +20,19 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
         <ellipse
           cx={w/2} cy={h * 0.6} rx={w * 0.5} ry={h * 0.5}
           fill={REALM.chaosFelDark} opacity="0.4"
-          style={isIdle ? { animation: `flameOuter ${1.8 + delay * 0.1}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` } : undefined}
+          style={{ animation: `${golem.flameOuter} ${1.8 + delay * 0.1}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` }}
         />
         {/* Middle flame */}
         <ellipse
           cx={w/2} cy={h * 0.55} rx={w * 0.35} ry={h * 0.4}
           fill={REALM.chaosFelMid} opacity="0.7"
-          style={isIdle ? { animation: `flameMid ${1.5 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` } : undefined}
+          style={{ animation: `${golem.flameMid} ${1.5 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` }}
         />
         {/* Inner bright core */}
         <ellipse
           cx={w/2} cy={h * 0.5} rx={w * 0.2} ry={h * 0.3}
           fill={REALM.chaosFelBright} opacity="0.85"
-          style={isIdle ? { animation: `flameInner ${1.2 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.5}px` } : undefined}
+          style={{ animation: `${golem.flameInner} ${1.2 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.5}px` }}
         />
       </g>
     )
@@ -53,28 +48,24 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
         <ellipse
           cx={w/2} cy={h * 0.6} rx={w * 0.45} ry={h * 0.45}
           fill={REALM.chaosFelDark} opacity="0.35"
-          style={isIdle ? { animation: `flameOuter ${1.6 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` } : undefined}
+          style={{ animation: `${golem.flameOuter} ${1.6 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` }}
         />
         {/* Inner core */}
         <ellipse
           cx={w/2} cy={h * 0.55} rx={w * 0.25} ry={h * 0.35}
           fill={REALM.chaosFelMid} opacity="0.75"
-          style={isIdle ? { animation: `flameInner ${1.3 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` } : undefined}
+          style={{ animation: `${golem.flameInner} ${1.3 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` }}
         />
       </g>
     )
   }
 
-  const breathStyle: React.CSSProperties = isIdle
-    ? { animation: 'infernalBreath 3s ease-in-out infinite', transformOrigin: 'center bottom' }
-    : {}
-
   return (
     <svg aria-hidden="true"
-      width={160 * scale}
-      height={200 * scale}
+      width={160}
+      height={200}
       viewBox="0 0 160 200"
-      style={{ overflow: 'visible', ...breathStyle }}
+      style={{ overflow: 'visible', animation: `${golem.infernalBreath} 3s ease-in-out infinite`, transformOrigin: 'center bottom' }}
     >
       <defs>
         {/* Rock gradient - dark grey with texture */}
@@ -120,7 +111,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
       </defs>
 
       {/* ============ LEFT LEG (back layer) - with idle shift ============ */}
-      <g style={isIdle ? { animation: 'leftLegShift 5s ease-in-out infinite', transformOrigin: '50px 120px' } : {}}>
+      <g style={{ animation: `${golem.leftLegShift} 5s ease-in-out infinite`, transformOrigin: '50px 120px' }}>
         {/* Thigh */}
         <polygon
           points="50,120 42,140 52,145 58,125"
@@ -145,7 +136,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
       </g>
 
       {/* ============ RIGHT LEG (back layer) - with idle shift ============ */}
-      <g style={isIdle ? { animation: 'rightLegShift 5s ease-in-out infinite', transformOrigin: '110px 120px' } : {}}>
+      <g style={{ animation: `${golem.rightLegShift} 5s ease-in-out infinite`, transformOrigin: '110px 120px' }}>
         {/* Thigh */}
         <polygon
           points="110,120 102,125 108,145 118,140"
@@ -174,7 +165,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
       <FelFlame cx={105} cy={115} size={2.7} delay={4} />
 
       {/* ============ TORSO - with idle sway ============ */}
-      <g style={isIdle ? { animation: 'torsoSway 7s ease-in-out infinite', transformOrigin: '80px 115px' } : {}}>
+      <g style={{ animation: `${golem.torsoSway} 7s ease-in-out infinite`, transformOrigin: '80px 115px' }}>
         {/* Main torso rock plates */}
         <polygon
           points="45,60 38,90 50,115 80,122 110,115 122,90 115,60 95,50 65,50"
@@ -219,7 +210,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
       <path d="M120,35 L125,55 L115,70" stroke={REALM.chaosFelMid} strokeWidth="2" fill="none" filter={`url(#${glowId}Inner)`} />
 
       {/* ============ LEFT ARM - with idle sway ============ */}
-      <g style={isIdle ? { animation: 'leftArmSway 6s ease-in-out infinite', transformOrigin: '25px 78px' } : {}}>
+      <g style={{ animation: `${golem.leftArmSway} 6s ease-in-out infinite`, transformOrigin: '25px 78px' }}>
         {/* Upper arm */}
         <polygon
           points="20,78 12,95 22,105 32,90"
@@ -245,7 +236,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
       </g>
 
       {/* ============ RIGHT ARM - with idle sway ============ */}
-      <g style={isIdle ? { animation: 'rightArmSway 6s ease-in-out infinite', transformOrigin: '135px 78px' } : {}}>
+      <g style={{ animation: `${golem.rightArmSway} 6s ease-in-out infinite`, transformOrigin: '135px 78px' }}>
         {/* Upper arm */}
         <polygon
           points="140,78 148,90 138,105 128,95"
@@ -274,7 +265,7 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
       <FelFlame cx={80} cy={48} size={2.4} delay={11} />
 
       {/* ============ HEAD (Menacing Skull) - with idle look animation ============ */}
-      <g style={isIdle ? { animation: 'headLook 8s ease-in-out infinite', transformOrigin: '80px 50px' } : {}}>
+      <g style={{ animation: `${golem.headLook} 8s ease-in-out infinite`, transformOrigin: '80px 50px' }}>
         {/* Skull base shape */}
         <polygon
           points="58,48 52,35 55,18 65,8 80,5 95,8 105,18 108,35 102,48 92,50 68,50"
@@ -307,8 +298,8 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
         />
         {/* Fire glow from deep inside */}
         <ellipse cx="69" cy="36" rx="4" ry="3" fill={REALM.chaosFelDark} opacity="0.8" />
-        <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
-        {isIdle && <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelBright} opacity="0" style={{ animation: 'eyeFlare 2s ease-in-out infinite' }} />}
+        <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelMid} opacity="0.9" style={{ animation: `${golem.eyeGlow} 2s ease-in-out infinite` }} />
+        <ellipse cx="69" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelBright} opacity="0" style={{ animation: `${golem.eyeFlare} 2s ease-in-out infinite` }} />
         <ellipse cx="69" cy="34" rx="1.5" ry="1" fill={REALM.chaosFelBright} opacity="0.7" filter={`url(#${glowId})`} />
 
         {/* RIGHT EYE SOCKET - Dark hole with fire from within */}
@@ -319,8 +310,8 @@ export function InfernalGolemSVG({ id, isIdle = false, scale = 1 }: InfernalGole
           strokeWidth="1"
         />
         <ellipse cx="91" cy="36" rx="4" ry="3" fill={REALM.chaosFelDark} opacity="0.8" />
-        <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelMid} opacity="0.9" style={isIdle ? { animation: 'eyeGlow 2s ease-in-out infinite' } : {}} />
-        {isIdle && <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelBright} opacity="0" style={{ animation: 'eyeFlare 2s ease-in-out infinite' }} />}
+        <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelMid} opacity="0.9" style={{ animation: `${golem.eyeGlow} 2s ease-in-out infinite` }} />
+        <ellipse cx="91" cy="35" rx="2.5" ry="2" fill={REALM.chaosFelBright} opacity="0" style={{ animation: `${golem.eyeFlare} 2s ease-in-out infinite` }} />
         <ellipse cx="91" cy="34" rx="1.5" ry="1" fill={REALM.chaosFelBright} opacity="0.7" filter={`url(#${glowId})`} />
 
         {/* NASAL CAVITY - Dark triangular hole */}

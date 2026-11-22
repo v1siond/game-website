@@ -1,0 +1,11 @@
+/* The ice particles of the frost dividers swell and glow */
+@keyframes felPulse {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.25;
+    transform: scale(1.08);
+  }
+}

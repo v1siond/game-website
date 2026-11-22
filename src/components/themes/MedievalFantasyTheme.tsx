@@ -5,6 +5,7 @@ import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
+import { useSiteLinks } from '@/components/cv/SiteLinks'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
@@ -17,7 +18,6 @@ import { HeroActions, RealmButton, RealmLanguageMenu } from './MedievalFantasy/a
 import { FTArtDivider } from './MedievalFantasy/ornaments'
 import { FelPaths, ProfessionNode } from './MedievalFantasy/professions'
 import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy/sections'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // Medieval Fantasy: the page composition. Its palette, backdrop, frames, buttons, cards, ornaments and
 // per profession sections live in ./MedievalFantasy.
@@ -25,33 +25,34 @@ import { ENGINE_LINK } from '@/lib/engineLink'
 // His outfit plate: a dark iron plaque with lifted gold lettering and a gold rim, like the realm's frames.
 const OUTFIT_LOOK: WardrobeLook = { plate: REALM.bgVoid, text: REALM.goldText, ring: REALM.goldMid }
 
+// A window 800 px tall or more spaces the sections and art dividers 4rem apart and draws the dividers
+// larger; a shorter window keeps them 3rem apart with smaller dividers. Both are built once, so the sections
+// fed a layout keep it across renders.
+const LARGE_SCREEN_HEIGHT = 800
+
+const LAYOUT: Record<'large' | 'small', SectionLayout> = {
+  large: { sectionSpacing: '4rem', artDividerMargin: '4rem', artDividerScale: 1.3 },
+  small: { sectionSpacing: '3rem', artDividerMargin: '3rem', artDividerScale: 1.1 },
+}
+
 export default function MedievalFantasyTheme() {
   const view = useWorldView()
   const { navigation, actions: actionLabels, sections } = useLabels()
   const active = view.profession
+  const { cv, engine } = useSiteLinks()
   const [mounted, setMounted] = useState(false)
-  const [viewportHeight, setViewportHeight] = useState(800)
+  const [isLargeScreen, setIsLargeScreen] = useState(true)
 
-  // Track viewport height for content visibility and animation spacing
+  // The spacing follows the window height; a resize re-renders the page only when it crosses 800 px.
   useEffect(() => {
     setMounted(true)
-    setViewportHeight(window.innerHeight)
-
-    const handleResize = () => setViewportHeight(window.innerHeight)
-    window.addEventListener('resize', handleResize, { passive: true })
-    return () => window.removeEventListener('resize', handleResize)
+    const measure = () => setIsLargeScreen(window.innerHeight >= LARGE_SCREEN_HEIGHT)
+    measure()
+    window.addEventListener('resize', measure, { passive: true })
+    return () => window.removeEventListener('resize', measure)
   }, [])
 
-  // Calculate available space - EXACT match to Dark Fantasy spacing
-  // Dark Fantasy uses: py-6 md:py-8 (1.5rem/2rem padding) for sections, py-16 (4rem) for art dividers
-  // Section gap in DF = bottom padding + top padding of next = 3rem (small) / 4rem (md+)
-  // Art divider total padding = 8rem (4rem top + 4rem bottom), but we use margin so just 4rem each side
-  const isLargeScreen = viewportHeight >= 800
-  const layout: SectionLayout = {
-    sectionSpacing: isLargeScreen ? '4rem' : '3rem',
-    artDividerMargin: isLargeScreen ? '4rem' : '3rem',
-    artDividerScale: isLargeScreen ? 1.3 : 1.1,
-  }
+  const layout = LAYOUT[isLargeScreen ? 'large' : 'small']
   const { sectionSpacing } = layout
 
   return (
@@ -59,7 +60,7 @@ export default function MedievalFantasyTheme() {
       {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
       {mounted && <DualZoneAtmosphere />}
 
-      {/* ============ MAIN CONTENT - Starts at top like Dark Fantasy ============ */}
+      {/* ============ MAIN CONTENT ============ */}
       <div style={{ position: 'relative', zIndex: 2, padding: 'clamp(1rem, 4vw, 2rem)', maxWidth: '900px', margin: '0 auto' }}>
 
         {/* ============ REIGN OF CHAOS ZONE ============ */}
@@ -89,9 +90,9 @@ export default function MedievalFantasyTheme() {
                       <p style={{ color: REALM.textBright, fontSize: '0.875rem' }}>{line}</p>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
-                      <HeroActions actions={actions} zone="roc" />
-                      <RealmButton href="/cv" zone="roc">{actionLabels.cv}</RealmButton>
-                      <RealmButton linkProps={ENGINE_LINK} zone="roc">{actionLabels.engine}</RealmButton>
+                      <HeroActions actions={actions} />
+                      <RealmButton href={cv.linkProps.href}>{cv.label}</RealmButton>
+                      <RealmButton linkProps={engine.linkProps}>{engine.label}</RealmButton>
                       <LanguageSwitcher render={(state) => <RealmLanguageMenu {...state} />} />
                     </div>
                   </div>
@@ -144,7 +145,7 @@ export default function MedievalFantasyTheme() {
           <FTArtDivider variant="throne" scale={layout.artDividerScale} />
         </ArtDivider>
 
-        {/* Contact - no card, floating text like Dark Fantasy. The last section never reaches the default end
+        {/* Contact - no card, floating text. The last section never reaches the default end
             line (half the viewport) before the page runs out, so its reveal ends higher, at full opacity. */}
         <ScrollScene end={0.8}>
           <section aria-label={sections.contact} style={{ marginBottom: sectionSpacing, textAlign: 'center', padding: '2rem 0', marginTop: '-10vh' }}>
@@ -163,8 +164,8 @@ export default function MedievalFantasyTheme() {
                   </h2>
                   <p style={{ color: REALM.textMid, marginBottom: '1.25rem', fontSize: '0.875rem' }}>{line}</p>
                   <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-                    <HeroActions actions={actions} zone="ft" />
-                    <RealmButton href="/cv" zone="ft">{actionLabels.cv}</RealmButton>
+                    <HeroActions actions={actions} />
+                    <RealmButton href={cv.linkProps.href}>{cv.label}</RealmButton>
                   </div>
                 </>
               )}

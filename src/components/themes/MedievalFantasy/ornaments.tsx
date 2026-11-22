@@ -1,33 +1,41 @@
-import { memo } from 'react'
+import { memo, type ReactNode } from 'react'
 import { REALM } from './palette'
+import ornament from './ornaments.module.css'
 import { svgNumber } from '@/components/themes/shared/svgNumber'
 
 // The zone ornaments set beside each section and the art dividers drawn between them.
 
-export const RoCOrnament = memo(function RoCOrnament({ side, type }: { side: 'left' | 'right'; type: 'flag' | 'weapons' | 'shield' }) {
-  const posStyle: React.CSSProperties = {
-    position: 'absolute',
-    [side]: '-80px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    opacity: 0.25,
-    pointerEvents: 'none',
-  }
+// One ornament per type: its box and its art, drawn in the zone's palette.
+interface Ornament {
+  width: string
+  height: string
+  viewBox: string
+  art: ReactNode
+}
 
-  if (type === 'flag') {
-    return (
-      <svg aria-hidden="true" style={{ ...posStyle, width: '60px', height: '120px' }} viewBox="0 0 60 120">
+type RoCOrnamentType = 'flag' | 'weapons' | 'shield'
+type FTOrnamentType = 'shard' | 'rune' | 'frost'
+
+const ROC_ORNAMENTS: Record<RoCOrnamentType, Ornament> = {
+  flag: {
+    width: '60px',
+    height: '120px',
+    viewBox: '0 0 60 120',
+    art: (
+      <>
         <line x1="15" y1="5" x2="15" y2="115" stroke={REALM.ember16c} strokeWidth="4" />
         <line x1="5" y1="20" x2="25" y2="20" stroke={REALM.ember11a} strokeWidth="3" />
         <path d="M17,8 Q45,18 42,45 Q40,60 48,75 L19,68 Q22,50 19,30 Z" fill={REALM.bloodRed} opacity="0.8" />
         <circle cx="32" cy="40" r="8" fill={REALM.goldDark} opacity="0.6" />
-      </svg>
-    )
-  }
-
-  if (type === 'weapons') {
-    return (
-      <svg aria-hidden="true" style={{ ...posStyle, width: '70px', height: '80px' }} viewBox="0 0 70 80">
+      </>
+    ),
+  },
+  weapons: {
+    width: '70px',
+    height: '80px',
+    viewBox: '0 0 70 80',
+    art: (
+      <>
         {/* Broken sword */}
         <g transform="translate(15,60) rotate(-50)">
           <path d="M0,0 L3,-35 L6,-32 L4,0 Z" fill={REALM.metalLight} />
@@ -39,68 +47,90 @@ export const RoCOrnament = memo(function RoCOrnament({ side, type }: { side: 'le
           <rect x="0" y="-25" width="4" height="30" fill={REALM.ember16c} />
           <path d="M4,-25 L18,-20 L15,-10 L4,-15 Z" fill={REALM.metalLight} />
         </g>
-      </svg>
-    )
-  }
+      </>
+    ),
+  },
+  shield: {
+    width: '60px',
+    height: '80px',
+    viewBox: '0 0 60 80',
+    art: (
+      <>
+        {/* Shield with arrows */}
+        <path d="M10,5 L50,15 L50,45 Q50,65 30,75 Q10,65 10,45 Z" fill={REALM.ember28a} stroke={REALM.metalMid} strokeWidth="2" />
+        <circle cx="30" cy="35" r="8" fill={REALM.goldDark} opacity="0.5" />
+        <line x1="20" y1="25" x2="35" y2="5" stroke={REALM.ember16c} strokeWidth="2" />
+        <polygon points="35,5 40,3 37,10" fill={REALM.metalLight} />
+        <line x1="38" y1="40" x2="50" y2="18" stroke={REALM.ember16c} strokeWidth="2" />
+        <polygon points="50,18 55,17 51,24" fill={REALM.metalLight} />
+      </>
+    ),
+  },
+}
 
-  return (
-    <svg aria-hidden="true" style={{ ...posStyle, width: '60px', height: '80px' }} viewBox="0 0 60 80">
-      {/* Shield with arrows */}
-      <path d="M10,5 L50,15 L50,45 Q50,65 30,75 Q10,65 10,45 Z" fill={REALM.ember28a} stroke={REALM.metalMid} strokeWidth="2" />
-      <circle cx="30" cy="35" r="8" fill={REALM.goldDark} opacity="0.5" />
-      <line x1="20" y1="25" x2="35" y2="5" stroke={REALM.ember16c} strokeWidth="2" />
-      <polygon points="35,5 40,3 37,10" fill={REALM.metalLight} />
-      <line x1="38" y1="40" x2="50" y2="18" stroke={REALM.ember16c} strokeWidth="2" />
-      <polygon points="50,18 55,17 51,24" fill={REALM.metalLight} />
-    </svg>
-  )
-})
-
-export const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left' | 'right'; type: 'shard' | 'rune' | 'frost' }) {
-  const posStyle: React.CSSProperties = {
-    position: 'absolute',
-    [side]: '-70px',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    opacity: 0.2,
-    pointerEvents: 'none',
-  }
-
-  if (type === 'shard') {
-    return (
-      <svg aria-hidden="true" style={{ ...posStyle, width: '50px', height: '100px' }} viewBox="0 0 50 100">
+const FT_ORNAMENTS: Record<FTOrnamentType, Ornament> = {
+  shard: {
+    width: '50px',
+    height: '100px',
+    viewBox: '0 0 50 100',
+    art: (
+      <>
         <polygon points="25,0 32,45 28,100 22,100 18,45" fill={REALM.frostIceMid} />
         <polygon points="25,8 29,40 25,80" fill={REALM.frostIceBright} opacity="0.5" />
         <polygon points="12,30 18,55 15,85 9,85 6,55" fill={REALM.frostIceDark} opacity="0.6" />
         <polygon points="38,35 42,58 40,82 36,82 34,58" fill={REALM.frostIceDark} opacity="0.5" />
-      </svg>
-    )
-  }
-
-  if (type === 'rune') {
-    return (
-      <svg aria-hidden="true" style={{ ...posStyle, width: '45px', height: '70px' }} viewBox="0 0 45 70">
+      </>
+    ),
+  },
+  rune: {
+    width: '45px',
+    height: '70px',
+    viewBox: '0 0 45 70',
+    art: (
+      <>
         <path d="M22,0 L42,12 L42,48 L22,60 L2,48 L2,12 Z" fill={REALM.metalDark} stroke={REALM.metalMid} strokeWidth="2" />
         <path d="M22,6 L36,15 L36,45 L22,54 L8,45 L8,15 Z" fill={REALM.bgDeep} />
         <g fill={REALM.frostIceMid} opacity="0.7">
           <path d="M22,15 L17,25 L22,32 L27,25 Z" />
           <line x1="22" y1="32" x2="22" y2="48" stroke={REALM.frostIceMid} strokeWidth="2" />
         </g>
-      </svg>
-    )
-  }
+      </>
+    ),
+  },
+  frost: {
+    width: '60px',
+    height: '60px',
+    viewBox: '0 0 60 60',
+    art: (
+      <>
+        {/* Frost pattern */}
+        <circle cx="30" cy="30" r="25" fill="none" stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
+        <circle cx="30" cy="30" r="18" fill="none" stroke={REALM.frostIceBright} strokeWidth="1" opacity="0.4" />
+        {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+          <line key={i} x1="30" y1="30" x2={svgNumber(30 + 22 * Math.cos(angle * Math.PI / 180))} y2={svgNumber(30 + 22 * Math.sin(angle * Math.PI / 180))} stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
+        ))}
+        <circle cx="30" cy="30" r="5" fill={REALM.frostIceBright} opacity="0.6" />
+      </>
+    ),
+  },
+}
 
+// The ornament hangs outside the section's edge on its side, faded: the chaos ones 80px out at a quarter,
+// the frost ones 70px out at a fifth.
+function OrnamentSvg({ ornament: { width, height, viewBox, art }, side, offset, opacity }: { ornament: Ornament; side: 'left' | 'right'; offset: string; opacity: number }) {
   return (
-    <svg aria-hidden="true" style={{ ...posStyle, width: '60px', height: '60px' }} viewBox="0 0 60 60">
-      {/* Frost pattern */}
-      <circle cx="30" cy="30" r="25" fill="none" stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
-      <circle cx="30" cy="30" r="18" fill="none" stroke={REALM.frostIceBright} strokeWidth="1" opacity="0.4" />
-      {[0, 60, 120, 180, 240, 300].map((angle, i) => (
-        <line key={i} x1="30" y1="30" x2={svgNumber(30 + 22 * Math.cos(angle * Math.PI / 180))} y2={svgNumber(30 + 22 * Math.sin(angle * Math.PI / 180))} stroke={REALM.frostIceMid} strokeWidth="1" opacity="0.5" />
-      ))}
-      <circle cx="30" cy="30" r="5" fill={REALM.frostIceBright} opacity="0.6" />
+    <svg aria-hidden="true" style={{ position: 'absolute', [side]: offset, top: '50%', transform: 'translateY(-50%)', opacity, pointerEvents: 'none', width, height }} viewBox={viewBox}>
+      {art}
     </svg>
   )
+}
+
+export const RoCOrnament = memo(function RoCOrnament({ side, type }: { side: 'left' | 'right'; type: RoCOrnamentType }) {
+  return <OrnamentSvg ornament={ROC_ORNAMENTS[type]} side={side} offset="-80px" opacity={0.25} />
+})
+
+export const FTOrnament = memo(function FTOrnament({ side, type }: { side: 'left' | 'right'; type: FTOrnamentType }) {
+  return <OrnamentSvg ornament={FT_ORNAMENTS[type]} side={side} offset="-70px" opacity={0.2} />
 })
 
 // =============================================================================
@@ -268,30 +298,6 @@ export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', s
       justifyContent: 'center',
       overflow: 'hidden',
     }}>
-      {/* Background gradient fade - blends with frozen landscape */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        background: `linear-gradient(180deg,
-          transparent 0%,
-          ${REALM.frostIceDark}08 20%,
-          ${`${REALM.frostIceMid}60`}12 50%,
-          ${REALM.frostIceDark}08 80%,
-          transparent 100%
-        )`,
-        pointerEvents: 'none',
-      }} />
-
-      {/* Ice glow behind center */}
-      <div style={{
-        position: 'absolute',
-        width: '300px',
-        height: '80px',
-        background: `radial-gradient(ellipse, ${`${REALM.frostIceMid}60`}30 0%, transparent 70%)`,
-        filter: 'blur(25px)',
-        pointerEvents: 'none',
-      }} />
-
       {/* Horizontal decorative lines - icy */}
       <div style={{
         position: 'absolute',
@@ -407,7 +413,7 @@ export const FTArtDivider = memo(function FTArtDivider({ variant = 'crystals', s
             opacity: 0.3 + (i % 4) * 0.1,
             borderRadius: '1px',
             transform: `rotate(${i * 15}deg)`,
-            animation: `felPulse ${2.5 + i * 0.2}s ease-in-out infinite`,
+            animation: `${ornament.felPulse} ${2.5 + i * 0.2}s ease-in-out infinite`,
           }}
         />
       ))}

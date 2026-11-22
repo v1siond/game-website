@@ -3,6 +3,7 @@
 import { memo, useMemo, type CSSProperties } from 'react'
 import { FrostHero } from './hero'
 import { REALM } from './palette'
+import frost from './frostZone.module.css'
 
 // The frost zone backdrop: snow layers, frost wind and the ice field.
 
@@ -239,7 +240,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         {/* Perspective lines (subtle, icy) */}
         <g opacity="0.06">
           {[-50, -30, -15, 0, 15, 30, 50].map((offset, i) => (
-            <line key={i} x1={500 + offset * 2} y1="150" x2={offset < 0 ? -300 : offset > 0 ? 1300 : 500} y2="850" stroke={REALM.night19a} strokeWidth="1" />
+            <line key={i} x1={500 + offset * 2} y1="150" x2={500 + Math.sign(offset) * 800} y2="850" stroke={REALM.night19a} strokeWidth="1" />
           ))}
         </g>
       </svg>
@@ -389,7 +390,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="160,250 150,252 148,260 158,262" fill={REALM.stone7} />
           {/* Blue smoke from back left hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} opacity="0.25" className="mf-drift" style={{ '--drift-dur': '2s', '--drift-y': '-10px', '--drift-sy': 1.875 } as CSSProperties}>
+            <ellipse cx="154" cy="255" rx="12" ry="8" fill={REALM.frostIceMid} opacity="0.25" className={frost.drift} style={{ '--drift-dur': '2s', '--drift-y': '-10px', '--drift-sy': 1.875 } as CSSProperties}>
               <animate attributeName="opacity" values="0.25;0.1;0.25" dur="2s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -399,7 +400,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="184,245 174,248 172,256 182,258" fill={REALM.stone7} />
           {/* Blue smoke from back right hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} opacity="0.2" className="mf-drift" style={{ '--drift-dur': '2.3s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
+            <ellipse cx="178" cy="250" rx="10" ry="7" fill={REALM.frostIceBright} opacity="0.2" className={frost.drift} style={{ '--drift-dur': '2.3s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
               <animate attributeName="opacity" values="0.2;0.08;0.2" dur="2.3s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -411,7 +412,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="34,255 44,257 46,265 36,267" fill={REALM.stone7} />
           {/* Blue smoke from front left hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} opacity="0.3" className="mf-drift" style={{ '--drift-dur': '1.8s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
+            <ellipse cx="40" cy="260" rx="14" ry="9" fill={REALM.frostIceMid} opacity="0.3" className={frost.drift} style={{ '--drift-dur': '1.8s', '--drift-y': '-12px', '--drift-sy': 2 } as CSSProperties}>
               <animate attributeName="opacity" values="0.3;0.1;0.3" dur="1.8s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -421,7 +422,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           <polygon points="55,250 65,252 67,260 57,262" fill={REALM.stone7} />
           {/* Blue smoke from front right hoof */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} opacity="0.22" className="mf-drift" style={{ '--drift-dur': '2.1s', '--drift-y': '-13px', '--drift-sy': 2 } as CSSProperties}>
+            <ellipse cx="61" cy="255" rx="11" ry="8" fill={REALM.frostIceBright} opacity="0.22" className={frost.drift} style={{ '--drift-dur': '2.1s', '--drift-y': '-13px', '--drift-sy': 2 } as CSSProperties}>
               <animate attributeName="opacity" values="0.22;0.08;0.22" dur="2.1s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -459,10 +460,10 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
 
           {/* BLUE SMOKE from eyes */}
           <g filter="url(#smokeBlur)">
-            <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} opacity="0.35" className="mf-drift" style={{ '--drift-dur': '2s', '--drift-x': '10px' } as CSSProperties}>
+            <ellipse cx="8" cy="-28" rx="10" ry="6" fill={REALM.frostIceMid} opacity="0.35" className={frost.drift} style={{ '--drift-dur': '2s', '--drift-x': '10px' } as CSSProperties}>
               <animate attributeName="opacity" values="0.35;0.1;0.35" dur="2s" repeatCount="indefinite" />
             </ellipse>
-            <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} opacity="0.2" className="mf-drift" style={{ '--drift-dur': '2.5s', '--drift-x': '13px' } as CSSProperties}>
+            <ellipse cx="15" cy="-32" rx="8" ry="5" fill={REALM.frostIceBright} opacity="0.2" className={frost.drift} style={{ '--drift-dur': '2.5s', '--drift-x': '13px' } as CSSProperties}>
               <animate attributeName="opacity" values="0.2;0.05;0.2" dur="2.5s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -470,7 +471,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
           {/* BLUE SMOKE from nostrils */}
           <ellipse cx="-28" cy="-45" rx="3" ry="4" fill={REALM.stone4a} />
           <g filter="url(#smokeBlur)">
-            <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} opacity="0.3" className="mf-drift" style={{ '--drift-dur': '3s', '--drift-y': '-13px' } as CSSProperties}>
+            <ellipse cx="-32" cy="-52" rx="8" ry="5" fill={REALM.frostIceMid} opacity="0.3" className={frost.drift} style={{ '--drift-dur': '3s', '--drift-y': '-13px' } as CSSProperties}>
               <animate attributeName="opacity" values="0.3;0.08;0.3" dur="3s" repeatCount="indefinite" />
             </ellipse>
           </g>
@@ -480,14 +481,14 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         </g>
 
         {/* MANE - ghostly ice wisps */}
-        <g style={{ animation: 'capeWave 3s ease-in-out infinite' }}>
+        <g style={{ animation: `${frost.capeWave} 3s ease-in-out infinite` }}>
           <path d="M30,45 Q50,15 38,-15 Q65,10 58,45" fill={REALM.frostIceDark} opacity="0.4" />
           <path d="M42,55 Q68,15 62,-20" stroke={REALM.frostIceMid} strokeWidth="3" fill="none" opacity="0.35" />
           <path d="M52,70 Q78,30 72,0" stroke={REALM.frostIceBright} strokeWidth="2" fill="none" opacity="0.25" />
         </g>
 
         {/* TAIL - ghostly */}
-        <g style={{ animation: 'capeWave 4s ease-in-out infinite reverse' }}>
+        <g style={{ animation: `${frost.capeWave} 4s ease-in-out infinite reverse` }}>
           <path d="M200,120 Q225,115 245,135 Q240,160 215,155 Q222,135 200,128" fill={REALM.frostIceDark} opacity="0.35" />
           <path d="M205,128 Q230,122 242,145" stroke={REALM.frostIceMid} strokeWidth="2.5" fill="none" opacity="0.3" />
         </g>
@@ -497,24 +498,6 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
       </svg>
 
       <FrostHero />
-
-      <style>{`
-        @keyframes capeWave {
-          0%, 100% { transform: rotate(0deg); }
-          50% { transform: rotate(1.5deg); }
-        }
-        /* Smoke and breath that swell and drift: each wisp moves by --drift-x and --drift-y and stretches by
-           --drift-sx and --drift-sy about its own centre, then returns, linear like the opacity beside it */
-        .mf-drift {
-          transform-box: fill-box;
-          transform-origin: center;
-          animation: mfDrift var(--drift-dur) linear infinite;
-        }
-        @keyframes mfDrift {
-          0%, 100% { transform: translate(0, 0) scale(1, 1); }
-          50% { transform: translate(var(--drift-x, 0px), var(--drift-y, 0px)) scale(var(--drift-sx, 1), var(--drift-sy, 1)); }
-        }
-      `}</style>
 
       {/* Horizontal wind/frost streaks - blow RIGHT to LEFT */}
       {windStreaks.map((streak) => (
@@ -527,7 +510,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
             width: streak.length,
             height: streak.thickness,
             background: `linear-gradient(270deg, transparent 0%, ${REALM.frostFrostWhite}30 30%, ${REALM.frostFrostWhite}50 50%, ${REALM.frostFrostWhite}30 70%, transparent 100%)`,
-            animation: `windStreak ${streak.duration}s linear infinite`,
+            animation: `${frost.windStreak} ${streak.duration}s linear infinite`,
             animationDelay: `${streak.delay}s`,
             filter: 'blur(1px)',
           }}
@@ -547,7 +530,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
             borderRadius: '50%',
             background: REALM.frostFrostMid,
             opacity: 0.4,
-            animation: `blizzardFar ${flake.duration}s linear infinite`,
+            animation: `${frost.blizzardFar} ${flake.duration}s linear infinite`,
             animationDelay: `${flake.delay}s`,
           }}
         />
@@ -566,7 +549,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
             borderRadius: '50%',
             background: REALM.frostFrostWhite,
             opacity: 0.6,
-            animation: `blizzardMid ${flake.duration}s linear infinite`,
+            animation: `${frost.blizzardMid} ${flake.duration}s linear infinite`,
             animationDelay: `${flake.delay}s`,
           }}
         />
@@ -585,7 +568,7 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
             borderRadius: '40%',
             background: `linear-gradient(180deg, ${REALM.frostFrostWhite}80 0%, ${REALM.frostFrostWhite}20 100%)`,
             opacity: 0.7,
-            animation: `blizzardNear ${flake.duration}s linear infinite`,
+            animation: `${frost.blizzardNear} ${flake.duration}s linear infinite`,
             animationDelay: `${flake.delay}s`,
             filter: 'blur(1px)',
           }}
@@ -818,27 +801,6 @@ export const FrostAtmosphere = memo(function FrostAtmosphere() {
         background: `linear-gradient(0deg, ${REALM.frostIceDark}30 0%, ${REALM.frostIceMid}15 40%, transparent 100%)`,
         filter: 'blur(15px)',
       }} />
-
-      <style>{`
-        @keyframes windStreak {
-          0% { transform: translateX(0); opacity: 0; }
-          10% { opacity: 0.6; }
-          90% { opacity: 0.6; }
-          100% { transform: translateX(-130vw); opacity: 0; }
-        }
-        @keyframes blizzardFar {
-          0% { transform: translate(0, 0); opacity: 0.4; }
-          100% { transform: translate(-25vw, 110vh); opacity: 0; }
-        }
-        @keyframes blizzardMid {
-          0% { transform: translate(0, 0); opacity: 0.6; }
-          100% { transform: translate(-35vw, 110vh); opacity: 0; }
-        }
-        @keyframes blizzardNear {
-          0% { transform: translate(0, 0); opacity: 0.7; }
-          100% { transform: translate(-50vw, 115vh); opacity: 0; }
-        }
-      `}</style>
     </>
   )
 })
