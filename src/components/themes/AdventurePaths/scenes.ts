@@ -1,7 +1,7 @@
 import type { Labels } from '@/lib/cv/labels'
 import type { Profession } from '@/lib/cv/professions'
-import type { SectionId, SectionSlot, SlotOf } from '@/lib/cv/sectionPlan'
-import { muayThaiFacts } from '@/lib/cv/sectionText'
+import type { SectionId, SectionSlot } from '@/lib/cv/sectionPlan'
+import { stageItems } from '@/lib/cv/stageItems'
 import type { LayerMotions, TheatreScene } from '../shared/theatre/useTheatre'
 import type { StageLayer } from '../shared/theatre/Stage'
 import { about } from './scenes/about'
@@ -18,7 +18,7 @@ import { work } from './scenes/work'
 
 // The page as scenes: the hub (hero), one level per section of the shown profession in reading order,
 // the goal (contact). Each scene names its picture, its words in labels.trail for the HUD, its anchor and
-// how many cards its section counts, read from the same slot the section's cards are drawn from.
+// how many cards its section counts (stageItems), read from the same slot the section's cards are drawn from.
 
 export type SceneId = 'hero' | SectionId | 'contact'
 
@@ -45,21 +45,6 @@ const SCENE_DEFS: Record<SceneId, SceneDef> = {
   contact: { level: goal, place: 'placeContact', tally: null, anchor: 'contact' },
 }
 
-// How many cards each section counts: what it marks with data-stage-items, read off its slot.
-const COUNT_FOR: { [Id in SectionId]: (slot: SlotOf<Id>, labels: Labels, highlights: number) => number } = {
-  about: (_slot, _labels, highlights) => highlights,
-  work: ({ jobs }) => jobs.length,
-  tech: ({ categories }) => categories.length,
-  services: ({ services: list }) => list.length,
-  projects: ({ projects: list }) => list.length,
-  ventures: ({ companies }) => companies.length,
-  bands: ({ bands: list }) => list.length,
-  muayThai: ({ martialArts }, labels) => muayThaiFacts(martialArts, labels).length + martialArts.primary.achievements.length,
-}
-
-const countOf = (slot: SectionSlot, labels: Labels, highlights: number): number =>
-  (COUNT_FOR[slot.id] as (slot: SectionSlot, labels: Labels, highlights: number) => number)(slot, labels, highlights)
-
 export interface TrailScene extends TheatreScene, Omit<SceneDef, 'level'> {
   id: SceneId
   layers: StageLayer[]
@@ -75,7 +60,10 @@ const sceneOf = (id: SceneId, slot: SectionSlot | null, count: number, professio
 
 /** Every scene of the page in order, each with what its picture is built from. */
 export function scenesOf(slots: readonly SectionSlot[], labels: Labels, highlights: number, profession: Profession): TrailScene[] {
-  const sections = slots.map((slot) => sceneOf(slot.id, slot, countOf(slot, labels, highlights), profession))
+  const sections = slots.map((slot) => {
+    const { lead, count } = stageItems(slot, labels, highlights)
+    return sceneOf(slot.id, slot, lead + count, profession)
+  })
   return [sceneOf('hero', null, 0, profession), ...sections, sceneOf('contact', null, 0, profession)]
 }
 
