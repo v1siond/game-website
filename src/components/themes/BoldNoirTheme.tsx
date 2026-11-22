@@ -39,7 +39,7 @@ export default function BoldNoirTheme() {
   const rootRef = usePointerVars(!reducedMotion)
 
   return (
-    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={NOIR_VARS}>
+    <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root}`} style={NOIR_VARS}>
       <NoirBackdrop />
 
       {/* the first screen: his calling card and the menu where he stands */}
