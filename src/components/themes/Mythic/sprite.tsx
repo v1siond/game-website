@@ -6,7 +6,7 @@ import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { useLatest } from '@/hooks/useLatest'
 import { MYTH } from './palette'
-import { MOVES, NEAR_FIST, REST, bodyCss, bodyTransform, jointCss, jointTransform, resolveKeys, type Joint, type Move, type Pose } from './rig'
+import { MOVES, NEAR_FIST, REST, bodyCss, bodyTransform, firstPose, jointCss, jointTransform, resolveKeys, type Joint, type Move, type Pose } from './rig'
 import s from './sprite.module.css'
 
 // Him as this world's own sprite, a parody of the ash pale Spartan with the chained blades (reference
@@ -555,9 +555,17 @@ function useRigMotion(svg: SVGSVGElement | null, profession: Profession, motion:
   }, [svg, reduced, waiting, motion, profession, take, doneRef])
 }
 
+// The pose drawn when no move plays (reduced motion): the move's first key, so a figure resting in a hang
+// hangs from his holds instead of standing in the air; 'still' keeps his profession's rest pose.
+const stillPose = (motion: SpriteMotion, profession: Profession): Pose | undefined => {
+  if (motion === 'still') return undefined
+  return firstPose(motion, profession)
+}
+
 /** Him as the chained blade Spartan, in a profession's kit, playing one motion. */
 export function SpartanSprite({ profession, motion, className = '', place, onDone, sheathed = false, take = 0, waiting = false }: SpriteProps) {
   const [svg, setSvg] = useState<SVGSVGElement | null>(null)
+  const reduced = useReducedMotion()
   useRigMotion(svg, profession, motion, take, waiting, onDone)
-  return <SpartanFigure profession={profession} className={className} place={place} svgRef={setSvg} sheathed={sheathed} />
+  return <SpartanFigure profession={profession} pose={reduced ? stillPose(motion, profession) : undefined} className={className} place={place} svgRef={setSvg} sheathed={sheathed} />
 }
