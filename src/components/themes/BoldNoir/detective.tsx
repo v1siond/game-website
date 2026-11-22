@@ -1,4 +1,4 @@
-import { useId, type ReactNode } from 'react'
+import { memo, useId, type ReactNode } from 'react'
 import type { Profession } from '@/lib/cv/professions'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { NOIR } from './palette'
@@ -248,7 +248,8 @@ interface DetectiveProps {
   className?: string
 }
 
-export function Detective({ profession, motion = 'idle', className = '' }: DetectiveProps) {
+// Memoised: its props are primitives, so a parent render that leaves them as they are draws nothing again.
+export const Detective = memo(function Detective({ profession, motion = 'idle', className = '' }: DetectiveProps) {
   const kit = KITS[profession]
   const dotsId = `noir-dots-${useId().replace(/:/g, '')}`
   const dots = `url(#${dotsId})`
@@ -271,4 +272,4 @@ export function Detective({ profession, motion = 'idle', className = '' }: Detec
       </g>
     </svg>
   )
-}
+})
