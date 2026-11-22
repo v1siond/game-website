@@ -815,6 +815,11 @@
   .near {
     transform: none !important;
   }
+
+  /* The fulfilled stamp's end frame is its tilt at full size, not the scale(2) it is struck from. */
+  .fulfilled {
+    transform: rotate(-10deg) !important;
+  }
 }
 
 /* The tech stack climb: a panel lights once he grips it, glows while its page is pointed at; he rises a hold per reach. */
