@@ -1,15 +1,15 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { JourneyBackdrop, Wanderer, type Zone } from './RetroAtomic/journey'
 import { VaultEntrance } from './RetroAtomic/vaultDoor'
 import { WristComputer } from './RetroAtomic/wristComputer'
@@ -46,13 +46,11 @@ export default function RetroAtomicTheme() {
   const [booted, setBooted] = useState(false)
   const rootRef = usePointerVars(!reducedMotion)
   const onOpened = useCallback(() => setBooted(true), [])
-  const [zone, setZone] = useState<Zone>('shelter')
-  const onZone = useCallback((next: Zone) => setZone(next), [])
-  const stage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
+  const { zones, stage } = useZoneStore<Zone>('shelter', reducedMotion)
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:theme(colors.atomic.yellow)] [--focus-halo:theme(colors.atomic.ink)] ${atomic.root} ${atomicFace.variable}`}>
-      <JourneyBackdrop zone={zone} />
+      <JourneyBackdrop zones={zones} />
       {!reducedMotion && <VaultEntrance onOpened={onOpened} />}
 
       <header className="relative z-30 px-3 pb-8 pt-14 sm:px-6 sm:pt-10">
@@ -69,11 +67,11 @@ export default function RetroAtomicTheme() {
         <ContactTerminal />
       </ZoneStageProvider>
 
-      <Wanderer zone={zone} />
+      <Wanderer zones={zones} />
 
       <footer className="relative z-20 bg-atomic-ink py-8 text-center" role="contentinfo">
         <p className="text-sm text-atomic-ash">
-          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+          <CopyrightLine />
         </p>
       </footer>
     </div>

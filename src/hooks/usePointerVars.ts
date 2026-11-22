@@ -6,8 +6,9 @@ import { useEffect, useRef } from 'react'
 
 /**
  * Writes the pointer's place on the element as --mx and --my, -1 to 1 from the viewport centre: one
- * passive listener, at most one write a frame. Off until the element is drawn and under reduced
- * motion, where the layers stay still.
+ * passive listener, at most one write a frame. It listens only while `enabled` is true; the hook reads
+ * no media query itself, so each world passes `!reducedMotion` and its layers stay still under reduced
+ * motion.
  */
 export function usePointerVars(enabled: boolean) {
   const ref = useRef<HTMLDivElement>(null)

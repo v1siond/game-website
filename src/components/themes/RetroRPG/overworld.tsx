@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, type CSSProperties, type ReactNode } from 'react'
+import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { RPG } from './palette'
 import rooms from './rooms.module.css'
 
@@ -154,7 +155,8 @@ function Town() {
 
 const ART: Record<Zone, () => ReactNode> = { ruins: Ruins, snow: Snow, water: Water, heat: Heat, town: Town }
 
-export const Overworld = memo(function Overworld({ zone }: { zone: Zone }) {
+export const Overworld = memo(function Overworld({ zones }: { zones: ValueStore<Zone> }) {
+  const zone = useStoreValue(zones)
   return (
     <div className="pointer-events-none fixed inset-0 z-0 bg-[color:var(--rpg-void)]" aria-hidden="true">
       {ZONES.map((id) => {

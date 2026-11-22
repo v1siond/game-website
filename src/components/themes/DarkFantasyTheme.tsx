@@ -24,6 +24,7 @@ import { BattleReveal } from './DarkFantasy/BattleReveal'
 import { drumsSince, headingId, jobYears, newTabName } from '@/lib/cv/sectionText'
 import { fillLabel } from '@/lib/cv/labels'
 import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
 import { DARK_FANTASY, DARK_FANTASY_VARS } from './DarkFantasy/palette'
@@ -1994,7 +1995,7 @@ export default function DarkFantasyTheme() {
         <div className="inline-flex items-center gap-4" style={{ color: DARK_FANTASY.silverText }}>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
           <span className="text-sm tracking-[0.2em]" style={{ fontFamily: DF_FONT }}>
-            <span className="sr-only">{navigation.copyright} </span>© {new Date().getFullYear()} <NameWords name={view.hero.name} />
+            <CopyrightLine srPrefix={navigation.copyright} />
           </span>
           <div className="w-12 h-px" style={{ background: DARK_FANTASY.brass }} aria-hidden="true" />
         </div>

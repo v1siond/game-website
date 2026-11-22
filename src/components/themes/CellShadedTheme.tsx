@@ -1,14 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
 import { Bangers } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
 import { paletteVars } from './shared/paletteVars'
 import { fillLabel } from '@/lib/cv/labels'
 import { CEL } from './CellShaded/palette'
@@ -39,23 +38,15 @@ export default function CellShadedTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const [zone, setZone] = useState<Zone>('noon')
-  const pointerRef = usePointerVars(mounted && !reduced)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const onZone = useCallback((next: Zone) => setZone(next), [])
-
-  if (!mounted) return null
+  const pointerRef = usePointerVars(!reduced)
+  const { zones, stage } = useZoneStore<Zone>('noon', reduced)
+  useZoneAttribute(zones, pointerRef)
 
   return (
-    <div ref={pointerRef} style={ROOT_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>
+    <div ref={pointerRef} style={ROOT_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${cel.root} ${celFace.variable}`}>
       <HatchDefs />
       <Wasteland />
-      <ZoneStageProvider value={{ reduced, onZone }}>
+      <ZoneStageProvider value={stage}>
         <FreezeIntro profession={active} reduced={reduced} />
         <QuickChange profession={active} />
 
@@ -70,7 +61,7 @@ export default function CellShadedTheme() {
 
       <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <p className="inline-block bg-[var(--cel-ink)] px-3 py-1 text-base font-bold text-[var(--cel-paper)]">
-          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+          <CopyrightLine />
         </p>
       </footer>
     </div>

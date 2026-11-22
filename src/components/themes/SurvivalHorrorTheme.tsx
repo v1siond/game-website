@@ -1,14 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { usePointerVars } from '@/hooks/usePointerVars'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { usePreview } from '@/themes/PreviewContext'
 import { SH_VARS } from './SurvivalHorror/palette'
 import { DoorProvider } from './SurvivalHorror/door'
@@ -16,7 +16,7 @@ import { HallHero } from './SurvivalHorror/hall'
 import { ItemBox } from './SurvivalHorror/itemBox'
 import { SECTION_VIEWS } from './SurvivalHorror/views'
 import { SafeRoom } from './SurvivalHorror/saferoom'
-import { RoomWindow, Stage, StageProvider } from './SurvivalHorror/stage'
+import { RoomWindow, Stage, StageProvider, createStageState } from './SurvivalHorror/stage'
 import type { Zone } from './SurvivalHorror/scripts'
 import look from './SurvivalHorror/world.module.css'
 
@@ -38,27 +38,16 @@ export default function SurvivalHorrorTheme() {
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
   const preview = usePreview()
-  const [mounted, setMounted] = useState(false)
-  const [zone, setZone] = useState<Zone>('hall')
-  const [herbs, takeHerbs] = useState(0)
-  const [saves, setSaves] = useState(0)
-  const rootRef = usePointerVars(mounted && !reduced)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const onZone = useCallback((next: Zone) => setZone(next), [])
-  const save = useCallback(() => setSaves((count) => count + 1), [])
-  const zones = useMemo(() => ({ reduced, onZone }), [reduced, onZone])
-  const state = useMemo(() => ({ herbs, takeHerbs, saves, save }), [herbs, saves, save])
+  const rootRef = usePointerVars(!reduced)
+  const { zones, stage } = useZoneStore<Zone>('hall', reduced)
+  const [state] = useState(createStageState)
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--sh-flame)] [--focus-halo:var(--sh-void)] ${look.root}`} style={SH_VARS}>
       <DoorProvider>
-        <ZoneStageProvider value={zones}>
+        <ZoneStageProvider value={stage}>
           <StageProvider value={state}>
-            <Stage zone={preview ? 'hall' : zone} profession={active} reduced={reduced} still={preview} />
+            <Stage zones={zones} profession={active} reduced={reduced} still={preview} />
 
             <div className="relative z-10">
               <RoomWindow zone="hall">
@@ -83,7 +72,7 @@ export default function SurvivalHorrorTheme() {
 
               <footer className="py-10 text-center">
                 <p className={`inline-block bg-[color:var(--sh-void)] px-3 py-1 text-sm text-[color:var(--sh-fog-text)] ${look.typed}`}>
-                  © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+                  <CopyrightLine />
                 </p>
               </footer>
             </div>

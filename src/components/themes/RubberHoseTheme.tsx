@@ -1,15 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { HOSE, HOSE_VARS } from './RubberHose/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
@@ -52,17 +51,8 @@ export default function RubberHoseTheme() {
   const view = useWorldView()
   const { navigation, professions, sections } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const rootRef = usePointerVars(mounted && !reducedMotion)
-  const [isle, setIsle] = useState<Isle>('meadow')
-  const onZone = useCallback((zone: Isle) => setIsle(zone), [])
-  const zoneStage = useMemo(() => ({ reduced: reducedMotion, onZone }), [reducedMotion, onZone])
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
+  const rootRef = usePointerVars(!reducedMotion)
+  const { zones, stage } = useZoneStore<Isle>('meadow', reducedMotion)
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--hose-ink)] [--focus-halo:var(--hose-paper)] ${world.root} ${world.focusRing}`} style={HOSE_VARS}>
@@ -70,8 +60,8 @@ export default function RubberHoseTheme() {
         {navigation.skipToContent}
       </a>
 
-      <ZoneStageProvider value={zoneStage}>
-      <Isles current={isle} />
+      <ZoneStageProvider value={stage}>
+      <Isles zones={zones} />
       <FilmFrame />
       <FilmGrain />
       <RisingNotes />
@@ -162,7 +152,7 @@ export default function RubberHoseTheme() {
           <div className="flex items-center justify-center gap-4">
             <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
             <p className={`px-3 py-1 text-sm tracking-widest ${world.chip}`}>
-              © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+              <CopyrightLine />
             </p>
             <div className="h-0.5 w-8 shrink-0 bg-[var(--hose-ink)] sm:w-16" aria-hidden="true" />
           </div>

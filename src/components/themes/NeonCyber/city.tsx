@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from 'react'
+import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { NEON } from './palette'
 import world from './world.module.css'
 
@@ -223,7 +224,8 @@ const DISTRICTS: Record<District, ComponentType> = { watson: Watson, japantown: 
 
 const DISTRICT_ORDER: District[] = ['watson', 'japantown', 'megablock', 'badlands']
 
-export function CityBackdrop({ district }: { district: District }) {
+export function CityBackdrop({ zones }: { zones: ValueStore<District> }) {
+  const district = useStoreValue(zones)
   return (
     <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
       <Far />

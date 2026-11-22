@@ -1,14 +1,14 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { SkipLink } from '@/components/themes/shared/AccessibilityStyles'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneAttribute, useZoneStore } from '@/hooks/useZoneStage'
 import { fillLabel } from '@/lib/cv/labels'
 import { MYTH_VARS } from './Mythic/palette'
 import { Depths } from './Mythic/depths'
@@ -35,29 +35,21 @@ export default function MythicTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reduced = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const [zone, setZone] = useState<Zone>('hall')
   const [rebirths, setRebirths] = useState(0)
-  const pointerRef = usePointerVars(mounted && !reduced)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  const onZone = useCallback((next: Zone) => setZone(next), [])
+  const pointerRef = usePointerVars(!reduced)
+  const { zones, stage } = useZoneStore<Zone>('hall', reduced)
+  useZoneAttribute(zones, pointerRef)
 
   const returnToHouse = useCallback(() => {
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
     setRebirths((count) => count + 1)
   }, [reduced])
 
-  if (!mounted) return null
-
   return (
-    <div ref={pointerRef} style={MYTH_VARS} data-zone={zone} className={`relative min-h-screen overflow-x-clip ${u.root}`}>
+    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${u.root}`}>
       <SkipLink href="#main-content" />
       <Depths />
-      <ZoneStageProvider value={{ reduced, onZone }}>
+      <ZoneStageProvider value={stage}>
         <HouseProvider value={{ rebirths, returnToHouse }}>
           <PoolRise profession={active} reduced={reduced} />
           <Mirror profession={active} />
@@ -74,7 +66,7 @@ export default function MythicTheme() {
 
       <footer className="relative z-20 py-8 text-center" role="contentinfo">
         <p className="inline-block bg-[var(--myth-ink)] px-3 py-1 text-base text-[var(--myth-bone)]">
-          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+          <CopyrightLine />
         </p>
       </footer>
     </div>

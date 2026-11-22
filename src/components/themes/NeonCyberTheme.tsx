@@ -1,15 +1,15 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Share_Tech_Mono } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { usePointerVars } from '@/hooks/usePointerVars'
-import { ZoneStageProvider } from '@/hooks/useZoneStage'
+import { ZoneStageProvider, useZoneStore } from '@/hooks/useZoneStage'
 import { CityBackdrop, type District } from './NeonCyber/city'
 import { DistrictStage, DriveOff } from './NeonCyber/life'
 import { BootHero } from './NeonCyber/boot'
@@ -41,23 +41,15 @@ export default function NeonCyberTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
   const [scanning, setScanning] = useState(false)
-  const [district, setDistrict] = useState<District>('watson')
-  const stage = useMemo(() => ({ reduced: reducedMotion, onZone: (zone: District) => setDistrict(zone) }), [reducedMotion])
-  const rootRef = usePointerVars(mounted && !reducedMotion)
+  const { zones, stage } = useZoneStore<District>('watson', reducedMotion)
+  const rootRef = usePointerVars(!reducedMotion)
   useTimeSlow(rootRef, scanning)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
 
   return (
     <div ref={rootRef} data-scan={scanning ? 'on' : 'off'} className={`relative min-h-screen overflow-x-clip ${world.root} ${neonFace.variable}`} style={NEON_VARS}>
       <ZoneStageProvider value={stage}>
-      <CityBackdrop district={district} />
+      <CityBackdrop zones={zones} />
       <ScanVeil />
 
       <DistrictStage district="watson">
@@ -84,7 +76,7 @@ export default function NeonCyberTheme() {
       <footer className="relative z-20 flex items-center justify-center gap-3 pb-10" role="contentinfo">
         <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
         <p className="text-sm tracking-widest text-[color:var(--neon-ash)]">
-          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+          <CopyrightLine />
         </p>
         <span className={`block w-16 ${world.ticks}`} aria-hidden="true" />
       </footer>

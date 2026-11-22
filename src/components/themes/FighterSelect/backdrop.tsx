@@ -1,6 +1,7 @@
 'use client'
 
 import type { CSSProperties, ReactNode } from 'react'
+import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { FS } from './palette'
 import living from './living.module.css'
 
@@ -204,7 +205,8 @@ const STAGES: Record<Zone, ReactNode> = {
 }
 const ZONES = Object.keys(STAGES) as Zone[]
 
-export function TourBackdrop({ zone }: { zone: Zone }) {
+export function TourBackdrop({ zones }: { zones: ValueStore<Zone> }) {
+  const zone = useStoreValue(zones)
   return (
     <div className="pointer-events-none fixed inset-0 z-0" aria-hidden="true">
       {ZONES.map((id) => (

@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useRef, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
+import { useStoreValue, type ValueStore } from '@/hooks/useZoneStage'
 import { ShelterBackdrop } from './backdrop'
 import { DwellerSprite } from './dweller'
 import { DogSprite } from './dog'
@@ -82,7 +83,8 @@ function TownLayer() {
 }
 
 /** The fixed backdrop: the shelter, the wasteland and the town, the zone in view shown. */
-export const JourneyBackdrop = memo(function JourneyBackdrop({ zone }: { zone: Zone }) {
+export const JourneyBackdrop = memo(function JourneyBackdrop({ zones }: { zones: ValueStore<Zone> }) {
+  const zone = useStoreValue(zones)
   return (
     <>
       <ShelterBackdrop />
@@ -97,7 +99,8 @@ export const JourneyBackdrop = memo(function JourneyBackdrop({ zone }: { zone: Z
 })
 
 /** He and the dog on the ground strip, walking to the zone in view. */
-export function Wanderer({ zone }: { zone: Zone }) {
+export function Wanderer({ zones }: { zones: ValueStore<Zone> }) {
+  const zone = useStoreValue(zones)
   const { active } = useProfession()
   const [walking, setWalking] = useState(false)
   const first = useRef(true)

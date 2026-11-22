@@ -1,8 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useProfession } from '@/contexts/ProfessionContext'
-import { NameWords } from '@/components/cv/NameWords'
+import { CopyrightLine } from './shared/CopyrightLine'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { fillLabel } from '@/lib/cv/labels'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -37,14 +36,7 @@ export default function BoldNoirTheme() {
   const view = useWorldView()
   const { navigation, professions } = useLabels()
   const reducedMotion = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  const rootRef = usePointerVars(mounted && !reducedMotion)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
+  const rootRef = usePointerVars(!reducedMotion)
 
   return (
     <div ref={rootRef} className={`relative min-h-screen overflow-x-clip ${world.root} ${world.focusRing}`} style={NOIR_VARS}>
@@ -79,7 +71,7 @@ export default function BoldNoirTheme() {
       <footer className="relative z-20 flex items-center justify-center gap-3 py-10" role="contentinfo">
         <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />
         <p className={`text-sm text-[color:var(--noir-fog)] ${world.copy}`}>
-          © {new Date().getFullYear()} <NameWords name={view.hero.name} />
+          <CopyrightLine />
         </p>
         <span className="block h-1 w-10 bg-[color:var(--noir-red)]" aria-hidden="true" />
       </footer>
