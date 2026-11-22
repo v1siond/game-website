@@ -1,9 +1,8 @@
-import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { useLabels } from '@/components/cv/CVDataProvider'
+import { ContactLink, useSiteLinks } from '@/components/cv/SiteLinks'
 import atomic from './atomic.module.css'
-import { ENGINE_LINK } from '@/lib/engineLink'
 
 // The world's actions as rows of the terminal's menu: the green text on the glass, and under the
 // pointer or focus the row inverts (the phosphor bar fills in from the left, the text turns glass dark),
@@ -45,32 +44,26 @@ function Row({ children }: { children: ReactNode }) {
   )
 }
 
+// A menu row's inside: the caret and the label, for every contact link.
+const asMenuRow = (label: string) => <Row>{label}</Row>
+
 /** The four actions, one menu row each. A second copy on the page takes its own label so the two navs differ. */
 export function ActionMenu({ className = '', label }: { className?: string; label?: string }) {
-  const { actions, navigation } = useLabels()
+  const { navigation } = useLabels()
+  const { cv, engine } = useSiteLinks('engine')
 
   return (
     <RecruiterHero
       render={(hero) => (
         <nav aria-label={label ?? navigation.contactAndCv} className={className}>
           <ul className="space-y-1">
-            {hero.actions.map((action) => (
-              <li key={action.id}>
-                <a {...action.linkProps} className={MENU_ROW}>
-                  <Row>{action.label}</Row>
-                </a>
+            {[...hero.actions, cv, engine].map((slot) => (
+              <li key={slot.id}>
+                <ContactLink slot={slot} className={MENU_ROW}>
+                  {asMenuRow}
+                </ContactLink>
               </li>
             ))}
-            <li>
-              <Link href="/cv" className={MENU_ROW}>
-                <Row>{actions.cv}</Row>
-              </Link>
-            </li>
-            <li>
-              <Link {...ENGINE_LINK} className={MENU_ROW} aria-label={actions.viewEngine}>
-                <Row>{actions.engine}</Row>
-              </Link>
-            </li>
           </ul>
         </nav>
       )}
