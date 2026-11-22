@@ -85,4 +85,4 @@ export type SoulColor = keyof typeof SOUL
 export const SOUL_VARS = paletteVars('soul', SOUL)
 
 // One carved serif for every word of the world, the cut of the game's banners and menus.
-export const CARVED = "font-['Optimus_Princeps','Cinzel','Trajan_Pro',Georgia,'Times_New_Roman',serif]"
+export const CARVED = "[font-family:var(--soul-carved),Georgia,'Times_New_Roman',serif]"

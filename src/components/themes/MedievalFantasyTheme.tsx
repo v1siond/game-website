@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, type CSSProperties } from 'react'
+import { Cinzel } from 'next/font/google'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { ProfessionSwitch } from '@/components/cv/ProfessionSwitch'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
@@ -10,7 +11,7 @@ import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
 import { ScrollScene } from '@/components/scroll/ScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
 import { CopyrightLine } from './shared/CopyrightLine'
-import { REALM, REALM_VARS } from './MedievalFantasy/palette'
+import { REALM, REALM_FACE, REALM_VARS } from './MedievalFantasy/palette'
 import Wardrobe, { type WardrobeLook } from '@/components/worlds/Wardrobe'
 import { DualZoneAtmosphere } from './MedievalFantasy/backdrop'
 import { RealmFrame } from './MedievalFantasy/panels'
@@ -21,6 +22,14 @@ import { ArtDivider, SECTION_VIEWS, type SectionLayout } from './MedievalFantasy
 
 // Medieval Fantasy: the page composition. Its palette, backdrop, frames, buttons, cards, ornaments and
 // per profession sections live in ./MedievalFantasy.
+
+// The realm's carved capitals, Cinzel (an inscriptional Roman face): the root carries its --realm-face
+// variable and every text style reads it through REALM_FACE.
+const realmFace = Cinzel({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--realm-face',
+})
 
 // His outfit plate: a dark iron plaque with lifted gold lettering and a gold rim, like the realm's frames.
 const OUTFIT_LOOK: WardrobeLook = { plate: REALM.bgVoid, text: REALM.goldText, ring: REALM.goldMid }
@@ -40,7 +49,7 @@ const LAYOUT: Record<'large' | 'small', SectionLayout> = {
 const isLargeWindow = (): boolean => window.innerHeight >= LARGE_SCREEN_HEIGHT
 
 // The root's palette variables and base look, built once instead of on every render.
-const ROOT_STYLE: CSSProperties = { ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: '"Cinzel", Georgia, serif', color: REALM.textBright }
+const ROOT_STYLE: CSSProperties = { ...REALM_VARS, minHeight: '100vh', overflowX: 'clip', background: REALM.bgVoid, fontFamily: REALM_FACE, color: REALM.textBright }
 
 export default function MedievalFantasyTheme() {
   const view = useWorldView()
@@ -63,7 +72,7 @@ export default function MedievalFantasyTheme() {
   const { sectionSpacing } = layout
 
   return (
-    <div className="[--focus-ring:var(--realm-gold-bright)] [--focus-halo:var(--realm-bg-void)]" style={ROOT_STYLE}>
+    <div className={`[--focus-ring:var(--realm-gold-bright)] [--focus-halo:var(--realm-bg-void)] ${realmFace.variable}`} style={ROOT_STYLE}>
       {/* The backdrop draws random weather, so it mounts on the client; the page renders on the server. */}
       {mounted && <DualZoneAtmosphere />}
 

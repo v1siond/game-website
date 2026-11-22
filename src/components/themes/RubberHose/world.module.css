@@ -15,7 +15,7 @@
 
 /* The poster lettering: a heavy display serif. */
 .lettering {
-  font-family: 'Abril Fatface', Georgia, serif;
+  font-family: var(--hose-lettering), Georgia, serif;
   letter-spacing: 0.05em;
 }
 

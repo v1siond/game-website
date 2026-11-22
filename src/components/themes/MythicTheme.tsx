@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useState } from 'react'
+import { Cinzel } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useLabels, useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -18,6 +19,14 @@ import { SECTION_VIEWS } from './Mythic/regions'
 import { LastGate } from './Mythic/gate'
 import { HouseProvider, type Zone } from './Mythic/stage'
 import u from './Mythic/underworld.module.css'
+
+// The carved inscriptional capitals, Cinzel: the root carries its --myth-display variable and the world's css
+// reads it.
+const mythDisplay = Cinzel({
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--myth-display',
+})
 
 // Mythic, the chained blade Spartan's ascent painted in ink over colour: the page climbs from the great
 // hall to Olympus. He rises out of the blood pool in the hall, the mirror changes his talent, his work is
@@ -46,7 +55,7 @@ export default function MythicTheme() {
   }, [reduced])
 
   return (
-    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${u.root}`}>
+    <div ref={pointerRef} style={MYTH_VARS} data-zone={zones.first()} className={`relative min-h-screen overflow-x-clip ${u.root} ${mythDisplay.variable}`}>
       <SkipLink href="#main-content" />
       <Depths />
       <ZoneStageProvider value={stage}>

@@ -272,3 +272,7 @@ export const REALM = {
 export type RealmColor = keyof typeof REALM
 
 export const REALM_VARS = paletteVars('realm', REALM)
+
+// The realm's lettering: Cinzel through the --realm-face variable the root sets (next/font), Georgia until
+// it loads.
+export const REALM_FACE = 'var(--realm-face), Georgia, serif'

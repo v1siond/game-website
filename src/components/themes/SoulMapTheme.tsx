@@ -1,5 +1,6 @@
 'use client'
 
+import { Marcellus } from 'next/font/google'
 import { useProfession } from '@/contexts/ProfessionContext'
 import { useWorldView } from '@/components/cv/CVDataProvider'
 import { ProfessionSectionsView } from '@/components/cv/ProfessionSectionsView'
@@ -15,6 +16,15 @@ import { SECTION_VIEWS } from './SoulMap/views'
 import { LastFire } from './SoulMap/lastFire'
 import { RunOverlay } from './SoulMap/hud'
 import ashen from './SoulMap/ashen.module.css'
+
+// The carved serif, Marcellus, the closest free face to the banner capitals the world was drawn for: the
+// root carries its --soul-carved variable and CARVED reads it.
+const soulCarved = Marcellus({
+  weight: '400',
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+  variable: '--soul-carved',
+})
 
 // Soul Map: the ash and bonfire world of a hard knight action game (named in code only), played the way
 // that game is played. The hero is the ruined shrine at dusk where the fire is kindled (./SoulMap/shrine),
@@ -35,7 +45,7 @@ export default function SoulMapTheme() {
 
   return (
     <RunProvider>
-      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--soul-glow)] [--focus-halo:var(--soul-abyss)] ${CARVED} ${ashen.world}`} style={SOUL_VARS}>
+      <div ref={rootRef} className={`relative min-h-screen overflow-x-clip [--focus-ring:var(--soul-glow)] [--focus-halo:var(--soul-abyss)] ${CARVED} ${ashen.world} ${soulCarved.variable}`} style={SOUL_VARS}>
         <AshFall />
 
         <header className="relative z-20">

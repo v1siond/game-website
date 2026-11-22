@@ -20,7 +20,7 @@
 
 /* Carved inscriptional capitals for titles and buttons; the text face is Georgia. */
 .display {
-  font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', Georgia, serif;
+  font-family: var(--myth-display), 'Times New Roman', Georgia, serif;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -189,7 +189,7 @@
   gap: 0.5rem;
   padding: 0.55rem 1.15rem;
   border: 2px solid var(--myth-ink);
-  font-family: 'Cinzel', 'Trajan Pro', 'Times New Roman', Georgia, serif;
+  font-family: var(--myth-display), 'Times New Roman', Georgia, serif;
   font-size: 0.9375rem;
   font-weight: 700;
   letter-spacing: 0.08em;

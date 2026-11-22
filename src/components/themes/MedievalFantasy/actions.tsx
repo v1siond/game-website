@@ -6,7 +6,7 @@ import { locales, type Locale } from '@/i18n/config'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { LocaleSwitchState } from '@/components/cv/LanguageSwitcher'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { REALM } from './palette'
+import { REALM, REALM_FACE } from './palette'
 import menu from './actions.module.css'
 
 // The world's buttons: the bevelled metal button, the language dropdown drawn for the shared
@@ -18,7 +18,7 @@ type RealmButtonVariant = 'default' | 'primary'
 // with void ink. Both are built once, so a button's style keeps its identity across renders.
 const BUTTON_FRAME: CSSProperties = {
   boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-  fontFamily: '"Cinzel", Georgia, serif',
+  fontFamily: REALM_FACE,
   fontSize: '1.125rem',
   fontWeight: 600,
   textTransform: 'uppercase',
@@ -115,7 +115,7 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
           border: `2px solid ${REALM.metalDark}`,
           boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
           color: REALM.textBright,
-          fontFamily: '"Cinzel", Georgia, serif',
+          fontFamily: REALM_FACE,
           fontSize: '0.875rem',
           fontWeight: 600,
           textTransform: 'uppercase',
@@ -159,7 +159,7 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
                 minHeight: '44px',
                 border: 'none',
                 borderBottom: locale !== locales[locales.length - 1] ? `1px solid ${REALM.metalDark}50` : 'none',
-                fontFamily: '"Cinzel", Georgia, serif',
+                fontFamily: REALM_FACE,
                 fontSize: '0.875rem',
                 textAlign: 'left',
                 cursor: 'pointer',

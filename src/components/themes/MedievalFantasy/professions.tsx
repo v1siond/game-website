@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { ProfessionOption } from '@/components/cv/ProfessionSwitch'
 import type { Profession } from '@/lib/cv/professions'
-import { REALM } from './palette'
+import { REALM, REALM_FACE } from './palette'
 
 // =============================================================================
 // PROFESSION NODE - REALM command card button, drawn for the shared ProfessionSwitch. The switch lays
@@ -86,7 +86,7 @@ export function ProfessionNode({ option, isLargeScreen }: { option: ProfessionOp
         style={{
           color: tint,
           fontSize: '0.875rem',
-          fontFamily: '"Cinzel", serif',
+          fontFamily: REALM_FACE,
           fontWeight: 700,
           textTransform: 'uppercase',
           letterSpacing: '0.05em',

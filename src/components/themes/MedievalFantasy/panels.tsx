@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react'
-import { REALM } from './palette'
+import { REALM, REALM_FACE } from './palette'
 
 // The heavy metal frame with gold bevels and the inner card the sections sit in, tinted per zone.
 
@@ -61,7 +61,7 @@ export function RealmFrame({ children, title, zone = 'roc' }: { children: ReactN
                   <div style={{ width: '8px', height: '8px', background: accentColor, boxShadow: `0 0 8px ${accentColor}` }} />
                   <h2 style={{
                     color: REALM.goldBright,
-                    fontFamily: '"Cinzel", Georgia, serif',
+                    fontFamily: REALM_FACE,
                     fontSize: '1.125rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
