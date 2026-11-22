@@ -126,7 +126,8 @@ interface HeroSectionProps extends BootHeroProps {
 /**
  * The first screen: the booting optics panel and the quickhack menu over Watson, him under the overpass to
  * the right. His outfit plate sits beside him from lg, its fan opening down over the street; below lg it
- * sits under the menu, its fan opening down into the hero's own bottom space, clear of every control.
+ * sits under the menu, clear of every control: on a phone its fan opens down into the hero's own bottom
+ * space, which the visitor scrolls to; from md to lg the plate is on the first screen, so the fan opens up.
  * Under reduced motion the hero's picture sits still behind it.
  */
 export function HeroSection({ scene, still, profession, scanning, onScan }: HeroSectionProps) {
@@ -142,7 +143,7 @@ export function HeroSection({ scene, still, profession, scanning, onScan }: Hero
       </div>
       <Wardrobe
         look={OUTFIT_LOOK}
-        className={`c-wardrobe--fan-down-below-lg c-wardrobe--fan-down-from-lg absolute bottom-[8.5rem] left-1/2 z-10 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-[4vw] lg:top-24 lg:translate-x-0 ${world.fadeLate}`}
+        className={`c-wardrobe--fan-down-below-md c-wardrobe--fan-down-from-lg absolute bottom-[8.5rem] left-1/2 z-10 -translate-x-1/2 lg:bottom-auto lg:left-auto lg:right-[4vw] lg:top-24 lg:translate-x-0 ${world.fadeLate}`}
       />
     </section>
   )

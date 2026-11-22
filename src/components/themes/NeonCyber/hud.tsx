@@ -24,8 +24,8 @@ export const hudButton = (tone: HudTone): string => `${world.cut} min-h-[44px] b
 /** A link out of a card (a stream, a repository, a demo), the outlined control in the use tone. */
 export const HUD_LINK = `${hudButton('use')} inline-flex items-center`
 
-/** Chips of tech, skills or services, square, the data cyan on glass. */
+/** Chips of tech, skills or services, square, the data cyan on solid ink: they sit outside the cards, over the city. */
 export const DATA_CHIPS: TagListLook = {
   list: 'flex flex-wrap gap-1',
-  tag: 'border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color-mix(in_srgb,var(--neon-data)_8%,transparent)] px-2 py-0.5 text-sm text-[color:var(--neon-data-text)]',
+  tag: 'border border-[color-mix(in_srgb,var(--neon-data)_45%,transparent)] bg-[color-mix(in_srgb,var(--neon-data)_8%,var(--neon-ink))] px-2 py-0.5 text-sm text-[color:var(--neon-data-text)]',
 }
