@@ -39,6 +39,7 @@ type AnimationPhase =
   | 'bug-death'      // Bug EXPLODES
   | 'bug-fall'       // Bug falls to ground
   | 'content-drop'   // Content drops from above
+  | 'content-settled' // The death burst is gone and the blood pool spreads under the corpse
   | 'complete'       // Final static state
 
 interface BattleRevealProps {
@@ -56,8 +57,50 @@ const PHASE_TIMING = {
   'bug-death': 1100,
   'bug-fall': 1600,
   'content-drop': 2000,
+  // 500ms after the fall starts, once the tumble has landed
+  'content-settled': 2100,
   'complete': 2500,
 }
+
+// What each phase shows beside the fighters: the slash arc, the hit burst and splatter, the bug's hit flash and
+// tremble, the death burst and screen shake, and the blood pool.
+interface BattleFlags {
+  slash: boolean
+  impact: boolean
+  splatter: boolean
+  hit: boolean
+  tremble: boolean
+  deathBurst: boolean
+  shake: boolean
+  pool: boolean
+}
+
+const QUIET: BattleFlags = {
+  slash: false,
+  impact: false,
+  splatter: false,
+  hit: false,
+  tremble: false,
+  deathBurst: false,
+  shake: false,
+  pool: false,
+}
+
+const PHASE_FLAGS: Record<AnimationPhase, BattleFlags> = {
+  'idle': QUIET,
+  'bug-wander': QUIET,
+  'knight-dash': QUIET,
+  'slash': { ...QUIET, slash: true },
+  'bug-hit': { ...QUIET, impact: true, splatter: true, hit: true },
+  'bug-tremble': { ...QUIET, splatter: true, tremble: true },
+  'bug-death': { ...QUIET, deathBurst: true, shake: true },
+  'bug-fall': { ...QUIET, deathBurst: true },
+  'content-drop': { ...QUIET, deathBurst: true },
+  'content-settled': { ...QUIET, pool: true },
+  'complete': { ...QUIET, pool: true },
+}
+
+const DEAD_PHASES: ReadonlySet<AnimationPhase> = new Set(['bug-death', 'bug-fall', 'content-drop', 'content-settled', 'complete'])
 
 // The bug's size and its height over its width, and how it lies dead on the ground (COMBAT_GROUND) the knight
 // stands on: rolled left of where it stood and shrunk about its centre to DEAD_SCALE, then sunk by the height
@@ -75,14 +118,6 @@ export const BattleReveal = memo(function BattleReveal({
   triggered
 }: BattleRevealProps) {
   const [phase, setPhase] = useState<AnimationPhase>('idle')
-  const [showSlash, setShowSlash] = useState(false)
-  const [showImpact, setShowImpact] = useState(false)
-  const [showDeathParticles, setShowDeathParticles] = useState(false)
-  const [showBloodSplatter, setShowBloodSplatter] = useState(false)
-  const [showBloodPool, setShowBloodPool] = useState(false)
-  const [screenShake, setScreenShake] = useState(false)
-  const [bugHit, setBugHit] = useState(false)
-  const [bugTremble, setBugTremble] = useState(false)
   const [attackPhase, setAttackPhase] = useState(0)
   const [legPhase, setLegPhase] = useState(0)
   const [antennaPhase, setAntennaPhase] = useState(0)
@@ -95,7 +130,8 @@ export const BattleReveal = memo(function BattleReveal({
   // section, so the battle never mixes into it; -12% bottom shows them a touch sooner on entry.
   const { ref: stageRef, inView } = useSectionTrigger({ ...COMBAT_IN_VIEW, rootMargin: '-48% 0px -12% 0px' })
 
-  const isBugDead = ['bug-death', 'bug-fall', 'content-drop', 'complete'].includes(phase)
+  const flags = PHASE_FLAGS[phase]
+  const isBugDead = DEAD_PHASES.has(phase)
 
   // The living bug's legs and antennae, one step a frame; the loop ends with the bug, the only reader.
   useEffect(() => {
@@ -144,7 +180,6 @@ export const BattleReveal = memo(function BattleReveal({
     // Slash attack - animate attack phase
     timers.push(setTimeout(() => {
       setPhase('slash')
-      setShowSlash(true)
       // Animate attack phase from 0 to 1 over 200ms
       const start = performance.now()
       const animateAttack = (now: number) => {
@@ -156,50 +191,25 @@ export const BattleReveal = memo(function BattleReveal({
     }, PHASE_TIMING['slash']))
 
     // Bug hit - blood splatter!
-    timers.push(setTimeout(() => {
-      setShowSlash(false)
-      setShowImpact(true)
-      setShowBloodSplatter(true)
-      setBugHit(true)
-      setPhase('bug-hit')
-    }, PHASE_TIMING['bug-hit']))
+    timers.push(setTimeout(() => setPhase('bug-hit'), PHASE_TIMING['bug-hit']))
 
     // Bug tremble - shaking violently before explosion
-    timers.push(setTimeout(() => {
-      setShowImpact(false)
-      setBugHit(false)
-      setBugTremble(true)
-      setPhase('bug-tremble')
-    }, PHASE_TIMING['bug-tremble']))
+    timers.push(setTimeout(() => setPhase('bug-tremble'), PHASE_TIMING['bug-tremble']))
 
     // Bug death - EXPLOSIVE with screen shake!
     timers.push(setTimeout(() => {
-      setShowBloodSplatter(false)
-      setBugTremble(false)
-      setShowDeathParticles(true)
-      setScreenShake(true)
       setPhase('bug-death')
       setAttackPhase(0)
     }, PHASE_TIMING['bug-death']))
 
     // Bug fall - start the tumble
-    timers.push(setTimeout(() => {
-      setScreenShake(false)
-      setPhase('bug-fall')
-    }, PHASE_TIMING['bug-fall']))
-
-    // Blood pool appears AFTER tumble animation completes (500ms after bug-fall starts)
-    timers.push(setTimeout(() => {
-      setShowBloodPool(true)
-    }, PHASE_TIMING['bug-fall'] + 500))
-
-    // Death particles fade (longer - 500ms after fall)
-    timers.push(setTimeout(() => {
-      setShowDeathParticles(false)
-    }, PHASE_TIMING['bug-fall'] + 500))
+    timers.push(setTimeout(() => setPhase('bug-fall'), PHASE_TIMING['bug-fall']))
 
     // Content drop
     timers.push(setTimeout(() => setPhase('content-drop'), PHASE_TIMING['content-drop']))
+
+    // The death burst fades and the blood pool spreads once the tumble has landed
+    timers.push(setTimeout(() => setPhase('content-settled'), PHASE_TIMING['content-settled']))
 
     // Complete
     timers.push(setTimeout(() => setPhase('complete'), PHASE_TIMING['complete']))
@@ -309,6 +319,7 @@ export const BattleReveal = memo(function BattleReveal({
           transition: 'transform 500ms cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         }
       case 'content-drop':
+      case 'content-settled':
         // Dead on the ground - rolled/tumbled to the right
         return {
           ...baseStyle,
@@ -348,6 +359,7 @@ export const BattleReveal = memo(function BattleReveal({
           opacity: 0
         }
       case 'content-drop':
+      case 'content-settled':
         return {
           transform: 'translateY(0)',
           opacity: 1,
@@ -368,14 +380,14 @@ export const BattleReveal = memo(function BattleReveal({
 
   const showKnight = phase !== 'idle'
   const showBug = phase !== 'idle'
-  const showContent = phase === 'content-drop' || phase === 'complete'
+  const showContent = phase === 'content-drop' || phase === 'content-settled' || phase === 'complete'
   const isAttacking = phase === 'slash' || phase === 'knight-dash'
 
   return (
     <>
       <div
         ref={stageRef}
-        className={`relative w-full min-h-[300px] flex items-center justify-center ${screenShake ? battle.shaking : ''}`}
+        className={`relative w-full min-h-[300px] flex items-center justify-center ${flags.shake ? battle.shaking : ''}`}
       >
         {/* Knight + bug pinned to the viewport corners (left-15% / right-18%), both standing on COMBAT_GROUND;
             only the content below scrolls past them. Fades out as the section leaves view. */}
@@ -399,7 +411,7 @@ export const BattleReveal = memo(function BattleReveal({
         )}
 
         {/* Slash Arc Effect */}
-        {showSlash && (
+        {flags.slash && (
           <div
             className="absolute left-[30%] bottom-[30%] z-30 pointer-events-none"
             style={{ animation: `${battle.slashArc} 150ms ease-out forwards` }}
@@ -430,11 +442,11 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Bug container - all bug-related effects are children so they follow the bug */}
         {showBug && (
           <div
-            className={`absolute right-[18%] ${COMBAT_GROUND} z-10 ${bugTremble ? battle.trembling : ''}`}
+            className={`absolute right-[18%] ${COMBAT_GROUND} z-10 ${flags.tremble ? battle.trembling : ''}`}
             style={getBugStyle()}
           >
             {/* Impact Burst - centered on bug */}
-            {showImpact && (
+            {flags.impact && (
               <div
                 className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none"
                 style={{ animation: `${battle.impactBurst} 150ms ease-out forwards` }}
@@ -444,14 +456,14 @@ export const BattleReveal = memo(function BattleReveal({
             )}
 
             {/* Blood Splatter - centered on bug */}
-            {showBloodSplatter && (
+            {flags.splatter && (
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-35 pointer-events-none">
                 <BloodSplatter />
               </div>
             )}
 
             {/* Death Particles - dead center on bug */}
-            {showDeathParticles && (
+            {flags.deathBurst && (
               <div className="absolute left-1/2 top-1/2 z-30 pointer-events-none">
                 <DeathParticles />
               </div>
@@ -464,7 +476,7 @@ export const BattleReveal = memo(function BattleReveal({
                 size={BUG_SIZE}
                 legPhase={legPhase}
                 antennaPhase={antennaPhase}
-                isHit={bugHit}
+                isHit={flags.hit}
               />
             )}
           </div>
@@ -473,7 +485,7 @@ export const BattleReveal = memo(function BattleReveal({
         {/* Blood Pool - RIGHT EDGE at dead bug CENTER */}
         {/* Bug final pos: right:18% on COMBAT_GROUND, moved by DEAD_LIE */}
         {/* Blood pool right edge should touch bug center */}
-        {showBloodPool && isBugDead && (
+        {flags.pool && isBugDead && (
           <div
             className={`absolute right-[18%] ${COMBAT_GROUND} z-4 pointer-events-none`}
             style={{

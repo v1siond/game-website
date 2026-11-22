@@ -1527,6 +1527,75 @@ const ArtSectionCrystals = memo(function ArtSectionCrystals() {
   )
 })
 
+// The profession selector: the waystations on their wire and, for 500ms after each pick, the energy running
+// along it from the station he left to the one he picked. The selector keeps the station the energy leaves
+// from, so a pick and the energy's end re-render it alone, not the whole world.
+const ENERGY_FLOW_MS = 500
+
+function WaystationSelector({ active }: { active: Profession }) {
+  const { navigation } = useLabels()
+  const previous = useRef(active)
+  const [from, setFrom] = useState<Profession | null>(null)
+  const flowing = from !== null
+
+  useEffect(() => {
+    const left = previous.current
+    previous.current = active
+    if (left === active) return
+    setFrom(left)
+    const timer = setTimeout(() => setFrom(null), ENERGY_FLOW_MS)
+    return () => clearTimeout(timer)
+  }, [active])
+
+  return (
+    <ScrollScene>
+      <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
+        <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div
+            className={`relative h-40 md:h-56 overflow-hidden ${world.selector}`}
+            style={{
+              background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
+              borderRadius: '4px',
+            }}
+          >
+            {/* Connection paths */}
+            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
+                  <stop offset="50%" stopColor={DARK_FANTASY.brass} stopOpacity="0.4" />
+                  <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
+                </linearGradient>
+              </defs>
+              <line x1="17%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+              <line x1="50%" y1="30%" x2="83%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
+              {/* Gear decorations at intersections */}
+              <circle cx="33.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+              <circle cx="66.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
+            </svg>
+
+            {/* Energy flow animation between nodes */}
+            <EnergyFlowAnimation
+              fromProfession={from}
+              toProfession={active}
+              isAnimating={flowing}
+            />
+
+            <ProfessionSwitch
+              className="absolute inset-0"
+              label={navigation.professionSelection}
+              renderOption={(option) => (
+                <WaystationNode option={option} isReceivingEnergy={flowing && option.selected} />
+              )}
+            />
+          </div>
+        </div>
+      </section>
+    </ScrollScene>
+  )
+}
+
 // Profession sections. Each animated section gets its own useSectionTrigger, from its real position.
 const DF_BUTTON =
   'inline-flex items-center justify-center px-6 py-3 text-sm tracking-[0.15em] uppercase transition-transform hover:scale-105 min-h-[44px] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--df-spirit-gold)] focus-visible:ring-offset-2 focus-visible:ring-offset-[color:var(--df-void)]'
@@ -1729,28 +1798,6 @@ export default function DarkFantasyTheme() {
   const active = view.profession
   const [mounted, setMounted] = useState(false)
 
-  // Track previous profession for energy flow animation
-  const previousProfession = useRef<Profession>(active)
-  const [isEnergyFlowing, setIsEnergyFlowing] = useState(false)
-  const [animatingFrom, setAnimatingFrom] = useState<Profession | null>(null)
-
-  // On a profession change, run the energy along the wire from the old node to the new one
-  useEffect(() => {
-    const from = previousProfession.current
-    previousProfession.current = active
-    if (from === active) return
-
-    setAnimatingFrom(from)
-    setIsEnergyFlowing(true)
-
-    // Clear animation state after animation completes
-    const timer = setTimeout(() => {
-      setIsEnergyFlowing(false)
-      setAnimatingFrom(null)
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [active])
-
   // fire the final battle just slightly before it's centered (small positive bottom margin), // a touch later than the previous +18% which kicked off before you'd even seen the section
   const contactTrigger = useSectionTrigger({ threshold: 0.1, rootMargin: '0px 0px 5% 0px' })
 
@@ -1905,52 +1952,7 @@ export default function DarkFantasyTheme() {
       {/* Main content */}
       <main id="main-content" tabIndex={-1} className="outline-none">
 
-      {/* Profession Selector - Waystation style */}
-      <ScrollScene>
-        <section className="relative z-20 py-6 md:py-8" aria-labelledby="profession-heading">
-          <h2 id="profession-heading" className="sr-only">{navigation.selectYourProfession}</h2>
-          <div className="max-w-6xl mx-auto px-4 md:px-6">
-            <div
-              className={`relative h-40 md:h-56 overflow-hidden ${world.selector}`}
-              style={{
-                background: `linear-gradient(180deg, transparent, ${DARK_FANTASY.voidPurple}30)`,
-                borderRadius: '4px',
-              }}
-            >
-              {/* Connection paths */}
-              <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="pathGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
-                    <stop offset="50%" stopColor={DARK_FANTASY.brass} stopOpacity="0.4" />
-                    <stop offset="100%" stopColor={DARK_FANTASY.brass} stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                <line x1="17%" y1="55%" x2="50%" y2="30%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-                <line x1="50%" y1="30%" x2="83%" y2="55%" stroke="url(#pathGrad)" strokeWidth="1" strokeDasharray="6 4" />
-                {/* Gear decorations at intersections */}
-                <circle cx="33.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
-                <circle cx="66.5%" cy="42.5%" r="3" fill={DARK_FANTASY.copper} opacity="0.3" />
-              </svg>
-
-              {/* Energy flow animation between nodes */}
-              <EnergyFlowAnimation
-                fromProfession={animatingFrom}
-                toProfession={active}
-                isAnimating={isEnergyFlowing}
-              />
-
-              <ProfessionSwitch
-                className="absolute inset-0"
-                label={navigation.professionSelection}
-                renderOption={(option) => (
-                  <WaystationNode option={option} isReceivingEnergy={isEnergyFlowing && option.selected} />
-                )}
-              />
-            </div>
-          </div>
-        </section>
-      </ScrollScene>
+      <WaystationSelector active={active} />
 
       <ProfessionSectionsView views={SECTION_VIEWS} sections={view.sections} />
 
