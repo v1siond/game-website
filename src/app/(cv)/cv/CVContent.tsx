@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/cv/LanguageSwitcher'
 import { DownloadPdfButton } from '@/components/cv/DownloadPdfButton'
-import { jobSpanCompact } from '@/lib/cv/sectionText'
+import { jobSpanCompact, shownUrl } from '@/lib/cv/sectionText'
 import { NameWords } from '@/components/cv/NameWords'
 import { SlashBreaks } from '@/components/cv/SlashBreaks'
 import { MASONRY_ITEM, MASONRY_LIST } from '@/lib/cv/masonry'
@@ -13,9 +13,6 @@ import { CVSection } from './CVSection'
 
 // The element the PDF button turns into the PDF.
 const CV_CONTENT_ID = 'cv-content'
-
-// A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x.
-const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
 
 // The page's print rules (colours kept, links plain, the page margin) as a plain style element, since
 // styled-jsx runs only in a client component and this one renders on the server.

@@ -3,62 +3,63 @@ import golem from './character.module.css'
 
 // The infernal golem, the rock creature with fel fire joints that lands in the chaos zone.
 
+// The golem's flames sit at module scope, so a golem render keeps them mounted and their loops running.
+// Simplified flame using CSS animations (much faster than feTurbulence)
+const FelFlame = ({ cx, cy, size = 1, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
+  const w = size * 14
+  const h = size * 20
+  return (
+    <g transform={`translate(${cx - w/2}, ${cy - h})`}>
+      {/* Outer glow */}
+      <ellipse
+        cx={w/2} cy={h * 0.6} rx={w * 0.5} ry={h * 0.5}
+        fill={REALM.chaosFelDark} opacity="0.4"
+        style={{ animation: `${golem.flameOuter} ${1.8 + delay * 0.1}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` }}
+      />
+      {/* Middle flame */}
+      <ellipse
+        cx={w/2} cy={h * 0.55} rx={w * 0.35} ry={h * 0.4}
+        fill={REALM.chaosFelMid} opacity="0.7"
+        style={{ animation: `${golem.flameMid} ${1.5 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` }}
+      />
+      {/* Inner bright core */}
+      <ellipse
+        cx={w/2} cy={h * 0.5} rx={w * 0.2} ry={h * 0.3}
+        fill={REALM.chaosFelBright} opacity="0.85"
+        style={{ animation: `${golem.flameInner} ${1.2 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.5}px` }}
+      />
+    </g>
+  )
+}
+
+// Smaller flame for joints - CSS animation based (performance optimized)
+const SmallFlame = ({ cx, cy, size = 0.6, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
+  const w = size * 10
+  const h = size * 14
+  return (
+    <g transform={`translate(${cx - w/2}, ${cy - h})`}>
+      {/* Outer glow */}
+      <ellipse
+        cx={w/2} cy={h * 0.6} rx={w * 0.45} ry={h * 0.45}
+        fill={REALM.chaosFelDark} opacity="0.35"
+        style={{ animation: `${golem.flameOuter} ${1.6 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` }}
+      />
+      {/* Inner core */}
+      <ellipse
+        cx={w/2} cy={h * 0.55} rx={w * 0.25} ry={h * 0.35}
+        fill={REALM.chaosFelMid} opacity="0.75"
+        style={{ animation: `${golem.flameInner} ${1.3 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` }}
+      />
+    </g>
+  )
+}
+
 // The golem the chaos zone draws stands idle: it breathes, looks around and sways while its fel fires burn.
 export function InfernalGolemSVG({ id }: { id: string }) {
   const rockId = `rockIdle${id}`
   const felFireId = `felFireIdle${id}`
   const glowId = `glowIdle${id}`
   const rockCrackId = `rockCrackIdle${id}`
-
-  // Simplified flame using CSS animations (much faster than feTurbulence)
-  const FelFlame = ({ cx, cy, size = 1, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
-    const w = size * 14
-    const h = size * 20
-    return (
-      <g transform={`translate(${cx - w/2}, ${cy - h})`}>
-        {/* Outer glow */}
-        <ellipse
-          cx={w/2} cy={h * 0.6} rx={w * 0.5} ry={h * 0.5}
-          fill={REALM.chaosFelDark} opacity="0.4"
-          style={{ animation: `${golem.flameOuter} ${1.8 + delay * 0.1}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` }}
-        />
-        {/* Middle flame */}
-        <ellipse
-          cx={w/2} cy={h * 0.55} rx={w * 0.35} ry={h * 0.4}
-          fill={REALM.chaosFelMid} opacity="0.7"
-          style={{ animation: `${golem.flameMid} ${1.5 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` }}
-        />
-        {/* Inner bright core */}
-        <ellipse
-          cx={w/2} cy={h * 0.5} rx={w * 0.2} ry={h * 0.3}
-          fill={REALM.chaosFelBright} opacity="0.85"
-          style={{ animation: `${golem.flameInner} ${1.2 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.5}px` }}
-        />
-      </g>
-    )
-  }
-
-  // Smaller flame for joints - CSS animation based (performance optimized)
-  const SmallFlame = ({ cx, cy, size = 0.6, delay = 0 }: { cx: number; cy: number; size?: number; delay?: number }) => {
-    const w = size * 10
-    const h = size * 14
-    return (
-      <g transform={`translate(${cx - w/2}, ${cy - h})`}>
-        {/* Outer glow */}
-        <ellipse
-          cx={w/2} cy={h * 0.6} rx={w * 0.45} ry={h * 0.45}
-          fill={REALM.chaosFelDark} opacity="0.35"
-          style={{ animation: `${golem.flameOuter} ${1.6 + delay * 0.08}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.6}px` }}
-        />
-        {/* Inner core */}
-        <ellipse
-          cx={w/2} cy={h * 0.55} rx={w * 0.25} ry={h * 0.35}
-          fill={REALM.chaosFelMid} opacity="0.75"
-          style={{ animation: `${golem.flameInner} ${1.3 + delay * 0.05}s ease-in-out infinite`, transformOrigin: `${w/2}px ${h * 0.55}px` }}
-        />
-      </g>
-    )
-  }
 
   return (
     <svg aria-hidden="true"

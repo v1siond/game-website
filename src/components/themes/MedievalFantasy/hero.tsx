@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react'
 import { HERO_IDENTITY } from '@/lib/cv/heroIdentity'
 import { REALM } from './palette'
 import frost from './frostZone.module.css'
+import { pulse } from './pulse'
 import hero from './hero.module.css'
 
 // Him as the death knight king of the frost zone: the spiked pauldrons, the skull chest plate, the fur trimmed
@@ -94,12 +95,8 @@ export function FrostHero() {
         <ellipse cx="100" cy="123" rx="12" ry="10" fill={REALM.night15a} />
         <ellipse cx="94" cy="120" rx="4" ry="3" fill={REALM.night9c} />
         <ellipse cx="106" cy="120" rx="4" ry="3" fill={REALM.night9c} />
-        <ellipse cx="94" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5">
-          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
-        </ellipse>
-        <ellipse cx="106" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5">
-          <animate attributeName="opacity" values="0.3;0.6;0.3" dur="2s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse cx="94" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5" {...pulse(0.3, 0.6, 2)} />
+        <ellipse cx="106" cy="120" rx="2" ry="1.5" fill={REALM.frostIceMid} opacity="0.5" {...pulse(0.3, 0.6, 2)} />
         <path d="M100,126 L97,132 L103,132 Z" fill={REALM.night9c} />
         {/* Belt with skull buckle */}
         <rect x="60" y="175" width="80" height="15" fill={REALM.night15a} />
@@ -164,9 +161,7 @@ export function FrostHero() {
       {/* === FROSTMOURNE - IN HIS RIGHT HAND === */}
       <g transform="translate(185, 175) rotate(-5)">
         {/* Blade glow */}
-        <ellipse cx="0" cy="90" rx="18" ry="95" fill={REALM.frostIceBright} opacity="0.15" filter="url(#frostGlow)">
-          <animate attributeName="opacity" values="0.1;0.22;0.1" dur="2s" repeatCount="indefinite" />
-        </ellipse>
+        <ellipse cx="0" cy="90" rx="18" ry="95" fill={REALM.frostIceBright} opacity="0.15" filter="url(#frostGlow)" {...pulse(0.1, 0.22, 2)} />
 
         {/* Blade pointing down */}
         <path d="M0,15 L8,25 L11,70 L10,140 L7,190 L0,210 L-7,190 L-10,140 L-11,70 L-8,25 Z" fill="url(#frostmourneGlow)" />
@@ -176,15 +171,9 @@ export function FrostHero() {
         <path d="M-10,60 L-16,55 L-12,70" fill="url(#frostmourneGlow)" />
 
         {/* Runes - pulsing */}
-        <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={REALM.frostIceBright}>
-          <animate attributeName="opacity" values="0.6;1;0.6" dur="1.5s" repeatCount="indefinite" />
-        </path>
-        <path d="M0,95 L4,108 L0,121 L-4,108 Z" fill={REALM.frostIceBright}>
-          <animate attributeName="opacity" values="0.6;1;0.6" dur="1.8s" repeatCount="indefinite" />
-        </path>
-        <path d="M0,145 L3,156 L0,167 L-3,156 Z" fill={REALM.frostIceBright}>
-          <animate attributeName="opacity" values="0.6;1;0.6" dur="2.1s" repeatCount="indefinite" />
-        </path>
+        <path d="M0,50 L3,60 L0,70 L-3,60 Z" fill={REALM.frostIceBright} {...pulse(0.6, 1, 1.5)} />
+        <path d="M0,95 L4,108 L0,121 L-4,108 Z" fill={REALM.frostIceBright} {...pulse(0.6, 1, 1.8)} />
+        <path d="M0,145 L3,156 L0,167 L-3,156 Z" fill={REALM.frostIceBright} {...pulse(0.6, 1, 2.1)} />
 
         {/* Crossguard - skull motif - at hand level */}
         <path d="M-30,8 L0,15 L30,8 L24,20 L0,25 L-24,20 Z" fill={REALM.night15a} />
@@ -238,12 +227,8 @@ export function FrostHero() {
       {/* EYES */}
       <ellipse cx="90" cy="40" rx="5" ry="4" fill={HERO_IDENTITY.eyes} />
       <ellipse cx="110" cy="40" rx="5" ry="4" fill={HERO_IDENTITY.eyes} />
-      <ellipse cx="90" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)">
-        <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
-      </ellipse>
-      <ellipse cx="110" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)">
-        <animate attributeName="opacity" values="0.15;0.3;0.15" dur="3s" repeatCount="indefinite" />
-      </ellipse>
+      <ellipse cx="90" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)" {...pulse(0.15, 0.3, 3)} />
+      <ellipse cx="110" cy="40" rx="6" ry="5" fill={REALM.frostIceBright} opacity="0.2" filter="url(#frostGlow)" {...pulse(0.15, 0.3, 3)} />
 
       {/* NOSE */}
       <path d="M100,46 L96,56 L104,56 Z" fill={HERO_IDENTITY.skinShade} />
@@ -265,9 +250,9 @@ export function FrostHero() {
       <path d="M116,72 Q110,88 102,102" stroke={REALM.stone10} strokeWidth="1.5" fill="none" opacity="0.25" />
 
       {/* Frost breath */}
-      <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} opacity="0.15" filter="url(#frostGlow)" className={frost.drift} style={{ '--drift-dur': '3s', '--drift-sx': 1.6667 } as CSSProperties}>
-        <animate attributeName="opacity" values="0.1;0.22;0.1" dur="3s" repeatCount="indefinite" />
-      </ellipse>
+      <g opacity="0.15" {...pulse(0.1, 0.22, 3)}>
+        <ellipse cx="110" cy="72" rx="12" ry="6" fill={REALM.frostFrostWhite} filter="url(#frostGlow)" className={frost.drift} style={{ '--drift-dur': '3s', '--drift-sx': 1.6667 } as CSSProperties} />
+      </g>
 
       {/* Ground frost */}
       <ellipse cx="100" cy="315" rx="90" ry="12" fill={REALM.frostIceMid} opacity="0.1" filter="url(#frostGlow)" />

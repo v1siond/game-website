@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import { drumsSince, jobSpanCompact, jobYears, newTabName, projectLinks, yearSpan } from '@/lib/cv/sectionText'
+import { drumsSince, jobSpanCompact, jobYears, newTabName, projectLinks, shownUrl, yearSpan } from '@/lib/cv/sectionText'
 import { labelsFor, type LabelsFile } from '@/lib/cv/labels'
 
 const file: LabelsFile = JSON.parse(readFileSync(join(process.cwd(), 'content', 'cv', 'labels.json'), 'utf8'))
@@ -45,5 +45,16 @@ describe('the phrases read the labels', () => {
     const links = projectLinks({ links: { site: 'https://a.example', app: '', store: '', story: 'https://b.example' } }, english.links)
     expect(links.map(({ label }) => label)).toEqual(['Website', 'Story'])
     expect(newTabName(english.links, 'Lumi')).toBe('Lumi (opens in a new tab)')
+  })
+})
+
+describe('shownUrl', () => {
+  it('drops the scheme and the trailing slash a link prints', () => {
+    expect(shownUrl('https://dbadbadba.com/')).toBe('dbadbadba.com')
+    expect(shownUrl('http://www.linkedin.com/in/x/')).toBe('www.linkedin.com/in/x')
+  })
+
+  it('keeps an address with neither as it is', () => {
+    expect(shownUrl('getpmx.com/shop')).toBe('getpmx.com/shop')
   })
 })

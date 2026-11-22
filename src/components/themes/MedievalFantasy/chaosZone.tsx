@@ -1,6 +1,7 @@
 'use client'
 
 import { memo, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactElement, type ReactNode } from 'react'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 import { REALM } from './palette'
 import chaos from './chaosZone.module.css'
 import { InfernalGolemSVG } from './character'
@@ -81,54 +82,117 @@ function flashOverlayAlpha(brightness: number): number {
 // The diagonal a falling meteor takes, by the side it drifts to.
 const METEOR_RAIN: Record<'left' | 'right', string> = { left: chaos.meteorRainLeft, right: chaos.meteorRainRight }
 
-export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
+// Cloud zones for realistic sequential flashing (left, center-left, center, center-right, right)
+const CLOUD_ZONES = [
+  { x: 12, y: 25, spread: 15 },   // left
+  { x: 30, y: 35, spread: 18 },   // center-left
+  { x: 50, y: 28, spread: 20 },   // center
+  { x: 70, y: 32, spread: 18 },   // center-right
+  { x: 88, y: 30, spread: 15 },   // right
+]
+
+// The ambient lightning over the clouds. Its state lives here, so each flash re-renders this layer alone and
+// never the backdrop around it or the golem on it.
+function AmbientFlash() {
   const [ambientFlash, setAmbientFlash] = useState(false)
   const [ambientFlashX, setAmbientFlashX] = useState(30)
-  // Cloud zones for realistic sequential flashing (left, center-left, center, center-right, right)
-  const cloudZones = useMemo(() => [
-    { x: 12, y: 25, spread: 15 },   // left
-    { x: 30, y: 35, spread: 18 },   // center-left
-    { x: 50, y: 28, spread: 20 },   // center
-    { x: 70, y: 32, spread: 18 },   // center-right
-    { x: 88, y: 30, spread: 15 },   // right
-  ], [])
   const [activeZone, setActiveZone] = useState(0)
   const lastZoneRef = useRef(-1)
-  // Occasional falling meteor (every 8-15 seconds)
+  const reduced = useReducedMotion()
+
+  // Ambient thunder flashes - realistic sequential cloud zone flashing; none under reduced motion.
+  useEffect(() => {
+    if (reduced) return
+    let isActive = true
+    const timeouts: NodeJS.Timeout[] = []
+
+    const triggerAmbientFlash = () => {
+      if (!isActive) return
+
+      // Pick a cloud zone different from the last one
+      let newZone = Math.floor(Math.random() * CLOUD_ZONES.length)
+      while (newZone === lastZoneRef.current && CLOUD_ZONES.length > 1) {
+        newZone = Math.floor(Math.random() * CLOUD_ZONES.length)
+      }
+      lastZoneRef.current = newZone
+
+      const zone = CLOUD_ZONES[newZone]
+      // Add slight variation within the zone
+      const flashX = zone.x + (Math.random() - 0.5) * zone.spread * 0.5
+      setAmbientFlashX(flashX)
+      setActiveZone(newZone)
+      setAmbientFlash(true)
+
+      // Quick double-flash effect (realistic lightning flicker)
+      timeouts.push(setTimeout(() => setAmbientFlash(false), 80))
+      timeouts.push(setTimeout(() => setAmbientFlash(true), 120))
+      timeouts.push(setTimeout(() => setAmbientFlash(false), 200))
+
+      // Sometimes chain to adjacent zone (30% chance)
+      if (Math.random() > 0.7) {
+        const adjacentZone = newZone + (Math.random() > 0.5 ? 1 : -1)
+        if (adjacentZone >= 0 && adjacentZone < CLOUD_ZONES.length) {
+          const adjZone = CLOUD_ZONES[adjacentZone]
+          timeouts.push(setTimeout(() => {
+            setAmbientFlashX(adjZone.x + (Math.random() - 0.5) * 8)
+            setActiveZone(adjacentZone)
+            setAmbientFlash(true)
+          }, 300))
+          timeouts.push(setTimeout(() => setAmbientFlash(false), 400))
+        }
+      }
+    }
+
+    const scheduleAmbientFlash = () => {
+      if (!isActive) return
+      // Flash every 2-5 seconds for frequent storm effect
+      const delay = 2000 + Math.random() * 3000
+      timeouts.push(setTimeout(() => {
+        triggerAmbientFlash()
+        scheduleAmbientFlash()
+      }, delay))
+    }
+
+    // Start after a short delay
+    timeouts.push(setTimeout(scheduleAmbientFlash, 800))
+
+    return () => {
+      isActive = false
+      timeouts.forEach(t => clearTimeout(t))
+    }
+  }, [reduced])
+
+  if (reduced || !ambientFlash) return null
+  const zone = CLOUD_ZONES[activeZone] || { x: 50, y: 30, spread: 18 }
+  return (
+    <div style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: '100%',
+      background: `
+        radial-gradient(ellipse at ${ambientFlashX}% ${zone.y}%, ${REALM.chaosFelBright}80 0%, ${REALM.chaosFelBright}45 15%, ${REALM.chaosFelMid}25 30%, transparent ${zone.spread + 45}%),
+        radial-gradient(ellipse at ${ambientFlashX + 8}% ${zone.y + 12}%, ${REALM.chaosFelMid}40 0%, transparent 25%)
+      `,
+      transition: 'opacity 0.05s ease-out',
+    }} />
+  )
+}
+
+// The meteor that crosses the sky every 8 to 15 seconds, its state kept apart from the backdrop like the flash.
+function FallingMeteor() {
   const [fallingMeteor, setFallingMeteor] = useState<{
     id: number
     startX: number
     direction: 'left' | 'right'
     active: boolean
   } | null>(null)
+  const reduced = useReducedMotion()
 
-  // Right-side golem spawn sequence: meteor → explosion → assembly → final
-  const [golemPhase, setGolemPhase] = useState<'waiting' | 'meteor' | 'explosion' | 'assembling' | 'final'>('waiting')
-  const [hideAssembly, setHideAssembly] = useState(false)
-
+  // No meteor crosses the sky under reduced motion.
   useEffect(() => {
-    const timeouts: NodeJS.Timeout[] = []
-
-    // Phase 1: Meteor falls (starts after 2s, lasts 1.5s)
-    timeouts.push(setTimeout(() => setGolemPhase('meteor'), 2000))
-
-    // Phase 2: Explosion on impact (after meteor lands)
-    timeouts.push(setTimeout(() => setGolemPhase('explosion'), 3500))
-
-    // Phase 3: Rocks start assembling (after explosion)
-    timeouts.push(setTimeout(() => setGolemPhase('assembling'), 4200))
-
-    // Phase 4: Final detailed golem appears (assembly stays visible)
-    timeouts.push(setTimeout(() => setGolemPhase('final'), 6500))
-
-    // Phase 5: Hide assembly after final is fully visible (0.5s overlap)
-    timeouts.push(setTimeout(() => setHideAssembly(true), 7000))
-
-    return () => timeouts.forEach(t => clearTimeout(t))
-  }, [])
-
-  // Occasional meteor spawn (every 8-15 seconds)
-  useEffect(() => {
+    if (reduced) return
     let meteorId = 0
     let isActive = true
     const timeouts: NodeJS.Timeout[] = []
@@ -165,69 +229,253 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
       isActive = false
       timeouts.forEach(t => clearTimeout(t))
     }
-  }, [])
+  }, [reduced])
 
-  // Ambient thunder flashes - realistic sequential cloud zone flashing
+  if (reduced || !fallingMeteor || !fallingMeteor.active) return null
+  return (
+    <div
+      key={`meteor-${fallingMeteor.id}`}
+      style={{
+        position: 'absolute',
+        left: `${fallingMeteor.startX}%`,
+        top: '-5%',
+        width: '25px',
+        height: '25px',
+        animation: `${METEOR_RAIN[fallingMeteor.direction]} 4s ease-in forwards`,
+        zIndex: 4,
+        pointerEvents: 'none',
+      }}
+    >
+      {/* Meteor glow */}
+      <div style={{
+        position: 'absolute',
+        width: '70px',
+        height: '70px',
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%, -50%)',
+        borderRadius: '50%',
+        background: `radial-gradient(circle, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}35 35%, ${REALM.chaosFelDark}20 60%, transparent 80%)`,
+        filter: 'blur(8px)',
+      }} />
+      {/* Meteor body */}
+      <svg aria-hidden="true" width="25" height="25" viewBox="0 0 30 30" style={{ position: 'relative', zIndex: 2 }}>
+        <defs>
+          <radialGradient id={`meteor${fallingMeteor.id}`} cx="30%" cy="30%">
+            <stop offset="0%" stopColor={REALM.chaosFireCore} />
+            <stop offset="35%" stopColor={REALM.chaosFireBright} />
+            <stop offset="70%" stopColor={REALM.chaosFelMid} />
+            <stop offset="100%" stopColor={REALM.ember10} />
+          </radialGradient>
+        </defs>
+        <path
+          d="M15,2 L22,6 L26,12 L28,18 L24,24 L18,28 L10,26 L4,22 L2,14 L6,8 L12,4 Z"
+          fill={`url(#meteor${fallingMeteor.id})`}
+        />
+        <path d="M10,8 L15,15 L12,22" stroke={REALM.chaosFelBright} strokeWidth="1.5" fill="none" opacity="0.6" />
+        <circle cx="12" cy="12" r="3" fill={REALM.chaosFireCore} opacity="0.7" />
+      </svg>
+      {/* Fire trail */}
+      <div style={{
+        position: 'absolute',
+        top: '-80px',
+        left: '50%',
+        width: '15px',
+        height: '90px',
+        background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}30 15%, ${REALM.chaosFelMid}55 45%, ${REALM.chaosFelBright}80 75%, ${REALM.chaosFireCore} 100%)`,
+        filter: 'blur(5px)',
+        transform: `translateX(-50%) rotate(${fallingMeteor.direction === 'left' ? '25deg' : '-25deg'})`,
+        transformOrigin: 'bottom center',
+      }} />
+    </div>
+  )
+}
+
+// The golem that lands on the right: a meteor, the explosion, the rocks assembling and the golem itself.
+// Its phases re-render this branch alone.
+function GolemSpawn() {
+  const [golemPhase, setGolemPhase] = useState<'waiting' | 'meteor' | 'explosion' | 'assembling' | 'final'>('waiting')
+  const [hideAssembly, setHideAssembly] = useState(false)
+  const reduced = useReducedMotion()
+
   useEffect(() => {
-    let isActive = true
+    if (reduced) return
     const timeouts: NodeJS.Timeout[] = []
 
-    const triggerAmbientFlash = () => {
-      if (!isActive) return
+    // Phase 1: Meteor falls (starts after 2s, lasts 1.5s)
+    timeouts.push(setTimeout(() => setGolemPhase('meteor'), 2000))
 
-      // Pick a cloud zone different from the last one
-      let newZone = Math.floor(Math.random() * cloudZones.length)
-      while (newZone === lastZoneRef.current && cloudZones.length > 1) {
-        newZone = Math.floor(Math.random() * cloudZones.length)
-      }
-      lastZoneRef.current = newZone
+    // Phase 2: Explosion on impact (after meteor lands)
+    timeouts.push(setTimeout(() => setGolemPhase('explosion'), 3500))
 
-      const zone = cloudZones[newZone]
-      // Add slight variation within the zone
-      const flashX = zone.x + (Math.random() - 0.5) * zone.spread * 0.5
-      setAmbientFlashX(flashX)
-      setActiveZone(newZone)
-      setAmbientFlash(true)
+    // Phase 3: Rocks start assembling (after explosion)
+    timeouts.push(setTimeout(() => setGolemPhase('assembling'), 4200))
 
-      // Quick double-flash effect (realistic lightning flicker)
-      timeouts.push(setTimeout(() => setAmbientFlash(false), 80))
-      timeouts.push(setTimeout(() => setAmbientFlash(true), 120))
-      timeouts.push(setTimeout(() => setAmbientFlash(false), 200))
+    // Phase 4: Final detailed golem appears (assembly stays visible)
+    timeouts.push(setTimeout(() => setGolemPhase('final'), 6500))
 
-      // Sometimes chain to adjacent zone (30% chance)
-      if (Math.random() > 0.7) {
-        const adjacentZone = newZone + (Math.random() > 0.5 ? 1 : -1)
-        if (adjacentZone >= 0 && adjacentZone < cloudZones.length) {
-          const adjZone = cloudZones[adjacentZone]
-          timeouts.push(setTimeout(() => {
-            setAmbientFlashX(adjZone.x + (Math.random() - 0.5) * 8)
-            setActiveZone(adjacentZone)
-            setAmbientFlash(true)
-          }, 300))
-          timeouts.push(setTimeout(() => setAmbientFlash(false), 400))
-        }
-      }
-    }
+    // Phase 5: Hide assembly after final is fully visible (0.5s overlap)
+    timeouts.push(setTimeout(() => setHideAssembly(true), 7000))
 
-    const scheduleAmbientFlash = () => {
-      if (!isActive) return
-      // Flash every 2-5 seconds for frequent storm effect
-      const delay = 2000 + Math.random() * 3000
-      timeouts.push(setTimeout(() => {
-        triggerAmbientFlash()
-        scheduleAmbientFlash()
-      }, delay))
-    }
+    return () => timeouts.forEach(t => clearTimeout(t))
+  }, [reduced])
 
-    // Start after a short delay
-    timeouts.push(setTimeout(scheduleAmbientFlash, 800))
+  // Under reduced motion the golem stands from the start: no meteor, explosion or assembly plays.
+  const phase = reduced ? 'final' : golemPhase
+  const assemblyDone = reduced || hideAssembly
 
-    return () => {
-      isActive = false
-      timeouts.forEach(t => clearTimeout(t))
-    }
-  }, [cloudZones])
+  if (phase === 'waiting') return null
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        right: '15%',
+        top: '25vh',
+        transform: 'scale(0.6)',
+        transformOrigin: 'center top',
+        zIndex: 5,
+        pointerEvents: 'none',
+      }}
+    >
+      {/* PHASE 1: METEOR FALLING - diagonal, starts small and grows */}
+      {phase === 'meteor' && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '-50px',
+            top: '-200px',
+            animation: `${chaos.golemMeteorFall} 1.5s ease-in forwards`,
+          }}
+        >
+          {/* Meteor core - scales up during animation */}
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosFelMid} 85%, var(--realm-stone8c) 100%)`,
+            boxShadow: `0 0 35px ${REALM.chaosFelBright}, 0 0 70px ${REALM.chaosFireMid}`,
+            transformOrigin: '0 0',
+            animation: `${chaos.meteorGrow} 1.5s ease-in forwards`,
+          }} />
+          {/* Meteor trail - diagonal, grows with meteor */}
+          <div style={{
+            position: 'absolute',
+            top: '-160px',
+            left: '0px',
+            width: '14px',
+            height: '120px',
+            background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}40 30%, ${REALM.chaosFelMid}70 60%, ${REALM.chaosFelBright}95 85%, ${REALM.chaosFireCore} 100%)`,
+            filter: 'blur(5px)',
+            transformOrigin: 'bottom center',
+            animation: `${chaos.meteorTrailGrow} 1.5s ease-in forwards`,
+          }} />
+        </div>
+      )}
 
+      {/* PHASE 2: EXPLOSION */}
+      {(phase === 'explosion' || phase === 'assembling' || phase === 'final') && (
+        <>
+          {/* Explosion flash - only during explosion phase */}
+          {phase === 'explosion' && (
+            <div style={{
+              position: 'absolute',
+              left: '80px',
+              top: '200px',
+              transform: 'translate(-50%, -50%)',
+              width: '250px',
+              height: '250px',
+              background: `radial-gradient(circle, ${REALM.chaosFelBright}90 0%, ${REALM.chaosFelMid}60 30%, ${REALM.chaosFelDark}30 60%, transparent 80%)`,
+              animation: `${chaos.explosionFlash} 0.6s ease-out forwards`,
+            }} />
+          )}
+
+          {/* Crater - appears after explosion */}
+          <svg aria-hidden="true"
+            width="160"
+            height="40"
+            viewBox="0 0 160 40"
+            style={{
+              position: 'absolute',
+              left: '0px',
+              top: '200px',
+              transform: 'translateY(-50%)',
+              zIndex: -1,
+            }}
+          >
+            <ellipse cx="80" cy="20" rx="75" ry="18" fill={REALM.stone2c} />
+            <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out forwards` }} />
+            <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out 0.1s forwards` }} />
+            <ellipse cx="80" cy="20" rx="12" ry="6" fill={REALM.chaosFelDark} opacity="0.4" />
+          </svg>
+
+          {/* Shadow */}
+          <div style={{
+            position: 'absolute',
+            left: '80px',
+            transform: 'translateX(-50%) translateY(-50%)',
+            top: '200px',
+            width: '120px',
+            height: '25px',
+            background: `radial-gradient(ellipse, ${REALM.chaosFelDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
+            borderRadius: '50%',
+          }} />
+        </>
+      )}
+
+      {/* PHASE 3: ROCK ASSEMBLY - stays visible until final golem fades in */}
+      {(phase === 'assembling' || phase === 'explosion' || (phase === 'final' && !assemblyDone)) && (
+        <>
+          {/* Emergence glow */}
+          <div style={{
+            position: 'absolute',
+            left: '80px',
+            top: '200px',
+            transform: 'translateX(-50%) translateY(-50%)',
+            width: '150px',
+            height: '200px',
+            background: `radial-gradient(ellipse at 50% 90%, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}30 30%, transparent 70%)`,
+            animation: `${chaos.emergeGlow} 2.5s ease-out forwards`,
+            pointerEvents: 'none',
+          }} />
+
+          {/* Assembling rocks */}
+          <svg aria-hidden="true"
+            width="160"
+            height="200"
+            viewBox="0 0 160 200"
+            style={{
+              position: 'absolute',
+              left: '-10px',
+              top: '0px',
+              overflow: 'visible',
+              opacity: (phase === 'assembling' || phase === 'final') ? 1 : 0,
+              transition: 'opacity 0.5s ease',
+            }}
+          >
+            {ROCK_PARTS.map((part) => (
+              <g key={part.keyframes} style={{ animation: `${part.keyframes} ${part.timing} forwards`, opacity: part.startHidden ? 0 : undefined }}>
+                {part.outline(part.outlineFill)}
+                {part.detail}
+                <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `${chaos.rockFlash} ${part.timing} both` } as CSSProperties}>
+                  {part.outline(REALM.ash100)}
+                </g>
+              </g>
+            ))}
+          </svg>
+        </>
+      )}
+
+      {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
+      {phase === 'final' && (
+        <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} 1s ease-out forwards` }}>
+          <InfernalGolemSVG id="final" />
+        </div>
+      )}
+    </div>
+  )
+}
+
+export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
   // Rain drops - longer animation cycles = fewer repaints = better performance
   // Reduced particle counts for performance
   const raindrops = useMemo(() =>
@@ -836,23 +1084,7 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
         }} />
 
         {/* === AMBIENT THUNDER FLASH - Localized to specific cloud zones === */}
-        {ambientFlash && (() => {
-          const zone = cloudZones[activeZone] || { x: 50, y: 30, spread: 18 }
-          return (
-            <div style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '100%',
-              background: `
-                radial-gradient(ellipse at ${ambientFlashX}% ${zone.y}%, ${REALM.chaosFelBright}80 0%, ${REALM.chaosFelBright}45 15%, ${REALM.chaosFelMid}25 30%, transparent ${zone.spread + 45}%),
-                radial-gradient(ellipse at ${ambientFlashX + 8}% ${zone.y + 12}%, ${REALM.chaosFelMid}40 0%, transparent 25%)
-              `,
-              transition: 'opacity 0.05s ease-out',
-            }} />
-          )
-        })()}
+        <AmbientFlash />
 
         {/* Cloud underlighting - ambient glow within clouds */}
         <div style={{
@@ -872,213 +1104,10 @@ export const ChaosAtmosphere = memo(function ChaosAtmosphere() {
       </div>
 
       {/* === OCCASIONAL FALLING METEOR - Every 8-15 seconds === */}
-      {fallingMeteor && fallingMeteor.active && (
-        <div
-          key={`meteor-${fallingMeteor.id}`}
-          style={{
-            position: 'absolute',
-            left: `${fallingMeteor.startX}%`,
-            top: '-5%',
-            width: '25px',
-            height: '25px',
-            animation: `${METEOR_RAIN[fallingMeteor.direction]} 4s ease-in forwards`,
-            zIndex: 4,
-            pointerEvents: 'none',
-          }}
-        >
-          {/* Meteor glow */}
-          <div style={{
-            position: 'absolute',
-            width: '70px',
-            height: '70px',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            borderRadius: '50%',
-            background: `radial-gradient(circle, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}35 35%, ${REALM.chaosFelDark}20 60%, transparent 80%)`,
-            filter: 'blur(8px)',
-          }} />
-          {/* Meteor body */}
-          <svg aria-hidden="true" width="25" height="25" viewBox="0 0 30 30" style={{ position: 'relative', zIndex: 2 }}>
-            <defs>
-              <radialGradient id={`meteor${fallingMeteor.id}`} cx="30%" cy="30%">
-                <stop offset="0%" stopColor={REALM.chaosFireCore} />
-                <stop offset="35%" stopColor={REALM.chaosFireBright} />
-                <stop offset="70%" stopColor={REALM.chaosFelMid} />
-                <stop offset="100%" stopColor={REALM.ember10} />
-              </radialGradient>
-            </defs>
-            <path
-              d="M15,2 L22,6 L26,12 L28,18 L24,24 L18,28 L10,26 L4,22 L2,14 L6,8 L12,4 Z"
-              fill={`url(#meteor${fallingMeteor.id})`}
-            />
-            <path d="M10,8 L15,15 L12,22" stroke={REALM.chaosFelBright} strokeWidth="1.5" fill="none" opacity="0.6" />
-            <circle cx="12" cy="12" r="3" fill={REALM.chaosFireCore} opacity="0.7" />
-          </svg>
-          {/* Fire trail */}
-          <div style={{
-            position: 'absolute',
-            top: '-80px',
-            left: '50%',
-            width: '15px',
-            height: '90px',
-            background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}30 15%, ${REALM.chaosFelMid}55 45%, ${REALM.chaosFelBright}80 75%, ${REALM.chaosFireCore} 100%)`,
-            filter: 'blur(5px)',
-            transform: `translateX(-50%) rotate(${fallingMeteor.direction === 'left' ? '25deg' : '-25deg'})`,
-            transformOrigin: 'bottom center',
-          }} />
-        </div>
-      )}
+      <FallingMeteor />
 
       {/* === SINGLE RIGHT-SIDE INFERNAL GOLEM - Full spawn sequence === */}
-      {golemPhase !== 'waiting' && (
-        <div
-          style={{
-            position: 'fixed',
-            right: '15%',
-            top: '25vh',
-            transform: 'scale(0.6)',
-            transformOrigin: 'center top',
-            zIndex: 5,
-            pointerEvents: 'none',
-          }}
-        >
-          {/* PHASE 1: METEOR FALLING - diagonal, starts small and grows */}
-          {golemPhase === 'meteor' && (
-            <div
-              style={{
-                position: 'absolute',
-                left: '-50px',
-                top: '-200px',
-                animation: `${chaos.golemMeteorFall} 1.5s ease-in forwards`,
-              }}
-            >
-              {/* Meteor core - scales up during animation */}
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                background: `radial-gradient(circle at 30% 30%, ${REALM.chaosFireCore} 0%, ${REALM.chaosFireBright} 30%, ${REALM.chaosFireMid} 60%, ${REALM.chaosFelMid} 85%, var(--realm-stone8c) 100%)`,
-                boxShadow: `0 0 35px ${REALM.chaosFelBright}, 0 0 70px ${REALM.chaosFireMid}`,
-                transformOrigin: '0 0',
-                animation: `${chaos.meteorGrow} 1.5s ease-in forwards`,
-              }} />
-              {/* Meteor trail - diagonal, grows with meteor */}
-              <div style={{
-                position: 'absolute',
-                top: '-160px',
-                left: '0px',
-                width: '14px',
-                height: '120px',
-                background: `linear-gradient(180deg, transparent 0%, ${REALM.chaosFelDark}40 30%, ${REALM.chaosFelMid}70 60%, ${REALM.chaosFelBright}95 85%, ${REALM.chaosFireCore} 100%)`,
-                filter: 'blur(5px)',
-                transformOrigin: 'bottom center',
-                animation: `${chaos.meteorTrailGrow} 1.5s ease-in forwards`,
-              }} />
-            </div>
-          )}
-
-          {/* PHASE 2: EXPLOSION */}
-          {(golemPhase === 'explosion' || golemPhase === 'assembling' || golemPhase === 'final') && (
-            <>
-              {/* Explosion flash - only during explosion phase */}
-              {golemPhase === 'explosion' && (
-                <div style={{
-                  position: 'absolute',
-                  left: '80px',
-                  top: '200px',
-                  transform: 'translate(-50%, -50%)',
-                  width: '250px',
-                  height: '250px',
-                  background: `radial-gradient(circle, ${REALM.chaosFelBright}90 0%, ${REALM.chaosFelMid}60 30%, ${REALM.chaosFelDark}30 60%, transparent 80%)`,
-                  animation: `${chaos.explosionFlash} 0.6s ease-out forwards`,
-                }} />
-              )}
-
-              {/* Crater - appears after explosion */}
-              <svg aria-hidden="true"
-                width="160"
-                height="40"
-                viewBox="0 0 160 40"
-                style={{
-                  position: 'absolute',
-                  left: '0px',
-                  top: '200px',
-                  transform: 'translateY(-50%)',
-                  zIndex: -1,
-                }}
-              >
-                <ellipse cx="80" cy="20" rx="75" ry="18" fill={REALM.stone2c} />
-                <path d="M80,20 L100,22 L105,18 L125,23 L130,19 L150,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out forwards` }} />
-                <path d="M80,20 L60,22 L55,18 L35,23 L30,19 L10,24" stroke={REALM.stone3c} strokeWidth="2.5" fill="none" strokeLinecap="round" style={{ strokeDasharray: 200, animation: `${chaos.crackGrow} 0.8s ease-out 0.1s forwards` }} />
-                <ellipse cx="80" cy="20" rx="12" ry="6" fill={REALM.chaosFelDark} opacity="0.4" />
-              </svg>
-
-              {/* Shadow */}
-              <div style={{
-                position: 'absolute',
-                left: '80px',
-                transform: 'translateX(-50%) translateY(-50%)',
-                top: '200px',
-                width: '120px',
-                height: '25px',
-                background: `radial-gradient(ellipse, ${REALM.chaosFelDark}60 0%, rgba(0,0,0,0.5) 50%, transparent 100%)`,
-                borderRadius: '50%',
-              }} />
-            </>
-          )}
-
-          {/* PHASE 3: ROCK ASSEMBLY - stays visible until final golem fades in */}
-          {(golemPhase === 'assembling' || golemPhase === 'explosion' || (golemPhase === 'final' && !hideAssembly)) && (
-            <>
-              {/* Emergence glow */}
-              <div style={{
-                position: 'absolute',
-                left: '80px',
-                top: '200px',
-                transform: 'translateX(-50%) translateY(-50%)',
-                width: '150px',
-                height: '200px',
-                background: `radial-gradient(ellipse at 50% 90%, ${REALM.chaosFelBright}60 0%, ${REALM.chaosFelMid}30 30%, transparent 70%)`,
-                animation: `${chaos.emergeGlow} 2.5s ease-out forwards`,
-                pointerEvents: 'none',
-              }} />
-
-              {/* Assembling rocks */}
-              <svg aria-hidden="true"
-                width="160"
-                height="200"
-                viewBox="0 0 160 200"
-                style={{
-                  position: 'absolute',
-                  left: '-10px',
-                  top: '0px',
-                  overflow: 'visible',
-                  opacity: (golemPhase === 'assembling' || golemPhase === 'final') ? 1 : 0,
-                  transition: 'opacity 0.5s ease',
-                }}
-              >
-                {ROCK_PARTS.map((part) => (
-                  <g key={part.keyframes} style={{ animation: `${part.keyframes} ${part.timing} forwards`, opacity: part.startHidden ? 0 : undefined }}>
-                    {part.outline(part.outlineFill)}
-                    {part.detail}
-                    <g style={{ '--rock-flash': flashOverlayAlpha(part.brightness), animation: `${chaos.rockFlash} ${part.timing} both` } as CSSProperties}>
-                      {part.outline(REALM.ash100)}
-                    </g>
-                  </g>
-                ))}
-              </svg>
-            </>
-          )}
-
-          {/* PHASE 4: FINAL DETAILED GOLEM - only visible in final phase */}
-          {golemPhase === 'final' && (
-            <div style={{ position: 'absolute', left: '-10px', top: '0px', animation: `${chaos.golemFadeIn} 1s ease-out forwards` }}>
-              <InfernalGolemSVG id="final" />
-            </div>
-          )}
-        </div>
-      )}
+      <GolemSpawn />
 
       {/* === WIND STREAKS - Horizontal gusts across battlefield === */}
       {rainWindStreaks.map((streak) => (

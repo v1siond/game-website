@@ -31,6 +31,9 @@ export function projectLinks(project: Pick<Project, 'links'>, links: Labels['lin
   }))
 }
 
+/** A link's text without its scheme: https://www.linkedin.com/in/x/ reads www.linkedin.com/in/x. */
+export const shownUrl = (url: string): string => url.replace(/^https?:\/\//, '').replace(/\/$/, '')
+
 /** The accessible name of a link that opens a new tab: "Lumi (opens in a new tab)". */
 export const newTabName = (links: Labels['links'], name: string): string => fillLabel(links.newTab, { name })
 

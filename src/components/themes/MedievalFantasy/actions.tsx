@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useRef, useState, type AnchorHTMLAttributes, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type AnchorHTMLAttributes, type CSSProperties, type FocusEvent, type KeyboardEvent, type ReactNode } from 'react'
 import Link from 'next/link'
 import { locales, type Locale } from '@/i18n/config'
 import { useLabels } from '@/components/cv/CVDataProvider'
 import type { LocaleSwitchState } from '@/components/cv/LanguageSwitcher'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { REALM } from './palette'
+import { REALM, REALM_FACE } from './palette'
+import menu from './actions.module.css'
 
 // The world's buttons: the bevelled metal button, the language dropdown drawn for the shared
 // LanguageSwitcher, and the hero's contact actions as buttons.
@@ -17,7 +18,7 @@ type RealmButtonVariant = 'default' | 'primary'
 // with void ink. Both are built once, so a button's style keeps its identity across renders.
 const BUTTON_FRAME: CSSProperties = {
   boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
-  fontFamily: '"Cinzel", Georgia, serif',
+  fontFamily: REALM_FACE,
   fontSize: '1.125rem',
   fontWeight: 600,
   textTransform: 'uppercase',
@@ -65,6 +66,9 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
   const { languages } = useLabels()
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  const listId = useId()
+  const code = currentLocale.toUpperCase()
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -81,18 +85,37 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
     changeLocale(newLocale)
   }
 
+  // Escape closes the open menu and hands focus back to its button.
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Escape' || !isOpen) return
+    setIsOpen(false)
+    buttonRef.current?.focus()
+  }
+
+  // Focus moving past the menu closes it. A blur with no next target (a click on a button that takes no focus,
+  // as in Safari) is left to the outside click handler, so the click on a language still lands.
+  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
+    const next = event.relatedTarget
+    if (!next || event.currentTarget.contains(next)) return
+    setIsOpen(false)
+  }
+
   return (
-    <div ref={dropdownRef} style={{ position: 'relative' }}>
+    <div ref={dropdownRef} style={{ position: 'relative' }} onKeyDown={handleKeyDown} onBlur={handleBlur}>
       <button
+        ref={buttonRef}
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         disabled={isPending}
-        aria-label={languages[currentLocale]}
+        aria-label={`${code}, ${languages[currentLocale]}`}
+        aria-expanded={isOpen}
+        aria-controls={isOpen ? listId : undefined}
         style={{
           background: `linear-gradient(180deg, ${REALM.metalMid} 0%, ${REALM.metalDark} 100%)`,
           border: `2px solid ${REALM.metalDark}`,
           boxShadow: `inset 1px 1px 2px ${REALM.metalLight}, inset -1px -1px 2px ${REALM.metalDark}, 0 2px 4px rgba(0,0,0,0.4)`,
           color: REALM.textBright,
-          fontFamily: '"Cinzel", Georgia, serif',
+          fontFamily: REALM_FACE,
           fontSize: '0.875rem',
           fontWeight: 600,
           textTransform: 'uppercase',
@@ -107,12 +130,12 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
         }}
       >
         <span aria-hidden="true" style={{ fontSize: '0.875rem' }}>🌐</span>
-        <span>{currentLocale.toUpperCase()}</span>
+        <span>{code}</span>
         <span aria-hidden="true" style={{ fontSize: '0.875rem', marginLeft: '0.125rem' }}>▼</span>
       </button>
 
       {isOpen && (
-        <div style={{
+        <div id={listId} style={{
           position: 'absolute',
           top: '100%',
           right: 0,
@@ -126,34 +149,23 @@ export function RealmLanguageMenu({ currentLocale, isPending, changeLocale }: Lo
           {locales.map((locale) => (
             <button
               key={locale}
+              type="button"
+              className={menu.item}
+              aria-current={currentLocale === locale ? 'true' : undefined}
               onClick={() => handleLocaleChange(locale)}
               style={{
                 width: '100%',
                 padding: '0.5rem 0.75rem',
                 minHeight: '44px',
-                background: currentLocale === locale ? `${REALM.chaosFelDark}40` : 'transparent',
                 border: 'none',
                 borderBottom: locale !== locales[locales.length - 1] ? `1px solid ${REALM.metalDark}50` : 'none',
-                color: currentLocale === locale ? REALM.chaosFelBright : REALM.textMid,
-                fontFamily: '"Cinzel", Georgia, serif',
+                fontFamily: REALM_FACE,
                 fontSize: '0.875rem',
                 textAlign: 'left',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-              }}
-              onMouseEnter={(e) => {
-                if (currentLocale !== locale) {
-                  e.currentTarget.style.background = `${REALM.metalMid}30`
-                  e.currentTarget.style.color = REALM.textBright
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (currentLocale !== locale) {
-                  e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.color = REALM.textMid
-                }
               }}
             >
               <span>{languages[locale]}</span>

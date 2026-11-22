@@ -203,7 +203,7 @@ medal in Art Deco, whose cord columns stay three.
 |-------|------|--------------|
 | ScrollScene, FadeInScene | `src/components/scroll/ScrollScene.tsx` | A section whose scene follows scroll: writes `--scene-progress` (0 to 1) so children animate with classes, no React re-render. FadeInScene is the plain fade block between levels. |
 | HERO_IDENTITY | `src/lib/cv/heroIdentity.ts` | The only shared part of his character: skin, short dark hair, full dark beard, oval eyes. Each world maps these into its own palette. |
-| sectionText | `src/lib/cv/sectionText.ts` | Shared text: project links, year spans, job years, `jobSpan` ("2019 to 2022") and `jobSpanCompact` ("2019 - 2022"), Muay Thai facts, heading ids. |
+| sectionText | `src/lib/cv/sectionText.ts` | Shared text: project links, year spans, job years, `jobSpan` ("2019 to 2022") and `jobSpanCompact` ("2019 - 2022"), a link's address as it reads (`shownUrl`, no scheme or trailing slash), Muay Thai facts, heading ids. |
 | jobCard, projectCard, ventureCard, aboutBlock | `src/lib/cv/cvView.ts` | The card view models: every field of a job, project, venture or the About block whole, with its strings formatted, so each world renders the same content in its own look. |
 | VentureList | `src/components/cv/VentureList.tsx` | The ventures without a look, in `viewFor`'s order, each with its link props and accessible names. |
 | TechList | `src/components/cv/TechList.tsx` | The tech stack without a look: one masonry item per category with its heading, icon and named list; the world passes its classes and draws each technology with `renderItem`. |
