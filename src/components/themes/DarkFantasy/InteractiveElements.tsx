@@ -278,18 +278,19 @@ interface Particle {
   life: number
 }
 
+// One fade tick: every particle loses life and drifts up a pixel, and the spent ones go.
+const fadeStep = (particles: Particle[]): Particle[] =>
+  particles.map((p) => ({ ...p, life: p.life - 0.05, y: p.y - 1 })).filter((p) => p.life > 0)
+
 export const CursorTrail = memo(function CursorTrail() {
   const [particles, setParticles] = useState<Particle[]>([])
   const isVisible = useMediaQuery(WIDER_THAN_MOBILE)
-  const mouseRef = useRef({ x: 0, y: 0 })
   const lastEmitRef = useRef(0)
   const particleIdRef = useRef(0)
 
   // Create particles on mouse move
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY }
-
       const now = Date.now()
       if (now - lastEmitRef.current > 50) { // Emit every 50ms
         lastEmitRef.current = now
@@ -312,18 +313,13 @@ export const CursorTrail = memo(function CursorTrail() {
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
 
-  // Animate particles (fade out)
+  // Fade the particles out, ticking only while any is alive: with the pointer still the trail renders nothing.
+  const alive = particles.length > 0
   useEffect(() => {
-    const interval = setInterval(() => {
-      setParticles(prev =>
-        prev
-          .map(p => ({ ...p, life: p.life - 0.05, y: p.y - 1 }))
-          .filter(p => p.life > 0)
-      )
-    }, 30)
-
+    if (!alive) return
+    const interval = setInterval(() => setParticles(fadeStep), 30)
     return () => clearInterval(interval)
-  }, [])
+  }, [alive])
 
   if (!isVisible) return null
 

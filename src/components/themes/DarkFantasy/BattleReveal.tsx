@@ -93,11 +93,11 @@ export const BattleReveal = memo(function BattleReveal({
   // section, so the battle never mixes into it; -12% bottom shows them a touch sooner on entry.
   const { ref: stageRef, inView } = useSectionTrigger({ ...COMBAT_IN_VIEW, rootMargin: '-48% 0px -12% 0px' })
 
-  // Continuous animation loop for leg/antenna movement
+  const isBugDead = ['bug-death', 'bug-fall', 'content-drop', 'complete'].includes(phase)
+
+  // The living bug's legs and antennae, one step a frame; the loop ends with the bug, the only reader.
   useEffect(() => {
-    if (phase === 'idle' || phase === 'complete') {
-      return
-    }
+    if (phase === 'idle' || isBugDead) return
 
     const animate = (currentTime: number) => {
       if (!lastTimeRef.current) lastTimeRef.current = currentTime
@@ -116,7 +116,7 @@ export const BattleReveal = memo(function BattleReveal({
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current)
     }
-  }, [phase])
+  }, [phase, isBugDead])
 
   // Trigger animation sequence
   useEffect(() => {
@@ -368,7 +368,6 @@ export const BattleReveal = memo(function BattleReveal({
   const showKnight = phase !== 'idle'
   const showBug = phase !== 'idle'
   const showContent = phase === 'content-drop' || phase === 'complete'
-  const isBugDead = ['bug-death', 'bug-fall', 'content-drop', 'complete'].includes(phase)
   const isAttacking = phase === 'slash' || phase === 'knight-dash'
 
   return (

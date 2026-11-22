@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, memo, ReactNode, useRef, type CSSProperties } from 'react'
+import { useMediaQuery } from '@/hooks/useMediaQuery'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { FixedCombatLayer, COMBAT_GROUND, COMBAT_IN_VIEW, COMBAT_PHONE_SCALE, COMBAT_Z, moveAndFade } from './fixedCombat'
 import { FRAME_INSET_REM, KnightCharacter } from './KnightCharacter'
@@ -94,6 +95,8 @@ const PULL_STAGE = { '--frame-inset': `${FRAME_INSET_REM}rem`, minHeight: '280px
 const PHONE_FIGHT_HEIGHT_PX = (PULL_BUG_SIZE * BUG_ASPECT + BUG_HOVER.high) * COMBAT_PHONE_SCALE
 const PHONE_FIGHT = { '--phone-scale': COMBAT_PHONE_SCALE, '--ground': '0px' } as CSSProperties
 const SHADOW_TIMING = '400ms ease-out'
+// Tailwind's lg breakpoint, where the fight moves from the page to the pinned layer.
+const LG_UP = '(min-width: 1024px)'
 
 export const BugPullReveal = memo(function BugPullReveal({
   children,
@@ -105,6 +108,7 @@ export const BugPullReveal = memo(function BugPullReveal({
   const hasAnimated = useRef(false)
   // continuous in-view so the fixed Alex/bug fade out once we scroll past the section
   const { ref: stageRef, inView } = useSectionTrigger(COMBAT_IN_VIEW)
+  const isDesktop = useMediaQuery(LG_UP)
 
   useEffect(() => {
     if (phase === 'idle' || phase === 'complete') return
@@ -258,8 +262,10 @@ export const BugPullReveal = memo(function BugPullReveal({
   return (
     <div ref={stageRef} className={`relative w-full ${PULL_STAGE_CLASS} ${className}`} style={PULL_STAGE}>
       {/* Below lg: the fight in the page, standing on the panel frame's top line (PULL_STAGE); COMBAT_Z.fighters
-          keeps it over the fixed backdrop and vignette and under the panel, as the pinned fighters are from lg */}
-      {fighting && (
+          keeps it over the fixed backdrop and vignette and under the panel, as the pinned fighters are from lg.
+          Only the copy for the screen's width mounts, so the per frame leg steps render one bug; each copy keeps
+          its lg class, so a render that reads the server's answer to the query still hides the wrong one. */}
+      {fighting && !isDesktop && (
         <div
           className={`pointer-events-none relative ${COMBAT_Z.fighters} -mb-[calc(var(--panel-top)_+_var(--frame-inset))] overflow-x-clip lg:hidden`}
           style={{ height: PHONE_FIGHT_HEIGHT_PX }}
@@ -272,7 +278,7 @@ export const BugPullReveal = memo(function BugPullReveal({
       )}
 
       {/* From lg: Alex (knight) + bug pinned to the viewport bottom; only the content scrolls */}
-      {fighting && (
+      {fighting && isDesktop && (
         <FixedCombatLayer inView={inView}>
           <div className="max-lg:hidden">{fighters}</div>
         </FixedCombatLayer>
