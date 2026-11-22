@@ -3,7 +3,7 @@ import { beatAt, beatsOf, marksUpTo, reached, type Bout } from './bout'
 const CAR: Bout = {
   lead: [{ hero: 'walk' }],
   item: { hero: 'punch', mark: 'hit' },
-  close: [{ hero: 'shoryuken', mark: 'wreck' }, { hero: 'win' }],
+  close: [{ hero: 'uppercut', mark: 'wreck' }, { hero: 'win' }],
 }
 
 describe('a bout between him and his partner', () => {

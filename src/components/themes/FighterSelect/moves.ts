@@ -29,9 +29,9 @@ const MOTION: Record<Exclude<FighterPose, 'act'>, Motion> = {
   stance: { mode: 'pingpong', cycleMs: 480, key: 0, runs: 6 },
   walk: { mode: 'forward', cycleMs: 600, key: 1, runs: 1 },
   walkBack: { mode: 'backward', cycleMs: 600, key: 1, runs: 1 },
-  hadouken: { mode: 'forward', cycleMs: 1000, key: 2, runs: 1, ball: 'ki' },
-  shoryuken: { mode: 'forward', cycleMs: 760, key: 2, runs: 1 },
-  tatsumaki: { mode: 'forward', cycleMs: 360, key: 0, runs: 3 },
+  fireball: { mode: 'forward', cycleMs: 1000, key: 2, runs: 1, ball: 'ki' },
+  uppercut: { mode: 'forward', cycleMs: 760, key: 2, runs: 1 },
+  spinKick: { mode: 'forward', cycleMs: 360, key: 0, runs: 3 },
   win: { mode: 'forward', cycleMs: 520, key: 0, runs: 2 },
   punch: { mode: 'forward', cycleMs: 420, key: 1, runs: 1 },
   hurt: { mode: 'forward', cycleMs: 480, key: 0, runs: 1 },
@@ -57,7 +57,7 @@ export const WIN_MS = MOTION.win.cycleMs * MOTION.win.runs
 
 export const motionFor = (pose: FighterPose, profession: Profession): Motion => (pose === 'act' ? ACT_MOTION[profession] : MOTION[pose])
 
-export const SPECIALS = ['hadouken', 'shoryuken', 'tatsumaki'] as const
+export const SPECIALS = ['fireball', 'uppercut', 'spinKick'] as const
 export type Special = (typeof SPECIALS)[number]
 
 // How far he may walk from his mark either way, in steps.

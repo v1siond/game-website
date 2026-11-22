@@ -155,7 +155,7 @@ const posesOf = (beats: readonly Beat[], who: 'hero' | 'partner'): FighterPose[]
 /** About, the bonus stage: he walks up to the car, a punch per highlight dents it, the uppercut wrecks it. */
 const about: SceneSpec = {
   zone: 'castle',
-  bout: { lead: [{ hero: 'walk' }], item: { hero: 'punch', mark: 'hit' }, close: [{ hero: 'shoryuken', mark: 'wreck' }, { hero: 'win' }] },
+  bout: { lead: [{ hero: 'walk' }], item: { hero: 'punch', mark: 'hit' }, close: [{ hero: 'uppercut', mark: 'wreck' }, { hero: 'win' }] },
   heroX: ({ index, t }) => HERO_X + (index === 0 ? t : 1) * HERO_STEP,
   props: (_xs, labels) => (
     <>
@@ -201,7 +201,7 @@ const TARGETS = { from: 1260, to: 1480 }
 /** The Tech Stack: a ki blast per category, each lighting its target. */
 const tech: SceneSpec = {
   zone: 'market',
-  bout: { lead: [{ hero: 'stance' }], item: { hero: 'hadouken', mark: 'light' }, close: [{ hero: 'win' }] },
+  bout: { lead: [{ hero: 'stance' }], item: { hero: 'fireball', mark: 'light' }, close: [{ hero: 'win' }] },
   props: (xs) => xs.map((x, i) => <Target key={i} x={x} i={i} />),
   write: (stage, xs) => {
     const lits = xs.map((_, i) => fx(stage, `lit-${i}`))
@@ -212,7 +212,7 @@ const tech: SceneSpec = {
 /** Services: the rising uppercut launches a crate per service. */
 const services: SceneSpec = {
   zone: 'market',
-  bout: { lead: [{ hero: 'walk' }], item: { hero: 'shoryuken', mark: 'hit' }, close: [{ hero: 'win' }] },
+  bout: { lead: [{ hero: 'walk' }], item: { hero: 'uppercut', mark: 'hit' }, close: [{ hero: 'win' }] },
   props: (xs) => xs.map((x, i) => <Crate key={i} x={x} i={i} />),
   write: (stage, xs) => {
     const crates = xs.map((_, i) => fx(stage, `crate-${i}`))
@@ -228,7 +228,7 @@ const services: SceneSpec = {
 /** Projects: the super move; the screen dims to the flash, then a hit per project on the combo counter. */
 const projects: SceneSpec = {
   zone: 'harbour',
-  bout: { lead: [{ hero: 'stance' }, { hero: 'hadouken', mark: 'flash' }], item: { hero: 'tatsumaki', mark: 'hit' }, close: [{ hero: 'win' }] },
+  bout: { lead: [{ hero: 'stance' }, { hero: 'fireball', mark: 'flash' }], item: { hero: 'spinKick', mark: 'hit' }, close: [{ hero: 'win' }] },
   props: (_xs, labels) => (
     <>
       <rect data-fx="flash" width={W} height={H} fill={FS.flash} opacity="0" />
@@ -271,7 +271,7 @@ const ventures: SceneSpec = {
   bout: {
     lead: [{ hero: 'stance', partner: 'walk' }],
     item: { hero: 'parry', partner: 'punch', mark: 'light' },
-    close: [{ hero: 'shoryuken', partner: 'hurt', mark: 'hit' }, { hero: 'win', partner: 'stance' }],
+    close: [{ hero: 'uppercut', partner: 'hurt', mark: 'hit' }, { hero: 'win', partner: 'stance' }],
   },
 }
 
