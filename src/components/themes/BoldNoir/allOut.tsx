@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from 'react'
 import type { ProjectSlot } from '@/components/cv/ProjectList'
 import { prefersReducedMotion } from '@/hooks/useReducedMotion'
+import { useModalDialog } from '@/hooks/useModalDialog'
 import { PROFESSION_ORDER } from '@/lib/cv/professions'
 import { LOOK, NOIR_BUTTON } from './actions'
 import { GlassStar, HitStar } from './backdrop'
@@ -198,20 +199,8 @@ interface AllOutProps {
  * project's finish card. Each open mounts the rush (or, under reduced motion, the finish) fresh.
  */
 function AllOutAttack({ slot, phase, trigger, onPhase }: AllOutProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
-  const open = phase !== 'closed'
-
-  useEffect(() => {
-    if (!open) return
-    const dialog = dialogRef.current
-    const opener = trigger.current
-    dialog?.showModal()
-    return () => {
-      dialog?.close()
-      opener?.focus()
-    }
-  }, [open, trigger])
+  const dialogRef = useModalDialog(phase !== 'closed', trigger)
 
   useEffect(() => {
     if (phase !== 'rush') return
