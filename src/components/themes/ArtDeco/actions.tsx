@@ -1,7 +1,6 @@
-import Link from 'next/link'
 import type { HeroActionSlot } from '@/components/cv/RecruiterHero'
-import { useLabels } from '@/components/cv/CVDataProvider'
-import { ENGINE_LINK } from '@/lib/engineLink'
+import { ContactLink, useSiteLinks, type ContactLinkId } from '@/components/cv/SiteLinks'
+import type { SiteLinkId } from '@/lib/cv/siteLinks'
 
 // The world's buttons: email is the gold primary action, everything else the gold outline.
 
@@ -11,33 +10,21 @@ const DECO_BUTTON =
 export const GOLD_OUTLINE = `${DECO_BUTTON} border-2 border-[color:var(--deco-gold)] text-[color:var(--deco-gold-text)]`
 const GOLD_FILL = `${DECO_BUTTON} border-2 border-[color:var(--deco-gold-bright)] bg-[color:var(--deco-gold)] text-[color:var(--deco-deep-sea)]`
 
-const HERO_ACTION_LOOK: Record<HeroActionSlot['id'], string> = {
+const CONTACT_LOOK: Record<ContactLinkId, string> = {
   email: GOLD_FILL,
   linkedin: GOLD_OUTLINE,
+  cv: GOLD_OUTLINE,
+  engine: GOLD_OUTLINE,
 }
 
-export function HeroAction({ action }: { action: HeroActionSlot }) {
+/** The hero's actions, then the site links named in `sites` (the engine one reads "Portfolio"). */
+export function DecoLinks({ actions, sites }: { actions: readonly HeroActionSlot[]; sites: readonly SiteLinkId[] }) {
+  const siteLinks = useSiteLinks('portfolio')
   return (
-    <a {...action.linkProps} className={HERO_ACTION_LOOK[action.id]}>
-      {action.label}
-    </a>
-  )
-}
-
-export function CVLink() {
-  const { actions } = useLabels()
-  return (
-    <Link href="/cv" className={GOLD_OUTLINE}>
-      {actions.cv}
-    </Link>
-  )
-}
-
-export function PortfolioLink() {
-  const { actions } = useLabels()
-  return (
-    <Link {...ENGINE_LINK} className={GOLD_OUTLINE}>
-      {actions.portfolio}
-    </Link>
+    <>
+      {[...actions, ...sites.map((id) => siteLinks[id])].map((slot) => (
+        <ContactLink key={slot.id} slot={slot} className={CONTACT_LOOK[slot.id]} />
+      ))}
+    </>
   )
 }

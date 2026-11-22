@@ -5,7 +5,7 @@ import { RecruiterHero } from '@/components/cv/RecruiterHero'
 import { headingId } from '@/lib/cv/sectionText'
 import { usePoseSequence } from '@/hooks/usePoseSequence'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
-import { CVLink, HeroAction } from './actions'
+import { DecoLinks } from './actions'
 import { SurvivorSprite, type DecoMotion } from './sprite'
 import { DECO_COLORS as C } from './palette'
 import vita from './vita.module.css'
@@ -74,10 +74,7 @@ export function VitaChamber() {
             </h2>
             <p className="mt-4 text-base text-[color:var(--deco-cream)]">{line}</p>
             <nav className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap" aria-label={sections.contact}>
-              {actions.map((action) => (
-                <HeroAction key={action.id} action={action} />
-              ))}
-              <CVLink />
+              <DecoLinks actions={actions} sites={['cv']} />
             </nav>
           </div>
         )}

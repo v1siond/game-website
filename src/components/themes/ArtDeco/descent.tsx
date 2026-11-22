@@ -6,7 +6,7 @@ import { useLabels } from '@/components/cv/CVDataProvider'
 import { useSectionTrigger } from '@/hooks/useSectionTrigger'
 import { useScrollScene } from '@/hooks/useScrollScene'
 import { NameWords } from '@/components/cv/NameWords'
-import { CVLink, HeroAction, PortfolioLink } from './actions'
+import { DecoLinks } from './actions'
 import { DepthGauge } from './plaque'
 import { DECO_COLORS as C } from './palette'
 import descent from './descent.module.css'
@@ -285,11 +285,7 @@ export function BathysphereHero() {
               <p className="mt-2 text-base italic text-[color:var(--deco-gold-text)]">{tagline}</p>
               <p className="mt-2 text-base text-[color:var(--deco-mist)]">{line}</p>
               <nav className="mt-7 flex flex-wrap items-center justify-center gap-3 md:justify-start" aria-label={navigation.contactAndCv}>
-                {actions.map((action) => (
-                  <HeroAction key={action.id} action={action} />
-                ))}
-                <CVLink />
-                <PortfolioLink />
+                <DecoLinks actions={actions} sites={['cv', 'engine']} />
               </nav>
             </div>
           </div>
